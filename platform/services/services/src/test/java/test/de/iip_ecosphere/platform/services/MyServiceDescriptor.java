@@ -27,9 +27,9 @@ import de.iip_ecosphere.platform.support.iip_aas.Version;
 class MyServiceDescriptor extends AbstractServiceDescriptor<MyArtifactDescriptor> {
 
     private MyServiceDescriptor ensembleLeader;
-    
+
     /**
-     * Creates an instance. Call {@link #setClassification(
+     * Creates an instance with empty application id. Call {@link #setClassification(
      *     de.iip_ecosphere.platform.services.environment.ServiceKind, boolean, boolean)} afterwards.
      * 
      * @param id the service id
@@ -38,7 +38,21 @@ class MyServiceDescriptor extends AbstractServiceDescriptor<MyArtifactDescriptor
      * @param version the version
      */
     protected MyServiceDescriptor(String id, String name, String description, Version version) {
-        super(id, name, description, version);
+        this(id, "", name, description, version);
+    }
+    
+    /**
+     * Creates an instance. Call {@link #setClassification(
+     *     de.iip_ecosphere.platform.services.environment.ServiceKind, boolean, boolean)} afterwards.
+     * 
+     * @param id the service id
+     * @param appId the application id, may be empty
+     * @param name the name of this service
+     * @param description the description of the service
+     * @param version the version
+     */
+    protected MyServiceDescriptor(String id, String appId, String name, String description, Version version) {
+        super(id, appId, name, description, version);
     }
     
     @Override

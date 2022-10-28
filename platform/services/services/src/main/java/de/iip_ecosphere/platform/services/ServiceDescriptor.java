@@ -19,6 +19,7 @@ import java.util.concurrent.ExecutionException;
 import de.iip_ecosphere.platform.services.environment.Service;
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
+import de.iip_ecosphere.platform.services.environment.switching.ServiceBase;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.iip_aas.Version;
 
@@ -34,9 +35,35 @@ public interface ServiceDescriptor {
     /**
      * Returns the unique id of the service.
      * 
-     * @return the unique id
+     * @return the id (may contain the {@link #getApplicationId() application id} if specified)
      */
     public String getId();
+
+    /**
+     * Returns the application id this service is assigned to.
+     * 
+     * @return the application id
+     */
+    public String getApplicationId();
+
+    /**
+     * Returns the service id of the service, i.e. {@link #getId()} without {@link #getApplicationInstanceId()}.
+     * 
+     * @return the id
+     */
+    public default String getServiceId() {
+        return ServiceBase.getServiceId(getId());
+    }
+
+    /**
+     * Returns the application instance id this service is running within. Usually, the 
+     * {@link #getApplicationId() application id} shall be a prefix of this id.
+     * 
+     * @return the application instance id (may be empty for the default application instance)
+     */
+    public default String getApplicationInstanceId() {
+        return ServiceBase.getApplicationId(getId());
+    }
     
     /**
      * The name of the service.

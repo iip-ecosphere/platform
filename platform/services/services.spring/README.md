@@ -2,7 +2,7 @@
 
 Alternative service management implementation for services running with [Spring Cloud Stream](https://spring.io/projects/spring-cloud-stream). Services are given as JAR file. A JAR file may contain multiple services as well as network-coupled service implementations in other programming languages. The services are defined as usual in Spring Clout Stream as Java Bean methods returning Supplier, Function or Consumer. The linking between the services and their binding properties are defined in an `application.yml`. 
 
-## Artifact Deployment Descriptor
+## Service Artifact Deployment Descriptor
 
 In addition, service deployment properties are given in a separate descriptor, the `deployment.yml` with the following structure. Unless stated explicitly, fields are mandatory.
 * `artifact` characterizes the artifact itself as well as global definitions of elements within the artifact: 
@@ -11,7 +11,7 @@ In addition, service deployment properties are given in a separate descriptor, t
     * An artifact definition enumerates the contained `services` (see below).
     * An artifact may declare `types`, i.e., types used by the services for passing data. Java types (in particular primitives, `String` without qualification) and types known to the platform must not be declared and can be referenced by their qualified name. Service specific types must be declared, in particular as record/class like structures with their declared qualified `name` and their contained fields, each consisting of a `name` and a `type`.
 * `services` consisting of individual service entries, each with: 
-    * Unique identifier `id`, `name`, `version` (numbers separated by dots) and an optional `description` of the service (default is empty). 
+    * Unique identifier `id` (may include application id/application instance id postfixed after @), `applicationId` the id of the application this service is part of (may be empty for legacy/the "default" application), `name`, `version` (numbers separated by dots) and an optional `description` of the service (default is empty). 
     * Optional specification whether the service is `deployable` in distributed manner (default is `true`).
     Optional specification whether the service is `topLevel` or nested, e.g., family member (default is `true`).
     * The Service `kind` (see `de.iip_ecosphere.platform.services.ServiceKind`). 
@@ -36,7 +36,7 @@ In addition, service deployment properties are given in a separate descriptor, t
       * The Boolean property `started` indicates whether the underlying process is already started (default is `false`), e.g., in case of a database.
       *  `waitTime` defines a time to wait until the process is supposed to be ready before continuing service start activities (default `0`, positive values denote milliseconds to wait).
 
-The schematic descriptor structure looks as given below (lists are indicates by a single element):
+The descriptor structure looks as given below (lists are indicates by a single element):
 
     id: <String>
     name: <String>
@@ -48,6 +48,7 @@ The schematic descriptor structure looks as given below (lists are indicates by 
           -type: <QString>
     services:
       - id: <String>
+        applicationId: <String>
         name: <String>
         version: <VersionString>
         description: <String>

@@ -38,6 +38,20 @@ public interface Service {
      * @return the name
      */
     public String getId();
+    
+    /**
+     * Returns the application id this service is assigned to.
+     * 
+     * @return the application id
+     */
+    public String getApplicationId();
+
+    /**
+     * Returns the application instance id this service is running within.
+     * 
+     * @return the application instance id (may be empty for the default application instance)
+     */
+    public String getApplicationInstanceId();
 
     /**
      * Returns the name of the service.

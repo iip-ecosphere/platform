@@ -90,6 +90,7 @@ public class ServicesAas implements AasContributor {
     public static final String NAME_SUBCOLL_INPUT_DATA_CONN = "inputDataConnectors";
     public static final String NAME_SUBCOLL_OUTPUT_DATA_CONN = "outputDataConnectors";
     public static final String NAME_PROP_ID = "id";
+    public static final String NAME_PROP_APPLICATION_ID = "applicationId";
     public static final String NAME_PROP_NAME = "name";
     public static final String NAME_PROP_STATE = "state";
     public static final String NAME_PROP_KIND = "kind";
@@ -378,6 +379,9 @@ public class ServicesAas implements AasContributor {
             = serviceBuilder.createSubmodelElementCollectionBuilder(fixId(desc.getId()), false, false);
         descriptorBuilder.createPropertyBuilder(NAME_PROP_ID)
             .setValue(Type.STRING, desc.getId())
+            .build();
+        descriptorBuilder.createPropertyBuilder(NAME_PROP_APPLICATION_ID)
+            .setValue(Type.STRING, desc.getApplicationId())
             .build();
         if (null != desc.getArtifact()) { // defensive
             descriptorBuilder.createPropertyBuilder(NAME_PROP_ARTIFACT)

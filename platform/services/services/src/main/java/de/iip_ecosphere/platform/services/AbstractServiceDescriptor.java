@@ -42,6 +42,7 @@ import de.iip_ecosphere.platform.support.iip_aas.Version;
 public abstract class AbstractServiceDescriptor<A extends ArtifactDescriptor> implements ServiceDescriptor {
     
     private String id;
+    private String applicationId;
     private String name;
     private String description;
     private Version version;
@@ -59,12 +60,15 @@ public abstract class AbstractServiceDescriptor<A extends ArtifactDescriptor> im
      * Creates an instance. Call {@link #setClassification(ServiceKind, boolean, boolean)} afterwards.
      * 
      * @param id the service id
+     * @param applicationId the application id, may be empty for default application/legacy
      * @param name the name of this service
      * @param description the description of the service
      * @param version the version
      */
-    protected AbstractServiceDescriptor(String id, String name, String description, Version version) {
+    protected AbstractServiceDescriptor(String id, String applicationId, String name, String description, 
+        Version version) {
         this.id = id;
+        this.applicationId = applicationId;
         this.name = name;
         this.description = description;
         this.version = version;
@@ -114,6 +118,11 @@ public abstract class AbstractServiceDescriptor<A extends ArtifactDescriptor> im
     @Override
     public String getId() {
         return id; // no stub here, we shall have consistent information
+    }
+    
+    @Override
+    public String getApplicationId() {
+        return applicationId; // no stub here, we shall have consistent information
     }
 
     @Override

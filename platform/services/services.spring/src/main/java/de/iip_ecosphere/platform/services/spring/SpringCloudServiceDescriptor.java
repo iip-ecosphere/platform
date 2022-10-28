@@ -74,7 +74,8 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
      * @see #setClassification(de.iip_ecosphere.platform.services.environment.ServiceKind, boolean, boolean)
      */
     public SpringCloudServiceDescriptor(Service service, TypeResolver resolver) {
-        super(service.getId(), service.getName(), service.getDescription(), service.getVersion());
+        super(service.getId(), service.getApplicationId(), service.getName(), service.getDescription(), 
+            service.getVersion());
         setClassification(service.getKind(), service.isDeployable(), service.isTopLevel());
         this.service = service;
         
