@@ -33,18 +33,24 @@ The configuration model is written in the languages of EASy-Producer, namely Int
 
 The regression tests are based on IVML models. Some just serve for structural purposes and regression testing within this component. Some are executable and part of the regression tests in [examples](https://github.com/iip-ecosphere/platform/tree/main/platform/examples/examples/README.md). Implementation components stem from [test.configuration.configuration](https://github.com/iip-ecosphere/platform/tree/main/platform/tests/test.configuration.configuration/README.md) with mutual dependencies to this project. For a graphical documentation of the test cases, see [test case slides](https://github.com/iip-ecosphere/platform/tree/main/platform/configuration/configuration/src/test/easy/summary.pdf).
 
-## hint
+## The resources folder
+
+The resources directory contains files that shall be packaged into platform jars or into an application artifact during platform/application instantiation. It is split into
+
+- `devices`: resources for devices such as nameplate information to be packaged with the ECS runtime
+- `platform`: resources for all platform components such as central services, monitoring, ECS runtime, service manager
+- `software`: resources for software services to be packaged into the service artifacts
+- `rtsa`: additional resources for RapidMiner RTSA, e.g., a licensed version replacing our fake RTSA or actual deployments
+
+So far, multiple resources folders may exist. Typically, resources is given and committed with resources that are not IPR protected. In contrast `resources.ipr` is the typical name of a local folder that must not be committed with mirrored files and those replaced that contain IPR content. So far, mirroring is required but replacement of resources.ipr over a basic version in resources would be desirable.
+
+Applications projects containing the configuration model of the application typically do have their own resources folder, usually with subfolders `software` and if required `rtsa`.
+
+## Hint
 
 For running the tests locally, you need a Python 3.9 installed. On Windows, this can easily be obtained from the Microsoft Store.
 
 Some of the test models include the RapidMiner RTSA integration. As RTSA is an IPR-protected commercial production, we cannot package it with its integration and must integrate its artifacts here. For this purpose, the folder `resources` contains resources that shall be packaged during platform/application installation. The RTSA files committed there contain fake RTSA implementation for testing built by the RTSA integration package. However, if you have a real RTSA at hands, create a similar directory called resources.ipr with the actual files and the instantiation will take it up.
-
-## missing
-
-- variability model: resources, resource assignment to ServiceMeshes
-- generation of containers (in progress)
-- AAS-based interface to the configuration, reasoning, instantiation 
-- Connectors: object array types, object list types, enums, full-cycle test
 
 **Hint:** If tests are failing on your side due to a missing Docker installation, you may prevent this by `-Deasy.docker.failOnError=false`.
 
