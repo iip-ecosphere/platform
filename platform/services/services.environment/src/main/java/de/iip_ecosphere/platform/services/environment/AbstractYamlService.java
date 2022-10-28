@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.services.environment;
 
+import de.iip_ecosphere.platform.services.environment.switching.ServiceBase;
 import de.iip_ecosphere.platform.support.iip_aas.Version;
 
 /**
@@ -24,6 +25,7 @@ import de.iip_ecosphere.platform.support.iip_aas.Version;
 public abstract class AbstractYamlService {
 
     private String id;
+    private String applicationId = "";
     private String name;
     private Version version;
     private String description = "";
@@ -32,12 +34,40 @@ public abstract class AbstractYamlService {
     private boolean topLevel = true;
 
     /**
-     * Returns the name of the service.
+     * Returns the unique id of the service.
      * 
-     * @return the name
+     * @return the id (may contain the {@link #getApplicationId() application id} if specified)
      */
     public String getId() {
         return id;
+    }
+    
+    /**
+     * Returns the application id this service is assigned to.
+     * 
+     * @return the application id
+     */
+    public String getApplicationId() {
+        return applicationId;
+    }
+
+    /**
+     * Returns the service id of the service, i.e. {@link #getId()} without {@link #getApplicationInstanceId()}.
+     * 
+     * @return the id
+     */
+    public String getServiceId() {
+        return ServiceBase.getServiceId(id);
+    }
+
+    /**
+     * Returns the application instance id this service is running within. Usually, the 
+     * {@link #getApplicationId() application id} shall be a prefix of this id.
+     * 
+     * @return the application instance id (may be empty for the default application instance)
+     */
+    public String getApplicationInstanceId() {
+        return ServiceBase.getApplicationId(id);
     }
 
     /**
@@ -97,7 +127,7 @@ public abstract class AbstractYamlService {
     /**
      * Defines the id of the service. [required by SnakeYaml]
      * 
-     * @param id the id
+     * @param id the id (may contain the {@link #getApplicationId() application id} if specified)
      */
     public void setId(String id) {
         this.id = id;
@@ -110,6 +140,15 @@ public abstract class AbstractYamlService {
      */
     public void setName(String name) {
         this.name = name;
+    }
+    
+    /**
+     * Defines the application id this service is assigned to. [required by SnakeYaml]
+     * 
+     * @param applicationId the application id
+     */
+    public void setApplicationId(String applicationId) {
+        this.applicationId = applicationId;
     }
 
     /**

@@ -77,7 +77,9 @@ public class InstalledDependenciesSetup extends AbstractSetup {
         if (SystemUtils.IS_OS_WINDOWS) {
             exeSuffix = ".exe";
         }
-        addDefaultEntry(getJavaKey(), new File(SystemUtils.getJavaHome(), "bin/java" + exeSuffix));
+        File javaPath = new File(SystemUtils.getJavaHome(), "bin/java" + exeSuffix);
+        addDefaultEntry(getJavaKey(), javaPath);
+        addDefaultEntry(KEY_PREFIX_JAVA, javaPath);
     }
     
     /**
