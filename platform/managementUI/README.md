@@ -22,3 +22,14 @@ If your version is not recent enough, e.g., not 12:
 
 - install dependencies: change directory to /managementUi and run `npm install` 
 - Angular Projekt build: `ng build --base-href ./` creates a build and stores it in folder `dist`
+
+## Setting up the Management UI
+
+An installed management UI contains a setup JSON file in `assets/config/config.json`, which is created/modified during platform instantiation based on the UI configuration in the configuration model. Currently, an example looks as follows
+
+    {
+        "ip": "http://192.168.0.199:9001",
+        "urn": "urn%3A%3A%3AAAS%3A%3A%3AiipEcosphere%23"
+    }
+    
+whereby the `ip` points to the platform AAS server and the the `urn` denotes the URN of the IIP-Ecosphere platform AAS.
