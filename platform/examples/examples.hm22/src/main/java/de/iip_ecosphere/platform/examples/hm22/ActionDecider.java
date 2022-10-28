@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import static java.util.Comparator.*;
 import java.util.function.Predicate;
@@ -35,9 +36,12 @@ import de.iip_ecosphere.platform.services.environment.ProcessSupport.ScriptOwner
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
 import iip.datatypes.AiResult;
 import iip.datatypes.Command;
+import iip.datatypes.CommandImpl;
 import iip.datatypes.DecisionResult;
 import iip.datatypes.DecisionResultImpl;
 import iip.datatypes.MdzhOutput;
+import iip.datatypes.PlcInput;
+import iip.datatypes.PlcInputImpl;
 import iip.datatypes.PlcOutput;
 import iip.impl.ActionDeciderImpl;
 
@@ -48,7 +52,37 @@ import iip.impl.ActionDeciderImpl;
  */
 public class ActionDecider extends ActionDeciderImpl {
 
-    public static final int OVERALL_TIMEOUT = 120 * 1000;
+    public static final long OVERALL_TIMEOUT = TimeUnit.MINUTES.toMillis(2);
+    
+    protected enum ScanPos {
+        LEFT,
+        RIGHT
+    }
+
+    // between starting to wait / we accept completed
+    protected static final long TIMEDIFF_ROBOT_BUSY_SAFE = TimeUnit.MICROSECONDS.toMillis(700); 
+    protected static final int PLC_ROBOT_SCAN_QR = 1;
+    protected static final int PLC_ROBOT_SCAN_LEFT = 2; // legacy
+    protected static final int PLC_ROBOT_SCAN_RIGHT = 3; // legacy
+    protected static final int PLC_ROBOT_HAPPY = 10; // legacy
+    protected static final int PLC_ROBOT_UNHAPPY = 11; // legacy
+    protected static final int PLC_ROBOT_BASE = 20; // legacy
+    protected static final int PLC_ROBOT_NOP = 0;
+    protected static final int PLC_ROBOT_NEXT_QUIT = -2; // translate, do not send to PLC
+    protected static final int PLC_ROBOT_NEXT_NONE = -1; // do not send to PLC
+    protected static final int PLC_ROBOT_NEXT_HAPPY = 10; // TODO PLC check INDEX
+    protected static final int PLC_ROBOT_NEXT_UNHAPPY = 11; // TODO PLC check INDEX
+    protected static final int PLC_ROBOT_NEXT_BASE = 12; // TODO PLC check INDEX
+    protected static final int PLC_ROBOT_NEXT_ANY = 100;
+    // TODO PLC check OPCUA PC_RequestOperation#
+
+    protected static final int ROS_ROBOT_SCAN_QR = 1;
+    protected static final int ROS_ROBOT_SCAN_LEFT = 2;
+    protected static final int ROS_ROBOT_SCAN_RIGHT = 3;
+    protected static final int ROS_ROBOT_HAPPY = 10;
+    protected static final int ROS_ROBOT_UNHAPPY = 11;
+    protected static final int ROS_ROBOT_BASE = 20;
+
     private static ActionDecider instance;
     
     // getParameterRobotIP() now available after constructor and reconfigure was executed
@@ -68,7 +102,7 @@ public class ActionDecider extends ActionDeciderImpl {
     private long lastStateChange;
     
     private ScriptOwner robotScriptOwner = new ScriptOwner("hm22-robot", "src/main/python/robot", "python-robot.zip");
-
+    
     /**
      * Internal states for longer running operations.
      * 
@@ -77,7 +111,8 @@ public class ActionDecider extends ActionDeciderImpl {
     protected enum State {
         STOP,
         RUNNING, // sub-divided by robot movements, picture taking and result receiving
-        SWITCHING_AI
+        SWITCHING_AI,
+        WAIT_FOR_ROBOT
     }
     
     /**
@@ -346,11 +381,17 @@ public class ActionDecider extends ActionDeciderImpl {
             store(data);
             aiResults.add(data);
             if (aiResults.size() == 1) {
-                robotDoCarScanInPos(1);
-                sendCommand(Commands.SOURCE_TAKE_PICTURE);
+                Command aasQueryCommand = new CommandImpl();
+                aasQueryCommand.setCommand(Commands.QUERY_CAR_AAS.toString());
+                aasQueryCommand.setStringParam(data.getProductId());
+                sendCommand(aasQueryCommand);
+                robotDoCarScanInPos(ScanPos.LEFT, 
+                    () -> setCurrentState(State.WAIT_FOR_ROBOT), 
+                    () -> sendCommand(Commands.SOURCE_TAKE_PICTURE));
             } else if (aiResults.size() == 2) {
-                robotDoCarScanInPos(2);
-                sendCommand(Commands.SOURCE_TAKE_PICTURE);
+                robotDoCarScanInPos(ScanPos.RIGHT, 
+                    () -> setCurrentState(State.WAIT_FOR_ROBOT),
+                    () -> sendCommand(Commands.SOURCE_TAKE_PICTURE));
             } else if (aiResults.size() >= 3) { // actually three, but who knows
                 DecisionResult res = aggregateResults();
                 String prodId = res.getProductId();
@@ -577,6 +618,12 @@ public class ActionDecider extends ActionDeciderImpl {
         } else if (data.getHW_SwitchAi()) {
             handleCommand(Commands.REQUEST_SWITCH_AI, null);
         } // TODO hw request quit? red button?
+        if (State.WAIT_FOR_ROBOT == currentState) {
+            if (!data.getPC_RobotBusyOperating() 
+                && System.currentTimeMillis() - lastStateChange > TIMEDIFF_ROBOT_BUSY_SAFE) { // TODO PLC check
+                setCurrentState(State.RUNNING);
+            }
+        }
     }
 
     @Override
@@ -620,7 +667,7 @@ public class ActionDecider extends ActionDeciderImpl {
             }
             break;
         case REQUEST_QUIT: // 
-            if (currentState == State.RUNNING) {
+            if (currentState == State.RUNNING || currentState == State.WAIT_FOR_ROBOT) {
                 robotConfirmQuit();
                 setCurrentState(State.STOP);
             } else {
@@ -656,9 +703,9 @@ public class ActionDecider extends ActionDeciderImpl {
      */
     public void robotDoQrScan() {
         if (usePlc) {
-            sendRobotCommand(1, false);
+            sendRobotCommand(PLC_ROBOT_SCAN_QR, PLC_ROBOT_NEXT_NONE);
         } else {
-            callRobot(1);
+            callRobot(ROS_ROBOT_SCAN_QR);
         }
     }
     
@@ -666,20 +713,24 @@ public class ActionDecider extends ActionDeciderImpl {
      * Requests the robot to do the car scan in given position. [public for testing]
      * 
      * @param pos the position to drive the robot to (1 or 2 [else])
+     * @param nextPlc the operation to do immediately after sending the command if the PLC is controlling the robot
+     * @param nextRos the operation to do immediately after sending the command if ROS is controlling the robot
      */
-    public void robotDoCarScanInPos(int pos) {
+    public void robotDoCarScanInPos(ScanPos pos, Runnable nextPlc, Runnable nextRos) {
         if (usePlc) {
-            if (pos == 1) {
-                sendRobotCommand(2, false);
+            if (pos == ScanPos.LEFT) {
+                sendRobotCommand(PLC_ROBOT_SCAN_LEFT, PLC_ROBOT_NEXT_ANY); // we have a picture, just do the next
             } else {
-                sendRobotCommand(3, false);
+                sendRobotCommand(PLC_ROBOT_SCAN_RIGHT, PLC_ROBOT_NEXT_ANY); // we have a picture, just do the next
             }
+            nextPlc.run();
         } else {
-            if (pos == 1) {
+            if (pos == ScanPos.LEFT) {
                 callRobot(2);
             } else {
                 callRobot(3);
             }
+            nextRos.run();
         }
     }
 
@@ -688,9 +739,9 @@ public class ActionDecider extends ActionDeciderImpl {
      */
     public void robotDoSignalSuccess() {
         if (usePlc) {
-            sendRobotCommand(4, false);
+            sendRobotCommand(PLC_ROBOT_HAPPY, PLC_ROBOT_NEXT_HAPPY);
         } else {
-            callRobot(10);
+            callRobot(ROS_ROBOT_HAPPY);
         }
     }
 
@@ -699,9 +750,9 @@ public class ActionDecider extends ActionDeciderImpl {
      */
     public void robotDoSignalFailure() {
         if (usePlc) {
-            sendRobotCommand(5, false);
+            sendRobotCommand(PLC_ROBOT_HAPPY, PLC_ROBOT_NEXT_UNHAPPY);
         } else {
-            callRobot(11);
+            callRobot(ROS_ROBOT_UNHAPPY);
         }
     }
     
@@ -710,9 +761,9 @@ public class ActionDecider extends ActionDeciderImpl {
      */
     public void robotGoToBasePostion() {
         if (usePlc) {
-            sendRobotCommand(6, false);
+            sendRobotCommand(PLC_ROBOT_BASE, PLC_ROBOT_NEXT_BASE);
         } else {
-            callRobot(20);
+            callRobot(ROS_ROBOT_BASE);
         }
     }
 
@@ -721,7 +772,7 @@ public class ActionDecider extends ActionDeciderImpl {
      */
     public void robotConfirmQuit() {
         if (usePlc) {
-            sendRobotCommand(0, true);
+            sendRobotCommand(PLC_ROBOT_NOP, PLC_ROBOT_NEXT_QUIT);
         } // as we have no information on that without PLC, no Python action here
     }
     
@@ -738,24 +789,25 @@ public class ActionDecider extends ActionDeciderImpl {
      * Sends a robot command.
      * 
      * @param op the robot operation number as agreed
-     * @param quit whether it shall be a quit
+     * @param next the next command in pre-defined movement chain, ignored if negative
      */
-    protected void sendRobotCommand(int op, boolean quit) {
-        // TODO requires PLC connector input declaration, action decider output declaration
-        /*if (null != plcInputIngestor) {
-            if (readyForRequest()) {
-                PlcInput pi = new PlcInputImpl();
-                if (quit) {
-                    pi.setPC_Quit(true);
-                } else {
-                    pi.setPC_RequestOperation(op);
-                }
-                // ignore the others for now
-                plcInputIngestor.ingest(pi);
+    protected void sendRobotCommand(int op, int next) {
+        if (readyForRequest()) {
+            PlcInput pi = new PlcInputImpl();
+            pi.setPC_StartOperation(false); // just to be sure
+            if (next == PLC_ROBOT_NEXT_QUIT) {
+                pi.setPC_Quit(true);
+            } else if (next > 0) {
+                pi.setPC_Command01(next); // ok, just do the next step
             } else {
-                System.out.println("Cannot send command, PLC not ready");
+                pi.setPC_RequestedOperation(op);
+                pi.setPC_StartOperation(true); // TODO PLC separate?
             }
-        }*/
+            // ignore the others for now
+            ingestPlcInput(pi);
+        } else {
+            System.out.println("Cannot send robot command, PLC not ready");
+        }
     }
 
     /**

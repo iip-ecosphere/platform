@@ -54,9 +54,9 @@ public class ActionDecider extends de.iip_ecosphere.platform.examples.hm22.Actio
     }
 
     @Override
-    protected void sendRobotCommand(int op, boolean quit) {
-        System.out.println("Call robot on PLC " + op + " quit " + quit);
-        super.sendRobotCommand(op, quit);
+    protected void sendRobotCommand(int op, int next) {
+        System.out.println("Call robot on PLC " + op + " next " + next);
+        super.sendRobotCommand(op, next);
     }
     
     @Override

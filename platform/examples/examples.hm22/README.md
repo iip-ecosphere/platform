@@ -31,7 +31,7 @@ For all Maven executions, please ensure that the Maven platformDependencies are 
 
 The project contains an identity store (`src/main/resources/identityStore.yml`) declaring all username/password combinations as identity tokes. This includes now the authentication token for the broker. For packaging reasons, the same file must also be located in (`resources/software`). The build process overwrites that file by `src/main/resources/identityStore.yml`, so please make changes only in `src/main/resources/identityStore.yml`. 
 
-Due to licensing issues, the project contains the IIP-Ecosphere fake version of RTSA. 
+Due to licensing issues, the project contains the IIP-Ecosphere fake version of RTSA. If you want to include that, copy the `resources folder` to `resources.ipr`, add your licensed RTSA/deployment there and call the build commands with `-Diip.resources=resources=%cd%\resources.ipr` on Windows or `-Diip.resources=resources=$PWD/resources.ipr`.
 
 ## Model modes and regression tests
 

@@ -163,24 +163,14 @@ project ExampleHm22Install {
         path = "Objects/PLCnext/Arp.Plc.Eclr",
         fields = {
             Field {
-                // TODO here we require a display name or so "PC_RequestOperation#"
-                name = "PC_RequestOperation",
+                name = "PC_RequestedOperation",
                 type = refBy(IntegerType)
             }, Field {
                 name = "PC_StartOperation",
                 type = refBy(BooleanType)
             }, Field {
-                name = "PC_GoToBasePosition",
-                type = refBy(BooleanType)
-            }, Field {
-                name = "PC_CarScanResultNegative",
-                type = refBy(BooleanType)
-            }, Field {
-                name = "PC_CarScanResultPositive",
-                type = refBy(BooleanType)
-            }, Field {
-                name = "PC_QrCodeDetected",
-                type = refBy(BooleanType)
+                name = "PC_Command01",
+                type = refBy(IntegerType)
             }, Field {
                 name = "PC_Quit",
                 type = refBy(BooleanType)
@@ -356,6 +346,7 @@ project ExampleHm22Install {
         host = opcUaServer,
         port = 4840,
         samplingPeriod = samplingPeriod(500, 5000),
+        cacheMode = CacheMode::EQUALS,
         mock = flowTest, 
         security = {
             keyAlias = "device",
@@ -364,7 +355,7 @@ project ExampleHm22Install {
             hostNameVerification = false   
         },
         
-        input = {{type=refBy(PlcInput)}}, //, forward=false
+        input = {{type=refBy(PlcInput), forward=false}},
         output = {{type=refBy(PlcOutput)}},
         inInterface = refBy(PlcInput),
         outInterface = refBy(PlcOutput),
@@ -380,13 +371,18 @@ project ExampleHm22Install {
         host = carAasServer,
         idShortSpec = "iri:.*car.*",
         port = 9989,
-        samplingPeriod = samplingPeriod(10000, 10000),
+        //samplingPeriod = samplingPeriod(10000, 10000),
         registryHost = carAasServer,
         registryPort = 9989,
         registryPath = "registry",
         mock = flowTest, 
+        inputHandlers = {ConnectorInputHandler{
+            type=refBy(Command), 
+            class="de.iip_ecosphere.platform.examples.hm22.MdzhInputHandler",
+            artifact="de.iip-ecosphere.platform:examples.hm22:" + iipVer
+        }},
         
-        input = {{type=refBy(MdzhInput)}},
+        input = {{type=refBy(MdzhInput)}, {type=refBy(Command), forward=false}},
         output = {{type=refBy(MdzhOutput)}},
         inInterface = refBy(MdzhInput), 
         outInterface = refBy(MdzhOutput),
@@ -513,6 +509,7 @@ project ExampleHm22Install {
         description = "RapidMiner AI",
         ver = "0.1.0",
         deployable = true,
+        includesRtsa = true, // true for IPR experiment, // false else
         input = {{type=refBy(ImageInput)}, {type=refBy(Command), forward=false}},
         output = {{type=refBy(AiResult)}},
         path = "iip_basic/score_v1",
@@ -568,7 +565,7 @@ project ExampleHm22Install {
         artifact = "de.iip-ecosphere.platform:examples.hm22:" + iipVer,
         kind = ServiceKind::TRANSFORMATION_SERVICE,
         input = {{type=refBy(AiResult)}, {type=refBy(PlcOutput)}, {type=refBy(MdzhOutput)}, {type=refBy(Command), forward=false}},
-        output = {{type=refBy(DecisionResult)}, {type=refBy(Command), forward=false}}, //, {type=refBy(PlcInput), forward=false}
+        output = {{type=refBy(DecisionResult)}, {type=refBy(Command), forward=false}, {type=refBy(PlcInput), forward=false}},
         dependencies = {refBy(PYTHON39)}, // for fallback robot control
         parameter = {
           StringParameter {

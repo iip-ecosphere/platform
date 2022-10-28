@@ -50,6 +50,11 @@ public enum Commands {
     SWITCH_AI,
     
     /**
+     * Queries the car AAS for a certain id given as parameter.
+     */
+    QUERY_CAR_AAS,
+    
+    /**
      * Invalid command, do nothing.
      */
     INVALID;

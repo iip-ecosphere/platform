@@ -40,11 +40,9 @@ project InstallTest {
     transportProtocol = TransportProtocolAMQP {
         globalHost = "192.168.2.1",
         port = 8883,
-        user = "user",
-        password = "pwd"
-        //security = { // replaces user/password, requires identityStore.yml in src/test/ or src/main depeding on use
-        //    authenticationKey = "amqp"
-        //}
+        security = { // -> identityStore.yml in src/test/ or src/main depeding on use
+            authenticationKey = "amqp"
+        }
     };
 
     serviceManager = SpringCloudStream {
