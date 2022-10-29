@@ -17,7 +17,7 @@ import java.util.concurrent.ExecutionException;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
 
 /**
- * Just the very basics needed to do service switching.
+ * Just the very basics needed to do service switching. 
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -26,7 +26,9 @@ public interface ServiceBase {
     public static final String APPLICATION_SEPARATOR = "@";
     
     /**
-     * Returns the unique id of the service.
+     * Returns the unique id of the service. May be a single service id, a service id and a postfixed application 
+     * id (after {@link #APPLICATION_SEPARATOR}) or a service id with application id and postfixed application instance 
+     * id (after {@link #APPLICATION_SEPARATOR})
      * 
      * @return the unique id
      */
@@ -54,6 +56,7 @@ public interface ServiceBase {
      * @return the service id, may be {@code id} if there is no application id
      * 
      * @see #composeId(String, String)
+     * @see #composeId(String, String, String)
      */
     public static String getServiceId(String id) {
         String result;
@@ -73,33 +76,79 @@ public interface ServiceBase {
      * @return the application id, may be empty if there is none
      * 
      * @see #composeId(String, String)
+     * @see #composeId(String, String, String)
      */
     public static String getApplicationId(String id) {
         String result;
-        int pos = id.indexOf(APPLICATION_SEPARATOR);
-        if (pos > 0) {
-            result = id.substring(pos + 1);
+        int fPos = id.indexOf(APPLICATION_SEPARATOR);
+        int lPos = id.lastIndexOf(APPLICATION_SEPARATOR);
+        if (fPos > 0 && lPos > 0 && fPos != lPos) {
+            result = id.substring(fPos + 1, lPos);
+        } else if (fPos > 0) {
+            result = id.substring(fPos + 1);
         } else {
             result = "";
         }
         return result;
     }
-    
+
     /**
-     * Composes an (internal) id from a service and an application id.
+     * Returns the application instance id from an (internal) id.
      * 
-     * @param serviceId the service id
-     * @param applicationId the application id, may be <b>null</b> or empty for none
-     * @return the composed id
+     * @param id the id to split
+     * @return the application id, may be empty if there is none
+     * 
+     * @see #composeId(String, String)
+     * @see #composeId(String, String, String)
      */
-    public static String composeId(String serviceId, String applicationId) {
+    public static String getApplicationInstanceId(String id) {
         String result;
-        if (null != applicationId && applicationId.length() > 0) {
-            result = serviceId + APPLICATION_SEPARATOR + applicationId;
+        int fPos = id.indexOf(APPLICATION_SEPARATOR);
+        int lPos = id.lastIndexOf(APPLICATION_SEPARATOR);
+        if (fPos > 0 && lPos > 0 && fPos != lPos) {
+            result = id.substring(lPos + 1);
         } else {
-            result = serviceId;
+            result = "";
         }
         return result;
     }
 
+    /**
+     * Composes an (internal) id from a service and an application id.
+     * 
+     * @param serviceId the service id
+     * @param applicationId the application id, may be <b>null</b> or empty for none, {@link #APPLICATION_SEPARATOR} in 
+     *     {@code applicationId} will be removed
+     * @return the composed id
+     */
+    public static String composeId(String serviceId, String applicationId) {
+        return composeId(serviceId, applicationId, "");
+    }
+
+    /**
+     * Composes an (internal) id from a service and an application id.
+     * 
+     * @param serviceId the service id, {@link #APPLICATION_SEPARATOR} in 
+     *     {@code serviceId} will be removed
+     * @param applicationId the application id, may be <b>null</b> or empty for none, {@link #APPLICATION_SEPARATOR} in 
+     *     {@code applicationId} will be removed
+     * @param applicationInstanceId the application instance id, may be <b>null</b> or empty for none, used 
+     *     only if {@code applicationId} is given, {@link #APPLICATION_SEPARATOR} in 
+     *     {@code applicationInstanceId} will be removed
+     * @return the composed id
+     */
+    public static String composeId(String serviceId, String applicationId, String applicationInstanceId) {
+        String result;
+        if (null != applicationId && applicationId.length() > 0) {
+            result = serviceId.replace(APPLICATION_SEPARATOR, "");
+            result += APPLICATION_SEPARATOR + applicationId.replace(APPLICATION_SEPARATOR, "");
+            if (null != applicationInstanceId && applicationInstanceId.length() > 0) {
+                result += APPLICATION_SEPARATOR + applicationInstanceId.replace(APPLICATION_SEPARATOR, "");
+            }
+        } else {
+            result = serviceId.replace(APPLICATION_SEPARATOR, "");
+        }
+        return result;
+    }
+    
 }

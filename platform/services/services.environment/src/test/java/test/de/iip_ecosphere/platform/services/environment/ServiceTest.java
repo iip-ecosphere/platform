@@ -44,14 +44,27 @@ public class ServiceTest {
         String id = ServiceBase.composeId("sId", null);
         Assert.assertEquals("sId", ServiceBase.getServiceId(id));
         Assert.assertEquals("", ServiceBase.getApplicationId(id));
+        Assert.assertEquals("", ServiceBase.getApplicationInstanceId(id));
 
         id = ServiceBase.composeId("sId", "");
         Assert.assertEquals("sId", ServiceBase.getServiceId(id));
         Assert.assertEquals("", ServiceBase.getApplicationId(id));
+        Assert.assertEquals("", ServiceBase.getApplicationInstanceId(id));
 
         id = ServiceBase.composeId("sId", "aId");
         Assert.assertEquals("sId", ServiceBase.getServiceId(id));
         Assert.assertEquals("aId", ServiceBase.getApplicationId(id));
+        Assert.assertEquals("", ServiceBase.getApplicationInstanceId(id));
+
+        id = ServiceBase.composeId("sId", "aId", "001");
+        Assert.assertEquals("sId", ServiceBase.getServiceId(id));
+        Assert.assertEquals("aId", ServiceBase.getApplicationId(id));
+        Assert.assertEquals("001", ServiceBase.getApplicationInstanceId(id));
+
+        id = ServiceBase.composeId("s@Id", "a@Id", "0@01");
+        Assert.assertEquals("sId", ServiceBase.getServiceId(id));
+        Assert.assertEquals("aId", ServiceBase.getApplicationId(id));
+        Assert.assertEquals("001", ServiceBase.getApplicationInstanceId(id));
     }
     
 }

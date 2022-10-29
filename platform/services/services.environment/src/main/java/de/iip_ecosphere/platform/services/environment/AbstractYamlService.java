@@ -36,14 +36,16 @@ public abstract class AbstractYamlService {
     /**
      * Returns the unique id of the service.
      * 
-     * @return the id (may contain the {@link #getApplicationId() application id} if specified)
+     * @return the id (may contain the {@link #getApplicationId() application id} and the 
+     *     {@link #getApplicationInstanceId() application instance id} if specified)
      */
     public String getId() {
         return id;
     }
     
     /**
-     * Returns the application id this service is assigned to.
+     * Returns the application id this service is assigned to (without 
+     * {@link #getApplicationInstanceId() application instance id}).
      * 
      * @return the application id
      */
@@ -52,7 +54,8 @@ public abstract class AbstractYamlService {
     }
 
     /**
-     * Returns the service id of the service, i.e. {@link #getId()} without {@link #getApplicationInstanceId()}.
+     * Returns the service id of the service, i.e. {@link #getId()} without {@link #getApplicationId()} 
+     * and {@link #getApplicationInstanceId()}.
      * 
      * @return the id
      */
@@ -67,7 +70,7 @@ public abstract class AbstractYamlService {
      * @return the application instance id (may be empty for the default application instance)
      */
     public String getApplicationInstanceId() {
-        return ServiceBase.getApplicationId(id);
+        return ServiceBase.getApplicationInstanceId(id);
     }
 
     /**
