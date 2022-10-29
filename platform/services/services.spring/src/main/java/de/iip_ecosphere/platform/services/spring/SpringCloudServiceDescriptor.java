@@ -30,9 +30,11 @@ import org.springframework.core.io.Resource;
 
 import de.iip_ecosphere.platform.services.AbstractServiceDescriptor;
 import de.iip_ecosphere.platform.services.AbstractServiceManager.TypedDataConnection;
+import de.iip_ecosphere.platform.services.environment.ServiceKind;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.services.environment.ServiceStub;
 import de.iip_ecosphere.platform.services.environment.Starter;
+import de.iip_ecosphere.platform.services.environment.switching.ServiceBase;
 import de.iip_ecosphere.platform.services.spring.descriptor.Endpoint;
 import de.iip_ecosphere.platform.services.spring.descriptor.ProcessSpec;
 import de.iip_ecosphere.platform.services.spring.descriptor.Relation;
@@ -45,6 +47,7 @@ import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
+import de.iip_ecosphere.platform.support.iip_aas.Version;
 import de.iip_ecosphere.platform.support.net.ManagedServerAddress;
 import de.iip_ecosphere.platform.support.net.NetworkManager;
 import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
@@ -94,6 +97,47 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
         }
     }
     
+    /**
+     * Creates an instance. Call {@link #setClassification(ServiceKind, boolean, boolean)} afterwards.
+     * 
+     * @param id the service id
+     * @param applicationId the application id, may be empty for default application/legacy
+     * @param name the name of this service
+     * @param description the description of the service
+     * @param version the version
+     */
+    protected SpringCloudServiceDescriptor(String id, String applicationId, String name, String description, 
+        Version version) {
+        super(id, applicationId, name, description, version);
+    }
+    
+    /**
+     * Instantiates this service as a template to represent an instance service with id {@code serviceId}.
+     * Typically, the application instance id changes compared to existing service descriptors.
+     * 
+     * @param sId the service id
+     * @return the instantiated service
+     */
+    SpringCloudServiceDescriptor instantiate(String sId) {
+        SpringCloudServiceDescriptor result = new SpringCloudServiceDescriptor(sId, getApplicationId(), 
+            getName(), getDescription(), getVersion());
+        result.instantiateFrom(this);
+        result.service = this.service;
+        if (null != this.ensembleLeader) {
+            String ensId = this.ensembleLeader.getServiceId();
+            String appInstanceId = ServiceBase.getApplicationInstanceId(sId);
+            String appId = ServiceBase.getApplicationId(sId);
+            ensId = ServiceBase.composeId(ensId, appId, appInstanceId);
+            result.ensembleLeader = this.getArtifact().getService(ensId);
+            if (null == result.ensembleLeader) {
+                result = this.ensembleLeader.instantiate(ensId);
+                this.getArtifact().addService(result);
+            }
+        }
+        //deploymentId, portId, process, processDir, serviceProtocol, adminAddr come at runtime
+        return result;
+    }
+
     @Override
     protected Class<SpringCloudArtifactDescriptor> getArtifactDescriptorClass() {
         return SpringCloudArtifactDescriptor.class;

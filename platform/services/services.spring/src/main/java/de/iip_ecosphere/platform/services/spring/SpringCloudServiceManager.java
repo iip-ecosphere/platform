@@ -309,6 +309,7 @@ public class SpringCloudServiceManager
 
     @Override
     public void startService(Map<String, String> options, String... serviceIds) throws ExecutionException {
+        checkServiceInstances(serviceIds);
         serviceIds = topLevel(this, serviceIds); // avoid accidentally accessing family members
         handleOptions(options, serviceIds);
         AppDeployer deployer = getDeployer();
@@ -371,6 +372,15 @@ public class SpringCloudServiceManager
         checkErrors(errors);
         LOGGER.info("Started services " + Arrays.toString(serviceIds));
     }
+    
+    @Override
+    protected SpringCloudServiceDescriptor instantiateFromTemplate(SpringCloudServiceDescriptor template, 
+        String serviceId) {
+        SpringCloudServiceDescriptor result = template.instantiate(serviceId);
+        result.getArtifact().addService(result);
+        return result;
+    }
+
     
     /**
      * Prepares the processes of the family members.

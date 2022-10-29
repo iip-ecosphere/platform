@@ -89,4 +89,10 @@ public class SpringCloudArtifactDescriptor extends AbstractArtifactDescriptor<Sp
         return new SpringCloudArtifactDescriptor(artifact.getId(), artifact.getName(), uri, jarFile, services);        
     }
     
+    // for package access
+    @Override
+    protected void addService(SpringCloudServiceDescriptor service) {
+        super.addService(service);
+    }
+    
 }
