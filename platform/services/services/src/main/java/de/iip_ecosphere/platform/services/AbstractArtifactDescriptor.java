@@ -93,4 +93,13 @@ public class AbstractArtifactDescriptor<S extends AbstractServiceDescriptor<?>> 
         return null == serviceId ? null : services.get(serviceId);
     }
 
+    /**
+     * Adds a service.
+     * 
+     * @param service the service to be added
+     */
+    protected void addService(S service) {
+        services.put(service.getId(), service);
+    }
+
 }

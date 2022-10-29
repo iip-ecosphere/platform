@@ -29,7 +29,9 @@ import org.slf4j.LoggerFactory;
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.services.environment.ServiceStub;
+import de.iip_ecosphere.platform.services.environment.switching.ServiceBase;
 import de.iip_ecosphere.platform.support.CollectionUtils;
+import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
 
 /**
  * A basic re-usable implementation of the service manager. Implementations shall override at least 
@@ -671,6 +673,55 @@ public abstract class AbstractServiceManager<A extends AbstractArtifactDescripto
         }
         return result;
     }
+    
+    /**
+     * Checks for service instances regarding application id and application instance id. If needed, creates instances 
+     * using existing service descriptors as templates via 
+     * {@link #instantiateFromTemplate(AbstractServiceDescriptor, String)}.
+     * 
+     * @param sId service ids to check
+     */
+    protected void checkServiceInstances(String[] sId) {
+        for (String id: sId) {
+            if (null == getService(id)) {
+                S template = null;
+                String appInstanceId = ServiceBase.getApplicationInstanceId(id);
+                String appId = ServiceBase.getApplicationId(id);
+                String serviceId = ServiceBase.getServiceId(id);
+                if (AbstractSetup.isNotEmpty(appInstanceId)) {
+                    template = getService(ServiceBase.composeId(serviceId, appId));
+                }
+                if (null == template) {
+                    for (String tId: getServiceIds()) {
+                        S s = getService(tId);
+                        if (s.getServiceId().equals(serviceId) && s.getApplicationId().equals(appId)) {
+                            template = s;
+                            break;
+                        }
+                    }
+                }
+                if (null == template) {
+                    template = getService(serviceId);
+                }
+                if (null == template) {
+                    LoggerFactory.getLogger(getClass()).warn("No service found for id {}, also no template found "
+                        + "to instantiate.", id);
+                } else {
+                    instantiateFromTemplate(template, id);
+                }
+            }
+        }
+    }
+
+    /**
+     * Creates a service instance descriptor from {@code template}. Application and application instance id shall
+     * match {@code template}.
+     * 
+     * @param template the service descriptor template
+     * @param serviceId the service id, usually including application id and application instance id
+     * @return the instantiated descriptor
+     */
+    protected abstract S instantiateFromTemplate(S template, String serviceId);
     
     /**
      * Clears the internal data. [testing]

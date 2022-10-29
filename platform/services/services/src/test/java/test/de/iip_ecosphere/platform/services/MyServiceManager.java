@@ -191,5 +191,13 @@ class MyServiceManager extends AbstractServiceManager<MyArtifactDescriptor, MySe
     protected Predicate<TypedDataConnectorDescriptor> getAvailablePredicate() {
         return c-> true;
     }
+
+    @Override
+    protected MyServiceDescriptor instantiateFromTemplate(MyServiceDescriptor template, String serviceId) {
+        MyServiceDescriptor result = new MyServiceDescriptor(serviceId, template.getApplicationId(), 
+            template.getName(), template.getDescription(), template.getVersion());
+        // ignore further, ensemble leader for now in test
+        return result;
+    }
     
 }

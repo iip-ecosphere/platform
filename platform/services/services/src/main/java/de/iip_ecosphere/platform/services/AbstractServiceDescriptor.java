@@ -76,6 +76,23 @@ public abstract class AbstractServiceDescriptor<A extends ArtifactDescriptor> im
     }
     
     /**
+     * Does further initialization after {@link #AbstractServiceDescriptor(String, String, String, String, Version)}
+     * to instantiate an instance from {@code template}.
+     * 
+     * @param template the descriptor being used as template
+     */
+    protected void instantiateFrom(AbstractServiceDescriptor<A> template) {
+        this.artifact = template.artifact;
+        this.kind = template.kind;
+        this.isDeployable = template.isDeployable;
+        this.isTopLevel = template.isTopLevel;
+        this.parameters.addAll(template.parameters); 
+        this.input.addAll(template.input); 
+        this.input.addAll(template.output); 
+        // not the stub
+    }
+    
+    /**
      * Returns the utilized artifact descriptor class.
      * 
      * @return the class

@@ -35,19 +35,22 @@ public interface ServiceDescriptor {
     /**
      * Returns the unique id of the service.
      * 
-     * @return the id (may contain the {@link #getApplicationId() application id} if specified)
+     * @return the id (may contain the {@link #getApplicationId() application id} and the 
+     *     {@link #getApplicationInstanceId() application instance id} if specified)
      */
     public String getId();
 
     /**
-     * Returns the application id this service is assigned to.
+     * Returns the application id this service is assigned to (without 
+     * {@link #getApplicationInstanceId() application instance id}).
      * 
      * @return the application id
      */
     public String getApplicationId();
 
     /**
-     * Returns the service id of the service, i.e. {@link #getId()} without {@link #getApplicationInstanceId()}.
+     * Returns the service id of the service, i.e. {@link #getId()} without {@link #getApplicationId()} 
+     * and {@link #getApplicationInstanceId()}.
      * 
      * @return the id
      */
@@ -62,7 +65,7 @@ public interface ServiceDescriptor {
      * @return the application instance id (may be empty for the default application instance)
      */
     public default String getApplicationInstanceId() {
-        return ServiceBase.getApplicationId(getId());
+        return ServiceBase.getApplicationInstanceId(getId());
     }
     
     /**
