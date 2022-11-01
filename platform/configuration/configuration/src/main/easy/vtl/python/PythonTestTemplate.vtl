@@ -15,8 +15,7 @@ template PythonTestTemplate(Configuration config, FileArtifact target) {
         parser.add_argument("relModelPath", help="relative path to the impl.model project")
         args = parser.parse_args()
 
-        """ Paths are temporary set but seem to work like this paths can only be hardcoded from the /gen onwards! """
-        """ Temp as reminder! :../../../../examples.templates.model """
+        """ will be the relativve paths from impl.impl to impl.model, given through pom /gen onwards! """
         sys.path.insert(1, (args.relModelPath + "/gen/test/ApplicationInterfaces/src/main/python"))
         sys.path.insert(2, (args.relModelPath + "/gen/test/ApplicationInterfaces/src/main/python/iip"))
         """ always fixed value as these directorys are generated in the impl.impl """
@@ -28,22 +27,21 @@ template PythonTestTemplate(Configuration config, FileArtifact target) {
         # Import the required types from datatypes here
 
         class TestPyServive(unittest.TestCase):
-    
+        
             def test_inputTest(self):
 
-            # prepare your data, e.g., loading from json
+                # prepare your data, e.g., loading from json
+                """Needed to enable the loading of resources like the finished service would"""
+                os.chdir("../../main/python") 
         
-            """Quick fix for the wrong placement of the class (positioning would not allow for loading of resources otherwise)"""
-            os.chdir("../../main/python") 
-        
-            # instantiate your service here, e.g., service = PyService()
-            # call your service here, e.g., service.processNewInput(impl)
-            
-            # do your asserts here
-            self.assertTrue(True)
+                # instantiate your service here, e.g., service = PyService()
+                # call your service here, e.g., service.processNewInput(impl)
+	            
+                # do your asserts here
+                self.assertTrue(True)
 
         if __name__ == "__main__":
-            """ actually dont know what this does..."""
+            """Makes unittest and argparse work together"""
             unittest.main(argv=["first-arg-is-ignored"], exit=False)'
     }
     
