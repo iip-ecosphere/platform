@@ -28,6 +28,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DeploymentPlansComponent } from './components/deployment-plans/deployment-plans.component';
 import { ResourceDetailsComponent } from './components/resource-details/resource-details.component';
 import { OperationQueryComponent } from './components/resource-details/operation-query/operation-query.component';
+import { OnlyIdPipe } from './pipes/only-id.pipe';
 
 @NgModule({
   declarations: [
@@ -39,7 +40,8 @@ import { OperationQueryComponent } from './components/resource-details/operation
     TidyPipe,
     DeploymentPlansComponent,
     ResourceDetailsComponent,
-    OperationQueryComponent
+    OperationQueryComponent,
+    OnlyIdPipe
   ],
   imports: [
     BrowserModule,

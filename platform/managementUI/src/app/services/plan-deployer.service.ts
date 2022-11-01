@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, firstValueFrom, Subscription } from 'rxjs';
 import { platformResponse } from 'src/interfaces';
+import { OnlyIdPipe } from '../pipes/only-id.pipe';
 import { EnvConfigService } from './env-config.service';
 
 @Injectable({
@@ -23,7 +24,7 @@ export class PlanDeployerService {
   emitter: BehaviorSubject<{ executionState: string,messages: string[]}>;
 
 
-  constructor(private http: HttpClient, private envConfigService: EnvConfigService) {
+  constructor(private http: HttpClient, private envConfigService: EnvConfigService, private onlyId: OnlyIdPipe) {
     this.emitter = new BehaviorSubject(this.status);
     const env = this.envConfigService.getEnv();
     //the ip and urn are taken from the json.config
@@ -44,47 +45,76 @@ export class PlanDeployerService {
     let response;
     let basyxFunc;
     if (undeploy) {
-      basyxFunc = "undeployPlan";
+      basyxFunc = "undeployPlanAsync";
     } else {
-      basyxFunc = "deployPlan";
+      basyxFunc = "deployPlanAsync";
       this.emitter.next( {
         executionState: "deployment plan sent",
         messages: ["waiting for response"]
       })
     }
     try {
-      response = await this.http.post<platformResponse>(this.ip + '/shells/' + this.urn + "/aas/submodels/Artifacts/submodel/" + basyxFunc + "/invoke"
+      response = await firstValueFrom(this.http.post<platformResponse>(this.ip + '/shells/' + this.urn + "/aas/submodels/Artifacts/submodel/" + basyxFunc + "/invoke"
       ,{"inputArguments": params,"requestId":"1bfeaa30-1512-407a-b8bb-f343ecfa28cf", "inoutputArguments":[], "timeout":10000}
-      , {responseType: 'json', reportProgress: true});
+      , {responseType: 'json', reportProgress: true}));
     } catch(e) {
       console.log(e);
     }
-    this.sub = response?.subscribe((dep: platformResponse) => {
-      this.status.executionState = dep.executionState;
-      let i = 0;
-      console.log(dep);
-      for(const message of dep.outputArguments) {
-        if(message.value) {
-          this.status.messages.push(message.value.value as string);
-        }
-        i++;
-      }
-      this.emitter.next(this.status);
-    });
-    if (this.status.executionState = "") {
+    console.log(response);
+    // this.sub = response?.subscribe((dep: platformResponse) => {
+    //   //replace this with saving of taskId from the asynchronous response and use getTaskStatus to refresh the status in a set time interval
+    //   this.status.executionState = dep.executionState;
+    //   console.log(dep);
+    //   for(const message of dep.outputArguments) {
+    //     if(message.value) {
+    //       this.status.messages.push(message.value.value as string);
+    //     }
+    //   }
+    //   this.emitter.next(this.status);
+    // });
+    // if (this.status.executionState = "") {
 
+    // }
+    if(response && response.outputArguments[0] && response.outputArguments[0].value) {
+      this.getStatus(response.outputArguments[0].value.value);
     }
-    return response;
   }
 
-  private async getStatus(url: string) {
-    let Data;
-    try {
-      Data = await firstValueFrom(this.http.get( this.ip + '/shells/' + this.urn + '/aas/submodels/Status/submodel'));
+  public getStatus(id: string | undefined) {
+    let response;
+    let params = [
+      {
+        modelType: {
+          name: "operationsVariable"
+        },
+        value: {
+          idShort: "taskId",
+          kind: "template",
+          valueType: "string",
+          modelType: {
+            name: "Property"
+          },
+          value: ""
+        }
+    }];
+
+    params[0].value.value = this.onlyId.transform(id);
+
+      try {
+      response = this.http.post<platformResponse>(this.ip + '/shells/' + this.urn + "/aas/submodels/Artifacts/submodel/getTaskStatus/invoke"
+      ,{"inputArguments": params,"requestId":"1bfeaa30-1512-407a-b8bb-f343ecfa28cf", "inoutputArguments":[], "timeout":10000}
+      , {responseType: 'json', reportProgress: true});
+      this.sub = response.subscribe((status: platformResponse )=> {
+        if(status.outputArguments[0].value && status.outputArguments[0].value.value) {
+          this.status.executionState = status.executionState;
+          this.status.messages[0] = status.outputArguments[0].value.value;
+          this.emitter.next(this.status);
+        }
+        console.log(status);
+      });
     } catch(e) {
       console.log(e);
     }
-    return Data;
   }
 
 }
