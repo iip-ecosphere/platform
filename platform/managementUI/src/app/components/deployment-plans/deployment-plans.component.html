@@ -12,13 +12,4 @@
   <mat-card>selected: <span *ngIf="selected && selected.value" style="background-color: white; color:black">{{ getName(selected.value) }}</span></mat-card>
   <button mat-raised-button class="button" (click)="deploy()">deploy</button>
   <button mat-raised-button style="background-color: rgb(255,204,0)" (click)="undeploy()">udeploy</button>
-  <mat-card *ngIf="status && status.executionState != ''" style="background-color: teal;">
-    <div *ngIf="status" style="text-align: center;">Status: {{ status.executionState }}</div>
-    <mat-card-content *ngIf="status.messages" style="display: flex; justify-content:center; align-items:center;">
-            <div *ngFor="let message of status.messages">
-              {{message}}
-             </div>
-            <mat-progress-spinner *ngIf="status.executionState != 'Completed'" mode="indeterminate" ></mat-progress-spinner>
-    </mat-card-content>
-  </mat-card>
 </div>

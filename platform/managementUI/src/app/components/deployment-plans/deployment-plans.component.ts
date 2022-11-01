@@ -17,18 +17,7 @@ export class DeploymentPlansComponent implements OnInit {
   deployPlanInput: any;
   undeployPlanInput: any;
 
-  //subscription: Subscription | undefined;
-  //deployResponse: platformResponse | undefined;
-
-  messageSub: Subscription;
-  status = {
-    executionState: "",
-    messages: [""]
-  }
-
   constructor(public api: ApiService, private deployer: PlanDeployerService) {
-    this.messageSub = this.deployer.emitter.subscribe((status: { executionState: string,messages: string[]}) => {this.status = status});
-
   }
 
   async ngOnInit() {
@@ -59,34 +48,9 @@ export class DeploymentPlansComponent implements OnInit {
        }
       const response = await this.deployer.deployPlan(params);
       this.selected = undefined;
-      //this.subscription = response?.subscribe((dep: platformResponse) => {this.updateMessage(dep)});
-
-      //this.openSnackbar(response.outputArguments);
-
     }
 
   }
-  // private updateMessage(dep: platformResponse) {
-  //   this.deployResponse = dep;
-  //   this.openSnackbar(dep.outputArguments);
-  //   console.log(dep)  }
-
-  // private openSnackbar(output: outputArgument[]) {
-  //   try {
-  //     let message = '';
-  //     if(output[0].value) {
-  //       //this.bar.openSnackbar(output[0].value.value);
-  //       for(let bit of output) {
-  //         message = message.concat(bit.value.value);
-  //         message = message.concat('  ')
-  //       }
-  //     }
-  //     this.message = message;
-  //   } catch(e) {
-  //     console.log(e);
-  //   }
-
-  // }
 
   public async undeploy() {
     if(this.selected && this.selected.value) {

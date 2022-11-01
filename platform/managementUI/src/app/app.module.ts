@@ -17,6 +17,7 @@ import {MatIconModule} from '@angular/material/icon';
 import {MatSelectModule} from '@angular/material/select';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {MatSidenavModule} from '@angular/material/sidenav';
 
 import { ResourcesComponent } from './components/resources/resources.component';
 import { ContainersComponent } from './components/containers/containers.component';
@@ -29,6 +30,7 @@ import { DeploymentPlansComponent } from './components/deployment-plans/deployme
 import { ResourceDetailsComponent } from './components/resource-details/resource-details.component';
 import { OperationQueryComponent } from './components/resource-details/operation-query/operation-query.component';
 import { OnlyIdPipe } from './pipes/only-id.pipe';
+import { StatusBoxComponent } from './components/deployment-plans/status-box/status-box.component';
 
 @NgModule({
   declarations: [
@@ -41,7 +43,8 @@ import { OnlyIdPipe } from './pipes/only-id.pipe';
     DeploymentPlansComponent,
     ResourceDetailsComponent,
     OperationQueryComponent,
-    OnlyIdPipe
+    OnlyIdPipe,
+    StatusBoxComponent
   ],
   imports: [
     BrowserModule,
@@ -59,7 +62,8 @@ import { OnlyIdPipe } from './pipes/only-id.pipe';
     MatIconModule,
     MatSelectModule,
     MatSnackBarModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatSidenavModule
   ],
   providers: [{
     provide:HTTP_INTERCEPTORS,

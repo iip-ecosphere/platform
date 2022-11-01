@@ -43,3 +43,22 @@
   background-color:chocolate;
   @include mat.elevation(10);
 }
+
+.footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%
+}
+
+.container {
+  width: 100%;
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  margin: 1em;
+}
+
+.item {
+  width: auto;
+  height: auto;
+}
