@@ -187,6 +187,11 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     }
                 }
                 elements = elements->sortedBy(n|n.name).toSequence(); // for testing
+                sequenceOf(MeshElement) pythonElements = elements->select(e|e.impl.isKindOf(PythonService));
+                if (pythonElements.size() > 0) {
+                    vilTemplateProcessor("PythonTestTemplate", config, "${appRoot}/src/test/python/pyTest.py", pythonElements=pythonElements);
+                }
+                
                 vilTemplateProcessor("TemplatesEclipseReadme", config, "${appRoot}/README.md", appName="impl." + appName, nodes=elements);
 
                 String appVersion = getAppMvnVersion(a);
