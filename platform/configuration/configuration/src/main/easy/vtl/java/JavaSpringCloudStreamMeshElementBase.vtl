@@ -172,21 +172,24 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
     }
 
     def registerService(MeshElement elt, ServiceBase service) {
-        'serviceSent = Counter.builder("service.sent")
-            .baseUnit("tuple/s")
-            .description("Tuples sent out by a service")
-            .tags("service", "${elt.impl.id}", "application", "${app.id}", "device", Id.getDeviceId())
-            .register(metrics.getRegistry());'
-        'serviceReceived = Counter.builder("service.received")
-            .baseUnit("tuple/s")
-            .description("Tuples received by a service")
-            .tags("service", "${elt.impl.id}", "application", "${app.id}", "device", Id.getDeviceId())
-            .register(metrics.getRegistry());'
-        'processingTime = io.micrometer.core.instrument.Timer.builder("service.processed")
-            .description("Main processing time of a service")
-            .tags("service", "${elt.impl.id}", "application", "${app.id}", "device", Id.getDeviceId())
-            .register(metrics.getRegistry());'
         for (String s: serviceVars) {
+            'serviceSent = Counter.builder("service.sent")
+                .baseUnit("tuple/s")
+                .description("Tuples sent out by a service")
+                .tags("service", "${elt.impl.id}", "application", "${app.id}", "device", Id.getDeviceId(), 
+                    "serviceId", ${s}.getId())
+                .register(metrics.getRegistry());'
+            'serviceReceived = Counter.builder("service.received")
+                .baseUnit("tuple/s")
+                .description("Tuples received by a service")
+                .tags("service", "${elt.impl.id}", "application", "${app.id}", "device", Id.getDeviceId(), 
+                    "serviceId", ${s}.getId())
+                .register(metrics.getRegistry());'
+            'processingTime = io.micrometer.core.instrument.Timer.builder("service.processed")
+                .description("Main processing time of a service")
+                .tags("service", "${elt.impl.id}", "application", "${app.id}", "device", Id.getDeviceId(), 
+                    "serviceId", ${s}.getId())
+                .register(metrics.getRegistry());'
             '${attachMetricsProvider("${s}")}'
             '${genMapService("${s}")}'
         }

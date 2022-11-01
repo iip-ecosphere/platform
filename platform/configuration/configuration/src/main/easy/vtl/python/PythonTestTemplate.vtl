@@ -1,0 +1,50 @@
+import Basics;
+import PythonBasics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template PythonTestTemplate(Configuration config, FileArtifact target) {
+
+    def main(Configuration config, FileArtifact target) {
+        'import unittest
+        
+        import sys
+        import os
+        import argparse
+        parser = argparse.ArgumentParser()
+        parser.add_argument("relModelPath", help="relative path to the impl.model project")
+        args = parser.parse_args()
+
+        """ Paths are temporary set but seem to work like this paths can only be hardcoded from the /gen onwards! """
+        """ Temp as reminder! :../../../../examples.templates.model """
+        sys.path.insert(1, (args.relModelPath + "/gen/test/ApplicationInterfaces/src/main/python"))
+        sys.path.insert(2, (args.relModelPath + "/gen/test/ApplicationInterfaces/src/main/python/iip"))
+        """ always fixed value as these directorys are generated in the impl.impl """
+        sys.path.insert(3, "../../main/python/services") 
+
+        import json
+
+        # Import your service here
+        # Import the required types from datatypes here
+
+        class TestPyServive(unittest.TestCase):
+    
+            def test_inputTest(self):
+
+            # prepare your data, e.g., loading from json
+        
+            """Quick fix for the wrong placement of the class (positioning would not allow for loading of resources otherwise)"""
+            os.chdir("../../main/python") 
+        
+            # instantiate your service here, e.g., service = PyService()
+            # call your service here, e.g., service.processNewInput(impl)
+            
+            # do your asserts here
+            self.assertTrue(True)
+
+        if __name__ == "__main__":
+            """ actually dont know what this does..."""
+            unittest.main(argv=["first-arg-is-ignored"], exit=False)'
+    }
+    
+}

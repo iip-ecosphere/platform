@@ -232,6 +232,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
             Path testResourcesSrc = "${appRoot}/src/test/resources";
             vilTemplateProcessor("TemplatesTestDataJson", config, "${testResourcesSrc}/testData-${getClsName(no)}.json.tmpl", elt=no);
         }
+        vilTemplateProcessor("PythonTestTemplate", config, "${appRoot}/src/test/python/pyTest.py");
     }
     
     // ------------------------------------------ generating apps: generating service-specific code artifacts -----------------------------------

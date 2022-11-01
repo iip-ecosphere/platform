@@ -104,6 +104,18 @@ template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, sequenceOf(Mesh
             new XmlElement(execArgs, "argument", "1");
             new XmlElement(execCfg, "mainClass", "de.iip_ecosphere.platform.services.environment.PythonSyntaxTest");
             new XmlElement(execCfg, "classpathScope", "test");
+            
+            exec = new XmlElement(execPluginExecs, "execution");
+            new XmlElement(exec, "id", "PyServiceUnitTest");
+            new XmlElement(new XmlElement(exec, "goals"), "goal", "java");
+            execCfg = new XmlElement(exec, "configuration");
+            execArgs = new XmlElement(execCfg, "arguments");
+            new XmlElement(execArgs, "argument", "\\${project.basedir}/src/test/python");
+            new XmlElement(execArgs, "argument", "pyTest.py");
+            new XmlComment(execArgs, "Please adjust relative path to model");
+            new XmlElement(execArgs, "argument", "../../../../examples.templates.model");
+            new XmlElement(execCfg, "mainClass", "de.iip_ecosphere.platform.services.environment.PythonUnitTest");
+            new XmlElement(execCfg, "classpathScope", "test");
         }
         
         dep = createDependencies(project);
