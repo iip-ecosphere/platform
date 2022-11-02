@@ -41,6 +41,7 @@ public class Starter {
     
     public static final String PARAM_IIP_PROTOCOL = "iip.protocol";
     public static final String PARAM_IIP_PORT = "iip.port";
+    public static final String PARAM_IIP_APP_ID = "iip.appId";
     public static final String PARAM_IIP_TRANSPORT_GLOBAL = "iip.transport.global";
     public static final String PARAM_IIP_TEST_TRANSPORT_PORT = "iip.test.transport.port";
     public static final String PARAM_IIP_TEST_SERVICE_AUTOSTART = "iip.test.service.autostart";
