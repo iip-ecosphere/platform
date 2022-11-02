@@ -28,6 +28,10 @@ import de.iip_ecosphere.platform.configuration.PlatformInstantiator.NonCleaningI
 import de.iip_ecosphere.platform.configuration.StatisticsVisitor;
 import de.iip_ecosphere.platform.configuration.StatisticsVisitor.Statistics;
 import net.ssehub.easy.varModel.confModel.Configuration;
+import net.ssehub.easy.varModel.model.AbstractVariable;
+import net.ssehub.easy.varModel.model.datatypes.DerivedDatatype;
+import net.ssehub.easy.varModel.model.datatypes.IDatatype;
+import net.ssehub.easy.varModel.model.datatypes.TypeQueries;
 
 /**
  * Tests the model for provided IVML comments.
@@ -35,6 +39,28 @@ import net.ssehub.easy.varModel.confModel.Configuration;
  * @author Holger Eichelberger, SSE
  */
 public class CommentTests {
+    
+    /**
+     * Called to record a variable with missing comment.
+     * 
+     * @param var the variable without comment
+     * @param missing the missing set that may be updated as side effect
+     * @return {@code true} count as missing, {@code false} ignore in statistics
+     */
+    private static final boolean recordMissing(AbstractVariable var, SortedSet<String> missing) {
+        boolean record = true;
+        if (var.getParent() instanceof AbstractVariable) {
+            AbstractVariable parentVar = (AbstractVariable) var.getParent();
+            IDatatype type = DerivedDatatype.resolveToBasis(parentVar.getType());
+            if (TypeQueries.isContainer(type)) {
+                record = false;
+            }
+        }
+        if (record) {
+            missing.add(var.getQualifiedName() + " = ");
+        }
+        return record;
+    }
     
     /**
      * Tests for comments.
@@ -49,7 +75,7 @@ public class CommentTests {
         ConfigurationLifecycleDescriptor lcd = configurer.obtainLifecycleDescriptor();
         lcd.startup(new String[0]); // shall register executor
         StatisticsVisitor vis = new StatisticsVisitor();
-        vis.setNoCommentConsumer(v -> missing.add(v.getQualifiedName() + " = "));
+        vis.setNoCommentConsumer(v -> recordMissing(v, missing));
         Configuration cfg = ConfigurationManager.getIvmlConfiguration();
         Assert.assertNotNull(cfg);
         vis.visitConfiguration(cfg);
