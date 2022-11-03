@@ -35,6 +35,7 @@ import de.iip_ecosphere.platform.services.TypedDataConnectorDescriptor;
 import de.iip_ecosphere.platform.services.TypedDataDescriptor;
 import de.iip_ecosphere.platform.services.AbstractServiceManager.TypedDataConnection;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
+import de.iip_ecosphere.platform.services.environment.switching.ServiceBase;
 import de.iip_ecosphere.platform.services.spring.SpringCloudArtifactDescriptor;
 import de.iip_ecosphere.platform.services.spring.SpringCloudServiceDescriptor;
 import de.iip_ecosphere.platform.services.spring.SpringCloudServiceManager;
@@ -309,6 +310,20 @@ public class ServiceMgrAndDescriptorTest {
         Assert.assertTrue(resList.size() == 2);
         Assert.assertTrue(resList.contains("SimpleTransformer3"));
         Assert.assertTrue(resList.contains("SimpleReceiver3"));
+    }
+    
+    /**
+     * Tests {@link SpringCloudServiceManager#addAppId(String, List)}.
+     */
+    @Test
+    public void testAppId() {
+        List<String> cmdArgs = new ArrayList<String>();
+        SpringCloudServiceManager.addAppId(ServiceBase.composeId("service", "", ""), cmdArgs);
+        Assert.assertEquals(0, cmdArgs.size());
+        SpringCloudServiceManager.addAppId(ServiceBase.composeId("service", "application", ""), cmdArgs);
+        Assert.assertEquals(1, cmdArgs.size());
+        SpringCloudServiceManager.addAppId(ServiceBase.composeId("service", "application", "001"), cmdArgs);
+        Assert.assertEquals(2, cmdArgs.size());
     }
 
 }
