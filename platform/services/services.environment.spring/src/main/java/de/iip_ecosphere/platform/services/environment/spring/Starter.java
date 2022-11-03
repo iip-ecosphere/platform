@@ -14,6 +14,7 @@ package de.iip_ecosphere.platform.services.environment.spring;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 import org.slf4j.LoggerFactory;
@@ -33,7 +34,9 @@ import de.iip_ecosphere.platform.services.environment.ServiceMapper;
 import de.iip_ecosphere.platform.services.environment.YamlArtifact;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsExtractorRestClient;
 import de.iip_ecosphere.platform.services.environment.spring.metricsProvider.MetricsProvider;
+import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.iip_aas.config.CmdLine;
+import de.iip_ecosphere.platform.support.iip_aas.config.YamlFile;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 import de.iip_ecosphere.platform.transport.Transport;
 
@@ -182,6 +185,46 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
     }
     
     /**
+     * Augments the command line arguments by spring cloud stream binder destination args containing the 
+     * application id if {@link #PARAM_IIP_APP_ID} is given.
+     * 
+     * @param args the command line arguments
+     * @return the (augmented) command line arguments
+     */
+    public static String[] augmentByAppId(String[] args) {
+        String appId = CmdLine.getArg(args, PARAM_IIP_APP_ID, "");
+        if (appId.length() > 0) {
+            List<String> res = CollectionUtils.toList(args);
+            try {
+                Object data = YamlFile.read(ResourceLoader.getResourceAsStream("application.yml"));
+                LoggerFactory.getLogger(Starter.class).info("Augmenting stream bindings by appId {}", appId);
+                final String bindingsPath = "spring.cloud.stream.bindings";
+                final String[] bindingsFieldPath = bindingsPath.split("\\.");
+                Map<Object, Object> tmp = YamlFile.getFieldAsMap(data, bindingsFieldPath);
+                for (Map.Entry<Object, Object> ent : tmp.entrySet()) {
+                    String dest = YamlFile.getFieldAsString(ent.getValue(), "destination", null);
+                    if (null != dest) {
+                        String[] dTmp = dest.split(",");
+                        dest = "";
+                        for (String d : dTmp) {
+                            if (dest.length() > 0) {
+                                dest = dest + ",";
+                            }
+                            dest = dest + appId + "_" + d;
+                        }
+                        res.add(CmdLine.PARAM_PREFIX  + bindingsPath + "." + ent.getKey() + ".destination" 
+                            + CmdLine.PARAM_VALUE_SEP + dest);
+                    }
+                }
+            } catch (IOException e) {
+                LoggerFactory.getLogger(Starter.class).error("Cannot augment stream bindings: {}", e.getMessage());
+            }
+            args = res.toArray(new String[res.size()]);
+        }
+        return args;
+    }
+    
+    /**
      * Main function.
      * 
      * @param cls the class to start
@@ -192,6 +235,7 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
         Starter.parse(args);
         parseExternConnections(args, e -> Transport.addGlobalRoutingKey(e));
         getSetup(); // ensure instance
+        args = augmentByAppId(args);
         // start spring cloud app
         SpringApplication app = new SpringApplication(cls);
         ctx = app.run(args);
