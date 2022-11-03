@@ -88,6 +88,30 @@ template PythonType(Configuration config, FileArtifact target, RecordType type, 
     def genSetterParamVDoc(Field f, NumericPrimitiveType type) {
         ', may be of type ${toTypeName(f.type)} or the corresponding numpy type'
     }
+    
+    def genTypeImports(String init, RecordType type) {
+        String res = init;
+        for (Field f: type.fields) {
+            String imp = genImport(f.type);
+            if (res.length() > 0) {
+                if (imp.length() > 0) {
+                    res = res + "\n" + imp;
+                }
+            } else {
+                res = imp;
+            }
+        }
+        res;
+    }
+
+    def String genImport(DataType type) {    
+        ''
+    }
+
+    def String genImport(RecordType type) {
+        String clsName = asTypeName(type.name);
+        'from datatypes.${clsName} import ${clsName}'
+    }
 
     def main(Configuration config, FileArtifact target, RecordType type, Boolean interface, Boolean sharedInterfaces) {
         String clsName = asTypeName(type.name);
@@ -102,13 +126,13 @@ template PythonType(Configuration config, FileArtifact target, RecordType type, 
                 add = "Impl";
                 comment = "Implementation";
                 ext = "(${clsName})";
-                imp = "from datatypes.${clsName} import ${clsName}\n";                
+                imp = "from datatypes.${clsName} import ${clsName}";                
             }
         } else {
             comment = "Implementation";
             interface = false;
         }
-        '${imp|e}
+        '${genTypeImports(imp, type)|e}
         from datetime import datetime
         
         class ${clsName}${add}${ext}:
