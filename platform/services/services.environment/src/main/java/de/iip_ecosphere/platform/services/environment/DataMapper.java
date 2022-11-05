@@ -344,6 +344,7 @@ public class DataMapper {
          * Returns {@code true} if the iteration has more elements.
          *
          * @return {@code true} if the iteration has more elements
+         * @throws IOException if providing the next element caused an I/O problem
          */
         public boolean hasNext() throws IOException;
 
@@ -352,6 +353,7 @@ public class DataMapper {
          *
          * @return the next element in the iteration
          * @throws NoSuchElementException if the iteration has no more elements
+         * @throws IOException if checking for the next element caused an I/O problem
          */
         public T next() throws IOException;
         
