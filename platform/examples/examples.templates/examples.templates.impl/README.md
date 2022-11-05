@@ -13,7 +13,7 @@ assembly descriptors may need adjustment.
 Typical build steps:
  - Configure your application and generate application interfaces (done).
  - Implement your services
- - `mvn -P App install`.
+ - `mvn -P App install`
  - Test your services / application. Helper command line executions are hooked into the POM.
  - Generate application integration code.
  - Create a deployment plan and upload it into the artifacts folder of the platform.
@@ -25,6 +25,8 @@ Typical build steps:
  - `mvn -P App exec:java@app` runs the full application with all services locally without the platform. If you want to 
  implement individual services, this execution renders useless.
  - `mvn -P App exec:java@transportLogger` runs the transport logger with default setup in the context of this application.
-  - `mvn -P App exec:java@PyServiceTest` executes the service/connector test for `PyService` - `mvn -P App exec:java@SinkTest` executes the service/connector test for `Sink` - `mvn -P App exec:java@SourceTest` executes the service/connector test for `Source`
-- `mvn -P App exec:java@py-test` tests for python syntax.
+ - `mvn -P App exec:java@PyServiceTest` executes the service/connector test for `PyService` 
+ - `mvn -P App exec:java@SinkTest` executes the service/connector test for `Sink` 
+ - `mvn -P App exec:java@SourceTest` executes the service/connector test for `Source`
+ - `mvn -P App exec:java@py-test` tests for python syntax.
  
