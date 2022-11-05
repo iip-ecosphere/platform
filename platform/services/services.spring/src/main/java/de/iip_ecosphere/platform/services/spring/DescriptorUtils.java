@@ -29,7 +29,6 @@ import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.services.environment.Starter;
 import de.iip_ecosphere.platform.services.spring.descriptor.Endpoint;
-import de.iip_ecosphere.platform.services.spring.descriptor.ProcessSpec;
 import de.iip_ecosphere.platform.services.spring.descriptor.Relation;
 import de.iip_ecosphere.platform.services.spring.descriptor.Validator;
 import de.iip_ecosphere.platform.services.spring.yaml.YamlArtifact;
@@ -151,71 +150,6 @@ public class DescriptorUtils {
     }
     
     /**
-     * Extracts artifacts that are required for a service being realized of external processes.
-     * 
-     * @param sId the service id
-     * @param pSpec the process specification
-     * @param artFile the ZIP/JAR service artifact
-     * @param processBaseDir the base directory to be used to create a process home directory within if 
-     *     {@link ProcessSpec#getHomePath()} is <b>null</b> 
-     * @return the folder into which the process has been extracted. May be {@link ProcessSpec#getHomePath()} or
-     *     a temporary directory.
-     * @throws IOException if accessing files fails
-     */
-    public static File extractProcessArtifacts(String sId, ProcessSpec pSpec, File artFile, File processBaseDir) 
-        throws IOException {
-        // take over / create process home dir
-        File processDir = pSpec.getHomePath();
-        if (null == processDir) {
-            processDir = new File(processBaseDir, Starter.normalizeServiceId(sId) + "-" + System.currentTimeMillis());
-        }
-        if (!pSpec.isStarted()) {
-            FileUtils.deleteQuietly(processDir); // unlikely, just to be sure
-        }
-        processDir.mkdirs();
-
-        // unpack artifacts to home
-        for (String artPath : pSpec.getArtifacts()) {
-            while (artPath.startsWith("/")) {
-                artPath = artPath.substring(1);
-            }
-            FileInputStream fis = null;
-            InputStream artifact = null; 
-            try { // spring packaging
-                fis = new FileInputStream(artFile);
-                artifact = JarUtils.findFile(fis, "BOOT-INF/classes/" + artPath);
-                if (null == artifact) {
-                    fis = new FileInputStream(artFile); // TODO preliminary, use predicate
-                    artifact = JarUtils.findFile(fis, artPath);
-                    if (null != artifact) {
-                        getLogger().info("Found " + artPath + " in " + artFile + " " 
-                            + artifact.getClass().getSimpleName());
-                    }
-                } else {
-                    getLogger().info("Found " + artPath + " in BOOT-INF/classes/" + artPath + " " 
-                        + artifact.getClass().getSimpleName());
-                }
-            } catch (IOException e) {
-                getLogger().info("Cannot open " + artFile + ": " + e.getMessage());
-            }
-            if (null == artifact) { 
-                artifact = ResourceLoader.getResourceAsStream(DescriptorUtils.class, artPath);
-                if (null != artifact) {
-                    getLogger().info("Found " + artPath + " on classpath " + artifact.getClass().getSimpleName());
-                }
-            }
-            if (null == artifact) {
-                throw new IOException("Cannot find artifact '" + artPath + "' in actual service JAR");
-            }
-            JarUtils.extractZip(artifact, processDir.toPath());
-            getLogger().info("Extracted process artifact " + artPath + " to " + processDir);
-            FileUtils.closeQuietly(artifact);
-            FileUtils.closeQuietly(fis);
-        }
-        return processDir;
-    }
-    
-    /**
      * Adds commandline args for a given {@code endpoint}.
      * 
      * @param cmdLine the command line arguments to modify as a side effect
@@ -307,7 +241,7 @@ public class DescriptorUtils {
         for (YamlService service : art.getServices()) {
             YamlProcess proc = service.getProcess();
             if (null != proc) {
-                File d = extractProcessArtifacts(service.getId(), proc, jar, null);
+                File d = Starter.extractProcessArtifacts(service.getId(), proc, jar, null);
                 FileUtils.deleteOnExit(d);
             }
             for (Relation r : service.getRelations()) {
