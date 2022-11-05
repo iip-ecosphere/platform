@@ -276,7 +276,7 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
             try {
                 String fileName = System.getProperty("iip.test.dataFile", "../../src/test/resources/${fileName}");
                 LoggerFactory.getLogger(getClass()).info("Opening {}", fileName);
-                in = new java.io.FileInputStream(fileName);
+                in = new FileInputStream(fileName);
             } catch (IOException e) {
                 in = ResourceLoader.getResourceAsStream("${fileName}");
             }
@@ -341,7 +341,7 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
             try {
                 String fileName = System.getProperty("iip.test.dataFile", "../../src/test/resources/${fileName}");
                 LoggerFactory.getLogger(getClass()).info("Opening {}", fileName);
-                in = new java.io.FileInputStream(fileName);
+                in = new FileInputStream(fileName);
             } catch (IOException e) {
                 in = ResourceLoader.getResourceAsStream("${fileName}");
             }
@@ -666,9 +666,20 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
     }
     
     def genMain(MeshElement elt, ServiceBase service, String clsName) {
+        String serviceArtifact = "${getAppMvnName(app)}-${getAppMvnVersion(app)}-bin.jar";
         'iip.Starter.setServiceAutostart(true);
         iip.Starter.setOnServiceAutostartAttachShutdownHook(false);
         AbstractProcessService.setInheritIo(true); // allow e.g. Python to emit output
+        
+        YamlService yaml = YamlArtifact.readFromYamlSafe(ResourceLoader.getResourceAsStream("deployment.yml"))
+            .getServiceSafe("${service.id}");
+        File f = FileUtils.findFile(new File(".."), "${serviceArtifact}");
+        if (null != f) {
+            Starter.extractProcessArtifacts("${service.id}", yaml.getProcess(), f, null);
+        } else {
+            LoggerFactory.getLogger(${clsName}Test.class).info("Service artifact {} not found in {}", "${serviceArtifact}", "..");
+        }
+        
         JUnitCore junit = new JUnitCore();
         junit.addListener(new TextListener(System.out));
         junit.run(${clsName}Test.class);'
@@ -724,13 +735,13 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
 
         'package ${pkg};
         
-        import java.io.IOException;
+        import java.io.*;
         import java.util.*;
         import java.util.function.*;
         import java.util.concurrent.BlockingQueue;
         import java.util.concurrent.ExecutionException;
         
-        import de.iip_ecosphere.platform.support.TimeUtils;
+        import de.iip_ecosphere.platform.support.*;
         import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
         import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
         import de.iip_ecosphere.platform.support.iip_aas.config.CmdLine;
