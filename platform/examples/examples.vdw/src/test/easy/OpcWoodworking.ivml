@@ -32,7 +32,7 @@ project OpcWoodworking {
                 cachingTime = CACHE_ALWAYS
             }, Field {
                 name = "YearOfConstruction",
-                type = refBy(UInt16Type),
+                type = refBy(UnsignedInteger16Type),
                 cachingTime = CACHE_ALWAYS
             }
         }

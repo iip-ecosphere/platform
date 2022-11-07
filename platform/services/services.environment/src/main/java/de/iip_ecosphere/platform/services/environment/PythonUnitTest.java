@@ -1,3 +1,15 @@
+/**
+ * ******************************************************************************
+ * Copyright (c) {2022} The original author or authors
+ *
+ * All rights reserved. This program and the accompanying materials are made 
+ * available under the terms of the Eclipse Public License 2.0 which is available 
+ * at http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
+ ********************************************************************************/
+
 package de.iip_ecosphere.platform.services.environment;
 
 import java.io.BufferedReader;
@@ -5,8 +17,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.concurrent.ExecutionException;
 
+/**
+ * Executes syntactic tests on Python scripts.
+ * 
+ * @author Alexander Weber, SSE
+ */
 public class PythonUnitTest {
     
     /**
@@ -14,7 +30,6 @@ public class PythonUnitTest {
      * time.
      * 
      * @param args Args. No used.
-     * @throws ExecutionException In case the Python file is not well build
      */
     public static void main(String[] args) {
         /*
@@ -33,7 +48,6 @@ public class PythonUnitTest {
         //Args[1] = name of the concrete test file
         //args[2] = relative path from src/test/python into the  impl.model project
         String output = "";
-        String errorLine = "";
         String[] cmd = {pythonExecutable.getName(), args[1], args[2]}; 
         output += "This should be seeable:"; 
         output += runPythonTest(cmd, args[0]);

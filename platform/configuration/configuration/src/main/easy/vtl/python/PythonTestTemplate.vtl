@@ -54,11 +54,16 @@ template PythonTestTemplate(Configuration config, FileArtifact target, sequenceO
         class TestPyServive(unittest.TestCase):
         
             def test_inputTest(self):
+            
+                #Change name to correct .json, access rawData for values i.e. rawData["InputType"]["Value1"]
+                rawData = ""
+                with open ("../resources/testData-PyService.json", "r") as f:
+                    rawData = json.load(f)
 
                 # prepare your data, e.g., loading from json
                 """Needed to enable the loading of resources like the finished service would"""
                 os.chdir("../../main/python") 
-        
+
                 # instantiate your service here, e.g., service = PyService()
                 # call your service here, e.g., service.processNewInput(impl)
 	            

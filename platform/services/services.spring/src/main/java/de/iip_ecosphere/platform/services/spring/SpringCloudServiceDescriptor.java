@@ -376,7 +376,7 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
     int startProcess(SpringCloudServiceSetup config, ProcessSpec pSpec) throws ExecutionException {
         int result = -1;
         try {
-            processDir = DescriptorUtils.extractProcessArtifacts(getId(), pSpec, getArtifact().getJar(), 
+            processDir = Starter.extractProcessArtifacts(getId(), pSpec, getArtifact().getJar(), 
                 SpringInstances.getConfig().getDownloadDir());
 
             if (!pSpec.isStarted()) {

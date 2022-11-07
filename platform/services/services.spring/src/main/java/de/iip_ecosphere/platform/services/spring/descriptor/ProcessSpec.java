@@ -12,7 +12,6 @@
 
 package de.iip_ecosphere.platform.services.spring.descriptor;
 
-import java.io.File;
 import java.util.List;
 
 /**
@@ -24,46 +23,7 @@ import java.util.List;
  *  
  * @author Holger Eichelberger, SSE
  */
-public interface ProcessSpec {
-
-    /**
-     * Returns the process implementing artifacts within the containing artifact to be extracted into the 
-     * {@link #getHomePath() process home directory}.
-     * 
-     * @return the relative paths to the artifacts, shall start with "/" as part of ZIP/JAR
-     */
-    public List<String> getArtifacts();
-
-    /**
-     * Returns the system command or relative path within the artifact to be executed.
-     * 
-     * @return the command or relative path
-     */
-    public String getExecutable();
-    
-    /**
-     * Returns an optional path to be prefixed before the executable. Relevance depends on the execution environment.
-     * 
-     * @return the optional executable path, may be <b>null</b> for none
-     */
-    public File getExecutablePath();
-    
-    /**
-     * Returns the home directory of the process to be executed.
-     * 
-     * @return the home directory, may be <b>null</b> to rely on extracted paths, may be given to explicitly 
-     *     define a home path
-     */
-    public File getHomePath();
-    
-    /**
-     * Returns the command line arguments to start the process. The shell will be executed within the folder where
-     * the files from {@link #getHomePath()} are extracted.
-     * 
-     * @return the command line arguments (may be empty for none), {@link #getStreamEndpoint() streaming endpoint} and 
-     *     {@link #getAasEndpoint() AAS endpoint} will be added anyway
-     */
-    public List<String> getCmdArg();
+public interface ProcessSpec extends de.iip_ecosphere.platform.services.environment.ProcessSpec {
 
     /**
      * Returns additional/optional command line arguments required to start the service. The port placeholder
@@ -98,16 +58,6 @@ public interface ProcessSpec {
      * @return the AAS endpoint
      */
     public Endpoint getAasEndpoint();
-    
-    /**
-     * Returns whether the underlying process is already started when firing up the service or it will be started 
-     * through the service implementation. If specified, {@link #getArtifacts() artifacts} will be extracted anyway
-     * into the {@link #getHomePath() process home directory}, assuming that a pre-installed executable will not specify
-     * artifacts to be extracted.
-     * 
-     * @return {@code true} for started, {@code false} else (default)
-     */
-    public boolean isStarted();
     
     /**
      * Returns the time to wait for the process before going on with starting other services.

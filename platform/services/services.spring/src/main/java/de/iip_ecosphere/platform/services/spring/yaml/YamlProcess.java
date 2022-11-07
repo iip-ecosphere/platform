@@ -29,17 +29,10 @@ import de.iip_ecosphere.platform.services.spring.descriptor.Service;
  */
 public class YamlProcess extends de.iip_ecosphere.platform.services.environment.YamlProcess implements ProcessSpec {
 
-    private List<String> artifacts = new ArrayList<String>();
     private YamlEndpoint serviceStreamEndpoint;
     private YamlEndpoint streamEndpoint;
     private YamlEndpoint aasEndpoint;
-    private boolean started = false;
     private int waitTime = 0;
-
-    @Override
-    public List<String> getArtifacts() {
-        return artifacts;
-    }
     
     @Override
     public List<String> getCmdArg(int port, String protocol) {
@@ -67,25 +60,10 @@ public class YamlProcess extends de.iip_ecosphere.platform.services.environment.
     public YamlEndpoint getAasEndpoint() {
         return aasEndpoint;
     }
-    
-    @Override
-    public boolean isStarted() {
-        return started;
-    }
 
     @Override
     public int getWaitTime() {
         return waitTime;
-    }
-    
-    
-    /**
-     * Defines the process implementing artifacts within the containing artifact to be extracted.
-     * 
-     * @param artifacts the relative paths to the artifacts
-     */
-    public void setArtifacts(List<String> artifacts) {
-        this.artifacts = artifacts;
     }
 
     /**
@@ -115,15 +93,6 @@ public class YamlProcess extends de.iip_ecosphere.platform.services.environment.
      */
     public void setAasEndpoint(YamlEndpoint aasEndpoint) {
         this.aasEndpoint = aasEndpoint;
-    }
-
-    /**
-     * Changes whether the underlying process is already started when firing up the service. [required by SnakeYaml] 
-     * 
-     * @param started {@code true} for started (default), {@code false} else
-     */
-    public void setStarted(boolean started) {
-        this.started = started;
     }
 
     /**

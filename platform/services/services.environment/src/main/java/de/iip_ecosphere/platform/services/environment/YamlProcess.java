@@ -24,19 +24,45 @@ import org.apache.commons.io.FileUtils;
  *  
  * @author Holger Eichelberger, SSE
  */
-public class YamlProcess {
+public class YamlProcess implements ProcessSpec {
 
     private String executable;
     private String executablePath;
     private String homePath;
     private String locationKey;
     private List<String> cmdArg = new ArrayList<>();
-    
+    private List<String> artifacts = new ArrayList<String>();
+    private boolean started = false;
+
+    @Override
+    public List<String> getArtifacts() {
+        return artifacts;
+    }
+
+    @Override
+    public boolean isStarted() {
+        return started;
+    }
+
     /**
-     * Returns the system command or relative path to be executed.
+     * Defines the process implementing artifacts within the containing artifact to be extracted.
      * 
-     * @return the command or relative path
+     * @param artifacts the relative paths to the artifacts
      */
+    public void setArtifacts(List<String> artifacts) {
+        this.artifacts = artifacts;
+    }
+
+    /**
+     * Changes whether the underlying process is already started when firing up the service. [required by SnakeYaml] 
+     * 
+     * @param started {@code true} for started (default), {@code false} else
+     */
+    public void setStarted(boolean started) {
+        this.started = started;
+    }
+
+    @Override
     public String getExecutable() {
         return executable;
     }
@@ -50,23 +76,12 @@ public class YamlProcess {
         return locationKey;
     }
 
-    /**
-     * Returns an optional path to be prefixed before the executable. Relevance depends on the execution environment. 
-     * Replaces "${tmp}" by the system temporary directory path and "${user}" by the user directory path.
-     * 
-     * @return the optional executable path, may be <b>null</b> for none
-     */
+    @Override
     public File getExecutablePath() {
         return toSubstFilePath(executablePath);
     }
 
-    /**
-     * Returns the home directory of the process to be executed. Replaces "${tmp}" by the system temporary directory 
-     * path and "${user}" by the user directory path.
-     * 
-     * @return the home directory, may be <b>null</b> to rely on extracted paths, may be given to explicitly 
-     *     define a home path
-     */
+    @Override
     public File getHomePath() {
         return toSubstFilePath(homePath);
     }
@@ -84,6 +99,7 @@ public class YamlProcess {
         } else {
             result = path.replace("${tmp}", FileUtils.getTempDirectoryPath());
             result = result.replace("${user}", FileUtils.getUserDirectoryPath());
+            result = new File(result).toString(); // prevent OS file sep mismatch
         }
         return result;
     }
@@ -99,11 +115,7 @@ public class YamlProcess {
         return null == tmp ? null : new File(tmp);
     }
     
-    /**
-     * Returns the command line arguments to start the process. 
-     * 
-     * @return the command line arguments (may be empty for none)
-     */
+    @Override
     public List<String> getCmdArg() {
         return cmdArg;
     }
