@@ -674,7 +674,7 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
         YamlService yaml = YamlArtifact.readFromYamlSafe(ResourceLoader.getResourceAsStream("deployment.yml"))
             .getServiceSafe("${service.id}");
         File f = FileUtils.findFile(new File(".."), "${serviceArtifact}");
-        if (null != f) {
+        if (null != f && null != yaml.getProcess()) {
             Starter.extractProcessArtifacts("${service.id}", yaml.getProcess(), f, null);
         } else {
             LoggerFactory.getLogger(${clsName}Test.class).info("Service artifact {} not found in {}", "${serviceArtifact}", "..");
