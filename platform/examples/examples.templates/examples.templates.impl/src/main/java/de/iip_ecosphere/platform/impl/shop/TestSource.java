@@ -56,7 +56,6 @@ public class TestSource extends SourceImpl {
      * Takes the .csv containing the test data set from the training and reads it in.
      * The read values will be aggregated in a list of TestInputs for the transport.
      * @param fileName Name of the datafile.
-     * @throws URISyntaxException if the file is not found.
      */
     private void readTestDataCsv(String fileName) {
         if (!testDataLoaded) {
