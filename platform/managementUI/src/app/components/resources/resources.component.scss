@@ -1,0 +1,31 @@
+.container {
+  max-height: 400px;
+  display:flex;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+
+}
+
+.element {
+  margin: 0.5em;
+  width: 400px;
+  //max-width: 1000px;
+}
+
+#box {
+  margin: 0.5em;
+  display:flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#box > div {
+  margin-left: 0.5em;
+  margin-right: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+.bottom {
+  display: flex;
+  justify-content: center;
+}

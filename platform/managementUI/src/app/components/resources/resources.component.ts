@@ -18,12 +18,13 @@ export class ResourcesComponent implements OnInit {
   errorMsg: string | undefined;
 
   clicked: boolean = false;
+  test = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+  defaultImageUrl = '../../../assets/devideDefault.jpg';
 
   constructor(public http: HttpClient, public api: ApiService, public router: Router) {
     this.errorSub = this.api.errorEmitter.subscribe((error: HttpErrorResponse) => {this.errorMsg = error.message});
   }
-
-
 
   ngOnInit(): void {
     this.getData();
