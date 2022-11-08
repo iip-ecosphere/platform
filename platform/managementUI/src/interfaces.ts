@@ -125,6 +125,7 @@ export interface platformResponse {
 export interface buildInformation {
   version: string | undefined;
   buildId: string | undefined;
+  isRelease: boolean | undefined;
 }
 
 export interface platformData {

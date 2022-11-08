@@ -48,7 +48,7 @@ export class ApiService {
     return Data;
   }
 
-  public async getTechData() {
+  public async getPlatformData() {
     const Data = await this.getData('aas/submodels/platform/submodel/submodelElements') as ResourceValue[];
     return Data;
   }
