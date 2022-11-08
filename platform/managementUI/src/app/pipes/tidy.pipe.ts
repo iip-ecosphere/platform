@@ -25,7 +25,6 @@ export class TidyPipe implements PipeTransform {
         value = '?';
       }
     }
-    console.log(value);
     return value;
   }
 
