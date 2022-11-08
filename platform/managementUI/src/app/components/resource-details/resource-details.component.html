@@ -14,7 +14,7 @@
             <div *ngFor="let element of resource.value">
               <div *ngIf="!element.invokable">
                 <span class="shortId">{{ element.idShort }}: </span>
-                <span *ngIf="element.value"> {{ element.value}} </span>
+                <span *ngIf="element.value"> {{ element.value | tidy}} </span>
               </div>
             </div>
           </div>
