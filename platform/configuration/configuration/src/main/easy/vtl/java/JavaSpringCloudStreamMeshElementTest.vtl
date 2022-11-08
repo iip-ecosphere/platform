@@ -42,8 +42,6 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
         import de.iip_ecosphere.platform.services.environment.spring.SpringAsyncServiceBase;
         import de.iip_ecosphere.platform.transport.Transport;
         
-        import java.io.InputStream;
-        
         import org.slf4j.LoggerFactory;
         
         import org.hamcrest.core.IsAnything;
@@ -272,23 +270,21 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
         * @throws IOException if setting up the source fails
         */
         public void testSource() throws IOException {
-            InputStream in;
-            try {
-                String fileName = System.getProperty("iip.test.dataFile", "../../src/test/resources/${fileName}");
-                LoggerFactory.getLogger(getClass()).info("Opening {}", fileName);
-                in = new FileInputStream(fileName);
-            } catch (IOException e) {
-                in = ResourceLoader.getResourceAsStream("${fileName}");
+            DataMapper.BaseMappingConsumer<DataUnit> consumer = 
+                new DataMapper.BaseMappingConsumer<DataUnit>(DataUnit.class, getInitialPeriod());
+            ${genConsumerBindings(elt, service, "consumer")|e}
+            ${processOutput(elt, service, nodes)}
+            TimeUtils.sleep(5000);
+            Service svc = iip.Starter.getMappedService("${service.id}");
+            if (null != svc) {
+                try {
+                    LoggerFactory.getLogger(getClass()).info("Service autostop (test): ${service.id}");
+                    svc.setState(ServiceState.STOPPING);
+                } catch (ExecutionException e) {
+                    LoggerFactory.getLogger(getClass()).error("Stopping service ${service.id}: {}", e.getMessage());
+                }
             }
-            if (null != in) {
-                DataMapper.BaseMappingConsumer<DataUnit> consumer = 
-                    new DataMapper.BaseMappingConsumer<DataUnit>(DataUnit.class, getInitialPeriod());
-                ${genConsumerBindings(elt, service, "consumer")|e}
-                DataMapper.mapJsonData(in, DataUnit.class, consumer);
-                ${processOutput(elt, service, nodes)}
-            } else {
-                LoggerFactory.getLogger(getClass()).error("No test data found. Skipping test.");
-            }
+            System.exit(0);
         }
         '
     }
@@ -313,8 +309,9 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
                 DataMapper.BaseMappingConsumer<DataUnit> consumer = 
                     new DataMapper.BaseMappingConsumer<DataUnit>(DataUnit.class, getInitialPeriod());
                 ${genConsumerBindings(elt, service, "consumer")}
-                DataMapper.mapJsonData(in, DataUnit.class, consumer);
                 ${processOutput(elt, service, nodes)}
+                DataMapper.mapJsonData(in, DataUnit.class, consumer);
+                TimeUtils.sleep(3000); // if context is not ready
                 context.close();
                 detach();
                 LoggerFactory.getLogger(getClass()).info("Test done. Cooling down for 1s");
@@ -395,6 +392,9 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
                     } else {
                         String senderId = p.impl.id;
                         result = appendWithNewline(result, '${var}.addHandler(${fullTypeName}.class, d -> {
+                            // one for spring - ignored if async
+                            Transport.send(c -> c.asyncSend("${conn}", d), "${senderId}", "${conn}-in-0");
+                            // one for async via transport - ignored if spring
                             Transport.send(c -> c.asyncSend("${senderId}_${typeName}", d), "${senderId}", "${conn}-in-0");
                         });');
                     }
@@ -594,23 +594,13 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
         }
 
         calcBindings(mMesh, no, destinations, functions, sources, elt.impl.id);
+        setOf(String) dest = {};
         if (destinations.size() > 0) {
             for (String k : destinations.keys().asSequence()->sortedBy(e|e)) { // sortedBy for testing
-                String dst = "";
-                Boolean useNativeEncoding = false;
                 for (String d : destinations.get(k).asSequence()->sortedBy(n|n)) { // sortedBy for testing
-                    if (d == "*") {
-                        useNativeEncoding = true;
-                    } else {
-                        if (dst.length() > 0) {
-                            dst = dst + ",";
-                        }
-                        dst = dst + d;
+                    if (d <> "*") {
+                        dest.add(d);
                     }
-                }
-                result = appendWithSeparator(result, sep, '"spring.cloud.stream.bindings.${k}.destination=${dst}"');
-                if (useNativeEncoding) {
-                    result = appendWithSeparator(result, sep, '"spring.cloud.stream.bindings.${k}.useNativeEncoding=true"');
                 }
             }
         }
@@ -622,6 +612,9 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
             result = appendWithSeparator(result, sep, '"spring.cloud.stream.poller.fixedDelay=${pollInterval}"');
         }
         result = appendWithSeparator(result, sep, '"spring.cloud.function.definition=${semicolonList(functions)}"');
+        if (dest.length() > 0) {
+            result = appendWithSeparator(result, sep, '"spring.cloud.stream.source=${semicolonList(dest)}"');
+        }
         for (MeshElement e : nodes->sortedBy(n|n.impl.id)) { // sorting for testing tests
             String sId = toIdentifier(e.impl.id);
             result = appendWithSeparator(result, sep, '"iip.service.${sId}=${e == elt}"');
@@ -669,7 +662,6 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
         String serviceArtifact = "${getAppMvnName(app)}-${getAppMvnVersion(app)}-bin.jar";
         'iip.Starter.setServiceAutostart(true);
         iip.Starter.setOnServiceAutostartAttachShutdownHook(false);
-        AbstractProcessService.setInheritIo(true); // allow e.g. Python to emit output
         
         YamlService yaml = YamlArtifact.readFromYamlSafe(ResourceLoader.getResourceAsStream("deployment.yml"))
             .getServiceSafe("${service.id}");
