@@ -12,7 +12,10 @@
                 <p>resource</p>
               </div>
               <div>
-                <img src="../../../assets/deviceDefault.jpg" alt="imagePlaceholder">
+                <img *ngIf="!element.pic; else pictureAvailable" src="../../../assets/deviceDefault.jpg" [alt]="element.idShort" width="150px" height="200px">
+                <ng-template #pictureAvailable>
+                  <img [src]="'data:image/jpg;base64,' + element.pic" [alt]="element.idShort" width="150px" height="200px">
+                </ng-template>
               </div>
             </div>
             <div class="bottom">

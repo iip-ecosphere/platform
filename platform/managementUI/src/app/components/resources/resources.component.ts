@@ -3,7 +3,8 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ApiService } from 'src/app/services/api.service';
-import { PlatformResources, ResourceValue } from 'src/interfaces';
+import { TechnicalDataRetrieverService } from 'src/app/services/technical-data-retriever.service';
+import { PlatformResources, ResourceAttribute, ResourceProductPicture } from 'src/interfaces';
 
 @Component({
   selector: 'app-resources',
@@ -13,6 +14,7 @@ import { PlatformResources, ResourceValue } from 'src/interfaces';
 export class ResourcesComponent implements OnInit {
 
   Data: PlatformResources = {};
+  ResourcePictures: ResourceProductPicture[] = [];
 
   errorSub: Subscription;
   errorMsg: string | undefined;
@@ -22,7 +24,7 @@ export class ResourcesComponent implements OnInit {
 
   defaultImageUrl = '../../../assets/devideDefault.jpg';
 
-  constructor(public http: HttpClient, public api: ApiService, public router: Router) {
+  constructor(public http: HttpClient, public api: ApiService, public router: Router, private tech: TechnicalDataRetrieverService) {
     this.errorSub = this.api.errorEmitter.subscribe((error: HttpErrorResponse) => {this.errorMsg = error.message});
   }
 
@@ -31,7 +33,22 @@ export class ResourcesComponent implements OnInit {
   }
 
   public async getData() {
+    this.tech.emitter.subscribe( item => {
+      this.ResourcePictures.push(item)
+      if(this.Data && this.Data.submodelElements && item.idShort && item.picture) {
+        let a = this.Data.submodelElements.find(item2 => item2.idShort === item.idShort)
+        if(a) {
+          a.pic = item.picture;
+          console.log(a);
+          console.log(this.Data.submodelElements);
+        }
+      }
+    });
     this.Data = await this.api.getResources();
+    if(this.Data && this.Data.submodelElements) {
+      this.tech.getTechnicalData(this.Data.submodelElements);
+
+    }
     console.log(this.Data);
   }
 
@@ -40,7 +57,7 @@ export class ResourcesComponent implements OnInit {
     return bo;
   }
 
-  public async details(resource: ResourceValue[] | undefined) {
+  public async details(resource: ResourceAttribute[] | undefined) {
     let id: string | undefined = undefined;
     if(this.isArray(resource)){
       const test = await resource?.find(item => item.idShort === "managedId");
@@ -57,7 +74,7 @@ export class ResourcesComponent implements OnInit {
 
   }
 
-  public async details2(resource: ResourceValue[] | undefined) {
+  public async details2(resource: ResourceAttribute[] | undefined) {
     let id: string | undefined = undefined;
     if(this.isArray(resource)){
       const test = await resource?.find(item => item.idShort === "managedId");

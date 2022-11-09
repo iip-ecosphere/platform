@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ApiService } from 'src/app/services/api.service';
-import { outputArgument, platformResponse, Resource, ResourceAttribute, ResourceValue } from 'src/interfaces';
+import { outputArgument, platformResponse, Resource, ResourceAttribute } from 'src/interfaces';
 
 @Component({
   selector: 'app-operation-query',
@@ -14,7 +14,7 @@ export class OperationQueryComponent implements OnInit {
 
   functions: ResourceAttribute[] = [];
   selected: ResourceAttribute | null = null;
-  inputVariables: ResourceValue[] = [];
+  inputVariables: ResourceAttribute[] = [];
   inputVariablesValues: any[] = [];
 
   message: string = '';

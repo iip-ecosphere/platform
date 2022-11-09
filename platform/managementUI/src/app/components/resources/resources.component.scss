@@ -19,7 +19,7 @@
   align-items: center;
 }
 
-#box > div {
+#box > div { //child divs of element with id "box"
   margin-left: 0.5em;
   margin-right: 0.5em;
   margin-bottom: 0.5em;

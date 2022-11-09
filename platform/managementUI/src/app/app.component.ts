@@ -35,6 +35,5 @@ export class AppComponent implements OnInit{
         this.Data.isRelease = isRelease.value;
       }
     }
-    console.log(response);
   }
 }
