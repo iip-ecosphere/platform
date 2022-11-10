@@ -27,6 +27,9 @@
       </mat-card>
     </div>
   </div>
+  <div *ngIf="!services">
+    <p>Service Aas not reachable, ServiceManager might not be running</p>
+  </div>
   <h1>available Artifacts</h1>
   <div>
     <div *ngFor="let element of artifacts.submodelElements; let i = index">

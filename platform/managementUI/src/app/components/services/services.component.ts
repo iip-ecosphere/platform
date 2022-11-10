@@ -18,7 +18,6 @@ export class ServicesComponent implements OnInit {
   artifacts: PlatformArtifacts = {};
   artifactsToggle: boolean[] = [];
 
-
   ngOnInit(): void {
     this.getServices();
     this.getArtifacts();
@@ -26,7 +25,6 @@ export class ServicesComponent implements OnInit {
 
   public async getServices() {
     this.services = await this.api.getServices();
-    console.log(this.services);
     if(this.services && this.services.submodelElements) {
       this.servicesToggle = new Array(this.services.submodelElements.length).fill(false);
     }
@@ -43,7 +41,6 @@ export class ServicesComponent implements OnInit {
     if(this.artifacts && this.artifacts.submodelElements) {
       this.artifactsToggle = new Array(this.artifacts.submodelElements.length).fill(false);
     }
-    console.log(this.artifacts);
   }
 
   public artToggle(index: number) {
