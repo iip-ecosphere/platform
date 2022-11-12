@@ -8,8 +8,10 @@ template PythonType(Configuration config, FileArtifact target, RecordType type, 
     // generates code for the individual attributes
     def attributes(RecordType type) {
         if (not(interface)) {
+            '#Mapped into properties without leading _ below resembling getter/setter'
+            ''
             for (Field f: type.fields) {
-                '${asIdentifier(f.name)}: ${toTypeName(f.type)}'
+                '_${asIdentifier(f.name)}: ${toTypeName(f.type)} = ${defaultValue(f.type)}'
             }
         }
     }
@@ -25,7 +27,7 @@ template PythonType(Configuration config, FileArtifact target, RecordType type, 
             if (interface) {
             '    raise NotImplementedError'
             } else {
-            '    return self.${asIdentifier(f.name)}'
+            '    return self._${asIdentifier(f.name)}'
             }
             ''
         }
@@ -47,9 +49,21 @@ template PythonType(Configuration config, FileArtifact target, RecordType type, 
             ''
         }
     }
+
+    // generates code for the properties
+    def properties(RecordType type) {
+        '#Indeed, there are 2.4 decorators for this, but for now we want to have all here: pythonic field access'
+        '#backed by getter/setter and the ability to replace data classes by e.g. projecting or data enhancing'
+        '#functionality (original idea of the "interfaces" with similar naming as in Java. It may be that the '
+        "#interfaces become superfluous due to the properties, but let's leave them in for now."
+        ''
+        for (Field f: type.fields) {
+            '${asIdentifier(f.name)} = property(get${asMethodNameSuffix(f.name)}, set${asMethodNameSuffix(f.name)})'
+        }
+    }
     
     def genSetterAssignment(Field f, DataType type) {
-        'self.${asIdentifier(f.name)} = v'
+        'self._${asIdentifier(f.name)} = v'
     }
 
     def genSetterTypeAnnotation(Field f, DataType type) {
@@ -76,9 +90,9 @@ template PythonType(Configuration config, FileArtifact target, RecordType type, 
     
     protected def genNumpyConversion(Field f, DataType type) {
         'if ("numpy" in str(type(v))):
-            self.${asIdentifier(f.name)} = v.item()
+            self._${asIdentifier(f.name)} = v.item()
          else:
-            self.${asIdentifier(f.name)} = v'
+            self._${asIdentifier(f.name)} = v'
     }
     
     def genSetterTypeAnnotation(Field f, NumericPrimitiveType type) {
@@ -143,7 +157,9 @@ template PythonType(Configuration config, FileArtifact target, RecordType type, 
             
             ${getters(type)}
             
-            ${setters(type)}'
+            ${setters(type)}
+            
+            ${properties(type)}'
     }
     
 }
