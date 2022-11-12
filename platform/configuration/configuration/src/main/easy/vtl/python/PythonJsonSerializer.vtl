@@ -18,7 +18,11 @@ template PythonJsonSerializer(Configuration config, FileArtifact target, RecordT
           dict
             the attributes
         """
-        return o.__dict__
+        tmp = dict()
+        for key in o.__dict__:
+            k = key[1:] # by generation convention
+            tmp[k] = o.__dict__[key]
+        return tmp
     '
     }
     

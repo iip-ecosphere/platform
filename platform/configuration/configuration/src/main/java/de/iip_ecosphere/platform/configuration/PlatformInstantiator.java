@@ -246,6 +246,16 @@ public class PlatformInstantiator {
             return kind == LanguageElementKind.FAILURE || kind == LanguageElementKind.LANGUAGE_UNIT 
                 || kind == LanguageElementKind.FUNCTION_EXECUTION;
         }
+        
+        /**
+         * Returns whether warnings are enabled.
+         * 
+         * @return {@code true} for warnings, {@code false} else
+         */
+        //@Override
+        public boolean isWarningEnabled() {
+            return false;
+        }
 
     }
     
