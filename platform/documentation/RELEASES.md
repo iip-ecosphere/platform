@@ -23,6 +23,7 @@ In progress:
 * [#69](https://github.com/iip-ecosphere/platform/issues/69): Revise platform installation guidelines
 * [#100](https://github.com/iip-ecosphere/platform/issues/100): Run multiple app instances
 * [#101](https://github.com/iip-ecosphere/platform/issues/101): Documentation of fixed formats used by the platform
+* [#103](https://github.com/iip-ecosphere/platform/issues/36): Generation of Python code: initialize the fields in data classes, allow for more Pythonic field access while keeping getters/setters
 
 New features:
 * [#51](https://github.com/iip-ecosphere/platform/issues/51): Device specific measurement plugin for Phoenix Contact AXC

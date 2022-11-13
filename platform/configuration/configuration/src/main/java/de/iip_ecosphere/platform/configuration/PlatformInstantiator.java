@@ -247,12 +247,7 @@ public class PlatformInstantiator {
                 || kind == LanguageElementKind.FUNCTION_EXECUTION;
         }
         
-        /**
-         * Returns whether warnings are enabled.
-         * 
-         * @return {@code true} for warnings, {@code false} else
-         */
-        //@Override
+        @Override
         public boolean isWarningEnabled() {
             return false;
         }
