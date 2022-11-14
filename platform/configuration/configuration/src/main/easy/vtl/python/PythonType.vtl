@@ -11,9 +11,17 @@ template PythonType(Configuration config, FileArtifact target, RecordType type, 
             '#Mapped into properties without leading _ below resembling getter/setter'
             ''
             for (Field f: type.fields) {
-                '_${asIdentifier(f.name)}: ${toTypeName(f.type)} = ${defaultValue(f.type)}'
+                '_${asIdentifier(f.name)}: ${toTypeName(f.type)} = ${fieldDefaultValue(f)}'
             }
         }
+    }
+    
+    def String fieldDefaultValue(Field field) {
+        if (field.optional) {
+            "None";
+        } else {
+            defaultValue(field.type);
+        }    
     }
     
     // generates code for the getters
