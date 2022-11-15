@@ -83,11 +83,11 @@ template PythonServiceInterface(Configuration config, FileArtifact target, Servi
 
     def main(Configuration config, FileArtifact target, ServiceBase service, String pkg) {
         String clsName = asTypeName(service.name);
-        'from iip.AbstractService import AbstractService
+        'from AbstractService import AbstractService
         import Registry
-        from iip.Version import Version
-        from iip.Service import ServiceState
-        from iip.Service import ServiceKind
+        from Version import Version
+        from Service import ServiceState
+        from Service import ServiceKind
         ${produceDatatypeImports(service)}
 
         class ${clsName}Interface(AbstractService):
