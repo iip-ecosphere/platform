@@ -17,6 +17,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.concurrent.ExecutionException;
+
+import de.iip_ecosphere.platform.services.environment.PythonSyntaxTest;
 
 /**
  * Executes syntactic tests on Python scripts.
@@ -30,8 +33,9 @@ public class PythonUnitTest {
      * time.
      * 
      * @param args Args. No used.
+     * @throws ExecutionException Whe nthe python Test fails.
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ExecutionException {
         /*
          * This call just goes through some locations known to contain the python3
          * executable. i.e. "/usr/bin/python3" not perfect as the last option, the one
@@ -49,9 +53,11 @@ public class PythonUnitTest {
         //args[2] = relative path from src/test/python into the  impl.model project
         String output = "";
         String[] cmd = {pythonExecutable.getName(), args[1], args[2]}; 
-        output += "This should be seeable:"; 
         output += runPythonTest(cmd, args[0]);
-        System.out.println(output);
+        //System.out.println(output);
+        if (output.contains("Traceback")) {
+            throw new ExecutionException(output, null);
+        }
         
         //throw new ExecutionException(output, null);
     }
@@ -66,32 +72,13 @@ public class PythonUnitTest {
         String output = "";
         try {
             process = Runtime.getRuntime().exec(cmd, null, new File(workingDirectory));
-            output = readProcessOutput(process.getInputStream());
-            output += readProcessOutput(process.getErrorStream());
-            // only test if error is due to missing pyflakes!
+            output = PythonSyntaxTest.readProcessOutput(process.getInputStream());
+            output += PythonSyntaxTest.readProcessOutput(process.getErrorStream());
+
             process.waitFor();
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
         return output;
-    }
-    
-    /**
-     * Shall take in input stream of processes to collect console output.
-     * 
-     * @param stream Process to be observed.
-     * @return The read Lines from the process.
-     * @throws IOException If the reading of the lines does fail.
-     */
-    public static String readProcessOutput(InputStream stream) throws IOException {
-        StringBuffer output = new StringBuffer();
-        String line = "";
-        InputStreamReader reader = new InputStreamReader(stream);
-        BufferedReader bufferedReader = new BufferedReader(reader);
-        while ((line = bufferedReader.readLine()) != null) {
-            output.append(line);
-            output.append("\n");
-        }
-        return output.toString();
     }
 }

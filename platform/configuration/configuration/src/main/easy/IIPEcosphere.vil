@@ -174,7 +174,9 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 
                 vilTemplateProcessor("TemplatesEclipseProject", config, "${appRoot}/.project", appName="impl." + appName);
                 vilTemplateProcessor("TemplatesEclipseClasspath", config, "${appRoot}/.classpath", appName="impl." + appName);
+                vilTemplateProcessor("TemplatesEclipsePyDevProject", config, "${appRoot}/.pydevproject", appName=appName);
                 vilTemplateProcessor("TemplatesEclipseGitignore", config, "${appRoot}/.gitignore", appName=appName);
+                vilTemplateProcessor("TemplatesEasyProducer", config, "${appRoot}/.EASyProducer", appName=appName);
 
                 setOf(String) assemblies = {}; 
                 mapOf(MeshElement, setOf(MeshConnector)) mappedMesh = {};

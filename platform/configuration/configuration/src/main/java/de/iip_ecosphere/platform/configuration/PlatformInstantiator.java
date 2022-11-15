@@ -246,6 +246,11 @@ public class PlatformInstantiator {
             return kind == LanguageElementKind.FAILURE || kind == LanguageElementKind.LANGUAGE_UNIT 
                 || kind == LanguageElementKind.FUNCTION_EXECUTION;
         }
+        
+        @Override
+        public boolean isWarningEnabled() {
+            return false;
+        }
 
     }
     

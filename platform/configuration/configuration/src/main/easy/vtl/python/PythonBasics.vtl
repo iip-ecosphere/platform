@@ -144,4 +144,26 @@ template PythonBasics(Configuration config, FileArtifact target) {
         "list[" + toTypeName(type.type) + "]";
     } 
     
+    // --------------------------------- default values ---------------------------
+    
+    def String defaultValue(DataType type) {
+        "None";
+    }
+    
+    def String defaultValue(NumericPrimitiveType type) {
+        "0";
+    }
+
+    def String defaultValue(FloatTypeType type) {
+        "0.0";
+    }
+
+    def String defaultValue(DoubleTypeType type) {
+        "0.0";
+    }
+    
+    def String defaultValue(StringTypeType type) {
+        "\"\"";
+    }
+    
 }
