@@ -43,6 +43,7 @@ template Dockerfile_Python(IIPEcosphere config, FileArtifact target, sequenceOf(
             }
         }
         '${containerSettings(config, containerType, device)}'
+        'RUN apk add bash'
         ''
         '# Installed dependencies (shall be in /)'
         'COPY installedDependencies.yml installedDependencies.yml'
