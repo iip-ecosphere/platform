@@ -98,9 +98,9 @@ template PythonType(Configuration config, FileArtifact target, RecordType type, 
     
     protected def genNumpyConversion(Field f, DataType type) {
         'if ("numpy" in str(type(v))):
-            self._${asIdentifier(f.name)} = v.item()
+             self._${asIdentifier(f.name)} = v.item()
          else:
-            self._${asIdentifier(f.name)} = v'
+             self._${asIdentifier(f.name)} = v'
     }
     
     def genSetterTypeAnnotation(Field f, NumericPrimitiveType type) {
