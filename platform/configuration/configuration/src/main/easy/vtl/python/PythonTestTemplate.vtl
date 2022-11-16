@@ -26,6 +26,7 @@ template PythonTestTemplate(Configuration config, FileArtifact target, sequenceO
             if (not(done.includes(clsName))) {
                 done.add(clsName);
                 'from datatypes.${clsName} import ${clsName}'
+                'from datatypes.${clsName}Impl import ${clsName}Impl'
             }
         }
     }
