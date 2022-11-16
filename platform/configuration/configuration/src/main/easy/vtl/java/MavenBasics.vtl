@@ -119,6 +119,10 @@ template MavenBasics(Configuration config, FileArtifact target) {
         new XmlElement(project, "dependencies");
     }
 
+    def createPluginManagement(XmlElement project) {
+        new XmlElement(project, "pluginManagement");
+    }
+
     def appendExecutionsParent(XmlElement parent) {
         new XmlElement(parent, "executions");
     }
@@ -432,6 +436,29 @@ template MavenBasics(Configuration config, FileArtifact target) {
                 appendArtifact(parent, p.artifact);
             }        
         } // use the default builtin
+    }
+    
+    def appendEclipseLifecycleMappingPlugin(XmlElement parent, String groupId, String artifactId, String versionRange, String goal, String ver="1.0.0") {
+        XmlElement pluginCfg = appendPlugin(parent, "org.eclipse.m2e", "lifecycle-mapping", ver, true);
+        new XmlComment(pluginCfg, "Plugin is only needed for Eclipse, used phase is usually valid for maven, warning in Eclipse can be ignored.");
+        XmlElement lfcMeta = new XmlElement(pluginCfg, "lifecycleMappingMetadata");
+        XmlElement execs = new XmlElement(lfcMeta, "pluginExecutions");
+        XmlElement exec = new XmlElement(execs, "pluginExecution");
+
+        XmlElement filter = new XmlElement(exec, "pluginExecutionFilter"); 
+        new XmlElement(filter, "groupId", groupId);
+        new XmlElement(filter, "artifactId", artifactId);
+        new XmlElement(filter, "versionRange", versionRange);
+        XmlElement goals = new XmlElement(filter, "goals");
+        new XmlElement(goals, "goal", goal);
+
+        XmlElement action = new XmlElement(exec, "action");
+        new XmlElement(action, "ignore");
+        pluginCfg;
+    }
+
+    def appendEclipseLifecycleMapping4DependenciesPlugin(XmlElement parent, String versionRange="[3.1.2,)", String goal="copy", String ver="1.0.0") {
+        appendEclipseLifecycleMappingPlugin(parent, "org.apache.maven.plugins", "maven-dependency-plugin", versionRange, goal, ver);
     }
 
 }

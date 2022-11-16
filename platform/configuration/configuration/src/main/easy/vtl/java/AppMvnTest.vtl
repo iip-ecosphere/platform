@@ -49,13 +49,16 @@ template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, sequenceOf(Mesh
         appendExclusion(e, "org.springframework.boot", "spring-boot-starter-actuator"); 
         appendDependency(dep, gId, appName, appVersion, scope="test", type="test-jar");
      
-        XmlElement plugins = createMavenBuildElement(profile, "", true);
+        XmlElement build = createMavenBuildElement(profile, "", false);
+        XmlElement plugins = createPlugins(build);
         XmlElement execs = appendMavenDependencyPluginUnpackArtifact(plugins, "${iipGroup}:services.environment:${projectVersion}", "python", "\\${project.basedir}/src/main/python", "pythonEnv.zip", type="zip");
         XmlElement unpackItems = appendMavenDependencyPluginExecution(execs, "unpack", 
             "de.iip-ecosphere.platform:services.environment:" + projectVersion, "python", 
             "\\${project.build.directory}/pyEnv", "pyEnv.zip", type="zip", id="pythonSources", phase="validate");
         appendMavenDependencyPluginArtifactItem(unpackItems, cfg.sharedArtifact + ":" + projectVersion, "python", 
             "\\${project.build.directory}/pySrc", "pyIf.zip", type="zip");
+        XmlElement pluginMgt = createPlugins(createPluginManagement(build));
+        appendEclipseLifecycleMapping4DependenciesPlugin(pluginMgt, goal="unpack");
         
         XmlElement assemblyPlugin = appendAssemblyPlugin(plugins);
         for (String ass: assemblies.asSequence()->sortedBy(a|a)) { // sortedBy for testing
