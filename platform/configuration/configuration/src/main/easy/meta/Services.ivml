@@ -150,7 +150,7 @@ project Services {
        Constraint sourceTypesOk = kind == ServiceKind.SOURCE_SERVICE implies isDefined(output) and fwdTypes(output).size() > 0; // does not hold for connectors: and fwdTypes(input).size() == 0;
        Constraint sinkTypesOk = kind == ServiceKind.SINK_SERVICE implies isDefined(input) and fwdTypes(input).size() > 0;
        Constraint transTypesOk = kind == ServiceKind.TRANSFORMATION_SERVICE or kind == ServiceKind.PROBE_SERVICE implies isDefined(input) and fwdTypes(input).size() > 0 and isDefined(output) and fwdTypes(output).size() > 0;
-       Constraint syncEqualIO = not(asynchronous) and kind <> ServiceKind.SOURCE_SERVICE implies isDefined(input) and isDefined(output) and fwdTypes(input).size() == fwdTypes(output).size();
+       Constraint syncEqualIO = not(asynchronous) and kind <> ServiceKind.SOURCE_SERVICE and kind <> ServiceKind.SINK_SERVICE implies isDefined(input) and isDefined(output) and fwdTypes(input).size() == fwdTypes(output).size();
    }
 
    Constraint serviceIdsUnique = allInstances(ServiceBase)->isUnique(s|s.id);

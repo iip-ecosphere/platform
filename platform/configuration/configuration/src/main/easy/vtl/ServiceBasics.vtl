@@ -27,7 +27,7 @@ template ServiceBasics(Configuration config, FileArtifact target) {
     }
     
     def produceForInputTypes(ServiceBase service) {
-        if (service.asynchronous) {
+        if (service.asynchronous or service.kind==ServiceKind::SINK_SERVICE) {
             for (IOType in : service.input) {
                 '${produceAsyncProcessorBody(in)}'
             }

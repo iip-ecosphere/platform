@@ -181,10 +181,11 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 setOf(String) assemblies = {}; 
                 mapOf(MeshElement, setOf(MeshConnector)) mappedMesh = {};
                 sequenceOf(MeshElement) elements = {};
+                setOf(String) javaTests = {};
                 for (ServiceMesh n : a.services) {
                     setOf(MeshElement) nodes = n.sources->closure(MeshElement e|nextMeshNodes(e, mappedMesh));
                     for (MeshElement no : nodes) {
-                        generateTemplateElements(appRoot, config, no, no.impl, assemblies);
+                        generateTemplateElements(appRoot, config, no, no.impl, assemblies, javaTests);
                         elements.add(no);
                     }
                 }
@@ -192,6 +193,9 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 sequenceOf(MeshElement) pythonElements = elements->select(e|e.impl.isKindOf(PythonService));
                 if (pythonElements.size() > 0) {
                     vilTemplateProcessor("PythonTestTemplate", config, "${appRoot}/src/test/python/pyTest.py", pythonElements=pythonElements);
+                }
+                if (javaTests.size() > 0) {
+                    vilTemplateProcessor("JavaAllTestsTemplate", config, "${appRoot}/src/test/java/AllTests.java", javaTests=javaTests, pkg="");
                 }
                 
                 vilTemplateProcessor("TemplatesEclipseReadme", config, "${appRoot}/README.md", appName="impl." + appName, nodes=elements);
@@ -208,14 +212,14 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
 
     // ------------------------------------------ generating apps: generating template code -----------------------------------
     
-    generateTemplateElements(Path appRoot, Configuration config, MeshElement no, ServiceBase service, setOf(String) assemblies) = {
+    generateTemplateElements(Path appRoot, Configuration config, MeshElement no, ServiceBase service, setOf(String) assemblies, setOf(String) javaTests) = {
     }
 
-    generateTemplateElements(Path appRoot, Configuration config, MeshElement no, CompleteService service, setOf(String) assemblies) = {
+    generateTemplateElements(Path appRoot, Configuration config, MeshElement no, CompleteService service, setOf(String) assemblies, setOf(String) javaTests) = {
         // do nothing, everything is here already generically in place
     }
 
-    generateTemplateElements(Path appRoot, Configuration config, MeshElement no, JavaService service, setOf(String) assemblies) = {
+    generateTemplateElements(Path appRoot, Configuration config, MeshElement no, JavaService service, setOf(String) assemblies, setOf(String) javaTests) = {
         if (service.class <> "") {
             JavaPath jp = service.class;
             Path p = appRoot + "/src/main/java/" + jp.getPathSegments().toPath();
@@ -225,10 +229,13 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 Path testResourcesSrc = "${appRoot}/src/test/resources";
                 vilTemplateProcessor("TemplatesTestDataJson", config, "${testResourcesSrc}/testData-${getClsName(no)}.json.tmpl", elt=no);
             }
+            p = appRoot + "/src/test/java/" + jp.getPathSegments().toPath();
+            vilTemplateProcessor("JavaServiceTestTemplate", config, "${p}/${jp.getName()}Test.java", service=service, pkg=jp.getPathSegments());
+            javaTests.add(service.class + "Test");
         }
     }
 
-    generateTemplateElements(Path appRoot, Configuration config, MeshElement no, PythonService service, setOf(String) assemblies) = {
+    generateTemplateElements(Path appRoot, Configuration config, MeshElement no, PythonService service, setOf(String) assemblies, setOf(String) javaTests) = {
         String clsName = asTypeName(no.name);
         vilTemplateProcessor("PythonMeshElementTemplate", config, "${appRoot}/src/main/python/services/${clsName}.py", elt=no, pkg="services");
         Path assemblyPath = "${appRoot}/src/main/assembly";
