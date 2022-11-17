@@ -1,10 +1,10 @@
-# IIP-Ecosphere platform examples: Asynchronous Python
+# IIP-Ecosphere platform examples: Synchronous Python
 
-Demonstrates a simple application-specific (asynchronous) Python service in a simple service chain. If compile errors show up, e.g., in Eclipse, this means that the generated code is not yet in place. Run the instantiation/connector generation as described below (generated classes are intentionally not in github, generated example components are intentionally not deployed to Maven).
+Demonstrates a simple application-specific (synchronous) Python service in a simple service chain. If compile errors show up, e.g., in Eclipse, this means that the generated code is not yet in place. Run the instantiation/connector generation as described below (generated classes are intentionally not in github, generated example components are intentionally not deployed to Maven).
 
 The application consists of three (micro)-services, which are composed in the configuration model and integrated in a model-based fashion through the platform/application instantiation:
-  * A sender service asynchronously ingests data once per second.
-  * An asynchronous "AI" service in Python based on configuration-determined interfaces, processes the data and delivers a "classification".
+  * A sender service synchronously ingests data once per second.
+  * A synchronous "AI" service in Python based on configuration-determined interfaces, processes the data and delivers a "classification".
   * An asynchronous receiver service emits the finally received (and classified/scored) data on the console.
 
 This example consists of several pieces:
