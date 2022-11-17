@@ -153,8 +153,8 @@ public class PythonSyncProcessService extends AbstractPythonProcessService {
     }
 
     @Override
-    public <I, O> O process(String inType, I data) throws ExecutionException {
-        return processImpl(inType, data);
+    public <I> void process(String inType, I data) throws ExecutionException {
+        processImpl(inType, data);
     }
     
     @Override

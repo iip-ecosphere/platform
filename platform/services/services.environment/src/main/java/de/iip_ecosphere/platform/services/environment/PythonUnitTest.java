@@ -12,14 +12,9 @@
 
 package de.iip_ecosphere.platform.services.environment;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.concurrent.ExecutionException;
-
-import de.iip_ecosphere.platform.services.environment.PythonSyntaxTest;
 
 /**
  * Executes syntactic tests on Python scripts.

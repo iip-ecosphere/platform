@@ -160,13 +160,13 @@ public class PythonProcessServiceTest {
         service.registerOutputTypeTranslator(Rec13.class, rec13TypeName, new Rec13OutTranslator());
         
         service.setState(ServiceState.STARTING);
-        Assert.assertEquals("test", service.process(stringTypeName, "test"));
-        Assert.assertEquals("test", service.process(stringTypeName, "test"));
-        Assert.assertEquals("test", service.processQuiet(stringTypeName, "test"));
+        Assert.assertEquals("test", service.processSync(stringTypeName, "test", stringTypeName));
+        Assert.assertEquals("test", service.processSync(stringTypeName, "test", stringTypeName));
+        Assert.assertEquals("test", service.processSyncQuiet(stringTypeName, "test", stringTypeName));
         Rec13 r = new Rec13Impl();
         r.setIntField(10);
         r.setStringField("abba");
-        Assert.assertEquals(r, service.processQuiet(rec13TypeName, r));
+        Assert.assertEquals(r, service.processSyncQuiet(rec13TypeName, r, rec13TypeName));
         service.setState(ServiceState.STOPPING);
 
         service.activate();

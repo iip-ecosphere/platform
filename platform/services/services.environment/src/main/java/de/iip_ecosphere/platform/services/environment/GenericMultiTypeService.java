@@ -66,15 +66,12 @@ public interface GenericMultiTypeService extends Service {
      * Requests asynchronous processing a data item.
      * 
      * @param <I> the input data type
-     * @param <O> the output data type
      * @param inTypeName the name of {@code inType} in the configuration model
      * @param data the data item to be processed
-     * @return the output, always <b>null</b> in case of asynchronous processing as the result is passed to a 
-     *     registered ingestor
      * @throws ExecutionException if the execution fails for some reason, e.g., because type translators 
      *    are not registered (@link #registerInputTypeTranslator(Class, Class, TypeTranslator, TypeTranslator)}
      */
-    public <I, O> O process(String inTypeName, I data) throws ExecutionException;
+    public <I> void process(String inTypeName, I data) throws ExecutionException;
 
     /**
      * Requests synchronous processing a data item.
@@ -96,18 +93,14 @@ public interface GenericMultiTypeService extends Service {
      * exceptions.
      * 
      * @param <I> the input data type
-     * @param <O> the output data type
      * @param inTypeName the name of {@code inType} in the configuration model
      * @param data the data item to be processed
-     * @return the output, always <b>null</b> in case of asynchronous processing as the result is passed to a 
-     *     registered ingestor
      */
-    public default <I, O> O processQuiet(String inTypeName, I data) {
+    public default <I> void processQuiet(String inTypeName, I data) {
         try {
-            return process(inTypeName, data);
+            process(inTypeName, data);
         } catch (ExecutionException e) {
             LoggerFactory.getLogger(getClass()).error("Processing failed: " + e.getMessage());
-            return null;
         }
     }
 

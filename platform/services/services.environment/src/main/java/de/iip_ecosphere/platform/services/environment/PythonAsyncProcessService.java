@@ -177,7 +177,7 @@ public class PythonAsyncProcessService extends AbstractPythonProcessService {
 
     @SuppressWarnings("unchecked")
     @Override
-    public <I, O> O process(String inType, I data) throws ExecutionException {
+    public <I> void process(String inType, I data) throws ExecutionException {
         InTypeInfo<?> info = getInTypeInfo(inType);
         if (null != info) {
             TypeTranslator<I, String> inT = (TypeTranslator<I, String>) info.getInTranslator();
@@ -193,7 +193,6 @@ public class PythonAsyncProcessService extends AbstractPythonProcessService {
         } else {
             throw new ExecutionException("No input type translator registered", null);
         }
-        return null;
     }
 
     @SuppressWarnings("unchecked")
