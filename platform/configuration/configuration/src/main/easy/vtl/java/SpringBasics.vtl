@@ -78,9 +78,19 @@ template SpringBasics(Configuration config, FileArtifact target) {
                         String eltId = getMethodSuffixId(getMethodSuffix(elt, toTypeName(eltOut), outType(elt, eltOut)), elt);
                         if (not(eltImpl.kind==ServiceKind::SOURCE_SERVICE and eltImpl.asynchronous)) { // bindings for async sources cause troubles
                             if (not(eltImpl.asynchronous)) { // output happens via ingestors/transport
-                                addDestination(destinations, "${eltId}-out-0", eltId); // appId may be added
-                                if (includeInFunc(filterFunc, eltId)) {
-                                    functions.add(eltId);
+                                String eId = eltId;
+                                if (eltImpl.kind<>ServiceKind::SOURCE_SERVICE and eltImpl.kind<>ServiceKind::SINK_SERVICE) {
+                                    mapOf(IOType, IOType) pairs = ioPairs(elt);
+                                    for (IOType in : pairs.keys()) {
+                                        IOType out = pairs.get(in);
+                                        if (out.type==eltOut.type) {
+                                            eId = getMethodSuffixId(getMethodSuffix(elt, toTypeName(in), toTypeName(out)), elt);
+                                        }
+                                    }
+                                }
+                                addDestination(destinations, "${eId}-out-0", eltId); // appId may be added
+                                if (includeInFunc(filterFunc, eId)) {
+                                    functions.add(eId);
                                 }
                             } else {
                                 // async -> sync connection requires spring as target is function

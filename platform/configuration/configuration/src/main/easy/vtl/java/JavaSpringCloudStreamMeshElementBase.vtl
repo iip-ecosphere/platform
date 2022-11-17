@@ -991,7 +991,7 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
     }
     
     def generateSyncProcessorBody(MeshProcessor proc, PythonService service, String methodSuffix, String methodSuffixWithServiceId, String inType, String outType) {
-        String expr = 'service.processQuiet("${inType}", data)';
+        String expr = 'service.processSyncQuiet("${inType}", data, "${outType}")';
         'return data -> ${genSentProbe(service, expr, true, inType, "data")};'
     }
 
