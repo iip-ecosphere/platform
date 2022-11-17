@@ -33,6 +33,7 @@ import com.github.dockerjava.api.command.PullImageResultCallback;
 import com.github.dockerjava.api.model.AuthConfig;
 import com.github.dockerjava.api.model.Container;
 import com.github.dockerjava.api.model.ExposedPort;
+import com.github.dockerjava.api.model.HostConfig;
 import com.github.dockerjava.api.model.Info;
 import com.github.dockerjava.api.model.Volume;
 import com.github.dockerjava.core.DefaultDockerClientConfig;
@@ -152,7 +153,7 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
                 } catch (InterruptedException e) {
                     throw new ExecutionException(e);
                 }
-                result = getDockerId(DockerContainerDescriptor.getRepository(imageName)); // unsure, with/out version
+                result = imageName; // unsure, with/out version
             }
         }
         return result;
@@ -334,8 +335,16 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
         if (dockerClient == null) {
             throwExecutionException("Starting container failed", "Could not connect to the Docker daemon.");
         }
+        
+        dockerClient.createContainerCmd(dockerId)
+            .withName(id)
+            .withHostConfig(new HostConfig().withNetworkMode("host"))
+            .withExposedPorts(new ExposedPort(8001))
+            .withEnv("iip.port=8001")
+            .exec();
+        
         setState(container, ContainerState.DEPLOYING);
-        dockerClient.startContainerCmd(dockerId).exec();
+        dockerClient.startContainerCmd(id).exec();
         setState(container, ContainerState.DEPLOYED);
         LOGGER.info("Container " + id + " started");
     }
@@ -351,7 +360,7 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
             throwExecutionException("Stopping container failed", "Could not connect to the Docker daemon.");
         }
         setState(container, ContainerState.STOPPING);
-        dockerClient.stopContainerCmd(dockerId).exec();
+        dockerClient.stopContainerCmd(id).exec();
         setState(container, ContainerState.STOPPED);
         LOGGER.info("Container " + id + " stopped");
     }
@@ -381,7 +390,7 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
         if (dockerClient == null) {
             throwExecutionException("Undeploying container failed", "Could not connect to the Docker daemon.");
         }
-        dockerClient.removeContainerCmd(dockerId).exec();
+        dockerClient.removeContainerCmd(id).exec();
         
         // Removing image from download directory
         FactoryDescriptor factory = new FactoryDescriptor();
