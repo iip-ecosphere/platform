@@ -12,6 +12,8 @@
 
 package de.iip_ecosphere.platform.services.environment;
 
+import java.util.concurrent.ExecutionException;
+
 /**
  * Allows to ingest data asynchronously. An ingestor encapsulates access to a certain named channel but
  * does not expose the channel or its name.
@@ -28,4 +30,15 @@ public interface DataIngestor<D> {
      */
     public void ingest(D data);
 
+    /**
+     * In case of synchronous services, waits for the response and returns it. In case of asynchronous
+     * services, shall always return <b>null</b>.
+     * 
+     * @return the (synchronous) processing result
+     * @throws ExecutionException if waiting was interrupted and there is no data
+     */
+    public default D waitForResult() throws ExecutionException {
+        return null;
+    }
+    
 }

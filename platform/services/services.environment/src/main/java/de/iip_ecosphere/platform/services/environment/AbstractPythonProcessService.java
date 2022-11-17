@@ -20,7 +20,9 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.HashMap;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import org.slf4j.LoggerFactory;
 
@@ -137,6 +139,31 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
          */
         protected TypeTranslator<String, T> getOutTranslator() {
             return outTranslator;
+        }
+        
+        /**
+         * Returns the associated ingestor.
+         * 
+         * @return the ingestor (may be <b>null</b>)
+         */
+        protected DataIngestor<T> getIngestor() {
+            return ingestor;
+        }
+        
+        /**
+         * Validates the associated ingestor and returns it. If no ingestor is associated, an ingestor
+         * for synchronous processing ({@link SyncDataIngestor}) will be created and associated.
+         * 
+         * @param typeName the data type name as specified in the configuration model
+         * @return the ingestor
+         */
+        protected DataIngestor<T> validateAndGetIngestor(String typeName) {
+            if (null == ingestor) {
+                getLogger().info(
+                    "No ingestor registered for: {}. Registering an internal synchronous ingestor.", typeName);
+                ingestor = new SyncDataIngestor<T>();
+            }
+            return ingestor;
         }
 
     }
@@ -270,10 +297,10 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
                         break;
                     }
                 } catch (IOException e) {
-                    LoggerFactory.getLogger(getClass()).error("Error processing " + line + ": " + e.getMessage());
+                    getLogger().error("Error processing {}: {}", line, e.getMessage());
                 }
             } else {
-                LoggerFactory.getLogger(getClass()).error("No type name in result " + line);
+                getLogger().error("No type name in result {}", line);
             }
         }
         sc.close();
@@ -300,12 +327,38 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
     }
     
     /**
+     * Ingestor implementation for synchronous processing. Stores received data and returns it.
+     * 
+     * @param <D> type of data to be ingested
+     * @author Holger Eichelberger, SSE
+     */
+    protected static class SyncDataIngestor<D> implements DataIngestor<D> {
+
+        private BlockingQueue<D> received = new LinkedBlockingQueue<>();
+        
+        @Override
+        public void ingest(D data) {
+            received.offer(data);
+        }
+        
+        @Override
+        public D waitForResult() throws ExecutionException {
+            try {
+                return received.take();
+            } catch (InterruptedException e) {
+                throw new ExecutionException(e);
+            }
+        }
+        
+    }
+    
+    /**
      * Handles a received processing result and ingests it back asynchronously.
      * 
      * @param <O> the data type
      * @param cls the data type class
      * @param data the serialized data
-     * @param typeName the data type name
+     * @param typeName the data type name as specified in the configuration model
      */
     @SuppressWarnings("unchecked")
     protected <O> void handleResult(Class<O> cls, String data, String typeName) {
@@ -315,17 +368,14 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
                 TypeTranslator<String, O> outT = info.outTranslator;
                 if (outT != null) {
                     O tmp = outT.to(data);
-                    if (null != info.ingestor) {
-                        info.ingestor.ingest(tmp);
-                    } else {
-                        LoggerFactory.getLogger(getClass()).error("No ingestor registered for: " + typeName);
-                    }
+                    DataIngestor<O> ingestor = info.validateAndGetIngestor(typeName);
+                    ingestor.ingest(tmp);
                 } else {
-                    LoggerFactory.getLogger(getClass()).error("No result type translator registered for: " + typeName);
+                    getLogger().error("No result type translator registered for: {}", typeName);
                 }
             }
         } catch (IOException e) {
-            LoggerFactory.getLogger(getClass()).error("Receiving result: " + e.getMessage());
+            getLogger().error("Receiving result: {}", e.getMessage());
         }
     }
     

@@ -87,7 +87,7 @@ public class PythonAsyncProcessService extends AbstractPythonProcessService {
             if (null != info) {
                 handleResult(info.getType(), d, t);
             } else {
-                LoggerFactory.getLogger(getClass()).error("No output type translator registered for: " + t);
+                getLogger().error("No output type translator registered for: {}", t);
             }
             return false;
         }).start();
@@ -111,8 +111,7 @@ public class PythonAsyncProcessService extends AbstractPythonProcessService {
             try {
                 FileUtils.forceDelete(getHome());
             } catch (IOException e) {
-                LoggerFactory.getLogger(getClass()).error("Cannot delete Python process home {}: {}", 
-                    getHome(), e.getMessage());
+                getLogger().error("Cannot delete Python process home {}: {}", getHome(), e.getMessage());
             }
         }
         return ServiceState.STOPPED;
@@ -195,6 +194,15 @@ public class PythonAsyncProcessService extends AbstractPythonProcessService {
             throw new ExecutionException("No input type translator registered", null);
         }
         return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <I, O> O processSync(String inTypeName, I data, String outTypeName) throws ExecutionException {
+        process(inTypeName, data);
+        OutTypeInfo<O> outInfo = (OutTypeInfo<O>) getOutTypeInfo(outTypeName);
+        DataIngestor<O> ingestor = outInfo.validateAndGetIngestor(outTypeName);
+        return ingestor.waitForResult();
     }
 
 }
