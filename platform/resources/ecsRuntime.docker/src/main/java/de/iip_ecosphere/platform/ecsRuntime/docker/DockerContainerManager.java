@@ -188,7 +188,6 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
 
                 CreateContainerCmd cmdCreate = dockerClient.createContainerCmd(dockerImageName)
                         .withName(containerName);
-
                 configure(cmdCreate, port, port1, container);
                 cmdCreate.exec(); 
                 
