@@ -22,11 +22,11 @@ The Python compiler plugin runs by default in the `compile` lifecycle phase with
                     <goals>
                         <goal>compile-python</goal>
                     </goals>
+                    <configuration>
+                        <failOnError>true</failOnError>
+                    </configuration>
                 </execution>
             </executions>
-            <configuration>
-                <failOnError>true</failOnError>
-            </configuration>
         </plugin>
      </plugins>
   </build>
@@ -52,18 +52,18 @@ The Python test plugin currently executes Python files, either those directly lo
                     <goals>
                         <goal>test-python</goal>
                     </goals>
+                    <configuration>
+                        <failOnError>true</failOnError>
+                        <modelProject>../../../../examples.templates.model</modelProject>
+                        <fileset>
+                            <directory>src/test/python</directory>
+                            <includes>
+                                <include>**/*Test.py</include>
+                            </includes>
+                        </fileset>                    
+                    </configuration>
                 </execution>
             </executions>
-            <configuration>
-                <failOnError>true</failOnError>
-                <modelProject>../../../../examples.templates.model</modelProject>
-                <fileset>
-                    <directory>src/test/python</directory>
-                    <includes>
-                        <include>**/*Test.py</include>
-                    </includes>
-                </fileset>                    
-            </configuration>
         </plugin>
      </plugins>
   </build>

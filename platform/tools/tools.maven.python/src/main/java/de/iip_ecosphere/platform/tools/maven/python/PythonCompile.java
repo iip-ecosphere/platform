@@ -81,24 +81,25 @@ public class PythonCompile extends AbstractMojo {
                 String[] cmd = {pythonExecutable, "-m", "py_compile", f.getAbsolutePath()};
                 output += runPythonTest(cmd);
             }
-        }
-        
-        if (output.length() > 0) {
+            if (output.length() > 0) {
 
-            boolean failure = false;
-            String[] outputs = output.split("\n");
-            for (String line : outputs) {
-                // Unused import are not supposed to fail the build
-                if (!line.contains("import")) {
-                    failure = true;
-                    errorLine = line;
+                boolean failure = false;
+                String[] outputs = output.split("\n");
+                for (String line : outputs) {
+                    // Unused import are not supposed to fail the build
+                    // are there pyflake options to disable those warnings
+                    if (!line.contains("import") && !line.contains("redefinition") 
+                        && !line.contains("but never used")) {
+                        failure = true;
+                        errorLine = line;
+                    }
+                }
+                if (failure && failOnError) {
+                    throw new MojoExecutionException(errorLine);
                 }
             }
-            if (failure && failOnError) {
-                throw new MojoExecutionException(errorLine);
-            }
+        
         }
-        //Run the command to check the scripts!
     }
     
     /**
