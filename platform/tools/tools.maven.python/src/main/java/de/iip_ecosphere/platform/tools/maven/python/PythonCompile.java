@@ -70,7 +70,7 @@ public class PythonCompile extends AbstractMojo {
         for (File f : pythonFiles) {
             getLog().info("Testing Python syntax: " + f.getAbsolutePath());
             if (pyflakesExists) {
-                String[] cmd = {pythonExecutable.getName(), "-m", "pyflakes",  f.getAbsolutePath()}; 
+                String[] cmd = {pythonExecutable.getAbsolutePath(), "-m", "pyflakes",  f.getAbsolutePath()}; 
                 output += runPythonTest(cmd);
                 if (output.contains("No module named")) {
                     pyflakesExists = !output.contains("pyflakes");
@@ -78,7 +78,7 @@ public class PythonCompile extends AbstractMojo {
 
             } 
             if (!pyflakesExists) {
-                String[] cmd = {pythonExecutable.getName(), "-m", "py_compile", f.getAbsolutePath()};
+                String[] cmd = {pythonExecutable.getAbsolutePath(), "-m", "py_compile", f.getAbsolutePath()};
                 output += runPythonTest(cmd);
             }
         }

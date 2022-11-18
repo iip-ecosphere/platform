@@ -65,7 +65,7 @@ public class PythonTest extends AbstractMojo {
         String output = "";
         for (File f : pythonFiles) {
             getLog().info("Executing Python test: " + f.getName());
-            String[] cmd = {pythonExecutable.getName(), f.getName(), modelProject}; 
+            String[] cmd = {pythonExecutable.getAbsolutePath(), f.getName(), modelProject}; 
             output += runPythonTest(cmd, new File(baseDir, "src/test/python/").getAbsolutePath());
         }
         if (output.contains("Traceback")) {
