@@ -18,15 +18,15 @@ def suite():
     return suite
 
 if __name__ == '__main__':
-    suite = unittest.defaultTestLoader.loadTestsFromTestCase(YamlArtifactTest)
-    unittest.TextTestRunner(verbosity=3).run(suite)
+    exSuite = unittest.defaultTestLoader.loadTestsFromTestCase(YamlArtifactTest)
+    unittest.TextTestRunner(verbosity=3).run(exSuite)
 
-    suite = unittest.defaultTestLoader.loadTestsFromTestCase(ForwardingAppTest)
-    unittest.TextTestRunner(verbosity=3).run(suite)
+    exSuite = unittest.defaultTestLoader.loadTestsFromTestCase(ForwardingAppTest)
+    unittest.TextTestRunner(verbosity=3).run(exSuite)
 
-    suite = unittest.defaultTestLoader.loadTestsFromTestCase(Rec1SerializerTest)
-    unittest.TextTestRunner(verbosity=3).run(suite)
+    exSuite = unittest.defaultTestLoader.loadTestsFromTestCase(Rec1SerializerTest)
+    unittest.TextTestRunner(verbosity=3).run(exSuite)
     
-    suite = unittest.defaultTestLoader.loadTestsFromTestCase(CmdLineServiceEnvironmentTest)
-    unittest.TextTestRunner(verbosity=3).run(suite)    
+    exSuite = unittest.defaultTestLoader.loadTestsFromTestCase(CmdLineServiceEnvironmentTest)
+    unittest.TextTestRunner(verbosity=3).run(exSuite)    
     

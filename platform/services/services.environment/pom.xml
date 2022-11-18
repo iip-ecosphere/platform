@@ -166,6 +166,25 @@
               </execution>
          </executions>
         </plugin>
+        
+        <!-- future: overriding platformDependencies, tests work differently in here -->
+         <plugin>
+            <groupId>de.iip-ecosphere.platform</groupId>
+            <artifactId>maven-python</artifactId>
+            <version>${project.version}</version>
+            <executions>
+                <execution>
+                    <id>compile</id>
+                    <goals>
+                        <goal>compile-python</goal>
+                    </goals>
+                    <configuration>
+                        <failOnError>true</failOnError>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+        
     </plugins>
   </build>
 

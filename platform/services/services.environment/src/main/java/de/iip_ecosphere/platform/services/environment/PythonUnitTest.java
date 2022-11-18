@@ -39,7 +39,7 @@ public class PythonUnitTest {
          * python to something else to potentially run multiple version besides each
          * other
          */
-        File pythonExecutable = PythonUtils.getPythonExecutable();
+        String pythonExecutable = PythonUtils.getPythonExecutable().toString();
 
         //search the site_packages of the python for pyflakes! Currently not doable on windows!
         
@@ -47,7 +47,7 @@ public class PythonUnitTest {
         //Args[1] = name of the concrete test file
         //args[2] = relative path from src/test/python into the  impl.model project
         String output = "";
-        String[] cmd = {pythonExecutable.getName(), args[1], args[2]}; 
+        String[] cmd = {pythonExecutable, args[1], args[2]}; 
         output += runPythonTest(cmd, args[0]);
         //System.out.println(output);
         if (output.contains("Traceback")) {

@@ -75,7 +75,7 @@ class VABBaSyxTCPInterface:
 
     def basyxSet(self, path, json, conn):
         param = json.loads(json)
-        self.providerBackend.setModelPropertyValue(path, parameter)
+        self.providerBackend.setModelPropertyValue(path, param)
         self.sendResponseFrame(conn, '', BASYX_RESULT_OK) #no return
 
     def basyxCreate(self, path, json, conn):

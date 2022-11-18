@@ -42,7 +42,8 @@ public class PythonUtils {
      *   <li>The command "python"</li>
      * </ol>
      * 
-     * @return the executable, returns at least "python"
+     * @return the executable, returns at least "python"; the result may be an absolute path but must not be. Calling 
+     *     {@link File#getAbsolutePath()} on the result may be misleading - if required, use it as string.
      */
     public static File getPythonExecutable() {
         File result = pythonExecutable; 
