@@ -14,6 +14,7 @@ package de.iip_ecosphere.platform.tools.maven.python;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.plugin.AbstractMojo;
@@ -23,6 +24,8 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.shared.model.fileset.FileSet;
+import org.apache.maven.shared.model.fileset.util.FileSetManager;
 
 import de.iip_ecosphere.platform.services.environment.PythonUtils;
 
@@ -43,13 +46,31 @@ public class PythonTest extends AbstractMojo {
     
     @Parameter(property = "python-test.modelProject", required = true)
     private String modelProject;
-    
+
+    /**
+     * A specific <code>fileSet</code> rule to select files and directories.
+     */
+    @Parameter(required = false)
+    private FileSet fileset;
+
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
 
         File baseDir = project.getBasedir();
-        List<File> pythonFiles = PythonCompile.getAllPythonFiles(
-            new File(baseDir, "/src/test/python/").getAbsolutePath(), false); 
+        List<File> pythonFiles;
+        if (null != fileset) {
+            pythonFiles = new ArrayList<>();
+            FileSetManager fileSetManager = new FileSetManager();
+            String[] includedFiles = fileSetManager.getIncludedFiles(fileset);
+            for (String f : includedFiles) {
+                if (f.endsWith(".py")) {
+                    pythonFiles.add(new File(f));
+                }
+            }
+        } else {
+            pythonFiles = PythonCompile.getAllPythonFiles(
+                new File(baseDir, "/src/test/python/").getAbsolutePath(), false);
+        }
 
         /*
          * This call just goes through some locations known to contain the python3
@@ -59,13 +80,14 @@ public class PythonTest extends AbstractMojo {
          * python to something else to potentially run multiple version besides each
          * other
          */
-        File pythonExecutable = PythonUtils.getPythonExecutable();
-        getLog().info("Using Python " + pythonExecutable.getAbsolutePath());
+        String pythonExecutable = PythonUtils.getPythonExecutable().toString();
+
+        getLog().info("Using Python " + pythonExecutable);
 
         String output = "";
         for (File f : pythonFiles) {
             getLog().info("Executing Python test: " + f.getName());
-            String[] cmd = {pythonExecutable.getAbsolutePath(), f.getName(), modelProject}; 
+            String[] cmd = {pythonExecutable.toString(), f.getName(), modelProject}; 
             output += runPythonTest(cmd, new File(baseDir, "src/test/python/").getAbsolutePath());
         }
         if (output.contains("Traceback")) {

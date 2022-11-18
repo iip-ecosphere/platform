@@ -24,6 +24,12 @@
             <configuration>
                 <failOnError>true</failOnError>
                 <modelProject>..</modelProject>
+                <fileset>
+                    <directory>src/test/python</directory>
+                    <includes>
+                        <include>**/*Test.py</include>
+                    </includes>
+                </fileset>                
             </configuration>
         </plugin>
     </plugins>

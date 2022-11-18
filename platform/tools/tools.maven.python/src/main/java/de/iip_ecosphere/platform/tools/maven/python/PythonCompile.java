@@ -55,8 +55,8 @@ public class PythonCompile extends AbstractMojo {
          * python to something else to potentially run multiple version besides each
          * other
          */
-        File pythonExecutable = PythonUtils.getPythonExecutable();
-        getLog().info("Using Python " + pythonExecutable.getAbsolutePath());
+        String pythonExecutable = PythonUtils.getPythonExecutable().toString();
+        getLog().info("Using Python " + pythonExecutable);
 
         //search the site_packages of the python for pyflakes! Currently not doable on windows!
         
@@ -70,7 +70,7 @@ public class PythonCompile extends AbstractMojo {
         for (File f : pythonFiles) {
             getLog().info("Testing Python syntax: " + f.getAbsolutePath());
             if (pyflakesExists) {
-                String[] cmd = {pythonExecutable.getAbsolutePath(), "-m", "pyflakes",  f.getAbsolutePath()}; 
+                String[] cmd = {pythonExecutable, "-m", "pyflakes",  f.getAbsolutePath()}; 
                 output += runPythonTest(cmd);
                 if (output.contains("No module named")) {
                     pyflakesExists = !output.contains("pyflakes");
@@ -78,7 +78,7 @@ public class PythonCompile extends AbstractMojo {
 
             } 
             if (!pyflakesExists) {
-                String[] cmd = {pythonExecutable.getAbsolutePath(), "-m", "py_compile", f.getAbsolutePath()};
+                String[] cmd = {pythonExecutable, "-m", "py_compile", f.getAbsolutePath()};
                 output += runPythonTest(cmd);
             }
         }

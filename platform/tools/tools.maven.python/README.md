@@ -38,7 +38,7 @@ The compiler plugin supports the following configuration settings:
   
 ## Python test plugin
 
-The Python test plugin currently executes all Python files directly located in `src/test/python`. The plugin runs by default in the `test` lifecycle phase with the goal `test-python`.
+The Python test plugin currently executes Python files, either those directly located in `src/test/python` or those specified by a file set. The plugin runs by default in the `test` lifecycle phase with the goal `test-python`.
 
   ```xml
   <build>
@@ -57,6 +57,12 @@ The Python test plugin currently executes all Python files directly located in `
             <configuration>
                 <failOnError>true</failOnError>
                 <modelProject>../../../../examples.templates.model</modelProject>
+                <fileset>
+                    <directory>src/test/python</directory>
+                    <includes>
+                        <include>**/*Test.py</include>
+                    </includes>
+                </fileset>                    
             </configuration>
         </plugin>
      </plugins>
@@ -66,6 +72,7 @@ The Python test plugin currently executes all Python files directly located in `
 The compiler plugin supports the following configuration settings:
   - `failOnError` (default `true`, `-Dpython-compile.failOnError=true`): Whether the build process shall fail if Python compile errors are detected.
   - `modelProject` (default `..`, `-Dpython-test.modelProject=..`): First parameter passed to the test, so far required to obtain the Python source code generated in the application model project. After refactoring the tests and their generation, we will probably remove this setting.
+  - `fileset` (default not given, execute all files directly located in `src/test/python`) is optional and can be used to determine the tests to be executed.
   
 ## Combining the plugins
 
