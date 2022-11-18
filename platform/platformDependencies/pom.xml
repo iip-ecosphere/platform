@@ -193,6 +193,18 @@
 	    </snapshots>
 	</repository>
   </repositories>
+  
+  <pluginRepositories>
+     <pluginRepository>
+       <id>SSE-plugins</id>
+       <name>SSE</name>
+       <url>https://projects.sse.uni-hildesheim.de/qm/maven/</url>
+       <layout>default</layout>
+       <snapshots>
+          <updatePolicy>always</updatePolicy>
+       </snapshots>
+     </pluginRepository>
+  </pluginRepositories>
 
   <dependencyManagement>
     <dependencies>
