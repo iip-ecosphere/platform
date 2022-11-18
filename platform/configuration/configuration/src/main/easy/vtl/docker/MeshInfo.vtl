@@ -15,18 +15,21 @@ template MeshInfo(IIPEcosphere config, FileArtifact target, Application app, Con
             'version: ${app.ver}'
             'dockerImageName: ${toDockerImageName(appName, "ecs", app.ver)}'
             'dockerImageZipfile: ECS:${getAppMvnVersion(app)}.zip'
+            'dood: true'
         } else if (containerType == ContainerType::C1Ecs_C2Svc_App) {
             'id: ${appName}_${deviceName}_NoECS'
             'name: ${getAppMvnName(app)}'
             'version: ${app.ver}'
             'dockerImageName: ${toDockerImageName(appName, deviceName, app.ver)}'
             'dockerImageZipfile: ${getAppMvnName(app)}:${getAppMvnVersion(app)}.zip'
+            'dood: false'
         } else {
             'id: ${appName}_${deviceName}_ECS'
             'name: ${getAppMvnName(app)}'
             'version: ${app.ver}'
             'dockerImageName: ${toDockerImageName(appName, deviceName, app.ver)}'
             'dockerImageZipfile: ${getAppMvnName(app)}:${getAppMvnVersion(app)}.zip'
+            'dood: true'
         }
         Boolean useEphemeralPort = not(useFixedPort(config, device));
         if (useEphemeralPort) { // else instantiated into Dockerfile
@@ -45,6 +48,5 @@ template MeshInfo(IIPEcosphere config, FileArtifact target, Application app, Con
         }
         '    - 22/UDP'
         'networkMode: host'
-        'dood: true'
     }
 }
