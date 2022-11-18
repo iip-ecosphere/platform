@@ -137,7 +137,7 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
                     registry = dockerCfg.getRegistry();
                     internalRegistry = true;
                 }
-                PullImageCmd cmd = dockerClient.pullImageCmd(DockerContainerDescriptor.getRepository(imageName))
+                PullImageCmd cmd = dockerClient.pullImageCmd(imageName)
                     .withRegistry(registry);
                 String tag = DockerContainerDescriptor.getTag(imageName);
                 if (DockerSetup.isNotEmpty(tag)) {
