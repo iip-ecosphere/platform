@@ -152,18 +152,21 @@ public class PythonCompile extends AbstractMojo {
     static List<File> getAllPythonFiles(String directory, boolean recurse) {
         List<File> pythonFiles = new ArrayList<File>();
         File file = new File(directory);
-        if (file.isDirectory()) {
-            for (File f : file.listFiles()) {
-                if (f.isDirectory()) {
-                    if (recurse) {
-                        pythonFiles.addAll(getAllPythonFiles(f.getAbsolutePath(), true));  
+        if (file.exists()) {
+            if (file.isDirectory()) {
+                File[] files = file.listFiles();
+                if (null != files) {
+                    for (File f : files) {
+                        if (f.isDirectory() && recurse) {
+                            pythonFiles.addAll(getAllPythonFiles(f.getAbsolutePath(), true));  
+                        } else if (!f.isDirectory() && f.getAbsolutePath().endsWith(".py")) {
+                            pythonFiles.add(f);
+                        }
                     }
-                } else if (f.getAbsolutePath().endsWith(".py")) {
-                    pythonFiles.add(f);
                 }
+            } else {
+                pythonFiles.add(file);
             }
-        } else {
-            pythonFiles.add(file);
         }
         return pythonFiles;
     }
