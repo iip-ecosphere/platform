@@ -100,6 +100,41 @@
             </execution>
           </executions>
         </plugin>
+        
+        <!-- preliminary, to be moved into platformDependencies -->
+        <plugin>
+            <groupId>de.iip-ecosphere.platform</groupId>
+            <artifactId>maven-python</artifactId>
+            <version>${project.version}</version>
+            <executions>
+                <execution>
+                    <id>compile</id>
+                    <goals>
+                        <goal>compile-python</goal>
+                    </goals>
+                    <configuration>
+                        <failOnError>true</failOnError>
+                    </configuration>
+                </execution>
+                <execution>
+                    <id>test</id>
+                    <goals>
+                        <goal>test-python</goal>
+                    </goals>
+                    <configuration>
+                        <failOnError>true</failOnError>
+                        <modelProject>../../../../examples.templates.model</modelProject>
+                        <fileset>
+                            <directory>src/test/python</directory>
+                            <includes>
+                                <include>**/*Test.py</include>
+                            </includes>
+                        </fileset>                    
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+        
   	</plugins>
   </build>
 
