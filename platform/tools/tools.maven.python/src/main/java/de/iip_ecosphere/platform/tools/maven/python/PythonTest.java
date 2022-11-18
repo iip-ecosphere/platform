@@ -60,6 +60,7 @@ public class PythonTest extends AbstractMojo {
          * other
          */
         File pythonExecutable = PythonUtils.getPythonExecutable();
+        getLog().info("Using Python " + pythonExecutable.getAbsolutePath());
 
         String output = "";
         for (File f : pythonFiles) {

@@ -56,6 +56,7 @@ public class PythonCompile extends AbstractMojo {
          * other
          */
         File pythonExecutable = PythonUtils.getPythonExecutable();
+        getLog().info("Using Python " + pythonExecutable.getAbsolutePath());
 
         //search the site_packages of the python for pyflakes! Currently not doable on windows!
         
