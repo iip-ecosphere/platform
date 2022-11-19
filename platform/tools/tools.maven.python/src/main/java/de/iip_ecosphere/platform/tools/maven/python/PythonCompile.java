@@ -82,7 +82,7 @@ public class PythonCompile extends AbstractMojo {
                 output += runPythonTest(cmd);
             }
             if (output.length() > 0) {
-
+                getLog().info(output);
                 boolean failure = false;
                 String[] outputs = output.split("\n");
                 for (String line : outputs) {

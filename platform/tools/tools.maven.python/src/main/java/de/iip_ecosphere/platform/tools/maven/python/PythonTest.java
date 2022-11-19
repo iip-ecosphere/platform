@@ -90,6 +90,7 @@ public class PythonTest extends AbstractMojo {
             String[] cmd = {pythonExecutable.toString(), f.getName(), modelProject}; 
             output += runPythonTest(cmd, new File(baseDir, "src/test/python/").getAbsolutePath());
         }
+        getLog().info(output);
         if (output.contains("Traceback")) {
             throw new MojoExecutionException(output, null);
         }
