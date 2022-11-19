@@ -71,10 +71,36 @@ The Python test plugin currently executes Python files, either those directly lo
 
 The compiler plugin supports the following configuration settings:
   - `failOnError` (default `true`, `-Dpython-compile.failOnError=true`): Whether the build process shall fail if Python compile errors are detected.
-  - `modelProject` (default `..`, `-Dpython-test.modelProject=..`): First parameter passed to the test, so far required to obtain the Python source code generated in the application model project. After refactoring the tests and their generation, we will probably remove this setting.
+  - `modelProject` (default `src/test/python`, `-Dpython-test.modelProject=src/test/python`): Optional First parameter passed to the test. So far required to obtain the Python source code generated in the application model project. After refactoring the tests and their generation, we will probably remove this setting.
   - `fileset` (default not given, execute all files directly located in `src/test/python`) is optional and can be used to determine the tests to be executed.
   
-## Combining the plugins
+## Combining the goals
 
-You may specify multiple executions with individual goals and configurations.
+You may specify both goals in different executions with individual configurations. Then an id per execution is required.
+  
+  ```xml
+  <build>
+      <plugins>
+         <plugin>
+            <groupId>de.iip-ecosphere.platform</groupId>
+            <artifactId>maven-python</artifactId>
+            <version>${project.version}</version>
+            <executions>
+                <execution>
+                    <id>py-compile</id>
+                    <goals>
+                        <goal>compile-python</goal>
+                    </goals>
+                </execution>
+                <execution>
+                    <id>py-test</id>
+                    <goals>
+                        <goal>test-python</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
+     </plugins>
+  </build>
+  ```
   
