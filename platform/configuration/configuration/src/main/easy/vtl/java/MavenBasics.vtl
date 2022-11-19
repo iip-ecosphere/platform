@@ -438,6 +438,25 @@ template MavenBasics(Configuration config, FileArtifact target) {
         } // use the default builtin
     }
     
+    def appendIipPythonPlugin(XmlElement parent, String ver, String modelProject="") {
+        XmlElement plugin = appendPlugin(parent, "de.iip-ecosphere.platform", "maven-python", ver, false);
+        XmlElement execs = appendExecutionsParent(plugin);
+        XmlElement exec = new XmlElement(execs, "execution");
+        new XmlElement(exec, "id", "py-compile");
+        appendGoal(exec, "compile-python");
+
+        exec = new XmlElement(execs, "execution");
+        new XmlElement(exec, "id", "py-test");
+        appendGoal(exec, "test-python");
+        XmlElement cfg = appendConfiguration(exec);
+        if (modelProject <> "") {
+            new XmlElement(cfg, "modelProject", modelProject);
+        }
+        XmlElement fileSet = new XmlElement(cfg, "fileSet");
+        new XmlElement(fileSet, "directory", "src/test/python");
+        new XmlElement(new XmlElement(fileSet, "includes"), "include", "**/*Test.py");
+    }
+    
     def appendEclipseLifecycleMappingPlugin(XmlElement parent, String groupId, String artifactId, String versionRange, String goal, String ver="1.0.0") {
         XmlElement pluginCfg = appendPlugin(parent, "org.eclipse.m2e", "lifecycle-mapping", ver, true);
         new XmlComment(pluginCfg, "Plugin is only needed for Eclipse, used phase is usually valid for maven, warning in Eclipse can be ignored.");

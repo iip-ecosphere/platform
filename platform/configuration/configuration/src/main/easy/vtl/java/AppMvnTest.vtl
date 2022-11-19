@@ -57,8 +57,9 @@ template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, sequenceOf(Mesh
             "\\${project.build.directory}/pyEnv", "pyEnv.zip", type="zip", id="pythonSources", phase="validate");
         appendMavenDependencyPluginArtifactItem(unpackItems, cfg.sharedArtifact + ":" + projectVersion, "python", 
             "\\${project.build.directory}/pySrc", "pyIf.zip", type="zip");
-        XmlElement pluginMgt = createPlugins(createPluginManagement(build));
-        appendEclipseLifecycleMapping4DependenciesPlugin(pluginMgt, goal="unpack");
+        appendIipPythonPlugin(plugins, projectVersion, modelProject="target/pySrc");
+        //XmlElement pluginMgt = createPlugins(createPluginManagement(build));
+        //appendEclipseLifecycleMapping4DependenciesPlugin(pluginMgt, goal="unpack");
         
         XmlElement assemblyPlugin = appendAssemblyPlugin(plugins);
         for (String ass: assemblies.asSequence()->sortedBy(a|a)) { // sortedBy for testing
