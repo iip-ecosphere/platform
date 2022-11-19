@@ -111,6 +111,25 @@
                 </execution>
             </executions>
         </plugin>
+        <plugin>
+           <groupId>de.iip-ecosphere.platform</groupId>
+           <artifactId>maven-python</artifactId>
+           <version>${project.version}</version>
+           <executions>
+               <execution>
+                   <id>py-compile</id>
+                   <goals>
+                       <goal>compile-python</goal>
+                   </goals>
+               </execution>
+               <execution>
+                   <id>py-test</id>
+                   <goals>
+                       <goal>test-python</goal>
+                   </goals>
+               </execution>
+           </executions>
+         </plugin>
          <plugin>
              <!-- When the usual build process is done, package also the implementing Python code. As this will
                   be automatically integrated with the generated code, we exclude in the assembly descriptor the
@@ -136,41 +155,6 @@
              </executions>
          </plugin>
      </plugins>
-    <pluginManagement>
-        <plugins>
-            <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
-            <plugin>
-                <groupId>org.eclipse.m2e</groupId>
-                <artifactId>lifecycle-mapping</artifactId>
-                <version>1.0.0</version>
-                <configuration>
-                    <lifecycleMappingMetadata>
-                        <pluginExecutions>
-                            <pluginExecution>
-                                <pluginExecutionFilter>
-                                    <groupId>
-                                        org.apache.maven.plugins
-                                    </groupId>
-                                    <artifactId>
-                                        maven-dependency-plugin
-                                    </artifactId>
-                                    <versionRange>
-                                        [3.1.2,)
-                                    </versionRange>
-                                    <goals>
-                                        <goal>unpack</goal>
-                                    </goals>
-                                </pluginExecutionFilter>
-                                <action>
-                                    <ignore/>
-                                </action>
-                            </pluginExecution>
-                        </pluginExecutions>
-                    </lifecycleMappingMetadata>
-                </configuration>
-            </plugin>
-        </plugins>
-    </pluginManagement>
   </build>
 
 </project>
