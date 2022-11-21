@@ -175,8 +175,16 @@ template MavenBasics(Configuration config, FileArtifact target) {
         appendPlugin(plugins, "org.apache.maven.plugins", "maven-dependency-plugin", ver, false);
     } 
 
+    def XmlElement appendMavenIipDependencyPlugin(XmlElement plugins, String ver="\\${project.version}") {
+        appendPlugin(plugins, "de.iip-ecosphere.platform", "dependency-plugin", ver, false);
+    } 
+
     def XmlElement appendMavenDependencyPluginUnpackArtifact(XmlElement plugins, String artifact, String classifier, String outputDir, String destFileName, String ver="3.2.0", String type="jar", String phase="process-sources") {
         XmlElement plugin = appendMavenDependencyPlugin(plugins, ver);
+        appendMavenDependencyPluginUnpackArtifactExecution(plugin, artifact, classifier, outputDir, destFileName, type, phase);
+    }
+    
+    def XmlElement appendMavenDependencyPluginUnpackArtifactExecution(XmlElement plugin, String artifact, String classifier, String outputDir, String destFileName, String type="jar", String phase="process-sources") {
         XmlElement execs = new XmlElement(plugin, "executions");
         appendMavenDependencyPluginExecution(execs, "unpack", artifact, classifier, outputDir, destFileName, type=type, phase=phase);
         execs;
@@ -210,6 +218,28 @@ template MavenBasics(Configuration config, FileArtifact target) {
         new XmlElement(item, "destFileName", destFileName);
         item;    
     }
+    
+    // includes/excludes separated by ;
+    def XmlElement appendMavenIipDependencyPluginCleanup(XmlElement cfg, String directory, String includes, String excludes) {
+        XmlElement cleanup = new XmlElement(cfg, "cleanup");
+        new XmlElement(cleanup, "directory", directory);
+        if (includes <> "") {
+            XmlElement inc = new XmlElement(cleanup, "includes");
+            sequenceOf(String) tmp = includes.split(";");
+            for (String t : tmp) {
+                new XmlElement(inc, "include", t);
+            }
+        }
+        if (excludes <> "") {
+            XmlElement exc = new XmlElement(cleanup, "excludes");
+            sequenceOf(String) tmp = includes.split(";");
+            for (String t : tmp) {
+                new XmlElement(exc, "exclude", t);
+            }
+        }
+        cfg;
+    }
+    
     
     def XmlElement appendMavenDependencyPluginCopyDeps(XmlElement plugins, String ver="3.2.0", String jarDir="", Boolean copyOwn=false, Boolean prependGroupId=true) {
         XmlElement plugin = appendMavenDependencyPlugin(plugins, ver);
@@ -452,7 +482,7 @@ template MavenBasics(Configuration config, FileArtifact target) {
         if (modelProject <> "") {
             new XmlElement(cfg, "modelProject", modelProject);
         }
-        XmlElement fileSet = new XmlElement(cfg, "fileSet");
+        XmlElement fileSet = new XmlElement(cfg, "fileset");
         new XmlElement(fileSet, "directory", "src/test/python");
         new XmlElement(new XmlElement(fileSet, "includes"), "include", "**/*Test.py");
     }
