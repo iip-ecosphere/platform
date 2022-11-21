@@ -17,10 +17,10 @@ import java.io.File;
 import org.apache.maven.project.MavenProject;
 import org.junit.Test;
 
-import de.iip_ecosphere.platform.tools.maven.python.PythonTest;
+import de.iip_ecosphere.platform.tools.maven.python.PythonTestMojo;
 
 /**
- * Test for {@link PythonTest}.
+ * Test for {@link PythonTestMojo}.
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -48,7 +48,7 @@ public class PythonTestTest extends AbstractTest {
     @Test
     public void testTest() throws Exception {
         MavenProject project = readMavenProject(new File( "src/test/resources/unit/project-test"));
-        PythonTest myMojo = (PythonTest) lookupConfiguredMojo(project, "test-python");
+        PythonTestMojo myMojo = (PythonTestMojo) lookupConfiguredMojo(project, "test-python");
         assertNotNull(myMojo);
         myMojo.execute();
     }

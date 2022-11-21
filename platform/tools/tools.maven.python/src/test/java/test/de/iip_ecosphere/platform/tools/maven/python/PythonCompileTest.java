@@ -18,12 +18,12 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.junit.Test;
 
-import de.iip_ecosphere.platform.tools.maven.python.PythonCompile;
+import de.iip_ecosphere.platform.tools.maven.python.PythonCompileMojo;
 
 import org.junit.Assert;
 
 /**
- * Test for {@link PythonCompile}.
+ * Test for {@link PythonCompileMojo}.
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -51,7 +51,7 @@ public class PythonCompileTest extends AbstractTest {
     @Test
     public void testOk() throws Exception {
         MavenProject project = readMavenProject(new File( "src/test/resources/unit/project-ok"));
-        PythonCompile myMojo = (PythonCompile) lookupConfiguredMojo(project, "compile-python");
+        PythonCompileMojo myMojo = (PythonCompileMojo) lookupConfiguredMojo(project, "compile-python");
         assertNotNull(myMojo);
         myMojo.execute();
     }
@@ -65,7 +65,7 @@ public class PythonCompileTest extends AbstractTest {
     public void testFail() throws Exception {
         MavenProject project = readMavenProject(new File( "src/test/resources/unit/project-fail"));
         
-        PythonCompile myMojo = (PythonCompile) lookupConfiguredMojo(project, "compile-python");
+        PythonCompileMojo myMojo = (PythonCompileMojo) lookupConfiguredMojo(project, "compile-python");
         assertNotNull(myMojo);
         try {
             myMojo.execute();

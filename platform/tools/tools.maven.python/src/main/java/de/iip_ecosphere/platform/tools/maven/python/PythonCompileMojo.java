@@ -37,7 +37,7 @@ import de.iip_ecosphere.platform.services.environment.PythonUtils;
  * @author Holger Eichelberger, SSE
  */
 @Mojo(name = "compile-python", defaultPhase = LifecyclePhase.COMPILE)
-public class PythonCompile extends AbstractMojo {
+public class PythonCompileMojo extends AbstractMojo {
 
     @Parameter(defaultValue = "${project}", required = true, readonly = true)
     private MavenProject project;

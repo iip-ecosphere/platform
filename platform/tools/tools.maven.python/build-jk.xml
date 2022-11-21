@@ -8,6 +8,6 @@
     <!-- deploy to SSE Mvn repo -->
 	<target name="maven"> 
 	    <maven pomFile="pom.xml" goal="package"/>
-		<mvnDeployResolveArtifact folderName="IIP-services" pomFile="pom.xml" jarFolder="target" artifactPattern="maven-python-*.*.*.jar" />
+		<mvnDeployResolveArtifact folderName="IIP-toolsMavenPython" pomFile="pom.xml" jarFolder="target" artifactPattern="maven-python-*.*.*.jar" />
 	</target>
 </project>

@@ -36,7 +36,7 @@ import de.iip_ecosphere.platform.services.environment.PythonUtils;
  * @author Holger Eichelberger, SSE
  */
 @Mojo(name = "test-python", defaultPhase = LifecyclePhase.TEST)
-public class PythonTest extends AbstractMojo {
+public class PythonTestMojo extends AbstractMojo {
 
     @Parameter(defaultValue = "${project}", required = true, readonly = true)
     private MavenProject project;
@@ -68,7 +68,7 @@ public class PythonTest extends AbstractMojo {
                 }
             }
         } else {
-            pythonFiles = PythonCompile.getAllPythonFiles(
+            pythonFiles = PythonCompileMojo.getAllPythonFiles(
                 new File(baseDir, "/src/test/python/").getAbsolutePath(), false);
         }
 
@@ -107,8 +107,8 @@ public class PythonTest extends AbstractMojo {
         String output = "";
         try {
             process = Runtime.getRuntime().exec(cmd, null, new File(workingDirectory));
-            output = PythonCompile.readProcessOutput(process.getInputStream());
-            output += PythonCompile.readProcessOutput(process.getErrorStream());
+            output = PythonCompileMojo.readProcessOutput(process.getInputStream());
+            output += PythonCompileMojo.readProcessOutput(process.getErrorStream());
 
             process.waitFor();
         } catch (IOException | InterruptedException e) {
