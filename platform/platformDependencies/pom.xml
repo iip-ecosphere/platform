@@ -610,6 +610,25 @@
                                     <ignore/>
                                 </action>
                             </pluginExecution>
+                            <pluginExecution>
+                                <pluginExecutionFilter>
+                                    <groupId>
+                                        de.iip-ecosphere.platform
+                                    </groupId>
+                                    <artifactId>
+                                        dependency-plugin
+                                    </artifactId>
+                                    <versionRange>
+                                        [${project.version},)
+                                    </versionRange>
+                                    <goals>
+                                        <goal>unpack</goal>
+                                    </goals>
+                                </pluginExecutionFilter>
+                                <action>
+                                    <ignore/>
+                                </action>
+                            </pluginExecution>
                         </pluginExecutions>
                     </lifecycleMappingMetadata>
                 </configuration>
