@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>de.iip-ecosphere.platform</groupId>
+  <version>0.5.0-SNAPSHOT</version>
+  <artifactId>maven-dependencies-noClean</artifactId>
+  <packaging>jar</packaging>
+  <name>Tests not cleaning the target folder</name>
+  <description>Tests not cleaning the target folder.</description>
+
+  <build>
+      <plugins>
+         <plugin>
+            <groupId>de.iip-ecosphere.platform</groupId>
+            <artifactId>dependency-plugin</artifactId>
+            <version>${project.version}</version>
+            <executions>
+                <execution>
+                    <id>unpack</id>
+                    <goals>
+                        <goal>unpack</goal>
+                    </goals>
+                    <phase>process-sources</phase>
+                    <configuration>
+                        <artifactItems>
+                            <!-- just unpack something that is there before our first build and only 
+                            some files for testing -->
+                            <artifactItem>
+                                <groupId>org.apache.maven.plugins</groupId>
+                                <artifactId>maven-dependency-plugin</artifactId>
+                                <version>3.2.0</version>
+                                <type>jar</type>
+                                <classifier>sources</classifier>
+                                <overWrite>true</overWrite>
+                                <outputDirectory>${project.basedir}/src/main/python</outputDirectory>
+                                <destFileName>mvnDep.zip</destFileName>
+                                <includes>*.properties</includes>
+                            </artifactItem>
+                        </artifactItems>
+                    </configuration>
+                </execution>
+            </executions>
+            <configuration>
+            </configuration>
+        </plugin>
+    </plugins>
+  </build>
+
+</project>

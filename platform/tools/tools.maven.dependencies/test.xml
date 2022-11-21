@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="tools.maven.dependencies.test" default="test" basedir=".">
+	<!-- import of the global SSE Jenkins properties -->
+	<property file="${user.home}/global-build.properties"/>
+	<property file="${user.home}/qualimaster-build.properties"/>
+	<include file="${user.home}/macros.xml"/>
+
+    <target name="test"> 
+        <delete dir="./target/test-resources" quiet="true"/>
+        <copy toDir="./target/test-resources">
+            <fileset dir="./src/test/resources"/>
+        </copy>
+    	<antcall target="test-noClean"/>
+        <antcall target="test-clean"/>
+        <!--<delete dir="target/test-resources" quiet="true"/>-->
+   	</target>
+
+	<target name="test-noClean"> 
+		<!--<exec executable="w:\apache-maven-3.6.3\bin\mvn.cmd" dir="./target/test-resources/unit/project-noClean">
+			<arg value="process-sources"/>
+		</exec>-->
+	    <maven pomFile="./target/test-resources/unit/project-noClean/pom.xml" goal="process-sources"/>
+		<fail message="Files are missing.">
+		    <condition>
+		        <not>
+		            <resourcecount count="3">
+                        <!-- counting HelloWorld.py, still there -->
+		                <fileset id="fs" dir="./target/test-resources/unit/project-noClean/src/main" 
+		                    includes="python/HelloWorld.py,python/analyze-report.properties,java/readme.txt"/>
+		            </resourcecount>
+		        </not>
+		    </condition>
+		</fail>
+	</target>
+	
+    <target name="test-clean"> 
+        <!--<exec executable="w:\apache-maven-3.6.3\bin\mvn.cmd" dir="./target/test-resources/unit/project-clean">
+            <arg value="process-sources"/>
+        </exec>-->
+        <maven pomFile="./target/test-resources/unit/project-clean/pom.xml" goal="process-sources"/>
+        <fail message="Files are missing.">
+            <condition>
+                <not>
+                    <resourcecount count="2">
+                    	<!-- not counting HelloWorld.py, deleted -->
+                        <fileset id="fs" dir="./target/test-resources/unit/project-clean/src/main" 
+                            includes="python/HelloWorld.py,python/analyze-report.properties,java/readme.txt"/>
+                    </resourcecount>
+                </not>
+            </condition>
+        </fail>
+    </target>
+	
+</project>
