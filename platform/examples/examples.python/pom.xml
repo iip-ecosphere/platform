@@ -164,9 +164,9 @@
         <build>
           <plugins>
              <plugin>
-               <groupId>org.apache.maven.plugins</groupId>
-               <artifactId>maven-dependency-plugin</artifactId>
-               <version>3.2.0</version>
+               <groupId>de.iip-ecosphere.platform</groupId>
+               <artifactId>dependency-plugin</artifactId>
+               <version>${project.version}</version>
                <executions>
                  <execution>
                    <id>unpack</id>
@@ -197,6 +197,16 @@
                          <destFileName>serviceEnv-py.zip</destFileName>
                        </artifactItem>
                      </artifactItems>
+                     <cleanup>
+                         <directory>${project.basedir}/src/main/easy</directory>
+                         <includes>
+                             <include>cfg</include>
+                             <include>files</include>
+                             <include>meta</include>
+                             <include>vtl</include>
+                             <include>IIPEcosphere*.*</include>
+                         </includes>
+                     </cleanup>
                      <overWriteReleases>false</overWriteReleases>
                      <overWriteSnapshots>true</overWriteSnapshots>
                    </configuration>
