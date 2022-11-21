@@ -70,9 +70,9 @@
      <plugins>
         <plugin>
             <!-- Obtain generated python sources from Maven repository (shall be deployed there) -->
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-dependency-plugin</artifactId>
-            <version>3.2.0</version>
+            <groupId>de.iip-ecosphere.platform</groupId>
+            <artifactId>dependency-plugin</artifactId>
+            <version>${project.version}</version>
             <executions>
                 <execution>
                     <id>unpack python</id>
@@ -107,6 +107,15 @@
                                 <destFileName>pythonEnv.zip</destFileName>
                             </artifactItem>
                         </artifactItems>
+                        <cleanup>
+                            <directory>${project.basedir}/src/main/python</directory>
+                            <includes>
+                                <include>datatypes</include>
+                                <include>iip</include>
+                                <include>interfaces</include>
+                                <include>serializers</include>
+                            </includes>
+                        </cleanup>
                     </configuration>
                 </execution>
             </executions>
