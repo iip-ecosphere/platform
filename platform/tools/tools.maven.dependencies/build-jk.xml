@@ -12,6 +12,6 @@
              to set it up correctly through program. So we test through ANT, in an own file so that
              it can be called locally without running macros from macros.xml.-->
 		<ant antfile="test.xml"/>
-		<mvnDeployResolveArtifact folderName="IIP-toolsMavenDependencies" pomFile="pom.xml" jarFolder="target" artifactPattern="maven-python-*.*.*.jar" />
+		<mvnDeployResolveArtifact folderName="IIP-toolsMavenDependencies" pomFile="pom.xml" jarFolder="target" artifactPattern="dependency-plugin-*.*.*.jar" />
 	</target>
 </project>
