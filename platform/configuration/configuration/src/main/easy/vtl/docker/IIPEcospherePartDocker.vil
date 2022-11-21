@@ -62,7 +62,7 @@ vilScript IIPEcospherePartDocker (Project source, Configuration config, Project 
     String createContainerImage(DockerContainerManager mgr, Path base, Path buildFile, String registry, String repository, String tag) = {
         String id = dockerBuildImage(base, buildFile, toDockerImageName(registry, repository, tag));
         if (isDefined(mgr.registry) and mgr.registry.length() > 0) {
-            dockerPushImage(toDockerImageName(registry, repository, tag), mgr.registry, repository, tag);
+            dockerPushImage(toDockerImageName(registry, repository, tag), mgr.registry, registry.toLower() + "/" + repository, tag);
         }
         id;
     }
