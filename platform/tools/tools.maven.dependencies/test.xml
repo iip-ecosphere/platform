@@ -12,6 +12,7 @@
         </copy>
     	<antcall target="test-noClean"/>
         <antcall target="test-clean"/>
+    	<antcall target="test-cleanExclude"/>
         <!--<delete dir="target/test-resources" quiet="true"/>-->
    	</target>
 
@@ -50,5 +51,23 @@
             </condition>
         </fail>
     </target>
-	
+
+    <target name="test-cleanExclude"> 
+        <!--<exec executable="w:\apache-maven-3.6.3\bin\mvn.cmd" dir="./target/test-resources/unit/project-cleanExclude">
+            <arg value="process-sources"/>
+        </exec>-->
+        <maven pomFile="./target/test-resources/unit/project-cleanExclude/pom.xml" goal="process-sources"/>
+        <fail message="Files are missing.">
+            <condition>
+                <not>
+                    <resourcecount count="3">
+                        <!-- not counting MyType.py, deleted -->
+                        <fileset id="fs" dir="./target/test-resources/unit/project-cleanExclude/src/main" 
+                            includes="python/datatypes/MyType.py,python/services/HelloWorld.py,python/analyze-report.properties,java/readme.txt"/>
+                    </resourcecount>
+                </not>
+            </condition>
+        </fail>
+    </target>
+
 </project>
