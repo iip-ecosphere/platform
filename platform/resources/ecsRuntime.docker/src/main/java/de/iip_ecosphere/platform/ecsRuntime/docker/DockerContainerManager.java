@@ -164,11 +164,12 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
                         if (portString.contains("${port}")) {
                             continue;
                         }
-                        if (port == 0) {
-                            port = Integer.parseInt(portString.substring(0, portString.indexOf("/")));
-                        } else {
-                            port1 = Integer.parseInt(portString.substring(0, portString.indexOf("/")));
+                        port = Integer.parseInt(portString.substring(0, portString.indexOf("/")));
+                    } else if (portString.contains("iip.port.svgMgr")) {
+                        if (portString.contains("${port_1}")) {
+                            continue;
                         }
+                        port1 = Integer.parseInt(portString.substring(portString.indexOf("=") + 1));
                     }
                 }
                 if (port == 0) {
