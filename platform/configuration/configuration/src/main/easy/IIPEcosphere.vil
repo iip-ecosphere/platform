@@ -12,7 +12,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     
     Boolean tests = true;
     Boolean mvnUpdate = false;
-    setOf(Type) usedServiceTypes = {};
+    setOf(String) usedServiceTypes = {};
     
     main(Project source, Configuration config, Project target) = {
         generatePlatform(source, config, target); // first for container
@@ -85,7 +85,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     vilTemplateProcessor("JavaJsonSerializer", config, "${javaSerializersSrc}/${clsName}Serializer.java", 
                         type=r, pkg=javaSerializersPackage, typePkg=javaDatatypesPackage, sharedInterfaces=false);
                     javaSerializers.add("${javaSerializersPackage}.${clsName}Serializer");
-                    if (usedServiceTypes.includes(PythonService)) {
+                    if (isPythonUsed(usedServiceTypes)) {
                         vilTemplateProcessor("PythonType", config, "${pySrc}/datatypes/${clsName}.py", type=r, interface=false, 
                             sharedInterfaces=false);
                         vilTemplateProcessor("PythonJsonSerializer", config, "${pySrc}/serializers/${clsName}Serializer.py", 
@@ -148,7 +148,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 if (not(cfg.sharedInterfaces)) {
                     vilTemplateProcessor("JavaInterfaceAssembly", config, "${assemblySrc}/javaInterfaces.xml");
                     assemblies.add("interfaces|${assemblyRel}/javaInterfaces.xml|package|${mvnProjectBuildDir}");
-                    if (usedServiceTypes.includes(PythonService)) {
+                    if (isPythonUsed(usedServiceTypes)) {
                         vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/pythonInterfaces.xml", withServices=false, dependency="");
                         assemblies.add("python|${assemblyRel}/pythonInterfaces.xml|package|${mvnProjectBuildDir}");
                     }
@@ -226,7 +226,8 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 mapOf(MeshElement, setOf(MeshConnector)) mappedMesh = {};
                 setOf(MeshElement) nodes = n.sources->closure(MeshElement e|nextMeshNodes(e, mappedMesh));
                 for (MeshElement elt: nodes) {
-                    usedServiceTypes.add(elt.impl.getType());
+                    String name = elt.impl.getType(); // converts to strings, VIL/VTL types are not hash-compatible 
+                    usedServiceTypes.add(name);
                 }        
             }
         }
@@ -578,7 +579,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
             vilTemplateProcessor("JavaJsonSerializer", config, "${javaSerializersSrc}/${clsName}ImplSerializer.java", 
                 type=r, pkg=javaSerializersPackage, typePkg=javaDatatypesPackage, sharedInterfaces=true, impl=true);
             javaSerializers.add("${javaSerializersPackage}.${clsName}ImplSerializer");
-            if (usedServiceTypes.includes(PythonService)) {
+            if (isPythonUsed(usedServiceTypes)) {
                 vilTemplateProcessor("PythonType", config, "${pySrc}/datatypes/${clsName}.py", type=r, interface=true, 
                     sharedInterfaces=true);
                 vilTemplateProcessor("PythonType", config, "${pySrc}/datatypes/${clsName}Impl.py", type=r, interface=false, 
@@ -594,7 +595,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         
         //vilTemplateProcessor("JavaInterfaceAssembly", config, "${assemblySrc}/javaInterfaces.xml");
         //assemblies.add("interfaces|${assemblyRel}/javaInterfaces.xml|package|${mvnProjectBuildDir}");
-        if (usedServiceTypes.includes(PythonService)) {
+        if (isPythonUsed(usedServiceTypes)) {
             vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/pythonInterfaces.xml", withServices=false, dependency="");
             assemblies.add("python|${assemblyRel}/pythonInterfaces.xml|package|${mvnProjectBuildDir}");
         }
@@ -617,7 +618,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
             String clsName = asTypeName(e.name);
             vilTemplateProcessor("JavaEnum", config, "${javaDatatypesSrc}/${clsName}.java", type=e, 
                 pkg=javaDatatypesPackage);
-            if (usedServiceTypes.includes(PythonService)) {
+            if (isPythonUsed(usedServiceTypes)) {
                 vilTemplateProcessor("PythonEnum", config, "${pySrc}/datatypes/${clsName}.py", type=e);
             }
         }
