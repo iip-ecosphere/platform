@@ -5,9 +5,9 @@ import MeshBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, sequenceOf(MeshElement) nodes, String appName, String appVersion, String appDescription, Boolean tests, setOf(String) assemblies, Boolean springPackaging=true, String groupId="") {
+template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, setOf(Type) usedServiceTypes, sequenceOf(MeshElement) nodes, String appName, String appVersion, String appDescription, Boolean tests, setOf(String) assemblies, Boolean springPackaging=true, String groupId="") {
 
-    def main(IIPEcosphere config, XmlFileArtifact target, sequenceOf(MeshElement) nodes, String appName, String appVersion, String appDescription, Boolean tests, setOf(String) assemblies, Boolean springPackaging=true, String groupId="") {
+    def main(IIPEcosphere config, XmlFileArtifact target, setOf(Type) usedServiceTypes, sequenceOf(MeshElement) nodes, String appName, String appVersion, String appDescription, Boolean tests, setOf(String) assemblies, Boolean springPackaging=true, String groupId="") {
         IIPEcosphere cfg = config;
         String iipGroup = "de.iip-ecosphere.platform";
         String gId = groupId;
@@ -51,7 +51,11 @@ template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, sequenceOf(Mesh
      
         XmlElement build = createMavenBuildElement(profile, "", false);
         XmlElement plugins = createPlugins(build);
-        XmlElement execs = appendMavenDependencyPluginUnpackArtifact(plugins, "${iipGroup}:services.environment:${projectVersion}", "python", "\\${project.basedir}/src/main/python", "pythonEnv.zip", type="zip");
+        XmlElement dependencyPlugin = appendMavenDependencyPlugin(plugins);
+        XmlElement execs = new XmlElement(dependencyPlugin, "executions");
+        if (usedServiceTypes.includes(PythonService)) { // hasPython instead?
+            appendMavenDependencyPluginExecution(execs, "unpack", "${iipGroup}:services.environment:${projectVersion}", "python", "\\${project.basedir}/src/main/python", "pythonEnv.zip", type="zip");
+        }
         XmlElement unpackItems = appendMavenDependencyPluginExecution(execs, "unpack", 
             "de.iip-ecosphere.platform:services.environment:" + projectVersion, "python", 
             "\\${project.build.directory}/pyEnv", "pyEnv.zip", type="zip", id="pythonSources", phase="validate");

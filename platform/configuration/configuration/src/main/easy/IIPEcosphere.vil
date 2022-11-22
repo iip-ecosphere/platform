@@ -12,6 +12,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     
     Boolean tests = true;
     Boolean mvnUpdate = false;
+    setOf(Type) usedServiceTypes = {};
     
     main(Project source, Configuration config, Project target) = {
         generatePlatform(source, config, target); // first for container
@@ -46,6 +47,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         IIPEcosphere cfg = config;
         setOf(RecordType) recordTypes = RecordType.allInstances();
         setOf(Application) applications = Application.allInstances();
+        initUsedServiceTypes(applications);
         
         setOf(String) javaSerializers = {};
         setOf(String) artifacts = {};
@@ -83,10 +85,12 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     vilTemplateProcessor("JavaJsonSerializer", config, "${javaSerializersSrc}/${clsName}Serializer.java", 
                         type=r, pkg=javaSerializersPackage, typePkg=javaDatatypesPackage, sharedInterfaces=false);
                     javaSerializers.add("${javaSerializersPackage}.${clsName}Serializer");
-                    vilTemplateProcessor("PythonType", config, "${pySrc}/datatypes/${clsName}.py", type=r, interface=false, 
-                        sharedInterfaces=false);
-                    vilTemplateProcessor("PythonJsonSerializer", config, "${pySrc}/serializers/${clsName}Serializer.py", 
-                        type=r, sharedInterfaces=false);
+                    if (usedServiceTypes.includes(PythonService)) {
+                        vilTemplateProcessor("PythonType", config, "${pySrc}/datatypes/${clsName}.py", type=r, interface=false, 
+                            sharedInterfaces=false);
+                        vilTemplateProcessor("PythonJsonSerializer", config, "${pySrc}/serializers/${clsName}Serializer.py", 
+                            type=r, sharedInterfaces=false);
+                    }
                 };
             }
 
@@ -144,13 +148,15 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 if (not(cfg.sharedInterfaces)) {
                     vilTemplateProcessor("JavaInterfaceAssembly", config, "${assemblySrc}/javaInterfaces.xml");
                     assemblies.add("interfaces|${assemblyRel}/javaInterfaces.xml|package|${mvnProjectBuildDir}");
-                    vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/pythonInterfaces.xml", withServices=false, dependency="");
-                    assemblies.add("python|${assemblyRel}/pythonInterfaces.xml|package|${mvnProjectBuildDir}");
+                    if (usedServiceTypes.includes(PythonService)) {
+                        vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/pythonInterfaces.xml", withServices=false, dependency="");
+                        assemblies.add("python|${assemblyRel}/pythonInterfaces.xml|package|${mvnProjectBuildDir}");
+                    }
                 }
                 
                 // partition according to container strategy
                 String appVersion = getAppMvnVersion(a);
-                vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", artifacts=artifacts, bins=bins, assemblies=assemblies, resources=resources, starterCls="iip.Starter", appName=appName, appVersion=appVersion, appDescription=a.description, tests=tests);
+                vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", usedServiceTypes=usedServiceTypes, artifacts=artifacts, bins=bins, assemblies=assemblies, resources=resources, starterCls="iip.Starter", appName=appName, appVersion=appVersion, appDescription=a.description, tests=tests);
                 vilTemplateProcessor("AppAnt", config, "${appRoot}/build-jk.xml", artifactPrefix=appName, srvFolderName="IIP-apps-${appName}");
                 
                 maven("${appRoot}", mvnUpdate);
@@ -201,13 +207,29 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 vilTemplateProcessor("TemplatesEclipseReadme", config, "${appRoot}/README.md", appName="impl." + appName, nodes=elements);
 
                 String appVersion = getAppMvnVersion(a);
-                vilTemplateProcessor("AppMvnTest", config, "${appRoot}/pom.xml", assemblies=assemblies, nodes=elements, appName=appName, appVersion=appVersion, appDescription="Implementation of ${a.name}", tests=tests);
+                vilTemplateProcessor("AppMvnTest", config, "${appRoot}/pom.xml", usedServiceTypes=usedServiceTypes, assemblies=assemblies, nodes=elements, appName=appName, appVersion=appVersion, appDescription="Implementation of ${a.name}", tests=tests);
                 vilTemplateProcessor("TemplatesIdentityStoreYaml", config, "${resourcesSrc}/identityStore.yml", appName=appName);
                 identityStoreJsl(testResourcesSrc, cfg);
                 
                 zip(appRoot, appRoot, "${target}/templates/eclipse/impl.${appName}.zip");
             }
         };
+    }
+
+    /*
+    * Collects all IVML types of services used in all applications and stores them globally to usedServiceTypes.
+    * usedServiceTypes.includes(PythonService) tells you whether the application employs Python services.
+    */    
+    initUsedServiceTypes(setOf(Application) applications) = {
+        for (Application a: applications) {
+            for (ServiceMesh n : a.services) {
+                mapOf(MeshElement, setOf(MeshConnector)) mappedMesh = {};
+                setOf(MeshElement) nodes = n.sources->closure(MeshElement e|nextMeshNodes(e, mappedMesh));
+                for (MeshElement elt: nodes) {
+                    usedServiceTypes.add(elt.impl.getType());
+                }        
+            }
+        }
     }
 
     // ------------------------------------------ generating apps: generating template code -----------------------------------
@@ -542,7 +564,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         setOf(String) assemblies = {}; 
         setOf(String) resources = {}; 
         sequenceOf(MeshElement) elements = {};
-    
         generateEnums(javaDatatypesSrc, pySrc);    
         for (RecordType r : recordTypes) {
             // generate for all languages and according to serializer settings
@@ -557,12 +578,14 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
             vilTemplateProcessor("JavaJsonSerializer", config, "${javaSerializersSrc}/${clsName}ImplSerializer.java", 
                 type=r, pkg=javaSerializersPackage, typePkg=javaDatatypesPackage, sharedInterfaces=true, impl=true);
             javaSerializers.add("${javaSerializersPackage}.${clsName}ImplSerializer");
-            vilTemplateProcessor("PythonType", config, "${pySrc}/datatypes/${clsName}.py", type=r, interface=true, 
-                sharedInterfaces=true);
-            vilTemplateProcessor("PythonType", config, "${pySrc}/datatypes/${clsName}Impl.py", type=r, interface=false, 
-                sharedInterfaces=true);
-            vilTemplateProcessor("PythonJsonSerializer", config, "${pySrc}/serializers/${clsName}Serializer.py", type=r, 
-                sharedInterfaces=true);
+            if (usedServiceTypes.includes(PythonService)) {
+                vilTemplateProcessor("PythonType", config, "${pySrc}/datatypes/${clsName}.py", type=r, interface=true, 
+                    sharedInterfaces=true);
+                vilTemplateProcessor("PythonType", config, "${pySrc}/datatypes/${clsName}Impl.py", type=r, interface=false, 
+                    sharedInterfaces=true);
+                vilTemplateProcessor("PythonJsonSerializer", config, "${pySrc}/serializers/${clsName}Serializer.py", type=r, 
+                    sharedInterfaces=true);
+            }
         };
         
         for (ServiceBase s : serviceTypes) {
@@ -571,13 +594,15 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         
         //vilTemplateProcessor("JavaInterfaceAssembly", config, "${assemblySrc}/javaInterfaces.xml");
         //assemblies.add("interfaces|${assemblyRel}/javaInterfaces.xml|package|${mvnProjectBuildDir}");
-        vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/pythonInterfaces.xml", withServices=false, dependency="");
-        assemblies.add("python|${assemblyRel}/pythonInterfaces.xml|package|${mvnProjectBuildDir}");
+        if (usedServiceTypes.includes(PythonService)) {
+            vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/pythonInterfaces.xml", withServices=false, dependency="");
+            assemblies.add("python|${assemblyRel}/pythonInterfaces.xml|package|${mvnProjectBuildDir}");
+        }
             
         // partition according to container strategy
         
         sequenceOf(String) artList = cfg.sharedArtifact.split(":");
-        vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", artifacts=artifacts, bins=bins, assemblies=assemblies, resources=resources, starterCls="iip.Starter", 
+        vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", usedServiceTypes=usedServiceTypes, artifacts=artifacts, bins=bins, assemblies=assemblies, resources=resources, starterCls="iip.Starter", 
             appName=artList[1], appVersion=artList[2], appDescription="Shared application interfaces", tests=tests, springPackaging=false, groupId=artList[0]);
         vilTemplateProcessor("AppAnt", config, "${appRoot}/build-jk.xml", artifactPrefix=artList[1], srvFolderName="IIP-apps-${artList[1]}");
             
@@ -592,7 +617,9 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
             String clsName = asTypeName(e.name);
             vilTemplateProcessor("JavaEnum", config, "${javaDatatypesSrc}/${clsName}.java", type=e, 
                 pkg=javaDatatypesPackage);
-            vilTemplateProcessor("PythonEnum", config, "${pySrc}/datatypes/${clsName}.py", type=e);
+            if (usedServiceTypes.includes(PythonService)) {
+                vilTemplateProcessor("PythonEnum", config, "${pySrc}/datatypes/${clsName}.py", type=e);
+            }
         }
     }
     

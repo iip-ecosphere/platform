@@ -66,8 +66,6 @@ public abstract class IvmlSerializerConfigTests extends IvmlTests {
      */
     protected void assertAppInterfaces(File base, boolean old) throws IOException {
         File srcMain = new File(base, "src/main");
-        File srcMainPython = new File(srcMain, "python");
-        File srcMainAssembly = new File(srcMain, "assembly");
         File srcMainJava = new File(srcMain, "java");
         File srcMainJavaIip = new File(srcMainJava, "iip");
 
@@ -81,6 +79,9 @@ public abstract class IvmlSerializerConfigTests extends IvmlTests {
         assertJavaInterface(srcMainJavaIip, "MyOpcConnExample", old, true);
         assertJavaInterface(srcMainJavaIip, "MySourceExample", old, false);
         
+        /* no python anymore if not used in application
+        File srcMainPython = new File(srcMain, "python");
+        File srcMainAssembly = new File(srcMain, "assembly");
         assertPythonDatatype(srcMainPython, "Rec1");
         if (!old) {
             assertPythonDatatypeImpl(srcMainPython, "Rec1Impl");
@@ -96,7 +97,7 @@ public abstract class IvmlSerializerConfigTests extends IvmlTests {
         if (!old) {
             pythonSourceCodeCheck(srcMainPython, "datatypes/Rec1Impl.py");
         }
-        pythonSourceCodeCheck(srcMainPython, "serializers/Rec1Serializer.py");
+        pythonSourceCodeCheck(srcMainPython, "serializers/Rec1Serializer.py");*/
     }
     
 }
