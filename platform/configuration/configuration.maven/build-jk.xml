@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="tools.maven.dependencies" default="maven" basedir=".">
+<project name="configuration.maven" default="maven" basedir=".">
 	<!-- import of the global SSE Jenkins properties -->
 	<property file="${user.home}/global-build.properties"/>
 	<property file="${user.home}/qualimaster-build.properties"/>
@@ -12,6 +12,6 @@
              to set it up correctly through program. So we test through ANT, in an own file so that
              it can be called locally without running macros from macros.xml.-->
 		<ant antfile="test.xml"/>
-		<mvnDeployResolveArtifact folderName="IIP-toolsMavenDependencies" pomFile="pom.xml" jarFolder="target" artifactPattern="dependency-plugin-*.*.*.jar" />
+		<mvnDeployResolveArtifact folderName="IIP-configurationMaven" pomFile="pom.xml" jarFolder="target" artifactPattern="configuration-plugin-*.*.*.jar" />
 	</target>
 </project>
