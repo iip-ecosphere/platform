@@ -8,10 +8,6 @@
     <!-- deploy to SSE Mvn repo -->
 	<target name="maven"> 
 	    <maven pomFile="pom.xml" goal="install"/>
-		<!-- Maven test harness does not cope with plugin configuration and we do not understand how 
-             to set it up correctly through program. So we test through ANT, in an own file so that
-             it can be called locally without running macros from macros.xml.-->
-		<ant antfile="test.xml"/>
 		<mvnDeployResolveArtifact folderName="IIP-configurationMaven" pomFile="pom.xml" jarFolder="target" artifactPattern="configuration-plugin-*.*.*.jar" />
 	</target>
 </project>
