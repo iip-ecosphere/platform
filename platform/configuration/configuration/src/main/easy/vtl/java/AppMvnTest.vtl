@@ -51,7 +51,7 @@ template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, setOf(String) u
      
         XmlElement build = createMavenBuildElement(profile, "", false);
         XmlElement plugins = createPlugins(build);
-        XmlElement dependencyPlugin = appendMavenDependencyPlugin(plugins);
+        XmlElement dependencyPlugin = appendMavenIipDependencyPlugin(plugins);
         XmlElement execs = new XmlElement(dependencyPlugin, "executions");
         if (isPythonUsed(usedServiceTypes)) { // hasPython instead?
             appendMavenDependencyPluginExecution(execs, "unpack", "${iipGroup}:services.environment:${projectVersion}", "python", "\\${project.basedir}/src/main/python", "pythonEnv.zip", type="zip");
