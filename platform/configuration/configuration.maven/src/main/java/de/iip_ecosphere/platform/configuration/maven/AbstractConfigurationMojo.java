@@ -36,7 +36,7 @@ public abstract class AbstractConfigurationMojo extends AbstractMojo {
     @Parameter(property = "configuration.model", required = true)
     private String model;
 
-    @Parameter(property = "configuration.modelDirectory", required = true)
+    @Parameter(property = "configuration.modelDirectory", required = true, defaultValue = "src/test/easy")
     private String modelDirectory;
 
     @Parameter(property = "configuration.outputDirectory", required = true, defaultValue = "gen")
@@ -214,7 +214,7 @@ public abstract class AbstractConfigurationMojo extends AbstractMojo {
     
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        System.setProperty("iip.easy.tracing", getTracingLevel());
+        System.setProperty(PlatformInstantiator.KEY_PROPERTY_TRACING, getTracingLevel());
         String resourcesDir = validateDirectory(makeAbsolute(getResourcesDirectory()));
         if (null == resourcesDir) {
             resourcesDir = validateDirectory(makeAbsolute(getFallbackResourcesDirectory()));
@@ -228,7 +228,7 @@ public abstract class AbstractConfigurationMojo extends AbstractMojo {
             if (isModelDirectoryValid()) {
                 getLog().info("Calling platform instantiator with " + java.util.Arrays.toString(args) + ", tracing "
                     + getTracingLevel() + (null == resourcesDir ? "" : " and resources dir " + resourcesDir));        
-                PlatformInstantiator.main(args);
+                PlatformInstantiator.mainImpl(args);
             }
         } catch (ExecutionException e) {
             throw new MojoExecutionException(e.getMessage());
