@@ -82,6 +82,7 @@ A typical setup (an all-in-one-project implementation). happens in conjunction w
                 <tracingLevel>TOP</tracingLevel>
                 <resourcesDirectory>${project.basedir}/${iip.resources}</resourcesDirectory>
                 <fallbackResourcesDirectory>${project.basedir}/${iip.resources}</fallbackResourcesDirectory>
+                <adjustOutputDirectoryIfGenBroker>true</adjustOutputDirectoryIfGenBroker>
             </configuration>
         </plugin>
      </plugins>
@@ -89,9 +90,10 @@ A typical setup (an all-in-one-project implementation). happens in conjunction w
   ```
 
 The phases support the following configuration settings: 
-  - `model` the name of the IVML configuration model
-  - `modelDirectory` the directory the configuration model is located with (currently, usually `src/test/easy`). If not absolute, the project base directory will be prepended.
-  - `outputDirectory` the directory where to write the generated parts to (usually, `gen` or a sub-directory of it). If not absolute, the project base directory will be prepended.
-  - `tracingLevel` the level of tracing during instantiation (`ALL` for everything, `TOP` for the top-level calls, `FUNC` for the VIL/VTL function level, default is `TOP`)
-  - `resourcesDirectory` optional folder containing resources to be included into the application (see platform handbook, default `resources.ipr`). If given and not absolute, the project base directory will be prepended.
-  - `fallbackResourcesDirectory` optional folder containing resources to be included into the application if `resourcesDirectory` does not exist (see platform handbook, default `resources`). If given and not absolute, the project base directory will be prepended.
+  - `model` (`-Dconfiguration.model=...`) the name of the IVML configuration model
+  - `modelDirectory` the directory the configuration model is located with (currently, usually and by default `src/test/easy`, `-Dconfiguration.modelDirectory=...`). If not absolute, the project base directory will be prepended.
+  - `outputDirectory` the directory where to write the generated parts to (usually, `gen` or a sub-directory of it, default `gen`, `-Dconfiguration.outputDirectory=...`). If not absolute, the project base directory will be prepended.
+  - `tracingLevel` the level of tracing during instantiation (`ALL` for everything, `TOP` for the top-level calls, `FUNC` for the VIL/VTL function level, default is `TOP`, `-Dconfiguration.tracingLevel=...`)
+  - `resourcesDirectory` optional folder containing resources to be included into the application (see platform handbook, default `resources.ipr`, `-Dconfiguration.resourcesDirectory=...`). If given and not absolute, the project base directory will be prepended.
+  - `fallbackResourcesDirectory` optional folder containing resources to be included into the application if `resourcesDirectory` does not exist (see platform handbook, default `resources``-Dconfiguration.fallbackResourcesDirectory=...`). If given and not absolute, the project base directory will be prepended.
+  - `adjustOutputDirectoryIfGenBroker` (default `true`,`-Dconfiguration.adjustOutputDirectoryIfGenBroker=...`) adjust the output directory to the sub-directory `broker` if the goal is `genBroker` using any `gen` folder as parent, or if no `gen` folder is on the path, using the actual output directory as parent folder for `broker`.

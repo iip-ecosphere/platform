@@ -51,6 +51,9 @@ public abstract class AbstractConfigurationMojo extends AbstractMojo {
     @Parameter(property = "configuration.tracingLevel", required = false, defaultValue = "TOP")
     private String tracingLevel;
 
+    @Parameter(property = "configuration.adjustOutputDirectoryIfGenBroker", required = false, defaultValue = "trues")
+    private boolean adjustOutputDirectoryIfGenBroker;
+
     /**
      * Returns the actual Maven project.
      * 
@@ -176,6 +179,39 @@ public abstract class AbstractConfigurationMojo extends AbstractMojo {
         return result;
     }
     
+    /**
+     * Adjusts the output directory if necessary.
+     * 
+     * @param outputDir the output directory
+     * @return the adjusted output directory, by default just {@code outputDir}
+     */
+    protected String adjustOutputDir(String outputDir) {
+        return outputDir;
+    }
+    
+    /**
+     * Returns the "gen" parent folder if it exists, if not just {@code outputDir}.
+     * 
+     * @param outputDir the output directory where to start finding the "gen" parent folder
+     * @return the default gen parent folder or {@code outputDir} if not found
+     */
+    protected File findGenParent(String outputDir) {
+        File parent = new File(outputDir);
+        File iter = parent;
+        boolean genFound = false;
+        while (null != iter) {
+            if (iter.getName().equals("gen")) {
+                genFound = true;
+                break;
+            }
+            iter = iter.getParentFile();
+        }
+        if (null != iter && genFound) {
+            parent = iter;
+        }
+        return parent;
+    }
+    
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         System.setProperty("iip.easy.tracing", getTracingLevel());
@@ -186,8 +222,8 @@ public abstract class AbstractConfigurationMojo extends AbstractMojo {
         if (null != resourcesDir) {
             System.setProperty("iip.resources", resourcesDir);
         }
-        String[] args = {getModel(), makeAbsolute(getModelDirectory()), makeAbsolute(getOutputDirectory()), 
-            getStartRule()};
+        String outputDir = adjustOutputDir(makeAbsolute(getOutputDirectory()));
+        String[] args = {getModel(), makeAbsolute(getModelDirectory()), outputDir, getStartRule()};
         try {
             if (isModelDirectoryValid()) {
                 getLog().info("Calling platform instantiator with " + java.util.Arrays.toString(args) + ", tracing "

@@ -13,6 +13,8 @@
 
 package de.iip_ecosphere.platform.configuration.maven;
 
+import java.io.File;
+
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 
@@ -27,6 +29,11 @@ public class GenerateBrokerMojo extends AbstractConfigurationMojo {
     @Override
     public String getStartRule() {
         return "generateBroker";
+    }
+
+    @Override
+    protected String adjustOutputDir(String outputDir) {
+        return new File(findGenParent(outputDir), "broker").toString();
     }
 
 }

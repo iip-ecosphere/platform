@@ -57,6 +57,7 @@
                 <tracingLevel>TOP</tracingLevel>
                 <resourcesDirectory>${project.basedir}/${iip.resources}</resourcesDirectory>
                 <fallbackResourcesDirectory>${project.basedir}/resources</fallbackResourcesDirectory>
+                <adjustOutputDirectoryIfGenBroker>true</adjustOutputDirectoryIfGenBroker>
             </configuration>            
         </plugin>
     </plugins>
