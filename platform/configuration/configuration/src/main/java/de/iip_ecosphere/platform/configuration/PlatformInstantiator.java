@@ -39,6 +39,8 @@ import net.ssehub.easy.varModel.model.ModelQueryException;
  */
 public class PlatformInstantiator {
 
+    public static final String KEY_PROPERTY_TRACING = "iip.easy.tracing";
+    public static final String KEY_PROPERTY_EXIT = "iip.easy.exit";
     private static int exitCode = 0;
     
     /**
@@ -276,9 +278,10 @@ public class PlatformInstantiator {
             System.out.println("   - generateApps: app interfaces, apps with artifact dependencies");
             System.out.println("   - generateBroker: create a sample broker");
             System.out.println("   - generatePlatform: platform components only");
-            System.out.println("Optional: Output filtering -Diip.easy.tracing=ALL|FUNC|TOP, default TOP=toplevel");
+            System.out.println("Optional: Output filtering -D" + KEY_PROPERTY_TRACING 
+                + "=ALL|FUNC|TOP, default TOP=toplevel");
         } else {
-            String tracing = System.getProperty("iip.easy.tracing", "TOP").toUpperCase();
+            String tracing = System.getProperty(KEY_PROPERTY_TRACING, "TOP").toUpperCase();
             ITraceFilter filter = TopLevelExecutionTraceFilter.INSTANCE;
             if ("FUNC".equals(tracing)) {
                 filter = new FunctionLevelTraceFilter();
@@ -291,7 +294,9 @@ public class PlatformInstantiator {
                 c.setStartRuleName(args[3]);
             }
             instantiate(c);
-            System.exit(exitCode);
+            if (Boolean.valueOf(System.getProperty(KEY_PROPERTY_EXIT, "false"))) {
+                System.exit(exitCode);
+            }
         }
     }
 
