@@ -37,6 +37,7 @@
                                 <includes>*.properties</includes>
                             </artifactItem>
                         </artifactItems>
+                        <force>true</force> <!-- for tests -->
                         <cleanup>
 		                    <directory>${project.basedir}/src/main/python</directory>
 		                    <includes>
