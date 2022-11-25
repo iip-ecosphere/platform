@@ -21,7 +21,7 @@ project OpcUaDataTypes {
             }
         }
     };
-
+    
     compound NodeId {
 		Integer nameSpaceIndex;
 		Integer identifier;
@@ -77,17 +77,6 @@ project OpcUaDataTypes {
         name = "uint32[]",
         type = refBy(Integer32Type)
     };
-
-//    compound GuidTypeType refines PrimitiveType {
-//		UnsignedInteger32TypeType data1;
-//		UnsignedInteger16TypeType data2;
-//		UnsignedInteger16TypeType data3;
-//		ByteStringTypeType data4;
-//    }
-//	
-//    GuidTypeType opcGuidType = {
-//		name = "Guid"
-//    };
     
     RecordType opcGuidType = {
         name = "Guid",
@@ -157,16 +146,8 @@ project OpcUaDataTypes {
     NumericRangeTypeType opcNumericRangeType = {
 		name = "NumericRange"
     };
-
-//    compound RangeTypeType refines PrimitiveType {
-//        Real lowestValue;
-//		Real highestValue;
-//    }
-//    RangeTypeType opcRangeType = {
-//		name = "Range"
-//    };
 	
-	RecordType opcRangeType = {
+    RecordType opcRangeType = {
         name = "Range",
         fields = {
             Field {
@@ -180,16 +161,6 @@ project OpcUaDataTypes {
             }
         }
     };
-
-//    compound EUInformationTypeType refines PrimitiveType {
-//        String namespaceUri;
-//		Integer32TypeType unitId;
-//		String displayName;
-//		OpcLocalizedText description;
-//    }
-//    EUInformationTypeType opcEUInformationType = {
-//		name = "EUInformation"
-//    };
     
     RecordType opcEUInformationType = {
         name = "EUInformation",
@@ -219,14 +190,8 @@ project OpcUaDataTypes {
     UtcTimeTypeType opcUtcTimeType = {
 		name = "UtcTime"
     };
-
-//    compound ArgumentTypeType refines PrimitiveType {
-//    }
-//    ArgumentTypeType opcArgumentType = {
-//		name = "Argument"
-//    };
     
-	RecordType opcArgumentType = {
+    RecordType opcArgumentType = {
         name = "Argument",
         fields = {
             Field {
@@ -249,13 +214,7 @@ project OpcUaDataTypes {
         }
     };
     
-//    compound StructureTypeType refines PrimitiveType {
-//    }
-//    StructureTypeType opcStructureType = {
-//		name = "Structure"
-//    };
-    
-	RecordType opcStructureType = {
+    RecordType opcStructureType = {
         name = "Structure",
         fields = {
         }
@@ -271,15 +230,21 @@ project OpcUaDataTypes {
     }
 
     compound UAObjectType refines UABaseType {
+		refTo(DataType) type;
 		UAObjectFields fields;
     }
 
     compound UARootObjectType refines UAObjectType {
-    	refTo(DataType) type;
+		refTo(DataType) rootParent;
     }
 
-    compound UARootObjectTypeType refines UABaseType {
+    compound UAObjectTypeType refines UABaseType {
 		String documentation;
+    }
+
+    compound UAVariableTypeType refines UABaseType {
+		String documentation;
+		refTo(DataType) type;
     }
 
     compound UAFieldType refines Field {
@@ -291,8 +256,9 @@ project OpcUaDataTypes {
     }
 
     compound UAVariableType refines UAFieldType {
+    	refTo(DataType) dataType;
 		Integer accessLevel;
-		Integer valueRank; 
+		Integer valueRank;
 		Integer arrayDimensions;
     }
 
@@ -329,14 +295,7 @@ project OpcUaDataTypes {
     // freeze all primitives
     freeze {
 		UnsignedInteger32ArrayType;
-		opcNodeIdType;
 		opcLocalizedTextType;
-		opcDateStringType;
-		opcDecimalStringType;
-		opcDurationStringType;
-		opcNormalizedStringType;
-		opcTimeStringType;
-		opcUnknownDataType;
 	    opcGuidType;
 		opcIdType;
 		opcUnsignedIntegerType;
