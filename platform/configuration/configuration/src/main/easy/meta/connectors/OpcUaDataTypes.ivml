@@ -295,6 +295,7 @@ project OpcUaDataTypes {
     // freeze all primitives
     freeze {
 		UnsignedInteger32ArrayType;
+		opcNodeIdType;
 		opcLocalizedTextType;
 	    opcGuidType;
 		opcIdType;
