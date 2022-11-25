@@ -10,6 +10,7 @@
      <groupId>de.iip-ecosphere.platform</groupId>
      <artifactId>platformDependencies</artifactId>
      <version>0.5.0-SNAPSHOT</version>
+     <relativePath></relativePath>
   </parent>
 
   <dependencies>
@@ -185,6 +186,14 @@
                         <goals>
                             <goal>test-python</goal>
                         </goals>
+                        <configuration>
+                          <fileset>
+                            <directory>src/test/python</directory>
+                            <includes>
+                                <include>**/*Test.py</include>
+                            </includes>
+                          </fileset>                            
+                        </configuration>                        
                     </execution>
                 </executions>
 	        </plugin>
@@ -193,6 +202,11 @@
      </profile>
      <profile>
         <id>EasyGen</id>
+        <properties>
+            <maven.main.skip>true</maven.main.skip>
+            <maven.test.skip>true</maven.test.skip>
+            <maven.javadoc.skip>true</maven.javadoc.skip>
+        </properties>        
         <build>
           <plugins>
              <plugin>
@@ -278,7 +292,7 @@
                <groupId>org.codehaus.mojo</groupId>
                <artifactId>exec-maven-plugin</artifactId>
                <version>3.0.0</version>
-      		 <executions>
+      		   <executions>
                     <execution>
                        <id>generateBroker</id>
                        <configuration>

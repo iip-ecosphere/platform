@@ -23,8 +23,10 @@ import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
+import javax.ws.rs.ProcessingException;
 
 import org.slf4j.LoggerFactory;
 
@@ -47,6 +49,7 @@ import de.iip_ecosphere.platform.support.semanticId.eclass.model.TranslatableLab
  */
 public class EclassSemanticIdResolver extends SemanticIdResolver {
 
+    public static final String RELEASE_LATEST = "LATEST";
     private static final String REGEX = "^[0-9]{4}-[A-Z0-9:_.]{1,35}((-[A-Z0-9:_.]{1,35}"
         + "(-[A-Z0-9]{1}(-[A-Z0-9:_.]{1,70})?)?)?|-([A-Z0-9:_.]{1,35})?--[A-Z0-9:_.]{1,70}|---[A-Z0-9:_.]{1,70})"
         + "#[0-9A-Z]{2}-[A-Z0-9:_.]{1,131}#[0-9]{1,10}$";
@@ -84,6 +87,7 @@ public class EclassSemanticIdResolver extends SemanticIdResolver {
                         "No authentication token for '{}'. Disabling this resolver.", keystoreKey);
                     disabled = true;
                 } else {
+                    KeyManager[] keyManagers = null;
                     InputStream keyStoreStream = iStore.getKeystoreAsStream(keystoreKey);
                     if (null != keyStoreStream) {
                         try {                    
@@ -96,9 +100,10 @@ public class EclassSemanticIdResolver extends SemanticIdResolver {
                             // Eclass cert default -> SHA256
                             KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance("SunX509");
                             keyManagerFactory.init(keyStores, pw);
-                            SSLContext context = SSLContext.getInstance("TLS");
+                            keyManagers = keyManagerFactory.getKeyManagers();
+/*                            SSLContext context = SSLContext.getInstance("TLS");
                             context.init(keyManagerFactory.getKeyManagers(), null, null);
-                            AuthApiClient.setSslContext(context);
+                            AuthApiClient.setSslContext(context);*/
                         } catch (GeneralSecurityException e) {
                             LoggerFactory.getLogger(EclassSemanticIdResolver.class).error(
                                 "Cannot load certificate. Disabling this resolver.", e.getMessage());
@@ -111,6 +116,7 @@ public class EclassSemanticIdResolver extends SemanticIdResolver {
                     }
                     EclassJsonReadServicesApi api = new EclassJsonReadServicesApi();
                     AuthApiClient apiClient = new AuthApiClient();
+                    apiClient.setKeyManagers(keyManagers);
                     api.setApiClient(apiClient);
                     apiClient.setBasePath("https://eclass-cdp.com/");
                     eclassApi = api;
@@ -155,10 +161,11 @@ public class EclassSemanticIdResolver extends SemanticIdResolver {
      * 
      * @param preferredName the preferred name, may be <b>null</b>
      * @param structuredName the structured name, may be <b>null</b>
+     * @param description the description, may be <b>null</b>
      * @return the naming map
      */
     public static Map<String, DefaultNaming> createNaming(TranslatableLabel preferredName, 
-        TranslatableLabel structuredName) {
+        TranslatableLabel structuredName, TranslatableLabel description) {
         Map<String, DefaultNaming> result = new HashMap<String, DefaultNaming>();
         if (null != preferredName) {
             createNaming(preferredName, (n, v) -> n.setName(v), result);
@@ -166,6 +173,9 @@ public class EclassSemanticIdResolver extends SemanticIdResolver {
         if (null != structuredName) {
             createNaming(structuredName, (n, v) -> n.setStructuredName(v), result);
         }
+        if (null != description) {
+            createNaming(description, (n, v) -> n.setDescription(v), result);
+        }        
         return result;
     }
     
@@ -215,29 +225,36 @@ public class EclassSemanticIdResolver extends SemanticIdResolver {
                 String prefLang = preferredLanguage.toString();
                 // may be there is a way to get the type/kind out??
                 try {
-                    ReadUnit res = eclassApi.jsonapiV1UnitsIrdiGet(semanticId, prefLang, "false");
+                    ReadUnit res = eclassApi.jsonapiV1UnitsIrdiGet(semanticId, prefLang, "false", RELEASE_LATEST);
                     if (res != null) {
                         result = createInstance(semanticId);
                         // no access to revision, version, description; just guessing/parsing
-                        result.setNamingTyped(createNaming(res.getShortName(), res.getPreferredName()));
+                        result.setNamingTyped(createNaming(res.getShortName(), res.getPreferredName(), null));
                     }
                 } catch (ApiException e) {
                     LoggerFactory.getLogger(EclassSemanticIdResolver.class).error("API error: {} code {} body {}", 
                         e.getMessage(), e.getCode(), e.getResponseBody());
+                } catch (ProcessingException e) {
+                    LoggerFactory.getLogger(EclassSemanticIdResolver.class).error(
+                        "Processing error: {}", e.getMessage());
                 }
                 if (null == result) {
                     try {
                         ReadProperty res = eclassApi.jsonapiV1PropertiesIrdiGet(semanticId, 
-                            prefLang, "false");
+                            prefLang, "false", RELEASE_LATEST);
                         if (res != null) {
                             result = createInstance(semanticId);
-                            result.setNamingTyped(createNaming(null, res.getPreferredName()));
+                            // no access to revision, version, description; just guessing/parsing
+                            result.setNamingTyped(createNaming(res.getPreferredName(), res.getPreferredName(), null));
                         }
                     } catch (ApiException e) {
                         LoggerFactory.getLogger(EclassSemanticIdResolver.class).error("API error: {} code {} body {}", 
                             e.getMessage(), e.getCode(), e.getResponseBody());
                     } catch (IllegalArgumentException e) {
                         
+                    } catch (ProcessingException e) {
+                        LoggerFactory.getLogger(EclassSemanticIdResolver.class).error(
+                                "Processing error: {}", e.getMessage());
                     }
                 }
             }

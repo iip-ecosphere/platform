@@ -19,6 +19,7 @@ import javax.ws.rs.client.ClientBuilder;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.HttpUrlConnectorProvider;
 import org.glassfish.jersey.jackson.JacksonFeature;
+import org.glassfish.jersey.jsonp.JsonProcessingFeature;
 import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 
@@ -44,7 +45,7 @@ public class AuthApiClient extends ApiClient {
         context = ctx;
     }
     
-    @Override
+    /*@Override
     protected Client buildHttpClient(boolean debugging) {
         if (null != context) {
             final ClientConfig clientConfig = new ClientConfig();
@@ -56,7 +57,7 @@ public class AuthApiClient extends ApiClient {
                 clientConfig.register(new LoggingFeature(java.util.logging.Logger
                             .getLogger(LoggingFeature.DEFAULT_LOGGER_NAME), 
                             java.util.logging.Level.INFO, 
-                            LoggingFeature.Verbosity.PAYLOAD_ANY, 1024 * 50 /* Log payloads up to 50K */));
+                            LoggingFeature.Verbosity.PAYLOAD_ANY, 1024 * 50 /* Log payloads up to 50K *//*));
                 clientConfig.property(LoggingFeature.LOGGING_FEATURE_VERBOSITY, LoggingFeature.Verbosity.PAYLOAD_ANY);
                 // Set logger to ALL
                 java.util.logging.Logger.getLogger(LoggingFeature.DEFAULT_LOGGER_NAME)
@@ -68,5 +69,10 @@ public class AuthApiClient extends ApiClient {
             return super.buildHttpClient(debugging);
         }
     }
+
+    @Override
+    protected void performAdditionalClientConfiguration(ClientConfig clientConfig) {
+        clientConfig.register(JsonProcessingFeature.class);
+    }*/
 
 }    
