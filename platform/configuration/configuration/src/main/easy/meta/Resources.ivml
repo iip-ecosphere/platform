@@ -97,7 +97,7 @@ project Resources {
         NonEmptyEphemeralPort alertMgrPort = 9091;
         NonEmptyString alertMgrHost = "127.0.0.1";
         Boolean alertMgrRunning = false; // running somewhere else, do we have to start it
-        Integer scrapeInterval = 1000;
+        Integer scrapeInterval = 1001;
         Integer scrapeTimeout = 1000;
         
         scrapeInterval > 50;
