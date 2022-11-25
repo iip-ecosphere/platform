@@ -44,61 +44,67 @@ public class PythonCompileMojo extends AbstractMojo {
 
     @Parameter(property = "python-compile.failOnError", defaultValue = "true")
     private boolean failOnError;
-    
+
+    @Parameter(property = "python-compile.skip", required = false, defaultValue = "false")
+    private boolean skip;
+
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        /*
-         * This call just goes through some locations known to contain the python3
-         * executable. i.e. "/usr/bin/python3" not perfect as the last option, the one
-         * most likely for windows, will not return a path to look into the
-         * side-packages! Also only working for as long windows user did not rename
-         * python to something else to potentially run multiple version besides each
-         * other
-         */
-        String pythonExecutable = PythonUtils.getPythonExecutable().toString();
-        getLog().info("Using Python " + pythonExecutable);
-
-        //search the site_packages of the python for pyflakes! Currently not doable on windows!
-        
-        File baseDir = project.getBasedir();
-        List<File> pythonFiles = getAllPythonFiles(new File(baseDir, "/src/main/python/").getAbsolutePath(), true); 
-        pythonFiles.addAll(getAllPythonFiles(new File(baseDir, "/src/test/python/").getAbsolutePath(), true));
-        
-        String output = "";
-        String errorLine = "";
-        boolean pyflakesExists = true;
-        for (File f : pythonFiles) {
-            getLog().info("Testing Python syntax: " + f.getAbsolutePath());
-            if (pyflakesExists) {
-                String[] cmd = {pythonExecutable, "-m", "pyflakes",  f.getAbsolutePath()}; 
-                output += runPythonTest(cmd);
-                if (output.contains("No module named")) {
-                    pyflakesExists = !output.contains("pyflakes");
+        if (!skip) {
+            /*
+             * This call just goes through some locations known to contain the python3
+             * executable. i.e. "/usr/bin/python3" not perfect as the last option, the one
+             * most likely for windows, will not return a path to look into the
+             * side-packages! Also only working for as long windows user did not rename
+             * python to something else to potentially run multiple version besides each
+             * other
+             */
+            String pythonExecutable = PythonUtils.getPythonExecutable().toString();
+            getLog().info("Using Python " + pythonExecutable);
+    
+            //search the site_packages of the python for pyflakes! Currently not doable on windows!
+            
+            File baseDir = project.getBasedir();
+            List<File> pythonFiles = getAllPythonFiles(new File(baseDir, "/src/main/python/").getAbsolutePath(), true); 
+            pythonFiles.addAll(getAllPythonFiles(new File(baseDir, "/src/test/python/").getAbsolutePath(), true));
+            
+            String output = "";
+            String errorLine = "";
+            boolean pyflakesExists = true;
+            for (File f : pythonFiles) {
+                getLog().info("Testing Python syntax: " + f.getAbsolutePath());
+                if (pyflakesExists) {
+                    String[] cmd = {pythonExecutable, "-m", "pyflakes",  f.getAbsolutePath()}; 
+                    output += runPythonTest(cmd);
+                    if (output.contains("No module named")) {
+                        pyflakesExists = !output.contains("pyflakes");
+                    }
+    
+                } 
+                if (!pyflakesExists) {
+                    String[] cmd = {pythonExecutable, "-m", "py_compile", f.getAbsolutePath()};
+                    output += runPythonTest(cmd);
                 }
-
-            } 
-            if (!pyflakesExists) {
-                String[] cmd = {pythonExecutable, "-m", "py_compile", f.getAbsolutePath()};
-                output += runPythonTest(cmd);
-            }
-            if (output.length() > 0) {
-                getLog().info(output);
-                boolean failure = false;
-                String[] outputs = output.split("\n");
-                for (String line : outputs) {
-                    // Unused import are not supposed to fail the build
-                    // are there pyflake options to disable those warnings
-                    if (!line.contains("import") && !line.contains("redefinition") 
-                        && !line.contains("but never used")) {
-                        failure = true;
-                        errorLine = line;
+                if (output.length() > 0) {
+                    getLog().info(output);
+                    boolean failure = false;
+                    String[] outputs = output.split("\n");
+                    for (String line : outputs) {
+                        // Unused import are not supposed to fail the build
+                        // are there pyflake options to disable those warnings
+                        if (!line.contains("import") && !line.contains("redefinition") 
+                            && !line.contains("but never used")) {
+                            failure = true;
+                            errorLine = line;
+                        }
+                    }
+                    if (failure && failOnError) {
+                        throw new MojoExecutionException(errorLine);
                     }
                 }
-                if (failure && failOnError) {
-                    throw new MojoExecutionException(errorLine);
-                }
             }
-        
+        } else {
+            getLog().info("Skipping Python compiler execution");
         }
     }
     

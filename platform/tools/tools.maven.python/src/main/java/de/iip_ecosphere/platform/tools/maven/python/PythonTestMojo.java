@@ -46,6 +46,9 @@ public class PythonTestMojo extends AbstractMojo {
     
     @Parameter(property = "python-test.modelProject", defaultValue = "src/test/python")
     private String modelProject;
+    
+    @Parameter(property = "python-test.skip", required = false, defaultValue = "false")
+    private boolean skip;
 
     /**
      * A specific <code>fileSet</code> rule to select files and directories.
@@ -55,44 +58,47 @@ public class PythonTestMojo extends AbstractMojo {
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-
-        File baseDir = project.getBasedir();
-        List<File> pythonFiles;
-        if (null != fileset) {
-            pythonFiles = new ArrayList<>();
-            FileSetManager fileSetManager = new FileSetManager();
-            String[] includedFiles = fileSetManager.getIncludedFiles(fileset);
-            for (String f : includedFiles) {
-                if (f.endsWith(".py")) {
-                    pythonFiles.add(new File(f));
+        if (!skip) {
+            File baseDir = project.getBasedir();
+            List<File> pythonFiles;
+            if (null != fileset) {
+                pythonFiles = new ArrayList<>();
+                FileSetManager fileSetManager = new FileSetManager();
+                String[] includedFiles = fileSetManager.getIncludedFiles(fileset);
+                for (String f : includedFiles) {
+                    if (f.endsWith(".py")) {
+                        pythonFiles.add(new File(f));
+                    }
                 }
+            } else {
+                pythonFiles = PythonCompileMojo.getAllPythonFiles(
+                    new File(baseDir, "/src/test/python/").getAbsolutePath(), false);
+            }
+    
+            /*
+             * This call just goes through some locations known to contain the python3
+             * executable. i.e. "/usr/bin/python3" not perfect as the last option, the one
+             * most likely for windows, will not return a path to look into the
+             * side-packages! Also only working for as long windows user did not rename
+             * python to something else to potentially run multiple version besides each
+             * other
+             */
+            String pythonExecutable = PythonUtils.getPythonExecutable().toString();
+    
+            getLog().info("Using Python " + pythonExecutable);
+    
+            String output = "";
+            for (File f : pythonFiles) {
+                getLog().info("Executing Python test: " + f.getName());
+                String[] cmd = {pythonExecutable.toString(), f.getName(), modelProject}; 
+                output += runPythonTest(cmd, new File(baseDir, "src/test/python/").getAbsolutePath());
+            }
+            getLog().info(output);
+            if (output.contains("Traceback")) {
+                throw new MojoExecutionException(output, null);
             }
         } else {
-            pythonFiles = PythonCompileMojo.getAllPythonFiles(
-                new File(baseDir, "/src/test/python/").getAbsolutePath(), false);
-        }
-
-        /*
-         * This call just goes through some locations known to contain the python3
-         * executable. i.e. "/usr/bin/python3" not perfect as the last option, the one
-         * most likely for windows, will not return a path to look into the
-         * side-packages! Also only working for as long windows user did not rename
-         * python to something else to potentially run multiple version besides each
-         * other
-         */
-        String pythonExecutable = PythonUtils.getPythonExecutable().toString();
-
-        getLog().info("Using Python " + pythonExecutable);
-
-        String output = "";
-        for (File f : pythonFiles) {
-            getLog().info("Executing Python test: " + f.getName());
-            String[] cmd = {pythonExecutable.toString(), f.getName(), modelProject}; 
-            output += runPythonTest(cmd, new File(baseDir, "src/test/python/").getAbsolutePath());
-        }
-        getLog().info(output);
-        if (output.contains("Traceback")) {
-            throw new MojoExecutionException(output, null);
+            getLog().info("Skipping Python test execution");
         }
     }
     

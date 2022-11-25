@@ -33,8 +33,8 @@ The Python compiler plugin runs by default in the `compile` lifecycle phase with
   ```
 
 The compiler plugin supports the following configuration settings:
-  - `failOnError` (default `true`, `-Dpython-compile.failOnError=true`): Whether the build process shall fail if Python compile errors are detected.
-  
+  - `failOnError` (default `true`, user property `python-compile.failOnError`): Whether the build process shall fail if Python compile errors are detected.
+  - `skip` (default `false`, user property `python-compile.skip`) skips the execution of this plugin. 
   
 ## Python test plugin
 
@@ -70,9 +70,10 @@ The Python test plugin currently executes Python files, either those directly lo
   ```
 
 The compiler plugin supports the following configuration settings:
-  - `failOnError` (default `true`, `-Dpython-compile.failOnError=true`): Whether the build process shall fail if Python compile errors are detected.
-  - `modelProject` (default `src/test/python`, `-Dpython-test.modelProject=src/test/python`): Optional First parameter passed to the test. So far required to obtain the Python source code generated in the application model project. After refactoring the tests and their generation, we will probably remove this setting.
+  - `failOnError` (default `true`, user property `python-compile.failOnError`): Whether the build process shall fail if Python compile errors are detected.
+  - `modelProject` (default `src/test/python`, user property `python-test.modelProject`): Optional first parameter passed to the test. So far required to obtain the Python source code generated in the application model project. After refactoring the tests and their generation, we will probably remove this setting.
   - `fileset` (default not given, execute all files directly located in `src/test/python`) is optional and can be used to determine the tests to be executed.
+  - `skip` (default `false`, user property `python-compile.skip`) skips the execution of this plugin. 
   
 ## Combining the goals
 
