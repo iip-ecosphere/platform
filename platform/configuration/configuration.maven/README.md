@@ -2,11 +2,11 @@
 
 Maven plugin for the following platform installation tasks (represented as Maven goals in untypical notation).
 
-* generateInterfaces: app interfaces, no apps
-* generateAppsNoDeps: app interfaces, apps without artifact dependencies
-* generateApps: app interfaces, apps with artifact dependencies
-* generateBroker: create a sample broker
-* generatePlatform: platform components only
+* generateInterfaces: generate app interfaces, but no apps - executed only if `outputDirectory` is empty or IVML files in `modelDirectory`are newer than `outputDirectory`
+* generateAppsNoDeps: app interfaces with apps, but without dependencies to artifacts - executed only if `outputDirectory` is empty or IVML files in `modelDirectory`are newer than `outputDirectory`
+* generateApps: app interfaces with apps including artifact dependencies - executed always
+* generateBroker: create a sample broker - executed only if `outputDirectory` is empty or IVML files in `modelDirectory`are newer than `outputDirectory`
+* generatePlatform: exclusively platform components - executed only if `outputDirectory` is empty or IVML files in `modelDirectory`are newer than `outputDirectory`
 
 A typical setup (an all-in-one-project implementation). happens in conjunction with the extended unpack resources plugin. As shown below, in the `prepare-sources` phase, the configuration meta model is obtained, then in `generate-sources` the applications are instantiated without dependencies. Not shown is the remaining setup for service implementation, which would happen in the `compile` and `test` phases. Finally, in the `package` phase the full applications are generated and assembled.
 
@@ -77,11 +77,11 @@ A typical setup (an all-in-one-project implementation). happens in conjunction w
             </executions>
             <configuration>
                 <model>ExamplePython</model>
-                <modelDirectory>${project.basedir}/src/test/easy</modelDirectory>
-                <outputDirectory>${project.basedir}/gen/py</outputDirectory>
+                <modelDirectory>src/test/easy</modelDirectory>
+                <outputDirectory>gen/py</outputDirectory>
                 <tracingLevel>TOP</tracingLevel>
-                <resourcesDirectory>${project.basedir}/${iip.resources}</resourcesDirectory>
-                <fallbackResourcesDirectory>${project.basedir}/${iip.resources}</fallbackResourcesDirectory>
+                <resourcesDirectory>${iip.resources}</resourcesDirectory>
+                <fallbackResourcesDirectory>${iip.resources}</fallbackResourcesDirectory>
                 <adjustOutputDirectoryIfGenBroker>true</adjustOutputDirectoryIfGenBroker>
             </configuration>
         </plugin>

@@ -27,5 +27,11 @@ public class GenerateAppsMojo extends AbstractConfigurationMojo {
     public String getStartRule() {
         return "generateApps";
     }
+    
+    @Override
+    protected boolean enableRun(String modelDir, String outputDir) {
+        return true;
+    }
+
 
 }

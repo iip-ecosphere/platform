@@ -13,6 +13,7 @@
 package de.iip_ecosphere.platform.configuration.maven;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.maven.plugin.AbstractMojo;
@@ -212,6 +213,53 @@ public abstract class AbstractConfigurationMojo extends AbstractMojo {
         return parent;
     }
     
+    /**
+     * Returns whether {@code modelDir} is considered to be newer than {@code outDir}.
+     * 
+     * @param modelDir the model directory
+     * @param outDir the output directory
+     * @return {@code true} if {@code modelDir} is considered to be newer than {@code outDir}, {@code false} else
+     */
+    protected boolean modelNewerThanOut(String modelDir, String outDir) {
+        long maxModel = getMaxLastModified(modelDir, f -> f.getName().endsWith(".ivml"));
+        long maxOut = getMaxLastModified(outDir, f -> true);
+        return maxOut < 0 || maxModel > maxOut;
+    }
+    
+    /**
+     * Returns the maximum modification time of the files in {@code dir} fulfilling {@code filter}.
+     * 
+     * @param dir the directory to analyze
+     * @param filter filter on files found in {@code dir}
+     * @return the maximum modification time or {@code -1} if no files were found
+     */
+    protected long getMaxLastModified(String dir, FileFilter filter) {
+        long result = -1;
+        File d = new File(dir);
+        if (d.exists()) {
+            File[] files = d.listFiles(filter);
+            if (files != null) {
+                for (File f : files) {
+                    result = Math.max(result, f.lastModified());
+                }
+            }
+        }
+        return result;
+    }
+    
+    /**
+     * Called by {@link #execute()} to figure out whether the instantiation shall take place. By default,
+     * instantiation will be enabled if IVML files in {@code modelDir} are newer than files in {@code 
+     * output directory} or if output directory is empty or missing.
+     * 
+     * @param modelDir the model directory
+     * @param outputDir the output directory
+     * @return {@code true} for instantiation, {@code false} for no instantiation
+     */
+    protected boolean enableRun(String modelDir, String outputDir) {
+        return modelNewerThanOut(modelDir, outputDir);
+    }
+    
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         System.setProperty(PlatformInstantiator.KEY_PROPERTY_TRACING, getTracingLevel());
@@ -223,12 +271,17 @@ public abstract class AbstractConfigurationMojo extends AbstractMojo {
             System.setProperty("iip.resources", resourcesDir);
         }
         String outputDir = adjustOutputDir(makeAbsolute(getOutputDirectory()));
-        String[] args = {getModel(), makeAbsolute(getModelDirectory()), outputDir, getStartRule()};
+        String modelDir = makeAbsolute(getModelDirectory());
+        String[] args = {getModel(), modelDir, outputDir, getStartRule()};
         try {
             if (isModelDirectoryValid()) {
-                getLog().info("Calling platform instantiator with " + java.util.Arrays.toString(args) + ", tracing "
-                    + getTracingLevel() + (null == resourcesDir ? "" : " and resources dir " + resourcesDir));        
-                PlatformInstantiator.mainImpl(args);
+                if (enableRun(modelDir, outputDir)) {
+                    getLog().info("Calling platform instantiator with " + java.util.Arrays.toString(args) + ", tracing "
+                        + getTracingLevel() + (null == resourcesDir ? "" : " and resources dir " + resourcesDir));
+                    PlatformInstantiator.mainImpl(args);
+                } else {
+                    getLog().info("Skipped as code in output directory is newer than IVML model.");
+                }
             }
         } catch (ExecutionException e) {
             throw new MojoExecutionException(e.getMessage());
