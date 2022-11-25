@@ -4,7 +4,7 @@ We use the `maven-dependency-plugin` for various tasks, e.g., to unpack Python c
 
 ## Extended unpack goal
 
-The extended `unpack` goal behaves like the original goal offering all configuration options, but in addition the `cleanup` option.
+The extended `unpack` goal behaves like the original goal offering all configuration options, but in addition the `cleanup` option. Unpacking only happens if the output directory given in the respective artifact item does not exist or if `force` is specified, usually via command line.
 
   ```xml
   <build>
@@ -40,6 +40,7 @@ The extended `unpack` goal behaves like the original goal offering all configura
 
 The extended unpack goal supports the following additional configuration settings:
   - `cleanup` (default not given) specifying the files and directories to be deleted (via `includes`) before unpacking. Typically, `directory` points to the `outputDirectory` of the artifact item(s).
+  - `force` (default `false`) forces an update of the files applying a cleanup if needed. If `false`, unpacking only happens if the output folder does not exist.
   
   
 ## copy-dependencies goal

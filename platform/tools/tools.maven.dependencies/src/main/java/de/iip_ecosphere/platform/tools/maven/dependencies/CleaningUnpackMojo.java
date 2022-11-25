@@ -22,6 +22,7 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.dependency.fromConfiguration.ArtifactItem;
 import org.apache.maven.plugins.dependency.fromConfiguration.UnpackMojo;
 import org.apache.maven.shared.model.fileset.FileSet;
 import org.apache.maven.shared.model.fileset.util.FileSetManager;
@@ -39,6 +40,9 @@ public class CleaningUnpackMojo extends UnpackMojo {
      */
     @Parameter(required = false)
     private FileSet cleanup;
+    
+    @Parameter(property = "unpack.force", required = false, defaultValue = "false")
+    private boolean force;
 
     /**
      * Determines excluded paths from the given paths, i.e., split the directories add them to {@code excluded}.
@@ -93,19 +97,31 @@ public class CleaningUnpackMojo extends UnpackMojo {
     
     @Override
     protected void doExecute() throws MojoExecutionException, MojoFailureException {
-        if (null != cleanup) {
-            FileSetManager fileSetManager = new FileSetManager();
-            Set<String> excluded = new HashSet<>();
-            excluded.add("");  // don't delete containing directory, it's part of included directories
-            excluded.add(".");
-
-            addExcludedPaths(fileSetManager.getExcludedDirectories(cleanup), false, excluded);
-            addExcludedPaths(fileSetManager.getExcludedFiles(cleanup), true, excluded);
-
-            deletePaths(fileSetManager.getIncludedFiles(cleanup), excluded);
-            deletePaths(fileSetManager.getIncludedDirectories(cleanup), excluded);
+        boolean execute;
+        if (force) {
+            execute = true;
+        } else {
+            execute = false;
+            for (ArtifactItem ai : getArtifactItems()) {
+                execute |= ai.isNeedsProcessing() || !ai.getOutputDirectory().exists();
+            }
+        }        
+        
+        if (execute) {
+            if (null != cleanup) {
+                FileSetManager fileSetManager = new FileSetManager();
+                Set<String> excluded = new HashSet<>();
+                excluded.add("");  // don't delete containing directory, it's part of included directories
+                excluded.add(".");
+    
+                addExcludedPaths(fileSetManager.getExcludedDirectories(cleanup), false, excluded);
+                addExcludedPaths(fileSetManager.getExcludedFiles(cleanup), true, excluded);
+    
+                deletePaths(fileSetManager.getIncludedFiles(cleanup), excluded);
+                deletePaths(fileSetManager.getIncludedDirectories(cleanup), excluded);
+            }
+            super.doExecute();
         }
-        super.doExecute();
     }
 
 }
