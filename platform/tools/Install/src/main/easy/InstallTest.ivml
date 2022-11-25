@@ -102,11 +102,26 @@ project InstallTest {
 
     // --------------------- monitoring ---------------------------
     
-    // current default: no monitoring configured
+    platformMonitoring = PrometheusPlatformMonitoring {
+        schema = PrometheusSchema::HTTP,
+        host = "127.0.0.1",
+        port = 9090,
+        running = false,
+        exporterPort = -1, // ephemeral
+        exporterHost = "127.0.0.1",
+        exporterRunning = false,
+        alertMgrPort = 9091,
+        alertMgrHost = "127.0.0.1",
+        alertMgrRunning = false,
+        scrapeInterval = 1001,
+        scrapeTimeout = 1000
+    };
     
     // ------------------------- UI -------------------------------
     
-    // current default: no UI configured
+    managementUi = AngularManagementUI {
+        port = 4200
+    };
 
     // ------------ application and service nets ------------------
     
