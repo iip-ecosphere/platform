@@ -21,7 +21,7 @@ COPY monJars/ monJars
 COPY monitoring.sh monitoring.sh
 # UI
 COPY mgtUi/ mgtUi
-COPY mgtUi_modified.sh mgtUi.sh
+COPY mgtUi.sh mgtUi.sh
 # Wrapper script
 COPY wrapper_script.sh wrapper_script.sh
 
