@@ -202,7 +202,7 @@
                <executions>
                  <execution>
                    <id>unpack</id>
-                   <phase>generate-sources</phase>
+                   <phase>prepare-sources</phase>
                    <goals>
                      <goal>unpack</goal>
                    </goals>
@@ -245,6 +245,35 @@
                  </execution>
                </executions>
              </plugin>
+			<plugin>
+	            <groupId>de.iip-ecosphere.platform</groupId>
+	            <artifactId>configuration-plugin</artifactId>
+	            <version>${project.version}</version>
+	            <executions>
+                    <execution>
+                        <id>generateBroker</id>
+                        <goals>
+                            <goal>generateBroker</goal>
+                        </goals>
+                    </execution>
+	                <execution>
+	                    <id>generateAppsNoDeps</id>
+	                    <goals>
+	                        <goal>generateAppsNoDeps</goal>
+	                    </goals>
+	                </execution>
+	                <execution>
+	                    <id>generateApps</id>
+	                    <goals>
+	                        <goal>generateApps</goal>
+	                    </goals>
+	                </execution>
+	            </executions>
+	            <configuration>
+	                <model>ExamplePython</model>
+	                <outputDirectory>gen/py</outputDirectory>
+	            </configuration>
+	        </plugin>
              <plugin>
                <groupId>org.codehaus.mojo</groupId>
                <artifactId>exec-maven-plugin</artifactId>
