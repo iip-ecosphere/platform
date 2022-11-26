@@ -2,6 +2,8 @@
 
 Explicitly invoking multiple lifecycles, goals and profiles for execution is usually not possible from inside maven. The maven-invoker plugin allows such tasks for integration testing but not in simplified manner directly from a maven POM. This plugin is largely inspired by (the code of) maven-invoker.
 
+This package binds with `invoke` in life-cycle phase `validate`, with `install` in life-cycle phase `install` and with `package` in life-cycle phase `package`.
+
 The following example demonstrates the application of this plugin. We declare two profiles, `EasyGen` and `Main`. `EasyGen` shall be executed from `Main` (and explicitly via command line). The `Main` profile is declared to be activated by default and uses this plugin to define an execution on the `EasyGen` profile for phase `process-sources`. When executing `mvn`, the `Main` profile will be executed, which in turn executes `EasyGen`. Please be careful to not invoke the profile in which this plugin is declared, which may lead to an endless loop.
 
 

@@ -20,8 +20,6 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
-import org.apache.maven.plugins.annotations.LifecyclePhase;
-import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.invoker.CommandLineConfigurationException;
@@ -37,8 +35,7 @@ import org.apache.maven.shared.invoker.MavenInvocationException;
  * 
  * @author Holger Eichelberger, SSE
  */
-@Mojo(name = "invoke", defaultPhase = LifecyclePhase.VALIDATE)
-public class InvokerMojo extends AbstractMojo {
+public class AbstractInvokerMojo extends AbstractMojo {
 
     @Parameter(defaultValue = "${project}", readonly = true)
     private MavenProject project;
@@ -125,7 +122,9 @@ public class InvokerMojo extends AbstractMojo {
         Properties sysProperties = new Properties();
         if (null != systemProperties) {
             for (SystemProperty prop : systemProperties) {
-                sysProperties.put(prop.getKey(), prop.getValue());
+                if (null != prop.getKey()) {
+                    sysProperties.put(prop.getKey(), prop.getValue() == null ? "" : prop.getValue());
+                }
             }
         }
         request.setProperties(sysProperties);
