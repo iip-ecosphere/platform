@@ -23,6 +23,7 @@ As stated above, directly after obtaining this project, the application will not
 
   * Ensure that the Maven platformDependencies are installed (see [install](https://github.com/iip-ecosphere/platform/tree/main/platform/tools/Install))
   * Execute `mvn -U install` This will perform the broker-instantiation, the interface generation, the code compilation and packaging as well as the final application packaging. Build steps are only executed if the configuration model changes or generate code is not already existing. If a `resources.ipr` folder is present, it will take precendence over the `resources` folder. 
+  * To update/upgrade the model, call `mvn -U generate-sources -Dunpack.force=true`.
 
 If you want to execute the example in a platform installation, add `gen/py/SimplePythonDemoFlowApp/target/SimplePythonDemoFlowApp-0.1.0-SNAPSHOT-bin.jar` to the devices and execute the application (Platform CLI, deployment script, etc. see Platform Handbook for details). If you want to execute the application standalone without platform:
 
