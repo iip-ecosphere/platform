@@ -24,7 +24,7 @@ public class SystemProperty {
     @Parameter(required = true)
     private String key;
 
-    @Parameter(defaultValue = "")
+    @Parameter(required = true)
     private String value;
 
     /**

@@ -122,8 +122,11 @@ public class AbstractInvokerMojo extends AbstractMojo {
         Properties sysProperties = new Properties();
         if (null != systemProperties) {
             for (SystemProperty prop : systemProperties) {
-                if (null != prop.getKey()) {
-                    sysProperties.put(prop.getKey(), prop.getValue() == null ? "" : prop.getValue());
+                if (null != prop.getKey() && null != prop.getValue()) {
+                    sysProperties.put(prop.getKey(), prop.getValue());
+                } else {
+                    getLog().error("Skipping property " + prop.getKey() + "=" + prop.getValue() 
+                        + " as either key or value are not given");
                 }
             }
         }
