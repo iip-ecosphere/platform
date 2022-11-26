@@ -24,7 +24,7 @@ public class SystemProperty {
     @Parameter(required = true)
     private String key;
 
-    @Parameter(required = true)
+    @Parameter(defaultValue = "")
     private String value;
 
     /**
@@ -39,7 +39,7 @@ public class SystemProperty {
     /**
      * Returns the property value.
      * 
-     * @return the value
+     * @return the value (may be empty for none)
      */
     public String getValue() {
         return value;
