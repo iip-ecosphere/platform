@@ -200,6 +200,7 @@
           </plugins>
         </build> 
      </profile>
+     
      <profile>
         <id>EasyGen</id>
         <properties>
@@ -349,6 +350,78 @@
           </plugins>
         </build> 
      </profile>
+     
+      <profile>
+         <id>Main</id>
+         <activation>
+            <activeByDefault>true</activeByDefault>
+         </activation>
+        <properties>
+            <maven.main.skip>true</maven.main.skip>
+            <maven.test.skip>true</maven.test.skip>
+            <maven.javadoc.skip>true</maven.javadoc.skip>
+        </properties>        
+
+          <build>
+              <plugins>
+                 <plugin>
+                    <groupId>de.iip-ecosphere.platform</groupId>
+                    <artifactId>invoker-plugin</artifactId>
+                    <version>${project.version}</version>
+                    <executions>
+                        <execution>
+                            <id>genInterfaces</id>
+		                    <goals>
+		                        <goal>install</goal>
+		                    </goals>
+                            <configuration>
+                                <invokeProfiles>
+                                    <invokeProfile>EasyGen</invokeProfile>
+                                </invokeProfiles>
+                                <invokeGoals>
+                                    <invokeGoal>process-sources</invokeGoal>
+                                </invokeGoals>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>installServices</id>
+		                    <goals>
+		                        <goal>install</goal>
+		                    </goals>
+                            <configuration>
+                                <invokeProfiles>
+                                    <invokeProfile>App</invokeProfile>
+                                </invokeProfiles>
+                                <invokeGoals>
+                                    <invokeGoal>install</invokeGoal>
+                                </invokeGoals>
+                                <systemProperties>
+                                  <systemProperty>
+                                    <key>skipTests</key>
+                                  </systemProperty>
+                                </systemProperties>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>integrateApp</id>
+		                    <goals>
+		                        <goal>install</goal>
+		                    </goals>
+                            <configuration>
+                                <invokeProfiles>
+                                    <invokeProfile>EasyGen</invokeProfile>
+                                </invokeProfiles>
+                                <invokeGoals>
+                                    <invokeGoal>package</invokeGoal>
+                                </invokeGoals>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+          </build>
+      </profile>
+     
   </profiles>
 
 </project>

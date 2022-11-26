@@ -11,9 +11,10 @@ rm -rf gen
 #mvn -P EasyGen exec:java@generateAppsNoDeps
 #mvn -U -P App install -DskipTests
 #mvn -P EasyGen exec:java@generateApps
-mvn -U -P EasyGen generate-sources
-mvn -U -P App install -DskipTests
-mvn -U -P EasyGen package
+#mvn -U -P EasyGen generate-sources
+#mvn -U -P App install -DskipTests
+#mvn -U -P EasyGen package
+mvn -U install
 
 #execute and test
 
