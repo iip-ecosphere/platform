@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="tools.maven.dependencies.test" default="test" basedir=".">
+	<!-- import of the global SSE Jenkins properties -->
+	<property file="${user.home}/global-build.properties"/>
+	<property file="${user.home}/qualimaster-build.properties"/>
+	<include file="${user.home}/macros.xml"/>
+
+    <target name="test"> 
+        <delete dir="./target/test-resources" quiet="true"/>
+        <copy toDir="./target/test-resources">
+            <fileset dir="./src/test/resources"/>
+        </copy>
+    	<antcall target="test-ok"/>
+        <!--<delete dir="target/test-resources" quiet="true"/>-->
+   	</target>
+
+	<target name="test-ok"> 
+		<!--<exec executable="w:\apache-maven-3.6.3\bin\mvn.cmd" dir="./target/test-resources/unit/project-ok">
+			<arg value="validate"/>
+		</exec>-->
+	    <maven pomFile="./target/test-resources/unit/project-ok/pom.xml" goal="validate"/>
+		<fail message="Files are missing.">
+		    <condition>
+		        <not>
+		            <resourcecount count="1">
+                        <!-- unpacked from invoked profile -->
+		                <fileset id="fs" dir="./target/test-resources/unit/project-ok/src/main" 
+		                    includes="python/analyze-report.properties"/>
+		            </resourcecount>
+		        </not>
+		    </condition>
+		</fail>
+	</target>
+
+</project>
