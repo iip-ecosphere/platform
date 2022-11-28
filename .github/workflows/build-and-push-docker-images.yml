@@ -45,7 +45,7 @@ jobs:
       - name: Instantiate the platform, prepare container building
         run: |
           cd ./platform/tools/Install
-          sed -i 's/String serverHost = "147.172.178.145";/String serverHost = "172.19.0.22";/' src/main/easy/InstallTest.ivml
+          sed -i 's/String serverHost = "147.172.178.145";/String serverHost = "172.19.0.22";/g' src/main/easy/InstallTest.ivml
           echo "Using configuration:"
           cat src/main/easy/InstallTest.ivml
           mvn --batch-mode --update-snapshots exec:java -Dexec.args="InstallTest src/main/easy gen"
