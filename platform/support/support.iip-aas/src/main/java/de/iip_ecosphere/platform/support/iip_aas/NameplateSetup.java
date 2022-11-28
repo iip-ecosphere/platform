@@ -374,16 +374,15 @@ public class NameplateSetup {
         } catch (IOException e) {
             // not there, ok
             try {
-                NameplateSetup nSetup = obtainNameplateSetup(); 
                 AasBuilder aasBuilder = factory.createAasBuilder(id, urn);
                 TechnicalDataSubmodelBuilder tdBuilder = aasBuilder.createTechnicalDataSubmodelBuilder(null);
                 GeneralInformationBuilder giBuilder = tdBuilder.createGeneralInformationBuilder(
-                    nSetup.getManufacturerName(), 
-                    LangString.create(nSetup.getManufacturerProductDesignation()), "", "");
-                PlatformAas.createAddress(giBuilder, nSetup.getAddress()); // inofficial, not in Generic Frame
-                AasUtils.resolveImage(nSetup.getProductImage(), AasUtils.CLASSPATH_RESOURCE_RESOLVER, false, 
+                    getManufacturerName(), 
+                    LangString.create(getManufacturerProductDesignation()), "", "");
+                PlatformAas.createAddress(giBuilder, getAddress()); // inofficial, not in Generic Frame
+                AasUtils.resolveImage(getProductImage(), AasUtils.CLASSPATH_RESOURCE_RESOLVER, false, 
                     (n, r, m) -> giBuilder.addProductImageFile(n, r, m));
-                AasUtils.resolveImage(nSetup.getManufacturerLogo(), AasUtils.CLASSPATH_RESOURCE_RESOLVER, true, 
+                AasUtils.resolveImage(getManufacturerLogo(), AasUtils.CLASSPATH_RESOURCE_RESOLVER, true, 
                     (n, r, m) -> giBuilder.setManufacturerLogo(r, m));
                 giBuilder.build();
                 final GregorianCalendar now = new GregorianCalendar();
@@ -394,8 +393,8 @@ public class NameplateSetup {
                 tdBuilder.createProductClassificationsBuilder().build();
                 tdBuilder.build();
                 SubmodelBuilder sub = aasBuilder.createSubmodelBuilder(SUBMODEL_SERVICES, null);
-                if (null != nSetup.getServices()) {
-                    for (Service s: nSetup.getServices()) {
+                if (null != getServices()) {
+                    for (Service s: getServices()) {
                         SubmodelElementCollectionBuilder smcb = sub
                             .createSubmodelElementCollectionBuilder(s.getKey(), false, false);
                         smcb.createPropertyBuilder(PROPERTY_KEY)
