@@ -126,6 +126,7 @@ template JavaServiceTestTemplate(Configuration config, FileArtifact target, Java
             public void startup() {
                 service = new ${clsName}(); // constructor for testing, does not set up service management values!
                 ${genIngestorAttachments()}
+                
                 try {
                     service.setState(ServiceState.STARTING);
                 } catch (ExecutionException e) {
