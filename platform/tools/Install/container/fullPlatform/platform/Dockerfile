@@ -29,7 +29,7 @@ COPY wrapper_script.sh wrapper_script.sh
 RUN apk update && apk add bash
 RUN apk add nodejs npm
 # Creating a symlink from nodejs to node (for mgtUI.sh)
-RUN ln -s /usr/bin/node /usr/lib/nodejs
+RUN ln -s /usr/bin/node /usr/bin/nodejs
 
 # Running the wrapper script
 CMD ./wrapper_script.sh
