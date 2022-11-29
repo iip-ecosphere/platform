@@ -23,6 +23,7 @@ In progress:
 * [#69](https://github.com/iip-ecosphere/platform/issues/69): Revise platform installation guidelines
 * [#100](https://github.com/iip-ecosphere/platform/issues/100): Run multiple app instances
 * [#101](https://github.com/iip-ecosphere/platform/issues/101): Documentation of fixed formats used by the platform
+* [#109](https://github.com/iip-ecosphere/platform/issues/101): Maven integration for platform/application instantiation and orchestrated execution of Maven, e.g., for the examples.
 
 New features:
 * [#51](https://github.com/iip-ecosphere/platform/issues/51): Device specific measurement plugin for Phoenix Contact AXC
