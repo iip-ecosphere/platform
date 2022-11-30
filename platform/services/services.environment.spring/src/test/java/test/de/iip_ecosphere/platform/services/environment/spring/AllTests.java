@@ -23,7 +23,8 @@ import test.de.iip_ecosphere.platform.services.environment.spring.metricsProvide
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
     MetricsProviderTest.class,
-    StarterTests.class
+    StarterTests.class,
+    SpringAsyncServiceBaseTests.class
 })
 public class AllTests {
 }
