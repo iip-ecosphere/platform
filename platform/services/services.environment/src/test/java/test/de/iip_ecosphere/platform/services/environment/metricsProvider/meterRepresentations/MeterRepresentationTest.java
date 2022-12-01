@@ -137,8 +137,7 @@ public class MeterRepresentationTest {
     @Test
     public void testTagNoKey() throws IOException {
         JsonObject obj = TestUtils.readJsonFromResources(FOLDER, JSON_VALID_NO_DESCRIPTION);
-
-        assertThrows(IllegalArgumentException.class, () -> GaugeRepresentation.parseGauge(obj, ":value"));
+        GaugeRepresentation.parseGauge(obj, ":value");
     }
 
     /**
@@ -150,8 +149,7 @@ public class MeterRepresentationTest {
     public void testTagNoValue() throws IOException {
         JsonObject obj = TestUtils.readJsonFromResources(FOLDER, JSON_VALID_NO_DESCRIPTION);
         String[] tags = {"key:"};
-
-        assertThrows(IllegalArgumentException.class, () -> GaugeRepresentation.parseGauge(obj, tags));
+        GaugeRepresentation.parseGauge(obj, tags);
     }
 
     /**
@@ -164,7 +162,7 @@ public class MeterRepresentationTest {
         JsonObject obj = TestUtils.readJsonFromResources(FOLDER, JSON_VALID_NO_DESCRIPTION);
         String[] tags = {"potato"};
 
-        assertThrows(IllegalArgumentException.class, () -> GaugeRepresentation.parseGauge(obj, tags));
+        GaugeRepresentation.parseGauge(obj, tags);
     }
 
     /**
