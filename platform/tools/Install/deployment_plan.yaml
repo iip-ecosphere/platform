@@ -1,0 +1,10 @@
+artifact: file:/device/SimpleMeshTestingApp-0.1.0-SNAPSHOT-bin.jar
+id: fullPlatform
+parallelize: true
+onUndeployRemoveArtifact: true
+assignments:
+  - resource: fullPlatform
+    artifact: file:/device/SimpleMeshTestingApp-0.1.0-SNAPSHOT-bin.jar
+    services:
+      - SimpleSource
+      - SimpleReceiver
