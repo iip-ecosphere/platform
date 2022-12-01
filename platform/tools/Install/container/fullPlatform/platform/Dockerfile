@@ -25,6 +25,8 @@ COPY mgtUi.sh mgtUi.sh
 # Wrapper script
 COPY wrapper_script.sh wrapper_script.sh
 
+COPY deployment_plan.yaml artifacts/deployment_plan.yaml
+
 # Installing bash
 RUN apk update && apk add bash
 RUN apk add nodejs npm
@@ -33,3 +35,4 @@ RUN ln -s /usr/bin/node /usr/bin/nodejs
 
 # Running the wrapper script
 CMD ./wrapper_script.sh
+

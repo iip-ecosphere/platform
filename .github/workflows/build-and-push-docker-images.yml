@@ -50,6 +50,7 @@ jobs:
           cat src/main/easy/InstallTest.ivml
           mvn --batch-mode --update-snapshots exec:java -Dexec.args="InstallTest src/main/easy gen"
           cp container/fullPlatform/platform/*.sh gen
+          cp container/fullPlatform/platform/deployment_plan.yaml gen
           cp ../../configuration/configuration/gen/tests/SimpleMesh/SimpleMeshTestingApp/target/SimpleMeshTestingApp-0.1.0-SNAPSHOT-bin.jar gen
           echo "Base directory for container creation:"
           ls gen
