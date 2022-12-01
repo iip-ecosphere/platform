@@ -12,7 +12,7 @@ do
   sleep 1
 done
 printf "\n\n>>> Starting local ECS-Runtime...\n"
-./ecs.sh &
+./ecs.sh --iip.id=fullPlatform &
 while [ ! -f /run/iip-ecsRuntime.pid ]
 do
   sleep 1
