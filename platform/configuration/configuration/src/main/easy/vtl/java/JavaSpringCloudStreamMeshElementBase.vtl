@@ -174,7 +174,10 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
     def registerService(MeshElement elt, ServiceBase service) {
         'String iId;'
         for (String s: serviceVars) {
-            'iId = ServiceBase.getApplicationInstanceId(${s}.getId());'
+            'iId = ServiceBase.getApplicationInstanceId(${s}.getId());
+            if (iId == null || iId.length() == 0) {
+                iId = "dflt";
+            }'
             'serviceSent = Counter.builder("service.sent")
                 .baseUnit("tuple/s")
                 .description("Tuples sent out by a service")
