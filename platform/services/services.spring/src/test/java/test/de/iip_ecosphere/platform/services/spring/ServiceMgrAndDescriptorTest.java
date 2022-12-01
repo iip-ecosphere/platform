@@ -177,6 +177,11 @@ public class ServiceMgrAndDescriptorTest {
         public void cloneArtifact(String artifactId, URI location) throws ExecutionException {
         }
 
+        @Override
+        public int getServiceInstanceCount(String serviceId) {
+            return 0;
+        }
+
     }
 
     /**
