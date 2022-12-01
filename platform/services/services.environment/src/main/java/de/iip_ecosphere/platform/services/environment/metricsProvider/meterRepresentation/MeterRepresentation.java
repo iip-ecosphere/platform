@@ -155,11 +155,12 @@ public abstract class MeterRepresentation implements Meter {
         try {
             for (String tag : tags) {
                 aux = tag.split(":");
-                if (aux[0].equals("") || aux[1].equals("")) {
-                    throw new IllegalArgumentException(NON_VALID_JSON);
+                if (aux.length == 2 && aux[0].length() > 0 && aux[1].length() > 0) {
+                    tagList.add(new ImmutableTag(aux[0], aux[1]));
+                } else {
+                    LoggerFactory.getLogger(MeterRepresentation.class).warn(
+                        "'{}' does not parse to a vaild meter tag. Ignoring.", tag);
                 }
-                tagList.add(new ImmutableTag(aux[0], aux[1]));
-
             }
         } catch (ArrayIndexOutOfBoundsException aiobe) {
             throw new IllegalArgumentException(NON_VALID_JSON, aiobe);
