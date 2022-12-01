@@ -39,6 +39,14 @@ public interface ContainerOperations {
     public String addContainer(URI location) throws ExecutionException;
 
     /**
+     * Returns the container id for a given container location as used in {@link #addContainer(URI)}.
+     * 
+     * @param location the location
+     * @return the id of the container, may be empty or <b>null</b>null if there is none
+     */
+    public String getId(URI location);
+
+    /**
      * Starts a container. The container must be already within the management domain of this instance by
      * {@link #addContainer(URI)}. The container shall after some time be in state 
      * {@link ContainerState#DEPLOYING}, {@link ContainerState#DEPLOYED} or {@link ContainerState#FAILED}.

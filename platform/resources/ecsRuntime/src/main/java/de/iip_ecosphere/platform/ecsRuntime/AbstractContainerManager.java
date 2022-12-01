@@ -52,6 +52,19 @@ public abstract class AbstractContainerManager<C extends ContainerDescriptor> im
     }
     
     @Override
+    public String getId(URI location) {
+        String result = null;
+        URI loc = location.normalize();
+        for (C desc : containers.values()) {
+            if (desc.getUri().equals(loc)) {
+                result = desc.getId();
+                break;
+            }
+        }
+        return result;
+    }
+    
+    @Override
     public ContainerState getState(String id) {
         ContainerState result = ContainerState.UNKNOWN;
         if (null != id) {

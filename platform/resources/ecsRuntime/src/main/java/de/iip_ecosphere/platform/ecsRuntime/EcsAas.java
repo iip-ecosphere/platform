@@ -81,6 +81,7 @@ public class EcsAas implements AasContributor {
     
     public static final String NAME_OP_GET_STATE = "getState";
     public static final String NAME_OP_CONTAINER_ADD = "addContainer";
+    public static final String NAME_OP_CONTAINER_GETID = "getId";
     public static final String NAME_OP_CONTAINER_ADD_TASK = "addContainerAsTask";
     public static final String NAME_OP_CONTAINER_UNDEPLOY = "undeployContainer";
     public static final String NAME_OP_CONTAINER_UPDATE = "updateContainer";
@@ -156,23 +157,23 @@ public class EcsAas implements AasContributor {
             jB.createOperationBuilder(NAME_OP_CONTAINER_ADD)
                 .setInvocable(iCreator.createInvocable(getQName(NAME_OP_CONTAINER_ADD)))
                 .addInputVariable("url", Type.STRING)
-                .addOutputVariable("result", Type.STRING)
-                .build();
+                .build(Type.STRING);
+            jB.createOperationBuilder(NAME_OP_CONTAINER_GETID)
+                .setInvocable(iCreator.createInvocable(getQName(NAME_OP_CONTAINER_GETID)))
+                .addInputVariable("url", Type.STRING)
+                .build(Type.STRING);
             jB.createOperationBuilder(NAME_OP_CONTAINER_ADD_TASK)
                 .setInvocable(iCreator.createInvocable(getQName(NAME_OP_CONTAINER_ADD_TASK)))
                 .addInputVariable("url", Type.STRING)
                 .addInputVariable("taskId", Type.STRING)
-                .addOutputVariable("result", Type.STRING)
-                .build();
+                .build(Type.STRING);
         }
         jB.build();
-
         if (null != mgr) {
             for (ContainerDescriptor desc : mgr.getContainers()) {
                 addContainer(smB, desc);
             }
         }
-
         smB.defer(); // join with services if present, build done by AAS
         return null;
     }
@@ -237,12 +238,16 @@ public class EcsAas implements AasContributor {
                 return EcsFactory.getContainerManager().getState(readString(p)); 
             }
         ));
-
         sBuilder.defineOperation(getQName(NAME_OP_CONTAINER_ADD), 
             new JsonResultWrapper(p -> { 
                 return EcsFactory.getContainerManager().addContainer(readUri(p, 0, EMPTY_URI)); 
             }
         ));
+        sBuilder.defineOperation(getQName(NAME_OP_CONTAINER_GETID), 
+            p -> { 
+                return EcsFactory.getContainerManager().getId(readUri(p, 0, EMPTY_URI)); 
+            }
+        );
         sBuilder.defineOperation(getQName(NAME_OP_CONTAINER_ADD_TASK), 
             new JsonResultWrapper(p -> { 
                 return EcsFactory.getContainerManager().addContainer(readUri(p, 0, EMPTY_URI)); 
@@ -264,8 +269,8 @@ public class EcsAas implements AasContributor {
                 }
                 return result;
             });
-        //MetricsAasConstructor.addMetricsProtocols(sBuilder, Monitor.getMetricsProvider(), null, s -> getQName(s));
     }
+    //MetricsAasConstructor.addMetricsProtocols(sBuilder, Monitor.getMetricsProvider(), null, s -> getQName(s));
 
     @Override
     public Kind getKind() {

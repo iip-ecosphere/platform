@@ -145,4 +145,14 @@ public class EcsAasClient extends SubmodelElementsCollectionClient implements Ec
         fromJson(getOperation(EcsAas.NAME_OP_CONTAINER_STOP_TASK).invoke(id, taskId));
     }
 
+    @Override
+    public String getId(URI location) {
+        try {
+            return (String) getOperation(EcsAas.NAME_OP_CONTAINER_GETID).invoke(location.toString());
+        } catch (ExecutionException e) {
+            getLogger().error("Requesting service container id: " + e.getMessage());
+            return null;
+        }
+    }
+
 }
