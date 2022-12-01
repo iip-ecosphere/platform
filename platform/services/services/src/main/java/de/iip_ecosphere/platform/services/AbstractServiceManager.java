@@ -121,7 +121,7 @@ public abstract class AbstractServiceManager<A extends AbstractArtifactDescripto
     protected String addArtifact(String artifactId, A descriptor) throws ExecutionException {
         checkId(artifactId, "artifactId");
         if (artifacts.containsKey(artifactId)) {
-            throw new ExecutionException("Artifact id '" + artifactId + "' is already known", null);
+            throw new ExecutionException("Artifact id '" + artifactId + "' " + EXC_ALREADY_KNOWN, null);
         }
         artifacts.put(artifactId, descriptor);
         ServicesAas.notifyArtifactAdded(descriptor);
@@ -728,6 +728,25 @@ public abstract class AbstractServiceManager<A extends AbstractArtifactDescripto
      */
     public void clear() {
         artifacts.clear();
+    }
+    
+    @Override
+    public int getServiceInstanceCount(String serviceId) {
+        int result = 0;
+        String aId = ServiceBase.getApplicationId(serviceId);
+        String sId = ServiceBase.getServiceId(serviceId);
+        if (null == aId || aId.length() == 0) {
+            if (null != getService(sId)) {
+                result = 1;
+            }
+        } else {
+            for (S service : getServices()) {
+                if (aId.equals(service.getApplicationId()) && sId.equals(service.getServiceId())) {
+                    result++;
+                }
+            }
+        }
+        return result;
     }
 
 }

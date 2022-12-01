@@ -37,6 +37,7 @@ import de.iip_ecosphere.platform.services.ServiceFactory;
 import de.iip_ecosphere.platform.services.ServiceManager;
 import de.iip_ecosphere.platform.services.TypedDataConnectorDescriptor;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
+import de.iip_ecosphere.platform.services.environment.switching.ServiceBase;
 import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
@@ -107,6 +108,23 @@ public class ServiceManagerTest {
         mgr.removeArtifact(aId);
         Assert.assertFalse(mgr.getArtifactIds().contains(aId));
         Assert.assertFalse(mgr.getArtifacts().contains(aDesc));
+        ActiveAasBase.setNotificationMode(oldM);
+    }
+    
+    /**
+     * Tests basic application id related functions.
+     * 
+     * @throws ExecutionException shall not occur in a successful run
+     * @throws URISyntaxException shall not occur in a successful run
+     */
+    @Test
+    public void testMgrAppId() throws ExecutionException, URISyntaxException {
+        NotificationMode oldM = ActiveAasBase.setNotificationMode(NotificationMode.NONE);
+        ActiveAasBase.setNotificationMode(oldM);
+        ServiceManager mgr = new MyServiceManagerAppInst();
+        Assert.assertEquals(1, mgr.getServiceInstanceCount("s1"));
+        Assert.assertEquals(4, mgr.getServiceInstanceCount(ServiceBase.composeId("s1", "a1")));
+        Assert.assertEquals(4, mgr.getServiceInstanceCount(ServiceBase.composeId("s1", "a1", "007")));
         ActiveAasBase.setNotificationMode(oldM);
     }
     
