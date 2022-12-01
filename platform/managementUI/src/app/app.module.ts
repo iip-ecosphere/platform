@@ -31,6 +31,9 @@ import { ResourceDetailsComponent } from './components/resource-details/resource
 import { OperationQueryComponent } from './components/resource-details/operation-query/operation-query.component';
 import { OnlyIdPipe } from './pipes/only-id.pipe';
 import { StatusBoxComponent } from './components/deployment-plans/status-box/status-box.component';
+import { FlowchartComponent } from './components/flowchart/flowchart.component';
+
+//import { NgFlowchartModule } from '@joelwenzel/ng-flowchart';
 
 @NgModule({
   declarations: [
@@ -44,7 +47,8 @@ import { StatusBoxComponent } from './components/deployment-plans/status-box/sta
     ResourceDetailsComponent,
     OperationQueryComponent,
     OnlyIdPipe,
-    StatusBoxComponent
+    StatusBoxComponent,
+    FlowchartComponent
   ],
   imports: [
     BrowserModule,
@@ -63,7 +67,8 @@ import { StatusBoxComponent } from './components/deployment-plans/status-box/sta
     MatSelectModule,
     MatSnackBarModule,
     MatProgressSpinnerModule,
-    MatSidenavModule
+    MatSidenavModule,
+    //NgFlowchartModule
   ],
   providers: [{
     provide:HTTP_INTERCEPTORS,
