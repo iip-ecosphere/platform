@@ -32,8 +32,8 @@ import { OperationQueryComponent } from './components/resource-details/operation
 import { OnlyIdPipe } from './pipes/only-id.pipe';
 import { StatusBoxComponent } from './components/deployment-plans/status-box/status-box.component';
 import { FlowchartComponent } from './components/flowchart/flowchart.component';
+import { DrawflowDirective } from './directives/drawflow.directive';
 
-//import { NgFlowchartModule } from '@joelwenzel/ng-flowchart';
 
 @NgModule({
   declarations: [
@@ -48,7 +48,8 @@ import { FlowchartComponent } from './components/flowchart/flowchart.component';
     OperationQueryComponent,
     OnlyIdPipe,
     StatusBoxComponent,
-    FlowchartComponent
+    FlowchartComponent,
+    DrawflowDirective
   ],
   imports: [
     BrowserModule,
@@ -68,7 +69,6 @@ import { FlowchartComponent } from './components/flowchart/flowchart.component';
     MatSnackBarModule,
     MatProgressSpinnerModule,
     MatSidenavModule,
-    //NgFlowchartModule
   ],
   providers: [{
     provide:HTTP_INTERCEPTORS,

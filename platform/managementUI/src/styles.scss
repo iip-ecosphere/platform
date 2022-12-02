@@ -68,3 +68,381 @@
   width: auto;
   height: auto;
 }
+
+
+/* You can add global styles to this file, and also import other style files */
+/* Drawflow styles starts here */
+
+:root {
+  --dfBackgroundColor: #ffffff;
+  --dfBackgroundSize: 25px;
+  --dfBackgroundImage: linear-gradient(
+      to right,
+      rgba(233, 233, 233, 1) 1px,
+      transparent 1px
+    ),
+    linear-gradient(to bottom, rgba(233, 233, 233, 1) 1px, transparent 1px);
+
+  --dfNodeType: flex;
+  --dfNodeTypeFloat: none;
+  --dfNodeBackgroundColor: rgba(247, 247, 247, 1);
+  --dfNodeTextColor: #000000;
+  --dfNodeBorderSize: 1px;
+  --dfNodeBorderColor: rgba(202, 202, 202, 1);
+  --dfNodeBorderRadius: 2px;
+  --dfNodeMinHeight: 20px;
+  --dfNodeMinWidth: 160px;
+  --dfNodePaddingTop: 15px;
+  --dfNodePaddingBottom: 14px;
+  --dfNodeBoxShadowHL: 0px;
+  --dfNodeBoxShadowVL: 1px;
+  --dfNodeBoxShadowBR: 15px;
+  --dfNodeBoxShadowS: 1px;
+  --dfNodeBoxShadowColor: rgba(195, 195, 195, 1);
+
+  --dfNodeHoverBackgroundColor: rgba(247, 247, 247, 1);
+  --dfNodeHoverTextColor: rgba(0, 0, 0, 1);
+  --dfNodeHoverBorderSize: 1px;
+  --dfNodeHoverBorderColor: rgba(202, 202, 202, 1);
+  --dfNodeHoverBorderRadius: 3px;
+
+  --dfNodeHoverBoxShadowHL: 0px;
+  --dfNodeHoverBoxShadowVL: 1px;
+  --dfNodeHoverBoxShadowBR: 15px;
+  --dfNodeHoverBoxShadowS: 0px;
+  --dfNodeHoverBoxShadowColor: rgba(195, 195, 195, 1);
+
+  --dfNodeSelectedBackgroundColor: rgba(247, 247, 247, 1);
+  --dfNodeSelectedTextColor: rgba(34, 89, 140, 1);
+  --dfNodeSelectedBorderSize: 1px;
+  --dfNodeSelectedBorderColor: rgba(78, 169, 255, 1);
+  --dfNodeSelectedBorderRadius: 3px;
+
+  --dfNodeSelectedBoxShadowHL: 2px;
+  --dfNodeSelectedBoxShadowVL: 3px;
+  --dfNodeSelectedBoxShadowBR: 20px;
+  --dfNodeSelectedBoxShadowS: 0px;
+  --dfNodeSelectedBoxShadowColor: rgba(94, 177, 255, 1);
+
+  --dfInputBackgroundColor: rgba(255, 255, 255, 1);
+  --dfInputBorderSize: 1px;
+  --dfInputBorderColor: rgba(200, 200, 200, 1);
+  --dfInputBorderRadius: 50px;
+  --dfInputLeft: -24px;
+  --dfInputHeight: 15px;
+  --dfInputWidth: 15px;
+
+  --dfInputHoverBackgroundColor: rgba(78, 169, 255, 1);
+  --dfInputHoverBorderSize: 1px;
+  --dfInputHoverBorderColor: rgba(200, 200, 200, 1);
+  --dfInputHoverBorderRadius: 50px;
+
+  --dfOutputBackgroundColor: #ffffff;
+  --dfOutputBorderSize: 1px;
+  --dfOutputBorderColor: rgba(200, 200, 200, 1);
+  --dfOutputBorderRadius: 50px;
+  --dfOutputRight: -7px;
+  --dfOutputHeight: 15px;
+  --dfOutputWidth: 15px;
+
+  --dfOutputHoverBackgroundColor: rgba(78, 169, 255, 1);
+  --dfOutputHoverBorderSize: 1px;
+  --dfOutputHoverBorderColor: rgba(200, 200, 200, 1);
+  --dfOutputHoverBorderRadius: 50px;
+
+  --dfLineWidth: 3px;
+  --dfLineColor: rgba(78, 169, 255, 1);
+  --dfLineHoverColor: #4682b4;
+  --dfLineSelectedColor: rgba(67, 185, 147, 1);
+
+  --dfRerouteBorderWidth: 4px;
+  --dfRerouteBorderColor: rgba(78, 169, 255, 1);
+  --dfRerouteBackgroundColor: #ffffff;
+
+  --dfRerouteHoverBorderWidth: 8px;
+  --dfRerouteHoverBorderColor: rgba(67, 185, 147, 1);
+  --dfRerouteHoverBackgroundColor: #ffffff;
+
+  --dfDeleteDisplay: block;
+  --dfDeleteColor: rgba(78, 169, 255, 1);
+  --dfDeleteBackgroundColor: rgba(255, 255, 255, 1);
+  --dfDeleteBorderSize: 1px;
+  --dfDeleteBorderColor: rgba(78, 169, 255, 1);
+  --dfDeleteBorderRadius: 50px;
+  --dfDeleteTop: -15px;
+
+  --dfDeleteHoverColor: rgba(78, 169, 255, 1);
+  --dfDeleteHoverBackgroundColor: rgba(255, 255, 255, 1);
+  --dfDeleteHoverBorderSize: 1px;
+  --dfDeleteHoverBorderColor: rgba(78, 169, 255, 1);
+  --dfDeleteHoverBorderRadius: 50px;
+}
+
+/* Editing Drawflow */
+
+#drawflow {
+  position: relative;
+  width: 100%;
+  height: 70vh;
+  background: var(--dfBackgroundColor);
+  background-size: var(--dfBackgroundSize) var(--dfBackgroundSize);
+  background-image: var(--dfBackgroundImage);
+}
+
+.drawflow .drawflow-node {
+  align-items: center;
+  text-align: center;
+  position: absolute;
+  z-index: 2;
+  display: var(--dfNodeType);
+  background: var(--dfNodeBackgroundColor);
+  color: var(--dfNodeTextColor);
+  border: var(--dfNodeBorderSize) solid var(--dfNodeBorderColor);
+  border-radius: var(--dfNodeBorderRadius);
+  min-height: var(--dfNodeMinHeight);
+  width: auto;
+  min-width: var(--dfNodeMinWidth);
+  padding-top: var(--dfNodePaddingTop);
+  padding-bottom: var(--dfNodePaddingBottom);
+  -webkit-box-shadow: var(--dfNodeBoxShadowHL) var(--dfNodeBoxShadowVL)
+    var(--dfNodeBoxShadowBR) var(--dfNodeBoxShadowS) var(--dfNodeBoxShadowColor);
+  box-shadow: var(--dfNodeBoxShadowHL) var(--dfNodeBoxShadowVL)
+    var(--dfNodeBoxShadowBR) var(--dfNodeBoxShadowS) var(--dfNodeBoxShadowColor);
+}
+
+.drawflow .drawflow-node:hover {
+  background: var(--dfNodeHoverBackgroundColor);
+  color: var(--dfNodeHoverTextColor);
+  border: var(--dfNodeHoverBorderSize) solid var(--dfNodeHoverBorderColor);
+  border-radius: var(--dfNodeHoverBorderRadius);
+  -webkit-box-shadow: var(--dfNodeHoverBoxShadowHL)
+    var(--dfNodeHoverBoxShadowVL) var(--dfNodeHoverBoxShadowBR)
+    var(--dfNodeHoverBoxShadowS) var(--dfNodeHoverBoxShadowColor);
+  box-shadow: var(--dfNodeHoverBoxShadowHL) var(--dfNodeHoverBoxShadowVL)
+    var(--dfNodeHoverBoxShadowBR) var(--dfNodeHoverBoxShadowS)
+    var(--dfNodeHoverBoxShadowColor);
+}
+
+.drawflow .drawflow-node.selected {
+  background: var(--dfNodeSelectedBackgroundColor);
+  color: var(--dfNodeSelectedTextColor);
+  border: var(--dfNodeSelectedBorderSize) solid var(--dfNodeSelectedBorderColor);
+  border-radius: var(--dfNodeSelectedBorderRadius);
+  -webkit-box-shadow: var(--dfNodeSelectedBoxShadowHL)
+    var(--dfNodeSelectedBoxShadowVL) var(--dfNodeSelectedBoxShadowBR)
+    var(--dfNodeSelectedBoxShadowS) var(--dfNodeSelectedBoxShadowColor);
+  box-shadow: var(--dfNodeSelectedBoxShadowHL) var(--dfNodeSelectedBoxShadowVL)
+    var(--dfNodeSelectedBoxShadowBR) var(--dfNodeSelectedBoxShadowS)
+    var(--dfNodeSelectedBoxShadowColor);
+}
+
+/* .drawflow .drawflow-node.selected .title-box {
+   color: #22598c;
+   border-bottom: 1px solid #4ea9ff;
+} */
+
+.drawflow .drawflow-node .input {
+  left: var(--dfInputLeft);
+  background: var(--dfInputBackgroundColor);
+  border: var(--dfInputBorderSize) solid var(--dfInputBorderColor);
+  border-radius: var(--dfInputBorderRadius);
+  height: var(--dfInputHeight);
+  width: var(--dfInputWidth);
+}
+
+.drawflow .drawflow-node .input:hover {
+  background: var(--dfInputHoverBackgroundColor);
+  border: var(--dfInputHoverBorderSize) solid var(--dfInputHoverBorderColor);
+  border-radius: var(--dfInputHoverBorderRadius);
+}
+
+.drawflow .drawflow-node .outputs {
+  float: var(--dfNodeTypeFloat);
+}
+
+.drawflow .drawflow-node .output {
+  right: var(--dfOutputRight);
+  background: var(--dfOutputBackgroundColor);
+  border: var(--dfOutputBorderSize) solid var(--dfOutputBorderColor);
+  border-radius: var(--dfOutputBorderRadius);
+  height: var(--dfOutputHeight);
+  width: var(--dfOutputWidth);
+}
+
+.drawflow .drawflow-node .output:hover {
+  background: var(--dfOutputHoverBackgroundColor);
+  border: var(--dfOutputHoverBorderSize) solid var(--dfOutputHoverBorderColor);
+  border-radius: var(--dfOutputHoverBorderRadius);
+}
+
+.drawflow .connection .main-path {
+  stroke-width: var(--dfLineWidth);
+  stroke: var(--dfLineColor);
+}
+
+.drawflow .connection .main-path:hover {
+  stroke: var(--dfLineHoverColor);
+}
+
+.drawflow .connection .main-path.selected {
+  stroke: var(--dfLineSelectedColor);
+}
+
+.drawflow .connection .point {
+  stroke: var(--dfRerouteBorderColor);
+  stroke-width: var(--dfRerouteBorderWidth);
+  fill: var(--dfRerouteBackgroundColor);
+}
+
+.drawflow .connection .point:hover {
+  stroke: var(--dfRerouteHoverBorderColor);
+  stroke-width: var(--dfRerouteHoverBorderWidth);
+  fill: var(--dfRerouteHoverBackgroundColor);
+}
+
+.drawflow-delete {
+  display: var(--dfDeleteDisplay);
+  color: var(--dfDeleteColor);
+  background: var(--dfDeleteBackgroundColor);
+  border: var(--dfDeleteBorderSize) solid var(--dfDeleteBorderColor);
+  border-radius: var(--dfDeleteBorderRadius);
+}
+
+.parent-node .drawflow-delete {
+  top: var(--dfDeleteTop);
+}
+
+.drawflow-delete:hover {
+  color: var(--dfDeleteHoverColor);
+  background: var(--dfDeleteHoverBackgroundColor);
+  border: var(--dfDeleteHoverBorderSize) solid var(--dfDeleteHoverBorderColor);
+  border-radius: var(--dfDeleteHoverBorderRadius);
+}
+
+.drawflow-node .title-box {
+  height: 50px;
+  line-height: 50px;
+  background: var(--dfNodeBackgroundColor);
+  border-bottom: 1px solid #e9e9e9;
+  border-radius: 4px 4px 0px 0px;
+  padding-left: 10px;
+}
+
+.drawflow .title-box svg {
+  position: initial;
+}
+
+.drawflow-node .box {
+  padding: 10px 20px 20px 20px;
+  font-size: 14px;
+  color: #555555;
+}
+
+.drawflow-node .box p {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+.drawflow-node.welcome {
+  width: 250px;
+}
+
+.drawflow-node.slack .title-box {
+  border-radius: 4px;
+}
+
+.drawflow-node input,
+.drawflow-node select,
+.drawflow-node textarea {
+  border-radius: 4px;
+  border: 1px solid var(--dfNodeBorderColor);
+  height: 30px;
+  line-height: 30px;
+  font-size: 16px;
+  width: 158px;
+  color: #555555;
+}
+
+.drawflow-node textarea {
+  height: 100px;
+}
+
+.drawflow-node.personalized {
+  background: red;
+  height: 200px;
+  text-align: center;
+  color: white;
+}
+
+.drawflow-node.personalized .input {
+  background: yellow;
+}
+
+.drawflow-node.personalized .output {
+  background: green;
+}
+
+.drawflow-node.personalized.selected {
+  background: blue;
+}
+
+.parent-drawflow {
+  display: flex;
+  overflow: hidden;
+  touch-action: none;
+  outline: none;
+}
+
+.drawflow {
+  width: 100%;
+  height: 70vh;
+  position: relative;
+  user-select: none;
+  perspective: 0;
+}
+
+.drawflow .drawflow-node .drawflow_content_node {
+  width: 100%;
+  display: block;
+}
+
+.drawflow svg {
+  z-index: 0;
+  position: absolute;
+  overflow: visible !important;
+}
+
+.drawflow,
+.drawflow .parent-node {
+  position: relative;
+}
+
+.drawflow .connection {
+  position: absolute;
+  pointer-events: none;
+}
+
+/* .drawflow > .drawflow-delete {
+  margin-left: -10px;
+  margin-top: 10px;
+} */
+
+.edit-node-button {
+  right: 20px;
+  top: -15px;
+  width: 30px;
+  height: 30px;
+  z-index: 5;
+  display: var(--dfDeleteDisplay);
+  background: var(--dfDeleteBackgroundColor);
+  border: var(--dfDeleteBorderSize) solid var(--dfDeleteBorderColor);
+  border-radius: var(--dfDeleteBorderRadius);
+  font-family: monospace;
+  cursor: pointer;
+}
+.edit-node-button i {
+  color: var(--dfDeleteColor);
+  font-size: 12px;
+}
+
+/* Drawflow styles ends here */
