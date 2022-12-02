@@ -22,7 +22,8 @@ On the Python side, this component provides a simple framework around the "abstr
 Prerequisites/requirements:
 
 - Python at least version 3.9
-- pyyaml for YAML parsing 
+- Pyflakes at least version 2.5.0
+- PyYaml at least version 6.0
 
 ## Developing against the Application AAS
 

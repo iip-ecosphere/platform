@@ -4,6 +4,8 @@ The virtual IIP-Ecosphere Industry 4.0/IIoT platform aims at demonstrating new a
 
 ## News
 
+* Improved build proces integration: Python "compile"/test, platform instantiator and Maven  orchestrator build plugins
+* Improved Python code integration: More Pythonic data type generation and Eclipse Editor support for PyDev.
 * Developer support: Platform configuration goes AAS, generated implementation templates, transport telegram logging
 * Platform release 0.4.0 (2022/09/02)
 * AI-based Code for HM'22/TddT'22 as public platform example/regression test.
@@ -70,6 +72,7 @@ The following layers and components of the IIP-Ecosphere are available in this p
     * Resource optimization
     * Adaptation
  * [Management UI](https://github.com/iip-ecosphere/platform/tree/main/platform/managementUI/README.md)
+ * [Tools](https://github.com/iip-ecosphere/platform/tree/main/platform/tools/README.md) including implementation templates, Python Maven plugins and extended Maven dependency plugin for model updates.
     
 
 Released components are made available via [Maven Central](https://search.maven.org/search?q=iip-ecosphere) and example installations in terms of Docker Containers via [Docker Hub](https://hub.docker.com/r/iipecosphere/platform).

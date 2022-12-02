@@ -38,7 +38,7 @@ public class PythonSyntaxTest {
          * python to something else to potentially run multiple version besides each
          * other
          */
-        File pythonExecutable = PythonUtils.getPythonExecutable();
+        String pythonExecutable = PythonUtils.getPythonExecutable().toString();
 
         //search the site_packages of the python for pyflakes! Currently not doable on windows!
         
@@ -50,7 +50,7 @@ public class PythonSyntaxTest {
         for (File f : pythonFiles) {
             System.out.println("Testing: " + f.getAbsolutePath());
             if (pyflakesExists) {
-                String[] cmd = {pythonExecutable.getName(), "-m", "pyflakes",  f.getAbsolutePath()}; 
+                String[] cmd = {pythonExecutable, "-m", "pyflakes",  f.getAbsolutePath()}; 
                 output += runPythonTest(cmd);
                 if (output.contains("No module named")) {
                     pyflakesExists = !output.contains("pyflakes");
@@ -58,7 +58,7 @@ public class PythonSyntaxTest {
 
             } 
             if (!pyflakesExists) {
-                String[] cmd = {pythonExecutable.getName(), "-m", "py_compile", f.getAbsolutePath()};
+                String[] cmd = {pythonExecutable, "-m", "py_compile", f.getAbsolutePath()};
                 output += runPythonTest(cmd);
             }
         }

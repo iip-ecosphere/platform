@@ -78,9 +78,9 @@ template PythonMeshElementTemplate(Configuration config, FileArtifact target, Me
         }
         String clsName = asTypeName(elt.name);
         'import iip.Registry
-        from iip.Version import Version
-        from iip.Service import ServiceState
-        from iip.Service import ServiceKind
+        from Version import Version
+        from Service import ServiceState
+        from Service import ServiceKind
         ${produceDatatypeImports(elt)}
         from interfaces.${clsName}Interface import ${clsName}Interface
 

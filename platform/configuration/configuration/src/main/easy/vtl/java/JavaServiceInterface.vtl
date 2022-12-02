@@ -28,7 +28,7 @@ template JavaServiceInterface(Configuration config, FileArtifact target, Service
         ' * Processes/transforms a data item of type "${t}" synchronously.'
         ' *'
         ' * @param data the data item to be processed'
-        ' * @return the result of processing'
+        ' * @return the result of processing (must not be <b>null</b>)'
         ' */'
         'public ${r} transform${t.firstToUpperCase()}(${t} data);'
     }

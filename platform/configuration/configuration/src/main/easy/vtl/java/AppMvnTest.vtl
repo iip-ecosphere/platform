@@ -5,9 +5,9 @@ import MeshBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, sequenceOf(MeshElement) nodes, String appName, String appVersion, String appDescription, Boolean tests, setOf(String) assemblies, Boolean springPackaging=true, String groupId="") {
+template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedServiceTypes, sequenceOf(MeshElement) nodes, String appName, String appVersion, String appDescription, Boolean tests, setOf(String) assemblies, Boolean springPackaging=true, String groupId="") {
 
-    def main(IIPEcosphere config, XmlFileArtifact target, sequenceOf(MeshElement) nodes, String appName, String appVersion, String appDescription, Boolean tests, setOf(String) assemblies, Boolean springPackaging=true, String groupId="") {
+    def main(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedServiceTypes, sequenceOf(MeshElement) nodes, String appName, String appVersion, String appDescription, Boolean tests, setOf(String) assemblies, Boolean springPackaging=true, String groupId="") {
         IIPEcosphere cfg = config;
         String iipGroup = "de.iip-ecosphere.platform";
         String gId = groupId;
@@ -49,7 +49,22 @@ template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, sequenceOf(Mesh
         appendExclusion(e, "org.springframework.boot", "spring-boot-starter-actuator"); 
         appendDependency(dep, gId, appName, appVersion, scope="test", type="test-jar");
      
-        XmlElement plugins = createMavenBuildElement(profile, "", true);
+        XmlElement build = createMavenBuildElement(profile, "", false);
+        XmlElement plugins = createPlugins(build);
+        XmlElement dependencyPlugin = appendMavenIipDependencyPlugin(plugins, ver=projectVersion);
+        XmlElement execs = new XmlElement(dependencyPlugin, "executions");
+        if (isPythonUsed(usedServiceTypes)) { // hasPython instead?
+            appendMavenDependencyPluginExecution(execs, "unpack", "${iipGroup}:services.environment:${projectVersion}", "python", "\\${project.basedir}/src/main/python", "pythonEnv.zip", type="zip");
+        }
+        XmlElement unpackItems = appendMavenDependencyPluginExecution(execs, "unpack", 
+            "de.iip-ecosphere.platform:services.environment:" + projectVersion, "python", 
+            "\\${project.build.directory}/pyEnv", "pyEnv.zip", type="zip", id="pythonSources", phase="validate");
+        appendMavenDependencyPluginArtifactItem(unpackItems, cfg.sharedArtifact + ":" + projectVersion, "python", 
+            "\\${project.build.directory}/pySrc", "pyIf.zip", type="zip");
+        appendIipPythonPlugin(plugins, projectVersion);
+        //XmlElement pluginMgt = createPlugins(createPluginManagement(build));
+        //appendEclipseLifecycleMapping4DependenciesPlugin(pluginMgt, goal="unpack");
+        
         XmlElement assemblyPlugin = appendAssemblyPlugin(plugins);
         for (String ass: assemblies.asSequence()->sortedBy(a|a)) { // sortedBy for testing
             sequenceOf(String) tmp = ass.split("\\|"); // escape |, splits into chars

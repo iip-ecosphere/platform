@@ -19,11 +19,11 @@ class ExamplePythonService(ExamplePythonServiceInterface):
           - data -- the data to process
         """
         result = PythonTestOutputImpl()
-        result.setId(data.getId())
-        result.setValue1(data.getValue1())
-        result.setValue2(data.getValue2())
-        result.setConfidence(random.uniform(0, 1))
-        result.setPrediction(result.getConfidence() > 0.75)
+        result.id = data.id
+        result.value1 = data.value1
+        result.value2 = data.value2
+        result.confidence = random.uniform(0, 1)
+        result.prediction = result.confidence > 0.75
         
         self.ingest(result) # asynchronous processing, call ingest from parent       
 

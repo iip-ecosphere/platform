@@ -99,9 +99,20 @@ public class PythonSyncProcessService extends AbstractPythonProcessService {
         return LoggerFactory.getLogger(PythonSyncProcessService.class);
     }
 
+    /**
+     * Requests processing a data item.
+     * 
+     * @param <I> the input data type
+     * @param <O> the output data type
+     * @param inType the name of {@code inType} in the configuration model
+     * @param data the data item to be processed
+     * @return the output, always <b>null</b> in case of asynchronous processing as the result is passed to a 
+     *     registered ingestor
+     * @throws ExecutionException if the execution fails for some reason, e.g., because type translators 
+     *    are not registered (@link #registerInputTypeTranslator(Class, Class, TypeTranslator, TypeTranslator)}
+     */
     @SuppressWarnings("unchecked")
-    @Override
-    public <I, O> O process(String inType, I data) throws ExecutionException {
+    private <I, O> O processImpl(String inType, I data) throws ExecutionException {
         O result = null;
         InTypeInfo<?> info = getInTypeInfo(inType);
         if (null != info) {
@@ -139,6 +150,16 @@ public class PythonSyncProcessService extends AbstractPythonProcessService {
             }
         }
         return result;
+    }
+
+    @Override
+    public <I> void process(String inType, I data) throws ExecutionException {
+        processImpl(inType, data);
+    }
+    
+    @Override
+    public <I, O> O processSync(String inType, I data, String outType) throws ExecutionException {
+        return processImpl(inType, data);
     }
 
 }

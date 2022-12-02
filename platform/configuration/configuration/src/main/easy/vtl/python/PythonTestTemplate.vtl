@@ -26,6 +26,7 @@ template PythonTestTemplate(Configuration config, FileArtifact target, sequenceO
             if (not(done.includes(clsName))) {
                 done.add(clsName);
                 'from datatypes.${clsName} import ${clsName}'
+                'from datatypes.${clsName}Impl import ${clsName}Impl'
             }
         }
     }
@@ -41,8 +42,8 @@ template PythonTestTemplate(Configuration config, FileArtifact target, sequenceO
         args = parser.parse_args()
 
         """ will be the relativve paths from impl.impl to impl.model, given through pom /gen onwards! """
-        sys.path.insert(1, (args.relModelPath + "/gen/test/ApplicationInterfaces/src/main/python"))
-        sys.path.insert(2, (args.relModelPath + "/gen/test/ApplicationInterfaces/src/main/python/iip"))
+        sys.path.insert(1, (args.relModelPath))
+        sys.path.insert(2, ("/iip"))
         """ always fixed value as these directorys are generated in the impl.impl """
         sys.path.insert(3, "../../main/python/services") 
 
@@ -54,11 +55,19 @@ template PythonTestTemplate(Configuration config, FileArtifact target, sequenceO
         class TestPyServive(unittest.TestCase):
         
             def test_inputTest(self):
+            
+                #Change name to correct .json, access rawData for values i.e. rawData["InputType"]["Value1"]
+                rawData = ""
+                try :
+                    with open ("../resources/testData-PyService.json", "r") as f:
+                        rawData = json.load(f)
+                except:
+                    print("You need to edit the template files in /src/test/resources to be correct json") 
 
                 # prepare your data, e.g., loading from json
                 """Needed to enable the loading of resources like the finished service would"""
                 os.chdir("../../main/python") 
-        
+
                 # instantiate your service here, e.g., service = PyService()
                 # call your service here, e.g., service.processNewInput(impl)
 	            

@@ -24,6 +24,8 @@ import de.iip_ecosphere.platform.services.environment.ServiceState;
  * @author Holger Eichelberger, SSE
  */
 public interface ServiceOperations {
+    
+    public static final String EXC_ALREADY_KNOWN = "is already known";
 
     /**
      * Adds an artifact (and transitively the contained services) to the management domain of this instance, e.g., 
@@ -155,5 +157,14 @@ public interface ServiceOperations {
      * @return the state of the service
      */
     public ServiceState getServiceState(String serviceId);
+    
+    /**
+     * Returns the number of service instances of the same service in the same application.
+     * 
+     * @param serviceId the service id, application instance id is ignored if not given 
+     * @return 0 if there is no other service instance, 1 if no applicationId is given in {@code serviceId} but there
+     *    is a service with the same id, the number of instances otherwise
+     */
+    public int getServiceInstanceCount(String serviceId);
 
 }

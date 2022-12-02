@@ -33,6 +33,6 @@ class Rec12TransformerToString(TypeTranslatorToString):
         return result
 
     def writeTo(self, source) -> str:
-        return Rec12Encoder().encode(source).encode("UTF-8")
+        return Rec12TransformerToString.Rec12Encoder().encode(source).encode("UTF-8")
 
 Rec12TransformerToString()

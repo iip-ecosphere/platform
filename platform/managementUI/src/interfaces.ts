@@ -1,39 +1,30 @@
 
-
 export interface PlatformResources {
-  submodelElements?: ResourceSubmodelElement[]
-}
-
-export interface ResourceSubmodelElement {
-  idShort?: string;
-  kind?: string;
-  value?: ResourceValue[];
-  description?: any;
-  invokable?: any;
-  inputVariables?: any; //for deploymentPlans, deploymentPlan will need its own interface to avoid confusion
-
+  submodelElements?: Resource[]
 }
 
 //to be replaced by ResourceAttribute
-export interface ResourceValue {
-  idShort?: string;
-  kind?: string;
-  valueType?: string;
-  value?: any;
-  description?: any;
-  inoutputVariables?: any;
-  inputVariables?: any;
-  outputVariables?: any;
-  invokable?: any;
-}
+// export interface ResourceValue {
+//   idShort?: string;
+//   kind?: string;
+//   valueType?: string;
+//   value?: any;
+//   description?: any;
+//   inoutputVariables?: any;
+//   inputVariables?: any;
+//   outputVariables?: any;
+//   invokable?: any;
+// }
 
 export interface Resource {
-  allowDuplicates: boolean;
+  allowDuplicates?: boolean;
   idShort?: string;
   identification?: any;
   kind?: string;
   valueType?: string;
   value?: ResourceAttribute[];
+
+  pic?: string; //for displaying pictures on resource view
 }
 
 //this is either an Attribute or a Function since both are stored in the same Array
@@ -47,6 +38,20 @@ export interface ResourceAttribute {
   inputVariables?: InputVariable[];
   outputVariables?: any;
   invokable?: any;
+}
+
+//The submodelElements are either basyx functions (i.e. deploy plan) or collections (i.e. KnownServices)
+export interface PlatformArtifacts {
+  submodelElements?: Artifact[]
+}
+export interface Artifact {
+  idShort?: string;
+  kind?: string;
+  value?: ResourceAttribute[];
+  description?: any;
+  invokable?: any;
+  inputVariables?: any;
+
 }
 
 export interface InputVariable {
@@ -125,8 +130,59 @@ export interface platformResponse {
 export interface buildInformation {
   version: string | undefined;
   buildId: string | undefined;
+  isRelease: boolean | undefined;
 }
 
-export interface platformData {
+export interface TechnicalDataResponse {
+  semanticId?: SemanticId;
+  idShort?: string;
+  kind?: string;
+  dataSpecification?: any[];
+  submodelElements: TechnicalDataElement[];
+}
 
+export interface TechnicalDataElement {
+  ordered?: boolean;
+  semanticId?: SemanticId;
+  idShort: string;
+  kind: string;
+  modelType: {
+    name: string;
+  }
+  value: TechnicalDataValue[]
+}
+
+export interface TechnicalDataValue {
+  parent: any;
+  semanticId: SemanticId;
+  idShort: string;
+  kind: string;
+  valueType: string;
+  modelType: any;
+  value: string;
+}
+
+export interface TechnicalDataValueValue {
+  semanticId: SemanticId;
+  idShort: string;
+  kind?: string;
+  valueType?: string;
+  modelType?: {
+    name: string;
+  }
+  value: string;
+}
+
+export interface SemanticId {
+  keys: [
+    idType: string,
+    type: string,
+    value: string,
+    local: boolean
+  ]
+}
+
+export interface ResourceProductPicture {
+  idShort: string; //id of the resource
+  picture: string; //encoded picture
 }

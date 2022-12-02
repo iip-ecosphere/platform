@@ -38,7 +38,7 @@ template JavaSpringCloudStreamMeshElementPartRtsa(Configuration config, FileArti
     }
 
     def genIngestor(RtsaService service, String methodSuffix, String conn, String type, String dir, ServiceBase target, String connPlaceHolder) {
-        String expr = generateTransportSend(service, type, springConnId(service, conn, target), connPlaceHolder);
+        String expr = generateTransportSend(service, type, springConnId(service, conn, target, app), connPlaceHolder);
         if (getTypeAdd() <> "") {
             'service.attachIngestor(${type}${getTypeAdd()}.class, data -> ${genSentProbe(service, expr, false, type, "data")});'
         }

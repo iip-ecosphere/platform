@@ -151,7 +151,7 @@ template JavaSpringCloudStreamYaml(IIPEcosphere config, FileArtifact target, map
         mapOf(String, setOf(String)) destinations = {};
         setOf(String) functions = {};
         setOf(String) sources = {};
-        calcBindings(mappedMesh, nodes, destinations, functions, sources, "");
+        calcBindings(mappedMesh, nodes, destinations, functions, sources, "", app);
 
         '${protocolConfig(config, false)}'
         '${produceTransport(config)}'

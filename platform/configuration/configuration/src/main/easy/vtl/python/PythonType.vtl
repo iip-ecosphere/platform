@@ -8,10 +8,20 @@ template PythonType(Configuration config, FileArtifact target, RecordType type, 
     // generates code for the individual attributes
     def attributes(RecordType type) {
         if (not(interface)) {
+            '#Mapped into properties without leading _ below resembling getter/setter'
+            ''
             for (Field f: type.fields) {
-                '${asIdentifier(f.name)}: ${toTypeName(f.type)}'
+                '_${asIdentifier(f.name)}: ${toTypeName(f.type)} = ${fieldDefaultValue(f)}'
             }
         }
+    }
+    
+    def String fieldDefaultValue(Field field) {
+        if (field.optional) {
+            "None";
+        } else {
+            defaultValue(field.type);
+        }    
     }
     
     // generates code for the getters
@@ -25,7 +35,7 @@ template PythonType(Configuration config, FileArtifact target, RecordType type, 
             if (interface) {
             '    raise NotImplementedError'
             } else {
-            '    return self.${asIdentifier(f.name)}'
+            '    return self._${asIdentifier(f.name)}'
             }
             ''
         }
@@ -47,9 +57,21 @@ template PythonType(Configuration config, FileArtifact target, RecordType type, 
             ''
         }
     }
+
+    // generates code for the properties
+    def properties(RecordType type) {
+        '#Indeed, there are 2.4 decorators for this, but for now we want to have all here: pythonic field access'
+        '#backed by getter/setter and the ability to replace data classes by e.g. projecting or data enhancing'
+        '#functionality (original idea of the "interfaces" with similar naming as in Java. It may be that the '
+        "#interfaces become superfluous due to the properties, but let's leave them in for now."
+        ''
+        for (Field f: type.fields) {
+            '${asIdentifier(f.name)} = property(get${asMethodNameSuffix(f.name)}, set${asMethodNameSuffix(f.name)})'
+        }
+    }
     
     def genSetterAssignment(Field f, DataType type) {
-        'self.${asIdentifier(f.name)} = v'
+        'self._${asIdentifier(f.name)} = v'
     }
 
     def genSetterTypeAnnotation(Field f, DataType type) {
@@ -76,9 +98,9 @@ template PythonType(Configuration config, FileArtifact target, RecordType type, 
     
     protected def genNumpyConversion(Field f, DataType type) {
         'if ("numpy" in str(type(v))):
-            self.${asIdentifier(f.name)} = v.item()
+             self._${asIdentifier(f.name)} = v.item()
          else:
-            self.${asIdentifier(f.name)} = v'
+             self._${asIdentifier(f.name)} = v'
     }
     
     def genSetterTypeAnnotation(Field f, NumericPrimitiveType type) {
@@ -87,6 +109,30 @@ template PythonType(Configuration config, FileArtifact target, RecordType type, 
     
     def genSetterParamVDoc(Field f, NumericPrimitiveType type) {
         ', may be of type ${toTypeName(f.type)} or the corresponding numpy type'
+    }
+    
+    def genTypeImports(String init, RecordType type) {
+        String res = init;
+        for (Field f: type.fields) {
+            String imp = genImport(f.type);
+            if (res.length() > 0) {
+                if (imp.length() > 0) {
+                    res = res + "\n" + imp;
+                }
+            } else {
+                res = imp;
+            }
+        }
+        res;
+    }
+
+    def String genImport(DataType type) {    
+        ''
+    }
+
+    def String genImport(RecordType type) {
+        String clsName = asTypeName(type.name);
+        'from datatypes.${clsName} import ${clsName}'
     }
 
     def main(Configuration config, FileArtifact target, RecordType type, Boolean interface, Boolean sharedInterfaces) {
@@ -102,13 +148,13 @@ template PythonType(Configuration config, FileArtifact target, RecordType type, 
                 add = "Impl";
                 comment = "Implementation";
                 ext = "(${clsName})";
-                imp = "from datatypes.${clsName} import ${clsName}\n";                
+                imp = "from datatypes.${clsName} import ${clsName}";                
             }
         } else {
             comment = "Implementation";
             interface = false;
         }
-        '${imp|e}
+        '${genTypeImports(imp, type)|e}
         from datetime import datetime
         
         class ${clsName}${add}${ext}:
@@ -119,7 +165,9 @@ template PythonType(Configuration config, FileArtifact target, RecordType type, 
             
             ${getters(type)}
             
-            ${setters(type)}'
+            ${setters(type)}
+            
+            ${properties(type)}'
     }
     
 }

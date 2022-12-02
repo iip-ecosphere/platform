@@ -125,5 +125,17 @@ public class FileUtilsTest {
         File f = File.createTempFile("iip-test", null);
         FileUtils.deleteOnExit(f);
     }
+    
+    /**
+     * Tests {@link FileUtils#findFile(File, String)}.
+     */
+    @Test
+    public void testFindFile() {
+        File f = FileUtils.findFile(new File("."), "identityStore.yml");
+        Assert.assertNotNull(f);
+        Assert.assertEquals("identityStore.yml", f.getName());
+        f = FileUtils.findFile(new File("."), "identityStoreNotThere.yml");
+        Assert.assertNull(f);
+    }
 
 }

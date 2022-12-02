@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="tools.maven.dependencies" default="maven" basedir=".">
+	<!-- import of the global SSE Jenkins properties -->
+	<property file="${user.home}/global-build.properties"/>
+	<property file="${user.home}/qualimaster-build.properties"/>
+	<include file="${user.home}/macros.xml"/>
+	
+    <!-- deploy to SSE Mvn repo -->
+	<target name="maven"> 
+	    <maven pomFile="pom.xml" goal="install"/>
+		<!-- Maven test harness does not cope with plugin configuration and we do not understand how 
+             to set it up correctly through program. So we test through ANT, in an own file so that
+             it can be called locally without running macros from macros.xml.-->
+		<ant antfile="test.xml"/>
+		<mvnDeployResolveArtifact folderName="IIP-toolsMavenDependencies" pomFile="pom.xml" jarFolder="target" artifactPattern="dependency-plugin-*.*.*.jar" />
+	</target>
+</project>

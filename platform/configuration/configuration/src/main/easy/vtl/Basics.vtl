@@ -2,6 +2,15 @@
 @indent(indentation = 4, additional = 0)
 template Basics(Configuration config, FileArtifact target) {
 	
+    def Boolean isUsedType(setOf(String) usedServiceTypes, Type type) {
+        String name = type;
+        usedServiceTypes.includes(name);
+    }
+    
+    def Boolean isPythonUsed(setOf(String) usedServiceTypes) {
+        isUsedType(usedServiceTypes, PythonService);
+    }	
+	
 	/**
 	* Generic function to substitute characters that are typically not allowed in programming 
 	* language identifiers by respective character sequences.

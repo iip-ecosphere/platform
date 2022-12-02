@@ -81,7 +81,7 @@ public class EclassSemanticIdResolverTest {
         Assert.assertEquals("1", res.getRevision());
         Assert.assertEquals("4", res.getVersion());
         
-        Map<String, DefaultNaming> naming = EclassSemanticIdResolver.createNaming(null, null);
+        Map<String, DefaultNaming> naming = EclassSemanticIdResolver.createNaming(null, null, null);
         Assert.assertNotNull(naming);
         Assert.assertTrue(naming.isEmpty());
         
@@ -91,14 +91,18 @@ public class EclassSemanticIdResolverTest {
         TranslatableLabel s = new TranslatableLabel();
         s.put(Locale.GERMAN.toString(), "Deutsch!");
         s.put(Locale.ENGLISH.toLanguageTag(), "English!");
+        TranslatableLabel d = new TranslatableLabel();
+        s.put(Locale.GERMAN.toString(), "D1");
+        s.put(Locale.ENGLISH.toLanguageTag(), "E1");
         
-        naming = EclassSemanticIdResolver.createNaming(p , null);
+        naming = EclassSemanticIdResolver.createNaming(p , null, null);
         assertNaming(p, naming, n -> n.getName());
-        naming = EclassSemanticIdResolver.createNaming(null , s);
+        naming = EclassSemanticIdResolver.createNaming(null , s, null);
         assertNaming(s, naming, n -> n.getStructuredName());
-        naming = EclassSemanticIdResolver.createNaming(p, s);
+        naming = EclassSemanticIdResolver.createNaming(p, s, d);
         assertNaming(p, naming, n -> n.getName());
         assertNaming(s, naming, n -> n.getStructuredName());
+        assertNaming(d, naming, n -> n.getDescription());
     }
 
     /**

@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { Subscription } from 'rxjs';
 import { ApiService } from 'src/app/services/api.service';
 import { PlanDeployerService } from 'src/app/services/plan-deployer.service';
-import { PlatformResources, ResourceSubmodelElement, ResourceValue } from 'src/interfaces';
+import { ResourceAttribute, Resource, PlatformArtifacts } from 'src/interfaces';
 
 @Component({
   selector: 'app-deployment-plans',
@@ -11,9 +10,9 @@ import { PlatformResources, ResourceSubmodelElement, ResourceValue } from 'src/i
 })
 export class DeploymentPlansComponent implements OnInit {
 
-  artifacts: PlatformResources = {};
-  deploymentPlans: ResourceSubmodelElement | undefined = {};
-  selected: ResourceSubmodelElement | undefined;
+  artifacts: PlatformArtifacts = {};
+  deploymentPlans: Resource | undefined = {};
+  selected: Resource | undefined;
   deployPlanInput: any;
   undeployPlanInput: any;
 
@@ -28,6 +27,7 @@ export class DeploymentPlansComponent implements OnInit {
 
   public async getArtifacts() {
     const response = await this.api.getArtifacts();
+    console.log(response);
     if(response.submodelElements) {
       this.deploymentPlans = response.submodelElements.find(item => item.idShort === "DeploymentPlans");
       this.deployPlanInput = response.submodelElements.find(item => item.idShort === "deployPlan")?.inputVariables;
@@ -66,7 +66,7 @@ export class DeploymentPlansComponent implements OnInit {
   }
 
   //this method gets called multiple times when the select in the template is clicked, this is not desired
-  public getName(plan: ResourceValue[]) {
+  public getName(plan: ResourceAttribute[]) {
     // console.log(plan);
     let name: any = plan.find(item => item.idShort === 'name');
     if(!name) {

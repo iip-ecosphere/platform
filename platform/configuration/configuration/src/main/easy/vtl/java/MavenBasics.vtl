@@ -73,11 +73,12 @@ template MavenBasics(Configuration config, FileArtifact target) {
 
     // creates the Maven parent element, to reference to a parent pom
     // The parent is the <project> node as e.g. returned by createMavenRoot     
-    def createMavenParent(XmlElement project, String groupId, String artifactId, String version) {
+    def createMavenParent(XmlElement project, String groupId, String artifactId, String version, String relativePath="") {
         XmlElement par = new XmlElement(project, "parent");
         new XmlElement(par, "groupId", groupId);
         new XmlElement(par, "artifactId", artifactId);
         new XmlElement(par, "version", version);
+        new XmlElement(par, "relativePath", relativePath);
         par;
     }
     
@@ -117,6 +118,10 @@ template MavenBasics(Configuration config, FileArtifact target) {
     
     def createDependencies(XmlElement project) {
         new XmlElement(project, "dependencies");
+    }
+
+    def createPluginManagement(XmlElement project) {
+        new XmlElement(project, "pluginManagement");
     }
 
     def appendExecutionsParent(XmlElement parent) {
@@ -171,8 +176,16 @@ template MavenBasics(Configuration config, FileArtifact target) {
         appendPlugin(plugins, "org.apache.maven.plugins", "maven-dependency-plugin", ver, false);
     } 
 
+    def XmlElement appendMavenIipDependencyPlugin(XmlElement plugins, String ver="\\${project.version}") {
+        appendPlugin(plugins, "de.iip-ecosphere.platform", "dependency-plugin", ver, false);
+    } 
+
     def XmlElement appendMavenDependencyPluginUnpackArtifact(XmlElement plugins, String artifact, String classifier, String outputDir, String destFileName, String ver="3.2.0", String type="jar", String phase="process-sources") {
         XmlElement plugin = appendMavenDependencyPlugin(plugins, ver);
+        appendMavenDependencyPluginUnpackArtifactExecution(plugin, artifact, classifier, outputDir, destFileName, type, phase);
+    }
+    
+    def XmlElement appendMavenDependencyPluginUnpackArtifactExecution(XmlElement plugin, String artifact, String classifier, String outputDir, String destFileName, String type="jar", String phase="process-sources") {
         XmlElement execs = new XmlElement(plugin, "executions");
         appendMavenDependencyPluginExecution(execs, "unpack", artifact, classifier, outputDir, destFileName, type=type, phase=phase);
         execs;
@@ -206,6 +219,28 @@ template MavenBasics(Configuration config, FileArtifact target) {
         new XmlElement(item, "destFileName", destFileName);
         item;    
     }
+    
+    // includes/excludes separated by ;
+    def XmlElement appendMavenIipDependencyPluginCleanup(XmlElement cfg, String directory, String includes, String excludes) {
+        XmlElement cleanup = new XmlElement(cfg, "cleanup");
+        new XmlElement(cleanup, "directory", directory);
+        if (includes <> "") {
+            XmlElement inc = new XmlElement(cleanup, "includes");
+            sequenceOf(String) tmp = includes.split(";");
+            for (String t : tmp) {
+                new XmlElement(inc, "include", t);
+            }
+        }
+        if (excludes <> "") {
+            XmlElement exc = new XmlElement(cleanup, "excludes");
+            sequenceOf(String) tmp = includes.split(";");
+            for (String t : tmp) {
+                new XmlElement(exc, "exclude", t);
+            }
+        }
+        cfg;
+    }
+    
     
     def XmlElement appendMavenDependencyPluginCopyDeps(XmlElement plugins, String ver="3.2.0", String jarDir="", Boolean copyOwn=false, Boolean prependGroupId=true) {
         XmlElement plugin = appendMavenDependencyPlugin(plugins, ver);
@@ -432,6 +467,48 @@ template MavenBasics(Configuration config, FileArtifact target) {
                 appendArtifact(parent, p.artifact);
             }        
         } // use the default builtin
+    }
+    
+    def appendIipPythonPlugin(XmlElement parent, String ver, String modelProject="") {
+        XmlElement plugin = appendPlugin(parent, "de.iip-ecosphere.platform", "maven-python", ver, false);
+        XmlElement execs = appendExecutionsParent(plugin);
+        XmlElement exec = new XmlElement(execs, "execution");
+        new XmlElement(exec, "id", "py-compile");
+        appendGoal(exec, "compile-python");
+
+        exec = new XmlElement(execs, "execution");
+        new XmlElement(exec, "id", "py-test");
+        appendGoal(exec, "test-python");
+        XmlElement cfg = appendConfiguration(exec);
+        if (modelProject <> "") {
+            new XmlElement(cfg, "modelProject", modelProject);
+        }
+        XmlElement fileSet = new XmlElement(cfg, "fileset");
+        new XmlElement(fileSet, "directory", "src/test/python");
+        new XmlElement(new XmlElement(fileSet, "includes"), "include", "**/*Test.py");
+    }
+    
+    def appendEclipseLifecycleMappingPlugin(XmlElement parent, String groupId, String artifactId, String versionRange, String goal, String ver="1.0.0") {
+        XmlElement pluginCfg = appendPlugin(parent, "org.eclipse.m2e", "lifecycle-mapping", ver, true);
+        new XmlComment(pluginCfg, "Plugin is only needed for Eclipse, used phase is usually valid for maven, warning in Eclipse can be ignored.");
+        XmlElement lfcMeta = new XmlElement(pluginCfg, "lifecycleMappingMetadata");
+        XmlElement execs = new XmlElement(lfcMeta, "pluginExecutions");
+        XmlElement exec = new XmlElement(execs, "pluginExecution");
+
+        XmlElement filter = new XmlElement(exec, "pluginExecutionFilter"); 
+        new XmlElement(filter, "groupId", groupId);
+        new XmlElement(filter, "artifactId", artifactId);
+        new XmlElement(filter, "versionRange", versionRange);
+        XmlElement goals = new XmlElement(filter, "goals");
+        new XmlElement(goals, "goal", goal);
+
+        XmlElement action = new XmlElement(exec, "action");
+        new XmlElement(action, "ignore");
+        pluginCfg;
+    }
+
+    def appendEclipseLifecycleMapping4DependenciesPlugin(XmlElement parent, String versionRange="[3.1.2,)", String goal="copy", String ver="1.0.0") {
+        appendEclipseLifecycleMappingPlugin(parent, "org.apache.maven.plugins", "maven-dependency-plugin", versionRange, goal, ver);
     }
 
 }

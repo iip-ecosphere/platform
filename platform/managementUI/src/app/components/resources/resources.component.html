@@ -1,15 +1,48 @@
 <div *ngIf="errorMsg">{{ errorMsg }}</div>
 <div *ngIf="errorMsg"> Please check CORS and reload the page</div>
 <div *ngIf="Data && Data.submodelElements">
-  <div *ngFor="let element of Data.submodelElements">
-    <div *ngIf="element.idShort != 'deviceRegistry' && element.idShort != 'deviceManager' && element.idShort != 'containers'">
-      <mat-card tabindex="0" [class.contentBox]="!clicked" (click)="clicked = !clicked">
-        <mat-card-title><button mat-raised-button class="button" (click)="details(element.value)">{{ element.idShort }}</button></mat-card-title>
-        <mat-card-content>
+  <div  class="container">
+    <div *ngFor="let element of Data.submodelElements" class="element">
+      <div *ngIf="element.idShort != 'deviceRegistry' && element.idShort != 'deviceManager' && element.idShort != 'containers'">
+        <mat-card tabindex="0" >
+          <mat-card-content>
+            <div id="box">
+              <div>
+                <h1>{{ element.idShort }}</h1>
+                <p>resource</p>
+              </div>
+              <div>
+                <img *ngIf="!element.pic; else pictureAvailable" src="../../../assets/deviceDefault.jpg" [alt]="element.idShort" width="150px" height="200px">
+                <ng-template #pictureAvailable>
+                  <img [src]="'data:image/jpg;base64,' + element.pic" [alt]="element.idShort" width="150px" height="200px">
+                </ng-template>
+              </div>
+            </div>
+            <div class="bottom">
+              <button mat-raised-button class="button" (click)="details(element.value)">Details for {{ element.idShort }}</button>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+    <!-- <div *ngFor="let element of test" class="element">
+      <mat-card tabindex="0" >
+        <mat-card-content >
+          <div id="box">
+            <div>
+              <p>Element {{ element }}</p>
+              <p>rsource</p>
+            </div>
+            <div>
+              <img src="../../../assets/deviceDefault.jpg" alt="imagePlaceholder">
+            </div>
 
+          </div>
+          <div class="bottom">
+            <button mat-raised-button class="button">Details for element {{element}}</button>
+          </div>
         </mat-card-content>
       </mat-card>
-    </div>
-
+    </div> -->
   </div>
 </div>

@@ -433,6 +433,26 @@ template MeshBasics(Configuration config, FileArtifact target) {
         '${result}'
     }
     
+    /**
+    * Composes the given connection/method id and the application (id) to a destination string.
+    */
+    def composeDestination(String connId, Application app) {
+        "data_${connId}_${app.id}"; // string value here
+    }
+    
+    /**
+    * Composes a destination String expression. If given, appending the value of instanceIdVar assuming to contain
+    * a separator character and the actual application instance identifier or being empty. 
+    */
+    def composeDestination(String connId, Application app, String instanceIdVar) {
+        //connId; // before app-specific destinations
+        String result = '"${composeDestination(connId, app)}"'; // expression, turn into String constant
+        if (instanceIdVar.length() > 0) {
+            result = result + " + " + instanceIdVar; // expression, String append
+        }
+        result;
+    }  
+    
     // ------------------------------ testing data format --------------------------------------
     
     def needsDataUnitJson(ServiceBase service) {

@@ -8,17 +8,23 @@ template WrapperScript(IIPEcosphere config, FileArtifact target, ContainerType c
        	
         '#!/bin/bash'
         ''
-        'bash broker.sh &'
-        'sleep 4;'
         if (containerType == ContainerType::Ecs) {
+            'bash broker.sh 8888 &'
+            'sleep 4;'
             'bash ecs.sh'
         } else if (containerType == ContainerType::Ecs_Svc_App) {
+            'bash broker.sh 8889 &'
+            'sleep 4;'
             'bash ecsServiceMgr.sh'
         } else if (containerType == ContainerType::EcsSvc_App) {
+            'bash broker.sh 8888 &'
+            'sleep 4;'
             'bash ecs.sh'
             'sleep 7;'
             'bash serviceMgr.sh'
         } else if (containerType == ContainerType::C1Ecs_C2Svc_App) {
+            'bash broker.sh 8889 &'
+            'sleep 4;'
             'bash serviceMgr.sh'
         } 
     }

@@ -92,7 +92,7 @@ def start(a):
     if len(args.config) > 0:
         service = Registry.services.get(sId)
         if service:
-            service.reconfigure(json.loads(data))
+            service.reconfigure(json.loads(args.data))
 
     if consoleMode:
         console(a, args.data, sId)

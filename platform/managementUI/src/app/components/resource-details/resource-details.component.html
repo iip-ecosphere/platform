@@ -1,12 +1,8 @@
-<div class="contentBox">
-  content
-</div>
-
   <div>
     <h1 *ngIf="resource && resource.idShort">Detail View of {{ resource.idShort }}</h1>
     <div>
       <div>
-        <mat-card class="contentBox">
+        <mat-card>
           <h1>
             Resource Attributes
           </h1>
@@ -14,15 +10,15 @@
             <div *ngFor="let element of resource.value">
               <div *ngIf="!element.invokable">
                 <span class="shortId">{{ element.idShort }}: </span>
-                <span *ngIf="element.value"> {{ element.value}} </span>
+                <span *ngIf="element.value"> {{ element.value | tidy}} </span>
               </div>
             </div>
           </div>
         </mat-card>
       </div>
       <br>
-      <div *ngIf="resource2 && resource2.idShort">
-          <app-operation-query [resource]="resource2" [managedId]="id"></app-operation-query>
+      <div *ngIf="resource && resource.idShort">
+          <app-operation-query [resource]="resource" [managedId]="id"></app-operation-query>
       </div>
     </div>
   </div>

@@ -18,7 +18,11 @@ template PythonJsonSerializer(Configuration config, FileArtifact target, RecordT
           dict
             the attributes
         """
-        return o.__dict__
+        tmp = dict()
+        for key in o.__dict__:
+            k = key[1:] # by generation convention
+            tmp[k] = o.__dict__[key]
+        return tmp
     '
     }
     
@@ -40,7 +44,7 @@ template PythonJsonSerializer(Configuration config, FileArtifact target, RecordT
         'from json import JSONEncoder
         import json
         from datetime import datetime
-        from iip.TypeTranslatorToString import TypeTranslatorToString
+        from TypeTranslatorToString import TypeTranslatorToString
         import Registry
         from datatypes.${clsName} import ${clsName}
         from datatypes.${clsName}Impl import ${clsName}Impl

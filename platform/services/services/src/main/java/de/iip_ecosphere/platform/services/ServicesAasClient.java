@@ -242,5 +242,20 @@ public class ServicesAasClient extends SubmodelElementsCollectionClient implemen
         fromJson(getOperation(ServicesAas.NAME_OP_SERVICE_STOP_TASK)
             .invoke(JsonUtils.toJson(serviceId), JsonUtils.toJson(taskId)));
     }
+
+    @Override
+    public int getServiceInstanceCount(String serviceId) {
+        int result = 0;
+        try {
+            Object tmp = getOperation(ServicesAas.NAME_OP_SERVICE_INSTANCE_COUNT)
+                .invoke(JsonUtils.toJson(serviceId));
+            if (tmp instanceof Integer) {
+                result = ((Integer) tmp).intValue();
+            }
+        } catch (ExecutionException | NumberFormatException e) {
+            getLogger().error("Requesting service instance count: " + e.getMessage());
+        }        
+        return result;
+    }
     
 }

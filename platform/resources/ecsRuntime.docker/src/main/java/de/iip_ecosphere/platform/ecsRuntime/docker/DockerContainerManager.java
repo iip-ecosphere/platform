@@ -136,7 +136,7 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
                     registry = dockerCfg.getRegistry();
                     internalRegistry = true;
                 }
-                PullImageCmd cmd = dockerClient.pullImageCmd(DockerContainerDescriptor.getRepository(imageName))
+                PullImageCmd cmd = dockerClient.pullImageCmd(imageName)
                     .withRegistry(registry);
                 String tag = DockerContainerDescriptor.getTag(imageName);
                 if (DockerSetup.isNotEmpty(tag)) {
@@ -152,7 +152,46 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
                 } catch (InterruptedException e) {
                     throw new ExecutionException(e);
                 }
-                result = getDockerId(DockerContainerDescriptor.getRepository(imageName)); // unsure, with/out version
+                String dockerImageName = getImageName(container);
+                String containerName = container.getName().trim().replaceAll("\\s", "_");
+
+                ArrayList<String> exposedPorts = container.getExposedPorts();
+                int port = 0;
+                int port1 = 0;
+                for (String portString : exposedPorts) {
+                    if (portString.contains("TCP")) {
+                        if (portString.contains("${port}")) {
+                            continue;
+                        }
+                        port = Integer.parseInt(portString.substring(0, portString.indexOf("/")));
+                    } else if (portString.contains("iip.port.svgMgr")) {
+                        if (portString.contains("${port_1}")) {
+                            continue;
+                        }
+                        port1 = Integer.parseInt(portString.substring(portString.indexOf("=") + 1));
+                    }
+                }
+                if (port == 0) {
+                    if (container.requiresPort(DockerContainerDescriptor.PORT_PLACEHOLDER)) {
+                        // may be gone until used, limit then netMgr ports in setup
+                        NetworkManager netMgr = NetworkManagerFactory.getInstance();
+                        port = netMgr.obtainPort(container.getNetKey()).getPort();
+                    }
+                }
+                if (port1 == 0) {
+                    if (container.requiresPort(DockerContainerDescriptor.PORT_PLACEHOLDER_1)) {
+                        // may be gone until used, limit then netMgr ports in setup
+                        NetworkManager netMgr = NetworkManagerFactory.getInstance();
+                        port1 = netMgr.obtainPort(container.getNetKey1()).getPort();
+                    }
+                }
+
+                CreateContainerCmd cmdCreate = dockerClient.createContainerCmd(dockerImageName)
+                        .withName(containerName);
+                configure(cmdCreate, port, port1, container);
+                cmdCreate.exec(); 
+                
+                result = imageName; // unsure, with/out version
             }
         }
         return result;
@@ -328,14 +367,15 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
     public void startContainer(String id) throws ExecutionException {
         LOGGER.info("Starting container " + id);
         DockerContainerDescriptor container = getContainer(id, "id", "start");
-        String dockerId = container.getDockerId();
+        String containerName = container.getName().trim().replaceAll("\\s", "_");
         
         DockerClient dockerClient = getDockerClient();
         if (dockerClient == null) {
             throwExecutionException("Starting container failed", "Could not connect to the Docker daemon.");
         }
+        
         setState(container, ContainerState.DEPLOYING);
-        dockerClient.startContainerCmd(dockerId).exec();
+        dockerClient.startContainerCmd(containerName).exec();
         setState(container, ContainerState.DEPLOYED);
         LOGGER.info("Container " + id + " started");
     }
@@ -344,14 +384,14 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
     public void stopContainer(String id) throws ExecutionException {
         LOGGER.info("Stopping container " + id);
         DockerContainerDescriptor container = getContainer(id, "id", "stop");
-        String dockerId = container.getDockerId();
+        String containerName = container.getName().trim().replaceAll("\\s", "_");
         
         DockerClient dockerClient = getDockerClient();
         if (dockerClient == null) {
             throwExecutionException("Stopping container failed", "Could not connect to the Docker daemon.");
         }
         setState(container, ContainerState.STOPPING);
-        dockerClient.stopContainerCmd(dockerId).exec();
+        dockerClient.stopContainerCmd(containerName).exec();
         setState(container, ContainerState.STOPPED);
         LOGGER.info("Container " + id + " stopped");
     }
@@ -366,7 +406,7 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
     public void undeployContainer(String id) throws ExecutionException {
         LOGGER.info("Undeploying container " + id);
         DockerContainerDescriptor container = getContainer(id, "id", "undeploy");
-        String dockerId = container.getDockerId();
+        String containerName = container.getName().trim().replaceAll("\\s", "_");
 
         if (container.requiresPort(DockerContainerDescriptor.PORT_PLACEHOLDER)) {
             NetworkManager netMgr = NetworkManagerFactory.getInstance();
@@ -381,7 +421,7 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
         if (dockerClient == null) {
             throwExecutionException("Undeploying container failed", "Could not connect to the Docker daemon.");
         }
-        dockerClient.removeContainerCmd(dockerId).exec();
+        dockerClient.removeContainerCmd(containerName).exec();
         
         // Removing image from download directory
         FactoryDescriptor factory = new FactoryDescriptor();

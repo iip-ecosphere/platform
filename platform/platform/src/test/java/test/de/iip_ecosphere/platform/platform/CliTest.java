@@ -274,6 +274,17 @@ public class CliTest {
         @Override
         public void stopServiceAsTask(String taskId, String... serviceId) throws ExecutionException {
         }
+
+        /**
+         * Returns the number of service instances of the same service in the same application.
+         * 
+         * @param serviceId the service id, application instance id is ignored if not given 
+         * @return 0 if there is no other service instance, 1 if no applicationId is given in {@code serviceId} but 
+         *    there is a service with the same id, the number of instances otherwise
+         */
+        public int getServiceInstanceCount(String serviceId) {
+            return 0;
+        }
         
     }
 
@@ -360,6 +371,16 @@ public class CliTest {
 
         @Override
         public void stopContainerAsTask(String taskId, String id) throws ExecutionException {
+        }
+
+        /**
+         * Returns the container id for a given container location as used in {@link #addContainer(URI)}.
+         * 
+         * @param location the location
+         * @return the id of the container, may be empty or <b>null</b>null if there is none
+         */
+        public String getId(URI location) {
+            return null;
         }
         
     }

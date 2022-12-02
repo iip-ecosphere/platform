@@ -21,12 +21,13 @@ template SpringBasics(Configuration config, FileArtifact target) {
     * Returns an empty string if the connection shall be realized via the transport layer. Returns
     * A connection id if the connection shall happen through the active Spring binder.
     */
-    def springConnId(ServiceBase source, String conn, ServiceBase target) {
+    def springConnId(ServiceBase source, String conn, ServiceBase target, Application app) {
         String springConnId = "";
         if (source.kind <> ServiceKind::SOURCE_SERVICE // source always via transfer 
             and source.kind <> ServiceKind::SINK_SERVICE // sinks no output, only backward, via transfer
             and source.asynchronous and not(target.asynchronous)) {
             // async -> sync connection requires spring as target is function
+            // app may be used here if destination names are used
             springConnId = "${conn}-in-0";
         }
         springConnId;
@@ -59,7 +60,8 @@ template SpringBasics(Configuration config, FileArtifact target) {
     * output by ref.
     */
     def calcBindings(mapOf(MeshElement, setOf(MeshConnector)) mappedMesh, sequenceOf(MeshElement) nodes, 
-        mapOf(String, setOf(String)) destinations, setOf(String) functions, setOf(String) sources, String filterFunc) {
+        mapOf(String, setOf(String)) destinations, setOf(String) functions, setOf(String) sources, String filterFunc, 
+        Application app) {
         for (MeshElement elt: mappedMesh.keys()) {
             ServiceBase eltImpl = elt.impl;
           
@@ -78,16 +80,26 @@ template SpringBasics(Configuration config, FileArtifact target) {
                         String eltId = getMethodSuffixId(getMethodSuffix(elt, toTypeName(eltOut), outType(elt, eltOut)), elt);
                         if (not(eltImpl.kind==ServiceKind::SOURCE_SERVICE and eltImpl.asynchronous)) { // bindings for async sources cause troubles
                             if (not(eltImpl.asynchronous)) { // output happens via ingestors/transport
-                                addDestination(destinations, "${eltId}-out-0", eltId); // appId may be added
-                                if (includeInFunc(filterFunc, eltId)) {
-                                    functions.add(eltId);
+                                String eId = eltId;
+                                if (eltImpl.kind<>ServiceKind::SOURCE_SERVICE and eltImpl.kind<>ServiceKind::SINK_SERVICE) {
+                                    mapOf(IOType, IOType) pairs = ioPairs(elt);
+                                    for (IOType in : pairs.keys()) {
+                                        IOType out = pairs.get(in);
+                                        if (out.type==eltOut.type) {
+                                            eId = getMethodSuffixId(getMethodSuffix(elt, toTypeName(in), toTypeName(out)), elt);
+                                        }
+                                    }
+                                }
+                                addDestination(destinations, "${eId}-out-0", composeDestination(eltId, app));
+                                if (includeInFunc(filterFunc, eId)) {
+                                    functions.add(eId);
                                 }
                             } else {
                                 // async -> sync connection requires spring as target is function
                                 addDestination(destinations, "${nextId}-in-0", "*");
                             }
                             
-                            addDestination(destinations, "${nextId}-in-0", eltId); // destination name source
+                            addDestination(destinations, "${nextId}-in-0", composeDestination(eltId, app)); // destination name source
                             if (includeInFunc(filterFunc, nextId)) {
                                 functions.add(nextId);
                             }

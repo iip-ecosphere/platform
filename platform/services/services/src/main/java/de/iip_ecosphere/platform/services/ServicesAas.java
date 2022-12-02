@@ -123,6 +123,7 @@ public class ServicesAas implements AasContributor {
     public static final String NAME_OP_SERVICE_SET_STATE = "setServiceSate";
     public static final String NAME_OP_ARTIFACT_ADD = "addArtifact";
     public static final String NAME_OP_ARTIFACT_REMOVE = "removeArtifact";
+    public static final String NAME_OP_SERVICE_INSTANCE_COUNT  = "getServiceInstanceCount";
     
     private static final String ID_SUBMODEL = null; // take the short name, shall become public and an URN later
     
@@ -149,6 +150,7 @@ public class ServicesAas implements AasContributor {
             createIdOp(jB, NAME_OP_SERVICE_STOP, iCreator);
             createIdOp(jB, NAME_OP_SERVICE_STOP_TASK, iCreator, "taskId");
             createIdOp(jB, NAME_OP_SERVICE_GET_STATE, iCreator);
+            createIdOp(jB, NAME_OP_SERVICE_INSTANCE_COUNT, iCreator);
             createIdOp(jB, NAME_OP_SERVICE_SET_STATE, iCreator, "state");
             
             // probably relevant ops only
@@ -157,6 +159,10 @@ public class ServicesAas implements AasContributor {
                 .addInputVariable("url", Type.STRING)
                 .addOutputVariable("result", Type.STRING)
                 .build();
+            jB.createOperationBuilder(NAME_OP_SERVICE_INSTANCE_COUNT)
+                .setInvocable(iCreator.createInvocable(getQName(NAME_OP_SERVICE_INSTANCE_COUNT)))
+                .addInputVariable("id", Type.STRING)
+                .build(Type.INTEGER);
             createIdOp(jB, NAME_OP_ARTIFACT_REMOVE, iCreator);
             jB.build();
     
@@ -286,6 +292,11 @@ public class ServicesAas implements AasContributor {
                 return ServiceFactory.getServiceManager().getServiceState(readString(p)); 
             }
         ));
+        sBuilder.defineOperation(getQName(NAME_OP_SERVICE_INSTANCE_COUNT), 
+            new JsonResultWrapper(p -> { 
+                return ServiceFactory.getServiceManager().getServiceInstanceCount(readString(p)); 
+            }
+        ));
         sBuilder.defineOperation(getQName(NAME_OP_SERVICE_SET_STATE), 
             new JsonResultWrapper(p -> { 
                 ServiceState state = ServiceState.valueOf(readString(p, 1, "")); // exception shall be caught by wrapper
@@ -293,6 +304,16 @@ public class ServicesAas implements AasContributor {
                 return null;
             }
         ));
+        contributeArtifactTo(sBuilder);
+        contributeTaskTo(sBuilder);
+    }
+    
+    /**
+     * Further operation contributions for artifacts.
+     * 
+     * @param sBuilder the server protocol builder
+     */
+    private void contributeArtifactTo(ProtocolServerBuilder sBuilder) {
         sBuilder.defineOperation(getQName(NAME_OP_ARTIFACT_ADD), 
             new JsonResultWrapper(p -> { 
                 return ServiceFactory.getServiceManager().addArtifact(readUri(p, 0, EMPTY_URI)); 
@@ -304,11 +325,10 @@ public class ServicesAas implements AasContributor {
                 return null;
             }
         ));
-        contributeTaskTo(sBuilder);
     }
 
     /**
-     * Further operation contributions.
+     * Further task operation contributions.
      * 
      * @param sBuilder the server protocol builder
      */

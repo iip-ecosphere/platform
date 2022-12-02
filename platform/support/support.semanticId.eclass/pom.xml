@@ -47,6 +47,14 @@
         <groupId>org.glassfish.jersey.inject</groupId>
         <artifactId>jersey-hk2</artifactId>
       </dependency>
+      <dependency>
+	    <groupId>org.glassfish.jersey.media</groupId>
+	    <artifactId>jersey-media-json-processing</artifactId>
+      </dependency>
+      <dependency>
+        <groupId>org.glassfish.jersey.media</groupId>
+        <artifactId>jersey-media-moxy</artifactId>
+      </dependency>
 	  <dependency>
 	    <groupId>org.glassfish.jersey.media</groupId>
 	    <artifactId>jersey-media-json-jackson</artifactId>
@@ -56,7 +64,34 @@
 	    <artifactId>migbase64</artifactId>
 	    <version>2.2</version>
 	  </dependency>
-
+<dependency>
+    <groupId>com.google.code.gson</groupId>
+    <artifactId>gson</artifactId>
+</dependency>
+<dependency>
+    <groupId>com.squareup.okhttp</groupId>
+    <artifactId>okhttp</artifactId>
+    <version>2.7.5</version>
+</dependency>
+<dependency>
+    <groupId>io.gsonfire</groupId>
+    <artifactId>gson-fire</artifactId>
+    <version>1.8.5</version>
+</dependency>
+<dependency>
+    <groupId>com.squareup.okhttp</groupId>
+    <artifactId>logging-interceptor</artifactId>
+    <version>2.7.5</version>
+</dependency>
+<dependency>
+    <groupId>org.apache.oltu.oauth2</groupId>
+    <artifactId>org.apache.oltu.oauth2.client</artifactId>
+    <version>1.0.2</version>
+</dependency>
+<dependency>
+    <groupId>com.squareup.okhttp3</groupId>
+    <artifactId>okhttp</artifactId>
+</dependency>
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
@@ -74,7 +109,7 @@
 	    <plugin>
 	      <groupId>io.swagger.codegen.v3</groupId>
 	      <artifactId>swagger-codegen-maven-plugin</artifactId>
-	      <version>3.0.25</version>
+	      <version>3.0.35</version>
 	      <executions>
 	        <execution>
 	          <goals>
@@ -83,7 +118,7 @@
 	          <configuration>
 	            <inputSpec>${project.basedir}/src/main/eclass.json</inputSpec>
 	            <language>java</language>
-	            <library>jersey2</library>
+	            <library>okhttp-gson</library>
 	            <apiPackage>de.iip_ecosphere.platform.support.semanticId.eclass.api</apiPackage>
 	            <modelPackage>de.iip_ecosphere.platform.support.semanticId.eclass.model</modelPackage>
 	            <invokerPackage>de.iip_ecosphere.platform.support.semanticId.eclass.handler</invokerPackage>

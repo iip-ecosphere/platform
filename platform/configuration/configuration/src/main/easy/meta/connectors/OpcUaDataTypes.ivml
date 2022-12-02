@@ -7,13 +7,27 @@ project OpcUaDataTypes {
 
     enum NodeClass {UAObject, UAObjectType, UAVariable, UAVariableType, UADataType};
 
-    compound NodeId {
-	Integer nameSpaceIndex;
-	Integer identifier;
+	RecordType opcNodeIdType = {
+        name = "NodeId",
+        fields = {
+            Field {
+                name = "nameSpaceIndex",
+                type = refBy(IntegerType),
+                cachingTime = CACHE_ALWAYS
+            }, Field {
+                name = "identifier",
+                type = refBy(IntegerType),
+                cachingTime = CACHE_ALWAYS
+            }
+        }
     };
-
-    typedef OpcLocalizedText String; //  with (matches(NonEmptyNameString, "^[\\w \\[\\]-\\Q$_\\E]+$")); // non whitespace	
-	//typedef OpcLocalizedTextTypeType StringTypeType;
+    
+    compound NodeId {
+		Integer nameSpaceIndex;
+		Integer identifier;
+    }
+    
+    typedef OpcLocalizedText String;
 	
     compound OpcLocalizedTextTypeType refines StringTypeType {
     }
@@ -21,10 +35,39 @@ project OpcUaDataTypes {
 		name = "LocalizedText"
     };
     
-    compound opcUnknownDataTypeType refines ObjectTypeType {
+    compound OpcDateStringTypeType refines StringTypeType {
+    }
+    OpcDateStringTypeType opcDateStringType = {
+		name = "DateString"
     };
     
-	opcUnknownDataTypeType opcUnknownDataType = {
+    compound OpcDecimalStringTypeType refines StringTypeType {
+    }
+    OpcDecimalStringTypeType opcDecimalStringType = {
+		name = "DecimalString"
+    };
+    
+    compound OpcDurationStringTypeType refines StringTypeType {
+    }
+    OpcDurationStringTypeType opcDurationStringType = {
+		name = "DurationString"
+    };
+    
+    compound OpcNormalizedStringTypeType refines StringTypeType {
+    }
+    OpcNormalizedStringTypeType opcNormalizedStringType = {
+		name = "NormalizedString"
+    };
+    
+    compound OpcTimeStringTypeType refines StringTypeType {
+    }
+    OpcTimeStringTypeType opcTimeStringType = {
+		name = "TimeString"
+    };
+    
+    compound OpcUnknownDataTypeType refines ObjectTypeType {
+    }
+    OpcUnknownDataTypeType opcUnknownDataType = {
 		name = "UnknownDataType"
     };
 
@@ -34,24 +77,36 @@ project OpcUaDataTypes {
         name = "uint32[]",
         type = refBy(Integer32Type)
     };
-
-    compound GuidTypeType refines PrimitiveType {
-		UnsignedInteger32TypeType data1;
-		UnsignedInteger16TypeType data2;
-		UnsignedInteger16TypeType data3;
-		ByteStringTypeType data4;
+    
+    RecordType opcGuidType = {
+        name = "Guid",
+        fields = {
+            Field {
+                name = "data1",
+                type = refBy(UnsignedInteger32Type),
+                cachingTime = CACHE_ALWAYS
+            }, Field {
+                name = "data2",
+                type = refBy(UnsignedInteger16Type),
+                cachingTime = CACHE_ALWAYS
+            }, Field {
+                name = "data3",
+                type = refBy(UnsignedInteger16Type),
+                cachingTime = CACHE_ALWAYS
+            }, Field {
+                name = "data4",
+                type = refBy(ByteStringType),
+                cachingTime = CACHE_ALWAYS
+            }
+        }
     };
-
-    GuidTypeType opcGuidType = { // = fehlt
-		name = "Guid"
-    };
+    
 
     compound IdTypeType refines EnumType {
     }  
 
-    IdTypeType opcIdType = { // = fehlt
+    IdTypeType opcIdType = {
         name = "IdType",
-	
 		literals = {
 	    	EnumLiteral {
                 name = "Numeric",
@@ -62,76 +117,112 @@ project OpcUaDataTypes {
                 ordinal = 1,
                 description = "String value"
             }, EnumLiteral {
-                name = "Guid", // ""
+                name = "Guid",
                 ordinal = 2,
                 description = "Globally unique identifier"
             }, EnumLiteral {
-                name = "Opaque", // ""
+                name = "Opaque",
                 ordinal = 3,
                 description = "Namespace specific format"
 	    }
         }
-    }; // ;
+    };
 
-    compound UnsignedIntegerTypeType refines PrimitiveType {
+    compound UnsignedIntegerTypeType refines IntegerTypeType {
     }
     UnsignedIntegerTypeType opcUnsignedIntegerType = {
-	name = "UnsignedInteger"
+		name = "UnsignedInteger"
     };
     
-    compound NumberTypeType refines PrimitiveType {
+    compound NumberTypeType refines IntegerTypeType {
     }
     NumberTypeType opcNumberType = {
-	name = "Number"
+		name = "Number"
     };
 
-    compound NumericRangeTypeType refines PrimitiveType {
+    compound NumericRangeTypeType refines StringTypeType {
         String range;
     }
     NumericRangeTypeType opcNumericRangeType = {
 		name = "NumericRange"
     };
-
-    compound RangeTypeType refines PrimitiveType {
-        Real lowestValue; // Double -> Real
-		Real highestValue;
-    }
-    RangeTypeType opcRangeType = {
-	name = "Range"
-    };
-
-    compound EUInformationTypeType refines PrimitiveType {
-        String namespaceUri;
-		Integer32TypeType unitId;
-		String displayName;
-		OpcLocalizedText description; //name@language
-    }
-
-    EUInformationTypeType opcEUInformationType = {
-	name = "EUInformation"
+	
+    RecordType opcRangeType = {
+        name = "Range",
+        fields = {
+            Field {
+                name = "lowestValue",
+                type = refBy(DoubleType),
+                cachingTime = CACHE_ALWAYS
+            }, Field {
+                name = "highestValue",
+                type = refBy(DoubleType),
+                cachingTime = CACHE_ALWAYS
+            }
+        }
     };
     
-    compound UtcTimeTypeType refines PrimitiveType {
+    RecordType opcEUInformationType = {
+        name = "EUInformation",
+        fields = {
+            Field {
+                name = "namespaceUri",
+                type = refBy(StringType),
+                cachingTime = CACHE_ALWAYS
+            }, Field {
+                name = "unitId",
+                type = refBy(Integer32Type),
+                cachingTime = CACHE_ALWAYS
+            }, Field {
+                name = "displayName",
+                type = refBy(StringType),
+                cachingTime = CACHE_ALWAYS
+            }, Field {
+                name = "description",
+                type = refBy(opcLocalizedTextType),
+                cachingTime = CACHE_ALWAYS
+            }
+        }
+    };
+    
+    compound UtcTimeTypeType refines DateTimeTypeType {
     }
     UtcTimeTypeType opcUtcTimeType = {
-	name = "UtcTime"
+		name = "UtcTime"
     };
-
-    compound ArgumentTypeType refines PrimitiveType {
-    }
-    ArgumentTypeType opcArgumentType = {
-	name = "Argument"
+    
+    RecordType opcArgumentType = {
+        name = "Argument",
+        fields = {
+            Field {
+                name = "dataType",
+                type = refBy(opcNodeIdType),
+                cachingTime = CACHE_ALWAYS
+            }, Field {
+                name = "valueRank",
+                type = refBy(Integer32Type),
+                cachingTime = CACHE_ALWAYS
+            }, Field {
+                name = "arrayDimensions",
+                type = refBy(UnsignedInteger32ArrayType),
+                cachingTime = CACHE_ALWAYS
+            }, Field {
+                name = "description",
+                type = refBy(opcLocalizedTextType),
+                cachingTime = CACHE_ALWAYS
+            }
+        }
     };
-
-    compound StructureTypeType refines PrimitiveType {
-    }
-    StructureTypeType opcStructureType = {
-	name = "Structure"
+    
+    RecordType opcStructureType = {
+        name = "Structure",
+        fields = {
+        }
     };
-
+    
     compound UABaseType refines RecordType {
         self.isTypeOf(UABaseType) implies fields.size() == 0;
-        	NodeId nodeId;
+        NodeId nodeId;
 		NodeClass nodeClass;
 		String browseName;
 		String displayName;
@@ -139,15 +230,21 @@ project OpcUaDataTypes {
     }
 
     compound UAObjectType refines UABaseType {
+		refTo(DataType) type;
 		UAObjectFields fields;
     }
 
     compound UARootObjectType refines UAObjectType {
-    	refTo(DataType) type;
+		refTo(DataType) rootParent;
     }
 
-    compound UARootObjectTypeType refines UABaseType {
-	String documentation;
+    compound UAObjectTypeType refines UABaseType {
+		String documentation;
+    }
+
+    compound UAVariableTypeType refines UABaseType {
+		String documentation;
+		refTo(DataType) type;
     }
 
     compound UAFieldType refines Field {
@@ -158,22 +255,20 @@ project OpcUaDataTypes {
 		OpcLocalizedText description;
     }
 
-
-    //-----> Fields auch für Variablen? Variablen können Variablen enthalten!
-
     compound UAVariableType refines UAFieldType {
-		Integer accessLevel; // Type
-		Integer valueRank; // Type
-		Integer arrayDimensions; // Type
+    	refTo(DataType) dataType;
+		Integer accessLevel;
+		Integer valueRank;
+		Integer arrayDimensions;
     }
 
     compound UAEnumType refines EnumType {
-	NodeId nodeId;
-	NodeClass nodeClass;
-	String browseName;
-	String displayName;
-	OpcLocalizedText description;
-	String documentation;
+		NodeId nodeId;
+		NodeClass nodeClass;
+		String browseName;
+		String displayName;
+		OpcLocalizedText description;
+		String documentation;
     }
     
     compound DataLiteral {
@@ -189,8 +284,8 @@ project OpcUaDataTypes {
 		String displayName;
 		OpcLocalizedText description;
 		String documentation;
-        sequenceOf(DataLiteral) literals;
-	Constraint dataLiteralNamesUnique = literals->isUnique(l|l.name);
+	    sequenceOf(DataLiteral) literals;
+		Constraint dataLiteralNamesUnique = literals->isUnique(l|l.name);
     }
 
     typedef UAObjectFields sequenceOf(UAFieldType) with (UAObjectFields->collect(f|f.name).hasDuplicates() == false);
@@ -199,18 +294,19 @@ project OpcUaDataTypes {
     
     // freeze all primitives
     freeze {
-	UnsignedInteger32ArrayType;
-	opcLocalizedTextType;
-    	opcGuidType;
-	opcIdType;
-	opcUnsignedIntegerType;
-	opcNumberType;
-	opcNumericRangeType;
-	opcRangeType;
-	opcEUInformationType;
-	opcUtcTimeType;
-	opcArgumentType;
-	opcStructureType;
+		UnsignedInteger32ArrayType;
+		opcNodeIdType;
+		opcLocalizedTextType;
+	    opcGuidType;
+		opcIdType;
+		opcUnsignedIntegerType;
+		opcNumberType;
+		opcNumericRangeType;
+		opcRangeType;
+		opcEUInformationType;
+		opcUtcTimeType;
+		opcArgumentType;
+		opcStructureType;
     };
     
 }

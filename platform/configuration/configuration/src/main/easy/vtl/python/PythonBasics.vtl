@@ -84,37 +84,37 @@ template PythonBasics(Configuration config, FileArtifact target) {
 	// Start - Added types OPC UA - by Ahmad
     //NOT READY!! Check mapping to Python
     def String toTypeName(Integer16TypeType type) {
-        "Int";
+        "int";
     }
     
     //NOT READY!! Check mapping to Python
     def String toTypeName(Integer32TypeType type) {
-        "Int";
+        "int";
     }
     
     //NOT READY!! Check mapping to Python
     def String toTypeName(Integer64TypeType type) {
-        "Int";
+        "int";
     }
     
     //NOT READY!! Check mapping to Python
     def String toTypeName(SByteTypeType type) {
-        "Int";
+        "int";
     }
     
     //NOT READY!! Check mapping to Python
     def String toTypeName(UnsignedInteger16TypeType type) {
-        "Int";
+        "int";
     }
 
     //NOT READY!! Check mapping to Python
     def String toTypeName(UnsignedInteger32TypeType type) {
-        "Int";
+        "int";
     }
     
     //NOT READY!! Check mapping to Python
     def String toTypeName(UnsignedInteger64TypeType type) {
-        "Int";
+        "int";
     }
     
     //NOT READY!! Check mapping to Python
@@ -143,5 +143,27 @@ template PythonBasics(Configuration config, FileArtifact target) {
     def String toTypeName(ListType type) {
         "list[" + toTypeName(type.type) + "]";
     } 
+    
+    // --------------------------------- default values ---------------------------
+    
+    def String defaultValue(DataType type) {
+        "None";
+    }
+    
+    def String defaultValue(NumericPrimitiveType type) {
+        "0";
+    }
+
+    def String defaultValue(FloatTypeType type) {
+        "0.0";
+    }
+
+    def String defaultValue(DoubleTypeType type) {
+        "0.0";
+    }
+    
+    def String defaultValue(StringTypeType type) {
+        "\"\"";
+    }
     
 }

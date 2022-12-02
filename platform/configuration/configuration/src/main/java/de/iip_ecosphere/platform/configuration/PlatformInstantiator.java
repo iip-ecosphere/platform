@@ -39,6 +39,7 @@ import net.ssehub.easy.varModel.model.ModelQueryException;
  */
 public class PlatformInstantiator {
 
+    public static final String KEY_PROPERTY_TRACING = "iip.easy.tracing";
     private static int exitCode = 0;
     
     /**
@@ -246,6 +247,11 @@ public class PlatformInstantiator {
             return kind == LanguageElementKind.FAILURE || kind == LanguageElementKind.LANGUAGE_UNIT 
                 || kind == LanguageElementKind.FUNCTION_EXECUTION;
         }
+        
+        @Override
+        public boolean isWarningEnabled() {
+            return false;
+        }
 
     }
     
@@ -271,23 +277,37 @@ public class PlatformInstantiator {
             System.out.println("   - generateApps: app interfaces, apps with artifact dependencies");
             System.out.println("   - generateBroker: create a sample broker");
             System.out.println("   - generatePlatform: platform components only");
-            System.out.println("Optional: Output filtering -Diip.easy.tracing=ALL|FUNC|TOP, default TOP=toplevel");
+            System.out.println("Optional: Output filtering -D" + KEY_PROPERTY_TRACING 
+                + "=ALL|FUNC|TOP, default TOP=toplevel");
         } else {
-            String tracing = System.getProperty("iip.easy.tracing", "TOP").toUpperCase();
-            ITraceFilter filter = TopLevelExecutionTraceFilter.INSTANCE;
-            if ("FUNC".equals(tracing)) {
-                filter = new FunctionLevelTraceFilter();
-            } else if ("ALL".equals(tracing)) {
-                filter = NoTraceFilter.INSTANCE;
-            }
-            TracerFactory.setTraceFilter(filter);
-            InstantiationConfigurer c = new InstantiationConfigurer(args[0], new File(args[1]), new File(args[2]));
-            if (args.length == 4) {
-                c.setStartRuleName(args[3]);
-            }
-            instantiate(c);
+            mainImpl(args);
             System.exit(exitCode);
         }
+    }
+    
+    /**
+     * Main functionality without returning exit code/output of help for re-use. Could be with explicit parameters...
+     * 
+     * @param args command line arguments
+     * @return the exit code
+     * @throws ExecutionException in case that the VIL instantiation fails, shall not occur here as handled by 
+     *     default {@link InstantiationConfigurer}
+     */
+    public static int mainImpl(String[] args) throws ExecutionException {
+        String tracing = System.getProperty(KEY_PROPERTY_TRACING, "TOP").toUpperCase();
+        ITraceFilter filter = TopLevelExecutionTraceFilter.INSTANCE;
+        if ("FUNC".equals(tracing)) {
+            filter = new FunctionLevelTraceFilter();
+        } else if ("ALL".equals(tracing)) {
+            filter = NoTraceFilter.INSTANCE;
+        }
+        TracerFactory.setTraceFilter(filter);
+        InstantiationConfigurer c = new InstantiationConfigurer(args[0], new File(args[1]), new File(args[2]));
+        if (args.length == 4) {
+            c.setStartRuleName(args[3]);
+        }
+        instantiate(c);
+        return exitCode;
     }
 
 }

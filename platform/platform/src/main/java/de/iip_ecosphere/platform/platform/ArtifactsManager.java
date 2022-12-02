@@ -597,7 +597,9 @@ public class ArtifactsManager {
         Artifact result = null;
         BasicContainerDescriptor desc = BasicContainerDescriptor.readFromYamlFile(file);
         if (null != desc.getImageFile() && desc.getImageFile().length() > 0) {
-            File f = new File(file.getParentFile(), desc.getImageFile());
+            result = new ContainerArtifact(desc, accessUri);
+            // container may be in container registry, don't check 
+            /*File f = new File(file.getParentFile(), desc.getImageFile());
             if (f.exists()) {
                 result = new ContainerArtifact(desc, accessUri);
                 LoggerFactory.getLogger(ArtifactsManager.class).info("Deployment plan artifact added: {} @ {}", 
@@ -605,7 +607,7 @@ public class ArtifactsManager {
             } else {
                 LoggerFactory.getLogger(ArtifactsManager.class).info("Cannot create container descriptor for {}: "
                     + "Container image file {} not found in same directory", file, desc.getImageFile());
-            }
+            }*/
         }
         if (null == result) {
             try {

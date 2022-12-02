@@ -43,6 +43,7 @@ import de.iip_ecosphere.platform.services.ServicesAas;
 import de.iip_ecosphere.platform.services.TypedDataConnectorDescriptor;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.services.environment.spring.Starter;
+import de.iip_ecosphere.platform.services.environment.switching.ServiceBase;
 import de.iip_ecosphere.platform.services.spring.yaml.YamlArtifact;
 import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.FileUtils;
@@ -306,6 +307,19 @@ public class SpringCloudServiceManager
             }
         }
     }
+    
+    /**
+     * Turns the application (instance) id into a command line argument.
+     * 
+     * @param serviceId the service id to take the application (instance) id from
+     * @param cmdArgs the command line arguments
+     */
+    public static void addAppId(String serviceId, List<String> cmdArgs) {
+        String appId = ServiceBase.getApplicationId(serviceId) + ServiceBase.getApplicationInstanceId(serviceId);
+        if (appId.length() > 0) {
+            cmdArgs.add(CmdLine.PARAM_PREFIX + Starter.PARAM_IIP_APP_ID + CmdLine.PARAM_VALUE_SEP + appId);
+        }
+    }
 
     @Override
     public void startService(Map<String, String> options, String... serviceIds) throws ExecutionException {
@@ -330,6 +344,7 @@ public class SpringCloudServiceManager
                 LOGGER.info("Preparing {} for start", sId);
                 String[] sIdEns = serviceAndEnsemble(sId, serviceIds);
                 List<String> externalServiceArgs = new ArrayList<>(commonServiceArgs);
+                addAppId(sId, externalServiceArgs);
                 // adjust spring function definition from application.yml if subset of services shall be started 
                 externalServiceArgs.add(determineCloudFunctionArg(sIdEns));
                 externalServiceArgs.addAll(determineSpringConditionals(this, sIdEns));

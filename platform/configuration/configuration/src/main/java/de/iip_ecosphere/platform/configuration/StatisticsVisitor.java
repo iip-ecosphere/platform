@@ -14,7 +14,7 @@ package de.iip_ecosphere.platform.configuration;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.function.Consumer;
+import java.util.function.Function;
 
 import net.ssehub.easy.varModel.confModel.AbstractConfigurationStatisticsVisitor;
 import net.ssehub.easy.varModel.confModel.IConfigurationElement;
@@ -63,7 +63,7 @@ public class StatisticsVisitor extends AbstractConfigurationStatisticsVisitor {
 
     }
     
-    private Consumer<AbstractVariable> noComment = v -> { };
+    private Function<AbstractVariable, Boolean> noComment = v -> true;
     private Set<Object> done = new HashSet<>();
 
     /**
@@ -74,11 +74,12 @@ public class StatisticsVisitor extends AbstractConfigurationStatisticsVisitor {
     }
 
     /**
-     * Optional consumer if a variable has no comment/description.
+     * Optional function if a variable has no comment/description.
      * 
-     * @param noComment the no comment consumer, may be <b>null</b>, ignored then
+     * @param noComment the no comment function (returns {@code false} if the variable shall be counted as commented), 
+     *     may be <b>null</b>, ignored then
      */
-    public void setNoCommentConsumer(Consumer<AbstractVariable> noComment) {
+    public void setNoCommentConsumer(Function<AbstractVariable, Boolean> noComment) {
         if (null != noComment) {
             this.noComment = noComment;
         }
@@ -127,7 +128,9 @@ public class StatisticsVisitor extends AbstractConfigurationStatisticsVisitor {
             if (ModelInfo.hasComment(var)) {
                 stat.metaVarsWithComment++;
             } else {
-                noComment.accept(var);
+                if (!noComment.apply(var)) {
+                    stat.metaVarsWithComment++;
+                }
             }
             done.add(var);
         }

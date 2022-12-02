@@ -24,6 +24,8 @@ import de.iip_ecosphere.platform.support.iip_aas.Version;
  */
 public interface ContainerOperations {
 
+    public static final String EXC_ALREADY_KNOWN = "is already known";
+    
     /**
      * Adds a container to the management domain of this instance, e.g., by downloading it from a container registry.
      * This defines the {@code id} of the container within the management domain of this instance. After a successful
@@ -35,6 +37,14 @@ public interface ContainerOperations {
      * @throws ExecutionException in case that adding the container fails for some reason
      */
     public String addContainer(URI location) throws ExecutionException;
+
+    /**
+     * Returns the container id for a given container location as used in {@link #addContainer(URI)}.
+     * 
+     * @param location the location
+     * @return the id of the container, may be empty or <b>null</b>null if there is none
+     */
+    public String getId(URI location);
 
     /**
      * Starts a container. The container must be already within the management domain of this instance by
@@ -89,7 +99,7 @@ public interface ContainerOperations {
     /**
      * Returns the state of the container.
      * 
-     * @param id the id of the container
+     * @param id the id/URI of the container
      * @return the state of the container
      */
     public ContainerState getState(String id);

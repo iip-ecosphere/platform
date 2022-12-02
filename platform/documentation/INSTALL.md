@@ -78,7 +78,7 @@ Create a network:
 
 and start the platform parts:
 
-    docker run --network platform --ip 172.19.0.22 -p 9001:9001 -p 9002:9002 -p 8883:8883 iipecosphere/platform:platform_all.latest  
+    docker run --network platform --ip 172.19.0.22 -p 9001:9001 -p 9002:9002 -p 8883:8883 -p 9090:9090 -p 9091:9091 -p 4200:4200 iipecosphere/platform:platform_all.latest  
 
 and similarly for the CLI
 

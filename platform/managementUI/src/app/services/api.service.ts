@@ -1,6 +1,6 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { PlatformResources, PlatformServices, ResourceValue } from 'src/interfaces';
+import { PlatformArtifacts, PlatformResources, PlatformServices, ResourceAttribute } from 'src/interfaces';
 import { firstValueFrom, Subject } from 'rxjs';
 import { EnvConfigService } from './env-config.service';
 
@@ -39,17 +39,17 @@ export class ApiService {
   }
 
   public async getServices() {
-    const Data = await this.getData('aas/submodels/services/submodel') as PlatformServices;
-    return Data;
+      const Data = await this.getData('aas/submodels/services/submodel') as PlatformServices;
+      return Data;
   }
 
   public async getArtifacts() {
-    const Data = await this.getData('aas/submodels/Artifacts/submodel') as PlatformResources;
+    const Data = await this.getData('aas/submodels/Artifacts/submodel') as PlatformArtifacts;
     return Data;
   }
 
-  public async getTechData() {
-    const Data = await this.getData('aas/submodels/platform/submodel/submodelElements') as ResourceValue[];
+  public async getPlatformData() {
+    const Data = await this.getData('aas/submodels/platform/submodel/submodelElements') as ResourceAttribute[];
     return Data;
   }
 
@@ -65,8 +65,6 @@ export class ApiService {
   }
 
   public async executeFunction(resource: string, basyxFunc: string, params: any) {
-    console.log(resource + '  ' + basyxFunc);
-    console.log(params);
     let response;
     try {
       response = await firstValueFrom(this.http.post(this.ip + '/shells/' + this.urn + "/aas/submodels/resources/submodel/submodelElements/" + resource + "/" + basyxFunc + "/invoke"

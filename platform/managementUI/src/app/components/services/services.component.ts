@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from 'src/app/services/api.service';
-import { PlatformResources, PlatformServices } from 'src/interfaces';
+import { PlatformArtifacts, PlatformResources, PlatformServices } from 'src/interfaces';
 
 @Component({
   selector: 'app-services',
@@ -15,9 +15,8 @@ export class ServicesComponent implements OnInit {
   services: PlatformServices = {};
   servicesToggle: boolean[] = [];
 
-  artifacts: PlatformResources = {};
+  artifacts: PlatformArtifacts = {};
   artifactsToggle: boolean[] = [];
-
 
   ngOnInit(): void {
     this.getServices();

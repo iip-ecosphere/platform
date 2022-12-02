@@ -16,8 +16,13 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.util.Base64;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+
+import org.apache.commons.io.filefilter.FileFilterUtils;
+import org.apache.commons.io.filefilter.TrueFileFilter;
 
 /**
  * Basic file functionality.
@@ -215,6 +220,27 @@ public class FileUtils {
     public static String sanitizeFileName(String str, boolean addTimestamp) {
         String tmp = addTimestamp ? str + "-" + System.currentTimeMillis() : str;
         return sanitizeFileName(tmp);
+    }
+
+    /**
+     * Tries to find the file {@code name} in {@code folder} and its subfolders.
+     * 
+     * @param folder the folder to search
+     * @param name the file name to find
+     * @return the found file or <b>null</b> for none
+     */
+    public static File findFile(File folder, String name) {
+        Collection<File> tmp = org.apache.commons.io.FileUtils.listFiles(folder, 
+            FileFilterUtils.nameFileFilter(name), 
+            TrueFileFilter.INSTANCE);
+        Iterator<File> iter = tmp.iterator();
+        File result;
+        if (iter.hasNext()) {
+            result = iter.next();
+        } else {
+            result = null;
+        }
+        return result;
     }
 
 }
