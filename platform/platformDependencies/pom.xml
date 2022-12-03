@@ -629,6 +629,49 @@
                                     <ignore/>
                                 </action>
                             </pluginExecution>
+                            <pluginExecution>
+                                <pluginExecutionFilter>
+                                    <groupId>
+                                        de.iip-ecosphere.platform
+                                    </groupId>
+                                    <artifactId>
+                                        configuration-plugin
+                                    </artifactId>
+                                    <versionRange>
+                                        [${project.version},)
+                                    </versionRange>
+                                    <goals>
+                                        <goal>generateAppsNoDeps</goal>
+                                        <goal>generateApps</goal>
+                                        <goal>generateBroker</goal>
+                                        <goal>generateInterfaces</goal>
+                                        <goal>generatePlatform</goal>
+                                    </goals>
+                                </pluginExecutionFilter>
+                                <action>
+                                    <ignore/>
+                                </action>
+                            </pluginExecution>
+                            <pluginExecution>
+                                <pluginExecutionFilter>
+                                    <groupId>
+                                        de.iip-ecosphere.platform
+                                    </groupId>
+                                    <artifactId>
+                                        invoker-plugin
+                                    </artifactId>
+                                    <versionRange>
+                                        [${project.version},)
+                                    </versionRange>
+                                    <goals>
+                                        <goal>install</goal>
+                                        <goal>generate-sources</goal>
+                                    </goals>
+                                </pluginExecutionFilter>
+                                <action>
+                                    <ignore/>
+                                </action>
+                            </pluginExecution>
                         </pluginExecutions>
                     </lifecycleMappingMetadata>
                 </configuration>
