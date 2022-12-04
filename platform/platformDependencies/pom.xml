@@ -121,6 +121,18 @@
       </roles>
       <timezone>Europe/Berlin</timezone>
     </developer>
+    <developer>
+      <id>Cepok</id>
+      <name>Jan-Hendrik Cepok</name>
+      <email>cepokj@uni-hildesheim.de</email>
+      <url>https://sse.uni-hildesheim.de/</url>
+      <organization>SSE @ University of Hildesheim</organization>
+      <organizationUrl>https://sse.uni-hildesheim.de/</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>Europe/Berlin</timezone>
+    </developer>
   </developers>  
   
   <scm>
@@ -646,6 +658,7 @@
                                         <goal>generateBroker</goal>
                                         <goal>generateInterfaces</goal>
                                         <goal>generatePlatform</goal>
+                                        <goal>generateAll</goal>
                                     </goals>
                                 </pluginExecutionFilter>
                                 <action>
