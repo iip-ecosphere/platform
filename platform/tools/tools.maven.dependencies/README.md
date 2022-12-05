@@ -4,7 +4,7 @@ We use the `maven-dependency-plugin` for various tasks, e.g., to unpack Python c
 
 ## Extended unpack goal
 
-The extended `unpack` goal behaves like the original goal offering all configuration options, but in addition the `cleanup` option. Unpacking only happens if the output directory given in the respective artifact item does not exist or if `force` is specified, usually via command line.
+The extended `unpack` goal behaves like the original goal offering all configuration options, but in addition the `cleanup` option. Unpacking only happens if the output directory given in the respective artifact item does not exist, it only contains files listed in `initiallyAllowed` or if `force` is specified, usually via command line.
 
   ```xml
   <build>
@@ -39,8 +39,9 @@ The extended `unpack` goal behaves like the original goal offering all configura
   ```
 
 The extended unpack goal supports the following additional configuration settings:
-  - `cleanup` (default not given) specifying the files and directories to be deleted (via `includes`) before unpacking. Typically, `directory` points to the `outputDirectory` of the artifact item(s).
-  - `force` (default `false`) forces an update of the files applying a cleanup if needed. If `false`, unpacking only happens if the output folder does not exist.
+  - `cleanup` (default not given) specifying the files and directories to be deleted (via `includes`) before unpacking. Typically, `directory` points to the `outputDirectory` of the `artifactItems`.
+  - `force` (default `false`, user property `unpack.force`) forces an update of the files applying a cleanup if needed. If `false`, unpacking only happens if the output folder does not exist (see `initiallyAllowed`).
+  - `initiallyAllowed` list of colon or semicolon separated relative file names (default empty) in one of the `outputDirectory` settings in the `artifactItems`. If an existing `outputDirectory` only contains `initiallyAllowed` files, perform the unpacking anyway, else only if `force` (or `-Dunpack.force`) is given.
   
   
 ## copy-dependencies goal

@@ -13,6 +13,7 @@
 package de.iip_ecosphere.platform.tools.maven.dependencies;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -40,6 +41,9 @@ public class CleaningUnpackMojo extends UnpackMojo {
      */
     @Parameter(required = false)
     private FileSet cleanup;
+    
+    @Parameter(required = false, defaultValue = "")
+    private String initiallyAllowed;
     
     @Parameter(property = "unpack.force", required = false, defaultValue = "false")
     private boolean force;
@@ -103,7 +107,22 @@ public class CleaningUnpackMojo extends UnpackMojo {
         } else {
             execute = false;
             for (ArtifactItem ai : getArtifactItems()) {
-                execute |= ai.isNeedsProcessing() || !ai.getOutputDirectory().exists();
+                boolean outDirExists = ai.getOutputDirectory().exists();
+                execute |= ai.isNeedsProcessing() || !outDirExists;
+                if (!execute && outDirExists && initiallyAllowed != null) {
+                    String tmp = initiallyAllowed.replace(";", ":");
+                    Set<String> allowed = new HashSet<String>();
+                    getLog().info("Output directory " + ai.getOutputDirectory() + " exists. "
+                        + "Checking for initially allowed files: " + allowed);
+                    Collections.addAll(allowed, tmp.split(":"));
+                    execute = true;
+                    for (String fn : ai.getOutputDirectory().list()) {
+                        if (!allowed.contains(fn)) {
+                            getLog().info("Disabling execution as " + fn + " is not initially allowed");
+                            execute = false;
+                        }
+                    }
+                }
             }
         }        
         
