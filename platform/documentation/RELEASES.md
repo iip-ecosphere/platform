@@ -49,6 +49,7 @@ Improvements:
 * [#104](https://github.com/iip-ecosphere/platform/issues/104): Generation and execution of synchronous Python services/Java sinks
 * [#108](https://github.com/iip-ecosphere/platform/issues/108): Generated implementation templates support Eclipse PythonEditor PyDev
 * [#103](https://github.com/iip-ecosphere/platform/issues/36): Generation of Python code with initialized fields and Pythonic field access while keeping getters/setters
+* Multi-module top-level POM for local builds of the platform (please refer to the platform handbook for details).
 
 ### Version 0.4.0 (2022/09/02, TddT'22):
 

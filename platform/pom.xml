@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>de.iip-ecosphere.platform</groupId>
+  <artifactId>fullPlatform</artifactId>
+  <packaging>pom</packaging>
+  <version>0.5.0-SNAPSHOT</version>
+  <name>Full local platform build</name>
+  <description>Full local platform build through maven modules.</description>
+  
+  <!-- First build without (SSE) maven repository may required -Diip.build.initial=true and second build afterwards. -->
+  
+  <modules>
+     <!-- platform dependencies first -->
+     <module>platformDependencies</module>
+     <!-- maven plugins -->
+     <module>tools/tools.maven.python</module>
+     <module>tools/tools.maven.invoker</module>
+     <module>tools/tools.maven.dependencies</module>
+     <!-- test broker -->
+     <module>tests/test.amqp.qpid</module>
+     <module>tests/test.mqtt.hivemq</module>
+     <module>tests/test.mqtt.moquette</module>
+     <!-- support layer -->
+     <module>support/support.aas</module>
+     <module>support/support.aas.basyx</module>
+     <module>support/support.aas.basyx.server</module>
+     <module>support/support.iip-aas</module>
+     <module>support/support.dfltSysMetrics</module>
+     <module>support/support.sysMetrics.plcnext</module>
+     <module>support/support.semanticId.eclass</module>
+     <!-- transport/connectors layer, transport component -->
+     <module>transport/transport</module>
+     <module>transport/transport.amqp</module>
+     <module>transport/transport.mqttv3</module>
+     <module>transport/transport.mqttv5</module>
+     <module>transport/transport.spring</module>
+     <module>transport/transport.spring.amqp</module>
+     <module>transport/transport.spring.mqttv3</module>
+     <module>transport/transport.spring.mqttv5</module>
+     <module>transport/transport.spring.hivemqv3</module>
+     <module>transport/transport.spring.hivemqv5</module>
+     <!-- transport/connectors layer, connectors component -->
+     <module>connectors/connectors</module>
+     <module>connectors/connectors.mqttv3</module>
+     <module>connectors/connectors.mqttv5</module>
+     <module>connectors/connectors.mqtt</module>
+     <module>connectors/connectors.basyx</module>
+     <module>connectors/connectors.opcuav1</module>
+     <!-- services layer -->
+     <module>services/services.environment</module>
+     <module>services/services.environment.spring</module>
+     <module>services/services</module>
+     <module>tests/test.simpleStream.spring</module>
+     <module>services/services.spring</module>
+     <!-- resources layer, device management -->
+     <module>resources/deviceMgt</module>
+     <module>resources/deviceMgt.basicRegistry</module>
+     <module>resources/deviceMgt.minio</module>
+     <module>resources/deviceMgt.s3mock</module>
+     <module>resources/deviceMgt.thingsboard</module>
+     <!-- resources layer, ECS runtime -->
+     <module>resources/ecsRuntime</module>
+     <module>resources/ecsRuntime.docker</module>
+     <module>resources/ecsRuntime.lxc</module>
+     <!--<module>resources/ecsRuntime.kubernetes</module>-->
+     <!-- resources layer, monitoring -->
+     <module>resources/monitoring</module>
+     <module>resources/monitoring.prometheus</module>
+     <!-- security services -->
+     <module>securityDataProtection/security.services.kodex</module>
+     <!-- reusable intelligent services -->
+     <module>reusableIntelligentServices/kiServices.functions</module>
+     <module>reusableIntelligentServices/kiServices.rapidminer.rtsa</module>
+     <!-- configuration -->
+     <module>configuration/configuration</module> <!-- requires next -->
+     <module>tests/test.configuration.configuration</module> <!-- requires interface build of tests -->
+     <!-- platform services, CLI, AAS -->
+     <module>platform</module>
+     <!-- examples -->
+     <module>examples/examples</module>
+     <module>examples/examples.KODEX/examples.KODEX.db</module>
+	 <module>examples/examples.KODEX/examples.KODEX</module>
+     <module>examples/examples.python</module>
+     <module>examples/examples.pythonSync</module>
+     <module>examples/examples.rtsa</module>
+     <!--<module>examples/examples.templates</module>--> <!-- Needs orchestrated pom.xml at this level -->
+     <module>examples/examples.vdw</module>
+     <module>examples/examples.hm22</module>
+  </modules>
+
+</project>
