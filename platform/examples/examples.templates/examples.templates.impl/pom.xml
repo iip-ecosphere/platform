@@ -10,6 +10,7 @@
         <groupId>de.iip-ecosphere.platform</groupId>
         <artifactId>platformDependencies</artifactId>
         <version>0.5.0-SNAPSHOT</version>
+        <relativePath/>
     </parent>
     <!--Template application/service implementation POM.-->
     <profiles>
@@ -64,6 +65,93 @@
             </dependencies>
             <build>
                 <plugins>
+                    <plugin>
+                        <groupId>de.iip-ecosphere.platform</groupId>
+                        <artifactId>dependency-plugin</artifactId>
+                        <version>0.5.0-SNAPSHOT</version>
+                        <executions>
+                            <execution>
+                                <id>unpack</id>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <phase>process-sources</phase>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>de.iip-ecosphere.platform</groupId>
+                                            <artifactId>services.environment</artifactId>
+                                            <version>0.5.0-SNAPSHOT</version>
+                                            <type>zip</type>
+                                            <classifier>python</classifier>
+                                            <overWrite>true</overWrite>
+                                            <outputDirectory>${project.basedir}/src/main/python</outputDirectory>
+                                            <destFileName>pythonEnv.zip</destFileName>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>pythonSources</id>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <phase>validate</phase>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>de.iip-ecosphere.platform</groupId>
+                                            <artifactId>services.environment</artifactId>
+                                            <version>0.5.0-SNAPSHOT</version>
+                                            <type>zip</type>
+                                            <classifier>python</classifier>
+                                            <overWrite>true</overWrite>
+                                            <outputDirectory>${project.build.directory}/pyEnv</outputDirectory>
+                                            <destFileName>pyEnv.zip</destFileName>
+                                        </artifactItem>
+                                        <artifactItem>
+                                            <groupId>de.iip-ecosphere.platform</groupId>
+                                            <artifactId>apps.AppInterfaces</artifactId>
+                                            <version>0.5.0-SNAPSHOT</version>
+                                            <type>0.5.0-SNAPSHOT</type>
+                                            <type>zip</type>
+                                            <classifier>python</classifier>
+                                            <overWrite>true</overWrite>
+                                            <outputDirectory>${project.build.directory}/pySrc</outputDirectory>
+                                            <destFileName>pyIf.zip</destFileName>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>de.iip-ecosphere.platform</groupId>
+                        <artifactId>maven-python</artifactId>
+                        <version>0.5.0-SNAPSHOT</version>
+                        <executions>
+                            <execution>
+                                <id>py-compile</id>
+                                <goals>
+                                    <goal>compile-python</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>py-test</id>
+                                <goals>
+                                    <goal>test-python</goal>
+                                </goals>
+                                <configuration>
+                                    <fileset>
+                                        <directory>src/test/python</directory>
+                                        <includes>
+                                            <include>**/*Test.py</include>
+                                        </includes>
+                                    </fileset>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-assembly-plugin</artifactId>
@@ -157,8 +245,8 @@
                                 <configuration>
                                     <arguments>
                                         <argument>${project.basedir}/src/test/python</argument>
-                                        <!-- made to enable different pyservice tests seperately  -->
                                         <argument>pyTest.py</argument>
+                                        <!--Please adjust relative path to model-->
                                         <argument>../../../../examples.templates.model</argument>
                                     </arguments>
                                     <mainClass>de.iip_ecosphere.platform.services.environment.PythonUnitTest</mainClass>
