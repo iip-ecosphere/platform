@@ -434,15 +434,15 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
     
     // --------------------------------------- reception callback -----------------------------------------
     
-    def generateReceptionCallback(MeshElement elt) {
-        generateReceptionCallback(elt, elt.impl);
+    def generateReceptionCallback(MeshElement elt, Application app) {
+        generateReceptionCallback(elt, elt.impl, app);
     }
 
-    def generateReceptionCallback(MeshElement elt, ServiceBase service) {
+    def generateReceptionCallback(MeshElement elt, ServiceBase service, Application app) {
         ''
     }
 
-    def generateReceptionCallback(MeshElement elt, Connector conn) {
+    def generateReceptionCallback(MeshElement elt, Connector conn, Application app) {
         String serviceId = "_" + toIdentifier(conn.id);
         String coType = asTypeName(getFirstTypeName(conn.output));
         String suffix = coType.firstToUpperCase() + serviceId;
@@ -478,7 +478,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
             @Override
             public void received(${coType} data) {
                 MetricsProvider.increaseCounterBy(serviceSent, 1.0);
-                Transport.send(c -> c.asyncSend("${conn.id}_${coType}", data), "${conn.id}"${connectionIds});
+                Transport.send(c -> c.asyncSend(${composeDestination("${conn.id}_${coType}", app, "appInstId")}, data), "${conn.id}"${connectionIds});
             }
         
             @Override

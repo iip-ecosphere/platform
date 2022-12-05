@@ -17,7 +17,6 @@ import test.de.iip_ecosphere.platform.services.environment.metricsProvider.meter
 import test.de.iip_ecosphere.platform.services.environment.metricsProvider.meterRepresentations.GaugeRepresentationTest;
 import test.de.iip_ecosphere.platform.services.environment.metricsProvider.meterRepresentations.MeterRepresentationTest;
 import test.de.iip_ecosphere.platform.services.environment.metricsProvider.meterRepresentations.TimerRepresentationTest;
-import test.de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsAasConstructionBundleTest;
 import test.de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsExtractorRestClientTest;
 
 /**
@@ -37,7 +36,6 @@ import test.de.iip_ecosphere.platform.services.environment.metricsProvider.metri
     MetricsProviderTest.class,
     
     MetricsExtractorRestClientTest.class,
-    MetricsAasConstructionBundleTest.class,
     
     MonitoredTranslatingProtocolAdapterTest.class
 })

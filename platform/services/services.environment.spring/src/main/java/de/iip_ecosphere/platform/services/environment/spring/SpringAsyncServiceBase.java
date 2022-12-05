@@ -23,6 +23,8 @@ import javax.annotation.PreDestroy;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import de.iip_ecosphere.platform.services.environment.Service;
+import de.iip_ecosphere.platform.services.environment.switching.ServiceBase;
 import de.iip_ecosphere.platform.support.function.IOConsumer;
 import de.iip_ecosphere.platform.transport.Transport;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
@@ -172,6 +174,24 @@ public class SpringAsyncServiceBase {
     public void destroy() {
         detach();
         Transport.releaseConnector();
+    }
+    
+    /**
+     * Composes a channel suffix id for a service possibly including the application instance id.
+     * 
+     * @param service the service instance
+     * @param separator the separator string to insert between the ids
+     * @return the id suffix, may be empty
+     */
+    public static String getAppInstIdSuffix(Service service, String separator) {
+        String sId = service.getId();
+        String result = ServiceBase.getApplicationInstanceId(sId);
+        if (null == result || result.length() == 0) {
+            result = "";
+        } else {
+            result = separator + result;
+        }
+        return result;
     }
 
 }

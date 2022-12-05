@@ -172,23 +172,28 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
     }
 
     def registerService(MeshElement elt, ServiceBase service) {
+        'String iId;'
         for (String s: serviceVars) {
+            'iId = ServiceBase.getApplicationInstanceId(${s}.getId());
+            if (iId == null || iId.length() == 0) {
+                iId = "dflt";
+            }'
             'serviceSent = Counter.builder("service.sent")
                 .baseUnit("tuple/s")
                 .description("Tuples sent out by a service")
                 .tags("service", "${elt.impl.id}", "application", "${app.id}", "device", Id.getDeviceId(), 
-                    "serviceId", ${s}.getId())
+                    "serviceId", ${s}.getId(), "applicationInstance", iId)
                 .register(metrics.getRegistry());'
             'serviceReceived = Counter.builder("service.received")
                 .baseUnit("tuple/s")
                 .description("Tuples received by a service")
                 .tags("service", "${elt.impl.id}", "application", "${app.id}", "device", Id.getDeviceId(), 
-                    "serviceId", ${s}.getId())
+                    "serviceId", ${s}.getId(), "applicationInstance", iId)
                 .register(metrics.getRegistry());'
             'processingTime = io.micrometer.core.instrument.Timer.builder("service.processed")
                 .description("Main processing time of a service")
                 .tags("service", "${elt.impl.id}", "application", "${app.id}", "device", Id.getDeviceId(), 
-                    "serviceId", ${s}.getId())
+                    "serviceId", ${s}.getId(), "applicationInstance", iId)
                 .register(metrics.getRegistry());'
             '${attachMetricsProvider("${s}")}'
             '${genMapService("${s}")}'
@@ -209,8 +214,7 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
             prefix = "receive";
         }
         String func = "${prefix}${coType}_${toIdentifier(receiver.impl.id)}";
-
-        'createReceptionCallback("${source.impl.id}_${coType}", ${func}(), ${coType}.class, "${func}-in-0");'
+        'createReceptionCallback(${composeDestination("${source.impl.id}_${coType}", app, "appInstId")}, ${func}(), ${coType}.class, "${func}-in-0");'
     }
     
     def attachIngestors(MeshElement elt, ServiceBase base) {
@@ -229,7 +233,7 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
         } else {
             methodName = "attach${methodSuffix}Ingestor";
         }
-        String expr = generateTransportSend(base, type, springConnId(base, conn, target), connPlaceHolder);
+        String expr = generateTransportSend(base, type, springConnId(base, conn, target, app), connPlaceHolder);
         'service.${methodName}(data -> ${genSentProbe(base, expr, false, type, "data")});'
     }
     
@@ -242,7 +246,7 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
             if (familyInterface <> "" and familyMember == sender) {
                 senderId = elt.impl.id;
             }
-            'Transport.send(c -> c.asyncSend("${senderId}_${type}", data), "${senderId}"${connPlaceHolder})'
+            'Transport.send(c -> c.asyncSend(${composeDestination("${senderId}_${type}", app, "appInstId")}, data), "${senderId}"${connPlaceHolder})'
         }
     }
     
@@ -477,12 +481,17 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
     def attachMetricsProvider(String serviceVarName) {
         'MonitoringService.setUp(${serviceVarName}, metrics);'
     }
+    
+    def initAppInstId(String serviceVar) {
+        'appInstId = getAppInstIdSuffix(${serviceVar}, "_");'
+    }
 
     def initialService(MeshElement elt, JavaService service, setOf(String) serviceVars) {
         if (service.class.length() > 0) {
             serviceVars.add("service");
             '${generateAbstractServiceCreateInstance(elt, service, "service", service.class)}'
             '${generateParameterInit(service)|e}'
+            '${initAppInstId("service")}'
         } else {
             '// NO service defined, no initialization possible'
         }
@@ -500,7 +509,8 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
         ${getYamlServiceFragment("serviceData", clsName, conn.id)}; 
         service = new ${wrapperCls(conn)}${getConnectorGenerics(conn, true)}(serviceData, conn, 
             () -> param);
-        service.setReceptionCallback(new ConnectorReceptionCallback());'
+        service.setReceptionCallback(new ConnectorReceptionCallback());
+        ${initAppInstId("service")}'
     }
     
     def wrapperCls(Connector conn) {
@@ -545,6 +555,7 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
         ''
     }
     
+    // still needed??
     def generateReceptionCallback(MeshProcessor elt, ServiceBase service, String serviceId) {
         for (IOType out : elt.output) {
              String type = toTypeName(out.type);
@@ -718,7 +729,8 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
     def initialService(MeshElement elt, ServiceFamily family, setOf(String) serviceVars) {
         serviceVars.add("familyStub");
         'familyStub = new FamilyServiceStub("${family.id}", 
-            AbstractService.getResourceAsStream(${getClsName(elt)}.class.getClassLoader(), "${getDeploymentDescriptorPath()}"));'
+            AbstractService.getResourceAsStream(${getClsName(elt)}.class.getClassLoader(), "${getDeploymentDescriptorPath()}"));
+        ${initAppInstId("familyStub")}'
     }
 
     def generateSelectorServiceAttribute(ServiceFamily family, FamilyMemberSelector selector) {
@@ -965,6 +977,7 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
             String type = toTypeName(out);
             'service.registerOutputTypeTranslator(${type}.class, "${type}", new ${type}OutputTranslator());\n'
         }
+        '${initAppInstId("service")}'
     }
     
     def generateImports(PythonService service) {
@@ -981,7 +994,7 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
     }
         
     def genIngestor(PythonService service, String methodSuffix, String conn, String type, String dir, ServiceBase target, String connPlaceHolder) {
-        String expr = generateTransportSend(service, type, springConnId(service, conn, target), connPlaceHolder);
+        String expr = generateTransportSend(service, type, springConnId(service, conn, target, app), connPlaceHolder);
         'service.attachIngestor(${type}.class, "${type}", data -> ${genSentProbe(service, expr, false, type, "data")});'
     }
 
@@ -1113,6 +1126,7 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
             private Counter serviceSent;
             private Counter serviceReceived;
             private io.micrometer.core.instrument.Timer processingTime;
+            private String appInstId = "";
             ${generateInputEventHandlers(elt, impl, mainClsName)|e}
 
             ${generateReceptionCallback(elt, impl)|e}
@@ -1140,7 +1154,7 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
                 }
             }
             ${generateAdapterTranslators(elt)}
-            ${generateReceptionCallback(elt)}
+            ${generateReceptionCallback(elt, app)}
             ${generateEventHandlers(elt, impl)|e}
             ${generateServiceBase(implements)|e}
         }'

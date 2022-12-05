@@ -14,10 +14,6 @@ package de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAa
 
 /**
  * Enum used to specify the type of Meter.<br>
- * This enum is used to aid the
- * {@link MetricsAasConstructor#addCustomMetric(MetricsAasConstructionBundle, String, MeterType)}
- * method to create the correct type of custom metric that the user wants to
- * create.<br>
  * There are three types of Metric:
  * <ul>
  * <li>Counters</li>

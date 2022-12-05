@@ -23,6 +23,8 @@ In progress:
 * [#69](https://github.com/iip-ecosphere/platform/issues/69): Revise platform installation guidelines
 * [#100](https://github.com/iip-ecosphere/platform/issues/100): Run multiple app instances
 * [#101](https://github.com/iip-ecosphere/platform/issues/101): Documentation of fixed formats used by the platform
+* [#109](https://github.com/iip-ecosphere/platform/issues/101): Maven integration for platform/application instantiation and orchestrated execution of Maven, e.g., for the examples.
+* [#54](https://github.com/iip-ecosphere/platform/issues/54): Document example models 
 
 New features:
 * [#51](https://github.com/iip-ecosphere/platform/issues/51): Device specific measurement plugin for Phoenix Contact AXC
@@ -42,7 +44,7 @@ Improvements:
 * [#38](https://github.com/iip-ecosphere/platform/issues/89): Transparent numpy conversion in generated Python
 * [#58](https://github.com/iip-ecosphere/platform/issues/58): Remove user/password/keystore from model/code, use identity store instead
 * [#95](https://github.com/iip-ecosphere/platform/issues/96): Document IVML model/variables for UI
-* [#54](https://github.com/iip-ecosphere/platform/issues/54): Document example models 
+* [#53](https://github.com/iip-ecosphere/platform/issues/53): Document test models 
 * [#85](https://github.com/iip-ecosphere/platform/issues/85): Display of platform build information on the UI
 * [#104](https://github.com/iip-ecosphere/platform/issues/104): Generation and execution of synchronous Python services/Java sinks
 * [#108](https://github.com/iip-ecosphere/platform/issues/108): Generated implementation templates support Eclipse PythonEditor PyDev
@@ -100,7 +102,7 @@ New functionality:
 * EASy-Producer version 1.3.2
 * Complete platform runs in Docker container, see [install information](../documentation/INSTALL.md) how to play with them.
 * Installation summary for Docker containers and platform from scratch on github.
-* Model-based of KODEX as platform service (and upgrade to 0.0.8) for anonymization/pseudonymization (GO program, via command line streams). Respective extension of configuration model and code generation.
+* Model-based integration of KODEX as platform service (and upgrade to 0.0.8) for anonymization/pseudonymization (GO program, via command line streams). Respective extension of configuration model and code generation.
 * Initial mapping of the AAS product name/typeplate into the AAS abstraction and the default BaSyx implementation.
 * Initial version of service execution with multiple brokers and data paths between multiple devices.
 * More flexible device ids via IdProvider and, if permitted, overriding the device id via command line parameter `--iip.id`.
@@ -114,7 +116,7 @@ New functionality:
 * Platform can instantiate broker.
 * Template projects for application creation.
 * Lifecycle profiles for starting parts of components.
-* Integration of Prometheus for central monitoring, i.e., delivery of micrometer data into prometheus, alerts to AAS. Disabled, conflicting with Tomcat/Apache Qpid.
+* Integration of Prometheus for central monitoring, i.e., delivery of micrometer data into prometheus, alerts to AAS. Disabled, conflicting with Tomcat/Apache Qpid.    
 
 Bug fixes / Improvements:
 * Missing resource headline/identifier in platform Cli

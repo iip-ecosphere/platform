@@ -274,6 +274,11 @@ public class CliTest {
         @Override
         public void stopServiceAsTask(String taskId, String... serviceId) throws ExecutionException {
         }
+
+        @Override
+        public int getServiceInstanceCount(String serviceId) {
+            return 0;
+        }
         
     }
 
@@ -360,6 +365,11 @@ public class CliTest {
 
         @Override
         public void stopContainerAsTask(String taskId, String id) throws ExecutionException {
+        }
+
+        @Override
+        public String getId(URI location) {
+            return null;
         }
         
     }

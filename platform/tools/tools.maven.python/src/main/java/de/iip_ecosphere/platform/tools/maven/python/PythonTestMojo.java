@@ -44,7 +44,7 @@ public class PythonTestMojo extends AbstractMojo {
     @Parameter(property = "python-test.failOnError", defaultValue = "true")
     private boolean failOnError;
     
-    @Parameter(property = "python-test.modelProject", defaultValue = "src/test/python")
+    @Parameter(property = "python-test.modelProject", defaultValue = "../../../target/pySrc")
     private String modelProject;
     
     @Parameter(property = "python-test.skip", required = false, defaultValue = "false")

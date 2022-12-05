@@ -12,6 +12,8 @@
 
 package de.iip_ecosphere.platform.ecsRuntime;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -50,12 +52,37 @@ public abstract class AbstractContainerManager<C extends ContainerDescriptor> im
     }
     
     @Override
+    public String getId(URI location) {
+        String result = null;
+        URI loc = location.normalize();
+        for (C desc : containers.values()) {
+            if (desc.getUri().equals(loc)) {
+                result = desc.getId();
+                break;
+            }
+        }
+        return result;
+    }
+    
+    @Override
     public ContainerState getState(String id) {
         ContainerState result = ContainerState.UNKNOWN;
         if (null != id) {
             ContainerDescriptor d = containers.get(id);
             if (null != d) {
                 result = d.getState();
+            } else {
+                try {
+                    String uriId = new URI(id).normalize().toString();
+                    for (C desc : containers.values()) {
+                        if (desc.getUri().toString().equals(uriId)) {
+                            result = desc.getState();
+                            break;
+                        }
+                    }
+                } catch (URISyntaxException e) {
+                    // input not an URI, ignore
+                }
             }
         }
         return result;
@@ -72,7 +99,7 @@ public abstract class AbstractContainerManager<C extends ContainerDescriptor> im
     protected String addContainer(String id, C descriptor) throws ExecutionException {
         checkId(id, "id");
         if (containers.containsKey(id)) {
-            throwExecutionException(null, "Container id '" + id + "' is already known");
+            throwExecutionException(null, "Container id '" + id + "' " + EXC_ALREADY_KNOWN);
         }
         containers.put(id, descriptor);
         EcsAas.notifyContainerAdded(descriptor);

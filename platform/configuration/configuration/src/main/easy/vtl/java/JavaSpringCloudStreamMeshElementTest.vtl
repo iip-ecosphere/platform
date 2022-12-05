@@ -21,7 +21,7 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
     def generateIngestor(ServiceBase base, String methodSuffix, String conn, String type, String dir, ServiceBase target, String connPlaceHolder) {
         if (not(doneIngestors.includes(type))) {
             doneIngestors.add(type);
-            if (springConnId(base, conn, target) <> "") { 
+            if (springConnId(base, conn, target, app) <> "") { 
                 'matcher.addPredicate(${type}.class, getAssertPredicate${type}());' // dynamic evaluation, no test needed
             } else {
                 'final Predicate<${type}> pred${type} = getAssertPredicate${type}();
@@ -372,7 +372,7 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
             for (IOType predOut : p.impl.output) {
                 if (inTypes.includes(predOut.type)) {
                     String conn = getMethodSuffixId(getMethodSuffix(p, toTypeName(predOut), outType(p, predOut)), p);
-                    String connId = springConnId(p.impl, conn, elt.impl);
+                    String connId = springConnId(p.impl, conn, elt.impl, app);
                     String typeName = toTypeName(predOut);
                     String attributeName = firstToLowerCase(typeName);
                     String fullTypeName = typeName;
@@ -593,7 +593,7 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
             }
         }
 
-        calcBindings(mMesh, no, destinations, functions, sources, elt.impl.id);
+        calcBindings(mMesh, no, destinations, functions, sources, elt.impl.id, app);
         setOf(String) dest = {};
         if (destinations.size() > 0) {
             for (String k : destinations.keys().asSequence()->sortedBy(e|e)) { // sortedBy for testing

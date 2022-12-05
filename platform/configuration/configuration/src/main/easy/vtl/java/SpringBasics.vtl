@@ -21,12 +21,13 @@ template SpringBasics(Configuration config, FileArtifact target) {
     * Returns an empty string if the connection shall be realized via the transport layer. Returns
     * A connection id if the connection shall happen through the active Spring binder.
     */
-    def springConnId(ServiceBase source, String conn, ServiceBase target) {
+    def springConnId(ServiceBase source, String conn, ServiceBase target, Application app) {
         String springConnId = "";
         if (source.kind <> ServiceKind::SOURCE_SERVICE // source always via transfer 
             and source.kind <> ServiceKind::SINK_SERVICE // sinks no output, only backward, via transfer
             and source.asynchronous and not(target.asynchronous)) {
             // async -> sync connection requires spring as target is function
+            // app may be used here if destination names are used
             springConnId = "${conn}-in-0";
         }
         springConnId;
@@ -59,7 +60,8 @@ template SpringBasics(Configuration config, FileArtifact target) {
     * output by ref.
     */
     def calcBindings(mapOf(MeshElement, setOf(MeshConnector)) mappedMesh, sequenceOf(MeshElement) nodes, 
-        mapOf(String, setOf(String)) destinations, setOf(String) functions, setOf(String) sources, String filterFunc) {
+        mapOf(String, setOf(String)) destinations, setOf(String) functions, setOf(String) sources, String filterFunc, 
+        Application app) {
         for (MeshElement elt: mappedMesh.keys()) {
             ServiceBase eltImpl = elt.impl;
           
@@ -88,7 +90,7 @@ template SpringBasics(Configuration config, FileArtifact target) {
                                         }
                                     }
                                 }
-                                addDestination(destinations, "${eId}-out-0", eltId); // appId may be added
+                                addDestination(destinations, "${eId}-out-0", composeDestination(eltId, app));
                                 if (includeInFunc(filterFunc, eId)) {
                                     functions.add(eId);
                                 }
@@ -97,7 +99,7 @@ template SpringBasics(Configuration config, FileArtifact target) {
                                 addDestination(destinations, "${nextId}-in-0", "*");
                             }
                             
-                            addDestination(destinations, "${nextId}-in-0", eltId); // destination name source
+                            addDestination(destinations, "${nextId}-in-0", composeDestination(eltId, app)); // destination name source
                             if (includeInFunc(filterFunc, nextId)) {
                                 functions.add(nextId);
                             }

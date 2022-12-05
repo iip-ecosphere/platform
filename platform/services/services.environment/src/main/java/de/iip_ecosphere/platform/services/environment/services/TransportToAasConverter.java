@@ -259,28 +259,59 @@ public abstract class TransportToAasConverter<T> {
             for (Method m : cls.getMethods()) {
                 if (isGetter(m)) {
                     String field = m.getName().substring(PREFIX_GETTER.length());
+                    Class<?> valueCls = null;
+                    Object value = null;
                     TypeConverter tConv = converters.get(m.getReturnType());
-                    if (null != tConv) {
-                        try {
-                            payloadBuilder.createPropertyBuilder(AasUtils.fixId(field))
-                                .setValue(tConv.getType(), tConv.convert(m.invoke(payload)))
-                                .build();
-                        } catch (SecurityException | InvocationTargetException | IllegalAccessException e) {
-                            LoggerFactory.getLogger(getClass()).error(
-                                "Cannot map value of operation {}/field {} to AAS: {}", 
-                                m.getName(), field, e.getMessage());
+                    if (null == tConv) { // not found, could be Object, try via actual type
+                        value = getValue(payload, m, field);
+                        if (null != value) {
+                            valueCls = value.getClass();
+                            tConv = converters.get(valueCls);
                         }
+                    }
+                    if (null != tConv) {
+                        if (null == valueCls) { // not called so far
+                            value = getValue(payload, m, field);
+                        }
+                        payloadBuilder.createPropertyBuilder(AasUtils.fixId(field))
+                            .setValue(tConv.getType(), tConv.convert(value))
+                            .build();
                     } else {
                         if (!METHODS_TO_IGNORE.contains(m.getName())) {
+                            String type = cls.getName();
+                            if (null != valueCls) {
+                                type += "/" + valueCls;
+                            }
                             LoggerFactory.getLogger(getClass()).warn(
-                                "Cannot map value of operation {}/field {} to AAS: No converter is defined", 
-                                m.getName(), field);
+                                "Cannot map value of operation {}/field {} of type {} to AAS: No converter defined", 
+                                m.getName(), field, type);
                         }
                     }
                 }
             }
             payloadBuilder.build();
         }
+    }
+
+    /**
+     * Obtains the value return by {@code method} on {@code payload}.
+     * 
+     * @param object the object to call the method on
+     * @param method the method to call
+     * @param field the represented field (for logging)
+     * @return the value of {@code field} via {@code method}
+     */
+    private Object getValue(Object object, Method method, String field) {
+        Object result;
+        try {
+            result = method.invoke(object);
+        } catch (SecurityException | InvocationTargetException | IllegalAccessException e) {
+            result = null;
+            LoggerFactory.getLogger(getClass()).error(
+                "Cannot obtain value of operation {}/field {} of class {} to AAS: {}", 
+                method.getName(), field, method.getDeclaringClass().getName(), e.getMessage());
+        }
+        return result;
     }
     
     /**

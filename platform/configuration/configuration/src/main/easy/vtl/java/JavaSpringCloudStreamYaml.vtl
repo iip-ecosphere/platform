@@ -84,6 +84,14 @@ template JavaSpringCloudStreamYaml(IIPEcosphere config, FileArtifact target, map
             "localhost";
         }
     } 
+    
+    def protocolPort(TransportProtocol protocol, Boolean global) {
+        if (global or not(isDefined(protocol.localPort))) {
+            protocol.port;
+        } else {
+            protocol.localPort;
+        }
+    }
 
     // convenience function
     def protocolConfig(IIPEcosphere config, Boolean global) {
@@ -110,7 +118,7 @@ template JavaSpringCloudStreamYaml(IIPEcosphere config, FileArtifact target, map
     def produceProtocolConfig(TransportProtocol protocol, String key, Boolean global, Boolean userPwdFallback) {
         '${key}:
             host: ${protocolHost(protocol, global)}
-            port: ${protocol.port}
+            port: ${protocolPort(protocol, global)}
             ${produceTransportSecurity(protocol, userPwdFallback)|e}'
     }
     
@@ -151,7 +159,7 @@ template JavaSpringCloudStreamYaml(IIPEcosphere config, FileArtifact target, map
         mapOf(String, setOf(String)) destinations = {};
         setOf(String) functions = {};
         setOf(String) sources = {};
-        calcBindings(mappedMesh, nodes, destinations, functions, sources, "");
+        calcBindings(mappedMesh, nodes, destinations, functions, sources, "", app);
 
         '${protocolConfig(config, false)}'
         '${produceTransport(config)}'

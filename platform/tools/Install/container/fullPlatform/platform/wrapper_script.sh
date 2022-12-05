@@ -12,13 +12,13 @@ do
   sleep 1
 done
 printf "\n\n>>> Starting local ECS-Runtime...\n"
-./ecs.sh &
+bash ecs.sh --iip.id=fullPlatform &
 while [ ! -f /run/iip-ecsRuntime.pid ]
 do
   sleep 1
 done
 printf "\n\n>>> Starting local Service Manager...\n"
-bash serviceMgr.sh &
+bash serviceMgr.sh --iip.id=fullPlatform &
 while [ ! -f /run/iip-serviceMgr.pid ]
 do
   sleep 1
@@ -33,3 +33,4 @@ printf "\n\n>>> Starting UI...\n"
 bash mgtUi.sh
 
 fg %1
+
