@@ -7,10 +7,10 @@ This example currently contains two parts:
 * A generated connector based on a preliminary model.  
 
     * Ensure that the Maven platformDependencies are installed (see [install](https://github.com/iip-ecosphere/platform/tree/main/platform/tools/Install))
-    * Obtain the platform configuration meta-model, which is intentionally not included here: `mvn -P EasyGen generate-sources` (use `-U` to update it if it is already in place) 
-    * Instantiate the pseudo-application using the OPC UA connector: `mvn -P EasyGen exec:java@generateApps`
-    * If you try the example from within Eclipse, we would now need here now a Maven project refresh.
-    * Compile the project with `mvn -P App compile`
+    
+    * Execute `mvn -U install` This will perform the interface generation, the code compilation and packaging as well as the final application packaging. Build steps are only executed if the configuration model changes or generate code is not already existing. If a `resources.ipr` folder is present, it will take precendence over the `resources` folder. 
+    * To update/upgrade the model, call `mvn -U generate-sources -Dunpack.force=true`.
+  
     * Run the generated connector with `mvn -P App exec:java@generatedConnector`
     * The generated connector writes `opcTest.txt` containing measurements provided through a micrometer timing probe.
 * A hand-crafted connector for comparison: `mvn -P App exec:java@manualConnector`

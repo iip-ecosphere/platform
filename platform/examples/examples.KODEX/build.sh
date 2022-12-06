@@ -7,11 +7,13 @@ rm -rf gen
 
 #build with broker
 
-mvn -U -P EasyGen generate-sources
-mvn -P EasyGen exec:java@generateBroker
-mvn -P EasyGen exec:java@generateAppsNoDeps
-mvn -U -P App install -DskipTests
-mvn -P EasyGen exec:java@generateApps
+#mvn -U -P EasyGen generate-sources
+#mvn -P EasyGen exec:java@generateBroker
+#mvn -P EasyGen exec:java@generateAppsNoDeps
+#mvn -U -P App install -DskipTests
+#mvn -P EasyGen exec:java@generateApps
+
+mvn -U install
 
 cd ..
 
