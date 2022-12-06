@@ -196,26 +196,6 @@
 		           </executions>
 		       </plugin>
 		       
-	           <plugin>
-	                <groupId>de.iip-ecosphere.platform</groupId>
-	                <artifactId>maven-python</artifactId>
-	                <version>${project.version}</version>
-	                <executions>
-	                    <execution>
-	                        <id>py-compile</id>
-	                        <goals>
-	                            <goal>compile-python</goal>
-	                        </goals>
-	                    </execution>
-                        <execution>
-                            <id>py-test</id>
-                            <goals>
-                                <goal>test-python</goal>
-                            </goals>
-                        </execution>
-	                </executions>
-	            </plugin>
-		       
 		        <plugin>
 		            <groupId>org.codehaus.mojo</groupId>
 		            <artifactId>exec-maven-plugin</artifactId>

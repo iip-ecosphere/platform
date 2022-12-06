@@ -170,33 +170,6 @@
                       <mainClass>de.iip_ecosphere.platform.examples.python.Starter</mainClass>
                   </configuration>
               </plugin>
-	         <plugin>
-	            <groupId>de.iip-ecosphere.platform</groupId>
-	            <artifactId>maven-python</artifactId>
-	            <version>${project.version}</version>
-                <executions>
-                    <execution>
-                        <id>py-compile</id>
-                        <goals>
-                            <goal>compile-python</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>py-test</id>
-                        <goals>
-                            <goal>test-python</goal>
-                        </goals>
-                        <configuration>
-                          <fileset>
-                            <directory>src/test/python</directory>
-                            <includes>
-                                <include>**/*Test.py</include>
-                            </includes>
-                          </fileset>                            
-                        </configuration>                        
-                    </execution>
-                </executions>
-	        </plugin>
           </plugins>
         </build> 
      </profile>
