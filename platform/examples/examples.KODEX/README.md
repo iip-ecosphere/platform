@@ -9,13 +9,8 @@ As stated above, directly after obtaining this project, the application will not
 
   * Ensure that the Maven platformDependencies are installed and up to date (see [install](https://github.com/iip-ecosphere/platform/tree/main/platform/tools/Install))
   * Ensure that the In-Memory H2 database running (see [examples.KODEX.db](https://github.com/iip-ecosphere/platform/tree/main/platform/examples/examples.KODEX/examples.KODEX.db))
-  * Obtain the actual platform configuration meta-model, which is intentionally not included here: `mvn -P EasyGen generate-sources`.
-  * Instantiate the application. This creates the interfaces, the generic implementation of the services and data classes as well as the Spring Cloud Stream services, but it does not bind the service implementation against the application (not compilable so far, please note the `generateAppsNoDeps` argument). `mvn -P EasyGen exec:java@generateAppsNoDeps`
-  * If you try the example from an IDE, please perform a Maven project refresh. In extreme cases, for the first run, you may even have to restart your IDE here.
-  * Compile the project with `mvn -P App install -DskipTests`. This makes the service implementations for source and receiver available to the instantiation.
-  * Re-instantiate the application as done above. This step binds the service implementation provided by this project to the application (please note the `generateApps` argument): `mvn -P EasyGen exec:java@generateApps`
-    
-In case you have to change the resources folder, e.g., to utilize licensed resources, you should add `-Diip.resources="NewFolderName"` to the commands (default value is `resources`). For example `mvn -P EasyGen exec:java@generateApps -Diip.resources="NewFolderName"`.
+  * Execute `mvn -U install` This will perform the broker-instantiation, the interface generation, the code compilation and packaging as well as the final application packaging. Build steps are only executed if the configuration model changes or generate code is not already existing. If a `resources.ipr` folder is present, it will take precendence over the `resources` folder. 
+  * To update/upgrade the model, call `mvn -U generate-sources -Dunpack.force=true`.
 
 If you want to execute the example in a platform installation, add `gen/KODEX/SimpleKodexTestingApp/target/SimpleKodexTestingApp-0.1.0-SNAPSHOT-bin.jar` to the devices and execute the application (Platform CLI, deployment script, etc. see Platform Handbook for details). If you want to execute the application standalone without platform:
     
