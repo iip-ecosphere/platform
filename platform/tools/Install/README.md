@@ -9,7 +9,7 @@ For running the platform as well as for supporting the development of the platfo
 * Run `mvn install` in the folder `platformDependencies`. 
 
 If you also want to install/execute the platform, also execute
-  * Run `mvn package -DskipTests` in the *main folder* of the install package.
+  * Run `mvn package` in the *main folder* of the install package.
   * Modify `src/main/easy/InstallTest.ivml` in particular to reflect your IP addresses.
   * Run `mvn exec:java` in the *main folder* of the install package.
   * Copy the created artifacts in `gen` (`broker`, `ecsJars`, `ecs.*`, `serviceMgr`, `serviceMgr.*`, `SimpleMeshTestingApp-0.1.0-SNAPSHOT.jar`) to the target machines.
