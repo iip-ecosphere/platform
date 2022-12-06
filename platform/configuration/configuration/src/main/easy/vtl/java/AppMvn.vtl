@@ -88,7 +88,7 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
             }            
             appendAssemblyDescriptor(assemblyPlugin, id, path, attach=true, outputDir=outDir, finalName=fName, phase=phase);
         }
-        appendIipPythonPlugin(plugins, projectVersion);
+        //appendIipPythonPlugin(plugins, projectVersion);
         if (springPackaging) {
             appendSpringBootPlugin(plugins, "2.4.2", "${starterCls}");
         }
