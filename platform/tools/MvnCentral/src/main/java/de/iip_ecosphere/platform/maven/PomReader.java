@@ -5,6 +5,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -43,6 +46,7 @@ public class PomReader {
         private String parentGroupId = null;
         private String parentArtifactId = null;
         private String parentVersion = null;
+        private Map<String, String> properties = new HashMap<>();
         
         /**
          * Returns the fullPath.
@@ -118,6 +122,17 @@ public class PomReader {
         public String getParentVersion() {
             return parentVersion;
         }
+        
+        /**
+         * Returns the value of a property.
+         * 
+         * @param property the name of the property
+         * @param dflt the default value if the property does not exist
+         * @return the value, may be <b>null</b> if the property does not exist
+         */
+        public String getProperty(String property, String dflt) {
+            return properties.containsKey(property) ? properties.get(property) : dflt;
+        }
 
         @Override
         public String toString() {
@@ -171,6 +186,11 @@ public class PomReader {
                 @Override
                 public void handleParentPom(Node node) {
                     // ignore
+                }
+                
+                @Override
+                public void handleProperty(Node node, String property) {
+                    info.properties.put(property, node.getTextContent());
                 }
 
                 @Override
@@ -264,6 +284,14 @@ public class PomReader {
          */
         public void handleParentPom(Node node);
         
+        /**
+         * Handles the given property.
+         * 
+         * @param property the property
+         * @param node the node
+         */
+        public void handleProperty(Node node, String property);
+        
     }
     
     /**
@@ -342,6 +370,8 @@ public class PomReader {
                     parseParent(node, handler);
                 } else if (nodeName.equals("modelVersion")) {
                     modelVersion = node.getTextContent();
+                } else if (nodeName.equals("properties")) {
+                    parseProperties(node, handler);
                 }
             }
             if (null == modelVersion) {
@@ -394,7 +424,26 @@ public class PomReader {
         }
         handler.handleParentPom(node);
     }
+
+    /**
+     * Parses a POM property information.
+     * 
+     * @param node the node identified as parent
+     * @param handler the POM handler
+     */
+    private static void parseProperties(Node node, PomHandler handler) {
+        NodeList list = node.getChildNodes();
+        for (int i = 0; i < list.getLength(); i++) {
+            Node child = list.item(i);
+            if (child.getNodeType() == Node.ELEMENT_NODE) {
+                String nodeName = child.getNodeName();
+                handler.handleProperty(child, nodeName);
+            }
+        }        
+    }
     
+    // checkstyle: stop parameter number check
+
     /**
      * Replaces POM versions.
      * 
@@ -403,11 +452,12 @@ public class PomReader {
      * @param newPomVersion the new POM version (may be <b>null</b> to ignore)
      * @param oldParentPomVersion the old parent POM version (may be <b>null</b> to ignore)
      * @param newParentPomVersion the new parent POM version (may be <b>null</b> to ignore)
+     * @param properties set of properties to be considered for POM version replacement
      * @return whether {@code file} was modified
      * @throws IOException if reading/writing fails
      */
     public static boolean replaceVersion(File file, String oldPomVersion, String newPomVersion, 
-        String oldParentPomVersion, String newParentPomVersion) throws IOException {
+        String oldParentPomVersion, String newParentPomVersion, Set<String> properties) throws IOException {
         
         PomHandler handler = new PomHandler() {
             
@@ -454,6 +504,16 @@ public class PomReader {
             }
             
             @Override
+            public void handleProperty(Node node, String property) {
+                if (null != oldPomVersion && null != newPomVersion && properties.contains(property)) {
+                    if (equalsSafe(node.getTextContent(), oldPomVersion)) {
+                        node.setTextContent(newPomVersion);
+                        modified = true;
+                    }
+                }
+            }
+
+            @Override
             public boolean wasModified() {
                 return modified;
             }
@@ -462,5 +522,7 @@ public class PomReader {
         readPom(file, handler);
         return handler.wasModified();
     }
-    
+
+    // checkstyle: resume parameter number check
+
 }

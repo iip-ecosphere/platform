@@ -14,6 +14,9 @@ package de.iip_ecosphere.platform.maven;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -39,6 +42,8 @@ public class ChangePomVersion {
     
     private Predicate<String> incPattern;
     private Predicate<String> excPattern;
+    
+    private Set<String> properties = new HashSet<>();
 
     /**
      * Creates a program instance.
@@ -57,6 +62,7 @@ public class ChangePomVersion {
         for (int i = 0; !simulate && i < args.length; i++) {
             simulate = args[i].equals("--simulate"); // safe side...
         }
+        Collections.addAll(properties, getArg(args, "properties", "").replace(';', ':').split(":"));
         
         if (includes.length() == 0) {
             includes = ".*/pom(-model)?.xml$";
@@ -117,7 +123,8 @@ public class ChangePomVersion {
             } 
         } else {
             try {
-                PomReader.replaceVersion(file, oldPomVersion, newPomVersion, oldParentPomVersion, newParentPomVersion);
+                PomReader.replaceVersion(file, oldPomVersion, newPomVersion, oldParentPomVersion, newParentPomVersion, 
+                    properties);
                 System.out.println("done");
             } catch (IOException e) {
                 System.out.println(e.getMessage());
@@ -178,6 +185,7 @@ public class ChangePomVersion {
             System.out.println(" --newParentPOMVersion=<ver>");
             System.out.println(" --includes=.*/pom(-model)?.xml$; regEx match all paths with /");
             System.out.println(" --excludes=.*/gen/.*; regEx match all paths with /");
+            System.out.println(" --properties=<str> : or ; separated list of properties to replace POM version");
             System.out.println(" --simulate=true/false; do not execute");
         } else {
             File f = new File(args[0]);

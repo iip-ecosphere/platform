@@ -18,6 +18,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
@@ -100,7 +102,7 @@ public class PomReaderTest {
         Path source = Paths.get("src/test/resources/testPom3.xml");
         Path target = new File(FileUtils.getTempDirectory(), "testPom3.xml").toPath();
         Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
-        PomReader.replaceVersion(target.toFile(), "0.2.0-SNAPSHOT", "0.3.0", null, null);
+        PomReader.replaceVersion(target.toFile(), "0.2.0-SNAPSHOT", "0.3.0", null, null, new HashSet<>());
         PomInfo info = PomReader.getInfo(target.toFile());
         Assert.assertEquals("0.3.0", info.getVersion());
     }
@@ -115,7 +117,7 @@ public class PomReaderTest {
         Path source = Paths.get("src/test/resources/testPom.xml");
         Path target = new File(FileUtils.getTempDirectory(), "testPom.xml").toPath();
         Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
-        PomReader.replaceVersion(target.toFile(), null, null, "0.3.0-SNAPSHOT", "0.4.0");
+        PomReader.replaceVersion(target.toFile(), null, null, "0.3.0-SNAPSHOT", "0.4.0", new HashSet<>());
         PomInfo info = PomReader.getInfo(target.toFile());
         Assert.assertEquals("0.4.0", info.getParentVersion());
     }
@@ -130,10 +132,29 @@ public class PomReaderTest {
         Path source = Paths.get("src/test/resources/testPom2.xml");
         Path target = new File(FileUtils.getTempDirectory(), "testPom2.xml").toPath();
         Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
-        PomReader.replaceVersion(target.toFile(), "0.2.0-SNAPSHOT", "0.1.0", "0.3.0-SNAPSHOT", "0.4.0");
+        PomReader.replaceVersion(target.toFile(), "0.2.0-SNAPSHOT", "0.1.0", "0.3.0-SNAPSHOT", "0.4.0", 
+            new HashSet<>());
         PomInfo info = PomReader.getInfo(target.toFile());
         Assert.assertEquals("0.1.0", info.getVersion());
         Assert.assertEquals("0.4.0", info.getParentVersion());
+    }
+    
+    /**
+     * Replaces the POM version in testPom3.xml including property.
+     * 
+     * @throws IOException shall not occur
+     */
+    @Test
+    public void testReplacePomProperties() throws IOException {
+        Path source = Paths.get("src/test/resources/testPomProperties.xml");
+        Path target = new File(FileUtils.getTempDirectory(), "testPomProperties.xml").toPath();
+        Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
+        Set<String> props = new HashSet<>();
+        props.add("my.version");
+        PomReader.replaceVersion(target.toFile(), "0.2.0-SNAPSHOT", "0.3.0", null, null, props);
+        PomInfo info = PomReader.getInfo(target.toFile());
+        Assert.assertEquals("0.3.0", info.getVersion());
+        Assert.assertEquals("0.3.0", info.getProperty("my.version", ""));
     }
 
 }
