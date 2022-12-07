@@ -141,6 +141,8 @@
   
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    
+    <iip.version>0.5.0-SNAPSHOT</iip.version> <!-- project.version is always narrowest version -> plugins -->
 
     <org.slf4j.version>1.7.25</org.slf4j.version>
     <com.googlecode.json-simple.version>1.1.1</com.googlecode.json-simple.version>
@@ -534,7 +536,7 @@
       <plugin>
          <groupId>de.iip-ecosphere.platform</groupId>
          <artifactId>maven-python</artifactId>
-         <version>${project.version}</version>
+         <version>${iip.version}</version>
          <executions>
              <execution>
                  <id>py-compile</id>
@@ -601,7 +603,7 @@
                                         maven-python
                                     </artifactId>
                                     <versionRange>
-                                        [0.0.1,)
+                                        [${iip.version},)
                                     </versionRange>
                                     <goals>
                                         <goal>compile-python</goal>
@@ -659,7 +661,7 @@
                                         dependency-plugin
                                     </artifactId>
                                     <versionRange>
-                                        [${project.version},)
+                                        [${iip.version},)
                                     </versionRange>
                                     <goals>
                                         <goal>unpack</goal>
@@ -678,7 +680,7 @@
                                         configuration-plugin
                                     </artifactId>
                                     <versionRange>
-                                        [${project.version},)
+                                        [${iip.version},)
                                     </versionRange>
                                     <goals>
                                         <goal>generateAppsNoDeps</goal>
@@ -702,7 +704,7 @@
                                         invoker-plugin
                                     </artifactId>
                                     <versionRange>
-                                        [${project.version},)
+                                        [${iip.version},)
                                     </versionRange>
                                     <goals>
                                         <goal>install</goal>
