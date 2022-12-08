@@ -22,7 +22,7 @@ project Devices {
 
     compound LxcContainerManager refines ContainerManager {
         // so far, code is copied from LXC; open, unclear what is missing -> cf. Devices.text!
-        NonEmptyString dockerHost;
+        NonEmptyString dockerHost = "/var/snap/lxd/common/lxd/unix.socket";
         NonEmptyString lxcImageYamlFilename = "image-info.yml";
         Boolean deleteWhenUndeployed = false;
         // registry?

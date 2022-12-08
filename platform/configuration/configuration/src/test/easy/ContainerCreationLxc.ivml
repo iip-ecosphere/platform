@@ -1,0 +1,264 @@
+project ContainerCreationLxc {
+
+    import IIPEcosphere;
+    import DataTypes;
+
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+
+    // ------------ component setup ------------------
+
+    serializer = Serializer::Json;
+    // serviceManager, containerManager are already defined    
+        
+    aasServer = {
+        schema = AasSchema::HTTP,
+        port = 9001,
+        host = "127.0.0.1"
+    };
+    aasRegistryServer = {
+        schema = AasSchema::HTTP,
+        port = 9002,
+        host = "127.0.0.1",
+        path = "registry"
+    };
+    aasImplServer = {
+        port = 9003
+    };
+    aasProtocol = AasProtocolVabTcp{};
+    
+    // ------------------ transport --------------------------
+    
+    transportProtocol = TransportProtocolAMQP {
+        port = 8883,
+        security = { // -> identityStore.yml in src/test/ or src/main depeding on use
+            authenticationKey = "amqp"
+        }
+    };
+    
+    serviceProtocol = ServiceProtocolAMQP {};
+    
+    // ------------------ resources/devicemgt ----------------
+    
+    deviceRegistry = BasicDeviceRegistry {
+    };
+    
+    deviceMgtStorage = S3MockDeviceMgtStorage {
+        host = "localhost",
+        port = 8884,
+        region = "local"
+    };
+    
+    // just for testing, this instantiates app rather than platform
+    deviceMgtStorageServer = S3MockDeviceMgtStorageServer{};
+
+    containerManager = LxcContainerManager{};
+
+    // ------------ data types ------------------
+    
+    RecordType rec1 = {
+        name = "Rec1",
+        fields = {
+            Field {
+                name = "intField",
+                type = refBy(IntegerType)
+            }, Field {
+                name = "stringField",
+                type = refBy(StringType)
+            }
+        }
+    };
+    
+    // ------------ individual, reusable services ------------------
+        
+    Service mySourceService = JavaService {
+        id = "SimpleSource",
+        name = "Simple Data Source",
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+        asynchronous = true,
+        class = "de.iip_ecosphere.platform.test.apps.serviceImpl.SimpleSourceImpl",
+        artifact = "de.iip-ecosphere.platform:apps.ServiceImpl:" + iipVer,
+        kind = ServiceKind::SOURCE_SERVICE,
+        output = {{type=refBy(rec1)}}
+    };
+        
+    Service myTransformerService = PythonService {
+    	id = "SimpleTransformer",
+        name = "Simple Data Transformer",
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+        asynchronous = true,	
+        //class = "de.iip_ecosphere.platform.test.apps.serviceImpl.SimpleTransformer3Impl",
+        //artifact = "de.iip-ecosphere.platform:apps.ServiceImpl:" + iipVer,
+        //dependencies = {{name="PythonMesh2", version="1"}},
+        kind = ServiceKind::TRANSFORMATION_SERVICE,
+        input = {{type=refBy(rec1)}},
+        output = {{type=refBy(rec1)}}, 
+        dependencies = {refBy(PYTHON39), refBy(Tflite_Runtime28), refBy(Pandas135), refBy(Sklearn), refBy(Pillow), refBy(KreasApplications108), refBy(Psutil), refBy(Glob2), refBy(OpenCVPython45564)}     
+    };
+    
+    // refBy(ScipPy141), refBy(NumPy1201), // fail, require SysPythonNative and still fail
+    
+    LinuxCommandBasedSystemDependency SysPythonNative = {
+        installCommands = {"apk add make automake gcc g++ subversion python3-dev"}
+    };
+    
+    PythonDependency ScipPy141 = {
+       name = "scipy",
+       version = "1.4.1", 
+       dependencies = {refBy(SysPythonNative)}
+    };
+
+    PythonDependency NumPy1201 = { 
+       name = "numpy",
+       version = "1.20.1", 
+       dependencies = {refBy(SysPythonNative)}
+    };
+    
+    PythonDependency Tflite_Runtime28 = {
+       name = "tflite_runtime",
+       version = "2.8"
+    };
+
+    PythonDependency Pandas135 = {
+       name = "pandas",
+       version = "1.3.5"
+    };
+    
+    PythonDependency Sklearn = {
+       name = "sklearn",
+       version = "0.0"
+    };
+    
+    PythonDependency Pillow = {
+       name = "Pillow",
+       version = "9.1.0"
+    };
+    
+    PythonDependency KreasApplications108 = {
+       name = "Keras-Applications",
+       version = "1.0.8"
+    };
+    
+    PythonDependency Psutil = {
+       name = "psutil",
+       version = "5.9.0"
+    };
+    
+    PythonDependency Glob2 = {
+       name = "glob2",
+       version = "0.7"
+    };
+    
+    PythonDependency OpenCVPython45564 = {
+       name = "opencv-python",
+       version = "4.5.5.64"
+    };
+    
+    Service myReceiverService = JavaService {
+        id = "SimpleReceiver",
+        name = "Simple Data Receiver",
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+        class = "de.iip_ecosphere.platform.test.apps.serviceImpl.SimpleReceiverImpl",
+        artifact = "de.iip-ecosphere.platform:apps.ServiceImpl:" + iipVer,
+        kind = ServiceKind::SINK_SERVICE,
+        input = {{type=refBy(rec1)}}
+    };
+    
+    // --------------------- monitoring ---------------------------
+    
+    // current default: no monitoring configured
+    
+    // ------------------------- UI -------------------------------
+    
+    // current default: no UI configured
+
+    // ------------ application and service nets ------------------
+    
+    Application myApp = {
+        //id = "SimpleMeshApp",
+        id = "SimpleMeshContainerApp",
+        name = "Simple Mesh Testing Container App",
+        //name = "Simple Mesh Testing App",
+        ver = "0.1.0",
+        description = "",
+        createContainer = true,
+        services = {refBy(myMesh)}        
+    };
+    
+    ServiceMesh myMesh = {
+        description = "initial service net",
+        sources = {refBy(mySource)}
+    };
+    
+    MeshSource mySource = {
+        pollInterval = 800, // only if source is synchronous
+        impl = refBy(mySourceService),
+        next = {refBy(myConnMySourceMyReceiver)}
+    };
+    
+    MeshConnector myConnMySourceMyReceiver = {
+        name = "Source->Transformer",
+        next = refBy(myTransformer)
+    };
+    
+    MeshProcessor myTransformer = {
+        impl = refBy(myTransformerService),
+        next = {refBy(myConnMyTransformerMyReceiver)}
+    };
+
+    MeshConnector myConnMyTransformerMyReceiver = {
+        name = "Transformer->Receiver",
+        next = refBy(myReceiver)
+    };
+
+    MeshSink myReceiver = {
+        impl = refBy(myReceiverService)
+    };
+    
+    // ---------------- device ----------------
+    
+    EcsDevice device = {
+        containerType = ContainerType::Ecs_Svc_App
+    };
+    
+    // ---------- generation setup ------------
+    
+    sharedInterfaces = true;
+    sharedArtifact = "de.iip-ecosphere.platform:apps.AppInterfacesContainerCreation:" + iipVer; // for testing all-in-one
+
+    // ------------ freezing ------------------
+    
+    freeze {
+        aas;
+        aasServer;
+        aasRegistryServer;
+        aasImplServer;
+        aasPersistency;
+        aasProtocol;
+        serializer;
+        transportProtocol;
+        serviceManager;
+        serviceProtocol;
+        containerManager;
+        deviceMgtStorageServer;
+        deviceMgtStorage;
+        deviceRegistry;
+        javaModuleOpts;
+        javaOpts;
+        pidDir;
+        sharedInterfaces;
+        sharedArtifact;
+        platformMonitoring;
+        managementUi;
+        artifactsFolder;
+        artifactsUriPrefix;
+        device;
+        .; // every variable declared in this project
+    } but (f|f.bindingTime >= BindingTime.runtimeMon);
+
+}
