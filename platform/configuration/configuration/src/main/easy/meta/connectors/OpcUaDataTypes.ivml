@@ -230,7 +230,7 @@ project OpcUaDataTypes {
     }
 
     compound UAObjectType refines UABaseType {
-		refTo(DataType) type;
+		refTo(DataType) typeDefinition;
 		UAObjectFields fields;
     }
 
@@ -256,7 +256,7 @@ project OpcUaDataTypes {
     }
 
     compound UAVariableType refines UAFieldType {
-    	refTo(DataType) dataType;
+    	refTo(DataType) typeDefinition;
 		Integer accessLevel;
 		Integer valueRank;
 		Integer arrayDimensions;
