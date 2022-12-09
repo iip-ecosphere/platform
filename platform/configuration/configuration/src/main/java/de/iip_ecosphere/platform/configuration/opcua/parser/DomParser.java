@@ -1,0 +1,1075 @@
+package de.iip_ecosphere.platform.configuration.opcua.parser;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Scanner;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
+import de.iip_ecosphere.platform.configuration.opcua.data.*;
+
+/**
+ * Denotes the OPC UA element types.
+ * 
+ * @author Jan-Hendrick Cepok, SSE
+ */
+enum ElementType {
+    OBJECTTYPE, OBJECT, SUBOBJECT, VARIABLE, FIELD, ENUM, DATATYPE, VARIABLETYPE
+}
+
+/**
+ * XML parser for OPC UA companion spec files.
+ * 
+ * @author Jan-Hendrick Cepok, SSE
+ */
+public class DomParser {
+
+    // private NodeList requiredModels;
+    private Document[] documents;
+    private NodeList objectTypeList;
+    private NodeList objectList;
+    private NodeList variableList;
+    private NodeList dataTypeList;
+    private NodeList variableTypeList;
+    private NodeList aliasList;
+    private ArrayList<BaseType> hierarchy;
+
+    // checkstyle: stop parameter number check
+
+    /**
+     * Creates a DOM parser/translator.
+     * 
+     * @param documents returns the documents to process
+     * @param objectTypeList the already parsed object type list
+     * @param objectList the already parsed object list
+     * @param variableList the already parsed variable list
+     * @param dataTypeList the already parsed data type list
+     * @param variableTypeList the already parsed variable type list
+     * @param aliasList the already parsed alias list
+     * @param hierarchy the base type hierarchy
+     */
+    private DomParser(Document[] documents, NodeList objectTypeList, NodeList objectList, NodeList variableList,
+        NodeList dataTypeList, NodeList variableTypeList, NodeList aliasList, ArrayList<BaseType> hierarchy) {
+        // this.requiredModels = requiredModels;
+        this.documents = documents;
+        this.objectTypeList = objectTypeList;
+        this.objectList = objectList;
+        this.variableList = variableList;
+        this.dataTypeList = dataTypeList;
+        this.variableTypeList = variableTypeList;
+        this.aliasList = aliasList;
+        this.hierarchy = hierarchy;
+    }
+    
+    // checkstyle: resume parameter number check
+
+//  public NodeList getRequiredModels() {
+//      return requiredModels;
+//  }
+
+    /**
+     * Searches for a field type variable name.
+     * 
+     * @param uaElement the UA element delivering the node Id to search for
+     * @param hierarchy the type hierarchy to search within
+     * @return the variable name of the found field type
+     */
+    public static String searchVarName(ObjectType uaElement, ArrayList<BaseType> hierarchy) {
+        String varName = "";
+        for (BaseType o : hierarchy) {
+            if (o instanceof ObjectType) {
+                ArrayList<FieldType> fields = ((ObjectType) o).getFields();
+                if (!fields.isEmpty()) {
+                    for (FieldType f : fields) {
+                        if (!(f instanceof VariableType)) {
+                            if (uaElement.getNodeId().equals(f.getNodeId())) {
+                                varName = f.getDataType();
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return varName;
+    }
+    
+    // checkstyle: stop method length check
+
+    /**
+     * Turns OPC UA type names to IIP-Ecosphere meta model type names.
+     * 
+     * @param dataType the data type
+     * @return the translated data type
+     */
+    // TODO REMOVE nur default case ist nötig
+    public static String changeVariableDataTypes(String dataType) {
+        switch (dataType) {
+        case "SByte":
+            dataType = "SByteType";
+            break;
+        case "Boolean":
+            dataType = "BooleanType";
+            break;
+        case "Byte":
+            dataType = "ByteType";
+            break;
+        case "Int16":
+            dataType = "Integer16Type";
+            break;
+        case "UInt16":
+            dataType = "UnsignedInteger16Type";
+            break;
+        case "Int32":
+            dataType = "Integer32Type";
+            break;
+        case "UInt32":
+            dataType = "UnsignedInteger32Type";
+            break;
+        case "Int64":
+            dataType = "Integer64Type";
+            break;
+        case "UInt64":
+            dataType = "UnsignedInteger64Type";
+            break;
+        case "Float":
+            dataType = "FloatType";
+            break;
+        case "Double":
+            dataType = "DoubleType";
+            break;
+        case "String":
+            dataType = "StringType";
+            break;
+        case "DateTime":
+            dataType = "DateTimeType";
+            break;
+        case "Guid":
+            dataType = "opcGuidType";
+            break;
+        case "IdType":
+            dataType = "opcIdType";
+            break;
+        case "LocalizedText":
+            dataType = "opcLocalizedTextType";
+            break;
+        case "UInteger":
+            dataType = "opcUnsignedIntegerType";
+            break;
+        case "Number":
+            dataType = "opcNumberType";
+            break;
+        case "NumericRange":
+            dataType = "opcNumericRangeType";
+            break;
+        case "Range":
+            dataType = "opcRangeType";
+            break;
+        case "EUInformation":
+            dataType = "opcEUInformationType";
+            break;
+        case "UtcTime":
+            dataType = "opcUtcTimeType";
+            break;
+        case "Argument":
+            dataType = "opcArgumentType";
+            break;
+        case "Structure":
+            dataType = "opcStructureType";
+            break;
+        case "DecimalString":
+            dataType = "opcDecimalStringType";
+            break;
+        case "DateString":
+            dataType = "opcDateStringType";
+            break;
+        case "DurationString":
+            dataType = "opcDurationStringType";
+            break;
+        case "NormalizedString":
+            dataType = "opcNormalizedStringType";
+            break;
+        case "TimeString":
+            dataType = "opcTimeStringType";
+            break;
+        default:
+            dataType = "opc" + dataType + "Type";
+            break;
+        }
+        return dataType;
+    }
+    
+    // checkstyle: resume method length check
+
+    /**
+     * Adapts the OPC UA data types to IIP-Ecosphere meta model type names.
+     *  
+     * @param uaElement the UA element to adapt the types for
+     */
+    public static void adaptDatatypesToModel(ObjectType uaElement) {
+        ArrayList<FieldType> fields = uaElement.getFields();
+        for (FieldType f : fields) {
+            if (f instanceof VariableType) {
+                f.setDataType(changeVariableDataTypes(f.getDataType()));
+                fields.set(fields.indexOf(f), f);
+            } else if (f instanceof FieldType) {
+                f.setDataType(BaseType.validateVarName(uaElement.getVarName() + f.getDisplayname()));
+                fields.set(fields.indexOf(f), f);
+            }
+        }
+    }
+
+//  public static String checkString(String input) {
+//    return relatedElement;
+//  }
+
+    /**
+     * Checks the relations and returns a node with NodeId {@code currentNodeId}.
+     * 
+     * @param currentNodeId the node id to search for
+     * @param nodes the nodes to search
+     * @return the found element
+     */
+    public static Element checkRelation(String currentNodeId, NodeList nodes) {
+
+        Element relatedElement = null;
+
+        for (int i = 0; i < nodes.getLength(); i++) {
+            Element node = getNextNodeElement(nodes, i);
+            String nodeId = node.getAttribute("NodeId");
+            if (currentNodeId.equals(nodeId)) {
+                relatedElement = node;
+                i = nodes.getLength();
+            }
+        }
+        return relatedElement;
+    }
+
+    /**
+     * Returns the next node element.
+     * 
+     * @param nodes the nodes to search for
+     * @param iterator the 0-based index into nodes
+     * @return the next node element
+     */
+    public static Element getNextNodeElement(NodeList nodes, int iterator) {
+
+        Node n = nodes.item(iterator);
+        Element node = null;
+
+        if (n.getNodeType() == Node.ELEMENT_NODE) {
+            node = (Element) n;
+        }
+        return node;
+    }
+
+    /**
+     * Retrieves the root parent.
+     * 
+     * @param parentNodeId the parent node id
+     * @return the root parent
+     */
+    public String retrieveRootParent(String parentNodeId) {
+        String rootParent = "";
+        Element element = checkRelation(parentNodeId, objectTypeList);
+        NodeList childNodeList = element.getChildNodes();
+
+        for (int j = 0; j < childNodeList.getLength(); j++) {
+            Element childNode = getNextNodeElement(childNodeList, j);
+            if (childNode != null) {
+                if (childNode.getTagName() == "DisplayName") {
+                    rootParent = "opc" + childNode.getTextContent();
+                }
+            }
+        }
+        return rootParent;
+    }
+
+    /**
+     * Checks for an extern data type.
+     * 
+     * @param dataType the data type to look for
+     */
+    public void checkForExternDataType(String dataType) {
+        NodeList typeList = null;
+        for (int i = 0; i < aliasList.getLength(); i++) {
+            Element alias = getNextNodeElement(aliasList, i);
+            NodeList childNodeList = alias.getChildNodes();
+            for (int j = 0; j < childNodeList.getLength(); j++) {
+                Element childNode = getNextNodeElement(childNodeList, j);
+                if (childNode != null) {
+                    if (childNode.getAttribute("Alias").contentEquals(dataType)) {
+                        String nodeId = childNode.getTextContent();
+                        if (nodeId.contains("ns=")) {
+                            if (!nodeId.contains("ns=1")) {
+                                for (int k = 1; k < documents.length; k++) {
+                                    typeList = documents[k].getElementsByTagName("UADataType");
+                                    nodeId = nodeId.substring(0, nodeId.indexOf("=") + 1) + 1
+                                            + nodeId.substring(nodeId.indexOf(";"), nodeId.length());
+                                    Element element = checkRelation(nodeId, typeList);
+                                    if (element != null) {
+                                        retrieveAttributes(element, null, ElementType.ENUM);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    
+    // checkstyle: stop method length check
+
+    /**
+     * Identifies a specific reference.
+     * 
+     * @param reference the reference to look for
+     * @param node the node to analyze the children
+     * @param type the type to look for
+     * @return the reference value
+     */
+    public String identifySpecificReference(String reference, Node node, ElementType type) {
+//      //TODO REMOVE
+//      if(reference.equals("HasModellingRule")) {
+//          System.out.println("TEST");
+//      }
+        NodeList references = node.getChildNodes();
+        NodeList typeList = null;
+        for (int k = 0; k < references.getLength(); k++) {
+            Element refNode = getNextNodeElement(references, k);
+            if (refNode != null && refNode.getAttribute("ReferenceType").equals(reference)) {
+
+                // get extern List
+                String refId = refNode.getTextContent();
+
+                if (refId.contains("ns=1;") || !refId.contains("ns=")) {
+                    if (refId.contains("ns=1;")) {
+                        // comp spec
+                        if (type == ElementType.OBJECT || type == ElementType.SUBOBJECT) {
+                            typeList = objectTypeList;
+                        } else if (type == ElementType.VARIABLE) {
+                            typeList = variableTypeList;
+                            type = ElementType.VARIABLETYPE;
+                        }
+                    } else if (!refId.contains("ns=")) {
+                        // core
+                        if (type == ElementType.OBJECT || type == ElementType.SUBOBJECT) {
+                            if (reference.equals("HasModellingRule")) {
+                                typeList = documents[0].getElementsByTagName("UAObject");
+                            } else {
+                                typeList = documents[0].getElementsByTagName("UAObjectType");
+                                type = ElementType.OBJECTTYPE;
+                            }
+                        } else if (type == ElementType.VARIABLE) {
+                            if (reference.equals("HasModellingRule")) {
+                                typeList = documents[0].getElementsByTagName("UAObject");
+                                type = ElementType.OBJECT;
+                            } else {
+                                typeList = documents[0].getElementsByTagName("UAVariableType");
+                                type = ElementType.VARIABLETYPE;
+                            }
+                        }
+                    }
+                    String displayName = "";
+                    String description = "";
+                    String documentation = "";
+                    Element refElement = checkRelation(refId, typeList);
+                    if (refElement != null) {
+                        // create Attribute, LÖSUNG FÜR REFERENCE INIT ÜBERLEGEN
+                        NodeList childNodeList = refElement.getChildNodes();
+                        for (int j = 0; j < childNodeList.getLength(); j++) {
+                            Element childNode = getNextNodeElement(childNodeList, j);
+                            if (childNode != null && childNode.getTagName() != "References") {
+                                if (childNode.getTagName() == "DisplayName") {
+                                    reference = childNode.getTextContent().replaceAll("[“”\"]", "");
+                                    displayName = reference;
+                                } else if (childNode.getTagName() == "Description") {
+                                    description = childNode.getTextContent();
+                                } else if (childNode.getTagName() == "Documentation") {
+                                    documentation = childNode.getTextContent();
+                                }
+                            }
+                        }
+                        if (type != ElementType.OBJECT && type != ElementType.SUBOBJECT) {
+                            createElement(type, refElement, displayName, description, documentation, null, null, null,
+                                    null, null, false);
+                        }
+                    }
+                } else {
+                    // other models
+                    String newRefId = refId.substring(0, refId.indexOf("=") + 1) + 1
+                            + refId.substring(refId.indexOf(";"), refId.length());
+                    refId = newRefId;
+                    for (int i = 1; i < documents.length; i++) {
+                        if (type == ElementType.OBJECT || type == ElementType.SUBOBJECT) {
+                            typeList = documents[i].getElementsByTagName("UAObjectType");
+                            type = ElementType.OBJECTTYPE;
+                        } else {
+                            typeList = documents[i].getElementsByTagName("UAVariableType");
+                            type = ElementType.VARIABLETYPE;
+                        }
+                        String displayName = "";
+                        String description = "";
+                        String documentation = "";
+                        Element refElement = checkRelation(refId, typeList);
+                        if (refElement != null) {
+                            // create Attribute
+                            NodeList childNodeList = refElement.getChildNodes();
+                            for (int j = 0; j < childNodeList.getLength(); j++) {
+                                Element childNode = getNextNodeElement(childNodeList, j);
+                                if (childNode != null && childNode.getTagName() != "References") {
+                                    if (childNode.getTagName() == "DisplayName") {
+                                        reference = childNode.getTextContent().replaceAll("[“”\"]", "");
+                                        displayName = reference;
+                                    } else if (childNode.getTagName() == "Description") {
+                                        description = childNode.getTextContent();
+                                    } else if (childNode.getTagName() == "Documentation") {
+                                        documentation = childNode.getTextContent();
+                                    }
+                                }
+                            }
+                            createElement(type, refElement, displayName, description, documentation, null, null, null,
+                                    null, null, false);
+                            break;
+                        }
+                    }
+
+                }
+                // TODO METHODENAUFRUF ERSTELLEN
+                break;
+            }
+        }
+        return reference;
+    }
+    
+    // checkstyle: resume method length check
+
+    /**
+     * Identifies the fields of {@code childNode}.
+     * 
+     * @param childNode the child node to analyze
+     * @return the identified fields
+     */
+    public ArrayList<FieldType> identifyFields(Node childNode) {
+
+        ArrayList<FieldType> fields = new ArrayList<FieldType>();
+        NodeList references = childNode.getChildNodes();
+
+        for (int k = 0; k < references.getLength(); k++) {
+            Element refNode = getNextNodeElement(references, k);
+            // TODO REFERENCES HasOrderedComponent, ToState, FromState ergÃ¤nzen --> weitere
+            // prÃ¼fen
+            if (refNode != null && (refNode.getAttribute("ReferenceType").equals("HasComponent")
+                    || refNode.getAttribute("ReferenceType").equals("HasOrderedComponent")
+                    || refNode.getAttribute("ReferenceType").equals("HasProperty")
+                    || refNode.getAttribute("ReferenceType").equals("FromState")
+                    || refNode.getAttribute("ReferenceType").equals("ToState"))) {
+                String refId = refNode.getTextContent();
+                Element refElement = checkRelation(refId, variableList);
+                if (refElement != null) {
+                    if (fields.size() == 0) {
+                        retrieveAttributes(refElement, fields, ElementType.VARIABLE);
+                    } else {
+                        boolean retrieve = true;
+                        for (FieldType f : fields) {
+                            if (f.getNodeId().equals(refId)) {
+                                retrieve = false;
+                            }
+                        }
+                        if (retrieve) {
+                            retrieveAttributes(refElement, fields, ElementType.VARIABLE);
+                        }
+                    }
+                } else {
+                    // REDUNDANT AUSLAGERN LIST UND ELEMENTTYPE ÜBERGEBEN
+                    refElement = checkRelation(refId, objectList);
+                    if (refElement != null && !(refNode.getAttribute("IsForward").equals("false"))) {
+                        if (fields.size() == 0) {
+                            retrieveAttributes(refElement, fields, ElementType.FIELD);
+                        } else {
+                            boolean retrieve = true;
+                            for (FieldType f : fields) {
+                                if (f.getNodeId().equals(refId)) {
+                                    retrieve = false;
+                                }
+                            }
+                            if (retrieve) {
+                                retrieveAttributes(refElement, fields, ElementType.FIELD);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return fields;
+    }
+
+    /**
+     * Retrieves the root element.
+     * 
+     * @param object the element to start with
+     */
+    public void retrieveRootElement(Element object) {
+        System.out.println("Rootobject:");
+        retrieveAttributes(object, null, ElementType.OBJECT);
+    }
+
+    /**
+     * Retrieves the related sub elements.
+     * 
+     * @param subElements the sub elements to analyze
+     */
+    public void retrieveRelatedSubElements(ArrayList<FieldType> subElements) {
+
+        ArrayList<FieldType> fields = new ArrayList<FieldType>();
+
+        for (FieldType field : subElements) {
+            if (!(field instanceof VariableType)) {
+                Element object = checkRelation(field.getNodeId(), objectList);
+                System.out.println("Subobject:");
+                retrieveAttributes(object, fields, ElementType.SUBOBJECT);
+            }
+        }
+    }
+    
+    // checkstyle: stop method length check
+
+    /**
+     * Retrieves the attributes and creates respective elements.
+     * 
+     * @param element the element to analyze the child nodes for
+     * @param subFields
+     * @param type
+     */
+    public void retrieveAttributes(Element element, ArrayList<FieldType> subFields, ElementType type) {
+
+        String description = "";
+        String displayName = "";
+        String documentation = "";
+        String typeDef = "";
+        String modellingRule = "";
+        boolean optional = false;
+        ArrayList<FieldType> objectFields = new ArrayList<FieldType>();
+        ArrayList<EnumLiteral> literals = new ArrayList<EnumLiteral>();
+        ArrayList<DataLiteral> dataLiterals = new ArrayList<DataLiteral>();
+
+        NodeList childNodeList = element.getChildNodes();
+
+        for (int j = 0; j < childNodeList.getLength(); j++) {
+            Element childNode = getNextNodeElement(childNodeList, j);
+            if (childNode != null && childNode.getTagName() != "References") {
+                if (childNode.getTagName() == "Description") {
+                    description = (childNode.getTextContent() + "@" + childNode.getAttribute("Locale"))
+                            .replaceAll("[“”\"]", "");
+                } else if (childNode.getTagName() == "DisplayName") {
+                    displayName = childNode.getTextContent().replaceAll("[“”\"]", "");
+                    // TODO REMOVE
+                    if (displayName.equals("OperationMode")) {
+                        System.out.println("OperationMode");
+                    }
+                } else if (childNode.getTagName() == "Documentation") {
+                    documentation = childNode.getTextContent().replaceAll("[“”\"]", "");
+                } else if (childNode.getTagName() == "Definition") {
+                    NodeList fields = childNode.getChildNodes();
+
+                    for (int k = 0; k < fields.getLength(); k++) {
+                        Element fieldNode = getNextNodeElement(fields, k);
+                        if (fieldNode != null) {
+                            String fieldName = fieldNode.getAttribute("Name");
+                            String fieldValue = fieldNode.getAttribute("Value");
+                            String fieldDataType = "";
+                            if (fieldValue.equals("")) {
+                                type = ElementType.DATATYPE;
+                                fieldDataType = fieldNode.getAttribute("DataType");
+                            }
+                            String fieldDescription = "";
+                            NodeList fieldChilds = fieldNode.getChildNodes();
+
+                            for (int l = 0; l < fieldChilds.getLength(); l++) {
+                                Element fieldChildNode = getNextNodeElement(fieldChilds, l);
+                                if (fieldChildNode != null) {
+                                    if (fieldChildNode.getTagName() == "Description") {
+                                        if (fieldChildNode.getAttribute("Locale").equals("")) {
+                                            fieldDescription = fieldChildNode.getTextContent();
+                                        } else {
+                                            fieldDescription = fieldChildNode.getTextContent() + "@"
+                                                    + fieldChildNode.getAttribute("Locale");
+                                        }
+                                    }
+                                }
+
+                            }
+                            if (type.equals(ElementType.ENUM)) {
+                                EnumLiteral literal = new EnumLiteral(fieldName, fieldValue, fieldDescription);
+                                literals.add(literal);
+                            } else {
+                                DataLiteral literal = new DataLiteral(fieldName, changeVariableDataTypes(fieldDataType),
+                                        fieldDescription);
+                                dataLiterals.add(literal);
+                            }
+                        }
+
+                    }
+                }
+            } else if (childNode != null && childNode.getTagName() == "References") {
+                if (type != ElementType.VARIABLE && type != ElementType.FIELD && type != ElementType.ENUM) {
+                    objectFields = identifyFields(childNode);
+                }
+                if (type != ElementType.ENUM && type != ElementType.FIELD) {
+                    typeDef = BaseType.validateVarName(identifySpecificReference("HasTypeDefinition", childNode, type));
+                    modellingRule = identifySpecificReference("HasModellingRule", childNode, type);
+                    if (modellingRule.toUpperCase().contains("OPTIONAL")) {
+                        optional = true;
+                    }
+                }
+            }
+        }
+        createElement(type, element, displayName, description, documentation, subFields, objectFields, literals,
+                dataLiterals, typeDef, optional);
+    }
+
+    // checkstyle: stop parameter number check
+
+    /**
+     * Creates an element.
+     * 
+     * @param type the element type.
+     * @param element the actual element
+     * @param displayName the display name
+     * @param description the description
+     * @param documentation the documentation
+     * @param subFields the sub fields
+     * @param objectFields the object fields
+     * @param literals the literals
+     * @param dataLiterals the data literals
+     * @param typeDef the type def
+     * @param optional whether the type is optional
+     */
+    public void createElement(ElementType type, Element element, String displayName, String description,
+        String documentation, ArrayList<FieldType> subFields, ArrayList<FieldType> objectFields,
+        ArrayList<EnumLiteral> literals, ArrayList<DataLiteral> dataLiterals, String typeDef, boolean optional) {
+
+        String dataType;
+        ObjectType uaElement;
+
+        switch (type) {
+        case ENUM:
+            System.out.println("DataType:");
+            EnumType enumeration = new EnumType(element.getAttribute("NodeId"),
+                    element.getAttribute("BrowseName").replaceAll("[“”\"]", ""), displayName, description,
+                    documentation, literals);
+            enumeration.setVarName("opc" + displayName + "Type");
+            if (checkRedundancy(enumeration.getVarName()) == false) {
+                System.out.println(enumeration.toString());
+                hierarchy.add(enumeration);
+                System.out.println("");
+            }
+            break;
+        case DATATYPE:
+            System.out.println("DataType:");
+            DataType uaDataType = new DataType(element.getAttribute("NodeId"),
+                    element.getAttribute("BrowseName").replaceAll("[“”\"]", ""), displayName, description,
+                    documentation, dataLiterals);
+            uaDataType.setVarName("opc" + displayName);
+            System.out.println(uaDataType.toString());
+            hierarchy.add(uaDataType);
+            System.out.println("");
+            break;
+        case SUBOBJECT:
+            uaElement = new ObjectType(element.getAttribute("NodeId"),
+                    element.getAttribute("BrowseName").replaceAll("[“”\"]", ""), displayName, description, typeDef,
+                    objectFields);
+            uaElement.setVarName(searchVarName(uaElement, hierarchy));
+            if (!objectFields.isEmpty()) {
+                adaptDatatypesToModel(uaElement);
+            }
+            System.out.println(uaElement.toString());
+            hierarchy.add(uaElement);
+            System.out.println("");
+            if (!uaElement.getFields().isEmpty()) {
+                retrieveRelatedSubElements(uaElement.getFields());
+            }
+            break;
+        case OBJECT:
+            uaElement = new RootObject(element.getAttribute("NodeId"),
+                    element.getAttribute("BrowseName").replaceAll("[“”\"]", ""), displayName, description, typeDef,
+                    retrieveRootParent(element.getAttribute("ParentNodeId")), objectFields);
+            uaElement.setVarName(retrieveRootParent(element.getAttribute("ParentNodeId")) + displayName);
+            // uaElement.setVarName("opc" + displayName);
+            if (!objectFields.isEmpty()) {
+                adaptDatatypesToModel(uaElement);
+            }
+            System.out.println(uaElement.toString());
+            hierarchy.add(uaElement);
+            System.out.println("");
+            if (!uaElement.getFields().isEmpty()) {
+                retrieveRelatedSubElements(uaElement.getFields());
+            }
+            break;
+        case OBJECTTYPE:
+            ObjectTypeType uaObjectType = new ObjectTypeType(element.getAttribute("NodeId"),
+                    element.getAttribute("BrowseName").replaceAll("[“”\"]", ""), displayName, description,
+                    documentation);
+            uaObjectType.setVarName("opc" + displayName);
+            if (checkRedundancy(uaObjectType.getVarName()) == false) {
+                System.out.println(uaObjectType.toString());
+                hierarchy.add(uaObjectType);
+            }
+
+            System.out.println("");
+            break;
+        case VARIABLE:
+            if (displayName.equals("StacklightMode")) {
+                System.out.println("TEST");
+            }
+            dataType = element.getAttribute("DataType");
+            if (dataType == "EnumValueType") {
+                Element relatedDataTypeElement = checkRelation(element.getAttribute("ParentNodeId"), dataTypeList);
+                NodeList dataChildNodeList = relatedDataTypeElement.getChildNodes();
+                for (int j = 0; j < dataChildNodeList.getLength(); j++) {
+                    Element childNode = getNextNodeElement(dataChildNodeList, j);
+                    if (childNode.getTagName() == "DisplayName") {
+                        dataType = childNode.getTextContent();
+                    }
+                }
+            } else {
+                checkForExternDataType(dataType);
+            }
+            VariableType uaVariable = new VariableType(element.getAttribute("NodeId"),
+                    element.getAttribute("BrowseName").replaceAll("[“”\"]", ""), displayName, description, dataType,
+                    typeDef, optional, element.getAttribute("AccessLevel"), element.getAttribute("ValueRank"),
+                    element.getAttribute("ArrayDimensions"));
+            subFields.add(uaVariable);
+            break;
+        case FIELD:
+            FieldType uaField = new FieldType(element.getAttribute("NodeId"),
+                    element.getAttribute("BrowseName").replaceAll("[“”\"]", ""), displayName, description, "");
+            subFields.add(uaField);
+            break;
+        case VARIABLETYPE:
+            VariableTypeType uaVariableType = new VariableTypeType(element.getAttribute("NodeId"),
+                    element.getAttribute("BrowseName").replaceAll("[“”\"]", ""), displayName, description,
+                    documentation, changeVariableDataTypes(element.getAttribute("DataType")));
+            uaVariableType.setVarName("opc" + displayName);
+            if (checkRedundancy(uaVariableType.getVarName()) == false) {
+                System.out.println(uaVariableType.toString());
+                hierarchy.add(uaVariableType);
+            }
+            break;
+        default:
+            break;
+        }
+    }
+    
+    // checkstyle: resume parameter number check
+    // checkstyle: resume method length check
+
+    /**
+     * Checks for redundant/duplicate variable names in {@link #hierarchy}.
+     * 
+     * @param varName the variable name to check for
+     * @return {@code true} if there are duplicates, {@code false} else
+     */
+    public boolean checkRedundancy(String varName) {
+        boolean duplicateVar = false;
+        for (BaseType o : hierarchy) {
+            if (o.getVarName().equals(varName)) {
+                duplicateVar = true;
+            }
+        }
+        return duplicateVar;
+    }
+
+    /**
+     * Retrieves the element types and nested attributes via 
+     * {@link #retrieveAttributes(Element, ArrayList, ElementType)}.
+     */
+    public void retrieveElementTypes() {
+
+        for (int i = 0; i < objectTypeList.getLength(); i++) {
+            Element objectType = getNextNodeElement(objectTypeList, i);
+            if (objectType != null) {
+                retrieveAttributes(objectType, null, ElementType.OBJECTTYPE);
+            }
+        }
+        for (int i = 0; i < dataTypeList.getLength(); i++) {
+            Element dataType = getNextNodeElement(dataTypeList, i);
+            if (dataType != null) {
+                // TODO ADD elementType.DATATYPE
+                retrieveAttributes(dataType, null, ElementType.ENUM);
+            }
+        }
+    }
+
+    // checkstyle: stop method length check
+
+    /**
+     * Turns a file into an operating-system dependent string path.
+     * 
+     * @param file the file 
+     * @return the path
+     */
+    private static String toOsPath(File file) {
+        return file.toString();
+    }
+    
+    /**
+     * Turns a string (assumed to be a path) into an operating-system dependent string path.
+     * 
+     * @param path the path to be translated 
+     * @return the path
+     */
+    private static String toOsPath(String path) {
+        return toOsPath(new File(path)); // normalize to OS paths
+    }
+    
+    /**
+     * Checks for required models.
+     * 
+     * @param path the path to check for
+     * @param fileName the file name to check for
+     * @param nameSpaceUris the OPC namespace URIs
+     * @return the found/required model files
+     */
+    public static File[] checkRequiredModels(String path, String fileName, NodeList nameSpaceUris) {
+        Scanner scanner = new Scanner(System.in);
+        // suche die Modelle
+        ArrayList<String> uris = new ArrayList<String>();
+        for (int i = 0; i < nameSpaceUris.getLength(); i++) {
+            Element element = getNextNodeElement(nameSpaceUris, i);
+            if (element != null) {
+                NodeList childNodeList = element.getChildNodes();
+
+                for (int j = 0; j < childNodeList.getLength(); j++) {
+                    Element childNode = getNextNodeElement(childNodeList, j);
+                    if (childNode != null) {
+                        if (childNode.getTagName() == "Uri") {
+                            uris.add(childNode.getTextContent());
+                        }
+                    }
+                }
+            }
+        }
+//      //entferne das MutterNodeSet
+        for (Iterator<String> iterator = uris.iterator(); iterator.hasNext();) {
+            String value = iterator.next();
+            if (value.replace("http://opcfoundation.org/UA/", "").replace("/", "").equals(fileName)) {
+                iterator.remove();
+            }
+        }
+        // CORE SPEC
+        uris.add(0, "UA");
+
+        boolean correct = false;
+        File[] models = null;
+        File[] files = null;
+        ArrayList<File> foundFiles = new ArrayList<File>();
+        File f = new File(path, "RequiredModels");
+        do {
+            if (!f.exists()) {
+                File requiredModels = new File(path, "RequiredModels");
+                System.out.println("Directory " + requiredModels.toString() + " is not existing.");
+                boolean created = requiredModels.mkdir();
+                if (created) {
+                    System.out.println("Creating directory.\n");
+                } else {
+                    System.out.println("Directory " + requiredModels.toString() + " can't be created.\n");
+                }
+                System.out.println("Please add the following models to " + requiredModels.toString() + ":");
+                for (String s : uris) {
+                    System.out.println(s);
+                }
+            } else {
+                File requiredModels = new File(path, "RequiredModels");
+                files = f.listFiles();
+                if (files.length == 0) {
+                    System.out.println("The folder RequiredModels is still empty.");
+                    System.out.println("Please add the following models to " + requiredModels.toString() + ":");
+                    for (String s : uris) {
+                        System.out.println(s);
+                    }
+                } else {
+                    String missingModels = "";
+                    boolean modelFound = false;
+                    for (String s : uris) {
+                        s = s.replace("http://opcfoundation.org/UA/", "").replace("/", "").toUpperCase();
+                        for (int i = 0; i < files.length; i++) {
+                            String model = null;
+                            if (toOsPath(files[i]).equals(toOsPath(path + "\\RequiredModels\\Opc.Ua.NodeSet2.xml"))) {
+                                model = "UA";
+                            } else {
+                                model = toOsPath(files[i]).replace(toOsPath(path + "\\RequiredModels\\Opc.Ua."), "")
+                                    .replace(".NodeSet2.xml", "").toUpperCase();
+                            }
+                            if (model.equals(s)) {
+                                if (model.equals("UA")) {
+                                    File rModel = new File(files[i].toString());
+                                    foundFiles.add(rModel);
+                                } else {
+                                    File rModel = new File(files[i].toString());
+                                    foundFiles.add(rModel);
+                                }
+                                modelFound = true;
+                                break;
+                            }
+                        }
+                        if (modelFound == false) {
+                            missingModels += s + "\n";
+                        }
+                        modelFound = false;
+                    }
+                    if (missingModels == "") {
+                        System.out.println("All required models are available in " + path);
+                        models = new File[foundFiles.size()];
+                        models = foundFiles.toArray(models);
+                        correct = true;
+                    } else {
+                        System.out.println("The following models are still missing:\n" + missingModels);
+                    }
+                }
+                // Überprüfung, ob files fehlen und wenn, ja welche
+            }
+            if (correct == false) {
+                boolean confirmed = false;
+                do {
+                    System.out.println("\nPress y to continue if the respective files were added.");
+                    String input = scanner.nextLine();
+                    if (input.equals("y")) {
+                        confirmed = true;
+                    }
+                } while (confirmed == false);
+            }
+        } while (correct == false);
+        scanner.close();
+        return models;
+    }
+    
+    // checkstyle: resume method length check
+
+    /**
+     * Parses a file by retrieving all root elements of the objects in {@link #objectList} and retriving all
+     * data types in {@link #dataTypeList}.
+     */
+    public void parseFile() {
+        for (int i = 0; i < objectList.getLength(); i++) {
+            Element object = getNextNodeElement(objectList, i);
+            if (object != null) {
+                String parentNodeId = object.getAttribute("ParentNodeId");
+                Element rootObject = checkRelation(parentNodeId, objectTypeList);
+                if (rootObject != null) {
+                    retrieveRootElement(object);
+                }
+            }
+        }
+        if (dataTypeList.getLength() > 0) {
+            retrieveElementTypes();
+        }
+    }
+
+    /**
+     * Creates the parser.
+     * 
+     * @param path the path to the OPC UA nodeset models
+     * @param compSpec the companion spec to be parsed
+     * @return the DOM parser after parsing
+     */
+    public static DomParser createParser(String path, File compSpec) {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DomParser parser = null;
+        try {
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document doc = builder.parse(compSpec);
+            System.out.println("\n" + compSpec.getName());
+            NodeList nameSpaceUris = doc.getElementsByTagName("NamespaceUris");
+            NodeList objectTypeList = doc.getElementsByTagName("UAObjectType");
+            NodeList objectList = doc.getElementsByTagName("UAObject");
+            NodeList variableList = doc.getElementsByTagName("UAVariable");
+            NodeList dataTypeList = doc.getElementsByTagName("UADataType");
+            NodeList variableTypeList = doc.getElementsByTagName("UAVariableType");
+            NodeList aliasList = doc.getElementsByTagName("Aliases");
+            ArrayList<BaseType> hierarchy = new ArrayList<BaseType>();
+            // Statt models docs sammeln?
+            File[] models = checkRequiredModels(path,
+                compSpec.toString().replace(toOsPath(path + "\\Opc.Ua."), "").replace(".NodeSet2.xml", ""), nameSpaceUris);
+            Document[] documents = new Document[models.length];
+            for (int i = 0; i < models.length; i++) {
+                System.out.println(models[i]);
+                documents[i] = builder.parse(models[i]);
+            }
+
+            parser = new DomParser(documents, objectTypeList, objectList, variableList, dataTypeList, variableTypeList,
+                aliasList, hierarchy);
+            parser.parseFile();
+        } catch (ParserConfigurationException | SAXException | IOException e) {
+            LoggerFactory.getLogger(DomParser.class).error(e.getMessage());
+        }
+        return parser;
+    }
+
+    /**
+     * Creates the IVML model in the given {@code fileName}.
+     * 
+     * @param fileName the file name for the IVML model
+     * @param ivmlFile the output file
+     */
+    public void createIvmlModel(String fileName, File ivmlFile) {
+        String ivmlHeader = "project Opc" + fileName + " {\n\n" + "\timport IIPEcosphere;\n" + "\timport DataTypes;\n"
+            + "\timport OpcUaDataTypes;\n\n"
+            + "\tannotate BindingTime bindingTime = BindingTime::compile to .;\n\n";
+
+        String ivmlEnding = "\tfreeze {\n" + "\t\t.; // every variable declared in this project\n"
+            + "\t} but (f|f.bindingTime >= BindingTime.compile);\n\n" + "}";
+
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(ivmlFile));
+            writer.write(ivmlHeader);
+            for (BaseType b : hierarchy) {
+                writer.write(b.toString());
+            }
+            writer.write(ivmlEnding);
+            writer.close();
+        } catch (IOException ioe) {
+            LoggerFactory.getLogger(DomParser.class).error(ioe.getMessage());
+        }
+    }
+    
+    
+
+    /**
+     * Executes the parser.
+     * 
+     * @param args command line arguments (ignored)
+     */
+    public static void main(String[] args) {
+        File file;
+        File ivmlFile;
+        if (args.length == 1) {
+            file = new File(args[0]);
+        } else {
+            file = new File("src\\main\\resources\\NodeSets\\Opc.Ua.MachineTool.NodeSet2.xml");
+        }
+        String path = file.getParent();
+        String fileName = file.getName().replace(".NodeSet2.xml", "");
+        ivmlFile = new File("gen\\Opc" + fileName + ".ivml");
+        
+        DomParser parser = createParser(path, file);
+        parser.createIvmlModel(fileName, ivmlFile);
+    }
+    
+}
