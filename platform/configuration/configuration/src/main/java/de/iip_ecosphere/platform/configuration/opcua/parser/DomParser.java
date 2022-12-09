@@ -387,9 +387,6 @@ public class DomParser {
                             }
                         }
                     }
-                    String displayName = "";
-                    String description = "";
-                    String documentation = "";
                     Element refElement = checkRelation(refId, typeList);
                     if (refElement != null) {
                         // create Attribute, LÖSUNG FÜR REFERENCE INIT ÜBERLEGEN
@@ -413,9 +410,6 @@ public class DomParser {
                             typeList = documents[i].getElementsByTagName("UAVariableType");
                             type = ElementType.VARIABLETYPE;
                         }
-                        String displayName = "";
-                        String description = "";
-                        String documentation = "";
                         Element refElement = checkRelation(refId, typeList);
                         if (refElement != null) {
                             DescriptionOrDocumentation d = getDescriptionOrDocumentation(reference, refElement);
