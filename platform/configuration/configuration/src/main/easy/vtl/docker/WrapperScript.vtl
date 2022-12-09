@@ -9,7 +9,7 @@ template WrapperScript(IIPEcosphere config, FileArtifact target, ContainerType c
         '#!/bin/bash'
         ''
         if (containerType == ContainerType::Ecs) {
-            'bash broker.sh &'
+            'bash broker.sh 8889 &'
             'sleep 4;'
             'bash ecs.sh'
         } else if (containerType == ContainerType::Ecs_Svc_App) {
