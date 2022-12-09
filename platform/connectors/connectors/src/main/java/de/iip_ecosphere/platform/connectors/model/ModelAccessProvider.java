@@ -12,6 +12,10 @@
 
 package de.iip_ecosphere.platform.connectors.model;
 
+import java.io.IOException;
+
+import org.slf4j.LoggerFactory;
+
 import de.iip_ecosphere.platform.connectors.MachineConnector;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
 
@@ -35,5 +39,44 @@ public interface ModelAccessProvider {
      * @param modelAccess the model access
      */
     public void setModelAccess(ModelAccess modelAccess);
+    
+    
+    /**
+     * A simple (optional) function that may throw an {@link IOException}. {@link IndexOutOfBoundsException}
+     * is also considered as serializer parsers may throw that also.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public interface IOVoidFunction {
+        
+        /**
+         * Executes the function.
+         * 
+         * @param modelAccess the model access
+         * @throws IOException may be thrown but also caught in {@link #optional(IOVoidFunction)}
+         * @throws IndexOutOfBoundsException may be thrown but also caught in {@link #optional(IOVoidFunction)}
+         */
+        public void execute(ModelAccess modelAccess) throws IOException, IndexOutOfBoundsException;
+
+    }
+
+    /**
+     * Executes {@code func} but consumes {@link IOException} as execution is considered optional.
+     * 
+     * @param modelAccess the model access to be passed into {@code func}
+     * @param func the function to execute
+     * @return {@code true} for success without exception, {@code false} for failed with caught exception
+     */
+    public static boolean optional(ModelAccess modelAccess, IOVoidFunction func) {
+        boolean success = true;
+        try {
+            func.execute(modelAccess);
+        } catch (IOException | IndexOutOfBoundsException e) {
+            LoggerFactory.getLogger(IOVoidFunction.class).debug(
+                "Function call failed, but considered optional. " + e.getMessage());
+            success = false;
+        }
+        return success;
+    }
     
 }
