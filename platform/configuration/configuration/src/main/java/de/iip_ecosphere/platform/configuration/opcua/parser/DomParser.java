@@ -393,23 +393,11 @@ public class DomParser {
                     Element refElement = checkRelation(refId, typeList);
                     if (refElement != null) {
                         // create Attribute, LÖSUNG FÜR REFERENCE INIT ÜBERLEGEN
-                        NodeList childNodeList = refElement.getChildNodes();
-                        for (int j = 0; j < childNodeList.getLength(); j++) {
-                            Element childNode = getNextNodeElement(childNodeList, j);
-                            if (childNode != null && childNode.getTagName() != "References") {
-                                if (childNode.getTagName() == "DisplayName") {
-                                    reference = childNode.getTextContent().replaceAll("[“”\"]", "");
-                                    displayName = reference;
-                                } else if (childNode.getTagName() == "Description") {
-                                    description = childNode.getTextContent();
-                                } else if (childNode.getTagName() == "Documentation") {
-                                    documentation = childNode.getTextContent();
-                                }
-                            }
-                        }
+                        DescriptionOrDocumentation d = getDescriptionOrDocumentation(reference, refElement);
+                        reference = d.reference;
                         if (type != ElementType.OBJECT && type != ElementType.SUBOBJECT) {
-                            createElement(type, refElement, displayName, description, documentation, null, null, null,
-                                    null, null, false);
+                            createElement(type, refElement, d.displayName, d.description, d.documentation, null, 
+                                null, null, null, null, false);
                         }
                     }
                 } else {
@@ -430,23 +418,11 @@ public class DomParser {
                         String documentation = "";
                         Element refElement = checkRelation(refId, typeList);
                         if (refElement != null) {
+                            DescriptionOrDocumentation d = getDescriptionOrDocumentation(reference, refElement);
                             // create Attribute
-                            NodeList childNodeList = refElement.getChildNodes();
-                            for (int j = 0; j < childNodeList.getLength(); j++) {
-                                Element childNode = getNextNodeElement(childNodeList, j);
-                                if (childNode != null && childNode.getTagName() != "References") {
-                                    if (childNode.getTagName() == "DisplayName") {
-                                        reference = childNode.getTextContent().replaceAll("[“”\"]", "");
-                                        displayName = reference;
-                                    } else if (childNode.getTagName() == "Description") {
-                                        description = childNode.getTextContent();
-                                    } else if (childNode.getTagName() == "Documentation") {
-                                        documentation = childNode.getTextContent();
-                                    }
-                                }
-                            }
-                            createElement(type, refElement, displayName, description, documentation, null, null, null,
-                                    null, null, false);
+                            reference = d.reference;
+                            createElement(type, refElement, d.displayName, d.description, d.documentation, null, 
+                                null, null, null, null, false);
                             break;
                         }
                     }
@@ -457,6 +433,47 @@ public class DomParser {
             }
         }
         return reference;
+    }
+    
+    /**
+     * Results instance for {@link DomParser#getDescriptionOrDocumentation(String, Element)}.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static class DescriptionOrDocumentation {
+
+        private String reference;
+        private String displayName = "";
+        private String description = "";
+        private String documentation = "";
+        
+    }
+    
+    /**
+     * Extracts information about description or documentation from {@code refElement}.
+     * 
+     * @param reference the actual reference being processed 
+     * @param refElement the reference element to take the data from
+     * @return result instance carrying the extracted information 
+     */
+    private DescriptionOrDocumentation getDescriptionOrDocumentation(String reference, Element refElement) {
+        DescriptionOrDocumentation result = new DescriptionOrDocumentation();
+        result.reference = reference;
+        NodeList childNodeList = refElement.getChildNodes();
+        for (int j = 0; j < childNodeList.getLength(); j++) {
+            Element childNode = getNextNodeElement(childNodeList, j);
+            if (childNode != null && childNode.getTagName() != "References") {
+                if (childNode.getTagName() == "DisplayName") {
+                    result.reference = childNode.getTextContent().replaceAll("[“”\"]", "");
+                    result.displayName = result.reference;
+                } else if (childNode.getTagName() == "Description") {
+                    result.description = childNode.getTextContent();
+                } else if (childNode.getTagName() == "Documentation") {
+                    result.documentation = childNode.getTextContent();
+                }
+            }
+        }
+        return result;
     }
     
     // checkstyle: resume method length check
@@ -599,23 +616,7 @@ public class DomParser {
                                 type = ElementType.DATATYPE;
                                 fieldDataType = fieldNode.getAttribute("DataType");
                             }
-                            String fieldDescription = "";
-                            NodeList fieldChilds = fieldNode.getChildNodes();
-
-                            for (int l = 0; l < fieldChilds.getLength(); l++) {
-                                Element fieldChildNode = getNextNodeElement(fieldChilds, l);
-                                if (fieldChildNode != null) {
-                                    if (fieldChildNode.getTagName() == "Description") {
-                                        if (fieldChildNode.getAttribute("Locale").equals("")) {
-                                            fieldDescription = fieldChildNode.getTextContent();
-                                        } else {
-                                            fieldDescription = fieldChildNode.getTextContent() + "@"
-                                                    + fieldChildNode.getAttribute("Locale");
-                                        }
-                                    }
-                                }
-
-                            }
+                            String fieldDescription = getFieldDescription(fieldNode);
                             if (type.equals(ElementType.ENUM)) {
                                 EnumLiteral literal = new EnumLiteral(fieldName, fieldValue, fieldDescription);
                                 literals.add(literal);
@@ -647,6 +648,32 @@ public class DomParser {
 
     // checkstyle: stop parameter number check
 
+    /**
+     * Returns the field description of {@code fieldNode}.
+     * 
+     * @param fieldNode the field node
+     * @return the field description
+     */
+    private static String getFieldDescription(Element fieldNode) {
+        String fieldDescription = "";
+        NodeList fieldChilds = fieldNode.getChildNodes();
+
+        for (int l = 0; l < fieldChilds.getLength(); l++) {
+            Element fieldChildNode = getNextNodeElement(fieldChilds, l);
+            if (fieldChildNode != null) {
+                if (fieldChildNode.getTagName() == "Description") {
+                    if (fieldChildNode.getAttribute("Locale").equals("")) {
+                        fieldDescription = fieldChildNode.getTextContent();
+                    } else {
+                        fieldDescription = fieldChildNode.getTextContent() + "@"
+                                + fieldChildNode.getAttribute("Locale");
+                    }
+                }
+            }
+        }
+        return fieldDescription;
+    }
+    
     /**
      * Creates an element.
      * 
@@ -1018,7 +1045,6 @@ public class DomParser {
                 aliasList, hierarchy);
             parser.parseFile();
         } catch (ParserConfigurationException | SAXException | IOException e) {
-e.printStackTrace();            
             LoggerFactory.getLogger(DomParser.class).error(e.getMessage());
         }
         return parser;
