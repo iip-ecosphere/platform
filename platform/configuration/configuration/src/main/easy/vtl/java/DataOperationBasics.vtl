@@ -467,9 +467,13 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
     
     // wraps a function expression (without considering ";") so that IOExceptions are 
     // caught, requires static import of de.iip_ecosphere.platform.support.function.IOVoidFunction.optional
-    def wrapOptional(Field field, String ex) {
+    def wrapOptional(Field field, String ex, String args="()", String optFind="", String optReplace="") {
         if (field.optional) {
-            "optional(() -> ${ex})"
+            String e = ex;
+            if (optFind <> "") {
+                e = e.replace(optFind, optReplace);
+            }
+            "optional(${args} -> ${e})"
         } else {
             ex;
         }

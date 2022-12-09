@@ -247,9 +247,9 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
        }
        if (set) {
            if (not(genFrom)) {
-               wrapOptional(field, path + ".set" + asMethodNameSuffix(field.name) + "(" + value + ")") + "${setEnd}"; 
+               wrapOptional(field, path + ".set" + asMethodNameSuffix(field.name) + "(" + value + ")", args="access, a", optFind="access.", optReplace="a.") + "${setEnd}"; 
            } else {
-               wrapOptional(field, "access.set(\"" + p +"\", " + genConvertOp("outConverter", field.type, "from", value) + ")") + "${setEnd}"; 
+               wrapOptional(field, "access.set(\"" + p +"\", " + genConvertOp("outConverter", field.type, "from", value) + ")", args="access, a", optFind="access.", optReplace="a.") + "${setEnd}"; 
            }
        } else {
            String ex = "access.get(\"" + p +"\", ${cachingTime(field)})";
@@ -273,9 +273,9 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
                 String nextPath = getterPath(tgtQual, tgt); // all "vars" before the .set
                 String cons = "new ${toTypeName(tgt.type)}${add}()";
                 '\n${createTemporaryVariable(nextPath, mapSourceSeparator(), tgt.type, "${cons}")}
-                ${wrapOptional(tgt, setterPath(getTemporaryVariable(tgtQual, tgtQual), tgt, getTemporaryVariable(nextPath, cons)))};'
+                ${wrapOptional(tgt, setterPath(getTemporaryVariable(tgtQual, tgtQual), tgt, getTemporaryVariable(nextPath, cons)), args="access, a", optFind="access.", optReplace="a.")};'
             } else {
-                '\n${wrapOptional(tgt, setterPath(getTemporaryVariable(tgtQual, tgtQual), tgt, acc))};'
+                '\n${wrapOptional(tgt, setterPath(getTemporaryVariable(tgtQual, tgtQual), tgt, acc), args="access, a", optFind="access.", optReplace="a.")};'
             }            
         } else {
             '${acc}'
@@ -368,8 +368,8 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
             @Override
             public ${coType} to(${oType} source) throws IOException {
                 ModelAccess access = getModelAccess();
-                ModelInputConverter inConverter = access.getInputConverter();
-                ModelOutputConverter outConverter = access.getOutputConverter();
+                final ModelInputConverter inConverter = access.getInputConverter();
+                final ModelOutputConverter outConverter = access.getOutputConverter();
                 ${coType} result = new ${coType}${add}();
                 ${genOutputTransTo(conn.outInterface, getFirstType(conn.output), conn.operations)}
                 return result; 
@@ -410,8 +410,8 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
             @Override
             public ${iType} from(${ciType} data) throws IOException {
                 ModelAccess access = getModelAccess();
-                ModelInputConverter inConverter = access.getInputConverter();
-                ModelOutputConverter outConverter = access.getOutputConverter();
+                final ModelInputConverter inConverter = access.getInputConverter();
+                final ModelOutputConverter outConverter = access.getOutputConverter();
                 ${genOutputTransFrom(conn.inInterface, getFirstType(conn.input), conn.operations)}
                 return null; // done, no instance of pseudo type
             }
