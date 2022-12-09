@@ -11,3 +11,5 @@ ServicePartKodex::KodexService::kind = Refined service kind for KODEX
 ServicePartKodex::KodexService::ver = Actual version of KODEX to use
 ServicePartKodex::KodexService::artifact = Refined default artifact for KODEX
 ServicePartKodex::KodexService::nameplateInfo = Refined default nameplate for KODEX
+ServicePartKodex::KodexService::dependencies = Refined default dependencies for KODEX
+ServicePartKodex::lxLibc6Compat = Required Linux library libc6-compatfor KODEX

@@ -1005,8 +1005,8 @@ public class DomParser {
             NodeList aliasList = doc.getElementsByTagName("Aliases");
             ArrayList<BaseType> hierarchy = new ArrayList<BaseType>();
             // Statt models docs sammeln?
-            File[] models = checkRequiredModels(path,
-                compSpec.toString().replace(toOsPath(path + "\\Opc.Ua."), "").replace(".NodeSet2.xml", ""), nameSpaceUris);
+            File[] models = checkRequiredModels(path, toOsPath(compSpec).replace(toOsPath(path + "\\Opc.Ua."), "")
+                .replace(".NodeSet2.xml", ""), nameSpaceUris);
             Document[] documents = new Document[models.length];
             for (int i = 0; i < models.length; i++) {
                 System.out.println(models[i]);
