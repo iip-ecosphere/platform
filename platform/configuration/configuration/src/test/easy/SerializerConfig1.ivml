@@ -52,7 +52,8 @@ project SerializerConfig1 {
         fields = {
             Field {
                 name = "dataField",
-                type = refBy(StringType)
+                type = refBy(StringType),
+                optional = true
             }, Field {
                 name = "axis",
                 type = refBy(IntegerType)
