@@ -38,9 +38,9 @@ public class DomParserTest {
     public void testDomParser() throws IOException {
         File in = new File("src/main/resources/NodeSets/Opc.Ua.MachineTool.NodeSet2.xml");
         Assert.assertTrue(in.exists());
-        System.out.println("IN " + in.getAbsolutePath());
-        File out = new File("gen/OpcMachineTool.ivml");
-        System.out.println("OUT " + out.getAbsolutePath());
+        File tmp = new File("target/tmp");
+        tmp.mkdirs();
+        File out = new File(tmp, "OpcMachineTool.ivml");
         // implicit from in to out
         DomParser.setDefaultVerbose(false); // reduce output
         DomParser.main(new String[0]);
@@ -49,7 +49,6 @@ public class DomParserTest {
         
         Charset charset = Charset.forName("UTF-8");
         File expected = new File("src/test/resources/OpcMachineTool.ivml");
-        System.out.println("EXP " + expected.getAbsolutePath());
         String exContents = normalize(FileUtils.readFileToString(expected, charset));
         String outContents = normalize(FileUtils.readFileToString(out, charset));
         /*for (int i = 0; i < Math.min(exContents.length(), outContents.length()); i++) {
