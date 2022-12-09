@@ -28,6 +28,7 @@ project ServicePartKodex {
        ServiceKind kind = ServiceKind::TRANSFORMATION_SERVICE;
        IipVersion ver = "0.7.0";
        String artifact = "de.iip-ecosphere.platform:security.services.kodex:" + iipVer;
+       setOf(refTo(Dependency)) dependencies = {refBy(lxLibc6Compat)};
        NameplateInfo nameplateInfo = {
            manufacturerProductDesignation = "KODEX anonymizer/pseudonymizer service@en",
            manufacturer = refBy(manufacturer_kiprotect)
@@ -38,5 +39,10 @@ project ServicePartKodex {
        // TODO #input=#output -> _kip
        // TODO unclear - multiple types per DataForm, multiple DataForms, prevent same id, nested fields
    }
+   
+   LinuxSystemDependency lxLibc6Compat = {
+       key = "",
+       name = "libc6-compat"
+   };
       
 }
