@@ -933,10 +933,10 @@ public class DomParser {
                         s = s.replace("http://opcfoundation.org/UA/", "").replace("/", "").toUpperCase();
                         for (int i = 0; i < files.length; i++) {
                             String model = null;
-                            if (toOsPath(files[i]).equals(toOsPath(path + "\\RequiredModels\\Opc.Ua.NodeSet2.xml"))) {
+                            if (toOsPath(files[i]).equals(toOsPath(path + "/RequiredModels/Opc.Ua.NodeSet2.xml"))) {
                                 model = "UA";
                             } else {
-                                model = toOsPath(files[i]).replace(toOsPath(path + "\\RequiredModels\\Opc.Ua."), "")
+                                model = toOsPath(files[i]).replace(toOsPath(path + "/RequiredModels/Opc.Ua."), "")
                                     .replace(".NodeSet2.xml", "").toUpperCase();
                             }
                             if (model.equals(s)) {
@@ -1027,7 +1027,7 @@ public class DomParser {
             NodeList aliasList = doc.getElementsByTagName("Aliases");
             ArrayList<BaseType> hierarchy = new ArrayList<BaseType>();
             // Statt models docs sammeln?
-            File[] models = checkRequiredModels(path, toOsPath(compSpec).replace(toOsPath(path + "\\Opc.Ua."), "")
+            File[] models = checkRequiredModels(path, toOsPath(compSpec).replace(toOsPath(path + "/Opc.Ua."), "")
                 .replace(".NodeSet2.xml", ""), nameSpaceUris);
             Document[] documents = new Document[models.length];
             for (int i = 0; i < models.length; i++) {
@@ -1094,14 +1094,14 @@ public class DomParser {
         if (args.length == 1) {
             file = new File(args[0]);
         } else {
-            file = new File("src\\main\\resources\\NodeSets\\Opc.Ua.MachineTool.NodeSet2.xml");
+            file = new File("src/main/resources/NodeSets/Opc.Ua.MachineTool.NodeSet2.xml");
         }
         String fileName = file.getName();
         fileName = StringUtils.removeStart(fileName, "Opc.Ua");
         fileName = StringUtils.removeEnd(fileName, ".xml");
         fileName = StringUtils.removeEnd(fileName, ".NodeSet2");
         fileName = fileName.replace(".", "");
-        File ivmlFile = new File("gen\\Opc" + fileName + ".ivml");
+        File ivmlFile = new File("gen/Opc" + fileName + ".ivml");
         process(file, fileName, ivmlFile);
     }
     
