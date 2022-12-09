@@ -12,6 +12,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -1017,6 +1018,7 @@ public class DomParser {
                 aliasList, hierarchy);
             parser.parseFile();
         } catch (ParserConfigurationException | SAXException | IOException e) {
+e.printStackTrace();            
             LoggerFactory.getLogger(DomParser.class).error(e.getMessage());
         }
         return parser;
@@ -1048,8 +1050,19 @@ public class DomParser {
             LoggerFactory.getLogger(DomParser.class).error(ioe.getMessage());
         }
     }
-    
-    
+
+    /**
+     * Processes an OPC XML file.
+     * 
+     * @param xmlIn the input file
+     * @param outName the output file/model name
+     * @param ivmlOut the full output file name
+     */
+    public static void process(File xmlIn, String outName, File ivmlOut) {
+        String path = xmlIn.getParent();
+        DomParser parser = createParser(path, xmlIn);
+        parser.createIvmlModel(outName, ivmlOut);
+    }
 
     /**
      * Executes the parser.
@@ -1058,18 +1071,18 @@ public class DomParser {
      */
     public static void main(String[] args) {
         File file;
-        File ivmlFile;
         if (args.length == 1) {
             file = new File(args[0]);
         } else {
             file = new File("src\\main\\resources\\NodeSets\\Opc.Ua.MachineTool.NodeSet2.xml");
         }
-        String path = file.getParent();
-        String fileName = file.getName().replace(".NodeSet2.xml", "");
-        ivmlFile = new File("gen\\Opc" + fileName + ".ivml");
-        
-        DomParser parser = createParser(path, file);
-        parser.createIvmlModel(fileName, ivmlFile);
+        String fileName = file.getName();
+        fileName = StringUtils.removeStart(fileName, "Opc.Ua");
+        fileName = StringUtils.removeEnd(fileName, ".xml");
+        fileName = StringUtils.removeEnd(fileName, ".NodeSet2");
+        fileName = fileName.replace(".", "");
+        File ivmlFile = new File("gen\\Opc" + fileName + ".ivml");
+        process(file, fileName, ivmlFile);
     }
     
 }

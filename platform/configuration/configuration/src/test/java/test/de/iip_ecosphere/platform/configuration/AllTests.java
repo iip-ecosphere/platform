@@ -33,7 +33,9 @@ import org.junit.runners.Suite;
     
     DataflowGraphFormatTest.class,
     AasIvmlMapperTest.class,
-    CommentTests.class
+    CommentTests.class,
+    
+    test.de.iip_ecosphere.platform.configuration.opcua.AllTests.class
 })
 public class AllTests {
 }
