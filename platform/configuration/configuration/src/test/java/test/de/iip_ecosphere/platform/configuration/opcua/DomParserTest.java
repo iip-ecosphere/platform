@@ -40,9 +40,10 @@ public class DomParserTest {
         Assert.assertTrue(in.exists());
         File out = new File("gen/OpcMachineTool.ivml");
         // implicit from in to out
+        DomParser.setDefaultVerbose(false); // reduce output
         DomParser.main(new String[0]);
         DomParser.main(new String[] {in.toString()});
-        DomParser.process(in, "MachineTool", out);
+        DomParser.process(in, "MachineTool", out, false);
         
         Charset charset = Charset.forName("UTF-8");
         File expected = new File("src/test/resources/OpcMachineTool.ivml");

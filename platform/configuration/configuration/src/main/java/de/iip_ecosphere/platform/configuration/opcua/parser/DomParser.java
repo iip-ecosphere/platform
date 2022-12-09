@@ -38,6 +38,8 @@ enum ElementType {
  */
 public class DomParser {
 
+    private static boolean verbose_default = true;
+    
     // private NodeList requiredModels;
     private Document[] documents;
     private NodeList objectTypeList;
@@ -47,6 +49,7 @@ public class DomParser {
     private NodeList variableTypeList;
     private NodeList aliasList;
     private ArrayList<BaseType> hierarchy;
+    private boolean verbose = verbose_default;
 
     // checkstyle: stop parameter number check
 
@@ -73,6 +76,15 @@ public class DomParser {
         this.variableTypeList = variableTypeList;
         this.aliasList = aliasList;
         this.hierarchy = hierarchy;
+    }
+    
+    /**
+     * Changes the default verbose mode used when instantiating a parser.
+     * 
+     * @param verbose verbose or non verbose mode
+     */
+    public static void setDefaultVerbose(boolean verbose) {
+        verbose_default = verbose;
     }
     
     // checkstyle: resume parameter number check
@@ -538,7 +550,7 @@ public class DomParser {
      * @param object the element to start with
      */
     public void retrieveRootElement(Element object) {
-        System.out.println("Rootobject:");
+        println("Rootobject:");
         retrieveAttributes(object, null, ElementType.OBJECT);
     }
 
@@ -554,7 +566,7 @@ public class DomParser {
         for (FieldType field : subElements) {
             if (!(field instanceof VariableType)) {
                 Element object = checkRelation(field.getNodeId(), objectList);
-                System.out.println("Subobject:");
+                println("Subobject:");
                 retrieveAttributes(object, fields, ElementType.SUBOBJECT);
             }
         }
@@ -593,7 +605,7 @@ public class DomParser {
                     displayName = childNode.getTextContent().replaceAll("[“”\"]", "");
                     // TODO REMOVE
                     if (displayName.equals("OperationMode")) {
-                        System.out.println("OperationMode");
+                        println("OperationMode");
                     }
                 } else if (childNode.getTagName() == "Documentation") {
                     documentation = childNode.getTextContent().replaceAll("[“”\"]", "");
@@ -692,26 +704,26 @@ public class DomParser {
 
         switch (type) {
         case ENUM:
-            System.out.println("DataType:");
+            println("DataType:");
             EnumType enumeration = new EnumType(element.getAttribute("NodeId"),
                     element.getAttribute("BrowseName").replaceAll("[“”\"]", ""), displayName, description,
                     documentation, literals);
             enumeration.setVarName("opc" + displayName + "Type");
             if (checkRedundancy(enumeration.getVarName()) == false) {
-                System.out.println(enumeration.toString());
+                println(enumeration.toString());
                 hierarchy.add(enumeration);
-                System.out.println("");
+                println("");
             }
             break;
         case DATATYPE:
-            System.out.println("DataType:");
+            println("DataType:");
             DataType uaDataType = new DataType(element.getAttribute("NodeId"),
                     element.getAttribute("BrowseName").replaceAll("[“”\"]", ""), displayName, description,
                     documentation, dataLiterals);
             uaDataType.setVarName("opc" + displayName);
-            System.out.println(uaDataType.toString());
+            println(uaDataType.toString());
             hierarchy.add(uaDataType);
-            System.out.println("");
+            println("");
             break;
         case SUBOBJECT:
             uaElement = new ObjectType(element.getAttribute("NodeId"),
@@ -721,9 +733,9 @@ public class DomParser {
             if (!objectFields.isEmpty()) {
                 adaptDatatypesToModel(uaElement);
             }
-            System.out.println(uaElement.toString());
+            println(uaElement.toString());
             hierarchy.add(uaElement);
-            System.out.println("");
+            println("");
             if (!uaElement.getFields().isEmpty()) {
                 retrieveRelatedSubElements(uaElement.getFields());
             }
@@ -737,9 +749,9 @@ public class DomParser {
             if (!objectFields.isEmpty()) {
                 adaptDatatypesToModel(uaElement);
             }
-            System.out.println(uaElement.toString());
+            println(uaElement.toString());
             hierarchy.add(uaElement);
-            System.out.println("");
+            println("");
             if (!uaElement.getFields().isEmpty()) {
                 retrieveRelatedSubElements(uaElement.getFields());
             }
@@ -750,15 +762,15 @@ public class DomParser {
                     documentation);
             uaObjectType.setVarName("opc" + displayName);
             if (checkRedundancy(uaObjectType.getVarName()) == false) {
-                System.out.println(uaObjectType.toString());
+                println(uaObjectType.toString());
                 hierarchy.add(uaObjectType);
             }
 
-            System.out.println("");
+            println("");
             break;
         case VARIABLE:
             if (displayName.equals("StacklightMode")) {
-                System.out.println("TEST");
+                println("TEST");
             }
             dataType = element.getAttribute("DataType");
             if (dataType == "EnumValueType") {
@@ -790,7 +802,7 @@ public class DomParser {
                     documentation, changeVariableDataTypes(element.getAttribute("DataType")));
             uaVariableType.setVarName("opc" + displayName);
             if (checkRedundancy(uaVariableType.getVarName()) == false) {
-                System.out.println(uaVariableType.toString());
+                println(uaVariableType.toString());
                 hierarchy.add(uaVariableType);
             }
             break;
@@ -1009,9 +1021,10 @@ public class DomParser {
      * 
      * @param path the path to the OPC UA nodeset models
      * @param compSpec the companion spec to be parsed
+     * @param verbose verbose output
      * @return the DOM parser after parsing
      */
-    public static DomParser createParser(String path, File compSpec) {
+    public static DomParser createParser(String path, File compSpec, boolean verbose) {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DomParser parser = null;
         try {
@@ -1037,6 +1050,7 @@ public class DomParser {
 
             parser = new DomParser(documents, objectTypeList, objectList, variableList, dataTypeList, variableTypeList,
                 aliasList, hierarchy);
+            parser.verbose = verbose;
             parser.parseFile();
         } catch (ParserConfigurationException | SAXException | IOException e) {
             LoggerFactory.getLogger(DomParser.class).error(e.getMessage());
@@ -1070,6 +1084,17 @@ public class DomParser {
             LoggerFactory.getLogger(DomParser.class).error(ioe.getMessage());
         }
     }
+    
+    /**
+     * Prints out information in verbose mode.
+     * 
+     * @param text the text to print
+     */
+    private void println(String text) {
+        if (verbose) {
+            System.out.println(text);
+        }
+    }
 
     /**
      * Processes an OPC XML file.
@@ -1077,15 +1102,17 @@ public class DomParser {
      * @param xmlIn the input file
      * @param outName the output file/model name
      * @param ivmlOut the full output file name
+     * @param verbose verbose output
      */
-    public static void process(File xmlIn, String outName, File ivmlOut) {
+    public static void process(File xmlIn, String outName, File ivmlOut, boolean verbose) {
+        System.out.println("Processing " + xmlIn + " to " + outName + "(" + ivmlOut + ")");
         String path = xmlIn.getParent();
-        DomParser parser = createParser(path, xmlIn);
+        DomParser parser = createParser(path, xmlIn, verbose);
         parser.createIvmlModel(outName, ivmlOut);
     }
 
     /**
-     * Executes the parser.
+     * Executes the parser, per default in verbose mode.
      * 
      * @param args command line arguments (ignored)
      */
@@ -1102,7 +1129,7 @@ public class DomParser {
         fileName = StringUtils.removeEnd(fileName, ".NodeSet2");
         fileName = fileName.replace(".", "");
         File ivmlFile = new File("gen/Opc" + fileName + ".ivml");
-        process(file, fileName, ivmlFile);
+        process(file, fileName, ivmlFile, verbose_default);
     }
     
 }
