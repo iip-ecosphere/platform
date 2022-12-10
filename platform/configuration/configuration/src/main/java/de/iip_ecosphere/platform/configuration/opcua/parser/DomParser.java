@@ -749,7 +749,7 @@ public class DomParser {
                     element.getAttribute("BrowseName").replaceAll("[“”\"]", ""), displayName, description,
                     documentation, literals);
             enumeration.setVarName("opc" + displayName + "Type");
-            if (checkRedundancy(enumeration.getVarName()) == false) {
+            if (!checkRedundancy(enumeration.getVarName())) {
                 println(enumeration.toString());
                 hierarchy.add(enumeration);
                 println("");
@@ -801,7 +801,7 @@ public class DomParser {
                     element.getAttribute("BrowseName").replaceAll("[“”\"]", ""), displayName, description,
                     documentation);
             uaObjectType.setVarName("opc" + displayName);
-            if (checkRedundancy(uaObjectType.getVarName()) == false) {
+            if (!checkRedundancy(uaObjectType.getVarName())) {
                 println(uaObjectType.toString());
                 hierarchy.add(uaObjectType);
             }
@@ -841,7 +841,7 @@ public class DomParser {
                     element.getAttribute("BrowseName").replaceAll("[“”\"]", ""), displayName, description,
                     documentation, changeVariableDataTypes(element.getAttribute("DataType")));
             uaVariableType.setVarName("opc" + displayName);
-            if (checkRedundancy(uaVariableType.getVarName()) == false) {
+            if (!checkRedundancy(uaVariableType.getVarName())) {
                 println(uaVariableType.toString());
                 hierarchy.add(uaVariableType);
             }
@@ -1003,12 +1003,12 @@ public class DomParser {
                                 break;
                             }
                         }
-                        if (modelFound == false) {
+                        if (!modelFound) {
                             missingModels += s + "\n";
                         }
                         modelFound = false;
                     }
-                    if (missingModels == "") {
+                    if (missingModels.isEmpty()) {
                         System.out.println("All required models are available in " + path);
                         models = new File[foundFiles.size()];
                         models = foundFiles.toArray(models);
@@ -1019,7 +1019,7 @@ public class DomParser {
                 }
                 // Überprüfung, ob files fehlen und wenn, ja welche
             }
-            if (correct == false) {
+            if (!correct) {
                 boolean confirmed = false;
                 do {
                     System.out.println("\nPress y to continue if the respective files were added.");
@@ -1027,9 +1027,9 @@ public class DomParser {
                     if (input.equals("y")) {
                         confirmed = true;
                     }
-                } while (confirmed == false);
+                } while (!confirmed);
             }
-        } while (correct == false);
+        } while (!correct);
         scanner.close();
         return models;
     }

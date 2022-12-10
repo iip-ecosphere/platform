@@ -19,10 +19,8 @@ import java.nio.charset.Charset;
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
-import static org.junit.Assume.assumeFalse;
 
 import de.iip_ecosphere.platform.configuration.opcua.parser.DomParser;
-import de.iip_ecosphere.platform.support.NetUtils;
 
 /**
  * Tests {@link DomParser}.
@@ -53,11 +51,6 @@ public class DomParserTest {
         File expected = new File("src/test/resources/OpcMachineTool.ivml");
         String exContents = normalize(FileUtils.readFileToString(expected, charset));
         String outContents = normalize(FileUtils.readFileToString(out, charset));
-        /*for (int i = 0; i < Math.min(exContents.length(), outContents.length()); i++) {
-            if (exContents.charAt(i) != outContents.charAt(i)) {
-                System.out.println(((int)exContents.charAt(i))+" "+((int)outContents.charAt(i)));
-            }
-        }*/
         Assert.assertEquals(exContents, outContents);
     }
 
@@ -68,7 +61,6 @@ public class DomParserTest {
      */
     @Test
     public void testDomParserWoodworking() throws IOException {
-        assumeFalse(NetUtils.getOwnHostname().equals("jenkins-2")); // Linux character comparison
         File in = new File("src/main/resources/NodeSets/Opc.Ua.Woodworking.NodeSet2.xml");
         Assert.assertTrue(in.exists());
         File tmp = new File("target/tmp");
@@ -82,12 +74,21 @@ public class DomParserTest {
         File expected = new File("src/test/resources/OpcWoodworking.ivml");
         String exContents = normalize(FileUtils.readFileToString(expected, charset));
         String outContents = normalize(FileUtils.readFileToString(out, charset));
-        /*for (int i = 0; i < Math.min(exContents.length(), outContents.length()); i++) {
-            if (exContents.charAt(i) != outContents.charAt(i)) {
-                System.out.println(((int)exContents.charAt(i))+" "+((int)outContents.charAt(i)));
-            }
-        }*/
         Assert.assertEquals(exContents, outContents);
+    }
+
+    /**
+     * Helper function to indicate char differences to apply when string comparison fails.
+     * 
+     * @param exContents the expected contents
+     * @param outContents the actual contents
+     */
+    static void printCharDiff(String exContents, String outContents) {
+        for (int i = 0; i < Math.min(exContents.length(), outContents.length()); i++) {
+            if (exContents.charAt(i) != outContents.charAt(i)) {
+                System.out.println(((int) exContents.charAt(i)) + " " + ((int) outContents.charAt(i)));
+            }
+        }
     }
 
     /**
@@ -104,7 +105,7 @@ public class DomParserTest {
                 tmp.setCharAt(i, '-');
             } else if (c == 8804) {
                 tmp.setCharAt(i, (char) 63);
-            } else if (c == 8217 || c == 8222 || c == 8220) {
+            } else if (c == 8217 || c == 8222 || c == 8220 || c == 8230) {
                 tmp.setCharAt(i, (char) 45);
             }
         }
