@@ -537,41 +537,42 @@ public class DomParser {
                 String refId = refNode.getTextContent();
                 Element refElement = checkRelation(refId, variableList);
                 if (refElement != null) {
-                    if (fields.size() == 0) {
-                        retrieveAttributes(refElement, fields, ElementType.VARIABLE);
-                    } else {
-                        boolean retrieve = true;
-                        for (FieldType f : fields) {
-                            if (f.getNodeId().equals(refId)) {
-                                retrieve = false;
-                            }
-                        }
-                        if (retrieve) {
-                            retrieveAttributes(refElement, fields, ElementType.VARIABLE);
-                        }
-                    }
+                    retrieveAttributesForRefElement(fields, refId, refElement, ElementType.VARIABLE);
                 } else {
                     // REDUNDANT AUSLAGERN LIST UND ELEMENTTYPE ÜBERGEBEN
                     refElement = checkRelation(refId, objectList);
                     if (refElement != null && !(refNode.getAttribute("IsForward").equals("false"))) {
-                        if (fields.size() == 0) {
-                            retrieveAttributes(refElement, fields, ElementType.FIELD);
-                        } else {
-                            boolean retrieve = true;
-                            for (FieldType f : fields) {
-                                if (f.getNodeId().equals(refId)) {
-                                    retrieve = false;
-                                }
-                            }
-                            if (retrieve) {
-                                retrieveAttributes(refElement, fields, ElementType.FIELD);
-                            }
-                        }
+                        retrieveAttributesForRefElement(fields, refId, refElement, ElementType.FIELD);
                     }
                 }
             }
         }
         return fields;
+    }
+
+    /**
+     * Retrieves attribute for a reference element.
+     * 
+     * @param fields the fields to retrieve the attributes for
+     * @param refId the ref id
+     * @param refElement the ref element
+     * @param elementType the elementType
+     */
+    private void retrieveAttributesForRefElement(ArrayList<FieldType> fields, String refId, Element refElement, 
+        ElementType elementType) {
+        if (fields.size() == 0) {
+            retrieveAttributes(refElement, fields, elementType);
+        } else {
+            boolean retrieve = true;
+            for (FieldType f : fields) {
+                if (f.getNodeId().equals(refId)) {
+                    retrieve = false;
+                }
+            }
+            if (retrieve) {
+                retrieveAttributes(refElement, fields, elementType);
+            }
+        }
     }
 
     /**
