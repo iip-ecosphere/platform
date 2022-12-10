@@ -19,8 +19,10 @@ import java.nio.charset.Charset;
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
+import static org.junit.Assume.assumeFalse;
 
 import de.iip_ecosphere.platform.configuration.opcua.parser.DomParser;
+import de.iip_ecosphere.platform.support.NetUtils;
 
 /**
  * Tests {@link DomParser}.
@@ -36,7 +38,6 @@ public class DomParserTest {
      */
     @Test
     public void testDomParserMachineTool() throws IOException {
-        //assumeFalse(NetUtils.getOwnHostname().equals("jenkins-2")); // unclear failures
         File in = new File("src/main/resources/NodeSets/Opc.Ua.MachineTool.NodeSet2.xml");
         Assert.assertTrue(in.exists());
         File tmp = new File("target/tmp");
@@ -67,7 +68,7 @@ public class DomParserTest {
      */
     @Test
     public void testDomParserWoodworking() throws IOException {
-        //assumeFalse(NetUtils.getOwnHostname().equals("jenkins-2")); // unclear failures
+        assumeFalse(NetUtils.getOwnHostname().equals("jenkins-2")); // Linux character comparison
         File in = new File("src/main/resources/NodeSets/Opc.Ua.Woodworking.NodeSet2.xml");
         Assert.assertTrue(in.exists());
         File tmp = new File("target/tmp");
