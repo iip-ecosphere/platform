@@ -5,8 +5,11 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Scanner;
+import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -39,6 +42,17 @@ enum ElementType {
 public class DomParser {
 
     private static boolean verboseDefault = true;
+    private static final Set<String> IDENTIFY_FIELDS_PERMITTED_REFERENCE_TYPE;
+    
+    static {
+        HashSet<String> tmp = new HashSet<>();
+        tmp.add("HasComponent");
+        tmp.add("HasOrderedComponent");
+        tmp.add("HasProperty");
+        tmp.add("FromState");
+        tmp.add("ToState");
+        IDENTIFY_FIELDS_PERMITTED_REFERENCE_TYPE = Collections.unmodifiableSet(tmp);
+    }
     
     // private NodeList requiredModels;
     private Document[] documents;
@@ -521,7 +535,6 @@ public class DomParser {
      * @return the identified fields
      */
     public ArrayList<FieldType> identifyFields(Node childNode) {
-
         ArrayList<FieldType> fields = new ArrayList<FieldType>();
         NodeList references = childNode.getChildNodes();
 
@@ -529,17 +542,13 @@ public class DomParser {
             Element refNode = getNextNodeElement(references, k);
             // TODO REFERENCES HasOrderedComponent, ToState, FromState ergänzen --> weitere
             // prüfen
-            if (refNode != null && (refNode.getAttribute("ReferenceType").equals("HasComponent")
-                    || refNode.getAttribute("ReferenceType").equals("HasOrderedComponent")
-                    || refNode.getAttribute("ReferenceType").equals("HasProperty")
-                    || refNode.getAttribute("ReferenceType").equals("FromState")
-                    || refNode.getAttribute("ReferenceType").equals("ToState"))) {
+            if (refNode != null 
+                && IDENTIFY_FIELDS_PERMITTED_REFERENCE_TYPE.contains(refNode.getAttribute("ReferenceType"))) {
                 String refId = refNode.getTextContent();
                 Element refElement = checkRelation(refId, variableList);
                 if (refElement != null) {
                     retrieveAttributesForRefElement(fields, refId, refElement, ElementType.VARIABLE);
                 } else {
-                    // REDUNDANT AUSLAGERN LIST UND ELEMENTTYPE �BERGEBEN
                     refElement = checkRelation(refId, objectList);
                     if (refElement != null && !(refNode.getAttribute("IsForward").equals("false"))) {
                         retrieveAttributesForRefElement(fields, refId, refElement, ElementType.FIELD);
