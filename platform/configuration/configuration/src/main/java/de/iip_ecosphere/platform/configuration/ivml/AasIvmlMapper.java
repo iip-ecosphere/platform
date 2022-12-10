@@ -620,14 +620,14 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
      * 
      * @param appName the application name
      * @param meshName the mesh name
-     * @param graph
-     * @param results
+     * @param graph the graph to create the mesh project for
+     * @param results the results to be modified as a side effect
      * @throws ModelQueryException if IVML types/variables cannot be found
      * @throws ModelManagementException if IVML types/variables cannot be found
      * @throws ExecutionException if setting IVML values fails
      */
     private void createMeshProject(String appName, String meshName, IvmlGraph graph, ModelResults results) 
-         throws ModelQueryException, ModelManagementException, ExecutionException {
+        throws ModelQueryException, ModelManagementException, ExecutionException {
         net.ssehub.easy.varModel.confModel.Configuration cfg = getIvmlConfiguration();
         Project root = cfg.getProject();
         String meshProjectName = getMeshProjectName(appName, meshName);

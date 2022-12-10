@@ -38,7 +38,7 @@ enum ElementType {
  */
 public class DomParser {
 
-    private static boolean verbose_default = true;
+    private static boolean verboseDefault = true;
     
     // private NodeList requiredModels;
     private Document[] documents;
@@ -49,7 +49,7 @@ public class DomParser {
     private NodeList variableTypeList;
     private NodeList aliasList;
     private ArrayList<BaseType> hierarchy;
-    private boolean verbose = verbose_default;
+    private boolean verbose = verboseDefault;
 
     // checkstyle: stop parameter number check
 
@@ -84,7 +84,7 @@ public class DomParser {
      * @param verbose verbose or non verbose mode
      */
     public static void setDefaultVerbose(boolean verbose) {
-        verbose_default = verbose;
+        verboseDefault = verbose;
     }
     
     // checkstyle: resume parameter number check
@@ -317,7 +317,6 @@ public class DomParser {
      * @param dataType the data type to look for
      */
     public void checkForExternDataType(String dataType) {
-        NodeList typeList = null;
         for (int i = 0; i < aliasList.getLength(); i++) {
             Element alias = getNextNodeElement(aliasList, i);
             NodeList childNodeList = alias.getChildNodes();
@@ -328,21 +327,30 @@ public class DomParser {
                         String nodeId = childNode.getTextContent();
                         if (nodeId.contains("ns=")) {
                             if (!nodeId.contains("ns=1")) {
-                                for (int k = 1; k < documents.length; k++) {
-                                    typeList = documents[k].getElementsByTagName("UADataType");
-                                    nodeId = nodeId.substring(0, nodeId.indexOf("=") + 1) + 1
-                                            + nodeId.substring(nodeId.indexOf(";"), nodeId.length());
-                                    Element element = checkRelation(nodeId, typeList);
-                                    if (element != null) {
-                                        retrieveAttributes(element, null, ElementType.ENUM);
-                                        break;
-                                    }
-                                }
+                                retrieveAttributesForExternDataType(nodeId);
                             }
                         }
                         break;
                     }
                 }
+            }
+        }
+    }
+
+    /**
+     * Retrieves attributes from {@link #documents} for extern data types.
+     * 
+     * @param nodeId the node id of the node to retrieve the attributes for
+     */
+    private void retrieveAttributesForExternDataType(String nodeId) {
+        for (int k = 1; k < documents.length; k++) {
+            NodeList typeList = documents[k].getElementsByTagName("UADataType");
+            nodeId = nodeId.substring(0, nodeId.indexOf("=") + 1) + 1
+                    + nodeId.substring(nodeId.indexOf(";"), nodeId.length());
+            Element element = checkRelation(nodeId, typeList);
+            if (element != null) {
+                retrieveAttributes(element, null, ElementType.ENUM);
+                break;
             }
         }
     }
@@ -578,8 +586,8 @@ public class DomParser {
      * Retrieves the attributes and creates respective elements.
      * 
      * @param element the element to analyze the child nodes for
-     * @param subFields
-     * @param type
+     * @param subFields the sub fields for the creation of output for {@code element}
+     * @param type the element type
      */
     public void retrieveAttributes(Element element, ArrayList<FieldType> subFields, ElementType type) {
 
@@ -1129,7 +1137,7 @@ public class DomParser {
         fileName = StringUtils.removeEnd(fileName, ".NodeSet2");
         fileName = fileName.replace(".", "");
         File ivmlFile = new File("gen/Opc" + fileName + ".ivml");
-        process(file, fileName, ivmlFile, verbose_default);
+        process(file, fileName, ivmlFile, verboseDefault);
     }
     
 }

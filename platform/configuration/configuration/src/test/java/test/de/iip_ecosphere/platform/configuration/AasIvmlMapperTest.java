@@ -419,6 +419,7 @@ public class AasIvmlMapperTest {
      * Tests the create/delete variable function.
      * 
      * @throws IOException if copying/resetting files fails
+     * @throws ExecutionException if creating/deleting the variable fails
      */
     @Test
     public void testCreateDeleteVariable() throws IOException, ExecutionException {

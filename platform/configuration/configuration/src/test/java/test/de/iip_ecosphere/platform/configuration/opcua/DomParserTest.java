@@ -30,12 +30,13 @@ import de.iip_ecosphere.platform.configuration.opcua.parser.DomParser;
 public class DomParserTest {
     
     /**
-     * Tests {@link DomParser}.
+     * Tests {@link DomParser} on the machine tool companion spec XML.
      * 
      * @throws IOException shall not occur
      */
     @Test
-    public void testDomParser() throws IOException {
+    public void testDomParserMachineTool() throws IOException {
+        //assumeFalse(NetUtils.getOwnHostname().equals("jenkins-2")); // unclear failures
         File in = new File("src/main/resources/NodeSets/Opc.Ua.MachineTool.NodeSet2.xml");
         Assert.assertTrue(in.exists());
         File tmp = new File("target/tmp");
@@ -60,12 +61,41 @@ public class DomParserTest {
     }
 
     /**
+     * Tests {@link DomParser} on the woodworking companion spec XML.
+     * 
+     * @throws IOException shall not occur
+     */
+    @Test
+    public void testDomParserWoodworking() throws IOException {
+        //assumeFalse(NetUtils.getOwnHostname().equals("jenkins-2")); // unclear failures
+        File in = new File("src/main/resources/NodeSets/Opc.Ua.Woodworking.NodeSet2.xml");
+        Assert.assertTrue(in.exists());
+        File tmp = new File("target/tmp");
+        tmp.mkdirs();
+        File out = new File(tmp, "OpcWoodworking.ivml");
+        // implicit from in to out
+        DomParser.setDefaultVerbose(false); // reduce output
+        DomParser.process(in, "Woodworking", out, false);
+        
+        Charset charset = Charset.forName("UTF-8");
+        File expected = new File("src/test/resources/OpcWoodworking.ivml");
+        String exContents = normalize(FileUtils.readFileToString(expected, charset));
+        String outContents = normalize(FileUtils.readFileToString(out, charset));
+        /*for (int i = 0; i < Math.min(exContents.length(), outContents.length()); i++) {
+            if (exContents.charAt(i) != outContents.charAt(i)) {
+                System.out.println(((int)exContents.charAt(i))+" "+((int)outContents.charAt(i)));
+            }
+        }*/
+        Assert.assertEquals(exContents, outContents);
+    }
+
+    /**
      * Normalizes unicode/UTF-8 strings for comparison (heuristics).
      * 
      * @param text the text to be normalized
      * @return the normalized text
      */
-    private String normalize(String text) {
+    private static String normalize(String text) {
         StringBuilder tmp = new StringBuilder(text);
         for (int i = 0; i < tmp.length(); i++) {
             int c = (int) tmp.charAt(i);
