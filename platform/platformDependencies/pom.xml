@@ -133,6 +133,18 @@
       </roles>
       <timezone>Europe/Berlin</timezone>
     </developer>
+    <developer>
+      <id>schulzlu</id>
+      <name>Luca Schulz</name>
+      <email>schulzlu@uni-hildesheim.de</email>
+      <url>https://sse.uni-hildesheim.de/</url>
+      <organization>SSE @ University of Hildesheim</organization>
+      <organizationUrl>https://sse.uni-hildesheim.de/</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>Europe/Berlin</timezone>
+    </developer>
   </developers>  
   
   <scm>
