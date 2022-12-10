@@ -355,12 +355,10 @@ public class DomParser {
         }
     }
     
-    // checkstyle: stop method length check
-
     /**
      * Identifies a specific reference.
      * 
-     * @param reference the reference to look for
+     * @param reference the reference type to look for
      * @param node the node to analyze the children
      * @param type the type to look for
      * @return the reference value
@@ -371,7 +369,6 @@ public class DomParser {
 //          System.out.println("TEST");
 //      }
         NodeList references = node.getChildNodes();
-        NodeList typeList = null;
         for (int k = 0; k < references.getLength(); k++) {
             Element refNode = getNextNodeElement(references, k);
             if (refNode != null && refNode.getAttribute("ReferenceType").equals(reference)) {
@@ -380,34 +377,9 @@ public class DomParser {
                 String refId = refNode.getTextContent();
 
                 if (refId.contains("ns=1;") || !refId.contains("ns=")) {
-                    if (refId.contains("ns=1;")) {
-                        // comp spec
-                        if (type == ElementType.OBJECT || type == ElementType.SUBOBJECT) {
-                            typeList = objectTypeList;
-                        } else if (type == ElementType.VARIABLE) {
-                            typeList = variableTypeList;
-                            type = ElementType.VARIABLETYPE;
-                        }
-                    } else if (!refId.contains("ns=")) {
-                        // core
-                        if (type == ElementType.OBJECT || type == ElementType.SUBOBJECT) {
-                            if (reference.equals("HasModellingRule")) {
-                                typeList = documents[0].getElementsByTagName("UAObject");
-                            } else {
-                                typeList = documents[0].getElementsByTagName("UAObjectType");
-                                type = ElementType.OBJECTTYPE;
-                            }
-                        } else if (type == ElementType.VARIABLE) {
-                            if (reference.equals("HasModellingRule")) {
-                                typeList = documents[0].getElementsByTagName("UAObject");
-                                type = ElementType.OBJECT;
-                            } else {
-                                typeList = documents[0].getElementsByTagName("UAVariableType");
-                                type = ElementType.VARIABLETYPE;
-                            }
-                        }
-                    }
-                    Element refElement = checkRelation(refId, typeList);
+                    TypeListAndType r = getTypeListAndTypeRootNs(refId, reference, type);
+                    type = r.type;
+                    Element refElement = checkRelation(refId, r.typeList);
                     if (refElement != null) {
                         // create Attribute, LÖSUNG FÜR REFERENCE INIT ÜBERLEGEN
                         DescriptionOrDocumentation d = getDescriptionOrDocumentation(reference, refElement);
@@ -423,6 +395,7 @@ public class DomParser {
                             + refId.substring(refId.indexOf(";"), refId.length());
                     refId = newRefId;
                     for (int i = 1; i < documents.length; i++) {
+                        NodeList typeList = null;
                         if (type == ElementType.OBJECT || type == ElementType.SUBOBJECT) {
                             typeList = documents[i].getElementsByTagName("UAObjectType");
                             type = ElementType.OBJECTTYPE;
@@ -447,6 +420,57 @@ public class DomParser {
             }
         }
         return reference;
+    }
+
+    /**
+     * Result for {@link DomParser#getTypeListAndTypeRootNs(String, String, ElementType)}.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static class TypeListAndType {
+        private NodeList typeList;
+        private ElementType type;
+    }
+
+    /**
+     * Extracts the type list and type for a given root namespace {@code refId}.
+     * 
+     * @param refId the ref id
+     * @param reference the reference type
+     * @param type the actual element type
+     * @return the extracted result
+     */
+    private TypeListAndType getTypeListAndTypeRootNs(String refId, String reference, ElementType type) {
+        TypeListAndType result = new TypeListAndType();
+        result.type = type;
+        if (refId.contains("ns=1;")) {
+            // comp spec
+            if (type == ElementType.OBJECT || type == ElementType.SUBOBJECT) {
+                result.typeList = objectTypeList;
+            } else if (type == ElementType.VARIABLE) {
+                result.typeList = variableTypeList;
+                result.type = ElementType.VARIABLETYPE;
+            }
+        } else if (!refId.contains("ns=")) {
+            // core
+            if (type == ElementType.OBJECT || type == ElementType.SUBOBJECT) {
+                if (reference.equals("HasModellingRule")) {
+                    result.typeList = documents[0].getElementsByTagName("UAObject");
+                } else {
+                    result.typeList = documents[0].getElementsByTagName("UAObjectType");
+                    result.type = ElementType.OBJECTTYPE;
+                }
+            } else if (type == ElementType.VARIABLE) {
+                if (reference.equals("HasModellingRule")) {
+                    result.typeList = documents[0].getElementsByTagName("UAObject");
+                    result.type = ElementType.OBJECT;
+                } else {
+                    result.typeList = documents[0].getElementsByTagName("UAVariableType");
+                    result.type = ElementType.VARIABLETYPE;
+                }
+            }
+        }
+        return result;
     }
     
     /**
@@ -490,8 +514,6 @@ public class DomParser {
         return result;
     }
     
-    // checkstyle: resume method length check
-
     /**
      * Identifies the fields of {@code childNode}.
      * 
