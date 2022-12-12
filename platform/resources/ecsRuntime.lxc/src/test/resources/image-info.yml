@@ -1,6 +1,6 @@
 id:
 name: test-container
-lxcImageAlias: imagefromtemplate
+lxcImageAlias: images:ubuntu/jammy
 env:
   - IIP_PORT=${port}
 exposedPorts:

@@ -12,6 +12,7 @@
 
 package test.de.iip_ecosphere.platform.ecsRuntime.lxc;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -47,8 +48,9 @@ public class LxcContainerManagerTest {
     public void testContainerManager() throws 
         URISyntaxException, ExecutionException, InterruptedException, IOException {
     	
-		System.setProperty("snap_cert", "/home/linuxluca/snap/lxd/common/config/client.crt");
-		System.setProperty("snap_key", "/home/linuxluca/snap/lxd/common/config/client.key");
+    	String userHome = System.getProperty("user.home");
+		System.setProperty("snap_cert", userHome + File.separator  + "snap/lxd/common/config/client.crt");
+		System.setProperty("snap_key", userHome + File.separator  + "snap/lxd/common/config/client.key");
 
         NotificationMode oldM = ActiveAasBase.setNotificationMode(NotificationMode.NONE); // no AAS here
         // TODO test against full AAS setup, see EcsAasTest
