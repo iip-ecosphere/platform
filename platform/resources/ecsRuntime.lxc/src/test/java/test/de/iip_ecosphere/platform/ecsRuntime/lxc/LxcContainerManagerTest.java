@@ -15,16 +15,14 @@ package test.de.iip_ecosphere.platform.ecsRuntime.lxc;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.concurrent.ExecutionException;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.github.dockerjava.api.DockerClient;
-import com.github.dockerjava.api.model.Container;
-
+import au.com.jcloud.lxd.model.Container;
+import au.com.jcloud.lxd.service.ILxdService;
 import de.iip_ecosphere.platform.ecsRuntime.ContainerState;
 import de.iip_ecosphere.platform.ecsRuntime.EcsFactory;
 import de.iip_ecosphere.platform.ecsRuntime.lxc.LxcContainerManager;
@@ -34,7 +32,7 @@ import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 /**
  * Template test.
  * 
- * @author Monika Staciwa, SSE
+ * @author Luca Schulz, SSE
  */
 public class LxcContainerManagerTest {
         
@@ -48,18 +46,23 @@ public class LxcContainerManagerTest {
     @Test
     public void testContainerManager() throws 
         URISyntaxException, ExecutionException, InterruptedException, IOException {
+    	
+		System.setProperty("snap_cert", "/home/linuxluca/snap/lxd/common/config/client.crt");
+		System.setProperty("snap_key", "/home/linuxluca/snap/lxd/common/config/client.key");
 
         NotificationMode oldM = ActiveAasBase.setNotificationMode(NotificationMode.NONE); // no AAS here
         // TODO test against full AAS setup, see EcsAasTest
         LxcContainerManager cm = (LxcContainerManager) EcsFactory.getContainerManager();
         Assert.assertTrue(cm instanceof LxcContainerManager);
         
-        // Checking if Docker API Client can connect with Docker daemon.
-        if (cm.getDockerClient() == null) {
+        // Checking if LXC API Client can connect with LXC daemon.
+        if (cm.getLxcClient() == null) {
+        	System.out.println("null");
             return;
         }
         
-        String testId = "01";
+        System.out.println(cm.getLxcClient().loadServerInfo());
+        
         String testName = "test-container";
         
         //---- Adding container -----------------
@@ -68,70 +71,82 @@ public class LxcContainerManagerTest {
         URI location = new URI(imageLocationStr);        
         
         // Is the id of the container same as in the yaml file?
-        Assert.assertEquals(testId, cm.addContainer(location));
-        Assert.assertEquals(ContainerState.AVAILABLE, cm.getState(testId));
+        Assert.assertEquals(testName, cm.addContainer(location));
         Thread.sleep(4000);
-        // Does the container have a Docker Id?
-        Assert.assertNotNull(cm.getDockerId(testName));
+        Assert.assertEquals("Stopped", cm.getLxcClient().loadContainerState(testName).getStatus());
         
         //---- Starting container -----------------
-        cm.startContainer(testId);
+        cm.startContainer(testName);
         Thread.sleep(3000);
+        Assert.assertEquals("Running", cm.getLxcClient().loadContainerState(testName).getStatus());
         // Is there a running container with a given name?
-        Assert.assertNotNull(getContainerId(testName, "running", cm));
-        Assert.assertEquals(ContainerState.DEPLOYED, cm.getState(testId));
+        Assert.assertNotNull(getLxcName(testName, "running", cm));
+        
+        //---- Freezing container -----------------
+        cm.freezeContainer(testName);
+        Thread.sleep(3000);
+        Assert.assertEquals("Frozen", cm.getLxcClient().loadContainerState(testName).getStatus());
+        // Is there a running container with a given name?
+        Assert.assertNotNull(getLxcName(testName, "frozen", cm));
+        
+        //---- Unfreezing container -----------------
+        cm.unfreezeContainer(testName);
+        Thread.sleep(3000);
+        Assert.assertEquals("Running", cm.getLxcClient().loadContainerState(testName).getStatus());
+        // Is there a running container with a given name?
+        Assert.assertNotNull(getLxcName(testName, "running", cm));
 
         //---- Stopping container -----------------
-        cm.stopContainer(testId);
+        cm.stopContainer(testName);
         Thread.sleep(3000);
+        Assert.assertEquals("Stopped", cm.getLxcClient().loadContainerState(testName).getStatus());
         // Is there a exited container with a given name?
-        Assert.assertNotNull(getContainerId(testName, "exited", cm));
-        Assert.assertEquals(ContainerState.STOPPED, cm.getState(testId));
+        Assert.assertNotNull(getLxcName(testName, "stopped", cm));
 
-        //---- Undeploying container --------------
-        cm.undeployContainer(testId);
+        //---- Delete container --------------
+        cm.deleteContainer(testName);
         Thread.sleep(3000);
-        // Removed from Docker system?
-        Assert.assertNull(cm.getDockerId(testName));
-        // Removed from Platform?
-        Assert.assertNull(cm.getContainer(testId));
+        // Removed from system?
+        Assert.assertNull(cm.getLxcName(testName));
+
         
-        //---- Docker System Version --------------
-        Assert.assertNotEquals("", cm.getContainerSystemVersion());
+        //---- LXC System Version --------------
+        Assert.assertNotEquals(null, cm.getContainerSystemVersion());
         
         ActiveAasBase.setNotificationMode(oldM);
         
     }
     
     /**
-     * Returns the Docker Id of a container with a given {@code name} and {@code state}.
+     * Returns the Lxc Name of a container with a given {@code name} and {@code state}.
      * 
      * @param name container's name
      * @param state container's state (created, running etc)
      * @param cm container Manager
-     * @return container Docker Id
+     * @return container Lxc Name
      */
-    public static String getContainerId(String name, String state, LxcContainerManager cm) {
-        DockerClient dockerClient = cm.getDockerClient();
+    public String getLxcName(String name, String state, LxcContainerManager cm) throws ExecutionException {
+        ILxdService lxcClient = cm.getLxcClient();
         
-        ArrayList<Container> containers = (ArrayList<Container>) dockerClient.listContainersCmd()
-                .withStatusFilter(Arrays.asList(state))
-                .withNameFilter(Arrays.asList(name))
-                .exec();
-        
-        if (containers.size() == 0) {
-            return null;
-        } 
-        
-        for (int i = 0; i < containers.size(); i++) {
-            Container container = containers.get(i);
-            String dockerName = container.getNames()[0];
-            // removing the slash symbol before the name
-            dockerName = dockerName.substring(1, dockerName.length());
-            if (dockerName.equals(name)) {
-                return container.getId();
-            }
-        }
+        // Getting list of all container that LXC "knows".
+        Collection<Container> containers = null;
+		try {
+			containers = lxcClient.loadContainerMap().values();
+		} catch (IOException | InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		if (containers.size() == 0) {
+	        return null;
+		}
+         
+        // Looking for the container with a given name.
+		for (Container container : containers) {
+			if(container.getName().equals(name) && container.getStatus().equalsIgnoreCase(state)) {
+				return container.getName();
+			}
+		}
         return null;
-    }    
+    }   
 }

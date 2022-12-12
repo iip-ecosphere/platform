@@ -1,5 +1,11 @@
-id: 01
+id:
 name: test-container
-version: 1.0
-dockerImageName: arvindr226/alpine-ssh
-dockerImageZipfile: alpine-ssh-image.tar.gz
+lxcImageAlias: imagefromtemplate
+env:
+  - IIP_PORT=${port}
+exposedPorts:
+  - ${port}/TCP
+  - 22/UDP
+  - 80
+  - 8080/DEFAULT
+  - 8443

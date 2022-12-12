@@ -38,7 +38,7 @@ public class LxcSetup extends EcsSetup {
     }
     
     /**
-     * Defines LXC setup. [required by SnakeYaml]
+     * Defines LXC setup.
      * 
      * @param lxc the setup instance
      */

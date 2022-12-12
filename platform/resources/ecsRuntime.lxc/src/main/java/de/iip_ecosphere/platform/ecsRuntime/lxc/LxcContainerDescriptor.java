@@ -23,18 +23,16 @@ import java.util.List;
 
 import org.slf4j.LoggerFactory;
 
-import com.github.dockerjava.api.model.ExposedPort;
-import com.github.dockerjava.api.model.InternetProtocol;
-
 import de.iip_ecosphere.platform.ecsRuntime.BasicContainerDescriptor;
+import de.iip_ecosphere.platform.ecsRuntime.lxc.LxcContainerDescriptor;
 import de.iip_ecosphere.platform.support.iip_aas.Id;
 import de.iip_ecosphere.platform.support.iip_aas.Version;
 import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
 
 /**
- * Implements a container descriptor for docker-based container management.
+ * Implements a container descriptor for lxc-based container management.
  * 
- * @author Monika Staciwa, SSE
+ * @author Luca Schulz, SSE
  */
 public class LxcContainerDescriptor extends BasicContainerDescriptor {
     
@@ -44,17 +42,11 @@ public class LxcContainerDescriptor extends BasicContainerDescriptor {
 
     // internal
     private int instance = instanceCount++;
-    private String dockerId;
-    private String downloadedImageZipfile;
+    private String lxcId;
 
     // configurable
-    private String dockerImageName;
-    private boolean dood = false;
-    private boolean attachStdIn = false;
-    private boolean attachStdOut = false;
-    private boolean attachStdErr = false;
-    private boolean privileged = false;
-    private boolean withTty = false;
+    private String lxcImageAlias;
+    private String lxcZip;
     private String networkMode;
     private ArrayList<String> exposedPorts = new ArrayList<String>();
     private ArrayList<String> env = new ArrayList<String>();
@@ -80,55 +72,52 @@ public class LxcContainerDescriptor extends BasicContainerDescriptor {
     }
     
     /**
-     * Defines the Docker container's id.
-     * @param dockerId
+     * Defines the LXC container's id for LXC its the fingerprint in specific.
+     * @param lxcId
      */
-    void setDockerId(String dockerId) {
-        this.dockerId = dockerId;
+    public void setId(String lxcId) {
+        this.lxcId = lxcId;
     }
     
     /**
-     * Returns the Docker container's id.
-     * @return Docker id
+     * Returns the LXC container's id for LXC its the fingerprint in specific.
+     * @return LXC id
      */
-    public String getDockerId() {
-        return this.dockerId;
+    public String getId() {
+        return this.lxcId;
+    }
+    /**
+     * Defines the name of the LXC image.
+     * @param lxcImageAlias
+     */
+    public void setLxcImageAlias(String lxcImageAlias) {
+        this.lxcImageAlias = lxcImageAlias;
     }
     
     /**
-     * Defines the name of the Docker image. [required by SnakeYaml]
-     * @param dockerImageName
+     * Returns the name of the LXC image.
+     * @return lxcImageAlias
      */
-    public void setDockerImageName(String dockerImageName) {
-        this.dockerImageName = dockerImageName;
+    public String getLxcImageAlias() {
+        return this.lxcImageAlias;
     }
-    
     /**
-     * Returns the name of the Docker image.
-     * @return name
+     * Returns the name of the LXC image zip.
+     * @return lxcZip
      */
-    public String getDockerImageName() {
-        return this.dockerImageName;
-    }
-    
-    /**
-     * Defines the name of the downloaded file with the Docker image.
-     * @param name
+	public String getLxcZip() {
+		return lxcZip;
+	}
+	/**
+     * Defines the name of the LXC image zip.
+     * @param lxcZip
      */
-    void setDownloadedImageZipfile(String name) {
-        this.downloadedImageZipfile = name;
-    }
-    
+	public void setLxcZip(String lxcZip) {
+		this.lxcZip = lxcZip;
+	}
+	
     /**
-     * Returns a name of downloaded file with the Docker image.
-     * @return image's name
-     */
-    public String getDownloadedImageZipfile() {
-        return this.downloadedImageZipfile;
-    }
-
-    /**
-     * Defines the exposed ports. [required by SnakeYaml]
+     * Defines the exposed ports.
      * @param exposedPorts the exposed ports
      */
     public void setExposedPorts(ArrayList<String> exposedPorts) {
@@ -151,36 +140,36 @@ public class LxcContainerDescriptor extends BasicContainerDescriptor {
      * @param port1 to replace {@link #PORT_PLACEHOLDER_1}
      * @return the exposed ports
      */
-    public List<ExposedPort> instantiateExposedPorts(int port, int port1) {
-        ArrayList<ExposedPort> result = new ArrayList<ExposedPort>();
-        String tmpPort = String.valueOf(port);
-        String tmpPort1 = String.valueOf(port1);
-        for (String e: exposedPorts) {
-            String tmp = e.replace(PORT_PLACEHOLDER, tmpPort);
-            tmp = tmp.replace(PORT_PLACEHOLDER_1, tmpPort1);
-            int pos = tmp.indexOf('/');
-            String iPort;
-            String iProtocol;
-            if (pos > 0) {
-                iPort = tmp.substring(0, pos);
-                iProtocol = tmp.substring(pos + 1);
-                if ("DEFAULT".equals(iProtocol)) {
-                    iProtocol = InternetProtocol.DEFAULT.name();
-                }
-            } else {
-                iPort = tmp;
-                iProtocol = InternetProtocol.TCP.name();
-            }
-            try {
-                result.add(new ExposedPort(Integer.parseInt(iPort), InternetProtocol.valueOf(iProtocol)));
-            } catch (IllegalArgumentException ex) {
-            }
-        }
-        return result;
-    }
+//    public List<ExposedPort> instantiateExposedPorts(int port, int port1) {
+//        ArrayList<ExposedPort> result = new ArrayList<ExposedPort>();
+//        String tmpPort = String.valueOf(port);
+//        String tmpPort1 = String.valueOf(port1);
+//        for (String e: exposedPorts) {
+//            String tmp = e.replace(PORT_PLACEHOLDER, tmpPort);
+//            tmp = tmp.replace(PORT_PLACEHOLDER_1, tmpPort1);
+//            int pos = tmp.indexOf('/');
+//            String iPort;
+//            String iProtocol;
+//            if (pos > 0) {
+//                iPort = tmp.substring(0, pos);
+//                iProtocol = tmp.substring(pos + 1);
+//                if ("DEFAULT".equals(iProtocol)) {
+//                    iProtocol = InternetProtocol.DEFAULT.name();
+//                }
+//            } else {
+//                iPort = tmp;
+//                iProtocol = InternetProtocol.TCP.name();
+//            }
+//            try {
+//                result.add(new ExposedPort(Integer.parseInt(iPort), InternetProtocol.valueOf(iProtocol)));
+//            } catch (IllegalArgumentException ex) {
+//            }
+//        }
+//        return result;
+//    }
 
     /**
-     * Defines the environment settings to start the container. [required by SnakeYaml]
+     * Defines the environment settings to start the container.
      * @param env the environment settings, may contain {@link #PORT_PLACEHOLDER} to be replaced by the dynamic port 
      *    of the AAS implementation server of the service manager
      */
@@ -206,64 +195,6 @@ public class LxcContainerDescriptor extends BasicContainerDescriptor {
     public ArrayList<String> getEnv() {
         return this.env;
     }
-    
-    /**
-     * Returns whether the container shall allow for managing containers (DooD).
-     * 
-     * @return {@code true} if docker shall be available/mapped, {@code false} else
-     * @see #getWithTty()
-     * @see #getAttachStdIn()
-     */
-    public boolean getDood() {
-        return dood;
-    }
-
-    /**
-     * Returns whether the container shall provide an interactive terminal.
-     * 
-     * @return {@code true} if the terminal shall be provided, {@code false} else
-     * @see #getDood()
-     */
-    public boolean getWithTty() {
-        return withTty || dood;
-    }
-
-    /**
-     * Returns whether the container shall run in privileged mode.
-     * 
-     * @return {@code true} if privileged model shall apply, {@code false} else
-     */
-    public boolean getPrivileged() {
-        return privileged;
-    }
-
-    /**
-     * Returns whether standard error shall be attached to the container.
-     * 
-     * @return {@code true} to attach, {@code false} else
-     */
-    public boolean getAttachStdErr() {
-        return attachStdErr;
-    }
-
-    /**
-     * Returns whether standard in shall be attached to the container.
-     * 
-     * @return {@code true} to attach, {@code false} else
-     * @see #getDood()
-     */
-    public boolean getAttachStdIn() {
-        return attachStdIn || dood;
-    }
-
-    /**
-     * Returns whether standard out shall be attached to the container.
-     * 
-     * @return {@code true} to attach, {@code false} else
-     */
-    public boolean getAttachStdOut() {
-        return attachStdOut;
-    }
 
     /**
      * Defines the network mode. [snakeyaml]
@@ -272,60 +203,6 @@ public class LxcContainerDescriptor extends BasicContainerDescriptor {
      */
     public void setNetworkMode(String networkMode) {
         this.networkMode = networkMode;
-    }
-    
-    /**
-     * Changes whether the container shall run in privileged mode. [snakeyaml]
-     * 
-     * @param privileged {@code true} if privileged model shall apply, {@code false} else
-     */
-    public void setPrivileged(boolean privileged) {
-        this.privileged = privileged;
-    }
-
-    /**
-     * Changes whether the container shall allow for managing containers (DooD).
-     * 
-     * @param dood {@code true} if docker shall be available/mapped, {@code false} else
-     */
-    public void setDood(boolean dood) {
-        this.dood = dood;
-    }
-
-    /**
-     * Returns whether the container shall provide an interactive terminal.
-     * 
-     * @param withTty {@code true} if the terminal shall be provided, {@code false} else
-     */
-    public void setWithTty(boolean withTty) {
-        this.withTty = withTty;
-    }
-
-    /**
-     * Changes whether standard out shall be attached to the container.
-     * 
-     * @param attachStdErr {@code true} to attach, {@code false} else
-     */
-    public void setAttachStdErr(boolean attachStdErr) {
-        this.attachStdErr = attachStdErr;
-    }
-
-    /**
-     * Changes whether standard in shall be attached to the container.
-     * 
-     * @param attachStdIn {@code true} to attach, {@code false} else
-     */
-    public void setAttachStdIn(boolean attachStdIn) {
-        this.attachStdIn = attachStdIn;
-    }
-
-    /**
-     * Changes whether standard out shall be attached to the container.
-     * 
-     * @param attachStdOut {@code true} to attach, {@code false} else
-     */
-    public void setAttachStdOut(boolean attachStdOut) {
-        this.attachStdOut = attachStdOut;
     }
     
     /**
@@ -375,7 +252,7 @@ public class LxcContainerDescriptor extends BasicContainerDescriptor {
      * @return the key
      */
     public String getNetKey() {
-        return Id.getDeviceId() + "_" + dockerImageName + "_" + instance;
+        return Id.getDeviceId() + "_" + lxcImageAlias + "_" + instance;
     }
 
     /**
@@ -384,13 +261,15 @@ public class LxcContainerDescriptor extends BasicContainerDescriptor {
      * @return the key
      */
     public String getNetKey1() {
-        return Id.getDeviceId() + "_" + dockerImageName + "_1_" + instance;
+        return Id.getDeviceId() + "_" + lxcImageAlias + "_1_" + instance;
     }
+    
+    
 
     /**
-     * Returns a DockerContainerDescriptor with a information from a yaml file.
+     * Returns a LxcContainerDescriptor with a information from a yaml file.
      * @param file yaml file
-     * @return DockerContainerDescriptor (may be <b>null</b>)
+     * @return LxcContainerDescriptor (may be <b>null</b>)
      */
     public static LxcContainerDescriptor readFromYamlFile(File file) {
         LxcContainerDescriptor result = null;
@@ -406,10 +285,10 @@ public class LxcContainerDescriptor extends BasicContainerDescriptor {
     }
     
     /**
-     * Returns a DockerContainerDescriptor with a information from a yaml file.
+     * Returns a LxcContainerDescriptor with a information from a yaml file.
      * @param in an inout stream with Yaml contents (may be <b>null</b>)
      * @param uri the URI the descriptor was read from
-     * @return DockerContainerDescriptor (may be <b>null</b>)
+     * @return LxcContainerDescriptor (may be <b>null</b>)
      */
     public static LxcContainerDescriptor readFromYaml(InputStream in, URI uri) {
         LxcContainerDescriptor result = null;
@@ -421,6 +300,71 @@ public class LxcContainerDescriptor extends BasicContainerDescriptor {
                 LoggerFactory.getLogger(LxcContainerDescriptor.class).error(
                     "Reading container descriptor: " + e.getMessage());
             }
+        }
+        return result;
+    }
+    
+    /**
+     * Turns a full container image name with optional registry, repository and version into its repository/name.
+     * 
+     * @param imgName the image name
+     * @return the repository
+     */
+    public static String getRepository(String imgName) {
+        String result = imgName;
+        String tag = getTag(imgName);
+        if (LxcSetup.isNotEmpty(tag)) {
+            int pos = imgName.lastIndexOf(':');
+            if (pos > 0) {
+                result = imgName.substring(0, pos);
+            }
+        }
+        String reg = getRegistry(result);
+        if (LxcSetup.isNotEmpty(reg)) {
+            result = result.substring(reg.length() + 1);
+        }
+        return result;
+    }
+    
+    /**
+     * Turns a full container image name with optional registry, repository and version into its repository/name.
+     * 
+     * @param imgName the image name
+     * @return the repository
+     */
+    public static String getRegistry(String imgName) {
+        String result;
+        int pos = imgName.indexOf('/');
+        if (pos > 0) {
+            int lastPos = imgName.lastIndexOf('/');
+            if (pos != lastPos) {
+                result = imgName.substring(0, pos);
+            } else {
+                result = "";
+            }
+        } else {
+            result = "";
+        }
+        return result;
+    }
+
+    /**
+     * Turns a full container image name with optional registry, repository and version into its (version) tag.
+     * 
+     * @param imgName the image name
+     * @return the tag, may be empty
+     */
+    public static String getTag(String imgName) {
+        String result;
+        int pos = imgName.lastIndexOf('/'); // repo/registry before?
+        if (pos > 0) {
+            imgName = imgName.substring(pos + 1);
+        }
+        pos = imgName.lastIndexOf(':');
+        if (pos > 0) {
+            result = imgName.substring(pos + 1);
+        } else {
+            result = "";
         }
         return result;
     }
