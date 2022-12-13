@@ -1,8 +1,7 @@
 id: test-serviceMgr
 name: Test Service Manager
-version: 1.0
-dockerImageName: iip/serviceMgr
-dockerImageZipfile: serviceMgr.tar.gz
+lxcImageAlias: iip/serviceMgr
+lxcZip: serviceMgr.tar.gz
 env:
   - IIP_PORT=${port}
 exposedPorts:
@@ -10,5 +9,6 @@ exposedPorts:
   - 22/UDP
   - 80
   - 8080/DEFAULT
+  - 8443
 networkMode: host
-dood: true  
+ 

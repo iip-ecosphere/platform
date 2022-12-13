@@ -11,45 +11,61 @@
  ********************************************************************************/
 package de.iip_ecosphere.platform.ecsRuntime.lxc;
 
-import org.apache.commons.lang.SystemUtils;
-
 import de.iip_ecosphere.platform.ecsRuntime.EcsSetup.AbstractManagerSetup;
 
 /**
- * Implements the docker specific configuration.
+ * Implements the LXC specific configuration.
  * 
- * @author Monika Staciwa, SSE
+ * @author Luca Schulz, SSE
  *
  */
 public class Lxc extends AbstractManagerSetup {
     
-    // TODO unify common parts with Docker -> ecsRuntime???
+    // TODO unify common parts with Lxc -> ecsRuntime???
 
-    // http://localhost:2375 does not seem to work although discussed as solution
-    private String dockerHost = SystemUtils.IS_OS_WINDOWS 
-        ? "unix:///var/run/docker.sock" : "unix:///var/run/docker.sock";
-    private String lxcImageYamlFilename = "image-info.yml";
-    private boolean deleteWhenUndeployed = false;
+    private String lxcHost = "localhost";
+    private String lxcPort = "8443";
+    
+    /**
+     * Returns the LXC port.
+     * 
+     * @return the LXC port as LXC port string, e.g., port
+     */
+    public String getLxcPort() {
+		return lxcPort;
+	}
+    
+    /**
+     * Defines the LXC port.
+     * 
+     * @return the LXC port as LXC port string, e.g., 8443
+     */
+	public void setLxcPort(String lxcPort) {
+		this.lxcPort = lxcPort;
+	}
+
+	private String lxcImageYamlFilename = "image-info.yml";
     private String downloadDirectory;
     
     /**
-     * Returns the docker host.
+     * Returns the LXC host.
      * 
-     * @return the docker host as Docker host string, e.g., unix:///var/run/docker.sock
+     * @return the LXChost as LXC host string, e.g., localhost
      */
-    public String getDockerHost() {
-        return dockerHost;
+    public String getLxcHost() {
+        return lxcHost;
     }
     
     /**
-     * Defines the docker host. [required by SnakeYaml]
+     * Defines the LXC host.
      * 
-     * @param dockerHost the docker host as Docker host string, e.g., unix:///var/run/docker.sock
+     * @param lxcHost the LXC host as LXC host string, e.g., localhost
      */
-    public void setDockerHost(String dockerHost) {
-        this.dockerHost = dockerHost;
+    public void setLxcHost(String lxcHost) {
+        this.lxcHost = lxcHost;
     }
     
+    // Can possibly be removed, see during process
     /**
      * Returns the name of the Yaml file with information about the LXC Image.
      * 
@@ -68,27 +84,10 @@ public class Lxc extends AbstractManagerSetup {
         this.lxcImageYamlFilename = filename;
     }
     
+    
+    // Can possibly be removed, see during process
     /**
-     * Returns True if Docker files should be removed when the corresponding container
-     * gets undeployed. Otherwise it returns False.
-     *  
-     * @return True/False
-     */
-    public boolean getDeleteWhenUndeployed() {
-        return this.deleteWhenUndeployed;
-    }
-    /**
-     * Defines if Docker files should be deleted when the corresponding container 
-     * gets undeployed. [required by SnakeYaml]
-     * 
-     * @param deleteWhenUndeployed True or False
-     */
-    public void setDeleteWhenUndeployed(boolean deleteWhenUndeployed) {
-        this.deleteWhenUndeployed = deleteWhenUndeployed;
-    }
-
-    /**
-     * Defines the download directory. [required by SnakeYaml]
+     * Defines the download directory.
      * @param directory
      */
     public void setDownloadDirectory(String directory) {

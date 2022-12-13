@@ -33,8 +33,8 @@ public class LxcSetupTest {
     public void testConfiguration() throws IOException {
         LxcSetup cfg = LxcSetup.readFromYaml();
         Assert.assertNotNull(cfg);
-        Assert.assertNotNull(cfg.getLxc().getDockerHost());
-        Assert.assertTrue(cfg.getLxc().getDockerHost().length() > 0);
+        Assert.assertNotNull(cfg.getLxc().getLxcHost());
+        Assert.assertTrue(cfg.getLxc().getLxcHost().length() > 0);
     }
 
 }
