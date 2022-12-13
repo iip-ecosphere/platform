@@ -37,6 +37,8 @@ New features:
 * [#94](https://github.com/iip-ecosphere/platform/issues/94): Transport logging tool for debugging
 * [#96](https://github.com/iip-ecosphere/platform/issues/96): Hostname as device id (optional, not default)
 * [#36](https://github.com/iip-ecosphere/platform/issues/36): Generated service test frames
+* [#114](https://github.com/iip-ecosphere/platform/issues/114): Initial integration of the OPC UA companion spec to IVML generator by J.-H. Cepok
+* [#105](https://github.com/iip-ecosphere/platform/issues/105): Maven plugins for Python build steps.
 
 Improvements:
 * Extend configuration model, e.g., by constraints [#52](https://github.com/iip-ecosphere/platform/issues/52)
