@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=Chrome
+Type=Application
+Exec=/usr/bin/google-chrome --no-sandbox
+Terminal=false
+Icon=/usr/share/icons/hicolor/48x48/apps/google-chrome.png

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+
+<!-- Preferences page -->
+   <extension point="org.eclipse.ui.preferencePages">
+      <page
+            class="org.python.pydev.jython.ui.JyScriptingPreferencesPage"
+            category="org.python.pydev.prefs"
+            id="org.python.pydev.jython.ui.JyScriptingPreferencesPage"
+            name="Scripting PyDev"/>
+   </extension>
+<!-- Initialize our preferences -->
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer class="org.python.pydev.jython.ScriptingExtensionInitializer"/>
+   </extension>
+
+<!-- Custom marker types that can be used in Jython scripts -->
+   <extension
+         id="problemmarker"
+         point="org.eclipse.core.resources.markers">
+         <super type="org.eclipse.core.resources.problemmarker"/>
+         <persistent value="true"/>
+   </extension>
+   <extension
+         id="taskmarker"
+         point="org.eclipse.core.resources.markers">
+         <super type="org.eclipse.core.resources.taskmarker"/>
+         <persistent value="true"/>
+   </extension>
+   <extension
+         id="bookmark"
+         point="org.eclipse.core.resources.markers">
+         <super type="org.eclipse.core.resources.bookmark"/>
+         <persistent value="true"/>
+   </extension>   
+  
+</plugin>

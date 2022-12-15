@@ -1,0 +1,64 @@
+Manifest-Version: 1.0
+Automatic-Module-Name: org.eclipse.m2e.sourcelookup
+Bundle-SymbolicName: org.eclipse.m2e.sourcelookup;singleton:=true
+Require-Bundle: org.eclipse.m2e.launching;bundle-version="[1.16.0,2.0.
+ 0)",org.eclipse.m2e.core;bundle-version="[1.16.0,2.0.0)",org.eclipse.
+ m2e.maven.runtime;bundle-version="[1.16.0,2.0.0)",org.eclipse.jdt.cor
+ e;bundle-version="3.7.0",org.eclipse.jdt.debug;bundle-version="3.8.0"
+ ,org.eclipse.jdt.launching;bundle-version="3.9.0",org.eclipse.debug.c
+ ore;bundle-version="3.7.0",org.eclipse.core.runtime;bundle-version="3
+ .7.0",org.eclipse.core.expressions;bundle-version="3.4.400",org.eclip
+ se.debug.ui;bundle-version="3.10.0",org.eclipse.core.resources,com.go
+ ogle.guava;bundle-version="[27.1,28.0)",com.google.gson;bundle-versio
+ n="2.2.4",org.eclipse.core.variables;bundle-version="3.2.0"
+Bundle-ManifestVersion: 2
+Bundle-RequiredExecutionEnvironment: JavaSE-11
+Bundle-ActivationPolicy: lazy
+Eclipse-SourceReferences: scm:git:https://github.com/eclipse-m2e/m2e-c
+ ore.git;path="org.eclipse.m2e.sourcelookup";commitId=d1d7356dff3b7efa
+ cc0b9f73df551d6ec23c2ac5
+Bundle-Vendor: %Bundle-Vendor
+Import-Package: org.slf4j;version="1.6.2"
+Export-Package: org.eclipse.m2e.sourcelookup.internal.launch;x-friends
+ :="org.eclipse.m2e.sourcelookup.ui,org.eclipse.m2e.binaryproject"
+Bundle-Version: 1.17.1.20210115-1536
+Bundle-Name: %Bundle-Name
+Bundle-Localization: plugin
+Build-Jdk-Spec: 11
+Created-By: Maven Archiver 3.5.0
+Eclipse-BundleShape: dir
+
+Name: plugin.xml
+SHA-256-Digest: eJ8DKf9LjH7aJfyodWGXXzYPPo+8IPapvXSQ1JJwJ8A=
+
+Name: org/eclipse/m2e/sourcelookup/internal/launch/MavenArtifactIdenti
+ fier$1.class
+SHA-256-Digest: wA3iX2HukXmp0tqzK1yigRNIEx+dMi004FUYv7HXdtA=
+
+Name: META-INF/maven/org.eclipse.m2e/org.eclipse.m2e.sourcelookup/pom.
+ xml
+SHA-256-Digest: c8sM+eFEG2lq03PgzKrx1Yf663yrReq96eBLiqnCLiI=
+
+Name: org/eclipse/m2e/sourcelookup/internal/launch/MavenArtifactIdenti
+ fier.class
+SHA-256-Digest: OKUxQZP3dWy4FmaYTsp6sYgRgyjJ0ocmWYEeY4+V6Vk=
+
+Name: plugin.properties
+SHA-256-Digest: kP0QF6Pk17Ex2edFczoWO7gyWmiTVyTkyQCc1RZoJ00=
+
+Name: org/eclipse/m2e/sourcelookup/internal/launch/MetaInfMavenScanner
+ .class
+SHA-256-Digest: e34hkZVXIQ1h5mMJ/Fex6Aw//uUTO5FlJXNteOWS+KE=
+
+Name: META-INF/maven/org.eclipse.m2e/org.eclipse.m2e.sourcelookup/pom.
+ properties
+SHA-256-Digest: VBxnMCB74AlicmMppvFrjo1AOUBMxiYklAayJVdgaxo=
+
+Name: org/eclipse/m2e/sourcelookup/internal/launch/MavenSourceContaine
+ rResolver.class
+SHA-256-Digest: vcvOaGxcbjRvDNnwmsVUwwgQs8V1vXgboTw+yW8/87Y=
+
+Name: org/eclipse/m2e/sourcelookup/internal/launch/MavenSourceLookupPa
+ rticipant.class
+SHA-256-Digest: 9wFcPJE/uxyWrju/xDnZq3R5dgslgRKKMk0ElNax8p0=
+

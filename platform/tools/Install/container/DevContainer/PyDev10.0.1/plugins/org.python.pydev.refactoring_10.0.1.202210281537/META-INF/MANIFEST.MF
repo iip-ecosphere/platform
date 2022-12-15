@@ -1,0 +1,90 @@
+Manifest-Version: 1.0
+Created-By: Maven Archiver 3.5.2
+Build-Jdk-Spec: 11
+Bundle-ManifestVersion: 2
+Bundle-Name: %peptic.pluginName
+Bundle-SymbolicName: org.python.pydev.refactoring;singleton:=true
+Bundle-Version: 10.0.1.202210281537
+Bundle-Activator: org.python.pydev.refactoring.PepticPlugin
+Bundle-Vendor: %peptic.providerName
+Bundle-Localization: plugin
+Eclipse-BundleShape: dir
+Require-Bundle: org.eclipse.ui,org.eclipse.core.runtime,org.python.pydev
+ .core;bundle-version="[10.0.1,10.0.2)",org.python.pydev.parser;bundle-v
+ ersion="[10.0.1,10.0.2)",org.eclipse.ltk.core.refactoring,org.eclipse.l
+ tk.ui.refactoring,org.eclipse.core.resources,org.eclipse.jface.text,org
+ .eclipse.ui.ide,org.eclipse.ui.workbench.texteditor,org.eclipse.ui.edit
+ ors,org.python.pydev.ast;bundle-version="[10.0.1,10.0.2)",org.python.py
+ dev;bundle-version="[10.0.1,10.0.2)",org.eclipse.compare,org.python.pyd
+ ev.shared_ui;bundle-version="[10.0.1,10.0.2)",org.junit;bundle-version=
+ "4.0.0";resolution:=optional
+Bundle-ActivationPolicy: lazy
+Bundle-ClassPath: refactoring.jar
+Export-Package: org.python.pydev.refactoring,org.python.pydev.refactorin
+ g.ast,org.python.pydev.refactoring.ast.adapters,org.python.pydev.refact
+ oring.ast.adapters.offsetstrategy,org.python.pydev.refactoring.ast.visi
+ tors,org.python.pydev.refactoring.ast.visitors.context,org.python.pydev
+ .refactoring.ast.visitors.info,org.python.pydev.refactoring.ast.visitor
+ s.position,org.python.pydev.refactoring.ast.visitors.renamer,org.python
+ .pydev.refactoring.ast.visitors.rewriter,org.python.pydev.refactoring.a
+ st.visitors.selection,org.python.pydev.refactoring.codegenerator.constr
+ uctorfield,org.python.pydev.refactoring.codegenerator.constructorfield.
+ edit,org.python.pydev.refactoring.codegenerator.constructorfield.reques
+ t,org.python.pydev.refactoring.codegenerator.generateproperties,org.pyt
+ hon.pydev.refactoring.codegenerator.generateproperties.edit,org.python.
+ pydev.refactoring.codegenerator.generateproperties.request,org.python.p
+ ydev.refactoring.codegenerator.overridemethods,org.python.pydev.refacto
+ ring.codegenerator.overridemethods.edit,org.python.pydev.refactoring.co
+ degenerator.overridemethods.request,org.python.pydev.refactoring.codere
+ factoring.extractlocal,org.python.pydev.refactoring.coderefactoring.ext
+ ractlocal.edit,org.python.pydev.refactoring.coderefactoring.extractloca
+ l.request,org.python.pydev.refactoring.coderefactoring.extractmethod,or
+ g.python.pydev.refactoring.coderefactoring.extractmethod.edit,org.pytho
+ n.pydev.refactoring.coderefactoring.extractmethod.request,org.python.py
+ dev.refactoring.coderefactoring.inlinelocal,org.python.pydev.refactorin
+ g.coderefactoring.inlinelocal.edit,org.python.pydev.refactoring.coderef
+ actoring.inlinelocal.request,org.python.pydev.refactoring.core.base,org
+ .python.pydev.refactoring.core.change,org.python.pydev.refactoring.core
+ .edit,org.python.pydev.refactoring.core.model,org.python.pydev.refactor
+ ing.core.model.constructorfield,org.python.pydev.refactoring.core.model
+ .generateproperties,org.python.pydev.refactoring.core.model.overridemet
+ hods,org.python.pydev.refactoring.core.model.tree,org.python.pydev.refa
+ ctoring.core.request,org.python.pydev.refactoring.core.validator,org.py
+ thon.pydev.refactoring.messages,org.python.pydev.refactoring.ui.actions
+ ,org.python.pydev.refactoring.ui.actions.internal,org.python.pydev.refa
+ ctoring.ui.pages.core.eclipse
+Bundle-RequiredExecutionEnvironment: JavaSE-11
+Automatic-Module-Name: org.python.pydev.refactoring
+
+Name: icons/methpub_obj.gif
+SHA-256-Digest: U+gNojYX4ATy6n89c7HaCCVfC2z43Ab9pf83WJLo2Y4=
+
+Name: icons/attrpub_obj.gif
+SHA-256-Digest: Z0Z5scwhm2907E2BgIBMb46J9BIYyyMHjoLbzaRaaxA=
+
+Name: icons/class_obj.gif
+SHA-256-Digest: izgHul4JnN51PFyvF4em2brmt21rtHnvJ0Y34kiLCco=
+
+Name: refactoring.jar
+SHA-256-Digest: xPjmBHeDIGBwZxAKxC2ZLNj0/nDUNPKiPjBWvIOmhEM=
+
+Name: icons/logo.ufo
+SHA-256-Digest: SnL4BP7SIKrD1CcuPIUrnZgX5T1iqtFP81OAiqODrvU=
+
+Name: META-INF/maven/org.python.pydev/org.python.pydev.refactoring/pom.p
+ roperties
+SHA-256-Digest: oOT+rF1lBncVjYxWaKUv7oAU/1+GGLdBc4JNcSeJa4s=
+
+Name: LICENSE.txt
+SHA-256-Digest: J75t01G5GT6rkY9hiDNA+yh/SDVMI+VNinfwannMATI=
+
+Name: plugin.properties
+SHA-256-Digest: 0v6HN/cI+F7Onr1xrJhtsPsNbde5dGHYSBr9p2v/1O4=
+
+Name: META-INF/maven/org.python.pydev/org.python.pydev.refactoring/pom.x
+ ml
+SHA-256-Digest: 8ZcG3XfFqSzq8f72i6442xXygoi+AYo7FnfzyvzmdFY=
+
+Name: icons/logo.png
+SHA-256-Digest: HJS8WtheNlEVIVla2uuHuuAIzS2JSBDvQ7j/6FEdIjs=
+

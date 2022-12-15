@@ -1,0 +1,103 @@
+Manifest-Version: 1.0
+Created-By: Maven Archiver 3.5.2
+Build-Jdk-Spec: 11
+Bundle-ManifestVersion: 2
+Bundle-Name: Shared Core Plug-in
+Bundle-SymbolicName: org.python.pydev.shared_core;singleton:=true
+Bundle-Version: 10.0.1.202210281537
+Bundle-ClassPath: shared_core.jar,libs/snakeyaml-engine-2.1-20200105.160
+ 423-4.jar,libs/org.apache.lucene.analyzers-common_8.4.1.v20200122-1459.
+ jar,libs/org.apache.lucene.core_8.4.1.v20200122-1459.jar
+Bundle-Activator: org.python.pydev.shared_core.SharedCorePlugin
+Eclipse-BundleShape: dir
+Require-Bundle: org.eclipse.core.runtime,org.junit;bundle-version="4.0";
+ resolution:=optional,org.eclipse.core.resources,org.eclipse.core.filebu
+ ffers,org.eclipse.text
+Bundle-ActivationPolicy: lazy
+Export-Package: org.apache.lucene,org.apache.lucene.analysis,org.apache.
+ lucene.analysis.ar,org.apache.lucene.analysis.bg,org.apache.lucene.anal
+ ysis.br,org.apache.lucene.analysis.ca,org.apache.lucene.analysis.charfi
+ lter,org.apache.lucene.analysis.cjk,org.apache.lucene.analysis.ckb,org.
+ apache.lucene.analysis.commongrams,org.apache.lucene.analysis.compound,
+ org.apache.lucene.analysis.compound.hyphenation,org.apache.lucene.analy
+ sis.core,org.apache.lucene.analysis.custom,org.apache.lucene.analysis.c
+ z,org.apache.lucene.analysis.da,org.apache.lucene.analysis.de,org.apach
+ e.lucene.analysis.el,org.apache.lucene.analysis.en,org.apache.lucene.an
+ alysis.es,org.apache.lucene.analysis.et,org.apache.lucene.analysis.eu,o
+ rg.apache.lucene.analysis.fa,org.apache.lucene.analysis.fi,org.apache.l
+ ucene.analysis.fr,org.apache.lucene.analysis.ga,org.apache.lucene.analy
+ sis.gl,org.apache.lucene.analysis.hi,org.apache.lucene.analysis.hu,org.
+ apache.lucene.analysis.hunspell,org.apache.lucene.analysis.hy,org.apach
+ e.lucene.analysis.id,org.apache.lucene.analysis.in,org.apache.lucene.an
+ alysis.it,org.apache.lucene.analysis.lt,org.apache.lucene.analysis.lv,o
+ rg.apache.lucene.analysis.miscellaneous,org.apache.lucene.analysis.ngra
+ m,org.apache.lucene.analysis.nl,org.apache.lucene.analysis.no,org.apach
+ e.lucene.analysis.path,org.apache.lucene.analysis.pattern,org.apache.lu
+ cene.analysis.payloads,org.apache.lucene.analysis.pt,org.apache.lucene.
+ analysis.query,org.apache.lucene.analysis.reverse,org.apache.lucene.ana
+ lysis.ro,org.apache.lucene.analysis.ru,org.apache.lucene.analysis.shing
+ le,org.apache.lucene.analysis.sinks,org.apache.lucene.analysis.snowball
+ ,org.apache.lucene.analysis.sr,org.apache.lucene.analysis.standard,org.
+ apache.lucene.analysis.sv,org.apache.lucene.analysis.synonym,org.apache
+ .lucene.analysis.th,org.apache.lucene.analysis.tokenattributes,org.apac
+ he.lucene.analysis.tr,org.apache.lucene.analysis.util,org.apache.lucene
+ .analysis.wikipedia,org.apache.lucene.codecs,org.apache.lucene.codecs.b
+ locktree,org.apache.lucene.codecs.compressing,org.apache.lucene.codecs.
+ lucene50,org.apache.lucene.codecs.lucene60,org.apache.lucene.codecs.luc
+ ene70,org.apache.lucene.codecs.lucene80,org.apache.lucene.codecs.lucene
+ 84,org.apache.lucene.codecs.perfield,org.apache.lucene.collation,org.ap
+ ache.lucene.collation.tokenattributes,org.apache.lucene.document,org.ap
+ ache.lucene.geo,org.apache.lucene.index,org.apache.lucene.search,org.ap
+ ache.lucene.search.similarities,org.apache.lucene.search.spans,org.apac
+ he.lucene.store,org.apache.lucene.util,org.apache.lucene.util.automaton
+ ,org.apache.lucene.util.bkd,org.apache.lucene.util.fst,org.apache.lucen
+ e.util.graph,org.apache.lucene.util.mutable,org.apache.lucene.util.pack
+ ed,org.python.pydev.shared_core,org.python.pydev.shared_core.actions,or
+ g.python.pydev.shared_core.auto_edit,org.python.pydev.shared_core.bundl
+ e,org.python.pydev.shared_core.cache,org.python.pydev.shared_core.callb
+ acks,org.python.pydev.shared_core.code_completion,org.python.pydev.shar
+ ed_core.document,org.python.pydev.shared_core.editor,org.python.pydev.s
+ hared_core.global_feedback,org.python.pydev.shared_core.image,org.pytho
+ n.pydev.shared_core.index,org.python.pydev.shared_core.io,org.python.py
+ dev.shared_core.jython,org.python.pydev.shared_core.locator,org.python.
+ pydev.shared_core.log,org.python.pydev.shared_core.markers,org.python.p
+ ydev.shared_core.model,org.python.pydev.shared_core.net,org.python.pyde
+ v.shared_core.out_of_memory,org.python.pydev.shared_core.parsing,org.py
+ thon.pydev.shared_core.partitioner,org.python.pydev.shared_core.path_wa
+ tch,org.python.pydev.shared_core.preferences,org.python.pydev.shared_co
+ re.process,org.python.pydev.shared_core.progress,org.python.pydev.share
+ d_core.resource_stubs,org.python.pydev.shared_core.resources,org.python
+ .pydev.shared_core.string,org.python.pydev.shared_core.structure,org.py
+ thon.pydev.shared_core.testutils,org.python.pydev.shared_core.threaded_
+ objects_pool,org.python.pydev.shared_core.utils,org.python.pydev.shared
+ _core.yaml
+Bundle-Vendor: Brainwy Software Ltda
+Bundle-RequiredExecutionEnvironment: JavaSE-11
+Automatic-Module-Name: org.python.pydev.shared.core
+
+Name: libs/org.apache.lucene.analyzers-common_8.4.1.v20200122-1459.jar
+SHA-256-Digest: sS8zBwklECjs8Wx9xxTdtwugV5oIVos0XWF3INwjgyk=
+
+Name: shared_core.jar
+SHA-256-Digest: 9QY+DDKmmR9rkyOVP15pevzRZJnN9Rn0HEutIPm7WAU=
+
+Name: META-INF/maven/org.python.pydev/org.python.pydev.shared_core/pom.x
+ ml
+SHA-256-Digest: oWUpo1qqtV877auQgkZBZ9KZ3+GK+LGcCGTaSD0uxfA=
+
+Name: libs/org.apache.lucene.core_8.4.1.v20200122-1459.jar
+SHA-256-Digest: DNbKuwwawmSaCbOH/NBqdutHZWGlvZwiyeXMzHH5sEU=
+
+Name: LICENSE.txt
+SHA-256-Digest: J75t01G5GT6rkY9hiDNA+yh/SDVMI+VNinfwannMATI=
+
+Name: META-INF/maven/org.python.pydev/org.python.pydev.shared_core/pom.p
+ roperties
+SHA-256-Digest: jxU9i4FX7Ffi3iR3R0EOMCGi6F7VsVhnPnwFeGH8ZII=
+
+Name: libs/snakeyaml-engine-2.1-20200105.160423-4.jar
+SHA-256-Digest: 9QQwSVi2J5p6+vo2FOSdRxAUhvn+Y6/xvhgQjgshdL0=
+
+Name: libs/README.txt
+SHA-256-Digest: bKcfWWZZmjHPNHGJYhEh6GI2ImY1LKRPPNvp6URfQr8=
+

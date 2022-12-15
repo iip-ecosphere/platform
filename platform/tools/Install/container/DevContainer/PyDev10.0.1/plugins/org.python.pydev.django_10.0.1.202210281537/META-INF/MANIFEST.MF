@@ -1,0 +1,62 @@
+Manifest-Version: 1.0
+Created-By: Maven Archiver 3.5.2
+Build-Jdk-Spec: 11
+Bundle-ManifestVersion: 2
+Bundle-Name: Pydev Django
+Bundle-SymbolicName: org.python.pydev.django;singleton:=true
+Bundle-Version: 10.0.1.202210281537
+Bundle-Vendor: Brainwy Software Ltda
+Bundle-Activator: org.python.pydev.django.DjangoPlugin
+Eclipse-BundleShape: dir
+Require-Bundle: org.eclipse.ui,org.eclipse.core.runtime,org.eclipse.jfac
+ e.text,org.python.pydev;bundle-version="[10.0.1,10.0.2)",org.python.pyd
+ ev.core;bundle-version="[10.0.1,10.0.2)",org.junit;bundle-version="4.0"
+ ;resolution:=optional,org.python.pydev.ast;bundle-version="[10.0.1,10.0
+ .2)",org.python.pydev.parser;bundle-version="[10.0.1,10.0.2)",org.eclip
+ se.ui.editors,org.eclipse.ui.workbench.texteditor,org.eclipse.core.reso
+ urces,org.eclipse.core.variables,org.eclipse.debug.core,org.eclipse.deb
+ ug.ui,org.python.pydev.debug;bundle-version="[10.0.1,10.0.2)",org.eclip
+ se.ui.console,org.python.pydev.jython;bundle-version="[10.0.1,10.0.2)",
+ org.eclipse.search,org.eclipse.ui.ide,org.python.pydev.customizations;b
+ undle-version="[10.0.1,10.0.2)",org.eclipse.core.expressions,org.python
+ .pydev.shared_ui;bundle-version="[10.0.1,10.0.2)",org.python.pydev.shar
+ ed_interactive_console;bundle-version="[10.0.1,10.0.2)"
+Bundle-ActivationPolicy: lazy
+Bundle-ClassPath: pydev_django.jar
+Bundle-RequiredExecutionEnvironment: JavaSE-11
+Automatic-Module-Name: org.python.pydev.django
+
+Name: plugin.xml
+SHA-256-Digest: trPRKi1dHc9m4tmTdstebkPvgYABybuuVE5YHy41+BU=
+
+Name: icons/django_logo.png
+SHA-256-Digest: 6A229ZAt0/YCvvnZ/7r8rIgTb0T6BcrCM86pXPIsvQg=
+
+Name: META-INF/maven/org.python.pydev/org.python.pydev.django/pom.xml
+SHA-256-Digest: ytngHg35GlMdT/J0mJQpT/RLzL5unWYiTyHhhUUFcUo=
+
+Name: icons/django_nature.png
+SHA-256-Digest: C6QcuRzLLlWgfwQUGwh82JPeEKt6rSueigUrQrvdXUo=
+
+Name: icons/django_remove_nature.png
+SHA-256-Digest: PvtfS6LIWSnvHkxZlBIP87W2oWWAsc/WEZzEunpY1/U=
+
+Name: LICENSE.txt
+SHA-256-Digest: J75t01G5GT6rkY9hiDNA+yh/SDVMI+VNinfwannMATI=
+
+Name: icons/djangoNature.gif
+SHA-256-Digest: m8t0FNT9SFNJ4S2adw5v4dxUVSTzBwLNswHY5vScnxU=
+
+Name: pydev_django.jar
+SHA-256-Digest: taN5pa1H7Akmhu08s47NMezyWLLZAUEPf61TM32lKCU=
+
+Name: icons/django_7x7.png
+SHA-256-Digest: jYGAje6whcu2EOz06KI3qzWjTpJUPmvHJFptSrN01Pc=
+
+Name: META-INF/maven/org.python.pydev/org.python.pydev.django/pom.proper
+ ties
+SHA-256-Digest: K8dBymVuxwHWUFRNAyDo5VFTG4HQkp/nWmu9QqINyZw=
+
+Name: icons/django_16x16.png
+SHA-256-Digest: j9K39yx0f0aoKaIyKcR8lf3qWTsIjIMkDHVHDKETwoQ=
+

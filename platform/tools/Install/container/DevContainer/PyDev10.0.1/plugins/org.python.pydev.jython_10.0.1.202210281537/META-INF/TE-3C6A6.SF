@@ -1,0 +1,1789 @@
+Signature-Version: 1.0
+Created-By: 11.0.9 (Oracle Corporation)
+SHA-256-Digest-Manifest: eQDIGSDopw0LlSvo44SoGw+Vh0idjUjMVNrgcarEvQc=
+SHA-256-Digest-Manifest-Main-Attributes: FHKvjZJfzUKLW22oMNV+A+LX3lZgyj4
+ toHlS+e8+ldY=
+
+Name: Lib/bdb.py
+SHA-256-Digest: yPhdyOjaImlTpVv7ub5gqj64ZN/0q9cIfZTmXTRoRBI=
+
+Name: Lib/contextlib.py
+SHA-256-Digest: VYX6AxMxJLzl/YYWJIsnpnfUgcfO1ff7eR0NG/P2r1U=
+
+Name: Lib/runpy.py
+SHA-256-Digest: AmGzWWXI9GrOyyjNqIWzsfZwVskSey/YN1qJ5f9mpn4=
+
+Name: Lib/json/decoder.py
+SHA-256-Digest: taGUue23oZYV9NjbM3a8tQveqWMtBpoggium9xlBISw=
+
+Name: Lib/grp.py
+SHA-256-Digest: fvW4+cL2Nlpz+16hmXeTi9zoRQNFRHCTQmeK6fDM4aU=
+
+Name: jysrc/tests/test_assign_to_self_attributes.py
+SHA-256-Digest: xuwVPugZclwg1gmQ3pBW97KEsRIUAxq30sQQ29eXA90=
+
+Name: Lib/wsgiref/headers.py
+SHA-256-Digest: wAPTZTr7r84rzGlaVIS3/hSmWq5QeZ01m8G4bjNjk5I=
+
+Name: Lib/encodings/koi8_u.py
+SHA-256-Digest: 3QVxnPZL70l5aLFTgZKLwxgUM2l1oKL1nl/V6W5AAs8=
+
+Name: Lib/json/__init__.py
+SHA-256-Digest: TuXKWMBHb7mdxBFfLSU4Mk4GqkZ38KA+0TUfzBpaqlY=
+
+Name: Lib/xml/dom/minicompat.py
+SHA-256-Digest: rO1PEdgWBeJ9aDHYFOLokF91Nxb/ak9K8ArEQEif2+c=
+
+Name: Lib/modjy/modjy_params.py
+SHA-256-Digest: 9h/udnkpkCW5a02Jn9I03rVApFSTbO+iCrwf4efF/gM=
+
+Name: Lib/nturl2path.py
+SHA-256-Digest: cYhoSBPicPnX5mBzfMpvCGcioYNhtN436zaSpOGthr0=
+
+Name: Lib/xml/FtCore.py
+SHA-256-Digest: baCNMFxnZ2mGk6fIJ5k5CH8heDZNRxh1KgtFw6yl0Zg=
+
+Name: Lib/unittest/main.py
+SHA-256-Digest: G13BbeK5xTCgQ2D8iAcoMjH3JwN2yRuX8fkXoBYo444=
+
+Name: Lib/wsgiref/simple_server.py
+SHA-256-Digest: tLjmAwr5w0S8A9G6EBwZAJbhJvQNSGygQwcXb1U2LUg=
+
+Name: Lib/distutils/tests/test_core.py
+SHA-256-Digest: lmI1QJspnuC81fek/YJnZtO8pXrST6eKzFQvylMtwfY=
+
+Name: Lib/distutils/tests/test_install_data.py
+SHA-256-Digest: 6n5c6nDmbKGdx4LNP8n1aJjYXZAjml8AXmWhZeckizY=
+
+Name: Lib/smtpd.py
+SHA-256-Digest: hcX597vLp1M7utEt4Q+156CEtpsGy6lm/JsMdzOD3Tk=
+
+Name: Lib/rlcompleter.py
+SHA-256-Digest: 68+bMvQB9KIp3pGr6ykP+EyFCzp0fM6gmBfnyKEP2h8=
+
+Name: Lib/unittest/test/test_program.py
+SHA-256-Digest: JkSX/oAPgvT8gmrQ9kKa0N3AotLMuJzRhTIpPBENDJg=
+
+Name: Lib/signal.py
+SHA-256-Digest: 5RiannmY3wvYeJp1CLd19Y+fuZ2PGiDXVJdbKXJFCsQ=
+
+Name: Lib/email/mime/nonmultipart.py
+SHA-256-Digest: E7BXNOPgRHJ7tQqHbXqk/0d/9O7+ylGjOqo22d/y4Bk=
+
+Name: Lib/gzip.py
+SHA-256-Digest: RKYIFIQbTgwGUzomcpvcGA+f2bHlW2YXC5672PfWwis=
+
+Name: Lib/encodings/big5.py
+SHA-256-Digest: jhAzZoABLxiZJ6xWnXUcJ3um+cxjrsbiUCyhCy7Y3ns=
+
+Name: Lib/encodings/cp1251.py
+SHA-256-Digest: lydnAl8FIsgc44onKBp69QxyGPn32pdsQ3EYegEROzM=
+
+Name: Lib/encodings/cp858.py
+SHA-256-Digest: C6IllsCP9U9wN3ShKbYWvQsTS6a3UBlkEuDOMRQhB5w=
+
+Name: Lib/encodings/mac_latin2.py
+SHA-256-Digest: TAMIHh4tavrfAlOv1NLLD91Kvwm0F5Opma2x6SJ1w1E=
+
+Name: Lib/unittest/test/dummy.py
+SHA-256-Digest: YJXO1Pun3b5NOq+st0zwUlCcUtmfIsX6XpI9pILof/Y=
+
+Name: Lib/distutils/filelist.py
+SHA-256-Digest: t9j7VcMJdF+Cs+m1YG78GwYpIwUyjDq+W01wXhCKR3w=
+
+Name: Lib/json/tests/test_fail.py
+SHA-256-Digest: BO1cYWwUVoG1A5OQnBKmBl2jD0a+gq58QS5uUsyviCk=
+
+Name: Lib/email/Errors.py
+SHA-256-Digest: noQ9BpLRMrwHGj6AHLzrQs+UhdV8NP8+B5WId+rIcnU=
+
+Name: Lib/encodings/iso8859_7.py
+SHA-256-Digest: e25D4GvUILgdmIGweUVEGh9ZoRBu905yiHIkij4j6m8=
+
+Name: Lib/xml/dom/domreg.py
+SHA-256-Digest: B9HnMBLldYPKJ8SVg2EKnIVYv/444WWp7QFm/97DaA8=
+
+Name: Lib/tabnanny.py
+SHA-256-Digest: BZMfeq46bR4LCiPuTnr9QJ2V9p659cg2LIl4qnStIuo=
+
+Name: Lib/_google_ipaddr_r234.py
+SHA-256-Digest: vVrnmcMRJAjHCzc7Gr0TXbPmTd3884gfOQxJidWCb4Q=
+
+Name: Lib/xml/dom/xmlbuilder.py
+SHA-256-Digest: Halbgw84IZfSU68SFa5Gj0QBu0JUiH2IBG3DqagW6Us=
+
+Name: Lib/unittest/test/test_break.py
+SHA-256-Digest: 9Eck21KTQyFD3NjNLULDGAs+K5MmsBldxUkMl31C+d4=
+
+Name: Lib/argparse.py
+SHA-256-Digest: M2mHX2vpFuMfGAoSSpLGehfs2NG/qMXZWkza3y1EHjc=
+
+Name: Lib/email/mime/base.py
+SHA-256-Digest: 85375PeiOF59t09RgOX3R+/9Gp/pNuwbfYdbDSGxY7g=
+
+Name: Lib/popen2.py
+SHA-256-Digest: lxMGdcEjaq+KJIGBqfEGcRJVmkkRH6ETq9Ao/2iGI5I=
+
+Name: Lib/json/tests/test_separators.py
+SHA-256-Digest: 9J9lOEMbtcKrPEgm7TdK34V3sLY1iaPupyX+KEFGbig=
+
+Name: Lib/modjy/modjy_publish.py
+SHA-256-Digest: qsL6fC8KIv6BSRR+afntpxoDAK18VGLgcsiB4se8FGU=
+
+Name: Lib/unittest/test/test_runner.py
+SHA-256-Digest: pgKpyZEoX6N3QAgw+5WyDBeD0TwJTXyc2eUWHnRjVvQ=
+
+Name: Lib/difflib.py
+SHA-256-Digest: D4QLk5hYZrQEW83Ql05X+wVjX3hyxYa1Ykh+1tdnWFc=
+
+Name: Lib/encodings/cp1252.py
+SHA-256-Digest: eOzHO92O8NfIxEu2ayKVY2GmP9XCAcZw2gKSUjJL17U=
+
+Name: Lib/xml/dom/pulldom.py
+SHA-256-Digest: vxlSRIKF/ffLrLkAYj4vcP95D86gxDBJwHpRn+LjK/g=
+
+Name: Lib/unittest/signals.py
+SHA-256-Digest: IsgtLvzkNGYiSAEefPtBfhzwSKi+2/vn9+dLtNyqFO4=
+
+Name: Lib/email/mime/application.py
+SHA-256-Digest: 4qU9l2VrwX4tL4UU9rrBpFPZzJmHcnJmFt4IeuZuFA8=
+
+Name: Lib/compiler/pyassem.py
+SHA-256-Digest: zl5OD4m91dNJzjY9xHMEAiQPaKfavT1GxK5RK0cWpdI=
+
+Name: Lib/email/Charset.py
+SHA-256-Digest: jfzKMMmHaGpxhXNSWbbNmeCWEr0y+RyMlN898mwudfE=
+
+Name: Lib/modjy/__init__.py
+SHA-256-Digest: a4WCiB7I489M0z5P+zjcTSUrb2TQnq8SLaIiAMObrn8=
+
+Name: Lib/HTMLParser.py
+SHA-256-Digest: jY2xrhxE4mSBjfkYAQaO9YSvnJeCb7KlL/KX/FAn/LE=
+
+Name: Lib/email/Parser.py
+SHA-256-Digest: Q6RutBFUcj4DO4KXV+1M981ddfJtzzZypN/hiqKpxPg=
+
+Name: Lib/future_builtins.py
+SHA-256-Digest: feN508SOOgP8QhAtr4DLatqbRsgZb11ERwG2zqGfDTI=
+
+Name: Lib/json/tests/test_indent.py
+SHA-256-Digest: cBab6wg4R5OxZdqeticLpWzOthc2/H2SztWmo3ga5nM=
+
+Name: Lib/encodings/hex_codec.py
+SHA-256-Digest: ZyXNSB6Oq5zyRj2KcPw9e4+R2vOhjmOv3WHDfI87edo=
+
+Name: Lib/numbers.py
+SHA-256-Digest: EehDyE0F5zk8Ej+DbfYHtKzQgGMl6G7klajiGLoMiVo=
+
+Name: Lib/encodings/iso8859_8.py
+SHA-256-Digest: YNyvBxvqxRO1rGJLd+/frOZAM24CPIS5i9f3QZO8Yrc=
+
+Name: Lib/encodings/mac_greek.py
+SHA-256-Digest: AtlIFWAIDakjF+g4iS7AweU/GKb/6Jsab7fyIyulZE4=
+
+Name: Lib/json/tests/test_check_circular.py
+SHA-256-Digest: u+gNU0k9TU0lw2t3qRXZllUTjOTuqrwI7WdO7RPsHNI=
+
+Name: Lib/hmac.py
+SHA-256-Digest: EMP7pg1A5dc0YcVHoqOQvsrLKYk79/rcZ4FXvgYT/2M=
+
+Name: Lib/encodings/cp869.py
+SHA-256-Digest: 7AegGfB9O5ZOJ1yuSWyqeSDduXnDHSsdWv+mpp5CwJM=
+
+Name: Lib/distutils/tests/test_spawn.py
+SHA-256-Digest: LJoGFSyDS+B8HpDU5POcekkwoGPpWonsb2UYa90APxk=
+
+Name: Lib/distutils/util.py
+SHA-256-Digest: x0/rp6o7TvvB6oBiixxFAhX+KnmTFSLix8+So/2IOts=
+
+Name: Lib/whichdb.py
+SHA-256-Digest: eAsbQGtHbTCQTYalVohahg3idmn2KiVnuc4VNAW/9+I=
+
+Name: Lib/posixpath.py
+SHA-256-Digest: ND4j2eSOYzcfmAyLTRSDbCGww5izC3Natd4hJafm6k0=
+
+Name: Lib/py_compile.py
+SHA-256-Digest: eAhQTChtUXhBsTYXHN+Icm4tuNAwt4zg8ZQQLxIhhN8=
+
+Name: Lib/email/__init__.py
+SHA-256-Digest: iVZmx8Rw2IudTIZEkPopuss42X0DKDvrDrR1PMSEHeU=
+
+Name: Lib/distutils/tests/__init__.py
+SHA-256-Digest: JdT9HGjKAMMuNGVLhjnjzc+fzdxaUOZhfCglqqjV+Sg=
+
+Name: Lib/formatter.py
+SHA-256-Digest: x6mMrRB+wpgl0IKWxu7Bk/Qtm6qKtEi+VyKmOZWFObs=
+
+Name: Lib/json/tests/test_decode.py
+SHA-256-Digest: F2N8QR49IOgRKNcKKQ0rMHo7XO527J84R0dZTU+CnuQ=
+
+Name: Lib/encodings/iso8859_13.py
+SHA-256-Digest: x85g96P/8J4hYgdb6Y/sQG558KOr83g8mamhl0BNKS0=
+
+Name: Lib/fileinput.py
+SHA-256-Digest: hUKm4Frbh5LuMrUC7cE0Bi4podliXeP0BmwnC6EK32E=
+
+Name: Lib/json/tests/__init__.py
+SHA-256-Digest: nOc6bXXMeJ9KMhqHTFT290HQ/iqq/bf12K8zN9KD5uI=
+
+Name: Lib/fnmatch.py
+SHA-256-Digest: IBP8770+4sB6j1MXyxjlTS1gOzm8sgYyLWXIaKbl0dk=
+
+Name: Lib/distutils/tests/test_upload.py
+SHA-256-Digest: aTRQNtbFPswHqD6S7YvsEk8WwsHXB47YoD0LsNAl7/8=
+
+Name: Lib/distutils/tests/test_install_lib.py
+SHA-256-Digest: CJRIaCZuZEdiXN4On0naAPz2vfYafMoiUOkPNYR6+3c=
+
+Name: Lib/wsgiref/validate.py
+SHA-256-Digest: 2GmPo2SmdF73V6kf4T0ygwCcyUjGMnZ7JTj+5+dK7do=
+
+Name: Lib/distutils/errors.py
+SHA-256-Digest: thZI1vPO9+lSkkMrN9xDjRnnY4g6PYnaC8Kb/9BzDrw=
+
+Name: Lib/os.py
+SHA-256-Digest: 7Jm8pX2IQ3yVD+LlYEfVejeyEc95/n+eXkxRL4u+lDU=
+
+Name: Lib/distutils/tests/test_register.py
+SHA-256-Digest: P3cRL+eavQb/H3sXCsy6onkGthnsPfS6QGYl2oRhPic=
+
+Name: pydev-jython.jar
+SHA-256-Digest: EadR4tA7dEt6JsfLlCE6P2gFYgAMcA1F9SVrvTobxPE=
+
+Name: Lib/urllib2.py
+SHA-256-Digest: 75m/32bLAWSnGIp9eALs4J/ZnrOz5qLK7tcd9XVz5c0=
+
+Name: Lib/wsgiref.egg-info
+SHA-256-Digest: /WGoAjzbUpj3yJeJhUbEQ7puYn2jwY2EKpZGOKjzYWw=
+
+Name: Lib/sre_compile.py
+SHA-256-Digest: hFE9JgpBdJD1oMg76so+x4d7mTEw7Y9wLz0/c5jrhGI=
+
+Name: Lib/distutils/tests/test_unixccompiler.py
+SHA-256-Digest: uFh54PREIcQOgWpn4CvtoMx5EUbSwRlH7UiSYxjrRlA=
+
+Name: Lib/encodings/undefined.py
+SHA-256-Digest: 5MCyzetpjfopaeHfM2+kS0xX7Wwtj3LmJ1HKgv1Tcr8=
+
+Name: Lib/htmlentitydefs.py
+SHA-256-Digest: hXewNnKn9wzMo8ampes7NvFosVZNuZ1s3mJWtIBcdfI=
+
+Name: Lib/distutils/tests/test_bdist_wininst.py
+SHA-256-Digest: DW89K4i8XGj7ZwXaZMX5KVZ3cQxi4oZB2KXElzC94dk=
+
+Name: Lib/posixfile.py
+SHA-256-Digest: ln30zEwJGQ5ik1SijfN7ZwtHXexgDRQ/G8nfr62zB/s=
+
+Name: Lib/__future__.py
+SHA-256-Digest: HHqErZavCd3hRfboJWKZIfqfogqrun9ECWyru9VQ28E=
+
+Name: Lib/encodings/cp1250.py
+SHA-256-Digest: R1EZ65ZNKg4X9/v8kNDl/dE1sLobL07gB5HrI4vV6yE=
+
+Name: Lib/encodings/iso8859_14.py
+SHA-256-Digest: 2zlW8ToEIYJKUNDjCVNEYacWKhikSudq14f586LxWf8=
+
+Name: jysrc/tests/test_convert.py
+SHA-256-Digest: v+W/w50rENZt8xBRDy+EFz/oSozN0d/hm/BG0rHXLk8=
+
+Name: Lib/md5.py
+SHA-256-Digest: 7YvXFOyQY7QwE3TEzugHeUY4ysxl0nehVCLpoP2pLsY=
+
+Name: Lib/encodings/mac_farsi.py
+SHA-256-Digest: XWXVxZBsdkD0mhaavBZJfSrQpDjJp86UewDCFMhoU34=
+
+Name: Lib/select.py
+SHA-256-Digest: Z5frOgbThEf0Xqm2GSzq29ZMxhhB+9Ps6SLXZZyWP4w=
+
+Name: Lib/json/tests/test_encode_basestring_ascii.py
+SHA-256-Digest: T/8nCYaDnU7lARANC4DOhHZVPc9Jqvxyf7TXgdMerbE=
+
+Name: Lib/unittest/test/test_setups.py
+SHA-256-Digest: Y5NsT9HrKS/jo3ZcTXZpKWEOm6ePaihdJN2fPvHLU90=
+
+Name: Lib/sched.py
+SHA-256-Digest: KhylpMiTspCSlkTjdwyw+4fbExCSY1oYpsWMayOFhVE=
+
+Name: Lib/compiler/ast.py
+SHA-256-Digest: dj6p+UP9I49Af9lM1Amm7AihQhB7q/jAlBdjWWD+g8s=
+
+Name: Lib/compiler/transformer.py
+SHA-256-Digest: 7pvq7IYBSV/d/soLGpjDjDn2TGuFyQAQHQl+8xkREDs=
+
+Name: Lib/pty.py
+SHA-256-Digest: zfD52cirt5C+wkOX2KqMmgnSGZe4mRHtWnokSqbGfwQ=
+
+Name: Lib/_jyio.py
+SHA-256-Digest: hwfg0IHL1A6+kDKeUsU+ZcvxmpXBZEnR97hGR9bmFMk=
+
+Name: Lib/asynchat.py
+SHA-256-Digest: mrjFTNJNU2iRB1pQ3F1/02vYn4gBFIUvgwXCgHGu7gA=
+
+Name: Lib/encodings/cp720.py
+SHA-256-Digest: VO1eXRQKiK6d4y8RBvI2581Khcoqv0c3EAtZFHMCCOk=
+
+Name: Lib/xml/dom/minidom.py
+SHA-256-Digest: ygfI4CggKuZ/PlvE4Z+b1xMT61wVlmhAemelDCdqqgU=
+
+Name: Lib/encodings/euc_jisx0213.py
+SHA-256-Digest: n2GvxIKqWh2vqqAP8stbyIwcPLlvejt4f6K3ZakaOOU=
+
+Name: Lib/unittest/test/test_case.py
+SHA-256-Digest: 3fuZejGF5DuHyPM23S9+frfGVi+2j1cFQfZf+PEDjkY=
+
+Name: Lib/encodings/cp424.py
+SHA-256-Digest: G7Vy50KbmLEo/M1Au0jrp0sRFTXmiMUh32aM2iEo1Bw=
+
+Name: Lib/xml/dom/MessageSource.py
+SHA-256-Digest: yVh4y9+ILjCni4bOwNuzq4nowBEUps43oLPr0RqkDS8=
+
+Name: Lib/user.py
+SHA-256-Digest: 94S/zcPM1vWm1kiOyTf22zZwy4hC3mHMxqC+nTfIGgo=
+
+Name: Lib/encodings/cp860.py
+SHA-256-Digest: VyOnIOT3Npw3R/8y8BSHU+yvhUMCdUQf5+qKsRa5jF8=
+
+Name: Lib/nntplib.py
+SHA-256-Digest: 3DSQ5QWWY5+Acdukc8fO/L3ERqBnJHY8X5FBlMuy0Ak=
+
+Name: Lib/json/tests/test_recursion.py
+SHA-256-Digest: MvT2FBSvAxDg2kn+tvte1iLiDmiKLbymhppX0BEJKTs=
+
+Name: Lib/unittest/__main__.py
+SHA-256-Digest: vcQQDdKvb6J9t+cy/s8/Eu+wgKweut/0Jmu4cqsJSXo=
+
+Name: jysrc/pyedit_wrap_expression.py
+SHA-256-Digest: xXM6ZJiCKEDHNLCKB2jU3PqmfG/wsD8LDfdt9bN1F9A=
+
+Name: Lib/xml/dom/__init__.py
+SHA-256-Digest: 9qG6mD+gVHCJ+nLoJsNsY4gZEFEwSlMZ7zVj5iNBkUo=
+
+Name: Lib/distutils/__init__.py
+SHA-256-Digest: kZTYVsN1+tAkpISK5VXdrQLJbJQ5VR3uBmNYcej/QmQ=
+
+Name: Lib/encodings/rot_13.py
+SHA-256-Digest: h3NGL/jztyeN5Gua6l2uWzvss3MIQfCfm51r3un2ZAo=
+
+Name: Lib/distutils/tests/test_build.py
+SHA-256-Digest: H/nQSb1d+ZoKSmpYOB7TGp0aR0P1G+DazL5c74Z5W5g=
+
+Name: Lib/distutils/tests/setuptools_build_ext.py
+SHA-256-Digest: 4YitwKse5xVGqD+fjs+0UXn5nZrovCj/f/yfAiGJYZ8=
+
+Name: Lib/ntpath.py
+SHA-256-Digest: uV1qtKCg6mcec7t9+fIlykUBDb3+vTlZhaHG6X9RwPE=
+
+Name: Lib/pickletools.py
+SHA-256-Digest: PWZVrgO9k96rHLastmYIzLRiQUcSr3iWHTQcKmt1nGU=
+
+Name: Lib/imghdr.py
+SHA-256-Digest: 4QKS3STsMjzJVYhsZMYJD0h7FRtwDpmRI/OuLL41hpQ=
+
+Name: Lib/pdb.py
+SHA-256-Digest: y/rebgMLzu1lThpdfJK8cjbsk+QuRRBAWAjN0r5ZbvA=
+
+Name: Lib/email/Iterators.py
+SHA-256-Digest: 7dXRYQoT1PrOn4U6TY/vKGI2rOU18nx4TevzgEgaehQ=
+
+Name: Lib/wsgiref/handlers.py
+SHA-256-Digest: 8e0jIg1WATNX/pZgt3Mt4PTNf1XBVeeDlFIUK4MSLcU=
+
+Name: Lib/distutils/README
+SHA-256-Digest: F8HY8MPHElS+XnmPKmWRLthCUodtsBuwBDZZpvNkzlE=
+
+Name: Lib/distutils/ccompiler.py
+SHA-256-Digest: vMYOjXq5q+yrD/8n37kjimW6EbALutryhX3DX+eJG8E=
+
+Name: Lib/email/Generator.py
+SHA-256-Digest: aKdRYrCIQMrxZHV4u5dt3tSmA1uU9XglvyuGDLHrBzA=
+
+Name: Lib/encodings/euc_jis_2004.py
+SHA-256-Digest: 3cl4AfScNDDpXuOZmyBhlFFw9vxg8dU1t2h0h6zSRFw=
+
+Name: Lib/encodings/shift_jisx0213.py
+SHA-256-Digest: KUiM+ErepcfhOxHFjxA6hYOGyEys7Q+GYHurabu/CtU=
+
+Name: Lib/rfc822.py
+SHA-256-Digest: UOedtr6PbLWHa5WZi+SnN2+zRcTkPATVZWhj0eQqQCM=
+
+Name: Lib/unittest/test/test_functiontestcase.py
+SHA-256-Digest: wnjkBYgcLmdQZTO+o+GH5IkF2YyqQPk5Vr+moFuO2ZY=
+
+Name: Lib/distutils/command/bdist_wininst.py
+SHA-256-Digest: 97yP3++ZHkQfKdcitmoA00h9hYTguc7EuPo5NNEMnk8=
+
+Name: Lib/xml/etree/ElementPath.py
+SHA-256-Digest: C6R10IWEBfm7pbsRzgppQeDdh/zjklkEx4KUAQeaZjI=
+
+Name: Lib/encodings/ascii.py
+SHA-256-Digest: rQB2Isv3Xi3DIX+Vyv84mzpjEFJeQTCThMZuJ19MFIo=
+
+Name: Lib/distutils/command/build.py
+SHA-256-Digest: FwUn2bQjCFxV/8w+++qAvdROSPobhDs28+pY7gZuBxE=
+
+Name: Lib/sgmllib.py
+SHA-256-Digest: 1K2QJ/KrIJlmw+xXDaLt5Y9jOOfg3GkiwWPJQEImkAc=
+
+Name: jysrc/pyedit_import_to_string.py
+SHA-256-Digest: ZlKv0/D0hhCchjLCTLCK8n1uL7/2QZhSIMteZDUSbOE=
+
+Name: jysrc/pyedit_marker_example.py
+SHA-256-Digest: Xye1dzf66JyqIYQcjFqZnAjLvVgvRf7j6n2/Uv8p+Q8=
+
+Name: Lib/modjy/modjy_log.py
+SHA-256-Digest: uDc3/5tMjbMQC4dPRsIWxnZwAV1xOBY25kttOqEn3jY=
+
+Name: Lib/encodings/iso8859_9.py
+SHA-256-Digest: UgA31af5OkCru0nca0oOmLPUbFEErcykma8elZVBWo4=
+
+Name: Lib/decimal.py
+SHA-256-Digest: A+oT0POI7VjlS1HayxKPYqaPe7rRFYWj0SfbnWalMeM=
+
+Name: Lib/MimeWriter.py
+SHA-256-Digest: VxQpaHRD+zv4EpfpqfusFyxe54/umPvihRiAZdzvgkE=
+
+Name: Lib/encodings/iso2022_kr.py
+SHA-256-Digest: BB3+6kid+syKIK28sYyrwoTZUg+sPeei9ZBm3ScC+3g=
+
+Name: Lib/textwrap.py
+SHA-256-Digest: waXGl+Nn4DhI04yQL2U/qfC/6ER/U8CVgQPgh2gMoDs=
+
+Name: Lib/xml/parsers/__init__.py
+SHA-256-Digest: KlfGtMDiaPsg3LoHjQP5L0b1U/kRcHQTLeRRLIv3/HM=
+
+Name: Lib/locale.py
+SHA-256-Digest: 8MXgp1QcS/GioaOo1pCQREvNPJHxY7sYooZmkcd8Uwk=
+
+Name: Lib/encodings/mac_romanian.py
+SHA-256-Digest: DRh1Yz6v9KLjFoliyZcWJm4jLKdh69yZVGKPgbewNAY=
+
+Name: Lib/encodings/hp_roman8.py
+SHA-256-Digest: PkIZNLuM6SVqngjKoo+yoNdbW59Rm2/umEkdIFcXTow=
+
+Name: Lib/re.py
+SHA-256-Digest: A4ZRIApUYlrc2iwoEWe+OjjipQG0cq0cmp0hBFa0Ctk=
+
+Name: Lib/robotparser.py
+SHA-256-Digest: UTZZyCTFok2mWBoctjV5eMWsfCRB3AobAxy5dIw+Yl4=
+
+Name: Lib/distutils/config.py
+SHA-256-Digest: tN9FhOY/T90YHsVHq831iEmXeGpHCg2f+pwlj3HUHU4=
+
+Name: Lib/encodings/uu_codec.py
+SHA-256-Digest: YAv+hBvB+DxFDs2SlKZoMPRhKrvBlOYwO6WjNUpj64g=
+
+Name: Lib/json/tests/test_default.py
+SHA-256-Digest: aYLWG3hmcgOqJ4PWUZW3OEy9r+x4wezNU8ZFG7xwEBw=
+
+Name: Lib/encodings/iso8859_10.py
+SHA-256-Digest: Bfga19Y5cTlw2ZcFoWvA+pHjMu+YJ/1VwrFKJqMT6aw=
+
+Name: Lib/encodings/mac_centeuro.py
+SHA-256-Digest: cr/CM7TxGzV9jYh2rNF/Nm5bLBDs+k6Av2EWMqru4C8=
+
+Name: Lib/xml/etree/__init__.py
+SHA-256-Digest: nGhtnxGI+pJpJJiaRwN+xZFaHj9aZ4JG+3CzhfBlgOk=
+
+Name: Lib/pkgutil.py
+SHA-256-Digest: jCafvbQ1eqxcMtLVDvJDX4gQod5UDZutRb24FhD78rQ=
+
+Name: Lib/encodings/cp850.py
+SHA-256-Digest: aeswTilCes8NVic/19BVSKiw4bbXNIYAMdiHcyvtfxQ=
+
+Name: Lib/encodings/utf_32_be.py
+SHA-256-Digest: rPlZZkufiIeb58+kJnm7yuTDEbm9u0gAZdDKkDWXgpY=
+
+Name: Lib/distutils/tests/test_config_cmd.py
+SHA-256-Digest: 00bWp7jJSmx+GS3vo0PVq4QF/295SWSDHz0wBRd7myA=
+
+Name: Lib/unittest/loader.py
+SHA-256-Digest: RXxO6UJGDDTYTZ6dcjRsGdpeqjXQwTp7rbAaSd1twGs=
+
+Name: Lib/cgitb.py
+SHA-256-Digest: 44rWRRG3YVVUb1FPweSh1w+M3LodaEb3/5lIqMwjoMU=
+
+Name: Lib/pickle.py
+SHA-256-Digest: e9OPDDxhokZWjVK8c4bTFOgaXAQ4DZ3eM7NykCxCtu0=
+
+Name: Lib/encodings/shift_jis_2004.py
+SHA-256-Digest: BDG4+maliEhktQimrv9Mmops/aBqKy3fww/qjw2r66I=
+
+Name: Lib/xml/Uri.py
+SHA-256-Digest: wq/nV3xNPIzzIhFwhFYa8VLnllvIAjwvEYRloG5UbEg=
+
+Name: META-INF/maven/org.python.pydev/org.python.pydev.jython/pom.xml
+SHA-256-Digest: a4noBPf6v89bjGm3tYkmCrAxBIB4VNJlHVaMeSDvdqE=
+
+Name: jysrc/convert_api_to_pypredef.py
+SHA-256-Digest: nIGEnfGOTsxp/qQGWjbMgTnP+vBGnrsRSY9Gno2TYIw=
+
+Name: Lib/unittest/test/test_result.py
+SHA-256-Digest: 3QG4js/qUQpvGkMgzrQXTOq0YORizxZY0OYGWxKHTlw=
+
+Name: Lib/functools.py
+SHA-256-Digest: hhQgbSI7YP3MGOP/FnkeeKwPrhxnpN6Ifok8vaI5Pls=
+
+Name: Lib/encodings/utf_16.py
+SHA-256-Digest: DmZh7tYdlO5mU4SkWFxQpIL2CqKwKM9uL228ny2Kl+s=
+
+Name: Lib/urlparse.py
+SHA-256-Digest: 0z7PK/dgdS0abmp6CeInCF07XQVpF5Dl7aPv4w/MRnQ=
+
+Name: Lib/site-packages/README
+SHA-256-Digest: qxvlzGzCMrUq2ftbZuoXOSpkIGaA7XxE2Q9wuOpTjTs=
+
+Name: Lib/encodings/shift_jis.py
+SHA-256-Digest: h/hiq0yYEkcM+MWNB4xIv8d4gr7PBTRCxuX+bG/q1V0=
+
+Name: Lib/json/tests/test_dump.py
+SHA-256-Digest: 3lgiJwaEbJcTqROSQYawpZzyktkWv9vajTQwgVRRY9A=
+
+Name: Lib/unittest/test/test_discovery.py
+SHA-256-Digest: e7c1OnYmhKShDz5b/A/Klf8hAEokKaKnxLVYprn8/Po=
+
+Name: Lib/fpformat.py
+SHA-256-Digest: 6hOYnFzeTPigPRYaOOJ6lk2d/AsTvi2OVUDdpxTaanw=
+
+Name: LICENSE.txt
+SHA-256-Digest: kKR//0aU3zBgl9SCeCpwoQ+GrOEHBzEb90XcPTX/6Do=
+
+Name: Lib/Queue.py
+SHA-256-Digest: rgQGjYyd6qd4sBBZkzWSlx+D8/d57rJy7/Z/xBCDrew=
+
+Name: Lib/json/tests/test_unicode.py
+SHA-256-Digest: JkqQhEXWyHI8WJYyIvtpKB9xvGz8Hf4jOAJQApk+7Wk=
+
+Name: Lib/UserDict.py
+SHA-256-Digest: tRSCNS5cji9t1QPzVtN+HZ+5U4pTkMFVlu4ZqQnKB7w=
+
+Name: Lib/encodings/cp874.py
+SHA-256-Digest: voVFau7q9DasrML/Ytvk1GlqJ55Dkj8Xi0GdJ2Yv4Hc=
+
+Name: jysrc/pyedit_assign_params_to_attributes.py
+SHA-256-Digest: QGEPXmEebch5+te2H/wnJ7JdvkGzITFHq5i+TW8n0zA=
+
+Name: Lib/codeop.py
+SHA-256-Digest: UUlS6bD1WuPbEQVpFvO/Ti7YK2T62XhzBiFrpW5tOxA=
+
+Name: Lib/encodings/cp037.py
+SHA-256-Digest: gEEYKe2tRCFAfvi+1koygtwxZJY5rEZKX1UiOmxqkDA=
+
+Name: Lib/uu.py
+SHA-256-Digest: clDsQdg4CFcuf+Fhs5zz3zp3iCo1REZzZby2IHsQJCU=
+
+Name: Lib/modjy/modjy_write.py
+SHA-256-Digest: mWdaVzNaa2se2U9u/pRgHvh9WXlo/uKU0a1V0/DsGRU=
+
+Name: Lib/distutils/tests/test_dep_util.py
+SHA-256-Digest: WXmQTVPt1Ryb/7TbhCs8j3v+XI/zo6NkLK4xiCnSYCc=
+
+Name: Lib/distutils/command/__init__.py
+SHA-256-Digest: 8fSIqz8d2houE9/ltZk3Q9pndEeNYpRuVoRKWk0ARX0=
+
+Name: Lib/pydoc.py
+SHA-256-Digest: GGN7eowHvU+wr0LJT2jRkyZenKEYXy6EXt2MGlpWgYU=
+
+Name: Lib/glob.py
+SHA-256-Digest: 2SAbkB6zC5UPTvjG9ly4L2HNOwq2+h+C18nuytOWDNk=
+
+Name: Lib/cmd.py
+SHA-256-Digest: u7kP/1YBguq01/fyTHZt/YErBxWGY+UsYGblGOwyJVU=
+
+Name: Lib/encodings/cp861.py
+SHA-256-Digest: Fj0M51A+li08ZwO+8QXTmTSzy2P799AK1lzDzrNI78s=
+
+Name: Lib/trace.py
+SHA-256-Digest: MB6qk2lVYi84kH69XFRdk7xNSsY97zfEtcr1sHxshyk=
+
+Name: Lib/timeit.py
+SHA-256-Digest: KvbT5Q/IWkFI0dayC5z/JaDLgW7s4r2PJF0HH0HqJnc=
+
+Name: Lib/email/quopriMIME.py
+SHA-256-Digest: /d0g3MQGoRJ1Ej/YZqX1mz8EH2gl2d2M6Mr6u1SfbX0=
+
+Name: Lib/compiler/misc.py
+SHA-256-Digest: u98DtFuqhJwqjwiqiexVct79x1I4SHwVa736XXSwzTE=
+
+Name: Lib/collections.py
+SHA-256-Digest: oGnKGTnA2lUeO20SSfCt5Gr0XGjt8cYbMag38bUG/II=
+
+Name: Lib/string.py
+SHA-256-Digest: HONkZGkpuM9UBu6kh8fmnSqQcrmACyJNn3TDFBELCe8=
+
+Name: Lib/SimpleHTTPServer.py
+SHA-256-Digest: hZhMoPj0xnBxouOKSb7hvYCy56Dgxyvueo3dGNL4Msk=
+
+Name: Lib/macurl2path.py
+SHA-256-Digest: UrkJIHhgary+to7jMjOsvKt4xsyqWZDAdCEafKI0Fjo=
+
+Name: Lib/opcode.py
+SHA-256-Digest: VtSvym231+8NG+i5W+HmYTgv7hyVRMD3skqh2k3lJG0=
+
+Name: Lib/_threading_local.py
+SHA-256-Digest: HcA1FNu4b4DzpPgOXzPnVYimALxdZLCakKOMk/KxYao=
+
+Name: Lib/xml/sax/_exceptions.py
+SHA-256-Digest: d2R8b7Kxej9vsMnEX1Zztad5EFjXR8gmqRWnF/8pNEQ=
+
+Name: Lib/encodings/iso8859_5.py
+SHA-256-Digest: GdVLrgNniYiJqMTiLHYQ99FFnx6+32+X1W62bYhYfko=
+
+Name: Lib/smtplib.py
+SHA-256-Digest: Le3EsclV5jsew7qmNJ6lffyjTFOktyf3L5xD12fgpCA=
+
+Name: Lib/encodings/euc_kr.py
+SHA-256-Digest: Ffzf5YTXD3LXfRbSW7q08ZC2RLpQQbquIFWcT9Xrpfw=
+
+Name: Lib/encodings/mac_croatian.py
+SHA-256-Digest: UwfikP0BXD2XBEBTBZ5CYWCZ+z6uX/si2CBayB1inic=
+
+Name: Lib/StringIO.py
+SHA-256-Digest: aAGSsq9Y1EjxNbOHzhbD9gqWd9iw2/MJTU/Ol0w263I=
+
+Name: Lib/UserString.py
+SHA-256-Digest: 2hjXC6OcV3MIdAcu0CUFU9cNcT3wU7DtZ8dp5vht5e4=
+
+Name: Lib/encodings/zlib_codec.py
+SHA-256-Digest: 2svxE4SRw1/XkLJPD1gRlHVLUp+GwJzAi+nuxhrk2/E=
+
+Name: Lib/json/encoder.py
+SHA-256-Digest: CKwW2YK81YJNhg5B57gXzgzEgSS8dhWNIfedZFfcfeE=
+
+Name: Lib/compiler/visitor.py
+SHA-256-Digest: NFznRiP1j98p5k4vjfeErPZCjxLrvIA2Y+1HhmbMg9k=
+
+Name: Lib/dbexts.py
+SHA-256-Digest: xJ30cXFVca7dTtZH0ZkMbp/oNQdqg381XI8VBU2dWgU=
+
+Name: Lib/pipes.py
+SHA-256-Digest: 1jn6F2jh1oRjmJozwxhkK4MtuMcjcoWyKno62r4EJEM=
+
+Name: Lib/symbol.py
+SHA-256-Digest: Gl+nN5tvGrgW0LrrZAGO6ckwZWwDlVQptTm8nm9q2bY=
+
+Name: Lib/distutils/jythoncompiler.py
+SHA-256-Digest: bZ/BFp3UQmrg6BFnY1gByUHjFcMDEGpqzBRsJLWoohQ=
+
+Name: Lib/distutils/core.py
+SHA-256-Digest: v4ohO2s3mV1AV/vSrYYXFwlsCS25jrRMxzO0MHetvf4=
+
+Name: Lib/encodings/iso2022_jp_3.py
+SHA-256-Digest: yBDu2B5uOKqe+8dNVaoWY9iRBjTnd510rBAXEb/iMGA=
+
+Name: Lib/encodings/gb2312.py
+SHA-256-Digest: Jtml1+Un+4np11ktgqoGGAjADLdFTRLPpEFg/WfkNu0=
+
+Name: Lib/javashell.py
+SHA-256-Digest: o5QR2fFg1Ar+kN4UDGYVA4OYtW8fyjTCgVU5od6eo4U=
+
+Name: Lib/keyword.py
+SHA-256-Digest: vaD8Ir4BCnJW0tIsiEwHHyRLcYec1L0rHXXXKaO/Kqk=
+
+Name: Lib/macpath.py
+SHA-256-Digest: PMh7WV/UWbLNbEGf1NnbHHXWOHNmYcRWaqSUEi8oov8=
+
+Name: Lib/threading.py
+SHA-256-Digest: bvGo3iHRVj/gl2LRMlPwUbsFcTa3o8oJhRgzxigcOZk=
+
+Name: Lib/profile.py
+SHA-256-Digest: 1bG7FtCvv/WSW3u71jSwe0A7tA/UDgVEJnQLMkdvChc=
+
+Name: Lib/compileall.py
+SHA-256-Digest: IBGP0S3gmFSkYh9Ndcg8OP+u4pEa8+FPnZl8fM1da40=
+
+Name: Lib/encodings/iso8859_6.py
+SHA-256-Digest: Um4Q26UEZbSK6+1HaU8sWCRD4DJ8KT8dtBxaz0iCibg=
+
+Name: Lib/encodings/cp1026.py
+SHA-256-Digest: VSK8Kn+gdZWfSi7LVLYhL1rorlp4nWVlLPgNEj0yV0k=
+
+Name: Lib/distutils/tests/test_bdist_msi.py
+SHA-256-Digest: 7N+LNhQKTrFaI9lryy0g1BRyCCpF1iCcjdpHN7Gfkrc=
+
+Name: Lib/isql.py
+SHA-256-Digest: ZcXuuGqoOcHoexhd0N3oI2I7q7J3MZk9hkoTQG1XMk0=
+
+Name: Lib/logging/config.py
+SHA-256-Digest: 0Mjk5REoRUopExdFZMYrETUNKAF9yiNZp5ezplrilO0=
+
+Name: Lib/distutils/msvccompiler.py
+SHA-256-Digest: ND+RjMIA89qJEP0TR4igXtyfP4jY9pLr2sJD6OjYwNc=
+
+Name: Lib/heapq.py
+SHA-256-Digest: iEZmHWRgVgfnWVIX3XWhboibaHn5G8G1zHD9Bn1ejnY=
+
+Name: Lib/encodings/cp863.py
+SHA-256-Digest: oLcZxIDFNbQIihpEfq/Duj1B60v25kePCcuVXJaOFUc=
+
+Name: jysrc/pyedit_enable_editor_wrap.py
+SHA-256-Digest: KmHiMaHd6mAkgkKHdiWKSjkMWSIUi23oogi267G7rbg=
+
+Name: Lib/compiler/future.py
+SHA-256-Digest: CW02BUSAE8oItxWKoir3VtiW/QbmC+bS3PK7bMLDgSs=
+
+Name: Lib/xml/sax/saxlib.py
+SHA-256-Digest: /R6wz9YCda9Bc4RaQHsE43Cyex2OLrRCDtbvurF4t54=
+
+Name: Lib/distutils/tests/test_util.py
+SHA-256-Digest: 3/qcg/IOn+f489tBBUSrBB4S3h4TRUREXr8NuJlUYtQ=
+
+Name: Lib/encodings/cp1258.py
+SHA-256-Digest: GQziz413UEyQ8SJ5+fPt3phdAECIGboLQQPUZFiZrLM=
+
+Name: Lib/shelve.py
+SHA-256-Digest: NZuoc7+J3lt3TJNOpqjnvLLxTyrdXfQt/4ac1GHnn+Y=
+
+Name: Lib/getopt.py
+SHA-256-Digest: ugaxSxKmeLNg+9T296nPBK1dTuU1QXXsQYZvvYZJ1Ps=
+
+Name: Lib/unittest/test/__init__.py
+SHA-256-Digest: exZMqNhqx99ZES8EoIi9lOLWjDfFsQBYvwyspZrDJng=
+
+Name: Lib/unittest/case.py
+SHA-256-Digest: 2pp9UaXe8nyjR9HNVQQ3Enjv+TLU6whbfpOMDw5kmyc=
+
+Name: Lib/unittest/test/support.py
+SHA-256-Digest: ow5an2cC9jvVUQZcd5miVk9fdABhYuqbi/MY2LceW2M=
+
+Name: Lib/compiler/consts.py
+SHA-256-Digest: JksF6vIzu5DihfjxJyDynqqVqFWjAuZ9TnX5nBg1mpQ=
+
+Name: Lib/distutils/command/command_template
+SHA-256-Digest: 2h8pJf8Bwi0zUb8d1wgG7JXYq2/M/vcm0G6Xpnqtl7M=
+
+Name: Lib/random.py
+SHA-256-Digest: uMBTZC3Vmo8cI8vcrgHCibgO04NQf54RdbckwBlePrU=
+
+Name: Lib/distutils/tests/test_filelist.py
+SHA-256-Digest: y3VWJ+xnCvn9YmSvQHx2dcEmVReDiNv/Ym10deTJDFQ=
+
+Name: Lib/distutils/command/install_lib.py
+SHA-256-Digest: Eajz+8HD3RVQPN8wzoGTb6Qj5z6syDKB8feHh16l8/8=
+
+Name: Lib/fractions.py
+SHA-256-Digest: a7zGvYUDMqFEJdp3JQTImThJOl2Q7eEIJgDBh4nCNKE=
+
+Name: Lib/compiler/pycodegen.py
+SHA-256-Digest: xdUQQfgtc0BjXxmR7hKq+NxGJHQAMdFAT0depc9QzoQ=
+
+Name: Lib/encodings/unicode_internal.py
+SHA-256-Digest: lZVoO3dqRfeFeLW6tRyCcNXInv/2sXE9oot87i49Qvo=
+
+Name: Lib/distutils/tests/test_ccompiler.py
+SHA-256-Digest: yfL10LKCWUzPPVBx/UH6Y/6p068E7y8Sj+bRVLCUvSU=
+
+Name: Lib/compiler/symbols.py
+SHA-256-Digest: f/1GbM5hqgYEwDVHUZ5g2kp/kxjw7dNdsFv6ItLYpYw=
+
+Name: Lib/encodings/cp932.py
+SHA-256-Digest: rZmrP8t0txweQO3cjB5ofQ2X+OpTs0HLftJejP8zKk0=
+
+Name: jysrc/split_text_in_commas.py
+SHA-256-Digest: XJIaWxUigv6pqH5iMpheG/wtof0wrDaj8HRWG5XiBP0=
+
+Name: Lib/doctest.py
+SHA-256-Digest: H+r2aZBSSsez97PNQf9T/MS/nzxa2UX7JGqc6nkKbfo=
+
+Name: Lib/encodings/punycode.py
+SHA-256-Digest: uQ/JRsS7Af7P/211FbCpKWlSvFwuD/CBeksIvnZ/Gfg=
+
+Name: Lib/unittest/suite.py
+SHA-256-Digest: kf8Y8FT2VMmzi0EVrgr5q05QD/v/AtOwGHo9sTeOYQs=
+
+Name: Lib/urllib.py
+SHA-256-Digest: iBlo0bh7VdGFh/i+ECPCjPLhO6F/5UYtf8DhZxD+7Tk=
+
+Name: Lib/modjy/modjy.py
+SHA-256-Digest: S55PUx+GiWU4pih0m168Eoql8kXewlCTkB4HMu7gjD8=
+
+Name: Lib/socket.py
+SHA-256-Digest: iVxClvAjBbISPAi1Se4KiQhAi+/qoi3vfgNyUrAT0no=
+
+Name: Lib/encodings/mac_cyrillic.py
+SHA-256-Digest: d9BGco5IPN0HnNVQa4a75eU2M19RpwMBMPsnNaEReV0=
+
+Name: Lib/encodings/tis_620.py
+SHA-256-Digest: gGfLhlPyoetJS5pJhGp/LfbijIJhQ2+NBgaMVPaig9w=
+
+Name: Lib/encodings/johab.py
+SHA-256-Digest: xDlWYOFMOPs/Gw/EuRXSWtC2VfpkXnkINaCmByXsSKU=
+
+Name: Lib/mailcap.py
+SHA-256-Digest: PE2VMyzV8uex2gHvmNQH5JOVmwe3Vn7KrjBdCDf1QUY=
+
+Name: Lib/encodings/iso8859_11.py
+SHA-256-Digest: WhdSB7EcyU11d3lNgesIXw5tIZV3mwa42K0ZvS2UxB0=
+
+Name: Lib/distutils/debug.py
+SHA-256-Digest: H4yIFJ2DeFb1VQddOkfDBxYuIqJPRssvPZh6W3KUs/4=
+
+Name: Lib/encodings/hz.py
+SHA-256-Digest: xdRimLPysyp+MohfQ+oo0CfhDDQEhBDFOXdcTOUC0yA=
+
+Name: Lib/distutils/tests/test_version.py
+SHA-256-Digest: ideBN/SF+BYHYXPn5wXm1XKHKRlvceYgxtqt0s7no4k=
+
+Name: Lib/wsgiref/__init__.py
+SHA-256-Digest: YjNHl+I56OOlF7yJJloszKjFd9F7OemdliF9hFIIjug=
+
+Name: Lib/distutils/emxccompiler.py
+SHA-256-Digest: ZjlBGaaTrJIHdMDxa42S6/fgu1qHPdl7b5rj1pQehSE=
+
+Name: Lib/filecmp.py
+SHA-256-Digest: pofiVSNzf6oc7cbmpRaWKE5oXA8sDMPvXWNQQP3mlds=
+
+Name: Lib/unittest/__init__.py
+SHA-256-Digest: GWFBE7kDHyLaRs49/q0trGKaIuScJAyC8TVBWplXgtY=
+
+Name: Lib/distutils/tests/test_build_py.py
+SHA-256-Digest: f3Vw6g56Vg/c+rldENzsgc17Clt0RTs9sL9h0QWXi2o=
+
+Name: Lib/hashlib.py
+SHA-256-Digest: mNADiSDPJ/7Vur6iAMtafwmBxq/h5cdBwfa/kjPvY40=
+
+Name: Lib/new.py
+SHA-256-Digest: JAincGI5LkZnH2CIEBsam9aqab0BxwCqo42WF+FOY6c=
+
+Name: Lib/encodings/iso2022_jp.py
+SHA-256-Digest: tILz6mWjOg8QCXaECL9y/I5TsXlez1UtoniRpxL2Ue0=
+
+Name: Lib/distutils/dep_util.py
+SHA-256-Digest: 0LCaWa5vd5G3VS+uXXE3nY3VNvMmLslmgm87Qel5+eI=
+
+Name: Lib/logging/__init__.py
+SHA-256-Digest: U3g9fghoYJPA8M6/XAZFeRbO+q/jn0imFWCoLBjgylA=
+
+Name: Lib/distutils/version.py
+SHA-256-Digest: D4z1JjaqwKbKk4Kf+L/RgJvRxy5n3v71SQRYgSJCHkU=
+
+Name: Lib/email/feedparser.py
+SHA-256-Digest: 3CU5EE/EK99+UqVL8l5VbJq7lukU1ZiDavGU62ObsrY=
+
+Name: Lib/binhex.py
+SHA-256-Digest: jvxRr/GvFLiIHmSrej/N4S7vcCOwlnwxcIJ9clKjrlw=
+
+Name: Lib/email/mime/audio.py
+SHA-256-Digest: 7zwmowI2FDDejosmGe6nHMaBsWq4RGNH8A/UYXNkUpE=
+
+Name: Lib/cgi.py
+SHA-256-Digest: 1Ieacuw0YXdhc2Qp1bwNkXk9aS3HESgm2mO5TkpUfoY=
+
+Name: Lib/encodings/euc_jp.py
+SHA-256-Digest: 4P/ZluFhdRwYaMz6FpyEpJF4QV2Fs22Jt0V89fb3+vg=
+
+Name: Lib/cookielib.py
+SHA-256-Digest: wmnvaO+WWR89LdkdWQ69zYeO1Ubj6j7XeC8Dq67khDA=
+
+Name: Lib/genericpath.py
+SHA-256-Digest: 1WuWKq/bSZYhSP91xHCuwitS1VVCsVLA0QhfI2WwlKY=
+
+Name: Lib/distutils/tests/Setup.sample
+SHA-256-Digest: suT4XcuOXHGwdhVgdv3D4K6NQmiDrvdXXss8mqSLtCU=
+
+Name: Lib/distutils/dir_util.py
+SHA-256-Digest: 6Ay3uU6i8RCMu1RDFfxmtBWDHnfWJkkDDe953J3a+js=
+
+Name: Lib/sndhdr.py
+SHA-256-Digest: T5Au77w80CuYUnkWl+07MDNSeRvx+t7OyOszGvAkjXU=
+
+Name: Lib/httplib.py
+SHA-256-Digest: yuHnCl7g1FKszRyJkZ2ja+CkOxZFxxHnnbXBAl/S/9M=
+
+Name: Lib/tty.py
+SHA-256-Digest: qtwc1QTMztA8vu9stZAsm5hbzQNiu+Mxgpg2KrGGO6c=
+
+Name: Lib/_strptime.py
+SHA-256-Digest: fAr7BjdVbpTspzwbaKwp/9UI5yNuwvJqMkPpJ/8jR5o=
+
+Name: Lib/distutils/command/bdist_rpm.py
+SHA-256-Digest: 0o8AjcNSxZHInhHPzSo7mXRnLC/+wUEahmxtzF8c2d0=
+
+Name: Lib/distutils/command/sdist.py
+SHA-256-Digest: tUq9aSNBy60qHe1Jr9ri4W8DSugulkPorjBdTC6pDvA=
+
+Name: Lib/asyncore.py
+SHA-256-Digest: jw7jzbeHFRzcKJDQAkbxeFzTk2zsSsvbgz7uRbvwf6Q=
+
+Name: Lib/encodings/cp862.py
+SHA-256-Digest: DQWO2LAXcanvkb1SlJte/1FYe7JMGaEksFzYp7I4D5k=
+
+Name: Lib/encodings/mac_iceland.py
+SHA-256-Digest: Ad+KXcfoGG5bzNIWx+mr7RS8OcnM+wtlFbwwppCAerE=
+
+Name: Lib/traceback.py
+SHA-256-Digest: GhPDS6P8AgEMgHPrfwuVsKzjBCuWjzY+9Uz1Mvf1buk=
+
+Name: Lib/distutils/tests/test_archive_util.py
+SHA-256-Digest: UFvmXddIHk+1lRdDeGMbOBNnkQyUMeouYY/hQxuoNgc=
+
+Name: Lib/email/mime/multipart.py
+SHA-256-Digest: R0Qla1f6TGjhZys0W3jb6WlxZx10LMSsN7ZXU249EXA=
+
+Name: jysrc/pyedit_example2.py
+SHA-256-Digest: OqHXhEIHnZoAx39o6UCWqBVUaKLw4jUjvxUzPQHVXgM=
+
+Name: Lib/xdrlib.py
+SHA-256-Digest: Y9fnpnQwoUqpjk1drpVEHmb8u4TwkxBuRd7zE6pZnNk=
+
+Name: Lib/distutils/command/build_ext.py
+SHA-256-Digest: 9JvslpbyYc/ccZjSjjuhpgW5qqSA/5j7Wvr4lJWdNyE=
+
+Name: Lib/email/Utils.py
+SHA-256-Digest: 9x00A/6CThESJ4AmNm58NI1g7WHXVUp4W483or28ZEQ=
+
+Name: Lib/encodings/latin_1.py
+SHA-256-Digest: /F8rrkfigcLByiWlBjYA1LCDIb8iBnBD+ImvvkWoKyQ=
+
+Name: Lib/mimetools.py
+SHA-256-Digest: kkXWmpZEQ+bVgm8ZLANnJ0ujBHJG6gyNWoyGtZ5GEsY=
+
+Name: Lib/_fsum.py
+SHA-256-Digest: 6LCqT/+KXp8eAu1U6RY83wYz67M0BhXyZRJXS2Z9xp4=
+
+Name: Lib/distutils/tests/test_cmd.py
+SHA-256-Digest: rOcnN3C8CYFwt1OEtqUqnduGzuuYCygvy+RZs6cBmho=
+
+Name: plugin.xml
+SHA-256-Digest: EnXTlwu/75HpVhLmUS83WePNoruJRXvQrgnZQTA9C+0=
+
+Name: Lib/modjy/modjy_wsgi.py
+SHA-256-Digest: P8PVTPTwtliTBZ3ITUFZ/rEZAClaLr6Q/56yfQ5mj5I=
+
+Name: icons/python_scripting.png
+SHA-256-Digest: pmXesyYhe+SL++Flz3JUg6Tv8Z0j3jW+5OdyJ0r/YIA=
+
+Name: Lib/pprint.py
+SHA-256-Digest: qACpV+Ooxp/kcIFaqFr4YcDlEeLbU3yUyOz0IFWzGGE=
+
+Name: Lib/encodings/iso8859_2.py
+SHA-256-Digest: G2sJg943qD1A69dudqBGsD79ibgpF2aR3TQq3nPpK4U=
+
+Name: Lib/distutils/command/bdist.py
+SHA-256-Digest: C9NfWPyQSUSHwWXQzdrXvk9+TmEes2wUeL2tVSHPqBQ=
+
+Name: Lib/csv.py
+SHA-256-Digest: i5NraOCB0AyUGa95hhEME2f49Zd/qFinjceoeCPqI+s=
+
+Name: Lib/distutils/command/bdist_dumb.py
+SHA-256-Digest: jYz0jvhYdB8Vfki6RflD5si1Ts6IO++VN+BnWC1TOmk=
+
+Name: jysrc/pyedit_switch_equals.py
+SHA-256-Digest: 8glt5vQ8vmAyogZ5H8HHcy398eJ/m8SM5Dcf3x68yAw=
+
+Name: Lib/warnings.py
+SHA-256-Digest: pvcra75jXyIKhAzI3hNxm5UC2lY+QqlHtcCEPMQ1V84=
+
+Name: Lib/distutils/command/build_py.py
+SHA-256-Digest: labWwc1o1w4rNciY7XTqNWFzjim/QJRHqmQou/QFpEs=
+
+Name: Lib/uuid.py
+SHA-256-Digest: bJeFemfleWAdFQdFHuKFojE89WJuoT5y/9sKDiiw7mI=
+
+Name: Lib/distutils/command/register.py
+SHA-256-Digest: vHZQ721yjCAhavmb05FSo1+wu+tkHVuVm2qBisSz3os=
+
+Name: Lib/dummy_thread.py
+SHA-256-Digest: 0/dnfldMa4YePSl06/x65EhMB9JZBMGLtOSLGQ6ct7I=
+
+Name: Lib/distutils/spawn.py
+SHA-256-Digest: LkBd8YIni4iH7b7CaZQLkWmuvh6aVvDLgkYZ+D/jGhI=
+
+Name: Lib/distutils/tests/test_dir_util.py
+SHA-256-Digest: TorPH75oRus/T12kz9ls9vvIYkJ7N9frtw3xKb0MDIA=
+
+Name: Lib/encodings/utf_8.py
+SHA-256-Digest: 1/xLyoovtpHuQGoueBsYp1FmVKsaK3iONuGXefIVKFM=
+
+Name: Lib/copy.py
+SHA-256-Digest: n751iGVYMHmt+NYdiJbfyE7vlEeM5Bx1mkIZ1Od8DuU=
+
+Name: Lib/distutils/extension.py
+SHA-256-Digest: J37lHeoalWZaDMnhzdxhj8XQIIKFASj8NbqAQet9hmM=
+
+Name: Lib/encodings/aliases.py
+SHA-256-Digest: SA3rfrjXLm2A/z3TjFNFDGqXxIT8S64/KD1DcGPmFfc=
+
+Name: Lib/xml/etree/ElementTree.py
+SHA-256-Digest: 2ARfUOWbiLP7tndmg5q0H6jWcS0vPy4CEQ3kH7pd3Xs=
+
+Name: Lib/datetime.py
+SHA-256-Digest: 1aJ239J3sSljJZOoV/o6FZc+9e8HK0lOQjnfMhQUgMo=
+
+Name: Lib/dircache.py
+SHA-256-Digest: HwK8yK9HzBYF4QcLHMenA2y2mb4qIQL0GR44PxoFtzo=
+
+Name: Lib/distutils/sysconfig.py
+SHA-256-Digest: V+/VNQoAOH/idYVxQRNPseJz5lz3oLv5amS73dHwUeg=
+
+Name: Lib/distutils/tests/test_clean.py
+SHA-256-Digest: 3awpLcqJR7+hHCkNObCBCqjBYkRUMqFTW6DVq5v3WGk=
+
+Name: Lib/distutils/command/clean.py
+SHA-256-Digest: IaioXCWeQgNvttWE79d0lQ/WuodrtusSBLveMw0s18o=
+
+Name: Lib/getpass.py
+SHA-256-Digest: Atr+KoSJ48CWb7kw0d0t/MXoQBMBkNe6BLRMfvWmBn0=
+
+Name: Lib/imaplib.py
+SHA-256-Digest: jhGQ16vhFCMg3W17EdTNWe6FWSR08jvHarGxuQptOO4=
+
+Name: Lib/wsgiref/util.py
+SHA-256-Digest: PBOEQjNpuweRF8tuAGeirFHPM0cL/VoJTTrefPjlXxk=
+
+Name: jysrc/pyedit_exec_line_in_shell.py
+SHA-256-Digest: 5U3ucUF7aHfo7euXhbXTAxbDTPD6d4FEzQS1JIMKqCY=
+
+Name: Lib/ConfigParser.py
+SHA-256-Digest: tg1AvuYLyFMubz61HWX1jTGLFlHYmL5gla49YXjln8A=
+
+Name: Lib/mhlib.py
+SHA-256-Digest: ynO9YiyV74sAlcNfI8+GOJfeZtsfzRN9HeByJwo1GgY=
+
+Name: Lib/distutils/tests/test_dist.py
+SHA-256-Digest: SZlmksI23eM88UNny5CVWigxY9Er+OQIDMZ5rnZ33VA=
+
+Name: Lib/unittest/test/test_assertions.py
+SHA-256-Digest: K3Tmu1+LnEEyNTRPiet0BpjhPPglYXjXRdvkoMWbN0M=
+
+Name: Lib/encodings/cp864.py
+SHA-256-Digest: AjoojwSbVKLhRbM1EuTZs4/I++U6PxoyNpSxyelv/bs=
+
+Name: Lib/encodings/iso2022_jp_1.py
+SHA-256-Digest: U/4mAhAFp0BcRvgig3n65rvmV9mgTiyhehHV072WoQg=
+
+Name: Lib/Cookie.py
+SHA-256-Digest: DRckppMgiSrdmdQQTrjtMl6ztji9oMuEggU5Aq4pKu0=
+
+Name: Lib/xml/sax/__init__.py
+SHA-256-Digest: ocKf/lVbdrx6li8xFvB2JQmQwVc57aFFN3P1FjRcc/4=
+
+Name: Lib/distutils/command/build_scripts.py
+SHA-256-Digest: bfrhOkiUr/wuAwXNUXAgKKphxiImURCqTi9UYy3aMYE=
+
+Name: Lib/sysconfig.py
+SHA-256-Digest: 9pBYH77PfTyPOKgNyeKqttYL0yn6PzhshUNn+JCEy/A=
+
+Name: Lib/xmlrpclib.py
+SHA-256-Digest: 1czJq+JfVTthcdVyqWJIqnn6KB9MOXKHyE1MorDR7eo=
+
+Name: Lib/distutils/command/upload.py
+SHA-256-Digest: TJPHJx2vBv7rR6ee9ckwj230cM3Yza3I/6JShKPWgyE=
+
+Name: Lib/mutex.py
+SHA-256-Digest: PN0Kc+gPc6bIbsPXx6+UUWLSWvRg1A/OIzyZ3d+gQf0=
+
+Name: Lib/json/tool.py
+SHA-256-Digest: kDERTKWx5Rt3aGOGnzF5YswKYZ+1VgJTSZCUqAzJidM=
+
+Name: Lib/dummy_threading.py
+SHA-256-Digest: 65bIE+aM8K3GDtkl76UWdmNxIWudVSuGFu+M4KfCm1c=
+
+Name: Lib/DocXMLRPCServer.py
+SHA-256-Digest: tgl3zsgUCbGEdWYprf1J9lu+HqdZr4jMRJ5BOoKu0I0=
+
+Name: Lib/io.py
+SHA-256-Digest: Ux2ru5YjXOYT5OYhGPGcQEiLYOo8f5y1XDZvy9T/TG8=
+
+Name: Lib/pyclbr.py
+SHA-256-Digest: kxEn/RKcslfGygWfxfGwmb0yDgg2acPvOK8rUwh4om0=
+
+Name: Lib/encodings/cp852.py
+SHA-256-Digest: CP3cfNpZOyocWaUseUJh7kApJqRVzsNYFW39kDN7xkk=
+
+Name: Lib/_pyio.py
+SHA-256-Digest: oocoPXg3opMZDdg32Rwnsx/fe6t+/StGb06GUpVqeuc=
+
+Name: jysrc/pyedit_assist_assign_value_to_var_if_None.py
+SHA-256-Digest: TT5mdEFu8gBVpFZLzYSVb5GhLH4etszjFNWZW7vgiZs=
+
+Name: Lib/pawt/colors.py
+SHA-256-Digest: vtcGGEswycKC6eKYj+7Noc8UZSwrdIW6D8ljPBLlm6A=
+
+Name: Lib/pawt/swing.py
+SHA-256-Digest: Zb7zlFI4OR6TzdWxk3otnKtfM/j/jHIARFC2TE+u63g=
+
+Name: Lib/xml/sax/drivers2/__init__.py
+SHA-256-Digest: KrBEv0myIEgd7DY3NirYf0nOuOiR4e457vJ7lmr4xd8=
+
+Name: Lib/compiler/__init__.py
+SHA-256-Digest: B+uY86iRCAXeZhV+pnuWfABp8Ow9KoiNDi0zI8bpKlc=
+
+Name: Lib/encodings/cp1257.py
+SHA-256-Digest: MTgDeNZEzH1LHY4GEk+kcWNiZeo+AUZxl2cfZ7tdtZU=
+
+Name: Lib/compiler/syntax.py
+SHA-256-Digest: /Js7bhan7jvSwf1KoQCsOdlm5UPp7w6EBzE0+IVPmwg=
+
+Name: Lib/tarfile.py
+SHA-256-Digest: kf1XSPmq+gSecOLrCcplaLDUHokBTEPF5Ss0VmNePZg=
+
+Name: Lib/distutils/tests/test_bdist.py
+SHA-256-Digest: vlOKvv4CdDfmUcyPpb5Wlbbr+7omrpk+YOJrCabaHGI=
+
+Name: Lib/distutils/tests/test_text_file.py
+SHA-256-Digest: RcM16CwgnkATNR2Jxkc7GiUUx2q/CZlkxdChVP4h02c=
+
+Name: Lib/distutils/tests/test_build_clib.py
+SHA-256-Digest: BvOLoI2lhtgU+fEX5xHOfqXYPDBihch1eLuW24++cdo=
+
+Name: Lib/encodings/utf_32.py
+SHA-256-Digest: 9P73Vd8VYqJICLvvvzeN7Kz/LU/JYk2hyV+dqjy1B70=
+
+Name: Lib/xml/sax/drivers2/drv_javasax.py
+SHA-256-Digest: MhjaZPBWYd42nKs+b5wOz8LAvn6LdhaoyZje0xQyQhc=
+
+Name: Lib/email/Message.py
+SHA-256-Digest: 4Otgn6rMM/DM5R2KibXLaG1PlT883T2Ay9O8eb0K6NI=
+
+Name: Lib/bisect.py
+SHA-256-Digest: 2x4xTcFwiaQO9rtfqbfNJIfkVG6DourztgCUFAsWN7I=
+
+Name: Lib/distutils/file_util.py
+SHA-256-Digest: BOd2YWSG8hOtABa+kMCWt4Rqai+Vgo7j74ZyAKTbEeo=
+
+Name: Lib/mimetypes.py
+SHA-256-Digest: arY8gIxzjBoogZXMJ9irCk+X8cZRy3qFW4t7Equx3ek=
+
+Name: Lib/ctypes/__init__.py
+SHA-256-Digest: 0oO9SSXV4arz2YAohJJ+xkhJklmm7dlf5v4A6N16HCM=
+
+Name: Lib/_MozillaCookieJar.py
+SHA-256-Digest: xKAvQ4D+azSg94AFxm/d28HDvfL7KVmsmDw5M8E+VK0=
+
+Name: Lib/abc.py
+SHA-256-Digest: 56VkSd+o+dL4H/bBgBiSfzncroLIT4JU3YqMuBHWaZQ=
+
+Name: Lib/tempfile.py
+SHA-256-Digest: L5YnKWnU1dcNjhng6BbsJ477AfY6zBz0flSDvQZi79Y=
+
+Name: Lib/unittest/result.py
+SHA-256-Digest: 1i4gdD5UIKPNKRjhvHUphEypLhLDs/KwYKl1hmP+Xiw=
+
+Name: Lib/distutils/command/build_clib.py
+SHA-256-Digest: 0TR1+n6F/Rg7j1WsMxAsnj55l3QpU1F+0ARdTP2PbKY=
+
+Name: Lib/encodings/raw_unicode_escape.py
+SHA-256-Digest: N0tEQZgte2AHDzAMFVA//HSSOtdttZt3s0D5e4e8FKQ=
+
+Name: Lib/encodings/iso2022_jp_2004.py
+SHA-256-Digest: YaNBGCyP3aEUjIs5Irq8Bs6fYd/x+D+SsRVFVfEmVDk=
+
+Name: Lib/encodings/cp1006.py
+SHA-256-Digest: frJDipncRNAH9j1UMQ4p8kfW9ntyYUHTmuLTZO7nxc0=
+
+Name: Lib/encodings/mac_roman.py
+SHA-256-Digest: L4IpCJ2Wr4emk9elYu/nz0EscG1VqBs/2eIonGW25Lc=
+
+Name: Lib/distutils/tests/test_msvc9compiler.py
+SHA-256-Digest: q2g082D3eaCEXnSGhJplnl27+/uLgTipr6z2rxYWJEk=
+
+Name: Lib/encodings/iso8859_3.py
+SHA-256-Digest: TlE3i0v5yzt6Ha0MtLXQEMcGCr/ZpRnElWopY9bep0c=
+
+Name: Lib/json/tests/test_pass1.py
+SHA-256-Digest: SHHU5qs0WpDt48WEZ/mPXJjdEv+CulNjOwxn9YcOKsI=
+
+Name: Lib/unittest/test/test_loader.py
+SHA-256-Digest: yI4zwYG8WqgnQz5W2Ub89ej2Yn/jB5ncEngN/vkeRXI=
+
+Name: Lib/dis.py
+SHA-256-Digest: a+zIU5EVNcz5tiG/FQAwa7Fve2LNUqT9YrIyyCE+6iE=
+
+Name: Lib/distutils/tests/test_install_scripts.py
+SHA-256-Digest: lcPm1Vfp1L7qnpHhJVUPVjthr8Z8H3t9mG0ulqsi/Dg=
+
+Name: Lib/encodings/cp1255.py
+SHA-256-Digest: hBHlGcUPrb0T2Z3jLYFJpOMVKCpp0bJcv6xEysjKXg4=
+
+Name: Lib/encodings/big5hkscs.py
+SHA-256-Digest: 74XaNyK4GXw9sNirvs050p5a4tvMPeRjQboTdQcZNUo=
+
+Name: Lib/pstats.py
+SHA-256-Digest: ynSsTuxWvqZxo9jHgfMHLLhl0XDJt9Bsr9GlgvSM214=
+
+Name: jython.jar
+SHA-256-Digest: Gw6c+nelqeN3I4H/7cbl0srBF/xLbdwcuAtZVxN2FKg=
+
+Name: Lib/encodings/cp875.py
+SHA-256-Digest: Loi6YDknU3nX+taLeaXz9EhNdb0SlZzhhgnB0LgJCv0=
+
+Name: Lib/code.py
+SHA-256-Digest: 0D5v51g5qCvglWAK3pZy5VsXX/lUUP5yZBNpSKsh+aU=
+
+Name: Lib/encodings/utf_16_be.py
+SHA-256-Digest: R5+/LJEINRQP+sJBzTnl/4itsOhapJrgHO3niwwwTLo=
+
+Name: Lib/repr.py
+SHA-256-Digest: oLUD5LVDHp+3OVWUqoglAz92b+cGbi0UtvaHKKt1CSY=
+
+Name: Lib/encodings/mac_arabic.py
+SHA-256-Digest: wjIXM1ppRjPf/EeCrMwCT9fO8tZP0x00JSfml2SMxPI=
+
+Name: Lib/tokenize.py
+SHA-256-Digest: h9WTf01vLCl1L7Ln1osIdyuta3mx4kmgc5UuNMSpLsA=
+
+Name: Lib/xml/dom/NodeFilter.py
+SHA-256-Digest: 0iD/mfDc8F5NxszpecZpt4k8VxTeqFbbr7v7obF2g94=
+
+Name: Lib/distutils/tests/test_check.py
+SHA-256-Digest: c4CZuSZJTvZYGkN0Hlk1cCoJLK/SunWMDGdOcV/l5h4=
+
+Name: Lib/encodings/utf_32_le.py
+SHA-256-Digest: Ah+2TMUP9i+8HXwYRDmGSyLfLq1AwsQ7MLbe0VthmfU=
+
+Name: Lib/encodings/iso8859_4.py
+SHA-256-Digest: owWKGpkSjjKStqTDoV/uVpa2q6z3CZ/7wNXKmXSIG6A=
+
+Name: Lib/email/base64MIME.py
+SHA-256-Digest: KvVLA7pg3aJymjux1BL4D399sWmqFLC80bh1t6H6qPc=
+
+Name: jysrc/pytemplate_defaults.py
+SHA-256-Digest: Np9EDCLS/k/dJM9j1ssund5qUDIuSrkBmKe+0/WyFpI=
+
+Name: Lib/aifc.py
+SHA-256-Digest: heJqBpkjzWR2nWkW9b6cr1E8D7YKA9D9RXvqdtxQvUo=
+
+Name: Lib/distutils/command/check.py
+SHA-256-Digest: RjWgnURA30CZLHbC2jMpN7Eea89m0GR2yshsy+gQaA0=
+
+Name: Lib/xml/etree/ElementInclude.py
+SHA-256-Digest: ofdPnoG2eui6uIgjX5+NsAP1tUQs/gWDbGTnXvdlTlw=
+
+Name: Lib/encodings/cp1256.py
+SHA-256-Digest: IAquUL2wZ1bXWesbkfRNcGeUioyU+HDkffd0PVcy/fg=
+
+Name: Lib/unittest/test/test_suite.py
+SHA-256-Digest: 9YUcr5zcdXlGV5IqfKxuzBDlycGqt7rKuvc7n7UWvKM=
+
+Name: Lib/distutils/command/install_scripts.py
+SHA-256-Digest: nhFz2Rrh7+NcyuBPTenlC2foZI/f5bdew80lqMXd7AY=
+
+Name: Lib/ftplib.py
+SHA-256-Digest: kCipOuxT8qD+YdEnnsPAy5I5B67lhrodN2Xj2vLk9S4=
+
+Name: Lib/encodings/cp865.py
+SHA-256-Digest: v+sm5dkJIAgEcZHDYpwoCROVjPEBHyLBCZ0095BM1OE=
+
+Name: Lib/distutils/command/install_egg_info.py
+SHA-256-Digest: r6rSgUFREOoxMKhvd3wcAcokD+IOWp9GEeBSEHZZHUw=
+
+Name: Lib/encodings/iso2022_jp_2.py
+SHA-256-Digest: mnIGn7r9Ztu8TJcvDU9Xy4kR2e1DexXW3g9T1hfQTYc=
+
+Name: Lib/encodings/cp737.py
+SHA-256-Digest: hud4rqJkxaE0mMnov+8ZbRWs17rri+N9OoUJL0GvsGA=
+
+Name: Lib/encodings/__init__.py
+SHA-256-Digest: a6eM5wkRoJVRkGdEKEeUm/7sMOLVBU0zXcDx2yaf9RU=
+
+Name: Lib/email/Header.py
+SHA-256-Digest: bqP7TgsTxmOxo3mXSK6wtThhVbj9arp6+Je1n+h2+yQ=
+
+Name: Lib/email/mime/image.py
+SHA-256-Digest: f9lDAqeW5Z8Dgb2jF5IwChGtERcTb7WZhyppXQ3q5dU=
+
+Name: Lib/pyexpat.py
+SHA-256-Digest: RZ/K43A+mlMILRmRXx8w1KA7ioR5VpdTfKJWTVWuCBU=
+
+Name: Lib/email/mime/__init__.py
+SHA-256-Digest: +f/Cyg1cj5oRFuPDY1kbY5B4wAO/YywMTNiXTOL1o/s=
+
+Name: Lib/encodings/cp1140.py
+SHA-256-Digest: D1XVHPLpDYbU+TTYca1JD/a2ql4v7mpKbKZaMXO05t0=
+
+Name: Lib/distutils/log.py
+SHA-256-Digest: B9hCb2R7Fa3XCBiw+7rYoLKija32hQcHf40Wf/aTw8w=
+
+Name: Lib/logging/handlers.py
+SHA-256-Digest: q6lP4Hah8uTud1NheS5kYNxVvcGeZmduZI7D3mDMLBs=
+
+Name: Lib/netrc.py
+SHA-256-Digest: 6TgHm0tDof1tjqu1TrVtxasmSl+Mjr9GJrSH5G9y7X8=
+
+Name: icons/python_file.gif
+SHA-256-Digest: VL0QlSic8EiqJCjvEBfGve7Eh0YSsMF3aVVsbZneT78=
+
+Name: Lib/distutils/tests/test_bdist_dumb.py
+SHA-256-Digest: aKd+0zCgcslcpInRp9dW43/G0wWgZLnqFWFGI6SZCjs=
+
+Name: Lib/encodings/unicode_escape.py
+SHA-256-Digest: FAjVQu+DnNTvpoLrmbS7M1mRBxJ7Gre29DShe12iV4g=
+
+Name: Lib/json/tests/test_float.py
+SHA-256-Digest: 2D/FDg/jtxGr+rvyWkG6DoZ7hYFpZQCsl2p3iz7npqw=
+
+Name: Lib/encodings/cp500.py
+SHA-256-Digest: a+YOUohDsLEinmcH6adBm0VQajNspTTvY7Mb735vOzc=
+
+Name: Lib/encodings/bz2_codec.py
+SHA-256-Digest: o0XuFN1YKC9csFS1kA7EDs9pDmOEJ90C3j509UapW4E=
+
+Name: Lib/sre.py
+SHA-256-Digest: RE5tnmEVz5oc7HkKzp/Ulmm6T+oiqfc/zUuQLq8x5zE=
+
+Name: Lib/calendar.py
+SHA-256-Digest: aJ6YDOs4jR49GQYNXmD/xihf80MI8ppoBvl/l6gJWmg=
+
+Name: Lib/email/mime/text.py
+SHA-256-Digest: tX5/+WIUEebYW1U8c63y6ryhhkeKCpvGC6RXqdMIkqY=
+
+Name: Lib/distutils/tests/support.py
+SHA-256-Digest: 26B4ymUTZVaH1lyNbjfjv6qGLTu/UuaM1zZ86cP1LUs=
+
+Name: Lib/base64.py
+SHA-256-Digest: 5TsufNsIctPGeoo/V1RCUmDCWe0qGwY9MMjm1DAqPi4=
+
+Name: Lib/_abcoll.py
+SHA-256-Digest: buxS4r89Lqy0LAvGsq9p9nKD2FvGZrlxS9k712kTaqQ=
+
+Name: Lib/encodings/utf_7.py
+SHA-256-Digest: 8HxLgalKLj0qgmMlsG+i7uUmOmLRLmmMNHn16EdRBWA=
+
+Name: Lib/encodings/koi8_r.py
+SHA-256-Digest: ZqkoDUvw7v92oilv91WHvSXk4X6FO+bjHR50y7RiFXg=
+
+Name: Lib/types.py
+SHA-256-Digest: Rj3fPqcFxvE+OyZnVOyPjKdsvvq20ddy58VM3nOHzuI=
+
+Name: Lib/multifile.py
+SHA-256-Digest: ErNRjsldWegDytNjSmi3+u3P1GC5/kRRVQOgQGS6Ca8=
+
+Name: Lib/distutils/unixccompiler.py
+SHA-256-Digest: J9/cYyE2eLuLDWnWtxyG9jwt4USdTNryeF4c5cCPGgQ=
+
+Name: Lib/distutils/dist.py
+SHA-256-Digest: 1vC81vBgbIAHkkpt/zJk4mFqxSh6/bU6ddm9wKlGRgw=
+
+Name: jysrc/pyedit_clear_templates_cache.py
+SHA-256-Digest: spchMHl10rh5FCWEy6MkM8XsAEJQfJfNXmlotTeP6+A=
+
+Name: Lib/encodings/cp1254.py
+SHA-256-Digest: ne/lYEPa2HzghtZG6TkY9yo1ZGsBichxoqaLTHwLY/E=
+
+Name: Lib/colorsys.py
+SHA-256-Digest: VaA/PxHyumiGrS9NjU4E6Wtvl0CtJk9YV+WJCcfNiLc=
+
+Name: Lib/sha.py
+SHA-256-Digest: WJn/R7RkqkKwwUln5kbPMtUX8xpk6BFV6i7voGlzNrk=
+
+Name: Lib/ssl.py
+SHA-256-Digest: ML75rk19v9uZQ0dlMZAUOeNAy4lnzOYujSR0fErWBBY=
+
+Name: jysrc/pyedit_kill_shells.py
+SHA-256-Digest: Vi7eD44HsySwcai9rUXH9tpyywWgIWGJyjpFuaNTki0=
+
+Name: Lib/encodings/iso2022_jp_ext.py
+SHA-256-Digest: SvpY8xOb/q9zdQbmZDiBWzsbyMkwcyJdVAp1t7GE/jk=
+
+Name: Lib/distutils/command/install_data.py
+SHA-256-Digest: OFdCc/YXrEuqj5UpRwIRo4Rgj+Zx0MEmzNpKYmY2qMg=
+
+Name: Lib/xml/sax/saxutils.py
+SHA-256-Digest: D9cJ6R6rE93fYuHCdzDDAdaTz5T1pvh+m9F/xJ8AoUM=
+
+Name: Lib/xml/sax/handler.py
+SHA-256-Digest: zTs4SiTIkXUjwqYhWdGlzHmUCZHZ6aCstqeg1W4oeMc=
+
+Name: Lib/distutils/archive_util.py
+SHA-256-Digest: liqsNKUmx5ADI7v3lpQNqGmHnt8hxrcMlpwAFttYdsQ=
+
+Name: Lib/_weakrefset.py
+SHA-256-Digest: hRDnINBczJG3lgi+5rMjYDHij3VLzae/wAQYO5mrbMU=
+
+Name: Lib/encodings/cp437.py
+SHA-256-Digest: SYKkwRhRJqO1KFySt8op+Kn7c0/74S/XrD4Rgq9P8pM=
+
+Name: Lib/CGIHTTPServer.py
+SHA-256-Digest: nvXS+Yo/ZlmKS2RUhBcgZKDqu9XySKFWBhkkwtdnXMY=
+
+Name: Lib/encodings/utf_16_le.py
+SHA-256-Digest: r3HlQfQAtYllDc5ju5sjDbv1r/2cEuiBjY3rWbJjxtU=
+
+Name: Lib/poplib.py
+SHA-256-Digest: 57ldwDDrGbkrYoy4wWBZw5lyx35BZThkBprM4eM3yts=
+
+Name: Lib/distutils/cmd.py
+SHA-256-Digest: kbDxNNmbwFonsWpfSJiLoaNRR5/Jk2siH7RSaqsf4Wo=
+
+Name: LICENSE_PYHON.txt
+SHA-256-Digest: 2JDAenyCrEjUOW1FjydKNfi0WgMKTx7RshNchIPN44k=
+
+Name: Lib/encodings/gb18030.py
+SHA-256-Digest: bviBTzP3G2gWa/So4MeJYswGBavbEiBLX6nND7Z4220=
+
+Name: Lib/distutils/msvc9compiler.py
+SHA-256-Digest: sF49oIsAi9KK5fV2uDI8VCMdsoTyINRwXmkMUrvQM8o=
+
+Name: Lib/sre_constants.py
+SHA-256-Digest: wPdd0qHq9SVh6HcKqLvJFko3HcR8ET2rusdpst0gyyQ=
+
+Name: Lib/pycimport.py
+SHA-256-Digest: HhNdGvsjRgj9uXs+Rqf+OXulExURS1kBAezCUj2EUvc=
+
+Name: Lib/modjy/modjy_input.py
+SHA-256-Digest: 3gawFBJFRlqYncteU5ptY6VqMSBA/PopRqVEFtZ//O4=
+
+Name: Lib/weakref.py
+SHA-256-Digest: +6JHRKsA1h+jGjIjEvjiJu3mZK4MH8r+RfggH1Y0NSY=
+
+Name: Lib/distutils/command/install.py
+SHA-256-Digest: eEaGMKbqqkbHINULeaM+d9dwT6ZoheRUY0yUTR5ZTFk=
+
+Name: Lib/chunk.py
+SHA-256-Digest: AVpcKURP375vDwWGWKWKsX1hDYZ5NWTPQ6AD2BjVSZM=
+
+Name: Lib/encodings/base64_codec.py
+SHA-256-Digest: kmWB2dxqrPYXo9aL7fzPrFX3mAwzqnWnLL+fM5Xzl3U=
+
+Name: Lib/dumbdbm.py
+SHA-256-Digest: uctff/g8gxNfi72Ga1Z15uHpm7QiCZ304G7KP53vUQs=
+
+Name: Lib/xml/parsers/expat.py
+SHA-256-Digest: Y/YaIx+hvbV41wz5IQLR3bTuCVn0IpsLJ2MJ+LC5IVA=
+
+Name: Lib/encodings/iso8859_15.py
+SHA-256-Digest: /ca0hVoQKxRmIfn3hQBPcY6R5+vJC/jD81JNJVttMWc=
+
+Name: Lib/distutils/text_file.py
+SHA-256-Digest: gRPcFIWZnsnDpkt7WFMZiek33mf8Wl49iJGBLZnwMHk=
+
+Name: LICENSE_JYTHON.txt
+SHA-256-Digest: sEV6J8KkGg4EQMZgIDIbFfR077mQdT1+JGbc5H0HzSs=
+
+Name: jysrc/assign_params_to_attributes_action.py
+SHA-256-Digest: yfqkkaSiLoWKDrC6D79b6zE4PoBU0hRICxlr7e0m0ag=
+
+Name: Lib/SocketServer.py
+SHA-256-Digest: ME4QLNGpZ4FTUR5oym1Ya2Y0B30/l3i5OWRW5dhpnCo=
+
+Name: Lib/marshal.py
+SHA-256-Digest: P0Pp8dHFCR+uo3b8ELGqKhcuWNInn9DGp0j+1+Kk5aE=
+
+Name: Lib/xml/sax/xmlreader.py
+SHA-256-Digest: MLTGaOKlX1MguYk3QMB+vtRJrhsksXAfxR4bYI15MWU=
+
+Name: Lib/distutils/tests/test_sdist.py
+SHA-256-Digest: oPPCMG1FdjVumjo8SkzsHLdGlOy0JTIwiakhEFs6D2Y=
+
+Name: Lib/modjy/modjy_response.py
+SHA-256-Digest: 1kkg2epO/3dlw6sonZuKhPwRHoUmtamAt9rwtI1M72A=
+
+Name: Lib/plistlib.py
+SHA-256-Digest: /wbJi2cXK+1lYAWroQlvy4D/YgWbdyOZcheFxaJYjcA=
+
+Name: Lib/stat.py
+SHA-256-Digest: WXSkcMcTCfl+fSr3aBOv04iOBHF8ZUVxrgW1MpWu9/M=
+
+Name: Lib/copy_reg.py
+SHA-256-Digest: yZAjgMbn3LTcOEX64CNTSYq/iOYQx65HdvyNDgic+4M=
+
+Name: Lib/quopri.py
+SHA-256-Digest: AZDdG2mNj26J9AAxNXHeIy0bWDlFAXjVw9GQr5Hb0HU=
+
+Name: Lib/subprocess.py
+SHA-256-Digest: cXl9rG/mabwM2bfVBxTV/niKUvSiY4PwxYHpuDVTMLw=
+
+Name: Lib/atexit.py
+SHA-256-Digest: UuR1JPHMrWIePZjEw3G/2SWKg8jytDOxQ9Z9++pLVd4=
+
+Name: Lib/distutils/fancy_getopt.py
+SHA-256-Digest: iS4dkz1ERCeJmWs+pdaF2tUsDPNHpTwJmNK10BwZbTU=
+
+Name: Lib/encodings/mbcs.py
+SHA-256-Digest: gxzP9dIokNLf++cgLkawTsuQ8ypD8lbXe7n6R9Ix3zs=
+
+Name: Lib/json/tests/test_pass2.py
+SHA-256-Digest: TbQ9gNulbglNwhjTcqGgQOjJNbRfRc1TPftjEFcgUUY=
+
+Name: Lib/encodings/cp855.py
+SHA-256-Digest: JrzS8oYH10B28rQyJ+Yczg4vDiLxkfwxdM/LRxw7pjw=
+
+Name: Lib/distutils/tests/setuptools_extension.py
+SHA-256-Digest: EdsbgD00+ucd89rpHMwnysVx+4sMSTIH7YZDypfvMBc=
+
+Name: Lib/commands.py
+SHA-256-Digest: vBJAlPQ50/58Q7UhI6kwTj3zV8UOIqNddeLyNOVcPsg=
+
+Name: Lib/importlib/__init__.py
+SHA-256-Digest: iDwanSe5Hw0jHx1RV9vPKVCscPxXFJffczDN78Dzf9I=
+
+Name: Lib/encodings/iso8859_16.py
+SHA-256-Digest: l2baxvlSn+WtjEVCSe5Hnt6DIsWAdo2gPXKxiJ4JADs=
+
+Name: Lib/zipfile.py
+SHA-256-Digest: bmTrOvw+eEkwdVj9SO4OQXdYohrNoPfWwPL9ZwOXtrI=
+
+Name: Lib/telnetlib.py
+SHA-256-Digest: +LyM5/ZrWAgxmFpomamgIbdMNycHvsy7bkZLS+nLRZM=
+
+Name: Lib/xml/__init__.py
+SHA-256-Digest: mUG5/GkQnRc1+xzCJqMpTV2haMja//Kp+gnNtaaHgVU=
+
+Name: Lib/encodings/cp775.py
+SHA-256-Digest: j1jNt0Mxbl7UhBmH73whiesaFVm22bJ1ZL3n40SrJn8=
+
+Name: Lib/distutils/command/bdist_msi.py
+SHA-256-Digest: 828pt0AdtXEnS2C0EbogJ+8+dh60U2COQwJiQkn372Y=
+
+Name: Lib/UserList.py
+SHA-256-Digest: 32dpTBSR/MEVNWKKzpBYlSzNz/Sonfe2hC+wh/Sz2kM=
+
+Name: Lib/readline.py
+SHA-256-Digest: 4OA7uSbDYgH9ScfCCLuQQyO4Ao/2Q7i7V6yuLxPu+ZQ=
+
+Name: jysrc/tests/__init__.py
+SHA-256-Digest: 1PRcyercEgOvaVNFkhcLCiR+dOHB1YobWMeQklplcIc=
+
+Name: Lib/markupbase.py
+SHA-256-Digest: 3u/2GOecBAJCUN7x3SArgSiBg2G1pKKOp19q44XykbQ=
+
+Name: jysrc/assist_regex_based_proposal.py
+SHA-256-Digest: 7GwWPMHh+cX/iXRhzdDrSak/OfyIt1XoA9sMoBztnLo=
+
+Name: Lib/distutils/bcppcompiler.py
+SHA-256-Digest: SusJV8Z6FmlGkFjL3h7vHqupaDsQY9SoKUFmVoZ8USM=
+
+Name: Lib/javapath.py
+SHA-256-Digest: ucOVymp1IB8g2swpYOiJ2Tdb3HgZdQ3sw3VgfGLG5dg=
+
+Name: jysrc/assist_proposal.py
+SHA-256-Digest: BG7fEEpgaXb/tapQcQA+q8bqySpfs667V5VkZABlnSM=
+
+Name: jysrc/pyedit_wrap_paragraph.py
+SHA-256-Digest: RgKn5OBeRDFKwv5fX4SwFLso0V+PH8ADVNuQv0PSx5o=
+
+Name: Lib/shutil.py
+SHA-256-Digest: l+Ij8d2xpm/crfPhJvB2v+mnjL8C40zoaa9koJyzFqU=
+
+Name: Lib/pwd.py
+SHA-256-Digest: 4mI70+CETIMQiYO3eOWKs5hS0AqUXpzDztuTfjd5rbA=
+
+Name: jysrc/pyedit_create_lines_on_commas.py
+SHA-256-Digest: H874ucGu1eSjNieW1JIUU3WM/drMG4mDHTrhTNdM0hI=
+
+Name: Lib/encodings/utf_8_sig.py
+SHA-256-Digest: iFkyppObIg9HRHxpoXMuAW0WvQ6EaTVV0hWleEUHRpo=
+
+Name: Lib/json/tests/test_speedups.py
+SHA-256-Digest: JUmLQ0YV4lGJ+tBF3QDaR6T/PAd2nRWrhQXvQdaVENQ=
+
+Name: Lib/email/mime/message.py
+SHA-256-Digest: uWTEEBatFirqsTFDN44G1TL0BKU6zIEEcUUkEIVucJU=
+
+Name: Lib/encodings/cp866.py
+SHA-256-Digest: +6e8dJAZI+xthwagIKJr8olKCXljYemStub7FFju2p0=
+
+Name: Lib/_rawffi.py
+SHA-256-Digest: jt0fx75kRBCoGJFztUiAy6EF7hbWB9rhHjKREe1pIZU=
+
+Name: Lib/json/tests/test_scanstring.py
+SHA-256-Digest: hc00GRmFBiNGv9QiYdgHwvbTICxvU8j0L4qAuWN/UXE=
+
+Name: Lib/codecs.py
+SHA-256-Digest: wMhxN0J5x1VWd3xKZG9AKOdRkrUL56tXrYgVlapDpFQ=
+
+Name: Lib/encodings/cp857.py
+SHA-256-Digest: 5qnRT8MHGW7nNho6msV9g7qErdLKg9HfjhdhXJiB+j4=
+
+Name: Lib/unittest/util.py
+SHA-256-Digest: vUx8iNRuhr7FGot+u+VIlEnLUX/Ki/KRU2WnoChKB0w=
+
+Name: Lib/email/_parseaddr.py
+SHA-256-Digest: gQVKw8cB5g8l+kNqj1XknGJWWCWRfvdGinV51QCt1tQ=
+
+Name: jysrc/assign_params_to_attributes_assist.py
+SHA-256-Digest: b3sSCW8ADq5nta1iQx9v9CwNUaFSOKIsQovpT0wxSEo=
+
+Name: Lib/distutils/tests/test_config.py
+SHA-256-Digest: /14VMOjlyn+UmPyIA/DkFphke+W1MI0S8d79OM9vNrI=
+
+Name: Lib/encodings/mac_turkish.py
+SHA-256-Digest: s/rtoVwh/mCqXVXvX9KWAptN0n1VDDWBT6g6BXgpU20=
+
+Name: Lib/distutils/tests/test_install.py
+SHA-256-Digest: 6ENypNlOr2nXOjQUYHc7FiXP+bi/klwH1jvUKkuRhAQ=
+
+Name: Lib/_LWPCookieJar.py
+SHA-256-Digest: HM2R96c7wHlWS3WM3McbAolubPWgJKUrcu71BNZcOfc=
+
+Name: jysrc/tests/test_templates.py
+SHA-256-Digest: GmB57cIjoN8i3hBENx2KRjgSvROdhJxwNCtyhU2CUNo=
+
+Name: Lib/gettext.py
+SHA-256-Digest: Jeqnlg2CkMSOLIPmUVEpFz65KJYBhTMWy7acuMjYJtA=
+
+Name: Lib/encodings/charmap.py
+SHA-256-Digest: 7LLiwtsMSnV9ti5l1lxB1mWaO354iJRxzeSjLWajp0c=
+
+Name: Lib/xmllib.py
+SHA-256-Digest: 8eqZsd0T5wThWe5Xd8Gp0joiwBViJ6zoPJhhuuDfhFI=
+
+Name: Lib/encodings/ptcp154.py
+SHA-256-Digest: BKUgArxpYlAiF9yfGU50cUuzLVUjfO0D8dm5TJQAaeQ=
+
+Name: Lib/distutils/tests/test_versionpredicate.py
+SHA-256-Digest: TeUWzOc+Q80rRAxpXLkgM4ROMddqfaQ9uEJEKTmmRH4=
+
+Name: Lib/encodings/cp949.py
+SHA-256-Digest: Qc/EEjn64kNx9iRg2bcmq4dwkxYxxZgVIPmWjeIJJyA=
+
+Name: Lib/json/tests/test_tool.py
+SHA-256-Digest: Wa1vbLYohfGHrTh8xYH9tsLGgbbUy2OrjOvpJiHLqQY=
+
+Name: Lib/distutils/command/install_headers.py
+SHA-256-Digest: ybtNMj9Fgn/9eD4Ve11ZKGn86OFweK4Nouoqe8fuabo=
+
+Name: jysrc/pyedit_example.py
+SHA-256-Digest: CUgLWpLFBlA/zHD/E0pFJP4jg25A+PSyYDErrvuMrRc=
+
+Name: Lib/modjy/modjy_exceptions.py
+SHA-256-Digest: VyXJ2Ub5ZgRAgshiBN0yn+0h847FgDtR7Wvhp7bfe8c=
+
+Name: Lib/ast.py
+SHA-256-Digest: rlFtENgoepyj7ZJfVI8BtXRT7/0ivpOHEmSezHpMGMs=
+
+Name: Lib/email/Encoders.py
+SHA-256-Digest: lHicdMShXmVG8DWlctTJyRzE3c2uUeGIx/jJw6ygCRo=
+
+Name: Lib/unicodedata.py
+SHA-256-Digest: 0vzLmrHWniRhXjbAYvHMbF+mchO05zIJhywsFt7vhRY=
+
+Name: Lib/mailbox.py
+SHA-256-Digest: 0F3kcDeOSQjqZPVYX53lT26V2l3vAk6X/IfS574aSps=
+
+Name: Lib/encodings/quopri_codec.py
+SHA-256-Digest: +d+J9l+oABx0VqxbRcwu/0Xw5HHJYk0i3uBTe1MqwGQ=
+
+Name: Lib/unittest/runner.py
+SHA-256-Digest: yRC8nJwFQfNfB2dCPAoeEoj/d6TsX9UVJsrxQ467Jqw=
+
+Name: Lib/distutils/tests/test_bdist_rpm.py
+SHA-256-Digest: ELYUAHgVg6vNb4eN9HsPmBw4Gn/nNngvCPDM2IwVeNg=
+
+Name: Lib/distutils/tests/test_file_util.py
+SHA-256-Digest: I2xf4f9k4A3GN+id6pVNZnu+zaNid7vak4vIXzyAT/Q=
+
+Name: Lib/platform.py
+SHA-256-Digest: 5qCyC4w/0LC/8NVeb7QaVLV781qBiMw8bjWMNBmXg8M=
+
+Name: Lib/htmllib.py
+SHA-256-Digest: QbzRpTHCygAOREutxz1ImipmexQoccbwCk0rTtfl7oc=
+
+Name: Lib/BaseHTTPServer.py
+SHA-256-Digest: YMuJP7l4+Qw1Oi4w2bsm65/Mcpjh/ixNyOzx5sjdDXU=
+
+Name: Lib/encodings/gbk.py
+SHA-256-Digest: mjskfadGYNfwRi0LlU/ArjwKJmCzIZEGdp7vLOfbBRQ=
+
+Name: Lib/shlex.py
+SHA-256-Digest: YaijjGLHCrVfSapx9MQ3gl25wT/B17D8tQE6K/m8QfI=
+
+Name: META-INF/maven/org.python.pydev/org.python.pydev.jython/pom.proper
+ ties
+SHA-256-Digest: IyZ/XJg2SKB9g1Npt12cwHKke0JgVRsdvtrhr768oS8=
+
+Name: Lib/modjy/modjy_impl.py
+SHA-256-Digest: 4M+2ppxEB5OsmQcio6omUnL43NK7ClNh2h23sNwIFf0=
+
+Name: jysrc/about.html
+SHA-256-Digest: lmkJKPRsBKoMLZ1uPrxTv4DClXX56Me1hA8FPc5qNm8=
+
+Name: Lib/unittest/test/test_skipping.py
+SHA-256-Digest: GUj0cD2PbZ7uRWDzvcZ5lhicvMrHdJQyUwmBdznrENg=
+
+Name: Lib/json/scanner.py
+SHA-256-Digest: cjXIZunwun9Z/n26boja/iEqTdwd4nkxw2smKkaLaT4=
+
+Name: Lib/distutils/command/config.py
+SHA-256-Digest: jyXL+zAoO+SJ2hEK5KiwoYX3mZ0ZwflyOq2xbzAZ73g=
+
+Name: Lib/sre_parse.py
+SHA-256-Digest: JOHyoHzAcAGn558gcqveT4jb4HyuE20DEcVdAumV0mQ=
+
+Name: Lib/optparse.py
+SHA-256-Digest: ARJ7+U21nnurWy1EuqmYNaaQvbwftlXfRbBgWMYQhFk=
+
+Name: Lib/SimpleXMLRPCServer.py
+SHA-256-Digest: gtx4URFd1FyzEM9SjsbIC6xQhAoyHzmh1ljWTLEX1vk=
+
+Name: Lib/site.py
+SHA-256-Digest: 1xSYEBpicgTgnwdnkszVEXZXrSeqAAoRFBAL0cxSNJI=
+
+Name: Lib/distutils/cygwinccompiler.py
+SHA-256-Digest: SDFFUllMC/BP4dDfs4t6YeOowCcDomzUlNg2xLlQcbc=
+
+Name: Lib/anydbm.py
+SHA-256-Digest: EYXHcUeFcwBLB9IuG1tdLWbodk5FPPiI77jdiFyMRGg=
+
+Name: Lib/distutils/tests/test_build_scripts.py
+SHA-256-Digest: YzHxDnEj4tIJDC0VWndpCoFc4DYrgKY11p79vb9kBAQ=
+
+Name: Lib/token.py
+SHA-256-Digest: eKel53DTfCbwvR9D6eT7XsYtJIVyiNq1IEbOqhdg72k=
+
+Name: Lib/zlib.py
+SHA-256-Digest: gTzB8ALJ96hDDQQHGnLF7ogE/Q74aQn4545iiGtd9qY=
+
+Name: Lib/distutils/versionpredicate.py
+SHA-256-Digest: myE9EZFxauGp8nBLjki5eXfgXLtiV0EWf+YdCPy5Pi8=
+
+Name: Lib/encodings/iso8859_1.py
+SHA-256-Digest: xZVcKEH2LozVNPsyF+PUKuBampC7IGZkrEVJR5dTul8=
+
+Name: Lib/json/tests/test_pass3.py
+SHA-256-Digest: 2Jaa7OsH4kzRRpEOTDY3g4o8EiAH/HGzaobDxAUtLDQ=
+
+Name: Lib/encodings/palmos.py
+SHA-256-Digest: sb+igoDX0z5EkkcBrrSMXiPMAp/VR0q5w5xoQw8etxw=
+
+Name: Lib/encodings/cp856.py
+SHA-256-Digest: w6Gd0Q+I7k9qwzxRrLuk82k4oo3QPuzwHah2TI8R/Cc=
+
+Name: Lib/pawt/__init__.py
+SHA-256-Digest: NKsoAIqlEqWvsTmXT7VLhakEDCQqEea9sgPImYAUgho=
+
+Name: Lib/encodings/cp1253.py
+SHA-256-Digest: AmIJQfRFAs7V+ES86UZwa4fwCs+6n52nIQkxwht+X44=
+
+Name: jysrc/template_helper.py
+SHA-256-Digest: wWjhiHCpdTlKTvoMYX2VzRXiMvNUSKChjNFoIRqidlw=
+
+Name: Lib/distutils/tests/test_sysconfig.py
+SHA-256-Digest: PxMTsq2lYXlnzVhO5Rz46botRmpGu+goRikWi/nILEc=
+
+Name: Lib/ihooks.py
+SHA-256-Digest: 9M4rdc9suSwhlWrwicf/v9llaAZcA+ByQmlT7Z++wIg=
+
+Name: Lib/linecache.py
+SHA-256-Digest: LxQagOJEGroshhXL1udbzr10u0F9iWa0rxejA7S4Ab8=
+
+Name: Lib/encodings/string_escape.py
+SHA-256-Digest: Vf9kGl6kae62IFvdHdlyyRNUCVPtkd+IohCBWWTS288=
+
+Name: Lib/distutils/tests/test_build_ext.py
+SHA-256-Digest: 7uuGdQ5aXA389KlG5ZtHJtN5tfePnVgiHUug4GNAmxA=
+
+Name: Lib/inspect.py
+SHA-256-Digest: LRJensZyYm2OBg989w2VDq+4OZ7/9Xlt1HGwwMusTyg=
+
+Name: Lib/mimify.py
+SHA-256-Digest: OxvbKvgMQbGFIPAMXHBQAwXLr0G49YcsTSmFMuPXb5o=
+
+Name: Lib/encodings/idna.py
+SHA-256-Digest: vqKITKw1PCScr4q4lqdcOhZf5Pys2Hj8K4MvpN8RMfQ=
+
+Name: Lib/encodings/cp950.py
+SHA-256-Digest: MCxWhJvJNWxLAIAtQQ8UWPQ8/3Qc9/bu8Bs5kYIK050=
+
+Name: Lib/sets.py
+SHA-256-Digest: Aq1wQ3yu1wQVsMo0ZeznIVH8uhASSIvwqle3he7J4uY=
+
+Name: Lib/distutils/tests/test_install_headers.py
+SHA-256-Digest: rB32LIg5gg6RxYgL8kisnGNj4V2MFr+6OW4S+STTPss=
+
+Name: Lib/this.py
+SHA-256-Digest: arZhNNtf4kQ2ybiUPZDRM/jIj5yxUMspvmmo91g3/N0=
+
+Name: Lib/xml/etree/cElementTree.py
+SHA-256-Digest: jYOLTZwv6I+yOgAh1tgJIMDzhxBk/s47ZzVKh2cozHM=
+

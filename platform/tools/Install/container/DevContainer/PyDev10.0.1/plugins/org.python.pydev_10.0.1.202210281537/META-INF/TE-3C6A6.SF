@@ -1,0 +1,78 @@
+Signature-Version: 1.0
+Created-By: 11.0.9 (Oracle Corporation)
+SHA-256-Digest-Manifest: YbhdprJk/sU6PqMihIhwCahpZNYK5gs3Cx6MJCy2LWw=
+SHA-256-Digest-Manifest-Main-Attributes: AVd70jQhtLHnUqoyx1YbABWk1nSFHpm
+ o4nE1G7W6SuU=
+
+Name: schema/pydev_debug_preferences_page.exsd
+SHA-256-Digest: ss+MIRYF9Od5dZfWT5CIQs0blU8Kb/Opwt9PbKhVWiI=
+
+Name: plugin.xml
+SHA-256-Digest: 7FYUvZIBWSO/sOFDAaxu3XarcMFg0SYS64sTCPgMx8M=
+
+Name: libs/WinRegistry-4.5.jar
+SHA-256-Digest: 7LBKlr6zXnObs+X3ncJx8DV7wU4pZCvoLlT28DRxiOU=
+
+Name: META-INF/maven/org.python.pydev/org.python.pydev/pom.xml
+SHA-256-Digest: T9mQvn411nmuI/u0Nuls1VXmMpCo0NIsTrOUbf032C0=
+
+Name: pydev.jar
+SHA-256-Digest: /56KCJWRKanzC/ntiVHsHFQg4TVgBqyrnkOFnSfYiXc=
+
+Name: schema/pydev_formatter.exsd
+SHA-256-Digest: cVD9q4rVyGV2ehuOFPPZ8kDkBMAqkOFT2NFa0/kgC70=
+
+Name: css/dark/e4-pydev-dark_preferencestyle.css
+SHA-256-Digest: 2R8tDrSm6+MIIDGom+FV32LqNVfHsVwPZjaIVVbl0zA=
+
+Name: icons/python_file.gif
+SHA-256-Digest: C0chHUngMwZs5HXGTU9zGI0/OXlMQeVzK9EWK9X2sDE=
+
+Name: schema/pydev_view_created_observer.exsd
+SHA-256-Digest: glWYbee38iSU9sMZM8ZZIGy9Jdwwf2NCUt7VhkecNqY=
+
+Name: about.mappings
+SHA-256-Digest: LdgiihvKTZh36tEZLEQo35xrupOxXqXb18V0zRj8rU0=
+
+Name: META-INF/maven/org.python.pydev/org.python.pydev/pom.properties
+SHA-256-Digest: n96d6FK70VV2VdaVFAc1VQdvmlS6AsMgANGVn8DsKy8=
+
+Name: schema/pydev_globals_browser.exsd
+SHA-256-Digest: Tr6BxQy8Y9XeXIOhzvDClCE2tsGr7uilepIWBFLSeRw=
+
+Name: schema/pydev_hover2.exsd
+SHA-256-Digest: mTNtWcsDXAb+znpG3XpEJKW8OlqmQgVePUC9xFE/LIc=
+
+Name: about.ini
+SHA-256-Digest: zZjjdkNy3fYG0jvEXTHxYF3XL/jMKdaNvJJpu84kIs0=
+
+Name: schema/pydev_organize_imports.exsd
+SHA-256-Digest: 0seaQeCIxsz8EYqlj/QGRJDX3QR6uP6mKJ3i95nNMzI=
+
+Name: schema/pydev_pyedit_listener.exsd
+SHA-256-Digest: VkWsiEP58Q3czhU4DLYprN95dRhJ6GS5A/22AkXOIAE=
+
+Name: LICENSE.txt
+SHA-256-Digest: kKR//0aU3zBgl9SCeCpwoQ+GrOEHBzEb90XcPTX/6Do=
+
+Name: plugin.properties
+SHA-256-Digest: /0S++w6f9be69hdxK/IawBkhrEHhD0O3QSaDb/wnAZk=
+
+Name: schema/pydev_interpreter_provider.exsd
+SHA-256-Digest: RmnKWsC+iblrzIuhYt1cTm4/OX7jd4BsOsoUxmk61tw=
+
+Name: schema/pydev_ctrl_1.exsd
+SHA-256-Digest: qMur/U4W3EPXWvfdQrEgx91kUqTEapHXQocWydsS1eg=
+
+Name: pydev.png
+SHA-256-Digest: t53JSSVN0Gpp4wvmXqgvs4LAq6hh+kICDIe/FT5txOs=
+
+Name: icons/python_16x16.png
+SHA-256-Digest: UlWdtiaTyYcKigbPLwxMA5uSY78qXFapsBitjzJRRtE=
+
+Name: icons/opentype.gif
+SHA-256-Digest: Uc6sQw31uedjA/fOP8oDbjfWKxf5iR886o8NC+gHsX8=
+
+Name: schema/pydev_quick_outline.exsd
+SHA-256-Digest: pdWmty0+37EZSGXNQjoMafUBO8KN0yZVmyXoJJ2hFOk=
+

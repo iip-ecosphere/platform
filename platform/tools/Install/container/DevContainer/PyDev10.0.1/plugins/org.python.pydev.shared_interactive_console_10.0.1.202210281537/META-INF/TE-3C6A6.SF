@@ -1,0 +1,50 @@
+Signature-Version: 1.0
+Created-By: 11.0.9 (Oracle Corporation)
+SHA-256-Digest-Manifest: NiVqI5mwH1G2TIrgtB6/gXu+nKoZ29ZOqJKeLwP4wV4=
+SHA-256-Digest-Manifest-Main-Attributes: cClCcDY9xf1ecuHLjc7+OC9mxhh0SdP
+ REgWHsKUtdTU=
+
+Name: icons/terminate.gif
+SHA-256-Digest: 2cctbkl+S8ICn5tDxnDs23OVl8R/4pawRnNWeZPyEPc=
+
+Name: plugin.xml
+SHA-256-Digest: AOx9t3lNSZ5yXj+FpKSh3SpvM3W5970bWohgZ2/YuIc=
+
+Name: xmlrpc-server-3.1.3.jar
+SHA-256-Digest: TKkKbqWJq7c4iHEKJf6tf83UYBGG0qL7UtZEcJ6bq0Q=
+
+Name: icons/interrupt.gif
+SHA-256-Digest: m3YwuSgRpQ811DSh4+CzFWmE4nx/DRJ/lmdhp7MTrSM=
+
+Name: xmlrpc-common-3.1.3.jar
+SHA-256-Digest: i2zDBUj9Zc+IFaCBhWFijLmJG9Fry0oK8Jtb4/nivcA=
+
+Name: META-INF/maven/org.python.pydev/org.python.pydev.shared_interactiv
+ e_console/pom.xml
+SHA-256-Digest: 6iqBX63s5KvhE3JFOB03PHNELvbXpws0nKlwulKT+vQ=
+
+Name: META-INF/maven/org.python.pydev/org.python.pydev.shared_interactiv
+ e_console/pom.properties
+SHA-256-Digest: yJZ4NMlGHbDzZtpgklCy8n5VGJZhDaIuNeyjGK9Kwd0=
+
+Name: icons/sync_ed.gif
+SHA-256-Digest: 3Mm0z+rce8Dg4cK9vrI1LFW/RWQFRPP/LSeulq/U7E4=
+
+Name: icons/save.gif
+SHA-256-Digest: CXcFZaJKFqpneSLoS9yAGicb1/7rITBV6kU2GWdxzEM=
+
+Name: ws-commons-util-1.0.2.jar
+SHA-256-Digest: /V3d7YIK6NvqGyJjFo0c9qhfzVK6TskDRl7RJyHYNJU=
+
+Name: xmlrpc-client-3.1.3.jar
+SHA-256-Digest: /7nIx7/IUiu5vvnXwdQQ931JHaVdd/Md0dXfMISsWjk=
+
+Name: commons-logging-1.1.1.jar
+SHA-256-Digest: w1WPQUeIRIBXXKY2V4wDcpfTXuqsF71aDGmMtNZpPlY=
+
+Name: LICENSE.txt
+SHA-256-Digest: kKR//0aU3zBgl9SCeCpwoQ+GrOEHBzEb90XcPTX/6Do=
+
+Name: interactive_console.jar
+SHA-256-Digest: GXFrcaqIUII/w9i4j2u7TdxsmoQTtknQh0t8b5qz/xk=
+

@@ -1,0 +1,74 @@
+Signature-Version: 1.0
+SHA-256-Digest-Manifest-Main-Attributes: jQBThHuEFsy17MsMCWU6ECwo3kUbG
+ u0JDwywWzLCvZU=
+SHA-256-Digest-Manifest: K02StEoogh3/6htYmIM4rP9U7G7ynOvC9sFtcqe4xiY=
+Created-By: 1.8.0_51 (Oracle Corporation)
+
+Name: org/eclipse/equinox/internal/security/linux/SecretSchemaAttribut
+ e.class
+SHA-256-Digest: 29y7dIYRG2F9UKZUggoB+vRL5CogVhGV15nZknEmIMs=
+
+Name: about.html
+SHA-256-Digest: ncO+WCNUIJ0JLCOl/ot53yopwTqvvtVu0qSgblesdYo=
+
+Name: org/eclipse/equinox/internal/security/linux/GList.class
+SHA-256-Digest: LmzqaOgJvY1qPAJj6ejewE9JGuELUNxgvEDk/BN4BIM=
+
+Name: fragment.xml
+SHA-256-Digest: z353u9L8LWTDghGDOimbDcCIYMRBpAwKQy/6Sx/OzMs=
+
+Name: org/eclipse/equinox/internal/security/linux/GBusType.class
+SHA-256-Digest: xfriqeGFGSmSEcGhYm67amO1J9kL3TtBDDEEFKHtU0s=
+
+Name: .api_description
+SHA-256-Digest: wkjAuntYzZuM9Leqamhv6bqXQ+FduhPLyDIU2IDWZas=
+
+Name: org/eclipse/equinox/internal/security/linux/SecretSchema.class
+SHA-256-Digest: YmgQBKaniHC9lgQKA13O8TBWWlSNyaLWYmNRRQrXS4k=
+
+Name: org/eclipse/equinox/internal/security/linux/LinuxPasswordProvide
+ r$LibGio.class
+SHA-256-Digest: AAppFj9b3ULl+3lkuS7RUmeZH9AyGUQwa6UvNVSoKK0=
+
+Name: org/eclipse/equinox/internal/security/linux/SecretSchemaAttribut
+ eType.class
+SHA-256-Digest: awUo1TH+8XVUixREpbnk9z+VcYgE7PIHLHeXu7GznWQ=
+
+Name: fragment.properties
+SHA-256-Digest: S9M43rTQ9Yumhy2FctvrTK6Z6z0mAmhZ6lVJ+tpyBpk=
+
+Name: org/eclipse/equinox/internal/security/linux/nls/LinuxPasswordPro
+ viderMessages.class
+SHA-256-Digest: KuIyBCVzwrk1KwPlSk2UgUHYMucRO7TxyUsf/C0+ge8=
+
+Name: org/eclipse/equinox/internal/security/linux/LinuxPasswordProvide
+ r.class
+SHA-256-Digest: i0TtdOylFppM90e8pRQ5bPF4ha7aXowqPt1VHCCwHf0=
+
+Name: org/eclipse/equinox/internal/security/linux/SecretServiceFlags.c
+ lass
+SHA-256-Digest: 5agciFpZ3ti5r5nq3UWpdPW8W+QohCgfDchwfZgki/k=
+
+Name: org/eclipse/equinox/internal/security/linux/SecretCollectionFlag
+ s.class
+SHA-256-Digest: oV+kAn/f1iCzZ+HpZQeDjHK5Ig/9F0T8XW796MmZD50=
+
+Name: org/eclipse/equinox/internal/security/linux/SecretSchemaFlags.cl
+ ass
+SHA-256-Digest: zeuNLMdF/4T8iur5OKw8EkXA5aTcmPb95y105uQY6I8=
+
+Name: org/eclipse/equinox/internal/security/linux/GError.class
+SHA-256-Digest: Ih5msvxz9lKRC2q91+IqSWgfLQYiaj76tJopNDVt214=
+
+Name: org/eclipse/equinox/internal/security/linux/GList$ByReference.cl
+ ass
+SHA-256-Digest: fT4BU+IgCku7rRVGQ8w4FHJGZWvYwuc7DyVpEdZVI+I=
+
+Name: org/eclipse/equinox/internal/security/linux/LinuxPasswordProvide
+ r$LibSecret.class
+SHA-256-Digest: 7MVV6HUe+3Hrq4CxGlhSgrCvDieTneWTLwbbBAB9VrI=
+
+Name: org/eclipse/equinox/internal/security/linux/nls/messages.propert
+ ies
+SHA-256-Digest: C4cCy5f+K2zK89iWdixcMKzXv1JvLTyj1sOE5f5X4QA=
+

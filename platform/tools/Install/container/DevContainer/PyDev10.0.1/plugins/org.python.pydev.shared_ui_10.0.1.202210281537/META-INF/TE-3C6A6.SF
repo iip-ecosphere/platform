@@ -1,0 +1,373 @@
+Signature-Version: 1.0
+Created-By: 11.0.9 (Oracle Corporation)
+SHA-256-Digest-Manifest: t6ENx0s0i/GULiwNhmGQl8NmRorHGZ5ids4pKj9FtBQ=
+SHA-256-Digest-Manifest-Main-Attributes: UmKpFV9BZNLXEDvLJPrjaETuQZbIQG4
+ QN9miIFcPLLU=
+
+Name: icons/home_nav.gif
+SHA-256-Digest: XOLDaWRTDuwqgFBgGFBUOCqL7hXXWSjCUUfbYbW7SeM=
+
+Name: icons/new/xml_tag.png
+SHA-256-Digest: vquD0dEzvZ9n0X+odvzw2G4wOElc6NkYLAeZO/gogb0=
+
+Name: plugin.xml
+SHA-256-Digest: XW0xDVty4QrQLJrDR4ATNcEBup6bCdWYbEdAkHs/wwc=
+
+Name: icons/error_small.gif
+SHA-256-Digest: /S8D3JTfoFrp2ekP/Gf3e2eUyLOlDJXpganBoQ4Y/78=
+
+Name: icons/packagefolder_obj_remove.gif
+SHA-256-Digest: 2TyBRlNljWolUgf2Fi7YFX0GX+jdKONyYB5NUXtB8E4=
+
+Name: icons/remove_nature.png
+SHA-256-Digest: 0gEgYzNsuIOdvP4ccLl4jf/1yM0gxT0obYJRbpGP4YU=
+
+Name: icons/new/create_attrpub_obj.png
+SHA-256-Digest: 4e0enUiy2phWIz3h1Mrm8GCLKd7eb0QpsmdB1MjCYUw=
+
+Name: icons/python_nature.png
+SHA-256-Digest: Qeg2yYyEI/TpBSsz7oPvKgZRiN9sy4ZPBSAgMLGPMhQ=
+
+Name: icons/python_coverage.png
+SHA-256-Digest: SKxqLikE2E+wmPAqLx7VS4+urdVId/TLLw60burcqeQ=
+
+Name: icons/failures.gif
+SHA-256-Digest: N61XPeIzbJnPR93EIlMnM6FvYDw6OqPq43YBGHECGi4=
+
+Name: icons/warning_decoration.gif
+SHA-256-Digest: 4v5oSJNs1QeueJkQN4uVvlVvoc+HgQs4krmS8D6V6QE=
+
+Name: icons/static_co.gif
+SHA-256-Digest: r9E6Ql9GbQFUF8wdCSocdtRvwisfn5ORl+pYmqvXRrw=
+
+Name: icons/pydev_package_explorer.gif
+SHA-256-Digest: e6tEOj8m7TwxcHx8JgE46u4Ir2WRiL5590f9Lfwxx4A=
+
+Name: icons/search.gif
+SHA-256-Digest: cZFm8oKsLmSx+STPneFHyhzeksoh63ZkKRY7BASFD84=
+
+Name: icons/cython_file.png
+SHA-256-Digest: jO5KHrUH+6FckLBiPJGj47WwBdbxflR0cbHyOKurBk0=
+
+Name: icons/relaunch_errors.png
+SHA-256-Digest: z8vQH6DxSsgDxvHO1iTjKjyUt7uTfE3mciOWn+2vjKQ=
+
+Name: icons/jython_run.png
+SHA-256-Digest: zVO9+cTpEat+iv/aSWCY0Fyf3qmm/txJ603SxN75K5g=
+
+Name: icons/jar_nonexist_obj.gif
+SHA-256-Digest: CQ63lcU7bO1B/3zOcbyAZCoU+/n9oCDpRNPL7VccCvo=
+
+Name: icons/python_unit.png
+SHA-256-Digest: GPU6GSP2hjhJLWGOAHhjJEJDT+2NdSlX6s4CTnqkiko=
+
+Name: icons/relaunch.png
+SHA-256-Digest: G/bi0vwF1walMDL2tMuJgmjIUc3mrHn5RUbKhP4Mntg=
+
+Name: icons/warning.png
+SHA-256-Digest: VOUJKicSzAGc/smvSZBNDWIaXWAxy5HltR1gteq4wCg=
+
+Name: icons/new/imp_obj.gif
+SHA-256-Digest: S2JHxl30oopRv/DwH4L8RxrPWox8mHFnpe5vw1qa1sM=
+
+Name: icons/forward_nav.gif
+SHA-256-Digest: R0rm9FJbP8SmLT15oeUKz3n93Ln7ar4hPkmd5yjI5yM=
+
+Name: icons/custom_init.png
+SHA-256-Digest: 3UCn6qAgmo7DrQbwhrXIB0y7qToZ5lc6gPfAINEcoEc=
+
+Name: icons/new/imp_dec.gif
+SHA-256-Digest: JgnMVno9LmDZI3mLkTJkxwbEDgk+XFC6z/+PgDjODLE=
+
+Name: icons/pythonNature.gif
+SHA-256-Digest: Qurj0Q7EgjX7/BhVCwruyI7AQ2f7knV8ZjD+5JrONh8=
+
+Name: icons/relaunch1.png
+SHA-256-Digest: MdY8Br2mVmpvqXIc+BlSgMGmGkV0xQBne09NkjmAW1s=
+
+Name: icons/python_module.png
+SHA-256-Digest: EJeu40s4ibft4mNo24ft9Jgw8AmaonIFPpBByf7m5O0=
+
+Name: icons/add_correction.gif
+SHA-256-Digest: LyWHC+CoKJyQEBJfpeN4OujYepp8eBQrJWaj1ir7RCk=
+
+Name: icons/custom_python_file.png
+SHA-256-Digest: 9ORG/1KUmIe5qXhsvV8bLhqvE2hb7iqAyMkaMahpCfQ=
+
+Name: icons/filter.gif
+SHA-256-Digest: mHEedjXOlz0zZswLSedwKXep3i8tnds7zwTdGgIstx8=
+
+Name: icons/alphab_sort_co.gif
+SHA-256-Digest: +9EOxFPlF3ImAa+ZUB0TwnN50dhuOuSPovVGYYQaDdA=
+
+Name: icons/tabs_inactive.png
+SHA-256-Digest: wvueGKtIiqsbqgk2I8m1B7WBzu6tmZdPIsasX4YD/AQ=
+
+Name: icons/file.gif
+SHA-256-Digest: AWvmJes2x/o7sSOVQkPAgOeMTU7wznIyos5E+vsnBr8=
+
+Name: icons/jar_obj.gif
+SHA-256-Digest: YKvGK2+6O+fB7TuddQg1UCyqJo8IKVpGftc1SqGQJ5g=
+
+Name: icons/remove.gif
+SHA-256-Digest: SHYbfyH3HQtMItUzFNWlzXTotO3bfjiUo3UB7zygX+w=
+
+Name: LICENSE.txt
+SHA-256-Digest: kKR//0aU3zBgl9SCeCpwoQ+GrOEHBzEb90XcPTX/6Do=
+
+Name: icons/field_private_obj.gif
+SHA-256-Digest: M8JTKTkbrDiGuV2iuULz2oMNTMBEqfQjpuF09bOHBMA=
+
+Name: icons/refresh_nav.gif
+SHA-256-Digest: XpdXI/4taaUFPuFFrD+SELbJjjRJqRzdoCvPR2Oyeas=
+
+Name: icons/jar_desc_obj.gif
+SHA-256-Digest: G6tp/Eh/KC2s0pi3OW9XRSzvDf6gzuaiA3FdCmcOLhE=
+
+Name: icons/showerr_tsk.gif
+SHA-256-Digest: VDDdk22lRW5hRufsdlT/r10RGmUFL17HE1LIs2v9uy8=
+
+Name: icons/new/create_class_obj.png
+SHA-256-Digest: 2djyi7/xCAqQzMdr5LbZZrINt2cmeYklbEOx2bbpseQ=
+
+Name: icons/project_source_folder.gif
+SHA-256-Digest: fFJrch8o0VgfQ1id6kJ6s9Jgkf8W+mFwsmdCsEoN7+8=
+
+Name: icons/field_public_obj.gif
+SHA-256-Digest: yykaRMFVfLkmaCj8jPgKhakt2aPa0SaJFWjgRtRrOP8=
+
+Name: icons/private_obj.gif
+SHA-256-Digest: IVV1u5i+ht5R1WGsdStvU3KZq/tDsWQqBY/kk9bKe7g=
+
+Name: icons/jar_src_obj.gif
+SHA-256-Digest: JMadh1FXSoUVSP4LYxJ2yoeLuZn5K5GHbuk8CkPpb+Y=
+
+Name: icons/python_logo.png
+SHA-256-Digest: D0AqRNn26XvkcBf7T3WbyVU8YsUCvVuyS6rPgedt3VE=
+
+Name: icons/environment_obj.gif
+SHA-256-Digest: I37Vm8KiTvNk9hRDXOWu2rcNKuawkzRBf7VYpebAE00=
+
+Name: META-INF/maven/org.python.pydev/org.python.pydev.shared_ui/pom.pro
+ perties
+SHA-256-Digest: 8B4t53B7A1nU3LHp19hoPOn7xnKlY8Qod1EmPtcci/Y=
+
+Name: icons/close.gif
+SHA-256-Digest: DE9KIQ+K1yJaCx/lQ41g/Fjmnk05qgkZs/kmrDch/Ck=
+
+Name: icons/cython.png
+SHA-256-Digest: 14R27pRfLJnEt9g3rb/fGPWLoFUUj7w6BSBZlGm5rpg=
+
+Name: icons/console_enabled.png
+SHA-256-Digest: eqxWx2vZlSGnrow3ktOnU3tiniebYUKlKrFzBKR65Es=
+
+Name: icons/decoration_class_obj.png
+SHA-256-Digest: zI67A9om0aYBmprEXP2RG8r8tj/4wPMs+6BzCNl2vf0=
+
+Name: icons/down_arrow.png
+SHA-256-Digest: peVUrEME3Qr6Vq6YU2UtNdmrm4Sr9B44qQK7/XxJ1FI=
+
+Name: icons/template.gif
+SHA-256-Digest: 5syVtL9AZuyPnmm59zJLMUw805nP5pu/tHuzRPLjqz0=
+
+Name: icons/new/create_method_obj.png
+SHA-256-Digest: 1juhUmKMpUfc/CdOXloAYNO0u2XlZDXqEatvHgQ3QK4=
+
+Name: icons/python_16x16.png
+SHA-256-Digest: UlWdtiaTyYcKigbPLwxMA5uSY78qXFapsBitjzJRRtE=
+
+Name: icons/new/attrpub_obj.gif
+SHA-256-Digest: z+gdxSgECi3Xt3Rm/BkCanOpR7odS4BraQvKy3sMgUs=
+
+Name: icons/remove_all.gif
+SHA-256-Digest: dCoe4ZGk6g4aPrpKa/RpsZpFsPs9tJyWml/zbfl8pwc=
+
+Name: icons/searchm_obj.gif
+SHA-256-Digest: RS04BdD2Mk1uRCO1It16MSSrvDiNEsKu9V1rKMzf6cw=
+
+Name: icons/copy.gif
+SHA-256-Digest: 5z7v/2z9DbpNHrLMdWy/ReTXmY58/98u8IQqFutQtps=
+
+Name: icons/decoration_static_obj.png
+SHA-256-Digest: gmAYikyTB0etrlaUvc+tr7nu5YWa/zk8C1TtSfwgR0A=
+
+Name: icons/new/old_imp_rel_obj.gif
+SHA-256-Digest: 5t+jvsZI4p3m5ljA3b3tRs5O1KomfQvt683hSLEJSFo=
+
+Name: icons/workset.gif
+SHA-256-Digest: KO4Lejuhzr8IEH05e9DAs/QtedVwAkmBRmoA2i3UTRs=
+
+Name: icons/protected_obj.gif
+SHA-256-Digest: Ern2M/VodQrbhjzMMszVBcrgZ7gZIa04KW6WaMpBRg4=
+
+Name: icons/terminate_all.gif
+SHA-256-Digest: 4WNvczlKWZ5nWwzbR8kysbC2HCAzsZGj8klZZi9NGRQ=
+
+Name: icons/history_list.gif
+SHA-256-Digest: JJh7WlmObXAOO7s8SBYR83K1sJGFoN/8uCmBloceCIs=
+
+Name: icons/annotation_obj.gif
+SHA-256-Digest: PRaJf4IQ5RPEmgKgVAJjEHSJ6UqfEFGbcLQnaQtuMhQ=
+
+Name: icons/new/__imp_obj.gif
+SHA-256-Digest: E0VLKz2s7vJ1n8wD11m/a5QcNLYqbPHq8mCv5W0ogwY=
+
+Name: icons/new/create_python_module.png
+SHA-256-Digest: Ea0qQmFlpcCd5YEF8FaITqybceSfLwhJdVUGMlUjqgs=
+
+Name: icons/correction_move.gif
+SHA-256-Digest: L0jxbh4ZUJALKANNpB3C/3pVzfsNGqnTd4EVwp1CkPA=
+
+Name: icons/new/imp_obj.png
+SHA-256-Digest: CG0yuqdQhn/xMiFKPQqXSJ+s8jXtfbnVoUGs7ie7Eks=
+
+Name: icons/builtin_obj.gif
+SHA-256-Digest: ebqTxoIJAhlB3ns0ERrlT5dVTqQM8wID9s4pxnG2N+k=
+
+Name: icons/expand.gif
+SHA-256-Digest: dkHfjAvN1vEWjz1KwMGC4TbUVbm+vM054sMjPnPw9Q8=
+
+Name: icons/flake8.png
+SHA-256-Digest: TceDV+dIjbw92Nj2sZITUEYkFxv7ipZ1OwqSOgmUohM=
+
+Name: icons/gotten_from.txt
+SHA-256-Digest: gNThh45MK4iqHHIntEQiD7l6Cec1op85YFpSI6tOcUU=
+
+Name: icons/backward_nav.gif
+SHA-256-Digest: UOc+AfsjdnsznJ1IALDt1ZHPllAo0fVb5GjLvBlIkpc=
+
+Name: icons/relaunch_background_enabled.png
+SHA-256-Digest: kkNyMHfE8BInHpKS+YZkLBhgXjPiybCZOhNN4GiQOjw=
+
+Name: icons/jar_lsrc_obj.gif
+SHA-256-Digest: 8hZaENTq3y0pWJYdGvlNcNXSOWrIvf6YC9wTzSUskP0=
+
+Name: icons/collapseall.gif
+SHA-256-Digest: V0jy6U2wM8KwRmmBohwc7zo0mMx/RP00S2+3gusBPsg=
+
+Name: icons/python_comment_black.png
+SHA-256-Digest: JJgKvcTh2I4yYbBGcudD71rs6+UaYgGJt3i/lmwjK20=
+
+Name: shared_ui.jar
+SHA-256-Digest: ts5b0kBcANwbS5Tq8QwLZtAzSLBe4zex+WZ6/J3Fsis=
+
+Name: icons/cpyqual_menu.gif
+SHA-256-Digest: iTgmo+NQezJm97n3v/knwQVKHfNebTSZwVNLPNIQTu8=
+
+Name: icons/relaunch_background_disabled.png
+SHA-256-Digest: EAWWZdkqWzH1KCLS7P2qvh5kSy2OoLo19FpKcL5PJ5I=
+
+Name: icons/python_perspective.png
+SHA-256-Digest: dUiVT786jf0IL3ARG1iOjYsdL70vl8xHVOsviwnyhAI=
+
+Name: icons/new/method_obj.gif
+SHA-256-Digest: 4FPtTbsjr05/72QcJ8vdZbHw3L3kIFxiuyG7SooId7M=
+
+Name: icons/terminate.gif
+SHA-256-Digest: 2cctbkl+S8ICn5tDxnDs23OVl8R/4pawRnNWeZPyEPc=
+
+Name: icons/magic_co.gif
+SHA-256-Digest: B37PXxbhTX8kd4q16/VhYnp0/ZcmM/eQma+kekm+tlA=
+
+Name: icons/new/template.pdn
+SHA-256-Digest: jiZ02NdU1YYfVLAv+XUrRN55wjOHKm+4BIfx72fnXeQ=
+
+Name: icons/tabs_active.png
+SHA-256-Digest: FSLzyJMKuUpDr144GBGgnQ3wdeOX5vXcrGalrFxKt7k=
+
+Name: icons/python_run.png
+SHA-256-Digest: BcVHCjEmVh6kyTIoj2JybuCrZSxRdLSm6hXIdQ/bAeE=
+
+Name: icons/new/class_obj.gif
+SHA-256-Digest: e+YHgLrgia4z4JhK4CitqHlso+T14opV7ZFONR3MvaU=
+
+Name: icons/parameters_obj.gif
+SHA-256-Digest: U6RDSQWi7K2gq8uFPvsnE30X/XJODdImQdhm4wn5eYU=
+
+Name: icons/project.png
+SHA-256-Digest: 95Ojqxt1Op8dSKoeZV6QMpjb/66AcgTCN4x29Dq++ZQ=
+
+Name: icons/class_hi.gif
+SHA-256-Digest: iV/9Cj3mwVkGlw0Mmy3W8spXbNpQALlJPKLnGNm1HPo=
+
+Name: icons/python_comment.png
+SHA-256-Digest: 5QUWCzv1N0IQ4jQqD5L1JakUipq3/AV3NlupkHwSAMk=
+
+Name: icons/python_refactor.png
+SHA-256-Digest: 08vjU1TfIEypusu2AMSipENP5pYtC96EK6Sql1sj0vk=
+
+Name: icons/console_disabled.png
+SHA-256-Digest: ZKwyAk1DmNTEEbu8vgUv0lzlOpCV/b8pJHji62mggAc=
+
+Name: icons/search_docs.gif
+SHA-256-Digest: dJcL5XhKO8KSmUnm65igRpZJ3D4MS22mCw33abba3wA=
+
+Name: icons/mainfunction.gif
+SHA-256-Digest: oc5KuSmD8FvRSgTJHddZH4u2BhxLUqBN10341i+pRyY=
+
+Name: icons/save.gif
+SHA-256-Digest: CXcFZaJKFqpneSLoS9yAGicb1/7rITBV6kU2GWdxzEM=
+
+Name: icons/toggle_tabs.png
+SHA-256-Digest: SRo1wd5jjFfsyvxMj7O5W2E5jeCWZNgM2UoX1KbetKA=
+
+Name: icons/library_obj.gif
+SHA-256-Digest: 1tsjMYtheGeelU9Qo27R3pKF6m2iK7bZPK+dRsFqIyU=
+
+Name: META-INF/maven/org.python.pydev/org.python.pydev.shared_ui/pom.xml
+SHA-256-Digest: jMwRU6Cx7b6T6GBcwQ7XrBVP77BDiyS1WcpemYIQCzs=
+
+Name: icons/python_logging.png
+SHA-256-Digest: +UmWhWq6tEop2CVH//iyun8pe+uN2vk+nXJoU9LGgtE=
+
+Name: icons/pylint.png
+SHA-256-Digest: yXAaQZyfi3Vk2dOt1UtWMcftSfItZNB6+s5SrhfNlzw=
+
+Name: icons/folder.gif
+SHA-256-Digest: bTYU4a8IloR1fha3BlVmoaGE+Xr0rxtGeu2/yUS0EuU=
+
+Name: icons/line_match.gif
+SHA-256-Digest: lIBXJM3X8vS8jpKKwobss/itACGbSLIxzg4DhqXt9Y0=
+
+Name: icons/jar_l_obj.gif
+SHA-256-Digest: mh3qFg01J/XkSRADgvXaItm4JoijxEuVHrvkOTcQ4rw=
+
+Name: icons/new/action.png
+SHA-256-Digest: hiaEwuke7AqpNmdYtKI8nrZRM7QmHyeTxP3GFJ3fnGA=
+
+Name: icons/packagefolder_obj.gif
+SHA-256-Digest: RXncmxpNYhuvRqvCx4hehw1+3z6lPGMqivrONu6HncM=
+
+Name: icons/new/imp_rel_obj.gif
+SHA-256-Digest: MRPmU29fgEMKxkoGrTaut4RVFC9V3SGtJlw7i7MtC/s=
+
+Name: icons/sync_ed.gif
+SHA-256-Digest: 3Mm0z+rce8Dg4cK9vrI1LFW/RWQFRPP/LSeulq/U7E4=
+
+Name: icons/jar_remove_l_obj.gif
+SHA-256-Digest: IdBRAfUjdIYF9klCcYE4NRsCMsN76rsG3e446SR4luY=
+
+Name: icons/python_file.gif
+SHA-256-Digest: C0chHUngMwZs5HXGTU9zGI0/OXlMQeVzK9EWK9X2sDE=
+
+Name: icons/up_arrow.png
+SHA-256-Digest: PEkqS85aI9XU1O+j4TwkDvgeClOYY5Kpfizs+Sbb1lk=
+
+Name: icons/build_var_obj.gif
+SHA-256-Digest: fi6FU+SU64TeeQA6Z5vICQriA72JDRAiJa2HDnon2b8=
+
+Name: icons/sample.gif
+SHA-256-Digest: nityhfdwDBvBTJAmLEfJHWWF9m4KlBIJ1DoECZjq87w=
+
+Name: icons/error_decoration.gif
+SHA-256-Digest: 7YJQzcjH7aeigtTNjXete+xO/vVerqFC2XqlsMXk3yo=
+
+Name: icons/fields_co.gif
+SHA-256-Digest: 2sEMN5sqYZU5nA+yi89X6oSd86UdxUNtdGBzP31+g2w=
+
+Name: icons/package_obj.gif
+SHA-256-Digest: 2yspehXW/OK0E3/OyP8D9Ow3EyRsXYAbXQ73cF4/fNQ=
+
+Name: icons/field_protected_obj.gif
+SHA-256-Digest: H6P2XROuUm7nBdu9FY54/e3SnJ07Zc4vXLEhrDkY9DE=
+

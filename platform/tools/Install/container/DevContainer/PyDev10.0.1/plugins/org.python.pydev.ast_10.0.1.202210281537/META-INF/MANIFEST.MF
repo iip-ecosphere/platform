@@ -1,0 +1,79 @@
+Manifest-Version: 1.0
+Created-By: Maven Archiver 3.5.2
+Build-Jdk-Spec: 11
+Bundle-ManifestVersion: 2
+Bundle-Name: Ast Plug-in
+Bundle-SymbolicName: org.python.pydev.ast; singleton:=true
+Bundle-Version: 10.0.1.202210281537
+Bundle-ClassPath: ast.jar
+Bundle-Activator: org.python.pydev.ast.AstPlugin
+Eclipse-BundleShape: dir
+Require-Bundle: org.eclipse.core.resources,org.eclipse.core.runtime,org.
+ python.pydev.core;bundle-version="[10.0.1,10.0.2)",org.eclipse.text,org
+ .python.pydev.parser;bundle-version="[10.0.1,10.0.2)",org.eclipse.core.
+ variables,org.eclipse.debug.core
+Bundle-ActivationPolicy: lazy
+Export-Package: org.python.pydev.ast,org.python.pydev.ast.analysis,org.p
+ ython.pydev.ast.analysis.messages,org.python.pydev.ast.builder,org.pyth
+ on.pydev.ast.codecompletion,org.python.pydev.ast.codecompletion.revisit
+ ed,org.python.pydev.ast.codecompletion.revisited.modules,org.python.pyd
+ ev.ast.codecompletion.revisited.visitors,org.python.pydev.ast.codecompl
+ etion.shell,org.python.pydev.ast.cython,org.python.pydev.ast.formatter,
+ org.python.pydev.ast.interpreter_managers,org.python.pydev.ast.item_poi
+ nter,org.python.pydev.ast.listing_utils,org.python.pydev.ast.location,o
+ rg.python.pydev.ast.refactoring,org.python.pydev.ast.runners,org.python
+ .pydev.ast.simpleassist,org.python.pydev.core.pep8,org.python.pydev.plu
+ gin,org.python.pydev.plugin.nature
+Bundle-Vendor: Brainwy Software Ltda
+Bundle-RequiredExecutionEnvironment: JavaSE-11
+Automatic-Module-Name: org.python.pydev.ast
+
+Name: plugin.xml
+SHA-256-Digest: gbjF8xOM9KjKV9m1h5BvUivx0Z+89vKWX9bGK/TGCt0=
+
+Name: schema/org.python.pydev.pydev_simpleassist.exsd
+SHA-256-Digest: 3F48ufgonwEOfC514GOzX0L5gwUFVcmRiGPAnnvRVbk=
+
+Name: schema/org.python.pydev.pydev_manager_observer.exsd
+SHA-256-Digest: NP07XU2Pwu2jtiwBIdLjbQScFDp/Zx5zscNhjjalmOk=
+
+Name: META-INF/maven/org.python.pydev/org.python.pydev.ast/pom.xml
+SHA-256-Digest: HWZNSJtp5oiD0jb1/E5JGJ1khbqJ5lmDrqh2NtMz7cQ=
+
+Name: schema/org.python.pydev.pydev_modules_observer.exsd
+SHA-256-Digest: ErgZsvCGKF7ZGFLjVpcYc6HC7iYBt0M1dSZFFyPelBE=
+
+Name: schema/org.python.pydev.pydev_interpreter_new_custom_entries.exsd
+SHA-256-Digest: Y4+USuVtANs4i0tKljDEhxFqYVEfRZkOJ2qARIHDGns=
+
+Name: schema/org.python.pydev.pydev_pythonpath_contrib.exsd
+SHA-256-Digest: Pe9oLvnniDCN6VNv58QRK9lpezxIHR+EtsFNZxu7RdU=
+
+Name: schema/org.python.pydev.pydev_interpreter_observer.exsd
+SHA-256-Digest: kAnn1cLOeJyFymdx4P+pu7rE6DNSSU0oBgiTfUDgU2U=
+
+Name: schema/org.python.pydev.pydev_builder.exsd
+SHA-256-Digest: czFjNg/TFNQNaV49bjUXxaVJBdBh4dpp6hIxCLlgu4A=
+
+Name: schema/org.python.pydev.pydev_interpreter_info_builder.exsd
+SHA-256-Digest: 0RIIBayIEELEc7rio9uc8SRJjxxs6VNYGarJ0iEUNww=
+
+Name: LICENSE.txt
+SHA-256-Digest: J75t01G5GT6rkY9hiDNA+yh/SDVMI+VNinfwannMATI=
+
+Name: schema/org.python.pydev.pydev_refactoring.exsd
+SHA-256-Digest: ZD+DD8sols6UzAXCZ/H8XMRxxbVbexZMhbIxzv1mwcU=
+
+Name: schema/org.python.pydev.pydev_python_module_resolver.exsd
+SHA-256-Digest: nzeb9zts2rJR/jkEsTihIKSiH3nrZr6AoBJlgI8esHQ=
+
+Name: ast.jar
+SHA-256-Digest: b/ghmQk3lDvSjP2jXynfyAUH26NuC+sLtHzvGv4AScI=
+
+Name: schema/org.python.pydev.pydev_completion.exsd
+SHA-256-Digest: aShZu4R8LaxHnjsD6Qh8fmVoKuJKE8xhSzJcnymEBB4=
+
+Name: META-INF/maven/org.python.pydev/org.python.pydev.ast/pom.propertie
+ s
+SHA-256-Digest: icPXVyp8ay4XZDj62NP//mHwXt4iGeGgequ+nqSYygE=
+
