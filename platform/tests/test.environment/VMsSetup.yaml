@@ -1,51 +1,64 @@
-VMware Path: C:\Program Files (x86)\VMware\VMware Player\vmrun
-VMs Path: C:\Users\alamoush\Documents\Virtual Machines\
 Setup:
     TestMgrOS                 : Linux
-    CopyVMs                   : False
-    StartVMs                  : False
     MoveScripts               : True
     InstallPrerequisite       : False
-    EcsSvcMgrContainers       : True
+    EcsSvcMgrContainers       : "C1Ecs_C2Svc_App"
+    # Ecs, // 0 - just ecs (used only internally, prevent by constraint)
+    # Ecs_Svc_App, // 1 - one container: ecs + svc + app
+    # EcsSvc_App, // 2 - one container: ecsSvc + app
+    # C1Ecs_C2Svc_App // 3 - 1st container: ecs, 2nd container: svc + app
+    RunDockerRegistry         : True
+    DockerRegistry            : "147.172.178.145:5001"
+    DockerRegistryPort        : 5001
+    ArtifactsFolder           : "/iip/actual/artifacts"
+    MgtUiServerIP             : "147.172.178.145"
     InstallPlatform           : True
+    NewInstallFiles           : True
+    IIPEasyTracing            : True
     DockerRegistryCerts       : False
-    RunDockerRegistry         : False
-    PushEcsSvcMgrContainers   : False
-    GetPlatformFiles          : False
-    PullRunEcsContainer       : False
-    StopEcsContainer          : False
-    DistrPlatformFiles        : False
-    DistrDockerRegistryCerts  : False
-    StartPlatfrom             : False
-    DevicesJoinPlatform       : False
-    DevicesJoinByEcsContainer : False
-    DevicesLeavePlatform      : False
-    DevicesLeaveByEcsContainer: False
-    StopPlatfrom              : False
-    StopVMs                   : False
-    DownloadExamples          : False
+    StartPlatfrom             : True
+    #PullRunEcsContainer       : True
+    #StopEcsContainer          : True
+    #DistrDockerRegistryCerts  : False
+    DevicesJoinPlatform       : True
+    StartServiceMgrContainer  : True
+    StopServiceMgrContainer   : True
+    DevicesLeavePlatform      : True
+    StopPlatfrom              : True
+    DownloadExamples          : True
+    CompileExamples           : True
     RunExamples               : False
 Examples:
+  - Name        : SimpleMesh
+    Included    : True
+    Redownload  : True
+    Compile     : No
+    Artifact    : "SimpleMeshTestingApp-0.1.0-SNAPSHOT-bin.jar"
+    Run         : False
   - Name        : examples.KODEX
-    Included    : False
+    Included    : True
     Redownload  : True
     Compile     : Normal
-    Test        : True
+    Artifact    : "SimpleKodexTestingApp-0.1.0-SNAPSHOT-bin.jar"
+    Run         : False
   - Name        : examples.python
-    Included    : False
+    Included    : True
     Redownload  : True
     Compile     : Normal
-    Test        : True
+    Artifact    : "SimplePythonDemoFlowApp-0.1.0-SNAPSHOT-bin.jar"
+    Run         : False
   - Name        : examples.rtsa
-    Included    : False
+    Included    : True
     Redownload  : True
     Compile     : Normal
-    Test        : True
+    Artifact    : "SimpleRTSADemoFlowApp-0.1.0-SNAPSHOT-bin.jar"
+    Run         : False
   - Name        : examples.vdw
-    Included    : False
+    Included    : True
     Redownload  : True
     Compile     : Connector
-    Test        : False
+    Artifact    : "SimpleVDWOPCDemoApp-0.1.0-SNAPSHOT-bin.jar"
+    Run         : False
 Machines:
   - Name           : Server 147.172.178.145 Platform
     IP             : 147.172.178.145
@@ -54,26 +67,32 @@ Machines:
     Role           : Server
     OS             : Linux
     Included       : True
+    NewDeviceFiles : False
     DeviceID       : TestEnvSer001
     DockerRegistry : True
+    RunAsContainer : False
   - Name           : Server 147.172.178.147 Device02
     IP             : 147.172.178.147
     Username       : iis_ecouser
     Password       : $$e_iisecoPW2
     Role           : Device
     OS             : Linux
-    Included       : False
+    Included       : True
+    NewDeviceFiles : True
     DeviceID       : TestEnvDev02
     DockerRegistry : False
+    RunAsContainer : False
   - Name           : Server 147.172.178.148 Device03
     IP             : 147.172.178.148
     Username       : iis_ecouser
     Password       : $$e_iisecoPW2
     Role           : Device
     OS             : Linux
-    Included       : False
+    Included       : True
+    NewDeviceFiles : False
     DeviceID       : TestEnvDev03
     DockerRegistry : False
+    RunAsContainer : True
   - Name           : Server 147.172.178.149 Device04
     IP             : 147.172.178.149
     Username       : iis_ecouser
@@ -81,26 +100,43 @@ Machines:
     Role           : Device
     OS             : Linux
     Included       : False
+    NewDeviceFiles : False
     DeviceID       : TestEnvDev04
     DockerRegistry : False
+    RunAsContainer : False
   - Name           : Ubuntu 20.04.3 IIP Platform
-    IP             : 192.168.81.245
+    IP             : 192.168.81.100
     Username       : osboxes
     Password       : osboxes.org
     Role           : Server
     OS             : Linux
     Included       : False
+    NewDeviceFiles : False
     DeviceID       : LinSer000001
-    DockerRegistry : False
-  - Name           : Ubuntu 20.04.3 IIP Platform Device
-    IP             : 192.168.81.243
+    DockerRegistry : True
+    RunAsContainer : False
+  - Name           : Ubuntu 20.04.3 IIP Platform Device 1
+    IP             : 192.168.81.110
     Username       : osboxes
     Password       : osboxes.org
     Role           : Device
     OS             : Linux
     Included       : False
+    NewDeviceFiles : False
+    DeviceID       : LinDev000001
+    DockerRegistry : False
+    RunAsContainer : True
+  - Name           : Ubuntu 20.04.3 IIP Platform Device 2
+    IP             : 192.168.81.120
+    Username       : osboxes
+    Password       : osboxes.org
+    Role           : Device
+    OS             : Linux
+    Included       : False
+    NewDeviceFiles : True
     DeviceID       : LinDev000002
     DockerRegistry : False
+    RunAsContainer : False
   - Name           : Win 10 IIP Platform Server
     IP             : 192.168.81.151
     Username       : IEUser
@@ -108,8 +144,10 @@ Machines:
     Role           : Server
     OS             : Win
     Included       : False
+    NewDeviceFiles : False
     DeviceID       : WinSer000001
     DockerRegistry : False
+    RunAsContainer : True
   - Name           : Win 10 IIP Platform Device
     IP             : 192.168.81.150
     Username       : IEUser
@@ -117,8 +155,10 @@ Machines:
     Role           : Device
     OS             : Win
     Included       : False
+    NewDeviceFiles : False
     DeviceID       : WinDev000002
     DockerRegistry : False
+    RunAsContainer : True
   - Name           : Win 10 IIP Platform Device 2
     IP             : 192.168.81.144
     Username       : IEUser
@@ -126,6 +166,8 @@ Machines:
     Role           : Device
     OS             : Win
     Included       : False
+    NewDeviceFiles : False
     DeviceID       : WinDev000003
     DockerRegistry : False
+    RunAsContainer : True
        

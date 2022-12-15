@@ -11,7 +11,7 @@ cd platformDependencies
 call mvn install -U
 cd..
 
-call mvn package -DskipTests -U
+call mvn package
 
 for /f "tokens=1-2 delims=:" %%a in ('ipconfig^|find "IPv4"') do set ip=%%b
 set ip=%ip: =%
@@ -95,5 +95,3 @@ copy /y gen\serviceMgr.sh DeviceFolder\serviceMgr.sh
 copy /y gen\serviceMgr.bat DeviceFolder\serviceMgr.bat
 copy /y gen\ecsServiceMgr.sh DeviceFolder\ecsServiceMgr.sh
 copy /y gen\ecsServiceMgr.bat DeviceFolder\ecsServiceMgr.bat
-copy /y gen\SimpleMeshTestingApp\target\SimpleMeshTestingApp-0.1.0-SNAPSHOT-bin.jar DeviceFolder\SimpleMeshTestingApp-0.1.0-SNAPSHOT.jar
-

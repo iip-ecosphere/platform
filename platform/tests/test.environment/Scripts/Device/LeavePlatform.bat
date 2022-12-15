@@ -2,6 +2,7 @@
 setlocal enabledelayedexpansion
 
 cd Files 
+cd platformFiles
 
 set svcCount=0
 for /F "tokens=*" %%i in (svcProcessesIDs.info) do (

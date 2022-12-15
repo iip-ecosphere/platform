@@ -1,0 +1,2 @@
+echo $1 | sudo -S docker exec -d $(docker ps -q --filter ancestor=192.168.81.100:5001/simplemeshtestingapp/ecs:0.1.0) /bin/sh -c  "echo -n -e 'kill ' > kill.sh; cat /run/iip-ecsRuntime.pid >> kill.sh; chmod u+x kill.sh"
+echo $1 | sudo -S docker exec -d $(docker ps -q --filter ancestor=192.168.81.100:5001/simplemeshtestingapp/ecs:0.1.0) /bin/sh -c /kill.sh

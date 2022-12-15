@@ -2,6 +2,11 @@
 setlocal enabledelayedexpansion
 
 cd Files 
+mkdir platformFiles
+cd platformFiles
+
+wget http://192.168.81.100:4200/download/DeviceFolder.tar.gz
+tar xzpvf DeviceFolder.tar.gz
 
 start /separate cmd.exe /c "echo "Running ecs... Please don't close it" & ecs.bat --iip.id=%2 > ecs.log"
 

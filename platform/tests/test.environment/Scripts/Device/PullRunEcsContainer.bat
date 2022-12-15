@@ -1,0 +1,2 @@
+echo $1 | sudo -S docker run --rm --expose 8000 --env iip.port=8000 -d --network=host -v /var/run/docker.sock:/var/run/docker.sock 192.168.81.100:5001/simplemeshtestingapp/ecs:0.1.0
+echo "Ecs are Running... Please don't close it"

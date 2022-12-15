@@ -21,6 +21,8 @@ sudo apt-get update -y
 
 sudo apt-get install docker-ce=5:20.10.7~3-0~ubuntu-focal docker-ce-cli=5:20.10.7~3-0~ubuntu-focal containerd.io docker-compose-plugin -y
 
+sudo usermod -aG docker $USER
+
 sudo apt update -y
 
 sudo apt install software-properties-common -y
@@ -29,3 +31,11 @@ sudo echo | add-apt-repository ppa:deadsnakes/ppa
 
 sudo apt update -y
 sudo apt install python3.9 -y
+
+sudo apt-get install python3-pip -y
+
+sudo pip install pyflakes
+
+sudo apt install npm -y
+
+sudo apt install curl -y

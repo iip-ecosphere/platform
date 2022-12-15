@@ -20,5 +20,8 @@ curl https://desktop.docker.com/win/stable/amd64/65384/Docker%%20Desktop%%20Inst
 rename "Docker%%20Desktop%%20Installer.exe" DockerDesktopInstaller.exe
 start /w "" "DockerDesktopInstaller.exe" install --quiet
 
+sudo usermod -aG docker $USER
+
 curl https://www.python.org/ftp/python/3.9.6/python-3.9.6-amd64.exe -O python-3.9.6-amd64.exe
 python-3.9.6-amd64.exe /quiet InstallAllUsers=1 PrependPath=1 Include_test=0
+pip install pyflakes

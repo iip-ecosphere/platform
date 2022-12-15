@@ -10,4 +10,4 @@ cd platformDependencies
 call mvn install -U
 cd..
 
-call mvn package -DskipTests -U
+call mvn package
