@@ -11,6 +11,9 @@
   
   <properties>
       <iip.resources>resources</iip.resources>
+      <iip.model>InstallTest</iip.model>
+      <iip.modelDir>src/main/easy</iip.modelDir>
+      <iip.outputDir>gen</iip.outputDir>
   </properties>
 
   <!-- required for container building on github when release is not already in Mvn central -->  
@@ -20,6 +23,9 @@
       <name>SSE</name>
       <url>https://projects.sse.uni-hildesheim.de/qm/maven/</url>
       <layout>default</layout>
+      <snapshots>
+          <updatePolicy>always</updatePolicy>
+      </snapshots>
     </repository>
     
     <repository>
@@ -33,6 +39,18 @@
         </snapshots>
     </repository>
   </repositories>
+
+  <pluginRepositories>
+     <pluginRepository>
+       <id>SSE-plugins</id>
+       <name>SSE</name>
+       <url>https://projects.sse.uni-hildesheim.de/qm/maven/</url>
+       <layout>default</layout>
+       <snapshots>
+          <updatePolicy>always</updatePolicy>
+       </snapshots>
+     </pluginRepository>
+  </pluginRepositories>
   
   <dependencies>
     <dependency>
@@ -54,14 +72,14 @@
   
   <build>
     <plugins>
-       <plugin>
-         <groupId>org.apache.maven.plugins</groupId>
-         <artifactId>maven-dependency-plugin</artifactId>
-         <version>3.2.0</version>
+	     <plugin>
+         <groupId>de.iip-ecosphere.platform</groupId>
+         <artifactId>dependency-plugin</artifactId>
+         <version>${project.version}</version>
          <executions>
            <execution>
              <id>unpack</id>
-             <phase>package</phase>
+             <phase>generate-sources</phase>
              <goals>
                <goal>unpack</goal>
              </goals>
@@ -78,6 +96,17 @@
                    <destFileName>model.jar</destFileName>
                  </artifactItem>
                </artifactItems>
+               <cleanup>
+                   <directory>${project.basedir}/src/main/easy</directory>
+                   <includes>
+                       <include>cfg</include>
+                       <include>files</include>
+                       <include>meta</include>
+                       <include>vtl</include>
+                       <include>IIPEcosphere*.*</include>
+                   </includes>
+               </cleanup>
+               <initiallyAllowed>InstallTest.ivml</initiallyAllowed>
                <overWriteReleases>false</overWriteReleases>
                <overWriteSnapshots>true</overWriteSnapshots>
              </configuration>
@@ -103,6 +132,24 @@
               </systemProperty>
            </systemProperties>
          </configuration>
+       </plugin>
+       <plugin>
+           <groupId>de.iip-ecosphere.platform</groupId>
+           <artifactId>configuration-plugin</artifactId>
+           <version>${project.version}</version>
+           <executions>
+               <execution>
+                   <id>generateAll</id>
+                   <goals>
+                       <goal>generateAll</goal>
+                   </goals>
+               </execution>
+           </executions>
+           <configuration>
+               <model>${iip.model}</model>
+               <modelDirectory>${iip.modelDir}</modelDirectory>
+               <outputDirectory>${iip.outputDir}</outputDirectory>
+           </configuration>
        </plugin>
     </plugins>
   </build> 
