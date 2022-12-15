@@ -75,23 +75,6 @@ template JavaSpringCloudStreamYaml(IIPEcosphere config, FileArtifact target, map
     }
     
     // ----------------------------- creates a protocol setup --------------------------
-    
-    // what is the protocol host, if not global -> "localhost", else initially the global protocol host in the cfg
-    def protocolHost(TransportProtocol protocol, Boolean global) {
-        if (global) {
-            protocol.globalHost;
-        } else {
-            "localhost";
-        }
-    } 
-    
-    def protocolPort(TransportProtocol protocol, Boolean global) {
-        if (global or not(isDefined(protocol.localPort))) {
-            protocol.port;
-        } else {
-            protocol.localPort;
-        }
-    }
 
     // convenience function
     def protocolConfig(IIPEcosphere config, Boolean global) {

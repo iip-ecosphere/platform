@@ -5,25 +5,26 @@ import Basics;
 template WrapperScript(IIPEcosphere config, FileArtifact target, ContainerType containerType) {
 
     def main(IIPEcosphere config, FileArtifact target, ContainerType containerType) {
-       	
+        Integer svcBrokerPort = protocolPort(config.transportProtocol, false);
         '#!/bin/bash'
         ''
         if (containerType == ContainerType::Ecs) {
-            'bash broker.sh 8889 &'
+            Integer ecsBrokerPort = config.transportProtocol.localEcsPort;
+            'bash broker.sh ${ecsBrokerPort} &'
             'sleep 4;'
             'bash ecs.sh'
         } else if (containerType == ContainerType::Ecs_Svc_App) {
-            'bash broker.sh &'
+            'bash broker.sh ${svcBrokerPort} &'
             'sleep 4;'
             'bash ecsServiceMgr.sh'
         } else if (containerType == ContainerType::EcsSvc_App) {
-            'bash broker.sh &'
+            'bash broker.sh ${svcBrokerPort} &'
             'sleep 4;'
             'bash ecs.sh'
             'sleep 7;'
             'bash serviceMgr.sh'
         } else if (containerType == ContainerType::C1Ecs_C2Svc_App) {
-            'bash broker.sh &'
+            'bash broker.sh ${svcBrokerPort} &'
             'sleep 4;'
             'bash serviceMgr.sh'
         } 

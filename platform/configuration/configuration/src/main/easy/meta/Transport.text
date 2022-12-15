@@ -3,6 +3,7 @@ Transport::transportProtocol = The transport protocol
 Transport::TransportProtocol::globalHost = The host name of the platform clobal communication server/broker, by default "localhost"
 Transport::TransportProtocol::port = The communication port where to reach the communication server/broker, by default 8883.
 Transport::TransportProtocol::localPort = The communication port where to reach the local communication server/broker, by default 8883 as "port".
+Transport::TransportProtocol::localEcsPort = The local broker port for ECS containers.
 Transport::TransportProtocol::security = The security settings of the protocol.
 Transport::TransportProtocol::type = The type of the protocol to enable comparisons.
 Transport::TransportProtocolAMQP::type = The redefined protocol type for AMQP assigning a default value.

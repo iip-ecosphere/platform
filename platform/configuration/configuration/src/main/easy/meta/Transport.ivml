@@ -17,7 +17,8 @@ project Transport {
     	ProtocolType type;
     	String globalHost = "localhost"; // ignored for local, only for global
     	Port port = 8883; // preliminary, needed for AMQP tests
-    	Port localPort = port; // by default, we run the local brokers on the same port, but this may be overridden 
+    	Port localPort = port; // by default, we run the local brokers on the same port, but this may be overridden
+    	Port localEcsPort = 8889; // the local broker port for ECS containers  
         SecuritySettings security = null;
     };
     

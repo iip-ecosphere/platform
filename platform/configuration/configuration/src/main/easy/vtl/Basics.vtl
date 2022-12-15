@@ -106,5 +106,26 @@ template Basics(Configuration config, FileArtifact target) {
             text2;
         }
     }
+    
+    /*
+    * Returns the protocol (broker) port, which may be the global port (if requested)/no local port is defined
+    * or the local port defined in protocol.
+    */
+    def protocolPort(TransportProtocol protocol, Boolean global) {
+        if (global or not(isDefined(protocol.localPort))) {
+            protocol.port;
+        } else {
+            protocol.localPort;
+        }
+    }
+    
+    // what is the protocol host, if not global -> "localhost", else initially the global protocol host in the cfg
+    def protocolHost(TransportProtocol protocol, Boolean global) {
+        if (global) {
+            protocol.globalHost;
+        } else {
+            "localhost";
+        }
+    } 
 	
 }
