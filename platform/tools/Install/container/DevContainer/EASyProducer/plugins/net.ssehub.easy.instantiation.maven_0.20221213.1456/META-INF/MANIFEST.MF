@@ -1,0 +1,24 @@
+Manifest-Version: 1.0
+Ant-Version: Apache Ant 1.10.5
+Created-By: 11.0.17+8-post-Ubuntu-1ubuntu220.04 (Ubuntu)
+Bundle-ManifestVersion: 2
+Bundle-Name: Maven Instantiation Support
+Bundle-SymbolicName: net.ssehub.easy.instantiation.maven;singleton:=true
+Automatic-Module-Name: net.ssehub.easy.instantiation.maven
+Bundle-Version: 0.20221213.1456
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Import-Package: org.osgi.framework;version="1.3.0",org.osgi.service.comp
+ onent
+Bundle-ActivationPolicy: lazy
+Bundle-Vendor: University of Hildesheim, SSE
+EASyLoader-BundleClassPath: false
+Service-Component: OSGI-INF/instantiator.xml
+Eclipse-BundleShape: dir
+Require-Bundle: net.ssehub.easy.instantiation.core,net.ssehub.easy.basic
+ s,org.eclipse.equinox.ds;resolution:=optional,org.apache.felix.scr;reso
+ lution:=optional,org.eclipse.core.runtime,net.ssehub.easy.dslCore
+Bundle-ClassPath: .
+Export-Package: net.ssehub.easy.instantiation.maven
+Bundle-Activator: net.ssehub.easy.instantiation.maven.Activator
+
+

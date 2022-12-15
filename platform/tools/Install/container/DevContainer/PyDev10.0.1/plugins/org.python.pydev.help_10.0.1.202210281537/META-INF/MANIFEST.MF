@@ -1,0 +1,33 @@
+Manifest-Version: 1.0
+Created-By: Maven Archiver 3.5.2
+Build-Jdk-Spec: 11
+Bundle-ManifestVersion: 2
+Bundle-Name: Pydev Online Help
+Bundle-SymbolicName: org.python.pydev.help; singleton:=true
+Bundle-Version: 10.0.1.202210281537
+Bundle-Vendor: Brainwy Software Ltda
+Bundle-ActivationPolicy: lazy
+Eclipse-BundleShape: dir
+
+Name: html/index.html
+SHA-256-Digest: gBbFehBsRlb/lkE8/kYByxWQCYcj8cE+DwMfiF+3xX0=
+
+Name: plugin.xml
+SHA-256-Digest: iIxJ4ZU1rl2YCpglT55AUK/H9+8O1gyJ8jmCcoYGtEE=
+
+Name: META-INF/maven/org.python.pydev/org.python.pydev.help/pom.xml
+SHA-256-Digest: aCGz7+vf62xFZPCymy1IN6fCukaJO/Iant0kBdvX1ZQ=
+
+Name: LICENSE.txt
+SHA-256-Digest: J75t01G5GT6rkY9hiDNA+yh/SDVMI+VNinfwannMATI=
+
+Name: toc_main.xml
+SHA-256-Digest: TaeeES5xzph5UHYeF+NRJVE2ZdGJhsJT3e5P2CfRgj4=
+
+Name: META-INF/maven/org.python.pydev/org.python.pydev.help/pom.properti
+ es
+SHA-256-Digest: 9hRVoEnUXvcQySskYnDXVUl8Vua5r6Gdnun44l0AbNk=
+
+Name: html/links.html
+SHA-256-Digest: lJUfsCuE0AJOaLe6r5nrBt0xKWJpbsMhvMNrHq0VS3A=
+

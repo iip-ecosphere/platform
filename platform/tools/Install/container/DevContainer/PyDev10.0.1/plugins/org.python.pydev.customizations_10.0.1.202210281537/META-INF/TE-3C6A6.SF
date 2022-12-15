@@ -1,0 +1,77 @@
+Signature-Version: 1.0
+Created-By: 11.0.9 (Oracle Corporation)
+SHA-256-Digest-Manifest: YuiWFe8eVAcHy9VMW66+lqNgwXny7oMpAwWZiCK7wF0=
+SHA-256-Digest-Manifest-Main-Attributes: IbPZwLa536BEBHArreODnHoJKEt48Zl
+ NVglX+v5vHRs=
+
+Name: templates/google_app_engine/hello_webapp_world/helloworld.py
+SHA-256-Digest: WsAJdrgJb3BW4hR0tL7SvqP0NROklVtmsOIwXBgPqZQ=
+
+Name: plugin.xml
+SHA-256-Digest: 4fKXwtZAIQafdc02ERPGItSL12o63evsSNPPdzj45gY=
+
+Name: templates/google_app_engine/hello_world/app.yaml
+SHA-256-Digest: B+G3ennX4hB6gYo/uRKLbTQ0E9Qa9R5R2yyiBpaed7M=
+
+Name: icons/app_engine.gif
+SHA-256-Digest: gG70Di0Z1ZHQs0QEFn6aVixT6OEz9D+vTGjP0sMC+MM=
+
+Name: templates/google_app_engine/hello_world/description.txt
+SHA-256-Digest: tnmlNRCh6OhdCmMkQaSwe4KYOZS4AbAEBrJZU0vCckY=
+
+Name: icons/AppEngine-16.png
+SHA-256-Digest: iJGwiMtSGZ5L1GS6e7z9gMVjlJgH+5EzYeyJyiS5AWo=
+
+Name: icons/app_engine_16_16.gif
+SHA-256-Digest: V5HNjiKPPg6vDg3d+Z2KwywQSUDg99g7OlcCJM4fuNw=
+
+Name: META-INF/maven/org.python.pydev/org.python.pydev.customizations/po
+ m.xml
+SHA-256-Digest: sO1rvafQlYax/4XS7dLb0Tu31lsN7UL2CtXJr1JcN50=
+
+Name: templates/google_app_engine/ask_login/description.txt
+SHA-256-Digest: oI8BVgBZBYm+mMVQ2McKIUI14lz+sPxmofmmPAETtEo=
+
+Name: icons/AppEngine-256.png
+SHA-256-Digest: M1z1pSwIfL9tJYMwRBqADZ/dz5/hOFNcmydzQRknug4=
+
+Name: icons/AppEngine-48.png
+SHA-256-Digest: 5HJAMCw2c92mGLGp1QjCt5ixblRjGIXPL0b7BjBosl8=
+
+Name: templates/google_app_engine/hello_webapp_world/app.yaml
+SHA-256-Digest: nlxYz+6r+7dWjjPw2hh98g6DAaLZDTEYmc/43kjIw8g=
+
+Name: icons/AppEngine-128.png
+SHA-256-Digest: CdrNBj9JLQdWvb5FjXnz8Jz03VHlrOHTKbJqrXsXiy0=
+
+Name: icons/AppEngine-32.png
+SHA-256-Digest: WJNDUDXbiwgSudWnWGRklNcwh5Pbvt4FteybgDgNRNU=
+
+Name: icons/appengine-noborder-120x30.gif
+SHA-256-Digest: qjYQvzswtPye6V4Ned36djt5pgWCo5Dr27REEvWlLCM=
+
+Name: templates/google_app_engine/ask_login/app.yaml
+SHA-256-Digest: FU8d1rpQiXZFTmEtHwlz/XQcyXtWarlfYYJGEKvfdls=
+
+Name: LICENSE.txt
+SHA-256-Digest: kKR//0aU3zBgl9SCeCpwoQ+GrOEHBzEb90XcPTX/6Do=
+
+Name: templates/google_app_engine/hello_webapp_world/description.txt
+SHA-256-Digest: UHlEENpMCQQLvxdhtVEHOBHbDQq8br5QWih97zt+6A8=
+
+Name: META-INF/maven/org.python.pydev/org.python.pydev.customizations/po
+ m.properties
+SHA-256-Digest: V8nI+4HoMBOJwVpY/Ayf2TJiNc+ybe1IpD6rTEtPRxM=
+
+Name: templates/google_app_engine/ask_login/asklogin.py
+SHA-256-Digest: HR+T0Anu79ziHNnO9RFsFKwjP/6fZeIEWwMZDGJFZt0=
+
+Name: icons/AppEngine-64.png
+SHA-256-Digest: cG7ClWRpV3EfX8DtP8B5KEBSbX4s8tsYM0o9UHKa7cI=
+
+Name: templates/google_app_engine/hello_world/helloworld.py
+SHA-256-Digest: uNTvIdwLK/3O1OIATOO3cbS5O9RlYsN0rPgfvtgETSg=
+
+Name: customizations.jar
+SHA-256-Digest: W3PoQKetli/UyiOQQNKZ53njmFP9NpmDBW3HcFDRd3Y=
+

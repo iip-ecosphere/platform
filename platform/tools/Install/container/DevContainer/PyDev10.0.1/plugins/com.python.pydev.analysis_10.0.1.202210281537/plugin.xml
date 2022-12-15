@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+
+	<extension
+       id="pydev_analysis_problemmarker"
+       name="PyDev Problem"
+       point="org.eclipse.core.resources.markers">
+	   <super type="org.eclipse.core.resources.problemmarker"/>
+	   <persistent value="true"/>
+	</extension>
+
+
+   <extension point="org.eclipse.core.runtime.preferences">
+      <initializer class="com.python.pydev.analysis.AnalysisPreferenceInitializer"/>
+   </extension>
+
+
+   <extension point="org.python.pydev.pydev_interpreter_info_builder">
+  		<interpreter_info_builder_participant class="com.python.pydev.analysis.system_info_builder.InterpreterInfoBuilder"/>
+   </extension>
+
+   <extension point="org.python.pydev.pydev_interpreter_observer">
+  		<interpreter_observer class="com.python.pydev.analysis.additionalinfo.builders.InterpreterObserver"/>
+   </extension>
+
+   <extension point="org.python.pydev.pydev_completion">
+  		<completion_participant class="com.python.pydev.codecompletion.participant.ImportsCompletionParticipant"/>
+   </extension>
+
+   <extension point="org.python.pydev.pydev_completion">
+  		<completion_participant class="com.python.pydev.codecompletion.ctxinsensitive.CtxParticipant"/>
+   </extension>
+
+   <extension point="org.python.pydev.pydev_simpleassist">
+  		<simpleassist_participant class="com.python.pydev.codecompletion.simpleassist.KeywordsSimpleAssist"/>
+   </extension>
+
+   <extension point="org.python.pydev.pydev_refactoring">
+  		<refactoring_participant class="com.python.pydev.analysis.refactoring.refactorer.Refactorer"/>
+   </extension>
+
+   <extension point="org.python.pydev.pydev_builder">
+   		<builder_participant class="com.python.pydev.analysis.additionalinfo.builders.AnalysisBuilderVisitor"/>
+   </extension>
+
+</plugin>

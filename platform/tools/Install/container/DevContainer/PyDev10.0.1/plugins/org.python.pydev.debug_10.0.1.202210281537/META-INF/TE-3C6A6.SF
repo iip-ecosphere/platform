@@ -1,0 +1,148 @@
+Signature-Version: 1.0
+Created-By: 11.0.9 (Oracle Corporation)
+SHA-256-Digest-Manifest: m8hIzXQJXnwMkHimT6Xuh8DXo5nzZD0lSVO3K+yBdNI=
+SHA-256-Digest-Manifest-Main-Attributes: G1gVF6QR3vj4GZVo7CWl7Z8vAE9c1Xo
+ EvvQ+rQWhjXo=
+
+Name: icons/referrers.png
+SHA-256-Digest: 6+jFhBDD+rjcJxLfZAyWgovIL/c5R4KfqOs+/fyFlPI=
+
+Name: plugin.xml
+SHA-256-Digest: NTW2PU8+Ftuzg8lcipIJp9S44s/kzAqMITcEdFmizz4=
+
+Name: icons/pin_arrow.png
+SHA-256-Digest: Z3HRCDZT56ChNYY30CAu6/zbnfwsfFasc0uxLAg2Qcw=
+
+Name: icons/stepover_co.gif
+SHA-256-Digest: luLXbCsqtsfej/lbzsgmWUiMII7UwsoWN5Gsx8oDB3Q=
+
+Name: icons/ironpython_run.png
+SHA-256-Digest: r48RKdGzoMpAY0MNB470gleJjr5ENGntrAgXPCxe8PE=
+
+Name: icons/python_refactor.png
+SHA-256-Digest: /BIed5tBM++ZlQbIrNOUBOAFXCtkVWJabEHngNNBry0=
+
+Name: icons/breakmarker_django.png
+SHA-256-Digest: HApg79tJAmbjJZPZLVsE4nzupi3dIEChPpPnXjmR5Zk=
+
+Name: icons/python_coverage.png
+SHA-256-Digest: /0EG558+2WGmgQ/v7FZ9Af1RPUjtfgVDu4DP+QY2tNU=
+
+Name: icons/reddot.GIF
+SHA-256-Digest: iHLzkMny+j2YePahXvMzeFB9W1j7i5fjposvvzCTcZI=
+
+Name: META-INF/maven/org.python.pydev/org.python.pydev.debug/pom.xml
+SHA-256-Digest: WNzcwMoAJMFNaaf9ESy/D1V5h/ZF0zaax2I5r3mPy0c=
+
+Name: icons/greendot.gif
+SHA-256-Digest: mhN8/v9NjWKETHwexfqwRXoIzh1iF9KHkAtbofOAgRc=
+
+Name: icons/greendot_big.gif
+SHA-256-Digest: dnfdI+lmrYJvkhA0ZJIgt5Ttd9fCq65amqxXcLzpowg=
+
+Name: icons/failures.gif
+SHA-256-Digest: N61XPeIzbJnPR93EIlMnM6FvYDw6OqPq43YBGHECGi4=
+
+Name: icons/jython_unit.png
+SHA-256-Digest: qr5H5I85RnWGxiRbHGhlgi0QSzX7UIeky1T5CEdhe5Q=
+
+Name: icons/setnext_co.gif
+SHA-256-Digest: VxMubTfSCr/igWd8DpndGmYMVaZl6a/EO7dMPrCdd7g=
+
+Name: icons/pin.png
+SHA-256-Digest: GSgtdDcxUfbNRTNMZcUyFMgdCozSwXGORB74Vi/Yrpg=
+
+Name: icons/python_profile.png
+SHA-256-Digest: cqkzT6jwIKeYCtSOtuQCkaM+I9XQsaqfcxlmEVgWgRk=
+
+Name: icons/breakmarker_conditional.gif
+SHA-256-Digest: ZSrghWbtxbnpQsZ93eYL9n2DSMb58mw1W/1O9rmZe+Q=
+
+Name: icons/testerrors_ovr.gif
+SHA-256-Digest: e6aAraM5YKa1dY2e1fyB8c/35whXuP2wn6LAa9TA3UU=
+
+Name: pydev-debug.jar
+SHA-256-Digest: pO+U9aDLLefbY57c6t8k8JCou5YX09ZCi7WSR9FG8bw=
+
+Name: icons/ovr16/error_ovr.gif
+SHA-256-Digest: uWDY98VU2BL3tmUOqH2wlaTcQ7FE+cWWkhhLGgxnENw=
+
+Name: icons/python_16x16.png
+SHA-256-Digest: UlWdtiaTyYcKigbPLwxMA5uSY78qXFapsBitjzJRRtE=
+
+Name: icons/return_value.png
+SHA-256-Digest: Fpe3+yINrlSSC67jjg0z8skF7wopzIZ755ZQAiIn1oA=
+
+Name: icons/refresh.png
+SHA-256-Digest: RTOxF5DaVKTmEl7TBoLoCSOSAZMm49uzi6RH1V/VCI8=
+
+Name: libs/winp-1.26.0.7.jar
+SHA-256-Digest: I3kayctuo2WjYVMslEnq3jcG3Vm9ETCGJECICB91Axw=
+
+Name: icons/breakmarker_django_gray.png
+SHA-256-Digest: B6OMYc4Mh4/LOLqfdSt2sIY2uguhYoGiOerDhl7XhZw=
+
+Name: icons/breakmarker_gray.gif
+SHA-256-Digest: c+NPHYWeyj0xWXltbGf5tEAobywY31r4Udiqzj4gVY4=
+
+Name: icons/jython_run.png
+SHA-256-Digest: bedtOucwT8ej+SGlzOb9nQyxACR9HPtAo5+F7WblQ5s=
+
+Name: icons/python_unit.png
+SHA-256-Digest: JeXHRkf5fvfVvhf8++ANukBwuhA1h76trWZONUBeRdc=
+
+Name: icons/pyunit_old.png
+SHA-256-Digest: r1G3riSalyE4AUmLgxpkvDg9DINDvQFkLBouXn5gs10=
+
+Name: icons/breakmarker.gif
+SHA-256-Digest: ePsnU0BHMLE5Yvx8dgQEzU1ZSqNNd/oghcJPuwNx3gU=
+
+Name: schema/pydev_debug_command_line_participant.exsd
+SHA-256-Digest: YzsjIpd+uKjwvDPVlVUWJkkwl/GcL4HDbp1YhjjCaOU=
+
+Name: META-INF/maven/org.python.pydev/org.python.pydev.debug/pom.propert
+ ies
+SHA-256-Digest: hljowQCThT7trMBD1rF8/mhedLIBrcXBw8mbSrTMUHw=
+
+Name: icons/python_run.png
+SHA-256-Digest: T88q/IpoZ/+qWeQP9ta3hUV83EvR5YbfC3OzJi3TvCg=
+
+Name: icons/ovr16/failed_ovr.gif
+SHA-256-Digest: MSonQ7eDdV7y1/XifnQXYcV8PO+Ly1Jx6NAawTFgWq4=
+
+Name: schema/pydev_debug_console_input_listener.exsd
+SHA-256-Digest: JLrIQ2cjdDSamP4Wm4QSaaXp0awMMSF0W7aVJDGRZes=
+
+Name: icons/watch_exp.gif
+SHA-256-Digest: f4D+ZGA9ScmkrgSTzXTJb6S1aP4QtmxaERIHtXSUx3o=
+
+Name: icons/breakmarker_gray_conditional.gif
+SHA-256-Digest: CImKk805qpXF0+sPKXBPytCvQohrcFgcDTBWSBI91AM=
+
+Name: icons/setnext_co_dis.gif
+SHA-256-Digest: srB9zoLahzpEo431JkdRlIxEjLuXqyFLyHug/SYIjuo=
+
+Name: icons/testfailures_ovr.gif
+SHA-256-Digest: GPa3Bdy8Eqnwj4nA30vPtZEX6yrVAS2JgooU9+KSIBM=
+
+Name: icons/arguments.gif
+SHA-256-Digest: P3fryt5x0HFl8atMGbEIRI58b360Du8KY5KRGBwsvho=
+
+Name: icons/ironpython_unit.png
+SHA-256-Digest: GYpALJwKG0Kqedkv9eJUaAMuFhqazwLouEHJ6hsbYOc=
+
+Name: icons/python_exception_breakpoint.png
+SHA-256-Digest: /8Fy1yfjoXeC3JRbxZJpwlssmHXjRt8O+sDOIABNsbg=
+
+Name: LICENSE.txt
+SHA-256-Digest: kKR//0aU3zBgl9SCeCpwoQ+GrOEHBzEb90XcPTX/6Do=
+
+Name: icons/pyunit.png
+SHA-256-Digest: IbhOz+3YNPNZqXDMonHxKo8HxsZYuXr75Km/d13ShJA=
+
+Name: icons/ovr16/success_ovr.gif
+SHA-256-Digest: 1VvUNx/mBkqzTGSbcMlos94zRDUaiYHw5cLY8/Usnsw=
+
+Name: icons/tasklet.png
+SHA-256-Digest: A+QHlFhbOH+TLhWpS7nrYPzLoK5QfI/CXitdIlYeyvY=
+
