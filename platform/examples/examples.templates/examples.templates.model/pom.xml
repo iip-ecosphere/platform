@@ -82,6 +82,12 @@
           <artifactId>configuration-plugin</artifactId>
           <version>${project.version}</version>
           <executions>
+			  <execution>
+                  <id>generateBroker</id>
+                  <goals>
+                      <goal>generateBroker</goal>
+                  </goals>
+              </execution>
               <execution>
                   <id>generateAppsNoDeps</id>
                   <goals>
@@ -94,6 +100,7 @@
                       <goal>generateApps</goal>
                   </goals>
               </execution>
+			  
           </executions>
           <configuration>
               <model>${ivml.file}</model>
@@ -118,6 +125,19 @@
                      </arguments>
                  </configuration>
               </execution>
+			  <execution>
+                       <id>generateBroker</id>
+                       <configuration>
+                           <mainClass>de.iip_ecosphere.platform.configuration.PlatformInstantiator</mainClass>
+                           <cleanupDaemonThreads>false</cleanupDaemonThreads>
+                           <arguments>
+                               <argument>${ivml.file}</argument>
+                               <argument>src/test/easy</argument>
+                               <argument>gen/broker</argument>
+                               <argument>generateBroker</argument>
+                           </arguments>
+                       </configuration>
+                </execution>
               <execution>
                  <id>generateApps</id>
                  <configuration>
