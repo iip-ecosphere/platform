@@ -1,0 +1,19 @@
+project ApplicationPartMyApp {
+
+    import ServiceMeshPartMyApp*;
+
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+
+    Application myApp = {
+        id = "SimpleMeshInstallApp",
+        name = "Simple Mesh Install Testing App",
+        ver = "0.1.0",
+        description = "",
+        services = {refBy(myMesh)}        
+    };
+    
+    freeze {
+        .;
+    }
+
+}

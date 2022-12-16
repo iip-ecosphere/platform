@@ -11,7 +11,7 @@
   
   <properties>
       <iip.resources>resources</iip.resources>
-      <iip.model>InstallTest</iip.model>
+      <iip.model>PlatformConfiguration</iip.model>
       <iip.modelDir>src/main/easy</iip.modelDir>
       <iip.outputDir>gen</iip.outputDir>
   </properties>
@@ -94,6 +94,7 @@
                    <overWrite>true</overWrite>
                    <outputDirectory>${project.basedir}/src/main/easy</outputDirectory>
                    <destFileName>model.jar</destFileName>
+                   <excludes>cfg/*.*</excludes>
                  </artifactItem>
                </artifactItems>
                <cleanup>
@@ -106,7 +107,7 @@
                        <include>IIPEcosphere*.*</include>
                    </includes>
                </cleanup>
-               <initiallyAllowed>InstallTest.ivml</initiallyAllowed>
+               <initiallyAllowed>InstallTest.ivml;${iip.model}.ivml;AllServices.ivml;AllTypes.ivml;ApplicationPartMyApp.ivml;ServiceMeshPartMyAppMyMesh.ivml;TechnicalSetup.ivml</initiallyAllowed>
                <overWriteReleases>false</overWriteReleases>
                <overWriteSnapshots>true</overWriteSnapshots>
              </configuration>
@@ -121,7 +122,7 @@
            <mainClass>de.iip_ecosphere.platform.configuration.PlatformInstantiator</mainClass>
            <cleanupDaemonThreads>false</cleanupDaemonThreads>
            <arguments>
-              <argument>InstallTest</argument>
+              <argument>${iip.model}</argument>
               <argument>src/main/easy</argument>
               <argument>gen</argument>
            </arguments>

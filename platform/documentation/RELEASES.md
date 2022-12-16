@@ -97,6 +97,7 @@ Improvements:
 * Identity mechanism now with keystore support. `UriResolver` moved into basic support layer.
 * [#40](https://github.com/iip-ecosphere/platform/issues/40): Simplification and unification of build processes for installation, templates and examples.
 * [#73](https://github.com/iip-ecosphere/platform/issues/73): UI server improvements
+* [#80](https://github.com/iip-ecosphere/platform/issues/80): UI instantiation 
 
 ### Version 0.3.0 (2022/06/04, HM'22):
 

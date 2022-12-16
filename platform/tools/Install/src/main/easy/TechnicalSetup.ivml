@@ -1,7 +1,6 @@
-project InstallTest {
+project TechnicalSetup {
 
     import IIPEcosphere;
-    import DataTypes;
 
     annotate BindingTime bindingTime = BindingTime::compile to .;
 
@@ -58,48 +57,6 @@ project InstallTest {
         port = 9005
     };
 
-    // ------------ data types ------------------
-    
-    RecordType rec1 = {
-        name = "Rec1",
-        fields = {
-            Field {
-                name = "intField",
-                type = refBy(IntegerType)
-            }, Field {
-                name = "stringField",
-                type = refBy(StringType)
-            }
-        }
-    };
-    
-    // ------------ individual, reusable services ------------------
-        
-    Service mySourceService = JavaService {
-        id = "SimpleSource",
-        name = "Simple Data Source",
-        description = "",
-        ver = "0.1.0",
-        deployable = true,
-        asynchronous = true,
-        class = "de.iip_ecosphere.platform.test.apps.serviceImpl.SimpleSourceImpl",
-        artifact = "de.iip-ecosphere.platform:apps.ServiceImpl:" + iipVer,
-        kind = ServiceKind::SOURCE_SERVICE,
-        output = {{type=refBy(rec1)}}
-    };
-    
-    Service myReceiverService = JavaService {
-        id = "SimpleReceiver",
-        name = "Simple Data Receiver",
-        description = "",
-        ver = "0.1.0",
-        deployable = true,
-        class = "de.iip_ecosphere.platform.test.apps.serviceImpl.SimpleReceiverImpl",
-        artifact = "de.iip-ecosphere.platform:apps.ServiceImpl:" + iipVer,
-        kind = ServiceKind::SINK_SERVICE,
-        input = {{type=refBy(rec1)}}
-    };
-
     // --------------------- monitoring ---------------------------
     
     platformMonitoring = PrometheusPlatformMonitoring {
@@ -122,41 +79,11 @@ project InstallTest {
     managementUi = AngularManagementUI {
         port = 4200
     };
-
-    // ------------ application and service nets ------------------
-    
-    Application myApp = {
-        id = "SimpleMeshApp",
-        name = "Simple Mesh Testing App",
-        ver = "0.1.0",
-        description = "",
-        services = {refBy(myMesh)}        
-    };
-    
-    ServiceMesh myMesh = {
-        description = "initial service net",
-        sources = {refBy(mySource)}
-    };
-    
-    MeshSource mySource = {
-        pollInterval = 800, // only if source is synchronous
-        impl = refBy(mySourceService),
-        next = {refBy(myConnMySourceMyReceiver)}
-    };
-    
-    MeshConnector myConnMySourceMyReceiver = {
-        name = "Source->Receiver",
-        next = refBy(myReceiver)
-    };
-
-    MeshSink myReceiver = {
-        impl = refBy(myReceiverService)
-    };
     
     // ---------- generation setup ------------
     
     sharedInterfaces = true;
-    sharedArtifact = "de.iip-ecosphere.platform:apps.AppInterfacesSimpleMesh:" + iipVer; // for testing all-in-one
+    sharedArtifact = "de.iip-ecosphere.platform:apps.AppInterfacesSimpleMeshInstall:" + iipVer; // for testing all-in-one
 
     // ------------ freezing ------------------
     
