@@ -55,6 +55,10 @@ public abstract class AbstractConfigurationMojo extends AbstractMojo {
     @Parameter(property = "configuration.adjustOutputDirectoryIfGenBroker", required = false, defaultValue = "trues")
     private boolean adjustOutputDirectoryIfGenBroker;
 
+    // different name, hook up with unpack
+    @Parameter(property = "unpack.force", required = false, defaultValue = "false") 
+    private boolean unpackForce;
+
     /**
      * Returns the actual Maven project.
      * 
@@ -118,6 +122,15 @@ public abstract class AbstractConfigurationMojo extends AbstractMojo {
      */
     public String getTracingLevel() {
         return tracingLevel;
+    }
+    
+    /**
+     * A force through the IIP-Ecosphere unpacking plugin is requested.
+     * 
+     * @return {@code true} for force through unpacking, {@code false} else
+     */
+    protected boolean getUnpackForce() {
+        return unpackForce;
     }
     
     /**

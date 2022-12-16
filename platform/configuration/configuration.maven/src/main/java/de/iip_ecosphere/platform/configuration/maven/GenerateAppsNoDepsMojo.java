@@ -27,5 +27,10 @@ public class GenerateAppsNoDepsMojo extends AbstractConfigurationMojo {
     public String getStartRule() {
         return "generateAppsNoDeps";
     }
+    
+    @Override
+    protected boolean enableRun(String modelDir, String outputDir) { 
+        return getUnpackForce() || super.enableRun(modelDir, outputDir);
+    }
 
 }

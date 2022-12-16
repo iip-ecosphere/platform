@@ -29,4 +29,9 @@ public class GenerateInterfacesMojo extends AbstractConfigurationMojo {
         return "generateInterfaces";
     }
 
+    @Override
+    protected boolean enableRun(String modelDir, String outputDir) { 
+        return getUnpackForce() || super.enableRun(modelDir, outputDir);
+    }
+
 }
