@@ -1,16 +1,15 @@
 #!/bin/bash
 #Explanation see README.MD
 rm -rf gen
-#build with broker
 dir=$PWD
+#build until interfaces (obtain model, generateAppsNoDeps)
 mvn -U generate-sources
+#build/deploy service implementation
+cd ../examples.templates.impl
 mvn install
-cd gen/py/templates/eclipse/impl.TestTestApp
-mvn install
+#return and build full application
 cd $dir
-
 mvn install
-
 
 #execute and test
 
