@@ -1,0 +1,453 @@
+Manifest-Version: 1.0
+Bundle-SymbolicName: org.eclipse.m2e.maven.indexer;singleton:=false
+Require-Bundle: org.eclipse.m2e.maven.runtime;bundle-version="[1.16.0,
+ 1.17.0)",org.eclipse.m2e.archetype.common;bundle-version="[1.16.0,1.1
+ 7.0)"
+Bnd-LastModified: 1614683635744
+Bundle-ManifestVersion: 2
+Bundle-RequiredExecutionEnvironment: JavaSE-11
+Embed-Dependency: *;scope=compile|runtime
+Bundle-DocURL: www.eclipse.org
+Bundle-Vendor: %Bundle-Vendor
+Require-Capability: osgi.ee;filter:="(&(osgi.ee=JavaSE)(version=11))"
+Tool: Bnd-5.1.1.202006162103
+Embedded-Artifacts: indexer-core-6.0.0.jar;g="org.apache.maven.indexer
+ ";a="indexer-core";v="6.0.0",slf4j-api-1.7.25.jar;g="org.slf4j";a="sl
+ f4j-api";v="1.7.25",javax.inject-1.jar;g="javax.inject";a="javax.inje
+ ct";v="1",javax.annotation-api-1.2.jar;g="javax.annotation";a="javax.
+ annotation-api";v="1.2",lucene-core-5.5.5.jar;g="org.apache.lucene";a
+ ="lucene-core";v="5.5.5",lucene-queryparser-5.5.5.jar;g="org.apache.l
+ ucene";a="lucene-queryparser";v="5.5.5",lucene-queries-5.5.5.jar;g="o
+ rg.apache.lucene";a="lucene-queries";v="5.5.5",lucene-sandbox-5.5.5.j
+ ar;g="org.apache.lucene";a="lucene-sandbox";v="5.5.5",lucene-analyzer
+ s-common-5.5.5.jar;g="org.apache.lucene";a="lucene-analyzers-common";
+ v="5.5.5",lucene-backward-codecs-5.5.5.jar;g="org.apache.lucene";a="l
+ ucene-backward-codecs";v="5.5.5",lucene-highlighter-5.5.5.jar;g="org.
+ apache.lucene";a="lucene-highlighter";v="5.5.5",lucene-join-5.5.5.jar
+ ;g="org.apache.lucene";a="lucene-join";v="5.5.5",lucene-memory-5.5.5.
+ jar;g="org.apache.lucene";a="lucene-memory";v="5.5.5",guava-30.1-jre.
+ jar;g="com.google.guava";a="guava";v="30.1-jre",failureaccess-1.0.1.j
+ ar;g="com.google.guava";a="failureaccess";v="1.0.1",listenablefuture-
+ 9999.0-empty-to-avoid-conflict-with-guava.jar;g="com.google.guava";a=
+ "listenablefuture";v="9999.0-empty-to-avoid-conflict-with-guava",chec
+ ker-qual-3.5.0.jar;g="org.checkerframework";a="checker-qual";v="3.5.0
+ ",error_prone_annotations-2.3.4.jar;g="com.google.errorprone";a="erro
+ r_prone_annotations";v="2.3.4",j2objc-annotations-1.3.jar;g="com.goog
+ le.j2objc";a="j2objc-annotations";v="1.3"
+Export-Package: META-INF.sisu,org.apache.lucene;mandatory:=provider;pr
+ ovider=m2e,org.apache.lucene.analysis;mandatory:=provider;provider=m2
+ e,org.apache.lucene.analysis.ar;mandatory:=provider;provider=m2e,org.
+ apache.lucene.analysis.bg;mandatory:=provider;provider=m2e,org.apache
+ .lucene.analysis.br;mandatory:=provider;provider=m2e,org.apache.lucen
+ e.analysis.ca;mandatory:=provider;provider=m2e,org.apache.lucene.anal
+ ysis.charfilter;mandatory:=provider;provider=m2e,org.apache.lucene.an
+ alysis.cjk;mandatory:=provider;provider=m2e,org.apache.lucene.analysi
+ s.ckb;mandatory:=provider;provider=m2e,org.apache.lucene.analysis.com
+ mongrams;mandatory:=provider;provider=m2e,org.apache.lucene.analysis.
+ compound;mandatory:=provider;provider=m2e,org.apache.lucene.analysis.
+ compound.hyphenation;mandatory:=provider;provider=m2e,org.apache.luce
+ ne.analysis.core;mandatory:=provider;provider=m2e,org.apache.lucene.a
+ nalysis.custom;mandatory:=provider;provider=m2e,org.apache.lucene.ana
+ lysis.cz;mandatory:=provider;provider=m2e,org.apache.lucene.analysis.
+ da;mandatory:=provider;provider=m2e,org.apache.lucene.analysis.de;man
+ datory:=provider;provider=m2e,org.apache.lucene.analysis.el;mandatory
+ :=provider;provider=m2e,org.apache.lucene.analysis.en;mandatory:=prov
+ ider;provider=m2e,org.apache.lucene.analysis.es;mandatory:=provider;p
+ rovider=m2e,org.apache.lucene.analysis.eu;mandatory:=provider;provide
+ r=m2e,org.apache.lucene.analysis.fa;mandatory:=provider;provider=m2e,
+ org.apache.lucene.analysis.fi;mandatory:=provider;provider=m2e,org.ap
+ ache.lucene.analysis.fr;mandatory:=provider;provider=m2e,org.apache.l
+ ucene.analysis.ga;mandatory:=provider;provider=m2e,org.apache.lucene.
+ analysis.gl;mandatory:=provider;provider=m2e,org.apache.lucene.analys
+ is.hi;mandatory:=provider;provider=m2e,org.apache.lucene.analysis.hu;
+ mandatory:=provider;provider=m2e,org.apache.lucene.analysis.hunspell;
+ mandatory:=provider;provider=m2e,org.apache.lucene.analysis.hy;mandat
+ ory:=provider;provider=m2e,org.apache.lucene.analysis.id;mandatory:=p
+ rovider;provider=m2e,org.apache.lucene.analysis.in;mandatory:=provide
+ r;provider=m2e,org.apache.lucene.analysis.it;mandatory:=provider;prov
+ ider=m2e,org.apache.lucene.analysis.lt;mandatory:=provider;provider=m
+ 2e,org.apache.lucene.analysis.lv;mandatory:=provider;provider=m2e,org
+ .apache.lucene.analysis.miscellaneous;mandatory:=provider;provider=m2
+ e,org.apache.lucene.analysis.ngram;mandatory:=provider;provider=m2e,o
+ rg.apache.lucene.analysis.nl;mandatory:=provider;provider=m2e,org.apa
+ che.lucene.analysis.no;mandatory:=provider;provider=m2e,org.apache.lu
+ cene.analysis.path;mandatory:=provider;provider=m2e,org.apache.lucene
+ .analysis.pattern;mandatory:=provider;provider=m2e,org.apache.lucene.
+ analysis.payloads;mandatory:=provider;provider=m2e,org.apache.lucene.
+ analysis.pt;mandatory:=provider;provider=m2e,org.apache.lucene.analys
+ is.query;mandatory:=provider;provider=m2e,org.apache.lucene.analysis.
+ reverse;mandatory:=provider;provider=m2e,org.apache.lucene.analysis.r
+ o;mandatory:=provider;provider=m2e,org.apache.lucene.analysis.ru;mand
+ atory:=provider;provider=m2e,org.apache.lucene.analysis.shingle;manda
+ tory:=provider;provider=m2e,org.apache.lucene.analysis.sinks;mandator
+ y:=provider;provider=m2e,org.apache.lucene.analysis.snowball;mandator
+ y:=provider;provider=m2e,org.apache.lucene.analysis.sr;mandatory:=pro
+ vider;provider=m2e,org.apache.lucene.analysis.standard;mandatory:=pro
+ vider;provider=m2e,org.apache.lucene.analysis.standard.std40;mandator
+ y:=provider;provider=m2e,org.apache.lucene.analysis.sv;mandatory:=pro
+ vider;provider=m2e,org.apache.lucene.analysis.synonym;mandatory:=prov
+ ider;provider=m2e,org.apache.lucene.analysis.th;mandatory:=provider;p
+ rovider=m2e,org.apache.lucene.analysis.tokenattributes;mandatory:=pro
+ vider;provider=m2e,org.apache.lucene.analysis.tr;mandatory:=provider;
+ provider=m2e,org.apache.lucene.analysis.util;mandatory:=provider;prov
+ ider=m2e,org.apache.lucene.analysis.wikipedia;mandatory:=provider;pro
+ vider=m2e,org.apache.lucene.bkdtree;mandatory:=provider;provider=m2e,
+ org.apache.lucene.codecs;mandatory:=provider;provider=m2e,org.apache.
+ lucene.codecs.blocktree;mandatory:=provider;provider=m2e,org.apache.l
+ ucene.codecs.compressing;mandatory:=provider;provider=m2e,org.apache.
+ lucene.codecs.idversion;mandatory:=provider;provider=m2e,org.apache.l
+ ucene.codecs.lucene40;mandatory:=provider;provider=m2e,org.apache.luc
+ ene.codecs.lucene41;mandatory:=provider;provider=m2e,org.apache.lucen
+ e.codecs.lucene410;mandatory:=provider;provider=m2e,org.apache.lucene
+ .codecs.lucene42;mandatory:=provider;provider=m2e,org.apache.lucene.c
+ odecs.lucene45;mandatory:=provider;provider=m2e,org.apache.lucene.cod
+ ecs.lucene46;mandatory:=provider;provider=m2e,org.apache.lucene.codec
+ s.lucene49;mandatory:=provider;provider=m2e,org.apache.lucene.codecs.
+ lucene50;mandatory:=provider;provider=m2e,org.apache.lucene.codecs.lu
+ cene53;mandatory:=provider;provider=m2e,org.apache.lucene.codecs.luce
+ ne54;mandatory:=provider;provider=m2e,org.apache.lucene.codecs.perfie
+ ld;mandatory:=provider;provider=m2e,org.apache.lucene.collation;manda
+ tory:=provider;provider=m2e,org.apache.lucene.collation.tokenattribut
+ es;mandatory:=provider;provider=m2e,org.apache.lucene.document;mandat
+ ory:=provider;provider=m2e,org.apache.lucene.index;mandatory:=provide
+ r;provider=m2e,org.apache.lucene.index.memory;mandatory:=provider;pro
+ vider=m2e,org.apache.lucene.payloads;mandatory:=provider;provider=m2e
+ ,org.apache.lucene.queries;mandatory:=provider;provider=m2e,org.apach
+ e.lucene.queries.function;mandatory:=provider;provider=m2e,org.apache
+ .lucene.queries.function.docvalues;mandatory:=provider;provider=m2e,o
+ rg.apache.lucene.queries.function.valuesource;mandatory:=provider;pro
+ vider=m2e,org.apache.lucene.queries.mlt;mandatory:=provider;provider=
+ m2e,org.apache.lucene.queries.payloads;mandatory:=provider;provider=m
+ 2e,org.apache.lucene.queryparser.analyzing;mandatory:=provider;provid
+ er=m2e,org.apache.lucene.queryparser.classic;mandatory:=provider;prov
+ ider=m2e,org.apache.lucene.queryparser.complexPhrase;mandatory:=provi
+ der;provider=m2e,org.apache.lucene.queryparser.ext;mandatory:=provide
+ r;provider=m2e,org.apache.lucene.queryparser.flexible.core;mandatory:
+ =provider;provider=m2e,org.apache.lucene.queryparser.flexible.core.bu
+ ilders;mandatory:=provider;provider=m2e,org.apache.lucene.queryparser
+ .flexible.core.config;mandatory:=provider;provider=m2e,org.apache.luc
+ ene.queryparser.flexible.core.messages;mandatory:=provider;provider=m
+ 2e,org.apache.lucene.queryparser.flexible.core.nodes;mandatory:=provi
+ der;provider=m2e,org.apache.lucene.queryparser.flexible.core.parser;m
+ andatory:=provider;provider=m2e,org.apache.lucene.queryparser.flexibl
+ e.core.processors;mandatory:=provider;provider=m2e,org.apache.lucene.
+ queryparser.flexible.core.util;mandatory:=provider;provider=m2e,org.a
+ pache.lucene.queryparser.flexible.messages;mandatory:=provider;provid
+ er=m2e,org.apache.lucene.queryparser.flexible.precedence;mandatory:=p
+ rovider;provider=m2e,org.apache.lucene.queryparser.flexible.precedenc
+ e.processors;mandatory:=provider;provider=m2e,org.apache.lucene.query
+ parser.flexible.standard;mandatory:=provider;provider=m2e,org.apache.
+ lucene.queryparser.flexible.standard.builders;mandatory:=provider;pro
+ vider=m2e,org.apache.lucene.queryparser.flexible.standard.config;mand
+ atory:=provider;provider=m2e,org.apache.lucene.queryparser.flexible.s
+ tandard.nodes;mandatory:=provider;provider=m2e,org.apache.lucene.quer
+ yparser.flexible.standard.parser;mandatory:=provider;provider=m2e,org
+ .apache.lucene.queryparser.flexible.standard.processors;mandatory:=pr
+ ovider;provider=m2e,org.apache.lucene.queryparser.simple;mandatory:=p
+ rovider;provider=m2e,org.apache.lucene.queryparser.surround.parser;ma
+ ndatory:=provider;provider=m2e,org.apache.lucene.queryparser.surround
+ .query;mandatory:=provider;provider=m2e,org.apache.lucene.queryparser
+ .xml;mandatory:=provider;provider=m2e,org.apache.lucene.queryparser.x
+ ml.builders;mandatory:=provider;provider=m2e,org.apache.lucene.ranget
+ ree;mandatory:=provider;provider=m2e,org.apache.lucene.sandbox.querie
+ s;mandatory:=provider;provider=m2e,org.apache.lucene.sandbox.queries.
+ regex;mandatory:=provider;provider=m2e,org.apache.lucene.search;manda
+ tory:=provider;provider=m2e,org.apache.lucene.search.highlight;mandat
+ ory:=provider;provider=m2e,org.apache.lucene.search.join;mandatory:=p
+ rovider;provider=m2e,org.apache.lucene.search.postingshighlight;manda
+ tory:=provider;provider=m2e,org.apache.lucene.search.similarities;man
+ datory:=provider;provider=m2e,org.apache.lucene.search.spans;mandator
+ y:=provider;provider=m2e,org.apache.lucene.search.vectorhighlight;man
+ datory:=provider;provider=m2e,org.apache.lucene.store;mandatory:=prov
+ ider;provider=m2e,org.apache.lucene.util;mandatory:=provider;provider
+ =m2e,org.apache.lucene.util.automaton;mandatory:=provider;provider=m2
+ e,org.apache.lucene.util.fst;mandatory:=provider;provider=m2e,org.apa
+ che.lucene.util.mutable;mandatory:=provider;provider=m2e,org.apache.l
+ ucene.util.packed;mandatory:=provider;provider=m2e,org.apache.maven.i
+ ndex;mandatory:=provider;provider=m2e,org.apache.maven.index.archetyp
+ e;mandatory:=provider;provider=m2e,org.apache.maven.index.artifact;ma
+ ndatory:=provider;provider=m2e,org.apache.maven.index.context;mandato
+ ry:=provider;provider=m2e,org.apache.maven.index.creator;mandatory:=p
+ rovider;provider=m2e,org.apache.maven.index.expr;mandatory:=provider;
+ provider=m2e,org.apache.maven.index.fs;mandatory:=provider;provider=m
+ 2e,org.apache.maven.index.incremental;mandatory:=provider;provider=m2
+ e,org.apache.maven.index.locator;mandatory:=provider;provider=m2e,org
+ .apache.maven.index.packer;mandatory:=provider;provider=m2e,org.apach
+ e.maven.index.search.grouping;mandatory:=provider;provider=m2e,org.ap
+ ache.maven.index.treeview;mandatory:=provider;provider=m2e,org.apache
+ .maven.index.updater;mandatory:=provider;provider=m2e,org.apache.mave
+ n.index.util;mandatory:=provider;provider=m2e,org.apache.maven.index.
+ util.zip;mandatory:=provider;provider=m2e
+Bundle-Name: %Bundle-Name
+Bundle-Version: 1.17.1.20210129-0849
+Bundle-ClassPath: .,indexer-core-6.0.0.jar,slf4j-api-1.7.25.jar,javax.
+ inject-1.jar,javax.annotation-api-1.2.jar,lucene-core-5.5.5.jar,lucen
+ e-queryparser-5.5.5.jar,lucene-queries-5.5.5.jar,lucene-sandbox-5.5.5
+ .jar,lucene-analyzers-common-5.5.5.jar,lucene-backward-codecs-5.5.5.j
+ ar,lucene-highlighter-5.5.5.jar,lucene-join-5.5.5.jar,lucene-memory-5
+ .5.5.jar,guava-30.1-jre.jar,failureaccess-1.0.1.jar,listenablefuture-
+ 9999.0-empty-to-avoid-conflict-with-guava.jar,checker-qual-3.5.0.jar,
+ error_prone_annotations-2.3.4.jar,j2objc-annotations-1.3.jar
+Build-Jdk-Spec: 11
+Embed-Transitive: true
+Created-By: Apache Maven Bundle Plugin
+Eclipse-BundleShape: dir
+
+Name: org/apache/maven/index/ArtifactInfoRecord.class
+SHA-256-Digest: GkQMKnE5hY33KVTRT2narZa4mm8VyIHUlUq6gvgrI5c=
+
+Name: org/apache/maven/index/DefaultScanner$1.class
+SHA-256-Digest: zXOvFb7Qfob3p5/DWknVsAkZ+KGPq0UisO1ZDHL6Fec=
+
+Name: org/apache/maven/index/DefaultNexusIndexer.class
+SHA-256-Digest: sdkeJMeJ2qupgO6Ue6xFSPyTf88MRq56Rc+NT9vcB7w=
+
+Name: org/apache/maven/index/MatchHighlight.class
+SHA-256-Digest: jsG7yE5oko+G/JwHxOY2mZxKu7ApA3Fol9z+dj/Vuxc=
+
+Name: org/apache/maven/index/DefaultIteratorResultSet.class
+SHA-256-Digest: Nbu6TF+nZKGnHcC/23IKha32GZaS7uXW1RSJv1OqGas=
+
+Name: org/apache/maven/index/ArtifactScanningListener.class
+SHA-256-Digest: dZgfVX0GR8+5YTsYDZ7ttw1jRWUIahpC3SCkv64EKgY=
+
+Name: org/apache/maven/index/AbstractSearchPageableRequest.class
+SHA-256-Digest: jh8JVSLw9Xxq5rV+vnC4FwAoyyS5jlQpmSBB4G0KNwM=
+
+Name: org/apache/maven/index/DefaultScannerListener.class
+SHA-256-Digest: GESXZ9Dd/BLf9aBMArzexGobmSXv3g8KpOvR7LJzfoM=
+
+Name: org/apache/maven/index/FlatSearchResponse.class
+SHA-256-Digest: 3su75hINVdpPneXDNd4YTDsCqJVO+BOvdgoWZ1kgBIQ=
+
+Name: org/apache/maven/index/ArtifactInfoGroup.class
+SHA-256-Digest: Y0AUlt+6V4IKEdfawtwhgJnK571s3jg/160y1QSvZBA=
+
+Name: org/apache/maven/index/MAVEN.class
+SHA-256-Digest: toTZidtACiXjsvmtCunbIlbfVrsi1H90sLieWZR5DRY=
+
+Name: org/apache/maven/index/UniqueGAArtifactFilterPostprocessor.class
+SHA-256-Digest: bWMzMHUBYoG6rI/S1iBr7e1VJjDGJvIEupZfARl6LPk=
+
+Name: org/apache/maven/index/Scanner.class
+SHA-256-Digest: KK78PwSPh0zg2FcFpcjmKq73wWi9gy2sGly+r4in4tY=
+
+Name: failureaccess-1.0.1.jar
+SHA-256-Digest: oXHuTHNN0tqDfksWvp30Zhr6typBra8x64Tf2vk2yiY=
+
+Name: org/apache/maven/index/IndexerEngine.class
+SHA-256-Digest: hJn8Hmpq3921FNeK5FI++a5XxYIwaqAW93LanOIBbhY=
+
+Name: org/apache/maven/index/IteratorSearchResponse.class
+SHA-256-Digest: vS1uAIC2u+8pdYbdOyVKtRZgBJwwMjLhaJ2jTFG06G0=
+
+Name: lucene-highlighter-5.5.5.jar
+SHA-256-Digest: FSaWAKyuzktc+5+1NwaczOe+b6iQ45BRGLtxsQHWUlY=
+
+Name: org/apache/maven/index/CleaningEncoder.class
+SHA-256-Digest: uho69h2oHROtALdCNzD2LqOb/9WqvxFW4YH4c1vqkSs=
+
+Name: lucene-queries-5.5.5.jar
+SHA-256-Digest: 8PFcWQz+Pue8X2FzHpr9xbHI7Mv8cVsSow1Ha16iqlw=
+
+Name: org/apache/maven/index/DefaultSearchEngine.class
+SHA-256-Digest: bs6MbGwAJtI3huXiTuvO9cdEhSbW2XDbvg2J6HqdXNE=
+
+Name: org/apache/maven/index/ArtifactAvailability.class
+SHA-256-Digest: S+PwyQrjdkDQNSlvoUmV4O0+nuRl7w1FQMmW92HAaq4=
+
+Name: org/apache/maven/index/AbstractMultiArtifactInfoFilter.class
+SHA-256-Digest: 1f6Zm9Ws64bOUAcWlZtnsU+LpfWN8hWAoZN1AnXgqwA=
+
+Name: org/apache/maven/index/ArtifactContextProducer.class
+SHA-256-Digest: aanw1fi47qawvsgVNA/LnKqBb9cIJpP5jjKqrIHsdPQ=
+
+Name: org/apache/maven/index/Indexer.class
+SHA-256-Digest: +Ta7WKK4hitEDf4YXE2OAiEEDUymvrP2mKvR40MnLLg=
+
+Name: org/apache/maven/index/ArtifactInfoFilter.class
+SHA-256-Digest: 1BdAaNjW2f1CgV6kyo7k/HXHjg+VgDIy/ZmJjuk2t5E=
+
+Name: META-INF/sisu/javax.inject.Named
+SHA-256-Digest: XbgX+Zafzk7eF4mQ5Z6L6UrUBh5KJSZeRJJs3M2RBPg=
+
+Name: javax.annotation-api-1.2.jar
+SHA-256-Digest: WQmzlso6K+ENDuoyx073jYFuG06tId4deN4fiQ0DPgQ=
+
+Name: org/apache/maven/index/IteratorSearchRequest.class
+SHA-256-Digest: ECzbAaNEMPKpmiS6uTD2obAnJioPh+qsUq1Kn9M5FFg=
+
+Name: org/apache/maven/index/AbstractSearchRequest.class
+SHA-256-Digest: H8mQ4X3St20xMU3RYQAuekGa5YQzXr3IvtP+CzA6u8A=
+
+Name: lucene-core-5.5.5.jar
+SHA-256-Digest: jSeoq07oiDKC13E/Bn5y0c/eHojQ9XAaEZEA7J6G1+E=
+
+Name: slf4j-api-1.7.25.jar
+SHA-256-Digest: GMSgCV1cHaa4F1kudnuyPSndL1YK1033X/OWHb3iW3k=
+
+Name: org/apache/maven/index/AbstractSearchResponse.class
+SHA-256-Digest: BU21V3FeQf084vZlvJlkdzjVi7DLzCPNNe3Qmyo81+4=
+
+Name: org/apache/maven/index/OSGI.class
+SHA-256-Digest: Lc5dRTRAYzHoSavwAow6Cz+XX4NcndMZHpOLusnloSM=
+
+Name: org/apache/maven/index/ScanningRequest.class
+SHA-256-Digest: /fejlBelN6HQaNeZJXuU0XOM+l1U2ZqP9uyzFYItmaY=
+
+Name: org/apache/maven/index/DefaultIndexer.class
+SHA-256-Digest: ScZ2S4CNejW3gc6WYu4IXq2MCrYhwZmpio3U2+YLDUg=
+
+Name: org/apache/maven/index/DefaultScanner$ScannerFileComparator.clas
+ s
+SHA-256-Digest: U4qLKKCkOtkHucUKqgYDL/nZ5pHQU/Gm5qk6Mb89auo=
+
+Name: org/apache/maven/index/IteratorSearchResponse$1.class
+SHA-256-Digest: xdZf9lkT5VXyCOdya0eDLgWrra2Y8gYFcGhR+E6z9WQ=
+
+Name: org/apache/maven/index/UniqueArtifactFilterPostprocessor.class
+SHA-256-Digest: SO565TSb5IzZzK+0ln6BOC3kNtiQKWLKd0p3P2Gy9H4=
+
+Name: OSGI-INF/l10n/bundle.properties
+SHA-256-Digest: OY2+k02Vv3pbNaLwYc6wNUWoiybEsJOOjBnwUjp0NmU=
+
+Name: org/apache/maven/index/DefaultQueryCreator.class
+SHA-256-Digest: kZ1v05DPk5jhV3JKAVTGgS7rTu16OS2WBkbeBBqQ0m0=
+
+Name: org/apache/maven/index/ArtifactInfo.class
+SHA-256-Digest: AxQdAMkIaeQuJIexcsS5Ch21igjObEL34T8BwGLeC2E=
+
+Name: org/apache/maven/index/DefaultScanner.class
+SHA-256-Digest: h1GCvoMqLATGoztiuipbrNGAL2vzQ/GnPl01MZjYZ9Y=
+
+Name: lucene-analyzers-common-5.5.5.jar
+SHA-256-Digest: 9f0qmpg43Ut9SiEmGq8tRXt7gx08Z0KT5m01ZWnvlKw=
+
+Name: org/apache/maven/index/NexusArchetypeDataSource.class
+SHA-256-Digest: f137jjkVPn7vvyO5gqeccmGwJbfT8QV/wMPY5zpWB90=
+
+Name: org/apache/maven/index/ArtifactInfo$RepositoryVersionComparator.
+ class
+SHA-256-Digest: 1W28Fp3uyBcZvBrflG1+gEkjtela0bSDQJv6GJc5XcQ=
+
+Name: org/apache/maven/index/OneLineFragmenter.class
+SHA-256-Digest: uRZAIcN4+97kHwNgiw0Pz1Y2e9GYFR2ETHAeZ0PNz1s=
+
+Name: org/apache/maven/index/ArtifactInfoPostprocessor.class
+SHA-256-Digest: Eqag8+f5lwjKlbe+zNtB7rwjdoc/dJtnGMlOdbZ0bnQ=
+
+Name: about_files/LICENSE-2.0.txt
+SHA-256-Digest: z8d0m5b2O9McPEK1xHG/dWgUBT6EfBDz6wA0F7xSPTA=
+
+Name: indexer-core-6.0.0.jar
+SHA-256-Digest: rHm/jOAilrCbl9GqIpzkzk0SSICTMzStKdQOySycwac=
+
+Name: listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar
+SHA-256-Digest: s3KgN9QjCqV/vv/e8w/WEj+cDC24XQrO0AyRuXTzP5k=
+
+Name: org/apache/maven/index/SearchEngine.class
+SHA-256-Digest: cD+AVbe1bgeY5MsV2/bJK8Ll0m3NIOxHbB7VM8JE9wo=
+
+Name: org/apache/maven/index/FlatSearchRequest.class
+SHA-256-Digest: qJMD7esiQNUJpCA4UYdLMc6HpDqAkQtgQpveOLSSLMA=
+
+Name: org/apache/maven/index/NexusIndexer.class
+SHA-256-Digest: tmyGTVKAvoZPCe14o7Rr9MvBVUzdEooffH5U6k6DWe4=
+
+Name: javax.inject-1.jar
+SHA-256-Digest: kcdwRKUMSBY2wy2Rb9ickRinIZU5BFLIEGUID5V95/8=
+
+Name: lucene-memory-5.5.5.jar
+SHA-256-Digest: SZdgttQz28pKOF/8/Nbmc+uW8XYclqejxpLbHu+xtwo=
+
+Name: org/apache/maven/index/IndexerFieldVersion.class
+SHA-256-Digest: 8tQA8P82+akvFYKOJzU75bOW1pY/OLiBVQRmjVtzhEs=
+
+Name: org/apache/maven/index/AndMultiArtifactInfoFilter.class
+SHA-256-Digest: pF817szv8OWKjnMfmP5PYNWsG/aRrEeSOCIx2Fe4APc=
+
+Name: org/apache/maven/index/GroupedSearchRequest.class
+SHA-256-Digest: O9AfRj89cCrVYI4vpm6W+n/K7B4Fc1BXmPHNoMY7NXo=
+
+Name: org/apache/maven/index/DefaultIndexerEngine.class
+SHA-256-Digest: 7q34FqyGGvYk1tnghhvSYtLnWnklusKQa3WigIBGBaw=
+
+Name: org/apache/maven/index/GroupedSearchResponse.class
+SHA-256-Digest: 3HCvZWSg/obnaG0lkmHV9pGkskZB20IEsKbbJ+g8eoQ=
+
+Name: checker-qual-3.5.0.jar
+SHA-256-Digest: cpmQs/GKlWBvwlc4NraVi820TLUr+9G3qpwznP81paQ=
+
+Name: org/apache/maven/index/DefaultArtifactContextProducer.class
+SHA-256-Digest: ED2fy3V//3xzzwrTOAKodYFafa6zH42QhdC1kOuM2Wc=
+
+Name: org/apache/maven/index/QueryCreator.class
+SHA-256-Digest: VFv7clhLVFsv16ugLaYar/NN92YKjOz8M3rbp8mc5tw=
+
+Name: guava-30.1-jre.jar
+SHA-256-Digest: 5t0HL50/4CpGAGiDgL1CK9rBhMr2/iQYz90JNPCUMqo=
+
+Name: lucene-join-5.5.5.jar
+SHA-256-Digest: DSQJqU6BN+6Z7wtreUcbp0iMq6Dtq0OoxYhlcAM5v+g=
+
+Name: lucene-sandbox-5.5.5.jar
+SHA-256-Digest: tRaYvtlx1YJFETXHuLfvcay4Bf5m72p9/t3FJbFONF4=
+
+Name: org/apache/maven/index/ScanningResult.class
+SHA-256-Digest: U3xJSVnsNB170F4DC6j4mVUqRWIruwfppBiEHVcQJAg=
+
+Name: org/apache/maven/index/ArtifactInfo$VersionComparator.class
+SHA-256-Digest: jLIa3LgkJKqpTfX/SYZe6oQw2q8bd1himbM7F3HaMpg=
+
+Name: org/apache/maven/index/MatchHighlightMode.class
+SHA-256-Digest: rS4eqLR70znWTLgI57BX7GDUNOYKTS6ZjAh+EqLGD78=
+
+Name: about.html
+SHA-256-Digest: pENCRpNJPzb5O3F8RdyoR90pFn6ReYSuj4C5k4a8SN8=
+
+Name: lucene-queryparser-5.5.5.jar
+SHA-256-Digest: ie0xp5nysRoL1cQVU4HANpTSIj+yHTlAzn0Bh2b/Ypo=
+
+Name: org/apache/maven/index/Grouping.class
+SHA-256-Digest: VznwxYiJvcj5SMENG9EKmX43cL2wAZlwRQNtYUeiG0U=
+
+Name: org/apache/maven/index/IteratorResultSet.class
+SHA-256-Digest: Gl8lTCn0r6Y2qw8SuORY5yVMkD/y2usaO1mCffM5BBA=
+
+Name: org/apache/maven/index/ArtifactContext.class
+SHA-256-Digest: SBe6Gzb4fPZWYjXUH0xFcIxpoPbUhdVlDu498vqbdv0=
+
+Name: org/apache/maven/index/NEXUS.class
+SHA-256-Digest: 04Vu0Zy0cjGNgfsdwWz64QZM35gEdtScoaE7hKxMeiI=
+
+Name: lucene-backward-codecs-5.5.5.jar
+SHA-256-Digest: ti4In1Bbxy3Yq7CtVQQGBM3ZIwbhSHHX/ry/lH3ZxuU=
+
+Name: org/apache/maven/index/MatchHighlightRequest.class
+SHA-256-Digest: 51rRmLKgiYOfLKkN33bxSm2JhsLlkAqZPKPzQHWqILg=
+
+Name: org/apache/maven/index/IndexerField.class
+SHA-256-Digest: 64zt26uVEzfPhyDYe3ILJDmwj7kSgMkAwlyeud8m7YI=
+
+Name: org/apache/maven/index/Field.class
+SHA-256-Digest: fbL9Y3zuTMSAyOp6+51B3Y0QdK4l9n8n8nTuwUYIPS0=
+
+Name: org/apache/maven/index/ArtifactInfo$ContextVersionComparator.cla
+ ss
+SHA-256-Digest: WVbTZau/tkZFC6Rq0iv+twbPRWx3n6XzlyBrq5Y+wR4=
+
+Name: org/apache/maven/index/SearchType.class
+SHA-256-Digest: 6+lsSkQ/qGcUjXHr3jpFn+M080j4W0KbnX0mOdfIjGE=
+
+Name: error_prone_annotations-2.3.4.jar
+SHA-256-Digest: uvfW6pfOYGxT4RtoVLpfLOfvXCTd3wr6GNEmC9JbACw=
+
+Name: org/apache/maven/index/SearchType$1.class
+SHA-256-Digest: e822gqIENFWakQueIeLhzFoDLhxhe5Zn+zRS1xqPozw=
+
+Name: j2objc-annotations-1.3.jar
+SHA-256-Digest: Ia8wySJnvWEiwOC00gzMtmQaN+r5VsZUDsRx1YTmSns=
+
+Name: org/apache/maven/index/ArtifactDiscoveryListener.class
+SHA-256-Digest: BfQgvamKEmDv8UMXKbuWmENQnTfIkJk4EcC9i2ognog=
+

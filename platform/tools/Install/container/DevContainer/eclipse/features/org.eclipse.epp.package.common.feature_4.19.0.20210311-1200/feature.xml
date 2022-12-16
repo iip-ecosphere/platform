@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="org.eclipse.epp.package.common.feature"
+      label="Eclipse Packaging Project Common Feature"
+      version="4.19.0.20210311-1200"
+      provider-name="Eclipse Packaging Project">
+
+   <description url="http://eclipse.org/epp">
+      %description
+   </description>
+
+   <copyright>
+      %copyright
+   </copyright>
+
+   <license url="%licenseURL">
+      %license
+   </license>
+
+   <requires>
+      <!-- Bug 568379: Workaround (temporarily!) JAXB version problems.
+      By forcing all the EPPs to have both versions of JAXB it means that
+      even though p2 does not resolve properly, as both versions
+      will be installed OSGI won't have a wiring problem.
+      Once no one depends on 2.2.0 anyore (specifically no
+      Require-Bundle javax.xml.bind in any MANIFEST.MF in simrel) then
+      we can remove this workaround.
+       -->
+      <import plugin="com.sun.xml.bind" version="2.3.3" match="equivalent"/>
+      <import plugin="com.sun.xml.bind" version="2.2.0" match="equivalent"/>
+      <import plugin="jakarta.xml.bind" version="2.3.3" match="equivalent"/>
+      <import plugin="javax.xml.bind" version="2.2.0" match="equivalent"/>
+   </requires>
+
+   <plugin
+         id="org.eclipse.epp.package.common"
+         download-size="151"
+         install-size="413"
+         version="4.19.0.20210311-1200"
+         unpack="true"/>
+
+</feature>

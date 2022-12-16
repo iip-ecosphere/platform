@@ -1,0 +1,81 @@
+Manifest-Version: 1.0
+Created-By: Maven Archiver 3.5.2
+Build-Jdk-Spec: 11
+Bundle-ManifestVersion: 2
+Bundle-Name: Interactive Console Plug-in
+Bundle-SymbolicName: org.python.pydev.shared_interactive_console;singlet
+ on:=true
+Bundle-Version: 10.0.1.202210281537
+Bundle-ClassPath: interactive_console.jar,commons-logging-1.1.1.jar,ws-c
+ ommons-util-1.0.2.jar,xmlrpc-client-3.1.3.jar,xmlrpc-common-3.1.3.jar,x
+ mlrpc-server-3.1.3.jar
+Bundle-Activator: org.python.pydev.shared_interactive_console.Interactiv
+ eConsolePlugin
+Eclipse-BundleShape: dir
+Require-Bundle: org.eclipse.ui,org.eclipse.core.runtime,org.eclipse.jfac
+ e.text,org.eclipse.ui.console,org.eclipse.debug.core,org.eclipse.debug.
+ ui,org.eclipse.ui.workbench.texteditor,org.python.pydev.shared_core;bun
+ dle-version="[10.0.1,10.0.2)",org.python.pydev.core;bundle-version="[10
+ .0.1,10.0.2)",org.python.pydev.shared_ui;bundle-version="[10.0.1,10.0.2
+ )",org.eclipse.ui.ide
+Bundle-ActivationPolicy: lazy
+Export-Package: org.apache.commons.logging,org.apache.commons.logging.im
+ pl,org.apache.ws.commons.serialize,org.apache.ws.commons.util,org.apach
+ e.xmlrpc,org.apache.xmlrpc.client,org.apache.xmlrpc.client.util,org.apa
+ che.xmlrpc.common,org.apache.xmlrpc.jaxb,org.apache.xmlrpc.metadata,org
+ .apache.xmlrpc.parser,org.apache.xmlrpc.serializer,org.apache.xmlrpc.se
+ rver,org.apache.xmlrpc.util,org.apache.xmlrpc.webserver,org.python.pyde
+ v.shared_interactive_console,org.python.pydev.shared_interactive_consol
+ e.console,org.python.pydev.shared_interactive_console.console.codegen,o
+ rg.python.pydev.shared_interactive_console.console.ui,org.python.pydev.
+ shared_interactive_console.console.ui.internal,org.python.pydev.shared_
+ interactive_console.console.ui.internal.actions,org.python.pydev.shared
+ _interactive_console.console.ui.internal.fromeclipse
+Bundle-Vendor: Brainwy Software Ltda
+Bundle-RequiredExecutionEnvironment: JavaSE-11
+Automatic-Module-Name: org.python.pydev.shared.interactive.console
+
+Name: icons/terminate.gif
+SHA-256-Digest: TE802GttkNpbgC/xdSDietf/MIWlKLif9tcmG5fQa94=
+
+Name: plugin.xml
+SHA-256-Digest: YutPjZTu60X28I7Xb1nyzoBRe00lr2N0tiSAX7cZ/B8=
+
+Name: xmlrpc-server-3.1.3.jar
+SHA-256-Digest: fj1Po8S9oLW0wyXy5oDgwo6deRnzNscsT68bfSKDJyo=
+
+Name: icons/interrupt.gif
+SHA-256-Digest: yGMQ0S1C0Q7KVORgYNMPn9lsuLQVa/LuY9seittTLos=
+
+Name: xmlrpc-common-3.1.3.jar
+SHA-256-Digest: w3LSCnV9jdafT/H3582hj+qMyrxMUkFoztzIX+IJaX8=
+
+Name: META-INF/maven/org.python.pydev/org.python.pydev.shared_interactiv
+ e_console/pom.xml
+SHA-256-Digest: x3bBVRdK6kNIjSvw3j/39vFp3kC6d7CHup/lXixtVEE=
+
+Name: META-INF/maven/org.python.pydev/org.python.pydev.shared_interactiv
+ e_console/pom.properties
+SHA-256-Digest: pt9ScJ3gSqmoM8/TAWjST4RyKarfCN7PXzb0aVpIqns=
+
+Name: icons/sync_ed.gif
+SHA-256-Digest: QDqJvieRo8o5BVQKtIHtDSGJ//p3qN7wMrRCCdK5MHY=
+
+Name: icons/save.gif
+SHA-256-Digest: 2LNOC+AzCvg88HUi8Ud5kUlvp5ehQOfw22rA8BDVk6M=
+
+Name: ws-commons-util-1.0.2.jar
+SHA-256-Digest: l8GD01tZbGoBDf6pZ8oeZ/Z2loBlNdzvW+F/+yaSz9Y=
+
+Name: xmlrpc-client-3.1.3.jar
+SHA-256-Digest: DsNR5UddW0OBMv/XmFJprUP00idnzWWQJDe0h7J8V/s=
+
+Name: commons-logging-1.1.1.jar
+SHA-256-Digest: zm+RPK0fDbOq1wGG1lxbx//Mmpnj/o4LE3MSgZ98Ni8=
+
+Name: LICENSE.txt
+SHA-256-Digest: J75t01G5GT6rkY9hiDNA+yh/SDVMI+VNinfwannMATI=
+
+Name: interactive_console.jar
+SHA-256-Digest: KbC5Bqku79Nv3+l85Scc7hYy61F3PDF41y0ZPZq9b94=
+

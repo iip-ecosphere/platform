@@ -8,6 +8,7 @@ Typical steps:
   * please also adjust `sharedArtifact`.
   * In case your basic model name is not "Test", then change the "Test" name in "< argument>Test</ argument>" in pom.xml file to your basic model name - two places (generateAppsNoDeps, generateApps).
   * Instantiate the application without integration `mvn install` (replace "Test" by the name of your model)
+  * the broker will be created as part of this process in gen/broker
   * you will have a template project in the `gen\py\...` directory
   * import the .zip file into your workspace as a project
   * run `mvn install` once to generate the needed classes in traget

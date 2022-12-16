@@ -1,0 +1,98 @@
+Manifest-Version: 1.0
+Created-By: Maven Archiver 3.5.2
+Build-Jdk-Spec: 11
+Bundle-ManifestVersion: 2
+Bundle-Name: Customizations Plug-in
+Bundle-SymbolicName: org.python.pydev.customizations; singleton:=true
+Bundle-Version: 10.0.1.202210281537
+Bundle-ClassPath: customizations.jar
+Bundle-Activator: org.python.pydev.customizations.CustomizationsPlugin
+Eclipse-BundleShape: dir
+Require-Bundle: org.eclipse.ui,org.eclipse.core.runtime,org.eclipse.core
+ .resources,org.python.pydev.core;bundle-version="[10.0.1,10.0.2)",org.p
+ ython.pydev.ast;bundle-version="[10.0.1,10.0.2)",org.python.pydev;bundl
+ e-version="[10.0.1,10.0.2)",org.python.pydev.debug;bundle-version="[10.
+ 0.1,10.0.2)",org.junit;bundle-version="4.0";resolution:=optional,org.ec
+ lipse.debug.core,org.eclipse.debug.ui,org.eclipse.core.expressions,org.
+ python.pydev.shared_ui;bundle-version="[10.0.1,10.0.2)"
+Bundle-ActivationPolicy: lazy
+Export-Package: org.python.pydev.customizations,org.python.pydev.customi
+ zations.app_engine.actions,org.python.pydev.customizations.app_engine.l
+ aunching,org.python.pydev.customizations.app_engine.util,org.python.pyd
+ ev.customizations.app_engine.wizards,org.python.pydev.customizations.co
+ mmon
+Bundle-Vendor: Brainwy Software Ltda
+Bundle-RequiredExecutionEnvironment: JavaSE-11
+Automatic-Module-Name: org.python.pydev.customizations
+
+Name: templates/google_app_engine/hello_webapp_world/helloworld.py
+SHA-256-Digest: jhqVRDsfMKtbgaoYvHhCOxPySA4ktkBPIQ541NFYl9Y=
+
+Name: plugin.xml
+SHA-256-Digest: 3Kw1gs6qLAclL31cpQSf9p8VboNR/PdNKH82FvT46zE=
+
+Name: templates/google_app_engine/hello_world/app.yaml
+SHA-256-Digest: OS7YDlmGj1x8E8pdilWG/mTpjJD5ElohHVQ+JbA1Nr8=
+
+Name: icons/app_engine.gif
+SHA-256-Digest: YPzTpv+3Ry4z3vGUfOCYqMXKSlfWJvx+lmE6c1Zo9Ig=
+
+Name: templates/google_app_engine/hello_world/description.txt
+SHA-256-Digest: s6OrVPFuJes2gB8TeB1IPf6wFEgvghE0HZdBIEhT4Z0=
+
+Name: icons/AppEngine-16.png
+SHA-256-Digest: 83NeP7BCfSl9ciizq0IrClza22wyL+9ra0PFUgEDBHk=
+
+Name: icons/app_engine_16_16.gif
+SHA-256-Digest: NAbNm5XMqobT0RvkbotpOqkYnU92zrtCOMOV61C+7Qo=
+
+Name: META-INF/maven/org.python.pydev/org.python.pydev.customizations/po
+ m.xml
+SHA-256-Digest: tx/XYwqy8hnCwTh16KV1PEleHRz9GlJksOSGyqpeeBo=
+
+Name: templates/google_app_engine/ask_login/description.txt
+SHA-256-Digest: TMseY2KqTZ8V8auh7Wx6OVXDTaVsdn/STNcJU0JNsCM=
+
+Name: icons/AppEngine-256.png
+SHA-256-Digest: XO14v63XxZJrkZv7I3rxYGCHyglmDrimJPJcITh+2pY=
+
+Name: icons/AppEngine-48.png
+SHA-256-Digest: Cc5J4vI0T5QsOIfolmDMdXVc1XshS3jZIWRxIGee+dw=
+
+Name: templates/google_app_engine/hello_webapp_world/app.yaml
+SHA-256-Digest: qPrHbMdVcHichmQszwQb+vJsflYxpPSZd/gVGupBB6o=
+
+Name: icons/AppEngine-128.png
+SHA-256-Digest: JLlPyVq80dNLREWn/k6kjbIycN2ugkfHKF2aiDLPk/E=
+
+Name: icons/AppEngine-32.png
+SHA-256-Digest: jKottIaU+15KRtfITkyYfyjLydJ4XpMsuqckDYg0TPg=
+
+Name: icons/appengine-noborder-120x30.gif
+SHA-256-Digest: ssxSoQo2uJ9fWsU50jkKn52hq7Ta40JBy0lc7tHZW7E=
+
+Name: templates/google_app_engine/ask_login/app.yaml
+SHA-256-Digest: +qcj0YalVy9dhGngM4mvCnIHUqKNUsRLCHMISE0lk0s=
+
+Name: LICENSE.txt
+SHA-256-Digest: J75t01G5GT6rkY9hiDNA+yh/SDVMI+VNinfwannMATI=
+
+Name: templates/google_app_engine/hello_webapp_world/description.txt
+SHA-256-Digest: QW8cPKbvmWr1lzx3hIzcrNCpPjJ0ja7HdlMGWv6prS0=
+
+Name: META-INF/maven/org.python.pydev/org.python.pydev.customizations/po
+ m.properties
+SHA-256-Digest: PHPNHdkxlvYDLLoe1K4KzmiFBENO3hyyVYMr1RDrFFM=
+
+Name: templates/google_app_engine/ask_login/asklogin.py
+SHA-256-Digest: UTINdIQ1Xn8TRz91KSghqSgbyO1Mog66LfteD4IWyZA=
+
+Name: icons/AppEngine-64.png
+SHA-256-Digest: BScVgyVvNHh7rMM7ENXcEQ9hJ7JQJ6Cr88RTcGvSULs=
+
+Name: templates/google_app_engine/hello_world/helloworld.py
+SHA-256-Digest: knn4s1T8l/sPZpzE2GIIOgu54iiEpJWZsti4moUKtwY=
+
+Name: customizations.jar
+SHA-256-Digest: cLj6o9g+k9bD8gEoKKxOtK7+WOCPADNF+q7FTDVg4Tk=
+

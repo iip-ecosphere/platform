@@ -25,16 +25,18 @@ Setup:
     StopServiceMgrContainer   : True
     DevicesLeavePlatform      : True
     StopPlatfrom              : True
-    DownloadExamples          : True
-    CompileExamples           : True
-    RunExamples               : False
+    DownloadExamples          : False
+    CompileExamples           : False
+    RunExamples               : True
+    RunDeploymentPlans        : True
+    StopDeploymentPlans       : True
 Examples:
   - Name        : SimpleMesh
     Included    : True
     Redownload  : True
     Compile     : No
     Artifact    : "SimpleMeshTestingApp-0.1.0-SNAPSHOT-bin.jar"
-    Run         : False
+    Run         : True
   - Name        : examples.KODEX
     Included    : True
     Redownload  : True
@@ -59,6 +61,13 @@ Examples:
     Compile     : Connector
     Artifact    : "SimpleVDWOPCDemoApp-0.1.0-SNAPSHOT-bin.jar"
     Run         : False
+Deployments:
+  - Name        : SimpleMesh
+    Run         : True
+    yaml        : "SimpleMeshAppDeployment.yaml"
+  - Name        : Rsta
+    Run         : False
+    yaml        : "RSTADeployment.yaml"
 Machines:
   - Name           : Server 147.172.178.145 Platform
     IP             : 147.172.178.145

@@ -1,0 +1,30 @@
+Manifest-Version: 1.0
+Automatic-Module-Name: org.eclipse.equinox.security.linux.x86_64
+Bundle-SymbolicName: org.eclipse.equinox.security.linux.x86_64;singlet
+ on:=true
+Bundle-ManifestVersion: 2
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Eclipse-PlatformFilter: (& (osgi.os=linux) (osgi.arch=x86_64))
+Eclipse-SourceReferences: scm:git:git://git.eclipse.org/gitroot/equino
+ x/rt.equinox.bundles.git;path="bundles/org.eclipse.equinox.security.l
+ inux.x86_64";tag="I20210125-1800";commitId=42d585c8c6c1260df54900584c
+ 59c7f01ab47ece
+Bundle-Vendor: %providerName
+Fragment-Host: org.eclipse.equinox.security;bundle-version="[1.0.0,2.0
+ .0)"
+Bundle-Name: %fragmentName
+Bundle-Version: 1.1.500.v20210125-1508
+Bundle-Localization: fragment
+Build-Jdk-Spec: 11
+Created-By: Maven Archiver 3.5.0
+Eclipse-BundleShape: dir
+
+Name: META-INF/p2.inf
+SHA-256-Digest: nS5acuoTKeLyIOmSrwImgbUf+mrpa1HXK0mlf+5eyXs=
+
+Name: about.html
+SHA-256-Digest: 7mbS+ztMDS7S5/aYvJ7U49bPd/pcr0CtAylhJdsaxfA=
+
+Name: fragment.properties
+SHA-256-Digest: ZZX4/VeAmZScwgg4WmNJmLZIcn7v9fL8VwQw5/bLcpQ=
+
