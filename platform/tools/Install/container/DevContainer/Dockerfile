@@ -55,6 +55,6 @@ COPY chrome.desktop /root/Desktop/chrome.desktop
 COPY mjhpgnbimicffchbodmgfnemoghjakai.json /opt/google/chrome/extensions/mjhpgnbimicffchbodmgfnemoghjakai.json
 
 # running platform
-COPY platform.conf /etc/supervisor/conf.d/platform.conf
+COPY platform.txt /etc/supervisor/conf.d/platform.txt
 RUN cat /etc/supervisor/conf.d/platform.conf >> /etc/supervisor/conf.d/supervisord.conf
 
