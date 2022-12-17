@@ -4,7 +4,7 @@ This project contains a dependencies POM to install the basic parts of the platf
 
 The details are described in the platform handbook. Please note that special characters like whitespaces in folder names (in particular on Windows) may cause the installation, platform installation or examples to fail.
 
-  * Modify `src/main/easy/InstallTest.ivml` in particular to reflect your IP addresses.
+  * Modify `src/main/easy/TechnicalSetup.ivml` in particular to reflect your IP addresses.
   * Run `mvn install` in the *main folder* of the install package.
   * Copy the created artifacts in `gen` (`broker`, `ecsJars`, `ecs.*`, `serviceMgr`, `serviceMgr.*`, `SimpleMeshTestingApp-0.1.0-SNAPSHOT.jar`) to the target machines.
   * Start the broker, e.g., using `broker` (sh or bat) on the "server" and the "device" machine(s).

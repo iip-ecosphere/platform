@@ -4,13 +4,12 @@
 
 Planned:
 * Component upgrades: Spring Cloud Stream [#57](https://github.com/iip-ecosphere/platform/issues/57)
+* Integrated container management for Kubernetes [#39](https://github.com/iip-ecosphere/platform/issues/39)
 
 ### Next release (Winter 2022):
 
 Planned:
-* Integrated container management for Kubernetes [#39](https://github.com/iip-ecosphere/platform/issues/39)
 * Component upgrades: BaSyx [#35](https://github.com/iip-ecosphere/platform/issues/35), Apache QPID-J [#76](https://github.com/iip-ecosphere/platform/issues/76)
-* Automatic creation of containers [#10](https://github.com/iip-ecosphere/platform/issues/10), [#9](https://github.com/iip-ecosphere/platform/issues/9).
 * Enable tolerant switching: [#26](https://github.com/iip-ecosphere/platform/issues/26)
 * Platform component heartbeat and AAS cleanup: [#62](https://github.com/iip-ecosphere/platform/issues/62)
 * Filtering of monitoring telegrams [#75](https://github.com/iip-ecosphere/platform/issues/75)
@@ -18,8 +17,8 @@ Planned:
 * Semantic Ids in the UI [#63](https://github.com/iip-ecosphere/platform/issues/63)
 
 In progress:
+* Automatic creation of containers [#10](https://github.com/iip-ecosphere/platform/issues/10), [#9](https://github.com/iip-ecosphere/platform/issues/9).
 * [#59](https://github.com/iip-ecosphere/platform/issues/59): Distributed testing/evaluation environment
-* [#55](https://github.com/iip-ecosphere/platform/issues/55): Service integration workshop example/material
 * [#69](https://github.com/iip-ecosphere/platform/issues/69): Revise platform installation guidelines
 * [#100](https://github.com/iip-ecosphere/platform/issues/100): Run multiple app instances
 * [#101](https://github.com/iip-ecosphere/platform/issues/101): Documentation of fixed formats used by the platform
@@ -52,6 +51,8 @@ Improvements:
 * [#108](https://github.com/iip-ecosphere/platform/issues/108): Generated implementation templates support Eclipse PythonEditor PyDev
 * [#103](https://github.com/iip-ecosphere/platform/issues/36): Generation of Python code with initialized fields and Pythonic field access while keeping getters/setters
 * Multi-module top-level POM for local builds of the platform (please refer to the platform handbook for details).
+* [#55](https://github.com/iip-ecosphere/platform/issues/55): Service integration workshop example/material
+* [#112](https://github.com/iip-ecosphere/platform/issues/112): Example use of managed platform model structure in install package.
 
 ### Version 0.4.0 (2022/09/02, TddT'22):
 
