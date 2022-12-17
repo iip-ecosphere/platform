@@ -9,8 +9,9 @@ The virtual IIP-Ecosphere Industry 4.0/IIoT platform aims at demonstrating new a
 * Improved build process integration: Python "compile"/test, platform instantiator and Maven orchestrator build plugins for simplified platform and application build processes
 * Improved Python code integration: More Pythonic data type generation and Eclipse Editor support for PyDev.
 * Developer support: Platform configuration goes AAS, generated implementation templates, transport telegram logging
-* Platform release 0.4.0 (2022/09/02)
-* AI-based Code for HM'22/TddT'22 as public platform example/regression test.
+
+## Public demonstrations
+
 * Successful presentation of improved robot-based platform demonstrator at [TddT'22, Berlin](https://www.digitale-technologien.de/DT/Redaktion/DE/Veranstaltungen/2022/DT/220829_Tage_der_digitalen_Technologien.html) 
 * Successful presentation of robot-based visual quality inspection app on [HM'22](https://www.hannovermesse.de/de/) (with 3 sources, Python-based AI, AAS-based Angular application).
 
@@ -30,7 +31,7 @@ We also prepare a set of [examples and demonstration use cases](https://github.c
 
 ## Building the Platform
 
-The platform consists of some core and many alternative components. We use a Continuous Integration server to build the platform upon changes (snapshot builds) and releases. To speed up this process, the build sequence is incremental and (currently) not a Maven module build. So we recommend that you install Java, Maven and an IDE (supported/working versions see [documentation overview](https://github.com/iip-ecosphere/platform/tree/main/platform/documentation/README.md)) and let Maven resolve the actual binaries for you. Prerequisite is the installation of the actual platform dependencies (see [installation overview](https://github.com/iip-ecosphere/platform/tree/main/platform/documentation/INSTALL.md)). For more detailed information on the build dependencies, please refer to the platform handbook.
+The platform consists of some core and many alternative components which can be built locally via the provided Maven multi-module POM. However, to save time, we recommend relying on the pre-built snapshot and release binaries from our Continuous Integration server. To speed up this process when changes to the individual modules occur, the build sequence is incremental and not based on the Maven multi-module build. So we recommend that you install Java, Maven and an IDE (supported/working versions see [documentation overview](https://github.com/iip-ecosphere/platform/tree/main/platform/documentation/README.md)) and let Maven resolve the actual binaries for you. For more detailed information on the build dependencies, please refer to the platform handbook.
 
 ## Available components
 
