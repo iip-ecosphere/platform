@@ -109,12 +109,9 @@ Log out and log back so that your group membership is re-evaluated.
 
 **On server and devices:** Obtain the IIP-Ecosphere platform install package. Snapshots can be obtained from SSE Jenkins for [Windows](https://jenkins-2.sse.uni-hildesheim.de/view/IIP-Ecosphere/job/IIP_Install/lastSuccessfulBuild/artifact/install.zip), [Linux](https://jenkins-2.sse.uni-hildesheim.de/view/IIP-Ecosphere/job/IIP_Install/lastSuccessfulBuild/artifact/install.tar.gz) or from [github](https://downgit.github.io/#/home?url=https://github.com/iip-ecosphere/platform/tree/main/platform/tools/Install). The install package for the actual release can be obtained from [github](https://downgit.github.io/#/home?url=https://github.com/iip-ecosphere/platform/tree/v0.4.0/platform/tools/Install).
 
-**On server and devices:** Unpack the install package. Using Maven, obtain the IIP-Ecosphere platform dependencies first. 
+**On server and devices:** Unpack the install package (on Linux, you may use the provided TAR-ball). 
 
     ~$ unzip Install.zip
-    ~$ cd Install/platformDependencies
-    ~/Install/platformDependencies$ mvn install
-    ~/Install/platformDependencies$ cd ..
 
 This must be done once before other Maven installation steps.
 
@@ -130,19 +127,19 @@ To run the broker, execute the respective script in the broker directory. The br
 
 **On server and devices:** Run Maven now on the install package itself 
 
-    ~/Install$ mvn package
+    ~/Install$ mvn install
     
 You may perform the Maven install command, but the package command is sufficient here. This step also obtains and unpacks the respective platform configuration model into `src/main/easy`.
 
-**On the server:** Edit the example configuration file `InstallTest.ivml` in `src/main/easy` so that your local IP address is used. In this release, the devices are not listed in the configuration, i.e., search for `147.172.178.145` and replace this IP by the IP of your server machine. You may perform more changes, but this requires background knowledge on the platform configuration model (cf. Platform Handbook). Currently, the selection of code artifacts is restricted to the Maven servers used for development, i.e., further artifacts cannot be obtained from further repositories, e.g., the future platform service store. This will be targeted by one of the next releases. 
+**On the server:** Edit the example configuration file `TechnicalSetup.ivml` in `src/main/easy` so that your local IP address is used. In this release, the devices are not listed in the configuration, i.e., search for `147.172.178.145` and replace this IP by the IP of your server machine. You may perform more changes, but this requires background knowledge on the platform configuration model (cf. Platform Handbook). Currently, the selection of code artifacts is restricted to the Maven servers used for development, i.e., further artifacts cannot be obtained from further repositories, e.g., the future platform service store. This will be targeted by one of the next releases. 
 
 Depending on the Java version, various settings to open the Java module system may be needed. Currently, these settings are fixed in IIPEcosphere.ivml in the variable `javaOpts` and can be adjusted before generation if needed. Pragmatically, you may also alter the generated shell scripts (cf. below). 
 
 **On the server:** Instantiate the platform using 
 
-    ~/Install$ mvn exec:java
+    ~/Install$ mvn install
 
-This executes the PlatformInstantiator through Maven, passing it three parameters, namely the name of the model to instantiate (`InstallTest`), the relative folder where the model is located (`src/main/easy`) and the folder where to store the instantiated artifacts (the relative folder `gen`). Please note that this may fail if your modifications to the configuration file are syntactically or semantically incorrect. Alternatively, you can check out the full code from github and run the PlatformInstantiator from your IDE or force maven to copy all dependencies into a folder and run Java manually on the command line. As several files and folders are produced by the instantiation process, also a `README.txt` file is generated, which provides some explanation on the individual files and folders.
+This executes the PlatformInstantiator through Maven, passing default values for the name of the model to instantiate, the relative folder where the model is located and the folder where to store the instantiated artifacts (the relative folder (values can be overridden using Mavan CLI arguments). Please note that this may fail if your modifications to the configuration file are syntactically or semantically incorrect. Alternatively, you can check out the full code from github and run the PlatformInstantiator from your IDE or force maven to copy all dependencies into a folder and run Java manually on the command line. As several files and folders are produced by the instantiation process, also a `README.txt` file is generated, which provides some explanation on the individual files and folders.
 
 **On the server:** Copy the created artifacts in `gen` (`ecsJars/*`, `ecs.sh`, `svcJars/*`, `serviceMgr.sh`, `SimpleMeshTestingApp-0.1.0-SNAPSHOT.jar`) to the respective devices. For each artifact, the instantiation creates a folder with all dependencies and the respective startup script. In future versions of the platform, this step will be taken over by the device management, the automated container creation and the distribution of containers by the platform.
 
