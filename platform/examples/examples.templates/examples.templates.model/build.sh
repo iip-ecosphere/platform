@@ -29,6 +29,7 @@ pidBroker=$!
 cd $dir
 
 echo "Broker PID $pidBroker"
+cd ../examples.templates.impl
 mvn -P App exec:java -Dexec.args="--iip.test.stop=30000 --iip.test.brokerPort=$brokerPort" > log &
 pidTest=$!
 echo "Test started $pidTest"
@@ -36,6 +37,6 @@ echo "Test started $pidTest"
 sleep 30 && pkill -9 -P "$pidTest" && kill -9 "$pidTest"
 pkill -9 -P "$pidBroker" && kill -9 "$pidBroker"
 
-echo "Testing for RECEIVED in log"
+echo "Testing for Output: in log"
 
-grep -Fq "RECEIVED" log
+grep -Fq "Output:" log

@@ -122,6 +122,7 @@
                              <overWrite>true</overWrite>
                              <outputDirectory>${project.basedir}/src/main/easy</outputDirectory>
                              <destFileName>model.jar</destFileName>
+                             <excludes>cfg/*.*</excludes>
                            </artifactItem>
                          </artifactItems>
 			             <cleanup>
