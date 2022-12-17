@@ -5,7 +5,8 @@ The virtual IIP-Ecosphere Industry 4.0/IIoT platform aims at demonstrating new a
 ## News
 
 * Upcoming: Development container for service implemenation and (video) material from service integration workshop.
-* Improved build proces integration: Python "compile"/test, platform instantiator and Maven  orchestrator build plugins
+* Upcoming: Distributed testing/evaluation environment for platform and applications
+* Improved build process integration: Python "compile"/test, platform instantiator and Maven orchestrator build plugins for simplified platform and application build processes
 * Improved Python code integration: More Pythonic data type generation and Eclipse Editor support for PyDev.
 * Developer support: Platform configuration goes AAS, generated implementation templates, transport telegram logging
 * Platform release 0.4.0 (2022/09/02)
