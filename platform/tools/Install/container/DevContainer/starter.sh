@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # turn on bash's job control
-sleep 10;
+sleep 5;
 set -m
 mkdir /root/platform/logs
 cd /root/platform
