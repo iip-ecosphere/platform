@@ -63,10 +63,12 @@ public class VariableType extends FieldType {
         builder.append("\t\t\t\tbrowseName = \"" + getBrowseName() + "\",\n");
         builder.append("\t\t\t\tdisplayName = \"" + getDisplayname() + "\",\n");
         builder.append("\t\t\t\tdescription = \"" + getDescription() + "\"");
-        if (!getDataType().equals("opc")) {
-            builder.append(",\n\t\t\t\ttype = refBy(" + getDataType() + ")");
-        } else {
-            builder.append(",\n\t\t\t\ttype = refBy(opcUnknownDataType)");
+        if (!getDataType().equals("")) {
+            if (!getDataType().equals("opcType")) {
+                builder.append(",\n\t\t\t\ttype = refBy(" + getDataType() + ")");
+            } else {
+                builder.append(",\n\t\t\t\ttype = refBy(opcUnknownDataType)");
+            }
         }
         builder.append(",\n\t\t\t\ttypeDefinition = refBy(opc" + variableType + ")");
         builder.append(",\n\t\t\t\toptional = " + optional);

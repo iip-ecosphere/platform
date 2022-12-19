@@ -5607,6 +5607,18 @@ project OpcMachineTool {
 		documentation = "https://reference.opcfoundation.org/v104/MachineTool/v100/docs/8.4.4"
 	};
 
+	UADataType opcNodeIdType = {
+		name = "opcNodeIdType",
+		nodeId = {nameSpaceIndex = 0, identifier = 17},
+		nodeClass = NodeClass::UADataType,
+		browseName = "NodeId",
+		displayName = "NodeId",
+		description = "",
+		documentation = "https://reference.opcfoundation.org/v105/Core/docs/Part5/12.2.8",
+		literals = {
+		}
+	};
+
 	UAObjectTypeType opcProductionActiveProgramType = {
 		name = "opcProductionActiveProgramType",
 		nodeId = {nameSpaceIndex = 1, identifier = 32},

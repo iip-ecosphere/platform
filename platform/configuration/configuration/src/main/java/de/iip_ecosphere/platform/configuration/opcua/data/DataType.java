@@ -73,17 +73,19 @@ public class DataType extends BaseType {
         builder.append("\t\tbrowseName = \"" + getBrowseName() + "\",\n");
         builder.append("\t\tdisplayName = \"" + getDisplayname() + "\",\n");
         builder.append("\t\tdescription = \"" + getDescription() + "\",\n");
-        builder.append("\t\tdocumentation = \"" + getDocumentation() + "\",\n");
-        builder.append("\t\tliterals = {\n\t\t\t");
-        for (DataLiteral l : literals) {
-            builder.append(l.toString());
-            if (l.equals(literals.get(literals.size() - 1))) {
-                builder.append("\t\t\t}\n");
-            } else {
-                builder.append("\t\t\t}, ");
+        builder.append("\t\tdocumentation = \"" + getDocumentation() + "\"");
+        builder.append(",\n\t\tliterals = {\n");
+        if (!literals.isEmpty()) {
+            builder.append("\t\t\t");
+            for (DataLiteral l : literals) {
+                builder.append(l.toString());
+                if (l.equals(literals.get(literals.size() - 1))) {
+                    builder.append("\t\t\t}\n");
+                } else {
+                    builder.append("\t\t\t}, ");
+                }
             }
         }
-
         builder.append("\t\t}\n");
         builder.append("\t};\n\n");
         return builder.toString();

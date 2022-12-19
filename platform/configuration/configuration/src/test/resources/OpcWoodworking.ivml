@@ -252,7 +252,7 @@ project OpcWoodworking {
 				nodeClass = NodeClass::UAVariable,
 				browseName = "1:Safety",
 				displayName = "Safety",
-				description = "The Safety Variable is true if at least one safety device (light curtain, safety mat, …) has intervened.@en",
+				description = "The Safety Variable is true if at least one safety device (light curtain, safety mat, ï¿½) has intervened.@en",
 				type = refBy(BooleanType),
 				typeDefinition = refBy(opcBaseDataVariableType),
 				optional = true
@@ -971,7 +971,7 @@ project OpcWoodworking {
 				nodeClass = NodeClass::UAVariable,
 				browseName = "1:Safety",
 				displayName = "Safety",
-				description = "The Safety Variable is true if at least one safety device (light curtain, safety mat, …) has intervened.@en",
+				description = "The Safety Variable is true if at least one safety device (light curtain, safety mat, ï¿½) has intervened.@en",
 				type = refBy(BooleanType),
 				typeDefinition = refBy(opcBaseDataVariableType),
 				optional = true
@@ -1699,7 +1699,7 @@ project OpcWoodworking {
 				nodeClass = NodeClass::UAVariable,
 				browseName = "1:Safety",
 				displayName = "Safety",
-				description = "The Safety Variable is true if at least one safety device (light curtain, safety mat, …) has intervened.@en",
+				description = "The Safety Variable is true if at least one safety device (light curtain, safety mat, ï¿½) has intervened.@en",
 				type = refBy(BooleanType),
 				typeDefinition = refBy(opcBaseDataVariableType),
 				optional = true
@@ -2883,6 +2883,16 @@ project OpcWoodworking {
 		type = refBy(opcUnknownDataType)
 	};
 
+	UAObjectTypeType opcMachineIdentificationType = {
+		name = "opcMachineIdentificationType",
+		nodeId = {nameSpaceIndex = 1, identifier = 1012},
+		nodeClass = NodeClass::UAObjectType,
+		browseName = "1:MachineIdentificationType",
+		displayName = "MachineIdentificationType",
+		description = "Contains information about the identification and nameplate of a machine",
+		documentation = "https://reference.opcfoundation.org/v104/Machinery/v101/docs/8.6"
+	};
+
 	UARootObjectType opcWwMachineTypeIdentification = {
 		name = "opcWwMachineTypeIdentification",
 		nodeId = {nameSpaceIndex = 1, identifier = 5007},
@@ -2890,7 +2900,7 @@ project OpcWoodworking {
 		browseName = "2:Identification",
 		displayName = "Identification",
 		description = "The Identification Object provides identification information of the machine.@en",
-		typeDefinition = refBy(opcHasTypeDefinition),
+		typeDefinition = refBy(opcMachineIdentificationType),
 		rootParent = refBy(opcWwMachineType),
 		fields = {
 			UAVariableType {
@@ -3075,7 +3085,7 @@ Southern latitudes have a negative value, western longitudes as well. For exampl
 				browseName = "2:UIElement",
 				displayName = "UIElement",
 				description = "A user interface element assigned to this group.@",
-				type = refBy(opcType),
+				type = refBy(opcUnknownDataType),
 				typeDefinition = refBy(opcUIElementType),
 				optional = true
 			}, UAVariableType {
@@ -3407,7 +3417,7 @@ Southern latitudes have a negative value, western longitudes as well. For exampl
 				nodeClass = NodeClass::UAVariable,
 				browseName = "1:Safety",
 				displayName = "Safety",
-				description = "The Safety Variable is true if at least one safety device (light curtain, safety mat, …) has intervened.@en",
+				description = "The Safety Variable is true if at least one safety device (light curtain, safety mat, ï¿½) has intervened.@en",
 				type = refBy(BooleanType),
 				typeDefinition = refBy(opcBaseDataVariableType),
 				optional = true
@@ -4134,7 +4144,7 @@ Southern latitudes have a negative value, western longitudes as well. For exampl
 				nodeClass = NodeClass::UAVariable,
 				browseName = "1:Safety",
 				displayName = "Safety",
-				description = "The Safety Variable is true if at least one safety device (light curtain, safety mat, …) has intervened.@en",
+				description = "The Safety Variable is true if at least one safety device (light curtain, safety mat, ï¿½) has intervened.@en",
 				type = refBy(BooleanType),
 				typeDefinition = refBy(opcBaseDataVariableType),
 				optional = true
@@ -4785,8 +4795,8 @@ Southern latitudes have a negative value, western longitudes as well. For exampl
 		}
 	};
 
-	UADataType opcWwMessageArgumentDataType = {
-		name = "opcWwMessageArgumentDataType",
+	UADataType opcWwMessageArgumentDataTypeType = {
+		name = "opcWwMessageArgumentDataTypeType",
 		nodeId = {nameSpaceIndex = 1, identifier = 3003},
 		nodeClass = NodeClass::UADataType,
 		browseName = "1:WwMessageArgumentDataType",
@@ -4802,8 +4812,8 @@ Southern latitudes have a negative value, western longitudes as well. For exampl
 		}
 	};
 
-	UADataType opcWwMessageArgumentValueDataType = {
-		name = "opcWwMessageArgumentValueDataType",
+	UADataType opcWwMessageArgumentValueDataTypeType = {
+		name = "opcWwMessageArgumentValueDataTypeType",
 		nodeId = {nameSpaceIndex = 1, identifier = 3002},
 		nodeClass = NodeClass::UADataType,
 		browseName = "1:WwMessageArgumentValueDataType",

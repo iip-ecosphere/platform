@@ -126,6 +126,7 @@ public abstract class BaseType {
      */
     public static String validateVarName(String varName) {
         varName = varName.replaceAll("[^A-Za-z0-9]", "");
+        varName = varName.replace("_", "");
         return varName;
     }
 
