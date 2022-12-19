@@ -24,7 +24,7 @@ COPY mgtUi.sh mgtUi.sh
 # CLI
 COPY cli.sh cli.sh
 COPY deployment_plan.yaml artifacts/deployment_plan.yaml
-COPY SimpleMeshTestingApp/target/SimpleMeshTestingApp-0.1.0-SNAPSHOT-bin.jar SimpleMeshTestingApp-0.1.0-SNAPSHOT-bin.jar
+COPY SimpleMeshInstallTestingApp/target/SimpleMeshInstallTestingApp-0.1.0-SNAPSHOT-bin.jar SimpleMeshInstallTestingApp-0.1.0-SNAPSHOT-bin.jar
 
 # Script starts all platform components
 COPY starter.sh /root/Desktop/starter.sh
