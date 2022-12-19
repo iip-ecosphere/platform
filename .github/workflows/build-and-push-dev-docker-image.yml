@@ -45,10 +45,10 @@ jobs:
       - name: Instantiate the platform, prepare container building
         run: |
           cd ./platform/tools/Install
-          sed -i 's/String platformServer = "147.172.178.145";/String platformServer = "172.19.0.22";\nartifactsFolder="\/root\/\/platform\/artifacts";/g' src/main/easy/InstallTest.ivml
+          sed -i 's/String platformServer = "147.172.178.145";/String platformServer = "172.19.0.22";\nartifactsFolder="\/root\/\/platform\/artifacts";/g' src/main/easy/TechnicalSetup.ivml
           echo "Using configuration:"
-          cat src/main/easy/InstallTest.ivml
-          mvn --batch-mode --update-snapshots exec:java -Dexec.args="InstallTest src/main/easy gen"
+          cat src/main/easy/TechnicalSetup.ivml
+          mvn install
           cp -r container/DevContainer/* gen
           cp ../../configuration/configuration/gen/tests/SimpleMesh/SimpleMeshTestingApp/target/SimpleMeshTestingApp-0.1.0-SNAPSHOT-bin.jar gen
           echo "Base directory for container creation:"
