@@ -21,7 +21,7 @@ template Basics(Configuration config, FileArtifact target) {
 	def String substNonIdCharacters(String s) {
 	    // don't replace $ or "." here -> Java
 	    String tmp = s.replace("<", "Lt").replace(">", "Rt");
-	    tmp.toIdentifier();
+	    tmp.toIdentifier("id");
 	}
 
     /**
