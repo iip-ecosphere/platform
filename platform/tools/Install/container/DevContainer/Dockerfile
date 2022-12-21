@@ -25,17 +25,19 @@ COPY mgtUi.sh mgtUi.sh
 COPY cli.sh cli.sh
 COPY deployment_plan.yaml artifacts/deployment_plan.yaml
 COPY SimpleMeshInstallTestingApp/target/SimpleMeshInstallTestingApp-0.1.0-SNAPSHOT-bin.jar SimpleMeshInstallTestingApp-0.1.0-SNAPSHOT-bin.jar
-
-# Script starts all platform components
-COPY starter.sh /root/Desktop/starter.sh
-RUN chmod 777 /root/Desktop/starter.sh
-COPY starter.sh starter.sh
-RUN chmod 777 starter.sh
+# Starter scripts
+COPY brokerPl_starter.sh brokerPl_starter.sh
+COPY ecs_starter.sh ecs_starter.sh
+COPY serviceMgr_starter.sh serviceMgr_starter.sh
+COPY monitoring_starter.sh monitoring_starter.sh
+COPY ui_starter.sh ui_starter.sh
+RUN chmod 777 *   
 
 # ------ Eclipse ----------------------------------------------------------------------
 COPY eclipse/ /opt/eclipse
 COPY PyDev10.0.1 /opt/eclipse/dropins/PyDev10.0.1
 COPY EASyProducer /opt/eclipse/dropins/EASyProducer
+COPY impl.model /root/Desktop/eclipse-workspace/impl.model 
 
 # ------ installing dependencies ------------------------------------------------------
 RUN wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
