@@ -38,7 +38,7 @@ public class IvmlContainerLxcTests extends IvmlTests {
     public void testContainerTest() throws ExecutionException, IOException {
         File gen = new File("gen/tests/ContainerCreationLxc");
         PlatformInstantiator.instantiate(
-            genApps(new TestConfigurer("ContainerCreationLcx", new File("src/test/easy"), gen)));
+            genApps(new TestConfigurer("ContainerCreationLxc", new File("src/test/easy"), gen)));
         assertAllFiles(gen);
         assertTemplateZip(gen, "impl.SimpleMeshTestingContainerApp");
     }
