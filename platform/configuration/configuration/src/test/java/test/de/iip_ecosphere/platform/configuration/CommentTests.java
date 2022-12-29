@@ -69,8 +69,10 @@ public class CommentTests {
     public void testComments() {
         SortedSet<String> missing = new TreeSet<>();
         ConfigurationSetup setup = ConfigurationSetup.getSetup();
+        EasySetup easySetup = setup.getEasyProducer();
+        easySetup.reset();
         InstantiationConfigurer configurer = new NonCleaningInstantiationConfigurer(EasySetup.PLATFORM_META_MODEL_NAME, 
-            setup.getEasyProducer().getIvmlMetaModelFolder(), new File("gen"));
+            easySetup.getIvmlMetaModelFolder(), new File("gen"));
         configurer.configure(setup);
         ConfigurationLifecycleDescriptor lcd = configurer.obtainLifecycleDescriptor();
         lcd.startup(new String[0]); // shall register executor

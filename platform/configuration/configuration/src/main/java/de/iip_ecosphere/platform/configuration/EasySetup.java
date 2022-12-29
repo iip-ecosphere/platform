@@ -43,6 +43,7 @@ public class EasySetup {
             ivmlMetaModelFolder = new File("src/main/easy");
         }
         ivmlConfigFolder = null;
+        additionalIvmlFolders = null;
         ivmlModelName = PLATFORM_META_MODEL_NAME;
     }
     
