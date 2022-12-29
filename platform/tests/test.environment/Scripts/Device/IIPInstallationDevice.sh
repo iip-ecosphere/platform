@@ -11,10 +11,6 @@ else
     cd Install
 fi
 
-cd platformDependencies
-echo $1 | sudo -S mvn install -U
-cd ..
-
-echo $1 | sudo -S mvn package -U
+echo $1 | sudo -S mvn install
 
 sudo chown -R $3 ../Install

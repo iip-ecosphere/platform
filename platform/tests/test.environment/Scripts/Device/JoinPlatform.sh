@@ -12,7 +12,7 @@ fi
 
 cd broker
 
-setsid ./broker.sh &> broker.log &
+setsid ./broker.sh 8888 &> broker.log &
 
 if [[ $(cat broker.sh | grep amqp) ]]; then
     brokerReady=$(cat broker.log | grep "Qpid Broker Ready")
