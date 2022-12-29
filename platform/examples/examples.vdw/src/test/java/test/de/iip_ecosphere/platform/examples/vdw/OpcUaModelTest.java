@@ -27,7 +27,7 @@ import de.iip_ecosphere.platform.configuration.PlatformInstantiator.Instantiatio
 import de.iip_ecosphere.platform.examples.vdw.GeneratedConnector;
 import net.ssehub.easy.reasoning.core.reasoner.ReasoningResult;
 import net.ssehub.easy.varModel.confModel.Configuration;
-import test.de.iip_ecosphere.platform.configuration.IvmlTests;
+import test.de.iip_ecosphere.platform.configuration.AbstractIvmlTests;
 
 /**
  * OPC UA test with generated platform/connector.
@@ -102,7 +102,7 @@ public class OpcUaModelTest {
     public void testVdw() throws ExecutionException, IOException {
         File gen = new File("gen/vdw");
         PlatformInstantiator.instantiate(
-            IvmlTests.genApps(new TestConfigurer("VDW", new File("src/test/easy"), gen)));
+            AbstractIvmlTests.genApps(new TestConfigurer("VDW", new File("src/test/easy"), gen)));
     }
     
     /**
