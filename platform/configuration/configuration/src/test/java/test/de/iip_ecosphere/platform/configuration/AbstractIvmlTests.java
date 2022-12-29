@@ -22,7 +22,7 @@ import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
-import org.apache.qpid.server.util.FileUtils;
+import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 
 import de.iip_ecosphere.platform.configuration.ConfigurationLifecycleDescriptor;
@@ -43,7 +43,7 @@ import static test.de.iip_ecosphere.platform.services.environment.PythonEnvironm
  * 
  * @author Holger Eichelberger, SSE
  */
-public abstract class IvmlTests {
+public abstract class AbstractIvmlTests {
     
     private static final Set<String> ASSERT_FILE_EXTENSIONS = new HashSet<>();
     private static final Set<String> ASSERT_FILE_NAME_EXCLUSIONS = new HashSet<>();
@@ -89,6 +89,8 @@ public abstract class IvmlTests {
      */
     protected static class TestConfigurer extends InstantiationConfigurer {
 
+        private File ivmlMetaModelFolder = null; // use the default in EasySetup
+        
         /**
          * Creates a configurer instance.
          * 
@@ -98,6 +100,24 @@ public abstract class IvmlTests {
          */
         public TestConfigurer(String ivmlModelName, File modelFolder, File outputFolder) {
             super(ivmlModelName, modelFolder, outputFolder);
+            final String srcName = "./src/main/easy";
+            final String srcCfgName = (srcName + "/cfg/").replace('/', File.separatorChar);
+            File src = new File(srcName);
+            File tgt = new File("./target/ivml");
+            try {
+                FileUtils.deleteDirectory(tgt);
+                tgt.mkdirs();
+                // copy IVML metamodel and omit the managed configuration template
+                FileUtils.copyDirectory(src, tgt, f -> !f.toString().startsWith(srcCfgName), true); 
+                ivmlMetaModelFolder = tgt;
+            } catch (IOException e) {
+                Assert.fail("Cannot copy IVML meta model from " + src + " to " + tgt);
+            }
+        }
+
+        @Override
+        protected File getIvmlMetaModelFolder() {
+            return ivmlMetaModelFolder;
         }
 
         /**
@@ -362,7 +382,12 @@ public abstract class IvmlTests {
                         extension = name.substring(pos);
                     }
                     if (ASSERT_FILE_EXTENSIONS.contains(extension) && !ASSERT_FILE_NAME_EXCLUSIONS.contains(name)) {
-                        Assert.assertTrue("File " + f + " is empty", FileUtils.readFileAsString(f).trim().length() > 0);
+                        try {
+                            Assert.assertTrue("File " + f + " is empty", 
+                                FileUtils.readFileToString(f, Charset.defaultCharset()).trim().length() > 0);
+                        } catch (IOException e) {
+                            Assert.fail("Cannot read " + f + ": " + e.getMessage());
+                        }
                     }
                 }
             }
@@ -379,7 +404,7 @@ public abstract class IvmlTests {
      */
     protected static void assertFileContains(File base, String name, String... search) throws IOException {
         File f = assertFile(base, name);
-        String contents = org.apache.commons.io.FileUtils.readFileToString(f, Charset.defaultCharset());
+        String contents = FileUtils.readFileToString(f, Charset.defaultCharset());
         for (String s : search) {
             Assert.assertTrue("File " + f + " must contain '" + s + "'", contents.contains(s));
         }

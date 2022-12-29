@@ -25,7 +25,7 @@ import de.iip_ecosphere.platform.configuration.PlatformInstantiator;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class IvmlKodexMeshTests extends IvmlTests {
+public class IvmlKodexMeshTests extends AbstractIvmlTests {
     
     /**
      * Tests loading, reasoning and instantiating "KodexMesh", a simple, generated service chain for testing the 

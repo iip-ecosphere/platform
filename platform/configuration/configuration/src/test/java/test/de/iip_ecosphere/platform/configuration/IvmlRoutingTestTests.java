@@ -25,7 +25,7 @@ import de.iip_ecosphere.platform.configuration.PlatformInstantiator;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class IvmlRoutingTestTests extends IvmlTests {
+public class IvmlRoutingTestTests extends AbstractIvmlTests {
 
     /**
      * Tests loading, reasoning and instantiating "RoutingTest" aiming at various routing issues.

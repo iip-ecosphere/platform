@@ -25,7 +25,7 @@ import de.iip_ecosphere.platform.configuration.PlatformInstantiator;
  * 
  * @author Monika Staciwa, SSE
  */
-public class IvmlContainerTests extends IvmlTests {
+public class IvmlContainerTests extends AbstractIvmlTests {
        
     /**
      * Tests loading, reasoning and instantiating "ContainerTest", a simple, generated service chain for testing 

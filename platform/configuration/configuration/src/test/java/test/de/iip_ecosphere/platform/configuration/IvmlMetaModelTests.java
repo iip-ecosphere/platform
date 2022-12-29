@@ -25,7 +25,7 @@ import net.ssehub.easy.reasoning.core.reasoner.ReasoningResult;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class IvmlMetaModelTests extends IvmlTests {
+public class IvmlMetaModelTests extends AbstractIvmlTests {
 
     /**
      * Tests loading the meta model.

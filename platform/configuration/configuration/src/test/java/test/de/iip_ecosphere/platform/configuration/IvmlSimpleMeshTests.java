@@ -25,7 +25,7 @@ import de.iip_ecosphere.platform.configuration.PlatformInstantiator;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class IvmlSimpleMeshTests extends IvmlTests {
+public class IvmlSimpleMeshTests extends AbstractIvmlTests {
 
     /**
      * Tests loading, reasoning and instantiating "SimpleMesh", a simple, generated service chain for testing. Here, we 
