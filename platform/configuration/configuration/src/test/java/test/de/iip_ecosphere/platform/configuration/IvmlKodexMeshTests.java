@@ -39,7 +39,8 @@ public class IvmlKodexMeshTests extends AbstractIvmlTests {
     @Test
     public void testKodexMesh() throws ExecutionException, IOException {
         File gen = new File("gen/tests/KodexMesh");
-        PlatformInstantiator.instantiate(genApps(new TestConfigurer("KodexMesh", new File("src/test/easy"), gen)));
+        PlatformInstantiator.instantiate(
+            genApps(new TestConfigurer("KodexMesh", new File("src/test/easy/single"), gen)));
 
         File base = new File(gen, "ApplicationInterfaces");
         File srcMain = new File(base, "src/main");

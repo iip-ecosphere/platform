@@ -16,7 +16,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.Set;
@@ -28,6 +30,7 @@ import org.junit.Assert;
 import de.iip_ecosphere.platform.configuration.ConfigurationLifecycleDescriptor;
 import de.iip_ecosphere.platform.configuration.ConfigurationSetup;
 import de.iip_ecosphere.platform.configuration.EasyLogLevel;
+import de.iip_ecosphere.platform.configuration.EasySetup;
 import de.iip_ecosphere.platform.configuration.PlatformInstantiator.InstantiationConfigurer;
 import de.iip_ecosphere.platform.services.environment.YamlArtifact;
 import de.iip_ecosphere.platform.support.JarUtils;
@@ -90,9 +93,13 @@ public abstract class AbstractIvmlTests {
     protected static class TestConfigurer extends InstantiationConfigurer {
 
         private File ivmlMetaModelFolder = null; // use the default in EasySetup
+        private List<File> additionalIvmlFolders = null;
         
         /**
-         * Creates a configurer instance.
+         * Creates a configurer instance. Copies the IVML configuration meta model to {@code target/ivml}
+         * and filters out the configuration templates. Uses that folder to load the model from. If the parent of 
+         * {@code modelFolder} contains a folder named {@code common} (reusable, shared parts of tests), that 
+         * folder is added as additional IVML folder to EASy setup and considered while loading the IVML meta model.
          * 
          * @param ivmlModelName the name of the IVML model representing the topmost platform configuration
          * @param modelFolder the folder where the model is located (ignored if <b>null</b>)
@@ -113,11 +120,11 @@ public abstract class AbstractIvmlTests {
             } catch (IOException e) {
                 Assert.fail("Cannot copy IVML meta model from " + src + " to " + tgt);
             }
-        }
-
-        @Override
-        protected File getIvmlMetaModelFolder() {
-            return ivmlMetaModelFolder;
+            File commonIvml = new File(modelFolder.getParentFile(), "common");
+            if (commonIvml.exists()) {
+                additionalIvmlFolders = new ArrayList<>();
+                additionalIvmlFolders.add(commonIvml);
+            }
         }
 
         /**
@@ -146,8 +153,15 @@ public abstract class AbstractIvmlTests {
 
         @Override
         public void configure(ConfigurationSetup setup) {
+            EasySetup easySetup = setup.getEasyProducer();
+            if (null != ivmlMetaModelFolder) {
+                easySetup.setIvmlMetaModelFolder(ivmlMetaModelFolder);
+            }
+            if (null != additionalIvmlFolders) {
+                easySetup.setAdditionalIvmlFolders(additionalIvmlFolders);
+            }
             super.configure(setup);
-            setup.getEasyProducer().setLogLevel(EasyLogLevel.VERBOSE); // override for debugging
+            easySetup.setLogLevel(EasyLogLevel.VERBOSE); // override for debugging
         }
 
     }

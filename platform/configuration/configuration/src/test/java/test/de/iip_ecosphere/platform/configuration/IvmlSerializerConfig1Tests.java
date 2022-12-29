@@ -40,7 +40,8 @@ public class IvmlSerializerConfig1Tests extends IvmlSerializerConfigTests {
     public void testSerializerConfig1() throws ExecutionException, IOException {
         assumeFalse(Boolean.valueOf(System.getProperty("iip.build.initial", "false")));
         File gen = new File("gen/tests/SerializerConfig1");
-        PlatformInstantiator.instantiate(new TestConfigurer("SerializerConfig1", new File("src/test/easy"), gen));
+        PlatformInstantiator.instantiate(
+            new TestConfigurer("SerializerConfig1", new File("src/test/easy/single"), gen));
 
         assertAppInterfaces(new File(gen, "ApplicationInterfaces"), false);
         assertApplication(new File(gen, "MyAppExample"), true);

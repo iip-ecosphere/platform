@@ -105,7 +105,8 @@ public class AasIvmlMapperTest {
         org.apache.commons.io.FileUtils.copyDirectory(origIvmlMeta, new File(ivmlFolder, "meta"));
         org.apache.commons.io.FileUtils.copyDirectory(origIvmlConfig == null ? origBase : origIvmlConfig, 
             ivmlFolder, f -> f.getName().endsWith(".ivml") || f.getName().endsWith(".text"));
-        copy("src/test/easy/", "SimpleMesh.ivml", "CommonSetup.ivml", "CommonSetupNoMonUi.ivml");
+        copy("src/test/easy/simpleMesh", "SimpleMesh.ivml");
+        copy("src/test/easy/common", "CommonSetup.ivml", "CommonSetupNoMonUi.ivml");
         copy("src/main/easy/cfg", "PlatformConfiguration.ivml", "TechnicalSetup.ivml", "AllTypes.ivml", 
             "AllServices.ivml");
     }

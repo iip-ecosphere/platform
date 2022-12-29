@@ -38,7 +38,8 @@ public class IvmlSimpleMesh3Tests extends AbstractIvmlTests {
     @Test
     public void testSimpleMesh3() throws ExecutionException, IOException {
         File gen = new File("gen/tests/SimpleMesh3");
-        PlatformInstantiator.instantiate(genApps(new TestConfigurer("SimpleMesh3", new File("src/test/easy"), gen)));
+        PlatformInstantiator.instantiate(
+            genApps(new TestConfigurer("SimpleMesh3", new File("src/test/easy/simpleMesh3"), gen)));
         assertAllFiles(gen);
         assertTemplateZip(gen, "impl.SimpleMeshTestingApp3");
     }

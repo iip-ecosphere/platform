@@ -37,7 +37,7 @@ public class IvmlRoutingTestTests extends AbstractIvmlTests {
     public void testRoutingTest() throws ExecutionException, IOException {
         File gen = new File("gen/tests/RoutingTest");
         PlatformInstantiator.instantiate(
-            genApps(new TestConfigurer("RoutingTest", new File("src/test/easy"), gen)));
+            genApps(new TestConfigurer("RoutingTest", new File("src/test/easy/routingTest"), gen)));
         assertAllFiles(gen);
         assertTemplateZip(gen, "impl.RoutingTestApp");
     }

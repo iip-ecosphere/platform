@@ -13,6 +13,7 @@
 package de.iip_ecosphere.platform.configuration;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * Settings for EASy-Producer.
@@ -27,6 +28,7 @@ public class EasySetup {
     private File genTarget;
     private File ivmlMetaModelFolder; 
     private File ivmlConfigFolder;
+    private List<File> additionalIvmlFolders;
     private String ivmlModelName;
     private EasyLogLevel logLevel = EasyLogLevel.NORMAL;
     
@@ -157,6 +159,28 @@ public class EasySetup {
      */
     public void setLogLevel(EasyLogLevel logLevel) {
         this.logLevel = logLevel;
+    }
+    
+    /**
+     * Returns additional IVML folders to be considered when loading the configuration model. Usually, additional IVML
+     * folders are only used in very specialized (test) setups, e.g., to reuse a part of the model while the remainder 
+     * of the (managed) configuration is for separation purposes in a different folder on the same level.
+     * 
+     * @return the additional IVML folders, may be <b>null</b> for undefined
+     */
+    public List<File> getAdditionalIvmlFolders() {
+        return additionalIvmlFolders;
+    }
+    
+    /**
+     * Returns additional IVML folders to be considered when loading the configuration model. Usually, additional IVML
+     * folders are only used in very specialized (test) setups, e.g., to reuse a part of the model while the remainder 
+     * of the (managed) configuration is for separation purposes in a different folder on the same level.
+     * 
+     * @param additionalIvmlFolders the additional IVML folders (may be <b>null</b> for none, or empty)
+     */
+    public void setAdditionalIvmlFolders(List<File> additionalIvmlFolders) {
+        this.additionalIvmlFolders = additionalIvmlFolders;
     }
 
 }

@@ -86,10 +86,6 @@ public class PlatformInstantiator {
          */
         public void configure(ConfigurationSetup setup) {
             EasySetup easySetup = setup.getEasyProducer();
-            File mmf = getIvmlMetaModelFolder();
-            if (null != mmf) {
-                easySetup.setIvmlMetaModelFolder(mmf);
-            }
             easySetup.setIvmlModelName(ivmlModelName);
             if (null != modelFolder) {
                 easySetup.setIvmlConfigFolder(modelFolder);
@@ -99,15 +95,6 @@ public class PlatformInstantiator {
                 outputFolder.mkdirs();
             }
             easySetup.setGenTarget(outputFolder);    
-        }
-        
-        /**
-         * Returns the actual IVML meta model folder to be used.
-         * 
-         * @return the meta model folder or <b>null</b> to use the default from {@code EasySetup}
-         */
-        protected File getIvmlMetaModelFolder() {
-            return null;
         }
         
         /**

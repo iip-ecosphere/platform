@@ -39,7 +39,7 @@ public class IvmlSerializerConfig1OldTests extends IvmlSerializerConfigTests {
     public void testSerializerConfig1Old() throws ExecutionException, IOException {
         File gen = new File("gen/tests/SerializerConfig1old");
         PlatformInstantiator.instantiate(
-            genApps(new TestConfigurer("SerializerConfig1Old", new File("src/test/easy"), gen)));
+            genApps(new TestConfigurer("SerializerConfig1Old", new File("src/test/easy/single"), gen)));
         
         File base = new File(gen, "MyAppExampleOld");
         assertAppInterfaces(base, true); // old style

@@ -152,6 +152,11 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
             if (null != ivmlCfg && !ivmlCfg.equals(easySetup.getIvmlMetaModelFolder())) {
                 exec.prependIvmlFolder(ivmlCfg);
             }
+            if (null != easySetup.getAdditionalIvmlFolders()) {
+                for (File f : easySetup.getAdditionalIvmlFolders()) {
+                    exec.addIvmlFolder(f);
+                }
+            }
             try {
                 exec.setupLocations();
                 ConfigurationManager.setExecutor(exec);
