@@ -1,0 +1,81 @@
+project ServiceMeshPartRoutingTestAppMyMesh {
+
+    import AllServices;
+
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+
+    ServiceMesh myMesh = {
+        description = "routing test mesh",
+        sources = {refBy(mySource), refBy(myConn)}
+    };
+    
+    MeshSource mySource = {
+        pollInterval = 800, // only if source is synchronous
+        impl = refBy(mySourceService),
+        next = {refBy(myConnMySourceMyProcessor)}
+    };
+
+    MeshConnector myConnMySourceMyProcessor = {
+        name = "Source->Processor",
+        next = refBy(myProcessor)
+    };
+    
+    MeshSource myConn = {
+        impl = refBy(myConnector),
+        next = {refBy(myConnMyConnMyProcessor)}
+    };
+    
+    MeshConnector myConnMyConnMyProcessor = {
+        name = "Conn->Processor",
+        next = refBy(myProcessor)
+    };
+
+    MeshProcessor myProcessor = {
+        impl = refBy(myProcessorService),
+        next = {refBy(myConnMyProcessorMyParallelProc1), refBy(myConnMyProcessorMyParallelProc2), refBy(myConnMyProcessorMyParallelProc3)}
+    };
+    
+    MeshConnector myConnMyProcessorMyParallelProc1 = {
+        name = "Processor->ParallelProc1",
+        next = refBy(myProcessorP1)
+    };
+
+    MeshConnector myConnMyProcessorMyParallelProc2 = {
+        name = "Processor->ParallelProc2",
+        next = refBy(myProcessorP2)
+    };
+
+    MeshConnector myConnMyProcessorMyParallelProc3 = {
+        name = "Processor->ParallelProc3",
+        next = refBy(myProcessorP3)
+    };
+
+    MeshProcessor myProcessorP1 = {
+        impl = refBy(myProcessorP1Service),
+        next = {refBy(myConnMyProcessorMySink)}
+    };
+
+    MeshProcessor myProcessorP2 = {
+        impl = refBy(myProcessorP2Service),
+        next = {refBy(myConnMyProcessorMySink)}
+    };
+    
+    MeshProcessor myProcessorP3 = {
+        impl = refBy(myProcessorP3Service),
+        next = {refBy(myConnMyProcessorMySink)}
+    };
+
+    MeshConnector myConnMyProcessorMySink = {
+        name = "ProcessorP1/P2/P3->Sink",
+        next = refBy(mySink)
+    };
+
+    MeshSink mySink = {
+        impl = refBy(mySinkService)
+    };
+
+    freeze {
+        .;
+    }
+
+}

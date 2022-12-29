@@ -20,7 +20,7 @@ import java.io.IOException;
  * 
  * @author Holger Eichelberger, SSE
  */
-public abstract class IvmlSerializerConfigTests extends AbstractIvmlTests {
+public abstract class AbstractIvmlSerializerConfigTests extends AbstractIvmlTests {
     
     /**
      * Asserts file and contents of the application part.

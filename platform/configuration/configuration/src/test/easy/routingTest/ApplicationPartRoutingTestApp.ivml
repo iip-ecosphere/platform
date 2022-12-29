@@ -1,0 +1,19 @@
+project ApplicationPartRoutingTestApp {
+
+    import ServiceMeshPartRoutingTestApp*;
+
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+
+    Application myApp = {
+        id = "RoutingTestApp",
+        name = "Routing Test App",
+        ver = "0.1.0",
+        description = "",
+        services = {refBy(myMesh)}        
+    };
+    
+    freeze {
+        .;
+    }
+
+}

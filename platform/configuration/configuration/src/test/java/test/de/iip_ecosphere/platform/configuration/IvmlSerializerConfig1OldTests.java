@@ -25,7 +25,7 @@ import de.iip_ecosphere.platform.configuration.PlatformInstantiator;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class IvmlSerializerConfig1OldTests extends IvmlSerializerConfigTests {
+public class IvmlSerializerConfig1OldTests extends AbstractIvmlSerializerConfigTests {
     
     /**
      * Tests loading, reasoning and instantiating "SerializerConfig1Old" (legacy name, originally only for serializer) 
