@@ -29,7 +29,7 @@ project CommonSetup {
     
     transportProtocol = TransportProtocolAMQP {
         port = 8883,
-        security = { // -> identityStore.yml in src/test/ or src/main depeding on use
+        security = { // -> identityStore.yml in src/test/ or src/main depending on use
             authenticationKey = "amqp"
         }
     };

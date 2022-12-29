@@ -20,18 +20,22 @@ project Transport {
     	Port localPort = port; // by default, we run the local brokers on the same port, but this may be overridden
     	Port localEcsPort = 8889; // the local broker port for ECS containers  
         SecuritySettings security = null;
+        String brokerVer = ""; // Maven version of the (instantiated default) broker to use
     };
     
     compound TransportProtocolAMQP refines TransportProtocol {
     	ProtocolType type = ProtocolType::Amqp;
+    	IipVersion brokerVer = "8.0.2"; // of Apache QPID-J, still on JDK 8 to keep JDK 8 test process, use 9.0.0 for bug fixes and JDK 11
     };
     
     compound TransportProtocolMQTTv3 refines TransportProtocol {
     	ProtocolType type = ProtocolType::Mqttv3;
+        String brokerVer = "2020.4"; // of hivemq
     };
     
     compound TransportProtocolMQTTv5 refines TransportProtocol {
     	ProtocolType type = ProtocolType::Mqttv5;
+        String brokerVer = "2020.4"; // of hivemq
     };    
     
     TransportProtocol transportProtocol = TransportProtocolAMQP {

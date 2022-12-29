@@ -772,7 +772,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     }
     
     generateBrokerScripts(Configuration config, TransportProtocolAMQP protocol) = {
-        vilTemplateProcessor("AmqpPom", config, "${brokerRoot}/pom.xml");
+        vilTemplateProcessor("AmqpPom", config, "${brokerRoot}/pom.xml", ver=protocol.brokerVer);
         vilTemplateProcessor("AmqpLinuxSysd", config, "${brokerRoot}/iip-broker.service");
         vilTemplateProcessor("AmqpLinux", config, "${brokerRoot}/broker.sh");
         FileArtifact f = "${brokerRoot}/broker.sh";
@@ -785,15 +785,15 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     }
 
     generateBrokerScripts(Configuration config, TransportProtocolMQTTv3 protocol) = {
-        generateBrokerScriptsHiveMq(config);
+        generateBrokerScriptsHiveMq(config, protocol.brokerVer);
     }
 
     generateBrokerScripts(Configuration config, TransportProtocolMQTTv5 protocol) = {
-        generateBrokerScriptsHiveMq(config);
+        generateBrokerScriptsHiveMq(config, protocol.brokerVer);
     }
     
-    generateBrokerScriptsHiveMq(Configuration config) = {
-        vilTemplateProcessor("MqttPom", config, "${brokerRoot}/pom.xml");
+    generateBrokerScriptsHiveMq(Configuration config, String brokerVer) = {
+        vilTemplateProcessor("MqttPom", config, "${brokerRoot}/pom.xml", ver=brokerVer);
         vilTemplateProcessor("MqttLinuxSysd", config, "${brokerRoot}/iip-broker.service");
         vilTemplateProcessor("MqttLinux", config, "${brokerRoot}/broker.sh");
         FileArtifact f = "${brokerRoot}/broker.sh";

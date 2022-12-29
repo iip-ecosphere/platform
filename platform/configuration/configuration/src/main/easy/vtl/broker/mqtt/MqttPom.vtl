@@ -1,8 +1,8 @@
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template MqttPom(IIPEcosphere config, FileArtifact target) {
+template MqttPom(IIPEcosphere config, FileArtifact target, String ver) {
 	
-    def main(IIPEcosphere config, FileArtifact target) {
+    def main(IIPEcosphere config, FileArtifact target, String ver) {
     '<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
         <modelVersion>4.0.0</modelVersion>
         <artifactId>InstallBroker</artifactId>
@@ -25,7 +25,7 @@ template MqttPom(IIPEcosphere config, FileArtifact target) {
           <dependency>
             <groupId>com.hivemq</groupId>
             <artifactId>hivemq-community-edition-embedded</artifactId>
-            <version>2020.4</version>
+            <version>${ver}</version>
           </dependency>
         </dependencies>
       
