@@ -146,6 +146,7 @@ public class ConfigurationManager {
         if (null != executor) {
             try {
                 executor.discardLocations();
+                executor.clearModels();
                 executor.setupLocations();
                 executor.loadIvmlModel();
             } catch (ModelManagementException e) {

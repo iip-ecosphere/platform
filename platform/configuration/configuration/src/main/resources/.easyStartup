@@ -7,3 +7,4 @@ DS:net.ssehub.easy.instantiation.java.Registration
 DS:net.ssehub.easy.instantiation.ant.Registration
 DS:net.ssehub.easy.instantiation.maven.Registration
 DS:net.ssehub.easy.instantiation.docker.Registration
+DS:net.ssehub.easy.instantiation.lxc.Registration

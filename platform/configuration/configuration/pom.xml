@@ -95,6 +95,10 @@
         <groupId>net.ssehub.easy.instantiation</groupId>
         <artifactId>docker</artifactId>
     </dependency>
+    <dependency>
+        <groupId>net.ssehub.easy.instantiation</groupId>
+        <artifactId>lxc</artifactId>
+    </dependency>
   
     <dependency>
       <groupId>com.googlecode.json-simple</groupId>

@@ -1,0 +1,23 @@
+project AllTypesPartSimpleMesh3 {
+
+    import IIPEcosphere; 
+    
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+
+    RecordType rec1 = {
+        name = "Rec13",
+        fields = {
+            Field {
+                name = "intField",
+                type = refBy(IntegerType)
+            }, Field {
+                name = "stringField",
+                type = refBy(StringType)
+            }
+        }
+    };
+
+    freeze {
+        .;
+    }
+}

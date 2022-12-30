@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -39,6 +40,7 @@ import de.iip_ecosphere.platform.configuration.ivml.DefaultEdge;
 import de.iip_ecosphere.platform.configuration.ivml.DefaultGraph;
 import de.iip_ecosphere.platform.configuration.ivml.DefaultNode;
 import de.iip_ecosphere.platform.configuration.ivml.GraphFormat;
+import de.iip_ecosphere.platform.configuration.ivml.IvmlGraphMapper;
 import de.iip_ecosphere.platform.configuration.ivml.IvmlGraphMapper.IvmlGraph;
 import de.iip_ecosphere.platform.configuration.ivml.IvmlGraphMapper.IvmlGraphEdge;
 import de.iip_ecosphere.platform.configuration.ivml.IvmlGraphMapper.IvmlGraphNode;
@@ -53,9 +55,13 @@ import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper;
+import net.ssehub.easy.basics.modelManagement.ModelManagementException;
 import net.ssehub.easy.instantiation.core.model.vilTypes.configuration.Configuration;
 import net.ssehub.easy.reasoning.core.reasoner.ReasoningResult;
 import net.ssehub.easy.varModel.confModel.IDecisionVariable;
+import net.ssehub.easy.varModel.model.ModelQuery;
+import net.ssehub.easy.varModel.model.Project;
+import net.ssehub.easy.varModel.model.ProjectImport;
 
 /**
  * Tests {@link AasIvmlMapper}.
@@ -102,13 +108,14 @@ public class AasIvmlMapperTest {
             org.apache.commons.io.FileUtils.deleteDirectory(ivmlFolder);
         }
         ivmlFolder = FileUtils.createTmpFolder("config.config");
-        org.apache.commons.io.FileUtils.copyDirectory(origIvmlMeta, new File(ivmlFolder, "meta"));
+        
+        String srcCfg = (origIvmlMeta.toString() + "/cfg/").replace('/', File.separatorChar);
+        org.apache.commons.io.FileUtils.copyDirectory(origIvmlMeta, new File(ivmlFolder, "meta"), 
+            f -> !f.toString().startsWith(srcCfg));
         org.apache.commons.io.FileUtils.copyDirectory(origIvmlConfig == null ? origBase : origIvmlConfig, 
             ivmlFolder, f -> f.getName().endsWith(".ivml") || f.getName().endsWith(".text"));
-        copy("src/test/easy/simpleMesh", "SimpleMesh.ivml");
+        org.apache.commons.io.FileUtils.copyDirectory(new File("src/test/easy/simpleMesh"), ivmlFolder);
         copy("src/test/easy/common", "CommonSetup.ivml", "CommonSetupNoMonUi.ivml");
-        copy("src/main/easy/cfg", "PlatformConfiguration.ivml", "TechnicalSetup.ivml", "AllTypes.ivml", 
-            "AllServices.ivml");
     }
     
     /**
@@ -146,7 +153,7 @@ public class AasIvmlMapperTest {
      */
     @Test
     public void testAasIvmlMapper() throws ExecutionException {
-        InstantiationConfigurer configurer = new NonCleaningInstantiationConfigurer("SimpleMesh", 
+        InstantiationConfigurer configurer = new NonCleaningInstantiationConfigurer(MODEL_NAME, 
             ivmlFolder, FileUtils.getTempDirectory());
         GraphFormat format = new DrawflowGraphFormat();
         IvmlGraph graph = assertGraphMesh(configurer, "myApp", 0, s -> {
@@ -223,7 +230,7 @@ public class AasIvmlMapperTest {
     private IvmlGraph assertGraphMesh(InstantiationConfigurer configurer, String appName, int netIndex, 
         Consumer<SubmodelElementCollection> servicesAsserter, GraphFormat format) throws ExecutionException {
         ConfigurationLifecycleDescriptor lcd = startEasyValidate(configurer);
-        AasIvmlMapper mapper = getInstance();
+        AasIvmlMapper mapper = getInstance(false);
         mapper.addGraphFormat(format);        
         
         AasFactory aasFactory = AasFactory.getInstance();
@@ -239,16 +246,75 @@ public class AasIvmlMapperTest {
     }
 
     /**
+     * A slightly extended graph mapper that changes an extended managed model structure with wildcards
+     * for AllTypes and AllServices into the usual structure while modifying a graph. 
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static class MyAasIvmlMapper extends AasIvmlMapper {
+        
+        private boolean adapt;
+
+        /**
+         * Creates a mapper with default settings.
+         * 
+         * @param cfgSupplier a supplier providing the actual configuration instance
+         * @param graphMapper maps a graph from IVML to an internal structure
+         * @param adapt allow for adaptation/rewriting
+         * @throws IllegalArgumentException if {@code cfgSupplier} is <b>null</b>
+         */
+        public MyAasIvmlMapper(Supplier<Configuration> cfgSupplier, IvmlGraphMapper graphMapper, boolean adapt) {
+            super(cfgSupplier, graphMapper, null, null);
+            this.adapt = adapt;
+        }
+
+        @Override
+        protected Project adaptTarget(Project root, Project project) throws ExecutionException {
+            String prjName = project.getName();
+            if (adapt && (PRJ_NAME_ALLSERVICES.equals(prjName) || PRJ_NAME_ALLTYPES.equals(prjName))) {
+                boolean found = false;
+                for (int i = project.getImportsCount() - 1; i >= 0; i--) {
+                    ProjectImport imp = project.getImport(i);
+                    if (imp.isWildcard()) {
+                        project.removeImport(imp);
+                        found = true;
+                    }
+                }
+                if (found) {
+                    // this is the simple variant. Full solution: copy over model elements.
+                    try {
+                        if (PRJ_NAME_ALLSERVICES.equals(prjName)) {
+                            ProjectImport imp = new ProjectImport(PRJ_NAME_ALLTYPES);
+                            imp.setResolved(ModelQuery.findProject(root, PRJ_NAME_ALLTYPES));
+                            project.addImport(imp);
+                        } else if (PRJ_NAME_ALLTYPES.equals(prjName)) {
+                            ProjectImport imp = new ProjectImport("IIPEcosphere");
+                            imp.setResolved(ModelQuery.findProject(root, "IIPEcosphere"));
+                            project.addImport(imp);
+                        }
+                    } catch (ModelManagementException e) {
+                        throw new ExecutionException(e);
+                    }
+                }
+            }
+            return project;
+        }
+
+    }
+
+    /**
      * Creates a mapper instance. Call {@link #startEasy(InstantiationConfigurer)} or 
      * {@code #startEasyValidate(InstantiationConfigurer)} before.
      * 
+     * @param adapt allow for adaptation/rewriting of the model structure from an extended managed model to 
+     *   a default managed model
      * @return the instance
      */
-    private AasIvmlMapper getInstance() {
+    private AasIvmlMapper getInstance(boolean adapt) {
         Configuration cfg = ConfigurationManager.getVilConfiguration();
         Assert.assertNotNull("No configuration available", cfg);
         // TODO no listeners for now
-        return new AasIvmlMapper(() -> cfg, new ConfigurationAas.IipGraphMapper(), null, null); 
+        return new MyAasIvmlMapper(() -> cfg, new ConfigurationAas.IipGraphMapper(), adapt); 
     }
     
     /**
@@ -294,7 +360,7 @@ public class AasIvmlMapperTest {
         InstantiationConfigurer configurer = new NonCleaningInstantiationConfigurer(MODEL_NAME, 
             ivmlFolder, FileUtils.getTempDirectory());
         ConfigurationLifecycleDescriptor lcd = startEasyValidate(configurer);
-        AasIvmlMapper mapper = getInstance();
+        AasIvmlMapper mapper = getInstance(false);
         
         Assert.assertNotNull(mapper.getVariable("instDir"));
         Assert.assertNull(mapper.getVariable("instDir123"));
@@ -315,7 +381,7 @@ public class AasIvmlMapperTest {
         InstantiationConfigurer configurer = new NonCleaningInstantiationConfigurer(MODEL_NAME, 
             ivmlFolder, FileUtils.getTempDirectory());
         ConfigurationLifecycleDescriptor lcd = startEasyValidate(configurer);
-        AasIvmlMapper mapper = getInstance();
+        AasIvmlMapper mapper = getInstance(false);
         
         Map<String, String> values = new HashMap<String, String>();
         values.put("instDir", "\"/home/iip\""); // IVML expression
@@ -361,7 +427,7 @@ public class AasIvmlMapperTest {
         n1.addEdge(e1);
         n2.addEdge(e1);
         
-        AasIvmlMapper mapper = getInstance();
+        AasIvmlMapper mapper = getInstance(true);
         mapper.addGraphFormat(drawflowFormat);
         
         mapper.createVariable("rec1", "RecordType", "{}");
@@ -427,7 +493,7 @@ public class AasIvmlMapperTest {
         InstantiationConfigurer configurer = new NonCleaningInstantiationConfigurer(MODEL_NAME, 
             ivmlFolder, FileUtils.getTempDirectory());
         ConfigurationLifecycleDescriptor lcd = startEasyValidate(configurer);
-        AasIvmlMapper mapper = getInstance();
+        AasIvmlMapper mapper = getInstance(false);
 
         mapper.createVariable("rec1", "RecordType", "{}");
 

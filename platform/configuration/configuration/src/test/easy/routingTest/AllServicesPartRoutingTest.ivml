@@ -4,7 +4,7 @@ project AllServicesPartRoutingTest {
     
     annotate BindingTime bindingTime = BindingTime::compile to .;
     
-        Service mySourceService = JavaService {
+    Service mySourceService = JavaService {
         id = "myRoutingSource",
         name = "myRoutingSource",
         description = "",

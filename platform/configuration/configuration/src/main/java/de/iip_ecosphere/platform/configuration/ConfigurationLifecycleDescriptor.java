@@ -24,10 +24,7 @@ import net.ssehub.easy.basics.logger.EASyLoggerFactory;
 import net.ssehub.easy.basics.logger.ILogger;
 import net.ssehub.easy.basics.logger.LoggingLevel;
 import net.ssehub.easy.basics.modelManagement.ModelManagementException;
-import net.ssehub.easy.instantiation.core.model.buildlangModel.BuildModel;
-import net.ssehub.easy.instantiation.core.model.templateModel.TemplateModel;
 import net.ssehub.easy.producer.core.mgmt.EasyExecutor;
-import net.ssehub.easy.varModel.management.VarModel;
 
 /**
  * The lifecycle descriptor for the configuration component.
@@ -185,9 +182,7 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
             }
         }
         
-        TemplateModel.INSTANCE.clear(); // preliminary
-        BuildModel.INSTANCE.clear();
-        VarModel.INSTANCE.clear();
+        exec.clearModels();
         
         ConfigurationManager.setExecutor(null);
         if (null != loader) {

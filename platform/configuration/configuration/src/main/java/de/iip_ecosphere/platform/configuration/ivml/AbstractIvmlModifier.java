@@ -249,6 +249,18 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
     protected Project getVariableTarget(Project root, IDatatype type) {
         return root;
     }
+    
+    /**
+     * Allows to adapt a target IVML project, e.g., in testing context.
+     * 
+     * @param root the root project (for type resolution)
+     * @param project the project to be adapted
+     * @return the adapted project
+     * @throws ExecutionException if adapting fails
+     */
+    protected Project adaptTarget(Project root, Project project) throws ExecutionException {
+        return project;
+    }
 
     /**
      * Creates an IVML variable. [public for testing]
@@ -263,7 +275,7 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
         Project root = cfg.getProject();
         try {
             IDatatype t = ModelQuery.findType(root, type, null);
-            Project target = getVariableTarget(root, t);
+            Project target = adaptTarget(root, getVariableTarget(root, t));
             if (null != t) {
                 DecisionVariableDeclaration var = new DecisionVariableDeclaration(toIdentifier(varName), t, target);
                 setValue(var, valueEx);

@@ -89,12 +89,11 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     public static final Predicate<IDecisionVariable> FILTER_NO_CONSTRAINT_VARIABLES = 
         v -> !TypeQueries.isConstraint(v.getDeclaration().getType());
     public static final Function<String, String> SHORTID_PREFIX_META = n -> "meta" + PseudoString.firstToUpperCase(n);
+    protected static final String PRJ_NAME_ALLSERVICES = "AllServices";
+    protected static final String PRJ_NAME_ALLTYPES = "AllTypes";
+    protected static final String PRJ_NAME_TECHSETUP = "TechnicalSetup";
     private static final TypeVisitor TYPE_VISITOR = new TypeVisitor();
-    
     private static final String PROGRESS_COMPONENT_ID = "configuration.configuration";
-    private static final String PRJ_NAME_ALLSERVICES = "AllServices";
-    private static final String PRJ_NAME_ALLTYPES = "AllTypes";
-    private static final String PRJ_NAME_TECHSETUP = "TechnicalSetup";
 
     private Supplier<Configuration> cfgSupplier;
     private Function<String, String> metaShortId = SHORTID_PREFIX_META;
@@ -468,7 +467,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
      * 
      * @author Holger Eichelberger, SSE
      */
-    private static class ModelResults {
+    protected static class ModelResults {
         
         private Project meshProject;
         private DecisionVariableDeclaration meshVar;
@@ -565,7 +564,8 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         if (mVal instanceof ReferenceValue) {
             ReferenceValue rVal = (ReferenceValue) mVal;
             IDecisionVariable var2 = cfg.getDecision(rVal.getValue());
-            String var2Name = getValue(var2.getNestedElement("name")).toString();
+            Object var2n = getValue(var2.getNestedElement("name"));
+            String var2Name = null == var2n ? "" : var2n.toString();
             if (var2Name.equals(name)) {
                 result = true;
             }
@@ -922,7 +922,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
      */
     private static Object getValue(IDecisionVariable var) {
         Object aasValue = null;
-        if (null != var.getValue()) {
+        if (null != var && null != var.getValue()) {
             ValueVisitor valueVisitor = new ValueVisitor();
             var.getValue().accept(valueVisitor);
             aasValue = valueVisitor.getAasValue();
