@@ -107,7 +107,7 @@
                        <include>IIPEcosphere*.*</include>
                    </includes>
                </cleanup>
-               <initiallyAllowed>InstallTest.ivml;${iip.model}.ivml;AllServices.ivml;AllTypes.ivml;apps/ApplicationPartMyApp.ivml;meshes/ServiceMeshPartMyAppMyMesh.ivml;TechnicalSetup.ivml</initiallyAllowed>
+               <initiallyAllowed>${iip.model}.ivml;AllServices.ivml;AllTypes.ivml;apps;apps/ApplicationPartMyApp.ivml;meshes;meshes/ServiceMeshPartMyAppMyMesh.ivml;TechnicalSetup.ivml</initiallyAllowed>
                <overWriteReleases>false</overWriteReleases>
                <overWriteSnapshots>true</overWriteSnapshots>
              </configuration>

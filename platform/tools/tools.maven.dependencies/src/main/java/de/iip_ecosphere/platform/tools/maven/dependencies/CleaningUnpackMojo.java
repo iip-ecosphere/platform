@@ -112,9 +112,9 @@ public class CleaningUnpackMojo extends UnpackMojo {
                 if (!execute && outDirExists && initiallyAllowed != null) {
                     String tmp = initiallyAllowed.replace(";", ":");
                     Set<String> allowed = new HashSet<String>();
+                    Collections.addAll(allowed, tmp.split(":"));
                     getLog().info("Output directory " + ai.getOutputDirectory() + " exists. "
                         + "Checking for initially allowed files: " + allowed);
-                    Collections.addAll(allowed, tmp.split(":"));
                     execute = true;
                     for (String fn : ai.getOutputDirectory().list()) {
                         if (!allowed.contains(fn)) {
