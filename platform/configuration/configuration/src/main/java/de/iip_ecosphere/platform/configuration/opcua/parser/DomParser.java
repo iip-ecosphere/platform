@@ -43,6 +43,7 @@ enum ElementType {
 public class DomParser {
 
     private static boolean verboseDefault = true;
+    private static String mainOutFolder = "src/test/easy";
     private static final Set<String> IDENTIFY_FIELDS_PERMITTED_REFERENCE_TYPE;
 
     static {
@@ -100,6 +101,15 @@ public class DomParser {
      */
     public static void setDefaultVerbose(boolean verbose) {
         verboseDefault = verbose;
+    }
+    
+    /**
+     * Sets the name of the output folder to be used in {@link #main(String[])}.
+     * 
+     * @param folder the folder name
+     */
+    public static void setMainOutFolder(String folder) {
+        mainOutFolder = folder;
     }
 
     // checkstyle: resume parameter number check
@@ -1338,7 +1348,7 @@ public class DomParser {
         fileName = fileName.replace(".", "");
         // TODO wieder in "gen/opc" ändern
         // File ivmlFile = new File("gen/Opc" + fileName + ".ivml");
-        File ivmlFile = new File("src/test/easy/Opc" + fileName + ".ivml");
+        File ivmlFile = new File(mainOutFolder, "Opc" + fileName + ".ivml");
         process(file, fileName, ivmlFile, verboseDefault);
     }
 
