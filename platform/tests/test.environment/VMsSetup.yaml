@@ -8,12 +8,12 @@ Setup:
     # EcsSvc_App, // 2 - one container: ecsSvc + app
     # C1Ecs_C2Svc_App // 3 - 1st container: ecs, 2nd container: svc + app
     RunDockerRegistry         : True
-    DockerRegistry            : "147.172.178.145:5001"
+    DockerRegistry            : "192.168.81.100:5001"
     DockerRegistryPort        : 5001
     ArtifactsFolder           : "/iip/actual/artifacts"
-    MgtUiServerIP             : "147.172.178.145"
+    MgtUiServerIP             : "192.168.81.100"
     InstallPlatform           : True
-    NewInstallFiles           : True
+    NewInstallFiles           : False
     IIPEasyTracing            : True
     DockerRegistryCerts       : False
     StartPlatfrom             : True
@@ -75,7 +75,7 @@ Machines:
     Password       : $$e_iisecoPW2
     Role           : Server
     OS             : Linux
-    Included       : True
+    Included       : False
     NewDeviceFiles : False
     DeviceID       : TestEnvSer001
     DockerRegistry : True
@@ -86,7 +86,7 @@ Machines:
     Password       : $$e_iisecoPW2
     Role           : Device
     OS             : Linux
-    Included       : True
+    Included       : False
     NewDeviceFiles : True
     DeviceID       : TestEnvDev02
     DockerRegistry : False
@@ -97,7 +97,7 @@ Machines:
     Password       : $$e_iisecoPW2
     Role           : Device
     OS             : Linux
-    Included       : True
+    Included       : False
     NewDeviceFiles : False
     DeviceID       : TestEnvDev03
     DockerRegistry : False
@@ -119,7 +119,7 @@ Machines:
     Password       : osboxes.org
     Role           : Server
     OS             : Linux
-    Included       : False
+    Included       : True
     NewDeviceFiles : False
     DeviceID       : LinSer000001
     DockerRegistry : True
@@ -130,7 +130,7 @@ Machines:
     Password       : osboxes.org
     Role           : Device
     OS             : Linux
-    Included       : False
+    Included       : True
     NewDeviceFiles : False
     DeviceID       : LinDev000001
     DockerRegistry : False
@@ -141,7 +141,7 @@ Machines:
     Password       : osboxes.org
     Role           : Device
     OS             : Linux
-    Included       : False
+    Included       : True
     NewDeviceFiles : True
     DeviceID       : LinDev000002
     DockerRegistry : False
