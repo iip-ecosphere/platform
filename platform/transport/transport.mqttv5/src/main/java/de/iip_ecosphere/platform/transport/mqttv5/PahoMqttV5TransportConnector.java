@@ -117,6 +117,7 @@ public class PahoMqttV5TransportConnector extends AbstractMqttTransportConnector
                 }
             }
             waitForCompletion(client.connect(connOpts));
+            LoggerFactory.getLogger(getClass()).info("MQTT: connected");
         } catch (MqttException e) {
             throw new IOException(e.getMessage(), e);
         }
