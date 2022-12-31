@@ -82,7 +82,8 @@ project ExampleHm22Install {
         globalHost = platformServer,
         security = { // -> identityStore.yml in src/test/ or src/main depeding on use
             authenticationKey = "amqp"
-        }
+        },
+        brokerVer = "9.0.0"
     };
     
     serviceProtocol = ServiceProtocolAMQP {};

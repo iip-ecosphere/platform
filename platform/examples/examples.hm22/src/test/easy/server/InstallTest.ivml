@@ -42,7 +42,8 @@ project InstallTest {
         port = 8883,
         security = { // -> identityStore.yml in src/test/ or src/main depeding on use
             authenticationKey = "amqp"
-        }
+        },
+        brokerVer = "9.0.0"
     };
 
     serviceManager = SpringCloudStream {
