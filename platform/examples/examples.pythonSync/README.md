@@ -6,7 +6,6 @@ The application consists of three (micro)-services, which are composed in the co
   * A sender service synchronously ingests data once per second.
   * A synchronous "AI" service in Python based on configuration-determined interfaces, processes the data and delivers a "classification".
   * An asynchronous receiver service emits the finally received (and classified/scored) data on the console.
-Communication in this example happens via MQTT (requiring at least JDK 11 for execution).
 
 This example consists of several pieces:
   * An IVML configuration for the application in `src/test/easy/ExamplePython.ivml`.
