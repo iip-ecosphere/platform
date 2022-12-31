@@ -772,7 +772,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     }
     
     generateBrokerScripts(Configuration config, TransportProtocolAMQP protocol) = {
-        vilTemplateProcessor("AmqpPom", config, "${brokerRoot}/pom.xml", ver=protocol.brokerVer);
+        vilTemplateProcessor("AmqpPom", config, "${brokerRoot}/pom.xml", ver=getStringValueSafe(protocol.brokerVer, "8.0.2"));
         vilTemplateProcessor("AmqpLinuxSysd", config, "${brokerRoot}/iip-broker.service");
         vilTemplateProcessor("AmqpLinux", config, "${brokerRoot}/broker.sh");
         FileArtifact f = "${brokerRoot}/broker.sh";
@@ -785,11 +785,11 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     }
 
     generateBrokerScripts(Configuration config, TransportProtocolMQTTv3 protocol) = {
-        generateBrokerScriptsHiveMq(config, protocol.brokerVer);
+        generateBrokerScriptsHiveMq(config, getStringValueSafe(protocol.brokerVer, "2020.4"));
     }
 
     generateBrokerScripts(Configuration config, TransportProtocolMQTTv5 protocol) = {
-        generateBrokerScriptsHiveMq(config, protocol.brokerVer);
+        generateBrokerScriptsHiveMq(config, getStringValueSafe(protocol.brokerVer, "2020.4"));
     }
     
     generateBrokerScriptsHiveMq(Configuration config, String brokerVer) = {
