@@ -28,14 +28,11 @@ project ExamplePython {
     
     // ------------------ transport --------------------------
     
-    transportProtocol = TransportProtocolAMQP {
-        port = 8883,
-        security = { // replaces user/password, requires identityStore.yml in src/test/ or src/main depeding on use
-            authenticationKey = "amqp"
-        }
+    transportProtocol = TransportProtocolMQTTv3 {
+        port = 8883
     };
     
-    serviceProtocol = ServiceProtocolAMQP {};
+    serviceProtocol = ServiceProtocolMQTTv3 {};
     
     // ------------------ resources/devicemgt ----------------
     
