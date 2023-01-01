@@ -21,6 +21,8 @@ project Transport {
     	Port localEcsPort = 8889; // the local broker port for ECS containers  
         SecuritySettings security = null;
         String brokerVer = ""; // Maven version of the (instantiated default) broker to use
+        Integer actionTimeout = 1000;
+        Constraint actionTimeoutValid = isDefined(actionTimeout) and actionTimeout > 0;
     };
     
     compound TransportProtocolAMQP refines TransportProtocol {
@@ -31,11 +33,13 @@ project Transport {
     compound TransportProtocolMQTTv3 refines TransportProtocol {
     	ProtocolType type = ProtocolType::Mqttv3;
         String brokerVer = "2020.4"; // of hivemq
+        Integer actionTimeout = 3000;
     };
     
     compound TransportProtocolMQTTv5 refines TransportProtocol {
     	ProtocolType type = ProtocolType::Mqttv5;
         String brokerVer = "2020.4"; // of hivemq
+        Integer actionTimeout = 1000;
     };    
     
     TransportProtocol transportProtocol = TransportProtocolAMQP {

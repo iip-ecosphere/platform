@@ -84,6 +84,7 @@ template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, FileArtifact 
        'transport:
             host: ${tp.globalHost}
             port: ${tp.port}
+            actionTimeout: ${tp.actionTimeout}
             ${produceTransportSecurity(tp, true)|e}'
     }
     
