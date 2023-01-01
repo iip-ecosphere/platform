@@ -6,7 +6,7 @@ Planned:
 * Component upgrades: Spring Cloud Stream [#57](https://github.com/iip-ecosphere/platform/issues/57)
 * Integrated container management for Kubernetes [#39](https://github.com/iip-ecosphere/platform/issues/39)
 
-### Next release (Winter 2022):
+### Next release (Winter 2023, end of January 2023):
 
 Planned:
 * Component upgrades: BaSyx [#35](https://github.com/iip-ecosphere/platform/issues/35), Apache QPID-J [#76](https://github.com/iip-ecosphere/platform/issues/76)
@@ -23,6 +23,7 @@ In progress:
 * [#100](https://github.com/iip-ecosphere/platform/issues/100): Run multiple app instances
 * [#101](https://github.com/iip-ecosphere/platform/issues/101): Documentation of fixed formats used by the platform
 * [#102](https://github.com/iip-ecosphere/platform/issues/102): Create/provide container for service development.
+* Test examples with MQTT [#61](https://github.com/iip-ecosphere/platform/issues/71), examples.pythonSync now running with MQTT v3 instead of AMQP for transport.
 
 New features:
 * [#51](https://github.com/iip-ecosphere/platform/issues/51): Device specific measurement plugin for Phoenix Contact AXC
@@ -39,6 +40,7 @@ New features:
 * [#114](https://github.com/iip-ecosphere/platform/issues/114): Initial integration of the OPC UA companion spec to IVML generator by J.-H. Cepok
 * [#105](https://github.com/iip-ecosphere/platform/issues/105): Maven plugins for Python build steps.
 * [#109](https://github.com/iip-ecosphere/platform/issues/101): Maven integration for platform/application instantiation and orchestrated execution of Maven, e.g., for the examples.
+* [#76](https://github.com/iip-ecosphere/platform/issues/76): Maven version of broker can be defined in configuration, optionally enabling use of QPID-J 9.0.0.
 
 Improvements:
 * Extend configuration model, e.g., by constraints [#52](https://github.com/iip-ecosphere/platform/issues/52)
@@ -54,6 +56,7 @@ Improvements:
 * Multi-module top-level POM for local builds of the platform (please refer to the platform handbook for details).
 * [#55](https://github.com/iip-ecosphere/platform/issues/55): Service integration workshop example/material
 * [#112](https://github.com/iip-ecosphere/platform/issues/112): Example use of managed platform model structure in install package.
+* [#91](https://github.com/iip-ecosphere/platform/issues/91): Dockerhub demonstration containers now with monitoring and management UI.
 
 ### Version 0.4.0 (2022/09/02, TddT'22):
 
