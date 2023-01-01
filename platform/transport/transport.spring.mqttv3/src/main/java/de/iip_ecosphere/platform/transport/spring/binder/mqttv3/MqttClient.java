@@ -258,7 +258,7 @@ public class MqttClient {
             try {
                 client.publish(topic, message);
             } catch (MqttException e) {
-                LOGGER.error("Sending MQTT message with topic " + topic + ": " + e.getMessage(), e);
+                LOGGER.error("Sending MQTT message with topic " + topic + ": " + e.getMessage());
             }
         }
     }
