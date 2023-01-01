@@ -102,7 +102,7 @@ template JavaSpringCloudStreamYaml(IIPEcosphere config, FileArtifact target, map
         '${key}:
             host: ${protocolHost(protocol, global)}
             port: ${protocolPort(protocol, global)}
-            actionTimeout: ${protocol.actionTimeout}
+            actionTimeout: ${getActionTimeout(protocol)}
             ${produceTransportSecurity(protocol, userPwdFallback)|e}'
     }
     

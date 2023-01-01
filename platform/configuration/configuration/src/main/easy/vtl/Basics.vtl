@@ -137,5 +137,15 @@ template Basics(Configuration config, FileArtifact target) {
         }
         res;
     }
+
+    def getIntegerValueSafe(DecisionVariable var, Integer dflt) {
+        Integer res;
+        if (isDefined(var) and var <> null) {
+            res = var;
+        } else {
+            res = dflt;
+        }
+        res;
+    }
 	
 }

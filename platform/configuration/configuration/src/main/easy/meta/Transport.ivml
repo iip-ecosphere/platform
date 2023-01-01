@@ -22,7 +22,7 @@ project Transport {
         SecuritySettings security = null;
         String brokerVer = ""; // Maven version of the (instantiated default) broker to use
         Integer actionTimeout = 1000;
-        Constraint actionTimeoutValid = isDefined(actionTimeout) and actionTimeout > 0;
+        //Constraint actionTimeoutValid = isDefined(actionTimeout) and actionTimeout > 0; // currently NPE in EAYs
     };
     
     compound TransportProtocolAMQP refines TransportProtocol {
@@ -30,16 +30,14 @@ project Transport {
     	IipVersion brokerVer = "8.0.2"; // of Apache QPID-J, still on JDK 8 to keep JDK 8 test process, use 9.0.0 for bug fixes and JDK 11
     };
     
-    compound TransportProtocolMQTTv3 refines TransportProtocol {
+    compound TransportProtocolMQTTv3 refines TransportProtocol { // min actionTimeout done by VTL
     	ProtocolType type = ProtocolType::Mqttv3;
         String brokerVer = "2020.4"; // of hivemq
-        Integer actionTimeout = 3000;
     };
     
-    compound TransportProtocolMQTTv5 refines TransportProtocol {
+    compound TransportProtocolMQTTv5 refines TransportProtocol { // min actionTimeout done by VTL
     	ProtocolType type = ProtocolType::Mqttv5;
         String brokerVer = "2020.4"; // of hivemq
-        Integer actionTimeout = 1000;
     };    
     
     TransportProtocol transportProtocol = TransportProtocolAMQP {

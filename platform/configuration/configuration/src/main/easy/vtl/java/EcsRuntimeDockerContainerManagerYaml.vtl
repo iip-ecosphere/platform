@@ -1,3 +1,4 @@
+import Basics;
 import JavaMapping;
 
 @advice(IIPEcosphere)
@@ -79,12 +80,24 @@ template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, FileArtifact 
         }
     }
     
+    def getActionTimeout(TransportProtocol tp) {
+        max(1000, getIntegerValueSafe(tp.actionTimeout, 1000));
+    }
+
+    def getActionTimeout(TransportProtocolMQTTv3 tp) {
+        max(3000, getIntegerValueSafe(tp.actionTimeout, 3000));
+    }
+
+    def getActionTimeout(TransportProtocolMQTTv5 tp) {
+        max(3000, getIntegerValueSafe(tp.actionTimeout, 3000));
+    }
+    
     def produceTransport(IIPEcosphere config) {
        TransportProtocol tp = config.transportProtocol;
        'transport:
             host: ${tp.globalHost}
             port: ${tp.port}
-            actionTimeout: ${tp.actionTimeout}
+            actionTimeout: ${getActionTimeout(tp)}
             ${produceTransportSecurity(tp, true)|e}'
     }
     
