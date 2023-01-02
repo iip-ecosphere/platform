@@ -64,7 +64,8 @@ jobs:
         with:
           build-args: VERSION=${{ env.VERSION }}
           push: true
-          tags: iipecosphere/platform:platform_all.latest
+          # tags: iipecosphere/platform:platform_all.latest
+          tags: iipecosphere/platform:platform_all.test
           context: ./platform/tools/Install/gen/
           file: ./platform/tools/Install/container/fullPlatform/platform/Dockerfile
       - name: Build and push cli
@@ -72,6 +73,7 @@ jobs:
         with:
           build-args: VERSION=${{ env.VERSION }}
           push: true
-          tags: iipecosphere/platform:cli.latest
+          # tags: iipecosphere/platform:cli.latest
+          tags: iipecosphere/platform:cli.test
           context: ./platform/tools/Install/gen/
           file: ./platform/tools/Install/container/fullPlatform/cli/Dockerfile
