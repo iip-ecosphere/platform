@@ -7,6 +7,9 @@
 	
     <!-- deploy to SSE Mvn repo -->
 	<target name="maven">
+        <exec executable="/bin/bash">
+	      <arg value="${basedir}/cleanup.sh"/>
+        </exec>
 		<exec executable="/bin/bash ${basedir}/cleanup.sh" />
 		
 	    <maven pomFile="pom.xml" goal="package"/>
