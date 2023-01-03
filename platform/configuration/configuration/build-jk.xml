@@ -10,7 +10,6 @@
         <exec executable="/bin/bash">
 	      <arg value="${basedir}/cleanup.sh"/>
         </exec>
-		<exec executable="/bin/bash ${basedir}/cleanup.sh" />
 		
 	    <maven pomFile="pom.xml" goal="package"/>
 		<mvnDeployResolveArtifact folderName="IIP-configuration.configuration" pomFile="pom.xml" jarFolder="target" artifactPattern="configuration.configuration-*.*.*.jar" />
