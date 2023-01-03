@@ -7,7 +7,7 @@ then
     docker rmi -f "$IMGS"
 fi
 
-IMGS=$(docker images -qa "simplemeshtestingcontainerapp/dflt")
+IMGS=$(docker images -qa "simplemeshtestingcontainerapp/*")
 echo "Cleaning up IIP-Ecosphere configuration.configuration test images: $IMGS"
 if [ ! -z "$IMGS" ]
 then
