@@ -17,6 +17,11 @@ import static de.iip_ecosphere.platform.support.iip_aas.AasUtils.fixId;
 import java.net.URISyntaxException;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
+
+import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.platform.ArtifactsManager.Artifact;
 import de.iip_ecosphere.platform.support.TaskRegistry;
@@ -24,14 +29,17 @@ import de.iip_ecosphere.platform.support.TaskRegistry.TaskData;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
+import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
+import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.iip_aas.AasContributor;
 import de.iip_ecosphere.platform.support.iip_aas.AasUtils;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
+import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper;
 import de.iip_ecosphere.platform.transport.status.TaskUtils;
 
@@ -44,6 +52,7 @@ public class PlatformAas implements AasContributor {
 
     public static final String NAME_SUBMODEL_ARTIFACTS = "Artifacts";
     public static final String NAME_SUBMODEL_STATUS = "Status";
+    public static final String NAME_SUBMODEL_APPINSTANCES = "ApplicationInstances";
     public static final String NAME_COLL_SERVICE_ARTIFACTS = "ServiceArtifacts";
     public static final String NAME_COLL_CONTAINER = "Container";
     public static final String NAME_COLL_DEPLOYMENT_PLANS = "DeploymentPlans";
@@ -51,11 +60,16 @@ public class PlatformAas implements AasContributor {
     public static final String NAME_PROP_ID = "id";
     public static final String NAME_PROP_NAME = "name";
     public static final String NAME_PROP_URI = "uri";
+    public static final String NAME_PROP_APPID = "appId";
+    public static final String NAME_PROP_INSTANCEID = "instanceId";
+    public static final String NAME_PROP_TIMESTAMP = "timestamp";
     
     public static final String NAME_OPERATION_DEPLOY = "deployPlan";
     public static final String NAME_OPERATION_UNDEPLOY = "undeployPlan";
+    public static final String NAME_OPERATION_UNDEPLOY_WITHID = "undeployPlanWithId";
     public static final String NAME_OPERATION_DEPLOY_ASYNC = "deployPlanAsync";
     public static final String NAME_OPERATION_UNDEPLOY_ASYNC = "undeployPlanAsync";
+    public static final String NAME_OPERATION_UNDEPLOY_WITHID_ASYNC = "undeployPlanWithIdAsync";
     public static final String NAME_OPERATION_GET_TASK_STATUS = "getTaskStatus";
     
     private static final String PROGRESS_COMPONENT_ID = "IIP-Ecosphere Platform";
@@ -79,9 +93,14 @@ public class PlatformAas implements AasContributor {
         smB.createOperationBuilder(NAME_OPERATION_DEPLOY)
             .addInputVariable("url", Type.STRING)
             .setInvocable(iCreator.createInvocable(NAME_OPERATION_DEPLOY))
-            .build(Type.NONE);
+            .build(Type.STRING);
         smB.createOperationBuilder(NAME_OPERATION_UNDEPLOY)
             .addInputVariable("url", Type.STRING)
+            .setInvocable(iCreator.createInvocable(NAME_OPERATION_UNDEPLOY))
+            .build(Type.NONE);
+        smB.createOperationBuilder(NAME_OPERATION_UNDEPLOY_WITHID)
+            .addInputVariable("url", Type.STRING)
+            .addInputVariable("instanceId", Type.STRING)
             .setInvocable(iCreator.createInvocable(NAME_OPERATION_UNDEPLOY))
             .build(Type.NONE);
         smB.createOperationBuilder(NAME_OPERATION_DEPLOY_ASYNC)
@@ -92,6 +111,11 @@ public class PlatformAas implements AasContributor {
             .addInputVariable("url", Type.STRING)
             .setInvocable(iCreator.createInvocable(NAME_OPERATION_UNDEPLOY_ASYNC))
             .build(Type.STRING);
+        smB.createOperationBuilder(NAME_OPERATION_UNDEPLOY_WITHID_ASYNC)
+            .addInputVariable("url", Type.STRING)
+            .addInputVariable("instanceId", Type.STRING)
+            .setInvocable(iCreator.createInvocable(NAME_OPERATION_UNDEPLOY_ASYNC))
+            .build(Type.STRING);
         smB.createOperationBuilder(NAME_OPERATION_GET_TASK_STATUS)
             .addInputVariable("taskId", Type.STRING)
             .setInvocable(iCreator.createInvocable(NAME_OPERATION_GET_TASK_STATUS))
@@ -99,6 +123,7 @@ public class PlatformAas implements AasContributor {
         smB.build();
         
         aasBuilder.createSubmodelBuilder(NAME_SUBMODEL_STATUS, null).build(); // just that it is there
+        aasBuilder.createSubmodelBuilder(NAME_SUBMODEL_APPINSTANCES, null).build(); // just that it is there
         
         return null;
     }
@@ -109,13 +134,20 @@ public class PlatformAas implements AasContributor {
             return deployPlan(AasUtils.readString(p));
         }));
         sBuilder.defineOperation(NAME_OPERATION_UNDEPLOY, new JsonResultWrapper(p -> { 
-            return undeployPlan(AasUtils.readString(p));
+            return undeployPlan(AasUtils.readString(p), null);
+        }));
+        sBuilder.defineOperation(NAME_OPERATION_UNDEPLOY_WITHID, new JsonResultWrapper(p -> { 
+            return undeployPlan(AasUtils.readString(p), AasUtils.readString(p, 1));
         }));
         sBuilder.defineOperation(NAME_OPERATION_DEPLOY_ASYNC, new JsonResultWrapper(p -> {
             return TaskUtils.executeAsTask(PROGRESS_COMPONENT_ID, q -> deployPlan(AasUtils.readString(q)), p);
         }));
         sBuilder.defineOperation(NAME_OPERATION_UNDEPLOY_ASYNC, new JsonResultWrapper(p -> {
-            return TaskUtils.executeAsTask(PROGRESS_COMPONENT_ID, q -> undeployPlan(AasUtils.readString(q)), p);
+            return TaskUtils.executeAsTask(PROGRESS_COMPONENT_ID, q -> undeployPlan(AasUtils.readString(q), null), p);
+        }));
+        sBuilder.defineOperation(NAME_OPERATION_UNDEPLOY_WITHID_ASYNC, new JsonResultWrapper(p -> {
+            return TaskUtils.executeAsTask(PROGRESS_COMPONENT_ID, 
+                q -> undeployPlan(AasUtils.readString(q), AasUtils.readString(q, 1)), p);
         }));
         sBuilder.defineOperation(NAME_OPERATION_GET_TASK_STATUS, new JsonResultWrapper(p -> {
             TaskData data = TaskRegistry.getTaskData(AasUtils.readString(p));
@@ -128,13 +160,12 @@ public class PlatformAas implements AasContributor {
      * Deploys a deployment plan.
      * 
      * @param url the URL of the deployment plan
-     * @return <b>null</b>
+     * @return the application instance id
      * @throws ExecutionException if the operation fails
      */
     static Object deployPlan(String url) throws ExecutionException {
         try {
-            CliBackend.deployPlan(CliBackend.toUri(url));
-            return null;
+            return CliBackend.deployPlan(CliBackend.toUri(url));
         } catch (URISyntaxException e) {
             throw new ExecutionException(e);
         }
@@ -144,12 +175,13 @@ public class PlatformAas implements AasContributor {
      * Undeploys a deployment plan.
      * 
      * @param url the URL of the deployment plan
+     * @param instanceId the application instance id, may be empty or <b>null</b> for legacy/default starts
      * @return <b>null</b>
      * @throws ExecutionException if the operation fails
      */
-    static Object undeployPlan(String url) throws ExecutionException {
+    static Object undeployPlan(String url, String instanceId) throws ExecutionException {
         try {
-            CliBackend.undeployPlan(CliBackend.toUri(url));
+            CliBackend.undeployPlan(CliBackend.toUri(url), instanceId);
             return null;
         } catch (URISyntaxException e) {
             throw new ExecutionException(e);
@@ -164,6 +196,136 @@ public class PlatformAas implements AasContributor {
     @Override
     public boolean isValid() {
         return true;
+    }
+    
+    // TODO move the next three functions down to support.aas?
+
+    /**
+     * Returns the value of the specified property without throwing exceptions.
+     * 
+     * @param <T> the type of the value to return
+     * @param coll the collection to take the value from
+     * @param propIdShort the short id of the property
+     * @param type the type of the value to return
+     * @param transformer the value transformer
+     * @param dflt the default value if the property cannot be found
+     * @return the value or {@code dflt}
+     */
+    private static <T> T getPropertyValueSafe(SubmodelElementCollection coll, String propIdShort, Class<T> type, 
+        Function<Object, T> transformer, T dflt) {
+        T result = dflt;
+        Property prop = coll.getProperty(propIdShort);
+        if (null != prop) {
+            try {
+                result = transformer.apply(prop.getValue());
+            } catch (ExecutionException e) {
+                LoggerFactory.getLogger(PlatformAas.class).warn("Cannot access AAS property {} value: {}", 
+                    propIdShort, e.getMessage());
+            }
+        } else {
+            LoggerFactory.getLogger(PlatformAas.class).warn("Cannot find AAS property {} in collection {}", 
+                propIdShort, coll.getIdShort());
+        }
+        return result;
+    }
+
+    /**
+     * Returns the value of the specified property as string without throwing exceptions.
+     * 
+     * @param coll the collection to take the value from
+     * @param propIdShort the short id of the property
+     * @param dflt the default value if the property cannot be found or it's value is <b>null</b>
+     * @return the value or {@code dflt}
+     */
+    private static String getPropertyValueAsStringSafe(SubmodelElementCollection coll, String propIdShort, 
+        String dflt) {
+        return getPropertyValueSafe(coll, propIdShort, String.class, o -> null == o ? dflt : o.toString(), dflt);
+    }
+
+    /**
+     * Returns the value of the specified property as Integer without throwing exceptions.
+     * 
+     * @param coll the collection to take the value from
+     * @param propIdShort the short id of the property
+     * @param dflt the default value if the property cannot be found or it's value is <b>null</b>
+     * @return the value or {@code dflt}
+     */
+    private static Integer getPropertyValueAsIntegerSafe(SubmodelElementCollection coll, String propIdShort, 
+        Integer dflt) {
+        return getPropertyValueSafe(coll, propIdShort, Integer.class, o -> null == o ? dflt : (Integer) o, dflt);
+    }
+
+    /**
+     * Called to notify that a new instance of the application <code>appId</code> is about to be started.
+     * 
+     * @param appId the application id
+     * @return the id of the new instance to be passed on to the service starts, may be <b>null</b> 
+     *    for default/legacy start
+     */
+    static String notifyAppNewInstance(String appId) {
+        AtomicReference<String> result = new AtomicReference<String>(null);
+        ActiveAasBase.processNotification(NAME_SUBMODEL_APPINSTANCES, NotificationMode.SYNCHRONOUS, (sub, aas) -> {
+            int newId = -1;
+            for (SubmodelElement elt: sub.submodelElements()) {
+                if (elt instanceof SubmodelElementCollection) {
+                    SubmodelElementCollection coll = (SubmodelElementCollection) elt;
+                    if (appId.equals(getPropertyValueAsStringSafe(coll, NAME_PROP_APPID, null))) {
+                        newId = Math.max(newId, getPropertyValueAsIntegerSafe(coll, NAME_PROP_INSTANCEID, 0));
+                        break;
+                    }
+                }
+            }
+
+            newId++; // the next instance
+            String id = appId + "-" + newId;
+            SubmodelElementCollectionBuilder cBuilder // get or create
+                = sub.createSubmodelElementCollectionBuilder(NAME_SUBMODEL_APPINSTANCES, false, false);
+            SubmodelElementCollectionBuilder dBuilder 
+                = cBuilder.createSubmodelElementCollectionBuilder(fixId(id), false, false);
+            dBuilder.createPropertyBuilder(NAME_PROP_APPID)
+                .setValue(Type.STRING, appId)
+                .build();
+            dBuilder.createPropertyBuilder(NAME_PROP_INSTANCEID)
+                .setValue(Type.STRING, newId)
+                .build();
+            dBuilder.createPropertyBuilder(NAME_PROP_TIMESTAMP)
+                .setValue(Type.INTEGER, System.currentTimeMillis())
+                .build();
+            if (newId > 0) {
+                result.set(String.valueOf(newId));
+            }
+        });
+
+        return result.get();        
+    }
+    
+    /**
+     * Called to notify that an app instance was stopped.
+     * 
+     * @param appId the application id of the instance that was stopped
+     * @param instanceId the instance id of the instance, may be <b>null</b> or empty for legacy application starts
+     * @return the remaining instances
+     */
+    static int notifyAppInstanceStopped(String appId, String instanceId) {
+        final AtomicInteger result = new AtomicInteger(0);
+        final String instId = null == instanceId ? "0" : instanceId;
+        ActiveAasBase.processNotification(NAME_SUBMODEL_APPINSTANCES, NotificationMode.SYNCHRONOUS, (sub, aas) -> {
+            String id = fixId(appId + "-" + instId);
+            SubmodelElementCollection coll = sub.getSubmodelElementCollection(id);
+            if (null != coll) {
+                coll.deleteElement(id);
+            }
+            
+            for (SubmodelElement elt: sub.submodelElements()) {
+                if (elt instanceof SubmodelElementCollection) {
+                    coll = (SubmodelElementCollection) elt;
+                    if (appId.equals(getPropertyValueAsStringSafe(coll, NAME_PROP_APPID, null))) {
+                        result.incrementAndGet();
+                    }
+                }
+            }
+        });
+        return result.get();
     }
     
     /**

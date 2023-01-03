@@ -35,6 +35,7 @@ import java.util.function.Predicate;
 import org.apache.commons.lang.ArrayUtils;
 
 import de.iip_ecosphere.platform.deviceMgt.DeviceRemoteManagementOperations;
+import de.iip_ecosphere.platform.ecsRuntime.ContainerState;
 import de.iip_ecosphere.platform.ecsRuntime.EcsClient;
 import de.iip_ecosphere.platform.platform.cli.CommandProvider;
 import de.iip_ecosphere.platform.platform.cli.DeviceManagementClientFactory;
@@ -404,40 +405,95 @@ class CliBackend {
     }
     
     /**
+     * Checks whether we have an already known exception.
+     * 
+     * @param ex the exception
+     * @param marker the already known marker
+     * @param text the text to print out as information on the element
+     * @param id the id of the element
+     * @throws ExecutionException if it is not an already known exception
+     */
+    private static void checkAlreadyKnown(ExecutionException ex, String marker, String text, String id) 
+        throws ExecutionException {
+        if (!ex.getMessage().contains(marker)) {
+            throw ex;
+        } else {
+            println("Skipping " + text + " '" + id + "' as already known");
+        }
+    }
+    
+    /**
+     * Deploys the containers for {@code plan}.
+     * 
+     * @param plan the deployment plan
+     * @throws ExecutionException if executing a container operation fails
+     * @throws IOException if calling an AAS container operation fails
+     * @throws URISyntaxException if building a container URI fails
+     */
+    private static void deployContainers(ServiceDeploymentPlan plan) throws ExecutionException, 
+        IOException, URISyntaxException {
+        for (ContainerResourceAssignment c : plan.getContainer()) {
+            try {
+                EcsClient client = getEcsFactory().create(c.getResource());
+                println("Adding container '" + c.getContainerDesc() + "' to resource " + c.getResource());
+                URI contURI = toUri(c.getContainerDesc());
+                ContainerState contState = client.getState(contURI.toString());
+                String cId;
+                if (ContainerState.UNKNOWN == contState) {
+                    cId = client.addContainer(contURI);
+                    printlnDone();
+                } else {
+                    cId = client.getId(contURI);
+                }
+                if (null == cId || cId.length() == 0) {
+                    throw new ExecutionException("Cannot add/retrieve container for " + contURI, null);
+                }
+                if (ContainerState.AVAILABLE == contState || ContainerState.STOPPED == contState) {
+                    println("Starting container '" + c.getContainerDesc() + "'(" + cId + ") on resource " 
+                        + c.getResource());
+                    client.startContainer(cId);
+                    printlnDone();
+                }
+            } catch (ExecutionException e) { 
+                checkAlreadyKnown(e, EcsClient.EXC_ALREADY_KNOWN, "container", c.getContainerDesc()); // just in case
+            }
+        }
+    }
+    
+    /**
      * Deploys a {@link ServiceDeploymentPlan} given in terms of an URI.
      * 
      * @param plan the plan to be deployed
+     * @return the application instance id of the started application
      * @throws ExecutionException if deploying the plain fails
      */
-    protected static void deployPlan(URI plan) throws ExecutionException {
+    protected static String deployPlan(URI plan) throws ExecutionException {
         ServiceDeploymentPlan p = loadPlan(plan);
+        String appInstanceId = null;
         try {
-            for (ContainerResourceAssignment c : p.getContainer()) {
-                EcsClient client = getEcsFactory().create(c.getResource());
-                println("Adding container '" + c.getContainerDesc() + "' to resource " + c.getResource());
-                String cId = client.addContainer(toUri(c.getContainerDesc()));
-                printlnDone();
-                println("Starting container '" + c.getContainerDesc() + "'(" + cId + ") on resource " 
-                    + c.getResource());
-                client.startContainer(cId);
-                printlnDone();
-            }
+            appInstanceId = PlatformAas.notifyAppNewInstance(p.getAppId());
+            deployContainers(p);
             URI artifact = toUri(p.getArtifact());
             Map<String, ServicesClient> serviceClients = new HashMap<>();
             for (ServiceResourceAssignment a: p.getAssignments()) {
                 URI art = getArtifact(artifact, a);
-                println("Adding artifact '" + art + "' to resource " + a.getResource());
-                ServicesClient client = getServicesFactory().create(a.getResource());
-                serviceClients.put(a.getResource(), client);
-                client.addArtifact(art);
-                printlnDone();
+                try {
+                    println("Adding artifact '" + art + "' to resource " + a.getResource());
+                    ServicesClient client = getServicesFactory().create(a.getResource());
+                    serviceClients.put(a.getResource(), client);
+                    client.addArtifact(art);
+                    printlnDone();
+                } catch (ExecutionException e) {
+                    checkAlreadyKnown(e, ServicesClient.EXC_ALREADY_KNOWN, "artifact", art.toString());
+                }
             }
             ExecutorService es = p.isParallelize() ? Executors.newCachedThreadPool() : null;
             List<StartServicesRunnable> runnables = new ArrayList<>();
             for (ServiceResourceAssignment a: p.getAssignments()) {
                 if (a.getServices().size() > 0) {
                     StartServicesRunnable r = new StartServicesRunnable(a.getResource(),
-                        serviceClients.get(a.getResource()), a.getServicesAsArray(), p.getEnsembles());
+                        serviceClients.get(a.getResource()), a.getServicesAsArray(p.getAppId(), appInstanceId), 
+                            p.getEnsembles());
                     runnables.add(r);
                     if (null != es) {
                         es.execute(r);
@@ -474,28 +530,51 @@ class CliBackend {
         } catch (IOException | URISyntaxException e) {
             throw new ExecutionException(e);
         }
+        return appInstanceId;
+    }
+    
+    /**
+     * Returns whether the resource with {@code resourceId} still has running service instances.
+     * 
+     * @param stillRunning the map of resources and instances after terminating requested services
+     * @param resourceId the resource id
+     * @return {@code true} for still running, {@code false} else
+     */
+    private static boolean isStillRunning(Map<String, Integer> stillRunning, String resourceId) {
+        Integer instances = stillRunning.get(resourceId);
+        if (null == instances) {
+            instances = 0;
+        }
+        return instances > 0;
     }
 
     /**
      * Undeploys a {@link ServiceDeploymentPlan} given in terms of an URI.
      * 
      * @param plan the plan to be deployed
+     * @param appInstanceId the application instance id, may be empty or <b>null</b> for legacy/default starts
      * @throws ExecutionException if deploying the plain fails
      */
-    protected static void undeployPlan(URI plan) throws ExecutionException {
+    protected static void undeployPlan(URI plan, String appInstanceId) throws ExecutionException {
         ServiceDeploymentPlan p = loadPlan(plan);
         try {
             URI artifact = toUri(p.getArtifact());
             Map<String, ServicesClient> serviceClients = new HashMap<>();
+            Map<String, Integer> stillRunning = new HashMap<>();
             List<ServiceResourceAssignment> assignments = new ArrayList<>(p.getAssignments());
             Collections.reverse(assignments);
             for (ServiceResourceAssignment a: assignments) {
                 if (a.getServices().size() > 0) {
                     ServicesClient client = getServicesFactory().create(a.getResource());
                     serviceClients.put(a.getResource(), client);
-                    String[] services = a.getServicesAsArray();
+                    String[] services = a.getServicesAsArray(p.getAppId(), appInstanceId);
                     ArrayUtils.reverse(services);
                     println("Stopping services " + Arrays.toString(services) + " on " + a.getResource());
+                    int running = 0;
+                    for (int i = 0; i < services.length; i++) {
+                        running += Math.max(client.getServiceInstanceCount(services[i]) - 1, 0); // stopping one
+                    }
+                    stillRunning.put(a.getResource(), running);
                     TaskData data = TaskRegistry.getTaskData();
                     if (null != data) {
                         client.stopServiceAsTask(data.getId(), services);
@@ -508,7 +587,7 @@ class CliBackend {
                 Set<String> done = new HashSet<String>();
                 for (ServiceResourceAssignment a: p.getAssignments()) {
                     String resourceId = a.getResource();
-                    if (!done.contains(resourceId)) {
+                    if (!done.contains(resourceId) && !isStillRunning(stillRunning, resourceId)) {
                         done.add(resourceId);
                         URI art = getArtifact(artifact, a);
                         String uri = art.normalize().toString();
@@ -520,18 +599,22 @@ class CliBackend {
             List<ContainerResourceAssignment> container = new ArrayList<>(p.getContainer());
             Collections.reverse(container);
             for (ContainerResourceAssignment c : container) {
-                EcsClient client = getEcsFactory().create(c.getResource());
-                String cDescUri = toUri(c.getContainerDesc()).normalize().toString();
-                println("Stopping container '" + c.getContainerDesc() + " on resource " + c.getResource());
-                client.stopContainer(cDescUri);
-                printlnDone();
-                
-                if (p.isOnUndeployRemoveArtifact()) {
-                    println("Removing container '" + c.getContainerDesc() + "' from resource " + c.getResource());
-                    client.undeployContainer(cDescUri);
+                String resourceId = c.getResource();
+                if (!isStillRunning(stillRunning, resourceId)) {
+                    EcsClient client = getEcsFactory().create(resourceId);
+                    String cDescUri = toUri(c.getContainerDesc()).normalize().toString();
+                    println("Stopping container '" + c.getContainerDesc() + " on resource " + c.getResource());
+                    client.stopContainer(cDescUri);
                     printlnDone();
+                    
+                    if (p.isOnUndeployRemoveArtifact()) {
+                        println("Removing container '" + c.getContainerDesc() + "' from resource " + c.getResource());
+                        client.undeployContainer(cDescUri);
+                        printlnDone();
+                    }
                 }
-            }            
+            }
+            PlatformAas.notifyAppInstanceStopped(p.getAppId(), appInstanceId);
         } catch (URISyntaxException | IOException e) {
             throw new ExecutionException(e);
         }
