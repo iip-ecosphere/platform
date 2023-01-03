@@ -6,7 +6,9 @@
 	<include file="${user.home}/macros.xml"/>
 	
     <!-- deploy to SSE Mvn repo -->
-	<target name="maven"> 
+	<target name="maven">
+		<exec executable="/bin/bash ${basedir}/cleanup.sh" />
+		
 	    <maven pomFile="pom.xml" goal="package"/>
 		<mvnDeployResolveArtifact folderName="IIP-configuration.configuration" pomFile="pom.xml" jarFolder="target" artifactPattern="configuration.configuration-*.*.*.jar" />
 		
