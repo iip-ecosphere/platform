@@ -57,6 +57,7 @@ Improvements:
 * [#55](https://github.com/iip-ecosphere/platform/issues/55): Service integration workshop example/material
 * [#112](https://github.com/iip-ecosphere/platform/issues/112): Example use of managed platform model structure in install package.
 * [#91](https://github.com/iip-ecosphere/platform/issues/91): Dockerhub demonstration containers now with monitoring and management UI.
+* [#119](https://github.com/iip-ecosphere/platform/issues/119): CI build process for configuration.configuration now cleans up left-over containers.
 
 ### Version 0.4.0 (2022/09/02, TddT'22):
 
