@@ -46,12 +46,12 @@ So far, multiple resources folders may exist. Typically, resources is given and 
 
 Applications projects containing the configuration model of the application typically do have their own resources folder, usually with subfolders `software` and if required `rtsa`.
 
-## Hint
+## Prerequisites
 
-For running the tests locally, you need a Python 3.9 installed. On Windows, this can easily be obtained from the Microsoft Store.
+For running the tests locally, you need a Python 3.9 with all IIP-Python dependencies (at least PyYaml, pyflakes - see platform handbook and [Install Package](https://github.com/iip-ecosphere/platform/tree/main/platform/tools/Install)) installed. On Windows, this can easily be obtained from the Microsoft Store.
 
 Some of the test models include the RapidMiner RTSA integration. As RTSA is an IPR-protected commercial production, we cannot package it with its integration and must integrate its artifacts here. For this purpose, the folder `resources` contains resources that shall be packaged during platform/application installation. The RTSA files committed there contain fake RTSA implementation for testing built by the RTSA integration package. However, if you have a real RTSA at hands, create a similar directory called resources.ipr with the actual files and the instantiation will take it up.
 
 **Hint:** If tests are failing on your side due to a missing Docker installation, you may prevent this by `-Deasy.docker.failOnError=false`.
 
-**For snapshots:** EASy-Producer 1.3.4-SNAPSHOT built on **2022/10/27** or newer is required. Use `mvn -U exec:java ...`
+**For snapshots:** EASy-Producer 1.3.4-SNAPSHOT built on **2023/01/03** or newer is required. Use `mvn -U exec:java ...`

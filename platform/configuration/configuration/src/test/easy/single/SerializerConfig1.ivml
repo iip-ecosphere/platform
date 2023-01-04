@@ -142,7 +142,8 @@ project SerializerConfig1 {
         parameter = {
           BooleanParameter {
             name="passThrough", 
-            defaultValue=false
+            defaultValue=false,
+            systemProperty="iip.app.sc1.passThrough"
           }
         }
     };
