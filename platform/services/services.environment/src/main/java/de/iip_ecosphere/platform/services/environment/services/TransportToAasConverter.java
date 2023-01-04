@@ -95,6 +95,9 @@ public abstract class TransportToAasConverter<T> {
         DEFAULT_CONVERTERS.put(boolean[].class, new TypeConverter(Type.STRING, JSON_CONVERTER));
         DEFAULT_CONVERTERS.put(String[].class, new TypeConverter(Type.STRING, JSON_CONVERTER));
         
+        // fallback, nothing specific, just turn to JSON
+        DEFAULT_CONVERTERS.put(Object.class, new TypeConverter(Type.STRING, JSON_CONVERTER));
+        
         METHODS_TO_IGNORE.add("getClass");
     }
 
