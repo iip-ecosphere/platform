@@ -171,6 +171,7 @@ public class ServiceDeploymentPlan extends AbstractSetup {
     private boolean onUndeployRemoveArtifact = true;
     private Map<String, String> ensembles = new HashMap<>();
     private boolean disabled = false;
+    private List<String> arguments;
 
     /**
      * Returns the name of the application.
@@ -278,6 +279,24 @@ public class ServiceDeploymentPlan extends AbstractSetup {
      */
     public Map<String, String> getEnsembles() {
         return ensembles;
+    }
+
+    /**
+     * Returns the optional arguments.
+     * 
+     * @return the arguments, may be empty or <b>null</b> for none
+     */
+    public List<String> getArguments() {
+        return arguments;
+    }
+
+    /**
+     * Returns the optional arguments. [SnakeYaml]
+     * 
+     * @param arguments the arguments, may be empty or <b>null</b> for none
+     */
+    public void setArguments(List<String> arguments) {
+        this.arguments = arguments;
     }
 
     /**

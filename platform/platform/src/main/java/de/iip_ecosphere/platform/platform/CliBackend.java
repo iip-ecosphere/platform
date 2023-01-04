@@ -55,6 +55,7 @@ import de.iip_ecosphere.platform.support.TaskRegistry.TaskData;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
+import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
 import de.iip_ecosphere.platform.support.net.UriResolver;
 
 /**
@@ -461,6 +462,32 @@ class CliBackend {
     }
     
     /**
+     * Turns information form {@code plan} into service start options.
+     * 
+     * @param plan the plan to take the information from
+     * @return the service start options, may be <b>null</b>
+     */
+    private static Map<String, String> getStartOptions(ServiceDeploymentPlan plan) {
+        Map<String, String> options = new HashMap<String, String>();
+
+        Map<String, String> ensembles = plan.getEnsembles();
+        if (null != ensembles && ensembles.size() > 0) {
+            options.put(ServicesClient.OPTION_ENSEMBLE, JsonUtils.toJson(ensembles));
+        }
+        
+        List<String> args = plan.getArguments();
+        if (null != args && args.size() > 0) {
+            options.put(ServicesClient.OPTION_ARGS, JsonUtils.toJson(args));
+        }
+        
+        if (options.size() == 0) {
+            options = null;
+        }
+        
+        return options;
+    }
+    
+    /**
      * Deploys a {@link ServiceDeploymentPlan} given in terms of an URI.
      * 
      * @param plan the plan to be deployed
@@ -489,11 +516,12 @@ class CliBackend {
             }
             ExecutorService es = p.isParallelize() ? Executors.newCachedThreadPool() : null;
             List<StartServicesRunnable> runnables = new ArrayList<>();
+            Map<String, String> options = getStartOptions(p);
             for (ServiceResourceAssignment a: p.getAssignments()) {
                 if (a.getServices().size() > 0) {
                     StartServicesRunnable r = new StartServicesRunnable(a.getResource(),
                         serviceClients.get(a.getResource()), a.getServicesAsArray(p.getAppId(), appInstanceId), 
-                            p.getEnsembles());
+                            options);
                     runnables.add(r);
                     if (null != es) {
                         es.execute(r);
