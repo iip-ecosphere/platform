@@ -43,7 +43,6 @@ public class DomParserTest {
         File out = new File(tmp, "OpcMachineTool.ivml");
         // implicit from in to out
         DomParser.setDefaultVerbose(false); // reduce output
-        DomParser.setMainOutFolder("target/tmp");
         DomParser.main(new String[0]);
         DomParser.main(new String[] {in.toString()});
         DomParser.process(in, "MachineTool", out, false);
@@ -69,7 +68,6 @@ public class DomParserTest {
         File out = new File(tmp, "OpcWoodworking.ivml");
         // implicit from in to out
         DomParser.setDefaultVerbose(false); // reduce output
-        DomParser.setMainOutFolder("target/tmp");
         DomParser.process(in, "Woodworking", out, false);
         
         Charset charset = Charset.forName("UTF-8");

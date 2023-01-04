@@ -15,27 +15,25 @@ package de.iip_ecosphere.platform.configuration.opcua.data;
 /**
  * Represents an object meta type.
  * 
- * @author Jan-Hendrick Cepok, SSE
+ * @author Jan-Hendrik Cepok, SSE
  */
 public class ObjectTypeType extends BaseType {
 
     private String documentation;
-    // private ArrayList<ObjectType> objects;
 
     /**
      * Creates an instance.
      * 
-     * @param nodeId the node id
-     * @param browseName the browse name
-     * @param displayName the display name
-     * @param description the description
+     * @param nodeId        the node id
+     * @param browseName    the browse name
+     * @param displayName   the display name
+     * @param description   the description
      * @param documentation the documentation
      */
     public ObjectTypeType(String nodeId, String browseName, String displayName, String description,
         String documentation) {
-        super(nodeId, browseName, displayName, description);
+        super(nodeId, browseName, displayName, description, false);
         this.documentation = documentation;
-        // this.objects = objects;
     }
 
     /**
@@ -58,17 +56,7 @@ public class ObjectTypeType extends BaseType {
         builder.append("\t\tdisplayName = \"" + getDisplayname() + "\",\n");
         builder.append("\t\tdescription = \"" + getDescription() + "\",\n");
         builder.append("\t\tdocumentation = \"" + documentation + "\"\n");
-        /*
-         * if(!objects.isEmpty()) { builder.append("\tfields = {\n\t\t"); for(ObjectType
-         * o : objects) { builder.append("name = " + o.getVarName());
-         * if(o.equals(objects.get(objects.size() - 1))) { builder.append("\t\t}\n"); }
-         * else { builder.append("\t\t}, "); } } builder.append("\t}\n"); } else {
-         * builder.append("\tfields = {\n\t\n}"); }
-         */
         builder.append("\t};\n\n");
-        // return "UAObjectType [nodeId=" + getNodeId() + ", browseName=" +
-        // getBrowseName() + ", displayName=" + getDisplayname()
-        // + ", description=" + getDescription() + ", \nfields=\n" + fields + "\n]";
         return builder.toString();
     }
 

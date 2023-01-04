@@ -15,44 +15,30 @@ package de.iip_ecosphere.platform.configuration.opcua.data;
 import java.util.ArrayList;
 
 /**
- * Represents an OPC UA object type (declaration).
+ * Represents an OPC UA method type (declaration).
  * 
  * @author Jan-Hendrik Cepok, SSE
  */
-public class ObjectType extends BaseType {
+public class MethodType extends BaseType {
 
-    private String type;
     private ArrayList<FieldType> fields;
 
     // checkstyle: stop parameter number check
     
     /**
-     * Creates an OPC UA object type representation/declaration.
+     * Creates an OPC UA method type representation/declaration.
      * 
      * @param nodeId      the node id
      * @param browseName  the browse name
      * @param displayName the display name
      * @param description the description
      * @param optional    whether the type is optional
-     * @param type        the type of the object
      * @param fields      the fields the object is constituted from
      */
-    public ObjectType(String nodeId, String browseName, String displayName, String description, boolean optional, 
-        String type, ArrayList<FieldType> fields) {
+    public MethodType(String nodeId, String browseName, String displayName, String description, boolean optional, 
+        ArrayList<FieldType> fields) {
         super(nodeId, browseName, displayName, description, optional);
-        this.type = type;
         this.fields = fields;
-    }
-    
-    // checkstyle: resume parameter number check
-
-    /**
-     * Returns the type of the object.
-     * 
-     * @return the type
-     */
-    public String getType() {
-        return type;
     }
 
     /**
@@ -76,15 +62,13 @@ public class ObjectType extends BaseType {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("\tUAObjectType " + getVarName() + " = {\n");
+        builder.append("\tUAMethodType " + getVarName() + " = {\n");
         builder.append("\t\tname = \"" + getVarName() + "\",\n");
         builder.append("\t\t" + formatNodeId(getNodeId()) + "\n");
-        builder.append("\t\tnodeClass = NodeClass::UAObject,\n");
+        builder.append("\t\tnodeClass = NodeClass::UAMethod,\n");
         builder.append("\t\tbrowseName = \"" + getBrowseName() + "\",\n");
         builder.append("\t\tdisplayName = \"" + getDisplayname() + "\",\n");
-        builder.append("\t\tdescription = \"" + getDescription() + "\",\n");
         builder.append("\t\toptional = " + isOptional() + ",\n");
-        builder.append("\t\ttypeDefinition = refBy(opc" + type + "),\n");
         if (!fields.isEmpty()) {
             builder.append("\t\tfields = {\n\t\t\t");
             for (FieldType f : fields) {

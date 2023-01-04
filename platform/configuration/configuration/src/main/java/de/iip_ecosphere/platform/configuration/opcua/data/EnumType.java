@@ -17,7 +17,7 @@ import java.util.ArrayList;
 /**
  * Represents an OPC UA enumeration type.
  * 
- * @author Jan-Hendrick Cepok, SSE
+ * @author Jan-Hendrik Cepok, SSE
  */
 public class EnumType extends BaseType {
 
@@ -29,16 +29,16 @@ public class EnumType extends BaseType {
     /**
      * Creates an OPC UA data type instance.
      * 
-     * @param nodeId the node id
-     * @param browseName the browse name
-     * @param displayname the display name
-     * @param description the description
+     * @param nodeId        the node id
+     * @param browseName    the browse name
+     * @param displayname   the display name
+     * @param description   the description
      * @param documentation the documentation of the type
-     * @param literals the literals of this data type
+     * @param literals      the literals of this data type
      */
     public EnumType(String nodeId, String browseName, String displayname, String description, String documentation,
             ArrayList<EnumLiteral> literals) {
-        super(nodeId, browseName, displayname, description);
+        super(nodeId, browseName, displayname, description, false);
         this.documentation = documentation;
         this.literals = literals;
     }
@@ -89,9 +89,6 @@ public class EnumType extends BaseType {
         builder.append("\t\t}\n");
         builder.append("\t};\n\n");
         return builder.toString();
-        // return "EnumType [nodeId=" + getNodeId() + ", browseName=" + getBrowseName()
-        // + ", displayName=" + getDisplayname()
-        // + ", description=" + getDescription() + ", \nliterals=\n" + literals + "\n]";
     }
 
 }

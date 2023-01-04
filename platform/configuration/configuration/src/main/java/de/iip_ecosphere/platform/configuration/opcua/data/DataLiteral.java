@@ -15,34 +15,22 @@ package de.iip_ecosphere.platform.configuration.opcua.data;
 /**
  * Represents an OPC UA data literal.
  * 
- * @author Jan-Hendrick Cepok, SSE
+ * @author Jan-Hendrik Cepok, SSE
  */
-public class DataLiteral {
+public class DataLiteral extends Literal {
 
-    private String name;
     private String dataType;
-    private String description;
 
     /**
      * Creates a data literal instance.
      * 
-     * @param name the name of the literal
-     * @param dataType the data type
+     * @param name        the name of the literal
+     * @param dataType    the data type
      * @param description the description
      */
     public DataLiteral(String name, String dataType, String description) {
-        this.name = name;
+        super(name, description);
         this.dataType = dataType;
-        this.description = description;
-    }
-
-    /**
-     * Returns the name of the literal.
-     * 
-     * @return the literal
-     */
-    public String getName() {
-        return name;
     }
 
     /**
@@ -54,25 +42,14 @@ public class DataLiteral {
         return dataType;
     }
 
-    /**
-     * Returns the name of the description.
-     * 
-     * @return the description
-     */
-    public String getDescription() {
-        return description;
-    }
-
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append("DataLiteral {\n");
-        builder.append("\t\t\t\tname = \"" + name + "\",\n");
+        builder.append("\t\t\t\tname = \"" + getName() + "\",\n");
         builder.append("\t\t\t\ttype = refBy(" + dataType + "),\n");
-        builder.append("\t\t\t\tdescription = \"" + description + "\"\n");
+        builder.append("\t\t\t\tdescription = \"" + getDescription() + "\"\n");
         return builder.toString();
-        // return "EnumLiteral [name=" + name + ", ordinal=" + ordinal + ",
-        // description=" + description + "]\n";
     }
 
 }

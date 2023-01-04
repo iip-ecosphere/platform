@@ -13,42 +13,54 @@
 package de.iip_ecosphere.platform.configuration.opcua.data;
 
 /**
- * Represents an OPC UA enumeration literal.
+ * Represents an OPC UA literal.
  * 
  * @author Jan-Hendrik Cepok, SSE
  */
-public class EnumLiteral extends Literal {
+public abstract class Literal {
 
-    private String ordinal;
+    private String name;
+    private String description;
 
     /**
-     * Creates an enumeration literal instance.
+     * Creates a literal instance.
      * 
      * @param name        the name of the literal
-     * @param ordinal     the ordinal value
-     * @param description the description of the literal
+     * @param description the description
      */
-    public EnumLiteral(String name, String ordinal, String description) {
-        super(name, description);
-        this.ordinal = ordinal;
+    public Literal(String name, String description) {
+        this.name = name;
+        this.description = description;
     }
 
     /**
-     * Returns the ordinal.
+     * Returns the name of the literal.
      * 
-     * @return the ordinal
+     * @return the literal
      */
-    public String getOrdinal() {
-        return ordinal;
+    public String getName() {
+        return name;
     }
-    
-    @Override
+
+    /**
+     * Returns the name of the literal description.
+     * 
+     * @return the description
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * Formats the OPC UA literal in IVML.
+     * 
+     * @return the IVML representation of the OPC UA literal
+     */
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("EnumLiteral {\n");
-        builder.append("\t\t\t\tname = \"" + getName() + "\",\n");
-        builder.append("\t\t\t\tordinal = " + ordinal + ",\n");
-        builder.append("\t\t\t\tdescription = \"" + getDescription() + "\"\n");
+        builder.append("Literal {\n");
+        builder.append("\t\t\t\tname = \"" + name + "\",\n");
+        builder.append("\t\t\t\tdescription = \"" + description + "\"\n");
         return builder.toString();
     }
 

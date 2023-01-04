@@ -17,7 +17,7 @@ import java.util.ArrayList;
 /**
  * Represents an OPC UA data type.
  * 
- * @author Jan-Hendrick Cepok, SSE
+ * @author Jan-Hendrik Cepok, SSE
  */
 public class DataType extends BaseType {
 
@@ -29,16 +29,16 @@ public class DataType extends BaseType {
     /**
      * Creates an OPC UA data type instance.
      * 
-     * @param nodeId the node id
-     * @param browseName the browse name
-     * @param displayName the display name
-     * @param description the description
+     * @param nodeId        the node id
+     * @param browseName    the browse name
+     * @param displayName   the display name
+     * @param description   the description
      * @param documentation the documentation of the type
-     * @param literals the literals of this data type
+     * @param literals      the literals of this data type
      */
     public DataType(String nodeId, String browseName, String displayName, String description, String documentation,
         ArrayList<DataLiteral> literals) {
-        super(nodeId, browseName, displayName, description);
+        super(nodeId, browseName, displayName, description, false);
         this.documentation = documentation;
         this.literals = literals;
     }
@@ -89,9 +89,6 @@ public class DataType extends BaseType {
         builder.append("\t\t}\n");
         builder.append("\t};\n\n");
         return builder.toString();
-        // return "EnumType [nodeId=" + getNodeId() + ", browseName=" + getBrowseName()
-        // + ", displayName=" + getDisplayname()
-        // + ", description=" + getDescription() + ", \nliterals=\n" + literals + "\n]";
     }
 
 }

@@ -13,18 +13,16 @@
 package de.iip_ecosphere.platform.configuration.opcua.data;
 
 /**
- * Represents an OPC UA field type.
+ * Represents an OPC UA field method type.
  * 
  * @author Jan-Hendrik Cepok, SSE
  */
-public abstract class FieldType extends BaseType {
-
-    private String dataType;
+public class FieldMethodType extends FieldType {
 
     // checkstyle: stop parameter number check
     
     /**
-     * Creates an OPC UA field type instance.
+     * Creates an OPC UA field method type instance.
      * 
      * @param nodeId      the node id
      * @param browseName  the browse name
@@ -33,44 +31,24 @@ public abstract class FieldType extends BaseType {
      * @param dataType    the type of the field
      * @param optional    the optional status
      */
-    public FieldType(String nodeId, String browseName, String displayName, String description, String dataType, 
+    public FieldMethodType(String nodeId, String browseName, String displayName, String description, String dataType, 
         boolean optional) {
-        super(nodeId, browseName, displayName, description, optional);
-        this.dataType = dataType;
+        super(nodeId, browseName, displayName, description, dataType, optional);
     }
-    
+
     // checkstyle: resume parameter number check
-
-    /**
-     * Returns the type of the field.
-     * 
-     * @return the type
-     */
-    public String getDataType() {
-        return dataType;
-    }
-
-    /**
-     * Changes the type of the field.
-     * 
-     * @param dataType the new type
-     */
-    public void setDataType(String dataType) {
-        this.dataType = dataType;
-    }
-
+    
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("UAFieldType {\n");
+        builder.append("UAFieldMethodType {\n");
         builder.append("\t\t\t\tname = \"" + validateVarName(getDisplayname()) + "\",\n");
         builder.append("\t\t\t\t" + formatNodeId(getNodeId()) + "\n");
-        builder.append("\t\t\t\tnodeClass = NodeClass::UAObject,\n");
+        builder.append("\t\t\t\tnodeClass = NodeClass::UAMethod,\n");
         builder.append("\t\t\t\tbrowseName = \"" + getBrowseName() + "\",\n");
         builder.append("\t\t\t\tdisplayName = \"" + getDisplayname() + "\",\n");
-        builder.append("\t\t\t\tdescription = \"" + getDescription() + "\",\n");
-        builder.append("\t\t\t\ttype = refBy(" + dataType + ")\n");
+        builder.append("\t\t\t\toptional = " + isOptional() + ",\n");
+        builder.append("\t\t\t\ttype = refBy(" + getDataType() + ")\n");
         return builder.toString();
     }
-
 }

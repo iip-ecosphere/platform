@@ -15,19 +15,18 @@ package de.iip_ecosphere.platform.configuration.opcua.data;
 import java.util.ArrayList;
 
 /**
- * Represents an OPC UA object type (declaration).
+ * Represents an OPC UA root object.
  * 
  * @author Jan-Hendrik Cepok, SSE
  */
-public class ObjectType extends BaseType {
+public class RootObjectType extends ObjectType {
 
-    private String type;
-    private ArrayList<FieldType> fields;
+    private String rootParent;
 
     // checkstyle: stop parameter number check
     
     /**
-     * Creates an OPC UA object type representation/declaration.
+     * Creates an OPC UA root object type representation/declaration.
      * 
      * @param nodeId      the node id
      * @param browseName  the browse name
@@ -35,48 +34,30 @@ public class ObjectType extends BaseType {
      * @param description the description
      * @param optional    whether the type is optional
      * @param type        the type of the object
+     * @param rootParent  the root parent
      * @param fields      the fields the object is constituted from
      */
-    public ObjectType(String nodeId, String browseName, String displayName, String description, boolean optional, 
-        String type, ArrayList<FieldType> fields) {
-        super(nodeId, browseName, displayName, description, optional);
-        this.type = type;
-        this.fields = fields;
+    public RootObjectType(String nodeId, String browseName, String displayName, String description, boolean optional, 
+        String type, String rootParent, ArrayList<FieldType> fields) {
+        super(nodeId, browseName, displayName, description, optional, type, fields);
+        this.rootParent = rootParent;
     }
     
     // checkstyle: resume parameter number check
 
     /**
-     * Returns the type of the object.
+     * Returns the root parent.
      * 
-     * @return the type
+     * @return the root parent
      */
-    public String getType() {
-        return type;
-    }
-
-    /**
-     * Returns the fields making up the type.
-     * 
-     * @return the fields
-     */
-    public ArrayList<FieldType> getFields() {
-        return fields;
-    }
-
-    /**
-     * Changes the fields making up the type.
-     * 
-     * @param fields the new fields
-     */
-    public void setFields(ArrayList<FieldType> fields) {
-        this.fields = fields;
+    public String getRootParent() {
+        return rootParent;
     }
 
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("\tUAObjectType " + getVarName() + " = {\n");
+        builder.append("\tUARootObjectType " + getVarName() + " = {\n");
         builder.append("\t\tname = \"" + getVarName() + "\",\n");
         builder.append("\t\t" + formatNodeId(getNodeId()) + "\n");
         builder.append("\t\tnodeClass = NodeClass::UAObject,\n");
@@ -84,9 +65,11 @@ public class ObjectType extends BaseType {
         builder.append("\t\tdisplayName = \"" + getDisplayname() + "\",\n");
         builder.append("\t\tdescription = \"" + getDescription() + "\",\n");
         builder.append("\t\toptional = " + isOptional() + ",\n");
-        builder.append("\t\ttypeDefinition = refBy(opc" + type + "),\n");
-        if (!fields.isEmpty()) {
+        builder.append("\t\ttypeDefinition = refBy(" + getType() + "),\n");
+        builder.append("\t\trootParent = refBy(" + rootParent + "),\n");
+        if (!getFields().isEmpty()) {
             builder.append("\t\tfields = {\n\t\t\t");
+            ArrayList<FieldType> fields = getFields();
             for (FieldType f : fields) {
                 builder.append(f.toString());
                 if (f.equals(fields.get(fields.size() - 1))) {
@@ -97,7 +80,7 @@ public class ObjectType extends BaseType {
             }
             builder.append("\t\t}\n");
         } else {
-            builder.append("\t\tfields = {\n\t}\n");
+            builder.append("\t\tfields = {\n\t\t}\n");
         }
         builder.append("\t};\n\n");
         return builder.toString();
