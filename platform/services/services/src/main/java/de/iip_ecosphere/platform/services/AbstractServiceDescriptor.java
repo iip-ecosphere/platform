@@ -55,6 +55,7 @@ public abstract class AbstractServiceDescriptor<A extends ArtifactDescriptor> im
     private List<TypedDataConnectorDescriptor> input = new ArrayList<>(); 
     private List<TypedDataConnectorDescriptor> output = new ArrayList<>(); 
     private ServiceStub stub;
+    private List<String> additionalArgs;
     
     /**
      * Creates an instance. Call {@link #setClassification(ServiceKind, boolean, boolean)} afterwards.
@@ -284,6 +285,16 @@ public abstract class AbstractServiceDescriptor<A extends ArtifactDescriptor> im
         this.output.add(output);
     }
 
+    @Override
+    public void setAdditionalArguments(List<String> additionalArgs) {
+        this.additionalArgs = additionalArgs;
+    }
+    
+    @Override
+    public List<String> getAdditionalArguments() {
+        return this.additionalArgs;
+    }
+    
     /**
      * Returns all services in the same ensemble. [public, static for testing]
      * 

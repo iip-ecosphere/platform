@@ -28,6 +28,16 @@ public interface ServiceOperations {
     public static final String EXC_ALREADY_KNOWN = "is already known";
 
     /**
+     * Service start options, ensemble mapping (member-leader mapping), given as JSON map (string).
+     */
+    public static final String OPTION_ENSEMBLE = "ensemble";
+
+    /**
+     * Service start options, command line options, usually -D&lt;key&gt;=&lt;value&gt;, given as JSON list (string).
+     */
+    public static final String OPTION_ARGS = "args";
+    
+    /**
      * Adds an artifact (and transitively the contained services) to the management domain of this instance, e.g., 
      * by downloading it from an artifact/service store. This defines the {@code id} of the service within the 
      * management domain of this instance. After a successful execution, the artifact {@code id} is returned, artifact 
@@ -56,8 +66,9 @@ public interface ServiceOperations {
      * 
      * @param options optional map of optional options to be passed to the service manager, may modify the 
      *   service descriptors, e.g., to change services to be started together on demand, may be empty for none; options 
-     *   are a name-value mapping with values that come either as primitive values or as JSON structures. The 
-     *   service manager is responsible for correct JSON de-serialization
+     *   are a name-value mapping with values that come either as primitive values or as JSON structures. For 
+     *   pre-defined names, see {@link #OPTION_ARGS} and {@link #OPTION_ENSEMBLE}. The service manager is responsible 
+     *   for correct JSON de-serialization.
      * @param serviceId the id(s) of the service(s)
      * @throws ExecutionException in case that starting the service fails for some reason
      * @see #startService(String...)
