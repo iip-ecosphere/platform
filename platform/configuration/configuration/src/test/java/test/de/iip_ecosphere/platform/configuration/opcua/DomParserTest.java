@@ -95,7 +95,8 @@ public class DomParserTest {
     }
 
     /**
-     * Normalizes unicode/UTF-8 strings for comparison (heuristics).
+     * Normalizes unicode/UTF-8 strings for comparison (heuristics). This is just a hack. Any normalization solution 
+     * solving that problem is welcome.
      * 
      * @param text the text to be normalized
      * @return the normalized text
@@ -104,7 +105,9 @@ public class DomParserTest {
         StringBuilder tmp = new StringBuilder(text);
         for (int i = 0; i < tmp.length(); i++) {
             int c = (int) tmp.charAt(i);
-            if (c == 8211 || c == 65533) {
+            if (c == 172) {
+                tmp.setCharAt(i, (char) 45);
+            } else if (c == 8211 || c == 65533) {
                 tmp.setCharAt(i, '-');
             } else if (c == 8804) {
                 tmp.setCharAt(i, (char) 63);
