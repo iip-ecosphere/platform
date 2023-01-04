@@ -389,7 +389,7 @@ public abstract class AbstractService implements Service {
     // checkstyle: stop parameter number check
 
     /**
-     * Helper method to add parameter configurers to {@code configurers}.
+     * Helper method to add parameter configurers to {@code configurers} without binding to a system property.
      * 
      * @param <T> the parameter type
      * @param configurers the configurers map to be modified
@@ -401,7 +401,30 @@ public abstract class AbstractService implements Service {
      */
     public static <T> void addConfigurer(Map<String, ParameterConfigurer<?>> configurers, String name, 
         Class<T> cls, TypeTranslator<String, T> trans, ValueConfigurer<T> cfg, Supplier<T> getter) {
-        configurers.put(name, new ParameterConfigurer<T>(name, cls, trans, cfg, getter));
+        addConfigurer(configurers, name, cls, trans, cfg, getter, null);
+    }
+
+    /**
+     * Helper method to add parameter configurers to {@code configurers} without binding to a system property.
+     * 
+     * @param <T> the parameter type
+     * @param configurers the configurers map to be modified
+     * @param name the name of the parameter
+     * @param cls the class representing the parameter type
+     * @param trans the type translator to turn initial string values into internal values
+     * @param cfg the value configurer that may change the value / throw exceptions
+     * @param getter the getter for the value (may be <b>null</b> for none, prevents rollback)
+     * @param systemProperty optional system property to take the higher precedence initial/default value for the 
+     *     parameter from, may be empty or <b>null</b> for none
+     */
+    public static <T> void addConfigurer(Map<String, ParameterConfigurer<?>> configurers, String name, 
+        Class<T> cls, TypeTranslator<String, T> trans, ValueConfigurer<T> cfg, Supplier<T> getter, 
+        String systemProperty) {
+        ParameterConfigurer<T> pc = new ParameterConfigurer<T>(name, cls, trans, cfg, getter);
+        if (null != systemProperty && systemProperty.length() > 0) {
+            pc.withSystemProperty(systemProperty);
+        }
+        configurers.put(name, pc);
     }
 
     // checkstyle: resume parameter number check
