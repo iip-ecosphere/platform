@@ -73,6 +73,7 @@ enum ElementType {
 public class DomParser {
 
     private static boolean verboseDefault = true;
+    private static String usingIvmlFolder = "src/test/easy";
     private static final Set<String> IDENTIFY_FIELDS_PERMITTED_REFERENCE_TYPE;
 
     static {
@@ -1419,6 +1420,15 @@ public class DomParser {
         }
         return parser;
     }
+    
+    /**
+     * Sets the folder where to generate example using IVML models.
+     * 
+     * @param folder the folder name (by default "src/test/easy")
+     */
+    public static void setUsingIvmlFolder(String folder) {
+        usingIvmlFolder = folder;
+    }
 
     /**
      * Creates the IVML model in the given {@code fileName}.
@@ -1428,7 +1438,7 @@ public class DomParser {
      */
     private void createIvmlModel(String fileName, File ivmlFile) {
         Generator.generateIVMLModel(fileName, ivmlFile, hierarchy);
-        Generator.generateVDWConnectorSettings(fileName, hierarchy);
+        Generator.generateVDWConnectorSettings(fileName, hierarchy, usingIvmlFolder);
         println("FINISHED");
     }
 

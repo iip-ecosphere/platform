@@ -67,10 +67,11 @@ public class Generator {
      * 
      * @param fileName  the file name for the IVML model
      * @param hierarchy the parsed element hierarchy
+     * @param folder target folder
      */
-    public static void generateVDWConnectorSettings(String fileName, ArrayList<BaseType> hierarchy) {
-        File vdwSpecificConfig = new File("src/test/easy/VDW_" + fileName + ".ivml");
-        File vdwConfig = new File("src/test/easy/VDW.ivml");
+    public static void generateVDWConnectorSettings(String fileName, ArrayList<BaseType> hierarchy, String folder) {
+        File vdwSpecificConfig = new File(folder, "VDW_" + fileName + ".ivml");
+        File vdwConfig = new File(folder, "VDW.ivml");
         String configHeader = "project VDW {\n\n" + "    import IIPEcosphere;\n" + "    import OpcUaDataTypes;\n"
                 + "    import Opc" + fileName + ";\n\n"
                 + "    annotate BindingTime bindingTime = BindingTime::compile to .;\n\n"
