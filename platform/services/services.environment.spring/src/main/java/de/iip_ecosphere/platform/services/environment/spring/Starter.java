@@ -28,6 +28,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.stereotype.Component;
+import org.yaml.snakeyaml.Yaml;
 
 import de.iip_ecosphere.platform.services.environment.Service;
 import de.iip_ecosphere.platform.services.environment.ServiceMapper;
@@ -35,10 +36,13 @@ import de.iip_ecosphere.platform.services.environment.YamlArtifact;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsExtractorRestClient;
 import de.iip_ecosphere.platform.services.environment.spring.metricsProvider.MetricsProvider;
 import de.iip_ecosphere.platform.support.CollectionUtils;
+import de.iip_ecosphere.platform.support.NetUtils;
+import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.iip_aas.config.CmdLine;
 import de.iip_ecosphere.platform.support.iip_aas.config.YamlFile;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 import de.iip_ecosphere.platform.transport.Transport;
+import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 
 /**
  * A specialized starter for Spring Cloud Stream in including the metrics provider.
@@ -232,6 +236,9 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
      */
     public static void main(Class<? extends Starter> cls, String[] args) {
         ResourceLoader.registerResourceResolver(new SpringResourceResolver()); // ensure spring resolution
+        setLocalTransportSetupSupplier(setup -> {
+            return YamlSetup.getInternalTransportSetup();
+        });
         Starter.parse(args);
         parseExternConnections(args, e -> Transport.addGlobalRoutingKey(e));
         getSetup(); // ensure instance
