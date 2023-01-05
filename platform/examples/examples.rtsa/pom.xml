@@ -73,7 +73,10 @@
                   <artifactId>exec-maven-plugin</artifactId>
                   <version>3.0.0</version>
                   <configuration>
-                      <mainClass>de.iip_ecosphere.platform.examples.rtsa.Starter</mainClass>
+                      <mainClass>de.iip_ecosphere.platform.examples.SpringStartup</mainClass>
+                      <arguments>
+                        <argument>gen/rtsa/SimpleRTSADemoFlowApp/target/SimpleRTSADemoFlowApp-0.1.0-SNAPSHOT-bin.jar</argument>
+                      </arguments>
                   </configuration>
               </plugin>
           </plugins>
