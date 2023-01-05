@@ -66,6 +66,7 @@ project Services {
    // -------------------- service parameters -------------------------
    
     compound Parameter refines CReversibleProperty {
+        String systemProperty = "";
     }
     typedef Parameters sequenceOf(Parameter) with (Parameters->collect(p|p.name).size() == Parameters.size()/*  and isDefined(Parameters)*/);
 

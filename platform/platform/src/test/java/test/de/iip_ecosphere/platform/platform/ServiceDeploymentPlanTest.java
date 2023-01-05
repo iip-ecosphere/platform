@@ -48,7 +48,7 @@ public class ServiceDeploymentPlanTest {
         Assert.assertEquals("a1234", assng.getResource());
         Assert.assertNotNull(assng.getServices());
         Assert.assertEquals(2, assng.getServices().size());
-        Assert.assertEquals(2, assng.getServicesAsArray().length);
+        Assert.assertEquals(2, assng.getServicesAsArray(null, null).length);
         Assert.assertEquals("Start", assng.getServices().get(0));
         Assert.assertEquals("Transform", assng.getServices().get(1));
         
@@ -56,7 +56,8 @@ public class ServiceDeploymentPlanTest {
         Assert.assertEquals("a1235", assng.getResource());
         Assert.assertNotNull(assng.getServices());
         Assert.assertEquals(2, assng.getServices().size());
-        Assert.assertEquals(2, assng.getServicesAsArray().length);
+        Assert.assertEquals(2, assng.getServicesAsArray(null, null).length);
+        Assert.assertEquals(2, assng.getServicesAsArray("app", "001").length);
         Assert.assertEquals("AI", assng.getServices().get(0));
         Assert.assertEquals("End", assng.getServices().get(1));
         

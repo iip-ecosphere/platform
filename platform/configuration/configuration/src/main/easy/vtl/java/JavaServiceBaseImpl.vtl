@@ -21,7 +21,11 @@ template JavaServiceBaseImpl(Configuration config, FileArtifact target, ServiceB
     
     def registerParameter(Parameter p, String cls, String typeTranslator) {
         String suffix = attributeMethodSuffix(p);
-        regs.add('AbstractService.addConfigurer(paramConfigurers, "${p.name}", ${cls}, ${typeTranslator}, v -> setParameter${suffix}(v), () -> getParameter${suffix}());');
+        String sysProp = getStringValueSafe(p.systemProperty, "");
+        if (sysProp <> "") {
+            sysProp = ', "${sysProp}"';
+        }
+        regs.add('AbstractService.addConfigurer(paramConfigurers, "${p.name}", ${cls}, ${typeTranslator}, v -> setParameter${suffix}(v), () -> getParameter${suffix}()${sysProp});');
     }
 
     def produceRegisterParameterConfigurers() {

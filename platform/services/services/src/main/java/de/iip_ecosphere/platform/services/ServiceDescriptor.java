@@ -181,4 +181,18 @@ public interface ServiceDescriptor {
      */
     public InvocablesCreator getInvocablesCreator();
     
+    /**
+     * Defines additional arguments to be passed on during service start.
+     * 
+     * @param args the arguments, may be empty or <b>null</b> for none
+     */
+    public void setAdditionalArguments(List<String> args);
+    
+    /**
+     * Returns the additional arguments to be passed on during service start.
+     * 
+     * @return the arguments, may be empty or <b>null</b> for none
+     */
+    public List<String> getAdditionalArguments();
+    
 }

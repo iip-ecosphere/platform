@@ -17,7 +17,7 @@ import java.util.ArrayList;
 /**
  * Represents an OPC UA object type (declaration).
  * 
- * @author Jan-Hendrick Cepok, SSE
+ * @author Jan-Hendrik Cepok, SSE
  */
 public class ObjectType extends BaseType {
 
@@ -29,16 +29,17 @@ public class ObjectType extends BaseType {
     /**
      * Creates an OPC UA object type representation/declaration.
      * 
-     * @param nodeId the node id
-     * @param browseName the browse name
+     * @param nodeId      the node id
+     * @param browseName  the browse name
      * @param displayName the display name
      * @param description the description
-     * @param type the type of the object
-     * @param fields the fields the object is constituted from
+     * @param optional    whether the type is optional
+     * @param type        the type of the object
+     * @param fields      the fields the object is constituted from
      */
-    public ObjectType(String nodeId, String browseName, String displayName, String description, String type,
-        ArrayList<FieldType> fields) {
-        super(nodeId, browseName, displayName, description);
+    public ObjectType(String nodeId, String browseName, String displayName, String description, boolean optional, 
+        String type, ArrayList<FieldType> fields) {
+        super(nodeId, browseName, displayName, description, optional);
         this.type = type;
         this.fields = fields;
     }
@@ -82,7 +83,7 @@ public class ObjectType extends BaseType {
         builder.append("\t\tbrowseName = \"" + getBrowseName() + "\",\n");
         builder.append("\t\tdisplayName = \"" + getDisplayname() + "\",\n");
         builder.append("\t\tdescription = \"" + getDescription() + "\",\n");
-        // TODO change to typeDef
+        builder.append("\t\toptional = " + isOptional() + ",\n");
         builder.append("\t\ttypeDefinition = refBy(opc" + type + "),\n");
         if (!fields.isEmpty()) {
             builder.append("\t\tfields = {\n\t\t\t");
@@ -99,9 +100,6 @@ public class ObjectType extends BaseType {
             builder.append("\t\tfields = {\n\t}\n");
         }
         builder.append("\t};\n\n");
-        // return "UAObjectType [nodeId=" + getNodeId() + ", browseName=" +
-        // getBrowseName() + ", displayName=" + getDisplayname()
-        // + ", description=" + getDescription() + ", \nfields=\n" + fields + "\n]";
         return builder.toString();
     }
 

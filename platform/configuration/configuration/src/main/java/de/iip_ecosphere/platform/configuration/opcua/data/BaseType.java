@@ -15,7 +15,7 @@ package de.iip_ecosphere.platform.configuration.opcua.data;
 /**
  * Representation of an OPC UA type.
  * 
- * @author Jan-Hendrick Cepok, SSE
+ * @author Jan-Hendrik Cepok, SSE
  */
 public abstract class BaseType {
 
@@ -24,20 +24,23 @@ public abstract class BaseType {
     private String browseName;
     private String displayName;
     private String description;
+    private boolean optional;
 
     /**
      * Creates an OPC UA type representation.
      * 
-     * @param nodeId the node id
-     * @param browseName the browse name
+     * @param nodeId      the node id
+     * @param browseName  the browse name
      * @param displayname the display name
      * @param description the description
+     * @param optional    whether the type is optional
      */
-    public BaseType(String nodeId, String browseName, String displayname, String description) {
+    public BaseType(String nodeId, String browseName, String displayname, String description, boolean optional) {
         this.nodeId = nodeId;
         this.browseName = browseName;
         this.displayName = displayname;
         this.description = description;
+        this.optional = optional;
     }
 
     /**
@@ -93,7 +96,21 @@ public abstract class BaseType {
     public String getDescription() {
         return description;
     }
-
+    
+    /**
+     * Returns the OPC UA optional status.
+     * 
+     * @return the optional status
+     */
+    public boolean isOptional() {
+        return optional;
+    }
+    
+    /**
+     * Formats the respective OPC UA type in IVML.
+     * 
+     * @return the IVML representation of the OPC UA type
+     */
     @Override
     public String toString() {
         return "BaseType [nodeId=" + nodeId + ", browseName=" + browseName + ", displayName=" + displayName
@@ -127,6 +144,9 @@ public abstract class BaseType {
     public static String validateVarName(String varName) {
         varName = varName.replaceAll("[^A-Za-z0-9]", "");
         varName = varName.replace("_", "");
+        if (Character.isDigit(varName.charAt(0))) {
+            varName = "_" + varName;
+        }
         return varName;
     }
 

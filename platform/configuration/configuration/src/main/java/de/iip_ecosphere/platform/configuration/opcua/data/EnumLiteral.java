@@ -15,64 +15,41 @@ package de.iip_ecosphere.platform.configuration.opcua.data;
 /**
  * Represents an OPC UA enumeration literal.
  * 
- * @author Jan-Hendrick Cepok, SSE
+ * @author Jan-Hendrik Cepok, SSE
  */
-public class EnumLiteral {
+public class EnumLiteral extends Literal {
 
-    private String name;
     private String ordinal;
-    private String description;
 
     /**
      * Creates an enumeration literal instance.
      * 
-     * @param name the name of the literal
-     * @param ordinal the ordinal value
+     * @param name        the name of the literal
+     * @param ordinal     the ordinal value
      * @param description the description of the literal
      */
     public EnumLiteral(String name, String ordinal, String description) {
-        this.name = name;
+        super(name, description);
         this.ordinal = ordinal;
-        this.description = description;
     }
 
     /**
-     * Returns the name of the literal.
-     * 
-     * @return the name
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Returns the ordinal of the literal.
+     * Returns the ordinal.
      * 
      * @return the ordinal
      */
     public String getOrdinal() {
         return ordinal;
     }
-
-    /**
-     * Returns the description of the literal.
-     * 
-     * @return the description
-     */
-    public String getDescription() {
-        return description;
-    }
-
+    
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append("EnumLiteral {\n");
-        builder.append("\t\t\t\tname = \"" + name + "\",\n");
+        builder.append("\t\t\t\tname = \"" + getName() + "\",\n");
         builder.append("\t\t\t\tordinal = " + ordinal + ",\n");
-        builder.append("\t\t\t\tdescription = \"" + description + "\"\n");
+        builder.append("\t\t\t\tdescription = \"" + getDescription() + "\"\n");
         return builder.toString();
-        // return "EnumLiteral [name=" + name + ", ordinal=" + ordinal + ",
-        // description=" + description + "]\n";
     }
 
 }

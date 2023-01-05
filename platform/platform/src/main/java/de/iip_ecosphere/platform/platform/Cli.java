@@ -13,6 +13,7 @@
 package de.iip_ecosphere.platform.platform;
 
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
@@ -120,7 +121,8 @@ public class Cli extends CliBackend {
             }
             if (level.isTopLevel()) {
                 println(" deploy <file/URI> runs the given deployment plan");
-                println(" undeploy <file/URI> reverts the given deployment plan");
+                println(" undeploy <file/URI> <id>? reverts the given deployment plan, if given for "
+                    + "the specified application id");
                 println(" snapshotAAS - creates a snapshot of the AAS of the platform");
                 println(" help - prints help for this program");
                 println(" exit - exits the program", provider);
@@ -166,10 +168,10 @@ public class Cli extends CliBackend {
                 exit = rci.interpret(provider, Level.RESOURCES);
                 break;
             case "deploy":
-                callWithUri(provider, uri -> deployPlan(uri));
+                callWithUri(provider, uri -> deployPlanEmitId(uri));
                 break;
             case "undeploy":
-                callWithUri(provider, uri -> undeployPlan(uri));
+                callWithUri(provider, uri -> undeployPlan(uri, provider.nextCommand()));
                 break;
             default:
                 exit = super.interpretFurther(provider, level, cmd);
@@ -178,6 +180,19 @@ public class Cli extends CliBackend {
             return exit;
         }
 
+    }
+    
+    /**
+     * Calls {@link #deployPlan(URI)} and emits the returned application id if there is any.
+     * 
+     * @param uri the URI of the deployment plan to start
+     * @throws ExecutionException if deploying the plain fails
+     */
+    private static void deployPlanEmitId(URI uri) throws ExecutionException {
+        String appInstId = deployPlan(uri);
+        if (null != appInstId && appInstId.length() > 0) {
+            println("Started with application id " + appInstId);
+        }
     }
 
     /**

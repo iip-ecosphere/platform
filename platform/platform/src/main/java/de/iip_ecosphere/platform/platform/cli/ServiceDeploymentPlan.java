@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.iip_ecosphere.platform.services.environment.switching.ServiceBase;
 import de.iip_ecosphere.platform.support.iip_aas.Version;
 import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
 
@@ -121,10 +122,20 @@ public class ServiceDeploymentPlan extends AbstractSetup {
         /**
          * Returns the {@link #getServices()} in terms of an array.
          * 
-         * @return the services
+         * @param appId the application id, may be null or empty for legacy start
+         * @param appInstanceId the application instance id, may be null or empty for legacy start
+         * @return the full service ids if {@code appId} and {@code appInstanecId] are given, the plain service ids else
          */
-        public String[] getServicesAsArray() {
-            return services.toArray(new String[services.size()]);
+        public String[] getServicesAsArray(String appId, String appInstanceId) {
+            String[] result = new String[services.size()];
+            if (null == appId || appId.length() == 0 || null == appInstanceId || appInstanceId.length() == 0) {
+                result = services.toArray(result);
+            } else {
+                for (int s = 0; s < services.size(); s++) {
+                    result[s] = ServiceBase.composeId(services.get(s), appId, appInstanceId);
+                }
+            }
+            return result;
         }
 
         /**
@@ -160,6 +171,7 @@ public class ServiceDeploymentPlan extends AbstractSetup {
     private boolean onUndeployRemoveArtifact = true;
     private Map<String, String> ensembles = new HashMap<>();
     private boolean disabled = false;
+    private List<String> arguments;
 
     /**
      * Returns the name of the application.
@@ -267,6 +279,24 @@ public class ServiceDeploymentPlan extends AbstractSetup {
      */
     public Map<String, String> getEnsembles() {
         return ensembles;
+    }
+
+    /**
+     * Returns the optional arguments.
+     * 
+     * @return the arguments, may be empty or <b>null</b> for none
+     */
+    public List<String> getArguments() {
+        return arguments;
+    }
+
+    /**
+     * Returns the optional arguments. [SnakeYaml]
+     * 
+     * @param arguments the arguments, may be empty or <b>null</b> for none
+     */
+    public void setArguments(List<String> arguments) {
+        this.arguments = arguments;
     }
 
     /**

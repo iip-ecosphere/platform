@@ -21,7 +21,7 @@ This package contains also programs to optimize specific deployments, e.g., to r
 
 **External programs**
 
-* Python 3.9, further dependencies see `requirements.txt`
-* For the management UI: Angular 13, further dependencies see `dependencies.json`
+* Python 3.9, further dependencies for code generation, communication and potentially the Python-based data processing functions see [requirements.txt](./requirements.txt).
+* For the management UI: Angular 13, further dependencies see [dependencies.json](./dependencies.json).
 
 **For snapshots:** See required EASy-Producer version in [configuration integration and the configuration meta model](https://github.com/iip-ecosphere/platform/tree/main/platform/configuration/configuration/README.md)

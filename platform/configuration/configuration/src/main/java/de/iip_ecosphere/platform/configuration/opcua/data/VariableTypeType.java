@@ -15,7 +15,7 @@ package de.iip_ecosphere.platform.configuration.opcua.data;
 /**
  * Represents a variable meta-type.
  * 
- * @author Jan-Hendrick Cepok, SSE
+ * @author Jan-Hendrik Cepok, SSE
  */
 public class VariableTypeType extends BaseType {
 
@@ -27,16 +27,16 @@ public class VariableTypeType extends BaseType {
     /**
      * Creates an instance.
      * 
-     * @param nodeId the node id
-     * @param browseName the browse name
-     * @param displayName the display name
-     * @param description the description
+     * @param nodeId        the node id
+     * @param browseName    the browse name
+     * @param displayName   the display name
+     * @param description   the description
      * @param documentation the documentation
-     * @param dataType the data type
+     * @param dataType      the data type
      */
     public VariableTypeType(String nodeId, String browseName, String displayName, String description,
         String documentation, String dataType) {
-        super(nodeId, browseName, displayName, description);
+        super(nodeId, browseName, displayName, description, false);
         this.documentation = documentation;
         this.dataType = dataType;
     }

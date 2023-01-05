@@ -15,30 +15,31 @@ package de.iip_ecosphere.platform.configuration.opcua.data;
 import java.util.ArrayList;
 
 /**
- * Represents an OPC UA root object.
+ * Represents an OPC UA root method.
  * 
- * @author Jan-Hendrick Cepok, SSE
+ * @author Jan-Hendrik Cepok, SSE
  */
-public class RootObject extends ObjectType {
+public class RootMethodType extends ObjectType {
 
     private String rootParent;
 
     // checkstyle: stop parameter number check
     
     /**
-     * Creates an instance.
+     * Creates an OPC UA root method type representation/declaration.
      * 
-     * @param nodeId the node id
-     * @param browseName the browse name
+     * @param nodeId      the node id
+     * @param browseName  the browse name
      * @param displayName the display name
      * @param description the description
-     * @param type the type of the object
-     * @param rootParent the root parent
-     * @param fields the fields the object is constituted from
+     * @param optional    whether the type is optional
+     * @param type        the type of the object
+     * @param rootParent  the root parent
+     * @param fields      the fields the object is constituted from
      */
-    public RootObject(String nodeId, String browseName, String displayName, String description, String type,
-        String rootParent, ArrayList<FieldType> fields) {
-        super(nodeId, browseName, displayName, description, type, fields);
+    public RootMethodType(String nodeId, String browseName, String displayName, String description, boolean optional, 
+        String type, String rootParent, ArrayList<FieldType> fields) {
+        super(nodeId, browseName, displayName, description, optional, type, fields);
         this.rootParent = rootParent;
     }
     
@@ -56,14 +57,13 @@ public class RootObject extends ObjectType {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("\tUARootObjectType " + getVarName() + " = {\n");
+        builder.append("\tUARootMethodType " + getVarName() + " = {\n");
         builder.append("\t\tname = \"" + getVarName() + "\",\n");
         builder.append("\t\t" + formatNodeId(getNodeId()) + "\n");
-        builder.append("\t\tnodeClass = NodeClass::UAObject,\n");
+        builder.append("\t\tnodeClass = NodeClass::UAMethod,\n");
         builder.append("\t\tbrowseName = \"" + getBrowseName() + "\",\n");
         builder.append("\t\tdisplayName = \"" + getDisplayname() + "\",\n");
-        builder.append("\t\tdescription = \"" + getDescription() + "\",\n");
-        builder.append("\t\ttypeDefinition = refBy(opc" + getType() + "),\n");
+        builder.append("\t\toptional = " + isOptional() + ",\n");
         builder.append("\t\trootParent = refBy(" + rootParent + "),\n");
         if (!getFields().isEmpty()) {
             builder.append("\t\tfields = {\n\t\t\t");

@@ -70,7 +70,6 @@ public class SpringCloudServiceManager
 
     public static final String OPT_SERVICE_PREFIX = "iip.service.";
     private static final String PROGRESS_COMPONENT_ID = "Spring Cloud Service Manager";
-    private static final String OPTION_ENSEMBLE = "ensemble";
     private static final Logger LOGGER = LoggerFactory.getLogger(SpringCloudServiceManager.class);
     private Predicate<TypedDataConnectorDescriptor> available = c -> true;
     
@@ -274,6 +273,19 @@ public class SpringCloudServiceManager
             String opt = options.get(OPTION_ENSEMBLE);
             if (null != opt) {
                 handleOptionEnsemble(opt, serviceIds, mgr);
+            }
+
+            opt = options.get(OPTION_ARGS);
+            List<String> argList = null;
+            if (null != opt) {
+                List<?> tmp = JsonUtils.fromJson(opt, List.class);
+                argList = new ArrayList<>();
+                for (Object t : tmp) {
+                    argList.add(t.toString());
+                }
+            }
+            for (String sId : serviceIds) {
+                mgr.getService(sId).setAdditionalArguments(argList); // set/reset
             }
         }
     }

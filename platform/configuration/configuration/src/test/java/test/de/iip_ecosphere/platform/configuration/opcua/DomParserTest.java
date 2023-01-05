@@ -43,7 +43,7 @@ public class DomParserTest {
         File out = new File(tmp, "OpcMachineTool.ivml");
         // implicit from in to out
         DomParser.setDefaultVerbose(false); // reduce output
-        DomParser.setMainOutFolder("target/tmp");
+        DomParser.setUsingIvmlFolder("target/tmp");
         DomParser.main(new String[0]);
         DomParser.main(new String[] {in.toString()});
         DomParser.process(in, "MachineTool", out, false);
@@ -69,7 +69,8 @@ public class DomParserTest {
         File out = new File(tmp, "OpcWoodworking.ivml");
         // implicit from in to out
         DomParser.setDefaultVerbose(false); // reduce output
-        DomParser.setMainOutFolder("target/tmp");
+        new File("target/ivml").mkdirs();
+        DomParser.setUsingIvmlFolder("target/tmp");
         DomParser.process(in, "Woodworking", out, false);
         
         Charset charset = Charset.forName("UTF-8");
@@ -94,7 +95,8 @@ public class DomParserTest {
     }
 
     /**
-     * Normalizes unicode/UTF-8 strings for comparison (heuristics).
+     * Normalizes unicode/UTF-8 strings for comparison (heuristics). This is just a hack. Any normalization solution 
+     * solving that problem is welcome.
      * 
      * @param text the text to be normalized
      * @return the normalized text
@@ -103,7 +105,9 @@ public class DomParserTest {
         StringBuilder tmp = new StringBuilder(text);
         for (int i = 0; i < tmp.length(); i++) {
             int c = (int) tmp.charAt(i);
-            if (c == 8211 || c == 65533) {
+            if (c == 172) {
+                tmp.setCharAt(i, (char) 45);
+            } else if (c == 8211 || c == 65533) {
                 tmp.setCharAt(i, '-');
             } else if (c == 8804) {
                 tmp.setCharAt(i, (char) 63);

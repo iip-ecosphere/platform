@@ -23,6 +23,7 @@ public class ParameterConfigurer<T> implements ValueConfigurer<T> {
     private ValueConfigurer<T> cfg;
     private Supplier<T> getter;
     private Class<T> cls;
+    private String sysProperty;
     
     /**
      * Creates a parameter configurer without getter, i.e., implicitly recovery is disabled.
@@ -54,6 +55,18 @@ public class ParameterConfigurer<T> implements ValueConfigurer<T> {
         this.translator = translator;
         this.cfg = cfg;
         this.getter = getter;
+    }
+
+    /**
+     * Optional system property that shall be considered during initialization.
+     * 
+     * @param sysProperty system property name that shall be used via {@code translator} to initialize the parameter, 
+     *   takes precedence
+     * @return <b>this</b> (builder style)
+     */
+    public ParameterConfigurer<T> withSystemProperty(String sysProperty) {
+        this.sysProperty = sysProperty;
+        return this;
     }
     
     @Override
@@ -96,12 +109,24 @@ public class ParameterConfigurer<T> implements ValueConfigurer<T> {
      * @param value the value to be added
      */
     public void addValue(Map<String, String> values, Object value) {
+        if (sysProperty != null) {
+            String propValue = System.getProperty(sysProperty, null);
+            if (null != propValue) {
+                try {
+                    value = translator.to(propValue);
+                } catch (IOException e) {
+                    LoggerFactory.getLogger(ParameterConfigurer.class).warn("Cannot convert system property {} to "
+                        + "value of service parameter {}: {}. Ignoring system property.", 
+                        sysProperty, name, e.getMessage());
+                }
+            }
+        }
         if (cls.isInstance(value)) {
             try {
                 values.put(name, translator.from(cls.cast(value)));
             } catch (IOException e) {
-                LoggerFactory.getLogger(ParameterConfigurer.class).warn("Cannot add value for " 
-                    + name + ": " + e.getMessage());
+                LoggerFactory.getLogger(ParameterConfigurer.class).warn(
+                    "Cannot add value for service parameter {}: {}", name, e.getMessage());
             }
         } else {
             LoggerFactory.getLogger(ParameterConfigurer.class).warn("Cannot add value for " 

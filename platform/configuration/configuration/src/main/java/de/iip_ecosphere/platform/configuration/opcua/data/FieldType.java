@@ -15,25 +15,31 @@ package de.iip_ecosphere.platform.configuration.opcua.data;
 /**
  * Represents an OPC UA field type.
  * 
- * @author Jan-Hendrick Cepok, SSE
+ * @author Jan-Hendrik Cepok, SSE
  */
-public class FieldType extends BaseType {
+public abstract class FieldType extends BaseType {
 
     private String dataType;
 
+    // checkstyle: stop parameter number check
+    
     /**
      * Creates an OPC UA field type instance.
      * 
-     * @param nodeId the node id
-     * @param browseName the browse name
+     * @param nodeId      the node id
+     * @param browseName  the browse name
      * @param displayName the display name
      * @param description the description
-     * @param dataType the type of the field
+     * @param dataType    the type of the field
+     * @param optional    the optional status
      */
-    public FieldType(String nodeId, String browseName, String displayName, String description, String dataType) {
-        super(nodeId, browseName, displayName, description);
+    public FieldType(String nodeId, String browseName, String displayName, String description, String dataType, 
+        boolean optional) {
+        super(nodeId, browseName, displayName, description, optional);
         this.dataType = dataType;
     }
+    
+    // checkstyle: resume parameter number check
 
     /**
      * Returns the type of the field.
@@ -65,9 +71,6 @@ public class FieldType extends BaseType {
         builder.append("\t\t\t\tdescription = \"" + getDescription() + "\",\n");
         builder.append("\t\t\t\ttype = refBy(" + dataType + ")\n");
         return builder.toString();
-        // return "FieldType [nodeId=" + getNodeId() + ", browseName=" + getBrowseName()
-        // + ", displayName=" + getDisplayname()
-        // + ", description=" + getDescription() + ", dataType=" + dataType + "]\n";
     }
 
 }

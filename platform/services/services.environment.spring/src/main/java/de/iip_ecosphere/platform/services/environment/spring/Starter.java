@@ -232,6 +232,9 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
      */
     public static void main(Class<? extends Starter> cls, String[] args) {
         ResourceLoader.registerResourceResolver(new SpringResourceResolver()); // ensure spring resolution
+        setLocalTransportSetupSupplier(setup -> {
+            return YamlSetup.getInternalTransportSetup();
+        });
         Starter.parse(args);
         parseExternConnections(args, e -> Transport.addGlobalRoutingKey(e));
         getSetup(); // ensure instance

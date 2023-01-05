@@ -20,6 +20,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,6 +64,32 @@ public class Starter {
     private static String transportHost = null;
     private static boolean transportGlobal = false;
     private static EnvironmentSetup setup;
+
+    /**
+     * Default supplier for the local transport setup. This basic implementation is a bit heuristic
+     * as it assumes the same authentication/port as the global setup, which may not work in certain container
+     * settings.
+     */
+    protected static final Function<EnvironmentSetup, TransportSetup> DFLT_LOCAL_TRANSPORT_SETUP_SUPPLIER = setup -> {
+        TransportSetup localSetup = null;
+        TransportSetup globalSetup = setup.getTransport();
+        String globalHost = globalSetup.getHost();
+        if (!transportGlobal && !ServerAddress.LOCALHOST.equals(globalHost) 
+            && !"127.0.0.1".equals(globalHost) && !NetUtils.isOwnAddress(globalHost)) {
+            localSetup = setup.getTransport().copy(); // TODO same authentication/port assumed
+            localSetup.setHost(ServerAddress.LOCALHOST);
+        }        
+        return localSetup;
+    };
+
+    /**
+     * Defines the supplier for the local transport setup. Called only in {@link #getSetup()} if 
+     * {@link #transportGlobal a need for a separation of global/local transport} was detected.
+     * Specific service execution implementations may override this using 
+     * {@link #setLocalTransportSetupSupplier(Supplier)}. Default is {@link #DFLT_LOCAL_TRANSPORT_SETUP_SUPPLIER}.
+     */
+    private static Function<EnvironmentSetup, TransportSetup> localTransportSetupSupplier 
+        = DFLT_LOCAL_TRANSPORT_SETUP_SUPPLIER;
 
     /**
      * Adds all environment properties starting with {@link #IIP_APP_PREFIX} to the command line of the service 
@@ -445,8 +473,7 @@ public class Starter {
         if (null == setup) {
             try {
                 LoggerFactory.getLogger(Starter.class).info("Loading setup");
-                setup = EnvironmentSetup.readFromYaml(EnvironmentSetup.class, 
-                    ResourceLoader.getResourceAsStream(Starter.class, "application.yml"));
+                setup = EnvironmentSetup.readFromYaml(EnvironmentSetup.class, getApplicationSetupAsStream());
                 if (transportPort > 0) {
                     setup.getTransport().setPort(transportPort);
                 }
@@ -460,14 +487,13 @@ public class Starter {
                 TransportSetup globalSetup = setup.getTransport();
                 LoggerFactory.getLogger(Starter.class).info("Global transport {}:{}", 
                     globalSetup.getHost(), globalSetup.getPort());
-                String globalHost = globalSetup.getHost();
-                if (!transportGlobal && !ServerAddress.LOCALHOST.equals(globalHost) 
-                    && !"127.0.0.1".equals(globalHost) && !NetUtils.isOwnAddress(globalHost)) {
-                    TransportSetup localSetup = setup.getTransport().copy(); // TODO same authentication/port assumed
-                    localSetup.setHost(ServerAddress.LOCALHOST);
-                    LoggerFactory.getLogger(Starter.class).info("Local transport {}:{}", 
-                        localSetup.getHost(), localSetup.getPort());
-                    Transport.setLocalSetup(() -> localSetup);
+                if (!transportGlobal) {
+                    TransportSetup localSetup = localTransportSetupSupplier.apply(setup);
+                    if (null != localSetup) {
+                        LoggerFactory.getLogger(Starter.class).info("Local transport {}:{}", 
+                            localSetup.getHost(), localSetup.getPort());
+                        Transport.setLocalSetup(() -> localSetup);
+                    }
                 }
             } catch (IOException e) {
                 setup = new EnvironmentSetup();
@@ -475,6 +501,26 @@ public class Starter {
             }
         }
         return setup;
+    }
+    
+    /**
+     * Returns the application setup as stream.
+     *  
+     * @return the application setup as stream
+     */
+    public static InputStream getApplicationSetupAsStream() {
+        return ResourceLoader.getResourceAsStream(Starter.class, "application.yml"); // spring only?
+    }
+    
+    /**
+     * Changes the local transport supplier determining the setup for the local transport.
+     * 
+     * @param supplier the new supplier, may be <b>null</b> for none
+     */
+    protected static void setLocalTransportSetupSupplier(Function<EnvironmentSetup, TransportSetup> supplier) {
+        if (null != supplier) { // ensure that there is one
+            localTransportSetupSupplier = supplier;
+        }
     }
 
     /**

@@ -94,6 +94,16 @@ public class CliTest {
         "help",
         "exit"
     };
+    
+    /**
+     * Successful command sequence within services level. 
+     */
+    private static final String[] SERVICES_ADD_SEQUENCE = new String[] {
+        "services", "ab01", "add", "http://me.de/download/artifact1.jar", "..",
+        "services", "ab02", "add", "http://me.de/download/artifact1.jar",
+        "help",
+        "exit"
+    };
 
     /**
      * Successful service start command sequence within services level. 
@@ -178,6 +188,15 @@ public class CliTest {
     private static final String[] DEPLOY_SEQUENCE = new String[] {
         "deploy", DEPLOYMENT_PLAN_URI,
         "undeploy", DEPLOYMENT_PLAN_URI,
+        "exit"
+    };
+
+    /**
+     * Successful sequence for deployment plan execution with assumed application id for undeployment.
+     */
+    private static final String[] DEPLOY_SEQUENCE_APPID = new String[] {
+        "deploy", DEPLOYMENT_PLAN_URI,
+        "undeploy", DEPLOYMENT_PLAN_URI, "001",
         "exit"
     };
 
@@ -500,6 +519,8 @@ public class CliTest {
         test(SERVICES_START_SEQUENCE, errorConsumer, 0);
         test(SNAPSHOT_SEQUENCE, errorConsumer, 0);
         test(DEPLOY_SEQUENCE, errorConsumer, 0);
+        test(DEPLOY_SEQUENCE_APPID, errorConsumer, 0);
+        test(SERVICES_ADD_SEQUENCE, errorConsumer, 0);
 
         test(MAIN_FAIL, errorConsumer, 1);
         test(RESOURCES_FAIL, errorConsumer, 1);

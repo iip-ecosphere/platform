@@ -81,6 +81,18 @@ public abstract class AbstractSetup {
     public static boolean isNotEmpty(String str) {
         return str != null && str.length() > 0;
     }
+    
+    /**
+     * Creates a tolerant YAML object to read objects of type {@code cls}.
+     * 
+     * @param cls the type to read
+     * @return the yamp object
+     */
+    public static Yaml createYaml(Class<?> cls) {
+        Representer representer = new Representer();
+        representer.getPropertyUtils().setSkipMissingProperties(true);
+        return new Yaml(new Constructor(cls), representer);
+    }
 
     /**
      * Reads a instance from {@code in}. Unknown properties are ignored.
@@ -95,10 +107,7 @@ public abstract class AbstractSetup {
         C result = null;
         if (in != null) {
             try {
-                Representer representer = new Representer();
-                representer.getPropertyUtils().setSkipMissingProperties(true);
-                Yaml yaml = new Yaml(new Constructor(cls), representer);
-                result = yaml.load(in);
+                result = createYaml(cls).load(in);
                 in.close();
             } catch (YAMLException e) {
                 in.close();
