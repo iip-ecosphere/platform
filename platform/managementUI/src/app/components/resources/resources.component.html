@@ -9,12 +9,13 @@
             <div id="box">
               <div>
                 <h1>{{ element.idShort }}</h1>
-                <p>resource</p>
+                <p *ngIf="element.generalInformation && element.generalInformation.ManufacturerName; else noName">{{element.generalInformation.ManufacturerName}}</p>
+                <ng-template #noName>Unknown Manufacturer</ng-template>
               </div>
               <div>
-                <img *ngIf="!element.pic; else pictureAvailable" src="../../../assets/deviceDefault.jpg" [alt]="element.idShort" width="150px" height="200px">
+                <img *ngIf="!element.generalInformation?.picture; else pictureAvailable" src="../../../assets/deviceDefault.jpg" [alt]="element.idShort" width="150px" height="200px">
                 <ng-template #pictureAvailable>
-                  <img [src]="'data:image/jpg;base64,' + element.pic" [alt]="element.idShort" width="150px" height="200px">
+                  <img [src]="'data:image/jpg;base64,' + element.generalInformation?.picture" [alt]="element.idShort" width="150px" height="200px">
                 </ng-template>
               </div>
             </div>
