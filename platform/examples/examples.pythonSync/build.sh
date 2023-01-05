@@ -34,7 +34,7 @@ echo "Broker PID $pidBroker"
 
 sleep 10
 
-mvn -P App exec:java -Dexec.args="--iip.test.stop=30000 --iip.test.brokerPort=$brokerPort" > log &
+mvn -P App exec:java -Diip.springStart.args="--iip.test.stop=30000 --iip.test.brokerPort=$brokerPort" > log &
 pidTest=$!
 echo "Test started $pidTest"
 
