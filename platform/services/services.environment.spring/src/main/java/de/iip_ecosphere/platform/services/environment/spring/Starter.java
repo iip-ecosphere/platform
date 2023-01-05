@@ -39,6 +39,7 @@ import de.iip_ecosphere.platform.support.iip_aas.config.CmdLine;
 import de.iip_ecosphere.platform.support.iip_aas.config.YamlFile;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 import de.iip_ecosphere.platform.transport.Transport;
+import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 
 /**
  * A specialized starter for Spring Cloud Stream in including the metrics provider.
@@ -232,9 +233,9 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
      */
     public static void main(Class<? extends Starter> cls, String[] args) {
         ResourceLoader.registerResourceResolver(new SpringResourceResolver()); // ensure spring resolution
-        setLocalTransportSetupSupplier(setup -> {
+        /*setLocalTransportSetupSupplier(setup -> {
             return YamlSetup.getInternalTransportSetup();
-        });
+        });*/
         Starter.parse(args);
         parseExternConnections(args, e -> Transport.addGlobalRoutingKey(e));
         getSetup(); // ensure instance
