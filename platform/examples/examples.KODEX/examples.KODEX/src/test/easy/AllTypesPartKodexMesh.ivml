@@ -1,0 +1,39 @@
+project AllTypesPartKodexMesh {
+
+    import IIPEcosphere; 
+    
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+
+    RecordType rec1 = {
+        name = "KRec13",
+        fields = {
+            Field {
+                name = "intField",
+                type = refBy(IntegerType)
+            }, Field {
+                name = "stringField",
+                type = refBy(StringType)
+            }
+        }
+    };
+    
+    RecordType rec2 = {
+        name = "KRec13Anon",
+        fields = {
+            Field {
+                name = "_kip",
+                type = refBy(StringType)
+            }, Field {
+                name = "intField",
+                type = refBy(IntegerType)
+            }, Field {
+                name = "stringField",
+                type = refBy(StringType)
+            }
+        }
+    };
+
+    freeze {
+        .;
+    }
+}

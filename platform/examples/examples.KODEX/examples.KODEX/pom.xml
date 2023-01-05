@@ -61,6 +61,7 @@
 
   <properties>
         <iip.resources>resources</iip.resources>
+        <iip.model>PlatformConfiguration</iip.model>
   </properties>
     
   <profiles>
@@ -176,7 +177,7 @@
                                <mainClass>de.iip_ecosphere.platform.configuration.PlatformInstantiator</mainClass>
                                <cleanupDaemonThreads>false</cleanupDaemonThreads>
                                <arguments>
-                                   <argument>ExampleKODEX</argument>
+                                   <argument>${iip.model}</argument>
                                    <argument>src/test/easy</argument>
                                    <argument>gen/broker</argument>
                                    <argument>generateBroker</argument>
@@ -189,7 +190,7 @@
                                <mainClass>de.iip_ecosphere.platform.configuration.PlatformInstantiator</mainClass>
                                <cleanupDaemonThreads>false</cleanupDaemonThreads>
                                <arguments>
-                                   <argument>ExampleKODEX</argument>
+                                   <argument>${iip.model}</argument>
                                    <argument>src/test/easy</argument>
                                    <argument>gen/KODEX</argument>
                                    <argument>generateAppsNoDeps</argument>
@@ -208,7 +209,7 @@
                                <mainClass>de.iip_ecosphere.platform.configuration.PlatformInstantiator</mainClass>
                                <cleanupDaemonThreads>false</cleanupDaemonThreads>
                                <arguments>
-                                   <argument>ExampleKODEX</argument>
+                                   <argument>${iip.model}</argument>
                                    <argument>src/test/easy</argument>
                                    <argument>gen/KODEX</argument>
                                    <argument>generateApps</argument>

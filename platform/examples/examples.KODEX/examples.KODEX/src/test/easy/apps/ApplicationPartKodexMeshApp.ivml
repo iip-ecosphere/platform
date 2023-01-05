@@ -1,0 +1,19 @@
+project ApplicationPartKodexMeshApp {
+
+    import ServiceMeshPartKodexMeshApp*;
+
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+    
+    Application myApp = {
+        id = "KodexMeshApp",
+        name = "Simple Kodex Testing App",
+        ver = "0.1.0",
+        description = "",
+        services = {refBy(myMesh)}        
+    };
+    
+    freeze {
+        .;
+    }
+
+}
