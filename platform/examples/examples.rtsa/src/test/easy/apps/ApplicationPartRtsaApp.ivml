@@ -1,0 +1,19 @@
+project ApplicationPartRtsaApp {
+
+    import ServiceMeshPartRtsaApp*;
+
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+    
+    Application myApp = {
+        id = "RtsaApp",
+        name = "Simple RTSA demo flow app",
+        ver = "0.1.0",
+        description = "",
+        services = {refBy(myMesh)}        
+    };
+    
+    freeze {
+        .;
+    }
+
+}

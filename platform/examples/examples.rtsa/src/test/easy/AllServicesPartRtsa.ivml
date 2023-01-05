@@ -1,0 +1,47 @@
+project AllServicesPartRtsa {
+
+    import AllTypes; 
+    
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+   
+    Service mySourceService = JavaService {
+        id = "SimpleSource",
+        name = "Simple Data Source",
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+        asynchronous = true,
+        class = "de.iip_ecosphere.platform.examples.rtsa.SimpleSourceImpl",
+        artifact = "de.iip-ecosphere.platform:examples.rtsa:" + iipVer,
+        kind = ServiceKind::SOURCE_SERVICE,
+        output = {{type=refBy(RtsaTestInput)}}
+    };
+    
+    Service myRtsaService = RtsaService {
+        // file name of RTSA is derived from rtsaVer, file name for instance in RTSA is derived from ver and service name
+        id = "myRtsa",
+        name = "myRtsa example",
+        description = "Test RapidMiner RTSA integration",
+        ver = "0.1.0",
+        deployable = true,
+        input = {{type=refBy(RtsaTestInput)}},
+        output = {{type=refBy(RtsaTestOutput)}},
+        path = "iip_basic/score_v1"
+    };
+
+    Service myReceiverService = JavaService {
+        id = "SimpleReceiver",
+        name = "Simple Data Receiver",
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+        class = "de.iip_ecosphere.platform.examples.rtsa.SimpleReceiverImpl",
+        artifact = "de.iip-ecosphere.platform:examples.rtsa:" + iipVer,
+        kind = ServiceKind::SINK_SERVICE,
+        input = {{type=refBy(RtsaTestOutput)}}
+    };
+   
+    freeze {
+        .;
+    }
+}

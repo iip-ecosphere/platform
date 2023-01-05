@@ -49,6 +49,7 @@
   
   <properties>
         <iip.resources>resources</iip.resources>
+        <iip.model>PlatformConfiguration</iip.model>
   </properties>
   
   <profiles>
@@ -169,7 +170,7 @@
 	                </execution>
 	            	</executions>
 	            	<configuration>
-	                	<model>ExampleRTSA</model>
+	                	<model>${iip.model}</model>
 	                	<outputDirectory>gen/rtsa</outputDirectory>
 	            	</configuration>
 	        	</plugin>
@@ -184,7 +185,7 @@
                                 <mainClass>de.iip_ecosphere.platform.configuration.PlatformInstantiator</mainClass>
                                 <cleanupDaemonThreads>false</cleanupDaemonThreads>
                                 <arguments>
-                                    <argument>ExampleRTSA</argument>
+                                    <argument>${iip.model}</argument>
                                     <argument>src/test/easy</argument>
                                     <argument>gen/broker</argument>
                                     <argument>generateBroker</argument>
@@ -197,7 +198,7 @@
                                 <mainClass>de.iip_ecosphere.platform.configuration.PlatformInstantiator</mainClass>
                                 <cleanupDaemonThreads>false</cleanupDaemonThreads>
                                 <arguments>
-                                    <argument>ExampleRTSA</argument>
+                                    <argument>${iip.model}</argument>
                                     <argument>src/test/easy</argument>
                                     <argument>gen/rtsa</argument>
                                     <argument>generateAppsNoDeps</argument>
@@ -216,7 +217,7 @@
                                 <mainClass>de.iip_ecosphere.platform.configuration.PlatformInstantiator</mainClass>
                                 <cleanupDaemonThreads>false</cleanupDaemonThreads>
                                 <arguments>
-                                    <argument>ExampleRTSA</argument>
+                                    <argument>${iip.model}</argument>
                                     <argument>src/test/easy</argument>
                                     <argument>gen/rtsa</argument>
                                     <argument>generateApps</argument>
