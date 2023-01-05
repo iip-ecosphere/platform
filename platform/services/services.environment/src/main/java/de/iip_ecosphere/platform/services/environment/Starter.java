@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,7 +85,7 @@ public class Starter {
      * Defines the supplier for the local transport setup. Called only in {@link #getSetup()} if 
      * {@link #transportGlobal a need for a separation of global/local transport} was detected.
      * Specific service execution implementations may override this using 
-     * {@link #setLocalTransportSetupSupplier(Supplier)}. Default is {@link #DFLT_LOCAL_TRANSPORT_SETUP_SUPPLIER}.
+     * {@link #setLocalTransportSetupSupplier(Function)}. Default is {@link #DFLT_LOCAL_TRANSPORT_SETUP_SUPPLIER}.
      */
     private static Function<EnvironmentSetup, TransportSetup> localTransportSetupSupplier 
         = DFLT_LOCAL_TRANSPORT_SETUP_SUPPLIER;
@@ -487,8 +486,14 @@ public class Starter {
                 TransportSetup globalSetup = setup.getTransport();
                 LoggerFactory.getLogger(Starter.class).info("Global transport {}:{}", 
                     globalSetup.getHost(), globalSetup.getPort());
+                
                 if (!transportGlobal) {
-                    TransportSetup localSetup = localTransportSetupSupplier.apply(setup);
+                    TransportSetup lSetup = localTransportSetupSupplier.apply(setup);
+                    if (null == lSetup && localTransportSetupSupplier != DFLT_LOCAL_TRANSPORT_SETUP_SUPPLIER) {
+                        // fallback, in particular for testing
+                        lSetup = DFLT_LOCAL_TRANSPORT_SETUP_SUPPLIER.apply(setup);
+                    }
+                    TransportSetup localSetup = lSetup;
                     if (null != localSetup) {
                         LoggerFactory.getLogger(Starter.class).info("Local transport {}:{}", 
                             localSetup.getHost(), localSetup.getPort());
