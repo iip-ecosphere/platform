@@ -162,7 +162,7 @@
                         </execution>
                     </executions>
                     <configuration>
-                        <model>ExampleKODEX</model>
+                        <model>${iip.model}</model>
                         <outputDirectory>gen/KODEX</outputDirectory>
                     </configuration>
                 </plugin>
