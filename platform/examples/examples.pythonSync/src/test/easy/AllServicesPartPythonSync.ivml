@@ -1,0 +1,50 @@
+project AllServicesPartPythonSync {
+
+    import AllTypes; 
+    
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+   
+    Service mySourceService = JavaService {
+        id = "SimpleSource",
+        name = "Simple Data Source",
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+        asynchronous = false,
+        class = "de.iip_ecosphere.platform.examples.python.SimpleSourceImpl",
+        artifact = "de.iip-ecosphere.platform:examples.pythonSync:" + iipVer,
+        kind = ServiceKind::SOURCE_SERVICE,
+        output = {{type=refBy(PythonTestInput)}}
+    };
+    
+    Service myPythonService = PythonService {
+        id = "ExamplePythonService",
+        name = "Example Python Service",
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+        asynchronous = false,
+        input = {{type=refBy(PythonTestInput)}},
+        output = {{type=refBy(PythonTestOutput)}},
+        artifact = "de.iip-ecosphere.platform:examples.pythonSync:" + iipVer,
+        kind = ServiceKind::TRANSFORMATION_SERVICE,
+        dependencies = {refBy(PYTHON39)}
+    };
+
+    Service myReceiverService = JavaService {
+        id = "SimpleReceiver",
+        name = "Simple Data Receiver",
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+        asynchronous = false,
+        class = "de.iip_ecosphere.platform.examples.python.SimpleReceiverImpl",
+        artifact = "de.iip-ecosphere.platform:examples.pythonSync:" + iipVer,
+        kind = ServiceKind::SINK_SERVICE,
+        input = {{type=refBy(PythonTestOutput)}}
+    };
+   
+    freeze {
+        .;
+    }
+}

@@ -1,0 +1,19 @@
+project ApplicationPartPythonSyncApp {
+
+    import ServiceMeshPartPythonSyncApp*;
+
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+    
+    Application myApp = {
+        id = "PythonSyncApp",
+        name = "Simple Synchronous Python demo flow app",
+        ver = "0.1.0",
+        description = "",
+        services = {refBy(myMesh)}        
+    };
+    
+    freeze {
+        .;
+    }
+
+}
