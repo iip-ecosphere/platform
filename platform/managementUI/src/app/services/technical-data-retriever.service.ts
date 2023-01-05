@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Subscription, Subject } from 'rxjs';
-import { Resource, ResourceProductPicture, TechnicalDataResponse } from 'src/interfaces';
+import { Resource, TechnicalDataResponse, GeneralInformation, AddressPart } from 'src/interfaces';
 
 @Injectable({
   providedIn: 'root'
@@ -11,11 +11,11 @@ export class TechnicalDataRetrieverService {
 
   TechnicalResponses: TechnicalDataResponse[] = [];
   Subscriptions: Subscription[] = [];
-  emitter: Subject<ResourceProductPicture>;
-  ResourcePictures: ResourceProductPicture[] = [];
+  emitter: Subject<GeneralInformation>;
+  ResourcePictures: GeneralInformation[] = [];
 
   constructor(private http: HttpClient) {
-    this.emitter = new Subject<ResourceProductPicture>();
+    this.emitter = new Subject<GeneralInformation>();
   }
 
   public getTechnicalData(resources: Resource[]) {
@@ -30,15 +30,19 @@ export class TechnicalDataRetrieverService {
               this.TechnicalResponses.push(item);
               const GeneralInformation = item.submodelElements.find(item => item.idShort === 'GeneralInformation');
               if(GeneralInformation && GeneralInformation.value) {
-                const ProductImage = GeneralInformation.value.find(item => item.idShort.includes('ProductImage'))
-                if(ProductImage && ProductImage.value && resource.idShort) {
-                  let pic = {
-                    picture: ProductImage.value,
-                    idShort: resource.idShort
-                  }
-                  this.ResourcePictures.push(pic);
-                  this.emitter.next(pic);
-                }
+                const ProductImage = GeneralInformation.value.find(item => item.idShort.includes('ProductImage'));
+                const ManufacturerName = GeneralInformation.value.find(item => item.idShort.includes('ManufacturerName'));
+                const Address = GeneralInformation.value.find(item => item.idShort.includes('Address'));
+                  let GeneralInfo = {
+                    picture: ProductImage?.value,
+                    resourceIdShort: resource?.idShort,
+                    ManufacturerName: ManufacturerName?.value,
+                    Address: Address
+                  };
+                  console.log(GeneralInfo);
+                  this.ResourcePictures.push(GeneralInfo); //make it so that generalInformation is stored in the api services resource array
+                  this.emitter.next(GeneralInfo);
+
               }
             } ));
           }

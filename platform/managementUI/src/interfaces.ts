@@ -24,7 +24,7 @@ export interface Resource {
   valueType?: string;
   value?: ResourceAttribute[];
 
-  pic?: string; //for displaying pictures on resource view
+  generalInformation?: GeneralInformation; //for displaying pictures on resource view
 }
 
 //this is either an Attribute or a Function since both are stored in the same Array
@@ -61,6 +61,7 @@ export interface InputVariable {
     kind?: string;
     valueType?: string;
     value?: string;
+    modelType?: any;
   }
 }
 
@@ -174,15 +175,30 @@ export interface TechnicalDataValueValue {
 }
 
 export interface SemanticId {
-  keys: [
+  keys: [{
     idType: string,
     type: string,
     value: string,
     local: boolean
-  ]
+  }]
 }
 
-export interface ResourceProductPicture {
-  idShort: string; //id of the resource
-  picture: string; //encoded picture
+export interface GeneralInformation {
+  resourceIdShort?: string; //id of the resource
+  picture?: string; //encoded picture
+  ManufacturerName?: string;
+  ManufacturerProductDesignation?: string;
+  Address?: any;
+}
+
+export interface GeneralInformationElement {
+
+}
+
+export interface AddressPart {
+  idShort?: string;
+  value?: [{
+    language: string;
+    text: string;
+  }]
 }

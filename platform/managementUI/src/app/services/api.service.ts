@@ -1,6 +1,6 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { PlatformArtifacts, PlatformResources, PlatformServices, ResourceAttribute } from 'src/interfaces';
+import { PlatformArtifacts, PlatformResources, PlatformServices, ResourceAttribute, InputVariable } from 'src/interfaces';
 import { firstValueFrom, Subject } from 'rxjs';
 import { EnvConfigService } from './env-config.service';
 
@@ -69,6 +69,42 @@ export class ApiService {
     try {
       response = await firstValueFrom(this.http.post(this.ip + '/shells/' + this.urn + "/aas/submodels/resources/submodel/submodelElements/" + resource + "/" + basyxFunc + "/invoke"
       ,{"inputArguments": params,"requestId":"1bfeaa30-1512-407a-b8bb-f343ecfa28cf", "inoutputArguments":[], "timeout":10000}));
+    } catch(e) {
+      console.log(e);
+    }
+    return response;
+  }
+
+  public async getGraph() {
+    let response;
+    let input: InputVariable[] = [{
+      modelType: {name: "OperationVariable"},
+      value: {
+        idShort: "varName",
+        kind: "Template",
+        valueType: "string",
+        modelType: {
+          name: "Property"
+        },
+        value: ""
+      }
+    },
+    {
+      modelType: {name: "OperationVariable"},
+      value: {
+        idShort: "format",
+        kind: "Template",
+        valueType: "string",
+        modelType: {
+          name: "Property"
+        },
+        value: ""
+      }
+    }]
+
+    try {
+      response = await firstValueFrom(this.http.post(this.ip + '/shells/' + this.urn + "/aas/submodels/Configuration/submodel/submodelElements/getGraph/invoke"
+      ,{"inputArguments": input,"requestId":"1bfeaa30-1512-407a-b8bb-f343ecfa28cf", "inoutputArguments":[], "timeout":10000}));
     } catch(e) {
       console.log(e);
     }

@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ApiService } from 'src/app/services/api.service';
 import { TechnicalDataRetrieverService } from 'src/app/services/technical-data-retriever.service';
-import { PlatformResources, ResourceAttribute, ResourceProductPicture } from 'src/interfaces';
+import { PlatformResources, ResourceAttribute, GeneralInformation } from 'src/interfaces';
 
 @Component({
   selector: 'app-resources',
@@ -14,7 +14,7 @@ import { PlatformResources, ResourceAttribute, ResourceProductPicture } from 'sr
 export class ResourcesComponent implements OnInit {
 
   Data: PlatformResources = {};
-  ResourcePictures: ResourceProductPicture[] = [];
+  ResourcePictures: GeneralInformation[] = [];
 
   errorSub: Subscription;
   errorMsg: string | undefined;
@@ -34,11 +34,13 @@ export class ResourcesComponent implements OnInit {
 
   public async getData() {
     this.tech.emitter.subscribe( item => {
+      console.log(item);
       this.ResourcePictures.push(item)
-      if(this.Data && this.Data.submodelElements && item.idShort && item.picture) {
-        let a = this.Data.submodelElements.find(item2 => item2.idShort === item.idShort)
+      if(this.Data && this.Data.submodelElements && item.resourceIdShort && item.picture) {
+        let a = this.Data.submodelElements.find(item2 => item2.idShort === item.resourceIdShort)
+        console.log(a);
         if(a) {
-          a.pic = item.picture;
+          a.generalInformation = item;
           console.log(a);
           console.log(this.Data.submodelElements);
         }
