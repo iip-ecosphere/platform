@@ -55,6 +55,7 @@ public class SpringStartup {
     public static final void start(String... args) {
         if (args.length > 0) {
             File f = new File(args[0]);
+            LogManager.getLogger(SpringStartup.class).info("Artifact arg: {} -> {}", f, args[0]);
             String[] restArgs = new String[args.length - 1];
             for (int i = 1; i < args.length; i++) {
                 restArgs[i - 1] = args[i];
@@ -89,9 +90,10 @@ public class SpringStartup {
         int brokerPort = CmdLine.getIntArg(args, ARG_BROKER_PORT, DFLT_BROKER_PORT);
         int stop = CmdLine.getIntArg(args, ARG_STOP, 0);
         try {
+            LogManager.getLogger(SpringStartup.class).info("Command line for artifact: {}", artifact);
             List<String> cmdLine = DescriptorUtils.createStandaloneCommandArgs(artifact, brokerPort, 
                 brokerHost, adminPort, serviceProtocol);
-            LogManager.getLogger(SpringStartup.class).info("Starting with arguments: " + cmdLine);
+            LogManager.getLogger(SpringStartup.class).info("Starting with arguments: {}", cmdLine);
             ProcessBuilder builder = new ProcessBuilder(cmdLine);
             if (null != procCfg) {
                 procCfg.accept(builder);
