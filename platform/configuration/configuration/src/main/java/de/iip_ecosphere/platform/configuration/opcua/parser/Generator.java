@@ -20,10 +20,7 @@ import java.util.ArrayList;
 
 import org.slf4j.LoggerFactory;
 
-import de.iip_ecosphere.platform.configuration.opcua.data.BaseType;
-import de.iip_ecosphere.platform.configuration.opcua.data.RootMethodType;
-import de.iip_ecosphere.platform.configuration.opcua.data.RootObjectType;
-import de.iip_ecosphere.platform.configuration.opcua.data.RootVariableType;
+import de.iip_ecosphere.platform.configuration.opcua.data.*;
 
 /**
  * Generates the IVML model.

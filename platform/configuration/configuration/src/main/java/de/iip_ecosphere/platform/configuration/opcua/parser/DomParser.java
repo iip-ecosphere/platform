@@ -436,7 +436,7 @@ public class DomParser {
             for (int j = 0; j < childNodeList.getLength(); j++) {
                 Element childNode = getNextNodeElement(childNodeList, j);
                 if (childNode != null) {
-                    if (childNode.getTagName() == "DisplayName") {
+                    if (childNode.getTagName().equals("DisplayName")) {
                         rootParent = BaseType.validateVarName("opc" + childNode.getTextContent());
                         break;
                     }
@@ -461,8 +461,8 @@ public class DomParser {
                     NodeList childNodeList = dataType.getChildNodes();
                     for (int j = 0; j < childNodeList.getLength(); j++) {
                         Element childNode = getNextNodeElement(childNodeList, j);
-                        if (childNode != null && childNode.getTagName() != "References") {
-                            if (childNode.getTagName() == "DisplayName") {
+                        if (childNode != null && !childNode.getTagName().equals("References")) {
+                            if (childNode.getTagName().equals("DisplayName")) {
                                 identifiedDataType = childNode.getTextContent().replaceAll("[“”\"_\\\\]", "");
                                 break;
                             }
@@ -528,8 +528,8 @@ public class DomParser {
 
                 for (int j = 0; j < childNodeList.getLength(); j++) {
                     Element childNode = getNextNodeElement(childNodeList, j);
-                    if (childNode != null && childNode.getTagName() != "References") {
-                        if (childNode.getTagName() == "DisplayName") {
+                    if (childNode != null && !childNode.getTagName().equals("References")) {
+                        if (childNode.getTagName().equals("DisplayName")) {
                             dataType = childNode.getTextContent().replaceAll("[“”\"_\\\\]", "");
                             break;
                         }
@@ -688,13 +688,13 @@ public class DomParser {
         NodeList childNodeList = refElement.getChildNodes();
         for (int j = 0; j < childNodeList.getLength(); j++) {
             Element childNode = getNextNodeElement(childNodeList, j);
-            if (childNode != null && childNode.getTagName() != "References") {
-                if (childNode.getTagName() == "DisplayName") {
+            if (childNode != null && !childNode.getTagName().equals("References")) {
+                if (childNode.getTagName().equals("DisplayName")) {
                     result.reference = childNode.getTextContent().replaceAll("[“”\"\\\\]", "");
                     result.displayName = result.reference;
-                } else if (childNode.getTagName() == "Description") {
+                } else if (childNode.getTagName().equals("Description")) {
                     result.description = childNode.getTextContent().replaceAll("[“”\"\\\\]", "");
-                } else if (childNode.getTagName() == "Documentation") {
+                } else if (childNode.getTagName().equals("Documentation")) {
                     result.documentation = childNode.getTextContent();
                 }
             }
@@ -825,15 +825,15 @@ public class DomParser {
 
         for (int j = 0; j < childNodeList.getLength(); j++) {
             Element childNode = getNextNodeElement(childNodeList, j);
-            if (childNode != null && childNode.getTagName() != "References") {
-                if (childNode.getTagName() == "Description") {
+            if (childNode != null && !childNode.getTagName().equals("References")) {
+                if (childNode.getTagName().equals("Description")) {
                     description = (childNode.getTextContent() + "@" + childNode.getAttribute("Locale"))
                             .replaceAll("[“”\"\\\\]", "");
-                } else if (childNode.getTagName() == "DisplayName") {
+                } else if (childNode.getTagName().equals("DisplayName")) {
                     displayName = childNode.getTextContent().replaceAll("[“”\"_\\\\]", "");
-                } else if (childNode.getTagName() == "Documentation") {
+                } else if (childNode.getTagName().equals("Documentation")) {
                     documentation = childNode.getTextContent().replaceAll("[“”\"\\\\]", "");
-                } else if (childNode.getTagName() == "Definition") {
+                } else if (childNode.getTagName().equals("Definition")) {
                     NodeList fields = childNode.getChildNodes();
 
                     for (int k = 0; k < fields.getLength(); k++) {
@@ -867,7 +867,7 @@ public class DomParser {
 
                     }
                 }
-            } else if (childNode != null && childNode.getTagName() == "References") {
+            } else if (childNode != null && childNode.getTagName().equals("References")) {
                 if (type.equals(ElementType.ROOTOBJECT) || type.equals(ElementType.SUBOBJECT)
                         || type.equals(ElementType.ROOTMETHOD) || type.equals(ElementType.SUBMETHOD)) {
                     objectFields = identifyFields(childNode);
@@ -906,7 +906,7 @@ public class DomParser {
         for (int l = 0; l < fieldChilds.getLength(); l++) {
             Element fieldChildNode = getNextNodeElement(fieldChilds, l);
             if (fieldChildNode != null) {
-                if (fieldChildNode.getTagName() == "Description") {
+                if (fieldChildNode.getTagName().equals("Description")) {
                     if (fieldChildNode.getAttribute("Locale").equals("")) {
                         fieldDescription = fieldChildNode.getTextContent().replaceAll("[“”\"\\\\]", "");
                     } else {
@@ -964,7 +964,7 @@ public class DomParser {
                 for (int j = 0; j < dataChildNodeList.getLength(); j++) {
                     Element childNode = getNextNodeElement(dataChildNodeList, j);
                     if (childNode != null) {
-                        if (childNode.getTagName() == "DisplayName") {
+                        if (childNode.getTagName().equals("DisplayName")) {
                             dataType = childNode.getTextContent();
                         }
                     }
@@ -1041,7 +1041,7 @@ public class DomParser {
                 for (int j = 0; j < dataChildNodeList.getLength(); j++) {
                     Element childNode = getNextNodeElement(dataChildNodeList, j);
                     if (childNode != null) {
-                        if (childNode.getTagName() == "DisplayName") {
+                        if (childNode.getTagName().equals("DisplayName")) {
                             dataType = childNode.getTextContent();
                         }
                     }
@@ -1209,7 +1209,7 @@ public class DomParser {
                 for (int j = 0; j < childNodeList.getLength(); j++) {
                     Element childNode = getNextNodeElement(childNodeList, j);
                     if (childNode != null) {
-                        if (childNode.getTagName() == "Uri") {
+                        if (childNode.getTagName().equals("Uri")) {
                             uris.add(childNode.getTextContent());
                         }
                     }
