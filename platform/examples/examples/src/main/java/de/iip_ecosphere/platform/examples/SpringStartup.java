@@ -14,15 +14,18 @@ package de.iip_ecosphere.platform.examples;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
+import org.apache.commons.text.StringTokenizer;
 import org.apache.logging.log4j.LogManager;
 
 import de.iip_ecosphere.platform.services.spring.DescriptorUtils;
+import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.iip_aas.config.CmdLine;
 
 /**
@@ -32,17 +35,26 @@ import de.iip_ecosphere.platform.support.iip_aas.config.CmdLine;
  */
 public class SpringStartup {
     
+    public static final String PROPERTY_ARGS = "iip.springStart.args";
     public static final String ARG_BROKER_PORT = "iip.test.brokerPort";
     public static final int DFLT_BROKER_PORT = 8883;
     public static final String ARG_STOP = "iip.test.stop";
 
     /**
-     * Main program to start the application.
+     * Main program to start the application. Takes into account additional args via system
+     * property {@link #PROPERTY_ARGS} to allow for maven basic execution with fixed parameters in POM 
+     * and additional arguments passed in via {@link #PROPERTY_ARGS}.
      * 
      * @param args the command line arguments; the first is the artifact file to start, the remaining is passed on 
      *     to Spring
      */
     public static void main(String[] args) {
+        String sysArgs = System.getProperty(PROPERTY_ARGS, null);
+        if (null != sysArgs) {
+            List<String> tmp = CollectionUtils.toList(args);
+            CollectionUtils.addAll(tmp, new StringTokenizer(sysArgs, "").getTokenArray()); // initial, without quotin
+            args = tmp.toArray(new String[0]);
+        }
         start(args);
     }
     
@@ -54,8 +66,8 @@ public class SpringStartup {
      */
     public static final void start(String... args) {
         if (args.length > 0) {
+            LogManager.getLogger(SpringStartup.class).info("Artifact args: {}", Arrays.toString(args));
             File f = new File(args[0]);
-            LogManager.getLogger(SpringStartup.class).info("Artifact arg: {} -> {}", f, args[0]);
             String[] restArgs = new String[args.length - 1];
             for (int i = 1; i < args.length; i++) {
                 restArgs[i - 1] = args[i];
