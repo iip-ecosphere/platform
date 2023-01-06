@@ -1,0 +1,48 @@
+project AllTypesPartPython {
+
+    import IIPEcosphere; 
+    
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+
+    RecordType PythonTestInput = {
+        name = "PythonTestInput",
+        fields = {
+            Field {
+                name = "id",
+                type = refBy(IntegerType)
+            }, Field {
+                name = "value1",
+                type = refBy(DoubleType)
+            }, Field {
+                name = "value2",
+                type = refBy(DoubleType)
+            }
+        }
+    };
+
+    RecordType PythonTestOutput = {
+        name = "PythonTestOutput",
+        fields = {
+            Field {
+                name = "id",
+                type = refBy(IntegerType)
+            }, Field {
+                name = "value1",
+                type = refBy(DoubleType)
+            }, Field {
+                name = "value2",
+                type = refBy(DoubleType)
+            }, Field {
+                name = "confidence",
+                type = refBy(DoubleType)
+            }, Field {
+                name = "prediction",
+                type = refBy(BooleanType)
+            }
+        }
+    };    
+
+    freeze {
+        .;
+    }
+}

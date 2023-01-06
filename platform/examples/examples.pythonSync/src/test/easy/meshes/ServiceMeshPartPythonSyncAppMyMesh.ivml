@@ -1,0 +1,41 @@
+project ServiceMeshPartPythonSyncAppMyMesh {
+
+    import AllServices;
+
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+
+    ServiceMesh myMesh = {
+        description = "Sync Python Service Net",
+        sources = {refBy(mySource)}
+    };
+
+    MeshSource mySource = {
+       impl = refBy(mySourceService),
+       pollInterval = 600,
+       next = {refBy(myConnMySourceMyTransformer)}
+    };
+
+    MeshConnector myConnMySourceMyTransformer = {
+        name = "Source->Transformer",
+        next = refBy(myTransformer)
+    };
+
+    MeshProcessor myTransformer = {
+        impl = refBy(myPythonService),
+        next = {refBy(myConnMyTransformerMyReceiver)}
+    };
+
+    MeshConnector myConnMyTransformerMyReceiver = {
+        name = "Transformer->Receiver",
+        next = refBy(myReceiver)
+    };
+    
+    MeshSink myReceiver = {
+       impl = refBy(myReceiverService)
+    };
+
+    freeze {
+        .;
+    }
+
+}
