@@ -59,6 +59,7 @@ Improvements:
 * [#91](https://github.com/iip-ecosphere/platform/issues/91): Dockerhub demonstration containers now with monitoring and management UI.
 * [#119](https://github.com/iip-ecosphere/platform/issues/119): CI build process for configuration.configuration now cleans up left-over containers.
 * [#111](https://github.com/iip-ecosphere/platform/issues/119): Simplifying the platform installation using the IIP-Ecosphere Maven plugins.
+* [#121](https://github.com/iip-ecosphere/platform/issues/121): Examples and selected test models turned into managed model structure. Starter classes of examples substituted by maven exec:java.
 
 ### Version 0.4.0 (2022/09/02, TddT'22):
 
