@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.support.iip_aas.config;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -113,5 +114,41 @@ public class CmdLine {
     public static boolean getBooleanArg(String[] args, String argName, boolean dflt) {
         return Boolean.valueOf(getArg(args, argName, String.valueOf(dflt)));
     }    
+
+    /**
+     * Turns a command line string into arguments. Considers usual quotes.
+     * 
+     * @param args the arguments as string
+     * @return the parsed arguments
+     */
+    public static String[] toArgs(String args) {
+        if (args == null) {
+            args = "";
+        }
+        List<String> result = new ArrayList<>();
+        boolean inQuote = false;
+        int lastPos = 0;
+        for (int i = 0; i < args.length(); i++) {
+            char c = args.charAt(i);
+            if ('\'' == c || '"' == c) {
+                inQuote = !inQuote;
+            } else if (' ' == c && !inQuote) {
+                if (lastPos != i) {
+                    String tmp = args.substring(lastPos, i).trim();
+                    if (tmp.length() > 0) {
+                        result.add(tmp);
+                    }
+                }
+                lastPos = i + 1;
+            }
+        }
+        if (lastPos < args.length()) {
+            String tmp = args.substring(lastPos, args.length()).trim();
+            if (tmp.length() > 0) {
+                result.add(tmp);
+            }
+        }
+        return result.toArray(new String[0]);
+    }
 
 }

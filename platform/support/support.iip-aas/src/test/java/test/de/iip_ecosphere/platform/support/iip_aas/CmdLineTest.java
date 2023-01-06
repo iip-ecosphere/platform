@@ -79,4 +79,28 @@ public class CmdLineTest {
         Assert.assertEquals(false, CmdLine.getBooleanArg(args, "bla", false));
     }
 
+    /**
+     * Tests {@link CmdLine#toArgs(String)}.
+     */
+    @Test
+    public void testToArgs() {
+        String[] tmp = CmdLine.toArgs("");
+        Assert.assertNotNull(tmp);
+        Assert.assertEquals(0, tmp.length);
+
+        tmp = CmdLine.toArgs("--iip.app.p=5 --iip.app.w=7 --transport=5");
+        Assert.assertNotNull(tmp);
+        Assert.assertEquals(3, tmp.length);
+        Assert.assertEquals("--iip.app.p=5", tmp[0]);
+        Assert.assertEquals("--iip.app.w=7", tmp[1]);
+        Assert.assertEquals("--transport=5", tmp[2]);
+
+        tmp = CmdLine.toArgs("--iip.app.p='5' --iip.app.w=\"7\" --transport=5");
+        Assert.assertNotNull(tmp);
+        Assert.assertEquals(3, tmp.length);
+        Assert.assertEquals("--iip.app.p='5'", tmp[0]);
+        Assert.assertEquals("--iip.app.w=\"7\"", tmp[1]);
+        Assert.assertEquals("--transport=5", tmp[2]);
+    }
+    
 }
