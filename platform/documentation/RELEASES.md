@@ -41,6 +41,7 @@ New features:
 * [#105](https://github.com/iip-ecosphere/platform/issues/105): Maven plugins for Python build steps.
 * [#109](https://github.com/iip-ecosphere/platform/issues/101): Maven integration for platform/application instantiation and orchestrated execution of Maven, e.g., for the examples.
 * [#76](https://github.com/iip-ecosphere/platform/issues/76): Maven version of broker can be defined in configuration, optionally enabling use of QPID-J 9.0.0.
+* [#81](https://github.com/iip-ecosphere/platform/issues/81): UI displays information from device AAS.
 
 Improvements:
 * Extend configuration model, e.g., by constraints [#52](https://github.com/iip-ecosphere/platform/issues/52)
