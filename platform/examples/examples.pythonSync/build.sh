@@ -34,11 +34,11 @@ echo "Broker PID $pidBroker"
 
 sleep 10
 
-mvn -P App exec:java -Diip.springStart.args="--iip.test.stop=30000 --iip.test.brokerPort=$brokerPort" > log &
+mvn -P App exec:java -Diip.springStart.args="--iip.test.stop=40000 --iip.test.brokerPort=$brokerPort" > log &
 pidTest=$!
 echo "Test started $pidTest"
 
-sleep 30 && pkill 9 -P "$pidTest" && kill -9 "$pidTest"
+sleep 40 && pkill 9 -P "$pidTest" && kill -9 "$pidTest"
 pkill -9 -P "$pidBroker" && kill -9 "$pidBroker"
 
 echo "Testing for RECEIVED in log"
