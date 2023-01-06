@@ -80,9 +80,12 @@
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>exec-maven-plugin</artifactId>
                     <version>3.0.0</version>
-                    <configuration>
-                        <mainClass>de.iip_ecosphere.platform.examples.kodex.Starter</mainClass>
-                    </configuration>
+	                <configuration>
+                      <mainClass>de.iip_ecosphere.platform.examples.SpringStartup</mainClass>
+                      <arguments>
+                        <argument>gen/KODEX/SimpleKodexTestingApp/target/SimpleKodexTestingApp-0.1.0-SNAPSHOT-bin.jar</argument>
+                      </arguments>
+	                </configuration>
                 </plugin>
             </plugins>
         </build> 
