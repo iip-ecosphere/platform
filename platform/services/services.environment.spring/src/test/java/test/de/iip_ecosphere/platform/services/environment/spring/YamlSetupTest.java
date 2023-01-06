@@ -34,12 +34,18 @@ public class YamlSetupTest {
      */
     @Test
     public void testYamlSetup() throws IOException {
-        TransportSetup internal = YamlSetup.getInternalTransportSetup();
+        TransportSetup internal = YamlSetup.getInternalTransportSetup(new String[0]);
         Assert.assertNotNull(internal);
         Assert.assertEquals(8888, internal.getPort());
         Assert.assertEquals("localhost", internal.getHost());
         
-        TransportSetup external = YamlSetup.getExternalTransportSetup();
+        internal = YamlSetup.getInternalTransportSetup(new String[] {"--transport.port=8080", 
+            "--spring.cloud.stream.binders.properties.internal.environment.amqp.port=8889"});
+        Assert.assertNotNull(internal);
+        Assert.assertEquals(8889, internal.getPort());
+        Assert.assertEquals("localhost", internal.getHost());
+        
+        TransportSetup external = YamlSetup.getExternalTransportSetup(new String[0]);
         Assert.assertNotNull(external);
         Assert.assertEquals(8883, external.getPort());
         Assert.assertEquals("192.168.2.1", external.getHost());
