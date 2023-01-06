@@ -30,7 +30,7 @@ pidBroker=$!
 cd $dir
 
 echo "Broker PID $pidBroker"
-mvn -P App exec:java@app -Dexec.args="--iip.test.stop=180000 --iip.test.brokerPort=$brokerPort -Diip.app.hm22.mock.callRobot=false" > log &
+mvn -P App exec:java@app -Diip.springStart.args="--iip.test.stop=180000 --iip.test.brokerPort=$brokerPort -Diip.app.hm22.mock.callRobot=false" > log &
 pidTest=$!
 echo "Test started $pidTest"
 

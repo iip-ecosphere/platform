@@ -210,10 +210,13 @@
 		                </execution>
 		                <execution>
 		                    <id>app</id>
-		                    <configuration>
-		                        <mainClass>de.iip_ecosphere.platform.examples.hm22.Starter</mainClass>
-		                        <classpathScope>test</classpathScope>
-		                    </configuration>
+                            <configuration>
+                              <mainClass>de.iip_ecosphere.platform.examples.SpringStartup</mainClass>
+                              <arguments>
+                                <argument>gen/hm22/DemonstrationAppHM22/target/DemonstrationAppHM22-0.1.0-SNAPSHOT-bin.jar</argument>
+                              </arguments>
+                              <classpathScope>test</classpathScope>
+                            </configuration>
 		                </execution>
                         <execution>
                             <id>ActionDeciderTest</id>
