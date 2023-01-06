@@ -73,7 +73,7 @@ public class Starter {
         TransportSetup localSetup = null;
         TransportSetup globalSetup = setup.getTransport();
         String globalHost = globalSetup.getHost();
-        if (!transportGlobal && !ServerAddress.LOCALHOST.equals(globalHost) 
+        if (!ServerAddress.LOCALHOST.equals(globalHost) 
             && !"127.0.0.1".equals(globalHost) && !NetUtils.isOwnAddress(globalHost)) {
             localSetup = setup.getTransport().copy(); // TODO same authentication/port assumed
             localSetup.setHost(ServerAddress.LOCALHOST);
@@ -487,7 +487,7 @@ public class Starter {
                 LoggerFactory.getLogger(Starter.class).info("Global transport {}:{}", 
                     globalSetup.getHost(), globalSetup.getPort());
                 
-                if (!transportGlobal) {
+                if (!transportGlobal && enablesLocalTransport(globalSetup)) {
                     TransportSetup lSetup = localTransportSetupSupplier.apply(setup);
                     if (null == lSetup && localTransportSetupSupplier != DFLT_LOCAL_TRANSPORT_SETUP_SUPPLIER) {
                         // fallback, in particular for testing
@@ -499,6 +499,8 @@ public class Starter {
                             localSetup.getHost(), localSetup.getPort());
                         Transport.setLocalSetup(() -> localSetup);
                     }
+                } else {
+                    LoggerFactory.getLogger(Starter.class).info("Local transport: use global as it is local");
                 }
             } catch (IOException e) {
                 setup = new EnvironmentSetup();
@@ -506,6 +508,18 @@ public class Starter {
             }
         }
         return setup;
+    }
+    
+    /**
+     * Returns whether {@code globalSetup} enables local transport.
+     * 
+     * @param globalSetup the global setup
+     * @return {@code true} for enabled, {@code false} for local transport is sufficient, e.g., in local testing
+     */
+    protected static final boolean enablesLocalTransport(TransportSetup globalSetup) {
+        String globalHost = globalSetup.getHost();
+        return (!ServerAddress.LOCALHOST.equals(globalHost) 
+            && !"127.0.0.1".equals(globalHost) && !NetUtils.isOwnAddress(globalHost));
     }
     
     /**
