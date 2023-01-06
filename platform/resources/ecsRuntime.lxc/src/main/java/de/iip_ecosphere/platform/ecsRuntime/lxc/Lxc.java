@@ -20,33 +20,33 @@ import de.iip_ecosphere.platform.ecsRuntime.EcsSetup.AbstractManagerSetup;
  *
  */
 public class Lxc extends AbstractManagerSetup {
-    
+
     // TODO unify common parts with Lxc -> ecsRuntime???
 
     private String lxcHost = "localhost";
     private String lxcPort = "8443";
-    
+
     /**
      * Returns the LXC port.
      * 
      * @return the LXC port as LXC port string, e.g., port
      */
     public String getLxcPort() {
-		return lxcPort;
-	}
-    
+        return lxcPort;
+    }
+
     /**
      * Defines the LXC port.
      * 
      * @return the LXC port as LXC port string, e.g., 8443
      */
-	public void setLxcPort(String lxcPort) {
-		this.lxcPort = lxcPort;
-	}
+    public void setLxcPort(String lxcPort) {
+        this.lxcPort = lxcPort;
+    }
 
-	private String lxcImageYamlFilename = "image-info.yml";
+    private String lxcImageYamlFilename = "image-info.yml";
     private String downloadDirectory;
-    
+
     /**
      * Returns the LXC host.
      * 
@@ -55,7 +55,7 @@ public class Lxc extends AbstractManagerSetup {
     public String getLxcHost() {
         return lxcHost;
     }
-    
+
     /**
      * Defines the LXC host.
      * 
@@ -64,7 +64,7 @@ public class Lxc extends AbstractManagerSetup {
     public void setLxcHost(String lxcHost) {
         this.lxcHost = lxcHost;
     }
-    
+
     // Can possibly be removed, see during process
     /**
      * Returns the name of the Yaml file with information about the LXC Image.
@@ -74,29 +74,31 @@ public class Lxc extends AbstractManagerSetup {
     public String getLxcImageYamlFilename() {
         return this.lxcImageYamlFilename;
     }
-    
+
     /**
-     * Defines the standard name of the Yaml file with a information about the LXC Image.
+     * Defines the standard name of the Yaml file with a information about the LXC
+     * Image.
      * 
      * @param filename the name of the Yaml file
      */
     public void setLxcImageYamlFilename(String filename) {
         this.lxcImageYamlFilename = filename;
     }
-    
-    
+
     // Can possibly be removed, see during process
     /**
      * Defines the download directory.
+     * 
      * @param directory
      */
     public void setDownloadDirectory(String directory) {
         this.downloadDirectory = directory;
     }
-    
+
     /**
-     * Returns the download directory. If the configured download directory is <b>null</b> or empty, it returns 
-     * the system temporary directory.
+     * Returns the download directory. If the configured download directory is
+     * <b>null</b> or empty, it returns the system temporary directory.
+     * 
      * @return directory, the system temporary directory if none is specified
      */
     public String getDownloadDirectory() {
@@ -105,5 +107,5 @@ public class Lxc extends AbstractManagerSetup {
         }
         return this.downloadDirectory;
     }
-    
+
 }

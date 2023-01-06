@@ -26,23 +26,22 @@ import de.iip_ecosphere.platform.support.resources.ResourceLoader;
  * @author Holger Eichelberger, SSE
  */
 public class LxcContainerDescriptorTest {
-    
-    
+
     /**
      * Tests reading descriptors.
      */
     @Test
     public void testDescriptor() {
-        Assert.assertNull(LxcContainerDescriptor.readFromYaml(ResourceLoader.getResourceAsStream("xyz.yml"), 
+        Assert.assertNull(LxcContainerDescriptor.readFromYaml(ResourceLoader.getResourceAsStream("xyz.yml"),
                 new File("xyz.yml").toURI()));
-        
-        LxcContainerDescriptor desc = LxcContainerDescriptor.readFromYaml(
-            ResourceLoader.getResourceAsStream("mesh-info.yml"), new File("mesh-info.yml").toURI());
+
+        LxcContainerDescriptor desc = LxcContainerDescriptor
+                .readFromYaml(ResourceLoader.getResourceAsStream("mesh-info.yml"), new File("mesh-info.yml").toURI());
         Assert.assertNotNull(desc);
-        
+
         Assert.assertEquals("test-serviceMgr", desc.getId());
         Assert.assertEquals("Test Service Manager", desc.getName());
-//        Assert.assertEquals("1.0", desc.getVersion().toString());
+        // Assert.assertEquals("1.0", desc.getVersion().toString());
         Assert.assertEquals("iip/serviceMgr", desc.getLxcImageAlias());
         Assert.assertEquals("serviceMgr.tar.gz", desc.getLxcZip());
         Assert.assertEquals(1, desc.getEnv().size());
@@ -55,20 +54,20 @@ public class LxcContainerDescriptorTest {
         Assert.assertEquals("80", desc.getExposedPorts().get(2));
         Assert.assertEquals("8080/DEFAULT", desc.getExposedPorts().get(3));
         Assert.assertEquals("8443", desc.getExposedPorts().get(4));
-//        List<ExposedPort> exp = desc.instantiateExposedPorts(1235, 0);
-//        Assert.assertEquals(4, exp.size());
-//        Assert.assertEquals(1235, exp.get(0).getPort());
-//        Assert.assertEquals(InternetProtocol.TCP, exp.get(0).getProtocol());
-//        Assert.assertEquals(22, exp.get(1).getPort());
-//        Assert.assertEquals(InternetProtocol.UDP, exp.get(1).getProtocol());
-//        Assert.assertEquals(80, exp.get(2).getPort());
-//        Assert.assertEquals(InternetProtocol.DEFAULT, exp.get(2).getProtocol());
-//        Assert.assertEquals(8080, exp.get(3).getPort());
-//        Assert.assertEquals(InternetProtocol.DEFAULT, exp.get(3).getProtocol());
+        // List<ExposedPort> exp = desc.instantiateExposedPorts(1235, 0);
+        // Assert.assertEquals(4, exp.size());
+        // Assert.assertEquals(1235, exp.get(0).getPort());
+        // Assert.assertEquals(InternetProtocol.TCP, exp.get(0).getProtocol());
+        // Assert.assertEquals(22, exp.get(1).getPort());
+        // Assert.assertEquals(InternetProtocol.UDP, exp.get(1).getProtocol());
+        // Assert.assertEquals(80, exp.get(2).getPort());
+        // Assert.assertEquals(InternetProtocol.DEFAULT, exp.get(2).getProtocol());
+        // Assert.assertEquals(8080, exp.get(3).getPort());
+        // Assert.assertEquals(InternetProtocol.DEFAULT, exp.get(3).getProtocol());
         Assert.assertTrue(desc.requiresPort(LxcContainerDescriptor.PORT_PLACEHOLDER));
         Assert.assertEquals("host", desc.getNetworkMode());
     }
-    
+
     /**
      * Tests static image name functions.
      */

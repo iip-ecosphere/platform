@@ -25,7 +25,7 @@ import de.iip_ecosphere.platform.ecsRuntime.lxc.LxcSetup;
  * @author Holger Eichelberger, SSE
  */
 public class LxcSetupTest {
-    
+
     /**
      * Tests the configuration.
      */
