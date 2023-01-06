@@ -21,7 +21,6 @@ import java.util.TimerTask;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
-import org.apache.commons.text.StringTokenizer;
 import org.apache.logging.log4j.LogManager;
 
 import de.iip_ecosphere.platform.services.spring.DescriptorUtils;
@@ -52,7 +51,7 @@ public class SpringStartup {
         String sysArgs = System.getProperty(PROPERTY_ARGS, null);
         if (null != sysArgs) {
             List<String> tmp = CollectionUtils.toList(args);
-            CollectionUtils.addAll(tmp, new StringTokenizer(sysArgs, " ").getTokenArray()); // initial, without quotin
+            CollectionUtils.addAll(tmp, CmdLine.toArgs(sysArgs));
             args = tmp.toArray(new String[0]);
         }
         start(args);
