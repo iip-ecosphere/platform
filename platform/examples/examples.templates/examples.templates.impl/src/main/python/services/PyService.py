@@ -7,7 +7,14 @@ from datatypes.NewInputImpl import NewInputImpl
 from datatypes.NewOutput import NewOutput
 from datatypes.NewOutputImpl import NewOutputImpl
 from interfaces.PyServiceInterface import PyServiceInterface
-import numpy as np
+numpyExists = True
+
+try:
+    import numpy as np
+except ImportError as e:
+    print(e)
+    numpyExists = False
+    pass
 import pickle
 
 
@@ -22,16 +29,18 @@ class PyService(PyServiceInterface):
     def processNewInput(self, data: NewInput):
         """Asynchronous data processing method. Use self.ingest(data) to pass the result back to the data stream.
         """
-        if (self.clf == None):
-            with open ("services/trained_forest.pkl", "rb") as p:
-                self.clf = pickle.load(p)
-        
-        print('Used Data ', data.__dict__)
-        datare = np.array([[data.getType(), data.getAirTemp(), data.getProcTemp(), data.getRotSpe()
-                          , data.getTorq(), data.getToolWear()]])
-        result = None
-        if (self.clf != None):
-            result = self.clf.predict(datare) 
+        result = [1, 2]
+        if (numpyExists):
+            if (self.clf == None):
+                with open ("services/trained_forest.pkl", "rb") as p:
+                    self.clf = pickle.load(p)
+            
+            print('Used Data ', data.__dict__)
+            datare = np.array([[data.getType(), data.getAirTemp(), data.getProcTemp(), data.getRotSpe()
+                              , data.getTorq(), data.getToolWear()]])
+            result = None
+            if (self.clf != None):
+                result = self.clf.predict(datare) 
             
         print(result)
         out = NewOutputImpl()
