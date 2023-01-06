@@ -20,7 +20,8 @@ import de.iip_ecosphere.platform.ecsRuntime.EcsSetup;
 import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
 
 /**
- * Implements the LXC specific configuration. For configuration prerequisites, see {@link EcsSetup}.
+ * Implements the LXC specific configuration. For configuration prerequisites,
+ * see {@link EcsSetup}.
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -36,7 +37,7 @@ public class LxcSetup extends EcsSetup {
     public Lxc getLxc() {
         return lxc;
     }
-    
+
     /**
      * Defines LXC setup.
      * 
@@ -45,13 +46,13 @@ public class LxcSetup extends EcsSetup {
     public void setLxc(Lxc lxc) {
         this.lxc = lxc;
     }
-    
+
     /**
-    * Reads a {@link LxcSetup} instance from a {@link AbstractSetup#DEFAULT_FNAME} in the 
-    * root folder of the jar/classpath. 
-    *
-    * @return configuration instance
-    */
+     * Reads a {@link LxcSetup} instance from a {@link AbstractSetup#DEFAULT_FNAME}
+     * in the root folder of the jar/classpath.
+     *
+     * @return configuration instance
+     */
     public static LxcSetup readFromYaml() {
         LxcSetup result;
         try {
@@ -62,5 +63,5 @@ public class LxcSetup extends EcsSetup {
         }
         return result;
     }
-    
+
 }

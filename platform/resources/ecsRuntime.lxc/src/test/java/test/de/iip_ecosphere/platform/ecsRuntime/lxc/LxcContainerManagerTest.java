@@ -37,124 +37,126 @@ import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
  * @author Luca Schulz, SSE
  */
 public class LxcContainerManagerTest {
-        
+
     /**
      * Template test.
-     * @throws URISyntaxException 
-     * @throws ExecutionException 
-     * @throws InterruptedException 
-     * @throws IOException 
+     * 
+     * @throws URISyntaxException
+     * @throws ExecutionException
+     * @throws InterruptedException
+     * @throws IOException
      */
     @Test
-    public void testContainerManager() throws 
-        URISyntaxException, ExecutionException, InterruptedException, IOException {
-    	
-    	// Some assumtions made for Jenkins to run test successfully
-    	// To activate test again either assume false or set "!SystemUtils.IS_OS_WINDOWS"
-    	Assume.assumeTrue(SystemUtils.IS_OS_WINDOWS);
-    	Assume.assumeTrue(!SystemUtils.USER_HOME.startsWith("/home/"));
-    	
-    	String userHome = System.getProperty("user.home");
-		System.setProperty("snap_cert", userHome + File.separator  + "snap/lxd/common/config/client.crt");
-		System.setProperty("snap_key", userHome + File.separator  + "snap/lxd/common/config/client.key");
+    public void testContainerManager()
+            throws URISyntaxException, ExecutionException, InterruptedException, IOException {
+
+        // Some assumtions made for Jenkins to run test successfully
+        // To activate test again either assume false or set
+        // "!SystemUtils.IS_OS_WINDOWS"
+        Assume.assumeTrue(SystemUtils.IS_OS_WINDOWS);
+        Assume.assumeTrue(!SystemUtils.USER_HOME.startsWith("/home/"));
+
+        String userHome = System.getProperty("user.home");
+        System.setProperty("snap_cert", userHome + File.separator + "snap/lxd/common/config/client.crt");
+        System.setProperty("snap_key", userHome + File.separator + "snap/lxd/common/config/client.key");
 
         NotificationMode oldM = ActiveAasBase.setNotificationMode(NotificationMode.NONE); // no AAS here
         // TODO test against full AAS setup, see EcsAasTest
         LxcContainerManager cm = (LxcContainerManager) EcsFactory.getContainerManager();
         Assert.assertTrue(cm instanceof LxcContainerManager);
-        
+
         // Checking if LXC API Client can connect with LXC daemon.
         if (cm.getLxcClient() == null) {
-        	System.out.println("null");
+            System.out.println("null");
             return;
         }
-        
+
         System.out.println(cm.getLxcClient().loadServerInfo());
-        
+
         String testName = "test-container";
 
-        //---- Adding container -----------------
+        // ---- Adding container -----------------
         String workingDir = System.getProperty("user.dir");
         String imageLocationStr = "file://" + workingDir + "/src/test/resources/";
-        URI location = new URI(imageLocationStr);        
-        
+        URI location = new URI(imageLocationStr);
+
         // Is the id of the container same as in the yaml file?
         Assert.assertEquals(testName, cm.addContainer(location));
         Thread.sleep(4000);
         Assert.assertEquals("Stopped", cm.getLxcClient().loadContainerState(testName).getStatus());
-        
-        //---- Starting container -----------------
+
+        // ---- Starting container -----------------
         cm.startContainer(testName);
         Thread.sleep(3000);
         Assert.assertEquals("Running", cm.getLxcClient().loadContainerState(testName).getStatus());
         // Is there a running container with a given name?
         Assert.assertNotNull(getLxcName(testName, "running", cm));
-        
-        //---- Freezing container -----------------
+
+        // ---- Freezing container -----------------
         cm.freezeContainer(testName);
         Thread.sleep(3000);
         Assert.assertEquals("Frozen", cm.getLxcClient().loadContainerState(testName).getStatus());
         // Is there a running container with a given name?
         Assert.assertNotNull(getLxcName(testName, "frozen", cm));
-        
-        //---- Unfreezing container -----------------
+
+        // ---- Unfreezing container -----------------
         cm.unfreezeContainer(testName);
         Thread.sleep(3000);
         Assert.assertEquals("Running", cm.getLxcClient().loadContainerState(testName).getStatus());
         // Is there a running container with a given name?
         Assert.assertNotNull(getLxcName(testName, "running", cm));
 
-        //---- Stopping container -----------------
+        // ---- Stopping container -----------------
         cm.stopContainer(testName);
         Thread.sleep(3000);
         Assert.assertEquals("Stopped", cm.getLxcClient().loadContainerState(testName).getStatus());
         // Is there a exited container with a given name?
         Assert.assertNotNull(getLxcName(testName, "stopped", cm));
 
-        //---- Delete container --------------
+        // ---- Delete container --------------
         cm.deleteContainer(testName);
         Thread.sleep(3000);
         // Removed from system?
         Assert.assertNull(cm.getLxcName(testName));
 
-        
-        //---- LXC System Version --------------
+        // ---- LXC System Version --------------
         Assert.assertNotEquals(null, cm.getContainerSystemVersion());
-        
+
         ActiveAasBase.setNotificationMode(oldM);
-        
+
     }
-    
+
     /**
-     * Returns the Lxc Name of a container with a given {@code name} and {@code state}.
+     * Returns the Lxc Name of a container with a given {@code name} and
+     * {@code state}.
      * 
-     * @param name container's name
+     * @param name  container's name
      * @param state container's state (created, running etc)
-     * @param cm container Manager
+     * @param cm    container Manager
      * @return container Lxc Name
      */
     public String getLxcName(String name, String state, LxcContainerManager cm) throws ExecutionException {
         ILxdService lxcClient = cm.getLxcClient();
-        
+
         // Getting list of all container that LXC "knows".
         Collection<Container> containers = null;
-		try {
-			containers = lxcClient.loadContainerMap().values();
-		} catch (IOException | InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+        try {
+            containers = lxcClient.loadContainerMap().values();
+        } catch (IOException | InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
-		if (containers.size() == 0) {
-	        return null;
-		}
-         
+        if (containers.size() == 0) {
+            return null;
+        }
+
         // Looking for the container with a given name.
-		for (Container container : containers) {
-			if(container.getName().equals(name) && container.getStatus().equalsIgnoreCase(state)) {
-				return container.getName();
-			}
-		}
+        for (Container container : containers) {
+            if (container.getName().equals(name) && container.getStatus().equalsIgnoreCase(state)) {
+                return container.getName();
+            }
+        }
         return null;
-    }   
+    }
 }

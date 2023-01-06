@@ -35,7 +35,7 @@ import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
  * @author Luca Schulz, SSE
  */
 public class LxcContainerDescriptor extends BasicContainerDescriptor {
-    
+
     public static final String PORT_PLACEHOLDER = "${port}";
     public static final String PORT_PLACEHOLDER_1 = "${port_1}";
     private static int instanceCount = 0;
@@ -50,74 +50,85 @@ public class LxcContainerDescriptor extends BasicContainerDescriptor {
     private String networkMode;
     private ArrayList<String> exposedPorts = new ArrayList<String>();
     private ArrayList<String> env = new ArrayList<String>();
-        
+
     /**
      * Creates a container descriptor instance.
      */
     public LxcContainerDescriptor() {
     }
-    
+
     /**
      * Creates a container descriptor instance.
      * 
-     * @param id the container id
-     * @param name the (file) name of the container
+     * @param id      the container id
+     * @param name    the (file) name of the container
      * @param version the version of the container
-     * @param uri the URI where the descriptor was loaded from
-     * @throws IllegalArgumentException if {@code id}, {@code name}, {@code version} or {@code uri} is invalid, e.g., 
-     *     <b>null</b> or empty
+     * @param uri     the URI where the descriptor was loaded from
+     * @throws IllegalArgumentException if {@code id}, {@code name}, {@code version}
+     *                                  or {@code uri} is invalid, e.g., <b>null</b>
+     *                                  or empty
      */
     protected LxcContainerDescriptor(String id, String name, Version version, URI uri) {
         super(id, name, version, uri);
     }
-    
+
     /**
      * Defines the LXC container's id for LXC its the fingerprint in specific.
+     * 
      * @param lxcId
      */
     public void setId(String lxcId) {
         this.lxcId = lxcId;
     }
-    
+
     /**
      * Returns the LXC container's id for LXC its the fingerprint in specific.
+     * 
      * @return LXC id
      */
     public String getId() {
         return this.lxcId;
     }
+
     /**
      * Defines the name of the LXC image.
+     * 
      * @param lxcImageAlias
      */
     public void setLxcImageAlias(String lxcImageAlias) {
         this.lxcImageAlias = lxcImageAlias;
     }
-    
+
     /**
      * Returns the name of the LXC image.
+     * 
      * @return lxcImageAlias
      */
     public String getLxcImageAlias() {
         return this.lxcImageAlias;
     }
+
     /**
      * Returns the name of the LXC image zip.
+     * 
      * @return lxcZip
      */
-	public String getLxcZip() {
-		return lxcZip;
-	}
-	/**
+    public String getLxcZip() {
+        return lxcZip;
+    }
+
+    /**
      * Defines the name of the LXC image zip.
+     * 
      * @param lxcZip
      */
-	public void setLxcZip(String lxcZip) {
-		this.lxcZip = lxcZip;
-	}
-	
+    public void setLxcZip(String lxcZip) {
+        this.lxcZip = lxcZip;
+    }
+
     /**
      * Defines the exposed ports.
+     * 
      * @param exposedPorts the exposed ports
      */
     public void setExposedPorts(ArrayList<String> exposedPorts) {
@@ -125,9 +136,10 @@ public class LxcContainerDescriptor extends BasicContainerDescriptor {
             this.exposedPorts = exposedPorts;
         }
     }
-    
+
     /**
      * Returns the ports exposed by the container.
+     * 
      * @return the exposed ports
      */
     public ArrayList<String> getExposedPorts() {
@@ -136,49 +148,53 @@ public class LxcContainerDescriptor extends BasicContainerDescriptor {
 
     /**
      * Instantiates the exposed by the container.
-     * @param port to replace {@link #PORT_PLACEHOLDER}
+     * 
+     * @param port  to replace {@link #PORT_PLACEHOLDER}
      * @param port1 to replace {@link #PORT_PLACEHOLDER_1}
      * @return the exposed ports
      */
-//    public List<ExposedPort> instantiateExposedPorts(int port, int port1) {
-//        ArrayList<ExposedPort> result = new ArrayList<ExposedPort>();
-//        String tmpPort = String.valueOf(port);
-//        String tmpPort1 = String.valueOf(port1);
-//        for (String e: exposedPorts) {
-//            String tmp = e.replace(PORT_PLACEHOLDER, tmpPort);
-//            tmp = tmp.replace(PORT_PLACEHOLDER_1, tmpPort1);
-//            int pos = tmp.indexOf('/');
-//            String iPort;
-//            String iProtocol;
-//            if (pos > 0) {
-//                iPort = tmp.substring(0, pos);
-//                iProtocol = tmp.substring(pos + 1);
-//                if ("DEFAULT".equals(iProtocol)) {
-//                    iProtocol = InternetProtocol.DEFAULT.name();
-//                }
-//            } else {
-//                iPort = tmp;
-//                iProtocol = InternetProtocol.TCP.name();
-//            }
-//            try {
-//                result.add(new ExposedPort(Integer.parseInt(iPort), InternetProtocol.valueOf(iProtocol)));
-//            } catch (IllegalArgumentException ex) {
-//            }
-//        }
-//        return result;
-//    }
+    // public List<ExposedPort> instantiateExposedPorts(int port, int port1) {
+    // ArrayList<ExposedPort> result = new ArrayList<ExposedPort>();
+    // String tmpPort = String.valueOf(port);
+    // String tmpPort1 = String.valueOf(port1);
+    // for (String e: exposedPorts) {
+    // String tmp = e.replace(PORT_PLACEHOLDER, tmpPort);
+    // tmp = tmp.replace(PORT_PLACEHOLDER_1, tmpPort1);
+    // int pos = tmp.indexOf('/');
+    // String iPort;
+    // String iProtocol;
+    // if (pos > 0) {
+    // iPort = tmp.substring(0, pos);
+    // iProtocol = tmp.substring(pos + 1);
+    // if ("DEFAULT".equals(iProtocol)) {
+    // iProtocol = InternetProtocol.DEFAULT.name();
+    // }
+    // } else {
+    // iPort = tmp;
+    // iProtocol = InternetProtocol.TCP.name();
+    // }
+    // try {
+    // result.add(new ExposedPort(Integer.parseInt(iPort),
+    // InternetProtocol.valueOf(iProtocol)));
+    // } catch (IllegalArgumentException ex) {
+    // }
+    // }
+    // return result;
+    // }
 
     /**
      * Defines the environment settings to start the container.
-     * @param env the environment settings, may contain {@link #PORT_PLACEHOLDER} to be replaced by the dynamic port 
-     *    of the AAS implementation server of the service manager
+     * 
+     * @param env the environment settings, may contain {@link #PORT_PLACEHOLDER} to
+     *            be replaced by the dynamic port of the AAS implementation server
+     *            of the service manager
      */
     public void setEnv(ArrayList<String> env) {
         if (null != env) {
             this.env = env;
         }
     }
-    
+
     /**
      * Returns the network mode.
      * 
@@ -187,9 +203,10 @@ public class LxcContainerDescriptor extends BasicContainerDescriptor {
     public String getNetworkMode() {
         return networkMode;
     }
-    
+
     /**
      * Returns the plain environment settings to start the container.
+     * 
      * @return the environment settings, may contain {@link #PORT_PLACEHOLDER}}
      */
     public ArrayList<String> getEnv() {
@@ -204,18 +221,19 @@ public class LxcContainerDescriptor extends BasicContainerDescriptor {
     public void setNetworkMode(String networkMode) {
         this.networkMode = networkMode;
     }
-    
+
     /**
      * Returns the substituted environment variable settings to start the container.
-     * @param port the port to substitute {@link #PORT_PLACEHOLDER} 
-     * @param port1 the port to substitute {@link #PORT_PLACEHOLDER_1} 
-     * @return the instantiated environment variable settings 
+     * 
+     * @param port  the port to substitute {@link #PORT_PLACEHOLDER}
+     * @param port1 the port to substitute {@link #PORT_PLACEHOLDER_1}
+     * @return the instantiated environment variable settings
      */
     public List<String> instantiateEnv(int port, int port1) {
         List<String> result = new ArrayList<String>();
         for (String s : env) {
-            result.add(s.replace(PORT_PLACEHOLDER, String.valueOf(port))
-                .replace(PORT_PLACEHOLDER_1, String.valueOf(port1)));
+            result.add(s.replace(PORT_PLACEHOLDER, String.valueOf(port)).replace(PORT_PLACEHOLDER_1,
+                    String.valueOf(port1)));
         }
         return result;
     }
@@ -241,11 +259,11 @@ public class LxcContainerDescriptor extends BasicContainerDescriptor {
                     break;
                 }
             }
-            
+
         }
         return result;
     }
-    
+
     /**
      * Returns the key for the network manager.
      * 
@@ -263,11 +281,10 @@ public class LxcContainerDescriptor extends BasicContainerDescriptor {
     public String getNetKey1() {
         return Id.getDeviceId() + "_" + lxcImageAlias + "_1_" + instance;
     }
-    
-    
 
     /**
      * Returns a LxcContainerDescriptor with a information from a yaml file.
+     * 
      * @param file yaml file
      * @return LxcContainerDescriptor (may be <b>null</b>)
      */
@@ -278,15 +295,16 @@ public class LxcContainerDescriptor extends BasicContainerDescriptor {
             in = new FileInputStream(file);
             result = readFromYaml(in, file.toURI());
         } catch (FileNotFoundException e) {
-            LoggerFactory.getLogger(LxcContainerDescriptor.class).error(
-                "Reading container descriptor: " + e.getMessage());
+            LoggerFactory.getLogger(LxcContainerDescriptor.class)
+                    .error("Reading container descriptor: " + e.getMessage());
         }
         return result;
     }
-    
+
     /**
      * Returns a LxcContainerDescriptor with a information from a yaml file.
-     * @param in an inout stream with Yaml contents (may be <b>null</b>)
+     * 
+     * @param in  an inout stream with Yaml contents (may be <b>null</b>)
      * @param uri the URI the descriptor was read from
      * @return LxcContainerDescriptor (may be <b>null</b>)
      */
@@ -297,15 +315,16 @@ public class LxcContainerDescriptor extends BasicContainerDescriptor {
                 result = AbstractSetup.readFromYaml(LxcContainerDescriptor.class, in);
                 result.setUri(uri);
             } catch (IOException e) {
-                LoggerFactory.getLogger(LxcContainerDescriptor.class).error(
-                    "Reading container descriptor: " + e.getMessage());
+                LoggerFactory.getLogger(LxcContainerDescriptor.class)
+                        .error("Reading container descriptor: " + e.getMessage());
             }
         }
         return result;
     }
-    
+
     /**
-     * Turns a full container image name with optional registry, repository and version into its repository/name.
+     * Turns a full container image name with optional registry, repository and
+     * version into its repository/name.
      * 
      * @param imgName the image name
      * @return the repository
@@ -325,9 +344,10 @@ public class LxcContainerDescriptor extends BasicContainerDescriptor {
         }
         return result;
     }
-    
+
     /**
-     * Turns a full container image name with optional registry, repository and version into its repository/name.
+     * Turns a full container image name with optional registry, repository and
+     * version into its repository/name.
      * 
      * @param imgName the image name
      * @return the repository
@@ -349,7 +369,8 @@ public class LxcContainerDescriptor extends BasicContainerDescriptor {
     }
 
     /**
-     * Turns a full container image name with optional registry, repository and version into its (version) tag.
+     * Turns a full container image name with optional registry, repository and
+     * version into its (version) tag.
      * 
      * @param imgName the image name
      * @return the tag, may be empty
@@ -368,7 +389,7 @@ public class LxcContainerDescriptor extends BasicContainerDescriptor {
         }
         return result;
     }
-    
+
     /**
      * Tests reading a Docker container file.
      * 
