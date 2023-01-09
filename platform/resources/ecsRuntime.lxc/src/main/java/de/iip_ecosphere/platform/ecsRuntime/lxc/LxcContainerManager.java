@@ -49,10 +49,6 @@ public class LxcContainerManager extends AbstractContainerManager<LxcContainerDe
     private static LxcSetup config = LxcSetup.readFromYaml();
     private static final Logger LOGGER = LoggerFactory.getLogger(LxcContainerManager.class);
 
-    // don't change name of outer/inner class
-    // TODO upon start, scan file-system for containers and add them automatically
-    // if applicable
-
     /**
      * Implements the factory descriptor for hooking the LXC container manager into
      * the ECS factory.
@@ -75,14 +71,10 @@ public class LxcContainerManager extends AbstractContainerManager<LxcContainerDe
 
     /**
      * Adds a container from a selected repository that was defined in a YAML-File
-     * to the local repository
+     * to the local repository.
      * 
-     * @param pathToYaml,          The path to the directory where the YAML with
-     *                             container information is
-     * @param lxcImageName,        Gets the name of the base image of the container
-     *                             from the YAML if only the name is given it
-     *                             assumes to use local image
-     * @param lxcImageFingerprint,
+     * @param location, the location where the Yaml with container info is
+     * @return containerName, name of the created container
      **/
     @Override
     public String addContainer(URI location) throws ExecutionException {
@@ -125,7 +117,7 @@ public class LxcContainerManager extends AbstractContainerManager<LxcContainerDe
              * 
              * First IF for container creation with local image if fingerprint was found
              * Second IF for container creation with remote image, should be removed if CURL
-             * can be corrected
+             * can be corrected.
              * 
              **/
             if (lxcClient.loadContainer(containerName) == null && lxcImageFingerprint != null) {
@@ -146,14 +138,12 @@ public class LxcContainerManager extends AbstractContainerManager<LxcContainerDe
     /**
      * 
      * Adds a container from a tarball that can be created with distrobuilder and a
-     * template or via exporting an image
+     * template or via exporting an image.
      * 
      * @see maybe add function to create tarball with distrobuilder in this method
-     * @param homeDir,     the path where the project source folder is located
-     * @param imageName,   the name of the image defined in the yaml
-     * @param imageTar,    the filename of the tarball defined in the yaml
-     * @param fingerprint, the fingerprint of the image
-     * @param executed,    check whether the executeCmd was successful or not
+     * @param location, the location where the Yaml with container info is
+     * 
+     * @return containerName, the name of the created container
      * 
      **/
     public String addContainerFromTarball(URI location) throws ExecutionException {
@@ -196,7 +186,7 @@ public class LxcContainerManager extends AbstractContainerManager<LxcContainerDe
 
             /**
              * First check if image with same name already exists than try importing image
-             * if image with same fingerprint but different name exists executed is empty
+             * if image with same fingerprint but different name exists executed is empty.
              * 
              **/
 
@@ -214,7 +204,7 @@ public class LxcContainerManager extends AbstractContainerManager<LxcContainerDe
             }
 
             /**
-             * If image name and fingerprint didn't exist container creation is started
+             * If image name and fingerprint didn't exist container creation is started.
              **/
             if (fingerprint != null) {
 
@@ -294,7 +284,7 @@ public class LxcContainerManager extends AbstractContainerManager<LxcContainerDe
     }
 
     /**
-     * Starts an existing container with given name
+     * Starts an existing container with given name.
      * 
      * @param name, the name of the container
      * 
@@ -320,7 +310,7 @@ public class LxcContainerManager extends AbstractContainerManager<LxcContainerDe
     }
 
     /**
-     * Stops an existing container with given name
+     * Stops an existing container with given name.
      * 
      * @param name, the name of the container
      * 
@@ -344,7 +334,7 @@ public class LxcContainerManager extends AbstractContainerManager<LxcContainerDe
     }
 
     /**
-     * Deletes an existing container with given name
+     * Deletes an existing container with given name.
      * 
      * @param name, the name of the container
      * 
@@ -369,7 +359,7 @@ public class LxcContainerManager extends AbstractContainerManager<LxcContainerDe
     }
 
     /**
-     * Freezes an existing container with given name
+     * Freezes an existing container with given name.
      * 
      * @param name, the name of the container
      * 
@@ -394,7 +384,7 @@ public class LxcContainerManager extends AbstractContainerManager<LxcContainerDe
     }
 
     /**
-     * Unfreezes an existing container with given name
+     * Unfreezes an existing container with given name.
      * 
      * @param name, the name of the container
      * 
@@ -419,7 +409,7 @@ public class LxcContainerManager extends AbstractContainerManager<LxcContainerDe
     }
 
     /**
-     * Creates a snapshot of a container with given name
+     * Creates a snapshot of a container with given name.
      * 
      * @param containerName, the name of the container
      * @param snapshot,      the name that the snapshot is going to get
@@ -443,7 +433,7 @@ public class LxcContainerManager extends AbstractContainerManager<LxcContainerDe
 
     /**
      * Publishes an container and the corresponding snapshot as an image to the
-     * local server
+     * local server.
      * 
      * @param containerName, the name of the container
      * @param snapshot,      the name of the corresponding snapshot
@@ -476,7 +466,7 @@ public class LxcContainerManager extends AbstractContainerManager<LxcContainerDe
     }
 
     /**
-     * Exports an existing image as a tarball to the users home directory
+     * Exports an existing image as a tarball to the users home directory.
      * 
      * @param imageAlias, the name the image that is going to be exported
      * 
@@ -504,7 +494,7 @@ public class LxcContainerManager extends AbstractContainerManager<LxcContainerDe
     }
 
     /**
-     * Imports an image from an existing tarball to the local server
+     * Imports an image from an existing tarball to the local server.
      * 
      * @param tarball,    the path to the tarball/gzip file
      * @param imageAlias, the name that the image is going to get
@@ -532,7 +522,7 @@ public class LxcContainerManager extends AbstractContainerManager<LxcContainerDe
 
     /**
      * Copy/import an image from a remote server that is defined in
-     * {@coder RemoteServer.java} and set up on localhost
+     * {@coder RemoteServer.java} and set up on localhost.
      * 
      * @param remote,      the RemoteServer where the wanted image is stored
      * @param remoteImage, the name of the image that is going to be copied
@@ -561,11 +551,21 @@ public class LxcContainerManager extends AbstractContainerManager<LxcContainerDe
         LOGGER.info("Image from: " + remote.getName() + " imported as " + imageAlias);
     }
 
+    /**
+     * Returns the ContainerSystemName.
+     * 
+     * @return ContainerSystemName e.g. "LXC"
+     **/
     @Override
     public String getContainerSystemName() {
         return "LXC";
     }
 
+    /**
+     * Returns the ContainerSystemVersion.
+     * 
+     * @return ContainerSystemVersion
+     **/
     @Override
     public String getContainerSystemVersion() {
         LxcContainerManager cm = (LxcContainerManager) EcsFactory.getContainerManager();
@@ -578,7 +578,7 @@ public class LxcContainerManager extends AbstractContainerManager<LxcContainerDe
     }
 
     /**
-     * This method is not relevant for LXC
+     * This method is not relevant for LXC.
      **/
     @Override
     public void updateContainer(String id, URI location) throws ExecutionException {

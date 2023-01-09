@@ -84,7 +84,7 @@ public class LxcContainerDescriptor extends BasicContainerDescriptor {
     /**
      * Returns the LXC container's id for LXC its the fingerprint in specific.
      * 
-     * @return LXC id
+     * @return lxcId
      */
     public String getId() {
         return this.lxcId;
@@ -140,19 +140,19 @@ public class LxcContainerDescriptor extends BasicContainerDescriptor {
     /**
      * Returns the ports exposed by the container.
      * 
-     * @return the exposed ports
+     * @return exposedPorts, the exposed ports
      */
     public ArrayList<String> getExposedPorts() {
         return this.exposedPorts;
     }
 
-    /**
-     * Instantiates the exposed by the container.
-     * 
-     * @param port  to replace {@link #PORT_PLACEHOLDER}
-     * @param port1 to replace {@link #PORT_PLACEHOLDER_1}
-     * @return the exposed ports
-     */
+//    /**
+//     * Instantiates the exposed by the container.
+//     * 
+//     * @param port  to replace {@link #PORT_PLACEHOLDER}
+//     * @param port1 to replace {@link #PORT_PLACEHOLDER_1}
+//     * @return exposedPorts, the exposed ports
+//     */
     // public List<ExposedPort> instantiateExposedPorts(int port, int port1) {
     // ArrayList<ExposedPort> result = new ArrayList<ExposedPort>();
     // String tmpPort = String.valueOf(port);
@@ -198,7 +198,7 @@ public class LxcContainerDescriptor extends BasicContainerDescriptor {
     /**
      * Returns the network mode.
      * 
-     * @return the network mode, may be <b>null</b> for none
+     * @return networkMode, the network mode, may be <b>null</b> for none
      */
     public String getNetworkMode() {
         return networkMode;
@@ -227,7 +227,7 @@ public class LxcContainerDescriptor extends BasicContainerDescriptor {
      * 
      * @param port  the port to substitute {@link #PORT_PLACEHOLDER}
      * @param port1 the port to substitute {@link #PORT_PLACEHOLDER_1}
-     * @return the instantiated environment variable settings
+     * @return result, the instantiated environment variable settings
      */
     public List<String> instantiateEnv(int port, int port1) {
         List<String> result = new ArrayList<String>();
@@ -242,7 +242,7 @@ public class LxcContainerDescriptor extends BasicContainerDescriptor {
      * Returns whether a dynamic port for a placeholder is required.
      * 
      * @param placeholder the name of the placeholder
-     * @return {@code true} for dynamic port, {@code false} else
+     * @return result, {@code true} for dynamic port, {@code false} else
      */
     public boolean requiresPort(String placeholder) {
         boolean result = false;
