@@ -8,7 +8,7 @@ template Dockerfile_3_ecs(IIPEcosphere config, FileArtifact target, sequenceOf(M
 	
     def main(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, Application app, ContainerType containerType, EcsDevice device) {
     	
-    	'FROM docker'  // TODO Java-Version & CPU
+    	'FROM docker' 
     	'${containerSettings(config, containerType, device)}'
     	''
         'RUN apk add openjdk13'
@@ -21,15 +21,7 @@ template Dockerfile_3_ecs(IIPEcosphere config, FileArtifact target, sequenceOf(M
     	'COPY ecsJars/ ecsJars'
     	'COPY common/ common'
     	'COPY ecs.sh ecs.sh'
-    	''	
-    	'# Broker'
-    	'COPY broker/brokerJars/ brokerJars'
-    	'COPY broker/src/ src'
-    	'COPY broker/broker.sh broker.sh'
     	''
-    	'# Running ECS and Service Manager'
-    	'COPY ecs.wrapper_script.sh ecs.wrapper_script.sh'
-		'RUN chmod 777 ecs.wrapper_script.sh'
-        'CMD ./ecs.wrapper_script.sh'
+        'CMD ./ecs.sh'
     }	
 }

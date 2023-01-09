@@ -58,13 +58,13 @@ template Dockerfile_Python(IIPEcosphere config, FileArtifact target, sequenceOf(
         '# App'
         'COPY ${getAppMvnName(app)}/target/${getAppMvnName(app)}-${getAppMvnVersion(app)}-bin.jar ${getAppMvnName(app)}-${getAppMvnVersion(app)}-bin.jar'
         ''
-        if (containerType == ContainerType::Ecs_Svc_App) {
+        if (containerType == ContainerType::EcsSvc_App) {
             '# ECS and Service Manager'
             'COPY ecsSvcJars/ ecsSvcJars'
             'COPY common/ common'
             'COPY ecsServiceMgr.sh ecsServiceMgr.sh'
         
-        } else if (containerType == ContainerType::EcsSvc_App) {
+        } else if (containerType == ContainerType::Ecs_Svc_App) {
             '# Service Manager'
             'COPY svcJars/ svcJars'
             'COPY common/ common'
