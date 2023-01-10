@@ -406,6 +406,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 vilTemplateProcessor("InstalledDependencies", config, instDep, elements=elements, isPython=isPythonService);
             
                 String dfName = createContainerBuildScript(mgr, a, elements, appRoot, cntType, isPythonService, device);
+
                 if (cntType == ContainerType::Ecs_Svc_App) {
                     // Wrapper-Skript 
                     Path ws = "${appRoot}/../wrapper_script.sh";
