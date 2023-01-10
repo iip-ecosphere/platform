@@ -382,7 +382,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
             }
             
             // Checking if there is any PythonService in app
-            Integer isPythonService = 0;        // 0 - false, 1 - true, -1 below ECS only (containerType == CONTAINER_C1Ecs_C2Svc_App)
+            Integer isPythonService = 0;        // 0 - false, 1 - true, -1 below ECS only (containerType == C1Ecs_C2Svc_App)
             for (MeshElement elem : elements) {
                 Service service = elem.impl;
                 if (service.isTypeOf(PythonService)) {
@@ -419,7 +419,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     
                     // Mesh-Info, Container-Descriptor
                     Path meshInfo = "${artifactsFolder}/${filePrefix}mesh-info.yml";
-                    //vilTemplateProcessor("MeshInfo", config, meshInfo, app=a, containerType=cntType); TODO 
                     vilTemplateProcessor("MeshInfo", config, meshInfo, app=a, containerType=ContainerType::Ecs_Svc_App, device=device);
                 }
                 
@@ -441,10 +440,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 if (cntType == ContainerType::C1Ecs_C2Svc_App) {
                     // Container with ECS
                     String ecsDfName = createContainerBuildScript(mgr, a, elements, appRoot, cntType, -1, device);
-                    
-                    Path ecs_ws = "${appRoot}/../ecs.wrapper_script.sh";
-                    vilTemplateProcessor("WrapperScript", config, ecs_ws, containerType=ContainerType::Ecs);
-                    
+                                        
                     Path b = "${appRoot}/../";
                     Path d = "${appRoot}/../" + ecsDfName;
                     String ecs_imageId = createContainerImage(mgr, b, d, a.name.toIdentifier(), "ecs", a.ver);
