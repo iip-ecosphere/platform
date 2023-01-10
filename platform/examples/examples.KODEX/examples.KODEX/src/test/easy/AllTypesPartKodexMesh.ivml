@@ -4,7 +4,7 @@ project AllTypesPartKodexMesh {
     
     annotate BindingTime bindingTime = BindingTime::compile to .;
 
-    RecordType rec1 = {
+    RecordType kodexRec1 = {
         name = "KRec13",
         fields = {
             Field {
@@ -17,7 +17,7 @@ project AllTypesPartKodexMesh {
         }
     };
     
-    RecordType rec2 = {
+    RecordType kodexRec2 = {
         name = "KRec13Anon",
         fields = {
             Field {

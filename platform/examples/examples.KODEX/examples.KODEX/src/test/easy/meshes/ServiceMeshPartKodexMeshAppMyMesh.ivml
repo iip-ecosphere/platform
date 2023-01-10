@@ -4,34 +4,34 @@ project ServiceMeshPartKodexMeshAppMyMesh {
 
     annotate BindingTime bindingTime = BindingTime::compile to .;
 
-    ServiceMesh myMesh = {
+    ServiceMesh myKodexMesh = {
         description = "initial service net",
-        sources = {refBy(mySource)}
+        sources = {refBy(myKodexSource)}
     };
     
-    MeshSource mySource = {
+    MeshSource myKodexSource = {
         pollInterval = 800, // only if source is synchronous
-        impl = refBy(mySourceService),
-        next = {refBy(myConnMySourceMyTransformer)}
+        impl = refBy(myKodexSourceService),
+        next = {refBy(myKodexConnMySourceMyTransformer)}
     };
     
-    MeshConnector myConnMySourceMyTransformer = {
+    MeshConnector myKodexConnMySourceMyTransformer = {
         name = "Source->Kodex",
-        next = refBy(myTransformer)
+        next = refBy(myKodexTransformer)
     };
 
-    MeshProcessor myTransformer = {
+    MeshProcessor myKodexTransformer = {
         impl = refBy(myKodexService),
-        next = {refBy(myConnMyPythonMyReceiver)}
+        next = {refBy(myKodexConnMyPythonMyReceiver)}
     };
 
-    MeshConnector myConnMyPythonMyReceiver = {
+    MeshConnector myKodexConnMyPythonMyReceiver = {
         name = "Python->Receiver",
-        next = refBy(myReceiver)
+        next = refBy(myKodexReceiver)
     };
 
-    MeshSink myReceiver = {
-        impl = refBy(myReceiverService)
+    MeshSink myKodexReceiver = {
+        impl = refBy(myKodexReceiverService)
     };
 
     freeze {
