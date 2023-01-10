@@ -73,8 +73,9 @@ public class LxcContainerManager extends AbstractContainerManager<LxcContainerDe
      * Adds a container from a selected repository that was defined in a YAML-File
      * to the local repository.
      * 
-     * @param location, the location where the Yaml with container info is
+     * @param location the location where the Yaml with container info is
      * @return containerName, name of the created container
+     * @throws ExecutionException if adding the container failed
      **/
     @Override
     public String addContainer(URI location) throws ExecutionException {
@@ -141,10 +142,10 @@ public class LxcContainerManager extends AbstractContainerManager<LxcContainerDe
      * template or via exporting an image.
      * 
      * @see maybe add function to create tarball with distrobuilder in this method
-     * @param location, the location where the Yaml with container info is
+     * @param location the location where the Yaml with container info is
      * 
      * @return containerName, the name of the created container
-     * 
+     * @throws ExecutionException if adding the container failed
      **/
     public String addContainerFromTarball(URI location) throws ExecutionException {
 
@@ -250,6 +251,8 @@ public class LxcContainerManager extends AbstractContainerManager<LxcContainerDe
     private String getLxcId(LxcContainerDescriptor desc) {
         return desc.getId();
     }
+    
+    // checkstyle: stop exception type check
 
     /**
      * Returns a LXC API Client. If there is not running LXC daemon on the host it
@@ -283,11 +286,13 @@ public class LxcContainerManager extends AbstractContainerManager<LxcContainerDe
         return service;
     }
 
+    // checkstyle: resume exception type check
+
     /**
      * Starts an existing container with given name.
      * 
-     * @param name, the name of the container
-     * 
+     * @param name the name of the container
+     * @throws ExecutionException if starting the container failed
      **/
     @Override
     public void startContainer(String name) throws ExecutionException {
@@ -312,8 +317,8 @@ public class LxcContainerManager extends AbstractContainerManager<LxcContainerDe
     /**
      * Stops an existing container with given name.
      * 
-     * @param name, the name of the container
-     * 
+     * @param name the name of the container
+     * @throws ExecutionException if stopping the container failed
      **/
     @Override
     public void stopContainer(String name) throws ExecutionException {
@@ -336,8 +341,8 @@ public class LxcContainerManager extends AbstractContainerManager<LxcContainerDe
     /**
      * Deletes an existing container with given name.
      * 
-     * @param name, the name of the container
-     * 
+     * @param name the name of the container
+     * @throws ExecutionException if deleting the container failed
      **/
     public void deleteContainer(String name) throws ExecutionException {
         LOGGER.info("Deleting container " + name);
@@ -361,8 +366,8 @@ public class LxcContainerManager extends AbstractContainerManager<LxcContainerDe
     /**
      * Freezes an existing container with given name.
      * 
-     * @param name, the name of the container
-     * 
+     * @param name the name of the container
+     * @throws ExecutionException if freezing the container failed
      **/
     public void freezeContainer(String name) throws ExecutionException {
         LOGGER.info("Freezing container " + name);
@@ -386,8 +391,8 @@ public class LxcContainerManager extends AbstractContainerManager<LxcContainerDe
     /**
      * Unfreezes an existing container with given name.
      * 
-     * @param name, the name of the container
-     * 
+     * @param name the name of the container
+     * @throws ExecutionException if unfreezing the container failed
      **/
     public void unfreezeContainer(String name) throws ExecutionException {
         LOGGER.info("Unfreezing container " + name);
@@ -411,9 +416,9 @@ public class LxcContainerManager extends AbstractContainerManager<LxcContainerDe
     /**
      * Creates a snapshot of a container with given name.
      * 
-     * @param containerName, the name of the container
-     * @param snapshot,      the name that the snapshot is going to get
-     * 
+     * @param containerName the name of the container
+     * @param snapshot      the name that the snapshot is going to get
+     * @throws ExecutionException if creating the snapshot failed
      **/
     public void createSnapshot(String containerName, String snapshot) throws ExecutionException {
         LOGGER.info("Creating snapshot of: " + containerName);
@@ -435,11 +440,11 @@ public class LxcContainerManager extends AbstractContainerManager<LxcContainerDe
      * Publishes an container and the corresponding snapshot as an image to the
      * local server.
      * 
-     * @param containerName, the name of the container
-     * @param snapshot,      the name of the corresponding snapshot
-     * @param imageAlias,    the name that the image is going to get
-     * @param isPublic,      defines if the image should be public or not
-     * 
+     * @param containerName the name of the container
+     * @param snapshot      the name of the corresponding snapshot
+     * @param imageAlias    the name that the image is going to get
+     * @param isPublic      defines if the image should be public or not
+     * @throws ExecutionException if publishing the image failed
      **/
     public void publishImage(String containerName, String snapshot, String imageAlias, boolean isPublic)
             throws ExecutionException {
@@ -468,8 +473,8 @@ public class LxcContainerManager extends AbstractContainerManager<LxcContainerDe
     /**
      * Exports an existing image as a tarball to the users home directory.
      * 
-     * @param imageAlias, the name the image that is going to be exported
-     * 
+     * @param imageAlias the name the image that is going to be exported
+     * @throws ExecutionException if expoerting the image failed
      **/
     public void exportImage(String imageAlias) throws ExecutionException {
 
@@ -496,9 +501,9 @@ public class LxcContainerManager extends AbstractContainerManager<LxcContainerDe
     /**
      * Imports an image from an existing tarball to the local server.
      * 
-     * @param tarball,    the path to the tarball/gzip file
-     * @param imageAlias, the name that the image is going to get
-     * 
+     * @param tarball    the path to the tarball/gzip file
+     * @param imageAlias the name that the image is going to get
+     * @throws ExecutionException if importing the container failed
      **/
     public void importImage(String tarball, String imageAlias) throws ExecutionException {
 
@@ -524,10 +529,10 @@ public class LxcContainerManager extends AbstractContainerManager<LxcContainerDe
      * Copy/import an image from a remote server that is defined in
      * {@coder RemoteServer.java} and set up on localhost.
      * 
-     * @param remote,      the RemoteServer where the wanted image is stored
-     * @param remoteImage, the name of the image that is going to be copied
-     * @param imageAlias,  the name that the image is going to get
-     * 
+     * @param remote      the RemoteServer where the wanted image is stored
+     * @param remoteImage the name of the image that is going to be copied
+     * @param imageAlias  the name that the image is going to get
+     * @throws ExecutionException if copying the image failed
      **/
     public void copyImageFromRemote(RemoteServer remote, String remoteImage, String imageAlias)
             throws ExecutionException {
