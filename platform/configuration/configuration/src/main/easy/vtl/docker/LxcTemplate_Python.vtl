@@ -1,0 +1,112 @@
+import Basics;
+import JavaBasics;
+import DockerBasics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template LxcTemplate_Python(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, Application app, ContainerType containerType, EcsDevice device) {
+	
+    def main(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, Application app, ContainerType containerType, EcsDevice device) {
+        
+        'FROM openjdk:13-alpine'  // TODO Java-Version & CPU
+        'COPY requirements.txt requirements.txt'
+        
+        setOf(Dependency) allDependencies = collectDependencies(elements);
+        sequenceOf(String) tmp = {};
+        for (Dependency d: allDependencies) {
+            installBeforePip(d, tmp);
+        }
+        sequenceOf(PythonService) services = elements -> collect(e|e.impl) -> selectByType(PythonService);
+        
+        for (PythonService pyService : services) {
+            setOf(Dependency) deps = pyService.dependencies;
+            for (Dependency s : deps) {
+                if (genDependency(s) == 'PYTHON2') {
+                    'COPY --from=python:2.7.10 / /'
+                    for (String s: tmp) {
+                        '${s}'
+                    }
+                    'RUN python2 -m pip install -r requirements.txt'
+                } else if (genDependency(s) == 'PYTHON3') {
+                    'COPY --from=python:3.8-slim-buster / /'
+                    for (String s: tmp) {
+                        '${s}'
+                    }
+                    'RUN python3 -m pip install -r requirements.txt'
+                } else if (genDependency(s) == 'PYTHON39') {
+                    'COPY --from=python:3.9-slim-buster / /'
+                    for (String s: tmp) {
+                        '${s}'
+                    }
+                    'RUN python3 -m pip install -r requirements.txt'
+                } 
+            }
+        }
+        '${containerSettings(config, containerType, device)}'
+        'RUN apk add bash'
+        ''
+        '# Installed dependencies (shall be in /)'
+        'COPY installedDependencies.yml installedDependencies.yml'
+        ''
+        'WORKDIR /app'
+        ''
+        '# Broker'
+        'COPY broker/brokerJars/ brokerJars'
+        'COPY broker/src/ src'
+        'COPY broker/broker.sh broker.sh'
+        ''
+        '# App'
+        'COPY ${getAppMvnName(app)}/target/${getAppMvnName(app)}-${getAppMvnVersion(app)}-bin.jar ${getAppMvnName(app)}-${getAppMvnVersion(app)}-bin.jar'
+        ''
+        if (containerType == ContainerType::Ecs_Svc_App) {
+            '# ECS and Service Manager'
+            'COPY ecsSvcJars/ ecsSvcJars'
+            'COPY common/ common'
+            'COPY ecsServiceMgr.sh ecsServiceMgr.sh'
+        
+        } else if (containerType == ContainerType::EcsSvc_App) {
+            '# Service Manager'
+            'COPY svcJars/ svcJars'
+            'COPY common/ common'
+            'COPY serviceMgr.sh serviceMgr.sh'
+            ''
+            '# ECS'
+            'COPY ecsJars/ ecsJars'
+            'COPY ecs.sh ecs.sh'
+        } else if (containerType == ContainerType::C1Ecs_C2Svc_App) {
+            '# Service Manager'
+            'COPY svcJars/ svcJars'
+            'COPY common/ common'
+            'COPY serviceMgr.sh serviceMgr.sh'
+        }
+        ''		
+        '# Running the script'
+        'COPY wrapper_script.sh wrapper_script.sh'
+        'RUN chmod 777 wrapper_script.sh'
+        'CMD ./wrapper_script.sh'
+    }
+    
+    def genDependency(Dependency d) {
+        '';
+    }
+    
+    def genDependency(SystemDependency d) {
+        '${d.key}';
+    }
+    
+    def installBeforePip(Dependency d, sequenceOf(String) result) {
+    }
+
+    def installBeforePip(LinuxSystemDependency d, sequenceOf(String) result) {
+        result.add('RUN apk add ${d.name}');
+    }
+    
+    def installBeforePip(LinuxCommandBasedSystemDependency d, sequenceOf(String) result) {
+         // TODO downloads
+         // TODO bashSetups
+        for (String c: d.installCommands) {
+            result.add('RUN ${c}');
+        }
+    }
+    
+}

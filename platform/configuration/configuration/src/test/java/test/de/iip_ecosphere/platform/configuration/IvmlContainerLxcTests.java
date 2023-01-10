@@ -16,6 +16,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
+import org.apache.commons.lang3.SystemUtils;
+import org.junit.Assume;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.configuration.PlatformInstantiator;
@@ -36,9 +38,13 @@ public class IvmlContainerLxcTests extends AbstractIvmlTests {
      */
     @Test
     public void testContainerTest() throws ExecutionException, IOException {
+    	
+    	Assume.assumeFalse(SystemUtils.IS_OS_WINDOWS);
+    	Assume.assumeTrue(SystemUtils.USER_HOME.startsWith("/home/"));
+    	
         File gen = new File("gen/tests/ContainerCreationLxc");
         PlatformInstantiator.instantiate(
-            genApps(new TestConfigurer("ContainerCreationLxc", new File("src/test/easy/single"), gen)));
+            new TestConfigurer("ContainerCreationLxc", new File("src/test/easy/single"), gen));
         assertAllFiles(gen);
         assertTemplateZip(gen, "impl.SimpleMeshTestingContainerApp");
     }
