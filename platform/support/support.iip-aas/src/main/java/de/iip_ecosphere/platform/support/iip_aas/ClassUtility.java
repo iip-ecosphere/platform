@@ -173,8 +173,7 @@ public class ClassUtility {
         if (NAME_MAPPING.containsKey(type)) {
             result = subModelBuilder
                 .createPropertyBuilder(idShort)
-                .setType(Type.STRING)
-                .setValue(NAME_MAPPING.get(type))
+                .setValue(Type.STRING, NAME_MAPPING.get(type))
                 .build();
         } else if (type.isArray()) {
             SubmodelElementCollectionBuilder cBuilder = subModelBuilder.createSubmodelElementCollectionBuilder(
@@ -182,8 +181,7 @@ public class ClassUtility {
             addTypeSubModelElement(cBuilder, NAME_ARRAY_PROPERTY_TYPE, type.getComponentType());
             cBuilder
                 .createPropertyBuilder(NAME_ARRAY_PROPERTY_DIMENSIONS)
-                .setType(Type.INTEGER)
-                .setValue((int) type.getSimpleName().chars().filter(c -> c == '[').count())
+                .setValue(Type.INTEGER, (int) type.getSimpleName().chars().filter(c -> c == '[').count())
                 .build();
             result = cBuilder.build();
         } else {
