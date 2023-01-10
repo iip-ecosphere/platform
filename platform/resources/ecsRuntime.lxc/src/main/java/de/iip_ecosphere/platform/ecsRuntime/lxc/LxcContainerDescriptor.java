@@ -24,7 +24,6 @@ import java.util.List;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.ecsRuntime.BasicContainerDescriptor;
-import de.iip_ecosphere.platform.ecsRuntime.lxc.LxcContainerDescriptor;
 import de.iip_ecosphere.platform.support.iip_aas.Id;
 import de.iip_ecosphere.platform.support.iip_aas.Version;
 import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;

@@ -31,7 +31,6 @@ public class Lxc extends AbstractManagerSetup {
     /**
      * Returns the LXC port.
      * 
-     * @param lxcPort, the port lxc is listening on
      * @return the LXC port as LXC port string, e.g., port
      */
     public String getLxcPort() {
@@ -41,8 +40,7 @@ public class Lxc extends AbstractManagerSetup {
     /**
      * Defines the LXC port.
      * 
-     * @param lxcPort, the port lxc is listening on
-     * @return the LXC port as LXC port string, e.g., 8443
+     * @param lxcPort the port lxc is listening on
      */
     public void setLxcPort(String lxcPort) {
         this.lxcPort = lxcPort;
@@ -51,7 +49,6 @@ public class Lxc extends AbstractManagerSetup {
     /**
      * Returns the LXC host.
      * 
-     * @param lxcHost, the lxc host
      * @return the LXChost as LXC host string, e.g., localhost
      */
     public String getLxcHost() {
@@ -71,7 +68,6 @@ public class Lxc extends AbstractManagerSetup {
     /**
      * Returns the name of the Yaml file with information about the LXC Image.
      * 
-     * @param lxcImageYamlFilename the name of the Yaml file
      * @return lxcImageYamlFilename of the Yaml file
      */
     public String getLxcImageYamlFilename() {
@@ -82,7 +78,7 @@ public class Lxc extends AbstractManagerSetup {
      * Defines the standard name of the Yaml file with a information about the LXC
      * Image.
      * 
-     * @param lxcImageYamlFilename the name of the Yaml file
+     * @param filename the name of the Yaml file
      */
     public void setLxcImageYamlFilename(String filename) {
         this.lxcImageYamlFilename = filename;
@@ -92,7 +88,7 @@ public class Lxc extends AbstractManagerSetup {
     /**
      * Defines the download directory.
      * 
-     * @param downloadDirectory
+     * @param directory the directory
      */
     public void setDownloadDirectory(String directory) {
         this.downloadDirectory = directory;
@@ -102,7 +98,6 @@ public class Lxc extends AbstractManagerSetup {
      * Returns the download directory. If the configured download directory is
      * <b>null</b> or empty, it returns the system temporary directory.
      * 
-     * @param downloadDirectory
      * @return downloadDirectory, the system temporary directory if none is
      *         specified
      */
