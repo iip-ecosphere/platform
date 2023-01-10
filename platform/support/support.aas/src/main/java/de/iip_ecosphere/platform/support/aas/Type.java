@@ -19,7 +19,15 @@ package de.iip_ecosphere.platform.support.aas;
  */
 public enum Type {
 
+    /**
+     * Integer type corresponding to Java for compliance with pre-BaSyx 1.3 code.
+     */
     INTEGER, 
+
+    /**
+     * Integer type as defined in AAS, may lead to "big" integer in Java.
+     */
+    AAS_INTEGER,
     NON_POSITIVE_INTEGER,
     NON_NEGATIVE_INTEGER,
     POSITIVE_INTEGER,

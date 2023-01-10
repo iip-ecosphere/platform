@@ -69,6 +69,7 @@ public class AasTest {
     private static final String NAME_VAR_SUBMODELC_OUTER_REF = "outerRef";
     private static final String NAME_SUBMODELC_INNER = "inner";
     private static final String NAME_VAR_SUBMODELC_INNER_VAR = "innerVar";
+    private static final String NAME_VAR_SUBMODELC_INNER_INT = "innerInt";
     private static final String NAME_VAR_SUBMODELC_INNER_REF = "innerRef";
     private static final String NAME_VAR_LOTSIZE = "lotSize";
     private static final String NAME_VAR_VENDOR = "vendor";
@@ -286,7 +287,8 @@ public class AasTest {
             NAME_SUBMODELC_OUTER, false, true);
         SubmodelElementCollectionBuilder smcBuilderInner = smcBuilderOuter.createSubmodelElementCollectionBuilder(
             NAME_SUBMODELC_INNER, false, true);
-        smcBuilderInner.createPropertyBuilder(NAME_VAR_SUBMODELC_INNER_VAR).setType(Type.INTEGER).build();
+        smcBuilderInner.createPropertyBuilder(NAME_VAR_SUBMODELC_INNER_VAR).setType(Type.AAS_INTEGER).build();
+        smcBuilderInner.createPropertyBuilder(NAME_VAR_SUBMODELC_INNER_INT).setValue(Type.INTEGER, 1).build();
         ReferenceElement re = smcBuilderInner.createReferenceElementBuilder(NAME_VAR_SUBMODELC_INNER_REF)
             .setValue(subModelBuilderRef).build();
         Assert.assertNotNull(re.getValue());
@@ -397,6 +399,8 @@ public class AasTest {
         SubmodelElementCollection secInner = secOuter.getSubmodelElementCollection(NAME_SUBMODELC_INNER);
         Assert.assertNotNull(secInner);
         Assert.assertNotNull(secInner.getProperty(NAME_VAR_SUBMODELC_INNER_VAR));
+        Assert.assertNotNull(secInner.getProperty(NAME_VAR_SUBMODELC_INNER_INT));
+        Assert.assertEquals(1, secInner.getProperty(NAME_VAR_SUBMODELC_INNER_INT).getValue());
         Assert.assertNotNull(secInner.getReferenceElement(NAME_VAR_SUBMODELC_INNER_REF));
 
         // the lately added sub-models/elements
