@@ -59,6 +59,8 @@ public class AasPartRegistry {
     public static final String NAME_AAS = "IIP_Ecosphere";
     
     // common submodel names are declared already here to relax dependencies
+    public static final String NAME_SUBMODEL_SERVICES = "services";
+    public static final String NAME_COLLECTION_SERVICES = "services";
     public static final String NAME_SUBMODEL_RESOURCES = "resources"; 
     public static final String NAME_PROP_DEVICE_AAS = "deviceAas";
     
