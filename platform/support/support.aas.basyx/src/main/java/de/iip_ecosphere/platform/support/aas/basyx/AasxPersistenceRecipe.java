@@ -28,6 +28,7 @@ import org.eclipse.basyx.aas.factory.aasx.AASXPackageExplorerConformantHelper;
 import org.eclipse.basyx.aas.factory.aasx.InMemoryFile;
 import org.eclipse.basyx.aas.metamodel.api.IAssetAdministrationShell;
 import org.eclipse.basyx.aas.metamodel.api.parts.asset.IAsset;
+import org.eclipse.basyx.aas.metamodel.exception.MetamodelConstructionException;
 import org.eclipse.basyx.components.aas.aasx.AASXPackageManager;
 import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
 import org.eclipse.basyx.submodel.metamodel.api.parts.IConceptDescription;
@@ -120,8 +121,8 @@ class AasxPersistenceRecipe extends AbstractPersistenceRecipe {
                 aas.clear();
                 submodels.clear();
             }
-        } catch (SAXException | ParserConfigurationException | InvalidFormatException e) {
-            e.printStackTrace();            
+        } catch (SAXException | ParserConfigurationException | InvalidFormatException 
+            | MetamodelConstructionException | IllegalArgumentException e) {
             throw new IOException(e);
         }
         return result;

@@ -34,6 +34,9 @@ import org.eclipse.basyx.submodel.metamodel.map.reference.Reference;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.property.valuetype.ValueType;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+
 import de.iip_ecosphere.platform.support.aas.AssetKind;
 import de.iip_ecosphere.platform.support.aas.IdentifierType;
 import de.iip_ecosphere.platform.support.aas.Type;
@@ -57,7 +60,8 @@ public class Tools {
         mapType(Type.BOOLEAN, ValueType.Boolean);
         mapType(Type.DOUBLE, ValueType.Double);
         mapType(Type.FLOAT, ValueType.Float);
-        mapType(Type.INTEGER, ValueType.Integer);
+        mapType(Type.INTEGER, ValueType.Int32);
+        mapType(Type.AAS_INTEGER, ValueType.Integer);
         mapType(Type.STRING, ValueType.String);
 
         mapType(Type.NON_POSITIVE_INTEGER, ValueType.NonPositiveInteger);
@@ -430,12 +434,23 @@ public class Tools {
      * Translates a BaSyx value back.
      * 
      * @param val the value to be translated
+     * @param type the expected target type to support the translation, may be <b>null</b>
      * @return the translated value
      */
     @SuppressWarnings("unchecked")
-    public static Object translateValueFromBaSyx(Object val) {
-        if (LangString.isLangString(val)) {
-            val = Tools.translate(LangString.createAsFacade((Map<String, Object>) val));
+    public static Object translateValueFromBaSyx(Object val, ValueType type) {
+        if (ValueType.LangString == type) {
+            if (LangString.isLangString(val)) {
+                val = Tools.translate(LangString.createAsFacade((Map<String, Object>) val));
+            } else if (val instanceof String) {
+                Gson gson = new Gson();
+                try {
+                    Map<String, Object> map = gson.fromJson(val.toString(), Map.class);
+                    val = Tools.translate(LangString.createAsFacade(map));
+                } catch (JsonSyntaxException e) {
+                    // do nothing
+                }
+            }
         }
         return val;
     }

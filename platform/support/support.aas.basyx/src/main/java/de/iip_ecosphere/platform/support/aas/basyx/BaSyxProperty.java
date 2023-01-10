@@ -177,7 +177,11 @@ public class BaSyxProperty extends BaSyxSubmodelElement implements Property {
     @Override
     public Object getValue() throws ExecutionException {
         try {
-            return Tools.translateValueFromBaSyx(property.getValue());
+            ValueType type = null;
+            if (property instanceof IProperty) {
+                type = ((IProperty) property).getValueType();
+            }
+            return Tools.translateValueFromBaSyx(property.getValue(), type);
         } catch (ResourceNotFoundException e) { // TODO check BaSyx Bug 0.1.0-SNAPSHOT for dynamic properties
             throw new ExecutionException(e);
         } catch (Exception e) {

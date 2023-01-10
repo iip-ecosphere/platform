@@ -18,8 +18,10 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
 import org.eclipse.basyx.submodel.metamodel.api.qualifier.haskind.ModelingKind;
+import org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElement;
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.operation.IOperation;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.property.Property;
+import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.property.valuetype.ValueType;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.operation.OperationVariable;
 import org.slf4j.LoggerFactory;
 
@@ -197,8 +199,15 @@ public class BaSyxOperation extends BaSyxSubmodelElement implements Operation {
     @Override
     public Object invoke(Object... args) throws ExecutionException {
         try {
+            ValueType type = null; 
+            if (operation.getOutputVariables().size() > 0) {
+                ISubmodelElement outVar = operation.getOutputVariables().iterator().next().getValue();
+                if (outVar instanceof Property) {
+                    type = ((Property) outVar).getValueType();
+                }
+            }
             // TODO param translate needed but sequence of in/inout unclear
-            return Tools.translateValueFromBaSyx(operation.invoke(args));
+            return Tools.translateValueFromBaSyx(operation.invoke(args), type);
         } catch (Exception e) {
             throw new ExecutionException(e);
         }
