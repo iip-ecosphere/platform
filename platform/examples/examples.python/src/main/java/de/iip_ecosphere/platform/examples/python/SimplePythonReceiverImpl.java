@@ -16,19 +16,19 @@ import java.io.InputStream;
 
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
 import iip.datatypes.PythonTestOutput;
-import iip.impl.SimpleDataReceiverImpl;
+import iip.impl.SimplePythonDataReceiverImpl;
 
 /**
  * A simple receiver implementation just printing out the received data.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class SimpleReceiverImpl extends SimpleDataReceiverImpl {
+public class SimplePythonReceiverImpl extends SimplePythonDataReceiverImpl {
 
     /**
      * Fallback constructor.
      */
-    public SimpleReceiverImpl() {
+    public SimplePythonReceiverImpl() {
         super(ServiceKind.SINK_SERVICE);
     }
     
@@ -38,7 +38,7 @@ public class SimpleReceiverImpl extends SimpleDataReceiverImpl {
      * @param serviceId the service id
      * @param ymlFile the YML file containing the YAML artifact with the service descriptor
      */
-    public SimpleReceiverImpl(String serviceId, InputStream ymlFile) {
+    public SimplePythonReceiverImpl(String serviceId, InputStream ymlFile) {
         super(serviceId, ymlFile);
     }
 

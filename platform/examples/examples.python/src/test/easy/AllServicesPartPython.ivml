@@ -4,14 +4,14 @@ project AllServicesPartPython {
     
     annotate BindingTime bindingTime = BindingTime::compile to .;
    
-    Service mySourceService = JavaService {
-        id = "SimpleSource",
-        name = "Simple Data Source",
+    Service myPythonSourceService = JavaService {
+        id = "SimplePythonSource",
+        name = "Simple Python Data Source",
         description = "",
         ver = "0.1.0",
         deployable = true,
         asynchronous = true,
-        class = "de.iip_ecosphere.platform.examples.python.SimpleSourceImpl",
+        class = "de.iip_ecosphere.platform.examples.python.SimplePythonSourceImpl",
         artifact = "de.iip-ecosphere.platform:examples.python:" + iipVer,
         kind = ServiceKind::SOURCE_SERVICE,
         output = {{type=refBy(PythonTestInput)}}
@@ -30,13 +30,13 @@ project AllServicesPartPython {
         dependencies = {refBy(PYTHON39)}
     };
 
-    Service myReceiverService = JavaService {
-        id = "SimpleReceiver",
-        name = "Simple Data Receiver",
+    Service myPythonReceiverService = JavaService {
+        id = "SimplePythonReceiver",
+        name = "Simple Python Data Receiver",
         description = "",
         ver = "0.1.0",
         deployable = true,
-        class = "de.iip_ecosphere.platform.examples.python.SimpleReceiverImpl",
+        class = "de.iip_ecosphere.platform.examples.python.SimplePythonReceiverImpl",
         artifact = "de.iip-ecosphere.platform:examples.python:" + iipVer,
         kind = ServiceKind::SINK_SERVICE,
         input = {{type=refBy(PythonTestOutput)}}

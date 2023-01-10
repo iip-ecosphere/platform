@@ -21,7 +21,7 @@ import de.iip_ecosphere.platform.services.environment.DataIngestor;
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
 import iip.datatypes.PythonTestInput;
 import iip.datatypes.PythonTestInputImpl;
-import iip.impl.SimpleDataSourceImpl;
+import iip.impl.SimplePythonDataSourceImpl;
 
 /**
  * A simple test source ingesting data according to a timer schema. Analogously, a connector can be linked to a
@@ -29,7 +29,7 @@ import iip.impl.SimpleDataSourceImpl;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class SimpleSourceImpl extends SimpleDataSourceImpl {
+public class SimplePythonSourceImpl extends SimplePythonDataSourceImpl {
 
     private Timer timer = new Timer();
     private Random random = new Random();
@@ -38,7 +38,7 @@ public class SimpleSourceImpl extends SimpleDataSourceImpl {
     /**
      * Fallback constructor.
      */
-    public SimpleSourceImpl() {
+    public SimplePythonSourceImpl() {
         super(ServiceKind.SOURCE_SERVICE);
     }
     
@@ -48,7 +48,7 @@ public class SimpleSourceImpl extends SimpleDataSourceImpl {
      * @param serviceId the service id
      * @param ymlFile the YML file containing the YAML artifact with the service descriptor
      */
-    public SimpleSourceImpl(String serviceId, InputStream ymlFile) {
+    public SimplePythonSourceImpl(String serviceId, InputStream ymlFile) {
         super(serviceId, ymlFile);
     }
 

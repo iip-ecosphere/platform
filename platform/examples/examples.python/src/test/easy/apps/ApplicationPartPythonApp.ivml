@@ -4,12 +4,12 @@ project ApplicationPartPythonApp {
 
     annotate BindingTime bindingTime = BindingTime::compile to .;
     
-    Application myApp = {
+    Application myPythonApp = {
         id = "PythonApp",
         name = "Simple Python demo flow app",
         ver = "0.1.0",
         description = "",
-        services = {refBy(myMesh)}        
+        services = {refBy(myPythonMesh)}        
     };
     
     freeze {

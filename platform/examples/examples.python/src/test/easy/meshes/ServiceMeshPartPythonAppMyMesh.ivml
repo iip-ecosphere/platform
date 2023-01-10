@@ -4,33 +4,33 @@ project ServiceMeshPartPythonAppMyMesh {
 
     annotate BindingTime bindingTime = BindingTime::compile to .;
 
-    ServiceMesh myMesh = {
+    ServiceMesh myPythonMesh = {
         description = "VDW Service Net",
-        sources = {refBy(mySource)}
+        sources = {refBy(myPythonSource)}
     };
 
-    MeshSource mySource = {
-       impl = refBy(mySourceService),
-       next = {refBy(myConnMySourceMyTransformer)}
+    MeshSource myPythonSource = {
+       impl = refBy(myPythonSourceService),
+       next = {refBy(myPythonConnMySourceMyTransformer)}
     };
 
-    MeshConnector myConnMySourceMyTransformer = {
+    MeshConnector myPythonConnMySourceMyTransformer = {
         name = "Source->Transformer",
-        next = refBy(myTransformer)
+        next = refBy(myPythonTransformer)
     };
 
-    MeshProcessor myTransformer = {
+    MeshProcessor myPythonTransformer = {
         impl = refBy(myPythonService),
-        next = {refBy(myConnMyTransformerMyReceiver)}
+        next = {refBy(myPythonConnMyTransformerMyReceiver)}
     };
 
-    MeshConnector myConnMyTransformerMyReceiver = {
+    MeshConnector myPythonConnMyTransformerMyReceiver = {
         name = "Transformer->Receiver",
-        next = refBy(myReceiver)
+        next = refBy(myPythonReceiver)
     };
     
-    MeshSink myReceiver = {
-       impl = refBy(myReceiverService)
+    MeshSink myPythonReceiver = {
+       impl = refBy(myPythonReceiverService)
     };
 
     freeze {
