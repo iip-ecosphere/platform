@@ -13,12 +13,12 @@ vilScript IIPEcospherePartDocker (Project source, Configuration config, Project 
         String vtlFile;
         String targetFile;
         Path df = "${appRoot}/../app.Dockerfile.txt";
-        
+        /*
         if (contType == ContainerType::Ecs) {
             vtlFile = "Dockerfile_3_ecs";
             targetFile = "ecs.Dockerfile";   
             df = "${appRoot}/../app.Dockerfile.Ecs";
-        }
+        }*/
 		
         if (contType == ContainerType::Ecs_Svc_App) {
             if (isPythonService == 0) {

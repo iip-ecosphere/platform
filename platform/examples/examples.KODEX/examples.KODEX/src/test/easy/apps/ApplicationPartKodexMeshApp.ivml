@@ -4,12 +4,12 @@ project ApplicationPartKodexMeshApp {
 
     annotate BindingTime bindingTime = BindingTime::compile to .;
     
-    Application myApp = {
+    Application myKodexMeshApp = {
         id = "KodexMeshApp",
         name = "Simple Kodex Testing App",
         ver = "0.1.0",
         description = "",
-        services = {refBy(myMesh)}        
+        services = {refBy(myKodexMesh)}        
     };
     
     freeze {
