@@ -16,9 +16,9 @@ import java.io.InputStream;
 import java.util.Random;
 
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
-import iip.datatypes.PythonTestInput;
-import iip.datatypes.PythonTestInputImpl;
-import iip.impl.SimpleDataSourceImpl;
+import iip.datatypes.PythonSyncTestInput;
+import iip.datatypes.PythonSyncTestInputImpl;
+import iip.impl.SimplePythonSyncDataSourceImpl;
 
 /**
  * A simple test source ingesting data according to a timer schema. Analogously, a connector can be linked to a
@@ -26,7 +26,7 @@ import iip.impl.SimpleDataSourceImpl;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class SimpleSourceImpl extends SimpleDataSourceImpl {
+public class SimplePythonSyncSourceImpl extends SimplePythonSyncDataSourceImpl {
 
     private Random random = new Random();
     private int counter = 0;
@@ -34,7 +34,7 @@ public class SimpleSourceImpl extends SimpleDataSourceImpl {
     /**
      * Fallback constructor.
      */
-    public SimpleSourceImpl() {
+    public SimplePythonSyncSourceImpl() {
         super(ServiceKind.SOURCE_SERVICE);
     }
     
@@ -44,13 +44,13 @@ public class SimpleSourceImpl extends SimpleDataSourceImpl {
      * @param serviceId the service id
      * @param ymlFile the YML file containing the YAML artifact with the service descriptor
      */
-    public SimpleSourceImpl(String serviceId, InputStream ymlFile) {
+    public SimplePythonSyncSourceImpl(String serviceId, InputStream ymlFile) {
         super(serviceId, ymlFile);
     }
 
     @Override
-    public PythonTestInput producePythonTestInput() {
-        PythonTestInput rec = new PythonTestInputImpl();
+    public PythonSyncTestInput producePythonSyncTestInput() {
+        PythonSyncTestInput rec = new PythonSyncTestInputImpl();
         rec.setId(counter++);
         rec.setValue1(random.nextDouble());
         rec.setValue2(random.nextDouble());

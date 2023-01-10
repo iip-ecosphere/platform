@@ -31,7 +31,7 @@ import de.iip_ecosphere.platform.support.TimeUtils;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class ExamplePythonServiceTest {
+public class ExamplePythonSyncServiceTest {
 
     /**
      * Tests whether the service code can be compiled and basically executed.

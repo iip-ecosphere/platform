@@ -15,20 +15,20 @@ package de.iip_ecosphere.platform.examples.python;
 import java.io.InputStream;
 
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
-import iip.datatypes.PythonTestOutput;
-import iip.impl.SimpleDataReceiverImpl;
+import iip.datatypes.PythonSyncTestOutput;
+import iip.impl.SimplePythonSyncDataReceiverImpl;
 
 /**
  * A simple receiver implementation just printing out the received data.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class SimpleReceiverImpl extends SimpleDataReceiverImpl {
+public class SimplePythonSyncReceiverImpl extends SimplePythonSyncDataReceiverImpl {
 
     /**
      * Fallback constructor.
      */
-    public SimpleReceiverImpl() {
+    public SimplePythonSyncReceiverImpl() {
         super(ServiceKind.SINK_SERVICE);
     }
     
@@ -38,12 +38,12 @@ public class SimpleReceiverImpl extends SimpleDataReceiverImpl {
      * @param serviceId the service id
      * @param ymlFile the YML file containing the YAML artifact with the service descriptor
      */
-    public SimpleReceiverImpl(String serviceId, InputStream ymlFile) {
+    public SimplePythonSyncReceiverImpl(String serviceId, InputStream ymlFile) {
         super(serviceId, ymlFile);
     }
 
     @Override
-    public void processPythonTestOutput(PythonTestOutput data) {
+    public void processPythonSyncTestOutput(PythonSyncTestOutput data) {
         System.out.printf("RECEIVED id=%d val1=%.2f val2=%.2f conf=%.2f pred=%b%n", data.getId(), data.getValue1(), 
             data.getValue2(), data.getConfidence(), data.getPrediction());
     }

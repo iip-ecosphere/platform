@@ -4,44 +4,44 @@ project AllServicesPartPythonSync {
     
     annotate BindingTime bindingTime = BindingTime::compile to .;
    
-    Service mySourceService = JavaService {
-        id = "SimpleSource",
-        name = "Simple Data Source",
+    Service myPythonSyncSourceService = JavaService {
+        id = "SimplePythonSyncSource",
+        name = "Simple Python Sync Data Source",
         description = "",
         ver = "0.1.0",
         deployable = true,
         asynchronous = false,
-        class = "de.iip_ecosphere.platform.examples.python.SimpleSourceImpl",
+        class = "de.iip_ecosphere.platform.examples.python.SimplePythonSyncSourceImpl",
         artifact = "de.iip-ecosphere.platform:examples.pythonSync:" + iipVer,
         kind = ServiceKind::SOURCE_SERVICE,
-        output = {{type=refBy(PythonTestInput)}}
+        output = {{type=refBy(PythonSyncTestInput)}}
     };
     
-    Service myPythonService = PythonService {
-        id = "ExamplePythonService",
-        name = "Example Python Service",
+    Service myPythonSyncService = PythonService {
+        id = "ExamplePythonSyncService",
+        name = "Example Python Sync Service",
         description = "",
         ver = "0.1.0",
         deployable = true,
         asynchronous = false,
-        input = {{type=refBy(PythonTestInput)}},
-        output = {{type=refBy(PythonTestOutput)}},
+        input = {{type=refBy(PythonSyncTestInput)}},
+        output = {{type=refBy(PythonSyncTestOutput)}},
         artifact = "de.iip-ecosphere.platform:examples.pythonSync:" + iipVer,
         kind = ServiceKind::TRANSFORMATION_SERVICE,
         dependencies = {refBy(PYTHON39)}
     };
 
-    Service myReceiverService = JavaService {
-        id = "SimpleReceiver",
-        name = "Simple Data Receiver",
+    Service myPythonSyncReceiverService = JavaService {
+        id = "SimplePythonSyncReceiver",
+        name = "Simple Python Sync Data Receiver",
         description = "",
         ver = "0.1.0",
         deployable = true,
         asynchronous = false,
-        class = "de.iip_ecosphere.platform.examples.python.SimpleReceiverImpl",
+        class = "de.iip_ecosphere.platform.examples.python.SimplePythonSyncReceiverImpl",
         artifact = "de.iip-ecosphere.platform:examples.pythonSync:" + iipVer,
         kind = ServiceKind::SINK_SERVICE,
-        input = {{type=refBy(PythonTestOutput)}}
+        input = {{type=refBy(PythonSyncTestOutput)}}
     };
    
     freeze {

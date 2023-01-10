@@ -20,7 +20,7 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    ExamplePythonServiceTest.class
+    ExamplePythonSyncServiceTest.class
 })
 public class AllTests {
 }

@@ -1,18 +1,18 @@
-from datatypes.PythonTestInput import PythonTestInput
-from datatypes.PythonTestInputImpl import PythonTestInputImpl
-from datatypes.PythonTestOutput import PythonTestOutput
-from datatypes.PythonTestOutputImpl import PythonTestOutputImpl
-from interfaces.ExamplePythonServiceInterface import ExamplePythonServiceInterface
+from datatypes.PythonSyncTestInput import PythonSyncTestInput
+from datatypes.PythonSyncTestInputImpl import PythonSyncTestInputImpl
+from datatypes.PythonSyncTestOutput import PythonSyncTestOutput
+from datatypes.PythonSyncTestOutputImpl import PythonSyncTestOutputImpl
+from interfaces.ExamplePythonSyncServiceInterface import ExamplePythonSyncServiceInterface
 import random
 
-class ExamplePythonService(ExamplePythonServiceInterface):
-    """Example Python Service implementing generated interface."""
+class ExamplePythonSyncService(ExamplePythonSyncServiceInterface):
+    """Example Python Sync Service implementing generated interface."""
     
     def __init__(self):
         """Initializes the service.""" 
         super().__init__()
         
-    def transformPythonTestInput(self, data: PythonTestInput) -> PythonTestOutput:
+    def transformPythonSyncTestInput(self, data: PythonSyncTestInput) -> PythonSyncTestOutput:
         """Synchronous data processing/transformation method.
     
         Parameters:
@@ -20,7 +20,7 @@ class ExamplePythonService(ExamplePythonServiceInterface):
         Returns:
           the processed data              
         """
-        result = PythonTestOutputImpl()
+        result = PythonSyncTestOutputImpl()
         result.id = data.id
         result.value1 = data.value1
         result.value2 = data.value2
@@ -30,4 +30,4 @@ class ExamplePythonService(ExamplePythonServiceInterface):
         return result # synchronous processing
 
 #registers itself
-ExamplePythonService()
+ExamplePythonSyncService()

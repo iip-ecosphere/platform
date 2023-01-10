@@ -4,8 +4,8 @@ project AllTypesPartPythonSync {
     
     annotate BindingTime bindingTime = BindingTime::compile to .;
 
-    RecordType PythonTestInput = {
-        name = "PythonTestInput",
+    RecordType PythonSyncTestInput = {
+        name = "PythonSyncTestInput",
         fields = {
             Field {
                 name = "id",
@@ -20,8 +20,8 @@ project AllTypesPartPythonSync {
         }
     };
 
-    RecordType PythonTestOutput = {
-        name = "PythonTestOutput",
+    RecordType PythonSyncTestOutput = {
+        name = "PythonSyncTestOutput",
         fields = {
             Field {
                 name = "id",
