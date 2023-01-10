@@ -28,25 +28,25 @@ import de.iip_ecosphere.platform.configuration.PlatformInstantiator;
  * @author Luca Schulz, SSE
  */
 public class IvmlContainerLxcTests extends AbstractIvmlTests {
-       
+
     /**
-     * Tests loading, reasoning and instantiating "ContainerTest", a simple, generated service chain for testing 
-     * container creation. Here, we instantiate the full platform as basis for container creation.
+     * Tests loading, reasoning and instantiating "ContainerTest", a simple,
+     * generated service chain for testing container creation. Here, we instantiate
+     * the full platform as basis for container creation.
      * 
      * @throws ExecutionException shall not occur
-     * @throws IOException shall not occur
+     * @throws IOException        shall not occur
      */
     @Test
     public void testContainerTest() throws ExecutionException, IOException {
-    	
-    	Assume.assumeFalse(SystemUtils.IS_OS_WINDOWS);
-    	Assume.assumeTrue(SystemUtils.USER_HOME.startsWith("/home/"));
-    	
+        Assume.assumeFalse(SystemUtils.IS_OS_WINDOWS);
+        Assume.assumeTrue(SystemUtils.USER_HOME.startsWith("/home/"));
+
         File gen = new File("gen/tests/ContainerCreationLxc");
-        PlatformInstantiator.instantiate(
-            new TestConfigurer("ContainerCreationLxc", new File("src/test/easy/single"), gen));
+        PlatformInstantiator
+            .instantiate(new TestConfigurer("ContainerCreationLxc", new File("src/test/easy/single"), gen));
         assertAllFiles(gen);
         assertTemplateZip(gen, "impl.SimpleMeshTestingContainerApp");
     }
-    
+
 }
