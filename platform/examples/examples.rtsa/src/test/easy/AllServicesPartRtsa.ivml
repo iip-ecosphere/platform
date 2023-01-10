@@ -4,14 +4,14 @@ project AllServicesPartRtsa {
     
     annotate BindingTime bindingTime = BindingTime::compile to .;
    
-    Service mySourceService = JavaService {
-        id = "SimpleSource",
-        name = "Simple Data Source",
+    Service myRtsaSourceService = JavaService {
+        id = "SimpleRtsaSource",
+        name = "Simple Rtsa Data Source",
         description = "",
         ver = "0.1.0",
         deployable = true,
         asynchronous = true,
-        class = "de.iip_ecosphere.platform.examples.rtsa.SimpleSourceImpl",
+        class = "de.iip_ecosphere.platform.examples.rtsa.SimpleRtsaSourceImpl",
         artifact = "de.iip-ecosphere.platform:examples.rtsa:" + iipVer,
         kind = ServiceKind::SOURCE_SERVICE,
         output = {{type=refBy(RtsaTestInput)}}
@@ -29,13 +29,13 @@ project AllServicesPartRtsa {
         path = "iip_basic/score_v1"
     };
 
-    Service myReceiverService = JavaService {
-        id = "SimpleReceiver",
-        name = "Simple Data Receiver",
+    Service myRtsaReceiverService = JavaService {
+        id = "SimpleRtsaReceiver",
+        name = "Simple Rtsa Data Receiver",
         description = "",
         ver = "0.1.0",
         deployable = true,
-        class = "de.iip_ecosphere.platform.examples.rtsa.SimpleReceiverImpl",
+        class = "de.iip_ecosphere.platform.examples.rtsa.SimpleRtsaReceiverImpl",
         artifact = "de.iip-ecosphere.platform:examples.rtsa:" + iipVer,
         kind = ServiceKind::SINK_SERVICE,
         input = {{type=refBy(RtsaTestOutput)}}

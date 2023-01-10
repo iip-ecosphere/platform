@@ -4,12 +4,12 @@ project ApplicationPartRtsaApp {
 
     annotate BindingTime bindingTime = BindingTime::compile to .;
     
-    Application myApp = {
+    Application myRtsaApp = {
         id = "RtsaApp",
         name = "Simple RTSA demo flow app",
         ver = "0.1.0",
         description = "",
-        services = {refBy(myMesh)}        
+        services = {refBy(myRtsaMesh)}        
     };
     
     freeze {
