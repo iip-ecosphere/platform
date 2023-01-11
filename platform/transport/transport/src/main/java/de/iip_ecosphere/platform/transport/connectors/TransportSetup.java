@@ -61,7 +61,7 @@ public class TransportSetup implements Serializable {
     }
     
     /**
-     * Returns the alias of the key in {@link #getKeystore()} to use.
+     * Returns the alias of the key in {@link #getKeystoreKey()} to use.
      * 
      * @return the alias or <b>null</b> for none/first match
      */
@@ -115,7 +115,7 @@ public class TransportSetup implements Serializable {
     }
     
     /**
-     * Returns the alias of the key in {@link #getKeystore()} to use. [required by SnakeYaml]
+     * Returns the alias of the key in {@link #getKeystoreKey()} to use. [required by SnakeYaml]
      * 
      * @param keyAlias the alias or <b>null</b> for none/first match
      */
