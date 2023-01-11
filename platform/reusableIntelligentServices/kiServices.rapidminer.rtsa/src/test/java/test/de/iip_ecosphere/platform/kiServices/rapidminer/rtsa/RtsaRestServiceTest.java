@@ -17,11 +17,14 @@ import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.commons.lang3.SystemUtils;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.kiServices.rapidminer.rtsa.RtsaRestService;
+import de.iip_ecosphere.platform.services.environment.InstalledDependenciesSetup;
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.services.environment.YamlProcess;
@@ -97,6 +100,24 @@ public class RtsaRestServiceTest {
             return FileUtils.getResolvedPath(new File("."), "target/fake"); 
         }
         
+    }
+    
+    /**
+     * Initialization of environment, search for Java 8 required for RTSA.
+     */
+    @BeforeClass
+    public static void startup() {
+        if (!SystemUtils.IS_JAVA_1_8) {
+            String prop = System.getProperty("iip.test.java8", null);
+            if (prop != null) {
+                File java8 = new File(prop);
+                Assert.assertTrue("Java8 binary " + prop + " does not exist", java8.exists());
+                Assert.assertTrue("Java8 binary " + prop + " is not a file", java8.isFile());
+                InstalledDependenciesSetup.getInstance().setLocation(InstalledDependenciesSetup.KEY_JAVA_8, java8);
+            } else {
+                Assert.fail("JAVA8_HOME not specified.");
+            }
+        }
     }
     
     /**

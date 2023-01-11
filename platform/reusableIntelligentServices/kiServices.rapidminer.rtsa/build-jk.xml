@@ -7,7 +7,9 @@
 	
     <!-- deploy to SSE Mvn repo -->
 	<target name="maven"> 
-	    <maven pomFile="pom.xml" goal="package"/>
+	    <maven pomFile="pom.xml" goal="package">
+		  <arg value="-Diip.test.java8=/usr/lib/jvm/java-8-openjdk-amd64/bin/java"/>
+	    </maven>
 		<mvnDeployResolveArtifact folderName="IIP-ki.rapidminer.rtsa" pomFile="pom.xml" jarFolder="target" artifactPattern="kiServices.rapidminer.rtsa-*.*.*.jar" />
 	</target>
 </project>

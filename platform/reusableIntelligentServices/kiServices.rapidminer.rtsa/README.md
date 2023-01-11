@@ -21,4 +21,5 @@ The `path` indicates the desired REST path/endpoint attached to the base path se
 Fields not given in the data but specified in `spec.yml` will be added to the output. 
 
 Building and testing in an IDE requires execution of Maven as neither classpath file nor jar folder for fake RTSA may exist.
-Manual building may require `mvn package -DskipTests -Djacoco.skip=true`
+Manual building may require `mvn package -DskipTests -Djacoco.skip=true`. If you are **not running the tests with Java 8**, specify `-Diip.test.java8=<path to java binary for JDK 8>`.
+
