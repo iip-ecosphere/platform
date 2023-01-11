@@ -21,7 +21,7 @@ import de.iip_ecosphere.platform.transport.spring.binder.mqttv5.MqttClient;
 import de.iip_ecosphere.platform.transport.spring.binder.mqttv5.MqttConfiguration;
 
 /**
- * Runs {@link AmqpMessageBinderTest} with TLS.
+ * Runs {@link MqttV5MessageBinderTest} with TLS.
  * 
  * @author Holger Eichelberger, SSE
  */

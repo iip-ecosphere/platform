@@ -22,7 +22,7 @@ import de.iip_ecosphere.platform.transport.spring.binder.mqttv3.MqttClient;
 import de.iip_ecosphere.platform.transport.spring.binder.mqttv3.MqttConfiguration;
 
 /**
- * Runs {@link AmqpMessageBinderTest} with TLS.
+ * Runs {@link MqttV3MessageBinderTest} with TLS.
  * 
  * @author Holger Eichelberger, SSE
  */

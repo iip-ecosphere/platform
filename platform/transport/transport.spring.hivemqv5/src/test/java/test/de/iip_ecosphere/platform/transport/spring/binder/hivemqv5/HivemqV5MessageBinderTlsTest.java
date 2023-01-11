@@ -27,7 +27,7 @@ import de.iip_ecosphere.platform.transport.spring.binder.hivemqv5.HivemqV5Client
 import de.iip_ecosphere.platform.transport.spring.binder.hivemqv5.HivemqV5Configuration;
 
 /**
- * Runs {@link AmqpMessageBinderTest} with TLS.
+ * Runs {@link HivemqV5MessageBinderTest} with TLS.
  * 
  * @author Holger Eichelberger, SSE
  */
