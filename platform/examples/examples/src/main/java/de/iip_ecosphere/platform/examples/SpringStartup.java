@@ -21,19 +21,24 @@ import java.util.TimerTask;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.logging.log4j.LogManager;
 
+import de.iip_ecosphere.platform.services.environment.InstalledDependenciesSetup;
 import de.iip_ecosphere.platform.services.spring.DescriptorUtils;
 import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.iip_aas.config.CmdLine;
 
 /**
- * Spring Cloud Stream emulating startup code.
+ * Spring Cloud Stream emulating startup code. Considers system properties ({@value #PROPERTY_JAVA8} 
+ * and {@value #PROPERTY_ARGS}) as well as command line arguments {@value #ARG_BROKER_PORT} (broker port to use) 
+ * and {@link #ARG_STOP} (auto-stop time in ms). 
  * 
  * @author Holger Eichelberger, SSE
  */
 public class SpringStartup {
     
+    public static final String PROPERTY_JAVA8 = "iip.test.java8";
     public static final String PROPERTY_ARGS = "iip.springStart.args";
     public static final String ARG_BROKER_PORT = "iip.test.brokerPort";
     public static final int DFLT_BROKER_PORT = 8883;
@@ -41,8 +46,8 @@ public class SpringStartup {
 
     /**
      * Main program to start the application. Takes into account additional args via system
-     * property {@link #PROPERTY_ARGS} to allow for maven basic execution with fixed parameters in POM 
-     * and additional arguments passed in via {@link #PROPERTY_ARGS}.
+     * property {@value #PROPERTY_ARGS} to allow for maven basic execution with fixed parameters in POM 
+     * and additional arguments passed in via {@value #PROPERTY_ARGS}.
      * 
      * @param args the command line arguments; the first is the artifact file to start, the remaining is passed on 
      *     to Spring
@@ -86,7 +91,8 @@ public class SpringStartup {
     }
     
     /**
-     * Starts the application.
+     * Starts the application. Considers system property {@value #PROPERTY_JAVA} as java binary for Java 8 if 
+     * not running under Java 8.
      * 
      * @param artifact the artifact file (JAR/ZIP) containing the application
      * @param doExit whether at the end of the timing if a timeout is given by {@code args} the JVM shall be shut down
@@ -97,6 +103,15 @@ public class SpringStartup {
         String brokerHost = "localHost";
         int adminPort = -1; // ephemeral
         String serviceProtocol = "";
+        
+        if (!SystemUtils.IS_JAVA_1_8) {
+            String prop = System.getProperty(PROPERTY_JAVA8, null);
+            if (prop != null) {
+                File java8 = new File(prop);
+                LogManager.getLogger(SpringStartup.class).info("Setting Java8 to: {}", java8);
+                InstalledDependenciesSetup.getInstance().setLocation(InstalledDependenciesSetup.KEY_JAVA_8, java8);
+            }
+        }
         
         int brokerPort = CmdLine.getIntArg(args, ARG_BROKER_PORT, DFLT_BROKER_PORT);
         int stop = CmdLine.getIntArg(args, ARG_STOP, 0);
