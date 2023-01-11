@@ -193,7 +193,11 @@ public class BaSyxProperty extends BaSyxSubmodelElement implements Property {
     
     @Override
     public void setValue(Object value) throws ExecutionException {
-        property.setValue(Tools.translateValueToBaSyx(Tools.getType(property), value));
+        try {
+            property.setValue(Tools.translateValueToBaSyx(Tools.getType(property), value));
+        } catch (ResourceNotFoundException e) {
+            throw new ExecutionException(e);
+        }
     }
 
     @Override
