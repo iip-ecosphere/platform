@@ -243,7 +243,7 @@ public class NameplateSetup {
     }
 
     /**
-     * Returns the (first specified) service with the given {@link key}.
+     * Returns the (first specified) service with the given {@code key}.
      * 
      * @param key the key
      * @return the service, may be <b>null</b> for none
@@ -581,11 +581,11 @@ public class NameplateSetup {
     }
     
     /**
-     * Resolves an {@code identifier} ({@link #getDeviceAasAddress()}, {@link #getURN()}) to the 
-     * respective AAS.
+     * Resolves an {@code identifier} to the respective AAS.
      * 
      * @param identifier the identifier, URN, URL to resolve
      * @return the resolved AAS or <b>null</b> for none
+     * @throws IOException if the resolution failed
      */
     public static Aas resolve(String identifier) throws IOException {
         Registry reg = AasFactory.getInstance().obtainRegistry(

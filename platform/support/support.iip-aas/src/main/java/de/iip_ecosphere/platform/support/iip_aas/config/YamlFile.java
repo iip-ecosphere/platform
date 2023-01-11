@@ -118,7 +118,7 @@ public class YamlFile {
      * @param data the data
      * @param field the field to read
      * @return the field as map, may be a sequence of nested fields, possibly empty if not found
-     * @see #getField(Object, String)
+     * @see #getField(Object, String...)
      * @see #asMap(Object)
      */
     public static Map<Object, Object> getFieldAsMap(Object data, String... field) {
@@ -131,7 +131,7 @@ public class YamlFile {
      * @param data the data
      * @param field the field to read
      * @return the field as map, possibly empty if not found
-     * @see #getField(Object, String)
+     * @see #getField(Object, String...)
      * @see #asList(Object)
      */
     public static List<Object> getFieldAsList(Object data, String field) {
@@ -145,8 +145,8 @@ public class YamlFile {
      * @param field the field to read
      * @param dflt what to return if there is no field/no convertible value
      * @return the field as string value, possibly {@code dflt} if not found
-     * @see #getField(Object, String)
-     * @see #asString(Object)
+     * @see #getField(Object, String...)
+     * @see #asString(Object, String)
      */
     public static String getFieldAsString(Object data, String field, String dflt) {
         return asString(getField(data, field), dflt);
