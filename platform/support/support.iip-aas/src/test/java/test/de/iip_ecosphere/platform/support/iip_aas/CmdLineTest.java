@@ -104,7 +104,7 @@ public class CmdLineTest {
     }
     
     /**
-     * Tests {@link CmdLine#composeArgument(String, String)}.
+     * Tests {@link CmdLine#composeArgument(String, Object)}.
      */
     @Test
     public void testComposeArgument() {

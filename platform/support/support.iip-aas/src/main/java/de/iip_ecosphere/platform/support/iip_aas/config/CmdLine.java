@@ -150,7 +150,7 @@ public class CmdLine {
         }
         return result.toArray(new String[0]);
     }
-    
+
     /**
      * Composes a command line argument.
      *
@@ -158,8 +158,8 @@ public class CmdLine {
      * @param value the value of the argument
      * @return the composed argument
      */
-    public static String composeArgument(String name, String value) {
-        return PARAM_PREFIX + name + CmdLine.PARAM_VALUE_SEP + value; 
+    public static String composeArgument(String name, Object value) {
+        return PARAM_PREFIX + name + CmdLine.PARAM_VALUE_SEP + value.toString(); 
     }
 
 }
