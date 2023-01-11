@@ -12,6 +12,7 @@
 
 package test.de.iip_ecosphere.platform.services.environment;
 
+import java.io.File;
 import java.util.concurrent.ExecutionException;
 
 import org.junit.Assert;
@@ -48,6 +49,10 @@ public class InstalledDependenciesSetupTest {
         Assert.assertNotNull(inst.getLocation("JAVA99"));
         Assert.assertNull(inst.getLocation("JAVA0"));
         Assert.assertTrue(InstalledDependenciesSetup.location(InstalledDependenciesSetup.getJavaKey()).isFile());
+        
+        inst.setLocation("curl", new File("/home/my/curl"));
+        Assert.assertNotNull(inst.getLocation("curl"));
+        Assert.assertNotNull("/home/my/curl", inst.getLocation("curl").toString());
     }
 
 }

@@ -137,6 +137,17 @@ public class InstalledDependenciesSetup extends AbstractSetup {
     }
     
     /**
+     * Sets a single location, but ensures the default values.
+     * 
+     * @param key the key to set
+     * @param location the new location
+     */
+    public void setLocation(String key, File location) {
+        locations.put(key, location);
+        setupDefaults(); // ensure defaults but do not overwrite values
+    }
+    
+    /**
      * Reads the given yaml file via the {@link ResourceLoader}, taking into account the system property 
      * {@link #PROPERTY_PATH} or the current directory as additional resource folder. [for testing]
      * 
