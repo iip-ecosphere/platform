@@ -1,3 +1,4 @@
+import Basics;
 import JavaBasics;
 
 // Generation operations for data assignment operations and data transfer among data types
@@ -230,6 +231,7 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
         String targetSep = mapTargetSeparator();
         String sourceSep = mapSourceSeparator();
         int index = 0;
+        String out = "";
         for (Field f : type.fields) {
             String iq;
             if (indexes.length() > 0) {
@@ -247,12 +249,16 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
             if (not(done.includes(tn)) and mapping.containsKey(mq)) {
                 Integer tnPos = tn.rfind(targetSep);
                 Integer mqPos = mq.rfind(sourceSep);
-                '${produceDataTransfer(f, prefixPath(tn, targetSep), mapping.get(mq), prefixPath(mq, sourceSep), iq, p)}' 
-                '${produceDataTransfer(f, f.type, mapping, tn, mq, done, iq, p)}'
-            } else {
-                ''
+                out = appendWithNewline(out, produceDataTransfer(f, prefixPath(tn, targetSep), mapping.get(mq), prefixPath(mq, sourceSep), iq, p));
+                out = appendWithNewline(out, produceDataTransfer(f, f.type, mapping, tn, mq, done, iq, p));
             }
         }
+        '${produceDataTransferOutput(type, out, getTemporaryVariable(typeQual, typeQual))}'
+    }
+    
+    // to be refined by caller; by default, data transfer code is written as one method. if not, output can be redirected
+    def produceDataTransferOutput(RecordType type, String text, String tmpVar) {
+        '${text}'
     }
 
     // internal dispatch basis, akin produceDataTransfer(DataType), but carries actual field that is not present at top-level call
@@ -343,12 +349,12 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
          "Enum"
     }
 
-	// Start - Added types OPC UA - by Ahmad
-	def convName(Integer16TypeType type) {
+    // Start - Added types OPC UA - by Ahmad
+    def convName(Integer16TypeType type) {
          "Short"
     }
 
-	def convName(Integer32TypeType type) {
+    def convName(Integer32TypeType type) {
          "Integer"
     }
     
@@ -360,11 +366,11 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
          "Byte"
     }
     
-	def convName(UnsignedInteger16TypeType type) {
+    def convName(UnsignedInteger16TypeType type) {
          "Short"
     }
 
-	def convName(UnsignedInteger32TypeType type) {
+    def convName(UnsignedInteger32TypeType type) {
          "Integer"
     }
     
@@ -379,8 +385,8 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
     def convName(DateTimeTypeType type) {
          "LocalDateTime"
     }
-	// End - Added types OPC UA - by Ahmad
-	
+    // End - Added types OPC UA - by Ahmad
+    
     /*def convName(ObjectTypeType type) { // currently no method in interface, needed?
     }
 

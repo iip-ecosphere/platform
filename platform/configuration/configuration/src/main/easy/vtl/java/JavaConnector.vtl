@@ -1,3 +1,4 @@
+import Basics;
 import JavaBasics;
 import DataOperationBasics;
 import MeshBasics;
@@ -12,6 +13,11 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
     String topPath = "";
     Integer nestedStepCount = 0;
     mapOf(Field, Integer) cachingTimes = {};
+    Boolean splitTranslatorMethods = true;
+    Boolean dataTransferTo = true; // temporary
+    mapOf(RecordType, String) typeOut = {};
+    RecordType topType;
+    mapOf(RecordType, String) typeOutVars = {};
     
     // path name customization
     
@@ -211,12 +217,12 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         ''
     }
     
-    def genOutputTransTo(DataType imType, DataType pltfType, setOf(AssignmentOperation) assng) {
+    def genOutputTransTo(DataType imType, DataType pltfType, setOf(AssignmentOperation) assng, String oType, String coType) {
         ''
     }
     
     // unify imType with access/model without having an instance, write into pltfType
-    def genOutputTransTo(RecordType imType, RecordType pltfType, setOf(AssignmentOperation) assng) {
+    def genOutputTransTo(RecordType imType, RecordType pltfType, setOf(AssignmentOperation) assng, String oType, String coType) {
         genFrom = false;
         setOf(String) done = {};
         topPath = imType.path;
@@ -224,10 +230,99 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         if (not(optWithStepIn)) {
              imTypePath = topPath;
         }
-        '${translateDataOperations(assng, imType, imTypePath, pltfType, "result", done)}'
         mapOf(String, Field) mapping = {};
         mapSourcePaths(imType, mapping, imTypePath);
-        '${produceDataTransfer(pltfType, mapping, "result", imTypePath, done, "", "")}'
+        dataTransferTo = true;
+        typeOut.add(pltfType, "");
+        topType = pltfType;
+        produceDataTransfer(pltfType, mapping, "result", imTypePath, done, "", "");
+        String topTypeOut = typeOut.get(pltfType);
+        typeOut.remove(pltfType);
+        for (RecordType t : typeOut.keys()->sortedBy(m|m.name)) {
+            String tName = toTypeName(t);
+            'private void to${tName}(ModelAccess access, ModelInputConverter inConverter, ${tName} ${typeOutVars.get(t)}) throws IOException {
+                ${emitAsLines(typeOut.get(t))}
+            }\n'
+        }
+        typeOut.clear();
+        typeOutVars.clear();
+        '@Override
+        public ${coType} to(${oType} source) throws IOException {
+            ModelAccess access = getModelAccess();
+            final ModelInputConverter inConverter = access.getInputConverter();
+            
+            ${coType} result = new ${coType}${add}();
+            ${translateDataOperations(assng, imType, imTypePath, pltfType, "result", done)}
+            ${emitAsLines(topTypeOut)}
+            
+            return result; 
+        }'|8;
+    }
+
+    def genOutputTransFrom(DataType imType, DataType pltfType, setOf(AssignmentOperation) assng, String iType, String ciType) {
+        ''
+    }
+
+    // unify imType with access/model without having an instance, write into pltfType
+    def genOutputTransFrom(RecordType imType, RecordType pltfType, setOf(AssignmentOperation) assng, String iType, String ciType) {
+        genFrom = true;
+        setOf(String) done = {};
+        topPath = imType.path;
+        String imTypePath = "";
+        if (not(optWithStepIn)) {
+             imTypePath = topPath;
+        }
+        mapOf(String, Field) mapping = {};
+        mapSourcePaths(imType, mapping, imTypePath);
+        dataTransferTo = false;
+        typeOut.add(pltfType, "");
+        topType = pltfType;
+        produceDataTransfer(pltfType, mapping, "data", imTypePath, done, "", "");
+        String topTypeOut = typeOut.get(pltfType);
+        typeOut.remove(pltfType);
+        for (RecordType t : typeOut.keys()->sortedBy(m|m.name)) {
+            'private void from${toTypeName(t)}(ModelAccess access, ModelOutputConverter outConverter, ${ciType} data) throws IOException {
+                ${emitAsLines(typeOut.get(t))}
+            }\n'
+        }
+        typeOut.clear();
+        typeOutVars.clear();        
+        '@Override
+        public ${iType} from(${ciType} data) throws IOException {
+            ModelAccess access = getModelAccess();
+            final ModelOutputConverter outConverter = access.getOutputConverter();
+            
+            ${translateDataOperations(assng, imType, imTypePath, pltfType, "data", done)}
+            ${emitAsLines(topTypeOut)}
+            
+            return null; // done, no instance of pseudo type
+        }'|8;
+    }
+    
+    def emitAsLines(String text) {
+        sequenceOf(String) lines = text.split("\n");
+        for (String l: lines) {
+            String tmp = trim(l);
+            if (tmp <> "") {
+                '${trim(tmp)}'
+            }
+        }
+    }
+    
+    def produceDataTransferOutput(RecordType type, String text, String tmpVar) {
+        String out = "";
+        if (splitTranslatorMethods) {
+            typeOut.add(type, text); // just override, even if it comes multiple times it's for the same type
+            typeOutVars.add(type, tmpVar);
+            if (dataTransferTo) {
+                out = 'to${toTypeName(type)}(access, inConverter, ${tmpVar});';
+            } else {
+                out = 'from${toTypeName(type)}(access, outConverter, data);\n';
+            }
+        } else {
+            typeOut.add(topType, appendWithNewline(typeOut.get(topType), text));
+        }
+        '${out}'
     }
     
     // called via translateDataOperations
@@ -249,7 +344,9 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
            if (not(genFrom)) {
                wrapOptional(field, path + ".set" + asMethodNameSuffix(field.name) + "(" + value + ")", args="access, a", optFind="access.", optReplace="a.") + "${setEnd}"; 
            } else {
-               wrapOptional(field, "access.set(\"" + p +"\", " + genConvertOp("outConverter", field.type, "from", value) + ")", args="access, a", optFind="access.", optReplace="a.") + "${setEnd}"; 
+               if (convName(field.type) <> "") { // is there a conversion?
+                   wrapOptional(field, "access.set(\"" + p +"\", " + genConvertOp("outConverter", field.type, "from", value) + ")", args="access, a", optFind="access.", optReplace="a.") + "${setEnd}"; 
+               }
            }
        } else {
            String ex = "access.get(\"" + p +"\", ${cachingTime(field)})";
@@ -292,7 +389,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
                 path = getFieldNameForPath(field);
             }
             nestedStepCount = nestedStepCount + 1;
-            '\n\naccess = access.stepInto("${path}");' !<CR>;
+            '\n\naccess = access.stepInto("${path}");'
         }
         '${produceDataTransfer(type, mapping, typeQual, mapQual, done, indexes, paths)}'
         if (not(genFrom) and optWithStepIn and nestedStepCount > 0) {
@@ -312,7 +409,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
     
     // overwrite internal dispatch basis to allow for data transfer generation on all fields. Object fields are used below to initalize
     // object fields of data instances
-    def produceDataTransfer(Field f, DataType type, mapOf(String, Field) mapping, String typeQual, String mapQual, setOf(String) done, String indexes, String paths) {
+    def produceDataTransfer(Field f, DataType type, mapOf(String, Field) mapping, String typeQual, String mapQual, setOf(String) done, String indexes, String paths, String level) {
         String targetSep = mapTargetSeparator();
         String sourceSep = mapSourceSeparator();
         String tn = mapTargetPath(typeQual, f);
@@ -324,25 +421,6 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         } else {
             ''
         }
-    }
-    
-    def genOutputTransFrom(DataType imType, DataType pltfType, setOf(AssignmentOperation) assng) {
-        ''
-    }
-
-    // unify imType with access/model without having an instance, write into pltfType
-    def genOutputTransFrom(RecordType imType, RecordType pltfType, setOf(AssignmentOperation) assng) {
-        genFrom = true;
-        setOf(String) done = {};
-        topPath = imType.path;
-        String imTypePath = "";
-        if (not(optWithStepIn)) {
-             imTypePath = topPath;
-        }
-        '${translateDataOperations(assng, imType, imTypePath, pltfType, "data", done)}'
-        mapOf(String, Field) mapping = {};
-        mapSourcePaths(imType, mapping, imTypePath);
-        '${produceDataTransfer(pltfType, mapping, "data", imTypePath, done, "", "")}'|8;
     }
     
     def setAdd(Configuration config) {
@@ -364,16 +442,8 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
             String oType = getMachineOutputTypeName(conn);
         '
         private static class MachineOutputTranslator extends AbstractConnectorOutputTypeTranslator<${oType}, ${coType}> {
-        
-            @Override
-            public ${coType} to(${oType} source) throws IOException {
-                ModelAccess access = getModelAccess();
-                final ModelInputConverter inConverter = access.getInputConverter();
-                final ModelOutputConverter outConverter = access.getOutputConverter();
-                ${coType} result = new ${coType}${add}();
-                ${genOutputTransTo(conn.outInterface, getFirstType(conn.output), conn.operations)}
-                return result; 
-            }
+
+            ${genOutputTransTo(conn.outInterface, getFirstType(conn.output), conn.operations, oType, coType)}
         
             @Override
             public void initializeModelAccess() throws IOException {
@@ -407,14 +477,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         '
         private static class MachineInputTranslator extends AbstractConnectorInputTypeTranslator<${ciType}, ${iType}> {
         
-            @Override
-            public ${iType} from(${ciType} data) throws IOException {
-                ModelAccess access = getModelAccess();
-                final ModelInputConverter inConverter = access.getInputConverter();
-                final ModelOutputConverter outConverter = access.getOutputConverter();
-                ${genOutputTransFrom(conn.inInterface, getFirstType(conn.input), conn.operations)}
-                return null; // done, no instance of pseudo type
-            }
+            ${genOutputTransFrom(conn.inInterface, getFirstType(conn.input), conn.operations, iType, ciType)}
         
             @Override
             public Class<? extends ${iType}> getSourceType() {
