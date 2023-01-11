@@ -347,6 +347,7 @@ public class SpringCloudServiceManager
         handleFamilyProcesses(serviceIds, true);
         // re-link binders if needed, i.e., subset shall be started locally
         List<String> commonServiceArgs = determineBindingServiceArgs(serviceIds);
+        commonServiceArgs.addAll(config.getServiceCmdArgs());
         for (String sId : sortByDependency(serviceIds, true)) {
             Transport.sendProcessStatus(PROGRESS_COMPONENT_ID, step, serviceIds.length + 1, "Starting " + sId);
             SpringCloudServiceDescriptor service = getService(sId);

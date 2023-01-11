@@ -42,6 +42,7 @@ import de.iip_ecosphere.platform.support.iip_aas.Id;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
 import de.iip_ecosphere.platform.transport.Transport;
+import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 import de.iip_ecosphere.platform.transport.status.ActionTypes;
 
 import static de.iip_ecosphere.platform.support.iip_aas.AasUtils.*;
@@ -81,10 +82,10 @@ import org.slf4j.LoggerFactory;
  */
 public class ServicesAas implements AasContributor {
 
-    public static final String NAME_SUBMODEL = "services";
+    public static final String NAME_SUBMODEL = AasPartRegistry.NAME_SUBMODEL_SERVICES;
     public static final String NAME_SUBMODEL_RESOURCES = AasPartRegistry.NAME_SUBMODEL_RESOURCES;
     public static final String NAME_COLL_ARTIFACTS = "artifacts";
-    public static final String NAME_COLL_SERVICES = "services";
+    public static final String NAME_COLL_SERVICES = AasPartRegistry.NAME_COLLECTION_SERVICES;
     public static final String NAME_COLL_RELATIONS = "relations";
     public static final String NAME_SUBCOLL_PARAMETERS = "parameters";
     public static final String NAME_SUBCOLL_INPUT_DATA_CONN = "inputDataConnectors";
@@ -735,9 +736,14 @@ public class ServicesAas implements AasContributor {
                     sub.createSubmodelElementCollectionBuilder(NAME_COLL_SERVICES, false, false);
             SubmodelElementCollectionBuilder subB =
                 serviceB.createSubmodelElementCollectionBuilder(fixId(desc.getId()), false, false);
+            
+            String devId = Id.getDeviceId();
+            TransportSetup tSetup = ServiceFactory.getTransport();
             MetricsAasConstructor.addProviderMetricsToAasSubmodel(subB, null, 
-                MetricsAasConstants.TRANSPORT_SERVICE_METRICS_CHANNEL, 
-                Id.getDeviceId(), ServiceFactory.getTransport());
+                MetricsAasConstants.TRANSPORT_SERVICE_METRICS_CHANNEL, devId, tSetup);
+            MetricsAasConstructor.addServiceMetricsToAasSubmodel(subB, null, 
+                MetricsAasConstants.TRANSPORT_SERVICE_METRICS_CHANNEL, devId, tSetup);
+
             subB.build();
         }
     }

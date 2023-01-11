@@ -12,6 +12,8 @@
 
 package de.iip_ecosphere.platform.services.spring;
 
+import java.util.List;
+
 import org.springframework.cloud.deployer.spi.app.AppDeployer;
 
 import de.iip_ecosphere.platform.services.ServiceFactory;
@@ -26,8 +28,8 @@ import de.iip_ecosphere.platform.services.ServiceFactory;
 public class SpringInstances {
 
     private static AppDeployer deployer;
-    
     private static SpringCloudServiceSetup config;
+    private static List<String> serviceCmdArgs;
 
     /**
      * Returns the deployer instance.
@@ -67,6 +69,23 @@ public class SpringInstances {
         if (null != cfg) {
             ServiceFactory.setAasSetup(cfg.getAas());
             ServiceFactory.setNetworkManagerSetup(cfg.getNetMgr());
+            if (null != serviceCmdArgs) {
+                config.setServiceCmdArgs(serviceCmdArgs);
+            }
+        }
+    }
+    
+    /**
+     * Caching helper methods to allow early setting the additional service command arguments, e.g., for testing.
+     * May be set later when {@code #setConfig(SpringCloudServiceSetup)} is called.
+     * 
+     * @param arguments the arguments
+     */
+    public static void setServiceCmdArgs(List<String> arguments) {
+        if (null == config) {
+            serviceCmdArgs = arguments;
+        } else {
+            config.setServiceCmdArgs(arguments);
         }
     }
 

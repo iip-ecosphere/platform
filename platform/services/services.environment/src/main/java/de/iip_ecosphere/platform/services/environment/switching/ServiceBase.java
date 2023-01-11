@@ -24,6 +24,7 @@ import de.iip_ecosphere.platform.services.environment.ServiceState;
 public interface ServiceBase {
 
     public static final String APPLICATION_SEPARATOR = "@";
+    public static final String DEFAULT_APPLICATION_INSTANCE_ID = "dflt";
     
     /**
      * Returns the unique id of the service. May be a single service id, a service id and a postfixed application 
@@ -109,6 +110,21 @@ public interface ServiceBase {
             result = id.substring(lPos + 1);
         } else {
             result = "";
+        }
+        return result;
+    }
+    
+    /**
+     * Validates an application instance id.
+     * 
+     * @param appInstanceId the id to validate
+     * @return the validated id, if {@code appInstanceId} would be <b>null</b> or empty, 
+     *    {@link #DEFAULT_APPLICATION_INSTANCE_ID} is returned
+     */
+    public static String validateApplicationInstanceId(String appInstanceId) {
+        String result = appInstanceId;
+        if (appInstanceId == null || appInstanceId.length() == 0) {
+            result = DEFAULT_APPLICATION_INSTANCE_ID;
         }
         return result;
     }

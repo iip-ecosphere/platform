@@ -12,6 +12,9 @@
 
 package de.iip_ecosphere.platform.services;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.net.NetworkManagerSetup;
@@ -28,6 +31,7 @@ public class ServiceSetup {
     private String serviceProtocol = AasFactory.DEFAULT_PROTOCOL;
     private TransportSetup transport = new TransportSetup();
     private NetworkManagerSetup netMgr = new NetworkManagerSetup();
+    private List<String> serviceCmdArgs = new ArrayList<String>();
 
     /**
      * Returns the AAS setup.
@@ -63,7 +67,16 @@ public class ServiceSetup {
      */
     public NetworkManagerSetup getNetMgr() {
         return netMgr;
-    }    
+    }
+    
+    /**
+     * Returns additional global service command arguments, e.g., for testing.
+     * 
+     * @return additional service command arguments
+     */
+    public List<String> getServiceCmdArgs() {
+        return serviceCmdArgs;
+    }
 
     /**
      * Defines the AAS setup. [required by snakeyaml]
@@ -100,4 +113,14 @@ public class ServiceSetup {
     public void setNetMgr(NetworkManagerSetup netMgr) {
         this.netMgr = netMgr;
     }
+    
+    /**
+     * Additional global service command arguments, e.g., for testing. [required snakeyaml]
+     * 
+     * @param serviceCmdArgs the additional command arguments
+     */
+    public void setServiceCmdArgs(List<String> serviceCmdArgs) {
+        this.serviceCmdArgs = serviceCmdArgs;
+    }
+
 }

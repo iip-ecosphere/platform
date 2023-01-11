@@ -62,11 +62,13 @@ import de.iip_ecosphere.platform.services.environment.metricsProvider.meterRepre
 import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsAasConstants;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsAasConstructor;
 import de.iip_ecosphere.platform.services.spring.SpringCloudServiceSetup;
+import de.iip_ecosphere.platform.services.spring.SpringInstances;
 import de.iip_ecosphere.platform.services.spring.ClasspathJavaCommandBuilder;
 import de.iip_ecosphere.platform.services.spring.SpringCloudServiceDescriptor;
 import de.iip_ecosphere.platform.services.spring.SpringCloudServiceManager;
 import de.iip_ecosphere.platform.services.spring.StartupApplicationListener;
 import de.iip_ecosphere.platform.services.spring.descriptor.ProcessSpec;
+import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.ServerAddress;
@@ -84,6 +86,7 @@ import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.iip_aas.AasUtils;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
+import de.iip_ecosphere.platform.support.iip_aas.config.CmdLine;
 import de.iip_ecosphere.platform.support.net.ManagedServerAddress;
 import de.iip_ecosphere.platform.support.net.NetworkManager;
 import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
@@ -145,6 +148,7 @@ public class TestServiceManager {
         setup.setHost("localhost");
         setup.setAuthenticationKey("amqp"); // -> identityStore.yml
         server.start();
+        System.out.println("AMQP broker on port " + BROKER.getPort());
         
         oldM = ActiveAasBase.setNotificationMode(NotificationMode.SYNCHRONOUS);
         Assert.assertTrue(AasPartRegistry.contributorClasses().contains(ServicesAas.class));
@@ -153,8 +157,19 @@ public class TestServiceManager {
         
         implServer = res.getProtocolServerBuilder().build();
         implServer.start();
+        System.out.println("AAS Imp server on port " + AasPartRegistry.getSetup().getImplementation().getPort());
         aasServer = AasPartRegistry.deploy(res.getAas()); 
         aasServer.start();
+        
+        int aasRegPort = AasPartRegistry.getSetup().getRegistry().getPort();
+        int aasPort = AasPartRegistry.getSetup().getServer().getPort();
+        System.out.println("AAS registry on port " + aasRegPort);
+        System.out.println("AAS server on port " + aasPort);
+
+        // additional arguments that AAS can be reached from service
+        SpringInstances.setServiceCmdArgs(CollectionUtils.toList(
+            CmdLine.composeArgument(Starter.PARAM_IIP_TEST_AAS_PORT, aasPort),
+            CmdLine.composeArgument(Starter.PARAM_IIP_TEST_AASREG_PORT, aasRegPort)));
     }
     
     /**
@@ -400,7 +415,7 @@ public class TestServiceManager {
                 Predicate<Object> pred = ent.getValue();
                 if (null != pred) {
                     Object val = prop.getValue();
-                    Assert.assertTrue(pred.test(val));
+                    Assert.assertTrue("Test for " + ent.getKey() + " failed", pred.test(val));
                 }
             }
         }

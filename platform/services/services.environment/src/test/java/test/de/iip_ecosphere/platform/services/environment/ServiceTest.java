@@ -66,5 +66,18 @@ public class ServiceTest {
         Assert.assertEquals("aId", ServiceBase.getApplicationId(id));
         Assert.assertEquals("001", ServiceBase.getApplicationInstanceId(id));
     }
+
+    /**
+     * Tests {@link ServiceBase#validateApplicationInstanceId(String)}.
+     */
+    @Test
+    public void testValidateApplicationInstanceId() {
+        Assert.assertEquals(ServiceBase.DEFAULT_APPLICATION_INSTANCE_ID, 
+            ServiceBase.validateApplicationInstanceId(null));
+        Assert.assertEquals(ServiceBase.DEFAULT_APPLICATION_INSTANCE_ID, 
+            ServiceBase.validateApplicationInstanceId(""));
+        Assert.assertEquals("id", 
+            ServiceBase.validateApplicationInstanceId("id"));
+    }
     
 }

@@ -81,6 +81,10 @@ public class MetricsAasConstants {
     public static final String DEVICE_CPU_TEMPERATURE = "CPU_Temperature";
     public static final String DEVICE_CASE_TEMPERATURE = "Case_Temperature";
     
+    public static final String SERVICE_TUPLES_SENT = "Service_Sent";
+    public static final String SERVICE_TUPLES_RECEIVED = "Service_Received";
+    public static final String SERVICE_TIME_PROCESSED = "Service_Processed";
+    
     /* Custom tags */
     public static final String UPDATE = "update";
     public static final String DELETE = "delete";

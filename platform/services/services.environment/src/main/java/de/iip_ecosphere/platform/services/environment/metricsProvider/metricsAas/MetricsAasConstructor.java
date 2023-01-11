@@ -13,10 +13,17 @@
 package de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas;
 
 import de.iip_ecosphere.platform.services.environment.metricsProvider.MetricsProvider;
+import de.iip_ecosphere.platform.support.CollectionUtils;
+import de.iip_ecosphere.platform.support.aas.ElementsAccess;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
+import de.iip_ecosphere.platform.support.aas.Property;
+import de.iip_ecosphere.platform.support.aas.Property.PropertyBuilder;
+import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
+import de.iip_ecosphere.platform.support.iip_aas.AasUtils;
+import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.Irdi;
 import de.iip_ecosphere.platform.transport.TransportFactory;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
@@ -28,8 +35,11 @@ import static de.iip_ecosphere.platform.services.environment.metricsProvider.met
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.StringReader;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -37,6 +47,7 @@ import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonNumber;
 import javax.json.JsonObject;
+import javax.json.JsonValue;
 import javax.json.stream.JsonParsingException;
 
 import org.slf4j.LoggerFactory;
@@ -72,9 +83,49 @@ import org.slf4j.LoggerFactory;
  */
 public class MetricsAasConstructor {
 
+    /**
+     * Default supplier for the submodel identified by the given id.
+     */
+    public static final CollectionSupplier DFLT_SUBMODEL_SUPPLIER = 
+        (p, id) -> CollectionUtils.toList(p.getSubmodelElementCollection(AasUtils.fixId(id)));
+        
+    /**
+     * Default push meter predicate which always returns true.
+     */
+    public static final PushMeterPredicate PREDICATE_ALWAYS_TRUE = 
+        (p, j) -> true;
+    
+    /**
+     * Does the underlying AAS implementation execute Lambda-Setters for AAS properties. If not, we activate
+     * a less performant fallback. Somewhen between BaSyx 1.1 and BaSyx 1.3 we lost this, but this may just depend
+     * on the underlying Java version.
+     */
+    public static final boolean LAMBDA_SETTERS_SUPPORTED = false; 
+
     private static Map<String, TransportConnector> conns = new HashMap<>();
     private static Map<String, JsonObjectHolder> holders = new HashMap<>();
-    private static final boolean METRICS_AS_VALUES = true;
+
+    private static Submodel monSubModel;
+    private static boolean monSubModelFailed = false;
+    private static Map<String, String> monMapping = new HashMap<>();
+    static {
+        monMapping.put(MetricsProvider.SYS_DISK_FREE, SYSTEM_DISK_FREE);
+        monMapping.put(MetricsProvider.SYS_DISK_TOTAL, SYSTEM_DISK_TOTAL);
+        monMapping.put(MetricsProvider.SYS_DISK_USABLE, SYSTEM_DISK_USABLE);
+        monMapping.put(MetricsProvider.SYS_DISK_USED, SYSTEM_DISK_USED);
+
+        monMapping.put(MetricsProvider.SYS_MEM_FREE, SYSTEM_MEMORY_FREE);
+        monMapping.put(MetricsProvider.SYS_MEM_TOTAL, SYSTEM_MEMORY_TOTAL);
+        monMapping.put(MetricsProvider.SYS_MEM_USAGE, SYSTEM_MEMORY_USAGE);
+        monMapping.put(MetricsProvider.SYS_MEM_USED, SYSTEM_MEMORY_USED);
+
+        monMapping.put(MetricsProvider.DEVICE_CPU_TEMPERATURE, DEVICE_CPU_TEMPERATURE);
+        monMapping.put(MetricsProvider.DEVICE_CASE_TEMPERATURE, DEVICE_CASE_TEMPERATURE);
+
+        monMapping.put(MetricsProvider.SERVICE_TUPLES_SENT, SERVICE_TUPLES_SENT);
+        monMapping.put(MetricsProvider.SERVICE_TUPLES_RECEIVED, SERVICE_TUPLES_RECEIVED);
+        monMapping.put(MetricsProvider.SERVICE_TIME_PROCESSED, SERVICE_TIME_PROCESSED);
+    }
     
     /**
      * Clears temporary data structures.
@@ -144,6 +195,149 @@ public class MetricsAasConstructor {
             return result;
         }
     }
+
+    /**
+     * Returns a (unmodifiable) mapping of monitoring meter names to AAS names.
+     * 
+     * @return the default (unmodifiable) monitoring mapping
+     */
+    public static Map<String, String> getMonitoringMapping() {
+        return Collections.unmodifiableMap(monMapping);
+    }
+
+    /**
+     * Alternative approach to update the metric values. Can be called from the regular sending thread. Enabled only if 
+     * not {@link #LAMBDA_SETTERS_SUPPORTED}. Uses the default meter-shortId names mapping defined in this class.
+     * Initial approach, not really performant. May have to be throttled.
+     * 
+     * @param json the JSON to be sent to the monitoring channel
+     * @param submodel the submodel to update (elements are assumed to be in a submodel elements collection on 
+     *     the next level)
+     * @param cSupplier collection supplier
+     * @param update whether this is an update or the first call
+     * @param mPredicate optional predicate to identify whether pushing a value shall happen, may be <b>null</b> 
+     *     then {@link #PREDICATE_ALWAYS_TRUE} is used
+     */
+    public static void pushToAas(String json, String submodel, CollectionSupplier cSupplier, boolean update, 
+        PushMeterPredicate mPredicate) {
+        pushToAas(json, submodel, cSupplier, update, monMapping, mPredicate);
+    }
+    
+    /**
+     * Generic collection supplier.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public interface CollectionSupplier {
+        
+        /**
+         * Returns the element access instances to be processed further during 
+         * {@link MetricsAasConstructor#pushToAas(ElementsAccess, java.util.Map.Entry, Map, PushMeterPredicate)}.
+         * 
+         * @param parent the parent access to derive the elements from
+         * @param deviceId the device id as passed in from the monitoring data
+         * @return the element access instances to push
+         */
+        public List<ElementsAccess> get(ElementsAccess parent, String deviceId);
+        
+    }
+
+    /**
+     * Predicate to determine whether pushing a meter value shall happen.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public interface PushMeterPredicate {
+
+        /**
+         * Tests whether pushing {@code meter} to {@code parent}. DeviceId is already matched.
+         * 
+         * @param parent the parent element
+         * @param meter the meter
+         * @return {@code true} if pushing is enabled, {@code false} if disabled and the meter shall not be pushed
+         */
+        public boolean test(ElementsAccess parent, JsonValue meter);
+        
+    }
+    
+    // checkstyle: stop parameter number check
+    
+    /**
+     * Alternative approach to update the metric values. Can be called from the regular sending thread. Enabled only if 
+     * not {@link #LAMBDA_SETTERS_SUPPORTED}. Initial approach, not really performant. May have to be throttled.
+     * 
+     * @param json the JSON to be sent to the monitoring channel
+     * @param submodel the submodel to update (elements are assumed to be in a submodel elements collection on 
+     *     the next level)
+     * @param cSupplier collection supplier within {@code submodel}
+     * @param update whether this is an update or the first call
+     * @param monMapping the meter-shortId mapping to use
+     * @param mPredicate optional predicate to identify whether pushing a value shall happen, may be <b>null</b> 
+     *     then {@link #PREDICATE_ALWAYS_TRUE} is used
+     */
+    public static void pushToAas(String json, String submodel, CollectionSupplier cSupplier,  
+        boolean update, Map<String, String> monMapping, PushMeterPredicate mPredicate) {
+        if (!LAMBDA_SETTERS_SUPPORTED && null == monSubModel && !monSubModelFailed) {
+            try {
+                monSubModel = ActiveAasBase.getSubmodel(submodel);
+            } catch (IOException e) {
+                LoggerFactory.getLogger(MetricsAasConstructor.class).error(
+                    "Obtaining submodel '{}' to push monitoring data to failed: {}", submodel, e.getMessage());
+
+                System.out.println("ERROR: " + e.getMessage());
+                monSubModelFailed = true;
+            }
+        }
+        if (null != monSubModel) {
+            mPredicate = null == mPredicate ? PREDICATE_ALWAYS_TRUE : mPredicate;
+            JsonObject obj = Json.createReader(new StringReader(json)).readObject();
+            String id = obj.getString("id");
+            if (null != id) {
+                List<ElementsAccess> coll = cSupplier.get(monSubModel, id);
+                if (null != coll) {
+                    JsonObject meters = obj.getJsonObject("meters");    
+                    if (null != meters) {
+                        for (ElementsAccess c : coll) {
+                            for (Map.Entry<String, JsonValue> ent : meters.entrySet()) {
+                                pushToAas(c, ent, monMapping, mPredicate);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // checkstyle: resume parameter number check
+
+    /**
+     * Pushes a JSON metrics entry to {@code coll}.
+     * 
+     * @param coll the collection to push to
+     * @param ent the metrics entry containing metrics name and measurement
+     * @param monMapping the meter-shortId mapping to use
+     * @param mPredicate optional predicate to identify whether pushing a value shall happen, may be <b>null</b> 
+     *     then {@link #PREDICATE_ALWAYS_TRUE} is used
+     */
+    private static void pushToAas(ElementsAccess coll, Map.Entry<String, JsonValue> ent, 
+        Map<String, String> monMapping, PushMeterPredicate mPredicate) {
+        String idShort = monMapping.get(ent.getKey());
+        if (null != idShort) {
+            JsonValue json = ent.getValue();
+            if (mPredicate.test(coll, json)) {
+                Property prop = coll.getProperty(idShort);
+                if (null != prop) {
+                    try {
+                        prop.setValue(getMeasurement(json.toString())); // implicit conversion
+                    } catch (ExecutionException e) {
+                        LoggerFactory.getLogger(MetricsAasConstructor.class).error(
+                            "AAS property set on '{}' failed: {}", idShort, e.getMessage());
+                    }
+                }
+            }
+        }
+    }
+
     
     // put information into map (metrics provider would be better)
     /**
@@ -214,33 +408,33 @@ public class MetricsAasConstructor {
         @Override
         public Object get() {
             String json = getHolder(id, channel, setup).getMeter(name);
-            return METRICS_AS_VALUES ? getMeasurement(json) : json;
+            return getMeasurement(json);
         }
 
-        /**
-         * Extracts the measurement out of the metrics JSON.
-         * 
-         * @param json the JSON, may be empty or <b>null</b>
-         * @return the measurement
-         */
-        private Object getMeasurement(String json) {
-            Object result = null;
-            if (null != json && json.length() > 0) {
-                JsonObject obj = Json.createReader(new StringReader(json)).readObject();
-                JsonArray meas = obj.getJsonArray("measurements");
-                if (null != meas && meas.size() > 0) {
-                    JsonObject measurement = meas.getJsonObject(0);
-                    if (null != measurement) {
-                        JsonNumber num = measurement.getJsonNumber("value");
-                        if (null != num) {
-                            result = num.doubleValue();
-                        }
+    }
+
+    /**
+     * Extracts the measurement out of the metrics JSON.
+     * 
+     * @param json the JSON, may be empty or <b>null</b>
+     * @return the measurement, may be <b>null</b>
+     */
+    private static Object getMeasurement(String json) {
+        Object result = null;
+        if (null != json && json.length() > 0) {
+            JsonObject obj = Json.createReader(new StringReader(json)).readObject();
+            JsonArray meas = obj.getJsonArray("measurements");
+            if (null != meas && meas.size() > 0) {
+                JsonObject measurement = meas.getJsonObject(0);
+                if (null != measurement) {
+                    JsonNumber num = measurement.getJsonNumber("value");
+                    if (null != num) {
+                        result = num.doubleValue();
                     }
                 }
             }
-            return result;
         }
-        
+        return result;
     }
     
     /**
@@ -271,29 +465,60 @@ public class MetricsAasConstructor {
         return sub.getElement(SYSTEM_DISK_FREE) != null;
     }
     
-    /**
-     * Returns the semantic id to use depending on {@link #METRICS_AS_VALUES}.
-     * 
-     * @param semId the id for {@link #METRICS_AS_VALUES}
-     * @return the {@code semId} or <b>null</b>
-     */
-    private static String semId(String semId) {
-        return METRICS_AS_VALUES ? semId : null;
-    }
+    // checkstyle: stop parameter number check
 
     /**
-     * Returns the property type to use depending on {@link #METRICS_AS_VALUES}.
+     * Creates a monitoring property.
      * 
-     * @param mAsVType the type for {@link #METRICS_AS_VALUES}
-     * @param other the type if {@link #METRICS_AS_VALUES} is disabled
-     * @return {@code mAsVType} or {@code other}
+     * @param smBuilder the parent submodel builder
+     * @param type the type of the property
+     * @param channel the transport channel (ignored if not {@link #LAMBDA_SETTERS_SUPPORTED})
+     * @param id the id to react on (ignored if not {@link #LAMBDA_SETTERS_SUPPORTED})
+     * @param setup the transport setup (ignored if not {@link #LAMBDA_SETTERS_SUPPORTED})
+     * @param metricsName the name of the metrics as defined in the {@link MetricsProvider}
+     * @param semId the optional semantic id (may be <b>null</b> for none)
+     * @return the created property
      */
-    private static Type propType(Type mAsVType, Type other) {
-        return METRICS_AS_VALUES ? mAsVType : other;
+    public static Property createProperty(SubmodelElementContainerBuilder smBuilder, Type type, String channel, 
+        String id, TransportSetup setup, String metricsName, String semId) {
+        String idShort = monMapping.get(metricsName);
+        PropertyBuilder pBuilder = smBuilder.createPropertyBuilder(idShort).setType(type);
+        if (LAMBDA_SETTERS_SUPPORTED) {
+            pBuilder.bind(new MeterGetter(channel, id, setup, metricsName), InvocablesCreator.READ_ONLY);
+        } else {
+            Object dflt;
+            switch (type) { // typical defaults for monitoring here for now
+            case AAS_INTEGER:
+                dflt = 0;
+                break;
+            case FLOAT:
+                dflt = 0.0;
+                break;
+            case DOUBLE:
+                dflt = 0.0;
+                break;
+            case INTEGER:
+                dflt = 0;
+                break;
+            default:
+                dflt = null;
+                break;
+            }
+            if (null != dflt) {
+                pBuilder.setValue(dflt); // needed by BaSyx 1.0.1
+            }
+        }
+        if (null != semId) {
+            pBuilder.setSemanticId(semId);
+        }
+        return pBuilder.build();
     }
-    
+
+    // checkstyle: resume parameter number check
+
     /**
-     * Adds metrics to the submodel/elements. Metric values are bound against a transport connector receiver.
+     * Adds system metrics to the submodel/elements. If {@link #LAMBDA_SETTERS_SUPPORTED}, values are bound against 
+     * a transport connector receiver.
      * 
      * @param smBuilder submodel/elements builder of the AAS
      * @param filter    metrics filter, may be <b>null</b> for all (currently ignored)
@@ -305,53 +530,49 @@ public class MetricsAasConstructor {
         Predicate<String> filter, String channel, String id, TransportSetup setup) {
 
         /* System Disk Capacity metrics, string as JSON meter is transferred  */
-        smBuilder.createPropertyBuilder(SYSTEM_DISK_FREE).setType(propType(Type.DOUBLE, Type.STRING))
-            .bind(new MeterGetter(channel, id, setup, MetricsProvider.SYS_DISK_FREE), InvocablesCreator.READ_ONLY)
-            .setSemanticId(semId(Irdi.AAS_IRDI_UNIT_BYTE))
-            .build();
-        smBuilder.createPropertyBuilder(SYSTEM_DISK_TOTAL).setType(propType(Type.DOUBLE, Type.STRING))
-            .bind(new MeterGetter(channel, id, setup, MetricsProvider.SYS_DISK_TOTAL), InvocablesCreator.READ_ONLY)
-            .setSemanticId(semId(Irdi.AAS_IRDI_UNIT_BYTE))
-            .build();
-        smBuilder.createPropertyBuilder(SYSTEM_DISK_USABLE).setType(propType(Type.DOUBLE, Type.STRING))
-            .bind(new MeterGetter(channel, id, setup, MetricsProvider.SYS_DISK_USABLE), InvocablesCreator.READ_ONLY)
-            .setSemanticId(semId(Irdi.AAS_IRDI_UNIT_BYTE))
-            .build();
-        smBuilder.createPropertyBuilder(SYSTEM_DISK_USED).setType(propType(Type.DOUBLE, Type.STRING))
-            .bind(new MeterGetter(channel, id, setup, MetricsProvider.SYS_DISK_USED), InvocablesCreator.READ_ONLY)
-            .setSemanticId(semId(Irdi.AAS_IRDI_UNIT_BYTE))
-            .build();
+        createProperty(smBuilder, Type.DOUBLE, channel, id, setup, MetricsProvider.SYS_DISK_FREE, 
+            Irdi.AAS_IRDI_UNIT_BYTE);
+        createProperty(smBuilder, Type.DOUBLE, channel, id, setup, MetricsProvider.SYS_DISK_TOTAL, 
+            Irdi.AAS_IRDI_UNIT_BYTE);
+        createProperty(smBuilder, Type.DOUBLE, channel, id, setup, MetricsProvider.SYS_DISK_USABLE, 
+            Irdi.AAS_IRDI_UNIT_BYTE);
+        createProperty(smBuilder, Type.DOUBLE, channel, id, setup, MetricsProvider.SYS_DISK_USED, 
+            Irdi.AAS_IRDI_UNIT_BYTE);
 
         /* System Physical Memory metrics, string as JSON meter is transferred  */
-        smBuilder.createPropertyBuilder(SYSTEM_MEMORY_FREE).setType(propType(Type.DOUBLE, Type.STRING))
-            .bind(new MeterGetter(channel, id, setup, MetricsProvider.SYS_MEM_FREE), InvocablesCreator.READ_ONLY)
-            .setSemanticId(semId(Irdi.AAS_IRDI_UNIT_BYTE))
-            .build();
-        smBuilder.createPropertyBuilder(SYSTEM_MEMORY_TOTAL).setType(propType(Type.DOUBLE, Type.STRING))
-            .bind(new MeterGetter(channel, id, setup, MetricsProvider.SYS_MEM_TOTAL), InvocablesCreator.READ_ONLY)
-            .setSemanticId(semId(Irdi.AAS_IRDI_UNIT_BYTE))
-            .build();
-        smBuilder.createPropertyBuilder(SYSTEM_MEMORY_USAGE).setType(propType(Type.DOUBLE, Type.STRING))
-            .bind(new MeterGetter(channel, id, setup, MetricsProvider.SYS_MEM_USAGE), InvocablesCreator.READ_ONLY)
-            .setSemanticId(semId(Irdi.AAS_IRDI_UNIT_PERCENT))
-            .build();
-        smBuilder.createPropertyBuilder(SYSTEM_MEMORY_USED).setType(propType(Type.DOUBLE, Type.STRING))
-            .bind(new MeterGetter(channel, id, setup, MetricsProvider.SYS_MEM_USED), InvocablesCreator.READ_ONLY)
-            .setSemanticId(semId(Irdi.AAS_IRDI_UNIT_BYTE))
-            .build();
+        createProperty(smBuilder, Type.DOUBLE, channel, id, setup, MetricsProvider.SYS_MEM_FREE, 
+            Irdi.AAS_IRDI_UNIT_BYTE);
+        createProperty(smBuilder, Type.DOUBLE, channel, id, setup, MetricsProvider.SYS_MEM_TOTAL, 
+            Irdi.AAS_IRDI_UNIT_BYTE);
+        createProperty(smBuilder, Type.DOUBLE, channel, id, setup, MetricsProvider.SYS_MEM_USAGE, 
+            Irdi.AAS_IRDI_UNIT_PERCENT);
+        createProperty(smBuilder, Type.DOUBLE, channel, id, setup, MetricsProvider.SYS_MEM_USED, 
+            Irdi.AAS_IRDI_UNIT_BYTE);
         
-        smBuilder.createPropertyBuilder(DEVICE_CPU_TEMPERATURE).setType(propType(Type.DOUBLE, Type.STRING))
-            .bind(new MeterGetter(channel, id, setup, MetricsProvider.DEVICE_CPU_TEMPERATURE), 
-                InvocablesCreator.READ_ONLY)
-            .setSemanticId(semId(Irdi.AAS_IRDI_UNIT_DEGREE_CELSIUS))
-            .build();
-        smBuilder.createPropertyBuilder(DEVICE_CASE_TEMPERATURE).setType(propType(Type.DOUBLE, Type.STRING))
-            .bind(new MeterGetter(channel, id, setup, MetricsProvider.DEVICE_CPU_TEMPERATURE), 
-                InvocablesCreator.READ_ONLY)
-            .setSemanticId(semId(Irdi.AAS_IRDI_UNIT_DEGREE_CELSIUS))
-            .build();
+        createProperty(smBuilder, Type.DOUBLE, channel, id, setup, MetricsProvider.DEVICE_CPU_TEMPERATURE, 
+            Irdi.AAS_IRDI_UNIT_DEGREE_CELSIUS);
+        createProperty(smBuilder, Type.DOUBLE, channel, id, setup, MetricsProvider.DEVICE_CASE_TEMPERATURE, 
+            Irdi.AAS_IRDI_UNIT_DEGREE_CELSIUS);
     }
 
+    /**
+     * Adds service metrics to the submodel/elements. If {@link #LAMBDA_SETTERS_SUPPORTED}, values are bound against 
+     * a transport connector receiver.
+     * 
+     * @param smBuilder submodel/elements builder of the AAS
+     * @param filter    metrics filter, may be <b>null</b> for all (currently ignored)
+     * @param channel   the transport channel to listen to
+     * @param id        the metrics provider id to listen to
+     * @param setup     the transport setup
+     */
+    public static void addServiceMetricsToAasSubmodel(SubmodelElementContainerBuilder smBuilder, 
+        Predicate<String> filter, String channel, String id, TransportSetup setup) {
+        createProperty(smBuilder, Type.DOUBLE, channel, id, setup, MetricsProvider.SERVICE_TUPLES_SENT, null);
+        createProperty(smBuilder, Type.DOUBLE, channel, id, setup, MetricsProvider.SERVICE_TUPLES_RECEIVED, null);
+        createProperty(smBuilder, Type.DOUBLE, channel, id, setup, MetricsProvider.SERVICE_TIME_PROCESSED, 
+            Irdi.AAS_IRDI_UNIT_MILLISECOND);
+    }    
+    
     /**
      * Removes provider metrics and all related elements from {@code sub}.
      * 

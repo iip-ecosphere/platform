@@ -59,7 +59,10 @@ public class Monitor {
                 provider.calculateMetrics();
                 if (null != Transport.getConnector()) {
                     try {
-                        Transport.getConnector().asyncSend(TRANSPORT_METRICS_CHANNEL, provider.toJson(id, update));
+                        String json = provider.toJson(id, update);
+                        Transport.getConnector().asyncSend(TRANSPORT_METRICS_CHANNEL, json);
+                        MetricsAasConstructor.pushToAas(json, EcsAas.NAME_SUBMODEL, 
+                            MetricsAasConstructor.DFLT_SUBMODEL_SUPPLIER, update, null);
                     } catch (IOException e) {
                         LoggerFactory.getLogger(Monitor.class).error(
                             "Cannot sent monitoring message: " + e.getMessage());

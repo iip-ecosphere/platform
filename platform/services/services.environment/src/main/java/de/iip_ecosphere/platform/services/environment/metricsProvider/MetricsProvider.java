@@ -42,6 +42,7 @@ import io.micrometer.core.instrument.search.MeterNotFoundException;
 import com.sun.management.OperatingSystemMXBean;
 
 import de.iip_ecosphere.platform.services.environment.UpdatingMonitoringService;
+import de.iip_ecosphere.platform.services.environment.switching.ServiceBase;
 import de.iip_ecosphere.platform.support.metrics.SystemMetrics;
 import de.iip_ecosphere.platform.support.metrics.SystemMetricsFactory;
 
@@ -65,7 +66,6 @@ import de.iip_ecosphere.platform.support.metrics.SystemMetricsFactory;
  * 
  * @author Miguel Gomez
  */
-@SuppressWarnings("restriction")
 public class MetricsProvider {
 
     public static final List<Tag> EMPTY_TAGS = Collections.unmodifiableList(new ArrayList<Tag>());
@@ -75,6 +75,12 @@ public class MetricsProvider {
         MeterFilter.denyNameStartsWith("logback."),
         MeterFilter.denyNameStartsWith("tomcat.")
     };
+    
+    public static final String TAG_SERVICE_SERVICE = "service";
+    public static final String TAG_SERVICE_APPLICATION = "application";
+    public static final String TAG_SERVICE_DEVICE = "device";
+    public static final String TAG_SERVICE_SERVICEID = "serviceId";
+    public static final String TAG_SERVICE_APPINSTID = "applicationInstance";
     
     // Some of the system metrics that we want to expose
     public static final String SYS_MEM_TOTAL = "system.memory.total";
@@ -92,6 +98,10 @@ public class MetricsProvider {
     public static final String DEVICE_TPU_CORES = "device.tpu.cores";
     public static final String DEVICE_GPU_CORES = "device.gpu.cores";
     public static final String DEVICE_CPU_CORES = "device.cpu.cores";
+    
+    public static final String SERVICE_TUPLES_SENT = "service.sent";
+    public static final String SERVICE_TUPLES_RECEIVED = "service.received";
+    public static final String SERVICE_TIME_PROCESSED = "service.processed";
 
     public static final CapacityBaseUnit DFLT_MEMORY = CapacityBaseUnit.BYTES;
     public static final CapacityBaseUnit DFLT_DISK = CapacityBaseUnit.BYTES;
@@ -1172,6 +1182,97 @@ public class MetricsProvider {
         sb.append("]");
 
         return sb.toString();
+    }
+
+    /**
+     * Creates and registers a default service received counter. The device id tag will be set from 
+     * {@link de.iip_ecosphere.platform.support.iip_aas.Id#getDeviceId()}.
+     * 
+     * @param serviceName the static name/id of the service
+     * @param serviceId the (complete) id of the service
+     * @param appId the id of the application
+     * @param appInstanceId the id of the application instance, as validated by 
+     *     {@link ServiceBase#validateApplicationInstanceId(String)}
+     * @return the registered counter instance
+     * @see #createServiceSentReceivedCounter(boolean, String, String, String, String)
+     */
+    public Counter createServiceReceivedCounter(String serviceName, String serviceId, 
+        String appId, String appInstanceId) {
+        return createServiceSentReceivedCounter(true, serviceName, serviceId, appId, appInstanceId);
+    }
+
+    /**
+     * Creates and registers a default service sent counter. The device id tag will be set from 
+     * {@link de.iip_ecosphere.platform.support.iip_aas.Id#getDeviceId()}.
+     * 
+     * @param serviceName the static name/id of the service
+     * @param serviceId the (complete) id of the service
+     * @param appId the id of the application
+     * @param appInstanceId the id of the application instance, as validated by 
+     *     {@link ServiceBase#validateApplicationInstanceId(String)}
+     * @return the registered counter instance
+     * @see #createServiceSentReceivedCounter(boolean, String, String, String, String)
+     */
+    public Counter createServiceSentCounter(String serviceName, String serviceId, 
+        String appId, String appInstanceId) {
+        return createServiceSentReceivedCounter(false, serviceName, serviceId, appId, appInstanceId);
+    }
+
+    /**
+     * Creates and registers a default service send/receive counter. The device id tag will be set from 
+     * {@link de.iip_ecosphere.platform.support.iip_aas.Id#getDeviceId()}.
+     * 
+     * @param receive is it for receiving ({@code true}) or sending
+     * @param serviceName the static name/id of the service
+     * @param serviceId the (complete) id of the service
+     * @param appId the id of the application
+     * @param appInstanceId the id of the application instance, as validated by 
+     *     {@link ServiceBase#validateApplicationInstanceId(String)}
+     * @return the registered counter instance
+     */
+    public Counter createServiceSentReceivedCounter(boolean receive, String serviceName, String serviceId, 
+        String appId, String appInstanceId) {
+        String description;
+        String name;
+        if (receive) {
+            description = "Tuples received by a service";
+            name = SERVICE_TUPLES_RECEIVED;
+        } else {
+            description =  "Tuples sent out by a service";
+            name = SERVICE_TUPLES_SENT;
+        }
+        return Counter.builder(name)
+            .baseUnit("tuple/s")
+            .description(description)
+            .tags(TAG_SERVICE_SERVICE, serviceName, 
+                TAG_SERVICE_APPLICATION, appId, 
+                TAG_SERVICE_DEVICE, de.iip_ecosphere.platform.support.iip_aas.Id.getDeviceId(), 
+                TAG_SERVICE_SERVICEID, serviceId, 
+                TAG_SERVICE_APPINSTID, ServiceBase.validateApplicationInstanceId(appInstanceId))
+            .register(getRegistry());
+    }
+
+    /**
+     * Creates and registers a default service processing timer. The device id tag will be set from 
+     * {@link de.iip_ecosphere.platform.support.iip_aas.Id#getDeviceId()}.
+     * 
+     * @param serviceName the static name/id of the service
+     * @param serviceId the (complete) id of the service
+     * @param appId the id of the application
+     * @param appInstanceId the id of the application instance, as validated by 
+     *     {@link ServiceBase#validateApplicationInstanceId(String)}
+     * @return the registered counter instance
+     */
+    public Timer createServiceProcessingTimer(String serviceName, String serviceId, String appId, 
+        String appInstanceId) {
+        return io.micrometer.core.instrument.Timer.builder(SERVICE_TIME_PROCESSED)
+            .description("Main processing time of a service")
+            .tags(TAG_SERVICE_SERVICE, serviceName, 
+                TAG_SERVICE_APPLICATION, appId, 
+                TAG_SERVICE_DEVICE, de.iip_ecosphere.platform.support.iip_aas.Id.getDeviceId(), 
+                TAG_SERVICE_SERVICEID, serviceId, 
+                TAG_SERVICE_APPINSTID, ServiceBase.validateApplicationInstanceId(appInstanceId))
+            .register(getRegistry());
     }
     
 }

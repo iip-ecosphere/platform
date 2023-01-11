@@ -32,6 +32,7 @@ import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
+import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 import de.iip_ecosphere.platform.transport.Transport;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
@@ -50,6 +51,8 @@ public class Starter {
     public static final String PARAM_IIP_APP_ID = "iip.appId";
     public static final String PARAM_IIP_TRANSPORT_GLOBAL = "iip.transport.global";
     public static final String PARAM_IIP_TEST_TRANSPORT_PORT = "iip.test.transport.port";
+    public static final String PARAM_IIP_TEST_AAS_PORT = "iip.test.aas.port";
+    public static final String PARAM_IIP_TEST_AASREG_PORT = "iip.test.aasRegistry.port";
     public static final String PARAM_IIP_TEST_SERVICE_AUTOSTART = "iip.test.service.autostart";
     public static final String IIP_APP_PREFIX = "iip.app.";
     
@@ -248,6 +251,16 @@ public class Starter {
             getIntArg(args, "transport.port", transportPort));
         if (transportPort > 0 || transportHost != null) {
             getSetup();
+        }
+        int tmpPort = getIntArg(args, PARAM_IIP_TEST_AAS_PORT, -1);
+        if (tmpPort > 0) {
+            AasPartRegistry.getSetup().getServer().setPort(tmpPort);
+            getLogger().info("Configuring IIP server port to {}", tmpPort);
+        }
+        tmpPort = getIntArg(args, PARAM_IIP_TEST_AASREG_PORT, -1);
+        if (tmpPort > 0) {
+            AasPartRegistry.getSetup().getRegistry().setPort(tmpPort);
+            getLogger().info("Configuring IIP registry port to {}", tmpPort);
         }
         serviceAutostart = getBooleanArg(args, PARAM_IIP_TEST_SERVICE_AUTOSTART, serviceAutostart);
         String protocol = getArg(args, PARAM_IIP_PROTOCOL, AasFactory.DEFAULT_PROTOCOL);

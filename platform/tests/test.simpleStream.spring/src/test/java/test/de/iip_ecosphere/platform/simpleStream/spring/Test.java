@@ -21,6 +21,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -36,6 +38,8 @@ import de.iip_ecosphere.platform.services.environment.YamlService;
 
 import de.iip_ecosphere.platform.services.environment.spring.metricsProvider.MetricsProvider;
 import de.iip_ecosphere.platform.support.iip_aas.config.CmdLine;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.Timer;
 
 /**
  * Defines the test stream to be processed. We assume that a broker is running.
@@ -48,11 +52,11 @@ import de.iip_ecosphere.platform.support.iip_aas.config.CmdLine;
     "de.iip_ecosphere.platform.services.environment.spring", "de.iip_ecosphere.platform.transport.spring"})
 public class Test extends Starter {
     
-    private static final String SUPPLIER_TIMER_ID = "suppliercustomtimer";
+    //private static final String SUPPLIER_TIMER_ID = "suppliercustomtimer";
     private static final String SUPPLIER_GAUGE_ID = "suppliercustomgauge";
     private static final String SUPPLIER_COUNTER_ID = "suppliercustomcounter";
 
-    private static final String CONSUMER_TIMER_ID = "consumercustomtimer";
+    //private static final String CONSUMER_TIMER_ID = "consumercustomtimer";
     private static final String CONSUMER_GAUGE_ID = "consumercustomgauge";
     private static final String CONSUMER_COUNTER_ID = "consumercustomcounter";
     private static final String CONSUMER_RECV_ID = "consumerreceptiongauge";
@@ -69,6 +73,13 @@ public class Test extends Starter {
     @Autowired
     private MetricsProvider metrics;
     private boolean first = true;
+    
+    private Counter logSent;
+    private Counter logReceived;
+    private Timer logTime;
+    private Counter createSent;
+    private Counter createReceived;
+    private Timer createTime;
     
     /**
      * Creates an instance.
@@ -88,7 +99,8 @@ public class Test extends Starter {
     @Bean
     public Supplier<String> create() {
         return () -> {
-            return metrics.recordWithTimer(SUPPLIER_TIMER_ID, () -> {
+            return createTime.record(() -> {
+                createReceived.increment();
                 if (config.isDebug()) {
                     System.out.println("Ingest " + ingestCount);
                 }
@@ -110,6 +122,7 @@ public class Test extends Starter {
                 if (config.getIngestCount() > 0) {
                     ingestCount++;
                 }
+                createSent.increment();
                 return String.valueOf(num);
             });
         };
@@ -123,11 +136,12 @@ public class Test extends Starter {
     @Bean
     public Consumer<String> log() {
         return data -> {
-            metrics.recordWithTimer(CONSUMER_TIMER_ID, () -> {
+            logReceived.increment();
+            logTime.record(() -> {
                 double num = Math.random();
                 String content = "Received: " + data + "\n";
                 if (config.isDebug()) {
-                    System.out.print("Received: " + data);
+                    System.out.println("Received: " + data);
                 }
                 metrics.addGaugeValue(CONSUMER_GAUGE_ID, num);
                 metrics.increaseCounter(CONSUMER_COUNTER_ID);
@@ -139,8 +153,25 @@ public class Test extends Starter {
                 } catch (IOException e) {
                     System.out.println("Error writing log: " + e.getMessage());
                 }
+                logSent.increment();
             });
         };
+    }
+    
+    /**
+     * Called after constructor.
+     */
+    @PostConstruct
+    public void postConstruct() {
+        String logId = "simpleStream-log";
+        String createId = "simpleStream-create";
+        String app = "simpleStream.spring";
+        logSent = metrics.createServiceSentCounter(logId, logId, app, null);
+        logReceived = metrics.createServiceReceivedCounter(logId, logId, app, null);
+        logTime = metrics.createServiceProcessingTimer(logId, logId, app, null);
+        createSent = metrics.createServiceSentCounter(createId, createId, app, null);
+        createReceived = metrics.createServiceReceivedCounter(createId, createId, app, null);
+        createTime = metrics.createServiceProcessingTimer(createId, createId, app, null);
     }
 
     @Override

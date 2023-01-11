@@ -14,13 +14,11 @@ mqtt:
 amqp:
     host: localhost
     port: 8883
-    user: user
-    password: pwd
+    authenticationKey: amqp
 transport:
     host: localhost
     port: 8883
-    user: user
-    password: pwd
+    authenticationKey: amqp
 binders:
     properties:
         internal:
@@ -32,8 +30,7 @@ binders:
                     port: 8883
                 amqp:
                     host: localhost
-                    user: user
-                    password: pwd
+                    authenticationKey: amqp
                     clientId: internal
                     port: 8883
         external:
@@ -45,8 +42,7 @@ binders:
                     port: 8883
                 amqp:
                     host: localhost
-                    user: user
-                    password: pwd
+                    authenticationKey: amqp
                     clientId: external
                     port: 8883
 logging:
@@ -89,8 +85,7 @@ spring:
                             amqp:
                                 host: localhost
                                 clientId: internal
-                                user: user
-                                password: pwd
+                                authenticationKey: amqp
                                 port: 8883
                     external:
                         type: amqpBinder
@@ -102,8 +97,7 @@ spring:
                             amqp:
                                 host: localhost
                                 clientId: external
-                                user: user
-                                password: pwd
+                                authenticationKey: amqp
                                 port: 8883
 ---
 
