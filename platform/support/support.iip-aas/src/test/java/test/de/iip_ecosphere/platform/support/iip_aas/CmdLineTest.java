@@ -103,4 +103,12 @@ public class CmdLineTest {
         Assert.assertEquals("--transport=5", tmp[2]);
     }
     
+    /**
+     * Tests {@link CmdLine#composeArgument(String, String)}.
+     */
+    @Test
+    public void testComposeArgument() {
+        Assert.assertEquals("--iip.app.p=5", CmdLine.composeArgument("iip.app.p", "5"));
+    }
+    
 }
