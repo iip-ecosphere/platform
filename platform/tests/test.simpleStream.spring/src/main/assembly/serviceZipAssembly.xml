@@ -21,6 +21,8 @@
             <directory>${project.build.directory}/test-classes</directory>
             <outputDirectory/>
             <includes>
+                <include>application.yml</include>
+                <include>identityStore.yml</include>
                 <include>deployment*.yml</include>
                 <include>*.zip</include>
                 <include>classpath</include>
