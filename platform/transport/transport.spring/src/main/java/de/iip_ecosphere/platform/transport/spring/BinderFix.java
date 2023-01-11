@@ -40,9 +40,7 @@ import org.springframework.util.Assert;
  * either the Spring-like binders structure {@code binders.properties} (then like structure below 
  * {@code spring.cloud.stream.binders}, see {@link BinderFixProperties}) or, as fallback, 
  * {@code spring.cloud.stream.defaultBinder} but without settings, environment etc. Needs to be revisited 
- * for more recent versions. Code is based on 
- * <a href="// https://stackoverflow.com/questions/64826496/
- * injected-dependency-in-customized-kafkaconsumerinterceptor-is-null-with-spring-c">StackOverflow</a>. 
+ * for more recent versions. Code is based on StackOverflow (link in code). 
  * 
  * @author Gary Russell, StackOverflow
  * @author Holger Eichelberger, SSE
@@ -50,6 +48,9 @@ import org.springframework.util.Assert;
 @Component
 public class BinderFix {
 
+    //https://stackoverflow.com/questions/64826496/
+    //injected-dependency-in-customized-kafkaconsumerinterceptor-is-null-with-spring-c"> 
+    
     @Autowired(required = false)
     private Collection<DefaultBinderFactory.Listener> binderFactoryListeners;
 
