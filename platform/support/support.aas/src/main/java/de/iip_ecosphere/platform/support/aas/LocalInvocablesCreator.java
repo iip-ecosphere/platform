@@ -16,6 +16,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import java.io.Serializable;
+
 import org.slf4j.LoggerFactory;
 
 /**
@@ -39,9 +41,10 @@ public class LocalInvocablesCreator implements InvocablesCreator {
 
     // checkstyle: stop exception type check
 
+    @SuppressWarnings("unchecked")
     @Override
     public Consumer<Object> createSetter(String name) {
-        return o -> {
+        return (Consumer<Object> & Serializable) (o -> {
             try {
                 Consumer<Object> tmp = instance.getSetter(name);
                 if (null != tmp) {
@@ -50,12 +53,13 @@ public class LocalInvocablesCreator implements InvocablesCreator {
             } catch (Throwable t) { // catch all, even runtime
                 LoggerFactory.getLogger(LocalInvocablesCreator.class).error("Getter " + name + ": " + t.getMessage());
             }
-        };
+        });
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Function<Object[], Object> createInvocable(String name) {
-        return p -> {
+        return (Function<Object[], Object> & Serializable) (p -> {
             try {
                 Function<Object[], Object> tmp = instance.getServiceFunction(name);
                 return null == tmp ? null : tmp.apply(p);
@@ -63,12 +67,13 @@ public class LocalInvocablesCreator implements InvocablesCreator {
                 LoggerFactory.getLogger(LocalInvocablesCreator.class).error("Function " + name + ": " + t.getMessage());
                 return null;
             }
-        };
+        });
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Supplier<Object> createGetter(String name) {
-        return () -> {
+        return (Supplier<Object> & Serializable) (() -> {
             try {
                 Supplier<Object> tmp = instance.getGetter(name);
                 return null == tmp ? null : tmp.get();
@@ -76,7 +81,7 @@ public class LocalInvocablesCreator implements InvocablesCreator {
                 LoggerFactory.getLogger(LocalInvocablesCreator.class).error("Setter " + name + ": " + t.getMessage());
                 return null;
             }
-        };
+        });
     }
     
     // checkstyle: resume exception type check
