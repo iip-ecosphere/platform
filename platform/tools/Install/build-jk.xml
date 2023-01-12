@@ -6,7 +6,17 @@
 	<include file="${user.home}/macros.xml"/>
 	
     <!-- build zip -->
-    <target name="maven"> 
+    <target name="maven">
+    	<!-- cleanup for update-based checkout --> 
+        <delete failonerror="false" includeemptydirs="true">
+        	<fileset dir="./gen">
+              <exclude name="setPermissions.sh"/>
+            </fileset>
+    	</delete>
+    	<delete file="install.zip" failonerror="false"/>
+    	<delete file="install.tar.gz" failonerror="false"/>
+    	
+    	<!-- build new -->
     	<maven pomFile="pom.xml" goal="package"/>
         <chmod dir="." perm="u+x" includes="**/*.sh"/>
         <zip destFile="install.zip">
