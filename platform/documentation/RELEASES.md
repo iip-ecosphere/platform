@@ -9,7 +9,6 @@ Planned:
 ### Next release (Winter 2023, end of January 2023):
 
 Planned:
-* Component upgrades: BaSyx [#35](https://github.com/iip-ecosphere/platform/issues/35), Apache QPID-J [#76](https://github.com/iip-ecosphere/platform/issues/76)
 * Enable tolerant switching: [#26](https://github.com/iip-ecosphere/platform/issues/26)
 * Platform component heartbeat and AAS cleanup: [#62](https://github.com/iip-ecosphere/platform/issues/62)
 * Filtering of monitoring telegrams [#75](https://github.com/iip-ecosphere/platform/issues/75)
@@ -17,6 +16,7 @@ Planned:
 * Semantic Ids in the UI [#63](https://github.com/iip-ecosphere/platform/issues/63)
 
 In progress:
+* Component upgrades to BaSyx 1.3.0 [#35](https://github.com/iip-ecosphere/platform/issues/35), Apache QPID-J 9.0.0 [#76](https://github.com/iip-ecosphere/platform/issues/76) and Java 11 in progress.
 * Automatic creation of containers [#10](https://github.com/iip-ecosphere/platform/issues/10), [#9](https://github.com/iip-ecosphere/platform/issues/9).
 * [#59](https://github.com/iip-ecosphere/platform/issues/59): Distributed testing/evaluation environment
 * [#69](https://github.com/iip-ecosphere/platform/issues/69): Revise platform installation guidelines

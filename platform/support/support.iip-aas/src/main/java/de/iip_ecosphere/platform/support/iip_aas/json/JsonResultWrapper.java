@@ -171,7 +171,7 @@ public class JsonResultWrapper implements Function<Object[], Object>, Serializab
      * 
      * @author Holger Eichelberger, SSE
      */
-    public interface ExceptionFunction {
+    public interface ExceptionFunction extends Serializable {
         
         /**
          * Applies the function.
