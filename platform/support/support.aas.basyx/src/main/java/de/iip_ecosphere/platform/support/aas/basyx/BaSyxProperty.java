@@ -97,6 +97,11 @@ public class BaSyxProperty extends BaSyxSubmodelElement implements Property {
             if (set != null && !(set instanceof Serializable)) {
                 throw new IllegalArgumentException("'set' for " + property.getIdShort() + " must be serializable.");
             }
+            return bindLazy(get, set);
+        }
+
+        @Override
+        public PropertyBuilder bindLazy(Supplier<Object> get, Consumer<Object> set) {
             if (null != get && null == set) {
                 LOGGER.warn("Creating AAS operation " + property.getIdShort() + " with only a bound getter "
                     + "can lead to runtime inconsistencies as setting the value will change the value in the "
@@ -105,8 +110,6 @@ public class BaSyxProperty extends BaSyxSubmodelElement implements Property {
             property.set(VABLambdaProviderHelper.createSimple(get, set), typeDef);
             return this;
         }
-
-        // TODO check validity?
 
         @Override
         public PropertyBuilder setValue(Type type, Object value) {

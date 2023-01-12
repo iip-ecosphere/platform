@@ -137,6 +137,11 @@ public class BaSyxOperation extends BaSyxSubmodelElement implements Operation {
                 throw new IllegalArgumentException("'invocable' for operation '" + operation.getIdShort() 
                     + "' must be Serializable.");
             }
+            return setInvocableLazy(invocable);
+        }
+
+        @Override
+        public OperationBuilder setInvocableLazy(Function<Object[], Object> invocable) {
             operation.setInvokable(invocable);
             return this;
         }
