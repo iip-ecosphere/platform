@@ -13,6 +13,7 @@
 package de.iip_ecosphere.platform.configuration.ivml;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -841,6 +842,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
      * @param id the id to use as variable name instead of the variable name itself, may be <b>null</b> for 
      *     the variable name
      */
+    @SuppressWarnings("unchecked")
     void mapVariable(IDecisionVariable var, SubmodelElementCollectionBuilder builder, String id) {
         if (variableFilter.test(var)) {
             AbstractVariable decl = var.getDeclaration();
@@ -888,7 +890,9 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                 if (var.getState() == AssignmentState.FROZEN) {
                     pb.setValue(aasType, aasValue);
                 } else {
-                    pb.setType(aasType).bind(() -> getValue(var), PropertyBuilder.READ_ONLY);
+                    pb.setType(aasType).bind(
+                        ((Supplier<Object> & Serializable) () -> getValue(var)), 
+                        PropertyBuilder.READ_ONLY);
                 }
                 setSemanticId(pb, semanticId);
                 pb.build();
