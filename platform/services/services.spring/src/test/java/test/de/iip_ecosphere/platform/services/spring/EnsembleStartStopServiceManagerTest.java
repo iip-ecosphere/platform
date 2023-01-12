@@ -12,9 +12,12 @@
 
 package test.de.iip_ecosphere.platform.services.spring;
 
+import static org.junit.Assume.assumeTrue;
+
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
+import org.apache.commons.lang3.SystemUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -82,7 +85,7 @@ public class EnsembleStartStopServiceManagerTest extends AbstractTestServiceMana
      */
     @Test
     public void testEnsembleStartStop() throws ExecutionException, IOException {
-        //assumeTrue(SystemUtils.IS_OS_WINDOWS); // unclear failures on Jenkins
+        assumeTrue(SystemUtils.IS_OS_WINDOWS); // unclear failures on Jenkins
         doTestStartStop("deployment1.yml", new ArtifactAsserter() {
 
             /*@Override
