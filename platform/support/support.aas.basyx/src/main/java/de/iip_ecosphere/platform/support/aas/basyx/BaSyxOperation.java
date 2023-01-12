@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.support.aas.basyx;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -132,6 +133,10 @@ public class BaSyxOperation extends BaSyxSubmodelElement implements Operation {
 
         @Override
         public OperationBuilder setInvocable(Function<Object[], Object> invocable) {
+            if (invocable != null && !(invocable instanceof Serializable)) {
+                throw new IllegalArgumentException("'invocable' for operation '" + operation.getIdShort() 
+                    + "' must be Serializable.");
+            }
             operation.setInvokable(invocable);
             return this;
         }

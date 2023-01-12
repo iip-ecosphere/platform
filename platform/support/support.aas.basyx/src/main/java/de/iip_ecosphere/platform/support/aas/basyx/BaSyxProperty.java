@@ -91,16 +91,16 @@ public class BaSyxProperty extends BaSyxSubmodelElement implements Property {
             if (null == typeDef) {
                 throw new IllegalArgumentException("setType was not called before");
             }
+            if (get != null && !(get instanceof Serializable)) {
+                throw new IllegalArgumentException("'get' for " + property.getIdShort() + " must be serializable.");
+            }
+            if (set != null && !(set instanceof Serializable)) {
+                throw new IllegalArgumentException("'set' for " + property.getIdShort() + " must be serializable.");
+            }
             if (null != get && null == set) {
                 LOGGER.warn("Creating AAS operation " + property.getIdShort() + " with only a bound getter "
                     + "can lead to runtime inconsistencies as setting the value will change the value in the "
                     + "property rather than the value in the underlying representation object.");
-            }
-            if (get != null && !(get instanceof Serializable)) {
-                LOGGER.warn("Given getter for " + property.getIdShort() + " shall be serializable.");
-            }
-            if (set != null && !(set instanceof Serializable)) {
-                LOGGER.warn("Given setter for " + property.getIdShort() + " shall be serializable.");
             }
             property.set(VABLambdaProviderHelper.createSimple(get, set), typeDef);
             return this;
