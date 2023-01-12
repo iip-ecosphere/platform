@@ -96,7 +96,7 @@ public class BaSyxOperation extends BaSyxSubmodelElement implements Operation {
         private OperationVariable createOperationVariable(String idShort, Type type) {
             Property prop = new Property();
             prop.setIdShort(idShort);
-            prop.setModelingKind(ModelingKind.TEMPLATE); // required with BaSyx 1.0.0
+            prop.setKind(ModelingKind.TEMPLATE); // required with BaSyx 1.0.0
             if (null != type) { // let's see whether this makes sense
                 prop.setValueType(Tools.translate(type));
             }
@@ -207,7 +207,7 @@ public class BaSyxOperation extends BaSyxSubmodelElement implements Operation {
                 }
             }
             // TODO param translate needed but sequence of in/inout unclear
-            return Tools.translateValueFromBaSyx(operation.invoke(args), type);
+            return Tools.translateValueFromBaSyx(operation.invokeSimple(args), type);
         } catch (Exception e) {
             throw new ExecutionException(e);
         }

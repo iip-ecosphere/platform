@@ -23,16 +23,16 @@ import java.util.Set;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.eclipse.basyx.aas.factory.aasx.AASXFactory;
+import org.eclipse.basyx.aas.bundle.AASBundle;
 import org.eclipse.basyx.aas.factory.aasx.AASXPackageExplorerConformantHelper;
+import org.eclipse.basyx.aas.factory.aasx.AASXToMetamodelConverter;
 import org.eclipse.basyx.aas.factory.aasx.InMemoryFile;
+import org.eclipse.basyx.aas.factory.aasx.MetamodelToAASXConverter;
 import org.eclipse.basyx.aas.metamodel.api.IAssetAdministrationShell;
 import org.eclipse.basyx.aas.metamodel.api.parts.asset.IAsset;
 import org.eclipse.basyx.aas.metamodel.exception.MetamodelConstructionException;
-import org.eclipse.basyx.components.aas.aasx.AASXPackageManager;
 import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
 import org.eclipse.basyx.submodel.metamodel.api.parts.IConceptDescription;
-import org.eclipse.basyx.support.bundle.AASBundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -94,7 +94,7 @@ class AasxPersistenceRecipe extends AbstractPersistenceRecipe {
 
         try (FileOutputStream out = new FileOutputStream(file)) {
             AASXPackageExplorerConformantHelper.adapt(basyxAas, assetList, conceptDescriptionList, basyxSubmodels);
-            AASXFactory.buildAASX(basyxAas, assetList, conceptDescriptionList, basyxSubmodels, 
+            MetamodelToAASXConverter.buildAASX(basyxAas, assetList, conceptDescriptionList, basyxSubmodels, 
                 new ArrayList<InMemoryFile>(), out);
             out.close();
         } catch (Throwable e) { // BaSyx may fail with connected AAS. Catch this here.
@@ -108,7 +108,7 @@ class AasxPersistenceRecipe extends AbstractPersistenceRecipe {
     public List<Aas> readFrom(File file) throws IOException {
         List<Aas> result = new ArrayList<Aas>();
         try {
-            AASXPackageManager apm = new AASXPackageManager(file.getAbsolutePath());
+            AASXToMetamodelConverter apm = new AASXToMetamodelConverter(file.getAbsolutePath());
             Set<AASBundle> bundles = apm.retrieveAASBundles();
             List<IAssetAdministrationShell> aas = new ArrayList<>();
             List<ISubmodel> submodels = new ArrayList<>();

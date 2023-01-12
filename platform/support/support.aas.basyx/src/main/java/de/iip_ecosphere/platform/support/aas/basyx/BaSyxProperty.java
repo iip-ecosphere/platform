@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.support.aas.basyx;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
@@ -94,6 +95,12 @@ public class BaSyxProperty extends BaSyxSubmodelElement implements Property {
                 LOGGER.warn("Creating AAS operation " + property.getIdShort() + " with only a bound getter "
                     + "can lead to runtime inconsistencies as setting the value will change the value in the "
                     + "property rather than the value in the underlying representation object.");
+            }
+            if (get != null && !(get instanceof Serializable)) {
+                LOGGER.warn("Given getter for " + property.getIdShort() + " shall be serializable.");
+            }
+            if (set != null && !(set instanceof Serializable)) {
+                LOGGER.warn("Given setter for " + property.getIdShort() + " shall be serializable.");
             }
             property.set(VABLambdaProviderHelper.createSimple(get, set), typeDef);
             return this;
