@@ -141,7 +141,7 @@ public abstract class IdentityStore {
      * @return the created SSL/TLS context
      * @throws IOException if creating/reading/opening a specified keystore/key manager fails
      * @see #getKeystoreFile(String, String...)
-     * @sse #getKeyManagers(String, String, String...)
+     * @see #getKeyManagers(String, String, String...)
      */
     public SSLContext createTlsContext(String identity, String keyAlias, String... fallback) throws IOException {
         return createTlsContext(identity, KeyManagerFactory.getDefaultAlgorithm(), keyAlias, 
@@ -161,7 +161,7 @@ public abstract class IdentityStore {
      * @return the created SSL/TLS context
      * @throws IOException if creating/reading/opening a specified keystore/key manager fails
      * @see #getKeystoreFile(String, String...)
-     * @sse #getKeyManagers(String, String, String...)
+     * @see #getKeyManagers(String, String, String...)
      */
     public SSLContext createTlsContext(String identity, String algorithm, String keyAlias, 
         String contextAlg, String... fallback) throws IOException {

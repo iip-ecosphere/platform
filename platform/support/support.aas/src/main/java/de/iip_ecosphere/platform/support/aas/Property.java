@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.support.aas;
 
+import java.io.Serializable;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -40,7 +41,8 @@ public interface Property extends Element, DataElement {
         /**
          * A setter implementation that does nothing.
          */
-        public static final Consumer<Object> READ_ONLY = (o) -> { };
+        @SuppressWarnings("unchecked")
+        public static final Consumer<Object> READ_ONLY = ((Consumer<Object> & Serializable) (o) -> { });
         
         /**
          * Returns the parent builder.

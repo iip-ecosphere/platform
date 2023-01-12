@@ -246,7 +246,7 @@ public class TaskRegistry {
     }
 
     /**
-     * Cleans up outdated task data after no change within {@link TIMEOUT}. 
+     * Cleans up outdated task data after no change within {@link #getTimeout()}. 
      */
     public static synchronized void cleanup() {
         long now = System.currentTimeMillis();

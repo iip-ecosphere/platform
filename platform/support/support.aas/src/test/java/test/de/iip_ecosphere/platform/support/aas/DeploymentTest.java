@@ -14,7 +14,9 @@ package test.de.iip_ecosphere.platform.support.aas;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Supplier;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -30,6 +32,7 @@ import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.AasPrintVisitor;
 import de.iip_ecosphere.platform.support.aas.AasServer;
 import de.iip_ecosphere.platform.support.aas.AssetKind;
+import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.Registry;
 import de.iip_ecosphere.platform.support.aas.ServerRecipe;
@@ -163,6 +166,7 @@ public class DeploymentTest {
      * @throws IOException shall not occur
      * @throws ExecutionException shall not occur
      */
+    @SuppressWarnings("unchecked")
     @Test
     public void localDynamicSubmodelElementsCollectionPropertyDeployment() throws IOException, ExecutionException {
         final String urn = "urn:::AAS:::testMachines#";
@@ -188,6 +192,8 @@ public class DeploymentTest {
         SubmodelElementCollectionBuilder smcB = sub.createSubmodelElementCollectionBuilder("coll", false, false);
         Assert.assertTrue(smcB.isNew());
         smcB.createPropertyBuilder("prop").setValue(Type.BOOLEAN, true).build();
+        smcB.createPropertyBuilder("prop2").setType(Type.INTEGER)
+            .bind((Supplier<Object> & Serializable) () -> 5, InvocablesCreator.READ_ONLY).build();
         smcB.build();
 
         aas = reg.retrieveAas(urn);
@@ -195,11 +201,8 @@ public class DeploymentTest {
         Assert.assertNotNull(sub);
         SubmodelElementCollection coll = sub.getSubmodelElementCollection("coll");
         Assert.assertNotNull(coll);
-        Property prop = coll.getProperty("prop");
-        Assert.assertNotNull(prop);
-        Assert.assertEquals(true, prop.getValue());
-        prop.setValue(false);
-        Assert.assertEquals(false, prop.getValue());
+        assertProp(coll);
+        assertProp2(coll);
 
         // add dynamically, no sub-model builder available, call buildDeferred at the end
         smcB = sub.createSubmodelElementCollectionBuilder("coll", false, false);
@@ -222,7 +225,7 @@ public class DeploymentTest {
         Assert.assertNotNull(sub);
         coll = sub.getSubmodelElementCollection("coll");
         Assert.assertNotNull(coll);
-        prop = coll.getProperty("prop");
+        Property prop = coll.getProperty("prop");
         Assert.assertNotNull(prop);
         Assert.assertEquals(false, prop.getValue());
 
@@ -243,6 +246,34 @@ public class DeploymentTest {
         Assert.assertEquals("ac", prop.getValue());
         
         server.stop(true);
+    }
+
+    /**
+     * Asserts the expected value of a boolean property before/after change.
+     * 
+     * @param coll the parent collection
+     * @throws ExecutionException if access fails
+     */
+    private void assertProp(SubmodelElementCollection coll) throws ExecutionException {
+        Property prop = coll.getProperty("prop");
+        Assert.assertNotNull(prop);
+        Assert.assertEquals(true, prop.getValue());
+        prop.setValue(false);
+        Assert.assertEquals(false, prop.getValue());
+    }
+
+    /**
+     * Asserts the expected value of an umodifialbe integer property before/after change.
+     * 
+     * @param coll the parent collection
+     * @throws ExecutionException if access fails
+     */
+    private void assertProp2(SubmodelElementCollection coll) throws ExecutionException {
+        Property prop2 = coll.getProperty("prop2");
+        Assert.assertNotNull(prop2);
+        Assert.assertEquals(5, prop2.getValue());
+        prop2.setValue(8);
+        Assert.assertEquals(5, prop2.getValue());
     }
 
     /**

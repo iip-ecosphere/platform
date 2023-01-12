@@ -37,7 +37,6 @@ import de.iip_ecosphere.platform.support.net.UriResolver;
  * 
  * @author Holger Eichelberger, SSE
  */
-@SuppressWarnings("restriction")
 public class UriResolverTest {
 
     private static final String TEST_TEXT = "TEST!";
