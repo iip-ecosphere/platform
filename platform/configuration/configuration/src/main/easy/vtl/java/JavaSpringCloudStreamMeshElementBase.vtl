@@ -178,23 +178,9 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
             if (iId == null || iId.length() == 0) {
                 iId = "dflt";
             }'
-            'serviceSent = Counter.builder("service.sent")
-                .baseUnit("tuple/s")
-                .description("Tuples sent out by a service")
-                .tags("service", "${elt.impl.id}", "application", "${app.id}", "device", Id.getDeviceId(), 
-                    "serviceId", ${s}.getId(), "applicationInstance", iId)
-                .register(metrics.getRegistry());'
-            'serviceReceived = Counter.builder("service.received")
-                .baseUnit("tuple/s")
-                .description("Tuples received by a service")
-                .tags("service", "${elt.impl.id}", "application", "${app.id}", "device", Id.getDeviceId(), 
-                    "serviceId", ${s}.getId(), "applicationInstance", iId)
-                .register(metrics.getRegistry());'
-            'processingTime = io.micrometer.core.instrument.Timer.builder("service.processed")
-                .description("Main processing time of a service")
-                .tags("service", "${elt.impl.id}", "application", "${app.id}", "device", Id.getDeviceId(), 
-                    "serviceId", ${s}.getId(), "applicationInstance", iId)
-                .register(metrics.getRegistry());'
+            'serviceSent = metrics.createServiceSentCounter("${elt.impl.id}", "${app.id}", ${s}.getId(), iId);'
+            'serviceReceived = metrics.createServiceReceivedCounter("${elt.impl.id}", "${app.id}", ${s}.getId(), iId);'
+            'processingTime = metrics.createServiceProcessingTimer("${elt.impl.id}", "${app.id}", ${s}.getId(), iId);'
             '${attachMetricsProvider("${s}")}'
             '${genMapService("${s}")}'
         }

@@ -28,6 +28,7 @@ import org.junit.runners.Suite;
     IvmlSerializerConfig1OldTests.class,
     IvmlRoutingTestTests.class,
     IvmlContainerTests.class,
+    IvmlContainerLxcTests.class,
     StorageFactoryTest.class,
     FallbackLoggerTest.class,
     

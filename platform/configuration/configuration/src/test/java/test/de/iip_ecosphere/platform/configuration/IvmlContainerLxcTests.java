@@ -39,8 +39,23 @@ public class IvmlContainerLxcTests extends AbstractIvmlTests {
      */
     @Test
     public void testContainerTest() throws ExecutionException, IOException {
-        Assume.assumeFalse(SystemUtils.IS_OS_WINDOWS);
-        Assume.assumeTrue(SystemUtils.USER_HOME.startsWith("/home/"));
+        boolean winAndLxcDisabled = false;
+        boolean uxAndHomeOk = false;
+        if (SystemUtils.IS_OS_WINDOWS) {
+            if (Boolean.valueOf(System.getProperty("easy.lxc.failOnError", "true"))) {
+                System.out.println("LXC does not support Windows. This test can run without "
+                    + "container create if -Deasy.lxc.failOnError=false.");
+            } else {
+                winAndLxcDisabled = true;
+            }
+        } else {
+            if (SystemUtils.USER_HOME.startsWith("/home/")) {
+                uxAndHomeOk = true;
+            } else {
+                System.out.println("LXC runs on linx only if the user home is in /home/");
+            }
+        }
+        Assume.assumeTrue(winAndLxcDisabled | uxAndHomeOk);
 
         File gen = new File("gen/tests/ContainerCreationLxc");
         PlatformInstantiator
