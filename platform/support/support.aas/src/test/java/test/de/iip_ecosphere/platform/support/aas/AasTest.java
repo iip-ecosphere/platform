@@ -169,7 +169,7 @@ public class AasTest {
             .build();
         subModelBuilder.createPropertyBuilder(NAME_VAR_VENDOR)
             .setType(Type.STRING)
-            .bind(invC.createGetter(NAME_VAR_VENDOR), invC.createSetter(NAME_VAR_VENDOR))
+            .bindLazy(invC.createGetter(NAME_VAR_VENDOR), invC.createSetter(NAME_VAR_VENDOR))
             .build();
         subModelBuilder.createPropertyBuilder(NAME_VAR_POWCONSUMPTION)
             .setType(Type.DOUBLE)
@@ -181,7 +181,7 @@ public class AasTest {
             .build(Type.NONE);
         subModelBuilder.createOperationBuilder(NAME_OP_RECONFIGURE)
             .addInputVariable(NAME_VAR_LOTSIZE, Type.INTEGER)
-            .setInvocable(invC.createInvocable(NAME_OP_RECONFIGURE))
+            .setInvocableLazy(invC.createInvocable(NAME_OP_RECONFIGURE))
             .build(Type.BOOLEAN);
         subModelBuilder.createOperationBuilder(NAME_OP_STOPMACHINE)
             .setInvocable(invC.createInvocable(NAME_OP_STOPMACHINE))

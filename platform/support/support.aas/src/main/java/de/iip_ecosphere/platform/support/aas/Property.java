@@ -101,7 +101,10 @@ public interface Property extends Element, DataElement {
         public PropertyBuilder setSemanticId(String refValue);
 
         /**
-         * Binds the value of the property against functions, e.g., accessing an underlying object.
+         * Binds the value of the property against functions, e.g., accessing an underlying object. May apply tests 
+         * to avoid known failures, e.g., regarding the type of the {@code invocable}. Use 
+         * {@link #bindLazy(Supplier, Consumer)} to avoid such tests and to take the responsibility for potential later 
+         * runtime errors.
          * 
          * @param get the getter function (use {@link #WRITE_ONLY} for write-only)
          * @param set the setter function called when the setter of the property is called (may be <b>bull</b>,
@@ -110,6 +113,19 @@ public interface Property extends Element, DataElement {
          * @throws IllegalArgumentException may be thrown if {@link #setType(Type)} was not called before
          */
         public PropertyBuilder bind(Supplier<Object> get, Consumer<Object> set);
+
+        /**
+         * Binds the value of the property against functions, e.g., accessing an underlying object.
+         * 
+         * @param get the getter function (use {@link #WRITE_ONLY} for write-only)
+         * @param set the setter function called when the setter of the property is called (may be <b>bull</b>,
+         *   then a new value may override the getter and hold the value locally, use {@link #READ_ONLY} for read-only))
+         * @return <b>this</b>
+         * @see #bind(Supplier, Consumer)
+         */
+        public default PropertyBuilder bindLazy(Supplier<Object> get, Consumer<Object> set) {
+            return bind(get, set);
+        }
 
     }
 

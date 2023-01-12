@@ -68,13 +68,27 @@ public interface Operation extends Element, SubmodelElement {
         public OperationBuilder addInOutVariable(String idShort, Type type);
         
         /**
+         * Sets the invocable of this operation. May apply tests to avoid known failures, 
+         * e.g., regarding the type of the {@code invocable}. Use {@link #setInvocableLazy(Function)}
+         * to avoid such tests and to take the responsibility for potential later runtime errors.
+         * 
+         * @param invocable the invocable
+         * @return <b>this</b>
+         * @throws IllegalArgumentException if the tests on {@code invocable} fail for some reason
+         */
+        public OperationBuilder setInvocable(Function<Object[], Object> invocable);
+
+        /**
          * Sets the invocable of this operation.
          * 
          * @param invocable the invocable
          * @return <b>this</b>
+         * @see #setInvocableLazy(Function)
          */
-        public OperationBuilder setInvocable(Function<Object[], Object> invocable);
-        
+        public default OperationBuilder setInvocableLazy(Function<Object[], Object> invocable) {
+            return setInvocable(invocable);
+        }
+
         /**
          * Convenience method to add the output variable {@value #DEFAULT_RETURN_VAR_NAME} with 
          * the given type and to call {@link #build()}.
