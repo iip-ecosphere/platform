@@ -14,7 +14,7 @@
             <fileset dir="." includes="platformDependencies/**/*.*" />
             <fileset dir="." includes="src/**/*.*" />
             <fileset dir="." includes="gen/**/*.*" />
-            <fileset dir="." includes="container/**/*.*" excludes="DevContainer/**/*" />
+            <fileset dir="." includes="container/**/*.*" excludes="container/DevContainer/**/*" />
             <fileset dir="." includes="resources/**/*.*" />
         </zip>
         <tar destfile="install.tar.gz" compression="gzip">
@@ -22,7 +22,7 @@
             <tarfileset dir="." filemode="755" includes="**/*.sh" excludes="broker/*.sh" />
             <fileset dir="." includes="platformDependencies/**/*.*" />
             <fileset dir="." includes="src/**/*.*" />
-        	<tarfileset dir="." includes="container/**/*" excludes="**/*.sh, DevContainer/**/*" />
+        	<tarfileset dir="." includes="container/**/*" excludes="**/*.sh, container/DevContainer/**/*" />
             <fileset dir="." includes="resources/**/*.*" />
         </tar>
     </target>
