@@ -14,19 +14,13 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 /**
- * Defines the tests to be executed.
+ * Defines the tests to be executed independently.
  * 
  * @author Holger Eichelberger, SSE
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    UtilsTest.class,
-    SimpleStartStopServiceManagerTest.class,
-    ArtifactInfoTest.class,
-    TestLifecycleDescriptor.class,
-    ServiceMgrAndDescriptorTest.class,
-    
-    DescriptorUtilsTest.class
+    ZipCpServiceManagerTest.class
 })
-public class AllTests {
+public class AllTests3 {
 }

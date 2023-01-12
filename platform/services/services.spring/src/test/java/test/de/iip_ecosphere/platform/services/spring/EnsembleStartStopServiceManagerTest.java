@@ -12,13 +12,10 @@
 
 package test.de.iip_ecosphere.platform.services.spring;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,13 +35,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import de.iip_ecosphere.platform.services.ArtifactDescriptor;
-import de.iip_ecosphere.platform.services.ServiceDescriptor;
 import de.iip_ecosphere.platform.services.spring.SpringCloudServiceSetup;
-import de.iip_ecosphere.platform.services.spring.SpringCloudServiceDescriptor;
 import de.iip_ecosphere.platform.services.spring.SpringCloudServiceManager;
 import de.iip_ecosphere.platform.services.spring.StartupApplicationListener;
-import de.iip_ecosphere.platform.services.spring.descriptor.ProcessSpec;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
@@ -54,12 +47,12 @@ import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
  * 
  * @author Holger Eichelberger, SSE
  */
-@SpringBootTest(classes = SimpleStartStopServiceManagerTest.Config.class)
+@SpringBootTest(classes = EnsembleStartStopServiceManagerTest.Config.class)
 @TestPropertySource(locations = "classpath:" + AbstractSetup.DEFAULT_FNAME)
-@ContextConfiguration(initializers = SimpleStartStopServiceManagerTest.Initializer.class)
+@ContextConfiguration(initializers = EnsembleStartStopServiceManagerTest.Initializer.class)
 @Import(SpringCloudServiceSetup.class)
 @RunWith(SpringRunner.class)
-public class SimpleStartStopServiceManagerTest extends AbstractTestServiceManager {
+public class EnsembleStartStopServiceManagerTest extends AbstractTestServiceManager {
 
     private static final ServerAddress BROKER = new ServerAddress(Schema.IGNORE); // localhost, ephemeral
     
@@ -81,42 +74,21 @@ public class SimpleStartStopServiceManagerTest extends AbstractTestServiceManage
     }
     
     /**
-     * Tests a simple start-stop cycle of the {@link SpringCloudServiceManager} with two processes. This test requires 
-     * an actual version of {@code test.simpleStream.spring} in {@code target/jars} - Maven downloads the artifact 
-     * in the compile phase.
+     * Tests a simple start-stop cycle of the {@link SpringCloudServiceManager} in one process as an ensemble. As 
+     * {@link #testSimpleStartStop()}, this test requires an actual version of {@code test.simpleStream.spring}.
      * 
      * @throws ExecutionException shall not occur for successful test
      * @throws IOException shall not occur for successful test
      */
     @Test
-    public void testSimpleStartStop() throws ExecutionException, IOException {
-        doTestStartStop("deployment.yml", new ArtifactAsserter() {
-            
-            private File homePath;
+    public void testEnsembleStartStop() throws ExecutionException, IOException {
+        //assumeTrue(SystemUtils.IS_OS_WINDOWS); // unclear failures on Jenkins
+        doTestStartStop("deployment1.yml", new ArtifactAsserter() {
 
-            @Override
-            public void testDeployment(ArtifactDescriptor aDesc) {
-                ServiceDescriptor sDesc = aDesc.getService("simpleStream-create");
-                Assert.assertTrue(sDesc instanceof SpringCloudServiceDescriptor);
-                ProcessSpec pspec = ((SpringCloudServiceDescriptor) sDesc).getSvc().getProcess();
-                Assert.assertNotNull(pspec);
-                Assert.assertTrue(pspec.isStarted());
-                Assert.assertNotNull(pspec.getArtifacts());
-                Assert.assertEquals(2, pspec.getArtifacts().size());
-
-                homePath = pspec.getHomePath();
-                Assert.assertNotNull(homePath);
-                Assert.assertTrue(homePath.toString().indexOf("${tmp}") < 0); // has been substituted
-                Assert.assertNotNull(pspec.getExecutablePath());
-                Assert.assertTrue(pspec.getExecutablePath().toString().indexOf("${tmp}") < 0); // has been substituted
-                assertFileExists(new File(homePath, "test.txt")); // extracted from artifacts
-                assertFileExists(new File(homePath, "test2.txt"));
-            }
-            
-            @Override
-            public void cleanup(ArtifactDescriptor aDesc) {
-                FileUtils.deleteQuietly(homePath); // for next test
-            }
+            /*@Override
+            public void testDescriptor(ArtifactDescriptor aDesc) {
+                // more specific tests may go here
+            }*/
 
         }, false);
     }
@@ -162,15 +134,6 @@ public class SimpleStartStopServiceManagerTest extends AbstractTestServiceManage
         class Startup extends StartupApplicationListener {
         }
         
-    }
-    
-    /**
-     * Tests known/default values in setup.
-     */
-    @Test
-    public void testSetup() {
-        Assert.assertNotNull(getConfig().getJavaOpts());
-        Assert.assertTrue(getConfig().getJavaOpts().size() > 0);
     }
 
 }
