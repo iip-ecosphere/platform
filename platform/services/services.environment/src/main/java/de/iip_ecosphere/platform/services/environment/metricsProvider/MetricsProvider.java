@@ -66,6 +66,7 @@ import de.iip_ecosphere.platform.support.metrics.SystemMetricsFactory;
  * 
  * @author Miguel Gomez
  */
+@SuppressWarnings("restriction")
 public class MetricsProvider {
 
     public static final List<Tag> EMPTY_TAGS = Collections.unmodifiableList(new ArrayList<Tag>());
