@@ -444,8 +444,8 @@
          <version>${org.apache.maven.compiler.version}</version>
          <configuration>
            <!-- Somehow it does not work with properties, at least on my side -->
-           <source>1.8</source>
-           <target>1.8</target>
+           <source>11</source>
+           <target>11</target>
            <encoding>${java.encoding}</encoding>
          </configuration>
        </plugin>
