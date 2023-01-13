@@ -170,7 +170,7 @@
     <rabbitmq.version>5.15.0</rabbitmq.version>
     <com.hivemq.version>2020.4</com.hivemq.version> <!-- Requires JDK 11 -->
     <io.moquette.version>0.13</io.moquette.version>
-    <org.apache.qpid.version>8.0.2</org.apache.qpid.version>
+    <org.apache.qpid.version>9.0.0</org.apache.qpid.version>
     
     <!-- When updating spring (cloud streams), please check whether the BinderFix in transport.spring is still needed -->
     
@@ -192,8 +192,8 @@
     <com.google.guava.version>22.0</com.google.guava.version>
 
     <!-- for now due to edge deployment/initial experience -->
-    <maven.compiler.target>1.8</maven.compiler.target>
-    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>11</maven.compiler.target>
+    <maven.compiler.source>11</maven.compiler.source>
     <java.encoding>Cp1252</java.encoding>
   </properties>
 
