@@ -72,6 +72,7 @@
      <module>securityDataProtection/security.services.kodex</module>
      <!-- reusable intelligent services -->
      <module>reusableIntelligentServices/kiServices.functions</module>
+     <module>reusableIntelligentServices/kiServices.rapidminer.rtsaFake</module>
      <module>reusableIntelligentServices/kiServices.rapidminer.rtsa</module>
      <!-- configuration -->
      <module>configuration/configuration</module> <!-- requires next -->
