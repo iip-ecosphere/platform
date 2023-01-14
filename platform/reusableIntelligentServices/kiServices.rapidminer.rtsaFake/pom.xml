@@ -107,7 +107,7 @@
                   <goals>
                       <goal>copy-dependencies</goal>
                   </goals>
-                  <phase>package</phase>
+                  <phase>generate-test-resources</phase>
                   <configuration>
                       <prependGroupId>true</prependGroupId>
                       <outputDirectory>${project.build.directory}/fake/rtsa/lib</outputDirectory>
