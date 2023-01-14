@@ -70,6 +70,12 @@
     <dependency>
         <groupId>net.ssehub.easy</groupId>
         <artifactId>core</artifactId>
+        <exclusions>
+        	<exclusion> <!-- already there in JDK 11, overlap in module path -->
+        		<groupId>xml-apis</groupId>
+        		<artifactId>xml-apis</artifactId>
+        	</exclusion>
+        </exclusions>
     </dependency>
     <dependency>
         <groupId>net.ssehub.easy</groupId>
