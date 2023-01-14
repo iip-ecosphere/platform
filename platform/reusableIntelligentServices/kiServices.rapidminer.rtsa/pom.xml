@@ -3,7 +3,7 @@
 
   <artifactId>kiServices.rapidminer.rtsa</artifactId>
   <packaging>jar</packaging>
-  <name>BasicMaven</name>
+  <name>RTSA service</name>
   <description>Integration of the RapidMiner Real-Time Intelligent Scoring Agent.</description>
 
   <parent>
@@ -51,12 +51,6 @@
       <artifactId>slf4j-simple</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-		<groupId>com.sparkjava</groupId>
-		<artifactId>spark-core</artifactId>
-		<version>2.9.3</version>
-		<scope>test</scope>
-	</dependency>
   </dependencies>
   
   <build>
@@ -69,12 +63,21 @@
               <execution>
                   <id>copy-dependencies</id>
                   <goals>
-                      <goal>copy-dependencies</goal>
+                      <goal>unpack</goal>
                   </goals>
-                  <phase>package</phase>
+                  <phase>process-test-resources</phase>
                   <configuration>
+                      <artifactItems>
+                        <artifactItem>
+                          <groupId>de.iip-ecosphere.platform</groupId>
+                          <artifactId>kiServices.rapidminer.rtsaFake</artifactId>
+                          <version>${project.version}</version>
+                          <classifier>bin</classifier>
+                          <type>zip</type>
+                        </artifactItem>
+                      </artifactItems>
                       <prependGroupId>true</prependGroupId>
-                      <outputDirectory>${project.build.directory}/fake/rtsa/lib</outputDirectory>
+                      <outputDirectory>${project.build.directory}/fake</outputDirectory>
                       <overWriteReleases>false</overWriteReleases>
                       <overWriteSnapshots>true</overWriteSnapshots>
                       <overWriteIfNewer>true</overWriteIfNewer>
@@ -96,46 +99,6 @@
                 </configuration>
               </execution>
           </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-	  	<artifactId>maven-antrun-plugin</artifactId>
-	    <version>1.8</version>
-	    <executions>
-	        <execution>
-	            <phase>process-test-resources</phase>
-	            <configuration>
-	                <target>
-                        <mkdir dir="${project.build.directory}/fake"/>
-	                    
-                        <mkdir dir="${project.build.directory}/fake/rtsa"/>
-	                    <mkdir dir="${project.build.directory}/fake/rtsa/bin"/>
-                        <mkdir dir="${project.build.directory}/fake/rtsa/home"/>
-                        <mkdir dir="${project.build.directory}/fake/rtsa/deployments"/>
-                        <mkdir dir="${project.build.directory}/fake/rtsa/lib"/>
-                        <jar basedir="${project.build.directory}/test-classes" destfile="${project.build.directory}/fake/rtsa/lib/fakeRtsa.jar" includes="test/de/iip_ecosphere/platform/kiServices/rapidminer/rtsa/Fake*.class, simplelogger.properties">
-                        </jar>
-                        <zip basedir="${project.build.directory}/fake/rtsa" destfile="${project.build.directory}/fake/RTSA-0.14.5.zip"/>
-
-                        <mkdir dir="${project.build.directory}/fake/empty"/>
-                        
-                        <mkdir dir="${project.build.directory}/fake/deployment"/>
-                        <mkdir dir="${project.build.directory}/fake/deployment/home"/>
-                        <mkdir dir="${project.build.directory}/fake/deployment/home/deployments"/>
-                        <jar basedir="${project.build.directory}/fake/empty" destfile="${project.build.directory}/fake/deployment/home/deployments/fakeDeployment.jar">
-                        </jar>
-                        <zip basedir="${project.build.directory}/fake/deployment" destfile="${project.build.directory}/fake/myRtsaexample-0.1.0.zip"/>
-                            
-                        <!-- for testing -->
-                        <mkdir dir="${project.build.directory}/fake/deployments"/>
-                        <copy file="${project.build.directory}/fake/myRtsaexample-0.1.0.zip" todir="${project.build.directory}/fake/deployments"/>
-	                </target>
-	            </configuration>
-	            <goals>
-	                <goal>run</goal>
-	            </goals>
-	        </execution>
-	    </executions>      
       </plugin>
     </plugins>
   </build>

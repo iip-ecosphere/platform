@@ -206,7 +206,7 @@ public class RtsaRestService<I, O> extends AbstractRestProcessService<I, O>  {
     protected String getMainClass(File rtsaPath) {
         String result;
         if (isFakeRtsa(rtsaPath)) {
-            result = "test.de.iip_ecosphere.platform.kiServices.rapidminer.rtsa.FakeRtsa";
+            result = "de.iip_ecosphere.platform.kiServices.rapidminer.rtsaFake.FakeRtsa";
         } else {
             result = "com.rapidminer.execution.scoring.Application";
         }

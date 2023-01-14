@@ -6,20 +6,7 @@ So far, the integration is preliminary, i.e., separating mechanisms, ports and t
 
 RTSA usually ships in one ZIP for the agent (to be named RTSA-version.ZIP) and one or multiple deployments (one per service, named according to the service). The RTSA ZIP may contain the RTSA folders directly in the top-level directory or in one singular directory located in the top-level directory. If a special packaging is applied, i.e., RTSA and deployment are shipped together, e.g., for experimental purposes, use an empty RTSA ZIP and an all-encompassing deployment.ZIP including the RTSA.
 
-For test packaging in the platform/application instantiation, the build process of this package creates two fake ZIP files in `target/fake`, one for RTSA and one for a deployment. The fake RTSA contains the respective class from testing, the deployment ZIP is intentionally more or less empty. For testing data flows, the Fake RTSA can be configured to react on incoming data. The deployment ZIP shall therefore contain a YAML file called `spec.yml` according to the following format:
+Testing of this component relies on the [fake version of RTSA](https://github.com/iip-ecosphere/platform/tree/main/platform/reusableIntelligentServices/kiServices.rapidminer.rtsaFake/README.md).
 
-    path: <String>
-    mappings:
-      <String>: <String>
-
-The `path` indicates the desired REST path/endpoint attached to the base path services. The mappings relate a field name in the input data to a function specification. As function specification, we currently offer 
-- PASS: just pass the value on
-- SKIP: do not emit the value to output, filter
-- RANDOM_BOOLEAN: the value of the field shall be a random boolean
-- RANDOM_PROBABILITY: the value of the field shall be a random double in [0;1]. 
-- RANDOM_SELECT(args): the value shall be a random selection from args, whereby args are separated by commas. Strings may be given in usual quotes.
-Fields not given in the data but specified in `spec.yml` will be added to the output. 
-
-Building and testing in an IDE requires execution of Maven as neither classpath file nor jar folder for fake RTSA may exist.
-Manual building may require `mvn package -DskipTests -Djacoco.skip=true`. If you are **not running the tests with Java 8**, specify `-Diip.test.java8=<path to java binary for JDK 8>`.
+If you are **not running the tests with Java 8**, specify `-Diip.test.java8=<path to java binary for JDK 8>`.
 

@@ -66,7 +66,7 @@ public class RtsaRestServiceTest {
 
         @Override
         protected String getMainClass(File rtsaPath) {
-            return "test.de.iip_ecosphere.platform.kiServices.rapidminer.rtsa.FakeRtsa";
+            return "de.iip_ecosphere.platform.kiServices.rapidminer.rtsaFake.FakeRtsa";
         }
         
         @Override
