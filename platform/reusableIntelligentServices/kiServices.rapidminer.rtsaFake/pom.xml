@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>kiServices.rapidminer.rtsaFake</artifactId>
+  <packaging>jar</packaging>
+  <name>Fake-RTSA</name>
+  <description>Fake RTSA implementation for testing.</description>
+
+  <parent>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>platformDependencies</artifactId>
+     <version>0.5.0-SNAPSHOT</version>
+     <relativePath></relativePath>
+  </parent>
+
+  <dependencies>
+    <dependency>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <artifactId>support.aas</artifactId>
+      <version>${project.version}</version>
+    </dependency>     
+    <dependency>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <artifactId>support.iip-aas</artifactId>
+      <version>${project.version}</version>
+    </dependency>     
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>com.sparkjava</groupId>
+        <artifactId>spark-core</artifactId>
+        <version>2.9.3</version>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  
+  <build>
+    <plugins>
+       <plugin>
+         <artifactId>maven-compiler-plugin</artifactId>
+         <version>${org.apache.maven.compiler.version}</version>
+           <configuration>
+             <!-- Must be the JDK of RTSA -->
+             <source>8</source>
+             <target>8</target>
+             <encoding>${java.encoding}</encoding>
+           </configuration>
+       </plugin>      
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.8</version>
+        <executions>
+            <execution>
+                <phase>process-test-resources</phase>
+                <configuration>
+                    <target>
+                        <mkdir dir="${project.build.directory}/fake"/>
+                        
+                        <mkdir dir="${project.build.directory}/fake/rtsa"/>
+                        <mkdir dir="${project.build.directory}/fake/rtsa/bin"/>
+                        <mkdir dir="${project.build.directory}/fake/rtsa/home"/>
+                        <mkdir dir="${project.build.directory}/fake/rtsa/deployments"/>
+                        <mkdir dir="${project.build.directory}/fake/rtsa/lib"/>
+                        <delete file="${project.build.directory}/fake/rtsa/lib/fakeRtsa.jar"/>
+                        <jar basedir="${project.build.directory}/classes" destfile="${project.build.directory}/fake/rtsa/lib/fakeRtsa.jar" includes="de/iip_ecosphere/platform/kiServices/rapidminer/rtsaFake/*.class, simplelogger.properties">
+                        </jar>
+                        <delete file="${project.build.directory}/fake/RTSA-0.14.5.zip"/>
+                        <zip basedir="${project.build.directory}/fake/rtsa" destfile="${project.build.directory}/fake/RTSA-0.14.5.zip"/>
+
+                        <mkdir dir="${project.build.directory}/fake/empty"/>
+                        
+                        <mkdir dir="${project.build.directory}/fake/deployment"/>
+                        <mkdir dir="${project.build.directory}/fake/deployment/home"/>
+                        <mkdir dir="${project.build.directory}/fake/deployment/home/deployments"/>
+                        <jar basedir="${project.build.directory}/fake/empty" destfile="${project.build.directory}/fake/deployment/home/deployments/fakeDeployment.jar">
+                        </jar>
+                        <zip basedir="${project.build.directory}/fake/deployment" destfile="${project.build.directory}/fake/myRtsaexample-0.1.0.zip"/>
+                            
+                        <!-- for testing -->
+                        <mkdir dir="${project.build.directory}/fake/deployments"/>
+                        <copy file="${project.build.directory}/fake/myRtsaexample-0.1.0.zip" todir="${project.build.directory}/fake/deployments"/>
+                    </target>
+                </configuration>
+                <goals>
+                    <goal>run</goal>
+                </goals>
+            </execution>
+        </executions>      
+      </plugin>
+
+      <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <version>3.2.0</version>
+          <executions>
+              <execution>
+                  <id>copy-dependencies</id>
+                  <goals>
+                      <goal>copy-dependencies</goal>
+                  </goals>
+                  <phase>package</phase>
+                  <configuration>
+                      <prependGroupId>true</prependGroupId>
+                      <outputDirectory>${project.build.directory}/fake/rtsa/lib</outputDirectory>
+                      <overWriteReleases>false</overWriteReleases>
+                      <overWriteSnapshots>true</overWriteSnapshots>
+                      <overWriteIfNewer>true</overWriteIfNewer>
+                      <!-- sync exclusions with build-classpath -->
+                  </configuration>
+              </execution>
+              <execution>
+                <id>build-classpath</id>
+                <phase>compile</phase>
+                <goals>
+                  <goal>build-classpath</goal>
+                </goals>
+                <configuration>
+                    <outputFile>${project.build.directory}/test-classes/classpath</outputFile>
+                    <prependGroupId>false</prependGroupId>
+                    <overWriteIfNewer>true</overWriteIfNewer>
+                    <includeScope>test</includeScope>
+                    <!-- sync exclusions with copy-dependencies -->
+                </configuration>
+              </execution>
+          </executions>
+      </plugin>
+      
+      <plugin>
+         <groupId>org.apache.maven.plugins</groupId>
+         <artifactId>maven-assembly-plugin</artifactId>
+         <version>3.1.1</version>
+         <executions>
+             <execution>
+                 <id>make-assembly</id>
+                 <phase>package</phase>
+                 <goals>
+                     <goal>single</goal>
+                 </goals>
+                 <configuration>
+                     <descriptors>
+                         <descriptor>src/main/assembly/assembly.xml</descriptor>
+                     </descriptors>
+                     <appendAssemblyId>false</appendAssemblyId>
+                     <finalName>${project.build.finalName}-bin</finalName>
+                 </configuration>
+             </execution>
+         </executions>
+        </plugin>
+
+    </plugins>
+  </build>
+
+</project>
