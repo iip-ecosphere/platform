@@ -32,9 +32,6 @@ import java.util.stream.Stream;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import de.iip_ecosphere.platform.support.JarUtils;
-import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
-import de.iip_ecosphere.platform.support.iip_aas.config.CmdLine;
 import spark.Route;
 import spark.Spark;
 

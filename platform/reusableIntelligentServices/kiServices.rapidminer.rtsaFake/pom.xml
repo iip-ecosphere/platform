@@ -14,16 +14,9 @@
   </parent>
 
   <dependencies>
-    <dependency>
-      <groupId>de.iip-ecosphere.platform</groupId>
-      <artifactId>support.aas</artifactId>
-      <version>${project.version}</version>
-    </dependency>     
-    <dependency>
-      <groupId>de.iip-ecosphere.platform</groupId>
-      <artifactId>support.iip-aas</artifactId>
-      <version>${project.version}</version>
-    </dependency>     
+    
+    <!-- Maximum JDK 1.8 -> RTSA!!! No direct IIP-Ecosphere dependencies!  -->
+
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
@@ -32,6 +25,19 @@
         <groupId>com.sparkjava</groupId>
         <artifactId>spark-core</artifactId>
         <version>2.9.3</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+    </dependency>     
+    <dependency>
+      <groupId>org.yaml</groupId>
+      <artifactId>snakeyaml</artifactId>
+      <scope>compile</scope>
     </dependency>
 
     <dependency>

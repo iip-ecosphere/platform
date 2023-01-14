@@ -1,6 +1,6 @@
 # IIP-Ecosphere platform: RapidMiner RTSA fake
 
-Fake version of the [RapidMiner](https://rapidminer.com) [Real-Time Scoring Agent (RTSA)](https://docs.rapidminer.com/latest/scoring-agent/install/) for testing. Please note that the **original RTSA** requires **exactly JDK 8** while the **fake RTSA** emulates RTSA and thus must be JDK compliant but runs with **JDK 8 and newer**.
+Fake version of the [RapidMiner](https://rapidminer.com) [Real-Time Scoring Agent (RTSA)](https://docs.rapidminer.com/latest/scoring-agent/install/) for testing. Please note that the **original RTSA** requires **exactly JDK 8** while the **fake RTSA** emulates RTSA and thus must be JDK compliant but runs with **JDK 8 and newer**. Anway, no dependencies that require a more modern JDK than 8 are allowed here, i.e., also no dependencies to the IIP-Ecosphere platform.
 
 For test packaging in the platform/application instantiation, the build process of this package creates two fake ZIP files in `target/fake`, one for RTSA and one for a deployment. The fake RTSA contains the respective class from testing, the deployment ZIP is intentionally more or less empty. For testing data flows, the Fake RTSA can be configured to react on incoming data. The deployment ZIP shall therefore contain a YAML file called `spec.yml` according to the following format:
 
