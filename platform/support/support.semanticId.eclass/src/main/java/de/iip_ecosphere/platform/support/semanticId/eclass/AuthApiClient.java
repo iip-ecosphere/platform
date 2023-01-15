@@ -13,15 +13,6 @@
 package de.iip_ecosphere.platform.support.semanticId.eclass;
 
 import javax.net.ssl.SSLContext;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-
-import org.glassfish.jersey.client.ClientConfig;
-import org.glassfish.jersey.client.HttpUrlConnectorProvider;
-import org.glassfish.jersey.jackson.JacksonFeature;
-import org.glassfish.jersey.jsonp.JsonProcessingFeature;
-import org.glassfish.jersey.logging.LoggingFeature;
-import org.glassfish.jersey.media.multipart.MultiPartFeature;
 
 import de.iip_ecosphere.platform.support.identities.IdentityToken;
 import de.iip_ecosphere.platform.support.semanticId.eclass.handler.ApiClient;
@@ -34,6 +25,7 @@ import de.iip_ecosphere.platform.support.semanticId.eclass.handler.ApiClient;
  */
 public class AuthApiClient extends ApiClient {
 
+    @SuppressWarnings("unused")
     private static SSLContext context;
 
     /**

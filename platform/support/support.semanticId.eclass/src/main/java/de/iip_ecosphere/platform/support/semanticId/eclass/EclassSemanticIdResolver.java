@@ -25,7 +25,6 @@ import java.util.regex.PatternSyntaxException;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.SSLContext;
 import javax.ws.rs.ProcessingException;
 
 import org.slf4j.LoggerFactory;

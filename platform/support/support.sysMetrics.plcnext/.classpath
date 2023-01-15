@@ -25,23 +25,27 @@
 	</classpathentry>
 	<classpathentry kind="src" output="target/classes" path="target/generated-sources/protobuf/java">
 		<attributes>
+			<attribute name="ignore_optional_problems" value="true"/>
 			<attribute name="optional" value="true"/>
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry excluding="**" kind="src" output="target/classes" path="src/main/proto">
 		<attributes>
+			<attribute name="ignore_optional_problems" value="true"/>
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="src" output="target/classes" path="target/generated-sources/protobuf/grpc-java">
 		<attributes>
+			<attribute name="ignore_optional_problems" value="true"/>
 			<attribute name="optional" value="true"/>
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-11">
 		<attributes>
+			<attribute name="module" value="true"/>
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
