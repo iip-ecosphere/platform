@@ -71,7 +71,6 @@
                           <type>zip</type>
                         </artifactItem>
                       </artifactItems>
-                      <prependGroupId>true</prependGroupId>
                       <outputDirectory>${project.build.directory}/fake</outputDirectory>
                       <overWriteReleases>false</overWriteReleases>
                       <overWriteSnapshots>true</overWriteSnapshots>
