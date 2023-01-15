@@ -50,10 +50,11 @@ public class ParserUtils {
                     + e.getMessage() + ", falling back to default constructor");
             }
             if (null == instance) {
-                instance = parserClass.newInstance();
+                instance = parserClass.getDeclaredConstructor().newInstance();
             }
             result = (InputParser<?>) instance;
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | ClassCastException e) {
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | ClassCastException 
+            | NoSuchMethodException | InvocationTargetException e) {
             String loaders = ClassLoaderUtils.hierarchyToString(loader);
             LoggerFactory.getLogger(ParserUtils.class).error("Cannot instantiate parser of type '" 
                 + className + " via " + loaders + "': " + e.getClass().getSimpleName() + " " + e.getMessage() 

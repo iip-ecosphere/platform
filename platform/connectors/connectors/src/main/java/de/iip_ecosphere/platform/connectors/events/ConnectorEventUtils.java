@@ -12,6 +12,8 @@
 
 package de.iip_ecosphere.platform.connectors.events;
 
+import java.lang.reflect.InvocationTargetException;
+
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.connectors.parser.InputParser;
@@ -40,9 +42,10 @@ public class ConnectorEventUtils {
         ConnectorInputHandler<T> result = null;
         try {
             Class<?> handlerClass = loader.loadClass(className);
-            Object instance = handlerClass.newInstance();
+            Object instance = handlerClass.getDeclaredConstructor().newInstance();
             result = (ConnectorInputHandler<T>) instance;
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | ClassCastException e) {
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException 
+            | ClassCastException | NoSuchMethodException | InvocationTargetException e) {
             String loaders = ClassLoaderUtils.hierarchyToString(loader);
             LoggerFactory.getLogger(ConnectorEventUtils.class).error("Cannot instantiate input handler of type '" 
                 + className + " via " + loaders + "': " + e.getClass().getSimpleName() + " " + e.getMessage() 
