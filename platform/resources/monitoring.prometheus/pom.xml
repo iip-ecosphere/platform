@@ -30,7 +30,7 @@
     <dependency>
       <groupId>org.apache.tomcat.embed</groupId>
       <artifactId>tomcat-embed-core</artifactId>
-      <version>8.5.41</version>
+      <version>8.5.41</version><!--$NO-MVN-MAN-VER$-->
     </dependency>
 	<dependency>
   		<groupId>io.prometheus</groupId>
@@ -46,7 +46,7 @@
 	<dependency>
   		<groupId>io.prometheus</groupId>
   		<artifactId>simpleclient_pushgateway</artifactId>
-        <version>${io.prometheus.version}</version>
+        <version>${io.prometheus.version}</version><!--$NO-MVN-MAN-VER$-->
 	</dependency>
 	<dependency>
     	<groupId>io.prometheus</groupId>
