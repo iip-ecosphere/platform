@@ -27,7 +27,7 @@ pidBroker=$!
 cd $dir
 
 echo "Broker PID $pidBroker"
-mvn -P App exec:java -Diip.springStart.args="--iip.test.stop=30000 --iip.test.brokerPort=$brokerPort" > log &
+mvn -P App exec:java -Diip.test.java8=/usr/lib/jvm/java-8-openjdk-amd64/bin/java -Diip.springStart.args="--iip.test.stop=30000 --iip.test.brokerPort=$brokerPort" > log &
 pidTest=$!
 echo "Test started $pidTest"
 

@@ -10,7 +10,7 @@ The application consists of three (micro)-services, which are composed in the co
 This example consists of several pieces:
   * An IVML configuration for the application in `src/test/easy/ExampleRTSA.ivml`.
   * An implementation of the Java services used in the application in `src/main/java`
-  * A fake implementation of RapidMiner RTSA in `resources`. If you have an RTSA at hands, just overwrite the packaged RTSA as well as the deployment with respective files in `resources`. Please note that the **original RTSA** requires **exactly JDK 8** while the **fake RTSA** runs with **JDK 8 and newer**.
+  * A fake implementation of RapidMiner RTSA in `resources`. If you have an RTSA at hands, just overwrite the packaged RTSA as well as the deployment with respective files in `resources`. Please note that the **original RTSA** requires **exactly JDK 8** while the **fake RTSA** runs with **JDK 8 and newer**. Execution may require `-Diip.test.java8=<location of java 8 jvm executable>`
   * `pom.xml` for the application. 
 
 In case you have to change the resources folder, e.g., to utilize licensed resources, you should add `-Diip.resources="NewFolderName"` to the commands (default value is `resources`). For example `mvn -P EasyGen exec:java@generateApps -Diip.resources="NewFolderName"`.
