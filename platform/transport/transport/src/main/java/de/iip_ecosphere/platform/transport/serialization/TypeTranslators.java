@@ -13,6 +13,7 @@
 package de.iip_ecosphere.platform.transport.serialization;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 
 import org.apache.commons.text.StringEscapeUtils;
 import org.slf4j.LoggerFactory;
@@ -151,8 +152,9 @@ public class TypeTranslators {
         TypeTranslator<?, ?> result = null;
         try {
             Class<?> translatorClass = loader.loadClass(className);
-            result = (TypeTranslator<?, ?>) translatorClass.newInstance();
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | ClassCastException e) {
+            result = (TypeTranslator<?, ?>) translatorClass.getDeclaredConstructor().newInstance();
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | ClassCastException 
+            | NoSuchMethodException | InvocationTargetException e) {
             String loaders = ClassLoaderUtils.hierarchyToString(loader);
             LoggerFactory.getLogger(TypeTranslators.class).error("Cannot instantiate instance of type '" 
                 + className + " via " + loaders + "': " + e.getClass().getSimpleName() + " " + e.getMessage());
