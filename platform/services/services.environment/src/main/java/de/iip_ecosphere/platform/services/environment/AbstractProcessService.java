@@ -570,7 +570,7 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractRunna
      * @return the id, may be negative if {@code proc} is <b>null</b> or the id cannot be obtained
      */
     public static long getProcessId(Process proc) {
-        return proc.pid();
+        return null == proc ? -1 : proc.pid();
     }
     
     /**
