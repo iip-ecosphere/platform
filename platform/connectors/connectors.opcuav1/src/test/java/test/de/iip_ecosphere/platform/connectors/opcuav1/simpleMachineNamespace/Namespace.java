@@ -28,6 +28,7 @@ import org.eclipse.milo.opcua.sdk.server.nodes.UaFolderNode;
 import org.eclipse.milo.opcua.sdk.server.nodes.UaMethodNode;
 import org.eclipse.milo.opcua.sdk.server.nodes.UaNode;
 import org.eclipse.milo.opcua.sdk.server.nodes.UaVariableNode;
+import org.eclipse.milo.opcua.sdk.server.nodes.UaVariableNode.UaVariableNodeBuilder;
 import org.eclipse.milo.opcua.sdk.server.util.SubscriptionModel;
 import org.eclipse.milo.opcua.sdk.server.model.nodes.objects.BaseEventTypeNode;
 import org.eclipse.milo.opcua.sdk.server.model.nodes.objects.ServerTypeNode;
@@ -389,7 +390,7 @@ public class Namespace extends ManagedNamespaceWithLifecycle {
         NodeId dataTypeId = type.toNodeIdOrThrow(getServer().getNamespaceTable());
         NodeId binaryEncodingId = encoding.toNodeIdOrThrow(getServer().getNamespaceTable());
 
-        UaVariableNode customStructTypeVariable = UaVariableNode.builder(getNodeContext())
+        UaVariableNode customStructTypeVariable = new UaVariableNodeBuilder(getNodeContext())
             .setNodeId(newNodeId(parent.getBrowseName().getName() + "/" + name))
             .setAccessLevel(AccessLevel.READ_WRITE)
             .setUserAccessLevel(AccessLevel.READ_WRITE)

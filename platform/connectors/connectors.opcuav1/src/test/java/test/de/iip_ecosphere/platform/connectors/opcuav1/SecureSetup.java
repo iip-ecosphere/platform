@@ -235,7 +235,7 @@ public class SecureSetup extends ServerSetup {
             .setTrustListManager(trustListManager)
             .setCertificateValidator(certificateValidator)
             .setHttpsKeyPair(httpsKeyPair)
-            .setHttpsCertificate(httpsCertificate)
+            .setHttpsCertificateChain(new X509Certificate[] {httpsCertificate})
             .setIdentityValidator(new CompositeValidator(identityValidator, x509IdentityValidator));
     }
 
