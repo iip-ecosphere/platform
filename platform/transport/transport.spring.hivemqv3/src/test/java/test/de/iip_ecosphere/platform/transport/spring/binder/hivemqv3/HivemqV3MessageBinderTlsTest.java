@@ -20,7 +20,6 @@ import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.transport.spring.binder.hivemqv3.HivemqV3Client;
 import de.iip_ecosphere.platform.transport.spring.binder.hivemqv3.HivemqV3Configuration;
-import de.iip_ecosphere.platform.transport.spring.binder.hivemqv3.HivemqV3MessageBinder;
 
 /**
  * Runs {@link HivemqV3MessageBinderTest} with TLS.

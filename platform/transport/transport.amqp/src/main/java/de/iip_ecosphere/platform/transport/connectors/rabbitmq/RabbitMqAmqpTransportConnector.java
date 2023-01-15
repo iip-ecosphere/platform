@@ -144,7 +144,6 @@ public class RabbitMqAmqpTransportConnector extends AbstractTransportConnector {
         return streamName;
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public void connect(TransportParameter params) throws IOException {
         super.connect(params);
