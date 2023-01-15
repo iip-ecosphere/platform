@@ -155,7 +155,7 @@ public class FakeRtsa {
                         FileInputStream fis = new FileInputStream(d);
                         JarUtils.extractZip(fis, baseDirPath);
                         fis.close();
-                        System.out.println(" - unzipped: " + d.getName());
+                        System.out.println(" - unzipped: " + d.getName() + " (" + d + ")" + " to " + baseDirPath);
                     } catch (IOException e) {
                         System.out.println(" - Cannot unzip deployment " + d.getName() + ": " + e.getMessage());
                     }

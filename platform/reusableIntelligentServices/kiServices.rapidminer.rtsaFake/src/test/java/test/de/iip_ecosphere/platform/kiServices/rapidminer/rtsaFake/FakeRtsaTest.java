@@ -31,7 +31,7 @@ public class FakeRtsaTest {
      */
     @Test
     public void testFakeRtsa() throws IOException {
-        System.setProperty("scoring-agent.baseDir", "src/test/resources");
+        System.setProperty("scoring-agent.baseDir", "target/tmp/rtsa"); // folder created as part of packaging
         FakeRtsa.main(new String[] {});
         TimeUtils.sleep(6000); // wait to be initialized
         // could send/receive a bit data here

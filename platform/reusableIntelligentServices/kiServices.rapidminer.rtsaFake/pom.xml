@@ -83,6 +83,7 @@
                         <zip basedir="${project.build.directory}/fake/rtsa" destfile="${project.build.directory}/fake/RTSA-0.14.5.zip"/>
 
                         <mkdir dir="${project.build.directory}/fake/empty"/>
+                        <copy file="src/test/resources/spec.yml" todir="${project.build.directory}/fake/empty" />
                         
                         <mkdir dir="${project.build.directory}/fake/deployment"/>
                         <mkdir dir="${project.build.directory}/fake/deployment/home"/>
@@ -92,8 +93,10 @@
                         <zip basedir="${project.build.directory}/fake/deployment" destfile="${project.build.directory}/fake/myRtsaexample-0.1.0.zip"/>
                             
                         <!-- for testing -->
-                        <mkdir dir="${project.build.directory}/fake/deployments"/>
-                        <copy file="${project.build.directory}/fake/myRtsaexample-0.1.0.zip" todir="${project.build.directory}/fake/deployments"/>
+                        <delete dir="${project.build.directory}/tmp/rtsa"/>
+                        <mkdir dir="${project.build.directory}/tmp/rtsa"/>
+                        <unzip src="${project.build.directory}/fake/RTSA-0.14.5.zip" dest="${project.build.directory}/tmp/rtsa"/>
+                        <copy file="${project.build.directory}/fake/myRtsaexample-0.1.0.zip" todir="${project.build.directory}/tmp/rtsa/deployments"/>
                     </target>
                 </configuration>
                 <goals>
