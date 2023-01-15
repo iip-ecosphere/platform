@@ -20,9 +20,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.PrintWriter;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
@@ -573,34 +570,7 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractRunna
      * @return the id, may be negative if {@code proc} is <b>null</b> or the id cannot be obtained
      */
     public static long getProcessId(Process proc) {
-        // https://stackoverflow.com/questions/4750470/how-to-get-pid-of-process-ive-just-started-within-java-program
-        // only available since Java 9
-        long result = -1;
-        if (null != proc) {
-            Class<?> cls = proc.getClass();
-            try {
-                Method m = cls.getDeclaredMethod("pid");
-                result = (long) m.invoke(proc); // declared as integer
-            } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-            }
-            if (result < 0) {
-                try { // Windows
-                    Field f = cls.getDeclaredField("handle");
-                    f.setAccessible(true);
-                    result = (long) f.get(proc); // declared as long
-                } catch (NoSuchFieldException | IllegalAccessException e) {
-                }
-            }
-            if (result < 0) {
-                try { // Unix-like
-                    Field f = cls.getDeclaredField("pid");
-                    f.setAccessible(true);
-                    result = (int) f.get(proc); // declared as integer
-                } catch (NoSuchFieldException | IllegalAccessException e) {
-                }
-            }
-        }
-        return result;
+        return proc.pid();
     }
     
     /**
