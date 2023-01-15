@@ -444,12 +444,14 @@
          <version>${org.apache.maven.compiler.version}</version>
          <configuration>
            <!-- Somehow it does not work with properties, at least on my side -->
-           <source>11</source>
-           <target>11</target>
+           <source>${maven.compiler.source}</source>
+           <target>${maven.compiler.target}</target>
            <encoding>${java.encoding}</encoding>
          </configuration>
        </plugin>
-       
+
+       <!-- Java 11 complains about links from non-module to module see 
+           https://stackoverflow.com/questions/58836862/jdk-11-and-javadoc -->       
        <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
@@ -457,9 +459,11 @@
         <configuration>
           <show>private</show>
           <encoding>${java.encoding}</encoding>
-          <source>1.8</source>
+          <source>8</source>
           <excludePackageNames>*.proto.*</excludePackageNames>
           <failOnError>false</failOnError>
+          <detectJavaApiLink>false</detectJavaApiLink> 
+          <detectOfflineLinks>false</detectOfflineLinks>
         </configuration>
         <executions>
           <execution>
@@ -600,6 +604,8 @@
                                         <goal>unpack</goal>
                                         <goal>copy</goal>
                                         <goal>build-classpath</goal>                                        
+                                        <goal>unpack-dependencies</goal>
+                                        <goal>copy-dependencies</goal>>
                                     </goals>
                                 </pluginExecutionFilter>
                                 <action>
