@@ -72,10 +72,7 @@ public class RtsaRestService<I, O> extends AbstractRestProcessService<I, O>  {
         File rtsaPath = selectNotNull(sSpec, s -> s.getExecutablePath(), new File("./src/main/resources/rtsa"));
         File origRtsaPath = rtsaPath;
         rtsaPath = checkNesting(rtsaPath);
-        String javaKey = isFakeRtsa(rtsaPath) 
-            ? InstalledDependenciesSetup.getJavaKey() // fake shall (soon) run with any java
-            : InstalledDependenciesSetup.KEY_JAVA_8; // fixed restriction for RTSA - do not change!
-        File exe = InstalledDependenciesSetup.location(javaKey);
+        File exe = InstalledDependenciesSetup.location(InstalledDependenciesSetup.KEY_JAVA_8);
         home = selectNotNull(sSpec, s -> s.getHomePath(), new File("./src/test/resources"));
         if (!origRtsaPath.equals(rtsaPath)) {
             home = checkNesting(home);
