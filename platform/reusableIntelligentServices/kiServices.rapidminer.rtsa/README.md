@@ -2,7 +2,7 @@
 
 Generic integration of the [RapidMiner](https://rapidminer.com) [Real-Time Scoring Agent (RTSA)](https://docs.rapidminer.com/latest/scoring-agent/install/) for AI components and processes.
 
-So far, the integration is preliminary, i.e., separating mechanisms, ports and the API path are currently fixed. Due to IPR and license reasons, RTSA itself is not part of this integration and must be added (also in the automated  integration) as external packages. For the regression tests, we use a rather simple fake/mock implementation that sets in of RTSA is not present (extracted in src/main/resources/rtsa). Please note that the **original RTSA** requires **exactly JDK 8** while the **fake RTSA** runs with **JDK 8 and newer**.
+So far, the integration is preliminary, i.e., separating mechanisms, ports and the API path are currently fixed. Due to IPR and license reasons, RTSA itself is not part of this integration and must be added (also in the automated  integration) as external packages. For the regression tests, we use a rather simple fake/mock implementation that sets in of RTSA is not present (extracted in src/main/resources/rtsa). Please note that the **original RTSA** as well as the **fake RTSA** require **exactly JDK 8**.
 
 RTSA usually ships in one ZIP for the agent (to be named RTSA-version.ZIP) and one or multiple deployments (one per service, named according to the service). The RTSA ZIP may contain the RTSA folders directly in the top-level directory or in one singular directory located in the top-level directory. If a special packaging is applied, i.e., RTSA and deployment are shipped together, e.g., for experimental purposes, use an empty RTSA ZIP and an all-encompassing deployment.ZIP including the RTSA.
 
