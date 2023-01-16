@@ -8,6 +8,8 @@
 
   <properties>
 	  <maven.version>3.6.0</maven.version>
+      <maven.compiler.target>8</maven.compiler.target>
+      <maven.compiler.source>8</maven.compiler.source>	  
   </properties>
 
   <parent>
@@ -74,6 +76,18 @@
 		    </plugin>
 	      </plugins>
       </pluginManagement>
+      <plugins>
+       <plugin>
+         <artifactId>maven-compiler-plugin</artifactId>
+         <version>${org.apache.maven.compiler.version}</version>
+         <configuration>
+           <!-- Keep this for now (fake RTSA) -->
+           <source>8</source>
+           <target>8</target>
+           <encoding>${java.encoding}</encoding>
+         </configuration>
+       </plugin>      
+      </plugins>
   </build>
 
 </project>
