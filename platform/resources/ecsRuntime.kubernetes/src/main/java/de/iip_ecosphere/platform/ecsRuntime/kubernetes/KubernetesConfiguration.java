@@ -17,7 +17,7 @@ import java.io.IOException;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.ecsRuntime.EcsSetup;
-import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
+import de.iip_ecosphere.platform.support.setup.AbstractSetup;
 
 /**
  * Implements the Kubernetes specific configuration. For configuration prerequisites, see {@link EcsSetup}.
