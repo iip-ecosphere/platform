@@ -22,8 +22,8 @@ import java.util.Scanner;
 
 import org.junit.Test;
 
-import de.iip_ecosphere.platform.services.environment.PythonUtils;
 import de.iip_ecosphere.platform.support.NetUtils;
+import de.iip_ecosphere.platform.support.PythonUtils;
 import de.iip_ecosphere.platform.support.TimeUtils;
 
 /**
