@@ -22,7 +22,7 @@ import java.util.Optional;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.LifecycleHandler;
-import de.iip_ecosphere.platform.support.iip_aas.config.CmdLine;
+import de.iip_ecosphere.platform.support.setup.CmdLine;
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
 
 /**
