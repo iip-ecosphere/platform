@@ -7,7 +7,6 @@ import org.junit.Test;
 
 import de.iip_ecosphere.platform.ecsRuntime.kubernetes.proxy.ProxyType;
 import de.iip_ecosphere.platform.support.Schema;
-import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.transport.TransportFactory;
@@ -133,7 +132,8 @@ public class MasterAmqpJavaK8SProxy {
         
         TransportFactory.setMainImplementation(RabbitMqAmqpTransportFactoryDescriptor.MAIN);
         
-        ConnectorCreator old = TransportFactory.setMainImplementation(new ConnectorCreator() {
+//        ConnectorCreator old = 
+        TransportFactory.setMainImplementation(new ConnectorCreator() {
             @Override
             public TransportConnector createConnector() {
                 return new FakeAuthConnector();
@@ -194,7 +194,8 @@ public class MasterAmqpJavaK8SProxy {
         
         TransportFactory.setMainImplementation(RabbitMqAmqpTransportFactoryDescriptor.MAIN);
         
-        ConnectorCreator old = TransportFactory.setMainImplementation(new ConnectorCreator() {
+//        ConnectorCreator old = 
+        TransportFactory.setMainImplementation(new ConnectorCreator() {
             @Override
             public TransportConnector createConnector() {
                 return new FakeAuthConnector();

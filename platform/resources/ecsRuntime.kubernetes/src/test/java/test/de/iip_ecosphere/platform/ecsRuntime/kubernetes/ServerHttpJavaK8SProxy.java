@@ -7,8 +7,6 @@ import java.io.InputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -16,14 +14,10 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
-
-import org.junit.Test;
-
 import de.iip_ecosphere.platform.ecsRuntime.kubernetes.proxy.HttpK8SJavaProxy;
 import de.iip_ecosphere.platform.ecsRuntime.kubernetes.proxy.K8SJavaProxy;
 import de.iip_ecosphere.platform.ecsRuntime.kubernetes.proxy.K8SRequest;
 import de.iip_ecosphere.platform.ecsRuntime.kubernetes.proxy.ProxyType;
-import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.TimeUtils;
 
 public class ServerHttpJavaK8SProxy {
@@ -210,7 +204,7 @@ public class ServerHttpJavaK8SProxy {
         
         System.out.println("Started multi-threaded server at localhost port " + localPort);
 
-        final Charset encoding = StandardCharsets.UTF_8;
+//        final Charset encoding = StandardCharsets.UTF_8;
         
         File file = new File("ServerReady.k8s"); 
         file.createNewFile();

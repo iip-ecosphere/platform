@@ -1,16 +1,12 @@
 package test.de.iip_ecosphere.platform.ecsRuntime.kubernetes;
 
 import java.io.BufferedOutputStream;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -18,25 +14,12 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
-
 import org.junit.Test;
-
 import de.iip_ecosphere.platform.ecsRuntime.kubernetes.proxy.AasK8SJavaProxy;
-import de.iip_ecosphere.platform.ecsRuntime.kubernetes.proxy.HttpK8SJavaProxy;
 import de.iip_ecosphere.platform.ecsRuntime.kubernetes.proxy.K8SJavaProxy;
 import de.iip_ecosphere.platform.ecsRuntime.kubernetes.proxy.K8SRequest;
 import de.iip_ecosphere.platform.ecsRuntime.kubernetes.proxy.ProxyType;
-import de.iip_ecosphere.platform.support.Endpoint;
-import de.iip_ecosphere.platform.support.Schema;
-import de.iip_ecosphere.platform.support.Server;
-import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.TimeUtils;
-import de.iip_ecosphere.platform.support.aas.Aas;
-import de.iip_ecosphere.platform.support.aas.AasFactory;
-import de.iip_ecosphere.platform.support.aas.Operation;
-import de.iip_ecosphere.platform.support.aas.Submodel;
-import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 
 public class WorkerAasJavaK8SProxy {
   
@@ -117,7 +100,7 @@ public class WorkerAasJavaK8SProxy {
      * @param vabPort the vab port
      */
     public void setVabPort(int vabPort) {
-        this.vabPort = vabPort;
+        WorkerAasJavaK8SProxy.vabPort = vabPort;
     }
 
     /**
@@ -135,7 +118,7 @@ public class WorkerAasJavaK8SProxy {
      * @param aasPort the aas port
      */
     public void setAasPort(int aasPort) {
-        this.aasPort = aasPort;
+        WorkerAasJavaK8SProxy.aasPort = aasPort;
     }
     
     /**
@@ -256,7 +239,7 @@ public class WorkerAasJavaK8SProxy {
         
         System.out.println("Started multi-threaded server at localhost port " + localPort);
 
-        final Charset encoding = StandardCharsets.UTF_8;
+//        final Charset encoding = StandardCharsets.UTF_8;
 
         File file = new File("ClientReady.k8s"); 
         file.createNewFile();
