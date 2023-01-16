@@ -3,14 +3,10 @@ package test.de.iip_ecosphere.platform.ecsRuntime.kubernetes;
 import java.io.File;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
 import org.bouncycastle.util.Arrays;
-
-import de.iip_ecosphere.platform.ecsRuntime.kubernetes.proxy.WorkerAasCreator;
 import de.iip_ecosphere.platform.ecsRuntime.kubernetes.proxy.AasK8SJavaProxy;
 import de.iip_ecosphere.platform.ecsRuntime.kubernetes.proxy.K8SJavaProxy;
 import de.iip_ecosphere.platform.ecsRuntime.kubernetes.proxy.K8SRequest;

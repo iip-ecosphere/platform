@@ -1,18 +1,11 @@
 package test.de.iip_ecosphere.platform.ecsRuntime.kubernetes;
 
 import java.io.IOException;
-
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
-
 import de.iip_ecosphere.platform.ecsRuntime.kubernetes.proxy.TransportMessage;
 import de.iip_ecosphere.platform.transport.serialization.Serializer;
-import test.de.iip_ecosphere.platform.transport.JsonUtils;
 
 public class TransportMessageJsonSerializer implements Serializer<TransportMessage> {
 
@@ -39,7 +32,7 @@ public class TransportMessageJsonSerializer implements Serializer<TransportMessa
         return result;
     }
 
-    @SuppressWarnings("unchecked")
+//    @SuppressWarnings("unchecked")
     @Override
     public byte[] to(TransportMessage value) throws IOException {
 //        JSONObject json = new JSONObject();

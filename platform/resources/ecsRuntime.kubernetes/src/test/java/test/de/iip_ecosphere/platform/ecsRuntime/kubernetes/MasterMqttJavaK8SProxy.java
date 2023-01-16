@@ -10,7 +10,6 @@ import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.transport.TransportFactory;
-import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter.TransportParameterBuilder;
 import de.iip_ecosphere.platform.transport.mqttv5.PahoMqttV5TransportConnectorFactoryDescriptor;
 //import de.iip_ecosphere.platform.transport.TransportFactory;

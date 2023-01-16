@@ -7,8 +7,6 @@ import java.io.InputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -24,7 +22,6 @@ import de.iip_ecosphere.platform.ecsRuntime.kubernetes.proxy.K8SRequest;
 import de.iip_ecosphere.platform.ecsRuntime.kubernetes.proxy.ProxyType;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.transport.TransportFactory;
-import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter.TransportParameterBuilder;
 import de.iip_ecosphere.platform.transport.mqttv5.PahoMqttV5TransportConnectorFactoryDescriptor;
 import test.de.iip_ecosphere.platform.test.mqtt.hivemq.TestHiveMqServer;
@@ -146,7 +143,7 @@ public class WorkerMqttJavaK8SProxy {
                     
                     TransportParameterConfigurer configurer = null;
                     if (tlsCheck) {
-                        File secCfg = new File("./src/test/MQTT/secCfg");
+//                        File secCfg = new File("./src/test/MQTT/secCfg");
                         configurer = new TransportParameterConfigurer() {
                             
                             @Override
@@ -201,11 +198,11 @@ public class WorkerMqttJavaK8SProxy {
 
         try {            
             TransportFactory.setMainImplementation(PahoMqttV5TransportConnectorFactoryDescriptor.MAIN);
-            TransportConnector cl1 = TransportFactory.createConnector();
+//            TransportConnector cl1 = TransportFactory.createConnector();
             
             TransportParameterConfigurer configurer = null;
             if (tlsCheck) {
-                File secCfg = new File("./src/test/MQTT/secCfg");
+//                File secCfg = new File("./src/test/MQTT/secCfg");
                 configurer = new TransportParameterConfigurer() {
                     
                     @Override
@@ -266,7 +263,7 @@ public class WorkerMqttJavaK8SProxy {
         
         System.out.println("Started multi-threaded server at localhost port " + localPort);
 
-        final Charset encoding = StandardCharsets.UTF_8;
+//        final Charset encoding = StandardCharsets.UTF_8;
 
         File file = new File("ClientReady.k8s"); 
         file.createNewFile();

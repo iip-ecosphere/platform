@@ -656,6 +656,7 @@ public abstract class AbstractK8SJavaProxy implements K8SJavaProxy {
         } catch (SocketTimeoutException e) {
             if (e.getMessage().contentEquals("timeout") || e.getMessage().contentEquals("Read timed out")) {
                 String timeout = "timeout";
+                System.out.println(timeout);
             } else {
                 e.printStackTrace();
             }

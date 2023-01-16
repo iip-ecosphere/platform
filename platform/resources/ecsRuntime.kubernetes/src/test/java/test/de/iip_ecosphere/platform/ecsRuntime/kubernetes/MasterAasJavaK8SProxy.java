@@ -68,7 +68,7 @@ public class MasterAasJavaK8SProxy {
      * @param vabPort the vab port
      */
     public void setVabPort(int vabPort) {
-        this.vabPort = vabPort;
+        MasterAasJavaK8SProxy.vabPort = vabPort;
     }
 
     /**
@@ -86,7 +86,7 @@ public class MasterAasJavaK8SProxy {
      * @param aasPort the aas port
      */
     public void setAasPort(int aasPort) {
-        this.aasPort = aasPort;
+        MasterAasJavaK8SProxy.aasPort = aasPort;
     }
     
     /**
@@ -157,9 +157,11 @@ public class MasterAasJavaK8SProxy {
         
         try {
             if (tlsCheck) {
-                ArrayList<Server> servers = aas.startLocalTLSAas();
+//                ArrayList<Server> servers = 
+                aas.startLocalTLSAas();
             } else {
-                ArrayList<Server> servers = aas.startLocalAas();
+//                ArrayList<Server> servers = 
+                aas.startLocalAas();
             }
         } catch (IOException e) {
             // TODO Auto-generated catch block
