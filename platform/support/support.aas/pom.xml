@@ -13,6 +13,11 @@
 
   <dependencies>
     <dependency>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>support</artifactId>
+     <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.yaml</groupId>
       <artifactId>snakeyaml</artifactId>
       <scope>compile</scope>
@@ -35,6 +40,13 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>support</artifactId>
+     <version>${project.version}</version>
+     <type>test-jar</type>
+     <scope>test</scope>
     </dependency>
   </dependencies>
 
