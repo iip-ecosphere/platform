@@ -28,8 +28,6 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
-import de.iip_ecosphere.platform.services.environment.PythonUtils;
-
 /**
  * Python compiler Mojo plugin.
  * 

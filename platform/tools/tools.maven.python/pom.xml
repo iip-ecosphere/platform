@@ -47,11 +47,6 @@
       <artifactId>file-management</artifactId>
       <version>3.1.0</version>
     </dependency>    
-    <dependency>
-      <artifactId>services.environment</artifactId>
-      <groupId>de.iip-ecosphere.platform</groupId>
-      <version>${project.version}</version>
-    </dependency>
 
     <dependency>
       <groupId>org.apache.maven.plugin-testing</groupId>

@@ -27,8 +27,6 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.model.fileset.FileSet;
 import org.apache.maven.shared.model.fileset.util.FileSetManager;
 
-import de.iip_ecosphere.platform.services.environment.PythonUtils;
-
 /**
  * Maven Mojo for Python unit tests.
  * 
