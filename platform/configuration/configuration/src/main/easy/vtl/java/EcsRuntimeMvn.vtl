@@ -15,6 +15,7 @@ template EcsRuntimeMvn(IIPEcosphere config, XmlFileArtifact target, String dir, 
         createMavenParent(project, iipGroup, "platformDependencies", "${config.iipVer}");
 
         XmlElement dep = createDependencies(project);
+        appendDependency(dep, iipGroup, "support", projectVersion);
         appendDependency(dep, iipGroup, "ecsRuntime", projectVersion);
         appendDependency(dep, iipGroup, containerManagerModule(config), projectVersion);
         appendDependency(dep, iipGroup, transportProtocolModule(config), projectVersion);

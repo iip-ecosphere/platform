@@ -20,6 +20,7 @@ template PlatformMvn(IIPEcosphere config, XmlFileArtifact target, String dir, St
         createMavenParent(project, iipGroup, "platformDependencies", "${config.iipVer}");
         
         XmlElement dep = createDependencies(project);
+        appendDependency(dep, iipGroup, "support", projectVersion);        
         XmlElement d = appendDependency(dep, iipGroup, aasClientModule(config), projectVersion);
         if (monitoring) {
             // conflicts on Linux with Tomcat

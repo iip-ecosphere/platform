@@ -16,6 +16,7 @@ template EcsServiceControlMvn(IIPEcosphere config, XmlFileArtifact target, Strin
         createMavenParent(project, iipGroup, "platformDependencies", "${config.iipVer}");
         
         XmlElement dep = createDependencies(project);
+        appendDependency(dep, iipGroup, "support", projectVersion);
         appendDependency(dep, iipGroup, "ecsRuntime", projectVersion);
         appendDependency(dep, iipGroup, "services", projectVersion);
         appendDependency(dep, iipGroup, serviceManagerModule(config), projectVersion);
