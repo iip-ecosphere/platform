@@ -82,6 +82,9 @@ public class FakeRtsa {
      * @throws IOException shall not occur
      */
     public static void main(String[] args) throws IOException {
+        if (!System.getProperty("java.specification.version", "").startsWith("1.8")) {
+            throw new IOException("As the original RTSA, also fake RTSA requires Java 8 for execution!");
+        }
         long start = System.currentTimeMillis();
         int serverPort = Integer.parseInt(System.getProperty("server.port", "8090")); 
         String defaultPath = CmdLine.getArg(args, "iip.rtsa.path", "iip_basic/score_v1");
