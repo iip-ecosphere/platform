@@ -37,7 +37,7 @@ import de.iip_ecosphere.platform.services.environment.spring.Starter;
 import de.iip_ecosphere.platform.services.environment.YamlService;
 
 import de.iip_ecosphere.platform.services.environment.spring.metricsProvider.MetricsProvider;
-import de.iip_ecosphere.platform.support.iip_aas.config.CmdLine;
+import de.iip_ecosphere.platform.support.setup.CmdLine;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Timer;
 
