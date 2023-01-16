@@ -83,7 +83,8 @@ public class FakeRtsa {
      */
     public static void main(String[] args) throws IOException {
         if (!System.getProperty("java.specification.version", "").startsWith("1.8")) {
-            throw new IOException("As the original RTSA, also fake RTSA requires Java 8 for execution!");
+            throw new IOException("As the original RTSA, also fake RTSA requires Java 8 for execution! "
+                + "(actual: " + System.getProperty("java.specification.version", "") + ")");
         }
         long start = System.currentTimeMillis();
         int serverPort = Integer.parseInt(System.getProperty("server.port", "8090")); 
