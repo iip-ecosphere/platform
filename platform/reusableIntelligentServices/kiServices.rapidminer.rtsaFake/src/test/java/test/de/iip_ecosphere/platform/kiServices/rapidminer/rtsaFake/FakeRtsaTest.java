@@ -17,7 +17,7 @@ import java.io.IOException;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.kiServices.rapidminer.rtsaFake.FakeRtsa;
-import de.iip_ecosphere.platform.kiServices.rapidminer.rtsaFake.TimeUtils;
+import de.iip_ecosphere.platform.support.TimeUtils;
 
 /**
  * Tests the fake RTSA.

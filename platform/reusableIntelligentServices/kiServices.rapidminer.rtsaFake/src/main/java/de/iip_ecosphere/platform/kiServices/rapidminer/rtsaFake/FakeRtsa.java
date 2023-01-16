@@ -32,6 +32,9 @@ import java.util.stream.Stream;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import de.iip_ecosphere.platform.support.ZipUtils;
+import de.iip_ecosphere.platform.support.setup.AbstractSetup;
+import de.iip_ecosphere.platform.support.setup.CmdLine;
 import spark.Route;
 import spark.Spark;
 
@@ -157,7 +160,7 @@ public class FakeRtsa {
                 if (d.getName().endsWith(".zip")) {
                     try {
                         FileInputStream fis = new FileInputStream(d);
-                        JarUtils.extractZip(fis, baseDirPath);
+                        ZipUtils.extractZip(fis, baseDirPath);
                         fis.close();
                         System.out.println(" - unzipped: " + d.getName() + " (" + d + ")" + " to " + baseDirPath);
                     } catch (IOException e) {

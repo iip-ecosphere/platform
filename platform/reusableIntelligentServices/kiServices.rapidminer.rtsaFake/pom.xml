@@ -15,8 +15,12 @@
 
   <dependencies>
     
-    <!-- Maximum JDK 1.8 -> RTSA!!! No direct IIP-Ecosphere dependencies!  -->
-
+    <!-- Maximum JDK 1.8 -> RTSA!!! No direct IIP-Ecosphere dependencies other than "support"!  -->
+    <dependency>
+      <artifactId>support</artifactId>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <version>${project.version}</version>
+    </dependency>  
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>

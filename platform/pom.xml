@@ -14,6 +14,7 @@
   <modules>
      <!-- platform dependencies first -->
      <module>platformDependencies</module>
+     <module>support/support</module>
      <!-- maven plugins -->
      <module>tools/tools.maven.python</module>
      <module>tools/tools.maven.invoker</module>
