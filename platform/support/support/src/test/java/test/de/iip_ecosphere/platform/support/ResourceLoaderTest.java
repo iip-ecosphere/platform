@@ -78,7 +78,7 @@ public class ResourceLoaderTest {
         is.close();
         
         // via classloader
-        Assert.assertTrue(myResolverCalled == 0);
+        Assert.assertTrue(myResolverCalled > 0);
         Assert.assertTrue(myResolver2Called == 0);
         
         // does not exist
@@ -100,11 +100,11 @@ public class ResourceLoaderTest {
         Assert.assertNotNull(is);
         is.close();
         
-        is = myResolver.resolve("de.iip_ecosphere.platform.support.aas.AasFactoryDescriptor");
+        is = myResolver.resolve("de.iip_ecosphere.platform.support.resources.ResourceResolver");
         Assert.assertNotNull(is);
         is.close();
         
-        is = ResourceLoader.getResourceAsStream("de.iip_ecosphere.platform.support.aas.AasFactoryDescriptor", fRes);
+        is = ResourceLoader.getResourceAsStream("de.iip_ecosphere.platform.support.resources.ResourceResolver", fRes);
         Assert.assertNotNull(is);
         is.close();
         
