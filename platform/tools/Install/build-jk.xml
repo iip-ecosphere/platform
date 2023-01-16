@@ -17,7 +17,9 @@
     	<delete file="install.tar.gz" failonerror="false"/>
     	
     	<!-- build new -->
-    	<maven pomFile="pom.xml" goal="package"/>
+    	<maven pomFile="pom.xml" goal="package">
+    		<arg value="-Dupdate.force=true"/>
+    	</maven>
         <chmod dir="." perm="u+x" includes="**/*.sh"/>
         <zip destFile="install.zip">
             <fileset dir="." includes="pom.xml README.md"/>
