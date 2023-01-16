@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
+import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,7 +55,9 @@ public class Starter {
     public static final String PARAM_IIP_TEST_AAS_PORT = "iip.test.aas.port";
     public static final String PARAM_IIP_TEST_AASREG_PORT = "iip.test.aasRegistry.port";
     public static final String PARAM_IIP_TEST_SERVICE_AUTOSTART = "iip.test.service.autostart";
+    public static final String PROPERTY_JAVA8 = "iip.test.java8";
     public static final String IIP_APP_PREFIX = "iip.app.";
+    public static final String IIP_TEST_PREFIX = "iip.test.";
     
     private static ProtocolServerBuilder builder;
     private static Server server;
@@ -94,8 +97,8 @@ public class Starter {
         = DFLT_LOCAL_TRANSPORT_SETUP_SUPPLIER;
 
     /**
-     * Adds all environment properties starting with {@link #IIP_APP_PREFIX} to the command line of the service 
-     * to be started.
+     * Adds all environment properties starting with {@link #IIP_APP_PREFIX} or {@link #IIP_TEST_PREFIX} to the command 
+     * line of the service to be started.
      * 
      * @param args the arguments to add the application environment settings
      */
@@ -104,9 +107,24 @@ public class Starter {
             String key = k.toString();
             if (key != null && key.length() > 0) {
                 String val = System.getProperty(key);
-                if (key.startsWith(IIP_APP_PREFIX)) {
+                if (key.startsWith(IIP_APP_PREFIX) 
+                    || key.startsWith(IIP_TEST_PREFIX)) { // could be dependent on PARAM_IIP_TEST_SERVICE_AUTOSTART
                     args.add("-D" + key + "=" + val);
                 }
+            }
+        }
+    }
+    
+    /**
+     * Considers installed dependencies properties, -D{@value #PROPERTY_JAVA8}.
+     */
+    public static void considerInstalledDependencies() {
+        if (!SystemUtils.IS_JAVA_1_8) {
+            String prop = System.getProperty(PROPERTY_JAVA8, null);
+            if (prop != null) {
+                File java8 = new File(prop);
+                LoggerFactory.getLogger(Starter.class).info("Setting Java8 to: {}", java8);
+                InstalledDependenciesSetup.getInstance().setLocation(InstalledDependenciesSetup.KEY_JAVA_8, java8);
             }
         }
     }
@@ -120,7 +138,8 @@ public class Starter {
     public static void transferArgsToEnvironment(String[] args) {
         for (String a : args) {
             String tmp = null;
-            if (a.startsWith("-D" + IIP_APP_PREFIX)) {
+            if (a.startsWith("-D" + IIP_APP_PREFIX) 
+                || a.startsWith("-D" + IIP_TEST_PREFIX)) { // so far only -D, may need PARAM_IIP_TEST_SERVICE_AUTOSTART
                 tmp = a.substring(2);
             } else if (a.startsWith("--" + IIP_APP_PREFIX)) {
                 tmp = a.substring(2);
@@ -239,6 +258,7 @@ public class Starter {
      */
     public static void parse(String... args) {
         transferArgsToEnvironment(args);
+        considerInstalledDependencies();
         AasFactory factory = AasFactory.getInstance();
         int port = getIntArg(args, PARAM_IIP_PORT, -1);
         if (port < 0) {
