@@ -14,7 +14,7 @@ import java.util.function.Consumer;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import de.iip_ecosphere.platform.services.environment.PythonUtils;
+import de.iip_ecosphere.platform.support.PythonUtils;
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.Server;
