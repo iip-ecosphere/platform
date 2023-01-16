@@ -19,8 +19,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
+import de.iip_ecosphere.platform.support.setup.AbstractSetup;
 
 /**
  * Represents the cars in the car production AAS.
