@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
-import de.iip_ecosphere.platform.support.iip_aas.config.CmdLine;
+import de.iip_ecosphere.platform.support.setup.CmdLine;
 
 /**
  * A command line provider wrapping interactive command line commands.
