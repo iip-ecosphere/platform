@@ -17,7 +17,7 @@ import java.io.IOException;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.deviceMgt.storage.PackageStorageSetup;
-import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
+import de.iip_ecosphere.platform.support.setup.AbstractSetup;
 
 /**
  * The setup for the configuration component. As there are also EASy-Producer configuration classes with different 
