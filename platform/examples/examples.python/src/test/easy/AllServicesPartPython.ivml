@@ -30,6 +30,11 @@ project AllServicesPartPython {
         dependencies = {refBy(PYTHON39)}
     };
 
+    PythonDependency PYTHON39 = {
+       name = "python",
+       version = "3.9"
+    };
+    
     Service myPythonReceiverService = JavaService {
         id = "SimplePythonReceiver",
         name = "Simple Python Data Receiver",
