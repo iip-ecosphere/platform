@@ -12,6 +12,15 @@ template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, FileArtifact 
             ''
         }
     }
+    
+    def produceAasCors(IIPEcosphere config) {
+        String aasCors = getStringValueSafe(config.aasAccessControlAllowOrigin, "");
+        if (aasCors <> "") {
+            'accessControlAllowOrigin: ${aasCors}'
+        } else {
+            ''
+        }
+    }
 
     def produceAas(IIPEcosphere config, String aasPersistence="", Boolean withDocker=true, Boolean implLocalEphemerial=false) {
         EndpointAddress aasServer = config.aasServer;
@@ -45,6 +54,7 @@ template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, FileArtifact 
             schema: ${aasImplServer.schema}
             protocol: ${aasProtocolName(aasImplServer.protocol)}
           ${serverHost(aasServer)|e}
+          ${produceAasCors(config)|e}
           ${produceAasPersistence(aasPersistence)|e}'
     }
 

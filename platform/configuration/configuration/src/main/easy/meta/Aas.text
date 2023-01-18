@@ -10,6 +10,7 @@ Aas::aasImplServer.port = port of the AAS implementation server
 Aas::aasImplServer.host = host name of the AAS implementation server
 Aas::aasImplServer:aasProtocol = AAS protocol
 Aas::aasPersistency = global AAS persistency mechanism
+Aas::aasAccessControlAllowOrigin = global AAS allowed cross-origin as URL/address, may be `*` for any
 Aas::AasSemanticIdResolver::artifact = Mvn artifact coordinates containing the AAS semantic ID resolver. May be empty if shipped with core platform component.
 Aas::AasSemanticIdResolver::class = Java class name of semantic resolver JSL descriptor.
 Aas::AdminShellYamlAasSemanticIdResolver::class = Refined JLS descriptor name of Yaml-based catalog resolver for ZVEI/IDTA specs.

@@ -70,6 +70,7 @@ project Aas {
     isDefined(aasImplServer);
     Persistency aasPersistency = Persistency::INMEMORY;
     isDefined(aasPersistency);
+    String aasAccessControlAllowOrigin = "*";
     
     // ------------------------ semanticIds -------------------------------
     
