@@ -119,7 +119,7 @@ public class CarAas {
                 Endpoint regEp = new Endpoint(serverAdr, registryPath);
                 ImmediateDeploymentRecipe rcp = factory.createDeploymentRecipe(new Endpoint(serverAdr, ""))
                     .setAccessControlAllowOrigin(DeploymentRecipe.ANY_CORS_ORIGIN)
-                    .addInMemoryRegistry(registryPath);
+                    .addInMemoryRegistry(regEp);
         
                 for (Car c: yml.getCars()) {
                     System.out.println("Creating AAS for car with id: " + c.getId());

@@ -163,7 +163,7 @@ public class MasterK8SAas {
         server.start();
 
         Server httpServer = AasFactory.getInstance().createDeploymentRecipe(aasServerBase)
-                .addInMemoryRegistry(aasServerRegistry.getEndpoint()).deploy(aas).createServer().start();
+                .addInMemoryRegistry(aasServerRegistry).deploy(aas).createServer().start();
 
         ArrayList<Server> servers = new ArrayList<Server>();
         servers.add(httpServer);
