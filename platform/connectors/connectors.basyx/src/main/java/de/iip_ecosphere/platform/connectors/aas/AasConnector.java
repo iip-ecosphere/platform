@@ -150,7 +150,6 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
     protected void connectImpl(ConnectorParameter params) throws IOException {
         if (connectedAAS.isEmpty()) {
             this.params = params;
-            // BaSyx... stays HTTP, no TLS on the registry!!!
             Schema schema = params.getSchema();
             String epPath = params.getEndpointPath();
             
@@ -172,7 +171,7 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
                 try {
                     regSchema = Schema.valueOf(url.getProtocol());
                 } catch (IllegalArgumentException e1) {
-                    regSchema = Schema.HTTP; // usual in BaSyx, not encrypted
+                    regSchema = schema; // usual in BaSyx, not encrypted
                 }
                 if (url.getHost().length() > 0 && url.getPort() > 0) {
                     regEp = new Endpoint(regSchema, url.getHost(), url.getPort(), url.getPath());
@@ -180,7 +179,7 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
             } catch (MalformedURLException e) {
             }
             if (null == regEp) { // fallback, use server and epPath
-                regEp = new Endpoint(Schema.HTTP, params.getHost(), params.getPort(), epPath);
+                regEp = new Endpoint(schema, params.getHost(), params.getPort(), epPath);
             }
             
             registry = factory.obtainRegistry(regEp, schema);

@@ -34,11 +34,6 @@ import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.DeploymentRecipe;
-import de.iip_ecosphere.platform.support.aas.Registry;
-import de.iip_ecosphere.platform.support.aas.DeploymentRecipe.RegistryDeploymentRecipe;
-import de.iip_ecosphere.platform.support.aas.ServerRecipe;
-import de.iip_ecosphere.platform.support.aas.ServerRecipe.LocalPersistenceType;
-import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
@@ -67,9 +62,7 @@ public class AasConnectorTest extends AbstractInformationModelConnectorTest<Obje
     
     private static final Logger LOGGER = LoggerFactory.getLogger(AasConnectorTest.class);
     private static final String AAS_URN = "urn:::AAS:::testMachines#";
-    private static ServerAddress aasServer = new ServerAddress(Schema.HTTP); // localhost, ephemeral
     private static final ServerAddress VAB_SERVER = new ServerAddress(Schema.HTTP); // localhost, ephemeral
-    private static final Endpoint REGISTRY = new Endpoint(aasServer, AasPartRegistry.DEFAULT_REGISTRY_ENDPOINT);
     private static KeyStoreDescriptor keyDesc;
     
     private static Server platformAasServer;
@@ -78,6 +71,7 @@ public class AasConnectorTest extends AbstractInformationModelConnectorTest<Obje
     private static Server repository;
     private static NotificationMode oldNotificationMode;
     private static AasSetup oldSetup;
+    private static ServerAddress aasServer;
     
     /**
      * Creates an instance of this test.
@@ -118,39 +112,33 @@ public class AasConnectorTest extends AbstractInformationModelConnectorTest<Obje
         // start required here by basyx-0.1.0-SNAPSHOT
         ccServer = AasTest.createOperationsServer(VAB_SERVER.getPort(), machine, 
             AasFactory.DEFAULT_PROTOCOL, null).start(); 
-        Aas aas = createAAS(machine);
+        Aas aas = createAAS();
         if (null != keyDesc) {
-            // override server with new schema and decouple port from registry (must be HTTP)
-            aasServer = new ServerAddress(Schema.HTTPS);
-            ServerRecipe sRecipe = AasFactory.getInstance().createServerRecipe();
-            repository = sRecipe.createRegistryServer(REGISTRY, LocalPersistenceType.INMEMORY).start();
-            try {
-                Endpoint sEndpoint = new Endpoint(aasServer, "");
-                RegistryDeploymentRecipe drcp = AasFactory.getInstance()
-                    .createDeploymentRecipe(sEndpoint, keyDesc)
-                    .setRegistryUrl(REGISTRY);
-                Registry reg = drcp.obtainRegistry();
-                httpServer = drcp.createServer().start();
-                reg.createAas(aas, sEndpoint.toUri());
-                for (Submodel sm : aas.submodels()) {
-                    reg.createSubmodel(aas, sm);
-                }
-            } catch (IOException e) {
-                Assert.fail("Exception: " + e.getMessage());
-            }
+            aasServer = new ServerAddress(Schema.HTTPS); // localhost, ephemeral
         } else {
-            DeploymentRecipe dBuilder = AasFactory.getInstance()
-                .createDeploymentRecipe(new Endpoint(aasServer, ""));
-            httpServer = dBuilder
-                .addInMemoryRegistry(REGISTRY.getEndpoint())
-                .deploy(aas)
-                .createServer();
-            httpServer.start();
+            aasServer = new ServerAddress(Schema.HTTP); // localhost, ephemeral
         }
-
+        
+        Endpoint registryEndpoint = getRegistryEndpoint();
+        DeploymentRecipe dBuilder = AasFactory.getInstance()
+            .createDeploymentRecipe(new Endpoint(aasServer, ""), keyDesc);
+        httpServer = dBuilder
+            .addInMemoryRegistry(registryEndpoint)
+            .deploy(aas)
+            .createServer();
+        httpServer.start();
         implServer.start();
 
         LOGGER.info("AAS server started");
+    }
+    
+    /**
+     * Returns the registry endpoint for {@link #aasServer}.
+     * 
+     * @return the endpoint
+     */
+    private static Endpoint getRegistryEndpoint() {
+        return new Endpoint(aasServer, AasPartRegistry.DEFAULT_REGISTRY_ENDPOINT);
     }
         
     /**
@@ -173,12 +161,11 @@ public class AasConnectorTest extends AbstractInformationModelConnectorTest<Obje
     /**
      * This method creates and starts the Asset Administration Shell.
      * 
-     * @param machine the test machine instance
      * @return the created AAS instance
      * @throws SocketException if the port to be used for the AAS is occupied
      * @throws UnknownHostException shall not occur
      */
-    public static Aas createAAS(TestMachine machine) throws SocketException, UnknownHostException {
+    public static Aas createAAS() throws SocketException, UnknownHostException {
         AasFactory factory = AasFactory.getInstance();
         AasBuilder aasBuilder = factory.createAasBuilder(AasTest.NAME_AAS, AAS_URN);
         SubmodelBuilder subModelBuilder = aasBuilder.createSubmodelBuilder(AasTest.NAME_SUBMODEL, null);
@@ -212,10 +199,11 @@ public class AasConnectorTest extends AbstractInformationModelConnectorTest<Obje
 
     @Override
     protected ConnectorParameter getConnectorParameter() {
+        Endpoint registryEndpoint = getRegistryEndpoint();
         return ConnectorParameterBuilder
-            .newBuilder(REGISTRY)
+            .newBuilder(registryEndpoint)
             .setApplicationInformation(AAS_URN, "")
-            .setEndpointPath(aasServer.getSchema() + ":" + REGISTRY.getEndpoint())
+            .setEndpointPath(aasServer.getSchema() + ":" + registryEndpoint.getEndpoint())
             // keysettings ingored, registry alyways HTTP
             .build();
     }
