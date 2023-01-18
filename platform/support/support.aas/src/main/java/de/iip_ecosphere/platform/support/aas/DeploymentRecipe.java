@@ -25,6 +25,11 @@ import de.iip_ecosphere.platform.support.Endpoint;
 public interface DeploymentRecipe {
     
     /**
+     * Allow any origin.
+     */
+    public static final String ANY_CORS_ORIGIN = "*";
+    
+    /**
      * Defines a sub-recive allowing for immediate deployment of AAS.
      * 
      * @author Holger Eichelberger, SSE
@@ -93,5 +98,26 @@ public interface DeploymentRecipe {
      * @return an instance of the sub-recipe
      */
     public RegistryDeploymentRecipe setRegistryUrl(Endpoint endpoint);
+    
+    /**
+     * Sets the access control to allow cross origin.
+     * 
+     * @param accessControlAllowOrigin the information to be placed in the HTTP header field 
+     * "Access-Control-Allow-Origin"; the specific server or {@link #ANY_CORS_ORIGIN}
+     * @return an instance of the sub-recipe
+     */
+    public DeploymentRecipe setAccessControlAllowOrigin(String accessControlAllowOrigin);
+
+    /**
+     * Sets the bearer authentication configuration.
+     * 
+     * @param issuerUri the URI of the issuer
+     * @param jwkSetUri unclear
+     * @param requiredAud unclear (may be <b>null</b>)
+     * @return an instance of the sub-recipe
+     * @throws IllegalArgumentException if the passed in information is invalid
+     */
+    public DeploymentRecipe setBearerTokenAuthenticationConfiguration(String issuerUri, String jwkSetUri, 
+        String requiredAud) throws IllegalArgumentException;
     
 }
