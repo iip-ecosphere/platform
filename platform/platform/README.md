@@ -12,6 +12,7 @@ The basic YAML configuration of the platform services (in ``iipecosphere.yml``) 
         host: <String>
         port: <int>
         path: <String>
+      accessControlAllowOrigin: <String>
       registry:
         schema: <HTTP|HTTPS>
         host: <String>
