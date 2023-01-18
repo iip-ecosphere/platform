@@ -16,6 +16,7 @@ As usual, this component supports a YAML-based setup:
         keyPassword: <String>
         keyAlias: <String>
       mode: <REMOTE_DEPLOY|REGISTER>
+      accessControlAllowOrigin: <String>
       registry:
         schema: <HTTP|HTTPS>
         host: <String>
