@@ -27,6 +27,7 @@ import org.eclipse.basyx.submodel.restapi.SubmodelProvider;
 import org.eclipse.basyx.vab.modelprovider.api.IModelProvider;
 import org.eclipse.basyx.vab.protocol.http.server.JwtBearerTokenAuthenticationConfiguration;
 import org.eclipse.basyx.vab.protocol.http.server.VABHTTPInterface;
+import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.Schema;
@@ -112,6 +113,14 @@ public class BaSyxDeploymentRecipe implements DeploymentRecipe {
         
     }
 
+    @Override
+    public ImmediateDeploymentRecipe addInMemoryRegistry(Endpoint regEndpoint) {
+        if (regEndpoint.getSchema() != deploymentSpec.getEndpoint().getSchema()) {
+            LoggerFactory.getLogger(getClass()).warn("");
+        }
+        return addInMemoryRegistry(regEndpoint.getEndpoint());
+    }
+    
     @Override
     public ImmediateDeploymentRecipe addInMemoryRegistry(String regEndpoint) {
         deploymentSpec.setRegistry(new InMemoryRegistry());

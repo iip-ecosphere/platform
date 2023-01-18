@@ -192,7 +192,7 @@ public class ClassUtilityTest {
         Endpoint regEp = new Endpoint(serverAdr, AasPartRegistry.DEFAULT_REGISTRY_ENDPOINT);
         Server httpServer = AasFactory.getInstance()
             .createDeploymentRecipe(new Endpoint(serverAdr, ""))
-            .addInMemoryRegistry(regEp.getEndpoint())
+            .addInMemoryRegistry(regEp)
             .deploy(aasBuilder.build())
             .createServer()
             .start();

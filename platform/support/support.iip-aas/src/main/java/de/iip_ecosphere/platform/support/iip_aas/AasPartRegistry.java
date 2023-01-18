@@ -670,7 +670,7 @@ public class AasPartRegistry {
     public static Server deploy(List<Aas> aas, String... options) {
         ImmediateDeploymentRecipe dBuilder = applyCorsOrigin(AasFactory.getInstance()
             .createDeploymentRecipe(setup.getServerEndpoint()), setup)
-            .addInMemoryRegistry(setup.getRegistry().getPath());
+            .addInMemoryRegistry(setup.getRegistry().getEndpoint());
         for (Aas a: aas) {
             dBuilder.deploy(a);
         }
