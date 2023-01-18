@@ -26,6 +26,7 @@ import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.AasServer;
+import de.iip_ecosphere.platform.support.aas.DeploymentRecipe;
 import de.iip_ecosphere.platform.support.aas.LangString;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.DeploymentRecipe.ImmediateDeploymentRecipe;
@@ -117,6 +118,7 @@ public class CarAas {
                 ServerAddress serverAdr = new ServerAddress(Schema.HTTP, hostname, 9989);
                 Endpoint regEp = new Endpoint(serverAdr, registryPath);
                 ImmediateDeploymentRecipe rcp = factory.createDeploymentRecipe(new Endpoint(serverAdr, ""))
+                    .setAccessControlAllowOrigin(DeploymentRecipe.ANY_CORS_ORIGIN)
                     .addInMemoryRegistry(registryPath);
         
                 for (Car c: yml.getCars()) {
