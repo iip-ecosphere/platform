@@ -72,7 +72,18 @@ public interface DeploymentRecipe {
          * @throws IOException in case that the recipe/connection cannot be created
          */
         public Registry obtainRegistry() throws IOException;
-        
+
+        /**
+         * Deploys the ASS and its sub-models. Intended for initial deployment. Requires a valid registry to be created 
+         * before. For incremental deployment of sub-models for already deployed AAS please consult 
+         * {@link AasServer#deploy(Aas, Submodel)}.
+         * 
+         * @param aas the AAS to deploy
+         * @return <b>this</b>
+         * @throws IllegalArgumentException if {@code aas} was not created by the corresponding {@link AasFactory}
+         */
+        public RegistryDeploymentRecipe deploy(Aas aas);
+
         /**
          * Creates the server instance.
          * 
@@ -90,6 +101,16 @@ public interface DeploymentRecipe {
      * @return an instance of the sub-recipe
      */
     public ImmediateDeploymentRecipe addInMemoryRegistry(String regEndpoint);
+
+    /**
+     * Adds an in-memory registry to the deployment.
+     * 
+     * @param regEndpoint the registry URL endpoint
+     * @return an instance of the sub-recipe
+     */
+    public default ImmediateDeploymentRecipe addInMemoryRegistry(Endpoint regEndpoint) {
+        return addInMemoryRegistry(regEndpoint.getEndpoint());
+    }
 
     /**
      * Points to a standalone registry.

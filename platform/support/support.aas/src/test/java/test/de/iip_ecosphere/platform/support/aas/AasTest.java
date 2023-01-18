@@ -80,9 +80,6 @@ public class AasTest {
     private static final String NAME_OP_RECONFIGURE = "setLotSize";
     private static final String NAME_OP_STOPMACHINE = "stopMachine";
 
-    private static final ServerAddress AAS_SERVER = new ServerAddress(Schema.HTTP); // localhost, ephemeral
-    private static final Endpoint AAS_SERVER_BASE = new Endpoint(AAS_SERVER, "");
-    private static final Endpoint AAS_SERVER_REGISTRY = new Endpoint(AAS_SERVER, "registry");
     private static final ServerAddress VAB_SERVER = new ServerAddress(Schema.HTTP); // localhost, ephemeral
     private static final String URN_AAS = "urn:::AAS:::testMachines#";
     
@@ -198,12 +195,24 @@ public class AasTest {
      */
     @Test
     public void testVabQuery() throws SocketException, UnknownHostException, ExecutionException, IOException {
-        for (String proto : AasFactory.getInstance().getProtocols()) {
-            if (!AasFactory.LOCAL_PROTOCOL.equals(proto) && !excludeProtocol(proto)) { // VAB only
-                System.out.println("Testing VAB protocol: " + proto);
-                testVabQuery(proto);
+        for (String sProto : getServerProtocols()) {
+            for (String proto : AasFactory.getInstance().getProtocols()) {
+                if (!AasFactory.LOCAL_PROTOCOL.equals(proto) && !excludeProtocol(proto)) { // VAB only
+                    System.out.println("Testing VAB protocol: " + proto 
+                        + (sProto.length() > 0 ? " on server protocol " + sProto : ""));
+                    testVabQuery(proto, sProto);
+                }
             }
         }
+    }
+    
+    /**
+     * Returns the server protocols to use during test.
+     * 
+     * @return the server protocols, empty for HTTP/unencrypted
+     */
+    public String[] getServerProtocols() {
+        return new String[] {""};
     }
 
     /**
@@ -230,13 +239,14 @@ public class AasTest {
      * Tests creating/reading an AAS.
      *
      * @param protocol the VAB protocol as used in {@link AasFactory}
+     * @param serverProtocol use server protocols to use, empty string for HTTP, rest see {@link AasFactory}
      * @throws SocketException shall not occur if the test works
      * @throws UnknownHostException shall not occur if the test works
      * @throws ExecutionException shall not occur if the test works
      * @throws IOException shall not occur if the test works
      */
-    protected void testVabQuery(String protocol) throws SocketException, UnknownHostException, ExecutionException, 
-        IOException {
+    protected void testVabQuery(String protocol, String serverProtocol) 
+        throws SocketException, UnknownHostException, ExecutionException, IOException {
         TestMachine machine = new TestMachine();
         Server ccServer = createOperationsServer(VAB_SERVER.getPort(), machine, protocol, 
             getKeyStoreDescriptor(protocol));
@@ -247,14 +257,26 @@ public class AasTest {
 
         Aas aas = createAas(machine, protocol);
         
-        Server httpServer = AasFactory.getInstance()
-            .createDeploymentRecipe(AAS_SERVER_BASE)
-            .addInMemoryRegistry(AAS_SERVER_REGISTRY.getEndpoint())
+        AasFactory factory = AasFactory.getInstance();
+        ServerAddress aasServerAddress;
+        Server httpServer;
+        Endpoint registryEndpoint;
+        KeyStoreDescriptor ksd;
+        if (serverProtocol.length() > 0) {
+            aasServerAddress = new ServerAddress(Schema.HTTPS); // localhost, ephemeral
+            ksd = getKeyStoreDescriptor(serverProtocol);
+        } else {
+            aasServerAddress = new ServerAddress(Schema.HTTP); // localhost, ephemeral
+            ksd = null;
+        }
+        registryEndpoint = new Endpoint(aasServerAddress, "registry");
+        httpServer = factory.createDeploymentRecipe(new Endpoint(aasServerAddress, ""), ksd)
+            .addInMemoryRegistry(registryEndpoint)
             .deploy(aas)
             .createServer()
             .start();
         
-        queryAas(machine);
+        queryAas(registryEndpoint, machine);
         httpServer.stop(true);
         ccServer.stop(true);
     }
@@ -347,13 +369,14 @@ public class AasTest {
     /**
      * Queries the created AAS.
      * 
+     * @param registry the registry to get the machine AAS from
      * @param machine the test machine as reference
      * @throws ExecutionException if operation invocations fail
      * @throws IOException if retrieving the AAS fails
      */
-    private static void queryAas(TestMachine machine) throws ExecutionException, IOException {
+    private static void queryAas(Endpoint registry, TestMachine machine) throws ExecutionException, IOException {
         AasFactory factory = AasFactory.getInstance();
-        Registry reg = factory.obtainRegistry(AAS_SERVER_REGISTRY);
+        Registry reg = factory.obtainRegistry(registry);
         Aas aas = reg.retrieveAas(URN_AAS);
         Assert.assertEquals(NAME_AAS, aas.getIdShort());
         Assert.assertEquals(2, aas.getSubmodelCount());
