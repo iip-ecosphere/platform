@@ -144,6 +144,18 @@ public class BaSyxDeploymentRecipe implements DeploymentRecipe {
             return AasFactory.getInstance().obtainRegistry(endpoint, deploymentSpec.getEndpoint().getSchema());
         }
 
+
+        @Override
+        public RegistryDeploymentRecipe deploy(Aas aas) {
+            try {
+                deploymentSpec.setRegistry(((BaSyxRegistry) obtainRegistry()).getRegistry());
+                BaSyxDeploymentRecipe.deploy(deploymentSpec, aas);
+                return this;
+            } catch (IOException e) {
+                throw new IllegalArgumentException(e); // preliminary
+            }
+        }
+
         @Override
         public AasServer createServer(String... options) {
             return new BaSyxRegistryDeploymentAasServer(deploymentSpec, endpoint.toUri(), 
@@ -176,7 +188,6 @@ public class BaSyxDeploymentRecipe implements DeploymentRecipe {
         AASModelProvider aasProvider = new AASModelProvider(bAas.getAas());
         MultiSubmodelProvider fullProvider = new MultiSubmodelProvider();
         fullProvider.setAssetAdministrationShell(aasProvider);
-
         AASDescriptor aasDescriptor = new AASDescriptor(bAas.getAas(), 
             AbstractAas.getAasEndpoint(deploymentSpec.getEndpoint(), aas));
         for (Submodel sm: bAas.submodels()) {

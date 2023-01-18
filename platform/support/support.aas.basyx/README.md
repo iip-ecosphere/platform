@@ -18,6 +18,8 @@ client side with server-sided functionality. We separated client and server side
 
 May be, future versions need to switch to lazy loading of deployed AAS instances (supported now by submodel elements collection, but no submodel or AAS).
 
+Please note that in more recent versions of BaSyx, the protocol schema of the AAS registry and the AAS server are assumed to be the same, e.g., http/http or https/https.
+
 **Missing**
 - Various AAS concepts (incremental addition as needed by the platform)
 - Authentication/RBAC

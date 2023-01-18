@@ -155,7 +155,7 @@ public class BaSyxAasFactory extends AasFactory {
     
     @Override
     public Registry obtainRegistry(Endpoint endpoint) throws IOException {
-        return obtainRegistry(endpoint, Schema.HTTP);
+        return obtainRegistry(endpoint, endpoint.getSchema());
     }
     
     @Override

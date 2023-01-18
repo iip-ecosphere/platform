@@ -235,6 +235,15 @@ public class BaSyxRegistry implements Registry {
         }
         return result;
     }
+    
+    /**
+     * Returns the internal registry instance.
+     * 
+     * @return the internal registry instance
+     */
+    IAASRegistry getRegistry() {
+        return registry;
+    }
 
     // TODO delete
     

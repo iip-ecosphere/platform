@@ -55,6 +55,11 @@ public class BaSyxTest extends AasTest {
         }
         return exclude;
     }
+
+    @Override
+    public String[] getServerProtocols() {
+        return new String[] {"", BaSyxAasFactory.PROTOCOL_VAB_HTTPS};
+    }
     
     /**
      * Tests lazy bindings.
