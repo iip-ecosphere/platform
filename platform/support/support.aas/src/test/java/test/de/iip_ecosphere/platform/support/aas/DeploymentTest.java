@@ -60,8 +60,6 @@ public class DeploymentTest {
     @Test
     public void localSubmodelDynamicDeployment() throws IOException, ExecutionException {
         final String urn = "urn:::AAS:::testMachines#";
-        //final int port = NetUtils.getEphemeralPort();
-        final String registryPath = "registry";
         
         AasFactory factory = AasFactory.getInstance();
         AasBuilder aasB = factory.createAasBuilder("myAas", urn);
@@ -69,12 +67,12 @@ public class DeploymentTest {
         Aas aas = aasB.build();
         
         ServerAddress serverAdr = new ServerAddress(Schema.HTTP);
+        Endpoint regEp = new Endpoint(serverAdr, "registry");
         AasServer server = factory.createDeploymentRecipe(new Endpoint(serverAdr, ""))
-            .addInMemoryRegistry(registryPath)
+            .addInMemoryRegistry(regEp)
             .deploy(aas)
             .createServer()
             .start();
-        Endpoint regEp = new Endpoint(serverAdr, registryPath);
         Registry reg = factory.obtainRegistry(regEp);
         aas = reg.retrieveAas(urn);
         Submodel sub = aas.createSubmodelBuilder("dynamic", null).build();
@@ -109,7 +107,7 @@ public class DeploymentTest {
     public void localDynamicSubmodelElementsCollectionDeployment() throws IOException, ExecutionException {
         final String urn = "urn:::AAS:::testMachines#";
         final ServerAddress serverAddress = new ServerAddress(Schema.HTTP);
-        final String registryPath = "registry";
+        Endpoint regEp = new Endpoint(serverAddress, "registry");
         
         AasFactory factory = AasFactory.getInstance();
         AasBuilder aasB = factory.createAasBuilder("myAas", urn);
@@ -117,12 +115,11 @@ public class DeploymentTest {
         Aas aas = aasB.build();
         
         AasServer server = factory.createDeploymentRecipe(new Endpoint(serverAddress, ""))
-            .addInMemoryRegistry(registryPath)
+            .addInMemoryRegistry(regEp)
             .deploy(aas)
             .createServer()
             .start();
 
-        Endpoint regEp = new Endpoint(serverAddress, registryPath);
         Registry reg = factory.obtainRegistry(regEp);
         aas = reg.retrieveAas(urn);
         Submodel sub = aas.getSubmodel("sub");
@@ -171,7 +168,7 @@ public class DeploymentTest {
     public void localDynamicSubmodelElementsCollectionPropertyDeployment() throws IOException, ExecutionException {
         final String urn = "urn:::AAS:::testMachines#";
         ServerAddress serverAddress = new ServerAddress(Schema.HTTP);
-        final String registryPath = "registry";
+        Endpoint regEp = new Endpoint(serverAddress, "registry");
         
         AasFactory factory = AasFactory.getInstance();
         AasBuilder aasB = factory.createAasBuilder("myAas", urn);
@@ -179,12 +176,11 @@ public class DeploymentTest {
         Aas aas = aasB.build();
         
         AasServer server = factory.createDeploymentRecipe(new Endpoint(serverAddress, ""))
-            .addInMemoryRegistry(registryPath)
+            .addInMemoryRegistry(regEp)
             .deploy(aas)
             .createServer()
             .start();
 
-        Endpoint regEp = new Endpoint(serverAddress, registryPath);
         Registry reg = factory.obtainRegistry(regEp);
         aas = reg.retrieveAas(urn);
         Submodel sub = aas.getSubmodel("sub");

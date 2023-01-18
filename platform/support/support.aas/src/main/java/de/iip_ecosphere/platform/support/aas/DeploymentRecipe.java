@@ -99,7 +99,9 @@ public interface DeploymentRecipe {
      * 
      * @param regEndpoint the registry URL endpoint
      * @return an instance of the sub-recipe
+     * @deprecated Use {@link #addInMemoryRegistry(Endpoint)} instead
      */
+    @Deprecated
     public ImmediateDeploymentRecipe addInMemoryRegistry(String regEndpoint);
 
     /**
