@@ -35,6 +35,7 @@ import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.AssetKind;
+import de.iip_ecosphere.platform.support.aas.DeploymentRecipe;
 import de.iip_ecosphere.platform.support.aas.DeploymentRecipe.ImmediateDeploymentRecipe;
 import de.iip_ecosphere.platform.support.aas.DeploymentRecipe.RegistryDeploymentRecipe;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
@@ -127,6 +128,7 @@ public class AasPartRegistry {
         private String serverHost = NO_SPECIFIC_SERVER_HOST; // -> use what is stated in server/registry
         
         private AasMode mode = AasMode.REMOTE_DEPLOY;
+        private String accessControlAllowOrigin = DeploymentRecipe.ANY_CORS_ORIGIN;
 
         /**
          * Default constructor.
@@ -297,6 +299,26 @@ public class AasPartRegistry {
          */
         public void setImplementation(ProtocolAddressHolder implementation) {
             this.implementation = implementation;
+        }
+        
+        /**
+         * Sets the access control to allow cross origin. [Snakeyaml]
+         * 
+         * @param accessControlAllowOrigin the information to be placed in the HTTP header field 
+         * "Access-Control-Allow-Origin"; the specific server or {@link #ANY_CORS_ORIGIN}
+         */
+        public void setAccessControlAllowOrigin(String accessControlAllowOrigin) {
+            this.accessControlAllowOrigin = accessControlAllowOrigin;
+        }
+
+        /**
+         * Returns the access control to allow cross origin.
+         * 
+         * @return  the information to be placed in the HTTP header field 
+         * "Access-Control-Allow-Origin"; the specific server or {@link #ANY_CORS_ORIGIN}, may be <b>null</b> or empty
+         */
+        public String getAccessControlAllowOrigin() {
+            return accessControlAllowOrigin;
         }
 
         /**
@@ -646,13 +668,28 @@ public class AasPartRegistry {
      * @return the server instance
      */
     public static Server deploy(List<Aas> aas, String... options) {
-        ImmediateDeploymentRecipe dBuilder = AasFactory.getInstance()
-            .createDeploymentRecipe(setup.getServerEndpoint())
+        ImmediateDeploymentRecipe dBuilder = applyCorsOrigin(AasFactory.getInstance()
+            .createDeploymentRecipe(setup.getServerEndpoint()), setup)
             .addInMemoryRegistry(setup.getRegistry().getPath());
         for (Aas a: aas) {
             dBuilder.deploy(a);
         }
         return dBuilder.createServer(options);
+    }
+    
+    /**
+     * Helper to apply the {@link AasSetup#getAccessControlAllowOrigin()} from {@code setup} to {@code rcp}.
+     * 
+     * @param rcp the recipe
+     * @param setup the setup to take the information from
+     * @return the rcp
+     */
+    static DeploymentRecipe applyCorsOrigin(DeploymentRecipe rcp, AasSetup setup) {
+        String acao = setup.getAccessControlAllowOrigin();
+        if (null != acao && acao.length() > 0) {
+            rcp.setAccessControlAllowOrigin(acao);
+        }
+        return rcp;
     }
 
     /**
@@ -666,8 +703,8 @@ public class AasPartRegistry {
      * @throws IOException if access to the AAS registry fails
      */
     public static Server register(List<Aas> aas, Endpoint registry, String... options) throws IOException {
-        RegistryDeploymentRecipe dBuilder = AasFactory.getInstance()
-            .createDeploymentRecipe(setup.getServerEndpoint(), setup.getServer().getKeystoreDescriptor())
+        RegistryDeploymentRecipe dBuilder = applyCorsOrigin(AasFactory.getInstance()
+            .createDeploymentRecipe(setup.getServerEndpoint(), setup.getServer().getKeystoreDescriptor()), setup)
             .setRegistryUrl(registry);
         Registry reg = dBuilder.obtainRegistry();
         for (Aas a: aas) {
@@ -697,8 +734,8 @@ public class AasPartRegistry {
      */
     public static void remoteDeploy(AasSetup setup, List<Aas> aas) throws IOException {
         Endpoint aasEndpoint = setup.getServerEndpoint();
-        RegistryDeploymentRecipe regD = AasFactory.getInstance()
-            .createDeploymentRecipe(aasEndpoint, setup.getServer().getKeystoreDescriptor())
+        RegistryDeploymentRecipe regD = applyCorsOrigin(AasFactory.getInstance()
+            .createDeploymentRecipe(aasEndpoint, setup.getServer().getKeystoreDescriptor()), setup)
             .setRegistryUrl(setup.getRegistryEndpoint());
         
         Registry reg = regD.obtainRegistry();

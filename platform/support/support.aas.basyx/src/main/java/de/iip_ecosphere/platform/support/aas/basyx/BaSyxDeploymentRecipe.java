@@ -25,6 +25,7 @@ import org.eclipse.basyx.aas.restapi.MultiSubmodelProvider;
 import org.eclipse.basyx.components.aas.configuration.AASServerBackend;
 import org.eclipse.basyx.submodel.restapi.SubmodelProvider;
 import org.eclipse.basyx.vab.modelprovider.api.IModelProvider;
+import org.eclipse.basyx.vab.protocol.http.server.JwtBearerTokenAuthenticationConfiguration;
 import org.eclipse.basyx.vab.protocol.http.server.VABHTTPInterface;
 
 import de.iip_ecosphere.platform.support.Endpoint;
@@ -75,6 +76,20 @@ public class BaSyxDeploymentRecipe implements DeploymentRecipe {
      */
     BaSyxDeploymentRecipe(String host, int port, String contextPath, String docBasePath) {
         deploymentSpec = new DeploymentSpec(new Endpoint(Schema.IGNORE, host, port, contextPath), docBasePath);
+    }
+    
+    @Override
+    public DeploymentRecipe setAccessControlAllowOrigin(String accessControlAllowOrigin) {
+        deploymentSpec.setAccessControlAllowOrigin(accessControlAllowOrigin);
+        return this;
+    }
+
+    @Override
+    public DeploymentRecipe setBearerTokenAuthenticationConfiguration(String issuerUri, String jwkSetUri, 
+        String requiredAud) throws IllegalArgumentException {
+        deploymentSpec.setJwtBearerTokenAuthenticationConfiguration(
+            JwtBearerTokenAuthenticationConfiguration.of(issuerUri, jwkSetUri, requiredAud));
+        return this;
     }
 
     /**

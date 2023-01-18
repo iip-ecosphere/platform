@@ -3,9 +3,12 @@ package de.iip_ecosphere.platform.support.aas.basyx;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
 import org.eclipse.basyx.aas.registration.api.IAASRegistry;
 import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
+import org.eclipse.basyx.vab.protocol.http.server.JwtBearerTokenAuthenticationConfiguration;
 
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
@@ -87,6 +90,26 @@ class DeploymentSpec {
             }
             
         };
+    }
+    
+    /**
+     * Sets the access control to allow cross origin.
+     * 
+     * @param accessControlAllowOrigin the information to be placed in the HTTP header field 
+     * "Access-Control-Allow-Origin"
+     */
+    public void setAccessControlAllowOrigin(String accessControlAllowOrigin) {
+        context.setAccessControlAllowOrigin(accessControlAllowOrigin);
+    }
+    
+    /**
+     * Sets the bearer authentication configuration.
+     * 
+     * @param conf the bearer authentication configuration
+     */
+    public void setJwtBearerTokenAuthenticationConfiguration(
+        @Nullable final JwtBearerTokenAuthenticationConfiguration conf) {
+        context.setJwtBearerTokenAuthenticationConfiguration(conf);
     }
     
     /**
