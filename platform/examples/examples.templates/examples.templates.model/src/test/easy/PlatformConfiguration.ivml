@@ -4,7 +4,7 @@ project PlatformConfiguration {
     import AllServices;
     import AllTypes;
     
-    annotate BindingTime bindingTime = BindingTime::compile to .
+    annotate BindingTime bindingTime = BindingTime::compile to .;
     
     freeze {
         .;
