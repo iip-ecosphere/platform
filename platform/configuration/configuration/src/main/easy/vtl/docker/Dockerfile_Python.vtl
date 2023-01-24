@@ -8,8 +8,8 @@ template Dockerfile_Python(IIPEcosphere config, FileArtifact target, sequenceOf(
 	
     def main(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, Application app, ContainerType containerType, EcsDevice device) {
         
-        'FROM openjdk:13-alpine'  // TODO Java-Version & CPU
-        'COPY requirements.txt requirements.txt'
+        
+        
         
         setOf(Dependency) allDependencies = collectDependencies(elements);
         sequenceOf(String) tmp = {};
@@ -22,26 +22,31 @@ template Dockerfile_Python(IIPEcosphere config, FileArtifact target, sequenceOf(
             setOf(Dependency) deps = pyService.dependencies;
             for (Dependency s : deps) {
                 if (genDependency(s) == 'PYTHON2') {
-                    'COPY --from=python:2.7.10 / /'
+                    'FROM python:2.7.10 '
                     for (String s: tmp) {
                         '${s}'
                     }
+                    'COPY requirements.txt requirements.txt'
                     'RUN python2 -m pip install -r requirements.txt'
                 } else if (genDependency(s) == 'PYTHON3') {
-                    'COPY --from=python:3.8-slim-buster / /'
+                    'FROM python:3.8-slim-buster'
                     for (String s: tmp) {
                         '${s}'
                     }
+                    'COPY requirements.txt requirements.txt'
                     'RUN python3 -m pip install -r requirements.txt'
                 } else if (genDependency(s) == 'PYTHON39') {
-                    'COPY --from=python:3.9-slim-buster / /'
+                    'FROM python:3.10'
                     for (String s: tmp) {
                         '${s}'
                     }
+                    'COPY requirements.txt requirements.txt'
                     'RUN python3 -m pip install -r requirements.txt'
                 } 
             }
         }
+        'COPY --from=openjdk:13-alpine / /'  // TODO Java-Version & CPU
+        
         '${containerSettings(config, containerType, device)}'
         'RUN apk add bash'
         ''
