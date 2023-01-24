@@ -13,8 +13,11 @@
 package de.iip_ecosphere.platform.tools.maven.dependencies;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
@@ -42,9 +45,12 @@ public class CleaningUnpackMojo extends UnpackMojo {
     @Parameter(required = false)
     private FileSet cleanup;
     
-    @Parameter(required = false, defaultValue = "")
+    @Parameter(property = "unpack.initiallyAllowed", required = false, defaultValue = "")
     private String initiallyAllowed;
-    
+
+    @Parameter(property = "unpack.initiallyAllowedFile", required = false, defaultValue = "")
+    private File initiallyAllowedFile;
+
     @Parameter(property = "unpack.force", required = false, defaultValue = "false")
     private boolean force;
 
@@ -98,6 +104,42 @@ public class CleaningUnpackMojo extends UnpackMojo {
             }
         }
     }
+
+    /**
+     * Returns whether there is a setup for initially allowed files, considering {@link #initiallyAllowedFile} and 
+     * {@link #initiallyAllowed}.
+     *  
+     * @return {@code true} if there is some setup, {@code false} else
+     */
+    private boolean hasInitiallyAllowed() {
+        return (initiallyAllowed != null || initiallyAllowedFile != null);
+    }
+    
+    /**
+     * Returns the initially allowed files, considering {@link #initiallyAllowedFile} and {@link #initiallyAllowed}.
+     *  
+     * @return the initially allowed files
+     */
+    private Set<String> getInitiallyAllowed() {
+        Set<String> allowed = new HashSet<String>();
+        if (null != initiallyAllowedFile) {
+            try {
+                List<String> allLines = Files.readAllLines(initiallyAllowedFile.toPath());
+                allowed.addAll(allLines);
+                allowed.add(initiallyAllowed.toString());
+                getLog().info("Taking initially allowed files from " + initiallyAllowedFile);
+            } catch (IOException e) {
+                getLog().warn("Cannot read initially allowed files from " + initiallyAllowedFile 
+                    + ": " + e.getMessage());
+            }
+        }
+        if (null != initiallyAllowed) {
+            String tmp = initiallyAllowed.replace(";", ":");
+            getLog().info("Taking initially allowed files from POM " + initiallyAllowed);
+            Collections.addAll(allowed, tmp.split(":"));
+        }
+        return allowed;
+    }
     
     @Override
     protected void doExecute() throws MojoExecutionException, MojoFailureException {
@@ -109,10 +151,8 @@ public class CleaningUnpackMojo extends UnpackMojo {
             for (ArtifactItem ai : getArtifactItems()) {
                 boolean outDirExists = ai.getOutputDirectory().exists();
                 execute |= ai.isNeedsProcessing() || !outDirExists;
-                if (!execute && outDirExists && initiallyAllowed != null) {
-                    String tmp = initiallyAllowed.replace(";", ":");
-                    Set<String> allowed = new HashSet<String>();
-                    Collections.addAll(allowed, tmp.split(":"));
+                if (!execute && outDirExists && hasInitiallyAllowed()) {
+                    Set<String> allowed = getInitiallyAllowed();
                     getLog().info("Output directory " + ai.getOutputDirectory() + " exists. "
                         + "Checking for initially allowed files: " + allowed);
                     execute = true;
