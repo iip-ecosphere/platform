@@ -30,6 +30,8 @@ The extended `unpack` goal behaves like the original goal offering all configura
                                 <include>HelloWorld.py</include>
                             </includes>
                         </cleanup>
+                        <initiallyAllowed>Test.ivml, Test.text</initiallyAllowed>
+                        <initiallyAllowedFile>src/main/easy/initiallyAllowed.txt</initiallyAllowedFile>
                     </configuration>
                 </execution>
             <executions>
@@ -41,8 +43,8 @@ The extended `unpack` goal behaves like the original goal offering all configura
 The extended unpack goal supports the following additional configuration settings:
   - `cleanup` (default not given) specifying the files and directories to be deleted (via `includes`) before unpacking. Typically, `directory` points to the `outputDirectory` of the `artifactItems`.
   - `force` (default `false`, user property `unpack.force`) forces an update of the files applying a cleanup if needed. If `false`, unpacking only happens if the output folder does not exist (see `initiallyAllowed`).
-  - `initiallyAllowed` list of colon or semicolon separated relative file names (default empty) in one of the `outputDirectory` settings in the `artifactItems`. If an existing `outputDirectory` only contains `initiallyAllowed` files, perform the unpacking anyway, else only if `force` (or `-Dunpack.force`) is given.
-  
+  - `initiallyAllowed` (default not given, user property `unpack.initiallyAllowed`) list of colon or semicolon separated relative file names (default empty) in one of the `outputDirectory` settings in the `artifactItems`. If an existing `outputDirectory` only contains `initiallyAllowed` files, perform the unpacking anyway, else only if `force` (or `-Dunpack.force`) is given.
+  - `initiallyAllowedFile` (default not given, user property `unpack.initiallyAllowed`) like `initiallyAllowed` but given as a text file with one allowed file per line. The initially allowed file is automatically part of the initially allowed file set. If both, `initiallyAllowed` and `initiallyAllowedFile` are given, first the allowed files from `initiallyAllowedFile` and then those in `initiallyAllowed` are added to the set of allowed files.
   
 ## copy-dependencies goal
 
