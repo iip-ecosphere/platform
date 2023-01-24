@@ -2,6 +2,7 @@ project AllServicesPartPython {
 
     import AllTypes;
     import ApplicationPart*;
+    import Applications;
     
     annotate BindingTime bindingTime = BindingTime::compile to .;
    
