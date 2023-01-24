@@ -102,11 +102,14 @@ public class DrawflowGraphFormat implements GraphFormat {
                 for (IvmlGraphNode node : graph.nodes()) {
                     JSONObject jNode = new JSONObject();
                     String nodeId = node2id.get(node);
-                    jNode.put("id", getId(node, nodeId));
+                    jNode.put("class", "node");
+                    jNode.put("id", nodeId);
                     jNode.put("name", node.getName());
-                    jNode.put("data", new JSONObject());
+                    JSONObject data = new JSONObject();
+                    data.put("ivmlVar", getId(node, nodeId));
+                    jNode.put("data", data);
                     //jNode.put("class", node.getType());
-                    jNode.put("html", "");
+                    jNode.put("html", "<div>" + node.getName() + "</div>"); // preliminary
                     jNode.put("typenode", false);
                     jNode.put("inputs", writeEdges(node.inEdges(), true));
                     jNode.put("outputs", writeEdges(node.outEdges(), false));
