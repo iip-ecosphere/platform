@@ -1,0 +1,75 @@
+project AllServicesPartPython {
+
+    import AllTypes;
+    import ApplicationPart*;
+    
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+   
+    Service source = JavaService {
+        id = "Source",		
+        name = "Source",
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+        asynchronous = false,
+		traceRcv = TraceKind::LOG,
+        traceSent = TraceKind::LOG,
+        class = "de.iip_ecosphere.platform.impl.shop.TestSource",   //Package of class in project
+        artifact = "de.iip-ecosphere.platform.apps:ExampleTemplates:" + appVersion(myApp),
+        kind = ServiceKind::SOURCE_SERVICE,
+        output = {{type=refBy(NewInput)}}
+    };
+    
+    Service pyth = PythonService {
+        id = "PyService",
+        name = "PyService",
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+		traceRcv = TraceKind::SYSOUT,
+        traceSent = TraceKind::SYSOUT,
+        input = {{type=refBy(NewInput)}},
+        output = {{type=refBy(NewOutput)}},
+        artifact = "de.iip-ecosphere.platform.apps:ExampleTemplates:" +  appVersion(myApp),
+		kind = ServiceKind::TRANSFORMATION_SERVICE,
+        dependencies = {refBy(PYTHON39)}
+    };
+
+    Service sink = JavaService {
+        id = "Sink",     //Unknown
+        name = "Sink", //Unknown
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+		traceRcv = TraceKind::SYSOUT,
+        traceSent = TraceKind::SYSOUT,
+        class = "de.iip_ecosphere.platform.impl.shop.TestSink",
+        artifact = "de.iip-ecosphere.platform.apps:ExampleTemplates:" +  appVersion(myApp),
+        kind = ServiceKind::SINK_SERVICE,
+        input = {{type=refBy(NewOutput)}}
+    };
+    
+    PythonDependency skLearn0232 = {
+    	name = "scikit-learn",
+    	version = "0.23.2"
+    };
+
+    PythonDependency numpy1201 = {
+       name = "numpy",
+       version = "1.20.1"
+    };
+
+    PythonDependency pickle40 = {
+       name = "pickle",
+       version = "4.0"
+    };
+
+    PythonDependency pyflakes250 = {
+       name = "pyflakes",
+       version = "2.5.0"
+    };
+	
+    freeze {
+        .;
+    }
+}
