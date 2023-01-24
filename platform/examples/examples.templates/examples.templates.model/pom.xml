@@ -29,7 +29,8 @@
   </dependencies>
 
   <properties>
-    <ivml.file>WorkshopApp</ivml.file>
+    <!-- <ivml.file>WorkshopApp</ivml.file> -->
+    <iip.model>PlatformConfiguration</iip.model>
 	<maven.main.skip>true</maven.main.skip>
 	<maven.test.skip>true</maven.test.skip>
 	<maven.javadoc.skip>true</maven.javadoc.skip>
@@ -104,7 +105,7 @@
 			  
           </executions>
           <configuration>
-              <model>${ivml.file}</model>
+              <model>${iip.model}</model>
               <outputDirectory>gen/py</outputDirectory>
           </configuration>
       </plugin>
@@ -119,7 +120,7 @@
                      <mainClass>de.iip_ecosphere.platform.configuration.PlatformInstantiator</mainClass>
                      <cleanupDaemonThreads>false</cleanupDaemonThreads>
                      <arguments>
-                         <argument>${ivml.file}</argument>
+                         <argument>${iip.model}</argument>
                          <argument>src/test/easy</argument>
                          <argument>gen/test</argument>
                          <argument>generateAppsNoDeps</argument>
@@ -132,7 +133,7 @@
                            <mainClass>de.iip_ecosphere.platform.configuration.PlatformInstantiator</mainClass>
                            <cleanupDaemonThreads>false</cleanupDaemonThreads>
                            <arguments>
-                               <argument>${ivml.file}</argument>
+                               <argument>${iip.model}</argument>
                                <argument>src/test/easy</argument>
                                <argument>gen/broker</argument>
                                <argument>generateBroker</argument>
@@ -145,7 +146,7 @@
                      <mainClass>de.iip_ecosphere.platform.configuration.PlatformInstantiator</mainClass>
                      <cleanupDaemonThreads>false</cleanupDaemonThreads>
                      <arguments>
-                         <argument>${ivml.file}</argument>
+                         <argument>${iip.model}</argument>
                          <argument>src/test/easy</argument>
                          <argument>gen/test</argument>
                          <argument>generateApps</argument>

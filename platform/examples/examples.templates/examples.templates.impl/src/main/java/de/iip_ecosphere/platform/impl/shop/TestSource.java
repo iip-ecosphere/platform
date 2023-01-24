@@ -1,12 +1,13 @@
 package de.iip_ecosphere.platform.impl.shop;
 
-import java.io.*;        
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 import de.iip_ecosphere.platform.services.environment.*;
 import iip.datatypes.*;
 import iip.impl.*;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Random;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 
 /**
@@ -51,6 +52,7 @@ public class TestSource extends SourceImpl {
         }
         return result;
     }
+    
     /**
      * Takes the .csv containing the test data set from the training and reads it in.
      * The read values will be aggregated in a list of TestInputs for the transport.
