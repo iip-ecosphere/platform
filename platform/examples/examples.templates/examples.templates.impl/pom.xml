@@ -207,7 +207,7 @@
                                 <configuration>
                                     <mainClass>de.iip_ecosphere.platform.examples.SpringStartup</mainClass>
                                     <arguments>
-                                        <argument>../examples.templates.model/gen/py/TestTestApp/target/TestTestApp-0.1.0-SNAPSHOT-bin.jar</argument>
+                                        <argument>&lt;put relative location of integrated, generated application here&gt;</argument>
                                     </arguments>
                                     <classpathScope>test</classpathScope>
                                 </configuration>
