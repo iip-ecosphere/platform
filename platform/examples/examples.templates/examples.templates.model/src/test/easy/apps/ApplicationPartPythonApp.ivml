@@ -6,7 +6,7 @@ project ApplicationPartPythonApp {
    
     Application myApp = {
         id = "ExampleTemplatesApp",
-        name = "ExampleTemplates",
+        name = "ExampleForTemplatesProjects",
         ver = "0.1.0",
         description = "",
         services = {refBy(myMesh)}        
