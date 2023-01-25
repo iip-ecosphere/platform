@@ -25,6 +25,7 @@ class PyService(PyServiceInterface):
     def __init__(self):
         """Initializes the service.""" 
         super().__init__()
+        self.clf = None
     
     def processNewInput(self, data: NewInput):
         """Asynchronous data processing method. Use self.ingest(data) to pass the result back to the data stream.
