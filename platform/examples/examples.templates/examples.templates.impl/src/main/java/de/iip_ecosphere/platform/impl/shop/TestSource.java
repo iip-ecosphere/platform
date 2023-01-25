@@ -6,8 +6,10 @@ import java.util.List;
 import java.util.Random;
 
 import de.iip_ecosphere.platform.services.environment.*;
+import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 import iip.datatypes.*;
 import iip.impl.*;
+
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 
 /**
@@ -16,13 +18,12 @@ import de.iip_ecosphere.platform.support.resources.ResourceLoader;
  */
 public class TestSource extends SourceImpl {
     
-
     private boolean testDataLoaded = false;
     
     private List<NewInput> prepInputs = new ArrayList<NewInput>();
     
     Random ran = new Random();
-
+    
     /**
     * Fallback constructor, also used for testing main program.
     */

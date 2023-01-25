@@ -16,7 +16,7 @@ project AllServicesPartPython {
 		traceRcv = TraceKind::LOG,
         traceSent = TraceKind::LOG,
         class = "de.iip_ecosphere.platform.impl.shop.TestSource",   //Package of class in project
-        artifact = "de.iip-ecosphere.platform.apps:ExampleForTemplatesProjects:" + appVersion(myApp),
+        artifact = "de.iip-ecosphere.platform.apps:ExampleForTemplates:" + appVersion(myApp),
         kind = ServiceKind::SOURCE_SERVICE,
         output = {{type=refBy(NewInput)}}
     };
@@ -31,7 +31,7 @@ project AllServicesPartPython {
         traceSent = TraceKind::SYSOUT,
         input = {{type=refBy(NewInput)}},
         output = {{type=refBy(NewOutput)}},
-        artifact = "de.iip-ecosphere.platform.apps:ExampleForTemplatesProjects:" +  appVersion(myApp),
+        artifact = "de.iip-ecosphere.platform.apps:ExampleForTemplates:" +  appVersion(myApp),
 		kind = ServiceKind::TRANSFORMATION_SERVICE,
         dependencies = {refBy(PYTHON39)}
     };
@@ -45,7 +45,7 @@ project AllServicesPartPython {
 		traceRcv = TraceKind::SYSOUT,
         traceSent = TraceKind::SYSOUT,
         class = "de.iip_ecosphere.platform.impl.shop.TestSink",
-        artifact = "de.iip-ecosphere.platform.apps:ExampleForTemplatesProjects:" +  appVersion(myApp),
+        artifact = "de.iip-ecosphere.platform.apps:ExampleForTemplates:" +  appVersion(myApp),
         kind = ServiceKind::SINK_SERVICE,
         input = {{type=refBy(NewOutput)}}
     };

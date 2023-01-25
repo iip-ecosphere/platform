@@ -7,7 +7,6 @@ from datatypes.NewInputImpl import NewInputImpl
 from datatypes.NewOutput import NewOutput
 from datatypes.NewOutputImpl import NewOutputImpl
 from interfaces.PyServiceInterface import PyServiceInterface
-
 numpyExists = True
 
 try:
@@ -26,7 +25,6 @@ class PyService(PyServiceInterface):
     def __init__(self):
         """Initializes the service.""" 
         super().__init__()
-        self.clf = None
     
     def processNewInput(self, data: NewInput):
         """Asynchronous data processing method. Use self.ingest(data) to pass the result back to the data stream.
@@ -51,6 +49,7 @@ class PyService(PyServiceInterface):
         out = NewOutputImpl()
         out.setResult(result[0])
         self.ingest(out)
+
 
 #registers itself
 PyService()
