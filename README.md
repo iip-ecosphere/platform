@@ -10,7 +10,6 @@ The virtual IIP-Ecosphere Industry 4.0/IIoT platform aims at demonstrating new a
 * **In development:** Distributed testing/evaluation environment for platform and applications
 * Improved build process integration: Python "compile"/test, platform instantiator and Maven orchestrator build plugins for simplified platform and application build processes
 * Improved Python code integration: More Pythonic data type generation and Eclipse Editor support for PyDev.
-* Developer support: Platform configuration goes AAS, generated implementation templates, transport telegram logging
 
 ## Public demonstrations
 
