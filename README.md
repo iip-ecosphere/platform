@@ -5,9 +5,9 @@ The virtual IIP-Ecosphere Industry 4.0/IIoT platform aims at demonstrating new a
 ## News
 
 * **New in 2023:** IIP-Ecosphere demonstrators from the [IIP-Ecosphere innovation idea competition](https://www.iip-ecosphere.de/ideenwettbewerb/). Stay tuned - also external components by new IIP-Ecosystem partners may be introduced.
-* **In preparation:** Upgrade of AAS foundation to BaSyx 1.3 and of the platform to JDK 11.
+* **January 2023:** IIP-Ecosphere platform now relies on JDK 11 and BaSyx 1.3.0.
 * **In preparation:** Development container for service implemenation and (video) material from service integration workshop.
-* **In preparation:** Distributed testing/evaluation environment for platform and applications
+* **In development:** Distributed testing/evaluation environment for platform and applications
 * Improved build process integration: Python "compile"/test, platform instantiator and Maven orchestrator build plugins for simplified platform and application build processes
 * Improved Python code integration: More Pythonic data type generation and Eclipse Editor support for PyDev.
 * Developer support: Platform configuration goes AAS, generated implementation templates, transport telegram logging
