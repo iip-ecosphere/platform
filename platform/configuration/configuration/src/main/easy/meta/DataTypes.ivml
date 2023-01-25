@@ -15,6 +15,17 @@ project DataTypes {
     typedef NonEmptyNameString NonEmptyString with (matches(NonEmptyNameString, "^[\\w \\[\\]-\\Q$_\\E]+$")); // non whitespace
     typedef ArtifactString String with (size(ArtifactString) == 0 or (size(ArtifactString) > 0 and matches(ArtifactString, ".+:.+:.+"))); 
     
+    def String mvnVersion(IipVersion ver, Boolean snapshot) = 
+       if (snapshot) then ver + "-SNAPSHOT" else ver endif;
+       
+    abstract compound VersionedElement {
+        IipVersion ver;
+        Boolean snapshot = true;
+    }
+    
+    def String mvnVersion(VersionedElement v) = 
+       if (v.snapshot) then v.ver + "-SNAPSHOT" else v.ver endif;
+    
     abstract compound DataType {
         NonEmptyNameString name;
     }

@@ -53,3 +53,5 @@ DataTypes::YamlFileIdentityStore::class = The class name of the Yaml-based ident
 DataTypes::dataTypeNamesUnique = Each declared data type must have an unique name.
 DataTypes::identityStore = The identity store alternative to be used.
 DataTypes::iipVer = Constant Maven version number of the platform.
+DataTypes::VersionedElement::snapshot = Shall the Maven artifact be a snapshot or a release. 
+DataTypes::VersionedElement::ver = Version of the element (numbers separated by a dot).
