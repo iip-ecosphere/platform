@@ -15,14 +15,18 @@ package de.iip_ecosphere.platform.tools.maven.dependencies;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOCase;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -116,29 +120,55 @@ public class CleaningUnpackMojo extends UnpackMojo {
     }
     
     /**
-     * Returns the initially allowed files, considering {@link #initiallyAllowedFile} and {@link #initiallyAllowed}.
+     * Returns the initially allowed files/wildcards. [public/static for testing]
+     * 
+     * @param initiallyAllowed colon or semicolon separated list of filenames/wildcards, may be <b>null</b>
+     * @param initiallyAllowedFile file with line separated list of filenames/wildcards, may be <b>null</b>
+     * @param log maven plugin logging instance
      *  
      * @return the initially allowed files
      */
-    private Set<String> getInitiallyAllowed() {
+    public static Set<String> getInitiallyAllowed(String initiallyAllowed, File initiallyAllowedFile, Log log) {
         Set<String> allowed = new HashSet<String>();
         if (null != initiallyAllowedFile) {
             try {
                 List<String> allLines = Files.readAllLines(initiallyAllowedFile.toPath());
                 allowed.addAll(allLines);
-                allowed.add(initiallyAllowed.toString());
-                getLog().info("Taking initially allowed files from " + initiallyAllowedFile);
+                allowed.add(initiallyAllowedFile.toString());
+                log.info("Taking initially allowed files from " + initiallyAllowedFile);
             } catch (IOException e) {
-                getLog().warn("Cannot read initially allowed files from " + initiallyAllowedFile 
+                log.warn("Cannot read initially allowed files from " + initiallyAllowedFile 
                     + ": " + e.getMessage());
             }
         }
         if (null != initiallyAllowed) {
             String tmp = initiallyAllowed.replace(";", ":");
-            getLog().info("Taking initially allowed files from POM " + initiallyAllowed);
+            log.info("Taking initially allowed files from POM " + initiallyAllowed);
             Collections.addAll(allowed, tmp.split(":"));
         }
-        return allowed;
+        
+        // normalize to enable path matching between windows/linux
+        Set<String> tmp = new HashSet<>();
+        for (String a : allowed) {
+            tmp.add(FilenameUtils.normalize(a));
+        }
+        return tmp;
+    }
+
+    /**
+     * Returns whether {@code file} matches at least one of the file names/wildcards in {@code allowed}.
+     * 
+     * @param file the file to match (including path)
+     * @param allowed the allowed file names/wildcards
+     * @return {@code true} for match, {@code false} for no match
+     */
+    public static boolean matches(File file, Collection<String> allowed) {
+        for (String a : allowed) {
+            if (FilenameUtils.wildcardMatch(FilenameUtils.normalize(file.toString()), a, IOCase.SENSITIVE)) {
+                return true;
+            }
+        }
+        return false;
     }
     
     @Override
@@ -152,13 +182,13 @@ public class CleaningUnpackMojo extends UnpackMojo {
                 boolean outDirExists = ai.getOutputDirectory().exists();
                 execute |= ai.isNeedsProcessing() || !outDirExists;
                 if (!execute && outDirExists && hasInitiallyAllowed()) {
-                    Set<String> allowed = getInitiallyAllowed();
+                    Set<String> allowed = getInitiallyAllowed(initiallyAllowed, initiallyAllowedFile, getLog());
                     getLog().info("Output directory " + ai.getOutputDirectory() + " exists. "
                         + "Checking for initially allowed files: " + allowed);
                     execute = true;
-                    for (String fn : ai.getOutputDirectory().list()) {
-                        if (!allowed.contains(fn)) {
-                            getLog().info("Disabling execution as " + fn + " is not initially allowed");
+                    for (File f : ai.getOutputDirectory().listFiles()) {
+                        if (matches(f, allowed)) {
+                            getLog().info("Disabling execution as " + f + " is not initially allowed");
                             execute = false;
                         }
                     }
