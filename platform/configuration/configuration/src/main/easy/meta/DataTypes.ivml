@@ -18,7 +18,7 @@ project DataTypes {
     def String mvnVersion(IipVersion ver, Boolean snapshot) = 
        if (snapshot) then ver + "-SNAPSHOT" else ver endif;
        
-    abstract compound VersionedElement {
+    compound VersionedElement {
         IipVersion ver;
         Boolean snapshot = true;
     }
