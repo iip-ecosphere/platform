@@ -45,10 +45,12 @@ template Dockerfile_Python(IIPEcosphere config, FileArtifact target, sequenceOf(
                 } 
             }
         }
-        'COPY --from=openjdk:13-alpine / /'  // TODO Java-Version & CPU
         
+        ''
+        'RUN apt-get update'
+        'RUN apt-get install -y openjdk-11-jre'
+        ''
         '${containerSettings(config, containerType, device)}'
-        'RUN apk add bash'
         ''
         '# Installed dependencies (shall be in /)'
         'COPY installedDependencies.yml installedDependencies.yml'
