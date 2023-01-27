@@ -33,33 +33,19 @@ vilScript IIPEcosphereBase (Project source, Configuration config, Project target
     String serviceArtifactsRel = "src/main/serviceArtifacts";
 
 
-    generateOsScripts(Configuration config, String pathName, String dir, String main, String desc, String pidName, String requires, Boolean withJava8=true, String addJavaOpts="", String sysd="") = {
+    generateOsScripts(Configuration config, String pathName, String dir, String main, String desc, String pidName, String requires, String addJavaOpts="", String sysd="") = {
         vilTemplateProcessor("WinBatch", config, "${pathName}.bat", dir=dir, main=main, addJavaOpts=addJavaOpts);
-        if (withJava8) {
-            vilTemplateProcessor("WinBatch", config, "${pathName}8.bat", dir=dir, main=main, withModuleOpts=false, addJavaOpts=addJavaOpts);
-        }
         vilTemplateProcessor("LinuxBash", config, "${pathName}.sh", dir=dir, main=main, addJavaOpts=addJavaOpts);
         FileArtifact f = "${pathName}.sh";
         f.setExecutable(false);
-        if (withJava8) {
-            vilTemplateProcessor("LinuxBash", config, "${pathName}8.sh", dir=dir, main=main, withModuleOpts=false, addJavaOpts=addJavaOpts);
-            f = "${pathName}8.sh";
-            f.setExecutable(false);
-        }
         if (pidName.length() > 0) {
            String sName = pathName;
            if (sysd <> "") {
                sName = sysd;
            }
            vilTemplateProcessor("LinuxSysd", config, "${sName}.service", dir=dir, main=main, description=desc, pidFile="${pidName}.pid", requires=requires, after=requires, addJavaOpts=addJavaOpts);
-           if (withJava8) {
-               vilTemplateProcessor("LinuxSysd", config, "${sName}8.service", dir=dir, main=main, description=desc, pidFile="${pidName}.pid", requires=requires, after=requires, withModuleOpts=false, addJavaOpts=addJavaOpts);
-           }
            if (requires.length() > 0) {
                vilTemplateProcessor("LinuxSysd", config, "${sName}-noDeps.service", dir=dir, main=main, description=desc, pidFile="${pidName}.pid", addJavaOpts=addJavaOpts);
-               if (withJava8) {
-                   vilTemplateProcessor("LinuxSysd", config, "${sName}8-noDeps.service", dir=dir, main=main, description=desc, pidFile="${pidName}.pid", withModuleOpts=false, addJavaOpts=addJavaOpts);
-               }
            }
         }
     }
