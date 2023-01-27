@@ -46,12 +46,15 @@ public class FileUtils {
      * 
      * @param name the name of the temporary folder within the system/user temporary directory
      * @param cleanup try to do an auto cleanup at JVM shutdown
-     * @return the temporary folder (descriptor)
+     * @return the temporary folder (descriptor), may receive a suffix if there is already a 
+     *     folder that cannot be deleted
      */
     public static File createTmpFolder(String name, boolean cleanup) {
         String tmp = System.getProperty("java.io.tmpdir");
         File result = new File(tmp, name);
-        deleteQuietly(result);
+        if (!deleteQuietly(result)) {
+            result = new File(tmp, name + "_" + System.currentTimeMillis());
+        }
         result.mkdir();
         if (cleanup) {
             result.deleteOnExit();
