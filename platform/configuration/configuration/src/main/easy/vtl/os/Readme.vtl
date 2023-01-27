@@ -8,7 +8,7 @@ template Readme(Configuration config, FileArtifact target) {
         
         For understanding the components and how to explore the platform, we recommend reading the platform handbook on:
           - https://www.iip-ecosphere.eu/
-          - https://doi.org/10.5281/zenodo.5168946
+          - https://doi.org/10.5281/zenodo.7047640
         
         This is an assembled and instantiated version of the IIP-Ecosphere platform of version ${cfg.iipVer}. 
         Components that are not configured to be part of the platform are left out. Glue code for services, wire 
@@ -18,48 +18,47 @@ template Readme(Configuration config, FileArtifact target) {
         This folder contains the top-level artifacts that are needed to execute the platform (in the following sequence):
           - The communication broker. If possible, we instantiate a working broker into the broker folder. System or 
             device brokers providing the same functionality may be used instead.
-            - broker.bat for Windows and JDK > 8 and JDK <= 13
-            - broker.sh for Linux/Bash and JDK > 8 and JDK <= 13
+            - broker.bat for Windows and JDK >= 11 and JDK <= 15
+            - broker.sh for Linux/Bash and JDK >= 11 and JDK <= 15
             - setup in src
             - binaries in "brokerJars"
-            - iip-broker.service for Linux/systemd and JDK > 8 and JDK <= 13
+            - iip-broker.service for Linux/systemd and JDK >= 11 and JDK <= 15
           - The central platform services, in particular the AAS server (due to various components, JDK 8 is not 
             feasible for the central platform services)
-            - platform.bat for Windows and JDK > 8 and JDK <= 13
-            - platform.sh for Linux/Bash and JDK > 8 and JDK <= 13
+            - platform.bat for Windows and JDK >= 11 and JDK <= 15
+            - platform.sh for Linux/Bash and JDK >= 11 and JDK <= 15
             - source code in "platform"
             - binaries in "plJars"
-            - iip-platform.service for Linux/systemd and JDK > 8 and JDK <= 13
+            - iip-platform.service for Linux/systemd and JDK >= 11 and JDK <= 15
           - The central monitoring component (if configured, as long as BaSyx, Tomcat and monitoring do conflict)
-            - monitoring.bat for Windows and JDK > 8 and JDK <= 13
-            - monitoring.sh for Linux/Bash and JDK > 8 and JDK <= 13
+            - monitoring.bat for Windows and JDK >= 11 and JDK <= 15
+            - monitoring.sh for Linux/Bash and JDK >= 11 and JDK <= 15
             - source code in "monitoring"
             - binaries in "monJars"
-            - iip-monitoring.service for Linux/systemd and JDK > 8 and JDK <= 13
+            - iip-monitoring.service for Linux/systemd and JDK >= 11 and JDK <= 15
           - The ECS runtime with container manager
-            - ecs.bat for Windows and JDK > 8 and JDK <= 13, ecs8.bat for Windows and JDK 8
-            - ecs.sh for Linux/Bash and JDK > 8 and JDK <= 13, ecs8.sh for Linux/Bash and JDK 8
+            - ecs.bat for Windows and JDK >= 11 and JDK <= 15
+            - ecs.sh for Linux/Bash and JDK >= 11 and JDK <= 15
             - source code in "ecsRuntime"
             - binaries in "ecsJars"
             - iip-ecs.service (with dependency to platform.service) as well as ecs-noDeps.service (for standalone 
-              device installation) for Linux/systemd and JDK > 8, ecs8.service for Linux/system and JDK 8
+              device installation) for Linux/systemd and JDK >= 11 and JDK <= 15
           - The service manager
-            - serviceMgr.bat for Windows and JDK > 8 and JDK <= 13, serviceMgr8.bat for Windows and JDK 8
-            - serviceMgr.sh for Linux/Bash and JDK > 8 and JDK <= 13, serviceMgr8.sh for for Linux/Bash and JDK 8
+            - serviceMgr.bat for Windows and JDK >= 11 and JDK <= 15
+            - serviceMgr.sh for Linux/Bash and JDK >= 11 and JDK <= 15
             - source code in "serviceMgr"
             - binaries in "svcJars"
             - iip-serviceMgr.service (with dependency to ecs.service) as well as serviceMgr-noDeps.service (for standalone 
-              device/container installation) for Linux/systemd and JDK > 8 and JDK <= 13, akin serviceMgr8.service and 
-              serviceMgr8-noDeps.service for JDK 8
+              device/container installation) for Linux/systemd and JDK >= 11 and JDK <= 15
           - For small resources: ECS runtime without container manager but including service manager
-            - ecsServiceMgr.bat for Windows and JDK > 8 and JDK <= 13, ecsServiceMgr8.bat for Windows and JDK 8
-            - ecsServiceMgr.sh for Linux/Bash and JDK > 8 and JDK <= 13, ecsServiceMgr8.sh for for Linux/Bash and JDK 8
+            - ecsServiceMgr.bat for Windows and JDK >= 11 and JDK <= 15
+            - ecsServiceMgr.sh for Linux/Bash and JDK >= 11 and JDK <= 15
             - source code in "ecsServiceMgr"
             - binaries in "ecsSvcJars"
-            - iip-ecsServiceMgr.service for Linux/systemd and JDK > 8, ecsServiceMgr8.service for Linux/system and JDK 8
+            - iip-ecsServiceMgr.service for Linux/systemd and JDK >= 11 and JDK <= 15
           - The platform command line 
-            - cli.bat for Windows and JDK > 8 and JDK <= 13, cli8.bat for Windows and JDK 8
-            - cli.sh for Linux/Bash and JDK > 8 and JDK <= 13, cli8.sh for Linux/Bash and JDK 8
+            - cli.bat for Windows and JDK >= 11 and JDK <= 15
+            - cli.sh for Linux/Bash and JDK >= 11 and JDK <= 15
             - source code also in "platform"
             - binaries also in "plJars"
           - The folder "common": 
