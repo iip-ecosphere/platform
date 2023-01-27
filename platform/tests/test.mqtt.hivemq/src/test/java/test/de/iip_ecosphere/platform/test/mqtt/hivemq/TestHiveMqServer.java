@@ -46,7 +46,7 @@ public class TestHiveMqServer extends AbstractTestServer {
     @Override
     public Server start() {
         if (null == hiveMQ) {
-            File hiveTmp = FileUtils.createTmpFolder("hivemq_v5");
+            File hiveTmp = FileUtils.createTmpFolder("hivemq_v5", true);
 
             System.setProperty("HIVEMQ_PORT", Integer.toString(addr.getPort()));
             System.setProperty("HIVEMQ_ADDRESS", addr.getHost());
