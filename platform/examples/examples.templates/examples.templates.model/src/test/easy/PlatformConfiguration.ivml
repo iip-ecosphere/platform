@@ -1,0 +1,12 @@
+project PlatformConfiguration {
+
+    import TechnicalSetup;
+    import AllServices;
+    import AllTypes;
+    
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+    
+    freeze {
+        .;
+    }
+}

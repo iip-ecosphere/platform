@@ -20,9 +20,10 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    // No tests here, test harness does not cope with plugin configuration and we do not understand how 
+    CleaningUnpackMojoTest.class
+    // No further tests here, test harness does not cope with plugin configuration and we do not understand how 
     // to set it up correctly through program
-    // Tests, see ANT test.xml.
+    // Plugin tests, see ANT test.xml.
 })
 public class AllTests {
 }

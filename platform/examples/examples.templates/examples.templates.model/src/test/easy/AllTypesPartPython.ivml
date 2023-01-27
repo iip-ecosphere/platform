@@ -1,0 +1,44 @@
+project AllTypesPartPython {
+
+    import IIPEcosphere; 
+    
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+    RecordType NewInput = {
+        name = "NewInput",
+        fields = {
+            Field {
+                name = "type",
+                type = refBy(IntegerType)
+            }, Field {
+                name = "airTemp",
+                type = refBy(FloatType)
+            }, Field {
+                name = "procTemp",
+                type = refBy(FloatType)
+            }, Field {
+                name = "rotSpe",
+                type = refBy(IntegerType)
+            }, Field {
+                name = "torq",
+                type = refBy(FloatType)
+            }, Field {
+                name = "toolWear",
+                type = refBy(IntegerType)
+            }
+        }
+    };
+
+    RecordType NewOutput = {
+        name = "NewOutput",
+        fields = {
+        	Field {
+                name = "result",
+                type = refBy(DoubleType)
+            }
+        }
+    };
+
+    freeze {
+        .;
+    }
+}

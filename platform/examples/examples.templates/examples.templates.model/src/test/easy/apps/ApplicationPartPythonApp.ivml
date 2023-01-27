@@ -1,0 +1,19 @@
+project ApplicationPartPythonApp {
+
+    import ServiceMeshPartPythonApp*;
+
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+   
+    Application myApp = {
+        id = "ExampleTemplatesApp",
+        name = "ExampleTemplatesProject",
+        ver = "0.1.0",
+        description = "",
+        services = {refBy(myMesh)}        
+    };
+    
+    freeze {
+        .;
+    }
+
+}

@@ -15,7 +15,6 @@ Planned:
 * Semantic Ids in the UI [#63](https://github.com/iip-ecosphere/platform/issues/63)
 
 In progress:
-* Component upgrades to BaSyx 1.3.0 [#35](https://github.com/iip-ecosphere/platform/issues/35), Apache QPID-J 9.0.0 [#76](https://github.com/iip-ecosphere/platform/issues/76) and Java 11 in progress.
 * UI progress reporting [#70](https://github.com/iip-ecosphere/platform/issues/70)
 * Automatic creation of containers [#10](https://github.com/iip-ecosphere/platform/issues/10), [#9](https://github.com/iip-ecosphere/platform/issues/9).
 * [#59](https://github.com/iip-ecosphere/platform/issues/59): Distributed testing/evaluation environment
@@ -61,6 +60,7 @@ Improvements:
 * [#119](https://github.com/iip-ecosphere/platform/issues/119): CI build process for configuration.configuration now cleans up left-over containers.
 * [#111](https://github.com/iip-ecosphere/platform/issues/119): Simplifying the platform installation using the IIP-Ecosphere Maven plugins.
 * [#121](https://github.com/iip-ecosphere/platform/issues/121): Examples and selected test models turned into managed model structure. Starter classes of examples substituted by maven exec:java.
+* Component upgrades to BaSyx 1.3.0 [#35](https://github.com/iip-ecosphere/platform/issues/35), Apache QPID-J 9.0.0 [#76](https://github.com/iip-ecosphere/platform/issues/76) and *Java 11*.
 
 ### Version 0.4.0 (2022/09/02, TddT'22):
 

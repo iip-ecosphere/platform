@@ -1,6 +1,6 @@
-# Service implementation project for impl.TestTestApp.
+# Service implementation project for impl.ExampleTemplatesProject.
 
-Contains a template project for service implementations for impl.TestTestApp. The configuration model is assumed to be 
+Contains a template project for service implementations for impl.ExampleTemplatesProject. The configuration model is assumed to be 
 managed by the platform. Although generated, this code is intended to be imported into your Eclipse IDE and modified. 
 Please do not link the code into your IDE as it will be re-generated and will override your changes. Please feel free
 to delete class templates or POM settings if needed, e.g., if you want to realize individual re-usable services in 

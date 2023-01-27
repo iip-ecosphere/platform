@@ -1,0 +1,41 @@
+project ServiceMeshPartPythonAppMyMesh {
+
+    import AllServices;
+
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+
+    ServiceMesh myMesh = {
+        description = "WorkshopApp",
+        sources = {refBy(mySource)} //defines all source services
+    };
+
+    MeshSource mySource = {
+	   pollInterval = 800, //if source service is asynchronous = false!
+       impl = refBy(source), //name of a concrete service defined above!
+       next = {refBy(myConnMySourceMyTransformer)}
+    };
+
+    MeshConnector myConnMySourceMyTransformer = {
+        name = "Source->Transformer", //Convetion only or usage driven?
+        next = refBy(myTransformer) 
+    };
+
+    MeshProcessor myTransformer = {
+        impl = refBy(pyth),  //defines the class containing his impl.
+        next = {refBy(myConnMyTransformerMyReceiver)}
+    };
+
+    MeshConnector myConnMyTransformerMyReceiver = {
+        name = "Transformer->Receiver",
+        next = refBy(myReceiver)
+    };
+    
+    MeshSink myReceiver = {
+       impl = refBy(sink)
+    };
+
+    freeze {
+        .;
+    }
+
+}

@@ -1,4 +1,4 @@
-name: TestTestApp
+name: ExampleTemplatesProject
 identities:
   "amqp": 
      type: USERNAME
