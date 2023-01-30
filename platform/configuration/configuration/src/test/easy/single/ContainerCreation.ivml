@@ -94,7 +94,7 @@ project ContainerCreation {
         kind = ServiceKind::TRANSFORMATION_SERVICE,
         input = {{type=refBy(rec1)}},
         output = {{type=refBy(rec1)}}, 
-        dependencies = {refBy(PYTHON39), refBy(Pandas135), refBy(Sklearn), refBy(Pillow), refBy(KreasApplications108), refBy(Psutil), refBy(Glob2), refBy(OpenCVPython45564)}     
+        dependencies = {refBy(PYTHON39), refBy(Tflite_Runtime28), refBy(Pandas135), refBy(Sklearn), refBy(Pillow), refBy(KreasApplications108), refBy(Psutil), refBy(Glob2), refBy(OpenCVPython45564)}     
     };
     
     // refBy(ScipPy141), refBy(NumPy1201), // fail, require SysPythonNative and still fail
@@ -114,12 +114,12 @@ project ContainerCreation {
        version = "1.20.1", 
        dependencies = {refBy(SysPythonNative)}
     };
-    /*
+    
     PythonDependency Tflite_Runtime28 = {
        name = "tflite_runtime",
        version = "2.8"
     };
-    */
+    
     PythonDependency Pandas135 = {
        name = "pandas",
        version = "1.3.5"
