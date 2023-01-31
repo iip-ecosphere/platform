@@ -161,7 +161,11 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 
                 maven("${appRoot}", mvnUpdate);
 
-                generateServiceContainer(appRoot, cfg, a, elements);
+                String appArtifact = generateServiceContainer(appRoot, cfg, a, elements);
+                if (appArtifact == null or appArtifact.length() == 0) {
+                    appArtifact = appName + "-" + appVersion + "-bin.jar"; // currently not other packaging
+                }
+                generateDeploymentPlans(appRoot, cfg, a, elements, appArtifact);
             }
             
             Boolean withTemplate = true; // preliminary
@@ -363,16 +367,29 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     }
     
     // ------------------------------------------ generating apps: generating app-specific containers --------------------------------------------
-    
-    // creates containers depending on container strategies
-    Integer isEcs = 0;        // Is a "Ecs" image already generated?: 0 - false, 1 - true
-    generateServiceContainer(Path appRoot, IIPEcosphere config, Application a, sequenceOf(MeshElement) elements) = {
 
+    String getArtifactsFolder(Path appRoot, IIPEcosphere config) = {
         String artifactsFolder = config.artifactsFolder;
         if (artifactsFolder == config.artifactsFolderDflt) { // default is in appRoot
             artifactsFolder = "${appRoot}/../${artifactsFolder}";
         }
-        
+        artifactsFolder;
+    }
+
+    generateDeploymentPlans(Path appRoot, IIPEcosphere config, Application a, sequenceOf(MeshElement) elements, String artifact) = {
+        String artifactsFolder = getArtifactsFolder(appRoot, config);
+        setOf(DeploymentPlan) plans = DeploymentPlan.allInstances();
+        for (DeploymentPlan p: plans) {
+            String fileName = toIdentifier(a.id + "_" + p.id);
+            vilTemplateProcessor("DeploymentPlan", config, "${artifactsFolder}/${fileName}.yml", plan=p, app=a, artifact=artifact);
+        }
+    }
+    
+    // creates containers depending on container strategies
+    Integer isEcs = 0;        // Is a "Ecs" image already generated?: 0 - false, 1 - true
+    String generateServiceContainer(Path appRoot, IIPEcosphere config, Application a, sequenceOf(MeshElement) elements) = {
+        String appImageId = "";
+        String artifactsFolder = getArtifactsFolder(appRoot, config);
         ContainerManager mgr = config.containerManager;
         if (a.createContainer) {
             String regUser = getProperty("iip.container.user." + mgr.authenticationKey, "");
@@ -416,7 +433,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     // Create image 
                     Path b = "${appRoot}/../";
                     Path d = "${appRoot}/../" + dfName;
-                    String imageId = createContainerImage(mgr, b, d, a.name.toIdentifier(), device.containerName.toIdentifier(), a.ver);
+                    appImageId = createContainerImage(mgr, b, d, a.name.toIdentifier(), device.containerName.toIdentifier(), a.ver);
                     
                     // Mesh-Info, Container-Descriptor
                     Path meshInfo = "${artifactsFolder}/${filePrefix}mesh-info.yml";
@@ -431,7 +448,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     // Create image 
                     Path b = "${appRoot}/../";
                     Path d = "${appRoot}/../" + dfName;
-                    String imageId = createContainerImage(mgr, b, d, a.name.toIdentifier(), device.containerName.toIdentifier(), a.ver);
+                    appImageId = createContainerImage(mgr, b, d, a.name.toIdentifier(), device.containerName.toIdentifier(), a.ver);
                     
                     // Mesh-Info, Container-Descriptor
                     Path meshInfo = "${artifactsFolder}/${filePrefix}mesh-info.yml";
@@ -474,7 +491,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     // Create image 
                     Path b2 = "${appRoot}/../";
                     Path d2 = "${appRoot}/../" + dfName;
-                    String app_imageId = createContainerImage(mgr, b2, d2, a.name.toIdentifier(), device.containerName.toIdentifier(), a.ver);
+                    appImageId = createContainerImage(mgr, b2, d2, a.name.toIdentifier(), device.containerName.toIdentifier(), a.ver);
                     
                     // Mesh-Info, Container-Descriptor
                     Path meshInfo = "${artifactsFolder}/${filePrefix}mesh-info.yml";
@@ -486,7 +503,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 logoutContainerRegistry(mgr);
             }
         }
-        
+        appImageId;
     }
     
     // ------------------------------------------ generating apps: nested, e.g., family ----------------------------------------------------------

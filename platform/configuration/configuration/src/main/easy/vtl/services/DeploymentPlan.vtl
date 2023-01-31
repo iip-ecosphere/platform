@@ -1,0 +1,67 @@
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template DeploymentPlan(IIPEcosphere config, FileArtifact target, DeploymentPlan plan, Application app, String artifact) {
+
+    def main(IIPEcosphere config, FileArtifact target, DeploymentPlan plan, Application app, String artifact) {
+        'application: ${plan.name}
+        id: ${plan.id}
+        appId: ${app.id}
+        version: ${plan.ver}
+        description: ${plan.description}
+        ${generateArtifact(artifact)|e}
+        parallelize: ${plan.parallelize}
+        onUndeployRemoveArtifact: ${plan.onUndeployRemoveArtifact}
+        disabled: ${plan.disabled}
+        ${generateEnsembles(plan)|e}
+        ${generateAssignments(plan)|e}
+        ${generateArguments(plan)|e}'
+    }
+    
+    def generateArtifact(String artifact) {
+        if (artifact <> "") {
+            'artifact: ${artifact}'
+        }
+    }
+    
+    def generateArguments(DeploymentPlan plan) {
+        if (isDefined(plan.cmdArg) and plan.cmdArg.length() > 0) { // EASY-bug
+            sequenceOf(String) tmp = plan.cmdArg.split(",");
+            'arguments:'
+            for (String a: tmp) {
+                "  - ${a}"
+            }
+        }
+    }
+    
+    def generateAssignments(DeploymentPlan plan) {
+        if (isDefined(plan.assignments) and plan.assignments.size() > 0) {
+            'assignments:'
+            for (ServiceAssignment a: plan.assignments) {
+                '${generateAssignment(a)}'
+            }
+        }
+    }
+
+    // dispatch basis
+    def generateAssignment(ServiceAssignment assng) {
+        ''
+    }
+
+    def generateAssignment(NamedServiceAssignment assng) {
+        '  - resource: ${assng.resource}
+            services:'
+        for (MeshElement s: assng.services) {
+            '    - ${s.impl.id}'
+        }
+    }
+    
+    def generateEnsembles(DeploymentPlan plan) {
+        if (isDefined(plan.ensembles) and plan.ensembles.size() > 0) {
+            '- ensembles:'
+            for (EnsembleSpec s: plan.ensembles) {
+                '  ${s.leader.impl.id}: ${s.member.impl.id}'
+            }
+        }
+    }
+
+}

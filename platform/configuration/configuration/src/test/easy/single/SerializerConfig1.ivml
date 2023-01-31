@@ -376,7 +376,24 @@ project SerializerConfig1 {
     MeshSink myAasSink = {
         impl = refBy(myAasSinkService)
     };
-
+    
+    DeploymentPlan plan1 = {
+       name = "This is plan1",
+       application = refBy(myApp),
+       id = "plan1",
+       ver = "1.2.3",
+       description = "My Deployment Plan",
+       parallelize = true,
+       onUndeployRemoveArtifact = true,
+       disabled = false,
+       cmdArg="--a=5,--b=6",
+       assignments={
+           NamedServiceAssignment{resource="res1",services={refBy(mySource), refBy(myAnonymizer), refBy(myMqttC), refBy(myOpcConn)}}, 
+           NamedServiceAssignment{resource="res2",services={refBy(myKi), refBy(myRtsa), refBy(myAasSink)}}
+       }, 
+       ensembles={{leader=refBy(mySource), member=refBy(myAnonymizer)}}
+    };
+    
     // ---------- generation setup ------------
     
     sharedInterfaces = true;

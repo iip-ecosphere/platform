@@ -121,4 +121,39 @@ project Applications {
        };
    }
    
+   // ------------------------------- deployment --------------------------------------
+   
+   // deployment plan, outside application allowing to keep the plan local while application can be shared
+   // explicit container specificiation is currently not intended, the artifact is derived
+   compound DeploymentPlan {
+       NonEmptyString name;
+       refTo(Application) application;
+       NonEmptyString id;
+       IipVersion ver = "0.0.0";
+       String description = "";
+       sequenceOf(ServiceAssignment) assignments;
+       sequenceOf(EnsembleSpec) ensembles;
+       Boolean parallelize = false;
+       Boolean onUndeployRemoveArtifact = false;
+       Boolean disabled = false;
+       String cmdArg; // for now, comma separated as in application
+   }
+   
+   compound EnsembleSpec {
+       refTo(MeshElement) leader;
+       refTo(MeshElement) member;
+   }
+   
+   abstract compound ServiceAssignment {
+       sequenceOf(refTo(MeshElement)) services;
+   }
+   
+   // basic version as for now, future may reference to Resource
+   compound NamedServiceAssignment refines ServiceAssignment {
+       NonEmptyString resource;
+   }
+   
+   // ids unique
+   // service assignments defined, not duplicate and complete
+   
 }
