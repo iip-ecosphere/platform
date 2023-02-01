@@ -37,6 +37,7 @@ New features:
 * [#96](https://github.com/iip-ecosphere/platform/issues/96): Hostname as device id (optional, not default)
 * [#36](https://github.com/iip-ecosphere/platform/issues/36): Generated service test frames
 * [#114](https://github.com/iip-ecosphere/platform/issues/114): Initial integration of the OPC UA companion spec to IVML generator by J.-H. Cepok
+* [#124](https://github.com/iip-ecosphere/platform/issues/124): Deployment plans can be configured and generated.
 * [#105](https://github.com/iip-ecosphere/platform/issues/105): Maven plugins for Python build steps like "compile" (syntax check) and test. [#125](https://github.com/iip-ecosphere/platform/issues/125) allowing to execute python tests individually similar to surefire.
 * [#109](https://github.com/iip-ecosphere/platform/issues/101): Maven integration for platform/application instantiation and orchestrated execution of Maven, e.g., for the examples.
 * [#76](https://github.com/iip-ecosphere/platform/issues/76): Maven version of broker can be defined in configuration, optionally enabling use of QPID-J 9.0.0.
