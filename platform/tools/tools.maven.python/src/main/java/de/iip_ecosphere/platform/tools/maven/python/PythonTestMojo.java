@@ -50,11 +50,39 @@ public class PythonTestMojo extends AbstractMojo {
     @Parameter(property = "python-test.skip", required = false, defaultValue = "false")
     private boolean skip;
 
+    @Parameter(property = "python-test.test", required = false, defaultValue = "")
+    private String test;
+
     /**
      * A specific <code>fileSet</code> rule to select files and directories.
      */
     @Parameter(required = false)
     private FileSet fileset;
+    
+    private int testedFileCount = 0;
+    
+    /**
+     * Modify the test file. [testing]
+     * 
+     * @param test the test file
+     */
+    public void setTest(String test) {
+        this.test = test;
+    }
+
+    /**
+     * Returns the number of tested files.
+     * 
+     * @param reset shall the number be reset
+     * @return the number of tested files
+     */
+    public int getTestedFileCount(boolean reset) {
+        int result = testedFileCount;
+        if (reset) {
+            testedFileCount = 0;
+        }
+        return result;
+    }
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -88,12 +116,24 @@ public class PythonTestMojo extends AbstractMojo {
             getLog().info("Using Python " + pythonExecutable);
     
             String output = "";
-            for (File f : pythonFiles) {
-                getLog().info("Executing Python test: " + f.getName());
-                String[] cmd = {pythonExecutable.toString(), f.getName(), modelProject}; 
-                output += runPythonTest(cmd, new File(baseDir, "src/test/python/").getAbsolutePath());
+            String testFile = test == null ? "" : test; // do not modify original
+            if (testFile.length() > 0) {
+                if (!testFile.endsWith(".py")) {
+                    testFile += ".py";
+                }
+                getLog().info("Seleted test file: " + testFile);
             }
-            getLog().info(output);
+            for (File f : pythonFiles) {
+                if (testFile.length() == 0 || f.getName().startsWith(testFile)) {
+                    getLog().info("Executing Python test: " + f.getName());
+                    String[] cmd = {pythonExecutable.toString(), f.getName(), modelProject}; 
+                    output += runPythonTest(cmd, new File(baseDir, "src/test/python/").getAbsolutePath());
+                    testedFileCount++;
+                }
+            }
+            if (output.length() > 0) {
+                getLog().info(output);
+            }
             if (output.contains("Traceback")) {
                 throw new MojoExecutionException(output, null);
             }

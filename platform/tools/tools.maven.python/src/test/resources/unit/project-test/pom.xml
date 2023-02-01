@@ -25,7 +25,8 @@
                 <failOnError>true</failOnError>
                 <modelProject>..</modelProject>
                 <fileset>
-                    <directory>src/test/python</directory>
+                    <!-- Mvn file mechanisms rely on project home directory! -->
+                    <directory>${project.basedir}/src/test/python</directory>
                     <includes>
                         <include>**/*Test.py</include>
                     </includes>

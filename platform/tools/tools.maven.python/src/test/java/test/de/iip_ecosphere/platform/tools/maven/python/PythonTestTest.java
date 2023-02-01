@@ -51,6 +51,16 @@ public class PythonTestTest extends AbstractTest {
         PythonTestMojo myMojo = (PythonTestMojo) lookupConfiguredMojo(project, "test-python");
         assertNotNull(myMojo);
         myMojo.execute();
+        assertEquals(1, myMojo.getTestedFileCount(true));
+        
+        myMojo.setTest("HelloWorldTest");
+        myMojo.execute();
+        assertEquals(1, myMojo.getTestedFileCount(true));
+
+        // shall not lead to test execution
+        myMojo.setTest("HelloWorldTest2");
+        myMojo.execute();
+        assertEquals(0, myMojo.getTestedFileCount(true));
     }
     
     // checkstyle: resume exception type check

@@ -69,10 +69,11 @@ The Python test plugin currently executes Python files, either those directly lo
   ```
 
 The compiler plugin supports the following configuration settings:
-  - `failOnError` (default `true`, user property `python-compile.failOnError`): Whether the build process shall fail if Python compile errors are detected.
+  - `failOnError` (default `true`, user property `python-test.failOnError`): Whether the build process shall fail if Python compile errors are detected.
   - `modelProject` (default `../../../target/pySrc`, user property `python-test.modelProject`): Optional set if generated templates are moved, set to path of generated python 	sources.
   - `fileset` (default not given, execute all files directly located in `src/test/python`) is optional and can be used to determine the tests to be executed.
-  - `skip` (default `false`, user property `python-compile.skip`) skips the execution of this plugin. 
+  - `skip` (default `false`, user property `python-test.skip`) skips the execution of this plugin. 
+  - `test` (default `empty`, user property `python-test.test`), optional (file) name of the test to be executed. If not given, all tests will be executed.
   
   
 ## Combining the goals
