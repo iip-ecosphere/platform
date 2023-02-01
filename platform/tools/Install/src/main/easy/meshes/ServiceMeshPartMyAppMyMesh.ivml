@@ -11,6 +11,8 @@ project ServiceMeshPartMyAppMyMesh {
     
     MeshSource mySource = {
         pollInterval = 800, // only if source is synchronous
+        pos_x = 10,
+        pos_y = 10,
         impl = refBy(mySourceService),
         next = {refBy(myConnMySourceMyReceiver)}
     };
@@ -21,6 +23,8 @@ project ServiceMeshPartMyAppMyMesh {
     };
 
     MeshSink myReceiver = {
+        pos_x = 100,
+        pos_y = 10,
         impl = refBy(myReceiverService)
     };
 
