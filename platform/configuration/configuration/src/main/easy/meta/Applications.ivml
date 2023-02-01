@@ -47,6 +47,9 @@ project Applications {
         Constraint ensembleOk = ensemble <> null implies (ensemble <> refBy(self) and not(ensemble.ensemble <> null)); // no self-loops, max 1-chains
     }
 
+    def setOf(refTo(MeshElement)) nextElts(MeshElement elt) = {};
+    def setOf(refTo(MeshElement)) nextElts(MeshSource src) = src.next->collect(c|c.next);
+    def setOf(refTo(MeshElement)) nextElts(MeshInnerElement elt) = elt.next->collect(c|c.next);
     Constraint meshElementsUnique = allInstances(MeshElement)->isUnique(e|e.name);
     
     // hint to requirements!
@@ -137,7 +140,16 @@ project Applications {
        Boolean onUndeployRemoveArtifact = false;
        Boolean disabled = false;
        String cmdArg; // for now, comma separated as in application
+       
+       Constraint hasAssignments = isDefined(self.assignments) and self.assignments.size() > 0;
+       Constraint meshCovered = sources(self.application)->closure(refTo(MeshElement) e|nextElts(e)) 
+           == self.assignments->collect(a|a.services).flatten().toSet();
+       Constraint noLoopEnsembles = not(self.ensembles->collect(e|e.member).overlaps(self.ensembles->collect(e|e.leader)));
    }
+   
+   def setOf(refTo(MeshElement)) sources(Application app) = app.services->collect(m|m.sources).flatten().selectByKind(refTo(MeshElement));
+
+   Constraint deployPlanIdUnique = allInstances(DeploymentPlan)->isUnique(d|d.id);
    
    compound EnsembleSpec {
        refTo(MeshElement) leader;

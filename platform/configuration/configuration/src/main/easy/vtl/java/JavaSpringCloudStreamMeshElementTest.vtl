@@ -24,8 +24,9 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
             if (springConnId(base, conn, target, app) <> "") { 
                 'matcher.addPredicate(${type}.class, getAssertPredicate${type}());' // dynamic evaluation, no test needed
             } else {
+                String dest = composeDestination("${base.id}_${type}", app);
                 'final Predicate<${type}> pred${type} = getAssertPredicate${type}();
-                createReceptionCallback("${base.id}_${type}", d -> {
+                createReceptionCallback("${dest}", d -> {
                     incrementReceived(${type}.class); 
                     printReceivedData(d);
                     Assert.assertTrue(pred${type}.test(d));
@@ -391,11 +392,12 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
                         });');
                     } else {
                         String senderId = p.impl.id;
+                        String dest = composeDestination("${senderId}_${typeName}", app);
                         result = appendWithNewline(result, '${var}.addHandler(${fullTypeName}.class, d -> {
                             // one for spring - ignored if async
                             Transport.send(c -> c.asyncSend("${conn}", d), "${senderId}", "${conn}-in-0");
                             // one for async via transport - ignored if spring
-                            Transport.send(c -> c.asyncSend("${senderId}_${typeName}", d), "${senderId}", "${conn}-in-0");
+                            Transport.send(c -> c.asyncSend("${dest}", d), "${senderId}", "${conn}-in-0");
                         });');
                     }
                 }
