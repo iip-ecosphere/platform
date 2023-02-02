@@ -32,7 +32,6 @@ import { OperationQueryComponent } from './components/resource-details/operation
 import { OnlyIdPipe } from './pipes/only-id.pipe';
 import { StatusBoxComponent } from './components/deployment-plans/status-box/status-box.component';
 import { FlowchartComponent } from './components/flowchart/flowchart.component';
-import { DrawflowDirective } from './directives/drawflow.directive';
 
 
 @NgModule({
@@ -48,8 +47,7 @@ import { DrawflowDirective } from './directives/drawflow.directive';
     OperationQueryComponent,
     OnlyIdPipe,
     StatusBoxComponent,
-    FlowchartComponent,
-    DrawflowDirective
+    FlowchartComponent
   ],
   imports: [
     BrowserModule,
