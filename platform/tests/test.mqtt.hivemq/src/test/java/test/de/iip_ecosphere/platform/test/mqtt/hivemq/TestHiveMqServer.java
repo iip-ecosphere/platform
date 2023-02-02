@@ -19,6 +19,7 @@ import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.ServerAddress;
+import de.iip_ecosphere.platform.support.setup.CmdLine;
 import test.de.iip_ecosphere.platform.transport.AbstractTestServer;
 
 /**
@@ -74,12 +75,26 @@ public class TestHiveMqServer extends AbstractTestServer {
     }
     
     /**
+     * Determins the server address from the command line.
+     * 
+     * @param args the first argument may be the port number, else 8883 is used; 
+     *     optionally --host=<name> may be given afterwards
+     * @return the server address
+     */
+    protected static ServerAddress getServerAddress(String[] args) {
+        return new ServerAddress(Schema.IGNORE, 
+            CmdLine.getArg(args, "host", ServerAddress.LOCALHOST), 
+            getInteger(args, 8883));
+    }
+    
+    /**
      * Starts the server from the command line.
      * 
-     * @param args the first argument may be the port number, else 8883 is used
+     * @param args the first argument may be the port number, else 8883 is used; 
+     *     optionally --host=<name> may be given afterwards
      */
     public static void main(String[] args) {
-        TestHiveMqServer server = new TestHiveMqServer(new ServerAddress(Schema.IGNORE, getInteger(args, 8883)));
+        TestHiveMqServer server = new TestHiveMqServer(getServerAddress(args));
         server.start();
     }
 

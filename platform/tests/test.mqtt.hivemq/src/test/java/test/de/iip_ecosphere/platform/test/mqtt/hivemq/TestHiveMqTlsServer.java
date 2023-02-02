@@ -12,7 +12,6 @@ package test.de.iip_ecosphere.platform.test.mqtt.hivemq;
 
 import java.io.File;
 
-import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.ServerAddress;
 
 /**
@@ -34,11 +33,12 @@ public class TestHiveMqTlsServer extends TestHiveMqServer {
     /**
      * Starts the server from the command line.
      * 
-     * @param args the first argument may be the port number, else 8883 is used
+     * @param args the first argument may be the port number, else 8883 is used; 
+     *     optionally --host=<name> may be given afterwards
      */
     public static void main(String[] args) {
         setConfigDir(new File("./src/test/secCfg"));
-        TestHiveMqTlsServer server = new TestHiveMqTlsServer(new ServerAddress(Schema.IGNORE, getInteger(args, 8883)));
+        TestHiveMqTlsServer server = new TestHiveMqTlsServer(getServerAddress(args));
         server.start();
     }
 
