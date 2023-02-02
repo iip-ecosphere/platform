@@ -45,6 +45,7 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
         appendDependency(dep, iipGroup, "connectors", projectVersion);
         appendDependency(dep, iipGroup, "services.environment", projectVersion);
         // TURN THIS INTO XML
+        XmlElement d;
         if (!ifArtifact) {
             appendDependency(dep, iipGroup, serviceEnvironmentModule(config), projectVersion);
             appendDependency(dep, "org.springframework.boot", "spring-boot-starter-web");
@@ -52,28 +53,30 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
             appendDependency(dep, iipGroup, transportProtocolModule(config), projectVersion);
             appendDependency(dep, iipGroup, serviceProtocolModule(config), projectVersion);
             appendArtifact(dep, deviceIdProviderModule(config));
+            addSemanticIdResolverDependencies(dep, config);
+            d = appendDependency(dep, iipGroup, aasClientModule(config), projectVersion);
+            XmlElement exs = new XmlElement(d, "exclusions");
+            XmlElement ex = new XmlElement(exs, "exclusion");
+            new XmlElement(ex, "groupId", "javax.el");
+            new XmlElement(ex, "artifactId", "el-api");
+            ex = new XmlElement(exs, "exclusion");
+            new XmlElement(ex, "groupId", "org.apache.tomcat");
+            new XmlElement(ex, "artifactId", "tomcat-catalina");
         }
-        addSemanticIdResolverDependencies(dep, config);
-        XmlElement d = appendDependency(dep, iipGroup, aasClientModule(config), projectVersion);
-        XmlElement exs = new XmlElement(d, "exclusions");
-        XmlElement ex = new XmlElement(exs, "exclusion");
-        new XmlElement(ex, "groupId", "javax.el");
-        new XmlElement(ex, "artifactId", "el-api");
-        ex = new XmlElement(exs, "exclusion");
-        new XmlElement(ex, "groupId", "org.apache.tomcat");
-        new XmlElement(ex, "artifactId", "tomcat-catalina");
         for (String art : artifacts.asSequence()->sortedBy(a|a)) { // sortedBy for testing
             appendArtifact(dep, art, projectVersion);
         }
         d = appendDependency(dep, "org.glassfish", "jakarta.el");
         new XmlElement(d, "optional", "false");
 
-        appendDependency(dep, "org.springframework", "spring-test", scope="test");
-        appendDependency(dep, "junit", "junit", scope="test");
-        appendDependency(dep, "org.junit.jupiter", "junit-jupiter-engine", scope="test");
-        appendDependency(dep, "org.junit.platform", "junit-platform-launcher");
-        appendDependency(dep, "org.springframework.boot", "spring-boot-test", scope="test");
-        appendDependency(dep, "org.springframework.cloud", "spring-cloud-stream", type="test-jar", scope="test", classifier="test-binder");
+        if (!ifArtifact) {
+            appendDependency(dep, "org.springframework", "spring-test", scope="test");
+            appendDependency(dep, "junit", "junit", scope="test");
+            appendDependency(dep, "org.junit.jupiter", "junit-jupiter-engine", scope="test");
+            appendDependency(dep, "org.junit.platform", "junit-platform-launcher");
+            appendDependency(dep, "org.springframework.boot", "spring-boot-test", scope="test");
+            appendDependency(dep, "org.springframework.cloud", "spring-cloud-stream", type="test-jar", scope="test", classifier="test-binder");
+        }
         
         XmlElement plugins = createMavenBuildElement(project, "", true);
         XmlElement assemblyPlugin = appendAssemblyPlugin(plugins);

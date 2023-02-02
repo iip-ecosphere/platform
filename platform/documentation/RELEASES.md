@@ -50,6 +50,7 @@ Improvements:
 * [#95](https://github.com/iip-ecosphere/platform/issues/96): Document IVML model/variables for UI
 * [#53](https://github.com/iip-ecosphere/platform/issues/53): Document test models 
 * [#54](https://github.com/iip-ecosphere/platform/issues/54): Document example models 
+* [#71](https://github.com/iip-ecosphere/platform/issues/71): Test/fixes for MQTT on transport layer instead of AMQP.
 * [#85](https://github.com/iip-ecosphere/platform/issues/85): Display of platform build information on the UI
 * [#104](https://github.com/iip-ecosphere/platform/issues/104): Generation and execution of synchronous Python services/Java sinks
 * [#108](https://github.com/iip-ecosphere/platform/issues/108): Generated implementation templates support Eclipse PythonEditor PyDev
