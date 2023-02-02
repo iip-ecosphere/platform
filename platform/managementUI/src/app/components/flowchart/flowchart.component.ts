@@ -1,5 +1,6 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import Drawflow from 'drawflow';
+import { ApiService } from 'src/app/services/api.service';
 
 @Component({
   selector: 'app-flowchart',
@@ -9,7 +10,7 @@ import Drawflow from 'drawflow';
 export class FlowchartComponent implements OnInit {
 
 
-  constructor() {
+  constructor(private api: ApiService) {
 
   }
 
@@ -40,9 +41,6 @@ export class FlowchartComponent implements OnInit {
 
       this.editor.addNode('Home', 1, 1, 50, 50, '', {name: 'cool node', coolNumber: '1' }, htmlTemplate);
       this.editor.addNode('Home', 1, 1, 300, 100, '', {name: 'cool node', coolNumber: '2' }, htmlTemplate);
-
-      console.log(this.editor);
-
     }
 
   }
@@ -55,6 +53,24 @@ export class FlowchartComponent implements OnInit {
 
   public zoomOut() {
     this.editor.zoom_out();
+  }
+
+  public async getGraph() {
+    let data = await this.api.getGraph();
+    if(data?.outputArguments[0].value?.value) {
+      let graph = JSON.parse(data?.outputArguments[0].value?.value);
+      let graph2 = JSON.parse(graph.result);
+
+      let nodes = graph2.drawflow.Home.data
+      for(let node in nodes) {
+        const a = nodes[node];
+        a.html = "<div> " + a.data.ivmlVar + "<div>"
+      }
+      this.editor.import(graph2);
+    }
+
+
+
   }
 
 }

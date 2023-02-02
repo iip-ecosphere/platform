@@ -1,6 +1,6 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { PlatformArtifacts, PlatformResources, PlatformServices, ResourceAttribute, InputVariable } from 'src/interfaces';
+import { PlatformArtifacts, PlatformResources, PlatformServices, ResourceAttribute, InputVariable, platformResponse, Resource } from 'src/interfaces';
 import { firstValueFrom, Subject } from 'rxjs';
 import { EnvConfigService } from './env-config.service';
 
@@ -86,7 +86,7 @@ export class ApiService {
         modelType: {
           name: "Property"
         },
-        value: ""
+        value: "myMesh"
       }
     },
     {
@@ -98,18 +98,35 @@ export class ApiService {
         modelType: {
           name: "Property"
         },
-        value: ""
+        value: "drawflow"
       }
     }]
 
     try {
       response = await firstValueFrom(this.http.post(this.ip + '/shells/' + this.urn + "/aas/submodels/Configuration/submodel/submodelElements/getGraph/invoke"
-      ,{"inputArguments": input,"requestId":"1bfeaa30-1512-407a-b8bb-f343ecfa28cf", "inoutputArguments":[], "timeout":10000}));
+      ,{"inputArguments": input,"requestId":"1bfeaa30-1512-407a-b8bb-f343ecfa28cf", "inoutputArguments":[], "timeout":10000})) as platformResponse;
     } catch(e) {
       console.log(e);
     }
     return response;
   }
+
+  // public async getServiceMeshes() {
+  //   let response;
+  //   let meshes: string[];
+  //   try {
+  //     response = await firstValueFrom(this.http.get(this.ip + '/shells/' + this.urn + "/aas/submodels/Configuration/submodel/submodelElements/Application")) as Resource;
+  //     if(response && response.value) {
+  //       for(let element of response.value) {
+
+  //       }
+  //     }
+
+  //   } catch(e) {
+  //     console.log(e);
+  //   }
+  //   return response;
+  // }
 
   public async getResource(id: string) {
     if(!this.resources || !this.resources.submodelElements) {
