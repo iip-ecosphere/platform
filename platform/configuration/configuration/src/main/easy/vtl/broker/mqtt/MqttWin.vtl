@@ -4,7 +4,7 @@ template MqttWin(IIPEcosphere config, FileArtifact target) {
 	
     def main(IIPEcosphere config, FileArtifact target) {
         Integer port = config.transportProtocol.port;
-        String host = "--host ${config.transportProtocol.globalHost}";
+        String host = "--host=${config.transportProtocol.globalHost}";
         '@echo off
         set PORT=${port}
         if "%~1"=="" goto blank

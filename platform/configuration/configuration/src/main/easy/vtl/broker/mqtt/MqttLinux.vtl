@@ -4,7 +4,7 @@ template MqttLinux(IIPEcosphere config, FileArtifact target) {
 	
     def main(IIPEcosphere config, FileArtifact target) {
         Integer port = config.transportProtocol.port;
-        String host = "--host ${config.transportProtocol.globalHost}";
+        String host = "--host=${config.transportProtocol.globalHost}";
         '#!/bin/bash
         PORT=${port}
         if [ $# -gt 0 ]
