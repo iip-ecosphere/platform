@@ -7,7 +7,7 @@ template MqttLinuxSysd(Configuration config, FileArtifact target) {
     def main(Configuration config, FileArtifact target) {
         IIPEcosphere cfg = config;
         Integer port = cfg.transportProtocol.port;
-        String host = "--host ${config.transportProtocol.globalHost}";
+        String host = "--host ${cfg.transportProtocol.globalHost}";
         String instDir = cfg.instDirDflt;
         String javaExe = cfg.javaExeDflt;
         if (isDefined(cfg.instDir)) {
