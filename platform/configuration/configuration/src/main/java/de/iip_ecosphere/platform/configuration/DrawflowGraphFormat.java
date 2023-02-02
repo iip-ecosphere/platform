@@ -29,7 +29,9 @@ import de.iip_ecosphere.platform.configuration.ivml.GraphFormat;
 import de.iip_ecosphere.platform.configuration.ivml.IvmlGraphMapper.IvmlGraph;
 import de.iip_ecosphere.platform.configuration.ivml.IvmlGraphMapper.IvmlGraphEdge;
 import de.iip_ecosphere.platform.configuration.ivml.IvmlGraphMapper.IvmlGraphNode;
+import de.iip_ecosphere.platform.configuration.ivml.IvmlUtils;
 import net.ssehub.easy.varModel.confModel.IDecisionVariable;
+import net.ssehub.easy.varModel.model.IvmlDatatypeVisitor;
 
 /**
  * Writes a graph in the <a href="https://github.com/jerosoler/Drawflow">"drawflow"</a> format.
@@ -89,6 +91,24 @@ public class DrawflowGraphFormat implements GraphFormat {
                 }
             }
         }
+        
+        /**
+         * Turns service information into data for the editor.
+         * 
+         * @param service the IVML variable representing the service, may be <b>null</b>
+         * @param data the data object to be modified
+         */
+        @SuppressWarnings("unchecked")
+        private void serviceToData(IDecisionVariable service, JSONObject data) {
+            if (null != service) {
+                String type = IvmlDatatypeVisitor.getUnqualifiedType(service.getDeclaration().getType());
+                data.put("type", type);
+                String kind = IvmlUtils.toName(IvmlUtils.getEnumValue(IvmlUtils.getNestedSafe(service, "kind")), null);
+                if (null != kind) {
+                    data.put("kind", kind);
+                }
+            }
+        }
 
         /**
          * Writes the "home" data section.
@@ -107,6 +127,7 @@ public class DrawflowGraphFormat implements GraphFormat {
                     jNode.put("name", node.getName());
                     JSONObject data = new JSONObject();
                     data.put("ivmlVar", getId(node, nodeId));
+                    serviceToData(IvmlUtils.getNestedSafe(node.getVariable(), "impl"), data); 
                     jNode.put("data", data);
                     //jNode.put("class", node.getType());
                     jNode.put("html", "<div>" + node.getName() + "</div>"); // preliminary

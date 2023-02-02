@@ -635,7 +635,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         
         sequenceOf(String) artList = cfg.sharedArtifact.split(":");
         vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", usedServiceTypes=usedServiceTypes, artifacts=artifacts, bins=bins, assemblies=assemblies, resources=resources, starterCls="iip.Starter", 
-            appName=artList[1], appVersion=artList[2], appDescription="Shared application interfaces", tests=tests, springPackaging=false, groupId=artList[0]);
+            appName=artList[1], appVersion=artList[2], appDescription="Shared application interfaces", tests=tests, springPackaging=false, groupId=artList[0], ifArtifact=true);
         vilTemplateProcessor("AppAnt", config, "${appRoot}/build-jk.xml", artifactPrefix=artList[1], srvFolderName="IIP-apps-${artList[1]}");
             
         maven("${appRoot}", mvnUpdate);

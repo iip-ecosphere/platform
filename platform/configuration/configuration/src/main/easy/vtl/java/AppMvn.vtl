@@ -4,7 +4,7 @@ import JavaMapping;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedServiceTypes, setOf(String) artifacts, setOf(String) bins, setOf(String) assemblies, setOf(String) resources, String starterCls, String appName, String appVersion, String appDescription, Boolean tests, Boolean springPackaging=true, String groupId="") {
+template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedServiceTypes, setOf(String) artifacts, setOf(String) bins, setOf(String) assemblies, setOf(String) resources, String starterCls, String appName, String appVersion, String appDescription, Boolean tests, Boolean springPackaging=true, String groupId="", Boolean ifArtifact=false) {
 
     def XmlElement appendSpringBootPlugin(XmlElement plugins, String version="2.4.2", String mainClass="") {
         XmlElement plugin = appendPlugin(plugins, "org.springframework.boot", "spring-boot-maven-plugin", version, false);
@@ -20,7 +20,7 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
         }
     }
 
-    def main(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedServiceTypes, setOf(String) artifacts, setOf(String) bins, setOf(String) assemblies, setOf(String) resources, String starterCls, String appName, String appVersion, String appDescription, Boolean tests, Boolean springPackaging=true, String groupId="") {
+    def main(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedServiceTypes, setOf(String) artifacts, setOf(String) bins, setOf(String) assemblies, setOf(String) resources, String starterCls, String appName, String appVersion, String appDescription, Boolean tests, Boolean springPackaging=true, String groupId="", Boolean ifArtifact=false) {
         String iipGroup = "de.iip-ecosphere.platform";
         String gId = groupId;
         if (length(gId) == 0) {
@@ -45,12 +45,14 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
         appendDependency(dep, iipGroup, "connectors", projectVersion);
         appendDependency(dep, iipGroup, "services.environment", projectVersion);
         // TURN THIS INTO XML
-        appendDependency(dep, iipGroup, serviceEnvironmentModule(config), projectVersion);
-        appendDependency(dep, "org.springframework.boot", "spring-boot-starter-web");
-        appendDependency(dep, "org.springframework.boot", "spring-boot-starter-actuator");
-        appendDependency(dep, iipGroup, transportProtocolModule(config), projectVersion);
-        appendDependency(dep, iipGroup, serviceProtocolModule(config), projectVersion);
-        appendArtifact(dep, deviceIdProviderModule(config));
+        if (!ifArtifact) {
+            appendDependency(dep, iipGroup, serviceEnvironmentModule(config), projectVersion);
+            appendDependency(dep, "org.springframework.boot", "spring-boot-starter-web");
+            appendDependency(dep, "org.springframework.boot", "spring-boot-starter-actuator");
+            appendDependency(dep, iipGroup, transportProtocolModule(config), projectVersion);
+            appendDependency(dep, iipGroup, serviceProtocolModule(config), projectVersion);
+            appendArtifact(dep, deviceIdProviderModule(config));
+        }
         addSemanticIdResolverDependencies(dep, config);
         XmlElement d = appendDependency(dep, iipGroup, aasClientModule(config), projectVersion);
         XmlElement exs = new XmlElement(d, "exclusions");
@@ -67,11 +69,9 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
         new XmlElement(d, "optional", "false");
 
         appendDependency(dep, "org.springframework", "spring-test", scope="test");
-        appendDependency(dep, "org.springframework.boot", "spring-boot-test", scope="test");
         appendDependency(dep, "junit", "junit", scope="test");
         appendDependency(dep, "org.junit.jupiter", "junit-jupiter-engine", scope="test");
         appendDependency(dep, "org.junit.platform", "junit-platform-launcher");
-        appendDependency(dep, "org.springframework", "spring-test", scope="test");
         appendDependency(dep, "org.springframework.boot", "spring-boot-test", scope="test");
         appendDependency(dep, "org.springframework.cloud", "spring-cloud-stream", type="test-jar", scope="test", classifier="test-binder");
         

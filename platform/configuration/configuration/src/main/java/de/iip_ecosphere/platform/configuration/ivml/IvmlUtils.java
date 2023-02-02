@@ -17,6 +17,7 @@ import net.ssehub.easy.varModel.model.AbstractVariable;
 import net.ssehub.easy.varModel.model.datatypes.IDatatype;
 import net.ssehub.easy.varModel.model.datatypes.TypeQueries;
 import net.ssehub.easy.varModel.model.values.BooleanValue;
+import net.ssehub.easy.varModel.model.values.EnumValue;
 import net.ssehub.easy.varModel.model.values.IntValue;
 import net.ssehub.easy.varModel.model.values.StringValue;
 import net.ssehub.easy.varModel.model.values.Value;
@@ -69,6 +70,41 @@ public class IvmlUtils {
             } else {
                 result = ((StringValue) val).getValue();
             }
+        }
+        return result;
+    }
+
+    
+    /**
+     * Returns an enum value from the given {@code var}.
+     * 
+     * @param var the variable (may be <b>null</b>)
+     * @return the value or <b>null</b>
+     */
+    public static EnumValue getEnumValue(IDecisionVariable var) {
+        EnumValue result = null;
+        if (var != null) {
+            Value val = var.getValue();
+            if (val instanceof EnumValue) {
+                result = (EnumValue) val;
+            }
+        }
+        return result;
+    }
+    
+    /**
+     * Turns an enum value to its name.
+     * 
+     * @param value the value, may be <b>null</b>
+     * @param deflt the default value to return if no value can be obtained
+     * @return the name of the enum literal or {@code deflt}
+     */
+    public static String toName(EnumValue value, String deflt) {
+        String result;
+        if (null == value) {
+            result = deflt;
+        } else {
+            result = value.getValue().getName();
         }
         return result;
     }
