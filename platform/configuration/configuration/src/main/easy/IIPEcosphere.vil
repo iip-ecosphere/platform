@@ -213,6 +213,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 String appVersion = getAppMvnVersion(a);
                 vilTemplateProcessor("AppMvnTest", config, "${appRoot}/pom.xml", usedServiceTypes=usedServiceTypes, assemblies=assemblies, nodes=elements, appName=appName, appVersion=appVersion, appDescription="Implementation of ${a.name}", tests=tests);
                 vilTemplateProcessor("TemplatesIdentityStoreYaml", config, "${resourcesSrc}/identityStore.yml", appName=appName);
+                vilTemplateProcessor("TemplatesTestLogbackXml", config, "${testResourcesSrc}/logback.xml");
                 identityStoreJsl(testResourcesSrc, cfg);
                 
                 zip(appRoot, appRoot, "${target}/templates/eclipse/impl.${appName}.zip");

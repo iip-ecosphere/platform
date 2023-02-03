@@ -1,0 +1,31 @@
+import JavaBasics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template LoggingBasics(Configuration config, FileArtifact target) {
+
+    def XmlElement createLogbackStdoutXml(XmlFileArtifact target, String rootLevel) {
+        target.setOmitXmlDeclaration(true);
+        XmlElement cfg = target.createRootElement("configuration");
+        
+        XmlElement appender = new XmlElement(cfg, "appender");
+        new XmlAttribute(appender, "name", "STDOUT");
+        new XmlAttribute(appender, "class", "ch.qos.logback.core.ConsoleAppender");
+        XmlElement encoder = new XmlElement(appender, "encoder");
+        new XmlElement(encoder, "pattern", "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n");
+        
+        XmlElement root = new XmlElement(cfg, "root");
+        new XmlAttribute(root, "level", rootLevel);
+        XmlElement appenderRef = new XmlElement(root, "appender-ref");
+        new XmlAttribute(appenderRef, "ref", "STDOUT");
+        
+        cfg;
+    }
+    
+    def getLogbackLoggerEntry(XmlElement cfg, String name, String level) {
+        XmlElement logger = new XmlElement(cfg, "logger");
+        new XmlAttribute(logger, "name", name);
+        new XmlAttribute(logger, "level", level);
+    }
+    
+}

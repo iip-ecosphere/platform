@@ -42,6 +42,8 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
         import de.iip_ecosphere.platform.support.resources.ResourceLoader;
         import de.iip_ecosphere.platform.services.environment.spring.SpringAsyncServiceBase;
         import de.iip_ecosphere.platform.transport.Transport;
+        import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
+        import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
         
         import org.slf4j.LoggerFactory;
         
@@ -492,8 +494,10 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
         */
         @Test
         public void test${firstToUpperCase(toIdentifier(service.id))}Service() throws IOException {
+            NotificationMode oldM = ActiveAasBase.setNotificationMode(NotificationMode.NONE);
             testSource();
             ${genAssertReceived()}
+            ActiveAasBase.setNotificationMode(oldM);
         }
         '
     }
@@ -507,6 +511,7 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
         */
         @Test
         public void test${firstToUpperCase(toIdentifier(service.id))}Service() throws IOException {
+            NotificationMode oldM = ActiveAasBase.setNotificationMode(NotificationMode.NONE);
             testService();
             ${genAssertReceived()}
             Service svc = iip.Starter.getMappedService("${service.id}");
@@ -518,6 +523,7 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
                     LoggerFactory.getLogger(getClass()).error("Stopping service ${service.id}: {}", e.getMessage());
                 }
             }
+            ActiveAasBase.setNotificationMode(oldM);
         }
         '
     }
