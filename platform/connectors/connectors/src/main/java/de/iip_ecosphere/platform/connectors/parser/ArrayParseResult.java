@@ -128,4 +128,9 @@ public class ArrayParseResult implements ParseResult<String> {
         return data;
     }
 
+    @Override
+    public int getArraySize() {
+        return -1; // not supported?
+    }
+
 }

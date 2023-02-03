@@ -68,6 +68,44 @@ public final class JsonInputParser implements InputParser<Any> {
     }
     
     /**
+     * Emulates a one-element entry "iterator".
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static final class OneElementEntryIterator implements EntryIterator {
+
+        private String key;
+        private Any value;
+        
+        /**
+         * Creates the instance.
+         * 
+         * @param key the key of the only element
+         * @param value the value of the only element
+         */
+        private OneElementEntryIterator(String key, Any value) {
+            this.key = key;
+            this.value = value;
+        }
+        
+        @Override
+        public boolean next() {
+            return false;
+        }
+
+        @Override
+        public String key() {
+            return key;
+        }
+
+        @Override
+        public Any value() {
+            return value;
+        }
+        
+    }
+    
+    /**
      * Defines a parse result instance for JSON.
      * 
      * @author Holger Eichelberger, SSE
@@ -135,27 +173,56 @@ public final class JsonInputParser implements InputParser<Any> {
         private EntryIterator findBy(int[] indexes) {
             EntryIterator result = null;
             if (indexes.length > 0) {
-                // ensure (lazy) iterator :( // LazyIterator#parse ??
-                Any tmp = Any.lazyObject(data, 0, data.length - 1);
+                Any tmp = dataToAny();
                 for (int i = 0; i < indexes.length; i++) {
                     int pos = indexes[i];
-                    EntryIterator it = tmp.entries();
-                    while (pos >= 0 && it.next()) {
-                        if (pos == 0) {
-                            if (i < indexes.length - 1) {
-                                tmp = it.value();
-                                if (tmp.valueType() == ValueType.STRING) { // index assumes an object, try to parse
-                                    tmp = JsonIterator.deserialize(tmp.toString());
+                    if (tmp.valueType() == ValueType.ARRAY) {
+                        result = new OneElementEntryIterator("", tmp.get(pos));
+                    } else {
+                        EntryIterator it = tmp.entries();
+                        while (pos >= 0 && it.next()) {
+                            if (pos == 0) {
+                                if (i < indexes.length - 1) {
+                                    tmp = deserializeIfString(it.value());
+                                } else {
+                                    result = it;
                                 }
-                            } else {
-                                result = it;
                             }
+                            pos--;
                         }
-                        pos--;
-                    }                    
+                    }
                 }
             }
             return result;
+        }
+        
+        /**
+         * Deserializes {@code tmp} if it looks like a string.
+         * 
+         * @param tmp the any to be considered
+         * @return {@code tmp} or deserialized any
+         */
+        private Any deserializeIfString(Any tmp) {
+            if (tmp.valueType() == ValueType.STRING) { // index assumes an object, try to parse
+                tmp = JsonIterator.deserialize(tmp.toString());
+            }
+            return tmp;
+        }
+        
+        /**
+         * Turns {@link #data} to any considering its "type".
+         * 
+         * @return any from {@link #data}
+         */
+        private Any dataToAny() {
+            Any tmp;
+            // ensure (lazy) iterator :( // LazyIterator#parse ??
+            if (data[0] == ((byte) '[')) {
+                tmp = Any.lazyArray(data, 0, data.length);
+            } else {
+                tmp = Any.lazyObject(data, 0, data.length - 1);    
+            }
+            return tmp;
         }
         
         /**
@@ -166,15 +233,18 @@ public final class JsonInputParser implements InputParser<Any> {
          */
         private EntryIterator findBy(int index) {
             EntryIterator result = null;
-            // ensure (lazy) iterator :( // LazyIterator#parse ??
-            Any tmp = Any.lazyObject(data, 0, data.length - 1);
-            EntryIterator it = tmp.entries();
-            while (index >= 0 && it.next()) {
-                if (index == 0) {
-                    result = it;
-                }
-                index--;
-            }                    
+            Any tmp = dataToAny();
+            if (tmp.valueType() == ValueType.ARRAY) {
+                result = new OneElementEntryIterator("", tmp.get(index));
+            } else {
+                EntryIterator it = tmp.entries();
+                while (index >= 0 && it.next()) {
+                    if (index == 0) {
+                        result = it;
+                    }
+                    index--;
+                }           
+            }
             return result;
         }
 
@@ -333,6 +403,11 @@ public final class JsonInputParser implements InputParser<Any> {
         public JsonParseResult stepOut() {
             return parent;
         }
+
+        @Override
+        public int getArraySize() {
+            return any.size();
+        }
         
     }
     
@@ -441,7 +516,7 @@ public final class JsonInputParser implements InputParser<Any> {
             }
             return dta; // exception?
         }
-
+        
         @Override
         public Object toObject(Any data) throws IOException {
             return null; // preliminary

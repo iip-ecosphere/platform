@@ -80,6 +80,18 @@ public class TextLineFormatterTest {
         public OutputConverter<String> getConverter() {
             return null;
         }
+
+        @Override
+        public void startArrayStructure(String name) throws IOException {
+        }
+
+        @Override
+        public void startObjectStructure(String name) throws IOException {
+        }
+
+        @Override
+        public void endStructure() throws IOException {
+        }
         
     }
 

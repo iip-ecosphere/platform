@@ -142,6 +142,13 @@ public interface InputParser<T> {
          * @return the actual (parent) context, may be <b>null</b> if this step out was illegal in a non-nested context
          */
         public ParseResult<T> stepOut();
+        
+        /**
+         * If the actual element is an array, return the size.
+         * 
+         * @return the size, may be negative
+         */
+        public int getArraySize();
 
         /**
          * Returns the name of the field. This operation may not be efficient on all input parsers, in particular
@@ -283,7 +290,7 @@ public interface InputParser<T> {
          * @throws IOException if conversion fails
          */
         public byte[] toByteArray(T data) throws IOException;
-
+        
         /**
          * Converts parsed data returned by {@link ParseResult} to a date representation.
          * 
@@ -346,7 +353,7 @@ public interface InputParser<T> {
          * @throws IOException if conversion fails
          */
         public Object toObject(T data) throws IOException;
-        
+
     }
     
     /**

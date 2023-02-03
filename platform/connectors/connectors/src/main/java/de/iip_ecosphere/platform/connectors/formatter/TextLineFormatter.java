@@ -66,4 +66,19 @@ public class TextLineFormatter implements OutputFormatter<String> {
         return CONVERTER;
     }
 
+    @Override
+    public void startArrayStructure(String name) throws IOException {
+        // ignored for now
+    }
+
+    @Override
+    public void startObjectStructure(String name) throws IOException {
+        // ignored for now
+    }
+
+    @Override
+    public void endStructure() throws IOException {
+        // ignored for now
+    }
+
 }

@@ -26,6 +26,18 @@ public class DummyFormatter implements OutputFormatter<String> {
     }
 
     @Override
+    public void startArrayStructure(String name) throws IOException {
+    }
+
+    @Override
+    public void startObjectStructure(String name) throws IOException {
+    }
+
+    @Override
+    public void endStructure() throws IOException {
+    }
+
+    @Override
     public byte[] chunkCompleted() throws IOException {
         return new byte[0];
     }

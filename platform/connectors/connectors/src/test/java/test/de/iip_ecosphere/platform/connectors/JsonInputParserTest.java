@@ -29,6 +29,55 @@ import de.iip_ecosphere.platform.connectors.parser.JsonInputParser.JsonParseResu
 public class JsonInputParserTest {
     
     /**
+     * Some object-based test data.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    static class JsonTestData {
+        
+        private String sValue;
+        private int iValue;
+        
+        
+        /**
+         * Returns the string value.
+         * 
+         * @return the string balue
+         */
+        public String getSValue() {
+            return sValue;
+        }
+        
+        /**
+         * Defines the string value.
+         * 
+         * @param sValue the string value to set
+         */
+        public void setSValue(String sValue) {
+            this.sValue = sValue;
+        }
+        
+        /**
+         * Returns the integer value.
+         * 
+         * @return the integer value
+         */
+        public int getIValue() {
+            return iValue;
+        }
+        
+        /**
+         * Defines the integer value.
+         * 
+         * @param iValue the integer value to set
+         */
+        public void setIValue(int iValue) {
+            this.iValue = iValue;
+        }
+        
+    }
+    
+    /**
      * Tests {@link JsonInputParser}.
      * 
      * @throws IOException shall not occur

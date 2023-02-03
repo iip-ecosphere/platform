@@ -67,4 +67,51 @@ public class JsonOutputFormatterTest {
         Assert.assertEquals(MyEnum.TEST1, pConv.toEnum(pr.getData("enumName", 0), MyEnum.class));
     }
 
+    /**
+     * Tests the output formatter on objects.
+     * 
+     * @throws IOException shall not occur
+     */
+    @Test
+    public void testFormatter4Object() throws IOException {
+        JsonOutputFormatter formatter = new JsonOutputFormatter();
+        JsonOutputConverter fConv = formatter.getConverter();
+        
+        formatter.startObjectStructure("obj");
+        formatter.add("iValue", fConv.fromInteger(-1));
+        formatter.add("sValue", fConv.fromString("abba"));
+        formatter.endStructure();
+        
+        formatter.startArrayStructure("arr");
+        formatter.startObjectStructure(null);
+        formatter.add("iValue", fConv.fromInteger(1));
+        formatter.add("sValue", fConv.fromString("bap"));
+        formatter.endStructure();
+        formatter.endStructure();
+
+        byte[] chunk = formatter.chunkCompleted();
+        String tmp = new String(chunk);
+        System.out.println("OUT " + tmp);
+
+        JsonInputParser parser = new JsonInputParser();
+        JsonInputConverter pConv = parser.getConverter();
+        JsonParseResult pr = parser.parse(chunk);
+        
+        JsonParseResult sub = pr.stepInto("obj", 0);
+        Assert.assertEquals(-1, pConv.toInteger(sub.getData("iValue")));
+        Assert.assertEquals("abba", pConv.toString(sub.getData("sValue")));
+        sub.stepOut();
+        
+        sub = pr.stepInto("arr", 1);
+        int size = sub.getArraySize();
+        Assert.assertEquals(1, size);
+        for (int i = 0; i < size; i++) {
+            JsonParseResult subO = sub.stepInto("", i);
+            Assert.assertEquals(1, pConv.toInteger(subO.getData("iValue")));
+            Assert.assertEquals("bap", pConv.toString(subO.getData("sValue")));
+            subO.stepOut();
+        }
+        sub.stepOut();
+    }
+
 }

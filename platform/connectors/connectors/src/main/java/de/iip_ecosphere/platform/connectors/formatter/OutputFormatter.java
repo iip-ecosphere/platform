@@ -216,6 +216,31 @@ public interface OutputFormatter<T> {
     public void add(String name, T data) throws IOException;
 
     /**
+     * Starts an array structure. Following {@link #add(String, Object)} calls will add elements to the array.
+     * Must be closed with {@#link #endStructure()} 
+     * 
+     * @param name optional data name field holding the array (may be <b>null</b> for none)
+     * @throws IOException if starting this structure fails
+     */
+    public void startArrayStructure(String name) throws IOException;
+    
+    /**
+     * Starts an object structure. Following {@link #add(String, Object)} calls will add elements to the object.
+     * Must be closed with {@#link #endStructure()} 
+     * 
+     * @param name optional data name field holding the array (may be <b>null</b> for none)
+     * @throws IOException if starting this structure fails
+     */
+    public void startObjectStructure(String name) throws IOException;
+    
+    /**
+     * Ends a structure started before.
+     * 
+     * @throws IOException if ending the actual structure fails
+     */
+    public void endStructure() throws IOException;
+    
+    /**
      * Completes a chunk of output data.
      * 
      * @return the chunk

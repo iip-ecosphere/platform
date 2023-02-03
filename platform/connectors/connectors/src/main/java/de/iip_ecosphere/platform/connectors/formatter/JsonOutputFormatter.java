@@ -15,6 +15,7 @@ package de.iip_ecosphere.platform.connectors.formatter;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Date;
+import java.util.Stack;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -30,10 +31,16 @@ import de.iip_ecosphere.platform.support.function.IOConsumer;
 @MachineFormatter
 public class JsonOutputFormatter implements OutputFormatter<IOConsumer<JsonGenerator>> {
 
+    private enum StructureType {
+        ARRAY,
+        OBJECT
+    }
+    
     private ObjectMapper objectMapper = new ObjectMapper();
     private StringWriter writer; // 
     private JsonGenerator gen; // temporary
     private String parentName = ""; // temporary, initial top-level
+    private Stack<StructureType> structures = new Stack<>();
     
     public static class JsonOutputConverter implements OutputConverter<IOConsumer<JsonGenerator>> {
 
@@ -134,14 +141,23 @@ public class JsonOutputFormatter implements OutputFormatter<IOConsumer<JsonGener
         }
     }
     
-    @Override
-    public void add(String name, IOConsumer<JsonGenerator> func) throws IOException {
+    /**
+     * Initializes the JSON writing.
+     * 
+     * @throws IOException if initialization fails
+     */
+    private void initialize() throws IOException {
         if (null == gen) {
             JsonFactory f = objectMapper.getFactory();
             writer = new StringWriter();
             gen = f.createGenerator(writer);
             gen.writeStartObject();
         }
+    }
+    
+    @Override
+    public void add(String name, IOConsumer<JsonGenerator> func) throws IOException {
+        initialize();
         String fieldName = name;
         if (name.indexOf(SEPARATOR) > 0) {
             int pos = name.lastIndexOf(SEPARATOR);
@@ -175,6 +191,43 @@ public class JsonOutputFormatter implements OutputFormatter<IOConsumer<JsonGener
         func.accept(gen);
     }
 
+    @Override
+    public void startArrayStructure(String name) throws IOException {
+        initialize();
+        structures.push(StructureType.ARRAY);
+        if (null != name) {
+            gen.writeFieldName(name);
+        }
+        gen.writeStartArray();
+    }
+
+    @Override
+    public void startObjectStructure(String name) throws IOException {
+        initialize();
+        structures.push(StructureType.OBJECT);
+        if (null != name) {
+            gen.writeFieldName(name);
+        }
+        gen.writeStartObject();
+    }
+
+    @Override
+    public void endStructure() throws IOException {
+        if (structures.isEmpty()) {
+            throw new IOException("No structure to close");
+        }
+        switch (structures.pop()) {
+        case ARRAY:
+            gen.writeEndArray();
+            break;
+        case OBJECT:
+            gen.writeEndObject();
+            break;
+        default: 
+            break;
+        }
+    }
+    
     @Override
     public byte[] chunkCompleted() throws IOException {
         byte[] res = null;
