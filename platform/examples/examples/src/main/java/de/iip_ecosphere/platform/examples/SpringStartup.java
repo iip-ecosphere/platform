@@ -26,6 +26,7 @@ import org.apache.logging.log4j.LogManager;
 import de.iip_ecosphere.platform.services.environment.Starter;
 import de.iip_ecosphere.platform.services.spring.DescriptorUtils;
 import de.iip_ecosphere.platform.support.CollectionUtils;
+import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.support.iip_aas.config.CmdLine;
 
 /**
@@ -41,6 +42,7 @@ public class SpringStartup {
     public static final String ARG_BROKER_PORT = "iip.test.brokerPort";
     public static final int DFLT_BROKER_PORT = 8883;
     public static final String ARG_STOP = "iip.test.stop";
+    
 
     /**
      * Main program to start the application. Takes into account additional args via system
@@ -89,6 +91,21 @@ public class SpringStartup {
     }
     
     /**
+     * Retrieves the AAS notification mode from cmd line argument {@link Starter#ARG_AAS_NOTIFICATION} and adds
+     * it to {@code cmdArgs}.
+     *  
+     * @param args the command line arguments
+     * @param cmdArgs the command line arguments to be modified as a side effect
+     * @see Starter#setAasNotificationMode(String[], NotificationMode)
+     */
+    private static void addAasNotificationMode(String[] args, List<String> cmdArgs) {
+        NotificationMode mode = Starter.setAasNotificationMode(args, NotificationMode.NONE);
+        if (null != mode) {
+            cmdArgs.add(CmdLine.composeArgument(Starter.ARG_AAS_NOTIFICATION, mode.name()));
+        }
+    }
+    
+    /**
      * Starts the application. Considers system property {@value #PROPERTY_JAVA} as java binary for Java 8 if 
      * not running under Java 8.
      * 
@@ -101,7 +118,7 @@ public class SpringStartup {
         String brokerHost = "localHost";
         int adminPort = -1; // ephemeral
         String serviceProtocol = "";
-        
+
         Starter.considerInstalledDependencies(); // if there, transported by createStandalineCommandArgs
         int brokerPort = CmdLine.getIntArg(args, ARG_BROKER_PORT, DFLT_BROKER_PORT);
         int stop = CmdLine.getIntArg(args, ARG_STOP, 0);
@@ -109,6 +126,7 @@ public class SpringStartup {
             LogManager.getLogger(SpringStartup.class).info("Command line for artifact: {}", artifact);
             List<String> cmdLine = DescriptorUtils.createStandaloneCommandArgs(artifact, brokerPort, 
                 brokerHost, adminPort, serviceProtocol);
+            addAasNotificationMode(args, cmdLine);
             LogManager.getLogger(SpringStartup.class).info("Starting with arguments: {}", cmdLine);
             ProcessBuilder builder = new ProcessBuilder(cmdLine);
             if (null != procCfg) {
