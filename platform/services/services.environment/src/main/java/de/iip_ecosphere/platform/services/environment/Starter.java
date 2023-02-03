@@ -34,6 +34,9 @@ import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
+import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
+import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
+import de.iip_ecosphere.platform.support.iip_aas.config.CmdLine;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 import de.iip_ecosphere.platform.transport.Transport;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
@@ -55,6 +58,7 @@ public class Starter {
     public static final String PARAM_IIP_TEST_AAS_PORT = "iip.test.aas.port";
     public static final String PARAM_IIP_TEST_AASREG_PORT = "iip.test.aasRegistry.port";
     public static final String PARAM_IIP_TEST_SERVICE_AUTOSTART = "iip.test.service.autostart";
+    public static final String ARG_AAS_NOTIFICATION = "iip.test.aas.notification";
     public static final String PROPERTY_JAVA8 = "iip.test.java8";
     public static final String IIP_APP_PREFIX = "iip.app.";
     public static final String IIP_TEST_PREFIX = "iip.test.";
@@ -114,6 +118,31 @@ public class Starter {
             }
         }
     }
+    
+    /**
+     * Retrieves the AAS notification mode from cmd line argument {@value #ARG_AAS_NOTIFICATION} and sets this mode 
+     * for AAS interactions. [testing]
+     *  
+     * @param args the command line arguments
+     * @param dflt the default value if no argument is present, may be <b>null</b> to keep the actual mode if not 
+     *     set explicitly
+     * @return the actual AAS notification mode, may be <b>null</b> for none
+     */
+    public static NotificationMode setAasNotificationMode(String[] args, NotificationMode dflt) {
+        NotificationMode mode = dflt;
+        String tmp = CmdLine.getArg(args, ARG_AAS_NOTIFICATION, null == mode ? "" : mode.name());
+        if (tmp.length() > 0) {
+            try {
+                mode = NotificationMode.valueOf(tmp);
+            } catch (IllegalArgumentException e) {
+                getLogger().info("AAS notification mode {} unknown. Resorting to {}", tmp, mode);
+            }
+        }
+        if (null != mode) {
+            ActiveAasBase.setNotificationMode(mode);
+        }
+        return mode;
+    }    
     
     /**
      * Considers installed dependencies properties, -D{@value #PROPERTY_JAVA8}.
@@ -282,6 +311,7 @@ public class Starter {
             AasPartRegistry.getSetup().getRegistry().setPort(tmpPort);
             getLogger().info("Configuring IIP registry port to {}", tmpPort);
         }
+        setAasNotificationMode(args, null); // keep default unless specified differently
         serviceAutostart = getBooleanArg(args, PARAM_IIP_TEST_SERVICE_AUTOSTART, serviceAutostart);
         String protocol = getArg(args, PARAM_IIP_PROTOCOL, AasFactory.DEFAULT_PROTOCOL);
         boolean found = false;

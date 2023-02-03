@@ -195,7 +195,7 @@ public class PythonEnvironmentTest extends AbstractEnvironmentTest {
         
         Server httpServer = AasFactory.getInstance()
             .createDeploymentRecipe(aasServerBase)
-            .addInMemoryRegistry(aasServerRegistry.getEndpoint())
+            .addInMemoryRegistry(aasServerRegistry)
             .deploy(aas)
             .createServer()
             .start();
