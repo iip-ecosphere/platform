@@ -10,6 +10,18 @@ template Basics(Configuration config, FileArtifact target) {
     def Boolean isPythonUsed(setOf(String) usedServiceTypes) {
         isUsedType(usedServiceTypes, PythonService);
     }	
+    
+    def Boolean isRecordArray(Field field) {
+        isRecordArray(field.type);
+    }
+    
+    def Boolean isRecordArray(DataType type) {
+        false;
+    }
+
+    def Boolean isRecordArray(ArrayType type) {
+        type.type.isKindOf(RecordType);
+    }
 	
 	/**
 	* Generic function to substitute characters that are typically not allowed in programming 

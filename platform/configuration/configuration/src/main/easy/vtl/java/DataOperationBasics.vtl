@@ -386,11 +386,8 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
          "LocalDateTime"
     }
     // End - Added types OPC UA - by Ahmad
-    
-    /*def convName(ObjectTypeType type) { // currently no method in interface, needed?
-    }
 
-    def convName(ByteArrayTypeType type) { // currently no method in interface, needed?
+    /*def convName(ByteArrayTypeType type) { // currently no method in interface, needed?
     }*/
 
     def convName(IntegerArrayTypeType type) {
@@ -399,6 +396,10 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
 
     def convName(DoubleArrayTypeType type) {
         "DoubleArray"
+    }
+
+    def convName(ArrayType type) {
+        "Object" // fallback
     }
 
     def convName(IEC61131_3DateTimeTypeType type) {

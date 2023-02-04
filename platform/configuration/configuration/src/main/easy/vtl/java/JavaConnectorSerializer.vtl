@@ -1,3 +1,4 @@
+import Basics;
 import JavaBasics;
 import DataOperationBasics;
 
@@ -14,6 +15,7 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
     Integer nestedStepCount = 0;
     Boolean optionalFound = false;
     Boolean genFrom = false;
+    Integer arrayCount = 0;
     
     def importTypePackage(String pkg, String typePkg) {
         if (pkg != typePkg) {
@@ -82,7 +84,6 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
        if (field.optional) {
            optionalFound = true; // disable getData via index after first optional as indexes "jump"
        }
-       
        if (set) {
            String ex;
            if (not(genFrom)) {
@@ -109,6 +110,23 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
     def produceDataTransfer(Field tgt, String tgtQual, Field src, String srcQual, String indexes, String paths) {
         String acc = genFieldAcc(mapSourcePath(srcQual, src), tgt, genFrom, ";", getterPath(tgtQual, tgt), indexes, paths);
         if (not(genFrom)) {
+            if (isRecordArray(tgt)) {
+                arrayCount = arrayCount + 1;
+                ArrayType at = tgt.type;
+                String arrayName = "array${arrayCount}";
+                String arrayEltTypeName = "${asTypeName(at.type.name)}";
+                String outerPrName = "prArray${arrayCount}";
+                '${getParserResultType(parser)} ${outerPrName} = pr.stepInto("${src.name}", ${indexes});
+                ${arrayEltTypeName}[] ${arrayName} = new ${arrayEltTypeName}[${outerPrName}.getArraySize()];
+                for (int i = 0, size = ${outerPrName}.getArraySize(); i < size; i++) {
+                    ${getParserResultType(parser)} prElement = ${outerPrName}.stepInto("", i);
+                    ${arrayName}[i] = new ${arrayEltTypeName}();
+                    // TODO fill ${arrayName}[i]
+                    prElement.stepOut();
+                }
+                prArray${arrayCount}.stepOut();'
+                acc = arrayName;
+            }
             if (tgt.type.isKindOf(RecordType)) {
                 String nextPath = getterPath(tgtQual, tgt); // all "vars" before the .set
                 String cons = "new ${toTypeName(tgt.type)}${add}()";
@@ -165,7 +183,22 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
     
     def genToField(String qual, String name, String fieldName, PrimitiveType type) {
         String data = "${qual}.get${asMethodNameSuffix(fieldName)}()";
-        'formatter.add("${name}", ${genConvertOp("outConverter", type, "from", data)});\n'
+        if (isRecordArray(type)) {
+            arrayCount = arrayCount + 1;
+            ArrayType at = type;
+            String arrayName = "array${arrayCount}";
+            String arrayEltTypeName = "${asTypeName(at.type.name)}";
+            '\nformatter.startArrayStructure("${name}");
+            formatter.startObjectStructure(null);
+            ${arrayEltTypeName}[] ${arrayName} = ${data};
+            for (int i = 0; i < ${arrayName}.length; i++) {
+                // TODO write data from ${arrayName}[i]
+            }
+            formatter.endStructure();
+            formatter.endStructure();'
+        } else {
+            'formatter.add("${name}", ${genConvertOp("outConverter", type, "from", data)});\n'
+        }
     }
     
     def genToField(String qual, String name, String fieldName, RecordType type) {

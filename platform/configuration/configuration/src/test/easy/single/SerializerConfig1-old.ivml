@@ -81,8 +81,26 @@ project SerializerConfig1Old {
             }, Field {
                 name = "cmdField",
                 type = refBy(StringType)
+            }, Field {
+                name = "nested",
+                type = refBy(myNestedArrayType)
             }
         }        
+    };
+    
+    ArrayType myNestedArrayType = {
+        name = "MyNested[]",
+        type = refBy(myNestedType)
+    }; 
+    
+    RecordType myNestedType = {
+        name = "MyNested",
+        fields = {
+            Field {
+                name = "state",
+                type = refBy(StringType)
+            }
+        }
     };
 
     RecordType myConnMachineOut = {
@@ -98,6 +116,9 @@ project SerializerConfig1Old {
             }, Field {
                 name = "dataValue",
                 type = refBy(IntegerType)
+            }, Field {
+                name = "nested",
+                type = refBy(myNestedArrayType)
             }
         }        
     };
@@ -117,6 +138,9 @@ project SerializerConfig1Old {
                 name = "dataField",
                 type = refBy(StringType),
                 optional = true
+            }, Field {
+                name = "nested",
+                type = refBy(myNestedArrayType)
             }
         }        
     };
@@ -129,6 +153,9 @@ project SerializerConfig1Old {
                 name = "cmdField",
                 type = refBy(StringType),
                 optional = true
+            }, Field {
+                name = "nested",
+                type = refBy(myNestedArrayType)
             }
         }        
     };
@@ -170,7 +197,7 @@ project SerializerConfig1Old {
         ver = "0.1.0",
         port = 4321, // default localhost
         
-        input = {{type=refBy(StringType)}}, // PRELIMINARY
+        input = {{type=refBy(myConnPltfOut)}}, // PRELIMINARY
         output = {{type=refBy(myConnPltfIn)}},
         inChannel = "IN",
         outChannel = "OUT",
