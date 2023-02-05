@@ -12,54 +12,12 @@
 
 package de.iip_ecosphere.platform.support;
 
-import java.io.File;
-
 /**
- * Some generic python process helper functions. For now taken over to keep this plugin on Java 8.
+ * Some generic Python process helper functions. Takes over/integrates the python utils from the
+ * IIP-Ecosphere Python maven plugin.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class PythonUtils {
+public class PythonUtils extends de.iip_ecosphere.platform.tools.maven.python.PythonUtils {
 
-    private static File pythonExecutable;
-
-    /**
-     * Defines the (global) Python executable.
-     * 
-     * @param exec the executable, may be <b>null</b> for dynamically determined
-     */
-    public static void setPythonExecutable(File exec) {
-        pythonExecutable = exec;
-    }
-    
-    /**
-     * Returns the Python executable. We consider the following precedences:
-     * <ol>
-     *   <li>Local python3 in Linux Jenkins installation (for testing, although this is production code; with 
-     *       installation path)</li>
-     *   <li>Local python3 in default Linux installation ("/usr/bin", with installation path)</li>
-     *   <li>The global python executable {@link #setPythonExecutable(File)} (with installation path)</li>
-     *   <li>The command "python"</li>
-     * </ol>
-     * 
-     * @return the executable, returns at least "python"; the result may be an absolute path but must not be. Calling 
-     *     {@link File#getAbsolutePath()} on the result may be misleading - if required, use it as string.
-     */
-    public static File getPythonExecutable() {
-        File result = pythonExecutable; 
-        // this is not nice, but at the moment it is rather difficult to pass an option via ANT to Maven to Surefire
-        File tmpPath = new File("/var/lib/jenkins/python/active/bin/python3"); // JENKINS
-        if (tmpPath.exists()) {
-            result = tmpPath;
-        } else {
-            tmpPath = new File("/usr/bin/python3"); // Standard Unix... do we need more???
-            if (tmpPath.exists()) {
-                result = tmpPath;
-            }
-        }
-        if (null == result) {
-            result = new File("python");
-        }
-        return result;
-    }
 }

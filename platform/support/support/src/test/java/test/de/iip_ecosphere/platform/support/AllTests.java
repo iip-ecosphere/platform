@@ -27,7 +27,8 @@ import org.junit.runners.Suite;
     OsUtilsTest.class,
     PidFileTest.class,
     TimeUtilsTest.class,
-    ResourceLoaderTest.class
+    ResourceLoaderTest.class,
+    PythonUtilsTest.class
 })
 public class AllTests {
 }
