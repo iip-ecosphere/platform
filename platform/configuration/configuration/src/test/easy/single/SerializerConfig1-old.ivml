@@ -197,7 +197,7 @@ project SerializerConfig1Old {
         ver = "0.1.0",
         port = 4321, // default localhost
         
-        input = {{type=refBy(myConnPltfOut)}}, // PRELIMINARY
+        input = {{type=refBy(myConnPltfOut)}},
         output = {{type=refBy(myConnPltfIn)}},
         inChannel = "IN",
         outChannel = "OUT",
