@@ -21,7 +21,8 @@ import java.io.File;
  */
 public class PythonUtils {
 
-    private static File pythonExecutable;
+    public static final File DEFAULT_PYTHON_EXECUTABLE = null;
+    private static File pythonExecutable = DEFAULT_PYTHON_EXECUTABLE;
 
     /**
      * Defines the (global) Python executable.

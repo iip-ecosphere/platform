@@ -21,7 +21,8 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
     PythonCompileTest.class,
-    PythonTestTest.class
+    PythonTestTest.class,
+    PythonUtilsTest.class
 })
 public class AllTests {
 }
