@@ -1,30 +1,103 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
+  <!-- Don't base this on platform dependencies! Used in platform dependencies, must be built before -->
+
+  <groupId>de.iip-ecosphere.platform</groupId>
   <artifactId>maven-python</artifactId>
   <packaging>maven-plugin</packaging>
+  <version>0.5.0-SNAPSHOT</version>
   <name>Maven Python Compile</name>
   <description>Embeds a Python compiler into Maven.</description>
 
+  <licenses>
+    <license>
+      <name>Apache License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+    <license>
+      <name>Eclipse Public License, Version 1.0</name>
+      <url>https://projects.eclipse.org/content/eclipse-public-license-1.0</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <id>eichelbe</id>
+      <name>Holger Eichelberger</name>
+      <email>eichelberger@sse.uni-hildesheim.de</email>
+      <url>https://sse.uni-hildesheim.de/mitglieder/dr-holger-eichelberger/</url>
+      <organization>SSE @ University of Hildesheim</organization>
+      <organizationUrl>https://sse.uni-hildesheim.de/</organizationUrl>
+      <roles>
+        <role>architect</role>
+        <role>developer</role>
+      </roles>
+      <timezone>Europe/Berlin</timezone>
+    </developer>
+    <developer>
+      <id>JimmiAppel</id>
+      <name>Alexander Weber</name>
+      <email>weber@sse.uni-hildesheim.de</email>
+      <url>https://sse.uni-hildesheim.de/</url>
+      <organization>SSE @ University of Hildesheim</organization>
+      <organizationUrl>https://sse.uni-hildesheim.de/</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>Europe/Berlin</timezone>
+    </developer>
+  </developers>  
+
+  <scm>
+    <url>https://github.com/iip-ecosphere/platform.git</url>
+  </scm>
+
+  <repositories>       
+    <repository>
+      <id>SSE</id>
+      <name>SSE</name>
+      <url>https://projects.sse.uni-hildesheim.de/qm/maven/</url>
+      <layout>default</layout>
+      <snapshots>
+          <updatePolicy>always</updatePolicy>
+      </snapshots>
+    </repository>
+  </repositories>
+
+  <pluginRepositories>
+     <pluginRepository>
+       <id>SSE-plugins</id>
+       <name>SSE</name>
+       <url>https://projects.sse.uni-hildesheim.de/qm/maven/</url>
+       <layout>default</layout>
+       <snapshots>
+          <updatePolicy>always</updatePolicy>
+       </snapshots>
+     </pluginRepository>
+  </pluginRepositories>
+
   <properties>
+      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	  <maven.version>3.6.0</maven.version>
+      <junit.version>4.12</junit.version>
+
+      <kr.motd.maven.os.version>1.6.2</kr.motd.maven.os.version>
+      <org.apache.maven.compiler.version>3.7.0</org.apache.maven.compiler.version>
+      <org.apache.maven.javadoc.version>3.2.0</org.apache.maven.javadoc.version>
+      <org.apache.maven.jar.version>3.2.0</org.apache.maven.jar.version>
+      <org.apache.maven.surefire.version>3.0.0-M3</org.apache.maven.surefire.version>
+      <org.apache.maven.assembly.version>3.1.1</org.apache.maven.assembly.version>
+      <org.jacoco.maven.jacoco.version>0.8.8</org.jacoco.maven.jacoco.version>
+
       <maven.compiler.target>8</maven.compiler.target>
       <maven.compiler.source>8</maven.compiler.source>	  
+      <java.encoding>Cp1252</java.encoding>
   </properties>
 
-  <parent>
-     <groupId>de.iip-ecosphere.platform</groupId>
-     <artifactId>platformDependencies</artifactId>
-     <version>0.5.0-SNAPSHOT</version>
-     <relativePath></relativePath>
-  </parent>
-
   <dependencies>
-    <dependency>
-      <artifactId>support</artifactId>
-      <groupId>de.iip-ecosphere.platform</groupId>
-      <version>${project.version}</version>
-    </dependency>  
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-plugin-api</artifactId>
@@ -62,32 +135,206 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
+      <version>${junit.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
   
   <build>
-      <pluginManagement>
-	      <plugins>
-		    <plugin>
-		      <groupId>org.apache.maven.plugins</groupId>
-		      <artifactId>maven-plugin-plugin</artifactId>
-		      <version>${maven.version}</version>
-		    </plugin>
-	      </plugins>
-      </pluginManagement>
       <plugins>
-       <plugin>
-         <artifactId>maven-compiler-plugin</artifactId>
-         <version>${org.apache.maven.compiler.version}</version>
-         <configuration>
-           <!-- Keep this for now (fake RTSA) -->
-           <source>8</source>
-           <target>8</target>
-           <encoding>${java.encoding}</encoding>
-         </configuration>
-       </plugin>      
+          <plugin>
+            <groupId>kr.motd.maven</groupId>
+            <artifactId>os-maven-plugin</artifactId>
+            <version>${kr.motd.maven.os.version}</version>
+            <executions>
+              <execution>
+                <phase>initialize</phase>
+                <goals>
+                  <goal>detect</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>    
+
+           <plugin>
+             <artifactId>maven-compiler-plugin</artifactId>
+             <version>${org.apache.maven.compiler.version}</version>
+             <configuration>
+               <!-- Somehow it does not work with properties, at least on my side -->
+               <source>${maven.compiler.source}</source>
+               <target>${maven.compiler.target}</target>
+               <encoding>${java.encoding}</encoding>
+             </configuration>
+           </plugin>
+
+           <!-- Java 11 complains about links from non-module to module see 
+               https://stackoverflow.com/questions/58836862/jdk-11-and-javadoc -->       
+           <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <version>${org.apache.maven.javadoc.version}</version>
+            <configuration>
+              <show>private</show>
+              <encoding>${java.encoding}</encoding>
+              <source>8</source>
+              <excludePackageNames>*.proto.*</excludePackageNames>
+              <failOnError>false</failOnError>
+              <detectJavaApiLink>false</detectJavaApiLink> 
+              <detectOfflineLinks>false</detectOfflineLinks>
+            </configuration>
+            <executions>
+              <execution>
+                <id>default-cli</id>
+                <goals>
+                  <goal>javadoc</goal>
+                  <goal>test-javadoc</goal>
+                  <goal>jar</goal>
+                  <goal>test-jar</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+           
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+            <version>${org.apache.maven.jar.version}</version>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>test-jar</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <version>3.2.0</version>
+            <executions>
+              <execution>
+                <id>attach-sources</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>jar-no-fork</goal>
+                  <goal>test-jar</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>      
+    
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <version>${org.apache.maven.surefire.version}</version>
+            <configuration>
+              <reuseForks>false</reuseForks> <!-- run each suite in an own JVM (Spring binders) -->
+              <includes> <!-- suites only, allow for multiple suites (Spring binders)  -->
+                <include>**/AllTests*.class</include>
+              </includes>
+              <forkedProcessTimeoutInSeconds>1800</forkedProcessTimeoutInSeconds>
+            </configuration>
+            <dependencies>
+              <!-- Force using the latest JUnit 47 provider, consider also in lib dependencies; seems also to work with
+                   jUnit 4.12, but not with 4.13 ;)  -->
+              <dependency>
+                <groupId>org.apache.maven.surefire</groupId>
+                <artifactId>surefire-junit47</artifactId>
+                <version>${org.apache.maven.surefire.version}</version>
+              </dependency>
+            </dependencies>        
+          </plugin>
+          
+          <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <version>${org.jacoco.maven.jacoco.version}</version>
+            <executions>
+                <execution>
+                    <goals>
+                        <goal>prepare-agent</goal>
+                    </goals>
+                </execution>
+                <execution>
+                    <id>report</id>
+                    <phase>test</phase>
+                    <goals>
+                        <goal>report</goal>
+                    </goals>
+                </execution>
+            </executions>
+          </plugin>
+          
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-plugin-plugin</artifactId>
+            <version>${maven.version}</version>
+            <configuration>
+            </configuration>
+            <executions>
+                <execution>
+                    <id>default-descriptor</id>
+                    <goals>
+                        <goal>descriptor</goal>
+                    </goals>
+                    <phase>process-classes</phase>
+                </execution>
+                <execution>
+                    <id>help-descriptor</id>
+                    <goals>
+                        <goal>helpmojo</goal>
+                    </goals>
+                    <phase>process-classes</phase>
+                </execution>
+            </executions>
+        </plugin>         
+          
       </plugins>
+  
+      <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-plugin-plugin</artifactId>
+              <version>${maven.version}</version>
+            </plugin>
+            
+            <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+            <plugin>
+                <groupId>org.eclipse.m2e</groupId>
+                <artifactId>lifecycle-mapping</artifactId>
+                <version>1.0.0</version>
+                <configuration>
+                    <lifecycleMappingMetadata>
+                        <pluginExecutions>
+                            <pluginExecution>
+                                <pluginExecutionFilter>
+                                    <groupId>
+                                        org.apache.maven.plugins
+                                    </groupId>
+                                    <artifactId>
+                                        maven-plugin-plugin
+                                    </artifactId>
+                                    <versionRange>
+                                        [3.2,)
+                                    </versionRange>
+                                    <goals>
+                                        <goal>descriptor</goal>
+                                        <goal>helpmojo</goal>
+                                    </goals>
+                                </pluginExecutionFilter>
+                                <action>
+                                    <ignore/>
+                                </action>
+                            </pluginExecution>
+                        </pluginExecutions>
+                    </lifecycleMappingMetadata>
+                </configuration>
+            </plugin>   
+                
+          </plugins>
+      </pluginManagement>
   </build>
 
 </project>
