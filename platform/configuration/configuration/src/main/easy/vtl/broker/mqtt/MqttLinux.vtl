@@ -1,10 +1,12 @@
+import MqttBasics;
+
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
 template MqttLinux(IIPEcosphere config, FileArtifact target) {
 	
     def main(IIPEcosphere config, FileArtifact target) {
         Integer port = config.transportProtocol.port;
-        String host = "--host=${config.transportProtocol.globalHost}";
+        String host = getHostOpt(config);
         '#!/bin/bash
         PORT=${port}
         if [ $# -gt 0 ]
