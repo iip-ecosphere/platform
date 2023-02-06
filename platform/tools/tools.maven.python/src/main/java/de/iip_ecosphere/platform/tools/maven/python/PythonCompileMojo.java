@@ -47,7 +47,7 @@ public class PythonCompileMojo extends AbstractMojo {
     private boolean skip;
     
     @Parameter(property = "python-compile.ignoreText", required = false, 
-        defaultValue = "imported but unused;is assigned to but never used")
+        defaultValue = "imported but unused;is assigned to but never used;redefinition of unused")
     private String ignoreText;
 
     @Override
