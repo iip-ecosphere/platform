@@ -26,14 +26,14 @@ import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.ZipUtils;
 
 /**
- * Tests {@link JarUtils}.
+ * Tests {@link ZipUtils}.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class JarUtilsTest {
+public class ZipUtilsTest {
     
     /**
-     * Tests {@link JarUtils#extractZip(java.io.InputStream, java.nio.file.Path)}.
+     * Tests {@link ZipUtils#extractZip(java.io.InputStream, java.nio.file.Path)}.
      * 
      * @throws IOException if reading/writing fails
      */
@@ -127,7 +127,7 @@ public class JarUtilsTest {
     }
     
     /**
-     * Tests {@link JarUtils#listFiles(InputStream, java.util.function.Predicate, java.util.function.Consumer)}.
+     * Tests {@link ZipUtils#listFiles(InputStream, java.util.function.Predicate, java.util.function.Consumer)}.
      * 
      * @throws IOException if reading/writing fails
      */

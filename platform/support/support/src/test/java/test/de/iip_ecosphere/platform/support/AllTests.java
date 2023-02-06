@@ -23,7 +23,7 @@ import org.junit.runners.Suite;
     AbstractSetupTest.class,
     CmdLineTest.class,
     FileUtilsTest.class,
-    JarUtilsTest.class,
+    ZipUtilsTest.class,
     OsUtilsTest.class,
     PidFileTest.class,
     TimeUtilsTest.class,
