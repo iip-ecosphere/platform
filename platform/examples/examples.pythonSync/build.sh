@@ -11,7 +11,7 @@ rm -rf gen
 #mvn -P EasyGen exec:java@generateAppsNoDeps
 #mvn -U -P App install -DskipTests
 #mvn -P EasyGen exec:java@generateApps
-mvn -U install
+mvn -U install -Dunpack.force=true
 
 #execute and test
 
