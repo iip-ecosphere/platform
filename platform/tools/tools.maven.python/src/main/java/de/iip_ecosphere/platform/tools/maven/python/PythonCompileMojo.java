@@ -84,10 +84,11 @@ public class PythonCompileMojo extends AbstractMojo {
                     output += runPythonTest(cmd);
                 }
                 if (output.length() > 0) {
-                    getLog().info(output);
                     boolean failure = false;
                     String[] outputs = output.split("\n");
+                    String filteredOutput = "";
                     for (String line : outputs) {
+                        boolean addLine = true;
                         // Unused import are not supposed to fail the build
                         // are there pyflake options to disable those warnings
                         if (!line.contains("import") && !line.contains("redefinition") 
@@ -95,7 +96,17 @@ public class PythonCompileMojo extends AbstractMojo {
                             failure = true;
                             errorLine = line;
                         }
+                        if (line.contains("imported but unused")) {
+                            addLine = false;
+                        }
+                        if (addLine) {
+                            if (filteredOutput.length() > 0) {
+                                filteredOutput = filteredOutput + "\n";
+                            }
+                            filteredOutput += line;
+                        }
                     }
+                    getLog().info(filteredOutput);
                     if (failure && failOnError) {
                         throw new MojoExecutionException(errorLine);
                     }
