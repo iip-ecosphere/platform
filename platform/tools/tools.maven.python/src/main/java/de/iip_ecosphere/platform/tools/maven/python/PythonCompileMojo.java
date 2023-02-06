@@ -45,6 +45,10 @@ public class PythonCompileMojo extends AbstractMojo {
 
     @Parameter(property = "python-compile.skip", required = false, defaultValue = "false")
     private boolean skip;
+    
+    @Parameter(property = "python-compile.ignoreText", required = false, 
+        defaultValue = "imported but unused;is assigned to but never used")
+    private String ignoreText;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -83,6 +87,7 @@ public class PythonCompileMojo extends AbstractMojo {
                     String[] cmd = {pythonExecutable, "-m", "py_compile", f.getAbsolutePath()};
                     output += runPythonTest(cmd);
                 }
+                String[] ignore = null == ignoreText ? new String[0] : ignoreText.split(";");
                 if (output.length() > 0) {
                     boolean failure = false;
                     String[] outputs = output.split("\n");
@@ -96,7 +101,8 @@ public class PythonCompileMojo extends AbstractMojo {
                             failure = true;
                             errorLine = line;
                         }
-                        if (line.contains("imported but unused")) {
+                        // flakes8 shall have options to switch individual warnings on/off
+                        if (isContained(line, ignore)) {
                             addLine = false;
                         }
                         if (addLine) {
@@ -115,6 +121,21 @@ public class PythonCompileMojo extends AbstractMojo {
         } else {
             getLog().info("Skipping Python compiler execution");
         }
+    }
+    
+    /**
+     * Returns whether at least one of the {@code substrings} are contained in {@code text}.
+     * 
+     * @param text the text to search for
+     * @param substrings the substrings
+     * @return {@code true} if at least one of {@code substrings} is contained in {@code text}
+     */
+    private static boolean isContained(String text, String[] substrings) {
+        boolean contained = false;
+        for (int i = 0; !contained && i < substrings.length; i++) {
+            contained = text.contains(substrings[i]);
+        }
+        return contained;
     }
     
     /**

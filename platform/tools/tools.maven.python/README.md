@@ -35,6 +35,7 @@ The Python compiler plugin runs by default in the `compile` lifecycle phase with
 The compiler plugin supports the following configuration settings:
   - `failOnError` (default `true`, user property `python-compile.failOnError`): Whether the build process shall fail if Python compile errors are detected.
   - `skip` (default `false`, user property `python-compile.skip`) skips the execution of this plugin. 
+  - `ignoreText` (default `imported but unused;is assigned to but never used`, user property `python-compile.ignoreText`) defines substrings separated by ; that indicate lines of the pyflakes output to not be emitted as result
   
 ## Python test plugin
 
@@ -68,13 +69,12 @@ The Python test plugin currently executes Python files, either those directly lo
   </build>
   ```
 
-The compiler plugin supports the following configuration settings:
+The test runner plugin supports the following configuration settings:
   - `failOnError` (default `true`, user property `python-test.failOnError`): Whether the build process shall fail if Python compile errors are detected.
   - `modelProject` (default `../../../target/pySrc`, user property `python-test.modelProject`): Optional set if generated templates are moved, set to path of generated python 	sources.
   - `fileset` (default not given, execute all files directly located in `src/test/python`) is optional and can be used to determine the tests to be executed.
   - `skip` (default `false`, user property `python-test.skip`) skips the execution of this plugin. 
-  - `test` (default `empty`, user property `python-test.test`), optional (file) name of the test to be executed. If not given, all tests will be executed.
-  
+  - `test` (default `empty`, user property `python-test.test`), optional (file) name of the test to be executed. If not given, all tests will be executed.  
   
 ## Combining the goals
 
@@ -105,4 +105,7 @@ You may specify both goals in different executions with individual configuration
      </plugins>
   </build>
   ```
-  
+
+## Hint
+
+Compilation and testing works pretty well with `mvn install` but may fail when started from Eclipse.
