@@ -94,7 +94,7 @@ project ContainerCreation {
         kind = ServiceKind::TRANSFORMATION_SERVICE,
         input = {{type=refBy(rec1)}},
         output = {{type=refBy(rec1)}}, 
-        dependencies = {refBy(PYTHON39), refBy(Tflite_Runtime28), refBy(Pandas135), refBy(Sklearn), refBy(Pillow), refBy(KreasApplications108), refBy(Psutil), refBy(Glob2), refBy(OpenCVPython45564)}     
+        dependencies = {refBy(PYTHON39), refBy(Pandas135)}     
     };
     
     // refBy(ScipPy141), refBy(NumPy1201), // fail, require SysPythonNative and still fail
@@ -103,58 +103,11 @@ project ContainerCreation {
         installCommands = {"apk add make automake gcc g++ subversion python3-dev"}
     };
     
-    PythonDependency ScipPy141 = {
-       name = "scipy",
-       version = "1.4.1", 
-       dependencies = {refBy(SysPythonNative)}
-    };
-
-    PythonDependency NumPy1201 = { 
-       name = "numpy",
-       version = "1.20.1", 
-       dependencies = {refBy(SysPythonNative)}
-    };
-    
-    PythonDependency Tflite_Runtime28 = {
-       name = "tflite_runtime",
-       version = "2.8"
-    };
-    
     PythonDependency Pandas135 = {
        name = "pandas",
        version = "1.3.5"
     };
-    
-    PythonDependency Sklearn = {
-       name = "sklearn",
-       version = "0.0"
-    };
-    
-    PythonDependency Pillow = {
-       name = "Pillow",
-       version = "9.1.0"
-    };
-    
-    PythonDependency KreasApplications108 = {
-       name = "Keras-Applications",
-       version = "1.0.8"
-    };
-    
-    PythonDependency Psutil = {
-       name = "psutil",
-       version = "5.9.0"
-    };
-    
-    PythonDependency Glob2 = {
-       name = "glob2",
-       version = "0.7"
-    };
-    
-    PythonDependency OpenCVPython45564 = {
-       name = "opencv-python",
-       version = "4.5.5.64"
-    };
-    
+        
     Service myReceiverService = JavaService {
         id = "SimpleReceiver",
         name = "Simple Data Receiver",
