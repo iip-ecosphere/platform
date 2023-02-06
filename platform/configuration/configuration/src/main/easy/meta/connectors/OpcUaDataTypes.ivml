@@ -20,13 +20,6 @@ project OpcUaDataTypes {
 		name = "UnknownDataType"
     };
 
-    compound UnsignedInteger32ArrayTypeType refines IntegerArrayTypeType {
-    }
-    UnsignedInteger32ArrayTypeType UnsignedInteger32ArrayType = {
-        name = "uint32[]",
-        type = refBy(Integer32Type)
-    };
-
     compound UnsignedIntegerTypeType refines IntegerTypeType {
     }
     UnsignedIntegerTypeType opcUnsignedIntegerType = {
@@ -130,7 +123,6 @@ project OpcUaDataTypes {
     
     // freeze all primitives
     freeze {
-		UnsignedInteger32ArrayType;
 		opcUnsignedIntegerType;
 		opcUnknownDataType;
     };

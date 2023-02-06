@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.configuration.opcua.parser;
 
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -146,6 +147,7 @@ public class Generator {
             BufferedWriter writer = new BufferedWriter(new FileWriter(vdwConfig));
             StringBuilder builder = new StringBuilder();
             writer.write(configHeader);
+            System.out.println("ConnectorFields:");
             for (BaseType b : hierarchy) {
                 if (b instanceof RootObjectType || b instanceof RootVariableType || b instanceof RootMethodType) {
                     connectorFields = "            Field {\n" + "                name = \"" + b.getVarName() + "\",\n"

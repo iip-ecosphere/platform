@@ -29,22 +29,12 @@ import de.iip_ecosphere.platform.configuration.opcua.data.*;
  * @author Jan-Hendrik Cepok, SSE
  */
 enum ElementType {
-    
-    OBJECTTYPE(false), 
-    VARIABLETYPE(false), 
-    ROOTOBJECT(true), 
-    ROOTVARIABLE(false), 
-    ROOTMETHOD(true), 
-    SUBOBJECT(true), 
-    SUBMETHOD(true), 
-    FIELDOBJECT(true), 
-    FIELDVARIABLE(false),
-    FIELDMETHOD(true), 
-    ENUM(false), 
-    DATATYPE(false);
+
+    OBJECTTYPE(false), VARIABLETYPE(false), ROOTOBJECT(true), ROOTVARIABLE(false), ROOTMETHOD(true), SUBOBJECT(true),
+    SUBMETHOD(true), FIELDOBJECT(true), FIELDVARIABLE(false), FIELDMETHOD(true), ENUM(false), DATATYPE(false);
 
     private boolean isCore;
-    
+
     /**
      * Creates a new enum value.
      * 
@@ -53,7 +43,7 @@ enum ElementType {
     private ElementType(boolean isCore) {
         this.isCore = isCore;
     }
-    
+
     /**
      * Returns whether this value is part of "core".
      * 
@@ -62,7 +52,7 @@ enum ElementType {
     public boolean isCore() {
         return isCore;
     }
-    
+
 }
 
 /**
@@ -97,6 +87,7 @@ public class DomParser {
     private ArrayList<BaseType> hierarchy;
     private boolean verbose = verboseDefault;
     private String baseNameSpace;
+    private ArrayList<NodeList> externAliasLists;
 
     // checkstyle: stop parameter number check
 
@@ -122,6 +113,15 @@ public class DomParser {
         this.variableTypeList = variableTypeList;
         this.aliasList = aliasList;
         this.hierarchy = hierarchy;
+    }
+
+    /**
+     * Defines the OPC UA core alias list.
+     * 
+     * @param externAliasLists the list of OPC UA core aliases.
+     */
+    public void setExternAliasLists(ArrayList<NodeList> externAliasLists) {
+        this.externAliasLists = externAliasLists;
     }
 
     /**
@@ -269,56 +269,8 @@ public class DomParser {
             dataType = "DateTimeType";
             modelTypes = true;
             break;
-        case "NodeId":
-            dataType = "opcNodeIdType";
-            break;
-        case "Guid":
-            dataType = "opcGuidType";
-            break;
-        case "IdType":
-            dataType = "opcIdType";
-            break;
-        case "LocalizedText":
-            dataType = "opcLocalizedTextType";
-            break;
         case "UInteger":
             dataType = "opcUnsignedIntegerType";
-            break;
-        case "Number":
-            dataType = "opcNumberType";
-            break;
-        case "NumericRange":
-            dataType = "opcNumericRangeType";
-            break;
-        case "Range":
-            dataType = "opcRangeType";
-            break;
-        case "EUInformation":
-            dataType = "opcEUInformationType";
-            break;
-        case "UtcTime":
-            dataType = "opcUtcTimeType";
-            break;
-        case "Argument":
-            dataType = "opcArgumentType";
-            break;
-        case "Structure":
-            dataType = "opcStructureType";
-            break;
-        case "DecimalString":
-            dataType = "opcDecimalStringType";
-            break;
-        case "DateString":
-            dataType = "opcDateStringType";
-            break;
-        case "DurationString":
-            dataType = "opcDurationStringType";
-            break;
-        case "NormalizedString":
-            dataType = "opcNormalizedStringType";
-            break;
-        case "TimeString":
-            dataType = "opcTimeStringType";
             break;
         case "":
             dataType = "opcUnknownDataType";
@@ -485,6 +437,7 @@ public class DomParser {
         if ((dataType.contains("ns=") | dataType.contains("i="))) {
             dataType = retrieveAttributesForExternDataType(dataType);
         }
+        boolean foundAlias = false;
         for (int i = 0; i < aliasList.getLength(); i++) {
             Element alias = getNextNodeElement(aliasList, i);
             NodeList childNodeList = alias.getChildNodes();
@@ -492,6 +445,7 @@ public class DomParser {
                 Element childNode = getNextNodeElement(childNodeList, j);
                 if (childNode != null) {
                     if (childNode.getAttribute("Alias").equals(dataType)) {
+                        foundAlias = true;
                         String nodeId = childNode.getTextContent();
                         if (nodeId.contains("i=")) {
                             if (!nodeId.contains("ns=" + baseNameSpace)) {
@@ -499,6 +453,27 @@ public class DomParser {
                             }
                         }
                         break;
+                    }
+                }
+            }
+        }
+        if (!foundAlias) {
+            for (NodeList l : externAliasLists) {
+                for (int i = 0; i < l.getLength(); i++) {
+                    Element alias = getNextNodeElement(l, i);
+                    NodeList childNodeList = alias.getChildNodes();
+                    for (int j = 0; j < childNodeList.getLength(); j++) {
+                        Element childNode = getNextNodeElement(childNodeList, j);
+                        if (childNode != null) {
+                            if (childNode.getAttribute("Alias").equals(dataType)) {
+                                foundAlias = true;
+                                String nodeId = childNode.getTextContent();
+                                if (nodeId.contains("i=") && !nodeId.contains("ns=" + baseNameSpace)) {
+                                    dataType = retrieveAttributesForExternDataType(nodeId);
+                                }
+                                break;
+                            }
+                        }
                     }
                 }
             }
@@ -555,16 +530,12 @@ public class DomParser {
         for (int k = 0; k < references.getLength(); k++) {
             Element refNode = getNextNodeElement(references, k);
             if (refNode != null && refNode.getAttribute("ReferenceType").equals(reference)) {
-
-                // get extern List
                 String refId = refNode.getTextContent();
-
                 if (refId.contains("ns=" + baseNameSpace) || !refId.contains("ns=")) {
                     TypeListAndType r = getTypeListAndTypeRootNs(refId, reference, type);
                     type = r.type;
                     Element refElement = checkRelation(refId, r.typeList);
                     if (refElement != null) {
-                        // create Attribute, LÖSUNG FÜR REFERENCE INIT ÜBERLEGEN
                         DescriptionOrDocumentation d = getDescriptionOrDocumentation(reference, refElement);
                         reference = d.reference;
                         if (!type.isCore()) {
@@ -617,7 +588,7 @@ public class DomParser {
         private NodeList typeList;
         private ElementType type;
     }
-    
+
     /**
      * Extracts the type list and type for a given root namespace {@code refId}.
      * 
@@ -821,6 +792,7 @@ public class DomParser {
         } else {
             id = externNodeId;
         }
+
         NodeList childNodeList = element.getChildNodes();
 
         for (int j = 0; j < childNodeList.getLength(); j++) {
@@ -840,7 +812,7 @@ public class DomParser {
                         Element fieldNode = getNextNodeElement(fields, k);
                         if (fieldNode != null) {
                             String fieldName = "_" + fieldNode.getAttribute("Name").replaceAll("[,“”\"\\\\]", "_");
-                            if (fieldName.equals("")) {
+                            if (fieldName.equals("") || fieldName.equals("_")) {
                                 fieldName = "placeholder_"
                                         + childNode.getAttribute("Name").replaceAll("[/,“”\"\\\\]", "_");
                             } else {
@@ -1198,7 +1170,6 @@ public class DomParser {
     private static File[] checkRequiredModels(DomParser parser, String modelName, String path, String fileName,
             NodeList nameSpaceUris) {
         Scanner scanner = new Scanner(System.in);
-        // suche die Modelle
         ArrayList<String> uris = new ArrayList<String>();
         // CORE SPEC
         uris.add(0, "UA");
@@ -1270,8 +1241,9 @@ public class DomParser {
                             if (toOsPath(files[i]).equals(toOsPath(path + "/RequiredModels/Opc.Ua.NodeSet2.xml"))) {
                                 model = "UA";
                             } else {
-                                model = toOsPath(files[i]).replace(toOsPath(path + "/RequiredModels/Opc.Ua."), "")
-                                        .replace(".NodeSet2.xml", "").toUpperCase();
+                                model = toOsPath(files[i]).toUpperCase()
+                                        .replace(toOsPath(path.toUpperCase() + "/REQUIREDMODELS/OPC.UA."), "")
+                                        .replace(".NODESET2.XML", "");
                             }
                             if (model.equals(s)) {
                                 if (model.equals("UA")) {
@@ -1402,25 +1374,32 @@ public class DomParser {
                 }
             }
             ArrayList<BaseType> hierarchy = new ArrayList<BaseType>();
+
             parser = new DomParser(objectTypeList, objectList, variableList, methodList, dataTypeList, variableTypeList,
                     aliasList, hierarchy);
             File[] reqModels = checkRequiredModels(parser, modelName, path,
                     toOsPath(compSpec).replace(toOsPath(path + "/Opc.Ua."), "").replace(".NodeSet.xml", ""),
                     nameSpaceUris);
             Document[] documents = new Document[reqModels.length];
+            ArrayList<NodeList> aliasLists = new ArrayList<NodeList>();
             for (int i = 0; i < reqModels.length; i++) {
                 System.out.println(reqModels[i]);
                 documents[i] = builder.parse(reqModels[i]);
+                NodeList externAliasList = documents[i].getElementsByTagName("Aliases");
+                aliasLists.add(externAliasList);
             }
+            parser.setExternAliasLists(aliasLists);
             parser.setDocuments(documents);
             parser.verbose = verbose;
             parser.parseFile();
+            Collector.collectInformation(compSpec.getName(), objectTypeList, objectList, variableList, methodList,
+                    dataTypeList, variableTypeList, hierarchy, reqModels.length);
         } catch (ParserConfigurationException | SAXException | IOException e) {
             LoggerFactory.getLogger(DomParser.class).error(e.getMessage());
         }
         return parser;
     }
-    
+
     /**
      * Sets the folder where to generate example using IVML models.
      * 
@@ -1467,7 +1446,7 @@ public class DomParser {
         DomParser parser = createParser(path, xmlIn, verbose);
         parser.createIvmlModel(outName, ivmlOut);
     }
-    
+
     // checkstyle: stop method length check
 
     /**
@@ -1477,107 +1456,200 @@ public class DomParser {
      */
     public static void main(String[] args) {
         File file;
+        ArrayList<File> files = new ArrayList<File>();
         if (args.length == 1) {
             file = new File(args[0]);
         } else {
             file = new File("src/main/resources/NodeSets/Opc.Ua.Woodworking.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.MachineTool.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.Weihenstephan.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.Adi.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.AutoID.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.CNC.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.BACnet.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.CAS.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.CommercialKitchenEquipment.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.CSPPlusForMachine.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.DEXPI.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.Sercos.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.TMC.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.Scheduler.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.Scales.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.Safety.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.RSL.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.Robotics.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.Pumps.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.POWERLINK.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.PnRio.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.PnEm.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.Pn.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.PLCopen.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.OPENSCS.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.Onboarding.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.AMLLibraries.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.AMB.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.Fdi5.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.Fdi7.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.FDT.NodeSet.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.fx.ac.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.fx.cm.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.fx.data.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.Glass.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.I4AAS.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.IEC61850-6.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.IEC61850-7-3.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.IEC61850-7-4.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.Ijt.Tightening.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.IOLink.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.IOLinkIODD.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.IRDI.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/opc.ua.isa95-jobcontrol.nodeset2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.ISA95.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.MachineVision.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.MDIS.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.MTConnect.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.Mining.DevelopmentSupport.Dozer.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.Mining.DevelopmentSupport.General.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.Mining.DevelopmentSupport.RoofSupportSystem.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.Mining.Extraction.General.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.Mining.Extraction.ShearerLoader.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.Mining.General.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.Mining.Loading.General.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.Mining.Loading.HydraulicExcavator.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.Mining.MineralProcessing.General.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.Mining.MineralProcessing.RockCrusher.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.Mining.MonitoringSupervisionServices.General.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.Mining.PELOServices.FaceAlignmentSystem.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.Mining.PELOServices.General.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.Mining.TransportDumping.ArmouredFaceConveyor.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.Mining.TransportDumping.General.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.Mining.TransportDumping.RearDumpTruck.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.PlasticsRubber.Extrusion_v2.Calender.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.PlasticsRubber.Extrusion_v2.Calibrator.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.PlasticsRubber.Extrusion_v2.Corrugator.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.PlasticsRubber.Extrusion_v2.Cutter.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.PlasticsRubber.Extrusion_v2.Die.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.PlasticsRubber.Extrusion_v2.Extruder.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.PlasticsRubber.Extrusion_v2.ExtrusionLine.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.PlasticsRubber.Extrusion_v2.Filter.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.PlasticsRubber.Extrusion_v2.GeneralTypes.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.PlasticsRubber.Extrusion_v2.HaulOff.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.PlasticsRubber.Extrusion_v2.MeltPump.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.PlasticsRubber.Extrusion_v2.Pelletizer.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.PlasticsRubber.GeneralTypes.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.PlasticsRubber.HotRunner.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.PlasticsRubber.IMM2MES.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.PlasticsRubber.LDS.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.PlasticsRubber.TCD.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.PackML.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.DI.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.IA.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.Gds.NodeSet2.xml");
-//      file = new File("src/main/resources/NodeSets/Opc.Ua.Machinery.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.MachineTool.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.Weihenstephan.NodeSet2.xml");
+            files.add(file);
+            /*file = new File("src/main/resources/NodeSets/Opc.Ua.Adi.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.AutoID.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.CNC.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.BACnet.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.CAS.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.CommercialKitchenEquipment.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.CSPPlusForMachine.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.DEXPI.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.Sercos.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.TMC.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.Scheduler.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.Scales.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.Safety.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.RSL.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.Robotics.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.Pumps.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.POWERLINK.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.PnRio.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.PnEm.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.Pn.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.PLCopen.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.OPENSCS.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.Onboarding.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.AMLLibraries.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.AMB.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.Fdi5.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.Fdi7.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.FDT.NodeSet.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.fx.ac.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.fx.cm.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.fx.data.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.Glass.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.I4AAS.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.IEC61850-6.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.IEC61850-7-3.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.IEC61850-7-4.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.Ijt.Tightening.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.IOLink.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.IOLinkIODD.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.IRDI.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/opc.ua.isa95-jobcontrol.nodeset2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.ISA95.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.MachineVision.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.MDIS.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.MTConnect.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.Mining.DevelopmentSupport.Dozer.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.Mining.DevelopmentSupport.General.NodeSet2.xml");
+            files.add(file);
+            file = new File(
+                    "src/main/resources/NodeSets/Opc.Ua.Mining.DevelopmentSupport.RoofSupportSystem.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.Mining.Extraction.General.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.Mining.Extraction.ShearerLoader.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.Mining.General.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.Mining.Loading.General.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.Mining.Loading.HydraulicExcavator.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.Mining.MineralProcessing.General.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.Mining.MineralProcessing.RockCrusher.NodeSet2.xml");
+            files.add(file);
+            file = new File(
+                    "src/main/resources/NodeSets/Opc.Ua.Mining.MonitoringSupervisionServices.General.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.Mining.PELOServices.FaceAlignmentSystem.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.Mining.PELOServices.General.NodeSet2.xml");
+            files.add(file);
+            file = new File(
+                    "src/main/resources/NodeSets/Opc.Ua.Mining.TransportDumping.ArmouredFaceConveyor.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.Mining.TransportDumping.General.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.Mining.TransportDumping.RearDumpTruck.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.PlasticsRubber.Extrusion_v2.Calender.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.PlasticsRubber.Extrusion_v2.Calibrator.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.PlasticsRubber.Extrusion_v2.Corrugator.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.PlasticsRubber.Extrusion_v2.Cutter.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.PlasticsRubber.Extrusion_v2.Die.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.PlasticsRubber.Extrusion_v2.Extruder.NodeSet2.xml");
+            files.add(file);
+            file = new File(
+                    "src/main/resources/NodeSets/Opc.Ua.PlasticsRubber.Extrusion_v2.ExtrusionLine.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.PlasticsRubber.Extrusion_v2.Filter.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.PlasticsRubber.Extrusion_v2.GeneralTypes.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.PlasticsRubber.Extrusion_v2.HaulOff.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.PlasticsRubber.Extrusion_v2.MeltPump.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.PlasticsRubber.Extrusion_v2.Pelletizer.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.PlasticsRubber.GeneralTypes.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.PlasticsRubber.HotRunner.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.PlasticsRubber.IMM2MES.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.PlasticsRubber.LDS.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.PlasticsRubber.TCD.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.PackML.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.DI.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.IA.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.Gds.NodeSet2.xml");
+            files.add(file);
+            file = new File("src/main/resources/NodeSets/Opc.Ua.Machinery.NodeSet2.xml");
+            files.add(file);*/
         }
-        String fileName = file.getName();
-        fileName = StringUtils.removeStart(fileName, "Opc.Ua");
-        fileName = StringUtils.removeEnd(fileName, ".xml");
-        fileName = StringUtils.removeEnd(fileName, ".NodeSet2");
-        // fileName = StringUtils.removeEnd(fileName, ".NodeSet");
-        fileName = fileName.replace(".", "");
-        fileName = fileName.replace("-", "_");
-        File ivmlFile = new File("gen/Opc" + fileName + ".ivml");
-        process(file, fileName, ivmlFile, verboseDefault);
+        for (File f : files) {
+            file = f;
+            String fileName = file.getName();
+            fileName = StringUtils.removeStart(fileName, "Opc.Ua");
+            fileName = StringUtils.removeEnd(fileName, ".xml");
+            fileName = StringUtils.removeEnd(fileName, ".NodeSet2");
+            fileName = fileName.replace(".", "");
+            fileName = fileName.replace("-", "_");
+            File ivmlFile = new File("gen/Opc" + fileName + ".ivml");
+            process(file, fileName, ivmlFile, verboseDefault);
+        }
+        Collector.informationToExcel();
     }
-    
     // checkstyle: resume method length check
 
 }

@@ -110,6 +110,11 @@
       <groupId>com.googlecode.json-simple</groupId>
       <artifactId>json-simple</artifactId>
     </dependency>
+	<dependency> <!-- preliminary -->
+	    <groupId>org.apache.poi</groupId>
+	    <artifactId>poi-ooxml</artifactId>
+	    <version>4.0.0</version>
+	</dependency>
 
     <dependency>
      <groupId>de.iip-ecosphere.platform</groupId>

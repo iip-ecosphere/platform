@@ -116,6 +116,18 @@ project OpcMachineTool {
 		}
 	};
 
+	UADataType opcNumberType = {
+		name = "opcNumberType",
+		nodeId = {nameSpaceIndex = 0, identifier = 26},
+		nodeClass = NodeClass::UADataType,
+		browseName = "Number",
+		displayName = "Number",
+		description = "",
+		documentation = "https://reference.opcfoundation.org/v105/Core/docs/Part5/12.2.9",
+		literals = {
+		}
+	};
+
 	UAVariableTypeType opcToolLifeTypeType = {
 		name = "opcToolLifeTypeType",
 		nodeId = {nameSpaceIndex = 1, identifier = 61},
@@ -349,6 +361,18 @@ project OpcMachineTool {
 				typeDefinition = refBy(opcPropertyTypeType),
 				optional = true
 			}
+		}
+	};
+
+	UADataType opcLocalizedTextType = {
+		name = "opcLocalizedTextType",
+		nodeId = {nameSpaceIndex = 0, identifier = 21},
+		nodeClass = NodeClass::UADataType,
+		browseName = "LocalizedText",
+		displayName = "LocalizedText",
+		description = "",
+		documentation = "https://reference.opcfoundation.org/v105/Core/docs/Part5/12.2.7",
+		literals = {
 		}
 	};
 
@@ -1798,6 +1822,18 @@ project OpcMachineTool {
 				typeDefinition = refBy(opcBaseDataVariableTypeType),
 				optional = true
 			}
+		}
+	};
+
+	UADataType opcUtcTimeType = {
+		name = "opcUtcTimeType",
+		nodeId = {nameSpaceIndex = 0, identifier = 294},
+		nodeClass = NodeClass::UADataType,
+		browseName = "UtcTime",
+		displayName = "UtcTime",
+		description = "",
+		documentation = "https://reference.opcfoundation.org/v105/Core/docs/Part5/12.2.4/#12.2.4.1",
+		literals = {
 		}
 	};
 
@@ -6330,6 +6366,18 @@ project OpcMachineTool {
 		accessLevel = 3
 	};
 
+	UADataType opcNodeIdType = {
+		name = "opcNodeIdType",
+		nodeId = {nameSpaceIndex = 0, identifier = 17},
+		nodeClass = NodeClass::UADataType,
+		browseName = "NodeId",
+		displayName = "NodeId",
+		description = "",
+		documentation = "https://reference.opcfoundation.org/v105/Core/docs/Part5/12.2.8",
+		literals = {
+		}
+	};
+
 	UARootVariableType opcProductionActiveProgramTypeJobNodeId = {
 		name = "opcProductionActiveProgramTypeJobNodeId",
 		nodeId = {nameSpaceIndex = 1, identifier = 382},
@@ -7419,31 +7467,31 @@ project OpcMachineTool {
 			EnumLiteral {
 				name = "_Automatic",
 				ordinal = 0,
-				description = "NC channel mode Automatic - execute CNC part programs.@en"
+				description = "NC channel mode Automatic – execute CNC part programs.@en"
 			}, EnumLiteral {
 				name = "_MdaMdi",
 				ordinal = 1,
-				description = "NC channel mode Mda/Mdi - manual data input and execution.@en"
+				description = "NC channel mode Mda/Mdi – manual data input and execution.@en"
 			}, EnumLiteral {
 				name = "_JogManual",
 				ordinal = 2,
-				description = "NC channel mode Jog Manual - axis movement triggered by user.@en"
+				description = "NC channel mode Jog Manual – axis movement triggered by user.@en"
 			}, EnumLiteral {
 				name = "_JogIncrement",
 				ordinal = 3,
-				description = "NC channel mode Jog Increment - incremental axis movement triggered by user.@en"
+				description = "NC channel mode Jog Increment – incremental axis movement triggered by user.@en"
 			}, EnumLiteral {
 				name = "_TeachingHandle",
 				ordinal = 4,
-				description = "NC channel mode Teaching Handle - teaching a machine tool by moving axes of the machine tool by hand.@en"
+				description = "NC channel mode Teaching Handle – teaching a machine tool by moving axes of the machine tool by hand.@en"
 			}, EnumLiteral {
 				name = "_Remote",
 				ordinal = 5,
-				description = "NC channel mode Remote - the machine tool can receive CNC files via a remote access mechanism.@en"
+				description = "NC channel mode Remote – the machine tool can receive CNC files via a remote access mechanism.@en"
 			}, EnumLiteral {
 				name = "_Reference",
 				ordinal = 6,
-				description = "NC channel mode Reference - The machine tool returns to its reference point/ zero position.@en"
+				description = "NC channel mode Reference – The machine tool returns to its reference point/ zero position.@en"
 			}, EnumLiteral {
 				name = "_Other",
 				ordinal = 7,
@@ -7560,7 +7608,7 @@ device.@en"
 			}, EnumLiteral {
 				name = "_Automatic",
 				ordinal = 1,
-				description = "Operating mode for the automatic, programmed and continuous operation of the machine. Manual loading and unloading workpieces are possible when the automatic program is stopped. Axis movement speeds are fully available to the machine tool-s ability.@en"
+				description = "Operating mode for the automatic, programmed and continuous operation of the machine. Manual loading and unloading workpieces are possible when the automatic program is stopped. Axis movement speeds are fully available to the machine tool’s ability.@en"
 			}, EnumLiteral {
 				name = "_Setup",
 				ordinal = 2,
@@ -7659,11 +7707,11 @@ device.@en"
 			}, EnumLiteral {
 				name = "_NumberOfParts",
 				ordinal = 1,
-				description = "The tool life indicates the total number of parts that have been produced or can still be produced using the tool. The unit shall be -one.@en"
+				description = "The tool life indicates the total number of parts that have been produced or can still be produced using the tool. The unit shall be „one.@en"
 			}, EnumLiteral {
 				name = "_NumberOfUsages",
 				ordinal = 2,
-				description = "The tool life indicates counting the process steps this tool has been used or can still be used (for example usages of a punching tool). The unit shall be -one.@en"
+				description = "The tool life indicates counting the process steps this tool has been used or can still be used (for example usages of a punching tool). The unit shall be „one.@en"
 			}, EnumLiteral {
 				name = "_Feed_Distance",
 				ordinal = 3,
