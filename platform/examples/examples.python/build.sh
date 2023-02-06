@@ -14,7 +14,7 @@ rm -rf gen
 #mvn -U -P EasyGen generate-sources
 #mvn -U -P App install -DskipTests
 #mvn -U -P EasyGen package
-mvn -U install
+mvn -U install -Dunpack.force=true
 
 #execute and test
 
