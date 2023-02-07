@@ -374,10 +374,14 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
     // called via MeshBasics.generateDataMethods for MeshSink
     def generateSinkMethod(MeshSink snk, String type, String methodSuffix, String methodSuffixWithServiceId) {
         String methodName;
-        if (sharedInterfaces) {
-            methodName = "process${type.firstToUpperCase()}";
+        if (snk.impl.isKindOf(Connector)) { // preliminary, no dispatch, right method?
+            methodName = "send";
         } else {
-            methodName = methodSuffix;
+            if (sharedInterfaces) {
+                methodName = "process${type.firstToUpperCase()}";
+            } else {
+                methodName = methodSuffix;
+            }
         }
         '/**
         * Called when data arrived that shall be received (data sink).

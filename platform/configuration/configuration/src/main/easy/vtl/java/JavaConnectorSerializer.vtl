@@ -118,7 +118,7 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
                 String srcArrayEltTypeName = asTypeName(srcArrayType.type.name);
                 String tgtArrayEltTypeName = asTypeName(tgtArrayType.type.name);
                 String outerPrName = "prArray${arrayCount}";
-                '${getParserResultType(parser)} ${outerPrName} = pr.stepInto("${src.name}", ${indexes});
+                '${getParserResultType(parser)} ${outerPrName} = pr.stepInto("${src.name}", ${suffixPath(indexes, ",")});
                 ${tgtArrayEltTypeName}[] ${arrayName} = new ${tgtArrayEltTypeName}[${outerPrName}.getArraySize()];
                 for (int i = 0, size = ${outerPrName}.getArraySize(); i < size; i++) {
                     ${getParserResultType(parser)} prElement = ${outerPrName}.stepInto("", i);
@@ -186,7 +186,6 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
     def genToField(String qual, String name, String fieldName, PrimitiveType type, PrimitiveType srcType) {
         String data = "${qual}.get${asMethodNameSuffix(fieldName)}()";
         if (isRecordArray(type) and isRecordArray(srcType)) {
-println("GEN-TO-FIELD");        
             arrayCount = arrayCount + 1;
             ArrayType tgtArrayType = type; // conversion
             ArrayType srcArrayType = srcType; // conversion
@@ -208,7 +207,7 @@ println("GEN-TO-FIELD");
     def genToField(String qual, String name, String fieldName, RecordType type, RecordType srcType) {
         String q = qual;
         if (fieldName.length() > 0) { // fieldName == "" on top level
-           q = q + ".get" + asMethodNameSuffix(fieldName);
+           q = q + ".get" + asMethodNameSuffix(fieldName) + "()";
         }
         mapOf(String, DataType) srcFieldTypes = {};
         for (Field f : srcType.fields) {

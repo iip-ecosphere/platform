@@ -193,10 +193,11 @@ project Connectors {
        Boolean mock = false; // in-vivo testing, enable a mocking connector service wrapper
        CacheMode cacheMode = CacheMode::NONE;
        String deviceServiceKey;
+       ServiceKind kind = ServiceKind.SOURCE_SERVICE;
 
        Constraint connectorOutputSize = fwdTypes(output).size() < 2;
        Constraint connectorInputSize = fwdTypes(input).size() < 2;
-       Constraint connectorKind = kind == ServiceKind.SOURCE_SERVICE;
+       Constraint connectorKind = kind == ServiceKind.SOURCE_SERVICE or kind == ServiceKind.SINK_SERVICE;
        Constraint connectorDeployability = deployable == true;
    }
    
