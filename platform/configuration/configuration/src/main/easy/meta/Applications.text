@@ -6,6 +6,7 @@ Applications::Application::description = Description of the application.
 Applications::Application::id = Unique id to administer/manager the application.
 Applications::Application::name = Human readable name of the application.
 Applications::Application::nameplateInfo = Nameplate information on the manufacturer of the application.
+Applications::Application::servers = Servers assigned to this application, dependent on configuration to be started/stopped with the application.
 Applications::Application::services = Service mesh(es) making up the application.
 Applications::Application::idOk = Application id must not contain @
 Applications::MeshConnector::next = The next service this connector is connecting to.

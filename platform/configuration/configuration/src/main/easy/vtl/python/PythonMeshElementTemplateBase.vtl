@@ -1,0 +1,106 @@
+import PythonBasics;
+import MeshBasics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template PythonMeshElementTemplateBase(Configuration config, FileArtifact target, MeshElement elt, String pkg) extends MeshBasics {
+
+    String typeAdd = "";
+
+    // called via MeshBasics.generateDataMethods for MeshSource
+    def generateSourceMethod(MeshSource src, String type, String methodSuffix, String methodSuffixWithServiceId) {
+        if (!src.impl.asynchronous) {
+        'def ${methodSuffix}(self) -> ${type}:
+            """Data generator for source classes.
+        
+            Return:
+              - the created data
+            """
+            result = ${type}${typeAdd}()
+            ${generateSourceMethodImpl(src.impl)}
+            return result'
+        }
+    } 
+    
+    // dispatch basis
+    def generateSourceMethodImpl(ServiceBase service) {
+        '#TODO add your code here'
+    }
+
+    // called via MeshBasics.generateDataMethods for asynch MeshProcessor
+    def generateAsyncProcessorInMethod(MeshProcessor proc, String type, String methodSuffix, String methodSuffixWithServiceId) {
+        'def ${methodSuffix}(self, data: ${type}):
+            """Asynchronous data processing method. Use self.ingest(data) to pass the result back to the data stream.
+        
+            Parameters:
+              - data -- the data to process
+            """
+            ${generateAsyncProcessorInMethodImpl(proc.impl)}'
+    }
+    
+    // dispatch basis
+    def generateAsyncProcessorInMethodImpl(ServiceBase service) {
+        '#create result instance and call self.ingest(data)
+        raise NotImplementedError'
+    } 
+
+    // called via MeshBasics.generateDataMethods for synch MeshProcessor
+    def generateSyncProcessorMethod(MeshProcessor proc, String inType, String outType, String methodSuffix, String methodSuffixWithServiceId) {
+        'def ${methodSuffix}(self, data: ${inType}) -> ${outType}:
+            """Synchronous data processing method.
+        
+            Parameters:
+              - data -- the data to process
+            Returns:
+              the processed data              
+            """
+            result = ${outType}${typeAdd}()
+            ${generateSyncProcessorMethodImpl(proc.impl)}
+            return result'
+    }
+    
+    // dispatch basis
+    def generateSyncProcessorMethodImpl(ServiceBase service) {
+        '#TODO add your code here'
+    } 
+    
+    // called via MeshBasics.generateDataMethods for MeshSink
+    def generateSinkMethod(MeshSink snk, String type, String methodSuffix, String methodSuffixWithServiceId) {
+        'def ${methodSuffix}(self, data: ${type}):
+            """Sink method, receives data.
+        
+            Parameters:
+              - data -- the received data
+            """
+            ${generateSinkMethodImpl(snk.impl)}'
+    }
+    
+    // dispatch basis
+    def generateSinkMethodImpl(ServiceBase service) {
+        'raise NotImplementedError'
+    }
+    
+    def produceDatatypeImports(MeshElement elt) {
+        '${generateImports(elt.impl)}|e'
+        setOf(RecordType) types = collectRecordTypes(elt);
+        for (RecordType t: types) {
+            String name = t.name;
+            'from datatypes.${name} import ${name}'
+            'from datatypes.${name}Impl import ${name}Impl'
+        }
+    } 
+
+    // dispatch basis
+    def generateImports(ServiceBase service) {
+        ''
+    }
+    
+    def initTypeAdd(IIPEcosphere cfg) {
+        if (cfg.sharedInterfaces) {
+            typeAdd = "Impl";
+        } else {
+            typeAdd = "";
+        }    
+    }
+    
+}

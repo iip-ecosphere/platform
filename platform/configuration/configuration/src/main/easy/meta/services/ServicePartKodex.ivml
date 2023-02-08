@@ -22,7 +22,6 @@ project ServicePartKodex {
        Integer typeIntMax = 0; // for Structured
    }
    
-   // preliminary, own module as kind of "extension"?
    compound KodexService refines CompleteService {
        setOf(KodexFieldAction) actions;
        ServiceKind kind = ServiceKind::TRANSFORMATION_SERVICE;

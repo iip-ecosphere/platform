@@ -1,0 +1,10 @@
+project ServerPartFlowerAI {
+
+   import Transport;
+   
+   annotate BindingTime bindingTime = BindingTime::compile to .;
+   
+   compound FlowerFederatedAiServer refines Server {
+   }
+   
+}

@@ -4,7 +4,6 @@ project ServicePartRtsa {
    
    annotate BindingTime bindingTime = BindingTime::compile to .;
    
-   // preliminary, own module as kind of "extension"?
    compound RtsaService refines CompleteService {
        ServiceKind kind = ServiceKind::TRANSFORMATION_SERVICE;
        IipVersion rtsaVer = "0.14.5";
