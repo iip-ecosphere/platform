@@ -12,6 +12,9 @@
 
 package de.iip_ecosphere.platform.services.spring.yaml;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.iip_ecosphere.platform.services.environment.AbstractYamlServer;
 import de.iip_ecosphere.platform.services.spring.descriptor.Server;
 
@@ -21,5 +24,36 @@ import de.iip_ecosphere.platform.services.spring.descriptor.Server;
  * @author Holger Eichelberger, SSE
  */
 public class YamlServer extends AbstractYamlServer implements Server {
+    
+    private String cls;
+    private List<String> args = new ArrayList<>();
+
+    @Override
+    public String getCls() {
+        return cls;
+    }
+
+    @Override
+    public List<String> getArguments() {
+        return args;
+    }
+
+    /**
+     * Defines the (integration) Java class to be executed.
+     * 
+     * @param cls the class
+     */
+    public void setCls(String cls) {
+        this.cls = cls;
+    }
+
+    /**
+     * Defines the arguments to be passed to the server implementation upon startup.
+     * 
+     * @param args the arguments
+     */
+    public void setArguments(List<String> args) {
+        this.args = args;
+    }
 
 }
