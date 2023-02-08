@@ -268,7 +268,15 @@ project SerializerConfig1Old {
         name = "myApp example old",
         ver = "0.1.0",
         description = "",
-        services = {refBy(myMesh)}        
+        services = {refBy(myMesh)},
+        servers = {refBy(pyServer)}
+    };
+    
+    PythonServer pyServer = {
+        id="test-pyServer", 
+        host="localhost", 
+        port=9871, 
+        entrypointModule="MyPyServer.py"
     };
     
     ServiceMesh myMesh = {

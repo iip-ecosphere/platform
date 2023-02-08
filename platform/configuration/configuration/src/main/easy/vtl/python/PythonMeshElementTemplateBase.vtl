@@ -95,6 +95,11 @@ template PythonMeshElementTemplateBase(Configuration config, FileArtifact target
         ''
     }
     
+    // dispatch basis
+    def inheritsFrom(String cls) {
+        cls;
+    }
+    
     def initTypeAdd(IIPEcosphere cfg) {
         if (cfg.sharedInterfaces) {
             typeAdd = "Impl";

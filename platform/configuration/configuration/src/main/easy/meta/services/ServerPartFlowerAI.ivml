@@ -4,7 +4,8 @@ project ServerPartFlowerAI {
    
    annotate BindingTime bindingTime = BindingTime::compile to .;
    
-   compound FlowerFederatedAiServer refines Server {
+   compound FlowerFederatedAiServer refines PythonServer {
+        NonEmptyString entrypointModule = "FlowerServer.py";
    }
    
 }

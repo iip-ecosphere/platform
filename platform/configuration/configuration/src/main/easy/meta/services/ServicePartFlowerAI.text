@@ -1,0 +1,4 @@
+ServicePartFlowerAI::FlowerFederatedAiService::framework = The AI framework to be used in the generated implementation template.
+ServicePartFlowerAI::FlowerFederatedAiService::client = The client type to be used in the generated implementation template.
+ServicePartFlowerAI::FlowerFederatedAiService::server = The declaration of the federated learning server.
+ServicePartFlowerAI::FlowerFederatedAiService::nameplateInfo = AAS nameplate information of this services.

@@ -22,4 +22,5 @@ Transport::Server::host = Default host where to start the server instance (may b
 Transport::Server::id = Unique server id.
 Transport::Server::port =  Default/intended port number on where to start the host.
 Transport::Server::running = Shall the server be started/stopped by the platform or is it assumed to be installed/running.
+Transport::PythonServer::entrypointModule = The Python module representing the server implementation.
 Transport::serversUnique = The id of all defined servers must be unique.

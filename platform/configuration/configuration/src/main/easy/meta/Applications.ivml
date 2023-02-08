@@ -32,6 +32,9 @@ project Applications {
     compound ServiceMesh {
         String description;
         setOf(refTo(MeshSource)) sources;
+
+        Constraint meshElementsUnique = self.sources->closure(refTo(MeshElement) e|nextElts(e))
+            .toSequence()->isUnique(e|e.name);
     }
     
     compound MeshElement {
@@ -52,7 +55,6 @@ project Applications {
     def setOf(refTo(MeshElement)) nextElts(MeshElement elt) = {};
     def setOf(refTo(MeshElement)) nextElts(MeshSource src) = src.next->collect(c|c.next);
     def setOf(refTo(MeshElement)) nextElts(MeshInnerElement elt) = elt.next->collect(c|c.next);
-    Constraint meshElementsUnique = allInstances(MeshElement)->isUnique(e|e.name);
     
     // hint to requirements!
     compound MeshConnector refines CConnector {

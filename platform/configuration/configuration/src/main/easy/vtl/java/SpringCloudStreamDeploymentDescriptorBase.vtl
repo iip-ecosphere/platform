@@ -276,48 +276,6 @@ template SpringCloudStreamDeploymentDescriptorBase(Configuration config, FileArt
         }
         res;
     }
-    
-    /*def generateRelations1(MeshElement elt, setOf(MeshConnector) conns) {
-        String res = "";
-        String tmp = substNewlines(generateDataMethods(elt, true), ",");
-        sequenceOf(String) eltM = tmp.split(",");
-        for (String eltMet: eltM) {
-            returnType = true;
-            inputType = true;
-            String eltType = trimTrailingComma(substNewlines(generateDataMethods(elt, true), ","));
-            returnType = false;
-            if (res.length() > 0) {
-                res = res + "\n";
-            }
-            res = res + 
-        '- channel: ${eltMet}-out-0
-          direction: OUT
-          type: ${eltType}';
-            if (conns.size() > 0) {
-                for (MeshConnector conn : conns, "\n") {
-                    MeshInnerElement next = conn.next;
-                    tmp = trimTrailingComma(substNewlines(generateDataMethods(next, true), ","));
-                    sequenceOf(String) nextM = tmp.split(",");
-                    for (String nextMeth: nextM) {
-                        returnType = true;
-                        inputType = true;
-                        String nextType = trimTrailingComma(substNewlines(generateDataMethods(next, true), ","));
-                        returnType = false;
-                        if (res.length() > 0) {
-                            res = res + "\n";
-                        }
-                        res = res + 
-        '- channel: ${nextMeth}-in-0
-          id: ${conn.name}
-          service: ${next.impl.id}
-          direction: IN
-          type: ${nextType}';
-                    }
-                }
-            }
-        }
-        '${res}'
-    }*/
 
     // -------------------------- mesh basics refinement, extract stream names ---------------------------------
 
@@ -464,17 +422,26 @@ template SpringCloudStreamDeploymentDescriptorBase(Configuration config, FileArt
         }
     }
 
-    // ----------------------------------- main -----------------------------------
+    def generateServers(Application app) {
+        if (isDefined(app.servers)) {
+            // sorted by for deterministic testing
+            for (Server s : app.servers->select(s|!s.running)->sortedBy(t|t.id)) {
+                '- id: ${s.id}
+                  host: ${s.host}
+                  port: ${s.port}
+                  ${generateServer(s)|e}'
+            }
+        }
+    }
     
-    def main(Configuration config, FileArtifact target, Application app, sequenceOf(MeshElement) elements) {
-        'id: ${app.id}
-        name: ${app.name}
-        version: ${app.ver}
-        ${generateAppSetup(app)}
-        ${generateTypes(elements)}
-        services:
-           ${generateServices(elements)}
-        '
+    def generateServer(Server server) {
+        ''
+    }
+
+    def generateServer(PythonServer server) {
+        'class: de.iip_ecosphere.platform.services.environment.PythonServer
+        args:
+          - ${server.entrypointModule}'
     }
 
 }

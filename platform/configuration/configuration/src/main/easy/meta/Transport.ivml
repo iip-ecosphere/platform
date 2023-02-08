@@ -58,6 +58,10 @@ project Transport {
         Boolean running = false; // running somewhere else, do we have to start it
     }
     
+    compound PythonServer refines Server {
+        NonEmptyString entrypointModule;
+    }
+    
     Constraint serversUnique = allInstances(Server)->isUnique(e|e.id);
     
     freeze {
