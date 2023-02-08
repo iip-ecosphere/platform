@@ -54,6 +54,13 @@ public interface Service {
     public String getApplicationInstanceId();
 
     /**
+     * Returns the network management key of a service instance this service is relying on.
+     * 
+     * @return the network management key, may be empty or <b>null</b> for none
+     */
+    public String getNetMgtKey();
+    
+    /**
      * Returns the name of the service.
      * 
      * @return the name

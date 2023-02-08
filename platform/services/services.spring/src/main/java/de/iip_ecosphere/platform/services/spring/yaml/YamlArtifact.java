@@ -19,6 +19,7 @@ import java.util.List;
 
 import de.iip_ecosphere.platform.services.environment.AbstractYamlArtifact;
 import de.iip_ecosphere.platform.services.spring.descriptor.Artifact;
+import de.iip_ecosphere.platform.services.spring.descriptor.Server;
 import de.iip_ecosphere.platform.services.spring.descriptor.Validator;
 import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
 
@@ -33,6 +34,7 @@ public class YamlArtifact extends AbstractYamlArtifact implements Artifact {
 
     private List<YamlService> services;
     private List<YamlType> types = new ArrayList<>();
+    private List<YamlServer> servers = new ArrayList<>();
     
     @Override
     public List<YamlService> getServices() {
@@ -76,6 +78,20 @@ public class YamlArtifact extends AbstractYamlArtifact implements Artifact {
             result.setServices(new ArrayList<>());
         }
         return result;
+    }
+
+    @Override
+    public List<? extends Server> getServers() {
+        return servers;
+    }
+
+    /**
+     * Sets the servers specification instances. [required by SnakeYaml]
+     * 
+     * @param servers the servers
+     */
+    public void setServers(List<YamlServer> servers) {
+        this.servers = servers;
     }
 
 }

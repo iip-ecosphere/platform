@@ -54,6 +54,13 @@ public interface Artifact {
     public List<? extends Service> getServices();
 
     /**
+     * Returns the contained server specifications.
+     * 
+     * @return the server specifications
+     */
+    public List<? extends Server> getServers();
+
+    /**
      * Returns the declared types.
      * 
      * @return the types

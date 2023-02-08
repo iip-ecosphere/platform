@@ -15,6 +15,7 @@ In addition, service deployment properties are given in a separate descriptor, t
     * Optional specification whether the service is `deployable` in distributed manner (default is `true`).
     Optional specification whether the service is `topLevel` or nested, e.g., family member (default is `true`).
     * The Service `kind` (see `de.iip_ecosphere.platform.services.ServiceKind`). 
+    * The optional network management key 'netMgtKey' of a server process the service is relying on. May be empty for one.
     * `cmdArg`: Optional list of command line arguments to be passed when the service is started. Within this list, `${port}` is substituted with the service command port and `${protocol}` with the command protocol, one of the AAS protocols. Further `${tmp}` is replaced by the temporary folder and `${user}` by the user home directory.
     * `instances`: The optional number of service replicas to be launched. Ignored if negative. Default value is `1`.
     * resource desires: Optional values for the number of `cpus`, the `memory` and the `disk` space, the latter in bytes. If not given or not positive, internal default values are used, i.e., one CPU and, e.g., automatically determined for a JVM. The deployer may ignore these values if not applicable to the type of process to be started.
@@ -35,6 +36,7 @@ In addition, service deployment properties are given in a separate descriptor, t
       * `streamEndpoint` and `aasEndpoint` denote (akin to `endpoint` above) communication settings to be appended to the command line arguments, here for the data streaming communication (i.e., the service will delegate the data there and receive input from there) and AAS command communication (typically via VAB). 
       * The Boolean property `started` indicates whether the underlying process is already started (default is `false`), e.g., in case of a database.
       *  `waitTime` defines a time to wait until the process is supposed to be ready before continuing service start activities (default `0`, positive values denote milliseconds to wait).
+* `servers`: An optional list of server instance specifications to be started/stopped with the referencing application. A server has an `id` (denoting its network management key), a `host` name (may be superseded by a deployment plan) and a `port`. The `netMgrKey` of a service may refer to one of the servers declared here indicating a shared lifecycle.
 
 The descriptor structure looks as given below (lists are indicates by a single element):
 
@@ -55,6 +57,7 @@ The descriptor structure looks as given below (lists are indicates by a single e
         deployable: <Boolean>
         topLevel: <Boolean>
         kind: <value from de.iip_ecosphere.platform.services.ServiceKind>
+        netMgtKey: <String>
         cmdArg: 
           - <String>
         instances: <Integer>
@@ -92,7 +95,11 @@ The descriptor structure looks as given below (lists are indicates by a single e
             portArg: <String, ${port} is substituted by the actual port number>
             hostArg: <String, ${host} is substituted by the actual host name>
           started: <boolean>
-          waitTime: <int>
+          waitTime: <Integer>
+    servers:
+        - id: <String>
+        - host: <String>
+        - port: <Integer> 
 
 ## Service Manager Configuration
 
