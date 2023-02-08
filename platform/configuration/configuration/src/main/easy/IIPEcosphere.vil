@@ -231,10 +231,26 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 mapOf(MeshElement, setOf(MeshConnector)) mappedMesh = {};
                 setOf(MeshElement) nodes = n.sources->closure(MeshElement e|nextMeshNodes(e, mappedMesh));
                 for (MeshElement elt: nodes) {
-                    String name = elt.impl.getType(); // converts to strings, VIL/VTL types are not hash-compatible 
-                    usedServiceTypes.add(name);
+                    initUsedServiceType(elt.impl);
                 }        
             }
+        }
+    }
+    
+    // dispatch basis, default
+    initUsedServiceType(ServiceBase service) = {
+        initUsedServiceTypeImpl(service);
+    }
+
+    initUsedServiceTypeImpl(ServiceBase service) = {
+        String name = service.getType(); // converts to strings, VIL/VTL types are not hash-compatible 
+        usedServiceTypes.add(name);
+    }
+
+    initUsedServiceType(ServiceFamily family) = {
+        initUsedServiceTypeImpl(family);
+        for (Service m: family.members) {
+            initUsedServiceType(m); // recurse
         }
     }
 
@@ -565,9 +581,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 bins.add(tmp[0]+":"+tmp[1]+":"+tmp[2]+"|python|${mvnProjectPySrcDir}|python.zip|zip|unpack");
             }
             vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/python_${serviceFolderName}.xml", withServices=true, dependency=artifact);
-            if (not(noDeps)) {
-                assemblies.add("python_${serviceFolderName}|${assemblyRel}/python_${serviceFolderName}.xml|prepare-package|${mvnProjectBuildDir}/classes|python_${serviceFolderName}");
-            }
+            assemblies.add("python_${serviceFolderName}|${assemblyRel}/python_${serviceFolderName}.xml|prepare-package|${mvnProjectBuildDir}/classes|python_${serviceFolderName}");
             artifacts.add(getArtifact(service));
         }
     }
@@ -576,6 +590,8 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     
     generateSharedInterfaces(Configuration config, Project target, setOf(String) javaSerializers, setOf(String) artifacts) = {
         IIPEcosphere cfg = config;
+        setOf(Application) applications = Application.allInstances();
+        initUsedServiceTypes(applications);        
         Path appRoot = "${target}/ApplicationInterfaces";
         appRoot.mkdir();
 
@@ -631,7 +647,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
             vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/pythonInterfaces.xml", withServices=false, dependency="");
             assemblies.add("python|${assemblyRel}/pythonInterfaces.xml|package|${mvnProjectBuildDir}");
         }
-            
+        
         // partition according to container strategy
         
         sequenceOf(String) artList = cfg.sharedArtifact.split(":");
