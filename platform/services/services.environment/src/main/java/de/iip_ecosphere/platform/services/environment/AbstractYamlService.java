@@ -32,6 +32,7 @@ public abstract class AbstractYamlService {
     private ServiceKind kind;
     private boolean deployable = false;
     private boolean topLevel = true;
+    private String netMgtKey;
 
     /**
      * Returns the unique id of the service.
@@ -71,6 +72,15 @@ public abstract class AbstractYamlService {
      */
     public String getApplicationInstanceId() {
         return ServiceBase.getApplicationInstanceId(id);
+    }
+
+    /**
+     * Returns the network management key of a service instance this service is relying on.
+     * 
+     * @return the network management key, may be empty or <b>null</b> for none
+     */
+    public String getNetMgtKey() {
+        return netMgtKey;
     }
 
     /**
@@ -154,6 +164,15 @@ public abstract class AbstractYamlService {
         this.applicationId = applicationId;
     }
 
+    /**
+     * Defines the network management key of a service instance this service is relying on.
+     * 
+     * @param netMgtKey the network management key, may be empty or <b>null</b> for none
+     */
+    public void setNetMgtKey(String netMgtKey) {
+        this.netMgtKey = netMgtKey;
+    }
+    
     /**
      * Defines the version of the service. [required by SnakeYaml]
      * 

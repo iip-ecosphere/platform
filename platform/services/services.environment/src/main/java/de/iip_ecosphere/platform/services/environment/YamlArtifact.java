@@ -30,6 +30,7 @@ import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
 public class YamlArtifact extends AbstractYamlArtifact {
 
     private List<YamlService> services;
+    private List<YamlServer> servers = new ArrayList<>();
 
     /**
      * Returns the services.
@@ -49,6 +50,24 @@ public class YamlArtifact extends AbstractYamlArtifact {
         this.services = services;
     }
 
+    /**
+     * Returns the server specification instances. [required by SnakeYaml]
+     * 
+     * @return the servers
+     */
+    public List<YamlServer> getServers() {
+        return servers;
+    }
+
+    /**
+     * Sets the server specification instances. [required by SnakeYaml]
+     * 
+     * @param servers the servers
+     */
+    public void setServers(List<YamlServer> servers) {
+        this.servers = servers;
+    }
+    
     /**
      * Returns a YAML service information object based on the given service id.
      * 
