@@ -27,6 +27,7 @@ class CmdLineServiceEnvironmentTest(unittest.TestCase):
             cwd="../../main/python", text=True)
         process.stdin.write('S|data\r\n')
         process.stdin.write('S|data\r\n')
+        process.stdin.write('*PARAM:String|{"name":"p","value":"1234"}\r\n')
         out = process.communicate()
         
         results = re.sub(r'\n\s*\n', '\n', out[0]).splitlines()

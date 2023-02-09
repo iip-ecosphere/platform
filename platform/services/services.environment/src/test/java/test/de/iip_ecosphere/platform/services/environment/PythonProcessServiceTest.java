@@ -15,7 +15,9 @@ package test.de.iip_ecosphere.platform.services.environment;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -26,6 +28,7 @@ import de.iip_ecosphere.platform.services.environment.DataIngestor;
 import de.iip_ecosphere.platform.services.environment.PythonAsyncProcessService;
 import de.iip_ecosphere.platform.services.environment.PythonSyncProcessService;
 import de.iip_ecosphere.platform.services.environment.AbstractPythonProcessService;
+import de.iip_ecosphere.platform.services.environment.AbstractService;
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.services.environment.YamlProcess;
@@ -45,6 +48,8 @@ import test.de.iip_ecosphere.platform.services.environment.pythonEnv.Rec13OutTra
  */
 public class PythonProcessServiceTest {
 
+    private String stringParam = null;
+    
     /**
      * Composes the basic command line arguments for this test. We assume that the service modules are in the 
      * "src/test/python" folder and we set the home folder of the Python process to "src/main/python" where the 
@@ -111,10 +116,21 @@ public class PythonProcessServiceTest {
                 receivedRec13Count.incrementAndGet();
             } 
         });
+        service.addParameterConfigurer(c -> AbstractService.addConfigurer(
+            c, "myParam", String.class, TypeTranslators.STRING, v -> stringParam = v));
+        Assert.assertNotNull(service.getParameterConfigurer("myParam"));
+        Map<String, String> rcf = new HashMap<>();
+        service.getParameterConfigurer("myParam").addValue(rcf, "VALUE");
+        service.reconfigure(rcf); // set default values
+        Assert.assertEquals("VALUE", stringParam); // "service" local value, set directly
         service.setState(ServiceState.STARTING);
         service.process(stringTypeName, "test");
         service.process(stringTypeName, "test");
         service.processQuiet(stringTypeName, "test");
+        rcf.clear();
+        rcf.put("myParam", "VALUE-R");
+        service.reconfigure(rcf); // set runtime values
+        Assert.assertEquals("VALUE-R", stringParam); // "service" local value, set directly
         Rec13 r = new Rec13Impl();
         r.setIntField(10);
         r.setStringField("abba");

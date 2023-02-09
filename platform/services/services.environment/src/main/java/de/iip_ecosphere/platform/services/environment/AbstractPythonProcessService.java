@@ -19,10 +19,12 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.HashMap;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.function.Consumer;
 
 import org.slf4j.LoggerFactory;
 
@@ -49,6 +51,7 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
     private String locationKey;
     private Map<String, OutTypeInfo<?>> outTypeInfos = new HashMap<>();
     private Map<String, InTypeInfo<?>> inTypeInfos = new HashMap<>();
+    private Map<String, ParameterConfigurer<?>> paramConfigurers = new HashMap<>();
     
     /**
      * Represents an input or output type.
@@ -578,4 +581,26 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
         return typeName + TYPE_SEPARATOR_CHAR + data;
     }
     
+    @Override
+    public ParameterConfigurer<?> getParameterConfigurer(String paramName) {
+        return paramConfigurers.get(paramName);
+    }
+    
+    @Override
+    public Set<String> getParameterNames() {
+        return paramConfigurers.keySet();
+    }
+    
+    /**
+     * Adds parameter configurers via a consumer.
+     * 
+     * @param paramConsumer the consumer, user 
+     *     {@link AbstractService#addConfigurer(Map, String, Class, TypeTranslator, ValueConfigurer)} and related 
+     *     methods in there
+     */
+    public void addParameterConfigurer(Consumer<Map<String, ParameterConfigurer<?>>> paramConsumer) {
+        paramConsumer.accept(paramConfigurers); // paramConfigurers may be protected here
+    }
+    
+
 }

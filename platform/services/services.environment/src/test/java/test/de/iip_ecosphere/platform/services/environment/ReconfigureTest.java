@@ -14,6 +14,7 @@ package test.de.iip_ecosphere.platform.services.environment;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.ExecutionException;
 
@@ -21,6 +22,7 @@ import org.junit.Test;
 
 import de.iip_ecosphere.platform.services.environment.AbstractService;
 import de.iip_ecosphere.platform.services.environment.ParameterConfigurer;
+import de.iip_ecosphere.platform.services.environment.ParameterConfigurerProvider;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslators;
 import org.junit.Assert;
@@ -47,6 +49,7 @@ public class ReconfigureTest {
         param3 = 10;
 
         Map<String, ParameterConfigurer<?>> configurers = new HashMap<>();
+        ParameterConfigurerProvider provider = new MapParameterConfigurerProvider(configurers);
         AbstractService.addConfigurer(configurers, "param1", Integer.class, TypeTranslators.INTEGER, 
             v -> param1 = v, () -> param1);
         AbstractService.addConfigurer(configurers, "param2", String.class, TypeTranslators.STRING, 
@@ -60,7 +63,7 @@ public class ReconfigureTest {
         values.put("param3", "abba"); // shall fail and lead to recovery
 
         try {
-            AbstractService.reconfigure(values, n -> configurers.get(n), true, ServiceState.AVAILABLE);
+            AbstractService.reconfigure(values, provider, true, ServiceState.AVAILABLE);
             Assert.fail();
         } catch (ExecutionException e) {
             // this is ok
@@ -81,6 +84,7 @@ public class ReconfigureTest {
         param3 = 10;
 
         Map<String, ParameterConfigurer<?>> configurers = new HashMap<>();
+        ParameterConfigurerProvider provider = new MapParameterConfigurerProvider(configurers);
         AbstractService.addConfigurer(configurers, "param1", Integer.class, TypeTranslators.INTEGER, 
             v -> param1 = v, () -> param1);
         AbstractService.addConfigurer(configurers, "param2", String.class, TypeTranslators.STRING, 
@@ -94,7 +98,7 @@ public class ReconfigureTest {
         values.put("param3", "abba"); // shall fail and lead to recovery
 
         try {
-            AbstractService.reconfigure(values, n -> configurers.get(n), false, ServiceState.AVAILABLE);
+            AbstractService.reconfigure(values, provider, false, ServiceState.AVAILABLE);
             Assert.fail();
         } catch (ExecutionException e) {
             // this is ok
@@ -103,6 +107,36 @@ public class ReconfigureTest {
         Assert.assertTrue(param1 == 0 || param1 == 20);
         Assert.assertTrue(param2 == null || param2.equals("abba"));
         Assert.assertEquals(10, param3); // cannot be changed, will fail
+    }
+    
+    /**
+     * A simple map-based parameter configurer provider.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static class MapParameterConfigurerProvider implements ParameterConfigurerProvider {
+
+        private Map<String, ParameterConfigurer<?>> configurers;
+        
+        /**
+         * Creates a provider.
+         * 
+         * @param configurers the provider
+         */
+        private MapParameterConfigurerProvider(Map<String, ParameterConfigurer<?>> configurers) {
+            this.configurers = configurers;
+        }
+        
+        @Override
+        public Set<String> getParameterNames() {
+            return configurers.keySet();
+        }
+        
+        @Override
+        public ParameterConfigurer<?> getParameterConfigurer(String paramName) {
+            return configurers.get(paramName);
+        }
+
     }
 
     /**
@@ -115,6 +149,8 @@ public class ReconfigureTest {
         param3 = 10;
 
         Map<String, ParameterConfigurer<?>> configurers = new HashMap<>();
+        ParameterConfigurerProvider provider = new MapParameterConfigurerProvider(configurers);
+        
         AbstractService.addConfigurer(configurers, "param1", Integer.class, TypeTranslators.INTEGER, 
             v -> param1 = v, () -> param1);
         AbstractService.addConfigurer(configurers, "param2", String.class, TypeTranslators.STRING, 
@@ -128,7 +164,7 @@ public class ReconfigureTest {
         configurers.get("param3").addValue(values, -1);
 
         try {
-            AbstractService.reconfigure(values, n -> configurers.get(n), true, ServiceState.AVAILABLE);
+            AbstractService.reconfigure(values, provider, true, ServiceState.AVAILABLE);
         } catch (ExecutionException e) {
             Assert.fail();
         }
@@ -142,7 +178,7 @@ public class ReconfigureTest {
         param3 = 10;
     
         try {
-            AbstractService.reconfigure(values, n -> configurers.get(n), false, ServiceState.AVAILABLE);
+            AbstractService.reconfigure(values, provider, false, ServiceState.AVAILABLE);
         } catch (ExecutionException e) {
             Assert.fail();
         }

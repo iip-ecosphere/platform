@@ -17,6 +17,65 @@ package de.iip_ecosphere.platform.services.environment;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class YamlServer extends AbstractYamlServer {
+public class YamlServer extends YamlProcess {
+
+    private String id;
+    private int port;
+    private String host;
+
+    /**
+     * Returns the id of the server, also to be used as network management key.
+     * 
+     * @return the id of the server
+     */
+    public String getId() {
+        return id;
+    }
+    
+    /**
+     * Returns the network port of this server instance.
+     * 
+     * @return the network port
+     */
+    public int getPort() {
+        return port;
+    }
+
+    /**
+     * Returns the host the server instance (may be superseded through a deployment plan).
+     * 
+     * @return the host name
+     */
+    public String getHost() {
+        return host;
+    }
+
+    
+    /**
+     * Returns the id of the server, also to be used as network management key. [required by SnakeYaml]
+     * 
+     * @param id the id of the server
+     */
+    public void setId(String id) {
+        this.id = id;
+    }
+    
+    /**
+     * Defines the network port of this server instance. [required by SnakeYaml]
+     * 
+     * @param port the network port
+     */
+    public void setPort(int port) {
+        this.port = port;
+    }
+
+    /**
+     * Defined the host the server instance (may be superseded through a deployment plan). [required by SnakeYaml]
+     * 
+     * @param host the host name
+     */
+    public void setHost(String host) {
+        this.host = host;
+    }
 
 }

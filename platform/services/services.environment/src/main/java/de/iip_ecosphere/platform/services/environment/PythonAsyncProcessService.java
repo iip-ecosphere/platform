@@ -18,6 +18,7 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
@@ -46,9 +47,10 @@ public class PythonAsyncProcessService extends AbstractPythonProcessService {
     private Process proc;
     private PrintWriter serviceIn;
     private boolean enableFileDeletion;
+    private Map<String, String> reconfValues;
  
     /**
-     * Creates an instace from a service id and a YAML artifact.
+     * Creates an instance from a service id and a YAML artifact.
      * 
      * @param serviceId the service id
      * @param ymlFile the YML file containing the YAML artifact with the service descriptor
@@ -92,6 +94,10 @@ public class PythonAsyncProcessService extends AbstractPythonProcessService {
             }
             return false;
         }).start();
+        if (null != reconfValues) {
+            sendToService(compose("*recfg", toJson(reconfValues)));
+            reconfValues = null;
+        }
         return ServiceState.RUNNING;
     }
 
@@ -135,7 +141,15 @@ public class PythonAsyncProcessService extends AbstractPythonProcessService {
 
     @Override
     public void reconfigure(Map<String, String> values) throws ExecutionException {
-        sendToService(compose("*recfg", toJson(values)));
+        if (ServiceState.RUNNING == getState()) {
+            sendToService(compose("*recfg", toJson(values)));
+        } else {
+            if (null == reconfValues) {
+                reconfValues = new HashMap<>();
+            }
+            reconfValues.putAll(values); // overwrite existing
+        }
+        super.reconfigure(values);
     }
     
     @Override

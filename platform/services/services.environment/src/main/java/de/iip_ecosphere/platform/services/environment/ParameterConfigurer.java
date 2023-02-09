@@ -100,6 +100,15 @@ public class ParameterConfigurer<T> implements ValueConfigurer<T> {
     public String getName() {
         return name;
     }
+    
+    /**
+     * Returns the type of the parameter.
+     * 
+     * @return the type
+     */
+    public Class<T> getType() {
+        return cls;
+    }
 
     /**
      * Adds the string representation of {@code value} to {@code values} in terms of the parameter represented by this 

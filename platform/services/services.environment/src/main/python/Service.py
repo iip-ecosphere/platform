@@ -118,7 +118,7 @@ class Service:
           resourceId -- the id of the resource to deploy to (str)
         """
 
-        raise NotImplementedError
+        pass
         
     def update(self, location:str):
         """Updates the service by the service in the given URL location. This operation is responsible for stopping
@@ -128,7 +128,7 @@ class Service:
           location -- the location from where to update the service (str)
         """
         
-        raise NotImplementedError
+        pass
        
     def switchTo(self, targetId:str):
         """Switches to an interface-compatible service. This method cares for stopping the old service, performing
@@ -138,17 +138,17 @@ class Service:
           targetId -- the id of the target service (str)
         """
         
-        raise NotImplementedError
+        pass
    
     def activate(self):
         """Activates the service. [adaptation]"""
         
-        raise NotImplementedError
+        pass
 
     def passivate(self):
         """Passivates the service. [adaptation]"""
         
-        raise NotImplementedError
+        pass
     
     def reconfigure(self, values:dict):
         """Reconfigures the service. [adaptation]
@@ -159,5 +159,5 @@ class Service:
             service is responsible for correct JSON de-serialization according to its descriptor.
         """
         
-        raise NotImplementedError
+        pass
 

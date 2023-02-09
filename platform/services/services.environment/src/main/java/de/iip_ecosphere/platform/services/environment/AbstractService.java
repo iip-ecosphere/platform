@@ -502,6 +502,18 @@ public abstract class AbstractService implements Service {
     @Override
     public void reconfigure(Map<String, String> values) throws ExecutionException {
         reconfigure(values, this, rollbackReconfigurationOnFailure(), getState());
+        for (Map.Entry<String, String> c : values.entrySet()) {
+            notifyReconfigured(c.getKey(), c.getValue());
+        }
+    }
+    
+    /**
+     * Called to notify values have been reconfigured.
+     * 
+     * @param paramName the name of the parameter
+     * @param value the serialized value (JSON)
+     */
+    protected void notifyReconfigured(String paramName, String value) {
     }
 
     /**

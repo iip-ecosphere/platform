@@ -14,6 +14,7 @@ package de.iip_ecosphere.platform.services.environment;
 
 import java.net.URI;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import de.iip_ecosphere.platform.services.environment.switching.ServiceBase;
@@ -121,6 +122,11 @@ public interface Service extends ParameterConfigurerProvider, ServiceBase {
 
     @Override
     public default ParameterConfigurer<?> getParameterConfigurer(String paramName) {
+        return null;
+    }
+    
+    @Override
+    public default Set<String> getParameterNames() {
         return null;
     }
 

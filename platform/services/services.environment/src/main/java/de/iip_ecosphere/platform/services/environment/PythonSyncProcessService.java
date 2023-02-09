@@ -89,6 +89,7 @@ public class PythonSyncProcessService extends AbstractPythonProcessService {
             reconfValues = new HashMap<>();
         }
         reconfValues.putAll(values); // overwrite existing
+        super.reconfigure(values);
     }
 
     /**

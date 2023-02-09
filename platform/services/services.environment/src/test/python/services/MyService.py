@@ -34,5 +34,8 @@ class MyService(MyServiceInterface):
         #do some stuff based on data
         self.ingest(data)
 
+    def reconfigure(self, values:dict):
+        print("RECONFIGURED: " + str(values))
+
 #registers itself
 MyService()

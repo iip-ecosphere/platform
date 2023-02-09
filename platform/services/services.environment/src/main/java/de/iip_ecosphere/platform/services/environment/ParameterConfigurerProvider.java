@@ -12,6 +12,8 @@
 
 package de.iip_ecosphere.platform.services.environment;
 
+import java.util.Set;
+
 /**
  * Provides access to parameter configurers.
  * 
@@ -28,4 +30,11 @@ public interface ParameterConfigurerProvider {
      */
     public ParameterConfigurer<?> getParameterConfigurer(String paramName);
 
+    /**
+     * The set of parameter names.
+     * 
+     * @return the parameter names, may be <b>null</b> for none
+     */
+    public Set<String> getParameterNames();
+    
 }
