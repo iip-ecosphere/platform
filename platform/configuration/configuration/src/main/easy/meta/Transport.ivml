@@ -51,15 +51,12 @@ project Transport {
     // - transport protocol payload limitation
     
     // required by application, to be started/stopped
-    abstract compound Server {
+    compound Server {
         NonEmptyString id;
         NonEmptyString host = "127.0.0.1";
         NonEmptyEphemeralPort port;
+        NonEmptyString executable;
         Boolean running = false; // running somewhere else, do we have to start it
-    }
-    
-    compound PythonServer refines Server {
-        NonEmptyString entrypointModule;
     }
     
     Constraint serversUnique = allInstances(Server)->isUnique(e|e.id);

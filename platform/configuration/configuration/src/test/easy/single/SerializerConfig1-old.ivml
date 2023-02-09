@@ -272,11 +272,10 @@ project SerializerConfig1Old {
         servers = {refBy(pyServer)}
     };
     
-    PythonServer pyServer = {
+    FlowerFederatedAiServer pyServer = {
         id="test-pyServer", 
         host="localhost", 
-        port=9871, 
-        entrypointModule="MyPyServer.py"
+        port=9871
     };
     
     ServiceMesh myMesh = {

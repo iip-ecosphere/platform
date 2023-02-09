@@ -8,7 +8,6 @@ import MeshBasics;
 @indent(indentation = 4, additional = 0)
 template SpringCloudStreamDeploymentDescriptorPartKodex(Configuration config, FileArtifact target, Application app, sequenceOf(MeshElement) elements) {
 
-    // preliminary in here, move out    
     def generateProcess(MeshElement elt, KodexService service) {
         String id = toFolderName(service.id);
         'process: 

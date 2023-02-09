@@ -425,10 +425,12 @@ template SpringCloudStreamDeploymentDescriptorBase(Configuration config, FileArt
     def generateServers(Application app) {
         if (isDefined(app.servers)) {
             // sorted by for deterministic testing
-            for (Server s : app.servers->select(s|!s.running)->sortedBy(t|t.id)) {
+            for (Server s : app.servers->sortedBy(t|t.id)) {
                 '- id: ${s.id}
                   host: ${s.host}
                   port: ${s.port}
+                  executable: ${s.executable}
+                  started: ${s.running}
                   ${generateServer(s)|e}'
             }
         }
@@ -436,12 +438,6 @@ template SpringCloudStreamDeploymentDescriptorBase(Configuration config, FileArt
     
     def generateServer(Server server) {
         ''
-    }
-
-    def generateServer(PythonServer server) {
-        'class: de.iip_ecosphere.platform.services.environment.PythonServer
-        args:
-          - ${server.entrypointModule}'
     }
 
 }

@@ -10,7 +10,6 @@ import Rtsa;
 @indent(indentation = 4, additional = 0)
 template SpringCloudStreamDeploymentDescriptorPartRtsa(Configuration config, FileArtifact target, Application app, sequenceOf(MeshElement) elements) {
 
-    // preliminary in here, move out    
     def generateProcess(MeshElement elt, RtsaService service) {
         String id = toFolderName(service.id);
         String bin = rtsaBin(service);
