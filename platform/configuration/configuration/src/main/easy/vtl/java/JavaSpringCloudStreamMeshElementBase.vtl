@@ -967,7 +967,69 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
             String type = toTypeName(out);
             'service.registerOutputTypeTranslator(${type}.class, "${type}", new ${type}OutputTranslator());\n'
         }
+        Parameters params = service.parameter;
+        if (size(params) > 0) {
+            'service.addParameterConfigurer(c -> {
+                ${produceParametersReg(params)}        
+            });
+        
+            HashMap<String, String> paramValues = new HashMap<>();
+            ParameterConfigurer<?> cfg;'
+            for (Parameter p: params) {
+                // TODO compile time?
+                'cfg = service.getParameterConfigurer("${p.name}");
+                if (null != cfg) {
+                    ${generateParameterInit(p)}
+                }'
+            }
+            'try {
+                service.reconfigure(paramValues);
+            } catch (ExecutionException e) {
+                LoggerFactory.getLogger(getClass()).error("Configuring initial parameter: " + e.getMessage());
+            }'
+        }
+        
         '${initAppInstId("service")}'
+    }
+
+    def produceParametersReg(Parameters params) {
+        for (Parameter p: params) {
+            '${produceParameterReg(p)}'
+        }
+    }
+
+    // dispatch basis
+    def produceParameterReg(Parameter p) {
+        ''
+    }
+    
+    def produceParameterReg(StringParameter p) {
+        '${produceParameterDecl(p, "String.class", "TypeTranslators.JSON_STRING")}'
+    }
+
+    def produceParameterReg(IntegerParameter p) {
+        '${produceParameterDecl(p, "Integer.class", "TypeTranslators.INTEGER")}'
+    }
+
+    def produceParameterReg(LongParameter p) {
+        '${produceParameterDecl(p, "Long.class", "TypeTranslators.LONG")}'
+    }
+
+    def produceParameterReg(BooleanParameter p) {
+        '${produceParameterDecl(p, "Boolean.class", "TypeTranslators.BOOLEAN")}'
+    }
+
+    def produceParameterReg(RealParameter p) {
+        '${produceParameterDecl(p, "Double.class", "TypeTranslators.DOUBLE")}'
+    }
+    
+    def produceParameterDecl(Parameter p, String cls, String typeTranslator) {
+        String sysProp = getStringValueSafe(p.systemProperty, "");
+        if (sysProp <> "") {
+            sysProp = ', "${sysProp}"';
+        }
+        // fast track, no attributes, no implicit recovery, just parameter declaration
+        'AbstractService.addConfigurer(c, "${p.name}", ${cls}, ${typeTranslator}, v -> {}, null${sysProp});'
     }
     
     def generateImports(PythonService service) {

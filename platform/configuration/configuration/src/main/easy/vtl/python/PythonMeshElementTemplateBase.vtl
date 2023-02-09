@@ -108,4 +108,21 @@ template PythonMeshElementTemplateBase(Configuration config, FileArtifact target
         }    
     }
     
+    def produceReconfigure(ServiceBase service) {
+        if (service.parameter.size() > 0) {
+            'def notifyReconfigured(self, values: dict):
+                """Called to inform the implementing class that a parameter reconfiguration happened.
+                   
+                   Parameters:
+                     - values -- the new param names/values
+                   """ 
+                # if you want to react on parameter changes, you may add code here
+                # if you are not interested in parameter changes, feel free to delete this method
+                pass
+            '
+        } else {
+            ''
+        }
+    }
+    
 }

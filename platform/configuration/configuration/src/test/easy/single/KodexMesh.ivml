@@ -69,7 +69,17 @@ project KodexMesh {
         asynchronous = false, // usually true, test false here
         input = {{type=refBy(rec2)}},
         output = {{type=refBy(rec2)}},
-        artifact = "de.iip-ecosphere.platform:apps.ServiceImpl:" + iipVer
+        artifact = "de.iip-ecosphere.platform:apps.ServiceImpl:" + iipVer,
+        parameter = {
+          BooleanParameter {
+            name="passThrough", 
+            defaultValue=false,
+            systemProperty="iip.app.sc1.passThrough"
+          }, StringParameter {
+            name="sParam",
+            defaultValue="abc"
+          }
+        }        
     };
     
     Service myReceiverService = JavaService {
