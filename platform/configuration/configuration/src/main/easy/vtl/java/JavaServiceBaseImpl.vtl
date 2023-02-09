@@ -238,6 +238,11 @@ template JavaServiceBaseImpl(Configuration config, FileArtifact target, ServiceB
                 return paramConfigurers.get(paramName);
             }
             
+            //@Override
+            public Set<String> getParameterNames() {
+                return paramConfigurers.keySet();
+            }
+            
             /**
             * Registers the configurers.
             */
