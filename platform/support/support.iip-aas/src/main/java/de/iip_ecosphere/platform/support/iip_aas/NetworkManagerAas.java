@@ -46,6 +46,9 @@ public class NetworkManagerAas implements AasContributor {
     public static final String PROP_LOW_PORT = "lowPort";
     public static final String OP_OBTAIN_PORT = "obtainPort";
     public static final String OP_RESERVE_PORT = "reservePort";
+    public static final String OP_REGISTER_INSTANCE = "registerInstance";
+    public static final String OP_UNREGISTER_INSTANCE = "unregisterInstance";
+    public static final String OP_GET_REGISTERED_INSTANCES = "getRegisteredInstances";
     
     @Override
     public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
@@ -76,6 +79,20 @@ public class NetworkManagerAas implements AasContributor {
                 .addInputVariable("key", Type.STRING)
                 .setInvocable(iCreator.createInvocable(getQName(OP_RELEASE_PORT)))
                 .build(Type.NONE);
+            smB.createOperationBuilder(OP_REGISTER_INSTANCE)
+                .addInputVariable("key", Type.STRING)
+                .addInputVariable("hostId", Type.STRING)
+                .setInvocable(iCreator.createInvocable(getQName(OP_REGISTER_INSTANCE)))
+                .build(Type.NONE);
+            smB.createOperationBuilder(OP_UNREGISTER_INSTANCE)
+                .addInputVariable("key", Type.STRING)
+                .addInputVariable("hostId", Type.STRING)
+                .setInvocable(iCreator.createInvocable(getQName(OP_UNREGISTER_INSTANCE)))
+                .build(Type.NONE);
+            smB.createOperationBuilder(OP_GET_REGISTERED_INSTANCES)
+                .addInputVariable("key", Type.STRING)
+                .setInvocable(iCreator.createInvocable(getQName(OP_GET_REGISTERED_INSTANCES)))
+                .build(Type.INTEGER);
             smB.createPropertyBuilder(PROP_HIGH_PORT)
                 .setType(Type.INTEGER)
                 .bind(iCreator.createGetter(getQName(PROP_HIGH_PORT)), PropertyBuilder.READ_ONLY)
@@ -103,7 +120,22 @@ public class NetworkManagerAas implements AasContributor {
         sBuilder.defineOperation(getQName(OP_IS_IN_USE_ADR), 
             p -> NetworkManagerFactory.getInstance().isInUse(JsonUtils.serverAddressFromJson(readString(p, 0, null))));
         sBuilder.defineOperation(getQName(OP_RELEASE_PORT), 
-            p -> { NetworkManagerFactory.getInstance().releasePort(readString(p, 0, null)); return null; });
+            p -> { 
+                NetworkManagerFactory.getInstance().releasePort(readString(p, 0, null)); 
+                return null; 
+            });
+        sBuilder.defineOperation(getQName(OP_REGISTER_INSTANCE), 
+            p -> { 
+                NetworkManagerFactory.getInstance().registerInstance(readString(p, 0, null), readString(p, 1, null)); 
+                return null;
+            });
+        sBuilder.defineOperation(getQName(OP_UNREGISTER_INSTANCE), 
+            p -> {
+                NetworkManagerFactory.getInstance().unregisterInstance(readString(p, 0, null), readString(p, 1, null)); 
+                return null;
+            });
+        sBuilder.defineOperation(getQName(OP_GET_REGISTERED_INSTANCES), 
+            p -> NetworkManagerFactory.getInstance().getRegisteredInstances(readString(p, 0, null)));
         sBuilder.defineProperty(getQName(PROP_HIGH_PORT), 
             () -> NetworkManagerFactory.getInstance().getHighPort(), 
             PropertyBuilder.READ_ONLY);

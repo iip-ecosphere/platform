@@ -153,4 +153,38 @@ public class NetworkManagerAasClient extends AbstractNetworkManagerImpl {
         return result;
     }
 
+    @Override
+    public void registerInstance(String key, String hostId) {
+        try {
+            checkKey(key);
+            getOperation(submodel, NetworkManagerAas.OP_REGISTER_INSTANCE).invoke(key, hostId);
+        } catch (ExecutionException e) {
+            throw new IllegalArgumentException(e.getMessage());
+        }
+    }
+
+    @Override
+    public void unregisterInstance(String key, String hostId) {
+        try {
+            checkKey(key);
+            getOperation(submodel, NetworkManagerAas.OP_UNREGISTER_INSTANCE).invoke(key, hostId);
+        } catch (ExecutionException e) {
+            throw new IllegalArgumentException(e.getMessage());
+        }
+    }
+
+    @Override
+    public int getRegisteredInstances(String key) {
+        int result = 0;
+        try {
+            checkKey(key);
+            Object tmp = getOperation(submodel, NetworkManagerAas.OP_GET_REGISTERED_INSTANCES).invoke(key);
+            if (tmp instanceof Integer) {
+                result = ((Integer) tmp).intValue();
+            }
+        } catch (ExecutionException e) {
+        }
+        return result;
+    }
+
 }
