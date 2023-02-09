@@ -86,6 +86,30 @@ public interface NetworkManager {
     public void releasePort(String key);
     
     /**
+     * Registers the use of the specified key by an instance.
+     * 
+     * @param key a key indicating the use
+     * @param hostId some identification of the using host, e.g., the IP address. May be empty,
+     */
+    public void registerInstance(String key, String hostId);
+
+    /**
+     * Unregisters the use of the specified key by an instance.
+     * 
+     * @param key a key indicating the use
+     * @param hostId some identification of the using host, e.g., the IP address. May be empty,
+     */
+    public void unregisterInstance(String key, String hostId);
+    
+    /**
+     * Returns the number of registered instances of the specified.
+     * 
+     * @param key a key indicating the use
+     * @return the number of registered using instances
+     */
+    public int getRegisteredInstances(String key);
+
+    /**
      * Returns whether the given address is in use/allocated by this manager.
      * 
      * @param address the address

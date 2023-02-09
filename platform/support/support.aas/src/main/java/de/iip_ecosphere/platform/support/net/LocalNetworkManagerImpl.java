@@ -44,6 +44,7 @@ public class LocalNetworkManagerImpl extends AbstractNetworkManagerImpl {
     
     private Map<String, ServerAddress> keyToAddress = new HashMap<>();
     private Map<Integer, String> portToKey = new HashMap<>();
+    private Map<String, Map<String, Integer>> instances = new HashMap<>();
     private String host = NetUtils.getOwnIP();
     private NetworkManager parent;
 
@@ -162,5 +163,60 @@ public class LocalNetworkManagerImpl extends AbstractNetworkManagerImpl {
             host = NetUtils.getOwnIP(getNetmask());
         }
     }
+    
+    @Override
+    public synchronized void registerInstance(String key, String hostId) {
+        if (null != key && null != hostId) {
+            Map<String, Integer> inst = instances.get(key);
+            if (null == inst) {
+                inst = new HashMap<>();
+                instances.put(key, inst);
+            }
+            Integer count = inst.get(hostId);
+            if (null == count) {
+                count = 1;
+            } else {
+                count++;
+            }
+            inst.put(hostId, count);
+        }
+    }
+
+    @Override
+    public synchronized void unregisterInstance(String key, String hostId) {
+        if (null != key && null != hostId) {
+            Map<String, Integer> inst = instances.get(key);
+            if (inst != null) {
+                Integer count = inst.get(hostId);
+                if (count != null) {
+                    count--;
+                    if (count == 0) {
+                        inst.remove(hostId);
+                    } else {
+                        inst.put(hostId, count);
+                    }
+                }
+                if (inst.isEmpty()) {
+                    instances.remove(key); 
+                }
+            }
+        }
+        
+    }
+
+    @Override
+    public synchronized int getRegisteredInstances(String key) {
+        int result = 0;
+        if (null != key) {
+            Map<String, Integer> inst = instances.get(key);
+            if (null != inst) {
+                for (Map.Entry<String, Integer> e : inst.entrySet()) {
+                    result += e.getValue();
+                }
+            }
+        }
+        return result;
+    }
+
 
 }

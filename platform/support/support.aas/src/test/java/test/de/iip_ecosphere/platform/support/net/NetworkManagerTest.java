@@ -160,7 +160,7 @@ public class NetworkManagerTest {
         Assert.assertEquals(adr2.getHost(), re2.getHost());
         Assert.assertTrue(manager.isInUse(re2.getPort()));
         Assert.assertTrue(manager.isInUse(re2));
-
+        assertInstances(manager);
         // release address 1
         manager.releasePort(key1);
         Assert.assertFalse(manager.isInUse(adr1));
@@ -172,6 +172,38 @@ public class NetworkManagerTest {
         Assert.assertFalse(manager.isInUse(adr2));
         testPortReservation(manager, suffix);
         testPrefixes(manager, suffix);
+    }
+    
+    /**
+     * Asserts the instance functions.
+     * 
+     * @param manager the manager instance
+     */
+    private static void assertInstances(NetworkManager manager) {
+        final String key1 = "key1";
+        final String key2 = "key2";
+        final String hostId0 = "HOST0";
+        final String hostId1 = "HOST1";
+        final String hostId2 = "HOST2";
+
+        Assert.assertEquals(0, manager.getRegisteredInstances(key2));
+        Assert.assertEquals(0, manager.getRegisteredInstances(key1));
+        manager.registerInstance(key2, hostId1);
+        manager.registerInstance(key2, hostId2);
+        manager.registerInstance(key2, hostId1);
+        manager.registerInstance(key1, hostId1);
+        Assert.assertEquals(3, manager.getRegisteredInstances(key2));
+        Assert.assertEquals(1, manager.getRegisteredInstances(key1));
+        manager.unregisterInstance(key1, hostId1);
+        Assert.assertEquals(0, manager.getRegisteredInstances(key1));
+        manager.unregisterInstance(key2, hostId0); // not reg
+        Assert.assertEquals(3, manager.getRegisteredInstances(key2));
+        manager.unregisterInstance(key2, hostId1);
+        Assert.assertEquals(2, manager.getRegisteredInstances(key2));
+        manager.unregisterInstance(key2, hostId1);
+        Assert.assertEquals(1, manager.getRegisteredInstances(key2));
+        manager.unregisterInstance(key2, hostId2);
+        Assert.assertEquals(0, manager.getRegisteredInstances(key2));
     }
     
     /**
