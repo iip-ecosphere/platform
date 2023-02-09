@@ -36,8 +36,22 @@ public class YamlProcess extends de.iip_ecosphere.platform.services.environment.
     
     @Override
     public List<String> getCmdArg(int port, String protocol) {
+        return substCmdArg(getCmdArg(), port, protocol);
+    }
+
+    /**
+     * Returns additional/optional command line arguments required to start the service. The port placeholder
+     * {@link Endpoint#PORT_PLACEHOLDER} will be replaced with the command port the platform is using to send
+     * administrative commands to the service (see {@link de.iip_ecosphere.platform.services.environment.Service}).
+     *
+     * @param cmdArg the command line arguments to be used as basis for substitution
+     * @param port the port used for the command communication
+     * @param protocol the protocol used for the command communication
+     * @return the resolved command line arguments (may be empty for none)
+     */
+    public static List<String> substCmdArg(List<String> cmdArg, int port, String protocol) {
         List<String> result = new ArrayList<String>();
-        for (String arg : getCmdArg()) {
+        for (String arg : cmdArg) {
             arg = arg.replace(Endpoint.PORT_PLACEHOLDER, String.valueOf(port));
             arg = arg.replace(Service.PROTOCOL_PLACEHOLDER, String.valueOf(protocol));
             arg = toSubstFileName(arg);

@@ -12,14 +12,12 @@
 
 package de.iip_ecosphere.platform.services.spring.descriptor;
 
-import java.util.List;
-
 /**
  * Server process specification of servers to be started/stopped with an application.
  * 
  * @author Holger Eichelberger, SSE
  */
-public interface Server {
+public interface Server extends ProcessSpec {
 
     /**
      * Returns the id of the server, also to be used as network management key.
@@ -41,19 +39,5 @@ public interface Server {
      * @return the host name
      */
     public String getHost();
-    
-    /**
-     * Returns the name of the Java class representing the server.
-     * 
-     * @return the Java class
-     */
-    public String getCls();
-    
-    /**
-     * Returns the server specific arguments to be passed upon start.
-     * 
-     * @return the arguments, may be empty or <b>null</b> for none
-     */ 
-    public List<String> getArguments();
 
 }

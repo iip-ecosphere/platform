@@ -12,10 +12,9 @@
 
 package de.iip_ecosphere.platform.services.spring.yaml;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import de.iip_ecosphere.platform.services.environment.AbstractYamlServer;
+import de.iip_ecosphere.platform.services.spring.descriptor.Endpoint;
 import de.iip_ecosphere.platform.services.spring.descriptor.Server;
 
 /**
@@ -23,37 +22,32 @@ import de.iip_ecosphere.platform.services.spring.descriptor.Server;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class YamlServer extends AbstractYamlServer implements Server {
-    
-    private String cls;
-    private List<String> args = new ArrayList<>();
+public class YamlServer extends de.iip_ecosphere.platform.services.environment.YamlServer 
+    implements Server {
 
     @Override
-    public String getCls() {
-        return cls;
+    public List<String> getCmdArg(int port, String protocol) {
+        return YamlProcess.substCmdArg(getCmdArg(), port, protocol);
     }
 
     @Override
-    public List<String> getArguments() {
-        return args;
+    public Endpoint getServiceStreamEndpoint() {
+        return null;
     }
 
-    /**
-     * Defines the (integration) Java class to be executed.
-     * 
-     * @param cls the class
-     */
-    public void setCls(String cls) {
-        this.cls = cls;
+    @Override
+    public Endpoint getStreamEndpoint() {
+        return null;
     }
 
-    /**
-     * Defines the arguments to be passed to the server implementation upon startup.
-     * 
-     * @param args the arguments
-     */
-    public void setArguments(List<String> args) {
-        this.args = args;
+    @Override
+    public Endpoint getAasEndpoint() {
+        return null;
+    }
+
+    @Override
+    public int getWaitTime() {
+        return 0;
     }
 
 }
