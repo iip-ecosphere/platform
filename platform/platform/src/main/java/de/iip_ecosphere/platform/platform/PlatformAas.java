@@ -17,11 +17,6 @@ import static de.iip_ecosphere.platform.support.iip_aas.AasUtils.fixId;
 import java.net.URISyntaxException;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
-
-import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.platform.ArtifactsManager.Artifact;
 import de.iip_ecosphere.platform.support.TaskRegistry;
@@ -29,17 +24,15 @@ import de.iip_ecosphere.platform.support.TaskRegistry.TaskData;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
-import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
-import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.iip_aas.AasContributor;
 import de.iip_ecosphere.platform.support.iip_aas.AasUtils;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
-import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
+import de.iip_ecosphere.platform.support.iip_aas.ApplicationInstanceAasConstructor;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper;
 import de.iip_ecosphere.platform.transport.status.TaskUtils;
 
@@ -52,7 +45,6 @@ public class PlatformAas implements AasContributor {
 
     public static final String NAME_SUBMODEL_ARTIFACTS = "Artifacts";
     public static final String NAME_SUBMODEL_STATUS = "Status";
-    public static final String NAME_SUBMODEL_APPINSTANCES = "ApplicationInstances";
     public static final String NAME_COLL_SERVICE_ARTIFACTS = "ServiceArtifacts";
     public static final String NAME_COLL_CONTAINER = "Container";
     public static final String NAME_COLL_DEPLOYMENT_PLANS = "DeploymentPlans";
@@ -60,9 +52,6 @@ public class PlatformAas implements AasContributor {
     public static final String NAME_PROP_ID = "id";
     public static final String NAME_PROP_NAME = "name";
     public static final String NAME_PROP_URI = "uri";
-    public static final String NAME_PROP_APPID = "appId";
-    public static final String NAME_PROP_INSTANCEID = "instanceId";
-    public static final String NAME_PROP_TIMESTAMP = "timestamp";
     
     public static final String NAME_OPERATION_DEPLOY = "deployPlan";
     public static final String NAME_OPERATION_UNDEPLOY = "undeployPlan";
@@ -84,7 +73,7 @@ public class PlatformAas implements AasContributor {
         SubmodelElementCollectionBuilder b = smB.createSubmodelElementCollectionBuilder(
             NAME_COLL_KNOWN_SERVICES, false, false);
         for (Map.Entry<String, String> ep : ServiceAas.createAas().entrySet()) {
-            b.createPropertyBuilder(AasUtils.fixId(ep.getKey()))
+            b.createPropertyBuilder(fixId(ep.getKey()))
                 .setValue(Type.STRING, ep.getValue())
                 .build();
         }
@@ -122,8 +111,9 @@ public class PlatformAas implements AasContributor {
             .build(Type.STRING);
         smB.build();
         
-        aasBuilder.createSubmodelBuilder(NAME_SUBMODEL_STATUS, null).build(); // just that it is there
-        aasBuilder.createSubmodelBuilder(NAME_SUBMODEL_APPINSTANCES, null).build(); // just that it is there
+        // just that they are there
+        aasBuilder.createSubmodelBuilder(NAME_SUBMODEL_STATUS, null).build();
+        aasBuilder.createSubmodelBuilder(ApplicationInstanceAasConstructor.NAME_SUBMODEL_APPINSTANCES, null).build();
         
         return null;
     }
@@ -198,62 +188,6 @@ public class PlatformAas implements AasContributor {
         return true;
     }
     
-    // TODO move the next three functions down to support.aas?
-
-    /**
-     * Returns the value of the specified property without throwing exceptions.
-     * 
-     * @param <T> the type of the value to return
-     * @param coll the collection to take the value from
-     * @param propIdShort the short id of the property
-     * @param type the type of the value to return
-     * @param transformer the value transformer
-     * @param dflt the default value if the property cannot be found
-     * @return the value or {@code dflt}
-     */
-    private static <T> T getPropertyValueSafe(SubmodelElementCollection coll, String propIdShort, Class<T> type, 
-        Function<Object, T> transformer, T dflt) {
-        T result = dflt;
-        Property prop = coll.getProperty(propIdShort);
-        if (null != prop) {
-            try {
-                result = transformer.apply(prop.getValue());
-            } catch (ExecutionException e) {
-                LoggerFactory.getLogger(PlatformAas.class).warn("Cannot access AAS property {} value: {}", 
-                    propIdShort, e.getMessage());
-            }
-        } else {
-            LoggerFactory.getLogger(PlatformAas.class).warn("Cannot find AAS property {} in collection {}", 
-                propIdShort, coll.getIdShort());
-        }
-        return result;
-    }
-
-    /**
-     * Returns the value of the specified property as string without throwing exceptions.
-     * 
-     * @param coll the collection to take the value from
-     * @param propIdShort the short id of the property
-     * @param dflt the default value if the property cannot be found or it's value is <b>null</b>
-     * @return the value or {@code dflt}
-     */
-    private static String getPropertyValueAsStringSafe(SubmodelElementCollection coll, String propIdShort, 
-        String dflt) {
-        return getPropertyValueSafe(coll, propIdShort, String.class, o -> null == o ? dflt : o.toString(), dflt);
-    }
-
-    /**
-     * Returns the value of the specified property as Integer without throwing exceptions.
-     * 
-     * @param coll the collection to take the value from
-     * @param propIdShort the short id of the property
-     * @param dflt the default value if the property cannot be found or it's value is <b>null</b>
-     * @return the value or {@code dflt}
-     */
-    private static Integer getPropertyValueAsIntegerSafe(SubmodelElementCollection coll, String propIdShort, 
-        Integer dflt) {
-        return getPropertyValueSafe(coll, propIdShort, Integer.class, o -> null == o ? dflt : (Integer) o, dflt);
-    }
 
     /**
      * Called to notify that a new instance of the application <code>appId</code> is about to be started.
@@ -263,40 +197,7 @@ public class PlatformAas implements AasContributor {
      *    for default/legacy start
      */
     static String notifyAppNewInstance(String appId) {
-        AtomicReference<String> result = new AtomicReference<String>(null);
-        ActiveAasBase.processNotification(NAME_SUBMODEL_APPINSTANCES, NotificationMode.SYNCHRONOUS, (sub, aas) -> {
-            int newId = -1;
-            for (SubmodelElement elt: sub.submodelElements()) {
-                if (elt instanceof SubmodelElementCollection) {
-                    SubmodelElementCollection coll = (SubmodelElementCollection) elt;
-                    if (appId.equals(getPropertyValueAsStringSafe(coll, NAME_PROP_APPID, null))) {
-                        newId = Math.max(newId, getPropertyValueAsIntegerSafe(coll, NAME_PROP_INSTANCEID, 0));
-                        break;
-                    }
-                }
-            }
-
-            newId++; // the next instance
-            String id = appId + "-" + newId;
-            SubmodelElementCollectionBuilder cBuilder // get or create
-                = sub.createSubmodelElementCollectionBuilder(NAME_SUBMODEL_APPINSTANCES, false, false);
-            SubmodelElementCollectionBuilder dBuilder 
-                = cBuilder.createSubmodelElementCollectionBuilder(fixId(id), false, false);
-            dBuilder.createPropertyBuilder(NAME_PROP_APPID)
-                .setValue(Type.STRING, appId)
-                .build();
-            dBuilder.createPropertyBuilder(NAME_PROP_INSTANCEID)
-                .setValue(Type.STRING, newId)
-                .build();
-            dBuilder.createPropertyBuilder(NAME_PROP_TIMESTAMP)
-                .setValue(Type.INTEGER, System.currentTimeMillis())
-                .build();
-            if (newId > 0) {
-                result.set(String.valueOf(newId));
-            }
-        });
-
-        return result.get();        
+        return ApplicationInstanceAasConstructor.notifyAppNewInstance(appId);
     }
     
     /**
@@ -307,26 +208,9 @@ public class PlatformAas implements AasContributor {
      * @return the remaining instances
      */
     static int notifyAppInstanceStopped(String appId, String instanceId) {
-        final AtomicInteger result = new AtomicInteger(0);
-        final String instId = null == instanceId ? "0" : instanceId;
-        ActiveAasBase.processNotification(NAME_SUBMODEL_APPINSTANCES, NotificationMode.SYNCHRONOUS, (sub, aas) -> {
-            String id = fixId(appId + "-" + instId);
-            SubmodelElementCollection coll = sub.getSubmodelElementCollection(id);
-            if (null != coll) {
-                coll.deleteElement(id);
-            }
-            
-            for (SubmodelElement elt: sub.submodelElements()) {
-                if (elt instanceof SubmodelElementCollection) {
-                    coll = (SubmodelElementCollection) elt;
-                    if (appId.equals(getPropertyValueAsStringSafe(coll, NAME_PROP_APPID, null))) {
-                        result.incrementAndGet();
-                    }
-                }
-            }
-        });
-        return result.get();
+        return ApplicationInstanceAasConstructor.notifyAppInstanceStopped(appId, instanceId);
     }
+
     
     /**
      * Called to notify that an artifact was created.
