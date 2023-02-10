@@ -21,11 +21,15 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.function.Function;
 
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
+import de.iip_ecosphere.platform.support.aas.Property;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 import de.iip_ecosphere.platform.support.resources.ResourceResolver;
@@ -271,5 +275,63 @@ public class AasUtils {
             handler.handle("", "", "");
         }
     }
+    
+    // TODO move the next three functions down to support.aas?
+
+    /**
+     * Returns the value of the specified property without throwing exceptions.
+     * 
+     * @param <T> the type of the value to return
+     * @param coll the collection to take the value from
+     * @param propIdShort the short id of the property
+     * @param type the type of the value to return
+     * @param transformer the value transformer
+     * @param dflt the default value if the property cannot be found
+     * @return the value or {@code dflt}
+     */
+    public static <T> T getPropertyValueSafe(SubmodelElementCollection coll, String propIdShort, Class<T> type, 
+        Function<Object, T> transformer, T dflt) {
+        T result = dflt;
+        Property prop = coll.getProperty(propIdShort);
+        if (null != prop) {
+            try {
+                result = transformer.apply(prop.getValue());
+            } catch (ExecutionException e) {
+                LoggerFactory.getLogger(PlatformAas.class).warn("Cannot access AAS property {} value: {}", 
+                    propIdShort, e.getMessage());
+            }
+        } else {
+            LoggerFactory.getLogger(PlatformAas.class).warn("Cannot find AAS property {} in collection {}", 
+                propIdShort, coll.getIdShort());
+        }
+        return result;
+    }
+
+    /**
+     * Returns the value of the specified property as string without throwing exceptions.
+     * 
+     * @param coll the collection to take the value from
+     * @param propIdShort the short id of the property
+     * @param dflt the default value if the property cannot be found or it's value is <b>null</b>
+     * @return the value or {@code dflt}
+     */
+    public static String getPropertyValueAsStringSafe(SubmodelElementCollection coll, String propIdShort, 
+        String dflt) {
+        return getPropertyValueSafe(coll, propIdShort, String.class, o -> null == o ? dflt : o.toString(), dflt);
+    }
+
+    /**
+     * Returns the value of the specified property as Integer without throwing exceptions.
+     * 
+     * @param coll the collection to take the value from
+     * @param propIdShort the short id of the property
+     * @param dflt the default value if the property cannot be found or it's value is <b>null</b>
+     * @return the value or {@code dflt}
+     */
+    public static Integer getPropertyValueAsIntegerSafe(SubmodelElementCollection coll, String propIdShort, 
+        Integer dflt) {
+        return getPropertyValueSafe(coll, propIdShort, Integer.class, o -> null == o ? dflt : (Integer) o, dflt);
+    }
+
 
 }
