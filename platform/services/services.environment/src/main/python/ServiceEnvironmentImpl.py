@@ -61,8 +61,10 @@ def start(a):
         default="", help='The operation mode of the environment (values: console, default: console).')    
     parser.add_argument('--sid', dest='sId', action='store', nargs=1, type=str, required=True,
         default="", help='Id of the service to execute.')    
+    parser.add_argument('--netMgtKeyAddress', dest='netMgtKeyAddress', action='store', nargs=1, type=str, required=False,
+        default=None, help='Resolved address of the netMgtKey of the service via the platform network management.')    
     parser.add_argument('--configure', dest='config', action='store', nargs=1, type=str, required=False,
-        default="", help='JSON value map to be passed to the service for initial reconfiguration.')    
+        default="", help='JSON value map to be passed to the service for initial reconfiguration.')
         
     args = parser.parse_args(a)
     consoleMode = len(args.mode) > 0 and args.mode[0]=='console'
@@ -88,6 +90,8 @@ def start(a):
     #print("sid: " + str(args.sId))
     
     sId = args.sId[0]
+    if (args.netMgtKeyAddress is not None):
+        Registry.netMgtKeyAddresses[sId] = args.netMgtKeyAddress[0]
 
     if len(args.config) > 0:
         service = Registry.services.get(sId)

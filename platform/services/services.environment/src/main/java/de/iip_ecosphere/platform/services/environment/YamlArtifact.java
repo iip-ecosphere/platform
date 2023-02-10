@@ -84,7 +84,24 @@ public class YamlArtifact extends AbstractYamlArtifact {
         }
         return result;
     }
-    
+
+    /**
+     * Returns a YAML server information object based on the given id.
+     * 
+     * @param id the server id
+     * @return the YamlServer, <b>null</b> if none was found
+     */
+    public YamlServer getServer(String id) {
+        YamlServer result = null;
+        for (int s = 0; null == result && s < servers.size(); s++) {
+            YamlServer tmp = servers.get(s);
+            if (tmp.getId().equals(id)) {
+                result = tmp;
+            }
+        }
+        return result;
+    }
+
     /**
      * Returns a YAML service information object based on the given service id.
      * 

@@ -35,6 +35,7 @@ import org.slf4j.Logger;
 
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.PythonUtils;
+import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
 
 /**
@@ -413,6 +414,11 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
             List<String> args = new ArrayList<String>();
             if (null != pythonArgs) { // if not completely intialized as service description is missing
                 args.addAll(pythonArgs);
+            }
+            ServerAddress netMgtKeyAdr = getNetMgtKeyAddress(); 
+            if (null != netMgtKeyAdr) {
+                args.add("--netMgtKeyAddress");
+                args.add(netMgtKeyAdr.getHost() + ":" + netMgtKeyAdr.getPort()); // preliminary
             }
             if (null != reconfValues && reconfValues.size() > 0) {
                 args.add("--configure");

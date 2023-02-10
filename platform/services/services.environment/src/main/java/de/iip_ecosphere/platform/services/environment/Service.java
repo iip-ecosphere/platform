@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import de.iip_ecosphere.platform.services.environment.switching.ServiceBase;
+import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.iip_aas.Version;
 
 /**
@@ -68,6 +69,15 @@ public interface Service extends ParameterConfigurerProvider, ServiceBase {
      * @return the service kind
      */
     public ServiceKind getKind();
+    
+    /**
+     * Returns the resolved network address of the netMgtKey specified in the service descriptor.
+     * 
+     * @return the resolved address, may be <b>null</b> in particular if no key was specified in the service descriptor
+     */
+    public default ServerAddress getNetMgtKeyAddress() {
+        return null;
+    }
 
     /**
      * Migrates a service. However, it may be required to migrate/move the containing artifact. [adaptation]

@@ -26,7 +26,10 @@ import java.util.function.Supplier;
 
 import org.slf4j.LoggerFactory;
 
+import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.iip_aas.Version;
+import de.iip_ecosphere.platform.support.net.ManagedServerAddress;
+import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
 import de.iip_ecosphere.platform.support.resources.FolderResourceResolver;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
@@ -54,6 +57,7 @@ public abstract class AbstractService implements Service {
     private boolean isTopLevel; 
     private ServiceKind kind;
     private ServiceState state;
+    private ManagedServerAddress netKeyMgtAddress;
 
     /**
      * Fallback constructor setting most fields to "empty" default values.
@@ -110,6 +114,9 @@ public abstract class AbstractService implements Service {
     protected AbstractService(YamlService yaml) {
         this(yaml.getId(), yaml.getName(), yaml.getVersion(), yaml.getDescription(), yaml.isDeployable(), 
             yaml.isTopLevel(), yaml.getKind());
+        if (null != yaml.getNetMgtKey() && yaml.getNetMgtKey().length() > 0) {
+            netKeyMgtAddress = NetworkManagerFactory.getInstance().getPort(yaml.getNetMgtKey());
+        }
         initializeFrom(yaml);
     }
     
@@ -351,6 +358,11 @@ public abstract class AbstractService implements Service {
     @Override
     public ServiceKind getKind() {
         return kind;
+    }
+    
+    @Override
+    public ServerAddress getNetMgtKeyAddress() {
+        return netKeyMgtAddress;
     }
 
     @Override

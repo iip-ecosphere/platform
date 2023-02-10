@@ -4,6 +4,7 @@ from Version import Version
 from Service import ServiceState
 from Service import ServiceKind
 from Service import Service
+import Registry
 
 class AbstractService(Service):
     """Basic implementation of the administrative service interface."""
@@ -12,7 +13,7 @@ class AbstractService(Service):
         """Initializes the service.
         
         Parameters:
-          - id -- the unique id of the service, taken from the desciptor (str)
+          - id -- the unique id of the service, taken from the descriptor (str)
           - name -- the descriptive name of the service, taken from the descriptor (str)
           - version -- the version of the service, taken from the descriptor (Version)
           - description -- the textual description of the service, may be empty, taken from the descriptor (str)
@@ -27,6 +28,7 @@ class AbstractService(Service):
         self.deployable = deployable
         self.kind = kind
         self.state = ServiceState.AVAILABLE
+        self.netMgtKeyAddress = Registry.netMgtKeyAddresses.get(self.id) # value or none
 
     def getId(self):
         """Returns the unique id of the service.
@@ -84,6 +86,16 @@ class AbstractService(Service):
           - newState -- the new state (ServiceState)
         """
         self.state = state # check whether this is permissible
+    
+    def getNetMgtKeyAddress(self):
+        """Returns the resolved address of the netMgtKey of the service.
+        
+        Returns:
+          str (for now)
+            Either None or host:port.
+        """
+        
+        return self.netMgtKeyAddress
     
     def isDeployable(self):
         """Returns whether the service is deployable in distributable manner or fixed in deployment location.

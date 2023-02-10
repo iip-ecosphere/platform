@@ -110,6 +110,16 @@ class Service:
         """
         
         raise NotImplementedError
+        
+    def getNetMgtKeyAddress(self):
+        """Returns the resolved address of the netMgtKey of the service.
+        
+        Returns:
+          str (for now)
+            Either None or host:port.
+        """
+        
+        raise NotImplementedError
 
     def migrate(self, resourceId:str):
         """Migrates a service. However, it may be required to migrate/move the containing artifact. [adaptation]

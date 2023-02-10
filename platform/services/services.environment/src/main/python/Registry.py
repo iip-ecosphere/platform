@@ -5,3 +5,4 @@ receivers = {}
 senders = {}
 asyncTransformers = {}
 syncTransformers = {}
+netMgtKeyAddresses = {}
