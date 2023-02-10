@@ -78,4 +78,12 @@ Services::ServiceSelectorBasedFamilyMemberSelector::class = Implementing class o
 Services::ServiceSelectorBasedFamilyMemberSelector::type = Input type of the service family the member selector shall react on.
 Services::serviceNamesUnique = The names of the declared services are not unique.
 Services::serviceIdsUnique = The ids of the declared services are not unique.
+Services::Server::host = Default host where to start the server instance (may be superseded by deployment plan).  
+Services::Server::id = Unique server id.
+Services::Server::port =  Default/intended port number on where to start the host.
+Services::Server::running = Shall the server be started/stopped by the platform or is it assumed to be installed/running.
+Services::Server::executable = The server executable. Artifact information will be added by the generation depending on the server type.
+Services::Server::parameter = Server parameters, "port" is implicitly declared as integer parameter.
+Services::PythonServer::entrypointModule = The Python module representing the server implementation.
+Services::serversUnique = The id of all defined servers must be unique.
 

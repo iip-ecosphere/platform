@@ -1,10 +1,10 @@
 project ServerPartFlowerAI {
 
-   import Transport;
+   import Services;
    
    annotate BindingTime bindingTime = BindingTime::compile to .;
    
-   compound FlowerFederatedAiServer refines Server {
+   compound FlowerFederatedAiServer refines PythonServer {
         NonEmptyString executable = "python";
    }
    

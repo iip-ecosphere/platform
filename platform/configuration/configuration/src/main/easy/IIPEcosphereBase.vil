@@ -15,6 +15,7 @@ vilScript IIPEcosphereBase (Project source, Configuration config, Project target
     String javaImplPackage = "iip.impl";
     String javaStubsPackage = "iip.stubs";
     String javaNodesPackage = "iip.nodes";
+    String javaServerPackage = "iip.server";
     String dfltMain="de.iip_ecosphere.platform.support.LifecycleHandler$"+"WaitingStarter";
     String mvnProjectBuildDir = "$" + "{project.build.directory}"; // escaping fails in some cases, safe choice
     String mvnProjectBaseDir = "$" + "{project.basedir}";

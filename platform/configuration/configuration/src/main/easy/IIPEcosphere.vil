@@ -133,6 +133,10 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                             generateServiceResources(no, m, appRoot, bins, assemblies, resources, artifacts, noDeps);
                         }
                     };
+                    
+                    for (Server ser: a.servers) {
+                        generateServer(config, ser, appRoot);
+                    }
                 };
                 elements = elements->sortedBy(n|n.name).toSequence(); // for testing
                 
@@ -219,6 +223,17 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 zip(appRoot, appRoot, "${target}/templates/eclipse/impl.${appName}.zip");
             }
         };
+    }
+    
+    generateServer(Configuration config, Server server, Path appRoot) = {
+    }
+    
+    generateServer(Configuration config, PythonServer server, Path appRoot) = {
+        Path javaSrc = "${appRoot}/src/main/java";
+        Path javaServerSrc = "${javaSrc}/${toPath(javaServerPackage)}";
+        String clsName = asTypeName(server.id);
+        vilTemplateProcessor("JavaServer", config, "${javaServerSrc}/${clsName}Server.java", server=server, pkg=javaServerPackage);
+        vilTemplateProcessor("PythonServer", config, "${appRoot}/src/main/python/services/${clsName}Server.py", server=server, pkg="services");
     }
 
     /*

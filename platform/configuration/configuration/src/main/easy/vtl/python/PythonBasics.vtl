@@ -166,4 +166,65 @@ template PythonBasics(Configuration config, FileArtifact target) {
         "\"\"";
     }
     
+    // --------------------- parameter ------------------------
+    
+    def produceParameterFields(Parameters params) {
+        for (Parameter p: params) {
+            'param_${p.name} = None'
+        }
+    }
+    
+    def produceReconfigure(Parameters params) {
+        if (params.size() > 0) {
+            'def notifyReconfigured(self, values: dict):
+                """Called to inform the implementing class that a parameter reconfiguration happened.
+                   
+                   Parameters:
+                     - values -- the new param names/values
+                   """ 
+                pass
+            
+            def reconfigure(self, values:dict):
+                """Called by ServiceEnvironment to initialize service parameters or to reconfigure them at runtime.
+                   
+                   Parameters:
+                     - values -- the new param names/values
+                   """ 
+                ${produceReconfigureCode(params)}
+                self.notifyReconfigured(values)
+            '
+        } else {
+            ''
+        }
+    }
+
+    def produceReconfigureCode(Parameters params) {
+        for (Parameter p: params) {
+            String expr = 'values["${p.name}"]';
+            'if "${p.name}" in values:
+                param_${p.name} = ${convertValue(p, expr)}'
+        }
+    }
+    
+    def convertValue(Parameter param, String expr) {
+        expr; // keep, also for string
+    }
+
+    def convertValue(IntegerParameter param, String expr) {
+        'Decimal(${expr})'
+    }
+
+    def convertValue(LongParameter param, String expr) {
+        'Decimal(${expr})'
+    }
+
+    def convertValue(RealParameter param, String expr) {
+        'Decimal(${expr})'
+    }
+
+    def convertValue(BooleanParameter param, String expr) {
+        'str(${expr}).lower() == "true"'
+    }
+
+    
 }

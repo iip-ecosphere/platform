@@ -429,7 +429,7 @@ template SpringCloudStreamDeploymentDescriptorBase(Configuration config, FileArt
                 '- id: ${s.id}
                   host: ${s.host}
                   port: ${s.port}
-                  executable: ${s.executable}
+                  cls: server.${asTypeName(s.id)}Server
                   started: ${s.running}
                   ${generateServer(s)|e}'
             }

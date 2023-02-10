@@ -1,0 +1,23 @@
+import PythonBasics;
+import MeshBasics;
+import PythonServerBase;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template PythonServerPartFlowerAI(Configuration config, FileArtifact target, PythonServer server, String pkg) {
+
+    def produceSetStateStarting(FlowerFederatedAiServer server) {
+        '# flower code for set state to STARTING
+        pass'
+    }
+
+    def produceSetStateStopping(FlowerFederatedAiServer server) {
+        '# flower code for set state to STOPPING
+        pass'
+    }
+
+    def produceImports(FlowerFederatedAiServer server) {
+        ''
+    }
+
+}

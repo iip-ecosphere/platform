@@ -226,6 +226,52 @@ template JavaBasics(Configuration config, FileArtifact target) {
         }
     }
     
+    // ------------------------------------ simple parameters -------------------------------
+    
+    def produceParametersReg(Parameters params) {
+        for (Parameter p: params) {
+            '${produceParameterReg(p)}'
+        }
+    }
+
+    // dispatch basis
+    def produceParameterReg(Parameter p) {
+        ''
+    }
+    
+    def produceParameterReg(StringParameter p) {
+        '${produceParameterDecl(p, "String.class", "TypeTranslators.JSON_STRING")}'
+    }
+
+    def produceParameterReg(IntegerParameter p) {
+        '${produceParameterDecl(p, "Integer.class", "TypeTranslators.INTEGER")}'
+    }
+
+    def produceParameterReg(LongParameter p) {
+        '${produceParameterDecl(p, "Long.class", "TypeTranslators.LONG")}'
+    }
+
+    def produceParameterReg(BooleanParameter p) {
+        '${produceParameterDecl(p, "Boolean.class", "TypeTranslators.BOOLEAN")}'
+    }
+
+    def produceParameterReg(RealParameter p) {
+        '${produceParameterDecl(p, "Double.class", "TypeTranslators.DOUBLE")}'
+    }
+    
+    def produceParameterDecl(Parameter p, String cls, String typeTranslator) {
+        String sysProp = getStringValueSafe(p.systemProperty, "");
+        if (sysProp <> "") {
+            sysProp = ', "${sysProp}"';
+        }
+        '${produceParameterDecl(p.name, cls, typeTranslator, sysProp)}'
+    }
+
+    def produceParameterDecl(String name, String cls, String typeTranslator, String sysProp) {
+        // fast track, no attributes, no implicit recovery, just parameter declaration
+        'AbstractService.addConfigurer(c, "${name}", ${cls}, ${typeTranslator}, v -> {}, null${sysProp});'
+    }
+    
     // ------------------------------------------ other -------------------------------------
 
     def String toPath(String pkg) {

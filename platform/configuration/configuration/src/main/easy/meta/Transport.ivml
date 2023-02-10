@@ -50,17 +50,6 @@ project Transport {
     // TODO 
     // - transport protocol payload limitation
     
-    // required by application, to be started/stopped
-    compound Server {
-        NonEmptyString id;
-        NonEmptyString host = "127.0.0.1";
-        NonEmptyEphemeralPort port;
-        NonEmptyString executable;
-        Boolean running = false; // running somewhere else, do we have to start it
-    }
-    
-    Constraint serversUnique = allInstances(Server)->isUnique(e|e.id);
-    
     freeze {
         // prevent later changes of constraint but make it referencable to .text
         serializerDefined;

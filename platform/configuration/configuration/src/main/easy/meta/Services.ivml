@@ -229,4 +229,21 @@ project Services {
         Constraint familyOutputOk = members->forAll(m|m.output = self.output);
    }
    
+   // ----------------------------- server processes ---------------------------
+   
+    // required by application, to be started/stopped
+    compound Server {
+        NonEmptyString id;
+        NonEmptyString host = "127.0.0.1";
+        NonEmptyEphemeralPort port;
+        NonEmptyString executable;
+        Boolean running = false; // running somewhere else, do we have to start it
+        Parameters parameter = {};
+    }
+
+    compound PythonServer refines Server {
+    }
+    
+    Constraint serversUnique = allInstances(Server)->isUnique(e|e.id);
+   
 }
