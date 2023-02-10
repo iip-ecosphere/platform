@@ -39,5 +39,12 @@ public interface Server extends ProcessSpec {
      * @return the host name
      */
     public String getHost();
+    
+    /**
+     * Returns the class to be started as server. Must implement {@link de.iip_ecosphere.platform.support.Server}.
+     * 
+     * @return the class name
+     */
+    public String getCls();
 
 }
