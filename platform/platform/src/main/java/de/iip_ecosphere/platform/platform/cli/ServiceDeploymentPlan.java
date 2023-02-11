@@ -172,6 +172,7 @@ public class ServiceDeploymentPlan extends AbstractSetup {
     private Map<String, String> ensembles = new HashMap<>();
     private boolean disabled = false;
     private List<String> arguments;
+    private Map<String, String> servers = new HashMap<>();
 
     /**
      * Returns the name of the application.
@@ -279,6 +280,15 @@ public class ServiceDeploymentPlan extends AbstractSetup {
      */
     public Map<String, String> getEnsembles() {
         return ensembles;
+    }
+
+    /**
+     * Returns the optional servers mapping.
+     * 
+     * @return the servers (id-IP address mapping)
+     */
+    public Map<String, String> getServers() {
+        return servers;
     }
 
     /**
@@ -405,6 +415,15 @@ public class ServiceDeploymentPlan extends AbstractSetup {
      */
     public void setEnsembles(Map<String, String> ensembles) {
         this.ensembles = ensembles;
+    }
+    
+    /**
+     * Defines the optional servers mapping.
+     * 
+     * @param servers the servers (id-IP address mapping)
+     */
+    public void setServers(Map<String, String> servers) {
+        this.servers = servers;
     }
     
     /**

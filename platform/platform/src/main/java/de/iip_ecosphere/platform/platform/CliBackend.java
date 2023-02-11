@@ -479,7 +479,12 @@ class CliBackend {
         if (null != args && args.size() > 0) {
             options.put(ServicesClient.OPTION_ARGS, JsonUtils.toJson(args));
         }
-        
+
+        Map<String, String> servers = plan.getServers();
+        if (null != servers && servers.size() > 0) {
+            options.put(ServicesClient.OPTION_SERVERS, JsonUtils.toJson(servers));
+        }
+
         if (options.size() == 0) {
             options = null;
         }
@@ -518,16 +523,14 @@ class CliBackend {
             List<StartServicesRunnable> runnables = new ArrayList<>();
             Map<String, String> options = getStartOptions(p);
             for (ServiceResourceAssignment a: p.getAssignments()) {
-                if (a.getServices().size() > 0) {
-                    StartServicesRunnable r = new StartServicesRunnable(a.getResource(),
-                        serviceClients.get(a.getResource()), a.getServicesAsArray(p.getAppId(), appInstanceId), 
-                            options);
-                    runnables.add(r);
-                    if (null != es) {
-                        es.execute(r);
-                    } else {
-                        r.run();
-                    }
+                StartServicesRunnable r = new StartServicesRunnable(a.getResource(),
+                    serviceClients.get(a.getResource()), a.getServicesAsArray(p.getAppId(), appInstanceId), 
+                        options);
+                runnables.add(r);
+                if (null != es) {
+                    es.execute(r);
+                } else {
+                    r.run();
                 }
             }
             boolean finished = true;
@@ -592,23 +595,21 @@ class CliBackend {
             List<ServiceResourceAssignment> assignments = new ArrayList<>(p.getAssignments());
             Collections.reverse(assignments);
             for (ServiceResourceAssignment a: assignments) {
-                if (a.getServices().size() > 0) {
-                    ServicesClient client = getServicesFactory().create(a.getResource());
-                    serviceClients.put(a.getResource(), client);
-                    String[] services = a.getServicesAsArray(p.getAppId(), appInstanceId);
-                    ArrayUtils.reverse(services);
-                    println("Stopping services " + Arrays.toString(services) + " on " + a.getResource());
-                    int running = 0;
-                    for (int i = 0; i < services.length; i++) {
-                        running += Math.max(client.getServiceInstanceCount(services[i]) - 1, 0); // stopping one
-                    }
-                    stillRunning.put(a.getResource(), running);
-                    TaskData data = TaskRegistry.getTaskData();
-                    if (null != data) {
-                        client.stopServiceAsTask(data.getId(), services);
-                    } else {
-                        client.stopService(services);
-                    }
+                ServicesClient client = getServicesFactory().create(a.getResource());
+                serviceClients.put(a.getResource(), client);
+                String[] services = a.getServicesAsArray(p.getAppId(), appInstanceId);
+                ArrayUtils.reverse(services);
+                println("Stopping services " + Arrays.toString(services) + " on " + a.getResource());
+                int running = 0;
+                for (int i = 0; i < services.length; i++) {
+                    running += Math.max(client.getServiceInstanceCount(services[i]) - 1, 0); // stopping one
+                }
+                stillRunning.put(a.getResource(), running);
+                TaskData data = TaskRegistry.getTaskData();
+                if (null != data) {
+                    client.stopServiceAsTask(data.getId(), services);
+                } else {
+                    client.stopService(services);
                 }
             }
             if (p.isOnUndeployRemoveArtifact()) {

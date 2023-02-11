@@ -81,6 +81,8 @@ Deploying multiple services, in particular across devices, can be tedious and er
       <String>: <String>
     arguments:
       - <String>
+    servers:
+      <String>: <String>
 
 A deployment plan may specify the `application` (name), the plan `id`, the application `id` (e.g., to retrieve the application AAS), the `version` of the plan as well as the `description` of the application/plan, all five optional and indented for display in the CLI/UI. Further, a deployment plan specifies the service implementation `artifact` containing the services, either as local path or as URI. The execution of the plan can be done sequentially (the default) or in parallel (set `parallelize` to `true`). If sequential, the author of the plan has the responsibility to state the resources/services in the sequence that they can be started through the installed/configured service manager. For the Spring Cloud Stream service manager, currently, all pre-requisite services must be started before an upstream service can be started, i.e., resources and services shall be given in their flow sequence from sources to sinks. Service implementation artifacts can be automatically removed from the respective resources upon undeployment (`onUndeployRemoveArtifact`, default is `true`). Within `assignments` the target resources with their respective ids and within the resources the services to be started with their respective service ids must be given. If not otherwise specified by an assignment-specific `artifact` (within `assignments` as shown above), the global `artifact` will be used. As indicated above, multiple services and resources can be given, a single resource can also be mentioned multiple times if required. 
 
@@ -98,6 +100,8 @@ As stated above, managing multiple services may be an error prone task depending
 Optionally, the `ensembles` for services may be redefined (depending on the capabilities of the service manager, supported by Spring Cloud Stream). Ensembles are started together, first the leader and in its JVM the members. Existing ensemble definitions from the service deployment descriptor will only be overridden if explicitly specified. `ensembles` is a map of service ids, the key is the member, the leader the respective value. If the leader service id is not valid, e.g., as an empty id is given, an existing mapping will be cleared.
 
 Similarly, optional `arguments` for the service startup may be stated. Arguments are primarily command line arguments to pass over to the service process while starting. In particular, system properties like of the form `-Diip.app.<key>=<value>` can be passed into and may even affect the default values of service parameters if defined in the configuration.
+
+Optionally, the `servers` define a mapping of server ids to target IP addresses/host names/(AAS) device ids for device identification. This allows re-locating server instances within a deployment plan. Already started server instances will not be relocated upon executing a follow-up deployment plan. In a deployment plan, resource without service assignments can be used to force server starts before services are started in a second/further resource item.
 
 ## Missing
 - AAS discovery, currently we rely on the full IP specification instantiated through the configuration
