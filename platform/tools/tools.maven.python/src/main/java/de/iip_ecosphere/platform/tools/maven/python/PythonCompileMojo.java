@@ -112,7 +112,9 @@ public class PythonCompileMojo extends AbstractMojo {
                             filteredOutput += line;
                         }
                     }
-                    getLog().info(filteredOutput);
+                    if (filteredOutput.length() > 0) {
+                        getLog().info(filteredOutput);
+                    }
                     if (failure && failOnError) {
                         throw new MojoExecutionException(errorLine);
                     }
