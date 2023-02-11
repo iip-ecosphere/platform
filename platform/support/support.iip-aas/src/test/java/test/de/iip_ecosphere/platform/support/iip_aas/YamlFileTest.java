@@ -13,6 +13,8 @@
 package test.de.iip_ecosphere.platform.support.iip_aas;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -76,6 +78,67 @@ public class YamlFileTest {
             found = true;
         }
         Assert.assertTrue(found);
+    }
+
+    /**
+     * A basic test type.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public static class BasicTestType {
+        
+        private int iValue;
+        
+        // public no-arg constructor
+
+        /**
+         * Returns iValue. 
+         * 
+         * @return iValue the new value
+         */
+        public int getIValue() {
+            return iValue;
+        }
+
+        /**
+         * Sets iValue. [required by Snakeyaml]
+         * 
+         * @param iValue the new value
+         */
+        public void setIValue(int iValue) {
+            this.iValue = iValue;
+        }
+        
+    }
+
+    /**
+     * A refined test type. Snakeyaml failed in something like this.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public static class TestType extends BasicTestType {
+        
+    }
+    
+    /**
+     * Tests {@link YamlFile#fixList(List, Class)} and {@link YamlFile#fixListSafe(List, Class)}.
+     */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @Test
+    public void testFixList() {
+        Assert.assertNull(YamlFile.fixListSafe(null, TestType.class));
+        List<TestType> list = new ArrayList<>();
+        Assert.assertEquals(list, YamlFile.fixListSafe(list, TestType.class));
+        
+        Map<Object, Object> oMap = new HashMap<>();
+        oMap.put("iValue", 10);
+        List<Object> oList = new ArrayList<>();
+        oList.add(oMap);
+        list = (List) oList; // wrong, but snakeyaml does something like that, probably via reflection
+        list = YamlFile.fixListSafe(list, TestType.class);
+        Assert.assertEquals(1, list.size());
+        Assert.assertTrue(list.get(0) instanceof TestType);
+        Assert.assertEquals(10, list.get(0).getIValue());
     }
 
 }

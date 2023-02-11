@@ -14,11 +14,15 @@ package de.iip_ecosphere.platform.support.iip_aas.config;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
+import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
 
 /**
@@ -150,6 +154,101 @@ public class YamlFile {
      */
     public static String getFieldAsString(Object data, String field, String dflt) {
         return asString(getField(data, field), dflt);
+    }
+
+    /**
+     * Somehow, Snakeyaml does not take up a generic type in a list and delivers a list of 
+     * hashmaps instead of a list of objects of that type. This method fixes the instances
+     * if the root cause cannot be determined. It also handles {@code list} is <b>null</b>
+     * and logs potential exceptions.
+     * 
+     * @param <T> the expected type of objects
+     * @param list the list
+     * @param cls the class denoting the expected type
+     * @return {@code list} eventually with modified entries
+     */
+    public static <T> List<T> fixListSafe(List<T> list, Class<T> cls) {
+        List<T> result = list;
+        if (list != null && list.size() > 0) {
+            try {
+                result = fixList(list, cls);
+            } catch (ExecutionException e) {
+                LoggerFactory.getLogger(YamlFile.class).error(e.getMessage());
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Somehow, Snakeyaml does not take up a generic type in a list and delivers a list of 
+     * hashmaps instead of a list of objects of that type. This method fixes the instances
+     * if the root cause cannot be determined.
+     * 
+     * @param <T> the expected type of objects
+     * @param list the list
+     * @param cls the class denoting the expected type
+     * @return {@code list} eventually with modified entries
+     * @throws ExecutionException if creation of objects fails
+     */
+    public static <T> List<T> fixList(List<T> list, Class<T> cls) throws ExecutionException {
+        for (int i = 0; i < list.size(); i++) {
+            Object o = list.get(i);
+            if (o instanceof HashMap) {
+                @SuppressWarnings("unchecked")
+                HashMap<Object, Object> map = (HashMap<Object, Object>) o;
+                T s = createInstance(cls);
+                for (Map.Entry<Object, Object> e : map.entrySet()) {
+                    Field f = findField(cls, e.getKey().toString());
+                    if (f != null) {
+                        f.setAccessible(true);
+                        try {
+                            f.set(s, e.getValue());
+                        } catch (IllegalArgumentException | IllegalAccessException e1) {
+                            LoggerFactory.getLogger(YamlFile.class).error("Cannot set field {} on YamlServer: {}", 
+                                f.getName(), e1.getMessage());
+                        }
+                    }
+                }
+                list.set(i, s);
+            }
+        }
+        return list;
+    }
+
+    /**
+     * Creates an instance of class {@code cls} and wraps all exceptions.
+     * 
+     * @param <T> the type of the instance
+     * @param cls the class stating the type
+     * @return the instance
+     * @throws ExecutionException if the creation fails, e.g., no public no-arg constructor
+     */
+    private static <T> T createInstance(Class<T> cls) throws ExecutionException {
+        try {
+            return cls.getConstructor().newInstance();
+        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException 
+            | IllegalArgumentException | InvocationTargetException | SecurityException e) {
+            throw new ExecutionException("Cannot create instanceo of type " + cls.getName() + ": " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Finds a field recursively in {@code cls}.
+     * 
+     * @param cls the class to start searching with
+     * @param name the field name
+     * @return the field or <b>null</b> if there is none
+     */
+    public static Field findField(Class<?> cls, String name) {
+        Field result = null;
+        try {
+            result = cls.getDeclaredField(name);
+        } catch (NoSuchFieldException e) {
+            if (cls.getSuperclass() != Object.class) {
+                result = findField(cls.getSuperclass(), name);
+            }
+        }
+        return result;
     }
 
 }
