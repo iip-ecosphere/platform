@@ -37,6 +37,12 @@ public enum ServiceKind {
     /**
      * A probe service receiving data and turning it into alarms or monitoring information.
      */
-    PROBE_SERVICE
+    PROBE_SERVICE,
+    
+    /**
+     * A server process being executed in the environment of a service to utilize the communication 
+     * capabilities of the service/transport/parameters. Internal service kind.
+     */
+    SERVER
     
 }

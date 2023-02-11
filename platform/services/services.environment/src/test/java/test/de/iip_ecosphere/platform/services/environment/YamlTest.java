@@ -57,6 +57,10 @@ public class YamlTest {
         Assert.assertEquals(null, art.getServiceSafe("xyz").getId());
         Assert.assertNotNull(art.getServiceSafe("simpleStream-create"));
         Assert.assertEquals("simpleStream-create", art.getServiceSafe("simpleStream-create").getId());
+        
+        Assert.assertNotNull(art.getServers());
+        Assert.assertEquals(1, art.getServers().size());
+        Assert.assertNotNull(art.getServer("test-Server"));
     }
     
 }

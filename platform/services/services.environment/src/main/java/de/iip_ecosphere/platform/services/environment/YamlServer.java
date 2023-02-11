@@ -109,10 +109,12 @@ public class YamlServer extends YamlProcess {
         result.setDeployable(true);
         result.setDescription("");
         result.setVersion(new Version(0, 0, 0));
+        result.setKind(ServiceKind.SERVER);
         result.setId(id);
         result.setName(id);
         result.setTopLevel(true);
         result.setProcess(this);
+        // no netMgrKey!
         return result;
     }
     

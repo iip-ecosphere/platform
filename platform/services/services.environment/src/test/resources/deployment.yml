@@ -34,3 +34,11 @@ services:
         id: intern
         type: String
         direction: IN
+servers:
+   - id: test-Server
+     host: localhost
+     port: 9871
+     cls: test.de.iip_ecosphere.platform.services.spring.TestServer
+     started: false
+     homePath: ${tmp}/spring.testServer
+     executablePath: ${tmp}/spring.testServer
