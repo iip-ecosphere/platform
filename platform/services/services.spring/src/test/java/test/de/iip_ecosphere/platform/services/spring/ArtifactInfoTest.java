@@ -31,6 +31,7 @@ import de.iip_ecosphere.platform.services.spring.yaml.YamlArtifact;
 import de.iip_ecosphere.platform.services.spring.yaml.YamlEndpoint;
 import de.iip_ecosphere.platform.services.spring.yaml.YamlProcess;
 import de.iip_ecosphere.platform.services.spring.yaml.YamlRelation;
+import de.iip_ecosphere.platform.services.spring.yaml.YamlServer;
 import de.iip_ecosphere.platform.services.spring.yaml.YamlService;
 
 /**
@@ -95,6 +96,10 @@ public class ArtifactInfoTest {
         Assert.assertEquals(1024, service.getMemory());
         Assert.assertEquals(500, service.getDisk());
         Assert.assertEquals(2, service.getCpus());
+        
+        Assert.assertEquals(1, info.getServers().size());
+        YamlServer ser = info.getServers().get(0);
+        Assert.assertEquals("test-Server", ser.getId());
         
         Validator val = new Validator();
         val.validate(info);

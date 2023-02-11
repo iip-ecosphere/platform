@@ -19,9 +19,9 @@ import java.util.List;
 
 import de.iip_ecosphere.platform.services.environment.AbstractYamlArtifact;
 import de.iip_ecosphere.platform.services.spring.descriptor.Artifact;
-import de.iip_ecosphere.platform.services.spring.descriptor.Server;
 import de.iip_ecosphere.platform.services.spring.descriptor.Validator;
 import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
+import de.iip_ecosphere.platform.support.iip_aas.config.YamlFile;
 
 /**
  * Information about an artifact containing services. The artifact is to be deployed. We assume that the underlying
@@ -81,7 +81,7 @@ public class YamlArtifact extends AbstractYamlArtifact implements Artifact {
     }
 
     @Override
-    public List<? extends Server> getServers() {
+    public List<YamlServer> getServers() {
         return servers;
     }
 
@@ -91,7 +91,8 @@ public class YamlArtifact extends AbstractYamlArtifact implements Artifact {
      * @param servers the servers
      */
     public void setServers(List<YamlServer> servers) {
-        this.servers = servers;
+        // somehow Snakeyaml delivers a list of HashMaps; did not find reason; explicit convert
+        this.servers = YamlFile.fixListSafe(servers, YamlServer.class);
     }
 
 }

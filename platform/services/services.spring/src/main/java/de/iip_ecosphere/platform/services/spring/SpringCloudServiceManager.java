@@ -14,15 +14,18 @@ package de.iip_ecosphere.platform.services.spring;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -44,14 +47,21 @@ import de.iip_ecosphere.platform.services.TypedDataConnectorDescriptor;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.services.environment.spring.Starter;
 import de.iip_ecosphere.platform.services.environment.switching.ServiceBase;
+import de.iip_ecosphere.platform.services.spring.descriptor.Server;
 import de.iip_ecosphere.platform.services.spring.yaml.YamlArtifact;
 import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.FileUtils;
+import de.iip_ecosphere.platform.support.NetUtils;
+import de.iip_ecosphere.platform.support.Schema;
+import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
+import de.iip_ecosphere.platform.support.iip_aas.Id;
+import de.iip_ecosphere.platform.support.iip_aas.NetworkManagerAasClient;
 import de.iip_ecosphere.platform.support.setup.CmdLine;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
+import de.iip_ecosphere.platform.support.net.NetworkManager;
 import de.iip_ecosphere.platform.support.net.UriResolver;
 import de.iip_ecosphere.platform.transport.Transport;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
@@ -72,6 +82,18 @@ public class SpringCloudServiceManager
     private static final String PROGRESS_COMPONENT_ID = "Spring Cloud Service Manager";
     private static final Logger LOGGER = LoggerFactory.getLogger(SpringCloudServiceManager.class);
     private Predicate<TypedDataConnectorDescriptor> available = c -> true;
+    private Map<SpringCloudServiceDescriptor, de.iip_ecosphere.platform.support.Server> 
+        runningServers = new HashMap<>();
+    private Supplier<NetworkManager> networkManagerSupplier = () -> {
+        NetworkManager result = null;
+        try {
+            result = new NetworkManagerAasClient();
+        } catch (IOException e) {
+            LOGGER.warn("Cannot create network manager AAS client. Cannot start servers. "
+                + "AAS server running? {}", e.getMessage());
+        }
+        return result;
+    };
     
     // do not rename this class or the following descriptor class! Java Service Loader
     
@@ -106,6 +128,20 @@ public class SpringCloudServiceManager
      * Prevents external creation.
      */
     private SpringCloudServiceManager() {
+    }
+    
+    /**
+     * Changes the network manager supplier. [testing]
+     * 
+     * @param supplier the new supplier, ignored if <b>null</b>
+     * @return the supplier before applying this function/changing the actual value
+     */
+    public Supplier<NetworkManager> setNetworkManagerClientSupplier(Supplier<NetworkManager> supplier) {
+        Supplier<NetworkManager> old = networkManagerSupplier;
+        if (null != supplier) {
+            networkManagerSupplier = supplier;
+        }
+        return old;
     }
 
     @Override
@@ -333,8 +369,132 @@ public class SpringCloudServiceManager
         }
     }
 
+    /**
+     * Starting server instances.
+     * 
+     * @param options optional map of optional options to be passed to the service manager, 
+     *     {@see #startService(Map, String...)}
+     */
+    private void startServers(Map<String, String> options) {
+        Map<String, String> hostMap = new HashMap<>();
+        if (null != options) {
+            String opt = options.get(OPTION_SERVERS);
+            if (null != opt) {
+                Map<?, ?> optMap = JsonUtils.fromJson(opt, Map.class);
+                for (Map.Entry<?, ?> ent : optMap.entrySet()) {
+                    hostMap.put(ent.getKey().toString(), ent.getValue().toString());
+                }
+            }
+        }
+        
+        String myHost = NetUtils.getOwnHostname();
+        Map<String, SpringCloudServiceDescriptor> servers = new HashMap<>();
+        Set<String> thisDevice = new HashSet<>();
+        thisDevice.add(ServerAddress.LOCALHOST);
+        thisDevice.add(myHost);
+        thisDevice.add(NetUtils.getOwnIP()); // may require netmask
+        thisDevice.add(Id.getDeviceId());
+        thisDevice.add(Id.getDeviceIdAas());
+        for (SpringCloudArtifactDescriptor desc : getArtifacts()) {
+            for (SpringCloudServiceDescriptor s: desc.getServers()) {
+                String id = s.getId();
+                String host = hostMap.get(id);
+                if (null == host) {
+                    host = s.getServer().getHost();
+                }
+                if (thisDevice.contains(host)) {
+                    servers.put(id, s);
+                }
+            }
+        }
+        if (servers.size() > 0) { // prevent warnings if there are no server specs to process
+            NetworkManager netClient = networkManagerSupplier.get();
+            if (null != netClient) {
+                for (SpringCloudServiceDescriptor s: servers.values()) {
+                    String id = s.getId();
+                    if (null == netClient.getPort(id)) {
+                        try {
+                            Server ser = s.getServer();
+                            Class<?> cls = Class.forName(ser.getCls()); 
+                            Object o = cls.getConstructor().newInstance();
+                            if (o instanceof de.iip_ecosphere.platform.support.Server) {
+                                de.iip_ecosphere.platform.support.Server sv = 
+                                    (de.iip_ecosphere.platform.support.Server) o;
+                                setStateSafe(s, ServiceState.STARTING);
+                                ServerAddress adr = new ServerAddress(Schema.IGNORE, myHost, ser.getPort());
+                                adr = netClient.reservePort(id, adr);
+                                sv.start();
+                                runningServers.put(s, sv);
+                                setStateSafe(s, ServiceState.RUNNING);
+                                LOGGER.info("Started server {} ", id);
+                            } else {
+                                LOGGER.error("Starting server {}. Specified class does not implement support.Server. "
+                                    + "Cannot start.", id);
+                            }
+                        } catch (ClassNotFoundException | InvocationTargetException | IllegalAccessException 
+                            | InstantiationException | NoSuchMethodException e) {
+                            LOGGER.error("Starting server {}: {}", id, e);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Stopping server instances.
+     */
+    private void stopServers() {
+        List<SpringCloudServiceDescriptor> servers = new ArrayList<>();
+        for (SpringCloudArtifactDescriptor desc : getArtifacts()) {
+            for (SpringCloudServiceDescriptor s: desc.getServers()) {
+                if (runningServers.containsKey(s)) {
+                    servers.add(s);
+                }
+            }
+        }
+        
+        if (servers.size() > 0) { // prevent warnings if there are no server specs to process
+            NetworkManager netClient = networkManagerSupplier.get();
+            if (null != netClient) {
+                for (SpringCloudServiceDescriptor s: servers) {
+                    String id = s.getId();
+                    if (netClient.getRegisteredInstances(id) == 0) {
+                        setStateSafe(s, ServiceState.STOPPING);
+                        de.iip_ecosphere.platform.support.Server sv = runningServers.remove(s);
+                        sv.stop(true);
+                        netClient.releasePort(id);
+                        setStateSafe(s, ServiceState.STOPPED);
+                        LOGGER.info("Stopped server {} ", id);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Marks the use of a server by a service.
+     * 
+     * @param started was the service started; if not, ignore call
+     * @param service the service to mark
+     * @param netClient the network client used for marking, may be <b>null</b>
+     * @return the network client used for marking, for instance reuse, may be <b>null</b>
+     */
+    private NetworkManager markServerUse(boolean started, SpringCloudServiceDescriptor service, 
+        NetworkManager netClient) {
+        String id = service.getSvc().getNetMgtKey();
+        if (id != null) { // prevent warnings if there are no server specs to process
+            if (netClient == null) {
+                netClient = networkManagerSupplier.get();
+            }
+            netClient.registerInstance(id, NetUtils.getOwnHostname());
+        }
+        return netClient;
+    }
+
     @Override
     public void startService(Map<String, String> options, String... serviceIds) throws ExecutionException {
+        startServers(options);
         checkServiceInstances(serviceIds);
         serviceIds = topLevel(this, serviceIds); // avoid accidentally accessing family members
         handleOptions(options, serviceIds);
@@ -346,6 +506,7 @@ public class SpringCloudServiceManager
         int step = 0;
         handleFamilyProcesses(serviceIds, true);
         // re-link binders if needed, i.e., subset shall be started locally
+        NetworkManager netClient = null;
         List<String> commonServiceArgs = determineBindingServiceArgs(serviceIds);
         commonServiceArgs.addAll(config.getServiceCmdArgs());
         for (String sId : sortByDependency(serviceIds, true)) {
@@ -362,6 +523,7 @@ public class SpringCloudServiceManager
                 externalServiceArgs.add(determineCloudFunctionArg(sIdEns));
                 externalServiceArgs.addAll(determineSpringConditionals(this, sIdEns));
                 AppDeploymentRequest req = service.createDeploymentRequest(config, externalServiceArgs);
+                boolean started = false;
                 if (null != req) {
                     setState(service, ServiceState.DEPLOYING);
                     LOGGER.info("Starting " + sId);
@@ -375,6 +537,7 @@ public class SpringCloudServiceManager
                         service.attachStub();
                         setState(service, ServiceState.STARTING);
                         LOGGER.info("Starting " + sId + " completed");
+                        started = true;
                     } else {
                         setState(service, ServiceState.FAILED);
                         errors.add("Starting service id '" + sId + "' failed:\n" + getDeployer().getLog(dId));
@@ -387,6 +550,7 @@ public class SpringCloudServiceManager
                         service.attachStub();
                         setState(service, ServiceState.STARTING);
                         LOGGER.info("Starting ensemble service " + sId + " completed");
+                        started = true;
                     } else {
                         setState(service, ServiceState.FAILED);
                         errors.add("Starting ensemble service id '" + sId + "' failed: See " 
@@ -394,6 +558,7 @@ public class SpringCloudServiceManager
                         LOGGER.info("Starting ensemble service " + sId + " failed");
                     }
                 }
+                netClient = markServerUse(started, service, netClient);
             }
             Transport.sendProcessStatus(PROGRESS_COMPONENT_ID, step++, serviceIds.length + 1, "Started " + sId);
         }
@@ -496,7 +661,6 @@ public class SpringCloudServiceManager
         List<String> errors = new ArrayList<>();
         AppDeployer deployer = getDeployer();
         LOGGER.info("Stopping services " + Arrays.toString(serviceIds));
-        // TODO add/check causes for failing
         int step = 0;
         handleFamilyProcesses(serviceIds, false);
         for (String ids : sortByDependency(serviceIds, false)) {
@@ -530,6 +694,7 @@ public class SpringCloudServiceManager
         }
         checkErrors(errors);
         LOGGER.info("Stopped services " + Arrays.toString(serviceIds));
+        stopServers();
     }
 
     @Override
@@ -572,6 +737,20 @@ public class SpringCloudServiceManager
     @Override
     public void cloneArtifact(String artifactId, URI location) throws ExecutionException {
         throw new ExecutionException("not implemented", null);  // TODO
+    }
+
+    /**
+     * Calls {@link #setState(ServiceDescriptor, ServiceState)} logging exceptions.
+     * 
+     * @param service the service to change
+     * @param state the new state
+     */
+    protected void setStateSafe(ServiceDescriptor service, ServiceState state) {
+        try {
+            setState(service, state);
+        } catch (ExecutionException e) {
+            LOGGER.warn("While setting service {} state: {}", service.getId(), e.getMessage());
+        }
     }
 
     @Override

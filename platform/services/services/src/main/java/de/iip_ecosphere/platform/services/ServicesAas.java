@@ -571,7 +571,9 @@ public class ServicesAas implements AasContributor {
             for (ServiceDescriptor s : desc.getServices()) {
                 addService(builder, s);
             }
-            builder.build();
+            for (ServiceDescriptor s : desc.getServers()) {
+                addService(builder, s);
+            }
         });
         Transport.sendServiceArtifactStatus(ActionTypes.ADDED, desc.getId());
     }

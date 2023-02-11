@@ -13,6 +13,7 @@
 package test.de.iip_ecosphere.platform.services;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 import de.iip_ecosphere.platform.services.AbstractArtifactDescriptor;
@@ -33,7 +34,7 @@ public class MyArtifactDescriptor extends AbstractArtifactDescriptor<MyServiceDe
      * @param services the contained services
      */
     MyArtifactDescriptor(String id, String name, URI uri, List<MyServiceDescriptor> services) {
-        super(id, name, uri, services);
+        super(id, name, uri, services, new ArrayList<MyServiceDescriptor>());
     }
 
 }

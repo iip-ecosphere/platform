@@ -57,7 +57,14 @@ public interface ArtifactDescriptor {
      * @return the service descriptors
      */
     public Collection<? extends ServiceDescriptor> getServices();
-    
+
+    /**
+     * Returns the server specifications as services provided by the artifact.
+     * 
+     * @return the service descriptors
+     */
+    public Collection<? extends ServiceDescriptor> getServers();
+
     /**
      * Returns a service descriptor.
      * 
@@ -66,4 +73,12 @@ public interface ArtifactDescriptor {
      */
     public ServiceDescriptor getService(String id); 
     
+    /**
+     * Returns a service descriptor for a server.
+     * 
+     * @param id the id of the server
+     * @return the related service descriptor or <b>null</b> if the server is not provided by this artifact
+     */
+    public ServiceDescriptor getServer(String id); 
+
 }

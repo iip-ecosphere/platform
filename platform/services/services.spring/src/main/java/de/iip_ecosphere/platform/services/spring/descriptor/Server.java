@@ -12,6 +12,8 @@
 
 package de.iip_ecosphere.platform.services.spring.descriptor;
 
+import de.iip_ecosphere.platform.services.environment.YamlService;
+
 /**
  * Server process specification of servers to be started/stopped with an application.
  * 
@@ -46,5 +48,12 @@ public interface Server extends ProcessSpec {
      * @return the class name
      */
     public String getCls();
+
+    /**
+     * Turns this server into a temporary (partially default filled) service instance.
+     * 
+     * @return the service instance
+     */
+    public YamlService toService();
 
 }

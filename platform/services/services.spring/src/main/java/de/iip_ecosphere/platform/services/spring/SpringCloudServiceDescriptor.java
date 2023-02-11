@@ -38,6 +38,7 @@ import de.iip_ecosphere.platform.services.environment.switching.ServiceBase;
 import de.iip_ecosphere.platform.services.spring.descriptor.Endpoint;
 import de.iip_ecosphere.platform.services.spring.descriptor.ProcessSpec;
 import de.iip_ecosphere.platform.services.spring.descriptor.Relation;
+import de.iip_ecosphere.platform.services.spring.descriptor.Server;
 import de.iip_ecosphere.platform.services.spring.descriptor.Relation.Direction;
 import de.iip_ecosphere.platform.services.spring.descriptor.Service;
 import de.iip_ecosphere.platform.services.spring.descriptor.TypeResolver;
@@ -68,6 +69,7 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
     private File processDir;
     private String serviceProtocol;
     private ManagedServerAddress adminAddr;
+    private Server server;
     
     /**
      * Creates an instance.
@@ -110,7 +112,32 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
         Version version) {
         super(id, applicationId, name, description, version);
     }
+
+    /**
+     * Creates a temporary descriptor for the given server spec instance.
+     * 
+     * @param server the server spec instance
+     * @return the descriptor
+     */
+    static SpringCloudServiceDescriptor createFor(Server server) {
+        de.iip_ecosphere.platform.services.environment.YamlService svc = server.toService();
+        SpringCloudServiceDescriptor result = new SpringCloudServiceDescriptor(svc.getId(), svc.getApplicationId(), 
+            svc.getName(), svc.getDescription(), svc.getVersion());
+        result.setClassification(svc.getKind(), svc.isDeployable(), svc.isTopLevel());
+        result.server = server;
+        // no service, no parameter, no relations
+        return result;
+    }
     
+    /**
+     * If the service represents a server, return the server specification.
+     * 
+     * @return the server specification, may be <b>null</b>
+     */
+    Server getServer() {
+        return server;
+    }
+
     /**
      * Instantiates this service as a template to represent an instance service with id {@code serviceId}.
      * Typically, the application instance id changes compared to existing service descriptors.

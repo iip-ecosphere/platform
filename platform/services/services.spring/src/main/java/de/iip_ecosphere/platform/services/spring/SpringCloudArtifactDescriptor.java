@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.iip_ecosphere.platform.services.AbstractArtifactDescriptor;
+import de.iip_ecosphere.platform.services.spring.descriptor.Server;
 import de.iip_ecosphere.platform.services.spring.descriptor.TypeResolver;
 import de.iip_ecosphere.platform.services.spring.yaml.YamlArtifact;
 import de.iip_ecosphere.platform.services.spring.yaml.YamlService;
@@ -36,16 +37,29 @@ public class SpringCloudArtifactDescriptor extends AbstractArtifactDescriptor<Sp
     /**
      * Creates an artifact descriptor.
      * 
-     * @param id the artifact id
-     * @param name the (file) name
+     * @param artifact the Yaml artifact
      * @param uri the URI the descriptor was loaded from ({@code jar} may be a local file instead)
      * @param jar the underlying jar artifact 
      * @param services the associated services
      */
-    SpringCloudArtifactDescriptor(String id, String name, URI uri, File jar, 
+    SpringCloudArtifactDescriptor(YamlArtifact artifact, URI uri, File jar, 
         List<SpringCloudServiceDescriptor> services) {
-        super(id, name, uri, services);
+        super(artifact.getId(), artifact.getName(), uri, services, createServersList(artifact));
         this.jar = jar;
+    }
+    
+    /**
+     * Creates a list of service descriptors for the servers in {@code artifact}.
+     * 
+     * @param artifact the artifact
+     * @return the service descriptors
+     */
+    private static List<SpringCloudServiceDescriptor> createServersList(YamlArtifact artifact) {
+        ArrayList<SpringCloudServiceDescriptor> result = new ArrayList<>();
+        for (Server s : artifact.getServers()) {
+            result.add(SpringCloudServiceDescriptor.createFor(s));
+        }
+        return result;
     }
     
     /**
@@ -86,7 +100,7 @@ public class SpringCloudArtifactDescriptor extends AbstractArtifactDescriptor<Sp
             }
         }
         
-        return new SpringCloudArtifactDescriptor(artifact.getId(), artifact.getName(), uri, jarFile, services);        
+        return new SpringCloudArtifactDescriptor(artifact, uri, jarFile, services);        
     }
     
     // for package access

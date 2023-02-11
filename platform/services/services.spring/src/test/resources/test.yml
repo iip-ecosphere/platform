@@ -79,3 +79,12 @@ services:
     memory: 1024
     disk: 500
     cpus: 2
+servers:
+  - id: test-Server
+    host: localhost
+    port: 9871
+    cls: test.de.iip_ecosphere.platform.services.spring.TestServer
+    started: false
+    homePath: ${tmp}/spring.testServer
+    executablePath: ${tmp}/spring.testServer
+    

@@ -136,9 +136,11 @@ public class AbstractTestServiceManager {
      */
     public static void shutdown() {
         MetricsAasConstructor.clear();
-        server.stop(false);
-        aasServer.stop(true);
-        implServer.stop(true);
+        if (null != server) {
+            server.stop(false);
+            aasServer.stop(true);
+            implServer.stop(true);
+        }
         AasPartRegistry.setAasSetup(oldSetup);
         ActiveAasBase.setNotificationMode(oldM);
     }

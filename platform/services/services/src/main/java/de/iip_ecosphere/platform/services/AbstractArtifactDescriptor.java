@@ -32,6 +32,7 @@ public class AbstractArtifactDescriptor<S extends AbstractServiceDescriptor<?>> 
     private String name;
     private URI uri;
     private Map<String, S> services = Collections.synchronizedMap(new HashMap<>());
+    private Map<String, S> servers = Collections.synchronizedMap(new HashMap<>());
     
     /**
      * Creates an artifact descriptor.
@@ -40,12 +41,14 @@ public class AbstractArtifactDescriptor<S extends AbstractServiceDescriptor<?>> 
      * @param name the (file) name
      * @param uri the URI the artifact was loaded from
      * @param services the contained services
+     * @param servers the container servers
      */
-    protected AbstractArtifactDescriptor(String id, String name, URI uri, List<S> services) {
+    protected AbstractArtifactDescriptor(String id, String name, URI uri, List<S> services, List<S> servers) {
         this.id = id;
         this.name = name;
         this.uri = null == uri ? null : uri.normalize();
         this.services = createMapping(services);
+        this.servers = createMapping(servers);
     }
     
     /**
@@ -87,10 +90,20 @@ public class AbstractArtifactDescriptor<S extends AbstractServiceDescriptor<?>> 
     public Collection<? extends S> getServices() {
         return services.values();
     }
+    
+    @Override
+    public Collection<? extends S> getServers() {
+        return servers.values();
+    }
 
     @Override
     public S getService(String serviceId) {
         return null == serviceId ? null : services.get(serviceId);
+    }
+
+    @Override
+    public S getServer(String serverId) {
+        return null == serverId ? null : servers.get(serverId);
     }
 
     /**

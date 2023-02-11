@@ -28,15 +28,20 @@ public interface ServiceOperations {
     public static final String EXC_ALREADY_KNOWN = "is already known";
 
     /**
-     * Service start options, ensemble mapping (member-leader mapping), given as JSON map (string).
+     * Service start option, ensemble mapping (member-leader mapping), given as JSON map (string).
      */
     public static final String OPTION_ENSEMBLE = "ensemble";
 
     /**
-     * Service start options, command line options, usually -D&lt;key&gt;=&lt;value&gt;, given as JSON list (string).
+     * Service start option, command line options, usually -D&lt;key&gt;=&lt;value&gt;, given as JSON list (string).
      */
     public static final String OPTION_ARGS = "args";
-    
+
+    /**
+     * Service start option, mapping of service ids to server IP addresses JSON map (string).
+     */
+    public static final String OPTION_SERVERS = "servers";
+
     /**
      * Adds an artifact (and transitively the contained services) to the management domain of this instance, e.g., 
      * by downloading it from an artifact/service store. This defines the {@code id} of the service within the 
