@@ -14,6 +14,7 @@ package de.iip_ecosphere.platform.transport.serialization;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Base64;
 
 import org.apache.commons.text.StringEscapeUtils;
 import org.slf4j.LoggerFactory;
@@ -137,6 +138,45 @@ public class TypeTranslators {
             } catch (NumberFormatException e) {
                 throw new IOException(e);
             }
+        }
+        
+    };
+    
+    
+    /**
+     * byte[] to String translator via base64 encoding.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public static final TypeTranslator<byte[], String> BYTEARRAY_TO_BASE64 = new TypeTranslator<byte[], String>() {
+
+        @Override
+        public byte[] from(String data) throws IOException {
+            return Base64.getDecoder().decode(data);
+        }
+
+        @Override
+        public String to(byte[] source) throws IOException {
+            return Base64.getEncoder().encodeToString(source);
+        }
+        
+    };
+
+    /**
+     * String to byte[] translator via base64 encoding.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public static final TypeTranslator<String, byte[]> BASE64_TO_BYTEARRAY = new TypeTranslator<String, byte[]>() {
+
+        @Override
+        public String from(byte[] data) throws IOException {
+            return Base64.getEncoder().encodeToString(data);
+        }
+
+        @Override
+        public byte[] to(String source) throws IOException {
+            return Base64.getDecoder().decode(source);
         }
         
     };

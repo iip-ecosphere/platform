@@ -100,7 +100,22 @@ public class TypeTranslatorsTest {
         final double test = 12.353058;
         Assert.assertEquals(test, TypeTranslators.DOUBLE.to(TypeTranslators.DOUBLE.from(test)).doubleValue(), 0.001);
     }
-    
+
+    /**
+     * Tests {@link TypeTranslators#BYTEARRAY_TO_BASE64} and {@link TypeTranslators#BASE64_TO_BYTEARRAY}.
+     * 
+     * @throws IOException shall not occur
+     */
+    @Test
+    public void testByteArrayBase64() throws IOException {
+        final String test = "123 BAAB\n42;";
+        final byte[] testArray = test.getBytes();
+        Assert.assertArrayEquals(testArray, TypeTranslators.BYTEARRAY_TO_BASE64.from(
+            TypeTranslators.BYTEARRAY_TO_BASE64.to(testArray)));
+        Assert.assertArrayEquals(testArray, TypeTranslators.BASE64_TO_BYTEARRAY.to(
+            TypeTranslators.BASE64_TO_BYTEARRAY.from(testArray)));
+    }
+
     public static class TestTypeTranslator implements TypeTranslator<String, String> {
 
         @Override
@@ -136,5 +151,5 @@ public class TypeTranslatorsTest {
         Assert.assertNull(TypeTranslators.createSerializer(getClass().getClassLoader(), 
             "abc.def"));
     }
-
+    
 }
