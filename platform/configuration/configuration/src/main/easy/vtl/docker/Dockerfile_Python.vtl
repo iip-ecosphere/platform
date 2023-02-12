@@ -55,6 +55,7 @@ template Dockerfile_Python(IIPEcosphere config, FileArtifact target, sequenceOf(
         '# Installed dependencies (shall be in /)'
         'COPY installedDependencies.yml installedDependencies.yml'
         ''
+        '${genServersExpose(app)|e}'
         'WORKDIR /app'
         ''
         '# Broker'

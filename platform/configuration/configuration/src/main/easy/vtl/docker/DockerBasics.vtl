@@ -83,5 +83,11 @@ template DockerBasics(Configuration config, FileArtifact target) {
         result.add(dep);
         addDependenciesRec(dep.dependencies, result);
     }
+    
+    def genServersExpose(Application app) {
+        for (Server s: app.servers) {
+            'EXPOSE ${s.port}'
+        }
+    }
 
 }

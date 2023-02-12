@@ -15,6 +15,7 @@ template Dockerfile(IIPEcosphere config, FileArtifact target, sequenceOf(MeshEle
         '# Installed dependencies (shall be in /)'
         'COPY installedDependencies.yml installedDependencies.yml'
         ''
+        '${genServersExpose(app)|e}'
         'WORKDIR /app'
         ''
         'COPY wrapper_script.sh wrapper_script.sh'

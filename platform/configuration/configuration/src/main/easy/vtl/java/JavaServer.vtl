@@ -19,7 +19,6 @@ template JavaServer(Configuration config, FileArtifact target, Server server, St
         
         service = new PythonAsyncProcessService(yServer.toService());
         service.addParameterConfigurer(c -> {
-            ${produceParameterDecl("port", "Integer.class", "TypeTranslators.INTEGER", "")}
             ${produceParametersReg(server.parameter)}
         });
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {

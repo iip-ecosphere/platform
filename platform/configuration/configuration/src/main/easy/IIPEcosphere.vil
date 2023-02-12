@@ -135,7 +135,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     };
                     
                     for (Server ser: a.servers) {
-                        generateServer(config, ser, appRoot);
+                        generateServer(config, ser, appRoot, artifacts);
                     }
                 };
                 elements = elements->sortedBy(n|n.name).toSequence(); // for testing
@@ -225,17 +225,23 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         };
     }
     
-    generateServer(Configuration config, Server server, Path appRoot) = {
+    generateServer(Configuration config, Server server, Path appRoot, setOf(String) artifacts) = {
+        if (isDefined(server.artifact) and server.artifact.length() > 0) {
+            artifacts.add(server.artifact);
+        }
     }
     
-    generateServer(Configuration config, PythonServer server, Path appRoot) = {
+    generateServer(Configuration config, PythonServer server, Path appRoot, setOf(String) artifacts) = {
         Path javaSrc = "${appRoot}/src/main/java";
         Path javaServerSrc = "${javaSrc}/${toPath(javaServerPackage)}";
         String clsName = asTypeName(server.id);
         vilTemplateProcessor("JavaServer", config, "${javaServerSrc}/${clsName}Server.java", server=server, pkg=javaServerPackage);
         vilTemplateProcessor("PythonServer", config, "${appRoot}/src/main/python/services/${clsName}Server.py", server=server, pkg="services");
+        if (isDefined(server.artifact) and server.artifact.length() > 0) {
+            artifacts.add(server.artifact);
+        }
     }
-
+    
     /*
     * Collects all IVML types of services used in all applications and stores them globally to usedServiceTypes.
     * usedServiceTypes.includes(PythonService) tells you whether the application employs Python services.

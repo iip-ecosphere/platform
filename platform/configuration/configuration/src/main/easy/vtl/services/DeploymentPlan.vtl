@@ -14,7 +14,8 @@ template DeploymentPlan(IIPEcosphere config, FileArtifact target, DeploymentPlan
         disabled: ${plan.disabled}
         ${generateEnsembles(plan)|e}
         ${generateAssignments(plan)|e}
-        ${generateArguments(plan)|e}'
+        ${generateArguments(plan)|e}
+        ${generateServers(plan)|e}'
     }
     
     def generateArtifact(String artifact) {
@@ -62,6 +63,24 @@ template DeploymentPlan(IIPEcosphere config, FileArtifact target, DeploymentPlan
                 '  ${s.leader.impl.id}: ${s.member.impl.id}'
             }
         }
+    }
+
+    def generateServers(DeploymentPlan plan) {
+        if (isDefined(plan.servers) and plan.servers.size() > 0) {
+            'servers:'
+            for (ServerAssignment a: plan.servers) {
+                '${generateServer(a)}'
+            }
+        }
+    }
+
+    // dispatch basis
+    def generateServer(ServerAssignment assng) {
+        ''
+    }
+
+    def generateServer(NamedServerAssignment assng) {
+        '  - ${assng.server.id}: ${assng.hostId}'
     }
 
 }

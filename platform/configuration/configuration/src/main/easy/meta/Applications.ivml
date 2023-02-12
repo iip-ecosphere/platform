@@ -138,14 +138,15 @@ project Applications {
        NonEmptyString id;
        IipVersion ver = "0.0.0";
        String description = "";
-       sequenceOf(ServiceAssignment) assignments;
+       sequenceOf(ServiceAssignment) assignments = {};
        sequenceOf(EnsembleSpec) ensembles;
        Boolean parallelize = false;
        Boolean onUndeployRemoveArtifact = false;
        Boolean disabled = false;
        String cmdArg; // for now, comma separated as in application
+       sequenceOf(ServerAssignment) servers = {};
        
-       Constraint hasAssignments = isDefined(self.assignments) and self.assignments.size() > 0;
+       Constraint hasAssignments = isDefined(self.assignments);
        Constraint meshCovered = sources(self.application)->closure(refTo(MeshElement) e|nextElts(e)) 
            == self.assignments->collect(a|a.services).flatten().toSet();
        Constraint noLoopEnsembles = not(self.ensembles->collect(e|e.member).overlaps(self.ensembles->collect(e|e.leader)));
@@ -158,6 +159,15 @@ project Applications {
    compound EnsembleSpec {
        refTo(MeshElement) leader;
        refTo(MeshElement) member;
+   }
+   
+   abstract compound ServerAssignment {
+       refTo(Server) server;
+       Constraint serverAssignmentServerDefined = isDefined(self.server) and self.server<>null;
+   }
+
+   compound NamedServerAssignment refines ServerAssignment{
+       NonEmptyString hostId;
    }
    
    abstract compound ServiceAssignment {

@@ -237,6 +237,7 @@ project Services {
         NonEmptyString host = "127.0.0.1";
         NonEmptyEphemeralPort port;
         NonEmptyString executable;
+        String artifact = ""; // optional maven artifact
         Boolean running = false; // running somewhere else, do we have to start it
         Parameters parameter = {};
     }
@@ -245,5 +246,7 @@ project Services {
     }
     
     Constraint serversUnique = allInstances(Server)->isUnique(e|e.id);
+    Constraint servicesServerUnique = allInstances(Service)->collect(s|s.id)
+        .excludesAll(allInstances(Server)->collect(e|e.id));
    
 }
