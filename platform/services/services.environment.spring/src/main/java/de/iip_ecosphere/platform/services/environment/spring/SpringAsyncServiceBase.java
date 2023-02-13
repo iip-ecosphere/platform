@@ -184,12 +184,17 @@ public class SpringAsyncServiceBase {
      * @return the id suffix, may be empty
      */
     public static String getAppInstIdSuffix(Service service, String separator) {
-        String sId = service.getId();
-        String result = ServiceBase.getApplicationInstanceId(sId);
-        if (null == result || result.length() == 0) {
-            result = "";
+        String result;
+        if (null != service) {
+            String sId = service.getId();
+            result = ServiceBase.getApplicationInstanceId(sId);
+            if (null == result || result.length() == 0) {
+                result = "";
+            } else {
+                result = separator + result;
+            }
         } else {
-            result = separator + result;
+            result = "";
         }
         return result;
     }
