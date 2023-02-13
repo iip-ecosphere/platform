@@ -15,7 +15,7 @@ In addition, service deployment properties are given in a separate descriptor, t
     * Optional specification whether the service is `deployable` in distributed manner (default is `true`).
     Optional specification whether the service is `topLevel` or nested, e.g., family member (default is `true`).
     * The Service `kind` (see `de.iip_ecosphere.platform.services.ServiceKind`). 
-    * The optional network management key 'netMgtKey' of a server process the service is relying on. May be empty for one.
+    * The optional network management key 'netMgtKey' of a server process the service is relying on. May be empty for one. 'transportChannel' can then denote the channel for the Transport layer to use. The service may use an own mechanism - discouraged.
     * `cmdArg`: Optional list of command line arguments to be passed when the service is started. Within this list, `${port}` is substituted with the service command port and `${protocol}` with the command protocol, one of the AAS protocols. Further `${tmp}` is replaced by the temporary folder and `${user}` by the user home directory.
     * `instances`: The optional number of service replicas to be launched. Ignored if negative. Default value is `1`.
     * resource desires: Optional values for the number of `cpus`, the `memory` and the `disk` space, the latter in bytes. If not given or not positive, internal default values are used, i.e., one CPU and, e.g., automatically determined for a JVM. The deployer may ignore these values if not applicable to the type of process to be started.
@@ -58,6 +58,7 @@ The descriptor structure looks as given below (lists are indicates by a single e
         topLevel: <Boolean>
         kind: <value from de.iip_ecosphere.platform.services.ServiceKind>
         netMgtKey: <String>
+        transportChannel: <String>
         cmdArg: 
           - <String>
         instances: <Integer>
@@ -98,9 +99,12 @@ The descriptor structure looks as given below (lists are indicates by a single e
           waitTime: <Integer>
     servers:
       - id: <String>
+        description: <String>
+        version: <String>
         host: <String>
         port: <Integer> 
         homePath: <String>
+        transportChannel: <String>
         artifacts: 
             - <String>
         executable: <String>

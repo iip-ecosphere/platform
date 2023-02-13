@@ -13,6 +13,7 @@
 package de.iip_ecosphere.platform.services.spring.descriptor;
 
 import de.iip_ecosphere.platform.services.environment.YamlService;
+import de.iip_ecosphere.platform.support.iip_aas.Version;
 
 /**
  * Server process specification of servers to be started/stopped with an application.
@@ -27,6 +28,20 @@ public interface Server extends ProcessSpec {
      * @return the id of the server
      */
     public String getId();
+    
+    /**
+     * Returns the version of the server.
+     * 
+     * @return the version
+     */
+    public Version getVersion();
+
+    /**
+     * Returns the description of the server.
+     * 
+     * @return the description
+     */
+    public String getDescription();
     
     /**
      * Returns the network port of this server instance.
