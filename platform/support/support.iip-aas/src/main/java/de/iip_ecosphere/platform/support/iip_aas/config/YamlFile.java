@@ -169,7 +169,7 @@ public class YamlFile {
      */
     public static <T> List<T> fixListSafe(List<T> list, Class<T> cls) {
         List<T> result = list;
-        if (list != null && list.size() > 0) {
+        if (list != null) {
             try {
                 result = fixList(list, cls);
             } catch (ExecutionException e) {
@@ -191,6 +191,7 @@ public class YamlFile {
      * @throws ExecutionException if creation of objects fails
      */
     public static <T> List<T> fixList(List<T> list, Class<T> cls) throws ExecutionException {
+        List<T> result = new ArrayList<T>(); // force a "conversion"
         for (int i = 0; i < list.size(); i++) {
             Object o = list.get(i);
             if (o instanceof HashMap) {
@@ -209,10 +210,10 @@ public class YamlFile {
                         }
                     }
                 }
-                list.set(i, s);
+                result.add(s);
             }
         }
-        return list;
+        return result;
     }
 
     /**
