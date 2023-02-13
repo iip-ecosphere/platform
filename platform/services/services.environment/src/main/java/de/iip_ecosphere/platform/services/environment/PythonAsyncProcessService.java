@@ -82,6 +82,7 @@ public class PythonAsyncProcessService extends AbstractPythonProcessService {
 
     @Override
     protected ServiceState start() throws ExecutionException {
+        super.start();
         proc = createAndCustomizeProcess(null, null);
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(proc.getOutputStream()));
         serviceIn = new PrintWriter(writer);
@@ -121,7 +122,23 @@ public class PythonAsyncProcessService extends AbstractPythonProcessService {
                 getLogger().error("Cannot delete Python process home {}: {}", getHome(), e.getMessage());
             }
         }
+        super.stop();
         return ServiceState.STOPPED;
+    }
+    
+    @Override
+    public void setState(ServiceState state) throws ExecutionException {
+        if (ServiceState.STOPPING == state) { // otherwise it's gone
+            sendToService(compose("*setstate", state.name()));
+        }
+        super.setState(state);
+        if (state != ServiceState.STOPPING) { // otherwise it's not yet there
+            sendToService(compose("*setstate", state.name()));
+        }
+        ServiceState st = getState();
+        if (st != state) { // for completeness
+            sendToService(compose("*setstate", st.name()));
+        }
     }
     
     @Override

@@ -11,8 +11,6 @@ from datatypes.Rec13 import Rec13
 class MyService(MyServiceInterface):
     """Demonstration and testing service (wrapper).""" 
 
-    rec12ingestor = None
-    
     def __init__(self):
         """Initializes the service.""" 
         super().__init__()
@@ -33,9 +31,22 @@ class MyService(MyServiceInterface):
     def transformStringString(self, data: str):
         #do some stuff based on data
         self.ingest(data)
+        
+    # ---------------- optional service management -----------------
 
     def reconfigure(self, values:dict):
         print("RECONFIGURED: " + str(values))
+        
+    def setState(self, state:ServiceState):
+        super().setState(state);
+        print("CHANGED STATE: " + str(state));
+
+    # ------------------ optional server-client-communication ------------------
+
+    def receivedClientServer(self, data):
+        print("FROM SERVER: " + str(data));
+        #do some stuff based on data, we just send it back
+        self.ingest(data)
 
 #registers itself
 MyService()

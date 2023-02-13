@@ -36,7 +36,11 @@ import org.slf4j.Logger;
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.PythonUtils;
 import de.iip_ecosphere.platform.support.ServerAddress;
+import de.iip_ecosphere.platform.transport.Transport;
+import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
+import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
+import de.iip_ecosphere.platform.transport.serialization.TypeTranslators;
 
 /**
  * Generic command-line-based Python integration for multiple data types.
@@ -50,9 +54,11 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
     private File home;
     private List<String> pythonArgs;
     private String locationKey;
+    private String transportChannel;
     private Map<String, OutTypeInfo<?>> outTypeInfos = new HashMap<>();
     private Map<String, InTypeInfo<?>> inTypeInfos = new HashMap<>();
     private Map<String, ParameterConfigurer<?>> paramConfigurers = new HashMap<>();
+    private Map<String, ReceptionCallback<?>> callbacks = new HashMap<>();
     
     /**
      * Represents an input or output type.
@@ -219,6 +225,7 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
             getLogger().warn("No home path given for service " + yaml.getId() + ". Falling back to temporary folder");
             home = FileUtils.createTmpFolder(FileUtils.sanitizeFileName(yaml.getId(), true));
         }
+        transportChannel = yaml.getTransportChannel();
     }
     
     /**
@@ -608,5 +615,167 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
         paramConsumer.accept(paramConfigurers); // paramConfigurers may be protected here
     }
     
+    @Override
+    protected ServiceState start() throws ExecutionException {
+        if (null != transportChannel && transportChannel.length() > 0) {
+            try {
+                LoggerFactory.getLogger(AbstractPythonProcessService.class).info(
+                    "Establishing clientserver channel for {}, {}: {} ", getId(), getKind());
+                if (ServiceKind.SERVER == getKind()) {
+                    establishServerListener("*SERVER", transportChannel);
+                } else {
+                    establishClientListener("*SERVER", transportChannel);
+                }
+            } catch (IOException e) {
+                LoggerFactory.getLogger(AbstractPythonProcessService.class).error(
+                    "While establishing client-server channel for {}, {}: {} ", getId(), getKind(), e.getMessage());
+            }
+        }
+        return super.start();
+    }
+    
+    @Override
+    protected ServiceState stop() {
+        if (!callbacks.isEmpty()) {
+            TransportConnector conn = Transport.getConnector();
+            if (null != conn) {
+                for (Map.Entry<String, ReceptionCallback<?>> c : callbacks.entrySet()) {
+                    try {
+                        conn.detachReceptionCallback(c.getKey(), c.getValue());
+                    } catch (IOException e) {
+                        // ignore for now
+                    }
+                }
+            }
+            callbacks.clear();
+        }
+        return super.stop();
+    }
 
+    /**
+     * Self-registering abstract byte array reception callback.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private abstract static class ByteArrayReceptionCallback implements ReceptionCallback<byte[]> {
+
+        /**
+         * Creates a callback instance and registers it in {@code callbacks}.
+         * 
+         * @param channel the channel name this callback is reacting on
+         * @param callbacks the callbacks (for cleanup in {@link AbstractPythonProcessService#stop()}.
+         */
+        private ByteArrayReceptionCallback(String channel, Map<String, ReceptionCallback<?>> callbacks) {
+            callbacks.put(channel, this);
+        }
+        
+        @Override
+        public Class<byte[]> getType() {
+            return byte[].class;
+        }
+
+    }
+
+    /**
+     * Establishes a server listener for internal server-client communication via Transport.
+     * 
+     * @param typeName the name of the type for Java-Python communication
+     * @param serverChannel the name of the server channel to send initial request to
+     * @throws IOException if sending/receiving messages fails
+     */
+    private void establishServerListener(String typeName, String serverChannel) throws IOException {
+        TransportConnector conn = Transport.createConnector();
+        // setup Python->Java channel
+        registerInputTypeTranslator(byte[].class, typeName, TypeTranslators.BYTEARRAY_TO_BASE64);
+        registerOutputTypeTranslator(byte[].class, typeName, TypeTranslators.BASE64_TO_BYTEARRAY);
+        // listen on incoming client requests for private server-client channels
+        conn.setReceptionCallback(serverChannel, new ByteArrayReceptionCallback(serverChannel, callbacks) {
+
+            @Override
+            public void received(byte[] data) {
+                String cChannel = new String(data);
+                // respond with server -> client channel
+                String cSChannel =  cChannel + "_" + System.currentTimeMillis();
+                // if data arrives from Python, pass it on to client
+                attachIngestor(byte[].class, typeName, d -> {
+                    try {
+                        conn.asyncSend(cChannel, data);
+                    } catch (IOException e) {
+                        LoggerFactory.getLogger(AbstractPythonProcessService.class).error(
+                            "While receiving from Python and passing on to {}", cChannel, e.getMessage());
+                    }
+                });
+                try {
+                    // listen on the private client->server channel, pass on data to Python
+                    conn.setReceptionCallback(cSChannel, new ByteArrayReceptionCallback(cSChannel, callbacks) {
+    
+                        @Override
+                        public void received(byte[] data) {
+                            try {
+                                process(typeName, data);
+                            } catch (ExecutionException e) {
+                                LoggerFactory.getLogger(AbstractPythonProcessService.class).error(
+                                    "While receiving on {} and passing on to Python: {}", cSChannel, e.getMessage());
+                            }
+                        }
+                        
+                    });
+                    // sent client connection ack with private client-server channel
+                    conn.asyncSend(cChannel, cSChannel); 
+                } catch (IOException e) {
+                    LoggerFactory.getLogger(AbstractPythonProcessService.class).error(
+                        "While setting up server-client-connection {}-{}", cChannel, cSChannel, e.getMessage());
+                }
+            }
+            
+        });
+    }
+    
+    /**
+     * Establishes a client listener for internal server-client communication via Transport.
+     * 
+     * @param typeName the name of the type for Java-Python communication
+     * @param serverChannel the name of the server channel to send initial request to
+     * @throws IOException if sending/receiving messages fails
+     */
+    private void establishClientListener(String typeName, String serverChannel) throws IOException {
+        TransportConnector conn = Transport.createConnector();
+        // setup Python->Java channel
+        registerInputTypeTranslator(byte[].class, typeName, TypeTranslators.BYTEARRAY_TO_BASE64);
+        registerOutputTypeTranslator(byte[].class, typeName, TypeTranslators.BASE64_TO_BYTEARRAY);
+        // init communication, setup listener on private server-client channel, 
+        String clientChannel = getId() + "_client_" + System.currentTimeMillis();
+        conn.setReceptionCallback(clientChannel, new ByteArrayReceptionCallback(clientChannel, callbacks) {
+
+            private boolean firstReception = true;
+            
+            @Override
+            public void received(byte[] data) {
+                if (firstReception) {
+                    // first reception, attach Python->Java ingestor passing on
+                    firstReception = false;
+                    String serverChannel = new String(data);
+                    attachIngestor(byte[].class, typeName, d -> {
+                        try {
+                            conn.asyncSend(serverChannel, d);
+                        } catch (IOException e) {
+                            LoggerFactory.getLogger(AbstractPythonProcessService.class).error(
+                                "While receiving from Python passing on to {}", serverChannel, e.getMessage());
+                        }
+                    });
+                } else {
+                    try {
+                        process(typeName, data);
+                    } catch (ExecutionException e) {
+                        LoggerFactory.getLogger(AbstractPythonProcessService.class).error(
+                            "While receiving on {} and passing on to Python: {}", clientChannel, e.getMessage());
+                    }
+                }
+            }
+            
+        });
+        // request private client-server channel
+        conn.asyncSend(serverChannel, clientChannel); 
+    }
+ 
 }

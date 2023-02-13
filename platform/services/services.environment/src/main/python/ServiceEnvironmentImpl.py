@@ -7,8 +7,11 @@ import importlib
 import time
 import os
 import json
+import base64
 from codecs import decode
 import Registry
+from Service import ServiceState
+from Service import ServiceKind
 
 def printStdout(text): 
     """ Use in here to write to stdout, independent whether redirected or not 
@@ -129,6 +132,10 @@ def consoleIngestResult(data):
             result = typeInfo + "|" + serializer.writeTo(data)
             printStdout(result)
             flushStdout()
+    else: # assume client-server-communication
+        result = "*SERVER|" + base64.b64encode(data).decode('utf-8')
+        printStdout(result)
+        flushStdout()
 
 def console(a, data, sId):
     """ Starts the command line based service environment
@@ -166,7 +173,9 @@ def process(composedData, sId):
         if type.startswith('*'):
             service = Registry.services.get(sId)
             if service:
-                if type == '*migrate':
+                if type == '*setstate':
+                    service.setState(ServiceState[str(data)])
+                elif type == '*migrate':
                     service.migrate(data)
                 elif type == '*update':
                     service.update(data)
@@ -178,6 +187,8 @@ def process(composedData, sId):
                     service.activate()
                 elif type == '*passivate':
                     service.passivate()
+                elif type == '*SERVER': # fixed base64 encoding-decoding
+                    service.receivedClientServer(base64.b64decode(data))
         else :
             serializer = Registry.serializers.get(type)
             if serializer:

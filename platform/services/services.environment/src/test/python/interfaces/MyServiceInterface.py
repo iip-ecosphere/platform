@@ -58,4 +58,14 @@ class MyServiceInterface(AbstractService):
           - data -- the data to be transformed. Pass result to associated ingestor.
         """
         raise NotImplementedError
+
+    # ------------------ optional server-client-communication ------------------
+
+    def receivedFromServer(self, data):
+        """Receives data from the server.
+        
+        Parameters:
+          - data -- the data object (type unknown, depends on client-server agreement)
+        """
+        raise NotImplementedError
         

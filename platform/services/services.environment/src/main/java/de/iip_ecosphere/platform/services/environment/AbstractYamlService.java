@@ -33,6 +33,7 @@ public abstract class AbstractYamlService {
     private boolean deployable = false;
     private boolean topLevel = true;
     private String netMgtKey;
+    private String transportChannel;
 
     /**
      * Returns the unique id of the service.
@@ -81,6 +82,16 @@ public abstract class AbstractYamlService {
      */
     public String getNetMgtKey() {
         return netMgtKey;
+    }
+
+    /**
+     * Returns the transport channel to utilize via {@link #getNetMgtKey()}.
+     * 
+     * @return the transport channel, may be empty or <b>null</b> for none if the service uses an own 
+     *     mechanism (discouraged if {@link #getNetMgtKey()} is given)
+     */
+    public String getTransportChannel() {
+        return transportChannel;
     }
 
     /**
@@ -171,6 +182,16 @@ public abstract class AbstractYamlService {
      */
     public void setNetMgtKey(String netMgtKey) {
         this.netMgtKey = netMgtKey;
+    }
+    
+    /**
+     * Defines the transport channel to utilize via {@link #getNetMgtKey()}.
+     * 
+     * @param transportChannel the transport channel, may be empty or <b>null</b> for none if the service uses an own 
+     *     mechanism (discouraged if {@link #getNetMgtKey()} is given)
+     */
+    public void setTransportChannel(String transportChannel) {
+        this.transportChannel = transportChannel;
     }
     
     /**

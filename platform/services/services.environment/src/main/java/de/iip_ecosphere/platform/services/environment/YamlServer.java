@@ -23,9 +23,12 @@ import de.iip_ecosphere.platform.support.iip_aas.Version;
 public class YamlServer extends YamlProcess {
 
     private String id;
+    private Version version;
+    private String description = "";
     private int port;
     private String host;
     private String cls;
+    private String transportChannel;
 
     /**
      * Returns the id of the server, also to be used as network management key.
@@ -34,6 +37,24 @@ public class YamlServer extends YamlProcess {
      */
     public String getId() {
         return id;
+    }
+    
+    /**
+     * Returns the version of the server.
+     * 
+     * @return the version
+     */
+    public Version getVersion() {
+        return version;
+    }
+
+    /**
+     * Returns the description of the server.
+     * 
+     * @return the description
+     */
+    public String getDescription() {
+        return description;
     }
     
     /**
@@ -64,12 +85,42 @@ public class YamlServer extends YamlProcess {
     }
     
     /**
+     * Returns the transport channel to utilize via {@link #getNetMgtKey()}.
+     * 
+     * @return the transport channel, may be empty or <b>null</b> for none if the service uses an own 
+     *     mechanism (discouraged if {@link #getNetMgtKey()} is given)
+     */
+    public String getTransportChannel() {
+        return transportChannel;
+    }
+    
+    /**
      * Returns the id of the server, also to be used as network management key. [required by SnakeYaml]
      * 
      * @param id the id of the server
      */
     public void setId(String id) {
         this.id = id;
+    }
+    
+    /**
+     * Defines the version of the service. [required by SnakeYaml]
+     * 
+     * @param version the version
+     */
+    public void setVersion(Version version) {
+        this.version = version;
+    }
+
+    /**
+     * Defines the description of the service. [required by SnakeYaml]
+     * 
+     * @param description the description (<b>null</b> is ignored, default is empty)
+     */
+    public void setDescription(String description) {
+        if (null != description) {
+            this.description = description;
+        }
     }
     
     /**
@@ -98,22 +149,33 @@ public class YamlServer extends YamlProcess {
     public void setCls(String cls) {
         this.cls = cls;
     }
+    
+    /**
+     * Defines the transport channel to utilize via {@link #getNetMgtKey()}.
+     * 
+     * @param transportChannel the transport channel, may be empty or <b>null</b> for none if the service uses an own 
+     *     mechanism (discouraged if {@link #getNetMgtKey()} is given)
+     */
+    public void setTransportChannel(String transportChannel) {
+        this.transportChannel = transportChannel;
+    }
 
     /**
-     * Turns this server into a temporary (partially default filled) service instance.
+     * Turns this server into a temporary service instance.
      * 
      * @return the service instance
      */
     public YamlService toService() {
         YamlService result = new YamlService();
         result.setDeployable(true);
-        result.setDescription("");
-        result.setVersion(new Version(0, 0, 0));
+        result.setDescription(getDescription());
+        result.setVersion(getVersion());
         result.setKind(ServiceKind.SERVER);
         result.setId(id);
         result.setName(id);
         result.setTopLevel(true);
         result.setProcess(this);
+        result.setTransportChannel(getTransportChannel());
         // no netMgrKey!
         return result;
     }

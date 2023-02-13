@@ -29,6 +29,7 @@ class ServiceKind(Enum):
     TRANSFORMATION_SERVICE = 1
     SINK_SERVICE = 2
     PROBE_SERVICE = 3
+    SERVER = 4
 
 class Service:
     """Interface of an administrative service interface."""
