@@ -15,14 +15,13 @@ Planned:
 * Semantic Ids in the UI [#63](https://github.com/iip-ecosphere/platform/issues/63)
 
 In progress:
+* Integration of federated learning [#127](https://github.com/iip-ecosphere/platform/issues/127)
 * UI progress reporting [#70](https://github.com/iip-ecosphere/platform/issues/70)
 * Automatic creation of containers [#10](https://github.com/iip-ecosphere/platform/issues/10), [#9](https://github.com/iip-ecosphere/platform/issues/9).
 * [#59](https://github.com/iip-ecosphere/platform/issues/59): Distributed testing/evaluation environment
-* [#69](https://github.com/iip-ecosphere/platform/issues/69): Revise platform installation guidelines
 * [#100](https://github.com/iip-ecosphere/platform/issues/100): Run multiple app instances
 * [#101](https://github.com/iip-ecosphere/platform/issues/101): Documentation of fixed formats used by the platform
 * [#102](https://github.com/iip-ecosphere/platform/issues/102): Create/provide container for service development.
-* Test examples with MQTT [#61](https://github.com/iip-ecosphere/platform/issues/71), examples.pythonSync now running with MQTT v3 instead of AMQP for transport.
 
 New features:
 * [#51](https://github.com/iip-ecosphere/platform/issues/51): Device specific measurement plugin for Phoenix Contact AXC
@@ -64,6 +63,8 @@ Improvements:
 * [#121](https://github.com/iip-ecosphere/platform/issues/121): Examples and selected test models turned into managed model structure. Starter classes of examples substituted by mvn exec:java.
 * [#84](https://github.com/iip-ecosphere/platform/issues/84): (generated) parameters for Python services.
 * Component upgrades to BaSyx 1.3.0 [#35](https://github.com/iip-ecosphere/platform/issues/35), Apache QPID-J 9.0.0 [#76](https://github.com/iip-ecosphere/platform/issues/76) and *Java 11*.
+* [#61](https://github.com/iip-ecosphere/platform/issues/71): examples.pythonSync now running with MQTT v3 instead of AMQP for transport.
+* [#69](https://github.com/iip-ecosphere/platform/issues/69): Revise platform installation guidelines
 
 ### Version 0.4.0 (2022/09/02, TddT'22):
 
