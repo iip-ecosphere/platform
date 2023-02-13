@@ -90,9 +90,12 @@ public class Transport {
          * Sets up the transport information.
          * 
          * @param supplier the transport supplier
+         * @return the supplier before this operation
          */
-        public void setTransportSetup(Supplier<TransportSetup> supplier) {
+        public Supplier<TransportSetup> setTransportSetup(Supplier<TransportSetup> supplier) {
+            Supplier<TransportSetup> old = transportSupplier;
             transportSupplier = supplier;
+            return old;
         }
         
         /**
@@ -631,9 +634,10 @@ public class Transport {
      * Sets up the (global) transport information.
      * 
      * @param supplier the transport supplier
+     * @return supplier the supplier before this operation
      */
-    public static void setTransportSetup(Supplier<TransportSetup> supplier) {
-        globalTransport.setTransportSetup(supplier);
+    public static Supplier<TransportSetup> setTransportSetup(Supplier<TransportSetup> supplier) {
+        return globalTransport.setTransportSetup(supplier);
     }
 
     /**
