@@ -158,4 +158,9 @@ public class ConnectorServiceWrapper<O, I, CO, CI> extends AbstractService {
         connector.enableNotifications(enableNotifications);
     }
 
+    @Override
+    protected void notifyReconfigured(String paramName, String value) {
+        connector.notifyReconfigured(paramName, value);
+    }
+    
 }
