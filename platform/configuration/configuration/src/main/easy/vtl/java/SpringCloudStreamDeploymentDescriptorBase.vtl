@@ -429,20 +429,25 @@ template SpringCloudStreamDeploymentDescriptorBase(Configuration config, FileArt
     }
 
     def generateServers(Application app) {
-        if (isDefined(app.servers)) {
-            // sorted by for deterministic testing
-            for (Server s : app.servers->sortedBy(t|t.id)) {
-                '- id: ${s.id}
-                  version: ${s.ver}
-                  description: ${s.description}
-                  transportChannel: ${getStringValueSafe(s.transportChannel, "")}
-                  host: ${s.host}
-                  port: ${s.port}
-                  cls: server.${asTypeName(s.id)}Server
-                  started: ${s.running}
-                  ${generateServer(s)|e}'
-            }
+        if (isDefined(app.servers) and app.servers.size() > 0) {
+            'servers:
+              ${generateServersImpl(app.servers)}'
         }
+    }
+    
+    def generateServersImpl(setOf(Server) servers) {
+        // sorted by for deterministic testing
+        for (Server s : servers->sortedBy(t|t.id)) {
+            '- id: ${s.id}
+              version: ${s.ver}
+              description: ${s.description}
+              transportChannel: ${getStringValueSafe(s.transportChannel, "")}
+              host: ${s.host}
+              port: ${s.port}
+              cls: server.${asTypeName(s.id)}Server
+              started: ${s.running}
+              ${generateServer(s)|e}'
+        }    
     }
     
     def generateServer(Server server) {

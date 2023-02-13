@@ -18,8 +18,7 @@ template SpringCloudStreamDeploymentDescriptor(Configuration config, FileArtifac
         ${generateTypes(elements)}
         services:
            ${generateServices(elements)}
-        servers:
-           ${generateServers(app)|e}
+        ${generateServers(app)|e}
         '
     }
 
