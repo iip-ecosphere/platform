@@ -234,15 +234,19 @@ project Services {
     // required by application, to be started/stopped
     compound Server {
         NonEmptyString id;
+        String description = ""; // TODO Constraint: must be configured
+        IipVersion ver;
         NonEmptyString host = "127.0.0.1";
         NonEmptyEphemeralPort port;
         NonEmptyString executable;
         String artifact = ""; // optional maven artifact
         Boolean running = false; // running somewhere else, do we have to start it
         Parameters parameter = {};
+        String transportChannel;
     }
 
     compound PythonServer refines Server {
+        NonEmptyString executable = "python";
     }
     
     Constraint serversUnique = allInstances(Server)->isUnique(e|e.id);

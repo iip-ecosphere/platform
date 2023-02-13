@@ -32,4 +32,8 @@ template PythonMeshElementTemplatePartFlowerAI(Configuration config, FileArtifac
     }
     */
 
+    def generateFurtherMethods(FlowerFederatedAiService service) {
+        '${generateReceiveClientServer(service.server)|e}'
+    } 
+
 }

@@ -5,7 +5,9 @@ project ServerPartFlowerAI {
    annotate BindingTime bindingTime = BindingTime::compile to .;
    
    compound FlowerFederatedAiServer refines PythonServer {
-        NonEmptyString executable = "python";
+        String transportChannel = "Server-FlowerAi";
+        String description = "Flower Federated Learning Server";
+        IipVersion ver = "1.3.0"; 
    }
    
 }

@@ -237,6 +237,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         String clsName = asTypeName(server.id);
         vilTemplateProcessor("JavaServer", config, "${javaServerSrc}/${clsName}Server.java", server=server, pkg=javaServerPackage);
         vilTemplateProcessor("PythonServer", config, "${appRoot}/src/main/python/services/${clsName}Server.py", server=server, pkg="services");
+        vilTemplateProcessor("PythonServerInterface", config, "${appRoot}/src/main/python/interfaces/${clsName}ServerInterface.py", server=server, pkg="interfaces");
         if (isDefined(server.artifact) and server.artifact.length() > 0) {
             artifacts.add(server.artifact);
         }

@@ -26,5 +26,14 @@ template SpringCloudStreamDeploymentDescriptorPartFlowerAI(Configuration config,
         homePath: \\${tmp}/flowerAi_${id}
         executablePath: \\${tmp}/flowerAi_${id}'
     }
-
+    
+    def generateService(FlowerFederatedAiService service) {
+        if (isDefined(service.server)) {
+            'netMgtKey: ${service.server.id}
+            transportChannel: ${getStringValueSafe(service.server.transportChannel, "")}'
+        } else {
+            ''
+        }
+    }
+    
 }

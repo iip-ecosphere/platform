@@ -15,7 +15,7 @@ project ServicePartFlowerAI {
    
    compound FlowerFederatedAiService refines PythonService {
        ServiceKind kind = ServiceKind::TRANSFORMATION_SERVICE;
-       IipVersion rtsaVer = "1.3.0";
+       IipVersion ver = "1.3.0";
        FlowerAiFramework framework;
        FlowerAiClient client;
        refTo(FlowerFederatedAiServer) server;

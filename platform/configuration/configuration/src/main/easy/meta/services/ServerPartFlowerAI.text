@@ -1,1 +1,3 @@
-ServerPartFlowerAI::FlowerFederatedAiServer::entrypointModule = The Python module representing the server implementation.
+ServerPartFlowerAI::FlowerFederatedAiServer::transportChannel = Refined name of transport channel.
+ServerPartFlowerAI::FlowerFederatedAiServer::description = Refined description of the server.
+ServerPartFlowerAI::FlowerFederatedAiServer::ver = Refined version of the server.

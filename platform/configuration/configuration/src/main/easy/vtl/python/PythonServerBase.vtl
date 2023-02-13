@@ -6,15 +6,9 @@ import ServiceBasics;
 @indent(indentation = 4, additional = 0)
 template PythonServerBase(Configuration config, FileArtifact target, PythonServer server, String pkg) {
     
-    def produceSuper(ServiceBase base) {
+    def produceSuper(PythonServer server) {
         ''
     } 
-    
-    def produceSuper(PythonServer server) {
-        String sId = "'${server.id}'";
-        'super().__init__("${server.id}", "${server.id}", Version("0.0.0"), "", True, ServiceKind.TRANSFORMER_SERVICE)
-        Registry.services[${sId}] = self'
-    }
     
     def produceSetStateStarting(PythonServer server) {
         '#code for set state to STARTING

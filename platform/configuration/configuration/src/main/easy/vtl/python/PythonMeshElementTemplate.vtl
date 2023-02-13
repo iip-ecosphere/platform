@@ -29,6 +29,7 @@ template PythonMeshElementTemplate(Configuration config, FileArtifact target, Me
             
             ${produceReconfigure(elt.impl)}
             ${generateDataMethods(elt, true)}
+            ${generateFurtherMethods(elt.impl)}
 
         #registers itself
         ${clsName}()'

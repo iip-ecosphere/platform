@@ -423,10 +423,13 @@ project SerializerConfig1 {
        servers={NamedServerAssignment{server=refBy(pyServer), hostId="res1"}}
     };
     
-    FlowerFederatedAiServer pyServer = {
+    PythonServer pyServer = { // avoid flower dependencies in test
         id="test-pyServer", 
         host="localhost", 
-        port=9871
+        port=9871,
+        transportChannel="MyChannel",
+        description = "Test server",
+        ver = "1.3.0" 
     };
     
     // ---------- generation setup ------------

@@ -226,5 +226,19 @@ template PythonBasics(Configuration config, FileArtifact target) {
         'str(${expr}).lower() == "true"'
     }
 
+    def generateReceiveClientServer(PythonServer server) {
+        if (isDefined(server.transportChannel) and server.transportChannel.length() > 0) {
+            'def receivedClientServer(self, data):
+                """Called when data on client-server connection arrives.
+                
+                Parameters:
+                  - data -- the data (type depends on client-server implementation)
+                """
+                
+                pass'
+        } else {
+            ''
+        }
+    }
     
 }
