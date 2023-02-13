@@ -39,6 +39,7 @@ public class SerializerRegistry {
      */
     public static void resetDefaults() {
         registerSerializer(StringSerializer.class);
+        registerSerializer(ByteArraySerializer.class);
         registerSerializer(StatusMessageSerializer.class);
         registerSerializer(TraceRecordSerializer.class);
         registerSerializer(AlertSerializer.class);
