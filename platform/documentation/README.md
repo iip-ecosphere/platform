@@ -9,6 +9,7 @@
 * [Install information](../documentation/INSTALL.md) for own installation, Docker containers and for playing with pre-packaged containers.
 * [Guideline for platform installation under Windows](../documentation/Platform_Installation_Guide_for_Windows.pdf)
 * [Guideline for platform installation under Linux](../documentation/Platform_Installation_Guide_for_Linux.pdf)
+* [Guide for adding EASy-Plugin to Eclipse under Linux](../documentation/Guide_Adding_Eclipse-EASy-Plugin_on_Linux.pdf)
 
 ## Guidelines
 * There is an overall **architecture** and a **platform handbook** in the IIP-Ecosphere ownCloud. Please consult the architecture first to understand how existing and new parts are related.
