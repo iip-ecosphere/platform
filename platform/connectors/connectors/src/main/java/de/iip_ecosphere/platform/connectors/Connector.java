@@ -139,5 +139,14 @@ public interface Connector <O, I, CO, CI> extends EventHandlingConnector {
     public default Class<? extends CachingStrategy> getCachingStrategyCls() {
         return DefaultCachingStrategy.class;
     }
+    
+    /**
+     * Called when parameters of the containing service are changed.
+     * 
+     * @param parameterName the parameter name
+     * @param value the new value
+     */
+    public default void notifyReconfigured(String parameterName, String value) {
+    }
 
 }

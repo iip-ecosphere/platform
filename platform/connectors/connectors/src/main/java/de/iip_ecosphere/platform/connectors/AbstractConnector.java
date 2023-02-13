@@ -32,7 +32,8 @@ import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
 /**
  * Provides a reusable base of a {@link Connector} implementation using the {@link ProtocolAdapter}. Call 
  * {@link #initializeModelAccess()} on {@link #connect(ConnectorParameter)} as soon as the connector is connected.
- * Handles interactions with {@link ConnectorRegistry}. 
+ * Handles interactions with {@link ConnectorRegistry}. Implicitly reacts on parameter "path" as string to override
+ * dynamically the configured data path into the connector data. 
  * 
  * @param <O> the output type from the underlying machine/platform
  * @param <I> the input type to the underlying machine/platform
@@ -52,6 +53,8 @@ public abstract class AbstractConnector<O, I, CO, CI> implements Connector<O, I,
     private ConnectorParameter params;
     private boolean enablePolling = true; // enable by default
     private CachingStrategy cachingStrategy;
+    private String outPath; // the runtime-reconfigured data path
+    private String inPath; // the runtime-reconfigured data path
 
     /**
      * Creates an instance and installs the protocol adapter(s) with a default selector for the first adapter.
@@ -438,6 +441,43 @@ public abstract class AbstractConnector<O, I, CO, CI> implements Connector<O, I,
     @Override
     public Class<? extends CO> getConnectorOutputType() {
         return adapter[0].getConnectorOutputType();
+    }
+
+    @Override
+    public void notifyReconfigured(String parameterName, String value) {
+        if ("outPath".equals(parameterName) && value != null && value.length() > 0) {
+            outPath = value;
+        } else if ("inPath".equals(parameterName) && value != null && value.length() > 0) {
+            inPath = value;
+        }
+    }
+    
+    /**
+     * Returns the (eventually re-configured) data access path within the protocol.
+     *  
+     * @param cfgPath the configured path from the model
+     * @return the path to use, may be {@code cfgPath}
+     */
+    protected String getOutPath(String cfgPath) {
+        String result = cfgPath;
+        if (null == outPath) {
+            result = outPath;
+        }
+        return result;
+    }
+
+    /**
+     * Returns the (eventually re-configured) data access path within the protocol.
+     *  
+     * @param cfgPath the configured path from the model
+     * @return the path to use, may be {@code cfgPath}
+     */
+    protected String getInPath(String cfgPath) {
+        String result = cfgPath;
+        if (null == inPath) {
+            result = inPath;
+        }
+        return result;
     }
 
 }
