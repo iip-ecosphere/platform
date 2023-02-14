@@ -25,7 +25,8 @@ import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 
 /**
- * Wraps a connector into a service.
+ * Wraps a connector into a service. Implicitly reacts on parameter "inPath" and "outPath" as string to override
+ * dynamically the configured data path into the connector data. 
  * 
  * @param <O> the output type from the underlying machine/platform
  * @param <I> the input type to the underlying machine/platform
@@ -38,6 +39,8 @@ public class ConnectorServiceWrapper<O, I, CO, CI> extends AbstractService {
 
     private Connector<O, I, CO, CI> connector;
     private Supplier<ConnectorParameter> connParamSupplier;
+    private String outPath; // the runtime-reconfigured data path
+    private String inPath; // the runtime-reconfigured data path
 
     /**
      * Creates a service wrapper instance.
@@ -161,6 +164,40 @@ public class ConnectorServiceWrapper<O, I, CO, CI> extends AbstractService {
     @Override
     protected void notifyReconfigured(String paramName, String value) {
         connector.notifyReconfigured(paramName, value);
+        if ("outPath".equals(paramName) && value != null && value.length() > 0) {
+            outPath = value;
+        } else if ("inPath".equals(paramName) && value != null && value.length() > 0) {
+            inPath = value;
+        }
     }
+    
+    /**
+     * Returns the (eventually re-configured) data access path within the protocol.
+     *  
+     * @param cfgPath the configured path from the model
+     * @return the path to use, may be {@code cfgPath}
+     */
+    public String getOutPath(String cfgPath) {
+        String result = cfgPath;
+        if (null == outPath) {
+            result = outPath;
+        }
+        return result;
+    }
+
+    /**
+     * Returns the (eventually re-configured) data access path within the protocol.
+     *  
+     * @param cfgPath the configured path from the model
+     * @return the path to use, may be {@code cfgPath}
+     */
+    public String getInPath(String cfgPath) {
+        String result = cfgPath;
+        if (null == inPath) {
+            result = inPath;
+        }
+        return result;
+    }
+
     
 }

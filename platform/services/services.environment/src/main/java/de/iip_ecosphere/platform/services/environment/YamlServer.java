@@ -85,10 +85,10 @@ public class YamlServer extends YamlProcess {
     }
     
     /**
-     * Returns the transport channel to utilize via {@link #getNetMgtKey()}.
+     * Returns the transport channel for client-server communication.
      * 
      * @return the transport channel, may be empty or <b>null</b> for none if the service uses an own 
-     *     mechanism (discouraged if {@link #getNetMgtKey()} is given)
+     *     mechanism (discouraged)
      */
     public String getTransportChannel() {
         return transportChannel;
@@ -151,10 +151,10 @@ public class YamlServer extends YamlProcess {
     }
     
     /**
-     * Defines the transport channel to utilize via {@link #getNetMgtKey()}.
+     * Defines the transport channel for client-server communication.
      * 
      * @param transportChannel the transport channel, may be empty or <b>null</b> for none if the service uses an own 
-     *     mechanism (discouraged if {@link #getNetMgtKey()} is given)
+     *     mechanism (discouraged)
      */
     public void setTransportChannel(String transportChannel) {
         this.transportChannel = transportChannel;
