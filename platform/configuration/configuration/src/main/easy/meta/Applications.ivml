@@ -131,7 +131,7 @@ project Applications {
    // ------------------------------- deployment --------------------------------------
    
    // deployment plan, outside application allowing to keep the plan local while application can be shared
-   // explicit container specificiation is currently not intended, the artifact is derived
+   // explicit container specification is currently not intended, the artifact is derived
    compound DeploymentPlan {
        NonEmptyString name;
        refTo(Application) application;
@@ -142,14 +142,18 @@ project Applications {
        sequenceOf(EnsembleSpec) ensembles;
        Boolean parallelize = false;
        Boolean onUndeployRemoveArtifact = false;
+       Boolean allowMultiExecution = true;
        Boolean disabled = false;
        String cmdArg; // for now, comma separated as in application
        sequenceOf(ServerAssignment) servers = {};
+       sequenceOf(ParameterServiceAssignment) parameter = {};
        
        Constraint hasAssignments = isDefined(self.assignments);
        Constraint meshCovered = sources(self.application)->closure(refTo(MeshElement) e|nextElts(e)) 
            == self.assignments->collect(a|a.services).flatten().toSet();
        Constraint noLoopEnsembles = not(self.ensembles->collect(e|e.member).overlaps(self.ensembles->collect(e|e.leader)));
+       Constraint parameterServicesUnique = parameter->isUnique(a|a.service);
+       Constraint parameterNamesUnique = parameter->forAll(a|a.parameter->isUnique(t|t.parameter));
    }
    
    def setOf(refTo(MeshElement)) sources(Application app) = app.services->collect(m|m.sources).flatten().selectByKind(refTo(MeshElement));
@@ -163,7 +167,7 @@ project Applications {
    
    abstract compound ServerAssignment {
        refTo(Server) server;
-       Constraint serverAssignmentServerDefined = isDefined(self.server) and self.server<>null;
+       //Constraint serverAssignmentServerDefined = isDefined(self.server) and self.server<>null;
    }
 
    compound NamedServerAssignment refines ServerAssignment{
@@ -179,7 +183,33 @@ project Applications {
        NonEmptyString resource;
    }
    
-   // ids unique
-   // service assignments defined, not duplicate and complete
+   compound ParameterServiceAssignment {
+       refTo(Service) service;
+       setOf(ParameterAssignment) parameter = {};
+   }
+   
+   abstract compound ParameterAssignment {
+       NonEmptyString parameter; // currently does not work with reference to parameter in service
+   }
+
+   compound StringParameterAssignment refines ParameterAssignment {
+       String value;
+   }
+
+   compound IntegerParameterAssignment refines ParameterAssignment {
+       Integer value;
+   }
+
+   compound RealParameterAssignment refines ParameterAssignment {
+       Real value;
+   }
+
+   compound BooleanParameterAssignment refines ParameterAssignment {
+       Boolean value;
+   }
+
+   compound LongParameterAssignment refines ParameterAssignment {
+       Integer value;
+   }
    
 }

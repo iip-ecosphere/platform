@@ -77,6 +77,9 @@ project Services {
         }*/
         //Constraint defaultValueCheck = isDefined(defaultValue);
     }
+
+    def IntegerParameter getIntegerParameter(refTo(ServiceBase) service, String param) = 
+        service.parameter->selectByType(IntegerParameter)->select(p|p.name==param).first();
     
     compound StringParameter refines Parameter {
         String defaultValue;
@@ -85,6 +88,9 @@ project Services {
         }*/
         //Constraint defaultValueCheck = isDefined(defaultValue);
     }
+    
+    def StringParameter getStringParameter(refTo(ServiceBase) service, String param) = 
+        service.parameter->selectByType(StringParameter)->select(p|p.name==param).first();
 
     compound RealParameter refines Parameter {
         Real defaultValue;
@@ -94,6 +100,9 @@ project Services {
         //Constraint defaultValueCheck = isDefined(defaultValue);
     }
 
+    def RealParameter getRealParameter(refTo(ServiceBase) service, String param) = 
+        service.parameter->selectByType(RealParameter)->select(p|p.name==param).first();
+
     compound BooleanParameter refines Parameter {
         Boolean defaultValue;
         /*assign(bindingTime = BindingTime.runtimeEnact) to {
@@ -101,6 +110,9 @@ project Services {
         }*/
         //Constraint defaultValueCheck = isDefined(defaultValue);
     }
+
+    def BooleanParameter getBooleanParameter(refTo(ServiceBase) service, String param) = 
+        service.parameter->selectByType(BooleanParameter)->select(p|p.name==param).first();
     
     compound LongParameter refines Parameter {
         Integer defaultValue;
@@ -109,6 +121,9 @@ project Services {
         }*/
         //Constraint defaultValueCheck = isDefined(defaultValue);
     }
+
+    def LongParameter getLongParameter(refTo(ServiceBase) service, String param) = 
+        service.parameter->selectByType(LongParameter)->select(p|p.name==param).first();
    
    // -------------------- services -----------------------------------
 

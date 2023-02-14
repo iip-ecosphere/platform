@@ -10,12 +10,14 @@ template DeploymentPlan(IIPEcosphere config, FileArtifact target, DeploymentPlan
         description: ${plan.description}
         ${generateArtifact(artifact)|e}
         parallelize: ${plan.parallelize}
+        allowMultiExecution: ${plan.allowMultiExecution}
         onUndeployRemoveArtifact: ${plan.onUndeployRemoveArtifact}
         disabled: ${plan.disabled}
         ${generateEnsembles(plan)|e}
         ${generateAssignments(plan)|e}
         ${generateArguments(plan)|e}
-        ${generateServers(plan)|e}'
+        ${generateServers(plan)|e}
+        ${generateParameter(plan)|e}'
     }
     
     def generateArtifact(String artifact) {
@@ -81,6 +83,51 @@ template DeploymentPlan(IIPEcosphere config, FileArtifact target, DeploymentPlan
 
     def generateServer(NamedServerAssignment assng) {
         '  - ${assng.server.id}: ${assng.hostId}'
+    }
+    
+    def generateParameter(DeploymentPlan plan) {
+        if (plan.parameter.size() > 0) {
+            'serviceParams:
+                ${generateParameterServiceAssignments(plan.parameter)}'
+        }
+    }
+    
+    def generateParameterServiceAssignments(sequenceOf(ParameterServiceAssignment) parameter) {
+        for (ParameterServiceAssignment a: parameter) {
+            '${a.service.id}:
+              ${generateParameterServiceAssignment(a)}'
+        }
+    }
+
+    def generateParameterServiceAssignment(ParameterServiceAssignment assng) {
+        for (ParameterAssignment a: assng.parameter) {
+            '  ${generateParameterAssignment(a)}'
+        }
+    }
+
+    // dispatch basis
+    def generateParameterAssignment(ParameterAssignment assng) {
+        ''
+    }
+
+    def generateParameterAssignment(IntegerParameterAssignment assng) {
+        '${assng.parameter} : ${assng.value}'
+    }
+
+    def generateParameterAssignment(StringParameterAssignment assng) {
+        '${assng.parameter} : ${assng.value}'
+    }
+
+    def generateParameterAssignment(RealParameterAssignment assng) {
+        '${assng.parameter} : ${assng.value}'
+    }
+
+    def generateParameterAssignment(BooleanParameterAssignment assng) {
+        '${assng.parameter} : ${assng.value}'
+    }
+
+    def generateParameterAssignment(LongParameterAssignment assng) {
+        '${assng.parameter} : ${assng.value}'
     }
 
 }

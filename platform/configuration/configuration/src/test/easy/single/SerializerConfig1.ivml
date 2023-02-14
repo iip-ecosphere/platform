@@ -420,7 +420,8 @@ project SerializerConfig1 {
            NamedServiceAssignment{resource="res2",services={refBy(myKi), refBy(myRtsa), refBy(myAasSink)}}
        }, 
        ensembles={{leader=refBy(mySource), member=refBy(myAnonymizer)}},
-       servers={NamedServerAssignment{server=refBy(pyServer), hostId="res1"}}
+       servers={NamedServerAssignment{server=refBy(pyServer), hostId="res1"}},
+       parameter={ParameterServiceAssignment{service=refBy(myAnonymizerService), parameter={BooleanParameterAssignment{parameter="passThrough", value=true}}}}
     };
     
     PythonServer pyServer = { // avoid flower dependencies in test
