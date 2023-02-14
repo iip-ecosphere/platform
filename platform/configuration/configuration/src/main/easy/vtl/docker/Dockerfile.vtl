@@ -11,7 +11,7 @@ template Dockerfile(IIPEcosphere config, FileArtifact target, sequenceOf(MeshEle
         'FROM openjdk:13-alpine'  // TODO Java-Version & CPU
         '${containerSettings(config, containerType, device)}'
         'RUN apk add bash'
-        if (not(collectDependencies(elements)->selectByType(SystemDependency)->select(d|d.key=='JAVA8').isEmpty())) {
+        if (not(collectDependencies(elements)->selectByKind(SystemDependency)->select(d|d.key=='JAVA8').isEmpty())) {
             'RUN apk add openjdk8'
         }
         ''
