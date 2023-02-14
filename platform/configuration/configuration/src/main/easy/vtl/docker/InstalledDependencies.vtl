@@ -1,5 +1,6 @@
 import Basics;
 import JavaBasics;
+import DockerBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
@@ -16,6 +17,14 @@ template InstalledDependencies(IIPEcosphere config, FileArtifact target, sequenc
             '    PYTHON3: /usr/local/bin/python'
         }
         '    JAVA13: /opt/openjdk-13/bin/java'
+        
+        setOf(Dependency) allDependencies = collectDependencies(elements);
+        for (SystemDependency d: allDependencies) {
+            if (d.key == 'JAVA8') {
+                '    JAVA8: /usr/lib/jvm/java-1.8-openjdk/bin/java'
+            }
+        }
+        
     }
     
 }

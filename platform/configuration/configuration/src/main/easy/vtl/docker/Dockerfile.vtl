@@ -11,6 +11,13 @@ template Dockerfile(IIPEcosphere config, FileArtifact target, sequenceOf(MeshEle
         'FROM openjdk:13-alpine'  // TODO Java-Version & CPU
         '${containerSettings(config, containerType, device)}'
         'RUN apk add bash'
+        setOf(Dependency) allDependencies = collectDependencies(elements);
+
+        for (SystemDependency d: allDependencies) {
+            if (d.key == 'JAVA8') {
+                'RUN apk add openjdk8'
+            }
+        }
         ''
         '# Installed dependencies (shall be in /)'
         'COPY installedDependencies.yml installedDependencies.yml'
