@@ -194,7 +194,9 @@ public class YamlFile {
         List<T> result = new ArrayList<T>(); // force a "conversion"
         for (int i = 0; i < list.size(); i++) {
             Object o = list.get(i);
-            if (o instanceof HashMap) {
+            if (cls.isInstance(o)) { // do we really have the issue? We had the case that it suddenly disappeared
+                result.add(cls.cast(o));
+            } else if (o instanceof HashMap) {
                 @SuppressWarnings("unchecked")
                 HashMap<Object, Object> map = (HashMap<Object, Object>) o;
                 T s = createInstance(cls);
