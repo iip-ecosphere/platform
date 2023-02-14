@@ -138,4 +138,14 @@ public class FileUtilsTest {
         Assert.assertNull(f);
     }
 
+    /**
+     * Tests {@link FileUtils#getSystemRoot()}.
+     */
+    @Test
+    public void testSystemRoot() {
+        File f = FileUtils.getSystemRoot();
+        Assert.assertNotNull(f);
+        Assert.assertTrue(f.toString().length() > 0);
+    }
+
 }

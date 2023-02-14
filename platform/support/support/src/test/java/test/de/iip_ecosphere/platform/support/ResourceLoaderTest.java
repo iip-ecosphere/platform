@@ -94,6 +94,7 @@ public class ResourceLoaderTest {
         is.close();
 
         // temporary own resolver
+        new FolderResourceResolver(); // not sure what to find there, just to call it
         FolderResourceResolver fRes = new FolderResourceResolver("./src/test/resources/META-INF/services");
         ResourceResolver myResolver = ResourceLoader.getAllRegisteredResolver(fRes); 
         is = myResolver.resolve("Logo.jpg");

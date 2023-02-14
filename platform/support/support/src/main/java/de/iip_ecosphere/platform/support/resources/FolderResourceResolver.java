@@ -17,6 +17,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import de.iip_ecosphere.platform.support.FileUtils;
+
 /**
  * A simple resource resolver that takes a given folder into account.
  * 
@@ -26,6 +28,13 @@ public class FolderResourceResolver implements ResourceResolver {
     
     private File basePath;
     private String removePrefix;
+    
+    /**
+     * Creates a folder resource resolve for the system root directory. 
+     */
+    public FolderResourceResolver() {
+        this(FileUtils.getSystemRoot());
+    }
 
     /**
      * Creates a resolver.
