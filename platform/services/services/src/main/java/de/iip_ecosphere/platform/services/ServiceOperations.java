@@ -41,6 +41,12 @@ public interface ServiceOperations {
      * Service start option, mapping of service ids to server IP addresses JSON map (string).
      */
     public static final String OPTION_SERVERS = "servers";
+    
+    /**
+     * Service start option, mapping of service ids to maps of name-value for re-configuring the service parameters 
+     * directly after start.
+     */
+    public static final String OPTION_PARAMS = "params";
 
     /**
      * Adds an artifact (and transitively the contained services) to the management domain of this instance, e.g., 
