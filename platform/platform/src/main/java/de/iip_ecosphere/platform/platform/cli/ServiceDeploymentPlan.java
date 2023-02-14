@@ -171,8 +171,10 @@ public class ServiceDeploymentPlan extends AbstractSetup {
     private boolean onUndeployRemoveArtifact = true;
     private Map<String, String> ensembles = new HashMap<>();
     private boolean disabled = false;
+    private boolean allowMultiExecution = true;
     private List<String> arguments;
     private Map<String, String> servers = new HashMap<>();
+    private Map<String, Map<String, String>> serviceParams = new HashMap<>();
 
     /**
      * Returns the name of the application.
@@ -245,7 +247,16 @@ public class ServiceDeploymentPlan extends AbstractSetup {
     public boolean isDisabled() {
         return disabled;
     }
-    
+
+    /**
+     * Returns whether the plan can be executed multiple times or only once, i.e., it checks for .
+     * 
+     * @return {@code true} for allowed multi-execution, {@code false} for single-execution else
+     */
+    public boolean isMultiExecution() {
+        return allowMultiExecution;
+    }
+
     /**
      * Returns whether artifacts shall be removed from the platform on undeployment.
      * 
@@ -291,6 +302,15 @@ public class ServiceDeploymentPlan extends AbstractSetup {
         return servers;
     }
 
+    /**
+     * Service parameters to be re-configured upon service start.
+     * 
+     * @return the service-id/name/value mapping for parameters
+     */
+    public Map<String, Map<String, String>> getServiceParams() {
+        return serviceParams;
+    }
+    
     /**
      * Returns the optional arguments.
      * 
@@ -400,6 +420,15 @@ public class ServiceDeploymentPlan extends AbstractSetup {
     }
 
     /**
+     * Returns whether the plan can be executed multiple times or only once, i.e., it checks for .
+     * 
+     * @param allowMultiExecution {@code true} for allowed multi-execution, {@code false} for single-execution else
+     */
+    public void setMultiExecution(boolean allowMultiExecution) {
+        this.allowMultiExecution = allowMultiExecution;
+    }
+
+    /**
      * Changes whether artifacts shall be removed from the platform on undeployment. [required by SnakeYaml]
      * 
      * @param onUndeployRemoveArtifact {@code true} for removal, {@code false} else
@@ -416,7 +445,7 @@ public class ServiceDeploymentPlan extends AbstractSetup {
     public void setEnsembles(Map<String, String> ensembles) {
         this.ensembles = ensembles;
     }
-    
+
     /**
      * Defines the optional servers mapping.
      * 
@@ -424,6 +453,15 @@ public class ServiceDeploymentPlan extends AbstractSetup {
      */
     public void setServers(Map<String, String> servers) {
         this.servers = servers;
+    }
+    
+    /**
+     * Service parameters to be re-configured upon service start. [SnakeYaml]
+     * 
+     * @param serviceParams the service-id/name/value mapping for parameters
+     */
+    public void setServiceParams(Map<String, Map<String, String>> serviceParams) {
+        this.serviceParams = serviceParams;
     }
     
     /**

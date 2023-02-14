@@ -193,11 +193,12 @@ public class PlatformAas implements AasContributor {
      * Called to notify that a new instance of the application <code>appId</code> is about to be started.
      * 
      * @param appId the application id
+     * @param planId the id of the plan starting the application
      * @return the id of the new instance to be passed on to the service starts, may be <b>null</b> 
      *    for default/legacy start
      */
-    static String notifyAppNewInstance(String appId) {
-        return ApplicationInstanceAasConstructor.notifyAppNewInstance(appId);
+    static String notifyAppNewInstance(String appId, String planId) {
+        return ApplicationInstanceAasConstructor.notifyAppNewInstance(appId, planId);
     }
     
     /**

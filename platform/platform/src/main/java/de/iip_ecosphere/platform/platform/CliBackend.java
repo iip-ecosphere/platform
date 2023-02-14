@@ -55,6 +55,7 @@ import de.iip_ecosphere.platform.support.TaskRegistry.TaskData;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
+import de.iip_ecosphere.platform.support.iip_aas.ApplicationInstancesAasClient;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
 import de.iip_ecosphere.platform.support.net.UriResolver;
 
@@ -485,6 +486,11 @@ class CliBackend {
             options.put(ServicesClient.OPTION_SERVERS, JsonUtils.toJson(servers));
         }
 
+        Map<String, Map<String, String>> sParams = plan.getServiceParams();
+        if (null != sParams && sParams.size() > 0) {
+            options.put(ServicesClient.OPTION_PARAMS, JsonUtils.toJson(sParams));
+        }
+
         if (options.size() == 0) {
             options = null;
         }
@@ -503,7 +509,14 @@ class CliBackend {
         ServiceDeploymentPlan p = loadPlan(plan);
         String appInstanceId = null;
         try {
-            appInstanceId = PlatformAas.notifyAppNewInstance(p.getAppId());
+            if (!p.isMultiExecution()) {
+                ApplicationInstancesAasClient cl = new ApplicationInstancesAasClient();
+                if (cl.getInstanceCount(p.getAppId(), p.getId()) > 0) {
+                    throw new ExecutionException("Plan " + p.getId() + " is specified to prevent multiple execution of"
+                        + " application " + p.getAppId() + ", which is already running", null);
+                }
+            }
+            appInstanceId = PlatformAas.notifyAppNewInstance(p.getAppId(), p.getId());
             deployContainers(p);
             URI artifact = toUri(p.getArtifact());
             Map<String, ServicesClient> serviceClients = new HashMap<>();
