@@ -34,6 +34,7 @@ public class ApplicationInstanceAasConstructor {
 
     public static final String NAME_SUBMODEL_APPINSTANCES = "ApplicationInstances";
     public static final String NAME_PROP_APPID = "appId";
+    public static final String NAME_PROP_PLANID = "planId";
     public static final String NAME_PROP_INSTANCEID = "instanceId";
     public static final String NAME_PROP_TIMESTAMP = "timestamp";
 
@@ -41,10 +42,11 @@ public class ApplicationInstanceAasConstructor {
      * Called to notify that a new instance of the application <code>appId</code> is about to be started.
      * 
      * @param appId the application id
+     * @param planId the id of the deployment plan starting the plan
      * @return the id of the new instance to be passed on to the service starts, may be <b>null</b> 
      *    for default/legacy start
      */
-    public static String notifyAppNewInstance(String appId) {
+    public static String notifyAppNewInstance(String appId, String planId) {
         AtomicReference<String> result = new AtomicReference<String>(null);
         ActiveAasBase.processNotification(NAME_SUBMODEL_APPINSTANCES, NotificationMode.SYNCHRONOUS, (sub, aas) -> {
             int newId = -1;
@@ -67,6 +69,9 @@ public class ApplicationInstanceAasConstructor {
             dBuilder.createPropertyBuilder(NAME_PROP_APPID)
                 .setValue(Type.STRING, appId)
                 .build();
+            dBuilder.createPropertyBuilder(NAME_PROP_PLANID)
+                .setValue(Type.STRING, planId)
+                .build();
             dBuilder.createPropertyBuilder(NAME_PROP_INSTANCEID)
                 .setValue(Type.STRING, newId)
                 .build();
@@ -86,7 +91,7 @@ public class ApplicationInstanceAasConstructor {
      * 
      * @param appId the application id of the instance that was stopped
      * @param instanceId the instance id of the instance, may be <b>null</b> or empty for legacy application starts
-     * @return the remaining instances
+     * @return the remaining instances (across all deployment plans)
      */
     public static int notifyAppInstanceStopped(String appId, String instanceId) {
         final AtomicInteger result = new AtomicInteger(0);
@@ -97,7 +102,7 @@ public class ApplicationInstanceAasConstructor {
             if (null != coll) {
                 coll.deleteElement(id);
             }
-            result.set(countAppInstances(appId, sub));
+            result.set(countAppInstances(appId, null, sub));
         });
         return result.get();
     }
@@ -106,16 +111,21 @@ public class ApplicationInstanceAasConstructor {
      * Return the number of application instances with the given {@code appId}.
      * 
      * @param appId the application id to look for
+     * @param planId the deployment plan id to filter for, may be empty or <b>null</b> to not filter for 
+     *     deployment plans
      * @param sub the submodel to take the data from
      * @return the number of instances
      */
-    static int countAppInstances(String appId, Submodel sub) {
+    static int countAppInstances(String appId, String planId, Submodel sub) {
         int result = 0;
         for (SubmodelElement elt: sub.submodelElements()) {
             if (elt instanceof SubmodelElementCollection) {
                 SubmodelElementCollection coll = (SubmodelElementCollection) elt;
                 if (appId.equals(AasUtils.getPropertyValueAsStringSafe(coll, NAME_PROP_APPID, null))) {
-                    result++;
+                    if (null == planId || planId.isEmpty() 
+                        || planId.equals(AasUtils.getPropertyValueAsStringSafe(coll, NAME_PROP_PLANID, null))) {
+                        result++;
+                    }
                 }
             }
         }

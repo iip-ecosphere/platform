@@ -31,13 +31,25 @@ public class ApplicationInstancesAasClient extends SubmodelClient {
     }
 
     /**
-     * Return the number of application instances with the given {@code appId}.
+     * Return the number of application instances with the given {@code appId} irrespective of deployment plans.
      * 
      * @param appId the application id to look for
      * @return the number of instances
      */
     public int getInstanceCount(String appId) {
-        return ApplicationInstanceAasConstructor.countAppInstances(appId, getSubmodel());
+        return ApplicationInstanceAasConstructor.countAppInstances(appId, null, getSubmodel());
+    }
+
+    /**
+     * Return the number of application instances with the given {@code appId} irrespective of deployment plans.
+     * 
+     * @param appId the application id to look for
+     * @param planId the deployment plan id to filter for, may be empty or <b>null</b> to not filter for 
+     *     deployment plans
+     * @return the number of instances
+     */
+    public int getInstanceCount(String appId, String planId) {
+        return ApplicationInstanceAasConstructor.countAppInstances(appId, planId, getSubmodel());
     }
 
 }
