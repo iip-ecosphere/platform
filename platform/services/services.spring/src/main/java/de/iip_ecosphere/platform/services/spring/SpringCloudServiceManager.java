@@ -43,6 +43,7 @@ import de.iip_ecosphere.platform.services.ServiceDescriptor;
 import de.iip_ecosphere.platform.services.ServiceFactoryDescriptor;
 import de.iip_ecosphere.platform.services.ServiceManager;
 import de.iip_ecosphere.platform.services.ServicesAas;
+import de.iip_ecosphere.platform.services.ServicesAasClient;
 import de.iip_ecosphere.platform.services.TypedDataConnectorDescriptor;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.services.environment.spring.Starter;
@@ -492,6 +493,38 @@ public class SpringCloudServiceManager
         return netClient;
     }
 
+    /**
+     * Reconfigures {@code service} if {@code started} with {@params}.
+     * 
+     * @param service the service to be reconfigured
+     * @param started whether it was (just) started
+     * @param options the options to reconfigure (serviceId/name/value)
+     * @throws ExecutionException if reconfiguration failed
+     */
+    @SuppressWarnings("unchecked")
+    private static void reconfigure(SpringCloudServiceDescriptor service, boolean started, Map<String, String> options) 
+        throws ExecutionException {
+        if (started && null != options) {
+            String txt = options.get(OPTION_PARAMS);
+            if (null != txt) {
+                Map<Object, Object> allParams = JsonUtils.fromJson(txt, Map.class);
+                Object tmp = allParams.get(service.getId());
+                if (tmp instanceof Map) {
+                    try {
+                        Map<String, String> params = new HashMap<>();
+                        for (Map.Entry<Object, Object> e : ((Map<Object, Object>) tmp).entrySet()) {
+                            params.put(e.getKey().toString(), e.getValue().toString());
+                        }
+                        ServicesAasClient client = new ServicesAasClient(Id.getDeviceIdAas());
+                        client.reconfigureService(service.getId(), params);
+                    } catch (IOException e) {
+                        throw new ExecutionException(e);
+                    }
+                }
+            }
+        }
+    }
+
     @Override
     public void startService(Map<String, String> options, String... serviceIds) throws ExecutionException {
         startServers(options);
@@ -558,6 +591,7 @@ public class SpringCloudServiceManager
                         LOGGER.info("Starting ensemble service " + sId + " failed");
                     }
                 }
+                reconfigure(service, started, options);
                 netClient = markServerUse(started, service, netClient);
             }
             Transport.sendProcessStatus(PROGRESS_COMPONENT_ID, step++, serviceIds.length + 1, "Started " + sId);
