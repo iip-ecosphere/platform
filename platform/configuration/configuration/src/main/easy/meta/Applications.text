@@ -52,6 +52,7 @@ Applications::DeploymentPlan::id = Unique id of the deployment plan.
 Applications::DeploymentPlan::ver = Version of the deployment plan.
 Applications::DeploymentPlan::description = Description of the (purpose of the) deployment plan.
 Applications::DeploymentPlan::parallelize = Is parallel execution of the deployment plan permitted.
+Applications::DeploymentPlan::allowMultiExecution = Enables or prevents execution of multiple application instances specified in this deployment plan.  
 Applications::DeploymentPlan::onUndeployRemoveArtifact = Shall artifacts be removed on undeployment or shall they be left over.
 Applications::DeploymentPlan::disabled = Is the plan enabled or disabled.
 Applications::DeploymentPlan::cmdArgs = Optional comma separated command line arguments for the services.
