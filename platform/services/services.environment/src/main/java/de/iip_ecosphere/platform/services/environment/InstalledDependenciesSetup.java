@@ -149,7 +149,7 @@ public class InstalledDependenciesSetup extends AbstractSetup {
     
     /**
      * Reads the given yaml file via the {@link ResourceLoader}, taking into account the system property 
-     * {@link #PROPERTY_PATH} or the current directory as additional resource folder. [for testing]
+     * {@link #PROPERTY_PATH}, the current directory as additional resource folder and the file system root.
      * 
      * @param fileName the file to read
      * @return the setup instance, if not found the default instance
@@ -157,7 +157,8 @@ public class InstalledDependenciesSetup extends AbstractSetup {
     public static InstalledDependenciesSetup readFromYaml(String fileName) {
         InstalledDependenciesSetup result = null;
         InputStream in = ResourceLoader.getResourceAsStream(fileName, 
-            new FolderResourceResolver(System.getProperty(PROPERTY_PATH, ".")));
+            new FolderResourceResolver(System.getProperty(PROPERTY_PATH, ".")),
+            new FolderResourceResolver()); // also look in system root
         if (null != in) {
             try {
                 result = readFromYaml(InstalledDependenciesSetup.class, in);
@@ -173,7 +174,8 @@ public class InstalledDependenciesSetup extends AbstractSetup {
     }
     
     /**
-     * Reads the default yaml file.
+     * Reads the default yaml file, taking into account the system property 
+     * {@link #PROPERTY_PATH}, the current directory as additional resource folder and the file system root.
      * 
      * @return the setup instance, if not found the default instance
      */

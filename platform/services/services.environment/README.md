@@ -42,7 +42,7 @@ Some services have specific requirements regarding their execution environment, 
       
 The path listing always starts with the keyword `locations`. Below, the logical names and their respective operating system dependent installation locations are stated. By default, the installed dependencies mechanism knows the actual Java version it is running within. For that default Java, the logical name is `JAVA`. Further, there is an entry based on the actual version, e.g., `JAVA8`, `JAVA11`, `JAVA13`. So far, `JAVA` as well as `JAVA8` and `JAVA11` are the only pre-defined names as they are used in platform service implementation code. All other names, in particular for Python are (currently) defined in the configuration model and attached to the service definitions there. 
 
-The container generation of the platform instantiation produces and installs a `installedDependencies.yml` by default. If you head for individual installations, please take care of a respective `installedDependencies.yml` file.
+The container generation of the platform instantiation produces and installs a `installedDependencies.yml` by default. If you head for individual installations, please take care of a respective `installedDependencies.yml` file. The `installedDependencies.yml` may be located in the classpath, the actual directory or the system root directory.
 
 ## missing
 
