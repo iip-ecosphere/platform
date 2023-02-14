@@ -1,7 +1,7 @@
 <div class="background">
   <h1>Deployment Plans</h1>
 
-  <mat-form-field appearance="outline">
+  <!-- <mat-form-field appearance="outline">
     <mat-label>Deployment Plan</mat-label>
     <mat-select *ngIf="deploymentPlans" [(value)]="selected">
       <mat-option *ngFor="let plan of deploymentPlans.value" [value]="plan">
@@ -11,5 +11,26 @@
   </mat-form-field>
   <mat-card>selected: <span *ngIf="selected && selected.value" style="background-color: white; color:black">{{ getName(selected.value) }}</span></mat-card>
   <button mat-raised-button class="button" (click)="deploy()">deploy</button>
-  <button mat-raised-button style="background-color: rgb(255,204,0)" (click)="undeploy()">udeploy</button>
+  <button mat-raised-button style="background-color: rgb(255,204,0)" (click)="undeploy()">udeploy</button> -->
+
+  <mat-list *ngIf="deploymentPlans; else noPlans">
+    <div *ngFor="let plan of deploymentPlans.value">
+      <mat-list-item >
+        <div class="container">
+          <span>{{ getName(plan.value) }}</span>
+          <span>
+            <button mat-raised-button class="button" (click)="deploy(plan)">deploy</button>
+            <button mat-raised-button style="background-color: rgb(255,204,0)" (click)="undeploy(plan)">udeploy</button>
+          </span>
+        </div>
+      </mat-list-item>
+      <mat-divider></mat-divider>
+    </div>
+  </mat-list>
+  <ng-template #noPlans>
+    <div>
+      <span>no deployment plans found</span>
+    </div>
+  </ng-template>
+
 </div>

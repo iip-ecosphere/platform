@@ -18,6 +18,8 @@ import {MatSelectModule} from '@angular/material/select';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {MatSidenavModule} from '@angular/material/sidenav';
+import {MatListModule} from '@angular/material/list';
+import {MatDividerModule} from '@angular/material/divider';
 
 import { ResourcesComponent } from './components/resources/resources.component';
 import { ContainersComponent } from './components/containers/containers.component';
@@ -67,6 +69,8 @@ import { FlowchartComponent } from './components/flowchart/flowchart.component';
     MatSnackBarModule,
     MatProgressSpinnerModule,
     MatSidenavModule,
+    MatListModule,
+    MatDividerModule
   ],
   providers: [{
     provide:HTTP_INTERCEPTORS,

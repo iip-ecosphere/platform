@@ -39,22 +39,29 @@ export class DeploymentPlansComponent implements OnInit {
     return Array.isArray(value);
   }
 
-  public async deploy() {
-    if(this.selected && this.selected.value) {
-      let params = this.deployPlanInput;
+  public async deploy(plan?: Resource) {
+    let params = this.deployPlanInput;
+    if(!plan && this.selected && this.selected.value) {
        let value = this.selected.value.find(item => item.idShort === "uri");
        if (value) {
         params[0].value.value = value.value;
        }
       const response = await this.deployer.deployPlan(params);
       this.selected = undefined;
+    } else if(plan && plan.value) {
+      let value = plan.value.find(item => item.idShort === "uri");
+      if(value) {
+        params[0].value.value = value.value;
+      }
+      const response = await this.deployer.deployPlan(params);
+
     }
 
   }
 
-  public async undeploy() {
-    if(this.selected && this.selected.value) {
-      let params = this.deployPlanInput;
+  public async undeploy(plan?: Resource) {
+    let params = this.undeployPlanInput;
+    if(!plan && this.selected && this.selected.value) {
        let value = this.selected.value.find(item => item.idShort === "uri");
        if (value) {
         params[0].value.value = value.value;
@@ -62,6 +69,12 @@ export class DeploymentPlansComponent implements OnInit {
       const response = this.deployer.deployPlan(params, true);
       this.selected = undefined;
       console.log(response);
+    } else if(plan && plan.value) {
+      let value = plan.value.find(item => item.idShort === "uri");
+      if(value) {
+        params[0].value.value = value.value;
+      }
+      const response = await this.deployer.deployPlan(params);
     }
   }
 
