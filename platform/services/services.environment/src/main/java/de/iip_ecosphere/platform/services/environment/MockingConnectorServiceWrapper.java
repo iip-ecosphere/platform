@@ -15,7 +15,6 @@ package de.iip_ecosphere.platform.services.environment;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Supplier;
 
@@ -232,10 +231,6 @@ public class MockingConnectorServiceWrapper<O, I, CO, CI> extends ConnectorServi
 
     @Override
     public void switchTo(String targetId) throws ExecutionException {
-    }
-
-    @Override
-    public void reconfigure(Map<String, String> values) throws ExecutionException {
     }
 
     @Override

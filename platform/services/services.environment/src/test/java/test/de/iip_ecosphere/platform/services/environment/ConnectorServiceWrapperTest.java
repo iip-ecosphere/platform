@@ -30,6 +30,8 @@ import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.support.iip_aas.Version;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -227,6 +229,15 @@ public class ConnectorServiceWrapperTest {
 
         wrapper.enableNotifications(false);
         wrapper.enablePolling(true);
+        
+        Assert.assertEquals("myPathOut", wrapper.getOutPath("myPathOut"));
+        Assert.assertEquals("myPathIn", wrapper.getInPath("myPathIn"));
+        Map<String, String> values = new HashMap<>();
+        values.put("inPath", "/pi/1/");
+        values.put("outPath", "/po/2/");
+        wrapper.reconfigure(values);
+        Assert.assertEquals("/po/2/", wrapper.getOutPath("myPathOut"));
+        Assert.assertEquals("/pi/1/", wrapper.getInPath("myPathIn"));
     }
 
     /**

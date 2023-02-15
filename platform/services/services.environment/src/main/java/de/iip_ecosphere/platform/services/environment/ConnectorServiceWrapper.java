@@ -14,7 +14,9 @@ package de.iip_ecosphere.platform.services.environment;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Supplier;
 
@@ -23,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import de.iip_ecosphere.platform.connectors.Connector;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
+import de.iip_ecosphere.platform.transport.serialization.TypeTranslators;
 
 /**
  * Wraps a connector into a service. Implicitly reacts on parameter "inPath" and "outPath" as string to override
@@ -39,6 +42,7 @@ public class ConnectorServiceWrapper<O, I, CO, CI> extends AbstractService {
 
     private Connector<O, I, CO, CI> connector;
     private Supplier<ConnectorParameter> connParamSupplier;
+    private Map<String, ParameterConfigurer<?>> paramConfigurers = new HashMap<>();
     private String outPath; // the runtime-reconfigured data path
     private String inPath; // the runtime-reconfigured data path
 
@@ -54,6 +58,11 @@ public class ConnectorServiceWrapper<O, I, CO, CI> extends AbstractService {
         super(yaml);
         this.connector = connector;
         this.connParamSupplier = connParamSupplier; 
+        
+        AbstractService.addConfigurer(paramConfigurers, "outPath", String.class, TypeTranslators.STRING, 
+            v -> setOutPath(v), () -> outPath);
+        AbstractService.addConfigurer(paramConfigurers, "inPath", String.class, TypeTranslators.STRING, 
+            v -> setInPath(v), () -> inPath);
     }
 
     /**
@@ -138,10 +147,6 @@ public class ConnectorServiceWrapper<O, I, CO, CI> extends AbstractService {
     public void switchTo(String targetId) throws ExecutionException {
     }
 
-    @Override
-    public void reconfigure(Map<String, String> values) throws ExecutionException {
-    }
-
     /**
      * Enable/disable polling (does not influence the polling timer).
      * 
@@ -162,12 +167,34 @@ public class ConnectorServiceWrapper<O, I, CO, CI> extends AbstractService {
     }
 
     @Override
-    protected void notifyReconfigured(String paramName, String value) {
-        connector.notifyReconfigured(paramName, value);
-        if ("outPath".equals(paramName) && value != null && value.length() > 0) {
-            outPath = value;
-        } else if ("inPath".equals(paramName) && value != null && value.length() > 0) {
-            inPath = value;
+    public ParameterConfigurer<?> getParameterConfigurer(String paramName) {
+        return paramConfigurers.get(paramName);
+    }
+    
+    @Override
+    public Set<String> getParameterNames() {
+        return paramConfigurers.keySet();
+    }
+    
+    /**
+     * Changes {@link #inPath}.
+     * 
+     * @param inPath the in path (ignored if <b>null</b> or empty)
+     */
+    private void setInPath(String inPath) {
+        if (inPath != null && inPath.length() > 0) {
+            this.inPath = inPath;
+        }
+    }
+    
+    /**
+     * Changes {@link #outPath}.
+     * 
+     * @param outPath the out path (ignored if <b>null</b> or empty)
+     */
+    private void setOutPath(String outPath) {
+        if (outPath != null && outPath.length() > 0) {
+            this.outPath = outPath;
         }
     }
     
@@ -179,7 +206,7 @@ public class ConnectorServiceWrapper<O, I, CO, CI> extends AbstractService {
      */
     public String getOutPath(String cfgPath) {
         String result = cfgPath;
-        if (null == outPath) {
+        if (outPath != null) {
             result = outPath;
         }
         return result;
@@ -193,7 +220,7 @@ public class ConnectorServiceWrapper<O, I, CO, CI> extends AbstractService {
      */
     public String getInPath(String cfgPath) {
         String result = cfgPath;
-        if (null == inPath) {
+        if (inPath != null) {
             result = inPath;
         }
         return result;
