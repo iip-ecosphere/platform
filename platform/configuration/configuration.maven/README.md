@@ -7,7 +7,9 @@ Maven plugin for the following platform installation tasks (represented as Maven
 * generateApps: app interfaces with apps including artifact dependencies - executed always
 * generateBroker: create a sample broker - executed only if `outputDirectory` is empty or IVML files in `modelDirectory`are newer than `outputDirectory`
 * generatePlatform: exclusively platform components - executed only if `outputDirectory` is empty or IVML files in `modelDirectory`are newer than `outputDirectory`
-* generateAll: generate everyting
+* generateAll: generate everything
+
+When you added this plugin to your POM, you may also execute the goals individually, e.g., using `mvn configuration:generateApps`. Depending on your setup it may be required that you may have to add a profile, e.g, in the platform examples `mvn -P EasyGen configuration:generateApps`.
 
 A typical setup (an all-in-one-project implementation), happens in conjunction with the extended unpack resources plugin. As shown below, in the `generate-sources` phase, the configuration meta model is obtained, then in `generate-sources` the applications are instantiated without dependencies. For this, it is important that the`dependency-plugin` is stated in the same profile before this plugin and its executions. Not shown is the remaining setup for service implementation, which would happen in the `compile` and `test` phases. Finally, in the `package` phase the full applications are generated and assembled.
 
