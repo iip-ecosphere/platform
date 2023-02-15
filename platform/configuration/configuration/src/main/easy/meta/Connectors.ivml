@@ -194,6 +194,16 @@ project Connectors {
        CacheMode cacheMode = CacheMode::NONE;
        String deviceServiceKey;
        ServiceKind kind = ServiceKind.SOURCE_SERVICE;
+       Parameters parameter = {
+           StringParameter {
+              name="outPath", // default parameter, changes machine output data path
+              defaultValue="" // interpreted by ConnectorServiceWrapper as not set
+           }, StringParameter {
+              name="inPath",  // default parameter, changes machine input data path
+              defaultValue="" // interpreted by ConnectorServiceWrapper as not set
+           }
+       };
+       
 
        Constraint connectorOutputSize = fwdTypes(output).size() < 2;
        Constraint connectorInputSize = fwdTypes(input).size() < 2;

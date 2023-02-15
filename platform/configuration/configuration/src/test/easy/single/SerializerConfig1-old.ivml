@@ -49,7 +49,6 @@ project SerializerConfig1Old {
         traceRcv = TraceKind::TRACE,
         traceSent = TraceKind::TRACE,        
         output = {{type=refBy(StringType)}}
-        // TODO parameter
     };
     
     RecordType testType = {
