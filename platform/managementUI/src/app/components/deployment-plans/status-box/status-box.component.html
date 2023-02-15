@@ -1,20 +1,19 @@
 <mat-card *ngIf="status && status.executionState != ''" style="background: RGB(35, 142, 183);">
 
-        <mat-card-content *ngIf="status.messages" style="display: flex; justify-content:center; align-items:center;">
-          <!--style="display: flex; justify-content:center; align-items:center;"-->
-<!--*ngIf="status.executionState != 'Completed'"-->
-
-                      <div >
-                        <div *ngIf="status" >Status: {{ status.executionState }}</div><br>
-                        <div *ngFor="let message of status.messages">
-                          {{message}}
-                        </div>
-                        <mat-progress-spinner  [diameter]="50" mode="indeterminate" ></mat-progress-spinner>
-                      </div>
-
-                      <div *ngIf="status.executionState == 'Completed'">
-                        <button mat-raised-button class="button" (click)="dismiss()" style="background:red">dismiss</button>
-                      </div>
-
+        <mat-card-content *ngIf="status.messages" >
+          <div style="display: flex; justify-content: flex-end">
+            <!-- *ngIf="status.executionState == 'Completed'" -->
+            <div>
+              <button mat-raised-button class="button" style="align-self: flex-end" (click)="dismiss()" style="background:red">X</button>
+            </div>
+          </div>
+          <div style="display: flex; justify-content: center;">
+            <div>
+              <div *ngIf="status" >Status: {{ status.executionState }}</div><br>
+              <div *ngFor="let message of status.messages"> {{message}}</div>
+            </div>
+            <div style="width: 50px"></div>
+            <div><mat-progress-spinner [diameter]="50" mode="indeterminate" ></mat-progress-spinner></div>
+          </div>
         </mat-card-content>
 </mat-card>
