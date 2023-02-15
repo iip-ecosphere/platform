@@ -4,10 +4,11 @@ The virtual IIP-Ecosphere Industry 4.0/IIoT platform aims at demonstrating new a
 
 ## News
 
+* **February 2023:** Started integration of federated learning framework [Flower](https://flower.dev/).
 * **New in 2023:** IIP-Ecosphere demonstrators from the [IIP-Ecosphere innovation idea competition](https://www.iip-ecosphere.de/ideenwettbewerb/). Stay tuned - also external components by new IIP-Ecosystem partners may be introduced.
-* **January 2023:** IIP-Ecosphere platform now relies on JDK 11 and BaSyx 1.3.0.
-* **In preparation:** Development container for service implemenation and (video) material from service integration workshop.
+* **In publication:** Development container for service implemenation and (video) material from service integration workshop.
 * **In development:** Distributed testing/evaluation environment for platform and applications
+* IIP-Ecosphere platform now relies on JDK 11 and BaSyx 1.3.0.
 * Improved build process integration: Python "compile"/test, platform instantiator and Maven orchestrator build plugins for simplified platform and application build processes
 * Improved Python code integration: More Pythonic data type generation and Eclipse Editor support for PyDev.
 
