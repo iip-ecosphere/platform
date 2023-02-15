@@ -390,6 +390,10 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
     /*def convName(ByteArrayTypeType type) { // currently no method in interface, needed?
     }*/
 
+    def convName(StringArrayTypeType type) {
+        "StringArray"
+    }
+
     def convName(IntegerArrayTypeType type) {
         "IntegerArray"
     }

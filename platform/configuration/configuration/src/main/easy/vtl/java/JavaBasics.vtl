@@ -129,7 +129,7 @@ template JavaBasics(Configuration config, FileArtifact target) {
 	
     def String toTypeName(ArrayType type) {
         toTypeName(type.type) + "[]";
-    } // implies ByteArrayTypeType, IntegerArrayTypeType, DoubleArrayTypeType
+    } // implies ByteArrayTypeType, IntegerArrayTypeType, DoubleArrayTypeType, StringArrayTypeType
 
     def String toTypeName(IEC61131_3DateTimeTypeType type) {
         "java.util.Date";

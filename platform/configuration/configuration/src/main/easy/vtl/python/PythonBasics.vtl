@@ -130,7 +130,7 @@ template PythonBasics(Configuration config, FileArtifact target) {
 	
     def String toTypeName(ArrayType type) {
         "list";
-    } // implies IntegerArrayTypeType, DoubleArrayTypeType 
+    } // implies ByteArrayTypeType, IntegerArrayTypeType, DoubleArrayTypeType, StringArrayTypeType 
 
     def String toTypeName(ByteArrayTypeType type) {
         "bytearray";

@@ -225,6 +225,13 @@ project DataTypes {
         name = "double[]",
         type = refBy(DoubleType)
     };
+
+    compound StringArrayTypeType refines ArrayType {
+    }
+    StringArrayTypeType StringArrayType = {
+        name = "String[]",
+        type = refBy(StringType)
+    };
     
     compound IEC61131_3DateTimeTypeType refines PrimitiveType {
     }
