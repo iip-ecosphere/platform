@@ -495,5 +495,24 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
         }
         result;
     }
+    
+    // dispatch basis
+    def getPath(DataType type) {
+        ''
+    }
+    
+    def getPath(RecordType type) {
+        type.path;
+    }
+    
+    // path expression substitution, pathEx usually a string constant, to be prefixed by pathVar
+    // of pathEx starts with quote + pathPrefix
+    def String substPathEx(String pathEx, String pathPrefix, String pathVar) {
+        String resultEx = pathEx;
+        if (resultEx.startsWith('"' + pathPrefix)) {
+            resultEx = pathVar + ' + "' + resultEx.substring(pathPrefix.length() + 1);
+        }
+        resultEx;
+    }
 
 }

@@ -98,12 +98,12 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         if (conn.inAdapterClass.length() > 0) {
             inAdapter = "new ${conn.inAdapterClass}()";
         } else {
-            inAdapter = "new MachineInputTranslator()";
+            inAdapter = "new MachineInputTranslator(inPathSupplier)";
         }
         if (conn.outAdapterClass.length() > 0) {
             outAdapter = "new ${conn.outAdapterClass}()";
         } else {
-            outAdapter = "new MachineOutputTranslator()";
+            outAdapter = "new MachineOutputTranslator(outPathSupplier)";
         }
         
         '${adapterType(conn, false)} ${varName};
@@ -154,7 +154,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
                 inSerializer = "(Serializer<"+asTypeName(getFirstTypeName(conn.input))+">) TypeTranslators.createSerializer(getClass().getClassLoader(), \"" + conn.inSerializerClass + "\")";
             }
         } else {
-            inSerializer = "new ${asTypeName(conn.name)}FormatterSerializer(${escapeString(getEncoding(conn))}, null)";
+            inSerializer = "new ${asTypeName(conn.name)}FormatterSerializer(${escapeString(getEncoding(conn))}, null, inPathSupplier)";
         }
         if (conn.outSerializerClass.length() > 0) {
             if (conn.outSerializerClass == "*") {
@@ -163,7 +163,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
                 outSerializer = "(Serializer<"+asTypeName(getFirstTypeName(conn.output))+">) TypeTranslators.createSerializer(getClass().getClassLoader(), \"" + conn.outSerializerClass + "\")";
             }
         } else {
-            outSerializer = "new ${asTypeName(conn.name)}ParserSerializer(${escapeString(getEncoding(conn))}, null)";
+            outSerializer = "new ${asTypeName(conn.name)}ParserSerializer(${escapeString(getEncoding(conn))}, null, outPathSupplier)";
         }
 
         String inAdapter;
@@ -240,7 +240,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         typeOut.remove(pltfType);
         for (RecordType t : typeOut.keys()->sortedBy(m|m.name)) {
             String tName = toTypeName(t);
-            'private void to${tName}(ModelAccess access, ModelInputConverter inConverter, ${tName} ${typeOutVars.get(t)}) throws IOException {
+            'private void to${tName}(ModelAccess access, ModelInputConverter inConverter, ${tName} ${typeOutVars.get(t)}, String path) throws IOException {
                 ${emitAsLines(typeOut.get(t))}
             }\n'
         }
@@ -250,6 +250,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         public ${coType} to(${oType} source) throws IOException {
             ModelAccess access = getModelAccess();
             final ModelInputConverter inConverter = access.getInputConverter();
+            final String path = pathSupplier == null ? "${topPath}" : pathSupplier.get();
             
             ${coType} result = new ${coType}${add}();
             ${translateDataOperations(assng, imType, imTypePath, pltfType, "result", done)}
@@ -291,6 +292,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         public ${iType} from(${ciType} data) throws IOException {
             ModelAccess access = getModelAccess();
             final ModelOutputConverter outConverter = access.getOutputConverter();
+            final String path = pathSupplier == null ? "${topPath}" : pathSupplier.get();
             
             ${translateDataOperations(assng, imType, imTypePath, pltfType, "data", done)}
             ${emitAsLines(topTypeOut)}
@@ -315,9 +317,9 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
             typeOut.add(type, text); // just override, even if it comes multiple times it's for the same type
             typeOutVars.add(type, tmpVar);
             if (dataTransferTo) {
-                out = 'to${toTypeName(type)}(access, inConverter, ${tmpVar});';
+                out = 'to${toTypeName(type)}(access, inConverter, ${tmpVar}, path);';
             } else {
-                out = 'from${toTypeName(type)}(access, outConverter, data);\n';
+                out = 'from${toTypeName(type)}(access, outConverter, data, path);\n';
             }
         } else {
             typeOut.add(topType, appendWithNewline(typeOut.get(topType), text));
@@ -340,16 +342,17 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
        } else {
            p = path + "/" + getFieldNameForPath(field);
        }
+       p = substPathEx('"${p}"', topPath, "path");
        if (set) {
            if (not(genFrom)) {
                wrapOptional(field, path + ".set" + asMethodNameSuffix(field.name) + "(" + value + ")", args="access, a", optFind="access.", optReplace="a.") + "${setEnd}"; 
            } else {
                if (convName(field.type) <> "") { // is there a conversion?
-                   wrapOptional(field, "access.set(\"" + p +"\", " + genConvertOp("outConverter", field.type, "from", value) + ")", args="access, a", optFind="access.", optReplace="a.") + "${setEnd}"; 
+                   wrapOptional(field, "access.set(${p}, " + genConvertOp("outConverter", field.type, "from", value) + ")", args="access, a", optFind="access.", optReplace="a.") + "${setEnd}"; 
                }
            }
        } else {
-           String ex = "access.get(\"" + p +"\", ${cachingTime(field)})";
+           String ex = "access.get(${p}, ${cachingTime(field)})";
            '${genConvertOp("inConverter", field.type, "to", ex)}';
        }
     }
@@ -394,7 +397,8 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
                 path = getFieldNameForPath(field);
             }
             nestedStepCount = nestedStepCount + 1;
-            '\n\naccess = access.stepInto("${path}");'
+            path = substPathEx('"${path}"', topPath, "path");
+            '\n\naccess = access.stepInto(${path});'
         }
         '${produceDataTransfer(type, mapping, typeQual, mapQual, done, indexes, paths)}'
         if (not(genFrom) and optWithStepIn and nestedStepCount > 0) {
@@ -448,6 +452,12 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         '
         private static class MachineOutputTranslator extends AbstractConnectorOutputTypeTranslator<${oType}, ${coType}> {
 
+            private Supplier<String> pathSupplier;
+        
+            private MachineOutputTranslator(Supplier<String> pathSupplier) {
+                this.pathSupplier = pathSupplier;
+            }
+
             ${genOutputTransTo(conn.outInterface, getFirstType(conn.output), conn.operations, oType, coType)}
         
             @Override
@@ -481,6 +491,12 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
             String iType = getMachineInputTypeName(conn);
         '
         private static class MachineInputTranslator extends AbstractConnectorInputTypeTranslator<${ciType}, ${iType}> {
+
+            private Supplier<String> pathSupplier;
+        
+            private MachineInputTranslator(Supplier<String> pathSupplier) {
+                this.pathSupplier = pathSupplier;
+            }
         
             ${genOutputTransFrom(conn.inInterface, getFirstType(conn.input), conn.operations, iType, ciType)}
         

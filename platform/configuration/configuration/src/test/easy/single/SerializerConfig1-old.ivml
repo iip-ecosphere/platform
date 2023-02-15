@@ -69,7 +69,7 @@ project SerializerConfig1Old {
     };
     
     RecordType myConnMachineIn = {
-        path = "/opc/mach/",
+        path = "/opc/machIn",
         name = "myConnMachineIn",
         fields = {
             Field {
@@ -104,7 +104,7 @@ project SerializerConfig1Old {
     };
 
     RecordType myConnMachineOut = {
-        path = "/opc/mach/",
+        path = "/opc/machOut",
         name = "myConnMachineOut",
         fields = {
             Field {

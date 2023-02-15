@@ -9,6 +9,7 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
     String className, setOf(AssignmentOperation) assng) extends DataOperationBasics {
 
     String add = "";
+    String topPath = "";
 
     // temporary
     String index = "";
@@ -95,10 +96,11 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
        } else {
            String ex;
            if (not(genFrom)) {
+               p = substPathEx('"${p}"', topPath, "path");
                if (ix.length() > 0 and not(optionalFound)) {
-                   ex = "pr.${getOp}(\"${p}\", ${ix})";
+                   ex = "pr.${getOp}(${p}, ${ix})";
                } else {
-                   ex = "pr.${getOp}(\"${p}\")";
+                   ex = "pr.${getOp}(${p})";
                }
            } else {
                ex = path + ".get" + asMethodNameSuffix(field.name) + "()";
@@ -118,7 +120,8 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
                 String srcArrayEltTypeName = asTypeName(srcArrayType.type.name);
                 String tgtArrayEltTypeName = asTypeName(tgtArrayType.type.name);
                 String outerPrName = "prArray${arrayCount}";
-                '${getParserResultType(parser)} ${outerPrName} = pr.stepInto("${src.name}", ${suffixPath(indexes, ",")});
+                String pathEx = substPathEx('"${src.name}"', topPath, "path");
+                '${getParserResultType(parser)} ${outerPrName} = pr.stepInto(${pathEx}, ${suffixPath(indexes, ",")});
                 ${tgtArrayEltTypeName}[] ${arrayName} = new ${tgtArrayEltTypeName}[${outerPrName}.getArraySize()];
                 for (int i = 0, size = ${outerPrName}.getArraySize(); i < size; i++) {
                     ${getParserResultType(parser)} prElement = ${outerPrName}.stepInto("", i);
@@ -145,9 +148,9 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
     // called via produceDataTransfer
     def produceDataTransfer(Field field, RecordType type, mapOf(String, Field) mapping, String typeQual, String mapQual, setOf(String) done, String indexes, String paths) {
         if (not(genFrom) and optWithStepIn) {
-            String path = field.name;
             nestedStepCount = nestedStepCount + 1;
-            '\n\npr = pr.stepInto("${path}", ${suffixPath(indexes, ",")});' !<CR>;
+            String pathEx = substPathEx('"${field.name}"', topPath, "path");
+            '\n\npr = pr.stepInto(${pathEx}, ${suffixPath(indexes, ",")});' !<CR>;
         }
         '${produceDataTransfer(type, mapping, typeQual, mapQual, done, indexes, paths)}'
         if (not(genFrom) and optWithStepIn and nestedStepCount > 0) {
@@ -200,7 +203,8 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
             formatter.endStructure();
             formatter.endStructure();'
         } else {
-            'formatter.add("${name}", ${genConvertOp("outConverter", type, "from", data)});\n'
+            String pathEx = substPathEx('"${name}"', topPath, "path");
+            'formatter.add(${pathEx}, ${genConvertOp("outConverter", type, "from", data)});\n'
         }
     }
     
@@ -426,6 +430,7 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
         Boolean sharedInterfaces, Boolean impl, MachineFormatter formatter, MachineParser parser, String className, 
         setOf(AssignmentOperation) assng) {
         String imTypeName = asTypeName(imType.name);
+        topPath = getPath(imType);
         String pltfTypeName = asTypeName(pltfType.name);
         if (sharedInterfaces) {
             add = "Impl";
@@ -435,6 +440,7 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
         
         import java.io.IOException;
         import java.util.*;
+        import java.util.function.*;
         import static de.iip_ecosphere.platform.support.function.IOVoidFunction.optional;
         import de.iip_ecosphere.platform.support.function.*;
         import de.iip_ecosphere.platform.transport.serialization.*;
@@ -456,20 +462,24 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
             ${generateParserAttribute()|e}
             ${generateFormatterAttribute()|e}
             private Map<String, Integer> mapping;
+            private Supplier<String> pathSupplier;
             
-            public ${className}(String encoding, Map<String, Integer> mapping) {
+            public ${className}(String encoding, Map<String, Integer> mapping, Supplier<String> pathSupplier) {
                 this.mapping = mapping;
+                this.pathSupplier = pathSupplier;
                 ${generateInitParser(className)|e}
                 ${generateInitFormatter(className)|e}
             }
         
             @Override             
             public ${pltfTypeName} from(byte[] data) throws IOException {
+                final String path = pathSupplier == null ? "${getPath(imType)}" : pathSupplier.get();
                 ${generateParserFrom("${imTypeName}${add}", "${pltfTypeName}")}
             }
 
             @Override    
             public byte[] to(${pltfTypeName} source) throws IOException {
+                final String path = pathSupplier == null ? "${getPath(imType)}" : pathSupplier.get();
                 ${generateFormatterTo("${imTypeName}${add}", "${pltfTypeName}")}
             }
 

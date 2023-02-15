@@ -487,6 +487,10 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
         }
     }
     
+    def genCreateConnectorAdapterSuppliers(Connector conn) {
+        '()->service.getInPath("${getPath(conn.inInterface)}"), ()->service.getOutPath("${getPath(conn.outInterface)}")'
+    }
+    
     def initialService(MeshElement elt, Connector conn, setOf(String) serviceVars) {
         String connGen = getConnectorGenerics(conn, true);
         String clsName = getClsName(elt);
@@ -494,7 +498,7 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
         'ConnectorParameter param = createConnectorParameter();
         Connector${connGen} conn = ConnectorFactory.createConnector(
             "${conn.class}", () -> param, 
-            createConnectorAdapter());
+            createConnectorAdapter(${genCreateConnectorAdapterSuppliers(conn)}));
         conn.enablePolling(false); // independent of notifications, disable as @Autowired may not be
         ${getYamlServiceFragment("serviceData", clsName, conn.id)}; 
         service = new ${wrapperCls(conn)}${getConnectorGenerics(conn, true)}(serviceData, conn, 
@@ -518,16 +522,27 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
     def generatedServiceInitMethod(MeshElement elt, Connector conn) {
         String connGen = getConnectorGenerics(conn, true);
         '/**
-        * Creates the connector adapter. [public for testing]
+        * Creates the default connector adapter without path suppliers. [public for testing]
         *
         * @return the connector adapter
         */
         public static ${adapterType(conn, false)} createConnectorAdapter() {
-            return createConnectorAdapter(null, null);
+            return createConnectorAdapter(null, null, null, null);
         }
         
         /**
         * Creates the connector adapter. [public for testing]
+        *
+        * @param inPathSupplier function returning the actual input base path to use for data accesses, may be <b>null</b>
+        * @param outPathSupplier function returning the actual output base path to use for data accesses, may be <b>null</b>
+        * @return the connector adapter
+        */
+        public static ${adapterType(conn, false)} createConnectorAdapter(Supplier<String> inPathSupplier, Supplier<String> outPathSupplier) {
+            return createConnectorAdapter(null, null, inPathSupplier, outPathSupplier);
+        }
+        
+        /**
+        * Creates the connector adapter without path suppliers. [public for testing]
         *
         * @param metrics the metrics provider to use, <b>null</b> for no metric measurements
         * @param log the log file to use to record individual measurements in experiments, <b>null</b> for no logging.
@@ -536,6 +551,21 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
         */
         public static ${adapterType(conn, false)} createConnectorAdapter(
             de.iip_ecosphere.platform.services.environment.metricsProvider.MetricsProvider metrics, File log) {
+            return createConnectorAdapter(metrics, log, null, null);
+        }
+        
+        /**
+        * Creates the connector adapter. [public for testing]
+        *
+        * @param metrics the metrics provider to use, <b>null</b> for no metric measurements
+        * @param log the log file to use to record individual measurements in experiments, <b>null</b> for no logging.
+        *      Only becomes active if {@code metrics} is not <b>null</b>
+        * @param inPathSupplier function returning the actual input base path to use for data accesses, may be <b>null</b>
+        * @param outPathSupplier function returning the actual output base path to use for data accesses, may be <b>null</b>
+        * @return the connector adapter
+        */
+        public static ${adapterType(conn, false)} createConnectorAdapter(
+            de.iip_ecosphere.platform.services.environment.metricsProvider.MetricsProvider metrics, File log, Supplier<String> inPathSupplier, Supplier<String> outPathSupplier) {
             ${adapterCreationFragment(conn, "adapter", "metrics", "log")};
             return adapter;
         }'
@@ -852,7 +882,7 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
                         if (null != newCls && newCls.length() > 0) {
                             ConnectorParameter param = createConnectorParameter();
                             Connector${connGen} conn = ConnectorFactory.createConnector(
-                                newCls, () -> param, createConnectorAdapter());
+                                newCls, () -> param, createConnectorAdapter(${genCreateConnectorAdapterSuppliers(conn)}));
                             if (null != conn) {
                                 try {
                                     // as experiment, simple form, no switching strategy for now
@@ -865,6 +895,7 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
                                     newService.setState(ServiceState.STARTING);
                                     service = newService;
                                     oldService.setState(ServiceState.STOPPING);
+                                    Starter.mapService(service);
                                 } catch (ExecutionException e) {
                                     System.out.println("Cannot switch connector: " + e.getMessage());
                                 }
