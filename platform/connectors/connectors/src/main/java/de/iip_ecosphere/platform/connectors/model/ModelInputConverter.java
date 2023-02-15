@@ -86,6 +86,11 @@ public class ModelInputConverter implements InputConverter<Object> {
     }
 
     @Override
+    public String[] toStringArray(Object data) throws IOException {
+        return (String[]) data; // unsure
+    }
+
+    @Override
     public byte[] toByteArray(Object data) throws IOException {
         return (byte[]) data; // unsure
     }

@@ -498,6 +498,15 @@ public final class JsonInputParser implements InputParser<Any> {
             }
             return dta; // exception?
         }
+        
+        @Override
+        public String[] toStringArray(Any data) throws IOException {
+            String[] dta = new String[data.size()];
+            for (int j = 0; j < dta.length; j++) {
+                dta[j] = data.get(j).toString();
+            }
+            return dta; // exception?
+        }        
 
         @Override
         public double[] toDoubleArray(Any data) throws IOException {

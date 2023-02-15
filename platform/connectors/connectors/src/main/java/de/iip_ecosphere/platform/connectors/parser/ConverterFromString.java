@@ -93,6 +93,11 @@ public class ConverterFromString implements InputConverter<String> {
     }
 
     @Override
+    public String[] toStringArray(String data) throws IOException {
+        throw new IOException("currently not implemented");
+    }
+
+    @Override
     public byte[] toByteArray(String data) throws IOException {
         throw new IOException("currently not implemented");
     }

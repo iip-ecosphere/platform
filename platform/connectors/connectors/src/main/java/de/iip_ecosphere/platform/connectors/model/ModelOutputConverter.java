@@ -87,6 +87,11 @@ public class ModelOutputConverter implements OutputConverter<Object> {
     }
 
     @Override
+    public Object fromStringArray(String[] data) throws IOException {
+        return data;
+    }
+
+    @Override
     public Object fromByteArray(byte[] data) throws IOException {
         return data;
     }

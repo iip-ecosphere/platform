@@ -73,6 +73,11 @@ public class ConverterToString implements OutputConverter<String> {
     public String fromDoubleArray(double[] data) throws IOException {
         throw new IOException("currently not supported");
     }
+    
+    @Override
+    public String fromStringArray(String[] data) throws IOException {
+        throw new IOException("currently not supported");
+    }
 
     @Override
     public String fromByteArray(byte[] data) throws IOException {

@@ -272,6 +272,15 @@ public interface InputParser<T> {
          * @throws IOException if conversion fails
          */
         public int[] toIntegerArray(T data) throws IOException;
+        
+        /**
+         * Converts parsed data returned by {@link ParseResult} to a String array.
+         * 
+         * @param data the obtained data
+         * @return the converted integer array
+         * @throws IOException if conversion fails
+         */
+        public String[] toStringArray(T data) throws IOException;        
 
         /**
          * Converts parsed data returned by {@link ParseResult} to a double array.

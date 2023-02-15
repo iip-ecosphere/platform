@@ -142,6 +142,15 @@ public interface OutputFormatter<T> {
         public T fromDoubleArray(double[] data) throws IOException;
 
         /**
+         * Converts data from a string array to the output format.
+         * 
+         * @param data the data
+         * @return the converted output format
+         * @throws IOException if conversion fails
+         */
+        public T fromStringArray(String[] data) throws IOException;
+
+        /**
          * Converts data from a byte array to the output format.
          * 
          * @param data the data
