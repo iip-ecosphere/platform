@@ -853,7 +853,7 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
         if (handlers.size() > 0) {
             ConnectorInputHandler h = handlers.projectSingle();
             String typeName = toTypeName(h.type);
-            "handle${typeName}(service, ${dataVar})"
+            "handle${typeName}(${dataVar})"
         } else {
             "service";
         }
@@ -870,13 +870,14 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
             for (ConnectorInputHandler h: conn.inputHandlers) {
                 String typeName = toTypeName(h.type);
                 String handleVar = "${firstToLowerCase(typeName)}Handler";
+                String service = "service";
                 String connGen = getConnectorGenerics(conn, true);
                 String clsName = getClsName(elt);
                 String connAccess = "service.getConnector()";
                 if (isDefined(conn.mock) and conn.mock) {
                     connAccess = "service"; // mock can handle triggers as proxy
                 }
-                'private ${serviceType} handle${typeName}(${serviceType} service, ${typeName} data) {
+                'private ${serviceType} handle${typeName}(${typeName} data) {
                     if (null != ${handleVar}) {
                         String newCls = ${handleVar}.getNewConnectorClass(data);
                         if (null != newCls && newCls.length() > 0) {
@@ -888,14 +889,14 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
                                     // as experiment, simple form, no switching strategy for now
                                     conn.enablePolling(false); // independent of notifications, disable as @Autowired may not be
                                     ${getYamlServiceFragment("serviceData", clsName, conn.id)}; 
-                                    ${serviceType} oldService = service;
+                                    ${serviceType} oldService = ${service};
                                     ${serviceType} newService 
                                         = new ${wrapperCls(conn)}${getConnectorGenerics(conn, true)}(serviceData, conn, () -> param);
                                     newService.setReceptionCallback(new ConnectorReceptionCallback());
                                     newService.setState(ServiceState.STARTING);
-                                    service = newService;
+                                    ${service} = newService;
                                     oldService.setState(ServiceState.STOPPING);
-                                    Starter.mapService(service);
+                                    Starter.mapService(${service});
                                 } catch (ExecutionException e) {
                                     System.out.println("Cannot switch connector: " + e.getMessage());
                                 }
