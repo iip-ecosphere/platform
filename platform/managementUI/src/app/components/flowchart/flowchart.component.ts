@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import Drawflow from 'drawflow';
 import { ApiService } from 'src/app/services/api.service';
+import { DrawflowService } from 'src/app/services/drawflow.service';
 
 @Component({
   selector: 'app-flowchart',
@@ -10,7 +11,7 @@ import { ApiService } from 'src/app/services/api.service';
 export class FlowchartComponent implements OnInit {
 
 
-  constructor(private api: ApiService) {
+  constructor(private df: DrawflowService) {
 
   }
 
@@ -56,7 +57,7 @@ export class FlowchartComponent implements OnInit {
   }
 
   public async getGraph() {
-    let data = await this.api.getGraph();
+    let data = await this.df.getGraph();
     if(data?.outputArguments[0].value?.value) {
       let graph = JSON.parse(data?.outputArguments[0].value?.value);
       let graph2 = JSON.parse(graph.result);
