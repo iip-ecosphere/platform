@@ -97,6 +97,9 @@ public class AbstractInvokerMojo extends AbstractMojo {
     @Parameter(defaultValue = "false")
     private boolean offline;
     
+    @Parameter(property = "unpack.force", required = false, defaultValue = "false") 
+    private boolean unpackForce;
+    
     @Component
     private Invoker invoker;
     
@@ -129,6 +132,9 @@ public class AbstractInvokerMojo extends AbstractMojo {
                         + " as either key or value are not given");
                 }
             }
+        }
+        if (unpackForce && !sysProperties.containsKey("unpack.force")) {
+            sysProperties.put("unpack.force", "true");
         }
         request.setProperties(sysProperties);
         File pomFile = pom;

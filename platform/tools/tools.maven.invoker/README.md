@@ -66,3 +66,5 @@ The plugin supports the following configuration settings:
   - `javaHome` the home directory of the JDK/JRE to execute (default not set, using the one Maven was called on)
   - `mavenHome` the home directory of Maven to execute (default not set, using the one Maven was called on)
   - `timeoutInSeconds` a timeout when the invocation shall be terminated as failed execution (default `0`)
+  
+The plugin takes over the system properties of the original request, in particular `-Dunpack.force` and passes them to the invoked maven processes.
