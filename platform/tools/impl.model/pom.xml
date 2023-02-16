@@ -32,6 +32,7 @@
       <maven.main.skip>true</maven.main.skip>
       <maven.test.skip>true</maven.test.skip>
       <maven.javadoc.skip>true</maven.javadoc.skip>
+      <iip.model>PlatformConfiguration</iip.model>
   </properties>
   
   <build>
@@ -71,11 +72,41 @@
                        <include>IIPEcosphere*.*</include>
                    </includes>
                </cleanup>
+               <initiallyAllowed>${iip.model}.ivml;AllServices.ivml;AllTypes.ivml;apps;apps/ApplicationPart*.ivml;meshes;meshes/ServiceMesh*.ivml;TechnicalSetup.ivml</initiallyAllowed>
                <overWriteReleases>false</overWriteReleases>
                <overWriteSnapshots>true</overWriteSnapshots>
              </configuration>
            </execution>
          </executions>
+       </plugin>
+       <plugin>
+       	<groupId>de.iip-ecosphere.platform</groupId>
+       	<artifactId>configuration-plugin</artifactId>
+       	<version>${project.version}</version>
+       	<executions>
+       		<execution>
+				<id>generateBroker</id>    
+				<goals>
+					<goal>generateBroker</goal>
+				</goals>   		
+       		</execution>
+       		       		<execution>
+				<id>generateAppsNoDeps</id>    
+				<goals>
+					<goal>generateAppsNoDeps</goal>
+				</goals>   		
+       		</execution>
+       		       		<execution>
+				<id>generateApps</id>    
+				<goals>
+					<goal>generateApps</goal>
+				</goals>   		
+       		</execution>
+       	</executions>
+       	<configuration>
+       		 <model>${iip.model}</model>
+       		 <outputDirectory>gen/py</outputDirectory>      		
+       	</configuration>
        </plugin>
        <plugin>
          <groupId>org.codehaus.mojo</groupId>
@@ -88,7 +119,7 @@
                      <mainClass>de.iip_ecosphere.platform.configuration.PlatformInstantiator</mainClass>
                      <cleanupDaemonThreads>false</cleanupDaemonThreads>
                      <arguments>
-                         <argument>${ivml.file}</argument>
+                         <argument>${iip.model}</argument>
                          <argument>src/test/easy</argument>
                          <argument>gen/test</argument>
                          <argument>generateAppsNoDeps</argument>
@@ -101,7 +132,7 @@
                      <mainClass>de.iip_ecosphere.platform.configuration.PlatformInstantiator</mainClass>
                      <cleanupDaemonThreads>false</cleanupDaemonThreads>
                      <arguments>
-                         <argument>${ivml.file}</argument>
+                         <argument>${iip.model}</argument>
                          <argument>src/test/easy</argument>
                          <argument>gen/test</argument>
                          <argument>generateApps</argument>
