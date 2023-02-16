@@ -213,6 +213,19 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
         super(selector, adapter);
         configureModelAccess(new OpcUaModelAccess());
     }
+    
+    /**
+     * Creates a data value for write accesses.
+     * 
+     * @param value the actual value
+     * @return the data value
+     */
+    private DataValue createWriteDataValue(Variant value) {
+        //return new DataValue(value); // original
+        // does this work with PLCnext? ", null, null, null" required for Beckhoff 
+        // https://github.com/eclipse/milo/issues/57
+        return new DataValue(value, null, null, null); // Beckhoff
+    }
 
     /**
      * Construct the endpoint URL.
@@ -839,10 +852,10 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
                 if (null == result) {
                     UaVariableNode node = retrieveVariableNode(qName, cached);
                     DataValue value = node.readValue();
-                    Variant r = value.getValue();
+                    Variant r = value.getValue();                    
                     if (null != r) {
                         result = r.getValue();
-                        if (result instanceof UNumber) { // simplfied
+                        if (result instanceof UNumber) { // simplified
                             result = ((UNumber) result).intValue();
                         } else if (result instanceof NodeId) {
                             result = result.toString();
@@ -909,10 +922,10 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
                 NodeCacheEntry cached = retrieveCacheEntry(qName);
                 cached.setValue(value);
                 UaVariableNode node = retrieveVariableNode(qName, cached);
-                node.writeValue(new DataValue(new Variant(value)));
+                node.writeValue(createWriteDataValue(new Variant(value)));
                 // TODO handle built-ins
             } catch (UaException e) {
-                throw new IOException(e);
+                throw new IOException("While setting " + qName + ":" + e);
             }
         }
 
