@@ -417,7 +417,14 @@ public class SpringCloudServiceManager
                         try {
                             Server ser = s.getServer();
                             Class<?> cls = Class.forName(ser.getCls()); 
-                            Object o = cls.getConstructor().newInstance();
+                            Object o;
+                            try {
+                                List<String> cmdLine = s.collectCmdArguments(getConfig(), ser.getPort(), "");
+                                o = cls.getConstructor(String[].class).newInstance(
+                                    (Object) cmdLine.toArray(new String[0]));
+                            } catch (NoSuchMethodException e) {
+                                o = cls.getConstructor().newInstance();
+                            }
                             if (o instanceof de.iip_ecosphere.platform.support.Server) {
                                 de.iip_ecosphere.platform.support.Server sv = 
                                     (de.iip_ecosphere.platform.support.Server) o;

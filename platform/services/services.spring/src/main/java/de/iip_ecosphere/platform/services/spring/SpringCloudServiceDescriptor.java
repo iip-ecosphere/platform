@@ -261,15 +261,11 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
             Utils.addPropertyIfPositiveToMeBi(deployProps, AppDeployer.DISK_PROPERTY_KEY, service.getDisk(), null);
             Utils.addPropertyIfPositiveToInt(deployProps, AppDeployer.CPU_PROPERTY_KEY, service.getCpus(), "1");
 
-            List<String> cmdLine = new ArrayList<String>();
-            if (null != config.getJavaOpts()) {
-                cmdLine.addAll(config.getJavaOpts());
-            }
             ManagedServerAddress springAddr = registerPort(mgr, "spring_" + getId());
             appProps.put("server.port", String.valueOf(springAddr.getPort())); // shall work, not another cmd arg
             adminAddr = registerPort(mgr, Starter.getServiceCommandNetworkMgrKey(getId()));
             serviceProtocol = config.getServiceProtocol();
-            cmdLine.addAll(service.getCmdArg(adminAddr.getPort(), serviceProtocol));
+            List<String> cmdLine = collectCmdArguments(config, adminAddr.getPort(), serviceProtocol);
             for (Relation r : service.getRelations()) {
                 Endpoint endpoint = r.getEndpoint();
                 if (r.getChannel().length() == 0) {
@@ -309,6 +305,23 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
             result = new AppDeploymentRequest(def, res, deployProps, cmdLine);
         }
         return result;
+    }
+    
+    /**
+     * Collects basic command line arguments.
+     * 
+     * @param config the configuration
+     * @param port the network port to substitute in the service command line arguments
+     * @param protocol the protocol, may be empty for none
+     * @return the command line arguments
+     */
+    List<String> collectCmdArguments(SpringCloudServiceSetup config, int port, String protocol) {
+        List<String> cmdLine = new ArrayList<String>();
+        if (null != config.getJavaOpts()) {
+            cmdLine.addAll(config.getJavaOpts());
+        }
+        cmdLine.addAll(service.getCmdArg(port, protocol));
+        return cmdLine;
     }
     
     /**
