@@ -156,17 +156,25 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         Map<String, SubmodelElementCollectionBuilder> types = new HashMap<>();
         Configuration cfg = cfgSupplier.get();
         if (null != cfg) { // as long as we are in transition from platform without contained model to this
+            IDatatype primitiveType = null; 
+            try {
+                primitiveType = ModelQuery.findType(cfg.getConfiguration().getProject(), "PrimitiveType", null);
+            } catch (ModelQueryException e) {
+            }
             Iterator<IDecisionVariable> iter = cfg.getConfiguration().iterator();
             while (iter.hasNext()) {
                 IDecisionVariable var = iter.next();
                 if (variableFilter.test(var)) {
-                    String typeName = getType(var);
-                    SubmodelElementCollectionBuilder builder = types.get(typeName);
-                    if (null == builder) {
-                        builder = createTypeCollectionBuilder(smBuilder, typeName);
-                        types.put(typeName, builder);
+                    IDatatype type = var.getDeclaration().getType();
+                    if (primitiveType == null || !primitiveType.isAssignableFrom(type)) {
+                        String typeName = IvmlDatatypeVisitor.getUnqualifiedType(type);                    
+                        SubmodelElementCollectionBuilder builder = types.get(typeName);
+                        if (null == builder) {
+                            builder = createTypeCollectionBuilder(smBuilder, typeName);
+                            types.put(typeName, builder);
+                        }
+                        mapVariable(var, builder, null);
                     }
-                    mapVariable(var, builder, null);
                 }
             }
             for (SubmodelElementCollectionBuilder builder : types.values()) {

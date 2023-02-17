@@ -247,7 +247,7 @@ project Services {
    // ----------------------------- server processes ---------------------------
    
     // required by application, to be started/stopped
-    compound Server {
+    abstract compound Server {
         NonEmptyString id;
         String description = ""; // TODO Constraint: must be configured
         IipVersion ver;
@@ -259,7 +259,13 @@ project Services {
         Parameters parameter = {};
         String transportChannel;
     }
+    
+    // direct Java-based Server, must implement Server interface
+    compound JavaServer {
+        NonEmptyString class;
+    }
 
+    // python based server instance, based on PythonServiceEnvironment, may be generated, must implement Server interface
     compound PythonServer refines Server {
         NonEmptyString executable = "python";
     }

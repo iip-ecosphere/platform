@@ -30,6 +30,7 @@ import de.iip_ecosphere.platform.configuration.ivml.IvmlGraphMapper.IvmlGraph;
 import de.iip_ecosphere.platform.configuration.ivml.IvmlGraphMapper.IvmlGraphEdge;
 import de.iip_ecosphere.platform.configuration.ivml.IvmlGraphMapper.IvmlGraphNode;
 import de.iip_ecosphere.platform.configuration.ivml.IvmlUtils;
+import net.ssehub.easy.varModel.confModel.Configuration;
 import net.ssehub.easy.varModel.confModel.IDecisionVariable;
 import net.ssehub.easy.varModel.model.IvmlDatatypeVisitor;
 
@@ -101,12 +102,11 @@ public class DrawflowGraphFormat implements GraphFormat {
         @SuppressWarnings("unchecked")
         private void serviceToData(IDecisionVariable service, JSONObject data) {
             if (null != service) {
-                String type = IvmlDatatypeVisitor.getUnqualifiedType(service.getDeclaration().getType());
+                service = Configuration.dereference(service); // if this is as often a refTo(Service)
+                String type = IvmlDatatypeVisitor.getUnqualifiedType(service.getValue().getType()); // dynamic type
                 data.put("type", type);
-                String kind = IvmlUtils.toName(IvmlUtils.getEnumValue(IvmlUtils.getNestedSafe(service, "kind")), null);
-                if (null != kind) {
-                    data.put("kind", kind);
-                }
+                String kind = IvmlUtils.toName(IvmlUtils.getEnumValue(IvmlUtils.getNestedSafe(service, "kind")), "?");
+                data.put("kind", kind);
             }
         }
 
