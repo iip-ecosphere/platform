@@ -14,6 +14,9 @@ package de.iip_ecosphere.platform.support;
 
 /**
  * A generic server, something that can be started or stopped and, finally, disposed.
+ * A platform managed server is instantiated via a public constructor receiving a {@code String[]} with
+ * command-line arguments - intended for handcrafted servers - or (less priority) a public non-arg 
+ * constructor - intended for generated servers.
  * 
  * @author Holger Eichelberger, SSE
  */
