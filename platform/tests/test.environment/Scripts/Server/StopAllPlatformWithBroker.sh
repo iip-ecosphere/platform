@@ -4,7 +4,6 @@ brokerPID=$(cat ProcessesIDs.info | grep brokerPID | cut -d ' ' -f1)
 platformPID=$(cat ProcessesIDs.info | grep platformPID | cut -d ' ' -f1)
 mgtUiPID=$(cat ProcessesIDs.info | grep mgtUiPID | cut -d ' ' -f1)
 monitoringPID=$(cat ProcessesIDs.info | grep monitoringPID | cut -d ' ' -f1)
-((monitoringPID=monitoringPID+1))
 
 echo $1 | sudo -S kill $monitoringPID
 

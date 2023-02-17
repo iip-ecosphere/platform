@@ -11,6 +11,6 @@ else
     cd Install
 fi
 
-echo $1 | sudo -S mvn install
+#echo $1 | sudo -S mvn install
 
-sudo chown -R $3 ../Install
+#sudo chown -R $3 ../Install

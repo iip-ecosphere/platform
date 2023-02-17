@@ -1,5 +1,6 @@
 echo $1 | sudo -S apt-get update
 sudo apt install unzip -y
+sudo apt install jq -y
 sudo apt install openjdk-13-jdk-headless -y
 sudo apt install maven -y
 
@@ -35,5 +36,7 @@ sudo apt install python3.9 -y
 sudo apt-get install python3-pip -y
 
 sudo pip install pyflakes
+
+sudo apt install npm -y
 
 sudo apt install curl -y
