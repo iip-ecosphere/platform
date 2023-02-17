@@ -1,66 +1,88 @@
+TestRun:
+    Repetition                : 1
 Setup:
     TestMgrOS                 : Linux
     MoveScripts               : True
     InstallPrerequisite       : False
-    EcsSvcMgrContainers       : "C1Ecs_C2Svc_App"
-    # Ecs, // 0 - just ecs (used only internally, prevent by constraint)
+    EcsSvcMgrContainers       : "Non"
+    # Non, // 0 - No containers
     # Ecs_Svc_App, // 1 - one container: ecs + svc + app
     # EcsSvc_App, // 2 - one container: ecsSvc + app
     # C1Ecs_C2Svc_App // 3 - 1st container: ecs, 2nd container: svc + app
-    RunDockerRegistry         : True
+    RunDockerRegistry         : False
     DockerRegistry            : "192.168.81.100:5001"
     DockerRegistryPort        : 5001
     ArtifactsFolder           : "/iip/actual/artifacts"
     MgtUiServerIP             : "192.168.81.100"
-    InstallPlatform           : True
+    CleanAll                  : False
+    InstallPlatform           : False
     NewInstallFiles           : False
-    IIPEasyTracing            : True
-    DockerRegistryCerts       : False
-    StartPlatfrom             : True
-    #PullRunEcsContainer       : True
-    #StopEcsContainer          : True
-    #DistrDockerRegistryCerts  : False
-    DevicesJoinPlatform       : True
-    StartServiceMgrContainer  : True
-    StopServiceMgrContainer   : True
-    DevicesLeavePlatform      : True
-    StopPlatfrom              : True
+    IIPEasyTracing            : False
+    StartPlatform             : False
+    DevicesJoinPlatform       : False
+    StartServiceMgrContainer  : False
+    StopServiceMgrContainer   : False
+    DevicesLeavePlatform      : False
+    CheckDevices              : False
+    StopPlatform              : False
+    StopDockerRegistry        : True
     DownloadExamples          : False
     CompileExamples           : False
-    RunExamples               : True
-    RunDeploymentPlans        : True
-    StopDeploymentPlans       : True
+    AddServiceExamples        : False
+    StartAllServiceExamples   : False
+    StopAllServiceExamples    : False
+    RemoveServiceExamples     : False
+    RunDeploymentPlans        : False
+    StopDeploymentPlans       : False
 Examples:
-  - Name        : SimpleMesh
-    Included    : True
-    Redownload  : True
-    Compile     : No
-    Artifact    : "SimpleMeshTestingApp-0.1.0-SNAPSHOT-bin.jar"
-    Run         : True
-  - Name        : examples.KODEX
-    Included    : True
-    Redownload  : True
-    Compile     : Normal
-    Artifact    : "SimpleKodexTestingApp-0.1.0-SNAPSHOT-bin.jar"
-    Run         : False
-  - Name        : examples.python
-    Included    : True
-    Redownload  : True
-    Compile     : Normal
-    Artifact    : "SimplePythonDemoFlowApp-0.1.0-SNAPSHOT-bin.jar"
-    Run         : False
-  - Name        : examples.rtsa
-    Included    : True
-    Redownload  : True
-    Compile     : Normal
-    Artifact    : "SimpleRTSADemoFlowApp-0.1.0-SNAPSHOT-bin.jar"
-    Run         : False
-  - Name        : examples.vdw
-    Included    : True
-    Redownload  : True
-    Compile     : Connector
-    Artifact    : "SimpleVDWOPCDemoApp-0.1.0-SNAPSHOT-bin.jar"
-    Run         : False
+  - Name           : SimpleMesh
+    Included       : True
+    Redownload     : False
+    Container      : True
+    Run            : True
+    Device         : LinDev000002
+    Artifact       : "SimpleMeshInstallTestingApp-0.1.0-SNAPSHOT-bin.jar"
+    ContainerDesc  : "SimpleMeshInstallTestingApp_dflt_mesh-info.yml"
+  - Name           : examples.KODEX
+    Included       : False
+    Redownload     : False
+    Container      : False
+    Run            : False
+    Device         : LinDev000001
+    Artifact       : "SimpleKodexTestingApp-0.1.0-SNAPSHOT-bin.jar"
+    ContainerDesc  : "SimpleKodexTestingApp_dflt_mesh-info.yml"
+  - Name           : examples.python
+    Included       : False
+    Redownload     : False
+    Container      : False
+    Run            : False
+    Device         : LinDev000001
+    Artifact       : "SimplePythonDemoFlowApp-0.1.0-SNAPSHOT-bin.jar"
+    ContainerDesc  : "SimplePythondemoflowapp_dflt_mesh-info.yml"
+  - Name           : examples.pythonSync
+    Included       : False
+    Redownload     : False
+    Container      : False
+    Run            : False
+    Device         : LinDev000001
+    Artifact       : "SimpleSynchronousPythonDemoFlowApp-0.1.0-SNAPSHOT-bin.jar"
+    ContainerDesc  : "SimpleSynchronousPythondemoflowapp_dflt_mesh-info.yml"
+  - Name           : examples.rtsa
+    Included       : True
+    Redownload     : True
+    Container      : True
+    Run            : True
+    Device         : LinDev000001
+    Artifact       : "SimpleRTSADemoFlowApp-0.1.0-SNAPSHOT-bin.jar"
+    ContainerDesc  : "SimpleRTSAdemoflowapp_dflt_mesh-info.yml"
+  - Name           : examples.vdw
+    Included       : False
+    Redownload     : False
+    Container      : False
+    Run            : False
+    Device         : LinDev000001
+    Artifact       : "SimpleVDWOPCDemoApp-0.1.0-SNAPSHOT-bin.jar"
+    ContainerDesc  : "Non"
 Deployments:
   - Name        : SimpleMesh
     Run         : True
@@ -68,6 +90,9 @@ Deployments:
   - Name        : Rsta
     Run         : False
     yaml        : "RSTADeployment.yaml"
+  - Name        : Rsta
+    Run         : False
+    yaml        : "PythonDeployment.yaml"
 Machines:
   - Name           : Server 147.172.178.145 Platform
     IP             : 147.172.178.145
@@ -130,8 +155,8 @@ Machines:
     Password       : osboxes.org
     Role           : Device
     OS             : Linux
-    Included       : True
-    NewDeviceFiles : False
+    Included       : False
+    NewDeviceFiles : True
     DeviceID       : LinDev000001
     DockerRegistry : False
     RunAsContainer : True
@@ -141,42 +166,8 @@ Machines:
     Password       : osboxes.org
     Role           : Device
     OS             : Linux
-    Included       : True
+    Included       : False
     NewDeviceFiles : True
     DeviceID       : LinDev000002
     DockerRegistry : False
     RunAsContainer : False
-  - Name           : Win 10 IIP Platform Server
-    IP             : 192.168.81.151
-    Username       : IEUser
-    Password       : Passw0rd!
-    Role           : Server
-    OS             : Win
-    Included       : False
-    NewDeviceFiles : False
-    DeviceID       : WinSer000001
-    DockerRegistry : False
-    RunAsContainer : True
-  - Name           : Win 10 IIP Platform Device
-    IP             : 192.168.81.150
-    Username       : IEUser
-    Password       : Passw0rd!
-    Role           : Device
-    OS             : Win
-    Included       : False
-    NewDeviceFiles : False
-    DeviceID       : WinDev000002
-    DockerRegistry : False
-    RunAsContainer : True
-  - Name           : Win 10 IIP Platform Device 2
-    IP             : 192.168.81.144
-    Username       : IEUser
-    Password       : Passw0rd!
-    Role           : Device
-    OS             : Win
-    Included       : False
-    NewDeviceFiles : False
-    DeviceID       : WinDev000003
-    DockerRegistry : False
-    RunAsContainer : True
-       
