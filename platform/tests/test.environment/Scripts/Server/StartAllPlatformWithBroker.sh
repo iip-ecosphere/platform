@@ -59,12 +59,12 @@ echo "Broker and Platform are Running... Please don't close it"
 brokerPPID=$(ps -Ao pid,command | grep broker.sh | grep -v grep | head -1 | xargs | cut -d ' ' -f -1)
 platformPPID=$(ps -Ao pid,command | grep platform.sh | grep -v grep | head -1 | xargs | cut -d ' ' -f -1)
 mgtUiPPID=$(ps -Ao pid,command | grep mgtUi.sh | grep -v grep | head -1 | xargs | cut -d ' ' -f -1)
-monitoringPPID=$(ps -Ao pid,command | grep monitoring.sh | grep -v grep | head -1 | xargs | cut -d ' ' -f -1)
+monitoringPPID=$(ps -Ao pid,command | grep "java -cp monJars/" | grep -v grep | head -1 | xargs | cut -d ' ' -f -1)
 
 brokerPID=$(pgrep -laP $brokerPPID | cut -d ' ' -f1)
 platformPID=$(pgrep -laP $platformPPID | cut -d ' ' -f1)
 mgtUiPID=$(pgrep -laP $mgtUiPPID | cut -d ' ' -f1)
-monitoringPID=$(pgrep -laP $monitoringPPID | cut -d ' ' -f1)
+#monitoringPID=$(pgrep -laP $monitoringPPID | cut -d ' ' -f1)
 
 cd ..
 cd ..
@@ -72,4 +72,4 @@ cd ..
 echo "$brokerPID  brokerPID" > ProcessesIDs.info
 echo "$platformPID  platformPID" >> ProcessesIDs.info
 echo "$mgtUiPID  mgtUiPID" >> ProcessesIDs.info
-echo "$monitoringPID  monitoringPID" >> ProcessesIDs.info
+echo "$monitoringPPID  monitoringPID" >> ProcessesIDs.info

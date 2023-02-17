@@ -1,32 +1,53 @@
 cd Files
 
+artifactsFolder=$6
+localIP=$(hostname -I | cut -d ' ' -f1)
+
 if [ $7 == "True" ]; then
+
     echo $1 | sudo -S rm -r Install
     mkdir -p Install
     cd Install
 
     wget https://jenkins-2.sse.uni-hildesheim.de/view/IIP-Ecosphere/job/IIP_Install/lastSuccessfulBuild/artifact/install.tar.gz
     tar xzpvf install.tar.gz
-else
-    cd Install
-fi
-
-artifactsFolder=$6
-localIP=$(hostname -I | cut -d ' ' -f1)
-
-if [ $7 == "True" ]; then
-
+        
     sed -i 's/147.172.178.145/'$localIP'/g' src/main/easy/TechnicalSetup.ivml
+    
     artifactsLineNumber=$(cat src/main/easy/TechnicalSetup.ivml | grep -n "String platformServer" | cut -d ' ' -f1 | sed 's/:/ /g')
     ((artifactsLineNumber=artifactsLineNumber+1))
     sed -i $artifactsLineNumber' i \ \ \ \ artifactsUriPrefix = "http://'$localIP':4200/download";' src/main/easy/TechnicalSetup.ivml
     sed -i $artifactsLineNumber' i \ \ \ \ artifactsFolder = "'$artifactsFolder'";' src/main/easy/TechnicalSetup.ivml
 
+else
+    cd Install
+fi
+
+cd ..
+./DownloadExamples.sh
+cd Install
+
+if [ $4 == "True" ]; then
+    echo $1 | sudo -S mvn configuration:generatePlatform -U -Dunpack.force=true -Diip.easy.tracing=ALL 
+    echo $1 | sudo -S rm -r gen
+    echo $1 | sudo -S mvn configuration:generateAppsNoDeps -Diip.easy.tracing=ALL
+else
+    echo $1 | sudo -S mvn configuration:generatePlatform -U -Dunpack.force=true
+    echo $1 | sudo -S rm -r gen
+    echo $1 | sudo -S mvn configuration:generateAppsNoDeps
+fi
+
+cd ..
+./CompileExamples.sh
+cd Install
+
+if [ $7 == "True" ]; then
+
     if [ $2 != "Non" ]; then
 
-      sed -i '/Application /a \ \ \ \ \ \ \ \ createContainer = true,' src/main/easy/ApplicationPartMyApp.ivml
+      #sed -i '/Application /a \ \ \ \ \ \ \ \ createContainer = true,' src/main/easy/apps/ApplicationPart*.ivml
 
-      sed -i '/transportProtocol = /a \ \ \ \ \ \ \ \ localPort = 8888,' src/main/easy/TechnicalSetup.ivml
+      #sed -i '/transportProtocol = /a \ \ \ \ \ \ \ \ localPort = 8888,' src/main/easy/TechnicalSetup.ivml
 
       generationLineNumber=$(cat src/main/easy/TechnicalSetup.ivml | grep -n "generation setup" | cut -d ' ' -f1 | sed 's/:/ /g')
       ((generationLineNumber=generationLineNumber-1))
@@ -47,17 +68,19 @@ if [ $7 == "True" ]; then
       echo "Containers Added"
 
     fi
+
 fi
 
 if [ $4 == "True" ]; then
-    echo $1 | sudo -S mvn install -U -Diip.easy.tracing=ALL
+    echo $1 | sudo -S mvn install -Diip.easy.tracing=ALL
 else
-    echo $1 | sudo -S mvn install -U 
+    echo $1 | sudo -S mvn install
 fi
 
 echo $1 | sudo -S find . -name "*bin.jar" -exec cp {} $artifactsFolder \;
 sudo chown -R $5 ../Install
 
+rm -r DeviceFolder
 mkdir -p DeviceFolder/
 mkdir DeviceFolder/ecsJars/
 mkdir DeviceFolder/broker/
