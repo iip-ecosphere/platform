@@ -32,7 +32,6 @@ import org.eclipse.basyx.submodel.metamodel.map.qualifier.LangString;
 import org.eclipse.basyx.submodel.metamodel.map.reference.Key;
 import org.eclipse.basyx.submodel.metamodel.map.reference.Reference;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.property.valuetype.ValueType;
-import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -385,9 +384,6 @@ public class Tools {
                 } catch (IOException e) {
                 }
             }
-        } else {
-            LoggerFactory.getLogger(Tools.class).warn("Tomcat working directory '" + workDir.getAbsolutePath() 
-                + "' not found for disposal.");
         }
     }
     
