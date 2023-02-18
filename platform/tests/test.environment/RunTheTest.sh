@@ -1,7 +1,7 @@
 
 jupyter nbconvert --to python 'TestManagementScript.ipynb'
 
-Repetition=$(cat TestSetup.yaml | grep Repetition | rev | cut -d ' ' -f -1)
+Repetition=$(cat $1 | grep Repetition | rev | cut -d ' ' -f -1)
 
 echo $Repetition
 
