@@ -35,6 +35,7 @@ services:
     description: Receives text tokens.
     deployable: true
     kind: SINK_SERVICE
+    netMgtKey: java-server
     cmdArg: 
       - --spring.profiles.active=sink
       - --iip.port=${port}
@@ -49,3 +50,10 @@ services:
         function: log
         service: simpleStream-create
         direction: IN
+servers:
+  - id: java-server
+    description: Test Java-based server.
+    version: 0.0.1
+    host: localhost
+    port: 16754
+    cls: test.de.iip_ecosphere.platform.simpleStream.spring.TestServer

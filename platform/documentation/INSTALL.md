@@ -2,7 +2,12 @@
 
 This document briefly summarizes how to install and run the IIP-Ecosphere platform. Further information on use cases or IoT demo applications will follow in the future.
 
-For further information on using the individual parts, please consult the platform handbook on [Zenodo](https://doi.org/10.5281/zenodo.5168946) or the [IIP-Ecosphere Website](https://www.iip-ecosphere.eu/). The links may become active/updated some days after a release.
+For further information on using the individual parts, please consult the platform handbook on [Zenodo](https://doi.org/10.5281/zenodo.5168946) or the [IIP-Ecosphere Website](https://www.iip-ecosphere.eu/). The links may become active/updated some days after a release. Please see also 
+
+* [Windows Installation Guide](https://github.com/iip-ecosphere/platform/tree/main/platform/documentation/Platform_Installation_Guide_for_Windows.pdf). 
+* [Linux Installation Guide](https://github.com/iip-ecosphere/platform/tree/main/platform/documentation/Platform_Installation_Guide_for_Linux.pdf). 
+
+We've heard about strange problems on Mac OS. So far, we do not have enough information to resolve the potential problems.
 
 ### Usage scenario
 

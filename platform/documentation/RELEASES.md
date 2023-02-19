@@ -24,6 +24,7 @@ In progress:
 * [#102](https://github.com/iip-ecosphere/platform/issues/102): Create/provide container for service development.
 
 New features:
+* Multi-channel connectors for MQTT in the connectors component and the code generation.
 * [#51](https://github.com/iip-ecosphere/platform/issues/51): Device specific measurement plugin for Phoenix Contact AXC
 * [#64](https://github.com/iip-ecosphere/platform/issues/64): Device specific measurement plugins controlled via configuration model 
 * [#92](https://github.com/iip-ecosphere/platform/issues/92): Generate application implementation project templates
