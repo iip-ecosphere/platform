@@ -526,7 +526,7 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
         *
         * @return the connector adapter
         */
-        public static ${adapterType(conn, false)} createConnectorAdapter() {
+        public static ${adapterType(conn, false, true)} createConnectorAdapter() {
             return createConnectorAdapter(null, null, null, null);
         }
         
@@ -537,7 +537,7 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
         * @param outPathSupplier function returning the actual output base path to use for data accesses, may be <b>null</b>
         * @return the connector adapter
         */
-        public static ${adapterType(conn, false)} createConnectorAdapter(Supplier<String> inPathSupplier, Supplier<String> outPathSupplier) {
+        public static ${adapterType(conn, false, true)} createConnectorAdapter(Supplier<String> inPathSupplier, Supplier<String> outPathSupplier) {
             return createConnectorAdapter(null, null, inPathSupplier, outPathSupplier);
         }
         
@@ -549,7 +549,7 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
         *      Only becomes active if {@code metrics} is not <b>null</b>
         * @return the connector adapter
         */
-        public static ${adapterType(conn, false)} createConnectorAdapter(
+        public static ${adapterType(conn, false, true)} createConnectorAdapter(
             de.iip_ecosphere.platform.services.environment.metricsProvider.MetricsProvider metrics, File log) {
             return createConnectorAdapter(metrics, log, null, null);
         }
@@ -564,7 +564,7 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
         * @param outPathSupplier function returning the actual output base path to use for data accesses, may be <b>null</b>
         * @return the connector adapter
         */
-        public static ${adapterType(conn, false)} createConnectorAdapter(
+        public static ${adapterType(conn, false, true)} createConnectorAdapter(
             de.iip_ecosphere.platform.services.environment.metricsProvider.MetricsProvider metrics, File log, Supplier<String> inPathSupplier, Supplier<String> outPathSupplier) {
             ${adapterCreationFragment(conn, "adapter", "metrics", "log")};
             return adapter;

@@ -166,15 +166,16 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                 IDecisionVariable var = iter.next();
                 if (variableFilter.test(var)) {
                     IDatatype type = var.getDeclaration().getType();
-                    if (primitiveType == null || !primitiveType.isAssignableFrom(type)) {
-                        String typeName = IvmlDatatypeVisitor.getUnqualifiedType(type);                    
-                        SubmodelElementCollectionBuilder builder = types.get(typeName);
-                        if (null == builder) {
-                            builder = createTypeCollectionBuilder(smBuilder, typeName);
-                            types.put(typeName, builder);
-                        }
-                        mapVariable(var, builder, null);
+                    if (primitiveType != null && primitiveType.isAssignableFrom(type)) {
+                        type = primitiveType; // group them together to simplify the AAS structure
+                    } 
+                    String typeName = IvmlDatatypeVisitor.getUnqualifiedType(type);                    
+                    SubmodelElementCollectionBuilder builder = types.get(typeName);
+                    if (null == builder) {
+                        builder = createTypeCollectionBuilder(smBuilder, typeName);
+                        types.put(typeName, builder);
                     }
+                    mapVariable(var, builder, null);
                 }
             }
             for (SubmodelElementCollectionBuilder builder : types.values()) {

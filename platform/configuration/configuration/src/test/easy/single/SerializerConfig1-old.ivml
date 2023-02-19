@@ -140,6 +140,10 @@ project SerializerConfig1Old {
             }, Field {
                 name = "nested",
                 type = refBy(myNestedArrayType)
+            }, Field {
+                name = "channel",
+                type = refBy(StringType),
+                optional = true
             }
         }        
     };
@@ -200,6 +204,7 @@ project SerializerConfig1Old {
         output = {{type=refBy(myConnPltfIn)}},
         inChannel = "IN",
         outChannel = "OUT",
+        outChannels = {"OUT1", "OUT2"},
         inInterface = refBy(myConnMachineIn),
         outInterface = refBy(myConnMachineOut),
         machineFormatter = TextLineFormatter{separator=","},
@@ -213,6 +218,8 @@ project SerializerConfig1Old {
                     DataFieldAccess{field=refBy(myConnMachineOut.fields[2])},
                     IntegerConstantDataOperation{value=100}}
             }
+          }, FieldAssignmentOperation{field=refBy(myConnPltfIn.fields[3]), 
+            operation=OutChannelDataOperation{}
           }
         }
     };

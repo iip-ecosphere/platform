@@ -78,17 +78,42 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         type = type + asTypeName(getFirstTypeName(conn.input));
         type + ">";
     }
+
+    // dispatch basis    
+    def setOf(String) getOutChannels(Connector conn) {
+        setOf(String) result = {};
+        result;
+    }
+
+    def setOf(String) getOutChannels(ChannelConnector conn) {
+        setOf(String) result = {};
+        if (isDefined(conn.outChannel) and conn.outChannel <> null and conn.outChannel.length() > 0) {
+            result.add(conn.outChannel);
+        }
+        if (isDefined(conn.outChannels) and conn.outChannels <> null) {
+            for (String c: conn.outChannels) {
+                result.add("${c}"); // EASy-Bug, string value conversion
+            }
+        }
+        result;
+    }
     
-    // dispatch basis: return the adapter type for a non-channel connector; monitoring - return the type name for the 
-    // monitoring wrapper
-    def adapterType(Connector conn, Boolean monitoring) {
-        String connGen = getConnectorGenerics(conn, true);
+    // dispatchBasis
+    def adapterBaseType(Connector conn, Boolean monitoring) {
         String name;
         if (monitoring) {
             name = "MonitoredTranslatingProtocolAdapter"; // channeled, but use without channels
         } else {
             name = "TranslatingProtocolAdapter";
         }
+        name;
+    }
+    
+    // dispatch basis: return the adapter type for a non-channel connector; monitoring - return the type name for the 
+    // monitoring wrapper
+    def adapterType(Connector conn, Boolean monitoring, Boolean withArray) {
+        String connGen = getConnectorGenerics(conn, true);
+        String name = adapterBaseType(conn, monitoring);
         '${name}${connGen}'
     }
     
@@ -106,14 +131,14 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
             outAdapter = "new MachineOutputTranslator(outPathSupplier)";
         }
         
-        '${adapterType(conn, false)} ${varName};
+        '${adapterType(conn, false, false)} ${varName};
         if (${metricsVarName} != null) {
-            ${varName} = new ${adapterType(conn, true)}(
+            ${varName} = new ${adapterType(conn, true, false)}(
                 ${outAdapter}, 
                 ${inAdapter}, 
                 ${metricsVarName}, ${logFileVarName});
         } else {
-            ${varName} = new ${adapterType(conn, false)}(
+            ${varName} = new ${adapterType(conn, false, false)}(
                 ${outAdapter}, 
                 ${inAdapter});
         }'
@@ -131,17 +156,26 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         }
     }
     
-    // return the adapter type for a channel connector; monitoring - return the type name for the 
-    // monitoring wrapper
-    def adapterType(ChannelConnector conn, Boolean monitoring) {
-        String connGen = getConnectorGenerics(conn, true);
+    def adapterBaseType(ChannelConnector conn, Boolean monitoring) {
         String name;
         if (monitoring) {
-            name = "MonitoredTranslatingProtocolAdapter"; // channeled, here use with channels
+            name = "MonitoredTranslatingProtocolAdapter"; // channeled, but use without channels
         } else {
             name = "ChannelTranslatingProtocolAdapter";
         }
-        '${name}${connGen}'
+        name;
+    }
+    
+    // return the adapter type for a channel connector; monitoring - return the type name for the 
+    // monitoring wrapper
+    def adapterType(ChannelConnector conn, Boolean monitoring, Boolean withArray) {
+        String connGen = getConnectorGenerics(conn, true);
+        String name = adapterBaseType(conn, monitoring);
+        String array = "";
+        if (withArray and getOutChannels(conn).size() > 1) {
+            array = "[]";
+        }
+        '${name}${connGen}${array}'
     }
 
     def adapterCreationFragment(ChannelConnector conn, String varName, String metricsVarName, String logFileVarName) {
@@ -154,7 +188,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
                 inSerializer = "(Serializer<"+asTypeName(getFirstTypeName(conn.input))+">) TypeTranslators.createSerializer(getClass().getClassLoader(), \"" + conn.inSerializerClass + "\")";
             }
         } else {
-            inSerializer = "new ${asTypeName(conn.name)}FormatterSerializer(${escapeString(getEncoding(conn))}, null, inPathSupplier)";
+            inSerializer = 'new ${asTypeName(conn.name)}FormatterSerializer(${escapeString(getEncoding(conn))}, null, inPathSupplier, "#CHANNEL#")';
         }
         if (conn.outSerializerClass.length() > 0) {
             if (conn.outSerializerClass == "*") {
@@ -163,7 +197,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
                 outSerializer = "(Serializer<"+asTypeName(getFirstTypeName(conn.output))+">) TypeTranslators.createSerializer(getClass().getClassLoader(), \"" + conn.outSerializerClass + "\")";
             }
         } else {
-            outSerializer = "new ${asTypeName(conn.name)}ParserSerializer(${escapeString(getEncoding(conn))}, null, outPathSupplier)";
+            outSerializer = 'new ${asTypeName(conn.name)}ParserSerializer(${escapeString(getEncoding(conn))}, null, outPathSupplier, "#CHANNEL#")';
         }
 
         String inAdapter;
@@ -178,18 +212,32 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         } else {
             outAdapter = "new ConnectorOutputTypeAdapter<${asTypeName(getFirstTypeName(conn.output))}>(${outSerializer})";
         }
-
-        '${adapterType(conn, false)} ${varName};
-        if (${metricsVarName} != null) {
-            ${varName} = new ${adapterType(conn, true)}(
-                "${conn.outChannel}", ${outAdapter}, 
-                "${conn.inChannel}", ${inAdapter}, 
-                ${metricsVarName}, ${logFileVarName});
-        } else {
-            ${varName} = new ${adapterType(conn, false)}(
-                "${conn.outChannel}", ${outAdapter}, 
-                "${conn.inChannel}", ${inAdapter});
-        }' 
+        
+        setOf(String) outChannels = getOutChannels(conn);
+        String arrayInit = "";
+        if (outChannels.size() > 1) {
+            arrayInit = " = new ${adapterBaseType(conn, false)}[${outChannels.size()}]";
+            '@SuppressWarnings("unchecked")'
+        }
+        '${adapterType(conn, false, true)} ${varName}${arrayInit};'
+        Integer arrayCount = 0;
+        for (String outChannel: outChannels->sortedBy(s|s)) {
+            String arrayAccess = "";
+            if (outChannels.size() > 1) {
+                arrayAccess = "[${arrayCount}]";
+            }
+            arrayCount = arrayCount + 1;
+            'if (${metricsVarName} != null) {
+                ${varName}${arrayAccess} = new ${adapterType(conn, true, false)}(
+                    "${outChannel}", ${outAdapter.substitute("#CHANNEL#", outChannel)}, 
+                    "${conn.inChannel}", ${inAdapter.substitute("#CHANNEL#", conn.inChannel)}, 
+                    ${metricsVarName}, ${logFileVarName});
+            } else {
+                ${varName}${arrayAccess} = new ${adapterType(conn, false, false)}(
+                    "${outChannel}", ${outAdapter.substitute("#CHANNEL#", outChannel)}, 
+                    "${conn.inChannel}", ${inAdapter.substitute("#CHANNEL#", conn.inChannel)});
+            }' 
+        }
     }
     
     // ------------------------------------------ generating adapter translator classes ---------------------------

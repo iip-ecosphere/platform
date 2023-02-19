@@ -463,10 +463,12 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
             ${generateFormatterAttribute()|e}
             private Map<String, Integer> mapping;
             private Supplier<String> pathSupplier;
+            private String channel;
             
-            public ${className}(String encoding, Map<String, Integer> mapping, Supplier<String> pathSupplier) {
+            public ${className}(String encoding, Map<String, Integer> mapping, Supplier<String> pathSupplier, String channel) {
                 this.mapping = mapping;
                 this.pathSupplier = pathSupplier;
+                this.channel = channel;
                 ${generateInitParser(className)|e}
                 ${generateInitFormatter(className)|e}
             }

@@ -34,7 +34,7 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
             ""
         }
     }
-
+    
     def String translateDataOperation(TransferAssignmentOperation assng, mapOf(Field, String) fields, mapOf(Field, String) indexes, setOf(String) done) {
         if (indexes.containsKey(assng.field) and fields.containsKey(assng.nameField) and fields.containsKey(assng.valueField)) {
             String fnExpr = getTransferAssignmentExpression(assng, fields, indexes, done);
@@ -51,6 +51,10 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
     // dispatch basis
     def String translateDataOperation(DataOperation op, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
         ""
+    }
+
+    def String translateDataOperation(OutChannelDataOperation op, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
+        "channel" // accesses serializer attribute
     }
 
     def String translateDataOperation(DataFieldAccess op, mapOf(Field, String) fields, mapOf(Field, String) indexes) {

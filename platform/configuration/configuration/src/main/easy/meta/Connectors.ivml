@@ -125,6 +125,11 @@ project Connectors {
         Real value;
     }
 
+    // obtains the actual output channel -> channel connectors    
+    compound OutChannelDataOperation refines DataOperation {
+        // -> Type String
+    }
+
     compound ParenthesisDataOperation refines DataOperation {
         DataOperation operation;
     }
@@ -216,6 +221,7 @@ project Connectors {
        String outSerializerClass = ""; // if not given, use registry
        String inChannel = "";
        String outChannel = "";
+       setOf(String) outChannels; // additional out channels towards platform, unified with outChannel; may also be used instead of outChannel
        MachineFormatter machineFormatter = null;
        MachineParser machineParser = null;
    }
