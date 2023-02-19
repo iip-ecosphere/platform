@@ -251,7 +251,7 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
                 Object data = read();
                 if (null != data) {
                     if (getCachingStrategy().checkCache(key, data)) {
-                        received(data);
+                        received(DEFAULT_CHANNEL, data);
                     }
                 }
             } catch (IOException e) {

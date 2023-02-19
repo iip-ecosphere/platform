@@ -106,7 +106,7 @@ public class PahoMqttv5Connector<CO, CI> extends AbstractChannelConnector<byte[]
 
         @Override
         public void messageArrived(String topic, MqttMessage message) throws Exception {
-            received(message.getPayload());
+            received(topic, message.getPayload());
         }
 
         @Override

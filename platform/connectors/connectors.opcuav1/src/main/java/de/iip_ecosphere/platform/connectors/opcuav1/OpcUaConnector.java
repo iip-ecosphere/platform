@@ -465,7 +465,7 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
     public void trigger(ConnectorTriggerQuery query) {
         if (null != query) {
             try {
-                received(new DataItem(query), true);
+                received(DEFAULT_CHANNEL, new DataItem(query), true);
             } catch (IOException e) {
                 LoggerFactory.getLogger(getClass()).error("Cannot trigger connector {}: {}", getName(), e.getMessage());
             }
@@ -1149,7 +1149,7 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
                 } else {
                     details = null;
                 }
-                received(details);
+                received(DEFAULT_CHANNEL, details);
             } catch (IOException e) {
                 LOGGER.info("While triggering reception", e);
             }
@@ -1164,7 +1164,7 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
         private void onEvent(UaMonitoredItem item, Variant[] var) {
             try {
                 // unclear about event details, no hint to changed node while it is there in UAExplorer
-                received(null);
+                received(DEFAULT_CHANNEL, null);
             } catch (IOException e) {
                 LOGGER.info("While triggering reception", e);
             }
