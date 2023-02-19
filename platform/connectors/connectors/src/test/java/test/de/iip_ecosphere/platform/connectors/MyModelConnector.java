@@ -228,7 +228,7 @@ public class MyModelConnector<CO, CI> extends AbstractConnector<Object, Object, 
         private void notify(Entry entry) {
             if (entry.notify) {
                 try {
-                    received(entry.value);
+                    received(DEFAULT_CHANNEL, entry.value);
                 } catch (IOException e) {
                     error("While notifying" , e);
                 }
@@ -291,7 +291,7 @@ public class MyModelConnector<CO, CI> extends AbstractConnector<Object, Object, 
         if (isPolling()) {
             offers.offer(trigger);
         } else {
-            received(trigger);
+            received(DEFAULT_CHANNEL, trigger);
         }
     }
 

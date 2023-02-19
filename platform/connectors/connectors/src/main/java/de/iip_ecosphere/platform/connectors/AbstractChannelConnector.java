@@ -13,8 +13,11 @@
 package de.iip_ecosphere.platform.connectors;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import de.iip_ecosphere.platform.connectors.types.ChannelProtocolAdapter;
+import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 
 /**
  * Defines a basic channeled connector.
@@ -52,14 +55,14 @@ public abstract class AbstractChannelConnector<O, I, CO, CI> extends AbstractCon
     @SafeVarargs
     protected AbstractChannelConnector(ChannelAdapterSelector<O, I, CO, CI> selector, 
         ChannelProtocolAdapter<O, I, CO, CI>... adapter) {
-        super(ensureAdapterSelector(selector, adapter), adapter);
+        super(ensureAdapterSelector(selector), adapter);
         this.selector = (ChannelAdapterSelector<O, I, CO, CI>) super.getSelector();
         outputChannels = new String[adapter.length];
         for (int a = 0; a < adapter.length; a++) {
             outputChannels[a] = adapter[a].getOutputChannel();
         }
     }
-
+    
     /**
      * Ensures that there is at least a default first-adapter selector of the right type.
      * 
@@ -69,28 +72,69 @@ public abstract class AbstractChannelConnector<O, I, CO, CI> extends AbstractCon
      * @param <CI> the input type of the connector
      * 
      * @param selector the adapter selector (<b>null</b> leads to a default selector for the first adapter)
-     * @param adapter the protocol adapter
      * @return {@code selector} or a default selector instance
      */
     private static <O, I, CO, CI> ChannelAdapterSelector<O, I, CO, CI> ensureAdapterSelector(
-        ChannelAdapterSelector<O, I, CO, CI> selector, ChannelProtocolAdapter<O, I, CO, CI>[] adapter) {
+        ChannelAdapterSelector<O, I, CO, CI> selector) {
         ChannelAdapterSelector<O, I, CO, CI> result = selector;
         if (null == result) {
             result = new ChannelAdapterSelector<O, I, CO, CI>() {
 
+                private Map<String, ChannelProtocolAdapter<O, I, CO, CI>> channelProvider = new HashMap<>();
+                private ChannelProtocolAdapter<O, I, CO, CI> fallback;
+                
                 @Override
-                public ChannelProtocolAdapter<O, I, CO, CI> selectSouthOutput(O data) {
-                    return adapter[0];
+                public ChannelProtocolAdapter<O, I, CO, CI> selectSouthOutput(String channel, O data) {
+                    ChannelProtocolAdapter<O, I, CO, CI> result = channelProvider.get(channel);
+                    if (null == result) {
+                        result = fallback;
+                    }
+                    return result;
                 }
 
                 @Override
                 public ChannelProtocolAdapter<O, I, CO, CI> selectNorthInput(CI data) {
-                    return adapter[0];
+                    return fallback;
+                }
+
+                @Override
+                public void init(ChannelAdapterProvider<O, I, CO, CI> provider) {
+                    // this is a simple selector, we always return the "first", also for the channels
+                    fallback = provider.getAdapter(0);
+                    for (int i = 0, size = provider.getAdapterCount(); i < size; i++) {
+                        ChannelProtocolAdapter<O, I, CO, CI> tmp = provider.getAdapter(i);
+                        String outChannel = tmp.getOutputChannel();
+                        if (!channelProvider.containsKey(outChannel)) {
+                            channelProvider.put(outChannel, tmp);
+                        }
+                    }
                 }
             };
         }
         return result;
     }
+    
+    /**
+     * Refines the parent's {@link BasicAdapterProvider} to comply with/provider {@link ChannelProtocolAdapter}.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private class ChannelAdapterProvider extends BasicAdapterProvider 
+        implements ChannelAdapterSelector.ChannelAdapterProvider<O, I, CO, CI> {
+
+        @Override
+        public ChannelProtocolAdapter<O, I, CO, CI> getAdapter(int index) {
+            // we know from constructor what must be in as type
+            return (ChannelProtocolAdapter<O, I, CO, CI>) super.getAdapter(index); 
+        }
+
+    }
+
+    @Override
+    protected void initSelector(AdapterSelector<O, I, CO, CI> selector) {
+        selector.init(new ChannelAdapterProvider());
+    }
+    
 
     /**
      * Returns the adapter selector.
@@ -99,6 +143,21 @@ public abstract class AbstractChannelConnector<O, I, CO, CI> extends AbstractCon
      */
     protected ChannelAdapterSelector<O, I, CO, CI> getSelector() {
         return selector;
+    }
+    
+    /**
+     * Explicitly requests reading data from the source. This is typically done by polling or
+     * events, but, in seldom cases, may be needed manually.
+     * 
+     * @param channel the channel to assign the received data to, may be {@link #DEFAULT_CHANNEL}.
+     * @param notifyCallback whether {@link #setReceptionCallback(ReceptionCallback) the reception callback} shall 
+     *   be informed about new data
+     * @return the data from the machine, <b>null</b> for none, i.e., also no call to 
+     *   {@link #setReceptionCallback(ReceptionCallback) the reception callback}
+     * @throws IOException in case that reading fails
+     */
+    public CO request(String channel, boolean notifyCallback) throws IOException {
+        return super.request(channel, notifyCallback);
     }
     
     @Override

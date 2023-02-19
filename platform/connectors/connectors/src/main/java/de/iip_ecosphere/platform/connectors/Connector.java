@@ -40,7 +40,7 @@ public interface Connector <O, I, CO, CI> extends EventHandlingConnector {
     public void connect(ConnectorParameter params) throws IOException;
     
     /**
-     * Explicitly requests reading data from the underlying machine. This is typically done by polling or
+     * Explicitly requests reading data from the source. This is typically done by polling or
      * events, but, in seldom cases, may be needed manually.
      * 
      * @param sendToCallback whether {@link #setReceptionCallback(ReceptionCallback) the reception callback} shall 
