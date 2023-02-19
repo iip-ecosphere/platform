@@ -20,16 +20,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import org.springframework.boot.loader.JarLauncher;
 import org.springframework.boot.loader.archive.Archive;
 import org.springframework.boot.loader.archive.JarFileArchive;
+
+import de.iip_ecosphere.platform.services.spring.DescriptorUtils.AccessibleJarLauncher;
 
 /**
  * Simple program to test Spring-packaged jar files for contained classes.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class JarTest extends JarLauncher {
+public class JarTest extends AccessibleJarLauncher {
 
     /**
      * Creates an instance of the test program.
@@ -42,16 +43,6 @@ public class JarTest extends JarLauncher {
 
     // checkstyle: stop exception type check
 
-    /**
-     * Creates a Spring class loader via the JarLauncher setup for the archive passed in to this class.
-     * 
-     * @return the classloader
-     * @throws Exception any kind of exception if loading the archive or constructing a class loader failed
-     */
-    private ClassLoader createClassLoader() throws Exception {
-        return createClassLoader(getClassPathArchivesIterator());
-    }
-    
     /**
      * Executes the test program.
      * 

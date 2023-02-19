@@ -40,6 +40,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import de.iip_ecosphere.platform.services.ArtifactDescriptor;
 import de.iip_ecosphere.platform.services.ServiceDescriptor;
+import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.services.spring.SpringCloudServiceSetup;
 import de.iip_ecosphere.platform.services.spring.SpringCloudServiceDescriptor;
 import de.iip_ecosphere.platform.services.spring.SpringCloudServiceManager;
@@ -111,11 +112,19 @@ public class SimpleStartStopServiceManagerTest extends AbstractTestServiceManage
                 Assert.assertTrue(pspec.getExecutablePath().toString().indexOf("${tmp}") < 0); // has been substituted
                 assertFileExists(new File(homePath, "test.txt")); // extracted from artifacts
                 assertFileExists(new File(homePath, "test2.txt"));
+                
+                sDesc = aDesc.getServer("java-server");
+                Assert.assertTrue(sDesc instanceof SpringCloudServiceDescriptor);
+                Assert.assertEquals(ServiceState.RUNNING, sDesc.getState());
             }
             
             @Override
             public void cleanup(ArtifactDescriptor aDesc) {
                 FileUtils.deleteQuietly(homePath); // for next test
+
+                ServiceDescriptor sDesc = aDesc.getServer("java-server");
+                Assert.assertTrue(sDesc instanceof SpringCloudServiceDescriptor);
+                Assert.assertEquals(ServiceState.STOPPED, sDesc.getState());
             }
 
         }, false);

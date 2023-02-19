@@ -43,6 +43,7 @@ import de.iip_ecosphere.platform.services.spring.descriptor.Relation.Direction;
 import de.iip_ecosphere.platform.services.spring.descriptor.Service;
 import de.iip_ecosphere.platform.services.spring.descriptor.TypeResolver;
 import de.iip_ecosphere.platform.services.spring.descriptor.TypedData;
+import de.iip_ecosphere.platform.services.spring.yaml.YamlService;
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
@@ -121,8 +122,20 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
      */
     static SpringCloudServiceDescriptor createFor(Server server) {
         de.iip_ecosphere.platform.services.environment.YamlService svc = server.toService();
+        YamlService ssvc = new YamlService();
+        ssvc.setDeployable(true);
+        ssvc.setDescription(svc.getDescription());
+        ssvc.setVersion(svc.getVersion());
+        ssvc.setKind(svc.getKind());
+        ssvc.setId(svc.getId());
+        ssvc.setName(svc.getName());
+        ssvc.setTopLevel(svc.isTopLevel());
+        // leave out process for now
+        ssvc.setTransportChannel(svc.getTransportChannel());        
+        ssvc.setCmdArg(svc.getProcess().getCmdArg());
         SpringCloudServiceDescriptor result = new SpringCloudServiceDescriptor(svc.getId(), svc.getApplicationId(), 
             svc.getName(), svc.getDescription(), svc.getVersion());
+        result.service = ssvc;
         result.setClassification(svc.getKind(), svc.isDeployable(), svc.isTopLevel());
         result.server = server;
         // no service, no parameter, no relations

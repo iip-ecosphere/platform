@@ -63,6 +63,7 @@ import de.iip_ecosphere.platform.support.iip_aas.NetworkManagerAasClient;
 import de.iip_ecosphere.platform.support.setup.CmdLine;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
 import de.iip_ecosphere.platform.support.net.NetworkManager;
+import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
 import de.iip_ecosphere.platform.support.net.UriResolver;
 import de.iip_ecosphere.platform.transport.Transport;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
@@ -90,8 +91,9 @@ public class SpringCloudServiceManager
         try {
             result = new NetworkManagerAasClient();
         } catch (IOException e) {
-            LOGGER.warn("Cannot create network manager AAS client. Cannot start servers. "
-                + "AAS server running? {}", e.getMessage());
+            LOGGER.warn("Cannot create network manager AAS client. Using factory-provided network manager, which may "
+                + "be local. AAS server running? {}", e.getMessage());
+            result = NetworkManagerFactory.getInstance(); 
         }
         return result;
     };
@@ -387,7 +389,6 @@ public class SpringCloudServiceManager
                 }
             }
         }
-        
         String myHost = NetUtils.getOwnHostname();
         Map<String, SpringCloudServiceDescriptor> servers = new HashMap<>();
         Set<String> thisDevice = new HashSet<>();
@@ -411,12 +412,18 @@ public class SpringCloudServiceManager
         if (servers.size() > 0) { // prevent warnings if there are no server specs to process
             NetworkManager netClient = networkManagerSupplier.get();
             if (null != netClient) {
+                Map<SpringCloudArtifactDescriptor, ClassLoader> loaders = new HashMap<>();
                 for (SpringCloudServiceDescriptor s: servers.values()) {
                     String id = s.getId();
                     if (null == netClient.getPort(id)) {
                         try {
                             Server ser = s.getServer();
-                            Class<?> cls = Class.forName(ser.getCls()); 
+                            ClassLoader loader = loaders.get(s.getArtifact());
+                            if (null == loader) {
+                                loader = DescriptorUtils.determineArtifactClassLoader(s);
+                                loaders.put(s.getArtifact(), loader);
+                            }
+                            Class<?> cls = Class.forName(ser.getCls(), true, loader); 
                             Object o;
                             try {
                                 List<String> cmdLine = s.collectCmdArguments(getConfig(), ser.getPort(), "");
@@ -439,9 +446,11 @@ public class SpringCloudServiceManager
                                 LOGGER.error("Starting server {}. Specified class does not implement support.Server. "
                                     + "Cannot start.", id);
                             }
-                        } catch (ClassNotFoundException | InvocationTargetException | IllegalAccessException 
-                            | InstantiationException | NoSuchMethodException e) {
-                            LOGGER.error("Starting server {}: {}", id, e);
+                        } catch (ClassNotFoundException  e) {
+                            LOGGER.error("Starting server {}: Cannot find class {}", id, e.getMessage());
+                        } catch (InvocationTargetException | IllegalAccessException | InstantiationException 
+                            | NoSuchMethodException e) {
+                            LOGGER.error("Starting server {}, cannot invoke constructor: {}", id, e.getMessage());
                         }
                     }
                 }
@@ -461,7 +470,6 @@ public class SpringCloudServiceManager
                 }
             }
         }
-        
         if (servers.size() > 0) { // prevent warnings if there are no server specs to process
             NetworkManager netClient = networkManagerSupplier.get();
             if (null != netClient) {
@@ -485,17 +493,24 @@ public class SpringCloudServiceManager
      * 
      * @param started was the service started; if not, ignore call
      * @param service the service to mark
+     * @param register register or unregister the server use
      * @param netClient the network client used for marking, may be <b>null</b>
      * @return the network client used for marking, for instance reuse, may be <b>null</b>
      */
-    private NetworkManager markServerUse(boolean started, SpringCloudServiceDescriptor service, 
+    private NetworkManager markServerUse(boolean started, SpringCloudServiceDescriptor service, boolean register,
         NetworkManager netClient) {
         String id = service.getSvc().getNetMgtKey();
         if (id != null) { // prevent warnings if there are no server specs to process
             if (netClient == null) {
                 netClient = networkManagerSupplier.get();
             }
-            netClient.registerInstance(id, NetUtils.getOwnHostname());
+            if (null != netClient) { // may be disabled in testing
+                if (register) {
+                    netClient.registerInstance(id, NetUtils.getOwnHostname());
+                } else {
+                    netClient.unregisterInstance(id, NetUtils.getOwnHostname());
+                }
+            }
         }
         return netClient;
     }
@@ -599,7 +614,7 @@ public class SpringCloudServiceManager
                     }
                 }
                 reconfigure(service, started, options);
-                netClient = markServerUse(started, service, netClient);
+                netClient = markServerUse(started, service, true, netClient);
             }
             Transport.sendProcessStatus(PROGRESS_COMPONENT_ID, step++, serviceIds.length + 1, "Started " + sId);
         }
@@ -704,6 +719,7 @@ public class SpringCloudServiceManager
         LOGGER.info("Stopping services " + Arrays.toString(serviceIds));
         int step = 0;
         handleFamilyProcesses(serviceIds, false);
+        NetworkManager netClient = null;
         for (String ids : sortByDependency(serviceIds, false)) {
             Transport.sendProcessStatus(PROGRESS_COMPONENT_ID, step, serviceIds.length + 1, "Stopping service " + ids);
             SpringCloudServiceDescriptor service = getService(ids);
@@ -732,6 +748,7 @@ public class SpringCloudServiceManager
             }
             service.detachStub();
             Transport.sendProcessStatus(PROGRESS_COMPONENT_ID, step++, serviceIds.length + 1, "Stopped service " + ids);
+            netClient = markServerUse(true, service, false, netClient);
         }
         checkErrors(errors);
         LOGGER.info("Stopped services " + Arrays.toString(serviceIds));
