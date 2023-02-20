@@ -1,27 +1,41 @@
 # IIP-Ecosphere platform: Releases
 
-### At the horizon (Spring 2023):
+### At the horizon (Fall 2023):
 
 Planned:
+* Measurements in testing environment [#126](https://github.com/iip-ecosphere/platform/issues/126)
+* RBAC on AAS [#122](https://github.com/iip-ecosphere/platform/issues/122)
 * Component upgrades: Spring Cloud Stream [#57](https://github.com/iip-ecosphere/platform/issues/57)
 * Integrated container management for Kubernetes [#39](https://github.com/iip-ecosphere/platform/issues/39)
+* Filtering of monitoring telegrams [#75](https://github.com/iip-ecosphere/platform/issues/75)
 
-### Next release (Winter 2023, end of January 2023):
+### At the fair (Spring 2023):
 
 Planned:
 * Enable tolerant switching: [#26](https://github.com/iip-ecosphere/platform/issues/26)
 * Platform component heartbeat and AAS cleanup: [#62](https://github.com/iip-ecosphere/platform/issues/62)
-* Filtering of monitoring telegrams [#75](https://github.com/iip-ecosphere/platform/issues/75)
-* Semantic Ids in the UI [#63](https://github.com/iip-ecosphere/platform/issues/63)
-
-In progress:
 * Integration of federated learning [#127](https://github.com/iip-ecosphere/platform/issues/127)
 * UI progress reporting [#70](https://github.com/iip-ecosphere/platform/issues/70)
+* Configuration: Path in record type moves into connector [#128](https://github.com/iip-ecosphere/platform/issues/128)
+* Integration of federated learning [#127](https://github.com/iip-ecosphere/platform/issues/127)
+* [#100](https://github.com/iip-ecosphere/platform/issues/100): Run multiple app instances
+* REST as alternative protocol for Python Service environment: [#56](https://github.com/iip-ecosphere/platform/issues/56)
+* Tracing in Python Service environment: [#88](https://github.com/iip-ecosphere/platform/issues/88)
+* Cleanup, e.g., old build processes: [#115](https://github.com/iip-ecosphere/platform/issues/115)
+* Platform installation scripts: [#107](https://github.com/iip-ecosphere/platform/issues/107)
+* CLI multi-device deployment problem: [#113](https://github.com/iip-ecosphere/platform/issues/113)
+* UI display application service meshes: [#90](https://github.com/iip-ecosphere/platform/issues/90)
+* UI restrucuture for larger lists: [#86](https://github.com/iip-ecosphere/platform/issues/86)
+* Angular config.json loading problem: [#79](https://github.com/iip-ecosphere/platform/issues/79)
+* KODEX: dynamic port assignment: [#14](https://github.com/iip-ecosphere/platform/issues/14), documentation: [#6](https://github.com/iip-ecosphere/platform/issues/6)
+
+### Next release (0.5.0, February 2023):
+
+Planned:
+* Semantic Ids in the UI [#63](https://github.com/iip-ecosphere/platform/issues/63)
 * Automatic creation of containers [#10](https://github.com/iip-ecosphere/platform/issues/10), [#9](https://github.com/iip-ecosphere/platform/issues/9).
 * [#59](https://github.com/iip-ecosphere/platform/issues/59): Distributed testing/evaluation environment
-* [#100](https://github.com/iip-ecosphere/platform/issues/100): Run multiple app instances
 * [#101](https://github.com/iip-ecosphere/platform/issues/101): Documentation of fixed formats used by the platform
-* [#102](https://github.com/iip-ecosphere/platform/issues/102): Create/provide container for service development.
 
 New features:
 * Multi-channel connectors for MQTT in the connectors component and the code generation.
@@ -42,6 +56,8 @@ New features:
 * [#109](https://github.com/iip-ecosphere/platform/issues/101): Maven integration for platform/application instantiation and orchestrated execution of Maven, e.g., for the examples.
 * [#76](https://github.com/iip-ecosphere/platform/issues/76): Maven version of broker can be defined in configuration, optionally enabling use of QPID-J 9.0.0.
 * [#81](https://github.com/iip-ecosphere/platform/issues/81): UI displays information from device AAS.
+* [#102](https://github.com/iip-ecosphere/platform/issues/102): Development Docker container for service development.
+* Technical Integration of federated learning [#127](https://github.com/iip-ecosphere/platform/issues/127), in particular server processes in application lifecycle and preparation of (template) generation
 
 Improvements:
 * Extend configuration model, e.g., by constraints [#52](https://github.com/iip-ecosphere/platform/issues/52)
