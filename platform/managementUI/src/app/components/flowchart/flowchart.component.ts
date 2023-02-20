@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import Drawflow from 'drawflow';
-import { ApiService } from 'src/app/services/api.service';
 import { DrawflowService } from 'src/app/services/drawflow.service';
 
 @Component({
@@ -16,11 +15,13 @@ export class FlowchartComponent implements OnInit {
   }
 
   editor: any;
+  services: any;
 
 
   ngOnInit(): void {
+    this.services = this.df.getServices();
+
     const drawFlowHtmlElement = <HTMLElement>document.getElementById('drawflow');
-    console.log(drawFlowHtmlElement);
     if(drawFlowHtmlElement) {
       this.editor = new Drawflow(drawFlowHtmlElement);
       this.editor.reroute = true;
@@ -36,12 +37,6 @@ export class FlowchartComponent implements OnInit {
       // this.editor.on('nodeCreated', function(id) {
       //   console.log("Node created " + id);
       // })
-
-      let data = {name: 'cool name', coolNumber: '2' }
-      const htmlTemplate = `<div">${data.name} ${data.coolNumber}</div>`;
-
-      this.editor.addNode('Home', 1, 1, 50, 50, '', {name: 'cool node', coolNumber: '1' }, htmlTemplate);
-      this.editor.addNode('Home', 1, 1, 300, 100, '', {name: 'cool node', coolNumber: '2' }, htmlTemplate);
     }
 
   }
@@ -61,11 +56,11 @@ export class FlowchartComponent implements OnInit {
     if(data?.outputArguments[0].value?.value) {
       let graph = JSON.parse(data?.outputArguments[0].value?.value);
       let graph2 = JSON.parse(graph.result);
-
+      console.log(graph2);
       let nodes = graph2.drawflow.Home.data
       for(let node in nodes) {
         const a = nodes[node];
-        a.html = "<div> " + a.data.ivmlVar + "<div>"
+        a.html = "<div><div> " + a.data.ivmlVar + "</div><br> <div>kind: "+ a.data.kind + "</div><br> <div> type: "+ a.data.type + "</div></div>";
       }
       this.editor.import(graph2);
     }

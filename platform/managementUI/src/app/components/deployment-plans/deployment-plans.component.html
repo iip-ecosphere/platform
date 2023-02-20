@@ -16,8 +16,10 @@
   <mat-list *ngIf="deploymentPlans; else noPlans">
     <div *ngFor="let plan of deploymentPlans.value">
       <mat-list-item >
-        <div class="container">
+        <span>{{ getName(plan.value) }}</span>
+        <span>{{ getDesc(plan.value) }}</span>fro     <div class="container">
           <span>{{ getName(plan.value) }}</span>
+          <span>{{ getDesc(plan.value) }}</span>
           <span>
             <button mat-raised-button class="button" (click)="deploy(plan)">deploy</button>
             <button mat-raised-button style="background-color: rgb(255,204,0)" (click)="undeploy(plan)">udeploy</button>
