@@ -43,6 +43,7 @@ import de.iip_ecosphere.platform.services.spring.descriptor.Relation.Direction;
 import de.iip_ecosphere.platform.services.spring.descriptor.Service;
 import de.iip_ecosphere.platform.services.spring.descriptor.TypeResolver;
 import de.iip_ecosphere.platform.services.spring.descriptor.TypedData;
+import de.iip_ecosphere.platform.services.spring.yaml.YamlProcess;
 import de.iip_ecosphere.platform.services.spring.yaml.YamlService;
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.TimeUtils;
@@ -130,7 +131,13 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
         ssvc.setId(svc.getId());
         ssvc.setName(svc.getName());
         ssvc.setTopLevel(svc.isTopLevel());
-        // leave out process for now
+        YamlProcess sprc = new YamlProcess();
+        sprc.setExecutable(server.getExecutable());
+        sprc.setExecutablePath(server.getExecutablePath());
+        sprc.setHomePath(server.getHomePath());
+        sprc.setArtifacts(server.getArtifacts());
+        sprc.setWaitTime(server.getWaitTime());
+        ssvc.setProcess(sprc);
         ssvc.setTransportChannel(svc.getTransportChannel());        
         ssvc.setCmdArg(svc.getProcess().getCmdArg());
         SpringCloudServiceDescriptor result = new SpringCloudServiceDescriptor(svc.getId(), svc.getApplicationId(), 

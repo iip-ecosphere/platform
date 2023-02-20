@@ -305,9 +305,10 @@ public class DescriptorUtils {
      * Determines the class loader of the {@code artifact}.
      * 
      * @param artifact the artifact to determine the class loader for
+     * @param homeDir process home dir to use for unpacking, may be <b>null</b> for none/unknown
      * @return the class loader
      */
-    public static ClassLoader determineArtifactClassLoader(SpringCloudArtifactDescriptor artifact) {
+    public static ClassLoader determineArtifactClassLoader(SpringCloudArtifactDescriptor artifact, File homeDir) {
         ClassLoader loader = SpringCloudServiceManager.class.getClassLoader();
         String artId = artifact.getId();
         File jar = artifact.getJar();
@@ -322,7 +323,10 @@ public class DescriptorUtils {
             }
         } else if (jarName.endsWith(".zip")) {
             try {
-                File tmp = FileUtils.createTmpFolder(FileUtils.sanitizeFileName(artId), true);
+                File tmp = homeDir;
+                if (null == tmp) {
+                    tmp = FileUtils.createTmpFolder(FileUtils.sanitizeFileName(artId), true);
+                }
                 getLogger().info("Creating URL classloader for {}/{} unpacked to {}", artId, jar, tmp);
                 tmp.deleteOnExit();
                 ZipUtils.extractZip(new FileInputStream(jar), tmp.toPath());
@@ -364,7 +368,11 @@ public class DescriptorUtils {
      * @return the class loader
      */
     public static ClassLoader determineArtifactClassLoader(SpringCloudServiceDescriptor service) {
-        return determineArtifactClassLoader(service.getArtifact());
+        File homePath = null;
+        if (null != service.getSvc() && null != service.getSvc().getProcess()) {
+            homePath = service.getSvc().getProcess().getHomePath();
+        }
+        return determineArtifactClassLoader(service.getArtifact(), homePath);
     }
 
     /**
