@@ -22,7 +22,8 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({
     AbstractServiceDescriptorTest.class,
     ServiceManagerTest.class,
-    ServicesAasTest.class
+    ServicesAasTest.class,
+    ServerWrapperTest.class
 })
 public class AllTests {
 

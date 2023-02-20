@@ -39,6 +39,7 @@ import org.springframework.stereotype.Component;
 
 import de.iip_ecosphere.platform.services.AbstractServiceManager;
 import de.iip_ecosphere.platform.services.ArtifactDescriptor;
+import de.iip_ecosphere.platform.services.ServerWrapper;
 import de.iip_ecosphere.platform.services.ServiceDescriptor;
 import de.iip_ecosphere.platform.services.ServiceFactoryDescriptor;
 import de.iip_ecosphere.platform.services.ServiceManager;
@@ -433,8 +434,7 @@ public class SpringCloudServiceManager
                                 o = cls.getConstructor().newInstance();
                             }
                             if (o instanceof de.iip_ecosphere.platform.support.Server) {
-                                de.iip_ecosphere.platform.support.Server sv = 
-                                    (de.iip_ecosphere.platform.support.Server) o;
+                                ServerWrapper sv = new ServerWrapper((de.iip_ecosphere.platform.support.Server) o);
                                 setStateSafe(s, ServiceState.STARTING);
                                 ServerAddress adr = new ServerAddress(Schema.IGNORE, myHost, ser.getPort());
                                 adr = netClient.reservePort(id, adr);
