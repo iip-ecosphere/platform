@@ -8,9 +8,10 @@ template Dockerfile(IIPEcosphere config, FileArtifact target, sequenceOf(MeshEle
 	
     def main(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, Application app, ContainerType containerType, EcsDevice device) {
 
-        'FROM openjdk:13-alpine'  // TODO Java-Version & CPU
+        'FROM alpine:3.14'
         '${containerSettings(config, containerType, device)}'
         'RUN apk add bash'
+        'RUN apk add openjdk11'
         if (not(collectDependencies(elements)->selectByKind(SystemDependency)->select(d|d.key=='JAVA8').isEmpty())) {
             'RUN apk add openjdk8'
         }
