@@ -40,6 +40,7 @@ VMsSetup.yaml structure:
     * DockerRegistryPort: The port for the private docker registry.
     * ArtifactsFolder: The directory for the generated artifacts by the platform instantiation. 
     * MgtUiServerIP: The IP address of the management UI server.
+    * LocalBrokerPort: Optional local port for the brokers in the devices and containers. 
     * CleanAll: Clean Maven local repository and the ArtifactsFolder - Jupyter Step "Clean Maven and Artifacts Folder".
     * InstallPlatform: Install the platform and instantiates it - Jupyter Step "Install The Platform".
     * NewInstallFiles: Get new installation files for the platform from the GitHub.

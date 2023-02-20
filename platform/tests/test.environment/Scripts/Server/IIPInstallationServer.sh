@@ -19,6 +19,9 @@ if [ $7 == "True" ]; then
     sed -i $artifactsLineNumber' i \ \ \ \ artifactsUriPrefix = "http://'$localIP':4200/download";' src/main/easy/TechnicalSetup.ivml
     sed -i $artifactsLineNumber' i \ \ \ \ artifactsFolder = "'$artifactsFolder'";' src/main/easy/TechnicalSetup.ivml
 
+    if [ $8 != "Non" ]; then
+        sed -i '/transportProtocol = /a \ \ \ \ \ \ \ \ localPort = '$8',' src/main/easy/TechnicalSetup.ivml
+    fi
 else
     cd Install
 fi
@@ -45,27 +48,25 @@ if [ $7 == "True" ]; then
 
     if [ $2 != "Non" ]; then
 
-      #sed -i '/Application /a \ \ \ \ \ \ \ \ createContainer = true,' src/main/easy/apps/ApplicationPart*.ivml
+        #sed -i '/Application /a \ \ \ \ \ \ \ \ createContainer = true,' src/main/easy/apps/ApplicationPart*.ivml
+      
+        generationLineNumber=$(cat src/main/easy/TechnicalSetup.ivml | grep -n "generation setup" | cut -d ' ' -f1 | sed 's/:/ /g')
+        ((generationLineNumber=generationLineNumber-1))
 
-      #sed -i '/transportProtocol = /a \ \ \ \ \ \ \ \ localPort = 8888,' src/main/easy/TechnicalSetup.ivml
-
-      generationLineNumber=$(cat src/main/easy/TechnicalSetup.ivml | grep -n "generation setup" | cut -d ' ' -f1 | sed 's/:/ /g')
-      ((generationLineNumber=generationLineNumber-1))
-
-      sed -i $generationLineNumber' i \ \ \ \ };' src/main/easy/TechnicalSetup.ivml     
-      sed -i $generationLineNumber' i \ \ \ \ \ \ \ \ containerType = ContainerType::'$2 src/main/easy/TechnicalSetup.ivml
-      sed -i $generationLineNumber' i \ \ \ \ EcsDevice device = {' src/main/easy/TechnicalSetup.ivml
-      sed -i $generationLineNumber' i \ \ \ \ ' src/main/easy/TechnicalSetup.ivml
-      if [ $3 != "Non" ]; then
         sed -i $generationLineNumber' i \ \ \ \ };' src/main/easy/TechnicalSetup.ivml     
-        sed -i $generationLineNumber' i \ \ \ \ \ \ \ \ registry = "'$3'"' src/main/easy/TechnicalSetup.ivml
-        sed -i $generationLineNumber' i \ \ \ \ containerManager = DockerContainerManager {' src/main/easy/TechnicalSetup.ivml
+        sed -i $generationLineNumber' i \ \ \ \ \ \ \ \ containerType = ContainerType::'$2 src/main/easy/TechnicalSetup.ivml
+        sed -i $generationLineNumber' i \ \ \ \ EcsDevice device = {' src/main/easy/TechnicalSetup.ivml
         sed -i $generationLineNumber' i \ \ \ \ ' src/main/easy/TechnicalSetup.ivml
-      fi
-      sed -i $generationLineNumber' i \ \ \ \ // ---------- Device ------------' src/main/easy/TechnicalSetup.ivml
-      sed -i $generationLineNumber' i \ \ \ \ ' src/main/easy/TechnicalSetup.ivml
+        if [ $3 != "Non" ]; then
+            sed -i $generationLineNumber' i \ \ \ \ };' src/main/easy/TechnicalSetup.ivml     
+            sed -i $generationLineNumber' i \ \ \ \ \ \ \ \ registry = "'$3'"' src/main/easy/TechnicalSetup.ivml
+            sed -i $generationLineNumber' i \ \ \ \ containerManager = DockerContainerManager {' src/main/easy/TechnicalSetup.ivml
+            sed -i $generationLineNumber' i \ \ \ \ ' src/main/easy/TechnicalSetup.ivml
+        fi
+        sed -i $generationLineNumber' i \ \ \ \ // ---------- Device ------------' src/main/easy/TechnicalSetup.ivml
+        sed -i $generationLineNumber' i \ \ \ \ ' src/main/easy/TechnicalSetup.ivml
 
-      echo "Containers Added"
+        echo "Containers Added"
 
     fi
 
