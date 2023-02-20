@@ -57,3 +57,5 @@ servers:
     host: localhost
     port: 16754
     cls: test.de.iip_ecosphere.platform.simpleStream.spring.TestServer
+    cmdArg:
+      - --port=${port}
