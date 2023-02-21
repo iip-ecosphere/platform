@@ -3,7 +3,7 @@
 Maven plugin for the following platform installation tasks (represented as Maven goals in untypical notation).
 
 * generateInterfaces: generate app interfaces, but no apps - executed only if `outputDirectory` is empty or IVML files in `modelDirectory`are newer than `outputDirectory`
-* generateAppsNoDeps: app interfaces with apps, but without dependencies to artifacts - executed only if `outputDirectory` is empty or IVML files in `modelDirectory`are newer than `outputDirectory`
+* generateAppsNoDeps: app interfaces with apps, but without dependencies to artifacts - executed only if `outputDirectory` is empty or IVML files in `modelDirectory` are newer than `outputDirectory`
 * generateApps: app interfaces with apps including artifact dependencies - executed always
 * generateBroker: create a sample broker - executed only if `outputDirectory` is empty or IVML files in `modelDirectory`are newer than `outputDirectory`
 * generatePlatform: exclusively platform components - executed only if `outputDirectory` is empty or IVML files in `modelDirectory`are newer than `outputDirectory`
