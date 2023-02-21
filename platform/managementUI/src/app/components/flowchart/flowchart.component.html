@@ -6,7 +6,7 @@
       <div *ngIf="services && services.value" class="toolbar">
         <mat-card *ngFor="let service of services.value">
           <mat-card-title *ngIf="service.idShort">{{ service.idShort }}</mat-card-title>
-          <mat-card-content><div *ngFor="let property of service.value"> {{property.idShort}}</div></mat-card-content>
+          <mat-card-content><div *ngFor="let property of service.value"> {{property.idShort}}: <span *ngIf="property.value">{{property.value}}</span></div></mat-card-content>
         </mat-card>
       </div>
 
