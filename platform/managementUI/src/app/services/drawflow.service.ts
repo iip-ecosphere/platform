@@ -1,6 +1,5 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { response } from 'express';
 import { firstValueFrom } from 'rxjs';
 import { InputVariable, platformResponse } from 'src/interfaces';
 import { EnvConfigService } from './env-config.service';
@@ -81,8 +80,9 @@ export class DrawflowService {
 
   //http://192.168.178.47:9001/shells/urn%3A%3A%3AAAS%3A%3A%3AiipEcosphere%23/aas/submodels/Configuration/submodel/submodelElements/Application/myApp/services
   public async  getServices() {
+    let response;
     try {
-      const response = await firstValueFrom(this.http.get(this.ip + '/shells/' + this.urn + "/aas/submodels/Configuration/submodel/submodelElements/Service"));
+      response = await firstValueFrom(this.http.get(this.ip + '/shells/' + this.urn + "/aas/submodels/Configuration/submodel/submodelElements/Service"));
       console.log(response);
     } catch(e) {
       console.log(e);

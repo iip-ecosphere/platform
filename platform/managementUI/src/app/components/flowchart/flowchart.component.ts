@@ -18,8 +18,9 @@ export class FlowchartComponent implements OnInit {
   services: any;
 
 
-  ngOnInit(): void {
-    this.services = this.df.getServices();
+  async ngOnInit() {
+    this.services = await this.df.getServices();
+    console.log(this.services);
 
     const drawFlowHtmlElement = <HTMLElement>document.getElementById('drawflow');
     if(drawFlowHtmlElement) {
