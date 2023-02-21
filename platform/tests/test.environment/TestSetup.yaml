@@ -14,10 +14,11 @@ Setup:
     DockerRegistryPort        : 5001
     ArtifactsFolder           : "/iip/actual/artifacts"
     MgtUiServerIP             : "192.168.81.100"
+    LocalBrokerPort           : Non
     CleanAll                  : False
-    InstallPlatform           : False
-    NewInstallFiles           : False
-    IIPEasyTracing            : False
+    InstallPlatform           : True
+    NewInstallFiles           : True
+    IIPEasyTracing            : True
     StartPlatform             : False
     DevicesJoinPlatform       : False
     StartServiceMgrContainer  : False
@@ -25,9 +26,9 @@ Setup:
     DevicesLeavePlatform      : False
     CheckDevices              : False
     StopPlatform              : False
-    StopDockerRegistry        : True
-    DownloadExamples          : False
-    CompileExamples           : False
+    StopDockerRegistry        : False
+    DownloadExamples          : True
+    CompileExamples           : True
     AddServiceExamples        : False
     StartAllServiceExamples   : False
     StopAllServiceExamples    : False
@@ -38,7 +39,7 @@ Examples:
   - Name           : SimpleMesh
     Included       : True
     Redownload     : False
-    Container      : True
+    Container      : False
     Run            : True
     Device         : LinDev000002
     Artifact       : "SimpleMeshInstallTestingApp-0.1.0-SNAPSHOT-bin.jar"
@@ -70,7 +71,7 @@ Examples:
   - Name           : examples.rtsa
     Included       : True
     Redownload     : True
-    Container      : True
+    Container      : False
     Run            : True
     Device         : LinDev000001
     Artifact       : "SimpleRTSADemoFlowApp-0.1.0-SNAPSHOT-bin.jar"

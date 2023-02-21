@@ -90,4 +90,15 @@ export class DeploymentPlansComponent implements OnInit {
     return name;
   }
 
+  public getDesc(plan: ResourceAttribute[]) {
+    // console.log(plan);
+    let name: any = plan.find(item => item.idShort === 'description');
+    if(!name) {
+      name = ''
+    } else {
+      name = name.value;
+    }
+    return name;
+  }
+
 }

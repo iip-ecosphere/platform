@@ -81,7 +81,7 @@ template PythonMeshElementTemplateBase(Configuration config, FileArtifact target
     }
     
     def produceDatatypeImports(MeshElement elt) {
-        '${generateImports(elt.impl)}|e'
+        '${generateImports(elt.impl)}'
         setOf(RecordType) types = collectRecordTypes(elt);
         for (RecordType t: types) {
             String name = t.name;

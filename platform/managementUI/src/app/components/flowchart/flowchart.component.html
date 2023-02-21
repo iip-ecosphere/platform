@@ -1,36 +1,16 @@
 
 <mat-drawer-container class="container">
-  <mat-drawer mode="side" opened class="toolbar">
+  <mat-drawer mode="side" opened >
     <div class="inner-toolbar">
-      <h1>Flowchart Test</h1>
-      <mat-card>
-        <mat-card-title>Element</mat-card-title>
-        <mat-card-content>This is an Element</mat-card-content>
-      </mat-card>
-      <mat-card>
-        <mat-card-title>Element</mat-card-title>
-        <mat-card-content>This is an Element</mat-card-content>
-      </mat-card>
-      <mat-card>
-        <mat-card-title>Element</mat-card-title>
-        <mat-card-content>This is an Element</mat-card-content>
-      </mat-card>
-      <mat-card>
-        <mat-card-title>Element</mat-card-title>
-        <mat-card-content>This is an Element</mat-card-content>
-      </mat-card>
-      <mat-card>
-        <mat-card-title>Element</mat-card-title>
-        <mat-card-content>This is an Element</mat-card-content>
-      </mat-card>
-      <mat-card>
-        <mat-card-title>Element</mat-card-title>
-        <mat-card-content>This is an Element</mat-card-content>
-      </mat-card>
-      <mat-card>
-        <mat-card-title>Element</mat-card-title>
-        <mat-card-content>This is an Element</mat-card-content>
-      </mat-card>
+      <h1>Services</h1>
+      <div *ngIf="services && services.value" class="toolbar">
+        <mat-card *ngFor="let service of services.value">
+          <mat-card-title *ngIf="service.idShort">{{ service.idShort }}</mat-card-title>
+          <mat-card-content><div *ngFor="let property of service.value"> {{property.idShort}}: <span *ngIf="property.value">{{property.value}}</span></div></mat-card-content>
+        </mat-card>
+      </div>
+
+
     </div>
   </mat-drawer>
   <mat-drawer-content>
