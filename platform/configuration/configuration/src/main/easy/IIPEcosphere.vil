@@ -242,8 +242,8 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
             artifacts.add(server.artifact);
         }
     }
-	
-	generateServerInterface(Configuration config, Server server, Path appRoot) = {
+    
+    generateServerInterface(Configuration config, Server server, Path appRoot) = {
     }
     
     generateServerInterface(Configuration config, PythonServer server, Path appRoot) = {
@@ -322,6 +322,8 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
             vilTemplateProcessor("TemplatesTestDataJson", config, "${testResourcesSrc}/testData-${getClsName(no)}.json.tmpl", elt=no);
         }
     }
+    
+    
     
     // ------------------------------------------ generating apps: generating service-specific code artifacts -----------------------------------
     
@@ -628,7 +630,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
 
         setOf(RecordType) recordTypes = RecordType.allInstances();
         setOf(ServiceBase) serviceTypes = ServiceBase.allInstances();
-		setOf(Server) serverTypes = Server.allInstances();
+        setOf(Server) serverTypes = Server.allInstances();
         Path javaSrc = "${appRoot}/src/main/java";
         Path pySrc = "${appRoot}/src/main/python";
         Path resourcesSrc = "${appRoot}/src/main/resources";
@@ -672,11 +674,12 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         for (ServiceBase s : serviceTypes) {
             generateServiceInterfaces(appRoot, config, s);
         }
-        
+		
 		for (Server s : serverTypes) {
 			generateServerInterface(config, s, appRoot);
 		}
-		
+
+        
         //vilTemplateProcessor("JavaInterfaceAssembly", config, "${assemblySrc}/javaInterfaces.xml");
         //assemblies.add("interfaces|${assemblyRel}/javaInterfaces.xml|package|${mvnProjectBuildDir}");
         if (isPythonUsed(usedServiceTypes)) {
