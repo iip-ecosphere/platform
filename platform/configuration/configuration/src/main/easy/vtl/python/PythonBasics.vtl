@@ -170,10 +170,34 @@ template PythonBasics(Configuration config, FileArtifact target) {
     
     def produceParameterFields(Parameters params) {
         for (Parameter p: params) {
-            'param_${p.name} = None'
+            'param_${p.name} = ${produceParameterDefault(p)}'
         }
     }
-    
+
+    def produceParameterDefault(Parameter p) {
+        'None'
+    }
+
+    def produceParameterDefault(IntegerParameter p) {
+        '${p.defaultValue}'
+    }
+
+    def produceParameterDefault(StringParameter p) {
+        '"${p.defaultValue}"'
+    }
+
+    def produceParameterDefault(RealParameter p) {
+        '${p.defaultValue}'
+    }
+
+    def produceParameterDefault(BooleanParameter p) {
+        '${toBoolean(p.defaultValue)}'
+    }
+
+    def produceParameterDefault(LongParameter p) {
+        '${toBoolean(p.defaultValue)}'
+    }
+
     def produceReconfigure(Parameters params) {
         if (params.size() > 0) {
             'def notifyReconfigured(self, values: dict):

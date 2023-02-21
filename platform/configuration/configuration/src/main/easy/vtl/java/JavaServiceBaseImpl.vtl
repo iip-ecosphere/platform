@@ -39,31 +39,31 @@ template JavaServiceBaseImpl(Configuration config, FileArtifact target, ServiceB
     // called via produceForParameterAttributes(service)
     def produceParameterAttribute(StringParameter p) {
         registerParameter(p, "String.class", "TypeTranslators.JSON_STRING");
-        'private String ${attributeName(p)};'
+        'private String ${attributeName(p)} = "${p.defaultValue}";'
     }
 
     // called via produceForParameterAttributes(service)
     def produceParameterAttribute(IntegerParameter p) {
         registerParameter(p, "Integer.class", "TypeTranslators.INTEGER");
-        'private int ${attributeName(p)};'
+        'private int ${attributeName(p)} = ${p.defaultValue};'
     }
 
     // called via produceForParameterAttributes(service)
     def produceParameterAttribute(LongParameter p) {
         registerParameter(p, "Long.class", "TypeTranslators.LONG");
-        'private long ${attributeName(p)};'
+        'private long ${attributeName(p)} = ${p.defaultValue};'
     }
 
     // called via produceForParameterAttributes(service)
     def produceParameterAttribute(BooleanParameter p) {
         registerParameter(p, "Boolean.class", "TypeTranslators.BOOLEAN");
-        'private boolean ${attributeName(p)};'
+        'private boolean ${attributeName(p)} = ${p.defaultValue};'
     }
 
     // called via produceForParameterAttributes(service)
     def produceParameterAttribute(RealParameter p) {
         registerParameter(p, "Double.class", "TypeTranslators.DOUBLE");
-        'private double ${attributeName(p)};'
+        'private double ${attributeName(p)} = ${p.defaultValue};'
     }
     
     def produceIngestorBody(IOType type) {

@@ -224,7 +224,8 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
             }
         };
     }
-    
+
+    // dispatch basis    
     generateServer(Configuration config, Server server, Path appRoot, setOf(String) artifacts) = {
         if (isDefined(server.artifact) and server.artifact.length() > 0) {
             artifacts.add(server.artifact);
@@ -243,13 +244,13 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         }
     }
     
+    // dispatch basis    
     generateServerInterface(Configuration config, Server server, Path appRoot) = {
     }
     
     generateServerInterface(Configuration config, PythonServer server, Path appRoot) = {
     	String clsName = asTypeName(server.id);
 	    vilTemplateProcessor("PythonServerInterface", config, "${appRoot}/src/main/python/interfaces/${clsName}ServerInterface.py", server=server, pkg="interfaces");	
-    
     }
     
     /*
@@ -323,7 +324,11 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         }
     }
     
-    
+    generateTemplateElements(Path appRoot, Configuration config, MeshElement no, ServiceFamily family, setOf(String) assemblies, setOf(String) javaTests) = {
+        for (Service m: family.members) {
+            generateTemplateElements(appRoot, config, no, m, assemblies, javaTests);
+        }
+    }    
     
     // ------------------------------------------ generating apps: generating service-specific code artifacts -----------------------------------
     

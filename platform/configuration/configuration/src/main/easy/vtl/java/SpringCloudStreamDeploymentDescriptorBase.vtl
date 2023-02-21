@@ -88,7 +88,11 @@ template SpringCloudStreamDeploymentDescriptorBase(Configuration config, FileArt
     
     // dispatch basis
     def generateService(ServiceBase service) {
-        ''
+        if (isDefined(service.server)) {
+            'netMgtKey: ${service.server.id}'
+        } else {
+            ''
+        }
     }
         
     def generateEnsemble(MeshElement elt, ServiceBase service, String familyId) {
@@ -151,10 +155,19 @@ template SpringCloudStreamDeploymentDescriptorBase(Configuration config, FileArt
     }
     
     def generateAppOpt() {
-        if (isDefined(app.cmdArg) and app.cmdArg.length() > 0) { // EASY-bug
-            sequenceOf(String) tmp = app.cmdArg.split(",");
+        '${generateCmdArg(getStringValueSafe(app.cmdArg, ""), "")}'
+    }
+
+    def generateCmdArg(String cmdArg, String key) {
+        if (cmdArg.length() > 0) { // EASY-bug
+            String indent = "";
+            if (key.length() > 0) {
+                indent = "  ";
+                '${key}'
+            }
+            sequenceOf(String) tmp = cmdArg.split(",");
             for (String a: tmp) {
-                "- ${a}"
+                "${indent}- ${a}"
             }
         }
     }
@@ -444,7 +457,7 @@ template SpringCloudStreamDeploymentDescriptorBase(Configuration config, FileArt
               transportChannel: ${getStringValueSafe(s.transportChannel, "")}
               host: ${s.host}
               port: ${s.port}
-              cls: server.${asTypeName(s.id)}Server
+              cls: ${getServerCls(s)}
               started: ${s.running}
               ${generateServer(s)|e}'
         }    
@@ -453,6 +466,10 @@ template SpringCloudStreamDeploymentDescriptorBase(Configuration config, FileArt
     // dispatch basis
     def generateServer(Server server) {
         ''
+    }
+
+    def generateServer(JavaServer server) {
+        '${generateCmdArg(getStringValueSafe(server.cmdArg, ""), "cmdArg")}'
     }
     
     def getServerCls(Server server) {

@@ -161,6 +161,7 @@ project Services {
        TraceKind traceSent = TraceKind::NONE;
        setOf(refTo(Dependency)) dependencies = {};
        NameplateInfo nameplateInfo;
+       refTo(Server) server;
 
        Constraint idOk = matches(id, "^[^@]+$");
        Constraint sourceTypesOk = kind == ServiceKind.SOURCE_SERVICE implies isDefined(output) and fwdTypes(output).size() > 0; // does not hold for connectors: and fwdTypes(input).size() == 0;
@@ -261,8 +262,9 @@ project Services {
     }
     
     // direct Java-based Server, must implement Server interface
-    compound JavaServer {
+    compound JavaServer refines Server {
         NonEmptyString class;
+        String cmdArg; // for now, comma separated
     }
 
     // python based server instance, based on PythonServiceEnvironment, may be generated, must implement Server interface
