@@ -325,6 +325,7 @@ project DataTypes {
         ByteArrayType;
         IntegerArrayType;
         DoubleArrayType;
+        StringArrayType;
         IEC61131_3DateTimeType;
         iipVer;
     };
