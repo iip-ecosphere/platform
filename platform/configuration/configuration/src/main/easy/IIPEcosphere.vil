@@ -242,6 +242,15 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
             artifacts.add(server.artifact);
         }
     }
+	
+	generateServerInterface(Configuration config, Server server, Path appRoot) = {
+    }
+    
+    generateServerInterface(Configuration config, PythonServer server, Path appRoot) = {
+    	String clsName = asTypeName(server.id);
+	    vilTemplateProcessor("PythonServerInterface", config, "${appRoot}/src/main/python/interfaces/${clsName}ServerInterface.py", server=server, pkg="interfaces");	
+    
+    }
     
     /*
     * Collects all IVML types of services used in all applications and stores them globally to usedServiceTypes.
@@ -619,6 +628,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
 
         setOf(RecordType) recordTypes = RecordType.allInstances();
         setOf(ServiceBase) serviceTypes = ServiceBase.allInstances();
+		setOf(Server) serverTypes = Server.allInstances();
         Path javaSrc = "${appRoot}/src/main/java";
         Path pySrc = "${appRoot}/src/main/python";
         Path resourcesSrc = "${appRoot}/src/main/resources";
@@ -663,6 +673,10 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
             generateServiceInterfaces(appRoot, config, s);
         }
         
+		for (Server s : serverTypes) {
+			generateServerInterface(config, s, appRoot);
+		}
+		
         //vilTemplateProcessor("JavaInterfaceAssembly", config, "${assemblySrc}/javaInterfaces.xml");
         //assemblies.add("interfaces|${assemblyRel}/javaInterfaces.xml|package|${mvnProjectBuildDir}");
         if (isPythonUsed(usedServiceTypes)) {
