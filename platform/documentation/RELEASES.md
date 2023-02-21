@@ -33,12 +33,11 @@ Planned:
 
 Planned:
 * Semantic Ids in the UI [#63](https://github.com/iip-ecosphere/platform/issues/63)
-* Automatic creation of containers [#10](https://github.com/iip-ecosphere/platform/issues/10), [#9](https://github.com/iip-ecosphere/platform/issues/9).
 * [#59](https://github.com/iip-ecosphere/platform/issues/59): Distributed testing/evaluation environment
-* [#101](https://github.com/iip-ecosphere/platform/issues/101): Documentation of fixed formats used by the platform
 
 New features:
 * Multi-channel connectors for MQTT in the connectors component and the code generation.
+* [#10](https://github.com/iip-ecosphere/platform/issues/10), [#9](https://github.com/iip-ecosphere/platform/issues/9): Automatic creation of containers from the configuration model.
 * [#51](https://github.com/iip-ecosphere/platform/issues/51): Device specific measurement plugin for Phoenix Contact AXC
 * [#64](https://github.com/iip-ecosphere/platform/issues/64): Device specific measurement plugins controlled via configuration model 
 * [#92](https://github.com/iip-ecosphere/platform/issues/92): Generate application implementation project templates
@@ -50,6 +49,7 @@ New features:
 * [#94](https://github.com/iip-ecosphere/platform/issues/94): Transport logging tool for debugging
 * [#96](https://github.com/iip-ecosphere/platform/issues/96): Hostname as device id (optional, not default)
 * [#36](https://github.com/iip-ecosphere/platform/issues/36): Generated service test frames
+* [#101](https://github.com/iip-ecosphere/platform/issues/101): Documentation of fixed formats used by the platform
 * [#114](https://github.com/iip-ecosphere/platform/issues/114): Initial integration of the OPC UA companion spec to IVML generator by J.-H. Cepok
 * [#124](https://github.com/iip-ecosphere/platform/issues/124): Deployment plans can be configured and generated.
 * [#105](https://github.com/iip-ecosphere/platform/issues/105): Maven plugins for Python build steps like "compile" (syntax check) and test. [#125](https://github.com/iip-ecosphere/platform/issues/125) allowing to execute python tests individually similar to surefire.
