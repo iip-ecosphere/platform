@@ -5,18 +5,18 @@ insert PythonMeshElementTemplatePart*;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template PythonMeshElementTemplate(Configuration config, FileArtifact target, MeshElement elt, String pkg) extends PythonMeshElementTemplateBase {
+template PythonMeshElementTemplate(Configuration config, FileArtifact target, MeshElement elt, String pkg, PythonService service) extends PythonMeshElementTemplateBase {
 
-    def main(Configuration config, FileArtifact target, MeshElement elt, String pkg) {
+    def main(Configuration config, FileArtifact target, MeshElement elt, String pkg, PythonService service) {
         IIPEcosphere cfg = config;
         initTypeAdd(cfg);
-        String clsName = asTypeName(elt.name);
+        String clsName = asTypeName(service.name);
         String ifName = "${clsName}Interface";
         'import iip.Registry
         from Version import Version
         from Service import ServiceState
         from Service import ServiceKind
-        ${produceDatatypeImports(elt)}
+        ${produceDatatypeImports(elt, service)}
         from interfaces.${clsName}Interface import ${clsName}Interface
 
         class ${clsName}(${inheritsFrom(ifName)}):
@@ -27,9 +27,9 @@ template PythonMeshElementTemplate(Configuration config, FileArtifact target, Me
                 """Initializes the service.""" 
                 super().__init__()
             
-            ${produceReconfigure(elt.impl)}
+            ${produceReconfigure(service)}
             ${generateDataMethods(elt, true)}
-            ${generateFurtherMethods(elt.impl)}
+            ${generateFurtherMethods(service)}
 
         #registers itself
         ${clsName}()'

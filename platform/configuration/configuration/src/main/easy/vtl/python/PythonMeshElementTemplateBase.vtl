@@ -3,7 +3,7 @@ import MeshBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template PythonMeshElementTemplateBase(Configuration config, FileArtifact target, MeshElement elt, String pkg) extends MeshBasics {
+template PythonMeshElementTemplateBase(Configuration config, FileArtifact target, MeshElement elt, String pkg, PythonService service) extends MeshBasics {
 
     String typeAdd = "";
 
@@ -18,7 +18,7 @@ template PythonMeshElementTemplateBase(Configuration config, FileArtifact target
             """
             result = ${type}${typeAdd}()
             ${generateSourceMethodImpl(src.impl)}
-            return result'
+            return result\n'
         }
     } 
     
@@ -35,7 +35,7 @@ template PythonMeshElementTemplateBase(Configuration config, FileArtifact target
             Parameters:
               - data -- the data to process
             """
-            ${generateAsyncProcessorInMethodImpl(proc.impl)}'
+            ${generateAsyncProcessorInMethodImpl(proc.impl)}\n'
     }
     
     // dispatch basis
@@ -56,7 +56,7 @@ template PythonMeshElementTemplateBase(Configuration config, FileArtifact target
             """
             result = ${outType}${typeAdd}()
             ${generateSyncProcessorMethodImpl(proc.impl)}
-            return result'
+            return result\n'
     }
     
     // dispatch basis
@@ -72,7 +72,7 @@ template PythonMeshElementTemplateBase(Configuration config, FileArtifact target
             Parameters:
               - data -- the received data
             """
-            ${generateSinkMethodImpl(snk.impl)}'
+            ${generateSinkMethodImpl(snk.impl)}\n'
     }
     
     // dispatch basis
@@ -80,8 +80,8 @@ template PythonMeshElementTemplateBase(Configuration config, FileArtifact target
         'raise NotImplementedError'
     }
     
-    def produceDatatypeImports(MeshElement elt) {
-        '${generateImports(elt.impl)}'
+    def produceDatatypeImports(MeshElement elt, ServiceBase service) {
+        '${generateImports(service)}'
         setOf(RecordType) types = collectRecordTypes(elt);
         for (RecordType t: types) {
             String name = t.name;

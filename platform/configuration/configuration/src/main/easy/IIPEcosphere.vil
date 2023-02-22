@@ -224,8 +224,8 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
             }
         };
     }
-
-    // dispatch basis    
+    
+    // dispatch basis
     generateServer(Configuration config, Server server, Path appRoot, setOf(String) artifacts) = {
         if (isDefined(server.artifact) and server.artifact.length() > 0) {
             artifacts.add(server.artifact);
@@ -243,8 +243,8 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
             artifacts.add(server.artifact);
         }
     }
-    
-    // dispatch basis    
+
+    // dispatch basis
     generateServerInterface(Configuration config, Server server, Path appRoot) = {
     }
     
@@ -297,13 +297,14 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
 
     generateTemplateElements(Path appRoot, Configuration config, MeshElement no, JavaService service, setOf(String) assemblies, setOf(String) javaTests) = {
         if (service.class <> "") {
+            String clsName = asTypeName(service.name);
             JavaPath jp = service.class;
             Path p = appRoot + "/src/main/java/" + jp.getPathSegments().toPath();
             p.mkdir();
             vilTemplateProcessor("JavaMeshElementTemplate", config, "${p}/${jp.getName()}.java", elt=no, pkg=jp.getPathSegments(), name=jp.getName());
-            if (needsDataUnitJson(no.impl)) {
+            if (needsDataUnitJson(service)) {
                 Path testResourcesSrc = "${appRoot}/src/test/resources";
-                vilTemplateProcessor("TemplatesTestDataJson", config, "${testResourcesSrc}/testData-${getClsName(no)}.json.tmpl", elt=no);
+                vilTemplateProcessor("TemplatesTestDataJson", config, "${testResourcesSrc}/testData-${clsName}.json.tmpl", elt=no);
             }
             p = appRoot + "/src/test/java/" + jp.getPathSegments().toPath();
             vilTemplateProcessor("JavaServiceTestTemplate", config, "${p}/${jp.getName()}Test.java", service=service, pkg=jp.getPathSegments());
@@ -312,15 +313,15 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     }
 
     generateTemplateElements(Path appRoot, Configuration config, MeshElement no, PythonService service, setOf(String) assemblies, setOf(String) javaTests) = {
-        String clsName = asTypeName(no.name);
-        vilTemplateProcessor("PythonMeshElementTemplate", config, "${appRoot}/src/main/python/services/${clsName}.py", elt=no, pkg="services");
+        String clsName = asTypeName(service.name);
+        vilTemplateProcessor("PythonMeshElementTemplate", config, "${appRoot}/src/main/python/services/${clsName}.py", elt=no, pkg="services", service=service);
         Path assemblyPath = "${appRoot}/src/main/assembly";
         assemblyPath.mkdir();
         vilTemplateProcessor("PythonAssemblyTemplate", config, "${assemblyPath}/python.xml");
         assemblies.add("python|${mvnProjectBaseDir}/${assemblyRel}/python.xml|package|${mvnProjectBuildDir}/classes|");
-        if (needsDataUnitJson(no.impl)) {
+        if (needsDataUnitJson(service)) {
             Path testResourcesSrc = "${appRoot}/src/test/resources";
-            vilTemplateProcessor("TemplatesTestDataJson", config, "${testResourcesSrc}/testData-${getClsName(no)}.json.tmpl", elt=no);
+            vilTemplateProcessor("TemplatesTestDataJson", config, "${testResourcesSrc}/testData-${clsName}.json.tmpl", elt=no);
         }
     }
     
@@ -328,7 +329,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         for (Service m: family.members) {
             generateTemplateElements(appRoot, config, no, m, assemblies, javaTests);
         }
-    }    
+    }
     
     // ------------------------------------------ generating apps: generating service-specific code artifacts -----------------------------------
     
