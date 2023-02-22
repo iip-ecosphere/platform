@@ -197,7 +197,7 @@ template PythonBasics(Configuration config, FileArtifact target) {
     def produceParameterDefault(LongParameter p) {
         '${toBoolean(p.defaultValue)}'
     }
-
+    
     def produceReconfigure(Parameters params) {
         if (params.size() > 0) {
             'def notifyReconfigured(self, values: dict):
@@ -263,6 +263,21 @@ template PythonBasics(Configuration config, FileArtifact target) {
         } else {
             ''
         }
+    }
+    
+    def generatePossibleOutputTypes(ServiceBase base, IIPEcosphere cfg) {
+        String res = "";
+        String typeAdd = "";
+        if (cfg.sharedInterfaces) {
+            typeAdd = "Impl";
+        }
+        for (IOType t : base.output) {
+            res = appendWithSeparator(res, ", ", toTypeName(t) + typeAdd);
+        }
+        if (res.length() > 0) {
+            res = "Possible output types: " + res;
+        }
+        res;
     }
     
 }

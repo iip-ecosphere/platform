@@ -15,7 +15,7 @@ template JavaMeshElementTemplate(Configuration config, FileArtifact target, Mesh
         if (elt.kind == ServiceKind::SINK_SERVICE) {
             comment = "Store, emit, pass on your data here. This is the sink.";
         } else {
-            comment = "call ingest<Type>(instance)";
+            comment = "call ingest<Type>(instance). ${generatePossibleOutputTypes(elt.impl, config)}";
         }
         '@Override
         public void process${t.firstToUpperCase()}(${t} data) {

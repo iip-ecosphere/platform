@@ -25,6 +25,7 @@ template PythonServiceInterface(Configuration config, FileArtifact target, Servi
         registerMethod("asyncTransformers", t, funcName);
         'def ${funcName}(self, data: ${t}):
             """Asynchronous data processing method. Use self.ingest(data) to pass the result back to the data stream.
+               ${generatePossibleOutputTypes(service, config)|e}
         
             Parameters:
               - data -- the data to process

@@ -285,5 +285,20 @@ template JavaBasics(Configuration config, FileArtifact target) {
             ""
         }
     }
+    
+    def generatePossibleOutputTypes(ServiceBase base, IIPEcosphere cfg) {
+        String res = "";
+        String typeAdd = "";
+        if (cfg.sharedInterfaces) {
+            typeAdd = "Impl";
+        }
+        for (IOType t : base.output) {
+            res = appendWithSeparator(res, ", ", toTypeName(t) + typeAdd);
+        }
+        if (res.length() > 0) {
+            res = "Possible output types: " + res;
+        }
+        res;
+    }
 
 }

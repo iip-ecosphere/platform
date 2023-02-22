@@ -30,7 +30,8 @@ template PythonMeshElementTemplateBase(Configuration config, FileArtifact target
     // called via MeshBasics.generateDataMethods for asynch MeshProcessor
     def generateAsyncProcessorInMethod(MeshProcessor proc, String type, String methodSuffix, String methodSuffixWithServiceId) {
         'def ${methodSuffix}(self, data: ${type}):
-            """Asynchronous data processing method. Use self.ingest(data) to pass the result back to the data stream.
+            """Asynchronous data processing method. Use self.ingest(data) to pass the result back to the data stream
+               ${generatePossibleOutputTypes(service, config)|e}
         
             Parameters:
               - data -- the data to process
