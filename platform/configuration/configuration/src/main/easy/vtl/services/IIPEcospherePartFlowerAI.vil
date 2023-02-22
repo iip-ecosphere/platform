@@ -1,0 +1,10 @@
+import JavaBasics;
+import JavaMapping;
+import Basics;
+import MeshBasics;
+import IIPEcosphereBase;
+
+@advice(IIPEcosphere)
+vilScript IIPEcospherePartFlowerAi (Project source, Configuration config, Project target) {
+
+}
