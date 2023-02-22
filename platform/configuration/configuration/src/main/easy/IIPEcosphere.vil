@@ -49,13 +49,19 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         setOf(Application) applications = Application.allInstances();
         initUsedServiceTypes(applications);
         
-        setOf(String) javaSerializers = {};
-        setOf(String) artifacts = {};
+        setOf(String) javaSerializersShared = {};
+        setOf(String) artifactsShared = {};
         if (cfg.sharedInterfaces) {
-            generateSharedInterfaces(config, target, javaSerializers, artifacts);
+            generateSharedInterfaces(config, target, javaSerializersShared, artifactsShared);
         }
         
-        for (Application a : applications) {
+        for (Application a : applications->sortedBy(a|a.id)) { // sortedBy for testing
+            // shared serializers/artifacts shall remain "immutable"
+            setOf(String) javaSerializers = {};
+            javaSerializers = javaSerializers.union(javaSerializersShared);
+            setOf(String) artifacts = {};
+            artifacts = artifacts.union(artifactsShared);
+        
             String appName = getAppMvnName(a);
             Path appRoot = "${target}/${appName}";
             appRoot.mkdir();
