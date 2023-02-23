@@ -124,6 +124,27 @@ public class AasUtils {
     }
 
     /**
+     * Reads the {@code index} argument from {@code} args as double.
+     * 
+     * @param args the array to take the value from 
+     * @param index the 0-based index into {@code} args
+     * @param dflt default value if the {@code index} is wrong, there is no value/null, the value is no int...
+     * @return the value
+     */
+    public static double readDouble(Object[] args, int index, int dflt) {
+        Object param = index >= 0 && index < args.length ? args[index] : null;
+        double result = dflt;
+        if (null != param) {
+            try {
+                result = Double.parseDouble(param.toString());
+            } catch (NumberFormatException e) {
+                // handled by result = deflt
+            }
+        }
+        return result;
+    }
+
+    /**
      * Reads the {@code index} argument from {@code} args as URI.
      * 
      * @param args the array to take the value from 

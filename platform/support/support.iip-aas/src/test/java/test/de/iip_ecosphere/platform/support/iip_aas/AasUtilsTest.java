@@ -61,6 +61,20 @@ public class AasUtilsTest {
     }
 
     /**
+     * Tests {@link AasUtils#readDouble(Object[], int, int)}.
+     */
+    @Test
+    public void testDouble() {
+        Object[] noArgs = new Object[0];
+        Object[] args = new Object[2];
+        args[0] = "abba";
+        args[1] = 5.23;
+        
+        Assert.assertEquals(-1, AasUtils.readDouble(noArgs, 1, -1), 0.01);
+        Assert.assertEquals(5.23, AasUtils.readDouble(args, 1, 0), 0.01);
+    }
+    
+    /**
      * Tests {@link AasUtils#readUri(Object[], int, URI)}.
      */
     @Test
