@@ -1,3 +1,4 @@
+//import { SemanticId } from './interfaces';
 
 export interface PlatformResources {
   submodelElements?: Resource[]
@@ -38,6 +39,9 @@ export interface ResourceAttribute {
   inputVariables?: InputVariable[];
   outputVariables?: any;
   invokable?: any;
+  semanticId?: SemanticId;
+  semanticName?: string;
+  semanticDescription?: string;
 }
 
 //The submodelElements are either basyx functions (i.e. deploy plan) or collections (i.e. KnownServices)

@@ -16,6 +16,7 @@ export class OperationQueryComponent implements OnInit {
   selected: ResourceAttribute | null = null;
   inputVariables: ResourceAttribute[] = [];
   inputVariablesValues: any[] = [];
+  resourcesURL:string = "/aas/submodels/resources/submodel/submodelElements/";
 
   message: string = '';
 
@@ -37,7 +38,11 @@ export class OperationQueryComponent implements OnInit {
       await this.setInputValues();
       if(this.selected && this.managedId && this.selected && this.selected.idShort) {
         console.log(this.selected);
-        const response = await this.api.executeFunction(this.managedId, this.selected.idShort, this.inputVariables) as platformResponse;
+        const response = await this.api.executeFunction(
+          this.managedId,
+          this.resourcesURL,
+          this.selected.idShort,
+          this.inputVariables) as platformResponse;
         console.log(response);
         if(response && response.outputArguments) {
           this.showMessage(response.outputArguments);
@@ -64,13 +69,16 @@ export class OperationQueryComponent implements OnInit {
     }
 
     private setInputValues() {
+      // selected: ResourceAttribute
       if(this.selected && this.selected.inputVariables) {
-
+        // list of "ResourceAttribute" = list of "InputVariable"
         this.inputVariables = this.selected.inputVariables;
         console.log(this.selected);
       }
       let i = 0
       for(const input of this.inputVariables) {
+        // input is of the type "InputVariable"
+        // string = any ?
         input.value.value = this.inputVariablesValues[i];
         i++;
       }

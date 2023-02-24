@@ -11,6 +11,12 @@
               <div *ngIf="!element.invokable">
                 <span class="shortId">{{ element.idShort }}: </span>
                 <span *ngIf="element.value"> {{ element.value | tidy}} </span>
+                <span *ngIf="element.semanticName"> [{{ element.semanticName | tidy}}] </span>
+                <!--
+                <span *ngIf="element.value && element.semanticId">
+                  <h4>Resolve ({{ element.semanticId.keys[0].value}}): {{feedback}} </h4>
+                </span>
+                -->
               </div>
             </div>
           </div>
@@ -18,7 +24,8 @@
       </div>
       <br>
       <div *ngIf="resource && resource.idShort">
-          <app-operation-query [resource]="resource" [managedId]="id"></app-operation-query>
+          <app-operation-query [resource]="resource" [managedId]="id">
+          </app-operation-query>
       </div>
     </div>
   </div>
