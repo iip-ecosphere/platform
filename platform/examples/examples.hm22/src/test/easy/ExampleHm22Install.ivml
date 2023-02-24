@@ -131,7 +131,7 @@ project ExampleHm22Install {
 
     RecordType PlcOutput = {
         name = "PlcOutput",
-        path = "Objects/PLCnext/Arp.Plc.Eclr",
+        path = "Objects/PLCnext/Arp.Plc.Eclr/",
         fields = {
             Field {
                 name = "HW_StartProcess",
@@ -161,7 +161,7 @@ project ExampleHm22Install {
 
     RecordType PlcInput = {
         name = "PlcInput",
-        path = "Objects/PLCnext/Arp.Plc.Eclr",
+        path = "Objects/PLCnext/Arp.Plc.Eclr/",
         fields = {
             Field {
                 name = "PC_RequestedOperation",
@@ -181,7 +181,7 @@ project ExampleHm22Install {
 
     RecordType MdzhOutput = { 
         name = "MdzhOutput",
-        path = "ProductData",
+        path = "ProductData/",
         fields = {
             Field {
                 name = "ProductId",

@@ -62,7 +62,7 @@ project VDW {
     };
     
     RecordType opcOut = {
-        path = "Objects/Machines/BasicWoodworking",
+        path = "Objects/Machines/BasicWoodworking/",
         name = "OpcOut",
         fields = {
             Field {
