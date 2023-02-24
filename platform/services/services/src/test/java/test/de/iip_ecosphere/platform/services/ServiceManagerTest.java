@@ -105,6 +105,10 @@ public class ServiceManagerTest {
         assertException(() -> mgr.switchToService(aId, sId));
         mgr.updateService(aId, dummy);
         
+        // no servers/non-top-level in this case but call them anyway
+        Assert.assertTrue(AbstractServiceManager.pruneServers(mgr, "service_0", "service_1").length == 2);
+        Assert.assertTrue(AbstractServiceManager.topLevel(mgr, "service_0", "service_1").length == 2);
+        
         mgr.removeArtifact(aId);
         Assert.assertFalse(mgr.getArtifactIds().contains(aId));
         Assert.assertFalse(mgr.getArtifacts().contains(aDesc));
