@@ -13,6 +13,25 @@ import Registry
 from Service import ServiceState
 from Service import ServiceKind
 
+avgResponseTime = 0
+numberResponseTimeSamples = 0
+
+def updateResponseTime(startTime):
+    """ Update the global average response time
+    
+    Parameters:
+      - startTime -- start time measured by time.time()"""
+
+    global numberResponseTimeSamples
+    global avgResponseTime
+    newValue = time.perf_counter() - startTime
+    if numberResponseTimeSamples < 0:
+        numberResponseTimeSamples = 0
+        avgResponseTime = 0
+    
+    numberResponseTimeSamples += 1
+    avgResponseTime = (avgResponseTime * (numberResponseTimeSamples - 1) + newValue) / numberResponseTimeSamples 
+
 def printStdout(text): 
     """ Use in here to write to stdout, independent whether redirected or not 
     
@@ -63,7 +82,7 @@ def start(a):
     parser.add_argument('--mode', dest='mode', action='store', nargs=1, type=str, required=False,
         default="", help='The operation mode of the environment (values: console, default: console).')    
     parser.add_argument('--sid', dest='sId', action='store', nargs=1, type=str, required=True,
-        default="", help='Id of the service to execute.')    
+        default="", help='Id of the service to execute.')
     parser.add_argument('--netMgtKeyAddress', dest='netMgtKeyAddress', action='store', nargs=1, type=str, required=False,
         default=None, help='Resolved address of the netMgtKey of the service via the platform network management.')    
     parser.add_argument('--configure', dest='config', action='store', nargs=1, type=str, required=False,
@@ -129,11 +148,12 @@ def consoleIngestResult(data):
     if typeInfo:
         serializer = Registry.serializers.get(typeInfo)
         if serializer:
-            result = typeInfo + "|" + serializer.writeTo(data)
+            global avgResponseTime
+            result = typeInfo + "|" + str(int(avgResponseTime)) + "|" + serializer.writeTo(data)
             printStdout(result)
             flushStdout()
     else: # assume client-server-communication
-        result = "*SERVER|" + base64.b64encode(data).decode('utf-8')
+        result = "*SERVER|0|" + base64.b64encode(data).decode('utf-8')
         printStdout(result)
         flushStdout()
 
@@ -195,10 +215,13 @@ def process(composedData, sId):
                 d = serializer.readFrom(str(data))
                 funcId = sId+"_"+type
                 func = Registry.asyncTransformers.get(funcId)
+                startTime = time.perf_counter()
                 if func:
                     func(d) #ingestor takes result
+                    updateResponseTime(startTime)
                 else:
                     func = Registry.syncTransformers.get(funcId)
+                    updateResponseTime(startTime)
                     if func:
                         consoleIngestResult(func(d))
         

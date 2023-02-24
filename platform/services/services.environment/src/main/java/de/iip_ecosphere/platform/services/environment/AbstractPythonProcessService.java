@@ -59,6 +59,7 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
     private Map<String, InTypeInfo<?>> inTypeInfos = new HashMap<>();
     private Map<String, ParameterConfigurer<?>> paramConfigurers = new HashMap<>();
     private Map<String, ReceptionCallback<?>> callbacks = new HashMap<>();
+    private String averageResponseTime = "";
     
     /**
      * Represents an input or output type.
@@ -304,6 +305,9 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
             if (pos > 0 && pos < line.length()) {
                 String typeName = line.substring(0, pos);
                 String data = line.substring(pos + 1);
+                pos = data.indexOf(TYPE_SEPARATOR_CHAR);
+                averageResponseTime = data.substring(0, pos);
+                data = data.substring(pos + 1);
                 try {
                     if (handler.handle(typeName, data)) {
                         break;
@@ -776,6 +780,19 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
         });
         // request private client-server channel
         conn.asyncSend(serverChannel, clientChannel); 
+    }
+
+    /**
+     * Returns the average response time for the execution in Python (without transport).
+     * 
+     * @return the average response time
+     */
+    public long getAvgResponseTime() {
+        try {
+            return Long.parseLong(averageResponseTime);
+        } catch (NumberFormatException e) {
+            return 0;
+        }
     }
  
 }

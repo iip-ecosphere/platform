@@ -149,6 +149,8 @@ public class PythonProcessServiceTest {
         service.process(rec13TypeName, r);
         TimeUtils.sleep(1000);
         
+        Assert.assertTrue(service.getAvgResponseTime() >= 0); // no real heavy-weight calculation in Python
+        
         service.setState(ServiceState.STOPPING);
         Assert.assertEquals(3, receivedStringCount.get()); // 3 in, 3 out
         //Assert.assertEquals(1, receivedStringCount.get()); // 1 in, 1 out // TODO enable

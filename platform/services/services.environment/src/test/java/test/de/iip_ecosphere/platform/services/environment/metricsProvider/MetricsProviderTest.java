@@ -333,8 +333,7 @@ public class MetricsProviderTest {
             .description("Tuples sent out by a service")
             .tags("service", "SimpleReceiver", "application", "SimpleMeshApp", "device", "dev0")
             .register(provider.getRegistry());
-        Counter
-            .builder("service.received")
+        Counter.builder("service.received")
             .baseUnit("tuple/s")
             .description("Tuples received by a service")
             .tags("service", "SimpleReceiver", "application", "SimpleMeshApp", "device", "dev0")
@@ -352,9 +351,10 @@ public class MetricsProviderTest {
             .description("Some value")
             .tags("service", "SimpleReceiver", "application", "SimpleMeshApp", "device", "dev2")
             .register(provider.getRegistry());
-        
+
         MetricsProvider.increaseCounterBy(counter, 1);
         timer.record(() -> { TimeUtils.sleep(400); return "ABBA"; });
+        MetricsProvider.recordMsTime(timer, () -> 400, () -> { }); // pretend there were another 400 ms
         
         String json = provider.toJson("id0", false,
             MeterFilter.acceptNameStartsWith("service.sent"),
