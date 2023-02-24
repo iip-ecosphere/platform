@@ -95,7 +95,11 @@ export class ResourceDetailsComponent implements OnInit {
     // Setting a semanticName for each attribute
     let j = 0;
     for(const name of resolvedIds) {
-      this.resource!.value![j].semanticName =  name;
+      if(name=="byte") {
+        this.convertByte(j, 1000000000, "GB")
+      } else {
+        this.resource!.value![j].semanticName =  name;
+      }
       j++;
     }
   }
@@ -142,7 +146,12 @@ export class ResourceDetailsComponent implements OnInit {
     }
   }
 
-
-
-
+  // Converts byte value of resource attribute:
+  // e.g. conversion to GB - dominator: 1000000000, unitName: GB
+  public convertByte(index:any, dominator:any, unitName:string) {
+    this.resource!.value![index].semanticName =  unitName;
+        let temp_value = this.resource!.value![index].value;
+        temp_value = (temp_value/dominator).toFixed(2)
+        this.resource!.value![index].value = temp_value
+  }
 }
