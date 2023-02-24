@@ -162,7 +162,7 @@ template JavaType(Configuration config, FileArtifact target, RecordType type, St
     
     def genRecHashCode(RecordType type) {
         for (Field f: type.fields) {
-            'hc += ${genHashCode("get${f.name.firstToUpper()}()", f.type, f.optional)};'
+            'hc += ${genHashCode("get${asMethodNameSuffix(f.name)}()", f.type, f.optional)};'
         }
     }
 
@@ -204,7 +204,7 @@ template JavaType(Configuration config, FileArtifact target, RecordType type, St
 
     def genRecEquals(RecordType type) {
         for (Field f: type.fields) {
-            'eq &= ${genEquals("get${f.name.firstToUpper()}()", f.type, f.optional)};'
+            'eq &= ${genEquals("get${asMethodNameSuffix(f.name)}()", f.type, f.optional)};'
         }
     }
 
