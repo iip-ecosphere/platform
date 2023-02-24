@@ -187,8 +187,15 @@ project SerializerConfig1Old {
             operation=AddDataTranslationOperation{
                 arguments={
                     DataFieldAccess{field=refBy(myConnMachineOut.fields[2])},
-                    IntegerConstantDataOperation{value=100}}
+                    IntegerConstantDataOperation{value=100}
+                }
             }
+          }, ModelCallOperation {
+               name="myOp",
+               arguments={
+                   DataFieldAccess{field=refBy(myConnMachineOut.fields[1])},
+                   IntegerConstantDataOperation{value=100}
+               }
           }
         }
     };

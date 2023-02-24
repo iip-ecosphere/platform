@@ -11,6 +11,7 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
     setOf(String) dummy = {}; // not nice
     Boolean optWithStepIn = true;
     mapOf(String, String) variables = {};
+    Integer argsNestingLevel = 0;
 
     def translateDataOperations(setOf(AssignmentOperation) assng, DataType src, String srcQual, DataType tgt, String tgtQual, setOf(String) done) {
         mapOf(Field, String) fields = {};
@@ -27,8 +28,29 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
         ""
     }
 
+    def String translateDataOperation(ModelCallOperation call, mapOf(Field, String) fields, mapOf(Field, String) indexes, setOf(String) done) {
+        boolean emit = true;
+        Boolean hasField = isDefined(call.field) and call.field <> null;
+        if (hasField)  {
+            if (fields.containsKey(field)) {
+                emit = false;
+            } else {
+                done.add(call.field);
+            }
+        }
+        String ex = "";
+        if (emit) {
+println("DA-EX");        
+            ex = 'access.call("${call.name}", ${combineArgs(call.arguments, ", ", fields, indexes)});';
+            if (hasField) {
+                ex = translateFieldAccess(call.field, fields, true, ";", ex, done, true, indexes);
+            }
+        }
+        ex;
+    }
+
     def String translateDataOperation(FieldAssignmentOperation assng, mapOf(Field, String) fields, mapOf(Field, String) indexes, setOf(String) done) {
-        if (fields.containsKey(assng.field)) {
+        if (fields.containsKey(assng.field) or argsNestingLevel > 0) {
             translateFieldAccess(assng.field, fields, true, ";", translateDataOperation(assng.operation, fields, indexes), done, true, indexes);
         } else {
             ""
@@ -36,7 +58,7 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
     }
     
     def String translateDataOperation(TransferAssignmentOperation assng, mapOf(Field, String) fields, mapOf(Field, String) indexes, setOf(String) done) {
-        if (indexes.containsKey(assng.field) and fields.containsKey(assng.nameField) and fields.containsKey(assng.valueField)) {
+        if ((indexes.containsKey(assng.field) and fields.containsKey(assng.nameField) and fields.containsKey(assng.valueField)) or argsNestingLevel > 0) {
             String fnExpr = getTransferAssignmentExpression(assng, fields, indexes, done);
             translateFieldAccess(assng.nameField, fields, true, ";", fnExpr, done, true, indexes);
         } else {
@@ -70,8 +92,8 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
     }
     
     def String translateFieldAccess(Field field, mapOf(Field, String) fields, Boolean set, String setEnd, String value, setOf(String) done, Boolean recordDone, mapOf(Field, String) indexes) {
-        if (fields.containsKey(field) and indexes.containsKey(field)) {
-           if (recordDone) {
+        if ((fields.containsKey(field) and indexes.containsKey(field)) or argsNestingLevel > 0) {
+           if (recordDone and argsNestingLevel == 0) {
                done.add(mapTargetPath(fields.get(field), field));
            }
            genFieldAccess(fields.get(field), field, set, setEnd, value, indexes.get(field));
@@ -142,6 +164,7 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
     def String combineArgs(sequenceOf(DataOperation) args, String sep, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
         String result = "";
         boolean first = true;
+        argsNestingLevel = argsNestingLevel + 1;
         for (DataOperation op : args) {
             if (not(first)) {
                 result = result + sep;
@@ -149,6 +172,7 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
             result = result + translateDataOperation(op, fields, indexes);
             first = false;
         }
+        argsNestingLevel = argsNestingLevel - 1;
         result;
     }
     

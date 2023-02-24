@@ -114,6 +114,10 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
         }
     }
     
+    def genTimeRecording(ServiceBase base, String timerVar, String expr) {
+        "${timerVar}.record(() -> ${expr})"
+    }
+    
     // generates a received probe expression (if configured) for the given functional expression 
     def genRcvProbe(ServiceBase base, String expr, String exprType, String data) {
         if (base.monitorRcvCount or base.monitorProcessingTime or base.traceRcv <> TraceKind::NONE) {
@@ -124,7 +128,7 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
             }
             if (base.monitorProcessingTime) {
                 if (expr <> "") {
-                    expr = "processingTime.record(() -> ${expr})";
+                    expr = genTimeRecording(base, "processingTime", expr);
                 }
             }
             if (base.traceRcv <> TraceKind::NONE) {
@@ -1035,6 +1039,10 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
         } else {
             "de.iip_ecosphere.platform.services.environment.PythonSyncProcessService"
         }
+    }
+    
+    def genTimeRecording(PythonService base, String timerVar, String expr) {
+        "MetricsProvider.recordMsTime(${timerVar}, () -> service.getAvgResponseTime(), () -> ${expr})"
     }
         
     def genIngestor(PythonService service, String methodSuffix, String conn, String type, String dir, ServiceBase target, String connPlaceHolder) {

@@ -84,13 +84,29 @@ project Connectors {
     // Post-parser mapping operations forming a simplified expression tree structure with 
     // record-field leaf nodes
     
-    abstract compound AssignmentOperation { // non refines ConnectorOperation, top level operation in connector 
+    abstract compound ConnectorOperation { // internal for constraints
+    }
+    
+    abstract compound AssignmentOperation refines ConnectorOperation { // top level operation in connector 
+    }
+    
+    def setOf(ConnectorOperation) collectOperations(setOf(ConnectorOperation) ops) = 
+        ops->collect(o|collectOperations(o)).flatten();
+    // dispatch basis
+    def sequenceOf(ConnectorOperation) collectOperations(ConnectorOperation op) = {};
+    
+    compound ModelCallOperation refines AssignmentOperation {
+        refTo(Field) field; // may be given to indicate that the call shall replace the translation of field
+        NonEmptyString name;
+        sequenceOf(DataOperation) arguments; // EASy-bug
     }
     
     compound FieldAssignmentOperation refines AssignmentOperation {
         refTo(Field) field;
         DataOperation operation;
     }
+
+    def sequenceOf(ConnectorOperation) collectOperations(FieldAssignmentOperation op) = {op.operation};
     
     // transfers both, value and field, potentially to different target fields (optimization)
     compound TransferAssignmentOperation refines AssignmentOperation {
@@ -99,7 +115,7 @@ project Connectors {
         refTo(Field) nameField;
     }
     
-    abstract compound DataOperation {
+    abstract compound DataOperation refines ConnectorOperation {
     }
     
     compound DataFieldAccess refines DataOperation {
@@ -133,6 +149,8 @@ project Connectors {
     compound ParenthesisDataOperation refines DataOperation {
         DataOperation operation;
     }
+
+    def setOf(ConnectorOperation) collectOperations(ParenthesisDataOperation op) = {op.operation};
     
     compound FieldNameDataOperation refines DataOperation {
         refTo(Field) field;
@@ -141,6 +159,8 @@ project Connectors {
     abstract compound DataTranslationOperation refines DataOperation {
         sequenceOf(DataOperation) arguments;
     }
+
+    def sequenceOf(ConnectorOperation) collectOperations(DataTranslationOperation op) = op.arguments;
     
     compound AddDataTranslationOperation refines DataTranslationOperation {
         // TODO constraint: args only real, integer fields/constants
@@ -224,6 +244,8 @@ project Connectors {
        setOf(String) outChannels; // additional out channels towards platform, unified with outChannel; may also be used instead of outChannel
        MachineFormatter machineFormatter = null;
        MachineParser machineParser = null;
+       
+       Constraint noModelCallOperation = collectOperations(operations)->selectByKind(ModelCallOperation).isEmpty();
    }
    
    compound OpcUaV1Connector refines Connector { // fixed template types see JavaConnector.vtl

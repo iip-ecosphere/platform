@@ -298,6 +298,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         public ${coType} to(${oType} source) throws IOException {
             ModelAccess access = getModelAccess();
             final ModelInputConverter inConverter = access.getInputConverter();
+            final ModelOutputConverter outConverter = access.getOutputConverter();
             final String path = pathSupplier == null ? "${topPath}" : pathSupplier.get();
             
             ${coType} result = new ${coType}${add}();
@@ -340,6 +341,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         public ${iType} from(${ciType} data) throws IOException {
             ModelAccess access = getModelAccess();
             final ModelOutputConverter outConverter = access.getOutputConverter();
+            final ModelInputConverter inConverter = access.getInputConverter();
             final String path = pathSupplier == null ? "${topPath}" : pathSupplier.get();
             
             ${translateDataOperations(assng, imType, imTypePath, pltfType, "data", done)}
