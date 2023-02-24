@@ -675,6 +675,42 @@ public abstract class AbstractServiceManager<A extends AbstractArtifactDescripto
     }
     
     /**
+     * Returns only top-level services from {@code serviceIds}.
+     * 
+     * @param mgr the service manager to take the descriptors from
+     * @param serviceIds the service ids to filter out
+     * @return {@code serviceIds} or a subset of {@code serviceIds}
+     */
+    public static String[] topLevel(ServiceManager mgr, String... serviceIds) {
+        List<String> result = new ArrayList<>();
+        for (String id: serviceIds) {
+            ServiceDescriptor desc = mgr.getService(id);
+            if (desc.isTopLevel()) {
+                result.add(id);
+            }
+        }
+        return result.toArray(new String[result.size()]);
+    }
+
+    /**
+     * Returns only non-server services from {@code serviceIds}.
+     * 
+     * @param mgr the service manager to take the descriptors from
+     * @param serviceIds the service ids to filter out
+     * @return {@code serviceIds} or a subset of {@code serviceIds}
+     */
+    public static String[] pruneServers(ServiceManager mgr, String... serviceIds) {
+        List<String> result = new ArrayList<>();
+        for (String id: serviceIds) {
+            ServiceDescriptor desc = mgr.getService(id);
+            if (desc.getKind() != ServiceKind.SERVER) {
+                result.add(id);
+            }
+        }
+        return result.toArray(new String[result.size()]);
+    }
+    
+    /**
      * Checks for service instances regarding application id and application instance id. If needed, creates instances 
      * using existing service descriptors as templates via 
      * {@link #instantiateFromTemplate(AbstractServiceDescriptor, String)}.
