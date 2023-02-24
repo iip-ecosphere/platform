@@ -1,8 +1,10 @@
+import { PlatformData, SemanticId } from './../../../interfaces';
+//import { SemanticId, outputArgument } from './../../../interfaces';
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ApiService } from 'src/app/services/api.service';
-import { PlatformResources, PlatformServices, Resource } from 'src/interfaces';
+import { Resource, ResourceAttribute, InputVariable, platformResponse, outputArgument } from 'src/interfaces';
 
 @Component({
   selector: 'app-resource-details',
@@ -19,14 +21,17 @@ export class ResourceDetailsComponent implements OnInit {
 
   id: string | null = null;
   resource: Resource | undefined;
+  inputVariables: InputVariable[] = [];
+  resourceAttributes: ResourceAttribute[] = [];
+  platformURL:string = "/aas/submodels/platform/submodel/submodelElements/";
 
-  constructor(public http: HttpClient, public api: ApiService, public route: ActivatedRoute) { }
+  constructor(public http: HttpClient, public api: ApiService,
+    public route: ActivatedRoute) { }
 
   ngOnInit(): void {
     this.id = this.route.snapshot.paramMap.get('id')
     if (this.id) {
       this.getResource(this.id);
-
     }
     // this.getServices();
     // this.getArtifacts();
@@ -34,6 +39,13 @@ export class ResourceDetailsComponent implements OnInit {
 
   private async getResource(id: string) {
     this.resource = await this.api.getResource(id);
+    this.resolveSemanticId();
+
+    // iterate through resource
+    //this.resource?.value?.find(val => val.semanticId? === "0173-1#02-AAO247#002"); // semanticName?: string;
+    // find the right place in resource
+    // return this.resources.submodelElements?.find(resource => resource.idShort === id);
+    // and setVariable
   }
 
   //currently not used
@@ -63,5 +75,74 @@ export class ResourceDetailsComponent implements OnInit {
   //     this.servicesToggle[index] = !this.servicesToggle[index]
   //   }
   // }
+
+  public async resolveSemanticId() {
+    await this.setInputValues();
+
+    let resolvedIds = []
+    let i = 0;
+    for(const value of this.inputVariables) {
+      const input:InputVariable[] = [value]
+      const response = await this.api.executeFunction(
+        "",
+        this.platformURL,
+        "resolveSemanticId",
+        input) as platformResponse;
+      // TODO retrieving only the name for given semanticId (for now)
+      resolvedIds.push(this.getResolvedId(response))
+      i++;
+    }
+    // Setting a semanticName for each attribute
+    let j = 0;
+    for(const name of resolvedIds) {
+      this.resource!.value![j].semanticName =  name;
+      j++;
+    }
+  }
+
+  // Creates a list of input parameters for the aas operation "resolveSemanticId"
+  // based on the semanticId of the resource attributes.
+  public setInputValues() {
+    if(this.resource && this.resource.value) {
+      this.resourceAttributes = this.resource.value;
+
+      let i = 0;
+      for(const attribute of this.resourceAttributes ) {
+        let input_value:InputVariable = {
+          value: {
+            modelType: {
+              name: "Property"
+            },
+            valueType: "string",
+            idShort: "semanticId",
+            value: this.resource.value[i].semanticId?.keys[0].value
+          }
+        }
+        this.inputVariables.push(input_value);
+        i++;
+      }
+    }
+  }
+
+  // Retrieves a semantic name from the platform response and give it back as string
+  // (or null if there is none).
+  public getResolvedId(response:platformResponse) {
+    if(response && response.outputArguments) {
+      let output = response.outputArguments[0]?.value?.value;
+      if (output) {
+        let temp = JSON.parse(output);
+        if (temp.result) {
+
+          let result = JSON.parse(temp.result);
+          return result.naming.en.name
+        } else {
+          return null
+        }
+      }
+    }
+  }
+
+
+
 
 }

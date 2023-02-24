@@ -24,27 +24,20 @@
           <div *ngFor="let input of selected.inputVariables; let i = index">
 
               <mat-form-field appearance="outline">
-                <mat-label *ngIf="input.value && input.value.idShort">{{ input.value.idShort }}</mat-label>
+                <mat-label *ngIf="input.value && input.value.idShort">
+                  {{ input.value.idShort }} | value: {{input.value.value}}
+                </mat-label>
                 <input matInput type="text" [(ngModel)]=inputVariablesValues[i] />
               </mat-form-field>
 
-          </div>
-        </div>
-      </td>
-    </tr>
-    <tr>
-      <td>
+          </div>#/resources/a90CCDF6E5A64
         <div *ngIf="message"> {{message}}</div>
       </td>
       <td>
         <div>
           <button mat-raised-button class="button" (click)="send()">Abschicken</button>
         </div>
-
       </td>
     </tr>
   </table>
-
-
-
 </mat-card>
