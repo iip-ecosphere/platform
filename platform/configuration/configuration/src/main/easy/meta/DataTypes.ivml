@@ -63,7 +63,7 @@ project DataTypes {
     }
     
     compound RecordType refines CDataProperty, DataType {
-        String path = "";
+        String path = ""; // may or may not end with protocol specific separator, to be moved #128
         Fields fields;
         Constraint fieldNamesUnique = fields->isUnique(l|l.name);
     }

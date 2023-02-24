@@ -387,10 +387,10 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
        if (optWithStepIn) {
            p = getFieldNameForPath(field);
            if (nestedCount == 0 and topPath <> "") {
-               p = topPath + "/" + p;
+               p = topPath + p;
            }
        } else {
-           p = path + "/" + getFieldNameForPath(field);
+           p = path + getFieldNameForPath(field);
        }
        p = substPathEx('"${p}"', topPath, "path");
        if (set) {
@@ -442,7 +442,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         if (not(genFrom) and optWithStepIn) {
             String path = topPath;
             if (nestedStepCount == 0 and path.length() > 0) {
-                path = path + "/" + getFieldNameForPath(field);
+                path = path + getFieldNameForPath(field);
             } else {
                 path = getFieldNameForPath(field);
             }

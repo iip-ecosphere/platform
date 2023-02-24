@@ -58,6 +58,7 @@ New features:
 * [#81](https://github.com/iip-ecosphere/platform/issues/81): UI displays information from device AAS.
 * [#102](https://github.com/iip-ecosphere/platform/issues/102): Development Docker container for service development.
 * Technical Integration of federated learning [#127](https://github.com/iip-ecosphere/platform/issues/127), in particular server processes in application lifecycle and preparation of (template) generation
+* Connector data paths (RecordType::path) are not assumed to be full paths anymore rather. They may end with a separator ("/") for full paths or not for prefix paths. For achieving the same behavior as before this version, please add a "/" to all path specifications in the configuration model.
 
 Improvements:
 * Extend configuration model, e.g., by constraints [#52](https://github.com/iip-ecosphere/platform/issues/52)
