@@ -11,7 +11,7 @@ template JavaEnum(Configuration config, FileArtifact target, EnumType type, Stri
             '/**
             * Defines the literal ${l.name}.${prependIfNotEmpty(" ", l.description)}
             */
-            ${asIdentifier(l.name)}(${l.ordinal})'
+            ${asMethodFieldIdentifier(l.name)}(${l.ordinal})'
         }
         '\n' // strange, needed to flush VTL :(
     }

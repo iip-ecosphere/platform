@@ -40,7 +40,6 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
         }
         String ex = "";
         if (emit) {
-println("DA-EX");        
             ex = 'access.call("${call.name}", ${combineArgs(call.arguments, ", ", fields, indexes)});';
             if (hasField) {
                 ex = translateFieldAccess(call.field, fields, true, ";", ex, done, true, indexes);

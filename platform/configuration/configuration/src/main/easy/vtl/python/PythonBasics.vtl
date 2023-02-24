@@ -16,6 +16,10 @@ template PythonBasics(Configuration config, FileArtifact target) {
         String tmp = substNonIdCharacters(s);
         s.replace(" ", "").replace("$","D").toIdentifier();
     }
+    
+    def String asMethodFieldIdentifier(String s) {
+        asIdentifier(s).replace(".", "_");
+    }    
 
     def String asMethodNameSuffix(String s) {
         s.asIdentifier().firstToUpperCase();

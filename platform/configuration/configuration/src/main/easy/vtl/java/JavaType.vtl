@@ -12,7 +12,7 @@ template JavaType(Configuration config, FileArtifact target, RecordType type, St
     def attributes(RecordType type) {
         if (not(interface)) {
             for (Field f: type.fields) {
-                'private ${toTypeName(f.type)} ${asIdentifier(f.name)};\n'
+                'private ${toTypeName(f.type)} ${asMethodFieldIdentifier(f.name)};\n'
             }
         }
     }
@@ -20,7 +20,7 @@ template JavaType(Configuration config, FileArtifact target, RecordType type, St
     // generates code for shallow copy of all fields (shallow for now)
     def copy(RecordType type, String sourceVariable) {
         for (Field f: type.fields) {
-            'this.${asIdentifier(f.name)} = ${sourceVariable}.get${asMethodNameSuffix(f.name)}();'
+            'this.${asMethodFieldIdentifier(f.name)} = ${sourceVariable}.get${asMethodNameSuffix(f.name)}();'
         }
     }
     
@@ -29,7 +29,7 @@ template JavaType(Configuration config, FileArtifact target, RecordType type, St
         for (Field f: type.fields) {
             if (emitJavadoc) {
                 '/**
-                  * Returns the value of {@code ${asIdentifier(f.name)}}.${prependIfNotEmpty(" ", f.description)}
+                  * Returns the value of {@code ${asMethodFieldIdentifier(f.name)}}.${prependIfNotEmpty(" ", f.description)}
                   * 
                   * @return the value
                   */'
@@ -39,7 +39,7 @@ template JavaType(Configuration config, FileArtifact target, RecordType type, St
             'public ${toTypeName(f.type)} get${asMethodNameSuffix(f.name)}()${ending}'
             if (not(interface)) {
                 '
-                    return ${asIdentifier(f.name)};
+                    return ${asMethodFieldIdentifier(f.name)};
                 }\n'
             }
         }
@@ -50,7 +50,7 @@ template JavaType(Configuration config, FileArtifact target, RecordType type, St
         for (Field f: type.fields) {
             if (emitJavadoc) {
                 '/**
-                 * Changes the value of {@code ${asIdentifier(f.name)}}.${prependIfNotEmpty(" ", f.description)}
+                 * Changes the value of {@code ${asMethodFieldIdentifier(f.name)}}.${prependIfNotEmpty(" ", f.description)}
                  * 
                  * @param value the new value
                  */'
@@ -60,7 +60,7 @@ template JavaType(Configuration config, FileArtifact target, RecordType type, St
             'public void set${asMethodNameSuffix(f.name)}(${toTypeName(f.type)} value)${ending}'
             if (not(interface)) {
                 '
-                    this.${asIdentifier(f.name)} = value;
+                    this.${asMethodFieldIdentifier(f.name)} = value;
                 }\n'
             }
         }

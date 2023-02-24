@@ -7,9 +7,13 @@ template JavaBasics(Configuration config, FileArtifact target) {
     def String asIdentifier(String s) {
         substNonIdCharacters(s);
     }
+    
+    def String asMethodFieldIdentifier(String s) {
+        substNonIdCharacters(s).replace(".", "_");
+    }
 
     def String asMethodNameSuffix(String s) {
-        substNonIdCharacters(s.firstToUpperCase());
+        asMethodFieldIdentifier(s.firstToUpperCase());
     }
     
     def String asTypeName(String s) {
