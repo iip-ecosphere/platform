@@ -85,8 +85,7 @@ public class LxcContainerManager extends AbstractContainerManager<LxcContainerDe
         LxcContainerDescriptor container;
         LOGGER.info("Adding container at " + location + "...");
         try {
-            FactoryDescriptor factory = new FactoryDescriptor();
-            LxcSetup setup = (LxcSetup) factory.getConfiguration();
+            LxcSetup setup = (LxcSetup) EcsFactory.getSetup();
             String downloadDirectory = setup.getLxc().getDownloadDirectory();
             File downloadDir = new File(downloadDirectory);
 
@@ -96,7 +95,7 @@ public class LxcContainerManager extends AbstractContainerManager<LxcContainerDe
                 pathToYaml += setup.getLxc().getLxcImageYamlFilename();
             }
             URI yamlURI = new URI(pathToYaml);
-            File imageInfo = UriResolver.resolveToFile(yamlURI, downloadDir);
+            File imageInfo = resolveUri(yamlURI, downloadDir);
             container = LxcContainerDescriptor.readFromYamlFile(imageInfo);
 
             ILinuxCliService lxcCliService = new LinuxCliServiceImpl();
@@ -157,8 +156,7 @@ public class LxcContainerManager extends AbstractContainerManager<LxcContainerDe
         LxcContainerDescriptor container;
         LOGGER.info("Adding container at " + location + "...");
         try {
-            FactoryDescriptor factory = new FactoryDescriptor();
-            LxcSetup setup = (LxcSetup) factory.getConfiguration();
+            LxcSetup setup = (LxcSetup) EcsFactory.getSetup();
             String downloadDirectory = setup.getLxc().getDownloadDirectory();
             File downloadDir = new File(downloadDirectory);
 

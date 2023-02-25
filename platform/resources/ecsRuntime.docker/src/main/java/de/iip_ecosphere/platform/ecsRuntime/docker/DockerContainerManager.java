@@ -203,8 +203,7 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
         DockerContainerDescriptor container;
         LOGGER.info("Adding container at " + location + "...");
         try {
-            FactoryDescriptor factory = new FactoryDescriptor();
-            DockerSetup setup = (DockerSetup) factory.getConfiguration();
+            DockerSetup setup = (DockerSetup) EcsFactory.getSetup();
             String downloadDirectory = setup.getDocker().getDownloadDirectory();
             File downloadDir = new File(downloadDirectory);
             
@@ -214,7 +213,7 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
                 pathToYaml += setup.getDocker().getDockerImageYamlFilename();
             }
             URI yamlURI = new URI(pathToYaml);
-            File imageInfo = UriResolver.resolveToFile(yamlURI, downloadDir);
+            File imageInfo = resolveUri(yamlURI, downloadDir);
             container = DockerContainerDescriptor.readFromYamlFile(imageInfo);
 
             String dockerId = null;
@@ -424,8 +423,7 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
         dockerClient.removeContainerCmd(containerName).exec();
         
         // Removing image from download directory
-        FactoryDescriptor factory = new FactoryDescriptor();
-        DockerSetup config = (DockerSetup) factory.getConfiguration();
+        DockerSetup config = (DockerSetup) EcsFactory.getSetup();
         if (config.getDocker().getDeleteWhenUndeployed()) {
             File downloadedImageZipfile = new File(container.getDownloadedImageZipfile());
             if (downloadedImageZipfile.exists()) {
