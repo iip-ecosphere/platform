@@ -9,7 +9,7 @@ template JavaBasics(Configuration config, FileArtifact target) {
     }
     
     def String asMethodFieldIdentifier(String s) {
-        substNonIdCharacters(s).replace(".", "_");
+        substNonIdCharacters(s.replace(".", "_"));
     }
 
     def String asMethodNameSuffix(String s) {

@@ -18,11 +18,11 @@ template PythonBasics(Configuration config, FileArtifact target) {
     }
     
     def String asMethodFieldIdentifier(String s) {
-        asIdentifier(s).replace(".", "_");
+        asIdentifier(s.replace(".", "_"));
     }    
 
     def String asMethodNameSuffix(String s) {
-        s.asIdentifier().firstToUpperCase();
+        asMethodFieldIdentifier(s.firstToUpperCase());
     }
     
     def String asTypeName(String s) {

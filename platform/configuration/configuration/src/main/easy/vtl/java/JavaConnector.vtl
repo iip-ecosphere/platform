@@ -273,7 +273,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
     def genOutputTransTo(RecordType imType, RecordType pltfType, setOf(AssignmentOperation) assng, String oType, String coType) {
         genFrom = false;
         setOf(String) done = {};
-        topPath = imType.path;
+        topPath = getPath(imType);
         String imTypePath = "";
         if (not(optWithStepIn)) {
              imTypePath = topPath;
@@ -317,7 +317,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
     def genOutputTransFrom(RecordType imType, RecordType pltfType, setOf(AssignmentOperation) assng, String iType, String ciType) {
         genFrom = true;
         setOf(String) done = {};
-        topPath = imType.path;
+        topPath = getPath(imType);
         String imTypePath = "";
         if (not(optWithStepIn)) {
              imTypePath = topPath;
