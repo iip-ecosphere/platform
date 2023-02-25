@@ -13,6 +13,8 @@
 package de.iip_ecosphere.platform.ecsRuntime;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import de.iip_ecosphere.platform.support.identities.IdentityStore;
 import de.iip_ecosphere.platform.support.iip_aas.AasBasedSetup;
@@ -33,6 +35,7 @@ public class EcsSetup extends AasBasedSetup {
     private NetworkManagerSetup netMgr = new NetworkManagerSetup();
     private int monitoringUpdatePeriod = 2000;
     private boolean autoOnOffboarding = true;
+    private List<String> artifactInfixes = new ArrayList<>();
 
     /**
      * Common settings for a container manager setup.
@@ -99,6 +102,16 @@ public class EcsSetup extends AasBasedSetup {
     public boolean getAutoOnOffboarding() {
         return autoOnOffboarding;
     }
+    
+    /**
+     * Returns artifact file name infixes that shall be tried before loading a non-infixed default
+     * artifact, e.g., a container.
+     * 
+     * @return optional artifact infixes, may be empty
+     */
+    public List<String> getArtifactInfixes() {
+        return artifactInfixes;
+    }
 
     /**
      * Changes the monitoring update period. [snakeyaml]
@@ -137,6 +150,16 @@ public class EcsSetup extends AasBasedSetup {
         this.autoOnOffboarding = implicitOnOffboarding;
     }
 
+    /**
+     * Defines artifact file name infixes that shall be tried before loading a non-infixed default
+     * artifact, e.g., a container. [snakeyaml]
+     * 
+     * @param artifactInfixes optional artifact infixes, may be empty
+     */
+    public void setArtifactInfixes(List<String> artifactInfixes) {
+        this.artifactInfixes = artifactInfixes;
+    }
+    
     /**
      * Reads a {@link EcsSetup} instance from {@link AbstractSetup#DEFAULT_FNAME} in the root folder of 
      * the jar/classpath. 

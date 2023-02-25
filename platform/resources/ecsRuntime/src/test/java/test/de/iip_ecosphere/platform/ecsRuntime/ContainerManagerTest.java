@@ -42,7 +42,7 @@ public class ContainerManagerTest {
     @Test(timeout = 10 * 6000)
     public void testContainerManager() throws ExecutionException, URISyntaxException {
         NotificationMode oldM = ActiveAasBase.setNotificationMode(NotificationMode.NONE); // no AAS here
-        URI dummy = new URI("file:///dummy");
+        URI dummy = new URI("file:///dummy/dummy.txt");
         ContainerManager mgr = EcsFactory.getContainerManager();
         Assert.assertNotNull(mgr);
         String id = mgr.addContainer(dummy);

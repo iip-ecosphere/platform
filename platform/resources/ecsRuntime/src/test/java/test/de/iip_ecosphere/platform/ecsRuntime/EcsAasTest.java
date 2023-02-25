@@ -185,7 +185,7 @@ public class EcsAasTest {
         long start = System.currentTimeMillis();
         test(client);
         long end = System.currentTimeMillis();
-        long minDiff = 3 * EcsFactory.getSetup().getMonitoringUpdatePeriod() - (end - start);
+        long minDiff = 5 * EcsFactory.getSetup().getMonitoringUpdatePeriod() - (end - start);
         if (minDiff > 0) { // ensure that some metrics can be sent
             TimeUtils.sleep((int) minDiff);
         }

@@ -13,8 +13,11 @@
 package test.de.iip_ecosphere.platform.ecsRuntime;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.util.concurrent.ExecutionException;
+
+import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.ecsRuntime.AbstractContainerManager;
 import de.iip_ecosphere.platform.ecsRuntime.ContainerState;
@@ -40,6 +43,13 @@ class MyContainerManager extends AbstractContainerManager<MyContainerDesciptor> 
     
     @Override
     public String addContainer(URI location) throws ExecutionException {
+        try {
+            File file = resolveUri(location, null);
+            LoggerFactory.getLogger(MyContainerManager.class).info("Adding container: URI {} resolved to ", 
+                location, file);
+        } catch (IOException e) {
+            // not so relevant as unused but resolveUri is called
+        }
         String sId = createId();
         return super.addContainer(sId, new MyContainerDesciptor(sId, "cName", new Version(0, 1), 
             new File("test.yml").toURI()));

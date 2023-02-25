@@ -12,17 +12,22 @@
 
 package de.iip_ecosphere.platform.ecsRuntime;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import org.slf4j.LoggerFactory;
+
+import de.iip_ecosphere.platform.support.net.UriResolver;
 
 /**
  * A basic re-usable implementation of the container manager. Implementations shall override at least 
@@ -230,5 +235,51 @@ public abstract class AbstractContainerManager<C extends ContainerDescriptor> im
         throw new ExecutionException(message, null);
     }
 
+    /**
+     * Resolves an URI taking {@link EcsSetup#getArtifactInfixes()} into account.
+     * 
+     * @param uri the default/base URI to be resolved
+     * @param downloadDir the directory to store resolved files, may be <b>null</b> for temporary files
+     * @return the resolve file
+     * @throws IOException if the {@code uri} ultimately cannot be resolved
+     */
+    protected File resolveUri(URI uri, File downloadDir) throws IOException {
+        EcsSetup setup = EcsFactory.getSetup();
+        File result = null;
+        List<String> infixes = setup.getArtifactInfixes();
+        for (String infix : infixes) {
+            String tmp = uri.toString();
+            int pos = tmp.lastIndexOf('.');
+            if (pos > 0) {
+                while (infix.startsWith("-")) {
+                    infix = infix.substring(1);
+                }
+                tmp = tmp.substring(0, pos) + "-" + infix + tmp.substring(pos);
+                try {
+                    result = UriResolver.resolveToFile(new URI(tmp), downloadDir);
+                    if (result.exists()) {
+                        break;
+                    } else {
+                        result = null;
+                    }
+                } catch (IOException e) {
+                    LoggerFactory.getLogger(getClass()).info("Cannot resolve {}. Trying with further artifact infixes "
+                        + "from {} or the base URI {}", tmp, uri, infixes);
+                } catch (URISyntaxException e) {
+                    LoggerFactory.getLogger(getClass()).info("Cannot resolve {} as this is not an URI ({}). Trying "
+                        + "with further artifact infixes from {} or the base URI {}", tmp, e.getMessage(), 
+                        uri, infixes);
+                }
+            } else {
+                LoggerFactory.getLogger(getClass()).warn("Cannot apply artifact infixes {} as base URI does not "
+                    + "seem to point to a file.", infixes, uri);
+                break;
+            }
+        }
+        if (null == result) {
+            result = UriResolver.resolveToFile(uri, downloadDir);
+        }
+        return result;
+    }
 
 }
