@@ -5,10 +5,13 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
@@ -205,8 +208,7 @@ public class AbstractTestServiceManager {
         ((SpringCloudServiceManager) mgr).clear(); // start test in fair conditions
         
         File f = new File("./target/jars/simpleStream.spring.jar");
-        Assert.assertTrue("Test cannot be executed as " + f 
-            + " does not exist. Was it downloaded by Maven?", f.exists());
+        Assert.assertTrue("Test cannot be executed, " + f + " does not exist. Downloaded by Maven?", f.exists());
         String aId = mgr.addArtifact(f.toURI());
         Assert.assertNotNull(aId);
         Assert.assertTrue(aId.length() > 0);
@@ -235,20 +237,21 @@ public class AbstractTestServiceManager {
             Assert.assertEquals(ServiceState.AVAILABLE, sDesc.getState());
         }
 
-        String[] ids = new String[aDesc.getServices().size()];
-        aDesc.getServiceIds().toArray(ids);
+        Set<String> sIds = new HashSet<>(); // emulate AAS result with all server-as-service ids
+        sIds.addAll(aDesc.getServiceIds());
+        String[] serviceIds = sIds.toArray(new String[0]);
+        sIds.addAll(aDesc.getServers().stream().map(s->s.getServiceId()).collect(Collectors.toSet()));
+        String[] allIds = sIds.toArray(new String[0]);
         if (fakeServer) {
-            startFakeServiceCommandServers(mgr, ids);
+            startFakeServiceCommandServers(mgr, serviceIds);
         }
 
-        System.out.println("STARTING " + mgr + " " + java.util.Arrays.toString(ids)); // needed on Jenkins...
-        mgr.startService(ids);
-
+        System.out.println("STARTING " + mgr + " " + java.util.Arrays.toString(allIds)); // needed on Jenkins...
+        mgr.startService(allIds);
         for (ServiceDescriptor sDesc : aDesc.getServices()) {
             Assert.assertEquals("Service " + sDesc.getId() + " " + sDesc.getName() + " not running: "
                 + sDesc.getState(), ServiceState.RUNNING, sDesc.getState());
         }
-        
         Aas aas = AasPartRegistry.retrieveIipAas();
         Submodel sub = aas.getSubmodel(ServicesAas.NAME_SUBMODEL);
         Assert.assertNotNull(sub);
@@ -259,10 +262,10 @@ public class AbstractTestServiceManager {
         Map<String, Predicate<Object>> expectedMetrics = new HashMap<>();
         expectedMetrics.put(MetricsAasConstants.SYSTEM_MEMORY_TOTAL, POSITIVE_GAUGE_VALUE);
         expectedMetrics.put(MetricsAasConstants.SYSTEM_MEMORY_USAGE, POSITIVE_GAUGE_VALUE);
-        assertMetrics(ids, expectedMetrics);
+        assertMetrics(serviceIds, expectedMetrics);
 
         asserter.testDeployment(aDesc);
-        mgr.stopService(ids);
+        mgr.stopService(allIds);
         releaseFakeServiceCommandServers();
         
         for (ServiceDescriptor sDesc : aDesc.getServices()) {
