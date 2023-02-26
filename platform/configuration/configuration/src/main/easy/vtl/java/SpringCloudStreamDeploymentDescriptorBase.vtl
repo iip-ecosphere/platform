@@ -473,7 +473,7 @@ template SpringCloudStreamDeploymentDescriptorBase(Configuration config, FileArt
     }
     
     def getServerCls(Server server) {
-        "server.${asTypeName(s.id)}Server"; // assumed: generation
+        "server.${asTypeName(server.id)}Server"; // assumed: generation
     }
 
     // dispatch basis
