@@ -94,6 +94,11 @@ project Devices {
         setOf(refTo(Dependency)) dependencies = {};
     }
     
+    PythonDependency tensorflow280 = {
+       name = "tensorflow",
+       version = "2.8.0"
+    };    
+    
     // ------------------ DeviceId --------------------------- 
     
     abstract compound DeviceIdProvider {
@@ -132,12 +137,31 @@ project Devices {
         setOf(refTo(Dependency)) provides = {};
         setOf(String) requiredModules = {};
         ContainerType containerType = ContainerType::Ecs_Svc_App;
+        setOf(ContainerArgument) containerArguments = {};
         Constraint noInternalContainerType = containerType <> ContainerType::Ecs; // internal
 
         Boolean isContainerTemplate = true; // currently for easing transition
-        String containerName = "dflt"; // the default containers without device-specific adjustments
+        String containerName = ""; // the default containers without device-specific adjustments; TODO: add to device-specific ECS setup as artifactInfix
         Constraint noInternalContainerName = containerName <> "ecs";
     }
+    
+    abstract compound ContainerArgument {
+    }
+
+    compound MountVolumeContainerArgument refines ContainerArgument {
+        NonEmptyString hostPath;
+        NonEmptyString containerPath;
+    }
+    
+    // there may be more relevant, e.g., --gpu
+
+    // for future    
+    compound EcsDeviceInstance refines CComputer {
+        NonEmptyString id;
+        refTo(EcsDevice) type;
+    }
+    
+    //EcsDevice defaultDeviceType = {}; // enable for #130
     
     Constraint ecsDeviceNamesUnique = allInstances(EcsDevice)->isUnique(d|d.id);
     // container names unique does currently not work as the same can be used in various instances
@@ -152,6 +176,8 @@ project Devices {
         PYTHON2;
         PYTHON3;
         PYTHON39;
+        tensorflow280;
+        //defaultDeviceType; // enable for #130
     } but (f|f.bindingTime >= BindingTime.runtimeMon);
 
 }

@@ -1,3 +1,7 @@
 ServerPartFlowerAI::FlowerFederatedAiServer::transportChannel = Refined name of transport channel.
 ServerPartFlowerAI::FlowerFederatedAiServer::description = Refined description of the server.
 ServerPartFlowerAI::FlowerFederatedAiServer::ver = Refined version of the server.
+ServerPartFlowerAI::FlowerFederatedAiServer::dependencies = Refined dependencies for Flower.
+ServerPartFlowerAI::FlowerFederatedAiServer::reqDependenciesOk = The minimum required dependencies for Flower must be specified.
+ServerPartFlowerAI::reqFlowerDependencies = Minimum required dependencies for Flower.
+ServerPartFlowerAI::flowrDependency = Required (re-usable) flower dependency.

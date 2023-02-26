@@ -90,6 +90,7 @@ Services::Server::artifact = Maven coordinate for optional artifact containing t
 Services::Server::transportChannel = The name of the transport channel for client-server (empty for none).
 Services::Server::description = Description of service functionality.
 Services::Server::ver = Version of service (numbers separated by a dot).
+Services::Server::dependencies = Dependencies required by a server.
 Services::JavaServer::class = Class in artifact to be executed as server (must implement IIP-Ecosphere server interface with String[]/no-arg constructor)
 Services::JavaServer::cmdArg = Comma-separated command line arguments, may be empty.
 Services::PythonServer::executable = The executable for the server implementation.

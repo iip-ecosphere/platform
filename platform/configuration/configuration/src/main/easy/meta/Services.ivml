@@ -259,6 +259,7 @@ project Services {
         String artifact = ""; // optional maven artifact
         Boolean running = false; // running somewhere else, do we have to start it
         Parameters parameter = {};
+        setOf(refTo(Dependency)) dependencies = {};
         String transportChannel;
     }
     
