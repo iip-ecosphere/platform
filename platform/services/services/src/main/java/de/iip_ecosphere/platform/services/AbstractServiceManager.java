@@ -685,7 +685,7 @@ public abstract class AbstractServiceManager<A extends AbstractArtifactDescripto
         List<String> result = new ArrayList<>();
         for (String id: serviceIds) {
             ServiceDescriptor desc = mgr.getService(id);
-            if (desc.isTopLevel()) {
+            if (null != desc && desc.isTopLevel()) {
                 result.add(id);
             }
         }
@@ -703,7 +703,7 @@ public abstract class AbstractServiceManager<A extends AbstractArtifactDescripto
         List<String> result = new ArrayList<>();
         for (String id: serviceIds) {
             ServiceDescriptor desc = mgr.getService(id);
-            if (desc.getKind() != ServiceKind.SERVER) {
+            if (null != desc && desc.getKind() != ServiceKind.SERVER) {
                 result.add(id);
             }
         }
