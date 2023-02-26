@@ -47,6 +47,9 @@ public class TestHiveMqServer extends AbstractTestServer {
     @Override
     public Server start() {
         if (null == hiveMQ) {
+            FileUtils.listFiles(FileUtils.getTempDirectory(), 
+                f -> f.getName().startsWith("hivemq_v5"), 
+                f -> f.delete()); // try to clean up left-over temp folders, ignore whether deletion is possible
             File hiveTmp = FileUtils.createTmpFolder("hivemq_v5", true);
 
             System.setProperty("HIVEMQ_PORT", Integer.toString(addr.getPort()));
