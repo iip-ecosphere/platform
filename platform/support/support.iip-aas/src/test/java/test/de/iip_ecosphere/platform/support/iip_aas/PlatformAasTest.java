@@ -24,6 +24,8 @@ import de.iip_ecosphere.platform.support.aas.AasPrintVisitor;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
+import de.iip_ecosphere.platform.support.iip_aas.ApplicationInstanceAasConstructor;
+import de.iip_ecosphere.platform.support.iip_aas.ApplicationInstancesAasClient;
 import de.iip_ecosphere.platform.support.iip_aas.PlatformAas;
 import de.iip_ecosphere.platform.support.iip_aas.PlatformAasClient;
 import de.iip_ecosphere.platform.support.iip_aas.PlatformClient;
@@ -99,7 +101,9 @@ public class PlatformAasTest {
         
         SemanticIdResolutionResult sres = client.resolveSemanticId(Eclass.IRDI_UNIT_BYTE);
         Assert.assertNotNull(sres);
-
+        
+        assertApplicationInstances();
+        
         AasPartRegistry.setAasSupplier(() -> res.getAas());
         // seems to work only once with BaSyx
         //assertString(client.snapshotAas(null), null);
@@ -109,6 +113,38 @@ public class PlatformAasTest {
         aasServer.stop(true);
         implServer.stop(true);
         AasPartRegistry.setAasSetup(oldSetup);
+    }
+    
+    /**
+     * Asserts results around application instances.
+     * 
+     * @throws IOException shall not occur, may occur if {@link ApplicationInstancesAasClient} fails
+     */
+    private static void assertApplicationInstances() throws IOException {
+        Aas aas = AasPartRegistry.retrieveIipAas(); // remote
+        aas.createSubmodelBuilder(ApplicationInstanceAasConstructor.NAME_SUBMODEL_APPINSTANCES, null).build(); 
+
+        ApplicationInstancesAasClient instClient = new ApplicationInstancesAasClient();
+        Assert.assertEquals(0, instClient.getInstanceCount("app-1"));
+        Assert.assertEquals(0, instClient.getInstanceCount("app-1", "plan-1"));
+        
+        String id1 = ApplicationInstanceAasConstructor.notifyAppNewInstance("app-1", "plan-1");
+        Assert.assertNull(id1); // it's the first one
+        String id2 = ApplicationInstanceAasConstructor.notifyAppNewInstance("app-1", "plan-1");
+        Assert.assertNotNull(id2);
+        
+        instClient = new ApplicationInstancesAasClient(); // short term use, no update
+        Assert.assertEquals(2, instClient.getInstanceCount("app-1"));
+        Assert.assertEquals(2, instClient.getInstanceCount("app-1", "plan-1"));
+        
+        int count = ApplicationInstanceAasConstructor.notifyAppInstanceStopped("app-1", id2);
+        Assert.assertEquals(1, count); // already one gone
+        count = ApplicationInstanceAasConstructor.notifyAppInstanceStopped("app-1", id1);
+        Assert.assertEquals(0, count); // both gone      
+        
+        instClient = new ApplicationInstancesAasClient(); // short term use, no update
+        Assert.assertEquals(0, instClient.getInstanceCount("app-1"));
+        Assert.assertEquals(0, instClient.getInstanceCount("app-1", "plan-1"));
     }
     
     /**
