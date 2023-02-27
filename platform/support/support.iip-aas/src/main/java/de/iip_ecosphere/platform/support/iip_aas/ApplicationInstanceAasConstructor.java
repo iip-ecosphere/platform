@@ -62,10 +62,10 @@ public class ApplicationInstanceAasConstructor {
 
             newId++; // the next instance
             String id = appId + "-" + newId;
-            SubmodelElementCollectionBuilder cBuilder // get or create
-                = sub.createSubmodelElementCollectionBuilder(NAME_SUBMODEL_APPINSTANCES, false, false);
+            //SubmodelElementCollectionBuilder cBuilder // get or create
+            //    = sub.createSubmodelElementCollectionBuilder(NAME_SUBMODEL_APPINSTANCES, false, false);
             SubmodelElementCollectionBuilder dBuilder 
-                = cBuilder.createSubmodelElementCollectionBuilder(fixId(id), false, false);
+                = sub.createSubmodelElementCollectionBuilder(fixId(id), false, false);
             dBuilder.createPropertyBuilder(NAME_PROP_APPID)
                 .setValue(Type.STRING, appId)
                 .build();
@@ -73,11 +73,13 @@ public class ApplicationInstanceAasConstructor {
                 .setValue(Type.STRING, planId)
                 .build();
             dBuilder.createPropertyBuilder(NAME_PROP_INSTANCEID)
-                .setValue(Type.STRING, newId)
+                .setValue(Type.INTEGER, newId)
                 .build();
             dBuilder.createPropertyBuilder(NAME_PROP_TIMESTAMP)
-                .setValue(Type.INTEGER, System.currentTimeMillis())
+                .setValue(Type.INT64, System.currentTimeMillis())
                 .build();
+            dBuilder.build();
+            //cBuilder.build();
             if (newId > 0) {
                 result.set(String.valueOf(newId));
             }
@@ -100,7 +102,7 @@ public class ApplicationInstanceAasConstructor {
             String id = fixId(appId + "-" + instId);
             SubmodelElementCollection coll = sub.getSubmodelElementCollection(id);
             if (null != coll) {
-                coll.deleteElement(id);
+                sub.delete(coll);
             }
             result.set(countAppInstances(appId, null, sub));
         });
