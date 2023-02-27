@@ -1,6 +1,6 @@
 cd Files/Install/gen/broker
 
-setsid ./broker.sh &> broker.log &
+echo $1 | sudo -S setsid ./broker.sh &> broker.log &
 
 if [[ $(cat broker.sh | grep amqp) ]]; then
     brokerReady=$(cat broker.log | grep "Qpid Broker Ready")
@@ -22,7 +22,7 @@ echo "Broker is started"
 
 cd ..
 
-setsid ./platform.sh &> platform.log &
+echo $1 | sudo -S setsid ./platform.sh &> platform.log &
 
 platformReady=$(cat platform.log | grep "Startup completed")
 while [ -z "$platformReady" ]; do
@@ -33,7 +33,7 @@ done
 
 echo "Platform is started"
 
-setsid ./mgtUi.sh &> mgtUi.log &
+echo $1 | sudo -S setsid ./mgtUi.sh &> mgtUi.log &
 
 mgtUiReady=$(cat mgtUi.log | grep "Server listening on port")
 while [ -z "$mgtUiReady" ]; do
@@ -56,14 +56,14 @@ done
 echo "Monitoring is started"
 echo "Broker and Platform are Running... Please don't close it"
 
-brokerPPID=$(ps -Ao pid,command | grep broker.sh | grep -v grep | head -1 | xargs | cut -d ' ' -f -1)
-platformPPID=$(ps -Ao pid,command | grep platform.sh | grep -v grep | head -1 | xargs | cut -d ' ' -f -1)
-mgtUiPPID=$(ps -Ao pid,command | grep mgtUi.sh | grep -v grep | head -1 | xargs | cut -d ' ' -f -1)
-monitoringPPID=$(ps -Ao pid,command | grep "java -cp monJars/" | grep -v grep | head -1 | xargs | cut -d ' ' -f -1)
+brokerPID=$(ps -Ao pid,command | grep "java -cp brokerJars/" | grep -v grep | head -1 | xargs | cut -d ' ' -f -1)
+platformPID=$(ps -Ao pid,command | grep "java -cp plJars/" | grep -v grep | head -1 | xargs | cut -d ' ' -f -1)
+mgtUiPID=$(ps -Ao pid,command | grep "nodejs server.js" | grep -v grep | head -1 | xargs | cut -d ' ' -f -1)
+monitoringPID=$(ps -Ao pid,command | grep "java -cp monJars/" | grep -v grep | head -1 | xargs | cut -d ' ' -f -1)
 
-brokerPID=$(pgrep -laP $brokerPPID | cut -d ' ' -f1)
-platformPID=$(pgrep -laP $platformPPID | cut -d ' ' -f1)
-mgtUiPID=$(pgrep -laP $mgtUiPPID | cut -d ' ' -f1)
+#brokerPID=$(pgrep -laP $brokerPPID | cut -d ' ' -f1)
+#platformPID=$(pgrep -laP $platformPPID | cut -d ' ' -f1)
+#mgtUiPID=$(pgrep -laP $mgtUiPPID | cut -d ' ' -f1)
 #monitoringPID=$(pgrep -laP $monitoringPPID | cut -d ' ' -f1)
 
 cd ..
@@ -72,4 +72,4 @@ cd ..
 echo "$brokerPID  brokerPID" > ProcessesIDs.info
 echo "$platformPID  platformPID" >> ProcessesIDs.info
 echo "$mgtUiPID  mgtUiPID" >> ProcessesIDs.info
-echo "$monitoringPPID  monitoringPID" >> ProcessesIDs.info
+echo "$monitoringPID  monitoringPID" >> ProcessesIDs.info

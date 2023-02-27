@@ -44,27 +44,19 @@ Examples:
     Device         : LinDev000002
     Artifact       : "SimpleMeshInstallTestingApp-0.1.0-SNAPSHOT-bin.jar"
     ContainerDesc  : "SimpleMeshInstallTestingApp_dflt_mesh-info.yml"
-  - Name           : examples.KODEX
-    Included       : False
-    Redownload     : False
-    Container      : False
-    Run            : False
-    Device         : LinDev000001
-    Artifact       : "SimpleKodexTestingApp-0.1.0-SNAPSHOT-bin.jar"
-    ContainerDesc  : "SimpleKodexTestingApp_dflt_mesh-info.yml"
   - Name           : examples.python
-    Included       : False
-    Redownload     : False
+    Included       : True
+    Redownload     : True
     Container      : False
-    Run            : False
+    Run            : True
     Device         : LinDev000001
     Artifact       : "SimplePythonDemoFlowApp-0.1.0-SNAPSHOT-bin.jar"
     ContainerDesc  : "SimplePythondemoflowapp_dflt_mesh-info.yml"
   - Name           : examples.pythonSync
-    Included       : False
-    Redownload     : False
+    Included       : True
+    Redownload     : True
     Container      : False
-    Run            : False
+    Run            : True
     Device         : LinDev000001
     Artifact       : "SimpleSynchronousPythonDemoFlowApp-0.1.0-SNAPSHOT-bin.jar"
     ContainerDesc  : "SimpleSynchronousPythondemoflowapp_dflt_mesh-info.yml"
@@ -76,6 +68,14 @@ Examples:
     Device         : LinDev000001
     Artifact       : "SimpleRTSADemoFlowApp-0.1.0-SNAPSHOT-bin.jar"
     ContainerDesc  : "SimpleRTSAdemoflowapp_dflt_mesh-info.yml"
+  - Name           : examples.KODEX
+    Included       : True
+    Redownload     : True
+    Container      : False
+    Run            : True
+    Device         : LinDev000001
+    Artifact       : "SimpleKodexTestingApp-0.1.0-SNAPSHOT-bin.jar"
+    ContainerDesc  : "SimpleKodexTestingApp_dflt_mesh-info.yml"
   - Name           : examples.vdw
     Included       : False
     Redownload     : False
@@ -156,18 +156,18 @@ Machines:
     Password       : osboxes.org
     Role           : Device
     OS             : Linux
-    Included       : False
+    Included       : True
     NewDeviceFiles : True
     DeviceID       : LinDev000001
     DockerRegistry : False
-    RunAsContainer : True
+    RunAsContainer : False
   - Name           : Ubuntu 20.04.3 IIP Platform Device 2
     IP             : 192.168.81.120
     Username       : osboxes
     Password       : osboxes.org
     Role           : Device
     OS             : Linux
-    Included       : False
+    Included       : True
     NewDeviceFiles : True
     DeviceID       : LinDev000002
     DockerRegistry : False

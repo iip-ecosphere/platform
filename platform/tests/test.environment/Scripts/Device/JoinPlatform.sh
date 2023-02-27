@@ -1,7 +1,7 @@
 cd Files
 
 if [ $3 == "True" ]; then
-    rm -r platformFiles
+    echo $1 | sudo -S rm -r platformFiles
     mkdir platformFiles
     cd platformFiles
     wget http://$4:4200/download/DeviceFolder.tar.gz
@@ -13,9 +13,9 @@ fi
 cd broker
 
 if [ $5 != "Non" ]; then
-    setsid ./broker.sh $5 &> broker.log &
+    echo $1 | sudo -S setsid ./broker.sh $5 &> broker.log &
 else
-    setsid ./broker.sh &> broker.log &
+    echo $1 | sudo -S setsid ./broker.sh &> broker.log &
 fi
 
 if [[ $(cat broker.sh | grep amqp) ]]; then
@@ -38,7 +38,7 @@ echo "Broker is started"
 
 cd ..
 
-setsid ./ecs.sh --iip.id=$2 &> ecs.log &
+echo $1 | sudo -S setsid ./ecs.sh --iip.id=$2 &> ecs.log &
 
 ecsReady=$(cat ecs.log | grep "Startup completed")
 while [ -z "$ecsReady" ]; do
@@ -49,7 +49,7 @@ done
 
 echo "Ecs is started"
 
-setsid ./serviceMgr.sh --iip.id=$2 &> serviceMgr.log &
+echo $1 | sudo -S setsid ./serviceMgr.sh --iip.id=$2 &> serviceMgr.log &
 
 serviceMgrReady=$(cat serviceMgr.log | grep "Startup completed")
 while [ -z "$serviceMgrReady" ]; do
@@ -62,13 +62,13 @@ echo "ServiceMgr is started"
 echo "Ecs and ServiceMgr are Running... Please don't close it"
 echo "DeviceID: $2"
 
-brokerPPID=$(ps -Ao pid,command | grep broker.sh | grep -v grep | head -1 | xargs | cut -d ' ' -f -1)
-ecsPPID=$(ps -Ao pid,command | grep ecs.sh | grep -v grep | head -1 | xargs | cut -d ' ' -f -1)
-serviceMgrPPID=$(ps -Ao pid,command | grep serviceMgr.sh | grep -v grep | head -1 | xargs | cut -d ' ' -f -1)
+brokerPID=$(ps -Ao pid,command | grep "java -cp brokerJars/" | grep -v grep | head -1 | xargs | cut -d ' ' -f -1)
+ecsPID=$(ps -Ao pid,command | grep "java -cp ecsJars/" | grep -v grep | head -1 | xargs | cut -d ' ' -f -1)
+serviceMgrPID=$(ps -Ao pid,command | grep "java -cp svcJars/" | grep -v grep | head -1 | xargs | cut -d ' ' -f -1)
 
-brokerPID=$(pgrep -laP $brokerPPID | cut -d ' ' -f1)
-ecsPID=$(pgrep -laP $ecsPPID | cut -d ' ' -f1)
-serviceMgrPID=$(pgrep -laP $serviceMgrPPID | cut -d ' ' -f1)
+#brokerPID=$(pgrep -laP $brokerPPID | cut -d ' ' -f1)
+#ecsPID=$(pgrep -laP $ecsPPID | cut -d ' ' -f1)
+#serviceMgrPID=$(pgrep -laP $serviceMgrPPID | cut -d ' ' -f1)
 
 echo "$ecsPID  ecsPID" > ecsSvcProcessesIDs.info
 echo "$serviceMgrPID  serviceMgrPID" >> ecsSvcProcessesIDs.info
