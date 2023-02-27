@@ -3,7 +3,7 @@ import JavaMapping;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, FileArtifact target) {
+template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, FileArtifact target, EcsDevice deviceType) {
 
     def serverHost(EndpointAddress addr) {
         if (addr.serverHost <> null) {
@@ -140,14 +140,24 @@ template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, FileArtifact 
             netmask: ${aasImplNetmask}'
     }
     
-    def produceEcsRuntimeCfg(IIPEcosphere config, FileArtifact target) {
+    def produceArtefactInfixes(EcsDevice deviceType) {
+        if (deviceType.containerName <> "") {
+            'artifactInfixes:
+              - ${deviceType.containerName}'
+        } else {
+            ''
+        }
+    }
+    
+    def produceEcsRuntimeCfg(IIPEcosphere config, FileArtifact target, EcsDevice deviceType) {
         '${produceTransport(config)}'
         '${produceAas(config, implLocalEphemerial=config.aasImplServer.devicesAsEphemeral)}'
         '${produceNetMgr(config)}'
-    }    
+        '${produceArtefactInfixes(deviceType)|e}'
+    } 
 
-    def main(IIPEcosphere config, FileArtifact target) {
-        produceEcsRuntimeCfg(config, target);
+    def main(IIPEcosphere config, FileArtifact target, EcsDevice deviceType) {
+        produceEcsRuntimeCfg(config, target, deviceType);
     }
 
 }

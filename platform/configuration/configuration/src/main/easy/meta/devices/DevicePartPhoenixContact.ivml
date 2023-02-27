@@ -5,8 +5,13 @@ project DevicePartPhoenixContact {
     annotate BindingTime bindingTime = BindingTime::compile to .;
     
     compound PhoenixContactDevice refines EcsDevice {
+        String id = "PhoenixContact PLCnext";
         setOf(String) requiredModules = {"de.iip-ecosphere.platform:support.metrics.plcNext:" + iipVer};
         String containerName = "plcNext";
+        Integer mainMemory = 2 * 1024;
+        CpuArchitecture cpu = CpuArchitecture::x86;
+        CpuBits bits = CpuBits::bit64; // TODO check
+        ContainerType containerType = ContainerType::EcsSvc_App;
         setOf(refTo(Dependency)) provides = {refBy(tensorflow280)}; // Tensorflow
         // see https://github.com/iip-ecosphere/platform/tree/main/platform/support/support.sysMetrics.plcnext, 
         // might also be /run/plcnext/grpc.sock:/run/plcnext/grpc.sock
@@ -18,10 +23,10 @@ project DevicePartPhoenixContact {
         };
     }
     
-    /*EcsDevice plcNextDeviceType = {}; // enable for #130
+    PhoenixContactDevice plcNextDeviceType = {};
     
     freeze {
-        plcNextDeviceType
-    };*/
+        plcNextDeviceType;
+    };
     
 }

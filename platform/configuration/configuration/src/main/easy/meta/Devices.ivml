@@ -132,10 +132,11 @@ project Devices {
     compound EcsDevice refines CComputer {
         String id; // currently, we are a bit more open here; may be restricted in future
         EphemeralPort aasImplPort; // for container; if given, "override" port from transport
+        Integer mainMemory; // in MBytes
         CpuArchitecture cpu;
         CpuBits bits;
         setOf(refTo(Dependency)) provides = {};
-        setOf(String) requiredModules = {};
+        setOf(String) requiredModules = {}; // mvn coordinates, assuming they come with own JLS descriptor
         ContainerType containerType = ContainerType::Ecs_Svc_App;
         setOf(ContainerArgument) containerArguments = {};
         Constraint noInternalContainerType = containerType <> ContainerType::Ecs; // internal
@@ -143,6 +144,7 @@ project Devices {
         Boolean isContainerTemplate = true; // currently for easing transition
         String containerName = ""; // the default containers without device-specific adjustments; TODO: add to device-specific ECS setup as artifactInfix
         Constraint noInternalContainerName = containerName <> "ecs";
+        Constraint containerNameForm = containerName.matches("\\w*");
     }
     
     abstract compound ContainerArgument {
@@ -161,9 +163,11 @@ project Devices {
         refTo(EcsDevice) type;
     }
     
-    //EcsDevice defaultDeviceType = {}; // enable for #130
+    EcsDevice defaultDeviceType = {};
     
     Constraint ecsDeviceNamesUnique = allInstances(EcsDevice)->isUnique(d|d.id);
+    Constraint ecsDeviceContainerNamesUnique = allInstances(EcsDevice)->isUnique(d|d.containerName);
+    Constraint ecsDeviceInstanceNamesUnique = allInstances(EcsDeviceInstance)->isUnique(d|d.id);
     // container names unique does currently not work as the same can be used in various instances
     
     // --------------- constant freezes --------------------
@@ -177,7 +181,7 @@ project Devices {
         PYTHON3;
         PYTHON39;
         tensorflow280;
-        //defaultDeviceType; // enable for #130
+        defaultDeviceType;
     } but (f|f.bindingTime >= BindingTime.runtimeMon);
 
 }

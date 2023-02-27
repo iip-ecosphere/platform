@@ -1,17 +1,18 @@
 import Basics;
+import JavaBasics;
 import MavenBasics;
 import JavaMapping;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template EcsRuntimeMvn(IIPEcosphere config, XmlFileArtifact target, String dir, String main, Boolean tests) {
+template EcsRuntimeMvn(IIPEcosphere config, XmlFileArtifact target, String dir, String main, Boolean tests, EcsDevice deviceType) {
 
-    def main(IIPEcosphere config, XmlFileArtifact target, String dir, String main, Boolean tests) {
+    def main(IIPEcosphere config, XmlFileArtifact target, String dir, String main, Boolean tests, EcsDevice deviceType) {
         String iipGroup = "de.iip-ecosphere.platform";
         String projectVersion = "\\${project.version}";
         
         XmlElement project = createMavenRoot(target);
-        createMavenProjectAttributes(project, "ecsRuntime.exec", "ConfiguredEcsRuntime", "Configured ECS runtime");
+        createMavenProjectAttributes(project, "ecsRuntime.exec${getContainerNameInfix(deviceType)}", "ConfiguredEcsRuntime", "Configured ECS runtime");
         createMavenParent(project, iipGroup, "platformDependencies", "${config.iipVer}");
 
         XmlElement dep = createDependencies(project);
@@ -23,6 +24,9 @@ template EcsRuntimeMvn(IIPEcosphere config, XmlFileArtifact target, String dir, 
         appendArtifact(dep, deviceIdProviderModule(config));
         addSemanticIdResolverDependencies(dep, config);
         appendIipBaseDependencies(dep);
+        for (String d:deviceType.requiredModules) {
+            appendArtifact(dep, "${d}");
+        }
 
         XmlElement plugins = createMavenBuildElement(project, "", true);
         appendMavenJarPlugin(plugins, "2.3", false, main);

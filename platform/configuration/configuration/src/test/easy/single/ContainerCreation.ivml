@@ -171,12 +171,6 @@ project ContainerCreation {
         impl = refBy(myReceiverService)
     };
     
-    // ---------------- device ----------------
-    
-    EcsDevice device = {
-        containerType = ContainerType::Ecs_Svc_App
-    };
-    
     // ---------- generation setup ------------
     
     sharedInterfaces = true;
@@ -208,7 +202,6 @@ project ContainerCreation {
         managementUi;
         artifactsFolder;
         artifactsUriPrefix;
-        device;
         .; // every variable declared in this project
     } but (f|f.bindingTime >= BindingTime.runtimeMon);
 
