@@ -16,7 +16,7 @@ done
 
 echo "Monitoring is stopped"
 
-kill $mgtUiPID
+echo $1 | sudo -S kill $mgtUiPID
 
 mgtUiKilled=$(ps -ef | grep  $mgtUiPID | grep -v grep)
 while [[ $mgtUiKilled ]]; do
@@ -27,7 +27,7 @@ done
 
 echo "Manage UI is stopped"
 
-kill $platformPID
+echo $1 | sudo -S kill $platformPID
 
 platformKilled=$(ps -ef | grep  $platformPID | grep -v grep)
 while [ -z "$platformKilled" ]; do
@@ -38,7 +38,7 @@ done
 
 echo "Platform is stopped"
 
-kill $brokerPID
+echo $1 | sudo -S kill $brokerPID
 
 brokerKilled=$(ps -ef | grep  $brokerPID | grep -v grep)
 while [ -z "$brokerKilled" ]; do

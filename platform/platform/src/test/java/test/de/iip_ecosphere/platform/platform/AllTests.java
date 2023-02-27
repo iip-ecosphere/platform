@@ -23,7 +23,8 @@ import org.junit.runners.Suite;
     PlatformTest.class,
     CliTest.class,
     ServiceDeploymentPlanTest.class,
-    ServiceAasTest.class
+    ServiceAasTest.class,
+    PlatformAasTest.class
 })
 public class AllTests {
 }
