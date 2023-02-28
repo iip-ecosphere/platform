@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>de.iip-ecosphere.platform</groupId>
   <artifactId>MvnCentral</artifactId>
-  <version>0.5.0-SNAPSHOT</version> <!-- for release, remove -SNAPSHOT -->
+  <version>0.5.0</version> <!-- for release, remove -SNAPSHOT -->
   
   <repositories>       
     <repository>
@@ -37,6 +37,32 @@
         <type>pom</type>
     </dependency>
 
+    <dependency>
+        <artifactId>dependency-plugin</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>    
+    <dependency>
+        <artifactId>invoker-plugin</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>    
+    <dependency>
+        <artifactId>maven-python</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>    
+    <dependency>
+        <artifactId>configuration-plugin</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>    
+
+    <dependency>
+        <artifactId>support</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>    
     <dependency>
         <artifactId>support.aas</artifactId>
         <groupId>de.iip-ecosphere.platform</groupId>
@@ -195,6 +221,11 @@
         <groupId>de.iip-ecosphere.platform</groupId>
         <version>${project.version}</version>
     </dependency>
+    <dependency>
+        <artifactId>ecsRuntime.lxc</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>
     <!-- not part of 0.3 release
     <dependency>
         <artifactId>ecsRuntime.kubernetes</artifactId>
@@ -274,7 +305,24 @@
     <!-- platform-provided services -->
     
     <dependency>
+        <artifactId>kiServices.functions</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>
+    <dependency>
+        <artifactId>kiServices.functions</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+        <classifier>python</classifier>
+        <type>zip</type>
+    </dependency>
+    <dependency>
         <artifactId>kiServices.rapidminer.rtsa</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>
+    <dependency>
+        <artifactId>kiServices.rapidminer.rtsaFake</artifactId>
         <groupId>de.iip-ecosphere.platform</groupId>
         <version>${project.version}</version>
     </dependency>

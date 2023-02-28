@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>kiServices.rapidminer.rtsaFake</artifactId>
@@ -9,8 +9,8 @@
   <parent>
      <groupId>de.iip-ecosphere.platform</groupId>
      <artifactId>platformDependencies</artifactId>
-     <version>0.5.0-SNAPSHOT</version>
-     <relativePath></relativePath>
+     <version>0.5.0</version>
+     <relativePath/>
   </parent>
 
   <dependencies>
@@ -87,7 +87,7 @@
                         <zip basedir="${project.build.directory}/fake/rtsa" destfile="${project.build.directory}/fake/RTSA-0.14.5.zip"/>
 
                         <mkdir dir="${project.build.directory}/fake/empty"/>
-                        <copy file="src/test/resources/spec.yml" todir="${project.build.directory}/fake/empty" />
+                        <copy file="src/test/resources/spec.yml" todir="${project.build.directory}/fake/empty"/>
                         
                         <mkdir dir="${project.build.directory}/fake/deployment"/>
                         <mkdir dir="${project.build.directory}/fake/deployment/home"/>
@@ -99,7 +99,7 @@
                         <!-- for testing -->
                         <delete dir="${project.build.directory}/tmp/rtsa"/>
                         <mkdir dir="${project.build.directory}/tmp/rtsa"/>
-                        <unzip src="${project.build.directory}/fake/RTSA-0.14.5.zip" dest="${project.build.directory}/tmp/rtsa"/>
+                        <unzip dest="${project.build.directory}/tmp/rtsa" src="${project.build.directory}/fake/RTSA-0.14.5.zip"/>
                         <copy file="${project.build.directory}/fake/myRtsaexample-0.1.0.zip" todir="${project.build.directory}/tmp/rtsa/deployments"/>
                     </target>
                 </configuration>
