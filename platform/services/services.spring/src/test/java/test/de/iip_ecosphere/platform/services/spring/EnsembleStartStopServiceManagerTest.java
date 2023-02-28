@@ -77,8 +77,7 @@ public class EnsembleStartStopServiceManagerTest extends AbstractTestServiceMana
     }
     
     /**
-     * Tests a simple start-stop cycle of the {@link SpringCloudServiceManager} in one process as an ensemble. As 
-     * {@link #testSimpleStartStop()}, this test requires an actual version of {@code test.simpleStream.spring}.
+     * Tests a simple start-stop cycle of the {@link SpringCloudServiceManager} in one process as an ensemble.
      * 
      * @throws ExecutionException shall not occur for successful test
      * @throws IOException shall not occur for successful test
