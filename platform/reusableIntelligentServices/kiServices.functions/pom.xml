@@ -77,6 +77,20 @@
                        <finalName>python-qr</finalName>
                    </configuration>
                </execution>
+               <execution>
+                   <id>python-qr-scan-mvn</id>
+                   <phase>prepare-package</phase>
+                   <goals>
+                       <goal>single</goal>
+                   </goals>
+                   <configuration>
+                       <descriptors>
+                           <descriptor>src/main/assembly/pythonQrScanner.xml</descriptor>
+                       </descriptors>
+                       <outputDirectory>${project.build.directory}</outputDirectory>
+                       <attach>false</attach>
+                   </configuration>
+               </execution>
            </executions>
        </plugin>
         <plugin>
