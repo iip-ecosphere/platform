@@ -1,3 +1,10 @@
+<nav mat-tab-nav-bar style="background: RGB(35, 142, 183);">
+  <div *ngIf="serviceMeshes">
+    <span *ngFor="let mesh of serviceMeshes.value">
+      <a mat-tab-link (click)="selectMesh(mesh.idShort)"> {{mesh.idShort}} </a>
+    </span>
+  </div>
+</nav>
 
 <mat-drawer-container class="container">
   <mat-drawer mode="side" opened >
@@ -6,17 +13,23 @@
       <div *ngIf="services && services.value" class="toolbar">
         <mat-card *ngFor="let service of services.value">
           <mat-card-title *ngIf="service.idShort">{{ service.idShort }}</mat-card-title>
-          <mat-card-content><div *ngFor="let property of service.value"> {{property.idShort}}: <span *ngIf="property.value">{{property.value}}</span></div></mat-card-content>
+          <mat-card-content>
+            <div *ngIf="service.idShort != 'metaState' && service.idShort != 'metaType'">
+              <div *ngFor="let property of service.value">
+                <span *ngIf="property.idShort === 'kind' || property.idShort === 'name' || property.idShort === 'ver' || property.idShort === 'type'"> {{property.idShort}}:
+                  <span *ngIf="property.value">{{property.value}}
+                  </span>
+                </span>
+              </div>
+            </div>
+          </mat-card-content>
         </mat-card>
       </div>
-
-
     </div>
   </mat-drawer>
-  <mat-drawer-content>
+  <mat-drawer-content class="content">
     <div id="drawflow"></div>
     <button mat-raised-button class="button" (click)="zoomIn()">Zoom In</button>
     <button mat-raised-button class="button" (click)="zoomOut()">Zoom Out</button>
-    <button mat-raised-button class="button" (click)="getGraph()">getGraph</button>
   </mat-drawer-content>
 </mat-drawer-container>

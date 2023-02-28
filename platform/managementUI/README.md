@@ -3,14 +3,13 @@
 ## Prerequisites (for Ubuntu Server, CI)
 
 - install node.js and node package manager (npm): `sudo apt install nodejs npm`
-- install Angular CLI: `sudo npm install -g @angular/cli`
+- install Angular CLI: `sudo npm install -g @angular/cli@latest`
 
-If your version is not recent enough, e.g., not 12:
+If you have an older version installed, you may have to execute
 
-- `sudo apt-get purge --auto-remove nodejs`
-- `sudo apt-get install curl`
-- `curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -`
-- `sudo apt-get install -y nodejs`
+- `npm update -g`
+
+Currently, we build the UI with npm version 9.5.1 and Angular 14.2.10.
 
 ## Running Management UI from Code
 

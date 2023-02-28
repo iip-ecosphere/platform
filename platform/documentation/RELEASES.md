@@ -15,30 +15,30 @@ Planned:
 * Enable tolerant switching: [#26](https://github.com/iip-ecosphere/platform/issues/26)
 * Platform component heartbeat and AAS cleanup: [#62](https://github.com/iip-ecosphere/platform/issues/62)
 * Integration of federated learning [#127](https://github.com/iip-ecosphere/platform/issues/127)
-* UI progress reporting [#70](https://github.com/iip-ecosphere/platform/issues/70)
 * Configuration: Path in record type moves into connector [#128](https://github.com/iip-ecosphere/platform/issues/128)
-* Integration of federated learning [#127](https://github.com/iip-ecosphere/platform/issues/127)
-* [#100](https://github.com/iip-ecosphere/platform/issues/100): Run multiple app instances
 * REST as alternative protocol for Python Service environment: [#56](https://github.com/iip-ecosphere/platform/issues/56)
 * Tracing in Python Service environment: [#88](https://github.com/iip-ecosphere/platform/issues/88)
 * Cleanup, e.g., old build processes: [#115](https://github.com/iip-ecosphere/platform/issues/115)
 * Platform installation scripts: [#107](https://github.com/iip-ecosphere/platform/issues/107)
 * CLI multi-device deployment problem: [#113](https://github.com/iip-ecosphere/platform/issues/113)
-* UI display application service meshes: [#90](https://github.com/iip-ecosphere/platform/issues/90)
-* UI restrucuture for larger lists: [#86](https://github.com/iip-ecosphere/platform/issues/86)
 * Angular config.json loading problem: [#79](https://github.com/iip-ecosphere/platform/issues/79)
 * KODEX: dynamic port assignment: [#14](https://github.com/iip-ecosphere/platform/issues/14), documentation: [#6](https://github.com/iip-ecosphere/platform/issues/6)
 
-### Next release (0.5.0, February 2023):
+In progress:
+* [#100](https://github.com/iip-ecosphere/platform/issues/100): Run multiple app instances
+* [#59](https://github.com/iip-ecosphere/platform/issues/59): Distributed testing/evaluation environment 
+* [#127](https://github.com/iip-ecosphere/platform/issues/127): Integration of federated learning
+* [#70](https://github.com/iip-ecosphere/platform/issues/70): UI progress reporting 
+* [#90](https://github.com/iip-ecosphere/platform/issues/90): UI display application service meshes: 
+* [#86](https://github.com/iip-ecosphere/platform/issues/86): UI restrucuturing for larger lists: 
 
-Planned:
-* Semantic Ids in the UI [#63](https://github.com/iip-ecosphere/platform/issues/63)
-* [#59](https://github.com/iip-ecosphere/platform/issues/59): Distributed testing/evaluation environment
+### Next release (0.5.0, February 2023):
 
 New features:
 * Multi-channel connectors for MQTT in the connectors component and the code generation.
 * [#10](https://github.com/iip-ecosphere/platform/issues/10), [#9](https://github.com/iip-ecosphere/platform/issues/9): Automatic creation of containers from the configuration model.
 * [#51](https://github.com/iip-ecosphere/platform/issues/51): Device specific measurement plugin for Phoenix Contact AXC
+* [#63](https://github.com/iip-ecosphere/platform/issues/63): Semantic Ids in the mangement UI (resources view)
 * [#64](https://github.com/iip-ecosphere/platform/issues/64): Device specific measurement plugins controlled via configuration model 
 * [#92](https://github.com/iip-ecosphere/platform/issues/92): Generate application implementation project templates
 * [#93](https://github.com/iip-ecosphere/platform/issues/93): Connector caching mode
