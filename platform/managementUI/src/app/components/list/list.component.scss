@@ -1,0 +1,16 @@
+.item {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+
+  color: black;
+}
+
+.buttons {
+  justify-content: flex-end;
+}
+
+.text {
+  font-size: medium;
+  justify-content: flex-start;
+}

@@ -55,7 +55,6 @@ export class FlowchartComponent implements OnInit {
   }
 
   public async getGraph(mesh: string) {
-    console.log("ffff");
     let data = await this.df.getGraph(mesh);
     console.log(data);
     if(data?.outputArguments[0].value?.value) {

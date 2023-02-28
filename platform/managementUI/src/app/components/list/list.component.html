@@ -1,0 +1,38 @@
+<div *ngIf="noData">ERROR: Could not retrieve data</div>
+<div *ngIf="data"> {{ data.idShort }}</div>
+<br>
+
+<!-- <mat-list role="list" *ngIf="submodelElements">
+  <mat-list-item role="listitem" *ngFor="let item of submodelElements" style="color: black;">
+    {{item.idShort}}
+  </mat-list-item>
+  <mat-divider></mat-divider>
+</mat-list> -->
+
+<!-- <h1>DATA</h1>
+<mat-list *ngIf="data && data.value">
+  <mat-list-item *ngFor="let item of data.value" class="item">
+    <span class="text">{{item.idShort}}</span>
+    <span class ="buttons">
+      <button mat-raised-button style="background-color: rgb(255,204,0)"  (click)="edit(item)">edit</button>
+      <button mat-raised-button style="background-color: rgb(255, 60, 0)" (click)="del(item)">delete</button>
+    </span>
+  </mat-list-item>
+  <mat-divider style="color: black;"></mat-divider>
+</mat-list> -->
+
+<div *ngIf="data && data.value">
+  <div *ngFor="let item of data.value" class="item">
+  <div class="text">{{item.idShort}}</div>
+    <div class ="buttons">
+      <button mat-raised-button style="background-color: rgb(255,204,0)"  (click)="edit(item)">edit</button>
+      <button mat-raised-button style="background-color: rgb(255, 60, 0)" (click)="del(item)">delete</button>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+

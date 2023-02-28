@@ -34,6 +34,8 @@ import { OperationQueryComponent } from './components/resource-details/operation
 import { OnlyIdPipe } from './pipes/only-id.pipe';
 import { StatusBoxComponent } from './components/deployment-plans/status-box/status-box.component';
 import { FlowchartComponent } from './components/flowchart/flowchart.component';
+import { ListComponent } from './components/list/list.component';
+import { ListSelectComponent } from './components/list/list-select/list-select.component';
 
 
 @NgModule({
@@ -49,7 +51,9 @@ import { FlowchartComponent } from './components/flowchart/flowchart.component';
     OperationQueryComponent,
     OnlyIdPipe,
     StatusBoxComponent,
-    FlowchartComponent
+    FlowchartComponent,
+    ListComponent,
+    ListSelectComponent
   ],
   imports: [
     BrowserModule,

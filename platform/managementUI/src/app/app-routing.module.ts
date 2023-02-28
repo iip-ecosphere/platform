@@ -4,6 +4,8 @@ import { ConnectorTypesComponent } from './components/connector-types/connector-
 import { ContainersComponent } from './components/containers/containers.component';
 import { DeploymentPlansComponent } from './components/deployment-plans/deployment-plans.component';
 import { FlowchartComponent } from './components/flowchart/flowchart.component';
+import { ListSelectComponent } from './components/list/list-select/list-select.component';
+import { ListComponent } from './components/list/list.component';
 import { ResourceDetailsComponent } from './components/resource-details/resource-details.component';
 import { ResourcesComponent } from './components/resources/resources.component';
 import { ServicesComponent } from './components/services/services.component';
@@ -17,7 +19,9 @@ const routes: Routes = [
   { path: 'services', component: ServicesComponent },
   { path: 'connectorTypes', component: ConnectorTypesComponent },
   { path: 'deploymentPlans', component: DeploymentPlansComponent },
-  { path: 'flowchart', component: FlowchartComponent }
+  { path: 'flowchart', component: FlowchartComponent },
+  { path: 'list', component: ListSelectComponent},
+  { path: 'list/:ls', component: ListComponent }
 
 ];
 
