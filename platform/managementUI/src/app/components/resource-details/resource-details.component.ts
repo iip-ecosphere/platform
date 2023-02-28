@@ -114,6 +114,7 @@ export class ResourceDetailsComponent implements OnInit {
             },
             valueType: "string",
             idShort: "semanticId",
+            kind: "Template",
             value: this.resource.value[i].semanticId?.keys[0].value
           }
         }
