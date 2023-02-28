@@ -15,7 +15,7 @@
                     {{ element.value | tidy}}
                   </span>
                 </span>
-                <span *ngIf="element.semanticName"> [{{ element.semanticName | tidy}}] </span>
+                <span class="semanticName" *ngIf="element.semanticName"> {{ element.semanticName | tidy}} </span>
                 <!--
                 <span *ngIf="element.value && element.semanticId">
                   <h4>Resolve ({{ element.semanticId.keys[0].value}}): {{feedback}} </h4>

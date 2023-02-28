@@ -12,6 +12,19 @@
 
 .shortId {
   color: white;
+  font-size: 16px;
+}
+
+.semanticName {
+  color: gray;
+}
+
+// tooltip
+.visible {
+  height: 3em;
+  width: 8em;
+  //color: rgb(27, 205, 250);
+  color: rgb(48, 196, 255);
 }
 
 .service {
@@ -447,7 +460,6 @@
 
 /* Drawflow styles ends here */
 
-.visible {
-  height: 3em;
-  width: 8em;
-}
+
+
+
