@@ -354,12 +354,28 @@ public class SpringCloudServiceManager
             cmdArgs.add(CmdLine.PARAM_PREFIX + Starter.PARAM_IIP_APP_ID + CmdLine.PARAM_VALUE_SEP + appId);
         }
     }
+    /**
+     * String returns the host names/ids to be considered equal for this (the executing) device.
+     *  
+     * @return the ids
+     */
+    private static Set<String> getThisDeviceHostIds() {
+        Set<String> thisDevice = new HashSet<>();
+        thisDevice.add(ServerAddress.LOCALHOST);
+        thisDevice.add("127.0.0.1");
+        thisDevice.add(NetUtils.getOwnHostname()); // may require netmask
+        thisDevice.add(NetUtils.getOwnIP()); // may require netmask
+        thisDevice.add(Id.getDeviceId());
+        thisDevice.add(Id.getDeviceIdAas());
+        return thisDevice;
+    }
 
     /**
      * Starting server instances.
      * 
      * @param options optional map of optional options to be passed to the service manager, 
      *     {@see #startService(Map, String...)}
+     * @see #getThisDeviceHostIds()
      */
     private void startServers(Map<String, String> options) {
         Map<String, String> hostMap = new HashMap<>();
@@ -374,15 +390,12 @@ public class SpringCloudServiceManager
         }
         String myHost = NetUtils.getOwnHostname();
         Map<String, SpringCloudServiceDescriptor> servers = new HashMap<>();
-        Set<String> thisDevice = new HashSet<>();
-        thisDevice.add(ServerAddress.LOCALHOST);
-        thisDevice.add(myHost);
-        thisDevice.add(NetUtils.getOwnIP()); // may require netmask
-        thisDevice.add(Id.getDeviceId());
-        thisDevice.add(Id.getDeviceIdAas());
+        Set<String> thisDevice = getThisDeviceHostIds();
+        Set<String> knownServers = new HashSet<>();
         for (SpringCloudArtifactDescriptor desc : getArtifacts()) {
             for (SpringCloudServiceDescriptor s: desc.getServers()) {
                 String id = s.getId();
+                knownServers.add(id);
                 String host = hostMap.get(id);
                 if (null == host) {
                     host = s.getServer().getHost();
@@ -391,6 +404,10 @@ public class SpringCloudServiceManager
                     servers.put(id, s);
                 }
             }
+        }
+        if (knownServers.size() > 0) {
+            LOGGER.info("Preparing server start: Of known servers {} starting {} on this host ({})", knownServers, 
+                servers, thisDevice);
         }
         if (servers.size() > 0) { // prevent warnings if there are no server specs to process
             NetworkManager netClient = networkManagerSupplier.get();

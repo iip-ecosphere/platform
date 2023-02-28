@@ -10,7 +10,11 @@
             <div *ngFor="let element of resource.value">
               <div *ngIf="!element.invokable">
                 <span class="shortId">{{ element.idShort }}: </span>
-                <span *ngIf="element.value"> {{ element.value | tidy}} </span>
+                <span *ngIf="element.value && element.semanticId">
+                  <span title="{{element.semanticDescription}}    [{{element.semanticId.keys[0].value}}]" class="visible">
+                    {{ element.value | tidy}}
+                  </span>
+                </span>
                 <span *ngIf="element.semanticName"> [{{ element.semanticName | tidy}}] </span>
                 <!--
                 <span *ngIf="element.value && element.semanticId">

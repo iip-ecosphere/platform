@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# fail on first error (try)
+set -e
+
 # Build script for CI
 # Assumption npm and angular cli installed
 

@@ -114,7 +114,6 @@ public class PlatformAas implements AasContributor {
         // just that they are there
         aasBuilder.createSubmodelBuilder(NAME_SUBMODEL_STATUS, null).build();
         aasBuilder.createSubmodelBuilder(ApplicationInstanceAasConstructor.NAME_SUBMODEL_APPINSTANCES, null).build();
-        
         return null;
     }
 
@@ -190,29 +189,29 @@ public class PlatformAas implements AasContributor {
     
 
     /**
-     * Called to notify that a new instance of the application <code>appId</code> is about to be started.
+     * Called to notify that a new instance of the application <code>appId</code> is about to be started. [public 
+     * for testing]
      * 
      * @param appId the application id
      * @param planId the id of the plan starting the application
      * @return the id of the new instance to be passed on to the service starts, may be <b>null</b> 
      *    for default/legacy start
      */
-    static String notifyAppNewInstance(String appId, String planId) {
+    public static String notifyAppNewInstance(String appId, String planId) {
         return ApplicationInstanceAasConstructor.notifyAppNewInstance(appId, planId);
     }
     
     /**
-     * Called to notify that an app instance was stopped.
+     * Called to notify that an app instance was stopped. [public for testing]
      * 
      * @param appId the application id of the instance that was stopped
      * @param instanceId the instance id of the instance, may be <b>null</b> or empty for legacy application starts
      * @return the remaining instances
      */
-    static int notifyAppInstanceStopped(String appId, String instanceId) {
+    public static int notifyAppInstanceStopped(String appId, String instanceId) {
         return ApplicationInstanceAasConstructor.notifyAppInstanceStopped(appId, instanceId);
     }
 
-    
     /**
      * Called to notify that an artifact was created.
      * 

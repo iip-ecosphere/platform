@@ -1,4 +1,4 @@
-import { PlatformData, SemanticId } from './../../../interfaces';
+//import { PlatformData, SemanticId, Resource } from './../../../interfaces';
 //import { SemanticId, outputArgument } from './../../../interfaces';
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
@@ -40,12 +40,6 @@ export class ResourceDetailsComponent implements OnInit {
   private async getResource(id: string) {
     this.resource = await this.api.getResource(id);
     this.resolveSemanticId();
-
-    // iterate through resource
-    //this.resource?.value?.find(val => val.semanticId? === "0173-1#02-AAO247#002"); // semanticName?: string;
-    // find the right place in resource
-    // return this.resources.submodelElements?.find(resource => resource.idShort === id);
-    // and setVariable
   }
 
   //currently not used
@@ -79,7 +73,7 @@ export class ResourceDetailsComponent implements OnInit {
   public async resolveSemanticId() {
     await this.setInputValues();
 
-    let resolvedIds = []
+    let resolvedInfo = []
     let i = 0;
     for(const value of this.inputVariables) {
       const input:InputVariable[] = [value]
@@ -88,18 +82,19 @@ export class ResourceDetailsComponent implements OnInit {
         this.platformURL,
         "resolveSemanticId",
         input) as platformResponse;
-      // TODO retrieving only the name for given semanticId (for now)
-      resolvedIds.push(this.getResolvedId(response))
+
+      resolvedInfo.push(this.getSemanticInfo(response))
       i++;
     }
-    // Setting a semanticName for each attribute
+
     let j = 0;
-    for(const name of resolvedIds) {
-      if(name=="byte") {
+    for(const value of resolvedInfo) {
+      if(value[0]=="byte") {
         this.convertByte(j, 1000000000, "GB")
       } else {
-        this.resource!.value![j].semanticName =  name;
+        this.resource!.value![j].semanticName = value[0];
       }
+      this.resource!.value![j].semanticDescription = value[1];
       j++;
     }
   }
@@ -144,6 +139,26 @@ export class ResourceDetailsComponent implements OnInit {
         }
       }
     }
+  }
+
+  // Returns an array [name, description]
+  public getSemanticInfo(response:platformResponse) {
+    let return_value = [null, null];
+    if(response && response.outputArguments) {
+      let output = response.outputArguments[0]?.value?.value;
+      if (output) {
+        let temp = JSON.parse(output);
+        if (temp.result) {
+          let result = JSON.parse(temp.result);
+          if (result.naming.en.description) {
+            return_value = [result.naming.en.name, result.naming.en.description]
+          } else {
+            return_value = [result.naming.en.name, null]
+          }
+        }
+      }
+    }
+    return return_value
   }
 
   // Converts byte value of resource attribute:
