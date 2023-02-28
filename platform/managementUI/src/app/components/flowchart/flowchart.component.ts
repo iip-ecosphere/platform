@@ -16,10 +16,12 @@ export class FlowchartComponent implements OnInit {
 
   editor: any;
   services: any;
+  serviceMeshes: any;
 
 
   async ngOnInit() {
     this.services = await this.df.getServices();
+    this.serviceMeshes = await this.df.getServiceMeshes();
     console.log(this.services);
 
     const drawFlowHtmlElement = <HTMLElement>document.getElementById('drawflow');
@@ -52,8 +54,10 @@ export class FlowchartComponent implements OnInit {
     this.editor.zoom_out();
   }
 
-  public async getGraph() {
-    let data = await this.df.getGraph();
+  public async getGraph(mesh: string) {
+    console.log("ffff");
+    let data = await this.df.getGraph(mesh);
+    console.log(data);
     if(data?.outputArguments[0].value?.value) {
       let graph = JSON.parse(data?.outputArguments[0].value?.value);
       let graph2 = JSON.parse(graph.result);
@@ -65,9 +69,10 @@ export class FlowchartComponent implements OnInit {
       }
       this.editor.import(graph2);
     }
+  }
 
-
-
+  public selectMesh(mesh: string) {
+    this.getGraph(mesh);
   }
 
 }
