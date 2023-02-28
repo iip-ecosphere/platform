@@ -10,7 +10,8 @@ template JavaServer(Configuration config, FileArtifact target, Server server, St
     }
 
     def generateConstructor(PythonServer server) {
-        'InputStream desc = ResourceLoader.getResourceAsStream("${getDeploymentDescriptorPath()}");
+        String clsName = asTypeName(server.id);
+        'InputStream desc = ResourceLoader.getResourceAsStream(${clsName}Server.class, "${getDeploymentDescriptorPath()}");
         YamlArtifact artifact = YamlArtifact.readFromYamlSafe(desc);
         YamlServer yServer = artifact.getServer("${server.id}");
         if (null == yServer) {
