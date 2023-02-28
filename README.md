@@ -4,10 +4,11 @@ The virtual IIP-Ecosphere Industry 4.0/IIoT platform aims at demonstrating new a
 
 ## News
 
+* **February 2023:** Starting preparation of release 0.5.0 including new version of platform handbook.
 * **February 2023:** Integration of federated learning framework [Flower](https://flower.dev/) started.
-* **New in 2023:** Upcoming demonstrator for HM'23 in collaboration with Phoenix Contact, Lenze, Bitmotec/OnLogic, UR.
+* **February 2023:** Service development tutorial online on [YouTube](https://www.youtube.com/playlist?list=PL5VSYtiD_PfdxUDXGlX53UsHdQlXcHYK7) and [IIP-Ecosphere](https://www.iip-ecosphere.de/angebote/plattform/).
+* **New in 2023:** Upcoming demonstrator for [HM'23](https://www.iip-ecosphere.de/iip-ecosphere-auf-der-hannover-messe-2023/) in collaboration with Phoenix Contact, Lenze, Bitmotec/OnLogic, UR.
 * **New in 2023:** IIP-Ecosphere demonstrators from the [IIP-Ecosphere innovation idea competition](https://www.iip-ecosphere.de/ideenwettbewerb/). Stay tuned - also external components by new IIP-Ecosystem partners may be introduced.
-* **In publication:** Development container for service implemenation and (video) material from service integration workshop.
 * **In development:** Distributed testing/evaluation environment for platform and applications
 * Confirmed compatibility: Phoenix Contact PLCnext (OPC UA), Beckhoff IPC (OPC UA), VDW UMATI (OPC UA) - and improving...
 * IIP-Ecosphere platform now relies on JDK 11 and BaSyx 1.3.0.
@@ -23,7 +24,7 @@ The virtual IIP-Ecosphere Industry 4.0/IIoT platform aims at demonstrating new a
 
 For detailed links to the individual components, please refer to the [platform](https://github.com/iip-ecosphere/platform/tree/main/platform/README.md) overview. The platform repository also contains a growing set of [examples and demonstration use cases](https://github.com/iip-ecosphere/platform/tree/main/platform/examples/README.md).
 
-Further, [compliance tests](https://github.com/iip-ecosphere/platform/tree/main/compliance/README.md) and benchmarks for interoperability are in planning.
+For more details on how to develop application-specific services for the IIP-Ecosphere platform, please watch our series of video tutorials on [YouTube](https://www.youtube.com/playlist?list=PL5VSYtiD_PfdxUDXGlX53UsHdQlXcHYK7) or [IIP-Ecosphere](https://www.iip-ecosphere.de/angebote/plattform/).
 
 ## Documentation
 
