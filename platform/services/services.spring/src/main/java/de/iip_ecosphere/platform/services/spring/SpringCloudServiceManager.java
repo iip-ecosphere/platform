@@ -371,13 +371,14 @@ public class SpringCloudServiceManager
     }
 
     /**
-     * Starting server instances.
+     * Returns the servers to be started.
      * 
      * @param options optional map of optional options to be passed to the service manager, 
      *     {@see #startService(Map, String...)}
-     * @see #getThisDeviceHostIds()
+     * @return the id-descriptor mapping of servers to be started, may be empty
      */
-    private void startServers(Map<String, String> options) {
+    private Map<String, SpringCloudServiceDescriptor> getServers(Map<String, String> options) {
+        Map<String, SpringCloudServiceDescriptor> servers = new HashMap<>();
         Map<String, String> hostMap = new HashMap<>();
         if (null != options) {
             String opt = options.get(OPTION_SERVERS);
@@ -388,8 +389,6 @@ public class SpringCloudServiceManager
                 }
             }
         }
-        String myHost = NetUtils.getOwnHostname();
-        Map<String, SpringCloudServiceDescriptor> servers = new HashMap<>();
         Set<String> thisDevice = getThisDeviceHostIds();
         Set<String> knownServers = new HashSet<>();
         for (SpringCloudArtifactDescriptor desc : getArtifacts()) {
@@ -409,6 +408,19 @@ public class SpringCloudServiceManager
             LOGGER.info("Preparing server start: Of known servers {} starting {} on this host ({})", knownServers, 
                 servers, thisDevice);
         }
+        return servers;
+    }
+
+    /**
+     * Starting server instances.
+     * 
+     * @param options optional map of optional options to be passed to the service manager, 
+     *     {@see #startService(Map, String...)}
+     * @see #getThisDeviceHostIds()
+     */
+    private void startServers(Map<String, String> options) {
+        String myHost = NetUtils.getOwnHostname();
+        Map<String, SpringCloudServiceDescriptor> servers = getServers(options);
         if (servers.size() > 0) { // prevent warnings if there are no server specs to process
             NetworkManager netClient = networkManagerSupplier.get();
             if (null != netClient) {
@@ -417,6 +429,9 @@ public class SpringCloudServiceManager
                     String id = s.getId();
                     if (null == netClient.getPort(id)) {
                         try {
+                            // current assumption: process comes with valid path, temporary path -> cmdLine
+                            Starter.extractProcessArtifacts(id, s.getServer(), s.getArtifact().getJar(), 
+                                SpringInstances.getConfig().getDownloadDir());
                             Server ser = s.getServer();
                             ClassLoader loader = loaders.get(s.getArtifact());
                             if (null == loader) {
@@ -450,6 +465,8 @@ public class SpringCloudServiceManager
                         } catch (InvocationTargetException | IllegalAccessException | InstantiationException 
                             | NoSuchMethodException e) {
                             LOGGER.error("Starting server {}, cannot invoke constructor: {}", id, e.getMessage());
+                        } catch (IOException e) {
+                            LOGGER.error("Starting server {}, unpacking artfiact: {}", id, e.getMessage());
                         }
                     }
                 }
