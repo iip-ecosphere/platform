@@ -91,13 +91,17 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
            optionalFound = true; // disable getData via index after first optional as indexes "jump"
        }
        if (set) {
-           String ex;
-           if (not(genFrom)) {
-               ex = value; // already converted
+           if (field.readOnly) {
+               ''
            } else {
-               ex = genConvertOp("outConverter", field.type, "from", value);
+               String ex;
+               if (not(genFrom)) {
+                   ex = value; // already converted
+               } else {
+                   ex = genConvertOp("outConverter", field.type, "from", value);
+               }
+               wrapOptional(field, path + ".set" + asMethodNameSuffix(field.name) + "(" + ex + ")") + "${setEnd}"; 
            }
-           wrapOptional(field, path + ".set" + asMethodNameSuffix(field.name) + "(" + ex + ")") + "${setEnd}"; 
        } else {
            String ex;
            if (not(genFrom)) {

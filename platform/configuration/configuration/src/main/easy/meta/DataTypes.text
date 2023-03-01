@@ -14,6 +14,7 @@ DataTypes::Field::name = Name of the field.
 DataTypes::Field::type = The type of the field given in terms of another data type.
 DataTypes::Field::description = The description of the field. [optional]
 DataTypes::Field::optional = Shall this field be considered as mandatory or optional. Optional fields that do not receive a value, e.g., from a connector, shall not cause an error. [default is not optional, i.e., mandatory]
+DataTypes::Field::readOnly = Shall this field be read-only, i.e., shall write access be prevented?
 DataTypes::Field::cachingTime = Time indicator until when a value in a connector may be cached instead of requested. 0 means no caching at all, negative values indicate endless caching, positive values the maximum caching/lifetime of this data field. Connectors and services may ignore this information (default -1).
 DataTypes::ArrayType::type = Datatype of the elements in the array.
 DataTypes::AuthenticationSettings::authenticationKey = Logical name to access the authentication information in the identity store.

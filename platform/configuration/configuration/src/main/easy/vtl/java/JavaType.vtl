@@ -47,7 +47,7 @@ template JavaType(Configuration config, FileArtifact target, RecordType type, St
 
     // generates code for the setters
     def setters(RecordType type) {
-        for (Field f: type.fields) {
+        for (Field f: type.fields->select(f|not(f.readOnly))) {
             if (emitJavadoc) {
                 '/**
                  * Changes the value of {@code ${asMethodFieldIdentifier(f.name)}}.${prependIfNotEmpty(" ", f.description)}

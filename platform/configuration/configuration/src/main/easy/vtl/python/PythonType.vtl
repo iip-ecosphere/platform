@@ -43,7 +43,7 @@ template PythonType(Configuration config, FileArtifact target, RecordType type, 
 
     // generates code for the setters
     def setters(RecordType type) {
-        for (Field f: type.fields) {
+        for (Field f: type.fields->select(f|not(f.readOnly))) {
             'def set${asMethodNameSuffix(f.name)}(self, v${genSetterTypeAnnotation(f, f.type)}):
                 """Changes the value of {@code ${asIdentifier(f.name)}}.${prependIfNotEmpty(" ", f.description)}
                 
@@ -66,7 +66,13 @@ template PythonType(Configuration config, FileArtifact target, RecordType type, 
         "#interfaces become superfluous due to the properties, but let's leave them in for now."
         ''
         for (Field f: type.fields) {
-            '${asIdentifier(f.name)} = property(get${asMethodNameSuffix(f.name)}, set${asMethodNameSuffix(f.name)})'
+            String set;
+            if (f.readOnly) {
+                set = "";
+            } else {
+                set = ", set${asMethodNameSuffix(f.name)}";
+            }
+            '${asIdentifier(f.name)} = property(get${asMethodNameSuffix(f.name)}${set})\n'
         }
     }
     

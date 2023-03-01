@@ -103,7 +103,8 @@ project SerializerConfig1 {
                 type = refBy(IntegerType)
             }, Field {
                 name = "dataField",
-                type = refBy(StringType)
+                type = refBy(StringType), 
+                readOnly = true
             }, Field {
                 name = "nested",
                 type = refBy(myNestedArrayType)

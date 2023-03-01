@@ -41,7 +41,7 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
         String ex = "";
         if (emit) {
             ex = 'access.call("${call.name}", ${combineArgs(call.arguments, ", ", fields, indexes)});';
-            if (hasField) {
+            if (hasField and not(call.field.readOnly)) {
                 ex = translateFieldAccess(call.field, fields, true, ";", ex, done, true, indexes);
             }
         }
@@ -49,7 +49,7 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
     }
 
     def String translateDataOperation(FieldAssignmentOperation assng, mapOf(Field, String) fields, mapOf(Field, String) indexes, setOf(String) done) {
-        if (fields.containsKey(assng.field) or argsNestingLevel > 0) {
+        if ((fields.containsKey(assng.field) or argsNestingLevel > 0) and not(assng.field.readOnly)) {
             translateFieldAccess(assng.field, fields, true, ";", translateDataOperation(assng.operation, fields, indexes), done, true, indexes);
         } else {
             ""

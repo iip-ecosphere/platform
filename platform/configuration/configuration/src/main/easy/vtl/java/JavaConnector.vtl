@@ -394,11 +394,15 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
        }
        p = substPathEx('"${p}"', topPath, "path");
        if (set) {
-           if (not(genFrom)) {
-               wrapOptional(field, path + ".set" + asMethodNameSuffix(field.name) + "(" + value + ")", args="access, a", optFind="access.", optReplace="a.") + "${setEnd}"; 
+           if (field.readOnly) {
+               ''
            } else {
-               if (convName(field.type) <> "") { // is there a conversion?
-                   wrapOptional(field, "access.set(${p}, " + genConvertOp("outConverter", field.type, "from", value) + ")", args="access, a", optFind="access.", optReplace="a.") + "${setEnd}"; 
+               if (not(genFrom)) {
+                   wrapOptional(field, path + ".set" + asMethodNameSuffix(field.name) + "(" + value + ")", args="access, a", optFind="access.", optReplace="a.") + "${setEnd}"; 
+               } else {
+                   if (convName(field.type) <> "") { // is there a conversion?
+                       wrapOptional(field, "access.set(${p}, " + genConvertOp("outConverter", field.type, "from", value) + ")", args="access, a", optFind="access.", optReplace="a.") + "${setEnd}"; 
+                   }
                }
            }
        } else {

@@ -134,7 +134,7 @@ project Services {
    }
    
    def Boolean isFlatDataType(IOType type) = 
-        isFlatDataType(type, type);
+        isFlatDataType(type.type);
    
    // aligned to services.environment
    enum ServiceKind {SOURCE_SERVICE, TRANSFORMATION_SERVICE, SINK_SERVICE, PROBE_SERVICE};

@@ -14,7 +14,8 @@ project KodexMesh {
                 type = refBy(IntegerType)
             }, Field {
                 name = "stringField",
-                type = refBy(StringType)
+                type = refBy(StringType),
+                readOnly = true
             }
         }
     };
