@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>de.iip-ecosphere.platform</groupId>
   <artifactId>MvnCentral</artifactId>
-  <version>0.5.0</version> <!-- for release, remove -SNAPSHOT -->
+  <version>0.6.0-SNAPSHOT</version> <!-- for release, remove -SNAPSHOT -->
   
   <repositories>       
     <repository>

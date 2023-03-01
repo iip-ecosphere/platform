@@ -9,9 +9,12 @@
     <parent>
         <groupId>de.iip-ecosphere.platform</groupId>
         <artifactId>platformDependencies</artifactId>
-        <version>0.5.0</version>
+        <version>0.6.0-SNAPSHOT</version>
         <relativePath/>
     </parent>
+    <properties>
+      <iip.version>0.6.0-SNAPSHOT</iip.version> <!-- automatically replaced on release -->
+    </properties>
     <!--Template application/service implementation POM.-->
     <profiles>
         <profile>
@@ -23,7 +26,7 @@
                 <dependency>
                     <groupId>de.iip-ecosphere.platform</groupId>
                     <artifactId>apps.AppInterfaces</artifactId>
-                    <version>0.5.0</version>
+                    <version>${iip.version}</version>
                     <exclusions>
                         <exclusion>
                             <groupId>org.springframework.boot</groupId>
@@ -68,7 +71,7 @@
                     <plugin>
                         <groupId>de.iip-ecosphere.platform</groupId>
                         <artifactId>dependency-plugin</artifactId>
-                        <version>0.5.0</version>
+                        <version>${iip.version}</version>
                         <executions>
                             <execution>
                                 <id>unpack</id>
@@ -81,7 +84,7 @@
                                         <artifactItem>
                                             <groupId>de.iip-ecosphere.platform</groupId>
                                             <artifactId>services.environment</artifactId>
-                                            <version>0.5.0</version>
+                                            <version>${iip.version}</version>
                                             <type>zip</type>
                                             <classifier>python</classifier>
                                             <overWrite>true</overWrite>
@@ -102,7 +105,7 @@
                                         <artifactItem>
                                             <groupId>de.iip-ecosphere.platform</groupId>
                                             <artifactId>services.environment</artifactId>
-                                            <version>0.5.0</version>
+                                            <version>${iip.version}</version>
                                             <type>zip</type>
                                             <classifier>python</classifier>
                                             <overWrite>true</overWrite>
@@ -112,7 +115,7 @@
                                         <artifactItem>
                                             <groupId>de.iip-ecosphere.platform</groupId>
                                             <artifactId>apps.AppInterfaces</artifactId>
-                                            <version>0.5.0</version>
+                                            <version>${iip.version}</version>
                                             <type>zip</type>
                                             <classifier>python</classifier>
                                             <overWrite>true</overWrite>
@@ -127,7 +130,7 @@
                     <plugin>
                         <groupId>de.iip-ecosphere.platform</groupId>
                         <artifactId>maven-python</artifactId>
-                        <version>0.5.0</version>
+                        <version>${iip.version}</version>
                         <executions>
                             <execution>
                                 <id>py-compile</id>
@@ -181,7 +184,7 @@
                                 <id>PyServiceTest</id>
                                 <configuration>
                                     <mainClass>iip.nodes.PyServiceTest</mainClass>
-                                    <classpathFilenameExclusions>transport.amqp-0.5.0.jar</classpathFilenameExclusions>
+                                    <classpathFilenameExclusions>transport.amqp-${iip.version}.jar</classpathFilenameExclusions>
                                     <classpathScope>test</classpathScope>
                                 </configuration>
                             </execution>
@@ -189,7 +192,7 @@
                                 <id>SinkTest</id>
                                 <configuration>
                                     <mainClass>iip.nodes.SinkTest</mainClass>
-                                    <classpathFilenameExclusions>transport.amqp-0.5.0.jar</classpathFilenameExclusions>
+                                    <classpathFilenameExclusions>transport.amqp-${iip.version}.jar</classpathFilenameExclusions>
                                     <classpathScope>test</classpathScope>
                                 </configuration>
                             </execution>
@@ -197,7 +200,7 @@
                                 <id>SourceTest</id>
                                 <configuration>
                                     <mainClass>iip.nodes.SourceTest</mainClass>
-                                    <classpathFilenameExclusions>transport.amqp-0.5.0.jar</classpathFilenameExclusions>
+                                    <classpathFilenameExclusions>transport.amqp-${iip.version}.jar</classpathFilenameExclusions>
                                     <classpathScope>test</classpathScope>
                                 </configuration>
                             </execution>
@@ -268,22 +271,22 @@
         <dependency>
             <groupId>de.iip-ecosphere.platform</groupId>
             <artifactId>services.environment</artifactId>
-            <version>0.5.0</version>
+            <version>${iip.version}</version>
         </dependency>
         <dependency>
             <groupId>de.iip-ecosphere.platform</groupId>
             <artifactId>services.environment.spring</artifactId>
-            <version>0.5.0</version>
+            <version>${iip.version}</version>
         </dependency>
         <dependency>
             <groupId>de.iip-ecosphere.platform</groupId>
             <artifactId>kiServices.functions</artifactId>
-            <version>0.5.0</version>
+            <version>${iip.version}</version>
         </dependency>
         <dependency>
             <groupId>de.iip-ecosphere.platform</groupId>
             <artifactId>examples</artifactId>
-            <version>0.5.0</version>
+            <version>${iip.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>de.iip-ecosphere.platform</groupId>
@@ -301,24 +304,24 @@
         <dependency>
             <groupId>de.iip-ecosphere.platform</groupId>
             <artifactId>support.aas.basyx</artifactId>
-            <version>0.5.0</version>
+            <version>${iip.version}</version>
         </dependency>
         <dependency>
             <groupId>de.iip-ecosphere.platform</groupId>
             <artifactId>transport</artifactId>
-            <version>0.5.0</version>
+            <version>${iip.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>de.iip-ecosphere.platform</groupId>
             <artifactId>transport.amqp</artifactId>
-            <version>0.5.0</version>
+            <version>${iip.version}</version>
         </dependency>
         <dependency>
             <groupId>de.iip-ecosphere.platform</groupId>
             <artifactId>services.spring</artifactId>
-            <version>0.5.0</version>
+            <version>${iip.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
