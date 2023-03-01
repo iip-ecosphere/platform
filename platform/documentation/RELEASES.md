@@ -30,7 +30,8 @@ In progress:
 * [#127](https://github.com/iip-ecosphere/platform/issues/127): Integration of federated learning
 * [#70](https://github.com/iip-ecosphere/platform/issues/70): UI progress reporting 
 * [#90](https://github.com/iip-ecosphere/platform/issues/90): UI display application service meshes: 
-* [#86](https://github.com/iip-ecosphere/platform/issues/86): UI restrucuturing for larger lists: 
+* [#86](https://github.com/iip-ecosphere/platform/issues/86): UI restrucuturing for larger lists 
+* [#129](https://github.com/iip-ecosphere/platform/issues/129): Read-only flag for RecordType field
 
 ### Release 0.5.0 (2023/03/01):
 
