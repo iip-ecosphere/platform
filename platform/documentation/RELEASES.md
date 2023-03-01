@@ -32,7 +32,7 @@ In progress:
 * [#90](https://github.com/iip-ecosphere/platform/issues/90): UI display application service meshes: 
 * [#86](https://github.com/iip-ecosphere/platform/issues/86): UI restrucuturing for larger lists: 
 
-### Next release (0.5.0, February 2023):
+### Release 0.5.0 (2023/03/01):
 
 New features:
 * Multi-channel connectors for MQTT in the connectors component and the code generation.
