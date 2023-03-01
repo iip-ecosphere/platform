@@ -50,6 +50,7 @@ public abstract class AbstractIvmlTests {
     
     private static final Set<String> ASSERT_FILE_EXTENSIONS = new HashSet<>();
     private static final Set<String> ASSERT_FILE_NAME_EXCLUSIONS = new HashSet<>();
+    private static Boolean isIipBuildInitial;
 
     static  {
         ASSERT_FILE_EXTENSIONS.add(".java");
@@ -74,11 +75,18 @@ public abstract class AbstractIvmlTests {
      * @return {@code true} for initial build, {@code false} else
      */
     protected static boolean isIipBuildInitial() {
-        String tmp = System.getenv("iip.build.initial");
-        if (null == tmp) {
-            tmp = "false";
+        if (null == isIipBuildInitial) {
+            String tmp = System.getenv("iipbuildinitial");
+            if (null == tmp) {
+                tmp = "false";
+            }
+            boolean result = Boolean.valueOf(System.getProperty("iip.build.initial", tmp));
+            if (result) {
+                System.out.println("Running in iip.build.initial mode, limiting to generateInterfaces");
+            }
+            isIipBuildInitial = result;
         }
-        return Boolean.valueOf(System.getProperty("iip.build.initial", tmp));
+        return isIipBuildInitial;
     }
 
     /**
@@ -222,18 +230,21 @@ public abstract class AbstractIvmlTests {
     
     /**
      * Asserts the structure of a deployment Yaml file (from service.environment perspective).
+     * Disabled if {@link #isIipBuildInitial()}.
      * 
      * @param base the base folder
      * @param name the name/path to the file
      */
     protected void assertDeploymentYaml(File base, String name) {
-        assertFile(base, name);
-        File f = new File(base, name);
-        try (FileInputStream in = new FileInputStream(f)) {
-            YamlArtifact.readFromYaml(in);
-            in.close();
-        } catch (IOException e) {
-            Assert.fail(f.getAbsolutePath() + ":" + e.getMessage());
+        if (!isIipBuildInitial()) {
+            assertFile(base, name);
+            File f = new File(base, name);
+            try (FileInputStream in = new FileInputStream(f)) {
+                YamlArtifact.readFromYaml(in);
+                in.close();
+            } catch (IOException e) {
+                Assert.fail(f.getAbsolutePath() + ":" + e.getMessage());
+            }
         }
     }
 
@@ -380,6 +391,7 @@ public abstract class AbstractIvmlTests {
 
     /**
      * Asserts the eclipse template ZIP file, usually indicating the the template generation was executed successfully.
+     * This assert is disabled if {@link #isIipBuildInitial()}.
      * 
      * @param gen the gen folder
      * @param name the name of the project
@@ -392,13 +404,16 @@ public abstract class AbstractIvmlTests {
     
     /**
      * Asserts that the specified file exists and has contents.
+     * This assert is disabled if {@link #isIipBuildInitial()}.
      * 
      * @param file the file
      * @return {@code file}
      */
     private static File assertFile(File file) {
-        Assert.assertTrue("File " + file + " does not exist", file.exists());
-        Assert.assertTrue("File " + file + " is empty", file.length() > 0);
+        if (!isIipBuildInitial()) {
+            Assert.assertTrue("File " + file + " does not exist", file.exists());
+            Assert.assertTrue("File " + file + " is empty", file.length() > 0);
+        }
         return file;
     }
     
@@ -435,6 +450,7 @@ public abstract class AbstractIvmlTests {
 
     /**
      * Asserts that the specified file exists, has contents and contains the specified {@code search} string(s).
+     * Is disabled when {@link #isIipBuildInitial()}.
      * 
      * @param base the base folder
      * @param name the name/path to the file
@@ -442,10 +458,12 @@ public abstract class AbstractIvmlTests {
      * @throws IOException if the file cannot be read
      */
     protected static void assertFileContains(File base, String name, String... search) throws IOException {
-        File f = assertFile(base, name);
-        String contents = FileUtils.readFileToString(f, Charset.defaultCharset());
-        for (String s : search) {
-            Assert.assertTrue("File " + f + " must contain '" + s + "'", contents.contains(s));
+        if (!isIipBuildInitial()) {
+            File f = assertFile(base, name);
+            String contents = FileUtils.readFileToString(f, Charset.defaultCharset());
+            for (String s : search) {
+                Assert.assertTrue("File " + f + " must contain '" + s + "'", contents.contains(s));
+            }
         }
     }
 
