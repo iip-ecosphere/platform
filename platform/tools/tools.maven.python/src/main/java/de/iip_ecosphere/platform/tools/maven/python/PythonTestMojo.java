@@ -44,7 +44,13 @@ public class PythonTestMojo extends AbstractMojo {
     
     @Parameter(property = "python-test.modelProject", defaultValue = "../../../target/pySrc")
     private String modelProject;
-    
+
+    @Parameter(property = "skipTests", required = false, defaultValue = "false")
+    private boolean surefireSkip;
+
+    @Parameter(property = "maven.test.skip", required = false, defaultValue = "false")
+    private boolean mavenSkip;
+
     @Parameter(property = "python-test.skip", required = false, defaultValue = "false")
     private boolean skip;
 
@@ -84,7 +90,7 @@ public class PythonTestMojo extends AbstractMojo {
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        if (!skip) {
+        if (!skip && !surefireSkip && !mavenSkip) {
             File baseDir = project.getBasedir();
             List<File> pythonFiles;
             if (null != fileset) {

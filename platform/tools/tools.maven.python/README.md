@@ -34,7 +34,7 @@ The Python compiler plugin runs by default in the `compile` lifecycle phase with
 
 The compiler plugin supports the following configuration settings:
   - `failOnError` (default `true`, user property `python-compile.failOnError`): Whether the build process shall fail if Python compile errors are detected.
-  - `skip` (default `false`, user property `python-compile.skip`) skips the execution of this plugin. 
+  - `skip` (default `false`, user property `python-compile.skip`, `maven.test.skip` or `skipTests`) skips the execution of this plugin. 
   - `ignoreText` (default `imported but unused;is assigned to but never used;redefinition of unused`, user property `python-compile.ignoreText`) defines substrings separated by ; that indicate lines of the pyflakes output to not be emitted as result
   
 ## Python test plugin
