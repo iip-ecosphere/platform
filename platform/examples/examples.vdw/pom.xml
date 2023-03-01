@@ -283,8 +283,12 @@
                       </invokeGoals>
                       <systemProperties>
                         <systemProperty>
+                          <key>maven.main.skip</key>
+                          <value>false</value>
+                        </systemProperty>
+                        <systemProperty>
                           <key>skipTests</key>
-                          <key>true</key>
+                          <value>true</value>
                         </systemProperty>
                       </systemProperties>
                     </configuration>
