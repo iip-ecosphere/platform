@@ -9,6 +9,7 @@
   <version>0.5.0</version>
   <name>Extended Maven Invoker Plugin</name>
   <description>Allows to executed multiple goals/profiles on the same POM.</description>
+  <url>https://www.iip-ecosphere.de/tt-plattformen/</url>
 
   <licenses>
     <license>

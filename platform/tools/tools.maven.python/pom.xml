@@ -9,6 +9,7 @@
   <version>0.5.0</version>
   <name>Maven Python Compile</name>
   <description>Embeds a Python compiler into Maven.</description>
+  <url>https://www.iip-ecosphere.de/tt-plattformen/</url>
 
   <licenses>
     <license>
