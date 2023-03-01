@@ -38,7 +38,7 @@ public class IvmlSerializerConfig1Tests extends AbstractIvmlSerializerConfigTest
      */
     @Test
     public void testSerializerConfig1() throws ExecutionException, IOException {
-        assumeFalse(Boolean.valueOf(System.getProperty("iip.build.initial", "false")));
+        assumeFalse(isIipBuildInitial());
         File gen = new File("gen/tests/SerializerConfig1");
         PlatformInstantiator.instantiate(
             new TestConfigurer("SerializerConfig1", new File("src/test/easy/single"), gen));

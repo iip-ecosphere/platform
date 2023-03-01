@@ -66,6 +66,20 @@ public abstract class AbstractIvmlTests {
         }
         System.setProperty("iip.resources", f.getAbsolutePath());
     }
+    
+    /**
+     * Returns whether a simplified build due to the first (CI) build shall be performed. Depends on JVM/system property
+     * {@code iip.build.initial}.
+     * 
+     * @return {@code true} for initial build, {@code false} else
+     */
+    protected static boolean isIipBuildInitial() {
+        String tmp = System.getenv("iip.build.initial");
+        if (null == tmp) {
+            tmp = "false";
+        }
+        return Boolean.valueOf(System.getProperty("iip.build.initial", tmp));
+    }
 
     /**
      * Asserts and returns an instance of the configuration lifecycle descriptor.
@@ -107,6 +121,9 @@ public abstract class AbstractIvmlTests {
          */
         public TestConfigurer(String ivmlModelName, File modelFolder, File outputFolder) {
             super(ivmlModelName, modelFolder, outputFolder);
+            if (isIipBuildInitial()) {
+                super.setStartRuleName("generateInterfaces");
+            }
             final String srcName = "./src/main/easy";
             final String srcCfgName = (srcName + "/cfg/").replace('/', File.separatorChar);
             File src = new File(srcName);
@@ -125,6 +142,14 @@ public abstract class AbstractIvmlTests {
                 additionalIvmlFolders = new ArrayList<>();
                 additionalIvmlFolders.add(commonIvml);
             }
+        }
+
+        @Override
+        public InstantiationConfigurer setStartRuleName(String startRuleName) {
+            if (!isIipBuildInitial()) { // set in constructor, do not allow to override
+                super.setStartRuleName(startRuleName);
+            }
+            return this;
         }
 
         /**

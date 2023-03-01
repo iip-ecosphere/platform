@@ -307,10 +307,9 @@ template JavaBasics(Configuration config, FileArtifact target) {
     
     def String getContainerNameInfix(EcsDevice device) {
         String result = "";
-        if (device.containerName <> "") {
+        if (device.containerName.length() > 0) {
             result = "-${device.containerName}";
         }
-println("CNT-INF |" + result + "| " + device );        
         result;
     }
 
