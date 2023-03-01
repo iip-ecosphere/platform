@@ -9,13 +9,14 @@
   <parent>
      <groupId>de.iip-ecosphere.platform</groupId>
      <artifactId>platformDependencies</artifactId>
-     <version>0.5.0</version>
+     <version>0.6.0-SNAPSHOT</version>
      <relativePath/>
   </parent>
   
   <properties>
     <maven.compiler.target>8</maven.compiler.target>
     <maven.compiler.source>8</maven.compiler.source>
+    <iip.version>0.6.0-SNAPSHOT</iip.version> <!-- automatically repaced for releases -->
   </properties>
 
   <dependencies>
@@ -39,7 +40,7 @@
     <dependency>
 	  <groupId>de.iip-ecosphere.platform</groupId>
 	  <artifactId>maven-python</artifactId>
-	  <version>0.5.0</version>
+	  <version>${iip.version}</version>
 	  <exclusions>
 	  	<exclusion>
 	  		<groupId>org.apache.maven</groupId>
