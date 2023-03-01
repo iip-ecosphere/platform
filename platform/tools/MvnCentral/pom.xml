@@ -226,7 +226,7 @@
         <groupId>de.iip-ecosphere.platform</groupId>
         <version>${project.version}</version>
     </dependency>
-    <!-- not part of 0.3 release
+    <!-- not part of 0.5 release -> check whether all Mvn artifacts are created
     <dependency>
         <artifactId>ecsRuntime.kubernetes</artifactId>
         <groupId>de.iip-ecosphere.platform</groupId>

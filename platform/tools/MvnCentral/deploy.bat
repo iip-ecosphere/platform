@@ -9,7 +9,7 @@ REM run this script
 REM goto https://oss.sonatype.org/#welcome, staging repositories, deiip-ecosphere...*, close for check/deploy
 
 setlocal ENABLEDELAYEDEXPANSION
-SET VERSION=0.4.0
+SET VERSION=0.5.0
 SET TARGET=https://oss.sonatype.org/service/local/staging/deploy/maven2
 SET REPO=ossrh-iip
 SET DEPLOYCMD=mvn gpg:sign-and-deploy-file -Durl=%TARGET% -DrepositoryId=%REPO%
@@ -45,7 +45,7 @@ REM param2: version of the artifact to deploy
     SET TESTSOURCES=%ARTIFACTPREFIX%-test-sources.jar
     SET JAVADOC=%ARTIFACTPREFIX%-javadoc.jar
     SET TESTJAVADOC=%ARTIFACTPREFIX%-test-javadoc.jar
-    SET PYTHON=%ARTIFACTPREFIX%-python.jar
+    SET PYTHON=%ARTIFACTPREFIX%-python.zip
     SET EASY=%ARTIFACTPREFIX%-easy.zip
     SET INTERFACES=%ARTIFACTPREFIX%-interfaces.jar
     SET BINZ=%ARTIFACTPREFIX%-bin.zip
@@ -74,11 +74,11 @@ REM param2: version of the artifact to deploy
         )
         if EXIST %FOLDER%\%PYTHON% (
           echo "PYTHON %FOLDER%\%PYTHON%"
-          call %DEPLOYCMD% -DpomFile=%FOLDER%\%POM% -Dfile=%FOLDER%\%PYTHON% -Dclassifier=python
+          call %DEPLOYCMD% -DpomFile=%FOLDER%\%POM% -Dfile=%FOLDER%\%PYTHON% -Dfiles=%FOLDER%\%PYTHON% -Dclassifiers=python -Dtypes=zip
         )
         if EXIST %FOLDER%\%EASY% (
           echo "EASY %FOLDER%\%EASY%"
-          call %DEPLOYCMD% -DpomFile=%FOLDER%\%POM% -Dfile=%FOLDER%\%EASY% -Dclassifier=easy
+          call %DEPLOYCMD% -DpomFile=%FOLDER%\%POM% -Dfile=%FOLDER%\%EASY% -Dfiles=%FOLDER%\%EASY% -Dclassifiers=easy -Dtypes=zip
         )
         if EXIST %FOLDER%\%INTERFACES% (
           echo "IF %FOLDER%\%INTERFACES%"
@@ -86,7 +86,7 @@ REM param2: version of the artifact to deploy
         )
         if EXIST %FOLDER%\%BINZ% (
           echo "BIN-Z IP%FOLDER%\%BINZ%"
-          call %DEPLOYCMD% -DpomFile=%FOLDER%\%POM% -Dfile=%FOLDER%\%BINZ% -Dclassifier=bin
+          call %DEPLOYCMD% -DpomFile=%FOLDER%\%POM% -Dfile=%FOLDER%\%BINZ% -Dfiles=%FOLDER%\%BINZ% -Dclassifiers=bin -Dtypes=zip
         )
         if EXIST %FOLDER%\%BINJ% (
           echo "BIN-JAR %FOLDER%\%BINJ%"
@@ -94,7 +94,7 @@ REM param2: version of the artifact to deploy
         )
         if EXIST %FOLDER%\%SPRING_ZIP% (
           echo "SPRING %FOLDER%\%SPRING_ZIP%"
-          call %DEPLOYCMD% -DpomFile=%FOLDER%\%POM% -Dfile=%FOLDER%\%SPRING_ZIP% -Dclassifier=spring
+          call %DEPLOYCMD% -DpomFile=%FOLDER%\%POM% -Dfile=%FOLDER%\%SPRING_ZIP% -Dfiles=%FOLDER%\%SPRING_ZIP% -Dclassifiers=spring -Dtypes=zip
         )
     ) else (
         echo "POM %FOLDER%\%POM%"
