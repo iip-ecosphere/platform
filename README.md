@@ -4,7 +4,7 @@ The virtual IIP-Ecosphere Industry 4.0/IIoT platform aims at demonstrating new a
 
 ## News
 
-* **February 2023:** Starting preparation of release 0.5.0 including new version of platform handbook.
+* **March 2023:** Technical release 0.5.0 is mostly done. Platform code switched to 0.6.0-SNAPSHOT..
 * **February 2023:** Integration of federated learning framework [Flower](https://flower.dev/) started.
 * **February 2023:** Service development tutorial online on [YouTube](https://www.youtube.com/playlist?list=PL5VSYtiD_PfdxUDXGlX53UsHdQlXcHYK7) and [IIP-Ecosphere](https://www.iip-ecosphere.de/angebote/plattform/).
 * **New in 2023:** Upcoming demonstrator for [HM'23](https://www.iip-ecosphere.de/iip-ecosphere-auf-der-hannover-messe-2023/) in collaboration with Phoenix Contact, Lenze, Bitmotec/OnLogic, UR.
