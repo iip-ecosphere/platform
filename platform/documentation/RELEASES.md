@@ -9,7 +9,7 @@ Planned:
 * Integrated container management for Kubernetes [#39](https://github.com/iip-ecosphere/platform/issues/39)
 * Filtering of monitoring telegrams [#75](https://github.com/iip-ecosphere/platform/issues/75)
 
-### At the fair (Spring 2023):
+### HM'23: At the fair (Spring 2023):
 
 Planned:
 * Enable tolerant switching: [#26](https://github.com/iip-ecosphere/platform/issues/26)
@@ -32,6 +32,9 @@ In progress:
 * [#90](https://github.com/iip-ecosphere/platform/issues/90): UI display application service meshes: 
 * [#86](https://github.com/iip-ecosphere/platform/issues/86): UI restrucuturing for larger lists 
 * [#129](https://github.com/iip-ecosphere/platform/issues/129): Read-only flag for RecordType field
+
+Improvements:
+* [#128](https://github.com/iip-ecosphere/platform/issues/128): Refactor model to move RecordType::path to connector. **May require an upgrade of configuration models using connectors.**
 
 ### Release 0.5.0 (2023/03/01):
 
