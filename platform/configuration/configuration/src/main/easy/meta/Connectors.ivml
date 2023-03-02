@@ -192,6 +192,10 @@ project Connectors {
         conn.input->exists(t|t.type == handler.type);
     
     // ------------------------ connector types --------------------------
+    
+    compound IOTypeWithPath refines IOType {
+       String path = ""; // may or may not end with protocol specific separator, to be moved #128
+    }    
       
     enum CacheMode {NONE, HASH, EQUALS};
       
@@ -206,8 +210,8 @@ project Connectors {
        String inAdapterClass = ""; // if given, use adapter; may be "*" to use generated transport serializer
        String outAdapterClass = ""; // if given, use adapter; may be "*" to use generated transport serializer
        // may collapse into one, to be supported by configurable mapping
-       refTo(DataType) inInterface; // provided data input to be mapped into adapter, alternative to adapterClass
-       refTo(DataType) outInterface; // provided data output to be mapped into adapter, alternative to adapterClass
+       IOTypeWithPath inInterface; // provided data input to be mapped into adapter, alternative to adapterClass
+       IOTypeWithPath outInterface; // provided data output to be mapped into adapter, alternative to adapterClass
        setOf(ConnectorInputHandler) inputHandlers = {};
        Constraint inputHandlersOk = inputHandlers->forAll(h|handlerOk(h, self));
        

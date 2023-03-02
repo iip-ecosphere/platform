@@ -36,8 +36,8 @@ project AllServicesPartRoutingTest {
         
         input = {{type=refBy(connIn)}, {type=refBy(command), forward=false}},
         output = {{type=refBy(connOut)}},
-        inInterface = refBy(connIn),
-        outInterface = refBy(connOut),
+        inInterface = {type=refBy(connIn)},
+        outInterface = {type=refBy(connOut)},
         inputHandlers = {{
           type=refBy(command), 
           class="de.iip_ecosphere.platform.test.apps.serviceImpl.routingTest.ConnectorCommandEventHandler", 

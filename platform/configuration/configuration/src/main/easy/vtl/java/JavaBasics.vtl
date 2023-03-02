@@ -313,4 +313,17 @@ template JavaBasics(Configuration config, FileArtifact target) {
         result;
     }
 
+    // dispatch basis
+    def getPath(DataType type) {
+        ''
+    }
+    
+    /*def getPath(RecordType type) {
+        type.path;
+    }*/
+
+    def getPath(IOTypeWithPath type) {
+        type.path;
+    }
+
 }

@@ -386,8 +386,8 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         IIPEcosphere cfg = config;
         Path javaSrc = "${appRoot}/src/main/java";
         Path javaNodesSrc = "${javaSrc}/${toPath(javaNodesPackage)}";
-        RecordType machineInIf = conn.inInterface;
-        RecordType machineOutIf = conn.outInterface;
+        IOTypeWithPath machineInIf = conn.inInterface;
+        IOTypeWithPath machineOutIf = conn.outInterface;
         DataType platfIn = firstType(conn.output);
         DataType platfOut = firstType(conn.input);
         Boolean sharedIf = cfg.sharedInterfaces;
@@ -395,17 +395,19 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         
         if (isConfigured(conn.machineParser) and conn.machineParser <> null) {
             String parserName = connName + "ParserSerializer";
-            vilTemplateProcessor("JavaConnectorSerializer", config, "${javaNodesSrc}/${parserName}.java", imType=machineOutIf,
-                pltfType=platfIn, pkg=javaNodesPackage, typePkg=javaDatatypesPackage, sharedInterfaces=sharedIf, impl=false, 
-                formatter=null, parser=conn.machineParser, className=parserName, assng=conn.operations);
+            vilTemplateProcessor("JavaConnectorSerializer", config, "${javaNodesSrc}/${parserName}.java", imType=machineOutIf.type,
+                path=getPath(machineOutIf), pltfType=platfIn, pkg=javaNodesPackage, typePkg=javaDatatypesPackage, 
+                sharedInterfaces=sharedIf, impl=false, formatter=null, parser=conn.machineParser, className=parserName, 
+                assng=conn.operations);
             determineArtifacts(artifacts, conn.machineParser);
         }
 
         if (isConfigured(conn.machineFormatter) and conn.machineFormatter <> null) {
             String formatterName = connName + "FormatterSerializer";
-            vilTemplateProcessor("JavaConnectorSerializer", config, "${javaNodesSrc}/${formatterName}.java", imType=machineInIf,
-                pltfType=platfOut, pkg=javaNodesPackage, typePkg=javaDatatypesPackage, sharedInterfaces=sharedIf, impl=false, 
-                formatter=conn.machineFormatter, parser=null, className=formatterName, assng=conn.operations);
+            vilTemplateProcessor("JavaConnectorSerializer", config, "${javaNodesSrc}/${formatterName}.java", imType=machineInIf.type,
+                path=getPath(machineInIf), pltfType=platfOut, pkg=javaNodesPackage, typePkg=javaDatatypesPackage, 
+                sharedInterfaces=sharedIf, impl=false, formatter=conn.machineFormatter, parser=null, className=formatterName, 
+                assng=conn.operations);
             determineArtifacts(artifacts, conn.machineFormatter);
         }
     }

@@ -29,6 +29,7 @@ Connectors::ModelCallOperation::arguments= Expressions defining the arguments fo
 Connectors::ConnectorInputHandler::type = The type of data the handler handles.
 Connectors::ConnectorInputHandler::class = Implementation class implementing "ConnectorInputHandler".
 Connectors::ConnectorInputHandler::artifact = Optional mvn coordinate of the artifact containing the input handler.
+Connectors::IOTypeWithPath::path = Prefix access path within a model/connector. May or may not end with path separator "/", depending on desired path access. Usually empty except for connector types. 
 Connectors::Connector::operations = Data transfer operations.
 Connectors::Connector::encoding = When transferring text, which encoding shall be used.
 Connectors::Connector::mapping = Data field mapping to ease translation operations (currently unused).

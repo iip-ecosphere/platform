@@ -68,7 +68,7 @@ project SerializerConfig1Old {
     };
     
     RecordType myConnMachineIn = {
-        path = "/opc/machIn/",
+        //path = "/opc/machIn/",
         name = "myConnMachineIn",
         fields = {
             Field {
@@ -103,7 +103,7 @@ project SerializerConfig1Old {
     };
 
     RecordType myConnMachineOut = {
-        path = "/opc/machOut/",
+        //path = "/opc/machOut/",
         name = "myConnMachineOut",
         fields = {
             Field {
@@ -173,8 +173,8 @@ project SerializerConfig1Old {
         
         input = {{type=refBy(myConnPltfOut)}},
         output = {{type=refBy(myConnPltfIn)}},
-        inInterface = refBy(myConnMachineIn), 
-        outInterface = refBy(myConnMachineOut),
+        inInterface = {type=refBy(myConnMachineIn), path="/opc/machIn/"}, 
+        outInterface = {type=refBy(myConnMachineOut), path="/opc/machOut/"},
         traceRcv = TraceKind::TRACE,
         traceSent = TraceKind::TRACE,
         security = {
@@ -213,8 +213,8 @@ project SerializerConfig1Old {
         inChannel = "IN",
         outChannel = "OUT",
         outChannels = {"OUT1", "OUT2"},
-        inInterface = refBy(myConnMachineIn),
-        outInterface = refBy(myConnMachineOut),
+        inInterface = {type=refBy(myConnMachineIn), path="/opc/machIn/"},
+        outInterface = {type=refBy(myConnMachineOut), path="/opc/machOut/"},
         machineFormatter = TextLineFormatter{separator=","},
         machineParser = TextLineParser{separator=","},
         traceRcv = TraceKind::LOG,

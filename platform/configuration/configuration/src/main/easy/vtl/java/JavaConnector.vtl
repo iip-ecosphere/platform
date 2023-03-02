@@ -183,7 +183,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         String outSerializer;
         if (conn.inSerializerClass.length() > 0) {
             if (conn.inSerializerClass == "*") {
-                inSerializer = "new ${conn.inInterface}Serializer()";
+                inSerializer = "new ${toTypeName(conn.inInterface)}Serializer()";
             } else {
                 inSerializer = "(Serializer<"+asTypeName(getFirstTypeName(conn.input))+">) TypeTranslators.createSerializer(getClass().getClassLoader(), \"" + conn.inSerializerClass + "\")";
             }
@@ -192,7 +192,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         }
         if (conn.outSerializerClass.length() > 0) {
             if (conn.outSerializerClass == "*") {
-                outSerializer = "new ${conn.outInterface}Serializer()";
+                outSerializer = "new ${toTypeName(conn.outInterface)}Serializer()";
             } else {
                 outSerializer = "(Serializer<"+asTypeName(getFirstTypeName(conn.output))+">) TypeTranslators.createSerializer(getClass().getClassLoader(), \"" + conn.outSerializerClass + "\")";
             }
@@ -265,15 +265,15 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         ''
     }
     
-    def genOutputTransTo(DataType imType, DataType pltfType, setOf(AssignmentOperation) assng, String oType, String coType) {
+    def genOutputTransTo(DataType imType, String path, DataType pltfType, setOf(AssignmentOperation) assng, String oType, String coType) {
         ''
     }
     
     // unify imType with access/model without having an instance, write into pltfType
-    def genOutputTransTo(RecordType imType, RecordType pltfType, setOf(AssignmentOperation) assng, String oType, String coType) {
+    def genOutputTransTo(RecordType imType, String path, RecordType pltfType, setOf(AssignmentOperation) assng, String oType, String coType) {
         genFrom = false;
         setOf(String) done = {};
-        topPath = getPath(imType);
+        topPath = path;
         String imTypePath = "";
         if (not(optWithStepIn)) {
              imTypePath = topPath;
@@ -309,15 +309,15 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         }'|8;
     }
 
-    def genOutputTransFrom(DataType imType, DataType pltfType, setOf(AssignmentOperation) assng, String iType, String ciType) {
+    def genOutputTransFrom(DataType imType, String path, DataType pltfType, setOf(AssignmentOperation) assng, String iType, String ciType) {
         ''
     }
 
     // unify imType with access/model without having an instance, write into pltfType
-    def genOutputTransFrom(RecordType imType, RecordType pltfType, setOf(AssignmentOperation) assng, String iType, String ciType) {
+    def genOutputTransFrom(RecordType imType, String path, RecordType pltfType, setOf(AssignmentOperation) assng, String iType, String ciType) {
         genFrom = true;
         setOf(String) done = {};
-        topPath = getPath(imType);
+        topPath = path;
         String imTypePath = "";
         if (not(optWithStepIn)) {
              imTypePath = topPath;
@@ -497,6 +497,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
 
     def generateMachineOutputTranslator(Connector conn) {
         clearTemporaryVariables();
+        IOTypeWithPath outIoType = conn.outInterface;
         Boolean useNotifications = conn.samplingPeriod <= 0; // else polling
         cachingTimes = mappedCachingTimes(conn.mapping);
         if (conn.inAdapterClass.length() == 0) {
@@ -512,7 +513,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
                 this.pathSupplier = pathSupplier;
             }
 
-            ${genOutputTransTo(conn.outInterface, getFirstType(conn.output), conn.operations, oType, coType)}
+            ${genOutputTransTo(outIoType.type, getPath(conn.outInterface), getFirstType(conn.output), conn.operations, oType, coType)}
         
             @Override
             public void initializeModelAccess() throws IOException {
@@ -538,6 +539,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
 
     def generateMachineInputTranslator(Connector conn) {
         clearTemporaryVariables();
+        IOTypeWithPath inIoType = conn.inInterface;
         cachingTimes = mappedCachingTimes(conn.mapping);
         if (conn.outAdapterClass.length() == 0) {
             setAdd(config);
@@ -552,7 +554,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
                 this.pathSupplier = pathSupplier;
             }
         
-            ${genOutputTransFrom(conn.inInterface, getFirstType(conn.input), conn.operations, iType, ciType)}
+            ${genOutputTransFrom(inIoType.type, getPath(conn.inInterface), getFirstType(conn.input), conn.operations, iType, ciType)}
         
             @Override
             public Class<? extends ${iType}> getSourceType() {

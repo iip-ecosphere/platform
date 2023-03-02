@@ -7,7 +7,6 @@ DataTypes::EnumType::literals = The declared literals of an enumeration.
 DataTypes::EnumType::enumLiteralNamesUnique = All declared names within an enumeration type must be unique.
 DataTypes::EnumType::enumLiteralOrdinalsUnique = All declared ordinals within an enumeration type must be unique.
 DataTypes::RecordType = Specifies a composite data type to be passed along a service chain.
-DataTypes::RecordType::path = Prefix access path within a model/connector. May or may not end with path separator "/", depending on desired path access. Usually empty except for connector types. 
 DataTypes::RecordType::fields = Declared fields of the containing record type.
 DataTypes::Field = Declared typed field within a record.
 DataTypes::Field::name = Name of the field.

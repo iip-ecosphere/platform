@@ -135,8 +135,8 @@ project SerializerConfig1 {
         
         input = {{type=refBy(myConnPltfOut)}}, // PRELIMINARY
         output = {{type=refBy(myConnPltfIn)}},
-        inInterface = refBy(myConnMachineIn),
-        outInterface = refBy(myConnMachineOut)
+        inInterface = {type=refBy(myConnMachineIn)},
+        outInterface = {type=refBy(myConnMachineOut)}
     };
     
     MqttV3Connector myMqttConn = {
@@ -150,8 +150,8 @@ project SerializerConfig1 {
         output = {{type=refBy(myConnPltfIn)}},
         inChannel = "IN",
         outChannel = "OUT",
-        inInterface = refBy(myConnMachineIn), 
-        outInterface = refBy(myConnMachineOut),
+        inInterface = {type=refBy(myConnMachineIn)}, 
+        outInterface = {type=refBy(myConnMachineOut)},
         machineFormatter = JavaMachineFormatter{class="TextLineFormatter", converterClass="TextLineFormatter.TextLineFormatterConverter", artifact=""},
         machineParser = JavaMachineParser{class="JsonInputParser", converterClass="JsonInputParser.JsonInputConverter", resultClass="JsonInputParser.JsonParseResult", artifact=""}
     };

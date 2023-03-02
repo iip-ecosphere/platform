@@ -4,7 +4,7 @@ import DataOperationBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template JavaConnectorSerializer(Configuration config, FileArtifact target, DataType imType, DataType pltfType, 
+template JavaConnectorSerializer(Configuration config, FileArtifact target, DataType imType, String path, DataType pltfType, 
     String pkg, String typePkg, Boolean sharedInterfaces, Boolean impl, MachineFormatter formatter, MachineParser parser, 
     String className, setOf(AssignmentOperation) assng) extends DataOperationBasics {
 
@@ -435,11 +435,11 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
     
     // ---------------------------------- main ---------------------------------------
 
-    def main(Configuration config, FileArtifact target, DataType imType, DataType pltfType, String pkg, String typePkg, 
-        Boolean sharedInterfaces, Boolean impl, MachineFormatter formatter, MachineParser parser, String className, 
-        setOf(AssignmentOperation) assng) {
+    def main(Configuration config, FileArtifact target, DataType imType, String path, DataType pltfType, String pkg, 
+        String typePkg, Boolean sharedInterfaces, Boolean impl, MachineFormatter formatter, MachineParser parser, 
+        String className, setOf(AssignmentOperation) assng) {
         String imTypeName = asTypeName(imType.name);
-        topPath = getPath(imType);
+        topPath = path;
         String pltfTypeName = asTypeName(pltfType.name);
         if (sharedInterfaces) {
             add = "Impl";
@@ -484,13 +484,13 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
         
             @Override             
             public ${pltfTypeName} from(byte[] data) throws IOException {
-                final String path = pathSupplier == null ? "${getPath(imType)}" : pathSupplier.get();
+                final String path = pathSupplier == null ? "${path}" : pathSupplier.get();
                 ${generateParserFrom("${imTypeName}${add}", "${pltfTypeName}")}
             }
 
             @Override    
             public byte[] to(${pltfTypeName} source) throws IOException {
-                final String path = pathSupplier == null ? "${getPath(imType)}" : pathSupplier.get();
+                final String path = pathSupplier == null ? "${path}" : pathSupplier.get();
                 ${generateFormatterTo("${imTypeName}${add}", "${pltfTypeName}")}
             }
 
