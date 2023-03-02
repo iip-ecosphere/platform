@@ -62,7 +62,7 @@ project VDW {
     };
     
     RecordType opcOut = {
-        path = "Objects/Machines/BasicWoodworking/",
+        //path = "Objects/Machines/BasicWoodworking/",
         name = "OpcOut",
         fields = {
             Field {
@@ -92,8 +92,8 @@ project VDW {
         
         input = {{type=refBy(opcIn)}},
         output = {{type=refBy(opcOut)}},
-        inInterface = refBy(opcIn), 
-        outInterface = refBy(opcOut)
+        inInterface = {type=refBy(opcIn)}, 
+        outInterface = {type=refBy(opcOut), path="Objects/Machines/BasicWoodworking/"}
         /*operations = {
           FieldAssignmentOperation{field=myConnPltfIn.fields[1], 
             operation=AddDataTranslationOperation{

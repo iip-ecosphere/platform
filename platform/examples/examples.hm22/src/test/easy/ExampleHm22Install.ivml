@@ -131,7 +131,7 @@ project ExampleHm22Install {
 
     RecordType PlcOutput = {
         name = "PlcOutput",
-        path = "Objects/PLCnext/Arp.Plc.Eclr/",
+        //path = "Objects/PLCnext/Arp.Plc.Eclr/",
         fields = {
             Field {
                 name = "HW_StartProcess",
@@ -161,7 +161,7 @@ project ExampleHm22Install {
 
     RecordType PlcInput = {
         name = "PlcInput",
-        path = "Objects/PLCnext/Arp.Plc.Eclr/",
+        //path = "Objects/PLCnext/Arp.Plc.Eclr/",
         fields = {
             Field {
                 name = "PC_RequestedOperation",
@@ -181,7 +181,7 @@ project ExampleHm22Install {
 
     RecordType MdzhOutput = { 
         name = "MdzhOutput",
-        path = "ProductData/",
+        //path = "ProductData/",
         fields = {
             Field {
                 name = "ProductId",
@@ -358,8 +358,8 @@ project ExampleHm22Install {
         
         input = {{type=refBy(PlcInput), forward=false}},
         output = {{type=refBy(PlcOutput)}},
-        inInterface = refBy(PlcInput),
-        outInterface = refBy(PlcOutput),
+        inInterface = {type=refBy(PlcInput), path="Objects/PLCnext/Arp.Plc.Eclr/"},
+        outInterface = {type=refBy(PlcOutput), path="Objects/PLCnext/Arp.Plc.Eclr/"},
         traceRcv = TraceKind::TRACE,
         traceSent = TraceKind::TRACE
     };
@@ -385,8 +385,8 @@ project ExampleHm22Install {
         
         input = {{type=refBy(MdzhInput)}, {type=refBy(Command), forward=false}},
         output = {{type=refBy(MdzhOutput)}},
-        inInterface = refBy(MdzhInput), 
-        outInterface = refBy(MdzhOutput),
+        inInterface = {type=refBy(MdzhInput)}, 
+        outInterface = {type=refBy(MdzhOutput), path="ProductData/"},
         traceRcv = TraceKind::TRACE,
         traceSent = TraceKind::TRACE
     };
