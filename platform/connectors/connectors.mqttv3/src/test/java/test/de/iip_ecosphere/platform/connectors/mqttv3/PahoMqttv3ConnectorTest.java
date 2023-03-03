@@ -38,9 +38,10 @@ import test.de.iip_ecosphere.platform.test.mqtt.hivemq.TestHiveMqServer;
  */
 public class PahoMqttv3ConnectorTest extends AbstractSerializingConnectorTest {
     
+    @SuppressWarnings("unchecked")
     @Override
     protected Connector<byte[], byte[], Product, Command> createConnector(
-        ChannelProtocolAdapter<byte[], byte[], Product, Command> adapter) {
+        ChannelProtocolAdapter<byte[], byte[], Product, Command>... adapter) {
         return new PahoMqttv3Connector<Product, Command>(adapter);
     }
 

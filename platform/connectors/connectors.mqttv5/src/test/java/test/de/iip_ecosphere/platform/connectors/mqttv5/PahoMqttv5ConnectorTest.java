@@ -38,9 +38,10 @@ import test.de.iip_ecosphere.platform.transport.Command;
  */
 public class PahoMqttv5ConnectorTest extends AbstractSerializingConnectorTest {
 
+    @SuppressWarnings("unchecked")
     @Override
     protected Connector<byte[], byte[], Product, Command> createConnector(
-        ChannelProtocolAdapter<byte[], byte[], Product, Command> adapter) {
+        ChannelProtocolAdapter<byte[], byte[], Product, Command>... adapter) {
         return new PahoMqttv5Connector<Product, Command>(adapter);
     }
 

@@ -132,6 +132,7 @@ public class PahoMqttv3Connector<CO, CI> extends AbstractChannelConnector<byte[]
                 broker = "tcp://";
             }
             broker += params.getHost() + ":" + params.getPort();
+            LoggerFactory.getLogger(getClass()).info("MQTT: Trying to connect to " + broker);
             String appId = AbstractTransportConnector.getApplicationId(params.getApplicationId(), "conn", 
                 params.getAutoApplicationId());
             client = new MqttAsyncClient(broker, appId, new MemoryPersistence());
