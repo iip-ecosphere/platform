@@ -188,7 +188,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
                 inSerializer = "(Serializer<"+asTypeName(getFirstTypeName(conn.input))+">) TypeTranslators.createSerializer(getClass().getClassLoader(), \"" + conn.inSerializerClass + "\")";
             }
         } else {
-            inSerializer = 'new ${asTypeName(conn.name)}FormatterSerializer(${escapeString(getEncoding(conn))}, null, inPathSupplier, "#CHANNEL#")';
+            inSerializer = 'new ${asTypeName(conn.name)}FormatterSerializer(${escapeString(getEncoding(conn))}, null, inPathSupplier)';
         }
         if (conn.outSerializerClass.length() > 0) {
             if (conn.outSerializerClass == "*") {
@@ -197,7 +197,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
                 outSerializer = "(Serializer<"+asTypeName(getFirstTypeName(conn.output))+">) TypeTranslators.createSerializer(getClass().getClassLoader(), \"" + conn.outSerializerClass + "\")";
             }
         } else {
-            outSerializer = 'new ${asTypeName(conn.name)}ParserSerializer(${escapeString(getEncoding(conn))}, null, outPathSupplier, "#CHANNEL#")';
+            outSerializer = 'new ${asTypeName(conn.name)}ParserSerializer(${escapeString(getEncoding(conn))}, null, outPathSupplier)';
         }
 
         String inAdapter;
@@ -210,7 +210,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         if (conn.outAdapterClass.length() > 0) {
             outAdapter = "new ${conn.outAdapterClass}()";
         } else {
-            outAdapter = "new ConnectorOutputTypeAdapter<${asTypeName(getFirstTypeName(conn.output))}>(${outSerializer})";
+            outAdapter = "new ChanneledConnectorOutputTypeAdapter<${asTypeName(getFirstTypeName(conn.output))}>(${outSerializer})";
         }
         
         setOf(String) outChannels = getOutChannels(conn);
