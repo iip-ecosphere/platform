@@ -26,6 +26,8 @@ import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter.ConnectorParameterBuilder;
 import de.iip_ecosphere.platform.connectors.types.ChannelProtocolAdapter;
 import de.iip_ecosphere.platform.connectors.types.ChannelTranslatingProtocolAdapter;
+import de.iip_ecosphere.platform.connectors.types.ChanneledConnectorOutputTypeAdapter;
+import de.iip_ecosphere.platform.connectors.types.ChanneledConnectorOutputTypeAdapter.ChanneledSerializer;
 import de.iip_ecosphere.platform.connectors.types.ConnectorInputTypeAdapter;
 import de.iip_ecosphere.platform.connectors.types.ConnectorOutputTypeAdapter;
 import de.iip_ecosphere.platform.support.Schema;
@@ -57,11 +59,12 @@ public abstract class AbstractSerializingConnectorTest {
     /**
      * Creates the connector to be tested.
      * 
-     * @param adapter the protocol adapter used to create the connector
+     * @param adapter the protocol adapter(s) used to create the connector
      * @return the connector instance
      */
+    @SuppressWarnings("unchecked")
     protected abstract Connector<byte[], byte[], Product, Command> createConnector(
-        ChannelProtocolAdapter<byte[], byte[], Product, Command> adapter);
+        ChannelProtocolAdapter<byte[], byte[], Product, Command>... adapter);
 
     /**
      * Returns the connector descriptor for {@link #createConnector(ChannelProtocolAdapter)}.
@@ -108,6 +111,7 @@ public abstract class AbstractSerializingConnectorTest {
         Server server = createTestServer(addr, null);
         server.start();
         doTest(addr, null);
+        doTestMultiChannel(addr, null);
         server.stop(true);
     }
     
@@ -129,6 +133,7 @@ public abstract class AbstractSerializingConnectorTest {
             Server server = createTestServer(addr, configurer.getConfigDir());
             server.start();
             doTest(addr, configurer);
+            doTestMultiChannel(addr, configurer);
             server.stop(true);
         }
     }
@@ -213,7 +218,6 @@ public abstract class AbstractSerializingConnectorTest {
         ConnectorTest.assertDescriptorRegistration(getConnectorDescriptor());
         Product prod1 = new Product("prod1", 10.2);
         Product prod2 = new Product("prod2", 5.1);
-
         System.out.println("Using JSON serializers");
         ConnectorParameter cParams = createConnectorParameter(addr, configurer);
         TransportParameter tParams = createTransportParameter(addr, configurer);
@@ -223,6 +227,7 @@ public abstract class AbstractSerializingConnectorTest {
         Serializer<Command> inSer = new CommandJsonSerializer();
         SerializerRegistry.registerSerializer(inSer);
         
+        @SuppressWarnings("unchecked")
         Connector<byte[], byte[], Product, Command> mConnector = createConnector(
             new ChannelTranslatingProtocolAdapter<byte[], byte[], Product, Command>(
                 PROD_CHANNEL, new ConnectorOutputTypeAdapter<Product>(outSer), 
@@ -288,6 +293,111 @@ public abstract class AbstractSerializingConnectorTest {
         Assert.assertEquals(2, received.size());
         Assert.assertEquals(prod1.getDescription(), received.get(0).getCommand());
         Assert.assertEquals(prod2.getDescription(), received.get(1).getCommand());
+    }
+
+    /**
+     * Just counts product receptions.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static class CountingProductReceptionCallback implements ReceptionCallback<Product> {
+        
+        private int counter;
+        
+        @Override
+        public void received(Product data) {
+            counter++;
+        }
+        
+        @Override
+        public Class<Product> getType() {
+            return Product.class;
+        }
+        
+        /**
+         * Returns the counter value.
+         * 
+         * @return the number of received products
+         */
+        public int getCounter() {
+            return counter;
+        }
+    }
+
+    /**
+     * Re-used channeled serializer, ignoring the channel here.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static class ChanneledProductJsonSerializer extends ProductJsonSerializer 
+        implements ChanneledSerializer<Product> {
+
+        @Override
+        public Product from(String channel, byte[] data) throws IOException {
+            Assert.assertNotNull(channel);
+            Assert.assertTrue(channel.length() > 0);            
+            return super.from(data);
+        }
+        
+    }
+
+    /**
+     * Does a multi-channel test.
+     * 
+     * @param addr the server address (schema is ignored)
+     * @param configurer the parameter configurer, may be <b>null</b> for none
+     * @throws IOException in case that connection/communication fails
+     */
+    protected void doTestMultiChannel(ServerAddress addr, ConnectorParameterConfigurer configurer) throws IOException {
+        final String prodChannel1 = "data/channel/prod1";
+        final String prodChannel2 = "data/channel/prod2";
+        final String prodChannelDyn = "data/channel/+";
+        Product prod1 = new Product("prod1", 10.2);
+        Product prod2 = new Product("prod2", 4.1);
+
+        ChanneledSerializer<Product> outSer = new ChanneledProductJsonSerializer();
+        SerializerRegistry.registerSerializer(outSer);
+        Serializer<Command> inSer = new CommandJsonSerializer();
+        SerializerRegistry.registerSerializer(inSer);
+        ConnectorParameter cParams = createConnectorParameter(addr, configurer);
+        TransportParameter tParams = createTransportParameter(addr, configurer);
+
+        // multi adapter setup for statically known channels
+        @SuppressWarnings("unchecked")
+        Connector<byte[], byte[], Product, Command> cConnector = createConnector(
+            new ChannelTranslatingProtocolAdapter<byte[], byte[], Product, Command>(
+                prodChannel1, new ConnectorOutputTypeAdapter<Product>(outSer), 
+                CMD_CHANNEL, new ConnectorInputTypeAdapter<Command>(inSer)),
+            new ChannelTranslatingProtocolAdapter<byte[], byte[], Product, Command>(
+                prodChannel2, new ConnectorOutputTypeAdapter<Product>(outSer), 
+                CMD_CHANNEL, new ConnectorInputTypeAdapter<Command>(inSer)));
+        cConnector.connect(cParams);
+        CountingProductReceptionCallback cCallback = new CountingProductReceptionCallback();
+        cConnector.setReceptionCallback(cCallback);
+
+        // single adapter setup for dynamically resolved wildcard channels
+        @SuppressWarnings("unchecked")
+        Connector<byte[], byte[], Product, Command> dConnector = createConnector(
+            new ChannelTranslatingProtocolAdapter<byte[], byte[], Product, Command>(
+                prodChannelDyn, new ChanneledConnectorOutputTypeAdapter<Product>(outSer), 
+                CMD_CHANNEL, new ConnectorInputTypeAdapter<Command>(inSer)));
+        dConnector.connect(cParams);
+        CountingProductReceptionCallback dCallback = new CountingProductReceptionCallback();
+        dConnector.setReceptionCallback(dCallback);
+        
+        TransportConnector tConnector = createTransportConnector();
+        tConnector.connect(tParams);
+        tConnector.syncSend(prodChannel1, prod1);
+        tConnector.syncSend(prodChannel2, prod2);
+
+        cConnector.disconnect();
+        tConnector.disconnect();
+
+        SerializerRegistry.unregisterSerializer(outSer);
+        SerializerRegistry.unregisterSerializer(inSer);
+        
+        Assert.assertEquals(2, cCallback.getCounter());
+        Assert.assertEquals(2, dCallback.getCounter());
     }
 
     /**

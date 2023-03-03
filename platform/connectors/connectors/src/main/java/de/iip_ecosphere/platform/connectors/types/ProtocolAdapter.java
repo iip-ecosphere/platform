@@ -40,11 +40,12 @@ public interface ProtocolAdapter <O, I, CO, CI> {
     /**
      * Adapts the output from the underlying machine/platform to the IIP-Ecosphere platform.
      * 
+     * @param channel the channel the data was received
      * @param data the data to be adapted
      * @return the adapted data
      * @throws IOException in case that the adaptation fails
      */
-    public CO adaptOutput(O data) throws IOException;
+    public CO adaptOutput(String channel, O data) throws IOException;
     
     /**
      * Returns the input type to the protocol.

@@ -18,7 +18,8 @@ import de.iip_ecosphere.platform.connectors.model.ModelAccess;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
 
 /**
- * Uses two {@link TypeTranslator} instances for the protocol adaptation.
+ * Uses two {@link TypeTranslator} instances for the protocol adaptation, optionally passing on the reception 
+ * channel to a given {@link ChanneledConnectorOutputTypeTranslator}.
  * 
  * @param <O> the output type from the underlying machine/platform
  * @param <I> the input type to the underlying machine/platform
@@ -30,17 +31,22 @@ import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
 public class TranslatingProtocolAdapter<O, I, CO, CI> extends AbstractProtocolAdapter<O, I, CO, CI> {
 
     private ConnectorOutputTypeTranslator<O, CO> outputTranslator;
+    private ChanneledConnectorOutputTypeTranslator<O, CO> channeledOutputTranslator;
     private ConnectorInputTypeTranslator<CI, I> inputTranslator;
     
     /**
      * Creates a translating protocol adapter.
      * 
-     * @param outputTranslator the output translator
+     * @param outputTranslator the output translator, may be a {@link ChanneledConnectorOutputTypeTranslator}
      * @param inputTranslator the input translator
      */
+    @SuppressWarnings("unchecked")
     public TranslatingProtocolAdapter(ConnectorOutputTypeTranslator<O, CO> outputTranslator, 
         ConnectorInputTypeTranslator<CI, I> inputTranslator) {
         this.outputTranslator = outputTranslator;
+        if (outputTranslator instanceof ChanneledConnectorOutputTypeTranslator) {
+            channeledOutputTranslator = (ChanneledConnectorOutputTypeTranslator<O, CO>) outputTranslator;
+        }
         this.inputTranslator = inputTranslator;
     }
     
@@ -50,8 +56,9 @@ public class TranslatingProtocolAdapter<O, I, CO, CI> extends AbstractProtocolAd
     }
 
     @Override
-    public CO adaptOutput(O data) throws IOException {
-        return outputTranslator.to(data);
+    public CO adaptOutput(String channel, O data) throws IOException {
+        return null != channeledOutputTranslator 
+            ? channeledOutputTranslator.to(channel, data) : outputTranslator.to(data);
     }
 
     @Override

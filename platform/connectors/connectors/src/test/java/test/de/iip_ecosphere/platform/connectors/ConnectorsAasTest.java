@@ -346,7 +346,7 @@ public class ConnectorsAasTest {
                 }
     
                 @Override
-                public DataOut1 adaptOutput(Object data) throws IOException {
+                public DataOut1 adaptOutput(String channel, Object data) throws IOException {
                     return null;
                 }
     

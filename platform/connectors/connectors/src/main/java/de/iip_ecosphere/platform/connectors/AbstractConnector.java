@@ -351,7 +351,7 @@ public abstract class AbstractConnector<O, I, CO, CI> implements Connector<O, I,
      * @throws IOException if receiving/translation fails
      */
     protected CO received(String channel, O data, boolean notifyCallback) throws IOException {
-        CO result = selector.selectSouthOutput(channel, data).adaptOutput(data);
+        CO result = selector.selectSouthOutput(channel, data).adaptOutput(channel, data);
         if (null != callback && notifyCallback && checkCache(data)) {
             callback.received(result);
         }

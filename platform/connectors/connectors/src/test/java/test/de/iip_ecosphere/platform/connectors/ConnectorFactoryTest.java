@@ -199,7 +199,7 @@ public class ConnectorFactoryTest {
         }
 
         @Override
-        public Object adaptOutput(byte[] data) throws IOException {
+        public Object adaptOutput(String channel, byte[] data) throws IOException {
             return null;
         }
 
@@ -332,7 +332,7 @@ public class ConnectorFactoryTest {
         }
 
         @Override
-        public Object adaptOutput(DataItem data) throws IOException {
+        public Object adaptOutput(String channel, DataItem data) throws IOException {
             return null;
         }
 
