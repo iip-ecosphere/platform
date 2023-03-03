@@ -149,7 +149,7 @@ public class MonitoredTranslatingProtocolAdapterTest {
         final int max = 10;
         for (int i = 0; i < max; i++) {
             try {
-                adapter.adaptInput(adapter.adaptOutput("test"));
+                adapter.adaptInput(adapter.adaptOutput("", "test"));
             } catch (IOException e) {
             }
         }

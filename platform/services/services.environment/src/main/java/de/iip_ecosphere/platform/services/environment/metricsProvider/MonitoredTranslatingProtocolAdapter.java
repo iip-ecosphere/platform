@@ -115,11 +115,11 @@ public class MonitoredTranslatingProtocolAdapter<O, I, CO, CI> extends ChannelTr
     }
 
     @Override
-    public CO adaptOutput(O data) throws IOException {
+    public CO adaptOutput(String channel, O data) throws IOException {
         // no obvious way to combine lambda with super, measurement from micrometer
         final long s = clock.monotonicTime();
         try {
-            return super.adaptOutput(data);
+            return super.adaptOutput(channel, data);
         } finally {
             final long duration = clock.monotonicTime() - s;
             metrics.recordWithTimer(ADAPT_OUTPUT_TIME, duration, TimeUnit.NANOSECONDS);
