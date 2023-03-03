@@ -30,6 +30,10 @@ template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, setOf(String) u
         createMavenParent(project, iipGroup, "platformDependencies", "${config.iipVer}");
         
         new XmlComment(project, "Template application/service implementation POM.");
+        XmlElement properties = new XmlElement(project, "properties");
+        new XmlElement(properties, "iip.version", projectVersion);
+        new XmlComment(properties, "Could be project.version, but that may differ depending on implementation, context, ...");
+        projectVersion = "\\${iip.version}";
         
         XmlElement profiles = new XmlElement(project, "profiles");
         XmlElement profile = new XmlElement(profiles, "profile");
