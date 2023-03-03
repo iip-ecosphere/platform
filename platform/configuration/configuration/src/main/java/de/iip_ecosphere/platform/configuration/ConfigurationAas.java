@@ -247,7 +247,7 @@ public class ConfigurationAas implements AasContributor, ConfigurationChangeList
                     IipNode node = nodes.get(next);
                     if (null == node) {
                         node = createNode(next);
-                        traverseNodes(var.getNestedElement("next"));
+                        traverseConnectors(next.getNestedElement("next"), node);
                     }
                     from.addEdge(new IipEdge(conn, from, node));
                     node.addEdge(new IipEdge(conn, from, node));
