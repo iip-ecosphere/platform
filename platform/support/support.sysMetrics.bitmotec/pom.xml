@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>support.metrics.bitmotec</artifactId>
+  <packaging>jar</packaging>
+  <name>SystemMetrics implementation for Bitmotec</name>
+  <description>SystemMetrics implementation for Bitmotec.</description>
+
+  <parent>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>platformDependencies</artifactId>
+     <version>0.6.0-SNAPSHOT</version>
+  </parent>
+  
+  <properties>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <artifactId>support.aas</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <artifactId>support.aas</artifactId>
+      <version>${project.version}</version>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+    </dependency>     
+  </dependencies>
+  
+  <build>
+  <extensions>
+      <extension>
+        <groupId>kr.motd.maven</groupId>
+        <artifactId>os-maven-plugin</artifactId>
+        <version>${kr.motd.maven.os.version}</version>
+      </extension>
+    </extensions>
+    <plugins>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>3.0.0</version>
+        <configuration>
+            <mainClass>test.de.iip_ecosphere.platform.support.metrics.plcnext.Main</mainClass>
+            <cleanupDaemonThreads>false</cleanupDaemonThreads>
+            <classpathScope>test</classpathScope>
+        </configuration>
+      </plugin>
+
+    </plugins>
+  </build>
+
+</project>
