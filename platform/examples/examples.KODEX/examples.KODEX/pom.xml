@@ -278,7 +278,7 @@
                       <systemProperties>
                         <systemProperty>
                           <key>skipTests</key>
-                          <key>true</key>
+                          <value>true</value>
                         </systemProperty>
                       </systemProperties>
                     </configuration>
