@@ -98,6 +98,11 @@
         <groupId>de.iip-ecosphere.platform</groupId>
         <version>${project.version}</version>
     </dependency>  
+    <dependency>
+        <artifactId>support.metrics.bitmotec</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>    
         
     <dependency>
         <artifactId>transport</artifactId>

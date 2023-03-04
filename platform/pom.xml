@@ -29,6 +29,7 @@
      <module>support/support.iip-aas</module>
      <module>support/support.dfltSysMetrics</module>
      <module>support/support.sysMetrics.plcnext</module>
+     <module>support/support.sysMetrics.bitmotec</module>
      <module>support/support.semanticId.eclass</module>
      <!-- transport/connectors layer, transport component -->
      <module>transport/transport</module>
