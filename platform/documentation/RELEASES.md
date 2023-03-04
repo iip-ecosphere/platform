@@ -30,8 +30,9 @@ In progress:
 * [#127](https://github.com/iip-ecosphere/platform/issues/127): Integration of federated learning
 * [#70](https://github.com/iip-ecosphere/platform/issues/70): UI progress reporting 
 * [#90](https://github.com/iip-ecosphere/platform/issues/90): UI display application service meshes: 
-* [#86](https://github.com/iip-ecosphere/platform/issues/86): UI restrucuturing for larger lists 
+* [#86](https://github.com/iip-ecosphere/platform/issues/86): UI restructuring for larger lists 
 * [#129](https://github.com/iip-ecosphere/platform/issues/129): Read-only flag for RecordType field
+* [#132](https://github.com/iip-ecosphere/platform/issues/132): Bitmotec integration
 
 Improvements:
 * [#128](https://github.com/iip-ecosphere/platform/issues/128): Refactor model to move RecordType::path to connector. **May require an upgrade of configuration models using connectors.**

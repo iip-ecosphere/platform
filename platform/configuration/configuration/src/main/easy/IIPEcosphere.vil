@@ -476,7 +476,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
             setOf(EcsDevice) devices = EcsDevice.allInstances();
             // #130 container creation currently disabled for non-default containers (-> and d.containerName.length()==0)
             // #130 consider getContainerNameInfix(device) from JavaBasics
-            for (EcsDevice device : devices->select(d|d.isContainerTemplate and d.containerName.length()==0)->sortedBy(d|d.id)) {
+            for (EcsDevice device : devices->select(d|d.containerName.length()==0)->sortedBy(d|d.id)) {
                 ContainerType cntType = device.containerType;
                 String deviceName = device.containerName.toIdentifier();
                 String filePrefix = "${appName}_${deviceName}_";

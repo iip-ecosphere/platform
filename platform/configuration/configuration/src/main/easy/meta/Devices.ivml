@@ -141,7 +141,7 @@ project Devices {
         setOf(ContainerArgument) containerArguments = {};
         Constraint noInternalContainerType = containerType <> ContainerType::Ecs; // internal
 
-        Boolean isContainerTemplate = true; // currently for easing transition
+        // TODO device may not support all container managers -> container generation, selection for device-specific ecs runtime; currently docker assumed
         String containerName = ""; // the default containers without device-specific adjustments; TODO: add to device-specific ECS setup as artifactInfix
         Constraint noInternalContainerName = containerName <> "ecs";
         Constraint containerNameForm = containerName.matches("\\w*");
