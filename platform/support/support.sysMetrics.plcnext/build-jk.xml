@@ -8,6 +8,6 @@
     <!-- deploy to SSE Mvn repo -->
 	<target name="maven"> 
 	    <maven pomFile="pom.xml" goal="package"/>
-		<mvnDeployResolveArtifact folderName="IIP-dfltSysMetrics" pomFile="pom.xml" jarFolder="target" artifactPattern="support.metrics.plcNext-*.*.*.jar" />
+		<mvnDeployResolveArtifact folderName="IIP-plcnextSysMetrics" pomFile="pom.xml" jarFolder="target" artifactPattern="support.metrics.plcNext-*.*.*.jar" />
 	</target>
 </project>
