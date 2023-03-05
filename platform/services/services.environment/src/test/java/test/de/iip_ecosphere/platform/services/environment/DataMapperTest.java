@@ -15,11 +15,13 @@ package test.de.iip_ecosphere.platform.services.environment;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.util.function.Consumer;
 
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.services.environment.DataMapper;
+import de.iip_ecosphere.platform.services.environment.DataMapper.BaseDataUnitFunctions;
 import de.iip_ecosphere.platform.services.environment.DataMapper.MappingConsumer;
 
 import org.junit.Assert;
@@ -260,6 +262,25 @@ public class DataMapperTest {
         DataMapper.mapJsonData(createTestInputStream(), DataUnit.class, mConsumer);
         Assert.assertEquals(2, count);
         count = 0;
+    }
+
+    /**
+     * Tests {@link DataMapper#createBaseDataUnitClass(Class)}.
+     */
+    @Test
+    public void testCreateBaseDataUnitClass() {
+        try {
+            Class<? extends Object> cls = DataMapper.createBaseDataUnitClass(Object.class);
+            Object o = cls.getConstructor().newInstance();
+            BaseDataUnitFunctions bdfu = (BaseDataUnitFunctions) o;
+            bdfu.set$period(123);
+            Assert.assertEquals(123, bdfu.get$period());
+            bdfu.set$repeats(2);
+            Assert.assertEquals(2, bdfu.get$repeats());
+        } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
+            | NoSuchMethodException | SecurityException | ClassCastException e) {
+            Assert.fail("Shall not occur: " + e.getMessage());
+        }
     }
 
 }

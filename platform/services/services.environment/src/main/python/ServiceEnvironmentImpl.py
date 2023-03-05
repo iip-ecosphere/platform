@@ -140,7 +140,10 @@ def loadModules(modulesPath, modulesDir):
             if split[1] == ".py":
                 moduleName = modulesDir + "." + split[0]
                 #sys.stderr.write("loading " + moduleName + " in " + path + "\n")
-                importlib.import_module(moduleName)
+                try:
+                    importlib.import_module(moduleName)
+                except ModuleNotFoundError as exception:
+                    sys.stderr.write("Warn: While loading " + moduleName + ": " + exception.message + "\n")
 
 def consoleIngestResult(data): 
     result = None

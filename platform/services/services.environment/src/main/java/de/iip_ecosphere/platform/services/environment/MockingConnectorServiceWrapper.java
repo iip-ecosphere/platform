@@ -30,10 +30,12 @@ import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.identities.IdentityToken;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
+import de.iip_ecosphere.platform.services.environment.DataMapper.BaseDataUnitFunctions;
 import de.iip_ecosphere.platform.services.environment.DataMapper.IOIterator;
 
 /**
  * Mocks a {@link ConnectorServiceWrapper} by data in a JSON file through {@link DataMapper}.
+ * JSON data may contain meta values $period or $repeats as for {@link BaseDataUnitFunctions}.
  * 
  * @param <O> the output type from the underlying machine/platform
  * @param <I> the input type to the underlying machine/platform
@@ -268,16 +270,33 @@ public class MockingConnectorServiceWrapper<O, I, CO, CI> extends ConnectorServi
         if (null == triggerIterator) {
             LoggerFactory.getLogger(getClass()).info("Opening trigger resource: {}", fileName);
             try {
-                triggerIterator = DataMapper.mapJsonDataToIterator(getDataStream(fileName), connectorOutType);
+                triggerIterator = DataMapper.mapJsonDataToIterator(getDataStream(fileName), 
+                    DataMapper.createBaseDataUnitClass(connectorOutType));
             } catch (IOException e) {
                 LoggerFactory.getLogger(getClass()).error("While opening trigger resource {}: {}", 
                     fileName, e.getMessage());
             }
         }
         if (null != triggerIterator) {
+            int period = 0;            
             try {
                 if (triggerIterator.hasNext()) {
-                    handleReceived(triggerIterator.next(), 0);
+                    CO next = triggerIterator.next();
+                    BaseDataUnitFunctions bduf = (BaseDataUnitFunctions) next; // see createBaseDataUnitClass
+                    boolean endless = bduf.get$repeats() < 0;
+                    boolean once = bduf.get$repeats() == 0;
+                    int count = 0;
+                    while (endless || once || count < bduf.get$repeats()) {
+                        handleReceived(next, 0);
+                        period = bduf.get$period();
+                        if (period > 0) {
+                            TimeUtils.sleep(period);
+                        }
+                        count++;
+                        if (once) {
+                            break;
+                        }
+                    }
                 }
             } catch (IOException e) {
                 LoggerFactory.getLogger(getClass()).error("While processing trigger: {}", 

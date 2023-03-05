@@ -31,6 +31,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.iip_ecosphere.platform.support.TimeUtils;
+import net.bytebuddy.ByteBuddy;
 
 /**
  * Maps data from a stream to input instances for a service. This class is intended as a basis for testing (here 
@@ -43,51 +44,96 @@ import de.iip_ecosphere.platform.support.TimeUtils;
 public class DataMapper {
     
     /**
-    * Base class to represent all potential inputs to the service and the JSON input format.
-    * Just defines the meta attributes (thus $ prefixes), needs to be refined with actual attributes 
-    * by using class.
+    * Interface to represent all potential inputs to the service and the JSON input format.
+    * Defines the meta attributes (thus $ prefixes), needs to be refined with actual attributes 
+    * by using class. Can be used for dynamic class proxying.
     *
     * @author Holger Eichelberger, SSE
     */
-    public abstract static class BaseDataUnit {
-        
+    public interface BaseDataUnitFunctions {
+
         // checkstyle: stop names check
-    
-        private int $period = 0;
-        private int $repeats = 0;
-        
+
         /**
          * Returns the delay period between this and the next data unit.
          *
          * @return the period in ms, use default/last value if zero or negative
          */
-        public int get$period() {
-            return $period;
-        }
+        public int get$period();
 
         /**
          * Returns the number of repeats of this data unit.
          *
          * @return the number of repeats, negative for infinite
          */
+        public int get$repeats();
+
+        /**
+        * Changes the delay period between this and the next data unit. [snakeyaml]
+        *
+        * @param $period the period in ms, default/last value if zero or negative
+        */
+        public void set$period(int $period);
+        
+        /**
+         * Changes the number of repeats of this data unit. [snakeyaml]
+         *
+         * @param $repeats the number of repeats, negative for infinite
+         */
+        public void set$repeats(int $repeats);
+
+        // checkstyle: resume names check
+
+    }
+    
+    /**
+     * Creates a dynamic class extending {@code cls} and implementing {@link BaseDataUnitFunctions}.
+     * 
+     * @param <T> the type of the class
+     * @param cls the class to extend (assuming it'S a generated data class)
+     * @return the created class
+     */
+    public static <T> Class<? extends T> createBaseDataUnitClass(Class<T> cls) {
+        return new ByteBuddy()
+            .subclass(cls)
+            .implement(BaseDataUnitFunctions.class)
+            .defineProperty("$period", Integer.TYPE)
+            .defineProperty("$repeats", Integer.TYPE)
+            .make()
+            .load(MockingConnectorServiceWrapper.class.getClassLoader())
+            .getLoaded();
+    }
+    
+    /**
+    * Base class to represent all potential inputs to the service and the JSON input format.
+    * Just defines the meta attributes (thus $ prefixes), needs to be refined with actual attributes 
+    * by using class.
+    *
+    * @author Holger Eichelberger, SSE
+    */
+    public abstract static class BaseDataUnit implements BaseDataUnitFunctions {
+        
+        // checkstyle: stop names check
+    
+        private int $period = 0;
+        private int $repeats = 0;
+        
+        @Override
+        public int get$period() {
+            return $period;
+        }
+
+        @Override
         public int get$repeats() {
             return $repeats;
         }
 
-        /**
-        * Changes the delay period between this and the next data unit.
-        *
-        * @param $period the period in ms, default/last value if zero or negative
-        */
+        @Override
         public void set$period(int $period) {
             this.$period = $period;
         }
 
-        /**
-         * Changes the number of repeats of this data unit.
-         *
-         * @param $repeats the number of repeats, negative for infinite
-         */
+        @Override
         public void set$repeats(int $repeats) {
             this.$repeats = $repeats;
         }
