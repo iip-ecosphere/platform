@@ -27,12 +27,8 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationConfig;
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleAbstractTypeResolver;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 
 import de.iip_ecosphere.platform.support.TimeUtils;
 import net.bytebuddy.ByteBuddy;
@@ -439,37 +435,10 @@ public class DataMapper {
      */
     public static <T> IOIterator<T> mapJsonDataToIterator(InputStream stream, Class<T> cls, 
         boolean failOnUnknownProperties) throws IOException {
-        
-        SimpleModule iipModule = new SimpleModule();
-        iipModule.setAbstractTypes(new SimpleAbstractTypeResolver() {
-            
-            private static final long serialVersionUID = -3746467806797935401L;
-
-            @Override
-            public JavaType findTypeMapping(DeserializationConfig config, JavaType type) {
-                JavaType result = null;
-                // for generated IIP-Ecosphere data interfaces, we can try it with Impl classes
-                String className = type.getRawClass().getName();
-                if (type.isInterface() && className.startsWith("iip.")) {
-                    String name = className + "Impl";
-                    try {
-                        Class<?> cls = Class.forName(name);
-                        result = config.getTypeFactory().constructType(cls);
-                    } catch (ClassNotFoundException e) {
-                        e.printStackTrace();
-                    }
-                }
-                if (null == result) {
-                    result = super.findTypeMapping(config, type);
-                }
-                return result;
-            }
-                
-        }); 
 
         ObjectMapper objectMapper = new ObjectMapper()
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, failOnUnknownProperties)
-            .registerModule(iipModule);
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, failOnUnknownProperties);
+        JacksonUtils.configureObjectMapper(objectMapper);
         
         JsonFactory jf = new JsonFactory();
         JsonParser jp = jf.createParser(stream);
