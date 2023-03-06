@@ -18,6 +18,7 @@ export class ListComponent implements OnInit {
   noData: boolean = false;
   data: any;
   submodelElements: any; //help
+  unwantedTypes = ["metaState", "metaType"];
 
   constructor(public http: HttpClient, private envConfigService: EnvConfigService, private route: ActivatedRoute) {
     const env = this.envConfigService.getEnv();
@@ -31,21 +32,34 @@ export class ListComponent implements OnInit {
    }
 
   async ngOnInit() {
-
     this.ls = this.route.snapshot.paramMap.get('ls');
     if(this.ls) {
       this.data = await this.getData(this.ls);
       console.log(this.data);
+      this.filter();
     }
     this.submodelElements = await this.getSubmodelElements();
+  }
 
-
+  public filter() {
+    const relevantValues = []
+    let indicesToRemove = []
+    let i = 0;
+    for(const item of this.data.value) {
+      if(!this.unwantedTypes.includes(item.idShort)) {
+        indicesToRemove.push(i)
+        relevantValues.push(item)
+      }
+      i++;
+    }
+    this.data.value = relevantValues
   }
 
   public async getData(list: string) {
     let response;
     try {
-      response = await firstValueFrom(this.http.get(this.ip + '/shells/' + this.urn + "/aas/submodels/Configuration/submodel/submodelElements/" + list));
+      response = await firstValueFrom(this.http.get(this.ip + '/shells/'
+      + this.urn + "/aas/submodels/Configuration/submodel/submodelElements/" + list));
     } catch(e) {
       console.log(e);
       this.noData = true;
@@ -57,12 +71,13 @@ export class ListComponent implements OnInit {
   public async getSubmodelElements() {
     let response;
     try {
-      response = await firstValueFrom(this.http.get(this.ip + '/shells/' + this.urn + "/aas/submodels/Configuration/submodel/submodelElements"));
+      response = await firstValueFrom(this.http.get(this.ip + '/shells/'
+      + this.urn + "/aas/submodels/Configuration/submodel/submodelElements"));
     } catch(e) {
       console.log(e);
       this.noData = true;
     }
-    console.log(response);
+    //console.log(response);
     return response;
   }
 
