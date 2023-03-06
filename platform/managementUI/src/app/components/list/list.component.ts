@@ -18,7 +18,7 @@ export class ListComponent implements OnInit {
   noData: boolean = false;
   data: any;
   submodelElements: any; //help
-  unwantedTypes = ["metaState", "metaType"];
+  unwantedTypes = ["metaState", "metaType", "metaProject"];
 
   constructor(public http: HttpClient, private envConfigService: EnvConfigService, private route: ActivatedRoute) {
     const env = this.envConfigService.getEnv();
@@ -35,7 +35,6 @@ export class ListComponent implements OnInit {
     this.ls = this.route.snapshot.paramMap.get('ls');
     if(this.ls) {
       this.data = await this.getData(this.ls);
-      console.log(this.data);
       this.filter();
     }
     this.submodelElements = await this.getSubmodelElements();
