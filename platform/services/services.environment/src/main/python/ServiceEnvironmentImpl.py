@@ -142,9 +142,9 @@ def loadModules(modulesPath, modulesDir):
                 #sys.stderr.write("loading " + moduleName + " in " + path + "\n")
                 try:
                     importlib.import_module(moduleName)
-                    print("Loaded: " + moduleName)
+                    print("Python ServiceEnvironment [Info]: Loaded " + moduleName)
                 except ModuleNotFoundError as exception:
-                    sys.stderr.write("Warn: While loading " + moduleName + ": ModuleNotFoundError\n")
+                    sys.stderr.write("Python ServiceEnvironment [Warn]: While loading " + moduleName + ": ModuleNotFoundError\n")
 
 def consoleIngestResult(data): 
     result = None
