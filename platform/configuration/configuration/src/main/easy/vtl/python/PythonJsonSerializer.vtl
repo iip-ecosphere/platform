@@ -22,6 +22,7 @@ template PythonJsonSerializer(Configuration config, FileArtifact target, RecordT
         for key in o.__dict__:
             k = key[1:] # by generation convention
             tmp[k] = o.__dict__[key]
+        # treat recursively from RecordType
         return tmp
     '
     }
@@ -72,7 +73,11 @@ template PythonJsonSerializer(Configuration config, FileArtifact target, RecordT
                 """
             
                 result = ${clsName}${add}()
-                result.__dict__ = json.loads(data)
+                tmp = json.loads(data)
+                for key in tmp:
+                    k = "_" + str(key) # by generation convention
+                    result.__dict__[k] = tmp[key]
+                # treat recursively from RecordType
                 return result
 
             def writeTo(self, source: ${clsName}) -> str:
