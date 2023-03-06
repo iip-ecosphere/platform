@@ -656,6 +656,7 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
                  public ${type} to(String source) throws IOException {
                      try {
                          ObjectMapper objectMapper = new ObjectMapper();
+                         JacksonUtils.configureObjectMapper(objectMapper); // only if nested?
                          return objectMapper.readValue(source, ${type}${getTypeAdd()}.class);
                      } catch (JsonProcessingException e) {
                          throw new IOException(e);

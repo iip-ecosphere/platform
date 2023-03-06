@@ -43,6 +43,7 @@ template JavaJsonSerializer(Configuration config, FileArtifact target, RecordTyp
         import java.io.IOException;
         import de.iip_ecosphere.platform.transport.serialization.*;
         import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
+        import de.iip_ecosphere.platform.services.environment.JacksonUtils;
         ${importTypePackage(pkg, typePkg)}
         import com.fasterxml.jackson.databind.ObjectMapper;
         import com.fasterxml.jackson.core.JsonProcessingException;
@@ -58,6 +59,7 @@ template JavaJsonSerializer(Configuration config, FileArtifact target, RecordTyp
                 try {
                     ObjectMapper objectMapper = new ObjectMapper();
                     ${defineJacksonOptionals(type, "objectMapper", typeName)|e}
+                    JacksonUtils.configureObjectMapper(objectMapper); // only if nested?
                     return objectMapper.readValue(data, ${clsName}${add}.class);
                 } catch (JsonProcessingException e) {
                     throw new IOException(e);
