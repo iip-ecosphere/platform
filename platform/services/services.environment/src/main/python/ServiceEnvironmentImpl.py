@@ -142,6 +142,7 @@ def loadModules(modulesPath, modulesDir):
                 #sys.stderr.write("loading " + moduleName + " in " + path + "\n")
                 try:
                     importlib.import_module(moduleName)
+                    print("Loaded: " + moduleName)
                 except ModuleNotFoundError as exception:
                     sys.stderr.write("Warn: While loading " + moduleName + ": ModuleNotFoundError\n")
 

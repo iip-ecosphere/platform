@@ -156,7 +156,7 @@ public class MockingConnectorServiceWrapper<O, I, CO, CI> extends ConnectorServi
             boolean send = cachingStrategy.checkCache(data);
             LoggerFactory.getLogger(MockingConnectorServiceWrapper.class)
                 .info("Received {} passing on {}", data, send);
-            if (send) {
+            if (send && callback != null) {
                 callback.received(data);
                 if (notifInterval > 0) {
                     TimeUtils.sleep(notifInterval);
@@ -280,7 +280,7 @@ public class MockingConnectorServiceWrapper<O, I, CO, CI> extends ConnectorServi
         if (null != triggerIterator) {
             int period = 0;            
             try {
-                if (triggerIterator.hasNext()) {
+                while (triggerIterator.hasNext()) {
                     CO next = triggerIterator.next();
                     BaseDataUnitFunctions bduf = (BaseDataUnitFunctions) next; // see createBaseDataUnitClass
                     boolean endless = bduf.get$repeats() < 0;
