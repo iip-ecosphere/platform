@@ -102,4 +102,15 @@ export class DeploymentPlansComponent implements OnInit {
   //   return name;
   // }
 
+  public applyLineStyle(index: number) {
+
+    let style = "white-line";
+
+    if(index % 2 === 0) {
+      style = "grey-line";
+    }
+    return (style);
+
+  }
+
 }

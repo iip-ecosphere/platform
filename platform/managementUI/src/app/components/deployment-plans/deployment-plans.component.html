@@ -1,4 +1,4 @@
-<div class="background">
+<div>
   <h1>Deployment Plans</h1>
 
   <!-- <mat-form-field appearance="outline">
@@ -14,8 +14,8 @@
   <button mat-raised-button style="background-color: rgb(255,204,0)" (click)="undeploy()">udeploy</button> -->
 
   <mat-list *ngIf="deploymentPlans; else noPlans">
-    <div *ngFor="let plan of deploymentPlans.value">
-      <mat-list-item >
+    <div *ngFor="let plan of deploymentPlans.value; let i = index">
+      <mat-list-item [ngClass]="applyLineStyle(i)">
         <div class="container">
           <span class="name">{{ getName(plan.value) }}</span>
           <span *ngIf="plan.description" class="description">{{ plan.description }}</span>
