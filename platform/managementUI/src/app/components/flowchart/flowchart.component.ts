@@ -51,7 +51,6 @@ export class FlowchartComponent implements OnInit {
   }
 
   public zoomIn() {
-    console.log('zoom zoom');
     this.editor.zoom_in();
 
   }
