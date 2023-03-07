@@ -23,7 +23,6 @@ import java.util.Map;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.ISODateTimeFormat;
-import org.slf4j.LoggerFactory;
 
 /**
  * Caches formatter instances.
@@ -188,8 +187,6 @@ public class FormatCache {
             result = convertToDate(data.getClass(), data);
             if (null == result) {
                 String tmp = null == data ? "" : data.toString();
-                LoggerFactory.getLogger(FormatCache.class).warn("Fallback, converting to String from {} {}", 
-                    data == null ? null : data.getClass().getName(), data); // TODO preliminary!
                 SimpleDateFormat f = FormatCache.getDateFormatter(format);
                 try {
                     return f.parse(tmp);
