@@ -21,6 +21,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
+import iip.datatypes.Abc;
+import iip.datatypes.AbcImpl;
 
 /**
  * Tests {@link JsonUtils}.
@@ -189,6 +191,24 @@ public class JsonUtilsTest {
      */
     private static void assertEscapeUnescape(String string) {
         Assert.assertEquals(string, JsonUtils.unescape(JsonUtils.escape(string)));
+    }
+
+    /**
+     * Tests {@link JsonUtils#handleIipDataClasses(ObjectMapper)}.
+     * 
+     * @throws JsonProcessingException shall not occur
+     */
+    @Test
+    public void testIipTypes() throws JsonProcessingException {
+        Abc abc = new AbcImpl();
+        abc.setValue(42);
+        ObjectMapper objectMapper = new ObjectMapper();
+        String str = objectMapper.writeValueAsString(abc);
+
+        JsonUtils.handleIipDataClasses(objectMapper);
+        Abc test = objectMapper.readValue(str, Abc.class);
+        Assert.assertNotNull(test);
+        Assert.assertEquals(abc.getValue(), test.getValue());
     }
 
 }
