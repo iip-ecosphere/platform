@@ -13,7 +13,9 @@
 package de.iip_ecosphere.platform.support.iip_aas.json;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import com.fasterxml.jackson.core.JsonParser;
@@ -23,7 +25,12 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.cfg.MapperConfig;
 import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
+import com.fasterxml.jackson.databind.introspect.AnnotatedField;
+import com.fasterxml.jackson.databind.introspect.AnnotatedMethod;
+import com.fasterxml.jackson.databind.introspect.AnnotatedParameter;
 import com.fasterxml.jackson.databind.module.SimpleAbstractTypeResolver;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
@@ -302,6 +309,83 @@ public class JsonUtils {
         }
         
     }
+
+    /**
+     * A property naming strategy exactly using the given names as JSON and Java field/getter/setter names.
+     * Applies a fallback strategy if there is no mapping.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public static class MappingPropertyNamingStrategy extends PropertyNamingStrategy {
+        
+        private static final long serialVersionUID = -3963175454099182994L;
+        private PropertyNamingStrategy fallback;
+        private Map<String, String> mapping;
+
+        /**
+         * Creates a mapping property naming strategy. Fallback strategy is {@code PropertyNamingStrategy} using
+         * the default names without strategy.
+         * 
+         * @param mapping the mapping of field names to json fields
+         */
+        public MappingPropertyNamingStrategy(Map<String, String> mapping) {
+            this(mapping, new PropertyNamingStrategy());
+        }
+
+        /**
+         * Creates a mapping property naming strategy with explicit fallback strategy.
+         * 
+         * @param mapping the mapping of field names to json fields
+         * @param fallback the fallback strategy
+         */
+        public MappingPropertyNamingStrategy(Map<String, String> mapping, PropertyNamingStrategy fallback) {
+            this.fallback = fallback;
+            this.mapping = mapping;
+        }
+
+        @Override
+        public String nameForConstructorParameter(MapperConfig<?> config, AnnotatedParameter ctorParam,
+            String defaultName) {
+            return fallback.nameForConstructorParameter(config, ctorParam, defaultName);
+        }
+        
+        @Override
+        public String nameForField(MapperConfig<?> config, AnnotatedField field, String defaultName) {
+            String result = field.getName();
+            //String result = mapping.get(field.getName());
+            if (result == null) {
+                result = fallback.nameForField(config, field, defaultName);
+            }
+            return result;
+        }
+
+        @Override
+        public String nameForGetterMethod(MapperConfig<?> config, AnnotatedMethod method, String defaultName) {
+            String fieldName = method.getName();
+            if (fieldName.startsWith("get")) {
+                fieldName = fieldName.substring(3);
+            }
+            String result = mapping.get(fieldName);
+            if (result == null) {
+                result = fallback.nameForGetterMethod(config, method, defaultName);
+            }
+            return result;
+        }
+        
+        @Override
+        public String nameForSetterMethod(MapperConfig<?> config, AnnotatedMethod method, String defaultName) {
+            String fieldName = method.getName();
+            if (fieldName.startsWith("set")) {
+                fieldName = fieldName.substring(3);
+            }
+            String result = mapping.get(fieldName);
+            if (result == null) {
+                result = fallback.nameForSetterMethod(config, method, defaultName);
+            }
+            return result;
+        }
+        
+    }
     
     /**
      * Configures a Jackson object mapper for IIP conventions.
@@ -325,6 +409,25 @@ public class JsonUtils {
      */
     public static ObjectMapper defineOptionals(ObjectMapper mapper, Class<?> cls, String... fieldNames) {
         return mapper.addHandler(new OptionalFieldsDeserializationProblemHandler(cls, fieldNames));
+    }
+
+    /**
+     * Defines a mapping of JSON names to Java field names using exactly the given names.
+     * 
+     * @param mapper the mapper to define the optionals on
+     * @param fieldNames the field names (names of JSON/Java fields)
+     * @return {@code mapper}
+     */
+    public static ObjectMapper defineFields(ObjectMapper mapper, String... fieldNames) {
+        Map<String, String> mapping = new HashMap<>();
+        for (String fn : fieldNames) {
+            String javaField = fn;
+            if (javaField.length() > 0) {
+                javaField = Character.toUpperCase(javaField.charAt(0)) + javaField.substring(1);
+            }
+            mapping.put(javaField, fn);
+        }
+        return mapper.setPropertyNamingStrategy(new MappingPropertyNamingStrategy(mapping));
     }
 
 }

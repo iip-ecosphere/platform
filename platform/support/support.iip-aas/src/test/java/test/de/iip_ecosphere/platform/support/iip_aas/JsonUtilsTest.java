@@ -210,5 +210,52 @@ public class JsonUtilsTest {
         Assert.assertNotNull(test);
         Assert.assertEquals(abc.getValue(), test.getValue());
     }
+    
+    // checkstyle: checkstyle: stop names check
+    
+    /**
+     * Json class as it would be generated for 
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    static class PropertyData {
+        private int INTVALUE = 5;
+        private String stringVAlue;
+        
+        public int getINTVALUE() {
+            return INTVALUE;
+        }
+
+        public String getStringVAlue() {
+            return stringVAlue;
+        }
+
+        public void setINTVALUE(int INTVALUE) {
+            this.INTVALUE = INTVALUE;
+        }
+
+        public void setStringVAlue(String stringVAlue) {
+            this.stringVAlue = stringVAlue;
+        }
+
+    }
+
+    // checkstyle: checkstyle: resume names check
+
+    /**
+     * Tests the mapping property naming strategy.
+     * 
+     * @throws JsonProcessingException shall not occur
+     */
+    @Test
+    public void testPropertyNaming() throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        String str = "{\"INTVALUE\":1, \"stringVAlue\":\"abba\"}";
+        JsonUtils.defineFields(objectMapper, "INTVALUE", "stringVAlue");
+        PropertyData test = objectMapper.readValue(str, PropertyData.class);
+        Assert.assertNotNull(test);
+        Assert.assertEquals(1, test.getINTVALUE());
+        Assert.assertEquals("abba", test.getStringVAlue());
+    }
 
 }
