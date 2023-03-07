@@ -51,6 +51,7 @@ public class PlatformAas implements AasContributor {
     public static final String NAME_COLL_KNOWN_SERVICES = "KnownServices";
     public static final String NAME_PROP_ID = "id";
     public static final String NAME_PROP_NAME = "name";
+    public static final String NAME_PROP_DESCRIPTION = "description";
     public static final String NAME_PROP_URI = "uri";
     
     public static final String NAME_OPERATION_DEPLOY = "deployPlan";
@@ -246,6 +247,9 @@ public class PlatformAas implements AasContributor {
                     .build();
                 dBuilder.createPropertyBuilder(NAME_PROP_NAME)
                     .setValue(Type.STRING, art.getName())
+                    .build();
+                dBuilder.createPropertyBuilder(NAME_PROP_DESCRIPTION)
+                    .setValue(Type.STRING, art.getDescription())
                     .build();
                 dBuilder.createPropertyBuilder(NAME_PROP_URI)
                     .setValue(Type.STRING, art.getAccessUri().toString())
