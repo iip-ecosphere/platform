@@ -18,10 +18,14 @@ import java.util.Set;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationConfig;
 import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
+import com.fasterxml.jackson.databind.module.SimpleAbstractTypeResolver;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.iip_aas.config.ServerAddressHolder;
@@ -33,6 +37,36 @@ import de.iip_ecosphere.platform.support.iip_aas.config.ServerAddressHolder;
  * @author Lemur Project (<a href="http://lemurproject.org/galago-license">BSD License</a>) 
  */
 public class JsonUtils {
+
+    /**
+     * A type resolver for "Impl" classes in "iip.".
+     */
+    public static final SimpleAbstractTypeResolver IIP_TYPE_RESOLVER = new SimpleAbstractTypeResolver() {
+        
+        private static final long serialVersionUID = -3746467806797935401L;
+        // no instance data here
+
+        @Override
+        public JavaType findTypeMapping(DeserializationConfig config, JavaType type) {
+            JavaType result = null;
+            // for generated IIP-Ecosphere data interfaces, we can try it with Impl classes
+            String className = type.getRawClass().getName();
+            if (type.isInterface() && className.startsWith("iip.")) {
+                String name = className + "Impl";
+                try {
+                    Class<?> cls = Class.forName(name);
+                    result = config.getTypeFactory().constructType(cls);
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (null == result) {
+                result = super.findTypeMapping(config, type);
+            }
+            return result;
+        }
+            
+    };
 
     /**
      * Reads a {@link ServerAddress} from a JSON string.
@@ -270,14 +304,27 @@ public class JsonUtils {
     }
     
     /**
+     * Configures a Jackson object mapper for IIP conventions.
+     * 
+     * @param mapper the mapper to be configured
+     * @return {@code mapper}
+     */
+    public static ObjectMapper handleIipDataClasses(ObjectMapper mapper) {
+        SimpleModule iipModule = new SimpleModule();
+        iipModule.setAbstractTypes(IIP_TYPE_RESOLVER);
+        return mapper.registerModule(iipModule);
+    }
+    
+    /**
      * Defines the given {@code fieldNames} as optional during deserialization.
      * 
      * @param mapper the mapper to define the optionals on
      * @param cls the cls the class {@code fieldNames} are member of
      * @param fieldNames the field names (names of Java fields)
+     * @return {@code mapper}
      */
-    public static void defineOptionals(ObjectMapper mapper, Class<?> cls, String... fieldNames) {
-        mapper.addHandler(new OptionalFieldsDeserializationProblemHandler(cls, fieldNames));
+    public static ObjectMapper defineOptionals(ObjectMapper mapper, Class<?> cls, String... fieldNames) {
+        return mapper.addHandler(new OptionalFieldsDeserializationProblemHandler(cls, fieldNames));
     }
 
 }
