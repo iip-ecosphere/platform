@@ -1,35 +1,38 @@
-<nav mat-tab-nav-bar style="background: RGB(35, 142, 183);">
-  <div *ngIf="serviceMeshes">
-    <span *ngFor="let mesh of serviceMeshes.value">
-      <a mat-tab-link (click)="selectMesh(mesh.idShort)"> {{mesh.idShort}} </a>
-    </span>
-  </div>
-</nav>
+<div class="outermost-container">
+  <nav mat-tab-nav-bar style="background: RGB(35, 142, 183);">
+    <div *ngIf="serviceMeshes">
+      <span *ngFor="let mesh of serviceMeshes.value">
+        <span *ngIf="mesh.idShort != 'metaState' && mesh.idShort != 'metaType'">
+          <a mat-tab-link (click)="selectMesh(mesh.idShort)"> {{mesh.idShort}} </a>
+        </span>
+      </span>
+    </div>
+  </nav>
 
-<mat-drawer-container class="container">
-  <mat-drawer mode="side" opened >
+  <div class="outer-container">
     <div class="inner-toolbar">
       <h1>Services</h1>
-      <div *ngIf="services && services.value" class="toolbar">
-        <mat-card *ngFor="let service of services.value">
-          <mat-card-title *ngIf="service.idShort">{{ service.idShort }}</mat-card-title>
-          <mat-card-content>
-            <div *ngIf="service.idShort != 'metaState' && service.idShort != 'metaType'">
+      <div *ngIf="servicesLoading">Loading...</div>
+      <div *ngIf="services && services.value">
+        <div *ngFor="let service of services.value">
+          <mat-card *ngIf="service.idShort != 'metaState' && service.idShort != 'metaType'" class="element" >
+            <mat-card-title *ngIf="service.idShort">{{ service.idShort }}</mat-card-title>
+            <mat-card-content>
               <div *ngFor="let property of service.value">
-                <span *ngIf="property.idShort === 'kind' || property.idShort === 'name' || property.idShort === 'ver' || property.idShort === 'type'"> {{property.idShort}}:
-                  <span *ngIf="property.value">{{property.value}}
-                  </span>
-                </span>
+                <p *ngIf="displayAttribute(property.idShort)" class="attribute"> {{property.idShort}}:
+                  <span *ngIf="property.value">{{property.value}}</span>
+                </p>
               </div>
-            </div>
-          </mat-card-content>
-        </mat-card>
+            </mat-card-content>
+          </mat-card>
+        </div>
       </div>
     </div>
-  </mat-drawer>
-  <mat-drawer-content class="content">
-    <div id="drawflow"></div>
-    <button mat-raised-button class="button" (click)="zoomIn()">Zoom In</button>
-    <button mat-raised-button class="button" (click)="zoomOut()">Zoom Out</button>
-  </mat-drawer-content>
-</mat-drawer-container>
+    <div class="drawflow-container">
+      <div id="drawflow"></div>
+      <button mat-raised-button class="button" (click)="zoomIn()">Zoom In</button>
+      <button mat-raised-button class="button" (click)="zoomOut()">Zoom Out</button>
+    </div>
+  </div>
+</div>
+

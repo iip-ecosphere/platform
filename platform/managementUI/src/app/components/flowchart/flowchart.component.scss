@@ -1,44 +1,43 @@
-.node {
-  align-items: center;
-  text-align: center;
-  position: absolute;
-  z-index: 2;
-  display: flex;
-  background: grey;
-  color: black;
-  border: 1px;
-  border-radius: 2;
-  min-height: 20px;
-  width: auto;
-  min-width: 60px;
-  padding-top: 5px;
-  padding-bottom: 5px;
-}
-
-.container {
-  margin: 0;
-  position: fixed;
-  height: 100%;
-  min-height: 100%;
+html, body {
+  overflow-y: hidden;
+  height:100%;
   width: 100%;
-  min-width: 100%;
-
 }
 
-.toolbar {
-  margin: 0;
-  width: 25%;
-  height: 100%;
+.outermost-container {
+  overflow-y: hidden;
+  overflow-x: hidden;
+  height:100%;
+  width:100%;
+  position:fixed;
 }
 
 .inner-toolbar {
-  margin:0.3em;
-  padding:2em;
   overflow-y: scroll;
-  overflow-x:scroll;
+  overflow-x: hidden;
+  flex-wrap: wrap;
+  position: relative;
+  width: 33%;
+  max-width: 40%;
 }
 
-.content {
-  width: 75%;
-  height: 100%;
+.outer-container {
+  display: flex;
+  justify-content: stretch;
+  overflow-y: hidden;
+  height:100%
+}
+
+.drawflow-container {
+  position:relative;
+  width: 100%;
+}
+
+.element {
+  margin-bottom: 0.5em;
+}
+
+.attribute {
+  margin: 1px, 1px;
+  padding: 1px, 1px;
 }
