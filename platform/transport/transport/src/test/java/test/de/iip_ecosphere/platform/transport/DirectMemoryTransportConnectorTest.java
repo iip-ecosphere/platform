@@ -12,7 +12,10 @@ package test.de.iip_ecosphere.platform.transport;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -20,7 +23,9 @@ import org.junit.Test;
 
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.ServerAddress;
+import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.jsl.ExcludeFirst;
+import de.iip_ecosphere.platform.transport.AppIntercom;
 import de.iip_ecosphere.platform.transport.DefaultTransportFactoryDescriptor;
 import de.iip_ecosphere.platform.transport.Transport;
 import de.iip_ecosphere.platform.transport.TransportFactory;
@@ -321,8 +326,23 @@ public class DirectMemoryTransportConnectorTest {
         Transport.sendServiceStatus(ActionTypes.REMOVED, "Service-1");
         Transport.sendServiceArtifactStatus(ActionTypes.REMOVED, "ServiceArtifact-1");
         Transport.sendTraceRecord(new TraceRecord("src", "act", null));
+        
+        try {
+            Set<String> data = new HashSet<>();
+            AppIntercom<String> intercom = new AppIntercom<>(d->data.add(d), String.class);
+            intercom.start();
+            intercom.asyncSend("async");
+            intercom.syncSend("sync");
+            intercom.stop();
+            TimeUtils.sleep(1000); // asyncSend
+            // TODO asserts
+        } catch (ExecutionException e) {
+            Assert.fail("Exception thrown: " + e);
+        }
+
         Transport.releaseConnector(); // prevent reconnects by default
         Transport.sendResourceStatus(ActionTypes.ADDED); // shall not be sent/received
+
         factoryUseDmcAsTransport = false;
         Assert.assertEquals(4, statusReceivedCount.get());
         Assert.assertEquals(1, traceReceivedCount.get());
