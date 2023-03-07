@@ -79,6 +79,7 @@ export class DeploymentPlansComponent implements OnInit {
   }
 
   //this method gets called multiple times when the select in the template is clicked, this is not desired
+  //select is currently not in use
   public getName(plan: ResourceAttribute[]) {
     // console.log(plan);
     let name: any = plan.find(item => item.idShort === 'name');
@@ -90,15 +91,15 @@ export class DeploymentPlansComponent implements OnInit {
     return name;
   }
 
-  public getDesc(plan: ResourceAttribute[]) {
-    // console.log(plan);
-    let name: any = plan.find(item => item.idShort === 'description');
-    if(!name) {
-      name = ''
-    } else {
-      name = name.value;
-    }
-    return name;
-  }
+  // public getDesc(plan: ResourceAttribute[]) {
+  //   // console.log(plan);
+  //   let name: any = plan.find(item => item.idShort === 'description');
+  //   if(!name) {
+  //     name = ''
+  //   } else {
+  //     name = name.value;
+  //   }
+  //   return name;
+  // }
 
 }

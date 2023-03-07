@@ -1,9 +1,25 @@
 .container {
   display: flex;
-  align-items: center;
+  flex-direction: row;
+  justify-content: space-between;
+
   color: black;
 }
 
 .mat-divider {
   border-top-color: rgb(0, 0, 0);
+}
+
+.description {
+  font-size: small;
+  justify-content: flex-start;
+}
+
+.buttons {
+  justify-content: flex-end;
+}
+
+.name {
+  font-size: medium;
+  justify-content: flex-start;
 }
