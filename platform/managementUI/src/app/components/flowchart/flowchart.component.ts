@@ -17,10 +17,16 @@ export class FlowchartComponent implements OnInit {
   editor: any;
   services: any;
   serviceMeshes: any;
+  private displayAttributes = ['kind', 'name', 'ver', 'type'];
+
+  servicesLoading = true;
 
 
   async ngOnInit() {
     this.services = await this.df.getServices();
+    if(this.services) {
+      this.servicesLoading = false;
+    }
     this.serviceMeshes = await this.df.getServiceMeshes();
     console.log(this.services);
 
@@ -72,6 +78,14 @@ export class FlowchartComponent implements OnInit {
 
   public selectMesh(mesh: string) {
     this.getGraph(mesh);
+  }
+
+  public displayAttribute(attribute: string) {
+    let contains = false;
+    if(this.displayAttributes.includes(attribute)){
+      contains = true;
+    }
+    return contains;
   }
 
 }
