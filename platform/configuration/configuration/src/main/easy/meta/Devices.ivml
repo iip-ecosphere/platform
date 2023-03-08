@@ -163,7 +163,17 @@ project Devices {
         refTo(EcsDevice) type;
     }
     
-    EcsDevice defaultDeviceType = {};
+    EcsDevice defaultDeviceType = {
+        id = "default/x86/64 bit",
+        containerName = "",
+        cpu = CpuArchitecture::x86,
+        bits = CpuBits::bit64,
+        provides = {},
+        requiredModules = {},
+        containerType = ContainerType::Ecs_Svc_App, // let's see
+        containerArguments = {},
+        containerName = ""
+    };
     
     Constraint ecsDeviceNamesUnique = allInstances(EcsDevice)->isUnique(d|d.id);
     Constraint ecsDeviceContainerNamesUnique = allInstances(EcsDevice)->isUnique(d|d.containerName);

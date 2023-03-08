@@ -56,6 +56,7 @@ public class MockingConnectorServiceWrapper<O, I, CO, CI> extends ConnectorServi
     private DataRunnable dataRunnable;
     private CachingStrategy cachingStrategy;
     private IOIterator<? extends CO> triggerIterator;
+    private String[] fieldNames;
     
     /**
      * Creates a service wrapper instance.
@@ -63,12 +64,14 @@ public class MockingConnectorServiceWrapper<O, I, CO, CI> extends ConnectorServi
      * @param yaml the service information as read from YAML
      * @param connector the connector instance to wrap
      * @param connParamSupplier the connector parameter supplier for connecting the underlying connector
+     * @param fieldNames explicit field names to be used as they are for JSON-Java mapping
      */
     @SuppressWarnings("unchecked")
     public MockingConnectorServiceWrapper(YamlService yaml, Connector<O, I, CO, CI> connector, 
-        Supplier<ConnectorParameter> connParamSupplier) {
+        Supplier<ConnectorParameter> connParamSupplier, String... fieldNames) {
         super(yaml, connector, connParamSupplier);
         this.connParamSupplier = connParamSupplier;
+        this.fieldNames = fieldNames;
         cachingStrategy = CachingStrategy.createInstance(connector.getCachingStrategyCls());
         cachingStrategy.setCacheMode(connParamSupplier.get().getCacheMode());
         connectorOutType = connector.getConnectorOutputType();
@@ -253,7 +256,7 @@ public class MockingConnectorServiceWrapper<O, I, CO, CI> extends ConnectorServi
      * @param data the last data
      */
     public void emitData(CI data) {
-        System.out.println(data);
+        System.out.println("Connector " + getId() + ": " + data);
     }
     
     /**
@@ -271,7 +274,7 @@ public class MockingConnectorServiceWrapper<O, I, CO, CI> extends ConnectorServi
             LoggerFactory.getLogger(getClass()).info("Opening trigger resource: {}", fileName);
             try {
                 triggerIterator = DataMapper.mapJsonDataToIterator(getDataStream(fileName), 
-                    DataMapper.createBaseDataUnitClass(connectorOutType));
+                    DataMapper.createBaseDataUnitClass(connectorOutType), fieldNames);
             } catch (IOException e) {
                 LoggerFactory.getLogger(getClass()).error("While opening trigger resource {}: {}", 
                     fileName, e.getMessage());
