@@ -2,6 +2,7 @@
 <h1 *ngIf="data"> {{ data.idShort }}</h1>
 <br>
 
+
 <!-- <mat-list role="list" *ngIf="submodelElements">
   <mat-list-item role="listitem" *ngFor="let item of submodelElements" style="color: black;">
     {{item.idShort}}
@@ -26,8 +27,12 @@
     <div class="item">
       <div class="text">{{item.idShort}}</div>
       <div class ="buttons">
-        <button mat-raised-button style="background-color: rgb(255,204,0)"  (click)="edit(item)">edit</button>
-        <button mat-raised-button style="background-color: rgb(255, 60, 0)" (click)="del(item)">delete</button>
+        <button
+          mat-raised-button style="background-color: rgb(255,204,0)"
+          (click)="edit(item)">edit</button>
+        <button
+          mat-raised-button style="background-color: rgb(255, 60, 0)"
+          (click)="del(item)">delete</button>
       </div>
     </div>
     <mat-divider></mat-divider>
