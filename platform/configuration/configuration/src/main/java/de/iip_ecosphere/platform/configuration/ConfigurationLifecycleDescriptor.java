@@ -113,7 +113,11 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
 
         @Override
         public void error(String text) {
-            getLogger().error(text);
+            ConfigurationSetup setup = ConfigurationSetup.getSetup();
+            EasySetup eSetup = setup.getEasyProducer();
+            getLogger().error("{} [base: {} model: {} meta: {} cfg: {} gen: {} additional: {}]", text, eSetup.getBase(),
+                eSetup.getIvmlModelName(), eSetup.getIvmlMetaModelFolder(), eSetup.getIvmlConfigFolder(), 
+                eSetup.getGenTarget(), eSetup.getAdditionalIvmlFolders());
         }
 
         @Override
