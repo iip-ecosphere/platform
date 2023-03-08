@@ -1,24 +1,47 @@
 <p></p>
+<nav mat-tab-nav-bar style="background: RGB(203, 203, 203);">
+    <div *ngFor="let item of listTitles | keyvalue">
+      <span>
+        <a mat-tab-link style="color: RGB(97, 95, 96)" (click)="selectList(item.value)"> {{item.key}} </a>
+      </span>
+    </div>
+</nav>
+<!--
 <mat-list role="list">
   <mat-list-item role="listitem">
-    <button mat-raised-button class="button" (click)="selectList('EndpointAddress')">Setup</button>
+    <button
+      mat-raised-button class="button"
+      (click)="selectList('EndpointAddress')">Setup</button>
   </mat-list-item>
   <mat-list-item role="listitem">
-    <button mat-raised-button class="button" (click)="selectList('String')">Constants</button>
+    <button
+      mat-raised-button class="button"
+      (click)="selectList('String')">Constants</button>
   </mat-list-item>
   <mat-list-item role="listitem">
-    <button mat-raised-button class="button" (click)="selectList('PrimitiveType')">Types</button>
+    <button
+      mat-raised-button class="button"
+      (click)="selectList('RecordType')">Types</button>
   </mat-list-item>
   <mat-list-item role="listitem">
-    <button mat-raised-button class="button" (click)="selectList('Service')">Services</button>
+    <button
+      mat-raised-button class="button"
+      (click)="selectList('Service')">Services</button>
   </mat-list-item>
   <mat-list-item role="listitem">
-    <button mat-raised-button class="button" (click)="selectList('Servers')">Servers</button>
+    <button
+    mat-raised-button class="button"
+    (click)="selectList('Servers')">Servers</button>
   </mat-list-item>
   <mat-list-item role="listitem">
-    <button mat-raised-button class="button" (click)="selectList('ServiceMesh')">Meshes</button>
+    <button
+    mat-raised-button class="button"
+    (click)="selectList('ServiceMesh')">Meshes</button>
   </mat-list-item>
   <mat-list-item role="listitem">
-    <button mat-raised-button class="button" (click)="selectList('Application')">Applications</button>
+    <button
+    mat-raised-button class="button"
+    (click)="selectList('Application')">Applications</button>
   </mat-list-item>
 </mat-list>
+-->
