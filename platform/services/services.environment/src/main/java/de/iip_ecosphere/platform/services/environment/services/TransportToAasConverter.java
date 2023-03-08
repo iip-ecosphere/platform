@@ -350,7 +350,6 @@ public abstract class TransportToAasConverter<T> {
         // remove outdated ones
         long now = System.currentTimeMillis();
         if (now - lastCleanup > cleanupTimeout) {
-            LoggerFactory.getLogger(getClass()).info("Cleaning up Trace AAS.");
             long timestamp = now - timeout;
             Submodel sm = aas.getSubmodel(submodelIdShort);
             List<SubmodelElement> delete = new ArrayList<>();
