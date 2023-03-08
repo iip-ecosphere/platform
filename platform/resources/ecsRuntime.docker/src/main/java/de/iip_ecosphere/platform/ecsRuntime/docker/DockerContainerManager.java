@@ -479,6 +479,11 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
     }
 
     @Override
+    public String getRuntimeName() {
+        return "IIP-Ecosphere Docker ECS-Runtime"; // may override version to add docker/client version
+    }
+
+    @Override
     public String getContainerSystemVersion() {
         DockerContainerManager cm = (DockerContainerManager) EcsFactory.getContainerManager();
         DockerClient dockerClient = cm.getDockerClient();

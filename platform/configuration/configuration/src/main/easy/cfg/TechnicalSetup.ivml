@@ -1,6 +1,7 @@
 project TechnicalSetup {
 
     import IIPEcosphere;
+    import DataTypes; 
     import AllConstants;
 
     annotate BindingTime bindingTime = BindingTime::compile to .;
@@ -60,6 +61,11 @@ project TechnicalSetup {
     // ------------------------- UI -------------------------------
     
     // current default: no UI configured
+    
+    // ---------- generation setup ------------
+    
+    //setup instDir, javaExe if you plan to use the Linux service descriptors - list variables in freeze block
+    //setup modelBaseFile and (if required) modelName/configFolder to provide AAS access for the UI  - list variables in freeze block
 
     // ------------ freezing ------------------
     

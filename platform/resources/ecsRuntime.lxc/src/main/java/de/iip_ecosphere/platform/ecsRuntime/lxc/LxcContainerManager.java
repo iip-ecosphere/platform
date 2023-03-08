@@ -563,6 +563,11 @@ public class LxcContainerManager extends AbstractContainerManager<LxcContainerDe
     public String getContainerSystemName() {
         return "LXC";
     }
+    
+    @Override
+    public String getRuntimeName() {
+        return "IIP-Ecosphere LXC ECS-Runtime"; // may override version to add LXC/client version
+    }
 
     /**
      * Returns the ContainerSystemVersion.

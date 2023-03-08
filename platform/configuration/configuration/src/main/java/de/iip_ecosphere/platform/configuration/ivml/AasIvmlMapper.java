@@ -912,8 +912,8 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             builder.createPropertyBuilder(AasUtils.fixId(metaShortId.apply("type")))
                 .setValue(Type.STRING, IvmlDatatypeVisitor.getUnqualifiedType(varType))
                 .build();
-            if (var.getParent() instanceof net.ssehub.easy.varModel.confModel.Configuration) { // top-level only for now
-                String prjName = var.getDeclaration().getProject().getName();
+            if (var.getDeclaration().getParent() instanceof Project) { // top-level only for now
+                String prjName = var.getDeclaration().getParent().getName();
                 builder.createPropertyBuilder(AasUtils.fixId(metaShortId.apply("project")))
                     .setValue(Type.STRING, prjName)
                     .build();
