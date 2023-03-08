@@ -18,7 +18,7 @@ project IIPEcosphere {
     String metaModelFolder = "src/main/easy";
     String configFolder = null;
     String genTarget = "gen";
-    String modelName = "IIPEcosphere";
+    String modelName = "PlatformConfiguration";
     
     // legacy transition (to be removed)
     Boolean sharedInterfaces = false;
