@@ -656,7 +656,7 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
                  public ${type} to(String source) throws IOException {
                      try {
                          ObjectMapper objectMapper = new ObjectMapper();
-                         JacksonUtils.configureObjectMapper(objectMapper); // only if nested?
+                         JsonUtils.handleIipDataClasses(objectMapper); // only if nested?
                          return objectMapper.readValue(source, ${type}${getTypeAdd()}.class);
                      } catch (JsonProcessingException e) {
                          throw new IOException(e);
@@ -1137,6 +1137,7 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
         import de.iip_ecosphere.platform.support.identities.*;
         import de.iip_ecosphere.platform.support.resources.*;
         import de.iip_ecosphere.platform.support.iip_aas.*;
+        import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
         import de.iip_ecosphere.platform.transport.Transport;
         import de.iip_ecosphere.platform.transport.status.TraceRecord;
         import de.iip_ecosphere.platform.transport.serialization.*;

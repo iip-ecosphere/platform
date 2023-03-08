@@ -27,6 +27,12 @@ template JavaJsonSerializer(Configuration config, FileArtifact target, RecordTyp
             'JsonUtils.defineOptionals(${objectMapperVar}, ${typeName}.class, ${fieldList});'
         }
     }
+    
+    def defineJacksonTypeMapper(IIPEcosphere config) {
+        if (config.sharedInterfaces) {
+             'JsonUtils.handleIipDataClasses(objectMapper); // only if nested?'
+        }
+    }
 
     def main(Configuration config, FileArtifact target, RecordType type, String pkg, String typePkg, Boolean sharedInterfaces, Boolean impl) {
         String clsName = asTypeName(type.name);
@@ -43,7 +49,6 @@ template JavaJsonSerializer(Configuration config, FileArtifact target, RecordTyp
         import java.io.IOException;
         import de.iip_ecosphere.platform.transport.serialization.*;
         import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
-        import de.iip_ecosphere.platform.services.environment.JacksonUtils;
         ${importTypePackage(pkg, typePkg)}
         import com.fasterxml.jackson.databind.ObjectMapper;
         import com.fasterxml.jackson.core.JsonProcessingException;
@@ -59,7 +64,7 @@ template JavaJsonSerializer(Configuration config, FileArtifact target, RecordTyp
                 try {
                     ObjectMapper objectMapper = new ObjectMapper();
                     ${defineJacksonOptionals(type, "objectMapper", typeName)|e}
-                    JacksonUtils.configureObjectMapper(objectMapper); // only if nested?
+                    ${defineJacksonTypeMapper(config)|e}
                     return objectMapper.readValue(data, ${clsName}${add}.class);
                 } catch (JsonProcessingException e) {
                     throw new IOException(e);

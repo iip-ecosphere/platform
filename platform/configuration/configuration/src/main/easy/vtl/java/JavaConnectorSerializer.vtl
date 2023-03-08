@@ -13,6 +13,7 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
 
     // temporary
     String index = "";
+    sequenceOf(String) prVariableName = {"pr"};
     Integer nestedStepCount = 0;
     Boolean optionalFound = false;
     Boolean genFrom = false;
@@ -57,6 +58,7 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
             '${translateDataOperations(assng, imType, imVarName, pltfType, pltfVarName, done)}'
             mapOf(String, Field) mapping = {};
             mapSourcePaths(imType, mapping, imVarName);
+            optionalFound = false; // from now again in sequence until optional
             '${produceDataTransfer(pltfType, mapping, pltfVarName, imVarName, done, "", "")}'
         } else {
             ''
@@ -107,9 +109,9 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
            if (not(genFrom)) {
                p = substPathEx('"${p}"', topPath, "path");
                if (ix.length() > 0 and not(optionalFound)) {
-                   ex = "pr.${getOp}(${p}, ${ix})";
+                   ex = "${prVariableName.last()}.${getOp}(${p}, ${ix})";
                } else {
-                   ex = "pr.${getOp}(${p})";
+                   ex = "${prVariableName.last()}.${getOp}(${p})";
                }
            } else {
                ex = path + ".get" + asMethodNameSuffix(field.name) + "()";
@@ -130,6 +132,7 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
                 String tgtArrayEltTypeName = asTypeName(tgtArrayType.type.name);
                 String outerPrName = "prArray${arrayCount}";
                 String pathEx = substPathEx('"${src.name}"', topPath, "path");
+                prVariableName.add("prElement");
                 '${getParserResultType(parser)} ${outerPrName} = pr.stepInto(${pathEx}, ${suffixPath(indexes, ",")});
                 ${tgtArrayEltTypeName}[] ${arrayName} = new ${tgtArrayEltTypeName}[${outerPrName}.getArraySize()];
                 for (int i = 0, size = ${outerPrName}.getArraySize(); i < size; i++) {
@@ -139,6 +142,7 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
                     prElement.stepOut();
                 }
                 prArray${arrayCount}.stepOut();'
+                prVariableName.removeLast();
                 acc = arrayName;
             }
             if (tgt.type.isKindOf(RecordType)) {

@@ -194,10 +194,13 @@ public class DrawflowGraphFormat implements GraphFormat {
          */
         @SuppressWarnings("unchecked")
         private JSONObject writeEdges(Iterable<? extends IvmlGraphEdge> edges, boolean inputEdges) {
-            JSONArray conns = new JSONArray();
+            JSONObject result = new JSONObject();
+            String prefix = inputEdges ? "input_" : "output_";
             int count = 1;
             for (IvmlGraphEdge edge : edges) {
+                JSONObject input = new JSONObject();
                 JSONObject jEdge = new JSONObject();
+                JSONArray conns = new JSONArray();
                 IvmlGraphNode other;
                 if (inputEdges) {
                     other = edge.getStart();
@@ -209,12 +212,10 @@ public class DrawflowGraphFormat implements GraphFormat {
                 jEdge.put("node", node2id.get(other));
                 conns.add(jEdge);
                 count++;
+                input.put("connections", conns);
+                result.put(prefix + count, input);
             }
-            JSONObject input = new JSONObject();
-            input.put("connections", conns);
-            JSONObject inputs = new JSONObject();
-            inputs.put(inputEdges ? "input_1" : "output_1", input);
-            return inputs;
+            return result;
         }
 
     }

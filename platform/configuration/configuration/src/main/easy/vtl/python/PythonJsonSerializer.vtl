@@ -22,7 +22,8 @@ template PythonJsonSerializer(Configuration config, FileArtifact target, RecordT
         for key in o.__dict__:
             k = key[1:] # by generation convention
             tmp[k] = o.__dict__[key]
-        # treat recursively from RecordType
+        ${generateWriteTo(type)|e}
+        
         return tmp
     '
     }
@@ -34,6 +35,95 @@ template PythonJsonSerializer(Configuration config, FileArtifact target, RecordT
         } else {
             ''
         }
+    }
+
+    // dispatch basis
+    def generateImports(DataType type, Boolean top) {
+        ''
+    }
+    
+    def generateImports(RecordType type, Boolean top) {
+        for (Field f: type.fields) {
+            '${generateImports(f.type, false)|e}'
+        }
+        if (!top) {
+             String clsName = asTypeName(type.name);
+            'from datatypes.${clsName} import ${clsName}\n'
+            'from serializers.${clsName}Serializer import ${clsName}Serializer\n'
+        } else {
+            ''
+        }
+    }
+    
+    def generateReadFrom(RecordType type) {
+        for (Field f: type.fields) {
+            '${genReadFrom(f, f.type)|e}'
+        }
+    }
+
+    // dispatch basis
+    def genReadFrom(Field f, DataType type) {
+        ''
+    }
+
+    def genReadFrom(Field f, RecordType type) {
+        'if "_${f.name}" in tmp:
+            tmp["_${f.name}"] = ${asTypeName(type.name)}Serializer.readFrom${asTypeName(type.name)}(tmp["_${f.name}"])'
+    }
+
+    def generateWriteTo(RecordType type) {
+        for (Field f: type.fields) {
+            '${genWriteTo(f, f.type)|e}'
+        }
+    }
+
+    // dispatch basis
+    def genWriteTo(Field f, DataType type) {
+        ''
+    }
+
+    def genWriteTo(Field f, RecordType type) {
+        'if "_${f.name}" in tmp:
+            tmp["_${f.name}"] = ${asTypeName(type.name)}Serializer.writeTo${asTypeName(type.name)}(tmp["_${f.name}"])'
+    }
+    
+    def genReadFrom(String clsName) {
+        'def readFrom${clsName}(d: dict) -> ${clsName}:
+            """Turns a dict into an object of type ${clsName} for deep deserialization.
+            
+            Parameters:
+              - d -- dict
+            Returns:
+              ${clsName}
+                the object, may be None
+            """
+            if d is None:
+                return None
+            else:
+                result = ${clsName}()
+                for key in d:
+                    k = "_" + str(key) # by generation convention
+                    result.__dict__[k] = d[key]
+                return result'
+    }
+    
+    def genWriteTo(String clsName) {
+        'def writeTo${clsName}(o: ${clsName}) -> dict:
+            """Turns an object of type ${clsName} into a dict for serialization.
+            
+            Parameters:
+              - o -- the object, may be None
+            Returns:
+              dict
+                the dict, may be None
+            """
+            if o is None:
+                return None
+            else:
+                result = dict()
+                for key in o.__dict__:
+                    k = key[1:] # by generation convention
+                    result[k] = o.__dict__[key]'    
     }
 
     def main(Configuration config, FileArtifact target, RecordType type, Boolean sharedInterfaces) {
@@ -49,6 +139,7 @@ template PythonJsonSerializer(Configuration config, FileArtifact target, RecordT
         import Registry
         from datatypes.${clsName} import ${clsName}
         from datatypes.${clsName}Impl import ${clsName}Impl
+        ${generateImports(type, true)|e}
         
         ${encoder(clsName)}
         
@@ -73,11 +164,14 @@ template PythonJsonSerializer(Configuration config, FileArtifact target, RecordT
                 """
             
                 result = ${clsName}${add}()
-                tmp = json.loads(data)
-                for key in tmp:
+                jTmp = json.loads(data)
+                tmp = dict()
+                for key in jTmp:
                     k = "_" + str(key) # by generation convention
-                    result.__dict__[k] = tmp[key]
-                # treat recursively from RecordType
+                    tmp[k] = jTmp[key]
+                ${generateReadFrom(type)|e}
+                
+                result.__dict__ = tmp
                 return result
 
             def writeTo(self, source: ${clsName}) -> str:
@@ -92,6 +186,10 @@ template PythonJsonSerializer(Configuration config, FileArtifact target, RecordT
                 
                 return ${clsName}Encoder().encode(source).encode("UTF-8").decode()
                 
+            ${genReadFrom(clsName)}
+            
+            ${genWriteTo(clsName)}
+
         ${clsName}Serializer()'
     }
     

@@ -47,6 +47,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         IIPEcosphere cfg = config;
         setOf(RecordType) recordTypes = RecordType.allInstances();
         setOf(Application) applications = Application.allInstances();
+        sequenceOf(MeshElement) allElements = {};
         initUsedServiceTypes(applications);
         
         setOf(String) javaSerializersShared = {};
@@ -176,6 +177,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     appArtifact = appName + "-" + appVersion + "-bin.jar"; // currently not other packaging
                 }
                 generateDeploymentPlans(appRoot, cfg, a, elements, appArtifact);
+                allElements = allElements.union(elements);
             }
             
             Boolean withTemplate = true; // preliminary
@@ -229,6 +231,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 zip(appRoot, appRoot, "${target}/templates/eclipse/impl.${appName}.zip");
             }
         };
+        generateAllAppsContainers(config, allElements);
     }
     
     // dispatch basis
@@ -570,6 +573,9 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
             }
         }
         appImageId;
+    }
+    
+    generateAllAppsContainers(IIPEcosphere config, sequenceOf(MeshElement) allElements) = {
     }
     
     // ------------------------------------------ generating apps: nested, e.g., family ----------------------------------------------------------
