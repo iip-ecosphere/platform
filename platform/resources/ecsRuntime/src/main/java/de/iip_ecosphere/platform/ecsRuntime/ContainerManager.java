@@ -15,6 +15,8 @@ package de.iip_ecosphere.platform.ecsRuntime;
 import java.util.Collection;
 import java.util.Set;
 
+import de.iip_ecosphere.platform.support.iip_aas.IipVersion;
+
 /**
  * A service provider interface for managing containers in the IIP-Ecosphere platform. The interface is rather simple 
  * as it shall be usable through an AAS. The id of a container used here must not be identical to some 
@@ -46,4 +48,23 @@ public interface ContainerManager extends ContainerOperations {
      */
     public ContainerDescriptor getContainer(String id); 
         
+    /**
+     * Returns the version of this ECS runtime.
+     * 
+     * @return the version, by default the platform version
+     */
+    public default String getVersion() {
+        IipVersion versionInfo = IipVersion.getInstance();
+        return versionInfo.getVersion();
+    }
+
+    /**
+     * Returns the descriptive name of this ECS runtime.
+     * 
+     * @return the descriptive name
+     */
+    public default String getRuntimeName() {
+        return "IIP-Ecosphere default ECS-Runtime";
+    }
+
 }

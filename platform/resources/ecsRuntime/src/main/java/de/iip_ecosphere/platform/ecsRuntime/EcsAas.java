@@ -126,11 +126,11 @@ public class EcsAas implements AasContributor {
             .setValue(Type.INTEGER, sysM.getNumGpuCores())
             .build();
         jB.createPropertyBuilder(NAME_PROP_RUNTIME_NAME)
-            .setValue(Type.STRING, "defaultEcsRuntime")
+            .setValue(Type.STRING, mgr.getRuntimeName())
             .setSemanticId(Irdi.AAS_IRDI_PROPERTY_SOFTWARE_NAME)
             .build();
         jB.createPropertyBuilder(NAME_PROP_RUNTIME_VERSION)
-            .setValue(Type.INTEGER, 1)
+            .setValue(Type.STRING, mgr.getVersion())
             .setSemanticId(Irdi.AAS_IRDI_PROPERTY_SOFTWARE_VERSION)
             .build();
         jB.createPropertyBuilder(NAME_PROP_DEVICE_AAS)
