@@ -24,15 +24,22 @@ import java.util.function.Supplier;
 
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ser.FilterProvider;
+import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
+import de.iip_ecosphere.platform.transport.serialization.Serializer;
+import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry;
 import net.bytebuddy.ByteBuddy;
+import net.bytebuddy.description.annotation.AnnotationDescription;
 
 /**
  * Maps data from a stream to input instances for a service. This class is intended as a basis for testing (here 
@@ -98,14 +105,63 @@ public class DataMapper {
      * @return the created class
      */
     public static <T> Class<? extends T> createBaseDataUnitClass(Class<T> cls) {
-        return new ByteBuddy()
+        AnnotationDescription jsonFilter = AnnotationDescription.Latent.Builder.ofType(JsonFilter.class)
+            .define("value", "iipFilter").build();
+        Class<? extends T> result = new ByteBuddy()
             .subclass(cls)
             .implement(BaseDataUnitFunctions.class)
+            .annotateType(jsonFilter)
             .defineProperty("$period", Integer.TYPE)
             .defineProperty("$repeats", Integer.TYPE)
             .make()
             .load(MockingConnectorServiceWrapper.class.getClassLoader())
             .getLoaded();
+        
+        // and we need an ad-hoch serializer that represents the new type and behaves as the existing type
+        final Serializer<T> ser = SerializerRegistry.getSerializer(cls);
+        if (null != ser) {
+            Serializer<T> newSer = new Serializer<T>() {
+
+                @Override
+                public T from(byte[] data) throws IOException {
+                    try {
+                        ObjectMapper objectMapper = new ObjectMapper();
+                        JsonUtils.handleIipDataClasses(objectMapper); // only if nested?
+                        return objectMapper.readValue(data, cls);
+                    } catch (JsonProcessingException e) {
+                        throw new IOException(e);
+                    }
+                }
+
+                @Override
+                public byte[] to(T source) throws IOException {
+                    try {
+                        ObjectMapper objectMapper = new ObjectMapper();
+                        SimpleBeanPropertyFilter theFilter = SimpleBeanPropertyFilter
+                            .serializeAllExcept("$period", "$repeats");
+                        FilterProvider filters = new SimpleFilterProvider()
+                            .addFilter("iipFilter", theFilter);
+                        return objectMapper.writer(filters).writeValueAsBytes(source);
+                    } catch (JsonProcessingException e) {
+                        throw new IOException(e);
+                    }
+                }
+
+                @Override
+                public T clone(T origin) throws IOException {
+                    return ser.clone(origin); // ignore additional fields
+                }
+
+                @SuppressWarnings("unchecked")
+                @Override
+                public Class<T> getType() {
+                    return (Class<T>) result;
+                }
+                
+            };
+            SerializerRegistry.registerSerializer(newSer);
+        }
+        return result;
     }
     
     /**

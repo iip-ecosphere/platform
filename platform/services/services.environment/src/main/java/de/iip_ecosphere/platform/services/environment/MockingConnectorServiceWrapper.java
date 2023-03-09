@@ -304,7 +304,7 @@ public class MockingConnectorServiceWrapper<O, I, CO, CI> extends ConnectorServi
                 }
                 LoggerFactory.getLogger(getClass()).info("Mocking data processed for {}, stopping trigger.", getId());
             } catch (IOException e) {
-                LoggerFactory.getLogger(getClass()).error("While processing trigger: {}", 
+                LoggerFactory.getLogger(getClass()).error("While processing trigger on {}: {}", 
                     fileName, e.getMessage());
             }
         } else {
