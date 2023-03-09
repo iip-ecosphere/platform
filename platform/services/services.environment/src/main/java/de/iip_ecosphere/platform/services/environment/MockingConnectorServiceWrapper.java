@@ -290,6 +290,8 @@ public class MockingConnectorServiceWrapper<O, I, CO, CI> extends ConnectorServi
                     boolean once = bduf.get$repeats() == 0;
                     int count = 0;
                     while (endless || once || count < bduf.get$repeats()) {
+                        LoggerFactory.getLogger(getClass()).info("Ingesting data for {} "
+                            + "[endless {}, once {}, count {}]: {}", getId(), endless, once, count, next);
                         handleReceived(next, 0);
                         period = bduf.get$period();
                         if (period > 0) {
@@ -301,6 +303,7 @@ public class MockingConnectorServiceWrapper<O, I, CO, CI> extends ConnectorServi
                         }
                     }
                 }
+                LoggerFactory.getLogger(getClass()).info("Mocking data processed for {}, stopping trigger.", getId());
             } catch (IOException e) {
                 LoggerFactory.getLogger(getClass()).error("While processing trigger: {}", 
                     fileName, e.getMessage());
