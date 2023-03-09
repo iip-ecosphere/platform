@@ -144,8 +144,7 @@ public class MockingConnectorServiceWrapper<O, I, CO, CI> extends ConnectorServi
                 param.getKeystoreKey());
         }
         // setup mock output
-        int notifInterval = enableNotifications ? 0 : param.getNotificationInterval();
-        DataMapper.mapJsonData(getDataStream(fileName), connectorOutType, d -> handleReceived(d, notifInterval));
+        trigger();
     }
     
     /**
@@ -280,7 +279,7 @@ public class MockingConnectorServiceWrapper<O, I, CO, CI> extends ConnectorServi
                     fileName, e.getMessage());
             }
         }
-        if (null != triggerIterator) {
+        if (null != triggerIterator) { // trigger would overlap with 
             int period = 0;            
             try {
                 while (triggerIterator.hasNext()) {
