@@ -449,10 +449,11 @@ public class SpringCloudServiceManager
                             }
                             if (o instanceof de.iip_ecosphere.platform.support.Server) {
                                 ServerWrapper sv = new ServerWrapper((de.iip_ecosphere.platform.support.Server) o);
+                                sv.start();
                                 setStateSafe(s, ServiceState.STARTING);
+                                LOGGER.info("Starting server {} ", id);
                                 ServerAddress adr = new ServerAddress(Schema.IGNORE, myHost, ser.getPort());
                                 adr = netClient.reservePort(id, adr);
-                                sv.start();
                                 runningServers.put(s, sv);
                                 setStateSafe(s, ServiceState.RUNNING);
                                 LOGGER.info("Started server {} ", id);
