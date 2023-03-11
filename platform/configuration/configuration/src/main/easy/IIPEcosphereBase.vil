@@ -8,8 +8,6 @@ vilScript IIPEcosphereBase (Project source, Configuration config, Project target
 
     // preliminary!!! make it language-generic
 
-    Boolean mvnUpdate = false; // shall we go for -U in general?
-
     // java packages, turned to paths below
     String javaDatatypesPackage = "iip.datatypes";
     String javaSerializersPackage = "iip.serializers";
@@ -103,8 +101,20 @@ vilScript IIPEcosphereBase (Project source, Configuration config, Project target
     // ---------------------------- maven -----------------------------------
     
     mvn(Path path) = {
-        // TODO consider iip.easy.mvnArgs, split into List and add as second argument when instantiator is updated
-        maven("${path}", mvnUpdate);
+        sequenceOf(String) args = getProperty("iip.easy.mvnArgs", "")
+            .split(",")->reject(s|s.trim().length()==0);
+        maven("${path}", args, false);
+    }
+    
+    setOf(Application) getApplications() = {
+        setOf(String) selectedApplications = getProperty("iip.easy.apps", "")
+            .split(",")->reject(s|s.trim().length()==0) // for "" the result will be "", prune this
+            .toSet();
+        setOf(Application) applications = Application.allInstances();
+        if (selectedApplications.size() > 0) {
+            applications = applications->select(a|selectedApplications.includes(a.id));
+        }
+        applications;        
     }
 
 }

@@ -45,7 +45,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     protected generateApps(Project source, Configuration config, Project target, Boolean apps, Boolean noDeps) = {
         IIPEcosphere cfg = config;
         setOf(RecordType) recordTypes = RecordType.allInstances();
-        setOf(Application) applications = Application.allInstances();
+        setOf(Application) applications = getApplications();
         sequenceOf(MeshElement) allElements = {};
         initUsedServiceTypes(applications);
         
@@ -661,7 +661,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     
     generateSharedInterfaces(Configuration config, Project target, setOf(String) javaSerializers, setOf(String) artifacts) = {
         IIPEcosphere cfg = config;
-        setOf(Application) applications = Application.allInstances();
+        setOf(Application) applications = Application.allInstances(); // do not prune here, keep interfaces stable
         initUsedServiceTypes(applications);        
         Path appRoot = "${target}/ApplicationInterfaces";
         appRoot.mkdir();
