@@ -59,6 +59,9 @@ public abstract class AbstractConfigurationMojo extends AbstractMojo {
     @Parameter(property = "configuration.adjustOutputDirectoryIfGenBroker", required = false, defaultValue = "trues")
     private boolean adjustOutputDirectoryIfGenBroker;
 
+    @Parameter(property = "configuration.apps", required = false, defaultValue = "")
+    private String apps;
+
     // different name, hook up with unpack
     @Parameter(property = "unpack.force", required = false, defaultValue = "false") 
     private boolean unpackForce;
@@ -276,7 +279,7 @@ public abstract class AbstractConfigurationMojo extends AbstractMojo {
     protected boolean enableRun(String modelDir, String outputDir) {
         return modelNewerThanOut(modelDir, outputDir);
     }
-    
+
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         System.setProperty(PlatformInstantiator.KEY_PROPERTY_TRACING, getTracingLevel());

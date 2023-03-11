@@ -26,7 +26,7 @@ import de.iip_ecosphere.platform.configuration.PlatformInstantiator;
 public abstract class AbstractAppsConfigurationMojo extends AbstractConfigurationMojo {
 
     @Parameter(property = "configuration.apps", required = false, defaultValue = "")
-    private String apps;
+    private String apps = "";
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
