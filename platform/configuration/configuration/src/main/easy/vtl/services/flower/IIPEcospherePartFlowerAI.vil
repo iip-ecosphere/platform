@@ -1,0 +1,22 @@
+import JavaBasics;
+import JavaMapping;
+import Basics;
+import MeshBasics;
+import IIPEcosphereBase;
+
+@advice(IIPEcosphere)
+vilScript IIPEcospherePartFlowerAi (Project source, Configuration config, Project target) {
+
+    generateTemplateElements(Path appRoot, Configuration config, FlowerFederatedAiServer server, setOf(String) assemblies) = {
+        String clsName = asTypeName(server.id);
+        vilTemplateProcessor("PythonServer", config, "${appRoot}/src/main/python/services/${clsName}Server.py", server=server, pkg="services");
+        vilTemplateProcessor("TemplatesFlowerConfig", config, "${appRoot}/src/main/python/services/flowers/config.ini", server=server);
+        vilTemplateProcessor("PythonFlowerServerStrategy", config, "${appRoot}/src/main/python/services/flowers/Strategy.py");
+        vilTemplateProcessor("PythonFlowerServerClient", config, "${appRoot}/src/main/python/services/flowers/Client.py");        
+        Path assemblyPath = "${appRoot}/src/main/assembly";
+        assemblyPath.mkdir();
+        vilTemplateProcessor("PythonAssemblyTemplate", config, "${assemblyPath}/python.xml");
+        assemblies.add("python|${mvnProjectBaseDir}/${assemblyRel}/python.xml|package|${mvnProjectBuildDir}/classes|");
+    } 
+    
+}

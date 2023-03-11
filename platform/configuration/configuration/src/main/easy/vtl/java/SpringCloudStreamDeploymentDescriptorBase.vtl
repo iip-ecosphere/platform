@@ -477,6 +477,7 @@ template SpringCloudStreamDeploymentDescriptorBase(Configuration config, FileArt
         String id = toFolderName(server.id);
         'artifacts:
           - /python_${id}.zip
+        netMgtKey: ${server.id}
         cmdArg:
           - --mode
           - console

@@ -210,6 +210,11 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                         elements.add(no);
                     }
                 }
+
+                for(Server s : a.servers) {
+                    generateTemplateElements(appRoot, config, s, assemblies);
+                }
+
                 elements = elements->sortedBy(n|n.name).toSequence(); // for testing
                 sequenceOf(MeshElement) pythonElements = elements->select(e|e.impl.isKindOf(PythonService));
                 if (pythonElements.size() > 0) {
@@ -299,6 +304,11 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     initUsedServiceTypeImpl(ServiceBase service) = {
         String name = service.getType(); // converts to strings, VIL/VTL types are not hash-compatible 
         usedServiceTypes.add(name);
+        if (service.isKindOf(JavaService)) { // keep basic types
+            usedServiceTypes.add("JavaService");
+        } else if (service.isKindOf(PythonService)) { // keep basic types
+            usedServiceTypes.add("PythonService");
+        }
     }
 
     initUsedServiceType(ServiceFamily family) = {
@@ -314,6 +324,14 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     }
 
     generateTemplateElements(Path appRoot, Configuration config, MeshElement no, CompleteService service, setOf(String) assemblies, setOf(String) javaTests) = {
+        // do nothing, everything is here already generically in place
+    }
+
+    generateTemplateElements(Path appRoot, Configuration config, Server server, setOf(String) assemblies) = {
+        // do nothing, everything is here already generically in place
+    }
+    
+    generateTemplateElements(Path appRoot, Configuration config, PythonServer server, setOf(String) assemblies) = {
         // do nothing, everything is here already generically in place
     }
 

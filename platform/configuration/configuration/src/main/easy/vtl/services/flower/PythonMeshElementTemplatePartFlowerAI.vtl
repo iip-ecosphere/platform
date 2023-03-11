@@ -5,32 +5,28 @@ import MeshBasics;
 @indent(indentation = 4, additional = 0)
 template PythonMeshElementTemplatePartFlowerAI(Configuration config, FileArtifact target, MeshElement elt, String pkg) {
 
-    /*
-    def generateSourceMethodImpl(FlowerFederatedAiService service) {
-        '#TODO add your code here'
-    }
-    
     def generateAsyncProcessorInMethodImpl(FlowerFederatedAiService service) {
-        '#create result instance and call self.ingest(data)
-        raise NotImplementedError'
+        '#self.IP = Service.getNetMgtKeyAddress()
+        client = Client()
+        fl.client.start_numpy_client(server_address=self.IP ,client=client)'
     } 
     
     def generateSyncProcessorMethodImpl(FlowerFederatedAiService service) {
-        '#TODO add your code here'
+        '#self.IP = Service.getNetMgtKeyAddress()
+         client = Client()
+        fl.client.start_numpy_client(server_address=self.IP ,client=client)'
     } 
     
-    def generateSinkMethodImpl(FlowerFederatedAiService service) {
-        'raise NotImplementedError'
-    }
-    
     def generateImports(FlowerFederatedAiService service) {
-        '' // may add flower, framework imports here
+        'from Service import Service
+        from services.flowers.Client import Client
+        import flwr as fl
+        '  
     }
     
     def inheritsFrom(String cls) {
         cls; // may add flower stuff here
     }
-    */
 
     def generateFurtherMethods(FlowerFederatedAiService service) {
         '${generateReceiveClientServer(service.server)|e}'

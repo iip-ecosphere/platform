@@ -1,0 +1,58 @@
+import PythonBasics;
+import MeshBasics;
+import PythonServerBase;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template PythonServerPartFlowerAI(Configuration config, FileArtifact target, PythonServer server, String pkg) {
+
+    def produceFields(FlowerFederatedAiServer server) {
+        ''
+    }
+
+    def produceSetStateStarting(FlowerFederatedAiServer server) {
+        '# flower code for set state to STARTING
+        print("Starting flower server: ${server.id}")
+        self.IP = self.getNetMgtKeyAddress()
+        self.thread = Thread(target=self.runServerMethod, args=(self))
+        self.thread.start()
+        pass'
+    }
+
+    def produceSetStateStopping(FlowerFederatedAiServer server) {
+        '# flower code for set state to STOPPING
+        print("Stopping flower server: ${server.id}")
+        self.thread.stop()
+        pass'
+    }
+
+    def produceImports(FlowerFederatedAiServer server) {
+        'from Service import Service
+        from threading import Thread
+        import flwr as fl
+        import configparser
+        from services.flowers.Strategy import Strategy
+        '
+    }
+
+    def produceRest(FlowerFederatedAiServer server) {
+        'def runServerMethod(self):
+            """started via thread runner in python"""
+            if self.IP is None:
+                # localhost fallback is always ok, for external traffic an IP might be needed
+                self.IP = "localhost:${server.port}" 
+            config = configparser.ConfigParser()
+            config.read("config.ini")
+
+            stra = fl.server.strategy.Strategy(   
+                min_evaluate_clients=config["fl"]["clients"],
+                min_available_clients=config["fl"]["clients"],
+                min_fit_clients=config["fl"]["clients"]
+            )
+            
+            print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Prestarted SERVER")
+            fl.server.start_server(server_address=self.IP, config=fl.server.ServerConfig(num_rounds=config["fl"]["rounds"], ), strategy=stra)
+        '
+    }
+
+}

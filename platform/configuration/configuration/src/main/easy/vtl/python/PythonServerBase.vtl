@@ -9,7 +9,11 @@ template PythonServerBase(Configuration config, FileArtifact target, PythonServe
     def produceSuper(PythonServer server) {
         ''
     } 
-    
+
+    def produceFields(PythonServer server) {
+        ''
+    }
+        
     def produceSetStateStarting(PythonServer server) {
         '#code for set state to STARTING
         pass'
@@ -23,5 +27,9 @@ template PythonServerBase(Configuration config, FileArtifact target, PythonServe
     def produceImports(PythonServer server) {
         ''
     }
-    
+
+    def produceRest(PythonServer server) {
+        ''
+    } 
+   
 }

@@ -14,6 +14,7 @@ project DataTypes {
     typedef Id NonEmptyString with (matches(Id, "^[^\\s*]+$")); // non whitespace
     typedef NonEmptyNameString NonEmptyString with (matches(NonEmptyNameString, "^[\\w \\[\\]\\-\\Q$_\\E]+$")); // non whitespace
     typedef ArtifactString String with (size(ArtifactString) == 0 or (size(ArtifactString) > 0 and matches(ArtifactString, ".+:.+:.+"))); 
+    typedef PositiveInteger Integer with (PositiveInteger > 0);
     
     def String mvnVersion(IipVersion ver, Boolean snapshot) = 
        if (snapshot) then ver + "-SNAPSHOT" else ver endif;

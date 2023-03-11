@@ -21,7 +21,6 @@ template PythonServerInterface(Configuration config, FileArtifact target, Python
         from Version import Version
         from Service import ServiceState
         from Service import ServiceKind
-        ${produceImports(server)|e}
 
         class ${clsName}ServerInterface(AbstractService):
             """Interface for server "${server.id}"

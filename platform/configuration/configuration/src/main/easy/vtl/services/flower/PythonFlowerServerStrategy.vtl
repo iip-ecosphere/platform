@@ -1,0 +1,19 @@
+import PythonBasics;
+import PythonServerBase;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template PythonFlowerServerStrategy(Configuration config, FileArtifact target) {
+
+    def main(Configuration config, FileArtifact target) {
+        IIPEcosphere cfg = config;
+        'import flwr as fl
+        from services.flowers.Client import Client
+
+        class Strategy(fl.server.strategy.FedAvg):
+
+            def __init__(self):
+                self.super()'
+    }
+    
+}

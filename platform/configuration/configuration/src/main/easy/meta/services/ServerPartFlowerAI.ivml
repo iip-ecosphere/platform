@@ -17,6 +17,10 @@ project ServerPartFlowerAI {
        String description = "Flower Federated Learning Server";
        setOf(refTo(Dependency)) dependencies = reqFlowerDependencies;
        IipVersion ver = "1.3.0"; 
+       PositiveInteger numServerClients = 1;
+       PositiveInteger numServerRounds = 3;
+       PositiveInteger numFlClients = 1;
+       PositiveInteger numFlRounds = 3;
        Constraint reqDependenciesOk = reqFlowerDependencies.intersection(dependencies).notEmpty();
    }
 
