@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.util.concurrent.ExecutionException;
 
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -34,6 +35,9 @@ public abstract class AbstractConfigurationMojo extends AbstractMojo {
     @Parameter(defaultValue = "${project}", required = true, readonly = true)
     private MavenProject project;
 
+    @Parameter(defaultValue = "${session}", required = true, readonly = true)
+    private MavenSession session;
+    
     @Parameter(property = "configuration.model", required = true)
     private String model;
 
@@ -276,6 +280,11 @@ public abstract class AbstractConfigurationMojo extends AbstractMojo {
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         System.setProperty(PlatformInstantiator.KEY_PROPERTY_TRACING, getTracingLevel());
+        String mvnArgs = "";
+        if (session.isOffline()) {
+            mvnArgs += "-o";
+        }
+        System.setProperty(PlatformInstantiator.KEY_PROPERTY_MVNARGS, mvnArgs);
         String resourcesDir = validateDirectory(makeAbsolute(getResourcesDirectory()));
         if (null == resourcesDir) {
             resourcesDir = validateDirectory(makeAbsolute(getFallbackResourcesDirectory()));

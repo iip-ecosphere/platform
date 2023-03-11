@@ -21,7 +21,7 @@ import org.apache.maven.plugins.annotations.Mojo;
  * @author Holger Eichelberger, SSE
  */
 @Mojo(name = "generateApps", defaultPhase = LifecyclePhase.PACKAGE)
-public class GenerateAppsMojo extends AbstractConfigurationMojo {
+public class GenerateAppsMojo extends AbstractAppsConfigurationMojo {
 
     @Override
     public String getStartRule() {
