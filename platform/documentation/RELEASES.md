@@ -31,11 +31,15 @@ In progress:
 * [#70](https://github.com/iip-ecosphere/platform/issues/70): UI progress reporting 
 * [#90](https://github.com/iip-ecosphere/platform/issues/90): UI display application service meshes: 
 * [#86](https://github.com/iip-ecosphere/platform/issues/86): UI restructuring for larger lists 
-* [#129](https://github.com/iip-ecosphere/platform/issues/129): Read-only flag for RecordType field
 * [#132](https://github.com/iip-ecosphere/platform/issues/132): Bitmotec integration
 
 Improvements:
 * [#128](https://github.com/iip-ecosphere/platform/issues/128): Refactor model to move RecordType::path to connector. **May require an upgrade of configuration models using connectors.**
+* [#129](https://github.com/iip-ecosphere/platform/issues/129): Read-only flag for RecordType field
+* Application intercommunication support (`AppIntercom`)
+* Connector improvements for OPC UA and MQTT, improved support for nested data types in transport/Python
+* Connector mocking data with $period and $repeats, preparation for exact JSON field mapping
+* Example build process fixes
 
 ### Release 0.5.0 (2023/03/01):
 

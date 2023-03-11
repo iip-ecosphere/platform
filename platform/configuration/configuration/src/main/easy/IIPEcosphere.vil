@@ -11,7 +11,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     // Paths now in IIPEcosphereBase
     
     Boolean tests = true;
-    Boolean mvnUpdate = false;
     setOf(String) usedServiceTypes = {};
     
     main(Project source, Configuration config, Project target) = {
@@ -170,7 +169,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", usedServiceTypes=usedServiceTypes, artifacts=artifacts, bins=bins, assemblies=assemblies, resources=resources, starterCls="iip.Starter", appName=appName, appVersion=appVersion, appDescription=a.description, tests=tests);
                 vilTemplateProcessor("AppAnt", config, "${appRoot}/build-jk.xml", artifactPrefix=appName, srvFolderName="IIP-apps-${appName}");
                 
-                maven("${appRoot}", mvnUpdate);
+                mvn(appRoot);
 
                 String appArtifact = generateServiceContainer(appRoot, cfg, a, elements);
                 if (appArtifact == null or appArtifact.length() == 0) {
@@ -491,15 +490,14 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
             
             String appName = a.name.toIdentifier();
             setOf(EcsDevice) devices = EcsDevice.allInstances();
-            // #130 container creation currently disabled for non-default containers (-> and d.containerName.length()==0)
-            // #130 consider getContainerNameInfix(device) from JavaBasics
-            for (EcsDevice device : devices->select(d|d.containerName.length()==0)->sortedBy(d|d.id)) {
+            for (EcsDevice device : devices->sortedBy(d|d.id)) {
                 ContainerType cntType = device.containerType;
-                String deviceName = device.containerName.toIdentifier();
+                String deviceName = getContainerNameDflt(device).toIdentifier();
                 String filePrefix = "${appName}_${deviceName}_";
 
                 if (isPythonService == 1) {
                     Path req = "${appRoot}/../requirements.txt";
+                    // TODO #130 consider server dependencies here
                     vilTemplateProcessor("PythonReq", config, req, elements=elements);
                 }
 
@@ -516,7 +514,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     // Create image 
                     Path b = "${appRoot}/../";
                     Path d = "${appRoot}/../" + dfName;
-                    appImageId = createContainerImage(mgr, b, d, a.name.toIdentifier(), device.containerName.toIdentifier(), a.ver);
+                    appImageId = createContainerImage(mgr, b, d, a.name.toIdentifier(), deviceName, a.ver);
                     
                     // Mesh-Info, Container-Descriptor
                     Path meshInfo = "${artifactsFolder}/${filePrefix}mesh-info.yml";
@@ -531,7 +529,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     // Create image 
                     Path b = "${appRoot}/../";
                     Path d = "${appRoot}/../" + dfName;
-                    appImageId = createContainerImage(mgr, b, d, a.name.toIdentifier(), device.containerName.toIdentifier(), a.ver);
+                    appImageId = createContainerImage(mgr, b, d, a.name.toIdentifier(), deviceName, a.ver);
                     
                     // Mesh-Info, Container-Descriptor
                     Path meshInfo = "${artifactsFolder}/${filePrefix}mesh-info.yml";
@@ -574,7 +572,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     // Create image 
                     Path b2 = "${appRoot}/../";
                     Path d2 = "${appRoot}/../" + dfName;
-                    appImageId = createContainerImage(mgr, b2, d2, a.name.toIdentifier(), device.containerName.toIdentifier(), a.ver);
+                    appImageId = createContainerImage(mgr, b2, d2, a.name.toIdentifier(), deviceName, a.ver);
                     
                     // Mesh-Info, Container-Descriptor
                     Path meshInfo = "${artifactsFolder}/${filePrefix}mesh-info.yml";
@@ -590,6 +588,10 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     }
     
     generateAllAppsContainers(IIPEcosphere config, sequenceOf(MeshElement) allElements) = {
+        // TODO #130 create all apps container here -> Ecs_Svc_AllApps and EcsSvc_AllApps
+        // TODO #130 move generation of ECS runtime here so that it is created only once; container also for device specific ECS (-> containerName)
+        //     --> consider getContainerNameInfix(device) from JavaBasics
+        // TODO #130 create platform container with platform, monitoring, UI here, only once
     }
     
     // ------------------------------------------ generating apps: nested, e.g., family ----------------------------------------------------------
@@ -730,7 +732,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
             appName=artList[1], appVersion=artList[2], appDescription="Shared application interfaces", tests=tests, springPackaging=false, groupId=artList[0], ifArtifact=true);
         vilTemplateProcessor("AppAnt", config, "${appRoot}/build-jk.xml", artifactPrefix=artList[1], srvFolderName="IIP-apps-${artList[1]}");
             
-        maven("${appRoot}", mvnUpdate);
+        mvn(appRoot);
 
         artifacts.add(cfg.sharedArtifact);
     }
@@ -798,7 +800,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         identityStoreJsl(p, cfg);
         aasSemanticIdResolverJsl(p, cfg);
         vilTemplateProcessor("EcsRuntimeMvn", config, "${path}/pom.xml", dir="ecsJars", main=dfltMain, tests=tests, deviceType=deviceType);
-        maven("${path}", mvnUpdate);
+        mvn(path);
         if (deviceType == defaultDeviceType) {
             generateOsScripts(config, "${target}/ecs", "ecsJars", dfltMain, "IIP-Ecosphere ECSRuntime", "iip-ecsRuntime", "iip-platform.service", addJavaOpts=toJvmMemLimitOpt(min(cfg.serviceManager.memLimit, 
               cfg.containerManager.memLimit)), sysd="${target}/iip-ecs");
@@ -819,7 +821,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         identityStoreJsl(p, cfg);
         aasSemanticIdResolverJsl(p, cfg);
         vilTemplateProcessor("EcsServiceControlMvn", config, "${path}/pom.xml", dir="ecsSvcJars", main=dfltMain, tests=tests, deviceType=deviceType);
-        maven("${path}", mvnUpdate);
+        mvn(path);
         if (deviceType == defaultDeviceType) {
           generateOsScripts(config, "${target}/ecsServiceMgr", "ecsSvcJars", dfltMain, "IIP-Ecosphere Ecs Runtime/Service Manager", "iip-ecsServiceMgr", "", 
             addJavaOpts=toJvmMemLimitOpt(cfg.serviceManager.memLimit), sysd="${target}/iip-ecsServiceMgr");
@@ -835,7 +837,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         generateEcsSvcMgr(ecsServiceMgrRoot, config, defaultDeviceType);
         setOf(EcsDevice) ecsDevices = EcsDevice.allInstances();
         for (EcsDevice dev: ecsDevices->reject(d|d==defaultDeviceType)->sortedBy(d|d.id)) {
-            String fileInfix = dev.containerName;
+            String fileInfix = getContainerNameDflt(dev);
             generateEcsRuntime("${ecsRuntimeRoot}-${fileInfix}", config, dev);
             generateEcsSvcMgr("${ecsServiceMgrRoot}-${fileInfix}", config, dev);
         }
@@ -851,7 +853,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         identityStoreJsl(p, cfg);
         aasSemanticIdResolverJsl(p, cfg);
         vilTemplateProcessor("ServiceControlMvn", config, "${serviceMgrRoot}/pom.xml", dir="svcJars", main=dfltMain, tests=tests);
-        maven("${serviceMgrRoot}", mvnUpdate);
+        mvn(serviceMgrRoot);
         generateOsScripts(config, "${target}/serviceMgr", "svcJars", dfltMain, "IIP-Ecosphere Service Manager", "iip-serviceMgr", "iip-ecs.service", 
             addJavaOpts=toJvmMemLimitOpt(cfg.serviceManager.memLimit), sysd="${target}/iip-serviceMgr");
         
@@ -867,7 +869,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         identityStoreJsl(p, cfg);
         aasSemanticIdResolverJsl(p, cfg);
         vilTemplateProcessor("PlatformMvn", config, "${platformRoot}/pom.xml", dir="plJars", main=dfltMain, tests=tests, monitoring=false);
-        maven("${platformRoot}", mvnUpdate);
+        mvn(platformRoot);
         generateOsScripts(config, "${target}/platform", "plJars", dfltMain, "IIP-Ecosphere Platform Services", "iip-platform", "iip-broker.service", 
             sysd="${target}/iip-platform");
         generateOsScripts(config, "${target}/cli", "plJars", "de.iip_ecosphere.platform.platform.Cli", "", "", "");
@@ -884,7 +886,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         identityStoreJsl(p, cfg);
         aasSemanticIdResolverJsl(p, cfg);
         vilTemplateProcessor("PlatformMvn", config, "${monitoringRoot}/pom.xml", dir="monJars", main=dfltMain, tests=tests, monitoring=true);
-        maven("${monitoringRoot}", mvnUpdate);
+        mvn(monitoringRoot);
         generateOsScripts(config, "${target}/monitoring", "monJars", dfltMain, "IIP-Ecosphere Platform Monitoring Services", "iip-monitoring", "iip-platform.service", 
             sysd="${target}/iip-monitoring");
  
@@ -900,7 +902,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         f.setExecutable(false);
         vilTemplateProcessor("UiAngularExpress", config, "${mgtUiRoot}/server.js");
         vilTemplateProcessor("UiAngularPom", config, "${mgtUiRoot}/pom.xml");
-        maven("${mgtUiRoot}", mvnUpdate);
+        mvn(mgtUiRoot);
         p = "${mgtUiRoot}/dist/iipes-web/assets/config";
         p.mkdir();
         vilTemplateProcessor("UiAngularConfig", config, "${p}/config.json");
@@ -922,7 +924,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         Path c = "${brokerRoot}/src/test";
         c.mkdir();
         vilTemplateProcessor("AmqpConf", config, "${c}/config.json");
-        maven("${brokerRoot}", mvnUpdate);
+        mvn(brokerRoot);
     }
 
     generateBrokerScripts(Configuration config, TransportProtocolMQTTv3 protocol) = {
@@ -945,7 +947,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         vilTemplateProcessor("MqttConf", config, "${c}/config.xml");
         c = "${c}/extensions";
         c.mkdir();
-        maven("${brokerRoot}", mvnUpdate);
+        mvn(brokerRoot);
     }
 
 }

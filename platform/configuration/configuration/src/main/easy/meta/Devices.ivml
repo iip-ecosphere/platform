@@ -124,9 +124,11 @@ project Devices {
     // container types:
     enum ContainerType {
         Ecs, // 0 - just ecs (used only internally, prevent by constraint)
-        Ecs_Svc_App, // 1 - one container: ecs + svc + app
-        EcsSvc_App, // 2 - one container: ecsSvc + app
-        C1Ecs_C2Svc_App // 3 - 1st container: ecs, 2nd container: svc + app
+        Ecs_Svc_App,     // 1 - one container: ecs + svc + app
+        EcsSvc_App,      // 2 - one container: ecsSvc + app
+        C1Ecs_C2Svc_App, // 3 - 1st container: ecs, 2nd container: svc + app
+        Ecs_Svc_AllApps, // * - one container: ecs + svc + all apps
+        EcsSvc_AllApps   // * - one container: ecsSvc + all apps
     };
     
     compound EcsDevice refines CComputer {

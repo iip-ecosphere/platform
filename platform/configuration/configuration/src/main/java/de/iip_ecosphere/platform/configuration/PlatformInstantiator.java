@@ -40,6 +40,8 @@ import net.ssehub.easy.varModel.model.ModelQueryException;
 public class PlatformInstantiator {
 
     public static final String KEY_PROPERTY_TRACING = "iip.easy.tracing";
+    public static final String KEY_PROPERTY_MVNARGS = "iip.easy.mvnArgs";
+    public static final String KEY_PROPERTY_APPS = "iip.easy.apps";
     private static int exitCode = 0;
     
     /**

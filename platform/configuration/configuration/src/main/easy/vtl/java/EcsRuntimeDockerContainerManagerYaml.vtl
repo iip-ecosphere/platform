@@ -141,7 +141,7 @@ template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, FileArtifact 
     }
     
     def produceArtefactInfixes(EcsDevice deviceType) {
-        if (deviceType.containerName <> "") {
+        if (deviceType.containerName <> "") { // not "dflt" here
             'artifactInfixes:
               - ${deviceType.containerName}'
         } else {

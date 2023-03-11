@@ -8,6 +8,8 @@ vilScript IIPEcosphereBase (Project source, Configuration config, Project target
 
     // preliminary!!! make it language-generic
 
+    Boolean mvnUpdate = false; // shall we go for -U in general?
+
     // java packages, turned to paths below
     String javaDatatypesPackage = "iip.datatypes";
     String javaSerializersPackage = "iip.serializers";
@@ -96,6 +98,13 @@ vilScript IIPEcosphereBase (Project source, Configuration config, Project target
     }
 
     logoutContainerRegistry(ContainerManager mgr) = {
+    }
+    
+    // ---------------------------- maven -----------------------------------
+    
+    mvn(Path path) = {
+        // TODO consider iip.easy.mvnArgs, split into List and add as second argument when instantiator is updated
+        maven("${path}", mvnUpdate);
     }
 
 }

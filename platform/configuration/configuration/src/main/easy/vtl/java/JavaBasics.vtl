@@ -307,7 +307,7 @@ template JavaBasics(Configuration config, FileArtifact target) {
     
     def String getContainerNameInfix(EcsDevice device) {
         String result = "";
-        if (device.containerName.length() > 0) {
+        if (device.containerName.length() > 0) { // not "dflt" here
             result = "-${device.containerName}";
         }
         result;

@@ -159,5 +159,13 @@ template Basics(Configuration config, FileArtifact target) {
         }
         res;
     }
+    
+    def String getContainerNameDflt(EcsDevice device) {
+        String containerName = device.containerName;
+        if (containerName.length() == 0) {
+            containerName = "dflt"; // -> default device empty container name
+        }
+        containerName;
+    }
 	
 }
