@@ -144,7 +144,7 @@ def loadModules(modulesPath, modulesDir):
                     importlib.import_module(moduleName)
                     print("Python ServiceEnvironment [Info]: Loaded " + moduleName)
                 except ModuleNotFoundError as exception:
-                    sys.stderr.write("Python ServiceEnvironment [Warn]: While loading " + moduleName + ": ModuleNotFoundError\n")
+                    sys.stderr.write("Python ServiceEnvironment [Warn]: While loading " + moduleName + ": ModuleNotFoundError " + str(exception) + "\n")
 
 def consoleIngestResult(data): 
     result = None
@@ -213,6 +213,8 @@ def process(composedData, sId):
                     service.passivate()
                 elif type == '*SERVER': # fixed base64 encoding-decoding
                     service.receivedClientServer(base64.b64decode(data))
+            else:
+                sys.stderr.write("Python ServiceEnvironment [Warn]: Cannot pass " + type + " to service - no service\n")
         else :
             serializer = Registry.serializers.get(type)
             if serializer:

@@ -624,7 +624,7 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
         if (null != transportChannel && transportChannel.length() > 0) {
             try {
                 LoggerFactory.getLogger(AbstractPythonProcessService.class).info(
-                    "Establishing clientserver channel for {}, {}: {} ", getId(), getKind());
+                    "Establishing clientserver channel for {}, {}: {} ", getId(), getKind(), transportChannel);
                 if (ServiceKind.SERVER == getKind()) {
                     establishServerListener("*SERVER", transportChannel);
                 } else {
@@ -689,6 +689,9 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
      */
     private void establishServerListener(String typeName, String serverChannel) throws IOException {
         TransportConnector conn = Transport.createConnector();
+        if (null == conn) {
+            return; // may happen in testing
+        }
         // setup Python->Java channel
         registerInputTypeTranslator(byte[].class, typeName, TypeTranslators.BYTEARRAY_TO_BASE64);
         registerOutputTypeTranslator(byte[].class, typeName, TypeTranslators.BASE64_TO_BYTEARRAY);
@@ -744,6 +747,9 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
      */
     private void establishClientListener(String typeName, String serverChannel) throws IOException {
         TransportConnector conn = Transport.createConnector();
+        if (null == conn) {
+            return; // may happen in testing
+        }
         // setup Python->Java channel
         registerInputTypeTranslator(byte[].class, typeName, TypeTranslators.BYTEARRAY_TO_BASE64);
         registerOutputTypeTranslator(byte[].class, typeName, TypeTranslators.BASE64_TO_BYTEARRAY);
