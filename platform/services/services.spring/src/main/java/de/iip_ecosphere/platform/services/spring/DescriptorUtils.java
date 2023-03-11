@@ -33,6 +33,10 @@ import org.springframework.boot.loader.JarLauncher;
 import org.springframework.boot.loader.archive.Archive;
 import org.springframework.boot.loader.archive.JarFileArchive;
 
+import de.iip_ecosphere.platform.services.ServiceDescriptor;
+import de.iip_ecosphere.platform.services.ServicesAas;
+import de.iip_ecosphere.platform.services.environment.ServiceKind;
+import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.services.environment.Starter;
 import de.iip_ecosphere.platform.services.spring.descriptor.Endpoint;
 import de.iip_ecosphere.platform.services.spring.descriptor.Relation;
@@ -46,6 +50,7 @@ import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.ZipUtils;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
+import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.support.setup.CmdLine;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 
@@ -55,6 +60,40 @@ import de.iip_ecosphere.platform.support.resources.ResourceLoader;
  * @author Holger Eichelberger, SSE
  */
 public class DescriptorUtils {
+    
+    /**
+     * Calls {@link #setState(ServiceDescriptor, ServiceState)} logging exceptions.
+     * 
+     * @param service the service to change
+     * @param state the new state
+     */
+    public static void setStateSafe(ServiceDescriptor service, ServiceState state) {
+        try {
+            setState(service, state);
+        } catch (ExecutionException e) {
+            LoggerFactory.getLogger(DescriptorUtils.class).warn("While setting service {} state: {}", 
+                service.getId(), e.getMessage());
+        }
+    }
+
+    /**
+     * Changes the service state and notifies {@link ServicesAas}.
+     * 
+     * @param service the service
+     * @param state the new state
+     * @throws ExecutionException if changing the state fails
+     */
+    public static void setState(ServiceDescriptor service, ServiceState state) throws ExecutionException {
+        ServiceState old = service.getState();
+        // must be done before setState (via stub), synchronous for now required on Jenkins/Linux
+        ServicesAas.notifyServiceStateChanged(old, state, service, NotificationMode.SYNCHRONOUS); 
+        service.setState(state);
+        // if service made an implicit transition, take up and notify
+        ServiceState further = service.getState();
+        if (further != state) {
+            ServicesAas.notifyServiceStateChanged(state, further, service, NotificationMode.SYNCHRONOUS); 
+        }
+    }
     
     /**
      * Reads the YAML deployment descriptor from {@code file}.
@@ -246,16 +285,18 @@ public class DescriptorUtils {
         result.add("--server.port=" + springPort);
         List<String> tmp = new ArrayList<String>();
         for (YamlService service : art.getServices()) {
-            YamlProcess proc = service.getProcess();
-            if (null != proc) {
-                File d = Starter.extractProcessArtifacts(service.getId(), proc, jar, null);
-                FileUtils.deleteOnExit(d);
+            if (service.getKind() != ServiceKind.SERVER) {
+                YamlProcess proc = service.getProcess();
+                if (null != proc) {
+                    File d = Starter.extractProcessArtifacts(service.getId(), proc, jar, null);
+                    FileUtils.deleteOnExit(d);
+                }
+                for (Relation r : service.getRelations()) {
+                    // simplification, don't think about relations
+                    DescriptorUtils.addEndpointArgs(tmp, r.getEndpoint(), brokerPort, brokerHost);
+                }
+                tmp.addAll(service.getCmdArg(adminPort, serviceProtocol));
             }
-            for (Relation r : service.getRelations()) {
-                // simplification, don't think about relations
-                DescriptorUtils.addEndpointArgs(tmp, r.getEndpoint(), brokerPort, brokerHost);
-            }
-            tmp.addAll(service.getCmdArg(adminPort, serviceProtocol));
         }
         Set<String> tmp2 = new HashSet<String>(tmp); // spring deployment does this implicitly via requests
         result.addAll(tmp2);
