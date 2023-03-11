@@ -142,7 +142,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     };
                     
                     for (Server ser: a.servers) {
-                        generateServer(config, ser, appRoot, artifacts);
+                        generateServer(config, ser, appRoot, noDeps, assemblies, artifacts);
                     }
                 };
                 elements = elements->sortedBy(n|n.name).toSequence(); // for testing
@@ -235,21 +235,35 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     }
     
     // dispatch basis
-    generateServer(Configuration config, Server server, Path appRoot, setOf(String) artifacts) = {
+    generateServer(Configuration config, Server server, Path appRoot, Boolean noDeps, setOf(String) assemblies, setOf(String) artifacts) = {
         if (isDefined(server.artifact) and server.artifact.length() > 0) {
             artifacts.add(server.artifact);
         }
     }
     
-    generateServer(Configuration config, PythonServer server, Path appRoot, setOf(String) artifacts) = {
+    generateServer(Configuration config, PythonServer server, Path appRoot, Boolean noDeps, setOf(String) assemblies, setOf(String) artifacts) = {
+        IIPEcosphere cfg = config; // from global
+        String serverFolderName = toFolderName(server.id);
         Path javaSrc = "${appRoot}/src/main/java";
         Path javaServerSrc = "${javaSrc}/${toPath(javaServerPackage)}";
         String clsName = asTypeName(server.id);
+        Path assemblySrc = "${appRoot}/${assemblyRel}";
+        
         vilTemplateProcessor("JavaServer", config, "${javaServerSrc}/${clsName}Server.java", server=server, pkg=javaServerPackage);
-        vilTemplateProcessor("PythonServer", config, "${appRoot}/src/main/python/services/${clsName}Server.py", server=server, pkg="services");
+        //vilTemplateProcessor("PythonServer", config, "${appRoot}/src/main/python/services/${clsName}Server.py", server=server, pkg="services");
         vilTemplateProcessor("PythonServerInterface", config, "${appRoot}/src/main/python/interfaces/${clsName}ServerInterface.py", server=server, pkg="interfaces");
-        if (isDefined(server.artifact) and server.artifact.length() > 0) {
-            artifacts.add(server.artifact);
+        if (not(noDeps)) {
+            /*if (cfg.sharedInterfaces) {
+                bins.add(cfg.sharedArtifact+"|python|${mvnProjectPySrcDir}|python.zip|zip|unpack");
+                bins.add(tmp[0]+":"+tmp[1]+":"+tmp[2]+"|python|${mvnProjectPySrcDir}|python.zip|zip|unpack");
+            }*/
+            if (isDefined(server.artifact) and server.artifact.length() > 0) {
+                artifacts.add(server.artifact);
+                sequenceOf(String) tmp = server.artifact.split(":");
+                String artifact = tmp[0]+":"+tmp[1]+":zip:python:"+tmp[2];
+                vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/python_${serverFolderName}.xml", withServices=true, dependency=artifact);
+                assemblies.add("python_${serverFolderName}|${assemblyRel}/python_${serverFolderName}.xml|prepare-package|${mvnProjectBuildDir}/classes|python_${serverFolderName}");
+            }
         }
     }
 

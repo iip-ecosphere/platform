@@ -13,16 +13,16 @@ template SpringCloudStreamDeploymentDescriptorPartFlowerAI(Configuration config,
         String clsName = asTypeName(server.id);
         String id = toFolderName(server.id);
         'artifacts:
-          - /python.zip
+          - /python_${id}.zip
         cmdArg:
           - --mode
           - console
           - --modulesPath
-          - \\${tmp}/${id}/python
+          - \\${tmp}/flowerAi_${id}
           - --servicesPackage
-          - services
+          - ${pythonServicesPackageName(server)}
           - --sid
-          - ${clsName}Server
+          - ${server.id}
         homePath: \\${tmp}/flowerAi_${id}
         executablePath: \\${tmp}/flowerAi_${id}'
     }

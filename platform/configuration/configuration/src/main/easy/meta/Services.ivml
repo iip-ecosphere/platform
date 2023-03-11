@@ -272,6 +272,7 @@ project Services {
     // python based server instance, based on PythonServiceEnvironment, may be generated, must implement Server interface
     compound PythonServer refines Server {
         NonEmptyString executable = "python";
+        String servicesPackageName = null; // use the default, helps in testing/mocking
     }
     
     Constraint serversUnique = allInstances(Server)->isUnique(e|e.id);

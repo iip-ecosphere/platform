@@ -238,7 +238,7 @@
                          <descriptor>src/main/assembly/easy.xml</descriptor>
                      </descriptors>
                      <outputDirectory>${project.build.directory}</outputDirectory>
-                     <attach>false</attach>
+                     <attach>true</attach>
                  </configuration>
               </execution>
          </executions>

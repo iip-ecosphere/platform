@@ -472,6 +472,32 @@ template SpringCloudStreamDeploymentDescriptorBase(Configuration config, FileArt
         '${generateCmdArg(getStringValueSafe(server.cmdArg, ""), "cmdArg")}'
     }
     
+    def generateServer(PythonServer server) {
+        String clsName = asTypeName(server.id);
+        String id = toFolderName(server.id);
+        'artifacts:
+          - /python_${id}.zip
+        cmdArg:
+          - --mode
+          - console
+          - --modulesPath
+          - \\${tmp}/python_${id}
+          - --servicesPackage
+          - ${pythonServicesPackageName(server)}
+          - --sid
+          - ${server.id}
+        homePath: \\${tmp}/python_${id}
+        executablePath: \\${tmp}/python_${id}'
+    }
+    
+    def pythonServicesPackageName(PythonServer server) {
+        if (server.servicesPackageName <> null) {
+            '${server.servicesPackageName}'
+        } else {
+            'server'
+        }
+    }    
+    
     def getServerCls(Server server) {
         "iip.server.${asTypeName(server.id)}Server"; // assumed: generation
     }

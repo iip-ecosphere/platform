@@ -94,5 +94,6 @@ Services::Server::dependencies = Dependencies required by a server.
 Services::JavaServer::class = Class in artifact to be executed as server (must implement IIP-Ecosphere server interface with String[]/no-arg constructor)
 Services::JavaServer::cmdArg = Comma-separated command line arguments, may be empty.
 Services::PythonServer::executable = The executable for the server implementation.
+Services::PythonServer::servicesPackageName = Name of the packages the service implementation is located in (default "services").
 Services::serversUnique = The id of all defined servers must be unique.
 Services::servicesServerUnique = The id of all defined services and servers must be unique.
