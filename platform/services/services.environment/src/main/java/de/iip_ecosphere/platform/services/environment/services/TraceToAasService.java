@@ -29,6 +29,7 @@ import de.iip_ecosphere.platform.services.environment.Starter;
 import de.iip_ecosphere.platform.services.environment.YamlArtifact;
 import de.iip_ecosphere.platform.services.environment.YamlService;
 import de.iip_ecosphere.platform.services.environment.services.TransportToAasConverter.TypeConverter;
+import de.iip_ecosphere.platform.services.environment.switching.ServiceBase;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
@@ -40,8 +41,12 @@ import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.iip_aas.AasUtils;
 import de.iip_ecosphere.platform.support.iip_aas.ApplicationSetup;
 import de.iip_ecosphere.platform.support.iip_aas.PlatformAas;
+import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
+import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
+import de.iip_ecosphere.platform.transport.serialization.BasicSerializerProvider;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslators;
 import de.iip_ecosphere.platform.transport.status.TraceRecord;
+import de.iip_ecosphere.platform.transport.status.TraceRecordSerializer;
 
 /**
  * Implements a generic service that maps {@link TraceRecord} to an (application) AAS.
@@ -51,11 +56,15 @@ import de.iip_ecosphere.platform.transport.status.TraceRecord;
  * Currently, the service builds up the AAS of an application. However, this functionality
  * shall be moved that the platform is providing the AAS and the service just hooks the traces submodel into.
  * 
+ * Can optionally send AAS data to a transport channel (see {@link #createTransport(BasicSerializerProvider)}, 
+ * {@link #getAasTransportChannel()}, {@link #getTransportParameter()}).
+ * 
  * @author Holger Eichelberger, SSE
  */
 public class TraceToAasService extends AbstractService {
 
     public static final String VERSION = "0.1.0";
+    public static final String TRANSPORT_CHANNEL_PREFIX = "result-AAS";
     
     public static final String SUBMODEL_TRACES = "Traces";
     public static final String SUBMODEL_COMMANDS = "Commands"; // commands from extern towards platform
@@ -70,6 +79,8 @@ public class TraceToAasService extends AbstractService {
     private ApplicationSetup appSetup;
     private YamlArtifact artifact;
     private Converter converter = createConverter();
+    private TransportConnector outTransport;
+    private TransportParameter outTransportParameter;
 
     /**
      * Creates a service instance.
@@ -221,6 +232,10 @@ public class TraceToAasService extends AbstractService {
         if (!ok) {
             result = ServiceState.FAILED;
         }
+        outTransport = createTransport(getConfiguredSerializationProvider());
+        if (null != outTransport) {
+            converter.addNotifier(d -> outTransport.asyncSend(getAasTransportChannel(), d));
+        }
         return result;
     }
 
@@ -233,6 +248,68 @@ public class TraceToAasService extends AbstractService {
         return result;
     }
     
+    /**
+     * Returns the AAS transport channel.
+     * 
+     * @return the AAS transport channel (per default, a combination of {@link #TRANSPORT_CHANNEL_PREFIX} and 
+     * the {@link ServiceBase#getApplicationId(String)}
+     */
+    protected String getAasTransportChannel() {
+        String appId = ServiceBase.getApplicationId(getId());
+        if (appId.length() > 0) {
+            appId = "_" + appId;
+        }
+        return TRANSPORT_CHANNEL_PREFIX + appId;
+    }
+    
+    /**
+     * Returns a pre-configured serialization provider for the output connector.
+     * 
+     * @return the provider
+     */
+    protected BasicSerializerProvider getConfiguredSerializationProvider() {
+        BasicSerializerProvider result = new BasicSerializerProvider();
+        result.registerSerializer(new TraceRecordSerializer());
+        return result;
+    }
+    
+    /**
+     * Defines the transport parameter for {@link #createTransport(BasicSerializerProvider)}.
+     * 
+     * @param transportParameter the transport parameter
+     */
+    public void setTransportParameter(TransportParameter transportParameter) {
+        this.outTransportParameter = transportParameter;
+    }
+    
+    /**
+     * Creates an optional transport connector to pump received data out. [factory]
+     * 
+     * @param serializationProvider pre-configured serialization provider
+     * @return the transport connector, may be <b>null</b> for none
+     */
+    protected TransportConnector createTransport(BasicSerializerProvider serializationProvider) {
+        return null;
+    }
+    
+    /**
+     * Returns the optional transport connector to pump received data out.
+     * 
+     * @return the transport connector, may be <b>null</b> for none
+     */
+    protected TransportConnector getTransport() {
+        return outTransport;
+    }
+
+    /**
+     * Returns the optional transport parameters.
+     * 
+     * @return the transport parameter, may be <b>null</b> for none
+     */
+    public TransportParameter getTransportParameter() {
+        return outTransportParameter;
+    }
+
     /**
      * Adds elements to the services submodel if available.
      * 

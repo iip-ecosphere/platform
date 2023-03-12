@@ -36,6 +36,7 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
+import de.iip_ecosphere.platform.support.function.IOConsumer;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.iip_aas.AasUtils;
@@ -67,6 +68,7 @@ public abstract class TransportToAasConverter<T> {
     private long lastCleanup = System.currentTimeMillis();
     private long cleanupTimeout = 5 * 1000; // when the next cleanup shall be considered
     private TraceRecordReceptionCallback callback;
+    private IOConsumer<T> notifier = t -> { };
     
     private String submodelIdShort;
     private String transportStream;
@@ -113,6 +115,19 @@ public abstract class TransportToAasConverter<T> {
         this.submodelIdShort = submodelIdShort;
         this.transportStream = transportStream;
         this.dataType = dataType;
+    }
+    
+    /**
+     * Defines a new notifier which is called when new data arrives. Currently only one notifier is supported.
+     * 
+     * @param notifier the notifier, ignored if <b>null</b>
+     */
+    public void addNotifier(IOConsumer<T> notifier) {
+        if (null != notifier) {
+            this.notifier = notifier;
+        } else {
+            LoggerFactory.getLogger(getClass()).warn("No notifier given. Ignoring change request.");
+        }
     }
     
     /**
@@ -230,8 +245,12 @@ public abstract class TransportToAasConverter<T> {
             smBuilder.build();
             cleanup(aas);
         } catch (IOException e) {
-            LoggerFactory.getLogger(getClass()).error(
-                "Cannot obtain AAS {}: {}", getAasUrn(), e.getMessage());
+            LoggerFactory.getLogger(getClass()).error("Cannot obtain AAS {}: {}", getAasUrn(), e.getMessage());
+        }
+        try { // notify independently
+            notifier.accept(data);
+        } catch (IOException e) {
+            LoggerFactory.getLogger(getClass()).error("Cannot inform notifier: {}", e.getMessage());
         }
     }
     
