@@ -29,6 +29,12 @@ template PythonMeshElementTemplateBase(Configuration config, FileArtifact target
 
     // called via MeshBasics.generateDataMethods for asynch MeshProcessor
     def generateAsyncProcessorInMethod(MeshProcessor proc, String type, String methodSuffix, String methodSuffixWithServiceId) {
+        boolean forward = true;
+        for (IOType t: proc.input) {
+            if (toTypeName(t) == type) {
+                forward = t.forward;
+            }
+        }
         'def ${methodSuffix}(self, data: ${type}):
             """Asynchronous data processing method. Use self.ingest(data) to pass the result back to the data stream
                ${generatePossibleOutputTypes(service, config)|e}
@@ -36,11 +42,11 @@ template PythonMeshElementTemplateBase(Configuration config, FileArtifact target
             Parameters:
               - data -- the data to process
             """
-            ${generateAsyncProcessorInMethodImpl(proc.impl)}\n'
+            ${generateAsyncProcessorInMethodImpl(proc.impl, forward)}\n\n'
     }
     
     // dispatch basis
-    def generateAsyncProcessorInMethodImpl(ServiceBase service) {
+    def generateAsyncProcessorInMethodImpl(ServiceBase service, Boolean forward) {
         '#create result instance and call self.ingest(data)
         raise NotImplementedError'
     } 
@@ -130,5 +136,10 @@ template PythonMeshElementTemplateBase(Configuration config, FileArtifact target
     def generateFurtherMethods(ServiceBase service) {
         ''
     } 
+    
+    // dispatch basis
+    def produceConstructorRest(ServiceBase service) {
+        ''
+    }    
     
 }

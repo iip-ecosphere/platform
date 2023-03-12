@@ -220,9 +220,25 @@ template PythonBasics(Configuration config, FileArtifact target) {
                    """ 
                 ${produceReconfigureCode(params)}
                 self.notifyReconfigured(values)
+                
+            ${produceParameterGetter(params)}
+            
             '
         } else {
             ''
+        }
+    }
+
+    def produceParameterGetter(Parameters params) {
+        for (Parameter p: params) {
+            'def get${asMethodNameSuffix(p.name)}(self):
+                """Returns the value of parameter ${p.name}. May change at runtime upon reconfiguration.
+                   
+                   Result:
+                     - the value of the parameter
+                   """ 
+
+                return self.param_${p.name}'
         }
     }
 
@@ -230,7 +246,7 @@ template PythonBasics(Configuration config, FileArtifact target) {
         for (Parameter p: params) {
             String expr = 'values["${p.name}"]';
             'if "${p.name}" in values:
-                param_${p.name} = ${convertValue(p, expr)}'
+                self.param_${p.name} = ${convertValue(p, expr)}'
         }
     }
     

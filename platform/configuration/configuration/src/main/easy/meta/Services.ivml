@@ -256,6 +256,7 @@ project Services {
         NonEmptyString host = "127.0.0.1";
         NonEmptyEphemeralPort port;
         NonEmptyString executable;
+        NameplateInfo nameplateInfo;
         String artifact = ""; // optional maven artifact
         Boolean running = false; // running somewhere else, do we have to start it
         Parameters parameter = {};

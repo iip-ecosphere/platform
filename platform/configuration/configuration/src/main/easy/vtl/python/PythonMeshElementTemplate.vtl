@@ -26,6 +26,7 @@ template PythonMeshElementTemplate(Configuration config, FileArtifact target, Me
             def __init__(self):
                 """Initializes the service.""" 
                 super().__init__()
+                ${produceConstructorRest(service)}
             
             ${produceReconfigure(service)}
             ${generateDataMethods(elt, true)}

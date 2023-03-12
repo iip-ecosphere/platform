@@ -85,6 +85,7 @@ Services::Server::id = Unique server id.
 Services::Server::port =  Default/intended port number on where to start the host.
 Services::Server::running = Shall the server be started/stopped by the platform or is it assumed to be installed/running.
 Services::Server::executable = The server executable. Artifact information will be added by the generation depending on the server type.
+Services::Server::nameplateInfo = Information used to construct the AAS nameplate of the service. 
 Services::Server::parameter = Server parameters, "port" is implicitly declared as integer parameter.
 Services::Server::artifact = Maven coordinate for optional artifact containing the service implementation.
 Services::Server::transportChannel = The name of the transport channel for client-server (empty for none).

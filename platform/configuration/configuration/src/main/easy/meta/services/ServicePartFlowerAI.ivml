@@ -22,7 +22,6 @@ project ServicePartFlowerAI {
        FlowerAiFramework framework;
        FlowerAiClient client;
        refTo(FlowerFederatedAiServer) server;
-       //String artifact = "de.iip-ecosphere.platform:kiServices.rapidminer.rtsa:" + iipVer;
        setOf(refTo(Dependency)) dependencies = getReqServiceDependencies(self);
        NameplateInfo nameplateInfo = {
            manufacturerProductDesignation = "Generic Flower FL AI service@en",
