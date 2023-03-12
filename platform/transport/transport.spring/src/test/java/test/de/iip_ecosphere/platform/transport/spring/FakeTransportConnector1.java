@@ -5,6 +5,7 @@ import java.io.IOException;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
+import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry.SerializerProvider;
 
 /**
  * Just for testing the Spring configuration.
@@ -59,6 +60,10 @@ public class FakeTransportConnector1 implements TransportConnector {
     @Override
     public String enabledEncryption() {
         return null;
+    }
+
+    @Override
+    public void setSerializerProvider(SerializerProvider serializerProvider) {
     }
 
 }
