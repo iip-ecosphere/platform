@@ -13,6 +13,8 @@ package test.de.iip_ecosphere.platform.kiServices.functions;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
+import test.de.iip_ecosphere.platform.kiServices.functions.aggregation.ChannelTimeSeriesAggregatorTest;
+
 /**
  * Defines the tests to be executed.
  * 
@@ -21,6 +23,7 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
     ImageTests.class,
+    ChannelTimeSeriesAggregatorTest.class
 })
 public class AllTests {
 }
