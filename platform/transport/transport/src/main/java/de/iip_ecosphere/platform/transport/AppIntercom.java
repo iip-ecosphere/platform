@@ -69,14 +69,18 @@ public class AppIntercom<T> {
     }
 
     /**
-     * Sart the intercom.
+     * Start the intercom.
      * 
      * @throws ExecutionException if starting fails
      */
     public void start() throws ExecutionException {
         try {
             conn = Transport.createConnector();
-            conn.setReceptionCallback(channel, commandCallback);
+            if (null != conn) {
+                conn.setReceptionCallback(channel, commandCallback);
+            } else {
+                LoggerFactory.getLogger(getClass()).error("Cannot set up transport intercom. No connector (null).");
+            }
         } catch (IOException e) {
             LoggerFactory.getLogger(getClass()).error("Cannot set up transport intercom: " + e.getMessage());
         }
