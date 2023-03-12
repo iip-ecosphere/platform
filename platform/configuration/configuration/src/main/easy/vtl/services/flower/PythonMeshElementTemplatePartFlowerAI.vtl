@@ -37,7 +37,7 @@ template PythonMeshElementTemplatePartFlowerAI(Configuration config, FileArtifac
     
     def produceConstructorRest(FlowerFederatedAiService service) {
         FlowerFederatedAiServer server = service.server;
-        'self.IP = Service.getNetMgtKeyAddress()
+        'self.IP = service.getNetMgtKeyAddress()
         if self.IP is None:
             # fallback, then server is not relocatable anymore
             self.IP = "${server.host}:${server.port}"'
