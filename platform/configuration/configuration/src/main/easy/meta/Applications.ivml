@@ -119,6 +119,7 @@ project Applications {
        IipVersion ver = "0.1.0";
        String artifact = ""; // ships with platform in service environment
        refTo(Application) application;
+       TraceToAasOutTransport outTransport = null;
        NameplateInfo nameplateInfo = {
            manufacturerProductDesignation = "Application AAS with Trace embedding@en",
            manufacturer = refBy(manufacturer_sse)
@@ -126,6 +127,16 @@ project Applications {
        Parameters parameter = {
          LongParameter{name="timeout", defaultValue=3600000}
        };
+   }
+   
+   compound TraceToAasOutTransport {
+       NonEmptyString host = null;
+       Port port;
+       SecuritySettings security = null;
+   }
+   
+   compound TraceToAasJavaService refines JavaService {
+       TraceToAasOutTransport outTransport = null;
    }
    
    // ------------------------------- deployment --------------------------------------

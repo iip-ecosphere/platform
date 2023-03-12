@@ -27,11 +27,14 @@ Planned:
 In progress:
 * [#100](https://github.com/iip-ecosphere/platform/issues/100): Run multiple app instances
 * [#59](https://github.com/iip-ecosphere/platform/issues/59): Distributed testing/evaluation environment 
-* [#127](https://github.com/iip-ecosphere/platform/issues/127): Integration of federated learning
 * [#70](https://github.com/iip-ecosphere/platform/issues/70): UI progress reporting 
 * [#90](https://github.com/iip-ecosphere/platform/issues/90): UI display application service meshes: 
 * [#86](https://github.com/iip-ecosphere/platform/issues/86): UI restructuring for larger lists 
 * [#132](https://github.com/iip-ecosphere/platform/issues/132): Bitmotec integration
+
+New features:
+* [#127](https://github.com/iip-ecosphere/platform/issues/127): Integration of Flower-based federated learning through generated templates
+* Generic time series data aggregator in data functions
 
 Improvements:
 * [#128](https://github.com/iip-ecosphere/platform/issues/128): Refactor model to move RecordType::path to connector. **May require an upgrade of configuration models using connectors.**
@@ -39,7 +42,9 @@ Improvements:
 * Application intercommunication support (`AppIntercom`)
 * Connector improvements for OPC UA and MQTT, improved support for nested data types in transport/Python
 * Connector mocking data with $period and $repeats, preparation for exact JSON field mapping
-* Example build process fixes
+* Transport connector can now have a local serialization provider.
+* Trace-to-AAS service and (new) extensible Java service can utilize optional (output) transport connector, e.g., for northbound integration.
+* Build process fixes for examples.
 
 ### Release 0.5.0 (2023/03/01):
 

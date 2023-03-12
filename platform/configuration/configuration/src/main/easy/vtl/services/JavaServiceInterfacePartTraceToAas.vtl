@@ -1,0 +1,19 @@
+import Basics;
+import JavaBasics;
+import ServiceBasics;
+import JavaServiceInterfaceBase;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template JavaServiceInterfacePartTraceToAas(Configuration config, FileArtifact target, ServiceBase service, String pkg) {
+
+    def producerInterfaceRest(TraceToAasJavaService service) {
+        '/**
+        * Sets optional Trace-to-AAS output transport parameter.
+        *
+        * @param params the transport parameter, may be <b>null</b> for none
+        */
+        public void setTransportParameter(de.iip_ecosphere.platform.transport.connectors.TransportParameter params);'
+    }
+    
+}

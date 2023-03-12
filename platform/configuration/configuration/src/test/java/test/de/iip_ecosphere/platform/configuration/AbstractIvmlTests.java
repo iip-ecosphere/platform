@@ -272,9 +272,9 @@ public abstract class AbstractIvmlTests {
      */
     protected void assertJavaNode(File folder, String name, boolean connector) {
         assertFile(new File(folder, "nodes"), name + ".java");
-        if (!connector) {
+        /*if (!connector) {
             assertFile(new File(folder, "stubs"), name + "Stub.java");
-        }
+        }*/
     }
 
     /**

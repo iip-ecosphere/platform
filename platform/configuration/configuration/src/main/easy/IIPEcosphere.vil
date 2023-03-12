@@ -210,11 +210,11 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                         elements.add(no);
                     }
                 }
-
+                
                 for(Server s : a.servers) {
                     generateTemplateElements(appRoot, config, s, assemblies);
                 }
-
+                
                 elements = elements->sortedBy(n|n.name).toSequence(); // for testing
                 sequenceOf(MeshElement) pythonElements = elements->select(e|e.impl.isKindOf(PythonService));
                 if (pythonElements.size() > 0) {
@@ -387,12 +387,12 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         if (not(cfg.sharedInterfaces)) {
             vilTemplateProcessor("JavaMeshElementInterface", config, "${javaInterfacesSrc}/${clsName}Service.java", elt=no, 
                 pkg=javaInterfacesPackage);
-            vilTemplateProcessor("JavaMeshElementStub", config, "${javaStubsSrc}/${clsName}Stub.java", elt=no, 
-                pkg=javaStubsPackage);
-        } else {
+            //vilTemplateProcessor("JavaMeshElementStub", config, "${javaStubsSrc}/${clsName}Stub.java", elt=no, 
+            //    pkg=javaStubsPackage);
+        } /*else {
             vilTemplateProcessor("JavaServiceStub", config, "${javaStubsSrc}/${clsName}Stub.java", service=service, 
                 pkg=javaStubsPackage);
-        }
+        }*/
     }
     
     generateServiceElements(Path appRoot, Configuration config, setOf(String) artifacts, MeshElement no, CompleteService service) = {
@@ -604,14 +604,14 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         }
         appImageId;
     }
-    
+
     generateAllAppsContainers(IIPEcosphere config, sequenceOf(MeshElement) allElements) = {
         // TODO #130 create all apps container here -> Ecs_Svc_AllApps and EcsSvc_AllApps
         // TODO #130 move generation of ECS runtime here so that it is created only once; container also for device specific ECS (-> containerName)
         //     --> consider getContainerNameInfix(device) from JavaBasics
         // TODO #130 create platform container with platform, monitoring, UI here, only once
     }
-    
+        
     // ------------------------------------------ generating apps: nested, e.g., family ----------------------------------------------------------
 
     // dispatch basis

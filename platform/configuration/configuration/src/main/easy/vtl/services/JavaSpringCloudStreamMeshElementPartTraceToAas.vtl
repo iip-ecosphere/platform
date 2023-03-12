@@ -17,6 +17,39 @@ template JavaSpringCloudStreamMeshElementPartTraceToAas(Configuration config, Fi
         serviceVars.add("service");
         '${getYamlServiceFragment("serviceData", clsName, "${service.id}", appVar="app")};\n'
         'service = new TraceToAasService(app, serviceData);'
+        '${generateOutTransport(service)|e}'
+    }
+
+    def initialServiceRest(TraceToAasJavaService service) {
+        if (isDefined(service.outTransport) and service.outTransport <> null) {
+            '${generateOutTransport(service.outTransport)|e}'
+        }
+    }
+
+    def generateOutTransport(TraceToAasService service) {
+        if (isDefined(service.outTransport) and service.outTransport <> null) {
+            '${generateOutTransport(service.outTransport)|e}'
+        }
+    }
+    
+    def generateOutTransport(TraceToAasOutTransport outTransport) {
+        String outTpHost = getStringValueSafe(outTransport.host, "");
+        Integer outTpPort = getIntegerValueSafe(outTransport.port, 0);
+        if (outTpHost <> "" and outTpPort <> "") {
+            'TransportParameter.TransportParameterBuilder tpBuilder = TransportParameter.TransportParameterBuilder.newBuilder("${outTpHost}", ${outTpPort});'
+            if (isDefined(outTransport.security) and outTransport.security <> null) {
+                SecuritySettings outTpSec = outTransport.security;
+                'tpBuilder.setAuthenticationKey("${outTpSec.authenticationKey}");'
+                if (isDefined(outTpSec.keystoreKey) and outTpSec.keystoreKey <> "") {
+                    'tpBuilder.setKeystoreKey("${outTpSec.keystoreKey}");'
+                }
+                'tpBuilder.setKeyAlias("${outTpSec.keyAlias}");'
+                'tpBuilder.setHostnameVerification(${outTpSec.hostNameVerification});'
+            }
+            'service.setTransportParameter(tpBuilder.build());'
+        } else {
+            ''
+        }
     }
     
     def generateImports(TraceToAasService service) {

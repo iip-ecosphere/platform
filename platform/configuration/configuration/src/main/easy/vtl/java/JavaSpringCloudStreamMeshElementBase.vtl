@@ -486,9 +486,14 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
             '${generateAbstractServiceCreateInstance(elt, service, "service", service.class)}'
             '${generateParameterInit(service)|e}'
             '${initAppInstId("service")}'
+            '${initialServiceRest(service)|e}'
         } else {
             '// NO service defined, no initialization possible'
         }
+    }
+
+    def initialServiceRest(JavaService service) {
+         ''
     }
     
     def genCreateConnectorAdapterSuppliers(Connector conn) {
