@@ -28,7 +28,10 @@ class AbstractService(Service):
         self.deployable = deployable
         self.kind = kind
         self.state = ServiceState.AVAILABLE
-        self.netMgtKeyAddress = Registry.netMgtKeyAddresses.get(self.id) # value or none
+        if self.id in Registry.netMgtKeyAddresses: 
+            self.netMgtKeyAddress = Registry.netMgtKeyAddresses.get(self.id) # value or none
+        else:
+            self.netMgtKeyAddress = None
 
     def getId(self):
         """Returns the unique id of the service.
