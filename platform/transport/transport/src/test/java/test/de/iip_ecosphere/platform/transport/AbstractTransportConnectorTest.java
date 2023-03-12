@@ -106,6 +106,7 @@ public class AbstractTransportConnectorTest {
         }
         TransportParameter param1 = tpb1.build();
         TransportConnector cl1 = TransportFactory.createConnector();
+        cl1.setSerializerProvider(SerializerRegistry.DEFAULT_PROVIDER); // the default, but used now
         Assert.assertTrue(cl1.getName().length() > 0);
         System.out.println("Connecting connector 1 to " + addr.toUri());
         cl1.connect(param1);

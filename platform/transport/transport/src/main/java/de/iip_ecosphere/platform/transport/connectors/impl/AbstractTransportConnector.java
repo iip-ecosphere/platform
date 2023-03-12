@@ -31,6 +31,7 @@ import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter.CloseAction;
 import de.iip_ecosphere.platform.transport.serialization.Serializer;
 import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry;
+import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry.SerializerProvider;
 
 /**
  * An abstract transport connector.
@@ -41,6 +42,7 @@ public abstract class AbstractTransportConnector implements TransportConnector {
 
     private Map<String, List<ReceptionCallback<?>>> callbacks = Collections.synchronizedMap(new HashMap<>());
     private TransportParameter params;
+    private SerializerProvider serializerProvider = SerializerRegistry.DEFAULT_PROVIDER;
 
     /**
      * Returns whether the connector shall use TLS.
@@ -274,7 +276,7 @@ public abstract class AbstractTransportConnector implements TransportConnector {
         if (null != callbacks) {
             for (int c = 0; c < callbacks.size(); c++) {
                 ReceptionCallback<T> callback = (ReceptionCallback<T>) callbacks.get(c);
-                Serializer<T> serializer = SerializerRegistry.getSerializer(callback.getType());
+                Serializer<T> serializer = serializerProvider.getSerializer(callback.getType());
                 if (null != serializer) {
                     try {
                         callback.received(serializer.from(data));
@@ -302,7 +304,7 @@ public abstract class AbstractTransportConnector implements TransportConnector {
         byte[] result;
         @SuppressWarnings("unchecked")
         Class<T> cls = (Class<T>) data.getClass();
-        Serializer<T> serializer = SerializerRegistry.getSerializer(cls);
+        Serializer<T> serializer = serializerProvider.getSerializer(cls);
         if (null != serializer) {
             result = serializer.to(data);
         } else {
@@ -310,5 +312,15 @@ public abstract class AbstractTransportConnector implements TransportConnector {
         }
         return result;
     }
+    
+    @Override
+    public void setSerializerProvider(SerializerProvider serializerProvider) {
+        if (null != serializerProvider) {
+            this.serializerProvider = serializerProvider;
+        } else {
+            LoggerFactory.getLogger(getClass()).warn("No serializer provider given. Ignoring change request.");
+        }
+    }
+
 
 }

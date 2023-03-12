@@ -27,11 +27,36 @@ import de.iip_ecosphere.platform.transport.status.TraceRecordSerializer;
  */
 public class SerializerRegistry {
 
+    public static final SerializerProvider DEFAULT_PROVIDER = new SerializerProvider() {
+        
+        @Override
+        public <T> Serializer<T> getSerializer(Class<T> type) {
+            return SerializerRegistry.getSerializer(type);
+        }
+    };
     private static Map<Class<?>, Serializer<?>> serializers = Collections.synchronizedMap(new HashMap<>());
     private static String wireName = "";
     
     static {
         resetDefaults();
+    }
+
+    /**
+     * Something that provides a serializer.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public interface SerializerProvider {
+        
+        /**
+         * Returns a serializer.
+         * 
+         * @param <T>  the data type to be handled by the serializer
+         * @param type the type to return the serializer for
+         * @return the serializer, <b>null</b> if no such serializer is registered
+         */
+        public <T> Serializer<T> getSerializer(Class<T> type);
+        
     }
     
     /**

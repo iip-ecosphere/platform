@@ -23,7 +23,7 @@ import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator
 import de.iip_ecosphere.platform.transport.serialization.Serializer;
 
 /**
- * A simple, generic status serializer. Additional enum constants must be registered here.
+ * A simple, generic JSON status serializer. Additional enum constants must be registered here.
  * 
  * @author Holger Eichelberger, SSE
  */

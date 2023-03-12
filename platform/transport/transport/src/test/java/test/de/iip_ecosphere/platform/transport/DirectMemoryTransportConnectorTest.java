@@ -37,6 +37,7 @@ import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 import de.iip_ecosphere.platform.transport.connectors.impl.DirectMemoryTransferTransportConnector;
 import de.iip_ecosphere.platform.transport.serialization.Serializer;
 import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry;
+import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry.SerializerProvider;
 import de.iip_ecosphere.platform.transport.status.ActionTypes;
 import de.iip_ecosphere.platform.transport.status.ComponentTypes;
 import de.iip_ecosphere.platform.transport.status.StatusMessage;
@@ -150,6 +151,10 @@ public class DirectMemoryTransportConnectorTest {
         @Override
         public void detachReceptionCallback(String stream, ReceptionCallback<?> callback) throws IOException {
             unsubscribe(stream, true);
+        }
+        
+        @Override
+        public void setSerializerProvider(SerializerProvider serializerProvider) {
         }
         
     }

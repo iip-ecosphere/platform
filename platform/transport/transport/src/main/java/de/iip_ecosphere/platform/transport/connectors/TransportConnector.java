@@ -12,6 +12,9 @@ package de.iip_ecosphere.platform.transport.connectors;
 
 import java.io.IOException;
 
+import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry;
+import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry.SerializerProvider;
+
 /**
  * Defines the interface of a transport connector. The connector can handle
  * multiple different homogeneous streams.
@@ -126,5 +129,12 @@ public interface TransportConnector {
      * @return the enabled encryption mechanisms (comma-separated), may be <b>null</b> or empty
      */
     public String enabledEncryption();
+    
+    /**
+     * Defines a special, local serializer provider that supersedes {@link SerializerRegistry#DEFAULT_PROVIDER}.
+     * 
+     * @param serializerProvider the provider, ignored if <b>null</b>
+     */
+    public void setSerializerProvider(SerializerProvider serializerProvider);
     
 }
