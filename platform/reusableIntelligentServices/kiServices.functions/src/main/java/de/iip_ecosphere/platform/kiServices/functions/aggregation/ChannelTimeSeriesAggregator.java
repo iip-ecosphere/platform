@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 /**
  * Generic time series aggregator for identified channels.
@@ -67,6 +68,26 @@ public class ChannelTimeSeriesAggregator <I, O, D, T> {
     }
 
     /**
+     * Determines whether an aggregation chunk is completed.
+     * 
+     * @param <T> the timestamp type within {@code I} and {@code O}
+     * @author Holger Eichelberger, SSE
+     */
+    public interface CompletionFunction<T> {
+
+        /**
+         * Returns whether an aggregation chunk has been completed and a result
+         * instance shall be created.
+         * 
+         * @param numberAggregatedSamples the number of samples aggregated so far
+         * @param timestamp the timestamp the aggregation started
+         * @return {@code true} for completed, {@code false} else
+         */
+        public boolean chunkCompleted(int numberAggregatedSamples, T timestamp);
+
+    }
+
+    /**
      * Represents and implements the data format independent access to aggregation data.
      * Individual information may be ignored depending on the actual aggregation.
      *
@@ -76,7 +97,7 @@ public class ChannelTimeSeriesAggregator <I, O, D, T> {
      * @param <T> the timestamp type within {@code I} and {@code O}
      * @author Holger Eichelberger, SSE
      */
-    public interface AggregationFunction<I, O, D, T> {
+    public interface AggregationFunction<I, O, D, T> extends CompletionFunction<T> {
 
         /**
          * Returns the aggregation timestamp from {@code input}.
@@ -102,15 +123,6 @@ public class ChannelTimeSeriesAggregator <I, O, D, T> {
          */
         public D getData(I input);
 
-        /**
-         * Returns whether an aggregation chunk has been completed and a result
-         * instance shall be created.
-         * 
-         * @param numberAggregatedSamples the number of samples aggregated so far
-         * @param timestamp the timestamp the aggregation started
-         * @return {@code true} for completed, {@code false} else
-         */
-        public boolean chunkCompleted(int numberAggregatedSamples, T timestamp);
         
         /**
          * Creates a result builder for composing a potentially multi-category result.
@@ -119,6 +131,69 @@ public class ChannelTimeSeriesAggregator <I, O, D, T> {
          * @return the result builder instance
          */
         public ResultBuilder<O, D, T> createResult(int categoriesCount);
+        
+    }
+    
+    /**
+     * Basic aggregation function delegating the operations to (lambda) functions.
+     * 
+     * @param <I> the input data type
+     * @param <O> the output data type
+     * @param <D> the data point type within {@code I} and {@code O}
+     * @param <T> the timestamp type within {@code I} and {@code O}
+     * @author Holger Eichelberger, SSE
+     */
+    public static class LambdaBasedAggregationFunction<I, O, D, T> implements AggregationFunction<I, O, D, T> {
+
+        private Function<I, T> timestampProvider;
+        private Function<I, String> categoryProvider;
+        private Function<I, D> dataProvider;
+        private CompletionFunction<T> completionFunction;
+        private Function<Integer, ResultBuilder<O, D, T>> resultBuilderProvider;
+        
+        /**
+         * Creates a lambda based aggregation function. All parameters must not be <b>null</b>.
+         * 
+         * @param timestampProvider the timestamp provider implementing {@link #getTimestamp(Object)}
+         * @param categoryProvider the timestamp provider implementing {@link #getCategory(Object)}
+         * @param dataProvider the data provider implementing {@link #getData(Object)}
+         * @param completionFunction the completion function provider implementing {@link #chunkCompleted(int, Object)}
+         * @param resultBuilderProvider the result builder function provider implementing {@link #createResult(int)}
+         */
+        public LambdaBasedAggregationFunction(Function<I, T> timestampProvider, Function<I, String> categoryProvider, 
+            Function<I, D> dataProvider, CompletionFunction<T> completionFunction, Function<Integer, 
+            ResultBuilder<O, D, T>> resultBuilderProvider) {
+            this.timestampProvider = timestampProvider;
+            this.categoryProvider = categoryProvider;
+            this.dataProvider = dataProvider;
+            this.resultBuilderProvider = resultBuilderProvider;
+            this.completionFunction = completionFunction;
+        }
+        
+        @Override
+        public T getTimestamp(I input) {
+            return timestampProvider.apply(input);
+        }
+
+        @Override
+        public String getCategory(I input) {
+            return categoryProvider.apply(input);
+        }
+
+        @Override
+        public D getData(I input) {
+            return dataProvider.apply(input);
+        }
+
+        @Override
+        public boolean chunkCompleted(int numberAggregatedSamples, T timestamp) {
+            return completionFunction.chunkCompleted(numberAggregatedSamples, timestamp);
+        }
+
+        @Override
+        public ResultBuilder<O, D, T> createResult(int categoriesCount) {
+            return resultBuilderProvider.apply(categoriesCount);
+        }
         
     }
 

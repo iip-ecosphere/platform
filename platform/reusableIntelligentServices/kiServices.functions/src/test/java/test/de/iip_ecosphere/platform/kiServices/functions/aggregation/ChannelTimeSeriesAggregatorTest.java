@@ -25,8 +25,7 @@ import org.junit.Test;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.kiServices.functions.aggregation.ChannelTimeSeriesAggregator;
-import de.iip_ecosphere.platform.kiServices.functions.aggregation.ChannelTimeSeriesAggregator.AggregationFunction;
-import de.iip_ecosphere.platform.kiServices.functions.aggregation.ChannelTimeSeriesAggregator.ResultBuilder;
+import de.iip_ecosphere.platform.kiServices.functions.aggregation.ChannelTimeSeriesAggregator.*;
 import de.iip_ecosphere.platform.services.environment.IipStringStyle;
 
 /**
@@ -89,6 +88,29 @@ public class ChannelTimeSeriesAggregatorTest {
 
     }
     
+    /**
+     * Converts the {@link PlcEnergyMeasurement#value} from {@code input}.
+     * 
+     * @param input the input instance
+     * @return the converted value
+     */
+    private static Double getValue(PlcEnergyMeasurement input) {
+        Double result;
+        try {
+            result = Double.valueOf(input.value);
+        } catch (NumberFormatException ex) {
+            result = -1.0;
+            LoggerFactory.getLogger(ChannelTimeSeriesAggregatorTest.class).info("Cannot add received value: {}", 
+                ex.getMessage());
+        }
+        return result;
+    }
+    
+    /**
+     * The aggregation function in a bit lazy form merged with the {@link ResultBuilder}.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
     private static class AggFunction implements AggregationFunction<PlcEnergyMeasurement, 
         AggregatedPlcEnergyMeasurement, Double, Date>, ResultBuilder<AggregatedPlcEnergyMeasurement, 
         Double, Date> {
@@ -108,14 +130,7 @@ public class ChannelTimeSeriesAggregatorTest {
 
         @Override
         public Double getData(PlcEnergyMeasurement input) {
-            Double result;
-            try {
-                result = Double.valueOf(input.value);
-            } catch (NumberFormatException ex) {
-                result = -1.0;
-                LoggerFactory.getLogger(getClass()).info("Cannot add received value: " + ex.getMessage());
-            }
-            return result;
+            return getValue(input);
         }
 
         @Override
@@ -154,12 +169,32 @@ public class ChannelTimeSeriesAggregatorTest {
         }
         
     }
-    
+
     /**
      * Tests {@link ChannelTimeSeriesAggregator}.
      */
     @Test
     public void testAggregator() {
+        testAggregator(new AggFunction());
+    }
+
+    /**
+     * Tests {@link ChannelTimeSeriesAggregator}.
+     */
+    @Test
+    public void testLambdaAggregator() {
+        testAggregator(new LambdaBasedAggregationFunction<PlcEnergyMeasurement, AggregatedPlcEnergyMeasurement, 
+            Double, Date>(d -> d.timestamp, d -> d.channel, d -> getValue(d), 
+                (n, t) -> n >= 3, s -> new AggFunction().createResult(s)));
+    }
+
+    /**
+     * Tests {@link ChannelTimeSeriesAggregator}.
+     * 
+     * @param aggFunc the aggregator function to test
+     */
+    private void testAggregator(AggregationFunction<PlcEnergyMeasurement, AggregatedPlcEnergyMeasurement, 
+        Double, Date> aggFunc) {
         Date now = Calendar.getInstance().getTime();
         PlcEnergyMeasurement[] data = new PlcEnergyMeasurement[3];
         data[0] = new PlcEnergyMeasurement();
@@ -177,7 +212,7 @@ public class ChannelTimeSeriesAggregatorTest {
 
         ChannelTimeSeriesAggregator<PlcEnergyMeasurement, AggregatedPlcEnergyMeasurement, Double, Date> agg 
             = new ChannelTimeSeriesAggregator<PlcEnergyMeasurement, AggregatedPlcEnergyMeasurement, Double, Date>(
-                new AggFunction());
+                aggFunc);
         agg.stopAggregating();
         agg.startAggregating();
         
