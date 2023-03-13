@@ -18,10 +18,8 @@ import { ResourcesComponent }
   from './components/resources/resources.component';
 import { ServicesComponent }
   from './components/services/services.component';
-import { ListAppComponent }
-  from './components/lists/list-app/list-app.component';
-import { ListsComponent }
-  from './components/lists/lists.component';
+//import { ListAppComponent } from './components/lists/list-app/list-app.component';
+//import { ListsComponent } from './components/lists/lists.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'resources', pathMatch: `full` },
