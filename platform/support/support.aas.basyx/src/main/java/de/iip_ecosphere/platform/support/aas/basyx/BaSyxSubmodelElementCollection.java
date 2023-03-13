@@ -261,6 +261,11 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
             return isNew;
         }
         
+        @Override
+        public boolean hasElement(String idShort) {
+            return instance.getElement(idShort) != null;
+        }
+        
     }
     
     /**

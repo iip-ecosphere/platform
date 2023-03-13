@@ -106,6 +106,11 @@ public class BaSyxISubmodel extends AbstractSubmodel<ISubmodel> {
         public boolean isNew() {
             return false; // see constructor
         }
+        
+        @Override
+        public boolean hasElement(String idShort) {
+            return instance.getSubmodelElement(idShort) != null;
+        }
 
     }
     

@@ -152,6 +152,11 @@ public class BaSyxSubmodel extends AbstractSubmodel<org.eclipse.basyx.submodel.m
         public boolean isNew() {
             return isNew;
         }
+        
+        @Override
+        public boolean hasElement(String idShort) {
+            return instance.getSubmodelElement(idShort) != null;
+        }
 
     }
 
