@@ -30,6 +30,13 @@ public interface ServiceFactoryDescriptor {
     public ServiceManager createInstance();
 
     /**
+     * Returns the service setup.
+     * 
+     * @return the setup
+     */
+    public ServiceSetup getSetup();
+
+    /**
      * Returns the AAS setup.
      * 
      * @return the setup

@@ -102,7 +102,7 @@ public class ServicesAasTest {
         Server aasServer = AasPartRegistry.deploy(res.getAas()); 
         aasServer.start();
         AasPartRegistry.retrieveIipAas().accept(new AasPrintVisitor());
-        ServicesAasClient client = new ServicesAasClient(Id.getDeviceIdAas());
+        ServicesAasClient client = new ServicesAasClient(Id.getDeviceIdAas(), "nonExApp");
         test(client);
         
         aasServer.stop(true);

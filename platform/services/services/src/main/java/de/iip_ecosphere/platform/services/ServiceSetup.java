@@ -13,6 +13,7 @@
 package de.iip_ecosphere.platform.services;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import de.iip_ecosphere.platform.support.aas.AasFactory;
@@ -27,12 +28,36 @@ import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
  */
 public class ServiceSetup {
 
+    public static final String ENV_SUPPORTED_APPIDS = "IIP_SUPPORTED_APPIDS";
+    public static final String PROPERTY_SUPPORTED_APPIDS = "iip.supportedAppIds";
     private AasSetup aas = new AasSetup();
     private String serviceProtocol = AasFactory.DEFAULT_PROTOCOL;
     private TransportSetup transport = new TransportSetup();
     private NetworkManagerSetup netMgr = new NetworkManagerSetup();
-    private List<String> serviceCmdArgs = new ArrayList<String>();
+    private List<String> serviceCmdArgs = new ArrayList<>();
+    private List<String> supportedAppIds = initialSupportedAppIds();
 
+    /**
+     * Tries to read the supported App ids from {@link #PROPERTY_SUPPORTED_APPIDS} as environment variable or
+     * java system property.
+     * 
+     * @return the initial App ids, may be empty
+     */
+    private static List<String> initialSupportedAppIds() {
+        List<String> result;
+        String tmp = System.getenv(ENV_SUPPORTED_APPIDS);
+        if (null == tmp) {
+            tmp = "";
+        }
+        tmp = System.getProperty(PROPERTY_SUPPORTED_APPIDS, tmp);
+        if (tmp.trim().length() > 0) {
+            result = Arrays.asList(tmp.split(","));
+        } else {
+            result = new ArrayList<>();
+        }
+        return result;
+    }
+    
     /**
      * Returns the AAS setup.
      * 
@@ -79,6 +104,15 @@ public class ServiceSetup {
     }
 
     /**
+     * Returns the supported App Ids.
+     * 
+     * @return the supported App Ids, may be empty for no restriction
+     */
+    public List<String> getSupportedAppIds() {
+        return supportedAppIds;
+    }
+
+    /**
      * Defines the AAS setup. [required by snakeyaml]
      * 
      * @param aas the AAS setup
@@ -115,12 +149,28 @@ public class ServiceSetup {
     }
     
     /**
-     * Additional global service command arguments, e.g., for testing. [required snakeyaml]
+     * Additional global service command arguments, e.g., for testing. [snakeyaml]
      * 
      * @param serviceCmdArgs the additional command arguments
      */
     public void setServiceCmdArgs(List<String> serviceCmdArgs) {
+        if (null == serviceCmdArgs) {
+            serviceCmdArgs = new ArrayList<>();
+        }
         this.serviceCmdArgs = serviceCmdArgs;
     }
+    
+    /**
+     * Changes the supported App Ids. [snakeyaml]
+     * 
+     * @param supportedAppIds the supported App Ids, may be empty for no restriction
+     */
+    public void setSupportedAppIds(List<String> supportedAppIds) {
+        if (null == supportedAppIds) {
+            supportedAppIds = new ArrayList<>();
+        }
+        this.supportedAppIds = supportedAppIds;
+    }
+
 
 }

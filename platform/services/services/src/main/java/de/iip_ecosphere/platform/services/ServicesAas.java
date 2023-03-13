@@ -87,6 +87,7 @@ public class ServicesAas implements AasContributor {
     public static final String NAME_COLL_ARTIFACTS = "artifacts";
     public static final String NAME_COLL_SERVICES = AasPartRegistry.NAME_COLLECTION_SERVICES;
     public static final String NAME_COLL_RELATIONS = "relations";
+    public static final String NAME_COLL_SERVICE_MANAGERS = "serviceManagers";
     public static final String NAME_SUBCOLL_PARAMETERS = "parameters";
     public static final String NAME_SUBCOLL_INPUT_DATA_CONN = "inputDataConnectors";
     public static final String NAME_SUBCOLL_OUTPUT_DATA_CONN = "outputDataConnectors";
@@ -108,6 +109,7 @@ public class ServicesAas implements AasContributor {
     public static final String NAME_PROP_SERVICE_AAS = "serviceAas";
     public static final String NAME_PROP_DEVICE_AAS = AasPartRegistry.NAME_PROP_DEVICE_AAS;
     public static final String NAME_PROP_IN_CLEANUP = "inCleanup";
+    public static final String NAME_PROP_SUPPORTED_APPIDS = "supportedAppIds";
     public static final String NAME_OP_SERVICE_START = "startService";
     public static final String NAME_OP_SERVICE_START_TASK = "startServiceAsTask";
     public static final String NAME_OP_SERVICE_START_WITH_OPTS = "startServiceWithOptions";
@@ -125,6 +127,7 @@ public class ServicesAas implements AasContributor {
     public static final String NAME_OP_ARTIFACT_ADD = "addArtifact";
     public static final String NAME_OP_ARTIFACT_REMOVE = "removeArtifact";
     public static final String NAME_OP_SERVICE_INSTANCE_COUNT  = "getServiceInstanceCount";
+    public static final String NAME_OP_SERVICE_STATE_COUNT  = "getServiceStateCount";
     
     private static final String ID_SUBMODEL = null; // take the short name, shall become public and an URN later
     
@@ -134,38 +137,22 @@ public class ServicesAas implements AasContributor {
         if (null != mgr) { // this shall not be needed, but if the Jar is present, the contributor will be executed 
             // operations contribute to the operation of the underlying resource (Service JVM or ECS Runtime JVM)
             SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL_RESOURCES, ID_SUBMODEL);
-            SubmodelElementCollectionBuilder jB 
+            SubmodelElementCollectionBuilder deviceB 
                 = smB.createSubmodelElementCollectionBuilder(Id.getDeviceIdAas(), false, false);
-        
-            // probably relevant ops only
-            createIdOp(jB, NAME_OP_SERVICE_START, iCreator);
-            createIdOp(jB, NAME_OP_SERVICE_START_TASK, iCreator, "taskId");
-            createIdOp(jB, NAME_OP_SERVICE_START_WITH_OPTS, iCreator, "options");
-            createIdOp(jB, NAME_OP_SERVICE_START_WITH_OPTS_TASK, iCreator, "taskId", "options");
-            createIdOp(jB, NAME_OP_SERVICE_ACTIVATE, iCreator);
-            createIdOp(jB, NAME_OP_SERVICE_PASSIVATE, iCreator);
-            createIdOp(jB, NAME_OP_SERVICE_MIGRATE, iCreator, "location");
-            createIdOp(jB, NAME_OP_SERVICE_UPDATE, iCreator, "location");
-            createIdOp(jB, NAME_OP_SERVICE_SWITCH, iCreator, "newId");
-            createIdOp(jB, NAME_OP_SERVICE_RECONF, iCreator, "values");
-            createIdOp(jB, NAME_OP_SERVICE_STOP, iCreator);
-            createIdOp(jB, NAME_OP_SERVICE_STOP_TASK, iCreator, "taskId");
-            createIdOp(jB, NAME_OP_SERVICE_GET_STATE, iCreator);
-            createIdOp(jB, NAME_OP_SERVICE_INSTANCE_COUNT, iCreator);
-            createIdOp(jB, NAME_OP_SERVICE_SET_STATE, iCreator, "state");
+            // #115 remove as legacy
+            if (!deviceB.hasElement(NAME_PROP_SUPPORTED_APPIDS)) { // just keep the first one, avoid overriding
+                createServiceManagerSubmodelElements(deviceB, iCreator); // legacy
+            }
+
+            SubmodelElementCollectionBuilder svcMgrsB 
+                = deviceB.createSubmodelElementCollectionBuilder(NAME_COLL_SERVICE_MANAGERS, false, false);
+            SubmodelElementCollectionBuilder svcMgrB
+                = svcMgrsB.createSubmodelElementCollectionBuilder(Id.getEnvIdAas(), false, false);
+            createServiceManagerSubmodelElements(svcMgrB, iCreator);
+            svcMgrB.build();
+            svcMgrsB.build();
             
-            // probably relevant ops only
-            jB.createOperationBuilder(NAME_OP_ARTIFACT_ADD)
-                .setInvocable(iCreator.createInvocable(getQName(NAME_OP_ARTIFACT_ADD)))
-                .addInputVariable("url", Type.STRING)
-                .addOutputVariable("result", Type.STRING)
-                .build();
-            jB.createOperationBuilder(NAME_OP_SERVICE_INSTANCE_COUNT)
-                .setInvocable(iCreator.createInvocable(getQName(NAME_OP_SERVICE_INSTANCE_COUNT)))
-                .addInputVariable("id", Type.STRING)
-                .build(Type.INTEGER);
-            createIdOp(jB, NAME_OP_ARTIFACT_REMOVE, iCreator);
-            jB.build();
+            deviceB.build();
     
             smB.defer(); // join with ecsRuntime if present, build done by AAS
     
@@ -187,6 +174,50 @@ public class ServicesAas implements AasContributor {
             smB.build();
         }
         return null;
+    }
+    
+    /**
+     * Creates the elements representing a service manager.
+     * 
+     * @param builder the target builder
+     * @param iCreator the invocables creator for binding (remote) property and operation implementations.
+     */
+    private void createServiceManagerSubmodelElements(SubmodelElementCollectionBuilder builder, 
+        InvocablesCreator iCreator) {
+        createIdOp(builder, NAME_OP_SERVICE_START, iCreator);
+        createIdOp(builder, NAME_OP_SERVICE_START_TASK, iCreator, "taskId");
+        createIdOp(builder, NAME_OP_SERVICE_START_WITH_OPTS, iCreator, "options");
+        createIdOp(builder, NAME_OP_SERVICE_START_WITH_OPTS_TASK, iCreator, "taskId", "options");
+        createIdOp(builder, NAME_OP_SERVICE_ACTIVATE, iCreator);
+        createIdOp(builder, NAME_OP_SERVICE_PASSIVATE, iCreator);
+        createIdOp(builder, NAME_OP_SERVICE_MIGRATE, iCreator, "location");
+        createIdOp(builder, NAME_OP_SERVICE_UPDATE, iCreator, "location");
+        createIdOp(builder, NAME_OP_SERVICE_SWITCH, iCreator, "newId");
+        createIdOp(builder, NAME_OP_SERVICE_RECONF, iCreator, "values");
+        createIdOp(builder, NAME_OP_SERVICE_STOP, iCreator);
+        createIdOp(builder, NAME_OP_SERVICE_STOP_TASK, iCreator, "taskId");
+        createIdOp(builder, NAME_OP_SERVICE_GET_STATE, iCreator);
+        createIdOp(builder, NAME_OP_SERVICE_INSTANCE_COUNT, iCreator);
+        createIdOp(builder, NAME_OP_SERVICE_SET_STATE, iCreator, "state");
+        
+        // probably relevant ops only
+        builder.createOperationBuilder(NAME_OP_ARTIFACT_ADD)
+            .setInvocable(iCreator.createInvocable(getQName(NAME_OP_ARTIFACT_ADD)))
+            .addInputVariable("url", Type.STRING)
+            .addOutputVariable("result", Type.STRING)
+            .build();
+        builder.createOperationBuilder(NAME_OP_SERVICE_INSTANCE_COUNT)
+            .setInvocable(iCreator.createInvocable(getQName(NAME_OP_SERVICE_INSTANCE_COUNT)))
+            .addInputVariable("id", Type.STRING)
+            .build(Type.INTEGER);
+        builder.createOperationBuilder(NAME_OP_SERVICE_STATE_COUNT)
+            .setInvocable(iCreator.createInvocable(getQName(NAME_OP_SERVICE_STATE_COUNT)))
+            .addInputVariable("state", Type.STRING)
+            .build(Type.INTEGER);
+        createIdOp(builder, NAME_OP_ARTIFACT_REMOVE, iCreator);
+        builder.createPropertyBuilder(NAME_PROP_SUPPORTED_APPIDS)
+            .setValue(Type.STRING, String.join(",", ServiceFactory.getSetup().getSupportedAppIds()))
+            .build();
     }
 
     /**
@@ -289,24 +320,42 @@ public class ServicesAas implements AasContributor {
             }
         ));
         sBuilder.defineOperation(getQName(NAME_OP_SERVICE_GET_STATE), 
-            new JsonResultWrapper(p -> { 
-                return ServiceFactory.getServiceManager().getServiceState(readString(p)); 
-            }
+            new JsonResultWrapper(p -> ServiceFactory.getServiceManager().getServiceState(readString(p))
         ));
         sBuilder.defineOperation(getQName(NAME_OP_SERVICE_INSTANCE_COUNT), 
-            new JsonResultWrapper(p -> { 
-                return ServiceFactory.getServiceManager().getServiceInstanceCount(readString(p)); 
-            }
+            new JsonResultWrapper(p -> ServiceFactory.getServiceManager().getServiceInstanceCount(readString(p))
+        ));
+        sBuilder.defineOperation(getQName(NAME_OP_SERVICE_STATE_COUNT), 
+            new JsonResultWrapper(p -> getServiceStateCount(readString(p, 0, "")) 
         ));
         sBuilder.defineOperation(getQName(NAME_OP_SERVICE_SET_STATE), 
             new JsonResultWrapper(p -> { 
-                ServiceState state = ServiceState.valueOf(readString(p, 1, "")); // exception shall be caught by wrapper
+                ServiceState state = ServiceState.valueOf(readString(p, 1, "")); // exception -> wrapper
                 ServiceFactory.getServiceManager().setServiceState(readString(p), state); 
                 return null;
             }
         ));
         contributeArtifactTo(sBuilder);
         contributeTaskTo(sBuilder);
+    }
+    
+    /**
+     * Returns the number of service instances in the given state. Preliminarily in here, may be moved into the service
+     * manager
+     * 
+     * @param state the state
+     * @return the number of service instances
+     */
+    private static int getServiceStateCount(String state) {
+        ServiceManager mgr = ServiceFactory.getServiceManager();
+        ServiceState st = ServiceState.valueOf(state); // exception -> wrapper
+        int count = 0;
+        for (String id : mgr.getServiceIds()) {
+            if (st == mgr.getServiceState(id)) {
+                count++;
+            }
+        }
+        return count; 
     }
     
     /**

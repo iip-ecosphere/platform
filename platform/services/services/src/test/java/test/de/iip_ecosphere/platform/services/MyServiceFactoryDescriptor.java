@@ -14,6 +14,7 @@ package test.de.iip_ecosphere.platform.services;
 
 import de.iip_ecosphere.platform.services.ServiceFactoryDescriptor;
 import de.iip_ecosphere.platform.services.ServiceManager;
+import de.iip_ecosphere.platform.services.ServiceSetup;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 
@@ -38,6 +39,11 @@ public class MyServiceFactoryDescriptor implements ServiceFactoryDescriptor {
 
     @Override
     public TransportSetup getTransport() {
+        return null; // try reading it from file
+    }
+
+    @Override
+    public ServiceSetup getSetup() {
         return null; // try reading it from file
     }
 

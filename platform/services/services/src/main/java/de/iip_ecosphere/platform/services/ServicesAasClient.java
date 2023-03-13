@@ -21,10 +21,12 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import de.iip_ecosphere.platform.services.environment.ServiceState;
+import de.iip_ecosphere.platform.support.aas.Operation;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
+import de.iip_ecosphere.platform.support.iip_aas.AasUtils;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.SubmodelElementsCollectionClient;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
@@ -39,6 +41,8 @@ import static de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper.*
  */
 public class ServicesAasClient extends SubmodelElementsCollectionClient implements ServicesClient {
 
+    private String appId = "";
+    
     /**
      * Creates a client instance based on a deployed IIP-AAS from {@link AasPartRegistry} based on a submodel with
      * {@link ServicesAas#NAME_SUBMODEL_RESOURCES resources}.
@@ -49,6 +53,71 @@ public class ServicesAasClient extends SubmodelElementsCollectionClient implemen
      */
     public ServicesAasClient(String resourceId) throws IOException {
         super(ServicesAas.NAME_SUBMODEL_RESOURCES, resourceId);
+    }
+
+    /**
+     * Creates a client instance based on a deployed IIP-AAS from {@link AasPartRegistry} based on a submodel with
+     * {@link ServicesAas#NAME_SUBMODEL_RESOURCES resources}.
+     * 
+     * @param resourceId the id used as key in {@link ServicesAas#NAME_SUBMODEL_RESOURCES} to denote the resource 
+     *   to operate on
+     * @param appId optional app id to select the service manager to use, may be empty or null for the 
+     *   first/fallback manager
+     * @throws IOException if retrieving the IIP-AAS or the respective submodel fails
+     */
+    public ServicesAasClient(String resourceId, String appId) throws IOException {
+        super(ServicesAas.NAME_SUBMODEL_RESOURCES, resourceId);
+        this.appId = appId == null ? "" : appId;
+    }
+
+    @Override
+    protected SubmodelElementCollection getSubmodelElementCollection() {
+        SubmodelElementCollection result = super.getSubmodelElementCollection();
+        SubmodelElementCollection m = result.getSubmodelElementCollection(ServicesAas.NAME_COLL_SERVICE_MANAGERS);
+        if (null != m) {
+            SubmodelElementCollection found = null;
+            int foundServices = -1;
+            SubmodelElementCollection fallback = null;
+            int fallbackServices = -1;
+            for (SubmodelElement elt : m.elements()) {
+                if (elt instanceof SubmodelElementCollection) {
+                    SubmodelElementCollection mgr = (SubmodelElementCollection) elt;
+                    String[] appIds = AasUtils.getPropertyValueAsStringSafe(mgr, 
+                        ServicesAas.NAME_PROP_SUPPORTED_APPIDS, "").split(",");
+                    int instances = getServiceStateCount(mgr, ServiceState.RUNNING);
+                    if (appIds.length == 0 || contains(appIds, appId)) { // eligible?
+                        if (foundServices < 0 || instances < foundServices) {
+                            found = mgr;
+                        }
+                    }
+                    if (fallbackServices < 0 || instances < fallbackServices) {
+                        fallback = mgr;
+                    }
+                }
+            }
+            if (null == found) {
+                found = fallback; // CACHE?
+            }
+            if (found != null) {
+                result = found;
+            }
+        }
+        return result;
+    }
+    
+    /**
+     * Returns whether {@code array} contains {@code elt}.
+     * 
+     * @param array the array to search
+     * @param elt the element to search for
+     * @return {@code true} if contained, {@code false} else
+     */
+    private static boolean contains(String[] array, String elt) {
+        boolean contains = false;
+        for (int i = 0; !contains && i < array.length; i++) {
+            contains = elt.equals(array[i]);
+        }
+        return contains;
     }
 
     @Override
@@ -241,6 +310,32 @@ public class ServicesAasClient extends SubmodelElementsCollectionClient implemen
     public void stopServiceAsTask(String taskId, String... serviceId) throws ExecutionException {
         fromJson(getOperation(ServicesAas.NAME_OP_SERVICE_STOP_TASK)
             .invoke(JsonUtils.toJson(serviceId), JsonUtils.toJson(taskId)));
+    }
+
+    /**
+     * Requests the number of services in the given {@code state} on the service manager submodel elements
+     * collection {@code resource}.
+     * 
+     * @param resource the submodel elements collection representing a service manager
+     * @param state the state to query for
+     * @return the number of service instances
+     */
+    private int getServiceStateCount(SubmodelElementCollection resource, ServiceState state) {
+        int result = 0;
+        try {
+            Operation op = resource.getOperation(ServicesAas.NAME_OP_SERVICE_STATE_COUNT);
+            if (null == op) {
+                throw new ExecutionException("Operation `" + ServicesAas.NAME_OP_SERVICE_STATE_COUNT 
+                    + "` on resource `" + resource.getIdShort() + "` not found.", null); 
+            }
+            Object tmp = op.invoke(JsonUtils.toJson(state.name()));
+            if (tmp instanceof Integer) {
+                result = ((Integer) tmp).intValue();
+            }
+        } catch (ExecutionException | NumberFormatException e) {
+            getLogger().error("Requesting state instance count: " + e.getMessage());
+        }        
+        return result;
     }
 
     @Override

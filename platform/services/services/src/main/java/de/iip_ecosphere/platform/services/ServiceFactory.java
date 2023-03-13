@@ -35,6 +35,7 @@ public class ServiceFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(ServiceFactory.class.getName());
     private static ServiceFactoryDescriptor desc;
     private static ServiceManager manager = null;
+    private static ServiceSetup service;
     private static AasSetup setup;
     private static TransportSetup transport;
     private static NetworkManagerSetup netwMgrSetup;
@@ -72,6 +73,33 @@ public class ServiceFactory {
         return manager;
     }
     
+    // TODO unify, simplify
+
+    /**
+     * Returns the actual service setup for the implementing service manager.
+     * 
+     * @return the service setup
+     */
+    public static ServiceSetup getSetup() {
+        if (null == service) {
+            init();
+            if (null != desc) {
+                service = desc.getSetup();
+            }
+            if (null == service) {
+                try {
+                    service = AbstractSetup.readFromYaml(ServiceSetup.class);
+                } catch (IOException e) {
+                    LoggerFactory.getLogger(ServiceFactory.class).warn("Cannot read setup: " + e.getMessage());
+                }
+                if (null == service) {
+                    service = new ServiceSetup();
+                }
+            }
+        }
+        return service;
+    }
+
     /**
      * Returns the actual AAS setup for the implementing service manager.
      * 
@@ -88,7 +116,7 @@ public class ServiceFactory {
                     ServiceSetup cfg = AbstractSetup.readFromYaml(ServiceSetup.class);
                     setup = cfg.getAas();
                 } catch (IOException e) {
-                    LoggerFactory.getLogger(ServiceFactory.class).warn("Cannot read configuration: " + e.getMessage());
+                    LoggerFactory.getLogger(ServiceFactory.class).warn("Cannot read setup: " + e.getMessage());
                 }
                 if (null == setup) {
                     setup = new AasSetup();
@@ -110,7 +138,7 @@ public class ServiceFactory {
                 ServiceSetup cfg = AbstractSetup.readFromYaml(ServiceSetup.class);
                 netwMgrSetup = cfg.getNetMgr();
             } catch (IOException e) {
-                LoggerFactory.getLogger(ServiceFactory.class).warn("Cannot read configuration: " + e.getMessage());
+                LoggerFactory.getLogger(ServiceFactory.class).warn("Cannot read setup: " + e.getMessage());
             }
             if (null == setup) {
                 netwMgrSetup = new NetworkManagerSetup();
@@ -135,7 +163,7 @@ public class ServiceFactory {
                     ServiceSetup cfg = AbstractSetup.readFromYaml(ServiceSetup.class);
                     transport = cfg.getTransport();
                 } catch (IOException e) {
-                    LoggerFactory.getLogger(ServiceFactory.class).warn("Cannot read configuration: " + e.getMessage());
+                    LoggerFactory.getLogger(ServiceFactory.class).warn("Cannot read setup: " + e.getMessage());
                 }
                 if (null == transport) {
                     transport = new TransportSetup();

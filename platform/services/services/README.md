@@ -54,6 +54,9 @@ tag of the implementation component:
     serviceCmdArgs:
       - <String>
       - <String>
+    supportedAppIds:
+      - <String>
+      - <String>
 
 * The `server` defines the setup of the main AAS server, i.e., the (URL) connection schema, the host name, the port number and the endpoint path on that server. The port number may be negative indicating any free (ephemerial) port, but then host shall typically be `localhost`. By default, the schema is `HTTP`, the host is `localhost`, the port  is `8080` and the path is empty. `keystore`, `keyPassword`, and `keyAlias` are optional TLS settings pointing to the keystore file, the alias of the key to use and the key(store) password. Please note that BaSyx currently requires that the alias is `tomcat`.
 * The `mode` defines whether a local server shall be powered up (`REGISTER`, host in `server` ignored) and the created AAS shall be registered with the `registry`, or whether the created AAS shall be deployed to `server` remotely and registered with `registry` (`REMOTE_DEPLOY`). Default is `REMOTE_DEPLOY`.
@@ -62,6 +65,7 @@ tag of the implementation component:
 * The `implementation` is the server counterpart for dynamic/active AAS providing actual property values and serving AAS operation requests. Similar to the entries above, the implementation server has a schema (just for illustrative purposes), a host name, a port (for negative ports see above) and a protocol (from `AasFactory`, e.g. empty for the default protocol `VAB`). By default, the schema is `TCP`, the host is `localhost`, the port is `9000` and the protocol is empty (i.e., the default protocol of the `AasFactory`). As typically a server instance shall be created and communicated to potential callers, the we turn `127.0.0.1` as the numerical representation of `localhost` into an IP address of the device. As a device may have multiple IP addresses and automatic selection may be desired, we consider `netmask` as a filter to select the desired IP address. `netmask` can either be given as a decimal netmask or as a Java regular expression over IP addresses. If `netmask` is empty, any IP address of the device is selected if available. Further, if the port number is invalid, e.g., negative, we turn it into an ephemeral port. `keystore`, `keyPassword`, and `keyAlias` are optional TLS settings pointing to the keystore file, the alias of the key to use and the key(store) password. Please note that BaSyx currently requires that the alias is `tomcat`.
 * `netMgr` sets up minimum or maximum port for automated ephemeral port assignment. Default range is 1024-65535 according to RFC 6056. The `netmask` has the same semantics as for `implementation`.
 * `serviceCmdArgs` are optional command line arguments to be passed to all service starts. This can be helful for testing.
+* `supportedAppIds` (initial value taken from environment or system property `iip.supportedAppIds` to ease container customization) are application ids that are particularly supported by this service manager. If empty, all known apps are supported. If ids are given and an app with a different id is started, the operation may fail.
 
 ## Running
 
