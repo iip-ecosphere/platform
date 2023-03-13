@@ -30,18 +30,20 @@ public interface ServicesClientFactory {
     public static final ServicesClientFactory DEFAULT = new ServicesClientFactory() {
         
         @Override
-        public ServicesClient create(String resourceId) throws IOException {
-            return new ServicesAasClient(resourceId);
+        public ServicesClient create(String resourceId, String appId) throws IOException {
+            return new ServicesAasClient(resourceId, appId);
         }
+        
     };
     
     /**
      * Creates a services AAS client.
      * 
      * @param resourceId the id of the resource to create the client for 
+     * @param appId the id of the application to create the client for, may be empty or <b>null</b> for none
      * @return the client instance
      * @throws IOException if the client cannot be created
      */
-    public ServicesClient create(String resourceId) throws IOException;
+    public ServicesClient create(String resourceId, String appId) throws IOException;
 
 }

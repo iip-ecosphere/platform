@@ -208,7 +208,7 @@ public class Cli extends CliBackend {
 
         @Override
         protected void initialize(String... args) throws IOException {
-            client = getServicesFactory().create(args[0]);
+            client = getServicesFactory().create(args[0], "");
         }
         
         @Override

@@ -208,7 +208,7 @@ public class CliTest {
     private static class ServicesFactory implements ServicesClientFactory, ServicesClient {
 
         @Override
-        public ServicesClient create(String resourceId) throws IOException {
+        public ServicesClient create(String resourceId, String appId) throws IOException {
             return this;
         }
 
