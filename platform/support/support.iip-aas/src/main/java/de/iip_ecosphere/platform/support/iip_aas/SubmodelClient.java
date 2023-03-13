@@ -56,6 +56,12 @@ public class SubmodelClient {
     protected Operation getOperation(String idShort) throws ExecutionException {
         return getOperation(submodel, idShort);
     }
+
+    /**
+     * If there is caching, force re-caching.
+     */
+    public void clear() {
+    }
     
     /**
      * Returns the property for the given {@code idShort} defined on {@link #submodel}.

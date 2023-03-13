@@ -225,6 +225,7 @@ public class AasPartRegistryTest {
         MyAasClient client = new MyAasClient(sub);
         client.assertProp();
         client.assertOp();
+        client.clear(); // just to call it
         
         server.stop(true);
         AasPartRegistry.setAasSetup(oldSetup);

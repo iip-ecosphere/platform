@@ -86,10 +86,19 @@ public class SubmodelElementsCollectionClient extends SubmodelClient {
         return result;
     }
 
+    /**
+     * Returns the actual submodel elements collection to use.
+     * 
+     * @return the collection
+     */
+    protected SubmodelElementCollection getSubmodelElementCollection() {
+        return getSubmodel().getSubmodelElementCollection(AasUtils.fixId(collectionId));
+    }
+
     @Override
     protected Operation getOperation(String idShort) throws ExecutionException {
         Operation result = null;
-        SubmodelElementCollection resource = getSubmodel().getSubmodelElementCollection(AasUtils.fixId(collectionId));
+        SubmodelElementCollection resource = getSubmodelElementCollection();
         if (resource != null) {
             result = resource.getOperation(idShort);
         }
@@ -103,7 +112,7 @@ public class SubmodelElementsCollectionClient extends SubmodelClient {
     @Override
     protected Property getProperty(String idShort) throws ExecutionException {
         Property result = null;
-        SubmodelElementCollection resource = getSubmodel().getSubmodelElementCollection(AasUtils.fixId(collectionId));
+        SubmodelElementCollection resource = getSubmodelElementCollection();
         if (resource != null) {
             result = resource.getProperty(idShort);
         }
