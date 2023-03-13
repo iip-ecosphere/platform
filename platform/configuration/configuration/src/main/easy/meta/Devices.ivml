@@ -97,7 +97,12 @@ project Devices {
     PythonDependency tensorflow280 = {
        name = "tensorflow",
        version = "2.8.0"
-    };    
+    };
+
+    PythonDependency tensorflow290 = {
+       name = "tensorflow",
+       version = "2.9.0"
+    };
     
     // ------------------ DeviceId --------------------------- 
     

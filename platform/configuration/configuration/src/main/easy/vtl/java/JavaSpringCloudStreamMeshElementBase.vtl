@@ -511,7 +511,7 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
         conn.enablePolling(false); // independent of notifications, disable as @Autowired may not be
         ${getYamlServiceFragment("serviceData", clsName, conn.id)}; 
         service = new ${wrapperCls(conn)}${getConnectorGenerics(conn, true)}(serviceData, conn, 
-            () -> param);
+            () -> param${wrapperCtorParam(conn)});
         service.setReceptionCallback(new ConnectorReceptionCallback());
         ${initAppInstId("service")}'
     }
@@ -522,6 +522,39 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
             wrapperCls = "MockingConnectorServiceWrapper";
         }
         wrapperCls;
+    }
+
+    def wrapperCtorParam(Connector conn) {
+        String result = "";
+        if (isDefined(conn.mock) and conn.mock) {
+            result = enumerateFields(conn.outInterface.type);
+            if (result.length() > 0) {
+                result = ", " + result;
+            }
+        }
+        result;
+    }
+    
+    // dispatch basis
+    def String enumerateFields(DataType type) {
+        "";
+    }
+
+    // dispatch basis
+    def String enumerateFields(ArrayType type) {
+        enumerateFields(type.type);
+    }
+
+    def String enumerateFields(RecordType type) {
+        String result = "";
+        for (Field f: type.fields) {
+            result = appendWithSeparator(result, ", ", '"${f.name}"');
+            String nested = enumerateFields(f.type);
+            if (nested.length() > 0) {
+                result = appendWithSeparator(result, ", ", nested);
+            }
+        }
+        result;
     }
     
     def initIngestors(MeshElement elt, Connector conn) {
@@ -901,7 +934,7 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
                                     ${getYamlServiceFragment("serviceData", clsName, conn.id)}; 
                                     ${serviceType} oldService = ${service};
                                     ${serviceType} newService 
-                                        = new ${wrapperCls(conn)}${getConnectorGenerics(conn, true)}(serviceData, conn, () -> param);
+                                        = new ${wrapperCls(conn)}${getConnectorGenerics(conn, true)}(serviceData, conn, () -> param${wrapperCtorParam(conn)});
                                     newService.setReceptionCallback(new ConnectorReceptionCallback());
                                     newService.setState(ServiceState.STARTING);
                                     ${service} = newService;

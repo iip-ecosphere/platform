@@ -14,6 +14,7 @@ Devices::LxcContainerManager::authenticationKey = Refined/default authentication
 Devices::MountVolumeContainerArgument::containerPath = Target path in container where to mount the host path into.
 Devices::MountVolumeContainerArgument::hostPath = Source path on host to be mounted.
 Devices::tensorflow280 = Default, reusable tensorflow 2.8.0 dependency.
+Devices::tensorflow290 = Default, reusable tensorflow 2.9.0 dependency.
 Devices::ContainerManager::memLimit = ECS-Runtime/Container manager memory limit for small devices in MBytes (default 0, none). 
 Devices::DeviceIdProvider::artifact = Mvn artifact coordinates containing the device ID provider. May be empty if shipped with core platform component.
 Devices::DeviceIdProvider::class = Java class name of the device ID provider JSL descriptor.
