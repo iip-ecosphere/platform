@@ -181,6 +181,11 @@ public class FakeSubmodel extends FakeElement implements Submodel {
         public boolean isNew() {
             return isNew;
         }
+        
+        @Override
+        public boolean hasElement(String idShort) {
+            return instance.elements.containsKey(idShort);
+        }
 
         @Override
         void defer(String shortId, Builder<?> builder) {

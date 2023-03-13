@@ -85,4 +85,12 @@ public interface SubmodelElementContainerBuilder {
      */
     public boolean isNew();
 
+    /**
+     * Returns whether there is an element with the given {@code idShort} in the collection.
+     * 
+     * @param idShort the element so search for
+     * @return {@code true} if the element exist, {@code false} else
+     */
+    public boolean hasElement(String idShort);
+
 }

@@ -181,6 +181,11 @@ public class FakeSubmodelElementCollection extends FakeElement implements Submod
             return instance;
         }
 
+        @Override
+        public boolean hasElement(String idShort) {
+            return instance.elements.containsKey(idShort);
+        }
+
     }
     
     /**
