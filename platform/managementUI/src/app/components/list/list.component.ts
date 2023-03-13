@@ -20,7 +20,9 @@ export class ListComponent implements OnInit {
   submodelElements: any; //help
   unwantedTypes = ["metaState", "metaType", "metaProject"];
 
-  constructor(public http: HttpClient, private envConfigService: EnvConfigService, private route: ActivatedRoute) {
+  constructor(public http: HttpClient,
+    private envConfigService: EnvConfigService,
+    private route: ActivatedRoute) {
     const env = this.envConfigService.getEnv();
     //the ip and urn are taken from the json.config
     if(env && env.ip) {
@@ -32,12 +34,15 @@ export class ListComponent implements OnInit {
    }
 
   async ngOnInit() {
+    console.log("init in list")
     this.ls = this.route.snapshot.paramMap.get('ls');
     if(this.ls) {
       this.data = await this.getData(this.ls);
+      console.log(this.data)
       this.filter();
     }
     this.submodelElements = await this.getSubmodelElements();
+
   }
 
   public filter() {
@@ -57,8 +62,11 @@ export class ListComponent implements OnInit {
   public async getData(list: string) {
     let response;
     try {
-      response = await firstValueFrom(this.http.get(this.ip + '/shells/'
-      + this.urn + "/aas/submodels/Configuration/submodel/submodelElements/" + list));
+      response = await firstValueFrom(
+        this.http.get(this.ip + '/shells/'
+      + this.urn
+      + "/aas/submodels/Configuration/submodel/submodelElements/"
+      + list));
     } catch(e) {
       console.log(e);
       this.noData = true;
@@ -76,7 +84,6 @@ export class ListComponent implements OnInit {
       console.log(e);
       this.noData = true;
     }
-    //console.log(response);
     return response;
   }
 
@@ -87,4 +94,9 @@ export class ListComponent implements OnInit {
   public del(item: any) {
 
   }
+
+  public createMesh() {
+
+  }
+
 }

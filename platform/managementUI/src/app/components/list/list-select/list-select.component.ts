@@ -20,18 +20,17 @@ export class ListSelectComponent implements OnInit {
     "Applications":"Application"
   }
 
-
-  //listTitles = ["Setup", "Constants", "Types", "Services"]
-
   ngOnInit(): void {
+    /*
     for (const [key, value] of Object.entries(this.listTitles)){
       console.log(key, value)
     }
+    console.log("end of all data")
+    */
   }
 
-  public selectList(list: string) {
+  public selectList(list: string, listName: string) {
     this.router.navigateByUrl('list/' + list)
-
   }
 
 }

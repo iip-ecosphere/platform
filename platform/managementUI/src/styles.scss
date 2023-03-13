@@ -10,6 +10,14 @@
   --secondary-colo-contrast:(#343434);
 }
 
+tr:nth-child(even) {
+  background-color: rgb(230, 230, 230);
+}
+
+.subtext {
+  font-size: 12px;
+}
+
 .shortId {
   color: white;
   font-size: 16px;
@@ -81,7 +89,6 @@
   width: auto;
   height: auto;
 }
-
 
 /* You can add global styles to this file, and also import other style files */
 /* Drawflow styles starts here */

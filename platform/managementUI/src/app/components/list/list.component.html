@@ -1,43 +1,103 @@
+
+<p></p>
+<!--
+<nav mat-tab-nav-bar style="background: RGB(203, 203, 203);">
+  <a mat-tab-link [routerLink]="'/list-app'"> Application </a>
+  <a mat-tab-link [routerLink]="'/services'"> Artifacts </a>
+</nav>
+-->
 <div *ngIf="noData">ERROR: Could not retrieve data</div>
 <h1 *ngIf="data"> {{ data.idShort }}</h1>
 <br>
 
+<div *ngIf="data && data.value">
+  <!-- New mesh Button -->
+  <div *ngIf="data.idShort == 'ServiceMesh'">
+    <p align="right">
+      <button
+      mat-raised-button style="background-color: rgb(97, 95, 96)"
+      (click)="createMesh()">new mesh</button>
+    </p>
+  </div>
 
-<!-- <mat-list role="list" *ngIf="submodelElements">
-  <mat-list-item role="listitem" *ngFor="let item of submodelElements" style="color: black;">
-    {{item.idShort}}
-  </mat-list-item>
-  <mat-divider></mat-divider>
-</mat-list> -->
+  <!-- TABLE -->
+  <table style="margin: 0px;">
+    <tr *ngFor="let item of data.value">
+      <td style="width: 100%;">{{item.idShort}}<br>
+        <!-- Application -->
+        <div *ngIf="data.idShort == 'Application'">
+          <!--
+            <td style="width: 100%;">{{item.value[4].value}}<br>
+          -->
+          <div class="subtext"> {{item.value[5].value}}</div>
+          <div class="subtext">Version: {{item.value[0].value}}</div>
+        </div>
 
-<!-- <h1>DATA</h1>
-<mat-list *ngIf="data && data.value">
-  <mat-list-item *ngFor="let item of data.value" class="item">
-    <span class="text">{{item.idShort}}</span>
-    <span class ="buttons">
-      <button mat-raised-button style="background-color: rgb(255,204,0)"  (click)="edit(item)">edit</button>
-      <button mat-raised-button style="background-color: rgb(255, 60, 0)" (click)="del(item)">delete</button>
-    </span>
-  </mat-list-item>
-  <mat-divider style="color: black;"></mat-divider>
-</mat-list> -->
+        <!-- Constants -->
 
+
+        <!-- Meshes -->
+        <div *ngIf="data.idShort == 'ServiceMesh'">
+          <div *ngIf="item.value[0].value">
+            <div class="subtext"> {{item.value[0].value}}</div>
+          </div>
+        </div>
+
+        <!-- Setup -->
+        <div *ngIf="data.idShort == 'EndpointAddress'">
+          <div *ngIf="item.value[3].value && item.value[4].value">
+            <div class="subtext">
+              {{item.value[3].value}}:{{item.value[4].value}}
+            </div>
+          </div>
+        </div>
+
+        <!-- Services -->
+        <div *ngIf="data.idShort == 'Service'">
+          <div *ngIf="item.value[3].value">
+            <div class="subtext"> {{item.value[3].value}}</div>
+            <div class="subtext"> version: {{item.value[22].value}}</div>
+            <div class="subtext"> {{item.value[10].value}}</div>
+          </div>
+        </div>
+
+      </td>
+      <td>
+        <button
+            mat-raised-button style="background-color: rgb(35, 142, 184)"
+            (click)="edit(item)">edit</button>
+      </td>
+      <td>
+        <button
+          mat-raised-button style="background-color: rgb(97, 95, 96)"
+          (click)="del(item)">delete</button>
+      </td>
+    </tr>
+  </table>
+</div>
+
+
+<!--
 <div *ngIf="data && data.value">
   <div *ngFor="let item of data.value">
     <div class="item">
       <div class="text">{{item.idShort}}</div>
       <div class ="buttons">
         <button
-          mat-raised-button style="background-color: rgb(255,204,0)"
+          mat-raised-button style="background-color: rgb(35, 142, 184)"
           (click)="edit(item)">edit</button>
         <button
-          mat-raised-button style="background-color: rgb(255, 60, 0)"
+          mat-raised-button style="background-color: rgb(97, 95, 96)"
           (click)="del(item)">delete</button>
       </div>
     </div>
-    <mat-divider></mat-divider>
+    <p></p>
   </div>
 </div>
+-->
+
+
+
 
 
 
