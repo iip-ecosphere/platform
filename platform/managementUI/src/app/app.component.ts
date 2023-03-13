@@ -22,9 +22,12 @@ export class AppComponent implements OnInit{
   async ngOnInit() {
     const response = await this.api.getPlatformData();
     if(response) {
-      const version = response.find(item => item.idShort === 'version');
-      const buildId = response.find(item => item.idShort === 'buildId');
-      const isRelease = response.find(item => item.idShort === 'isRelease');
+      const version = response.find(
+        item => item.idShort === 'version');
+      const buildId = response.find(
+        item => item.idShort === 'buildId');
+      const isRelease = response.find(
+        item => item.idShort === 'isRelease');
       if(version && version.value) {
         this.Data.version = version.value;
       }

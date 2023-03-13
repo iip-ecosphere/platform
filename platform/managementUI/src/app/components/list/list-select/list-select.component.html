@@ -1,11 +1,27 @@
 <p></p>
+
 <nav mat-tab-nav-bar style="background: RGB(203, 203, 203);">
     <div *ngFor="let item of listTitles | keyvalue">
       <span>
-        <a mat-tab-link style="color: RGB(97, 95, 96)" (click)="selectList(item.value)"> {{item.key}} </a>
+        <a mat-tab-link style="color: RGB(97, 95, 96)"
+        (click)="selectList(item.value, item.key)"> {{item.key}} </a>
       </span>
     </div>
 </nav>
+
+<!--
+<nav mat-tab-nav-bar style="background: RGB(97, 95, 96);"
+  [tabPanel]="tabPanel">
+  <a mat-tab-link [routerLink]="'list'"> nowe </a>
+  <a mat-tab-link [routerLink]="'list'"> nowe2 </a>
+  <a mat-tab-link [routerLink]="'list'"> nowe3 </a>
+</nav>
+<mat-tab-nav-panel #tabPanel></mat-tab-nav-panel>
+
+  <div class="footer">
+    <app-status-box></app-status-box>
+  </div>
+-->
 <!--
 <mat-list role="list">
   <mat-list-item role="listitem">
@@ -44,4 +60,5 @@
     (click)="selectList('Application')">Applications</button>
   </mat-list-item>
 </mat-list>
+
 -->
