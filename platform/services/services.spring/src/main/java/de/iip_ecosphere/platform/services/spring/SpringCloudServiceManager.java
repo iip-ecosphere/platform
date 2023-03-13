@@ -41,6 +41,7 @@ import de.iip_ecosphere.platform.services.ArtifactDescriptor;
 import de.iip_ecosphere.platform.services.ServiceDescriptor;
 import de.iip_ecosphere.platform.services.ServiceFactoryDescriptor;
 import de.iip_ecosphere.platform.services.ServiceManager;
+import de.iip_ecosphere.platform.services.ServiceSetup;
 import de.iip_ecosphere.platform.services.ServicesAas;
 import de.iip_ecosphere.platform.services.ServicesAasClient;
 import de.iip_ecosphere.platform.services.TypedDataConnectorDescriptor;
@@ -104,6 +105,11 @@ public class SpringCloudServiceManager
         @Override
         public ServiceManager createInstance() {
             return new SpringCloudServiceManager();
+        }
+        
+        @Override
+        public ServiceSetup getSetup() {
+            return null != SpringInstances.getConfig() ? SpringInstances.getConfig() : null;
         }
 
         @Override
