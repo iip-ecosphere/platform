@@ -31,6 +31,7 @@ In progress:
 * [#90](https://github.com/iip-ecosphere/platform/issues/90): UI display application service meshes: 
 * [#86](https://github.com/iip-ecosphere/platform/issues/86): UI restructuring for larger lists 
 * [#132](https://github.com/iip-ecosphere/platform/issues/132): Bitmotec integration
+* [#117](https://github.com/iip-ecosphere/platform/issues/117): Multiple service managers per device
 
 New features:
 * [#127](https://github.com/iip-ecosphere/platform/issues/127): Integration of Flower-based federated learning through generated templates
