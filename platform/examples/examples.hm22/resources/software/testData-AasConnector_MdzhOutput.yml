@@ -1,1 +1,1 @@
-{"productId":1234, "hardwareRevision":"1.23", "windows":3, "tiresColor":"green", "pattern":true, "engravingText":"MyText", "thickness":"12mm", "weight":"13mm", "length":"14mm"}
+{"ProductId":1234, "HardwareRevision":"1.23", "Windows":3, "TiresColor":"green", "Pattern":true, "EngravingText":"MyText", "Thickness":"12mm", "Weight":"13mm", "Length":"14mm"}
