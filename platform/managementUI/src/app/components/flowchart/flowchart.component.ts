@@ -18,7 +18,9 @@ export class FlowchartComponent implements OnInit {
   services: any;
   serviceMeshes: any;
   private displayAttributes = ['kind', 'name', 'ver', 'type'];
+  private meta = ['metaType', 'metaProject', 'metaState'];
 
+  meshUnchanged: any;
   servicesLoading = true;
 
 
@@ -40,6 +42,57 @@ export class FlowchartComponent implements OnInit {
       this.editor.force_first_input = false;
       this.editor.line_path = 1;
       this.editor.editor_mode = 'edit';
+
+      this.editor.createCurvature = function(start_pos_x: number, start_pos_y : number, end_pos_x: number, end_pos_y: number, curvature_value: any, type: any) {
+        var line_x = start_pos_x;
+        var line_y = start_pos_y;
+        var x = end_pos_x;
+        var y = end_pos_y;
+        var curvature = curvature_value;
+        //type openclose open close other
+        switch (type) {
+          case 'open':
+            if(start_pos_x >= end_pos_x) {
+              var hx1 = line_x + Math.abs(x - line_x) * curvature;
+              var hx2 = x - Math.abs(x - line_x) * (curvature*-1);
+            } else {
+              var hx1 = line_x + Math.abs(x - line_x) * curvature;
+              var hx2 = x - Math.abs(x - line_x) * curvature;
+            }
+            return ' M '+ line_x +' '+ line_y +' C '+ hx1 +' '+ line_y +' '+ hx2 +' ' + y +' ' + x +'  ' + y;
+
+            break
+          case 'close':
+            if(start_pos_x >= end_pos_x) {
+              var hx1 = line_x + Math.abs(x - line_x) * (curvature*-1);
+              var hx2 = x - Math.abs(x - line_x) * curvature;
+            } else {
+              var hx1 = line_x + Math.abs(x - line_x) * curvature;
+              var hx2 = x - Math.abs(x - line_x) * curvature;
+            }                                                                                                                  //M0 75H10L5 80L0 75Z
+
+            return ' M '+ line_x +' '+ line_y +' C '+ hx1 +' '+ line_y +' '+ hx2 +' ' + y +' ' + x +'  ' + y +' M '+ (x-11)  + ' ' + y + ' L'+(x-20)+' '+ (y-5)+'  L'+(x-20)+' '+ (y+5)+'Z';
+            break;
+          case 'other':
+            if(start_pos_x >= end_pos_x) {
+              var hx1 = line_x + Math.abs(x - line_x) * (curvature*-1);
+              var hx2 = x - Math.abs(x - line_x) * (curvature*-1);
+            } else {
+              var hx1 = line_x + Math.abs(x - line_x) * curvature;
+              var hx2 = x - Math.abs(x - line_x) * curvature;
+            }
+            return ' M '+ line_x +' '+ line_y +' C '+ hx1 +' '+ line_y +' '+ hx2 +' ' + y +' ' + x +'  ' + y;
+            break;
+          default:
+
+            var hx1 = line_x + Math.abs(x - line_x) * curvature;
+            var hx2 = x - Math.abs(x - line_x) * curvature;
+
+            //return ' M '+ line_x +' '+ line_y +' C '+ hx1 +' '+ line_y +' '+ hx2 +' ' + y +' ' + x +'  ' + y;
+            return ' M '+ line_x +' '+ line_y +' C '+ hx1 +' '+ line_y +' '+ hx2 +' ' + y +' ' + x +'  ' + y +' M '+ (x-11)  + ' ' + y + ' L'+(x-20)+' '+ (y-5)+'  L'+(x-20)+' '+ (y+5)+'Z';
+        }
+
+      }
 
       this.editor.start();
 
@@ -65,6 +118,7 @@ export class FlowchartComponent implements OnInit {
     if(data?.outputArguments[0].value?.value) {
       let graph = JSON.parse(data?.outputArguments[0].value?.value);
       let graph2 = JSON.parse(graph.result);
+      this.meshUnchanged = JSON.parse(JSON.stringify(graph2)); //for debug purposes
       console.log(graph2);
       let nodes = graph2.drawflow.Home.data
       for(let node in nodes) {
@@ -85,6 +139,14 @@ export class FlowchartComponent implements OnInit {
       contains = true;
     }
     return contains;
+  }
+
+  public isMeta(input: string) {
+    let isMeta = false;
+    if(this.meta.includes(input)) {
+      isMeta = true;
+    }
+    return isMeta;
   }
 
 }
