@@ -817,7 +817,8 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         deviceIdProviderJsl(p, cfg);
         identityStoreJsl(p, cfg);
         aasSemanticIdResolverJsl(p, cfg);
-        vilTemplateProcessor("EcsRuntimeMvn", config, "${path}/pom.xml", dir="ecsJars", main=dfltMain, tests=tests, deviceType=deviceType);
+        String cInfix = getContainerNameInfix(deviceType);
+        vilTemplateProcessor("EcsRuntimeMvn", config, "${path}/pom.xml", dir="ecsJars${cInfix}", main=dfltMain, tests=tests, deviceType=deviceType);
         mvn(path);
         if (deviceType == defaultDeviceType) {
             generateOsScripts(config, "${target}/ecs", "ecsJars", dfltMain, "IIP-Ecosphere ECSRuntime", "iip-ecsRuntime", "iip-platform.service", addJavaOpts=toJvmMemLimitOpt(min(cfg.serviceManager.memLimit, 
@@ -838,7 +839,8 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         deviceIdProviderJsl(p, cfg);
         identityStoreJsl(p, cfg);
         aasSemanticIdResolverJsl(p, cfg);
-        vilTemplateProcessor("EcsServiceControlMvn", config, "${path}/pom.xml", dir="ecsSvcJars", main=dfltMain, tests=tests, deviceType=deviceType);
+        String cInfix = getContainerNameInfix(deviceType);
+        vilTemplateProcessor("EcsServiceControlMvn", config, "${path}/pom.xml", dir="ecsSvcJars${cInfix}", main=dfltMain, tests=tests, deviceType=deviceType);
         mvn(path);
         if (deviceType == defaultDeviceType) {
           generateOsScripts(config, "${target}/ecsServiceMgr", "ecsSvcJars", dfltMain, "IIP-Ecosphere Ecs Runtime/Service Manager", "iip-ecsServiceMgr", "", 
