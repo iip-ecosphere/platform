@@ -2,13 +2,13 @@ EcsContainer=$(curl -s 'http://'$2'/v2/_catalog' | jq -r '.[]' | jq -r '.[] | se
 
 EcsContainerTags=$(curl -L -s http://$2/v2/$EcsContainer/tags/list | jq '.tags[0]' | sed 's/"//g')
 
-echo $1 | sudo -S docker run --pull=always --rm --expose 8000 --env iip.port=8000 -d --network=host -v /var/run/docker.sock:/var/run/docker.sock --name IIPEcs $2/$EcsContainer:$EcsContainerTags
+echo $1 | sudo -S $3 run --pull=always --rm --expose 8000 --env iip.port=8000 -d --network=host -v /var/run/docker.sock:/var/run/docker.sock --name IIPEcs $2/$EcsContainer:$EcsContainerTags
 
-containerLog=$(sudo -S docker logs IIPEcs)
+containerLog=$(sudo -S $3 logs IIPEcs)
 ecsReady=$(echo "$containerLog" | grep "Startup completed")
 while [ -z "$ecsReady" ]; do
   echo "Waiting ecs to be Ready";
-  containerLog=$(sudo -S docker logs IIPEcs);
+  containerLog=$(sudo -S $3 logs IIPEcs);
   ecsReady=$(echo "$containerLog" | grep "Startup completed");
   sleep 3;
 done

@@ -4,7 +4,7 @@ Setup:
     TestMgrOS                 : Linux
     MoveScripts               : True
     InstallPrerequisite       : False
-    EcsSvcMgrContainers       : "Non"
+    EcsSvcMgrContainers       : "C1Ecs_C2Svc_App"
     # Non, // 0 - No containers
     # Ecs_Svc_App, // 1 - one container: ecs + svc + app
     # EcsSvc_App, // 2 - one container: ecsSvc + app
@@ -19,6 +19,12 @@ Setup:
     InstallPlatform           : True
     NewInstallFiles           : True
     IIPEasyTracing            : True
+    InstallPlatformOption     : "Non"
+    # Non , No additional options.
+    # -U update dependencies, in particular snapshots.
+    # -o , offline mode, do not update at all.
+    # -Dmdep.skip=true , skips the dependency/unpacking plugin completely.
+    # -Dunpack.force=true , causes an unpacking of the configuration meta model even if there was no change in the model
     StartPlatform             : False
     DevicesJoinPlatform       : False
     StartServiceMgrContainer  : False
@@ -27,8 +33,8 @@ Setup:
     CheckDevices              : False
     StopPlatform              : False
     StopDockerRegistry        : False
-    DownloadExamples          : True
-    CompileExamples           : True
+    DownloadExamples          : False
+    CompileExamples           : False
     AddServiceExamples        : False
     StartAllServiceExamples   : False
     StopAllServiceExamples    : False
@@ -39,13 +45,13 @@ Examples:
   - Name           : SimpleMesh
     Included       : True
     Redownload     : False
-    Container      : False
+    Container      : True
     Run            : True
     Device         : LinDev000002
     Artifact       : "SimpleMeshInstallTestingApp-0.1.0-SNAPSHOT-bin.jar"
     ContainerDesc  : "SimpleMeshInstallTestingApp_dflt_mesh-info.yml"
   - Name           : examples.python
-    Included       : True
+    Included       : False
     Redownload     : True
     Container      : False
     Run            : True
@@ -53,7 +59,7 @@ Examples:
     Artifact       : "SimplePythonDemoFlowApp-0.1.0-SNAPSHOT-bin.jar"
     ContainerDesc  : "SimplePythondemoflowapp_dflt_mesh-info.yml"
   - Name           : examples.pythonSync
-    Included       : True
+    Included       : False
     Redownload     : True
     Container      : False
     Run            : True
@@ -61,7 +67,7 @@ Examples:
     Artifact       : "SimpleSynchronousPythonDemoFlowApp-0.1.0-SNAPSHOT-bin.jar"
     ContainerDesc  : "SimpleSynchronousPythondemoflowapp_dflt_mesh-info.yml"
   - Name           : examples.rtsa
-    Included       : True
+    Included       : False
     Redownload     : True
     Container      : False
     Run            : True
@@ -69,7 +75,7 @@ Examples:
     Artifact       : "SimpleRTSADemoFlowApp-0.1.0-SNAPSHOT-bin.jar"
     ContainerDesc  : "SimpleRTSAdemoflowapp_dflt_mesh-info.yml"
   - Name           : examples.KODEX
-    Included       : True
+    Included       : False
     Redownload     : True
     Container      : False
     Run            : True
@@ -95,80 +101,87 @@ Deployments:
     Run         : False
     yaml        : "PythonDeployment.yaml"
 Machines:
-  - Name           : Server 147.172.178.145 Platform
-    IP             : 147.172.178.145
-    Username       : iis_ecouser
-    Password       : $$e_iisecoPW2
-    Role           : Server
-    OS             : Linux
-    Included       : False
-    NewDeviceFiles : False
-    DeviceID       : TestEnvSer001
-    DockerRegistry : True
-    RunAsContainer : False
-  - Name           : Server 147.172.178.147 Device02
-    IP             : 147.172.178.147
-    Username       : iis_ecouser
-    Password       : $$e_iisecoPW2
-    Role           : Device
-    OS             : Linux
-    Included       : False
-    NewDeviceFiles : True
-    DeviceID       : TestEnvDev02
-    DockerRegistry : False
-    RunAsContainer : False
-  - Name           : Server 147.172.178.148 Device03
-    IP             : 147.172.178.148
-    Username       : iis_ecouser
-    Password       : $$e_iisecoPW2
-    Role           : Device
-    OS             : Linux
-    Included       : False
-    NewDeviceFiles : False
-    DeviceID       : TestEnvDev03
-    DockerRegistry : False
-    RunAsContainer : True
-  - Name           : Server 147.172.178.149 Device04
-    IP             : 147.172.178.149
-    Username       : iis_ecouser
-    Password       : $$e_iisecoPW2
-    Role           : Device
-    OS             : Linux
-    Included       : False
-    NewDeviceFiles : False
-    DeviceID       : TestEnvDev04
-    DockerRegistry : False
-    RunAsContainer : False
-  - Name           : Ubuntu 20.04.3 IIP Platform
-    IP             : 192.168.81.100
-    Username       : osboxes
-    Password       : osboxes.org
-    Role           : Server
-    OS             : Linux
-    Included       : True
-    NewDeviceFiles : False
-    DeviceID       : LinSer000001
-    DockerRegistry : True
-    RunAsContainer : False
-  - Name           : Ubuntu 20.04.3 IIP Platform Device 1
-    IP             : 192.168.81.110
-    Username       : osboxes
-    Password       : osboxes.org
-    Role           : Device
-    OS             : Linux
-    Included       : True
-    NewDeviceFiles : True
-    DeviceID       : LinDev000001
-    DockerRegistry : False
-    RunAsContainer : False
-  - Name           : Ubuntu 20.04.3 IIP Platform Device 2
-    IP             : 192.168.81.120
-    Username       : osboxes
-    Password       : osboxes.org
-    Role           : Device
-    OS             : Linux
-    Included       : True
-    NewDeviceFiles : True
-    DeviceID       : LinDev000002
-    DockerRegistry : False
-    RunAsContainer : False
+  - Name                 : Server 147.172.178.145 Platform
+    IP                   : 147.172.178.145
+    Username             : iis_ecouser
+    Password             : $$e_iisecoPW2
+    Role                 : Server
+    OS                   : Linux
+    Included             : False
+    NewDeviceFiles       : False
+    DeviceID             : TestEnvSer001
+    DockerRegistry       : True
+    RunAsContainer       : False
+    ContainerCommandLine : docker
+  - Name                 : Server 147.172.178.147 Device02
+    IP                   : 147.172.178.147
+    Username             : iis_ecouser
+    Password             : $$e_iisecoPW2
+    Role                 : Device
+    OS                   : Linux
+    Included             : False
+    NewDeviceFiles       : True
+    DeviceID             : TestEnvDev02
+    DockerRegistry       : False
+    RunAsContainer       : False
+    ContainerCommandLine : docker
+  - Name                 : Server 147.172.178.148 Device03
+    IP                   : 147.172.178.148
+    Username             : iis_ecouser
+    Password             : $$e_iisecoPW2
+    Role                 : Device
+    OS                   : Linux
+    Included             : False
+    NewDeviceFiles       : False
+    DeviceID             : TestEnvDev03
+    DockerRegistry       : False
+    RunAsContainer       : True
+    ContainerCommandLine : docker
+  - Name                 : Server 147.172.178.149 Device04
+    IP                   : 147.172.178.149
+    Username             : iis_ecouser
+    Password             : $$e_iisecoPW2
+    Role                 : Device
+    OS                   : Linux
+    Included             : False
+    NewDeviceFiles       : False
+    DeviceID             : TestEnvDev04
+    DockerRegistry       : False
+    RunAsContainer       : False
+    ContainerCommandLine : docker
+  - Name                 : Ubuntu 20.04.3 IIP Platform
+    IP                   : 192.168.81.100
+    Username             : osboxes
+    Password             : osboxes.org
+    Role                 : Server
+    OS                   : Linux
+    Included             : True
+    NewDeviceFiles       : False
+    DeviceID             : LinSer000001
+    DockerRegistry       : True
+    RunAsContainer       : False
+    ContainerCommandLine : docker
+  - Name                 : Ubuntu 20.04.3 IIP Platform Device 1
+    IP                   : 192.168.81.110
+    Username             : osboxes
+    Password             : osboxes.org
+    Role                 : Device
+    OS                   : Linux
+    Included             : False
+    NewDeviceFiles       : True
+    DeviceID             : LinDev000001
+    DockerRegistry       : False
+    RunAsContainer       : False
+    ContainerCommandLine : docker
+  - Name                 : Ubuntu 20.04.3 IIP Platform Device 2
+    IP                   : 192.168.81.120
+    Username             : osboxes
+    Password             : osboxes.org
+    Role                 : Device
+    OS                   : Linux
+    Included             : False
+    NewDeviceFiles       : True
+    DeviceID             : LinDev000002
+    DockerRegistry       : False
+    RunAsContainer       : False
+    ContainerCommandLine : docker
