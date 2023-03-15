@@ -10,7 +10,7 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package test.de.iip_ecosphere.platform.support.metrics.plcnext;
+package test.de.iip_ecosphere.platform.support.metrics.bitmotec;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -34,18 +34,15 @@ public class BitmotecSystemMetricsTest {
         SystemMetrics m = SystemMetricsFactory.getSystemMetrics();
         Assert.assertTrue(m instanceof BitmotecSystemMetrics);
         
-        /*SystemMetricsTest.testImplemented(m);
+        // for an arbitrary testing system, we do not know the results, whether there are results, ... 
+        m.getNumGpuCores();
+        m.getCaseTemperature();
+        m.getCpuTemperature();
+        m.getNumGpuCores();
+        m.getNumTpuCores();
         
-        int gpuNum = m.getNumGpuCores();
-        Assert.assertTrue(gpuNum >= 0); // does not make much sense, but is optional
-        System.out.println("#GPU: " + gpuNum); 
-
-        float cpuTemp = m.getCpuTemperature();
-        Assert.assertTrue(cpuTemp >= 0); // shall be the case, but only if executed in admin mode
-        System.out.println("temp CPU: " + cpuTemp); 
-
-        System.out.println("temp case: " + m.getCaseTemperature()); // not implemented here
-        */
+        Assert.assertTrue(null != m.getOsArch() && m.getOsArch().length() > 0);
+        Assert.assertTrue(null != m.getOsName() && m.getOsName().length() > 0);
     }
     
 }
