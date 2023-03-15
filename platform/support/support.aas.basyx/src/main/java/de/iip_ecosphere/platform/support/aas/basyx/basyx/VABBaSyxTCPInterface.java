@@ -337,7 +337,8 @@ public class VABBaSyxTCPInterface<ModelProvider extends IModelProvider> extends 
                 }
 
                 // Output error
-                logger.error("Exception in run", e);
+                logger.error("Exception in run", e); 
+                break; // already filled the logs in uncontrolled manner
             }
         }
         try {
