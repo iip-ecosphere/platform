@@ -45,6 +45,18 @@ VMsSetup.yaml structure:
     * InstallPlatform: Install the platform and instantiates it - Jupyter Step "Install The Platform".
     * NewInstallFiles: Get new installation files for the platform from the GitHub.
     * IIPEasyTracing: Show the full output of the platform instantiation phase.
+    * InstallPlatformOption: give more options to add to the instantiate platform command.
+    
+    	1. Non: No additional options.
+    	    	
+    	2. -U: update dependencies, in particular snapshots.
+    	
+    	3. -o: offline mode, do not update at all.
+    	
+    	4. -Dmdep.skip=true: skips the dependency/unpacking plugin completely.
+    	
+    	5. -Dunpack.force=true: causes an unpacking of the configuration meta model even if there was no change in the model
+    	
     * StartPlatfrom: Start the platform on the server - Jupyter Step "Start The Platform".
     * DevicesJoinPlatform: Join the devices to the platform - Jupyter Step "Device(s) Join The Platform".
     
@@ -96,3 +108,4 @@ VMsSetup.yaml structure:
     * DeviceID: The name used to be resource ID in the platform (In Normal version), Or used to match the device with resource ID (In Containerized version).
     * DockerRegistry: Check if the machine has private docker registry (For Servers).
     * RunAsContainer: Check if the Device is running Normal or Containerized version.
+    * ContainerCommandLine: Allow docker command to be customized.
