@@ -10,13 +10,50 @@
   --secondary-colo-contrast:(#343434);
 }
 
-tr:nth-child(even) {
+tr:nth-child(odd) {
   background-color: rgb(230, 230, 230);
 }
 
 .subtext {
+  color: rgb(97, 95, 96);
   font-size: 12px;
+  margin: 5px;
 }
+
+// sub-menu
+.mat-tab-label {
+  color: rgb(0,0,0) !important;
+  //background-color: rgb(203, 203, 203);
+  background-color: rgb(125, 214, 255);
+}
+
+.mat-tab-group.mat-primary .mat-ink-bar, .mat-tab-nav-bar.mat-primary .mat-ink-bar {
+  background-color:RGB(35, 142, 183);
+}
+
+.custom-label {
+  //padding-left: 2px;
+  //padding-right: 0px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  width: 120px;
+  //background-color: rgb(203, 203, 203);
+  background-color: rgb(125, 214, 255);
+  color: black;
+}
+
+.create-button {
+  background-color:rgb(35, 142, 184);
+  //background-color:rgb(132, 137, 143);
+  margin-right: 1vw;
+  color: white;
+  font-size: 14px;
+  line-height: 50px;
+  height: auto;
+  //width: 200px;
+  width: auto;
+}
+
 
 .shortId {
   color: white;

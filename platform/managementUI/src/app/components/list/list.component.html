@@ -1,83 +1,159 @@
+<p style="margin-bottom:2px"></p>
 
+<mat-tab-group animationDuration="0ms" mat-stretch-tabs>
+  <div *ngFor="let item of listTitles | keyvalue">
+    <mat-tab label="{{item.key}}">
+
+      <ng-template mat-tab-label >
+        <span (click)="loadData(item.value)" class="custom-label">{{item.key}}</span>
+      </ng-template>
+
+      <div *ngIf="data && data.value">
+        <!-- New mesh Button -->
+        <div *ngIf="data.idShort == 'ServiceMesh'"> <!-- TODO -->
+          <p style="margin-bottom:5px"></p>
+          <p align="right">
+            <button
+            mat-raised-button class="create-button"
+            (click)="createMesh()"> new mesh </button>
+          </p>
+        </div>
+
+        <!-- TABLE -->
+        <table style="margin: 0px;">
+          <tr *ngFor="let item of data.value">
+            <td style="width: 100%;">{{item.idShort}}<br>
+
+              <!-- Application -->
+              <div *ngIf="data.idShort == 'Application'"> <!-- TODO -->
+                <!--
+                  <td style="width: 100%;">{{item.value[4].value}}<br>
+                -->
+                <div *ngIf="item.value[5].idShort == 'name'">
+                  <div class="subtext"> {{item.value[5].value}}</div>
+                </div>
+                <div class="subtext">Version: {{item.value[0].value}}</div>
+              </div>
+
+              <!-- Constants -->
+
+
+              <!-- Meshes -->
+              <div *ngIf="data.idShort == 'ServiceMesh'"> <!-- TODO -->
+                <div *ngIf="item.value[0].value">
+                  <div class="subtext"> {{item.value[0].value}}</div>
+                </div><!-- TODO -->
+              </div>
+
+              <!-- Setup -->
+              <div *ngIf="data.idShort == 'EndpointAddress'"> <!-- TODO -->
+                <div *ngIf="item.value[3].value && item.value[4].value">
+                  <div class="subtext">
+                    {{item.value[3].value}}:{{item.value[4].value}}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Services -->
+              <div *ngIf="data.idShort == 'Service'"> <!-- TODO -->
+                <div *ngIf="item.value[3].value">
+                  <div class="subtext"> {{item.value[3].value}}</div>
+                  <div class="subtext"> version: {{item.value[22].value}}</div>
+                </div>
+              </div>
+
+            </td>
+            <td>
+              <button
+                  mat-raised-button style="background-color: rgb(35, 142, 184)"
+                  (click)="edit(item)">edit</button>
+            </td>
+            <td>
+              <button
+                mat-raised-button style="background-color: rgb(97, 95, 96)"
+                (click)="del(item)">delete</button>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </mat-tab>
+  </div>
+</mat-tab-group>
+
+
+<!--
+<nav mat-tab-nav-bar style="background: RGB(97, 95, 96);"
+  [tabPanel]="tabPanel">
+  <a mat-tab-link [routerLink]="'list'"> nowe </a>
+  <a mat-tab-link [routerLink]="'list'"> nowe2 </a>
+  <a mat-tab-link [routerLink]="'list'"> nowe3 </a>
+</nav>
+<mat-tab-nav-panel #tabPanel></mat-tab-nav-panel>
+
+  <div class="footer">
+    <app-status-box></app-status-box>
+  </div>
+-->
+<!--
+<mat-list role="list">
+  <mat-list-item role="listitem">
+    <button
+      mat-raised-button class="button"
+      (click)="selectList('EndpointAddress')">Setup</button>
+  </mat-list-item>
+  <mat-list-item role="listitem">
+    <button
+      mat-raised-button class="button"
+      (click)="selectList('String')">Constants</button>
+  </mat-list-item>
+  <mat-list-item role="listitem">
+    <button
+      mat-raised-button class="button"
+      (click)="selectList('RecordType')">Types</button>
+  </mat-list-item>
+  <mat-list-item role="listitem">
+    <button
+      mat-raised-button class="button"
+      (click)="selectList('Service')">Services</button>
+  </mat-list-item>
+  <mat-list-item role="listitem">
+    <button
+    mat-raised-button class="button"
+    (click)="selectList('Servers')">Servers</button>
+  </mat-list-item>
+  <mat-list-item role="listitem">
+    <button
+    mat-raised-button class="button"
+    (click)="selectList('ServiceMesh')">Meshes</button>
+  </mat-list-item>
+  <mat-list-item role="listitem">
+    <button
+    mat-raised-button class="button"
+    (click)="selectList('Application')">Applications</button>
+  </mat-list-item>
+</mat-list>
+
+-->
+
+
+<!--
 <p></p>
+
+<mat-tab-group animationDuration="0ms">
+  <mat-tab label="First">Content 1</mat-tab>
+  <mat-tab label="Second">Content 2</mat-tab>
+  <mat-tab label="Third">Content 3</mat-tab>
+</mat-tab-group>
+-->
+
+
 <!--
 <nav mat-tab-nav-bar style="background: RGB(203, 203, 203);">
   <a mat-tab-link [routerLink]="'/list-app'"> Application </a>
   <a mat-tab-link [routerLink]="'/services'"> Artifacts </a>
 </nav>
--->
-<div *ngIf="noData">ERROR: Could not retrieve data</div>
-<h1 *ngIf="data"> {{ data.idShort }}</h1>
-<br>
-
-<div *ngIf="data && data.value">
-  <!-- New mesh Button -->
-  <div *ngIf="data.idShort == 'ServiceMesh'">
-    <p align="right">
-      <button
-      mat-raised-button style="background-color: rgb(97, 95, 96)"
-      (click)="createMesh()">new mesh</button>
-    </p>
-  </div>
-
-  <!-- TABLE -->
-  <table style="margin: 0px;">
-    <tr *ngFor="let item of data.value">
-      <td style="width: 100%;">{{item.idShort}}<br>
-        <!-- Application -->
-        <div *ngIf="data.idShort == 'Application'">
-          <!--
-            <td style="width: 100%;">{{item.value[4].value}}<br>
-          -->
-          <div class="subtext"> {{item.value[5].value}}</div>
-          <div class="subtext">Version: {{item.value[0].value}}</div>
-        </div>
-
-        <!-- Constants -->
 
 
-        <!-- Meshes -->
-        <div *ngIf="data.idShort == 'ServiceMesh'">
-          <div *ngIf="item.value[0].value">
-            <div class="subtext"> {{item.value[0].value}}</div>
-          </div>
-        </div>
-
-        <!-- Setup -->
-        <div *ngIf="data.idShort == 'EndpointAddress'">
-          <div *ngIf="item.value[3].value && item.value[4].value">
-            <div class="subtext">
-              {{item.value[3].value}}:{{item.value[4].value}}
-            </div>
-          </div>
-        </div>
-
-        <!-- Services -->
-        <div *ngIf="data.idShort == 'Service'">
-          <div *ngIf="item.value[3].value">
-            <div class="subtext"> {{item.value[3].value}}</div>
-            <div class="subtext"> version: {{item.value[22].value}}</div>
-            <div class="subtext"> {{item.value[10].value}}</div>
-          </div>
-        </div>
-
-      </td>
-      <td>
-        <button
-            mat-raised-button style="background-color: rgb(35, 142, 184)"
-            (click)="edit(item)">edit</button>
-      </td>
-      <td>
-        <button
-          mat-raised-button style="background-color: rgb(97, 95, 96)"
-          (click)="del(item)">delete</button>
-      </td>
-    </tr>
-  </table>
-</div>
-
-
-<!--
 <div *ngIf="data && data.value">
   <div *ngFor="let item of data.value">
     <div class="item">
