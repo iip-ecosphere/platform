@@ -10,7 +10,7 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package test.de.iip_ecosphere.platform.support.metrics.plcnext;
+package test.de.iip_ecosphere.platform.support.metrics.bitmotec;
 
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.metrics.SystemMetrics;
@@ -33,7 +33,8 @@ public class Main {
         System.out.println("is enabled: " + desc.isEnabled() + " is fallback " + desc.isFallback());
         SystemMetrics metrics = desc.createInstance();
         for (int i = 0; i < 10; i++) {
-            System.out.println("cpu cores: " + metrics.getNumCpuCores() + " case temp: "
+            System.out.println("cpu cores: " + metrics.getNumCpuCores() + " gpu: " + metrics.getNumGpuCores() 
+                + " tpu: " + metrics.getNumTpuCores() + " case temp: "
                 + metrics.getCaseTemperature() + " cpu tmp: " + metrics.getCpuTemperature());
             TimeUtils.sleep(1000);
         }

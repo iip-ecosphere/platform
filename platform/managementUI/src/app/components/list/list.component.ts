@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { EnvConfigService } from 'src/app/services/env-config.service';
 import { ActivatedRoute } from '@angular/router';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-list',
@@ -10,7 +11,113 @@ import { ActivatedRoute } from '@angular/router';
   styleUrls: ['./list.component.scss']
 })
 export class ListComponent implements OnInit {
+  ip: string = "";
+  urn: string = "";
+  ls: string | null = null;
+  data: any;
+  noData: boolean = false;
+  submodelElements: any; //help
+  unwantedTypes = ["metaState", "metaType", "metaProject"];
 
+  constructor(private router: Router,
+    private route: ActivatedRoute,
+    public http: HttpClient,
+    private envConfigService: EnvConfigService) {
+      const env = this.envConfigService.getEnv();
+       //the ip and urn are taken from the json.config
+      if(env && env.ip) {
+        this.ip = env.ip;
+      }
+      if (env && env.urn) {
+        this.urn = env.urn;
+      }
+    }
+
+  listTitles = {
+    "Setup":"EndpointAddress",
+    "Constants":"String",
+    "Types":"RecordType",
+    "Services":"Service",
+    "Servers":"ImplAddress", // TODO
+    "Meshes":"ServiceMesh",
+    "Applications":"Application",
+    "Artifacts":"ImplAddress" // TODO ImplAddress is only temp there
+  }
+
+  ngOnInit(): void {
+  }
+
+  public async loadData(list: string) {
+    //this.router.navigateByUrl('list/' + list)
+    //this.ls = this.route.snapshot.paramMap.get('ls');
+    //this.ls = this.route.snapshot.paramMap.get(list);
+    this.ls = list; // TODO is it ok like this?
+    if(this.ls) {
+      this.data = await this.getData(this.ls);
+      this.filter();
+    }
+    this.submodelElements = await this.getSubmodelElements(); // TODO do I need it?
+  }
+
+  public async getData(list: string) {
+    let response;
+    try {
+      response = await firstValueFrom(
+        this.http.get(this.ip + '/shells/'
+      + this.urn
+      + "/aas/submodels/Configuration/submodel/submodelElements/"
+      + list));
+    } catch(e) {
+      console.log(e);
+      this.noData = true;
+    }
+    return response;
+  }
+
+  public filter() {
+    const relevantValues = []
+    let indicesToRemove = []
+    let i = 0;
+    for(const item of this.data.value) {
+      if(!this.unwantedTypes.includes(item.idShort)) {
+        indicesToRemove.push(i)
+        relevantValues.push(item)
+      }
+      i++;
+    }
+    this.data.value = relevantValues
+  }
+
+  //help method to instantly read all idShort of submodelElement collections in configuration
+  public async getSubmodelElements() {
+    let response;
+    try {
+      response = await firstValueFrom(this.http.get(
+        this.ip + '/shells/'
+      + this.urn
+      + "/aas/submodels/Configuration/submodel/submodelElements"));
+    } catch(e) {
+      console.log(e);
+      this.noData = true;
+    }
+    return response;
+  }
+
+  public edit(item: any) {
+
+  }
+
+  public del(item: any) {
+
+  }
+
+  public createMesh() {
+
+  }
+
+
+
+  /*
   ip: string = "";
   urn: string = "";
 
@@ -34,7 +141,6 @@ export class ListComponent implements OnInit {
    }
 
   async ngOnInit() {
-    console.log("init in list")
     this.ls = this.route.snapshot.paramMap.get('ls');
     if(this.ls) {
       this.data = await this.getData(this.ls);
@@ -98,5 +204,6 @@ export class ListComponent implements OnInit {
   public createMesh() {
 
   }
+  */
 
 }

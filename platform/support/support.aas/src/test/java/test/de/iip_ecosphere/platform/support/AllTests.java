@@ -17,6 +17,7 @@ import test.de.iip_ecosphere.platform.support.aas.LangStringTest;
 import test.de.iip_ecosphere.platform.support.aas.LocalInvocationTest;
 import test.de.iip_ecosphere.platform.support.fakeAas.FactoryTest;
 import test.de.iip_ecosphere.platform.support.fakeAas.PrintVisitorTest;
+import test.de.iip_ecosphere.platform.support.metrics.MetricsTests;
 import test.de.iip_ecosphere.platform.support.net.KeyStoreDescriptorTest;
 import test.de.iip_ecosphere.platform.support.net.NetworkManagerTest;
 import test.de.iip_ecosphere.platform.support.net.SslUtilsTest;
@@ -50,6 +51,7 @@ import test.de.iip_ecosphere.platform.support.net.UriResolverTest;
     SemanticIdResolverTest.class,
     TaskRegistryTests.class,
     
+    MetricsTests.class,
     test.de.iip_ecosphere.platform.support.identities.AllTests.class,
     
     // non-generic AAS 

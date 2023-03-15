@@ -51,7 +51,7 @@
         <artifactId>exec-maven-plugin</artifactId>
         <version>3.0.0</version>
         <configuration>
-            <mainClass>test.de.iip_ecosphere.platform.support.metrics.plcnext.Main</mainClass>
+            <mainClass>test.de.iip_ecosphere.platform.support.metrics.bitmotec.Main</mainClass>
             <cleanupDaemonThreads>false</cleanupDaemonThreads>
             <classpathScope>test</classpathScope>
         </configuration>

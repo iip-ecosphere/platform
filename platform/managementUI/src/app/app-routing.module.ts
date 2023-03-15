@@ -8,8 +8,6 @@ import { DeploymentPlansComponent }
   from './components/deployment-plans/deployment-plans.component';
 import { FlowchartComponent }
   from './components/flowchart/flowchart.component';
-import { ListSelectComponent }
-  from './components/list/list-select/list-select.component';
 import { ListComponent }
   from './components/list/list.component';
 import { ResourceDetailsComponent }
@@ -18,8 +16,6 @@ import { ResourcesComponent }
   from './components/resources/resources.component';
 import { ServicesComponent }
   from './components/services/services.component';
-//import { ListAppComponent } from './components/lists/list-app/list-app.component';
-//import { ListsComponent } from './components/lists/lists.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'resources', pathMatch: `full` },
@@ -31,10 +27,8 @@ const routes: Routes = [
   { path: 'connectorTypes', component: ConnectorTypesComponent },
   { path: 'deploymentPlans', component: DeploymentPlansComponent },
   { path: 'flowchart', component: FlowchartComponent },
-  //{ path: 'list-app', component: ListAppComponent}, // TODO remove
-  //{ path: 'lists', component: ListsComponent }, // TODO remove
-  { path: 'list', component: ListSelectComponent},
-  { path: 'list/:ls', component: ListComponent }
+  { path: 'list', component: ListComponent},
+  //{ path: 'list/:ls', component: ListComponent }
 
 ];
 

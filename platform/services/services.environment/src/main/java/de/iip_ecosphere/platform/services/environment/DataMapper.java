@@ -109,6 +109,7 @@ public class DataMapper {
             .define("value", "iipFilter").build();
         Class<? extends T> result = new ByteBuddy()
             .subclass(cls)
+            .name("iip.mock." + cls.getSimpleName() + "Mock")
             .implement(BaseDataUnitFunctions.class)
             .annotateType(jsonFilter)
             .defineProperty("$period", Integer.TYPE)

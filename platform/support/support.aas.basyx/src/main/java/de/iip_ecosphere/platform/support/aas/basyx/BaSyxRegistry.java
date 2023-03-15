@@ -24,6 +24,7 @@ import org.eclipse.basyx.aas.registration.api.IAASRegistry;
 import org.eclipse.basyx.aas.registration.proxy.AASRegistryProxy;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 import org.eclipse.basyx.vab.exception.provider.ProviderException;
+import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
 import org.eclipse.basyx.vab.protocol.api.IConnectorFactory;
 import org.slf4j.LoggerFactory;
 
@@ -200,10 +201,14 @@ public class BaSyxRegistry implements Registry {
     @Override
     public String getEndpoint(String aasIdShort) {
         String result = null;
-        for (AASDescriptor desc : registry.lookupAll()) {
-            if (desc.getIdShort().equals(aasIdShort)) {
-                result = desc.getFirstEndpoint();
+        try {
+            for (AASDescriptor desc : registry.lookupAll()) {
+                if (desc.getIdShort().equals(aasIdShort)) {
+                    result = desc.getFirstEndpoint();
+                }
             }
+        } catch (ResourceNotFoundException e) {
+            // for now
         }
         return result;
     }

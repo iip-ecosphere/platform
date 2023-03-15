@@ -8,7 +8,7 @@
  *
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
-package test.de.iip_ecosphere.platform.support.metrics.plcnext;
+package test.de.iip_ecosphere.platform.support.metrics.bitmotec;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

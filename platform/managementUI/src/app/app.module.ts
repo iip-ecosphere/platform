@@ -35,8 +35,6 @@ import { OnlyIdPipe } from './pipes/only-id.pipe';
 import { StatusBoxComponent } from './components/deployment-plans/status-box/status-box.component';
 import { FlowchartComponent } from './components/flowchart/flowchart.component';
 import { ListComponent } from './components/list/list.component';
-import { ListSelectComponent } from './components/list/list-select/list-select.component';
-
 
 @NgModule({
   declarations: [
@@ -52,8 +50,7 @@ import { ListSelectComponent } from './components/list/list-select/list-select.c
     OnlyIdPipe,
     StatusBoxComponent,
     FlowchartComponent,
-    ListComponent,
-    ListSelectComponent
+    ListComponent
   ],
   imports: [
     BrowserModule,

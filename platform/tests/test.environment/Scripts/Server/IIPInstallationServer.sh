@@ -53,10 +53,10 @@ if [ $7 == "True" ]; then
         generationLineNumber=$(cat src/main/easy/TechnicalSetup.ivml | grep -n "generation setup" | cut -d ' ' -f1 | sed 's/:/ /g')
         ((generationLineNumber=generationLineNumber-1))
 
-        sed -i $generationLineNumber' i \ \ \ \ };' src/main/easy/TechnicalSetup.ivml     
-        sed -i $generationLineNumber' i \ \ \ \ \ \ \ \ containerType = ContainerType::'$2 src/main/easy/TechnicalSetup.ivml
-        sed -i $generationLineNumber' i \ \ \ \ EcsDevice device = {' src/main/easy/TechnicalSetup.ivml
-        sed -i $generationLineNumber' i \ \ \ \ ' src/main/easy/TechnicalSetup.ivml
+        #sed -i $generationLineNumber' i \ \ \ \ };' src/main/easy/TechnicalSetup.ivml     
+        #sed -i $generationLineNumber' i \ \ \ \ \ \ \ \ containerType = ContainerType::'$2 src/main/easy/TechnicalSetup.ivml
+        #sed -i $generationLineNumber' i \ \ \ \ EcsDevice device = {' src/main/easy/TechnicalSetup.ivml
+        #sed -i $generationLineNumber' i \ \ \ \ ' src/main/easy/TechnicalSetup.ivml
         if [ $3 != "Non" ]; then
             sed -i $generationLineNumber' i \ \ \ \ };' src/main/easy/TechnicalSetup.ivml     
             sed -i $generationLineNumber' i \ \ \ \ \ \ \ \ registry = "'$3'"' src/main/easy/TechnicalSetup.ivml
@@ -72,10 +72,15 @@ if [ $7 == "True" ]; then
 
 fi
 
+InstallPlatformOption=""
+if [ $9 != "Non" ]; then
+    InstallPlatformOption=$9
+fi
+
 if [ $4 == "True" ]; then
-    echo $1 | sudo -S mvn install -Diip.easy.tracing=ALL
+    echo $1 | sudo -S mvn $InstallPlatformOption install -Diip.easy.tracing=ALL
 else
-    echo $1 | sudo -S mvn install
+    echo $1 | sudo -S mvn $InstallPlatformOption install
 fi
 
 echo $1 | sudo -S find . -name "*bin.jar" -exec cp {} $artifactsFolder \;

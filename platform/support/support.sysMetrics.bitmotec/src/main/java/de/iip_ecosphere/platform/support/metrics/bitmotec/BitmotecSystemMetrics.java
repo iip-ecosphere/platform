@@ -12,6 +12,9 @@
 
 package de.iip_ecosphere.platform.support.metrics.bitmotec;
 
+import java.io.File;
+
+import de.iip_ecosphere.platform.support.metrics.LinuxSystemMetricsUtils;
 import de.iip_ecosphere.platform.support.metrics.SystemMetrics;
 
 /**
@@ -21,10 +24,11 @@ import de.iip_ecosphere.platform.support.metrics.SystemMetrics;
  */
 public class BitmotecSystemMetrics implements SystemMetrics {
 
-    public static final SystemMetrics INSTANCE = new BitmotecSystemMetrics();
+    public static final BitmotecSystemMetrics INSTANCE = new BitmotecSystemMetrics();
     
-    private float boardTemp = SystemMetrics.INVALID_CELSIUS_TEMPERATURE;
-    private float cpuTemp = SystemMetrics.INVALID_CELSIUS_TEMPERATURE;
+    private File cpuTempFile = null;
+    private File boardTempFile = null;
+    private int gpuCores = -1;
 
     /**
      * Prevents external creation.
@@ -34,12 +38,14 @@ public class BitmotecSystemMetrics implements SystemMetrics {
     
     @Override
     public float getCaseTemperature() {
-        return boardTemp;
+        boardTempFile = LinuxSystemMetricsUtils.getSysTempFile(boardTempFile, "acpi");
+        return LinuxSystemMetricsUtils.getSysTemp(boardTempFile);
     }
 
     @Override
     public float getCpuTemperature() {
-        return cpuTemp;
+        cpuTempFile = LinuxSystemMetricsUtils.getSysTempFile(cpuTempFile, "x86");
+        return LinuxSystemMetricsUtils.getSysTemp(cpuTempFile);
     }
     
     // future? Service: ws://172.16.1.1:4000/v2 - Method: getSystemSoftware - Params: []
@@ -49,8 +55,12 @@ public class BitmotecSystemMetrics implements SystemMetrics {
     
     @Override
     public int getNumGpuCores() {
-        //request();
-        return 0; // so far not
+        if (gpuCores < 0) {
+            String tmp = LinuxSystemMetricsUtils.readStdoutFromProgram("", "nvidia-smi", "--list-gpus").trim();
+            String[] lines = tmp.split("\r\n|\r|\n");
+            gpuCores = lines.length;            
+        }
+        return gpuCores;
     }
 
     @Override

@@ -68,6 +68,8 @@ public class DrawflowGraphFormat implements GraphFormat {
 
         private Map<IvmlGraphNode, String> node2id = new HashMap<>();
         private IvmlGraph graph;
+        private Map<IvmlGraphNode, Integer> inputCounts = new HashMap<>();
+        private Map<IvmlGraphNode, Integer> outputCounts = new HashMap<>();
         
         /**
          * Creates a writer for {@code graph}.
@@ -204,17 +206,37 @@ public class DrawflowGraphFormat implements GraphFormat {
                 IvmlGraphNode other;
                 if (inputEdges) {
                     other = edge.getStart();
-                    jEdge.put("input", "output_" + count);
+                    jEdge.put("input", "output_" + nextCount(other, outputCounts));
                 } else {
                     other = edge.getEnd();
-                    jEdge.put("output", "input_" + count);
+                    jEdge.put("output", "input_" + nextCount(other, inputCounts));
                 }
                 jEdge.put("node", node2id.get(other));
                 conns.add(jEdge);
-                count++;
                 input.put("connections", conns);
                 result.put(prefix + count, input);
+                count++;
             }
+            return result;
+        }
+        
+        /**
+         * Returns the next input/output count for {@code node} with respect to the counting map {@code counts}.
+         * A call will modify {@code counts} as a side effect on the entry for node, either setting it to 1 or 
+         * incrementing it by one.
+         * 
+         * @param node the note to return the count for
+         * @param counts the counting map to use
+         * @return the counter
+         */
+        private int nextCount(IvmlGraphNode node, Map<IvmlGraphNode, Integer> counts) {
+            Integer result = counts.get(node);
+            if (null == result) {
+                result = 1;
+            } else {
+                result++;
+            }
+            counts.put(node, result);
             return result;
         }
 
