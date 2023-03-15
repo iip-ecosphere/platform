@@ -14,6 +14,7 @@ package de.iip_ecosphere.platform.configuration.ivml;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -38,11 +39,13 @@ import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.LangString;
 import de.iip_ecosphere.platform.support.aas.Property.PropertyBuilder;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
+import de.iip_ecosphere.platform.support.aas.Registry;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
+import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.AasUtils;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper.OperationCompletedListener;
@@ -92,6 +95,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     protected static final String PRJ_NAME_ALLSERVICES = "AllServices";
     protected static final String PRJ_NAME_ALLTYPES = "AllTypes";
     protected static final String PRJ_NAME_TECHSETUP = "TechnicalSetup";
+    private static final Map<String, String> PARENT_MAPPING;
     private static final TypeVisitor TYPE_VISITOR = new TypeVisitor();
     private static final String PROGRESS_COMPONENT_ID = "configuration.configuration";
 
@@ -99,6 +103,16 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     private Function<String, String> metaShortId = SHORTID_PREFIX_META;
     private Predicate<IDecisionVariable> variableFilter = FILTER_NO_CONSTRAINT_VARIABLES;
     private OperationCompletedListener aasOpListener;
+    
+    static {
+        Map<String, String> parentMap = new HashMap<>();
+        parentMap.put("Aas", PRJ_NAME_TECHSETUP);
+        parentMap.put("Transport", PRJ_NAME_TECHSETUP);
+        parentMap.put("Services", PRJ_NAME_TECHSETUP);
+        parentMap.put("Resources", PRJ_NAME_TECHSETUP);
+        parentMap.put("UI", PRJ_NAME_TECHSETUP);
+        PARENT_MAPPING = Collections.unmodifiableMap(parentMap);
+    }
     
     /**
      * Creates a mapper with default settings, e.g., short ids for meta IVML information are
@@ -119,6 +133,22 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         }
         this.cfgSupplier = cfgSupplier;
         this.aasOpListener = opListener;
+    }
+    
+    /**
+     * Returns the name of the parent project of {@code var} while considering {@link #PARENT_MAPPING}.
+     * If there is no mapping, the name of the parent project is returned.
+     * 
+     * @param var the variable to map
+     * @return the (mapped) name of the (declaring) parent project
+     */
+    private static String mapParent(IDecisionVariable var) {
+        String result = var.getDeclaration().getParent().getName();
+        String mapping = PARENT_MAPPING.get(result);
+        if (mapping != null) {
+            result = mapping;
+        }
+        return result;
     }
     
     /**
@@ -913,10 +943,20 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                 .setValue(Type.STRING, IvmlDatatypeVisitor.getUnqualifiedType(varType))
                 .build();
             if (var.getDeclaration().getParent() instanceof Project) { // top-level only for now
-                String prjName = var.getDeclaration().getParent().getName();
                 builder.createPropertyBuilder(AasUtils.fixId(metaShortId.apply("project")))
-                    .setValue(Type.STRING, prjName)
+                    .setValue(Type.STRING, mapParent(var))
                     .build();
+            }
+            try {
+                IDatatype serviceType = ModelQuery.findType(var.getConfiguration().getProject(), "ServiceBase", null);
+                if (null != serviceType && serviceType.isAssignableFrom(varType)) {
+                    String serviceId = IvmlUtils.getStringValue(var.getNestedElement("id"), "");
+                    Registry reg = AasPartRegistry.getIipAasRegistry();
+                    AasPartRegistry.addServiceAasEndpointProperty(reg, builder, metaShortId.apply("Aas"), serviceId);
+                }
+            } catch (ModelQueryException e) {
+                LoggerFactory.getLogger(AasIvmlMapper.class).warn(
+                    "Cannot find type ServiceBase. No service will have a AAS URL. {}", e.getMessage());
             }
         }
     }

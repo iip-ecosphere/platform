@@ -211,9 +211,9 @@ public class DrawflowGraphFormat implements GraphFormat {
                 }
                 jEdge.put("node", node2id.get(other));
                 conns.add(jEdge);
-                count++;
                 input.put("connections", conns);
                 result.put(prefix + count, input);
+                count++;
             }
             return result;
         }
