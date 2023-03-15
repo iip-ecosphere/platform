@@ -93,6 +93,8 @@ project Devices {
         String version;
         setOf(refTo(Dependency)) dependencies = {};
     }
+
+    // ------------------------ typical AI dependencies for all ------------------
     
     PythonDependency tensorflow280 = {
        name = "tensorflow",
@@ -103,6 +105,11 @@ project Devices {
        name = "tensorflow",
        version = "2.9.0"
     };
+    
+    PythonDependency keras290 = {
+       name = "keras",
+       version = "2.9.0"
+    };    
     
     // ------------------ DeviceId --------------------------- 
     

@@ -5,8 +5,8 @@ project ServerPartFlowerAI {
    annotate BindingTime bindingTime = BindingTime::compile to .;
 
    PythonDependency flowrDependency = {
-       name = "flowr",
-       version = "1.2"
+       name = "flwr",
+       version = "1.2.0"
    };
    
    // minimum dependencies
