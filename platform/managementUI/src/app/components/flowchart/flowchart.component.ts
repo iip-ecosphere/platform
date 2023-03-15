@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import Drawflow from 'drawflow';
 import { DrawflowService } from 'src/app/services/drawflow.service';
 
@@ -10,9 +11,7 @@ import { DrawflowService } from 'src/app/services/drawflow.service';
 export class FlowchartComponent implements OnInit {
 
 
-  constructor(private df: DrawflowService) {
-
-  }
+  constructor(private df: DrawflowService, private route: ActivatedRoute) {}
 
   editor: any;
   services: any;
@@ -22,6 +21,7 @@ export class FlowchartComponent implements OnInit {
 
   meshUnchanged: any;
   servicesLoading = true;
+  mesh: any;
 
 
   async ngOnInit() {
@@ -96,9 +96,11 @@ export class FlowchartComponent implements OnInit {
 
       this.editor.start();
 
-      // this.editor.on('nodeCreated', function(id) {
-      //   console.log("Node created " + id);
-      // })
+      const paramMesh = this.route.snapshot.paramMap.get('mesh')
+      if(paramMesh) {
+        this.getGraph(paramMesh);
+      }
+
     }
 
   }
@@ -118,8 +120,9 @@ export class FlowchartComponent implements OnInit {
     if(data?.outputArguments[0].value?.value) {
       let graph = JSON.parse(data?.outputArguments[0].value?.value);
       let graph2 = JSON.parse(graph.result);
-      this.meshUnchanged = JSON.parse(JSON.stringify(graph2)); //for debug purposes
+      //this.meshUnchanged = JSON.parse(JSON.stringify(graph2)); //for debug purposes
       console.log(graph2);
+      this.mesh = graph2;
       let nodes = graph2.drawflow.Home.data
       for(let node in nodes) {
         const a = nodes[node];
@@ -147,6 +150,13 @@ export class FlowchartComponent implements OnInit {
       isMeta = true;
     }
     return isMeta;
+  }
+
+  //to be removed, keeping in case i need to get the coordinates of a mesh again
+  public showCoords() {
+    for(let i=1; i <=8; i++) {
+      console.log(this.editor.getNodeFromId(i));
+    }
   }
 
 }

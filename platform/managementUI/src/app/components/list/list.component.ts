@@ -104,6 +104,10 @@ export class ListComponent implements OnInit {
   }
 
   public edit(item: any) {
+    if(this.ls === "ServiceMesh") {
+      this.router.navigateByUrl('flowchart/' + item.idShort);
+    }
+
 
   }
 
@@ -114,7 +118,6 @@ export class ListComponent implements OnInit {
   public createMesh() {
 
   }
-
 
 
   /*

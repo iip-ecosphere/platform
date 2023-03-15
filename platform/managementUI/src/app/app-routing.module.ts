@@ -26,6 +26,7 @@ const routes: Routes = [
   { path: 'services', component: ServicesComponent },
   { path: 'connectorTypes', component: ConnectorTypesComponent },
   { path: 'deploymentPlans', component: DeploymentPlansComponent },
+  { path: 'flowchart/:mesh', component: FlowchartComponent },
   { path: 'flowchart', component: FlowchartComponent },
   { path: 'list', component: ListComponent},
   //{ path: 'list/:ls', component: ListComponent }
