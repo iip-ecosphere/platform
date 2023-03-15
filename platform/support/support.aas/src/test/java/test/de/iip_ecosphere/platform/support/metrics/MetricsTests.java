@@ -63,6 +63,7 @@ public class MetricsTests {
         File tempFile2 = LinuxSystemMetricsUtils.getSysTempFile(tempFile, "x86");
         Assert.assertEquals(tempFile2, tempFile); // pass through
         Assert.assertTrue(LinuxSystemMetricsUtils.getSysTemp(tempFile) > 10); // 27...
+        Assert.assertTrue(LinuxSystemMetricsUtils.getSysTemp(tempFile) < 100); // 27...
         
         String[] args;
         if (SystemUtils.IS_OS_WINDOWS) {

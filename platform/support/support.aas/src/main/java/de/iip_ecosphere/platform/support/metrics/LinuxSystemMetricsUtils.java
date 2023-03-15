@@ -85,8 +85,8 @@ public class LinuxSystemMetricsUtils {
         float result = SystemMetrics.INVALID_CELSIUS_TEMPERATURE;
         if (null != file) {
             try {
-                String tmp = FileUtils.readFileToString(file, Charset.defaultCharset());
-                result = (float) (Integer.parseInt(tmp) / 100.0);
+                String tmp = FileUtils.readFileToString(file, Charset.defaultCharset()).trim();
+                result = (float) (Integer.parseInt(tmp) / 1000.0);
             } catch (IOException | NumberFormatException e) {
             } 
         }
