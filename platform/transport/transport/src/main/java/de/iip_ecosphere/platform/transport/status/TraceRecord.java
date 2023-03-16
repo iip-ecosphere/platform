@@ -170,4 +170,30 @@ public class TraceRecord {
         conn.asyncSend(TRACE_STREAM, this);
     }
 
+    /**
+     * Registers a type to be ignored when serializing trace record (payloads). [convenience]
+     * 
+     * @param cls the class representing the type to be ignored
+     */
+    public static void ignoreClass(Class<?> cls) {
+        TraceRecordSerializer.ignoreClass(cls);
+    }
+
+    /**
+     * Registers a field to be ignored when serializing trace record (payloads). [convenience]
+     * 
+     * @param cls the class representing the type containing the field
+     * @param field the field to be ignored
+     */
+    public static void ignoreField(Class<?> cls, String field) {
+        TraceRecordSerializer.ignoreField(cls, field);
+    }
+    
+    /**
+     * Clears all ignored types and fields. [convenience]
+     */
+    public static void clearIgnores() {
+        TraceRecordSerializer.clearIgnores();
+    }
+    
 }

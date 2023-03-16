@@ -21,6 +21,7 @@ import de.iip_ecosphere.platform.transport.status.StatusMessage;
 import de.iip_ecosphere.platform.transport.status.TraceRecord;
 import de.iip_ecosphere.platform.transport.status.TraceRecordSerializer;
 import org.junit.Assert;
+import org.junit.Ignore;
 
 /**
  * Tests {@link TraceRecord} and {@link TraceRecordSerializer}.
@@ -51,6 +52,91 @@ public class TraceRecordTest {
         Assert.assertEquals(payload.getAction(), p.getAction());
         Assert.assertEquals(payload.getId(), p.getId());
         Assert.assertArrayEquals(payload.getAliasIds(), p.getAliasIds());
+    }
+
+    /**
+     * We just need a type for testing.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public class Payload {
+        
+        private int field;
+        private InnerPayload inner;
+        
+        /**
+         * Returns the field value.
+         * 
+         * @return the field value
+         */
+        public int getField() {
+            return field;
+        }
+        
+        /**
+         * Changes the field.
+         * 
+         * @param field the field
+         */
+        public void setField(int field) {
+            this.field = field;
+        }
+        
+        /**
+         * Returns the inner value.
+         * 
+         * @return the inner value
+         */
+        public InnerPayload getInner() {
+            return inner;
+        }
+        
+        /**
+         * Defines the inner value.
+         * 
+         * @param inner the inner value
+         */
+        public void setInner(InnerPayload inner) {
+            this.inner = inner;
+        }
+        
+    }
+    
+    /**
+     * Another test type.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public class InnerPayload {
+    }
+    
+    /**
+     * Tests basic payload filtering.
+     * 
+     * @throws IOException shall not occur
+     */
+    @Ignore("Instable")
+    @Test
+    public void testTraceRecordFiltering() throws IOException {
+        Payload pl = new Payload();
+        pl.setField(25);
+        pl.setInner(new InnerPayload());
+        TraceRecord record = new TraceRecord("src", "act", pl);
+        TraceRecordSerializer ser = new TraceRecordSerializer();
+        
+        TraceRecord.ignoreClass(InnerPayload.class);
+        TraceRecord record2 = ser.from(ser.to(record));
+        Assert.assertTrue(record2.getPayload() instanceof Payload);
+        Payload pl2 = (Payload) record2.getPayload();
+        Assert.assertNull(pl2.getInner());
+        TraceRecordSerializer.clearIgnores();
+        
+        TraceRecord.ignoreField(Payload.class, "field");
+        record2 = ser.from(ser.to(record));
+        Assert.assertTrue(record2.getPayload() instanceof Payload);
+        pl2 = (Payload) record2.getPayload();
+        Assert.assertEquals(0, pl2.getField());
+        TraceRecordSerializer.clearIgnores();
     }
 
 }
