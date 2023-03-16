@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.services.environment;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -32,6 +33,7 @@ import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.services.environment.DataMapper.BaseDataUnitFunctions;
 import de.iip_ecosphere.platform.services.environment.DataMapper.IOIterator;
+import de.iip_ecosphere.platform.services.environment.testing.DataRecorder;
 
 /**
  * Mocks a {@link ConnectorServiceWrapper} by data in a JSON file through {@link DataMapper}.
@@ -57,6 +59,7 @@ public class MockingConnectorServiceWrapper<O, I, CO, CI> extends ConnectorServi
     private CachingStrategy cachingStrategy;
     private IOIterator<? extends CO> triggerIterator;
     private String[] fieldNames;
+    private DataRecorder recorder;    
     
     /**
      * Creates a service wrapper instance.
@@ -83,6 +86,29 @@ public class MockingConnectorServiceWrapper<O, I, CO, CI> extends ConnectorServi
             } catch (ClassNotFoundException e) {
             }
         }
+        recorder = createDataRecorder();
+    }
+    
+    /**
+     * Creates an optional data recorder instance. 
+     * 
+     * @return the data recorder instance, may be <b>null</b> for none
+     * @see #createDataRecorderOrig()
+     */
+    protected DataRecorder createDataRecorder() {
+        return createDataRecorderOrig();
+    }
+
+    /**
+     * Creates a default data recorder instance (writes to target in JSON format). Cannot be overriden to be accessible 
+     * to subclasses although {@link #createDataRecorder()} is overridden.  
+     * 
+     * @return the data recorder instance, may be <b>null</b> for none
+     * @see #createDataRecorderOrig()
+     */
+    protected final DataRecorder createDataRecorderOrig() {
+        return new DataRecorder(new File("target/recordings/connector-" + getId() + "-recorded.txt"), 
+            DataRecorder.JSON_FORMATTER);
     }
 
     /**
@@ -222,6 +248,9 @@ public class MockingConnectorServiceWrapper<O, I, CO, CI> extends ConnectorServi
             dataRunnable = null;
             callback = null;
             doSetState(ServiceState.STOPPED);
+            if (null != recorder) {
+                recorder.close();
+            }
         }
     }
     
@@ -256,6 +285,9 @@ public class MockingConnectorServiceWrapper<O, I, CO, CI> extends ConnectorServi
      */
     public void emitData(CI data) {
         System.out.println("Connector " + getId() + ": " + data);
+        if (null != recorder) {
+            recorder.record("data", data);
+        }
     }
     
     /**

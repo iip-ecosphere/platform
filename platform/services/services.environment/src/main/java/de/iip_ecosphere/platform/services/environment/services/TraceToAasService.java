@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.services.environment.services;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -30,6 +31,7 @@ import de.iip_ecosphere.platform.services.environment.YamlArtifact;
 import de.iip_ecosphere.platform.services.environment.YamlService;
 import de.iip_ecosphere.platform.services.environment.services.TransportToAasConverter.TypeConverter;
 import de.iip_ecosphere.platform.services.environment.switching.ServiceBase;
+import de.iip_ecosphere.platform.services.environment.testing.DataRecorder;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
@@ -81,6 +83,7 @@ public class TraceToAasService extends AbstractService {
     private Converter converter = createConverter();
     private TransportConnector outTransport;
     private TransportParameter outTransportParameter;
+    private DataRecorder recorder;
 
     /**
      * Creates a service instance.
@@ -94,6 +97,7 @@ public class TraceToAasService extends AbstractService {
         // parameter must be declared in this form in model!
         addParameterConfigurer(new ParameterConfigurer<>(
             "timeout", Long.class, TypeTranslators.LONG, t -> converter.setTimeout(t)));
+        recorder = createDataRecorder();
     }
     
     /**
@@ -147,7 +151,29 @@ public class TraceToAasService extends AbstractService {
         this(artifact.getApplication(), artifact.getService(serviceId));
         this.artifact = artifact;
     }
+    
+    /**
+     * Creates an optional data recorder instance. 
+     * 
+     * @return the data recorder instance, may be <b>null</b> for none
+     * @see #createDataRecorderOrig()
+     */
+    protected DataRecorder createDataRecorder() {
+        return createDataRecorderOrig();
+    }
 
+    /**
+     * Creates a default data recorder instance (writes to target in JSON format). Cannot be overriden to be accessible 
+     * to subclasses although {@link #createDataRecorder()} is overridden.  
+     * 
+     * @return the data recorder instance, may be <b>null</b> for none
+     * @see #createDataRecorderOrig()
+     */
+    protected final DataRecorder createDataRecorderOrig() {
+        return new DataRecorder(new File("target/recordings/appAas-" + getId() + "-recorded.txt"), 
+            DataRecorder.JSON_FORMATTER);
+    }
+    
     /**
      * Creates the actual converter instance.
      * 
@@ -236,12 +262,32 @@ public class TraceToAasService extends AbstractService {
         if (null != outTransport) {
             converter.addNotifier(d -> outTransport.asyncSend(getAasTransportChannel(), d));
         }
+        if (null != recorder) {
+            converter.addNotifier(d -> {
+                recorder.record(getAasTransportChannel(), d);
+            });        
+        }
         return result;
+    }
+
+    /**
+     * Allows to record arbitrary data.
+     * 
+     * @param channel the channel, may be empty or <b>null</b>
+     * @param data the data to be recorded
+     */
+    protected void recordData(String channel, Object data) {
+        if (null != recorder) {
+            recorder.record(channel, data);
+        }
     }
 
     @Override
     protected ServiceState stop() {
         ServiceState result = super.stop();
+        if (null != recorder) {
+            recorder.close();
+        }
         if (!converter.stop()) {
             result = ServiceState.FAILED;
         }

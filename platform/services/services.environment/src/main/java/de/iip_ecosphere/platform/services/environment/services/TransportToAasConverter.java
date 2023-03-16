@@ -68,7 +68,7 @@ public abstract class TransportToAasConverter<T> {
     private long lastCleanup = System.currentTimeMillis();
     private long cleanupTimeout = 5 * 1000; // when the next cleanup shall be considered
     private TraceRecordReceptionCallback callback;
-    private IOConsumer<T> notifier = t -> { };
+    private List<IOConsumer<T>> notifier = new ArrayList<>();
     
     private String submodelIdShort;
     private String transportStream;
@@ -124,9 +124,9 @@ public abstract class TransportToAasConverter<T> {
      */
     public void addNotifier(IOConsumer<T> notifier) {
         if (null != notifier) {
-            this.notifier = notifier;
+            this.notifier.add(notifier);
         } else {
-            LoggerFactory.getLogger(getClass()).warn("No notifier given. Ignoring change request.");
+            LoggerFactory.getLogger(getClass()).warn("No notifier given. Ignoring call.");
         }
     }
     
@@ -247,12 +247,25 @@ public abstract class TransportToAasConverter<T> {
         } catch (IOException e) {
             LoggerFactory.getLogger(getClass()).error("Cannot obtain AAS {}: {}", getAasUrn(), e.getMessage());
         }
-        try { // notify independently
-            notifier.accept(data);
-        } catch (IOException e) {
-            LoggerFactory.getLogger(getClass()).error("Cannot inform notifier: {}", e.getMessage());
+    }
+    
+    /**
+     * Handles a new trace record by calling {@link #handleNew(Object)} upon arrival. Entry point for handling new
+     * data, calling {@link #handleNew(Object)} to ensure that {@link #notifier} are processed.
+     * 
+     * @param data the trace record data
+     */
+    private void handleNewAndNotify(T data) {
+        handleNew(data);
+        for (IOConsumer<T> n: notifier) {
+            try { // notify independently
+                n.accept(data);
+            } catch (IOException e) {
+                LoggerFactory.getLogger(getClass()).error("Cannot inform notifier: {}", e.getMessage());
+            }
         }
     }
+    
     
     /**
      * Creates the submodel element representing a single received data value.
@@ -423,7 +436,7 @@ public abstract class TransportToAasConverter<T> {
         
         @Override
         public void received(T data) {
-            new Thread(() -> handleNew(data)).start(); // thread pool?
+            new Thread(() -> handleNewAndNotify(data)).start(); // thread pool?
         }
 
         @Override
