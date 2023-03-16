@@ -17,8 +17,13 @@ template Dockerfile_3_ecs(IIPEcosphere config, FileArtifact target, sequenceOf(M
         '# Installed dependencies (shall be in /)'
         'COPY installedDependencies.yml installedDependencies.yml'
     	''
+        String deviceSpec = device.containerName;
+        if (deviceSpec.length() > 0) {
+            deviceSpec = "-" + deviceSpec;
+        }
+
     	'# ECS and Service Manager'
-    	'COPY ecsJars/ ecsJars'
+    	'COPY ecsJars${deviceSpec}/ ecsJars'
     	'COPY common/ common'
     	'COPY ecs.sh ecs.sh'
     	''

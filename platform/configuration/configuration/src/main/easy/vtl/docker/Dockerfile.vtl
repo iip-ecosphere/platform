@@ -24,17 +24,22 @@ template Dockerfile(IIPEcosphere config, FileArtifact target, sequenceOf(MeshEle
         ''
         'COPY wrapper_script.sh wrapper_script.sh'
         ''
-        '# App'
-        'COPY ${getAppMvnName(app)}/target/${getAppMvnName(app)}-${getAppMvnVersion(app)}-bin.jar ${getAppMvnName(app)}-${getAppMvnVersion(app)}-bin.jar'
-        ''   	
+        // '# App'
+        // 'COPY ${getAppMvnName(app)}/target/${getAppMvnName(app)}-${getAppMvnVersion(app)}-bin.jar ${getAppMvnName(app)}-${getAppMvnVersion(app)}-bin.jar'
+        // ''   	
         '# Broker'
         'COPY broker/brokerJars/ brokerJars'
         'COPY broker/src/ src'
         'COPY broker/broker.sh broker.sh'
         ''
+        String deviceSpec = device.containerName;
+        if (deviceSpec.length() > 0) {
+            deviceSpec = "-" + deviceSpec;
+        }
+
         if (containerType == ContainerType::EcsSvc_App) {
             '# ECS and Service Manager'
-            'COPY ecsSvcJars/ ecsSvcJars'
+            'COPY ecsSvcJars${deviceSpec}/ ecsSvcJars'
             'COPY common/ common'
             'COPY ecsServiceMgr.sh ecsServiceMgr.sh'
             
@@ -45,7 +50,7 @@ template Dockerfile(IIPEcosphere config, FileArtifact target, sequenceOf(MeshEle
             'COPY serviceMgr.sh serviceMgr.sh'
             ''
             '# ECS'
-            'COPY ecsJars/ ecsJars'
+            'COPY ecsJars${deviceSpec}/ ecsJars'
             'COPY ecs.sh ecs.sh'
         
         } else if (containerType == ContainerType::C1Ecs_C2Svc_App) {

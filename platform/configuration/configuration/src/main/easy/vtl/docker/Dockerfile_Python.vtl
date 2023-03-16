@@ -20,28 +20,35 @@ template Dockerfile_Python(IIPEcosphere config, FileArtifact target, sequenceOf(
         
         for (PythonService pyService : services) {
             setOf(Dependency) deps = pyService.dependencies;
+            setOf(Dependency) pythonDeps = pyService.dependencies -> selectByType(PythonDependency);
             for (Dependency s : deps) {
                 if (genDependency(s) == 'PYTHON2') {
                     'FROM python:2.7.10 '
                     for (String s: tmp) {
                         '${s}'
                     }
-                    'COPY requirements.txt requirements.txt'
-                    'RUN python2 -m pip install -r requirements.txt'
+                    if (pythonDeps.size() > 0) {
+                        'COPY requirements.txt requirements.txt'
+                        'RUN python2 -m pip install -r requirements.txt'
+                    }
                 } else if (genDependency(s) == 'PYTHON3') {
                     'FROM python:3.8-slim-buster'
                     for (String s: tmp) {
                         '${s}'
                     }
-                    'COPY requirements.txt requirements.txt'
-                    'RUN python3 -m pip install -r requirements.txt'
+                    if (pythonDeps.size() > 0) {
+                        'COPY requirements.txt requirements.txt'
+                        'RUN python3 -m pip install -r requirements.txt'
+                    }
                 } else if (genDependency(s) == 'PYTHON39') {
                     'FROM python:3.9'
                     for (String s: tmp) {
                         '${s}'
                     }
-                    'COPY requirements.txt requirements.txt'
-                    'RUN python3 -m pip install -r requirements.txt'
+                    if (pythonDeps.size() > 0) {
+                        'COPY requirements.txt requirements.txt'
+                        'RUN python3 -m pip install -r requirements.txt'
+                    }
                 } 
             }
         }
@@ -63,12 +70,17 @@ template Dockerfile_Python(IIPEcosphere config, FileArtifact target, sequenceOf(
         'COPY broker/src/ src'
         'COPY broker/broker.sh broker.sh'
         ''
-        '# App'
-        'COPY ${getAppMvnName(app)}/target/${getAppMvnName(app)}-${getAppMvnVersion(app)}-bin.jar ${getAppMvnName(app)}-${getAppMvnVersion(app)}-bin.jar'
-        ''
+        // '# App'
+        // 'COPY ${getAppMvnName(app)}/target/${getAppMvnName(app)}-${getAppMvnVersion(app)}-bin.jar ${getAppMvnName(app)}-${getAppMvnVersion(app)}-bin.jar'
+        // ''
+        String deviceSpec = device.containerName;
+        if (deviceSpec.length() > 0) {
+            deviceSpec = "-" + deviceSpec;
+        }
+
         if (containerType == ContainerType::EcsSvc_App) {
             '# ECS and Service Manager'
-            'COPY ecsSvcJars/ ecsSvcJars'
+            'COPY ecsSvcJars${deviceSpec}/ ecsSvcJars'
             'COPY common/ common'
             'COPY ecsServiceMgr.sh ecsServiceMgr.sh'
         
@@ -79,7 +91,7 @@ template Dockerfile_Python(IIPEcosphere config, FileArtifact target, sequenceOf(
             'COPY serviceMgr.sh serviceMgr.sh'
             ''
             '# ECS'
-            'COPY ecsJars/ ecsJars'
+            'COPY ecsJars${deviceSpec}/ ecsJars'
             'COPY ecs.sh ecs.sh'
         } else if (containerType == ContainerType::C1Ecs_C2Svc_App) {
             '# Service Manager'

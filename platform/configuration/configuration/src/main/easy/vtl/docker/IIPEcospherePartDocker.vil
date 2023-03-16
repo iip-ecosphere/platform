@@ -13,6 +13,10 @@ vilScript IIPEcospherePartDocker (Project source, Configuration config, Project 
         String vtlFile;
         String targetFile;
         Path df = "${appRoot}/../app.Dockerfile.txt";
+        String appName = a.name.toIdentifier();
+        String deviceName = getContainerNameDflt(device).toIdentifier();
+        Path deviceDf = "${appRoot}/../DeviceDockerfiles/${appName}/DeviceDockerfile_${deviceName}";
+
         /*
         if (contType == ContainerType::Ecs) {
             vtlFile = "Dockerfile_3_ecs";
@@ -21,27 +25,29 @@ vilScript IIPEcospherePartDocker (Project source, Configuration config, Project 
         }*/
 		
         if (contType == ContainerType::Ecs_Svc_App) {
+            df = "${appRoot}/../${deviceName}.Dockerfile.Ecs.Svc";
             if (isPythonService == 0) {
                 // JAVA         
                 vtlFile = "Dockerfile";
-                targetFile = "Dockerfile";   
+                targetFile = "Dockerfile";
             } else {
                 // JAVA & PYTHON
                 vtlFile = "Dockerfile_Python";
-                targetFile = "Dockerfile";   
+                targetFile = "Dockerfile";  
             }
         }
                 
         if (contType == ContainerType::EcsSvc_App) {
+             df = "${appRoot}/../${deviceName}.Dockerfile.EcsSvc";
              if (isPythonService == 0) {
                 // JAVA         
                 vtlFile = "Dockerfile";
                 targetFile = "Dockerfile";   
              } else {
                 // JAVA & PYTHON
-                vtlFile = "Dockerfile";
-                targetFile = "Dockerfile_Python";   
-            }
+                vtlFile = "Dockerfile_Python";
+                targetFile = "Dockerfile";
+             }
         }   
 
         if (contType == ContainerType::C1Ecs_C2Svc_App) {
@@ -62,13 +68,142 @@ vilScript IIPEcospherePartDocker (Project source, Configuration config, Project 
                 
         vilTemplateProcessor(vtlFile, config, df, elements=elements, app=a, containerType=contType, device=device);
         df.rename(targetFile);
+        copy(df, deviceDf);
         targetFile;
     }
-    
+
+    String createContainerBuildScript(DockerContainerManager mgr, Application a, sequenceOf(MeshElement) elements, 
+        Path appRoot, ContainerType contType, Integer isPythonService, PhoenixContactDevice device) = {
+        String vtlFile;
+        String targetFile;
+        Path df = "${appRoot}/../app.Dockerfile.txt";
+        String appName = a.name.toIdentifier();
+        String deviceName = getContainerNameDflt(device).toIdentifier();
+        Path deviceDf = "${appRoot}/../DeviceDockerfiles/${appName}/DeviceDockerfile_${deviceName}";
+
+        /*
+        if (contType == ContainerType::Ecs) {
+            vtlFile = "Dockerfile_3_ecs";
+            targetFile = "ecs.Dockerfile";   
+            df = "${appRoot}/../app.Dockerfile.Ecs";
+        }*/
+		
+        if (contType == ContainerType::Ecs_Svc_App) {
+            df = "${appRoot}/../${deviceName}.Dockerfile.Ecs.Svc";
+            if (isPythonService == 0) {
+                // JAVA         
+                vtlFile = "Dockerfile";
+                targetFile = "Dockerfile";   
+            } else {
+                // JAVA & PYTHON
+                vtlFile = "Dockerfile_Python";
+                targetFile = "Dockerfile";  
+            }
+        }
+                
+        if (contType == ContainerType::EcsSvc_App) {
+             df = "${appRoot}/../${deviceName}.Dockerfile.EcsSvc";
+             if (isPythonService == 0) {
+                // JAVA         
+                vtlFile = "Dockerfile";
+                targetFile = "Dockerfile";   
+             } else {
+                // JAVA & PYTHON
+                vtlFile = "Dockerfile_Python";
+                targetFile = "Dockerfile"; 
+             }
+        }   
+
+        if (contType == ContainerType::C1Ecs_C2Svc_App) {
+            if (isPythonService == -1) { // Container with ECS
+                vtlFile = "Dockerfile_3_ecs";
+                targetFile = "ecs.Dockerfile";   
+                df = "${appRoot}/../app.Dockerfile.Ecs";
+            } else if (isPythonService == 0) { // Container with ServiceMgr and App
+                // JAVA         
+                vtlFile = "Dockerfile";
+                targetFile = "app.Dockerfile";   
+            } else { // Container with ServiceMgr and App
+                // JAVA & PYTHON
+                vtlFile = "Dockerfile_Python";
+                targetFile = "app.Dockerfile";   
+            }
+        }
+                
+        vilTemplateProcessor(vtlFile, config, df, elements=elements, app=a, containerType=contType, device=device);
+        df.rename(targetFile);
+        copy(df, deviceDf);
+        targetFile;
+    }
+
+    String createContainerBuildScript(DockerContainerManager mgr, Application a, sequenceOf(MeshElement) elements, 
+        Path appRoot, ContainerType contType, Integer isPythonService, BitmotecDevice device) = {
+        String vtlFile;
+        String targetFile;
+        Path df = "${appRoot}/../app.Dockerfile.txt";
+        String appName = a.name.toIdentifier();
+        String deviceName = getContainerNameDflt(device).toIdentifier();
+        Path deviceDf = "${appRoot}/../DeviceDockerfiles/${appName}/DeviceDockerfile_${deviceName}";
+
+        /*
+        if (contType == ContainerType::Ecs) {
+            vtlFile = "Dockerfile_3_ecs";
+            targetFile = "ecs.Dockerfile";   
+            df = "${appRoot}/../app.Dockerfile.Ecs";
+        }*/
+		
+        if (contType == ContainerType::Ecs_Svc_App) {
+            df = "${appRoot}/../${deviceName}.Dockerfile.Ecs.Svc";
+            if (isPythonService == 0) {
+                // JAVA         
+                vtlFile = "Dockerfile";
+                targetFile = "Dockerfile";   
+            } else {
+                // JAVA & PYTHON
+                vtlFile = "Dockerfile_Python";
+                targetFile = "Dockerfile";  
+            }
+        }
+                
+        if (contType == ContainerType::EcsSvc_App) {
+             df = "${appRoot}/../${deviceName}.Dockerfile.EcsSvc";
+             if (isPythonService == 0) {
+                // JAVA         
+                vtlFile = "Dockerfile";
+                targetFile = "Dockerfile";   
+             } else {
+                // JAVA & PYTHON
+                vtlFile = "Dockerfile_Python";
+                targetFile = "Dockerfile";
+             }
+        }   
+
+        if (contType == ContainerType::C1Ecs_C2Svc_App) {
+            if (isPythonService == -1) { // Container with ECS
+                vtlFile = "Dockerfile_3_ecs";
+                targetFile = "ecs.Dockerfile";   
+                df = "${appRoot}/../app.Dockerfile.Ecs";
+            } else if (isPythonService == 0) { // Container with ServiceMgr and App
+                // JAVA         
+                vtlFile = "Dockerfile";
+                targetFile = "app.Dockerfile";   
+            } else { // Container with ServiceMgr and App
+                // JAVA & PYTHON
+                vtlFile = "Dockerfile_Python";
+                targetFile = "app.Dockerfile";   
+            }
+        }
+                
+        vilTemplateProcessor(vtlFile, config, df, elements=elements, app=a, containerType=contType, device=device);
+        df.rename(targetFile);
+        copy(df, deviceDf);
+        targetFile;
+    }
+  
     String createContainerImage(DockerContainerManager mgr, Path base, Path buildFile, String registry, String repository, String tag) = {
         String id = dockerBuildImage(base, buildFile, toDockerImageName(registry, repository, tag));
         if (isDefined(mgr.registry) and mgr.registry.length() > 0) {
-            dockerPushImage(toDockerImageName(registry, repository, tag), mgr.registry, registry.toLower() + "/" + repository, tag);
+            dockerPushImage(toDockerImageName(registry, repository, tag), mgr.registry, registry.toLower() + "/" + repository.toLower(), tag);
         }
         id;
     }
