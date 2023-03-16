@@ -17,7 +17,6 @@ import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas
 import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsAasConstructor;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.aas.Aas;
-import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
@@ -34,7 +33,6 @@ import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.iip_aas.AasContributor;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
-import de.iip_ecosphere.platform.support.iip_aas.AasUtils;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.support.iip_aas.ClassUtility;
@@ -479,9 +477,9 @@ public class ServicesAas implements AasContributor {
         descriptorBuilder.createPropertyBuilder(NAME_PROP_RESOURCE)
             .setValue(Type.STRING, Id.getDeviceIdAas())
             .build();
-        Registry reg = getIipAasRegistry();
-        addServiceAasEndpointProperty(reg, descriptorBuilder, NAME_PROP_SERVICE_AAS, desc.getId());
-        addDeviceAasEndpointProperty(reg, descriptorBuilder, NAME_PROP_DEVICE_AAS, Id.getDeviceIdAas());
+        Registry reg = AasPartRegistry.getIipAasRegistry();
+        AasPartRegistry.addServiceAasEndpointProperty(reg, descriptorBuilder, NAME_PROP_SERVICE_AAS, desc.getId());
+        AasPartRegistry.addDeviceAasEndpointProperty(reg, descriptorBuilder, NAME_PROP_DEVICE_AAS, Id.getDeviceIdAas());
         addTypedData(descriptorBuilder, NAME_SUBCOLL_PARAMETERS, desc.getParameters());
         addTypedData(descriptorBuilder, NAME_SUBCOLL_INPUT_DATA_CONN, desc.getInputDataConnectors());
         addTypedData(descriptorBuilder, NAME_SUBCOLL_OUTPUT_DATA_CONN, desc.getOutputDataConnectors());
@@ -491,77 +489,7 @@ public class ServicesAas implements AasContributor {
         serviceBuilder.build();
         Transport.sendServiceStatus(ActionTypes.ADDED, desc.getId());
     }
-
-    /**
-     * Returns the AAS registry for the endpoint in the setup of {@link AasPartRegistry}.
-     * 
-     * @return the registry, may be <b>null</b> if there is none
-     */
-    public static Registry getIipAasRegistry() { // TODO move to AasPartRegistry?
-        Registry reg = null; 
-        try {
-            reg = AasFactory.getInstance().obtainRegistry(AasPartRegistry.getSetup().getRegistryEndpoint());
-        } catch (IOException e) {
-            LoggerFactory.getLogger(ServicesAas.class).error("Obtaining AAS registry: {}. No AAS linking possible.", 
-                e.getMessage());
-        }
-        return reg;
-    }
-
-    /**
-     * Adds a property to {@code builder} pointing to an AAS endpoint for an AAS with id {@code serviceId} 
-     * in registry {@code reg}.
-     * 
-     * @param reg the registry, may be <b>null</b> then the property will have an empty value.
-     * @param builder the builder to add the property to
-     * @param property the shortId of the property to create
-     * @param aasId the id of the AAS
-     * @return the created AAS property
-     * @see #getAasRegistry()
-     */
-    private static Property addAasEndpointProperty(Registry reg, SubmodelElementCollectionBuilder builder, 
-        String property, String aasId) {
-        String ep = null == reg ? null : reg.getEndpoint(AasUtils.fixId(aasId));
-        if (null == ep) {
-            ep = "";
-        }
-        return builder.createPropertyBuilder(property) // no reference resolution in BaSyx so far
-            .setValue(Type.STRING, ep)
-            .build();
-    }
     
-    /**
-     * Adds a property to {@code builder} pointing to an AAS endpoint for a service with id {@code serviceId} 
-     * in registry {@code reg}.
-     * 
-     * @param reg the registry, may be <b>null</b> then the property will have an empty value.
-     * @param builder the builder to add the property to
-     * @param property the shortId of the property to create
-     * @param serviceId the id of the service
-     * @return the created AAS property
-     * @see #getAasRegistry()
-     */
-    public static Property addServiceAasEndpointProperty(Registry reg, SubmodelElementCollectionBuilder builder, 
-        String property, String serviceId) {
-        return addAasEndpointProperty(reg, builder, property, "service_" + serviceId);
-    }
-
-    /**
-     * Adds a property to {@code builder} pointing to an AAS endpoint for a device with id {@code deviceId} in 
-     * registry {@code reg}.
-     * 
-     * @param reg the registry, may be <b>null</b> then the property will have an empty value.
-     * @param builder the builder to add the property to
-     * @param property the shortId of the property to create
-     * @param deviceId the id of the device
-     * @return the created AAS property
-     * @see #getAasRegistry()
-     */
-    public static Property addDeviceAasEndpointProperty(Registry reg, SubmodelElementCollectionBuilder builder, 
-        String property, String deviceId) {
-        return addAasEndpointProperty(reg, builder, property, "device_" + deviceId);
-    }
-
     /**
      * Adds a typed data submodel elements collection to the given {@code builder}.
      * 
