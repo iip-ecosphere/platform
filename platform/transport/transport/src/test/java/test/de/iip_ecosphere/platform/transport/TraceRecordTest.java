@@ -13,6 +13,7 @@
 package test.de.iip_ecosphere.platform.transport;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 import org.junit.Test;
 
@@ -21,7 +22,6 @@ import de.iip_ecosphere.platform.transport.status.StatusMessage;
 import de.iip_ecosphere.platform.transport.status.TraceRecord;
 import de.iip_ecosphere.platform.transport.status.TraceRecordSerializer;
 import org.junit.Assert;
-import org.junit.Ignore;
 
 /**
  * Tests {@link TraceRecord} and {@link TraceRecordSerializer}.
@@ -63,7 +63,7 @@ public class TraceRecordTest {
         
         private int field;
         private InnerPayload inner;
-        
+                
         /**
          * Returns the field value.
          * 
@@ -115,7 +115,7 @@ public class TraceRecordTest {
      * 
      * @throws IOException shall not occur
      */
-    @Ignore("Instable")
+    @SuppressWarnings("unchecked")
     @Test
     public void testTraceRecordFiltering() throws IOException {
         Payload pl = new Payload();
@@ -126,16 +126,17 @@ public class TraceRecordTest {
         
         TraceRecord.ignoreClass(InnerPayload.class);
         TraceRecord record2 = ser.from(ser.to(record));
-        Assert.assertTrue(record2.getPayload() instanceof Payload);
-        Payload pl2 = (Payload) record2.getPayload();
-        Assert.assertNull(pl2.getInner());
+        HashMap<Object, Object> payload = (HashMap<Object, Object>) record2.getPayload(); // object unknown
+        Assert.assertNotNull(payload.get("field"));
+        Assert.assertEquals(25, payload.get("field"));
+        Assert.assertNull(payload.get("inner"));
         TraceRecordSerializer.clearIgnores();
         
         TraceRecord.ignoreField(Payload.class, "field");
         record2 = ser.from(ser.to(record));
-        Assert.assertTrue(record2.getPayload() instanceof Payload);
-        pl2 = (Payload) record2.getPayload();
-        Assert.assertEquals(0, pl2.getField());
+        payload = (HashMap<Object, Object>) record2.getPayload(); // object unknown
+        Assert.assertNull(payload.get("field"));
+        Assert.assertNotNull(payload.get("inner"));
         TraceRecordSerializer.clearIgnores();
     }
 
