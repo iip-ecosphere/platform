@@ -14,8 +14,12 @@ package de.iip_ecosphere.platform.configuration;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import org.json.simple.JSONArray;
@@ -109,7 +113,23 @@ public class DrawflowGraphFormat implements GraphFormat {
                 data.put("type", type);
                 String kind = IvmlUtils.toName(IvmlUtils.getEnumValue(IvmlUtils.getNestedSafe(service, "kind")), "?");
                 data.put("kind", kind);
+                processBackward(service.getNestedElement("input"), data, "bus-receive");
+                processBackward(service.getNestedElement("output"), data, "bus-send");
             }
+        }
+        
+        /**
+         * Processes backward flows by adding their type names as String array into a JSON field called {@code name}.
+         * 
+         * @param set denotes the type set (input/output) to be analyzed
+         * @param data the data object to be modified
+         * @param name the name of the field to write the backward flows into
+         */
+        @SuppressWarnings("unchecked")
+        private void processBackward(IDecisionVariable set, JSONObject data, String name) {
+            JSONArray array = new JSONArray();
+            collectTypes(set, fwd -> !fwd, type -> array.add(type));
+            data.put(name, array);
         }
 
         /**
@@ -134,8 +154,8 @@ public class DrawflowGraphFormat implements GraphFormat {
                     //jNode.put("class", node.getType());
                     jNode.put("html", "<div>" + node.getName() + "</div>"); // preliminary
                     jNode.put("typenode", false);
-                    jNode.put("inputs", writeEdges(node.inEdges(), true));
-                    jNode.put("outputs", writeEdges(node.outEdges(), false));
+                    jNode.put("inputs", writeEdges(node, node.inEdges(), true));
+                    jNode.put("outputs", writeEdges(node, node.outEdges(), false));
                     if (node.getXPos() >= 0 && node.getYPos() >= 0) {
                         jNode.put("pos_x", node.getXPos());
                         jNode.put("pos_y", node.getYPos());
@@ -190,34 +210,87 @@ public class DrawflowGraphFormat implements GraphFormat {
         /**
          * Writes the given edges.
          * 
-         * @param edges the edges to write
+         * @param node the start/end node defining the {@code edges}
+         * @param edges the edges to write 
          * @param inputEdges are we writing input or output edges
          * @return the edges as JSON object
          */
         @SuppressWarnings("unchecked")
-        private JSONObject writeEdges(Iterable<? extends IvmlGraphEdge> edges, boolean inputEdges) {
+        private JSONObject writeEdges(IvmlGraphNode node, Iterable<? extends IvmlGraphEdge> edges, 
+            boolean inputEdges) {
             JSONObject result = new JSONObject();
             String prefix = inputEdges ? "input_" : "output_";
             int count = 1;
             for (IvmlGraphEdge edge : edges) {
-                JSONObject input = new JSONObject();
+                JSONObject inOutput = new JSONObject();
                 JSONObject jEdge = new JSONObject();
                 JSONArray conns = new JSONArray();
+                JSONObject data = new JSONObject();
                 IvmlGraphNode other;
                 if (inputEdges) {
                     other = edge.getStart();
                     jEdge.put("input", "output_" + nextCount(other, outputCounts));
+                    collectForwardTypes(other, node, edge, data);
                 } else {
                     other = edge.getEnd();
                     jEdge.put("output", "input_" + nextCount(other, inputCounts));
+                    collectForwardTypes(node, other, edge, data);
                 }
                 jEdge.put("node", node2id.get(other));
                 conns.add(jEdge);
-                input.put("connections", conns);
-                result.put(prefix + count, input);
+                inOutput.put("connections", conns);
+                inOutput.put("data", data);
+                result.put(prefix + count, inOutput);
                 count++;
             }
             return result;
+        }
+
+        /**
+         * Collects common forward types between the nodes involved in {@code edge} and adds the results as 
+         * "type"-array to {@code data}.
+         * 
+         * @param start the start node
+         * @param end the end node
+         * @param edge the edge (for future information)
+         * @param data the data object to add a "types" field
+         */
+        @SuppressWarnings("unchecked")
+        private void collectForwardTypes(IvmlGraphNode start, IvmlGraphNode end, IvmlGraphEdge edge, JSONObject data) {
+            if (start.getVariable() != null && end.getVariable() != null) {
+                SortedSet<String> types = new TreeSet<String>();
+                collectTypes(start.getVariable().getNestedElement("output"), fwd -> fwd, s -> types.add(s));
+                SortedSet<String> types2 = new TreeSet<String>();
+                collectTypes(end.getVariable().getNestedElement("input"), fwd -> fwd, s -> types2.add(s));
+                types.retainAll(types2);
+                JSONArray array = new JSONArray();
+                for (String type: types) {
+                    array.add(type);
+                }
+                data.put("types", array);
+            }
+        }
+        
+        /**
+         * Collects IIP-Ecosphere data types.
+         * 
+         * @param set the set of decisions to process
+         * @param direction a directional predicate over forward/backward types
+         * @param consumer processes identified type names
+         */
+        private void collectTypes(IDecisionVariable set, Predicate<Boolean> direction, Consumer<String> consumer) {
+            for (int n = 0; n < set.getNestedElementsCount(); n++) {
+                IDecisionVariable type = set.getNestedElement(n);
+                if (direction.test(IvmlUtils.getBooleanValue(type.getNestedElement("forward"), true))) {
+                    IDecisionVariable dataType = Configuration.dereference(type.getNestedElement("type"));
+                    if (null != dataType) {
+                        String typeName = IvmlUtils.getStringValue(dataType.getNestedElement("name"), "");
+                        if (typeName.length() > 0) {
+                            consumer.accept(typeName);
+                        }
+                    }
+                }
+            }
         }
         
         /**

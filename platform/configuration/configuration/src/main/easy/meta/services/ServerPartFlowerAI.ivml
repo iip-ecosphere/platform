@@ -21,7 +21,7 @@ project ServerPartFlowerAI {
        PositiveInteger numServerRounds = 3;
        PositiveInteger numFlClients = 1;
        PositiveInteger numFlRounds = 3;
-       Constraint reqDependenciesOk = reqFlowerDependencies.intersection(dependencies).notEmpty();
+       Constraint reqDependenciesOk = dependencies.includesAll(reqFlowerDependencies);
    }
 
    freeze {
