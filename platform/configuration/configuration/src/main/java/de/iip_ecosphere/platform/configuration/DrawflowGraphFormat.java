@@ -257,16 +257,18 @@ public class DrawflowGraphFormat implements GraphFormat {
          */
         @SuppressWarnings("unchecked")
         private void collectForwardTypes(IvmlGraphNode start, IvmlGraphNode end, IvmlGraphEdge edge, JSONObject data) {
-            SortedSet<String> types = new TreeSet<String>();
-            collectTypes(start.getVariable().getNestedElement("output"), fwd -> fwd, s -> types.add(s));
-            SortedSet<String> types2 = new TreeSet<String>();
-            collectTypes(end.getVariable().getNestedElement("input"), fwd -> fwd, s -> types2.add(s));
-            types.retainAll(types2);
-            JSONArray array = new JSONArray();
-            for (String type: types) {
-                array.add(type);
+            if (start.getVariable() != null && end.getVariable() != null) {
+                SortedSet<String> types = new TreeSet<String>();
+                collectTypes(start.getVariable().getNestedElement("output"), fwd -> fwd, s -> types.add(s));
+                SortedSet<String> types2 = new TreeSet<String>();
+                collectTypes(end.getVariable().getNestedElement("input"), fwd -> fwd, s -> types2.add(s));
+                types.retainAll(types2);
+                JSONArray array = new JSONArray();
+                for (String type: types) {
+                    array.add(type);
+                }
+                data.put("types", array);
             }
-            data.put("types", array);
         }
         
         /**
