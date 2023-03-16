@@ -1,3 +1,5 @@
+/* You can add global styles to this file, and also import other style files */
+/* Drawflow styles starts here */
 
 :root {
   --dfBackgroundColor: #ffffff;
@@ -204,6 +206,7 @@
 .drawflow .connection .main-path {
   stroke-width: var(--dfLineWidth);
   stroke: var(--dfLineColor);
+  fill: none;
 }
 
 .drawflow .connection .main-path:hover {
@@ -372,3 +375,4 @@
 }
 
 /* Drawflow styles ends here */
+
