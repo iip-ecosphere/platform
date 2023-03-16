@@ -30,11 +30,6 @@ project AllServicesPartPythonSync {
         kind = ServiceKind::TRANSFORMATION_SERVICE,
         dependencies = {refBy(PYTHON39)}
     };
-
-    PythonDependency PYTHON39 = {
-       name = "python",
-       version = "3.9"
-    };
     
     Service myPythonSyncReceiverService = JavaService {
         id = "SimplePythonSyncReceiver",
