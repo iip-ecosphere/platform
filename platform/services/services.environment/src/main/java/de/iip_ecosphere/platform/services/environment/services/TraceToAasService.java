@@ -357,6 +357,23 @@ public class TraceToAasService extends AbstractService {
     }
 
     /**
+     * Sends data asynchronously via the optional transport connector. Does nothing if there
+     * is no transport connector, {@link #createTransport(BasicSerializerProvider)}.
+     * 
+     * @param channel the channel to send to
+     * @param data the data object to send
+     */
+    protected void sendTransportAsync(String channel, Object data) {
+        if (null != outTransport) {
+            try {
+                outTransport.asyncSend(channel, data);
+            } catch (IOException e) {
+                LoggerFactory.getLogger(getClass()).warn("Cannot send to outTransport {}", e.getMessage());
+            }
+        }
+    }
+
+    /**
      * Adds elements to the services submodel if available.
      * 
      * @param smBuilder the submodel builder
