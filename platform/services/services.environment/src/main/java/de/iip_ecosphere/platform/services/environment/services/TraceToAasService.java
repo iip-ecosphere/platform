@@ -40,6 +40,7 @@ import de.iip_ecosphere.platform.support.aas.Registry;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
+import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.AasUtils;
 import de.iip_ecosphere.platform.support.iip_aas.ApplicationSetup;
 import de.iip_ecosphere.platform.support.iip_aas.PlatformAas;
@@ -421,6 +422,16 @@ public class TraceToAasService extends AbstractService {
     @Override
     public ParameterConfigurer<?> getParameterConfigurer(String paramName) {
         return paramConfigurers.get(paramName);
+    }
+    
+    /**
+     * Retrieves the App AAS.
+     * 
+     * @return the AAS
+     * @throws IOException if the App AAS cannot be retrieved
+     */
+    protected Aas retrieveAas() throws IOException {
+        return AasPartRegistry.retrieveAas(Starter.getSetup().getAas(), getAasUrn());
     }
     
     /**

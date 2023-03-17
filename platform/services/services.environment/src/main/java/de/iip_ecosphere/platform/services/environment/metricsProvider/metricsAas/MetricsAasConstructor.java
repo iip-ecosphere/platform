@@ -39,7 +39,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -325,15 +324,7 @@ public class MetricsAasConstructor {
         if (null != idShort) {
             JsonValue json = ent.getValue();
             if (mPredicate.test(coll, json)) {
-                Property prop = coll.getProperty(idShort);
-                if (null != prop) {
-                    try {
-                        prop.setValue(getMeasurement(json.toString())); // implicit conversion
-                    } catch (ExecutionException e) {
-                        LoggerFactory.getLogger(MetricsAasConstructor.class).error(
-                            "AAS property set on '{}' failed: {}", idShort, e.getMessage());
-                    }
-                }
+                AasUtils.setPropertyValueSafe(coll, idShort, getMeasurement(json.toString())); // implicit conversion
             }
         }
     }
