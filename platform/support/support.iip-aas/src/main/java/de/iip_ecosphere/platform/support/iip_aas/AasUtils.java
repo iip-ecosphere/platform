@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
+import de.iip_ecosphere.platform.support.aas.ElementsAccess;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
@@ -288,7 +289,7 @@ public class AasUtils {
                 }
             }
             if (!resolved) {
-                LoggerFactory.getLogger(PlatformAas.class).warn("Cannot resolve image '{}' {}", 
+                LoggerFactory.getLogger(AasUtils.class).warn("Cannot resolve image '{}' {}", 
                     image, prevMsg);
             }
         }
@@ -318,11 +319,11 @@ public class AasUtils {
             try {
                 result = transformer.apply(prop.getValue());
             } catch (ExecutionException e) {
-                LoggerFactory.getLogger(PlatformAas.class).warn("Cannot access AAS property {} value: {}", 
+                LoggerFactory.getLogger(AasUtils.class).warn("Cannot access AAS property {} value: {}", 
                     propIdShort, e.getMessage());
             }
         } else {
-            LoggerFactory.getLogger(PlatformAas.class).warn("Cannot find AAS property {} in collection {}", 
+            LoggerFactory.getLogger(AasUtils.class).warn("Cannot find AAS property {} in collection {}", 
                 propIdShort, coll.getIdShort());
         }
         return result;
@@ -354,5 +355,38 @@ public class AasUtils {
         return getPropertyValueSafe(coll, propIdShort, Integer.class, o -> null == o ? dflt : (Integer) o, dflt);
     }
 
+    /**
+     * Sets the value of property {@code propIdShort} on {@code parent}.
+     * 
+     * @param parent the parent, may be <b>null</b>, call is ignored then
+     * @param propIdShort the idShort of the property; call is ignored if the property does not exist
+     * @param value the value to set
+     * @throws ExecutionException if the value cannot be set
+     */
+    public static void setPropertyValue(ElementsAccess parent, String propIdShort, Object value) 
+        throws ExecutionException {
+        if (null != parent) {
+            Property prop = parent.getProperty(propIdShort);
+            if (null != prop) {
+                prop.setValue(value);
+            }
+        }
+    }
+
+    /**
+     * Sets the value of property {@code propIdShort} on {@code parent} logging potential errors.
+     * 
+     * @param parent the parent, may be <b>null</b>, call is ignored then
+     * @param propIdShort the idShort of the property; call is ignored if the property does not exist
+     * @param value the value to set
+     */
+    public static void setPropertyValueSafe(ElementsAccess parent, String propIdShort, Object value) {
+        try {
+            setPropertyValue(parent, propIdShort, value);
+        } catch (ExecutionException e) {
+            LoggerFactory.getLogger(AasUtils.class).warn("Cannot set value for AAS property {}: {}", 
+                propIdShort, e.getMessage());
+        }
+    }
 
 }
