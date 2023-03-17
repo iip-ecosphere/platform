@@ -428,14 +428,18 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
                 String arrayEltTypeName = "${asTypeName(at.type.name)}";
                 acc = "(${arrayEltTypeName}[]) " + acc;
             }
-            if (tgt.type.isKindOf(RecordType)) {
-                String nextPath = getterPath(tgtQual, tgt); // all "vars" before the .set
-                String cons = "new ${toTypeName(tgt.type)}${add}()";
-                '\n${createTemporaryVariable(nextPath, mapSourceSeparator(), tgt.type, "${cons}")}
-                ${wrapOptional(tgt, setterPath(getTemporaryVariable(tgtQual, tgtQual), tgt, getTemporaryVariable(nextPath, cons)), args="access, a", optFind="access.", optReplace="a.")};'
-            } else {
-                '\n${wrapOptional(tgt, setterPath(getTemporaryVariable(tgtQual, tgtQual), tgt, acc), args="access, a", optFind="access.", optReplace="a.")};'
-            }            
+            if (tgt.readOnly) {
+                ''
+            } else {            
+                if (tgt.type.isKindOf(RecordType)) {
+                    String nextPath = getterPath(tgtQual, tgt); // all "vars" before the .set
+                    String cons = "new ${toTypeName(tgt.type)}${add}()";
+                    '\n${createTemporaryVariable(nextPath, mapSourceSeparator(), tgt.type, "${cons}")}
+                    ${wrapOptional(tgt, setterPath(getTemporaryVariable(tgtQual, tgtQual), tgt, getTemporaryVariable(nextPath, cons)), args="access, a", optFind="access.", optReplace="a.")};'
+                } else {
+                    '\n${wrapOptional(tgt, setterPath(getTemporaryVariable(tgtQual, tgtQual), tgt, acc), args="access, a", optFind="access.", optReplace="a.")};'
+                }
+            }     
         } else {
             '${acc}'
         }
