@@ -487,7 +487,7 @@ public class ServicesAas implements AasContributor {
         descriptorBuilder.build();
         
         serviceBuilder.build();
-        Transport.sendServiceStatus(ActionTypes.ADDED, desc.getId());
+        Transport.sendServiceStatusWithDescription(ActionTypes.ADDED, desc.getId(), desc.getState().toString());
     }
     
     /**
@@ -735,20 +735,20 @@ public class ServicesAas implements AasContributor {
             getLogger().info("Handling service state change `{}`: {} -> {}", desc.getId(), old, act);
             if (ServiceState.AVAILABLE == old && ServiceState.STARTING == act) {
                 registerMetrics(desc, sub, elt);
-                Transport.sendServiceStatus(ActionTypes.CHANGED, desc.getId());
+                Transport.sendServiceStatusWithDescription(ActionTypes.CHANGED, desc.getId(), act.name());
             } else if (ServiceState.STARTING == old && ServiceState.RUNNING == act) {
                 setupRelations(desc, sub, elt);
-                Transport.sendServiceStatus(ActionTypes.CHANGED, desc.getId());
+                Transport.sendServiceStatusWithDescription(ActionTypes.CHANGED, desc.getId(), act.name());
             } else if ((ServiceState.RUNNING == old  || ServiceState.FAILED == old) 
                 && ServiceState.STOPPED == act) {
                 removeRelations(desc, sub, null);
-                Transport.sendServiceStatus(ActionTypes.REMOVED, desc.getId());
+                Transport.sendServiceStatusWithDescription(ActionTypes.REMOVED, desc.getId(), act.name());
             } else if ((ServiceState.RUNNING == old  || ServiceState.FAILED == old) 
                 && ServiceState.STOPPING == act) {
                 MetricsAasConstructor.removeProviderMetricsFromAasSubmodel(elt);
-                Transport.sendServiceStatus(ActionTypes.CHANGED, desc.getId());
+                Transport.sendServiceStatusWithDescription(ActionTypes.CHANGED, desc.getId(), act.name());
             } else if (old != act) {
-                Transport.sendServiceStatus(ActionTypes.CHANGED, desc.getId());
+                Transport.sendServiceStatusWithDescription(ActionTypes.CHANGED, desc.getId(), act.name());
             }
         });
     }
