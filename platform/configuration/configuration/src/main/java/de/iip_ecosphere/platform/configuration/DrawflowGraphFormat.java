@@ -113,8 +113,17 @@ public class DrawflowGraphFormat implements GraphFormat {
                 data.put("type", type);
                 String kind = IvmlUtils.toName(IvmlUtils.getEnumValue(IvmlUtils.getNestedSafe(service, "kind")), "?");
                 data.put("kind", kind);
+                String sId = IvmlUtils.getStringValue(IvmlUtils.getNestedSafe(service, "id"), "");
+                data.put("id", sId);
                 processBackward(service.getNestedElement("input"), data, "bus-receive");
                 processBackward(service.getNestedElement("output"), data, "bus-send");
+                final JSONObject serviceStates = new JSONObject();
+                if (sId.length() > 0) {
+                    StatusCache.getServiceStates(sId, state -> {
+                        serviceStates.put(state.getDeviceId(), state.getState());
+                    });
+                }
+                data.put("states", serviceStates);
             }
         }
         

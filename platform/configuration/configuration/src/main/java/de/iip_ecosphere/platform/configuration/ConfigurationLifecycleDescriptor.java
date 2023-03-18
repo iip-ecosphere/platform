@@ -164,6 +164,7 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
             try {
                 exec.setupLocations();
                 ConfigurationManager.setExecutor(exec);
+                StatusCache.start();
             } catch (ModelManagementException e) {
                 getLogger().error("Cannot set model locations. Configuration capabilities may be disabled. " 
                     + e.getMessage(), e);
@@ -176,6 +177,7 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
 
     @Override
     public void shutdown() {
+        StatusCache.stop();
         EasyExecutor exec = ConfigurationManager.getExecutor();
         if (null != exec) {
             try {
