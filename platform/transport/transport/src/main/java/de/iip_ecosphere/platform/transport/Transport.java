@@ -111,6 +111,21 @@ public class Transport {
         }
 
         /**
+         * Sends a service status message. Uses {@link Id#getDeviceId()}. Calls {@link #createConnector()} to obtain
+         * a connector instance on demand.
+         * 
+         * @param action the action on the service
+         * @param serviceId the service Id
+         * @param description with description, usually the new service state
+         * @param aliasIds optional alias ids for the service
+         */
+        public void sendServiceStatusWithDescription(ActionType action, String serviceId, String description, 
+            String... aliasIds) {
+            sendStatus(new StatusMessage(ComponentTypes.SERVICE, action, serviceId, Id.getDeviceId(), aliasIds)
+                .withDescription(description));
+        }
+
+        /**
          * Sends a service artifact status message. Uses {@link Id#getDeviceId()}. Calls {@link #createConnector()} to 
          * obtain a connector instance on demand.
          * 
@@ -374,6 +389,20 @@ public class Transport {
      */
     public static void sendServiceStatus(ActionType action, String serviceId, String... aliasIds) {
         globalTransport.sendServiceStatus(action, serviceId, aliasIds);
+    }
+
+    /**
+     * Sends a service status message. Uses {@link Id#getDeviceId()}. Calls {@link #createConnector()} to obtain
+     * a connector instance on demand.
+     * 
+     * @param action the action on the service
+     * @param serviceId the service Id
+     * @param description an optional description of the status change
+     * @param aliasIds optional alias ids for the service
+     */
+    public static void sendServiceStatusWithDescription(ActionType action, String serviceId, String description, 
+        String... aliasIds) {
+        globalTransport.sendServiceStatusWithDescription(action, serviceId, description, aliasIds);
     }
 
     /**
