@@ -36,14 +36,15 @@ In progress:
 New features:
 * [#127](https://github.com/iip-ecosphere/platform/issues/127): Integration of Flower-based federated learning through generated templates
 * Generic time series data aggregator in data functions
+* Application intercommunication support (`AppIntercom`)
 
 Improvements:
 * [#128](https://github.com/iip-ecosphere/platform/issues/128): Refactor model to move RecordType::path to connector. **May require an upgrade of configuration models using connectors.**
 * [#129](https://github.com/iip-ecosphere/platform/issues/129): Read-only flag for RecordType field
-* Application intercommunication support (`AppIntercom`)
+* Configurable startup waiting time/timeout for AAS resources (ECS-Runtime, serviceManager)
 * Connector improvements for OPC UA and MQTT, improved support for nested data types in transport/Python
 * Connector mocking data with $period and $repeats, preparation for exact JSON field mapping
-* Transport connector can now have a local serialization provider.
+* Transport connector can now have a local serialization provider, e.g., for MQTT out.
 * Trace-to-AAS service and (new) extensible Java service can utilize optional (output) transport connector, e.g., for northbound integration.
 * Build process fixes for examples.
 

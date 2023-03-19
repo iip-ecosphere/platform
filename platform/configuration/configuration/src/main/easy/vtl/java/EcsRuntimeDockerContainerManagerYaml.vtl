@@ -22,6 +22,15 @@ template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, FileArtifact 
         }
     }
 
+    def produceAasStartupTimeout(IIPEcosphere config) {
+        Integer timeout = getIntegerValueSafe(config.aasStartupTimeout, 0);
+        if (timeout > 0) {
+            'aasStartupTimeout: ${timeout}'
+        } else {
+            ''
+        }
+    }
+
     def produceAas(IIPEcosphere config, String aasPersistence="", Boolean withDocker=true, Boolean implLocalEphemerial=false) {
         EndpointAddress aasServer = config.aasServer;
         EndpointAddress aasRegistryServer = config.aasRegistryServer;
@@ -55,6 +64,7 @@ template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, FileArtifact 
             protocol: ${aasProtocolName(aasImplServer.protocol)}
           ${serverHost(aasServer)|e}
           ${produceAasCors(config)|e}
+          ${produceAasStartupTimeout(config)|e}
           ${produceAasPersistence(aasPersistence)|e}'
     }
 
@@ -141,7 +151,7 @@ template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, FileArtifact 
     }
     
     def produceArtefactInfixes(EcsDevice deviceType) {
-        if (deviceType.containerName <> "") { // not "dflt" here
+        if (deviceType.containerName.trim().length() > 0) { // not "dflt" here
             'artifactInfixes:
               - ${deviceType.containerName}'
         } else {
