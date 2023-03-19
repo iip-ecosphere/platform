@@ -13,6 +13,9 @@
 package test.de.iip_ecosphere.platform.support;
 
 import de.iip_ecosphere.platform.support.TimeUtils;
+
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -24,7 +27,7 @@ import org.junit.Test;
 public class TimeUtilsTest {
 
     /**
-     * Tests the sleep method.
+     * Tests the {@link TimeUtils#sleep(int)} method.
      */
     @Test
     public void testSleep() {
@@ -33,6 +36,26 @@ public class TimeUtilsTest {
         long after = System.currentTimeMillis();
         long diff = after - before;
         Assert.assertTrue(80 < diff && diff < 200);
+    }
+    
+    /**
+     * Tests the {@link TimeUtils#waitFor(java.util.function.Supplier, int, int)} method.
+     */
+    @Test
+    public void testWaitFor() {
+        Assert.assertTrue(TimeUtils.waitFor(() -> false, 200, 100)); // return immediately
+        
+        AtomicInteger counter = new AtomicInteger(0);
+        // return after 5 rounds, but called to wait endlessly
+        Assert.assertTrue(TimeUtils.waitFor(() -> counter.incrementAndGet() < 5, -1, 100)); 
+
+        counter.set(0);
+        // return after 5 rounds, before timeout
+        Assert.assertTrue(TimeUtils.waitFor(() -> counter.incrementAndGet() < 5, 1000, 100)); 
+
+        counter.set(0);
+        // timeout happens before
+        Assert.assertFalse(TimeUtils.waitFor(() -> counter.incrementAndGet() < 10, 300, 100)); 
     }
 
 }
