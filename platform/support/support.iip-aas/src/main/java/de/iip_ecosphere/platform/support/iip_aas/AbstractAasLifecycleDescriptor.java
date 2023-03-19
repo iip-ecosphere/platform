@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.function.Supplier;
 
 import org.slf4j.LoggerFactory;
@@ -151,31 +152,48 @@ public class AbstractAasLifecycleDescriptor implements LifecycleDescriptor {
     protected void waitForAasServer() {
         AasFactory factory = AasFactory.getInstance();
         AasSetup setup = AasPartRegistry.getSetup();
-        String regUri = factory.getFullRegistryUri(setup.getRegistryEndpoint());
+        String regAdr = factory.getFullRegistryUri(setup.getRegistryEndpoint());
+        String serverAdr = setup.getServerEndpoint().toServerUri();
         int startupTimeout = setup.getAasStartupTimeout();
-        try {
-            URL url = new URL(regUri);
-            LoggerFactory.getLogger(getClass()).info("Probing AAS registry {} for {} ms", regUri, startupTimeout);
+        try { // move down to AASfactory, connectionOk to NetUtils?
+            URL regUrl = new URL(regAdr);
+            URL serverUrl = new URL(serverAdr + "/shells");
+            LoggerFactory.getLogger(getClass()).info("Probing AAS registry {} and server{} for {} ms", 
+                regAdr, serverAdr, startupTimeout);
             if (!TimeUtils.waitFor(() -> {
-                boolean continueWaiting = true;
-                try { // initial, incomplete, move to AasFactory?
-                    HttpURLConnection huc = (HttpURLConnection) url.openConnection();
-                    int responseCode = huc.getResponseCode();
-                    continueWaiting = responseCode != HttpURLConnection.HTTP_OK;
-                } catch (IOException e) {
-                    // ignore
-                }
-                return continueWaiting;
+                return !connectionOk(regUrl) || !connectionOk(serverUrl);
             }, startupTimeout, 500)) {
                 LoggerFactory.getLogger(getClass()).error("No AAS registry/server reached within {} ms", 
                     startupTimeout);
             } else {
-                LoggerFactory.getLogger(getClass()).info("AAS registry/server found for {}", regUri);
+                LoggerFactory.getLogger(getClass()).info("AAS registry/server found for {}", regAdr);
             }
         } catch (MalformedURLException e) {
             LoggerFactory.getLogger(getClass()).warn("Cannot wait for AAS registry/server. AAS registry URL "
-                + "{} invalid: {}", regUri, e.getMessage());
+                + "{} invalid: {}", regAdr, e.getMessage());
         }
+    }
+    
+    /**
+     * Returns whether connecting to {@code url} succeeeds.
+     * 
+     * @param url the URK to connect to
+     * @return {@code true} if the connection is ok
+     */
+    private static boolean connectionOk(URL url) {
+        boolean connectionOk = false;
+        try { // initial, incomplete, move to AasFactory?
+            URLConnection conn = url.openConnection();
+            if (conn instanceof  HttpURLConnection) {
+                HttpURLConnection huc = (HttpURLConnection) url.openConnection();
+                int responseCode = huc.getResponseCode();
+                connectionOk = responseCode == HttpURLConnection.HTTP_OK;
+                huc.disconnect();
+            }
+        } catch (IOException e) {
+            // ignore, connectionOk == false
+        }
+        return connectionOk;
     }
 
     @Override
