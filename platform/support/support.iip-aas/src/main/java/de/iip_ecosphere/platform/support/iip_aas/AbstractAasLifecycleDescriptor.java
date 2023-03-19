@@ -166,11 +166,11 @@ public class AbstractAasLifecycleDescriptor implements LifecycleDescriptor {
                 LoggerFactory.getLogger(getClass()).error("No AAS registry/server reached within {} ms", 
                     startupTimeout);
             } else {
-                LoggerFactory.getLogger(getClass()).info("AAS registry/server found for {}", regAdr);
+                LoggerFactory.getLogger(getClass()).info("AAS registry/server found for {}/{}", regAdr, serverAdr);
             }
         } catch (MalformedURLException e) {
             LoggerFactory.getLogger(getClass()).warn("Cannot wait for AAS registry/server. AAS registry URL "
-                + "{} invalid: {}", regAdr, e.getMessage());
+                + "{} or {} invalid: {}", regAdr, serverAdr, e.getMessage());
         }
     }
     
