@@ -13,12 +13,16 @@
 package de.iip_ecosphere.platform.support.iip_aas;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.function.Supplier;
 
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.LifecycleDescriptor;
 import de.iip_ecosphere.platform.support.Server;
+import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasMode;
@@ -105,6 +109,7 @@ public class AbstractAasLifecycleDescriptor implements LifecycleDescriptor {
         if (AasFactory.isFullInstance()) {
             AasSetup setup = getAasSetup();
             AasPartRegistry.setAasSetup(setup);
+            waitForAasServer();
             // startImplServer=true due to incremental deployment; chain implServerBuilders
             AasPartRegistry.AasBuildResult res = AasPartRegistry.build(
                 c -> true, null == implServer, implServerBuilder);
@@ -135,8 +140,41 @@ public class AbstractAasLifecycleDescriptor implements LifecycleDescriptor {
                 AasPartRegistry.setAasSupplier(() -> res.getAas());
             }
         } else {
-            LoggerFactory.getLogger(getClass()).warn("No full AAS implementation registered. Cannot build up " 
-                + name + " AAS. Please add an appropriate dependency.");
+            LoggerFactory.getLogger(getClass()).warn("No full AAS implementation registered. Cannot build up {} AAS. "
+                + "Please add an appropriate dependency.", name);
+        }
+    }
+
+    /**
+     * Waits for the AAS server to come up.
+     */
+    protected void waitForAasServer() {
+        AasFactory factory = AasFactory.getInstance();
+        AasSetup setup = AasPartRegistry.getSetup();
+        String regUri = factory.getFullRegistryUri(setup.getRegistryEndpoint());
+        int startupTimeout = setup.getAasStartupTimeout();
+        try {
+            URL url = new URL(regUri);
+            LoggerFactory.getLogger(getClass()).info("Probing AAS registry {} for {} ms", regUri, startupTimeout);
+            if (!TimeUtils.waitFor(() -> {
+                boolean continueWaiting = true;
+                try { // initial, incomplete, move to AasFactory?
+                    HttpURLConnection huc = (HttpURLConnection) url.openConnection();
+                    int responseCode = huc.getResponseCode();
+                    continueWaiting = responseCode != HttpURLConnection.HTTP_OK;
+                } catch (IOException e) {
+                    // ignore
+                }
+                return continueWaiting;
+            }, startupTimeout, 500)) {
+                LoggerFactory.getLogger(getClass()).error("No AAS registry/server reached within {} ms", 
+                    startupTimeout);
+            } else {
+                LoggerFactory.getLogger(getClass()).info("AAS registry/server found for {}", regUri);
+            }
+        } catch (MalformedURLException e) {
+            LoggerFactory.getLogger(getClass()).warn("Cannot wait for AAS registry/server. AAS registry URL "
+                + "{} invalid: {}", regUri, e.getMessage());
         }
     }
 

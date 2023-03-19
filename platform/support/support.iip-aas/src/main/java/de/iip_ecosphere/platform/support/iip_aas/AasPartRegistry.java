@@ -132,6 +132,7 @@ public class AasPartRegistry {
         
         private AasMode mode = AasMode.REMOTE_DEPLOY;
         private String accessControlAllowOrigin = DeploymentRecipe.ANY_CORS_ORIGIN;
+        private int aasStartupTimeout = 120000;
 
         /**
          * Default constructor.
@@ -225,6 +226,24 @@ public class AasPartRegistry {
          */
         public AasMode getMode() {
             return mode;
+        }
+
+        /**
+         * Returns the AAS startup timeout, i.e., the time we may wait for an AAS server to come up.
+         * 
+         * @return the timeout in ms (default 120000)
+         */
+        public int getAasStartupTimeout() {
+            return aasStartupTimeout;
+        }
+
+        /**
+         * Changes the AAS startup timeout, i.e., the time we may wait for an AAS server to come up.
+         * 
+         * @param aasStartupTimeout the timeout in ms
+         */
+        public void setAasStartupTimeout(int aasStartupTimeout) {
+            this.aasStartupTimeout = aasStartupTimeout;
         }
 
         /**
