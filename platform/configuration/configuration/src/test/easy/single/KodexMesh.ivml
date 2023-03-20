@@ -66,6 +66,7 @@ project KodexMesh {
         description = "",
         ver = "0.1.0",
         deployable = true,
+        condaEnv = "myGPU",
         asynchronous = false, // usually true, test false here
         input = {{type=refBy(rec2)}},
         output = {{type=refBy(rec2)}},

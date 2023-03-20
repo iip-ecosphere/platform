@@ -34,6 +34,7 @@ public class TestHiveMqServer extends AbstractTestServer {
     public static final String KEY_ALIAS = "qpid";
     private EmbeddedHiveMQ hiveMQ;
     private ServerAddress addr;
+    private File hiveTmp;
 
     /**
      * Creates the server instance.
@@ -50,7 +51,7 @@ public class TestHiveMqServer extends AbstractTestServer {
             FileUtils.listFiles(FileUtils.getTempDirectory(), 
                 f -> f.getName().startsWith("hivemq_v5"), 
                 f -> FileUtils.deleteQuietly(f)); // try to clean up left-over temp folders
-            File hiveTmp = FileUtils.createTmpFolder("hivemq_v5", true);
+            hiveTmp = FileUtils.createTmpFolder("hivemq_v5", true);
 
             System.setProperty("HIVEMQ_PORT", Integer.toString(addr.getPort()));
             System.setProperty("HIVEMQ_ADDRESS", addr.getHost());
@@ -74,6 +75,9 @@ public class TestHiveMqServer extends AbstractTestServer {
         if (null != hiveMQ) {
             hiveMQ.stop().join();
             hiveMQ = null;
+            if (dispose && hiveTmp != null) {
+                FileUtils.deleteQuietly(hiveTmp);
+            }
         }
     }
     

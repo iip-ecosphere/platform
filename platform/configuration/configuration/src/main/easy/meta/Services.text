@@ -34,6 +34,7 @@ Services::PythonService::artifact = Maven coordinate for artifact containing the
 Services::PythonService::entrypointModule = If something else then the Python service environment shall execute the service (default empty). 
 Services::PythonService::integrationMode = Integration mode for python services (default console_continuous). 
 Services::PythonService::servicesPackageName = Name of the packages the service implementation is located in (default "services").
+Services::PythonService::condaEnv = Optional name of the conda environment. The conda command is either taken from the path or from specified installedDependencies.
 Services::Service::deployable = Can service be deployed to remote resources or must it be executed centrally.
 Services::Service::description = Description of service functionality.
 Services::Service::ver = Version of service (numbers separated by a dot).
