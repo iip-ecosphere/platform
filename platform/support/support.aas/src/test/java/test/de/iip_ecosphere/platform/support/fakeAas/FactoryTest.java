@@ -124,6 +124,11 @@ public class FactoryTest {
         public String getFullRegistryUri(Endpoint regEndpoint) {
             return DUMMY.getFullRegistryUri(regEndpoint);
         }
+        
+        @Override
+        public String getServerBaseUri(Endpoint serverEndpoint) {
+            return DUMMY.getServerBaseUri(serverEndpoint);
+        }
 
     }
     
@@ -176,6 +181,7 @@ public class FactoryTest {
             serverRecipe.toPersistenceType(LocalPersistenceType.INMEMORY.name()));
         
         Assert.assertTrue(instance.getFullRegistryUri(regEp).length() > 0);
+        Assert.assertTrue(instance.getServerBaseUri(regEp).length() > 0);
     }
 
     /**

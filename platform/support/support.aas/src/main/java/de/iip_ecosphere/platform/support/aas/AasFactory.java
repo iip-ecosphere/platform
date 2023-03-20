@@ -163,6 +163,11 @@ public abstract class AasFactory {
             return regEndpoint.toUri();
         }
 
+        @Override
+        public String getServerBaseUri(Endpoint serverEndpoint) {
+            return serverEndpoint.toUri();
+        }
+
     };
     
     /**
@@ -417,6 +422,14 @@ public abstract class AasFactory {
      * @return the full address/URI
      */
     public abstract String getFullRegistryUri(Endpoint regEndpoint);
+    
+    /**
+     * Returns a base AAS server URI (without accessing the server).
+     * 
+     * @param serverEndpoint the endpoint
+     * @return the address/URI
+     */
+    public abstract String getServerBaseUri(Endpoint serverEndpoint);
     
     /**
      * Creates a deployment recipe for unencrypted deployment.
