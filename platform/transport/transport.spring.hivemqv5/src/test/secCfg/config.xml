@@ -32,5 +32,38 @@
     <general>
         <update-check-enabled>false</update-check-enabled>
     </general>
-
+    <persistence>
+        <client-session>
+            <general>
+                <mode>in-memory</mode>
+            </general>
+            <queued-messages>
+                <mode>in-memory</mode>
+            </queued-messages>
+            <subscriptions>
+                <mode>in-memory</mode>
+            </subscriptions>
+        </client-session>
+        <message-flow>
+            <incoming>
+                <mode>in-memory</mode>
+            </incoming>
+            <outgoing>
+                <mode>in-memory</mode>
+            </outgoing>
+        </message-flow>
+        <retained-messages>
+            <mode>in-memory</mode>
+        </retained-messages>
+        <publish-payloads>
+            <mode>in-memory</mode>
+        </publish-payloads>
+        <attribute>
+            <mode>in-memory</mode>
+        </attribute>
+        <client-group>
+            <mode>in-memory</mode>
+        </client-group>
+    </persistence>
+    
 </hivemq>
