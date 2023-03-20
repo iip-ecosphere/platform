@@ -72,6 +72,7 @@ public class UriResolverTest {
         Assert.assertTrue(resolved.exists());
         Assert.assertTrue(resolved.isFile());
         Assert.assertEquals(f.length(), resolved.length());
+        FileUtils.deleteQuietly(resolved);
 
         ServerAddress addr = new ServerAddress(Schema.HTTP); // localhost, ephemeral
         HttpServer server = HttpServer.create(new InetSocketAddress(addr.getPort()), 0);
@@ -101,6 +102,7 @@ public class UriResolverTest {
         Assert.assertTrue(resolved.exists());
         Assert.assertTrue(resolved.isFile());
         Assert.assertEquals(TEST_TEXT.length(), resolved.length());
+        FileUtils.deleteQuietly(resolved);
         
         server.stop(0);
     }
