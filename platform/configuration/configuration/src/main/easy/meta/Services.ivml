@@ -212,6 +212,8 @@ project Services {
        String servicesPackageName = null; // use the default, helps in testing/mocking
        //dependency refinement removed -> system dependencies, use VIL dynamic dispatch 
        PythonIntegrationMode integrationMode = PythonIntegrationMode::console_continuous;
+       String condaEnv;
+       //Constraint conda = isDefined(condaEnv) and condaEnv <> "" implies dependencies->->selectByType(SystemDependency)->select(d|d.key.startsWith("CONDA")).notEmpty();
    }
    
    // ------------------------ families -----------------

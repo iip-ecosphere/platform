@@ -48,6 +48,7 @@ Devices::JDK11 = Pre-defined system dependency for JDK11.
 Devices::JDK8 = Pre-defined system dependency for JDK8.
 Devices::JRE11 = Pre-defined system dependency for JRE11.
 Devices::JRE8 = Pre-defined system dependency for JRE8.
+Devices::CONDA = Pre-defined generic conda dependency (unspecified version).
 Devices::PYTHON2 = Pre-defined system dependency for Python 2.
 Devices::PYTHON3 = Pre-defined system dependency for Python 3.
 Devices::PYTHON39 = Pre-defined system dependency for Python 3.9.

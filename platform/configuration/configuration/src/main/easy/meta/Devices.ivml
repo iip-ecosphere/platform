@@ -80,6 +80,10 @@ project Devices {
         key = "PYTHON2"
     };
 
+    SystemDependency CONDA = {
+        key = "CONDA"
+    };
+
     SystemDependency PYTHON3 = {
         key = "PYTHON3"
     };

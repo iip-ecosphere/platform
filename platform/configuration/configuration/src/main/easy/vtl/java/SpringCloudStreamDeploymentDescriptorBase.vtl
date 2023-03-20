@@ -117,6 +117,7 @@ template SpringCloudStreamDeploymentDescriptorBase(Configuration config, FileArt
             executablePath: \\${tmp}/${id}/python
             artifacts:
               - /python_${id}.zip
+            ${pythonExecArgs(service)|e}
             cmdArg:
               - --mode
               - console
@@ -128,6 +129,18 @@ template SpringCloudStreamDeploymentDescriptorBase(Configuration config, FileArt
               - ${service.id}
               ${pythonDataArg(service)|e}
             started: true'
+    }
+    
+    def pythonExecArgs(PythonService service) {
+        String condaEnv = getStringValueSafe(service.condaEnv, "");
+        if (condaEnv.trim().length() > 0) {
+            'execArg:
+              - run
+              - -n
+              - ${condaEnv}'
+        } else {
+            ''
+        }
     }
     
     def pythonServicesPackageName(PythonService service) {
