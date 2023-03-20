@@ -18,7 +18,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.io.FileUtils;
 import org.eclipse.basyx.aas.metamodel.map.descriptor.CustomId;
 import org.eclipse.basyx.aas.metamodel.map.descriptor.ModelUrn;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
@@ -36,6 +35,7 @@ import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.prop
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
+import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.aas.AssetKind;
 import de.iip_ecosphere.platform.support.aas.IdentifierType;
 import de.iip_ecosphere.platform.support.aas.Type;
@@ -380,11 +380,17 @@ public class Tools {
         if (workDir.exists()) {
             if (!FileUtils.deleteQuietly(workDir)) { // may fail if process is not terminated, see Tomcats workaround
                 try {
-                    FileUtils.forceDeleteOnExit(workDir);
+                    org.apache.commons.io.FileUtils.forceDeleteOnExit(workDir);
                 } catch (IOException e) {
                 }
             }
         }
+        FileUtils.listFiles(FileUtils.getTempDirectory(), 
+            f -> f.getName().startsWith("tomcat." + port), 
+            f -> FileUtils.deleteQuietly(f)); // try to clean up left-over temp folders
+        FileUtils.listFiles(FileUtils.getTempDirectory(), 
+            f -> f.getName().startsWith("tomcat-docbase." + port), 
+            f -> FileUtils.deleteQuietly(f)); // try to clean up left-over temp folders
     }
     
     /**
