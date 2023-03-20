@@ -1,18 +1,19 @@
 <p style="margin-bottom:2px"></p>
 
 <mat-tab-group animationDuration="0ms" mat-stretch-tabs>
-  <div *ngFor="let item of listTitles | keyvalue">
-    <mat-tab label="{{item.key}}">
-
+  <div *ngFor="let item of listTitles">
+    <mat-tab label="{{item.name}}">
       <ng-template mat-tab-label >
-        <span (click)="loadData(item.value)" class="custom-label">{{item.key}}</span>
+        <span (click)="loadData(item.value)" class="custom-label">
+          {{item.name}}
+        </span>
       </ng-template>
 
       <div *ngIf="data && data.value">
         <!-- New mesh Button -->
-        <div *ngIf="data.idShort == 'ServiceMesh'"> <!-- TODO -->
+        <div *ngIf="data.idShort == 'ServiceMesh'">
           <p style="margin-bottom:5px"></p>
-          <p align="right">
+          <p align="left">
             <button
             mat-raised-button class="create-button"
             (click)="createMesh()"> new mesh </button>
@@ -24,41 +25,43 @@
           <tr *ngFor="let item of data.value">
             <td style="width: 100%;">{{item.idShort}}<br>
 
+
               <!-- Application -->
-              <div *ngIf="data.idShort == 'Application'"> <!-- TODO -->
-                <!--
-                  <td style="width: 100%;">{{item.value[4].value}}<br>
-                -->
+              <div *ngIf="data.idShort == 'Application'">
                 <div *ngIf="item.value[5].idShort == 'name'">
                   <div class="subtext"> {{item.value[5].value}}</div>
                 </div>
                 <div class="subtext">Version: {{item.value[0].value}}</div>
               </div>
-
-              <!-- Constants -->
-
-
-              <!-- Meshes -->
-              <div *ngIf="data.idShort == 'ServiceMesh'"> <!-- TODO -->
+              <div *ngIf="data.idShort == 'ServiceMesh'">
                 <div *ngIf="item.value[0].value">
                   <div class="subtext"> {{item.value[0].value}}</div>
-                </div><!-- TODO -->
+                </div>
               </div>
 
-              <!-- Setup -->
-              <div *ngIf="data.idShort == 'EndpointAddress'"> <!-- TODO -->
+              <div *ngIf="data.idShort == 'EndpointAddress'">
                 <div *ngIf="item.value[3].value && item.value[4].value">
                   <div class="subtext">
                     {{item.value[3].value}}:{{item.value[4].value}}
                   </div>
                 </div>
               </div>
-
-              <!-- Services -->
-              <div *ngIf="data.idShort == 'Service'"> <!-- TODO -->
+              <div *ngIf="data.idShort == 'Service'">
                 <div *ngIf="item.value[3].value">
                   <div class="subtext"> {{item.value[3].value}}</div>
-                  <div class="subtext"> version: {{item.value[22].value}}</div>
+                  <div class="subtext">
+                    version: {{item.value[22].value}}</div>
+                </div>
+              </div>
+              <div *ngIf="data.idShort == 'services'">
+                <div *ngIf="item.value[4].value">
+                  <div class="subtext"> {{item.value[4].value}}</div>
+                </div>
+                <div *ngIf="item.value[7].value">
+                  <div class="subtext"> Version: {{item.value[7].value}}</div>
+                </div>
+                <div *ngIf="item.value[5].value">
+                  <div class="subtext"> {{item.value[5].value}} </div>
                 </div>
               </div>
 
