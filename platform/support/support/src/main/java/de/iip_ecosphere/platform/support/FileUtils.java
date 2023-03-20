@@ -53,7 +53,7 @@ public class FileUtils {
     public static File createTmpFolder(String name, boolean cleanup) {
         String tmp = System.getProperty("java.io.tmpdir");
         File result = new File(tmp, name);
-        if (!deleteQuietly(result)) {
+        if (result.exists() && !deleteQuietly(result)) {
             result = new File(tmp, name + "_" + System.currentTimeMillis());
         }
         result.mkdir();
