@@ -173,6 +173,11 @@ public class BaSyxAasFactory extends AasFactory {
     public String getFullRegistryUri(Endpoint regEndpoint) {
         return regEndpoint.toUri() + "/api/v1/registry";
     }
+    
+    @Override
+    public String getServerBaseUri(Endpoint serverEndpoint) {
+        return serverEndpoint.toUri() + "/shells";
+    }
 
     @Override
     public DeploymentRecipe createDeploymentRecipe(Endpoint endpoint) {

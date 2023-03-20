@@ -153,11 +153,11 @@ public class AbstractAasLifecycleDescriptor implements LifecycleDescriptor {
         AasFactory factory = AasFactory.getInstance();
         AasSetup setup = AasPartRegistry.getSetup();
         String regAdr = factory.getFullRegistryUri(setup.getRegistryEndpoint());
-        String serverAdr = setup.getServerEndpoint().toServerUri();
+        String serverAdr = factory.getServerBaseUri(setup.getServerEndpoint());
         int startupTimeout = setup.getAasStartupTimeout();
-        try { // move down to AASfactory, connectionOk to NetUtils?
+        try { 
             URL regUrl = new URL(regAdr);
-            URL serverUrl = new URL(serverAdr + "/shells");
+            URL serverUrl = new URL(serverAdr);
             LoggerFactory.getLogger(getClass()).info("Probing AAS registry {} and server{} for {} ms", 
                 regAdr, serverAdr, startupTimeout);
             if (!TimeUtils.waitFor(() -> {
@@ -166,7 +166,8 @@ public class AbstractAasLifecycleDescriptor implements LifecycleDescriptor {
                 LoggerFactory.getLogger(getClass()).error("No AAS registry/server reached within {} ms", 
                     startupTimeout);
             } else {
-                LoggerFactory.getLogger(getClass()).info("AAS registry/server found for {}/{}", regAdr, serverAdr);
+                LoggerFactory.getLogger(getClass()).info("AAS registry found at {} and server at {}", 
+                    regAdr, serverAdr);
             }
         } catch (MalformedURLException e) {
             LoggerFactory.getLogger(getClass()).warn("Cannot wait for AAS registry/server. AAS registry URL "
@@ -181,8 +182,8 @@ public class AbstractAasLifecycleDescriptor implements LifecycleDescriptor {
      * @return {@code true} if the connection is ok
      */
     private static boolean connectionOk(URL url) {
-        boolean connectionOk = false;
-        try { // initial, incomplete, move to AasFactory?
+        boolean connectionOk = false; // cannot move to NetUtils as difficult to test/mock
+        try { 
             URLConnection conn = url.openConnection();
             if (conn instanceof  HttpURLConnection) {
                 HttpURLConnection huc = (HttpURLConnection) url.openConnection();
