@@ -56,6 +56,16 @@ public class InstalledDependenciesSetup extends AbstractSetup {
      */
     public static final String KEY_PREFIX_JAVA = "JAVA";
     
+    /**
+     * The prefix for Conda program/dependency keys.
+     */
+    public static final String KEY_PREFIX_PYTHON = "PYTHON";
+    
+    /**
+     * The prefix for Conda program/dependency keys.
+     */
+    public static final String KEY_PREFIX_CONDA = "CONDA";
+    
     public static final String KEY_JAVA_8 = KEY_PREFIX_JAVA + 8;
     public static final String KEY_JAVA_11 = KEY_PREFIX_JAVA + 11;
     
@@ -80,6 +90,8 @@ public class InstalledDependenciesSetup extends AbstractSetup {
         File javaPath = new File(SystemUtils.getJavaHome(), "bin/java" + exeSuffix);
         addDefaultEntry(getJavaKey(), javaPath);
         addDefaultEntry(KEY_PREFIX_JAVA, javaPath);
+        addDefaultEntry(KEY_PREFIX_PYTHON, new File("python")); // generic python in path
+        addDefaultEntry(KEY_PREFIX_CONDA, new File("conda")); // generic conda in path
     }
     
     /**
