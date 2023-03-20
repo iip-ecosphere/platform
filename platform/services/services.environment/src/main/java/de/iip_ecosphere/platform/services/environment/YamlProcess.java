@@ -30,6 +30,7 @@ public class YamlProcess implements ProcessSpec {
     private String executablePath;
     private String homePath;
     private String locationKey;
+    private List<String> execArg = new ArrayList<>();
     private List<String> cmdArg = new ArrayList<>();
     private List<String> artifacts = new ArrayList<String>();
     private boolean started = false;
@@ -120,6 +121,11 @@ public class YamlProcess implements ProcessSpec {
         return cmdArg;
     }
     
+    @Override
+    public List<String> getExecArg() {
+        return execArg;
+    }
+    
     /**
      * Returns {@link #getCmdArg()} with substitutions from {@link #toSubstFileName(String)}
      * for all arguments.
@@ -194,6 +200,17 @@ public class YamlProcess implements ProcessSpec {
      */
     public void setHomePath(File home) {
         this.homePath = null == home ? null : home.toString();
+    }
+    
+    /**
+     * Defines the arguments to be passed to the executable itself. [required by SnakeYaml]
+     * Executable args and command line args may be the same in many cases, but also may differ for Java (-D arguments)
+     * or Python/Conda (conda arguments).
+     * 
+     * @param execArg the command line executable arguments (may be empty for none)
+     */
+    public void setExecArg(List<String> execArg) {
+        this.execArg = execArg;
     }
 
     /**

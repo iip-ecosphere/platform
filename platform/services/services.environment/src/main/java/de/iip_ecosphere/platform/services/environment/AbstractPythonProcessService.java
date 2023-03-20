@@ -214,6 +214,7 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
         if (pSpec != null) {
             locationKey = pSpec.getLocationKey();
             home = pSpec.getHomePath();
+            pythonArgs.addAll(pSpec.getExecArg());
             pythonArgs.add(getPythonModule(pSpec.getExecutable(), yaml, home));
             List<String> cmdArg = pSpec.getSubstCmdArg();
             if (null != cmdArg) {

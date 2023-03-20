@@ -64,6 +64,16 @@ public interface ProcessSpec {
      */
     public List<String> getCmdArg();
     
+    
+    /**
+     * Returns the arguments to be passed to the executable itself.
+     * Executable args and command line args may be the same in many cases, but also may differ for Java (-D arguments)
+     * or Python/Conda (conda arguments).
+     * 
+     * @return the command line executable arguments (may be empty for none)
+     */
+    public List<String> getExecArg();
+    
     /**
      * Returns whether the underlying process is already started when firing up the service or it will be started 
      * through the service implementation. If specified, {@link #getArtifacts() artifacts} will be extracted anyway
