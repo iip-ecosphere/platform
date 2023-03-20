@@ -1,3 +1,4 @@
+import { ApiService } from 'src/app/services/api.service';
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
@@ -22,7 +23,8 @@ export class ListComponent implements OnInit {
   constructor(private router: Router,
     private route: ActivatedRoute,
     public http: HttpClient,
-    private envConfigService: EnvConfigService) {
+    private envConfigService: EnvConfigService,
+    public api: ApiService) {
       const env = this.envConfigService.getEnv();
        //the ip and urn are taken from the json.config
       if(env && env.ip) {
@@ -33,16 +35,16 @@ export class ListComponent implements OnInit {
       }
     }
 
-  listTitles = {
-    "Setup":"EndpointAddress",
-    "Constants":"String",
-    "Types":"RecordType",
-    "Services":"Service",
-    "Servers":"ImplAddress", // TODO
-    "Meshes":"ServiceMesh",
-    "Applications":"Application",
-    "Artifacts":"ImplAddress" // TODO ImplAddress is only temp there
-  }
+  listTitles = [
+    {name:"Setup", value:"EndpointAddress"},
+    {name:"Constants", value:"String"},
+    {name:"Types", value:"RecordType"},
+    {name:"Services", value:"Service"},
+    {name:"Servers", value:"ImplAddress"}, // TODO
+    {name:"Meshes", value:"ServiceMesh"},
+    {name:"Applications", value:"Application"},
+    {name:"Artifacts", value:"artifact"}  // TODO
+  ]
 
   ngOnInit(): void {
   }
@@ -53,24 +55,36 @@ export class ListComponent implements OnInit {
     //this.ls = this.route.snapshot.paramMap.get(list);
     this.ls = list; // TODO is it ok like this?
     if(this.ls) {
+      console.log(this.ls)
       this.data = await this.getData(this.ls);
       this.filter();
     }
-    this.submodelElements = await this.getSubmodelElements(); // TODO do I need it?
+    this.submodelElements = await this.getSubmodelElements();
+    // TODO do I need it?
+    console.log(this.data)
   }
 
   public async getData(list: string) {
     let response;
-    try {
-      response = await firstValueFrom(
-        this.http.get(this.ip + '/shells/'
-      + this.urn
-      + "/aas/submodels/Configuration/submodel/submodelElements/"
-      + list));
-    } catch(e) {
-      console.log(e);
-      this.noData = true;
+    let path;
+    if (list == "artifact") {
+      path = "/aas/submodels/services/submodel/submodelElements/";
+      list = "services"
+    } else {
+      path = "/aas/submodels/Configuration/submodel/submodelElements/";
     }
+
+    try {
+        response = await firstValueFrom(
+          this.http.get(this.ip + '/shells/'
+        + this.urn
+        + path
+        + list));
+      } catch(e) {
+        console.log(e);
+        this.noData = true;
+      }
+
     return response;
   }
 
@@ -118,6 +132,7 @@ export class ListComponent implements OnInit {
   public createMesh() {
 
   }
+
 
 
   /*
