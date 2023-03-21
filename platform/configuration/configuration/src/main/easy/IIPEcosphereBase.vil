@@ -7,6 +7,8 @@ import MeshBasics;
 vilScript IIPEcosphereBase (Project source, Configuration config, Project target) {
 
     // preliminary!!! make it language-generic
+    
+    Boolean inTesting = getProperty("iip.tests", "false").toLowerCase() == "true";
 
     // java packages, turned to paths below
     String javaDatatypesPackage = "iip.datatypes";

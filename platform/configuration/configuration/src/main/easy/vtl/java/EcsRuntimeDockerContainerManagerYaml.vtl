@@ -16,7 +16,7 @@ template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, FileArtifact 
     def produceAasCors(IIPEcosphere config) {
         String aasCors = getStringValueSafe(config.aasAccessControlAllowOrigin, "");
         if (aasCors <> "") {
-            'accessControlAllowOrigin: ${aasCors}'
+            'accessControlAllowOrigin: "${aasCors}"'
         } else {
             ''
         }

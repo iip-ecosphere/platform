@@ -24,6 +24,7 @@ project CommonSetup {
         port = 9003
     };
     aasProtocol = AasProtocolVabTcp{};
+    aasAccessControlAllowOrigin = "*";
     
     // ------------------ transport --------------------------
     
@@ -69,6 +70,7 @@ project CommonSetup {
         aasImplServer;
         aasPersistency;
         aasProtocol;
+        aasAccessControlAllowOrigin;
         serializer;
         transportProtocol;
         serviceManager;
