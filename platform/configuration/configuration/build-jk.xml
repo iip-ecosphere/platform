@@ -13,7 +13,9 @@
           <arg value="${basedir}/cleanup.sh"/>
         </exec>
         
-        <maven pomFile="pom.xml" goal="package"/>
+        <maven pomFile="pom.xml" goal="package">
+    	    <arg value="-Diip.tests=true"/>
+    	</maven>
         <mvnDeployResolveArtifact folderName="IIP-configuration.configuration" pomFile="pom.xml" jarFolder="target" artifactPattern="configuration.configuration-*.*.*.jar" />
         
         <ant dir="gen/tests/SimpleMesh/ApplicationInterfaces" antfile="build-jk.xml" />
