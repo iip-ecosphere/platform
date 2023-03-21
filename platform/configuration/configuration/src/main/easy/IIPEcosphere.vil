@@ -241,7 +241,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
             }
         };
         generateAllAppsContainers(config, target, allAppsContainersElements);
-        generatePlatformContainers(config, target);
     }
     
     // dispatch basis
@@ -1063,6 +1062,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         vilTemplateProcessor("UiAngularConfig", config, "${p}/config.json");
         
         vilTemplateProcessor("Readme", config, "${target}/README.txt");
+        generatePlatformContainers(config, target);
     }
     
     generateBrokerScripts(Configuration config, TransportProtocol protocol) = {
