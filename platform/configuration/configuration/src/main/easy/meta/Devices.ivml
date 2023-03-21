@@ -144,7 +144,8 @@ project Devices {
         EcsSvc_App,      // 2 - one container: ecsSvc + app
         C1Ecs_C2Svc_App, // 3 - 1st container: ecs, 2nd container: svc + app
         Ecs_Svc_AllApps, // * - one container: ecs + svc + all apps
-        EcsSvc_AllApps   // * - one container: ecsSvc + all apps
+        EcsSvc_AllApps,  // * - one container: ecsSvc + all apps
+        C1Ecs_C2Svc_AllApps   // * - one container: ecs, 2nd container: svc + all apps
     };
     
     compound EcsDevice refines CComputer {
