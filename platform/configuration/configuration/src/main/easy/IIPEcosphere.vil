@@ -489,7 +489,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     }
     
     // creates containers depending on container strategies
-    Integer isEcs = 0;        // Is a "Ecs" image already generated?: 0 - false, 1 - true
+    setOf(EcsDevice) ecsDeviceGenerated = {};
     String generateServiceContainer(Path appRoot, IIPEcosphere config, Application a, sequenceOf(MeshElement) elements) = {
         String appImageId = "";
         String artifactsFolder = getArtifactsFolder(appRoot, config);
@@ -517,89 +517,97 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 ContainerType cntType = device.containerType;
                 String deviceName = getContainerNameDflt(device).toIdentifier();
                 String filePrefix = "${appName}_${deviceName}_";
+                if (not(isAllAppsContainer(cntType))){
+                    if (isPythonService == 1) {
+                        Path req = "${appRoot}/../requirements.txt";
+                        // TODO #130 consider server dependencies here
+                        vilTemplateProcessor("PythonReq", config, req, elements=elements, device=device);
+                    }
 
-                if (isPythonService == 1) {
-                    Path req = "${appRoot}/../requirements.txt";
-                    // TODO #130 consider server dependencies here
-                    vilTemplateProcessor("PythonReq", config, req, elements=elements);
-                }
-
-                Path instDep = "${appRoot}/../installedDependencies.yml";
-                vilTemplateProcessor("InstalledDependencies", config, instDep, elements=elements, isPython=isPythonService);
+                    Path instDep = "${appRoot}/../installedDependencies.yml";
+                    vilTemplateProcessor("InstalledDependencies", config, instDep, elements=elements, isPython=isPythonService);
             
-                String dfName = createContainerBuildScript(mgr, a, elements, appRoot, cntType, isPythonService, device);
+                    String dfName = createContainerBuildScript(mgr, a, elements, appRoot, cntType, isPythonService, device);
 
-                if (cntType == ContainerType::Ecs_Svc_App) {
-                    // Wrapper-Skript 
-                    Path ws = "${appRoot}/../wrapper_script.sh";
-                    vilTemplateProcessor("WrapperScript", config, ws, containerType=cntType); 
+                    if (cntType == ContainerType::Ecs_Svc_App) {
+                        // Wrapper-Skript 
+                        Path ws = "${appRoot}/../wrapper_script.sh";
+                        vilTemplateProcessor("WrapperScript", config, ws, containerType=cntType); 
 
-                    // Create image 
-                    Path b = "${appRoot}/../";
-                    Path d = "${appRoot}/../" + dfName;
-                    appImageId = createContainerImage(mgr, b, d, a.name.toIdentifier(), deviceName, a.ver);
-                    
-                    // Mesh-Info, Container-Descriptor
-                    Path meshInfo = "${artifactsFolder}/${filePrefix}mesh-info.yml";
-                    vilTemplateProcessor("MeshInfo", config, meshInfo, app=a, containerType=ContainerType::Ecs_Svc_App, device=device);
-                }
-                
-                if (cntType == ContainerType::EcsSvc_App) {
-                    // Wrapper-Skript 
-                    Path ws = "${appRoot}/../wrapper_script.sh";
-                    vilTemplateProcessor("WrapperScript", config, ws, containerType=cntType); 
-
-                    // Create image 
-                    Path b = "${appRoot}/../";
-                    Path d = "${appRoot}/../" + dfName;
-                    appImageId = createContainerImage(mgr, b, d, a.name.toIdentifier(), deviceName, a.ver);
-                    
-                    // Mesh-Info, Container-Descriptor
-                    Path meshInfo = "${artifactsFolder}/${filePrefix}mesh-info.yml";
-                    vilTemplateProcessor("MeshInfo", config, meshInfo, app=a, containerType=ContainerType::EcsSvc_App, device=device);
-				}	
-
-                if (cntType == ContainerType::C1Ecs_C2Svc_App) {
-                    // Container with ECS
-                    if (isEcs == 0) {
-                        String ecsDfName = createContainerBuildScript(mgr, a, elements, appRoot, cntType, -1, device);
-                    
-                        //Path ecs_ws = "${appRoot}/../ecs.wrapper_script.sh";
-                        //vilTemplateProcessor("WrapperScript", config, ecs_ws, containerType=ContainerType::Ecs);
-                    
+                        // Create image 
                         Path b = "${appRoot}/../";
-                        Path d = "${appRoot}/../" + ecsDfName;
-                        String ecs_imageId = createContainerImage(mgr, b, d, a.name.toIdentifier(), "ecs", a.ver);
+                        Path d = "${appRoot}/../" + dfName;
+                        appImageId = createContainerImage(mgr, b, d, a.name.toIdentifier(), deviceName, a.ver);
                     
                         // Mesh-Info, Container-Descriptor
-                        Path meshInfoEcs = "${artifactsFolder}/${filePrefix}mesh-info-ecs.yml";
-                        vilTemplateProcessor("MeshInfo", config, meshInfoEcs, app=a, containerType=ContainerType::Ecs, device=device);
-                        isEcs = isEcs + 1;                        
-                    } 
+                        Path meshInfo = "${artifactsFolder}/${filePrefix}mesh-info.yml";
+                        vilTemplateProcessor("MeshInfo", config, meshInfo, app=a, containerType=ContainerType::Ecs_Svc_App, device=device);
+                    }
+                
+                    if (cntType == ContainerType::EcsSvc_App) {
+                        // Wrapper-Skript 
+                        Path ws = "${appRoot}/../wrapper_script.sh";
+                        vilTemplateProcessor("WrapperScript", config, ws, containerType=cntType); 
+
+                        // Create image 
+                        Path b = "${appRoot}/../";
+                        Path d = "${appRoot}/../" + dfName;
+                        appImageId = createContainerImage(mgr, b, d, a.name.toIdentifier(), deviceName, a.ver);
                     
-                    //String ecsDfName = createContainerBuildScript(mgr, a, elements, appRoot, cntType, -1, device);
+                        // Mesh-Info, Container-Descriptor
+                        Path meshInfo = "${artifactsFolder}/${filePrefix}mesh-info.yml";
+                        vilTemplateProcessor("MeshInfo", config, meshInfo, app=a, containerType=ContainerType::EcsSvc_App, device=device);
+				    }	
+
+                    if (cntType == ContainerType::C1Ecs_C2Svc_App) {
+                        // Container with ECS
+                        Integer isEcs = 0;        // Is a "Ecs" image already generated?: 0 - false, 1 - true
+                        for (EcsDevice generatedDevice : ecsDeviceGenerated->sortedBy(d|d.id)) {
+                            if (device.id == generatedDevice.id) {
+                                isEcs = 1;
+                            }
+                        }
+                        if (isEcs == 0) {
+                            String ecsDfName = createContainerBuildScript(mgr, a, elements, appRoot, cntType, -1, device);
+                    
+                            //Path ecs_ws = "${appRoot}/../ecs.wrapper_script.sh";
+                            //vilTemplateProcessor("WrapperScript", config, ecs_ws, containerType=ContainerType::Ecs);
+                    
+                            Path b = "${appRoot}/../";
+                            Path d = "${appRoot}/../" + ecsDfName;
+                            String ecs_imageId = createContainerImage(mgr, b, d, a.name.toIdentifier(), "ecs", a.ver);
+                    
+                            // Mesh-Info, Container-Descriptor
+                            Path meshInfoEcs = "${artifactsFolder}/${filePrefix}mesh-info-ecs.yml";
+                            vilTemplateProcessor("MeshInfo", config, meshInfoEcs, app=a, containerType=ContainerType::Ecs, device=device);
+                            isEcs = isEcs + 1;
+                            ecsDeviceGenerated.add(device);               
+                        } 
+                    
+                        //String ecsDfName = createContainerBuildScript(mgr, a, elements, appRoot, cntType, -1, device);
                                         
-                    //Path b = "${appRoot}/../";
-                    //Path d = "${appRoot}/../" + ecsDfName;
-                    //String ecs_imageId = createContainerImage(mgr, b, d, a.name.toIdentifier(), "ecs", a.ver);
+                        //Path b = "${appRoot}/../";
+                        //Path d = "${appRoot}/../" + ecsDfName;
+                        //String ecs_imageId = createContainerImage(mgr, b, d, a.name.toIdentifier(), "ecs", a.ver);
                     
-                    // Mesh-Info, Container-Descriptor
-                    //Path meshInfoEcs = "${artifactsFolder}/${filePrefix}mesh-info-ecs.yml";
-                    //vilTemplateProcessor("MeshInfo", config, meshInfoEcs, app=a, containerType=ContainerType::Ecs, device=device);
+                        // Mesh-Info, Container-Descriptor
+                        //Path meshInfoEcs = "${artifactsFolder}/${filePrefix}mesh-info-ecs.yml";
+                        //vilTemplateProcessor("MeshInfo", config, meshInfoEcs, app=a, containerType=ContainerType::Ecs, device=device);
                     
-                    // Container with ServiceMgr and App
-                    // Wrapper-Skript 
-                    Path ws = "${appRoot}/../wrapper_script.sh";
-                    vilTemplateProcessor("WrapperScript", config, ws, containerType=ContainerType::C1Ecs_C2Svc_App);
+                        // Container with ServiceMgr and App
+                        // Wrapper-Skript 
+                        Path ws = "${appRoot}/../wrapper_script.sh";
+                        vilTemplateProcessor("WrapperScript", config, ws, containerType=ContainerType::C1Ecs_C2Svc_App);
                      
-                    // Create image 
-                    Path b2 = "${appRoot}/../";
-                    Path d2 = "${appRoot}/../" + dfName;
-                    appImageId = createContainerImage(mgr, b2, d2, a.name.toIdentifier(), deviceName, a.ver);
+                        // Create image 
+                        Path b2 = "${appRoot}/../";
+                        Path d2 = "${appRoot}/../" + dfName;
+                        appImageId = createContainerImage(mgr, b2, d2, a.name.toIdentifier(), deviceName, a.ver);
                     
-                    // Mesh-Info, Container-Descriptor
-                    Path meshInfo = "${artifactsFolder}/${filePrefix}mesh-info.yml";
-                    vilTemplateProcessor("MeshInfo", config, meshInfo, app=a, containerType=ContainerType::C1Ecs_C2Svc_App, device=device);
+                        // Mesh-Info, Container-Descriptor
+                        Path meshInfo = "${artifactsFolder}/${filePrefix}mesh-info.yml";
+                        vilTemplateProcessor("MeshInfo", config, meshInfo, app=a, containerType=ContainerType::C1Ecs_C2Svc_App, device=device);
+                    }
                 }
             }
 
@@ -644,7 +652,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     if (isPythonService == 1) {
                         Path req = "${target}/requirements.txt";
                         // TODO #130 consider server dependencies here
-                        vilTemplateProcessor("PythonReq", config, req, elements=allElements);
+                        vilTemplateProcessor("PythonReq", config, req, elements=allElements, device=device);
                     }
     
                     Path instDep = "${target}/installedDependencies.yml";

@@ -69,6 +69,13 @@ template Dockerfile_PythonAllApps(IIPEcosphere config, FileArtifact target, sequ
         ''
         '${containerSettings(config, containerType, device)}'
         ''
+        if (not(collectDependencies(elements)->selectByKind(SystemDependency)->select(d|d.key=='JAVA8').isEmpty())) {
+            'RUN apt-get install software-properties-common -y'
+            'RUN apt-add-repository "deb http://security.debian.org/debian-security stretch/updates main"'
+            'RUN apt-get update'
+            'RUN apt-get install -y openjdk-8-jdk'
+        }
+        ''
         '# Installed dependencies (shall be in /)'
         'COPY installedDependencies.yml installedDependencies.yml'
         ''
