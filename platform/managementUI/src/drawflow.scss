@@ -12,7 +12,7 @@
     linear-gradient(to bottom, rgba(233, 233, 233, 1) 1px, transparent 1px);
 
   --dfNodeType: flex;
-  --dfNodeTypeFloat: none;
+  --dfNodeTypeFloat: right;
   --dfNodeBackgroundColor: rgba(247, 247, 247, 1);
   --dfNodeTextColor: #000000;
   --dfNodeBorderSize: 1px;
@@ -136,6 +136,13 @@
     var(--dfNodeBoxShadowBR) var(--dfNodeBoxShadowS) var(--dfNodeBoxShadowColor);
   box-shadow: var(--dfNodeBoxShadowHL) var(--dfNodeBoxShadowVL)
     var(--dfNodeBoxShadowBR) var(--dfNodeBoxShadowS) var(--dfNodeBoxShadowColor);
+}
+
+.drawflow .drawflow-node p {
+  margin: 0.5em;
+  padding:0;
+  font-size:1em;
+  line-height: .75em;
 }
 
 .drawflow .drawflow-node:hover {

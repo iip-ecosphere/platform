@@ -17,7 +17,7 @@ export class FlowchartComponent implements OnInit {
   services: any;
   serviceMeshes: any;
   private displayAttributes = ['kind', 'name', 'ver', 'type'];
-  private meta = ['metaType', 'metaProject', 'metaState'];
+  private meta = ['metaType', 'metaProject', 'metaState', 'metaAas'];
 
   meshUnchanged: any;
   servicesLoading = true;
@@ -96,7 +96,7 @@ export class FlowchartComponent implements OnInit {
 
       this.editor.start();
 
-      const paramMesh = this.route.snapshot.paramMap.get('mesh')
+      const paramMesh = this.route.snapshot.paramMap.get('mesh');
       if(paramMesh) {
         this.getGraph(paramMesh);
       }
@@ -126,7 +126,7 @@ export class FlowchartComponent implements OnInit {
       let nodes = graph2.drawflow.Home.data
       for(let node in nodes) {
         const a = nodes[node];
-        a.html = "<div><div> " + a.data.ivmlVar + "</div><br> <div>kind: "+ a.data.kind + "</div><br> <div> type: "+ a.data.type + "</div></div>";
+        a.html = "<div><h3> " + a.data.id + "</h3> <p>kind: "+ a.data.kind + "</p><p> type: "+ a.data.type + "</p></div>";
       }
       this.editor.import(graph2);
     }
@@ -152,10 +152,17 @@ export class FlowchartComponent implements OnInit {
     return isMeta;
   }
 
+  public getId(serviceValue: any[]) {
+    return serviceValue.find(item => item.idShort === 'id').value;
+  }
+
   //to be removed, keeping in case i need to get the coordinates of a mesh again
   public showCoords() {
     for(let i=1; i <=8; i++) {
-      console.log(this.editor.getNodeFromId(i));
+      console.log(this.editor.getNodeFromId(i).id);
+      console.log(this.editor.getNodeFromId(i).data.id);
+      console.log("x: " + this.editor.getNodeFromId(i).pos_x);
+      console.log("y: " + this.editor.getNodeFromId(i).pos_y);
     }
   }
 

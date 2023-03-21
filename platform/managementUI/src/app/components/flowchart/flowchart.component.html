@@ -16,7 +16,7 @@
       <div *ngIf="services && services.value">
         <div *ngFor="let service of services.value">
           <mat-card *ngIf="!isMeta(service.idShort)" class="element" >
-            <mat-card-title *ngIf="service.idShort">{{ service.idShort }}</mat-card-title>
+            <mat-card-title *ngIf="service.idShort"><h2>{{ getId(service.value) }}</h2></mat-card-title>
             <mat-card-content>
               <div *ngFor="let property of service.value">
                 <p *ngIf="displayAttribute(property.idShort)" class="attribute"> {{property.idShort}}:
@@ -32,7 +32,7 @@
       <div id="drawflow"></div>
       <button mat-raised-button class="button" (click)="zoomIn()">Zoom In</button>
       <button mat-raised-button class="button" (click)="zoomOut()">Zoom Out</button>
-      <!-- <button mat-raised-button class="button" (click)="showCoords()">show coords</button> -->
+      <!-- <button mat-raised-button class="button" (click)="showCoords()">print to console</button> -->
     </div>
   </div>
 </div>
