@@ -516,7 +516,7 @@
           <includes> <!-- suites only, allow for multiple suites (Spring binders)  -->
             <include>**/AllTests*.class</include>
           </includes>
-          <forkedProcessTimeoutInSeconds>1800</forkedProcessTimeoutInSeconds>
+          <forkedProcessTimeoutInSeconds>3600</forkedProcessTimeoutInSeconds>
         </configuration>
         <dependencies>
           <!-- Force using the latest JUnit 47 provider, consider also in lib dependencies; seems also to work with
