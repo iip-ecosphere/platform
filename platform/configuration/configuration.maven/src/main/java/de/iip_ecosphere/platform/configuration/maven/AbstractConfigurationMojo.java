@@ -61,6 +61,9 @@ public abstract class AbstractConfigurationMojo extends AbstractMojo {
 
     @Parameter(property = "configuration.apps", required = false, defaultValue = "")
     private String apps;
+    
+    @Parameter(property = "configuration.force", required = false, defaultValue = "")
+    private boolean force;
 
     // different name, hook up with unpack
     @Parameter(property = "unpack.force", required = false, defaultValue = "false") 
@@ -277,7 +280,7 @@ public abstract class AbstractConfigurationMojo extends AbstractMojo {
      * @return {@code true} for instantiation, {@code false} for no instantiation
      */
     protected boolean enableRun(String modelDir, String outputDir) {
-        return modelNewerThanOut(modelDir, outputDir);
+        return modelNewerThanOut(modelDir, outputDir) || force;
     }
 
     @Override
