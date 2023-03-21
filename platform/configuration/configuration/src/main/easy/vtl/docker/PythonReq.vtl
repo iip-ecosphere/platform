@@ -2,9 +2,9 @@ import Basics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template PythonReq(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements) {
+template PythonReq(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, EcsDevice device) {
 	
-    def main(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements) {
+    def main(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, EcsDevice device) {
         sequenceOf(PythonService) services = elements -> collect(e|e.impl) -> selectByType(PythonService);
         
         setOf(Dependency) existDeps = {};
@@ -15,6 +15,12 @@ template PythonReq(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElem
                Integer exists = 0;
                for (PythonDependency existD : existDeps) {
                    if ((existD.name == d.name) and (existD.version == d.version)) {
+                       exists = 1;
+                   }
+               }
+               setOf(Dependency) dependencies = device.provides -> selectByType(PythonDependency);
+               for (PythonDependency dependency : dependencies) {
+                   if ((dependency.name == d.name) and (dependency.version == d.version)) {
                        exists = 1;
                    }
                }

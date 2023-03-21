@@ -19,8 +19,12 @@ template InstalledDependencies(IIPEcosphere config, FileArtifact target, sequenc
         '    JAVA13: /opt/openjdk-13/bin/java'
         
         if (not(collectDependencies(elements)->selectByKind(SystemDependency)->select(d|d.key=='JAVA8').isEmpty())) {
-            '    JAVA8: /usr/lib/jvm/java-1.8-openjdk/bin/java'
-        }
+            if (isPython == 1) {
+                '    JAVA8: /usr/lib/jvm/java-8-openjdk-amd64/bin/java'
+            } else {
+                '    JAVA8: /usr/lib/jvm/java-1.8-openjdk/bin/java'
+            }
+        }  
         
     }
     

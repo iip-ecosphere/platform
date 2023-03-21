@@ -11,19 +11,19 @@ template WrapperScript(IIPEcosphere config, FileArtifact target, ContainerType c
         ''
         if (containerType == ContainerType::Ecs) {
             'bash ecs.sh'
-        } else if (containerType == ContainerType::Ecs_Svc_App) {
+        } else if ((containerType == ContainerType::Ecs_Svc_App) or (containerType == ContainerType::Ecs_Svc_AllApps)) {
             'bash broker.sh ${svcBrokerPort} &'
             //'bash broker.sh ${ecsBrokerPort} &'
             'sleep 4;'
             'bash ecs.sh &'
             'sleep 7;'
             'bash serviceMgr.sh'
-        } else if (containerType == ContainerType::EcsSvc_App) {
+        } else if ((containerType == ContainerType::EcsSvc_App) or (containerType == ContainerType::EcsSvc_AllApps)) {
             'bash broker.sh ${svcBrokerPort} &'
             //'bash broker.sh ${ecsBrokerPort} &'
             'sleep 4;'
             'bash ecsServiceMgr.sh'
-        } else if (containerType == ContainerType::C1Ecs_C2Svc_App) {
+        } else if ((containerType == ContainerType::C1Ecs_C2Svc_App) or (containerType == ContainerType::C1Ecs_C2Svc_AllApps)) {
             'bash broker.sh ${svcBrokerPort} &'
             //'bash broker.sh ${ecsBrokerPort} &'
             'sleep 4;'
