@@ -1,0 +1,65 @@
+import Basics;
+import JavaBasics;
+import DockerBasics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template DockerfileAllApps(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, setOf(Application) apps, ContainerType containerType, EcsDevice device) {
+	
+    def main(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, setOf(Application) apps, ContainerType containerType, EcsDevice device) {
+
+        'FROM alpine:3.14'
+        '${containerSettings(config, containerType, device)}'
+        'RUN apk add bash'
+        'RUN apk add openjdk11'
+        if (not(collectDependencies(elements)->selectByKind(SystemDependency)->select(d|d.key=='JAVA8').isEmpty())) {
+            'RUN apk add openjdk8'
+        }
+        ''
+        '# Installed dependencies (shall be in /)'
+        'COPY installedDependencies.yml installedDependencies.yml'
+        ''
+        for (Application app : apps) {
+            '${genServersExpose(app)|e}'
+        }
+        'WORKDIR /app'
+        ''
+        'COPY wrapper_script.sh wrapper_script.sh'
+        ''  	
+        '# Broker'
+        'COPY broker/brokerJars/ brokerJars'
+        'COPY broker/src/ src'
+        'COPY broker/broker.sh broker.sh'
+        ''
+        String deviceSpec = device.containerName;
+        if (deviceSpec.length() > 0) {
+            deviceSpec = "-" + deviceSpec;
+        }
+
+        if (containerType == ContainerType::EcsSvc_AllApps) {
+            '# ECS and Service Manager'
+            'COPY ecsSvcJars${deviceSpec}/ ecsSvcJars'
+            'COPY common/ common'
+            'COPY ecsServiceMgr.sh ecsServiceMgr.sh'
+            
+        } else if (containerType == ContainerType::Ecs_Svc_AllApps) {
+    	    '# Service Manager'
+            'COPY svcJars/ svcJars'
+            'COPY common/ common'
+            'COPY serviceMgr.sh serviceMgr.sh'
+            ''
+            '# ECS'
+            'COPY ecsJars${deviceSpec}/ ecsJars'
+            'COPY ecs.sh ecs.sh'
+        
+        } else if (containerType == ContainerType::C1Ecs_C2Svc_AllApps) {
+            '# Service Manager'
+            'COPY svcJars/ svcJars'
+            'COPY common/ common'
+            'COPY serviceMgr.sh serviceMgr.sh'
+        }    	
+        ''
+        'RUN chmod 777 wrapper_script.sh'
+        'CMD ./wrapper_script.sh'
+    }
+}

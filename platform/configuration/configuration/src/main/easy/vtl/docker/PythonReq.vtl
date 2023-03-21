@@ -7,12 +7,22 @@ template PythonReq(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElem
     def main(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements) {
         sequenceOf(PythonService) services = elements -> collect(e|e.impl) -> selectByType(PythonService);
         
-        for (PythonService pyService : services) {          	
-        	//setOf(Dependency) deps = pyService.dependencies;
-        	setOf(Dependency) deps = pyService.dependencies -> selectByType(PythonDependency);
-        	for (PythonDependency d : deps) {
-        		'${d.name} == ${d.version}'
-        	}
+        setOf(Dependency) existDeps = {};
+        for (PythonService pyService : services) {              
+            //setOf(Dependency) deps = pyService.dependencies;
+            setOf(Dependency) deps = pyService.dependencies -> selectByType(PythonDependency);
+            for (PythonDependency d : deps) {
+               Integer exists = 0;
+               for (PythonDependency existD : existDeps) {
+                   if ((existD.name == d.name) and (existD.version == d.version)) {
+                       exists = 1;
+                   }
+               }
+               if (exists == 0) {
+                   '${d.name} == ${d.version}'
+                   existDeps.add(d);
+               }
+            }
         }
     }	
 }

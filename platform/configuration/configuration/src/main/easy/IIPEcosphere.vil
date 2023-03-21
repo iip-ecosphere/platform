@@ -47,6 +47,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         setOf(RecordType) recordTypes = RecordType.allInstances();
         setOf(Application) applications = getApplications();
         sequenceOf(MeshElement) allElements = {};
+        sequenceOf(MeshElement) allAppsContainersElements = {};
         initUsedServiceTypes(applications);
         
         setOf(String) javaSerializersShared = {};
@@ -177,6 +178,10 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 }
                 generateDeploymentPlans(appRoot, cfg, a, elements, appArtifact);
                 allElements = allElements.union(elements);
+                
+                if (a.createContainer) {
+                    allAppsContainersElements = allAppsContainersElements.union(elements);
+                }
             }
             
             Boolean withTemplate = true; // preliminary
@@ -235,7 +240,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 zip(appRoot, appRoot, "${target}/templates/eclipse/impl.${appName}.zip");
             }
         };
-        generateAllAppsContainers(config, allElements);
+        generateAllAppsContainers(config, target, allAppsContainersElements);
     }
     
     // dispatch basis
@@ -605,11 +610,140 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         appImageId;
     }
 
-    generateAllAppsContainers(IIPEcosphere config, sequenceOf(MeshElement) allElements) = {
+    generateAllAppsContainers(IIPEcosphere config, Project target, sequenceOf(MeshElement) allElements) = {
         // TODO #130 create all apps container here -> Ecs_Svc_AllApps and EcsSvc_AllApps
         // TODO #130 move generation of ECS runtime here so that it is created only once; container also for device specific ECS (-> containerName)
         //     --> consider getContainerNameInfix(device) from JavaBasics
         // TODO #130 create platform container with platform, monitoring, UI here, only once
+        String artifactsFolder = getArtifactsFolder(target, config);
+        ContainerManager mgr = config.containerManager;
+        setOf(EcsDevice) devices = EcsDevice.allInstances();
+        if (allElements.size() > 1) {
+
+            for (EcsDevice device : devices->sortedBy(d|d.id)) {
+                ContainerType cntType = device.containerType;
+                String deviceName = getContainerNameDflt(device).toIdentifier();
+                String filePrefix = "allApps_${deviceName}_";
+                if (isAllAppsContainer(cntType)){
+                    String regUser = getProperty("iip.container.user." + mgr.authenticationKey, "");
+                    String regPwd = getProperty("iip.container.password." + mgr.authenticationKey, "");
+                    Boolean authenticate = regUser <> "" and regPwd <> "";
+                    if (authenticate) {
+                        loginContainerRegistry(mgr, regUser, regPwd);
+                    }
+                            
+                    // Checking if there is any PythonService in app
+                    Integer isPythonService = 0;        // 0 - false, 1 - true, -1 below ECS only (containerType == C1Ecs_C2Svc_App)
+                    for (MeshElement elem : allElements) {
+                        Service service = elem.impl;
+                        if (service.isTypeOf(PythonService)) {
+                            isPythonService = 1;
+                        }
+                    }
+    
+                    if (isPythonService == 1) {
+                        Path req = "${target}/requirements.txt";
+                        // TODO #130 consider server dependencies here
+                        vilTemplateProcessor("PythonReq", config, req, elements=allElements);
+                    }
+    
+                    Path instDep = "${target}/installedDependencies.yml";
+                    vilTemplateProcessor("InstalledDependencies", config, instDep, elements=allElements, isPython=isPythonService);
+
+                    setOf(Application) applications = getApplications();
+                    String dfName = createContainerBuildScriptAllApps(mgr, applications, allElements, target, cntType, isPythonService, device);
+    
+                    // Wrapper-Skript 
+                    Path ws = "${target}/wrapper_script.sh";
+                    vilTemplateProcessor("WrapperScript", config, ws, containerType=cntType); 
+    
+                    // Create image 
+                    Path b = "${target}/";
+                    Path d = "${target}/" + dfName;
+                    String appImageId = createContainerImage(mgr, b, d, "allApps", deviceName, "0.1.0");
+    
+                    // Mesh-Info, Container-Descriptor
+                    Path meshInfo = "${artifactsFolder}/${filePrefix}mesh-info.yml";
+                    vilTemplateProcessor("MeshInfoAllApps", config, meshInfo, containerType=cntType, device=device);
+    
+                    if (cntType == ContainerType::C1Ecs_C2Svc_AllApps) {
+                        String ecsDfName = createContainerBuildScriptAllApps(mgr, applications, allElements, target, cntType, -1, device);
+                                                
+                        Path b = "${target}/";
+                        Path d = "${target}/" + ecsDfName;
+                        String ecs_imageId = createContainerImage(mgr, b, d, "allApps", deviceName + "_" + "ecs", "0.1.0");
+                            
+                        // Mesh-Info, Container-Descriptor
+                        Path meshInfoEcs = "${artifactsFolder}/${filePrefix}mesh-info-ecs.yml";
+                        vilTemplateProcessor("MeshInfoAllApps", config, meshInfoEcs, containerType=ContainerType::Ecs, device=device);
+                    } 
+    
+                    if (authenticate) {
+                        logoutContainerRegistry(mgr);
+                    }
+    
+                }
+            }        
+        }
+    }
+
+    Boolean isAllAppsContainer(ContainerType cntType) = { 
+	Boolean isAllApps=false;
+        if (cntType == ContainerType::Ecs_Svc_AllApps){
+            isAllApps=true;
+        }   
+        if (cntType == ContainerType::EcsSvc_AllApps){
+            isAllApps=true;
+        } 
+        if (cntType == ContainerType::C1Ecs_C2Svc_AllApps){
+            isAllApps=true;
+        } 
+        isAllApps;
+    }
+
+    generatePlatformContainers(IIPEcosphere config, Project target) = {
+        String artifactsFolder = getArtifactsFolder(target, config);
+        ContainerManager mgr = config.containerManager;
+        String deviceName = "Platform";
+        String filePrefix = "Platform_${deviceName}_";
+        String regUser = getProperty("iip.container.user." + mgr.authenticationKey, "");
+        String regPwd = getProperty("iip.container.password." + mgr.authenticationKey, "");
+        Boolean authenticate = regUser <> "" and regPwd <> "";
+        if (authenticate) {
+            loginContainerRegistry(mgr, regUser, regPwd);
+        }
+        Path req = "${target}/requirements.txt";
+        Path requirements = "${target}/../platformDependencies/requirements.txt";
+        FileArtifact requirementsArtifact = requirements;
+        Text requirementsText = requirementsArtifact.getText();
+
+        vilTemplateProcessor("PythonReqPlatform", config, req, text=requirementsText );
+
+        Integer isPythonService = 1;
+        sequenceOf(MeshElement) allElements = {};
+
+        Path instDep = "${target}/installedDependencies.yml";
+        vilTemplateProcessor("InstalledDependencies", config, instDep, elements=allElements, isPython=isPythonService);
+
+        String dfName = createContainerBuildScriptPlatform(mgr, target);
+
+        // Wrapper-Skript 
+        Path ws = "${target}/wrapper_script_platform.sh";
+        vilTemplateProcessor("WrapperScriptPlatform", config, ws); 
+
+        // Create image 
+        Path b = "${target}/";
+        Path d = "${target}/" + dfName;
+        String appImageId = createContainerImage(mgr, b, d, "Platform", deviceName, "0.1.0");
+
+        // Mesh-Info, Container-Descriptor
+        //Path meshInfo = "${artifactsFolder}/${filePrefix}mesh-info.yml";
+        //vilTemplateProcessor("MeshInfoPlatform", config, meshInfo);
+
+        if (authenticate) {
+            logoutContainerRegistry(mgr);
+        }
+
     }
         
     // ------------------------------------------ generating apps: nested, e.g., family ----------------------------------------------------------
@@ -928,6 +1062,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         vilTemplateProcessor("UiAngularConfig", config, "${p}/config.json");
         
         vilTemplateProcessor("Readme", config, "${target}/README.txt");
+        generatePlatformContainers(config, target);
     }
     
     generateBrokerScripts(Configuration config, TransportProtocol protocol) = {
