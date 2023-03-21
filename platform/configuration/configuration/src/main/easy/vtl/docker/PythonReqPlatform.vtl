@@ -1,0 +1,10 @@
+import Basics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template PythonReqPlatform(IIPEcosphere config, FileArtifact target, Text text) {
+	
+    def main(IIPEcosphere config, FileArtifact target, Text text) {
+        '${text.getText()}'
+    }	
+}

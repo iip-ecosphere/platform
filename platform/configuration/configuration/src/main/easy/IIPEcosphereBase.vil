@@ -87,6 +87,17 @@ vilScript IIPEcosphereBase (Project source, Configuration config, Project target
         "";
     }
 
+    // dispatch basis, creates container build script for all applications and returns file name
+    String createContainerBuildScriptAllApps(ContainerManager mgr, setOf(Application) applications, sequenceOf(MeshElement) elements, 
+        Project target, ContainerType contType, Integer isPythonService, EcsDevice device) = {
+        "";
+    }
+
+    // dispatch basis, creates container platform script and returns file name
+    String createContainerBuildScriptPlatform(ContainerManager mgr, Project target) = {
+        "";
+    }
+    
     // dispatch basis, build container image    
     String createContainerImage(ContainerManager mgr, Path base, Path buildFile, String registry, String repository, String tag) = {
         "";

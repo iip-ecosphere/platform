@@ -1,0 +1,141 @@
+import Basics;
+import JavaBasics;
+import DockerBasics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template Dockerfile_PythonAllApps(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, setOf(Application) apps, ContainerType containerType, EcsDevice device) {
+	
+    def main(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, setOf(Application) apps, ContainerType containerType, EcsDevice device) {
+        
+        
+        
+        
+        setOf(Dependency) allDependencies = collectDependencies(elements);
+        sequenceOf(String) tmp = {};
+        for (Dependency d: allDependencies) {
+            installBeforePip(d, tmp);
+        }
+        sequenceOf(PythonService) services = elements -> collect(e|e.impl) -> selectByType(PythonService);
+
+        Integer IsPythonInstalled = 0;
+        for (PythonService pyService : services) {
+            setOf(Dependency) deps = pyService.dependencies;
+            setOf(Dependency) pythonDeps = pyService.dependencies -> selectByType(PythonDependency);
+            for (Dependency s : deps) {
+                if (genDependency(s) == 'PYTHON2') {
+                    if (IsPythonInstalled == 0) {
+                        'FROM python:2.7.10 '
+                        for (String s: tmp) {
+                            '${s}'
+                        }
+                        if (pythonDeps.size() > 0) {
+                            'COPY requirements.txt requirements.txt'
+                            'RUN python2 -m pip install -r requirements.txt'
+                        }
+                        IsPythonInstalled = 1;
+                    }
+                } else if (genDependency(s) == 'PYTHON3') {
+                    if (IsPythonInstalled == 0) {
+                        'FROM python:3.8-slim-buster'
+                        for (String s: tmp) {
+                            '${s}'
+                        }
+                        if (pythonDeps.size() > 0) {
+                            'COPY requirements.txt requirements.txt'
+                            'RUN python3 -m pip install -r requirements.txt'
+                        }
+                        IsPythonInstalled = 1;
+                    }
+                } else if (genDependency(s) == 'PYTHON39') {
+                    if (IsPythonInstalled == 0) {
+                        'FROM python:3.9'
+                        for (String s: tmp) {
+                            '${s}'
+                        }
+                        if (pythonDeps.size() > 0) {
+                            'COPY requirements.txt requirements.txt'
+                            'RUN python3 -m pip install -r requirements.txt'
+                        }
+                        IsPythonInstalled = 1;
+                    }
+                } 
+            }
+        }
+        
+        ''
+        'RUN apt-get update'
+        'RUN apt-get install -y openjdk-11-jre'
+        ''
+        '${containerSettings(config, containerType, device)}'
+        ''
+        '# Installed dependencies (shall be in /)'
+        'COPY installedDependencies.yml installedDependencies.yml'
+        ''
+        for (Application app : apps) {
+            '${genServersExpose(app)|e}'
+        }
+        'WORKDIR /app'
+        ''
+        '# Broker'
+        'COPY broker/brokerJars/ brokerJars'
+        'COPY broker/src/ src'
+        'COPY broker/broker.sh broker.sh'
+        ''
+        String deviceSpec = device.containerName;
+        if (deviceSpec.length() > 0) {
+            deviceSpec = "-" + deviceSpec;
+        }
+
+        if (containerType == ContainerType::EcsSvc_AllApps) {
+            '# ECS and Service Manager'
+            'COPY ecsSvcJars${deviceSpec}/ ecsSvcJars'
+            'COPY common/ common'
+            'COPY ecsServiceMgr.sh ecsServiceMgr.sh'
+        
+        } else if (containerType == ContainerType::Ecs_Svc_AllApps) {
+            '# Service Manager'
+            'COPY svcJars/ svcJars'
+            'COPY common/ common'
+            'COPY serviceMgr.sh serviceMgr.sh'
+            ''
+            '# ECS'
+            'COPY ecsJars${deviceSpec}/ ecsJars'
+            'COPY ecs.sh ecs.sh'
+        } else if (containerType == ContainerType::C1Ecs_C2Svc_AllApps) {
+            '# Service Manager'
+            'COPY svcJars/ svcJars'
+            'COPY common/ common'
+            'COPY serviceMgr.sh serviceMgr.sh'
+        }
+        ''		
+        '# Running the script'
+        'COPY wrapper_script.sh wrapper_script.sh'
+        'RUN chmod 777 wrapper_script.sh'
+        'CMD ./wrapper_script.sh'
+    }
+    
+    def genDependency(Dependency d) {
+        '';
+    }
+    
+    def genDependency(SystemDependency d) {
+        '${d.key}';
+    }
+    
+    def installBeforePip(Dependency d, sequenceOf(String) result) {
+    }
+
+    def installBeforePip(LinuxSystemDependency d, sequenceOf(String) result) {
+        result.add('RUN apk add ${d.name}');
+    }
+    
+    def installBeforePip(LinuxCommandBasedSystemDependency d, sequenceOf(String) result) {
+         // TODO downloads
+         // TODO bashSetups
+        for (String c: d.installCommands) {
+            result.add('RUN ${c}');
+        }
+    }
+    
+}
