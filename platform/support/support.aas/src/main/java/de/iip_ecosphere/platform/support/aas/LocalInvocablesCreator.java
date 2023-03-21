@@ -26,8 +26,9 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class LocalInvocablesCreator implements InvocablesCreator {
+public class LocalInvocablesCreator implements InvocablesCreator, Serializable {
 
+    private static final long serialVersionUID = -3267383035483812825L;
     private OperationsProvider instance;
 
     /**
