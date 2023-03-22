@@ -48,7 +48,6 @@ import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.AasUtils;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper;
-import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper.OperationCompletedListener;
 import de.iip_ecosphere.platform.transport.status.TaskUtils;
 import net.ssehub.easy.basics.modelManagement.ModelManagementException;
 import net.ssehub.easy.instantiation.core.model.vilTypes.PseudoString;
@@ -72,6 +71,8 @@ import net.ssehub.easy.varModel.model.datatypes.TypeQueries;
 import net.ssehub.easy.varModel.model.values.ContainerValue;
 import net.ssehub.easy.varModel.model.values.ReferenceValue;
 import net.ssehub.easy.varModel.model.values.Value;
+
+import static de.iip_ecosphere.platform.configuration.ConfigurationManager.*;
 
 /**
  * Maps an IVML configuration generically into an AAS with references to IIP-Ecosphere.
@@ -102,7 +103,6 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     private Supplier<Configuration> cfgSupplier;
     private Function<String, String> metaShortId = SHORTID_PREFIX_META;
     private Predicate<IDecisionVariable> variableFilter = FILTER_NO_CONSTRAINT_VARIABLES;
-    private OperationCompletedListener aasOpListener;
     
     static {
         Map<String, String> parentMap = new HashMap<>();
@@ -122,17 +122,15 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
      * @param cfgSupplier a supplier providing the actual configuration instance
      * @param graphMapper maps a graph from IVML to an internal structure
      * @param changeListener optional configuration change listener, may be <b>null</b>
-     * @param opListener optional operation completed listener, may be <b>null</b>
      * @throws IllegalArgumentException if {@code cfgSupplier} is <b>null</b>
      */
     public AasIvmlMapper(Supplier<Configuration> cfgSupplier, IvmlGraphMapper graphMapper, 
-        ConfigurationChangeListener changeListener, OperationCompletedListener opListener) {
+        ConfigurationChangeListener changeListener) {
         super(graphMapper, changeListener);
         if (null == cfgSupplier) {
             throw new IllegalArgumentException("cfgSupplier must not be null");
         }
         this.cfgSupplier = cfgSupplier;
-        this.aasOpListener = opListener;
     }
     
     /**
@@ -235,48 +233,59 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
      * @param sBuilder the server builder
      */
     public void bindOperations(ProtocolServerBuilder sBuilder) {
+        bind(sBuilder);
+    }
+    
+    /**
+     * Binds the AAS operations (ensure static lambda functions).
+     * 
+     * @param sBuilder the server builder
+     */
+    private static void bind(ProtocolServerBuilder sBuilder) {
         sBuilder.defineOperation(OP_CHANGE_VALUES, 
             new JsonResultWrapper(a -> {
-                changeValues(AasUtils.readMap(a, 0, null));
+                getAasIvmlMapper().changeValues(AasUtils.readMap(a, 0, null));
                 return null;
-            }, aasOpListener)
+            }, getAasOperationCompletedListener())
         );
         sBuilder.defineOperation(OP_GET_GRAPH, 
-            new JsonResultWrapper(a -> getGraph(AasUtils.readString(a, 0), AasUtils.readString(a, 1)), 
-                aasOpListener));
+            new JsonResultWrapper(a -> getAasIvmlMapper().getGraph(AasUtils.readString(a, 0), 
+                AasUtils.readString(a, 1)), 
+            getAasOperationCompletedListener()));
         sBuilder.defineOperation(OP_SET_GRAPH, 
             new JsonResultWrapper(a ->  
-                setGraph(AasUtils.readString(a, 0), AasUtils.readString(a, 1), AasUtils.readString(a, 2), 
-                    AasUtils.readString(a, 3), AasUtils.readString(a, 4)), 
-                aasOpListener
+                getAasIvmlMapper().setGraph(AasUtils.readString(a, 0), AasUtils.readString(a, 1), 
+                    AasUtils.readString(a, 2), AasUtils.readString(a, 3), AasUtils.readString(a, 4)), 
+                getAasOperationCompletedListener()
             ));
         sBuilder.defineOperation(OP_DELETE_GRAPH, 
             new JsonResultWrapper(a ->  
-                deleteGraph(AasUtils.readString(a, 0), AasUtils.readString(a, 1)), 
-                aasOpListener
+                getAasIvmlMapper().deleteGraph(AasUtils.readString(a, 0), AasUtils.readString(a, 1)), 
+                getAasOperationCompletedListener()
             ));
         sBuilder.defineOperation(OP_CREATE_VARIABLE, 
             new JsonResultWrapper(a -> {
-                createVariable(AasUtils.readString(a, 0), AasUtils.readString(a, 1), AasUtils.readString(a, 2));
+                getAasIvmlMapper().createVariable(AasUtils.readString(a, 0), AasUtils.readString(a, 1), 
+                    AasUtils.readString(a, 2));
                 return null;
-            }, aasOpListener)
+            }, getAasOperationCompletedListener())
         );
         sBuilder.defineOperation(OP_DELETE_VARIABLE, 
             new JsonResultWrapper(a -> {
-                deleteVariable(AasUtils.readString(a));
+                getAasIvmlMapper().deleteVariable(AasUtils.readString(a));
                 return null;
-            }, aasOpListener)
+            }, getAasOperationCompletedListener())
         );
         sBuilder.defineOperation(OP_GEN_APPS, 
             new JsonResultWrapper(a -> {
                 return TaskUtils.executeAsTask(PROGRESS_COMPONENT_ID, 
-                    p -> instantiate(createInstantiationConfigurer(false)));
+                    p -> getAasIvmlMapper().instantiate(getAasIvmlMapper().createInstantiationConfigurer(false)));
             })
         );
         sBuilder.defineOperation(OP_GEN_APPS_NO_DEPS, 
             new JsonResultWrapper(a -> {
                 return TaskUtils.executeAsTask(PROGRESS_COMPONENT_ID, 
-                    p -> instantiate(createInstantiationConfigurer(true)));
+                    p -> getAasIvmlMapper().instantiate(getAasIvmlMapper().createInstantiationConfigurer(true)));
             })
         );
     }
@@ -876,7 +885,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
      * Maps a single variable {@code var} into {@code builder}.
      * 
      * @param var the variable to map as source
-     * @param builder the builder as target
+     * @param builder the builder as target (representing the parent of {@code var})
      * @param id the id to use as variable name instead of the variable name itself, may be <b>null</b> for 
      *     the variable name
      */
@@ -895,19 +904,19 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                         semanticId = val.toString();
                     }
                 }
-            }            
+            }
+            SubmodelElementCollectionBuilder varBuilder;
             if (TypeQueries.isCompound(varType)) {
-                SubmodelElementCollectionBuilder varBuilder = builder.createSubmodelElementCollectionBuilder(
+                varBuilder = builder.createSubmodelElementCollectionBuilder(
                     AasUtils.fixId(varName), false, false);
                 for (int member = 0; member < var.getNestedElementsCount(); member++) {
                     mapVariable(var.getNestedElement(member), varBuilder, null);
                 }
-                varBuilder.build();
             } else if (TypeQueries.isContainer(varType)) {
                 boolean isSequence = TypeQueries.isSequence(varType);
                 boolean isOrdered = isSequence; // just to clarify
                 boolean allowsDuplicates = isSequence; // just to clarify
-                SubmodelElementCollectionBuilder varBuilder = builder.createSubmodelElementCollectionBuilder(
+                varBuilder = builder.createSubmodelElementCollectionBuilder(
                     AasUtils.fixId(varName), isOrdered, allowsDuplicates);
                 for (int member = 0; member < var.getNestedElementsCount(); member++) {
                     mapVariable(var.getNestedElement(member), varBuilder, "var_" + member);
@@ -917,13 +926,14 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                     .setValue(Type.INTEGER, var.getNestedElementsCount());
                 setSemanticId(pb, semanticId);
                 pb.build();
-                varBuilder.build();
             } else {
+                String propName = id == null ? varName : id;
+                varBuilder = builder.createSubmodelElementCollectionBuilder(
+                    AasUtils.fixId(propName), false, false);
                 Object aasValue = getValue(var);
                 varType.getType().accept(TYPE_VISITOR);
                 Type aasType = TYPE_VISITOR.getAasType();
-                String propName = id == null ? varName : id;
-                PropertyBuilder pb = builder.createPropertyBuilder(AasUtils.fixId(propName));
+                PropertyBuilder pb = varBuilder.createPropertyBuilder(AasUtils.fixId("varValue"));
                 pb.setValue(aasType, aasValue);
                 /*if (var.getState() == AssignmentState.FROZEN) {
                     pb.setValue(aasType, aasValue);
@@ -936,29 +946,43 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                 setSemanticId(pb, semanticId);
                 pb.build();
             }
-            builder.createPropertyBuilder(AasUtils.fixId(metaShortId.apply("state")))
-                .setValue(Type.STRING, var.getState().toString())
-                .build();
-            builder.createPropertyBuilder(AasUtils.fixId(metaShortId.apply("type")))
-                .setValue(Type.STRING, IvmlDatatypeVisitor.getUnqualifiedType(varType))
-                .build();
-            if (var.getDeclaration().getParent() instanceof Project) { // top-level only for now
-                builder.createPropertyBuilder(AasUtils.fixId(metaShortId.apply("project")))
-                    .setValue(Type.STRING, mapParent(var))
-                    .build();
-            }
-            try {
-                IDatatype serviceType = ModelQuery.findType(var.getConfiguration().getProject(), "ServiceBase", null);
-                if (null != serviceType && serviceType.isAssignableFrom(varType)) {
-                    String serviceId = IvmlUtils.getStringValue(var.getNestedElement("id"), "");
-                    Registry reg = AasPartRegistry.getIipAasRegistry();
-                    AasPartRegistry.addServiceAasEndpointProperty(reg, builder, metaShortId.apply("Aas"), serviceId);
-                }
-            } catch (ModelQueryException e) {
-                LoggerFactory.getLogger(AasIvmlMapper.class).warn(
-                    "Cannot find type ServiceBase. No service will have a AAS URL. {}", e.getMessage());
-            }
+            addMetaProperties(var, varType, varBuilder);
+            varBuilder.build();
         }
+    }
+    
+    /**
+     * Adds the meta properties of {@code var} of type {@code varType} to {@code varBuilder}.
+     * 
+     * @param var the variable to take the meta-properties from
+     * @param varType the type of {@code var} (as we already have determined it)
+     * @param varBuilder the AAS builder representing {@code var} to add the AAS properties to
+     */
+    private void addMetaProperties(IDecisionVariable var, IDatatype varType, 
+        SubmodelElementCollectionBuilder varBuilder) {
+        varBuilder.createPropertyBuilder(AasUtils.fixId(metaShortId.apply("state")))
+            .setValue(Type.STRING, var.getState().toString())
+            .build();
+        varBuilder.createPropertyBuilder(AasUtils.fixId(metaShortId.apply("type")))
+            .setValue(Type.STRING, IvmlDatatypeVisitor.getUnqualifiedType(varType))
+            .build();
+        if (var.getDeclaration().getParent() instanceof Project) { // top-level only for now
+            varBuilder.createPropertyBuilder(AasUtils.fixId(metaShortId.apply("project")))
+                .setValue(Type.STRING, mapParent(var))
+                .build();
+        }
+        try {
+            IDatatype serviceType = ModelQuery.findType(var.getConfiguration().getProject(), "ServiceBase", null);
+            if (null != serviceType && serviceType.isAssignableFrom(varType)) {
+                String serviceId = IvmlUtils.getStringValue(var.getNestedElement("id"), "");
+                Registry reg = AasPartRegistry.getIipAasRegistry();
+                AasPartRegistry.addServiceAasEndpointProperty(reg, varBuilder, metaShortId.apply("Aas"), serviceId);
+            }
+        } catch (ModelQueryException e) {
+            LoggerFactory.getLogger(AasIvmlMapper.class).warn(
+                "Cannot find type ServiceBase. No service will have a AAS URL. {}", e.getMessage());
+        }
+        
     }
     
     /**

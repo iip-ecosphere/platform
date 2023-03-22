@@ -56,7 +56,6 @@ public class ConfigurationAas implements AasContributor, ConfigurationChangeList
     public static final String NAME_SUBMODEL = "Configuration"; 
     private static final GraphFactory GRAPH_FACTORY = new IipGraphFactory();
     
-    private AasIvmlMapper mapper;
     private transient List<AasChange> aasChanges = new ArrayList<>();
 
     /**
@@ -273,16 +272,19 @@ public class ConfigurationAas implements AasContributor, ConfigurationChangeList
     @Override
     public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
         SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null);
-        mapper = new AasIvmlMapper(() -> ConfigurationManager.getVilConfiguration(), new IipGraphMapper(), this, this);
+        AasIvmlMapper mapper = new AasIvmlMapper(() -> ConfigurationManager.getVilConfiguration(), 
+            new IipGraphMapper(), this);
         mapper.mapByType(smB, iCreator);
         mapper.addGraphFormat(new DrawflowGraphFormat());
+        ConfigurationManager.setAasOperationCompletedListener(this);
+        ConfigurationManager.setAasIvmlMapper(mapper);        
         smB.build();
         return null;
     }
 
     @Override
     public void contributeTo(ProtocolServerBuilder sBuilder) {
-        mapper.bindOperations(sBuilder);
+        ConfigurationManager.getAasIvmlMapper().bindOperations(sBuilder);
     }
 
     @Override
@@ -314,7 +316,7 @@ public class ConfigurationAas implements AasContributor, ConfigurationChangeList
             Submodel sm = aas.getSubmodel(NAME_SUBMODEL);
             SubmodelBuilder smB = aas.createSubmodelBuilder(NAME_SUBMODEL, null);
             for (AasChange c : aasChanges) {
-                c.apply(mapper, sm, smB);
+                c.apply(ConfigurationManager.getAasIvmlMapper(), sm, smB);
             }
             smB.build();
         } catch (IOException e) {

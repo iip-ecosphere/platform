@@ -264,7 +264,7 @@ public class AasIvmlMapperTest {
          * @throws IllegalArgumentException if {@code cfgSupplier} is <b>null</b>
          */
         public MyAasIvmlMapper(Supplier<Configuration> cfgSupplier, IvmlGraphMapper graphMapper, boolean adapt) {
-            super(cfgSupplier, graphMapper, null, null);
+            super(cfgSupplier, graphMapper, null);
             this.adapt = adapt;
         }
 
@@ -340,7 +340,9 @@ public class AasIvmlMapperTest {
         Assert.assertNotNull(sec); // this application shall be there
         sec = sec.getSubmodelElementCollection("services");
         Assert.assertNotNull(sec);
-        Property prop = sec.getProperty("var_" + netIndex);
+        SubmodelElementCollection varSmc = sec.getSubmodelElementCollection("var_" + netIndex);
+        Assert.assertNotNull(varSmc);
+        Property prop = varSmc.getProperty("varValue");
         Assert.assertNotNull(prop);
         String serviceNetName = prop.getValue().toString();
         Operation op = sm.getOperation(AasIvmlMapper.OP_GET_GRAPH);

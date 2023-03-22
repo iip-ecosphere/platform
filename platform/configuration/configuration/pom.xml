@@ -243,7 +243,30 @@
               </execution>
          </executions>
         </plugin>
-      
+
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>exec-maven-plugin</artifactId>
+          <version>3.0.0</version>
+          <executions>
+              <execution>
+                 <id>testAasIvml</id>
+                 <configuration>
+                     <mainClass>test.de.iip_ecosphere.platform.configuration.TestAasIvmlModel</mainClass>
+                     <cleanupDaemonThreads>false</cleanupDaemonThreads>
+                     <classpathScope>test</classpathScope>
+                     <!-- Example, please override on command line with -Dexec.args="" -->
+                     <!-- Does not work without further arguments for simpleMesh, simpleMesh3, rountingTest as they rely on common! -->
+                     <arguments>
+                         <argument>ContainerCreation</argument>
+                         <argument>${project.basedir}\src\test\easy\single</argument>
+                         <argument>myMesh</argument>
+                     </arguments>
+                 </configuration>
+              </execution>
+          </executions>
+        </plugin>
+           
     </plugins>
   </build>
   

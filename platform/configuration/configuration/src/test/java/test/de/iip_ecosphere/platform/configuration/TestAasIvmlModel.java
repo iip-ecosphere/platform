@@ -30,6 +30,7 @@ import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
+import de.iip_ecosphere.platform.support.aas.AasPrintVisitor;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.ServerRecipe;
@@ -76,8 +77,9 @@ public class TestAasIvmlModel {
 
             Configuration cfg = ConfigurationManager.getVilConfiguration();
             GraphFormat format = new DrawflowGraphFormat();
-            AasIvmlMapper mapper = new AasIvmlMapper(() -> cfg, new ConfigurationAas.IipGraphMapper(), null, null); 
+            AasIvmlMapper mapper = new AasIvmlMapper(() -> cfg, new ConfigurationAas.IipGraphMapper(), null); 
             mapper.addGraphFormat(format);
+            ConfigurationManager.setAasIvmlMapper(mapper);        
             
             AasSetup aasSetup = AasSetup.createLocalEphemeralSetup(null, false);
             AasPartRegistry.setAasSetup(aasSetup);
@@ -97,13 +99,14 @@ public class TestAasIvmlModel {
 
             AasFactory aasFactory = AasFactory.getInstance();
             AasBuilder aasBuilder = aasFactory.createAasBuilder("Platform", null);
-            SubmodelBuilder smb = aasFactory.createSubmodelBuilder(ConfigurationAas.NAME_SUBMODEL, null);
+            SubmodelBuilder smb = aasBuilder.createSubmodelBuilder(ConfigurationAas.NAME_SUBMODEL, null);
             InvocablesCreator iCreator = aasFactory.createInvocablesCreator(AasFactory.LOCAL_PROTOCOL, "localhost", 0);
             ProtocolServerBuilder psb = aasFactory.createProtocolServerBuilder(AasFactory.LOCAL_PROTOCOL, 0);
             mapper.mapByType(smb, iCreator);
             mapper.bindOperations(psb);
             smb.build();
             Aas aas = aasBuilder.build();
+            aas.accept(new AasPrintVisitor());
             psb.build();
 
             try {

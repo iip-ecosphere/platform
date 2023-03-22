@@ -16,6 +16,9 @@ import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
 
+import de.iip_ecosphere.platform.configuration.ConfigurationAas.IipGraphMapper;
+import de.iip_ecosphere.platform.configuration.ivml.AasIvmlMapper;
+import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper.OperationCompletedListener;
 import de.iip_ecosphere.platform.transport.Transport;
 import de.iip_ecosphere.platform.transport.status.ActionTypes;
 import de.iip_ecosphere.platform.transport.status.StatusMessage;
@@ -39,6 +42,8 @@ public class ConfigurationManager {
     private static EasyExecutor executor;
     private static boolean initialized = false;
     private static BasicProgressObserver observer = new BasicProgressObserver();
+    private static AasIvmlMapper aasIvmlMapper;
+    private static OperationCompletedListener aasOpListener;
 
     /**
      * Bridges between EASy progress monitoring and IIP progress notifications.
@@ -135,6 +140,11 @@ public class ConfigurationManager {
                     getLogger().error("Cannot load EASy-Producer models: " + e.getMessage());
                 }
             }
+            if (null == aasIvmlMapper) {
+                aasIvmlMapper = new AasIvmlMapper(() -> ConfigurationManager.getVilConfiguration(), 
+                     new IipGraphMapper(), null);
+                aasIvmlMapper.addGraphFormat(new DrawflowGraphFormat());
+            }
             initialized = true;
         }
     }
@@ -222,6 +232,46 @@ public class ConfigurationManager {
             }
         }
     }
+    
+    /**
+     * Defines the global AAS IVML mapper (for AAS lambda functions).
+     * 
+     * @param mapper the mapper instance (ignored if <b>null</b>)
+     */
+    public static void setAasIvmlMapper(AasIvmlMapper mapper) {
+        if (null != mapper) {
+            aasIvmlMapper = mapper;
+        }
+    }
+
+    /**
+     * Returns the global AAS IVML mapper (for AAS lambda functions).
+     * 
+     * @return the mapper instance
+     */
+    public static AasIvmlMapper getAasIvmlMapper() {
+        init();
+        return aasIvmlMapper;
+    }
+    
+    /**
+     * Defines the global AAS operation completed listener (for AAS lambda functions).
+     * 
+     * @param listener the listener
+     */
+    public static void setAasOperationCompletedListener(OperationCompletedListener listener) {
+        aasOpListener = listener;
+    }
+
+    /**
+     * Returns the global AAS operation completed listener (for AAS lambda functions).
+     * 
+     * @return the listener (may be <b>null</b>)
+     */
+    public static OperationCompletedListener getAasOperationCompletedListener() {
+        return aasOpListener;
+    };
+
 
     /**
      * Returns the logger for this class.
