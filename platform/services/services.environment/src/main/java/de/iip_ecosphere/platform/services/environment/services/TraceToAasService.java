@@ -99,6 +99,7 @@ public class TraceToAasService extends AbstractService {
         // parameter must be declared in this form in model!
         addParameterConfigurer(new ParameterConfigurer<>(
             "timeout", Long.class, TypeTranslators.LONG, t -> converter.setTimeout(t)));
+        registerParameterConfigurers();
         recorder = createDataRecorder();
         converter = createConverter();
         converter.setAasEnabledSupplier(() -> isAasEnabled());
@@ -155,6 +156,14 @@ public class TraceToAasService extends AbstractService {
         this(artifact.getApplication(), artifact.getService(serviceId));
         this.artifact = artifact;
     }
+    
+    
+    /**
+    * Registers own parameter configurers. Called by constructor. Use 
+    * {@link #addParameterConfigurer(ParameterConfigurer)} to declare a parameter.
+    */
+    protected void registerParameterConfigurers() {
+    }    
     
     /**
      * Creates an optional data recorder instance. 
