@@ -75,7 +75,6 @@ project Devices {
         key = "JAVA11"
     };
     
-    
     SystemDependency PYTHON2 = {
         key = "PYTHON2"
     };
@@ -207,6 +206,7 @@ project Devices {
         JRE11;
         JDK11;
         PYTHON2;
+        CONDA;
         PYTHON3;
         PYTHON39;
         tensorflow280;

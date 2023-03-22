@@ -619,77 +619,76 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     }
 
     generateAllAppsContainers(IIPEcosphere config, Project target, sequenceOf(MeshElement) allElements) = {
-        // TODO #130 create all apps container here -> Ecs_Svc_AllApps and EcsSvc_AllApps
-        // TODO #130 move generation of ECS runtime here so that it is created only once; container also for device specific ECS (-> containerName)
-        //     --> consider getContainerNameInfix(device) from JavaBasics
-        // TODO #130 create platform container with platform, monitoring, UI here, only once
         String artifactsFolder = getArtifactsFolder(target, config);
         ContainerManager mgr = config.containerManager;
         setOf(EcsDevice) devices = EcsDevice.allInstances();
+        int count = 1;
         if (allElements.size() > 1) {
 
             for (EcsDevice device : devices->sortedBy(d|d.id)) {
-                ContainerType cntType = device.containerType;
-                String deviceName = getContainerNameDflt(device).toIdentifier();
-                String filePrefix = "allApps_${deviceName}_";
-                if (isAllAppsContainer(cntType)){
-                    String regUser = getProperty("iip.container.user." + mgr.authenticationKey, "");
-                    String regPwd = getProperty("iip.container.password." + mgr.authenticationKey, "");
-                    Boolean authenticate = regUser <> "" and regPwd <> "";
-                    if (authenticate) {
-                        loginContainerRegistry(mgr, regUser, regPwd);
-                    }
-                            
-                    // Checking if there is any PythonService in app
-                    Integer isPythonService = 0;        // 0 - false, 1 - true, -1 below ECS only (containerType == C1Ecs_C2Svc_App)
-                    for (MeshElement elem : allElements) {
-                        Service service = elem.impl;
-                        if (service.isTypeOf(PythonService)) {
-                            isPythonService = 1;
+                if (!inTesting or (inTesting and count < 2)) { // inTesting, just produce the first one -> CI roundtrip time
+                    ContainerType cntType = device.containerType;
+                    String deviceName = getContainerNameDflt(device).toIdentifier();
+                    String filePrefix = "allApps_${deviceName}_";
+                    if (isAllAppsContainer(cntType)){
+                        String regUser = getProperty("iip.container.user." + mgr.authenticationKey, "");
+                        String regPwd = getProperty("iip.container.password." + mgr.authenticationKey, "");
+                        Boolean authenticate = regUser <> "" and regPwd <> "";
+                        if (authenticate) {
+                            loginContainerRegistry(mgr, regUser, regPwd);
                         }
-                    }
+                                
+                        // Checking if there is any PythonService in app
+                        Integer isPythonService = 0;        // 0 - false, 1 - true, -1 below ECS only (containerType == C1Ecs_C2Svc_App)
+                        for (MeshElement elem : allElements) {
+                            Service service = elem.impl;
+                            if (service.isTypeOf(PythonService)) {
+                                isPythonService = 1;
+                            }
+                        }
+        
+                        if (isPythonService == 1) {
+                            Path req = "${target}/requirements.txt";
+                            // TODO #130 consider server dependencies here
+                            vilTemplateProcessor("PythonReq", config, req, elements=allElements, device=device);
+                        }
+        
+                        Path instDep = "${target}/installedDependencies.yml";
+                        vilTemplateProcessor("InstalledDependencies", config, instDep, elements=allElements, isPython=isPythonService);
     
-                    if (isPythonService == 1) {
-                        Path req = "${target}/requirements.txt";
-                        // TODO #130 consider server dependencies here
-                        vilTemplateProcessor("PythonReq", config, req, elements=allElements, device=device);
-                    }
-    
-                    Path instDep = "${target}/installedDependencies.yml";
-                    vilTemplateProcessor("InstalledDependencies", config, instDep, elements=allElements, isPython=isPythonService);
-
-                    setOf(Application) applications = getApplications();
-                    String dfName = createContainerBuildScriptAllApps(mgr, applications, allElements, target, cntType, isPythonService, device);
-    
-                    // Wrapper-Skript 
-                    Path ws = "${target}/wrapper_script.sh";
-                    vilTemplateProcessor("WrapperScript", config, ws, containerType=cntType); 
-    
-                    // Create image 
-                    Path b = "${target}/";
-                    Path d = "${target}/" + dfName;
-                    String appImageId = createContainerImage(mgr, b, d, "allApps", deviceName, "0.1.0");
-    
-                    // Mesh-Info, Container-Descriptor
-                    Path meshInfo = "${artifactsFolder}/${filePrefix}mesh-info.yml";
-                    vilTemplateProcessor("MeshInfoAllApps", config, meshInfo, containerType=cntType, device=device);
-    
-                    if (cntType == ContainerType::C1Ecs_C2Svc_AllApps) {
-                        String ecsDfName = createContainerBuildScriptAllApps(mgr, applications, allElements, target, cntType, -1, device);
-                                                
+                        setOf(Application) applications = getApplications();
+                        String dfName = createContainerBuildScriptAllApps(mgr, applications, allElements, target, cntType, isPythonService, device);
+        
+                        // Wrapper-Skript 
+                        Path ws = "${target}/wrapper_script.sh";
+                        vilTemplateProcessor("WrapperScript", config, ws, containerType=cntType); 
+        
+                        // Create image 
                         Path b = "${target}/";
-                        Path d = "${target}/" + ecsDfName;
-                        String ecs_imageId = createContainerImage(mgr, b, d, "allApps", deviceName + "_" + "ecs", "0.1.0");
-                            
+                        Path d = "${target}/" + dfName;
+                        String appImageId = createContainerImage(mgr, b, d, "allApps", deviceName, "0.1.0");
+        
                         // Mesh-Info, Container-Descriptor
-                        Path meshInfoEcs = "${artifactsFolder}/${filePrefix}mesh-info-ecs.yml";
-                        vilTemplateProcessor("MeshInfoAllApps", config, meshInfoEcs, containerType=ContainerType::Ecs, device=device);
-                    } 
-    
-                    if (authenticate) {
-                        logoutContainerRegistry(mgr);
+                        Path meshInfo = "${artifactsFolder}/${filePrefix}mesh-info.yml";
+                        vilTemplateProcessor("MeshInfoAllApps", config, meshInfo, containerType=cntType, device=device);
+        
+                        if (cntType == ContainerType::C1Ecs_C2Svc_AllApps) {
+                            String ecsDfName = createContainerBuildScriptAllApps(mgr, applications, allElements, target, cntType, -1, device);
+                                                    
+                            Path b = "${target}/";
+                            Path d = "${target}/" + ecsDfName;
+                            String ecs_imageId = createContainerImage(mgr, b, d, "allApps", deviceName + "_" + "ecs", "0.1.0");
+                                
+                            // Mesh-Info, Container-Descriptor
+                            Path meshInfoEcs = "${artifactsFolder}/${filePrefix}mesh-info-ecs.yml";
+                            vilTemplateProcessor("MeshInfoAllApps", config, meshInfoEcs, containerType=ContainerType::Ecs, device=device);
+                        } 
+        
+                        if (authenticate) {
+                            logoutContainerRegistry(mgr);
+                        }
+                        count = count + 1;
                     }
-    
                 }
             }        
         }

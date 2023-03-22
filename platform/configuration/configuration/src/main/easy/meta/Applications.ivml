@@ -124,10 +124,13 @@ project Applications {
            manufacturerProductDesignation = "Application AAS with Trace embedding@en",
            manufacturer = refBy(manufacturer_sse)
        };
-       Parameters parameter = {
-         LongParameter{name="timeout", defaultValue=3600000}
-       };
+       Parameters parameter = dfltTraceToAasServiceParameter;
+       Constraint parameterOk = parameter.includesAll(dfltTraceToAasServiceParameter);
    }
+   
+   Parameters dfltTraceToAasServiceParameter = {
+       LongParameter{name="timeout", defaultValue=3600000}
+   };
    
    compound TraceToAasOutTransport {
        NonEmptyString host = null;
@@ -222,5 +225,9 @@ project Applications {
    compound LongParameterAssignment refines ParameterAssignment {
        Integer value;
    }
+   
+   freeze {
+       dfltTraceToAasServiceParameter;
+   } but (f|f.bindingTime >= BindingTime.runtimeMon);
    
 }
