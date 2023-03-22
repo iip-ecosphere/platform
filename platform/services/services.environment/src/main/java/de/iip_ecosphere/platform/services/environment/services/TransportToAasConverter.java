@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import org.slf4j.LoggerFactory;
 
@@ -69,6 +70,7 @@ public abstract class TransportToAasConverter<T> {
     private long cleanupTimeout = 5 * 1000; // when the next cleanup shall be considered
     private TraceRecordReceptionCallback callback;
     private List<IOConsumer<T>> notifier = new ArrayList<>();
+    private Supplier<Boolean> aasEnabledSupplier = () -> true;
     
     private String submodelIdShort;
     private String transportStream;
@@ -115,6 +117,26 @@ public abstract class TransportToAasConverter<T> {
         this.submodelIdShort = submodelIdShort;
         this.transportStream = transportStream;
         this.dataType = dataType;
+    }
+    
+    /**
+     * Changes the optional supplier for the AAS enabled state.
+     * 
+     * @param enabledSupplier the new supplier, ignored if <b>null</b>
+     */
+    public void setAasEnabledSupplier(Supplier<Boolean> enabledSupplier) {
+        if (null != enabledSupplier) {
+            this.aasEnabledSupplier = enabledSupplier;
+        }
+    }
+    
+    /**
+     * Returns whether the AAS functionality shall be enabled.
+     * 
+     * @return {@code true} for enabled, {@code false} else
+     */
+    protected boolean isAasEnabled() {
+        return aasEnabledSupplier.get();
     }
     
     /**
@@ -235,17 +257,19 @@ public abstract class TransportToAasConverter<T> {
      */
     protected void handleNew(T data) {
         // add new record
-        try {
-            Aas aas = AasPartRegistry.retrieveAas(aasSetup, getAasUrn());
-            SubmodelBuilder smBuilder = aas.createSubmodelBuilder(submodelIdShort, null);
-            SubmodelElementCollectionBuilder smcBuilder = smBuilder.createSubmodelElementCollectionBuilder(
-                getSubmodelElementIdFunction().apply(data), true, true); 
-            populateSubmodelElementCollection(smcBuilder, data);
-            smcBuilder.build();
-            smBuilder.build();
-            cleanup(aas);
-        } catch (IOException e) {
-            LoggerFactory.getLogger(getClass()).error("Cannot obtain AAS {}: {}", getAasUrn(), e.getMessage());
+        if (isAasEnabled()) {
+            try {
+                Aas aas = AasPartRegistry.retrieveAas(aasSetup, getAasUrn());
+                SubmodelBuilder smBuilder = aas.createSubmodelBuilder(submodelIdShort, null);
+                SubmodelElementCollectionBuilder smcBuilder = smBuilder.createSubmodelElementCollectionBuilder(
+                    getSubmodelElementIdFunction().apply(data), true, true); 
+                populateSubmodelElementCollection(smcBuilder, data);
+                smcBuilder.build();
+                smBuilder.build();
+                cleanup(aas);
+            } catch (IOException e) {
+                LoggerFactory.getLogger(getClass()).error("Cannot obtain AAS {}: {}", getAasUrn(), e.getMessage());
+            }
         }
     }
     
@@ -457,14 +481,16 @@ public abstract class TransportToAasConverter<T> {
         this.aasSetup = aasSetup;
         boolean success = true;
         try {
-            AasFactory factory = AasFactory.getInstance();
-            AasBuilder aasBuilder = factory.createAasBuilder(getAasId(), getAasUrn());
-            success = buildUpAas(aasBuilder);
-            aasBuilder.createSubmodelBuilder(submodelIdShort, null).build();
-            Aas aas = aasBuilder.build();
-            if (deploy) {
-                List<Aas> aasList = CollectionUtils.addAll(new ArrayList<Aas>(), aas);
-                AasPartRegistry.remoteDeploy(aasSetup, aasList);
+            if (isAasEnabled()) {
+                AasFactory factory = AasFactory.getInstance();
+                AasBuilder aasBuilder = factory.createAasBuilder(getAasId(), getAasUrn());
+                success = buildUpAas(aasBuilder);
+                aasBuilder.createSubmodelBuilder(submodelIdShort, null).build();
+                Aas aas = aasBuilder.build();
+                if (deploy) {
+                    List<Aas> aasList = CollectionUtils.addAll(new ArrayList<Aas>(), aas);
+                    AasPartRegistry.remoteDeploy(aasSetup, aasList);
+                }
             }
             callback = new TraceRecordReceptionCallback();
             TransportConnector conn = Transport.createConnector();
@@ -481,9 +507,10 @@ public abstract class TransportToAasConverter<T> {
     }
     
     /**
-     * Builds up the AAS.
+     * Builds up the AAS. May not be called if {@link #setAasEnabledSupplier(Supplier) AAS enabled supplier} signals
+     * that there shall not be an AAS.
      * 
-     * @param aasBuilder the aas builder to use
+     * @param aasBuilder the AAS builder to use
      * @return {@code true} for success, {@code false} else
      */
     protected boolean buildUpAas(AasBuilder aasBuilder) {
@@ -506,19 +533,22 @@ public abstract class TransportToAasConverter<T> {
             LoggerFactory.getLogger(getClass()).error("Detaching transport connector: " + e.getMessage());
             success = false;
         }
-        try {
-            Aas aas = AasPartRegistry.retrieveAas(aasSetup, getAasUrn());
-            aas.delete(aas.getSubmodel(submodelIdShort));
-            success = cleanUpAas(aas);
-        } catch (IOException e ) {
-            LoggerFactory.getLogger(getClass()).error("Cleaning up AAS: " + e.getMessage());
-            success = false;
+        if (isAasEnabled()) {
+            try {
+                Aas aas = AasPartRegistry.retrieveAas(aasSetup, getAasUrn());
+                aas.delete(aas.getSubmodel(submodelIdShort));
+                success = cleanUpAas(aas);
+            } catch (IOException e ) {
+                LoggerFactory.getLogger(getClass()).error("Cleaning up AAS: " + e.getMessage());
+                success = false;
+            }
         }
         return success;
     }
 
     /**
-     * Cleans up the AAS. Last action, may delete the AAS itself.
+     * Cleans up the AAS. Last action, may delete the AAS itself. May not be called if 
+     * {@link #setAasEnabledSupplier(Supplier) AAS enabled supplier} signals that there shall not be an AAS.
      * 
      * @param aas the AAS to clean up
      * @return {@code true} for success, {@code false} else

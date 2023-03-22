@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import org.slf4j.LoggerFactory;
 
@@ -81,7 +82,7 @@ public class TraceToAasService extends AbstractService {
     private Map<String, ParameterConfigurer<?>> paramConfigurers = new HashMap<>();
     private ApplicationSetup appSetup;
     private YamlArtifact artifact;
-    private Converter converter = createConverter();
+    private Converter converter;
     private TransportConnector outTransport;
     private TransportParameter outTransportParameter;
     private DataRecorder recorder;
@@ -99,6 +100,8 @@ public class TraceToAasService extends AbstractService {
         addParameterConfigurer(new ParameterConfigurer<>(
             "timeout", Long.class, TypeTranslators.LONG, t -> converter.setTimeout(t)));
         recorder = createDataRecorder();
+        converter = createConverter();
+        converter.setAasEnabledSupplier(() -> isAasEnabled());
     }
     
     /**
@@ -240,6 +243,16 @@ public class TraceToAasService extends AbstractService {
      */
     public String getAasUrn() {
         return  "urn:::AAS:::" + getAasId() + "#";
+    }
+    
+    /**
+     * Returns whether the AAS is enabled and shall be set up (the default) or whether it is 
+     * intentionally deactivated and shall not be started/modified.
+     * 
+     * @return {@code true} for enabled (default), {@code false} for disabled
+     */
+    protected boolean isAasEnabled() {
+        return true;
     }
     
     /**
@@ -401,6 +414,8 @@ public class TraceToAasService extends AbstractService {
 
     /**
      * Allows adding application-specific elements to the command submodel, e.g., operations.
+     * May not be called if {@link #setAasEnabledSupplier(Supplier) AAS enabled supplier} signals
+     * that there shall not be an AAS.
      * 
      * @param smBuilder the builder, do not call {@link SubmodelBuilder#build()} in here!
      */
@@ -428,7 +443,8 @@ public class TraceToAasService extends AbstractService {
      * Retrieves the App AAS.
      * 
      * @return the AAS
-     * @throws IOException if the App AAS cannot be retrieved
+     * @throws IOException if the App AAS cannot be retrieved, in particular if 
+     * {@link #setAasEnabledSupplier(Supplier) AAS enabled supplier} signals that there shall not be an AAS.
      */
     protected Aas retrieveAas() throws IOException {
         return AasPartRegistry.retrieveAas(Starter.getSetup().getAas(), getAasUrn());
