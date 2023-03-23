@@ -10,7 +10,7 @@ project DevicePartBitmotec {
         String containerName = "bitmotec";
         CpuArchitecture cpu = CpuArchitecture::x86;
         CpuBits bits = CpuBits::bit64; // TODO check
-        ContainerType containerType = ContainerType::EcsSvc_App;
+        ContainerType containerType = ContainerType::EcsSvc_AllApps;
     }
     
     BitmotecDevice bitmotecDeviceType = {};
