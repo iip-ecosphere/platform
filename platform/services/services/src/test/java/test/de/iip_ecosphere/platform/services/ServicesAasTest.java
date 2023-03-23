@@ -201,6 +201,8 @@ public class ServicesAasTest {
         Assert.assertEquals(ServiceState.RUNNING, client.getServiceState(sId));
         AasPartRegistry.retrieveIipAas().accept(new AasPrintVisitor());
         
+        Assert.assertEquals(1, client.getServiceInstanceCount(sId));
+        
         client.passivateService(sId);
         Assert.assertEquals(ServiceState.PASSIVATED, client.getServiceState(sId));
         client.activateService(sId);

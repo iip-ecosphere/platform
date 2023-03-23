@@ -207,11 +207,11 @@ public class ServicesAas implements AasContributor {
         builder.createOperationBuilder(NAME_OP_SERVICE_INSTANCE_COUNT)
             .setInvocable(iCreator.createInvocable(getQName(NAME_OP_SERVICE_INSTANCE_COUNT)))
             .addInputVariable("id", Type.STRING)
-            .build(Type.INTEGER);
+            .build(Type.STRING);
         builder.createOperationBuilder(NAME_OP_SERVICE_STATE_COUNT)
             .setInvocable(iCreator.createInvocable(getQName(NAME_OP_SERVICE_STATE_COUNT)))
             .addInputVariable("state", Type.STRING)
-            .build(Type.INTEGER);
+            .build(Type.STRING);
         createIdOp(builder, NAME_OP_ARTIFACT_REMOVE, iCreator);
         builder.createPropertyBuilder(NAME_PROP_SUPPORTED_APPIDS)
             .setValue(Type.STRING, String.join(",", ServiceFactory.getSetup().getSupportedAppIds()))
