@@ -343,7 +343,7 @@ public class ServicesAasClient extends SubmodelElementsCollectionClient implemen
         int result = 0;
         try {
             Object tmp = getOperation(ServicesAas.NAME_OP_SERVICE_INSTANCE_COUNT)
-                .invoke(JsonUtils.toJson(serviceId));
+                .invoke(serviceId);
             if (tmp instanceof Integer) {
                 result = ((Integer) tmp).intValue();
             }
