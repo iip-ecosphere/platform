@@ -328,7 +328,7 @@ public class ServicesAasClient extends SubmodelElementsCollectionClient implemen
                 throw new ExecutionException("Operation `" + ServicesAas.NAME_OP_SERVICE_STATE_COUNT 
                     + "` on resource `" + resource.getIdShort() + "` not found.", null); 
             }
-            Object tmp = op.invoke(JsonUtils.toJson(state.name()));
+            Object tmp = op.invoke(state.name());
             if (tmp instanceof Integer) {
                 result = ((Integer) tmp).intValue();
             }
