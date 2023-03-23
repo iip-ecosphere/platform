@@ -1,4 +1,5 @@
 pyyaml
+pyflakes
 pyzbar
 opencv-python
 numpy
