@@ -2,34 +2,57 @@
     <h1 *ngIf="resource && resource.idShort">Detail View of {{ resource.idShort }}</h1>
     <div>
       <div>
-        <mat-card>
+        <mat-card class="gray-element">
           <h1>
             Resource Attributes
           </h1>
-          <div *ngIf="resource">
-            <div *ngFor="let element of resource.value">
-              <div *ngIf="!element.invokable">
-                <span class="shortId">{{ element.idShort }}: </span>
-                <span *ngIf="element.value && element.semanticId">
-                  <span title="{{element.semanticDescription}}    [{{element.semanticId.keys[0].value}}]" class="visible">
-                    {{ element.value | tidy}}
+
+
+            <div *ngIf="resource">
+              <div *ngFor="let element of resource.value">
+                <div *ngIf="!element.invokable">
+                  <div *ngIf="element.value != ''">
+                    <span class="shortId">{{ element.idShort }}: </span>
+                    <span *ngIf="element.value && element.semanticId">
+                    <span title="{{element.semanticDescription}}
+                    [{{element.semanticId.keys[0].value}}]" class="visible">
+                      {{ element.value | tidy}}
+                    </span>
+                    </span>
+                    <span class="semanticName" *ngIf="element.semanticName">
+                     {{ element.semanticName | tidy}}
+                    </span>
+
+                  </div>
+                  <!--
+                  <span class="shortId">{{ element.idShort }}: </span>
+                  <span *ngIf="element.value && element.semanticId">
+                    <span title="{{element.semanticDescription}}
+                    [{{element.semanticId.keys[0].value}}]" class="visible">
+                      {{ element.value | tidy}}
+                    </span>
                   </span>
-                </span>
-                <span class="semanticName" *ngIf="element.semanticName"> {{ element.semanticName | tidy}} </span>
-                <!--
-                <span *ngIf="element.value && element.semanticId">
-                  <h4>Resolve ({{ element.semanticId.keys[0].value}}): {{feedback}} </h4>
-                </span>
-                -->
+                  <span class="semanticName" *ngIf="element.semanticName">
+                    {{ element.semanticName | tidy}}
+                  </span>
+                  -->
+
+                  <!--
+                  <span *ngIf="element.value && element.semanticId">
+                    <h4>Resolve ({{ element.semanticId.keys[0].value}}): {{feedback}} </h4>
+                  </span>
+                  -->
+                </div>
               </div>
             </div>
-          </div>
         </mat-card>
       </div>
       <br>
+      <!--
       <div *ngIf="resource && resource.idShort">
           <app-operation-query [resource]="resource" [managedId]="id">
           </app-operation-query>
       </div>
+    -->
     </div>
   </div>

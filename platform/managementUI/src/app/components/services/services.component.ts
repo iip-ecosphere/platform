@@ -1,7 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from 'src/app/services/api.service';
-import { PlatformArtifacts, PlatformResources, PlatformServices } from 'src/interfaces';
+import { PlatformArtifacts, PlatformResources, PlatformServices }
+  from 'src/interfaces';
 
 @Component({
   selector: 'app-services',
@@ -26,7 +27,8 @@ export class ServicesComponent implements OnInit {
   public async getServices() {
     this.services = await this.api.getServices();
     if(this.services && this.services.submodelElements) {
-      this.servicesToggle = new Array(this.services.submodelElements.length).fill(false);
+      this.servicesToggle = new Array(
+        this.services.submodelElements.length).fill(false);
     }
   }
 
@@ -39,7 +41,8 @@ export class ServicesComponent implements OnInit {
   public async getArtifacts() {
     this.artifacts = await this.api.getArtifacts();
     if(this.artifacts && this.artifacts.submodelElements) {
-      this.artifactsToggle = new Array(this.artifacts.submodelElements.length).fill(false);
+      this.artifactsToggle = new Array(
+        this.artifacts.submodelElements.length).fill(false);
     }
   }
 
