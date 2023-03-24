@@ -350,8 +350,8 @@ class CliBackend {
         @Override
         public void run() {
             try {
-                println(getMessagePrefix(true));
                 TaskData data = TaskRegistry.getTaskData();
+                println(getMessagePrefix(true) + (null == data ? "" : ": " + data.getId()));
                 if (null != data) {
                     client.startServiceAsTask(data.getId(), options, serviceIds);
                 } else {
