@@ -693,7 +693,8 @@ public abstract class AbstractServiceManager<A extends AbstractArtifactDescripto
     }
 
     /**
-     * Returns only non-server services from {@code serviceIds}.
+     * Returns only non-server services from {@code serviceIds}, i.e., only instances
+     * that can be identified as server are pruned.
      * 
      * @param mgr the service manager to take the descriptors from
      * @param serviceIds the service ids to filter out
@@ -703,7 +704,10 @@ public abstract class AbstractServiceManager<A extends AbstractArtifactDescripto
         List<String> result = new ArrayList<>();
         for (String id: serviceIds) {
             ServiceDescriptor desc = mgr.getService(id);
-            if (null != desc && desc.getKind() != ServiceKind.SERVER) {
+            if (null == desc) {
+                desc = mgr.getService(ServiceBase.getServiceId(id));
+            }
+            if (null == desc || (null != desc && desc.getKind() != ServiceKind.SERVER)) {
                 result.add(id);
             }
         }
