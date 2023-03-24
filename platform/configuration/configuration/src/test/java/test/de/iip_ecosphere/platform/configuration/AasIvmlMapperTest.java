@@ -53,6 +53,7 @@ import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
+import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper;
 import net.ssehub.easy.basics.modelManagement.ModelManagementException;
@@ -330,9 +331,8 @@ public class AasIvmlMapperTest {
     private String assertSubmodel(Submodel sm, String appName, int netIndex, 
         Consumer<SubmodelElementCollection> servicesAsserter) throws ExecutionException {
         
-        SubmodelElementCollection sec = sm.getSubmodelElementCollection("Service");
+        SubmodelElementCollection sec = sm.getSubmodelElementCollection("ServiceBase");
         Assert.assertNotNull(sec); // 2 variables of type service shall exist in the model
-
         // Accessing the net as intended
         sec = sm.getSubmodelElementCollection("Application");
         Assert.assertNotNull(sec); // 1 variables of type Application shall exist in the model

@@ -244,7 +244,8 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         if (type.getRefinesCount() > 0) {
             for (int r = 0; r < type.getRefinesCount(); r++) {
                 Compound ref = type.getRefines(r);
-                if (!ref.getProject().getName().equals("MetaConcepts")) { // scope out this
+                if (!ref.getProject().getName().equals("MetaConcepts") 
+                    && !ref.getName().equals("VersionedElement")) { // scope out this
                     result = mapType(ref);
                     break; // just take the first one for now
                 }
