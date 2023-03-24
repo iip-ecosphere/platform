@@ -21,6 +21,41 @@ tr:nth-child(odd) {
   margin: 5px;
 }
 
+// --- resource detail ----
+.gray-element {
+  background-color: rgb(173, 171, 172);
+  //color: black;
+}
+
+// tooltip
+.visible {
+  height: 3em;
+  width: 8em;
+  //color: rgb(35, 142, 184);
+  //color: rgb(48, 196, 255);
+  color: black;
+}
+
+.semanticName {
+  //color: gray;
+  //color: rgb(203, 203, 203);
+  color: rgb(97, 95, 96);
+  //color: rgb(125, 214, 255);
+}
+
+.shortId {
+  color: white;
+  font-size: 16px;
+  line-height: 1.4;
+}
+/*
+.bullets {
+  list-style-type: square;
+  color: rgb(125, 214, 255);
+}
+*/
+//-----------
+
 // sub-menu
 .mat-tab-label {
   color: rgb(0,0,0) !important;
@@ -53,24 +88,6 @@ tr:nth-child(odd) {
   height: auto;
   //width: 200px;
   width: auto;
-}
-
-
-.shortId {
-  color: white;
-  font-size: 16px;
-}
-
-.semanticName {
-  color: gray;
-}
-
-// tooltip
-.visible {
-  height: 3em;
-  width: 8em;
-  //color: rgb(27, 205, 250);
-  color: rgb(48, 196, 255);
 }
 
 .service {

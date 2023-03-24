@@ -40,6 +40,7 @@ export class ResourceDetailsComponent implements OnInit {
   private async getResource(id: string) {
     this.resource = await this.api.getResource(id);
     this.resolveSemanticId();
+    console.log(this.resource)
   }
 
   //currently not used

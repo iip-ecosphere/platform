@@ -1,32 +1,85 @@
 <p style="margin-bottom:2px"></p>
 
 <mat-tab-group animationDuration="0ms" mat-stretch-tabs>
-  <div *ngFor="let item of listTitles">
-    <mat-tab label="{{item.name}}">
+  <!-- Tab menu -->
+  <div *ngFor="let tab of filterParam">
+    <mat-tab label="{{tab.tabName}}">
       <ng-template mat-tab-label >
-        <span (click)="loadData(item.value)" class="custom-label">
-          {{item.name}}
+        <span (click)="loadData(tab.metaProject, tab.type)" class="custom-label">
+          {{tab.tabName}}
         </span>
       </ng-template>
 
-      <div *ngIf="data && data.value">
-        <!-- New mesh Button -->
-        <div *ngIf="data.idShort == 'ServiceMesh'">
-          <p style="margin-bottom:5px"></p>
-          <p align="left">
-            <button
-            mat-raised-button class="create-button"
-            (click)="createMesh()"> new mesh </button>
-          </p>
-        </div>
+      <!-- Table -->
+      <table style="margin: 0px;">
+        <tr *ngFor="let item of filteredData">
+          <td style="width: 100%;">
+            {{item.idShort}}
+          </td>
 
-        <!-- TABLE -->
+          <!-- Buttons -->
+          <td  *ngIf="tab.tabName == 'Applications'">
+            <button
+              mat-raised-button style="background-color: rgb(35, 142, 184)"
+              (click)="createMesh()" disabled>generate interfaces
+            </button>
+          </td>
+          <td  *ngIf="tab.tabName == 'Applications'">
+            <button
+              mat-raised-button style="background-color: rgb(35, 142, 184)"
+              (click)="createMesh()" disabled>generate template
+            </button>
+          </td>
+          <td  *ngIf="tab.tabName == 'Applications'">
+            <button
+              mat-raised-button style="background-color: rgb(35, 142, 184)"
+              (click)="createMesh()" disabled>integrate application
+            </button>
+          </td>
+
+          <td>
+            <div *ngIf="tab.tabName == 'Meshes'; else elseNotDone">
+              <button
+                mat-raised-button style="background-color: rgb(35, 142, 184)"
+                (click)="edit(item)">edit
+              </button>
+            </div>
+            <ng-template #elseNotDone>
+              <button
+                mat-raised-button style="background-color: rgb(35, 142, 184)"
+                (click)="edit(item)" disabled>edit
+              </button>
+            </ng-template>
+          </td>
+
+          <td>
+            <button
+              mat-raised-button style="background-color: rgb(97, 95, 96)"
+              (click)="del(item)" disabled>delete</button>
+          </td>
+
+        </tr>
+      </table>
+    </mat-tab>
+  </div>
+</mat-tab-group>
+
+
+        <!-- TABLE
         <table style="margin: 0px;">
           <tr *ngFor="let item of data.value">
-            <td style="width: 100%;">{{item.idShort}}<br>
 
+            <td style="width: 100%;">{{item.idShort}}
 
-              <!-- Application -->
+              <ng-container *ngIf="data.idShort == 'String'">
+                <div *ngFor="let val of item.value">
+                  <div *ngIf="val.value=='AllConstants'">
+                    <div *ngIf=></div>
+                    {{val.idShort}} : {{val.value}}
+                  </div>
+                </div>
+              </ng-container>
+
               <div *ngIf="data.idShort == 'Application'">
                 <div *ngIf="item.value[5].idShort == 'name'">
                   <div class="subtext"> {{item.value[5].value}}</div>
@@ -46,6 +99,7 @@
                   </div>
                 </div>
               </div>
+
               <div *ngIf="data.idShort == 'Service'">
                 <div *ngIf="item.value[3].value">
                   <div class="subtext"> {{item.value[3].value}}</div>
@@ -53,35 +107,50 @@
                     version: {{item.value[22].value}}</div>
                 </div>
               </div>
-              <div *ngIf="data.idShort == 'services'">
-                <div *ngIf="item.value[4].value">
-                  <div class="subtext"> {{item.value[4].value}}</div>
-                </div>
-                <div *ngIf="item.value[7].value">
-                  <div class="subtext"> Version: {{item.value[7].value}}</div>
-                </div>
-                <div *ngIf="item.value[5].value">
-                  <div class="subtext"> {{item.value[5].value}} </div>
-                </div>
-              </div>
-
             </td>
             <td>
-              <button
+              <div *ngIf="data.idShort == 'ServiceMesh'; else elseNotDone">
+                <button
                   mat-raised-button style="background-color: rgb(35, 142, 184)"
-                  (click)="edit(item)">edit</button>
+                  (click)="edit(item)">edit
+                </button>
+              </div>
+              <ng-template #elseNotDone>
+                <button
+                  mat-raised-button style="background-color: rgb(35, 142, 184)"
+                  (click)="edit(item)" disabled>edit
+                </button>
+              </ng-template>
+            </td>
+
+            <td  *ngIf="data.idShort == 'Application'">
+              <button
+                mat-raised-button style="background-color: rgb(35, 142, 184)"
+                (click)="createMesh()" disabled>generate interfaces
+              </button>
+            </td>
+            <td  *ngIf="data.idShort == 'Application'">
+              <button
+                mat-raised-button style="background-color: rgb(35, 142, 184)"
+                (click)="createMesh()" disabled>generate template
+              </button>
+            </td>
+            <td  *ngIf="data.idShort == 'Application'">
+              <button
+                mat-raised-button style="background-color: rgb(35, 142, 184)"
+                (click)="createMesh()" disabled>integrate application
+              </button>
             </td>
             <td>
               <button
                 mat-raised-button style="background-color: rgb(97, 95, 96)"
-                (click)="del(item)">delete</button>
+                (click)="del(item)" disabled>delete</button>
             </td>
           </tr>
         </table>
-      </div>
-    </mat-tab>
-  </div>
-</mat-tab-group>
+        -->
+
+
 
 
 <!--

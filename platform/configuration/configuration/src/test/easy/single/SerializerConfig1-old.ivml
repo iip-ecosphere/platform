@@ -356,6 +356,7 @@ project SerializerConfig1Old {
 
     // ---------- generation setup ------------
     
+    containerGeneration = false;
     sharedInterfaces = false;
     // default sharedArtifact, not used in testing
 
@@ -364,6 +365,7 @@ project SerializerConfig1Old {
     freeze {
         sharedInterfaces;
         sharedArtifact;
+        containerGeneration;
         .; // every variable declared in this project
     } but (f|f.bindingTime >= BindingTime.runtimeMon);
 

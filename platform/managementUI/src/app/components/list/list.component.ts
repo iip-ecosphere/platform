@@ -16,9 +16,10 @@ export class ListComponent implements OnInit {
   urn: string = "";
   ls: string | null = null;
   data: any;
-  noData: boolean = false;
-  submodelElements: any; //help
-  unwantedTypes = ["metaState", "metaType", "metaProject"];
+  filteredData: any;
+  //noData: boolean = false;
+  //unwantedTypes = ["metaState", "metaType", "metaProject", "metaAas"];
+  //dataToDisplay: any;
 
   constructor(private router: Router,
     private route: ActivatedRoute,
@@ -35,74 +36,113 @@ export class ListComponent implements OnInit {
       }
     }
 
-  listTitles = [
-    {name:"Setup", value:"EndpointAddress"},
-    {name:"Constants", value:"String"},
-    {name:"Types", value:"RecordType"},
-    {name:"Services", value:"Service"},
-    {name:"Servers", value:"ImplAddress"}, // TODO
-    {name:"Meshes", value:"ServiceMesh"},
-    {name:"Applications", value:"Application"},
-    {name:"Artifacts", value:"artifact"}  // TODO
+  filterParam = [
+    {tabName: "Setup", metaProject:"TechnicalSetup", type:null},
+    {tabName: "Constants", metaProject:"AllConstants", type:null},
+    {tabName: "Types", metaProject:"AllTypes", type:null},
+    {tabName: "Services", metaProject:null, type:"ServiceBase"},
+    {tabName: "Servers", metaProject:null, type:"Server"},
+    {tabName: "Meshes", metaProject:null, type:"ServiceMesh"},
+    {tabName: "Applications", metaProject:null, type:"Application"}
   ]
 
   ngOnInit(): void {
   }
 
-  public async loadData(list: string) {
-    //this.router.navigateByUrl('list/' + list)
-    //this.ls = this.route.snapshot.paramMap.get('ls');
-    //this.ls = this.route.snapshot.paramMap.get(list);
-    this.ls = list; // TODO is it ok like this?
-    if(this.ls) {
-      console.log(this.ls)
-      this.data = await this.getData(this.ls);
-      this.filter();
+  // TODO change string | null to any
+  public async loadData(metaProject: string | null, type: string | null) {
+    if (type) {
+      this.ls = type //TODO make it more elegant
+      this.data = await this.getData(type);
+      this.filteredData = this.data.value
+    } else {
+      this.data = await this.getData("")
+      this.filter(metaProject)
     }
-    this.submodelElements = await this.getSubmodelElements();
-    // TODO do I need it?
-    console.log(this.data)
   }
 
-  public async getData(list: string) {
+  public async getData(type: string) {
+    let response;
+    try {
+        response = await firstValueFrom(
+          this.http.get(this.ip + '/shells/'
+        + this.urn
+        + "/aas/submodels/Configuration/submodel/submodelElements/"
+        + type));
+      } catch(e) {
+        console.log(e);
+        //this.noData = true;
+      }
+    return response;
+  }
+
+  public filter(metaProject: string | null) {
+    let result = []
+    for(const submodelElement of this.data) {
+      if(submodelElement.value) {
+        for(const elemtSubmodelElement of submodelElement.value) {
+          for(const valElemtSubmodelElement of elemtSubmodelElement.value) {
+            if(valElemtSubmodelElement.idShort == "metaProject" && valElemtSubmodelElement.value == metaProject) {
+                result.push(elemtSubmodelElement)
+            }
+          }
+        }
+      }
+    }
+    this.filteredData = result;
+  }
+
+  // ---- buttons -----
+
+  public edit(item: any) {
+    if(this.ls === "ServiceMesh") {
+      this.router.navigateByUrl('flowchart/' + item.idShort);
+    }
+  }
+
+  public del(item: any) {
+
+  }
+
+  public createMesh() {
+
+  }
+
+  // --- display of details
+   /*
+  public getId(serviceValue: any[]) {
+    return serviceValue.find(item => item.idShort === 'id').value;
+  }
+  */
+
+  // old version
+  /*
+  public async getData(type: string) {
     let response;
     let path;
-    if (list == "artifact") {
+    if (this.ls == "artifact") {
       path = "/aas/submodels/services/submodel/submodelElements/";
-      list = "services"
+      this.ls = "services"
     } else {
       path = "/aas/submodels/Configuration/submodel/submodelElements/";
     }
-
     try {
         response = await firstValueFrom(
           this.http.get(this.ip + '/shells/'
         + this.urn
         + path
-        + list));
+        + this.ls));
       } catch(e) {
         console.log(e);
         this.noData = true;
       }
-
     return response;
   }
+  */
 
-  public filter() {
-    const relevantValues = []
-    let indicesToRemove = []
-    let i = 0;
-    for(const item of this.data.value) {
-      if(!this.unwantedTypes.includes(item.idShort)) {
-        indicesToRemove.push(i)
-        relevantValues.push(item)
-      }
-      i++;
-    }
-    this.data.value = relevantValues
-  }
 
   //help method to instantly read all idShort of submodelElement collections in configuration
+  /*
   public async getSubmodelElements() {
     let response;
     try {
@@ -116,23 +156,7 @@ export class ListComponent implements OnInit {
     }
     return response;
   }
-
-  public edit(item: any) {
-    if(this.ls === "ServiceMesh") {
-      this.router.navigateByUrl('flowchart/' + item.idShort);
-    }
-
-
-  }
-
-  public del(item: any) {
-
-  }
-
-  public createMesh() {
-
-  }
-
+  */
 
 
   /*

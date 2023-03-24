@@ -134,6 +134,7 @@ project SimpleMeshContainer {
     
     // ---------- generation setup ------------
     
+    containerGeneration = false;
     sharedInterfaces = true;
     sharedArtifact = "de.iip-ecosphere.platform:apps.AppInterfacesSimpleMesh:" + iipVer; // for testing all-in-one
 
@@ -163,6 +164,7 @@ project SimpleMeshContainer {
         managementUi;
         artifactsFolder;
         artifactsUriPrefix;
+        containerGeneration;
         .; // every variable declared in this project
     } but (f|f.bindingTime >= BindingTime.runtimeMon);
 

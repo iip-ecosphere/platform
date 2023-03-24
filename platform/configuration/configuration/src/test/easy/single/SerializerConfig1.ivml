@@ -3,7 +3,7 @@ project SerializerConfig1 {
     import CommonSetup;
 
     annotate BindingTime bindingTime = BindingTime::compile to .;
-
+    
     // ------------ data types ------------------
     
     EnumType myTestEnum = EnumType {
@@ -436,6 +436,7 @@ project SerializerConfig1 {
     
     // ---------- generation setup ------------
     
+    containerGeneration = false;
     sharedInterfaces = true;
     // default sharedArtifact, not used in testing
     modelBaseFolder = "../../.."; // gen/test/SerializerConfig1
@@ -456,6 +457,7 @@ project SerializerConfig1 {
         configFolder;
         genTarget;
         modelName;
+        containerGeneration;
         .; // every variable declared in this project
     } but (f|f.bindingTime >= BindingTime.runtimeMon);
 

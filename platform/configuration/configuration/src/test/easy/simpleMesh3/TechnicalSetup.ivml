@@ -8,6 +8,7 @@ project TechnicalSetup {
 
     // ---------- generation setup ------------
     
+    containerGeneration = false;
     sharedInterfaces = true;
     sharedArtifact = "de.iip-ecosphere.platform:apps.AppInterfacesSimpleMesh3:" + iipVer; // for testing all-in-one
 
@@ -16,6 +17,7 @@ project TechnicalSetup {
     freeze {
         sharedInterfaces;
         sharedArtifact;
+        containerGeneration;
         .; // every variable declared in this project
     } but (f|f.bindingTime >= BindingTime.runtimeMon);
 

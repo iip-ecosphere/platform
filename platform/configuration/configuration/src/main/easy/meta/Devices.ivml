@@ -155,7 +155,7 @@ project Devices {
         CpuBits bits;
         setOf(refTo(Dependency)) provides = {};
         setOf(String) requiredModules = {}; // mvn coordinates, assuming they come with own JLS descriptor
-        ContainerType containerType = ContainerType::Ecs_Svc_App;
+        ContainerType containerType = ContainerType::Ecs_Svc_AllApps;
         setOf(ContainerArgument) containerArguments = {};
         Constraint noInternalContainerType = containerType <> ContainerType::Ecs; // internal
 
@@ -188,7 +188,7 @@ project Devices {
         bits = CpuBits::bit64,
         provides = {},
         requiredModules = {},
-        containerType = ContainerType::Ecs_Svc_App, // let's see
+        containerType = ContainerType::Ecs_Svc_AllApps, // let's see
         containerArguments = {},
         containerName = ""
     };

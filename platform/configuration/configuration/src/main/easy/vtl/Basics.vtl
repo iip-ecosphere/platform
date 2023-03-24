@@ -168,4 +168,14 @@ template Basics(Configuration config, FileArtifact target) {
         containerName;
     }
 	
+    def getContainerGenerationSafe(Boolean containerGeneration) {
+        Boolean result;
+        if (containerGeneration <> null) {
+            result = containerGeneration;
+        } else {
+            result = true;
+        }
+        result;
+    }
+
 }

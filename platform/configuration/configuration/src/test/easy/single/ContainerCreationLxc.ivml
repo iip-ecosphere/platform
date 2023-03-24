@@ -4,7 +4,7 @@ project ContainerCreationLxc {
     import DataTypes;
 
     annotate BindingTime bindingTime = BindingTime::compile to .;
-
+    
     // ------------ component setup ------------------
 
     serializer = Serializer::Json;
@@ -222,6 +222,7 @@ project ContainerCreationLxc {
     
     // ---------- generation setup ------------
     
+    containerGeneration = true;
     sharedInterfaces = true;
     sharedArtifact = "de.iip-ecosphere.platform:apps.AppInterfacesContainerCreation:" + iipVer; // for testing all-in-one
 
@@ -251,6 +252,7 @@ project ContainerCreationLxc {
         managementUi;
         artifactsFolder;
         artifactsUriPrefix;
+        containerGeneration;
         .; // every variable declared in this project
     } but (f|f.bindingTime >= BindingTime.runtimeMon);
 
