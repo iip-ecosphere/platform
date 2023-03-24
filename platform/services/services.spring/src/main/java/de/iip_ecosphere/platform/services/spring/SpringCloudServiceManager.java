@@ -416,10 +416,12 @@ public class SpringCloudServiceManager
 
     @Override
     public void startService(Map<String, String> options, String... serviceIds) throws ExecutionException {
+        LOGGER.info("Received request to start services {} (options {})", Arrays.toString(serviceIds), options);
         serverManager.startServers(options, getArtifacts());
         serviceIds = pruneServers(this, serviceIds);
         checkServiceInstances(serviceIds);
         serviceIds = topLevel(this, serviceIds); // avoid accidentally accessing family members
+        LOGGER.info("Preparing to start top-level services {} (options {})", Arrays.toString(serviceIds), options);
         handleOptions(options, serviceIds);
         AppDeployer deployer = getDeployer();
         // TODO add/check causes for failing, potentially re-sort remaining services iteratively 
