@@ -66,6 +66,8 @@ import net.ssehub.easy.varModel.model.ModelQuery;
 import net.ssehub.easy.varModel.model.ModelQuery.FirstDeclTypeSelector;
 import net.ssehub.easy.varModel.model.ModelQueryException;
 import net.ssehub.easy.varModel.model.Project;
+import net.ssehub.easy.varModel.model.datatypes.Compound;
+import net.ssehub.easy.varModel.model.datatypes.DerivedDatatype;
 import net.ssehub.easy.varModel.model.datatypes.IDatatype;
 import net.ssehub.easy.varModel.model.datatypes.TypeQueries;
 import net.ssehub.easy.varModel.model.values.ContainerValue;
@@ -196,7 +198,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                     if (primitiveType != null && primitiveType.isAssignableFrom(type)) {
                         type = primitiveType; // group them together to simplify the AAS structure
                     } 
-                    String typeName = IvmlDatatypeVisitor.getUnqualifiedType(type);                    
+                    String typeName = IvmlDatatypeVisitor.getUnqualifiedType(mapType(type));
                     SubmodelElementCollectionBuilder builder = types.get(typeName);
                     if (null == builder) {
                         builder = createTypeCollectionBuilder(smBuilder, typeName);
@@ -213,6 +215,42 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             LoggerFactory.getLogger(AasIvmlMapper.class).warn("No IVML configuration found. "
                 + "Cannot create IVML-AAS model elements/operations.");
         }
+    }
+    
+    /**
+     * Maps the type of an IVML variable into the configuration submodel, usually searching for the top-most
+     * parent of compound types.
+     * 
+     * @param type the type to map
+     * @return the mapped type, may be {@code type}
+     */
+    private IDatatype mapType(IDatatype type) {
+        IDatatype result = DerivedDatatype.resolveToBasis(type);
+        if (type instanceof Compound) {
+            result = mapType((Compound) type);
+        }
+        return result;
+    }
+
+    /**
+     * Maps the type of an IVML variable into the configuration submodel, usually searching for the top-most
+     * parent of compound types.
+     * 
+     * @param type the type to map
+     * @return the mapped type, may be {@code type}
+     */
+    private Compound mapType(Compound type) {
+        Compound result = type;
+        if (type.getRefinesCount() > 0) {
+            for (int r = 0; r < type.getRefinesCount(); r++) {
+                Compound ref = type.getRefines(r);
+                if (!ref.getProject().getName().equals("MetaConcepts")) { // scope out this
+                    result = mapType(ref);
+                    break; // just take the first one for now
+                }
+            }
+        }
+        return result;
     }
     
     /**
