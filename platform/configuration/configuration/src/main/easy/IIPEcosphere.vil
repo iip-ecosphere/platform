@@ -494,7 +494,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         String appImageId = "";
         String artifactsFolder = getArtifactsFolder(appRoot, config);
         ContainerManager mgr = config.containerManager;
-        if (a.createContainer) {
+        if (a.createContainer and getContainerGenerationSafe(config.containerGeneration)) {
             String regUser = getProperty("iip.container.user." + mgr.authenticationKey, "");
             String regPwd = getProperty("iip.container.password." + mgr.authenticationKey, "");
             Boolean authenticate = regUser <> "" and regPwd <> "";
@@ -623,7 +623,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         ContainerManager mgr = config.containerManager;
         setOf(EcsDevice) devices = EcsDevice.allInstances();
         int count = 1;
-        if (allElements.size() > 1) {
+        if (allElements.size() > 1 and getContainerGenerationSafe(config.containerGeneration)) {
 
             for (EcsDevice device : devices->sortedBy(d|d.id)) {
                 if (!inTesting or (inTesting and count < 2)) { // inTesting, just produce the first one -> CI roundtrip time
@@ -1069,7 +1069,9 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         vilTemplateProcessor("UiAngularConfig", config, "${p}/config.json");
         
         vilTemplateProcessor("Readme", config, "${target}/README.txt");
-        generatePlatformContainers(config, target);
+        if (getContainerGenerationSafe(cfg.containerGeneration)){
+            generatePlatformContainers(config, target);
+        }
     }
     
     generateBrokerScripts(Configuration config, TransportProtocol protocol) = {

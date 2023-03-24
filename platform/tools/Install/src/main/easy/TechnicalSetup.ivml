@@ -84,6 +84,7 @@ project TechnicalSetup {
     
     // ---------- generation setup ------------
     
+    containerGeneration = true;
     sharedInterfaces = true;
     //sharedArtifact = "de.iip-ecosphere.platform:apps.AppInterfacesSimpleMeshInstall:" + iipVer; // for testing all-in-one
 
@@ -116,6 +117,7 @@ project TechnicalSetup {
         managementUi;
         artifactsFolder;
         artifactsUriPrefix;
+        containerGeneration;
         .; // every variable declared in this project
     } but (f|f.bindingTime >= BindingTime.runtimeMon);
 
