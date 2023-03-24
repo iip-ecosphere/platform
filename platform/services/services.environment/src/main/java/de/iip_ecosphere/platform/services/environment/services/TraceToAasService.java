@@ -68,7 +68,7 @@ import de.iip_ecosphere.platform.transport.status.TraceRecordSerializer;
 public class TraceToAasService extends AbstractService {
 
     public static final String VERSION = "0.1.0";
-    public static final String TRANSPORT_CHANNEL_PREFIX = "result-AAS";
+    public static final String TRANSPORT_CHANNEL_PREFIX = "iip/";
     
     public static final String SUBMODEL_TRACES = "Traces";
     public static final String SUBMODEL_COMMANDS = "Commands"; // commands from extern towards platform
@@ -328,7 +328,7 @@ public class TraceToAasService extends AbstractService {
         if (appId.length() > 0) {
             appId = "_" + appId;
         }
-        return TRANSPORT_CHANNEL_PREFIX + appId;
+        return TRANSPORT_CHANNEL_PREFIX + appId + "/traces";
     }
     
     /**
