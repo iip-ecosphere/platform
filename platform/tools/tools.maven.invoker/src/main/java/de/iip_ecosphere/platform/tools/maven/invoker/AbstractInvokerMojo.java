@@ -150,16 +150,14 @@ public class AbstractInvokerMojo extends AbstractMojo {
         request.setMavenExecutable(mavenExecutable);
         request.setTimeoutInSeconds(timeoutInSeconds);
 
-        if (getLog().isDebugEnabled()) {
+        if (enabled) {
             try {
-                getLog().debug("Using MAVEN_OPTS: " + request.getMavenOpts());
-                getLog().debug("Executing: " + new MavenCommandLineBuilder().build(request));
+                getLog().info(">>> Maven invoker: Using MAVEN_OPTS: " + request.getMavenOpts());
+                getLog().info(">>> Executing: " + new MavenCommandLineBuilder().build(request));
             } catch (CommandLineConfigurationException ex) {
                 getLog().debug("Failed to display command line: " + ex.getMessage());
             }
-        }
 
-        if (enabled) {
             try {
                 InvocationResult result = invoker.execute(request);
                 if (result.getExecutionException() != null) {
@@ -170,8 +168,9 @@ public class AbstractInvokerMojo extends AbstractMojo {
                 getLog().debug("Error invoking Maven: " + ex.getMessage(), ex);
                 throw new MojoExecutionException( "Maven invocation failed. " + ex.getMessage());
             }
+            getLog().info("<<< Maven invoker completed");
         } else {
-            getLog().info("Disabled, not executing.");
+            getLog().info("Maven invoker disabled, not executing.");
         }
     }
     
