@@ -45,6 +45,23 @@ public class TestMoquetteServer extends AbstractTestServer {
         this.addr = addr;
     }
     
+    /**
+     * Sets up a simple user and password authentication.
+     * 
+     * @param user the user to add
+     * @param password the plaintext password of the user
+     */
+    public static void setBasicAuth(String user, String password) {
+        Authenticator.setBasicAuth(user, password);
+    }
+    
+    /**
+     * Clears authentication entries.
+     */
+    public static void clearAuth() {
+        Authenticator.clear();
+    }
+    
     /*
     *  ssl_provider: defines the SSL implementation to use, default to "JDK"
     *            supported values are "JDK", "OPENSSL" and "OPENSSL_REFCNT"
@@ -86,6 +103,9 @@ public class TestMoquetteServer extends AbstractTestServer {
                 properties.setProperty(BrokerConstants.PORT_PROPERTY_NAME, String.valueOf(NetUtils.getEphemeralPort()));
             } else {
                 properties.setProperty(BrokerConstants.PORT_PROPERTY_NAME, String.valueOf(addr.getPort()));
+            }
+            if (Authenticator.isInitialized()) {
+                properties.setProperty(BrokerConstants.AUTHENTICATOR_CLASS_NAME, Authenticator.class.getName());
             }
             mqttBroker = new io.moquette.broker.Server();
             try {
