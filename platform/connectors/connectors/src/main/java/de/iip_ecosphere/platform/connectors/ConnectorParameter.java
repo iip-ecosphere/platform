@@ -306,7 +306,7 @@ public class ConnectorParameter {
         if (null != identityToken) {
             token = identityToken.get(endpointUrl);
             if (null == token) {
-                token = identityToken.get("");
+                token = identityToken.get(ANY_ENDPOINT);
             }
         }
         return token;
