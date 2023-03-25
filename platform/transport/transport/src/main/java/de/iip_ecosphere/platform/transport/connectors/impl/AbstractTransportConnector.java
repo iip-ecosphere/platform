@@ -93,22 +93,39 @@ public abstract class AbstractTransportConnector implements TransportConnector {
      * @param authenticationKey the authentication key
      * @param consumer the consumer
      * @return {@code true} for applied, {@code false} for ignored/failed
+     * @see #applyIdentityToken(IdentityToken, AuthenticationConsumer)
      */
     public static boolean applyAuthenticationKey(String authenticationKey, AuthenticationConsumer consumer) {
         boolean authDone = false;
         if (null != authenticationKey) {
             IdentityToken tok = IdentityStore.getInstance().getToken(authenticationKey);
             if (tok != null) {
-                if (IdentityToken.TokenType.USERNAME == tok.getType()) {
-                    authDone = consumer.accept(tok.getUserName(), tok.getTokenDataAsString(), 
-                        tok.getTokenEncryptionAlgorithm());
-                } else {
-                    LoggerFactory.getLogger(AbstractTransportConnector.class).info(
-                        "Cannot handle identity token type {}. Trying user/password.", tok.getType());
-                }
+                authDone = applyIdentityToken(tok, consumer);
             } else {
                 LoggerFactory.getLogger(AbstractTransportConnector.class).info(
                     "Authentication key {} not found. Trying user/password.", authenticationKey);
+            }
+        }
+        return authDone;
+    }
+
+    /**
+     * Tries to apply the given identity token to the given consumer.
+     * 
+     * @param tok the identity token
+     * @param consumer the consumer
+     * @return {@code true} for applied, {@code false} for ignored/failed
+     * @see #applyIdentityToken(IdentityToken, AuthenticationConsumer)
+     */
+    public static boolean applyIdentityToken(IdentityToken tok, AuthenticationConsumer consumer) {
+        boolean authDone = false;
+        if (tok != null) {
+            if (IdentityToken.TokenType.USERNAME == tok.getType()) {
+                authDone = consumer.accept(tok.getUserName(), tok.getTokenDataAsString(), 
+                    tok.getTokenEncryptionAlgorithm());
+            } else {
+                LoggerFactory.getLogger(AbstractTransportConnector.class).info(
+                    "Cannot handle identity token type {}. Trying user/password.", tok.getType());
             }
         }
         return authDone;
