@@ -84,7 +84,8 @@ public class MqttV3MessageBinderTest {
             if (null == MqttClient.getLastInstance() && null != getKeystoreKey()) {
                 TestPropertyValues
                     .of("mqtt.keystoreKey=" + getKeystoreKey(), 
-                        "mqtt.schema=ssl", "mqtt.actionTimeout=3000")
+                        "mqtt.schema=ssl", "mqtt.actionTimeout=3000", 
+                        "authenticationKey=mqttAuth")
                     .applyTo(applicationContext);
             }            
         }
@@ -129,6 +130,7 @@ public class MqttV3MessageBinderTest {
     @BeforeClass
     public static void init() {
         TestMoquetteServer.setConfigDir(secCfg);
+        TestMoquetteServer.setBasicAuth("user", "user");
         server = new TestMoquetteServer(addr);
         server.start();
         TimeUtils.sleep(1000);
@@ -137,6 +139,7 @@ public class MqttV3MessageBinderTest {
         try {
             TransportParameterBuilder tpBuilder = TransportParameterBuilder
                 .newBuilder(addr.getHost(), addr.getPort())
+                .setAuthenticationKey("mqttAuth")
                 .setApplicationId("infra");
             if (null != secCfg) {
                 tpBuilder.setKeystoreKey(getKeystoreKey()); 
@@ -177,6 +180,7 @@ public class MqttV3MessageBinderTest {
         server.stop(true);
         SerializerRegistry.unregisterSerializer(StringSerializer.class);
         SerializerRegistry.resetDefaults();
+        TestMoquetteServer.clearAuth();
         TestMoquetteServer.setConfigDir(null);
     }
     

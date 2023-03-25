@@ -166,6 +166,11 @@ public class MqttClient {
                 connOpts.setCleanSession(false);
                 connOpts.setKeepAliveInterval(config.getKeepAlive());
                 connOpts.setAutomaticReconnect(true);
+                AbstractTransportConnector.applyAuthenticationKey(config.getAuthenticationKey(), (user, pwd, enc) -> {
+                    connOpts.setUserName(user);
+                    connOpts.setPassword(pwd.toCharArray());
+                    return true;
+                });
                 if (config.useTls()) {
                     try {
                         connOpts.setHttpsHostnameVerificationEnabled(config.getHostnameVerification());

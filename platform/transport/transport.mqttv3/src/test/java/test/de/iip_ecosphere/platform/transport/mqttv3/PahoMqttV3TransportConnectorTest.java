@@ -58,7 +58,7 @@ public class PahoMqttV3TransportConnectorTest {
         doTest(new TransportParameterConfigurer() {
             @Override
             public void configure(TransportParameterBuilder builder) {
-//                builder.setAuthenticationKey("mqttAuth");
+                builder.setAuthenticationKey("mqttAuth");
             }            
         });
         TestMoquetteServer.clearAuth();
