@@ -92,6 +92,11 @@ public class PahoMqttV3TransportConnector extends AbstractMqttTransportConnector
             connOpts.setKeepAliveInterval(params.getKeepAlive());
             connOpts.setAutomaticReconnect(true);
             connOpts.setMaxInflight(1000); // preliminary, default 10
+            applyAuthenticationKey(params.getAuthenticationKey(), (user, pwd, enc) -> {
+                connOpts.setUserName(user);
+                connOpts.setPassword(pwd.toCharArray());
+                return true;
+            });
             if (useTls(params)) {
                 try {                
                     connOpts.setSocketFactory(createTlsContext(params).getSocketFactory());

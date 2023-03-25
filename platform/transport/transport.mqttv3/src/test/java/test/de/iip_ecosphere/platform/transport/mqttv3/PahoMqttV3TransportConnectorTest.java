@@ -54,7 +54,14 @@ public class PahoMqttV3TransportConnectorTest {
     @Test
     public void testPahoConnector() throws IOException {
         TestMoquetteServer.setConfigDir(null);
-        doTest(null);
+        TestMoquetteServer.setBasicAuth("user", "user");
+        doTest(new TransportParameterConfigurer() {
+            @Override
+            public void configure(TransportParameterBuilder builder) {
+//                builder.setAuthenticationKey("mqttAuth");
+            }            
+        });
+        TestMoquetteServer.clearAuth();
     }
 
     /**
