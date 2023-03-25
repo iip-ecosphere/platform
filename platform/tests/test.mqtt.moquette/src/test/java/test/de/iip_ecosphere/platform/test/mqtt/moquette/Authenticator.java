@@ -12,6 +12,7 @@
 
 package test.de.iip_ecosphere.platform.test.mqtt.moquette;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -57,7 +58,7 @@ public class Authenticator implements IAuthenticator {
 
     @Override
     public boolean checkValid(String clientId, String user, byte[] password) {
-        return null != users && users.get(user) != null && users.get(user).equals(password);
+        return null != users && users.get(user) != null && Arrays.equals(users.get(user).getBytes(), password);
     }
 
 }
