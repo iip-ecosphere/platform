@@ -3,6 +3,11 @@ import { ActivatedRoute } from '@angular/router';
 import Drawflow from 'drawflow';
 import { DrawflowService } from 'src/app/services/drawflow.service';
 
+interface Bus {
+  id: string;
+  color: string;
+}
+
 @Component({
   selector: 'app-flowchart',
   templateUrl: './flowchart.component.html',
@@ -22,6 +27,9 @@ export class FlowchartComponent implements OnInit {
   meshUnchanged: any;
   servicesLoading = true;
   mesh: any;
+
+  private Busses: Bus[] = [];
+  busColors = ["green", "orange", "blue", "yellow", "purple", "cyan", "red"];
 
 
   async ngOnInit() {
@@ -116,7 +124,6 @@ export class FlowchartComponent implements OnInit {
 
   public async getGraph(mesh: string) {
     let data = await this.df.getGraph(mesh);
-    console.log(data);
     if(data?.outputArguments[0].value?.value) {
       let graph = JSON.parse(data?.outputArguments[0].value?.value);
       let graph2 = JSON.parse(graph.result);
@@ -124,9 +131,68 @@ export class FlowchartComponent implements OnInit {
       console.log(graph2);
       this.mesh = graph2;
       let nodes = graph2.drawflow.Home.data
+      let busOut: string[] = [];
+      let busIn: string[] = [];
+      let count = 0;
       for(let node in nodes) {
+
         const a = nodes[node];
-        a.html = "<div><h3> " + a.data.id + "</h3> <p>kind: "+ a.data.kind + "</p><p> type: "+ a.data.type + "</p></div>";
+        if(a.data["bus-receive"]) {
+          busIn = a.data["bus-receive"];
+          console.log(busIn);
+        }
+        if(a.data["bus-send"]) {
+          busOut = a.data["bus-send"];
+          console.log(busOut);
+        }
+
+        for(let bus of busIn) {
+          if(!this.Busses.find(item => item.id === bus) && count < 7) {
+            this.Busses.push({id: bus, color: this.busColors[count]});
+            count++;
+          } else if(count >= 7) {
+            console.log("ERROR: maximum amount of busses exceeded (7)");
+          }
+        }
+        // for(let bus of busOut) {
+        //   if(!this.Busses.find(item => item.id === bus) && count < 7) {
+        //     this.Busses.push({id: bus, color: this.busColors[count]});
+        //     count++;
+        //   } else if(count >= 7) {
+        //     console.log("ERROR: maximum amount of busses exceeded (7)");
+        //   }
+        // }
+
+        let busInHtml = "";
+        if(busIn && busIn.length > 0) {
+          for(let busName of busIn) {
+            let bus = this.Busses.find(item => item.id === busName);
+            if(bus) {
+              busInHtml = busInHtml.concat("<i class=\"material-icons\" matTooltip=\"" + bus.id + "\" style=\"color:"+ bus.color +"\">keyboard_double_arrow_down</i>");
+            }
+          }
+
+        }
+
+        let busOutHtml = "";
+        if(busOut && busOut.length > 0) {
+          for(let busName of busOut) {
+            let bus = this.Busses.find(item => item.id === busName);
+            if(bus) {
+              busOutHtml = busOutHtml.concat("<i class=\"material-icons\" matTooltip=\"" + bus.id + "\" style=\"color:"+ bus.color +"\">keyboard_double_arrow_up</i>");
+            }
+          }
+
+        }
+        a.html = "<div>" +
+          "<div class=\"bus-icons\">" + busInHtml + busOutHtml + "</div>" +
+          "<h3> " + a.data.id + "</h3>" +
+          "<p>kind: "+ a.data.kind + "</p>" +
+          "<p> type: "+ a.data.type + "</p>" +
+          "</div>";
+
+          busIn = [];
+          busOut = [];
       }
       this.editor.import(graph2);
     }
@@ -153,7 +219,8 @@ export class FlowchartComponent implements OnInit {
   }
 
   public getId(serviceValue: any[]) {
-    return serviceValue.find(item => item.idShort === 'id').value;
+    let value = serviceValue.find(item => item.idShort === 'id').value;
+    return value.find((item: { idShort: string; }) => item.idShort === 'varValue').value;
   }
 
   //to be removed, keeping in case i need to get the coordinates of a mesh again

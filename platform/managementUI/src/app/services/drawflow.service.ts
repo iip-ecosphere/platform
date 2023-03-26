@@ -63,7 +63,7 @@ export class DrawflowService {
   public async  getServices() {
     let response;
     try {
-      response = await firstValueFrom(this.http.get(this.ip + '/shells/' + this.urn + "/aas/submodels/Configuration/submodel/submodelElements/Service"));
+      response = await firstValueFrom(this.http.get(this.ip + '/shells/' + this.urn + "/aas/submodels/Configuration/submodel/submodelElements/ServiceBase"));
       console.log(response);
     } catch(e) {
       console.log(e);

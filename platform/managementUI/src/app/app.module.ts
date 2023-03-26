@@ -20,6 +20,8 @@ import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {MatSidenavModule} from '@angular/material/sidenav';
 import {MatListModule} from '@angular/material/list';
 import {MatDividerModule} from '@angular/material/divider';
+import {MatTooltipModule} from '@angular/material/tooltip';
+
 
 import { ResourcesComponent } from './components/resources/resources.component';
 import { ContainersComponent } from './components/containers/containers.component';
@@ -71,7 +73,8 @@ import { ListComponent } from './components/list/list.component';
     MatProgressSpinnerModule,
     MatSidenavModule,
     MatListModule,
-    MatDividerModule
+    MatDividerModule,
+    MatTooltipModule
   ],
   providers: [{
     provide:HTTP_INTERCEPTORS,
