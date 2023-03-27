@@ -155,6 +155,12 @@ public class PahoMqttv5Connector<CO, CI> extends AbstractChannelConnector<byte[]
             connOpts.setCleanStart(true);
             connOpts.setKeepAliveInterval(params.getKeepAlive());
             connOpts.setAutomaticReconnect(true);
+            AbstractTransportConnector.applyIdentityToken(
+                params.getIdentityToken(ConnectorParameter.ANY_ENDPOINT), (user, pwd, enc) -> {
+                    connOpts.setUserName(user);
+                    connOpts.setPassword(pwd.getBytes());
+                    return true;
+                });
             if (useTls(params)) {
                 try {                
                     connOpts.setSocketFactory(createTlsContext(params).getSocketFactory());

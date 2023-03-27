@@ -13,14 +13,19 @@
 package test.de.iip_ecosphere.platform.connectors.mqttv3;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 import de.iip_ecosphere.platform.connectors.Connector;
 import de.iip_ecosphere.platform.connectors.ConnectorDescriptor;
+import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter.ConnectorParameterBuilder;
 import de.iip_ecosphere.platform.connectors.mqttv3.PahoMqttv3Connector;
 import de.iip_ecosphere.platform.connectors.types.ChannelProtocolAdapter;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.ServerAddress;
+import de.iip_ecosphere.platform.support.identities.IdentityStore;
+import de.iip_ecosphere.platform.support.identities.IdentityToken;
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter.TransportParameterBuilder;
 import de.iip_ecosphere.platform.transport.mqttv3.PahoMqttV3TransportConnector;
@@ -67,27 +72,63 @@ public class PahoMqttv3ConnectorTest extends AbstractSerializingConnectorTest {
     }
 
     @Override
-    protected ConnectorParameterConfigurer getConfigurer() {
-        return new ConnectorParameterConfigurer() {
-            
-            @Override
-            public File getConfigDir() {
-                return new File("./src/test/secCfg");
-            }
-            
-            @Override
-            public void configure(ConnectorParameterBuilder builder) {
-                builder.setKeystoreKey("mqttKeyStore");
-                builder.setKeyAlias(TestHiveMqServer.KEY_ALIAS);
-            }
+    protected ConnectorParameterConfigurer getConfigurer(boolean withTls) {
+        if (withTls) {
+            return new ConnectorParameterConfigurer() {
+                
+                @Override
+                public File getConfigDir() {
+                    return new File("./src/test/secCfg");
+                }
+                
+                @Override
+                public void configure(ConnectorParameterBuilder builder) {
+                    builder.setKeystoreKey("mqttKeyStore");
+                    builder.setKeyAlias(TestHiveMqServer.KEY_ALIAS);
+                }
+    
+                @Override
+                public void configure(TransportParameterBuilder builder) {
+                    builder.setKeystoreKey("mqttKeyStore");
+                    builder.setKeyAlias(TestHiveMqServer.KEY_ALIAS);
+                }
 
-            @Override
-            public void configure(TransportParameterBuilder builder) {
-                builder.setKeystoreKey("mqttKeyStore");
-                builder.setKeyAlias(TestHiveMqServer.KEY_ALIAS);
-            }
-            
-        };
+                @Override
+                public boolean withEncryption() {
+                    return true;
+                }
+
+            };
+        } else {
+            return new ConnectorParameterConfigurer() {
+                
+                @Override
+                public File getConfigDir() {
+                    return null;
+                }
+                
+                @Override
+                public void configure(ConnectorParameterBuilder builder) {
+                    Map<String, IdentityToken> map = new HashMap<>();
+                    IdentityToken tok = IdentityStore.getInstance().getToken("mqttAuth");
+                    if (null != tok) {
+                        map.put(ConnectorParameter.ANY_ENDPOINT, tok);
+                    }
+                    builder.setIdentities(map);
+                }
+    
+                @Override
+                public void configure(TransportParameterBuilder builder) {
+                    builder.setAuthenticationKey("mqttAuth");
+                }
+
+                @Override
+                public boolean withEncryption() {
+                    return false;
+                }
+                
+            };
+        }
     }
 
     @Override

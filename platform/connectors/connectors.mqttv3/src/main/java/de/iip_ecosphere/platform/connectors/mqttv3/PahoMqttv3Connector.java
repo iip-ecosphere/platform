@@ -142,6 +142,12 @@ public class PahoMqttv3Connector<CO, CI> extends AbstractChannelConnector<byte[]
             connOpts.setKeepAliveInterval(params.getKeepAlive());
             connOpts.setAutomaticReconnect(true);
             connOpts.setMaxInflight(1000); // preliminary, default 10
+            AbstractTransportConnector.applyIdentityToken(
+                params.getIdentityToken(ConnectorParameter.ANY_ENDPOINT), (user, pwd, enc) -> {
+                    connOpts.setUserName(user);
+                    connOpts.setPassword(pwd.toCharArray());
+                    return true;
+                });
             if (useTls(params)) {
                 try {                
                     connOpts.setSocketFactory(createTlsContext(params).getSocketFactory());

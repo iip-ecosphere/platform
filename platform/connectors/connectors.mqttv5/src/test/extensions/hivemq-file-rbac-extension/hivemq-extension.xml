@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<hivemq-extension>
+    <id>hivemq-file-rbac-extension</id>
+    <version>4.5.3</version>
+    <name>HiveMQ File Role Based Access Control Extension</name>
+    <author>HiveMQ</author>
+    <priority>1000</priority>
+    <start-priority>10000</start-priority>
+</hivemq-extension>
