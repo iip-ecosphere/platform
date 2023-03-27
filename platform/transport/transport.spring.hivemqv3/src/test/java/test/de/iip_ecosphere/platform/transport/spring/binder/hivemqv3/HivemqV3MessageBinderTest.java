@@ -79,7 +79,8 @@ public class HivemqV3MessageBinderTest {
         @Override
         public void initialize(ConfigurableApplicationContext applicationContext) {
             TestPropertyValues
-                .of("mqtt.port=" + addr.getPort())
+                .of("mqtt.port=" + addr.getPort(),
+                    "mqtt.authenticationKey=mqttAuth")
                 .applyTo(applicationContext);
             if (null == HivemqV3Client.getLastInstance() && null != getKeystoreKey()) {
                 TestPropertyValues
@@ -139,6 +140,8 @@ public class HivemqV3MessageBinderTest {
             if (null != secCfg) {
                 tpBuilder.setKeystoreKey(getKeystoreKey());
                 tpBuilder.setActionTimeout(3000); // Jenkins, 1 ms is not sufficient
+            } else {
+                tpBuilder.setAuthenticationKey("mqttAuth");
             }
             infra.connect(tpBuilder.build());
             infra.setReceptionCallback("hivemqBinder", new ReceptionCallback<String>() {

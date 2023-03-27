@@ -113,6 +113,13 @@ public class HivemqV3Client {
                 .serverHost(config.getHost())
                 .serverPort(config.getPort())
                 .automaticReconnect().applyAutomaticReconnect();
+            AbstractTransportConnector.applyAuthenticationKey(config.getAuthenticationKey(), (user, pwd, enc) -> {
+                builder.simpleAuth()
+                    .username(user)
+                    .password(pwd.getBytes())
+                    .applySimpleAuth();
+                return true;
+            });
             if (config.useTls()) {
                 try {
                     HostnameVerifier verifier = null; // use HTTPS
@@ -135,12 +142,7 @@ public class HivemqV3Client {
                 }
             }
             Mqtt3AsyncClient cl = builder.buildAsync();
-
             cl.connectWith()
-                //.simpleAuth()
-                //    .username("my-user")
-                //    .password("my-password".getBytes())
-                //    .applySimpleAuth()
                 .cleanSession(false)
                 .keepAlive(config.getKeepAlive())
                 .send()
