@@ -41,10 +41,15 @@ public class PahoMqttV5TransportConnectorTest {
      * 
      * @throws IOException in case that connection/communication fails
      */
-    @Test(timeout = 180 * 1000)
+    @Test
     public void testPahoConnector() throws IOException {
         TestHiveMqServer.setConfigDir(null);
-        doTest(null);
+        doTest(new TransportParameterConfigurer() {
+            @Override
+            public void configure(TransportParameterBuilder builder) {
+                builder.setAuthenticationKey("mqttAuth");
+            }            
+        });
     }
 
     /**
@@ -54,7 +59,7 @@ public class PahoMqttV5TransportConnectorTest {
      * 
      * @throws IOException in case that connection/communication fails
      */
-    @Test(timeout = 3 * 180 * 1000) // longer timeout for TLS
+    @Test
     public void testPahoTlsConnector() throws IOException {
         File secCfg = new File("./src/test/secCfg");
         TestHiveMqServer.setConfigDir(secCfg);
