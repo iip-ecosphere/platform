@@ -85,7 +85,7 @@ public class MqttV3MessageBinderTest {
                 TestPropertyValues
                     .of("mqtt.keystoreKey=" + getKeystoreKey(), 
                         "mqtt.schema=ssl", "mqtt.actionTimeout=3000", 
-                        "authenticationKey=mqttAuth")
+                        "mqtt.authenticationKey=mqttAuth")
                     .applyTo(applicationContext);
             }            
         }
