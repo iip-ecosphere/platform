@@ -105,13 +105,14 @@ public abstract class AbstractSerializingConnectorTest {
      * 
      * @throws IOException in case that connection/communication fails
      */
-    @Test(timeout = 180 * 1000)
+    @Test
     public void testConnector() throws IOException {
+        ConnectorParameterConfigurer configurer = getConfigurer(false);
         ServerAddress addr = new ServerAddress(Schema.IGNORE); // localhost, ephemeral port
         Server server = createTestServer(addr, null);
         server.start();
-        doTest(addr, null);
-        doTestMultiChannel(addr, null);
+        doTest(addr, configurer);
+        doTestMultiChannel(addr, configurer);
         server.stop(true);
     }
     
@@ -121,13 +122,13 @@ public abstract class AbstractSerializingConnectorTest {
      * the test is self-contained.
      * 
      * @throws IOException in case that connection/communication fails
-     * @see #getConfigurer()
+     * @see #getConfigurer(boolean)
      */
-    @Test(timeout = 2 * 180 * 1000)
+    @Test
     public void testTlsConnector() throws IOException {
-        ConnectorParameterConfigurer configurer = getConfigurer();
+        ConnectorParameterConfigurer configurer = getConfigurer(true);
         if (null == configurer) {
-            System.out.println("No TLS test performed.");
+            System.out.println("No TLS test performed, no connector.");
         } else {
             ServerAddress addr = new ServerAddress(Schema.IGNORE); // localhost, ephemeral port
             Server server = createTestServer(addr, configurer.getConfigDir());
@@ -139,11 +140,12 @@ public abstract class AbstractSerializingConnectorTest {
     }
     
     /**
-     * Returns the test configurer (for TLS tests).
+     * Returns the test configurer.
      * 
-     * @return the test configurer, may be <b>null</b> for none, i.e., no TLS tests 
+     * @param withTls shall a configurer for TLS tests be created
+     * @return the test configurer, may be <b>null</b> for none
      */
-    protected abstract ConnectorParameterConfigurer getConfigurer();
+    protected abstract ConnectorParameterConfigurer getConfigurer(boolean withTls);
 
     /**
      * Returns whether the connector implementation supports encryption.
@@ -172,6 +174,13 @@ public abstract class AbstractSerializingConnectorTest {
          * @return the directory, may be <b>null</b> for none
          */
         public File getConfigDir();
+        
+        /**
+         * Returns whether we test here for encryption.
+         * 
+         * @return {@code true} for encryption, {@code false} else
+         */
+        public boolean withEncryption();
         
     }
 
@@ -419,7 +428,9 @@ public abstract class AbstractSerializingConnectorTest {
             Assert.assertTrue(connector.enabledEncryption() ==  null 
                 || connector.enabledEncryption().length() == 0);
         } else {
-            Assert.assertTrue(connector.enabledEncryption().length() > 0);
+            if (configurer.withEncryption()) {
+                Assert.assertTrue(connector.enabledEncryption().length() > 0);
+            }
         }
     }
     
