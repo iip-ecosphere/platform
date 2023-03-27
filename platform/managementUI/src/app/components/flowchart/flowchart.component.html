@@ -8,7 +8,6 @@
       </span>
     </div>
   </nav>
-
   <div class="outer-container">
     <div class="inner-toolbar">
       <h1>Services</h1>
@@ -20,7 +19,7 @@
             <mat-card-content>
               <div *ngFor="let property of service.value">
                 <p *ngIf="displayAttribute(property.idShort)" class="attribute"> {{property.idShort}}:
-                  <span *ngIf="property.value">{{property.value}}</span>
+                  <span *ngIf="property.value">{{property.value[0].value}}</span>
                 </p>
               </div>
             </mat-card-content>
@@ -32,6 +31,8 @@
       <div id="drawflow"></div>
       <button mat-raised-button class="button" (click)="zoomIn()">Zoom In</button>
       <button mat-raised-button class="button" (click)="zoomOut()">Zoom Out</button>
+      <mat-icon (click)="zoomIn()">zoom_in</mat-icon>
+      <mat-icon (click)="zoomOut()">zoom_out</mat-icon>
       <!-- <button mat-raised-button class="button" (click)="showCoords()">print to console</button> -->
     </div>
   </div>
