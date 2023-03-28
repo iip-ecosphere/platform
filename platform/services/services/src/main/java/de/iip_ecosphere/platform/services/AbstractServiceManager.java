@@ -748,6 +748,7 @@ public abstract class AbstractServiceManager<A extends AbstractArtifactDescripto
                         + "to instantiate.", id);
                 } else {
                     instantiateFromTemplate(template, id);
+                    ServicesAas.notifyServiceAdded(getService(id));
                 }
             }
         }

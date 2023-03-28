@@ -237,8 +237,7 @@ public class AbstractTestServiceManager {
             Assert.assertEquals(ServiceState.AVAILABLE, sDesc.getState());
         }
 
-        Set<String> sIds = new HashSet<>(); // emulate AAS result with all server-as-service ids
-        sIds.addAll(aDesc.getServiceIds());
+        Set<String> sIds = getAllServiceIds(aDesc); // emulate AAS result with all server-as-service ids
         String[] serviceIds = sIds.toArray(new String[0]);
         sIds.addAll(aDesc.getServers().stream().map(s->s.getServiceId()).collect(Collectors.toSet()));
         String[] allIds = sIds.toArray(new String[0]);
@@ -280,6 +279,21 @@ public class AbstractTestServiceManager {
         Assert.assertNull(mgr.getArtifact(aId));
         assertReceiverLog();
         MetricsAasConstructor.clear();
+    }
+
+    /**
+     * Returns all service ids in the given artifact descriptor. Emulates AAS result with all server-as-service ids.
+     * 
+     * @param aDesc the artifact descriptor
+     * @return the service ids
+     */
+    private static Set<String> getAllServiceIds(ArtifactDescriptor aDesc) {
+        Set<String> sIds = new HashSet<>();
+        /*for (String s: aDesc.getServiceIds()) { // FOR TESTING
+            sIds.add(de.iip_ecosphere.platform.services.environment.switching.ServiceBase.composeId(s, "app", "1"));
+        }*/
+        sIds.addAll(aDesc.getServiceIds());
+        return sIds;
     }
     
     /**

@@ -13,6 +13,7 @@
 package de.iip_ecosphere.platform.services.environment.spring;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -28,12 +29,14 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.stereotype.Component;
+import org.yaml.snakeyaml.Yaml;
 
 import de.iip_ecosphere.platform.services.environment.Service;
 import de.iip_ecosphere.platform.services.environment.ServiceMapper;
 import de.iip_ecosphere.platform.services.environment.YamlArtifact;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsExtractorRestClient;
 import de.iip_ecosphere.platform.services.environment.spring.metricsProvider.MetricsProvider;
+import de.iip_ecosphere.platform.services.environment.switching.ServiceBase;
 import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.setup.CmdLine;
 import de.iip_ecosphere.platform.support.iip_aas.config.YamlFile;
@@ -187,38 +190,39 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
     
     /**
      * Augments the command line arguments by spring cloud stream binder destination args containing the 
-     * application id if {@link #PARAM_IIP_APP_ID} is given.
+     * application id if {@link #getAppId()} is given.
      * 
      * @param args the command line arguments
      * @return the (augmented) command line arguments
      */
     public static String[] augmentByAppId(String[] args) {
-        String appId = CmdLine.getArg(args, PARAM_IIP_APP_ID, "");
-        if (appId.length() > 0) {
+        if (getAppId().length() > 0) {
+            String appId = getAppId().replace(ServiceBase.APPLICATION_SEPARATOR, ""); // as before adding @, unsure
             List<String> res = CollectionUtils.toList(args);
-            try {
-                Object data = YamlFile.read(ResourceLoader.getResourceAsStream("application.yml"));
-                LoggerFactory.getLogger(Starter.class).info("Augmenting stream bindings by appId {}", appId);
-                final String bindingsPath = "spring.cloud.stream.bindings";
-                final String[] bindingsFieldPath = bindingsPath.split("\\.");
-                Map<Object, Object> tmp = YamlFile.getFieldAsMap(data, bindingsFieldPath);
-                for (Map.Entry<Object, Object> ent : tmp.entrySet()) {
-                    String dest = YamlFile.getFieldAsString(ent.getValue(), "destination", null);
-                    if (null != dest) {
-                        String[] dTmp = dest.split(",");
-                        dest = "";
-                        for (String d : dTmp) {
-                            if (dest.length() > 0) {
-                                dest = dest + ",";
-                            }
-                            dest = dest + appId + "_" + d;
+            Yaml yaml = new Yaml();
+            Object data = new Object();
+            Iterator<Object> it = yaml.loadAll(ResourceLoader.getResourceAsStream("application.yml")).iterator();
+            if (it.hasNext()) {
+                data = it.next(); // ignore the other sub-documents here
+            }
+            LoggerFactory.getLogger(Starter.class).info("Augmenting stream bindings by appId {}", appId);
+            final String bindingsPath = "spring.cloud.stream.bindings";
+            final String[] bindingsFieldPath = bindingsPath.split("\\.");
+            Map<Object, Object> tmp = YamlFile.getFieldAsMap(data, bindingsFieldPath);
+            for (Map.Entry<Object, Object> ent : tmp.entrySet()) {
+                String dest = YamlFile.getFieldAsString(ent.getValue(), "destination", null);
+                if (null != dest) {
+                    String[] dTmp = dest.split(",");
+                    dest = "";
+                    for (String d : dTmp) {
+                        if (dest.length() > 0) {
+                            dest = dest + ",";
                         }
-                        res.add(CmdLine.PARAM_PREFIX  + bindingsPath + "." + ent.getKey() + ".destination" 
-                            + CmdLine.PARAM_VALUE_SEP + dest);
+                        dest = dest + appId + "_" + d;
                     }
+                    res.add(CmdLine.PARAM_PREFIX  + bindingsPath + "." + ent.getKey() + ".destination" 
+                        + CmdLine.PARAM_VALUE_SEP + dest);
                 }
-            } catch (IOException e) {
-                LoggerFactory.getLogger(Starter.class).error("Cannot augment stream bindings: {}", e.getMessage());
             }
             args = res.toArray(new String[res.size()]);
         }

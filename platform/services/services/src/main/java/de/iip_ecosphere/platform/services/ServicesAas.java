@@ -607,6 +607,19 @@ public class ServicesAas implements AasContributor {
     }
 
     /**
+     * Is called when a service (via app instances) is added.
+     * 
+     * @param desc the service descriptor 
+     */
+    public static void notifyServiceAdded(ServiceDescriptor desc) {
+        ActiveAasBase.processNotification(NAME_SUBMODEL, (sub, aas) -> {
+            SubmodelBuilder builder = aas.createSubmodelBuilder(NAME_SUBMODEL, ID_SUBMODEL);
+            addService(builder, desc);
+        });
+        Transport.sendServiceStatus(ActionTypes.ADDED, desc.getId());
+    }
+
+    /**
      * Is called when an artifact is removed.
      * 
      * @param desc the artifact descriptor 

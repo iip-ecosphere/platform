@@ -349,8 +349,10 @@ public class SpringCloudServiceManager
      * @param cmdArgs the command line arguments
      */
     public static void addAppId(String serviceId, List<String> cmdArgs) {
-        String appId = ServiceBase.getApplicationId(serviceId) + ServiceBase.getApplicationInstanceId(serviceId);
-        if (appId.length() > 0) {
+        String aId = ServiceBase.getApplicationId(serviceId);
+        String iId = ServiceBase.getApplicationInstanceId(serviceId);
+        if (aId.length() > 0 && iId.length() > 0) {
+            String appId = aId + ServiceBase.APPLICATION_SEPARATOR + iId;
             cmdArgs.add(CmdLine.PARAM_PREFIX + Starter.PARAM_IIP_APP_ID + CmdLine.PARAM_VALUE_SEP + appId);
         }
     }

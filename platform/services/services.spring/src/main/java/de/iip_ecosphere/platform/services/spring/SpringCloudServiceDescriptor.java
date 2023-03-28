@@ -321,7 +321,7 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
                 cmdLine.addAll(getAdditionalArguments());
             }
             // if cmdLine becomes too long, check whether a Yaml file/stream could be a solution 
-            AppDefinition def = new AppDefinition(getId(), appProps);
+            AppDefinition def = new AppDefinition(getId().replace(ServiceBase.APPLICATION_SEPARATOR, "_"), appProps);
             result = new AppDeploymentRequest(def, res, deployProps, cmdLine);
         }
         return result;
