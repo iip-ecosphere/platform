@@ -87,6 +87,10 @@ project Devices {
         key = "PYTHON3"
     };
 
+    SystemDependency PYTHON38 = {
+        key = "PYTHON38"
+    };
+    
     SystemDependency PYTHON39 = {
         key = "PYTHON39"
     };
@@ -208,6 +212,7 @@ project Devices {
         PYTHON2;
         CONDA;
         PYTHON3;
+        PYTHON38;
         PYTHON39;
         tensorflow280;
         defaultDeviceType;

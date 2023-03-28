@@ -15,9 +15,7 @@ vilScript IIPEcospherePartDocker (Project source, Configuration config, Project 
         String vtlFile;
         String targetFile;
         Path df = "${appRoot}/../app.Dockerfile.txt";
-        String appName = a.name.toIdentifier();
         String deviceName = getContainerNameDflt(device).toIdentifier();
-        Path deviceDf = "${appRoot}/../DeviceDockerfiles/${appName}/DeviceDockerfile_${deviceName}";
 
         /*
         if (contType == ContainerType::Ecs) {
@@ -70,7 +68,6 @@ vilScript IIPEcospherePartDocker (Project source, Configuration config, Project 
                 
         vilTemplateProcessor(vtlFile, config, df, elements=elements, app=a, containerType=contType, device=device);
         df.rename(targetFile);
-        copy(df, deviceDf);
         targetFile;
     }
 
@@ -79,9 +76,7 @@ vilScript IIPEcospherePartDocker (Project source, Configuration config, Project 
         String vtlFile;
         String targetFile;
         Path df = "${appRoot}/../app.Dockerfile.txt";
-        String appName = a.name.toIdentifier();
         String deviceName = getContainerNameDflt(device).toIdentifier();
-        Path deviceDf = "${appRoot}/../DeviceDockerfiles/${appName}/DeviceDockerfile_${deviceName}";
 
         /*
         if (contType == ContainerType::Ecs) {
@@ -134,7 +129,6 @@ vilScript IIPEcospherePartDocker (Project source, Configuration config, Project 
                 
         vilTemplateProcessor(vtlFile, config, df, elements=elements, app=a, containerType=contType, device=device);
         df.rename(targetFile);
-        copy(df, deviceDf);
         targetFile;
     }
 
@@ -143,9 +137,7 @@ vilScript IIPEcospherePartDocker (Project source, Configuration config, Project 
         String vtlFile;
         String targetFile;
         Path df = "${appRoot}/../app.Dockerfile.txt";
-        String appName = a.name.toIdentifier();
         String deviceName = getContainerNameDflt(device).toIdentifier();
-        Path deviceDf = "${appRoot}/../DeviceDockerfiles/${appName}/DeviceDockerfile_${deviceName}";
 
         /*
         if (contType == ContainerType::Ecs) {
@@ -198,7 +190,6 @@ vilScript IIPEcospherePartDocker (Project source, Configuration config, Project 
                 
         vilTemplateProcessor(vtlFile, config, df, elements=elements, app=a, containerType=contType, device=device);
         df.rename(targetFile);
-        copy(df, deviceDf);
         targetFile;
     }
 
@@ -209,9 +200,7 @@ vilScript IIPEcospherePartDocker (Project source, Configuration config, Project 
         String vtlFile;
         String targetFile;
         Path df = "${target}/app.Dockerfile.txt";
-        String appName = "allApps";
         String deviceName = getContainerNameDflt(device).toIdentifier();
-        Path deviceDf = "${target}/DeviceDockerfiles/${appName}/DeviceDockerfile_${deviceName}";
 		
         if (contType == ContainerType::Ecs_Svc_AllApps) {
             df = "${target}/${deviceName}.Dockerfile.Ecs.Svc";
@@ -257,7 +246,6 @@ vilScript IIPEcospherePartDocker (Project source, Configuration config, Project 
                 
         vilTemplateProcessor(vtlFile, config, df, elements=elements, apps=applications, containerType=contType, device=device);
         df.rename(targetFile);
-        copy(df, deviceDf);
         targetFile;
     }
 
@@ -266,9 +254,7 @@ vilScript IIPEcospherePartDocker (Project source, Configuration config, Project 
         String vtlFile;
         String targetFile;
         Path df = "${target}/app.Dockerfile.txt";
-        String appName = "allApps";
         String deviceName = getContainerNameDflt(device).toIdentifier();
-        Path deviceDf = "${target}/DeviceDockerfiles/${appName}/DeviceDockerfile_${deviceName}";
 		
         if (contType == ContainerType::Ecs_Svc_AllApps) {
             df = "${target}/${deviceName}.Dockerfile.Ecs.Svc";
@@ -314,7 +300,6 @@ vilScript IIPEcospherePartDocker (Project source, Configuration config, Project 
                 
         vilTemplateProcessor(vtlFile, config, df, elements=elements, apps=applications, containerType=contType, device=device);
         df.rename(targetFile);
-        copy(df, deviceDf);
         targetFile;
     }
 
@@ -323,9 +308,7 @@ vilScript IIPEcospherePartDocker (Project source, Configuration config, Project 
         String vtlFile;
         String targetFile;
         Path df = "${target}/app.Dockerfile.txt";
-        String appName = "allApps";
         String deviceName = getContainerNameDflt(device).toIdentifier();
-        Path deviceDf = "${target}/DeviceDockerfiles/${appName}/DeviceDockerfile_${deviceName}";
 		
         if (contType == ContainerType::Ecs_Svc_AllApps) {
             df = "${target}/${deviceName}.Dockerfile.Ecs.Svc";
@@ -371,7 +354,6 @@ vilScript IIPEcospherePartDocker (Project source, Configuration config, Project 
                 
         vilTemplateProcessor(vtlFile, config, df, elements=elements, apps=applications, containerType=contType, device=device);
         df.rename(targetFile);
-        copy(df, deviceDf);
         targetFile;
     }
 
@@ -381,16 +363,13 @@ vilScript IIPEcospherePartDocker (Project source, Configuration config, Project 
         String vtlFile;
         String targetFile;
         Path df = "${target}/platform.Dockerfile.txt";
-        String appName = "platform";
-        String deviceName = "platform";
-        Path deviceDf = "${target}/DeviceDockerfiles/${appName}/DeviceDockerfile_${deviceName}";
+        String deviceName = getContainerNameDflt(device).toIdentifier();
 
         vtlFile = "DockerfilePlatform";
         targetFile = "Dockerfile";   
 
         vilTemplateProcessor(vtlFile, config, df);
         df.rename(targetFile);
-        copy(df, deviceDf);
         targetFile;
     }
 

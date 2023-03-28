@@ -17,40 +17,47 @@ template Dockerfile_Python(IIPEcosphere config, FileArtifact target, sequenceOf(
             installBeforePip(d, tmp);
         }
         sequenceOf(PythonService) services = elements -> collect(e|e.impl) -> selectByType(PythonService);
-        
+
+        Integer IsPythonInstalled = 0;
+        String pythonPipInstalled = "";
         for (PythonService pyService : services) {
             setOf(Dependency) deps = pyService.dependencies;
-            setOf(Dependency) pythonDeps = pyService.dependencies -> selectByType(PythonDependency);
+
             for (Dependency s : deps) {
                 if (genDependency(s) == 'PYTHON2') {
-                    'FROM python:2.7.10 '
+                    if (IsPythonInstalled == 0) {
+                        'FROM python:2.7.10 '
+                        IsPythonInstalled = 1;
+                        pythonPipInstalled = 'RUN python2 -m pip install -r requirements.txt';
+                    }
                     for (String s: tmp) {
                         '${s}'
                     }
-                    if (pythonDeps.size() > 0) {
-                        'COPY requirements.txt requirements.txt'
-                        'RUN python2 -m pip install -r requirements.txt'
+                } else if (genDependency(s) == 'PYTHON38') {
+                    if (IsPythonInstalled == 0) {
+                        'FROM python:3.8-slim-buster'
+                        IsPythonInstalled = 1;
+                        pythonPipInstalled = 'RUN python3 -m pip install -r requirements.txt';
                     }
-                } else if (genDependency(s) == 'PYTHON3') {
-                    'FROM python:3.8-slim-buster'
                     for (String s: tmp) {
                         '${s}'
-                    }
-                    if (pythonDeps.size() > 0) {
-                        'COPY requirements.txt requirements.txt'
-                        'RUN python3 -m pip install -r requirements.txt'
                     }
                 } else if (genDependency(s) == 'PYTHON39') {
-                    'FROM python:3.9'
+                    if (IsPythonInstalled == 0) {
+                        'FROM python:3.9-slim'
+                        IsPythonInstalled = 1;
+                        pythonPipInstalled = 'RUN python3 -m pip install -r requirements.txt';
+                    }
                     for (String s: tmp) {
                         '${s}'
-                    }
-                    if (pythonDeps.size() > 0) {
-                        'COPY requirements.txt requirements.txt'
-                        'RUN python3 -m pip install -r requirements.txt'
                     }
                 } 
             }
+        }
+
+        if (IsPythonInstalled == 1) {
+            'COPY requirements.txt requirements.txt'
+            '${pythonPipInstalled}'
         }
         
         ''

@@ -51,6 +51,7 @@ Devices::JRE8 = Pre-defined system dependency for JRE8.
 Devices::CONDA = Pre-defined generic conda dependency (unspecified version).
 Devices::PYTHON2 = Pre-defined system dependency for Python 2.
 Devices::PYTHON3 = Pre-defined system dependency for Python 3.
+Devices::PYTHON38 = Pre-defined system dependency for Python 3.8.
 Devices::PYTHON39 = Pre-defined system dependency for Python 3.9.
 Devices::PythonDependency::name = Name of the required Python dependency.
 Devices::PythonDependency::version = Version of the required Python dependency.

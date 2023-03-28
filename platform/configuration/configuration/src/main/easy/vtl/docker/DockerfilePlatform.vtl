@@ -8,7 +8,7 @@ template DockerfilePlatform(IIPEcosphere config, FileArtifact target) {
 	
     def main(IIPEcosphere config, FileArtifact target) {
 
-        'FROM python:3.9'
+        'FROM python:3.9-slim'
         //'${containerSettings(config, containerType, device)}'
         'RUN apt-get update && apt-get install -y openjdk-11-jre && apt-get install -y npm'
         //'RUN apt-get install -y openjdk-11-jre'
