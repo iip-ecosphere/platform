@@ -363,7 +363,6 @@ vilScript IIPEcospherePartDocker (Project source, Configuration config, Project 
         String vtlFile;
         String targetFile;
         Path df = "${target}/platform.Dockerfile.txt";
-        String deviceName = getContainerNameDflt(device).toIdentifier();
 
         vtlFile = "DockerfilePlatform";
         targetFile = "Dockerfile";   
