@@ -423,7 +423,7 @@ public class TraceToAasService extends AbstractService {
 
     /**
      * Allows adding application-specific elements to the command submodel, e.g., operations.
-     * May not be called if {@link #setAasEnabledSupplier(Supplier) AAS enabled supplier} signals
+     * May not be called if {@link Converter#setAasEnabledSupplier(Supplier) AAS enabled supplier} signals
      * that there shall not be an AAS.
      * 
      * @param smBuilder the builder, do not call {@link SubmodelBuilder#build()} in here!
@@ -453,7 +453,7 @@ public class TraceToAasService extends AbstractService {
      * 
      * @return the AAS
      * @throws IOException if the App AAS cannot be retrieved, in particular if 
-     * {@link #setAasEnabledSupplier(Supplier) AAS enabled supplier} signals that there shall not be an AAS.
+     * {@link Converter#setAasEnabledSupplier(Supplier) AAS enabled supplier} signals that there shall not be an AAS.
      */
     protected Aas retrieveAas() throws IOException {
         return AasPartRegistry.retrieveAas(Starter.getSetup().getAas(), getAasUrn());

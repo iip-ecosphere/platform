@@ -26,6 +26,7 @@ import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.iip_ecosphere.platform.services.environment.switching.ServiceBase;
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.JarUtils;
 import de.iip_ecosphere.platform.support.NetUtils;
@@ -73,6 +74,7 @@ public class Starter {
     private static String transportHost = null;
     private static boolean transportGlobal = false;
     private static EnvironmentSetup setup;
+    private static String appId = "";
 
     /**
      * Default supplier for the local transport setup. This basic implementation is a bit heuristic
@@ -184,6 +186,39 @@ public class Starter {
                 }
             }
         }
+    }
+    
+    /**
+     * Returns the application/application instance id passed in by {@link #PARAM_IIP_APP_ID}.
+     * 
+     * @return the app/application instance id (separated by {@link ServiceBase#APPLICATION_SEPARATOR}, may be empty
+     */
+    public static String getAppId() {
+        return appId;
+    }
+
+    /**
+     * Returns the id of {@code service} taking {@link #getAppId()} into account.
+     * 
+     * @param service the service
+     * @return the service including appId if known/specified
+     */
+    public static String getServiceId(Service service) {
+        return getServiceId(service.getId());
+    }
+
+    /**
+     * Returns the completed service id {@code sId} taking {@link #getAppId()} into account.
+     * 
+     * @param sId the service id
+     * @return the service including appId if known/specified
+     */
+    public static String getServiceId(String sId) {
+        String appId = Starter.getAppId();
+        if (null != appId && appId.length() > 0) {
+            sId += ServiceBase.APPLICATION_SEPARATOR + appId;
+        }
+        return sId;
     }
 
     /**
@@ -311,6 +346,7 @@ public class Starter {
             AasPartRegistry.getSetup().getRegistry().setPort(tmpPort);
             getLogger().info("Configuring IIP registry port to {}", tmpPort);
         }
+        appId = CmdLine.getArg(args, PARAM_IIP_APP_ID, "");
         setAasNotificationMode(args, null); // keep default unless specified differently
         serviceAutostart = getBooleanArg(args, PARAM_IIP_TEST_SERVICE_AUTOSTART, serviceAutostart);
         String protocol = getArg(args, PARAM_IIP_PROTOCOL, AasFactory.DEFAULT_PROTOCOL);

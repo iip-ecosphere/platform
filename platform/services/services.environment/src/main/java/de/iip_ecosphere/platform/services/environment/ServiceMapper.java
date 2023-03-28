@@ -149,7 +149,7 @@ public class ServiceMapper {
      * @return the qualified name
      */
     public static String getQName(Service service, String elementName) {
-        return getQName(service.getId(), elementName);
+        return getQName(Starter.getServiceId(service), elementName);
     }
 
     /**
