@@ -10,6 +10,7 @@
   margin: 0.5em;
   width: 400px;
   //max-width: 1000px;
+  //background-color: rgb(203, 203, 203);
 }
 
 #box {
@@ -28,4 +29,8 @@
 .bottom {
   display: flex;
   justify-content: center;
+}
+
+.device {
+  background-color: rgb(203, 203, 203);
 }

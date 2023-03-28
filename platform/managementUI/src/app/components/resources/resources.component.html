@@ -4,23 +4,28 @@
   <div  class="container">
     <div *ngFor="let element of Data.submodelElements" class="element">
       <div *ngIf="element.idShort != 'deviceRegistry' && element.idShort != 'deviceManager' && element.idShort != 'containers'">
-        <mat-card tabindex="0" >
+        <mat-card tabindex="0" class="device" >
           <mat-card-content>
             <div id="box">
               <div>
                 <h1>{{ element.idShort }}</h1>
-                <p *ngIf="element.generalInformation && element.generalInformation.ManufacturerName; else noName">{{element.generalInformation.ManufacturerName}}</p>
+                <p *ngIf="element.generalInformation && element.generalInformation.ManufacturerName; else noName">
+                  {{element.generalInformation.ManufacturerName}}</p>
                 <ng-template #noName>Unknown Manufacturer</ng-template>
               </div>
               <div>
-                <img *ngIf="!element.generalInformation?.picture; else pictureAvailable" src="../../../assets/deviceDefault.jpg" [alt]="element.idShort" width="150px" height="200px">
+                <img *ngIf="!element.generalInformation?.picture; else pictureAvailable" src="../../../assets/deviceDefault.jpg"
+                  [alt]="element.idShort" width="150px" height="150px">
                 <ng-template #pictureAvailable>
-                  <img [src]="'data:image/jpg;base64,' + element.generalInformation?.picture" [alt]="element.idShort" width="150px" height="200px">
+                  <img [src]="'data:image/jpg;base64,' + element.generalInformation?.picture"
+                  [alt]="element.idShort" width="150px" height="150px">
                 </ng-template>
               </div>
             </div>
             <div class="bottom">
-              <button mat-raised-button class="button" (click)="details(element.value)">Details for {{ element.idShort }}</button>
+              <button mat-raised-button class="button" (click)="details(element.value)">
+                resource details
+              </button>
             </div>
           </mat-card-content>
         </mat-card>
