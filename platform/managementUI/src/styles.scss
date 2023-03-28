@@ -23,30 +23,37 @@ tr:nth-child(odd) {
 
 // --- resource detail ----
 .gray-element {
-  background-color: rgb(173, 171, 172);
-  //color: black;
+  //background-color: rgb(173, 171, 172);
+  background-color: rgb(230, 230, 230);
+  color: rgb(58, 55, 57);
 }
 
 // tooltip
 .visible {
   height: 3em;
   width: 8em;
-  //color: rgb(35, 142, 184);
   //color: rgb(48, 196, 255);
-  color: black;
+  //color: black;
+  //color: rgb(35, 142, 184);
+  //color: rgb(0,102,160);
+  //color: rgb(13,118,216);
+  color: rgb(0, 94, 182);
+  //font-weight: bold;
+  font-weight: 500;
 }
 
 .semanticName {
   //color: gray;
   //color: rgb(203, 203, 203);
-  color: rgb(97, 95, 96);
-  //color: rgb(125, 214, 255);
+  //color: rgb(97, 95, 96);
+  color: rgb(173, 171, 172);
 }
 
 .shortId {
-  color: white;
+  //color: white;
+  color: rgb(58, 55, 57);
   font-size: 16px;
-  line-height: 1.4;
+  line-height: 1.6;
 }
 /*
 .bullets {

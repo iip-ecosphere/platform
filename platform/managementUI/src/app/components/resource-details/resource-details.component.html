@@ -1,13 +1,22 @@
   <div>
-    <h1 *ngIf="resource && resource.idShort">Detail View of {{ resource.idShort }}</h1>
+    <br>
+    <!-- <h1 *ngIf="resource && resource.idShort">Detail View of {{ resource.idShort }}</h1> -->
+    <div *ngIf="resource && resource.idShort" style="font-size: 23px; margin-left: 10px;">
+      Resource Details
+    </div>
+    <div *ngIf="resource && resource.idShort" style="font-size: 16px; margin-left: 20px; margin-top: 3px;">
+      {{ resource.idShort }}
+    </div><br>
+
     <div>
       <div>
         <mat-card class="gray-element">
-          <h1>
+          <!--
+            <h1>
             Resource Attributes
           </h1>
 
-
+          -->
             <div *ngIf="resource">
               <div *ngFor="let element of resource.value">
                 <div *ngIf="!element.invokable">
