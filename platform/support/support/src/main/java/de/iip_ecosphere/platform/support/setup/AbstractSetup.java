@@ -15,6 +15,7 @@ package de.iip_ecosphere.platform.support.setup;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Iterator;
 
 import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
@@ -107,7 +108,13 @@ public abstract class AbstractSetup {
         C result = null;
         if (in != null) {
             try {
-                result = createYaml(cls).load(in);
+                Iterator<Object> it = createYaml(cls).loadAll(in).iterator();
+                if (it.hasNext()) {
+                    Object o = it.next(); // ignore the other sub-documents here
+                    if (cls.isInstance(o)) {
+                        result = cls.cast(o);
+                    }
+                }
                 in.close();
             } catch (YAMLException e) {
                 in.close();
