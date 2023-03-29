@@ -65,7 +65,7 @@ public class SpringAsyncServiceBase {
     }
 
     /**
-     * Creates a reception callback.
+     * Creates a reception callback. [public for testing]
      * 
      * @param <T> the type of data handled by the callback
      * @param channel the channel to listen to
@@ -76,7 +76,7 @@ public class SpringAsyncServiceBase {
      *     transport instances
      * @return the callback or <b>null</b> if the callback cannot be created/registered with {@link Transport}
      */
-    protected <T> ReceptionCallback<T> createReceptionCallback(String channel, Consumer<T> consumer, Class<T> cls, 
+    public <T> ReceptionCallback<T> createReceptionCallback(String channel, Consumer<T> consumer, Class<T> cls, 
         String routingKey) {
         ReceptionCallback<T> result = null;
         Starter.getSetup();
@@ -186,7 +186,7 @@ public class SpringAsyncServiceBase {
     public static String getAppInstIdSuffix(Service service, String separator) {
         String result;
         if (null != service) {
-            String sId = service.getId();
+            String sId = Starter.getServiceId(service);
             result = ServiceBase.getApplicationInstanceId(sId);
             if (null == result || result.length() == 0) {
                 result = "";
