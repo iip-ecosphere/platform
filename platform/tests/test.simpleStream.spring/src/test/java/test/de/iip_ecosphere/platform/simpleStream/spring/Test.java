@@ -22,6 +22,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,11 +34,14 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 import de.iip_ecosphere.platform.services.environment.Service;
 import de.iip_ecosphere.platform.services.environment.YamlArtifact;
+import de.iip_ecosphere.platform.services.environment.spring.SpringAsyncServiceBase;
 import de.iip_ecosphere.platform.services.environment.spring.Starter;
 import de.iip_ecosphere.platform.services.environment.YamlService;
 
 import de.iip_ecosphere.platform.services.environment.spring.metricsProvider.MetricsProvider;
+import de.iip_ecosphere.platform.services.environment.switching.ServiceBase;
 import de.iip_ecosphere.platform.support.setup.CmdLine;
+import de.iip_ecosphere.platform.transport.Transport;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Timer;
 
@@ -80,6 +84,8 @@ public class Test extends Starter {
     private Counter createSent;
     private Counter createReceived;
     private Timer createTime;
+    private SpringAsyncServiceBase base = new SpringAsyncServiceBase();
+    private String appInstId = "";
     
     /**
      * Creates an instance.
@@ -89,6 +95,25 @@ public class Test extends Starter {
     @Autowired
     public Test(Environment environment) {
         super(environment);
+        appInstId = getAppInstIdSuffix("_");
+    }
+    
+    /**
+     * Composes a channel suffix id for a service possibly including the application instance id.
+     * 
+     * @param separator the separator string to insert between the ids
+     * @return the id suffix, may be empty
+     */
+    public static String getAppInstIdSuffix(String separator) {
+        String result;
+        String sId = Starter.getServiceId("create"); // we just need application instance id
+        result = ServiceBase.getApplicationInstanceId(sId);
+        if (null == result || result.length() == 0) {
+            result = "";
+        } else {
+            result = separator + result;
+        }
+        return result;
     }
     
     /**
@@ -123,6 +148,7 @@ public class Test extends Starter {
                     ingestCount++;
                 }
                 createSent.increment();
+                ingest(String.valueOf(num)); // also do async
                 return String.valueOf(num);
             });
         };
@@ -157,6 +183,29 @@ public class Test extends Starter {
             });
         };
     }
+
+    /**
+     * Simplified logging reception for async calls. Non-spring, no metrics.
+     * 
+     * @return the data receiver
+     */
+    private Consumer<String> logAsync() {
+        return data -> {
+            logReceived.increment();
+            logTime.record(() -> {
+                String content = "Received-Async: " + data + "\n";
+                if (config.isDebug()) {
+                    System.out.println("Received-Async: " + data);
+                }
+                try {
+                    Files.write(Paths.get(fileName), content.getBytes(), 
+                        StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+                } catch (IOException e) {
+                    System.out.println("Error writing log: " + e.getMessage());
+                }
+            });
+        };
+    }
     
     /**
      * Called after constructor.
@@ -172,6 +221,24 @@ public class Test extends Starter {
         createSent = metrics.createServiceSentCounter(createId, createId, app, null);
         createReceived = metrics.createServiceReceivedCounter(createId, createId, app, null);
         createTime = metrics.createServiceProcessingTimer(createId, createId, app, null);
+        base.createReceptionCallback("data_logAsync" + appInstId, logAsync(), String.class, "log-in-0");
+    }
+    
+    /**
+     * Called during shutdown.
+     */
+    @PreDestroy
+    public void destroy() {
+        base.detach();
+    }
+
+    /**
+     * Asynchronously ingests data.
+     * 
+     * @param data the data to ingest
+     */
+    private void ingest(Object data) {
+        Transport.send(c -> c.asyncSend("data_logAsync" + appInstId, data), "SimpleSource", "log-in-0"); 
     }
 
     @Override
