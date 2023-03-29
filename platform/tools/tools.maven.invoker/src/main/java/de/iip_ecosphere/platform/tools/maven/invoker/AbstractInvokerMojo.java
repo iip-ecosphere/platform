@@ -100,6 +100,9 @@ public class AbstractInvokerMojo extends AbstractMojo {
     @Parameter(property = "unpack.force", required = false, defaultValue = "false") 
     private boolean unpackForce;
     
+    @Parameter(defaultValue = "false") 
+    private boolean disableJava;
+    
     @Component
     private Invoker invoker;
     
@@ -135,6 +138,12 @@ public class AbstractInvokerMojo extends AbstractMojo {
         }
         if (unpackForce && !sysProperties.containsKey("unpack.force")) {
             sysProperties.put("unpack.force", "true");
+        }
+        if (disableJava) {
+            sysProperties.put("maven.main.skip", "true");
+            sysProperties.put("maven.test.skip", "true");
+            sysProperties.put("skipTests", "true");
+            sysProperties.put("maven.javadoc.skip", "true");
         }
         request.setProperties(sysProperties);
         File pomFile = pom;
