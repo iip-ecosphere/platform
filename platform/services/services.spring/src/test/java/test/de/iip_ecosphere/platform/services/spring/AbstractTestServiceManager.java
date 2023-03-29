@@ -3,6 +3,7 @@ package test.de.iip_ecosphere.platform.services.spring;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -54,6 +55,7 @@ import de.iip_ecosphere.platform.support.iip_aas.config.CmdLine;
 import de.iip_ecosphere.platform.support.net.ManagedServerAddress;
 import de.iip_ecosphere.platform.support.net.NetworkManager;
 import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
+import de.iip_ecosphere.platform.transport.Transport;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.Meter;
@@ -109,6 +111,7 @@ public class AbstractTestServiceManager {
         setup.setPort(broker.getPort());
         setup.setHost("localhost");
         setup.setAuthenticationKey("amqp"); // -> identityStore.yml
+        Transport.setTransportSetup(() -> setup);
         server.start();
         System.out.println("AMQP broker on port " + broker.getPort());
         
@@ -303,6 +306,13 @@ public class AbstractTestServiceManager {
         File f = new File(FileUtils.getTempDirectoryPath() + "/test.simpleStream.spring.log");
         Assert.assertTrue("Receiver log does not exist", f.exists());
         Assert.assertTrue("Receiver log is empty", f.length() > 0);
+        try {
+            String str = FileUtils.readFileToString(f, Charset.defaultCharset());
+            Assert.assertTrue(str.contains("Received:"));
+            Assert.assertTrue(str.contains("Received-Async:"));
+        } catch (IOException e) {
+            Assert.fail("While reading receiver log: " + e.getMessage());
+        }
     }
     
     /**

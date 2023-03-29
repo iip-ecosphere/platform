@@ -208,8 +208,12 @@ public class SpringCloudServiceManager
      * @see #determineFunctionalConnections(ServiceManager, String...)
      */
     private String determineCloudFunctionArg(String... serviceIds) {
+        String[] sIds = new String[serviceIds.length];
+        for (int s = 0; s < sIds.length; s++) {
+            sIds[s] = ServiceBase.getServiceId(serviceIds[s]); // this part is static and independent of app id
+        }
         return CmdLine.PARAM_PREFIX + Starter.OPT_SPRING_FUNCTION_DEF + CmdLine.PARAM_VALUE_SEP 
-            + SpringCloudServiceDescriptor.toFunctionDefinition(determineFunctionalConnections(this, serviceIds));
+            + SpringCloudServiceDescriptor.toFunctionDefinition(determineFunctionalConnections(this, sIds));
     }
     
     /**
@@ -237,7 +241,8 @@ public class SpringCloudServiceManager
 
         if (activeServices.size() != allServices.size()) {
             for (String id: allServices) {
-                result.add(CmdLine.PARAM_PREFIX + OPT_SERVICE_PREFIX + id 
+                String sId = ServiceBase.getServiceId(id); // annotation declaration in code is static
+                result.add(CmdLine.PARAM_PREFIX + OPT_SERVICE_PREFIX + sId 
                     + CmdLine.PARAM_VALUE_SEP + activeServices.contains(id));
             }
         }
