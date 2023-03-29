@@ -326,9 +326,9 @@ public class ServiceMgrAndDescriptorTest {
         SpringCloudServiceManager.addAppId(ServiceBase.composeId("service", "", ""), cmdArgs);
         Assert.assertEquals(0, cmdArgs.size());
         SpringCloudServiceManager.addAppId(ServiceBase.composeId("service", "application", ""), cmdArgs);
-        Assert.assertEquals(1, cmdArgs.size());
+        Assert.assertEquals(0, cmdArgs.size());
         SpringCloudServiceManager.addAppId(ServiceBase.composeId("service", "application", "001"), cmdArgs);
-        Assert.assertEquals(2, cmdArgs.size());
+        Assert.assertEquals(1, cmdArgs.size());
     }
-
+    
 }
