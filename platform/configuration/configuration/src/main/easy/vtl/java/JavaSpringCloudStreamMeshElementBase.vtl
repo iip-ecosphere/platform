@@ -176,15 +176,17 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
     }
 
     def registerService(MeshElement elt, ServiceBase service) {
-        'String iId;'
+        'String iId;
+        String sId;'
         for (String s: serviceVars) {
-            'iId = ServiceBase.getApplicationInstanceId(${s}.getId());
+            'sId = Starter.getServiceId(${s}); // ${s}.getId() is "static"
+            iId = ServiceBase.getApplicationInstanceId(sId);
             if (iId == null || iId.length() == 0) {
                 iId = "dflt";
             }'
-            'serviceSent = metrics.createServiceSentCounter("${elt.impl.id}", "${app.id}", ${s}.getId(), iId);'
-            'serviceReceived = metrics.createServiceReceivedCounter("${elt.impl.id}", "${app.id}", ${s}.getId(), iId);'
-            'processingTime = metrics.createServiceProcessingTimer("${elt.impl.id}", "${app.id}", ${s}.getId(), iId);'
+            'serviceSent = metrics.createServiceSentCounter("${elt.impl.id}", sId, "${app.id}", iId);'
+            'serviceReceived = metrics.createServiceReceivedCounter("${elt.impl.id}", sId, "${app.id}", iId);'
+            'processingTime = metrics.createServiceProcessingTimer("${elt.impl.id}", sId, "${app.id}", iId);'
             '${attachMetricsProvider("${s}")}'
             '${genMapService("${s}")}'
         }

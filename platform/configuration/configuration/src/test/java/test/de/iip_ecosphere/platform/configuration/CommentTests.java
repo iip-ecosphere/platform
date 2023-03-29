@@ -86,7 +86,8 @@ public class CommentTests {
         setup.getEasyProducer().reset();
         System.out.println("metaVars: " + stat.getMetaVars() + ", metaVars (commented): " 
             + stat.getMetaVarsWithComment() + ", used vars: " + stat.noOfVariables() 
-            + ", constraints: " + stat.noOfConstraintInstances());
+            + ", top-level vars: " + stat.noOfToplevelVariables()
+            + ", constraints: " + stat.noOfConstraintVariables());
         for (String s: missing) {
             System.out.println(s);
         }
