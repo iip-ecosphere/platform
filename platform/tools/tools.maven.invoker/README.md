@@ -25,6 +25,12 @@ The following example demonstrates the application of this plugin. We declare tw
          <activation>
             <activeByDefault>true</activeByDefault>
          </activation>
+         <properties>
+            <maven.main.skip>true</maven.main.skip>
+            <maven.test.skip>true</maven.test.skip>
+            <python-compile.skip>true</python-compile.skip>
+            <maven.javadoc.skip>true</maven.javadoc.skip>
+         </properties>       
 
           <build>
               <plugins>
