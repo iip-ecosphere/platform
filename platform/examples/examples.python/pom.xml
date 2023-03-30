@@ -336,8 +336,9 @@
         <properties>
             <maven.main.skip>true</maven.main.skip>
             <maven.test.skip>true</maven.test.skip>
+            <python-compile.skip>true</python-compile.skip>
             <maven.javadoc.skip>true</maven.javadoc.skip>
-        </properties>        
+        </properties>       
 
           <build>
               <plugins>
@@ -358,6 +359,7 @@
                                 <invokeGoals>
                                     <invokeGoal>process-sources</invokeGoal>
                                 </invokeGoals>
+                                <disableBuild>true</disableBuild>
                             </configuration>
                         </execution>
                         <execution>
@@ -392,6 +394,7 @@
                                 <invokeGoals>
                                     <invokeGoal>package</invokeGoal>
                                 </invokeGoals>
+                                <disableBuild>true</disableBuild>
                             </configuration>
                         </execution>
                     </executions>
