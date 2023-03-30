@@ -15,10 +15,15 @@ tr:nth-child(odd) {
   background-color: rgb(230, 230, 230);
 }
 
+.cell-with-button {
+  vertical-align: top;
+}
+
 .subtext {
   color: rgb(97, 95, 96);
   font-size: 12px;
-  margin: 5px;
+  //margin: 5px;
+  margin-left: 5px;
 }
 
 // --- resource detail ----

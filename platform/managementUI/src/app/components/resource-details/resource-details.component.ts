@@ -43,6 +43,7 @@ export class ResourceDetailsComponent implements OnInit {
     console.log(this.resource)
   }
 
+
   //currently not used
   // public async getServices() {
   //   let Data = await this.api.getServices();

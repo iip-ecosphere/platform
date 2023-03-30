@@ -2,7 +2,7 @@
 
 <mat-tab-group animationDuration="0ms" mat-stretch-tabs>
   <!-- Tab menu -->
-  <div *ngFor="let tab of filterParam">
+  <div *ngFor="let tab of tabsParam">
     <mat-tab label="{{tab.tabName}}">
       <ng-template mat-tab-label >
         <span (click)="loadData(tab.metaProject, tab.type)" class="custom-label">
@@ -10,34 +10,77 @@
         </span>
       </ng-template>
 
+
+      <div *ngIf="tab.tabName == 'Meshes'">
+        <button mat-raised-button style="background-color: rgb(35, 142, 184)"
+          (click)="createMesh()" disabled>
+          new mesh
+        </button>
+      </div>
+
       <!-- Table -->
       <table style="margin: 0px;">
         <tr *ngFor="let item of filteredData">
+
+
+
+          <!-- Icons -->
+          <td  *ngIf="tab.tabName == 'Services'">
+            <div>
+              <img src="../../../assets/java_350.png" width="50px" height="50px">
+            </div>
+
+
+          </td>
+
+          <!-- Item -->
           <td style="width: 100%;">
             {{item.idShort}}
+            <div *ngFor="let property of item.value" class="subtext" >
+              <div *ngIf="property.value">
+                {{property.value}}
+              </div>
+            </div>
+
+            <!--  {{getName(item, item.value, "")}} -->
+
+            <!--
+            <div *ngFor="let property of item.value" class="subtext">
+              <p *ngIf="displayAttribute(property.idShort, tab.tabName)"> {{property.idShort}}:
+                <span *ngIf="property.value">{{property.value}}</span>
+              </p>
+            </div>
+            -->
+
+              <!--
+              <p> {{property.idShort}}:
+                <span *ngIf="property.value[0].value">{{property.value[0].value}}</span>
+              </p>
+
+              -->
           </td>
 
           <!-- Buttons -->
-          <td  *ngIf="tab.tabName == 'Applications'">
+          <td  *ngIf="tab.tabName == 'Applications'" class="cell-with-button">
             <button
               mat-raised-button style="background-color: rgb(35, 142, 184)"
               (click)="createMesh()" disabled>generate interfaces
             </button>
           </td>
-          <td  *ngIf="tab.tabName == 'Applications'">
+          <td  *ngIf="tab.tabName == 'Applications'" class="cell-with-button">
             <button
               mat-raised-button style="background-color: rgb(35, 142, 184)"
               (click)="createMesh()" disabled>generate template
             </button>
           </td>
-          <td  *ngIf="tab.tabName == 'Applications'">
+          <td  *ngIf="tab.tabName == 'Applications'" class="cell-with-button">
             <button
               mat-raised-button style="background-color: rgb(35, 142, 184)"
               (click)="createMesh()" disabled>integrate application
             </button>
           </td>
 
-          <td>
+          <td class="cell-with-button">
             <div *ngIf="tab.tabName == 'Meshes'; else elseNotDone">
               <button
                 mat-raised-button style="background-color: rgb(35, 142, 184)"
@@ -52,10 +95,12 @@
             </ng-template>
           </td>
 
-          <td>
+          <td class="cell-with-button">
             <button
               mat-raised-button style="background-color: rgb(97, 95, 96)"
-              (click)="del(item)" disabled>delete</button>
+              (click)="del(item)" disabled>
+              delete
+            </button>
           </td>
 
         </tr>
