@@ -102,7 +102,13 @@ public class AbstractInvokerMojo extends AbstractMojo {
     
     @Parameter(defaultValue = "false") 
     private boolean disableJava;
-    
+
+    @Parameter(defaultValue = "false") 
+    private boolean disablePython;
+
+    @Parameter(defaultValue = "false") 
+    private boolean disableBuild;
+
     @Component
     private Invoker invoker;
     
@@ -139,11 +145,15 @@ public class AbstractInvokerMojo extends AbstractMojo {
         if (unpackForce && !sysProperties.containsKey("unpack.force")) {
             sysProperties.put("unpack.force", "true");
         }
-        if (disableJava) {
+        if (disableJava || disableBuild) {
             sysProperties.put("maven.main.skip", "true");
             sysProperties.put("maven.test.skip", "true");
-            sysProperties.put("skipTests", "true");
+            sysProperties.put("skipTests", "true"); // maven.test.skip might be sufficient
             sysProperties.put("maven.javadoc.skip", "true");
+        }
+        if (disablePython || disableBuild) {
+            sysProperties.put("python-compile.skip", "true");
+            sysProperties.put("python-test.skip", "true");
         }
         request.setProperties(sysProperties);
         File pomFile = pom;

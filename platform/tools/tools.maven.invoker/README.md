@@ -59,6 +59,8 @@ The plugin supports the following configuration settings:
   - `invokeGoals` the mandatory goals to be invoked, each stated in an own element `invokeGoal`
   - `invokeProfiles` optional profiles to be invoked, each stated in an own element `invokeProfile` (default: not given)
   - `disableJava` sets system properties to disable Java compilation, Java test compilation, test execution and javadoc generation. Helpful shortcut for executing generation profiles.
+  - `disablePython` sets system properties to disable IIP-Ecosphere Python "compilation" and testing.
+  - `disableBuild` is a shortcut for `disableJava` and `disablePython`.
   - `systemProperties` properties to be set for the Maven POM to be called, given in terms of `key` and `value` entries (default: not given)
   - `pom` the POM file to execute (default: not given, i.e., the actual POM)
   - `offline` run the called POM in offline mode (default `false`)
