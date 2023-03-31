@@ -19,6 +19,7 @@ export class ListComponent implements OnInit {
   tab: string | null = null;
   data: any;
   filteredData: any;
+  varValue = "varValue"
   //displayAttributes = ["varValue"]
   //attrServices = ["name"]
   //helper = 1;
@@ -54,14 +55,14 @@ export class ListComponent implements OnInit {
   params = [
     ["ver", "Version: ", ""],
     ["name", "", ""],
-    ["kind", "", ""],
+    //["kind", "", ""],
     ["host", "Host: ", ""],
     ["globalHost", "Global host: ", ""],
     ["port", "Port: ", ""],
     ["description", "", ""],
    // ["running", "Running: ", ""],
     ["schema", "Schema: ", ""],
-    ["waitingTime", "Waiting time: ", ""],
+    ["waitingTime", "Waiting time: ", " sec"],
     ["type", "Type: ", ""]
   ]
 
@@ -80,9 +81,6 @@ export class ListComponent implements OnInit {
       this.prefilter(metaProject)
     }
 
-
-    // TODO adjust the names of case so they come from
-    // one global variable
     switch(this.tab) {
       case "TechnicalSetup":
       //case this.tab:
@@ -142,16 +140,13 @@ export class ListComponent implements OnInit {
     this.filteredData = result;
   }
 
-
-
   public filterSetup() {
     let result = []
 
     for (let tableRow of this.filteredData) {
       let temp = []
       let rowValues = tableRow.value[0].value
-
-      // STRING
+      // string
       if((typeof rowValues) == "string") {
 
         for (let rowValues of tableRow.value) {
@@ -160,12 +155,12 @@ export class ListComponent implements OnInit {
             temp.push(new_rowValue)
           }
         }
-      // NUMBER
+      // number
       } else if((typeof rowValues) == "number") {
         // AAS  startup timeout
         let new_rowValue = {"value": rowValues + " sec"} // TODO is it true?
         temp.push(new_rowValue)
-      // OBJECT
+      // object
       } else {
         for (let rowValues of tableRow.value) {
           for (let param of this.params) {
@@ -182,8 +177,6 @@ export class ListComponent implements OnInit {
     this.filteredData = result
   }
 
-
-  // wo values
   public filterTypes() {
     let result = []
     for (let tableRow of this.filteredData) {
@@ -211,8 +204,6 @@ export class ListComponent implements OnInit {
   }
 
   public filterMeshes() {
-    //console.log(this.filteredData)
-
     let result = []
     for (let tableRow of this.filteredData) {
       let temp = []
@@ -228,8 +219,6 @@ export class ListComponent implements OnInit {
       result.push(new_value)
 
     }
-    //console.log("RESULT")
-    //console.log(result)
     this.filteredData = result
   }
 
@@ -262,14 +251,12 @@ export class ListComponent implements OnInit {
         if (rowValues.idShort == "id") {
           name = rowValues.value[0].value
         }
-
         for (let param of this.params) {
           if (rowValues.idShort == param[0]) {
             let new_rowValue = this.getValue(rowValues, param)
             temp.push(new_rowValue)
           }
         }
-
       }
       let new_value = {idShort: name, value: temp}
       result.push(new_value)
@@ -278,70 +265,10 @@ export class ListComponent implements OnInit {
   }
 
   private getValue(rowVal: any, param:any) {
-    return { "value":  param[1] + rowVal.value[0].value + param[2]}
+    let value = rowVal.value.find(
+      (elemt: { idShort: string; }) => elemt.idShort === this.varValue).value
+    return { "value":  param[1] + value + param[2]}
   }
-
-
-  /*
-  public filterServers() {
-
-    let result = []
-    for (let tableRow of this.filteredData) {
-      let temp = []
-      let name
-      for (let rowValues of tableRow.value) {
-        for (let param of this.params) {
-          if (rowValues.idShort == param[0]) {
-            let new_rowValue = this.getValue(rowValues, param)
-            temp.push(new_rowValue)
-          }
-        }
-
-        // id as name of the row
-        if (rowValues.idShort == "id") {
-          name = rowValues.value[0].value
-        }
-      }
-      let new_value = {idShort: name, value: temp}
-      result.push(new_value)
-
-    }
-    this.filteredData = result
-  }
-  */
-
-
-  /*
-  public filterApps() {
-    //console.log(this.filteredData)
-
-    let result = []
-    for (let tableRow of this.filteredData) {
-      let temp = []
-      let name
-      for (let rowValues of tableRow.value) {
-
-        for (let param of this.params) {
-          if (rowValues.idShort == param[0]) {
-            let new_rowValue = this.getValue(rowValues, param)
-            temp.push(new_rowValue)
-          }
-        }
-
-        // id as name of the row
-        if (rowValues.idShort == "id") {
-          name = rowValues.value[0].value
-        }
-      }
-      let new_value = {idShort: name, value: temp}
-      result.push(new_value)
-
-    }
-    //console.log("RESULT")
-    //console.log(result)
-    this.filteredData = result
-  }
-  */
 
   // ---- buttons -----
 
