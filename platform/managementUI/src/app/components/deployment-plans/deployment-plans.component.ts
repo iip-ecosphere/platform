@@ -22,15 +22,11 @@ export class DeploymentPlansComponent implements OnInit {
 
   async ngOnInit() {
     await this.getArtifacts();
-    console.log("dp")
-    console.log(this.deploymentPlans)
   }
-
-
 
   public async getArtifacts() {
     const response = await this.api.getArtifacts();
-    console.log(response);
+    //console.log(response);
     if(response.submodelElements) {
       this.deploymentPlans = response.submodelElements.find(item => item.idShort === "DeploymentPlans");
       this.deployPlanInput = response.submodelElements.find(item => item.idShort === "deployPlan")?.inputVariables;
@@ -97,7 +93,6 @@ export class DeploymentPlansComponent implements OnInit {
   public getDescription(plan: any) {
     let desc = plan.value.find(
       (item: { idShort: string; }) => item.idShort === "description").value
-    console.log(desc)
     return desc
   }
 

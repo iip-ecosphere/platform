@@ -43,7 +43,6 @@ export class ResourceDetailsComponent implements OnInit {
     console.log(this.resource)
   }
 
-
   //currently not used
   // public async getServices() {
   //   let Data = await this.api.getServices();
@@ -72,6 +71,53 @@ export class ResourceDetailsComponent implements OnInit {
   //   }
   // }
 
+  // col 0: attribute name from AAS
+  // col 1: name displayed in UI
+  // col 2: category of the attribute in UI
+  attributeNames = [
+    ["Storage_Free", "Free", "Storage"],
+    ["Storage_Capacity", "Capacity", "Storage"],
+    ["Storage_Usable", "Usable", "Storage"],
+    ["Allocated_Storage", "Allocated", "Storage"],
+    ["Memory_Free", "Free", "Memory"],
+    ["Memory_Capacity", "Capacity", "Memory"],
+    ["Allocated_Memory", "Allocated", "Memory"],
+    ["Memory_Used", "Used", "Memory"],
+    ["CPU_Temperature", "CPU", "Temperature"],
+    ["Case_Temperature", "Case", "Temperature"],
+    ["containerSystemName", "Name", "Container System"],
+    ["OS", "OS", "Device"],
+    ["CPU_Architecture", "CPU Architecture", "Device"],
+    ["CPU_Capacity", "CPU Capacity", "Device"],
+    ["runtimeName", "Name", "Runtime"],
+    ["runtimeVersion", "Version", "Runtime"],
+    ["deviceAas", "Device AAS", "Device"],
+    ["containerSystemVersion", "Version", "Container System"],
+    ["managedId", "Managed ID", "Device"],
+    ["ip", "IP", "Device"]
+  ]
+  categories = ["Storage", "Memory", "Container System", "Device", "Runtime", "Temperature"]
+
+  // index: 1 - attribute name
+  //        2 - attribute category (e.g. storage, memory)
+  public getAttributeInfo(element: any, col: number) {
+    let row = this.attributeNames.find(item => item[0] == element)
+    if(row != undefined) {
+      return row[col]
+    } else {
+      return null
+    }
+  }
+
+  public isNonEmptyString(value: any) {
+    let result = false
+    if (typeof value == "string" && value.length > 0) {
+      result = true
+    }
+    return result
+  }
+
+  // ---------- Semantic Id -------------------------
   public async resolveSemanticId() {
     await this.setInputValues();
 
@@ -88,7 +134,6 @@ export class ResourceDetailsComponent implements OnInit {
       resolvedInfo.push(this.getSemanticInfo(response))
       i++;
     }
-
     let j = 0;
     for(const value of resolvedInfo) {
       if(value[0]=="byte") {
