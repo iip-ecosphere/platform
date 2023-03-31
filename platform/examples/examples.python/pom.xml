@@ -266,64 +266,6 @@
 	                <outputDirectory>gen/py</outputDirectory>
 	            </configuration>
 	        </plugin>
-             <plugin>
-               <groupId>org.codehaus.mojo</groupId>
-               <artifactId>exec-maven-plugin</artifactId>
-               <version>3.0.0</version>
-      		   <executions>
-                    <execution>
-                       <id>generateBroker</id>
-                       <configuration>
-                           <mainClass>de.iip_ecosphere.platform.configuration.PlatformInstantiator</mainClass>
-                           <cleanupDaemonThreads>false</cleanupDaemonThreads>
-                           <arguments>
-                               <argument>${iip.model}</argument>
-                               <argument>src/test/easy</argument>
-                               <argument>gen/broker</argument>
-                               <argument>generateBroker</argument>
-                           </arguments>
-                       </configuration>
-                    </execution>
-                    <execution>
-                       <id>generateAppsNoDeps</id>
-                       <configuration>
-                           <mainClass>de.iip_ecosphere.platform.configuration.PlatformInstantiator</mainClass>
-                           <cleanupDaemonThreads>false</cleanupDaemonThreads>
-                           <arguments>
-                               <argument>${iip.model}</argument>
-                               <argument>src/test/easy</argument>
-                               <argument>gen/py</argument>
-                               <argument>generateAppsNoDeps</argument>
-                           </arguments>
-                           <systemProperties>
-                              <systemProperty>
-                                <key>iip.resources</key>
-                                <value>${project.basedir}/${iip.resources}</value>
-                              </systemProperty>
-                           </systemProperties>
-                       </configuration>
-                    </execution>
-                    <execution>
-                       <id>generateApps</id>
-                       <configuration>
-                           <mainClass>de.iip_ecosphere.platform.configuration.PlatformInstantiator</mainClass>
-                           <cleanupDaemonThreads>false</cleanupDaemonThreads>
-                           <arguments>
-                               <argument>${iip.model}</argument>
-                               <argument>src/test/easy</argument>
-                               <argument>gen/py</argument>
-                               <argument>generateApps</argument>
-                           </arguments>
-                           <systemProperties>
-                              <systemProperty>
-                                <key>iip.resources</key>
-                                <value>${project.basedir}/${iip.resources}</value>
-                              </systemProperty>
-                           </systemProperties>
-                       </configuration>
-                    </execution>
-      		 </executions>
-             </plugin>
           </plugins>
         </build> 
      </profile>

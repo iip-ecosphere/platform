@@ -6,7 +6,6 @@ rm -rf gen
 
 #build with broker
 
-#mvn -U generate-sources
 mvn -U install
 
 #execute and test
