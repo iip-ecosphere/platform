@@ -1,25 +1,42 @@
-<div class="background">
-  <h1>running Artifacts</h1>
+<div >
+  <div class="header" >
+    Running Artifacts
+  </div>
   <div *ngIf="services && services.submodelElements">
     <div *ngFor="let element of services.submodelElements; let i = index">
-      <mat-card *ngIf="element.idShort != 'deviceRegistry' && element.idShort != 'deviceManager' && element.idShort != 'containers'" tabindex="0">
-        <mat-card-title>
-          <mat-icon *ngIf="servicesToggle[i]">keyboard_arrow_down</mat-icon>
-          <mat-icon *ngIf="!servicesToggle[i]">keyboard_arrow_right</mat-icon>
+      <mat-card *ngIf="element.idShort != 'deviceRegistry'
+        && element.idShort != 'deviceManager'
+        && element.idShort != 'containers'
+        && element.idShort != 'relations'"
+        tabindex="0" class="container">
+        <mat-card-title >
+          <mat-icon *ngIf="servicesToggle[i]" class="arrow">keyboard_arrow_down</mat-icon>
+          <mat-icon *ngIf="!servicesToggle[i]" class="arrow">keyboard_arrow_right</mat-icon>
           <button mat-stroked-button class="button"  (click)="serToggle(i)">{{ element.idShort }}</button>
         </mat-card-title>
-        <mat-card-content *ngIf="servicesToggle[i]">
-          <div *ngFor="let element2 of element.value">
+        <mat-card-content *ngIf="servicesToggle[i]" >
+          <div *ngFor="let element2 of element.value" class="container">
             <div *ngIf="!element2.invokable">
               <span class="service">{{ element2.idShort }}: </span>
                 <div *ngFor="let element3 of element2.value">
-                  <span class="shortId"> {{ element3.idShort }}</span>
-                  <span *ngIf="!isObject(element3.value); else isobject"> {{ element3.value }} </span>
+                  <span *ngIf="isNonEmptyString(element3.value)" class="shortId">
+                    {{ element3.idShort }}:
+                  <!--
+                    <span *ngIf="!isObject(element3.value); else isobject">
+                  -->
+                    <span *ngIf="!isObject(element3.value);">
+                      {{ element3.value }}
+                    </span>
+                  </span>
+
+                  <!--
                   <ng-template #isobject>
                     <div *ngFor="let element4 of element3.value">
-                      <span *ngIf="element4.idShort != 'type'"> {{ element4.idShort }}:  {{ element4.value }}</span>
+                      <span *ngIf="element4.idShort != 'type'">
+                        [inner] {{ element4.idShort }}:  {{ element4.value }}</span>
                     </div>
                   </ng-template>
+                  -->
                 </div>
             </div>
           </div>
@@ -30,17 +47,23 @@
   <div *ngIf="!services">
     <p>Service Aas not reachable, ServiceManager might not be running</p>
   </div>
-  <h1>available Artifacts</h1>
+  <br>
+  <div class="header" >
+    Available Artifacts
+  </div>
   <div>
     <div *ngFor="let element of artifacts.submodelElements; let i = index">
-      <mat-card  *ngIf="!element.invokable" tabindex="0">
+      <mat-card  *ngIf="!element.invokable
+        && element.idShort == 'Container'"
+        tabindex="0"
+        class="container">
         <mat-card-title>
           <mat-icon *ngIf="artifactsToggle[i]">keyboard_arrow_down</mat-icon>
           <mat-icon *ngIf="!artifactsToggle[i]">keyboard_arrow_right</mat-icon>
           <button mat-stroked-button class="button"  (click)="artToggle(i)">{{ element.idShort }}</button>
         </mat-card-title>
         <mat-card class="secbg" *ngIf="artifactsToggle[i]">
-          <div *ngFor="let element2 of element.value">
+          <div *ngFor="let element2 of element.value" class="container">
             <div *ngIf="!element2.invokable">
               <span style="font-weight: bold;">{{ element2.idShort }}: </span>
               <div *ngIf="isArray(element2.value); else noArray ">
