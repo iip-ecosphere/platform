@@ -15,6 +15,7 @@
   
   <properties>
       <iip.resources>${project.basedir}/resources</iip.resources>
+      <iip.model>ExampleHm22Install</iip.model>
   </properties>
   
   <profiles>
@@ -121,6 +122,37 @@
 		               <overWriteSnapshots>true</overWriteSnapshots>
 		             </configuration>
 		           </execution>
+                   <execution>
+                     <id>pythonSources</id>
+                     <goals>
+                         <goal>unpack</goal>
+                     </goals>
+                     <phase>validate</phase>
+                     <configuration>
+                         <artifactItems>
+                             <artifactItem>
+                                 <groupId>de.iip-ecosphere.platform</groupId>
+                                 <artifactId>services.environment</artifactId>
+                                 <version>${project.version}</version>
+                                 <type>zip</type>
+                                 <classifier>python</classifier>
+                                 <overWrite>true</overWrite>
+                                 <outputDirectory>${project.build.directory}/pyEnv</outputDirectory>
+                                 <destFileName>pyEnv.zip</destFileName>
+                             </artifactItem>
+                             <artifactItem>
+                                 <groupId>de.iip-ecosphere.platform</groupId>
+                                 <artifactId>apps.AppInterfacesContainerCreation</artifactId>
+                                 <version>${project.version}</version>
+                                 <type>zip</type>
+                                 <classifier>python</classifier>
+                                 <overWrite>true</overWrite>
+                                 <outputDirectory>${project.build.directory}/pySrc</outputDirectory>
+                                 <destFileName>pyIf.zip</destFileName>
+                             </artifactItem>
+                         </artifactItems>
+                     </configuration>
+                   </execution>
 		           <execution>
 		               <id>copy-dependencies</id>
 		               <goals>
@@ -139,26 +171,6 @@
 		           </execution>
 		         </executions>
 		       </plugin>
-		      <!-- <plugin>
-		        <artifactId>maven-clean-plugin</artifactId>
-		        <version>2.5</version>
-		        <executions>
-		          <execution>
-		            <id>auto-clean</id>
-		            <phase>process-resources</phase>
-		            <goals>
-		              <goal>clean</goal>
-		            </goals>
-		            <configuration>
-		             <filesets>
-		                <fileset>
-		                  <directory>${project.build.directory}</directory>
-		                </fileset>
-		              </filesets>
-		            </configuration>
-		          </execution>
-		        </executions>
-		      </plugin>        -->
 		       <plugin>
 		           <groupId>org.apache.maven.plugins</groupId>
 		           <artifactId>maven-assembly-plugin</artifactId>
@@ -353,6 +365,35 @@
 	           </execution>
 	         </executions>
 	       </plugin>
+           <plugin>
+               <groupId>de.iip-ecosphere.platform</groupId>
+               <artifactId>configuration-plugin</artifactId>
+               <version>${project.version}</version>
+               <executions>
+                   <execution>
+                       <id>generateBroker</id>
+                       <goals>
+                           <goal>generateBroker</goal>
+                       </goals>
+                   </execution>
+                   <execution>
+                       <id>generateAppsNoDeps</id>
+                       <goals>
+                           <goal>generateAppsNoDeps</goal>
+                       </goals>
+                   </execution>
+                   <execution>
+                       <id>generateApps</id>
+                       <goals>
+                           <goal>generateApps</goal>
+                       </goals>
+                   </execution>
+               </executions>
+               <configuration>
+                   <model>${iip.model}</model>
+                   <outputDirectory>gen/hm22</outputDirectory>
+               </configuration>
+           </plugin>
 	       <plugin>
 	         <groupId>org.codehaus.mojo</groupId>
 	         <artifactId>exec-maven-plugin</artifactId>
@@ -364,7 +405,7 @@
                         <mainClass>de.iip_ecosphere.platform.configuration.PlatformInstantiator</mainClass>
                         <cleanupDaemonThreads>false</cleanupDaemonThreads>
                         <arguments>
-                            <argument>ExampleHm22Install</argument>
+                            <argument>${iip.model}</argument>
                             <argument>src/test/easy</argument>
                             <argument>gen/broker</argument>
                             <argument>generateBroker</argument>
@@ -377,7 +418,7 @@
                         <mainClass>de.iip_ecosphere.platform.configuration.PlatformInstantiator</mainClass>
                         <cleanupDaemonThreads>false</cleanupDaemonThreads>
                         <arguments>
-                            <argument>ExampleHm22Install</argument>
+                            <argument>${iip.model}</argument>
                             <argument>src/test/easy</argument>
                             <argument>gen/hm22</argument>
                             <argument>generateAppsNoDeps</argument>
@@ -396,7 +437,7 @@
                         <mainClass>de.iip_ecosphere.platform.configuration.PlatformInstantiator</mainClass>
                         <cleanupDaemonThreads>false</cleanupDaemonThreads>
                         <arguments>
-                            <argument>ExampleHm22Install</argument>
+                            <argument>${iip.model}</argument>
                             <argument>src/test/easy</argument>
                             <argument>gen/hm22</argument>
                             <argument>generateApps</argument>
@@ -414,6 +455,76 @@
           </plugins>
         </build>
      </profile>
+     
+      <profile>
+         <id>Main</id>
+         <activation>
+            <activeByDefault>true</activeByDefault>
+         </activation>
+        <properties>
+            <maven.main.skip>true</maven.main.skip>
+            <maven.test.skip>true</maven.test.skip>
+            <python-compile.skip>true</python-compile.skip>
+            <maven.javadoc.skip>true</maven.javadoc.skip>
+        </properties>       
+
+          <build>
+              <plugins>
+                 <plugin>
+                    <groupId>de.iip-ecosphere.platform</groupId>
+                    <artifactId>invoker-plugin</artifactId>
+                    <version>${project.version}</version>
+                    <executions>
+                        <execution>
+                            <id>genInterfaces</id>
+                            <goals>
+                                <goal>install</goal>
+                            </goals>
+                            <configuration>
+                                <invokeProfiles>
+                                    <invokeProfile>EasyGen</invokeProfile>
+                                </invokeProfiles>
+                                <invokeGoals>
+                                    <invokeGoal>process-sources</invokeGoal>
+                                </invokeGoals>
+                                <disableBuild>true</disableBuild>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>installServices</id>
+                            <goals>
+                                <goal>install</goal>
+                            </goals>
+                            <configuration>
+                                <invokeProfiles>
+                                    <invokeProfile>App</invokeProfile>
+                                </invokeProfiles>
+                                <invokeGoals>
+                                    <invokeGoal>install</invokeGoal>
+                                </invokeGoals>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>integrateApp</id>
+                            <goals>
+                                <goal>install</goal>
+                            </goals>
+                            <configuration>
+                                <invokeProfiles>
+                                    <invokeProfile>EasyGen</invokeProfile>
+                                </invokeProfiles>
+                                <invokeGoals>
+                                    <invokeGoal>package</invokeGoal>
+                                </invokeGoals> 
+                                <disableBuild>true</disableBuild>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+          </build>
+      </profile>
+     
   </profiles>
 
   <!-- dependencies for all profiles -->
