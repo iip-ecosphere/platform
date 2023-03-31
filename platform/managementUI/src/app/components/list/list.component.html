@@ -20,27 +20,34 @@
 
       <!-- Table -->
       <table style="margin: 0px;">
-        <tr *ngFor="let item of filteredData">
+        <tr *ngFor="let item of filteredData; let i = index">
 
+          <td style="width: 2%; text-align: center;"> {{i + 1}} </td>
 
-
-          <!-- Icons -->
-          <td  *ngIf="tab.tabName == 'Services'">
-            <div>
-              <img src="../../../assets/java_350.png" width="50px" height="50px">
+          <!-- Icons
+          <td  *ngIf="tab.tabName == 'Services'" style="vertical-align: top;">
+            <div *ngIf=" getIcon(item.idShort) != null">
+              <img src={{getIcon(item.idShort)}} class="service-icon">
             </div>
-
-
           </td>
+          -->
 
           <!-- Item -->
           <td style="width: 100%;">
-            {{item.idShort}}
+
+            <span class="row-title" >
+              <span style="height: 5px; vertical-align: top; margin-right: 10px;">{{item.idShort}}</span>
+              <span *ngIf=" getIcon(item.idShort) != null" >
+                <!-- <img src="../../../assets/java.png"  width="50px" height="50px"> -->
+                <img src={{getIcon(item.idShort)}} class="service-icon">
+              </span>
+            </span>
             <div *ngFor="let property of item.value" class="subtext" >
               <div *ngIf="property.value">
                 {{property.value}}
               </div>
             </div>
+
 
             <!--  {{getName(item, item.value, "")}} -->
 

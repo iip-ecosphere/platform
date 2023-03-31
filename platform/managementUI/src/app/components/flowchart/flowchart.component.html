@@ -10,16 +10,23 @@
   </nav>
   <div class="outer-container">
     <div class="inner-toolbar">
-      <h1>Services</h1>
+      <div class="header">Services</div>
       <div *ngIf="servicesLoading">Loading...</div>
       <div *ngIf="services && services.value">
         <div *ngFor="let service of services.value">
           <mat-card *ngIf="!isMeta(service.idShort)" class="element" >
-            <mat-card-title *ngIf="service.idShort"><h2>{{ getId(service.value) }}</h2></mat-card-title>
+            <mat-card-title *ngIf="service.idShort">
+              <h2>
+                {{ getId(service.value) }}
+              </h2>
+            </mat-card-title>
             <mat-card-content>
               <div *ngFor="let property of service.value">
-                <p *ngIf="displayAttribute(property.idShort)" class="attribute"> {{property.idShort}}:
-                  <span *ngIf="property.value">{{property.value[0].value}}</span>
+                <p *ngIf="displayAttribute(property.idShort)"
+                class="attribute"> {{property.idShort}}:
+                  <span *ngIf="property.value">
+                    {{property.value[0].value}}
+                  </span>
                 </p>
               </div>
             </mat-card-content>

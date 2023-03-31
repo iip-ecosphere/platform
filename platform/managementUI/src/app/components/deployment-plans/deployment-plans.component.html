@@ -7,10 +7,11 @@
     <tr *ngFor="let plan of deploymentPlans.value; let i = index">
       <td style="width: 2%; text-align: center;"> {{i + 1}} </td>
       <td style="width: 100%;">
-        <span>
-          {{ plan.idShort }} <br>
-          <span class="subtext"> {{getDescription(plan)}}</span>
-        </span>
+        <span class="row-title">
+          {{ plan.idShort }}
+
+        </span><br>
+        <span class="subtext"> {{getDescription(plan)}}</span>
       </td>
       <td>
         <button mat-raised-button class="button" (click)="deploy(plan)">deploy</button>

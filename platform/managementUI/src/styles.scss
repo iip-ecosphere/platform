@@ -26,11 +26,16 @@ tr:nth-child(odd) {
   vertical-align: top;
 }
 
-.subtext {
+.row-title {
+  font-size: medium;
+  line-height: 1.7;
+}
+.subtext{
   color: rgb(97, 95, 96);
-  font-size: 12px;
+  //font-size: small;
   //margin: 5px;
   margin-left: 5px;
+  line-height: 1.7;
 }
 
 // --- resource detail ----
@@ -73,6 +78,12 @@ tr:nth-child(odd) {
   color: black;
   font-size: 14px;
   line-height: 1.7;
+}
+
+.service-icon {
+  //width: 50px;
+  height: 25px;
+  border: 2px solid rgb(243, 251, 255);
 }
 
 //-----------
