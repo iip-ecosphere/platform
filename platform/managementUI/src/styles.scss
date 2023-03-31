@@ -11,6 +11,13 @@
   --secondary-colo-contrast:(#343434);
 }
 
+.header {
+  font-size: 23px;
+  margin-left: 10px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
 tr:nth-child(odd) {
   background-color: rgb(230, 230, 230);
 }
@@ -60,12 +67,7 @@ tr:nth-child(odd) {
   font-size: 16px;
   line-height: 1.6;
 }
-/*
-.bullets {
-  list-style-type: square;
-  color: rgb(125, 214, 255);
-}
-*/
+
 //-----------
 
 // sub-menu
@@ -102,8 +104,16 @@ tr:nth-child(odd) {
   width: auto;
 }
 
+.blue-button {
+  background-color:rgb(35, 142, 184);
+}
+
+.black-button {
+  background-color:  rgb(97, 95, 96);
+}
+
 .service {
-  font-weight: bold;
+  background-color:rgb(35, 142, 184);
 }
 
 .logo {

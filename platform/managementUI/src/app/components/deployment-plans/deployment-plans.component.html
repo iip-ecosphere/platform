@@ -1,24 +1,36 @@
 <div>
-  <h1>Deployment Plans</h1>
+  <div class="header">
+    Deployment Plans
+  </div>
 
-  <!-- <mat-form-field appearance="outline">
-    <mat-label>Deployment Plan</mat-label>
-    <mat-select *ngIf="deploymentPlans" [(value)]="selected">
-      <mat-option *ngFor="let plan of deploymentPlans.value" [value]="plan">
-        {{getName(plan.value)}}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
-  <mat-card>selected: <span *ngIf="selected && selected.value" style="background-color: white; color:black">{{ getName(selected.value) }}</span></mat-card>
-  <button mat-raised-button class="button" (click)="deploy()">deploy</button>
-  <button mat-raised-button style="background-color: rgb(255,204,0)" (click)="undeploy()">udeploy</button> -->
-
+  <table *ngIf="deploymentPlans; else noPlans" style="margin: 0px;" >
+    <tr *ngFor="let plan of deploymentPlans.value; let i = index">
+      <td style="width: 2%; text-align: center;"> {{i + 1}} </td>
+      <td style="width: 100%;">
+        <span>
+          {{ plan.idShort }} <br>
+          <span class="subtext"> {{getDescription(plan)}}</span>
+        </span>
+      </td>
+      <td>
+        <button mat-raised-button class="button" (click)="deploy(plan)">deploy</button>
+      </td>
+      <td>
+        <button mat-raised-button class= "black-button" (click)="undeploy(plan)">udeploy</button>
+      </td>
+    </tr>
+  </table>
+<!--
   <mat-list *ngIf="deploymentPlans; else noPlans">
     <div *ngFor="let plan of deploymentPlans.value; let i = index">
       <mat-list-item [ngClass]="applyLineStyle(i)">
         <div class="container">
-          <span class="name">{{ getName(plan.value) }}</span>
-          <span *ngIf="plan.description" class="description">{{ plan.description }}</span>
+          <span class="name">Name: {{ getName(plan.value) }}</span>
+          {{i + 1}}
+          <span class="name">
+            {{ plan.idShort }} <br>
+            <span class="description"> {{getDescription(plan)}}</span>
+          </span>
           <span>
             <button mat-raised-button class="button" (click)="deploy(plan)">deploy</button>
             <button mat-raised-button style="background-color: rgb(255,204,0)" (click)="undeploy(plan)">udeploy</button>
@@ -28,10 +40,12 @@
       <mat-divider></mat-divider>
     </div>
   </mat-list>
+  -->
   <ng-template #noPlans>
     <div>
       <span>no deployment plans found</span>
     </div>
   </ng-template>
+
 
 </div>
