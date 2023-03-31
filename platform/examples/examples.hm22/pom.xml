@@ -391,7 +391,7 @@
                </executions>
                <configuration>
                    <model>${iip.model}</model>
-                   <outputDirectory>gen/hm23</outputDirectory>
+                   <outputDirectory>gen/hm22</outputDirectory>
                </configuration>
            </plugin>
 	       <plugin>
