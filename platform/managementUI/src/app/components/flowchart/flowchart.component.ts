@@ -220,7 +220,8 @@ export class FlowchartComponent implements OnInit {
 
   public getId(serviceValue: any[]) {
     let value = serviceValue.find(item => item.idShort === 'id').value;
-    return value.find((item: { idShort: string; }) => item.idShort === 'varValue').value;
+    return value.find(
+      (item: { idShort: string; }) => item.idShort === 'varValue').value;
   }
 
   //to be removed, keeping in case i need to get the coordinates of a mesh again

@@ -286,6 +286,24 @@ export class ListComponent implements OnInit {
 
   }
 
+  // ---- icons -------------
+
+  icons = [
+    ["opc.png", ["PlcNextOpcConn", "PlcBeckhoffOpcConn", "DriveBeckhoffOpcConn"]],
+    ["java.png", ["CamSource", "AppAas", "ActionDecider", "DriveAppAas"]],
+    ["py.png", ["PythonAi", "DriveLenzePythonAi"]],
+    ["flower.png", ["FlowerAiServiceClient"]],
+    ["mqtt.png", ["DriveLenzeMqttConn", "mqttEnergyConn", "GraphanaMqttConn"]]
+  ]
+
+  public getIcon(serviceId:string) {
+    let icon_path = null
+    let row = this.icons.find(item => item[1].includes(serviceId))
+    if(row != undefined) {
+      icon_path = "../../../assets/" + row[0]
+    }
+    return icon_path
+  }
 
 
    /*

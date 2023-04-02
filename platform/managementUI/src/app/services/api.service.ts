@@ -34,12 +34,14 @@ export class ApiService {
   connectionTypes: any;
 
   public async getResources() {
-    this.resources = await this.getData('aas/submodels/resources/submodel') as PlatformResources;
+    this.resources = await this.getData('aas/submodels/resources/submodel') as
+      PlatformResources;
     return this.resources;
   }
 
   public async getServices() {
-      const Data = await this.getData('aas/submodels/services/submodel') as PlatformServices;
+      const Data = await this.getData('aas/submodels/services/submodel')as
+        PlatformServices;
       return Data;
   }
 

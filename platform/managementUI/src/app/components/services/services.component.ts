@@ -60,4 +60,13 @@ export class ServicesComponent implements OnInit {
   public isObject(value: any) {
     return (typeof value === 'object');
   }
+
+  public isNonEmptyString(value: any) {
+    let result = false
+    if (typeof value == "string" && value.length > 0) {
+      result = true
+    }
+    return result
+  }
+
 }

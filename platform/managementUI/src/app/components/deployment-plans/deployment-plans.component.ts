@@ -1,3 +1,4 @@
+import { firstValueFrom } from 'rxjs';
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from 'src/app/services/api.service';
 import { PlanDeployerService } from 'src/app/services/plan-deployer.service';
@@ -23,11 +24,9 @@ export class DeploymentPlansComponent implements OnInit {
     await this.getArtifacts();
   }
 
-
-
   public async getArtifacts() {
     const response = await this.api.getArtifacts();
-    console.log(response);
+    //console.log(response);
     if(response.submodelElements) {
       this.deploymentPlans = response.submodelElements.find(item => item.idShort === "DeploymentPlans");
       this.deployPlanInput = response.submodelElements.find(item => item.idShort === "deployPlan")?.inputVariables;
@@ -91,16 +90,11 @@ export class DeploymentPlansComponent implements OnInit {
     return name;
   }
 
-  // public getDesc(plan: ResourceAttribute[]) {
-  //   // console.log(plan);
-  //   let name: any = plan.find(item => item.idShort === 'description');
-  //   if(!name) {
-  //     name = ''
-  //   } else {
-  //     name = name.value;
-  //   }
-  //   return name;
-  // }
+  public getDescription(plan: any) {
+    let desc = plan.value.find(
+      (item: { idShort: string; }) => item.idShort === "description").value
+    return desc
+  }
 
   public applyLineStyle(index: number) {
 
