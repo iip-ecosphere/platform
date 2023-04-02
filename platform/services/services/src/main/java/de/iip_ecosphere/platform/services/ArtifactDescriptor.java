@@ -38,6 +38,28 @@ public interface ArtifactDescriptor {
     public String getName();
     
     /**
+     * Returns the usage count.
+     * 
+     * @return the usage count
+     */
+    public int getUsageCount();
+
+    /**
+     * Increases the usage count and returns the new count. Without calling this method, the usage
+     * count of this instance is initially {@code 0}.
+     * 
+     * @return the new value, 
+     */
+    public int increaseUsageCount();
+    
+    /**
+     * Decreases the usage count and returns the new count.
+     * 
+     * @return the new value, 
+     */
+    public int decreaseUsageCount();
+    
+    /**
      * Returns the ids of all services provided by the artifact.
      * 
      * @return the ids

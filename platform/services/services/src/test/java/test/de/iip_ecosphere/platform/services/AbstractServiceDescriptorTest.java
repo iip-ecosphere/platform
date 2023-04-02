@@ -8,6 +8,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.services.AbstractServiceDescriptor;
+import de.iip_ecosphere.platform.services.ArtifactDescriptor;
 import de.iip_ecosphere.platform.services.TypedDataConnectorDescriptor;
 
 import static test.de.iip_ecosphere.platform.services.ServiceManagerTest.*;
@@ -63,6 +64,22 @@ public class AbstractServiceDescriptorTest {
         assertCollection(AbstractServiceDescriptor.ensemble(s21), s21, s22, s23);
         assertCollection(AbstractServiceDescriptor.ensemble(s22), s21, s22, s23);
         assertCollection(AbstractServiceDescriptor.ensemble(s23), s21, s22, s23);
+    }
+    
+    /**
+     * Tests the usage count methods.
+     */
+    @Test
+    public void testUsageCount() {
+        List<MyServiceDescriptor> services = new ArrayList<MyServiceDescriptor>();
+        ArtifactDescriptor art = new MyArtifactDescriptor("a", "a", new File("a.jar").toURI(), services);
+        Assert.assertEquals(0, art.getUsageCount());
+        Assert.assertEquals(1, art.increaseUsageCount());
+        Assert.assertEquals(1, art.getUsageCount());
+        Assert.assertEquals(0, art.decreaseUsageCount());
+        Assert.assertEquals(0, art.getUsageCount());
+        Assert.assertEquals(0, art.decreaseUsageCount());
+        Assert.assertEquals(0, art.getUsageCount());
     }
     
     /**

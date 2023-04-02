@@ -31,6 +31,7 @@ public class AbstractArtifactDescriptor<S extends AbstractServiceDescriptor<?>> 
     private String id;
     private String name;
     private URI uri;
+    private int usageCount = 0;
     private Map<String, S> services = Collections.synchronizedMap(new HashMap<>());
     private Map<String, S> servers = Collections.synchronizedMap(new HashMap<>());
     
@@ -49,6 +50,26 @@ public class AbstractArtifactDescriptor<S extends AbstractServiceDescriptor<?>> 
         this.uri = null == uri ? null : uri.normalize();
         this.services = createMapping(services);
         this.servers = createMapping(servers);
+    }
+    
+    // usage count for now only for spring cloud stream
+    
+    @Override
+    public int getUsageCount() {
+        return usageCount;
+    }
+
+    @Override
+    public int increaseUsageCount() {
+        return ++usageCount;
+    }
+    
+    @Override
+    public int decreaseUsageCount() {
+        if (usageCount > 0) {
+            usageCount--;
+        }
+        return usageCount;
     }
     
     /**
