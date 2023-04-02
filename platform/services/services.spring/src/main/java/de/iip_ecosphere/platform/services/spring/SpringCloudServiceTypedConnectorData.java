@@ -12,6 +12,8 @@
 
 package de.iip_ecosphere.platform.services.spring;
 
+import java.util.function.Function;
+
 import de.iip_ecosphere.platform.services.TypedDataConnectorDescriptor;
 
 /**
@@ -48,6 +50,28 @@ public class SpringCloudServiceTypedConnectorData extends SpringCloudServiceType
     }
 
     // checkstyle: resume parameter number check
+
+    /**
+     * Creates an instance copy.
+     * 
+     * @param origin the origin descriptor to copy from
+     */
+    SpringCloudServiceTypedConnectorData(TypedDataConnectorDescriptor origin) {
+        this(origin, null);
+    }
+    
+    /**
+     * Creates an instance copy.
+     * 
+     * @param origin the origin descriptor to copy from
+     * @param serviceAdapter optional function that transforms the service entry, may be <b>null</b> for none
+     */
+    SpringCloudServiceTypedConnectorData(TypedDataConnectorDescriptor origin, Function<String, String> serviceAdapter) {
+        super(origin);
+        this.id = origin.getId();
+        this.service = null == serviceAdapter ? origin.getService() : serviceAdapter.apply(origin.getService());
+        this.function = origin.getFunction();
+    }
 
     @Override
     public String getId() {

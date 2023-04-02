@@ -15,6 +15,7 @@ package test.de.iip_ecosphere.platform.services.spring;
 import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Function;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.AfterClass;
@@ -41,6 +42,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import de.iip_ecosphere.platform.services.ArtifactDescriptor;
 import de.iip_ecosphere.platform.services.ServiceDescriptor;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
+import de.iip_ecosphere.platform.services.environment.switching.ServiceBase;
 import de.iip_ecosphere.platform.services.spring.SpringCloudServiceSetup;
 import de.iip_ecosphere.platform.services.spring.SpringCloudServiceDescriptor;
 import de.iip_ecosphere.platform.services.spring.SpringCloudServiceManager;
@@ -63,6 +65,7 @@ import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
 public class SimpleStartStopServiceManagerTest extends AbstractTestServiceManager {
 
     private static final ServerAddress BROKER = new ServerAddress(Schema.IGNORE); // localhost, ephemeral
+    private static final Function<String, String> APPID_ADAPTER = id -> ServiceBase.composeId(id, "app", "1");
     
     /**
      * Initializes the test by starting an embedded AMQP server. Requires the Qpid configuration file in src/test.
@@ -82,8 +85,65 @@ public class SimpleStartStopServiceManagerTest extends AbstractTestServiceManage
     }
     
     /**
+     * A re-usable artifact asserter.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private class MyArtifactAsserter extends ArtifactAsserter {
+
+        private File homePath;
+        private String createServiceId;
+
+        /**
+         * Creates an instance.
+         * 
+         * @param createServiceId the id of the create service to assert for
+         */
+        private MyArtifactAsserter(String createServiceId) {
+            this.createServiceId = createServiceId;
+        }
+
+        @Override
+        public void testDeployment(ArtifactDescriptor aDesc) {
+            ServiceDescriptor sDesc = aDesc.getService(createServiceId);
+            Assert.assertTrue(sDesc instanceof SpringCloudServiceDescriptor);
+            ProcessSpec pspec = ((SpringCloudServiceDescriptor) sDesc).getSvc().getProcess();
+            Assert.assertNotNull(pspec);
+            Assert.assertTrue(pspec.isStarted());
+            Assert.assertNotNull(pspec.getArtifacts());
+            Assert.assertEquals(2, pspec.getArtifacts().size());
+
+            homePath = pspec.getHomePath();
+            Assert.assertNotNull(homePath);
+            Assert.assertTrue(homePath.toString().indexOf("${tmp}") < 0); // has been substituted
+            Assert.assertNotNull(pspec.getExecutablePath());
+            Assert.assertTrue(pspec.getExecutablePath().toString().indexOf("${tmp}") < 0); // has been substituted
+            assertFileExists(new File(homePath, "test.txt")); // extracted from artifacts
+            assertFileExists(new File(homePath, "test2.txt"));
+            
+            sDesc = aDesc.getServer("java-server");
+            Assert.assertTrue(sDesc instanceof SpringCloudServiceDescriptor);
+            Assert.assertEquals(ServiceState.RUNNING, sDesc.getState());
+        }
+        
+        @Override
+        public void cleanup(ArtifactDescriptor aDesc) {
+            FileUtils.deleteQuietly(homePath); // for next test
+
+            ServiceDescriptor sDesc = aDesc.getServer("java-server");
+            Assert.assertTrue(sDesc instanceof SpringCloudServiceDescriptor);
+            Assert.assertEquals(ServiceState.STOPPED, sDesc.getState());
+            ProcessSpec ps = ((SpringCloudServiceDescriptor) sDesc).getSvc().getProcess();
+            if (null != ps && null != ps.getHomePath()) {
+                FileUtils.deleteQuietly(ps.getHomePath()); // for next test
+            }
+        }
+
+    }
+
+    /**
      * Tests a simple start-stop cycle of the {@link SpringCloudServiceManager} with two processes. This test requires 
-     * an actual version of {@code test.simpleStream.spring} in {@code target/jars} - Maven downloads the artifact 
+     * an actual version of {@code test.simpleStream.spring} in {@code target/jars}. Maven downloads the artifact 
      * in the compile phase.
      * 
      * @throws ExecutionException shall not occur for successful test
@@ -91,45 +151,23 @@ public class SimpleStartStopServiceManagerTest extends AbstractTestServiceManage
      */
     @Test
     public void testSimpleStartStop() throws ExecutionException, IOException {
-        doTestStartStop("deployment.yml", new ArtifactAsserter() {
-            
-            private File homePath;
-
-            @Override
-            public void testDeployment(ArtifactDescriptor aDesc) {
-                ServiceDescriptor sDesc = aDesc.getService("simpleStream-create");
-                Assert.assertTrue(sDesc instanceof SpringCloudServiceDescriptor);
-                ProcessSpec pspec = ((SpringCloudServiceDescriptor) sDesc).getSvc().getProcess();
-                Assert.assertNotNull(pspec);
-                Assert.assertTrue(pspec.isStarted());
-                Assert.assertNotNull(pspec.getArtifacts());
-                Assert.assertEquals(2, pspec.getArtifacts().size());
-
-                homePath = pspec.getHomePath();
-                Assert.assertNotNull(homePath);
-                Assert.assertTrue(homePath.toString().indexOf("${tmp}") < 0); // has been substituted
-                Assert.assertNotNull(pspec.getExecutablePath());
-                Assert.assertTrue(pspec.getExecutablePath().toString().indexOf("${tmp}") < 0); // has been substituted
-                assertFileExists(new File(homePath, "test.txt")); // extracted from artifacts
-                assertFileExists(new File(homePath, "test2.txt"));
-                
-                sDesc = aDesc.getServer("java-server");
-                Assert.assertTrue(sDesc instanceof SpringCloudServiceDescriptor);
-                Assert.assertEquals(ServiceState.RUNNING, sDesc.getState());
-            }
-            
-            @Override
-            public void cleanup(ArtifactDescriptor aDesc) {
-                FileUtils.deleteQuietly(homePath); // for next test
-
-                ServiceDescriptor sDesc = aDesc.getServer("java-server");
-                Assert.assertTrue(sDesc instanceof SpringCloudServiceDescriptor);
-                Assert.assertEquals(ServiceState.STOPPED, sDesc.getState());
-            }
-
-        }, false);
+        doTestStartStop("deployment.yml", new MyArtifactAsserter("simpleStream-create"), false);
     }
-    
+
+    /**
+     * Tests a simple start-stop cycle of the {@link SpringCloudServiceManager} with two processes and a given 
+     * app/instance id. This test requires an actual version of {@code test.simpleStream.spring} in {@code target/jars}.
+     * Maven downloads the artifact in the compile phase.
+     * 
+     * @throws ExecutionException shall not occur for successful test
+     * @throws IOException shall not occur for successful test
+     */
+    @Test
+    public void testSimpleStartStopAppId() throws ExecutionException, IOException {
+        doTestStartStop("deployment.yml", new MyArtifactAsserter(APPID_ADAPTER.apply("simpleStream-create")), 
+            false, APPID_ADAPTER);
+    }
+
     /**
      * Initializes/modifies the spring setup.
      * 

@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.springframework.cloud.deployer.spi.app.AppDeployer;
@@ -30,6 +31,8 @@ import org.springframework.core.io.Resource;
 
 import de.iip_ecosphere.platform.services.AbstractServiceDescriptor;
 import de.iip_ecosphere.platform.services.AbstractServiceManager.TypedDataConnection;
+import de.iip_ecosphere.platform.services.TypedDataConnectorDescriptor;
+import de.iip_ecosphere.platform.services.TypedDataDescriptor;
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.services.environment.ServiceStub;
@@ -170,10 +173,10 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
             getName(), getDescription(), getVersion());
         result.instantiateFrom(this);
         result.service = this.service;
+        final String appInstanceId = ServiceBase.getApplicationInstanceId(sId);
+        final String appId = ServiceBase.getApplicationId(sId);
         if (null != this.ensembleLeader) {
             String ensId = this.ensembleLeader.getServiceId();
-            String appInstanceId = ServiceBase.getApplicationInstanceId(sId);
-            String appId = ServiceBase.getApplicationId(sId);
             ensId = ServiceBase.composeId(ensId, appId, appInstanceId);
             result.ensembleLeader = this.getArtifact().getService(ensId);
             if (null == result.ensembleLeader) {
@@ -181,6 +184,21 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
                 this.getArtifact().addService(result);
             }
         }
+        for (TypedDataDescriptor p : this.getParameters()) {
+            result.addParameter(new SpringCloudServiceTypedData(p));
+        }
+        Function<String, String> serviceEntryAdapter = 
+            s -> ServiceBase.composeId(ServiceBase.getServiceId(s), appId, appInstanceId);
+        for (TypedDataConnectorDescriptor c : this.getInputDataConnectors()) {
+            result.addInputDataConnector(new SpringCloudServiceTypedConnectorData(c, serviceEntryAdapter));
+        }
+        for (TypedDataConnectorDescriptor c : this.getOutputDataConnectors()) {
+            result.addOutputDataConnector(new SpringCloudServiceTypedConnectorData(c, serviceEntryAdapter));
+        }
+        if (null != this.getAdditionalArguments()) {
+            result.setAdditionalArguments(new ArrayList<String>(this.getAdditionalArguments()));
+        }
+        
         //deploymentId, portId, process, processDir, serviceProtocol, adminAddr come at runtime
         return result;
     }

@@ -39,6 +39,17 @@ public class SpringCloudServiceTypedData implements TypedDataDescriptor {
         this.type = type;
     }
     
+    /**
+     * Copies a data instance.
+     * 
+     * @param origin the origin descriptor to copy from
+     */
+    SpringCloudServiceTypedData(TypedDataDescriptor origin) {
+        this.name = origin.getName();
+        this.description = origin.getDescription();
+        this.type = origin.getType();
+    }
+    
     @Override
     public String getName() {
         return name;

@@ -159,25 +159,42 @@ public class SpringCloudServiceManager
     
     @Override
     public String addArtifact(URI location) throws ExecutionException {
-        LOGGER.info("Adding " + location);
-        Transport.sendProcessStatus(PROGRESS_COMPONENT_ID, 0, 1, "Adding artifact " + location);
-        try {
-            File jarFile = UriResolver.resolveToFile(location, SpringInstances.getConfig().getDownloadDir());
-            YamlArtifact yamlArtifact = null;
-            if (null != jarFile) {
-                yamlArtifact = DescriptorUtils.readFromFile(jarFile);
-            } else {
-                DescriptorUtils.throwExecutionException("Adding " + location, 
-                    "Cannot load " + location + ". Must be a (resolved) file.");
+        URI nlocation = location.normalize();
+        SpringCloudArtifactDescriptor found = null;
+        for (SpringCloudArtifactDescriptor a: getArtifacts()) {
+            if (a.getUri().equals(nlocation)) {
+                found = a;
+                break;
             }
-            SpringCloudArtifactDescriptor artifact = SpringCloudArtifactDescriptor.createInstance(
-                yamlArtifact, location, jarFile);
-            String artifactId = super.addArtifact(artifact.getId(), artifact);
-            Transport.sendProcessStatus(PROGRESS_COMPONENT_ID, 1, 1, "Added artifact " + location + "  " + artifactId);
-            return artifactId;
-        } catch (IOException e) {
-            DescriptorUtils.throwExecutionException("Adding " + location, e);
-            return null;
+        }
+        
+        if (null == found) {
+            LOGGER.info("Adding {}", location);
+            Transport.sendProcessStatus(PROGRESS_COMPONENT_ID, 0, 1, "Adding artifact " + location);
+            try {
+                File jarFile = UriResolver.resolveToFile(location, SpringInstances.getConfig().getDownloadDir());
+                YamlArtifact yamlArtifact = null;
+                if (null != jarFile) {
+                    yamlArtifact = DescriptorUtils.readFromFile(jarFile);
+                } else {
+                    DescriptorUtils.throwExecutionException("Adding " + location, 
+                        "Cannot load " + location + ". Must be a (resolved) file.");
+                }
+                SpringCloudArtifactDescriptor artifact = SpringCloudArtifactDescriptor.createInstance(
+                    yamlArtifact, location, jarFile);
+                String artifactId = super.addArtifact(artifact.getId(), artifact);
+                Transport.sendProcessStatus(PROGRESS_COMPONENT_ID, 1, 1, 
+                    "Added artifact " + location + "  " + artifactId);
+                artifact.increaseUsageCount();
+                return artifactId;
+            } catch (IOException e) {
+                DescriptorUtils.throwExecutionException("Adding " + location, e);
+                return null;
+            }
+        } else {
+            found.increaseUsageCount();
+            LOGGER.info("Found known artifact for {}, registering additional use", location);
+            return found.getId();
         }
     }
 
@@ -228,15 +245,34 @@ public class SpringCloudServiceManager
 
         Set<ArtifactDescriptor> artifacts = new HashSet<>();
         Set<String> activeServices = new HashSet<>();
+        Set<String> activeAppIds = new HashSet<>();
+        Set<String> activeAppInstanceIds = new HashSet<>();
         for (String id: serviceIds) {
             ServiceDescriptor service = mgr.getService(id);
             artifacts.add(service.getArtifact());
             activeServices.add(id);
+            activeAppIds.add(ServiceBase.getApplicationId(id));
+            activeAppInstanceIds.add(ServiceBase.getApplicationInstanceId(id));
         }
         
         Set<String> allServices = new HashSet<>();
         for (ArtifactDescriptor a: artifacts) {
-            allServices.addAll(a.getServiceIds());
+            for (ServiceDescriptor s : a.getServices()) {
+                String sId = s.getId();
+                String aId = ServiceBase.getApplicationId(sId);
+                String iId = ServiceBase.getApplicationInstanceId(sId);
+                boolean addAsActive = false;
+                if (iId.length() > 0) {
+                    addAsActive = activeAppInstanceIds.contains(iId);
+                } else if (aId.length() > 0) {
+                    addAsActive = activeAppIds.contains(aId);
+                } else {
+                    addAsActive = activeAppInstanceIds.contains(""); // filled above, better than appId
+                }
+                if (addAsActive) {
+                    allServices.add(s.getId());
+                }
+            }
         }
 
         if (activeServices.size() != allServices.size()) {
@@ -640,22 +676,26 @@ public class SpringCloudServiceManager
 
     @Override
     public void removeArtifact(String artifactId) throws ExecutionException {
-        LOGGER.info("Removing artifact " + artifactId);
-        Transport.sendProcessStatus(PROGRESS_COMPONENT_ID, 0, 1, "Removing artifact " + artifactId);
         checkId(artifactId, "artifactId");
         SpringCloudArtifactDescriptor desc = getArtifact(artifactId);
-        super.removeArtifact(artifactId);
-        if (null != desc) {
-            File jar = desc.getJar();
-            File downloadDir = getConfig().getDownloadDir();
-            if (null != jar && null != downloadDir && jar.toPath().startsWith(downloadDir.toPath())) {
-                if (getConfig().getDeleteArtifacts()) {
-                    FileUtils.deleteQuietly(desc.getJar());
+        if (desc.decreaseUsageCount() > 0) {
+            LOGGER.info("Decreased usage of artifact {}", artifactId);
+        } else {
+            LOGGER.info("Removing artifact {}", artifactId);
+            Transport.sendProcessStatus(PROGRESS_COMPONENT_ID, 0, 1, "Removing artifact " + artifactId);
+            super.removeArtifact(artifactId);
+            if (null != desc) {
+                File jar = desc.getJar();
+                File downloadDir = getConfig().getDownloadDir();
+                if (null != jar && null != downloadDir && jar.toPath().startsWith(downloadDir.toPath())) {
+                    if (getConfig().getDeleteArtifacts()) {
+                        FileUtils.deleteQuietly(desc.getJar());
+                    }
                 }
             }
+            LOGGER.info("Removed artifact {}",  artifactId);
+            Transport.sendProcessStatus(PROGRESS_COMPONENT_ID, 1, 1, "Removied artifact " + artifactId);
         }
-        LOGGER.info("Removed artifact " + artifactId);
-        Transport.sendProcessStatus(PROGRESS_COMPONENT_ID, 1, 1, "Removied artifact " + artifactId);
     }
 
     @Override
