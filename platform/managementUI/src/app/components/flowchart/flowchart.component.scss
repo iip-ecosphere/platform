@@ -12,12 +12,12 @@ html, body {
   position:fixed;
 }
 
-.inner-toolbar {
+.services-toolbar {
   overflow-y: scroll;
   overflow-x: hidden;
   flex-wrap: wrap;
   position: relative;
-  width: 33%;
+  width: 28%;
   max-width: 40%;
 }
 
@@ -51,4 +51,17 @@ p
   display: flex;
   justify-content: flex-end;
   align-items:flex-end;
+}
+
+.flowchart-toolbar {
+  height: 100%;
+  background-color: rgba(141, 141, 141, 0.665);
+  margin: 1em 1em 1em 1em;
+
+}
+
+.flowchart-toolbar > mat-icon {
+  padding-bottom: 0.5em;
+  font-size: 40px;
+  width: 100%;
 }
