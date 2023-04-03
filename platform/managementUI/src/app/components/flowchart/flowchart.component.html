@@ -37,6 +37,11 @@
     <div class="drawflow-container">
       <div id="drawflow"></div>
       <!-- <button mat-raised-button class="button" (click)="showCoords()">print to console</button> -->
+      <mat-card *ngIf="toggleBus">
+        <div *ngFor="let bus of Busses"><span [class]="bus.color">{{bus.id}}</span></div>
+      </mat-card>
+      <button mat-raised-button class="button" (click)="toggleBus = !toggleBus">Bus</button>
+
     </div>
     <mat-card class="flowchart-toolbar">
       <mat-icon (click)="zoomIn()">zoom_in</mat-icon>
