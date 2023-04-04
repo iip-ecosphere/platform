@@ -29,7 +29,7 @@ export class FlowchartComponent implements OnInit {
   mesh: any;
 
   Busses: Bus[] = [];
-  busColors = ["green", "orange", "cyan", "yellow", "red", "purple", "magenta"];
+  busColors = ["red", "orange", "cyan", "yellow", "green", "purple", "magenta"];
 
   toggleBus = false;
 
@@ -127,6 +127,7 @@ export class FlowchartComponent implements OnInit {
   public async getGraph(mesh: string) {
     let data = await this.df.getGraph(mesh);
     if(data?.outputArguments[0].value?.value) {
+      this.Busses = [];
       let graph = JSON.parse(data?.outputArguments[0].value?.value);
       let graph2 = JSON.parse(graph.result);
       //this.meshUnchanged = JSON.parse(JSON.stringify(graph2)); //for debug purposes
@@ -154,21 +155,14 @@ export class FlowchartComponent implements OnInit {
             console.log("ERROR: maximum amount of busses exceeded (7)");
           }
         }
-        // for(let bus of busOut) {
-        //   if(!this.Busses.find(item => item.id === bus) && count < 7) {
-        //     this.Busses.push({id: bus, color: this.busColors[count]});
-        //     count++;
-        //   } else if(count >= 7) {
-        //     console.log("ERROR: maximum amount of busses exceeded (7)");
-        //   }
-        // }
 
         let busInHtml = "";
         if(busIn && busIn.length > 0) {
           for(let busName of busIn) {
             let bus = this.Busses.find(item => item.id === busName);
             if(bus) {
-              busInHtml = busInHtml.concat("<div style=\"position:relative; visibility: visible; display:inline-block; \"><i class=\"material-icons\" style=\"color:"+ bus.color +" \">keyboard_double_arrow_down</i><div style=\"visibility:hidden; width:120px; background-color:black; color:#fff; text-align:center; padding: 5px 0px; border-radius:6px; position:absolute; z-index:1;\">" + bus.id + "</div></div>");
+              //the line below contains
+              busInHtml = busInHtml.concat("<i class=\"material-icons\" style=\"color:"+ bus.color +" \">keyboard_double_arrow_down</i>");
             }
           }
         }
@@ -178,13 +172,32 @@ export class FlowchartComponent implements OnInit {
           for(let busName of busOut) {
             let bus = this.Busses.find(item => item.id === busName);
             if(bus) {
-              busOutHtml = busOutHtml.concat("<i class=\"material-icons\" matTooltip=\"" + bus.id + "\" style=\"color:"+ bus.color +"\">keyboard_double_arrow_up</i>");
+              busOutHtml = busOutHtml.concat("<i class=\"material-icons\" style=\"color:"+ bus.color +"\">keyboard_double_arrow_up</i>");
             }
           }
         }
 
+        let icon="";
+        let type= a.data.type as string;
+        type = type.toLowerCase();
+        let iconHtml="";
+        if(type.includes("java")) {
+          icon = "../../../assets/java.png";
+        } else if(type.includes("flower")) {
+          icon = "../../../assets/flower.png";
+        } else if(type.includes("opc")) {
+          icon = "../../../assets/opc.png";
+        } else if(type.includes("mqtt")) {
+          icon = "../../../assets/mqtt.png";
+        } else if(type.includes("py")) {
+          icon = "../../../assets/py.png";
+        }
+        if(icon != "") {
+          iconHtml= "<img src=\""+ icon +"\" width=\"24px\" height=\"24px\">";
+        }
+
         a.html = "<div>" +
-          "<table style=\"width:100%; margin-top: 0px\"><tr><td style=\"background-color:white\"><div style=\"text-align: left\">"+"</div></td><td style=\"background-color:white\"><div style=\"text-align: right\">" + busInHtml + busOutHtml + "</div></td></tr></table>" +
+          "<table style=\"width:100%; margin-top: 0px\"><tr><td style=\"background-color:rgb(240,240,240)\"><div style=\"text-align: left\">"+ iconHtml + "</div></td><td style=\"background-color:rgb(240,240,240)\"><div style=\"text-align: right\">" + busInHtml + busOutHtml + "</div></td></tr></table>" +
           "<h3> " + a.data.id + "</h3>" +
           "<p>kind: "+ a.data.kind + "</p>" +
           "<p> type: "+ a.data.type + "</p>" +

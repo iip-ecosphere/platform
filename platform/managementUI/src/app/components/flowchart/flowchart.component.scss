@@ -42,13 +42,9 @@ html, body {
 p
 {
   margin: 0.5em;
-  padding:0.1em;
+  padding:0.2em;
   font-size:1em;
   line-height: .75em;
-}
-
-.bus-icons {
-  text-align: right;
 }
 
 .flowchart-toolbar {
@@ -56,12 +52,18 @@ p
   background-color: rgba(141, 141, 141, 0.665);
   margin: 1em 1em 1em 1em;
 
+
 }
 
 .flowchart-toolbar > mat-icon {
   padding-bottom: 0.5em;
   font-size: 40px;
   width: 100%;
+  display: block; //this arranges icons vertically on its own
+}
+
+.test {
+  background-color:green;
 }
 
 //this is for assigning the text color of the bus ids on the bus list, not optimal but works for now
@@ -91,6 +93,10 @@ p
 
 .red {
   color: red;
+}
+
+.magenta {
+  color: magenta;
 }
 
 // .tooltip {

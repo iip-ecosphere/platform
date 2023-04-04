@@ -37,7 +37,7 @@
     <div class="drawflow-container">
       <div id="drawflow"></div>
       <!-- <button mat-raised-button class="button" (click)="showCoords()">print to console</button> -->
-      <mat-card *ngIf="toggleBus">
+      <mat-card *ngIf="toggleBus" class="footer">
         <div><span  *ngFor="let bus of Busses" [class]="bus.color">{{bus.id}}, </span></div>
       </mat-card>
       <button mat-raised-button class="button" (click)="toggleBus = !toggleBus">Bus</button>
