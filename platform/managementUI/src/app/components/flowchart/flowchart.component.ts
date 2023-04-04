@@ -29,7 +29,7 @@ export class FlowchartComponent implements OnInit {
   mesh: any;
 
   Busses: Bus[] = [];
-  busColors = ["green", "orange", "blue", "yellow", "purple", "cyan", "red"];
+  busColors = ["green", "orange", "cyan", "yellow", "red", "purple", "magenta"];
 
   toggleBus = false;
 
@@ -168,7 +168,7 @@ export class FlowchartComponent implements OnInit {
           for(let busName of busIn) {
             let bus = this.Busses.find(item => item.id === busName);
             if(bus) {
-              busInHtml = busInHtml.concat("<i class=\"material-icons\" matTooltip=\"" + bus.id + "\" style=\"color:"+ bus.color +"\">keyboard_double_arrow_down</i>");
+              busInHtml = busInHtml.concat("<div style=\"position:relative; visibility: visible; display:inline-block; \"><i class=\"material-icons\" style=\"color:"+ bus.color +" \">keyboard_double_arrow_down</i><div style=\"visibility:hidden; width:120px; background-color:black; color:#fff; text-align:center; padding: 5px 0px; border-radius:6px; position:absolute; z-index:1;\">" + bus.id + "</div></div>");
             }
           }
         }
