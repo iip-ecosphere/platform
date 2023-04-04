@@ -25,7 +25,6 @@ Planned:
 * KODEX: dynamic port assignment: [#14](https://github.com/iip-ecosphere/platform/issues/14), documentation: [#6](https://github.com/iip-ecosphere/platform/issues/6)
 
 In progress:
-* [#100](https://github.com/iip-ecosphere/platform/issues/100): Run multiple app instances
 * [#59](https://github.com/iip-ecosphere/platform/issues/59): Distributed testing/evaluation environment 
 * [#70](https://github.com/iip-ecosphere/platform/issues/70): UI progress reporting 
 * [#90](https://github.com/iip-ecosphere/platform/issues/90): UI display application service meshes:
@@ -33,6 +32,7 @@ In progress:
 
 New features:
 * [#127](https://github.com/iip-ecosphere/platform/issues/127): Integration of Flower-based federated learning through generated templates
+* [#100](https://github.com/iip-ecosphere/platform/issues/100): Allowing to start/stop multiple app instances (only via deployment plans)
 * Generic time series data aggregator in data functions
 * Application intercommunication support (`AppIntercom`)
 * [#132](https://github.com/iip-ecosphere/platform/issues/132): Bitmotec system monitoring integration
