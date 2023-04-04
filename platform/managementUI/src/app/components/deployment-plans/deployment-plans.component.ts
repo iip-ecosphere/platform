@@ -1,4 +1,3 @@
-import { firstValueFrom } from 'rxjs';
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from 'src/app/services/api.service';
 import { PlanDeployerService } from 'src/app/services/plan-deployer.service';
@@ -16,6 +15,10 @@ export class DeploymentPlansComponent implements OnInit {
   selected: Resource | undefined;
   deployPlanInput: any;
   undeployPlanInput: any;
+  undeployPlanByIdInput: any;
+
+  planId: string = ""; //for id input of undeployPlanById
+  responseMessage: string | undefined;
 
   constructor(public api: ApiService, private deployer: PlanDeployerService) {
   }
@@ -26,11 +29,12 @@ export class DeploymentPlansComponent implements OnInit {
 
   public async getArtifacts() {
     const response = await this.api.getArtifacts();
-    //console.log(response);
+    console.log(response);
     if(response.submodelElements) {
       this.deploymentPlans = response.submodelElements.find(item => item.idShort === "DeploymentPlans");
       this.deployPlanInput = response.submodelElements.find(item => item.idShort === "deployPlan")?.inputVariables;
       this.undeployPlanInput = response.submodelElements.find(item => item.idShort === "undeployPlan")?.inputVariables;
+      this.undeployPlanByIdInput = response.submodelElements.find(item => item.idShort === "undeployPlanWithId")?.inputVariables;
     }
   }
 
@@ -74,6 +78,14 @@ export class DeploymentPlansComponent implements OnInit {
         params[0].value.value = value.value;
       }
       const response = await this.deployer.deployPlan(params);
+    }
+  }
+
+  public async undeployById(id: string) {
+    let params = this.undeployPlanByIdInput;
+    const response = await this.deployer.undeployPlanById(params);
+    if(response) {
+      this.responseMessage = response.outputArguments[0].value?.value;
     }
   }
 

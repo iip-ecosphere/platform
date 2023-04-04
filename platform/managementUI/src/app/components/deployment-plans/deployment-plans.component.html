@@ -4,6 +4,16 @@
   </div>
 
   <table *ngIf="deploymentPlans; else noPlans" style="margin: 0px;" >
+    <tr>
+      <td colspan="4" style="background-color: grey">
+        <mat-form-field appearance="outline" >
+          <mat-label>undeploy by Id</mat-label>
+          <input matInput type="text" [(ngModel)]=planId />
+        </mat-form-field>
+        <button mat-raised-button (click)="undeployById(planId)" style="margin-left: 2em;">undeploy</button>
+        <span *ngIf="responseMessage" style="margin-left:2em">{{responseMessage}}</span>
+      </td>
+    </tr>
     <tr *ngFor="let plan of deploymentPlans.value; let i = index">
       <td style="width: 2%; text-align: center;"> {{i + 1}} </td>
       <td style="width: 100%;">

@@ -80,6 +80,18 @@ export class PlanDeployerService {
     }
   }
 
+  public async undeployPlanById(params: any) {
+    let response;
+    try {
+      response = await firstValueFrom(this.http.post<platformResponse>(this.ip + '/shells/' + this.urn + "/aas/submodels/Artifacts/submodel/undeployPlanWithId/invoke"
+      ,{"inputArguments": params,"requestId":"1bfeaa30-1512-407a-b8bb-f343ecfa28cf", "inoutputArguments":[], "timeout":10000}
+      , {responseType: 'json', reportProgress: true}));
+    } catch(e) {
+      console.log(e);
+    }
+    return response;
+  }
+
   public getStatus(id: string | undefined) {
     let response;
     let params = [

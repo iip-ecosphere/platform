@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ApiService } from 'src/app/services/api.service';
 import { TechnicalDataRetrieverService } from 'src/app/services/technical-data-retriever.service';
-import { PlatformResources, ResourceAttribute, GeneralInformation } from 'src/interfaces';
+import { PlatformResources, GeneralInformation } from 'src/interfaces';
 
 @Component({
   selector: 'app-resources',
@@ -62,12 +62,6 @@ export class ResourcesComponent implements OnInit {
   public async details(resource: string | undefined) {
     console.log(resource);
     let id: string | undefined = undefined;
-    // if(this.isArray(resource)){
-    //   const test = await resource?.find(item => item.idShort === "managedId");
-    //   if (test) {
-    //     id = test.value;
-    //   }
-    // }
     if(resource) {id = resource}
     if (id) {
       this.router.navigateByUrl("/resources/" + id);
