@@ -28,8 +28,10 @@ export class FlowchartComponent implements OnInit {
   servicesLoading = true;
   mesh: any;
 
-  private Busses: Bus[] = [];
+  Busses: Bus[] = [];
   busColors = ["green", "orange", "blue", "yellow", "purple", "cyan", "red"];
+
+  toggleBus = false;
 
 
   async ngOnInit() {
@@ -139,11 +141,9 @@ export class FlowchartComponent implements OnInit {
         const a = nodes[node];
         if(a.data["bus-receive"]) {
           busIn = a.data["bus-receive"];
-          console.log(busIn);
         }
         if(a.data["bus-send"]) {
           busOut = a.data["bus-send"];
-          console.log(busOut);
         }
 
         for(let bus of busIn) {
@@ -171,7 +171,6 @@ export class FlowchartComponent implements OnInit {
               busInHtml = busInHtml.concat("<i class=\"material-icons\" matTooltip=\"" + bus.id + "\" style=\"color:"+ bus.color +"\">keyboard_double_arrow_down</i>");
             }
           }
-
         }
 
         let busOutHtml = "";
@@ -182,17 +181,17 @@ export class FlowchartComponent implements OnInit {
               busOutHtml = busOutHtml.concat("<i class=\"material-icons\" matTooltip=\"" + bus.id + "\" style=\"color:"+ bus.color +"\">keyboard_double_arrow_up</i>");
             }
           }
-
         }
+
         a.html = "<div>" +
-          "<div class=\"bus-icons\">" + busInHtml + busOutHtml + "</div>" +
+          "<table style=\"width:100%; margin-top: 0px\"><tr><td style=\"background-color:white\"><div style=\"text-align: left\">"+"</div></td><td style=\"background-color:white\"><div style=\"text-align: right\">" + busInHtml + busOutHtml + "</div></td></tr></table>" +
           "<h3> " + a.data.id + "</h3>" +
           "<p>kind: "+ a.data.kind + "</p>" +
           "<p> type: "+ a.data.type + "</p>" +
           "</div>";
 
-          busIn = [];
-          busOut = [];
+        busIn = [];
+        busOut = [];
       }
       this.editor.import(graph2);
     }
