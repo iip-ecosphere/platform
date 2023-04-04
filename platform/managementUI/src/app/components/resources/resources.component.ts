@@ -59,33 +59,19 @@ export class ResourcesComponent implements OnInit {
     return bo;
   }
 
-  public async details(resource: ResourceAttribute[] | undefined) {
+  public async details(resource: string | undefined) {
+    console.log(resource);
     let id: string | undefined = undefined;
-    if(this.isArray(resource)){
-      const test = await resource?.find(item => item.idShort === "managedId");
-      if (test) {
-        id = test.value;
-      }
-    }
+    // if(this.isArray(resource)){
+    //   const test = await resource?.find(item => item.idShort === "managedId");
+    //   if (test) {
+    //     id = test.value;
+    //   }
+    // }
+    if(resource) {id = resource}
     if (id) {
       this.router.navigateByUrl("/resources/" + id);
 
-    } else {
-      console.log("ERROR: resource does not have a managedId");
-    }
-
-  }
-
-  public async details2(resource: ResourceAttribute[] | undefined) {
-    let id: string | undefined = undefined;
-    if(this.isArray(resource)){
-      const test = await resource?.find(item => item.idShort === "managedId");
-      if (test) {
-        id = test.value;
-      }
-    }
-    if (id) {
-      this.router.navigateByUrl("/services/" + id);
     } else {
       console.log("ERROR: resource does not have a managedId");
     }

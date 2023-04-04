@@ -23,7 +23,7 @@
               </div>
             </div>
             <div class="bottom">
-              <button mat-raised-button class="button" (click)="details(element.value)">
+              <button mat-raised-button class="button" (click)="details(element.idShort)">
                 resource details
               </button>
             </div>
@@ -31,24 +31,5 @@
         </mat-card>
       </div>
     </div>
-    <!-- <div *ngFor="let element of test" class="element">
-      <mat-card tabindex="0" >
-        <mat-card-content >
-          <div id="box">
-            <div>
-              <p>Element {{ element }}</p>
-              <p>rsource</p>
-            </div>
-            <div>
-              <img src="../../../assets/deviceDefault.jpg" alt="imagePlaceholder">
-            </div>
-
-          </div>
-          <div class="bottom">
-            <button mat-raised-button class="button">Details for element {{element}}</button>
-          </div>
-        </mat-card-content>
-      </mat-card>
-    </div> -->
   </div>
 </div>
