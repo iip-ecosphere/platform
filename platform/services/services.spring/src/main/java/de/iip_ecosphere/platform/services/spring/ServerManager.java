@@ -1,3 +1,15 @@
+/**
+ * ******************************************************************************
+ * Copyright (c) {2023} The original author or authors
+ *
+ * All rights reserved. This program and the accompanying materials are made 
+ * available under the terms of the Eclipse Public License 2.0 which is available 
+ * at http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
+ ********************************************************************************/
+
 package de.iip_ecosphere.platform.services.spring;
 
 import static de.iip_ecosphere.platform.services.spring.SpringInstances.getConfig;
@@ -28,8 +40,14 @@ import de.iip_ecosphere.platform.support.iip_aas.Id;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
 import de.iip_ecosphere.platform.support.net.NetworkManager;
 
+/**
+ * Manages server instances.
+ * 
+ * @author Holger Eichelberger, SSE
+ */
 public class ServerManager {
 
+    private static final String PROP_DISABLE_SERVER = "iip.services.disableServer";
     private static final Logger LOGGER = LoggerFactory.getLogger(ServerManager.class);
     private Map<SpringCloudServiceDescriptor, de.iip_ecosphere.platform.support.Server> 
         runningServers = new HashMap<>();
@@ -55,6 +73,7 @@ public class ServerManager {
     public void startServers(Map<String, String> options, Collection<SpringCloudArtifactDescriptor> artifacts) {
         String myHost = NetUtils.getOwnHostname();
         Map<String, SpringCloudServiceDescriptor> servers = getServers(options, artifacts);
+        
         if (servers.size() > 0) { // prevent warnings if there are no server specs to process
             NetworkManager netClient = networkManagerSupplier.get();
             if (null != netClient) {
@@ -193,6 +212,15 @@ public class ServerManager {
                 }
             }
         }
+        String[] disable = System.getProperty(PROP_DISABLE_SERVER, "").split(",");
+        for (String d : disable) {
+            String id = d.trim();
+            if (servers.containsKey(id)) {
+                servers.remove(id);
+                LOGGER.info("Ignoring disabled server {} from -D{}", id, PROP_DISABLE_SERVER);
+            }
+        }
+        
         if (knownServers.size() > 0) {
             LOGGER.info("Preparing server start: Of known servers {} starting {} on this host ({})", knownServers, 
                 servers, thisDevice);
