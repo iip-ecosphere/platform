@@ -39,7 +39,6 @@ export class TechnicalDataRetrieverService {
                     ManufacturerName: ManufacturerName?.value,
                     Address: Address
                   };
-                  console.log(GeneralInfo);
                   this.ResourcePictures.push(GeneralInfo); //make it so that generalInformation is stored in the api services resource array
                   this.emitter.next(GeneralInfo);
 

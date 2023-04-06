@@ -34,15 +34,11 @@ export class ResourcesComponent implements OnInit {
 
   public async getData() {
     this.tech.emitter.subscribe( item => {
-      console.log(item);
       this.ResourcePictures.push(item)
       if(this.Data && this.Data.submodelElements && item.resourceIdShort && item.picture) {
         let a = this.Data.submodelElements.find(item2 => item2.idShort === item.resourceIdShort)
-        console.log(a);
         if(a) {
           a.generalInformation = item;
-          console.log(a);
-          console.log(this.Data.submodelElements);
         }
       }
     });
@@ -51,7 +47,6 @@ export class ResourcesComponent implements OnInit {
       this.tech.getTechnicalData(this.Data.submodelElements);
 
     }
-    console.log(this.Data);
   }
 
   public isArray(value: any) {
@@ -60,14 +55,13 @@ export class ResourcesComponent implements OnInit {
   }
 
   public async details(resource: string | undefined) {
-    console.log(resource);
     let id: string | undefined = undefined;
     if(resource) {id = resource}
     if (id) {
       this.router.navigateByUrl("/resources/" + id);
 
     } else {
-      console.log("ERROR: resource does not have a managedId");
+      console.log("ERROR: invlalid idShort");
     }
 
   }
