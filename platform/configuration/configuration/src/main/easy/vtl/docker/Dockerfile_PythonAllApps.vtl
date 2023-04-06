@@ -81,6 +81,9 @@ template Dockerfile_PythonAllApps(IIPEcosphere config, FileArtifact target, sequ
         }
         'WORKDIR /app'
         ''
+        '# resources/devices'
+        'COPY resources/ resources'
+        ''
         '# Broker'
         'COPY broker/brokerJars/ brokerJars'
         'COPY broker/src/ src'
