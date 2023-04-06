@@ -776,10 +776,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         vilTemplateProcessor("InstalledDependencies", config, instDep, elements=allElements, isPython=isPythonService);
         copy(instDep, deviceDf);
 
-        Path resourcesPath = getResourcesFolder() + "/resources/devices";
-        Path genPath = "${target}/resources/devices";
-        copy(resourcesPath, genPath);
-
         String dfName = createContainerBuildScriptPlatform(mgr, target);
 
         // Wrapper-Skript 
