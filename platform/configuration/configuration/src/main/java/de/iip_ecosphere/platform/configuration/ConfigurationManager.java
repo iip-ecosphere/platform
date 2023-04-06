@@ -66,15 +66,19 @@ public class ConfigurationManager {
          * Sends the status via transport.
          */
         private void sendStatus() {
+            String heading;
             String[] alias;
             if (null != subTask) {
                 alias = new String[] {taskName, subTask};
+                heading = taskName + "/" + subTask;
             } else {
                 alias = new String[] {taskName};
+                heading = taskName;
             }
             Transport.sendStatus(
                 new StatusMessage(ActionTypes.PROCESS, "Configuration", alias)
                     .withProgress(maxSteps > 0 ? steps / maxSteps : 0));
+            getLogger().info("{} : {}", heading, (maxSteps > 0 ? steps / maxSteps : "."));
         }
         
         @Override
