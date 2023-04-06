@@ -20,12 +20,10 @@ Planned:
 * Tracing in Python Service environment: [#88](https://github.com/iip-ecosphere/platform/issues/88)
 * Cleanup, e.g., old build processes: [#115](https://github.com/iip-ecosphere/platform/issues/115)
 * CLI multi-device deployment problem: [#113](https://github.com/iip-ecosphere/platform/issues/113)
-* Angular config.json loading problem: [#79](https://github.com/iip-ecosphere/platform/issues/79)
 * KODEX: dynamic port assignment: [#14](https://github.com/iip-ecosphere/platform/issues/14), documentation: [#6](https://github.com/iip-ecosphere/platform/issues/6)
 
 In progress:
 * [#70](https://github.com/iip-ecosphere/platform/issues/70): UI progress reporting 
-* [#90](https://github.com/iip-ecosphere/platform/issues/90): UI display application service meshes:
 * [#117](https://github.com/iip-ecosphere/platform/issues/117): Multiple service managers per device
 * [#107](https://github.com/iip-ecosphere/platform/issues/107): Platform installation scripts
 
@@ -33,6 +31,7 @@ New features:
 * [#127](https://github.com/iip-ecosphere/platform/issues/127): Integration of Flower-based federated learning through generated templates
 * [#100](https://github.com/iip-ecosphere/platform/issues/100): Allowing to start/stop multiple app instances (only via deployment plans)
 * [#59](https://github.com/iip-ecosphere/platform/issues/59): Basic version of distributed testing/evaluation environment for platform and apps (PETE)
+* [#90](https://github.com/iip-ecosphere/platform/issues/90): UI display application service meshes
 * Generic time series data aggregator in data functions
 * Application intercommunication support (`AppIntercom`)
 * [#132](https://github.com/iip-ecosphere/platform/issues/132): Bitmotec system monitoring integration
@@ -41,7 +40,8 @@ Improvements:
 * [#128](https://github.com/iip-ecosphere/platform/issues/128): Refactor model to move RecordType::path to connector. **May require an upgrade of configuration models using connectors.**
 * [#129](https://github.com/iip-ecosphere/platform/issues/129): Read-only flag for RecordType field
 * [#137](https://github.com/iip-ecosphere/platform/issues/132): MQTT authentication on transport/connectors
-* [#86](https://github.com/iip-ecosphere/platform/issues/86): UI restructuring larger lists, unifiying use and look-and-feel
+* [#86](https://github.com/iip-ecosphere/platform/issues/86): UI restructuring larger lists, unifying use and look-and-feel
+* [#79](https://github.com/iip-ecosphere/platform/issues/79): Angular config.json loading problem (ok for now)
 * Configurable startup waiting time/timeout for AAS resources (ECS-Runtime, serviceManager)
 * Connector improvements for OPC UA and MQTT, improved support for nested data types in transport/Python
 * Connector mocking data with $period and $repeats, preparation for exact JSON field mapping
