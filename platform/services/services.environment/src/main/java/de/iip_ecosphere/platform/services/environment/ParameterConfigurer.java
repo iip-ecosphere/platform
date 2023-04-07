@@ -66,6 +66,19 @@ public class ParameterConfigurer<T> implements ValueConfigurer<T> {
      */
     public ParameterConfigurer<T> withSystemProperty(String sysProperty) {
         this.sysProperty = sysProperty;
+        if (null != cfg) {
+            Object value = getValueFromSysProperty(null);
+            if (cls.isInstance(value)) {
+                try {
+                    configure(cls.cast(value));
+                    LoggerFactory.getLogger(ParameterConfigurer.class).info("Initialized parameter {} from system "
+                        + "property {} with value {}", name, sysProperty, value);
+                } catch (ExecutionException e) {
+                    LoggerFactory.getLogger(ParameterConfigurer.class).warn("Cannot initialize value from system "
+                        + "property {}: {}", sysProperty, e.getMessage());
+                }
+            }
+        }
         return this;
     }
     
@@ -118,18 +131,7 @@ public class ParameterConfigurer<T> implements ValueConfigurer<T> {
      * @param value the value to be added
      */
     public void addValue(Map<String, String> values, Object value) {
-        if (sysProperty != null) {
-            String propValue = System.getProperty(sysProperty, null);
-            if (null != propValue) {
-                try {
-                    value = translator.to(propValue);
-                } catch (IOException e) {
-                    LoggerFactory.getLogger(ParameterConfigurer.class).warn("Cannot convert system property {} to "
-                        + "value of service parameter {}: {}. Ignoring system property.", 
-                        sysProperty, name, e.getMessage());
-                }
-            }
-        }
+        value = getValueFromSysProperty(value);
         if (cls.isInstance(value)) {
             try {
                 values.put(name, translator.from(cls.cast(value)));
@@ -142,5 +144,27 @@ public class ParameterConfigurer<T> implements ValueConfigurer<T> {
                 + name + " as value is not instance of " + cls.getName());
         }
     }
-
+    
+    /**
+     * Returns the object value determined from the attached system property.
+     * 
+     * @param value initial value, may be <b>null</b>
+     * @return the value if there is a system property and it can be converted/translated, {@code value} else
+     */
+    private Object getValueFromSysProperty(Object value) {
+        if (sysProperty != null) {
+            String propValue = System.getProperty(sysProperty, null);
+            if (null != propValue) {
+                try {
+                    value = translator.to(propValue);
+                } catch (IOException e) {
+                    LoggerFactory.getLogger(ParameterConfigurer.class).warn("Cannot convert system property {} to "
+                        + "value of service parameter {}: {}. Ignoring system property.", 
+                        sysProperty, name, e.getMessage());
+                }
+            }
+        }
+        return value;
+    }
+    
 }

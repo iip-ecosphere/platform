@@ -110,7 +110,7 @@ public class PythonAsyncProcessService extends AbstractPythonProcessService {
         }
         if (null != proc) {
             proc.destroyForcibly();
-            while (proc.isAlive()) {
+            while (null != proc && proc.isAlive()) {
                 TimeUtils.sleep(200);
             }
             proc = null;
@@ -201,9 +201,10 @@ public class PythonAsyncProcessService extends AbstractPythonProcessService {
      * @throws ExecutionException if sending fails for some reason
      */
     private void sendToService(String text) throws ExecutionException {
-        if (null != serviceIn) {
-            serviceIn.println(text);
-            serviceIn.flush();
+        PrintWriter si = serviceIn; // may be gone between println and flush
+        if (null != si) {
+            si.println(text);
+            si.flush();
         } // ignore, this may be a deactivated service that shall not be operating
     }
 

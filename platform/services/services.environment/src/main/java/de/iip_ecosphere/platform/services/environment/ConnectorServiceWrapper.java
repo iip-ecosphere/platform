@@ -60,9 +60,9 @@ public class ConnectorServiceWrapper<O, I, CO, CI> extends AbstractService {
         this.connParamSupplier = connParamSupplier; 
         
         AbstractService.addConfigurer(paramConfigurers, "outPath", String.class, TypeTranslators.STRING, 
-            v -> setOutPath(v), () -> outPath, "iip.connector." + getId() + ".outPath");
+            v -> setOutPath(v), () -> outPath, Starter.IIP_APP_PREFIX + getId() + ".outPath");
         AbstractService.addConfigurer(paramConfigurers, "inPath", String.class, TypeTranslators.STRING, 
-            v -> setInPath(v), () -> inPath, "iip.connector." + getId() + ".inPath");
+            v -> setInPath(v), () -> inPath, Starter.IIP_APP_PREFIX + getId() + ".inPath");
     }
 
     /**

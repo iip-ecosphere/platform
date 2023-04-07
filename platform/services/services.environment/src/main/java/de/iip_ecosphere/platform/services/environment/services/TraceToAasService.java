@@ -333,6 +333,7 @@ public class TraceToAasService extends AbstractService {
     
     /**
      * Returns a pre-configured serialization provider for the output connector.
+     * Please consider registering <b>data type implementations</b> rather than data type interfaces.
      * 
      * @return the provider
      */
