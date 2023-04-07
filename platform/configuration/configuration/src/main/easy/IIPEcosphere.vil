@@ -530,6 +530,10 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     Path instDep = "${appRoot}/../installedDependencies.yml";
                     vilTemplateProcessor("InstalledDependencies", config, instDep, elements=elements, isPython=isPythonService);
             
+                    Path resourcesPath = getResourcesFolder() + "/resources/devices";
+                    Path genPath = "${appRoot}/../resources/devices";
+                    copy(resourcesPath, genPath);
+            
                     String dfName = createContainerBuildScript(mgr, a, elements, appRoot, cntType, isPythonService, device);
 
                     if (cntType == ContainerType::Ecs_Svc_App) {
@@ -679,6 +683,10 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                         Path instDep = "${target}/installedDependencies.yml";
                         vilTemplateProcessor("InstalledDependencies", config, instDep, elements=allElements, isPython=isPythonService);
                         copy(instDep, deviceDf);
+
+                        Path resourcesPath = getResourcesFolder() + "/resources/devices";
+                        Path genPath = "${target}/resources/devices";
+                        copy(resourcesPath, genPath);
 
                         setOf(Application) applications = getApplications();
                         String dfName = createContainerBuildScriptAllApps(mgr, applications, allElements, target, cntType, isPythonService, device);

@@ -1,7 +1,5 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { ConnectorTypesComponent }
-  from './components/connector-types/connector-types.component';
 import { ContainersComponent }
   from './components/containers/containers.component';
 import { DeploymentPlansComponent }
@@ -24,7 +22,6 @@ const routes: Routes = [
   { path: 'containers', component: ContainersComponent },
   { path: 'services/:id', component: ServicesComponent },
   { path: 'services', component: ServicesComponent },
-  { path: 'connectorTypes', component: ConnectorTypesComponent },
   { path: 'deploymentPlans', component: DeploymentPlansComponent },
   { path: 'flowchart/:mesh', component: FlowchartComponent },
   { path: 'flowchart', component: FlowchartComponent },

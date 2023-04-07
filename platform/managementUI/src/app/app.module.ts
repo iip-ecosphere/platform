@@ -26,7 +26,6 @@ import {MatTooltipModule} from '@angular/material/tooltip';
 import { ResourcesComponent } from './components/resources/resources.component';
 import { ContainersComponent } from './components/containers/containers.component';
 import { ServicesComponent } from './components/services/services.component';
-import { ConnectorTypesComponent } from './components/connector-types/connector-types.component';
 import { TidyPipe } from './pipes/tidy.pipe';
 import { EnvConfigService } from './services/env-config.service';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -44,7 +43,6 @@ import { ListComponent } from './components/list/list.component';
     ResourcesComponent,
     ContainersComponent,
     ServicesComponent,
-    ConnectorTypesComponent,
     TidyPipe,
     DeploymentPlansComponent,
     ResourceDetailsComponent,
