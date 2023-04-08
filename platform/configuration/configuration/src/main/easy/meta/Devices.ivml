@@ -215,6 +215,8 @@ project Devices {
         PYTHON38;
         PYTHON39;
         tensorflow280;
+        tensorflow290;
+        keras290;
         defaultDeviceType;
     } but (f|f.bindingTime >= BindingTime.runtimeMon);
 

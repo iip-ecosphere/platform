@@ -20,6 +20,10 @@ template PythonReq(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElem
                }
                setOf(Dependency) dependencies = device.provides -> selectByType(PythonDependency);
                for (PythonDependency dependency : dependencies) {
+                   if ((dependency.name == d.name) and ((dependency.version == null) or (dependency.version.length() == 0))) {
+                       exists = 1;
+                   }
+
                    if ((dependency.name == d.name) and (dependency.version == d.version)) {
                        exists = 1;
                    }
