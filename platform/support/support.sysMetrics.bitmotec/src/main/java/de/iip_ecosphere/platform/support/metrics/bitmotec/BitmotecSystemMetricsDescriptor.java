@@ -13,6 +13,10 @@
 package de.iip_ecosphere.platform.support.metrics.bitmotec;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+
+import org.apache.commons.io.FileUtils;
 
 import de.iip_ecosphere.platform.support.metrics.SystemMetrics;
 import de.iip_ecosphere.platform.support.metrics.SystemMetricsDescriptor;
@@ -31,9 +35,16 @@ public class BitmotecSystemMetricsDescriptor implements SystemMetricsDescriptor 
 
     @Override
     public boolean isEnabled() {
+        boolean enabled = false;
         File f1 = new File("/etc/os-release"); // as discussed with Bitmotec
-        // /etc/core/settings.env
-        return f1.exists(); // look into file
+        try {
+            String contents = FileUtils.readFileToString(f1, Charset.defaultCharset());
+            enabled = contents.contains("Bitmoteco Core OS");
+        } catch (IOException e) {
+            // ignore, no bitmotec
+        }
+        // potential alternative: /etc/core/settings.env
+        return enabled;
     }
 
     @Override 
