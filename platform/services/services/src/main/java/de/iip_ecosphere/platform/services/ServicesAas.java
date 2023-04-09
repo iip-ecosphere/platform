@@ -345,12 +345,18 @@ public class ServicesAas implements AasContributor {
      * @return the number of service instances
      */
     private static int getServiceStateCount(String state) {
-        ServiceManager mgr = ServiceFactory.getServiceManager();
-        ServiceState st = ServiceState.valueOf(state); // exception -> wrapper
         int count = 0;
-        for (String id : mgr.getServiceIds()) {
-            if (st == mgr.getServiceState(id)) {
-                count++;
+        if (null != state) {
+            try {
+                ServiceManager mgr = ServiceFactory.getServiceManager();
+                ServiceState st = ServiceState.valueOf(state); // exception -> wrapper
+                for (String id : mgr.getServiceIds()) {
+                    if (st == mgr.getServiceState(id)) {
+                        count++;
+                    }
+                }
+            } catch (IllegalArgumentException e) {
+                // unknown state
             }
         }
         return count; 
