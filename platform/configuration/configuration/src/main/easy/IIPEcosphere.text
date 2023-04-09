@@ -17,4 +17,5 @@ IIPEcosphere::modelName = Name of the top-level IVML project representing the ac
 IIPEcosphere::pidDir = Installation directory where to place PID files, i.e., files containing the process identifier of core platform processes.
 IIPEcosphere::sharedArtifact = Maven coordinate of the generated artifact containing the platform service interfaces (if sharedInterfaces=false).
 IIPEcosphere::sharedInterfaces = Generate application interfaces into application code (default false, i.e., use separate folders)
-IIPEcosphere::containerGeneration = Start or skip the containers creation.
+IIPEcosphere::containerGeneration = Generate or skip the creation of all containers (default ture).
+IIPEcosphere::platformContainerGeneration = Generate or skip the Platform container creation (default ture).
