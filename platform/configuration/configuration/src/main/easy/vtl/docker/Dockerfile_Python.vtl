@@ -120,7 +120,7 @@ template Dockerfile_Python(IIPEcosphere config, FileArtifact target, sequenceOf(
         '# Running the script'
         'COPY wrapper_script.sh wrapper_script.sh'
         'RUN chmod 777 wrapper_script.sh'
-        'CMD ./wrapper_script.sh'
+        'CMD ./wrapper_script.sh >> /var/log/iip.logs'
     }
     
     def genDependency(Dependency d) {
