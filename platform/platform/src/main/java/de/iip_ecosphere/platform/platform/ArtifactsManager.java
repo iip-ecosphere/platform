@@ -705,5 +705,34 @@ public class ArtifactsManager {
     public int getArtifactCount() {
         return artifacts.size();
     }
+    
+    /**
+     * Test function for scanning a directory/file for artifacts.
+     * 
+     * @param args the first argument if given is interpreted as file/folder to scan
+     */
+    public static void main(String[] args) {
+        if (args.length > 0) {
+            ArtifactsManager mgr = new ArtifactsManager();
+            mgr.testScan(new File(args[0]));
+        }
+    }
+    
+    /**
+     * Scans {@code file} for potential artifacts and emits information.
+     * 
+     * @param file the file to scan
+     */
+    private void testScan(File file) {
+        if (file.isFile()) {
+            Artifact newArtifact = createArtifactInfo(file.toPath(), null);
+            System.out.println("Artifact for " + file + ": " + newArtifact);
+        } else {
+            File[] files = file.listFiles();
+            for (File f: files) {
+                testScan(f);
+            }
+        }
+    }
 
 }

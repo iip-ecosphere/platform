@@ -241,7 +241,8 @@ public class PlatformAas implements AasContributor {
                     = sub.createSubmodelElementCollectionBuilder(collName, false, false);
     
                 SubmodelElementCollectionBuilder dBuilder 
-                    = cBuilder.createSubmodelElementCollectionBuilder(fixId(art.getId()), false, false);
+                    = cBuilder.createSubmodelElementCollectionBuilder(
+                        fixId(art.getId() + "_" + art.getAccessUri().hashCode()), false, false);
                 dBuilder.createPropertyBuilder(NAME_PROP_ID)
                     .setValue(Type.STRING, art.getId())
                     .build();
