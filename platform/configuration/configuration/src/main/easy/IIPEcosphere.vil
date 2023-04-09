@@ -534,11 +534,10 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     Path devicesGenPath = "${appRoot}/../resources/devices";
                     copy(devicesPath, devicesGenPath);
 
-                    Path softwarePath = getResourcesFolder() + "/software";
-                    Path softwareGenPath = "${appRoot}/../resources";
-                    copy(softwarePath, softwareGenPath);
-
                     Path identityStorePath = getResourcesFolder() + "/platform/identityStore.yml";
+                    if (not(identityStorePath.exists())) {
+                        identityStorePath = getResourcesFolder() + "/software/identityStore.yml";
+                    }
                     Path identityStoreGenPath = "${appRoot}/../resources";
                     copy(identityStorePath, identityStoreGenPath);
 
@@ -692,17 +691,16 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                         vilTemplateProcessor("InstalledDependencies", config, instDep, elements=allElements, isPython=isPythonService);
                         copy(instDep, deviceDf);
 
-	                    Path devicesPath = getResourcesFolder() + "/devices";
-	                    Path devicesGenPath = "${target}/resources/devices";
-	                    copy(devicesPath, devicesGenPath);
-	
-	                    Path softwarePath = getResourcesFolder() + "/software";
-	                    Path softwareGenPath = "${target}/resources";
-	                    copy(softwarePath, softwareGenPath);
-	
-	                    Path identityStorePath = getResourcesFolder() + "/platform/identityStore.yml";
-	                    Path identityStoreGenPath = "${target}/resources";
-	                    copy(identityStorePath, identityStoreGenPath);
+                        Path devicesPath = getResourcesFolder() + "/devices";
+                        Path devicesGenPath = "${target}/resources/devices";
+                        copy(devicesPath, devicesGenPath);
+	                    
+                        Path identityStorePath = getResourcesFolder() + "/platform/identityStore.yml";
+                        if (not(identityStorePath.exists())) {
+                            identityStorePath = getResourcesFolder() + "/software/identityStore.yml";
+                        }
+                        Path identityStoreGenPath = "${target}/resources";
+                        copy(identityStorePath, identityStoreGenPath);
 
                         setOf(Application) applications = getApplications();
                         String dfName = createContainerBuildScriptAllApps(mgr, applications, allElements, target, cntType, isPythonService, device);
