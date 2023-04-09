@@ -101,7 +101,7 @@ public class YamlDeviceAasProvider extends DeviceAasProvider {
                     smb.build();
                 });
             } catch (IOException e) {
-                LoggerFactory.getLogger(getClass()).error("Device AAS cannot be createed: : {}", e.getMessage());
+                LoggerFactory.getLogger(getClass()).error("Device AAS cannot be created: : {}", e.getMessage());
             }
 
             if (null != aas) {
@@ -130,8 +130,10 @@ public class YamlDeviceAasProvider extends DeviceAasProvider {
             try {
                 is = new FileInputStream("src/test/resources/nameplate.yml");
             } catch (IOException e) {
-                LoggerFactory.getLogger(YamlDeviceAasProvider.class).info("Checking AAS for id {}", Id.getDeviceId());
-                is = AasUtils.CLASSPATH_RESOURCE_RESOLVER.resolve(Id.getDeviceId().toUpperCase() + ".yml");
+                String fName = Id.getDeviceId().toUpperCase() + ".yml";
+                LoggerFactory.getLogger(YamlDeviceAasProvider.class).info("Checking AAS for id {} in resource file {}", 
+                    Id.getDeviceId(), fName);
+                is = AasUtils.CLASSPATH_RESOURCE_RESOLVER.resolve(fName);
             }
         }
         return AbstractSetup.readFromYaml(NameplateSetup.class, is); // closes is
