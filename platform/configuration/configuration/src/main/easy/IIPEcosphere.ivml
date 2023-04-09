@@ -21,7 +21,8 @@ project IIPEcosphere {
     String configFolder = null;
     String genTarget = "gen";
     String modelName = "PlatformConfiguration";
-    Boolean containerGeneration = true; // To start or skip the containers creation
+    Boolean containerGeneration = true; // To generate or skip the creation of all containers.
+    Boolean platformContainerGeneration = true; // To generate or skip the Platform container creation.
     
     // legacy transition (to be removed)
     Boolean sharedInterfaces = false;

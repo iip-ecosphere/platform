@@ -178,4 +178,14 @@ template Basics(Configuration config, FileArtifact target) {
         result;
     }
 
+    def getPlatformContainerGenerationSafe(Boolean platformContainerGeneration) {
+        Boolean result;
+        if (platformContainerGeneration <> null) {
+            result = platformContainerGeneration;
+        } else {
+            result = true;
+        }
+        result;
+    }
+
 }
