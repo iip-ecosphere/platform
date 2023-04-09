@@ -12,7 +12,7 @@ project DevicePartPhoenixContact {
         CpuArchitecture cpu = CpuArchitecture::x86;
         CpuBits bits = CpuBits::bit64; // TODO check
         ContainerType containerType = ContainerType::EcsSvc_AllApps;
-        setOf(refTo(Dependency)) provides = {refBy(tensorflow280)}; // Tensorflow
+        setOf(refTo(Dependency)) provides = {refBy(tensorflowNoVersion)}; // Tensorflow
         // see https://github.com/iip-ecosphere/platform/tree/main/platform/support/support.sysMetrics.plcnext, 
         // might also be /run/plcnext/grpc.sock:/run/plcnext/grpc.sock
         setOf(ContainerArgument) containerArguments = {

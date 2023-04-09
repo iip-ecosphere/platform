@@ -112,7 +112,12 @@ project Devices {
        name = "tensorflow",
        version = "2.9.0"
     };
-    
+
+    PythonDependency tensorflowNoVersion = {
+       name = "tensorflow",
+       version = ""
+    };
+        
     PythonDependency keras290 = {
        name = "keras",
        version = "2.9.0"
@@ -217,6 +222,7 @@ project Devices {
         tensorflow280;
         tensorflow290;
         keras290;
+        tensorflowNoVersion;
         defaultDeviceType;
     } but (f|f.bindingTime >= BindingTime.runtimeMon);
 
