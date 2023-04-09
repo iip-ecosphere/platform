@@ -22,7 +22,8 @@ import de.iip_ecosphere.platform.support.metrics.SystemMetrics;
 import de.iip_ecosphere.platform.support.metrics.SystemMetricsDescriptor;
 
 /**
- * The default JSL system metrics descriptor.
+ * The default JSL system metrics descriptor. Enables the metrics if {@code /etc/os-release} or
+ * {@code /etc/os-release-bitmo} looks like a bitmotec file. 
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -35,15 +36,26 @@ public class BitmotecSystemMetricsDescriptor implements SystemMetricsDescriptor 
 
     @Override
     public boolean isEnabled() {
+        boolean enabled = isOsRelease(new File("/etc/os-release")); // as discussed with Bitmotec
+        enabled |= isOsRelease(new File("/etc/os-release-bitmo")); // mounted in container
+        // potential alternative: /etc/core/settings.env
+        return enabled;
+    }
+
+    /**
+     * Checks the given file considering it as {@code os-release} file.
+     * 
+     * @param file the file
+     * @return {@code true} if bitmotec is detected, {@code false} else
+     */
+    private boolean isOsRelease(File file) {
         boolean enabled = false;
-        File f1 = new File("/etc/os-release"); // as discussed with Bitmotec
         try {
-            String contents = FileUtils.readFileToString(f1, Charset.defaultCharset());
+            String contents = FileUtils.readFileToString(file, Charset.defaultCharset());
             enabled = contents.contains("Bitmoteco Core OS");
         } catch (IOException e) {
             // ignore, no bitmotec
         }
-        // potential alternative: /etc/core/settings.env
         return enabled;
     }
 
