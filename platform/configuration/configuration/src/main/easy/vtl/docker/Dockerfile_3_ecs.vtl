@@ -27,6 +27,6 @@ template Dockerfile_3_ecs(IIPEcosphere config, FileArtifact target, sequenceOf(M
     	'COPY common/ common'
     	'COPY ecs.sh ecs.sh'
     	''
-        'CMD ./ecs.sh'
+        'CMD ./ecs.sh >> /var/log/iip.logs'
     }	
 }

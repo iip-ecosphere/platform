@@ -63,6 +63,6 @@ template DockerfileAllApps(IIPEcosphere config, FileArtifact target, sequenceOf(
         }    	
         ''
         'RUN chmod 777 wrapper_script.sh'
-        'CMD ./wrapper_script.sh'
+        'CMD ./wrapper_script.sh >> /var/log/iip.logs'
     }
 }
