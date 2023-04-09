@@ -36,14 +36,23 @@ public class TypeResolver {
 
     static {
         PRIMITIVES.put("String", String.class);
+        PRIMITIVES.put("String[]", String[].class);
         PRIMITIVES.put("int", Integer.TYPE);
+        PRIMITIVES.put("int[]", int[].class);
         PRIMITIVES.put("boolean", Boolean.TYPE);
+        PRIMITIVES.put("boolean[]", boolean[].class);
         PRIMITIVES.put("byte", Byte.TYPE);
+        PRIMITIVES.put("byte[]", byte[].class);
         PRIMITIVES.put("double", Double.TYPE);
+        PRIMITIVES.put("double[]", double[].class);
         PRIMITIVES.put("float", Float.TYPE);
+        PRIMITIVES.put("float[]", float[].class);
         PRIMITIVES.put("char", Character.TYPE);
+        PRIMITIVES.put("char[]", char[].class);
         PRIMITIVES.put("short", Short.TYPE);
+        PRIMITIVES.put("short[]", short[].class);
         PRIMITIVES.put("long", Long.TYPE);
+        PRIMITIVES.put("long[]", long[].class);
     }
     
     /**
@@ -143,8 +152,13 @@ public class TypeResolver {
      * @return the type, may be <b>null</b>
      */
     public Class<?> resolve(String name) {
+        int arrayDims = 0;
         Class<?> result = PRIMITIVES.get(name);
         if (null == result) {
+            while (name.endsWith("[]")) {
+                name = name + name.substring(0, name.length() - 2);
+                arrayDims++;
+            }
             try {
                 result = Class.forName(name);
             } catch (ClassNotFoundException e) {
@@ -152,6 +166,12 @@ public class TypeResolver {
         }
         if (null == result) {
             result = classes.get(name);
+        }
+        if (null != result && arrayDims > 0 && !result.isArray()) {
+            try {
+                result = Class.forName("[L" + result.getName() + ";");
+            } catch (ClassNotFoundException e) {
+            }
         }
         return result;
     }
