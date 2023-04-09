@@ -377,7 +377,7 @@ public class NameplateSetup {
                 AasBuilder aasBuilder = factory.createAasBuilder(id, urn);
                 TechnicalDataSubmodelBuilder tdBuilder = aasBuilder.createTechnicalDataSubmodelBuilder(null);
                 GeneralInformationBuilder giBuilder = tdBuilder.createGeneralInformationBuilder(
-                    getManufacturerName(), 
+                    LangString.create(getManufacturerName()).getDescription(), 
                     LangString.create(getManufacturerProductDesignation()), "", "");
                 PlatformAas.createAddress(giBuilder, getAddress()); // inofficial, not in Generic Frame
                 AasUtils.resolveImage(getProductImage(), AasUtils.CLASSPATH_RESOURCE_RESOLVER, false, 
