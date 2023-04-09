@@ -120,13 +120,15 @@ public class ApplicationInstanceAasConstructor {
      */
     static int countAppInstances(String appId, String planId, Submodel sub) {
         int result = 0;
-        for (SubmodelElement elt: sub.submodelElements()) {
-            if (elt instanceof SubmodelElementCollection) {
-                SubmodelElementCollection coll = (SubmodelElementCollection) elt;
-                if (appId.equals(AasUtils.getPropertyValueAsStringSafe(coll, NAME_PROP_APPID, null))) {
-                    if (null == planId || planId.isEmpty() 
-                        || planId.equals(AasUtils.getPropertyValueAsStringSafe(coll, NAME_PROP_PLANID, null))) {
-                        result++;
+        if (null != sub && appId != null) {
+            for (SubmodelElement elt: sub.submodelElements()) {
+                if (elt instanceof SubmodelElementCollection) {
+                    SubmodelElementCollection coll = (SubmodelElementCollection) elt;
+                    if (appId.equals(AasUtils.getPropertyValueAsStringSafe(coll, NAME_PROP_APPID, null))) {
+                        if (null == planId || planId.isEmpty() 
+                            || planId.equals(AasUtils.getPropertyValueAsStringSafe(coll, NAME_PROP_PLANID, null))) {
+                            result++;
+                        }
                     }
                 }
             }
