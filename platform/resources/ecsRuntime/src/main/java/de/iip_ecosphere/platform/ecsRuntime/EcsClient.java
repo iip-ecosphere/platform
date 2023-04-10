@@ -32,7 +32,7 @@ public interface EcsClient extends ContainerOperations, DeviceManagementOperatio
     public SubmodelElementCollection getContainers();
     
     /**
-     * Like {@link #addContainer(String)} but tracked by a {@code taskId}.
+     * Like {@link #addContainer(URI)} but tracked by a {@code taskId}.
      * 
      * @param taskId the task id to report on
      * @param location the location from where to download the container, e.g., an URL
