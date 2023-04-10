@@ -58,6 +58,7 @@ import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.Meter;
 import test.de.iip_ecosphere.platform.test.amqp.qpid.TestQpidServer;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
+import de.iip_ecosphere.platform.support.iip_aas.AbstractAasLifecycleDescriptor;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 
 /**
@@ -166,6 +167,7 @@ public class EcsAasTest {
     @Test
     public void testLifecycle() throws IOException, ExecutionException, URISyntaxException {
         NotificationMode oldM = ActiveAasBase.setNotificationMode(NotificationMode.SYNCHRONOUS);
+        boolean oldWaitIip = AbstractAasLifecycleDescriptor.setWaitForIipAas(false);
         AasSetup aasSetup = AasSetup.createLocalEphemeralSetup(null, false);
         AasSetup oldSetup = AasPartRegistry.setAasSetup(aasSetup);
         EcsFactory.getSetup().setAas(aasSetup);
@@ -201,6 +203,7 @@ public class EcsAasTest {
         registryServer.stop(true);
 
         AasPartRegistry.setAasSetup(oldSetup);
+        AbstractAasLifecycleDescriptor.setWaitForIipAas(oldWaitIip);
         ActiveAasBase.setNotificationMode(oldM);
         MetricsAasConstructor.clear();        
     }

@@ -45,6 +45,7 @@ import de.iip_ecosphere.platform.support.aas.AasPrintVisitor;
 import de.iip_ecosphere.platform.support.aas.AasServer;
 import de.iip_ecosphere.platform.support.aas.ServerRecipe;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
+import de.iip_ecosphere.platform.support.iip_aas.AbstractAasLifecycleDescriptor;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.Id;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
@@ -121,6 +122,7 @@ public class ServicesAasTest {
     @Test
     public void testLifecycle() throws IOException, ExecutionException, URISyntaxException {
         NotificationMode oldM = ActiveAasBase.setNotificationMode(NotificationMode.SYNCHRONOUS);
+        boolean oldWaitIip = AbstractAasLifecycleDescriptor.setWaitForIipAas(false);
         AasSetup aasSetup = AasSetup.createLocalEphemeralSetup(null, false);
         AasSetup oldSetup = AasPartRegistry.setAasSetup(aasSetup);
         ServiceFactory.setAasSetup(aasSetup);
@@ -144,6 +146,7 @@ public class ServicesAasTest {
         aasServer.stop(true);
         registryServer.stop(true);
 
+        AbstractAasLifecycleDescriptor.setWaitForIipAas(oldWaitIip);
         AasPartRegistry.setAasSetup(oldSetup);
         ActiveAasBase.setNotificationMode(oldM);
     }
