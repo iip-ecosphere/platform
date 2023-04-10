@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from 'src/app/services/api.service';
 import { PlanDeployerService } from 'src/app/services/plan-deployer.service';
-import { ResourceAttribute, Resource, PlatformArtifacts } from 'src/interfaces';
+import { ResourceAttribute, Resource, PlatformArtifacts, InputVariable } from 'src/interfaces';
 
 @Component({
   selector: 'app-deployment-plans',
@@ -17,7 +17,7 @@ export class DeploymentPlansComponent implements OnInit {
   undeployPlanInput: any;
   undeployPlanByIdInput: any;
 
-  planId: string = ""; //for id input of undeployPlanById
+  instanceId: string[] = []; //for id input of undeployPlanById
   responseMessage: string | undefined;
 
   constructor(public api: ApiService, private deployer: PlanDeployerService) {
@@ -29,11 +29,14 @@ export class DeploymentPlansComponent implements OnInit {
 
   public async getArtifacts() {
     const response = await this.api.getArtifacts();
+    console.log(response);
     if(response.submodelElements) {
       this.deploymentPlans = response.submodelElements.find(item => item.idShort === "DeploymentPlans");
       this.deployPlanInput = response.submodelElements.find(item => item.idShort === "deployPlan")?.inputVariables;
       this.undeployPlanInput = response.submodelElements.find(item => item.idShort === "undeployPlan")?.inputVariables;
       this.undeployPlanByIdInput = response.submodelElements.find(item => item.idShort === "undeployPlanWithId")?.inputVariables;
+
+      this.instanceId.fill("", 0, this.deploymentPlans?.value?.length);
     }
   }
 
@@ -61,27 +64,36 @@ export class DeploymentPlansComponent implements OnInit {
 
   }
 
-  public async undeploy(plan?: Resource) {
-    let params = this.undeployPlanInput;
-    if(!plan && this.selected && this.selected.value) {
-       let value = this.selected.value.find(item => item.idShort === "uri");
-       if (value) {
-        params[0].value.value = value.value;
-       }
-      const response = this.deployer.deployPlan(params, true);
-      this.selected = undefined;
-      console.log(response);
-    } else if(plan && plan.value) {
-      let value = plan.value.find(item => item.idShort === "uri");
-      if(value) {
-        params[0].value.value = value.value;
+  public async undeploy(index: number, plan?: Resource,) {
+    if(plan && this.instanceId[index] && this.instanceId[index] != "" ) {
+      this.undeployById(plan, index);
+    } else {
+      let params = this.undeployPlanInput;
+      if(!plan && this.selected && this.selected.value) {
+         let value = this.selected.value.find(item => item.idShort === "uri");
+         if (value) {
+          params[0].value.value = value.value;
+         }
+        const response = this.deployer.deployPlan(params, true);
+        this.selected = undefined;
+        console.log(response);
+      } else if(plan && plan.value) {
+        let value = plan.value.find(item => item.idShort === "uri");
+        if(value) {
+          params[0].value.value = value.value;
+        }
+        const response = await this.deployer.deployPlan(params);
       }
-      const response = await this.deployer.deployPlan(params);
     }
+
   }
 
-  public async undeployById(id: string) {
-    let params = this.undeployPlanByIdInput;
+  public async undeployById(plan: Resource, index: number) {
+    let params: InputVariable[] = this.undeployPlanByIdInput;
+    if(params[0].value && params[1].value) {
+      params[0].value.value = plan.value?.find(item => item.idShort === "uri")?.value;
+      params[1].value.value = this.instanceId[index];
+    }
     const response = await this.deployer.undeployPlanById(params);
     if(response) {
       this.responseMessage = response.outputArguments[0].value?.value;
