@@ -25,6 +25,7 @@ import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.LifecycleHandler;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.TimeUtils;
+import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
@@ -159,7 +160,7 @@ public class PlatformTest {
             PlatformAas.NAME_COLL_SERVICE_ARTIFACTS);
         SubmodelElementCollection coll = sc.getSubmodel().getSubmodelElementCollection(
             PlatformAas.NAME_COLL_SERVICE_ARTIFACTS);
-        assertSubmodelElementsCollection(coll, "art", "art1");
+        assertSubmodelElementsCollection(coll, "art", "art1", "art_");
         
         coll = sc.getSubmodel().getSubmodelElementCollection(PlatformAas.NAME_COLL_CONTAINER);
         assertSubmodelElementsCollection(coll, "cnt1");
@@ -178,7 +179,7 @@ public class PlatformTest {
             PlatformAas.NAME_COLL_SERVICE_ARTIFACTS);
         coll = sc.getSubmodel().getSubmodelElementCollection(
             PlatformAas.NAME_COLL_SERVICE_ARTIFACTS);        
-        Assert.assertEquals(3, coll.getElementsCount());
+        Assert.assertEquals(4, coll.getElementsCount());
 
         coll = sc.getSubmodel().getSubmodelElementCollection(
             PlatformAas.NAME_COLL_CONTAINER);
@@ -200,7 +201,14 @@ public class PlatformTest {
     private void assertSubmodelElementsCollection(SubmodelElementCollection coll, String... ids) {
         Assert.assertEquals(ids.length, coll.getElementsCount());
         for (String id: ids) {
-            Assert.assertNotNull(coll.getElement(id)); // ID translated to AAS
+            boolean found = false;
+            for (SubmodelElement elt : coll.elements()) {
+                if (elt.getIdShort().startsWith(id + "_")) {
+                    found = true;
+                    break;
+                }
+            }
+            Assert.assertTrue(found); // ID translated to AAS
         }
     }
 
