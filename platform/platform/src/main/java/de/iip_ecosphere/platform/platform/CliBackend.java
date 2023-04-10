@@ -502,7 +502,7 @@ class CliBackend {
      * Deploys a {@link ServiceDeploymentPlan} given in terms of an URI.
      * 
      * @param plan the plan to be deployed
-     * @return the application instance id of the started application
+     * @return the application instance id of the started application, <b>null</b> for none
      * @throws ExecutionException if deploying the plain fails
      */
     protected static String deployPlan(URI plan) throws ExecutionException {
@@ -555,6 +555,7 @@ class CliBackend {
                         println("Not all start commands finished within timeout");
                     }
                 } catch (InterruptedException e) {
+                    PlatformAas.notifyAppInstanceStopped(p.getAppId(), appInstanceId);
                     throw new ExecutionException(e);
                 }
             }
@@ -569,9 +570,11 @@ class CliBackend {
                 }
             }
             if (msg.length() > 0) {
+                PlatformAas.notifyAppInstanceStopped(p.getAppId(), appInstanceId);
                 throw new ExecutionException(msg, null);
             }
         } catch (IOException | URISyntaxException e) {
+            PlatformAas.notifyAppInstanceStopped(p.getAppId(), appInstanceId);
             throw new ExecutionException(e);
         }
         return appInstanceId;
