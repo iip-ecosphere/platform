@@ -206,7 +206,7 @@ public class AasUtils {
         Object param = index >= 0 && index < args.length ? args[index] : null;
         Map<String, String> result = dflt;
         if (null != param) {
-            result = JsonUtils.fromJson(result, Map.class);
+            result = JsonUtils.fromJson(param, Map.class);
         }
         return result;
     }

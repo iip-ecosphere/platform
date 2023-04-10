@@ -14,6 +14,8 @@ package test.de.iip_ecosphere.platform.support.iip_aas;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -134,6 +136,36 @@ public class AasUtilsTest {
             Assert.assertTrue(r.length() > 0); 
             Assert.assertEquals("image/png", m); 
         });
+    }
+    
+    /**
+     * Tests {@link AasUtils#readMap(Object[], int, java.util.Map)}.
+     */
+    @Test
+    public void testReadMap() {
+        Object[] params = new Object[] {"value", "{}"};
+        Map<String, String> tmp = AasUtils.readMap(params, 1, null);
+
+        Assert.assertNotNull(tmp);
+        Map<String, String> expected = new HashMap<>();
+        Assert.assertEquals(expected, tmp);
+        expected.clear();
+
+        params = new Object[] {"{\"key\":\"value\"}", "value"};
+        tmp = AasUtils.readMap(params, 0, null);
+
+        Assert.assertNotNull(tmp);
+        expected = new HashMap<>();
+        expected.put("key", "value");
+        Assert.assertEquals(expected, tmp);
+        expected.clear();
+
+        tmp = AasUtils.readMap(params, 2, expected);
+        Assert.assertNotNull(tmp);
+        Assert.assertEquals(expected, tmp);
+
+        tmp = AasUtils.readMap(params, -1, null);
+        Assert.assertNull(tmp);
     }
 
 }
