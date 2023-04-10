@@ -36,6 +36,7 @@ class MyServiceManager extends AbstractServiceManager<MyArtifactDescriptor, MySe
     private int artifactId;
     private int serviceId;
     private boolean small;
+    private Map<String, String> lastOptions;
 
     /**
      * Prevents external creation.
@@ -115,9 +116,21 @@ class MyServiceManager extends AbstractServiceManager<MyArtifactDescriptor, MySe
     public void startService(String... serviceIds) throws ExecutionException {
         startService(null, serviceIds);
     }
+    
+    /**
+     * Returns the last options received through {@link #startService(Map, String...)}.
+     * 
+     * @return the last options, may be <b>null</b>
+     */
+    Map<String, String> getLastOptions() {
+        Map<String, String> result = lastOptions;
+        lastOptions = null;
+        return result;
+    }
 
     @Override
     public void startService(Map<String, String> options, String... serviceIds) throws ExecutionException {
+        lastOptions = options;
         for (String s: serviceIds) {
             setState(getServiceDescriptor(s, "serviceId", "start"), ServiceState.STARTING);
             setState(getServiceDescriptor(s, "serviceId", "start"), ServiceState.RUNNING);

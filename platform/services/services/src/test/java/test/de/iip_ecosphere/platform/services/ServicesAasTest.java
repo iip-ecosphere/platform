@@ -48,6 +48,7 @@ import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.AbstractAasLifecycleDescriptor;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.Id;
+import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import test.de.iip_ecosphere.platform.test.amqp.qpid.TestQpidServer;
@@ -226,12 +227,33 @@ public class ServicesAasTest {
         mgr.updateService(aId, dummy);
         
         // test with multiple ids
-        client.startService(ids);
+        Map<String, String> options = new HashMap<>();
+        options.put(ServicesAasClient.OPTION_ARGS, 
+            JsonUtils.toJson(CollectionUtils.toList("-Dx.y=true", "-Dy.z=false")));
+        options.put(ServicesAasClient.OPTION_PARAMS, "{\"service\":{\"p1\":\"v1\"}");
+        client.startService(options, ids);
+        assertOptions(mgr, options);
         client.stopService(ids);
         
         client.removeArtifact(aId);
         Assert.assertFalse(mgr.getArtifactIds().contains(aId));
         Assert.assertFalse(mgr.getArtifacts().contains(aDesc));
+    }
+    
+    /**
+     * Asserts received options on {@code mgr}.
+     * 
+     * @param mgr the manager instance
+     * @param options the expected options
+     */
+    private void assertOptions(ServiceManager mgr, Map<String, String> options) {
+        Assert.assertTrue(mgr instanceof MyServiceManager);
+        Map<String, String> received = ((MyServiceManager) mgr).getLastOptions();
+        if (options == null) {
+            Assert.assertNull(received);
+        } else {
+            Assert.assertEquals(options, received);
+        }
     }
 
 }

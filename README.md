@@ -8,7 +8,7 @@ The virtual IIP-Ecosphere Industry 4.0/IIoT platform aims at demonstrating new a
 * **March 2023:** Technical release of platform version 0.5.0.
 * **February 2023:** Service development tutorial online on [YouTube](https://www.youtube.com/playlist?list=PL5VSYtiD_PfdxUDXGlX53UsHdQlXcHYK7) and [IIP-Ecosphere](https://www.iip-ecosphere.de/angebote/plattform/).
 * **New in 2023:** IIP-Ecosphere demonstrators from the [IIP-Ecosphere innovation idea competition](https://www.iip-ecosphere.de/ideenwettbewerb/). Stay tuned - also external components by new IIP-Ecosystem partners may be introduced.
-* Confirmed compatibility: Phoenix Contact PLCnext (OPC UA), Beckhoff IPC (OPC UA), VDW UMATI (OPC UA) - and improving...
+* Confirmed compatibility: Phoenix Contact PLCnext (OPC UA), Beckhoff IPC (OPC UA), VDW UMATI (OPC UA), Bitmotec (MQTT) - and improving...
 
 ## Public demonstrations
 
