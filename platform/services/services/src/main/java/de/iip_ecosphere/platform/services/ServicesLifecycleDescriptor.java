@@ -38,7 +38,7 @@ public class ServicesLifecycleDescriptor extends AbstractAasLifecycleDescriptor 
 
     @Override
     protected String getOverridePortArg() {
-        return PARAM_IIP_PORT + "svcMgr";
+        return PARAM_IIP_PORT + ".svcMgr";
     }
     
     @Override

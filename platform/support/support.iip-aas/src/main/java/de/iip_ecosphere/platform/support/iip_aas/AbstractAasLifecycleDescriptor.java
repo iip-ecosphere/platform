@@ -86,19 +86,34 @@ public class AbstractAasLifecycleDescriptor implements LifecycleDescriptor {
      * @param init the initial value, a already known port if chained, usually {@code -1}
      * @return the port, may be {@code -1} for none
      */
-    private int getPort(String[] args, String arg, int init) {
+    private static int getPort(String[] args, String arg, int init) {
         int port = init;
         if (null != arg && port < 0) {
             port = CmdLine.getIntArg(args, arg, -1);
-            if (port < 0 && System.getenv(arg) != null) {
+            if (port < 0 && getenv(arg) != null) {
                 try {
-                    port = Integer.parseInt(System.getenv(arg));
+                    port = Integer.parseInt(getenv(arg));
                 } catch (NumberFormatException e) {
                     // ignore
                 }
             }
         }
         return port;
+    }
+    
+    /**
+     * Returns a value from the system environment, either as given or all in capital characters with dots replaced 
+     * by underscores.
+     * 
+     * @param key the key to look for
+     * @return the value, may by <b>null</b> for none
+     */
+    private static String getenv(String key) {
+        String result = System.getenv(key); 
+        if (null == result) { // particular for linux
+            result = System.getenv(key.toUpperCase().replace('.', '_'));
+        }
+        return result;
     }
     
     /**
