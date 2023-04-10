@@ -42,6 +42,7 @@ Improvements:
 * [#137](https://github.com/iip-ecosphere/platform/issues/132): MQTT authentication on transport/connectors
 * [#86](https://github.com/iip-ecosphere/platform/issues/86): UI restructuring larger lists, unifying use and look-and-feel
 * [#79](https://github.com/iip-ecosphere/platform/issues/79): Angular config.json loading problem (ok for now)
+* [#140](https://github.com/iip-ecosphere/platform/issues/140): Generated containers log platform service startup/execution
 * Configurable startup waiting time/timeout for AAS resources (ECS-Runtime, serviceManager)
 * Connector improvements for OPC UA and MQTT, improved support for nested data types in transport/Python
 * Connector mocking data with $period and $repeats, preparation for exact JSON field mapping
