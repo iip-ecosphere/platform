@@ -141,6 +141,7 @@ public class AbstractAasLifecycleDescriptor implements LifecycleDescriptor {
     
     @Override
     public void startup(String[] args) {
+        LoggerFactory.getLogger(getClass()).info("System environment: {}", System.getenv());
         int port = getPort(args, PARAM_IIP_PORT, getPort(args, getOverridePortArg(), -1));
         if (port > 0) {
             setupSupplier.get().getImplementation().setPort(port);
