@@ -381,7 +381,7 @@ class CliBackend {
          * Returns a formatted message composed from an exception caught while starting the service.
          * 
          * @return <b>null</b> if no exception occurred, else a text 
-         * @see #getMessagePrefix()
+         * @see #getMessagePrefix(boolean)
          */
         private String getExceptionMessage() {
             return null == exception ? null : getMessagePrefix(false) + ": " + exception.getMessage();

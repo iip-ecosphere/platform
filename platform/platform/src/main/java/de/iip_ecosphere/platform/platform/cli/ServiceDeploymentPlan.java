@@ -124,7 +124,7 @@ public class ServiceDeploymentPlan extends AbstractSetup {
          * 
          * @param appId the application id, may be null or empty for legacy start
          * @param appInstanceId the application instance id, may be null or empty for legacy start
-         * @return the full service ids if {@code appId} and {@code appInstanecId] are given, the plain service ids else
+         * @return the full service ids if {@code appId} and {@code appInstanceId} are given, the plain service ids else
          */
         public String[] getServicesAsArray(String appId, String appInstanceId) {
             String[] result = new String[services.size()];

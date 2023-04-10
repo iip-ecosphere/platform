@@ -110,5 +110,10 @@ public class PlattformAasLifecycleDescriptor extends AbstractAasLifecycleDescrip
         ArtifactsManager.stopWatching();
         super.shutdown();
     }
+    
+    @Override
+    protected boolean iipAasExists() {
+        return true; // don't probe at this level, we build it up
+    }
 
 }

@@ -596,7 +596,7 @@ public class ArtifactsManager {
     private Artifact createForYaml(File file, URI accessUri) {
         Artifact result = null;
         BasicContainerDescriptor desc = BasicContainerDescriptor.readFromYamlFile(file);
-        if (null != desc.getImageFile() && desc.getImageFile().length() > 0) {
+        if (null != desc && null != desc.getImageFile() && desc.getImageFile().length() > 0) {
             result = new ContainerArtifact(desc, accessUri);
             // container may be in container registry, don't check 
             /*File f = new File(file.getParentFile(), desc.getImageFile());
