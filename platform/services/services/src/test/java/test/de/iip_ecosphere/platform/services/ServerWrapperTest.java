@@ -20,7 +20,7 @@ import de.iip_ecosphere.platform.support.TimeUtils;
 import org.junit.Assert;
 
 /**
- * Tests {@class ServerWrapper}.
+ * Tests {@code ServerWrapper}.
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -91,7 +91,7 @@ public class ServerWrapperTest {
     }
 
     /**
-     * Tests {@class ServerWrapper}.
+     * Tests {@code ServerWrapper}.
      */
     @Test
     public void testWrapper() {

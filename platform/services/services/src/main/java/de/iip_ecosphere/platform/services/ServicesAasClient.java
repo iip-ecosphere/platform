@@ -328,7 +328,10 @@ public class ServicesAasClient extends SubmodelElementsCollectionClient implemen
                 throw new ExecutionException("Operation `" + ServicesAas.NAME_OP_SERVICE_STATE_COUNT 
                     + "` on resource `" + resource.getIdShort() + "` not found.", null); 
             }
-            result = Integer.parseInt(fromJson(op.invoke(state.name())));
+            String tmp = fromJson(op.invoke(state.name()));
+            if (null != tmp) {
+                result = Integer.parseInt(tmp);
+            }
         } catch (ExecutionException | NumberFormatException e) {
             getLogger().error("Requesting state instance count: " + e.getMessage());
         }        
@@ -339,8 +342,10 @@ public class ServicesAasClient extends SubmodelElementsCollectionClient implemen
     public int getServiceInstanceCount(String serviceId) {
         int result = 0;
         try {
-            result = Integer.parseInt(fromJson(getOperation(ServicesAas.NAME_OP_SERVICE_INSTANCE_COUNT)
-                .invoke(serviceId)));
+            String tmp = fromJson(getOperation(ServicesAas.NAME_OP_SERVICE_INSTANCE_COUNT).invoke(serviceId));
+            if (null != tmp) {
+                result = Integer.parseInt(tmp);
+            }
         } catch (ExecutionException | NumberFormatException e) {
             getLogger().error("Requesting service instance count: " + e.getMessage());
         }        
