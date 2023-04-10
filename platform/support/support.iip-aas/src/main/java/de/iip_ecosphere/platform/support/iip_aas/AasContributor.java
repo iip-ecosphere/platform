@@ -56,7 +56,7 @@ public interface AasContributor {
      * 
      * @param aasBuilder the AAS to contribute to
      * @param iCreator the invocables creator for binding (remote) property and operation implementations. Property and 
-     *    function namesshall be qualified by the AAS short id.
+     *    function names shall be qualified by the AAS short id.
      * @return the contributor may ignore {@code aasBuilder} and create an own AAS and return that. If this contributor 
      *   just contributes to the {@code aasBuilder} the result shall be <b>null</b>
      */

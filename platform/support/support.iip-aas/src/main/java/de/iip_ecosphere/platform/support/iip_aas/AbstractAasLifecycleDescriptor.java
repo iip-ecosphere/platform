@@ -17,6 +17,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import org.slf4j.LoggerFactory;
@@ -100,6 +101,16 @@ public class AbstractAasLifecycleDescriptor implements LifecycleDescriptor {
         return port;
     }
     
+    /**
+     * Allows to dynamically filter the contributors. May rely on {@link AasPartRegistry#contributors()} or 
+     * on {@link AasPartRegistry#contributorClasses()}.
+     * 
+     * @return the filter, by default a function that returns {@code true}
+     */
+    protected Predicate<AasContributor> getContributorFilter() {
+        return c -> true;
+    }
+    
     @Override
     public void startup(String[] args) {
         int port = getPort(args, PARAM_IIP_PORT, getPort(args, getOverridePortArg(), -1));
@@ -113,7 +124,7 @@ public class AbstractAasLifecycleDescriptor implements LifecycleDescriptor {
             waitForAasServer();
             // startImplServer=true due to incremental deployment; chain implServerBuilders
             AasPartRegistry.AasBuildResult res = AasPartRegistry.build(
-                c -> true, null == implServer, implServerBuilder);
+                getContributorFilter(), null == implServer, implServerBuilder);
             if (null == implServer) {
                 implServerBuilder = res.getProtocolServerBuilder();
                 implServer = res.getProtocolServer();
@@ -161,7 +172,7 @@ public class AbstractAasLifecycleDescriptor implements LifecycleDescriptor {
             LoggerFactory.getLogger(getClass()).info("Probing AAS registry {} and server{} for {} ms", 
                 regAdr, serverAdr, startupTimeout);
             if (!TimeUtils.waitFor(() -> {
-                return !connectionOk(regUrl) || !connectionOk(serverUrl);
+                return !connectionOk(regUrl) || !connectionOk(serverUrl) || !iipAasExists();
             }, startupTimeout, 500)) {
                 LoggerFactory.getLogger(getClass()).error("No AAS registry/server reached within {} ms", 
                     startupTimeout);
@@ -195,6 +206,22 @@ public class AbstractAasLifecycleDescriptor implements LifecycleDescriptor {
             // ignore, connectionOk == false
         }
         return connectionOk;
+    }
+    
+    /**
+     * Returns whether we have an IIP AAS.
+     * 
+     * @return {@code true} the AAS exists, {@code false} else
+     */
+    protected boolean iipAasExists() {
+        boolean exists;
+        try {
+            exists = null != AasPartRegistry.retrieveIipAas();
+        } catch (IOException e) {
+            // ignore
+            exists = false;
+        }
+        return exists;
     }
 
     @Override

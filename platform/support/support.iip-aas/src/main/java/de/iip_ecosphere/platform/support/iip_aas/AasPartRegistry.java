@@ -90,6 +90,7 @@ public class AasPartRegistry {
     
     private static AasSetup setup = new AasSetup();
     private static Supplier<List<Aas>> aasSupplier;
+    private static int aasImplPort = -1;
 
     /**
      * Aas installation/setup modes.
@@ -327,7 +328,7 @@ public class AasPartRegistry {
          * Sets the access control to allow cross origin. [Snakeyaml]
          * 
          * @param accessControlAllowOrigin the information to be placed in the HTTP header field 
-         * "Access-Control-Allow-Origin"; the specific server or {@link #ANY_CORS_ORIGIN}
+         * "Access-Control-Allow-Origin"; the specific server or {@link DeploymentRecipe#ANY_CORS_ORIGIN}
          */
         public void setAccessControlAllowOrigin(String accessControlAllowOrigin) {
             this.accessControlAllowOrigin = accessControlAllowOrigin;
@@ -337,7 +338,8 @@ public class AasPartRegistry {
          * Returns the access control to allow cross origin.
          * 
          * @return  the information to be placed in the HTTP header field 
-         * "Access-Control-Allow-Origin"; the specific server or {@link #ANY_CORS_ORIGIN}, may be <b>null</b> or empty
+         * "Access-Control-Allow-Origin"; the specific server or {@link DeploymentRecipe#ANY_CORS_ORIGIN}, 
+         * may be <b>null</b> or empty
          */
         public String getAccessControlAllowOrigin() {
             return accessControlAllowOrigin;
@@ -585,17 +587,19 @@ public class AasPartRegistry {
         }
         
         ProtocolAddressHolder impl = setup.getImplementation();
-        int implPort = ServerAddress.validatePort(impl.getPort());
+        if (aasImplPort < 0) { // do this only once, if e.g., for ecsSvcMgr
+            aasImplPort = ServerAddress.validatePort(impl.getPort());
+        }
         String implHost = impl.getHost();
         if (implHost.equals("127.0.0.1")) {
             implHost = NetUtils.getOwnIP(impl.getNetmask()); // make AAS implementation server externally available
-            LoggerFactory.getLogger(AasPartRegistry.class).warn("Using IP " + implHost 
-                + " for AAS implementation server");
         }
-        InvocablesCreator iCreator = factory.createInvocablesCreator(impl.getProtocol(), implHost, implPort, 
+        LoggerFactory.getLogger(AasPartRegistry.class).info("Using IP {} and port {} for AAS implementation server", 
+            implHost, aasImplPort);
+        InvocablesCreator iCreator = factory.createInvocablesCreator(impl.getProtocol(), implHost, aasImplPort, 
             impl.getKeystoreDescriptor());
         if (null == sBuilder) {
-            sBuilder = factory.createProtocolServerBuilder(impl.getProtocol(), implPort, 
+            sBuilder = factory.createProtocolServerBuilder(impl.getProtocol(), aasImplPort, 
                 impl.getKeystoreDescriptor());
         }
         Iterator<AasContributor> iter = contributors();
@@ -611,7 +615,7 @@ public class AasPartRegistry {
         }
         Server protocolServer = null;
         if (startImplServer) {
-            LoggerFactory.getLogger(AasPartRegistry.class).info("Starting implementation server on " + implPort);
+            LoggerFactory.getLogger(AasPartRegistry.class).info("Starting implementation server on " + aasImplPort);
             protocolServer = sBuilder.build().start();
         }
         aas.add(0, aasBuilder.build());
@@ -816,7 +820,6 @@ public class AasPartRegistry {
      * @param property the shortId of the property to create
      * @param aasId the id of the AAS
      * @return the created AAS property
-     * @see #getAasRegistry()
      */
     private static Property addAasEndpointProperty(Registry reg, SubmodelElementCollectionBuilder builder, 
         String property, String aasId) {
@@ -838,7 +841,6 @@ public class AasPartRegistry {
      * @param property the idShort of the property to create
      * @param serviceId the id of the service, may be empty leading to an empty property value
      * @return the created AAS property
-     * @see #getAasRegistry()
      */
     public static Property addServiceAasEndpointProperty(Registry reg, SubmodelElementCollectionBuilder builder, 
         String property, String serviceId) {
@@ -854,7 +856,6 @@ public class AasPartRegistry {
      * @param property the idShort of the property to create
      * @param deviceId the id of the device, may be empty leading to an empty property value
      * @return the created AAS property
-     * @see #getAasRegistry()
      */
     public static Property addDeviceAasEndpointProperty(Registry reg, SubmodelElementCollectionBuilder builder, 
         String property, String deviceId) {
