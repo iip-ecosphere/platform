@@ -26,7 +26,11 @@ template Dockerfile_3_ecs(IIPEcosphere config, FileArtifact target, sequenceOf(M
     	'COPY ecsJars${deviceSpec}/ ecsJars'
     	'COPY common/ common'
     	'COPY ecs.sh ecs.sh'
-    	''
-        'CMD ./ecs.sh >> /var/log/iip.logs'
+        ''		
+        '# Running the script'
+        'COPY ecs.wrapper_script.sh wrapper_script.sh'
+        'RUN chmod 777 wrapper_script.sh'
+        'ENTRYPOINT ["./wrapper_script.sh"]'
+
     }	
 }
