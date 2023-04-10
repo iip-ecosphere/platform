@@ -45,6 +45,7 @@ public class AbstractAasLifecycleDescriptor implements LifecycleDescriptor {
     
     private static Server implServer; // static if multiple ones share the same, e.g., ecs/svcMgr
     private static ProtocolServerBuilder implServerBuilder;
+    private static boolean waitForIipAas = true;
     private String name;
     private Supplier<AasSetup> setupSupplier;
     private Server aasServer;
@@ -58,6 +59,18 @@ public class AbstractAasLifecycleDescriptor implements LifecycleDescriptor {
     protected AbstractAasLifecycleDescriptor(String name, Supplier<AasSetup> setupSupplier) {
         this.name = name;
         this.setupSupplier = setupSupplier;
+    }
+    
+    /**
+     * Defines whether we shall wait for the IIP AAs to come up. [testing]
+     * 
+     * @param wait {@code true} for waiting, {@code false} for not waiting
+     * @return the previous value
+     */
+    public static boolean setWaitForIipAas(boolean wait) {
+        boolean old = waitForIipAas;
+        waitForIipAas = wait;
+        return old;
     }
     
     /**
@@ -230,11 +243,15 @@ public class AbstractAasLifecycleDescriptor implements LifecycleDescriptor {
      */
     protected boolean iipAasExists() {
         boolean exists;
-        try {
-            exists = null != AasPartRegistry.retrieveIipAas();
-        } catch (IOException e) {
-            // ignore
-            exists = false;
+        if (waitForIipAas) {
+            try {
+                exists = null != AasPartRegistry.retrieveIipAas();
+            } catch (IOException e) {
+                // ignore
+                exists = false;
+            }
+        } else {
+            exists = true; // do not wait
         }
         return exists;
     }
