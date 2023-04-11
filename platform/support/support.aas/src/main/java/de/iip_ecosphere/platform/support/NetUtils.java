@@ -22,6 +22,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -32,6 +33,8 @@ import java.util.regex.PatternSyntaxException;
  * @author Holger Eichelberger, SSE
  */
 public class NetUtils {
+    
+    private static String ip = null;
     
     /**
      * Returns a free ephemeral port. Such a port may be used for testing, e.g. to avoid clashes between 
@@ -123,15 +126,51 @@ public class NetUtils {
      * @return the preferred own network address
      */
     public static String getOwnIP() {
-        //https://stackoverflow.com/questions/9481865/getting-the-ip-address-of-the-current-machine-using-java
-        String ip = "";
-        try (final DatagramSocket socket = new DatagramSocket()) {
-            socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
-            ip = socket.getLocalAddress().getHostAddress();
-        } catch (UnknownHostException | SocketException | UncheckedIOException e) {
-            ip = "127.0.0.1";
+        if (null == ip) {
+            //https://stackoverflow.com/questions/9481865/getting-the-ip-address-of-the-current-machine-using-java
+            try (final DatagramSocket socket = new DatagramSocket()) {
+                socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
+                ip = socket.getLocalAddress().getHostAddress();
+                if ("0.0.0.0".equals(ip)) { // strange, happened in a docker container in a VM
+                    ip = findFallbackIP();
+                }
+            } catch (UnknownHostException | SocketException | UncheckedIOException e) {
+                ip = "127.0.0.1";
+            }
         }
         return ip;
+    }
+
+    /**
+     * Finds a fallback IP address. Must have an IPv4/IPv6 address (docker addresses so far have only 
+     * 
+     * @return a fallback IP address, may be {@code 127.0.0.1} if none was found
+     */
+    private static String findFallbackIP() {
+        String result = "127.0.0.1";
+        try {
+            Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
+            for (NetworkInterface netint : Collections.list(nets)) {
+                Enumeration<InetAddress> inetAddresses = netint.getInetAddresses();
+                String ipV4 = null;
+                String ipV6 = null;
+                for (InetAddress inetAddress : Collections.list(inetAddresses)) {
+                    if (!inetAddress.isLoopbackAddress()) {
+                        if (inetAddress.getAddress().length == 4) { // heuristic: docker container only had one
+                            ipV4 = inetAddress.getHostAddress();
+                        } else {
+                            ipV6 = inetAddress.getHostAddress();
+                        }
+                    }
+                }
+                if (ipV4 != null && ipV6 != null && !ipV6.startsWith("172.17.")) { // otherwise docker
+                    result = ipV4;
+                }
+            }
+        } catch (SocketException e) {
+            // ignore
+        }
+        return result;
     }
     
     /**

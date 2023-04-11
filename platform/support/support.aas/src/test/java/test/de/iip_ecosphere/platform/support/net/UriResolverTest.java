@@ -66,7 +66,8 @@ public class UriResolverTest {
      */
     @Test
     public void testUriResolution() throws IOException, URISyntaxException {
-        File f = new File("src/test/resolutionTest.txt");
+        File f = new File("target/resolutionTest.txt");
+        FileUtils.copyFile(new File("src/test/resolutionTest.txt"), f);
         File resolved = UriResolver.resolveToFile(f.toURI(), null);
         Assert.assertNotNull(resolved);
         Assert.assertTrue(resolved.exists());
