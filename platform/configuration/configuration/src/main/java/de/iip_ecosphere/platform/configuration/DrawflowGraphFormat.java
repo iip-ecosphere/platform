@@ -165,10 +165,8 @@ public class DrawflowGraphFormat implements GraphFormat {
                     jNode.put("typenode", false);
                     jNode.put("inputs", writeEdges(node, node.inEdges(), true));
                     jNode.put("outputs", writeEdges(node, node.outEdges(), false));
-                    if (node.getXPos() >= 0 && node.getYPos() >= 0) {
-                        jNode.put("pos_x", node.getXPos());
-                        jNode.put("pos_y", node.getYPos());
-                    }
+                    jNode.put("pos_x", node.getXPos());
+                    jNode.put("pos_y", node.getYPos());
                     homeData.put(nodeId, jNode);
                 }
             }

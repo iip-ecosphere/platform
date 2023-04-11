@@ -23,7 +23,7 @@ import net.ssehub.easy.varModel.confModel.IDecisionVariable;
  */
 public abstract class DefaultGraphElement implements IvmlGraphElement {
 
-    public static final int INVALID_POSITION = -1;
+    public static final int INVALID_POSITION = 0;
     public static final int INVALID_SIZE = -1;
     private IDecisionVariable var;
     private String name = "";
