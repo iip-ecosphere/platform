@@ -13,7 +13,8 @@
         <p class="category">{{cat}}</p>
         <div *ngFor="let element of resource.value" style="margin-left: 15px;">
           <span *ngIf="getAttributeInfo(element.idShort, 2) === cat">
-            <div *ngIf="!element.invokable && isNonEmptyString(element.value)">
+            <!--<div *ngIf="!element.invokable && isNonEmptyString(element.value)"> -->
+            <div *ngIf="!element.invokable">
 
               <span class="shortId">
                   {{getAttributeInfo(element.idShort, 1)}}:

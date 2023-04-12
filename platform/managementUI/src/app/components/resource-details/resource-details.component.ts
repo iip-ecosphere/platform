@@ -32,6 +32,7 @@ export class ResourceDetailsComponent implements OnInit {
   private async getResource(id: string) {
     this.resource = await this.api.getResource(id);
     this.resolveSemanticId();
+    console.log(this.resource)
   }
 
   public isObject(value: any) {
@@ -77,6 +78,7 @@ export class ResourceDetailsComponent implements OnInit {
   }
 
   public isNonEmptyString(value: any) {
+
     let result = false
     if (typeof value == "string" && value.length > 0) {
       result = true
