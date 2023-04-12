@@ -2,16 +2,16 @@ application: TestApp
 id: appDesc-1
 version: 1.0.0
 description: Just for testing 
-artifact: file:/W:/offlineFiles/git/IIP-ecosphere/platform/platform/configuration/configuration/gen/tests/SimpleMesh/SimpleMeshTestingApp/target/SimpleMeshTestingApp-0.1.0-SNAPSHOT.jar
+artifact: file:/W:/offlineFiles/git/IIP-ecosphere/platform/platform/configuration/configuration/gen/tests/SimpleMesh/SimpleMeshTestingApp/target/SimpleMeshTestingApp-0.1.0-SNAPSHOT-bin.jar
 parallelize: true
 onUndeployRemoveArtifact: true
 assignments:
   - resource: container1
-    artifact: file:/W:/offlineFiles/git/IIP-ecosphere/platform/platform/configuration/configuration/gen/tests/SimpleMesh/SimpleMeshTestingApp/target/SimpleMeshTestingApp-0.1.0-SNAPSHOT.jar
+    artifact: file:/W:/offlineFiles/git/IIP-ecosphere/platform/platform/configuration/configuration/gen/tests/SimpleMesh/SimpleMeshTestingApp/target/SimpleMeshTestingApp-0.1.0-SNAPSHOT-bin.jar
     services:
       - SimpleSource
   - resource: container2
-    artifact: file:/W:/offlineFiles/git/IIP-ecosphere/platform/platform/configuration/configuration/gen/tests/SimpleMesh/SimpleMeshTestingApp/target/SimpleMeshTestingApp-0.1.0-SNAPSHOT.jar
+    artifact: file:/W:/offlineFiles/git/IIP-ecosphere/platform/platform/configuration/configuration/gen/tests/SimpleMesh/SimpleMeshTestingApp/target/SimpleMeshTestingApp-0.1.0-SNAPSHOT-bin.jar
     services:
       - SimpleReceiver
 

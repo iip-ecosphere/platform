@@ -611,6 +611,7 @@ class CliBackend {
             List<ServiceResourceAssignment> assignments = new ArrayList<>(p.getAssignments());
             Collections.reverse(assignments);
             for (ServiceResourceAssignment a: assignments) {
+                println("Obtaining AAS client for " + a.getResource() + " " + p.getAppId());
                 ServicesClient client = getServicesFactory().create(a.getResource(), p.getAppId());
                 serviceClients.put(a.getResource(), client);
                 String[] services = a.getServicesAsArray(p.getAppId(), appInstanceId);
