@@ -140,6 +140,7 @@ export class FlowchartComponent implements OnInit {
       for(let node in nodes) {
 
         const a = nodes[node];
+        console.log(a)
         if(a.data["bus-receive"]) {
           busIn = a.data["bus-receive"];
         }
@@ -162,7 +163,7 @@ export class FlowchartComponent implements OnInit {
             let bus = this.Busses.find(item => item.id === busName);
             if(bus) {
               //the line below contains
-              busInHtml = busInHtml.concat("<i class=\"material-icons\" style=\"color:"+ bus.color +" \">keyboard_double_arrow_down</i>");
+              busInHtml = busInHtml.concat("<i class=\"material-icons\" style=\"color:"+ bus.color +"\">keyboard_double_arrow_down</i>");
             }
           }
         }
@@ -193,14 +194,16 @@ export class FlowchartComponent implements OnInit {
           icon = "../../../assets/py.png";
         }
         if(icon != "") {
-          iconHtml= "<img src=\""+ icon +"\" width=\"24px\" height=\"24px\">";
+          iconHtml= "<img src=\""+ icon +"\" height=\"25px\">";
         }
 
-        a.html = "<div>" +
-          "<table style=\"width:100%; margin-top: 0px\"><tr><td style=\"background-color:rgb(240,240,240)\"><div style=\"text-align: left\">"+ iconHtml + "</div></td><td style=\"background-color:rgb(240,240,240)\"><div style=\"text-align: right\">" + busInHtml + busOutHtml + "</div></td></tr></table>" +
+        a.html = "<div style=\"width:100%;\">" +
+          "<table style=\"width:100%; margin-top: 0px\"><tr><td style=\"background-color:rgb(247,247,247)\"><div style=\"text-align: left\">"
+          + iconHtml + "</div></td><td style=\"background-color:rgb(247,247,247)\"><div style=\"text-align: right\">"
+          + busInHtml + busOutHtml + "</div></td></tr></table>" +
           "<h3> " + a.data.id + "</h3>" +
-          "<p>kind: "+ a.data.kind + "</p>" +
-          "<p> type: "+ a.data.type + "</p>" +
+          "<p class=\"subtext-small\">"+ a.data.type + "</p>" +
+          "<p class=\"subtext-small\">"+ a.data.kind + "</p>" +
           "</div>";
 
         busIn = [];

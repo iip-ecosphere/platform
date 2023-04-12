@@ -6,10 +6,10 @@
   --dfBackgroundSize: 25px;
   --dfBackgroundImage: linear-gradient(
       to right,
-      rgba(233, 233, 233, 1) 1px,
+      rgb(233, 233, 233, 1) 1px,
       transparent 1px
     ),
-    linear-gradient(to bottom, rgba(233, 233, 233, 1) 1px, transparent 1px);
+    linear-gradient(to bottom, rgb(233, 233, 233, 1) 1px, transparent 1px);
 
   --dfNodeType: flex;
   --dfNodeTypeFloat: right;
@@ -79,8 +79,10 @@
   --dfOutputHoverBorderRadius: 50px;
 
   --dfLineWidth: 3px;
-  --dfLineColor: rgba(78, 169, 255, 1);
-  --dfLineHoverColor: #4682b4;
+  //--dfLineColor: rgba(78, 169, 255, 1);
+  --dfLineColor: rgb(35, 142, 184);
+  //--dfLineHoverColor: #4682b4;
+  --dfLineHoverColor:  rgb(35, 142, 184);
   --dfLineSelectedColor: rgba(67, 185, 147, 1);
 
   --dfRerouteBorderWidth: 4px;

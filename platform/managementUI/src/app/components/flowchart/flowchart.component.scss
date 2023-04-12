@@ -26,6 +26,7 @@ html, body {
   justify-content: stretch;
   overflow-y: hidden;
   height:100%;
+
 }
 
 .drawflow-container {
@@ -38,7 +39,12 @@ html, body {
   background-color: rgb(230, 230, 230);
   color: black;
 }
-
+/*
+.service-detail {
+  font-size: small;
+  color: rgb(97, 95, 96);
+}
+*/
 p
 {
   margin: 0.5em;

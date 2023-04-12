@@ -38,6 +38,11 @@ tr:nth-child(odd) {
   line-height: 1.7;
 }
 
+.subtext-small{
+  color: rgb(97, 95, 96);
+  font-size: 2.5em;
+}
+
 // --- resource detail ----
 .gray-element {
   //background-color: rgb(173, 171, 172);
@@ -49,8 +54,8 @@ tr:nth-child(odd) {
 
 .category {
   font-size: 18px;
-  color:rgb(165, 42, 42);
-  //color: black;
+  //color:rgb(165, 42, 42);
+  color: black;
   margin-bottom: 20px;
 }
 
