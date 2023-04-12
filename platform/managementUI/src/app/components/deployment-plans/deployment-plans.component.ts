@@ -119,6 +119,12 @@ export class DeploymentPlansComponent implements OnInit {
     return desc
   }
 
+  public getId(plan: any) {
+    let id = plan.value.find(
+      (item: { idShort: string; }) => item.idShort === "id").value
+    return id
+  }
+
   public applyLineStyle(index: number) {
 
     let style = "white-line";
