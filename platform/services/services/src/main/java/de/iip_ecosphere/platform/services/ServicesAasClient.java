@@ -73,7 +73,8 @@ public class ServicesAasClient extends SubmodelElementsCollectionClient implemen
     @Override
     protected SubmodelElementCollection getSubmodelElementCollection() {
         SubmodelElementCollection result = super.getSubmodelElementCollection();
-        SubmodelElementCollection m = result.getSubmodelElementCollection(ServicesAas.NAME_COLL_SERVICE_MANAGERS);
+        SubmodelElementCollection m = null == result ? null : result.getSubmodelElementCollection(
+            ServicesAas.NAME_COLL_SERVICE_MANAGERS);
         if (null != m) {
             SubmodelElementCollection found = null;
             int foundServices = -1;
