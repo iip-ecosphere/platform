@@ -116,6 +116,19 @@ public class SpringStartup {
     }
     
     /**
+     * If given in {@code args}, adds {@link Starter#PARAM_IIP_APP_ID} to {@code cmdArgs}.
+     * 
+     * @param args the command line arguments
+     * @param cmdArgs the command line arguments to be modified as a side effect
+     */
+    private static void addAppId(String[] args, List<String> cmdArgs) {
+        String appId = CmdLine.getArg(args, Starter.PARAM_IIP_APP_ID, "");
+        if (appId.length() > 0) {
+            cmdArgs.add(CmdLine.composeArgument(Starter.PARAM_IIP_APP_ID, appId));
+        }
+    }
+    
+    /**
      * Starts the application. Considers system property {@value Starter#PROPERTY_JAVA8} as java binary for Java 8 if 
      * not running under Java 8.
      * 
@@ -141,6 +154,7 @@ public class SpringStartup {
             List<String> cmdLine = DescriptorUtils.createStandaloneCommandArgs(artifact, brokerPort, 
                 brokerHost, adminPort, serviceProtocol);
             addAasNotificationMode(args, cmdLine);
+            addAppId(args, cmdLine);
             getLogger().info("Starting with arguments: {}", cmdLine);
             ProcessBuilder builder = new ProcessBuilder(cmdLine);
             if (null != procCfg) {
