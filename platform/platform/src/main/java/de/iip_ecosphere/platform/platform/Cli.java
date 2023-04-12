@@ -121,8 +121,7 @@ public class Cli extends CliBackend {
             }
             if (level.isTopLevel()) {
                 println(" deploy <file/URI> runs the given deployment plan");
-                println(" undeploy <file/URI> <id>? reverts the given deployment plan, if given for "
-                    + "the specified application id");
+                println(" undeploy <file/URI> <id>? reverts the given deployment plan without application instance id");
                 println(" snapshotAAS - creates a snapshot of the AAS of the platform");
                 println(" help - prints help for this program");
                 println(" exit - exits the program", provider);
@@ -171,6 +170,7 @@ public class Cli extends CliBackend {
                 callWithUri(provider, uri -> deployPlanEmitId(uri));
                 break;
             case "undeploy":
+                System.out.print("id (empty for none): ");
                 callWithUri(provider, uri -> undeployPlan(uri, provider.nextCommand()));
                 break;
             default:
