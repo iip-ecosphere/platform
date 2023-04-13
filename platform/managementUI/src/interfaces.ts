@@ -206,3 +206,8 @@ export interface AddressPart {
     text: string;
   }]
 }
+
+export interface StatusMsg {
+  executionState?: string;
+  messages?: string[];
+}
