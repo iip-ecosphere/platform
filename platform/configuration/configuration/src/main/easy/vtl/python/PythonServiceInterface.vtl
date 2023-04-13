@@ -90,6 +90,7 @@ template PythonServiceInterface(Configuration config, FileArtifact target, Servi
         from Service import ServiceState
         from Service import ServiceKind
         ${produceDatatypeImports(service)}
+        from decimal import Decimal
 
         class ${clsName}Interface(AbstractService):
             """Partially implemented service interface for "${service.name}"

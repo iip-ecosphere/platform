@@ -162,6 +162,7 @@ template PythonType(Configuration config, FileArtifact target, RecordType type, 
         }
         '${genTypeImports(imp, type)|e}
         from datetime import datetime
+        from decimal import Decimal
         
         class ${clsName}${add}${ext}:
             """${comment} of the application data type ${clsName}. 
