@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { PlanDeployerService } from 'src/app/services/plan-deployer.service';
+import { StatusMsg } from 'src/interfaces';
 
 @Component({
   selector: 'app-status-box',
@@ -10,13 +11,13 @@ import { PlanDeployerService } from 'src/app/services/plan-deployer.service';
 export class StatusBoxComponent implements OnInit {
 
   statusSub: Subscription;
-  status = {
+  status: StatusMsg = {
     executionState: "",
     messages: [""]
   }
 
   constructor(private deployer: PlanDeployerService) {
-    this.statusSub = this.deployer.emitter.subscribe((status: { executionState: string,messages: string[]}) => {this.status = status});
+    this.statusSub = this.deployer.emitter.subscribe((status: StatusMsg) => {this.status = status});
   }
 
   ngOnInit(): void {

@@ -2,7 +2,6 @@
   <div class="header">
     Deployment Plans
   </div>
-  <div *ngIf="responseMessage">{{responseMessage}}</div>
 
   <table *ngIf="deploymentPlans; else noPlans" style="margin: 0px;" >
     <tr *ngFor="let plan of deploymentPlans.value; let i = index">
