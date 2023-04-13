@@ -13,7 +13,12 @@
               <div *ngFor="let message of status.messages"> {{message}}</div>
             </div>
             <div style="width: 50px"></div>
-            <div><mat-progress-spinner [diameter]="50" mode="indeterminate" ></mat-progress-spinner></div>
+            <mat-card class="status-indicator">
+              <mat-progress-spinner *ngIf="status.executionState != 'Completed' && status.executionState != 'ERROR'" [diameter]="50" mode="indeterminate" ></mat-progress-spinner>
+              <mat-icon *ngIf="status.executionState === 'Completed'" class="checkmark">check</mat-icon>
+              <mat-icon *ngIf="status.executionState === 'ERROR'" class="cross">close</mat-icon>
+            </mat-card>
+
           </div>
         </mat-card-content>
 </mat-card>

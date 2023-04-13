@@ -1,13 +1,16 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, firstValueFrom, Subscription } from 'rxjs';
-import { platformResponse } from 'src/interfaces';
+import { BehaviorSubject, firstValueFrom, Observable, Subscription } from 'rxjs';
+import { platformResponse, StatusMsg } from 'src/interfaces';
 import { OnlyIdPipe } from '../pipes/only-id.pipe';
 import { EnvConfigService } from './env-config.service';
 
 @Injectable({
   providedIn: 'root'
 })
+
+
+
 export class PlanDeployerService {
 
   ip: string = "";
@@ -15,13 +18,13 @@ export class PlanDeployerService {
 
   sub: Subscription | undefined;
 
-  status = {
+  status: StatusMsg = {
     executionState: "",
     messages: [""]
   }
   isDone = false;
 
-  emitter: BehaviorSubject<{ executionState: string,messages: string[]}>;
+  emitter: BehaviorSubject<StatusMsg>;
 
 
   constructor(private http: HttpClient, private envConfigService: EnvConfigService, private onlyId: OnlyIdPipe) {
@@ -46,12 +49,10 @@ export class PlanDeployerService {
     let basyxFunc;
     if (undeploy) {
       basyxFunc = "undeployPlanAsync";
+      this.emitSendMessage("undeploy");
     } else {
       basyxFunc = "deployPlanAsync";
-      this.emitter.next( {
-        executionState: "deployment plan sent",
-        messages: ["waiting for response"]
-      })
+      this.emitSendMessage("deploy");
     }
     try {
       response = await firstValueFrom(this.http.post<platformResponse>(this.ip + '/shells/' + this.urn + "/aas/submodels/Artifacts/submodel/" + basyxFunc + "/invoke"
@@ -86,14 +87,21 @@ export class PlanDeployerService {
       response = await firstValueFrom(this.http.post<platformResponse>(this.ip + '/shells/' + this.urn + "/aas/submodels/Artifacts/submodel/undeployPlanWithId/invoke"
       ,{"inputArguments": params,"requestId":"1bfeaa30-1512-407a-b8bb-f343ecfa28cf", "inoutputArguments":[], "timeout":10000}
       , {responseType: 'json', reportProgress: true}));
+      this.emitSendMessage("undeployId");
     } catch(e) {
       console.log(e);
     }
+    const message = response?.outputArguments[0]?.value?.value;
+    const execState = response?.executionState;
+    if(message && execState) {
+      this.emitter.next({executionState: execState, messages: [message]});
+    }
+
     return response;
   }
 
   public getStatus(id: string | undefined) {
-    let response;
+    let response: Observable<platformResponse> = new Observable<platformResponse>();
     let params = [
       {
         modelType: {
@@ -111,22 +119,35 @@ export class PlanDeployerService {
     }];
 
     params[0].value.value = this.onlyId.transform(id);
-
       try {
-      response = this.http.post<platformResponse>(this.ip + '/shells/' + this.urn + "/aas/submodels/Artifacts/submodel/getTaskStatus/invoke"
-      ,{"inputArguments": params,"requestId":"1bfeaa30-1512-407a-b8bb-f343ecfa28cf", "inoutputArguments":[], "timeout":10000}
-      , {responseType: 'json', reportProgress: true});
-      this.sub = response.subscribe((status: platformResponse )=> {
-        if(status.outputArguments[0].value && status.outputArguments[0].value.value) {
-          this.status.executionState = status.executionState;
-          this.status.messages[0] = status.outputArguments[0].value.value;
-          this.emitter.next(this.status);
-        }
-        console.log(status);
-      });
+          response = this.http.post<platformResponse>(this.ip + '/shells/' + this.urn + "/aas/submodels/Artifacts/submodel/getTaskStatus/invoke"
+          ,{"inputArguments": params,"requestId":"1bfeaa30-1512-407a-b8bb-f343ecfa28cf", "inoutputArguments":[], "timeout":10000}
+          , {responseType: 'json', reportProgress: true});
+          console.log(response);
+          this.sub = response.subscribe((status: any )=> {
+            console.log(status);
+            if(status.outputArguments[0].value && status.outputArguments[0].value.value && this.status.messages && status.executionState) {
+              this.status.executionState = status.executionState;
+              this.status.messages[0] = status.outputArguments[0].value.value;
+              this.emitter.next(this.status);
+            }
+}, err => (this.emitter.next({executionState: "ERROR", messages: ["an error occured while getting the task status"]})));
+
     } catch(e) {
+
       console.log(e);
     }
+  }
+
+  private emitSendMessage(msg?: string) {
+    let state = "request sent";
+    if(msg) {
+      state = state.concat(" (" + msg + ")");
+    }
+    this.emitter.next( {
+      executionState: state,
+      messages: ["waiting for response"]
+    })
   }
 
 }
