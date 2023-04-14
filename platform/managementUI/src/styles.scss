@@ -86,9 +86,17 @@ tr:nth-child(odd) {
 }
 
 .service-icon {
-  //width: 50px;
+  //width: 30px;
+  margin-left: 5px;
+  margin-right: 5px;
   height: 25px;
-  border: 2px solid rgb(243, 251, 255);
+  //border: 2px solid rgb(243, 251, 255);
+}
+
+.cell-with-icon {
+  vertical-align: middle;
+  align-content: center;
+  margin-left: 15px;
 }
 
 //-----------

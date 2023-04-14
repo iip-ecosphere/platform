@@ -25,7 +25,7 @@
           <td style="width: 2%; text-align: center;"> {{i + 1}} </td>
 
           <!-- Icons
-          <td  *ngIf="tab.tabName == 'Services'" style="vertical-align: top;">
+          <td  *ngIf="tab.tabName == 'Services'" class="cell-with-icon">
             <div *ngIf=" getIcon(item.idShort) != null">
               <img src={{getIcon(item.idShort)}} class="service-icon">
             </div>
@@ -37,10 +37,11 @@
 
             <span class="row-title" >
               <span style="height: 5px; vertical-align: top; margin-right: 10px;">{{item.idShort}}</span>
+              <!--
               <span *ngIf=" getIcon(item.idShort) != null" >
-                <!-- <img src="../../../assets/java.png"  width="50px" height="50px"> -->
-                <img src={{getIcon(item.idShort)}} class="service-icon">
+                                <img src={{getIcon(item.idShort)}} class="service-icon">
               </span>
+            -->
             </span>
             <div *ngFor="let property of item.value" class="subtext" >
               <div *ngIf="property.value">
