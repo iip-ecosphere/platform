@@ -82,7 +82,7 @@ export class DeploymentPlansComponent implements OnInit {
         if(value) {
           params[0].value.value = value.value;
         }
-        const response = await this.deployer.deployPlan(params);
+        const response = await this.deployer.deployPlan(params, true);
       }
     }
 
