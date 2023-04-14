@@ -99,7 +99,13 @@ template PythonType(Configuration config, FileArtifact target, RecordType type, 
     }
 
     def genSetterAssignment(Field f, ArrayType type) {
-        genSetterAssignment(f, type.type);
+        'tmp = []
+         for e in v:
+             if ("numpy" in str(type(e))):
+                 tmp.append(e.item())
+             else:
+                 tmp.append(e)
+         self._${asIdentifier(f.name)} = tmp'
     }
     
     protected def genNumpyConversion(Field f, DataType type) {
