@@ -86,9 +86,38 @@ tr:nth-child(odd) {
 }
 
 .service-icon {
-  //width: 50px;
+  //width: 30px;
+  margin-left: 5px;
+  margin-right: 5px;
   height: 25px;
-  border: 2px solid rgb(243, 251, 255);
+  //border: 2px solid rgb(243, 251, 255);
+}
+
+.cell-with-icon {
+  vertical-align: middle;
+  align-content: center;
+  margin-left: 15px;
+}
+
+// -- deployment plan ---
+// here the size of input field can be adjusted
+.input-field {
+  //width: 130px;
+}
+
+.input-dplan {
+  color: rgb(97, 95, 96);
+  font-size: small;
+}
+
+// outline
+.mat-form-field-appearance-outline .mat-form-field-outline {
+  //color: black;
+  color: rgb(97, 95, 96);
+}
+// focused outline
+.mat-form-field-appearance-outline.mat-focused .mat-form-field-outline-thick {
+  color:rgb(35, 142, 184);
 }
 
 //-----------
@@ -135,6 +164,10 @@ tr:nth-child(odd) {
   background-color:  rgb(97, 95, 96);
 }
 
+.cell-btn-dp {
+  vertical-align: top;
+}
+
 .service {
   background-color:rgb(35, 142, 184);
 }
@@ -153,6 +186,7 @@ tr:nth-child(odd) {
 
 .button {
   background-color: var(--primary-color);
+
 }
 
 .background {

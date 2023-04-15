@@ -12,16 +12,17 @@
         </span><br>
         <span class="subtext"> {{getDescription(plan)}}</span>
       </td>
-      <td>
+      <td style="vertical-align: top;">
         <button mat-raised-button class="button" (click)="deploy(plan)">deploy</button>
       </td>
-      <td style="background-color: grey">
-        <mat-form-field appearance="outline" >
-          <mat-label>undeploy by Id</mat-label>
+      <td >
+        <!-- <mat-form-field appearance="outline" style="background-color: grey"> -->
+        <mat-form-field appearance="outline" class="input-field">
+          <mat-label class="input-dplan" >Undeploy by Id</mat-label>
           <input matInput type="text" [(ngModel)]=instanceId[i] />
         </mat-form-field>
       </td>
-      <td>
+      <td class="cell-btn-dp" >
         <button mat-raised-button class= "black-button" (click)="undeploy(i, plan)">undeploy</button>
       </td>
     </tr>
