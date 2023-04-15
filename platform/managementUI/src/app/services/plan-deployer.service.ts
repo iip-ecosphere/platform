@@ -40,6 +40,7 @@ export class PlanDeployerService {
    }
 
   public async deployPlan(params: any, undeploy?: boolean) {
+    console.log("Method: deployPlan")
     this.status = {
       executionState: "",
       messages: [""]
@@ -47,20 +48,25 @@ export class PlanDeployerService {
 
     let response;
     let basyxFunc;
+
     if (undeploy) {
+      console.log("# undeploy")
       basyxFunc = "undeployPlanAsync";
       this.emitSendMessage("undeploy");
     } else {
+      console.log("# deployed")
       basyxFunc = "deployPlanAsync";
       this.emitSendMessage("deploy");
     }
     try {
-      response = await firstValueFrom(this.http.post<platformResponse>(this.ip + '/shells/' + this.urn + "/aas/submodels/Artifacts/submodel/" + basyxFunc + "/invoke"
+      response = await firstValueFrom(this.http.post<platformResponse>(this.ip + '/shells/'
+        + this.urn + "/aas/submodels/Artifacts/submodel/" + basyxFunc + "/invoke"
       ,{"inputArguments": params,"requestId":"1bfeaa30-1512-407a-b8bb-f343ecfa28cf", "inoutputArguments":[], "timeout":10000}
       , {responseType: 'json', reportProgress: true}));
     } catch(e) {
       console.log(e);
     }
+    console.log("nach deploy")
     console.log(response);
     // this.sub = response?.subscribe((dep: platformResponse) => {
     //   //replace this with saving of taskId from the asynchronous response and use getTaskStatus to refresh the status in a set time interval
@@ -76,9 +82,12 @@ export class PlanDeployerService {
     // if (this.status.executionState = "") {
 
     // }
+
+    /*
     if(response && response.outputArguments[0] && response.outputArguments[0].value) {
       this.getStatus(response.outputArguments[0].value.value);
     }
+    */
   }
 
   public async undeployPlanById(params: any) {
