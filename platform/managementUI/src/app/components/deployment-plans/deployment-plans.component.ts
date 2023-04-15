@@ -54,8 +54,15 @@ export class DeploymentPlansComponent implements OnInit {
       const response = await this.deployer.deployPlan(params);
       this.selected = undefined;
     } else if(plan && plan.value) {
+      console.log("deploy")
+      console.log("deploy plan:")
+      console.log(plan)
+      console.log(plan.value)
       let value = plan.value.find(item => item.idShort === "uri");
+      console.log("uri value: ")
+      console.log(value)
       if(value) {
+        console.log(value.value)
         params[0].value.value = value.value;
       }
       const response = await this.deployer.deployPlan(params);
@@ -82,7 +89,8 @@ export class DeploymentPlansComponent implements OnInit {
         if(value) {
           params[0].value.value = value.value;
         }
-        const response = await this.deployer.deployPlan(params, true);
+        //const response = await this.deployer.deployPlan(params, true);
+        const response = await this.deployer.deployPlan(params);
       }
     }
 
