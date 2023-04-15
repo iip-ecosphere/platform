@@ -276,11 +276,8 @@ public class TraceToAasService extends AbstractService {
     
     @Override
     protected ServiceState start() throws ExecutionException {
-        boolean ok = converter.start(Starter.getSetup().getAas(), true); // deploy, it's the App AAS
+        converter.start(Starter.getSetup().getAas(), true); // deploy, it's the App AAS
         ServiceState result = super.start();
-        if (!ok) {
-            result = ServiceState.FAILED;
-        }
         outTransport = createTransport(getConfiguredSerializationProvider());
         if (null != outTransport) {
             converter.addNotifier(d -> outTransport.asyncSend(getAasTransportChannel(), d));
@@ -311,10 +308,17 @@ public class TraceToAasService extends AbstractService {
         if (null != recorder) {
             recorder.close();
         }
-        if (!converter.stop()) {
-            result = ServiceState.FAILED;
-        }
+        converter.stop();
         return result;
+    }
+    
+    /**
+     * Returns whether the AAS was started/startup is done.
+     * 
+     * @return {@code true} for started, {@code false} else
+     */
+    public boolean isAasStarted() {
+        return converter.isAasStarted();
     }
     
     /**
