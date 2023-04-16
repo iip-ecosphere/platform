@@ -545,7 +545,7 @@ public class TraceToAasService extends AbstractService {
                 .setValue(Type.STRING, data.getAction())
                 .build();
             smcBuilder.createPropertyBuilder(PROPERTY_TIMESTAMP)
-                .setValue(Type.INTEGER, data.getTimestamp())
+                .setValue(Type.INT64, data.getTimestamp())
                 .build();
             if (null != data.getPayload()) {
                 Class<?> cls = data.getPayload().getClass();
