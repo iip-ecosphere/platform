@@ -54,12 +54,20 @@ public class TranslatingProtocolAdapter<O, I, CO, CI> extends AbstractProtocolAd
     public I adaptInput(CI data) throws IOException {
         return inputTranslator.from(data);
     }
+    
+    // checkstyle: stop exception type check
 
     @Override
     public CO adaptOutput(String channel, O data) throws IOException {
-        return null != channeledOutputTranslator 
-            ? channeledOutputTranslator.to(channel, data) : outputTranslator.to(data);
+        try {
+            return null != channeledOutputTranslator 
+                ? channeledOutputTranslator.to(channel, data) : outputTranslator.to(data);
+        } catch (Throwable t) { // some OPC access may end in a strange exception, NPE, etc.
+            return null;
+        }
     }
+
+    // checkstyle: resume exception type check
 
     @Override
     public void setModelAccess(ModelAccess modelAccess) {
