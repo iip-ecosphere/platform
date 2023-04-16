@@ -12,11 +12,15 @@
 
 package de.iip_ecosphere.platform.support.aas.basyx;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElementCollection;
@@ -47,7 +51,8 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
     SubmodelElementsRegistrar {
     
     private ISubmodelElementCollection collection;
-    private Map<String, SubmodelElement> elements;
+    private Map<String, SubmodelElement> elementsMap;
+    private List<SubmodelElement> elementsList; // not nice, shall be two implementations
     private Map<String, Builder<?>> deferred;
     
     /**
@@ -100,8 +105,8 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
             Supplier<org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElementCollection> bCreator) {
             this.parentBuilder = parentBuilder;
             this.instance = wCreator.get();
-            this.instance.elements = new HashMap<String, SubmodelElement>();
             this.collection = bCreator.get();
+            this.instance.createElementsStructure();
         }
 
         /**
@@ -282,13 +287,34 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
     protected BaSyxSubmodelElementCollection(ISubmodelElementCollection collection) {
         this.collection = collection;
     }
+    
+    /**
+     * Creates the actual data structure to use. {@link #collection} shall be set before.
+     */
+    private void createElementsStructure() {
+        boolean ordered;
+        //boolean allowDuplicates;
+        if (null != collection) {
+            ordered = collection.isOrdered();
+            //allowDuplicates = collection.isAllowDuplicates();
+        } else { // just a fallback
+            ordered = true;
+            //allowDuplicates = true;
+        }
+        //ordered = false; // TODO allow list 
+        if (ordered) {
+            elementsList = new ArrayList<SubmodelElement>();
+        } else {
+            elementsMap = new HashMap<String, SubmodelElement>();
+        }
+    }
 
     /**
      * Dynamically initializes the elements structure.
      */
     private void initialize() {
-        if (null == elements) {
-            elements = new HashMap<String, SubmodelElement>();
+        if (null == elementsMap && null == elementsList) {
+            createElementsStructure();
             BaSyxElementTranslator.registerSubmodelElements(collection.getSubmodelElements(), this);        
         }
     }
@@ -296,13 +322,39 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
     @Override
     public int getElementsCount() {
         initialize();
-        return elements.size();
+        return null == elementsMap ? elementsList.size() : elementsMap.size();
     }
     
     @Override
     public Iterable<SubmodelElement> elements() {
         initialize();
-        return elements.values();
+        return null == elementsMap ? elementsList : elementsMap.values();
+    }
+    
+    /**
+     * Returns the elements as stream.
+     * 
+     * @return the stream
+     */
+    private Stream<SubmodelElement> elementsStream() {
+        initialize();
+        return null == elementsMap ? elementsList.stream() : elementsMap.values().stream();
+    }
+    
+    /**
+     * Adds an element.
+     * 
+     * @param <T> the actual type of the element
+     * @param elt the element
+     * @return {@code elt}
+     */
+    private <T extends SubmodelElement> T add(T elt) {
+        if (null == elementsMap) {
+            elementsList.add(elt);
+        } else {
+            elementsMap.put(elt.getIdShort(), elt);
+        }
+        return elt;
     }
     
     /**
@@ -316,9 +368,7 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
             
             @Override
             public Iterator<SubmodelElement> iterator() {
-                return elements
-                    .values()
-                    .stream()
+                return elementsStream()
                     .filter(filter)
                     .iterator();
             }
@@ -339,9 +389,7 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
             
             @Override
             public Iterator<E> iterator() {
-                return elements
-                    .values()
-                    .stream()
+                return elementsStream()
                     .filter(e -> castType.isInstance(e))
                     .filter(filter)
                     .map(e -> castType.cast(e))
@@ -362,9 +410,7 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
             
             @Override
             public Iterator<SubmodelElementCollection> iterator() {
-                return elements
-                    .values()
-                    .stream()
+                return elementsStream()
                     .filter(e -> e instanceof SubmodelElementCollection)
                     .map(SubmodelElementCollection.class::cast)
                     .filter(filter)
@@ -406,7 +452,16 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
     @Override
     public SubmodelElement getElement(String idShort) {
         initialize();
-        return elements.get(idShort);
+        SubmodelElement result = null;
+        if (null == elementsMap) {
+            Optional<SubmodelElement> tmp = elementsStream()
+                .filter(s -> s.getIdShort().equals(idShort))
+                .findFirst();
+            result = tmp.isPresent() ? tmp.get() : null; 
+        } else {
+            result = elementsMap.get(idShort); 
+        }
+        return result;
     }
 
     /**
@@ -433,48 +488,40 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
 
     @Override
     public BaSyxProperty register(BaSyxProperty property) {
-        elements.put(property.getIdShort(), property);
-        return property;
+        return add(property);
     }
 
     @Override
     public BaSyxFile register(BaSyxFile file) {
-        elements.put(file.getIdShort(), file);
-        return file;
+        return add(file);
     }
 
     @Override
     public BaSyxOperation register(BaSyxOperation operation) {
-        elements.put(operation.getIdShort(), operation);
-        return operation;
+        return add(operation);
     }
 
     @Override
     public BaSyxReferenceElement register(BaSyxReferenceElement reference) {
-        elements.put(reference.getIdShort(), reference);
-        return reference;
+        return add(reference);
     }
 
     @Override
     public BaSyxSubmodelElementCollection register(BaSyxSubmodelElementCollection collection) {
-        elements.put(collection.getIdShort(), collection);
-        return collection;
+        return add(collection);
     }
     
     @Override
     public <D extends org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.DataElement> 
         BaSyxDataElement<D> register(BaSyxDataElement<D> dataElement) {
-        elements.put(dataElement.getIdShort(),  dataElement);
-        return dataElement;
+        return add(dataElement);
     }
 
     @Override
     public void accept(AasVisitor visitor) {
         initialize();
         visitor.visitSubmodelElementCollection(this);
-        for (SubmodelElement se : elements.values()) {
-            se.accept(visitor);
-        }
+        elementsStream().forEach(se -> se.accept(visitor));
         visitor.endSubmodelElementCollection(this);
     }
 
@@ -486,15 +533,27 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
     @Override
     public void deleteElement(String idShort) {
         initialize();
-        if (elements.containsKey(idShort)) {
-            elements.remove(idShort);
-            collection.deleteSubmodelElement(idShort);
+        if (null == elementsMap) {
+            for (int i = 0; i < elementsList.size(); i++) {
+                SubmodelElement elt = elementsList.get(i);
+                if (elt.getIdShort().equalsIgnoreCase(idShort)) {
+                    elementsList.remove(i);
+                    collection.deleteSubmodelElement(idShort);
+                    break;
+                }
+            }
+        } else {
+            if (elementsMap.containsKey(idShort)) {
+                elementsMap.remove(idShort);
+                collection.deleteSubmodelElement(idShort);
+            }
         }
     }
 
     @Override
     public void update() {
-        elements = null;
+        elementsMap = null;
+        elementsList = null;
     }
 
 }
