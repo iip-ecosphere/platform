@@ -76,6 +76,7 @@ public abstract class TransportToAasConverter<T> {
     private String transportStream;
     private Class<T> dataType;
     private AasSetup aasSetup;
+    private boolean aasStarted;
     
     static {
         DEFAULT_CONVERTERS.put(String.class, new TypeConverter(Type.STRING, IDENTITY_CONVERTER));
@@ -280,7 +281,6 @@ public abstract class TransportToAasConverter<T> {
      * @param data the trace record data
      */
     private void handleNewAndNotify(T data) {
-        handleNew(data);
         for (IOConsumer<T> n: notifier) {
             try { // notify independently
                 n.accept(data);
@@ -288,6 +288,7 @@ public abstract class TransportToAasConverter<T> {
                 LoggerFactory.getLogger(getClass()).error("Cannot inform notifier: {}", e.getMessage());
             }
         }
+        handleNew(data);
     }
     
     
@@ -471,39 +472,51 @@ public abstract class TransportToAasConverter<T> {
     }
 
     /**
+     * Returns whether the AAS was started/startup is done.
+     * 
+     * @return {@code true} for started, {@code false} else
+     */
+    public boolean isAasStarted() {
+        return aasStarted;
+    }
+
+    /**
      * Starts the transport tracer.
      * 
      * @param aasSetup the AAS setup to use
      * @param deploy whether the AAS represented by this converter shall be deployed
-     * @return {@code true} for success, {@code false} else
      */
-    public boolean start(AasSetup aasSetup, boolean deploy) {
+    public void start(AasSetup aasSetup, boolean deploy) {
         this.aasSetup = aasSetup;
-        boolean success = true;
-        try {
-            if (isAasEnabled()) {
-                AasFactory factory = AasFactory.getInstance();
-                AasBuilder aasBuilder = factory.createAasBuilder(getAasId(), getAasUrn());
-                success = buildUpAas(aasBuilder);
-                aasBuilder.createSubmodelBuilder(submodelIdShort, null).build();
-                Aas aas = aasBuilder.build();
-                if (deploy) {
-                    List<Aas> aasList = CollectionUtils.addAll(new ArrayList<Aas>(), aas);
-                    AasPartRegistry.remoteDeploy(aasSetup, aasList);
+        if (isAasEnabled()) {
+            new Thread(() -> { // may block
+                try {
+                    AasFactory factory = AasFactory.getInstance();
+                    AasBuilder aasBuilder = factory.createAasBuilder(getAasId(), getAasUrn());
+                    buildUpAas(aasBuilder);
+                    aasBuilder.createSubmodelBuilder(submodelIdShort, null).build();
+                    Aas aas = aasBuilder.build();
+                    if (deploy) {
+                        List<Aas> aasList = CollectionUtils.addAll(new ArrayList<Aas>(), aas);
+                        AasPartRegistry.remoteDeploy(aasSetup, aasList);
+                    }
+                    this.aasStarted = true;
+                } catch (IOException e) {
+                    LoggerFactory.getLogger(getClass()).error("Creating AAS: " + e.getMessage());
                 }
-            }
-            callback = new TraceRecordReceptionCallback();
-            TransportConnector conn = Transport.createConnector();
-            if (null != conn) {
-                conn.setReceptionCallback(transportStream, callback);
-            } else {
-                LoggerFactory.getLogger(getClass()).error("No transport setup, will not listen to trace records.");
-            }
-        } catch (IOException e) {
-            LoggerFactory.getLogger(getClass()).error("Creating AAS: " + e.getMessage());
-            success = false;
+            }).start();
         }
-        return success;
+        callback = new TraceRecordReceptionCallback();
+        TransportConnector conn = Transport.createConnector();
+        if (null != conn) {
+            try {
+                conn.setReceptionCallback(transportStream, callback);
+            } catch (IOException e) {
+                LoggerFactory.getLogger(getClass()).error("Registring transport callback: " + e.getMessage());
+            }
+        } else {
+            LoggerFactory.getLogger(getClass()).error("No transport setup, will not listen to trace records.");
+        }
     }
     
     /**
@@ -519,11 +532,8 @@ public abstract class TransportToAasConverter<T> {
 
     /**
      * Stops the transport, deletes the AAS.
-     * 
-     * @return {@code true} for success, {@code false} else
      */
-    public boolean stop() {
-        boolean success = true;
+    public void stop() {
         try {
             TransportConnector conn = Transport.getConnector();
             if (null != conn) {
@@ -531,19 +541,16 @@ public abstract class TransportToAasConverter<T> {
             }
         } catch (IOException e) {
             LoggerFactory.getLogger(getClass()).error("Detaching transport connector: " + e.getMessage());
-            success = false;
         }
         if (isAasEnabled()) {
             try {
                 Aas aas = AasPartRegistry.retrieveAas(aasSetup, getAasUrn());
                 aas.delete(aas.getSubmodel(submodelIdShort));
-                success = cleanUpAas(aas);
+                cleanUpAas(aas);
             } catch (IOException e ) {
                 LoggerFactory.getLogger(getClass()).error("Cleaning up AAS: " + e.getMessage());
-                success = false;
             }
         }
-        return success;
     }
 
     /**

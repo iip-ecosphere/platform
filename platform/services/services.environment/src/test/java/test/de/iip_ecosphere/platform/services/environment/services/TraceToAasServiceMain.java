@@ -56,6 +56,7 @@ public class TraceToAasServiceMain {
     private static MyLifecycleDescriptor aasDesc;
     private static Server registryServer;
     private static Server aasServer;
+    private static boolean oldWaitForAas;
     
     /**
      * An internal lifecycle descriptor (mocking the platform).
@@ -86,6 +87,7 @@ public class TraceToAasServiceMain {
      * @param aasProtocolPort port for the AAS protocol server, may be {@code -1} for ephemeral
      */
     public static void startup(String host, int aasRegistryPort, int aasServerPort, int aasProtocolPort) {
+        oldWaitForAas = AbstractAasLifecycleDescriptor.setWaitForIipAas(false);
         ServerAddress broker = new ServerAddress(Schema.IGNORE);
         qpid = new TestQpidServer(broker);
         qpid.start();
@@ -141,6 +143,7 @@ public class TraceToAasServiceMain {
      * Shuts down the test.
      */
     public static void shutdown() {
+        AbstractAasLifecycleDescriptor.setWaitForIipAas(oldWaitForAas);
         aasDesc.shutdown();
         registryServer.stop(true);
         aasServer.stop(true);        

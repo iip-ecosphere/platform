@@ -73,6 +73,9 @@ public class TraceToAasServiceTest {
         ApplicationSetup app = service.getApplicationSetup();
         service.setState(ServiceState.STARTING);
         Assert.assertEquals(ServiceState.RUNNING, service.getState());
+        TimeUtils.waitFor(() -> !service.isAasStarted(), 5000, 300);
+        
+        System.out.println("Sending...");
         // send messages
         int[] img = new int[] {128, 128, 64, 12, 0, 8};
         TraceToAasServiceMain.MyData data = new TraceToAasServiceMain.MyData(img);
