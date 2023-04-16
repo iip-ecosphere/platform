@@ -3,7 +3,7 @@
   display:flex;
   justify-content: flex-start;
   flex-wrap: wrap;
-
+  //background-color: red;
 }
 
 .element {
@@ -11,6 +11,8 @@
   width: 400px;
   //max-width: 1000px;
   //background-color: rgb(203, 203, 203);
+  //background-color: red;
+
 }
 
 #box {
@@ -18,12 +20,14 @@
   display:flex;
   justify-content: space-between;
   align-items: center;
+
 }
 
 #box > div { //child divs of element with id "box"
   margin-left: 0.5em;
   margin-right: 0.5em;
   margin-bottom: 0.5em;
+
 }
 
 .bottom {
@@ -33,5 +37,7 @@
 
 .device {
   background-color: rgb(203, 203, 203);
+  //background-color: aqua;
+
   color:rgb(58, 55, 57);
 }

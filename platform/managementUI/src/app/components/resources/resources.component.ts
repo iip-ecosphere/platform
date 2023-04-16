@@ -45,8 +45,22 @@ export class ResourcesComponent implements OnInit {
     this.Data = await this.api.getResources();
     if(this.Data && this.Data.submodelElements) {
       this.tech.getTechnicalData(this.Data.submodelElements);
-
     }
+    this.filterSubmodelElements()
+  }
+
+  elementsToFilter = ["deviceManager", "deviceRegistry", "containers"]
+
+  public filterSubmodelElements() {
+    let temp = []
+    if (this.Data.submodelElements) {
+      for(let elemt of this.Data.submodelElements) {
+        if(elemt.idShort && !(this.elementsToFilter.includes(elemt.idShort))) {
+            temp.push(elemt)
+        }
+      }
+    }
+    this.Data.submodelElements = temp
   }
 
   public isArray(value: any) {
