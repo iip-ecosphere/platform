@@ -68,26 +68,11 @@ export class PlanDeployerService {
     }
     console.log("nach deploy")
     console.log(response);
-    // this.sub = response?.subscribe((dep: platformResponse) => {
-    //   //replace this with saving of taskId from the asynchronous response and use getTaskStatus to refresh the status in a set time interval
-    //   this.status.executionState = dep.executionState;
-    //   console.log(dep);
-    //   for(const message of dep.outputArguments) {
-    //     if(message.value) {
-    //       this.status.messages.push(message.value.value as string);
-    //     }
-    //   }
-    //   this.emitter.next(this.status);
-    // });
-    // if (this.status.executionState = "") {
 
-    // }
-
-    /*
     if(response && response.outputArguments[0] && response.outputArguments[0].value) {
       this.getStatus(response.outputArguments[0].value.value);
     }
-    */
+
   }
 
   public async undeployPlanById(params: any) {
@@ -118,7 +103,7 @@ export class PlanDeployerService {
         },
         value: {
           idShort: "taskId",
-          kind: "template",
+          kind: "Template",
           valueType: "string",
           modelType: {
             name: "Property"
@@ -126,18 +111,18 @@ export class PlanDeployerService {
           value: ""
         }
     }];
-
     params[0].value.value = this.onlyId.transform(id);
+    console.log(params);
       try {
           response = this.http.post<platformResponse>(this.ip + '/shells/' + this.urn + "/aas/submodels/Artifacts/submodel/getTaskStatus/invoke"
           ,{"inputArguments": params,"requestId":"1bfeaa30-1512-407a-b8bb-f343ecfa28cf", "inoutputArguments":[], "timeout":10000}
           , {responseType: 'json', reportProgress: true});
           console.log(response);
-          this.sub = response.subscribe((status: any )=> {
+          this.sub = response.subscribe((status: any ) => {
             console.log(status);
             if(status.outputArguments[0].value && status.outputArguments[0].value.value && this.status.messages && status.executionState) {
               this.status.executionState = status.executionState;
-              this.status.messages[0] = status.outputArguments[0].value.value;
+              this.status.messages[0] = this.onlyId.transform(status.outputArguments[0].value.value);
               this.emitter.next(this.status);
             }
 }, err => (this.emitter.next({executionState: "ERROR", messages: ["an error occured while getting the task status"]})));
