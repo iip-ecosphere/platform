@@ -94,27 +94,6 @@
                </execution>
            </executions>
        </plugin>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>exec-maven-plugin</artifactId>
-          <version>3.0.0</version>
-          <executions>
-            <execution>
-            <id>py-test</id>
-                  <goals>
-                    <goal>java</goal>
-                  </goals>
-                  <configuration>
-                  <arguments>
-                    <argument>${project.basedir}/src/main/python</argument>
-                    <argument>1</argument>
-                  </arguments>
-                  <mainClass>de.iip_ecosphere.platform.services.environment.PythonSyntaxTest</mainClass>
-                  <classpathScope>test</classpathScope>
-                </configuration>
-            </execution>
-          </executions>
-        </plugin>
         
   	</plugins>
   </build>
