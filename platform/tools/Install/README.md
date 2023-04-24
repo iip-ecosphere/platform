@@ -19,7 +19,7 @@ If you need to update the configuration model before instantiating the platform,
 
 This package contains also programs to optimize specific deployments, e.g., to reduce the overlap between JAR folders.
 
-**External programs**
+**External programs and prerequisites**
 
 * Python 3.9, further dependencies for code generation, communication and potentially the Python-based data processing functions see [requirements.txt](./requirements.txt).
 * For the management UI: Angular 13, further dependencies see [dependencies.json](./dependencies.json).
