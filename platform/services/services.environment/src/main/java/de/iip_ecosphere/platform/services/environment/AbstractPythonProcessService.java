@@ -172,7 +172,7 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
      * @return {@code false} for starting by full path returned by {@link #getPythonExecutable()}
      */
     protected boolean startExecutableByName() {
-        return true;
+        return false;
     }
        
     /**

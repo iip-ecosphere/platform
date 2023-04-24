@@ -15,7 +15,7 @@ class CmdLineServiceEnvironmentTest(unittest.TestCase):
     
     def processSync(self, test_value):
         dir = os.getcwd()
-        out = subprocess.check_output(['python3', 'ServiceEnvironment.py', '--modulesPath', dir, 
+        out = subprocess.check_output([str(sys.executable), 'ServiceEnvironment.py', '--modulesPath', dir, 
             '--mode', 'console', '--data', test_value, '--sid', '1234'], cwd="../../main/python", text=True)
         
         assert len(out) > 0
@@ -28,7 +28,7 @@ class CmdLineServiceEnvironmentTest(unittest.TestCase):
 
     def test_asynchronous(self):
         dir = os.getcwd()
-        process = subprocess.Popen(['python3', 'ServiceEnvironment.py', '--modulesPath', dir, 
+        process = subprocess.Popen([str(sys.executable), 'ServiceEnvironment.py', '--modulesPath', dir, 
             '--mode', 'console', '--sid', '1234'], bufsize=0, stdout=PIPE, stdin=PIPE, 
             cwd="../../main/python", text=True)
         process.stdin.write('S|data\r\n')
