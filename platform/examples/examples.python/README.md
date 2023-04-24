@@ -4,7 +4,7 @@ Demonstrates a simple application-specific (asynchronous) Python service in a si
 
 The application consists of three (micro)-services, which are composed in the configuration model and integrated in a model-based fashion through the platform/application instantiation:
   * A sender service asynchronously ingests data once per second.
-  * An asynchronous "AI" service in Python based on configuration-determined interfaces, processes the data and delivers a "classification".
+  * An asynchronous "AI" service in Python based on configuration-determined interfaces, processes the data and delivers a "classification". The Python service is integrated via WebSockets rather than command line streams.
   * An asynchronous receiver service emits the finally received (and classified/scored) data on the console.
 An explaining overview slide is available [here](https://github.com/iip-ecosphere/platform/tree/main/platform/examples/examples.python/docs/Examples_Python.pdf)
 
