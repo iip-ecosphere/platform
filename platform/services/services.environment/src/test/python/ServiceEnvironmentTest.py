@@ -10,11 +10,10 @@ from subprocess import PIPE
 class CmdLineServiceEnvironmentTest(unittest.TestCase):
 
     def test_synchronous(self):
-        print("Running in " + str(sys.version_info))
+        print("Running in " + str(sys.version_info)+" "+str(sys.executable))
         self.processSync("S|data")
     
     def processSync(self, test_value):
-        print("Running in " + str(sys.version_info))
         dir = os.getcwd()
         out = subprocess.check_output(['python3', 'ServiceEnvironment.py', '--modulesPath', dir, 
             '--mode', 'console', '--data', test_value, '--sid', '1234'], cwd="../../main/python", text=True)
@@ -28,7 +27,6 @@ class CmdLineServiceEnvironmentTest(unittest.TestCase):
         assert outMod.rstrip() == test_value.rstrip()
 
     def test_asynchronous(self):
-        print("Running in " + str(sys.version_info))
         dir = os.getcwd()
         process = subprocess.Popen(['python3', 'ServiceEnvironment.py', '--modulesPath', dir, 
             '--mode', 'console', '--sid', '1234'], bufsize=0, stdout=PIPE, stdin=PIPE, 
