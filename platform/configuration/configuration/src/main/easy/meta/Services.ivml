@@ -203,7 +203,8 @@ project Services {
    
    enum PythonIntegrationMode {
        console_continuous,
-       console_oneShot
+       console_oneShot,
+       websocket_continuous
    };
    
    compound PythonService refines Service {

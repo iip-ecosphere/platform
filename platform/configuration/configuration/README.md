@@ -48,7 +48,7 @@ Applications projects containing the configuration model of the application typi
 
 ## Prerequisites
 
-For running the tests locally, you need a Python 3.9 with all IIP-Python dependencies (at least PyYaml, pyflakes - see platform handbook and [Install Package](https://github.com/iip-ecosphere/platform/tree/main/platform/tools/Install)) installed. On Windows, this can easily be obtained from the Microsoft Store.
+For running the tests locally, you need a Python 3.9 with all IIP-Python dependencies (see platform handbook and [Install Package](https://github.com/iip-ecosphere/platform/tree/main/platform/tools/Install)) installed. On Windows, this can easily be obtained from the Microsoft Store.
 
 For running the container tests, you need Docker and LXC (Linux only). To bypass the container creation in either case, use `-Deasy.docker.failOnError=false` to disable failure reporting during Docker instantiator execution or `-Deasy.lxc.failOnError=false` to disable failure reporting for the LXC instantiator. The instantiation process shall then run anyway and produce the related artifacts, e.g., Dockerfiles or LXC templates, but no container images are created/deployed.
 

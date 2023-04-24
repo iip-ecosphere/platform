@@ -1075,7 +1075,9 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
     }
     
     def getServiceType(MeshElement elt, PythonService service) {
-        if (service.integrationMode == PythonIntegrationMode::console_continuous) {
+        if (service.integrationMode == PythonIntegrationMode::websocket_continuous) {
+            "de.iip_ecosphere.platform.services.environment.PythonWsProcessService"
+        } else if (service.integrationMode == PythonIntegrationMode::console_continuous) {
             "de.iip_ecosphere.platform.services.environment.PythonAsyncProcessService"
         } else {
             "de.iip_ecosphere.platform.services.environment.PythonSyncProcessService"

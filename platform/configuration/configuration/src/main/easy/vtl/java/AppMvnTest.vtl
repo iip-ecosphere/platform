@@ -113,30 +113,6 @@ template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, setOf(String) u
         new XmlElement(execArgs, "argument", "--status=true");
         new XmlElement(execCfg, "classpathScope", "test");
         
-        if (hasPython) {
-            exec = new XmlElement(execPluginExecs, "execution");
-            new XmlElement(exec, "id", "py-test");
-            new XmlElement(new XmlElement(exec, "goals"), "goal", "java");
-            execCfg = new XmlElement(exec, "configuration");
-            execArgs = new XmlElement(execCfg, "arguments");
-            new XmlElement(execArgs, "argument", "\\${project.basedir}/src/main/python/services");
-            new XmlElement(execArgs, "argument", "1");
-            new XmlElement(execCfg, "mainClass", "de.iip_ecosphere.platform.services.environment.PythonSyntaxTest");
-            new XmlElement(execCfg, "classpathScope", "test");
-            
-            exec = new XmlElement(execPluginExecs, "execution");
-            new XmlElement(exec, "id", "PyServiceUnitTest");
-            new XmlElement(new XmlElement(exec, "goals"), "goal", "java");
-            execCfg = new XmlElement(exec, "configuration");
-            execArgs = new XmlElement(execCfg, "arguments");
-            new XmlElement(execArgs, "argument", "\\${project.basedir}/src/test/python");
-            new XmlElement(execArgs, "argument", "pyTest.py");
-            new XmlComment(execArgs, "Please adjust relative path to model");
-            new XmlElement(execArgs, "argument", "../../../../examples.templates.model");
-            new XmlElement(execCfg, "mainClass", "de.iip_ecosphere.platform.services.environment.PythonUnitTest");
-            new XmlElement(execCfg, "classpathScope", "test");
-        }
-        
         dep = createDependencies(project);
         new XmlComment(dep, "Due to required exclusions, this dependency must be repeated as early as possible. Typically, it does not conflict with usual dependencies in profiles.");
         appendDependency(dep, "org.glassfish", "jakarta.el", scope="test");
