@@ -62,6 +62,8 @@ public class TranslatingProtocolAdapter<O, I, CO, CI> extends AbstractProtocolAd
         try {
             return null != channeledOutputTranslator 
                 ? channeledOutputTranslator.to(channel, data) : outputTranslator.to(data);
+        } catch (IOException e) {
+            throw e;
         } catch (Throwable t) { // some OPC access may end in a strange exception, NPE, etc.
             return null;
         }
