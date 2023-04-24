@@ -10,7 +10,7 @@ from subprocess import PIPE
 class CmdLineServiceEnvironmentTest(unittest.TestCase):
 
     def test_synchronous(self):
-        print("Running in " + str(sys.version_info)+" "+str(sys.executable))
+        print("Running in " + str(sys.version_info)+" "+str(sys.executable)+" "+str(sys.path))
         self.processSync("S|data")
     
     def processSync(self, test_value):
