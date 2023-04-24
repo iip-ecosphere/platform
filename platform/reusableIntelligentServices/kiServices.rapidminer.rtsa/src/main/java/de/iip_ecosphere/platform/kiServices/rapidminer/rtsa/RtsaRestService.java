@@ -29,6 +29,7 @@ import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
 import de.iip_ecosphere.platform.services.environment.AbstractRestProcessService;
 import de.iip_ecosphere.platform.services.environment.InstalledDependenciesSetup;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
+import de.iip_ecosphere.platform.services.environment.Starter;
 import de.iip_ecosphere.platform.services.environment.YamlProcess;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
@@ -80,7 +81,7 @@ public class RtsaRestService<I, O> extends AbstractRestProcessService<I, O>  {
         home = getResolvedFile(home);
         
         List<String> args = new ArrayList<>();
-        networkPortKey = "rtsa_" + getServiceSpec().getId();
+        networkPortKey = "rtsa_" + Starter.getServiceId(getServiceSpec().getId());
         instancePort = NetworkManagerFactory.getInstance().obtainPort(networkPortKey).getPort();
         args.add("-Dspring.config.location=" + getConfigLocation(rtsaPath));
         args.add("-Dscoring-agent.baseDir=" + getBaseDir(rtsaPath));
