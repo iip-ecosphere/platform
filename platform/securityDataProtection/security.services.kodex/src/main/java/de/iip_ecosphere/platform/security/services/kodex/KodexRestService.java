@@ -32,7 +32,6 @@ import org.yaml.snakeyaml.Yaml;
 import com.esotericsoftware.yamlbeans.YamlWriter;
 
 import de.iip_ecosphere.platform.services.environment.YamlService;
-import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.services.environment.AbstractRestProcessService;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.services.environment.YamlProcess;
@@ -134,18 +133,7 @@ public class KodexRestService<I, O> extends AbstractRestProcessService<I, O>  {
         addProcessSpecCmdArg(args);
         
         createAndConfigureProcess(exe, false, home, args);
-        boolean portAvailable = false;
-        while (!portAvailable) {
-            try {
-                getNewConnectionInstanceQuiet(false); // quiet, check whether connection exists
-                if (getConnection().getResponseCode() == 400) {
-                    portAvailable = true;
-                }
-            } catch (IOException e) {
-                // be quiet, checking connections
-            }
-            TimeUtils.sleep(100);
-        }
+        waitForConnection();
         setupConnectionManager();
         return ServiceState.RUNNING;
     }
