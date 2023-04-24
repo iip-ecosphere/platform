@@ -73,9 +73,39 @@ public class ServicesAasClient extends SubmodelElementsCollectionClient implemen
     @Override
     protected SubmodelElementCollection getSubmodelElementCollection() {
         SubmodelElementCollection result = super.getSubmodelElementCollection();
+
+        // do we find a service manager that handles the appId, in particular for stopping services
+        String serviceMgrId = null;
         SubmodelElementCollection m = null == result ? null : result.getSubmodelElementCollection(
-            ServicesAas.NAME_COLL_SERVICE_MANAGERS);
+            ServicesAas.NAME_COLL_SERVICES);
         if (null != m) {
+            for (SubmodelElement elt : m.elements()) {
+                if (elt instanceof SubmodelElementCollection) {
+                    SubmodelElementCollection service = (SubmodelElementCollection) elt;
+                    if (AasUtils.getPropertyValueAsStringSafe(service, 
+                        ServicesAas.NAME_PROP_APPLICATION_ID, "").equals(appId)) {
+                        serviceMgrId = AasUtils.getPropertyValueAsStringSafe(service, 
+                            ServicesAas.NAME_PROP_SERVICEMGR_ID, "");
+                        break;
+                    }
+                }                
+            }
+            serviceMgrId = AasUtils.fixId(serviceMgrId);
+        }
+        
+        m = null == result ? null : result.getSubmodelElementCollection(
+            ServicesAas.NAME_COLL_SERVICE_MANAGERS);
+        
+        // if there is a serviceManager id, try to use that
+        if (null != m && null != serviceMgrId) {
+            SubmodelElement se = m.getElement(serviceMgrId);
+            if (se instanceof SubmodelElementCollection) {
+                result = (SubmodelElementCollection) se;
+            }
+        }
+        
+        // else find candidates and do a bit load balancing
+        if (null != m && null == result) {
             SubmodelElementCollection found = null;
             int foundServices = -1;
             SubmodelElementCollection fallback = null;
@@ -99,6 +129,7 @@ public class ServicesAasClient extends SubmodelElementsCollectionClient implemen
             if (null == found) {
                 found = fallback; // CACHE?
             }
+                
             if (found != null) {
                 result = found;
             }
