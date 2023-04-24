@@ -30,6 +30,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.iip_ecosphere.platform.services.environment.GenericMultiTypeServiceImpl.OutTypeInfo;
 import de.iip_ecosphere.platform.support.PythonUtils;
+import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
 import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
 
@@ -107,12 +108,18 @@ public class PythonWsProcessService extends PythonAsyncProcessService {
     
     @Override
     protected void createScanInputThread(Process proc) {
-        try {
-            socket = new WebSocket(new URI("ws://localhost:" + instancePort));
-            socket.connectBlocking();
-        } catch (URISyntaxException | InterruptedException e) {
-            getLogger().error("Connecting to port {}: {}", instancePort, e.getMessage());
-        } 
+        while (null == socket) { 
+            try {
+                WebSocket tmp = new WebSocket(new URI("ws://localhost:" + instancePort));
+                if (tmp.connectBlocking()) { // blocking may fail
+                    getLogger().info("Connected to port {}", instancePort);
+                    socket = tmp;
+                }
+            } catch (URISyntaxException | InterruptedException e) {
+                getLogger().error("Connecting to port {}: {}", instancePort, e.getMessage());
+                TimeUtils.sleep(100);
+            } 
+        }
     }
     
     @Override
