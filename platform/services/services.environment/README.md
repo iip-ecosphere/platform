@@ -24,6 +24,7 @@ Prerequisites/requirements:
 - Python at least version 3.9
 - Pyflakes at least version 2.5.0
 - PyYaml at least version 6.0
+- Websockets at least version 11.0.2
 
 ## Developing against the Application AAS
 

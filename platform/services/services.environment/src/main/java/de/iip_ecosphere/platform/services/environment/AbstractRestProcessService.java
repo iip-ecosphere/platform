@@ -32,6 +32,7 @@ import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.LoggerFactory;
 
+import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
 
@@ -132,6 +133,24 @@ public abstract class AbstractRestProcessService<I, O> extends AbstractProcessSe
                     LoggerFactory.getLogger(AbstractRestProcessService.class).error(e.getMessage(), e);
                 }
             }
+        }
+    }
+
+    /**
+     * Waits until a connection is established.
+     */
+    protected void waitForConnection() {
+        boolean portAvailable = false;
+        while (!portAvailable) {
+            try {
+                getNewConnectionInstanceQuiet(false); // quiet, check whether connection exists
+                if (getConnection().getResponseCode() == 400) {
+                    portAvailable = true;
+                }
+            } catch (IOException e) {
+                // be quiet, checking connections
+            }
+            TimeUtils.sleep(100);
         }
     }
     

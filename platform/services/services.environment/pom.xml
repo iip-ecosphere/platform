@@ -77,6 +77,12 @@
 	    <version>6.1.6</version>
 	</dependency>
 
+	<dependency>
+	  <groupId>org.java-websocket</groupId>
+	  <artifactId>Java-WebSocket</artifactId>
+	  <version>1.5.3</version>
+	</dependency> 
+
     <dependency>
       <groupId>de.iip-ecosphere.platform</groupId>
       <artifactId>support.aas.basyx</artifactId>

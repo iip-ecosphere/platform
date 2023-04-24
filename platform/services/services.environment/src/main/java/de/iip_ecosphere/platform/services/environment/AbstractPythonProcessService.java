@@ -33,6 +33,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.slf4j.Logger;
 
+import de.iip_ecosphere.platform.services.environment.GenericMultiTypeServiceImpl.InTypeInfo;
+import de.iip_ecosphere.platform.services.environment.GenericMultiTypeServiceImpl.OutTypeInfo;
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.PythonUtils;
 import de.iip_ecosphere.platform.support.ServerAddress;
@@ -55,130 +57,11 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
     private List<String> pythonArgs;
     private String locationKey;
     private String transportChannel;
-    private Map<String, OutTypeInfo<?>> outTypeInfos = new HashMap<>();
-    private Map<String, InTypeInfo<?>> inTypeInfos = new HashMap<>();
+    private GenericMultiTypeServiceImpl impl = new GenericMultiTypeServiceImpl();
     private Map<String, ParameterConfigurer<?>> paramConfigurers = new HashMap<>();
     private Map<String, ReceptionCallback<?>> callbacks = new HashMap<>();
     private String averageResponseTime = "";
-    
-    /**
-     * Represents an input or output type.
-     * 
-     * @param <T> the Java representation of the output type
-     * 
-     * @author Holger Eichelberger, SSE
-     */
-    protected abstract static class AbstractTypeInfo<T> {
-        
-        private Class<T> type;
-        
-        /**
-         * Creates an instance.
-         * 
-         * @param type the class representing the data type
-         */
-        protected AbstractTypeInfo(Class<T> type) {
-            this.type = type;
-        }
-       
-        /**
-         * Returns the Java representation of the type.
-         * 
-         * @return the type
-         */
-        protected Class<T> getType() {
-            return type;
-        }
-        
-    }
-
-    /**
-     * Represents an input type.
-     * 
-     * @param <T> the Java representation of the output type
-     * 
-     * @author Holger Eichelberger, SSE
-     */
-    protected class InTypeInfo <T> extends AbstractTypeInfo<T> {
-        
-        private TypeTranslator<T, String> inTranslator;
-
-        /**
-         * Creates an instance.
-         * 
-         * @param type the class representing the data type
-         */
-        protected InTypeInfo(Class<T> type) {
-            super(type);
-        }
-        
-        /**
-         * Returns the input translator.
-         * 
-         * @return the type translator, may be <b>null</b>
-         */
-        protected TypeTranslator<T, String> getInTranslator() {
-            return inTranslator;
-        }
-        
-    }
-
-    /**
-     * Represents an output type.
-     * 
-     * @param <T> the Java representation of the output type
-     * 
-     * @author Holger Eichelberger, SSE
-     */
-    protected class OutTypeInfo <T> extends AbstractTypeInfo<T> {
-        
-        private TypeTranslator<String, T> outTranslator;
-        private DataIngestor<T> ingestor;
-
-        /**
-         * Creates an instance.
-         * 
-         * @param type the class representing the data type
-         */
-        protected OutTypeInfo(Class<T> type) {
-            super(type);
-        }
-
-        /**
-         * Returns the output translator.
-         * 
-         * @return the type translator, may be <b>null</b>
-         */
-        protected TypeTranslator<String, T> getOutTranslator() {
-            return outTranslator;
-        }
-        
-        /**
-         * Returns the associated ingestor.
-         * 
-         * @return the ingestor (may be <b>null</b>)
-         */
-        protected DataIngestor<T> getIngestor() {
-            return ingestor;
-        }
-        
-        /**
-         * Validates the associated ingestor and returns it. If no ingestor is associated, an ingestor
-         * for synchronous processing ({@link SyncDataIngestor}) will be created and associated.
-         * 
-         * @param typeName the data type name as specified in the configuration model
-         * @return the ingestor
-         */
-        protected DataIngestor<T> validateAndGetIngestor(String typeName) {
-            if (null == ingestor) {
-                getLogger().info(
-                    "No ingestor registered for: {}. Registering an internal synchronous ingestor.", typeName);
-                ingestor = new SyncDataIngestor<T>();
-            }
-            return ingestor;
-        }
-
-    }
+    private boolean enableFileDeletion;
 
     /**
      * Creates a service from a service id and a YAML artifact.
@@ -202,11 +85,6 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
         super(yaml);
     }
     
-    /**
-     * Does further setup of this instance from the given YAML information.
-     * 
-     * @param yaml the service information as read from YAML
-     */
     @Override
     protected void initializeFrom(YamlService yaml) {
         YamlProcess pSpec = yaml.getProcess();
@@ -228,6 +106,33 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
             home = FileUtils.createTmpFolder(FileUtils.sanitizeFileName(yaml.getId(), true));
         }
         transportChannel = yaml.getTransportChannel();
+        customizePythonArgs(pythonArgs);
+    }
+    
+    /**
+     * Allows to customize the Python command line arguments taken from the yaml spec.
+     * 
+     * @param pythonArgs the arguments to customize
+     */
+    protected void customizePythonArgs(List<String> pythonArgs) {
+    }
+    
+    /**
+     * Enables or deletes file deletion. By default, Python files are delete upon end of the process.
+     * 
+     * @param enableFileDeletion enables deletion
+     */
+    public void enableFileDeletion(boolean enableFileDeletion) {
+        this.enableFileDeletion = enableFileDeletion;
+    }
+    
+    /**
+     * Returns whether file deletion is enabled. By default, Python files are delete upon end of the process.
+     * 
+     * @return {@code true} if enabled, {@code false} else
+     */
+    public boolean isFileDeletionEnabled() {
+        return enableFileDeletion;
     }
     
     /**
@@ -380,9 +285,9 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
     @SuppressWarnings("unchecked")
     protected <O> void handleResult(Class<O> cls, String data, String typeName) {
         try {
-            OutTypeInfo<O> info = (OutTypeInfo<O>) outTypeInfos.get(typeName);
+            OutTypeInfo<O> info = (OutTypeInfo<O>) getOutTypeInfo(typeName);
             if (null != info) {
-                TypeTranslator<String, O> outT = info.outTranslator;
+                TypeTranslator<String, O> outT = info.getOutTranslator();
                 if (outT != null) {
                     O tmp = outT.to(data);
                     DataIngestor<O> ingestor = info.validateAndGetIngestor(typeName);
@@ -494,20 +399,10 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
         return LoggerFactory.getLogger(AbstractPythonProcessService.class);
     }
 
-    /**
-     * Adds an input type translator.
-     *  
-     * @param <I> the input data type
-     * @param inCls the class representing the input type
-     * @param inTypeName symbolic name of {@code inCls}, e.g. from configuration model
-     * @param inTrans the input data type translator
-     * @see #registerOutputTypeTranslator(Class, String, TypeTranslator)
-     */
     @Override
     public <I> void registerInputTypeTranslator(Class<I> inCls, String inTypeName, 
         TypeTranslator<I, String> inTrans) {
-        InTypeInfo<I> info = obtainInTypeInfo(inCls, inTypeName);
-        info.inTranslator = inTrans;
+        impl.registerInputTypeTranslator(inCls, inTypeName, inTrans);
     }
     
     /**
@@ -517,25 +412,7 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
      * @return the information object or <b>null</b> if none was registered
      */
     public InTypeInfo<?> getInTypeInfo(String inTypeName) {
-        return inTypeInfos.get(inTypeName);
-    }
-
-    /**
-     * Obtains an input type information object.
-     * 
-     * @param <I> the input type
-     * @param cls the class representing the type
-     * @param typeName the associated symbolic type name
-     * @return the input type information object, may be retrieved or new
-     */
-    @SuppressWarnings("unchecked")
-    private <I> InTypeInfo<I> obtainInTypeInfo(Class<I> cls, String typeName) {
-        InTypeInfo<I> info = (InTypeInfo<I>) inTypeInfos.get(typeName);
-        if (null == info) {
-            info = new InTypeInfo<I>(cls);
-            inTypeInfos.put(typeName, info);
-        }
-        return info;
+        return impl.getInTypeInfo(inTypeName);
     }
 
     /**
@@ -545,47 +422,18 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
      * @return the information object or <b>null</b> if none was registered
      */
     public OutTypeInfo<?> getOutTypeInfo(String outTypeName) {
-        return outTypeInfos.get(outTypeName);
+        return impl.getOutTypeInfo(outTypeName);
     }
 
-    /**
-     * Obtains an output type information object.
-     * 
-     * @param <O> the output type
-     * @param cls the class representing the type
-     * @param typeName the associated symbolic type name
-     * @return the output type information object, may be retrieved or new
-     */
-    @SuppressWarnings("unchecked")
-    private <O> OutTypeInfo<O> obtainOutTypeInfo(Class<O> cls, String typeName) {
-        OutTypeInfo<O> info = (OutTypeInfo<O>) outTypeInfos.get(typeName);
-        if (null == info) {
-            info = new OutTypeInfo<O>(cls);
-            outTypeInfos.put(typeName, info);
-        }
-        return info;
-    }
-
-    /**
-     * Adds an output type translator.
-     *  
-     * @param <O> the output data type
-     * @param outCls the class representing the input type
-     * @param outTypeName symbolic name of {@code outCls}, e.g. from configuration model
-     * @param outTrans the output data type translator
-     * @see #registerInputTypeTranslator(Class, String, TypeTranslator)
-     */
     @Override
     public <O> void registerOutputTypeTranslator(Class<O> outCls, String outTypeName, 
         TypeTranslator<String, O> outTrans) {
-        OutTypeInfo<O> info = obtainOutTypeInfo(outCls, outTypeName);
-        info.outTranslator = outTrans;
+        impl.registerOutputTypeTranslator(outCls, outTypeName, outTrans);
     }
 
     @Override
     public <O> void attachIngestor(Class<O> outCls, String outTypeName, DataIngestor<O> ingestor) {
-        OutTypeInfo<O> info = (OutTypeInfo<O>) obtainOutTypeInfo(outCls, outTypeName);
-        info.ingestor = ingestor;
+        impl.attachIngestor(outCls, outTypeName, ingestor);
     }
     
     /**
@@ -608,7 +456,7 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
     public Set<String> getParameterNames() {
         return paramConfigurers.keySet();
     }
-    
+
     /**
      * Adds parameter configurers via a consumer.
      * 
@@ -624,7 +472,7 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
     protected ServiceState start() throws ExecutionException {
         if (null != transportChannel && transportChannel.length() > 0) {
             try {
-                LoggerFactory.getLogger(AbstractPythonProcessService.class).info(
+                getLogger().info(
                     "Establishing clientserver channel for {}, {}: {} ", getId(), getKind(), transportChannel);
                 if (ServiceKind.SERVER == getKind()) {
                     establishServerListener("*SERVER", transportChannel);
@@ -632,7 +480,7 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
                     establishClientListener("*SERVER", transportChannel);
                 }
             } catch (IOException e) {
-                LoggerFactory.getLogger(AbstractPythonProcessService.class).error(
+                getLogger().error(
                     "While establishing client-server channel for {}, {}: {} ", getId(), getKind(), e.getMessage());
             }
         }
@@ -709,8 +557,7 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
                     try {
                         conn.asyncSend(cChannel, data);
                     } catch (IOException e) {
-                        LoggerFactory.getLogger(AbstractPythonProcessService.class).error(
-                            "While receiving from Python and passing on to {}", cChannel, e.getMessage());
+                        getLogger().error("While receiving from Python and passing on to {}", cChannel, e.getMessage());
                     }
                 });
                 try {
@@ -722,8 +569,8 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
                             try {
                                 process(typeName, data);
                             } catch (ExecutionException e) {
-                                LoggerFactory.getLogger(AbstractPythonProcessService.class).error(
-                                    "While receiving on {} and passing on to Python: {}", cSChannel, e.getMessage());
+                                getLogger().error("While receiving on {} and passing on to Python: {}", 
+                                    cSChannel, e.getMessage());
                             }
                         }
                         
@@ -731,8 +578,8 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
                     // sent client connection ack with private client-server channel
                     conn.asyncSend(cChannel, cSChannel); 
                 } catch (IOException e) {
-                    LoggerFactory.getLogger(AbstractPythonProcessService.class).error(
-                        "While setting up server-client-connection {}-{}", cChannel, cSChannel, e.getMessage());
+                    getLogger().error("While setting up server-client-connection {}-{}", 
+                        cChannel, cSChannel, e.getMessage());
                 }
             }
             
@@ -770,16 +617,16 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
                         try {
                             conn.asyncSend(serverChannel, d);
                         } catch (IOException e) {
-                            LoggerFactory.getLogger(AbstractPythonProcessService.class).error(
-                                "While receiving from Python passing on to {}", serverChannel, e.getMessage());
+                            getLogger().error("While receiving from Python passing on to {}", 
+                                serverChannel, e.getMessage());
                         }
                     });
                 } else {
                     try {
                         process(typeName, data);
                     } catch (ExecutionException e) {
-                        LoggerFactory.getLogger(AbstractPythonProcessService.class).error(
-                            "While receiving on {} and passing on to Python: {}", clientChannel, e.getMessage());
+                        getLogger().error("While receiving on {} and passing on to Python: {}", 
+                            clientChannel, e.getMessage());
                     }
                 }
             }

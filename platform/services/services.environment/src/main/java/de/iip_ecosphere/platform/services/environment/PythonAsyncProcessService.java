@@ -26,6 +26,8 @@ import org.slf4j.LoggerFactory;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 
+import de.iip_ecosphere.platform.services.environment.GenericMultiTypeServiceImpl.InTypeInfo;
+import de.iip_ecosphere.platform.services.environment.GenericMultiTypeServiceImpl.OutTypeInfo;
 import de.iip_ecosphere.platform.support.PythonUtils;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
@@ -46,7 +48,6 @@ public class PythonAsyncProcessService extends AbstractPythonProcessService {
 
     private Process proc;
     private PrintWriter serviceIn;
-    private boolean enableFileDeletion;
     private Map<String, String> reconfValues;
  
     /**
@@ -71,21 +72,26 @@ public class PythonAsyncProcessService extends AbstractPythonProcessService {
         super(yaml);
     }
     
-    /**
-     * Enables or deletes file deletion. By default, Python files are delete upon end of the process.
-     * 
-     * @param enableFileDeletion enables deletion
-     */
-    public void enableFileDeletion(boolean enableFileDeletion) {
-        this.enableFileDeletion = enableFileDeletion;
-    }
-
     @Override
     protected ServiceState start() throws ExecutionException {
         super.start();
         proc = createAndCustomizeProcess(null, null);
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(proc.getOutputStream()));
         serviceIn = new PrintWriter(writer);
+        createScanInputThread(proc);
+        if (null != reconfValues) {
+            sendToService("*recfg", toJson(reconfValues));
+            reconfValues = null;
+        }
+        return ServiceState.RUNNING;
+    }
+    
+    /**
+     * Creates the input scanning thread.
+     * 
+     * @param proc the process instance to observe
+     */
+    protected void createScanInputThread(Process proc) {
         createScanInputThread(proc, (t, d) -> {
             OutTypeInfo<?> info = getOutTypeInfo(t);
             if (null != info) {
@@ -95,11 +101,6 @@ public class PythonAsyncProcessService extends AbstractPythonProcessService {
             }
             return false;
         }).start();
-        if (null != reconfValues) {
-            sendToService(compose("*recfg", toJson(reconfValues)));
-            reconfValues = null;
-        }
-        return ServiceState.RUNNING;
     }
 
     @Override
@@ -115,7 +116,7 @@ public class PythonAsyncProcessService extends AbstractPythonProcessService {
             }
             proc = null;
         }
-        if (null != getHome() && enableFileDeletion) {
+        if (null != getHome() && isFileDeletionEnabled()) {
             try {
                 FileUtils.forceDelete(getHome());
             } catch (IOException e) {
@@ -129,37 +130,37 @@ public class PythonAsyncProcessService extends AbstractPythonProcessService {
     @Override
     public void setState(ServiceState state) throws ExecutionException {
         if (ServiceState.STOPPING == state) { // otherwise it's gone
-            sendToService(compose("*setstate", state.name()));
+            sendToService("*setstate", state.name());
         }
         super.setState(state);
         if (state != ServiceState.STOPPING) { // otherwise it's not yet there
-            sendToService(compose("*setstate", state.name()));
+            sendToService("*setstate", state.name());
         }
         ServiceState st = getState();
         if (st != state) { // for completeness
-            sendToService(compose("*setstate", st.name()));
+            sendToService("*setstate", st.name());
         }
     }
     
     @Override
     public void migrate(String resourceId) throws ExecutionException {
-        sendToService(compose("*migrate", resourceId));
+        sendToService("*migrate", resourceId);
     }
 
     @Override
     public void update(URI location) throws ExecutionException {
-        sendToService(compose("*update", location.toString()));
+        sendToService("*update", location.toString());
     }
 
     @Override
     public void switchTo(String targetId) throws ExecutionException {
-        sendToService(compose("*switch", targetId));
+        sendToService("*switch", targetId);
     }
 
     @Override
     public void reconfigure(Map<String, String> values) throws ExecutionException {
         if (ServiceState.RUNNING == getState()) {
-            sendToService(compose("*recfg", toJson(values)));
+            sendToService("*recfg", toJson(values));
         } else {
             if (null == reconfValues) {
                 reconfValues = new HashMap<>();
@@ -172,7 +173,7 @@ public class PythonAsyncProcessService extends AbstractPythonProcessService {
     @Override
     public void activate() throws ExecutionException {
         if (getState() == ServiceState.PASSIVATED) {
-            sendToService(compose("*activate", ""));
+            sendToService("*activate", "");
         }
         super.activate(); // TODO access to state -> Python
     }
@@ -180,7 +181,7 @@ public class PythonAsyncProcessService extends AbstractPythonProcessService {
     @Override
     public void passivate() throws ExecutionException {
         if (getState() == ServiceState.RUNNING) {
-            sendToService(compose("*passivate", ""));
+            sendToService("*passivate", "");
         }
         super.passivate(); // TODO access to state -> Python
     }
@@ -197,13 +198,14 @@ public class PythonAsyncProcessService extends AbstractPythonProcessService {
     /**
      * Sends {@code text} as input to the service process.
      * 
-     * @param text the text to be sent
+     * @param type the type of the data to be sent
+     * @param data the data to be sent
      * @throws ExecutionException if sending fails for some reason
      */
-    private void sendToService(String text) throws ExecutionException {
+    protected void sendToService(String type, Object data) throws ExecutionException {
         PrintWriter si = serviceIn; // may be gone between println and flush
         if (null != si) {
-            si.println(text);
+            si.println(compose(type, data.toString()));
             si.flush();
         } // ignore, this may be a deactivated service that shall not be operating
     }
@@ -216,7 +218,7 @@ public class PythonAsyncProcessService extends AbstractPythonProcessService {
             TypeTranslator<I, String> inT = (TypeTranslator<I, String>) info.getInTranslator();
             if (null != inT) {
                 try {
-                    sendToService(compose(inType, inT.to(data)));
+                    sendToService(inType, inT.to(data));
                 } catch (IOException e) {
                     throw new ExecutionException("Cannot transfer data to service: " + e.getMessage(), e);
                 }

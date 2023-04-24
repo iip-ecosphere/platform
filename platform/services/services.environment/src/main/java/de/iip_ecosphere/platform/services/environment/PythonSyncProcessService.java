@@ -24,6 +24,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
+import de.iip_ecosphere.platform.services.environment.GenericMultiTypeServiceImpl.InTypeInfo;
+import de.iip_ecosphere.platform.services.environment.GenericMultiTypeServiceImpl.OutTypeInfo;
 import de.iip_ecosphere.platform.support.PythonUtils;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
 

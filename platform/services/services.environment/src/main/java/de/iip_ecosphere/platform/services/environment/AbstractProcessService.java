@@ -195,6 +195,16 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractRunna
     }
     
     /**
+     * Returns the callbacks for a given type.
+     * 
+     * @param cls the type
+     * @return the callbacks, may be <b>null</b> if there are none
+     */
+    protected Iterable<ReceptionCallback<?>> getCallbacks(Class<?> cls) {
+        return callbacks.get(cls);
+    }
+    
+    /**
      * Returns the input translator.
      * 
      * @return the translator

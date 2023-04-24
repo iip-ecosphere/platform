@@ -30,6 +30,7 @@ import de.iip_ecosphere.platform.services.environment.DataIngestor;
 import de.iip_ecosphere.platform.services.environment.EnvironmentSetup;
 import de.iip_ecosphere.platform.services.environment.PythonAsyncProcessService;
 import de.iip_ecosphere.platform.services.environment.PythonSyncProcessService;
+import de.iip_ecosphere.platform.services.environment.PythonWsProcessService;
 import de.iip_ecosphere.platform.services.environment.AbstractPythonProcessService;
 import de.iip_ecosphere.platform.services.environment.AbstractService;
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
@@ -73,17 +74,36 @@ public class PythonProcessServiceTest {
      * @return the basic command line arguments
      */
     private List<String> composeCmdLineArguments(String serviceId) {
+        return composeCmdLineArguments(serviceId, "console", -1);
+    }
+
+    /**
+     * Composes the basic command line arguments for this test. We assume that the service modules are in the 
+     * "src/test/python" folder and we set the home folder of the Python process to "src/main/python" where the 
+     * service environment is located. This may differ in a real integration, e.g., both parts in one sub-folder 
+     * of temp.
+     * 
+     * @param serviceId the service id to use
+     * @param mode the service environment mode, e.g., "console" or "REST"
+     * @param port the port for "REST", ignored if zero or negative
+     * @return the basic command line arguments
+     */
+    private List<String> composeCmdLineArguments(String serviceId, String mode, int port) {
         File f = new File("src/test/python");
         List<String> args = new ArrayList<String>();
         args.add("--mode");
-        args.add("console");
+        args.add(mode);
+        if (port > 0) {
+            args.add("--port");
+            args.add(String.valueOf(port));
+        }
         args.add("--modulesPath");
         args.add(f.getAbsolutePath());
         args.add("--sid");
         args.add(serviceId);
         return args;
     }
-    
+
     /**
      * Tests the process-based service classes.
      * 
@@ -92,8 +112,6 @@ public class PythonProcessServiceTest {
      */
     @Test
     public void testAsyncProcessService() throws ExecutionException, IOException {
-        AtomicInteger receivedStringCount = new AtomicInteger(0);
-        AtomicInteger receivedRec13Count = new AtomicInteger(0);
         // mock the YAML service instance, as if read from a descriptor
         YamlService sDesc = new YamlService();
         sDesc.setName("Test");
@@ -106,9 +124,45 @@ public class PythonProcessServiceTest {
         pDesc.setCmdArg(composeCmdLineArguments("1234"));
         sDesc.setProcess(pDesc);
         
+        testService(new PythonAsyncProcessService(sDesc));
+    }
+
+    /**
+     * Tests the Websocket-based service classes.
+     * 
+     * @throws ExecutionException shall not occur
+     * @throws IOException shall not occur
+     */
+    @Test
+    public void testWsProcessService() throws ExecutionException, IOException {
+        // mock the YAML service instance, as if read from a descriptor
+        YamlService sDesc = new YamlService();
+        sDesc.setName("Test");
+        sDesc.setVersion(new Version("0.0.1"));
+        sDesc.setKind(ServiceKind.TRANSFORMATION_SERVICE);
+        sDesc.setId("Test");
+        sDesc.setDeployable(true);
+        YamlProcess pDesc = new YamlProcess();
+        pDesc.setHomePath("src/main/python");
+        pDesc.setCmdArg(composeCmdLineArguments("1234"));
+        sDesc.setProcess(pDesc);
+        
+        testService(new PythonWsProcessService(sDesc));
+    }
+
+    /**
+     * Tests the Python service environment integration.
+     * 
+     * @param service the service instance to test
+     * @throws ExecutionException shall not occur
+     * @throws IOException shall not occur
+     */
+    private void testService(PythonAsyncProcessService service) throws ExecutionException, IOException {
+        AtomicInteger receivedStringCount = new AtomicInteger(0);
+        AtomicInteger receivedRec13Count = new AtomicInteger(0);
         final String stringTypeName = "S"; // same symbolic type name for in/output
         final String rec13TypeName = "Rec13";
-        PythonAsyncProcessService service = new PythonAsyncProcessService(sDesc);
+
         service.enableFileDeletion(false); // do not remove src/main/python!
         service.registerInputTypeTranslator(String.class, stringTypeName, TypeTranslators.STRING);
         service.registerOutputTypeTranslator(String.class, stringTypeName, TypeTranslators.STRING);
