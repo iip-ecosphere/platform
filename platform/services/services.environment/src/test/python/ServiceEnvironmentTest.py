@@ -18,7 +18,12 @@ class CmdLineServiceEnvironmentTest(unittest.TestCase):
             '--mode', 'console', '--data', test_value, '--sid', '1234'], cwd="../../main/python", text=True)
         
         assert len(out) > 0
-        assert out.rstrip() == test_value.rstrip()
+        # cut out response time
+        firstPos = out.find("|")
+        secondPos = out.find("|", firstPos + 1)
+        outMod = out[0:firstPos + 1] + out[secondPos + 1:]
+        # assert
+        assert outMod.rstrip() == test_value.rstrip()
 
     def test_asynchronous(self):
         dir = os.getcwd()
@@ -32,8 +37,8 @@ class CmdLineServiceEnvironmentTest(unittest.TestCase):
         
         results = re.sub(r'\n\s*\n', '\n', out[0]).splitlines()
         assert len(results) == 2 # as input
-        assert results[0] == 'S|data'
-        assert results[1] == 'S|data'
+        assert results[0] == 'S|0|data'
+        assert results[1] == 'S|0|data'
 
         process.terminate()
         process.wait()
