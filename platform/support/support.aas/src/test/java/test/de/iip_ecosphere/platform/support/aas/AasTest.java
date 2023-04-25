@@ -348,9 +348,81 @@ public class AasTest {
         submodel.createSubmodelElementCollectionBuilder("sub_coll2", false, false).build();
         Assert.assertNotNull(submodel.getSubmodelElementCollection("sub_coll2"));
 
-        aas.accept(new AasPrintVisitor()); // assert the accepts
+        aas.accept(new AasPrintVisitor());
+
+        testCreateIterate(aas);
 
         return aas;
+    }
+    
+    /**
+     * Tests the create and iterate functions.
+     * 
+     * @param aas the aas to test the functions with
+     */
+    private static void testCreateIterate(Aas aas) {
+        // build some submodel with sub-structure
+        final int numElts = 10;
+        Submodel subAdd = aas.createSubmodelBuilder("sub_ai", null).build();
+        SubmodelElementCollectionBuilder outerB = subAdd.createSubmodelElementCollectionBuilder("outer", true, false);
+        SubmodelElementCollectionBuilder collsB = outerB.createSubmodelElementCollectionBuilder("colls", true, false);
+        for (int i = 1; i <= numElts; i++) {
+            SubmodelElementCollectionBuilder b = collsB.createSubmodelElementCollectionBuilder("id_" + i, false, false);
+            b.createPropertyBuilder("prop")
+                .setValue(Type.STRING, "a")
+                .build();
+            b.build();
+        }
+        collsB.createPropertyBuilder("prop") // for type filtering
+            .setValue(Type.STRING, "a")
+            .build();
+        collsB.build();
+        outerB.build();
+        
+        // false, submodel does not exist
+        Assert.assertFalse(subAdd.iterate(c-> { }, SubmodelElement.class, "xyz"));
+        // modify by iterate
+        Assert.assertTrue(subAdd.iterate(c -> {
+            SubmodelElement elt = c.getElement("prop");
+            if (elt instanceof Property) {
+                try {
+                    ((Property) elt).setValue("b");
+                } catch (ExecutionException e) {
+                    Assert.fail("Unexpected exception: " + e.getMessage());
+                }
+            }
+        }, SubmodelElementCollection.class, "outer", "colls"));
+        
+        // assert iterate changes
+        int count = 0;
+        for (SubmodelElement e : subAdd.getSubmodelElementCollection("outer")
+            .getSubmodelElementCollection("colls").elements()) {
+            if (e instanceof SubmodelElementCollection) {
+                try {
+                    Property prop = ((SubmodelElementCollection) e).getProperty("prop");
+                    Assert.assertNotNull(prop);
+                    Object val = prop.getValue();
+                    Assert.assertNotNull(val);
+                    Assert.assertEquals("b", val);
+                    count++;
+                } catch (ExecutionException ex) {
+                    Assert.fail("Unexpected exception: " + ex.getMessage());
+                }
+            }
+        }
+        Assert.assertEquals(numElts, count);
+        
+        // false, submodel does not exist
+        Assert.assertFalse(subAdd.create(c -> { }, true, "zyx"));
+        Assert.assertTrue(subAdd.create(c-> {
+            c.createSubmodelElementCollectionBuilder("id_100", false, true).build();
+        }, false, "outer", "colls"));
+        
+        SubmodelElementCollection oc = subAdd.getSubmodelElementCollection("outer")
+            .getSubmodelElementCollection("colls");
+        oc.update(); // propagation disabled above
+        
+        Assert.assertNotNull(oc.getSubmodelElementCollection("id_100"));
     }
     
     /**
@@ -379,7 +451,7 @@ public class AasTest {
         Registry reg = factory.obtainRegistry(registry);
         Aas aas = reg.retrieveAas(URN_AAS);
         Assert.assertEquals(NAME_AAS, aas.getIdShort());
-        Assert.assertEquals(2, aas.getSubmodelCount());
+        Assert.assertEquals(3, aas.getSubmodelCount());
         Submodel subm = aas.submodels().iterator().next();
         Assert.assertNotNull(subm);
         Assert.assertEquals(5, subm.getPropertiesCount());

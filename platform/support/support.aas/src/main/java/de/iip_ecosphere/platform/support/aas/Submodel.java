@@ -12,6 +12,8 @@
 
 package de.iip_ecosphere.platform.support.aas;
 
+import java.util.function.Consumer;
+
 import de.iip_ecosphere.platform.support.Builder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 
@@ -72,5 +74,29 @@ public interface Submodel extends Element, HasSemantics, Identifiable, Qualifiab
      * @param elt the element to delete
      */
     public void delete(SubmodelElement elt);
+    
+    /**
+     * Interprets {@code path} to end with a contained submodel elements collection and applies
+     * {@code func} to it without loading/caching the submodel into its interface representation.
+     * 
+     * @param func the function to apply for creation
+     * @param propagate the change into the interface instance; if applied frequently, may imply a performance issue
+     * @param path the path to the submodel
+     * @return {@code true} if something has been applied, {@code false} else
+     */
+    public boolean create(Consumer<SubmodelElementCollectionBuilder> func, boolean propagate, String... path);
+
+    /**
+     * Interprets {@code path} to end with a submodel element or a submode elements collection and applies
+     * {@code func} to the element or to all elements in the collection without loading/caching the submodel 
+     * elements into its interface representation.
+     * 
+     * @param <T> type of elements
+     * @param func the function to apply
+     * @param cls class of elements to filter during the iteration
+     * @param path the path to the submodel element/Collection
+     * @return {@code true} if something has been applied, {@code false} else
+     */
+    public <T extends SubmodelElement> boolean iterate(Consumer<T> func, Class<T> cls, String... path);    
 
 }

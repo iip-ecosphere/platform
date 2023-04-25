@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.Builder;
@@ -386,6 +387,16 @@ public class FakeSubmodel extends FakeElement implements Submodel {
     @Override
     public String getIdentification() {
         return identifier;
+    }
+    
+    @Override
+    public boolean create(Consumer<SubmodelElementCollectionBuilder> func, boolean propagate, String... path) {
+        return false;
+    }
+
+    @Override
+    public <T extends SubmodelElement> boolean iterate(Consumer<T> func, Class<T> cls, String... path) {
+        return false;
     }
 
 }

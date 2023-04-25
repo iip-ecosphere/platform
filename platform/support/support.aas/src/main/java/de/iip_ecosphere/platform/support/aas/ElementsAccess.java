@@ -20,6 +20,13 @@ package de.iip_ecosphere.platform.support.aas;
 public interface ElementsAccess {
 
     /**
+     * Returns the short id of the element.
+     * 
+     * @return the short id
+     */
+    public String getIdShort();
+    
+    /**
      * Returns a sub-model element collection with the given name.
      * 
      * @param idShort the short id of the property
