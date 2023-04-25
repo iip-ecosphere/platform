@@ -25,9 +25,9 @@ import de.iip_ecosphere.platform.support.aas.ReferenceElement.ReferenceElementBu
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.aas.basyx.BaSyxSubmodel;
 import de.iip_ecosphere.platform.support.aas.basyx.BaSyxSubmodelElementCollection;
+import de.iip_ecosphere.platform.support.aas.basyx.BaSyxSubmodelParent;
 import de.iip_ecosphere.platform.support.aas.basyx.Tools;
 import de.iip_ecosphere.platform.support.aas.basyx.AbstractAas.BaSyxAbstractAasBuilder;
-import de.iip_ecosphere.platform.support.aas.basyx.AbstractAas.BaSyxSubmodelParent;
 import de.iip_ecosphere.platform.support.aas.types.technicaldata.FurtherInformation;
 import de.iip_ecosphere.platform.support.aas.types.technicaldata.FurtherInformation.FurtherInformationBuilder;
 import de.iip_ecosphere.platform.support.aas.types.technicaldata.GeneralInformation;

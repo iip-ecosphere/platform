@@ -336,5 +336,12 @@ public abstract class AbstractSubmodel<S extends ISubmodel> implements Submodel,
     public String getIdentification() {
         return Tools.translateIdentifier(submodel.getIdentification());
     }
+    
+    /**
+     * Returns the parent AAS.
+     * 
+     * @return the parent AAS
+     */
+    abstract BaSyxSubmodelParent getAas();
 
 }

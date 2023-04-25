@@ -117,11 +117,12 @@ public class BaSyxConnectedAas extends AbstractAas<ConnectedAssetAdministrationS
      * Creates a connected AAS instance.
      * 
      * @param aas the implementing AAS
+     * @param populate populate the submodels with elements (performance!)
      */
-    BaSyxConnectedAas(ConnectedAssetAdministrationShell aas) {
+    BaSyxConnectedAas(ConnectedAssetAdministrationShell aas, boolean populate) {
         super(aas);
         for (ISubmodel sm : aas.getSubmodels().values()) {
-            register(new BaSyxISubmodel(this, sm));
+            register(new BaSyxISubmodel(this, sm, populate));
         }
     }
     
@@ -186,7 +187,7 @@ public class BaSyxConnectedAas extends AbstractAas<ConnectedAssetAdministrationS
     }
 
     @Override
-    public AasBuilder createAasBuilder() {
+    public BaSyxAbstractAasBuilder createAasBuilder() {
         return new BaSyxConnectedAasBuilder(this);
     }
 

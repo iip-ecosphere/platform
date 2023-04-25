@@ -38,26 +38,8 @@ import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSu
  * @param <A> the BaSyx AAS type to wrap
  * @author Holger Eichelberger, SSE
  */
-public abstract class AbstractAas<A extends IAssetAdministrationShell> implements Aas {
+public abstract class AbstractAas<A extends IAssetAdministrationShell> implements Aas, BaSyxSubmodelParent {
 
-    /**
-     * Represents the parent instance of a sub-model. Due to the two different AAS types in BaSyx, this
-     * cannot just be an AAS instance rather than a pseudo instance being able to provide the correct 
-     * operations.
-     * 
-     * @author Holger Eichelberger, SSE
-     */
-    public interface BaSyxSubmodelParent {
-        
-        /**
-         * Creates an AAS builder on parent level.
-         * 
-         * @return the AAS builder
-         */
-        public BaSyxAbstractAasBuilder createAasBuilder();
-        
-    }
-    
     /**
      * An abstract builder for two concrete AAS types in BaSyx.
      * 

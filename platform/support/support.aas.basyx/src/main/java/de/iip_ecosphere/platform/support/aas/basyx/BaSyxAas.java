@@ -24,7 +24,6 @@ import de.iip_ecosphere.platform.support.aas.Asset.AssetBuilder;
 import de.iip_ecosphere.platform.support.aas.AssetKind;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
-import de.iip_ecosphere.platform.support.aas.basyx.AbstractAas.BaSyxSubmodelParent;
 import de.iip_ecosphere.platform.support.aas.basyx.types.technicaldata.BaSyxTechnicalDataSubmodel;
 import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodel.TechnicalDataSubmodelBuilder;
 

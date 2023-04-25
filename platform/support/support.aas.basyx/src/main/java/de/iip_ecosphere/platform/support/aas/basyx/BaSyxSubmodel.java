@@ -25,7 +25,6 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
 import de.iip_ecosphere.platform.support.aas.basyx.AbstractAas.BaSyxAbstractAasBuilder;
-import de.iip_ecosphere.platform.support.aas.basyx.AbstractAas.BaSyxSubmodelParent;
 
 /**
  * Wraps a BaSyx sub-model.
@@ -225,13 +224,18 @@ public class BaSyxSubmodel extends AbstractSubmodel<org.eclipse.basyx.submodel.m
     }
 
     @Override
-    public boolean create(Consumer<SubmodelElementCollectionBuilder> func, boolean propagate, String... path) {
+    public boolean create(Consumer<SubmodelElementContainerBuilder> func, boolean propagate, String... path) {
         return BaSyxElementTranslator.create(this, func, propagate, path);
     }
 
     @Override
     public <T extends SubmodelElement> boolean iterate(Consumer<T> func, Class<T> cls, String... path) {
         return BaSyxElementTranslator.iterate(getSubmodel(), func, cls, path);
+    }
+
+    @Override
+    BaSyxSubmodelParent getAas() {
+        return parent;
     }
 
 }

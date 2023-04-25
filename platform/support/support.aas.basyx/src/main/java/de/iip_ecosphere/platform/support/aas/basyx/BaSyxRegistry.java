@@ -69,6 +69,11 @@ public class BaSyxRegistry implements Registry {
 
     @Override
     public Aas retrieveAas(String identifier) throws IOException {
+        return retrieveAas(identifier, true);
+    }
+    
+    @Override
+    public Aas retrieveAas(String identifier, boolean populate) throws IOException {
         Aas result = null;
         IIdentifier id = null;
         if (null != identifier) {
@@ -83,7 +88,7 @@ public class BaSyxRegistry implements Registry {
                 id = Tools.translateIdentifier(identifier, "");
             }
             if (null != id) {
-                result = obtainAas(id);
+                result = obtainAas(id, populate);
             }
         }
         return result;
@@ -125,12 +130,13 @@ public class BaSyxRegistry implements Registry {
      * Obtains an AAS for a given identifier.
      * 
      * @param aasId the AAS identifier
+     * @param populate the submodels with elements (performance!)
      * @return the AAS (may be <b>null</b> in case that the AAS cannot be obtained)
      * @throws IOException in case that the access fails
      */
-    private BaSyxConnectedAas obtainAas(IIdentifier aasId) throws IOException {
+    private BaSyxConnectedAas obtainAas(IIdentifier aasId, boolean populate) throws IOException {
         try {
-            return new BaSyxConnectedAas(manager.retrieveAAS(aasId));
+            return new BaSyxConnectedAas(manager.retrieveAAS(aasId), populate);
         } catch (ProviderException e) {
             throw new IOException(e);
         }
@@ -141,7 +147,7 @@ public class BaSyxRegistry implements Registry {
         try {
             IIdentifier aasId = Tools.translateIdentifier(aasIdentifier, "");
             IIdentifier submodelId = Tools.translateIdentifier(submodelIdentifier, "");
-            return new BaSyxISubmodel(obtainAas(aasId), manager.retrieveSubmodel(aasId, submodelId));
+            return new BaSyxISubmodel(obtainAas(aasId, true), manager.retrieveSubmodel(aasId, submodelId), true);
         } catch (ProviderException e) {
             throw new IOException(e);
         }

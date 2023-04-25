@@ -122,11 +122,14 @@ public class BaSyxISubmodel extends AbstractSubmodel<ISubmodel> {
      * 
      * @param parent the parent AAS
      * @param submodel the instance
+     * @param populate the submodel with elements (performance!)
      */
-    public BaSyxISubmodel(BaSyxConnectedAas parent, ISubmodel submodel) {
+    public BaSyxISubmodel(BaSyxConnectedAas parent, ISubmodel submodel, boolean populate) {
         super(submodel);
         this.parent = parent;
-        BaSyxElementTranslator.registerSubmodelElements(submodel.getSubmodelElements(), this);
+        if (populate) {
+            BaSyxElementTranslator.registerSubmodelElements(submodel.getSubmodelElements(), this);
+        }
     }
 
     @Override
@@ -154,13 +157,18 @@ public class BaSyxISubmodel extends AbstractSubmodel<ISubmodel> {
     }
     
     @Override
-    public boolean create(Consumer<SubmodelElementCollectionBuilder> func, boolean propagate, String... path) {
+    public boolean create(Consumer<SubmodelElementContainerBuilder> func, boolean propagate, String... path) {
         return BaSyxElementTranslator.create(this, func, propagate, path);
     }
 
     @Override
     public <T extends SubmodelElement> boolean iterate(Consumer<T> func, Class<T> cls, String... path) {
         return BaSyxElementTranslator.iterate(getSubmodel(), func, cls, path);
+    }
+
+    @Override
+    BaSyxSubmodelParent getAas() {
+        return parent;
     }
 
 }

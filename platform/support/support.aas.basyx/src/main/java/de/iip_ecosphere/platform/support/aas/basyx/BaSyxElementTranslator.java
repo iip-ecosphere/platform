@@ -31,7 +31,7 @@ import de.iip_ecosphere.platform.support.aas.ReferenceElement;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
-import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
 import de.iip_ecosphere.platform.support.aas.basyx.BaSyxSubmodelElementCollection.BaSyxSubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.aas.basyx.VabInvocablesCreator.Operation;
 
@@ -284,9 +284,9 @@ public class BaSyxElementTranslator {
      * @return {@code true} if {@code func} was applied, {@code false} if path did not point to a submodel 
      * element collection
      */
-    static boolean create(Submodel sub, Consumer<SubmodelElementCollectionBuilder> func, boolean propagate, 
-         String... path) {
-        SubmodelElementCollectionBuilder builder = null;
+    static boolean create(Submodel sub, Consumer<SubmodelElementContainerBuilder> func, boolean propagate, 
+        String... path) {
+        SubmodelElementContainerBuilder builder = null;
         if (path.length > 0) {
             // boolean build parameters are not relevant as we aim for an existing builder (chain)
             builder = sub.createSubmodelElementCollectionBuilder(path[0], true, true);
@@ -301,10 +301,15 @@ public class BaSyxElementTranslator {
                     }
                 }
             }
-            if (builder != null) {
+        } else {
+            builder = ((AbstractSubmodel<?>) sub).getAas().createAasBuilder().createSubmodelBuilder(
+                sub.getIdShort(), sub.getIdentification());
+        }
+        if (builder != null) {
+            if (builder instanceof BaSyxSubmodelElementCollectionBuilder) {
                 ((BaSyxSubmodelElementCollectionBuilder) builder).setPropagation(propagate);
-                func.accept(builder);
             }
+            func.accept(builder);
         }
         return builder != null;
     }
