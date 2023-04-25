@@ -30,7 +30,6 @@ import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.ElementsAccess;
 import de.iip_ecosphere.platform.support.aas.Property;
-import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 import de.iip_ecosphere.platform.support.resources.ResourceResolver;
@@ -311,7 +310,7 @@ public class AasUtils {
      * @param dflt the default value if the property cannot be found
      * @return the value or {@code dflt}
      */
-    public static <T> T getPropertyValueSafe(SubmodelElementCollection coll, String propIdShort, Class<T> type, 
+    public static <T> T getPropertyValueSafe(ElementsAccess coll, String propIdShort, Class<T> type, 
         Function<Object, T> transformer, T dflt) {
         T result = dflt;
         Property prop = coll.getProperty(propIdShort);
@@ -332,33 +331,33 @@ public class AasUtils {
     /**
      * Returns the value of the specified property as string without throwing exceptions.
      * 
-     * @param coll the collection to take the value from
+     * @param parent the collection/submodel to take the value from
      * @param propIdShort the short id of the property
      * @param dflt the default value if the property cannot be found or it's value is <b>null</b>
      * @return the value or {@code dflt}
      */
-    public static String getPropertyValueAsStringSafe(SubmodelElementCollection coll, String propIdShort, 
+    public static String getPropertyValueAsStringSafe(ElementsAccess parent, String propIdShort, 
         String dflt) {
-        return getPropertyValueSafe(coll, propIdShort, String.class, o -> null == o ? dflt : o.toString(), dflt);
+        return getPropertyValueSafe(parent, propIdShort, String.class, o -> null == o ? dflt : o.toString(), dflt);
     }
 
     /**
      * Returns the value of the specified property as Integer without throwing exceptions.
      * 
-     * @param coll the collection to take the value from
+     * @param parent the collection/submodel to take the value from
      * @param propIdShort the short id of the property
      * @param dflt the default value if the property cannot be found or it's value is <b>null</b>
      * @return the value or {@code dflt}
      */
-    public static Integer getPropertyValueAsIntegerSafe(SubmodelElementCollection coll, String propIdShort, 
+    public static Integer getPropertyValueAsIntegerSafe(ElementsAccess parent, String propIdShort, 
         Integer dflt) {
-        return getPropertyValueSafe(coll, propIdShort, Integer.class, o -> null == o ? dflt : (Integer) o, dflt);
+        return getPropertyValueSafe(parent, propIdShort, Integer.class, o -> null == o ? dflt : (Integer) o, dflt);
     }
 
     /**
      * Sets the value of property {@code propIdShort} on {@code parent}.
      * 
-     * @param parent the parent, may be <b>null</b>, call is ignored then
+     * @param parent the collection/submodel to take the property from, may be <b>null</b>, call is ignored then
      * @param propIdShort the idShort of the property; call is ignored if the property does not exist
      * @param value the value to set
      * @throws ExecutionException if the value cannot be set
@@ -376,7 +375,7 @@ public class AasUtils {
     /**
      * Sets the value of property {@code propIdShort} on {@code parent} logging potential errors.
      * 
-     * @param parent the parent, may be <b>null</b>, call is ignored then
+     * @param parent the collection/submodel to take the property from, may be <b>null</b>, call is ignored then
      * @param propIdShort the idShort of the property; call is ignored if the property does not exist
      * @param value the value to set
      */
