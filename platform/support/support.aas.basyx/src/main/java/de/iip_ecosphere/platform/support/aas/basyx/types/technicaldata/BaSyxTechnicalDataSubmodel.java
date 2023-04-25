@@ -85,7 +85,8 @@ public class BaSyxTechnicalDataSubmodel extends BaSyxSubmodel implements
         }
 
         @Override
-        protected BaSyxSubmodelElementCollection register(BaSyxSubmodelElementCollection collection) {
+        protected BaSyxSubmodelElementCollection register(BaSyxSubmodelElementCollection collection, 
+            boolean propagate) {
             if (collection instanceof BaSyxFurtherInformation) {
                 this.furtherInformation = (BaSyxFurtherInformation) collection;
             } else if (collection instanceof BaSyxGeneralInformation) {
@@ -119,10 +120,10 @@ public class BaSyxTechnicalDataSubmodel extends BaSyxSubmodel implements
                 technicalProperties.getSubmodelElement(),
                 furtherInformation.getSubmodelElement());
             setInstance(new BaSyxTechnicalDataSubmodel(tds));
-            super.register(furtherInformation);
-            super.register(generalInformation);
-            super.register(technicalProperties);
-            super.register(productClassifications);
+            super.register(furtherInformation, true); // propagation by default
+            super.register(generalInformation, true);
+            super.register(technicalProperties, true);
+            super.register(productClassifications, true);
             return super.build();
         }
         

@@ -120,12 +120,16 @@ public abstract class BaSyxSubmodelElementContainerBuilder<S extends ISubmodel>
      * Registers a sub-model element collection.
      * 
      * @param collection the collection
+     * @param propagate enable propagation into the interface instance (usually {@code true}) or take a (performance)
+     * shortcut and only update the BaSyx submodel ({@code false})
      * @return {@code collection}
      */
-    protected BaSyxSubmodelElementCollection register(BaSyxSubmodelElementCollection collection) {
+    protected BaSyxSubmodelElementCollection register(BaSyxSubmodelElementCollection collection, boolean propagate) {
         if (null == getInstance().getSubmodelElementCollection(collection.getIdShort())) {
             getInstance().getSubmodel().addSubmodelElement(collection.getSubmodelElement());
-            getInstance().register(collection);
+            if (propagate) {
+                getInstance().register(collection);
+            }
         }
         return collection;
     }

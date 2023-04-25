@@ -67,6 +67,7 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
         private BaSyxSubmodelElementCollection instance;
         private ISubmodelElementCollection collection;
         private boolean isNew = true;
+        private boolean propagate = true;
         
         /**
          * Creates a sub-model element collection builder. The parent builder must be set by the calling
@@ -211,9 +212,13 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
         }
 
         @Override
-        protected BaSyxSubmodelElementCollection register(BaSyxSubmodelElementCollection collection) {
+        protected BaSyxSubmodelElementCollection register(BaSyxSubmodelElementCollection collection, 
+            boolean propagate) {
             this.collection.addSubmodelElement(collection.getSubmodelElement());
-            return instance.register(collection);
+            if (propagate) {
+                instance.register(collection);
+            }
+            return collection;
         }
         
         @Override
@@ -241,7 +246,7 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
             buildMyDeferred();
             instance.collection = collection;
             if (isNew) {
-                parentBuilder.register(instance);
+                parentBuilder.register(instance, propagate);
             }
             return instance;
         }
@@ -269,6 +274,15 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
         @Override
         public boolean hasElement(String idShort) {
             return instance.getElement(idShort) != null;
+        }
+        
+        /**
+         * Enables or disables registration propagation into the interface instance.
+         * 
+         * @param propagate enable or disable propagation
+         */
+        void setPropagation(boolean propagate) {
+            this.propagate = propagate;            
         }
         
     }

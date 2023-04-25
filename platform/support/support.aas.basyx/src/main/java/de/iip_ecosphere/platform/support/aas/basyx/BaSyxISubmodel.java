@@ -12,10 +12,13 @@
 
 package de.iip_ecosphere.platform.support.aas.basyx;
 
+import java.util.function.Consumer;
+
 import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
 
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel;
+import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
@@ -148,6 +151,16 @@ public class BaSyxISubmodel extends AbstractSubmodel<ISubmodel> {
     
     @Override
     public void update() {
+    }
+    
+    @Override
+    public boolean create(Consumer<SubmodelElementCollectionBuilder> func, boolean propagate, String... path) {
+        return BaSyxElementTranslator.create(this, func, propagate, path);
+    }
+
+    @Override
+    public <T extends SubmodelElement> boolean iterate(Consumer<T> func, Class<T> cls, String... path) {
+        return BaSyxElementTranslator.iterate(getSubmodel(), func, cls, path);
     }
 
 }
