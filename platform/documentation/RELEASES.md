@@ -32,6 +32,7 @@ New features:
 * [#100](https://github.com/iip-ecosphere/platform/issues/100): Allowing to start/stop multiple app instances (only via deployment plans)
 * [#59](https://github.com/iip-ecosphere/platform/issues/59): Basic version of distributed testing/evaluation environment for platform and apps (PETE)
 * [#90](https://github.com/iip-ecosphere/platform/issues/90): UI display application service meshes
+* [#56](https://github.com/iip-ecosphere/platform/issues/56): Network-based integration protocol for Python service environment (websockets)
 * Generic time series data aggregator in data functions
 * Application intercommunication support (`AppIntercom`)
 * [#132](https://github.com/iip-ecosphere/platform/issues/132): Bitmotec system monitoring integration
