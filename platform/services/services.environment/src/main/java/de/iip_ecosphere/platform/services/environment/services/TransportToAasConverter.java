@@ -32,8 +32,6 @@ import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.Submodel;
-import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
-import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
@@ -77,6 +75,7 @@ public abstract class TransportToAasConverter<T> {
     private Class<T> dataType;
     private AasSetup aasSetup;
     private boolean aasStarted;
+    private transient Aas aas; // temporary, cache
     
     static {
         DEFAULT_CONVERTERS.put(String.class, new TypeConverter(Type.STRING, IDENTITY_CONVERTER));
@@ -260,13 +259,17 @@ public abstract class TransportToAasConverter<T> {
         // add new record
         if (isAasEnabled()) {
             try {
-                Aas aas = AasPartRegistry.retrieveAas(aasSetup, getAasUrn());
-                SubmodelBuilder smBuilder = aas.createSubmodelBuilder(submodelIdShort, null);
-                SubmodelElementCollectionBuilder smcBuilder = smBuilder.createSubmodelElementCollectionBuilder(
-                    getSubmodelElementIdFunction().apply(data), true, true); 
-                populateSubmodelElementCollection(smcBuilder, data);
-                smcBuilder.build();
-                smBuilder.build();
+                if (null == aas) {
+                    // do not populate, we just add/remove in this class
+                    aas = AasPartRegistry.retrieveAas(aasSetup, getAasUrn(), false);                    
+                }
+                // bypass without propagation
+                aas.getSubmodel(submodelIdShort).create(b -> {
+                    SubmodelElementCollectionBuilder smcBuilder = b.createSubmodelElementCollectionBuilder(
+                        getSubmodelElementIdFunction().apply(data), true, true); 
+                    populateSubmodelElementCollection(smcBuilder, data);
+                    smcBuilder.build();
+                }, false);
                 cleanup(aas);
             } catch (IOException e) {
                 LoggerFactory.getLogger(getClass()).error("Cannot obtain AAS {}: {}", getAasUrn(), e.getMessage());
@@ -409,19 +412,12 @@ public abstract class TransportToAasConverter<T> {
         if (now - lastCleanup > cleanupTimeout) {
             long timestamp = now - timeout;
             Submodel sm = aas.getSubmodel(submodelIdShort);
-            List<SubmodelElement> delete = new ArrayList<>();
-            CleanupPredicate delPred = getCleanupPredicate();
-            for (SubmodelElement elt : sm.submodelElements()) {
-                if (elt instanceof SubmodelElementCollection) {
-                    SubmodelElementCollection coll = (SubmodelElementCollection) elt;
-                    if (delPred.test(coll, timestamp)) {
-                        delete.add(elt);
-                    }
+            final CleanupPredicate delPred = getCleanupPredicate();
+            sm.iterate(e -> {
+                if (delPred.test(e, timestamp)) {
+                    sm.delete(e);
                 }
-            }
-            for (SubmodelElement elt : delete) {
-                sm.delete(elt);
-            }
+            }, SubmodelElementCollection.class);
             lastCleanup = now;
         }
     }

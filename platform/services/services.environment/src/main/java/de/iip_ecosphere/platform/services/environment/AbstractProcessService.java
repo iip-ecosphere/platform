@@ -353,7 +353,7 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractRunna
     public static Process createProcess(File exe, boolean byName, File dir, List<String> args, 
         Consumer<ProcessBuilder> customizer) throws IOException {
         List<String> tmp = new ArrayList<String>();
-        if (byName) {
+        if (byName || !exe.exists()) {
             tmp.add(exe.getName());
         } else {
             tmp.add(exe.getAbsolutePath());
