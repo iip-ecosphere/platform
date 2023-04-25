@@ -58,6 +58,7 @@ public class AasLifecycleTest {
      */
     @Test
     public void testLifecycle() {
+        boolean waitFor = AbstractAasLifecycleDescriptor.setWaitForIipAas(false);
         NotificationMode oldM = ActiveAasBase.setNotificationMode(NotificationMode.SYNCHRONOUS);
         AasSetup aasSetup = AasSetup.createLocalEphemeralSetup(null, false);
         AasSetup oldSetup = AasPartRegistry.setAasSetup(aasSetup);
@@ -80,6 +81,7 @@ public class AasLifecycleTest {
 
         AasPartRegistry.setAasSetup(oldSetup);
         ActiveAasBase.setNotificationMode(oldM);
+        AbstractAasLifecycleDescriptor.setWaitForIipAas(waitFor);
     }
 
 }
