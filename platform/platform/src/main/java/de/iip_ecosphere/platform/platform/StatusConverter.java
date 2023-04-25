@@ -36,10 +36,10 @@ class StatusConverter extends TransportToAasConverter<StatusMessage> {
         addConverter(ComponentTypes.class, new TypeConverter(Type.STRING, ENUM_NAME_CONVERTER));
     }
     
-    @Override
-    protected boolean isAasEnabled() { // TODO preliminary, BaSyx problems
+    /*@Override
+    protected boolean isAasEnabled() { // TODO preliminary, AAS performance problems
         return false;
-    }
+    }*/
 
     @Override
     public String getAasId() {
