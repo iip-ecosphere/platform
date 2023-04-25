@@ -390,7 +390,7 @@ public class FakeSubmodel extends FakeElement implements Submodel {
     }
     
     @Override
-    public boolean create(Consumer<SubmodelElementCollectionBuilder> func, boolean propagate, String... path) {
+    public boolean create(Consumer<SubmodelElementContainerBuilder> func, boolean propagate, String... path) {
         return false;
     }
 

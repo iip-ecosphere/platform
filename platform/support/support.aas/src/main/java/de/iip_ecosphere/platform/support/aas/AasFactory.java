@@ -90,6 +90,11 @@ public abstract class AasFactory {
                 }
 
                 @Override
+                public Aas retrieveAas(String identifier, boolean populate) throws IOException {
+                    return null;
+                }
+
+                @Override
                 public Submodel retrieveSubmodel(String aasUrn, String submodelUrn) throws IOException {
                     return null;
                 }
@@ -130,6 +135,7 @@ public abstract class AasFactory {
                 public List<String> getAasIdentifiers() {
                     return new ArrayList<String>();
                 }
+
             };
         }
         

@@ -84,7 +84,7 @@ public interface Submodel extends Element, HasSemantics, Identifiable, Qualifiab
      * @param path the path to the submodel
      * @return {@code true} if something has been applied, {@code false} else
      */
-    public boolean create(Consumer<SubmodelElementCollectionBuilder> func, boolean propagate, String... path);
+    public boolean create(Consumer<SubmodelElementContainerBuilder> func, boolean propagate, String... path);
 
     /**
      * Interprets {@code path} to end with a submodel element or a submode elements collection and applies

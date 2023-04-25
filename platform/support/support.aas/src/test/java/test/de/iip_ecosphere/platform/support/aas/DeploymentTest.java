@@ -121,14 +121,14 @@ public class DeploymentTest {
             .start();
 
         Registry reg = factory.obtainRegistry(regEp);
-        aas = reg.retrieveAas(urn);
+        aas = reg.retrieveAas(urn, true);
         Submodel sub = aas.getSubmodel("sub");
         Assert.assertNotNull(sub);
         SubmodelElementCollectionBuilder smcB = sub.createSubmodelElementCollectionBuilder("coll", false, true);
         smcB.createPropertyBuilder("prop").setValue(Type.BOOLEAN, true).build();
         smcB.build();
 
-        aas = reg.retrieveAas(urn);
+        aas = reg.retrieveAas(urn, true);
         Aas aas1 = reg.retrieveAas(urn); // snapshot
         
         sub = aas.getSubmodel("sub");
