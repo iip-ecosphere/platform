@@ -25,13 +25,13 @@ Planned:
 In progress:
 * [#70](https://github.com/iip-ecosphere/platform/issues/70): UI progress reporting 
 * [#117](https://github.com/iip-ecosphere/platform/issues/117): Multiple service managers per device
-* [#107](https://github.com/iip-ecosphere/platform/issues/107): Platform installation scripts
 
 New features:
 * [#127](https://github.com/iip-ecosphere/platform/issues/127): Integration of Flower-based federated learning through generated templates
 * [#100](https://github.com/iip-ecosphere/platform/issues/100): Allowing to start/stop multiple app instances (only via deployment plans)
 * [#59](https://github.com/iip-ecosphere/platform/issues/59): Basic version of distributed testing/evaluation environment for platform and apps (PETE)
 * [#90](https://github.com/iip-ecosphere/platform/issues/90): UI display application service meshes
+* [#107](https://github.com/iip-ecosphere/platform/issues/107): Platform installation scripts
 * [#56](https://github.com/iip-ecosphere/platform/issues/56): Network-based integration protocol for Python service environment (websockets)
 * Generic time series data aggregator in data functions
 * Application intercommunication support (`AppIntercom`)
