@@ -1,9 +1,12 @@
   <div>
     <br>
     <!-- <h1 *ngIf="resource && resource.idShort">Detail View of {{ resource.idShort }}</h1> -->
+
     <div *ngIf="resource && resource.idShort" style="font-size: 23px; margin-left: 10px;">
+      <img src="/assets/aas.png" alt="image" class="img-aas">
       Resource Details
     </div>
+
     <div *ngIf="resource && resource.idShort" style="font-size: 16px; margin-left: 20px; margin-top: 3px;">
       {{ resource.idShort }}
     </div><br>
