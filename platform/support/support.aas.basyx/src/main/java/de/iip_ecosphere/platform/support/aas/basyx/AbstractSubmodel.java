@@ -266,7 +266,7 @@ public abstract class AbstractSubmodel<S extends ISubmodel> implements Submodel,
     }
 
     @Override
-    public void delete(SubmodelElement elt) {
+    public void deleteElement(SubmodelElement elt) {
         try {
             if (elt instanceof Property) {
                 properties.remove(elt.getIdShort());
@@ -280,6 +280,19 @@ public abstract class AbstractSubmodel<S extends ISubmodel> implements Submodel,
         } catch (ResourceNotFoundException e) {
         }
     }
+    
+    @Override
+    public void deleteElement(String idShort) {
+        try {
+            properties.remove(idShort);
+            dataElements.remove(idShort);
+            operations.remove(idShort);
+            submodelElements.remove(idShort);
+            submodel.deleteSubmodelElement(idShort);
+        } catch (ResourceNotFoundException e) {
+        }
+    }
+
 
     /**
      * Returns an AAS sub-model URI according to the BaSyx naming schema. [public for testing, debugging]

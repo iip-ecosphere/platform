@@ -32,6 +32,7 @@ import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
+import de.iip_ecosphere.platform.support.aas.Submodel.IteratorFunction;
 import de.iip_ecosphere.platform.support.aas.basyx.BaSyxSubmodelElementCollection.BaSyxSubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.aas.basyx.VabInvocablesCreator.Operation;
 
@@ -176,9 +177,10 @@ public class BaSyxElementTranslator {
     private static class IterationSubmodelElementsRegistrar<T extends SubmodelElement> 
         implements SubmodelElementsRegistrar {
 
-        private Consumer<T> func;
+        private IteratorFunction<T> func;
         private Class<T> cls;
         private boolean applied;
+        private boolean cont = true;
         
         /**
          * Creates an instance.
@@ -186,7 +188,7 @@ public class BaSyxElementTranslator {
          * @param func the function to apply
          * @param cls the type used for matching
          */
-        private IterationSubmodelElementsRegistrar(Consumer<T> func, Class<T> cls) {
+        private IterationSubmodelElementsRegistrar(IteratorFunction<T> func, Class<T> cls) {
             this.func = func;
             this.cls = cls;
         }
@@ -199,7 +201,7 @@ public class BaSyxElementTranslator {
          * @return {@code elt}
          */
         private <S> S accept(S elt) {
-            func.accept(cls.cast(elt));
+            cont = func.apply(cls.cast(elt));
             applied = true;
             return elt;
         }
@@ -243,6 +245,15 @@ public class BaSyxElementTranslator {
             return applied;
         }
         
+        /**
+         * Returns whether iteration shall be continued.
+         * 
+         * @return {@code true} for continue, {@code false} else
+         */
+        private boolean isContinue() {
+            return cont;
+        }
+        
     }
 
     /**
@@ -257,7 +268,7 @@ public class BaSyxElementTranslator {
      * @return {@code true} if {@code func} was applied at least once, {@code false} if path did not point to a 
      *   submodel element collection containing at least one element matching {@code cls}
      */
-    static <T extends SubmodelElement> boolean iterate(IElementContainer cont, Consumer<T> func, Class<T> cls, 
+    static <T extends SubmodelElement> boolean iterate(IElementContainer cont, IteratorFunction<T> func, Class<T> cls, 
         String... path) {
         boolean result = false;
         cont = findInPath(cont, path);
@@ -266,6 +277,9 @@ public class BaSyxElementTranslator {
             for (ISubmodelElement e: ((ISubmodelElementCollection) cont).getSubmodelElements().values()) {
                 if (matchesType(e, cls)) {
                     registerSubmodelElement(e, reg);
+                    if (!reg.isContinue()) {
+                        break;
+                    }
                 }
             }
             result = reg.wasApplied();

@@ -102,7 +102,7 @@ public class ApplicationInstanceAasConstructor {
             String id = fixId(appId + "-" + instId);
             SubmodelElementCollection coll = sub.getSubmodelElementCollection(id);
             if (null != coll) {
-                sub.delete(coll);
+                sub.deleteElement(coll);
             }
             result.set(countAppInstances(appId, null, sub));
         });

@@ -229,7 +229,7 @@ public class BaSyxSubmodel extends AbstractSubmodel<org.eclipse.basyx.submodel.m
     }
 
     @Override
-    public <T extends SubmodelElement> boolean iterate(Consumer<T> func, Class<T> cls, String... path) {
+    public <T extends SubmodelElement> boolean iterate(IteratorFunction<T> func, Class<T> cls, String... path) {
         return BaSyxElementTranslator.iterate(getSubmodel(), func, cls, path);
     }
 
