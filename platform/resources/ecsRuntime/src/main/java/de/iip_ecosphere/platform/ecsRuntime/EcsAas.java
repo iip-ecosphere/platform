@@ -380,7 +380,7 @@ public class EcsAas implements AasContributor {
                 }
                 SubmodelElement elt = sub.getSubmodelElement(fixId(Id.getDeviceIdAas()));
                 if (null != elt) {
-                    sub.delete(elt);
+                    sub.deleteElement(elt);
                 }
             }
         });
@@ -408,7 +408,7 @@ public class EcsAas implements AasContributor {
             }
             SubmodelElement elt = sub.getSubmodelElement(aasDeviceId);
             if (null != elt) {
-                sub.delete(elt);
+                sub.deleteElement(elt);
             }
         });
     }

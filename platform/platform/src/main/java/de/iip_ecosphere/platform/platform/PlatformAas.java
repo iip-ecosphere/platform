@@ -279,7 +279,7 @@ public class PlatformAas implements AasContributor {
         ActiveAasBase.processNotification(NAME_SUBMODEL_ARTIFACTS, (sub, aas) -> {
             SubmodelElementCollection coll = sub.getSubmodelElementCollection(fixId(art.getId()));
             if (null != coll) {
-                sub.delete(coll);
+                sub.deleteElement(coll);
             }
         });
     }

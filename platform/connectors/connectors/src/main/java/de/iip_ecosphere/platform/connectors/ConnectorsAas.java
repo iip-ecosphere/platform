@@ -137,7 +137,7 @@ public class ConnectorsAas implements AasContributor {
             String idShort = ClassUtility.getId(NAME_SMC_CONNECTOR_PREFIX, connector);
             SubmodelElementCollection coll = submodel.getSubmodelElementCollection(idShort);
             if (null != coll) {
-                submodel.delete(coll);
+                submodel.deleteElement(coll);
             } else {
                 LOGGER.error("No element collection for connector: " + NAME_CONNECTORS_SUBMODEL 
                     + "/" + idShort);

@@ -414,9 +414,14 @@ public abstract class TransportToAasConverter<T> {
             Submodel sm = aas.getSubmodel(submodelIdShort);
             final CleanupPredicate delPred = getCleanupPredicate();
             sm.iterate(e -> {
+                boolean cont;
                 if (delPred.test(e, timestamp)) {
-                    sm.delete(e);
+                    sm.deleteElement(e);
+                    cont = true;
+                } else {
+                    cont = false; // assumption sorted
                 }
+                return cont;
             }, SubmodelElementCollection.class);
             lastCleanup = now;
         }
