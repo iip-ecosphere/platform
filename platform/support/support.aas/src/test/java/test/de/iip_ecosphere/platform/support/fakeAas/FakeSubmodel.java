@@ -352,8 +352,8 @@ public class FakeSubmodel extends FakeElement implements Submodel {
     }
 
     @Override
-    public void delete(SubmodelElement elt) {
-        elements.remove(elt.getIdShort());
+    public void deleteElement(String idShort) {
+        elements.remove(idShort);
     }
 
     /**
@@ -395,7 +395,7 @@ public class FakeSubmodel extends FakeElement implements Submodel {
     }
 
     @Override
-    public <T extends SubmodelElement> boolean iterate(Consumer<T> func, Class<T> cls, String... path) {
+    public <T extends SubmodelElement> boolean iterate(IteratorFunction<T> func, Class<T> cls, String... path) {
         return false;
     }
 

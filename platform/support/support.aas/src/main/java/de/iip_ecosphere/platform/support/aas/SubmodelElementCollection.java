@@ -65,11 +65,4 @@ public interface SubmodelElementCollection extends SubmodelElement, ElementsAcce
      */
     public Reference createReference();
 
-    /**
-     * Deletes the specified submodel element.
-     * 
-     * @param idShort the id of the element to delete
-     */
-    public void deleteElement(String idShort);
-
 }

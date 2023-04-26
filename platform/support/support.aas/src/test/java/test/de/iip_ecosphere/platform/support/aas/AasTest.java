@@ -380,7 +380,7 @@ public class AasTest {
         outerB.build();
         
         // false, submodel does not exist
-        Assert.assertFalse(subAdd.iterate(c-> { }, SubmodelElement.class, "xyz"));
+        Assert.assertFalse(subAdd.iterate(c -> false, SubmodelElement.class, "xyz"));
         // modify by iterate
         Assert.assertTrue(subAdd.iterate(c -> {
             SubmodelElement elt = c.getElement("prop");
@@ -391,6 +391,7 @@ public class AasTest {
                     Assert.fail("Unexpected exception: " + e.getMessage());
                 }
             }
+            return true;
         }, SubmodelElementCollection.class, "outer", "colls"));
         
         // assert iterate changes

@@ -66,4 +66,20 @@ public interface ElementsAccess {
      */
     public ReferenceElement getReferenceElement(String idShort);
 
+    /**
+     * Deletes a sub-model element.
+     * 
+     * @param elt the element to delete
+     */
+    public default void deleteElement(SubmodelElement elt) {
+        deleteElement(elt.getIdShort());
+    }
+    
+    /**
+     * Deletes the specified submodel element.
+     * 
+     * @param idShort the id of the element to delete
+     */
+    public void deleteElement(String idShort);
+    
 }

@@ -69,13 +69,6 @@ public interface Submodel extends Element, HasSemantics, Identifiable, Qualifiab
     public Reference createReference();
 
     /**
-     * Deletes a sub-model element.
-     * 
-     * @param elt the element to delete
-     */
-    public void delete(SubmodelElement elt);
-    
-    /**
      * Interprets {@code path} to end with a contained submodel elements collection and applies
      * {@code func} to it without loading/caching the submodel into its interface representation.
      * 
@@ -86,6 +79,19 @@ public interface Submodel extends Element, HasSemantics, Identifiable, Qualifiab
      */
     public boolean create(Consumer<SubmodelElementContainerBuilder> func, boolean propagate, String... path);
 
+    @FunctionalInterface
+    public interface IteratorFunction<T extends SubmodelElement> {
+
+        /**
+         * Applies the function.
+         * 
+         * @param element the element to apply the function to
+         * @return {@code true} for continuing the iteration, {@code false} for stopping
+         */
+        public boolean apply(T element);
+        
+    }
+    
     /**
      * Interprets {@code path} to end with a submodel element or a submode elements collection and applies
      * {@code func} to the element or to all elements in the collection without loading/caching the submodel 
@@ -97,6 +103,6 @@ public interface Submodel extends Element, HasSemantics, Identifiable, Qualifiab
      * @param path the path to the submodel element/Collection
      * @return {@code true} if something has been applied, {@code false} else
      */
-    public <T extends SubmodelElement> boolean iterate(Consumer<T> func, Class<T> cls, String... path);    
+    public <T extends SubmodelElement> boolean iterate(IteratorFunction<T> func, Class<T> cls, String... path);    
 
 }

@@ -145,7 +145,7 @@ public class DeploymentTest {
         coll1.update(); // force update
         Assert.assertNotNull(coll1.getProperty("prop1")); // there it is
 
-        sub.delete(coll);
+        sub.deleteElement(coll);
 
         aas = reg.retrieveAas(urn);
         sub = aas.getSubmodel("sub");
