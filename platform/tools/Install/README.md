@@ -23,5 +23,23 @@ This package contains also programs to optimize specific deployments, e.g., to r
 
 * Python 3.9, further dependencies for code generation, communication and potentially the Python-based data processing functions see [requirements.txt](./requirements.txt).
 * For the management UI: Angular 13, further dependencies see [dependencies.json](./dependencies.json).
+* IIP-EcosphereFullInstallationLinux: A script to do a full installation of the platform on Linux including the prerequisites (Java 13, Maven version 3.6.3, Docker version 20.10.7, Python version 3.9, and run Docker Private Registry). 
+
+  -- Java: If the Java is not installed, then the script will install Java 13. If java version less than Java 11, then the script asks to install Java 13 (If the answer is No then the installation will stop). 
+  
+  -- Maven, Docker, and Python: if these software are not installed, then the script will install it. If the versions are not matched with the mentioned recommended versions (you might have another version, but those versions are tested on the platform), then the script asks to install those versions (If the answer is No then those version are skipped and the installation will continue).
+  
+  -- Docker Private Registry: The script will ask to run a Docker Private Registry that will be used by the platform to store the generated containers (If the answer is No then Docker Private Registry is skipped and the installation will continue).
+   
+* IIP-EcosphereFullInstallationWin: A script to do a full installation of the platform on Linux including the prerequisites (Java 13, Maven version 3.6.3, Python version 3.9, and run Docker Private Registry). 
+
+  -- Docker: The script does NOT install Docker on Windows since it need more extra steps to make it running. nonetheless, the script check if Docker is installed then check the version.
+  
+  -- Java: If the Java is not installed, then the script will install Java 13. If java version less than Java 11, then the script asks to install Java 13 (If the answer is No then the installation will stop). 
+  
+  -- Maven and Python: if these software are not installed, then the script will install it. If the versions are not matched with the mentioned recommended versions (you might have another version, but those versions are tested on the platform), then the script asks to install those versions (If the answer is No then those version are skipped and the installation will continue).
+  
+  -- Docker Private Registry: If Docker is installed, then the script will ask to run a Docker Private Registry that will be used by the platform to store the generated containers (If the answer is No then Docker Private Registry is skipped and the installation will continue).
+
 
 **For snapshots:** See required EASy-Producer version in [configuration integration and the configuration meta model](https://github.com/iip-ecosphere/platform/tree/main/platform/configuration/configuration/README.md)
