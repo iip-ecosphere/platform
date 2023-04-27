@@ -70,7 +70,8 @@ public class InstalledDependenciesSetup extends AbstractSetup {
     public static final String KEY_JAVA_11 = KEY_PREFIX_JAVA + 11;
     
     private static InstalledDependenciesSetup instance;
-    private Map<String, File> locations = new HashMap<String, File>();
+    private Map<String, File> locations = new HashMap<>();
+    private Map<String, String> envMappings = new HashMap<>();
     
     /**
      * Sets up default values before overriding.
@@ -137,6 +138,27 @@ public class InstalledDependenciesSetup extends AbstractSetup {
     public File getLocation(String key) {
         return null == key ? null : locations.get(key);
     }
+
+    /**
+     * Returns an environment mapping for the given environment {@code key}.
+     * Environment mappings are generic environment key/name mappings and could, e.g.,
+     * be used to map a service-specific Python Conda environment to an implemented environment
+     * produced during container generation. 
+     * 
+     * @param key the key
+     * @param dflt the default value to return if there is no mapping
+     * @return the mapped value or {@code dflt}
+     */
+    public String getEnvironmentMapping(String key, String dflt) {
+        String result = dflt;
+        if (null != key) {
+            String env = envMappings.get(key);
+            if (null != env) {
+                result = env;
+            }
+        }
+        return result;
+    }
     
     /**
      * Changes the locations. [required by SnakeYaml]
@@ -147,7 +169,16 @@ public class InstalledDependenciesSetup extends AbstractSetup {
         this.locations = locations;
         setupDefaults(); // ensure defaults but do not overwrite values
     }
-    
+
+    /**
+     * Changes the locations. [required by SnakeYaml]
+     * 
+     * @param envMappings the mappings
+     */
+    public void setEnvMappings(Map<String, String> envMappings) {
+        this.envMappings = envMappings;
+    }
+
     /**
      * Sets a single location, but ensures the default values.
      * 

@@ -45,7 +45,9 @@ import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslators;
 
 /**
- * Generic command-line-based Python integration for multiple data types.
+ * Generic command-line-based Python integration for multiple data types. Considers 
+ * {@link InstalledDependenciesSetup#getEnvironmentMapping(String, String) environment mappings} if the arguments 
+ * indicate that the Python service shall be executed in a conda environment.
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -345,6 +347,22 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
                 args.add("--data");
                 args.add(org.apache.commons.text.StringEscapeUtils.escapeJava(data)); // quote quotes -> JSON
             } 
+            if (getPythonExecutable().getName().equals("conda")) {
+                boolean foundRun = false;
+                int envNameIndex = -1;
+                for (int i = 0; i < args.size(); i++) {
+                    String a = args.get(i);
+                    foundRun |= a.equals("run");
+                    if (a.equals("-n") && i + 1 < args.size()) {
+                        envNameIndex = i + 1;
+                    }
+                }
+                if (foundRun && envNameIndex > 0) {
+                    args.set(envNameIndex, InstalledDependenciesSetup.getInstance().getEnvironmentMapping(
+                        args.get(envNameIndex), args.get(envNameIndex)));
+                }
+            }
+            
             Process proc = AbstractProcessService.createProcess(getPythonExecutable(), 
                 startExecutableByName(), home, args);
             handleErrorStream(proc.getErrorStream());

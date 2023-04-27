@@ -2,3 +2,5 @@ locations:
   PYTHON2: /var/lib/python2/bin/python
   PYTHON3: /var/lib/python3/bin/python
   JAVA99: c:\program files\Java\Java11\bin\java.exe
+envMappings:
+  svc1: env4

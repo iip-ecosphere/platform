@@ -53,6 +53,10 @@ public class InstalledDependenciesSetupTest {
         inst.setLocation("curl", new File("/home/my/curl"));
         Assert.assertNotNull(inst.getLocation("curl"));
         Assert.assertNotNull("/home/my/curl", inst.getLocation("curl").toString());
+        
+        Assert.assertNull(inst.getEnvironmentMapping(null, null));
+        Assert.assertEquals("env1", inst.getEnvironmentMapping(null, "env1"));
+        Assert.assertEquals("env4", inst.getEnvironmentMapping("svc1", "env1"));
     }
 
 }
