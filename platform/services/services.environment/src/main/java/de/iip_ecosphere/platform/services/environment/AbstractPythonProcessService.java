@@ -331,7 +331,7 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
         throws ExecutionException {
         try {
             List<String> args = new ArrayList<String>();
-            if (null != pythonArgs) { // if not completely intialized as service description is missing
+            if (null != pythonArgs) { // if not completely initialized as service description is missing
                 args.addAll(pythonArgs);
             }
             ServerAddress netMgtKeyAdr = getNetMgtKeyAddress(); 
@@ -347,7 +347,8 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
                 args.add("--data");
                 args.add(org.apache.commons.text.StringEscapeUtils.escapeJava(data)); // quote quotes -> JSON
             } 
-            if (getPythonExecutable().getName().equals("conda")) {
+            File pyExec = getPythonExecutable();
+            if ("conda".equals(pyExec.getName())) {
                 boolean foundRun = false;
                 int envNameIndex = -1;
                 for (int i = 0; i < args.size(); i++) {
@@ -358,13 +359,12 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
                     }
                 }
                 if (foundRun && envNameIndex > 0) {
-                    args.set(envNameIndex, InstalledDependenciesSetup.getInstance().getEnvironmentMapping(
-                        args.get(envNameIndex), args.get(envNameIndex)));
+                    String env = args.get(envNameIndex);
+                    args.set(envNameIndex, InstalledDependenciesSetup.getInstance().getEnvironmentMapping(env, env));
                 }
             }
             
-            Process proc = AbstractProcessService.createProcess(getPythonExecutable(), 
-                startExecutableByName(), home, args);
+            Process proc = AbstractProcessService.createProcess(pyExec, startExecutableByName(), home, args);
             handleErrorStream(proc.getErrorStream());
             return proc;
         } catch (IOException e) {
