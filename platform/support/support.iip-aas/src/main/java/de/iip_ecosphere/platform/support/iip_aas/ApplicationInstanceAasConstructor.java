@@ -15,7 +15,9 @@ package de.iip_ecosphere.platform.support.iip_aas;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.Submodel;
+import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
@@ -50,7 +52,20 @@ public class ApplicationInstanceAasConstructor {
         AtomicReference<String> result = new AtomicReference<String>(null);
         ActiveAasBase.processNotification(NAME_SUBMODEL_APPINSTANCES, NotificationMode.SYNCHRONOUS, (sub, aas) -> {
             int newId = -1;
-            for (SubmodelElement elt: sub.submodelElements()) {
+            String propMaxId = AasUtils.fixId(appId + "_max");
+            Property propMax = sub.getProperty(propMaxId);
+            if (null == propMax) {
+                newId = 0;
+                SubmodelBuilder builder = aas.createSubmodelBuilder(sub.getIdShort(), sub.getIdentification());
+                builder.createPropertyBuilder(propMaxId)
+                    .setValue(Type.INTEGER, newId)
+                    .build();
+            } else {
+                newId = AasUtils.getPropertyValueAsIntegerSafe(sub, propMaxId, 0) + 1; // the next instance
+                AasUtils.setPropertyValueSafe(sub, appId, newId);
+            }
+            
+            /*for (SubmodelElement elt: sub.submodelElements()) {
                 if (elt instanceof SubmodelElementCollection) {
                     SubmodelElementCollection coll = (SubmodelElementCollection) elt;
                     if (appId.equals(AasUtils.getPropertyValueAsStringSafe(coll, NAME_PROP_APPID, null))) {
@@ -59,8 +74,8 @@ public class ApplicationInstanceAasConstructor {
                     }
                 }
             }
+            newId++; // the next instance */
 
-            newId++; // the next instance
             String id = appId + "-" + newId;
             //SubmodelElementCollectionBuilder cBuilder // get or create
             //    = sub.createSubmodelElementCollectionBuilder(NAME_SUBMODEL_APPINSTANCES, false, false);
