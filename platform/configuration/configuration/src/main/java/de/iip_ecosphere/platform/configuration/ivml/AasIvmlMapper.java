@@ -67,8 +67,10 @@ import net.ssehub.easy.varModel.model.ModelQuery.FirstDeclTypeSelector;
 import net.ssehub.easy.varModel.model.ModelQueryException;
 import net.ssehub.easy.varModel.model.Project;
 import net.ssehub.easy.varModel.model.datatypes.Compound;
+import net.ssehub.easy.varModel.model.datatypes.Container;
 import net.ssehub.easy.varModel.model.datatypes.DerivedDatatype;
 import net.ssehub.easy.varModel.model.datatypes.IDatatype;
+import net.ssehub.easy.varModel.model.datatypes.Reference;
 import net.ssehub.easy.varModel.model.datatypes.TypeQueries;
 import net.ssehub.easy.varModel.model.values.ContainerValue;
 import net.ssehub.easy.varModel.model.values.NullValue;
@@ -932,12 +934,17 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
      * @param builder the builder for {@link #META_TYPE_NAME}
      */
     void mapType(IDecisionVariable var, SubmodelElementCollectionBuilder builder) {
-        IDatatype type = null;
+        IDatatype type;
         Value val = var.getValue();
         if (null != val && NullValue.VALUE != val) {
             type = val.getType();
         } else {
-            var.getDeclaration().getType();
+            type = var.getDeclaration().getType();
+        }
+        type = Reference.dereference(type);
+        type = DerivedDatatype.resolveToBasis(type);
+        if (type instanceof Container) {
+            type = ((Container) type).getContainedType();
         }
         if (type instanceof Compound) {
             mapCompoundType((Compound) type, builder);
