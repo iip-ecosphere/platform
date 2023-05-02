@@ -71,6 +71,7 @@ import net.ssehub.easy.varModel.model.datatypes.DerivedDatatype;
 import net.ssehub.easy.varModel.model.datatypes.IDatatype;
 import net.ssehub.easy.varModel.model.datatypes.TypeQueries;
 import net.ssehub.easy.varModel.model.values.ContainerValue;
+import net.ssehub.easy.varModel.model.values.NullValue;
 import net.ssehub.easy.varModel.model.values.ReferenceValue;
 import net.ssehub.easy.varModel.model.values.Value;
 
@@ -94,6 +95,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     
     public static final Predicate<IDecisionVariable> FILTER_NO_CONSTRAINT_VARIABLES = 
         v -> !TypeQueries.isConstraint(v.getDeclaration().getType());
+    public static final String META_TYPE_NAME = "meta";
     public static final Function<String, String> SHORTID_PREFIX_META = n -> "meta" + PseudoString.firstToUpperCase(n);
     protected static final String PRJ_NAME_ALLSERVICES = "AllServices";
     protected static final String PRJ_NAME_ALLTYPES = "AllTypes";
@@ -185,6 +187,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         Map<String, SubmodelElementCollectionBuilder> types = new HashMap<>();
         Configuration cfg = cfgSupplier.get();
         if (null != cfg) { // as long as we are in transition from platform without contained model to this
+            types.put(META_TYPE_NAME, createTypeCollectionBuilder(smBuilder, META_TYPE_NAME));
             IDatatype primitiveType = null; 
             try {
                 primitiveType = ModelQuery.findType(cfg.getConfiguration().getProject(), "PrimitiveType", null);
@@ -201,6 +204,8 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                     String typeName = IvmlDatatypeVisitor.getUnqualifiedType(mapType(type));
                     SubmodelElementCollectionBuilder builder = types.get(typeName);
                     if (null == builder) {
+                        builder = types.get(META_TYPE_NAME);
+                        mapType(var, builder);
                         builder = createTypeCollectionBuilder(smBuilder, typeName);
                         types.put(typeName, builder);
                     }
@@ -921,6 +926,63 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     }
     
     /**
+     * Maps a type into the SMEC {@value #META_TYPE_NAME}.
+     * 
+     * @param var the variable to map
+     * @param builder the builder for {@link #META_TYPE_NAME}
+     */
+    void mapType(IDecisionVariable var, SubmodelElementCollectionBuilder builder) {
+        IDatatype type = null;
+        Value val = var.getValue();
+        if (null != val && NullValue.VALUE != val) {
+            type = val.getType();
+        } else {
+            var.getDeclaration().getType();
+        }
+        if (type instanceof Compound) {
+            mapCompoundType((Compound) type, builder);
+        }
+    }
+
+    /**
+     * Maps a compound type into the SMEC {@value #META_TYPE_NAME}. May be called for duplicates but leads only to
+     * one entry.
+     * 
+     * @param type the compound type
+     * @param builder the builder for {@link #META_TYPE_NAME}
+     */
+    void mapCompoundType(Compound type, SubmodelElementCollectionBuilder builder) {
+        String typeId = AasUtils.fixId(type.getName());
+        if (!builder.hasElement(typeId)) {
+            SubmodelElementCollectionBuilder typeB = builder.createSubmodelElementCollectionBuilder(
+                typeId, false, false);
+            String lang = getLang();
+            for (int i = 0; i < type.getDeclarationCount(); i++) {
+                DecisionVariableDeclaration slot = type.getDeclaration(i);
+                // if we get into trouble with property ids, we have to sub-structure that
+                IDatatype slotType = slot.getType();
+                typeB.createPropertyBuilder(AasUtils.fixId(slot.getName()))
+                    .setValue(Type.STRING, IvmlDatatypeVisitor.getUnqualifiedType(slotType))
+                    .setDescription(new LangString(ModelInfo.getCommentSafe(slot), lang))
+                    .build();
+                if (slotType instanceof Compound) {
+                    mapCompoundType((Compound) slotType, builder);
+                }
+            }
+            typeB.build();
+        }
+    }
+    
+    /**
+     * Returns the language to be used for {@link LangString}.
+     * 
+     * @return the language
+     */
+    private static String getLang() {
+        return ModelInfo.getLocale().getLanguage();
+    }
+    
+    /**
      * Maps a single variable {@code var} into {@code builder}.
      * 
      * @param var the variable to map as source
@@ -933,7 +995,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             AbstractVariable decl = var.getDeclaration();
             String varName = decl.getName();
             IDatatype varType = decl.getType();
-            String lang = ModelInfo.getLocale().getLanguage();
+            String lang = getLang();
             String semanticId = null;
             for (int a = 0; a < var.getAttributesCount(); a++) {
                 IDecisionVariable attribute = var.getAttribute(a);
