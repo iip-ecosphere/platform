@@ -17,6 +17,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -42,13 +44,15 @@ public class AbstractAasLifecycleDescriptor implements LifecycleDescriptor {
      * Explicitly determine the AAS implementation server port. If not given, use an ephemeral one.
      */
     public static final String PARAM_IIP_PORT = "iip.port";
-    
+
+    private static final int AAS_HEARTBEAT_PERIOD = 5000; 
     private static Server implServer; // static if multiple ones share the same, e.g., ecs/svcMgr
     private static ProtocolServerBuilder implServerBuilder;
     private static boolean waitForIipAas = true;
     private String name;
     private Supplier<AasSetup> setupSupplier;
     private Server aasServer;
+    private Timer timer;
     
     /**
      * Creates a descriptor instance.
@@ -142,6 +146,44 @@ public class AbstractAasLifecycleDescriptor implements LifecycleDescriptor {
     @Override
     public void startup(String[] args) {
         LoggerFactory.getLogger(getClass()).info("System environment: {}", System.getenv());
+        deploy(args, getContributorFilter());
+        if (null == timer && enableAasHeartbeat()) {
+            AasFactory factory = AasFactory.getInstance();
+            AasSetup setup = AasPartRegistry.getSetup();
+            String serverAdr = factory.getServerBaseUri(setup.getServerEndpoint());
+            try {
+                final URL serverUrl = new URL(serverAdr);
+                timer = new Timer(true);
+                timer.schedule(new TimerTask() {
+                    
+                    private boolean offline = false;
+    
+                    @Override
+                    public void run() {
+                        if (!connectionOk(serverUrl) || !iipAasExists()) {
+                            offline = true; // after multiple trials?
+                        } else if (offline) {
+                            // AAS contributors shall consider implement exists() 
+                            deploy(args, c ->  !c.exists() && getContributorFilter().test(c));
+                        }
+                    }
+                }, AAS_HEARTBEAT_PERIOD, AAS_HEARTBEAT_PERIOD);
+            } catch (MalformedURLException e) {
+                LoggerFactory.getLogger(getClass()).warn("Cannot heartbeat for AAS registry/server. AAS server URL "
+                    + "{} invalid: {}", serverAdr, e.getMessage());
+            }
+        }
+    }
+
+    /**
+     * Deploys the AAS via {@link AasPartRegistry#build()} and depending on the {@link AasMode} 
+     * {@link AasPartRegistry#register(java.util.List, de.iip_ecosphere.platform.support.Endpoint, String...)} or
+     * {@link AasPartRegistry#remoteDeploy(java.util.List)}.
+     * 
+     * @param args the command line arguments from {@link #startup(String[])}
+     * @param contributorFilter the AAS contributor filter to apply
+     */
+    private void deploy(String[] args, Predicate<AasContributor> contributorFilter) {
         int port = getPort(args, PARAM_IIP_PORT, getPort(args, getOverridePortArg(), -1));
         if (port > 0) {
             setupSupplier.get().getImplementation().setPort(port);
@@ -153,7 +195,7 @@ public class AbstractAasLifecycleDescriptor implements LifecycleDescriptor {
             waitForAasServer();
             // startImplServer=true due to incremental deployment; chain implServerBuilders
             AasPartRegistry.AasBuildResult res = AasPartRegistry.build(
-                getContributorFilter(), null == implServer, implServerBuilder);
+                contributorFilter, null == implServer, implServerBuilder);
             if (null == implServer) {
                 implServerBuilder = res.getProtocolServerBuilder();
                 implServer = res.getProtocolServer();
@@ -185,6 +227,15 @@ public class AbstractAasLifecycleDescriptor implements LifecycleDescriptor {
                 + "Please add an appropriate dependency.", name);
         }
     }
+    
+    /**
+     * Returns whether AAS server heartbeat shall be enabled.
+     * 
+     * @return {@code true} for enabled, {@code false} else
+     */
+    protected boolean enableAasHeartbeat() {
+        return false; // TODO disabled until tested #142
+    }
 
     /**
      * Waits for the AAS server to come up.
@@ -210,8 +261,8 @@ public class AbstractAasLifecycleDescriptor implements LifecycleDescriptor {
                     regAdr, serverAdr);
             }
         } catch (MalformedURLException e) {
-            LoggerFactory.getLogger(getClass()).warn("Cannot wait for AAS registry/server. AAS registry URL "
-                + "{} or {} invalid: {}", regAdr, serverAdr, e.getMessage());
+            LoggerFactory.getLogger(getClass()).warn("Cannot wait for AAS registry/server. AAS registry "
+                + "{} or server {} URL invalid: {}", regAdr, serverAdr, e.getMessage());
         }
     }
     
@@ -259,6 +310,9 @@ public class AbstractAasLifecycleDescriptor implements LifecycleDescriptor {
 
     @Override
     public void shutdown() {
+        if (null != timer) {
+            timer.cancel();
+        }
         if (null != implServer) {
             implServer.stop(true);
         }

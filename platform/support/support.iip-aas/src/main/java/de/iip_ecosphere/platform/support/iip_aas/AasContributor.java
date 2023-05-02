@@ -86,4 +86,14 @@ public interface AasContributor {
      */
     public boolean isValid();
     
+    /**
+     * Returns whether the contribution of this contributor already exists. This would skip
+     * this contributor. In particular considered when automatically re-building AAS after server disconnect.
+     * 
+     * @return {@code true} for exists, {@code false} else
+     */
+    public default boolean exists() {
+        return false;
+    }
+    
 }
