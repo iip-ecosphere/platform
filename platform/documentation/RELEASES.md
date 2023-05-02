@@ -21,10 +21,17 @@ Planned:
 * Cleanup, e.g., old build processes: [#115](https://github.com/iip-ecosphere/platform/issues/115)
 * CLI multi-device deployment problem: [#113](https://github.com/iip-ecosphere/platform/issues/113)
 * KODEX: dynamic port assignment: [#14](https://github.com/iip-ecosphere/platform/issues/14), documentation: [#6](https://github.com/iip-ecosphere/platform/issues/6)
+* Service development video tutorial: [#118](https://github.com/iip-ecosphere/platform/issues/118)
 
 In progress:
 * [#70](https://github.com/iip-ecosphere/platform/issues/70): UI progress reporting 
 * [#117](https://github.com/iip-ecosphere/platform/issues/117): Multiple service managers per device
+* [#146](https://github.com/iip-ecosphere/platform/issues/146): UI editors for configuration tables
+* [#145](https://github.com/iip-ecosphere/platform/issues/145): UI table for nameplate configurations
+* [#144](https://github.com/iip-ecosphere/platform/issues/144): Deployment plans and application instances
+* [#143](https://github.com/iip-ecosphere/platform/issues/143): Container testing mode(s)
+* [#142](https://github.com/iip-ecosphere/platform/issues/142): AAS resilience for ECS-Runtime/Service Manager
+* [#141](https://github.com/iip-ecosphere/platform/issues/141): Fix AppAAS performance/resource consumption issue
 
 New features:
 * [#127](https://github.com/iip-ecosphere/platform/issues/127): Integration of Flower-based federated learning through generated templates
