@@ -299,6 +299,7 @@ async def wsHandler(ws):
 async def wsMain(port):
     log = logger.getLogger('websockets.server')
     log.disabled = True
+    print("Starting Websockets server on port " + str(port))
     async with websockets.serve(wsHandler, "localhost", port):
         await asyncio.Future()  # run forever
 
