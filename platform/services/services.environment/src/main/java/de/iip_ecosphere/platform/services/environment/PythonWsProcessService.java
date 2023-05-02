@@ -167,6 +167,8 @@ public class PythonWsProcessService extends PythonAsyncProcessService {
      * @author Holger Eichelberger, SSE
      */
     private class WebSocket extends WebSocketClient {
+        
+        private String lastError;
 
         /**
          * Creates a web socket for the given server URI.
@@ -213,7 +215,11 @@ public class PythonWsProcessService extends PythonAsyncProcessService {
 
         @Override
         public void onError(Exception ex) {
-            getLogger().error("While running Python: {}", ex.getMessage());
+            String msg = ex.getMessage();
+            if (null == lastError || !lastError.equals(msg)) {
+                lastError = msg;
+                getLogger().error("While running Python: {}", ex.getMessage());
+            }
         }
 
     }
