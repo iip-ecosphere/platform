@@ -13,17 +13,12 @@ Planned:
 
 Planned:
 * Enable tolerant switching: [#26](https://github.com/iip-ecosphere/platform/issues/26)
-* Platform component heartbeat and AAS cleanup: [#62](https://github.com/iip-ecosphere/platform/issues/62)
-* Integration of federated learning [#127](https://github.com/iip-ecosphere/platform/issues/127)
-* Configuration: Path in record type moves into connector [#128](https://github.com/iip-ecosphere/platform/issues/128)
-* REST as alternative protocol for Python Service environment: [#56](https://github.com/iip-ecosphere/platform/issues/56)
 * Tracing in Python Service environment: [#88](https://github.com/iip-ecosphere/platform/issues/88)
-* Cleanup, e.g., old build processes: [#115](https://github.com/iip-ecosphere/platform/issues/115)
 * CLI multi-device deployment problem: [#113](https://github.com/iip-ecosphere/platform/issues/113)
 * KODEX: dynamic port assignment: [#14](https://github.com/iip-ecosphere/platform/issues/14), documentation: [#6](https://github.com/iip-ecosphere/platform/issues/6)
-* Service development video tutorial: [#118](https://github.com/iip-ecosphere/platform/issues/118)
 
 In progress:
+* [#127](https://github.com/iip-ecosphere/platform/issues/127): Integration of federated learning 
 * [#70](https://github.com/iip-ecosphere/platform/issues/70): UI progress reporting 
 * [#117](https://github.com/iip-ecosphere/platform/issues/117): Multiple service managers per device
 * [#146](https://github.com/iip-ecosphere/platform/issues/146): UI editors for configuration tables
@@ -32,6 +27,8 @@ In progress:
 * [#143](https://github.com/iip-ecosphere/platform/issues/143): Container testing mode(s)
 * [#142](https://github.com/iip-ecosphere/platform/issues/142): AAS resilience for ECS-Runtime/Service Manager
 * [#141](https://github.com/iip-ecosphere/platform/issues/141): Fix AppAAS performance/resource consumption issue
+* [#62](https://github.com/iip-ecosphere/platform/issues/62): Platform component heartbeat and AAS cleanup
+* [#115](https://github.com/iip-ecosphere/platform/issues/115): Cleanup, e.g., old build processes
 
 New features:
 * [#127](https://github.com/iip-ecosphere/platform/issues/127): Integration of Flower-based federated learning through generated templates
@@ -43,6 +40,7 @@ New features:
 * Generic time series data aggregator in data functions
 * Application intercommunication support (`AppIntercom`)
 * [#132](https://github.com/iip-ecosphere/platform/issues/132): Bitmotec system monitoring integration
+* [#118](https://github.com/iip-ecosphere/platform/issues/118): Service development video tutorial
 
 Improvements:
 * [#128](https://github.com/iip-ecosphere/platform/issues/128): Refactor model to move RecordType::path to connector. **May require an upgrade of configuration models using connectors.**
