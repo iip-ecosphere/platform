@@ -115,5 +115,11 @@ public class PlattformAasLifecycleDescriptor extends AbstractAasLifecycleDescrip
     protected boolean iipAasExists() {
         return true; // don't probe at this level, we build it up
     }
+    
+    @Override
+    protected boolean enableAasHeartbeat() {
+        return false; // we are the server, do not heartbeat and re-deploy to us
+    }
+
 
 }
