@@ -52,6 +52,7 @@ public class PythonWsProcessService extends PythonAsyncProcessService {
     private long averageResponseTime = 0;
     private WebSocket socket;
     private String networkPortKey;
+    private String lastError; // new instance of WebSocket per try
 
     /**
      * Creates an instance from a service id and a YAML artifact.
@@ -117,8 +118,10 @@ public class PythonWsProcessService extends PythonAsyncProcessService {
                 }
             } catch (URISyntaxException | InterruptedException e) {
                 getLogger().error("Connecting to port {}: {}", instancePort, e.getMessage());
-                TimeUtils.sleep(100);
             } 
+            if (null == socket) {
+                TimeUtils.sleep(250);
+            }
         }
     }
     
@@ -167,8 +170,6 @@ public class PythonWsProcessService extends PythonAsyncProcessService {
      * @author Holger Eichelberger, SSE
      */
     private class WebSocket extends WebSocketClient {
-        
-        private String lastError;
 
         /**
          * Creates a web socket for the given server URI.
