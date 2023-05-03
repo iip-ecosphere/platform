@@ -16,9 +16,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -964,16 +966,21 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             SubmodelElementCollectionBuilder typeB = builder.createSubmodelElementCollectionBuilder(
                 typeId, false, false);
             String lang = getLang();
-            for (int i = 0; i < type.getDeclarationCount(); i++) {
-                DecisionVariableDeclaration slot = type.getDeclaration(i);
+            Set<String> done = new HashSet<>();
+            for (int i = 0; i < type.getInheritedElementCount(); i++) {
+                DecisionVariableDeclaration slot = type.getInheritedElement(i);
                 // if we get into trouble with property ids, we have to sub-structure that
-                IDatatype slotType = slot.getType();
-                typeB.createPropertyBuilder(AasUtils.fixId(slot.getName()))
-                    .setValue(Type.STRING, IvmlDatatypeVisitor.getUnqualifiedType(slotType))
-                    .setDescription(new LangString(ModelInfo.getCommentSafe(slot), lang))
-                    .build();
-                if (slotType instanceof Compound) {
-                    mapCompoundType((Compound) slotType, builder);
+                String slotName = AasUtils.fixId(slot.getName());
+                if (!done.contains(slotName)) {
+                    done.add(slotName);
+                    IDatatype slotType = slot.getType();
+                    typeB.createPropertyBuilder(slotName)
+                        .setValue(Type.STRING, IvmlDatatypeVisitor.getUnqualifiedType(slotType))
+                        .setDescription(new LangString(ModelInfo.getCommentSafe(slot), lang))
+                        .build();
+                    if (slotType instanceof Compound) {
+                        mapCompoundType((Compound) slotType, builder);
+                    }
                 }
             }
             typeB.build();
