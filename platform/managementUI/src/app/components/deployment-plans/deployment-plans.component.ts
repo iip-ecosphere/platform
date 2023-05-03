@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { OnlyIdPipe } from 'src/app/pipes/only-id.pipe';
 import { ApiService } from 'src/app/services/api.service';
 import { PlanDeployerService } from 'src/app/services/plan-deployer.service';
 import { ResourceAttribute, Resource, PlatformArtifacts, InputVariable } from 'src/interfaces';
@@ -20,7 +21,9 @@ export class DeploymentPlansComponent implements OnInit {
   instanceId: string[] = []; //for id input of undeployPlanById
   responseMessage: string | undefined;
 
-  constructor(public api: ApiService, private deployer: PlanDeployerService) {
+  taskId: string = "";
+
+  constructor(public api: ApiService, private deployer: PlanDeployerService, private onlyId: OnlyIdPipe) {
   }
 
   async ngOnInit() {
@@ -54,18 +57,14 @@ export class DeploymentPlansComponent implements OnInit {
       const response = await this.deployer.deployPlan(params);
       this.selected = undefined;
     } else if(plan && plan.value) {
-      console.log("deploy")
-      console.log("deploy plan:")
-      console.log(plan)
-      console.log(plan.value)
       let value = plan.value.find(item => item.idShort === "uri");
-      console.log("uri value: ")
-      console.log(value)
       if(value) {
-        console.log(value.value)
         params[0].value.value = value.value;
       }
       const response = await this.deployer.deployPlan(params);
+      if(response && response.outputArguments[0] && response.outputArguments[0].value) {
+        this.taskId = this.onlyId.transform(response.outputArguments[0].value.value);
+      }
 
     }
 
@@ -141,6 +140,11 @@ export class DeploymentPlansComponent implements OnInit {
     }
     return (style);
 
+  }
+
+  public getStatus() {
+    console.log(this.taskId);
+    this.deployer.getStatus(this.taskId)
   }
 
 }

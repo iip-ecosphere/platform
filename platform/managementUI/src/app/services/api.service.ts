@@ -31,17 +31,14 @@ export class ApiService {
 
   resources: PlatformResources = {};
   //services: PlatformServices = {};
-  connectionTypes: any;
 
   public async getResources() {
-    this.resources = await this.getData('aas/submodels/resources/submodel') as
-      PlatformResources;
+    this.resources = await this.getData('aas/submodels/resources/submodel') as PlatformResources;
     return this.resources;
   }
 
   public async getServices() {
-      const Data = await this.getData('aas/submodels/services/submodel')as
-        PlatformServices;
+      const Data = await this.getData('aas/submodels/services/submodel')as PlatformServices;
       return Data;
   }
 
@@ -52,6 +49,12 @@ export class ApiService {
 
   public async getPlatformData() {
     const Data = await this.getData('aas/submodels/platform/submodel/submodelElements') as ResourceAttribute[];
+    return Data;
+  }
+
+  public async getInstances() {
+    const Data = await this.getData('aas/submodels/ApplicationInstances/submodel/submodelElements') as Resource[];
+    console.log(Data);
     return Data;
   }
 
@@ -121,23 +124,6 @@ export class ApiService {
     }
     return response;
   }
-
-  // public async getServiceMeshes() {
-  //   let response;
-  //   let meshes: string[];
-  //   try {
-  //     response = await firstValueFrom(this.http.get(this.ip + '/shells/' + this.urn + "/aas/submodels/Configuration/submodel/submodelElements/Application")) as Resource;
-  //     if(response && response.value) {
-  //       for(let element of response.value) {
-
-  //       }
-  //     }
-
-  //   } catch(e) {
-  //     console.log(e);
-  //   }
-  //   return response;
-  // }
 
   public async getResource(id: string) {
     if(!this.resources || !this.resources.submodelElements) {

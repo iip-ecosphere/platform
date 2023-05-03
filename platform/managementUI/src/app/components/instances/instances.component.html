@@ -1,0 +1,27 @@
+<table style="margin: 0px;">
+  <tr *ngFor="let item of filteredData; let i = index">
+
+    <td style="width: 2%; text-align: center;"> {{i + 1}} </td>
+
+    <!-- Item -->
+    <td style="width: 100%;">
+
+      <span class="row-title" >
+        <span style="height: 5px; vertical-align: top; margin-right: 10px;">{{item.idShort}}</span>
+      </span>
+      <div *ngFor="let property of item.value" class="subtext" >
+          {{printDetails(property.idShort, property.value)}}
+      </div>
+    </td>
+
+    <!-- Buttons -->
+    <td class="cell-with-button">
+      <button
+        mat-raised-button style="background-color: rgb(97, 95, 96)"
+        (click)="undeploy(item)">
+        undeploy
+      </button>
+    </td>
+
+  </tr>
+</table>

@@ -1,0 +1,20 @@
+.item {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+
+  color: #000000;
+}
+
+.buttons {
+  justify-content: flex-end;
+}
+
+.text {
+  font-size: medium;
+  justify-content: flex-start;
+}
+
+.mat-divider {
+  border-top-color: rgb(0, 0, 0);
+}

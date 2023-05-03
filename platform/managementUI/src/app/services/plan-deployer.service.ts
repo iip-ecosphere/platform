@@ -22,7 +22,6 @@ export class PlanDeployerService {
     executionState: "",
     messages: [""]
   }
-  isDone = false;
 
   emitter: BehaviorSubject<StatusMsg>;
 
@@ -40,7 +39,6 @@ export class PlanDeployerService {
    }
 
   public async deployPlan(params: any, undeploy?: boolean) {
-    console.log("Method: deployPlan")
     this.status = {
       executionState: "",
       messages: [""]
@@ -50,11 +48,9 @@ export class PlanDeployerService {
     let basyxFunc;
 
     if (undeploy) {
-      console.log("# undeploy")
       basyxFunc = "undeployPlanAsync";
       this.emitSendMessage("undeploy");
     } else {
-      console.log("# deployed")
       basyxFunc = "deployPlanAsync";
       this.emitSendMessage("deploy");
     }
@@ -66,22 +62,20 @@ export class PlanDeployerService {
     } catch(e) {
       console.log(e);
     }
-    console.log("nach deploy")
-    console.log(response);
 
     if(response && response.outputArguments[0] && response.outputArguments[0].value) {
       this.getStatus(response.outputArguments[0].value.value);
     }
-
+    return response;
   }
 
   public async undeployPlanById(params: any) {
     let response;
+    this.emitSendMessage("undeployId");
     try {
       response = await firstValueFrom(this.http.post<platformResponse>(this.ip + '/shells/' + this.urn + "/aas/submodels/Artifacts/submodel/undeployPlanWithId/invoke"
       ,{"inputArguments": params,"requestId":"1bfeaa30-1512-407a-b8bb-f343ecfa28cf", "inoutputArguments":[], "timeout":10000}
-      , {responseType: 'json', reportProgress: true}));
-      this.emitSendMessage("undeployId");
+      , {responseType: 'json'}));
     } catch(e) {
       console.log(e);
     }
@@ -112,7 +106,6 @@ export class PlanDeployerService {
         }
     }];
     params[0].value.value = this.onlyId.transform(id);
-    console.log(params);
       try {
           response = this.http.post<platformResponse>(this.ip + '/shells/' + this.urn + "/aas/submodels/Artifacts/submodel/getTaskStatus/invoke"
           ,{"inputArguments": params,"requestId":"1bfeaa30-1512-407a-b8bb-f343ecfa28cf", "inoutputArguments":[], "timeout":10000}
@@ -128,7 +121,6 @@ export class PlanDeployerService {
 }, err => (this.emitter.next({executionState: "ERROR", messages: ["an error occured while getting the task status"]})));
 
     } catch(e) {
-
       console.log(e);
     }
   }
