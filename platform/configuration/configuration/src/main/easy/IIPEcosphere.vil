@@ -781,6 +781,8 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
             loginContainerRegistry(mgr, regUser, regPwd);
         }
         Path req = "${target}/requirements.txt";
+        // reading from requirements.txt is not bad but assumes usage of install package
+        // better to have them in a list in the model similar to #143
         Path requirements = "${target}/../platformDependencies/requirements.txt";
         FileArtifact requirementsArtifact = requirements;
         Text requirementsText = requirementsArtifact.getText();

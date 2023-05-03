@@ -6,6 +6,11 @@ template PythonReq(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElem
 	
     def main(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, EcsDevice device) {
         sequenceOf(PythonService) services = elements -> collect(e|e.impl) -> selectByKind(PythonService);
+
+        // preliminary fix, just very basic ones, shall also include the remaining -> check versions here
+        'pyyaml
+        pyflakes
+        websockets'
         
         setOf(Dependency) existDeps = {};
         for (PythonService pyService : services) {              
