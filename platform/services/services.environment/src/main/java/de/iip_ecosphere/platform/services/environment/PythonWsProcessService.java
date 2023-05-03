@@ -109,20 +109,22 @@ public class PythonWsProcessService extends PythonAsyncProcessService {
     
     @Override
     protected void createScanInputThread(Process proc) {
-        while (null == socket) { 
-            try {
-                WebSocket tmp = new WebSocket(new URI("ws://localhost:" + instancePort));
+        String uri = "ws://localhost:" + instancePort;
+        try {
+            getLogger().info("Connecting to {}", uri);
+            while (null == socket) { 
+                WebSocket tmp = new WebSocket(new URI(uri)); // instance not reusable
                 if (tmp.connectBlocking()) { // blocking may fail
-                    getLogger().info("Connected to port {}", instancePort);
+                    getLogger().info("Connected to {}", uri);
                     socket = tmp;
+                } else {
+                    tmp.close(); // instance not reusable
+                    TimeUtils.sleep(250);
                 }
-            } catch (URISyntaxException | InterruptedException e) {
-                getLogger().error("Connecting to port {}: {}", instancePort, e.getMessage());
-            } 
-            if (null == socket) {
-                TimeUtils.sleep(250);
             }
-        }
+        } catch (URISyntaxException | InterruptedException e) {
+            getLogger().error("Connecting to {}: {}", uri, e.getMessage());
+        } 
     }
     
     @Override
