@@ -21,7 +21,6 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import org.java_websocket.client.WebSocketClient;
-import org.java_websocket.enums.ReadyState;
 import org.java_websocket.exceptions.WebsocketNotConnectedException;
 import org.java_websocket.handshake.ServerHandshake;
 import org.slf4j.Logger;
@@ -53,6 +52,7 @@ public class PythonWsProcessService extends PythonAsyncProcessService {
     private long averageResponseTime = 0;
     private WebSocket socket;
     private String networkPortKey;
+    private String lastError; // new instance of WebSocket per try
 
     /**
      * Creates an instance from a service id and a YAML artifact.
@@ -109,17 +109,20 @@ public class PythonWsProcessService extends PythonAsyncProcessService {
     
     @Override
     protected void createScanInputThread(Process proc) {
-        String uri = "ws://localhost:" + instancePort;
-        try {
-            getLogger().info("Connecting to {}", uri);
-            WebSocket tmp = new WebSocket(new URI(uri));
-            tmp.connect();
-            TimeUtils.waitFor(() -> tmp.getReadyState() != ReadyState.OPEN, -1, 250);
-            getLogger().info("Connected to {}", uri);
-            socket = tmp;
-        } catch (URISyntaxException e) {
-            getLogger().error("Connecting to {}: {}", uri, e.getMessage());
-        } 
+        while (null == socket) { 
+            try {
+                WebSocket tmp = new WebSocket(new URI("ws://localhost:" + instancePort));
+                if (tmp.connectBlocking()) { // blocking may fail
+                    getLogger().info("Connected to port {}", instancePort);
+                    socket = tmp;
+                }
+            } catch (URISyntaxException | InterruptedException e) {
+                getLogger().error("Connecting to port {}: {}", instancePort, e.getMessage());
+            } 
+            if (null == socket) {
+                TimeUtils.sleep(250);
+            }
+        }
     }
     
     @Override
@@ -167,8 +170,6 @@ public class PythonWsProcessService extends PythonAsyncProcessService {
      * @author Holger Eichelberger, SSE
      */
     private class WebSocket extends WebSocketClient {
-
-        private String lastError;
 
         /**
          * Creates a web socket for the given server URI.
