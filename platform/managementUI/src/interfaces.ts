@@ -4,19 +4,6 @@ export interface PlatformResources {
   submodelElements?: Resource[]
 }
 
-//to be replaced by ResourceAttribute
-// export interface ResourceValue {
-//   idShort?: string;
-//   kind?: string;
-//   valueType?: string;
-//   value?: any;
-//   description?: any;
-//   inoutputVariables?: any;
-//   inputVariables?: any;
-//   outputVariables?: any;
-//   invokable?: any;
-// }
-
 export interface Resource {
   allowDuplicates?: boolean;
   idShort?: string;
@@ -193,10 +180,6 @@ export interface GeneralInformation {
   ManufacturerName?: string;
   ManufacturerProductDesignation?: string;
   Address?: any;
-}
-
-export interface GeneralInformationElement {
-
 }
 
 export interface AddressPart {
