@@ -1,7 +1,7 @@
 pyyaml
 pyflakes
+websockets
 pyzbar
 opencv-python
 numpy
 Pillow
-websockets
