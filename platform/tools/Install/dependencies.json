@@ -1,5 +1,0 @@
-"dependencies": {
-  "@angular/cli": "^13.3.6",
-  "express": "^4.18.1",
-  "cors": "^2.8.5"
-},

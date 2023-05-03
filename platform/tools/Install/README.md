@@ -21,8 +21,8 @@ This package contains also programs to optimize specific deployments, e.g., to r
 
 **External programs and prerequisites**
 
-* Python 3.9, further dependencies for code generation, communication and potentially the Python-based data processing functions see [requirements.txt](./requirements.txt).
-* For the management UI: Angular 13, further dependencies see [dependencies.json](./dependencies.json).
+* Python 3.9, further dependencies for code generation, communication and potentially the Python-based data processing functions see [requirements.txt](./platformDependencies/requirements.txt).
+* For the management UI: Angular 13, further dependencies see [dependencies.json](./platformDependencies/dependencies.json).
 * IIP-EcosphereFullInstallationLinux: A script to do a full installation of the platform on Linux including the prerequisites (Java 13, Maven version 3.6.3, Docker version 20.10.7, Python version 3.9, and run Docker Private Registry). 
 
   -- Java: Java: If Java is not installed, then the script will install Java 13. If the Java version is less than Java 11, then the script asks to install Java 13 (If the answer is No then the installation will stop).
