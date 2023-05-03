@@ -15,6 +15,7 @@ from Service import ServiceKind
 import asyncio
 import websockets
 import signal
+import traceback
 
 sId = ""
 avgResponseTime = 0
@@ -197,21 +198,25 @@ def processRequest(sId, type, data):
         else:
             sys.stderr.write("Python ServiceEnvironment [Warn]: Cannot pass " + type + " to service - no service\n")
     else :
-        serializer = Registry.serializers.get(type)
-        if serializer:
-            d = serializer.readFrom(str(data))
-            funcId = sId+"_"+type
-            func = Registry.asyncTransformers.get(funcId)
-            startTime = time.perf_counter()
-            if func:
-                func(d) #ingestor takes result
-                updateResponseTime(startTime)
-            else:
-                func = Registry.syncTransformers.get(funcId)
-                updateResponseTime(startTime)
+        try :
+            serializer = Registry.serializers.get(type)
+            if serializer:
+                d = serializer.readFrom(str(data))
+                funcId = sId+"_"+type
+                func = Registry.asyncTransformers.get(funcId)
+                startTime = time.perf_counter()
                 if func:
-                    global responseFunction
-                    responseFunction(func(d))
+                    func(d) #ingestor takes result
+                    updateResponseTime(startTime)
+                else:
+                    func = Registry.syncTransformers.get(funcId)
+                    updateResponseTime(startTime)
+                    if func:
+                        global responseFunction
+                        responseFunction(func(d))
+        except Exception as err:
+            sys.stderr.write("Exception/error in service:\n")
+            traceback.print_tb(err.__traceback__)  
     return result
 
 # console mode
