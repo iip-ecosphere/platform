@@ -76,11 +76,8 @@ public class ApplicationInstanceAasConstructor {
             }
             newId++; // the next instance */
 
-            String id = appId + "-" + newId;
-            //SubmodelElementCollectionBuilder cBuilder // get or create
-            //    = sub.createSubmodelElementCollectionBuilder(NAME_SUBMODEL_APPINSTANCES, false, false);
             SubmodelElementCollectionBuilder dBuilder 
-                = sub.createSubmodelElementCollectionBuilder(fixId(id), false, false);
+                = sub.createSubmodelElementCollectionBuilder(getAasAppInstanceId(appId, newId), false, false);
             dBuilder.createPropertyBuilder(NAME_PROP_APPID)
                 .setValue(Type.STRING, appId)
                 .build();
@@ -94,13 +91,34 @@ public class ApplicationInstanceAasConstructor {
                 .setValue(Type.INT64, System.currentTimeMillis())
                 .build();
             dBuilder.build();
-            //cBuilder.build();
             if (newId > 0) {
                 result.set(String.valueOf(newId));
             }
         });
 
         return result.get();        
+    }
+
+    /**
+     * Returns the AAS application instance id.
+     * 
+     * @param appId the application id
+     * @param instanceId the instance id
+     * @return the application instance id ready to be used as id short in an AAS
+     */
+    private static String getAasAppInstanceId(String appId, int instanceId) {
+        return getAasAppInstanceId(appId, String.valueOf(instanceId));
+    }
+    
+    /**
+     * Returns the AAS application instance id.
+     * 
+     * @param appId the application id
+     * @param instanceId the instance id
+     * @return the application instance id ready to be used as id short in an AAS
+     */
+    private static String getAasAppInstanceId(String appId, String instanceId) {
+        return fixId(appId + "-" + instanceId);
     }
     
     /**
@@ -112,13 +130,9 @@ public class ApplicationInstanceAasConstructor {
      */
     public static int notifyAppInstanceStopped(String appId, String instanceId) {
         final AtomicInteger result = new AtomicInteger(0);
-        final String instId = null == instanceId ? "0" : instanceId;
+        final String instId = null == instanceId || instanceId.length() == 0 ? "0" : instanceId;
         ActiveAasBase.processNotification(NAME_SUBMODEL_APPINSTANCES, NotificationMode.SYNCHRONOUS, (sub, aas) -> {
-            String id = fixId(appId + "-" + instId);
-            SubmodelElementCollection coll = sub.getSubmodelElementCollection(id);
-            if (null != coll) {
-                sub.deleteElement(coll);
-            }
+            sub.deleteElement(getAasAppInstanceId(appId, instId));
             result.set(countAppInstances(appId, null, sub));
         });
         return result.get();
