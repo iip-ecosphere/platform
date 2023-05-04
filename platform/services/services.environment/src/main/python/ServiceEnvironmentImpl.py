@@ -176,29 +176,29 @@ def loadModules(modulesPath, modulesDir):
 
 def processRequest(sId, type, data):
     result = None
-    if type.startswith('*'):
-        service = Registry.services.get(sId)
-        if service:
-            if type == '*setstate':
-                service.setState(ServiceState[str(data)])
-            elif type == '*migrate':
-                service.migrate(data)
-            elif type == '*update':
-                service.update(data)
-            elif type == '*switch':
-                service.switchTo(data)
-            elif type == '*recfg':
-                service.reconfigure(json.loads(data))
-            elif type == '*activate':
-                service.activate()
-            elif type == '*passivate':
-                service.passivate()
-            elif type == '*SERVER': # fixed base64 encoding-decoding
-                service.receivedClientServer(base64.b64decode(data))
-        else:
-            sys.stderr.write("Python ServiceEnvironment [Warn]: Cannot pass " + type + " to service - no service\n")
-    else :
-        try :
+    try: # potential user code calls, catch everything
+        if type.startswith('*'):
+            service = Registry.services.get(sId)
+            if service:
+                if type == '*setstate':
+                    service.setState(ServiceState[str(data)])
+                elif type == '*migrate':
+                    service.migrate(data)
+                elif type == '*update':
+                    service.update(data)
+                elif type == '*switch':
+                    service.switchTo(data)
+                elif type == '*recfg':
+                    service.reconfigure(json.loads(data))
+                elif type == '*activate':
+                    service.activate()
+                elif type == '*passivate':
+                    service.passivate()
+                elif type == '*SERVER': # fixed base64 encoding-decoding
+                    service.receivedClientServer(base64.b64decode(data))
+            else:
+                sys.stderr.write("Python ServiceEnvironment [Warn]: Cannot pass " + type + " to service - no service\n")
+        else :
             serializer = Registry.serializers.get(type)
             if serializer:
                 d = serializer.readFrom(str(data))
@@ -214,9 +214,9 @@ def processRequest(sId, type, data):
                     if func:
                         global responseFunction
                         responseFunction(func(d))
-        except Exception as err:
-            sys.stderr.write("Exception/error in service:\n")
-            traceback.print_tb(err.__traceback__)  
+    except Exception as err:
+        sys.stderr.write("Exception/error in service:\n")
+        sys.stderr.write(str(err)+"\n")        
     return result
 
 # console mode
@@ -293,23 +293,23 @@ async def wsHandler(ws):
     global websocket
     websocket = ws
     while True:
-        message = await websocket.recv()
-        data = json.loads(message)
-        if "type" in data and "data" in data:
-            global sId
-            payload = data["data"]
-            tmp = str(payload)
-            if tmp.startswith("{") and tmp.endswith("}"):
-                payload = json.dumps(payload)
-            result = processRequest(sId, data["type"], payload)
-            if result:
-                wsIngestResult(result)
+        try:
+            message = await websocket.recv()
+            data = json.loads(message)
+            if "type" in data and "data" in data:
+                global sId
+                result = processRequest(sId, data["type"], data["data"])
+                if result:
+                    wsIngestResult(result)
+        except Exception as err:
+            sys.stderr.write("Exception/error in service:\n")
+            sys.stderr.write(str(err)+"\n")
 
 async def wsMain(port):
     log = logger.getLogger('websockets.server')
     log.disabled = True
     print("Starting Websockets server on port " + str(port))
-    async with websockets.serve(wsHandler, "127.0.0.1", port):
+    async with websockets.serve(wsHandler, "127.0.0.1", port, max_size=2**63): # max protocol size
         await asyncio.Future()  # run forever
 
 def wsStop(signum, frame):
