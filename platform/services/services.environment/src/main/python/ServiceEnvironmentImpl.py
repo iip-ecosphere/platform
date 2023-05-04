@@ -297,7 +297,11 @@ async def wsHandler(ws):
         data = json.loads(message)
         if "type" in data and "data" in data:
             global sId
-            result = processRequest(sId, data["type"], data["data"])
+            payload = data["data"]
+            tmp = str(payload)
+            if tmp.startswith("{") and tmp.endswith("}"):
+                payload = json.dumps(payload)
+            result = processRequest(sId, data["type"], payload)
             if result:
                 wsIngestResult(result)
 
