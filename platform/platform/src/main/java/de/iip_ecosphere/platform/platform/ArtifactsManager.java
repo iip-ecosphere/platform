@@ -407,7 +407,7 @@ public class ArtifactsManager {
     public Artifact artifactCreated(Path path, URI accessUri) {
         Artifact result = null;
         if (null != path && path.toFile().exists()) {
-            LoggerFactory.getLogger(ArtifactsManager.class).info("Potential artifact file created: {}", path);
+            LoggerFactory.getLogger(ArtifactsManager.class).info("Potential artifact file found: {}", path);
             Path pn = path.normalize();
             if (!artifactPaths.containsKey(pn)) {
                 result = createArtifactInfo(path, accessUri);
