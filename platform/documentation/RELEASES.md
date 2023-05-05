@@ -54,6 +54,7 @@ Improvements:
 * Connector mocking data with $period and $repeats, preparation for exact JSON field mapping
 * Transport connector can now have a local serialization provider, e.g., for MQTT out.
 * Trace-to-AAS service and (new) extensible Java service can utilize optional (output) transport connector, e.g., for northbound integration.
+* More reliable artifact file modification watching, in particular for Linux.
 * Build process fixes for examples.
 
 ### Release 0.5.0 (2023/03/01):
