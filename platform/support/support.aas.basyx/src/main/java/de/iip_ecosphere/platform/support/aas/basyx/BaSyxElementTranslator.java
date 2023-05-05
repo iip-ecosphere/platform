@@ -147,20 +147,21 @@ public class BaSyxElementTranslator {
     static <T extends SubmodelElement> boolean matchesType(ISubmodelElement elt, Class<T> cls) {
         boolean result;
         if (Property.class.isAssignableFrom(cls)) {
-            result = org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.property.Property.class
+            result = org.eclipse.basyx.submodel.metamodel.api.submodelelement.dataelement.IProperty.class
                 .isInstance(elt);
         } else if (Operation.class.isAssignableFrom(cls)) {
-            result = org.eclipse.basyx.submodel.metamodel.map.submodelelement.operation.Operation.class.isInstance(elt);
+            result = org.eclipse.basyx.submodel.metamodel.api.submodelelement.operation.IOperation.class
+                .isInstance(elt);
         } else if (ReferenceElement.class.isAssignableFrom(cls)) {
-            result = org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.ReferenceElement.class
+            result = org.eclipse.basyx.submodel.metamodel.api.submodelelement.dataelement.IReferenceElement.class
                 .isInstance(elt);
         } else if (SubmodelElementCollection.class.isAssignableFrom(cls)) {
-            result = org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElementCollection.class
+            result = org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElementCollection.class
                 .isInstance(elt);
         } else if (FileDataElement.class.isAssignableFrom(cls)) {
             result = File.class.isInstance(elt);
         } else if (SubmodelElement.class.isAssignableFrom(cls)) {
-            result = org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElement.class.isInstance(elt);
+            result = org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElement.class.isInstance(elt);
         } else {
             result = false;
         }
@@ -272,9 +273,9 @@ public class BaSyxElementTranslator {
         String... path) {
         boolean result = false;
         cont = findInPath(cont, path);
-        if (cont instanceof ISubmodelElementCollection) {
+        if (cont instanceof IElementContainer) {
             IterationSubmodelElementsRegistrar<T> reg = new IterationSubmodelElementsRegistrar<>(func, cls);
-            for (ISubmodelElement e: ((ISubmodelElementCollection) cont).getSubmodelElements().values()) {
+            for (ISubmodelElement e: ((IElementContainer) cont).getSubmodelElements().values()) {
                 if (matchesType(e, cls)) {
                     registerSubmodelElement(e, reg);
                     if (!reg.isContinue()) {
