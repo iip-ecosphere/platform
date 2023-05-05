@@ -153,10 +153,12 @@ public class AppAas extends de.iip_ecosphere.platform.examples.hm22.AppAas {
         }
     
         @Override
-        public void cleanup(Aas aas) {
+        public boolean cleanup(Aas aas) {
+            boolean done = false;
             if (DO_EVENTS) {
-                super.cleanup(aas);
+                done = super.cleanup(aas);
             }
+            return done;
         }
         
     }

@@ -70,6 +70,11 @@ public class TraceToAasServiceTest {
     @Test
     public void testService() throws ExecutionException, IOException {
         TraceToAasService service = TraceToAasServiceMain.createService();
+        final int cleanupTimeout = 2000;
+        // allow for quick cleanup
+        service.setTimeout(cleanupTimeout);
+        service.setCleanupTimeout(cleanupTimeout);
+        
         ApplicationSetup app = service.getApplicationSetup();
         service.setState(ServiceState.STARTING);
         Assert.assertEquals(ServiceState.RUNNING, service.getState());
@@ -113,7 +118,22 @@ public class TraceToAasServiceTest {
         }
         Assert.assertNotNull(elts.get("source"));
         Assert.assertNotNull(elts.get("receiver"));
-
+        
+        System.out.println("Waiting for cleanup... (max " + cleanupTimeout + " ms)");
+        TimeUtils.sleep(cleanupTimeout);
+        service.cleanup(); // trigger cleanup, no new elements
+        
+        aas = AasPartRegistry.retrieveAas(Starter.getSetup().getAas(), service.getAasUrn());
+        Assert.assertNotNull(aas);
+        submodel = aas.getSubmodel(TraceToAasService.SUBMODEL_TRACES);
+        int remainingCount = 0;
+        for (SubmodelElement e : submodel.submodelElements()) {
+            if (e instanceof SubmodelElementCollection) {
+                remainingCount++;
+            }
+        }
+        Assert.assertEquals(0, remainingCount); // shall be gone
+        
         service.setState(ServiceState.STOPPING);
     }
 

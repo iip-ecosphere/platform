@@ -160,6 +160,15 @@ public abstract class TransportToAasConverter<T> {
     public void setTimeout(long timeout) {
         this.timeout = timeout;
     }
+
+    /**
+     * Changes the cleanup timeout, i.e., the time between two cleanups.
+     * 
+     * @param cleanupTimeout the timeout in ms
+     */
+    public void setCleanupTimeout(long cleanupTimeout) {
+        this.cleanupTimeout = cleanupTimeout;
+    }
     
     /**
      * Returns the timeout.
@@ -400,14 +409,30 @@ public abstract class TransportToAasConverter<T> {
     }
     
     /**
+     * Pursues a cleanup of the (internally known) AAS.
+     * 
+     * @return whether a cleanup process was executed (not whether elements were deleted)
+     */
+    public boolean cleanup() {
+        boolean done = false;
+        if (null != aas) {
+            done = cleanup(aas);
+        }
+        return done;
+    }
+    
+    /**
      * Cleans up outdated trace entries. Called in {@link #handleNew(Object)} if regular input is expected,
      * may be called regularly by an external timer.
      * 
      * @param aas the AAS to clean up
+     * @return whether a cleanup process was executed (not whether elements were deleted)
      * @see #getCleanupPredicate()
+     * @see #cleanup()
      */
-    public void cleanup(Aas aas) {
+    public boolean cleanup(Aas aas) {
         // remove outdated ones
+        boolean done = false;
         long now = System.currentTimeMillis();
         if (now - lastCleanup > cleanupTimeout) {
             long timestamp = now - timeout;
@@ -424,7 +449,9 @@ public abstract class TransportToAasConverter<T> {
                 return cont;
             }, SubmodelElementCollection.class);
             lastCleanup = now;
+            done = true;
         }
+        return done;
     }
 
     /**
