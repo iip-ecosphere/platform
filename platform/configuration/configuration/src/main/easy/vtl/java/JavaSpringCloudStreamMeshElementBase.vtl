@@ -1085,7 +1085,7 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
     }
     
     def genTimeRecording(PythonService base, String timerVar, String expr) {
-        "MetricsProvider.recordMsTime(${timerVar}, () -> service.getAvgResponseTime(), () -> ${expr})"
+        "MetricsProvider.recordNsTime(${timerVar}, () -> service.getAvgResponseTime(), () -> ${expr})"
     }
         
     def genIngestor(PythonService service, String methodSuffix, String conn, String type, String dir, ServiceBase target, String connPlaceHolder) {
