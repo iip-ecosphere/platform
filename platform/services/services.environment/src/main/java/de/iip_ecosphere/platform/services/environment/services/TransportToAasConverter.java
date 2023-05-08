@@ -66,6 +66,8 @@ public abstract class TransportToAasConverter<T> {
     private long timeout = 20 * 60 * 1000; // cleanup after 20 minutes
     private long lastCleanup = System.currentTimeMillis();
     private long cleanupTimeout = 5 * 1000; // when the next cleanup shall be considered
+    private long aasFailedTimestamp = -1;
+    private long aasFailedTimeout = 30 * 1000;
     private TraceRecordReceptionCallback callback;
     private List<IOConsumer<T>> notifier = new ArrayList<>();
     private Supplier<Boolean> aasEnabledSupplier = () -> true;
@@ -266,7 +268,11 @@ public abstract class TransportToAasConverter<T> {
      */
     protected void handleNew(T data) {
         // add new record
-        if (isAasEnabled()) {
+        long now = System.currentTimeMillis();
+        if (isAasEnabled() && aasFailedTimestamp > 0 && now - aasFailedTimestamp < aasFailedTimeout) {
+            aasFailedTimestamp = -1; // allow for re-try
+        }
+        if (isAasEnabled() && aasFailedTimestamp < 0) {
             try {
                 if (null == aas) {
                     // do not populate, we just add/remove in this class
@@ -282,6 +288,7 @@ public abstract class TransportToAasConverter<T> {
                 cleanup(aas);
             } catch (IOException e) {
                 LoggerFactory.getLogger(getClass()).error("Cannot obtain AAS {}: {}", getAasUrn(), e.getMessage());
+                aasFailedTimestamp = now;
             }
         }
     }
