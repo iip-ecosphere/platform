@@ -657,7 +657,7 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
     /**
      * Returns the average response time for the execution in Python (without transport).
      * 
-     * @return the average response time
+     * @return the average response time (in nanoseconds)
      */
     public long getAvgResponseTime() {
         try {

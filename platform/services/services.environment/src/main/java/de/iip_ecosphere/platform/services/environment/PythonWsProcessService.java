@@ -302,7 +302,7 @@ class OutData {
     /**
      * Returns the time taken for processing in Python.
      * 
-     * @return the time in ms
+     * @return the elapsed time in ns
      */
     long getTime() {
         return time;
