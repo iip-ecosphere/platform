@@ -218,6 +218,19 @@
 	      <enabled>false</enabled>
 	    </snapshots>
 	</repository>
+	
+	<!-- not needed on Windows but Linux complains without -->
+	<repository>
+        <id>dcache</id>
+        <url>https://download.dcache.org/nexus/repository/berkeleydb-je/</url>
+        <releases>
+          <enabled>true</enabled>
+        </releases>
+        <snapshots>
+          <enabled>false</enabled>
+        </snapshots>
+    </repository>
+    
   </repositories>
   
   <pluginRepositories>
