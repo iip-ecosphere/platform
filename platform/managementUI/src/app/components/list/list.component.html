@@ -5,11 +5,10 @@
   <div *ngFor="let tab of tabsParam">
     <mat-tab label="{{tab.tabName}}">
       <ng-template mat-tab-label >
-        <span (click)="loadData(tab.metaProject, tab.type)" class="custom-label">
+        <span (click)="getDisplayData(tab.tabName, tab.metaProject, tab.submodelElement)" class="custom-label">
           {{tab.tabName}}
         </span>
       </ng-template>
-
 
       <div *ngIf="tab.tabName == 'Meshes'">
         <button mat-raised-button style="background-color: rgb(35, 142, 184)"
@@ -24,48 +23,20 @@
 
           <td style="width: 2%; text-align: center;"> {{i + 1}} </td>
 
-          <!-- Icons
-          <td  *ngIf="tab.tabName == 'Services'" class="cell-with-icon">
-            <div *ngIf=" getIcon(item.idShort) != null">
-              <img src={{getIcon(item.idShort)}} class="service-icon">
-            </div>
-          </td>
-          -->
-
           <!-- Item -->
           <td style="width: 100%;">
 
             <span class="row-title" >
               <span style="height: 5px; vertical-align: top; margin-right: 10px;">{{item.idShort}}</span>
-              <!--
-              <span *ngIf=" getIcon(item.idShort) != null" >
-                                <img src={{getIcon(item.idShort)}} class="service-icon">
-              </span>
-            -->
             </span>
+            <div *ngIf="item.logo">
+              <img src={{item.logo}} class="service-icon">
+            </div>
             <div *ngFor="let property of item.value" class="subtext" >
               <div *ngIf="property.value">
                 {{property.value}}
               </div>
             </div>
-
-
-            <!--  {{getName(item, item.value, "")}} -->
-
-            <!--
-            <div *ngFor="let property of item.value" class="subtext">
-              <p *ngIf="displayAttribute(property.idShort, tab.tabName)"> {{property.idShort}}:
-                <span *ngIf="property.value">{{property.value}}</span>
-              </p>
-            </div>
-            -->
-
-              <!--
-              <p> {{property.idShort}}:
-                <span *ngIf="property.value[0].value">{{property.value[0].value}}</span>
-              </p>
-
-              -->
           </td>
 
           <!-- Buttons -->
@@ -118,90 +89,6 @@
 </mat-tab-group>
 
 
-        <!-- TABLE
-        <table style="margin: 0px;">
-          <tr *ngFor="let item of data.value">
-
-            <td style="width: 100%;">{{item.idShort}}
-
-              <ng-container *ngIf="data.idShort == 'String'">
-                <div *ngFor="let val of item.value">
-                  <div *ngIf="val.value=='AllConstants'">
-                    <div *ngIf=></div>
-                    {{val.idShort}} : {{val.value}}
-                  </div>
-                </div>
-              </ng-container>
-
-              <div *ngIf="data.idShort == 'Application'">
-                <div *ngIf="item.value[5].idShort == 'name'">
-                  <div class="subtext"> {{item.value[5].value}}</div>
-                </div>
-                <div class="subtext">Version: {{item.value[0].value}}</div>
-              </div>
-              <div *ngIf="data.idShort == 'ServiceMesh'">
-                <div *ngIf="item.value[0].value">
-                  <div class="subtext"> {{item.value[0].value}}</div>
-                </div>
-              </div>
-
-              <div *ngIf="data.idShort == 'EndpointAddress'">
-                <div *ngIf="item.value[3].value && item.value[4].value">
-                  <div class="subtext">
-                    {{item.value[3].value}}:{{item.value[4].value}}
-                  </div>
-                </div>
-              </div>
-
-              <div *ngIf="data.idShort == 'Service'">
-                <div *ngIf="item.value[3].value">
-                  <div class="subtext"> {{item.value[3].value}}</div>
-                  <div class="subtext">
-                    version: {{item.value[22].value}}</div>
-                </div>
-              </div>
-            </td>
-            <td>
-              <div *ngIf="data.idShort == 'ServiceMesh'; else elseNotDone">
-                <button
-                  mat-raised-button style="background-color: rgb(35, 142, 184)"
-                  (click)="edit(item)">edit
-                </button>
-              </div>
-              <ng-template #elseNotDone>
-                <button
-                  mat-raised-button style="background-color: rgb(35, 142, 184)"
-                  (click)="edit(item)" disabled>edit
-                </button>
-              </ng-template>
-            </td>
-
-            <td  *ngIf="data.idShort == 'Application'">
-              <button
-                mat-raised-button style="background-color: rgb(35, 142, 184)"
-                (click)="createMesh()" disabled>generate interfaces
-              </button>
-            </td>
-            <td  *ngIf="data.idShort == 'Application'">
-              <button
-                mat-raised-button style="background-color: rgb(35, 142, 184)"
-                (click)="createMesh()" disabled>generate template
-              </button>
-            </td>
-            <td  *ngIf="data.idShort == 'Application'">
-              <button
-                mat-raised-button style="background-color: rgb(35, 142, 184)"
-                (click)="createMesh()" disabled>integrate application
-              </button>
-            </td>
-            <td>
-              <button
-                mat-raised-button style="background-color: rgb(97, 95, 96)"
-                (click)="del(item)" disabled>delete</button>
-            </td>
-          </tr>
-        </table>
-        -->
 
 
 
