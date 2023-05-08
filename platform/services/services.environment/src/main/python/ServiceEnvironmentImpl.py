@@ -19,6 +19,7 @@ import traceback
 
 sId = ""
 avgResponseTime = 0
+lastAsyncStart = []
 numberResponseTimeSamples = 0
 responseFunction = None # one arg, response data in respective format; returns response or None
 outStore = {}
@@ -28,7 +29,7 @@ def updateResponseTime(startTime):
     """ Update the global average response time
     
     Parameters:
-      - startTime -- start time measured by time.time()"""
+      - startTime -- start time measured by time.perf_counter()"""
 
     global numberResponseTimeSamples
     global avgResponseTime
@@ -39,6 +40,13 @@ def updateResponseTime(startTime):
     
     numberResponseTimeSamples += 1
     avgResponseTime = (avgResponseTime * (numberResponseTimeSamples - 1) + newValue) / numberResponseTimeSamples 
+
+def getAvgResponseTimeNs():
+    """ Returns the global average response time in nanoseconds
+    
+    Returns:
+      response time measured by time.time()"""
+    return avgResponseTime * 1000 * 1000
 
 def printStdout(text): 
     """ Use in here to write to stdout, independent whether redirected or not 
@@ -104,12 +112,12 @@ def start(a):
     
     global responseFunction
     if consoleMode:
-        responseFunction = consoleIngestResult
+        responseFunction = consoleSendResult
         ingestorFunction = consoleIngestResult
         sys.stdout = sys.stderr
     elif wsMode:
         sys.stdout = sys.stderr
-        responseFunction = wsIngestResult
+        responseFunction = wsSendResult
         ingestorFunction = wsIngestResult
 
     modulesPath = getArg(args.modulesPath)
@@ -206,14 +214,14 @@ def processRequest(sId, type, data):
                 func = Registry.asyncTransformers.get(funcId)
                 startTime = time.perf_counter()
                 if func:
+                    lastAsyncStart.append(startTime)
                     func(d) #ingestor takes result
-                    updateResponseTime(startTime)
                 else:
                     func = Registry.syncTransformers.get(funcId)
-                    updateResponseTime(startTime)
                     if func:
                         global responseFunction
                         responseFunction(func(d))
+                        updateResponseTime(startTime)
     except Exception as err:
         sys.stderr.write("Exception/error in service:\n")
         sys.stderr.write(str(err)+"\n")        
@@ -221,20 +229,26 @@ def processRequest(sId, type, data):
 
 # console mode
 
-def consoleIngestResult(data): 
+def consoleSendResult(data): 
     result = None
     typeInfo = Registry.types.get(type(data))
     if typeInfo:
         serializer = Registry.serializers.get(typeInfo)
         if serializer:
             global avgResponseTime
-            result = typeInfo + "|" + str(int(avgResponseTime)) + "|" + serializer.writeTo(data)
+            result = typeInfo + "|" + str(int(getAvgResponseTimeNs())) + "|" + serializer.writeTo(data)
             printStdout(result)
             flushStdout()
     else: # assume client-server-communication
         result = "*SERVER|0|" + base64.b64encode(data).decode('utf-8')
         printStdout(result)
         flushStdout()
+
+def consoleIngestResult(data): 
+    consoleSendResult(data)
+    global lastAsyncStart
+    if len(lastAsyncStart) > 0:
+        updateResponseTime(lastAsyncStart.pop())
 
 def console(a, data, sId):
     """ Starts the command line based service environment
@@ -267,6 +281,12 @@ def consoleProcess(composedData, sId):
 # WS parts
 
 def wsIngestResult(data): 
+    wsSendResult(data)
+    global lastAsyncStart
+    if len(lastAsyncStart) > 0:
+        updateResponseTime(lastAsyncStart.pop())
+
+def wsSendResult(data): 
     result = None
     typeInfo = Registry.types.get(type(data))
     if typeInfo:
@@ -275,7 +295,7 @@ def wsIngestResult(data):
             global avgResponseTime
             result = {}
             result["type"] = typeInfo
-            result["time"] = avgResponseTime
+            result["time"] = getAvgResponseTimeNs()
             result["data"] = serializer.writeTo(data)
     else: # assume client-server-communication
             result = {}
@@ -300,7 +320,7 @@ async def wsHandler(ws):
                 global sId
                 result = processRequest(sId, data["type"], data["data"])
                 if result:
-                    wsIngestResult(result)
+                    wsSendResult(result)
         except Exception as err:
             sys.stderr.write("Exception/error in service:\n")
             sys.stderr.write(str(err)+"\n")
