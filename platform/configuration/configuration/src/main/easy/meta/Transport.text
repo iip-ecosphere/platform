@@ -8,6 +8,7 @@ Transport::TransportProtocol::security = The security settings of the protocol.
 Transport::TransportProtocol::type = The type of the protocol to enable comparisons.
 Transport::TransportProtocol::brokerVer = Maven version of the (instantiated default) broker to use.
 Transport::TransportProtocol::actionTimeout = Timeout for protocol operations in ms.
+Transport::TransportProtocol::memLimit = Process memory limit in MBytes, e.g. for JVM 
 Transport::TransportProtocol::actionTimeoutValid = The timeout for protocol operations must be given and a positive value.
 Transport::TransportProtocolAMQP::type = The redefined protocol type for AMQP assigning a default value.
 Transport::TransportProtocolAMQP::brokerVer = (Refined) Maven version of the (instantiated default) broker to use.

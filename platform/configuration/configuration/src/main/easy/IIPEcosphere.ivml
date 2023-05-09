@@ -3,6 +3,7 @@ project IIPEcosphere {
     import UI; 
     
     annotate BindingTime bindingTime = BindingTime::compile to .;
+    annotate String semanticId = "" to .;
     
     String javaModuleOpts = "--add-opens java.base/jdk.internal.misc=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED";
     String javaOpts = "-Dio.netty.tryReflectionSetAccessible=true -Dlog4j2.formatMsgNoLookups=true";
@@ -23,6 +24,9 @@ project IIPEcosphere {
     String modelName = "PlatformConfiguration";
     Boolean containerGeneration = true; // To generate or skip the creation of all containers.
     Boolean platformContainerGeneration = true; // To generate or skip the Platform container creation.
+    assign (semanticId = Eclass_Unit_MByte) to {
+        Integer centralMemLimit = 256; // general memory limit for central platform services, e.g., JVM memory limit in MBytes
+    }
     
     // legacy transition (to be removed)
     Boolean sharedInterfaces = false;

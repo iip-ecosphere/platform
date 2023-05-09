@@ -27,7 +27,7 @@ template LinuxSysd(Configuration config, FileArtifact target, String dir, String
         Restart=on-failure
         KillMode=control-group
         PIDFile=${cfg.pidDir}/${pidFile}
-        ExecStart=${javaExe} -cp "${dir}/*:common/*" ${javaOpts(cfg, withModuleOpts)} -Diip.pid.dir=${cfg.pidDir} "${main}"
+        ExecStart=${javaExe} -cp "${dir}/*:common/*" ${javaOpts(cfg, withModuleOpts, addJavaOpts)} -Diip.pid.dir=${cfg.pidDir} "${main}"
         
         [Install]
         WantedBy=multi-user.target'

@@ -2,9 +2,9 @@ import MqttBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template MqttLinux(IIPEcosphere config, FileArtifact target) {
+template MqttLinux(IIPEcosphere config, FileArtifact target, String addJavaOpts="") {
 	
-    def main(IIPEcosphere config, FileArtifact target) {
+    def main(IIPEcosphere config, FileArtifact target, String addJavaOpts="") {
         Integer port = config.transportProtocol.port;
         String host = getHostOpt(config);
         '#!/bin/bash
@@ -14,7 +14,7 @@ template MqttLinux(IIPEcosphere config, FileArtifact target) {
           PORT=$1
         fi        
         echo "This Broker requires at least Java 11!"
-        java -cp "brokerJars/*" test.de.iip_ecosphere.platform.test.mqtt.hivemq.TestHiveMqServer \\$PORT ${host} \\$*'
+        java ${addJavaOpts} -cp "brokerJars/*" test.de.iip_ecosphere.platform.test.mqtt.hivemq.TestHiveMqServer \\$PORT ${host} \\$*'
     }
 	
 }
