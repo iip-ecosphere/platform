@@ -155,6 +155,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 assemblies.add("spring|${assemblyRel}/spring.xml|package|${mvnProjectBuildDir}");
                 vilTemplateProcessor("JavaLogbackXml", config, "${resourcesSrc}/logback.xml");
                 identityStoreJsl(resourcesSrc, cfg);
+                deviceIdProviderJsl(resourcesSrc, cfg);
     
                 if (not(cfg.sharedInterfaces)) {
                     vilTemplateProcessor("JavaInterfaceAssembly", config, "${assemblySrc}/javaInterfaces.xml");
