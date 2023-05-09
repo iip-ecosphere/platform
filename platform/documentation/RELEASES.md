@@ -22,7 +22,6 @@ In progress:
 * [#70](https://github.com/iip-ecosphere/platform/issues/70): UI progress reporting 
 * [#117](https://github.com/iip-ecosphere/platform/issues/117): Multiple service managers per device
 * [#146](https://github.com/iip-ecosphere/platform/issues/146): UI editors for configuration tables
-* [#145](https://github.com/iip-ecosphere/platform/issues/145): UI table for nameplate configurations
 * [#144](https://github.com/iip-ecosphere/platform/issues/144): Deployment plans and application instances
 * [#143](https://github.com/iip-ecosphere/platform/issues/143): Container testing mode(s)
 * [#141](https://github.com/iip-ecosphere/platform/issues/141): Fix AppAAS performance/resource consumption issue
@@ -37,6 +36,7 @@ New features:
 * [#142](https://github.com/iip-ecosphere/platform/issues/142): AAS resilience for ECS-Runtime/Service Manager
 * [#107](https://github.com/iip-ecosphere/platform/issues/107): Platform installation scripts
 * [#56](https://github.com/iip-ecosphere/platform/issues/56): Network-based integration protocol for Python service environment (websockets)
+* [#145](https://github.com/iip-ecosphere/platform/issues/145): UI table for nameplate configurations
 * Generic time series data aggregator in data functions
 * Application intercommunication support (`AppIntercom`)
 * [#132](https://github.com/iip-ecosphere/platform/issues/132): Bitmotec system monitoring integration
