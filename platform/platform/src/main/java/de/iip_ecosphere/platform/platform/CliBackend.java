@@ -509,6 +509,11 @@ class CliBackend {
         ServiceDeploymentPlan p = loadPlan(plan);
         String appInstanceId = null;
         try {
+            TaskData taskData = TaskRegistry.getTaskData();
+            if (null != taskData) {
+                int numServices = p.getAssignments().stream().mapToInt(a -> a.getServices().size()).sum();
+                taskData.setMaxEventCount(2 * numServices); // two events per service
+            }
             if (!p.isMultiExecution()) {
                 ApplicationInstancesAasClient cl = new ApplicationInstancesAasClient();
                 if (cl.getInstanceCount(p.getAppId(), p.getId()) > 0) {
@@ -610,6 +615,10 @@ class CliBackend {
             Map<String, Integer> stillRunning = new HashMap<>();
             List<ServiceResourceAssignment> assignments = new ArrayList<>(p.getAssignments());
             Collections.reverse(assignments);
+            TaskData taskData = TaskRegistry.getTaskData();
+            if (null != taskData) {
+                taskData.setMaxEventCount(assignments.size()); // simplified for now
+            }
             for (ServiceResourceAssignment a: assignments) {
                 println("Obtaining AAS client for " + a.getResource() + " " + p.getAppId());
                 ServicesClient client = getServicesFactory().create(a.getResource(), p.getAppId());
@@ -622,9 +631,8 @@ class CliBackend {
                     running += Math.max(client.getServiceInstanceCount(services[i]) - 1, 0); // stopping one
                 }
                 stillRunning.put(a.getResource(), running);
-                TaskData data = TaskRegistry.getTaskData();
-                if (null != data) {
-                    client.stopServiceAsTask(data.getId(), services);
+                if (null != taskData) {
+                    client.stopServiceAsTask(taskData.getId(), services);
                 } else {
                     client.stopService(services);
                 }
