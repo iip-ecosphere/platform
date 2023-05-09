@@ -97,8 +97,8 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     public static final String OP_GEN_APPS_NO_DEPS = "genAppsNoDepsAsync";
     public static final String OP_GEN_APPS = "genAppsAsync";
     
-    public static final Predicate<IDecisionVariable> FILTER_NO_CONSTRAINT_VARIABLES = 
-        v -> !TypeQueries.isConstraint(v.getDeclaration().getType());
+    public static final Predicate<AbstractVariable> FILTER_NO_CONSTRAINT_VARIABLES = 
+        v -> !TypeQueries.isConstraint(v.getType());
     public static final String META_TYPE_NAME = "meta";
     public static final Function<String, String> SHORTID_PREFIX_META = n -> "meta" + PseudoString.firstToUpperCase(n);
     protected static final String PRJ_NAME_ALLSERVICES = "AllServices";
@@ -110,7 +110,9 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
 
     private Supplier<Configuration> cfgSupplier;
     private Function<String, String> metaShortId = SHORTID_PREFIX_META;
-    private Predicate<IDecisionVariable> variableFilter = FILTER_NO_CONSTRAINT_VARIABLES;
+    private Predicate<AbstractVariable> variableFilter = FILTER_NO_CONSTRAINT_VARIABLES;
+    private Set<String> doneTypes = new HashSet<>();
+    private Map<String, SubmodelElementCollectionBuilder> types = new HashMap<>();
     
     static {
         Map<String, String> parentMap = new HashMap<>();
@@ -175,7 +177,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
      * 
      * @param variableFilter the predicate, ignored if <b>null</b>
      */
-    public void setVariableFilter(Predicate<IDecisionVariable> variableFilter) {
+    public void setVariableFilter(Predicate<AbstractVariable> variableFilter) {
         if (null != variableFilter) {
             this.variableFilter = variableFilter;
         }
@@ -188,7 +190,6 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
      * @param iCreator the invocables creator for operations
      */
     public void mapByType(SubmodelBuilder smBuilder, InvocablesCreator iCreator) {
-        Map<String, SubmodelElementCollectionBuilder> types = new HashMap<>();
         Configuration cfg = cfgSupplier.get();
         if (null != cfg) { // as long as we are in transition from platform without contained model to this
             types.put(META_TYPE_NAME, createTypeCollectionBuilder(smBuilder, META_TYPE_NAME));
@@ -200,7 +201,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             Iterator<IDecisionVariable> iter = cfg.getConfiguration().iterator();
             while (iter.hasNext()) {
                 IDecisionVariable var = iter.next();
-                if (variableFilter.test(var)) {
+                if (variableFilter.test(var.getDeclaration())) {
                     IDatatype type = var.getDeclaration().getType();
                     if (primitiveType != null && primitiveType.isAssignableFrom(type)) {
                         type = primitiveType; // group them together to simplify the AAS structure
@@ -208,8 +209,6 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                     String typeName = IvmlDatatypeVisitor.getUnqualifiedType(mapType(type));
                     SubmodelElementCollectionBuilder builder = types.get(typeName);
                     if (null == builder) {
-                        builder = types.get(META_TYPE_NAME);
-                        mapType(var, builder);
                         builder = createTypeCollectionBuilder(smBuilder, typeName);
                         types.put(typeName, builder);
                     }
@@ -933,9 +932,9 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
      * Maps a type into the SMEC {@value #META_TYPE_NAME}.
      * 
      * @param var the variable to map
-     * @param builder the builder for {@link #META_TYPE_NAME}
      */
-    void mapType(IDecisionVariable var, SubmodelElementCollectionBuilder builder) {
+    void mapType(IDecisionVariable var) {
+        SubmodelElementCollectionBuilder builder = types.get(META_TYPE_NAME);
         IDatatype type;
         Value val = var.getValue();
         if (null != val && NullValue.VALUE != val) {
@@ -943,14 +942,64 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         } else {
             type = var.getDeclaration().getType();
         }
+        mapType(type, builder);
+    }
+
+    /**
+     * Maps an IVML type into the SMEC {@value #META_TYPE_NAME}. May be called for duplicates but leads only to
+     * one entry.
+     * 
+     * @param type the IVML type
+     * @param builder the builder for {@link #META_TYPE_NAME}
+     */
+    void mapType(IDatatype type, SubmodelElementCollectionBuilder builder) {
         type = Reference.dereference(type);
-        type = DerivedDatatype.resolveToBasis(type);
-        if (type instanceof Container) {
-            type = ((Container) type).getContainedType();
+        if (type instanceof DerivedDatatype) {
+            mapDerivedType((DerivedDatatype) type, builder);
+        } else {
+            if (type instanceof Container) {
+                type = ((Container) type).getContainedType();
+            }
+            if (type instanceof Compound) {
+                mapCompoundType((Compound) type, builder);
+            }
         }
-        if (type instanceof Compound) {
-            mapCompoundType((Compound) type, builder);
+    }
+    
+    /**
+     * Returns whether {@code typeId} represents a done type (in {@link #doneTypes}). If not, adds {@cpde typeId} 
+     * to {@link #doneTypes}.
+     * 
+     * @param typeId the type id to search for
+     * @return {@code true} if the type is considered as done, {@code false} else
+     */
+    private boolean isDoneType(String typeId) {
+        boolean known = doneTypes.contains(typeId);
+        if (!known) {
+            doneTypes.add(typeId);
         }
+        return known;
+    }
+
+    /**
+     * Maps a derived type into the SMEC {@value #META_TYPE_NAME}. May be called for duplicates but leads only to
+     * one entry.
+     * 
+     * @param type the derived type
+     * @param builder the builder for {@link #META_TYPE_NAME}
+     */
+    private void mapDerivedType(DerivedDatatype type, SubmodelElementCollectionBuilder builder) {
+        String typeId = AasUtils.fixId(type.getName());
+        IDatatype baseType = type.getBasisType();
+        if (!isDoneType(typeId)) {
+            SubmodelElementCollectionBuilder typeB = builder.createSubmodelElementCollectionBuilder(
+                    typeId, false, false);
+            typeB.createPropertyBuilder(SHORTID_PREFIX_META.apply("refines"))
+                .setValue(Type.STRING, IvmlDatatypeVisitor.getUnqualifiedType(baseType))
+                .build();
+            typeB.build();
+        }
+        mapType(baseType, builder);
     }
 
     /**
@@ -960,31 +1009,54 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
      * @param type the compound type
      * @param builder the builder for {@link #META_TYPE_NAME}
      */
-    void mapCompoundType(Compound type, SubmodelElementCollectionBuilder builder) {
+    private void mapCompoundType(Compound type, SubmodelElementCollectionBuilder builder) {
         String typeId = AasUtils.fixId(type.getName());
-        if (!builder.hasElement(typeId)) {
+        if (!isDoneType(typeId)) {
             SubmodelElementCollectionBuilder typeB = builder.createSubmodelElementCollectionBuilder(
                 typeId, false, false);
             String lang = getLang();
-            Set<String> done = new HashSet<>();
+            Set<String> doneSlots = new HashSet<>();
             for (int i = 0; i < type.getInheritedElementCount(); i++) {
                 DecisionVariableDeclaration slot = type.getInheritedElement(i);
                 // if we get into trouble with property ids, we have to sub-structure that
                 String slotName = AasUtils.fixId(slot.getName());
-                if (!done.contains(slotName)) {
-                    done.add(slotName);
+                if (!doneSlots.contains(slotName) && variableFilter.test(slot)) {
+                    doneSlots.add(slotName);
                     IDatatype slotType = slot.getType();
                     typeB.createPropertyBuilder(slotName)
                         .setValue(Type.STRING, IvmlDatatypeVisitor.getUnqualifiedType(slotType))
                         .setDescription(new LangString(ModelInfo.getCommentSafe(slot), lang))
                         .build();
-                    if (slotType instanceof Compound) {
-                        mapCompoundType((Compound) slotType, builder);
+                    if (slotType != type) {
+                        mapType(slotType, builder);
                     }
                 }
             }
+            typeB.createPropertyBuilder(SHORTID_PREFIX_META.apply("abstract"))
+                .setValue(Type.BOOLEAN, type.isAbstract())
+                .build();
+            typeB.createPropertyBuilder(SHORTID_PREFIX_META.apply("refines"))
+                .setValue(Type.STRING, getRefines(type))
+                .build();
             typeB.build();
         }
+    }
+
+    /**
+     * Returns the refined type of {@code type} as comma-separated string list.
+     * 
+     * @param type the type to refine
+     * @return the refined types
+     */
+    private static String getRefines(Compound type) {
+        String result = "";
+        for (int i = 0; i < type.getRefinesCount(); i++) {
+            if (result.length() > 0) {
+                result += ", ";
+            }
+            result += IvmlDatatypeVisitor.getUnqualifiedType(type.getRefines(i));
+        }
+        return result;
     }
     
     /**
@@ -1005,7 +1077,8 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
      *     the variable name
      */
     void mapVariable(IDecisionVariable var, SubmodelElementCollectionBuilder builder, String id) {
-        if (variableFilter.test(var)) {
+        if (variableFilter.test(var.getDeclaration())) {
+            mapType(var);
             AbstractVariable decl = var.getDeclaration();
             String varName = decl.getName();
             IDatatype varType = decl.getType();
