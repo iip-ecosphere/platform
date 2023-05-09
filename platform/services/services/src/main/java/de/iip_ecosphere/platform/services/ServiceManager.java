@@ -31,6 +31,8 @@ import java.util.concurrent.ExecutionException;
  */
 public interface ServiceManager extends ServiceOperations {
 
+    public static final String PROGRESS_COMPONENT_ID = "Service Manager";
+
     /**
      * Clones the artifact. As services belong to artifacts, it is not possible to migrate a single service (except
      * for if the artifact consists of a single service). [adaptation]
