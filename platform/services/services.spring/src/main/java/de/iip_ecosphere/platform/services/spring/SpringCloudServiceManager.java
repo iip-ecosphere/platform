@@ -77,7 +77,6 @@ public class SpringCloudServiceManager
     extends AbstractServiceManager<SpringCloudArtifactDescriptor, SpringCloudServiceDescriptor> {
 
     public static final String OPT_SERVICE_PREFIX = "iip.service.";
-    private static final String PROGRESS_COMPONENT_ID = "Spring Cloud Service Manager";
     private static final Logger LOGGER = LoggerFactory.getLogger(SpringCloudServiceManager.class);
     private ServerManager serverManager;
     private Predicate<TypedDataConnectorDescriptor> available = c -> true;
