@@ -21,7 +21,7 @@ project Nameplate {
 
     Manufacturer manufacturer_l3s = {
         manufacturerName = "Universitaet Hannover@de",
-        manufacturerLogo = "SSE-Logo.png",
+        manufacturerLogo = "L3S-Logo.png",
         address = {
             department = "Forschungszentrum L3S@de",
             street = "Appelstraße 9a@de",

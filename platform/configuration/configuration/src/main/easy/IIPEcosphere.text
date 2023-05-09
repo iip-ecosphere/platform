@@ -20,3 +20,4 @@ IIPEcosphere::sharedInterfaces = Generate application interfaces into applicatio
 IIPEcosphere::containerGeneration = Generate or skip the creation of all containers (default true).
 IIPEcosphere::platformContainerGeneration = Generate or skip the Platform container creation (default true).
 IIPEcosphere::centralMemLimit = Memory limit for central platform services, e.g., JVM memory limit in MBytes
+IIPEcosphere::monitoringMemLimit = Memory limit for central monitoring service, e.g., JVM memory limit in MBytes

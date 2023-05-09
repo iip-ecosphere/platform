@@ -1119,7 +1119,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         vilTemplateProcessor("PlatformMvn", config, "${monitoringRoot}/pom.xml", dir="monJars", main=dfltMain, tests=tests, monitoring=true);
         mvn(monitoringRoot);
         generateOsScripts(config, "${target}/monitoring", "monJars", dfltMain, "IIP-Ecosphere Platform Monitoring Services", "iip-monitoring", "iip-platform.service", 
-            sysd="${target}/iip-monitoring", addJavaOpts=toJvmMemLimitOpt(cfg.centralMemLimit));
+            sysd="${target}/iip-monitoring", addJavaOpts=toJvmMemLimitOpt(cfg.monitoringMemLimit));
  
         artifactsRoot.mkdir();
         commonRoot.mkdir();
