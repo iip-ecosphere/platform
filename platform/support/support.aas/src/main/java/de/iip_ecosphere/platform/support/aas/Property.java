@@ -13,6 +13,7 @@
 package de.iip_ecosphere.platform.support.aas;
 
 import java.io.Serializable;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -165,5 +166,12 @@ public interface Property extends Element, DataElement {
      * @throws ExecutionException if accessing the value fails
      */
     public void setValue(Object value) throws ExecutionException;
+
+    /**
+     * Returns the description of this property, potentially in different languages.
+     * 
+     * @return the description, may be empty or <b>null</b>
+     */
+    public Map<String, LangString> getDescription();
     
 }

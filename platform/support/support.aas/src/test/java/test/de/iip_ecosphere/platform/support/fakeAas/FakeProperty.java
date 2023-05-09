@@ -12,6 +12,9 @@
 
 package test.de.iip_ecosphere.platform.support.fakeAas;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -34,6 +37,7 @@ public class FakeProperty extends FakeElement implements Property {
     private Type type;
     @SuppressWarnings("unused")
     private String semanticId;
+    private Map<String, LangString> description;
     
     /**
      * A fake property builder.
@@ -104,7 +108,14 @@ public class FakeProperty extends FakeElement implements Property {
 
         @Override
         public PropertyBuilder setDescription(LangString... description) {
-            // we just ignore this here
+            if (description.length > 0) {
+                instance.description = new HashMap<>();
+                for (LangString d : description) {
+                    instance.description.put(d.getLanguage(), d);
+                }
+            } else {
+                instance.description = null;
+            }
             return this;
         }
         
@@ -137,6 +148,11 @@ public class FakeProperty extends FakeElement implements Property {
     @Override
     public String getSemanticId(boolean stripPrefix) {
         return semanticId;
+    }
+
+    @Override
+    public Map<String, LangString> getDescription() {
+        return Collections.unmodifiableMap(description);
     }
 
 }

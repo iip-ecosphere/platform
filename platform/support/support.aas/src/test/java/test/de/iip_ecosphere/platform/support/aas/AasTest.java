@@ -15,6 +15,7 @@ package test.de.iip_ecosphere.platform.support.aas;
 import java.io.IOException;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import org.junit.Test;
@@ -82,6 +83,8 @@ public class AasTest {
 
     private static final ServerAddress VAB_SERVER = new ServerAddress(Schema.HTTP); // localhost, ephemeral
     private static final String URN_AAS = "urn:::AAS:::testMachines#";
+    
+    private static final LangString DESCRIPTION = new LangString("en", "A description");
     
     static {
         QNAME_VAR_LOTSIZE = NAME_SUBMODEL + "/" + NAME_VAR_LOTSIZE;
@@ -275,7 +278,7 @@ public class AasTest {
             .deploy(aas)
             .createServer()
             .start();
-        
+
         queryAas(registryEndpoint, machine);
         httpServer.stop(true);
         ccServer.stop(true);
@@ -309,7 +312,8 @@ public class AasTest {
             NAME_SUBMODELC_OUTER, false, true);
         SubmodelElementCollectionBuilder smcBuilderInner = smcBuilderOuter.createSubmodelElementCollectionBuilder(
             NAME_SUBMODELC_INNER, false, true);
-        smcBuilderInner.createPropertyBuilder(NAME_VAR_SUBMODELC_INNER_VAR).setType(Type.AAS_INTEGER).build();
+        smcBuilderInner.createPropertyBuilder(NAME_VAR_SUBMODELC_INNER_VAR).setType(Type.AAS_INTEGER)
+            .setDescription(DESCRIPTION).build();
         smcBuilderInner.createPropertyBuilder(NAME_VAR_SUBMODELC_INNER_INT).setValue(Type.INTEGER, 1).build();
         ReferenceElement re = smcBuilderInner.createReferenceElementBuilder(NAME_VAR_SUBMODELC_INNER_REF)
             .setValue(subModelBuilderRef).build();
@@ -495,6 +499,7 @@ public class AasTest {
         SubmodelElementCollection secInner = secOuter.getSubmodelElementCollection(NAME_SUBMODELC_INNER);
         Assert.assertNotNull(secInner);
         Assert.assertNotNull(secInner.getProperty(NAME_VAR_SUBMODELC_INNER_VAR));
+        assertDescription(secInner.getProperty(NAME_VAR_SUBMODELC_INNER_VAR), DESCRIPTION);
         Assert.assertNotNull(secInner.getProperty(NAME_VAR_SUBMODELC_INNER_INT));
         Assert.assertEquals(1, secInner.getProperty(NAME_VAR_SUBMODELC_INNER_INT).getValue());
         Assert.assertNotNull(secInner.getReferenceElement(NAME_VAR_SUBMODELC_INNER_REF));
@@ -519,13 +524,32 @@ public class AasTest {
         
         subm.getSubmodelElementCollection("conn_coll3").deleteElement("cc3_1");
         Assert.assertNull(subm.getSubmodelElementCollection("conn_coll3").getSubmodelElementCollection("cc3_1"));
-        
         aas.accept(new AasPrintVisitor()); // assert the accepts
         
         Aas aas2 = reg.retrieveAas(reg.getEndpoint(aas));
         Assert.assertNotNull(aas2);
         Assert.assertEquals(aas2.getIdShort(), aas.getIdShort());
         Assert.assertNull(reg.retrieveAas("http://me.here.de/aas"));
+    }
+    
+    /**
+     * Asserts the description of {@code prop}.
+     * 
+     * @param prop the property to assert
+     * @param expected the expected lang strings
+     */
+    private static void assertDescription(Property prop, LangString... expected) {
+        Map<String, LangString> value = prop.getDescription();
+        if (expected.length == 0) {
+            Assert.assertTrue(value == null || value.size() == 0);
+        } else {
+            for (LangString l : expected) {
+                Assert.assertTrue(value.containsKey(l.getLanguage()));
+                LangString v = value.get(l.getLanguage());
+                Assert.assertEquals(l.getLanguage(), v.getLanguage());
+                Assert.assertEquals(l.getDescription(), v.getDescription());
+            }
+        }
     }
 
     /**
