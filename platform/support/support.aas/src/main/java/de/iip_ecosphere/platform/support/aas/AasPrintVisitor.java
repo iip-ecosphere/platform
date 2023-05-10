@@ -86,7 +86,13 @@ public class AasPrintVisitor implements AasVisitor {
         } catch (ExecutionException e) {
             value = "?";
         }
-        log("PROPERTY " + property.getIdShort() + " = " + value);
+        String semId = property.getSemanticId();
+        if (null == semId) {
+            semId = "";
+        } else {
+            semId = " (semanticId: " + semId + ")";
+        }
+        log("PROPERTY " + property.getIdShort() + " = " + value + semId);
     }
 
     @Override
