@@ -31,7 +31,10 @@ export class InstancesComponent implements OnInit {
     console.log(data);
     if(data) {
       for(const element of data) {
-        this.filteredData.push(element);
+        if(element.value && element.value.length > 1) {
+          this.filteredData.push(element);
+        }
+
       }
     }
   }
