@@ -117,7 +117,7 @@ project ExampleHm22Install {
         alertMgrPort = 9091,
         alertMgrHost = platformServer,
         alertMgrRunning = false,
-        scrapeInterval = 1000,
+        scrapeInterval = 1001,
         scrapeTimeout = 1000
     };
     
