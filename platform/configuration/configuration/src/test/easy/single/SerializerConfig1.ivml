@@ -312,7 +312,7 @@ project SerializerConfig1 {
         alertMgrPort = 9091,
         alertMgrHost = "127.0.0.1",
         alertMgrRunning = false,
-        scrapeInterval = 1000,
+        scrapeInterval = 1001,
         scrapeTimeout = 1000
     };
     
