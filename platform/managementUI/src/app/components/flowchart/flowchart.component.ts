@@ -115,6 +115,29 @@ export class FlowchartComponent implements OnInit {
 
   }
 
+  public assignIcon(type: string, htmlTag?: boolean) {
+    type = type.toLowerCase();
+    let icon: string = '';
+    let iconHtml = '';
+    if(type.includes("java")) {
+      icon = "../../../assets/java.png";
+    } else if(type.includes("flower")) {
+      icon = "../../../assets/flower.png";
+    } else if(type.includes("opc")) {
+      icon = "../../../assets/opc.png";
+    } else if(type.includes("mqtt")) {
+      icon = "../../../assets/mqtt.png";
+    } else if(type.includes("py")) {
+      icon = "../../../assets/py.png";
+    }
+    if(icon != '' && htmlTag) {
+      iconHtml= "<img src=\""+ icon +"\" height=\"25px\">";
+    } else if(icon != '') {
+      iconHtml= icon;
+    }
+    return iconHtml;
+  }
+
   public zoomIn() {
     this.editor.zoom_in();
 
@@ -178,24 +201,7 @@ export class FlowchartComponent implements OnInit {
           }
         }
 
-        let icon="";
-        let type= a.data.type as string;
-        type = type.toLowerCase();
-        let iconHtml="";
-        if(type.includes("java")) {
-          icon = "../../../assets/java.png";
-        } else if(type.includes("flower")) {
-          icon = "../../../assets/flower.png";
-        } else if(type.includes("opc")) {
-          icon = "../../../assets/opc.png";
-        } else if(type.includes("mqtt")) {
-          icon = "../../../assets/mqtt.png";
-        } else if(type.includes("py")) {
-          icon = "../../../assets/py.png";
-        }
-        if(icon != "") {
-          iconHtml= "<img src=\""+ icon +"\" height=\"25px\">";
-        }
+        let iconHtml= this.assignIcon(a.data.type as string, true);
 
         a.html = "<div style=\"width:100%;\">" +
           "<table style=\"width:100%; margin-top: 0px\"><tr><td style=\"background-color:rgb(247,247,247)\"><div style=\"text-align: left\">"

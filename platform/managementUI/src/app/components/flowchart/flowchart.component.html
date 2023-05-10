@@ -16,9 +16,8 @@
         <div *ngFor="let service of services.value">
           <mat-card *ngIf="!isMeta(service.idShort)" class="element">
             <mat-card-title *ngIf="service.idShort">
-              <div class="row-title">
-                {{ getId(service.value) }}
-              </div>
+              {{ getId(service.value) }}
+              <img [src]=assignIcon(getId(service.value)) height="25px" >
             </mat-card-title>
             <mat-card-content>
               <div *ngFor="let property of service.value">
