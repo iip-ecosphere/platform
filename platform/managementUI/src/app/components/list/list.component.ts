@@ -16,16 +16,11 @@ import { MAT_PROGRESS_SPINNER_DEFAULT_OPTIONS_FACTORY } from '@angular/material/
 export class ListComponent implements OnInit {
   ip: string = "";
   urn: string = "";
-  tab: string | null = null;
-  data: any;
+  currentTab: string | null = null;
+  rawData: any;
   filteredData: any;
   varValue = "varValue"
-  //displayAttributes = ["varValue"]
-  //attrServices = ["name"]
-  //helper = 1;
-  //noData: boolean = false;
-  //unwantedTypes = ["metaState", "metaType", "metaProject", "metaAas"];
-  //dataToDisplay: any;
+  imgPath = "../../../assets/"
 
   constructor(private router: Router,
     private route: ActivatedRoute,
@@ -42,17 +37,22 @@ export class ListComponent implements OnInit {
       }
     }
 
+  // Filter ---------------------------------------------------------------------
+  // Information how the raw data for a given tab should be filtered:
+  // with the metaProject or with a name of the submodelElement
   tabsParam = [
-    {tabName: "Setup", metaProject:"TechnicalSetup", type:null},
-    {tabName: "Constants", metaProject:"AllConstants", type:null},
-    {tabName: "Types", metaProject:"AllTypes", type:null},
-    {tabName: "Services", metaProject:null, type:"ServiceBase"},
-    {tabName: "Servers", metaProject:null, type:"Server"},
-    {tabName: "Meshes", metaProject:null, type:"ServiceMesh"},
-    {tabName: "Applications", metaProject:null, type:"Application"}
+    {tabName: "Setup", metaProject:"TechnicalSetup", submodelElement:null},
+    {tabName: "Constants", metaProject:"AllConstants", submodelElement:null},
+    {tabName: "Types", metaProject:"AllTypes", submodelElement:null},
+    {tabName: "Nameplates", metaProject:null, submodelElement:"Manufacturer"},
+    {tabName: "Services", metaProject:null, submodelElement:"ServiceBase"},
+    {tabName: "Servers", metaProject:null, submodelElement:"Server"},
+    {tabName: "Meshes", metaProject:null, submodelElement:"ServiceMesh"},
+    {tabName: "Applications", metaProject:null, submodelElement:"Application"}
   ]
 
-  params = [
+  // Display ---------------------------------------------------------------------
+  paramToDisplay = [
     ["ver", "Version: ", ""],
     ["name", "", ""],
     //["kind", "", ""],
@@ -63,45 +63,45 @@ export class ListComponent implements OnInit {
    // ["running", "Running: ", ""],
     ["schema", "Schema: ", ""],
     ["waitingTime", "Waiting time: ", " sec"],
-    ["type", "Type: ", ""]
+    ["type", "Type: ", ""],
+    ["manufacturerLogo", "", ""],
+    ["address", "Address: ", ""]
   ]
+
+  //addressParams = ["department", "street"] TODO loe
 
   ngOnInit(): void {
   }
 
-  // TODO change string | null to any
-  public async loadData(metaProject: string | null, type: string | null) {
-    if (type) {
-      this.tab = type //TODO make it more elegant
-      this.data = await this.getData(type);
-      this.filteredData = this.data.value
-    } else {
-      this.tab = metaProject // TODO
-      this.data = await this.getData("")
-      this.prefilter(metaProject)
-    }
+  public async getDisplayData(tabName:string, metaProject: string | null, submodelElement: string | null) {
+    this.currentTab = tabName
 
-    switch(this.tab) {
-      case "TechnicalSetup":
-      //case this.tab:
+    await this.loadData(metaProject, submodelElement)
+
+    // filter
+    switch(this.currentTab) {
+      case "Setup":
         this.filterSetup();
         break;
-      case "AllConstants":
+      case "Constants":
         this.filterConstants();
         break;
-      case "AllTypes":
+      case "Types":
         this.filterTypes();
         break;
-      case "ServiceBase":
+      case "Nameplates":
+        this.filterManufacturer();
+        break;
+      case "Services":
         this.filterServices();
         break;
-      case "Server":
+      case "Servers":
         this.filterServices();
         break;
-    case "ServiceMesh":
+    case "Meshes":
         this.filterMeshes();
         break;
-    case "Application":
+    case "Applications":
         this.filterServices();
         break;
     default:
@@ -109,14 +109,29 @@ export class ListComponent implements OnInit {
     }
   }
 
-  public async getData(type: string) {
+  public async loadData(metaProject: any, submodelElement: any){
+    if (submodelElement) {
+      console.log("-> submodel")
+      this.rawData = await this.getData(submodelElement);
+      this.filteredData = this.rawData.value
+    } else {
+      console.log("-> metaproject")
+      this.rawData = await this.getData("")
+      this.filteredData = this.prefilter(metaProject)
+    }
+  }
+
+  /**
+   * It returns the whole "Configuration" submodel or only one submodelElement
+   * (depending on the submodelElement parameter e.g. "Application") */
+  public async getData(submodelElement: string) {
     let response;
     try {
         response = await firstValueFrom(
           this.http.get(this.ip + '/shells/'
         + this.urn
         + "/aas/submodels/Configuration/submodel/submodelElements/"
-        + type));
+        + submodelElement));
       } catch(e) {
         console.log(e);
         //this.noData = true;
@@ -124,9 +139,10 @@ export class ListComponent implements OnInit {
     return response;
   }
 
+  /**It returns items with given metaProject */
   public prefilter(metaProject: string | null) {
     let result = []
-    for(const submodelElement of this.data) {
+    for(const submodelElement of this.rawData) {
       if(submodelElement.value) {
         for(const elemtSubmodelElement of submodelElement.value) {
           for(const valElemtSubmodelElement of elemtSubmodelElement.value) {
@@ -137,8 +153,10 @@ export class ListComponent implements OnInit {
         }
       }
     }
-    this.filteredData = result;
+    return result;
   }
+
+  // Filter ---------------------------------------------------------------------------
 
   public filterSetup() {
     let result = []
@@ -163,7 +181,7 @@ export class ListComponent implements OnInit {
       // object
       } else {
         for (let rowValues of tableRow.value) {
-          for (let param of this.params) {
+          for (let param of this.paramToDisplay) {
             if (rowValues.idShort == param[0]) {
               let new_rowValue = this.getValue(rowValues, param)
               temp.push(new_rowValue)
@@ -191,7 +209,7 @@ export class ListComponent implements OnInit {
     for (let tableRow of this.filteredData) {
       let temp = []
       for (let rowValues of tableRow.value) {
-        if (rowValues.idShort == "varValue") {
+        if (rowValues.idShort == this.varValue) {
           let new_rowValue = {
             "value": rowValues.value}
           temp.push(new_rowValue)
@@ -208,7 +226,7 @@ export class ListComponent implements OnInit {
     for (let tableRow of this.filteredData) {
       let temp = []
       for (let rowValues of tableRow.value) {
-        for (let param of this.params) {
+        for (let param of this.paramToDisplay) {
           if (rowValues.idShort == param[0]) {
             let new_rowValue = this.getValue(rowValues, param)
             temp.push(new_rowValue)
@@ -222,36 +240,56 @@ export class ListComponent implements OnInit {
     this.filteredData = result
   }
 
+  public filterManufacturer() {
+    console.log("methode filterMan")
+    console.log(this.filteredData)
+    let result = []
+    for (let tableRow of this.filteredData) {
+      let temp = []
+      let name
+      let logo = null
+      for (let rowValues of tableRow.value) {
+        if (rowValues.idShort == "manufacturerName") {
+          name = rowValues.value[0].value
+        }
+        for (let param of this.paramToDisplay) {
+          if (rowValues.idShort == param[0]) {
+            if (param[0] == "manufacturerLogo") {
+              let logoValue = rowValues.value[0].value
+              if(logoValue !== "") {
+                logo = this.imgPath + logoValue
+              }
+            } else if (param[0] == "address"){
+              for (let val of rowValues.value) {
+                if (val.value[0].value) {
+                  let addressValue = {"value": this.removeChar('@de', val.value[0].value)}
+                  temp.push(addressValue)
+                }
+              }
+            }
+          }
+        }
+      }
+      let new_value = {idShort: this.removeChar('@de', name), logo: logo, value: temp}
+      result.push(new_value)
+    }
+    this.filteredData = result
+  }
+
+  public removeChar(char:string, str:string){
+    return str.replace(char, '')
+  }
+
   public filterServices() {
     let result = []
     for (let tableRow of this.filteredData) {
       let temp = []
       let name
       for (let rowValues of tableRow.value) {
-        // TODO maybe this version is better bc with params
-        // we will get more if as desired
-        /*
-        if (rowValues.idShort == "name") {
-          let new_rowValue = {
-            "value": rowValues.value[0].value}
-            temp.push(new_rowValue)
-        }
-        if (rowValues.idShort == "ver") {
-          let new_rowValue = {
-            "value": "Version: " + rowValues.value[0].value}
-            temp.push(new_rowValue)
-        }
-        if (rowValues.idShort == "kind") {
-          let new_rowValue = {
-            "value": rowValues.value[0].value}
-            temp.push(new_rowValue)
-        }
-
-        */
         if (rowValues.idShort == "id") {
           name = rowValues.value[0].value
         }
-        for (let param of this.params) {
+        for (let param of this.paramToDisplay) {
           if (rowValues.idShort == param[0]) {
             let new_rowValue = this.getValue(rowValues, param)
             temp.push(new_rowValue)
@@ -270,10 +308,10 @@ export class ListComponent implements OnInit {
     return { "value":  param[1] + value + param[2]}
   }
 
-  // ---- buttons -----
+  // ---- buttons ---------------------------------------------------------------
 
   public edit(item: any) {
-    if(this.tab === "ServiceMesh") {
+    if(this.currentTab === "Meshes") { // TODO
       this.router.navigateByUrl('flowchart/' + item.idShort);
     }
   }
@@ -286,7 +324,7 @@ export class ListComponent implements OnInit {
 
   }
 
-  // ---- icons -------------
+  // ---- icons ------------------------------------------------------------------
 
   icons = [
     ["opc.png", ["PlcNextOpcConn", "PlcBeckhoffOpcConn", "DriveBeckhoffOpcConn"]],
@@ -430,18 +468,6 @@ export class ListComponent implements OnInit {
       this.noData = true;
     }
     return response;
-  }
-
-  public edit(item: any) {
-
-  }
-
-  public del(item: any) {
-
-  }
-
-  public createMesh() {
-
   }
   */
 

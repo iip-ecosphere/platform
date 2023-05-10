@@ -2,9 +2,9 @@ import MqttBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template MqttWin(IIPEcosphere config, FileArtifact target) {
+template MqttWin(IIPEcosphere config, FileArtifact target, String addJavaOpts="") {
 	
-    def main(IIPEcosphere config, FileArtifact target) {
+    def main(IIPEcosphere config, FileArtifact target, String addJavaOpts="") {
         Integer port = config.transportProtocol.port;
         String host = getHostOpt(config);
         '@echo off
@@ -14,7 +14,7 @@ template MqttWin(IIPEcosphere config, FileArtifact target) {
         
         :blank
         echo "This Broker requires at least Java 11!"
-        java -cp "brokerJars/*" test.de.iip_ecosphere.platform.test.mqtt.hivemq.TestHiveMqServer %PORT% ${host} %*'
+        java ${addJavaOpts} -cp "brokerJars/*" test.de.iip_ecosphere.platform.test.mqtt.hivemq.TestHiveMqServer %PORT% ${host} %*'
     }
 	
 }

@@ -159,6 +159,16 @@ template Basics(Configuration config, FileArtifact target) {
         }
         res;
     }
+
+    def getBooleanValueSafe(DecisionVariable var, Boolean dflt) {
+        Boolean res;
+        if (isDefined(var) and var <> null) {
+            res = var;
+        } else {
+            res = dflt;
+        }
+        res;
+    }
     
     def String getContainerNameDflt(EcsDevice device) {
         String containerName = device.containerName;
@@ -167,25 +177,13 @@ template Basics(Configuration config, FileArtifact target) {
         }
         containerName;
     }
-	
-    def getContainerGenerationSafe(Boolean containerGeneration) {
-        Boolean result;
-        if (containerGeneration <> null) {
-            result = containerGeneration;
-        } else {
-            result = true;
-        }
-        result;
+    
+    def getContainerGenerationSafe(DecisionVariable var) {
+        getBooleanValueSafe(var, true);
     }
 
-    def getPlatformContainerGenerationSafe(Boolean platformContainerGeneration) {
-        Boolean result;
-        if (platformContainerGeneration <> null) {
-            result = platformContainerGeneration;
-        } else {
-            result = true;
-        }
-        result;
+    def getPlatformContainerGenerationSafe(DecisionVariable var) {
+        getBooleanValueSafe(var, true);
     }
 
 }

@@ -42,7 +42,7 @@ public class PlatformSetup extends AbstractSetup {
     private TransportSetup transport;
     private File artifactsFolder = new File("artifacts");
     private String artifactsUriPrefix = "";
-    private int aasHeartbeatTimeout = -1; //4000; // disabled for now
+    private int aasHeartbeatTimeout = 10 * 1000;
     private int aasStatusTimeout = 2 * 60 * 1000;
     
     /**

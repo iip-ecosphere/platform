@@ -15,9 +15,11 @@ from Service import ServiceKind
 import asyncio
 import websockets
 import signal
+import traceback
 
 sId = ""
 avgResponseTime = 0
+lastAsyncStart = []
 numberResponseTimeSamples = 0
 responseFunction = None # one arg, response data in respective format; returns response or None
 outStore = {}
@@ -27,7 +29,7 @@ def updateResponseTime(startTime):
     """ Update the global average response time
     
     Parameters:
-      - startTime -- start time measured by time.time()"""
+      - startTime -- start time measured by time.perf_counter()"""
 
     global numberResponseTimeSamples
     global avgResponseTime
@@ -38,6 +40,13 @@ def updateResponseTime(startTime):
     
     numberResponseTimeSamples += 1
     avgResponseTime = (avgResponseTime * (numberResponseTimeSamples - 1) + newValue) / numberResponseTimeSamples 
+
+def getAvgResponseTimeNs():
+    """ Returns the global average response time in nanoseconds
+    
+    Returns:
+      response time measured by time.time()"""
+    return avgResponseTime * 1000 * 1000
 
 def printStdout(text): 
     """ Use in here to write to stdout, independent whether redirected or not 
@@ -103,12 +112,12 @@ def start(a):
     
     global responseFunction
     if consoleMode:
-        responseFunction = consoleIngestResult
+        responseFunction = consoleSendResult
         ingestorFunction = consoleIngestResult
         sys.stdout = sys.stderr
     elif wsMode:
         sys.stdout = sys.stderr
-        responseFunction = wsIngestResult
+        responseFunction = wsSendResult
         ingestorFunction = wsIngestResult
 
     modulesPath = getArg(args.modulesPath)
@@ -175,61 +184,71 @@ def loadModules(modulesPath, modulesDir):
 
 def processRequest(sId, type, data):
     result = None
-    if type.startswith('*'):
-        service = Registry.services.get(sId)
-        if service:
-            if type == '*setstate':
-                service.setState(ServiceState[str(data)])
-            elif type == '*migrate':
-                service.migrate(data)
-            elif type == '*update':
-                service.update(data)
-            elif type == '*switch':
-                service.switchTo(data)
-            elif type == '*recfg':
-                service.reconfigure(json.loads(data))
-            elif type == '*activate':
-                service.activate()
-            elif type == '*passivate':
-                service.passivate()
-            elif type == '*SERVER': # fixed base64 encoding-decoding
-                service.receivedClientServer(base64.b64decode(data))
-        else:
-            sys.stderr.write("Python ServiceEnvironment [Warn]: Cannot pass " + type + " to service - no service\n")
-    else :
-        serializer = Registry.serializers.get(type)
-        if serializer:
-            d = serializer.readFrom(str(data))
-            funcId = sId+"_"+type
-            func = Registry.asyncTransformers.get(funcId)
-            startTime = time.perf_counter()
-            if func:
-                func(d) #ingestor takes result
-                updateResponseTime(startTime)
+    try: # potential user code calls, catch everything
+        if type.startswith('*'):
+            service = Registry.services.get(sId)
+            if service:
+                if type == '*setstate':
+                    service.setState(ServiceState[str(data)])
+                elif type == '*migrate':
+                    service.migrate(data)
+                elif type == '*update':
+                    service.update(data)
+                elif type == '*switch':
+                    service.switchTo(data)
+                elif type == '*recfg':
+                    service.reconfigure(json.loads(data))
+                elif type == '*activate':
+                    service.activate()
+                elif type == '*passivate':
+                    service.passivate()
+                elif type == '*SERVER': # fixed base64 encoding-decoding
+                    service.receivedClientServer(base64.b64decode(data))
             else:
-                func = Registry.syncTransformers.get(funcId)
-                updateResponseTime(startTime)
+                sys.stderr.write("Python ServiceEnvironment [Warn]: Cannot pass " + type + " to service - no service\n")
+        else :
+            serializer = Registry.serializers.get(type)
+            if serializer:
+                d = serializer.readFrom(str(data))
+                funcId = sId+"_"+type
+                func = Registry.asyncTransformers.get(funcId)
+                startTime = time.perf_counter()
                 if func:
-                    global responseFunction
-                    responseFunction(func(d))
+                    lastAsyncStart.append(startTime)
+                    func(d) #ingestor takes result
+                else:
+                    func = Registry.syncTransformers.get(funcId)
+                    if func:
+                        global responseFunction
+                        responseFunction(func(d))
+                        updateResponseTime(startTime)
+    except Exception as err:
+        sys.stderr.write("Exception/error in service:\n")
+        sys.stderr.write(str(err)+"\n")        
     return result
 
 # console mode
 
-def consoleIngestResult(data): 
+def consoleSendResult(data): 
     result = None
     typeInfo = Registry.types.get(type(data))
     if typeInfo:
         serializer = Registry.serializers.get(typeInfo)
         if serializer:
             global avgResponseTime
-            result = typeInfo + "|" + str(int(avgResponseTime)) + "|" + serializer.writeTo(data)
+            result = typeInfo + "|" + str(int(getAvgResponseTimeNs())) + "|" + serializer.writeTo(data)
             printStdout(result)
             flushStdout()
     else: # assume client-server-communication
         result = "*SERVER|0|" + base64.b64encode(data).decode('utf-8')
         printStdout(result)
         flushStdout()
+
+def consoleIngestResult(data): 
+    consoleSendResult(data)
+    global lastAsyncStart
+    if len(lastAsyncStart) > 0:
+        updateResponseTime(lastAsyncStart.pop())
 
 def console(a, data, sId):
     """ Starts the command line based service environment
@@ -262,6 +281,12 @@ def consoleProcess(composedData, sId):
 # WS parts
 
 def wsIngestResult(data): 
+    wsSendResult(data)
+    global lastAsyncStart
+    if len(lastAsyncStart) > 0:
+        updateResponseTime(lastAsyncStart.pop())
+
+def wsSendResult(data): 
     result = None
     typeInfo = Registry.types.get(type(data))
     if typeInfo:
@@ -270,7 +295,7 @@ def wsIngestResult(data):
             global avgResponseTime
             result = {}
             result["type"] = typeInfo
-            result["time"] = avgResponseTime
+            result["time"] = getAvgResponseTimeNs()
             result["data"] = serializer.writeTo(data)
     else: # assume client-server-communication
             result = {}
@@ -288,19 +313,23 @@ async def wsHandler(ws):
     global websocket
     websocket = ws
     while True:
-        message = await websocket.recv()
-        data = json.loads(message)
-        if "type" in data and "data" in data:
-            global sId
-            result = processRequest(sId, data["type"], data["data"])
-            if result:
-                wsIngestResult(result)
+        try:
+            message = await websocket.recv()
+            data = json.loads(message)
+            if "type" in data and "data" in data:
+                global sId
+                result = processRequest(sId, data["type"], data["data"])
+                if result:
+                    wsSendResult(result)
+        except Exception as err:
+            sys.stderr.write("Exception/error in service:\n")
+            sys.stderr.write(str(err)+"\n")
 
 async def wsMain(port):
     log = logger.getLogger('websockets.server')
     log.disabled = True
     print("Starting Websockets server on port " + str(port))
-    async with websockets.serve(wsHandler, "localhost", port):
+    async with websockets.serve(wsHandler, "127.0.0.1", port, max_size=2**63): # max protocol size
         await asyncio.Future()  # run forever
 
 def wsStop(signum, frame):

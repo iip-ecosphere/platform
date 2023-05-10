@@ -14,6 +14,8 @@ package de.iip_ecosphere.platform.support.aas.basyx;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -119,9 +121,11 @@ public class BaSyxProperty extends BaSyxSubmodelElement implements Property {
         
         @Override
         public PropertyBuilder setDescription(LangString... description) {
+            LangStrings l = new LangStrings();
             for (LangString d: description) {
-                property.getDescription().add(Tools.translate(d));
+                l.add(Tools.translate(d));
             }
+            property.setDescription(l);
             return this;
         }
 
@@ -218,6 +222,19 @@ public class BaSyxProperty extends BaSyxSubmodelElement implements Property {
     @Override
     public void accept(AasVisitor visitor) {
         visitor.visitProperty(this);
+    }
+    
+    @Override
+    public Map<String, LangString> getDescription() {
+        LangStrings l = property.getDescription();
+        Map<String, LangString> result = null;
+        if (null != l && !l.isEmpty()) {
+            result = new HashMap<>();
+            for (String lang : l.getLanguages()) {
+                result.put(lang, new LangString(lang, l.get(lang)));
+            }
+        }
+        return result;
     }
     
 }

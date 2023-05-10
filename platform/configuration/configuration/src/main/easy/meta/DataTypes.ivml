@@ -16,6 +16,9 @@ project DataTypes {
     typedef ArtifactString String with (size(ArtifactString) == 0 or (size(ArtifactString) > 0 and matches(ArtifactString, ".+:.+:.+"))); 
     typedef PositiveInteger Integer with (PositiveInteger > 0);
     
+    const String Eclass_Unit_MByte = "0173-1#05-AAA042#005";
+    const String Eclass_Unit_ms = "0173-1#05-AAA114#003";
+    
     def String mvnVersion(IipVersion ver, Boolean snapshot) = 
        if (snapshot) then ver + "-SNAPSHOT" else ver endif;
        
@@ -329,6 +332,8 @@ project DataTypes {
         StringArrayType;
         IEC61131_3DateTimeType;
         iipVer;
+        Eclass_Unit_MByte; // preliminary, until auto-freeze
+        Eclass_Unit_ms; // preliminary, until auto-freeze
     };
     
 }

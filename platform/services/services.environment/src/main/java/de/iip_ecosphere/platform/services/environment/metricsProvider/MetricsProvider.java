@@ -512,6 +512,18 @@ public class MetricsProvider {
     }
 
     /**
+     * Record nanoseconds time.
+     * 
+     * @param timer the timer to record the time on
+     * @param timeSupplier the time supplier returning the time after executing {@code function}
+     * @param function the function to execute
+     */
+    public static void recordNsTime(Timer timer, TimeSupplier timeSupplier, Runnable function) {
+        function.run();
+        timer.record(timeSupplier.get(), TimeUnit.NANOSECONDS);
+    }
+
+    /**
      * Increases the counter by one. <br>
      * If the identifier does not correspond to an existing counter, a new counter
      * will be created and registered. If it is an existing counter, the value will

@@ -8,21 +8,26 @@ project Services {
    import Nameplate;
    
    annotate BindingTime bindingTime = BindingTime::compile to .;
+   annotate String semanticId = "" to .;
    
    // -------------------- service manager ------------------
    
    abstract compound ServiceManager {
-       Integer memLimit = 0; // e.g., JVM memory limit in MBytes 
+       assign (semanticId = Eclass_Unit_MByte) to {
+         Integer memLimit = 256; // e.g., JVM memory limit in MBytes
+       }
    };
    
    compound SpringCloudStream refines ServiceManager {
        // logging.level.root: INFO
        Boolean deleteFilesOnExit = true;
        Boolean deleteArtifacts = true;
-       Integer waitingTime = 60000;
        String brokerHost = "localhost";
        Integer brokerPort = 8883;
-       Integer availabilityRetryDelay = 500;
+       assign (semanticId = Eclass_Unit_ms) to {
+           Integer waitingTime = 60000;
+           Integer availabilityRetryDelay = 500;
+       }
    };
    
    ServiceManager serviceManager = SpringCloudStream {};
@@ -144,7 +149,9 @@ project Services {
    // in some situations while in others it is important to have a service not being a family avoiding potential
    // instance recursions
    abstract compound ServiceBase refines CDataComponent {
-       Integer memLimit = 0; // e.g., JVM memory limit in MBytes 
+       assign (semanticId = Eclass_Unit_MByte) to {
+           Integer memLimit = 0; // e.g., JVM memory limit in MBytes
+       }
        Id id; // forward declaration
        NonEmptyNameString name; // forward declaration
        ServiceKind kind;

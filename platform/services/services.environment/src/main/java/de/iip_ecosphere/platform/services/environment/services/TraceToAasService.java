@@ -201,8 +201,26 @@ public class TraceToAasService extends AbstractService {
      * 
      * @param timeout the timeout in ms
      */
-    protected void setTimeout(long timeout) {
+    public void setTimeout(long timeout) {
         converter.setTimeout(timeout);
+    }
+    
+    /**
+     * Changes the cleanup timeout, i.e., the time between two cleanups.
+     * 
+     * @param cleanupTimeout the timeout in ms
+     */
+    public void setCleanupTimeout(long cleanupTimeout) {
+        converter.setCleanupTimeout(cleanupTimeout);
+    }
+    
+    /**
+     * Pursues a cleanup of the (internally known) AAS.
+     * 
+     * @return whether a cleanup process was executed (not whether elements were deleted)
+     */
+    public boolean cleanup() {
+        return converter.cleanup();
     }
     
     /**

@@ -4,9 +4,12 @@ project Devices {
     import DataTypes;
     
     annotate BindingTime bindingTime = BindingTime::compile to .;
+    annotate String semanticId = "" to .;
         
     abstract compound ContainerManager {
-       Integer memLimit = 0; // e.g., JVM memory limit in MBytes     
+       assign (semanticId = Eclass_Unit_MByte) to {
+           Integer memLimit = 256; // e.g., JVM memory limit in MBytes
+       }
        String authenticationKey;
          // - globally allocated hosts/ports
          // - global AAS location/URN/URI

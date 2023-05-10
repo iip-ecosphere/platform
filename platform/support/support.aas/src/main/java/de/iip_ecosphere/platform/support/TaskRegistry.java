@@ -42,7 +42,8 @@ public class TaskRegistry {
     }
 
     /**
-     * Represents data associated to a task.
+     * Represents data associated to a task. The task data may require multiple task status changes to count as 
+     * {@lint TaskStatus#STOPPED}. It may also count/compare a certain number of generic events.
      * 
      * @author Holger Eichelberger, SSE
      */
@@ -52,6 +53,10 @@ public class TaskRegistry {
         private long threadId;
         private long timestamp;
         private TaskStatus status;
+        private int requiredStopCalls = 1;
+        private int stopCallCount = 0;
+        private int maxEventCount = 0;
+        private int eventCount = 0;
         
         /**
          * Creates an instance, sets the id and turns the status to {@link TaskStatus#RUNNING}.
@@ -75,9 +80,53 @@ public class TaskRegistry {
          * @return <b>this</b>
          */
         private TaskData setStatus(TaskStatus status) {
-            this.status = status;
-            this.timestamp = System.currentTimeMillis();
+            if (TaskStatus.STOPPED == status) {
+                stopCallCount++;
+            }
+            if ((TaskStatus.STOPPED == status && stopCallCount == requiredStopCalls) || status != TaskStatus.STOPPED) {
+                this.status = status;
+                this.timestamp = System.currentTimeMillis();
+            }
             return this;
+        }
+        
+        /**
+         * Changes the number of required stop calls ({@link #setStatus(TaskStatus)} with {@link TaskStatus#STOPPED}) 
+         * to change the task to stopped. The default value is 1.
+         * 
+         * @param requiredStopCalls the number of required stop calls, ignored if not positive
+         */
+        public void setRequiredStopCalls(int requiredStopCalls) {
+            if (requiredStopCalls > 0) {
+                this.requiredStopCalls = requiredStopCalls;
+            }
+        }
+        
+        /**
+         * Defines the maximum number of (expected) events.
+         * 
+         * @param maxEventCount the maximum number of events
+         */
+        public void setMaxEventCount(int maxEventCount) {
+            this.maxEventCount = maxEventCount;
+        }
+
+        /**
+         * Increases the event counter.
+         * 
+         * @return the new counter value
+         */
+        public int incEventCount() {
+            return eventCount++;
+        }
+        
+        /**
+         * Returns whether the maximum number of (expected) events was already reached.
+         * 
+         * @return {@code true} for reached, {@code false} else
+         */
+        public boolean maxEventCountReached() {
+            return eventCount >= maxEventCount;
         }
         
         /**

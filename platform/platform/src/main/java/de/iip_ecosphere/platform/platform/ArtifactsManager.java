@@ -18,29 +18,22 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.file.ClosedWatchServiceException;
-import java.nio.file.FileSystem;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.WatchEvent;
-import java.nio.file.WatchEvent.Kind;
-import java.nio.file.WatchKey;
-import java.nio.file.WatchService;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.apache.commons.io.monitor.FileAlterationListenerAdaptor;
+import org.apache.commons.io.monitor.FileAlterationMonitor;
+import org.apache.commons.io.monitor.FileAlterationObserver;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.ecsRuntime.BasicContainerDescriptor;
 import de.iip_ecosphere.platform.platform.cli.ServiceDeploymentPlan;
 import de.iip_ecosphere.platform.services.environment.YamlArtifact;
 import de.iip_ecosphere.platform.support.JarUtils;
-import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.iip_aas.Version;
-
-import static java.nio.file.StandardWatchEventKinds.*;
 
 /**
  * A class holding/providing information about available artifacts.
@@ -51,7 +44,7 @@ public class ArtifactsManager {
     
     private static final ArtifactsManager INSTANCE = new ArtifactsManager();
     
-    private static WatchRunnable runnable;
+    private static FileAlterationMonitor monitor;
     private Map<String, Artifact> artifacts = Collections.synchronizedMap(new TreeMap<>());
     private Map<Path, Artifact> artifactPaths = Collections.synchronizedMap(new HashMap<>());
 
@@ -303,87 +296,31 @@ public class ArtifactsManager {
     public static ArtifactsManager getInstance() {
         return INSTANCE;
     }
-    
+
     /**
-     * Implements a thread palling for watch service events.
+     * Implements an artifact watcher. We rely here on the Apache rather than the java.nio implementation 
+     * as the Java WatchService has problems with change events on Linux file systems.
      * 
      * @author Holger Eichelberger, SSE
      */
-    private static class WatchRunnable implements Runnable {
-
-        private WatchService watch;
-        private boolean running = true;
-        private Path path;
-
-        /**
-         * Creates the runnable.
-         * 
-         * @param watch the watch to look for
-         * @param path the watched path
-         */
-        private WatchRunnable(WatchService watch, Path path) {
-            this.watch = watch;
-            this.path = path;
-        }
+    private static class ArtifactWatcher extends FileAlterationListenerAdaptor {
         
         @Override
-        public void run() {
-            WatchKey key = null;
-            while (running) {
-                try {
-                    key = watch.poll();
-                    if (key != null) {
-                        for (WatchEvent<?> watchEvent : key.pollEvents()) {
-                            // Get the type of the event
-                            Kind<?> kind = watchEvent.kind();
-                            if (ENTRY_CREATE == kind) {
-                                INSTANCE.artifactCreated(toPath(watchEvent), null);
-                            } else if (ENTRY_MODIFY == kind) {
-                                INSTANCE.artifactModified(toPath(watchEvent));
-                                watchEvent.context();
-                            } else if (ENTRY_DELETE == kind) {
-                                INSTANCE.artifactDeleted(toPath(watchEvent));
-                            }
-                        }
-                    } 
-                    TimeUtils.sleep(200);
-                } catch (ClosedWatchServiceException e) {
-                    running = false;
-                }
-            }
+        public void onFileCreate(File file) {
+            INSTANCE.artifactCreated(file.toPath(), null);
+        }
+
+        @Override
+        public void onFileDelete(File file) {
+            INSTANCE.artifactModified(file.toPath());
+        }  
+        
+        @Override
+        public void onFileChange(File file) {
+            INSTANCE.artifactDeleted(file.toPath());
         }
         
-        /**
-         * Turns a watch event into a file system path.
-         * 
-         * @param event the event
-         * @return the path
-         */
-        private Path toPath(WatchEvent<?> event) {
-            Path result = null;
-            Object context = event.context();
-            if (null != context) {
-                result = Paths.get(path.toString(), context.toString());
-            }
-            return result;
-        }
-        
-        /**
-         * Stops the runnable and the watch.
-         */
-        private void stop() {
-            if (running) {
-                running = false;
-                try {
-                    watch.close();
-                } catch (IOException e) {
-                    LoggerFactory.getLogger(ArtifactsManager.class)
-                        .error("While stop watching for artifacts: {}", e.getMessage());
-                }
-            }
-        }
-        
-    }
+    }    
 
     /**
      * Populates the manager by scanning {@code path} for artifacts.
@@ -412,6 +349,8 @@ public class ArtifactsManager {
         }
     }
     
+    // checkstyle: stop exception type check
+    
     /**
      * Starts watching for new artifacts.
      */
@@ -421,18 +360,16 @@ public class ArtifactsManager {
         if (artifactsFolder.exists()) {
             LoggerFactory.getLogger(ArtifactsManager.class)
                 .info("Watching artifacts folder {}", artifactsFolder.getAbsolutePath());
-            Path path = PlatformSetup.getInstance().getArtifactsFolder().toPath();
-            INSTANCE.scan(path);
-            FileSystem fs = path.getFileSystem();
+            INSTANCE.scan(artifactsFolder.toPath());
+            FileAlterationObserver observer = new FileAlterationObserver(artifactsFolder.getAbsolutePath());
+            observer.addListener(new ArtifactWatcher());
+            monitor = new FileAlterationMonitor(500, observer);
             try {
-                WatchService watch = fs.newWatchService();
-                path.register(watch, ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE);
-                runnable = new WatchRunnable(watch, path);
-                new Thread(runnable).start();
-            } catch (IOException e) {
+                monitor.start();
+            } catch (Exception e) {
                 LoggerFactory.getLogger(ArtifactsManager.class)
-                    .error("While stop watching for artifacts: {}", e.getMessage());
-            }
+                    .error("While starting file monitor for artifacts: {} Will not monitor artifacts", e.getMessage());
+            }        
         } else {
             LoggerFactory.getLogger(ArtifactsManager.class)
                 .warn("Configured artifacts folder {} does not exist. Disabling watching for artifacts", 
@@ -444,11 +381,18 @@ public class ArtifactsManager {
      * Stops watching for new artifacts.
      */
     static void stopWatching() {
-        if (null != runnable) {
-            runnable.stop();
-            runnable = null;
+        if (null != monitor) {
+            try {
+                monitor.stop();
+            } catch (Exception e) {
+                LoggerFactory.getLogger(ArtifactsManager.class)
+                    .error("While stopping file monitor for artifacts: {}", e.getMessage());
+            }        
+            monitor = null;
         }
     }
+
+    // checkstyle: resume exception type check
 
     /**
      * Informs the manager that an artifact was created. Called while watching the 
@@ -463,7 +407,7 @@ public class ArtifactsManager {
     public Artifact artifactCreated(Path path, URI accessUri) {
         Artifact result = null;
         if (null != path && path.toFile().exists()) {
-            LoggerFactory.getLogger(ArtifactsManager.class).info("Potential artifact file created: {}", path);
+            LoggerFactory.getLogger(ArtifactsManager.class).info("Potential artifact file found: {}", path);
             Path pn = path.normalize();
             if (!artifactPaths.containsKey(pn)) {
                 result = createArtifactInfo(path, accessUri);

@@ -155,6 +155,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 assemblies.add("spring|${assemblyRel}/spring.xml|package|${mvnProjectBuildDir}");
                 vilTemplateProcessor("JavaLogbackXml", config, "${resourcesSrc}/logback.xml");
                 identityStoreJsl(resourcesSrc, cfg);
+                deviceIdProviderJsl(resourcesSrc, cfg);
     
                 if (not(cfg.sharedInterfaces)) {
                     vilTemplateProcessor("JavaInterfaceAssembly", config, "${assemblySrc}/javaInterfaces.xml");
@@ -1030,8 +1031,9 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         vilTemplateProcessor("EcsRuntimeMvn", config, "${path}/pom.xml", dir="ecsJars${cInfix}", main=dfltMain, tests=tests, deviceType=deviceType);
         mvn(path);
         if (deviceType == defaultDeviceType) {
-            generateOsScripts(config, "${target}/ecs", "ecsJars", dfltMain, "IIP-Ecosphere ECSRuntime", "iip-ecsRuntime", "iip-platform.service", addJavaOpts=toJvmMemLimitOpt(min(cfg.serviceManager.memLimit, 
-              cfg.containerManager.memLimit)), sysd="${target}/iip-ecs");
+            Integer svcMemLimit = getIntegerValueSafe(cfg.serviceManager.memLimit, 0);
+            Integer cntMgmLimit = getIntegerValueSafe(cfg.containerManager.memLimit, 0);
+            generateOsScripts(config, "${target}/ecs", "ecsJars", dfltMain, "IIP-Ecosphere ECSRuntime", "iip-ecsRuntime", "iip-platform.service", addJavaOpts=toJvmMemLimitOpt(min(svcMemLimit, cntMgmLimit)), sysd="${target}/iip-ecs");
         }
     }
     
@@ -1100,7 +1102,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         vilTemplateProcessor("PlatformMvn", config, "${platformRoot}/pom.xml", dir="plJars", main=dfltMain, tests=tests, monitoring=false);
         mvn(platformRoot);
         generateOsScripts(config, "${target}/platform", "plJars", dfltMain, "IIP-Ecosphere Platform Services", "iip-platform", "iip-broker.service", 
-            sysd="${target}/iip-platform");
+            sysd="${target}/iip-platform", addJavaOpts=toJvmMemLimitOpt(cfg.centralMemLimit));
         generateOsScripts(config, "${target}/cli", "plJars", "de.iip_ecosphere.platform.platform.Cli", "", "", "");
 
         // preliminary, as long as BaSyx conflicts with Tomcat
@@ -1117,7 +1119,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         vilTemplateProcessor("PlatformMvn", config, "${monitoringRoot}/pom.xml", dir="monJars", main=dfltMain, tests=tests, monitoring=true);
         mvn(monitoringRoot);
         generateOsScripts(config, "${target}/monitoring", "monJars", dfltMain, "IIP-Ecosphere Platform Monitoring Services", "iip-monitoring", "iip-platform.service", 
-            sysd="${target}/iip-monitoring");
+            sysd="${target}/iip-monitoring", addJavaOpts=toJvmMemLimitOpt(cfg.monitoringMemLimit));
  
         artifactsRoot.mkdir();
         commonRoot.mkdir();
@@ -1147,12 +1149,13 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     }
     
     generateBrokerScripts(Configuration config, TransportProtocolAMQP protocol) = {
+        String addJavaOpts = toJvmMemLimitOpt(protocol.memLimit);
         vilTemplateProcessor("AmqpPom", config, "${brokerRoot}/pom.xml", ver=getStringValueSafe(protocol.brokerVer, "8.0.2"));
-        vilTemplateProcessor("AmqpLinuxSysd", config, "${brokerRoot}/iip-broker.service");
-        vilTemplateProcessor("AmqpLinux", config, "${brokerRoot}/broker.sh");
+        vilTemplateProcessor("AmqpLinuxSysd", config, "${brokerRoot}/iip-broker.service", addJavaOpts=addJavaOpts);
+        vilTemplateProcessor("AmqpLinux", config, "${brokerRoot}/broker.sh", addJavaOpts=addJavaOpts);
         FileArtifact f = "${brokerRoot}/broker.sh";
         f.setExecutable(false);
-        vilTemplateProcessor("AmqpWin", config, "${brokerRoot}/broker.bat");
+        vilTemplateProcessor("AmqpWin", config, "${brokerRoot}/broker.bat", addJavaOpts=addJavaOpts);
         Path c = "${brokerRoot}/src/test";
         c.mkdir();
         vilTemplateProcessor("AmqpConf", config, "${c}/config.json");
@@ -1160,20 +1163,21 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     }
 
     generateBrokerScripts(Configuration config, TransportProtocolMQTTv3 protocol) = {
-        generateBrokerScriptsHiveMq(config, getStringValueSafe(protocol.brokerVer, "2020.4"));
+        generateBrokerScriptsHiveMq(config, getStringValueSafe(protocol.brokerVer, "2020.4"), protocol);
     }
 
     generateBrokerScripts(Configuration config, TransportProtocolMQTTv5 protocol) = {
-        generateBrokerScriptsHiveMq(config, getStringValueSafe(protocol.brokerVer, "2020.4"));
+        generateBrokerScriptsHiveMq(config, getStringValueSafe(protocol.brokerVer, "2020.4"), protocol);
     }
     
-    generateBrokerScriptsHiveMq(Configuration config, String brokerVer) = {
+    generateBrokerScriptsHiveMq(Configuration config, String brokerVer, TransportProtocol protocol) = {
+        String addJavaOpts = toJvmMemLimitOpt(protocol.memLimit);
         vilTemplateProcessor("MqttPom", config, "${brokerRoot}/pom.xml", ver=brokerVer);
-        vilTemplateProcessor("MqttLinuxSysd", config, "${brokerRoot}/iip-broker.service");
-        vilTemplateProcessor("MqttLinux", config, "${brokerRoot}/broker.sh");
+        vilTemplateProcessor("MqttLinuxSysd", config, "${brokerRoot}/iip-broker.service", addJavaOpts=addJavaOpts);
+        vilTemplateProcessor("MqttLinux", config, "${brokerRoot}/broker.sh", addJavaOpts=addJavaOpts);
         FileArtifact f = "${brokerRoot}/broker.sh";
         f.setExecutable(false);
-        vilTemplateProcessor("MqttWin", config, "${brokerRoot}/broker.bat");
+        vilTemplateProcessor("MqttWin", config, "${brokerRoot}/broker.bat", addJavaOpts=addJavaOpts);
         Path c = "${brokerRoot}/src/test";
         c.mkdir();
         vilTemplateProcessor("MqttConf", config, "${c}/config.xml");

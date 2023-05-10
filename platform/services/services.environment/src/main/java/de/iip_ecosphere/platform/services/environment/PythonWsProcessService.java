@@ -52,6 +52,7 @@ public class PythonWsProcessService extends PythonAsyncProcessService {
     private long averageResponseTime = 0;
     private WebSocket socket;
     private String networkPortKey;
+    private String lastError; // new instance of WebSocket per try
 
     /**
      * Creates an instance from a service id and a YAML artifact.
@@ -108,18 +109,22 @@ public class PythonWsProcessService extends PythonAsyncProcessService {
     
     @Override
     protected void createScanInputThread(Process proc) {
-        while (null == socket) { 
-            try {
-                WebSocket tmp = new WebSocket(new URI("ws://localhost:" + instancePort));
+        String uri = "ws://localhost:" + instancePort;
+        try {
+            getLogger().info("Connecting to {}", uri);
+            while (null == socket) { 
+                WebSocket tmp = new WebSocket(new URI(uri)); // instance not reusable
                 if (tmp.connectBlocking()) { // blocking may fail
-                    getLogger().info("Connected to port {}", instancePort);
+                    getLogger().info("Connected to {}", uri);
                     socket = tmp;
+                } else {
+                    tmp.close(); // instance not reusable
+                    TimeUtils.sleep(250);
                 }
-            } catch (URISyntaxException | InterruptedException e) {
-                getLogger().error("Connecting to port {}: {}", instancePort, e.getMessage());
-                TimeUtils.sleep(100);
-            } 
-        }
+            }
+        } catch (URISyntaxException | InterruptedException e) {
+            getLogger().error("Connecting to {}: {}", uri, e.getMessage());
+        } 
     }
     
     @Override
@@ -167,8 +172,6 @@ public class PythonWsProcessService extends PythonAsyncProcessService {
      * @author Holger Eichelberger, SSE
      */
     private class WebSocket extends WebSocketClient {
-        
-        private String lastError;
 
         /**
          * Creates a web socket for the given server URI.
@@ -299,7 +302,7 @@ class OutData {
     /**
      * Returns the time taken for processing in Python.
      * 
-     * @return the time in ms
+     * @return the elapsed time in ns
      */
     long getTime() {
         return time;

@@ -2,9 +2,9 @@ import JavaOsBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template AmqpLinuxSysd(Configuration config, FileArtifact target) {
+template AmqpLinuxSysd(Configuration config, FileArtifact target, String addJavaOpts="") {
 	
-    def main(Configuration config, FileArtifact target) {
+    def main(Configuration config, FileArtifact target, String addJavaOpts="") {
         IIPEcosphere cfg = config;
         Integer port = cfg.transportProtocol.port;
         String instDir = cfg.instDirDflt;
@@ -26,7 +26,7 @@ template AmqpLinuxSysd(Configuration config, FileArtifact target) {
         KillMode=control-group
         Requires=multi-user.target
         After=multi-user.target
-        ExecStart=${javaExe} -cp "brokerJars/*" test.de.iip_ecosphere.platform.test.amqp.qpid.TestQpidServer ${port}
+        ExecStart=${javaExe} ${addJavaOpts} -cp "brokerJars/*" test.de.iip_ecosphere.platform.test.amqp.qpid.TestQpidServer ${port}
         
         [Install]
         WantedBy=multi-user.target'

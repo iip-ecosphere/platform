@@ -60,7 +60,7 @@ template DeploymentPlan(IIPEcosphere config, FileArtifact target, DeploymentPlan
     
     def generateEnsembles(DeploymentPlan plan) {
         if (isDefined(plan.ensembles) and plan.ensembles.size() > 0) {
-            '- ensembles:'
+            'ensembles:'
             for (EnsembleSpec s: plan.ensembles) {
                 '  ${s.leader.impl.id}: ${s.member.impl.id}'
             }

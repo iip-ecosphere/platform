@@ -56,3 +56,5 @@ DataTypes::identityStore = The identity store alternative to be used.
 DataTypes::iipVer = Constant Maven version number of the platform.
 DataTypes::VersionedElement::snapshot = Shall the Maven artifact be a snapshot or a release. 
 DataTypes::VersionedElement::ver = Version of the element (numbers separated by a dot).
+DataTypes::Eclass_Unit_MByte = Semantic id for unit Mega Byte. 
+DataTypes::Eclass_Unit_ms = Semantic id for unit millisecond.

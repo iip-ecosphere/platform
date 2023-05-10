@@ -1,8 +1,8 @@
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template AmqpWin(IIPEcosphere config, FileArtifact target) {
+template AmqpWin(IIPEcosphere config, FileArtifact target, String addJavaOpts="") {
 	
-    def main(IIPEcosphere config, FileArtifact target) {
+    def main(IIPEcosphere config, FileArtifact target, String addJavaOpts="") {
         Integer port = config.transportProtocol.port;
         '@echo off
         set PORT=${port}
@@ -10,7 +10,7 @@ template AmqpWin(IIPEcosphere config, FileArtifact target) {
         set PORT=%~1
         
         :blank
-        java -cp "brokerJars/*" test.de.iip_ecosphere.platform.test.amqp.qpid.TestQpidServer %PORT% %*'
+        java ${addJavaOpts} -cp "brokerJars/*" test.de.iip_ecosphere.platform.test.amqp.qpid.TestQpidServer %PORT% %*'
     }
 	
 }

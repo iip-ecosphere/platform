@@ -160,11 +160,22 @@ public class AbstractAasLifecycleDescriptor implements LifecycleDescriptor {
     
                     @Override
                     public void run() {
-                        if (!connectionOk(serverUrl) || !iipAasExists()) {
-                            offline = true; // after multiple trials?
-                        } else if (offline) {
-                            // AAS contributors shall consider implement exists() 
-                            deploy(args, c ->  !c.exists() && getContributorFilter().test(c));
+                        boolean hasConn = connectionOk(serverUrl) && iipAasExists();
+                        if (offline) {
+                            if (hasConn) {
+                                offline = false;
+                                LoggerFactory.getLogger(getClass()).warn("AAS server {} back. Re-deploying AAS.", 
+                                    serverUrl);
+                                // AAS contributors shall consider implement exists() 
+                                deploy(args, c ->  !c.exists() && getContributorFilter().test(c));
+                                LoggerFactory.getLogger(getClass()).warn("AAS server {} back. AAS re-deployed.", 
+                                    serverUrl);
+                            }
+                        } else { // online
+                            if (!hasConn) {
+                                LoggerFactory.getLogger(getClass()).warn("AAS server {} offline", serverUrl);
+                                offline = true; // after multiple trials?
+                            }
                         }
                     }
                 }, AAS_HEARTBEAT_PERIOD, AAS_HEARTBEAT_PERIOD);
@@ -234,7 +245,7 @@ public class AbstractAasLifecycleDescriptor implements LifecycleDescriptor {
      * @return {@code true} for enabled, {@code false} else
      */
     protected boolean enableAasHeartbeat() {
-        return false; // TODO disabled until tested #142
+        return true;
     }
 
     /**

@@ -4,6 +4,7 @@ project Resources {
    import DataTypes;
 
    annotate BindingTime bindingTime = BindingTime::compile to .;
+   annotate String semanticId = "" to .;
    
    abstract compound DeviceRegistry {
    }
@@ -97,8 +98,10 @@ project Resources {
         NonEmptyEphemeralPort alertMgrPort = 9091;
         NonEmptyString alertMgrHost = "127.0.0.1";
         Boolean alertMgrRunning = false; // running somewhere else, do we have to start it
-        Integer scrapeInterval = 1001;
-        Integer scrapeTimeout = 1000;
+        assign (semanticId = Eclass_Unit_ms) to {
+            Integer scrapeInterval = 1001;
+            Integer scrapeTimeout = 1000;
+        }
         
         scrapeInterval > 50;
         scrapeTimeout > 50 and scrapeTimeout < scrapeInterval; // required by Prometheus

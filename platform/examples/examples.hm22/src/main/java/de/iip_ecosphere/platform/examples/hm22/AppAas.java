@@ -182,10 +182,12 @@ public class AppAas extends TraceToAasService implements iip.interfaces.AppAasIn
         }
 
         @Override
-        public void cleanup(Aas aas) {
+        public boolean cleanup(Aas aas) {
+            boolean done = false;
             if (DO_CLEANUP) {
-                super.cleanup(aas);
+                done = super.cleanup(aas);
             }
+            return done;
         }
 
     }

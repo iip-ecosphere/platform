@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import de.iip_ecosphere.platform.platform.ArtifactsManager.Artifact;
+import de.iip_ecosphere.platform.services.ServiceManager;
 import de.iip_ecosphere.platform.support.TaskRegistry;
 import de.iip_ecosphere.platform.support.TaskRegistry.TaskData;
 import de.iip_ecosphere.platform.support.aas.Aas;
@@ -34,7 +35,9 @@ import de.iip_ecosphere.platform.support.iip_aas.AasUtils;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.ApplicationInstanceAasConstructor;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper;
+import de.iip_ecosphere.platform.transport.status.ActionTypes;
 import de.iip_ecosphere.platform.transport.status.TaskUtils;
+import de.iip_ecosphere.platform.transport.status.TaskUtils.TaskCompletedPredicate;
 
 /**
  * The platform AAS contributor, in particular for the available artifacts.
@@ -63,6 +66,13 @@ public class PlatformAas implements AasContributor {
     public static final String NAME_OPERATION_GET_TASK_STATUS = "getTaskStatus";
     
     private static final String PROGRESS_COMPONENT_ID = "IIP-Ecosphere Platform";
+    
+    private static final TaskCompletedPredicate DEPLOY_COMPLETED = (t, s) -> {
+        if (s.getAction() == ActionTypes.PROCESS && ServiceManager.PROGRESS_COMPONENT_ID.equals(s.getId())) {
+            t.incEventCount(); // 2 per service!
+        }
+        return t.maxEventCountReached();
+    };
     
     @Override
     public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
@@ -130,14 +140,16 @@ public class PlatformAas implements AasContributor {
             return undeployPlan(AasUtils.readString(p), AasUtils.readString(p, 1));
         }));
         sBuilder.defineOperation(NAME_OPERATION_DEPLOY_ASYNC, new JsonResultWrapper(p -> {
-            return TaskUtils.executeAsTask(PROGRESS_COMPONENT_ID, q -> deployPlan(AasUtils.readString(q)), p);
+            return TaskUtils.executeAsTask(PROGRESS_COMPONENT_ID, q -> deployPlan(AasUtils.readString(q)), 
+                DEPLOY_COMPLETED, p);
         }));
         sBuilder.defineOperation(NAME_OPERATION_UNDEPLOY_ASYNC, new JsonResultWrapper(p -> {
-            return TaskUtils.executeAsTask(PROGRESS_COMPONENT_ID, q -> undeployPlan(AasUtils.readString(q), null), p);
+            return TaskUtils.executeAsTask(PROGRESS_COMPONENT_ID, q -> undeployPlan(AasUtils.readString(q), null), 
+                DEPLOY_COMPLETED, p);
         }));
         sBuilder.defineOperation(NAME_OPERATION_UNDEPLOY_WITHID_ASYNC, new JsonResultWrapper(p -> {
             return TaskUtils.executeAsTask(PROGRESS_COMPONENT_ID, 
-                q -> undeployPlan(AasUtils.readString(q), AasUtils.readString(q, 1)), p);
+                q -> undeployPlan(AasUtils.readString(q), AasUtils.readString(q, 1)), DEPLOY_COMPLETED, p);
         }));
         sBuilder.defineOperation(NAME_OPERATION_GET_TASK_STATUS, new JsonResultWrapper(p -> {
             TaskData data = TaskRegistry.getTaskData(AasUtils.readString(p));
@@ -145,7 +157,7 @@ public class PlatformAas implements AasContributor {
         }));
         
     }
-    
+        
     /**
      * Deploys a deployment plan.
      * 
