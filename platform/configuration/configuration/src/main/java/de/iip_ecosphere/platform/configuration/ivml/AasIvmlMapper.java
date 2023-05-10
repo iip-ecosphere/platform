@@ -37,6 +37,7 @@ import de.iip_ecosphere.platform.configuration.PlatformInstantiator.Instantiatio
 import de.iip_ecosphere.platform.configuration.ivml.IvmlGraphMapper.IvmlGraph;
 import de.iip_ecosphere.platform.configuration.ivml.IvmlGraphMapper.IvmlGraphEdge;
 import de.iip_ecosphere.platform.configuration.ivml.IvmlGraphMapper.IvmlGraphNode;
+import de.iip_ecosphere.platform.support.aas.IdentifierType;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.LangString;
 import de.iip_ecosphere.platform.support.aas.Property.PropertyBuilder;
@@ -1087,9 +1088,12 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             for (int a = 0; a < var.getAttributesCount(); a++) {
                 IDecisionVariable attribute = var.getAttribute(a);
                 if ("semanticId".equals(attribute.getDeclaration().getName())) {
-                    Object val = getValue(var);
+                    Object val = getValue(attribute);
                     if (null != val) {
                         semanticId = val.toString();
+                        if (semanticId.length() == 0) {
+                            semanticId = null;
+                        }
                     }
                 }
             }
@@ -1181,6 +1185,9 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
      */
     private static void setSemanticId(PropertyBuilder pBuilder, String semanticId) {
         if (null != semanticId) {
+            if (!semanticId.startsWith(IdentifierType.IRDI_PREFIX)) {
+                semanticId = IdentifierType.IRDI_PREFIX + semanticId;
+            }
             pBuilder.setSemanticId(semanticId);
         }
     }

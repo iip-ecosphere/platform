@@ -72,9 +72,9 @@ project Aas {
     Persistency aasPersistency = Persistency::INMEMORY;
     isDefined(aasPersistency);
     String aasAccessControlAllowOrigin = "*";
-    //assign (semanticId = Eclass_Unit_ms) to {
+    assign (semanticId = Eclass_Unit_ms) to {
         Integer aasStartupTimeout = 120000;
-    //}
+    }
     
     // ------------------------ semanticIds -------------------------------
     
