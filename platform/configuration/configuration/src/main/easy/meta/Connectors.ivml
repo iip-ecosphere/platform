@@ -153,7 +153,7 @@ project Connectors {
     }
 
     @dispatchCase
-    def setOf(ConnectorOperation) collectOperations(ParenthesisDataOperation op) = {op.operation};
+    def sequenceOf(ConnectorOperation) collectOperations(ParenthesisDataOperation op) = {op.operation};
     
     compound FieldNameDataOperation refines DataOperation {
         refTo(Field) field;
