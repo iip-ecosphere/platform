@@ -229,6 +229,7 @@ project Services {
    abstract compound FamilyMemberSelector {
    }
 
+   @dispatchBasis
    def Boolean selectorTypeOk(FamilyMemberSelector selector, ServiceFamily family) = 
         true;
 
@@ -239,6 +240,7 @@ project Services {
        String artifact; // optional maven artifact
    }
    
+   @dispatchCase
    def Boolean selectorTypeOk(ServiceSelectorBasedFamilyMemberSelector selector, ServiceFamily family) = 
         family.input->exists(t|t.type == selector.type) or family.output->exists(t|t.type == selector.type);
    

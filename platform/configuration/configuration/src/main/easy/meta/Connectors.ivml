@@ -92,7 +92,8 @@ project Connectors {
     
     def setOf(ConnectorOperation) collectOperations(setOf(ConnectorOperation) ops) = 
         ops->collect(o|collectOperations(o)).flatten();
-    // dispatch basis
+    
+    @dispatchBasis
     def sequenceOf(ConnectorOperation) collectOperations(ConnectorOperation op) = {};
     
     compound ModelCallOperation refines AssignmentOperation {
@@ -106,6 +107,7 @@ project Connectors {
         DataOperation operation;
     }
 
+    @dispatchCase
     def sequenceOf(ConnectorOperation) collectOperations(FieldAssignmentOperation op) = {op.operation};
     
     // transfers both, value and field, potentially to different target fields (optimization)
@@ -150,6 +152,7 @@ project Connectors {
         DataOperation operation;
     }
 
+    @dispatchCase
     def setOf(ConnectorOperation) collectOperations(ParenthesisDataOperation op) = {op.operation};
     
     compound FieldNameDataOperation refines DataOperation {
@@ -160,6 +163,7 @@ project Connectors {
         sequenceOf(DataOperation) arguments;
     }
 
+    @dispatchCase
     def sequenceOf(ConnectorOperation) collectOperations(DataTranslationOperation op) = op.arguments;
     
     compound AddDataTranslationOperation refines DataTranslationOperation {

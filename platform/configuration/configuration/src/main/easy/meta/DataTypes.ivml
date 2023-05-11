@@ -332,8 +332,6 @@ project DataTypes {
         StringArrayType;
         IEC61131_3DateTimeType;
         iipVer;
-        Eclass_Unit_MByte; // preliminary, until auto-freeze
-        Eclass_Unit_ms; // preliminary, until auto-freeze
     };
     
 }

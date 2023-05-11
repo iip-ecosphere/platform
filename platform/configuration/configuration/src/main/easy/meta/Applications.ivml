@@ -52,8 +52,11 @@ project Applications {
         Constraint ensembleOk = ensemble <> null implies (ensemble <> refBy(self) and not(ensemble.ensemble <> null)); // no self-loops, max 1-chains
     }
 
+    @dispatchBasis
     def setOf(refTo(MeshElement)) nextElts(MeshElement elt) = {};
+    @dispatchCase
     def setOf(refTo(MeshElement)) nextElts(MeshSource src) = src.next->collect(c|c.next);
+    @dispatchCase
     def setOf(refTo(MeshElement)) nextElts(MeshInnerElement elt) = elt.next->collect(c|c.next);
     
     // hint to requirements!
@@ -96,15 +99,19 @@ project Applications {
     // of i/o above; if not both sides are defined, propagate them along the service mesh; if propagation fails, mesh
     // is anyway invalid; currently only check for unique type names 
     
+    @dispatchBasis
     def Boolean typeCheck(MeshElement start, MeshElement end) = 
         true;
     
+    @dispatchCase
     def Boolean typeCheck(MeshSource start, MeshSink end) =
         typeCheck(start.output, end.input); 
-         
+    
+    @dispatchCase     
     def Boolean typeCheck(MeshSource start, MeshProcessor end) =
         typeCheck(start.output, end.input); 
-        
+    
+    @dispatchCase
     def Boolean typeCheck(MeshProcessor start, MeshSink end) =
         typeCheck(start.output, end.input); 
 
