@@ -48,22 +48,23 @@ def runTestsFromTestFile(sId, rawData):
 """Method running all Tests of a testFile in one go"""
 def runAllTestsFromFile(sId, path):
     rawData = readTestDataJson(path)
-    runTestsFromTestFile(sId, rawData)
+    for line in rawData:
+        runTestsFromTestFile(sId, line)
 
 """Reads the datapoints form a file and stores them in a array
 Due to the way the data is returned it CANNOT be used for json.loads again without exchanging all ' with "
 """
 def readTestDataJson(path):
-        objects = []
-        try :
-            with open (path, "r") as f:
-                for line in f: #This is needed to make the json.loader handle multiple top level objects
-                    rawData = json.loads(line) #Needs "loads" instead of "load" -> load has issues with strings
-                    objects.append(rawData)
+    objects = []
+    try :
+        with open (path, "r") as f:
+            for line in f: #This is needed to make the json.loader handle multiple top level objects
+                rawData = json.loads(line) #Needs "loads" instead of "load" -> load has issues with strings
+                objects.append(rawData)
 
-                    #print(line)
-        except:
-            traceback.print_exc()
-            
-            print("Could not load the object json properly!") 
-        return objects
+                #print(line)
+    except:
+        traceback.print_exc()
+        
+        print("Could not load the object json properly!") 
+    return objects
