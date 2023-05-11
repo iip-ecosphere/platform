@@ -12,14 +12,14 @@ def runTestsFromFile(sId, d, dtype):
     startTime = time.perf_counter()
     if func:
         func(d) #ingestor takes result
-        print(func)
-        updateResponseTime(startTime)
+        #print(">: " , func)
+        #updateResponseTime(startTime)
     else:
         func = Registry.syncTransformers.get(funcId)
-        updateResponseTime(startTime)
+        #updateResponseTime(startTime)
         if func:
             result = (func(d))
-            print(func)
+            #print(">: " ,func)
     return result
 
 """A method just to create data objects from defined testfiles"""
