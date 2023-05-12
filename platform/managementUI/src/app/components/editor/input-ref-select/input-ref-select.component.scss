@@ -1,0 +1,16 @@
+.flexcontainer {
+  max-height: 400px;
+  display:flex;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  //background-color: red;
+}
+
+.valuebox {
+  width: 90%;
+  min-height: 60px;
+  border: 2px solid black;
+  border-radius: 4px;
+  background-color: rgb(199, 199, 199);
+  margin-left: 5%;
+}

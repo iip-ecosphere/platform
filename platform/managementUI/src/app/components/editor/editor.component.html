@@ -1,0 +1,36 @@
+<h1>Editor <span *ngIf="category">for {{ category }}</span></h1>
+
+<mat-card>
+  <div *ngIf="meta && meta.value">
+    <mat-form-field appearance="outline">
+      <mat-select [(value)]="selectedType">
+        <mat-option *ngFor="let type of meta.value" [value]="type" (click)="checkRef()">
+          {{ type.idShort }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+  <h2 *ngIf="selectedType && selectedType.idShort">{{selectedType.idShort}}</h2>
+</mat-card>
+
+<div *ngIf="selectedType && inputs[0]">
+  <table>
+    <tr *ngFor="let input of inputs">
+      <td><span>{{input.idShort}}</span></td>
+      <td>
+        <mat-form-field appearance="outline">
+          <mat-label *ngIf="input.value && input.idShort">{{ input.idShort }}</mat-label>
+          <input matInput [matTooltip]="input.description[0].text" type="text" [(ngModel)]=input.value />
+        </mat-form-field>
+      </td>
+  </tr>
+</table>
+<div *ngFor="let input of inputReferenceTo">
+  <app-input-ref-select [textfield]="true" [input]="input"></app-input-ref-select>
+</div>
+</div>
+
+<div>
+  <button mat-raised-button class="button" color="warning" routerLink="../..">Cancel</button>
+  <button mat-raised-button class="button" color="success" (click)="create()" disable>Create</button>
+</div>

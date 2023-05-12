@@ -1,0 +1,23 @@
+<div>
+  <div *ngIf="textfield">
+    <table style="width: 100%">
+      <tr>
+        <td style="width: 20%">
+          {{input.idShort}}:
+        </td>
+        <td>
+          <mat-form-field appearance="outline">
+            <input matInput [matTooltip]="tooltip" [(ngModel)]="textInput">
+          </mat-form-field>
+          <button mat-raised-button (click)="addFromTextfield()">add</button>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <div class="valuebox">
+    <div class="flexcontainer">
+      <mat-card *ngFor="let value of inputValues; let i=index">{{value}}<button mat-raised-button style="background-color: red; margin-left: 0.5em;" (click)="removeInputValue(i)">remove</button></mat-card>
+    </div>
+
+  </div>
+</div>
