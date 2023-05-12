@@ -31,6 +31,7 @@ export class ApiService {
 
   resources: PlatformResources = {};
   //services: PlatformServices = {};
+  meta: Resource = {};
 
   public async getResources() {
     this.resources = await this.getData('aas/submodels/resources/submodel') as PlatformResources;
@@ -54,8 +55,18 @@ export class ApiService {
 
   public async getInstances() {
     const Data = await this.getData('aas/submodels/ApplicationInstances/submodel/submodelElements') as Resource[];
-    console.log(Data);
     return Data;
+  }
+
+  public async getMeta() {
+    if(!this.meta || !this.meta.value) {
+      const Data = await this.getData('aas/submodels/Configuration/submodel/submodelElements/meta') as Resource;
+      if(Data) {
+        this.meta = Data;
+      }
+    }
+    console.log(this.meta);
+    return this.meta;
   }
 
   private async getData(url: string) {

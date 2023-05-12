@@ -324,6 +324,10 @@ export class ListComponent implements OnInit {
 
   }
 
+  public create() {
+    this.router.navigateByUrl("list/editor/all")
+  }
+
   // ---- icons ------------------------------------------------------------------
 
   icons = [

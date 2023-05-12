@@ -4,6 +4,7 @@ import { ContainersComponent }
   from './components/containers/containers.component';
 import { DeploymentPlansComponent }
   from './components/deployment-plans/deployment-plans.component';
+import { EditorComponent } from './components/editor/editor.component';
 import { FlowchartComponent }
   from './components/flowchart/flowchart.component';
 import { InstancesComponent } from './components/instances/instances.component';
@@ -26,6 +27,7 @@ const routes: Routes = [
   { path: 'deploymentPlans', component: DeploymentPlansComponent },
   { path: 'flowchart/:mesh', component: FlowchartComponent },
   { path: 'flowchart', component: FlowchartComponent },
+  { path: 'list/editor/:ls', component: EditorComponent},
   { path: 'list', component: ListComponent},
   { path: 'instances', component: InstancesComponent }
   //{ path: 'list/:ls', component: ListComponent }

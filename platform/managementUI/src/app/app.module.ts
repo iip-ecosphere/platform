@@ -37,6 +37,8 @@ import { StatusBoxComponent } from './components/deployment-plans/status-box/sta
 import { FlowchartComponent } from './components/flowchart/flowchart.component';
 import { ListComponent } from './components/list/list.component';
 import { InstancesComponent } from './components/instances/instances.component';
+import { EditorComponent } from './components/editor/editor.component';
+import { InputRefSelectComponent } from './components/editor/input-ref-select/input-ref-select.component';
 
 @NgModule({
   declarations: [
@@ -52,7 +54,9 @@ import { InstancesComponent } from './components/instances/instances.component';
     StatusBoxComponent,
     FlowchartComponent,
     ListComponent,
-    InstancesComponent
+    InstancesComponent,
+    EditorComponent,
+    InputRefSelectComponent
   ],
   imports: [
     BrowserModule,
