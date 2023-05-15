@@ -23,23 +23,31 @@ This package contains also programs to optimize specific deployments, e.g., to r
 
 * Python 3.9, further dependencies for code generation, communication and potentially the Python-based data processing functions see [requirements.txt](./platformDependencies/requirements.txt).
 * For the management UI: Angular 13, further dependencies see [dependencies.json](./platformDependencies/dependencies.json).
-* IIP-EcosphereFullInstallationLinux: A script to do a full installation of the platform on Linux including the prerequisites (Java 13, Maven version 3.6.3, Docker version 20.10.7, Python version 3.9, and run Docker Private Registry). 
+* IIP-EcosphereFullInstallationLinux: A script to do a full installation of the platform on Linux including the prerequisites (Java 13, Maven version 3.6.3, Docker version 20.10.7, Python version 3.9, and run Docker Private Registry). There is an option to install Angular version 14.2.11, Node.js version 14 and npm package manager for the JavaScript.
 
-  -- Java: Java: If Java is not installed, then the script will install Java 13. If the Java version is less than Java 11, then the script asks to install Java 13 (If the answer is No then the installation will stop).
+  -- Java: If Java is not installed, then the script will install Java 13. If the Java version is less than Java 11, then the script asks to install Java 13 (If the answer is No then the installation will stop).
   
-  -- Maven, Docker, and Python: if not installed, then the script will install it. If the versions are not matched with the mentioned recommended versions (you might have another version, but those versions are tested on the platform), then the script asks to install those versions (If the answer is No then those versions are skipped and the installation will continue).
+  -- Maven, Docker, and Python: If not installed, then the script will install it. If the versions are not matched with the mentioned recommended versions (you might have another version, but those versions are tested on the platform), then the script asks to install those versions (If the answer is No then those versions are skipped and the installation will continue).
+To use the management UI for the platform, you should install angular version 13 (Not included in this installation script)"
+
+  -- Angular, Node.js, and npm: The script gives the option to automatically install Angular version 14.2.11, Node.js version 14, and npm package manager for the JavaScript. The script will ask to install those versions (If the answer is No then those software are skipped and the installation will continue).
   
   -- Docker Private Registry: The script will ask to run a Docker Private Registry that will be used by the platform to store the generated containers (If the answer is No then Docker Private Registry is skipped and the installation will continue).
+  
+  -- Platform installation: Install the required Python libraries, next update the IP address in the ivml configuration file "TechnicalSetup.ivml", finally instantiate the platform.
    
 * IIP-EcosphereFullInstallationWin: A script to do a full installation of the platform on Windows including the prerequisites (Java 13, Maven version 3.6.3, Python version 3.9, and run Docker Private Registry). 
 
   -- Docker: The script does NOT install Docker on Windows since it needs extra steps to make it run. nonetheless, the script checks if Docker is installed and then checks the version.
+
+  -- Angular, Node.js, and npm: The script does NOT install Angular, Node.js, and npm on Windows since it needs more setup. If you want to use the management UI for the platform, make sure you install the Angular version 14.2.11.
   
   -- Java: If Java is not installed, then the script will install Java 13. If the Java version is less than Java 11, then the script asks to install Java 13 (If the answer is No then the installation will stop). 
   
-  -- Maven and Python: if not installed, then the script will install it. If the versions are not matched with the mentioned recommended versions (you might have another version, but those versions are tested on the platform), then the script asks to install those versions (If the answer is No then those versions are skipped and the installation will continue).
+  -- Maven and Python: If not installed, then the script will install it. If the versions are not matched with the mentioned recommended versions (you might have another version, but those versions are tested on the platform), then the script asks to install those versions (If the answer is No then those versions are skipped and the installation will continue).
   
   -- Docker Private Registry: If Docker is installed, then the script will ask to run a Docker Private Registry that will be used by the platform to store the generated containers (If the answer is No then Docker Private Registry is skipped and the installation will continue).
 
-
+  -- Platform installation: Install the required Python libraries, next update the IP address in the ivml configuration file "TechnicalSetup.ivml", finally instantiate the platform.
+  
 **For snapshots:** See required EASy-Producer version in [configuration integration and the configuration meta model](https://github.com/iip-ecosphere/platform/tree/main/platform/configuration/configuration/README.md)

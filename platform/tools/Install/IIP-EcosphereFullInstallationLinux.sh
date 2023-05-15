@@ -87,6 +87,18 @@ if [ $yn == "y" ] || [ $yn == "Y" ]; then
             * ) echo "Please answer y or n.";;
         esac
     done
+   
+    # Check Angular 13
+    
+    while true; do
+        echo "To use the management UI for the platform you should have angular version 13 installed (with npm and Node.js)"
+        read -p "Do you want to install Node.js version 14, angular version 13, and npm package manager for the JavaScript? - You might skip this step (y/n)" Angularyn
+        case $Angularyn in
+            [Yy]* ) break;;
+            [Nn]* ) break;;
+            * ) echo "Please answer y or n.";;
+        esac
+    done   
     
     # Install Java version 13 
     
@@ -119,7 +131,7 @@ if [ $yn == "y" ] || [ $yn == "Y" ]; then
         esac
     fi
     
-    # Install Dcoker version 20.10.7
+    # Install Docker version 20.10.7
     
     if ! [ -x "$(command -v docker --version)" ]; then
         sudo apt-get update -y
@@ -197,8 +209,17 @@ if [ $yn == "y" ] || [ $yn == "Y" ]; then
             [Nn]* ) break;;
         esac
     fi
+    
+    # Install nodejs version 14 and angular version 13
+    
+    case $Angularyn in
+        [Yy]* ) sudo curl -sL https://deb.nodesource.com/setup_14.x | sudo bash -;
+                sudo apt -y install nodejs;
+                sudo apt install npm -y;
+                sudo npm install -g @angular/cli@14.2.11;;
+        [Nn]* ) break;;
+    esac
 
-    sudo apt install npm -y
     sudo apt install curl -y
     
     localIP=$(hostname -I | cut -d ' ' -f1)
@@ -207,6 +228,10 @@ if [ $yn == "y" ] || [ $yn == "Y" ]; then
     
     wget https://jenkins-2.sse.uni-hildesheim.de/view/IIP-Ecosphere/job/IIP_Install/lastSuccessfulBuild/artifact/install.tar.gz
     tar xzpvf install.tar.gz
+    
+    cd platformDependencies/
+    python3 -m pip install -r requirements.txt
+    cd ..
             
     sed -i 's/147.172.178.145/'$localIP'/g' src/main/easy/TechnicalSetup.ivml
     
@@ -264,13 +289,29 @@ elif [ $yn == "n" ] || [ $yn == "N" ]; then
     sudo apt install unzip -y
     sudo apt install jq -y
     
+    # Install nodejs version 14 and angular version 13
+    
+    case $Angularyn in
+        [Yy]* ) sudo curl -sL https://deb.nodesource.com/setup_14.x | sudo bash -;
+                sudo apt -y install nodejs;
+                sudo apt install npm -y;
+                sudo npm install -g @angular/cli@14.2.11;;
+        [Nn]* ) break;;
+    esac
+    
+    sudo apt install curl -y
+    
     localIP=$(hostname -I | cut -d ' ' -f1)
 
     mkdir Install && cd Install
     
     wget https://jenkins-2.sse.uni-hildesheim.de/view/IIP-Ecosphere/job/IIP_Install/lastSuccessfulBuild/artifact/install.tar.gz
     tar xzpvf install.tar.gz
-            
+
+    cd platformDependencies/
+    python3 -m pip install -r requirements.txt
+    cd ..
+           
     sed -i 's/147.172.178.145/'$localIP'/g' src/main/easy/TechnicalSetup.ivml
 
     # Run Docker Private Registry

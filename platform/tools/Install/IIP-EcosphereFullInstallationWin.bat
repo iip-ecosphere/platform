@@ -35,6 +35,8 @@ if %dockerVersionCheck% == "Non" (
    echo "It is recommended to have version %RecommendDocker%"
    echo "You should use Windows Subsystem for Linux (WSL) to run Docker on windows (recommended to follow this link https://learn.microsoft.com/en-us/windows/wsl/install-manual)"
    echo =====================================================
+   echo =====================================================
+   echo "To use the management UI for the platform, you should install angular version 13 (Not included in this installation script)"
 )
 
 :answerDocker
@@ -228,6 +230,10 @@ cd Install
 curl https://jenkins-2.sse.uni-hildesheim.de/view/IIP-Ecosphere/job/IIP_Install/lastSuccessfulBuild/artifact/install.tar.gz -O install.tar.gz
 tar xzpvf install.tar.gz
 
+cd platformDependencies/
+python3 -m pip install -r requirements.txt
+cd ..
+    
 @echo off
 set "replace=147.172.178.145"
 set "replaced=%ip%"
