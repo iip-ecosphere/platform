@@ -37,7 +37,9 @@ To use the management UI for the platform, you should install angular version 13
   -- Platform installation: Install the required Python libraries, next update the IP address in the ivml configuration file "TechnicalSetup.ivml", finally instantiate the platform.
    
 * IIP-EcosphereFullInstallationWin: A script to do a full installation of the platform on Windows including the prerequisites (Java 13, Maven version 3.6.3, Python version 3.9, and run Docker Private Registry). 
-
+  
+  -- Make sure that you run the script in a command prompt with administrator privileges (Run as administrator) inside your directory.
+  
   -- Docker: The script does NOT install Docker on Windows since it needs extra steps to make it run. nonetheless, the script checks if Docker is installed and then checks the version.
 
   -- Angular, Node.js, and npm: The script does NOT install Angular, Node.js, and npm on Windows since it needs more setup. If you want to use the management UI for the platform, make sure you install the Angular version 14.2.11.
