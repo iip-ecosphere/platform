@@ -3,70 +3,89 @@ import PythonBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template PythonTestTemplate(Configuration config, FileArtifact target, sequenceOf(MeshElement) pythonElements) {
+template PythonTestTemplate(Configuration config, FileArtifact target, PythonService pythonElements) {
 
-    def serviceImports(sequenceOf(MeshElement) pythonElements) {
-        for (MeshElement elt: pythonElements) {
-            String clsName = asTypeName(elt.impl.name);
-            'from ${clsName} import ${clsName}'
-        }
+    def serviceImports(PythonService pythonElements) {
+        String clsName = asTypeName(pythonElements.name);
+        'from ${clsName} import ${clsName}
+        '
     }
     
-    def typeImports(sequenceOf(MeshElement) pythonElements) {
+    def typeImports(PythonService pythonElements) {
         setOf(String) done = {};
-        for (MeshElement elt: pythonElements) {
-            '${genTypeImports(elt.impl.input, done)}'
-            '${genTypeImports(elt.impl.output, done)}'                  
-        }
+        '${genTypeImports(pythonElements.input, done)}'
+        '${genTypeImports(pythonElements.output, done)}' 
     }
     
     def genTypeImports(sequenceOf(IOType) types, setOf(String) done) {
         for (IOType type : types) {
             String clsName = toTypeName(type);
             if (not(done.includes(clsName))) {
-                done.add(clsName);
+                done.add(clsName); 
                 'from datatypes.${clsName} import ${clsName}'
-                'from datatypes.${clsName}Impl import ${clsName}Impl'
+                'from datatypes.${clsName}Impl import ${clsName}Impl
+                '
             }
         }
     }
+    
+    def genSerializerImports(sequenceOf(IOType) types) {
+        //from serializers.ImageInputSerializer import ImageInputSerializer
+        for (IOType type : types) {
+            String typeName = toTypeName(type);
+            'from serializers.${typeName}Serializer import ${typeName}Serializer
+            '
+        }
+    }
+    
+    def genSerializerInitialization(sequenceOf(IOType) types) {
+            //from serializers.ImageInputSerializer import ImageInputSerializer
+        for (IOType type : types) {
+            String typeName = toTypeName(type);
+            'serializer${typeName} = ${typeName}Serializer()
+            '
+        }       
+    }
 
-    def main(Configuration config, FileArtifact target, sequenceOf(MeshElement) pythonElements) {
+
+    def main(Configuration config, FileArtifact target, PythonService pythonElements) {
         'import unittest
         
         import sys
         import os
         import argparse
-        parser = argparse.ArgumentParser()
-        parser.add_argument("relModelPath", help="relative path to the impl.model project")
-        args = parser.parse_args()
 
+        sys.path.insert(6, "../../../target/pySrc/iip")
+        sys.path.insert(7, "../../../target/pySrc")
+        from TestUtils import runTestsFromFile, runTestsFromTestFile, readTestDataJson, runAllTestsFromFile
         """ will be the relativve paths from impl.impl to impl.model, given through pom /gen onwards! """
-        sys.path.insert(1, (args.relModelPath))
-        sys.path.insert(2, ("/iip"))
+        sys.path.insert(1, "../../../gen/hm23/ApplicationInterfaces/src/main/python")
+        sys.path.insert(2, ("../../../gen/hm23/ApplicationInterfaces/src/main/python/iip"))
         """ always fixed value as these directorys are generated in the impl.impl """
         sys.path.insert(3, "../../main/python/services") 
+        sys.path.insert(5, "../../main/python/${pythonElements.servicesPackageName}") 
+        sys.path.insert(4, "../../main/python")
 
         import json
 
         ${serviceImports(pythonElements)}
         ${typeImports(pythonElements)}
+        ${genSerializerImports(pythonElements.input)}
 
-        class TestPyServive(unittest.TestCase):
+        os.chdir("../../main/python") 
+
+        class ${asTypeName(pythonElements.name)}Test(unittest.TestCase):
         
             def test_inputTest(self):
             
                 #Change name to correct .json, access rawData for values i.e. rawData["InputType"]["Value1"]
                 rawData = ""
-                try :
-                    with open ("../resources/testData-PyService.json", "r") as f:
-                        rawData = json.load(f)
-                except:
-                    print("You need to edit the template files in /src/test/resources to be correct json") 
-
+                service = ${asTypeName(pythonElements.name)}()
+                ${genSerializerInitialization(pythonElements.input)}
+                runAllTestsFromFile(service.getId(), "../../test/resources/testData-${asTypeName(pythonElements.name)}.json")
+                
                 # prepare your data, e.g., loading from json
                 """Needed to enable the loading of resources like the finished service would"""
-                os.chdir("../../main/python") 
 
                 # instantiate your service here, e.g., service = PyService()
                 # call your service here, e.g., service.processNewInput(impl)

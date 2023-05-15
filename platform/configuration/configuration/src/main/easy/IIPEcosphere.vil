@@ -223,9 +223,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 
                 elements = elements->sortedBy(n|n.name).toSequence(); // for testing
                 sequenceOf(MeshElement) pythonElements = elements->select(e|e.impl.isKindOf(PythonService));
-                if (pythonElements.size() > 0) {
-                    vilTemplateProcessor("PythonTestTemplate", config, "${appRoot}/src/test/python/pyTest.py", pythonElements=pythonElements);
-                }
+
                 if (javaTests.size() > 0) {
                     vilTemplateProcessor("JavaAllTestsTemplate", config, "${appRoot}/src/test/java/AllTests.java", javaTests=javaTests, pkg="");
                 }
@@ -369,6 +367,9 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
             Path testResourcesSrc = "${appRoot}/src/test/resources";
             vilTemplateProcessor("TemplatesTestDataJson", config, "${testResourcesSrc}/testData-${clsName}.json.tmpl", elt=no);
         }
+        //Path p = appRoot + "/src/test/python/";
+        vilTemplateProcessor("PythonTestTemplate", config, "${appRoot}/src/test/python/${clsName}Test.py", pythonElements=service);
+        //javaTests.add(service.class + "Test");
     }
     
     generateTemplateElements(Path appRoot, Configuration config, MeshElement no, ServiceFamily family, setOf(String) assemblies, setOf(String) javaTests) = {
