@@ -1,3 +1,68 @@
+<p style="margin-bottom:2px"></p>
+<mat-tab-group animationDuration="0ms" mat-stretch-tabs>
+  <div *ngFor="let tab of tabsParam">
+    <mat-tab label="{{tab.tabName}}">
+      <ng-template mat-tab-label >
+        <span (click)="getDisplayData(tab.tabName, tab.submodel, tab.submodelElement)" class="custom-label">
+          {{tab.tabName}}
+        </span>
+      </ng-template>
+
+      <!-- Table -->
+      <table style="margin: 0px;">
+        <tr *ngFor="let item of filteredData; let i = index">
+
+          <td style="width: 2%; text-align: center;"> {{i + 1}} </td>
+
+          <!-- Item -->
+          <td style="width: 100%;">
+
+            <span class="row-title" >
+              <span style="height: 5px; vertical-align: top; margin-right: 10px;">{{item.idShort}}</span>
+            </span>
+            <div *ngIf="item.logo">
+              <img src={{item.logo}} class="service-icon">
+            </div>
+            <div *ngFor="let property of item.value" class="subtext" >
+              <div *ngIf="property.value">
+                {{property.value}}
+              </div>
+            </div>
+          </td>
+
+          <!-- Buttons -->
+          <td  *ngIf="tab.tabName == 'deployment plans'" class="cell-with-button">
+            <button
+              mat-raised-button style="background-color: rgb(35, 142, 184)"
+              (click)="deploy(item.plan)"
+              >deploy
+            </button>
+          </td>
+          <td  *ngIf="tab.tabName == 'deployment plans'" class="cell-with-button">
+            input
+          </td>
+
+          <td  *ngIf="tab.tabName == 'deployment plans' || tab.tabName == 'instances'"
+            class="cell-with-button">
+            <button
+              mat-raised-button style="background-color: rgb(97, 95, 96)"
+              >undeploy
+            </button>
+          </td>
+
+          <td class="cell-with-button">
+          </td>
+
+        </tr>
+      </table>
+    </mat-tab>
+  </div>
+</mat-tab-group>
+
+
+
+<!--       OLD version
+<p style="margin-bottom:20px"> </p>
 <div >
   <div class="header" >
     <img src="/assets/aas.png" alt="image" class="img-aas">
@@ -22,22 +87,11 @@
                 <div *ngFor="let element3 of element2.value">
                   <span *ngIf="isNonEmptyString(element3.value)" class="shortId">
                     {{ element3.idShort }}:
-                  <!--
-                    <span *ngIf="!isObject(element3.value); else isobject">
-                  -->
                     <span *ngIf="!isObject(element3.value);">
                       {{ element3.value }}
                     </span>
                   </span>
 
-                  <!--
-                  <ng-template #isobject>
-                    <div *ngFor="let element4 of element3.value">
-                      <span *ngIf="element4.idShort != 'type'">
-                        [inner] {{ element4.idShort }}:  {{ element4.value }}</span>
-                    </div>
-                  </ng-template>
-                  -->
                 </div>
             </div>
           </div>
@@ -81,3 +135,4 @@
     </div>
   </div>
 </div>
+ -->

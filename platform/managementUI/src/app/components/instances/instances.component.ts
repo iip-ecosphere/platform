@@ -37,6 +37,8 @@ export class InstancesComponent implements OnInit {
 
       }
     }
+    console.log("instances")
+    console.log(this.filteredData)
   }
 
   public undeploy(item: any) {

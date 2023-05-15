@@ -3,7 +3,7 @@
     <div *ngIf="serviceMeshes">
       <span *ngFor="let mesh of serviceMeshes.value">
         <span *ngIf="!isMeta(mesh.idShort)">
-          <a mat-tab-link (click)="selectMesh(mesh.idShort)"> {{mesh.idShort}} </a>
+          <a mat-tab-link (click)="selectMesh(mesh.idShort)"> {{mesh.idShort}}</a>
         </span>
       </span>
     </div>

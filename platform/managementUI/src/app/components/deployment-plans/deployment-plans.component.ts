@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { OnlyIdPipe } from 'src/app/pipes/only-id.pipe';
 import { ApiService } from 'src/app/services/api.service';
 import { PlanDeployerService } from 'src/app/services/plan-deployer.service';
-import { ResourceAttribute, Resource, PlatformArtifacts, InputVariable } from 'src/interfaces';
+import { ResourceAttribute, Resource, PlatformArtifacts, InputVariable }
+  from 'src/interfaces';
 
 @Component({
   selector: 'app-deployment-plans',
@@ -23,7 +24,9 @@ export class DeploymentPlansComponent implements OnInit {
 
   taskId: string = "";
 
-  constructor(public api: ApiService, private deployer: PlanDeployerService, private onlyId: OnlyIdPipe) {
+  constructor(public api: ApiService,
+    private deployer: PlanDeployerService,
+    private onlyId: OnlyIdPipe) {
   }
 
   async ngOnInit() {
@@ -34,7 +37,8 @@ export class DeploymentPlansComponent implements OnInit {
     const response = await this.api.getArtifacts();
     console.log(response);
     if(response.submodelElements) {
-      this.deploymentPlans = response.submodelElements.find(item => item.idShort === "DeploymentPlans");
+      this.deploymentPlans = response.submodelElements.find(
+        item => item.idShort === "DeploymentPlans");
       this.deployPlanInput = response.submodelElements.find(item => item.idShort === "deployPlan")?.inputVariables;
       this.undeployPlanInput = response.submodelElements.find(item => item.idShort === "undeployPlan")?.inputVariables;
       this.undeployPlanByIdInput = response.submodelElements.find(item => item.idShort === "undeployPlanWithId")?.inputVariables;
@@ -48,6 +52,8 @@ export class DeploymentPlansComponent implements OnInit {
   }
 
   public async deploy(plan?: Resource) {
+    console.log("Plan")
+    console.log(plan)
     let params = this.deployPlanInput;
     if(!plan && this.selected && this.selected.value) {
        let value = this.selected.value.find(item => item.idShort === "uri");
@@ -59,6 +65,8 @@ export class DeploymentPlansComponent implements OnInit {
     } else if(plan && plan.value) {
       let value = plan.value.find(item => item.idShort === "uri");
       if(value) {
+
+        console.log("value " + value.value)
         params[0].value.value = value.value;
       }
       const response = await this.deployer.deployPlan(params);

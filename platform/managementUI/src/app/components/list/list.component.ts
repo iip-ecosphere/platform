@@ -107,6 +107,8 @@ export class ListComponent implements OnInit {
     default:
         break;
     }
+    console.log("filteredData")
+    console.log(this.filteredData)
   }
 
   public async loadData(metaProject: any, submodelElement: any){
