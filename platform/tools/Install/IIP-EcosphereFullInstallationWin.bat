@@ -231,7 +231,7 @@ curl https://jenkins-2.sse.uni-hildesheim.de/view/IIP-Ecosphere/job/IIP_Install/
 tar xzpvf install.tar.gz
 
 cd platformDependencies/
-python3 -m pip install -r requirements.txt
+python -m pip install -r requirements.txt
 cd ..
     
 @echo off
