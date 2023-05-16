@@ -69,7 +69,7 @@ export class ServicesComponent implements OnInit {
     ["description", "", ""],
     ["planId", "Deployment plan: ", ""],
     ["instanceId", "Instance: ", ""],
-    ["timestamp", "", ""],
+    ["timestamp", "Started on: ", ""],
     ["applicationId", "App: ", ""],
     ["state", "State: ", ""],
     ["version", "Version: ", ""],
@@ -185,7 +185,15 @@ export class ServicesComponent implements OnInit {
           }
           for (let param of this.paramToDisplay) {
             if (rowValues.idShort == param[0]) {
-              let new_rowValue =  { "value":  param[1] + rowValues.value + param[2]}
+              let new_rowValue
+              if(rowValues.idShort == "timestamp") {
+                const temp = Number(rowValues.value);
+                let date = new Date(temp);
+                new_rowValue =  { "value":  param[1] + date}
+              } else {
+                new_rowValue =  { "value":  param[1] + rowValues.value + param[2]}
+              }
+              //let new_rowValue =  { "value":  param[1] + rowValues.value + param[2]}
               temp.push(new_rowValue)
             }
           }

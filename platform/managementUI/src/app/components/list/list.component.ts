@@ -113,11 +113,9 @@ export class ListComponent implements OnInit {
 
   public async loadData(metaProject: any, submodelElement: any){
     if (submodelElement) {
-      console.log("-> submodel")
       this.rawData = await this.getData(submodelElement);
       this.filteredData = this.rawData.value
     } else {
-      console.log("-> metaproject")
       this.rawData = await this.getData("")
       this.filteredData = this.prefilter(metaProject)
     }
