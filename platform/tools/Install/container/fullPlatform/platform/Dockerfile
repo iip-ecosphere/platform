@@ -9,7 +9,7 @@ COPY broker/broker.sh broker.sh
 COPY plJars/ plJars
 COPY platform.sh platform.sh
 # App
-COPY SimpleMeshInstallApp/target/SimpleMeshInstallApp-0.1.0-SNAPSHOT-bin.jar SimpleMeshInstallTestingApp-0.1.0-SNAPSHOT-bin.jar
+#COPY SimpleMeshInstallTestingApp/target/SimpleMeshInstallTestingApp-0.1.0-SNAPSHOT-bin.jar SimpleMeshInstallTestingApp-0.1.0-SNAPSHOT-bin.jar
 # ECS
 COPY ecsJars/ ecsJars
 COPY ecs.sh ecs.sh
