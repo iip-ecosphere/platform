@@ -55,6 +55,7 @@ export class ListComponent implements OnInit {
   // Display ---------------------------------------------------------------------
   paramToDisplay = [
     ["ver", "Version: ", ""],
+    ["version", "Version: ", ""],
     ["name", "", ""],
     //["kind", "", ""],
     ["host", "Host: ", ""],
@@ -91,7 +92,7 @@ export class ListComponent implements OnInit {
         this.filterTypes();
         break;
       case "Dependencies":
-          this.filterTypes();
+          this.filterDependencies();
           break;
       case "Nameplates":
         this.filterManufacturer();
@@ -203,6 +204,26 @@ export class ListComponent implements OnInit {
     let result = []
     for (let tableRow of this.filteredData) {
       let new_value = {idShort: tableRow.idShort}
+      result.push(new_value)
+    }
+    this.filteredData = result
+  }
+
+  public filterDependencies() {
+    let result = []
+    for (let tableRow of this.filteredData) {
+      let temp = []
+      let name = tableRow.idShort
+      for (let value of tableRow.value) {
+        if (value.idShort == "version") {
+          let new_value = value.value.find(
+            (elemt: { idShort: string; }) => elemt.idShort === this.varValue).value
+          if(new_value != "") {
+            temp.push({ "value":  "Version: " + new_value})
+          }
+        }
+      }
+      let new_value = {idShort: name, value:temp}
       result.push(new_value)
     }
     this.filteredData = result
