@@ -82,6 +82,9 @@ template PythonTestTemplate(Configuration config, FileArtifact target, PythonSer
                 rawData = ""
                 service = ${asTypeName(pythonElements.name)}()
                 ${genSerializerInitialization(pythonElements.input)}
+
+                service.attachIngestor(assertionIngestor) 
+
                 runAllTestsFromFile(service.getId(), "../../test/resources/testData-${asTypeName(pythonElements.name)}.json")
                 
                 # prepare your data, e.g., loading from json
@@ -92,6 +95,10 @@ template PythonTestTemplate(Configuration config, FileArtifact target, PythonSer
 	            
                 # do your asserts here
                 self.assertTrue(True)
+
+        def assertionIngestor(data):
+            #add your assertions in this block, data will be your returned data
+            print("output", data)
 
         if __name__ == "__main__":
             """Makes unittest and argparse work together"""
