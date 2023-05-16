@@ -44,6 +44,7 @@ export class ListComponent implements OnInit {
     {tabName: "Setup", metaProject:"TechnicalSetup", submodelElement:null},
     {tabName: "Constants", metaProject:"AllConstants", submodelElement:null},
     {tabName: "Types", metaProject:"AllTypes", submodelElement:null},
+    {tabName: "Dependencies", metaProject: "", submodelElement: "Dependency"},
     {tabName: "Nameplates", metaProject:null, submodelElement:"Manufacturer"},
     {tabName: "Services", metaProject:null, submodelElement:"ServiceBase"},
     {tabName: "Servers", metaProject:null, submodelElement:"Server"},
@@ -89,6 +90,9 @@ export class ListComponent implements OnInit {
       case "Types":
         this.filterTypes();
         break;
+      case "Dependencies":
+          this.filterTypes();
+          break;
       case "Nameplates":
         this.filterManufacturer();
         break;
