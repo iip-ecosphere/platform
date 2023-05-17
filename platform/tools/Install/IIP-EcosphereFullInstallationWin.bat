@@ -36,7 +36,7 @@ if %dockerVersionCheck% == "Non" (
    echo "You should use Windows Subsystem for Linux (WSL) to run Docker on windows (recommended to follow this link https://learn.microsoft.com/en-us/windows/wsl/install-manual)"
    echo =====================================================
    echo =====================================================
-   echo "To use the management UI for the platform, you should install angular version 13 (Not included in this installation script)"
+   echo "To use the management UI for the platform, you should install angular version 14 (Not included in this installation script)"
 )
 
 :answerDocker

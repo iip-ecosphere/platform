@@ -88,11 +88,11 @@ if [ $yn == "y" ] || [ $yn == "Y" ]; then
         esac
     done
    
-    # Check Angular 13
+    # Check Angular 14
     
     while true; do
-        echo "To use the management UI for the platform you should have angular version 13 installed (with npm and Node.js)"
-        read -p "Do you want to install Node.js version 14, angular version 13, and npm package manager for the JavaScript? - You might skip this step (y/n)" Angularyn
+        echo "To use the management UI for the platform you should have angular version 14 installed (with npm and Node.js)"
+        read -p "Do you want to install Node.js version 14, angular version 14, and npm package manager for the JavaScript? - You might skip this step (y/n)" Angularyn
         case $Angularyn in
             [Yy]* ) break;;
             [Nn]* ) break;;
@@ -190,6 +190,7 @@ if [ $yn == "y" ] || [ $yn == "Y" ]; then
         sudo apt autoclean -y
         sudo apt install python3-apt -y
         sudo apt-get install python3-pip -y
+        sudo apt-get install python3-distutils
         sudo pip install pyflakes
     
     else
@@ -200,23 +201,24 @@ if [ $yn == "y" ] || [ $yn == "Y" ]; then
                     sudo apt update -y;
                     sudo apt install python3.9 -y;
                     ln -sf python3.9 /usr/bin/python3;
-                    sudo apt remove python3-apt -y
-                    sudo apt autoremove -y
-                    sudo apt autoclean -y
-                    sudo apt install python3-apt -y
+                    sudo apt remove python3-apt -y;
+                    sudo apt autoremove -y;
+                    sudo apt autoclean -y;
+                    sudo apt install python3-apt -y;
                     sudo apt-get install python3-pip -y;
+                    sudo apt-get install python3-distutils;
                     sudo pip install pyflakes;;
             [Nn]* ) break;;
         esac
     fi
     
-    # Install nodejs version 14 and angular version 13
+    # Install nodejs version 14 and angular version 14
     
     case $Angularyn in
         [Yy]* ) sudo curl -sL https://deb.nodesource.com/setup_14.x | sudo bash -;
                 sudo apt -y install nodejs;
                 sudo apt install npm -y;
-                sudo npm install -g @angular/cli@14.2.11;;
+                sudo npm install -g @angular/cli@14.2.10;;
         [Nn]* ) break;;
     esac
 
@@ -289,13 +291,13 @@ elif [ $yn == "n" ] || [ $yn == "N" ]; then
     sudo apt install unzip -y
     sudo apt install jq -y
     
-    # Install nodejs version 14 and angular version 13
+    # Install nodejs version 14 and angular version 14
     
     case $Angularyn in
         [Yy]* ) sudo curl -sL https://deb.nodesource.com/setup_14.x | sudo bash -;
                 sudo apt -y install nodejs;
                 sudo apt install npm -y;
-                sudo npm install -g @angular/cli@14.2.11;;
+                sudo npm install -g @angular/cli@14.2.10;;
         [Nn]* ) break;;
     esac
     
