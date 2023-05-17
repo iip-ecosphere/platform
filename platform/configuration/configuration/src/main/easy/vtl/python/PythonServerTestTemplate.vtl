@@ -3,7 +3,7 @@ import PythonBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template PythonTestTemplate(Configuration config, FileArtifact target, PythonService pythonElements) {
+template PythonServerTestTemplate(Configuration config, FileArtifact target, PythonService pythonElements) {
 
     def serviceImports(PythonService pythonElements) {
         String clsName = asTypeName(pythonElements.name);
