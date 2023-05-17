@@ -37,13 +37,13 @@ def serializeDataFromTestFile(rawData, dtype):
 
 """Runs a single test based on one data point form a test file"""
 def runTestsFromTestFile(sId, rawData):
-    dtype = list(rawData)[0]
-    dtype = dtype[0].upper() + dtype[1:]#Python serializers seem to register with uppercase, test data files assume lower case keys!(Seems to be fine in java
-    dataPoint = serializeDataFromTestFile(rawData, dtype)
-    """might be able to get by without dtype IF we can utilise the output of type(dataPoint) by correctly splitting and extracting the type
-    Unsure IF there is a secure way to split this to always get the needed element!"""
-    result = runTestsFromFile(sId, dataPoint, dtype) 
-    print(result)
+    for dtype in list(rawData):
+        dtype = dtype[0].upper() + dtype[1:]#Python serializers seem to register with uppercase, test data files assume lower case keys!(Seems to be fine in java
+        dataPoint = serializeDataFromTestFile(rawData, dtype)
+        """might be able to get by without dtype IF we can utilise the output of type(dataPoint) by correctly splitting and extracting the type
+        Unsure IF there is a secure way to split this to always get the needed element!"""
+        result = runTestsFromFile(sId, dataPoint, dtype) 
+        print(result)
 
 """Method running all Tests of a testFile in one go"""
 def runAllTestsFromFile(sId, path):
