@@ -44,6 +44,7 @@ export class ListComponent implements OnInit {
     {tabName: "Setup", metaProject:"TechnicalSetup", submodelElement:null},
     {tabName: "Constants", metaProject:"AllConstants", submodelElement:null},
     {tabName: "Types", metaProject:"AllTypes", submodelElement:null},
+    {tabName: "Dependencies", metaProject: "", submodelElement: "Dependency"},
     {tabName: "Nameplates", metaProject:null, submodelElement:"Manufacturer"},
     {tabName: "Services", metaProject:null, submodelElement:"ServiceBase"},
     {tabName: "Servers", metaProject:null, submodelElement:"Server"},
@@ -54,6 +55,7 @@ export class ListComponent implements OnInit {
   // Display ---------------------------------------------------------------------
   paramToDisplay = [
     ["ver", "Version: ", ""],
+    ["version", "Version: ", ""],
     ["name", "", ""],
     //["kind", "", ""],
     ["host", "Host: ", ""],
@@ -89,6 +91,9 @@ export class ListComponent implements OnInit {
       case "Types":
         this.filterTypes();
         break;
+      case "Dependencies":
+          this.filterDependencies();
+          break;
       case "Nameplates":
         this.filterManufacturer();
         break;
@@ -199,6 +204,26 @@ export class ListComponent implements OnInit {
     let result = []
     for (let tableRow of this.filteredData) {
       let new_value = {idShort: tableRow.idShort}
+      result.push(new_value)
+    }
+    this.filteredData = result
+  }
+
+  public filterDependencies() {
+    let result = []
+    for (let tableRow of this.filteredData) {
+      let temp = []
+      let name = tableRow.idShort
+      for (let value of tableRow.value) {
+        if (value.idShort == "version") {
+          let new_value = value.value.find(
+            (elemt: { idShort: string; }) => elemt.idShort === this.varValue).value
+          if(new_value != "") {
+            temp.push({ "value":  "Version: " + new_value})
+          }
+        }
+      }
+      let new_value = {idShort: name, value:temp}
       result.push(new_value)
     }
     this.filteredData = result
