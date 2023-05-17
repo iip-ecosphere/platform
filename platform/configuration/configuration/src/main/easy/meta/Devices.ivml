@@ -8,7 +8,7 @@ project Devices {
         
     abstract compound ContainerManager {
        assign (semanticId = Eclass_Unit_MByte) to {
-           Integer memLimit = 256; // e.g., JVM memory limit in MBytes
+           Integer memLimit = 312; // e.g., JVM memory limit in MBytes
        }
        String authenticationKey;
          // - globally allocated hosts/ports

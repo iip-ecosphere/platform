@@ -26,7 +26,7 @@ project Transport {
             Integer actionTimeout = 1000;
         }
         assign (semanticId = Eclass_Unit_MByte) to {
-            Integer memLimit = 256; // e.g., JVM memory limit in MBytes
+            Integer memLimit = 312; // e.g., JVM memory limit in MBytes
         }
         //Constraint actionTimeoutValid = isDefined(actionTimeout) and actionTimeout > 0; // currently NPE in EAYs
     };
