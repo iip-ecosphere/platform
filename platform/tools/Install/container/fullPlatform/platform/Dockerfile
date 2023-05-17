@@ -10,7 +10,7 @@ COPY plJars/ plJars
 COPY platform.sh platform.sh
 # App
 #COPY SimpleMeshInstallTestingApp/target/SimpleMeshInstallTestingApp-0.1.0-SNAPSHOT-bin.jar SimpleMeshInstallTestingApp-0.1.0-SNAPSHOT-bin.jar
-COPY SimpleMeshTestingApp/target/SimpleMeshTestingApp-0.1.0-SNAPSHOT-bin.jar SimpleMeshInstallTestingApp-0.1.0-SNAPSHOT-bin.jar
+COPY tests/SimpleMesh/SimpleMeshTestingApp/target/SimpleMeshTestingApp-0.1.0-SNAPSHOT-bin.jar SimpleMeshInstallTestingApp-0.1.0-SNAPSHOT-bin.jar
 # ECS
 COPY ecsJars/ ecsJars
 COPY ecs.sh ecs.sh
