@@ -81,6 +81,10 @@ template PythonTestTemplate(Configuration config, FileArtifact target, PythonSer
                 #Change name to correct .json, access rawData for values i.e. rawData["InputType"]["Value1"]
                 rawData = ""
                 service = ${asTypeName(pythonElements.name)}()
+
+                service.setState(ServiceState.STARTING)
+                service.setState(ServiceState.RUNNING)
+
                 ${genSerializerInitialization(pythonElements.input)}
 
                 service.attachIngestor(assertionIngestor) 
@@ -92,7 +96,10 @@ template PythonTestTemplate(Configuration config, FileArtifact target, PythonSer
 
                 # instantiate your service here, e.g., service = PyService()
                 # call your service here, e.g., service.processNewInput(impl)
-	            
+
+                service.setState(ServiceState.STOPPING)
+                service. setState(ServiceState.STOPPED)	            
+
                 # do your asserts here
                 self.assertTrue(True)
 
