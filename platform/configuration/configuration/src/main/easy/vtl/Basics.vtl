@@ -186,4 +186,8 @@ template Basics(Configuration config, FileArtifact target) {
         getBooleanValueSafe(var, true);
     }
 
+    def getContainerBaseImageMethodSafe(DecisionVariable var) {
+        getBooleanValueSafe(var, false);
+    }
+
 }
