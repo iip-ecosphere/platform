@@ -4,9 +4,9 @@ import DockerBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template Dockerfile_3_ecsAllApps(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, setOf(Application) apps, ContainerType containerType, EcsDevice device) {
+template Dockerfile_3_ecsAllApps(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, setOf(Application) apps, ContainerType containerType, EcsDevice device, Integer baseImageExist) {
 	
-    def main(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, setOf(Application) apps, ContainerType containerType, EcsDevice device) {
+    def main(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, setOf(Application) apps, ContainerType containerType, EcsDevice device, Integer baseImageExist) {
     	
     	'FROM docker' 
     	'${containerSettings(config, containerType, device)}'

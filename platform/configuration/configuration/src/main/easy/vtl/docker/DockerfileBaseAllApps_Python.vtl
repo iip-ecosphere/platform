@@ -4,69 +4,59 @@ import DockerBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template Dockerfile_PythonAllApps(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, setOf(Application) apps, ContainerType containerType, EcsDevice device, Integer baseImageExist) {
+template DockerfileBaseAllApps_Python(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, setOf(Application) apps, Boolean justCommenDep) {
 	
-    def main(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, setOf(Application) apps, ContainerType containerType, EcsDevice device, Integer baseImageExist) {
+    def main(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, setOf(Application) apps, Boolean justCommenDep) {
         
         
         Integer IsPythonInstalled = 0;
         String pythonPipInstalled = "";
         DockerContainerManager mgr = config.containerManager;
-        if (baseImageExist <> 0) {
-            setOf(Dependency) deviceDependencies = device.provides -> selectByType(PythonDependency);
 
-            if (deviceDependencies.size() > 0) {
-                'FROM ${mgr.registry}/allapps/appcommendepbaseimage:0.1.0'
-                '${containerSettings(config, containerType, device)}'
+        if (not(justCommenDep)) {
 
-                sequenceOf(PythonService) services = elements -> collect(e|e.impl) -> selectByType(PythonService);
-                for (PythonService pyService : services) {
-                    setOf(Dependency) deps = pyService.dependencies;
-                    for (Dependency s : deps) {
-                        if (genDependency(s) == 'PYTHON2') {
-                            if (IsPythonInstalled == 0) {
-                                IsPythonInstalled = 1;
-                                pythonPipInstalled = 'RUN python2 -m pip install -r requirements.txt';
-                            }
-                        } else if (genDependency(s) == 'PYTHON38') {
-                            if (IsPythonInstalled == 0) {
-                                IsPythonInstalled = 1;
-                                pythonPipInstalled = 'RUN python3 -m pip install -r requirements.txt';
-                            }
-                        } else if (genDependency(s) == 'PYTHON39') {
-                            if (IsPythonInstalled == 0) {
-                                IsPythonInstalled = 1;
-                                pythonPipInstalled = 'RUN python3 -m pip install -r requirements.txt';
-                            }
-                        } 
-                    }
-                }
+            'FROM ${mgr.registry}/allapps/appcommendepbaseimage:0.1.0'
 
-                if (IsPythonInstalled == 1) {
-                    'COPY requirements.txt requirements.txt'
-                    '${pythonPipInstalled}'
-                }
-            } else {
-                if (baseImageExist == 1) {
-                    'FROM ${mgr.registry}/allapps/appcommendepbaseimage:0.1.0'
-                    '${containerSettings(config, containerType, device)}'
-                } else if (baseImageExist == 2) {
-                    'FROM ${mgr.registry}/allapps/appalldepbaseimage:0.1.0'
-                    '${containerSettings(config, containerType, device)}'
+            sequenceOf(PythonService) services = elements -> collect(e|e.impl) -> selectByType(PythonService);
+            for (PythonService pyService : services) {
+                setOf(Dependency) deps = pyService.dependencies;
+                for (Dependency s : deps) {
+                    if (genDependency(s) == 'PYTHON2') {
+                        if (IsPythonInstalled == 0) {
+                            IsPythonInstalled = 1;
+                            pythonPipInstalled = 'RUN python2 -m pip install -r requirements.txt';
+                        }
+                    } else if (genDependency(s) == 'PYTHON38') {
+                        if (IsPythonInstalled == 0) {
+                            IsPythonInstalled = 1;
+                            pythonPipInstalled = 'RUN python3 -m pip install -r requirements.txt';
+                        }
+                    } else if (genDependency(s) == 'PYTHON39') {
+                        if (IsPythonInstalled == 0) {
+                            IsPythonInstalled = 1;
+                            pythonPipInstalled = 'RUN python3 -m pip install -r requirements.txt';
+                        }
+                    } 
                 }
             }
 
-        } else {         
+            if (IsPythonInstalled == 1) {
+                'COPY requirements.txt requirements.txt'
+                '${pythonPipInstalled}'
+            }
+        } else {
             setOf(Dependency) allDependencies = collectDependencies(elements);
             sequenceOf(String) tmp = {};
             for (Dependency d: allDependencies) {
                 installBeforePip(d, tmp);
             }
             sequenceOf(PythonService) services = elements -> collect(e|e.impl) -> selectByType(PythonService);
-
+    
+            Integer IsPythonInstalled = 0;
+            String pythonPipInstalled = "";
             for (PythonService pyService : services) {
                 setOf(Dependency) deps = pyService.dependencies;
-
+    
                 for (Dependency s : deps) {
                     if (genDependency(s) == 'PYTHON2') {
                         if (IsPythonInstalled == 0) {
@@ -84,7 +74,7 @@ template Dockerfile_PythonAllApps(IIPEcosphere config, FileArtifact target, sequ
                             pythonPipInstalled = 'RUN python3 -m pip install -r requirements.txt';
                         }
                         for (String s: tmp) {
-                            '${s}'
+                                '${s}'
                         }
                     } else if (genDependency(s) == 'PYTHON39') {
                         if (IsPythonInstalled == 0) {
@@ -108,8 +98,6 @@ template Dockerfile_PythonAllApps(IIPEcosphere config, FileArtifact target, sequ
             'RUN apt-get update'
             'RUN apt-get install -y openjdk-11-jre'
             ''
-            '${containerSettings(config, containerType, device)}'
-            ''
             if (not(collectDependencies(elements)->selectByKind(SystemDependency)->select(d|d.key=='JAVA8').isEmpty())) {
                 'RUN apt-get install software-properties-common -y'
                 'RUN apt-add-repository "deb http://security.debian.org/debian-security stretch/updates main"'
@@ -117,12 +105,15 @@ template Dockerfile_PythonAllApps(IIPEcosphere config, FileArtifact target, sequ
                 'RUN apt-get install -y openjdk-8-jdk'
             }
             ''
+            //'${containerSettings(config, containerType, device)}'
+            ''
             '# Installed dependencies (shall be in /)'
             'COPY installedDependencies.yml installedDependencies.yml'
             ''
             for (Application app : apps) {
                 '${genServersExpose(app)|e}'
             }
+            ''
             'WORKDIR /app'
             ''
             '# resources/devices'
@@ -134,40 +125,8 @@ template Dockerfile_PythonAllApps(IIPEcosphere config, FileArtifact target, sequ
             'COPY broker/broker.sh broker.sh'
             ''
         }
-
-        String deviceSpec = device.containerName;
-        if (deviceSpec.length() > 0) {
-            deviceSpec = "-" + deviceSpec;
-        }
-
-        if (containerType == ContainerType::EcsSvc_AllApps) {
-            '# ECS and Service Manager'
-            'COPY ecsSvcJars${deviceSpec}/ ecsSvcJars'
-            'COPY common/ common'
-            'COPY ecsServiceMgr.sh ecsServiceMgr.sh'
-        
-        } else if (containerType == ContainerType::Ecs_Svc_AllApps) {
-            '# Service Manager'
-            'COPY svcJars/ svcJars'
-            'COPY common/ common'
-            'COPY serviceMgr.sh serviceMgr.sh'
-            ''
-            '# ECS'
-            'COPY ecsJars${deviceSpec}/ ecsJars'
-            'COPY ecs.sh ecs.sh'
-        } else if (containerType == ContainerType::C1Ecs_C2Svc_AllApps) {
-            '# Service Manager'
-            'COPY svcJars/ svcJars'
-            'COPY common/ common'
-            'COPY serviceMgr.sh serviceMgr.sh'
-        }
-        ''		
-        '# Running the script'
-        'COPY wrapper_script.sh wrapper_script.sh'
-        'RUN chmod 777 wrapper_script.sh'
-        'ENTRYPOINT ["./wrapper_script.sh"]'
     }
-    
+
     def genDependency(Dependency d) {
         '';
     }

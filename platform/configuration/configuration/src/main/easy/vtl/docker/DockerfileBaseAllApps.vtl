@@ -1,0 +1,44 @@
+import Basics;
+import JavaBasics;
+import DockerBasics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template DockerfileBaseAllApps(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, setOf(Application) apps, Boolean justCommenDep) {
+	
+    def main(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, setOf(Application) apps, Boolean justCommenDep) {
+
+        DockerContainerManager mgr = config.containerManager;
+        if (not(justCommenDep)) {
+            'FROM ${mgr.registry}/allapps/appCommenDepBaseImage:0.1.0'
+        } else {
+            'FROM alpine:3.14'
+            //'${containerSettings(config, containerType, device)}'
+            'RUN apk add bash'
+            'RUN apk add openjdk11'
+            if (not(collectDependencies(elements)->selectByKind(SystemDependency)->select(d|d.key=='JAVA8').isEmpty())) {
+                'RUN apk add openjdk8'
+            }
+            ''
+            '# Installed dependencies (shall be in /)'
+            'COPY installedDependencies.yml installedDependencies.yml'
+            ''
+            for (Application app : apps) {
+                '${genServersExpose(app)|e}'
+            }
+            ''
+            'WORKDIR /app'
+            // '# App'
+            // 'COPY ${getAppMvnName(app)}/target/${getAppMvnName(app)}-${getAppMvnVersion(app)}-bin.jar ${getAppMvnName(app)}-${getAppMvnVersion(app)}-bin.jar'
+            // ''   	
+            '# resources/devices'
+            'COPY resources/ resources'
+            ''
+            '# Broker'
+            'COPY broker/brokerJars/ brokerJars'
+            'COPY broker/src/ src'
+            'COPY broker/broker.sh broker.sh'
+            ''
+        }
+    }
+}

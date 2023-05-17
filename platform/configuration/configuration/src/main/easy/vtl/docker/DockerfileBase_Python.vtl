@@ -4,68 +4,59 @@ import DockerBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template Dockerfile_Python(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, Application app, ContainerType containerType, EcsDevice device, Integer baseImageExist) {
+template DockerfileBase_Python(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, Application app, Boolean justCommenDep) {
 	
-    def main(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, Application app, ContainerType containerType, EcsDevice device, Integer baseImageExist) {
+    def main(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, Application app, Boolean justCommenDep) {
         
+
         Integer IsPythonInstalled = 0;
         String pythonPipInstalled = "";
         DockerContainerManager mgr = config.containerManager;
         String appName = app.name.toIdentifier().toLower();
-        if (baseImageExist <> 0) {
-            setOf(Dependency) deviceDependencies = device.provides -> selectByType(PythonDependency);
 
-            if (deviceDependencies.size() > 0) {
-                'FROM ${mgr.registry}/${appName}/appcommendepbaseimage:0.1.0'
-                '${containerSettings(config, containerType, device)}'
+        if (not(justCommenDep)) {
+            'FROM ${mgr.registry}/${appName}/appcommendepbaseimage:0.1.0'
 
-                sequenceOf(PythonService) services = elements -> collect(e|e.impl) -> selectByType(PythonService);
-                for (PythonService pyService : services) {
-                    setOf(Dependency) deps = pyService.dependencies;
-                    for (Dependency s : deps) {
-                        if (genDependency(s) == 'PYTHON2') {
-                            if (IsPythonInstalled == 0) {
-                                IsPythonInstalled = 1;
-                                pythonPipInstalled = 'RUN python2 -m pip install -r requirements.txt';
-                            }
-                        } else if (genDependency(s) == 'PYTHON38') {
-                            if (IsPythonInstalled == 0) {
-                                IsPythonInstalled = 1;
-                                pythonPipInstalled = 'RUN python3 -m pip install -r requirements.txt';
-                            }
-                        } else if (genDependency(s) == 'PYTHON39') {
-                            if (IsPythonInstalled == 0) {
-                                IsPythonInstalled = 1;
-                                pythonPipInstalled = 'RUN python3 -m pip install -r requirements.txt';
-                            }
-                        } 
-                    }
-                }
-
-                if (IsPythonInstalled == 1) {
-                    'COPY requirements.txt requirements.txt'
-                    '${pythonPipInstalled}'
-                }
-            } else {
-                if (baseImageExist == 1) {
-                    'FROM ${mgr.registry}/${appName}/appcommendepbaseimage:0.1.0'
-                    '${containerSettings(config, containerType, device)}'
-                } else if (baseImageExist == 2) {
-                    'FROM ${mgr.registry}/${appName}/appalldepbaseimage:0.1.0'
-                    '${containerSettings(config, containerType, device)}'
+            sequenceOf(PythonService) services = elements -> collect(e|e.impl) -> selectByType(PythonService);
+            for (PythonService pyService : services) {
+                setOf(Dependency) deps = pyService.dependencies;
+                for (Dependency s : deps) {
+                    if (genDependency(s) == 'PYTHON2') {
+                        if (IsPythonInstalled == 0) {
+                            IsPythonInstalled = 1;
+                            pythonPipInstalled = 'RUN python2 -m pip install -r requirements.txt';
+                        }
+                    } else if (genDependency(s) == 'PYTHON38') {
+                        if (IsPythonInstalled == 0) {
+                            IsPythonInstalled = 1;
+                            pythonPipInstalled = 'RUN python3 -m pip install -r requirements.txt';
+                        }
+                    } else if (genDependency(s) == 'PYTHON39') {
+                        if (IsPythonInstalled == 0) {
+                            IsPythonInstalled = 1;
+                            pythonPipInstalled = 'RUN python3 -m pip install -r requirements.txt';
+                        }
+                    } 
                 }
             }
-        } else {        
+
+            if (IsPythonInstalled == 1) {
+                'COPY requirements.txt requirements.txt'
+                '${pythonPipInstalled}'
+            }
+        } else {
             setOf(Dependency) allDependencies = collectDependencies(elements);
             sequenceOf(String) tmp = {};
             for (Dependency d: allDependencies) {
                 installBeforePip(d, tmp);
             }
             sequenceOf(PythonService) services = elements -> collect(e|e.impl) -> selectByType(PythonService);
-
+    
+            Integer IsPythonInstalled = 0;
+            String pythonPipInstalled = "";
             for (PythonService pyService : services) {
                 setOf(Dependency) deps = pyService.dependencies;
-
+    
                 for (Dependency s : deps) {
                     if (genDependency(s) == 'PYTHON2') {
                         if (IsPythonInstalled == 0) {
@@ -102,7 +93,7 @@ template Dockerfile_Python(IIPEcosphere config, FileArtifact target, sequenceOf(
                 'COPY requirements.txt requirements.txt'
                 '${pythonPipInstalled}'
             }
-        
+            
             ''
             'RUN apt-get update'
             'RUN apt-get install -y openjdk-11-jre'
@@ -114,7 +105,7 @@ template Dockerfile_Python(IIPEcosphere config, FileArtifact target, sequenceOf(
                 'RUN apt-get install -y openjdk-8-jdk'
             }
             ''
-            '${containerSettings(config, containerType, device)}'
+            //'${containerSettings(config, containerType, device)}'
             ''
             '# Installed dependencies (shall be in /)'
             'COPY installedDependencies.yml installedDependencies.yml'
@@ -130,42 +121,7 @@ template Dockerfile_Python(IIPEcosphere config, FileArtifact target, sequenceOf(
             'COPY broker/src/ src'
             'COPY broker/broker.sh broker.sh'
             ''
-            // '# App'
-            // 'COPY ${getAppMvnName(app)}/target/${getAppMvnName(app)}-${getAppMvnVersion(app)}-bin.jar ${getAppMvnName(app)}-${getAppMvnVersion(app)}-bin.jar'
-            // ''
         }
-
-        String deviceSpec = device.containerName;
-        if (deviceSpec.length() > 0) {
-            deviceSpec = "-" + deviceSpec;
-        }
-
-        if (containerType == ContainerType::EcsSvc_App) {
-            '# ECS and Service Manager'
-            'COPY ecsSvcJars${deviceSpec}/ ecsSvcJars'
-            'COPY common/ common'
-            'COPY ecsServiceMgr.sh ecsServiceMgr.sh'
-        
-        } else if (containerType == ContainerType::Ecs_Svc_App) {
-            '# Service Manager'
-            'COPY svcJars/ svcJars'
-            'COPY common/ common'
-            'COPY serviceMgr.sh serviceMgr.sh'
-            ''
-            '# ECS'
-            'COPY ecsJars${deviceSpec}/ ecsJars'
-            'COPY ecs.sh ecs.sh'
-        } else if (containerType == ContainerType::C1Ecs_C2Svc_App) {
-            '# Service Manager'
-            'COPY svcJars/ svcJars'
-            'COPY common/ common'
-            'COPY serviceMgr.sh serviceMgr.sh'
-        }
-        ''		
-        '# Running the script'
-        'COPY wrapper_script.sh wrapper_script.sh'
-        'RUN chmod 777 wrapper_script.sh'
-        'ENTRYPOINT ["./wrapper_script.sh"]'
     }
     
     def genDependency(Dependency d) {

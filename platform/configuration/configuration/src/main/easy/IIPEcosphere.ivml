@@ -28,6 +28,7 @@ project IIPEcosphere {
         Integer centralMemLimit = 0; // general memory limit for central platform services, e.g., JVM memory limit in MBytes
         Integer monitoringMemLimit = 256; // general memory limit for central platform services, e.g., JVM memory limit in MBytes
     }
+    Boolean containerBaseImageMethod = false; // Use container base image method during the container creation.
     
     // legacy transition (to be removed)
     Boolean sharedInterfaces = false;

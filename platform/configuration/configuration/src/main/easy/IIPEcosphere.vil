@@ -492,9 +492,15 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     
     // creates containers depending on container strategies
     setOf(EcsDevice) ecsDeviceGenerated = {};
+    Integer jarsCollecting = 0;
+    Integer brokerCollecting = 0;
     String generateServiceContainer(Path appRoot, IIPEcosphere config, Application a, sequenceOf(MeshElement) elements) = {
         String appImageId = "";
         String artifactsFolder = getArtifactsFolder(appRoot, config);
+        Integer baseImageCreated = 0; // 0 - Not base images, 1 - All dependencies base image, 2 - All and commen dependencies base images 
+        Boolean baseImageMethod = getContainerBaseImageMethodSafe(config.containerBaseImageMethod); 
+        String dfName;
+
         ContainerManager mgr = config.containerManager;
         if (a.createContainer and getContainerGenerationSafe(config.containerGeneration)) {
             String regUser = getProperty("iip.container.user." + mgr.authenticationKey, "");
@@ -515,35 +521,129 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
             
             String appName = a.name.toIdentifier();
             setOf(EcsDevice) devices = EcsDevice.allInstances();
+
+            setOf(Dependency) dependencies = {};
+            Boolean isContainerForOneApp = false;
+            for (EcsDevice device : devices->sortedBy(d|d.id)) {
+                setOf(Dependency) deviceDependencies = device.provides -> selectByType(PythonDependency);
+                ContainerType cntType = device.containerType;
+                for (PythonDependency dependency : deviceDependencies) {
+                    dependencies.add(dependency);
+                }
+
+                if (not(isAllAppsContainer(cntType))){
+                    isContainerForOneApp = true;
+                }
+            }
+
+            if ((isContainerForOneApp) and (baseImageMethod)){
+                Boolean justCommenDep = true;
+                Path deviceBaseDf = "${artifactsFolder}/DeviceDockerfiles/${appName}/DeviceDockerfile_CommenDepBase";
+
+                if (isPythonService == 1) {
+                    Path req = "${appRoot}/../requirements.txt";
+                    // TODO #130 consider server dependencies here
+                    vilTemplateProcessor("PythonBaseReq", config, req, elements=elements, dependencies=dependencies, justCommenDep=justCommenDep);
+                    copy(req, deviceBaseDf);
+                }
+
+                Path instDep = "${appRoot}/../installedDependencies.yml";
+                vilTemplateProcessor("InstalledDependencies", config, instDep, elements=elements, isPython=isPythonService);
+                copy(instDep, deviceBaseDf);
+            
+                Path devicesPath = getResourcesFolder() + "/devices";
+                Path devicesGenPath = "${appRoot}/../resources/devices";
+                copy(devicesPath, devicesGenPath);
+
+                Path identityStorePath = getResourcesFolder() + "/platform/identityStore.yml";
+                if (not(identityStorePath.exists())) {
+                    identityStorePath = getResourcesFolder() + "/software/identityStore.yml";
+                }
+                Path identityStoreGenPath = "${appRoot}/../resources";
+                copy(identityStorePath, identityStoreGenPath);
+
+                dfName = createContainerBuildBaseScript(mgr, a, elements, appRoot, isPythonService, justCommenDep);
+
+                // Create image 
+                Path b = "${appRoot}/../";
+                Path d = "${appRoot}/../" + dfName;
+                copy(d, deviceBaseDf);
+
+                appImageId = createContainerImage(mgr, b, d, appName, "appCommenDepBaseImage", "0.1.0");
+
+                justCommenDep = false;
+                if (isPythonService == 1) {
+                    Path req = "${appRoot}/../requirements.txt";
+                    // TODO #130 consider server dependencies here
+                    vilTemplateProcessor("PythonBaseReq", config, req, elements=elements, dependencies=dependencies, justCommenDep=justCommenDep);
+                }
+
+                Path commenDepRequirements = "${deviceBaseDf}/requirements.txt";
+                Path allDepRequirements = "${appRoot}/../requirements.txt";
+                Boolean checkDepRequirements = checkFilesEquality(allDepRequirements, commenDepRequirements);
+                baseImageCreated = 1;
+
+                if (not(checkDepRequirements)){
+                    deviceBaseDf = "${artifactsFolder}/DeviceDockerfiles/${appName}/DeviceDockerfile_AllDepBase";
+                    dfName = createContainerBuildBaseScript(mgr, a, elements, appRoot, isPythonService, justCommenDep);
+                    copy(allDepRequirements, deviceBaseDf);
+                    copy(instDep, deviceBaseDf);
+                    copy(devicesPath, devicesGenPath);
+                    copy(identityStorePath, identityStoreGenPath);
+                    copy(d, deviceBaseDf);
+                    appImageId = createContainerImage(mgr, b, d, appName, "appAllDepBaseImage", "0.1.0");
+                    baseImageCreated = 2;
+                }
+                
+            }
+
             for (EcsDevice device : devices->sortedBy(d|d.id)) {
                 ContainerType cntType = device.containerType;
                 String deviceName = getContainerNameDflt(device).toIdentifier();
                 String filePrefix = "${appName}_${deviceName}_";
                 Path deviceDf = "${artifactsFolder}/DeviceDockerfiles/${appName}/DeviceDockerfile_${deviceName}";
 
-                if (not(isAllAppsContainer(cntType))){
-                    if (isPythonService == 1) {
-                        Path req = "${appRoot}/../requirements.txt";
-                        // TODO #130 consider server dependencies here
-                        vilTemplateProcessor("PythonReq", config, req, elements=elements, device=device);
-                        copy(req, deviceDf);
+                if (not(isAllAppsContainer(cntType))) {
+
+                    setOf(Dependency) deviceDependencies = device.provides -> selectByType(PythonDependency);
+
+                    String dfName;
+
+                    if (baseImageCreated <> 0){
+                        if (deviceDependencies.size() > 0) {
+                            if (isPythonService == 1) {
+                                Path req = "${appRoot}/../requirements.txt";
+                                // TODO #130 consider server dependencies here
+                                vilTemplateProcessor("PythonReq", config, req, elements=elements, device=device);
+                                copy(req, deviceDf);
+                            }
+                        }
+
+                        dfName = createContainerBuildScript(mgr, a, elements, appRoot, cntType, isPythonService, device, baseImageCreated);
+                    } else {
+                        if (isPythonService == 1) {
+                            Path req = "${appRoot}/../requirements.txt";
+                            // TODO #130 consider server dependencies here
+                            vilTemplateProcessor("PythonReq", config, req, elements=elements, device=device);
+                            copy(req, deviceDf);
+                        }
+
+                        Path instDep = "${appRoot}/../installedDependencies.yml";
+                        vilTemplateProcessor("InstalledDependencies", config, instDep, elements=elements, isPython=isPythonService, baseImageExist=baseImageCreated);
+
+                        Path devicesPath = getResourcesFolder() + "/devices";
+                        Path devicesGenPath = "${appRoot}/../resources/devices";
+                        copy(devicesPath, devicesGenPath);
+
+                        Path identityStorePath = getResourcesFolder() + "/platform/identityStore.yml";
+                        if (not(identityStorePath.exists())) {
+                            identityStorePath = getResourcesFolder() + "/software/identityStore.yml";
+                        }
+                        Path identityStoreGenPath = "${appRoot}/../resources";
+                        copy(identityStorePath, identityStoreGenPath);
+
+                        dfName = createContainerBuildScript(mgr, a, elements, appRoot, cntType, isPythonService, device, baseImageCreated);
                     }
-
-                    Path instDep = "${appRoot}/../installedDependencies.yml";
-                    vilTemplateProcessor("InstalledDependencies", config, instDep, elements=elements, isPython=isPythonService);
-            
-                    Path devicesPath = getResourcesFolder() + "/devices";
-                    Path devicesGenPath = "${appRoot}/../resources/devices";
-                    copy(devicesPath, devicesGenPath);
-
-                    Path identityStorePath = getResourcesFolder() + "/platform/identityStore.yml";
-                    if (not(identityStorePath.exists())) {
-                        identityStorePath = getResourcesFolder() + "/software/identityStore.yml";
-                    }
-                    Path identityStoreGenPath = "${appRoot}/../resources";
-                    copy(identityStorePath, identityStoreGenPath);
-
-                    String dfName = createContainerBuildScript(mgr, a, elements, appRoot, cntType, isPythonService, device);
 
                     if (cntType == ContainerType::Ecs_Svc_App) {
                         // Wrapper-Skript 
@@ -592,7 +692,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                             }
                         }
                         if (isEcs == 0) {
-                            String ecsDfName = createContainerBuildScript(mgr, a, elements, appRoot, cntType, -1, device);
+                            String ecsDfName = createContainerBuildScript(mgr, a, elements, appRoot, cntType, -1, device, baseImageCreated);
                     
                             Path ecs_ws = "${appRoot}/../ecs.wrapper_script.sh";
                             vilTemplateProcessor("WrapperScript", config, ecs_ws, containerType=ContainerType::Ecs);
@@ -641,9 +741,50 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                         vilTemplateProcessor("MeshInfo", config, meshInfo, app=a, containerType=ContainerType::C1Ecs_C2Svc_App, device=device);
                         copy(meshInfo, deviceDf);
                     }
+
+                    if (jarsCollecting < device.size()) {
+                        Path deviceJarsDf = "${artifactsFolder}/DeviceDockerfiles/Jars/DeviceDockerfile_${deviceName}";
+                        String deviceSpec = device.containerName;
+                        String tmpFolderName = "";
+                        if (deviceSpec.length() > 0) {
+                            deviceSpec = "-" + deviceSpec;
+                        } 
+                        if (deviceSpec.length() == 0) {
+                            tmpFolderName = "-dflt";
+                        }
+
+                        Path ecsPath = "${appRoot}/../ecsJars${deviceSpec}";
+                        ecsPath.rename("ecsJars${deviceSpec}${tmpFolderName}");
+                        Path deviceEcsDf = "${deviceJarsDf}/ecsJars${deviceSpec}";
+                        copy(ecsPath, deviceEcsDf);
+                        ecsPath.rename("ecsJars${deviceSpec}");
+					    
+                        Path svcPath = "${appRoot}/../svcJars${deviceSpec}";
+                        svcPath.rename("svcJars${deviceSpec}${tmpFolderName}");
+                        Path deviceSvcDf = "${deviceJarsDf}/svcJars${deviceSpec}";
+                        copy(svcPath, deviceSvcDf);
+                        svcPath.rename("svcJars${deviceSpec}");
+					    
+                        Path ecsSvcJarsPath = "${appRoot}/../ecsSvcJars${deviceSpec}";
+                        ecsSvcJarsPath.rename("ecsSvcJars${deviceSpec}${tmpFolderName}");
+                        Path deviceEcsSvcDf = "${deviceJarsDf}/ecsSvcJars${deviceSpec}";
+                        copy(ecsSvcJarsPath, deviceEcsSvcDf);
+                        ecsSvcJarsPath.rename("ecsSvcJars${deviceSpec}");
+                        jarsCollecting = jarsCollecting + 1;
+                    }
+
+                    if (brokerCollecting == 0) {
+                        Path brokerDf = "${artifactsFolder}/DeviceDockerfiles/broker";
+                        Path brokerPath = "${target}/broker";
+                        copy(brokerPath, brokerDf);
+                        Path brokerJarsDf = "${artifactsFolder}/DeviceDockerfiles/broker/brokerJars";
+                        Path brokerJarsPath = "${target}/broker/brokerJars";
+                        copy(brokerJarsPath, brokerJarsDf);
+                        brokerCollecting = brokerCollecting + 1;
+                    }
+
                 }
             }
-
             if (authenticate) {
                 logoutContainerRegistry(mgr);
             }
@@ -656,7 +797,99 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         ContainerManager mgr = config.containerManager;
         setOf(EcsDevice) devices = EcsDevice.allInstances();
         int count = 1;
+        String dfName;
+        Integer baseImageCreated = 0; // 0 - Not base images, 1 - All dependencies base image, 2 - All and commen dependencies base images 
+        Boolean baseImageMethod = getContainerBaseImageMethodSafe(config.containerBaseImageMethod);
+
         if (allElements.size() > 1 and getContainerGenerationSafe(config.containerGeneration)) {
+
+            // Checking if there is any PythonService in app
+            Integer isPythonService = 0;        // 0 - false, 1 - true, -1 below ECS only (containerType == C1Ecs_C2Svc_App)
+            for (MeshElement elem : allElements) {
+                Service service = elem.impl;
+                if (service.isTypeOf(PythonService)) {
+                    isPythonService = 1;
+                }
+            }
+
+            setOf(Application) applications = getApplications();
+
+            setOf(Dependency) dependencies = {};
+            Boolean isContainerForAllApps = false;
+            for (EcsDevice device : devices->sortedBy(d|d.id)) {
+                setOf(Dependency) deviceDependencies = device.provides -> selectByType(PythonDependency);
+                ContainerType cntType = device.containerType;
+                for (PythonDependency dependency : deviceDependencies) {
+                    dependencies.add(dependency);
+                }
+
+                if (isAllAppsContainer(cntType)){
+                    isContainerForAllApps = true;
+                }
+            }
+
+            if ((isContainerForAllApps) and (baseImageMethod)){
+                String appImageId;
+                Boolean justCommenDep = true;
+                String appName = "allApps";
+                Path deviceBaseDf = "${artifactsFolder}/DeviceDockerfiles/${appName}/DeviceDockerfile_CommenDepBase";
+
+                if (isPythonService == 1) {
+                    Path req = "${target}/requirements.txt";
+                    // TODO #130 consider server dependencies here
+                    vilTemplateProcessor("PythonBaseReq", config, req, elements=allElements, dependencies=dependencies, justCommenDep=justCommenDep);
+                    copy(req, deviceBaseDf);
+                }
+
+                Path instDep = "${target}/installedDependencies.yml";
+                vilTemplateProcessor("InstalledDependencies", config, instDep, elements=allElements, isPython=isPythonService);
+                copy(instDep, deviceBaseDf);
+            
+                Path devicesPath = getResourcesFolder() + "/devices";
+                Path devicesGenPath = "${target}/resources/devices";
+                copy(devicesPath, devicesGenPath);
+
+                Path identityStorePath = getResourcesFolder() + "/platform/identityStore.yml";
+                if (not(identityStorePath.exists())) {
+                    identityStorePath = getResourcesFolder() + "/software/identityStore.yml";
+                }
+                Path identityStoreGenPath = "${target}/resources";
+                copy(identityStorePath, identityStoreGenPath);
+
+                dfName = createContainerBuildBaseScriptAllApps(mgr, applications, allElements, target, isPythonService, justCommenDep);
+
+                // Create image 
+                Path b = "${target}/";
+                Path d = "${target}/" + dfName;
+                copy(d, deviceBaseDf);
+
+                appImageId = createContainerImage(mgr, b, d, "allapps", "appCommenDepBaseImage", "0.1.0");
+
+                justCommenDep = false;
+                if (isPythonService == 1) {
+                    Path req = "${target}/requirements.txt";
+                    // TODO #130 consider server dependencies here
+                    vilTemplateProcessor("PythonBaseReq", config, req, elements=allElements, dependencies=dependencies, justCommenDep=justCommenDep);
+                }
+
+                Path commenDepRequirements = "${deviceBaseDf}/requirements.txt";
+                Path allDepRequirements = "${target}/requirements.txt";
+                Boolean checkDepRequirements = checkFilesEquality(allDepRequirements, commenDepRequirements);
+                baseImageCreated = 1;
+
+                if (not(checkDepRequirements)){
+                    deviceBaseDf = "${artifactsFolder}/DeviceDockerfiles/${appName}/DeviceDockerfile_AllDepBase";
+                    dfName = createContainerBuildBaseScriptAllApps(mgr, applications, allElements, target, isPythonService, justCommenDep);
+                    copy(allDepRequirements, deviceBaseDf);
+                    copy(instDep, deviceBaseDf);
+                    copy(devicesPath, devicesGenPath);
+                    copy(identityStorePath, identityStoreGenPath);
+                    copy(d, deviceBaseDf);
+                    appImageId = createContainerImage(mgr, b, d, "allapps", "appAllDepBaseImage", "0.1.0");
+                    baseImageCreated = 2;
+                }
+                
+            }
 
             for (EcsDevice device : devices->sortedBy(d|d.id)) {
                 if (!inTesting or (inTesting and count < 2)) { // inTesting, just produce the first one -> CI roundtrip time
@@ -673,41 +906,47 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                         if (authenticate) {
                             loginContainerRegistry(mgr, regUser, regPwd);
                         }
-                                
-                        // Checking if there is any PythonService in app
-                        Integer isPythonService = 0;        // 0 - false, 1 - true, -1 below ECS only (containerType == C1Ecs_C2Svc_App)
-                        for (MeshElement elem : allElements) {
-                            Service service = elem.impl;
-                            if (service.isTypeOf(PythonService)) {
-                                isPythonService = 1;
+                        
+                        setOf(Dependency) deviceDependencies = device.provides -> selectByType(PythonDependency);
+						
+                        if (baseImageCreated <> 0){
+                            if (deviceDependencies.size() > 0) {
+                                if (isPythonService == 1) {
+                                    Path req = "${target}/requirements.txt";
+                                    // TODO #130 consider server dependencies here
+                                    vilTemplateProcessor("PythonReq", config, req, elements=allElements, device=device);
+                                    copy(req, deviceDf);
+                                }
                             }
-                        }
-        
-                        if (isPythonService == 1) {
-                            Path req = "${target}/requirements.txt";
-                            // TODO #130 consider server dependencies here
-                            vilTemplateProcessor("PythonReq", config, req, elements=allElements, device=device);
-                            copy(req, deviceDf);
-                        }
-        
-                        Path instDep = "${target}/installedDependencies.yml";
-                        vilTemplateProcessor("InstalledDependencies", config, instDep, elements=allElements, isPython=isPythonService);
-                        copy(instDep, deviceDf);
 
-                        Path devicesPath = getResourcesFolder() + "/devices";
-                        Path devicesGenPath = "${target}/resources/devices";
-                        copy(devicesPath, devicesGenPath);
+                            dfName = createContainerBuildScriptAllApps(mgr, applications, allElements, target, cntType, isPythonService, device, baseImageCreated);
+                        } else {
+
+                            if (isPythonService == 1) {
+                                Path req = "${target}/requirements.txt";
+                                // TODO #130 consider server dependencies here
+                                vilTemplateProcessor("PythonReq", config, req, elements=allElements, device=device);
+                                copy(req, deviceDf);
+                            }
+        
+                            Path instDep = "${target}/installedDependencies.yml";
+                            vilTemplateProcessor("InstalledDependencies", config, instDep, elements=allElements, isPython=isPythonService);
+                            copy(instDep, deviceDf);
+
+                            Path devicesPath = getResourcesFolder() + "/devices";
+                            Path devicesGenPath = "${target}/resources/devices";
+                            copy(devicesPath, devicesGenPath);
 	                    
-                        Path identityStorePath = getResourcesFolder() + "/platform/identityStore.yml";
-                        if (not(identityStorePath.exists())) {
-                            identityStorePath = getResourcesFolder() + "/software/identityStore.yml";
-                        }
-                        Path identityStoreGenPath = "${target}/resources";
-                        copy(identityStorePath, identityStoreGenPath);
+                            Path identityStorePath = getResourcesFolder() + "/platform/identityStore.yml";
+                            if (not(identityStorePath.exists())) {
+                                identityStorePath = getResourcesFolder() + "/software/identityStore.yml";
+                            }
+                            Path identityStoreGenPath = "${target}/resources";
+                            copy(identityStorePath, identityStoreGenPath);
 
-                        setOf(Application) applications = getApplications();
-                        String dfName = createContainerBuildScriptAllApps(mgr, applications, allElements, target, cntType, isPythonService, device);
-        
+                            dfName = createContainerBuildScriptAllApps(mgr, applications, allElements, target, cntType, isPythonService, device, baseImageCreated);
+                        }
+
                         // Wrapper-Skript 
                         Path ws = "${target}/wrapper_script.sh";
                         vilTemplateProcessor("WrapperScript", config, ws, containerType=cntType); 
@@ -718,7 +957,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                         Path d = "${target}/" + dfName;
                         copy(d, deviceDf);
 
-                        String appImageId = createContainerImage(mgr, b, d, "allApps", deviceName, "0.1.0");
+                        String appImageId = createContainerImage(mgr, b, d, "allapps", deviceName, "0.1.0");
         
                         // Mesh-Info, Container-Descriptor
                         Path meshInfo = "${artifactsFolder}/${filePrefix}mesh-info.yml";
@@ -726,7 +965,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                         copy(meshInfo, deviceDf);
 
                         if (cntType == ContainerType::C1Ecs_C2Svc_AllApps) {
-                            String ecsDfName = createContainerBuildScriptAllApps(mgr, applications, allElements, target, cntType, -1, device);
+                            String ecsDfName = createContainerBuildScriptAllApps(mgr, applications, allElements, target, cntType, -1, device, baseImageCreated);
 
                             Path ecs_ws = "${target}/ecs.wrapper_script.sh";
                             vilTemplateProcessor("WrapperScript", config, ecs_ws, containerType=ContainerType::Ecs);
@@ -736,7 +975,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                             Path d = "${target}/" + ecsDfName;
                             copy(d, deviceDf);
 
-                            String ecs_imageId = createContainerImage(mgr, b, d, "allApps", deviceName + "_" + "ecs", "0.1.0");
+                            String ecs_imageId = createContainerImage(mgr, b, d, "allapps", deviceName + "_" + "ecs", "0.1.0");
                                 
                             // Mesh-Info, Container-Descriptor
                             Path meshInfoEcs = "${artifactsFolder}/${filePrefix}mesh-info-ecs.yml";
@@ -748,10 +987,53 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                             logoutContainerRegistry(mgr);
                         }
                         count = count + 1;
+
+                        String deviceSpec = device.containerName;
+                        String tmpFolderName = "";
+                        if (deviceSpec.length() > 0) {
+                            deviceSpec = "-" + deviceSpec;
+                        } 
+                        if (deviceSpec.length() == 0) {
+                            tmpFolderName = "-dflt";
+                        }
+					    
+                        Path ecsPath = "${target}/ecsJars${deviceSpec}";
+                        ecsPath.rename("ecsJars${deviceSpec}${tmpFolderName}");
+                        Path deviceEcsDf = "${deviceDf}/ecsJars${deviceSpec}";
+                        copy(ecsPath, deviceEcsDf);
+                        ecsPath.rename("ecsJars${deviceSpec}");
+					    
+                        Path svcPath = "${target}/svcJars${deviceSpec}";
+                        svcPath.rename("svcJars${deviceSpec}${tmpFolderName}");
+                        Path deviceSvcDf = "${deviceDf}/svcJars${deviceSpec}";
+                        copy(svcPath, deviceSvcDf);
+                        svcPath.rename("svcJars${deviceSpec}");
+					    
+                        Path ecsSvcJarsPath = "${target}/ecsSvcJars${deviceSpec}";
+                        ecsSvcJarsPath.rename("ecsSvcJars${deviceSpec}${tmpFolderName}");
+                        Path deviceEcsSvcDf = "${deviceDf}/ecsSvcJars${deviceSpec}";
+                        copy(ecsSvcJarsPath, deviceEcsSvcDf);
+                        ecsSvcJarsPath.rename("ecsSvcJars${deviceSpec}");
                     }
                 }
-            }        
+            }
+
+            if (isContainerForAllApps) {
+                String appName = "allApps";
+                Path brokerDf = "${artifactsFolder}/DeviceDockerfiles/${appName}/broker";
+                Path brokerPath = "${target}/broker";
+                copy(brokerPath, brokerDf);
+                Path brokerJarsDf = "${artifactsFolder}/DeviceDockerfiles/${appName}/broker/brokerJars";
+                Path brokerJarsPath = "${target}/broker/brokerJars";
+                copy(brokerJarsPath, brokerJarsDf);
+            }
         }
+    }
+
+    Boolean checkFilesEquality(Path pathFile1, Path pathFile2) = { 
+        FileArtifact pathFile1Artifact = pathFile1;
+        FileArtifact pathFile2Artifact = pathFile2;
+        pathFile1Artifact.hasSameContent(pathFile2Artifact);
     }
 
     Boolean isAllAppsContainer(ContainerType cntType) = { 

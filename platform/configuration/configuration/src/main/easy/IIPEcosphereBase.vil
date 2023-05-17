@@ -84,14 +84,25 @@ vilScript IIPEcosphereBase (Project source, Configuration config, Project target
     // ---------------------------- containers ------------------------------
     
     // dispatch basis, creates container build script and returns file name
+    String createContainerBuildBaseScript(ContainerManager mgr, Application a, sequenceOf(MeshElement) elements, 
+        Path appRoot, Integer isPythonService, Boolean justCommenDep) = {
+        "";
+    }
+   
+    String createContainerBuildBaseScriptAllApps(ContainerManager mgr, setOf(Application) applications, sequenceOf(MeshElement) elements, 
+        Project target, Integer isPythonService, Boolean justCommenDep) = {
+        "";
+    }
+
+    // dispatch basis, creates container build script and returns file name
     String createContainerBuildScript(ContainerManager mgr, Application a, sequenceOf(MeshElement) elements, 
-        Path appRoot, ContainerType contType, Integer isPythonService, EcsDevice device) = {
+        Path appRoot, ContainerType contType, Integer isPythonService, EcsDevice device, Integer baseImageExist) = {
         "";
     }
 
     // dispatch basis, creates container build script for all applications and returns file name
     String createContainerBuildScriptAllApps(ContainerManager mgr, setOf(Application) applications, sequenceOf(MeshElement) elements, 
-        Project target, ContainerType contType, Integer isPythonService, EcsDevice device) = {
+        Project target, ContainerType contType, Integer isPythonService, EcsDevice device, Integer baseImageExist) = {
         "";
     }
 
@@ -105,11 +116,17 @@ vilScript IIPEcosphereBase (Project source, Configuration config, Project target
         "";
     }
     
+    // dispatch basis, build container image without push to registry
+    String createContainerImageWithoutPush(ContainerManager mgr, Path base, Path buildFile, String registry, String repository, String tag) = {
+        "";
+    }
+
     loginContainerRegistry(ContainerManager mgr, String user, String password) = {
     }
 
     logoutContainerRegistry(ContainerManager mgr) = {
     }
+
     
     // ---------------------------- maven -----------------------------------
     

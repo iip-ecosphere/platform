@@ -4,37 +4,48 @@ import DockerBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template Dockerfile(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, Application app, ContainerType containerType, EcsDevice device) {
+template Dockerfile(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, Application app, ContainerType containerType, EcsDevice device, Integer baseImageExist) {
 	
-    def main(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, Application app, ContainerType containerType, EcsDevice device) {
+    def main(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, Application app, ContainerType containerType, EcsDevice device, Integer baseImageExist) {
 
-        'FROM alpine:3.14'
-        '${containerSettings(config, containerType, device)}'
-        'RUN apk add bash'
-        'RUN apk add openjdk11'
-        if (not(collectDependencies(elements)->selectByKind(SystemDependency)->select(d|d.key=='JAVA8').isEmpty())) {
-            'RUN apk add openjdk8'
+        DockerContainerManager mgr = config.containerManager;
+        String appName = app.name.toIdentifier().toLower();
+        if (baseImageExist <> 0) {
+            if (baseImageExist == 1) {
+                'FROM ${mgr.registry}/${appName}/appcommendepbaseimage:0.1.0'
+                '${containerSettings(config, containerType, device)}'
+            } else if (baseImageExist == 2) {
+                'FROM ${mgr.registry}/${appName}/appalldepbaseimage:0.1.0'
+                '${containerSettings(config, containerType, device)}'
+            }
+        } else {
+            'FROM alpine:3.14'
+            '${containerSettings(config, containerType, device)}'
+            'RUN apk add bash'
+            'RUN apk add openjdk11'
+            if (not(collectDependencies(elements)->selectByKind(SystemDependency)->select(d|d.key=='JAVA8').isEmpty())) {
+                'RUN apk add openjdk8'
+            }
+            ''
+            '# Installed dependencies (shall be in /)'
+            'COPY installedDependencies.yml installedDependencies.yml'
+            ''
+            '${genServersExpose(app)|e}'
+            'WORKDIR /app'
+            // '# App'
+            // 'COPY ${getAppMvnName(app)}/target/${getAppMvnName(app)}-${getAppMvnVersion(app)}-bin.jar ${getAppMvnName(app)}-${getAppMvnVersion(app)}-bin.jar'
+            // ''
+            ''   	
+            '# resources/devices'
+            'COPY resources/ resources'
+            ''
+            '# Broker'
+            'COPY broker/brokerJars/ brokerJars'
+            'COPY broker/src/ src'
+            'COPY broker/broker.sh broker.sh'
+            ''
         }
-        ''
-        '# Installed dependencies (shall be in /)'
-        'COPY installedDependencies.yml installedDependencies.yml'
-        ''
-        '${genServersExpose(app)|e}'
-        'WORKDIR /app'
-        ''
-        'COPY wrapper_script.sh wrapper_script.sh'
-        ''
-        // '# App'
-        // 'COPY ${getAppMvnName(app)}/target/${getAppMvnName(app)}-${getAppMvnVersion(app)}-bin.jar ${getAppMvnName(app)}-${getAppMvnVersion(app)}-bin.jar'
-        // ''   	
-        '# resources/devices'
-        'COPY resources/ resources'
-        ''
-        '# Broker'
-        'COPY broker/brokerJars/ brokerJars'
-        'COPY broker/src/ src'
-        'COPY broker/broker.sh broker.sh'
-        ''
+
         String deviceSpec = device.containerName;
         if (deviceSpec.length() > 0) {
             deviceSpec = "-" + deviceSpec;
@@ -63,6 +74,8 @@ template Dockerfile(IIPEcosphere config, FileArtifact target, sequenceOf(MeshEle
             'COPY serviceMgr.sh serviceMgr.sh'
         }    	
         ''
+        '# Running the script'
+        'COPY wrapper_script.sh wrapper_script.sh'
         'RUN chmod 777 wrapper_script.sh'
         'ENTRYPOINT ["./wrapper_script.sh"]'
     }
