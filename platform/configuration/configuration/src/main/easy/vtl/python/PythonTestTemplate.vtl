@@ -65,7 +65,8 @@ template PythonTestTemplate(Configuration config, FileArtifact target, PythonSer
         sys.path.insert(3, "../../main/python/services") 
         sys.path.insert(5, "../../main/python/${pythonElements.servicesPackageName}") 
         sys.path.insert(4, "../../main/python")
-
+    
+        from Service import ServiceState
         import json
 
         ${serviceImports(pythonElements)}
