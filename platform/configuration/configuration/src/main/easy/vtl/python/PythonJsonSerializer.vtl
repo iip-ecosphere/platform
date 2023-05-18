@@ -87,7 +87,7 @@ template PythonJsonSerializer(Configuration config, FileArtifact target, RecordT
             tmp["_${f.name}"] = ${asTypeName(type.name)}Serializer.writeTo${asTypeName(type.name)}(tmp["_${f.name}"])'
     }
     
-    def genReadFrom(String clsName) {
+    def genReadFrom(String clsName, String add) {
         'def readFrom${clsName}(d: dict) -> ${clsName}:
             """Turns a dict into an object of type ${clsName} for deep deserialization.
             
@@ -100,7 +100,7 @@ template PythonJsonSerializer(Configuration config, FileArtifact target, RecordT
             if d is None:
                 return None
             else:
-                result = ${clsName}()
+                result = ${clsName}${add}()
                 for key in d:
                     k = "_" + str(key) # by generation convention
                     result.__dict__[k] = d[key]
@@ -186,7 +186,7 @@ template PythonJsonSerializer(Configuration config, FileArtifact target, RecordT
                 
                 return ${clsName}Encoder().encode(source).encode("UTF-8").decode()
                 
-            ${genReadFrom(clsName)}
+            ${genReadFrom(clsName, add)}
             
             ${genWriteTo(clsName)}
 
