@@ -331,6 +331,7 @@ public abstract class TransportToAasConverter<T> {
      *  
      * @param payloadBuilder the payload builder
      * @param payload the payload to be presented
+     * @see #createPayloadEntry(String, Class, Class)
      */
     protected void createPayloadEntries(SubmodelElementCollectionBuilder payloadBuilder, Object payload) {
         if (null != payload) {
@@ -338,6 +339,9 @@ public abstract class TransportToAasConverter<T> {
             for (Method m : cls.getMethods()) {
                 if (isGetter(m)) {
                     String field = m.getName().substring(PREFIX_GETTER.length());
+                    if (!createPayloadEntry(field, m.getReturnType(), cls)) {
+                        continue;
+                    }
                     Class<?> valueCls = null;
                     Object value = null;
                     TypeConverter tConv = converters.get(m.getReturnType());
@@ -370,6 +374,19 @@ public abstract class TransportToAasConverter<T> {
             }
             payloadBuilder.build();
         }
+    }
+    
+    /**
+     * Returns whether a payload entry for a given field in a given class shall be created. Large entries may cause 
+     * AAS performance/memory issues.
+     * 
+     * @param fieldName the field name
+     * @param fieldType the declared field type (real value may be a sub-type)
+     * @param cls the class declaring the field
+     * @return {@code true} for creating a payload entry, {@code false} else
+     */
+    protected boolean createPayloadEntry(String fieldName, Class<?> fieldType, Class<?> cls) {
+        return true;
     }
 
     /**
