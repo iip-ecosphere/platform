@@ -1,20 +1,31 @@
 <div>
-  <div *ngIf="textfield">
+  <div >
     <table style="width: 100%">
       <tr>
         <td style="width: 20%">
           {{input.idShort}}:
         </td>
-        <td>
+        <td *ngIf="textfield">
           <mat-form-field appearance="outline">
             <input matInput [matTooltip]="tooltip" [(ngModel)]="textInput">
           </mat-form-field>
           <button mat-raised-button (click)="addFromTextfield()">add</button>
         </td>
+        <td>
+          <div *ngIf="references[0]">
+            <mat-form-field appearance="outline">
+              <mat-select [(value)]="selectedRef">
+                <mat-option *ngFor="let ref of references" [value]="ref" (click)="addFromRef()">
+                  {{ displayIdShort(ref) }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </td>
       </tr>
     </table>
   </div>
-  <div class="valuebox">
+  <div [ngClass]="valueboxClass()">
     <div class="flexcontainer">
       <mat-card *ngFor="let value of inputValues; let i=index">{{value}}<button mat-raised-button style="background-color: red; margin-left: 0.5em;" (click)="removeInputValue(i)">remove</button></mat-card>
     </div>
