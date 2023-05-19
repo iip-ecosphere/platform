@@ -16,6 +16,11 @@ template PythonReq(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElem
         for (PythonService pyService : services) {              
             //setOf(Dependency) deps = pyService.dependencies;
             setOf(Dependency) deps = pyService.dependencies -> selectByType(PythonDependency);
+            setOf(Dependency) serverDeps = pyService.server.dependencies -> selectByType(PythonDependency);
+            for (PythonDependency d : serverDeps) {
+               deps.add(d);
+            }
+
             for (PythonDependency d : deps) {
                Integer exists = 0;
                for (PythonDependency existD : existDeps) {
