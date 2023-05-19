@@ -8,8 +8,11 @@
         </span>
       </ng-template>
 
+      <ng-template #depPlans>
+        <app-deployment-plans></app-deployment-plans>
+      </ng-template>
       <!-- Table -->
-      <table style="margin: 0px;">
+      <table style="margin: 0px;" *ngIf="tab.tabName != 'deployment plans'; else depPlans">
         <tr *ngFor="let item of filteredData; let i = index">
 
           <td style="width: 2%; text-align: center;"> {{i + 1}} </td>
@@ -31,22 +34,6 @@
           </td>
 
           <!-- Buttons -->
-          <td  *ngIf="tab.tabName == 'deployment plans'" class="cell-with-button">
-            <button
-              mat-raised-button style="background-color: rgb(35, 142, 184)"
-              (click)="deploy(item.plan)"
-              >deploy
-            </button>
-          </td>
-
-          <td  *ngIf="tab.tabName == 'deployment plans' || tab.tabName == 'instances'"
-            class="cell-with-button">
-            <button
-              mat-raised-button style="background-color: rgb(97, 95, 96)"
-              >undeploy
-            </button>
-          </td>
-
           <td class="cell-with-button">
           </td>
 
