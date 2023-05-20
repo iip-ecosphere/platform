@@ -45,13 +45,14 @@ public class LocalNetworkManagerImpl extends AbstractNetworkManagerImpl {
     private Map<String, ServerAddress> keyToAddress = new HashMap<>();
     private Map<Integer, String> portToKey = new HashMap<>();
     private Map<String, Map<String, Integer>> instances = new HashMap<>();
-    private String host = NetUtils.getOwnIP();
+    private String host;
     private NetworkManager parent;
 
     /**
      * Create a local network manager instance without delegation.
      */
     public LocalNetworkManagerImpl() {
+        this.host = NetUtils.getOwnIP(getNetmask());
     }
 
     /**
@@ -62,6 +63,7 @@ public class LocalNetworkManagerImpl extends AbstractNetworkManagerImpl {
      */
     public LocalNetworkManagerImpl(NetworkManager parent) {
         this.parent = parent;
+        this.host = NetUtils.getOwnIP(getNetmask());
     }
 
     @Override

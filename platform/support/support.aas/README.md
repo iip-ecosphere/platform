@@ -57,10 +57,10 @@ The structure of an identity YAML file (must be resolvable as `identityStore.yml
 The identity mechanism currently supports 4 different token types, namely USERNAME (and password), ISSUED, X509 and ANONYMOUS. The required entries are illustrated above, while the first entries below `identities` denote the respective identity keys and must be unique within this file. The `tokenEncryptionAlgorithm` for discouraged USERNAME tokens is usually `UTF-8`. The identity keys can be used in respective configuration elements of the configuration model while in background the identity mechanism is queried for the token. One specific case is the last entry, a USERNAME token with attached `file` (may be a file or an URI) representing a keystore to be opened with `tokenData` as password. The `name` of an identity store is optional, but recommended to better identify, whether the intended store has been loaded.
  
 **Missing**
-- Various AAS concepts (AAS, sub-model, sub-model elements, properties [with semantic ids] and operations do exist; others will be added incrementally on demand)
+- AAS concepts (AAS, sub-model, sub-model elements, properties [with semantic ids] and operations do exist; others will be added incrementally on demand)
 - Authentication/RBAC
 - AAS Events (currently occurring in BaSyx)
 
 **Open questions**
 - How to resolve references to their target?
-- How to define semantic references, e.g., to eClass.
+
