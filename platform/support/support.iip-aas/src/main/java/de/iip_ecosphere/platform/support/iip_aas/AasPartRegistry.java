@@ -592,7 +592,8 @@ public class AasPartRegistry {
         }
         String implHost = impl.getHost();
         if (implHost.equals("127.0.0.1")) {
-            implHost = NetUtils.getOwnIP(impl.getNetmask()); // make AAS implementation server externally available
+            // make AAS implementation server externally available
+            implHost = NetUtils.getOwnIP(NetUtils.getNetMask(impl.getNetmask(), impl.getHost()));
         }
         LoggerFactory.getLogger(AasPartRegistry.class).info("Using IP {} and port {} for AAS implementation server", 
             implHost, aasImplPort);

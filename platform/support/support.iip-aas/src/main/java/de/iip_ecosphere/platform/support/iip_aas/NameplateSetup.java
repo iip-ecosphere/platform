@@ -149,7 +149,7 @@ public class NameplateSetup {
          */
         public String getHost() {
             if (null == host) {
-                host = NetUtils.getOwnIP(netmask);
+                host = NetUtils.getOwnIP(NetUtils.getNetMask(netmask, host));
             }
             return host;
         }
