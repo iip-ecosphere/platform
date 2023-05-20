@@ -28,7 +28,9 @@ import org.junit.runners.Suite;
     PidFileTest.class,
     TimeUtilsTest.class,
     ResourceLoaderTest.class,
-    PythonUtilsTest.class
+    PythonUtilsTest.class,
+    NetUtilsTest.class,
+    SchemaServerEndpointTest.class
 })
 public class AllTests {
 }
