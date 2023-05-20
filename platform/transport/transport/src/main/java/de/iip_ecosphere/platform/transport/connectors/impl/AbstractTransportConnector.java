@@ -243,7 +243,7 @@ public abstract class AbstractTransportConnector implements TransportConnector {
             }
         }
         if (makeUnique) {
-            appId += NetUtils.getOwnIP() + separator + System.currentTimeMillis(); 
+            appId += NetUtils.getOwnHostname() + separator + System.currentTimeMillis(); 
         } 
         return appId;
     }
