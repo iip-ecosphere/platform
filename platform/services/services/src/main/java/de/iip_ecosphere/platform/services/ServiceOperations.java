@@ -49,6 +49,11 @@ public interface ServiceOperations {
     public static final String OPTION_PARAMS = "params";
 
     /**
+     * Service start option, mapping of service ids to memory limits in MBytes.
+     */
+    public static final String OPTION_MEMLIMITS = "memLimits";
+
+    /**
      * Adds an artifact (and transitively the contained services) to the management domain of this instance, e.g., 
      * by downloading it from an artifact/service store. This defines the {@code id} of the service within the 
      * management domain of this instance. After a successful execution, the artifact {@code id} is returned, artifact 
@@ -78,7 +83,8 @@ public interface ServiceOperations {
      * @param options optional map of optional options to be passed to the service manager, may modify the 
      *   service descriptors, e.g., to change services to be started together on demand, may be empty for none; options 
      *   are a name-value mapping with values that come either as primitive values or as JSON structures. For 
-     *   pre-defined names, see {@link #OPTION_ARGS} and {@link #OPTION_ENSEMBLE}. The service manager is responsible 
+     *   pre-defined names, see {@link #OPTION_ARGS}, {@link #OPTION_ENSEMBLE}, {@link #OPTION_PARAMS}, 
+     *   {@link #OPTION_SERVERS}, or {@link #OPTION_MEMLIMITS}. The service manager is responsible 
      *   for correct JSON de-serialization.
      * @param serviceId the id(s) of the service(s)
      * @throws ExecutionException in case that starting the service fails for some reason
