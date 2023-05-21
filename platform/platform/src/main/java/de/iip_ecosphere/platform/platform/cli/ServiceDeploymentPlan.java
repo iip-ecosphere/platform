@@ -118,7 +118,7 @@ public class ServiceDeploymentPlan extends AbstractSetup {
         public String getArtifact() {
             return artifact;
         }
-        
+
         /**
          * Returns the {@link #getServices()} in terms of an array.
          * 
@@ -175,6 +175,7 @@ public class ServiceDeploymentPlan extends AbstractSetup {
     private List<String> arguments;
     private Map<String, String> servers = new HashMap<>();
     private Map<String, Map<String, String>> serviceParams = new HashMap<>();
+    private Map<String, Integer> memLimits = new HashMap<>();
 
     /**
      * Returns the name of the application.
@@ -303,6 +304,15 @@ public class ServiceDeploymentPlan extends AbstractSetup {
     }
 
     /**
+     * Returns the memory limits for all services.
+     * 
+     * @return the memory limits, may be <b>null</b>/empty for none (specified)
+     */
+    public Map<String, Integer> getMemLimits() {
+        return memLimits;
+    }
+
+    /**
      * Service parameters to be re-configured upon service start.
      * 
      * @return the service-id/name/value mapping for parameters
@@ -321,12 +331,21 @@ public class ServiceDeploymentPlan extends AbstractSetup {
     }
 
     /**
-     * Returns the optional arguments. [SnakeYaml]
+     * Changes the optional arguments. [snakeyaml]
      * 
      * @param arguments the arguments, may be empty or <b>null</b> for none
      */
     public void setArguments(List<String> arguments) {
         this.arguments = arguments;
+    }
+    
+    /**
+     * Changes the memory limits for all services. [snakeyaml]
+     * 
+     * @param memLimits the memory limits, may be <b>null</b>/empty for none (specified)
+     */
+    public void setMemLimits(Map<String, Integer> memLimits) {
+        this.memLimits = memLimits;
     }
 
     /**

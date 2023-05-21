@@ -486,6 +486,11 @@ class CliBackend {
             options.put(ServicesClient.OPTION_SERVERS, JsonUtils.toJson(servers));
         }
 
+        Map<String, Integer> memLimits = plan.getMemLimits();
+        if (null != memLimits && memLimits.size() > 0) {
+            options.put(ServicesClient.OPTION_MEMLIMITS, JsonUtils.toJson(memLimits));
+        }
+
         Map<String, Map<String, String>> sParams = plan.getServiceParams();
         if (null != sParams && sParams.size() > 0) {
             options.put(ServicesClient.OPTION_PARAMS, JsonUtils.toJson(sParams));
