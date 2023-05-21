@@ -74,7 +74,7 @@ public class DeviceManagement {
 
         if (null == device) {
             if (onboard) {
-                String ip = NetUtils.getOwnIP();
+                String ip = NetUtils.getOwnIP(NetUtils.NO_MASK);
                 result = registryClient.addDevice(Id.getDeviceIdAas(), ip);
                 Transport.sendResourceStatus(ActionTypes.ADDED);
             } else {
