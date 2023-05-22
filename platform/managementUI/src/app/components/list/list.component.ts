@@ -3,9 +3,10 @@ import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { EnvConfigService } from 'src/app/services/env-config.service';
-import { ActivatedRoute } from '@angular/router';
 import { Router } from '@angular/router';
+import { MatDialog, MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import { MAT_PROGRESS_SPINNER_DEFAULT_OPTIONS_FACTORY } from '@angular/material/progress-spinner';
+import { EditorComponent } from '../editor/editor.component';
 //import { table } from 'console';
 
 @Component({
@@ -23,10 +24,10 @@ export class ListComponent implements OnInit {
   imgPath = "../../../assets/"
 
   constructor(private router: Router,
-    private route: ActivatedRoute,
     public http: HttpClient,
     private envConfigService: EnvConfigService,
-    public api: ApiService) {
+    public api: ApiService,
+    public dialog: MatDialog) {
       const env = this.envConfigService.getEnv();
        //the ip and urn are taken from the json.config
       if(env && env.ip) {
@@ -350,7 +351,11 @@ export class ListComponent implements OnInit {
   }
 
   public create() {
-    this.router.navigateByUrl("list/editor/all")
+    //this.router.navigateByUrl("list/editor/all");
+    let dialogRef = this.dialog.open(EditorComponent, {
+      height: '90%',
+      width:  '90%',
+    })
   }
 
   // ---- icons ------------------------------------------------------------------

@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { MatDialogRef } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { ApiService } from 'src/app/services/api.service';
 import { Resource, ResourceAttribute } from 'src/interfaces';
@@ -15,8 +16,11 @@ export class EditorComponent implements OnInit {
   selectedType: Resource | undefined;
   inputs: ResourceAttribute[] = [];
   inputReferenceTo: ResourceAttribute[] = [];
+  inputSequenceOf: ResourceAttribute[] = [];
 
-  constructor(private route: ActivatedRoute, private api: ApiService) { }
+  metaTypes = ['metaState', 'metaProject', 'metaSize', 'metaType', 'metaRefines', 'metaAbstract'];
+
+  constructor(private route: ActivatedRoute, private api: ApiService, public dialog: MatDialogRef<EditorComponent>) { }
 
   ngOnInit(): void {
     this.getMeta();
@@ -33,26 +37,33 @@ export class EditorComponent implements OnInit {
   public checkRef() {
     this.inputs = [];
     this.inputReferenceTo = [];
+    this.inputSequenceOf = [];
 
     const selectedType = this.selectedType;
     if(selectedType && selectedType.value) {
       for(const input of selectedType.value) {
-        let value = input.value.toString().toLocaleLowerCase();
-        if(value.indexOf('refto') >= 0) {
-          this.inputReferenceTo.push(input);
-        } else {
+        if(input.idShort && this.metaTypes.indexOf(input.idShort) === -1) {
+          let value = input.value.toString().toLocaleLowerCase();
+          if(value.indexOf('refto') >= 0 || value.indexOf('sequenceof') >= 0) {
+            this.inputReferenceTo.push(input);
+          } else {
+            this.inputs.push(input);
+          }
           if(!(input.description && input.description[0] && input.description[0].text)) {
             input.description = [];
             input.description.push({text: '', language: ''});
           }
-          this.inputs.push(input);
         }
-      }
+        }
     }
   }
 
   public create() {
 
   }
+
+  public close() {
+    this.dialog.close();
+  };
 
 }

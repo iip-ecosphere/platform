@@ -39,6 +39,7 @@ import { ListComponent } from './components/list/list.component';
 import { InstancesComponent } from './components/instances/instances.component';
 import { EditorComponent } from './components/editor/editor.component';
 import { InputRefSelectComponent } from './components/editor/input-ref-select/input-ref-select.component';
+import { MatDialogModule } from '@angular/material/dialog';
 
 @NgModule({
   declarations: [
@@ -78,7 +79,8 @@ import { InputRefSelectComponent } from './components/editor/input-ref-select/in
     MatSidenavModule,
     MatListModule,
     MatDividerModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatDialogModule
   ],
   providers: [{
     provide:HTTP_INTERCEPTORS,

@@ -15,6 +15,7 @@ export class InputRefSelectComponent implements OnInit {
 
   textInput = '';
   isSetOf = false;
+  isSequenceOf = false;
   refTo = '';
   inputValues: string[] = [];
   references: Resource[] = [];
@@ -23,7 +24,7 @@ export class InputRefSelectComponent implements OnInit {
   tooltip= '';
 
   refTypes = ['Dependency', 'Resource', 'DataType', 'Server', 'ServiceMesh', 'MeshConnector', 'MeshElement', 'ServiceBase'];
-  metaTypes = ['metaState', 'metaProject', 'metaSize', 'metaType'];
+  metaTypes = ['metaState', 'metaProject', 'metaSize', 'metaType', 'metaRefines', 'metaAbstract'];
 
   constructor(private edit: EditorService) { }
 
@@ -39,6 +40,7 @@ export class InputRefSelectComponent implements OnInit {
 
   private init(value: string) {
     value = value.toLowerCase();
+    console.log(value);
     if(value) {
       if(value.indexOf('refto') >= 0) {
         if(value.indexOf('setof') >= 0) {
@@ -47,6 +49,10 @@ export class InputRefSelectComponent implements OnInit {
         const startIndex = value.indexOf('refto') + 6;
         this.refTo = value.substring(startIndex, value.indexOf(')', startIndex));
         this.getReferences(this.refTo);
+      }
+      if(value.indexOf('sequenceof') >= 0) {
+        console.log('sequenceOf ' + value);
+        this.isSequenceOf = true;
       }
     }
   }
@@ -81,18 +87,32 @@ export class InputRefSelectComponent implements OnInit {
   }
 
   public addFromRef() {
+    let idShort = '';
     if(this.selectedRef && this.selectedRef.idShort) {
+      if(this.selectedRef.value && this.selectedRef.value[0]) {
+        console.log(this.selectedRef);
+        let temp = this.selectedRef.value?.find(item => item.idShort == 'varValue');
+        if(temp && temp.idShort) {
+          idShort = temp.value;
+        } else {
+          idShort = this.selectedRef.idShort;
+        }
+      } else {
+        idShort = this.selectedRef.idShort;
+      }
       if(this.isSetOf) {
-        this.inputValues.push(this.selectedRef.idShort);
+        this.inputValues.push(idShort);
       } else {
         this.inputValues = [];
-        this.inputValues.push(this.selectedRef.idShort);
+        this.inputValues.push(idShort);
       }
     }
   }
 
+
+
   public addFromTextfield() {
-    if(this.isSetOf) {
+    if(this.isSetOf || this.isSequenceOf) {
       this.inputValues.push(this.textInput);
     } else {
       this.inputValues = [];
@@ -114,7 +134,7 @@ export class InputRefSelectComponent implements OnInit {
 
   public valueboxClass() {
     let cssclass = '';
-    if(this.isSetOf) {
+    if(this.isSetOf || this.isSequenceOf) {
       cssclass = 'valuebox';
     } else {
       cssclass = 'singlevaluebox';
@@ -123,7 +143,7 @@ export class InputRefSelectComponent implements OnInit {
     return cssclass;
   }
 
-  displayIdShort(element: any) {
+  public displayIdShort(element: any) {
     let displayName = '';
     console.log(element);
     if(this.refTo === 'dependency') {
@@ -138,6 +158,25 @@ export class InputRefSelectComponent implements OnInit {
     // }
 
     return displayName;
+  }
+
+  //true: left, false: right
+  public moveSequenceElement(direction: boolean, index: number) {
+    console.log(this.isSequenceOf);
+    const inputValues = this.inputValues
+    if(direction) {
+      if(inputValues[index - 1]) {
+        const temp = inputValues[index - 1];
+        inputValues[index - 1] = inputValues[index];
+        inputValues[index] = temp;
+      }
+    } else {
+      if(inputValues[index + 1]) {
+        const temp = inputValues[index + 1];
+        inputValues[index + 1] = inputValues[index];
+        inputValues[index] = temp;
+      }
+    }
   }
 
 }
