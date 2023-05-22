@@ -100,7 +100,7 @@ template DockerfileBase_Python(IIPEcosphere config, FileArtifact target, sequenc
             ''
             if (not(collectDependencies(elements)->selectByKind(SystemDependency)->select(d|d.key=='JAVA8').isEmpty())) {
                 'RUN apt-get install software-properties-common -y'
-                'RUN apt-add-repository "deb http://security.debian.org/debian-security stretch/updates main"'
+                'RUN apt-add-repository "deb http://archive.debian.org/debian-security stretch/updates main"'
                 'RUN apt-get update'
                 'RUN apt-get install -y openjdk-8-jdk'
             }
