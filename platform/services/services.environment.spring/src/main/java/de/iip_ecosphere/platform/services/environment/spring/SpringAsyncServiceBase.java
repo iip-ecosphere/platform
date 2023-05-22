@@ -101,8 +101,8 @@ public class SpringAsyncServiceBase {
                 icb.callback = result;
                 icb.channel = channel;
                 callbacks.add(icb);
-                LoggerFactory.getLogger(getClass()).info("Installed transport callback for type {} with routingKey {}", 
-                    cls.getName(), routingKey);
+                LoggerFactory.getLogger(getClass()).info("Installed transport callback on channel {} for type {} "
+                    + "with routingKey {}", channel, cls.getName(), routingKey);
             } catch (IOException e) {
                 result = null;
                 LoggerFactory.getLogger(getClass()).error("No transport setup, will not listen to data on {}. {}", 
