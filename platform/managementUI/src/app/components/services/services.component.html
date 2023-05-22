@@ -3,16 +3,27 @@
   <div *ngFor="let tab of tabsParam">
     <mat-tab label="{{tab.tabName}}">
       <ng-template mat-tab-label >
-        <span (click)="getDisplayData(tab.tabName, tab.submodel, tab.submodelElement)" class="custom-label">
+        <span (click)="getDisplayData(tab.tabName, tab.submodel, tab.submodelElement)"
+        class="custom-label">
           {{tab.tabName}}
         </span>
       </ng-template>
 
+      <ng-template #instances>
+        <app-instances></app-instances>
+      </ng-template>
       <ng-template #depPlans>
         <app-deployment-plans></app-deployment-plans>
       </ng-template>
+
+      <ng-template #elseOption>
+        <ng-template *ngIf="tab.tabName=='deployment plans'; then depPlans; else instances;">
+        </ng-template>
+      </ng-template>
+
       <!-- Table -->
-      <table style="margin: 0px;" *ngIf="tab.tabName != 'deployment plans'; else depPlans">
+      <table style="margin: 0px;"
+        *ngIf="tab.tabName == 'running services' || tab.tabName == 'running artifacts'; else elseOption">
         <tr *ngFor="let item of filteredData; let i = index">
 
           <td style="width: 2%; text-align: center;"> {{i + 1}} </td>

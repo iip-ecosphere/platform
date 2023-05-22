@@ -14,7 +14,8 @@
                 <ng-template #noName>Unknown Manufacturer</ng-template>
               </div>
               <div>
-                <img *ngIf="!element.generalInformation?.picture; else pictureAvailable" src="../../../assets/deviceDefault.jpg"
+                <img *ngIf="!element.generalInformation?.picture; else pictureAvailable"
+                  src="../../../assets/deviceDefault.jpg"
                   [alt]="element.idShort" width="120px" height="120px">
                 <ng-template #pictureAvailable>
                   <img [src]="'data:image/jpg;base64,' + element.generalInformation?.picture"

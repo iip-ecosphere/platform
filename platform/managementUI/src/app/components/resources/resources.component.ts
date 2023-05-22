@@ -24,8 +24,12 @@ export class ResourcesComponent implements OnInit {
 
   defaultImageUrl = '../../../assets/devideDefault.jpg';
 
-  constructor(public http: HttpClient, public api: ApiService, public router: Router, private tech: TechnicalDataRetrieverService) {
-    this.errorSub = this.api.errorEmitter.subscribe((error: HttpErrorResponse) => {this.errorMsg = error.message});
+  constructor(public http: HttpClient,
+    public api: ApiService,
+    public router: Router,
+    private tech: TechnicalDataRetrieverService) {
+    this.errorSub
+      = this.api.errorEmitter.subscribe((error: HttpErrorResponse) => {this.errorMsg = error.message});
   }
 
   ngOnInit(): void {
@@ -36,7 +40,8 @@ export class ResourcesComponent implements OnInit {
     this.tech.emitter.subscribe( item => {
       this.ResourcePictures.push(item)
       if(this.Data && this.Data.submodelElements && item.resourceIdShort && item.picture) {
-        let a = this.Data.submodelElements.find(item2 => item2.idShort === item.resourceIdShort)
+        let a = this.Data.submodelElements.find(
+          item2 => item2.idShort === item.resourceIdShort)
         if(a) {
           a.generalInformation = item;
         }
@@ -47,6 +52,8 @@ export class ResourcesComponent implements OnInit {
       this.tech.getTechnicalData(this.Data.submodelElements);
     }
     this.filterSubmodelElements()
+
+    console.log(this.Data)
   }
 
   elementsToFilter = ["deviceManager", "deviceRegistry", "containers"]
