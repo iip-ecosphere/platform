@@ -14,7 +14,7 @@ project Services {
    
    abstract compound ServiceManager {
        assign (semanticId = Eclass_Unit_MByte) to {
-         Integer memLimit = 312; // e.g., JVM memory limit in MBytes
+         Integer memLimit = 512; // e.g., JVM memory limit in MBytes
        }
    };
    

@@ -1316,7 +1316,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         if (deviceType == defaultDeviceType) {
             Integer svcMemLimit = getIntegerValueSafe(cfg.serviceManager.memLimit, 0);
             Integer cntMgmLimit = getIntegerValueSafe(cfg.containerManager.memLimit, 0);
-            generateOsScripts(config, "${target}/ecs", "ecsJars", dfltMain, "IIP-Ecosphere ECSRuntime", "iip-ecsRuntime", "iip-platform.service", addJavaOpts=toJvmMemLimitOpt(min(svcMemLimit, cntMgmLimit)), sysd="${target}/iip-ecs");
+            generateOsScripts(config, "${target}/ecs", "ecsJars", dfltMain, "IIP-Ecosphere ECSRuntime", "iip-ecsRuntime", "iip-platform.service", addJavaOpts=toJvmMemLimitOpt(max(svcMemLimit, cntMgmLimit)), sysd="${target}/iip-ecs");
         }
     }
     

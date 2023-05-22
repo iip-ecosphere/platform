@@ -75,13 +75,13 @@ template SpringCloudStreamDeploymentDescriptorBase(Configuration config, FileArt
           cmdArg: 
             - --iip.port=\\${port}
             - --iip.protocol=\\${protocol}
-            ${generateMemLimitOpt(service)|e}
             ${generateAppOpt()|e}
           relations:
             - endpoint:
                 portArg: --transport.port=\\${port} --binders.properties.external.environment.${getProtocolKey()}.port=\\${port} --spring.cloud.stream.binders.properties.external.environment.${getProtocolKey()}.port=\\${port}
                 hostArg: --transport.host=\\${host} --binders.properties.external.environment.${getProtocolKey()}.host=\\${host} --spring.cloud.stream.binders.properties.external.environment.${getProtocolKey()}.host=\\${host}
             ${generateRelations(elt)|e}
+          ${generateMemLimitEntry(service)|e}
           ${generateProcess(elt, service)|e}
           ${generateEnsemble(elt, service, familyId)|e}'
     }
@@ -182,6 +182,14 @@ template SpringCloudStreamDeploymentDescriptorBase(Configuration config, FileArt
             for (String a: tmp) {
                 "${indent}- ${a}"
             }
+        }
+    }
+    
+    def generateMemLimitEntry(Service service) {
+        if (service.memLimit > 0) {
+            "memory: ${service.memLimit}"
+        } else {
+            "";
         }
     }
     
