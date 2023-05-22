@@ -29,6 +29,7 @@ import de.iip_ecosphere.platform.support.function.IOConsumer;
 import de.iip_ecosphere.platform.transport.Transport;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
+import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 import de.iip_ecosphere.platform.transport.status.TraceRecord;
 
 /**
@@ -101,8 +102,10 @@ public class SpringAsyncServiceBase {
                 icb.callback = result;
                 icb.channel = channel;
                 callbacks.add(icb);
+                TransportSetup tSetup = Starter.getSetup().getTransport();
                 LoggerFactory.getLogger(getClass()).info("Installed transport callback on channel {} for type {} "
-                    + "with routingKey {}", channel, cls.getName(), routingKey);
+                    + "with routingKey {} on {}:{}", channel, cls.getName(), routingKey, tSetup.getHost(), 
+                    tSetup.getPort());
             } catch (IOException e) {
                 result = null;
                 LoggerFactory.getLogger(getClass()).error("No transport setup, will not listen to data on {}. {}", 
