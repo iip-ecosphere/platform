@@ -22,10 +22,13 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+import java.util.stream.Stream;
 
 import org.apache.commons.validator.routines.InetAddressValidator;
 
@@ -149,6 +152,7 @@ public class NetUtils {
      * Finds a fallback IP address. Must have an IPv4/IPv6 address (docker addresses so far have only 
      * 
      * @return a fallback IP address, may be {@code 127.0.0.1} if none was found
+     * @see #isContainerIp(String)
      */
     private static String findFallbackIP() {
         String result = "127.0.0.1";
@@ -167,7 +171,7 @@ public class NetUtils {
                         }
                     }
                 }
-                if (ipV4 != null && ipV6 != null && !ipV6.startsWith("172.17.")) { // otherwise docker
+                if (ipV4 != null && ipV6 != null && !isContainerIp(ipV4)) { 
                     result = ipV4;
                 }
             }
@@ -175,6 +179,63 @@ public class NetUtils {
             // ignore
         }
         return result;
+    }
+
+    /**
+     * Returns whether {@code address} is a container address. Currently, we only consider ipv4 addresses.
+     * 
+     * @param address the address
+     * @return {@code true} for a container address, {@code false} else
+     */
+    public static boolean isContainerIp(String address) {
+        return address.startsWith("172.17."); // is docker, may need configuration options
+    }
+    
+    /**
+     * Returns whether we are running inside a container.
+     * 
+     * @return {@code true} for container, {@code false} else
+     * @see #isContainerIp(String)
+     */
+    public static boolean isInContainer() {
+        boolean inContainer = isRunningInsideDocker();
+        if (!inContainer) {
+            try {
+                Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
+                for (NetworkInterface netint : Collections.list(nets)) {
+                    Enumeration<InetAddress> inetAddresses = netint.getInetAddresses();
+                    for (InetAddress inetAddress : Collections.list(inetAddresses)) {
+                        if (isContainerIp(inetAddress.getHostAddress())) {
+                            inContainer = true;
+                            break;
+                        }
+                    }
+                    if (inContainer) {
+                        break;
+                    }
+                }
+            } catch (SocketException e) {
+                // ignore
+            }
+        }
+        return inContainer;
+    }
+
+    /**
+     * Returns whether this JVM is running inside docker.
+     * 
+     * @return {@code true} for docker environment, {@code false} else
+     */
+    private static Boolean isRunningInsideDocker() {
+        //https://stackoverflow.com/questions/52580008/how-does-java-application-know-it-is-running
+        // -within-a-docker-container
+        
+        try (Stream<String> stream =
+            Files.lines(Paths.get("/proc/1/cgroup"))) {
+            return stream.anyMatch(line -> line.contains("/docker"));
+        } catch (IOException e) {
+            return false;
+        }
     }
     
     /**

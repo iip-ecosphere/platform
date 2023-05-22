@@ -156,4 +156,12 @@ public class NetUtilsTest {
         Assert.assertEquals("", NetUtils.getNetMask("", ""));
     }
     
+    /**
+     * Tests {@link NetUtils#isInContainer()}.
+     */
+    @Test
+    public void isInContainer() {
+        System.out.println("In container: " + NetUtils.isInContainer()); // we don't know where we are
+    }
+    
 }
