@@ -302,7 +302,4 @@ export class ServicesComponent implements OnInit {
     }
     return result
   }
-
-
-
 }
