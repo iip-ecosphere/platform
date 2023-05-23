@@ -13,6 +13,8 @@
 package de.iip_ecosphere.platform.configuration.ivml;
 
 import net.ssehub.easy.varModel.confModel.IDecisionVariable;
+import net.ssehub.easy.varModel.cst.ConstantValue;
+import net.ssehub.easy.varModel.cst.ConstraintSyntaxTree;
 import net.ssehub.easy.varModel.model.AbstractVariable;
 import net.ssehub.easy.varModel.model.datatypes.IDatatype;
 import net.ssehub.easy.varModel.model.datatypes.TypeQueries;
@@ -162,6 +164,36 @@ public class IvmlUtils {
      */
     public static String getVarNameSafe(AbstractVariable var, String dflt) {
         return null == var ? dflt : var.getName();
+    }
+
+    /**
+     * Returns the constant value of {@code cst} if {@code cst} is a constant expression.
+     * 
+     * @param cst the constraint syntax tree
+     * @return the constant value or <b>null</b>
+     */
+    public static Value getConstValue(ConstraintSyntaxTree cst) {
+        Value result = null;
+        if (cst instanceof ConstantValue) {
+            result = ((ConstantValue) cst).getConstantValue();
+        }
+        return result;
+    }
+
+    /**
+     * Returns the constant int value of {@code cst} if {@code cst} is a constant int expression.
+     * 
+     * @param cst the constraint syntax tree
+     * @param dflt the default value if {@code cst} is not a constant int expression
+     * @return the constant value or {@code dflt}
+     */
+    public static int getIntValue(ConstraintSyntaxTree cst, int dflt) {
+        int result = dflt;
+        Value val = getConstValue(cst);
+        if (val instanceof IntValue) {
+            result = ((IntValue) val).getValue().intValue();
+        }
+        return result;
     }
 
 }

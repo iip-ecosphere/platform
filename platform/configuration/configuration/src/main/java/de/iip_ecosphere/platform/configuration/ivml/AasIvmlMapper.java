@@ -16,11 +16,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -70,13 +68,10 @@ import net.ssehub.easy.varModel.model.ModelQuery.FirstDeclTypeSelector;
 import net.ssehub.easy.varModel.model.ModelQueryException;
 import net.ssehub.easy.varModel.model.Project;
 import net.ssehub.easy.varModel.model.datatypes.Compound;
-import net.ssehub.easy.varModel.model.datatypes.Container;
 import net.ssehub.easy.varModel.model.datatypes.DerivedDatatype;
 import net.ssehub.easy.varModel.model.datatypes.IDatatype;
-import net.ssehub.easy.varModel.model.datatypes.Reference;
 import net.ssehub.easy.varModel.model.datatypes.TypeQueries;
 import net.ssehub.easy.varModel.model.values.ContainerValue;
-import net.ssehub.easy.varModel.model.values.NullValue;
 import net.ssehub.easy.varModel.model.values.ReferenceValue;
 import net.ssehub.easy.varModel.model.values.Value;
 
@@ -112,7 +107,6 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     private Supplier<Configuration> cfgSupplier;
     private Function<String, String> metaShortId = SHORTID_PREFIX_META;
     private Predicate<AbstractVariable> variableFilter = FILTER_NO_CONSTRAINT_VARIABLES;
-    private Set<String> doneTypes = new HashSet<>();
     private Map<String, SubmodelElementCollectionBuilder> types = new HashMap<>();
     
     static {
@@ -199,6 +193,8 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                 primitiveType = ModelQuery.findType(cfg.getConfiguration().getProject(), "PrimitiveType", null);
             } catch (ModelQueryException e) {
             }
+            TypeMapper mapper = new TypeMapper(cfg, variableFilter, types.get(META_TYPE_NAME));
+            mapper.mapTypes();
             Iterator<IDecisionVariable> iter = cfg.getConfiguration().iterator();
             while (iter.hasNext()) {
                 IDecisionVariable var = iter.next();
@@ -930,142 +926,11 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     }
     
     /**
-     * Maps a type into the SMEC {@value #META_TYPE_NAME}.
-     * 
-     * @param var the variable to map
-     */
-    void mapType(IDecisionVariable var) {
-        SubmodelElementCollectionBuilder builder = types.get(META_TYPE_NAME);
-        IDatatype type;
-        Value val = var.getValue();
-        if (null != val && NullValue.VALUE != val) {
-            type = val.getType();
-        } else {
-            type = var.getDeclaration().getType();
-        }
-        mapType(type, builder);
-    }
-
-    /**
-     * Maps an IVML type into the SMEC {@value #META_TYPE_NAME}. May be called for duplicates but leads only to
-     * one entry.
-     * 
-     * @param type the IVML type
-     * @param builder the builder for {@link #META_TYPE_NAME}
-     */
-    void mapType(IDatatype type, SubmodelElementCollectionBuilder builder) {
-        type = Reference.dereference(type);
-        if (type instanceof DerivedDatatype) {
-            mapDerivedType((DerivedDatatype) type, builder);
-        } else {
-            if (type instanceof Container) {
-                type = ((Container) type).getContainedType();
-            }
-            if (type instanceof Compound) {
-                mapCompoundType((Compound) type, builder);
-            }
-        }
-    }
-    
-    /**
-     * Returns whether {@code typeId} represents a done type (in {@link #doneTypes}). If not, adds {@cpde typeId} 
-     * to {@link #doneTypes}.
-     * 
-     * @param typeId the type id to search for
-     * @return {@code true} if the type is considered as done, {@code false} else
-     */
-    private boolean isDoneType(String typeId) {
-        boolean known = doneTypes.contains(typeId);
-        if (!known) {
-            doneTypes.add(typeId);
-        }
-        return known;
-    }
-
-    /**
-     * Maps a derived type into the SMEC {@value #META_TYPE_NAME}. May be called for duplicates but leads only to
-     * one entry.
-     * 
-     * @param type the derived type
-     * @param builder the builder for {@link #META_TYPE_NAME}
-     */
-    private void mapDerivedType(DerivedDatatype type, SubmodelElementCollectionBuilder builder) {
-        String typeId = AasUtils.fixId(type.getName());
-        IDatatype baseType = type.getBasisType();
-        if (!isDoneType(typeId)) {
-            SubmodelElementCollectionBuilder typeB = builder.createSubmodelElementCollectionBuilder(
-                    typeId, false, false);
-            typeB.createPropertyBuilder(SHORTID_PREFIX_META.apply("refines"))
-                .setValue(Type.STRING, IvmlDatatypeVisitor.getUnqualifiedType(baseType))
-                .build();
-            typeB.build();
-        }
-        mapType(baseType, builder);
-    }
-
-    /**
-     * Maps a compound type into the SMEC {@value #META_TYPE_NAME}. May be called for duplicates but leads only to
-     * one entry.
-     * 
-     * @param type the compound type
-     * @param builder the builder for {@link #META_TYPE_NAME}
-     */
-    private void mapCompoundType(Compound type, SubmodelElementCollectionBuilder builder) {
-        String typeId = AasUtils.fixId(type.getName());
-        if (!isDoneType(typeId)) {
-            SubmodelElementCollectionBuilder typeB = builder.createSubmodelElementCollectionBuilder(
-                typeId, false, false);
-            String lang = getLang();
-            Set<String> doneSlots = new HashSet<>();
-            for (int i = 0; i < type.getInheritedElementCount(); i++) {
-                DecisionVariableDeclaration slot = type.getInheritedElement(i);
-                // if we get into trouble with property ids, we have to sub-structure that
-                String slotName = AasUtils.fixId(slot.getName());
-                if (!doneSlots.contains(slotName) && variableFilter.test(slot)) {
-                    doneSlots.add(slotName);
-                    IDatatype slotType = slot.getType();
-                    typeB.createPropertyBuilder(slotName)
-                        .setValue(Type.STRING, IvmlDatatypeVisitor.getUnqualifiedType(slotType))
-                        .setDescription(new LangString(ModelInfo.getCommentSafe(slot), lang))
-                        .build();
-                    if (slotType != type) {
-                        mapType(slotType, builder);
-                    }
-                }
-            }
-            typeB.createPropertyBuilder(SHORTID_PREFIX_META.apply("abstract"))
-                .setValue(Type.BOOLEAN, type.isAbstract())
-                .build();
-            typeB.createPropertyBuilder(SHORTID_PREFIX_META.apply("refines"))
-                .setValue(Type.STRING, getRefines(type))
-                .build();
-            typeB.build();
-        }
-    }
-
-    /**
-     * Returns the refined type of {@code type} as comma-separated string list.
-     * 
-     * @param type the type to refine
-     * @return the refined types
-     */
-    private static String getRefines(Compound type) {
-        String result = "";
-        for (int i = 0; i < type.getRefinesCount(); i++) {
-            if (result.length() > 0) {
-                result += ", ";
-            }
-            result += IvmlDatatypeVisitor.getUnqualifiedType(type.getRefines(i));
-        }
-        return result;
-    }
-    
-    /**
      * Returns the language to be used for {@link LangString}.
      * 
      * @return the language
      */
-    private static String getLang() {
+    static String getLang() {
         return ModelInfo.getLocale().getLanguage();
     }
     
@@ -1079,7 +944,6 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
      */
     void mapVariable(IDecisionVariable var, SubmodelElementCollectionBuilder builder, String id) {
         if (variableFilter.test(var.getDeclaration())) {
-            mapType(var);
             AbstractVariable decl = var.getDeclaration();
             String varName = decl.getName();
             IDatatype varType = decl.getType();

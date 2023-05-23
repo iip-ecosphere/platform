@@ -9,6 +9,7 @@ project Services {
    
    annotate BindingTime bindingTime = BindingTime::compile to .;
    annotate String semanticId = "" to .;
+   annotate Integer uiGroup = UiMandatoryGroup1 to .;
    
    // -------------------- service manager ------------------
    
@@ -149,26 +150,30 @@ project Services {
    // in some situations while in others it is important to have a service not being a family avoiding potential
    // instance recursions
    abstract compound ServiceBase refines CDataComponent {
-       assign (semanticId = Eclass_Unit_MByte) to {
-           Integer memLimit = 0; // e.g., JVM memory limit in MBytes
-       }
        Id id; // forward declaration
        NonEmptyNameString name; // forward declaration
        ServiceKind kind;
        Boolean asynchronous = true;
        sequenceOf(IOType) input;
        sequenceOf(IOType) output;
-       Parameters parameter = {};
-       setOf(refTo(EcsDevice)) requires;
-       refTo(EcsDevice) allocatedTo; // -> BindingTime::runtimeEnact
-       Boolean monitorRcvCount = true;
-       Boolean monitorSentCount = true;
-       Boolean monitorProcessingTime = true;
-       TraceKind traceRcv = TraceKind::NONE;
-       TraceKind traceSent = TraceKind::NONE;
        setOf(refTo(Dependency)) dependencies = {};
        NameplateInfo nameplateInfo;
-       refTo(Server) server;
+       assign (uiGroup = UiOptionalGroup1) to {
+           assign (semanticId = Eclass_Unit_MByte) to {
+               Integer memLimit = 0; // e.g., JVM memory limit in MBytes
+           }
+           Parameters parameter = {};
+           refTo(Server) server;
+       }
+       assign (uiGroup = UiOptionalGroup2) to {
+           setOf(refTo(EcsDevice)) requires;
+           refTo(EcsDevice) allocatedTo; // -> BindingTime::runtimeEnact
+           Boolean monitorRcvCount = true;
+           Boolean monitorSentCount = true;
+           Boolean monitorProcessingTime = true;
+           TraceKind traceRcv = TraceKind::NONE;
+           TraceKind traceSent = TraceKind::NONE;
+       }
 
        Constraint idOk = matches(id, "^[^@]+$");
        Constraint sourceTypesOk = kind == ServiceKind.SOURCE_SERVICE implies isDefined(output) and fwdTypes(output).size() > 0; // does not hold for connectors: and fwdTypes(input).size() == 0;
@@ -203,7 +208,9 @@ project Services {
        isDefined(class); // must be defined, not necessarily with a value
        isDefined(artifact); // must be defined, not necessarily with a value
        
-       JavaVersion javaVersion; // minimum requirement, todo remove and to be unified with Java System dependency
+       assign (uiGroup = UiOptionalGroup1) to {
+           JavaVersion javaVersion; // minimum requirement, todo remove and to be unified with Java System dependency
+       }
    }
    
    // ------------------------------- python (integrated) services -----------------
