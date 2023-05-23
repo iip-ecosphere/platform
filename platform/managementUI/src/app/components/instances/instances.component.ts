@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Subscription, interval } from 'rxjs';
 import { ApiService } from 'src/app/services/api.service';
 import { PlanDeployerService } from 'src/app/services/plan-deployer.service';
 import { InputVariable, Resource } from 'src/interfaces';
@@ -13,11 +14,20 @@ export class InstancesComponent implements OnInit {
   filteredData: any[]= [];
   deploymentPlans: Resource | undefined;
   undeployInput: InputVariable[] = [];
+  private subscription: Subscription = new Subscription();
 
-  constructor(private api: ApiService, private deployer: PlanDeployerService) { }
+  constructor(private api: ApiService,
+    private deployer: PlanDeployerService) { }
 
   async ngOnInit() {
+    this.getData();
 
+    // reloading instances every 3 sec
+    this.subscription = interval(3000).subscribe(
+      (val) => { this.getInstances()});
+  }
+
+  public async getData() {
     this.getInstances();
     const artifacts = await this.api.getArtifacts();
     if(artifacts) {
@@ -27,18 +37,28 @@ export class InstancesComponent implements OnInit {
   }
 
   public async getInstances() {
+    console.log("refreshing instances")
     const data = await this.api.getInstances();
-    console.log(data);
     if(data) {
       for(const element of data) {
         if(element.value && element.value.length > 1) {
-          this.filteredData.push(element);
+          // preventing double elements
+          if (!this.isElement(element, this.filteredData)) {
+            this.filteredData.push(element);
+          }
         }
-
       }
     }
-    console.log("instances")
-    console.log(this.filteredData)
+  }
+
+  public isElement(elem: any, list: any) {
+    let result = false;
+    for(let val of list) {
+      if (val.idShort === elem.idShort) {
+        return true
+      }
+    }
+    return result
   }
 
   public undeploy(item: any) {
