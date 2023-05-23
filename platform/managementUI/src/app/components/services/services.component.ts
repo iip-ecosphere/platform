@@ -78,22 +78,22 @@ export class ServicesComponent implements OnInit {
   ]
 
   ngOnInit(): void {
-    this.getServices();
-    this.getArtifacts();
+    //this.getServices();
+    //this.getArtifacts();
   }
 
   public async getDisplayData(tab:string, submodel:any, submodelElement: string) {
-    console.log("runtime/service component")
     this.currentTab = tab
     await this.loadData(submodel, submodelElement)
-    console.log(this.currentTab)
     switch(this.currentTab) {
+      /*
       case "deployment plans":
         this.filterDeplPlans();
         break;
       case "instances":
         this.filterInstances();
         break;
+      */
       case "running services":
         this.filterServices();
         break;
@@ -121,91 +121,14 @@ export class ServicesComponent implements OnInit {
       } catch(e) {
         console.log(e);
       }
-    console.log("load data:")
-    console.log(response)
     this.filteredData = response
 
     if(this.currentTab != "instances") {
       this.filteredData = this.filteredData.value
     }
-
-    //this.filteredData = response
-    /*
-    if (submodelElement) {
-      console.log("-> submodel")
-      this.rawData = await this.getData(submodelElement);
-      this.filteredData = this.rawData.value
-    } else {
-      console.log("-> metaproject")
-      this.rawData = await this.getData("")
-      this.filteredData = this.prefilter(metaProject)
-    }*/
   }
 
   // Filter
-
-  public filterDeplPlans() {
-    let result = []
-    for (let tableRow of this.filteredData) {
-      let temp = []
-      let name
-      for (let rowValues of tableRow.value) {
-        if (rowValues.idShort == "id") {
-          name = rowValues.value
-        }
-        for (let param of this.paramToDisplay) {
-          if (rowValues.idShort == param[0]) {
-            let new_rowValue =  { "value":  param[1] + rowValues.value + param[2]}
-            temp.push(new_rowValue)
-          }
-        }
-      }
-      let new_value = {idShort: name, value: temp, plan: tableRow}
-      result.push(new_value)
-    }
-    this.filteredData = result
-  }
-  /*
-  private getValue(rowVal: any, param:any) {
-    let value = rowVal.value.find(
-      (elemt: { idShort: string; }) => elemt.idShort === this.varValue).value
-    return { "value":  param[1] + value + param[2]}
-  }
-  */
-
-  public filterInstances() {
-    let result = []
-    for (let tableRow of this.filteredData) {
-      let temp = []
-      let name
-      if(tableRow.value) {
-        for (let rowValues of tableRow.value) {
-          if(rowValues.idShort == "appId") {
-            name = rowValues.value
-          }
-          for (let param of this.paramToDisplay) {
-            if (rowValues.idShort == param[0]) {
-              let new_rowValue
-              if(rowValues.idShort == "timestamp") {
-                const temp = Number(rowValues.value);
-                let date = new Date(temp);
-                new_rowValue =  { "value":  param[1] + date}
-              } else {
-                new_rowValue =  { "value":  param[1] + rowValues.value + param[2]}
-              }
-              //let new_rowValue =  { "value":  param[1] + rowValues.value + param[2]}
-              temp.push(new_rowValue)
-            }
-          }
-        }
-      }
-      if (name) { // TODO with this if I remove this strage item with "....max" name
-        let new_value = {idShort: name, value: temp}
-        result.push(new_value)
-      }
-    }
-    this.filteredData = result
-  }
 
   public filterServices() {
     let result = []
@@ -249,10 +172,65 @@ export class ServicesComponent implements OnInit {
     this.filteredData = result
   }
 
-  // ------------------------- buttons ---------------------------
-  public async deploy(plan: Resource) {
-
+    /*
+  public filterDeplPlans() {
+    let result = []
+    for (let tableRow of this.filteredData) {
+      let temp = []
+      let name
+      for (let rowValues of tableRow.value) {
+        if (rowValues.idShort == "id") {
+          name = rowValues.value
+        }
+        for (let param of this.paramToDisplay) {
+          if (rowValues.idShort == param[0]) {
+            let new_rowValue =  { "value":  param[1] + rowValues.value + param[2]}
+            temp.push(new_rowValue)
+          }
+        }
+      }
+      let new_value = {idShort: name, value: temp, plan: tableRow}
+      result.push(new_value)
+    }
+    this.filteredData = result
   }
+
+  public filterInstances() {
+    let result = []
+    for (let tableRow of this.filteredData) {
+      let temp = []
+      let name
+      if(tableRow.value) {
+        for (let rowValues of tableRow.value) {
+          if(rowValues.idShort == "appId") {
+            name = rowValues.value
+          }
+          for (let param of this.paramToDisplay) {
+            if (rowValues.idShort == param[0]) {
+              let new_rowValue
+              if(rowValues.idShort == "timestamp") {
+                const temp = Number(rowValues.value);
+                let date = new Date(temp);
+                new_rowValue =  { "value":  param[1] + date}
+              } else {
+                new_rowValue =  { "value":  param[1] + rowValues.value + param[2]}
+              }
+              //let new_rowValue =  { "value":  param[1] + rowValues.value + param[2]}
+              temp.push(new_rowValue)
+            }
+          }
+        }
+      }
+      if (name) { // TODO with this if I remove this strage item with "....max" name
+        let new_value = {idShort: name, value: temp}
+        result.push(new_value)
+      }
+    }
+    this.filteredData = result
+  }
+  */
+
+  // ------------------------- buttons ---------------------------
 
 
 
