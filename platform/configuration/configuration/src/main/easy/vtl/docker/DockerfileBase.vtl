@@ -21,6 +21,8 @@ template DockerfileBase(IIPEcosphere config, FileArtifact target, sequenceOf(Mes
                 'RUN apk add openjdk8'
             }
             ''
+            '${genTestingMode(config, "Alpine")}'
+            ''
             '# Installed dependencies (shall be in /)'
             'COPY installedDependencies.yml installedDependencies.yml'
             ''

@@ -30,6 +30,8 @@ template Dockerfile(IIPEcosphere config, FileArtifact target, sequenceOf(MeshEle
             '# Installed dependencies (shall be in /)'
             'COPY installedDependencies.yml installedDependencies.yml'
             ''
+            '${genTestingMode(config, "Alpine")}'
+            ''
             '${genServersExpose(app)|e}'
             'WORKDIR /app'
             // '# App'

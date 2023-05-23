@@ -190,4 +190,7 @@ template Basics(Configuration config, FileArtifact target) {
         getBooleanValueSafe(var, false);
     }
 
+    def getContainerTestingModeSafe(DecisionVariable var) {
+        getBooleanValueSafe(var, false);
+    }
 }

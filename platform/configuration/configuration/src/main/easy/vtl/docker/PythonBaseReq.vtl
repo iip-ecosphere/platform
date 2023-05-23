@@ -8,19 +8,24 @@ template PythonBaseReq(IIPEcosphere config, FileArtifact target, sequenceOf(Mesh
         sequenceOf(PythonService) services = elements -> collect(e|e.impl) -> selectByKind(PythonService);
 
         // preliminary fix, just very basic ones, shall also include the remaining -> check versions here
-        'pyyaml
-        pyflakes
-        websockets'
+        //'pyyaml
+        //pyflakes
+        //websockets'
 
         setOf(Dependency) existDeps = {};
         for (PythonService pyService : services) {              
             //setOf(Dependency) deps = pyService.dependencies;
             setOf(Dependency) deps = pyService.dependencies -> selectByType(PythonDependency);
             setOf(Dependency) serverDeps = pyService.server.dependencies -> selectByType(PythonDependency);
+            setOf(Dependency) platformDeps = config.basicPlatformDependencies -> selectByType(PythonDependency);
             for (PythonDependency d : serverDeps) {
                deps.add(d);
             }
 
+            for (PythonDependency d : platformDeps) {
+               deps.add(d);
+            }
+            
             for (PythonDependency d : deps) {
                Integer exists = 0;
                for (PythonDependency existD : existDeps) {
@@ -42,7 +47,11 @@ template PythonBaseReq(IIPEcosphere config, FileArtifact target, sequenceOf(Mesh
                }
 
                if (exists == 0) {
-                   '${d.name} == ${d.version}'
+                   if (d.version == "") {
+                       '${d.name}'
+                   } else {
+                       '${d.name} == ${d.version}'
+                   }
                    existDeps.add(d);
                }
             }

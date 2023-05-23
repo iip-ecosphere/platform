@@ -29,6 +29,7 @@ project IIPEcosphere {
         Integer monitoringMemLimit = 256; // general memory limit for central platform services, e.g., JVM memory limit in MBytes
     }
     Boolean containerBaseImageMethod = false; // Use container base image method during the container creation.
+    Boolean containerTestingMode = false; // Add more testing software into the containers.
     
     // legacy transition (to be removed)
     Boolean sharedInterfaces = false;

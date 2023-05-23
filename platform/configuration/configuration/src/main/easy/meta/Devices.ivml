@@ -124,8 +124,59 @@ project Devices {
     PythonDependency keras290 = {
        name = "keras",
        version = "2.9.0"
-    };    
+    };
     
+    setOf(refTo(Dependency)) linuxTestingDependencies = {refBy(linuxTestingNetworkUtilsRoute), refBy(linuxTestingNetworkUtilsTraceroute), refBy(linuxTestingNetworkUtilsPing), refBy(linuxTestingNetworkUtilsWget), refBy(linuxTestingFileUtilsLess), refBy(linuxTestingFileUtilsNano), refBy(linuxTestingFileUtilsTail), refBy(linuxTestingProcessUtilsProcps)};
+
+    LinuxSystemDependency linuxTestingNetworkUtilsRoute = {
+       name = "net-tools"
+    };
+
+    LinuxSystemDependency linuxTestingNetworkUtilsTraceroute = {
+       name = "traceroute"
+    };
+
+    LinuxSystemDependency linuxTestingNetworkUtilsPing = {
+       name = "iputils-ping"
+    };
+
+    LinuxSystemDependency linuxTestingNetworkUtilsWget = {
+       name = "wget"
+    };
+
+    LinuxSystemDependency linuxTestingFileUtilsLess = {
+       name = "less"
+    };
+
+    LinuxSystemDependency linuxTestingFileUtilsNano = {
+       name = "nano"
+    };
+
+    LinuxSystemDependency linuxTestingFileUtilsTail = {
+       name = "coreutils"
+    };
+
+    LinuxSystemDependency linuxTestingProcessUtilsProcps = {
+       name = "procps"
+    };  
+   
+    setOf(refTo(Dependency)) basicPlatformDependencies = {refBy(pyyamlNoVersion), refBy(pyflakesNoVersion), refBy(websocketsNoVersion)};
+
+    PythonDependency pyyamlNoVersion = {
+       name = "pyyaml",
+       version = ""
+    };
+
+    PythonDependency pyflakesNoVersion = {
+       name = "pyflakes",
+       version = ""
+    };
+    
+    PythonDependency websocketsNoVersion = {
+       name = "websockets",
+       version = ""
+    };
+
     // ------------------ DeviceId --------------------------- 
     
     abstract compound DeviceIdProvider {
@@ -227,6 +278,19 @@ project Devices {
         keras290;
         tensorflowNoVersion;
         defaultDeviceType;
+        linuxTestingDependencies;
+        basicPlatformDependencies;
+        linuxTestingNetworkUtilsRoute;
+        linuxTestingNetworkUtilsTraceroute;
+        linuxTestingNetworkUtilsPing;
+        linuxTestingNetworkUtilsWget;
+        linuxTestingFileUtilsLess;
+        linuxTestingFileUtilsNano;
+        linuxTestingFileUtilsTail;
+		linuxTestingProcessUtilsProcps;
+        pyyamlNoVersion;
+        pyflakesNoVersion;
+        websocketsNoVersion;
     } but (f|f.bindingTime >= BindingTime.runtimeMon);
 
 }

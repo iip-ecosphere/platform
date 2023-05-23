@@ -17,6 +17,9 @@ template Dockerfile_3_ecs(IIPEcosphere config, FileArtifact target, sequenceOf(M
         '# Installed dependencies (shall be in /)'
         'COPY installedDependencies.yml installedDependencies.yml'
     	''
+        ''
+        '${genTestingMode(config, "Docker")}'
+        ''
         String deviceSpec = device.containerName;
         if (deviceSpec.length() > 0) {
             deviceSpec = "-" + deviceSpec;

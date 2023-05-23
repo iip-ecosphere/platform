@@ -119,6 +119,8 @@ template Dockerfile_Python(IIPEcosphere config, FileArtifact target, sequenceOf(
             '# Installed dependencies (shall be in /)'
             'COPY installedDependencies.yml installedDependencies.yml'
             ''
+            '${genTestingMode(config, "Python")}'
+            ''
             '${genServersExpose(app)|e}'
             'WORKDIR /app'
             ''

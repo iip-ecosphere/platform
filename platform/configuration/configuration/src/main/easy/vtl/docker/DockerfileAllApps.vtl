@@ -29,6 +29,8 @@ template DockerfileAllApps(IIPEcosphere config, FileArtifact target, sequenceOf(
             '# Installed dependencies (shall be in /)'
             'COPY installedDependencies.yml installedDependencies.yml'
             ''
+            '${genTestingMode(config, "Alpine")}'
+            ''
             for (Application app : apps) {
                 '${genServersExpose(app)|e}'
             }

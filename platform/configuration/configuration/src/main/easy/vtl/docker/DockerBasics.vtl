@@ -90,4 +90,23 @@ template DockerBasics(Configuration config, FileArtifact target) {
         }
     }
 
+    def genTestingMode(IIPEcosphere config, String BaseImage) {
+        if (getContainerTestingModeSafe(config.containerTestingMode)) {
+            if (config.linuxTestingDependencies.size() > 0){
+                if (BaseImage == "Python"){
+                    'RUN apt-get install software-properties-common -y'
+                    'RUN apt-add-repository "deb  http://deb.debian.org/debian  stretch main"' 
+                }           
+                for (LinuxSystemDependency dep: config.linuxTestingDependencies) {
+                    if (BaseImage == "Python"){
+                        'RUN apt-get install -y ${dep.name}'
+                    } else if (BaseImage == "Alpine") {
+                        'RUN apk add ${dep.name}'
+                    } else if (BaseImage == "Docker") {
+                        'RUN apk add ${dep.name}'
+                    }
+                }
+            }
+        }
+    }
 }

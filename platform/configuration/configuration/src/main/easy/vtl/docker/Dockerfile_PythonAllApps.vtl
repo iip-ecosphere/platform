@@ -120,6 +120,8 @@ template Dockerfile_PythonAllApps(IIPEcosphere config, FileArtifact target, sequ
             '# Installed dependencies (shall be in /)'
             'COPY installedDependencies.yml installedDependencies.yml'
             ''
+            '${genTestingMode(config, "Python")}'
+            ''
             for (Application app : apps) {
                 '${genServersExpose(app)|e}'
             }
