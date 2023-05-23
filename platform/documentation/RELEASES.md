@@ -9,7 +9,7 @@ Planned:
 * Integrated container management for Kubernetes [#39](https://github.com/iip-ecosphere/platform/issues/39)
 * Filtering of monitoring telegrams [#75](https://github.com/iip-ecosphere/platform/issues/75)
 
-### HM'23: At the fair (Spring 2023):
+### HM'23: After the fair (Spring 2023):
 
 Planned:
 * Enable tolerant switching: [#26](https://github.com/iip-ecosphere/platform/issues/26)
@@ -18,6 +18,7 @@ Planned:
 * KODEX: dynamic port assignment: [#14](https://github.com/iip-ecosphere/platform/issues/14), documentation: [#6](https://github.com/iip-ecosphere/platform/issues/6)
 
 In progress:
+* [#139](https://github.com/iip-ecosphere/platform/issues/139): Fixing Python testing issues, better Python test generation
 * [#127](https://github.com/iip-ecosphere/platform/issues/127): Integration of federated learning 
 * [#70](https://github.com/iip-ecosphere/platform/issues/70): UI progress reporting 
 * [#117](https://github.com/iip-ecosphere/platform/issues/117): Multiple service managers per device
@@ -28,6 +29,7 @@ In progress:
 * [#115](https://github.com/iip-ecosphere/platform/issues/115): Cleanup, e.g., old build processes
 
 New features:
+* [#130](https://github.com/iip-ecosphere/platform/issues/130): Application/device specific containers.
 * [#127](https://github.com/iip-ecosphere/platform/issues/127): Integration of Flower-based federated learning through generated templates
 * [#100](https://github.com/iip-ecosphere/platform/issues/100): Allowing to start/stop multiple app instances (only via deployment plans)
 * [#59](https://github.com/iip-ecosphere/platform/issues/59): Basic version of distributed testing/evaluation environment for platform and apps (PETE)
