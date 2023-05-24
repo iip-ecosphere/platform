@@ -369,11 +369,12 @@ public class JsonUtils {
             }
             String result = mapping.get(fieldName);
             if (result == null) {
-                if (fieldName.length() > 2 && Character.isLowerCase(fieldName.charAt(1))) {
+                /*if (fieldName.length() > 2 && Character.isLowerCase(fieldName.charAt(1))) {
                     result = fallback.nameForSetterMethod(config, method, defaultName);
                 } else {
                     result = fieldName;
-                }
+                }*/
+                result = fallback.nameForSetterMethod(config, method, defaultName);
             }
             return result;
         }
@@ -386,11 +387,12 @@ public class JsonUtils {
             }
             String result = mapping.get(fieldName);
             if (result == null) {
-                if (fieldName.length() > 2 && Character.isLowerCase(fieldName.charAt(1))) {
+                /*if (fieldName.length() > 2 && Character.isLowerCase(fieldName.charAt(1))) {
                     result = fallback.nameForSetterMethod(config, method, defaultName);
                 } else {
                     result = fieldName;
-                }
+                }*/
+                result = fallback.nameForSetterMethod(config, method, defaultName);
             }
             return result;
         }
