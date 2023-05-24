@@ -156,7 +156,7 @@ public class TypeResolver {
         Class<?> result = PRIMITIVES.get(name);
         if (null == result) {
             while (name.endsWith("[]")) {
-                name = name + name.substring(0, name.length() - 2);
+                name = name.substring(0, name.length() - 2);
                 arrayDims++;
             }
             try {

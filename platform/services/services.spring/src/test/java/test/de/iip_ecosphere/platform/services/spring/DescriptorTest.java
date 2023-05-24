@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
 import de.iip_ecosphere.platform.services.spring.DescriptorUtils;
+import de.iip_ecosphere.platform.services.spring.SpringCloudArtifactDescriptor;
 import de.iip_ecosphere.platform.services.spring.yaml.YamlArtifact;
 
 /**
@@ -41,14 +42,21 @@ public class DescriptorTest {
                 } else {
                     System.out.println("Testing service descriptor in " + f);
                     try {
+                        YamlArtifact yamlArtifact = null;
                         if (f.getName().endsWith(".jar")) {
-                            DescriptorUtils.readFromFile(f);
-                        } else if (f.getName().endsWith(".xml")) {
+                            yamlArtifact = DescriptorUtils.readFromFile(f);
+                        } else if (f.getName().endsWith(".yml")) {
                             try (FileInputStream fis = new FileInputStream(f)) {
-                                YamlArtifact.readFromYaml(fis);
+                                yamlArtifact = YamlArtifact.readFromYaml(fis);
+                            } catch (IOException e) {
+                                System.out.println("Error:\n" + e.getMessage());
                             }
                         }
-                    } catch (ExecutionException | IOException e) {
+                        if (null != yamlArtifact) {
+                            System.out.println("Testing YAML artifact in " + f);
+                            SpringCloudArtifactDescriptor.createInstance(yamlArtifact, f.toURI(), null);
+                        }
+                    } catch (ExecutionException e) {
                         System.out.println("Error:\n" + e.getMessage());
                     }
                 }
