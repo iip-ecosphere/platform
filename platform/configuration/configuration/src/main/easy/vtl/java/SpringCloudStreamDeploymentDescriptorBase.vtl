@@ -365,8 +365,31 @@ template SpringCloudStreamDeploymentDescriptorBase(Configuration config, FileArt
         }
     }
     
+    @DispatchBasis
+    def collectRecordTypes(DataType type, setOf(RecordType) types) {
+    }
+    
+    @DispatchCase
+    def collectRecordTypes(RecordType type, setOf(RecordType) types) {
+        if (not(types.includes(type))) {
+            types.add(type);
+            for (Field f: type.fields) {
+                collectRecordTypes(f.type, types);                
+            }
+        }
+    }
+
+    @DispatchCase
+    def collectRecordTypes(ArrayType type, setOf(RecordType) types) {
+        collectRecordTypes(type.type, types);
+    }
+    
     def generateTypes(setOf(DataType) types) {
-        for (RecordType type: types->selectByType(RecordType)->sortedBy(t|t.name)) {
+        setOf(RecordType) recTypes = {};
+        for (DataType t : types) {
+            collectRecordTypes(t, recTypes);
+        }
+        for (RecordType type: recTypes->sortedBy(t|t.name)) {
             '${generateType(type)}'
         }
     }
