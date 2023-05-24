@@ -1,5 +1,6 @@
 import sys
 
+import traceback
 import logging as logger
 logger.basicConfig(level="DEBUG")
 import argparse
@@ -223,8 +224,9 @@ def processRequest(sId, type, data):
                         responseFunction(func(d))
                         updateResponseTime(startTime)
     except Exception as err:
-        sys.stderr.write("Exception/error in service:\n")
-        sys.stderr.write(str(err)+"\n")        
+        sys.stderr.write("Exception/error in python service env:\n")
+        sys.stderr.write(str(err)+"\n")  
+        traceback.print_exc()      
     return result
 
 # console mode
@@ -322,8 +324,9 @@ async def wsHandler(ws):
                 if result:
                     wsSendResult(result)
         except Exception as err:
-            sys.stderr.write("Exception/error in service:\n")
+            sys.stderr.write("Exception/error in python service env (websocket):\n")
             sys.stderr.write(str(err)+"\n")
+            traceback.print_exc()
 
 async def wsMain(port):
     log = logger.getLogger('websockets.server')
