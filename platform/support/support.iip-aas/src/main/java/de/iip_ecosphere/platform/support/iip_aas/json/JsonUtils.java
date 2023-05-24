@@ -130,6 +130,7 @@ public class JsonUtils {
         if (null != obj) {
             try {
                 ObjectMapper objectMapper = new ObjectMapper();
+                defineFields(objectMapper);
                 result = objectMapper.writeValueAsString(obj);
             } catch (JsonProcessingException e) {
                 // handled by default value
@@ -152,6 +153,7 @@ public class JsonUtils {
         if (null != json) {
             try {
                 ObjectMapper objectMapper = new ObjectMapper();
+                defineFields(objectMapper);
                 result = objectMapper.readValue(json.toString(), cls);
             } catch (JsonProcessingException e) {
                 //result = null;
@@ -367,7 +369,11 @@ public class JsonUtils {
             }
             String result = mapping.get(fieldName);
             if (result == null) {
-                result = fallback.nameForGetterMethod(config, method, defaultName);
+                if (fieldName.length() > 2 && Character.isLowerCase(fieldName.charAt(1))) {
+                    result = fallback.nameForSetterMethod(config, method, defaultName);
+                } else {
+                    result = fieldName;
+                }
             }
             return result;
         }
@@ -380,7 +386,11 @@ public class JsonUtils {
             }
             String result = mapping.get(fieldName);
             if (result == null) {
-                result = fallback.nameForSetterMethod(config, method, defaultName);
+                if (fieldName.length() > 2 && Character.isLowerCase(fieldName.charAt(1))) {
+                    result = fallback.nameForSetterMethod(config, method, defaultName);
+                } else {
+                    result = fieldName;
+                }
             }
             return result;
         }

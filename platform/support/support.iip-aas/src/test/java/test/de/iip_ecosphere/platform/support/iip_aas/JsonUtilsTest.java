@@ -257,5 +257,20 @@ public class JsonUtilsTest {
         Assert.assertEquals(1, test.getINTVALUE());
         Assert.assertEquals("abba", test.getStringVAlue());
     }
+    
+    /**
+     * Tests strange names in {@link PropertyData} with {@link JsonUtils#toJson(Object)} 
+     * and {@link JsonUtils#fromJson(Object, Class)}.
+     */
+    @Test
+    public void testToJson() {
+        PropertyData data = new PropertyData();
+        String json = JsonUtils.toJson(data);
+        Assert.assertTrue(json.contains("INTVALUE"));
+        Assert.assertTrue(json.contains("stringVAlue"));
+        PropertyData d1 = JsonUtils.fromJson(json, PropertyData.class);
+        Assert.assertEquals(data.getStringVAlue(), d1.getStringVAlue());
+        Assert.assertEquals(data.getINTVALUE(), d1.getINTVALUE());
+    }
 
 }
