@@ -152,7 +152,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 vilTemplateProcessor("JavaSpringCloudStreamYaml", config, "${resourcesSrc}/application.yml", mappedMesh=mappedMesh, nodes=elements, app=a);
                 vilTemplateProcessor("SpringCloudStreamDeploymentDescriptor", config, "${resourcesSrc}/deployment.yml", app=a, elements=elements);
                 vilTemplateProcessor("JavaSpringCloudStreamAssembly", config, "${assemblySrc}/spring.xml");
-                assemblies.add("spring|${assemblyRel}/spring.xml|package|${mvnProjectBuildDir}");
+                //assemblies.add("spring|${assemblyRel}/spring.xml|package|${mvnProjectBuildDir}");
                 vilTemplateProcessor("JavaLogbackXml", config, "${resourcesSrc}/logback.xml");
                 identityStoreJsl(resourcesSrc, cfg);
                 deviceIdProviderJsl(resourcesSrc, cfg);

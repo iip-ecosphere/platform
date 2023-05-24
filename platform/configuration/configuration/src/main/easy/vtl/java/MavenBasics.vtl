@@ -394,19 +394,22 @@ template MavenBasics(Configuration config, FileArtifact target) {
     
     // ------------------------------------------- maven clean plugin -----------------------------------------------------
     
-    def XmlElement appendCleanPlugin(XmlElement plugins, String ver="2.5", String phase="initialize", String goal="clean", String dir="\\${project.build.directory}", String include="*.jar") {
+    def XmlElement appendCleanPlugin(XmlElement plugins, String ver="2.5", String phase="initialize", String goal="clean", String dir="\\${project.build.directory}", String include="*.jar", Boolean excludeDefaultDirs=true) {
         XmlElement plugin = appendPlugin(plugins, "org.apache.maven.plugins", "maven-clean-plugin", ver, false);
         XmlElement exec = appendExecutions(plugin);
         new XmlElement(exec, "id", "auto-clean");
         new XmlElement(exec, "phase", phase);
         appendGoal(exec, goal);
         XmlElement cfg = appendConfiguration(exec);
-        new XmlElement(cfg, "excludeDefaultDirectories", "true");
+        new XmlElement(cfg, "excludeDefaultDirectories", "${excludeDefaultDirs}");
         XmlElement fileset = new XmlElement(new XmlElement(cfg, "filesets"), "fileset");
         new XmlElement(fileset, "directory", dir); 
         if (include.length() > 0) {
             XmlElement includes = new XmlElement(fileset, "includes");
-            new XmlElement(includes, "include", include);
+            sequenceOf(String) inTmp = include.split(",");
+            for (String in: inTmp) {
+                new XmlElement(includes, "include", in);
+            }
         }
         plugin;
     }

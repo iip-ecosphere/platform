@@ -147,6 +147,8 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
             phase="prepare-package", prependGroupId=false, excludeIds=zipExcludes, includeScope="runtime"); 
         appendMavenDependencyPluginBuildClasspathExecution(execs, outputFile="\\${project.build.directory}/classes/classpath", 
             prependGroupId=false, prefix="jars", fileSeparator="/", pathSeparator=":", includeScope="runtime"); 
+            
+        appendCleanPlugin(plugins, include="*-bin.jar,*-spring.jar");
     }
 
 }

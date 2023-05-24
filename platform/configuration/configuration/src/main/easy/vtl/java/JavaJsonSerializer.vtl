@@ -65,6 +65,7 @@ template JavaJsonSerializer(Configuration config, FileArtifact target, RecordTyp
                     ObjectMapper objectMapper = new ObjectMapper();
                     ${defineJacksonOptionals(type, "objectMapper", typeName)|e}
                     ${defineJacksonTypeMapper(config)|e}
+                    JsonUtils.defineFields(objectMapper);
                     return objectMapper.readValue(data, ${clsName}${add}.class);
                 } catch (JsonProcessingException e) {
                     throw new IOException(e);
@@ -75,6 +76,7 @@ template JavaJsonSerializer(Configuration config, FileArtifact target, RecordTyp
             public byte[] to(${typeName} source) throws IOException {
                 try {
                     ObjectMapper objectMapper = new ObjectMapper();
+                    JsonUtils.defineFields(objectMapper);
                     return objectMapper.writeValueAsBytes(source);
                 } catch (JsonProcessingException e) {
                     throw new IOException(e);
