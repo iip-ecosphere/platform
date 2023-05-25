@@ -114,8 +114,8 @@ public class ConfigurationTests {
         SpringStartup.start(f, false, p -> configureProcess(p, res), 
             "--iip.test.stop=" + stopTime, "--iip.test.brokerPort=" + broker.getPort());
         asserter.accept(FileUtils.readFileAsString(res));
-        res.deleteOnExit();
-        res.delete();
+        //res.deleteOnExit();
+        //res.delete();
     }
 
     /**

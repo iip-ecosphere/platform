@@ -23,9 +23,6 @@ import java.util.TimerTask;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.services.environment.Starter;
 import de.iip_ecosphere.platform.services.spring.DescriptorUtils;
 import de.iip_ecosphere.platform.services.spring.ServerManager;
@@ -48,6 +45,8 @@ import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
  * @author Holger Eichelberger, SSE
  */
 public class SpringStartup {
+    
+    // no logger in here, may collide/be superseded by broker logging (Apache qpid-j)
     
     public static final String PROPERTY_ARGS = "iip.springStart.args";
     public static final String ARG_BROKER_PORT = "iip.test.brokerPort";
@@ -80,7 +79,7 @@ public class SpringStartup {
      */
     public static final void start(String... args) {
         if (args.length > 0) {
-            getLogger().info("Artifact args: {}", Arrays.toString(args));
+            System.out.println("Artifact args: " + Arrays.toString(args));
             File f = new File(args[0]);
             String[] restArgs = new String[args.length - 1];
             for (int i = 1; i < args.length; i++) {
@@ -142,6 +141,7 @@ public class SpringStartup {
         int adminPort = -1; // ephemeral
         String serviceProtocol = "";
 
+        System.out.println("Spring Startup with args: " + Arrays.toString(args));
         SpringInstances.setConfig(new SpringCloudServiceSetup());
         Starter.considerInstalledDependencies(); // if there, transported by createStandalineCommandArgs
         int brokerPort = CmdLine.getIntArg(args, ARG_BROKER_PORT, DFLT_BROKER_PORT);
@@ -150,12 +150,12 @@ public class SpringStartup {
             ServerManager serverMgr = new ServerManager(() -> NetworkManagerFactory.getInstance()); // local, no AAS
             final Collection<SpringCloudArtifactDescriptor> artDesc = getArtifacts(artifact);
             serverMgr.startServers(null, artDesc);
-            getLogger().info("Command line for artifact: {}", artifact);
+            System.out.println("Command line for artifact: " + artifact);
             List<String> cmdLine = DescriptorUtils.createStandaloneCommandArgs(artifact, brokerPort, 
                 brokerHost, adminPort, serviceProtocol);
             addAasNotificationMode(args, cmdLine);
             addAppId(args, cmdLine);
-            getLogger().info("Starting with arguments: {}", cmdLine);
+            System.out.println("Starting with arguments: " + cmdLine);
             ProcessBuilder builder = new ProcessBuilder(cmdLine);
             if (null != procCfg) {
                 procCfg.accept(builder);
@@ -165,13 +165,13 @@ public class SpringStartup {
             Runtime.getRuntime().addShutdownHook(new Thread(() -> serverMgr.stopServers(artDesc)));
             Process proc = builder.start();
             if (stop > 0) {
-                getLogger().info("Scheduling for auto-stop after " + stop + " ms");
+                System.out.println("Scheduling for auto-stop after " + stop + " ms");
                 Timer timer = new Timer();
                 timer.schedule(new TimerTask() {
                     
                     @Override
                     public void run() {
-                        getLogger().info("Auto-stop after: " + stop + " ms");
+                        System.out.println("Auto-stop after: " + stop + " ms");
                         proc.destroyForcibly();
                         serverMgr.stopServers(artDesc);
                         timer.cancel();
@@ -183,17 +183,8 @@ public class SpringStartup {
             }
             proc.waitFor();
         } catch (ExecutionException | InterruptedException | IOException e) {
-            getLogger().error("Running the app: " + e.getMessage());
+            System.err.println("Running the app: " + e.getMessage());
         }
-    }
-    
-    /**
-     * Returns the logger.
-     * 
-     * @return the logger
-     */
-    private static Logger getLogger() {
-        return LoggerFactory.getLogger(SpringStartup.class);
     }
     
     /**
@@ -212,10 +203,12 @@ public class SpringStartup {
                     yamlArtifact, file.toURI(), file);
                 result.add(desc);
             } catch (ExecutionException e) {
-                getLogger().error("Loading deployment descriptor from : {}. Cannot start servers.", e.getMessage());
+                System.out.println("Loading deployment descriptor from : " + e.getMessage() 
+                    + ". Cannot start servers.");
             }
         } else {
-            getLogger().error("Loading deployment descriptor from {}: Cannot load file, cannot start servers.");
+            System.out.println("Loading deployment descriptor from " + file 
+                + ": Cannot load file, cannot start servers.");
         }
         return result;
     }
