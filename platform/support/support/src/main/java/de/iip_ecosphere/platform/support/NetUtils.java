@@ -30,6 +30,7 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang.SystemUtils;
 import org.apache.commons.validator.routines.InetAddressValidator;
 
 /**
@@ -188,7 +189,7 @@ public class NetUtils {
      * @return {@code true} for a container address, {@code false} else
      */
     public static boolean isContainerIp(String address) {
-        return address.startsWith("172.17."); // is docker, may need configuration options
+        return address.startsWith("172.17."); // may be docker or VMWare :/, may need configuration options
     }
     
     /**
@@ -198,8 +199,9 @@ public class NetUtils {
      * @see #isContainerIp(String)
      */
     public static boolean isInContainer() {
-        boolean inContainer = isRunningInsideDocker();
-        if (!inContainer) {
+        boolean inContainer = false;
+        if (SystemUtils.IS_OS_WINDOWS) {
+            // unsafe fallback
             try {
                 Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
                 for (NetworkInterface netint : Collections.list(nets)) {
@@ -217,6 +219,8 @@ public class NetUtils {
             } catch (SocketException e) {
                 // ignore
             }
+        } else {
+            inContainer = isRunningInsideDocker();
         }
         return inContainer;
     }
