@@ -17,3 +17,14 @@
 .status-indicator {
   background-color: rgb(184, 198, 181);
 }
+
+.statusContainer {
+  display: flex;
+  justify-content: flex-start;
+  overflow-x: scroll;
+}
+
+p {
+  margin-bottom: 0px;
+  margin-top: 0px;
+}

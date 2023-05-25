@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, firstValueFrom, Observable, Subscription } from 'rxjs';
-import { platformResponse, StatusMsg } from 'src/interfaces';
+import { BehaviorSubject, firstValueFrom, interval, Observable, Subject, Subscription } from 'rxjs';
+import { PlatformResources, platformResponse, Resource, StatusMsg } from 'src/interfaces';
 import { OnlyIdPipe } from '../pipes/only-id.pipe';
 import { EnvConfigService } from './env-config.service';
 
@@ -18,16 +18,21 @@ export class PlanDeployerService {
 
   sub: Subscription | undefined;
 
+  statusSubmodel: any;
+
   status: StatusMsg = {
     executionState: "",
     messages: [""]
   }
 
   emitter: BehaviorSubject<StatusMsg>;
+  allEmitter: Subject<Resource[]>
 
 
   constructor(private http: HttpClient, private envConfigService: EnvConfigService, private onlyId: OnlyIdPipe) {
     this.emitter = new BehaviorSubject(this.status);
+    this.allEmitter = new Subject();
+    //this.getDetailedStatus();
     const env = this.envConfigService.getEnv();
     //the ip and urn are taken from the json.config
     if(env && env.ip) {
@@ -65,6 +70,7 @@ export class PlanDeployerService {
 
     if(response && response.outputArguments[0] && response.outputArguments[0].value) {
       this.getStatus(response.outputArguments[0].value.value);
+      console.log(response.outputArguments[0].value.value);
     }
     return response;
   }
@@ -120,6 +126,28 @@ export class PlanDeployerService {
             }
 }, err => (this.emitter.next({executionState: "ERROR", messages: ["an error occured while getting the task status"]})));
 
+    } catch(e) {
+      console.log(e);
+    }
+  }
+
+  public async getDetailedStatus() {
+
+    let subscription: Subscription = new Subscription();
+
+    subscription = interval(4000).subscribe(
+      (val) => { this.getStatusSubmodel(); console.log("tick")});
+
+  }
+
+  private async getStatusSubmodel() {
+    let response;
+    try {
+      response = await firstValueFrom(this.http.get(this.ip + '/shells/' + this.urn + "/aas/submodels/Status/submodel")) as PlatformResources;
+      if(response) {
+        this.statusSubmodel = response.submodelElements;
+        this.allEmitter.next(this.statusSubmodel);
+      }
     } catch(e) {
       console.log(e);
     }

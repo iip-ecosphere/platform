@@ -1,8 +1,18 @@
+<!-- <div class="statusContainer">
+  <mat-card *ngFor="let status of statusSubmodel">
+    <h1>{{status.idShort}}</h1>
+    <div *ngFor="let statusDetail of status.value">
+      <p *ngIf="filter(statusDetail.idShort)">{{statusDetail.idShort}}:  {{statusDetail.value}}</p>
+    </div>
+
+  </mat-card>
+</div> -->
+
 <mat-card *ngIf="status && status.executionState != ''" style="background: RGB(35, 142, 183);">
 
         <mat-card-content *ngIf="status.messages" >
           <div style="display: flex; justify-content: flex-end">
-            <!-- *ngIf="status.executionState == 'Completed'" -->
+            *ngIf="status.executionState == 'Completed'"
             <div>
               <button mat-raised-button class="button" style="align-self: flex-end" (click)="dismiss()" style="background:red">X</button>
             </div>
