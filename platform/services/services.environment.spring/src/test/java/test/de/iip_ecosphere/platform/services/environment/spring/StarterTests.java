@@ -12,6 +12,9 @@
 
 package test.de.iip_ecosphere.platform.services.environment.spring;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -38,5 +41,34 @@ public class StarterTests {
         Starter.parseExternConnections(args, s -> bindings.add(s));
         Assert.assertTrue(bindings.contains("receiveDecisionResult_AppAas-in-0"));
     }
+    
+    /**
+     * Tests {@link Starter#augmentByAppId(String[], String, java.util.function.Supplier)}.
+     */
+    @Test
+    public void testAugmentByAppId() {
+        String[] args = {"--iip.service.unknown=true", "--Dsystem.property=5", 
+            "--spring.cloud.stream.bindings.receiveDecisionResult_AppAas-in-0.binder=external"};
+        String[] tmp = Starter.augmentByAppId(args, null, () -> getYamlFileStream());
+        Assert.assertArrayEquals(args, tmp);
+        tmp = Starter.augmentByAppId(args, "", () -> getYamlFileStream());
+        Assert.assertArrayEquals(args, tmp);
+        tmp = Starter.augmentByAppId(args, "myApp@0", () -> getYamlFileStream());
+        Assert.assertTrue(tmp.length > args.length);
+    }
+    
+    /**
+     * Returns a test yaml application input stream.
+     * 
+     * @return the stream
+     */
+    private static InputStream getYamlFileStream() {
+        try {
+            return new FileInputStream("src/test/resources/application.yml");
+        } catch (IOException e) {
+            return null;
+        }
+    }
+    
 
 }

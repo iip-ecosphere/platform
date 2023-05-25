@@ -64,6 +64,13 @@ public class SpringAsyncServiceBase {
     protected <T> ReceptionCallback<T> createReceptionCallback(String channel, Consumer<T> consumer, Class<T> cls) {
         return createReceptionCallback(channel, consumer, cls, null);
     }
+    
+    /**
+     * Ensures the setup data.
+     */
+    protected void ensureSetup() {
+        Starter.getSetup();
+    }
 
     /**
      * Creates a reception callback. [public for testing]
@@ -80,7 +87,7 @@ public class SpringAsyncServiceBase {
     public <T> ReceptionCallback<T> createReceptionCallback(String channel, Consumer<T> consumer, Class<T> cls, 
         String routingKey) {
         ReceptionCallback<T> result = null;
-        Starter.getSetup();
+        ensureSetup();
         TransportConnector conn = Transport.createConnector(routingKey);
         if (null != conn) {
             try {
