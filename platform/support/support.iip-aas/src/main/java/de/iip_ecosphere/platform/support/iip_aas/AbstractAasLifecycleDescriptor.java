@@ -25,6 +25,7 @@ import java.util.function.Supplier;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.LifecycleDescriptor;
+import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
@@ -102,35 +103,21 @@ public class AbstractAasLifecycleDescriptor implements LifecycleDescriptor {
      * @param arg the parameter name to search for
      * @param init the initial value, a already known port if chained, usually {@code -1}
      * @return the port, may be {@code -1} for none
+     * @see NetUtils#getEnv(String)
      */
     private static int getPort(String[] args, String arg, int init) {
         int port = init;
         if (null != arg && port < 0) {
             port = CmdLine.getIntArg(args, arg, -1);
-            if (port < 0 && getenv(arg) != null) {
+            if (port < 0 && NetUtils.getEnv(arg) != null) {
                 try {
-                    port = Integer.parseInt(getenv(arg));
+                    port = Integer.parseInt(NetUtils.getEnv(arg));
                 } catch (NumberFormatException e) {
                     // ignore
                 }
             }
         }
         return port;
-    }
-    
-    /**
-     * Returns a value from the system environment, either as given or all in capital characters with dots replaced 
-     * by underscores.
-     * 
-     * @param key the key to look for
-     * @return the value, may by <b>null</b> for none
-     */
-    private static String getenv(String key) {
-        String result = System.getenv(key); 
-        if (null == result) { // particular for linux
-            result = System.getenv(key.toUpperCase().replace('.', '_'));
-        }
-        return result;
     }
     
     /**
