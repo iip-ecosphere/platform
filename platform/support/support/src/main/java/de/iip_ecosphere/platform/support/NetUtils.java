@@ -40,6 +40,7 @@ import org.apache.commons.validator.routines.InetAddressValidator;
  */
 public class NetUtils {
     
+    public static final String PROP_INCONTAINER = "iip.inContainer";
     public static final String NO_MASK = "";
     private static String ip = null;
     
@@ -193,14 +194,18 @@ public class NetUtils {
     }
     
     /**
-     * Returns whether we are running inside a container. Can be overridden by {@code -Diip.inContainer=<bool>}.
+     * Returns whether we are running inside a container. Can be overridden by Boolean system property/env 
+     * {@link #PROP_INCONTAINER}.
      * 
      * @return {@code true} for container, {@code false} else
      * @see #isContainerIp(String)
      */
     public static boolean isInContainer() {
         boolean inContainer = false;
-        String tmp = System.getProperty("iip.inContainer", null);
+        String tmp = System.getProperty(PROP_INCONTAINER, null);
+        if (null == tmp) {
+            tmp = getEnv(PROP_INCONTAINER);
+        }
         if (null == tmp) {
             if (SystemUtils.IS_OS_WINDOWS) {
                 // unsafe fallback
@@ -309,6 +314,22 @@ public class NetUtils {
             result = fallbackIp.substring(0, pos + 1) + "255"; 
         } else {
             result = "";
+        }
+        return result;
+    }
+
+    
+    /**
+     * Returns a value from the system environment, either as given or all in capital characters with dots replaced 
+     * by underscores.
+     * 
+     * @param key the key to look for
+     * @return the value, may by <b>null</b> for none
+     */
+    public static String getEnv(String key) {
+        String result = System.getenv(key); 
+        if (null == result) { // particular for linux
+            result = System.getenv(key.toUpperCase().replace('.', '_'));
         }
         return result;
     }
