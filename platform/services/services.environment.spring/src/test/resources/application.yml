@@ -65,7 +65,15 @@ spring:
             default:
                 contentType: application/iip
             defaultBinder: internal
-            
+            bindings:
+              processAiResult_ActionDecider-in-0:
+                destination: data_processAiResult_FlowerAiServiceClient_Hm23FlApp,data_processAiResult_PythonAi_Hm23FlApp
+                producer: 
+                  useNativeEncoding: true
+              receiveDecisionResult_AppAas-in-0:
+                destination: data_processDecisionResult_ActionDecider_Hm23FlApp
+                producer: 
+                  useNativeEncoding: true
             binders:
                 properties:
                    internal:

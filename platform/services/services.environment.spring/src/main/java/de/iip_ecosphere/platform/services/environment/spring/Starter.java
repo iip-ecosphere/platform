@@ -13,10 +13,12 @@
 package de.iip_ecosphere.platform.services.environment.spring;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +40,7 @@ import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas
 import de.iip_ecosphere.platform.services.environment.spring.metricsProvider.MetricsProvider;
 import de.iip_ecosphere.platform.services.environment.switching.ServiceBase;
 import de.iip_ecosphere.platform.support.CollectionUtils;
+import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.setup.CmdLine;
 import de.iip_ecosphere.platform.support.iip_aas.config.YamlFile;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
@@ -196,15 +199,30 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
      * @return the (augmented) command line arguments
      */
     public static String[] augmentByAppId(String[] args) {
-        if (getAppId().length() > 0) {
-            String appId = getAppId().replace(ServiceBase.APPLICATION_SEPARATOR, ""); // as before adding @, unsure
+        return augmentByAppId(args, getAppId(), () -> ResourceLoader.getResourceAsStream("application.yml"));
+    }
+    
+    /**
+     * Augments the command line arguments by spring cloud stream binder destination args containing the 
+     * application id if given. [public for testing]
+     * 
+     * @param args the command line arguments
+     * @param appId the application id, may be empty
+     * @param appYamlSupplier provides access to the input stream (called if needed)
+     * @return the (augmented) command line arguments
+     */
+    public static String[] augmentByAppId(String[] args, String appId, Supplier<InputStream> appYamlSupplier) {
+        if (appId != null && appId.length() > 0) {
+            appId = appId.replace(ServiceBase.APPLICATION_SEPARATOR, ""); // as before adding @, unsure
             List<String> res = CollectionUtils.toList(args);
             Yaml yaml = new Yaml();
             Object data = new Object();
-            Iterator<Object> it = yaml.loadAll(ResourceLoader.getResourceAsStream("application.yml")).iterator();
+            InputStream yamlIn = appYamlSupplier.get();
+            Iterator<Object> it = yaml.loadAll(yamlIn).iterator();
             if (it.hasNext()) {
-                data = it.next(); // ignore the other sub-documents here
+                data = it.next(); // for now, ignore the other sub-documents here
             }
+            FileUtils.closeQuietly(yamlIn);
             LoggerFactory.getLogger(Starter.class).info("Augmenting stream bindings by appId {}", appId);
             final String bindingsPath = "spring.cloud.stream.bindings";
             final String[] bindingsFieldPath = bindingsPath.split("\\.");
@@ -220,8 +238,10 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
                         }
                         dest = dest + appId + "_" + d;
                     }
-                    res.add(CmdLine.PARAM_PREFIX  + bindingsPath + "." + ent.getKey() + ".destination" 
-                        + CmdLine.PARAM_VALUE_SEP + dest);
+                    String mod = CmdLine.PARAM_PREFIX  + bindingsPath + "." + ent.getKey() + ".destination" 
+                        + CmdLine.PARAM_VALUE_SEP + dest;
+                    res.add(mod);
+                    LoggerFactory.getLogger(Starter.class).info(" Additional cmdline entry: {}", mod);
                 }
             }
             args = res.toArray(new String[res.size()]);
@@ -236,6 +256,12 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
      * @param args command line arguments
      */
     public static void main(Class<? extends Starter> cls, String[] args) {
+        registerDefaultPlugins(a -> {
+            // start spring cloud app
+            SpringApplication app = new SpringApplication(cls);
+            ctx = app.run(a);
+        });
+        registerPlugin("springBroker", new TestSpringBroker());
         ResourceLoader.registerResourceResolver(new SpringResourceResolver()); // ensure spring resolution
         final String[] tmpArgs = args;
         setLocalTransportSetupSupplier(setup -> {
@@ -256,9 +282,7 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
         parseExternConnections(args, e -> Transport.addGlobalRoutingKey(e));
         getSetup(); // ensure instance
         args = augmentByAppId(args);
-        // start spring cloud app
-        SpringApplication app = new SpringApplication(cls);
-        ctx = app.run(args);
+        runPlugin(args);
     }
     
 }
