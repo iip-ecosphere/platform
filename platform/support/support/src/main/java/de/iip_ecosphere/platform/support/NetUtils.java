@@ -193,34 +193,39 @@ public class NetUtils {
     }
     
     /**
-     * Returns whether we are running inside a container.
+     * Returns whether we are running inside a container. Can be overridden by {@code -Diip.inContainer=<bool>}.
      * 
      * @return {@code true} for container, {@code false} else
      * @see #isContainerIp(String)
      */
     public static boolean isInContainer() {
         boolean inContainer = false;
-        if (SystemUtils.IS_OS_WINDOWS) {
-            // unsafe fallback
-            try {
-                Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
-                for (NetworkInterface netint : Collections.list(nets)) {
-                    Enumeration<InetAddress> inetAddresses = netint.getInetAddresses();
-                    for (InetAddress inetAddress : Collections.list(inetAddresses)) {
-                        if (isContainerIp(inetAddress.getHostAddress())) {
-                            inContainer = true;
+        String tmp = System.getProperty("iip.inContainer", null);
+        if (null == tmp) {
+            if (SystemUtils.IS_OS_WINDOWS) {
+                // unsafe fallback
+                try {
+                    Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
+                    for (NetworkInterface netint : Collections.list(nets)) {
+                        Enumeration<InetAddress> inetAddresses = netint.getInetAddresses();
+                        for (InetAddress inetAddress : Collections.list(inetAddresses)) {
+                            if (isContainerIp(inetAddress.getHostAddress())) {
+                                inContainer = true;
+                                break;
+                            }
+                        }
+                        if (inContainer) {
                             break;
                         }
                     }
-                    if (inContainer) {
-                        break;
-                    }
+                } catch (SocketException e) {
+                    // ignore
                 }
-            } catch (SocketException e) {
-                // ignore
+            } else {
+                inContainer = isRunningInsideDocker();
             }
         } else {
-            inContainer = isRunningInsideDocker();
+            inContainer = Boolean.valueOf(tmp);
         }
         return inContainer;
     }
