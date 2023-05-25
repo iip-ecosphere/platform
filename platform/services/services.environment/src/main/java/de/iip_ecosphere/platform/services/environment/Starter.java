@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +28,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.services.environment.switching.ServiceBase;
+import de.iip_ecosphere.platform.services.environment.testing.TestBroker;
+import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.JarUtils;
 import de.iip_ecosphere.platform.support.NetUtils;
@@ -63,6 +66,7 @@ public class Starter {
     public static final String PROPERTY_JAVA8 = "iip.test.java8";
     public static final String IIP_APP_PREFIX = "iip.app.";
     public static final String IIP_TEST_PREFIX = "iip.test.";
+    public static final String IIP_TEST_PLUGIN = "iip.test.plugin";
     
     private static ProtocolServerBuilder builder;
     private static Server server;
@@ -75,7 +79,33 @@ public class Starter {
     private static boolean transportGlobal = false;
     private static EnvironmentSetup setup;
     private static String appId = "";
+    private static Map<String, Plugin> plugins = new HashMap<>();
+    
+    /**
+     * Defines a starter plugin.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public interface Plugin {
 
+        /**
+         * Runs the plugin.
+         * 
+         * @param args the (modified) command line arguments
+         */
+        public void run(String[] args);
+        
+        /**
+         * Displays the help.
+         * 
+         * @param indent indentation characters for all lines after the first
+         * @return the formatted help text
+         */
+        public default String getHelp(String indent) {
+            return "runs default starter functionality";
+        }
+        
+    }
     /**
      * Default supplier for the local transport setup. This basic implementation is a bit heuristic
      * as it assumes the same authentication/port as the global setup, which may not work in certain container
@@ -102,6 +132,51 @@ public class Starter {
     private static Function<EnvironmentSetup, TransportSetup> localTransportSetupSupplier 
         = DFLT_LOCAL_TRANSPORT_SETUP_SUPPLIER;
 
+    
+    /**
+     * Registers a functional plugin.
+     * 
+     * @param name the name (turned to lower case)
+     * @param plugin the plugin instance
+     */
+    protected static void registerPlugin(String name, Plugin plugin) {
+        plugins.put(name.toLowerCase(), plugin);
+    }
+    
+    /**
+     * Registers the default plugins.
+     * 
+     * @param dflt the default plugin to be used if no command line argument is given for {@value #IIP_TEST_PLUGIN}.
+     */
+    protected static void registerDefaultPlugins(Plugin dflt) {
+        registerPlugin("", dflt);
+        registerPlugin("broker", new TestBroker());
+        registerPlugin("help", new HelpPlugin());
+    }
+    
+    /**
+     * The default plugin for displaying the help texts of the plugins.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static class HelpPlugin implements Plugin {
+
+        @Override
+        public void run(String[] args) {
+            List<String> names = CollectionUtils.toList(plugins.keySet().iterator());
+            Collections.sort(names);
+            for (String n : names) {
+                System.out.println("- " + n + ": " + plugins.get(n).getHelp("  "));
+            }
+        }
+        
+        @Override
+        public String getHelp(String indent) {
+            return "prints this help";
+        }
+        
+    }
+    
     /**
      * Adds all environment properties starting with {@link #IIP_APP_PREFIX} or {@link #IIP_TEST_PREFIX} to the command 
      * line of the service to be started.
@@ -616,9 +691,13 @@ public class Starter {
      * @return {@code true} for enabled, {@code false} for local transport is sufficient, e.g., in local testing
      */
     protected static final boolean enablesLocalTransport(TransportSetup globalSetup) {
+        boolean enable = false;
         String globalHost = globalSetup.getHost();
-        return (!ServerAddress.LOCALHOST.equals(globalHost) 
-            && !"127.0.0.1".equals(globalHost) && !NetUtils.isOwnAddress(globalHost));
+        if (!ServerAddress.LOCALHOST.equals(globalHost) && !"127.0.0.1".equals(globalHost)) {
+            enable = (!NetUtils.isOwnAddress(globalHost) // we are running on a different device 
+                || NetUtils.isInContainer()); // or on the server but in an (application) container
+        }
+        return enable;
     }
     
     /**
@@ -640,6 +719,22 @@ public class Starter {
             localTransportSetupSupplier = supplier;
         }
     }
+    
+    /**
+     * Selects the actual functional plugin via cmd line argument of {@value #IIP_TEST}. If none is given, start the 
+     * default plugin. 
+     * 
+     * @param args
+     */
+    protected static void runPlugin(String[] args) {
+        String test = CmdLine.getArg(args, IIP_TEST_PLUGIN, "").toLowerCase();
+        Plugin plugin = plugins.get(test);
+        if (null == plugin) {
+            System.out.println("No start plugin for '" + plugin + "' known. Stopping.");
+        } else {
+            plugin.run(args);
+        }
+    }
 
     /**
      * Simple default start main program without mapping any services before startup. This can be done on-demand
@@ -648,9 +743,10 @@ public class Starter {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+        registerDefaultPlugins(a -> Starter.start());
         Starter.parse(args);
         getSetup(); // ensure instance
-        Starter.start();
+        runPlugin(args);
     }
 
 }
