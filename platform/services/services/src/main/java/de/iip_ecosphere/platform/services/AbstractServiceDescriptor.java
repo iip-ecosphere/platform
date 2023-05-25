@@ -75,21 +75,39 @@ public abstract class AbstractServiceDescriptor<A extends ArtifactDescriptor> im
         this.version = version;
         this.state = ServiceState.AVAILABLE;
     }
+
+    /**
+     * Does further initialization after {@link #AbstractServiceDescriptor(String, String, String, String, Version)}
+     * to instantiate an instance from {@code template}. By default, adds parameters and connectors.
+     * 
+     * @param template the descriptor being used as template
+     * @see #instantiateFrom(AbstractServiceDescriptor, boolean, boolean)
+     */
+    protected void instantiateFrom(AbstractServiceDescriptor<A> template) {
+        instantiateFrom(template, true, true);
+    }
     
     /**
      * Does further initialization after {@link #AbstractServiceDescriptor(String, String, String, String, Version)}
      * to instantiate an instance from {@code template}.
      * 
      * @param template the descriptor being used as template
+     * @param addParameters add the parameters from {@code template}
+     * @param addConnectors add the input/output connectors from {@code template}
      */
-    protected void instantiateFrom(AbstractServiceDescriptor<A> template) {
+    protected void instantiateFrom(AbstractServiceDescriptor<A> template, 
+        boolean addParameters, boolean addConnectors) {
         this.artifact = template.artifact;
         this.kind = template.kind;
         this.isDeployable = template.isDeployable;
         this.isTopLevel = template.isTopLevel;
-        this.parameters.addAll(template.parameters); 
-        this.input.addAll(template.input); 
-        this.input.addAll(template.output); 
+        if (addParameters) {
+            this.parameters.addAll(template.parameters); 
+        }
+        if (addConnectors) {
+            this.input.addAll(template.input); 
+            this.input.addAll(template.output); 
+        }
         // not the stub
     }
     
