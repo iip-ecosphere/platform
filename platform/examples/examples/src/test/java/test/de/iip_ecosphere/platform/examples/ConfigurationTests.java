@@ -110,11 +110,11 @@ public class ConfigurationTests {
         }
         Assert.assertTrue("configuration.configuration must be built before", cfg.exists());
         File f = new File(cfg, folder + "/" + appName + "/target/" + appName + "-0.1.0-SNAPSHOT-bin.jar");
-        File res = File.createTempFile("examples-test", ".out");
-        res.deleteOnExit();
+        File res = File.createTempFile("examples-test-" + appName, ".out");
         SpringStartup.start(f, false, p -> configureProcess(p, res), 
             "--iip.test.stop=" + stopTime, "--iip.test.brokerPort=" + broker.getPort());
         asserter.accept(FileUtils.readFileAsString(res));
+        res.deleteOnExit();
         res.delete();
     }
 
