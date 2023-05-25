@@ -331,4 +331,39 @@ public class ServiceMgrAndDescriptorTest {
         Assert.assertEquals(1, cmdArgs.size());
     }
     
+    /**
+     * Tests {@link SpringCloudServiceDescriptor#instantiate(String)} with 
+     * {@link AbstractServiceManager#determineExternalConnections(ServiceManager, String...)}.
+     * 
+     * @throws IOException shall not occur
+     */
+    @Test
+    public void testInstantiate() throws IOException {
+        String appId = "MyApp";
+        String appInstId = "5";
+        List<String> serviceIds = new ArrayList<String>();
+        ServiceManager mgr = createServiceManager(new File("src/test/resources/ServiceMesh3Deployment.yml"));
+        for (ServiceDescriptor d : mgr.getServices()) {
+            SpringCloudServiceDescriptor desc = (SpringCloudServiceDescriptor) d;
+            String id = d.getServiceId();
+            String newId = ServiceBase.composeId(id, appId, appInstId);
+            serviceIds.add(newId);
+            SpringCloudServiceDescriptor inst = desc.instantiate(newId);
+            for (TypedDataConnectorDescriptor dc : inst.getDataConnectors()) {
+                String target = dc.getService();
+                Assert.assertEquals(appId, ServiceBase.getApplicationId(target));
+                Assert.assertEquals(appInstId, ServiceBase.getApplicationInstanceId(target));
+            }
+            desc.getArtifact().addService(desc);
+        }
+        System.out.println(serviceIds);
+        Set<TypedDataConnection> conns = AbstractServiceManager.determineExternalConnections(mgr, 
+            serviceIds.toArray(new String[serviceIds.size()]));
+        for (TypedDataConnection dc : conns) {
+            String target = dc.getService();
+            Assert.assertEquals(appId, ServiceBase.getApplicationId(target));
+            Assert.assertEquals(appInstId, ServiceBase.getApplicationInstanceId(target));
+        }
+    }
+    
 }

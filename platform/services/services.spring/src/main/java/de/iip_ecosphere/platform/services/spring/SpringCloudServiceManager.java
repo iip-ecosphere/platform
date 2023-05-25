@@ -489,7 +489,8 @@ public class SpringCloudServiceManager
                 // adjust spring function definition from application.yml if subset of services shall be started 
                 externalServiceArgs.add(determineCloudFunctionArg(sIdEns));
                 externalServiceArgs.addAll(determineSpringConditionals(this, sIdEns));
-                AppDeploymentRequest req = service.createDeploymentRequest(config, externalServiceArgs);
+                AppDeploymentRequest req = service.createDeploymentRequest(config, externalServiceArgs, 
+                    getMemLimit(options, sId));
                 boolean started = false;
                 if (null != req) {
                     setState(service, ServiceState.DEPLOYING);
@@ -541,7 +542,33 @@ public class SpringCloudServiceManager
         result.getArtifact().addService(result);
         return result;
     }
-
+    
+    /**
+     * Returns the specified memory limit of {@code sId} given in {@code options}.
+     * 
+     * @param options the service start options
+     * @param sId the service id
+     * @return the memory limit
+     */
+    private String getMemLimit(Map<String, String> options, String sId) {
+        String result = null;
+        if (null != options) {
+            String opt = options.get(OPTION_MEMLIMITS);
+            if (null != opt) {
+                Map<?, ?> optMap = JsonUtils.fromJson(opt, Map.class);
+                Object memLimitOpt = optMap.get(sId);
+                if (null != memLimitOpt) {
+                    try {
+                        result = Utils.formatToMeBi(Long.parseLong(sId.toString()), 2);
+                    } catch (NumberFormatException e) {
+                        LoggerFactory.getLogger(SpringCloudServiceManager.class).info(
+                            "Memlimit option for {} not a long value: {}", sId, e.getMessage());
+                    }
+                }
+            }
+        }
+        return result;
+    }
     
     /**
      * Prepares the processes of the family members.

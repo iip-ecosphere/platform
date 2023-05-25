@@ -163,15 +163,15 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
 
     /**
      * Instantiates this service as a template to represent an instance service with id {@code serviceId}.
-     * Typically, the application instance id changes compared to existing service descriptors.
+     * Typically, the application instance id changes compared to existing service descriptors. [public for testing]
      * 
      * @param sId the service id
      * @return the instantiated service
      */
-    SpringCloudServiceDescriptor instantiate(String sId) {
+    public SpringCloudServiceDescriptor instantiate(String sId) {
         SpringCloudServiceDescriptor result = new SpringCloudServiceDescriptor(sId, getApplicationId(), 
             getName(), getDescription(), getVersion());
-        result.instantiateFrom(this);
+        result.instantiateFrom(this, true, false);
         result.service = this.service;
         final String appInstanceId = ServiceBase.getApplicationInstanceId(sId);
         final String appId = ServiceBase.getApplicationId(sId);
@@ -190,7 +190,7 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
         Function<String, String> serviceEntryAdapter = 
             s -> ServiceBase.composeId(ServiceBase.getServiceId(s), appId, appInstanceId);
         for (TypedDataConnectorDescriptor c : this.getInputDataConnectors()) {
-            result.addInputDataConnector(new SpringCloudServiceTypedConnectorData(c, serviceEntryAdapter));
+            result.addInputDataConnector(new SpringCloudServiceTypedConnectorData(c, serviceEntryAdapter));            
         }
         for (TypedDataConnectorDescriptor c : this.getOutputDataConnectors()) {
             result.addOutputDataConnector(new SpringCloudServiceTypedConnectorData(c, serviceEntryAdapter));
@@ -278,11 +278,12 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
      * 
      * @param config the service manager configuration instance
      * @param cmdArgs further command line arguments to be considered, may be <b>null</b> or empty for none
+     * @param memLimit optional memory limit in MBytes as String, via {@link Utils#formatToMeBi(long)}
      * @return the deployment request, may be <b>null</b> if this service is an ensemble follower and should not be 
      * started individually
      * @throws ExecutionException when preparing the service fails for some reason
      */
-    AppDeploymentRequest createDeploymentRequest(SpringCloudServiceSetup config, List<String> cmdArgs) 
+    AppDeploymentRequest createDeploymentRequest(SpringCloudServiceSetup config, List<String> cmdArgs, String memLimit) 
         throws ExecutionException {
         AppDeploymentRequest result = null;
         if (null == ensembleLeader) {
@@ -295,7 +296,8 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
             //deployProps.put("spring.cloud.deployer.local.deleteFilesOnExit ", "false"); // does not work
             Utils.addPropertyIfPositiveToInt(deployProps, AppDeployer.COUNT_PROPERTY_KEY, service.getInstances(),  "1");
             deployProps.put(AppDeployer.INDEXED_PROPERTY_KEY, "false"); // index the instances?
-            Utils.addPropertyIfPositiveToMeBi(deployProps, AppDeployer.MEMORY_PROPERTY_KEY, service.getMemory(), null);
+            Utils.addPropertyIfPositiveToMeBi(deployProps, AppDeployer.MEMORY_PROPERTY_KEY, service.getMemory(), 
+                memLimit);
             Utils.addPropertyIfPositiveToMeBi(deployProps, AppDeployer.DISK_PROPERTY_KEY, service.getDisk(), null);
             Utils.addPropertyIfPositiveToInt(deployProps, AppDeployer.CPU_PROPERTY_KEY, service.getCpus(), "1");
 
@@ -397,7 +399,7 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
 
     /**
      * Attaches a service stub to directly interact with the service if {@link #adminAddr} has been set by 
-     * {@link #createDeploymentRequest(SpringCloudServiceSetup, List)} before.
+     * {@link #createDeploymentRequest(SpringCloudServiceSetup, List, String)} before.
      */
     void attachStub() {
         InvocablesCreator iCreator = getInvocablesCreator();

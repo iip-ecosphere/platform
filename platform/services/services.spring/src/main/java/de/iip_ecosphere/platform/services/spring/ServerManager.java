@@ -170,7 +170,7 @@ public class ServerManager {
         thisDevice.add(ServerAddress.LOCALHOST);
         thisDevice.add("127.0.0.1");
         thisDevice.add(NetUtils.getOwnHostname()); // may require netmask
-        thisDevice.add(NetUtils.getOwnIP()); // may require netmask
+        thisDevice.add(NetUtils.getOwnIP(NetUtils.NO_MASK)); // may require netmask
         thisDevice.add(Id.getDeviceId());
         thisDevice.add(Id.getDeviceIdAas());
         return thisDevice;
