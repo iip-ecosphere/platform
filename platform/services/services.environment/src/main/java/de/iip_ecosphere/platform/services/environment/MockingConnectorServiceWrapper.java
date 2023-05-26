@@ -58,7 +58,6 @@ public class MockingConnectorServiceWrapper<O, I, CO, CI> extends ConnectorServi
     private DataRunnable dataRunnable;
     private CachingStrategy cachingStrategy;
     private IOIterator<? extends CO> triggerIterator;
-    private String[] fieldNames;
     private DataRecorder recorder;    
     
     /**
@@ -67,14 +66,12 @@ public class MockingConnectorServiceWrapper<O, I, CO, CI> extends ConnectorServi
      * @param yaml the service information as read from YAML
      * @param connector the connector instance to wrap
      * @param connParamSupplier the connector parameter supplier for connecting the underlying connector
-     * @param fieldNames explicit field names to be used as they are for JSON-Java mapping
      */
     @SuppressWarnings("unchecked")
     public MockingConnectorServiceWrapper(YamlService yaml, Connector<O, I, CO, CI> connector, 
-        Supplier<ConnectorParameter> connParamSupplier, String... fieldNames) {
+        Supplier<ConnectorParameter> connParamSupplier) {
         super(yaml, connector, connParamSupplier);
         this.connParamSupplier = connParamSupplier;
-        this.fieldNames = fieldNames;
         cachingStrategy = CachingStrategy.createInstance(connector.getCachingStrategyCls());
         cachingStrategy.setCacheMode(connParamSupplier.get().getCacheMode());
         connectorOutType = connector.getConnectorOutputType();
@@ -305,7 +302,7 @@ public class MockingConnectorServiceWrapper<O, I, CO, CI> extends ConnectorServi
             LoggerFactory.getLogger(getClass()).info("Opening trigger resource: {}", fileName);
             try {
                 triggerIterator = DataMapper.mapJsonDataToIterator(getDataStream(fileName), 
-                    DataMapper.createBaseDataUnitClass(connectorOutType), fieldNames);
+                    DataMapper.createBaseDataUnitClass(connectorOutType));
             } catch (IOException e) {
                 LoggerFactory.getLogger(getClass()).error("While opening trigger resource {}: {}", 
                     fileName, e.getMessage());

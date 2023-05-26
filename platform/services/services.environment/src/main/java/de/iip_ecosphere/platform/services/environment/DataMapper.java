@@ -410,8 +410,6 @@ public class DataMapper {
         mapJsonData(stream, cls, cons, failOnUnknownProperties, null);
     }
     
-    // checkstyle: stop parameter number check
-    
     /**
      * Maps the data in {@code stream} to instances of {@code cls}, one instance per line. Calls {@code cons} per
      * instance/line. Closes {@code stream}.
@@ -423,13 +421,12 @@ public class DataMapper {
      * @param failOnUnknownProperties whether parsing shall be tolerant or not, the latter may be helpful for debugging
      * @param continueFunction optional function that tells the data mapper to go on reading the input, 
      *     may be <b>null</b> for none
-     * @param fields declared field names to be used as the are when reading JSON and writing to a java instance
      * @throws IOException if I/O or JSON parsing errors occur
      */
     public static <T> void mapJsonData(InputStream stream, Class<T> cls, Consumer<T> cons, 
-        boolean failOnUnknownProperties, Supplier<Boolean> continueFunction, String... fields) throws IOException {
+        boolean failOnUnknownProperties, Supplier<Boolean> continueFunction) throws IOException {
         try {
-            IOIterator<T> iter = mapJsonDataToIterator(stream, cls, failOnUnknownProperties, fields);
+            IOIterator<T> iter = mapJsonDataToIterator(stream, cls, failOnUnknownProperties);
             while (iter.hasNext() && (null == continueFunction || continueFunction.get())) {
                 cons.accept(iter.next());
             }
@@ -441,8 +438,6 @@ public class DataMapper {
             }
         }
     }
-
-    // checkstyle: resume parameter number check
 
     /**
      * An iterator that can throw {@link IOException}.
@@ -478,13 +473,12 @@ public class DataMapper {
      * @param <T> the type of data to read
      * @param stream the stream to read (may be <b>null</b> for none)
      * @param cls the type of data to read
-     * @param fields declared field names to be used as the are when reading JSON and writing to a java instance
      * @return the data iterator
      * @throws IOException if I/O or JSON parsing errors occur
      */
-    public static <T> IOIterator<T> mapJsonDataToIterator(InputStream stream, Class<T> cls, String... fields) 
+    public static <T> IOIterator<T> mapJsonDataToIterator(InputStream stream, Class<T> cls) 
         throws IOException {
-        return mapJsonDataToIterator(stream, cls, false, fields);
+        return mapJsonDataToIterator(stream, cls, false);
     }
     
     /**
@@ -495,12 +489,11 @@ public class DataMapper {
      * @param stream the stream to read (may be <b>null</b> for none)
      * @param cls the type of data to read
      * @param failOnUnknownProperties whether parsing shall be tolerant or not, the latter may be helpful for debugging
-     * @param fields declared field names to be used as the are when reading JSON and writing to a java instance
      * @return the data iterator
      * @throws IOException if I/O or JSON parsing errors occur
      */
     public static <T> IOIterator<T> mapJsonDataToIterator(InputStream stream, Class<T> cls, 
-        boolean failOnUnknownProperties, String... fields) throws IOException {
+        boolean failOnUnknownProperties) throws IOException {
 
         ObjectMapper objectMapper = new ObjectMapper()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, failOnUnknownProperties);
