@@ -10,8 +10,12 @@ template JavaType(Configuration config, FileArtifact target, RecordType type, St
     
     // generates code for the individual attributes
     def attributes(RecordType type) {
+        IIPEcosphere cfg = config;
         if (not(interface)) {
             for (Field f: type.fields) {
+            if (cfg.serializer==Serializer::Json) {
+                    '@JsonProperty("${f.name}")'
+                }
                 'private ${toTypeName(f.type)} ${asMethodFieldIdentifier(f.name)};\n'
             }
         }
@@ -207,6 +211,15 @@ template JavaType(Configuration config, FileArtifact target, RecordType type, St
             'eq &= ${genEquals("get${asMethodNameSuffix(f.name)}()", f.type, f.optional)};'
         }
     }
+    
+    def genImports() {
+        IIPEcosphere cfg = config;
+        if (cfg.serializer==Serializer::Json) {
+            'import com.fasterxml.jackson.annotation.JsonProperty;'
+        } else {
+            ''
+        }
+    }
 
     def main(Configuration config, FileArtifact target, RecordType type, String pkg, Boolean interface, Boolean sharedInterfaces, Boolean impl) {
         String clsName = asTypeName(type.name);
@@ -240,6 +253,7 @@ template JavaType(Configuration config, FileArtifact target, RecordType type, St
         'package ${pkg};
         
         ${imp|e}
+        ${genImports()|e}
 
         /**
          * ${comment} of the application data type ${clsName}.
