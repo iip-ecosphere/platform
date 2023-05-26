@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Subscription, interval } from 'rxjs';
 import { ApiService } from 'src/app/services/api.service';
 import { PlanDeployerService } from 'src/app/services/plan-deployer.service';
-import { InputVariable, Resource } from 'src/interfaces';
+import { InputVariable, Resource, StatusMsg } from 'src/interfaces';
 
 @Component({
   selector: 'app-instances',
@@ -16,8 +16,18 @@ export class InstancesComponent implements OnInit {
   undeployInput: InputVariable[] = [];
   private subscription: Subscription = new Subscription();
 
+  statusSub: Subscription;
+  status: StatusMsg = {
+    executionState: "",
+    messages: [""]
+  }
+
   constructor(private api: ApiService,
-    private deployer: PlanDeployerService) { }
+    private deployer: PlanDeployerService) {
+      this.statusSub = this.deployer.emitter.subscribe(
+        (status: StatusMsg) => {this.status = status});
+
+    }
 
   async ngOnInit() {
     this.getData();
@@ -25,6 +35,9 @@ export class InstancesComponent implements OnInit {
     // reloading instances every 3 sec
     this.subscription = interval(3000).subscribe(
       (val) => { this.getInstances()});
+
+      console.log("Status")
+      console.log(this.status)
   }
 
   public async getData() {
@@ -37,9 +50,12 @@ export class InstancesComponent implements OnInit {
   }
 
   public async getInstances() {
-    console.log("refreshing instances")
+    console.log("# refreshing instances")
+    console.log("status: ")
+    console.log(this.status)
     const data = await this.api.getInstances();
     if(data) {
+      this.filteredData = []
       for(const element of data) {
         if(element.value && element.value.length > 1) {
           // preventing double elements
@@ -49,6 +65,20 @@ export class InstancesComponent implements OnInit {
         }
       }
     }
+    console.log("Filtered Data")
+    console.log(this.filteredData)
+    console.log("----------------")
+    /*
+    if(data) {
+      for(const element of data) {
+        if(element.value && element.value.length > 1) {
+          // preventing double elements
+          if (!this.isElement(element, this.filteredData)) {
+            this.filteredData.push(element);
+          }
+        }
+      }
+    }*/
   }
 
   public isElement(elem: any, list: any) {
@@ -62,16 +92,24 @@ export class InstancesComponent implements OnInit {
   }
 
   public undeploy(item: any) {
-    const planId = item.value.find((item: { idShort: string; }) => item.idShort === "planId")?.value;
-    if(this.undeployInput && this.undeployInput != [] && this.undeployInput[0] && this.undeployInput[1]) {
+    const planId = item.value.find(
+      (item: { idShort: string; }) => item.idShort === "planId")?.value;
+    if(this.undeployInput
+      && this.undeployInput != []
+      && this.undeployInput[0]
+      && this.undeployInput[1]) {
       let input = this.undeployInput;
-      if(input[0].value && input[1].value && this.deploymentPlans && this.deploymentPlans.value) {
+      if(input[0].value && input[1].value && this.deploymentPlans
+        && this.deploymentPlans.value) {
         let compareId;
         for(const plan of this.deploymentPlans.value) {
-          compareId = plan.value.find((item: { idShort: string; }) => item.idShort === "id")?.value;
+          compareId = plan.value.find((
+            item: { idShort: string; }) => item.idShort === "id")?.value;
           if(compareId === planId) {
-            input[0].value.value = plan.value.find((item: { idShort: string; }) => item.idShort === "uri")?.value;
-            input[1].value.value = item.value.find((item: { idShort: string; }) => item.idShort === "instanceId")?.value;
+            input[0].value.value = plan.value.find(
+              (item: { idShort: string; }) => item.idShort === "uri")?.value;
+            input[1].value.value = item.value.find(
+              (item: { idShort: string; }) => item.idShort === "instanceId")?.value;
             break;
           }
         }
@@ -91,7 +129,6 @@ export class InstancesComponent implements OnInit {
     } else {
       print = print.concat(value);
     }
-
     return print;
   }
 
