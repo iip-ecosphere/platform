@@ -13,3 +13,5 @@ if [ ! -z "$IMGS" ]
 then
     docker rmi -f "$IMGS" 
 fi
+
+docker system prune -f --volumes
