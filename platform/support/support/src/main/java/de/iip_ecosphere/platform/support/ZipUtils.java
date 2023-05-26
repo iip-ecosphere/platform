@@ -31,6 +31,12 @@ import java.util.zip.ZipInputStream;
 public class ZipUtils {
     
     /**
+     * Preventing external creation.
+     */
+    protected ZipUtils() {
+    }
+    
+    /**
      * Finds a file within the ZIP/JAR file given by {@code in}. Closes {@code in} if not found.
      * 
      * @param in the input stream containing ZIP/JAR data

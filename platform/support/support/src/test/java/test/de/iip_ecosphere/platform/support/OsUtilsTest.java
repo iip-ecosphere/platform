@@ -44,4 +44,15 @@ public class OsUtilsTest {
         System.out.println("#CPU: " + cpuNum);
     }
 
+    /**
+     * Tests {@link SysUtils#getPropertyOrEnv(String, String)}, {@link SysUtils#getPropertyOrEnv(String)} and 
+     * implicitly {@link {@link SysUtils#getEnv(String)}.
+     */
+    @Test
+    public void testSystemPropertyOrEnv() {
+        Assert.assertNull(OsUtils.getPropertyOrEnv("iip.nonsense"));
+        Assert.assertEquals("abba", OsUtils.getPropertyOrEnv("iip.nonsense", "abba"));
+        // SysUtils.getEnv implicit; but just for non-whitebox :P
+        Assert.assertNull(OsUtils.getEnv("iip.nonsense1"));
+    }
 }

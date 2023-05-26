@@ -31,6 +31,12 @@ import org.apache.commons.lang.SystemUtils;
  * @author Holger Eichelberger, SSE
  */
 public class FileUtils {
+    
+    /**
+     * Preventing external creation.
+     */
+    private FileUtils() {
+    }
 
     /**
      * Creates a temporary folder in {@code java.io.tmpdir} without cleanup.

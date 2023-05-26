@@ -22,6 +22,12 @@ import java.util.function.Supplier;
 public class TimeUtils {
 
     /**
+     * Preventing external creation.
+     */
+    private TimeUtils() {
+    }
+    
+    /**
      * Just sleeps for the given amount of milliseconds.
      * 
      * @param ms the milliseconds to wait for

@@ -45,6 +45,12 @@ public class NetUtils {
     private static String ip = null;
     
     /**
+     * Preventing external creation.
+     */
+    private NetUtils() {
+    }
+    
+    /**
      * Returns a free ephemeral port. Such a port may be used for testing, e.g. to avoid clashes between 
      * multiple subsequent tests using the same static port.
      * 
@@ -202,10 +208,7 @@ public class NetUtils {
      */
     public static boolean isInContainer() {
         boolean inContainer = false;
-        String tmp = System.getProperty(PROP_INCONTAINER, null);
-        if (null == tmp) {
-            tmp = getEnv(PROP_INCONTAINER);
-        }
+        String tmp = OsUtils.getPropertyOrEnv(PROP_INCONTAINER);
         if (null == tmp) {
             if (SystemUtils.IS_OS_WINDOWS) {
                 // unsafe fallback
@@ -314,22 +317,6 @@ public class NetUtils {
             result = fallbackIp.substring(0, pos + 1) + "255"; 
         } else {
             result = "";
-        }
-        return result;
-    }
-
-    
-    /**
-     * Returns a value from the system environment, either as given or all in capital characters with dots replaced 
-     * by underscores.
-     * 
-     * @param key the key to look for
-     * @return the value, may by <b>null</b> for none
-     */
-    public static String getEnv(String key) {
-        String result = System.getenv(key); 
-        if (null == result) { // particular for linux
-            result = System.getenv(key.toUpperCase().replace('.', '_'));
         }
         return result;
     }
