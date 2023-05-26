@@ -35,6 +35,7 @@ import de.iip_ecosphere.platform.configuration.PlatformInstantiator.Instantiatio
 import de.iip_ecosphere.platform.services.environment.YamlArtifact;
 import de.iip_ecosphere.platform.support.JarUtils;
 import de.iip_ecosphere.platform.support.LifecycleDescriptor;
+import de.iip_ecosphere.platform.support.OsUtils;
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
 import net.ssehub.easy.reasoning.core.reasoner.ReasoningResult;
 import net.ssehub.easy.varModel.confModel.Configuration;
@@ -76,7 +77,7 @@ public abstract class AbstractIvmlTests {
      */
     protected static boolean isIipBuildInitial() {
         if (null == isIipBuildInitial) {
-            String tmp = System.getenv("iipbuildinitial");
+            String tmp = OsUtils.getEnv("iipbuildinitial");
             if (null == tmp) {
                 tmp = "false";
             }
