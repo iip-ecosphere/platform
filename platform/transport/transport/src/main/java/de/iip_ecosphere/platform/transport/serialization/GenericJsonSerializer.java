@@ -47,7 +47,6 @@ public class GenericJsonSerializer<T> implements Serializer<T> {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             JsonUtils.handleIipDataClasses(objectMapper);
-            JsonUtils.defineFields(objectMapper);
             return objectMapper.readValue(data, cls);
         } catch (JsonProcessingException e) {
             throw new IOException(e);
@@ -58,7 +57,6 @@ public class GenericJsonSerializer<T> implements Serializer<T> {
     public byte[] to(T source) throws IOException {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-            JsonUtils.defineFields(objectMapper);
             return objectMapper.writeValueAsBytes(source);
         } catch (JsonProcessingException e) {
             throw new IOException(e);

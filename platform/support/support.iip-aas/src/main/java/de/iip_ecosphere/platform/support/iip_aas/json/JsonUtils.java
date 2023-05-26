@@ -130,7 +130,6 @@ public class JsonUtils {
         if (null != obj) {
             try {
                 ObjectMapper objectMapper = new ObjectMapper();
-                defineFields(objectMapper);
                 result = objectMapper.writeValueAsString(obj);
             } catch (JsonProcessingException e) {
                 // handled by default value
@@ -153,7 +152,6 @@ public class JsonUtils {
         if (null != json) {
             try {
                 ObjectMapper objectMapper = new ObjectMapper();
-                defineFields(objectMapper);
                 result = objectMapper.readValue(json.toString(), cls);
             } catch (JsonProcessingException e) {
                 //result = null;
