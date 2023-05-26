@@ -18,6 +18,7 @@ template Dockerfile_Python(IIPEcosphere config, FileArtifact target, sequenceOf(
             if (deviceDependencies.size() > 0) {
                 'FROM ${mgr.registry}/${appName}/appcommendepbaseimage:0.1.0'
                 '${containerSettings(config, containerType, device)}'
+                'ENV IIP_INCONTAINER=true'
 
                 sequenceOf(PythonService) services = elements -> collect(e|e.impl) -> selectByType(PythonService);
                 for (PythonService pyService : services) {
@@ -50,9 +51,11 @@ template Dockerfile_Python(IIPEcosphere config, FileArtifact target, sequenceOf(
                 if (baseImageExist == 1) {
                     'FROM ${mgr.registry}/${appName}/appcommendepbaseimage:0.1.0'
                     '${containerSettings(config, containerType, device)}'
+                    'ENV IIP_INCONTAINER=true'
                 } else if (baseImageExist == 2) {
                     'FROM ${mgr.registry}/${appName}/appalldepbaseimage:0.1.0'
                     '${containerSettings(config, containerType, device)}'
+                    'ENV IIP_INCONTAINER=true'
                 }
             }
         } else {        
@@ -102,7 +105,6 @@ template Dockerfile_Python(IIPEcosphere config, FileArtifact target, sequenceOf(
                 'COPY requirements.txt requirements.txt'
                 '${pythonPipInstalled}'
             }
-        
             ''
             'RUN apt-get update'
             'RUN apt-get install -y openjdk-11-jre'
@@ -115,6 +117,7 @@ template Dockerfile_Python(IIPEcosphere config, FileArtifact target, sequenceOf(
             }
             ''
             '${containerSettings(config, containerType, device)}'
+            'ENV IIP_INCONTAINER=true'
             ''
             '# Installed dependencies (shall be in /)'
             'COPY installedDependencies.yml installedDependencies.yml'
