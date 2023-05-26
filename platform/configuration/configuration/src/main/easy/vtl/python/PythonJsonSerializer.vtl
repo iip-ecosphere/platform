@@ -189,12 +189,10 @@ template PythonJsonSerializer(Configuration config, FileArtifact target, RecordT
             
                 result = ${clsName}${add}()
                 jTmp = json.loads(data)
-                print(jTmp)
                 tmp = dict()
                 for key in jTmp:
                     k = "_" + str(key) # by generation convention
                     tmp[k] = jTmp[key]
-                    print("key to look for:", k)
                 ${generateReadFrom(type)|e}
                 
                 result.__dict__ = tmp
