@@ -721,10 +721,10 @@ public class Starter {
     }
     
     /**
-     * Selects the actual functional plugin via cmd line argument of {@value #IIP_TEST}. If none is given, start the 
-     * default plugin. 
+     * Selects the actual functional plugin via cmd line argument of {@value #IIP_TEST_PLUGIN}. If none is given, start 
+     * the default plugin. 
      * 
-     * @param args
+     * @param args command line arguments
      */
     protected static void runPlugin(String[] args) {
         String test = CmdLine.getArg(args, IIP_TEST_PLUGIN, "").toLowerCase();

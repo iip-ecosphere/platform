@@ -505,7 +505,6 @@ public class DataMapper {
         ObjectMapper objectMapper = new ObjectMapper()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, failOnUnknownProperties);
         JsonUtils.handleIipDataClasses(objectMapper);
-        JsonUtils.defineFields(objectMapper, fields);
         
         JsonFactory jf = new JsonFactory();
         JsonParser jp = jf.createParser(stream);

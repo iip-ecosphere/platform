@@ -155,6 +155,7 @@ public class GenericMultiTypeServiceImpl {
          * 
          * @param typeName the data type name as specified in the configuration model
          * @param data to be ingested
+         * @throws IOException if data ingestion failed
          */
         protected void validateAndIngest(String typeName, String data) throws IOException {
             ingestor.ingest(outTranslator.to(data));
