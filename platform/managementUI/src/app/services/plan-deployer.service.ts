@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, firstValueFrom, interval, Observable, Subject, Subscription } from 'rxjs';
+import { BehaviorSubject, firstValueFrom, interval, Observable, Subject, Subscription }
+  from 'rxjs';
 import { PlatformResources, platformResponse, Resource, StatusMsg } from 'src/interfaces';
 import { OnlyIdPipe } from '../pipes/only-id.pipe';
 import { EnvConfigService } from './env-config.service';
@@ -29,7 +30,9 @@ export class PlanDeployerService {
   allEmitter: Subject<Resource[]>
 
 
-  constructor(private http: HttpClient, private envConfigService: EnvConfigService, private onlyId: OnlyIdPipe) {
+  constructor(private http: HttpClient,
+    private envConfigService: EnvConfigService,
+    private onlyId: OnlyIdPipe) {
     this.emitter = new BehaviorSubject(this.status);
     this.allEmitter = new Subject();
     //this.getDetailedStatus();
@@ -60,15 +63,23 @@ export class PlanDeployerService {
       this.emitSendMessage("deploy");
     }
     try {
-      response = await firstValueFrom(this.http.post<platformResponse>(this.ip + '/shells/'
-        + this.urn + "/aas/submodels/Artifacts/submodel/" + basyxFunc + "/invoke"
-      ,{"inputArguments": params,"requestId":"1bfeaa30-1512-407a-b8bb-f343ecfa28cf", "inoutputArguments":[], "timeout":10000}
+      response = await firstValueFrom(this.http.post<platformResponse>(
+        this.ip
+        + '/shells/'
+        + this.urn
+        + "/aas/submodels/Artifacts/submodel/"
+        + basyxFunc
+        + "/invoke"
+      ,{"inputArguments": params,
+      "requestId":"1bfeaa30-1512-407a-b8bb-f343ecfa28cf",
+      "inoutputArguments":[], "timeout":10000}
       , {responseType: 'json', reportProgress: true}));
     } catch(e) {
       console.log(e);
     }
 
-    if(response && response.outputArguments[0] && response.outputArguments[0].value) {
+    if(response && response.outputArguments[0]
+      && response.outputArguments[0].value) {
       this.getStatus(response.outputArguments[0].value.value);
       console.log(response.outputArguments[0].value.value);
     }
@@ -79,8 +90,14 @@ export class PlanDeployerService {
     let response;
     this.emitSendMessage("undeployId");
     try {
-      response = await firstValueFrom(this.http.post<platformResponse>(this.ip + '/shells/' + this.urn + "/aas/submodels/Artifacts/submodel/undeployPlanWithId/invoke"
-      ,{"inputArguments": params,"requestId":"1bfeaa30-1512-407a-b8bb-f343ecfa28cf", "inoutputArguments":[], "timeout":10000}
+      response = await firstValueFrom(this.http.post<platformResponse>(
+        this.ip
+        + '/shells/'
+        + this.urn
+        + "/aas/submodels/Artifacts/submodel/undeployPlanWithId/invoke"
+      ,{"inputArguments": params,
+        "requestId":"1bfeaa30-1512-407a-b8bb-f343ecfa28cf",
+        "inoutputArguments":[], "timeout":10000}
       , {responseType: 'json'}));
     } catch(e) {
       console.log(e);
@@ -113,18 +130,30 @@ export class PlanDeployerService {
     }];
     params[0].value.value = this.onlyId.transform(id);
       try {
-          response = this.http.post<platformResponse>(this.ip + '/shells/' + this.urn + "/aas/submodels/Artifacts/submodel/getTaskStatus/invoke"
-          ,{"inputArguments": params,"requestId":"1bfeaa30-1512-407a-b8bb-f343ecfa28cf", "inoutputArguments":[], "timeout":10000}
+          response = this.http.post<platformResponse>(
+            this.ip
+            + '/shells/'
+            + this.urn
+            + "/aas/submodels/Artifacts/submodel/getTaskStatus/invoke"
+          ,{"inputArguments":
+            params,"requestId":"1bfeaa30-1512-407a-b8bb-f343ecfa28cf",
+            "inoutputArguments":[], "timeout":10000}
           , {responseType: 'json', reportProgress: true});
           console.log(response);
           this.sub = response.subscribe((status: any ) => {
             console.log(status);
-            if(status.outputArguments[0].value && status.outputArguments[0].value.value && this.status.messages && status.executionState) {
+            if(status.outputArguments[0].value
+              && status.outputArguments[0].value.value
+              && this.status.messages
+              && status.executionState) {
               this.status.executionState = status.executionState;
-              this.status.messages[0] = this.onlyId.transform(status.outputArguments[0].value.value);
+              this.status.messages[0] = this.onlyId.transform(
+                status.outputArguments[0].value.value);
               this.emitter.next(this.status);
             }
-}, err => (this.emitter.next({executionState: "ERROR", messages: ["an error occured while getting the task status"]})));
+}, err => (this.emitter.next({
+  executionState: "ERROR",
+  messages: ["an error occured while getting the task status"]})));
 
     } catch(e) {
       console.log(e);
@@ -143,7 +172,11 @@ export class PlanDeployerService {
   private async getStatusSubmodel() {
     let response;
     try {
-      response = await firstValueFrom(this.http.get(this.ip + '/shells/' + this.urn + "/aas/submodels/Status/submodel")) as PlatformResources;
+      response = await firstValueFrom(this.http.get(
+        this.ip
+        + '/shells/'
+        + this.urn
+        + "/aas/submodels/Status/submodel")) as PlatformResources;
       if(response) {
         this.statusSubmodel = response.submodelElements;
         this.allEmitter.next(this.statusSubmodel);
