@@ -24,4 +24,10 @@ public class JarUtils extends ZipUtils {
     
     // In transition to "support".
     
+    /**
+     * Preventing external creation.
+     */
+    private JarUtils() {
+    }
+
 }
