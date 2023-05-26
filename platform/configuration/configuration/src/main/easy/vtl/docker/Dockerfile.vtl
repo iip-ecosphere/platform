@@ -14,13 +14,16 @@ template Dockerfile(IIPEcosphere config, FileArtifact target, sequenceOf(MeshEle
             if (baseImageExist == 1) {
                 'FROM ${mgr.registry}/${appName}/appcommendepbaseimage:0.1.0'
                 '${containerSettings(config, containerType, device)}'
+                'ENV IIP_INCONTAINER=true'
             } else if (baseImageExist == 2) {
                 'FROM ${mgr.registry}/${appName}/appalldepbaseimage:0.1.0'
                 '${containerSettings(config, containerType, device)}'
+                'ENV IIP_INCONTAINER=true'
             }
         } else {
             'FROM alpine:3.14'
             '${containerSettings(config, containerType, device)}'
+            'ENV IIP_INCONTAINER=true'
             'RUN apk add bash'
             'RUN apk add openjdk11'
             if (not(collectDependencies(elements)->selectByKind(SystemDependency)->select(d|d.key=='JAVA8').isEmpty())) {

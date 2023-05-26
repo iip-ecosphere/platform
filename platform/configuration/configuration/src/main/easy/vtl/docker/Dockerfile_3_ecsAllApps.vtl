@@ -10,6 +10,7 @@ template Dockerfile_3_ecsAllApps(IIPEcosphere config, FileArtifact target, seque
     	
     	'FROM docker' 
     	'${containerSettings(config, containerType, device)}'
+    	'ENV IIP_INCONTAINER=true'
     	''
         'RUN apk add openjdk13'
         'RUN apk add bash'
