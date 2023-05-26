@@ -527,14 +527,7 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
     }
 
     def wrapperCtorParam(Connector conn) {
-        String result = "";
-        if (isDefined(conn.mock) and conn.mock) {
-            result = enumerateFields(conn.outInterface.type);
-            if (result.length() > 0) {
-                result = ", " + result;
-            }
-        }
-        result;
+        "";
     }
     
     // dispatch basis
