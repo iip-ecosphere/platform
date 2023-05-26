@@ -13,7 +13,7 @@ template JavaType(Configuration config, FileArtifact target, RecordType type, St
         IIPEcosphere cfg = config;
         if (not(interface)) {
             for (Field f: type.fields) {
-            if (cfg.serializer==Serializer::Json) {
+                if (cfg.serializer==Serializer::Json) {
                     '@JsonProperty("${f.name}")'
                 }
                 'private ${toTypeName(f.type)} ${asMethodFieldIdentifier(f.name)};\n'
@@ -30,6 +30,7 @@ template JavaType(Configuration config, FileArtifact target, RecordType type, St
     
     // generates code for the getters
     def getters(RecordType type) {
+        IIPEcosphere cfg = config;
         for (Field f: type.fields) {
             if (emitJavadoc) {
                 '/**
@@ -39,6 +40,9 @@ template JavaType(Configuration config, FileArtifact target, RecordType type, St
                   */'
             } else {
                 '@Override'
+            }
+            if (cfg.serializer==Serializer::Json) {
+                '@JsonIgnore'
             }
             'public ${toTypeName(f.type)} get${asMethodNameSuffix(f.name)}()${ending}'
             if (not(interface)) {
@@ -51,6 +55,7 @@ template JavaType(Configuration config, FileArtifact target, RecordType type, St
 
     // generates code for the setters
     def setters(RecordType type) {
+        IIPEcosphere cfg = config;
         for (Field f: type.fields->select(f|not(f.readOnly))) {
             if (emitJavadoc) {
                 '/**
@@ -60,6 +65,9 @@ template JavaType(Configuration config, FileArtifact target, RecordType type, St
                  */'
             } else {
                 '@Override'
+            }
+            if (cfg.serializer==Serializer::Json) {
+                '@JsonIgnore'
             }
             'public void set${asMethodNameSuffix(f.name)}(${toTypeName(f.type)} value)${ending}'
             if (not(interface)) {
@@ -216,6 +224,7 @@ template JavaType(Configuration config, FileArtifact target, RecordType type, St
         IIPEcosphere cfg = config;
         if (cfg.serializer==Serializer::Json) {
             'import com.fasterxml.jackson.annotation.JsonProperty;'
+            'import com.fasterxml.jackson.annotation.JsonIgnore;'
         } else {
             ''
         }
