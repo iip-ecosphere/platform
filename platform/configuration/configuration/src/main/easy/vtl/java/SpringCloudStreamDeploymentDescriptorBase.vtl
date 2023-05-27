@@ -288,13 +288,13 @@ template SpringCloudStreamDeploymentDescriptorBase(Configuration config, FileArt
     def generateConnection(MeshElement start, MeshElement end, IOType type, String dir, String connSuffix, String service) {
         String res = "";
         String typeName = toTypeName(type.type);
-        String conn = getMethodSuffixId(getMethodSuffix(end, typeName, getOutName(end, type.type)), end);
+        String conn = getMethodSuffixId(getMethodSuffix(end, typeName, getOutName(end, typeName)), end);
         String func = conn;
         if (dir == "OUT") {
             if (isAsyncSource(start)) {
                 func = "";
             } else {
-                func = getMethodSuffixId(getMethodSuffix(start, typeName, getOutName(start, type.type)), start);
+                func = getMethodSuffixId(getMethodSuffix(start, typeName, getOutName(start, typeName)), start);
             }
         } else {
             func = conn;
