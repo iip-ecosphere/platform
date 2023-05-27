@@ -145,7 +145,7 @@ public class HeartbeatWatcher {
      * @param deviceId the deviceId we received a signal/event from
      */
     public void notifyRecordReceived(String deviceId) {
-        if (null != deviceId) {
+        if (null != deviceId && deviceId.length() > 0) {
             received.put(deviceId, System.currentTimeMillis());
         }
     }
