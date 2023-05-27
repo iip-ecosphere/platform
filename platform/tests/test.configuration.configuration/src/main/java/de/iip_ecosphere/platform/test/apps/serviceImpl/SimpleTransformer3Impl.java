@@ -17,6 +17,7 @@ import java.io.InputStream;
 
 import de.iip_ecosphere.platform.services.environment.DataIngestor;
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
+import de.iip_ecosphere.platform.services.environment.Starter;
 import iip.datatypes.Rec13;
 import iip.datatypes.Rec13Impl;
 import iip.impl.SimpleDataTransformer3Impl;
@@ -56,7 +57,7 @@ public class SimpleTransformer3Impl extends SimpleDataTransformer3Impl {
     public Rec13 transformRec13(Rec13 data) {
         Rec13 result = new Rec13Impl(); // SimpleApp3Helper.createRec13Instance(); 
         result.setIntField(data.getIntField());
-        result.setStringField(data.getStringField() + " SyncT");
+        result.setStringField(data.getStringField() + " SyncT " + Starter.getAppId());
         return result;
     }
 
@@ -71,7 +72,7 @@ public class SimpleTransformer3Impl extends SimpleDataTransformer3Impl {
         if (null != ingestor) {
             Rec13 result = new Rec13Impl(); // SimpleApp3Helper.createRec13Instance(); 
             result.setIntField(data.getIntField());
-            result.setStringField(data.getStringField() + " ASyncT");
+            result.setStringField(data.getStringField() + " ASyncT " + Starter.getAppId());
             ingestor.ingest(result);
         }
     }
