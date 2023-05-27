@@ -63,11 +63,12 @@ export class InputRefSelectComponent implements OnInit {
       const response = await this.edit.getDependencies() as Resource;
       if(response && response.value) {
         for(let ele of response.value) {
-          for(let dep of ele.value) {
-            if(dep.idShort && this.metaTypes.indexOf(dep.idShort) === -1) {
-              this.references.push(dep);
-            }
-          }
+          this.references.push(ele);
+          // for(let dep of ele.value) {
+          //   if(dep.idShort && this.metaTypes.indexOf(dep.idShort) === -1) {
+          //     this.references.push(dep);
+          //   }
+          // }
 
         }
 

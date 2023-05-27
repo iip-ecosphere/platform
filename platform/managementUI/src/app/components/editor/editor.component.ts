@@ -16,7 +16,18 @@ export class EditorComponent implements OnInit {
   selectedType: Resource | undefined;
   inputs: ResourceAttribute[] = [];
   inputReferenceTo: ResourceAttribute[] = [];
-  inputSequenceOf: ResourceAttribute[] = [];
+
+  inputs1: ResourceAttribute[] = [];
+  inputReferenceTo1: ResourceAttribute[] = [];
+
+  inputs2: ResourceAttribute[] = [];
+  inputReferenceTo2: ResourceAttribute[] = [];
+
+  inputs1Opt: ResourceAttribute[] = [];
+  inputReferenceTo1Opt: ResourceAttribute[] = [];
+
+  inputs2Opt: ResourceAttribute[] = [];
+  inputReferenceTo2Opt: ResourceAttribute[] = [];
 
   metaTypes = ['metaState', 'metaProject', 'metaSize', 'metaType', 'metaRefines', 'metaAbstract'];
 
@@ -37,7 +48,6 @@ export class EditorComponent implements OnInit {
   public checkRef() {
     this.inputs = [];
     this.inputReferenceTo = [];
-    this.inputSequenceOf = [];
 
     const selectedType = this.selectedType;
     if(selectedType && selectedType.value) {
