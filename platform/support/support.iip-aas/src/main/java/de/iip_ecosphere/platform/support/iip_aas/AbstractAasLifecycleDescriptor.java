@@ -103,7 +103,7 @@ public class AbstractAasLifecycleDescriptor implements LifecycleDescriptor {
      * @param arg the parameter name to search for
      * @param init the initial value, a already known port if chained, usually {@code -1}
      * @return the port, may be {@code -1} for none
-     * @see SysUtils#getEnv(String)
+     * @see OsUtils#getEnv(String)
      */
     private static int getPort(String[] args, String arg, int init) {
         int port = init;

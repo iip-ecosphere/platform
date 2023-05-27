@@ -51,7 +51,8 @@ public class ApplicationInstanceAasConstructor {
     public static String notifyAppNewInstance(String appId, String planId) {
         AtomicReference<String> result = new AtomicReference<String>(null);
         ActiveAasBase.processNotification(NAME_SUBMODEL_APPINSTANCES, NotificationMode.SYNCHRONOUS, (sub, aas) -> {
-            int newId = -1;
+            // -1 is legacy, may fail when further app uses same services
+            int newId = sub.getSubmodelElementsCount() == 0 ? -1 : 0; 
             String propMaxId = AasUtils.fixId(appId + "_max");
             Property propMax = sub.getProperty(propMaxId);
             if (null == propMax) {
@@ -60,21 +61,11 @@ public class ApplicationInstanceAasConstructor {
                 builder.createPropertyBuilder(propMaxId)
                     .setValue(Type.INTEGER, newId)
                     .build();
+                builder.build();
             } else {
                 newId = AasUtils.getPropertyValueAsIntegerSafe(sub, propMaxId, 0) + 1; // the next instance
-                AasUtils.setPropertyValueSafe(sub, appId, newId);
+                AasUtils.setPropertyValueSafe(sub, propMaxId, newId);
             }
-            
-            /*for (SubmodelElement elt: sub.submodelElements()) {
-                if (elt instanceof SubmodelElementCollection) {
-                    SubmodelElementCollection coll = (SubmodelElementCollection) elt;
-                    if (appId.equals(AasUtils.getPropertyValueAsStringSafe(coll, NAME_PROP_APPID, null))) {
-                        newId = Math.max(newId, AasUtils.getPropertyValueAsIntegerSafe(coll, NAME_PROP_INSTANCEID, 0));
-                        break;
-                    }
-                }
-            }
-            newId++; // the next instance */
 
             SubmodelElementCollectionBuilder dBuilder 
                 = sub.createSubmodelElementCollectionBuilder(getAasAppInstanceId(appId, newId), false, false);
