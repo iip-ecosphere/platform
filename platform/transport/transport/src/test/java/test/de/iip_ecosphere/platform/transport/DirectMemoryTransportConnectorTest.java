@@ -286,7 +286,7 @@ public class DirectMemoryTransportConnectorTest {
         Assert.assertEquals(msg.getComponentType(), ComponentTypes.DEVICE);
         Assert.assertEquals(msg.getAction(), ActionTypes.REMOVED);
         Assert.assertEquals(msg.getId(), "AAA");
-        Assert.assertEquals(msg.getDeviceId(), "AAA");
+        Assert.assertEquals(msg.getDeviceId(), "");
         Assert.assertArrayEquals(msg.getAliasIds(), new String[]{"BBB", "CCC"});
     }
     

@@ -57,7 +57,7 @@ public class StatusMessage {
      * @param aliasIds optional alias ids
      */
     public StatusMessage(ActionType action, String id, String... aliasIds) {
-        this(ComponentTypes.DEVICE, action, id, id, aliasIds);
+        this(ComponentTypes.DEVICE, action, id, "", aliasIds);
     }
     
     /**
