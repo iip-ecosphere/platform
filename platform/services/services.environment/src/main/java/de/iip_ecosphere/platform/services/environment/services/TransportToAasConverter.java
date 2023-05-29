@@ -13,15 +13,15 @@
 package de.iip_ecosphere.platform.services.environment.services;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -35,14 +35,10 @@ import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
-import de.iip_ecosphere.platform.support.function.IOConsumer;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.iip_aas.AasUtils;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
-import de.iip_ecosphere.platform.transport.Transport;
-import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
-import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
 
 /**
  * Implements a generic converter from transport stream entries to AAS.
@@ -50,7 +46,7 @@ import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
  * @param <T> the data type
  * @author Holger Eichelberger, SSE
  */
-public abstract class TransportToAasConverter<T> {
+public abstract class TransportToAasConverter<T> extends TransportConverter<T> {
 
     public static final ValueConverter IDENTITY_CONVERTER = v -> v;
     public static final ValueConverter JSON_CONVERTER = v -> JsonUtils.toJson(v);
@@ -59,26 +55,20 @@ public abstract class TransportToAasConverter<T> {
     public static final ValueConverter ENUM_NAME_CONVERTER = v -> ((Enum<?>) v).name();
     
     private static final Map<Class<?>, TypeConverter> DEFAULT_CONVERTERS = new HashMap<>();
-    private static final String PREFIX_GETTER = "get";
     private static final Set<String> METHODS_TO_IGNORE = new HashSet<>();
-
     private Map<Class<?>, TypeConverter> converters = new HashMap<>();
+
     private long timeout = 20 * 60 * 1000; // cleanup after 20 minutes
     private long lastCleanup = System.currentTimeMillis();
     private long cleanupTimeout = 5 * 1000; // when the next cleanup shall be considered
     private long aasFailedTimestamp = -1;
     private long aasFailedTimeout = 30 * 1000;
-    private TraceRecordReceptionCallback callback;
-    private List<IOConsumer<T>> notifier = new ArrayList<>();
-    private Supplier<Boolean> aasEnabledSupplier = () -> true;
     
     private String submodelIdShort;
-    private String transportStream;
-    private Class<T> dataType;
     private AasSetup aasSetup;
     private boolean aasStarted;
     private transient Aas aas; // temporary, cache
-    
+
     static {
         DEFAULT_CONVERTERS.put(String.class, new TypeConverter(Type.STRING, IDENTITY_CONVERTER));
         DEFAULT_CONVERTERS.put(Boolean.TYPE, new TypeConverter(Type.BOOLEAN, IDENTITY_CONVERTER));
@@ -115,59 +105,17 @@ public abstract class TransportToAasConverter<T> {
      * @param dataType the type of the data in the transport stream
      */
     public TransportToAasConverter(String submodelIdShort, String transportStream, Class<T> dataType) {
+        super(transportStream, dataType);
         this.converters.putAll(DEFAULT_CONVERTERS);
         this.submodelIdShort = submodelIdShort;
-        this.transportStream = transportStream;
-        this.dataType = dataType;
     }
-    
-    /**
-     * Changes the optional supplier for the AAS enabled state.
-     * 
-     * @param enabledSupplier the new supplier, ignored if <b>null</b>
-     */
-    public void setAasEnabledSupplier(Supplier<Boolean> enabledSupplier) {
-        if (null != enabledSupplier) {
-            this.aasEnabledSupplier = enabledSupplier;
-        }
-    }
-    
-    /**
-     * Returns whether the AAS functionality shall be enabled.
-     * 
-     * @return {@code true} for enabled, {@code false} else
-     */
-    protected boolean isAasEnabled() {
-        return aasEnabledSupplier.get();
-    }
-    
-    /**
-     * Defines a new notifier which is called when new data arrives. Currently only one notifier is supported.
-     * 
-     * @param notifier the notifier, ignored if <b>null</b>
-     */
-    public void addNotifier(IOConsumer<T> notifier) {
-        if (null != notifier) {
-            this.notifier.add(notifier);
-        } else {
-            LoggerFactory.getLogger(getClass()).warn("No notifier given. Ignoring call.");
-        }
-    }
-    
-    /**
-     * Changes the timeout until trace events are deleted.
-     * 
-     * @param timeout the timeout in ms
-     */
+
+    @Override
     public void setTimeout(long timeout) {
         this.timeout = timeout;
     }
 
-    /**
-     * Changes the cleanup timeout, i.e., the time between two cleanups.
-     * 
-     * @param cleanupTimeout the timeout in ms
-     */
+    @Override
     public void setCleanupTimeout(long cleanupTimeout) {
         this.cleanupTimeout = cleanupTimeout;
     }
@@ -179,16 +127,6 @@ public abstract class TransportToAasConverter<T> {
      */
     public long getTimeout() { 
         return timeout;
-    }
-    
-    /**
-     * Adds/overwrites a converter.
-     * 
-     * @param cls the class the converter applies to
-     * @param converter the converter instance
-     */
-    protected void addConverter(Class<?> cls, TypeConverter converter) {
-        converters.put(cls, converter);
     }
     
     /**
@@ -204,6 +142,59 @@ public abstract class TransportToAasConverter<T> {
      * @return the URN
      */
     public abstract String getAasUrn();
+    
+    @Override
+    protected void handleNew(T data) {
+        // add new record
+        long now = System.currentTimeMillis();
+        if (isAasEnabled() && aasFailedTimestamp > 0 && now - aasFailedTimestamp < aasFailedTimeout) {
+            aasFailedTimestamp = -1; // allow for re-try
+        }
+        if (isAasEnabled() && aasFailedTimestamp < 0) {
+            try {
+                if (null == aas) {
+                    // do not populate, we just add/remove in this class
+                    aas = AasPartRegistry.retrieveAas(aasSetup, getAasUrn(), false);                    
+                }
+                // bypass without propagation
+                aas.getSubmodel(submodelIdShort).create(b -> {
+                    SubmodelElementCollectionBuilder smcBuilder = b.createSubmodelElementCollectionBuilder(
+                        getSubmodelElementIdFunction().apply(data), true, true); 
+                    populateSubmodelElementCollection(smcBuilder, data);
+                    smcBuilder.build();
+                }, false);
+                cleanup(aas);
+            } catch (IOException e) {
+                LoggerFactory.getLogger(getClass()).error("Cannot obtain AAS {}: {}", getAasUrn(), e.getMessage());
+                aasFailedTimestamp = now;
+            }
+        }
+    }
+    
+    /**
+     * Creates the submodel element representing a single received data value.
+     *  
+     * @param smcBuilder the builder for the submodel element collection representing the data value
+     * @param data the data that may be used to create the element
+     */
+    protected abstract void populateSubmodelElementCollection(SubmodelElementCollectionBuilder smcBuilder, T data);
+    
+    /**
+     * Returns a function turning a data instance into an id of the submodel representing the data instance.
+     * 
+     * @return the function
+     */
+    protected abstract Function<T, String> getSubmodelElementIdFunction();
+    
+    /**
+     * Adds/overwrites a converter.
+     * 
+     * @param cls the class the converter applies to
+     * @param converter the converter instance
+     */
+    protected void addConverter(Class<?> cls, TypeConverter converter) {
+        converters.put(cls, converter);
+    }
     
     /**
      * Encapsulates a Java-to-AAS type converter.
@@ -260,73 +251,6 @@ public abstract class TransportToAasConverter<T> {
     }
     
     /**
-     * Handles a new trace record and cleans up outdated ones. Called upon arrival. [protected for mocking]
-     * 
-     * @param data the trace record data
-     * @see #getSubmodelElementIdFunction()
-     * @see #populateSubmodelElementCollection(SubmodelElementCollectionBuilder, Object)
-     */
-    protected void handleNew(T data) {
-        // add new record
-        long now = System.currentTimeMillis();
-        if (isAasEnabled() && aasFailedTimestamp > 0 && now - aasFailedTimestamp < aasFailedTimeout) {
-            aasFailedTimestamp = -1; // allow for re-try
-        }
-        if (isAasEnabled() && aasFailedTimestamp < 0) {
-            try {
-                if (null == aas) {
-                    // do not populate, we just add/remove in this class
-                    aas = AasPartRegistry.retrieveAas(aasSetup, getAasUrn(), false);                    
-                }
-                // bypass without propagation
-                aas.getSubmodel(submodelIdShort).create(b -> {
-                    SubmodelElementCollectionBuilder smcBuilder = b.createSubmodelElementCollectionBuilder(
-                        getSubmodelElementIdFunction().apply(data), true, true); 
-                    populateSubmodelElementCollection(smcBuilder, data);
-                    smcBuilder.build();
-                }, false);
-                cleanup(aas);
-            } catch (IOException e) {
-                LoggerFactory.getLogger(getClass()).error("Cannot obtain AAS {}: {}", getAasUrn(), e.getMessage());
-                aasFailedTimestamp = now;
-            }
-        }
-    }
-    
-    /**
-     * Handles a new trace record by calling {@link #handleNew(Object)} upon arrival. Entry point for handling new
-     * data, calling {@link #handleNew(Object)} to ensure that {@link #notifier} are processed.
-     * 
-     * @param data the trace record data
-     */
-    private void handleNewAndNotify(T data) {
-        for (IOConsumer<T> n: notifier) {
-            try { // notify independently
-                n.accept(data);
-            } catch (IOException e) {
-                LoggerFactory.getLogger(getClass()).error("Cannot inform notifier: {}", e.getMessage());
-            }
-        }
-        handleNew(data);
-    }
-    
-    
-    /**
-     * Creates the submodel element representing a single received data value.
-     *  
-     * @param smcBuilder the builder for the submodel element collection representing the data value
-     * @param data the data that may be used to create the element
-     */
-    protected abstract void populateSubmodelElementCollection(SubmodelElementCollectionBuilder smcBuilder, T data);
-    
-    /**
-     * Returns a function turning a data instance into an id of the submodel representing the data instance.
-     * 
-     * @return the function
-     */
-    protected abstract Function<T, String> getSubmodelElementIdFunction();
-    
-    /**
      * Creates the generic properties and contents for the given payload object.
      *  
      * @param payloadBuilder the payload builder
@@ -375,68 +299,8 @@ public abstract class TransportToAasConverter<T> {
             payloadBuilder.build();
         }
     }
-    
-    /**
-     * Returns whether a payload entry for a given field in a given class shall be created. Large entries may cause 
-     * AAS performance/memory issues.
-     * 
-     * @param fieldName the field name
-     * @param fieldType the declared field type (real value may be a sub-type)
-     * @param cls the class declaring the field
-     * @return {@code true} for creating a payload entry, {@code false} else
-     */
-    protected boolean createPayloadEntry(String fieldName, Class<?> fieldType, Class<?> cls) {
-        return true;
-    }
 
-    /**
-     * Obtains the value return by {@code method} on {@code payload}.
-     * 
-     * @param object the object to call the method on
-     * @param method the method to call
-     * @param field the represented field (for logging)
-     * @return the value of {@code field} via {@code method}
-     */
-    private Object getValue(Object object, Method method, String field) {
-        Object result;
-        try {
-            result = method.invoke(object);
-        } catch (SecurityException | InvocationTargetException | IllegalAccessException e) {
-            result = null;
-            LoggerFactory.getLogger(getClass()).error(
-                "Cannot obtain value of operation {}/field {} of class {} to AAS: {}", 
-                method.getName(), field, method.getDeclaringClass().getName(), e.getMessage());
-        }
-        return result;
-    }
-    
-    /**
-     * Allows for application specific payload type names.
-     * 
-     * @param cls the type
-     * @return the mapped name
-     */
-    protected String mapPayloadType(Class<?> cls) {
-        return cls.getName();
-    }
-    
-    /**
-     * Returns whether {@code method} is an usual getter.
-     * 
-     * @param method the method to analyze
-     * @return {@code true} for getter, {@code false} else
-     */
-    private static boolean isGetter(Method method) {
-        int modifier = method.getModifiers();
-        boolean pubNonStatic = Modifier.isPublic(modifier) && !Modifier.isStatic(modifier);
-        return method.getName().startsWith(PREFIX_GETTER) && method.getParameterCount() == 0 && pubNonStatic; 
-    }
-    
-    /**
-     * Pursues a cleanup of the (internally known) AAS.
-     * 
-     * @return whether a cleanup process was executed (not whether elements were deleted)
-     */
+    @Override
     public boolean cleanup() {
         boolean done = false;
         if (null != aas) {
@@ -503,41 +367,12 @@ public abstract class TransportToAasConverter<T> {
      */
     public abstract CleanupPredicate getCleanupPredicate();
 
-    /**
-     * A trace reception callback calling {@link TransportToAasConverter#handleNew(Object)} 
-     * in own threads.
-     * 
-     * @author Holger Eichelberger, SSE
-     */
-    private class TraceRecordReceptionCallback implements ReceptionCallback<T> {
-        
-        @Override
-        public void received(T data) {
-            new Thread(() -> handleNewAndNotify(data)).start(); // thread pool?
-        }
-
-        @Override
-        public Class<T> getType() {
-            return dataType;
-        }
-        
-    }
-
-    /**
-     * Returns whether the AAS was started/startup is done.
-     * 
-     * @return {@code true} for started, {@code false} else
-     */
+    @Override
     public boolean isAasStarted() {
         return aasStarted;
     }
 
-    /**
-     * Starts the transport tracer.
-     * 
-     * @param aasSetup the AAS setup to use
-     * @param deploy whether the AAS represented by this converter shall be deployed
-     */
+    @Override
     public void start(AasSetup aasSetup, boolean deploy) {
         this.aasSetup = aasSetup;
         if (isAasEnabled()) {
@@ -558,17 +393,7 @@ public abstract class TransportToAasConverter<T> {
                 }
             }).start();
         }
-        callback = new TraceRecordReceptionCallback();
-        TransportConnector conn = Transport.createConnector();
-        if (null != conn) {
-            try {
-                conn.setReceptionCallback(transportStream, callback);
-            } catch (IOException e) {
-                LoggerFactory.getLogger(getClass()).error("Registring transport callback: " + e.getMessage());
-            }
-        } else {
-            LoggerFactory.getLogger(getClass()).error("No transport setup, will not listen to trace records.");
-        }
+        super.start(aasSetup, deploy);
     }
     
     /**
@@ -582,18 +407,9 @@ public abstract class TransportToAasConverter<T> {
         return true;
     }
 
-    /**
-     * Stops the transport, deletes the AAS.
-     */
+    @Override
     public void stop() {
-        try {
-            TransportConnector conn = Transport.getConnector();
-            if (null != conn) {
-                conn.detachReceptionCallback(transportStream, callback);
-            }
-        } catch (IOException e) {
-            LoggerFactory.getLogger(getClass()).error("Detaching transport connector: " + e.getMessage());
-        }
+        super.stop();
         if (isAasEnabled()) {
             try {
                 Aas aas = AasPartRegistry.retrieveAas(aasSetup, getAasUrn());
@@ -614,6 +430,75 @@ public abstract class TransportToAasConverter<T> {
      */
     protected boolean cleanUpAas(Aas aas) {
         return true;
+    }
+
+    /**
+     * Used in {@link AasWatcher} to regularly watch the status entires.
+     * 
+     * @param coll the collection representing an entry
+     * @param lastRun the last run of the watcher
+     */
+    protected abstract void doWatch(SubmodelElementCollection coll, long lastRun);
+    
+    /**
+     * A regular AAS watcher.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    protected class AasWatcher implements Watcher {
+
+        private Timer timer;
+        private int period;
+        private long lastRun = System.currentTimeMillis();
+        
+        /**
+         * Creates a watcher instance.
+         * 
+         * @param period the watching period in ms
+         */
+        private AasWatcher(int period) {
+            this.period = period;
+        }
+        
+        @Override
+        public Watcher start() {
+            timer = new Timer();
+            timer.schedule(new TimerTask() {
+
+                @Override
+                public void run() {
+                    try {
+                        if (null == aas) {
+                            // do not populate, we just add/remove in this class
+                            aas = AasPartRegistry.retrieveAas(aasSetup, getAasUrn(), false);                    
+                        }
+                        Submodel submodel = aas.getSubmodel(submodelIdShort);                    
+                        submodel.iterate(coll -> {
+                            doWatch(coll, lastRun);
+                            return true;
+                        }, SubmodelElementCollection.class);
+                        lastRun = System.currentTimeMillis();
+                    } catch (IOException e) {
+                        LoggerFactory.getLogger(getClass()).error("Cannot obtain AAS {}: {}", 
+                            getAasUrn(), e.getMessage());
+                    }
+                }
+                
+            }, 0, period);
+            return this;
+        }
+
+        @Override
+        public Watcher stop() {
+            timer.cancel();
+            return this;
+        }
+        
+    }
+    
+    @Override
+    public Watcher createWatcher(int period) {
+        return new AasWatcher(period);
     }
 
 }

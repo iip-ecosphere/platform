@@ -30,7 +30,6 @@ import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.services.environment.Starter;
 import de.iip_ecosphere.platform.services.environment.YamlArtifact;
 import de.iip_ecosphere.platform.services.environment.YamlService;
-import de.iip_ecosphere.platform.services.environment.services.TransportToAasConverter.TypeConverter;
 import de.iip_ecosphere.platform.services.environment.switching.ServiceBase;
 import de.iip_ecosphere.platform.services.environment.testing.DataRecorder;
 import de.iip_ecosphere.platform.support.aas.Aas;
@@ -39,6 +38,7 @@ import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.Registry;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
@@ -82,7 +82,7 @@ public class TraceToAasService extends AbstractService {
     private Map<String, ParameterConfigurer<?>> paramConfigurers = new HashMap<>();
     private ApplicationSetup appSetup;
     private YamlArtifact artifact;
-    private Converter converter;
+    private TransportConverter<TraceRecord> converter;
     private TransportConnector outTransport;
     private TransportParameter outTransportParameter;
     private DataRecorder recorder;
@@ -192,7 +192,7 @@ public class TraceToAasService extends AbstractService {
      * 
      * @return the converter
      */
-    protected Converter createConverter() {
+    protected TransportConverter<TraceRecord> createConverter() {
         return new Converter();
     }
 
@@ -242,16 +242,6 @@ public class TraceToAasService extends AbstractService {
         if (null != configurer) {
             paramConfigurers.put(configurer.getName(), configurer);
         }
-    }
-    
-    /**
-     * Adds/overwrites a converter.
-     * 
-     * @param cls the class the converter applies to
-     * @param converter the converter instance
-     */
-    protected void addConverter(Class<?> cls, TypeConverter converter) {
-        this.converter.addConverter(cls, converter);
     }
     
     /**
@@ -579,6 +569,11 @@ public class TraceToAasService extends AbstractService {
         @Override
         protected String mapPayloadType(Class<?> cls) {
             return TraceToAasService.this.mapPayloadType(cls);
+        }
+
+        @Override
+        protected void doWatch(SubmodelElementCollection coll, long lastRun) {
+            System.out.println(coll); // preliminary
         }        
         
     }
