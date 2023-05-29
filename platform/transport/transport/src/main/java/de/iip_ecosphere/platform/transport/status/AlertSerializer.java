@@ -25,16 +25,16 @@ import de.iip_ecosphere.platform.transport.serialization.Serializer;
  */
 public class AlertSerializer implements Serializer<Alert> {
 
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+    
     @Override
     public Alert from(byte[] data) throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.readValue(data, Alert.class);
+        return MAPPER.readValue(data, Alert.class);
     }
 
     @Override
     public byte[] to(Alert source) throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.writeValueAsBytes(source);
+        return MAPPER.writeValueAsBytes(source);
     }
 
     @Override

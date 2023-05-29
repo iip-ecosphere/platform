@@ -35,7 +35,7 @@ import de.iip_ecosphere.platform.transport.serialization.Serializer;
  */
 public class StatusMessageSerializer implements Serializer<StatusMessage> {
 
-    private static final SimpleModule MODULE = new SimpleModule();
+    private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final Map<String, ActionType> ACTION_CONSTANTS = new HashMap<>();
     private static final Map<String, ComponentType> COMPONENT_CONSTANTS = new HashMap<>();
 
@@ -44,11 +44,14 @@ public class StatusMessageSerializer implements Serializer<StatusMessage> {
         registerActions(ActionTypes.class);
         registerComponents(ComponentTypes.class);
         
+        SimpleModule module = new SimpleModule();
         // fill module
-        MODULE.addDeserializer(ActionType.class, 
+        module.addDeserializer(ActionType.class, 
             new EnumDeserializer<ActionType>(ACTION_CONSTANTS, ActionType.class));
-        MODULE.addDeserializer(ComponentType.class, 
+        module.addDeserializer(ComponentType.class, 
             new EnumDeserializer<ComponentType>(COMPONENT_CONSTANTS, ComponentType.class));
+        
+        MAPPER.registerModule(module);
     }
     
     /**
@@ -133,15 +136,12 @@ public class StatusMessageSerializer implements Serializer<StatusMessage> {
 
     @Override
     public StatusMessage from(byte[] data) throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(MODULE);
-        return objectMapper.readValue(data, StatusMessage.class);
+        return MAPPER.readValue(data, StatusMessage.class);
     }
 
     @Override
     public byte[] to(StatusMessage source) throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.writeValueAsBytes(source);
+        return MAPPER.writeValueAsBytes(source);
     }
 
     @Override

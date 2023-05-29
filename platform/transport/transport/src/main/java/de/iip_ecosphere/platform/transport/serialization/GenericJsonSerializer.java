@@ -31,7 +31,12 @@ import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
  */
 public class GenericJsonSerializer<T> implements Serializer<T> {
     
+    private static final ObjectMapper MAPPER = new ObjectMapper();
     private Class<T> cls;
+    
+    static {
+        JsonUtils.handleIipDataClasses(MAPPER);
+    }
 
     /**
      * Implements a simple generic JSON serializer.
@@ -45,9 +50,7 @@ public class GenericJsonSerializer<T> implements Serializer<T> {
     @Override             
     public T from(byte[] data) throws IOException {
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            JsonUtils.handleIipDataClasses(objectMapper);
-            return objectMapper.readValue(data, cls);
+            return MAPPER.readValue(data, cls);
         } catch (JsonProcessingException e) {
             throw new IOException(e);
         }
@@ -56,8 +59,7 @@ public class GenericJsonSerializer<T> implements Serializer<T> {
     @Override    
     public byte[] to(T source) throws IOException {
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            return objectMapper.writeValueAsBytes(source);
+            return MAPPER.writeValueAsBytes(source);
         } catch (JsonProcessingException e) {
             throw new IOException(e);
         }
