@@ -15,6 +15,7 @@ package de.iip_ecosphere.platform.support.iip_aas;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+import de.iip_ecosphere.platform.support.OsUtils;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
@@ -52,7 +53,8 @@ public class ApplicationInstanceAasConstructor {
         AtomicReference<String> result = new AtomicReference<String>(null);
         ActiveAasBase.processNotification(NAME_SUBMODEL_APPINSTANCES, NotificationMode.SYNCHRONOUS, (sub, aas) -> {
             // -1 is legacy, may fail when further app uses same services
-            int newId = sub.getSubmodelElementsCount() == 0 ? -1 : 0; 
+            int newId = Boolean.valueOf(OsUtils.getPropertyOrEnv("iip.firstWithoutAppId", "false")) 
+                && sub.getSubmodelElementsCount() == 0 ? -1 : 0; 
             String propMaxId = AasUtils.fixId(appId + "_max");
             Property propMax = sub.getProperty(propMaxId);
             if (null == propMax) {

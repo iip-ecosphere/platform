@@ -75,6 +75,8 @@ public class JsonUtils {
             
     };
 
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+
     /**
      * Reads a {@link ServerAddress} from a JSON string.
      * 
@@ -86,8 +88,7 @@ public class JsonUtils {
         ServerAddress result = null;
         if (null != json) {
             try {
-                ObjectMapper objectMapper = new ObjectMapper();
-                ServerAddressHolder tmp = objectMapper.readValue(json.toString(), ServerAddressHolder.class);
+                ServerAddressHolder tmp = MAPPER.readValue(json.toString(), ServerAddressHolder.class);
                 result = new ServerAddress(tmp.getSchema(), tmp.getHost(), tmp.getPort());
             } catch (JsonProcessingException e) {
                 // result = null;
@@ -107,9 +108,8 @@ public class JsonUtils {
         String result = "";
         if (null != address) {
             try {
-                ObjectMapper objectMapper = new ObjectMapper();
                 ServerAddressHolder tmp = new ServerAddressHolder(address);
-                result = objectMapper.writeValueAsString(tmp);
+                result = MAPPER.writeValueAsString(tmp);
             } catch (JsonProcessingException e) {
                 // handled by default value
             }
@@ -129,8 +129,7 @@ public class JsonUtils {
         String result = "";
         if (null != obj) {
             try {
-                ObjectMapper objectMapper = new ObjectMapper();
-                result = objectMapper.writeValueAsString(obj);
+                result = MAPPER.writeValueAsString(obj);
             } catch (JsonProcessingException e) {
                 // handled by default value
             }
@@ -151,8 +150,7 @@ public class JsonUtils {
         R result = null;
         if (null != json) {
             try {
-                ObjectMapper objectMapper = new ObjectMapper();
-                result = objectMapper.readValue(json.toString(), cls);
+                result = MAPPER.readValue(json.toString(), cls);
             } catch (JsonProcessingException e) {
                 //result = null;
             }

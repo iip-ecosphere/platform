@@ -49,6 +49,7 @@ public class NetworkManagerAas implements AasContributor {
     public static final String OP_REGISTER_INSTANCE = "registerInstance";
     public static final String OP_UNREGISTER_INSTANCE = "unregisterInstance";
     public static final String OP_GET_REGISTERED_INSTANCES = "getRegisteredInstances";
+    private static final ObjectMapper MAPPER = new ObjectMapper();
     
     @Override
     public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
@@ -209,9 +210,7 @@ public class NetworkManagerAas implements AasContributor {
         ManagedServerAddress result = null;
         if (null != json) {
             try {
-                ObjectMapper objectMapper = new ObjectMapper();
-                ManagedServerAddressHolder tmp = objectMapper.readValue(json.toString(), 
-                    ManagedServerAddressHolder.class);
+                ManagedServerAddressHolder tmp = MAPPER.readValue(json.toString(), ManagedServerAddressHolder.class);
                 result = new ManagedServerAddress(tmp.getSchema(), tmp.getHost(), tmp.getPort(), tmp.isNew());
             } catch (JsonProcessingException e) {
                 //result = null;
@@ -230,9 +229,8 @@ public class NetworkManagerAas implements AasContributor {
         String result = "";
         if (null != address) {
             try {
-                ObjectMapper objectMapper = new ObjectMapper();
                 ManagedServerAddressHolder tmp = new ManagedServerAddressHolder(address);
-                result = objectMapper.writeValueAsString(tmp);
+                result = MAPPER.writeValueAsString(tmp);
             } catch (JsonProcessingException e) {
                 // handled by default value
             }

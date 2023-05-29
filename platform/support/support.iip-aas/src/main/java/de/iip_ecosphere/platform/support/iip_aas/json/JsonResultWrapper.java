@@ -31,6 +31,7 @@ import de.iip_ecosphere.platform.support.TaskRegistry;
 public class JsonResultWrapper implements Function<Object[], Object>, Serializable {
 
     private static final long serialVersionUID = 6531890963314078947L;
+    private static final ObjectMapper MAPPER = new ObjectMapper();
     private ExceptionFunction func;
     private OperationCompletedListener listener;
     private Function<Object[], String> taskIdSupplier;
@@ -227,8 +228,7 @@ public class JsonResultWrapper implements Function<Object[], Object>, Serializab
         String result = "";
         if (null != res) {
             try {
-                ObjectMapper objectMapper = new ObjectMapper();
-                result = objectMapper.writeValueAsString(res);
+                result = MAPPER.writeValueAsString(res);
             } catch (JsonProcessingException e) {
                 // handled by default value
             }
@@ -247,8 +247,7 @@ public class JsonResultWrapper implements Function<Object[], Object>, Serializab
         Result result = null;
         if (null != json) {
             try {
-                ObjectMapper objectMapper = new ObjectMapper();
-                result = objectMapper.readValue(json.toString(), Result.class);
+                result = MAPPER.readValue(json.toString(), Result.class);
             } catch (JsonProcessingException e) {
                 result = new Result(e);
             }
