@@ -7,8 +7,11 @@ import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.services.environment.services.TransportToAasConverter;
 import de.iip_ecosphere.platform.support.aas.Type;
+import de.iip_ecosphere.platform.support.aas.SubmodelElement;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
+import de.iip_ecosphere.platform.support.iip_aas.AasUtils;
 import de.iip_ecosphere.platform.transport.status.ActionType;
 import de.iip_ecosphere.platform.transport.status.ActionTypes;
 import de.iip_ecosphere.platform.transport.status.ComponentType;
@@ -20,8 +23,9 @@ import de.iip_ecosphere.platform.transport.status.StatusMessage;
  * 
  * @author Holger Eichelberger, SSE
  */
-class StatusConverter extends TransportToAasConverter<StatusMessage> {
+public class StatusConverter extends TransportToAasConverter<StatusMessage> {
 
+    public static final StatusConverter INSTANCE = new StatusConverter();
     private static final String IDSHORT_PREFIX = "time_";
     private AtomicInteger counter = new AtomicInteger(0);
     
@@ -68,21 +72,48 @@ class StatusConverter extends TransportToAasConverter<StatusMessage> {
     @Override
     public CleanupPredicate getCleanupPredicate() {
         return (coll, borderTimestamp) -> {
-            boolean delete = false;
-            String idShort = coll.getIdShort();
-            String id = idShort;
-            if (id.startsWith(IDSHORT_PREFIX)) {
-                id = id.substring(id.lastIndexOf('_') + 1);
-            }
-            try {
-                long entryTimestamp = Long.parseLong(id);
-                delete = entryTimestamp < borderTimestamp;
-            } catch (NumberFormatException e) {
-                LoggerFactory.getLogger(PlatformAas.class).warn(
-                    "Cannot check AAS status entry {} ({}) for deletion: {}", idShort, id, e.getMessage());
-            }
-            return delete;
+            long entryTimestamp = getTimestamp(coll, true);
+            return entryTimestamp > 0 && entryTimestamp < borderTimestamp;
         };
+    }
+
+    @Override
+    protected void doWatch(SubmodelElementCollection coll, long lastRun) {
+        long timestamp = StatusConverter.getTimestamp(coll, false);
+        if (timestamp > 0 && timestamp > lastRun) {
+            String action = AasUtils.getPropertyValueAsStringSafe(coll, "action", "");
+            String id = AasUtils.getPropertyValueAsStringSafe(coll, "id", "");
+            String devId = AasUtils.getPropertyValueAsStringSafe(coll, "deviceId", "");
+            if (devId.length() > 0) {
+                System.out.print("On " + devId + " ");
+            }
+            System.out.println(id + " " + action);
+        }
+    }
+    
+    /**
+     * Returns the timestamp of the given element.
+     * 
+     * @param elt the element to take the timestamp from.
+     * @param logError log a timestamp conversion error
+     * @return negative if there is no timestamp, the timestamp else
+     */
+    public static long getTimestamp(SubmodelElement elt, boolean logError) {
+        long result = -1;
+        String idShort = elt.getIdShort();
+        String id = idShort;
+        if (id.startsWith(IDSHORT_PREFIX)) {
+            id = id.substring(id.lastIndexOf('_') + 1);
+        }
+        try {
+            result = Long.parseLong(id);
+        } catch (NumberFormatException e) {
+            if (logError) {
+                LoggerFactory.getLogger(PlatformAas.class).warn(
+                    "Cannot check AAS status entry {} ({}): {}", idShort, id, e.getMessage());
+            }
+        }
+        return result;
     }
     
 }
