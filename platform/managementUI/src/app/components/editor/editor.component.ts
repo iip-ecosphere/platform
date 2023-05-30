@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { ApiService } from 'src/app/services/api.service';
-import { Resource, ResourceAttribute } from 'src/interfaces';
+import { Resource, uiGroup, editorInput } from 'src/interfaces';
 
 @Component({
   selector: 'app-editor',
@@ -14,22 +14,8 @@ export class EditorComponent implements OnInit {
   category = 'all';
   meta: Resource | undefined;
   selectedType: Resource | undefined;
-  inputs: ResourceAttribute[] = [];
-  inputReferenceTo: ResourceAttribute[] = [];
 
-  inputs1: ResourceAttribute[] = [];
-  inputReferenceTo1: ResourceAttribute[] = [];
-
-  inputs2: ResourceAttribute[] = [];
-  inputReferenceTo2: ResourceAttribute[] = [];
-
-  inputs1Opt: ResourceAttribute[] = [];
-  inputReferenceTo1Opt: ResourceAttribute[] = [];
-
-  inputs2Opt: ResourceAttribute[] = [];
-  inputReferenceTo2Opt: ResourceAttribute[] = [];
-
-  inputValues: any[] = []
+  uiGroups: uiGroup[] = [];
 
   metaTypes = ['metaState', 'metaProject', 'metaSize', 'metaType', 'metaRefines', 'metaAbstract'];
 
@@ -47,29 +33,64 @@ export class EditorComponent implements OnInit {
       this.meta = await this.api.getMeta();
   }
 
-  public checkRef() {
-    this.inputs = [];
-    this.inputReferenceTo = [];
-
+  public generateInputs() {
+    this.uiGroups = [];
+    console.log(this.selectedType);
     const selectedType = this.selectedType;
     if(selectedType && selectedType.value) {
 
       for(const input of selectedType.value) {
         if(input.idShort && this.metaTypes.indexOf(input.idShort) === -1) {
-          let value = input.value.find((item: { idShort: string; }) => item.idShort === 'type')?.value
-          value = value.toString().toLocaleLowerCase();
-          this.inputValues.push(value);
-          if(value.indexOf('refto') >= 0 || value.indexOf('sequenceof') >= 0) {
-            this.inputReferenceTo.push(input);
+          let isOptional = false;
+          let uiGroup: number = input.value.find((item: { idShort: string; }) => item.idShort === 'uiGroup')?.value
+
+          if(uiGroup < 0) {
+            isOptional = true;
+            uiGroup = uiGroup * -1;
+          }
+          let uiGroupCompare =  this.uiGroups.find(item => item.uiGroup === uiGroup);
+          console.log(uiGroup);
+          console.log(uiGroupCompare);
+
+
+          let editorInput: editorInput = {name: '', type: '', value:[], description: [{language: '', text: ''}], refTo: false, multipleInputs: false};
+          let name = input.value.find((item: { idShort: string; }) => item.idShort === 'name')
+          editorInput.name = name.value;
+          if(name.description && name.description[0] && name.description[0].text && name.description[0].language) {
+            editorInput.description = name.description;
+          }
+          editorInput.type = input.value.find((item: { idShort: string; }) => item.idShort === 'type')?.value
+          if(editorInput.type.indexOf('refTo') >= 0) {
+            editorInput.refTo = true;
+          }
+          if(editorInput.type.indexOf('setOf') >= 0 || editorInput.type.indexOf('sequenceOf') >= 0) {
+            editorInput.multipleInputs = true;
+          }
+          if(!uiGroupCompare ){
+            if(isOptional) {
+              this.uiGroups.push({
+                uiGroup: uiGroup,
+                inputs: [],
+                optionalInputs: [editorInput]
+              });
+            } else {
+              this.uiGroups.push({
+                uiGroup: uiGroup,
+                inputs: [editorInput],
+                optionalInputs: []
+              });
+            }
           } else {
-            this.inputs.push(input);
-          }
-          if(!(input.description && input.description[0] && input.description[0].text)) {
-            input.description = [];
-            input.description.push({text: '', language: ''});
+            if(isOptional) {
+              uiGroupCompare?.optionalInputs.push(editorInput);
+            } else {
+              uiGroupCompare?.inputs.push(editorInput);
+            }
+
           }
         }
         }
+        console.log(this.uiGroups);
     }
   }
 

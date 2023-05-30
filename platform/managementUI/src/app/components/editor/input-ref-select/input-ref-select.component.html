@@ -1,13 +1,10 @@
 <div>
-  <div >
+  <div>
     <table style="width: 100%">
       <tr>
-        <td style="width: 20%">
-          {{input.idShort}}:
-        </td>
         <td *ngIf="textfield">
           <mat-form-field appearance="outline">
-            <input matInput [matTooltip]="tooltip" [(ngModel)]="textInput">
+            <input matInput [matTooltip]="input.description[0].language + ' ' + input.description[0].text" [(ngModel)]="textInput">
           </mat-form-field>
           <button mat-raised-button (click)="addFromTextfield()">add</button>
         </td>
@@ -27,7 +24,7 @@
   </div>
   <div [ngClass]="valueboxClass()">
     <div class="flexcontainer">
-      <mat-card *ngFor="let value of inputValues; let i=index">
+      <mat-card *ngFor="let value of input.value; let i=index">
         <table>
           <tr><td colspan="3" style="text-align: center">{{value}}</td></tr>
           <tr>

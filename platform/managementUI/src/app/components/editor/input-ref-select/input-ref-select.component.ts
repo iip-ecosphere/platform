@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { EditorService } from 'src/app/services/editor.service';
-import { Resource, ResourceAttribute } from 'src/interfaces';
+import { Resource, editorInput } from 'src/interfaces';
 
 @Component({
   selector: 'app-input-ref-select',
@@ -10,18 +10,15 @@ import { Resource, ResourceAttribute } from 'src/interfaces';
 export class InputRefSelectComponent implements OnInit {
 
   @Input() textfield = false;
-  @Input() input: ResourceAttribute = {};
+  @Input() input: editorInput = {name: '', type: '', description: [{text: '', language: ''}], refTo: true, value: []};
 
 
   textInput = '';
   isSetOf = false;
   isSequenceOf = false;
   refTo = '';
-  inputValues: string[] = [];
   references: Resource[] = [];
   selectedRef: Resource = {};
-
-  tooltip= '';
 
   refTypes = ['Dependency', 'Resource', 'DataType', 'Server', 'ServiceMesh', 'MeshConnector', 'MeshElement', 'ServiceBase'];
   metaTypes = ['metaState', 'metaProject', 'metaSize', 'metaType', 'metaRefines', 'metaAbstract'];
@@ -29,16 +26,8 @@ export class InputRefSelectComponent implements OnInit {
   constructor(private edit: EditorService) { }
 
   ngOnInit(): void {
-    let value = this.input.value.find((item: { idShort: string; }) => item.idShort === 'type')?.value;
-    value = value.toString().toLocaleLowerCase();
-    this.init(value);
-
-    let name = this.input.value.find((item: { idShort: string; }) => item.idShort === 'name');
-    if(name && name.description[0]) {
-      this.tooltip = name.description[0].language + ', ' + name.description[0].text;
-    } else if (name.description && typeof(name.description) === 'string' ) {
-      this.tooltip = name.description;
-    }
+    let type = this.input.type.toLowerCase();
+    this.init(type);
   }
 
   private init(value: string) {
@@ -87,6 +76,86 @@ export class InputRefSelectComponent implements OnInit {
 
         }
       }
+    } else if(refTo === 'application') {
+      const response = await this.edit.getApplications() as Resource;
+      if(response && response.value) {
+        for(let dep of response.value) {
+          if(dep.idShort && this.metaTypes.indexOf(dep.idShort) === -1) {
+            this.references.push(dep);
+          }
+
+        }
+      }
+    } else if(refTo === 'manufacturer') {
+      const response = await this.edit.getManufacturers() as Resource;
+      if(response && response.value) {
+        for(let dep of response.value) {
+          if(dep.idShort && this.metaTypes.indexOf(dep.idShort) === -1) {
+            this.references.push(dep);
+          }
+
+        }
+      }
+    } else if(refTo === 'servicemesh') {
+      const response = await this.edit.getServiceMeshes() as Resource;
+      if(response && response.value) {
+        for(let dep of response.value) {
+          if(dep.idShort && this.metaTypes.indexOf(dep.idShort) === -1) {
+            this.references.push(dep);
+          }
+
+        }
+      }
+    } else if(refTo === 'datatype') {
+      const response = await this.edit.getDataTypess() as Resource;
+      if(response && response.value) {
+        for(let dep of response.value) {
+          if(dep.idShort && this.metaTypes.indexOf(dep.idShort) === -1) {
+            this.references.push(dep);
+          }
+
+        }
+      }
+    } else if(refTo === 'ecsdevice') {
+      const response = await this.edit.getEcsDevices() as Resource;
+      if(response && response.value) {
+        for(let dep of response.value) {
+          if(dep.idShort && this.metaTypes.indexOf(dep.idShort) === -1) {
+            this.references.push(dep);
+          }
+
+        }
+      }
+    } else if(refTo === 'servicebase') {
+      const response = await this.edit.getServiceBases() as Resource;
+      if(response && response.value) {
+        for(let dep of response.value) {
+          if(dep.idShort && this.metaTypes.indexOf(dep.idShort) === -1) {
+            this.references.push(dep);
+          }
+
+        }
+      }
+    } else if(refTo === 'meshelement') {
+      const response = await this.edit.getMeshElements() as Resource;
+      if(response && response.value) {
+        for(let dep of response.value) {
+          if(dep.idShort && this.metaTypes.indexOf(dep.idShort) === -1) {
+            this.references.push(dep);
+          }
+
+        }
+      }
+    } else if(refTo === 'meshconnector') {
+      const response = await this.edit.getMeshConnectors() as Resource;
+      if(response && response.value) {
+        for(let dep of response.value) {
+          if(dep.idShort && this.metaTypes.indexOf(dep.idShort) === -1) {
+            this.references.push(dep);
+          }
+
+        }
+      }
     }
     console.log(this.references);
   }
@@ -106,10 +175,10 @@ export class InputRefSelectComponent implements OnInit {
         idShort = this.selectedRef.idShort;
       }
       if(this.isSetOf) {
-        this.inputValues.push(idShort);
+        this.input.value.push(idShort);
       } else {
-        this.inputValues = [];
-        this.inputValues.push(idShort);
+        this.input.value = [];
+        this.input.value.push(idShort);
       }
     }
   }
@@ -118,23 +187,24 @@ export class InputRefSelectComponent implements OnInit {
 
   public addFromTextfield() {
     if(this.isSetOf || this.isSequenceOf) {
-      this.inputValues.push(this.textInput);
+      this.input.value.push(this.textInput);
     } else {
-      this.inputValues = [];
-      this.inputValues.push(this.textInput);
+      this.input.value = [];
+      this.input.value.push(this.textInput);
     }
+    console.log(this.input.value);
   }
 
   public removeInputValue(removeIndex: number) {
     let newInputs = [];
     let index = 0;
-    for(const input of this.inputValues) {
+    for(const input of this.input.value) {
       if(index != removeIndex) {
-        newInputs.push(this.inputValues[index]);
+        newInputs.push(this.input.value[index]);
       }
       index++;
     }
-    this.inputValues = newInputs;
+    this.input.value = newInputs;
   }
 
   public valueboxClass() {
@@ -150,13 +220,11 @@ export class InputRefSelectComponent implements OnInit {
 
   public displayIdShort(element: any) {
     let displayName = '';
-    console.log(element);
     if(this.refTo === 'dependency') {
       let ele = element.value.find((item: { idShort: string; value: string;}) => item.idShort === 'key');
       if(!ele) {
         ele = element.value.find((item: { idShort: string; value: string;}) => item.idShort === 'name');
       }
-      console.log(ele);
       displayName = ele.value.find((item: { idShort: string; value: string;}) => item.idShort === 'varValue').value;
     } else if(this.refTo === 'server') {
       displayName = element.idShort;
@@ -173,7 +241,7 @@ export class InputRefSelectComponent implements OnInit {
   //true: left, false: right
   public moveSequenceElement(direction: boolean, index: number) {
     console.log(this.isSequenceOf);
-    const inputValues = this.inputValues
+    const inputValues = this.input.value
     if(direction) {
       if(inputValues[index - 1]) {
         const temp = inputValues[index - 1];

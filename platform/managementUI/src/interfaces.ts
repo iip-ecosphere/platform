@@ -194,3 +194,18 @@ export interface StatusMsg {
   executionState?: string;
   messages?: string[];
 }
+
+export interface uiGroup {
+  uiGroup: number;
+  inputs: editorInput[];
+  optionalInputs: editorInput[];
+}
+
+export interface editorInput {
+  value: string[];
+  type: string;
+  name: string;
+  description: [{language: string, text: string}];
+  refTo?: boolean;
+  multipleInputs?: boolean;
+}

@@ -2,8 +2,21 @@ tr:nth-child(odd) {
   background-color: initial;
 }
 
-.InputGroup {
+.inputGroup {
   display:flex;
   justify-content: flex-start;
   flex-wrap: wrap;
+  overflow-y:hidden;
+}
+
+.inputBox {
+  min-height: 10em;
+  min-width: 16em;
+  margin-bottom: 0.5em;
+  margin-left: 0.5em;
+}
+
+.refInput {
+    min-height: 10em;
+    min-width: 32em;
 }
