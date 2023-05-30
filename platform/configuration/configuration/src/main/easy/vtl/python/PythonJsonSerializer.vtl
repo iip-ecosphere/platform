@@ -1,3 +1,4 @@
+import Basics;
 import PythonBasics;
 
 @advice(IIPEcosphere)
@@ -37,16 +38,18 @@ template PythonJsonSerializer(Configuration config, FileArtifact target, RecordT
         }
     }
 
-    // dispatch basis
+    @DispatchBasis
     def generateImports(DataType type, Boolean top) {
         ''
     }
     
+	@DispatchCase
     def generateImports(ArrayType type, Boolean top) {
-        '${generateImports(type.type, top)}'
+        '${generateImports(type.type, top)|e}'
     }
     
-    def generateImports(RecordType type, Boolean top) {
+    @DispatchBasis
+	def generateImports(RecordType type, Boolean top) {
         for (Field f: type.fields) {
             '${generateImports(f.type, false)|e}'
         }
@@ -54,28 +57,30 @@ template PythonJsonSerializer(Configuration config, FileArtifact target, RecordT
              String clsName = asTypeName(type.name);
             'from datatypes.${clsName} import ${clsName}\n'
             'from serializers.${clsName}Serializer import ${clsName}Serializer\n'
-        } else {
-            ''
         }
     }
     
     def generateReadFrom(RecordType type) {
+	    String res = "";
         for (Field f: type.fields) {
-            '${genReadFrom(f, f.type)|e}'
+            res = appendWithNewline(res, genReadFrom(f, f.type));
         }
+		res;
     }
 
-    // dispatch basis
-    def genReadFrom(Field f, DataType type) {
-        '\n'
+    @DispatchBasis
+    def String genReadFrom(Field f, DataType type) {
+        ''
     }
     
-    def genReadFrom(Field f, RecordType type) {        
+	@DispatchCase
+    def String genReadFrom(Field f, RecordType type) {
         'if "_${f.name}" in tmp:
             tmp["_${f.name}"] = ${asTypeName(type.name)}Serializer.readFrom${asTypeName(type.name)}(tmp["_${f.name}"])'
     }
     
-    def genReadFrom(Field f, ArrayType type) {
+    @DispatchCase
+	def String genReadFrom(Field f, ArrayType type) {
         'if "_${f.name}" in tmp:
             tmplist = tmp["_${f.name}"]
             tmp["_${f.name}"] = []
@@ -92,17 +97,20 @@ template PythonJsonSerializer(Configuration config, FileArtifact target, RecordT
     }
     
     def generateWriteTo(RecordType type) {
+	    String res = "";
         for (Field f: type.fields) {
-            '${genWriteTo(f, f.type)|e}'
+            res = appendWithNewline(res, genWriteTo(f, f.type));
         }
+		res;
     }
 
-    // dispatch basis
-    def genWriteTo(Field f, DataType type) {
+    @DispatchBasis
+    def String genWriteTo(Field f, DataType type) {
         ''
     }
 
-    def genWriteTo(Field f, RecordType type) {
+    @DispatchCase
+    def String genWriteTo(Field f, RecordType type) {
         'if "_${f.name}" in tmp:
             tmp["_${f.name}"] = ${asTypeName(type.name)}Serializer.writeTo${asTypeName(type.name)}(tmp["_${f.name}"])'
     }
@@ -147,7 +155,7 @@ template PythonJsonSerializer(Configuration config, FileArtifact target, RecordT
                 result = dict()
                 for key in o.__dict__:
                     k = key[1:] # by generation convention
-                    result[k] = o.__dict__[key]'    
+                    result[k] = o.__dict__[key]'
     }
 
     def main(Configuration config, FileArtifact target, RecordType type, Boolean sharedInterfaces) {
