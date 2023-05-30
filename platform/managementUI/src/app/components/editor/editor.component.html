@@ -25,14 +25,29 @@
   </table>
 </mat-card>
 
+<!-- <div class="inputGroup">
+<mat-card *ngFor="let input of inputs1; let i = index">
+<mat-card-header>{{ input.idShort }}</mat-card-header>
+<mat-card-actions>
+  <mat-form-field appearance="outline">
+    <mat-label *ngIf="input.value && input.idShort">{{ input.idShort }}</mat-label>
+    <input matInput [matTooltip]="input.description[0].text + ' ' + input.description[0].language" type="text" [(ngModel)]=inputValues[i] />
+  </mat-form-field>
+  <ng-template>
+    <app-input-ref-select [textfield]="true" [input]="input"></app-input-ref-select>
+  </ng-template>
+</mat-card-actions>
+</mat-card>
+</div> -->
+
 <div *ngIf="selectedType && inputs[0]">
   <table>
-    <tr *ngFor="let input of inputs">
+    <tr *ngFor="let input of inputs; let i = index">
       <td><span>{{input.idShort}}</span></td>
       <td>
         <mat-form-field appearance="outline">
           <mat-label *ngIf="input.value && input.idShort">{{ input.idShort }}</mat-label>
-          <input matInput [matTooltip]="input.description[0].text + ' ' + input.description[0].language" type="text" [(ngModel)]=input.value />
+          <input matInput [matTooltip]="input.description[0].text + ' ' + input.description[0].language" type="text" [(ngModel)]=inputValues[i] />
         </mat-form-field>
       </td>
   </tr>

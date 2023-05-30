@@ -29,6 +29,8 @@ export class EditorComponent implements OnInit {
   inputs2Opt: ResourceAttribute[] = [];
   inputReferenceTo2Opt: ResourceAttribute[] = [];
 
+  inputValues: any[] = []
+
   metaTypes = ['metaState', 'metaProject', 'metaSize', 'metaType', 'metaRefines', 'metaAbstract'];
 
   constructor(private route: ActivatedRoute, private api: ApiService, public dialog: MatDialogRef<EditorComponent>) { }
@@ -51,9 +53,12 @@ export class EditorComponent implements OnInit {
 
     const selectedType = this.selectedType;
     if(selectedType && selectedType.value) {
+
       for(const input of selectedType.value) {
         if(input.idShort && this.metaTypes.indexOf(input.idShort) === -1) {
-          let value = input.value.toString().toLocaleLowerCase();
+          let value = input.value.find((item: { idShort: string; }) => item.idShort === 'type')?.value
+          value = value.toString().toLocaleLowerCase();
+          this.inputValues.push(value);
           if(value.indexOf('refto') >= 0 || value.indexOf('sequenceof') >= 0) {
             this.inputReferenceTo.push(input);
           } else {
@@ -66,6 +71,15 @@ export class EditorComponent implements OnInit {
         }
         }
     }
+  }
+
+  public displayName(property: Resource) {
+    let displayName = '';
+    if(property.value) {
+      displayName = property.value.find(item => item.idShort === 'name')?.value;
+    }
+    return displayName;
+
   }
 
   public create() {

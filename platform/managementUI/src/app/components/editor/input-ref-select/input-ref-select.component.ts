@@ -29,18 +29,22 @@ export class InputRefSelectComponent implements OnInit {
   constructor(private edit: EditorService) { }
 
   ngOnInit(): void {
-    this.init(this.input.value);
+    let value = this.input.value.find((item: { idShort: string; }) => item.idShort === 'type')?.value;
+    value = value.toString().toLocaleLowerCase();
+    this.init(value);
 
-    if(this.input.description && this.input.description[0]) {
-      this.tooltip =this.input.description[0].language + ', ' + this.input.description[0].text;
-    } else if (this.input.description && typeof(this.input.description) === 'string' ) {
-      this.tooltip = this.input.description;
+    let name = this.input.value.find((item: { idShort: string; }) => item.idShort === 'name');
+    if(name && name.description[0]) {
+      this.tooltip = name.description[0].language + ', ' + name.description[0].text;
+    } else if (name.description && typeof(name.description) === 'string' ) {
+      this.tooltip = name.description;
     }
   }
 
   private init(value: string) {
     value = value.toLowerCase();
     console.log(value);
+
     if(value) {
       if(value.indexOf('refto') >= 0) {
         if(value.indexOf('setof') >= 0) {
@@ -148,7 +152,12 @@ export class InputRefSelectComponent implements OnInit {
     let displayName = '';
     console.log(element);
     if(this.refTo === 'dependency') {
-      displayName = element.value.find((item: { idShort: string; value: string;}) => item.idShort === 'varValue').value;
+      let ele = element.value.find((item: { idShort: string; value: string;}) => item.idShort === 'key');
+      if(!ele) {
+        ele = element.value.find((item: { idShort: string; value: string;}) => item.idShort === 'name');
+      }
+      console.log(ele);
+      displayName = ele.value.find((item: { idShort: string; value: string;}) => item.idShort === 'varValue').value;
     } else if(this.refTo === 'server') {
       displayName = element.idShort;
     }
