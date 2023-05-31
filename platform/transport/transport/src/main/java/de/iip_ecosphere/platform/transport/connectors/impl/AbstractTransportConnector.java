@@ -162,6 +162,8 @@ public abstract class AbstractTransportConnector implements TransportConnector {
     public void unsubscribe(String stream, boolean delete) throws IOException {
         callbacks.remove(stream);
     }
+    
+    // checkstyle: stop exception type check
 
     @Override
     public void disconnect() throws IOException {
@@ -173,11 +175,16 @@ public abstract class AbstractTransportConnector implements TransportConnector {
                 } catch (IOException e) {
                     LoggerFactory.getLogger(getClass()).warn("While disconnecting/unsubscribing '" 
                         + stream + "': " + e.getMessage());
+                } catch (RuntimeException e) {
+                    LoggerFactory.getLogger(getClass()).warn("While disconnecting/unsubscribing '" 
+                        + stream + "': " + e.getMessage());
                 }
             }
         }
     }
 
+    // checkstyle: resume exception type check
+    
     /**
      * Returns the transport parameters.
      * 
