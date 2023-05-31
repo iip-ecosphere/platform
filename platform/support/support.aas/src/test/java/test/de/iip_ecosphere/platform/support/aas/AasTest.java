@@ -280,8 +280,8 @@ public class AasTest {
             .start();
 
         queryAas(registryEndpoint, machine);
-        httpServer.stop(true);
-        ccServer.stop(true);
+        Server.stop(httpServer, true);
+        Server.stop(ccServer, true);
     }
     
     /**

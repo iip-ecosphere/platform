@@ -33,7 +33,7 @@ public class NoOpServerTest {
         Server server = new NoOpServer();
         Assert.assertEquals(server, server.start());
         server.stop(true);
-        server.stop(false); // does not matter
+        Server.stop(server, false); // does not matter
     }
 
 }
