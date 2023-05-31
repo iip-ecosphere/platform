@@ -30,7 +30,8 @@ import org.junit.runners.Suite;
     ResourceLoaderTest.class,
     PythonUtilsTest.class,
     NetUtilsTest.class,
-    SchemaServerEndpointTest.class
+    SchemaServerEndpointTest.class,
+    ServerTest.class
 })
 public class AllTests {
 }
