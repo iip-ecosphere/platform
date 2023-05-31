@@ -173,6 +173,8 @@ public class PythonWsProcessService extends PythonAsyncProcessService {
      */
     private class WebSocket extends WebSocketClient {
 
+        private ObjectMapper objectMapper = new ObjectMapper();
+
         /**
          * Creates a web socket for the given server URI.
          * 
@@ -199,7 +201,6 @@ public class PythonWsProcessService extends PythonAsyncProcessService {
         @Override
         public void onMessage(String message) {
             try {
-                ObjectMapper objectMapper = new ObjectMapper();
                 OutData data = objectMapper.readValue(message, OutData.class);
                 OutTypeInfo<?> info = getOutTypeInfo(data.getType());
                 info.validateAndIngest(data.getType(), data.getData());

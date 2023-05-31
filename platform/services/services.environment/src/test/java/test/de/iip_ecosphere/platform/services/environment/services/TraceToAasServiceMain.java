@@ -148,7 +148,7 @@ public class TraceToAasServiceMain {
         registryServer.stop(true);
         aasServer.stop(true);        
         qpid.stop(true);
-        
+        Transport.releaseConnector(false);  // allow for reuse, next test
     }
     
     /**

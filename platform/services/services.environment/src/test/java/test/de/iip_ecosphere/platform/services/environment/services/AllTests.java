@@ -20,7 +20,8 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    TraceToAasServiceTest.class
+    TraceToAasServiceTest.class,
+    TransportToWsConverterTest.class
 })
 public class AllTests {
 }
