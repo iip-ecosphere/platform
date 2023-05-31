@@ -13,17 +13,26 @@ mat-raised-button color="success"
         </span>
       </ng-template>
 
+      <!-- TODO probably delete
       <div *ngIf="tab.tabName == 'Meshes'">
         <button mat-raised-button style="background-color: rgb(35, 142, 184)"
           (click)="createMesh()" disabled>
           new mesh
         </button>
       </div>
+      -->
+
+      <div *ngIf="tab.tabName"> <!--TODO make it visible together with table-->
+        <button mat-raised-button color="success"
+        style="background-color: rgb(35, 142, 184)"
+        (click)="new()">new
+        </button>
+      </div>
+
 
       <!-- Table -->
       <table style="margin: 0px;">
         <tr *ngFor="let item of filteredData; let i = index">
-
           <td style="width: 2%; text-align: center;"> {{i + 1}} </td>
 
           <!-- Item -->

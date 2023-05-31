@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { ApiService } from 'src/app/services/api.service';
-import { Resource, uiGroup, editorInput } from 'src/interfaces';
+import { Resource, uiGroup, editorInput, ResourceAttribute } from 'src/interfaces';
 
 @Component({
   selector: 'app-editor',
@@ -11,26 +11,32 @@ import { Resource, uiGroup, editorInput } from 'src/interfaces';
 })
 export class EditorComponent implements OnInit {
 
-  category = 'all';
+  category: string = 'all';
   meta: Resource | undefined;
   selectedType: Resource | undefined;
 
   uiGroups: uiGroup[] = [];
 
-  metaTypes = ['metaState', 'metaProject', 'metaSize', 'metaType', 'metaRefines', 'metaAbstract'];
+  metaTypes = ['metaState', 'metaProject',
+    'metaSize', 'metaType', 'metaRefines', 'metaAbstract'];
 
-  constructor(private route: ActivatedRoute, private api: ApiService, public dialog: MatDialogRef<EditorComponent>) { }
+  constructor(private route: ActivatedRoute,
+    private api: ApiService,
+    public dialog: MatDialogRef<EditorComponent>) { }
 
   ngOnInit(): void {
     this.getMeta();
+    /*
     const category = this.route.snapshot.paramMap.get('ls');
     if(category && category != '') {
       this.category = category;
     }
+    */
   }
 
   private async getMeta() {
       this.meta = await this.api.getMeta();
+      this.filterMeta()
   }
 
   public generateInputs() {
@@ -42,28 +48,39 @@ export class EditorComponent implements OnInit {
       for(const input of selectedType.value) {
         if(input.idShort && this.metaTypes.indexOf(input.idShort) === -1) {
           let isOptional = false;
-          let uiGroup: number = input.value.find((item: { idShort: string; }) => item.idShort === 'uiGroup')?.value
+          let uiGroup: number = input.value.find(
+            (item: { idShort: string; }) => item.idShort === 'uiGroup')?.value
 
           if(uiGroup < 0) {
             isOptional = true;
             uiGroup = uiGroup * -1;
           }
-          let uiGroupCompare =  this.uiGroups.find(item => item.uiGroup === uiGroup);
+          let uiGroupCompare =  this.uiGroups.find(
+            item => item.uiGroup === uiGroup);
           console.log(uiGroup);
           console.log(uiGroupCompare);
 
 
-          let editorInput: editorInput = {name: '', type: '', value:[], description: [{language: '', text: ''}], refTo: false, multipleInputs: false};
-          let name = input.value.find((item: { idShort: string; }) => item.idShort === 'name')
+          let editorInput: editorInput =
+            {name: '', type: '', value:[], description:
+              [{language: '', text: ''}],
+              refTo: false, multipleInputs: false};
+          let name = input.value.find(
+            (item: { idShort: string; }) => item.idShort === 'name')
           editorInput.name = name.value;
-          if(name.description && name.description[0] && name.description[0].text && name.description[0].language) {
+          if(name.description
+            && name.description[0]
+            && name.description[0].text
+            && name.description[0].language) {
             editorInput.description = name.description;
           }
-          editorInput.type = input.value.find((item: { idShort: string; }) => item.idShort === 'type')?.value
+          editorInput.type = input.value.find(
+            (item: { idShort: string; }) => item.idShort === 'type')?.value
           if(editorInput.type.indexOf('refTo') >= 0) {
             editorInput.refTo = true;
           }
-          if(editorInput.type.indexOf('setOf') >= 0 || editorInput.type.indexOf('sequenceOf') >= 0) {
+          if(editorInput.type.indexOf('setOf') >= 0
+            || editorInput.type.indexOf('sequenceOf') >= 0) {
             editorInput.multipleInputs = true;
           }
           if(!uiGroupCompare ){
@@ -90,6 +107,7 @@ export class EditorComponent implements OnInit {
           }
         }
         }
+        console.log("ui groups")
         console.log(this.uiGroups);
     }
   }
@@ -97,10 +115,35 @@ export class EditorComponent implements OnInit {
   public displayName(property: Resource) {
     let displayName = '';
     if(property.value) {
-      displayName = property.value.find(item => item.idShort === 'name')?.value;
+      displayName = property.value.find(
+        item => item.idShort === 'name')?.value;
     }
     return displayName;
 
+  }
+
+  filters = [
+    {cat: "Setup", value: ""},
+    {cat: "Constants", value: ""},
+    {cat: "Types", value: "DataType"},
+    {cat: "Dependencies", value: "Dependency"},
+    {cat: "Nameplates", value: "NameplateInfo"},
+    {cat: "Services", value: "JavaService"},
+    {cat: "Servers", value: "JavaServer"},
+    {cat: "Meshes", value: "ServiceMesh"},
+    {cat: "Applications", value: "Application"}
+  ]
+
+  public filterMeta() {
+    let filter = this.filters.find(item => item.cat === this.category)?.value
+    if (this.meta && filter != "") {
+      let temp = this.meta.value
+      if (temp) {
+        let tempValues = temp.find(
+          item => item.idShort === filter) as ResourceAttribute
+        this.meta!.value = [tempValues]
+      }
+    }
   }
 
   public create() {

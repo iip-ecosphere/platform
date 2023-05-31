@@ -17,7 +17,8 @@ import { EditorComponent } from '../editor/editor.component';
 export class ListComponent implements OnInit {
   ip: string = "";
   urn: string = "";
-  currentTab: string | null = null;
+  //currentTab: string | null = null;
+  currentTab = "";
   rawData: any;
   filteredData: any;
   varValue = "varValue"
@@ -356,6 +357,14 @@ export class ListComponent implements OnInit {
       height: '90%',
       width:  '90%',
     })
+  }
+
+  public new() {
+    let dialogRef = this.dialog.open(EditorComponent, {
+      height: '90%',
+      width:  '90%',
+    })
+    dialogRef.componentInstance.category = this.currentTab;
   }
 
   // ---- icons ------------------------------------------------------------------
