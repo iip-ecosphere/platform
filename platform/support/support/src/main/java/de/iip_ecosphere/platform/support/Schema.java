@@ -40,6 +40,11 @@ public enum Schema {
     SSL("ssl://", true),
     
     /**
+     * Non-encrypted websockets.
+     */
+    WS("ws://", false),
+    
+    /**
      * Use whatever you like.
      */
     IGNORE("", false);
