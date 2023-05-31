@@ -24,12 +24,16 @@ import org.junit.Test;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.services.environment.Starter;
 import de.iip_ecosphere.platform.services.environment.services.TraceToAasService;
+import de.iip_ecosphere.platform.services.environment.services.TransportConverter;
+import de.iip_ecosphere.platform.support.Endpoint;
+import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.ApplicationSetup;
 import de.iip_ecosphere.platform.support.iip_aas.PlatformAas;
@@ -100,7 +104,15 @@ public class TraceToAasServiceTest {
         Assert.assertNotNull(prop);
         Assert.assertEquals(app.getName(), prop.getValue());
 
+        SubmodelElementCollectionBuilder epBuilder = submodel.createSubmodelElementCollectionBuilder(
+            "endpoints", false, false); // submodel does not matter
+        TransportConverter.addEndpointToAas(epBuilder, null);
+        TransportConverter.addEndpointToAas(epBuilder, new Endpoint(Schema.HTTP, Endpoint.LOCALHOST, 1234, ""));
+        TransportConverter.addEndpointToAas(epBuilder, new Endpoint(Schema.WS, Endpoint.LOCALHOST, 1235, "/myPath"));
+        epBuilder.build();
+        
         submodel = aas.getSubmodel(TraceToAasService.SUBMODEL_TRACES);
+
         // initial comparison/testing
         Map<String, SubmodelElementCollection> elts = new HashMap<String, SubmodelElementCollection>();
         for (SubmodelElement e : submodel.submodelElements()) {

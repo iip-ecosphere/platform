@@ -18,11 +18,17 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.slf4j.LoggerFactory;
 
+import de.iip_ecosphere.platform.support.Endpoint;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
+import de.iip_ecosphere.platform.support.aas.Type;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.function.IOConsumer;
+import de.iip_ecosphere.platform.support.iip_aas.AasUtils;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.transport.Transport;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
@@ -174,22 +180,29 @@ public abstract class TransportConverter<T> {
      * 
      * @author Holger Eichelberger, SSE
      */
-    public interface Watcher {
+    public interface Watcher<T> {
         
         /**
          * Starts the watcher.
          * 
          * @return <b>this</b>
          */
-        public Watcher start();
+        public Watcher<T> start();
 
         /**
          * Stops the watcher.
          * 
          * @return <b>this</b>
          */
-        public Watcher stop();
+        public Watcher<T> stop();
 
+        /**
+        * Defines a consumer for the watched information.
+        * 
+        * @param consumer the consumer or <b>null</b> for none
+        */
+        public void setConsumer(Consumer<T> consumer);
+        
     }
     
     /**
@@ -292,11 +305,59 @@ public abstract class TransportConverter<T> {
     }
     
     /**
+     * Returns the server endpoint to connect to.
+     * 
+     * @return the server endpoint, may be <b>null</b> for none, in particular if this connector is hosted by an AAS
+     */
+    public Endpoint getEndpoint() {
+        return null;
+    }
+    
+    /**
      * Creates a watcher instance.
      * 
      * @param period the watching period in ms
      * @return the watcher
      */
-    public abstract Watcher createWatcher(int period);
+    public abstract Watcher<T> createWatcher(int period);
+    
+    /**
+     * Adds an endpoint to a given (endpoint) submodel/elements collection.
+     * 
+     * @param smBuilder the submodel/elements collection builder
+     * @param endpoint the endpoint, may be <b>null</b>
+     */
+    public static void addEndpointToAas(SubmodelElementContainerBuilder smBuilder, Endpoint endpoint) {
+        if (null != endpoint) {
+            String id = endpoint.getEndpoint();
+            while (id.startsWith("/")) {
+                id = id.substring(1);
+            }
+            if (id.length() == 0) {
+                id = String.valueOf(System.currentTimeMillis()); // just as fallback
+            }
+            
+            SubmodelElementCollectionBuilder eBuilder = smBuilder.createSubmodelElementCollectionBuilder(
+                AasUtils.fixId(id), false, false);
+            
+            eBuilder.createPropertyBuilder("schema")
+                .setValue(Type.STRING, endpoint.getSchema().name())
+                .build();
+            eBuilder.createPropertyBuilder("host")
+                .setValue(Type.STRING, endpoint.getHost())
+                .build();
+            eBuilder.createPropertyBuilder("port")
+                .setValue(Type.INT32, endpoint.getPort())
+                .build();
+            eBuilder.createPropertyBuilder("path")
+                .setValue(Type.STRING, endpoint.getEndpoint())
+                .build();
+            eBuilder.createPropertyBuilder("uri")
+                .setValue(Type.STRING, endpoint.toUri())
+                .build();
+            
+            eBuilder.build();
+        }
+    }
 
 }

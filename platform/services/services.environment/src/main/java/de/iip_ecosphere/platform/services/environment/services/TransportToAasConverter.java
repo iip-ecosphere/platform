@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -41,7 +42,15 @@ import de.iip_ecosphere.platform.support.iip_aas.AasUtils;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
 
 /**
- * Implements a generic converter from transport stream entries to AAS.
+ * Implements a generic converter from transport stream entries to AAS. Specific types may require an own
+ * type/value converter to AAS which can be attached to the converter instance. The actual implementation relies on
+ * dedicated entries in a given submodel, which may be resource consuming and cause conflicts with the
+ * AAS server when regularly cleaning up the entries. Thus, it is not recommended to use this until the
+ * underlying AAS implementation offers application-specific AAS events. The related {@link Watcher}
+ * ignores the attachable consumer and uses {@link #doWatch(SubmodelElementCollection, long)} instead to
+ * avoid converting submodel elements back to instances of the data type {@code T}.
+ * 
+ * Recommendation: If adequate, use {@link TransportToWsConverter} instead.
  * 
  * @param <T> the data type
  * @author Holger Eichelberger, SSE
@@ -445,7 +454,7 @@ public abstract class TransportToAasConverter<T> extends TransportConverter<T> {
      * 
      * @author Holger Eichelberger, SSE
      */
-    protected class AasWatcher implements Watcher {
+    protected class AasWatcher implements Watcher<T> {
 
         private Timer timer;
         private int period;
@@ -461,7 +470,7 @@ public abstract class TransportToAasConverter<T> extends TransportConverter<T> {
         }
         
         @Override
-        public Watcher start() {
+        public Watcher<T> start() {
             timer = new Timer();
             timer.schedule(new TimerTask() {
 
@@ -489,15 +498,20 @@ public abstract class TransportToAasConverter<T> extends TransportConverter<T> {
         }
 
         @Override
-        public Watcher stop() {
+        public Watcher<T> stop() {
             timer.cancel();
             return this;
+        }
+
+        @Override
+        public void setConsumer(Consumer<T> consumer) {
+            // ignore for doWatch
         }
         
     }
     
     @Override
-    public Watcher createWatcher(int period) {
+    public Watcher<T> createWatcher(int period) {
         return new AasWatcher(period);
     }
 
