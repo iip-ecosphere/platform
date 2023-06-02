@@ -26,22 +26,22 @@ import java.util.function.Function;
 
 import org.java_websocket.WebSocket;
 import org.java_websocket.client.WebSocketClient;
+import org.java_websocket.exceptions.WebsocketNotConnectedException;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.handshake.ServerHandshake;
 import org.java_websocket.server.WebSocketServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
+import de.iip_ecosphere.platform.transport.serialization.GenericJsonToStringTranslator;
+import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
 
 /**
- * Transport converter for websockets. Use {@link #createServer(Endpoint)} to create a server.
+ * Transport converter for websockets. Use {@link #createServer(ServerAddress)} to create a server.
  * 
  * @param <T> the data type
  * @author Holger Eichelberger, SSE
@@ -50,18 +50,39 @@ public class TransportToWsConverter<T> extends TransportConverter<T> {
 
     private Endpoint endpoint;
     private SenderClient sender;
-    private ObjectMapper objectMapper = new ObjectMapper();
-    
+    private boolean notConnectedError = false;
+    private TypeTranslator<T, String> typeTranslator;
+
     /**
      * Creates a transport to web socket converter running the server in this instance.
+     * The type translator will be the default one from 
+     * {@link #TransportToWsConverter(String, Class, Endpoint, TypeTranslator))}.
      * 
      * @param transportStream the transport stream to listen on
      * @param dataType the data type to listen for
      * @param endpoint the server endpoint
      */
     public TransportToWsConverter(String transportStream, Class<T> dataType, Endpoint endpoint) {
+        this(transportStream, dataType, endpoint, null);
+    }
+
+    /**
+     * Creates a transport to web socket converter running the server in this instance.
+     * 
+     * @param transportStream the transport stream to listen on
+     * @param dataType the data type to listen for
+     * @param endpoint the server endpoint
+     * @param translator the optional type translator; if not given, {@link GenericJsonToStringTranslator} will be used
+     */
+    public TransportToWsConverter(String transportStream, Class<T> dataType, Endpoint endpoint, 
+        TypeTranslator<T, String> translator) {
         super(transportStream, dataType);
         this.endpoint = endpoint;
+        if (null == translator) {
+            this.typeTranslator = new GenericJsonToStringTranslator<>(dataType);
+        } else {
+            this.typeTranslator = translator;
+        }
     }
 
     /**
@@ -120,9 +141,15 @@ public class TransportToWsConverter<T> extends TransportConverter<T> {
     @Override
     protected void handleNew(T data) {
         try {
-            sender.send(objectMapper.writeValueAsString(data));
-        } catch (JsonProcessingException e) {
+            sender.send(typeTranslator.to(data));
+            notConnectedError = false;
+        } catch (IOException e) {
             getLogger().error("Cannot write data: {}", e.getMessage());
+        } catch (WebsocketNotConnectedException e) {
+            if (!notConnectedError) {
+                getLogger().error("Cannot write data, not connected: {}", e.getMessage());
+                notConnectedError = true;
+            }
         }
     }
 
@@ -263,7 +290,7 @@ public class TransportToWsConverter<T> extends TransportConverter<T> {
         @Override
         public void onMessage(String message) {
             try {
-                T data = objectMapper.readValue(message, getType());
+                T data = typeTranslator.from(message);
                 consumer.accept(data);
             } catch (IOException e) {
                 getLogger().error("While ingesting result data: {}", e.getMessage());
