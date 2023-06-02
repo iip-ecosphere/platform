@@ -129,7 +129,11 @@ public class PlatformAasTest {
         Assert.assertEquals(0, instClient.getInstanceCount("app-1", "plan-1"));
         
         String id1 = ApplicationInstanceAasConstructor.notifyAppNewInstance("app-1", "plan-1");
-        Assert.assertNull(id1); // it's the first one
+        if (ApplicationInstanceAasConstructor.firstAppWithoutAppId()) {
+            Assert.assertNull(id1); // it's the first one
+        } else {
+            Assert.assertNotNull(id1);
+        }
         String id2 = ApplicationInstanceAasConstructor.notifyAppNewInstance("app-1", "plan-1");
         Assert.assertNotNull(id2);
         

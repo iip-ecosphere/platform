@@ -41,6 +41,16 @@ public class ApplicationInstanceAasConstructor {
     public static final String NAME_PROP_INSTANCEID = "instanceId";
     public static final String NAME_PROP_TIMESTAMP = "timestamp";
 
+    
+    /**
+     * Returns whether the first application shall receive an app id.
+     * 
+     * @return {@code true} for no app id, {@code false} else (default)
+     */
+    public static boolean firstAppWithoutAppId() {
+        return Boolean.valueOf(OsUtils.getPropertyOrEnv("iip.firstWithoutAppId", "false"));
+    }
+    
     /**
      * Called to notify that a new instance of the application <code>appId</code> is about to be started.
      * 
@@ -53,8 +63,7 @@ public class ApplicationInstanceAasConstructor {
         AtomicReference<String> result = new AtomicReference<String>(null);
         ActiveAasBase.processNotification(NAME_SUBMODEL_APPINSTANCES, NotificationMode.SYNCHRONOUS, (sub, aas) -> {
             // -1 is legacy, may fail when further app uses same services
-            int newId = Boolean.valueOf(OsUtils.getPropertyOrEnv("iip.firstWithoutAppId", "false")) 
-                && sub.getSubmodelElementsCount() == 0 ? 0 : 1; 
+            int newId = firstAppWithoutAppId() && sub.getSubmodelElementsCount() == 0 ? 0 : 1; 
             String propMaxId = AasUtils.fixId(appId + "_max");
             Property propMax = sub.getProperty(propMaxId);
             if (null == propMax) {
