@@ -544,11 +544,10 @@ class CliBackend {
             }
             ExecutorService es = p.isParallelize() ? Executors.newCachedThreadPool() : null;
             List<StartServicesRunnable> runnables = new ArrayList<>();
-            Map<String, String> options = getStartOptions(p);
+            Map<String, String> opt = getStartOptions(p);
             for (ServiceResourceAssignment a: p.getAssignments()) {
                 StartServicesRunnable r = new StartServicesRunnable(a.getResource(),
-                    serviceClients.get(a.getResource()), a.getServicesAsArray(p.getAppId(), appInstanceId), 
-                        options);
+                    serviceClients.get(a.getResource()), a.getServicesAsArray(p.getAppId(), appInstanceId), opt);
                 runnables.add(r);
                 if (null != es) {
                     es.execute(r);
@@ -569,16 +568,7 @@ class CliBackend {
                     throw new ExecutionException(e);
                 }
             }
-            String msg = "";
-            for (StartServicesRunnable r : runnables) {
-                String tmp = r.getExceptionMessage();
-                if (null != tmp) {
-                    if (msg.length() > 0) {
-                        msg = msg + ", ";
-                    }
-                    msg = msg + tmp;
-                }
-            }
+            String msg = collectExceptionMessages(runnables);
             if (msg.length() > 0) {
                 PlatformAas.notifyAppInstanceStopped(p.getAppId(), appInstanceId);
                 throw new ExecutionException(msg, null);
@@ -588,6 +578,26 @@ class CliBackend {
             throw new ExecutionException(e);
         }
         return appInstanceId;
+    }
+    
+    /**
+     * Collects the exception messages of {@code runnables}.
+     * 
+     * @param runnables the runnables
+     * @return the messages, may be empty for none
+     */
+    private static String collectExceptionMessages(List<StartServicesRunnable> runnables) {
+        String msg = "";
+        for (StartServicesRunnable r : runnables) {
+            String tmp = r.getExceptionMessage();
+            if (null != tmp) {
+                if (msg.length() > 0) {
+                    msg = msg + ", ";
+                }
+                msg = msg + tmp;
+            }
+        }
+        return msg;
     }
     
     /**
@@ -646,12 +656,15 @@ class CliBackend {
                 Set<String> done = new HashSet<String>();
                 for (ServiceResourceAssignment a: p.getAssignments()) {
                     String resourceId = a.getResource();
-                    if (!done.contains(resourceId) && !isStillRunning(stillRunning, resourceId)) {
+                    boolean alreadyDone = done.contains(resourceId);
+                    if (!alreadyDone && !isStillRunning(stillRunning, resourceId)) {
                         done.add(resourceId);
                         URI art = getArtifact(artifact, a);
                         String uri = art.normalize().toString();
                         println("Removing artifact " + art + " from " + resourceId);
                         serviceClients.get(resourceId).removeArtifact(uri); // works also with Artifact URI
+                    } else if (!alreadyDone) {
+                        println("Not removing artifact from " + resourceId + " as there is still a running instance");
                     }
                 }
             }

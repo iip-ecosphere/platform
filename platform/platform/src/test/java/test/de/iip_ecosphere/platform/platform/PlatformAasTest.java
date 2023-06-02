@@ -37,6 +37,7 @@ import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
+import de.iip_ecosphere.platform.support.iip_aas.ApplicationInstanceAasConstructor;
 import de.iip_ecosphere.platform.transport.Transport;
 import test.de.iip_ecosphere.platform.test.amqp.qpid.TestQpidServer;
 
@@ -106,7 +107,11 @@ public class PlatformAasTest {
         AasPartRegistry.remoteDeploy(res.getAas()); 
 
         String id1 = PlatformAas.notifyAppNewInstance("app-1", "plan-1");
-        Assert.assertNull(id1); // it's the first one
+        if (ApplicationInstanceAasConstructor.firstAppWithoutAppId()) {
+            Assert.assertNull(id1); // it's the first one
+        } else {
+            Assert.assertNotNull(id1); // it's the first one
+        }        
         String id2 = PlatformAas.notifyAppNewInstance("app-1", "plan-1");
         Assert.assertNotNull(id2);
         

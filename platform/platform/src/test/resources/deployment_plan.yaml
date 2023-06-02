@@ -4,12 +4,13 @@ disabled: false
 appId: TestApp
 version: 0.1.0
 description: Just a test deployment
-artifact: file:/W:/offlineFiles/git/IIP-ecosphere/platform/platform/configuration/configuration/gen/tests/SimpleMesh/SimpleMeshTestingApp/target/SimpleMeshTestingApp-0.1.0-SNAPSHOT-bin.jar
+artifact: file:/W:/offlineFiles/git/IIP-ecosphere/platform/platform/configuration/configuration/gen/tests/SimpleMesh3/SimpleMeshTestingApp3/target/SimpleMeshTestingApp3-0.1.0-SNAPSHOT-bin.jar
 parallelize: true
 onUndeployRemoveArtifact: true
 assignments:
   - resource: 72A8D3D50B3D
     services:
-      - SimpleSource
-      - SimpleReceiver
+      - SimpleSource3
+      - SimpleTransformer3
+      - SimpleReceiver3
 

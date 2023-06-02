@@ -23,11 +23,12 @@ import de.iip_ecosphere.platform.ecsRuntime.EcsCmdLineLifecycleDescriptor;
 import de.iip_ecosphere.platform.ecsRuntime.EcsLifecycleDescriptor;
 import de.iip_ecosphere.platform.services.ServicesAas;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.HeartbeatWatcher;
+import de.iip_ecosphere.platform.services.environment.services.TransportToWsConverter;
 import de.iip_ecosphere.platform.support.LifecycleExclude;
-import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.AbstractAasLifecycleDescriptor;
 import de.iip_ecosphere.platform.support.iip_aas.IipVersion;
 import de.iip_ecosphere.platform.transport.Transport;
+import de.iip_ecosphere.platform.transport.status.StatusMessage;
 
 /**
  * This descriptor is responsible for creating the AAS of the platform.
@@ -39,7 +40,7 @@ public class PlattformAasLifecycleDescriptor extends AbstractAasLifecycleDescrip
 
     private Timer timer = new Timer();
     private HeartbeatWatcher watcher = new HeartbeatWatcher();
-    private StatusConverter statusConverter = new StatusConverter();
+    private TransportToWsConverter<StatusMessage> traceConverter;
     
     /**
      * Creates AAS an instance for the service manager.
@@ -80,14 +81,16 @@ public class PlattformAasLifecycleDescriptor extends AbstractAasLifecycleDescrip
         }
         
         final long statusTimeout = PlatformSetup.getInstance().getAasStatusTimeout();
-        statusConverter.setTimeout(statusTimeout); 
-        statusConverter.start(getAasSetup(), false);
-        timer.schedule(new TimerTask() {
+        traceConverter = new TransportToWsConverter<>(StatusMessage.STATUS_STREAM, StatusMessage.class, 
+            PlatformSetup.getInstance().getStatusGatewayEndpoint());
+        traceConverter.setTimeout(statusTimeout);
+        traceConverter.start(getAasSetup(), false);
+        /*timer.schedule(new TimerTask() {
 
             @Override
             public void run() {
                 try {
-                    statusConverter.cleanup(AasPartRegistry.retrieveIipAas());
+                    StatusConverter.INSTANCE.cleanup(AasPartRegistry.retrieveIipAas());
                 } catch (IOException e) {
                     LoggerFactory.getLogger(PlattformAasLifecycleDescriptor.class)
                         .error("Cannot clean up status submodel: {}", e.getMessage());
@@ -95,11 +98,13 @@ public class PlattformAasLifecycleDescriptor extends AbstractAasLifecycleDescrip
             }
             
         }, statusTimeout, statusTimeout);
+        */
     }
     
     @Override
     public void shutdown() {
-        statusConverter.stop();
+        //StatusConverter.INSTANCE.stop();
+        traceConverter.stop();
         timer.cancel();
         try {
             watcher.uninstallFrom(Transport.getConnector());

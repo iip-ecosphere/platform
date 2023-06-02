@@ -20,6 +20,7 @@ import java.util.concurrent.ExecutionException;
 
 import de.iip_ecosphere.platform.platform.ArtifactsManager.Artifact;
 import de.iip_ecosphere.platform.services.ServiceManager;
+import de.iip_ecosphere.platform.services.environment.services.TransportConverter;
 import de.iip_ecosphere.platform.support.TaskRegistry;
 import de.iip_ecosphere.platform.support.TaskRegistry.TaskData;
 import de.iip_ecosphere.platform.support.aas.Aas;
@@ -123,7 +124,12 @@ public class PlatformAas implements AasContributor {
         smB.build();
         
         // just that they are there
-        aasBuilder.createSubmodelBuilder(NAME_SUBMODEL_STATUS, null).build();
+        SubmodelBuilder statusBuilder = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL_STATUS, null);
+        SubmodelElementCollectionBuilder statusEndpoints = statusBuilder.createSubmodelElementCollectionBuilder(
+            "endpoints", false, false);
+        TransportConverter.addEndpointToAas(statusEndpoints, PlatformSetup.getInstance().getStatusGatewayEndpoint());
+        statusEndpoints.build();
+        statusBuilder.build();
         aasBuilder.createSubmodelBuilder(ApplicationInstanceAasConstructor.NAME_SUBMODEL_APPINSTANCES, null).build();
         return null;
     }

@@ -27,9 +27,14 @@ import de.iip_ecosphere.platform.platform.cli.Level;
 import de.iip_ecosphere.platform.platform.cli.ScannerCommandProvider;
 import de.iip_ecosphere.platform.platform.cli.PrintVisitor.PrintType;
 import de.iip_ecosphere.platform.services.ServicesClient;
+import de.iip_ecosphere.platform.services.environment.services.TransportToWsConverter;
+import de.iip_ecosphere.platform.services.environment.services.TransportConverter.Watcher;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.IipVersion;
 import de.iip_ecosphere.platform.support.semanticId.SemanticIdResolver;
+import de.iip_ecosphere.platform.transport.status.ActionTypes;
+import de.iip_ecosphere.platform.transport.status.StatusMessage;
+import de.iip_ecosphere.platform.transport.status.StatusMessageSerializer;
 
 /**
  * A simple (optional interactive) command line client providing initial platform functionality through the various AAS.
@@ -171,7 +176,9 @@ public class Cli extends CliBackend {
                 break;
             case "undeploy":
                 System.out.print("id (empty for none): ");
+                Watcher<StatusMessage> watcher = createStatusWatcher().start();
                 callWithUri(provider, uri -> undeployPlan(uri, provider.nextCommand()));
+                watcher.stop();
                 break;
             default:
                 exit = super.interpretFurther(provider, level, cmd);
@@ -183,16 +190,41 @@ public class Cli extends CliBackend {
     }
     
     /**
+     * Creates a status message watcher.
+     * 
+     * @return the watcher instance
+     */
+    private static Watcher<StatusMessage> createStatusWatcher() {
+        PlatformSetup setup = PlatformSetup.getInstance();
+        Watcher<StatusMessage> result = new TransportToWsConverter<StatusMessage>(StatusMessage.STATUS_STREAM, 
+            StatusMessage.class, setup.getStatusGatewayEndpoint(), StatusMessageSerializer.createTypeTranslator())
+            .createWatcher(0);
+        result.setConsumer(s -> {
+            if (s.getAction() != ActionTypes.PROCESS && s.getAction() != ActionTypes.RESULT) {
+                String desc = s.getDescription();
+                if (desc.length() > 0) {
+                    desc = " " + desc;
+                }
+                System.out.println(" - " + s.getAction().toString().toLowerCase() + " " + s.getId() 
+                    + " to " + s.getDeviceId() + desc);
+            }
+        });
+        return result;
+    }
+    
+    /**
      * Calls {@link #deployPlan(URI)} and emits the returned application id if there is any.
      * 
      * @param uri the URI of the deployment plan to start
      * @throws ExecutionException if deploying the plain fails
      */
     private static void deployPlanEmitId(URI uri) throws ExecutionException {
+        Watcher<StatusMessage> watcher = createStatusWatcher().start();
         String appInstId = deployPlan(uri);
         if (null != appInstId && appInstId.length() > 0) {
             println("Started with application id " + appInstId);
         }
+        watcher.stop();
     }
 
     /**

@@ -41,8 +41,9 @@ public interface PlatformClientFactory {
         public PlatformClient create() throws IOException {
             return new PlatformAasClient();
         }
+        
     };
-    
+
     public static final PlatformClientFactory LOCAL = new PlatformClientFactory() {
 
         @Override
@@ -78,5 +79,5 @@ public interface PlatformClientFactory {
      * @throws IOException if the client cannot be created
      */
     public PlatformClient create() throws IOException;
-    
+
 }
