@@ -782,8 +782,12 @@ public abstract class AbstractServiceManager<A extends AbstractArtifactDescripto
             }
         } else {
             for (S service : getServices()) {
-                if (aId.equals(service.getApplicationId()) && sId.equals(service.getServiceId())) {
-                    result++;
+                String sAppId = ServiceBase.getApplicationId(service.getId());
+                if (aId.equals(sAppId) && sId.equals(service.getServiceId())) {
+                    ServiceState state = service.getState();
+                    if (state == ServiceState.STARTING || state == ServiceState.RUNNING) {
+                        result++;
+                    }
                 }
             }
         }

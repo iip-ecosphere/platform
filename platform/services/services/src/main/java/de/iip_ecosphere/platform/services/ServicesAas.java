@@ -46,6 +46,7 @@ import de.iip_ecosphere.platform.transport.status.ActionTypes;
 import static de.iip_ecosphere.platform.support.iip_aas.AasUtils.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Predicate;
@@ -606,10 +607,13 @@ public class ServicesAas implements AasContributor {
         ActiveAasBase.processNotification(NAME_SUBMODEL, (sub, aas) -> {
             SubmodelBuilder builder = aas.createSubmodelBuilder(NAME_SUBMODEL, ID_SUBMODEL);
             addArtifact(builder, desc);
-            for (ServiceDescriptor s : desc.getServices()) {
+            List<ServiceDescriptor> sTmp = new ArrayList<>(desc.getServices()); // concurrent
+            for (ServiceDescriptor s : sTmp) { 
                 addService(builder, s);
             }
-            for (ServiceDescriptor s : desc.getServers()) {
+            sTmp.clear();
+            sTmp.addAll(desc.getServers()); // concurrent
+            for (ServiceDescriptor s : sTmp) {
                 addService(builder, s);
             }
         });
