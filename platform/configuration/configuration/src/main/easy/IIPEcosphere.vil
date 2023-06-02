@@ -499,6 +499,8 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         String artifactsFolder = getArtifactsFolder(appRoot, config);
         Integer baseImageCreated = 0; // 0 - Not base images, 1 - All dependencies base image, 2 - All and commen dependencies base images 
         Boolean baseImageMethod = getContainerBaseImageMethodSafe(config.containerBaseImageMethod); 
+        Boolean newChangeOnContainerFiles = false;
+        Boolean newChangeJarFiles = false;
         String dfName;
 
         ContainerManager mgr = config.containerManager;
@@ -518,7 +520,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     isPythonService = 1;
                 }
             }
-            
+
             String appName = a.name.toIdentifier();
             setOf(EcsDevice) devices = EcsDevice.allInstances();
 
@@ -538,38 +540,65 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
 
             if ((isContainerForOneApp) and (baseImageMethod)){
                 Boolean justCommenDep = true;
+                newChangeOnContainerFiles = false;
                 Path deviceBaseDf = "${artifactsFolder}/DeviceDockerfiles/${appName}/DeviceDockerfile_CommenDepBase";
 
                 if (isPythonService == 1) {
                     Path req = "${appRoot}/../requirements.txt";
                     // TODO #130 consider server dependencies here
                     vilTemplateProcessor("PythonBaseReq", config, req, elements=elements, dependencies=dependencies, justCommenDep=justCommenDep);
-                    copy(req, deviceBaseDf);
+                    Path lastReq = "${deviceBaseDf}/requirements.txt";
+                    if (not(sameMd5HashFiles(req, lastReq))){
+                        copy(req, deviceBaseDf);
+                        newChangeOnContainerFiles = true;
+                    }
+                    
                 }
 
                 Path instDep = "${appRoot}/../installedDependencies.yml";
                 vilTemplateProcessor("InstalledDependencies", config, instDep, elements=elements, isPython=isPythonService);
-                copy(instDep, deviceBaseDf);
+                Path lastInstDep = "${deviceBaseDf}/installedDependencies.yml";
+                if (not(sameMd5HashFiles(instDep, lastInstDep))){
+                    copy(instDep, deviceBaseDf);
+                    newChangeOnContainerFiles = true;
+                }
             
                 Path devicesPath = getResourcesFolder() + "/devices";
                 Path devicesGenPath = "${appRoot}/../resources/devices";
                 copy(devicesPath, devicesGenPath);
-
+                Path lastDevicesPath = "${deviceBaseDf}/resources/devices";
+                if (not(sameMd5HashFolders(devicesPath, lastDevicesPath))){
+                    copy(devicesPath, lastDevicesPath);
+                    newChangeOnContainerFiles = true;
+                }
+                
                 Path identityStorePath = getResourcesFolder() + "/platform/identityStore.yml";
                 if (not(identityStorePath.exists())) {
                     identityStorePath = getResourcesFolder() + "/software/identityStore.yml";
                 }
                 Path identityStoreGenPath = "${appRoot}/../resources";
                 copy(identityStorePath, identityStoreGenPath);
-
+                Path lastIdentityStoreFilePath = "${deviceBaseDf}/resources/identityStore.yml";
+                if (not(sameMd5HashFiles(identityStorePath, lastIdentityStoreFilePath))){
+                    Path lastIdentityStorePath = "${deviceBaseDf}/resources";
+                    copy(identityStorePath, lastIdentityStorePath);
+                    newChangeOnContainerFiles = true;
+                }
+                
                 dfName = createContainerBuildBaseScript(mgr, a, elements, appRoot, isPythonService, justCommenDep);
 
                 // Create image 
                 Path b = "${appRoot}/../";
                 Path d = "${appRoot}/../" + dfName;
-                copy(d, deviceBaseDf);
-
-                appImageId = createContainerImage(mgr, b, d, appName, "appCommenDepBaseImage", "0.1.0");
+                Path lastDockerfile = "${deviceBaseDf}/${dfName}";
+                if (not(sameMd5HashFiles(d, lastDockerfile))){
+                    copy(d, deviceBaseDf);
+                    newChangeOnContainerFiles = true;
+                }
+                
+                if (newChangeOnContainerFiles) {
+                    appImageId = createContainerImage(mgr, b, d, appName, "appCommenDepBaseImage", "0.1.0");
+                }
 
                 justCommenDep = false;
                 if (isPythonService == 1) {
@@ -584,17 +613,29 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 baseImageCreated = 1;
 
                 if (not(checkDepRequirements)){
+                    newChangeOnContainerFiles = false;
                     deviceBaseDf = "${artifactsFolder}/DeviceDockerfiles/${appName}/DeviceDockerfile_AllDepBase";
                     dfName = createContainerBuildBaseScript(mgr, a, elements, appRoot, isPythonService, justCommenDep);
-                    copy(allDepRequirements, deviceBaseDf);
-                    copy(instDep, deviceBaseDf);
-                    copy(devicesPath, devicesGenPath);
-                    copy(identityStorePath, identityStoreGenPath);
-                    copy(d, deviceBaseDf);
-                    appImageId = createContainerImage(mgr, b, d, appName, "appAllDepBaseImage", "0.1.0");
+                    Path lastAllDepRequirements = "${deviceBaseDf}/requirements.txt";
+                    if (not(sameMd5HashFiles(allDepRequirements, lastAllDepRequirements))){
+                        copy(allDepRequirements, deviceBaseDf);
+                        newChangeOnContainerFiles = true;
+                    }
+                    
+                    Path b = "${appRoot}/../";
+                    Path d = "${appRoot}/../" + dfName;
+                    Path lastDockerfile = "${deviceBaseDf}/${dfName}";
+                    if (not(sameMd5HashFiles(d, lastDockerfile))){
+                        copy(d, deviceBaseDf);
+                        newChangeOnContainerFiles = true;
+                    }
+                    
+                    if (newChangeOnContainerFiles) {
+                        appImageId = createContainerImage(mgr, b, d, appName, "appAllDepBaseImage", "0.1.0");
+                    }
+                    
                     baseImageCreated = 2;
                 }
-                
             }
 
             for (EcsDevice device : devices->sortedBy(d|d.id)) {
@@ -606,16 +647,109 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 if (not(isAllAppsContainer(cntType))) {
 
                     setOf(Dependency) deviceDependencies = device.provides -> selectByType(PythonDependency);
-
                     String dfName;
 
+                    if (jarsCollecting < device.size()) {
+                        String deviceSpec = device.containerName;
+                        String tmpFolderName = "";
+                        if (deviceSpec.length() > 0) {
+                            deviceSpec = "-" + deviceSpec;
+                        } 
+                        if (deviceSpec.length() == 0) {
+                            tmpFolderName = "-dflt";
+                        }
+				    
+                        setOf(String) srcJarsPaths = {"ecsRuntime", "serviceMgr", "ecsServiceMgr", "ecsJars", "ecsSvcJars", "svcJars"};
+				        
+                        for (String srcJarsPath : srcJarsPaths) {
+                            Path newDevicePath = "";
+                            Path lastDevicePath = "";
+                            
+                            if (srcJarsPath.endsWith("Jars")) {
+                                Path deviceSourcesDf = "${artifactsFolder}/DeviceDockerfiles/Jars/DeviceDockerfile_${deviceName}";
+                                newDevicePath= "${appRoot}/../${srcJarsPath}${deviceSpec}";
+                                lastDevicePath = "${deviceSourcesDf}/${srcJarsPath}${deviceSpec}";
+                                if (newDevicePath.exists()) {
+                                    if (not(sameMd5HashJarsFolders(newDevicePath, lastDevicePath))){
+                                        newDevicePath.rename("${srcJarsPath}${deviceSpec}${tmpFolderName}");
+                                        copy(newDevicePath, lastDevicePath);
+                                        newDevicePath.rename("${srcJarsPath}${deviceSpec}");
+                                        newChangeJarFiles = true;
+                                    }
+                                }
+                            } else {
+                                Path deviceSourcesDf = "${artifactsFolder}/DeviceDockerfiles/sources/DeviceDockerfile_${deviceName}";
+                                newDevicePath= "${appRoot}/../${srcJarsPath}${deviceSpec}/src";
+                                lastDevicePath = "${deviceSourcesDf}/${srcJarsPath}${deviceSpec}/src";     
+                                
+                                if (newDevicePath.exists()) {
+                                    if (not(sameMd5HashFolders(newDevicePath, lastDevicePath))){
+                                        copy(newDevicePath, lastDevicePath);
+                                        if ((cntType == ContainerType::EcsSvc_App) and (srcJarsPath == "ecsServiceMgr")) {
+                                            newChangeJarFiles = true;
+                                        } else if ((cntType == ContainerType::Ecs_Svc_App) and ((srcJarsPath == "ecsRuntime") or (srcJarsPath == "serviceMgr"))) {
+                                            newChangeJarFiles = true;
+                                        } else if ((cntType == ContainerType::C1Ecs_C2Svc_App) and ((srcJarsPath == "ecsRuntime") or (srcJarsPath == "serviceMgr"))) {
+                                            newChangeJarFiles = true;
+                                        }
+                                    }
+
+                                    Path pomFileDf = "${deviceSourcesDf}/${srcJarsPath}${deviceSpec}/";
+                                    Path pomFile = "${appRoot}/../${srcJarsPath}${deviceSpec}/pom.xml";
+                                    Path lastPomFile = "${pomFileDf}/pom.xml";
+                                    if (not(sameMd5HashFiles(pomFile, lastPomFile))){
+                                        copy(pomFile, pomFileDf);
+                                        newChangeJarFiles = true;
+                                    }
+                                }
+                            }
+				        }
+                        
+                        jarsCollecting = jarsCollecting + 1;
+                    }
+				    
+                    if (brokerCollecting == 0) {
+                        Path brokerDf = "${artifactsFolder}/DeviceDockerfiles/broker/src";
+                        Path brokerPath = "${appRoot}/../broker/src";
+                        if (not(sameMd5HashFolders(brokerPath, brokerDf))){
+                            copy(brokerPath, brokerDf);
+                            newChangeJarFiles = true;
+                        }
+
+						setOf(String) brokerFiles = {"broker.bat", "broker.sh", "iip-broker.service", "pom.xml"};
+
+						for (String brokerFile : brokerFiles) {
+                            Path brokerFilesDf = "${artifactsFolder}/DeviceDockerfiles/broker/";
+                            Path newBrokerFile = "${appRoot}/../broker/${brokerFile}";
+                            Path lastBrokerFile = "${brokerFilesDf}/${brokerFile}";
+                            if (not(sameMd5HashFiles(newBrokerFile, lastBrokerFile))){
+                                copy(newBrokerFile, brokerFilesDf);
+                                newChangeJarFiles = true;
+                            }
+                        }
+
+                        Path lastBrokerJars = "${artifactsFolder}/DeviceDockerfiles/broker/brokerJars";
+                        Path newBrokerJars = "${target}/broker/brokerJars";
+                        if (not(sameMd5HashJarsFolders(newBrokerJars, lastBrokerJars))){
+                            copy(newBrokerJars, lastBrokerJars);
+                            newChangeJarFiles = true;
+                        }
+                        
+                        brokerCollecting = brokerCollecting + 1;
+                    }
+
+                    newChangeOnContainerFiles = false;
                     if (baseImageCreated <> 0){
                         if (deviceDependencies.size() > 0) {
                             if (isPythonService == 1) {
                                 Path req = "${appRoot}/../requirements.txt";
                                 // TODO #130 consider server dependencies here
                                 vilTemplateProcessor("PythonReq", config, req, elements=elements, device=device);
-                                copy(req, deviceDf);
+                                Path lastReq = "${deviceDf}/requirements.txt";
+                                if (not(sameMd5HashFiles(req, lastReq))){
+                                    copy(req, deviceDf);
+                                    newChangeOnContainerFiles = true;
+                                }
                             }
                         }
 
@@ -625,15 +759,29 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                             Path req = "${appRoot}/../requirements.txt";
                             // TODO #130 consider server dependencies here
                             vilTemplateProcessor("PythonReq", config, req, elements=elements, device=device);
-                            copy(req, deviceDf);
+                            Path lastReq = "${deviceDf}/requirements.txt";
+                            if (not(sameMd5HashFiles(req, lastReq))){
+                                copy(req, deviceDf);
+                                newChangeOnContainerFiles = true;
+                            }
                         }
 
                         Path instDep = "${appRoot}/../installedDependencies.yml";
                         vilTemplateProcessor("InstalledDependencies", config, instDep, elements=elements, isPython=isPythonService, baseImageExist=baseImageCreated);
-
+                        Path lastInstDep = "${deviceDf}/installedDependencies.yml";
+                        if (not(sameMd5HashFiles(instDep, lastInstDep))){
+                            copy(instDep, deviceDf);
+                            newChangeOnContainerFiles = true;
+                        }
+                
                         Path devicesPath = getResourcesFolder() + "/devices";
                         Path devicesGenPath = "${appRoot}/../resources/devices";
                         copy(devicesPath, devicesGenPath);
+                        Path lastDevicesPath = "${deviceDf}/resources/devices";
+                        if (not(sameMd5HashFolders(devicesPath, lastDevicesPath))){
+                            copy(devicesPath, lastDevicesPath);
+                            newChangeOnContainerFiles = true;
+                        }
 
                         Path identityStorePath = getResourcesFolder() + "/platform/identityStore.yml";
                         if (not(identityStorePath.exists())) {
@@ -641,48 +789,42 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                         }
                         Path identityStoreGenPath = "${appRoot}/../resources";
                         copy(identityStorePath, identityStoreGenPath);
+                        Path lastIdentityStoreFilePath = "${deviceDf}/resources/identityStore.yml";
+                        if (not(sameMd5HashFiles(identityStorePath, lastIdentityStoreFilePath))){
+                            Path lastIdentityStorePath = "${deviceDf}/resources";
+                            copy(identityStorePath, lastIdentityStorePath);
+                            newChangeOnContainerFiles = true;
+                        }
 
                         dfName = createContainerBuildScript(mgr, a, elements, appRoot, cntType, isPythonService, device, baseImageCreated);
                     }
 
-                    if (cntType == ContainerType::Ecs_Svc_App) {
-                        // Wrapper-Skript 
-                        Path ws = "${appRoot}/../wrapper_script.sh";
-                        vilTemplateProcessor("WrapperScript", config, ws, containerType=cntType); 
+                    // Wrapper-Skript 
+                    Path ws = "${appRoot}/../wrapper_script.sh";
+                    vilTemplateProcessor("WrapperScript", config, ws, containerType=cntType); 
+                    Path lastWs = "${deviceDf}/wrapper_script.sh";
+                    if (not(sameMd5HashFiles(ws, lastWs))){
                         copy(ws, deviceDf);
-
-                        // Create image 
-                        Path b = "${appRoot}/../";
-                        Path d = "${appRoot}/../" + dfName;
-                        copy(d, deviceDf);
-
-                        appImageId = createContainerImage(mgr, b, d, a.name.toIdentifier(), deviceName, a.ver);
-                    
-                        // Mesh-Info, Container-Descriptor
-                        Path meshInfo = "${artifactsFolder}/${filePrefix}mesh-info.yml";
-                        vilTemplateProcessor("MeshInfo", config, meshInfo, app=a, containerType=ContainerType::Ecs_Svc_App, device=device);
-                        copy(meshInfo, deviceDf);
+                        newChangeOnContainerFiles = true;
                     }
-                
-                    if (cntType == ContainerType::EcsSvc_App) {
-                        // Wrapper-Skript 
-                        Path ws = "${appRoot}/../wrapper_script.sh";
-                        vilTemplateProcessor("WrapperScript", config, ws, containerType=cntType); 
-                        copy(ws, deviceDf);
-
-                        // Create image 
-                        Path b = "${appRoot}/../";
-                        Path d = "${appRoot}/../" + dfName;
+                      
+                    // Create image 
+                    Path b = "${appRoot}/../";
+                    Path d = "${appRoot}/../" + dfName;
+                    Path lastDockerfile = "${deviceDf}/${dfName}";
+                    if (not(sameMd5HashFiles(d, lastDockerfile))){
                         copy(d, deviceDf);
-
+                        newChangeOnContainerFiles = true;
+                    }
+                  
+                    if ((newChangeOnContainerFiles) or (newChangeJarFiles)) {
                         appImageId = createContainerImage(mgr, b, d, a.name.toIdentifier(), deviceName, a.ver);
-                    
-                        // Mesh-Info, Container-Descriptor
-                        Path meshInfo = "${artifactsFolder}/${filePrefix}mesh-info.yml";
-                        vilTemplateProcessor("MeshInfo", config, meshInfo, app=a, containerType=ContainerType::EcsSvc_App, device=device);
-                        copy(meshInfo, deviceDf);
-                    }	
-
+                    }
+                      
+                    // Mesh-Info, Container-Descriptor
+                    Path meshInfo = "${artifactsFolder}/${filePrefix}mesh-info.yml";
+                    vilTemplateProcessor("MeshInfo", config, meshInfo, app=a, containerType=cntType, device=device);
+                
                     if (cntType == ContainerType::C1Ecs_C2Svc_App) {
                         // Container with ECS
                         Integer isEcs = 0;        // Is a "Ecs" image already generated?: 0 - false, 1 - true
@@ -693,94 +835,36 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                         }
                         if (isEcs == 0) {
                             String ecsDfName = createContainerBuildScript(mgr, a, elements, appRoot, cntType, -1, device, baseImageCreated);
-                    
+                            newChangeOnContainerFiles = false;
+                            
                             Path ecs_ws = "${appRoot}/../ecs.wrapper_script.sh";
                             vilTemplateProcessor("WrapperScript", config, ecs_ws, containerType=ContainerType::Ecs);
-                            copy(ecs_ws, deviceDf);
+                            Path lastEcs_Ws = "${deviceDf}/wrapper_script.sh";
+                            if (not(sameMd5HashFiles(ecs_ws, lastEcs_Ws))){
+                                copy(ecs_ws, deviceDf);
+                                newChangeOnContainerFiles = true;
+                            }                            
                      
-                            Path b = "${appRoot}/../";
-                            Path d = "${appRoot}/../" + ecsDfName;
-                            copy(d, deviceDf);
-
-                            String ecs_imageId = createContainerImage(mgr, b, d, a.name.toIdentifier(), "ecs", a.ver);
-                    
+                            Path ecsB = "${appRoot}/../";
+                            Path ecsD = "${appRoot}/../" + ecsDfName;
+                            Path lastDockerEcsfile = "${deviceDf}/${ecsDfName}";
+                            if (not(sameMd5HashFiles(ecsD, lastDockerEcsfile))){
+                                copy(ecsD, deviceDf);
+                                newChangeOnContainerFiles = true;
+                            }
+                            
+                            if ((newChangeOnContainerFiles) or (newChangeJarFiles)) {
+                                String ecs_imageId = createContainerImage(mgr, ecsB, ecsD, a.name.toIdentifier(), "ecs", a.ver);
+                            }
+                            
                             // Mesh-Info, Container-Descriptor
                             Path meshInfoEcs = "${artifactsFolder}/${filePrefix}mesh-info-ecs.yml";
                             vilTemplateProcessor("MeshInfo", config, meshInfoEcs, app=a, containerType=ContainerType::Ecs, device=device);
-                            copy(meshInfoEcs, deviceDf);
 
                             isEcs = isEcs + 1;
                             ecsDeviceGenerated.add(device);               
                         } 
                     
-                        //String ecsDfName = createContainerBuildScript(mgr, a, elements, appRoot, cntType, -1, device);
-                                        
-                        //Path b = "${appRoot}/../";
-                        //Path d = "${appRoot}/../" + ecsDfName;
-                        //String ecs_imageId = createContainerImage(mgr, b, d, a.name.toIdentifier(), "ecs", a.ver);
-                    
-                        // Mesh-Info, Container-Descriptor
-                        //Path meshInfoEcs = "${artifactsFolder}/${filePrefix}mesh-info-ecs.yml";
-                        //vilTemplateProcessor("MeshInfo", config, meshInfoEcs, app=a, containerType=ContainerType::Ecs, device=device);
-                    
-                        // Container with ServiceMgr and App
-                        // Wrapper-Skript 
-                        Path ws = "${appRoot}/../wrapper_script.sh";
-                        vilTemplateProcessor("WrapperScript", config, ws, containerType=ContainerType::C1Ecs_C2Svc_App);
-                        copy(ws, deviceDf);
-
-                        // Create image 
-                        Path b2 = "${appRoot}/../";
-                        Path d2 = "${appRoot}/../" + dfName;
-                        copy(d2, deviceDf);
-
-                        appImageId = createContainerImage(mgr, b2, d2, a.name.toIdentifier(), deviceName, a.ver);
-                    
-                        // Mesh-Info, Container-Descriptor
-                        Path meshInfo = "${artifactsFolder}/${filePrefix}mesh-info.yml";
-                        vilTemplateProcessor("MeshInfo", config, meshInfo, app=a, containerType=ContainerType::C1Ecs_C2Svc_App, device=device);
-                        copy(meshInfo, deviceDf);
-                    }
-
-                    if (jarsCollecting < device.size()) {
-                        Path deviceJarsDf = "${artifactsFolder}/DeviceDockerfiles/Jars/DeviceDockerfile_${deviceName}";
-                        String deviceSpec = device.containerName;
-                        String tmpFolderName = "";
-                        if (deviceSpec.length() > 0) {
-                            deviceSpec = "-" + deviceSpec;
-                        } 
-                        if (deviceSpec.length() == 0) {
-                            tmpFolderName = "-dflt";
-                        }
-
-                        Path ecsPath = "${appRoot}/../ecsJars${deviceSpec}";
-                        ecsPath.rename("ecsJars${deviceSpec}${tmpFolderName}");
-                        Path deviceEcsDf = "${deviceJarsDf}/ecsJars${deviceSpec}";
-                        copy(ecsPath, deviceEcsDf);
-                        ecsPath.rename("ecsJars${deviceSpec}");
-					    
-                        Path svcPath = "${appRoot}/../svcJars${deviceSpec}";
-                        svcPath.rename("svcJars${deviceSpec}${tmpFolderName}");
-                        Path deviceSvcDf = "${deviceJarsDf}/svcJars${deviceSpec}";
-                        copy(svcPath, deviceSvcDf);
-                        svcPath.rename("svcJars${deviceSpec}");
-					    
-                        Path ecsSvcJarsPath = "${appRoot}/../ecsSvcJars${deviceSpec}";
-                        ecsSvcJarsPath.rename("ecsSvcJars${deviceSpec}${tmpFolderName}");
-                        Path deviceEcsSvcDf = "${deviceJarsDf}/ecsSvcJars${deviceSpec}";
-                        copy(ecsSvcJarsPath, deviceEcsSvcDf);
-                        ecsSvcJarsPath.rename("ecsSvcJars${deviceSpec}");
-                        jarsCollecting = jarsCollecting + 1;
-                    }
-
-                    if (brokerCollecting == 0) {
-                        Path brokerDf = "${artifactsFolder}/DeviceDockerfiles/broker";
-                        Path brokerPath = "${target}/broker";
-                        copy(brokerPath, brokerDf);
-                        Path brokerJarsDf = "${artifactsFolder}/DeviceDockerfiles/broker/brokerJars";
-                        Path brokerJarsPath = "${target}/broker/brokerJars";
-                        copy(brokerJarsPath, brokerJarsDf);
-                        brokerCollecting = brokerCollecting + 1;
                     }
 
                 }
@@ -800,7 +884,9 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         String dfName;
         Integer baseImageCreated = 0; // 0 - Not base images, 1 - All dependencies base image, 2 - All and commen dependencies base images 
         Boolean baseImageMethod = getContainerBaseImageMethodSafe(config.containerBaseImageMethod);
-
+        Boolean newChangeOnContainerFiles = false;
+        Boolean newChangeJarFiles = false;
+        
         if (allElements.size() > 1 and getContainerGenerationSafe(config.containerGeneration)) {
 
             // Checking if there is any PythonService in app
@@ -838,16 +924,29 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     Path req = "${target}/requirements.txt";
                     // TODO #130 consider server dependencies here
                     vilTemplateProcessor("PythonBaseReq", config, req, elements=allElements, dependencies=dependencies, justCommenDep=justCommenDep);
-                    copy(req, deviceBaseDf);
+                    Path lastReq = "${deviceBaseDf}/requirements.txt";
+                    if (not(sameMd5HashFiles(req, lastReq))){
+                        copy(req, deviceBaseDf);
+                        newChangeOnContainerFiles = true;
+                    }
                 }
 
                 Path instDep = "${target}/installedDependencies.yml";
                 vilTemplateProcessor("InstalledDependencies", config, instDep, elements=allElements, isPython=isPythonService);
-                copy(instDep, deviceBaseDf);
+                Path lastInstDep = "${deviceBaseDf}/installedDependencies.yml";
+                if (not(sameMd5HashFiles(instDep, lastInstDep))){
+                    copy(instDep, deviceBaseDf);
+                    newChangeOnContainerFiles = true;
+                }
             
                 Path devicesPath = getResourcesFolder() + "/devices";
                 Path devicesGenPath = "${target}/resources/devices";
                 copy(devicesPath, devicesGenPath);
+                Path lastDevicesPath = "${deviceBaseDf}/resources/devices";
+                if (not(sameMd5HashFolders(devicesPath, lastDevicesPath))){
+                    copy(devicesPath, lastDevicesPath);
+                    newChangeOnContainerFiles = true;
+                }
 
                 Path identityStorePath = getResourcesFolder() + "/platform/identityStore.yml";
                 if (not(identityStorePath.exists())) {
@@ -855,16 +954,28 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 }
                 Path identityStoreGenPath = "${target}/resources";
                 copy(identityStorePath, identityStoreGenPath);
-
+                Path lastIdentityStoreFilePath = "${deviceBaseDf}/resources/identityStore.yml";
+                if (not(sameMd5HashFiles(identityStorePath, lastIdentityStoreFilePath))){
+                    Path lastIdentityStorePath = "${deviceBaseDf}/resources";
+                    copy(identityStorePath, lastIdentityStorePath);
+                    newChangeOnContainerFiles = true;
+                }
+                
                 dfName = createContainerBuildBaseScriptAllApps(mgr, applications, allElements, target, isPythonService, justCommenDep);
 
                 // Create image 
                 Path b = "${target}/";
                 Path d = "${target}/" + dfName;
-                copy(d, deviceBaseDf);
+                Path lastDockerfile = "${deviceBaseDf}/${dfName}";
+                if (not(sameMd5HashFiles(d, lastDockerfile))){
+                    copy(d, deviceBaseDf);
+                    newChangeOnContainerFiles = true;
+                }
 
-                appImageId = createContainerImage(mgr, b, d, "allapps", "appCommenDepBaseImage", "0.1.0");
-
+                if (newChangeOnContainerFiles) {
+                    appImageId = createContainerImage(mgr, b, d, "allapps", "appCommenDepBaseImage", "0.1.0");
+                }
+                
                 justCommenDep = false;
                 if (isPythonService == 1) {
                     Path req = "${target}/requirements.txt";
@@ -880,17 +991,58 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 if (not(checkDepRequirements)){
                     deviceBaseDf = "${artifactsFolder}/DeviceDockerfiles/${appName}/DeviceDockerfile_AllDepBase";
                     dfName = createContainerBuildBaseScriptAllApps(mgr, applications, allElements, target, isPythonService, justCommenDep);
-                    copy(allDepRequirements, deviceBaseDf);
-                    copy(instDep, deviceBaseDf);
-                    copy(devicesPath, devicesGenPath);
-                    copy(identityStorePath, identityStoreGenPath);
-                    copy(d, deviceBaseDf);
-                    appImageId = createContainerImage(mgr, b, d, "allapps", "appAllDepBaseImage", "0.1.0");
+                    Path lastAllDepRequirements = "${deviceBaseDf}/requirements.txt";
+                    if (not(sameMd5HashFiles(allDepRequirements, lastAllDepRequirements))){
+                        copy(allDepRequirements, deviceBaseDf);
+                        newChangeOnContainerFiles = true;
+                    }
+                    
+                    Path b = "${target}/";
+                    Path d = "${target}/" + dfName;
+                    Path lastDockerfile = "${deviceBaseDf}/${dfName}";
+                    if (not(sameMd5HashFiles(d, lastDockerfile))){
+                        copy(d, deviceBaseDf);
+                        newChangeOnContainerFiles = true;
+                    }
+                    
+                    if (newChangeOnContainerFiles) {
+                        appImageId = createContainerImage(mgr, b, d, "allapps", "appAllDepBaseImage", "0.1.0");
+                    }
+                    
                     baseImageCreated = 2;
                 }
                 
             }
 
+            if (isContainerForAllApps) {
+                String appName = "allApps";
+                Path brokerDf = "${artifactsFolder}/DeviceDockerfiles/broker/src";
+                Path brokerPath = "${target}/broker/src";
+                if (not(sameMd5HashFolders(brokerPath, brokerDf))){
+                    copy(brokerPath, brokerDf);
+                    newChangeJarFiles = true;
+                }
+                        
+                setOf(String) brokerFiles = {"broker.bat", "broker.sh", "iip-broker.service", "pom.xml"};
+
+                for (String brokerFile : brokerFiles) {
+                    Path brokerFilesDf = "${artifactsFolder}/DeviceDockerfiles/broker/";
+                    Path newBrokerFile = "${target}broker/${brokerFile}";
+                    Path lastBrokerFile = "${brokerFilesDf}/${brokerFile}";
+                    if (not(sameMd5HashFiles(newBrokerFile, lastBrokerFile))){
+                        copy(newBrokerFile, brokerFilesDf);
+                        newChangeJarFiles = true;
+                    }
+                }
+
+                Path lastBrokerJars = "${artifactsFolder}/DeviceDockerfiles/broker/brokerJars";
+                Path newBrokerJars = "${target}/broker/brokerJars";
+                if (not(sameMd5HashJarsFolders(newBrokerJars, lastBrokerJars))){
+                    copy(newBrokerJars, lastBrokerJars);
+                    newChangeJarFiles = true;
+                }
+            }
+            
             for (EcsDevice device : devices->sortedBy(d|d.id)) {
                 if (!inTesting or (inTesting and count < 2)) { // inTesting, just produce the first one -> CI roundtrip time
                     ContainerType cntType = device.containerType;
@@ -909,13 +1061,73 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                         
                         setOf(Dependency) deviceDependencies = device.provides -> selectByType(PythonDependency);
 						
+						String deviceSpec = device.containerName;
+                        String tmpFolderName = "";
+                        if (deviceSpec.length() > 0) {
+                            deviceSpec = "-" + deviceSpec;
+                        } 
+                        if (deviceSpec.length() == 0) {
+                            tmpFolderName = "-dflt";
+                        }
+                        
+                        setOf(String) srcJarsPaths = {"ecsRuntime", "serviceMgr", "ecsServiceMgr", "ecsJars", "ecsSvcJars", "svcJars"};
+				        
+                        for (String srcJarsPath : srcJarsPaths) {
+                            Path newDevicePath = "";
+                            Path lastDevicePath = "";
+                            
+                            if (srcJarsPath.endsWith("Jars")) {
+                                Path deviceSourcesDf = "${artifactsFolder}/DeviceDockerfiles/Jars/DeviceDockerfile_${deviceName}";
+                                newDevicePath= "${target}/${srcJarsPath}${deviceSpec}";
+                                lastDevicePath = "${deviceSourcesDf}/${srcJarsPath}${deviceSpec}";
+                                if (newDevicePath.exists()) {
+                                    if (not(sameMd5HashJarsFolders(newDevicePath, lastDevicePath))){
+                                        newDevicePath.rename("${srcJarsPath}${deviceSpec}${tmpFolderName}");
+                                        copy(newDevicePath, lastDevicePath);
+                                        newDevicePath.rename("${srcJarsPath}${deviceSpec}");
+                                        newChangeJarFiles = true;
+                                    }
+                                }
+                            } else {
+                                Path deviceSourcesDf = "${artifactsFolder}/DeviceDockerfiles/sources/DeviceDockerfile_${deviceName}";
+                                newDevicePath= "${target}/${srcJarsPath}${deviceSpec}/src";
+                                lastDevicePath = "${deviceSourcesDf}/${srcJarsPath}${deviceSpec}/src";     
+                                
+                                if (newDevicePath.exists()) {
+                                    if (not(sameMd5HashFolders(newDevicePath, lastDevicePath))){
+                                        copy(newDevicePath, lastDevicePath);
+                                        if ((cntType == ContainerType::EcsSvc_App) and (srcJarsPath == "ecsServiceMgr")) {
+                                            newChangeJarFiles = true;
+                                        } else if ((cntType == ContainerType::Ecs_Svc_App) and ((srcJarsPath == "ecsRuntime") or (srcJarsPath == "serviceMgr"))) {
+                                            newChangeJarFiles = true;
+                                        } else if ((cntType == ContainerType::C1Ecs_C2Svc_App) and ((srcJarsPath == "ecsRuntime") or (srcJarsPath == "serviceMgr"))) {
+                                            newChangeJarFiles = true;
+                                        }
+                                    }
+
+                                    Path pomFileDf = "${deviceSourcesDf}/${srcJarsPath}${deviceSpec}/";
+                                    Path pomFile = "${target}/${srcJarsPath}${deviceSpec}/pom.xml";
+                                    Path lastPomFile = "${pomFileDf}/pom.xml";
+                                    if (not(sameMd5HashFiles(pomFile, lastPomFile))){
+                                        copy(pomFile, pomFileDf);
+                                        newChangeJarFiles = true;
+                                    }
+                                }
+                            }						
+						}
+						
+						newChangeOnContainerFiles = false;
                         if (baseImageCreated <> 0){
                             if (deviceDependencies.size() > 0) {
                                 if (isPythonService == 1) {
                                     Path req = "${target}/requirements.txt";
                                     // TODO #130 consider server dependencies here
                                     vilTemplateProcessor("PythonReq", config, req, elements=allElements, device=device);
-                                    copy(req, deviceDf);
+                                    Path lastReq = "${deviceDf}/requirements.txt";
+                                    if (not(sameMd5HashFiles(req, lastReq))){
+                                        copy(req, deviceDf);
+                                        newChangeOnContainerFiles = true;
+                                    }
                                 }
                             }
 
@@ -926,16 +1138,29 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                                 Path req = "${target}/requirements.txt";
                                 // TODO #130 consider server dependencies here
                                 vilTemplateProcessor("PythonReq", config, req, elements=allElements, device=device);
-                                copy(req, deviceDf);
+                                Path lastReq = "${deviceDf}/requirements.txt";
+                                if (not(sameMd5HashFiles(req, lastReq))){
+                                    copy(req, deviceDf);
+                                    newChangeOnContainerFiles = true;
+                                }
                             }
         
                             Path instDep = "${target}/installedDependencies.yml";
                             vilTemplateProcessor("InstalledDependencies", config, instDep, elements=allElements, isPython=isPythonService);
-                            copy(instDep, deviceDf);
+                            Path lastInstDep = "${deviceDf}/installedDependencies.yml";
+                            if (not(sameMd5HashFiles(instDep, lastInstDep))){
+                                copy(instDep, deviceDf);
+                                newChangeOnContainerFiles = true;
+                            }
 
                             Path devicesPath = getResourcesFolder() + "/devices";
                             Path devicesGenPath = "${target}/resources/devices";
                             copy(devicesPath, devicesGenPath);
+                            Path lastDevicesPath = "${deviceDf}/resources/devices";
+                            if (not(sameMd5HashFolders(devicesPath, lastDevicesPath))){
+                                copy(devicesPath, lastDevicesPath);
+                                newChangeOnContainerFiles = true;
+                            }                            
 	                    
                             Path identityStorePath = getResourcesFolder() + "/platform/identityStore.yml";
                             if (not(identityStorePath.exists())) {
@@ -943,6 +1168,12 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                             }
                             Path identityStoreGenPath = "${target}/resources";
                             copy(identityStorePath, identityStoreGenPath);
+                            Path lastIdentityStoreFilePath = "${deviceDf}/resources/identityStore.yml";
+                            if (not(sameMd5HashFiles(identityStorePath, lastIdentityStoreFilePath))){
+                                Path lastIdentityStorePath = "${deviceDf}/resources";
+                                copy(identityStorePath, lastIdentityStorePath);
+                                newChangeOnContainerFiles = true;
+                            }
 
                             dfName = createContainerBuildScriptAllApps(mgr, applications, allElements, target, cntType, isPythonService, device, baseImageCreated);
                         }
@@ -950,82 +1181,65 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                         // Wrapper-Skript 
                         Path ws = "${target}/wrapper_script.sh";
                         vilTemplateProcessor("WrapperScript", config, ws, containerType=cntType); 
-                        copy(ws, deviceDf);
-
+                        Path lastWs = "${deviceDf}/wrapper_script.sh";
+                        if (not(sameMd5HashFiles(ws, lastWs))){
+                            copy(ws, deviceDf);
+                            newChangeOnContainerFiles = true;
+                        }
+                        
                         // Create image 
                         Path b = "${target}/";
                         Path d = "${target}/" + dfName;
-                        copy(d, deviceDf);
-
-                        String appImageId = createContainerImage(mgr, b, d, "allapps", deviceName, "0.1.0");
-        
+                        Path lastDockerfile = "${deviceDf}/${dfName}";
+                        if (not(sameMd5HashFiles(d, lastDockerfile))){
+                            copy(d, deviceDf);
+                            newChangeOnContainerFiles = true;
+                        }
+                        
+                        if ((newChangeOnContainerFiles) or (newChangeJarFiles)) {
+                            String appImageId = createContainerImage(mgr, b, d, "allapps", deviceName, "0.1.0");
+                        }
+                    
                         // Mesh-Info, Container-Descriptor
                         Path meshInfo = "${artifactsFolder}/${filePrefix}mesh-info.yml";
                         vilTemplateProcessor("MeshInfoAllApps", config, meshInfo, containerType=cntType, device=device);
-                        copy(meshInfo, deviceDf);
 
                         if (cntType == ContainerType::C1Ecs_C2Svc_AllApps) {
                             String ecsDfName = createContainerBuildScriptAllApps(mgr, applications, allElements, target, cntType, -1, device, baseImageCreated);
-
+                            newChangeOnContainerFiles = false;
+                            
                             Path ecs_ws = "${target}/ecs.wrapper_script.sh";
                             vilTemplateProcessor("WrapperScript", config, ecs_ws, containerType=ContainerType::Ecs);
-                            copy(ecs_ws, deviceDf);
-          
-                            Path b = "${target}/";
-                            Path d = "${target}/" + ecsDfName;
-                            copy(d, deviceDf);
+                            Path lastEcs_Ws = "${deviceDf}/wrapper_script.sh";
+                            if (not(sameMd5HashFiles(ecs_ws, lastEcs_Ws))){
+                                copy(ecs_ws, deviceDf);
+                                newChangeOnContainerFiles = true;
+                            }    
 
-                            String ecs_imageId = createContainerImage(mgr, b, d, "allapps", deviceName + "_" + "ecs", "0.1.0");
-                                
+                            Path ecsB = "${target}/";
+                            Path ecsD = "${target}/" + ecsDfName;
+                            Path lastDockerEcsfile = "${deviceDf}/${ecsDfName}";
+                            if (not(sameMd5HashFiles(ecsD, lastDockerEcsfile))){
+                                copy(ecsD, deviceDf);
+                                newChangeOnContainerFiles = true;
+                            }
+                            
+                            if ((newChangeOnContainerFiles) or (newChangeJarFiles)) {
+                                String ecs_imageId = createContainerImage(mgr, ecsB, ecsD, "allapps", deviceName + "_" + "ecs", "0.1.0");
+                            }
+                    
                             // Mesh-Info, Container-Descriptor
                             Path meshInfoEcs = "${artifactsFolder}/${filePrefix}mesh-info-ecs.yml";
                             vilTemplateProcessor("MeshInfoAllApps", config, meshInfoEcs, containerType=ContainerType::Ecs, device=device);
-                            copy(meshInfoEcs, deviceDf);
                         } 
         
                         if (authenticate) {
                             logoutContainerRegistry(mgr);
                         }
                         count = count + 1;
-
-                        String deviceSpec = device.containerName;
-                        String tmpFolderName = "";
-                        if (deviceSpec.length() > 0) {
-                            deviceSpec = "-" + deviceSpec;
-                        } 
-                        if (deviceSpec.length() == 0) {
-                            tmpFolderName = "-dflt";
-                        }
 					    
-                        Path ecsPath = "${target}/ecsJars${deviceSpec}";
-                        ecsPath.rename("ecsJars${deviceSpec}${tmpFolderName}");
-                        Path deviceEcsDf = "${deviceDf}/ecsJars${deviceSpec}";
-                        copy(ecsPath, deviceEcsDf);
-                        ecsPath.rename("ecsJars${deviceSpec}");
-					    
-                        Path svcPath = "${target}/svcJars${deviceSpec}";
-                        svcPath.rename("svcJars${deviceSpec}${tmpFolderName}");
-                        Path deviceSvcDf = "${deviceDf}/svcJars${deviceSpec}";
-                        copy(svcPath, deviceSvcDf);
-                        svcPath.rename("svcJars${deviceSpec}");
-					    
-                        Path ecsSvcJarsPath = "${target}/ecsSvcJars${deviceSpec}";
-                        ecsSvcJarsPath.rename("ecsSvcJars${deviceSpec}${tmpFolderName}");
-                        Path deviceEcsSvcDf = "${deviceDf}/ecsSvcJars${deviceSpec}";
-                        copy(ecsSvcJarsPath, deviceEcsSvcDf);
-                        ecsSvcJarsPath.rename("ecsSvcJars${deviceSpec}");
                     }
                 }
-            }
-
-            if (isContainerForAllApps) {
-                String appName = "allApps";
-                Path brokerDf = "${artifactsFolder}/DeviceDockerfiles/${appName}/broker";
-                Path brokerPath = "${target}/broker";
-                copy(brokerPath, brokerDf);
-                Path brokerJarsDf = "${artifactsFolder}/DeviceDockerfiles/${appName}/broker/brokerJars";
-                Path brokerJarsPath = "${target}/broker/brokerJars";
-                copy(brokerJarsPath, brokerJarsDf);
             }
         }
     }
@@ -1034,6 +1248,76 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         FileArtifact pathFile1Artifact = pathFile1;
         FileArtifact pathFile2Artifact = pathFile2;
         pathFile1Artifact.hasSameContent(pathFile2Artifact);
+    }
+
+    Boolean sameMd5HashFiles(Path newFilePath, Path lastFilePath) = { 
+        FileArtifact newFilePathArtifact = newFilePath;
+        FileArtifact lastFilePathArtifact = lastFilePath;
+        Boolean result = true;
+        
+        if (not(lastFilePath.exists())){
+            result = false;
+        } else if (not(newFilePathArtifact.getMd5Hash() == lastFilePathArtifact.getMd5Hash())){
+            result = false;
+        }
+        
+        result;
+    }
+    
+    Boolean sameMd5HashJarsFolders(Path newFilePath, Path lastFilePath) = { 
+        setOf(FileArtifact) newPathArtifactsSet = newFilePath.selectAll();
+        setOf(FileArtifact) lastPathArtifactsSet = lastFilePath.selectAll();
+
+        Boolean result = true;
+        
+        for (FileArtifact file : newPathArtifactsSet){
+            if (not(file.getName().startsWith("de.iip-ecosphere.platform"))) {
+                FileArtifact findFile;
+                String fileExist = "No";
+            
+                for (FileArtifact newFile : lastPathArtifactsSet){
+                    if (file.getName() == newFile.getName()){
+                        findFile = newFile;
+                        fileExist = "Yes";
+                    }
+                }
+            
+                if (fileExist == "No"){
+                    result = false;
+                } else if (not(file.getMd5Hash() == findFile.getMd5Hash())){
+                    result = false;
+                }
+            }
+        }
+        
+        result;
+    }
+    
+    Boolean sameMd5HashFolders(Path newFilePath, Path lastFilePath) = { 
+        setOf(FileArtifact) newPathArtifactsSet = newFilePath.selectAll();
+        setOf(FileArtifact) lastPathArtifactsSet = lastFilePath.selectAll();
+
+        Boolean result = true;
+        
+        for (FileArtifact file : newPathArtifactsSet){
+            FileArtifact findFile;
+            String fileExist = "No";
+            
+            for (FileArtifact newFile : lastPathArtifactsSet){
+                if (file.getName() == newFile.getName()){
+                    findFile = newFile;
+                    fileExist = "Yes";
+                }
+            }
+            
+            if (fileExist == "No"){
+                result = false;
+            } else if (not(file.getMd5Hash() == findFile.getMd5Hash())){
+                result = false;
+            }
+        }
+        
+        result;
     }
 
     Boolean isAllAppsContainer(ContainerType cntType) = { 
