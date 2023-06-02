@@ -596,7 +596,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     newChangeOnContainerFiles = true;
                 }
                 
-                if (newChangeOnContainerFiles) {
+                if ((newChangeOnContainerFiles) or (getForceContainersCreationSafe(config.forceContainersCreation))) {
                     appImageId = createContainerImage(mgr, b, d, appName, "appCommenDepBaseImage", "0.1.0");
                 }
 
@@ -630,7 +630,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                         newChangeOnContainerFiles = true;
                     }
                     
-                    if (newChangeOnContainerFiles) {
+                    if ((newChangeOnContainerFiles) or (getForceContainersCreationSafe(config.forceContainersCreation))) {
                         appImageId = createContainerImage(mgr, b, d, appName, "appAllDepBaseImage", "0.1.0");
                     }
                     
@@ -817,7 +817,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                         newChangeOnContainerFiles = true;
                     }
                   
-                    if ((newChangeOnContainerFiles) or (newChangeJarFiles)) {
+                    if ((newChangeOnContainerFiles) or (newChangeJarFiles) or (getForceContainersCreationSafe(config.forceContainersCreation))) {
                         appImageId = createContainerImage(mgr, b, d, a.name.toIdentifier(), deviceName, a.ver);
                     }
                       
@@ -853,7 +853,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                                 newChangeOnContainerFiles = true;
                             }
                             
-                            if ((newChangeOnContainerFiles) or (newChangeJarFiles)) {
+                            if ((newChangeOnContainerFiles) or (newChangeJarFiles) or (getForceContainersCreationSafe(config.forceContainersCreation))) {
                                 String ecs_imageId = createContainerImage(mgr, ecsB, ecsD, a.name.toIdentifier(), "ecs", a.ver);
                             }
                             
@@ -972,7 +972,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     newChangeOnContainerFiles = true;
                 }
 
-                if (newChangeOnContainerFiles) {
+                if ((newChangeOnContainerFiles) or (getForceContainersCreationSafe(config.forceContainersCreation))) {
                     appImageId = createContainerImage(mgr, b, d, "allapps", "appCommenDepBaseImage", "0.1.0");
                 }
                 
@@ -1005,7 +1005,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                         newChangeOnContainerFiles = true;
                     }
                     
-                    if (newChangeOnContainerFiles) {
+                    if ((newChangeOnContainerFiles) or (getForceContainersCreationSafe(config.forceContainersCreation))) {
                         appImageId = createContainerImage(mgr, b, d, "allapps", "appAllDepBaseImage", "0.1.0");
                     }
                     
@@ -1196,7 +1196,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                             newChangeOnContainerFiles = true;
                         }
                         
-                        if ((newChangeOnContainerFiles) or (newChangeJarFiles)) {
+                        if ((newChangeOnContainerFiles) or (newChangeJarFiles) or (getForceContainersCreationSafe(config.forceContainersCreation))) {
                             String appImageId = createContainerImage(mgr, b, d, "allapps", deviceName, "0.1.0");
                         }
                     
@@ -1224,7 +1224,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                                 newChangeOnContainerFiles = true;
                             }
                             
-                            if ((newChangeOnContainerFiles) or (newChangeJarFiles)) {
+                            if ((newChangeOnContainerFiles) or (newChangeJarFiles) or (getForceContainersCreationSafe(config.forceContainersCreation))) {
                                 String ecs_imageId = createContainerImage(mgr, ecsB, ecsD, "allapps", deviceName + "_" + "ecs", "0.1.0");
                             }
                     

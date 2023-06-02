@@ -30,6 +30,7 @@ project IIPEcosphere {
     }
     Boolean containerBaseImageMethod = false; // Use container base image method during the container creation.
     Boolean containerTestingMode = false; // Add more testing software into the containers.
+    Boolean forceContainersCreation = false; // Enforce containers creation regardless of the container's fingerprint.
     
     // legacy transition (to be removed)
     Boolean sharedInterfaces = false;

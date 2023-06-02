@@ -193,4 +193,8 @@ template Basics(Configuration config, FileArtifact target) {
     def getContainerTestingModeSafe(DecisionVariable var) {
         getBooleanValueSafe(var, false);
     }
+
+    def getForceContainersCreationSafe(DecisionVariable var) {
+        getBooleanValueSafe(var, false);
+    }
 }
