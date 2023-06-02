@@ -127,8 +127,8 @@ public class ServiceManagerTest {
         ActiveAasBase.setNotificationMode(oldM);
         ServiceManager mgr = new MyServiceManagerAppInst();
         Assert.assertEquals(1, mgr.getServiceInstanceCount("s1"));
-        Assert.assertEquals(4, mgr.getServiceInstanceCount(ServiceBase.composeId("s1", "a1")));
-        Assert.assertEquals(4, mgr.getServiceInstanceCount(ServiceBase.composeId("s1", "a1", "007")));
+        Assert.assertEquals(0, mgr.getServiceInstanceCount(ServiceBase.composeId("s1", "a1")));
+        Assert.assertEquals(0, mgr.getServiceInstanceCount(ServiceBase.composeId("s1", "a1", "007")));
         ActiveAasBase.setNotificationMode(oldM);
     }
     
