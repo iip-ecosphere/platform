@@ -321,7 +321,7 @@ public class Transport {
                                 }
                             }).start();
                         }
-                        LoggerFactory.getLogger(Transport.class).error(
+                        LoggerFactory.getLogger(Transport.class).info(
                             "Created transport connector for {}:{}", params.getHost(), params.getPort());
                     } catch (IOException e) {
                         LoggerFactory.getLogger(Transport.class).error(

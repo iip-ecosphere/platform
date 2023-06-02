@@ -17,6 +17,7 @@ import java.util.HashMap;
 
 import org.junit.Test;
 
+import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
 import de.iip_ecosphere.platform.transport.status.ActionTypes;
 import de.iip_ecosphere.platform.transport.status.StatusMessage;
 import de.iip_ecosphere.platform.transport.status.TraceRecord;
@@ -139,5 +140,20 @@ public class TraceRecordTest {
         Assert.assertNotNull(payload.get("inner"));
         TraceRecordSerializer.clearIgnores();
     }
-
+    
+    /**
+     * Tests JSON string serialization.
+     * 
+     * @throws IOException shall not occur
+     */
+    @Test
+    public void testTraceRecordJson() throws IOException {
+        Payload pl = new Payload();
+        pl.setField(25);
+        pl.setInner(new InnerPayload());
+        TraceRecord record = new TraceRecord("src", "act", pl);
+        TypeTranslator<TraceRecord, String> tt = TraceRecordSerializer.createTypeTranslator();
+        tt.from(tt.to(record));
+    }
+    
 }

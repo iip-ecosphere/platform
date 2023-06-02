@@ -28,7 +28,9 @@ import com.fasterxml.jackson.databind.introspect.AnnotatedMember;
 import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
 import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
 
+import de.iip_ecosphere.platform.transport.serialization.GenericJsonToStringTranslator;
 import de.iip_ecosphere.platform.transport.serialization.Serializer;
+import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
 
 /**
  * A simple, generic JSON status serializer. Additional enum constants must be registered here.
@@ -66,7 +68,16 @@ public class TraceRecordSerializer implements Serializer<TraceRecord> {
         }
         return objectMapper;
     }
-    
+
+    /**
+     * Creates a type translator based on the serialization approach in this class.
+     * 
+     * @return the type translator
+     */
+    public static TypeTranslator<TraceRecord, String> createTypeTranslator() {
+        return new GenericJsonToStringTranslator<TraceRecord>(TraceRecord.class, createMapper());
+    }
+
     @Override
     public TraceRecord from(byte[] data) throws IOException {
         return createMapper().readValue(data, TraceRecord.class);
