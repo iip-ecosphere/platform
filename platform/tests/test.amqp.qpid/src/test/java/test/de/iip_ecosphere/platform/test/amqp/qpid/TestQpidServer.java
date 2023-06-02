@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.qpid.server.SystemLauncher;
+import org.apache.qpid.server.model.Broker;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.Schema;
@@ -49,7 +50,7 @@ public class TestQpidServer extends AbstractTestServer {
     @Override
     public Server start() {
         try {
-            System.setProperty("qpid.amqp_port", Integer.toString(addr.getPort()));
+            System.setProperty(Broker.QPID_AMQP_PORT, Integer.toString(addr.getPort()));
             systemLauncher = new SystemLauncher();
             Map<String, Object> attributes = new HashMap<String, Object>();
             File f = new File(getConfigDir("./src/test"), "config.json");
@@ -58,6 +59,7 @@ public class TestQpidServer extends AbstractTestServer {
             // not refer to keystore, i.e., setting the (custom) system property does not matter here
             File certDir = f.getParentFile();
             System.setProperty("qpid.cert_dir", certDir.toURI().toURL().toExternalForm());
+            System.setProperty(Broker.STORE_FILESYSTEM_MAX_USAGE_PERCENT, "99"); // typically enough for testing
             // https://qpid.apache.org/releases/qpid-broker-j-8.0.0/book/
             // Java-Broker-Initial-Configuration-Configuration-Properties.html
             attributes.put("type", "Memory");
