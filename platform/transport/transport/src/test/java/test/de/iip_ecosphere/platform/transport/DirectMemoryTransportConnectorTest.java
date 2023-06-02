@@ -38,6 +38,7 @@ import de.iip_ecosphere.platform.transport.connectors.impl.DirectMemoryTransferT
 import de.iip_ecosphere.platform.transport.serialization.Serializer;
 import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry;
 import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry.SerializerProvider;
+import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
 import de.iip_ecosphere.platform.transport.status.ActionTypes;
 import de.iip_ecosphere.platform.transport.status.ComponentTypes;
 import de.iip_ecosphere.platform.transport.status.StatusMessage;
@@ -275,6 +276,11 @@ public class DirectMemoryTransportConnectorTest {
         Assert.assertEquals(msg.getId(), rcv.getId());
         Assert.assertEquals(msg.getDeviceId(), rcv.getDeviceId());
         Assert.assertArrayEquals(msg.getAliasIds(), rcv.getAliasIds());
+        
+        TypeTranslator<StatusMessage, String> tt = StatusMessageSerializer.createTypeTranslator();
+        tt.from(tt.to(msg));
+        msg.withResult(-1);
+        tt.from(tt.to(msg));
     }
 
     /**

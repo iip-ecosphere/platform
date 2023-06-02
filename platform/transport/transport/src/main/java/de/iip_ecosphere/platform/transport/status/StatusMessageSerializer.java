@@ -26,7 +26,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
+import de.iip_ecosphere.platform.transport.serialization.GenericJsonToStringTranslator;
 import de.iip_ecosphere.platform.transport.serialization.Serializer;
+import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
 
 /**
  * A simple, generic status serializer. Additional enum constants must be registered here.
@@ -35,12 +37,16 @@ import de.iip_ecosphere.platform.transport.serialization.Serializer;
  */
 public class StatusMessageSerializer implements Serializer<StatusMessage> {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final Map<String, ActionType> ACTION_CONSTANTS = new HashMap<>();
     private static final Map<String, ComponentType> COMPONENT_CONSTANTS = new HashMap<>();
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    static {
-        // register defaults
+    /**
+     * Creates an object mapper instances.
+     * 
+     * @return the mapper
+     */
+    static  {
         registerActions(ActionTypes.class);
         registerComponents(ComponentTypes.class);
         
@@ -52,6 +58,15 @@ public class StatusMessageSerializer implements Serializer<StatusMessage> {
             new EnumDeserializer<ComponentType>(COMPONENT_CONSTANTS, ComponentType.class));
         
         MAPPER.registerModule(module);
+    }
+    
+    /**
+     * Creates a type translator based on the serialization approach in this class.
+     * 
+     * @return the type translator
+     */
+    public static TypeTranslator<StatusMessage, String> createTypeTranslator() {
+        return new GenericJsonToStringTranslator<StatusMessage>(StatusMessage.class, MAPPER);
     }
     
     /**
@@ -104,7 +119,7 @@ public class StatusMessageSerializer implements Serializer<StatusMessage> {
      * @param <T> the type to deserialize
      * @author Holger Eichelberger, SSE
      */
-    static class EnumDeserializer<T> extends StdDeserializer<T> {
+    public static class EnumDeserializer<T> extends StdDeserializer<T> {
 
         private static final long serialVersionUID = -1654499344527076310L;
         private Map<String, T> mapping;
@@ -115,7 +130,7 @@ public class StatusMessageSerializer implements Serializer<StatusMessage> {
          * @param mapping the mapping to use for deserialization
          * @param cls the type of enums to deserialize
          */
-        private EnumDeserializer(Map<String, T> mapping, Class<T> cls) {
+        public EnumDeserializer(Map<String, T> mapping, Class<T> cls) {
             super(cls);
             this.mapping = mapping;
         }
