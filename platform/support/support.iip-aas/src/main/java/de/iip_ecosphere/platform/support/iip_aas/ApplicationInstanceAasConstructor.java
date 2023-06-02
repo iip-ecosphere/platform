@@ -54,11 +54,10 @@ public class ApplicationInstanceAasConstructor {
         ActiveAasBase.processNotification(NAME_SUBMODEL_APPINSTANCES, NotificationMode.SYNCHRONOUS, (sub, aas) -> {
             // -1 is legacy, may fail when further app uses same services
             int newId = Boolean.valueOf(OsUtils.getPropertyOrEnv("iip.firstWithoutAppId", "false")) 
-                && sub.getSubmodelElementsCount() == 0 ? -1 : 0; 
+                && sub.getSubmodelElementsCount() == 0 ? 0 : 1; 
             String propMaxId = AasUtils.fixId(appId + "_max");
             Property propMax = sub.getProperty(propMaxId);
             if (null == propMax) {
-                newId = 0;
                 SubmodelBuilder builder = aas.createSubmodelBuilder(sub.getIdShort(), sub.getIdentification());
                 builder.createPropertyBuilder(propMaxId)
                     .setValue(Type.INTEGER, newId)
