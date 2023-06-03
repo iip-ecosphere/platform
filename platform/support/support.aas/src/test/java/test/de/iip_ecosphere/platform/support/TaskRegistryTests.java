@@ -55,6 +55,14 @@ public class TaskRegistryTests {
 
         task = TaskRegistry.registerTask();
         TimeUtils.sleep(1500);
+
+        Thread t = new Thread(() -> { });
+        TaskRegistry.associateTask(t, task);
+        Assert.assertTrue(task.sameTask(TaskRegistry.getTaskData(t)));
+        Assert.assertFalse(task.sameTask((TaskData) null));
+        Assert.assertFalse(task.sameTask((String) null));
+        TaskRegistry.unassociateTask(t);
+        
         TaskRegistry.cleanup();
         // still running
         Assert.assertEquals(task, TaskRegistry.getTaskData());

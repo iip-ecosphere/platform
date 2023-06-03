@@ -24,7 +24,7 @@ import java.util.Map;
  */
 public class TaskRegistry {
 
-    public static final TaskData NO_TASK = new TaskData("").setStatus(TaskStatus.UNKNOWN);
+    public static final TaskData NO_TASK = new TaskData("", null).setStatus(TaskStatus.UNKNOWN);
     private static long timeout = 2 * 60 * 1000;
     private static Map<String, TaskData> idToData = new HashMap<>();
     private static Map<Long, TaskData> threadToData = new HashMap<>();
@@ -43,7 +43,7 @@ public class TaskRegistry {
 
     /**
      * Represents data associated to a task. The task data may require multiple task status changes to count as 
-     * {@lint TaskStatus#STOPPED}. It may also count/compare a certain number of generic events.
+     * {@link TaskStatus#STOPPED}. It may also count/compare a certain number of generic events.
      * 
      * @author Holger Eichelberger, SSE
      */
@@ -62,9 +62,10 @@ public class TaskRegistry {
          * Creates an instance, sets the id and turns the status to {@link TaskStatus#RUNNING}.
          * 
          * @param taskId a given task id, <b>null</b> for generate one
+         * @param thread the thread to take for the thread id, may be <b>null</b> for the actual thread
          */
-        private TaskData(String taskId) {
-            threadId = Thread.currentThread().getId();
+        private TaskData(String taskId, Thread thread) {
+            threadId = getThreadId(thread);
             if (null != taskId) {
                 id = taskId;
             } else {
@@ -117,7 +118,7 @@ public class TaskRegistry {
          * @return the new counter value
          */
         public int incEventCount() {
-            return eventCount++;
+            return ++eventCount;
         }
         
         /**
@@ -147,6 +148,43 @@ public class TaskRegistry {
             return status;
         }
         
+        @Override
+        public String toString() {
+            return "threadId " + threadId + " id " + id + " status " + status;
+        }
+        
+        /**
+         * Returns whether the given task {@code data} is the same regarding the task id modulo beginning/trailing 
+         * quotes as {@link #getId()}.
+         * 
+         * @param data the task id to compare (may be <b>null</b>)
+         * @return {@code true} if both task ids are the same (modulo begining/trailing quotes), 
+         */
+        public boolean sameTask(TaskData data) {
+            return data != null && sameTask(data.getId());
+        }
+        
+        /**
+         * Returns whether the given {@code taskId} modulo beginning/trailing quotes is the same
+         * as {@link #getId()}.
+         * 
+         * @param taskId the task id to compare (may be <b>null</b>)
+         * @return {@code true} if both task ids are the same (modulo begining/trailing quotes), 
+         */
+        public boolean sameTask(String taskId) {
+            return id.equals(taskId);
+        }
+        
+    }
+
+    /**
+     * Returns the thread id of {@code thread}.
+     * 
+     * @param thread the thread, may be <b>null</b> the the id of the current thread is returned
+     * @return the thread id
+     */
+    private static long getThreadId(Thread thread) {
+        return null == thread ? Thread.currentThread().getId() : thread.getId();
     }
     
     /**
@@ -209,8 +247,8 @@ public class TaskRegistry {
      * @return the task data of the new task
      */
     public static synchronized TaskData registerTask(Thread thread, String taskId) {
-        TaskData data = new TaskData(taskId);
-        long current = thread.getId();
+        TaskData data = new TaskData(taskId, thread);
+        long current = data.threadId;
         TaskData old = threadToData.remove(current);
         // not for idToData, keep for requests until cleanup
         if (null != old && old.status == TaskStatus.RUNNING) {
@@ -219,6 +257,32 @@ public class TaskRegistry {
         threadToData.put(current, data);
         idToData.put(data.id, data);
         return data;
+    }
+    
+    /**
+     * Associates existing task {@code data} with {@code thread}. In contrast, registring creates
+     * a new task data object, here an existing (keeping the thread id in {@code data}) with its status
+     * is used further on.
+     * 
+     * @param thread the thread, may be <b>null</b> then the current thread is assumed
+     * @param data the task data, may be <b>null</b> or {@link #NO_TASK} then nothing is happening
+     */
+    public static synchronized void associateTask(Thread thread, TaskData data) {
+        if (null != data && data != NO_TASK) {
+            long current = getThreadId(thread);
+            threadToData.put(current, data);
+        }
+    }
+
+    /**
+     * Unassociates a thread.
+     * 
+     * @param thread the thread, may be <b>null</b> then the current thread is assumed
+     * @see #associateTask(Thread, TaskData)
+     */
+    public static synchronized void unassociateTask(Thread thread) {
+        long current = getThreadId(thread);
+        threadToData.remove(current);
     }
 
     /**
