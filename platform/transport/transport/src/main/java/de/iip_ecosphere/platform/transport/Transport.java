@@ -107,7 +107,8 @@ public class Transport {
          * @param aliasIds optional alias ids for the service
          */
         public void sendServiceStatus(ActionType action, String serviceId, String... aliasIds) {
-            sendStatus(new StatusMessage(ComponentTypes.SERVICE, action, serviceId, Id.getDeviceId(), aliasIds));
+            sendStatus(new StatusMessage(ComponentTypes.SERVICE, action, serviceId, Id.getDeviceId(), aliasIds)
+                .withTask());
         }
 
         /**
@@ -122,7 +123,7 @@ public class Transport {
         public void sendServiceStatusWithDescription(ActionType action, String serviceId, String description, 
             String... aliasIds) {
             sendStatus(new StatusMessage(ComponentTypes.SERVICE, action, serviceId, Id.getDeviceId(), aliasIds)
-                .withDescription(description));
+                .withDescription(description).withTask());
         }
 
         /**
@@ -135,7 +136,7 @@ public class Transport {
          */
         public void sendServiceArtifactStatus(ActionType action, String artifactId, String... aliasIds) {
             sendStatus(new StatusMessage(ComponentTypes.SERVICE_ARTIFACT, action, artifactId, Id.getDeviceId(), 
-                aliasIds));
+                aliasIds).withTask());
         }
 
         /**

@@ -52,7 +52,7 @@ public class TaskUtils {
      */
     public static String executeAsTask(String componentId, ExceptionFunction func, TaskCompletedPredicate pred, 
         Object... params) {
-        return executeAsTask(TaskRegistry.registerTask(), componentId, func, pred, params);
+        return executeAsTask(null, componentId, func, pred, params);
     }
 
     /**
@@ -88,8 +88,6 @@ public class TaskUtils {
         
     }
     
-    // checkstyle: stop exception type check
-    
     /**
      * Executes {@code func} as task within the given task {@code data} and sends respective {@link StatusMessage}s.
      *
@@ -102,21 +100,59 @@ public class TaskUtils {
      */
     public static String executeAsTask(TaskData data, String componentId, ExceptionFunction func, 
         TaskCompletedPredicate pred, Object... params) {
-        new Thread(() -> {
+        Task task = new Task(componentId, func, pred, params);
+        Thread thread = new Thread(task);
+        if (null == data) {
+            data = TaskRegistry.registerTask(thread);
+            data.setRequiredStopCalls(2);
+        }
+        task.data = data;
+        thread.start();
+        return data.getId();        
+    }
+
+    /**
+     * Executes a given function as task/thread within the given task data and sends respective {@link StatusMessage}s.
+     */
+    private static class Task implements Runnable {
+        
+        private TaskData data;
+        private String componentId;
+        private ExceptionFunction func;
+        private TaskCompletedPredicate pred;
+        private Object[] params;
+        
+        /**
+         * Creates the task object.
+         *
+         * @param componentId the component id of the execution function
+         * @param func the function to execute
+         * @param pred optional task completed predicate function, may be <b>null</b>
+         * @param params the function parameters
+         */
+        private Task(String componentId, ExceptionFunction func, TaskCompletedPredicate pred, Object[] params) {
+            this.componentId = componentId;
+            this.func = func;
+            this.pred = pred;
+            this.params = params;
+        }
+ 
+        // checkstyle: stop exception type check
+        
+        @Override
+        public void run() {
             if (null != pred) {
-                data.setRequiredStopCalls(2);
                 ReceptionCallback<StatusMessage> cb = new ReceptionCallback<>() {
 
                     @Override
                     public void received(StatusMessage msg) {
-                        if (msg.getTaskId() == data.getId() && pred.test(data, msg)) {
+                        if (data.sameTask(msg.getTaskId()) && pred.test(data, msg)) {
                             try {
                                 Transport.getConnector().detachReceptionCallback(StatusMessage.STATUS_STREAM, this);
                             } catch (IOException e) {
                                 LoggerFactory.getLogger(TaskUtils.class).error("Cannot stop tracking task status of {} "
                                     + "for component {}: {}", data.getId(), componentId, e.getMessage());
                             }
-                            TaskRegistry.stopTask(data.getId());
                         }
                     }
 
@@ -138,10 +174,10 @@ public class TaskUtils {
                 Transport.sendProcessStatus(componentId, ActionTypes.RESULT, e.getMessage());
             }
             TaskRegistry.stopTask(data.getId());
-        }).start();
-        return data.getId();        
+        }
+
+        // checkstyle: resume exception type check
+
     }
-    
-    // checkstyle: resume exception type check
 
 }
