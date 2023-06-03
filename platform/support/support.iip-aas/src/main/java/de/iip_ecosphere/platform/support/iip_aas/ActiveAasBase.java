@@ -21,6 +21,8 @@ import java.util.function.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.iip_ecosphere.platform.support.TaskRegistry;
+import de.iip_ecosphere.platform.support.TaskRegistry.TaskData;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.Property;
@@ -110,7 +112,12 @@ public class ActiveAasBase {
                         if (NotificationMode.SYNCHRONOUS == mode) {
                             processor.process(submodel, aas);
                         } else {
-                            exec.execute(() -> processor.process(submodel, aas));
+                            final TaskData data = TaskRegistry.getTaskData();
+                            exec.execute(() -> {
+                                TaskRegistry.associateTask(null, data);
+                                processor.process(submodel, aas);
+                                TaskRegistry.unassociateTask(null);
+                            });
                         }
                     }
                 } else {
