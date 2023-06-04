@@ -266,13 +266,15 @@ public abstract class TransportToAasConverter<T> extends TransportConverter<T> {
      * @param payload the payload to be presented
      * @see #createPayloadEntry(String, Class, Class)
      */
+    @SuppressWarnings("deprecation")
     protected void createPayloadEntries(SubmodelElementCollectionBuilder payloadBuilder, Object payload) {
         if (null != payload) {
             Class<?> cls = payload.getClass();
             for (Method m : cls.getMethods()) {
                 if (isGetter(m)) {
-                    String field = m.getName().substring(PREFIX_GETTER.length());
-                    if (!createPayloadEntry(field, m.getReturnType(), cls)) {
+                    String fieldName = m.getName();
+                    String field = fieldName.substring(PREFIX_GETTER.length());
+                    if (!createPayloadEntry(field, m.getReturnType(), cls) || isExcludedField(fieldName)) {
                         continue;
                     }
                     Class<?> valueCls = null;

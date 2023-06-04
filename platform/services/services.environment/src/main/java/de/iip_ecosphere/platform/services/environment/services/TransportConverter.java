@@ -17,8 +17,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import org.slf4j.LoggerFactory;
@@ -49,7 +52,9 @@ public abstract class TransportConverter<T> {
     
     private String transportStream;
     private Class<T> dataType;
-    private Supplier<Boolean> aasEnabledSupplier = () -> true;
+    private Predicate<T> handleNewFilter = d -> true;
+    private Supplier<Boolean> aasEnabledSupplier;
+    private Set<String> excludedFields = new HashSet<>();
 
     /**
      * Creates a service instance.
@@ -58,10 +63,53 @@ public abstract class TransportConverter<T> {
      * @param dataType the type of the data in the transport stream
      */
     public TransportConverter(String transportStream, Class<T> dataType) {
+        this(transportStream, dataType, null);
+    }
+
+    /**
+     * Creates a service instance.
+     *
+     * @param transportStream the transport stream to be observed (name of the stream)
+     * @param dataType the type of the data in the transport stream
+     * @param handleNewFilter filter for {@link #handleNew(Object)}, may be <b>null</b>
+     */
+    public TransportConverter(String transportStream, Class<T> dataType, Predicate<T> handleNewFilter) {
         this.transportStream = transportStream;
         this.dataType = dataType;
+        this.handleNewFilter = null == handleNewFilter ? d -> true : handleNewFilter;
+    }
+
+    /**
+     * Sets the excluded fields for {@link #handleNew(Object)}.
+     * 
+     * @param excludedFields the excluded fields, may be <b>null</b> or empty for none
+     */
+    public void setExcludedFields(Set<String> excludedFields) {
+        this.excludedFields.clear();
+        if (excludedFields != null) {
+            this.excludedFields.addAll(excludedFields);
+        }
     }
     
+    /**
+     * Returns whether {@code fieldName} is excluded.
+     * 
+     * @param fieldName the name of the field
+     * @return {@code true} for excluded, {@code false} else
+     */
+    public boolean isExcludedField(String fieldName) {
+        return excludedFields.contains(fieldName);
+    }
+    
+    /**
+     * Returns the excluded fields array.
+     * 
+     * @return the excluded fields as array
+     */
+    protected String[] getExcludedFieldsArray() {
+        return excludedFields.toArray(new String[excludedFields.size()]);
+    }
+
     /**
      * Defines a new notifier which is called when new data arrives. Currently only one notifier is supported.
      * 
@@ -96,7 +144,9 @@ public abstract class TransportConverter<T> {
                 LoggerFactory.getLogger(getClass()).error("Cannot inform notifier: {}", e.getMessage());
             }
         }
-        handleNew(data);
+        if (handleNewFilter.test(data)) {
+            handleNew(data);
+        }
     }
     
     /**
@@ -107,7 +157,9 @@ public abstract class TransportConverter<T> {
      * @param fieldType the declared field type (real value may be a sub-type)
      * @param cls the class declaring the field
      * @return {@code true} for creating a payload entry, {@code false} else
+     * @deprecated use {@link #setExcludedFields(Set)} instead
      */
+    @Deprecated
     protected boolean createPayloadEntry(String fieldName, Class<?> fieldType, Class<?> cls) {
         return true;
     }
