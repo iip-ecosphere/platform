@@ -325,7 +325,7 @@ public class ServicesAasClient extends SubmodelElementsCollectionClient implemen
     @Override
     public void startServiceAsTask(String taskId, String... serviceId) throws ExecutionException {
         fromJson(getOperation(ServicesAas.NAME_OP_SERVICE_START_TASK)
-            .invoke(JsonUtils.toJson(serviceId), JsonUtils.toJson(taskId)));
+            .invoke(JsonUtils.toJson(serviceId), taskId));
     }
 
     @Override
@@ -335,13 +335,13 @@ public class ServicesAasClient extends SubmodelElementsCollectionClient implemen
             options = new HashMap<>();
         }
         fromJson(getOperation(ServicesAas.NAME_OP_SERVICE_START_WITH_OPTS_TASK)
-            .invoke(JsonUtils.toJson(serviceId), JsonUtils.toJson(taskId), writeMap(options)));
+            .invoke(JsonUtils.toJson(serviceId), taskId, writeMap(options)));
     }
 
     @Override
     public void stopServiceAsTask(String taskId, String... serviceId) throws ExecutionException {
         fromJson(getOperation(ServicesAas.NAME_OP_SERVICE_STOP_TASK)
-            .invoke(JsonUtils.toJson(serviceId), JsonUtils.toJson(taskId)));
+            .invoke(JsonUtils.toJson(serviceId), taskId));
     }
 
     /**
