@@ -32,6 +32,7 @@ import de.iip_ecosphere.platform.services.environment.services.TransportConverte
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.IipVersion;
 import de.iip_ecosphere.platform.support.semanticId.SemanticIdResolver;
+import de.iip_ecosphere.platform.transport.Transport;
 import de.iip_ecosphere.platform.transport.status.ActionTypes;
 import de.iip_ecosphere.platform.transport.status.StatusMessage;
 import de.iip_ecosphere.platform.transport.status.StatusMessageSerializer;
@@ -52,6 +53,7 @@ public class Cli extends CliBackend {
     public static void main(String[] args) {
         PlatformSetup setup = PlatformSetup.getInstance();
         AasPartRegistry.setAasSetup(setup.getAas());
+        Transport.setTransportSetup(() -> setup.getTransport());
         CommandProvider provider;
         SemanticIdResolver.resolve(""); // warm-up, initialize
         if (0 == args.length) {
@@ -200,14 +202,25 @@ public class Cli extends CliBackend {
             StatusMessage.class, setup.getStatusGatewayEndpoint(), StatusMessageSerializer.createTypeTranslator())
             .createWatcher(0);
         result.setConsumer(s -> {
-            if (s.getAction() != ActionTypes.PROCESS && s.getAction() != ActionTypes.RESULT) {
-                String desc = s.getDescription();
-                if (desc.length() > 0) {
-                    desc = " " + desc;
-                }
-                System.out.println(" - " + s.getAction().toString().toLowerCase() + " " + s.getId() 
-                    + " to " + s.getDeviceId() + desc);
+            String leadIn = "-"; // for now just all messages
+            if (s.getAction() == ActionTypes.PROCESS && s.getAction() == ActionTypes.RESULT) {
+                leadIn = "=";
+            } else if (s.getAction() == ActionTypes.ERROR) {
+                leadIn = "!";
             }
+            leadIn = " " + leadIn + " ";
+            String desc = s.getDescription();
+            if (desc.length() > 0) {
+                desc = " " + desc;
+            }
+            String taskId = s.getTaskId();
+            if (taskId != null) {
+                taskId = " in task " + taskId;
+            } else {
+                taskId = "";
+            }
+            System.out.println(leadIn + s.getAction().toString().toLowerCase() + " " + s.getId() 
+                + " to " + s.getDeviceId() + desc + taskId);
         });
         return result;
     }
@@ -219,14 +232,18 @@ public class Cli extends CliBackend {
      * @throws ExecutionException if deploying the plain fails
      */
     private static void deployPlanEmitId(URI uri) throws ExecutionException {
+        //System.out.println(TaskUtils.executeAsTask("IIP-Ecosphere Platform", q -> {
         Watcher<StatusMessage> watcher = createStatusWatcher().start();
         String appInstId = deployPlan(uri);
         if (null != appInstId && appInstId.length() > 0) {
             println("Started with application id " + appInstId);
         }
         watcher.stop();
+        //return appInstId;
+        //}, PlatformAas.DEPLOY_COMPLETED));
     }
-
+    
+    
     /**
      * The service-level command interpreter.
      * 

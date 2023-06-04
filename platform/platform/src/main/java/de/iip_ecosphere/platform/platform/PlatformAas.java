@@ -68,11 +68,11 @@ public class PlatformAas implements AasContributor {
     
     private static final String PROGRESS_COMPONENT_ID = "IIP-Ecosphere Platform";
     
-    private static final TaskCompletedPredicate DEPLOY_COMPLETED = (t, s) -> {
+    static final TaskCompletedPredicate DEPLOY_COMPLETED = (t, s) -> {
         if (s.getAction() == ActionTypes.PROCESS && ServiceManager.PROGRESS_COMPONENT_ID.equals(s.getId())) {
-            t.incEventCount(); // 2 per service!
+            t.incEventCount(); // 2 progress messages per service!
         }
-        return t.maxEventCountReached();
+        return t.maxEventCountReached() || s.getAction() == ActionTypes.ERROR;
     };
     
     @Override

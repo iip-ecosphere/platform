@@ -330,6 +330,7 @@ class CliBackend {
         private ExecutionException exception;
         private String resourceId;
         private Map<String, String> options;
+        private TaskData data;
 
         /**
          * Creates the runnable.
@@ -338,19 +339,20 @@ class CliBackend {
          * @param client the services client to be used
          * @param serviceIds the ids of the services to be started
          * @param options the service start options, may be <b>null</b>
+         * @param data the task data, may be <b>null</b>
          */
         private StartServicesRunnable(String resourceId, ServicesClient client, String[] serviceIds, 
-            Map<String, String> options) {
+            Map<String, String> options, TaskData data) {
             this.client = client;
             this.serviceIds = serviceIds;
             this.resourceId = resourceId;
             this.options = options;
+            this.data = data;
         }
 
         @Override
         public void run() {
             try {
-                TaskData data = TaskRegistry.getTaskData();
                 println(getMessagePrefix(true) + (null == data ? "" : ": " + data.getId()));
                 if (null != data) {
                     client.startServiceAsTask(data.getId(), options, serviceIds);
@@ -547,7 +549,8 @@ class CliBackend {
             Map<String, String> opt = getStartOptions(p);
             for (ServiceResourceAssignment a: p.getAssignments()) {
                 StartServicesRunnable r = new StartServicesRunnable(a.getResource(),
-                    serviceClients.get(a.getResource()), a.getServicesAsArray(p.getAppId(), appInstanceId), opt);
+                    serviceClients.get(a.getResource()),
+                    a.getServicesAsArray(p.getAppId(), appInstanceId), opt, taskData);
                 runnables.add(r);
                 if (null != es) {
                     es.execute(r);
