@@ -28,6 +28,7 @@ project Transport {
         assign (semanticId = Eclass_Unit_MByte) to {
             Integer memLimit = 312; // e.g., JVM memory limit in MBytes
         }
+        Port gatewayPort = 10000;
         //Constraint actionTimeoutValid = isDefined(actionTimeout) and actionTimeout > 0; // currently NPE in EAYs
     };
     
