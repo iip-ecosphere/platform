@@ -54,6 +54,15 @@ public class GenericJsonToStringTranslator<T> implements TypeTranslator<T, Strin
             this.mapper = mapper;
         }
     }
+    
+    /**
+     * Returns the object mapper, e.g., for further customization.
+     * 
+     * @return the mapper
+     */
+    public ObjectMapper getMapper() {
+        return mapper;
+    }
 
     @Override             
     public T from(String data) throws IOException {

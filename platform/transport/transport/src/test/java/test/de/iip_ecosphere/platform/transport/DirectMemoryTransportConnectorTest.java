@@ -35,6 +35,7 @@ import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 import de.iip_ecosphere.platform.transport.connectors.impl.DirectMemoryTransferTransportConnector;
+import de.iip_ecosphere.platform.transport.serialization.GenericJsonToStringTranslator;
 import de.iip_ecosphere.platform.transport.serialization.Serializer;
 import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry;
 import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry.SerializerProvider;
@@ -281,6 +282,15 @@ public class DirectMemoryTransportConnectorTest {
         tt.from(tt.to(msg));
         msg.withResult(-1);
         tt.from(tt.to(msg));
+    }
+
+    /**
+     * Basic tests on {@link GenericJsonToStringTranslator}.
+     */
+    @Test
+    public void testGenericJsonTypeTranslator() {
+        GenericJsonToStringTranslator<Object> tt = new GenericJsonToStringTranslator<Object>(Object.class);
+        Assert.assertNotNull(tt.getMapper());
     }
 
     /**
