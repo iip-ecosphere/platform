@@ -29,11 +29,14 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.cfg.MapperConfig;
 import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
 import com.fasterxml.jackson.databind.introspect.AnnotatedField;
+import com.fasterxml.jackson.databind.introspect.AnnotatedMember;
 import com.fasterxml.jackson.databind.introspect.AnnotatedMethod;
 import com.fasterxml.jackson.databind.introspect.AnnotatedParameter;
+import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
 import com.fasterxml.jackson.databind.module.SimpleAbstractTypeResolver;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
+import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.iip_aas.config.ServerAddressHolder;
 
@@ -436,6 +439,47 @@ public class JsonUtils {
             mapping.put(javaField, fn);
         }
         return mapper.setPropertyNamingStrategy(new MappingPropertyNamingStrategy(mapping));
+    }
+    
+    /**
+     * Returns an object writer for a mapper that applies a filter on {@code fieldNames} to be excluded.
+     * 
+     * @param mapper the mapper
+     * @param fieldNames the field names
+     * @return the object writer
+     */
+    public static ObjectMapper exceptFields(ObjectMapper mapper, String... fieldNames) {
+        final Set<String> exclusions = CollectionUtils.addAll(new HashSet<String>(), fieldNames);
+        mapper.setAnnotationIntrospector(new JacksonAnnotationIntrospector() {
+
+            private static final long serialVersionUID = -6485293464445674590L;
+
+            @Override
+            public boolean hasIgnoreMarker(final AnnotatedMember member) {
+                return exclusions.contains(member.getName()) || super.hasIgnoreMarker(member);
+            }
+        });
+        
+        return mapper;
+    }
+    
+    /**
+     * Turns {@code object} into JSON using {@code mapper}.
+     * 
+     * @param mapper the object mapper
+     * @param object the object to write (may be <b>null</b>)
+     * @return the JSON string or an empty string in case of problems/no address
+     */
+    public static String toJson(ObjectMapper mapper, Object object) {
+        String result = "";
+        if (null != object) {
+            try {
+                result = mapper.writeValueAsString(object);
+            } catch (JsonProcessingException e) {
+                // handled by default value
+            }
+        } 
+        return result;
     }
 
 }

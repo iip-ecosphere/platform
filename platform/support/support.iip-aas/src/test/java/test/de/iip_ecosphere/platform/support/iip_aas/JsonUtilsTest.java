@@ -17,6 +17,7 @@ import org.junit.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.ServerAddress;
@@ -268,20 +269,17 @@ public class JsonUtilsTest {
     }
     
     /**
-     * Tests strange names in {@link PropertyData} with {@link JsonUtils#toJson(Object)} 
-     * and {@link JsonUtils#fromJson(Object, Class)}.
+     * Tests {@link JsonUtils#exceptFields(ObjectMapper, String...)} and {@link JsonUtils#toJson(ObjectWriter, Object)}.
      */
-    /*@Test
-    public void testToJson() {
+    @Test
+    public void testExceptFields() {
         PropertyData data = new PropertyData();
         data.setStringVAlue("abba");
-        String json = JsonUtils.toJson(data);
-        Assert.assertTrue(json.contains("INTVALUE"));
-        Assert.assertTrue(json.contains("stringVAlue"));
-        PropertyData d1 = JsonUtils.fromJson(json, PropertyData.class);
-        Assert.assertEquals(data.getStringVAlue(), d1.getStringVAlue());
-        Assert.assertEquals(data.getINTVALUE(), d1.getINTVALUE());
-        Assert.assertEquals(data.getHW_Btn2(), d1.getHW_Btn2());
-    }*/
+        ObjectMapper mapper = JsonUtils.exceptFields(new ObjectMapper(), "stringVAlue");
+        Assert.assertEquals("", JsonUtils.toJson(mapper, null));
+        String json = JsonUtils.toJson(mapper, data);
+        Assert.assertTrue(json.contains("intvalue")); // no define fields, standard conventions
+        Assert.assertFalse(json.contains("stringVAlue"));
+    }
 
 }
