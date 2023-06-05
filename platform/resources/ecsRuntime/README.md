@@ -45,8 +45,12 @@ The basic YAML configuration of the services management (in ``iipecosphere.yml``
     transport:
         host: <String>
         port: <int>
-        password: <String>
-        user: <String>
+        authenticationKey: <String>
+        keystoreKey: <String>
+        keyAlias: <String>
+        hostnameVerification: <Boolean>
+        gatewayPort: <int>
+        netmask: <String>
     netMgr:
         lowPort: <int>
         highPort: <int>
@@ -60,7 +64,7 @@ The basic YAML configuration of the services management (in ``iipecosphere.yml``
 * `monitoringUpdatePeriod` defines a period in ms when internal metrics are updated and reported.
 * `autoOnOffboarding` always registers/removes the device to/from the central registry, failures are not reported. This is meant to be a debugging/development behavior rather than a production feature. Default is `true`, but shall be `false` in production settings.
 * `artifactInfixes` list of string file name indexes to be tried before a default artifact is loaded, e.g., to indicate device-specific containers.
-* `transport` defines the setup of the central transport server/broker. `password` and `user` are preliminary and may be removed in future versions.
+* `transport` defines the setup of the central transport server/broker. `authenticationKey` points to an entry in the identityStore providing the authentication information for this protocol. If TLS shall be used, the `keystoreKey` delivers the identity to open the associated keystore and `keyAlias` may point to a dedicated key in that keystore. TLS `hostnameVerification` may be explicitly enabled/disabled. Further, depending on context and utilized protocol, `gatewayPort` may indicate a port on `host` to allow for the transport converters to expose certain parts like platform status changes or AppAAS in terms of messages. If `gatewayPort` is negative, a local server may be created with an IP selected according to `netmask`.
 * `netMgr` sets up minimum or maximum port for automated ephemeral port assignment. Default range is 1024-65535 according to RFC 6056. The `netmask` has the same semantics as for `implementation`.
 
 ## Device AAS
