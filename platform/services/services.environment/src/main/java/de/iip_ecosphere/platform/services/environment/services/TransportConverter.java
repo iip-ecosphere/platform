@@ -27,8 +27,10 @@ import java.util.function.Supplier;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.Endpoint;
+import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
+import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.function.IOConsumer;
 import de.iip_ecosphere.platform.support.iip_aas.AasUtils;
@@ -57,6 +59,58 @@ public abstract class TransportConverter<T> {
     private Set<String> excludedFields = new HashSet<>();
 
     /**
+     * Represents a pair of server/converter created together.
+     * 
+     * @param <T> the data type
+     * @author Holger Eichelberger, SSE
+     */
+    public static class ConverterInstances<T> {
+        
+        private Server server;
+        private TransportConverter<T> converter;
+
+        /**
+         * Creates an instance without server.
+         * 
+         * @param converter the converter
+         */
+        public ConverterInstances(TransportConverter<T> converter) {
+            this(null, converter);
+        }
+
+        /**
+         * Creates an instance.
+         * 
+         * @param server the server (may be <b>null</b> for none)
+         * @param converter the converter
+         */
+        protected ConverterInstances(Server server, TransportConverter<T> converter) {
+            this.server = server;
+            this.converter = converter;
+        }
+
+        /**
+         * Returns the server.
+         * 
+         * @return the server (may be <b>null</b> for none)
+         */
+        public Server getServer() {
+            return server;
+        }
+        
+        /**
+        * Returns the converter.
+        * 
+        * @return the converter
+        */
+        public TransportConverter<T> getConverter() {
+            return converter;
+        }
+        
+    }
+    
+    
+    /**
      * Creates a service instance.
      *
      * @param transportStream the transport stream to be observed (name of the stream)
@@ -76,6 +130,15 @@ public abstract class TransportConverter<T> {
     public TransportConverter(String transportStream, Class<T> dataType, Predicate<T> handleNewFilter) {
         this.transportStream = transportStream;
         this.dataType = dataType;
+        setHandleNewFilter(handleNewFilter);
+    }
+
+    /**
+     * Sets a filter for {@link #handleNew(Object)}.
+     * 
+     * @param handleNewFilter filter for {@link #handleNew(Object)}, may be <b>null</b>
+     */
+    public void setHandleNewFilter(Predicate<T> handleNewFilter) {
         this.handleNewFilter = null == handleNewFilter ? d -> true : handleNewFilter;
     }
 
@@ -149,21 +212,6 @@ public abstract class TransportConverter<T> {
         }
     }
     
-    /**
-     * Returns whether a payload entry for a given field in a given class shall be created. Large entries may cause 
-     * AAS performance/memory issues.
-     * 
-     * @param fieldName the field name
-     * @param fieldType the declared field type (real value may be a sub-type)
-     * @param cls the class declaring the field
-     * @return {@code true} for creating a payload entry, {@code false} else
-     * @deprecated use {@link #setExcludedFields(Set)} instead
-     */
-    @Deprecated
-    protected boolean createPayloadEntry(String fieldName, Class<?> fieldType, Class<?> cls) {
-        return true;
-    }
-
     /**
      * Obtains the value return by {@code method} on {@code payload}.
      * 
@@ -267,12 +315,19 @@ public abstract class TransportConverter<T> {
     }
 
     /**
+     * Initializes the submodel.
+     * 
+     * @param smBuilder the submodel builder
+     */
+    public void initializeSubmodel(SubmodelBuilder smBuilder) {
+    }
+
+    /**
      * Starts the transport tracer.
      * 
      * @param aasSetup the AAS setup to use
-     * @param deploy whether the AAS represented by this converter shall be deployed
      */
-    public void start(AasSetup aasSetup, boolean deploy) {
+    public void start(AasSetup aasSetup) {
         callback = new TraceRecordReceptionCallback();
         TransportConnector conn = Transport.createConnector();
         if (null != conn) {
@@ -327,7 +382,7 @@ public abstract class TransportConverter<T> {
     /**
      * Changes the cleanup timeout, i.e., the time between two cleanups.
      * 
-     * @param cleanupTimeout the timeout in ms
+     * @param cleanupTimeout the timeout in ms, disables cleanup if negative
      */
     public void setCleanupTimeout(long cleanupTimeout) {
         // ignored
@@ -381,6 +436,9 @@ public abstract class TransportConverter<T> {
      */
     public static void addEndpointToAas(SubmodelElementContainerBuilder smBuilder, Endpoint endpoint) {
         if (null != endpoint) {
+            SubmodelElementCollectionBuilder endpoints = smBuilder.createSubmodelElementCollectionBuilder(
+                "endpoints", false, false);
+            
             String id = endpoint.getEndpoint();
             while (id.startsWith("/")) {
                 id = id.substring(1);
@@ -409,6 +467,7 @@ public abstract class TransportConverter<T> {
                 .build();
             
             eBuilder.build();
+            endpoints.build();
         }
     }
 

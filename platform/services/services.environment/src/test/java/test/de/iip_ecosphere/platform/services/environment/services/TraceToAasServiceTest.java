@@ -105,7 +105,7 @@ public class TraceToAasServiceTest {
         Assert.assertEquals(app.getName(), prop.getValue());
 
         SubmodelElementCollectionBuilder epBuilder = submodel.createSubmodelElementCollectionBuilder(
-            "endpoints", false, false); // submodel does not matter
+            "testEpContainer", false, false); // submodel does not matter
         TransportConverter.addEndpointToAas(epBuilder, null);
         TransportConverter.addEndpointToAas(epBuilder, new Endpoint(Schema.HTTP, Endpoint.LOCALHOST, 1234, ""));
         TransportConverter.addEndpointToAas(epBuilder, new Endpoint(Schema.WS, Endpoint.LOCALHOST, 1235, "/myPath"));

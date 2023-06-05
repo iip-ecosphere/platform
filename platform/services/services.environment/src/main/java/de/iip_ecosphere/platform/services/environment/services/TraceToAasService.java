@@ -16,7 +16,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
@@ -30,8 +32,11 @@ import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.services.environment.Starter;
 import de.iip_ecosphere.platform.services.environment.YamlArtifact;
 import de.iip_ecosphere.platform.services.environment.YamlService;
+import de.iip_ecosphere.platform.services.environment.services.TransportConverter.ConverterInstances;
 import de.iip_ecosphere.platform.services.environment.switching.ServiceBase;
 import de.iip_ecosphere.platform.services.environment.testing.DataRecorder;
+import de.iip_ecosphere.platform.support.CollectionUtils;
+import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
@@ -42,6 +47,7 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
+import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.iip_aas.AasUtils;
 import de.iip_ecosphere.platform.support.iip_aas.ApplicationSetup;
 import de.iip_ecosphere.platform.support.iip_aas.PlatformAas;
@@ -86,6 +92,7 @@ public class TraceToAasService extends AbstractService {
     private TransportConnector outTransport;
     private TransportParameter outTransportParameter;
     private DataRecorder recorder;
+    private Server server;
 
     /**
      * Creates a service instance.
@@ -101,8 +108,10 @@ public class TraceToAasService extends AbstractService {
             "timeout", Long.class, TypeTranslators.LONG, t -> converter.setTimeout(t)));
         registerParameterConfigurers();
         recorder = createDataRecorder();
-        converter = createConverter();
+        ConverterInstances<TraceRecord> inst = createConverter();
+        converter = inst.getConverter();
         converter.setAasEnabledSupplier(() -> isAasEnabled());
+        server = inst.getServer();
     }
     
     /**
@@ -156,7 +165,16 @@ public class TraceToAasService extends AbstractService {
         this(artifact.getApplication(), artifact.getService(serviceId));
         this.artifact = artifact;
     }
+
     
+    /**
+     * Returns the local gateway server.
+     * 
+     * @return the server instance, may be <b>null</b> for none
+     */
+    public Server getGatewayServer() {
+        return server;
+    }
     
     /**
     * Registers own parameter configurers. Called by constructor. Use 
@@ -190,10 +208,12 @@ public class TraceToAasService extends AbstractService {
     /**
      * Creates the actual converter instance.
      * 
-     * @return the converter
+     * @return the converter, the default one goes for web sockets (due to AAS performance problems)
      */
-    protected TransportConverter<TraceRecord> createConverter() {
-        return new Converter();
+    protected ConverterInstances<TraceRecord> createConverter() {
+        //return new ConverterInstances<TraceRecord>(new Converter());
+        return TransportToWsConverter.createInstances(TraceRecord.TRACE_STREAM, TraceRecord.class, 
+            getGatewayServer(), Starter.getSetup().getTransport(), this);
     }
 
     /**
@@ -284,7 +304,36 @@ public class TraceToAasService extends AbstractService {
     
     @Override
     protected ServiceState start() throws ExecutionException {
-        converter.start(Starter.getSetup().getAas(), true); // deploy, it's the App AAS
+        if (null != server) {
+            server.start();
+        }
+        
+        AasSetup aasSetup = Starter.getSetup().getAas();
+        new Thread(() -> { // may block
+            try {
+                AasFactory factory = AasFactory.getInstance();
+                AasBuilder aasBuilder = factory.createAasBuilder(getAasId(), getAasUrn());
+                SubmodelBuilder smBuilder = PlatformAas.createNameplate(aasBuilder, appSetup);
+                PlatformAas.addSoftwareInfo(smBuilder, appSetup);
+                smBuilder.build();
+                smBuilder = aasBuilder.createSubmodelBuilder(SUBMODEL_COMMANDS, null);
+                augmentCommandsSubmodel(smBuilder);
+                smBuilder.build();                
+                smBuilder = aasBuilder.createSubmodelBuilder(SUBMODEL_SERVICES, null);
+                augmentServicesSubmodel(smBuilder);
+                smBuilder.build();
+                SubmodelBuilder convSubmodel = aasBuilder.createSubmodelBuilder(SUBMODEL_TRACES, null);
+                converter.initializeSubmodel(convSubmodel);
+                convSubmodel.build();
+                Aas aas = aasBuilder.build();
+                List<Aas> aasList = CollectionUtils.addAll(new ArrayList<Aas>(), aas);
+                AasPartRegistry.remoteDeploy(aasSetup, aasList);
+                converter.start(aasSetup); 
+            } catch (IOException e) {
+                LoggerFactory.getLogger(getClass()).error("Creating AAS: " + e.getMessage());
+            }
+        }).start();
+        
         ServiceState result = super.start();
         outTransport = createTransport(getConfiguredSerializationProvider());
         if (null != outTransport) {
@@ -317,6 +366,7 @@ public class TraceToAasService extends AbstractService {
             recorder.close();
         }
         converter.stop();
+        Server.stop(server, true);
         return result;
     }
     
@@ -519,20 +569,6 @@ public class TraceToAasService extends AbstractService {
                 }
                 return del;
             };
-        }
-        
-        @Override
-        protected boolean buildUpAas(AasBuilder aasBuilder) {
-            SubmodelBuilder smBuilder = PlatformAas.createNameplate(aasBuilder, appSetup);
-            PlatformAas.addSoftwareInfo(smBuilder, appSetup);
-            smBuilder.build();
-            smBuilder = aasBuilder.createSubmodelBuilder(SUBMODEL_COMMANDS, null);
-            augmentCommandsSubmodel(smBuilder);
-            smBuilder.build();                
-            smBuilder = aasBuilder.createSubmodelBuilder(SUBMODEL_SERVICES, null);
-            augmentServicesSubmodel(smBuilder);
-            smBuilder.build();
-            return true;
         }
         
         @Override
