@@ -22,6 +22,7 @@ import de.iip_ecosphere.platform.services.environment.DataIngestor;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.services.environment.YamlService;
 import de.iip_ecosphere.platform.services.environment.services.TraceToAasService;
+import de.iip_ecosphere.platform.services.environment.services.TransportConverter.ConverterInstances;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.ServerAddress;
@@ -193,8 +194,8 @@ public class AppAas extends TraceToAasService implements iip.interfaces.AppAasIn
     }
 
     @Override
-    protected Converter createConverter() {
-        return new ConfiguredConverter();
+    protected ConverterInstances<TraceRecord> createConverter() {
+        return new ConverterInstances<TraceRecord>(new ConfiguredConverter());
     }
 
 }

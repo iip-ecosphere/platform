@@ -17,8 +17,8 @@ import java.io.IOException;
 
 import org.slf4j.LoggerFactory;
 
+import de.iip_ecosphere.platform.services.environment.services.TransportToWsConverter;
 import de.iip_ecosphere.platform.support.Endpoint;
-import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 
@@ -48,7 +48,6 @@ public class PlatformSetup extends AbstractSetup {
     private String artifactsUriPrefix = "";
     private int aasHeartbeatTimeout = 10 * 1000;
     private int aasStatusTimeout = 2 * 60 * 1000;
-    private int transportGatewayPort = 10000;
     
     /**
      * Returns the AAS setup.
@@ -180,43 +179,13 @@ public class PlatformSetup extends AbstractSetup {
     }
 
     /**
-     * Returns the transport UI gateway port (e.g., websocket).
-     * 
-     * @return the port
-     */
-    public int getTransportGatewayPort() {
-        return transportGatewayPort;
-    }
-    
-    /**
-     * Changes the transport websocket port. [snakeyaml]
-     * 
-     * @param transportGatewayPort the port
-     */
-    public void setTransportGatewayPort(int transportGatewayPort) {
-        this.transportGatewayPort = transportGatewayPort;
-    }
-
-    /**
-     * Returns the web socket server endpoint for a given {@code path}. The web socket server
-     * enables simplified pub-sub communication with the UI.
-     * 
-     * @param path the path, may be empty, e.g., to obtain just an address
-     * @return the endpoint
-     * @see #getTransportGatewayPort()
-     */
-    public Endpoint getGatewayServerEndpoint(String path) {
-        return new Endpoint(Schema.WS, Endpoint.LOCALHOST, getTransportGatewayPort(), path);
-    }
-
-    /**
      * Returns the web socket server endpoint for status messages.
      * 
      * @return the endpoint
      * @see #getGatewayServerEndpoint(String)
      */
     public Endpoint getStatusGatewayEndpoint() {
-        return getGatewayServerEndpoint(WS_PATH_STATUS);
+        return getTransport().getGatewayServerEndpoint(TransportToWsConverter.SCHEMA, WS_PATH_STATUS);
     }
 
 }

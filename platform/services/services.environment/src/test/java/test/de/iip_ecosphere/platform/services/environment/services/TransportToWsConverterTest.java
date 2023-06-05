@@ -58,7 +58,7 @@ public class TransportToWsConverterTest {
         Server converterServer = TransportToWsConverter.createServer(converterEndpoint).start();
         TransportToWsConverter<TraceRecord> converter = new TransportToWsConverter<>(TraceRecord.TRACE_STREAM, 
             TraceRecord.class, converterEndpoint);
-        converter.start(null, false);
+        converter.start(null);
         Assert.assertEquals(converterEndpoint, converter.getEndpoint());
         Watcher<TraceRecord> watcher = converter.createWatcher(0);
         watcher.setConsumer(t -> {

@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -33,10 +34,17 @@ import org.java_websocket.server.WebSocketServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.iip_ecosphere.platform.services.environment.Service;
+import de.iip_ecosphere.platform.services.environment.Starter;
 import de.iip_ecosphere.platform.support.Endpoint;
+import de.iip_ecosphere.platform.support.NetUtils;
+import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.ServerAddress;
+import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
+import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
+import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 import de.iip_ecosphere.platform.transport.serialization.GenericJsonToStringTranslator;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
 
@@ -48,6 +56,8 @@ import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
  */
 public class TransportToWsConverter<T> extends TransportConverter<T> {
 
+    public static final Schema SCHEMA = Schema.WS;
+    
     private Endpoint endpoint;
     private SenderClient sender;
     private boolean notConnectedError = false;
@@ -84,6 +94,33 @@ public class TransportToWsConverter<T> extends TransportConverter<T> {
             this.typeTranslator = translator;
         }
     }
+    
+    /**
+     * Creates a combined set of server/converter instances.
+     * 
+     * @param <T> the data type
+     * @param transportStream the transport stream to create the converter for
+     * @param cls the data class
+     * @param server the server, may be existing or <b>null</b>
+     * @param setup the transport setup
+     * @param service the service to create the instances for
+     * @return the instances object for server/converter
+     */
+    public static <T> ConverterInstances<T> createInstances(String transportStream, Class<T> cls, Server server, 
+        TransportSetup setup, Service service) {
+        Endpoint endpoint;
+        String path = "/app_" + Starter.getServiceId(service);
+        if (setup.isLocalGatewayEndpoint()) {
+            endpoint = new Endpoint(SCHEMA, NetUtils.getOwnIP(setup.getNetmask()), NetUtils.getEphemeralPort(), path);
+            if (null == server) {
+                server = createServer(endpoint);
+            }
+        } else {
+            endpoint = setup.getGatewayServerEndpoint(SCHEMA, path);
+            server = null;
+        }
+        return new ConverterInstances<T>(server, new TransportToWsConverter<T>(transportStream, cls, endpoint));
+    }
 
     /**
      * Creates a server instance for the given address.
@@ -114,15 +151,24 @@ public class TransportToWsConverter<T> extends TransportConverter<T> {
         };
         
     }
+
+    @Override
+    public void setExcludedFields(Set<String> excludedFields) {
+        super.setExcludedFields(excludedFields);
+        if (typeTranslator instanceof GenericJsonToStringTranslator) {
+            JsonUtils.exceptFields(((GenericJsonToStringTranslator<?>) typeTranslator).getMapper(), 
+                getExcludedFieldsArray());
+        }
+    }
+
+    @Override
+    public void initializeSubmodel(SubmodelBuilder smBuilder) {
+        addEndpointToAas(smBuilder, endpoint);
+    }
     
-    /**
-     * Starts the transport tracer.
-     * 
-     * @param aasSetup the AAS setup to use
-     * @param deploy whether the AAS represented by this converter shall be deployed
-     */
-    public void start(AasSetup aasSetup, boolean deploy) {
-        super.start(aasSetup, deploy);
+    @Override
+    public void start(AasSetup aasSetup) {
+        super.start(aasSetup);
         sender = createWithUri(u -> new SenderClient(u));
         try {
             sender.connectBlocking();

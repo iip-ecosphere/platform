@@ -14,10 +14,8 @@ package de.iip_ecosphere.platform.services.environment.services;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Timer;
@@ -28,10 +26,7 @@ import java.util.function.Supplier;
 
 import org.slf4j.LoggerFactory;
 
-import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.aas.Aas;
-import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
-import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
@@ -266,7 +261,6 @@ public abstract class TransportToAasConverter<T> extends TransportConverter<T> {
      * @param payload the payload to be presented
      * @see #createPayloadEntry(String, Class, Class)
      */
-    @SuppressWarnings("deprecation")
     protected void createPayloadEntries(SubmodelElementCollectionBuilder payloadBuilder, Object payload) {
         if (null != payload) {
             Class<?> cls = payload.getClass();
@@ -274,7 +268,7 @@ public abstract class TransportToAasConverter<T> extends TransportConverter<T> {
                 if (isGetter(m)) {
                     String fieldName = m.getName();
                     String field = fieldName.substring(PREFIX_GETTER.length());
-                    if (!createPayloadEntry(field, m.getReturnType(), cls) || isExcludedField(fieldName)) {
+                    if (isExcludedField(fieldName)) {
                         continue;
                     }
                     Class<?> valueCls = null;
@@ -333,7 +327,7 @@ public abstract class TransportToAasConverter<T> extends TransportConverter<T> {
         // remove outdated ones
         boolean done = false;
         long now = System.currentTimeMillis();
-        if (now - lastCleanup > cleanupTimeout) {
+        if (cleanupTimeout > 0 && now - lastCleanup > cleanupTimeout) {
             long timestamp = now - timeout;
             Submodel sm = aas.getSubmodel(submodelIdShort);
             final CleanupPredicate delPred = getCleanupPredicate();
@@ -384,38 +378,9 @@ public abstract class TransportToAasConverter<T> extends TransportConverter<T> {
     }
 
     @Override
-    public void start(AasSetup aasSetup, boolean deploy) {
+    public void start(AasSetup aasSetup) {
         this.aasSetup = aasSetup;
-        if (isAasEnabled()) {
-            new Thread(() -> { // may block
-                try {
-                    AasFactory factory = AasFactory.getInstance();
-                    AasBuilder aasBuilder = factory.createAasBuilder(getAasId(), getAasUrn());
-                    buildUpAas(aasBuilder);
-                    aasBuilder.createSubmodelBuilder(submodelIdShort, null).build();
-                    Aas aas = aasBuilder.build();
-                    if (deploy) {
-                        List<Aas> aasList = CollectionUtils.addAll(new ArrayList<Aas>(), aas);
-                        AasPartRegistry.remoteDeploy(aasSetup, aasList);
-                    }
-                    this.aasStarted = true;
-                } catch (IOException e) {
-                    LoggerFactory.getLogger(getClass()).error("Creating AAS: " + e.getMessage());
-                }
-            }).start();
-        }
-        super.start(aasSetup, deploy);
-    }
-    
-    /**
-     * Builds up the AAS. May not be called if {@link #setAasEnabledSupplier(Supplier) AAS enabled supplier} signals
-     * that there shall not be an AAS.
-     * 
-     * @param aasBuilder the AAS builder to use
-     * @return {@code true} for success, {@code false} else
-     */
-    protected boolean buildUpAas(AasBuilder aasBuilder) {
-        return true;
+        super.start(aasSetup);
     }
 
     @Override
@@ -423,13 +388,16 @@ public abstract class TransportToAasConverter<T> extends TransportConverter<T> {
         super.stop();
         if (isAasEnabled()) {
             try {
-                Aas aas = AasPartRegistry.retrieveAas(aasSetup, getAasUrn());
-                aas.delete(aas.getSubmodel(submodelIdShort));
-                cleanUpAas(aas);
+                cleanUpAas(AasPartRegistry.retrieveAas(aasSetup, getAasUrn()));
             } catch (IOException e ) {
                 LoggerFactory.getLogger(getClass()).error("Cleaning up AAS: " + e.getMessage());
             }
         }
+    }
+
+    @Override
+    public boolean isTraceInAas() {
+        return true;
     }
 
     /**

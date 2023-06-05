@@ -105,7 +105,7 @@ public class TraceToAasServiceTest {
         Assert.assertEquals(app.getName(), prop.getValue());
 
         SubmodelElementCollectionBuilder epBuilder = submodel.createSubmodelElementCollectionBuilder(
-            "endpoints", false, false); // submodel does not matter
+            "testEpContainer", false, false); // submodel does not matter
         TransportConverter.addEndpointToAas(epBuilder, null);
         TransportConverter.addEndpointToAas(epBuilder, new Endpoint(Schema.HTTP, Endpoint.LOCALHOST, 1234, ""));
         TransportConverter.addEndpointToAas(epBuilder, new Endpoint(Schema.WS, Endpoint.LOCALHOST, 1235, "/myPath"));
@@ -114,22 +114,25 @@ public class TraceToAasServiceTest {
         submodel = aas.getSubmodel(TraceToAasService.SUBMODEL_TRACES);
 
         // initial comparison/testing
-        Map<String, SubmodelElementCollection> elts = new HashMap<String, SubmodelElementCollection>();
-        for (SubmodelElement e : submodel.submodelElements()) {
-            if (e instanceof SubmodelElementCollection) {
-                SubmodelElementCollection coll = (SubmodelElementCollection) e;
-                prop = coll.getProperty(TraceToAasService.PROPERTY_SOURCE);
-                Assert.assertNotNull(prop);        
-                elts.put(prop.getValue().toString(), coll);
-
-                SubmodelElementCollection pColl = coll.getSubmodelElementCollection(TraceToAasService.PROPERTY_PAYLOAD);
-                Assert.assertNotNull(pColl);
-                Assert.assertTrue(pColl.getElementsCount() > 0); // something is in -> MyData
-                elts.put(prop.getValue().toString(), coll);
+        if (service.isTraceInAas()) {
+            Map<String, SubmodelElementCollection> elts = new HashMap<String, SubmodelElementCollection>();
+            for (SubmodelElement e : submodel.submodelElements()) {
+                if (e instanceof SubmodelElementCollection) {
+                    SubmodelElementCollection coll = (SubmodelElementCollection) e;
+                    prop = coll.getProperty(TraceToAasService.PROPERTY_SOURCE);
+                    Assert.assertNotNull(prop);        
+                    elts.put(prop.getValue().toString(), coll);
+    
+                    SubmodelElementCollection pColl = coll.getSubmodelElementCollection(
+                        TraceToAasService.PROPERTY_PAYLOAD);
+                    Assert.assertNotNull(pColl);
+                    Assert.assertTrue(pColl.getElementsCount() > 0); // something is in -> MyData
+                    elts.put(prop.getValue().toString(), coll);
+                }
             }
+            Assert.assertNotNull(elts.get("source"));
+            Assert.assertNotNull(elts.get("receiver"));
         }
-        Assert.assertNotNull(elts.get("source"));
-        Assert.assertNotNull(elts.get("receiver"));
         
         System.out.println("Waiting for cleanup... (max " + cleanupTimeout + " ms)");
         TimeUtils.sleep(cleanupTimeout);
@@ -144,8 +147,9 @@ public class TraceToAasServiceTest {
                 remainingCount++;
             }
         }
-        Assert.assertEquals(0, remainingCount); // shall be gone
-        
+        if (service.isTraceInAas()) {
+            Assert.assertEquals(0, remainingCount); // shall be gone
+        }
         service.setState(ServiceState.STOPPING);
     }
 

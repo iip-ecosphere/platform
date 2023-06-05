@@ -125,10 +125,7 @@ public class PlatformAas implements AasContributor {
         
         // just that they are there
         SubmodelBuilder statusBuilder = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL_STATUS, null);
-        SubmodelElementCollectionBuilder statusEndpoints = statusBuilder.createSubmodelElementCollectionBuilder(
-            "endpoints", false, false);
-        TransportConverter.addEndpointToAas(statusEndpoints, PlatformSetup.getInstance().getStatusGatewayEndpoint());
-        statusEndpoints.build();
+        TransportConverter.addEndpointToAas(statusBuilder, PlatformSetup.getInstance().getStatusGatewayEndpoint());
         statusBuilder.build();
         aasBuilder.createSubmodelBuilder(ApplicationInstanceAasConstructor.NAME_SUBMODEL_APPINSTANCES, null).build();
         return null;

@@ -37,7 +37,11 @@ As usual, this component supports a YAML-based setup:
       transport:
         host: <String>
         port: <int>
-        password: <String>
-        user: <String>
+        authenticationKey: <String>
+        keystoreKey: <String>
+        keyAlias: <String>
+        hostnameVerification: <Boolean>
+        gatewayPort: <int>
+        netmask: <String>
 
 The fields are akin to [EcsRuntime](https://github.com/iip-ecosphere/platform/tree/main/platform/resources/ecsRuntime).
