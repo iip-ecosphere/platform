@@ -29,6 +29,7 @@ project Transport {
             Integer memLimit = 312; // e.g., JVM memory limit in MBytes
         }
         Port gatewayPort = 10000;
+        String netmask = "";
         //Constraint actionTimeoutValid = isDefined(actionTimeout) and actionTimeout > 0; // currently NPE in EAYs
     };
     

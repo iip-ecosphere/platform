@@ -5,6 +5,7 @@ Transport::TransportProtocol::port = The communication port where to reach the c
 Transport::TransportProtocol::localPort = The communication port where to reach the local communication server/broker, by default 8883 as "port".
 Transport::TransportProtocol::localEcsPort = The local broker port for ECS containers.
 Transport::TransportProtocol::gatewayPort = The transport UI gateway if the AAS cannot be used.
+Transport::TransportProtocol::netmask = The transport UI gateway server netmask to override host with proper IP address if devices support multiple networks (default "") 
 Transport::TransportProtocol::security = The security settings of the protocol.
 Transport::TransportProtocol::type = The type of the protocol to enable comparisons.
 Transport::TransportProtocol::brokerVer = Maven version of the (instantiated default) broker to use.

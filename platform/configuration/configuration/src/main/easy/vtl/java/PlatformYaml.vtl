@@ -91,12 +91,6 @@ template PlatformYaml(IIPEcosphere config, FileArtifact target, String modelName
         '
     }
     
-    def produceGateway(IIPEcosphere config) {
-        TransportProtocol t = config.transportProtocol;
-        Integer port = getIntegerValueSafe(t.gatewayPort, 10000);
-        'transportGatewayPort: ${port}'
-    }
-
     def main(IIPEcosphere config, FileArtifact target, String modelName) {
         String pers = "${config.aasPersistency}";
         produceTransport(config);
@@ -105,7 +99,6 @@ template PlatformYaml(IIPEcosphere config, FileArtifact target, String modelName
         produceDevMgt(config);
         produceCentralMonitoring(config);
         produceEasy(config, modelName);
-        produceGateway(config);
         'artifactsFolder: ${config.artifactsFolder}
         artifactsUriPrefix: ${config.artifactsUriPrefix}'
     }
