@@ -13,7 +13,7 @@ tr:nth-child(odd) {
 
 .valuebox {
   width: 90%;
-  min-height: 60px;
+  min-height: 7em;
   border: 2px solid black;
   border-radius: 4px;
   background-color: rgb(199, 199, 199);
@@ -21,8 +21,8 @@ tr:nth-child(odd) {
 }
 
 .singlevaluebox {
-  width: 120px;
-  min-height: 60px;
+  width: 11em;
+  min-height: 7em;
   border: 2px solid black;
   border-radius: 4px;
   background-color: rgb(199, 199, 199);

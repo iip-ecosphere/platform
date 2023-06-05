@@ -32,7 +32,6 @@ export class InputRefSelectComponent implements OnInit {
 
   private init(value: string) {
     value = value.toLowerCase();
-    console.log(value);
 
     if(value) {
       if(value.indexOf('refto') >= 0) {
