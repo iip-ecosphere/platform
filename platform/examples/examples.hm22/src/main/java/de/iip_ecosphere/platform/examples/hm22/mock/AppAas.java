@@ -23,6 +23,7 @@ import de.iip_ecosphere.platform.examples.hm22.Commands;
 import de.iip_ecosphere.platform.services.environment.DataIngestor;
 import de.iip_ecosphere.platform.services.environment.IipStringStyle;
 import de.iip_ecosphere.platform.services.environment.YamlService;
+import de.iip_ecosphere.platform.services.environment.services.TransportConverter.ConverterInstances;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.iip_aas.ApplicationSetup;
 import de.iip_ecosphere.platform.transport.status.TraceRecord;
@@ -164,8 +165,8 @@ public class AppAas extends de.iip_ecosphere.platform.examples.hm22.AppAas {
     }
     
     @Override
-    protected Converter createConverter() {
-        return new ConfiguredMockingConverter();
+    protected ConverterInstances<TraceRecord> createConverter() {
+        return new ConverterInstances<TraceRecord>(new ConfiguredMockingConverter());
     }
 
 }
