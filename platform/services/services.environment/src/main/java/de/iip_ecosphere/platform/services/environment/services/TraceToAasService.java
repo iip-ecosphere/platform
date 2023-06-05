@@ -523,6 +523,15 @@ public class TraceToAasService extends AbstractService {
     }
     
     /**
+     * Returns whether traced data is directly stored in the AAS or not.
+     * 
+     * @return {@code true} for traced data in AAS, {@code false} else
+     */
+    public boolean isTraceInAas() {
+        return converter.isTraceInAas();
+    }
+    
+    /**
      * A configured transport to AAS converter for {@link TraceRecord}.
      * 
      * @author Holger Eichelberger, SSE

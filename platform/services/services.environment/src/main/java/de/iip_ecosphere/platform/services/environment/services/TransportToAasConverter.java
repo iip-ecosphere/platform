@@ -395,6 +395,11 @@ public abstract class TransportToAasConverter<T> extends TransportConverter<T> {
         }
     }
 
+    @Override
+    public boolean isTraceInAas() {
+        return true;
+    }
+
     /**
      * Cleans up the AAS. Last action, may delete the AAS itself. May not be called if 
      * {@link #setAasEnabledSupplier(Supplier) AAS enabled supplier} signals that there shall not be an AAS.

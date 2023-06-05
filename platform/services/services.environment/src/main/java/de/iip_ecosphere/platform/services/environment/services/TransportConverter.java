@@ -421,6 +421,15 @@ public abstract class TransportConverter<T> {
     }
     
     /**
+     * Returns whether traced data is directly stored in the AAS or not.
+     * 
+     * @return {@code true} for traced data in AAS, {@code false} else
+     */
+    public boolean isTraceInAas() {
+        return false;
+    }
+    
+    /**
      * Creates a watcher instance.
      * 
      * @param period the watching period in ms
