@@ -7,16 +7,20 @@ tr:nth-child(odd) {
   justify-content: flex-start;
   flex-wrap: wrap;
   overflow-y:hidden;
+  gap: 1em;
+  background-color: rgb(145, 145, 145);
+  margin-bottom: 2em;
 }
 
 .inputBox {
-  min-height: 10em;
+  min-height: 12em;
   min-width: 16em;
-  margin-bottom: 0.5em;
-  margin-left: 0.5em;
+  margin: 0.5em;
+  //flex-grow: 1;
 }
 
 .refInput {
-    min-height: 10em;
+    min-height: 11em;
     min-width: 32em;
+    //flex-grow: 6;
 }

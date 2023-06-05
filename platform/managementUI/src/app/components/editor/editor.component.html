@@ -31,50 +31,55 @@
 
 <div *ngFor="let uiGroup of uiGroups">
   <div class="inputGroup">
-    <mat-card *ngFor="let input of uiGroup.inputs" class="inputBox">
-    <p style="margin-bottom: 1em;">{{ input.name }}</p>
-    <mat-card-content
-      *ngIf="!input.refTo || input.multipleInputs; else ref">
-      <mat-form-field appearance="outline">
-        <mat-label>{{ input.type }}</mat-label>
-        <input matInput
-          [matTooltip]="input.description[0].text + ' ' + input.description[0].language" type="text" [(ngModel)]=input.value />
-      </mat-form-field>
-    </mat-card-content>
-    <ng-template #ref>
-    <mat-card-content>
-      <p style="margin-bottom: 1em;">{{ input.name }}</p>
-      <app-input-ref-select
-        [textfield]="true" [input]="input">
-      </app-input-ref-select>
-    </mat-card-content>
-  </ng-template>
-    </mat-card>
-    </div>
-    <h1 *ngIf="uiGroup.optionalInputs[0]">Optional</h1>
-    <div class="inputGroup">
-    <mat-card *ngFor="let input of uiGroup.optionalInputs">
-
-      <mat-card-content *ngIf="!input.refTo; else refOpt">
+    <div *ngFor="let input of uiGroup.inputs">
+      <mat-card class="inputBox">
         <p style="margin-bottom: 1em;">{{ input.name }}</p>
-        <mat-form-field appearance="outline" >
-          <mat-label>{{ input.type }}</mat-label>
-          <input matInput
-            [matTooltip]="input.description[0].text + ' ' + input.description[0].language" type="text" [(ngModel)]=input.value />
-        </mat-form-field>
-      </mat-card-content>
-
-      <ng-template #refOpt>
-        <mat-card-content class="refInput">
+        <mat-card-content
+          *ngIf="!input.multipleInputs && !input.refTo; else ref">
+          <mat-form-field appearance="outline">
+            <mat-label>{{ input.type }}</mat-label>
+            <input matInput
+              [matTooltip]="input.description[0].text + ' ' + input.description[0].language" type="text" [(ngModel)]=input.value />
+          </mat-form-field>
+        </mat-card-content>
+        <ng-template #ref>
+        <mat-card-content>
           <p style="margin-bottom: 1em;">{{ input.name }}</p>
           <app-input-ref-select
             [textfield]="true" [input]="input">
           </app-input-ref-select>
         </mat-card-content>
       </ng-template>
-      </mat-card>
+        </mat-card>
+    </div>
+    </div>
+
+    <div class="inputGroup">
+    <h1 *ngIf="uiGroup.optionalInputs[0]">Optional</h1>
+    <div *ngFor="let input of uiGroup.optionalInputs">
+      <mat-card class="inputBox">
+        <mat-card-content *ngIf="!input.multipleInputs && !input.refTo; else refOpt">
+          <p style="margin-bottom: 1em;">{{ input.name }}</p>
+          <mat-form-field appearance="outline" >
+            <mat-label>{{ input.type }}</mat-label>
+            <input matInput
+              [matTooltip]="input.description[0].text + ' ' + input.description[0].language" type="text" [(ngModel)]=input.value />
+          </mat-form-field>
+        </mat-card-content>
+
+        <ng-template #refOpt>
+          <mat-card-content class="refInput">
+            <p style="margin-bottom: 1em;">{{ input.name }}</p>
+            <app-input-ref-select
+              [textfield]="true" [input]="input">
+            </app-input-ref-select>
+          </mat-card-content>
+        </ng-template>
+        </mat-card>
+    </div>
+
   </div>
-  <h1>---</h1>
+
 </div>
 
 <div style="display: flex; justify-content: center">
