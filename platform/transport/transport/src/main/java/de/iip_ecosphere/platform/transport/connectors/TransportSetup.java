@@ -14,6 +14,8 @@ package de.iip_ecosphere.platform.transport.connectors;
 
 import java.io.Serializable;
 
+import de.iip_ecosphere.platform.support.Endpoint;
+import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.identities.IdentityStore;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter.TransportParameterBuilder;
 
@@ -32,6 +34,8 @@ public class TransportSetup implements Serializable {
     private String keyAlias;
     private boolean hostnameVerification = false;
     private String authenticationKey;
+    private int gatewayPort = 10000;
+    private String netmask = "";
     
     /**
      * Returns the server/broker host name.
@@ -140,7 +144,66 @@ public class TransportSetup implements Serializable {
     public void setHostnameVerification(boolean hostnameVerification) {
         this.hostnameVerification = hostnameVerification;
     }
+
+    /**
+     * Returns the transport gateway port (e.g., websocket).
+     * 
+     * @return the port, negative indicates that dependent on the context none or an ephemeral port shall be used
+     */
+    public int getGatewayPort() {
+        return gatewayPort;
+    }
     
+    /**
+     * Changes the transport gateway/websocket port. [snakeyaml]
+     * 
+     * @param gatewayPort the port, negative indicates that dependent on the context none or an ephemeral port
+     *  shall be used
+     */
+    public void setGatewayPort(int gatewayPort) {
+        this.gatewayPort = gatewayPort;
+    }
+    
+    /**
+     * Returns the netmask/network Java regex.
+     * 
+     * @return the netmask/network Java regex
+     */
+    public String getNetmask() {
+        return netmask;
+    }
+
+    /**
+     * Defines the netmask/network Java regex. [snakeyaml]
+     * 
+     * @param netmask the netmask
+     */
+    public void setNetmask(String netmask) {
+        this.netmask = netmask;
+    }
+    
+    /**
+     * Returns the web socket server endpoint for a given {@code path}. The gateways server
+     * enables simplified pub-sub communication with the UI.
+     * 
+     * @param schema the schema to use
+     * @param path the path, may be empty, e.g., to obtain just an address
+     * @return the endpoint
+     * @see #getGatewayPort()
+     */
+    public Endpoint getGatewayServerEndpoint(Schema schema, String path) {
+        return new Endpoint(schema, getHost(), getGatewayPort(), path);
+    }
+    
+    /**
+     * Returns whether this setup leads to a local gateway endpoint.
+     * 
+     * @return {@code true} for a local endpoint, {@code false} for a global
+     */
+    public boolean isLocalGatewayEndpoint() {
+        return getGatewayPort() < 0;
+    }
+
     /**
      * Derives a transport parameter instance.
      * 
@@ -168,6 +231,7 @@ public class TransportSetup implements Serializable {
         setup.setHostnameVerification(hostnameVerification);
         setup.setKeyAlias(keyAlias);
         setup.setKeystoreKey(keystoreKey);
+        setup.setGatewayPort(gatewayPort);
         return setup;
     }
 
