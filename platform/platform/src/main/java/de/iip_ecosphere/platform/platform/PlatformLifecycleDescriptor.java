@@ -61,7 +61,8 @@ public class PlatformLifecycleDescriptor implements LifecycleDescriptor, PidLife
         aasServer = rcp.createAasServer(aasSetup.getServerEndpoint(), pType, regEndpoint);
         aasServer.start();
         
-        wsServer = TransportToWsConverter.createServer(PlatformSetup.getInstance().getGatewayServerEndpoint(""));
+        wsServer = TransportToWsConverter.createServer(PlatformSetup.getInstance().getTransport()
+            .getGatewayServerEndpoint(TransportToWsConverter.SCHEMA, ""));
         wsServer.start();
     }
 

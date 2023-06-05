@@ -84,7 +84,7 @@ public class PlattformAasLifecycleDescriptor extends AbstractAasLifecycleDescrip
         traceConverter = new TransportToWsConverter<>(StatusMessage.STATUS_STREAM, StatusMessage.class, 
             PlatformSetup.getInstance().getStatusGatewayEndpoint());
         traceConverter.setTimeout(statusTimeout);
-        traceConverter.start(getAasSetup(), false);
+        traceConverter.start(getAasSetup());
         /*timer.schedule(new TimerTask() {
 
             @Override
