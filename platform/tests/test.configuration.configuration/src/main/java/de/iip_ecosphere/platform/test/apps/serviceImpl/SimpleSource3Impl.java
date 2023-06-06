@@ -19,6 +19,7 @@ import java.util.TimerTask;
 
 import de.iip_ecosphere.platform.services.environment.DataIngestor;
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
+import de.iip_ecosphere.platform.services.environment.Starter;
 import iip.datatypes.Rec13;
 import iip.datatypes.Rec13Impl;
 import iip.impl.SimpleDataSource3Impl;
@@ -61,7 +62,7 @@ public class SimpleSource3Impl extends SimpleDataSource3Impl {
     public Rec13 produceRec13() {
         Rec13 rec = new Rec13Impl(); // SimpleApp3Helper.createRec13Instance(); // normal programming use constructor!
         rec.setIntField(random.nextInt());
-        rec.setStringField("SYNC");
+        rec.setStringField("SYNC " + Starter.getAppId());
         return rec;
     }
 
@@ -78,7 +79,7 @@ public class SimpleSource3Impl extends SimpleDataSource3Impl {
                 public void run() {
                     Rec13 rec = new Rec13Impl(); // SimpleApp3Helper.createRec13Instance();
                     rec.setIntField(random.nextInt());
-                    rec.setStringField("ASYNC");
+                    rec.setStringField("ASYNC " + Starter.getAppId());
                     ingestor.ingest(rec);
                 }
             }, 0, 1000);
