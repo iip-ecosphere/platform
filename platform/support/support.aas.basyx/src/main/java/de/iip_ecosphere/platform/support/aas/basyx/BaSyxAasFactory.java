@@ -205,4 +205,9 @@ public class BaSyxAasFactory extends AasFactory {
         return SubmodelElementIdShortBlacklist.isBlacklisted(id);
     }
 
+    @Override
+    public boolean supportsPropertyFunctions() {
+        return BaSyxRegistryDeploymentAasServer.ENABLE_PROPERTY_LAMBDA;
+    }
+
 }

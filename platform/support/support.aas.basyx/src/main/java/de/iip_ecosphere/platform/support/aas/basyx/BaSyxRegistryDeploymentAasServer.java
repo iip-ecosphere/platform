@@ -13,6 +13,7 @@ import de.iip_ecosphere.platform.support.aas.AasServer;
  */
 class BaSyxRegistryDeploymentAasServer extends BaSyxAbstractAasServer {
 
+    static final boolean ENABLE_PROPERTY_LAMBDA = true;
     private AASServerComponent server; 
     
     /**
@@ -27,8 +28,14 @@ class BaSyxRegistryDeploymentAasServer extends BaSyxAbstractAasServer {
         String... options) {
         super(deploymentSpec);
         AASServerBackend back = Tools.getOption(options, backend, AASServerBackend.class);
-        server = new AASServerComponent(deploymentSpec.getContextConfiguration(), new BaSyxAASServerConfiguration(
-            back, "", regUrl)); // may require source via options
+        BaSyxAASServerConfiguration cfg = new BaSyxAASServerConfiguration(back, "", regUrl);
+        if (ENABLE_PROPERTY_LAMBDA) { // enables user lambdas, disables data mapper
+            cfg.disablePropertyDelegation();
+        } else { // enables data mapper, disables user lambdas
+            cfg.enablePropertyDelegation();
+        }
+        // may require source via options
+        server = new AASServerComponent(deploymentSpec.getContextConfiguration(), cfg);
     }
     
     @Override
