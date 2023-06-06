@@ -13,6 +13,9 @@ export class EditorComponent implements OnInit {
 
   category: string = 'all';
   meta: Resource | undefined;
+  // backup needed for data recovery before re-filtering data
+  // for the next tab
+  metaBackup: Resource | undefined;
   selectedType: Resource | undefined;
 
   uiGroups: uiGroup[] = [];
@@ -25,7 +28,7 @@ export class EditorComponent implements OnInit {
     public dialog: MatDialogRef<EditorComponent>) { }
 
   ngOnInit(): void {
-    this.getMeta();
+    this.getMeta()
     /*
     const category = this.route.snapshot.paramMap.get('ls');
     if(category && category != '') {
@@ -35,8 +38,9 @@ export class EditorComponent implements OnInit {
   }
 
   private async getMeta() {
-      this.meta = await this.api.getMeta();
-      this.filterMeta()
+    this.meta = await this.api.getMeta();
+    this.metaBackup = JSON.parse(JSON.stringify(this.meta)) // deep copy
+    this.filterMeta();
   }
 
   public generateInputs() {
@@ -122,28 +126,57 @@ export class EditorComponent implements OnInit {
 
   }
 
-  filters = [
-    {cat: "Setup", value: ""},
-    {cat: "Constants", value: ""},
-    {cat: "Types", value: "DataType"},
-    {cat: "Dependencies", value: "Dependency"},
-    {cat: "Nameplates", value: "NameplateInfo"},
-    {cat: "Services", value: "JavaService"},
-    {cat: "Servers", value: "JavaServer"},
-    {cat: "Meshes", value: "ServiceMesh"},
-    {cat: "Applications", value: "Application"}
+  datatypes = [
+    {cat: "Setup", value: ["PrimitiveType",
+      "TransportProtocol", "DeviceRegistry"]},
+    {cat: "Constants", value: ["PrimitiveType",
+      "NumericPrimitiveType"]},
+    {cat: "Types", value: ["RecordType", "ArrayType"]},
+    {cat: "Dependencies", value: ["Dependency"]},
+    {cat: "Nameplates", value: ["NameplateInfo"]},
+    {cat: "Services", value: ["Service"]},
+    {cat: "Servers", value: ["Server"]},
+    {cat: "Meshes", value: ["ServiceMesh"]},
+    {cat: "Applications", value: ["Application"]}
   ]
 
   public filterMeta() {
+    this.meta = JSON.parse(JSON.stringify(this.metaBackup))
+    let newMetaValues = []
+    if (this.meta && this.meta.value) {
+      for (const item of this.meta.value) {
+        if (this.isType(item)) {
+          newMetaValues.push(item)
+        }
+      }
+    }
+    this.meta!.value = newMetaValues
+
+    /*
     let filter = this.filters.find(item => item.cat === this.category)?.value
     if (this.meta && filter != "") {
       let temp = this.meta.value
       if (temp) {
         let tempValues = temp.find(
           item => item.idShort === filter) as ResourceAttribute
-        this.meta!.value = [tempValues]
+        this.meta!.value = [tempValues] // TODO what if there are more than one values
       }
     }
+    */
+  }
+
+  public isType(item:any) {
+    let requiredTypes = this.datatypes.find(type => type.cat === this.category)?.value
+    if (requiredTypes?.includes(item.idShort)) {
+      return true
+    } else {
+      let metaRefinesValue = item.value.find(
+        (val: { idShort: string; }) => val.idShort === "metaRefines").value
+      if (requiredTypes?.includes(metaRefinesValue)) {
+        return true
+      }
+    }
+    return false
   }
 
   public create() {

@@ -126,6 +126,7 @@ export class ListComponent implements OnInit {
       this.rawData = await this.getData("")
       this.filteredData = this.prefilter(metaProject)
     }
+    console.log(this.filteredData)
   }
 
   /**

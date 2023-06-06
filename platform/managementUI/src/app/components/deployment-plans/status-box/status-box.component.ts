@@ -22,8 +22,10 @@ export class StatusBoxComponent implements OnInit {
 
 
   constructor(private deployer: PlanDeployerService) {
-    this.statusSub = this.deployer.emitter.subscribe((status: StatusMsg) => {this.status = status});
-    this.allStatusSub = this.deployer.allEmitter.subscribe((status: Resource[]) => {this.statusSubmodel = status});
+    this.statusSub = this.deployer.emitter.subscribe(
+      (status: StatusMsg) => {this.status = status});
+    this.allStatusSub = this.deployer.allEmitter.subscribe(
+      (status: Resource[]) => {this.statusSubmodel = status});
   }
 
   ngOnInit(): void {
