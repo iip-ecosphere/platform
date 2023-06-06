@@ -568,7 +568,9 @@ public class AasTest {
      */
     @Test
     public void testFactory() {
-        Assert.assertTrue(AasFactory.getInstance().getName().length() > 0);
+        AasFactory factory = AasFactory.getInstance();
+        Assert.assertTrue(factory.getName().length() > 0);
+        factory.supportsPropertyFunctions(); // may be true, may be false
     }
 
     /**

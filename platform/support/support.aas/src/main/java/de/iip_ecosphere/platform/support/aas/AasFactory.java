@@ -573,4 +573,14 @@ public abstract class AasFactory {
         return result;
     }
     
+    /**
+     * Returns whether the implementation allows for user-defined functions assigned to
+     * AAS properties.
+     * 
+     * @return {@code true} if supported, {@code false}
+     */
+    public boolean supportsPropertyFunctions() {
+        return false;
+    }
+    
 }
