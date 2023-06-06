@@ -14,6 +14,7 @@ package de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAa
 
 import de.iip_ecosphere.platform.services.environment.metricsProvider.MetricsProvider;
 import de.iip_ecosphere.platform.support.CollectionUtils;
+import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.ElementsAccess;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.Property;
@@ -96,10 +97,9 @@ public class MetricsAasConstructor {
     
     /**
      * Does the underlying AAS implementation execute Lambda-Setters for AAS properties. If not, we activate
-     * a less performant fallback. Somewhen between BaSyx 1.1 and BaSyx 1.3 we lost this, but this may just depend
-     * on the underlying Java version.
+     * a less performant fallback.
      */
-    public static final boolean LAMBDA_SETTERS_SUPPORTED = false; 
+    public static final boolean LAMBDA_SETTERS_SUPPORTED = AasFactory.getInstance().supportsPropertyFunctions(); 
 
     private static Map<String, TransportConnector> conns = new HashMap<>();
     private static Map<String, JsonObjectHolder> holders = new HashMap<>();

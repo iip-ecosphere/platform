@@ -259,7 +259,6 @@ public abstract class TransportToAasConverter<T> extends TransportConverter<T> {
      *  
      * @param payloadBuilder the payload builder
      * @param payload the payload to be presented
-     * @see #createPayloadEntry(String, Class, Class)
      */
     protected void createPayloadEntries(SubmodelElementCollectionBuilder payloadBuilder, Object payload) {
         if (null != payload) {
