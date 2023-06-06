@@ -226,7 +226,7 @@ public abstract class AbstractService implements Service {
                     // see null == instance
                 } catch (InvocationTargetException e) {
                     LoggerFactory.getLogger(AbstractService.class).error("While instantiating " + className + ": " 
-                        + e.getMessage() + ", falling back to default constructor");
+                        + e.getMessage() + ", falling back to default constructor", e);
                 } catch (IOException e) {
                     LoggerFactory.getLogger(AbstractService.class).error("While instantiating " + className + " here "
                         + "loading descriptor " + deploymentDescFile + ": " + e.getMessage() + ", falling back to "

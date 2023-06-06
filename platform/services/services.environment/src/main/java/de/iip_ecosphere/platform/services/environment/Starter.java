@@ -279,7 +279,7 @@ public class Starter {
      * @return the service including appId if known/specified
      */
     public static String getServiceId(Service service) {
-        return getServiceId(service.getId());
+        return getServiceId(null == service ? "" : service.getId());
     }
 
     /**
