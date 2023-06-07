@@ -1,6 +1,7 @@
 <div>
   <div>
     <table style="width: 100%">
+      <tr><td>{{input.type}}</td></tr>
       <tr>
         <td *ngIf="textfield">
           <mat-form-field appearance="outline">
@@ -13,7 +14,7 @@
             <mat-form-field appearance="outline">
               <mat-select [(value)]="selectedRef">
                 <mat-option *ngFor="let ref of references" [value]="ref" (click)="addFromRef()">
-                  {{ displayIdShort(ref) }}
+                  {{ getDisplayName(ref) }}
                 </mat-option>
               </mat-select>
             </mat-form-field>

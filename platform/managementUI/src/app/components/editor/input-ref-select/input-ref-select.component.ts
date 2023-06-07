@@ -217,22 +217,21 @@ export class InputRefSelectComponent implements OnInit {
     return cssclass;
   }
 
-  public displayIdShort(element: any) {
+  public getDisplayName(element: any) {
     let displayName = '';
-    if(this.refTo === 'dependency') {
+
+
       let ele = element.value.find((item: { idShort: string; value: string;}) => item.idShort === 'key');
       if(!ele) {
         ele = element.value.find((item: { idShort: string; value: string;}) => item.idShort === 'name');
       }
-      displayName = ele.value.find((item: { idShort: string; value: string;}) => item.idShort === 'varValue').value;
-    } else if(this.refTo === 'server') {
-      displayName = element.idShort;
-    }
-    // if(element.value && typeof(element.value) === 'object' ) {
+      if(ele && ele.value && typeof(ele.value) != 'string') {
+        displayName = ele.value.find((item: { idShort: string; value: string;}) => item.idShort === 'varValue').value;
+      }
+      if(!displayName || typeof(displayName) != 'string') {
+        displayName = element.idShort;
+      }
 
-    // } else if(element.value && typeof(element.value) === 'string' ) {
-    //   displayName = element.value
-    // }
 
     return displayName;
   }
