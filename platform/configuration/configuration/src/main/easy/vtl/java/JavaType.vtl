@@ -13,9 +13,7 @@ template JavaType(Configuration config, FileArtifact target, RecordType type, St
         IIPEcosphere cfg = config;
         if (not(interface)) {
             for (Field f: type.fields) {
-                if (cfg.serializer==Serializer::Json) {
-                    '@JsonProperty("${f.name}")'
-                }
+                '@JsonProperty("${f.name}")'  // unconditional -> service integrations
                 'private ${toTypeName(f.type)} ${asMethodFieldIdentifier(f.name)};\n'
             }
         }
@@ -41,9 +39,7 @@ template JavaType(Configuration config, FileArtifact target, RecordType type, St
             } else {
                 '@Override'
             }
-            if (cfg.serializer==Serializer::Json) {
-                '@JsonIgnore'
-            }
+            '@JsonIgnore' // unconditional -> service integrations
             'public ${toTypeName(f.type)} get${asMethodNameSuffix(f.name)}()${ending}'
             if (not(interface)) {
                 '
@@ -66,9 +62,7 @@ template JavaType(Configuration config, FileArtifact target, RecordType type, St
             } else {
                 '@Override'
             }
-            if (cfg.serializer==Serializer::Json) {
-                '@JsonIgnore'
-            }
+            '@JsonIgnore' // unconditional -> service integrations
             'public void set${asMethodNameSuffix(f.name)}(${toTypeName(f.type)} value)${ending}'
             if (not(interface)) {
                 '

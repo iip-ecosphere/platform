@@ -165,8 +165,10 @@ project Services {
            Parameters parameter = {};
            refTo(Server) server;
        }
-       assign (uiGroup = UiOptionalGroup2) to {
+       assign (uiGroup = UiInivisibleGroup) to {
            setOf(refTo(EcsDevice)) requires;
+       }
+       assign (uiGroup = UiOptionalGroup2) to {
            refTo(EcsDevice) allocatedTo; // -> BindingTime::runtimeEnact
            Boolean monitorRcvCount = true;
            Boolean monitorSentCount = true;

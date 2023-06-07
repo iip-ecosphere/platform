@@ -19,6 +19,7 @@ project DataTypes {
     const String Eclass_Unit_MByte = "0173-1#05-AAA042#005";
     const String Eclass_Unit_ms = "0173-1#05-AAA114#003";
     
+    const Integer UiInivisibleGroup = 0;
     const Integer UiMandatoryGroup1 = 1;
     const Integer UiOptionalGroup1 = -1;
     const Integer UiMandatoryGroup2 = 2;
@@ -45,10 +46,10 @@ project DataTypes {
     // primitive data types in the sense of not refinable (via records)
     // name is used as fallback, new types shall override toTypeName(.) or cast(.) - if needed - in JavaBasics, 
     // toTypeName(.) in PythonBasics, convName(.) and convParam(.) in DataOperationBasics    
-    compound PrimitiveType refines DataType {
+    abstract compound PrimitiveType refines DataType {
     }
 
-    compound NumericPrimitiveType refines PrimitiveType {
+    abstract compound NumericPrimitiveType refines PrimitiveType {
     }
     
     compound ArrayType refines PrimitiveType {

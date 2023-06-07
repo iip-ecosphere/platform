@@ -58,6 +58,7 @@ DataTypes::VersionedElement::snapshot = Shall the Maven artifact be a snapshot o
 DataTypes::VersionedElement::ver = Version of the element (numbers separated by a dot).
 DataTypes::Eclass_Unit_MByte = Semantic id for unit Mega Byte. 
 DataTypes::Eclass_Unit_ms = Semantic id for unit millisecond.
+DataTypes::UiInivisibleGroup = UI hint for invisible settings 
 DataTypes::UiMandatoryGroup1 = UI hint for mandatory settings in primary group. 
 DataTypes::UiMandatoryGroup2 = UI hint for mandatory settings in secondary group.
 DataTypes::UiOptionalGroup1 = UI hint for optional settings in primary group.
