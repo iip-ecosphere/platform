@@ -23,6 +23,20 @@ export class EditorComponent implements OnInit {
   metaTypes = ['metaState', 'metaProject',
     'metaSize', 'metaType', 'metaRefines', 'metaAbstract'];
 
+  datatypes = [
+    {cat: "Setup", value: ["PrimitiveType",
+      "TransportProtocol", "DeviceRegistry"]},
+    {cat: "Constants", value: ["PrimitiveType",
+      "NumericPrimitiveType"]},
+    {cat: "Types", value: ["RecordType", "ArrayType"]},
+    {cat: "Dependencies", value: ["Dependency"]},
+    {cat: "Nameplates", value: ["NameplateInfo"]},
+    {cat: "Services", value: ["Service"]},
+    {cat: "Servers", value: ["Server"]},
+    {cat: "Meshes", value: ["ServiceMesh"]},
+    {cat: "Applications", value: ["Application"]}
+  ];
+
   constructor(private route: ActivatedRoute,
     private api: ApiService,
     public dialog: MatDialogRef<EditorComponent>) { }
@@ -125,20 +139,6 @@ export class EditorComponent implements OnInit {
     return displayName;
 
   }
-
-  datatypes = [
-    {cat: "Setup", value: ["PrimitiveType",
-      "TransportProtocol", "DeviceRegistry"]},
-    {cat: "Constants", value: ["PrimitiveType",
-      "NumericPrimitiveType"]},
-    {cat: "Types", value: ["RecordType", "ArrayType"]},
-    {cat: "Dependencies", value: ["Dependency"]},
-    {cat: "Nameplates", value: ["NameplateInfo"]},
-    {cat: "Services", value: ["Service"]},
-    {cat: "Servers", value: ["Server"]},
-    {cat: "Meshes", value: ["ServiceMesh"]},
-    {cat: "Applications", value: ["Application"]}
-  ]
 
   public filterMeta() {
     this.meta = JSON.parse(JSON.stringify(this.metaBackup))
