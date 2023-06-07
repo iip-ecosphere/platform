@@ -198,7 +198,9 @@ export interface StatusMsg {
 export interface uiGroup {
   uiGroup: number;
   inputs: editorInput[];
+  fullLineInputs: editorInput[];
   optionalInputs: editorInput[];
+  fullLineOptionalInputs: editorInput[];
 }
 
 export interface editorInput {

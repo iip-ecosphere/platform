@@ -17,6 +17,7 @@ export class EditorComponent implements OnInit {
   // for the next tab
   metaBackup: Resource | undefined;
   selectedType: Resource | undefined;
+  bool = true;
 
   uiGroups: uiGroup[] = [];
 
@@ -89,23 +90,59 @@ export class EditorComponent implements OnInit {
           }
           if(!uiGroupCompare ){
             if(isOptional) {
-              this.uiGroups.push({
-                uiGroup: uiGroup,
-                inputs: [],
-                optionalInputs: [editorInput]
-              });
+              if(editorInput.multipleInputs) {
+                this.uiGroups.push({
+                  uiGroup: uiGroup,
+                  inputs: [],
+                  optionalInputs: [],
+                  fullLineInputs: [],
+                  fullLineOptionalInputs: [editorInput]
+                });
+              } else {
+                this.uiGroups.push({
+                  uiGroup: uiGroup,
+                  inputs: [],
+                  optionalInputs: [editorInput],
+                  fullLineInputs: [],
+                  fullLineOptionalInputs: []
+                });
+              }
+
             } else {
-              this.uiGroups.push({
-                uiGroup: uiGroup,
-                inputs: [editorInput],
-                optionalInputs: []
-              });
+              if(editorInput.multipleInputs) {
+                this.uiGroups.push({
+                  uiGroup: uiGroup,
+                  inputs: [],
+                  optionalInputs: [],
+                  fullLineInputs: [editorInput],
+                  fullLineOptionalInputs: []
+                });
+              } else {
+                this.uiGroups.push({
+                  uiGroup: uiGroup,
+                  inputs: [editorInput],
+                  optionalInputs: [],
+                  fullLineInputs: [],
+                  fullLineOptionalInputs: []
+                });
+              }
+
             }
           } else {
             if(isOptional) {
-              uiGroupCompare?.optionalInputs.push(editorInput);
+              if(editorInput.multipleInputs) {
+                uiGroupCompare?.fullLineOptionalInputs.push(editorInput);
+              } else {
+                uiGroupCompare?.optionalInputs.push(editorInput);
+              }
+
             } else {
-              uiGroupCompare?.inputs.push(editorInput);
+              if(editorInput.multipleInputs) {
+                uiGroupCompare?.fullLineInputs.push(editorInput);
+              } else {
+                uiGroupCompare?.inputs.push(editorInput);
+              }
+
             }
 
           }
