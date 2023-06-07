@@ -39,6 +39,7 @@ export class ServicesComponent implements OnInit {
   ip: string = "";
   urn:string = "";
   filteredData: any;
+  technicalData: any; // manufacture info for services
   currentTab:string = "";
 
   //artifacts: PlatformArtifacts = {};
@@ -84,7 +85,11 @@ export class ServicesComponent implements OnInit {
 
   public async getDisplayData(tab:string, submodel:any, submodelElement: string) {
     this.currentTab = tab
+    console.log("submodel: " + submodel)
     await this.loadData(submodel, submodelElement)
+    console.log(this.filteredData)
+
+
     switch(this.currentTab) {
       /*
       case "deployment plans":
@@ -103,7 +108,7 @@ export class ServicesComponent implements OnInit {
       default:
         break;
     }
-    console.log("Filtered data:")
+    console.log("SERVICES  Filtered data:")
     console.log(this.filteredData)
   }
 
@@ -122,15 +127,66 @@ export class ServicesComponent implements OnInit {
         console.log(e);
       }
     this.filteredData = response
+    //console.log("resposnse: ")
+    //console.log(response)
 
     if(this.currentTab != "instances") {
       this.filteredData = this.filteredData.value
     }
   }
 
-  // Filter
+  public async getTechnicalData(url:string) {
+    let response;
+    let technicalDataUrl = url + "/submodels/TechnicalData/submodel"
+    console.log("(getTechnicalData) \nURL: " + technicalDataUrl)
+    try {
+      response = await firstValueFrom(this.http.get(technicalDataUrl));
+
+    } catch(e) {
+      console.log(e);
+    }
+    this.technicalData = response
+    console.log("(getTechnicalData) response:")
+    console.log(response)
+  }
+  /*
+  public isNotUrl(value:string) {
+    if(value.startsWith("http")) {
+      return false
+    } else {
+      return true
+    }
+  }
+*/
+  public async getManufacturerInfo(url:string) {
+    console.log("(getManfInfo)")
+    console.log("url: " + url)
+    let dummyUrl = "http://192.168.2.1:9001/shells/urn%3A%3A%3AAAS%3A%3A%3Aservice_CamSource%23/aas"
+    //url = dummyUrl
+    await this.getTechnicalData(url)
+
+    /* for local testing
+    let dummyTechData = [
+      {idShort: "ProductImage", value: ""},
+      {idShort: "ManufacturerLogo", value: "image/logo.png"},
+      {idShort: "ManufacturerName", value: "SSE"}
+    ]
+    this.technicalData = dummyTechData
+    */
+
+    if (this.technicalData) {
+      //let result = []
+      for (let value of this.technicalData) {
+        console.log("(getManfInfo) single values from response:")
+        console.log(value.idShort + ": " + value.value)
+      }
+    }
+
+  }
+  // Filter ------------------------------------
 
   public filterServices() {
+
     let result = []
     for (let tableRow of this.filteredData) {
       let temp = []
@@ -139,6 +195,12 @@ export class ServicesComponent implements OnInit {
         if (rowValues.idShort == "name") {
           name = rowValues.value
         }
+
+        // getting manufacturer info
+        if (rowValues.idShort == "serviceAas") {
+          this.getManufacturerInfo(rowValues.value)
+        }
+
         for (let param of this.paramToDisplay) {
           if (rowValues.idShort == param[0]) {
             let new_rowValue =  { "value":  param[1] + rowValues.value + param[2]}
@@ -150,6 +212,8 @@ export class ServicesComponent implements OnInit {
       result.push(new_value)
     }
     this.filteredData = result
+
+
   }
 
   public filterArtifacts() {

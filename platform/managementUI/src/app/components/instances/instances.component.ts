@@ -35,9 +35,6 @@ export class InstancesComponent implements OnInit {
     // reloading instances every 3 sec
     this.subscription = interval(3000).subscribe(
       (val) => { this.getInstances()});
-
-      console.log("Status")
-      console.log(this.status)
   }
 
   public async getData() {
@@ -50,9 +47,6 @@ export class InstancesComponent implements OnInit {
   }
 
   public async getInstances() {
-    console.log("# refreshing instances")
-    console.log("status: ")
-    console.log(this.status)
     const data = await this.api.getInstances();
     if(data) {
       this.filteredData = []
@@ -65,9 +59,6 @@ export class InstancesComponent implements OnInit {
         }
       }
     }
-    console.log("Filtered Data")
-    console.log(this.filteredData)
-    console.log("----------------")
     /*
     if(data) {
       for(const element of data) {
