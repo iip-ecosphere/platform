@@ -31,6 +31,7 @@ export class EditorService {
     } catch(e) {
       console.log(e);
     }
+    console.log(Data);
     return Data;
   }
 
