@@ -92,6 +92,7 @@ public class ServicesAas implements AasContributor {
     public static final String NAME_SUBCOLL_OUTPUT_DATA_CONN = "outputDataConnectors";
     public static final String NAME_PROP_ID = "id";
     public static final String NAME_PROP_APPLICATION_ID = "applicationId";
+    public static final String NAME_PROP_APPLICATION_INSTANCE_ID = "applicationInstanceId";
     public static final String NAME_PROP_SERVICEMGR_ID = "serviceMgr";
     public static final String NAME_PROP_NAME = "name";
     public static final String NAME_PROP_STATE = "state";
@@ -458,6 +459,9 @@ public class ServicesAas implements AasContributor {
             .build();
         descriptorBuilder.createPropertyBuilder(NAME_PROP_APPLICATION_ID)
             .setValue(Type.STRING, desc.getApplicationId())
+            .build();
+        descriptorBuilder.createPropertyBuilder(NAME_PROP_APPLICATION_INSTANCE_ID)
+            .setValue(Type.STRING, desc.getApplicationInstanceId())
             .build();
         descriptorBuilder.createPropertyBuilder(NAME_PROP_SERVICEMGR_ID)
             .setValue(Type.STRING, Id.getEnvId())
