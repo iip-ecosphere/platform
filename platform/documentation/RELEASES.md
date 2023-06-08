@@ -18,7 +18,6 @@ Planned:
 * KODEX: dynamic port assignment: [#14](https://github.com/iip-ecosphere/platform/issues/14), documentation: [#6](https://github.com/iip-ecosphere/platform/issues/6)
 
 In progress:
-* [#139](https://github.com/iip-ecosphere/platform/issues/139): Fixing Python testing issues, better Python test generation
 * [#127](https://github.com/iip-ecosphere/platform/issues/127): Integration of federated learning 
 * [#70](https://github.com/iip-ecosphere/platform/issues/70): UI progress reporting 
 * [#117](https://github.com/iip-ecosphere/platform/issues/117): Multiple service managers per device
@@ -48,6 +47,7 @@ Improvements:
 * [#128](https://github.com/iip-ecosphere/platform/issues/128): Refactor model to move RecordType::path to connector. **May require an upgrade of configuration models using connectors.**
 * [#129](https://github.com/iip-ecosphere/platform/issues/129): Read-only flag for RecordType field
 * [#137](https://github.com/iip-ecosphere/platform/issues/132): MQTT authentication on transport/connectors
+* [#139](https://github.com/iip-ecosphere/platform/issues/139): Fixing Python testing issues, better Python test generation based on JSON files
 * [#86](https://github.com/iip-ecosphere/platform/issues/86): UI restructuring larger lists, unifying use and look-and-feel
 * [#79](https://github.com/iip-ecosphere/platform/issues/79): Angular config.json loading problem (ok for now)
 * [#140](https://github.com/iip-ecosphere/platform/issues/140): Generated containers log platform service startup/execution

@@ -167,6 +167,9 @@ project Services {
        }
        assign (uiGroup = UiInivisibleGroup) to {
            setOf(refTo(EcsDevice)) requires;
+           assign(bindingTime = BindingTime::runtimeEnact) to {
+                refTo(EcsDevice) allocatedTo;
+           }       
        }
        assign (uiGroup = UiOptionalGroup2) to {
            refTo(EcsDevice) allocatedTo; // -> BindingTime::runtimeEnact
@@ -262,7 +265,7 @@ project Services {
         Constraint familySelectorOk = selector <> null implies selectorTypeOk(selector, self);
         Constraint familyAllSync = members->forAll(m|m.asynchronous = self.asynchronous);
         Constraint familyAllDeployable = members->collect(m|m.deployable).toSet().size() < 2;
-        Constraint familyParameterOk = members->forAll(m|m.parameters = self.parameters);
+        Constraint familyParameterOk = members->forAll(m|m.parameter = self.parameter);
         Constraint familyInputOk = members->forAll(m|m.input = self.input);
         Constraint familyOutputOk = members->forAll(m|m.output = self.output);
    }

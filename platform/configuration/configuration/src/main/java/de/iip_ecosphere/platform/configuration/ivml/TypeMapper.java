@@ -1,3 +1,15 @@
+/**
+ * ******************************************************************************
+ * Copyright (c) {2023} The original author or authors
+ *
+ * All rights reserved. This program and the accompanying materials are made 
+ * available under the terms of the Eclipse Public License 2.0 which is available 
+ * at http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
+ ********************************************************************************/
+
 package de.iip_ecosphere.platform.configuration.ivml;
 
 import java.util.HashMap;
@@ -30,10 +42,17 @@ import net.ssehub.easy.varModel.model.datatypes.Compound;
 import net.ssehub.easy.varModel.model.datatypes.Container;
 import net.ssehub.easy.varModel.model.datatypes.CustomDatatype;
 import net.ssehub.easy.varModel.model.datatypes.DerivedDatatype;
+import net.ssehub.easy.varModel.model.datatypes.Enum;
+import net.ssehub.easy.varModel.model.datatypes.EnumLiteral;
 import net.ssehub.easy.varModel.model.datatypes.IDatatype;
 import net.ssehub.easy.varModel.model.datatypes.Reference;
 import net.ssehub.easy.varModel.model.values.Value;
 
+/**
+ * Maps types to IVML.
+ * 
+ * @author Holger Eichelberger, SSE
+ */
 class TypeMapper {
 
     private Configuration cfg;
@@ -61,6 +80,10 @@ class TypeMapper {
      * Maps all types.
      */
     void mapTypes() {
+        mapPrimitiveType("String");
+        mapPrimitiveType("Boolean");
+        mapPrimitiveType("Real");
+        mapPrimitiveType("Integer");
         mapTypes(cfg.getConfiguration().getProject());
     }
 
@@ -85,6 +108,33 @@ class TypeMapper {
     }
 
     /**
+     * Maps a primitive type.
+     * 
+     * @param name the name of the primitive type.
+     */
+    private void mapPrimitiveType(String name) {
+        String typeId = AasUtils.fixId(name);
+        if (!isDoneType(typeId)) {
+            SubmodelElementCollectionBuilder typeB = builder.createSubmodelElementCollectionBuilder(
+                typeId, false, false);
+            addTypeKind(typeB, IvmlTypeKind.PRIMITIVE);
+            typeB.build();
+        }
+    }
+    
+    /**
+     * Adds an AAS type kind property.
+     * 
+     * @param typeB the type builder
+     * @param kind the type kind
+     */
+    private void addTypeKind(SubmodelElementCollectionBuilder typeB, IvmlTypeKind kind) {
+        typeB.createPropertyBuilder(AasUtils.fixId(AasIvmlMapper.SHORTID_PREFIX_META.apply("typeKind")))
+            .setValue(Type.INTEGER, kind.getId())
+            .build();
+    }
+
+    /**
      * Maps a compound type into the SMEC {@value #META_TYPE_NAME}. May be called for duplicates but leads only to
      * one entry.
      * 
@@ -104,6 +154,7 @@ class TypeMapper {
             typeB.createPropertyBuilder(AasIvmlMapper.SHORTID_PREFIX_META.apply("refines"))
                 .setValue(Type.STRING, getRefines(type))
                 .build();
+            addTypeKind(typeB, IvmlTypeKind.COMPOUND);
             typeB.build();
         }
     }
@@ -118,13 +169,42 @@ class TypeMapper {
         type = Reference.dereference(type);
         if (type instanceof DerivedDatatype) {
             mapDerivedType((DerivedDatatype) type);
+        } else if (type instanceof Enum) {
+            mapEnumType((Enum) type);
         } else {
             if (type instanceof Container) {
                 type = ((Container) type).getContainedType();
-            }
-            if (type instanceof Compound) {
+            } else if (type instanceof Compound) {
                 mapCompoundType((Compound) type);
             }
+        }
+    }
+    
+    /**
+     * Maps an IVML enum type.
+     * 
+     * @param type the type
+     */
+    private void mapEnumType(Enum type) {
+        String typeId = AasUtils.fixId(type.getName());
+        if (!isDoneType(typeId)) {
+            SubmodelElementCollectionBuilder typeB = builder.createSubmodelElementCollectionBuilder(
+                typeId, false, false);
+            for (int l = 0; l < type.getLiteralCount(); l++) {
+                EnumLiteral lit = type.getLiteral(l);
+                SubmodelElementCollectionBuilder litB = typeB.createSubmodelElementCollectionBuilder(
+                    AasUtils.fixId(lit.getName()), false, false);
+                // value is reserved by BaSyx/AAS
+                litB.createPropertyBuilder("varValue")
+                    .setValue(Type.STRING, lit.getName())
+                    .build();
+                litB.createPropertyBuilder("ordinal")
+                    .setValue(Type.INTEGER, lit.getOrdinal())
+                    .build();
+                litB.build();
+            }
+            addTypeKind(typeB, IvmlTypeKind.ENUM);
+            typeB.build();
         }
     }
     
@@ -158,6 +238,7 @@ class TypeMapper {
             typeB.createPropertyBuilder(AasIvmlMapper.SHORTID_PREFIX_META.apply("refines"))
                 .setValue(Type.STRING, IvmlDatatypeVisitor.getUnqualifiedType(baseType))
                 .build();
+            addTypeKind(typeB, IvmlTypeKind.asTypeKind(type));
             typeB.build();
         }
         mapType(baseType);

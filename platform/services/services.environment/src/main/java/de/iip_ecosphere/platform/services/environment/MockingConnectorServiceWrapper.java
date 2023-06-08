@@ -132,12 +132,26 @@ public class MockingConnectorServiceWrapper<O, I, CO, CI> extends ConnectorServi
     }
     
     /**
-     * The input data stream.
+     * Returns the input data stream for mocking. Considers ".yml" (legacy, typo) and ".json" files.
      * 
      * @param name the name of the file/resource to be used
-     * @return the stream
+     * @return the stream, may be <b>null</b>
      */
     protected InputStream getDataStream(String name) {
+        InputStream result = openDataStream(name);
+        if (null == result && name.endsWith(".yml")) {
+            result = openDataStream(name.substring(0, name.length() - 3) + "json");
+        }
+        return result;
+    }
+    
+    /**
+     * Tries to open an input data stream for mocking.
+     * 
+     * @param name the name of the file/resource to be used
+     * @return the stream, may be <b>null</b>
+     */
+    protected InputStream openDataStream(String name) {
         InputStream result = ResourceLoader.getResourceAsStream(name);
         if (null == result) {
             result = ResourceLoader.getResourceAsStream("resources/" + name); // app packaging

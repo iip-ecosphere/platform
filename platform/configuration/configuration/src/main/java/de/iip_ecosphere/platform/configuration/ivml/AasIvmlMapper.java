@@ -236,7 +236,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         }
         return result;
     }
-
+    
     /**
      * Maps the type of an IVML variable into the configuration submodel, usually searching for the top-most
      * parent of compound types.
@@ -989,7 +989,8 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                 Object aasValue = getValue(var);
                 varType.getType().accept(TYPE_VISITOR);
                 Type aasType = TYPE_VISITOR.getAasType();
-                PropertyBuilder pb = varBuilder.createPropertyBuilder(AasUtils.fixId("varValue"));
+                // value is reserved by BaSyx/AAS
+                PropertyBuilder pb = varBuilder.createPropertyBuilder(AasUtils.fixId("varValue")); 
                 pb.setValue(aasType, aasValue);
                 /*if (var.getState() == AssignmentState.FROZEN) {
                     pb.setValue(aasType, aasValue);
