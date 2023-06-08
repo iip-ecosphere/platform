@@ -198,4 +198,9 @@ public class Eclass {
      */
     public static final String IRDI_UNIT_DEGREE_CELSIUS = "0173-1#05-AAA567#004";
 
+    /**
+     * Aspect of a software version at delivery.
+     */
+    public static final String IRDI_ASPECT_SW_VERSION = "0173-1#02-AAS383#001";
+    
 }

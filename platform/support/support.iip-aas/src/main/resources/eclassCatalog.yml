@@ -457,7 +457,7 @@ definitions:
         description: street name and house number
   - semanticId: 0173-1#02-AAO129#002
     version: 2
-    revision: 1
+    revision: 2
     naming:
       de: 
         name: Postleitzahl
@@ -469,7 +469,7 @@ definitions:
         description: Postal code of the address
   - semanticId: 0173-1#02-AAO132#002
     version: 2
-    revision: 1
+    revision: 2
     naming:
       de:
         name: Ort
@@ -479,3 +479,15 @@ definitions:
         name: location
         structuredName: location
         description: location
+  - semanticId: 0173-1#02-AAS383#001
+    version: 1
+    revision: 2
+    naming:
+      de:
+        name: Version
+        structuredName: Version
+        description: Angabe des Entwicklungsstandes eines Softwareproduktes zum Zeitpunkt der Auslieferung
+      en:
+        name: version
+        structuredName: version
+        description: Specification of the development status of a software product at the time of delivery
