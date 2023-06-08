@@ -27,7 +27,7 @@ project MetaConcepts {
     compound CDataComponent refines CComponent {
         sequenceOf(CDataProperty) input;
         sequenceOf(CDataProperty) output;
-        sequenceOf(CReversibleProperty) parameters;
+        sequenceOf(CReversibleProperty) parameter; // typo in IIP, changed
     }
     
     def Boolean fieldCheck(sequenceOf(CStructuralProperty) fTuples, sequenceOf(CStructuralProperty) aTuples) = true;
@@ -40,7 +40,7 @@ project MetaConcepts {
         
         Constraint inputCheck = members->forAll(refTo(CDataComponent) m | fieldCheck(input, m.input));
         Constraint outputCheck = members->forAll(refTo(CDataComponent) m | fieldCheck(output, m.output));
-        Constraint parameterCheck = members->forAll(refTo(CDataComponent) m | parameterCheck(parameters, m.parameters));
+        Constraint parameterCheck = members->forAll(refTo(CDataComponent) m | parameterCheck(parameter, m.parameter));
         Constraint memberCheck = size(members) > 0 and isDefined(members);
     }
     
