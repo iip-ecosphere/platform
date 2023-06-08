@@ -276,7 +276,9 @@ project Services {
     abstract compound Server {
         NonEmptyString id;
         String description = ""; // TODO Constraint: must be configured
-        IipVersion ver;
+        assign (semanticId = Eclass_Aspect_swVersion) to {
+            IipVersion ver;
+        }
         NonEmptyString host = "127.0.0.1";
         NonEmptyEphemeralPort port;
         NonEmptyString executable;

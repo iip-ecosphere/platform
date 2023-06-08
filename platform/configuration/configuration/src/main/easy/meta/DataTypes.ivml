@@ -18,6 +18,7 @@ project DataTypes {
     
     const String Eclass_Unit_MByte = "0173-1#05-AAA042#005";
     const String Eclass_Unit_ms = "0173-1#05-AAA114#003";
+    const String Eclass_Aspect_swVersion = "0173-1#02-AAS383#001";
     
     const Integer UiInivisibleGroup = 0;
     const Integer UiMandatoryGroup1 = 1;

@@ -195,6 +195,8 @@ public class ConfigurationManager {
             : null;
     }
     
+    // checkstyle: stop exception type check
+    
     /**
      * Validates the model and propagates values within the model.
      * 
@@ -207,16 +209,11 @@ public class ConfigurationManager {
         } catch (IllegalStateException e) {
             getLogger().error(e.getMessage());
             return null;
+        } catch (Throwable e) { // not nice but if something goes wrong with the reasoner...
+            getLogger().error(e.getMessage());
+            e.printStackTrace();
+            return null;
         }
-    }
-
-    /**
-     * Performs a platform instantiation.
-     * 
-     * @throws ExecutionException if the instantiation fails for some reason
-     */
-    public static void instantiate() throws ExecutionException {
-        instantiate("main");
     }
     
     /**
@@ -233,8 +230,22 @@ public class ConfigurationManager {
                 executor.executeVil();
             } catch (ModelManagementException | VilException | IllegalStateException e) {
                 throw new ExecutionException(e);
+            } catch (Throwable e) { // not nice but if something goes wrong with the reasoner...
+                e.printStackTrace();
+                throw new ExecutionException(e);
             }
         }
+    }
+
+    // checkstyle: resume exception type check
+
+    /**
+     * Performs a platform instantiation.
+     * 
+     * @throws ExecutionException if the instantiation fails for some reason
+     */
+    public static void instantiate() throws ExecutionException {
+        instantiate("main");
     }
     
     /**
