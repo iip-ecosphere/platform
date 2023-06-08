@@ -75,7 +75,8 @@ export class ServicesComponent implements OnInit {
     ["state", "State: ", ""],
     ["version", "Version: ", ""],
     ["resource", "Resource: ", ""],
-    ["name", "", ""]
+    ["name", "", ""],
+    ["id", "Id: ", ""]
   ]
 
   ngOnInit(): void {
@@ -108,8 +109,8 @@ export class ServicesComponent implements OnInit {
       default:
         break;
     }
-    console.log("SERVICES  Filtered data:")
-    console.log(this.filteredData)
+    //console.log("SERVICES  Filtered data:")
+    //console.log(this.filteredData)
   }
 
   public async loadData(submodel: any, submodelElement: any){
@@ -138,7 +139,7 @@ export class ServicesComponent implements OnInit {
   public async getTechnicalData(url:string) {
     let response;
     let technicalDataUrl = url + "/submodels/TechnicalData/submodel"
-    console.log("(getTechnicalData) \nURL: " + technicalDataUrl)
+    console.log("# (getTechnicalData) \nURL: " + technicalDataUrl)
     try {
       response = await firstValueFrom(this.http.get(technicalDataUrl));
 
@@ -146,7 +147,7 @@ export class ServicesComponent implements OnInit {
       console.log(e);
     }
     this.technicalData = response
-    console.log("(getTechnicalData) response:")
+    console.log("# (getTechnicalData) response:")
     console.log(response)
   }
   /*
@@ -159,46 +160,49 @@ export class ServicesComponent implements OnInit {
   }
 */
   public async getManufacturerInfo(url:string) {
-    console.log("(getManfInfo)")
+    console.log("# (getManfInfo)")
     console.log("url: " + url)
-    let dummyUrl = "http://192.168.2.1:9001/shells/urn%3A%3A%3AAAS%3A%3A%3Aservice_CamSource%23/aas"
+    //let dummyUrl = "http://192.168.2.1:9001/shells/urn%3A%3A%3AAAS%3A%3A%3Aservice_CamSource%23/aas"
     //url = dummyUrl
     await this.getTechnicalData(url)
 
-    /* for local testing
-    let dummyTechData = [
+    // for local testing
+    /*
+    let dummyTechData = {
+      idShort: "TechnicalData",
+      submodelElements:[
       {idShort: "ProductImage", value: ""},
-      {idShort: "ManufacturerLogo", value: "image/logo.png"},
+      {idShort: "ManufacturerLogo", value: "../../../assets/SSE-Logo.png"},
       {idShort: "ManufacturerName", value: "SSE"}
-    ]
+    ]}
     this.technicalData = dummyTechData
+    console.log("dummy")
+    console.log(this.technicalData)
     */
-
+    let result = []
     if (this.technicalData) {
-      //let result = []
-      for (let value of this.technicalData) {
-        console.log("(getManfInfo) single values from response:")
+      for (let value of this.technicalData.submodelElements) {
+        console.log("# (getManfInfo) single values from response:")
         console.log(value.idShort + ": " + value.value)
+        result.push([value.idShort, value.value])
       }
     }
-
+    console.log("# (getManfInfo) result:")
+    console.log(result)
+    return result
   }
   // Filter ------------------------------------
 
-  public filterServices() {
+  public async filterServices() {
 
     let result = []
     for (let tableRow of this.filteredData) {
       let temp = []
       let name
+      let imgPath
       for (let rowValues of tableRow.value) {
         if (rowValues.idShort == "name") {
           name = rowValues.value
-        }
-
-        // getting manufacturer info
-        if (rowValues.idShort == "serviceAas") {
-          this.getManufacturerInfo(rowValues.value)
         }
 
         for (let param of this.paramToDisplay) {
@@ -207,12 +211,28 @@ export class ServicesComponent implements OnInit {
             temp.push(new_rowValue)
           }
         }
+
+        // getting manufacturer info
+        if (rowValues.idShort == "serviceAas") {
+          let serviceTechData = this.getManufacturerInfo(rowValues.value)
+          for (let value of await serviceTechData) {
+            let new_rowValue = {}
+            if (value[0] == "ManufacturerLogo") {
+              imgPath =  value[1]
+            } else {
+              new_rowValue =  { "value":  value[0] + ": " + value[1]}
+            }
+            temp.push(new_rowValue)
+          }
+        }
       }
-      let new_value = {idShort: name, value: temp}
+      let new_value = {idShort: name, logo: imgPath, value: temp}
+      //let new_value = {idShort: name, value: temp}
       result.push(new_value)
     }
     this.filteredData = result
-
+    console.log("# (filterService) filteredData:")
+    console.log(this.filteredData)
 
   }
 
