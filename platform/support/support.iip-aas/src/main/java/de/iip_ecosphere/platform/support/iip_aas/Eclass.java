@@ -36,6 +36,16 @@ public class Eclass {
      */
     public static final String IRDI_PROPERTY_SOFTWARE_NAME = "0173-1#02-AAO247#002";
 
+    /**
+     * Denotes a network protocol (as string).
+     */
+    public static final String IRDI_PROPERTY_NETWORK_PROTOCOL = "0173-1#02-AAK368#003";
+    
+    /**
+     * Denotes a network port (as number).
+     */
+    public static final String IRDI_PROPERTY_NETWORK_PORT = "0173-1#02-ABH333#001";
+
     
     /**
      * Basic unit of a bit.
@@ -200,6 +210,7 @@ public class Eclass {
 
     /**
      * Aspect of a software version at delivery.
+     * Use {@link #IRDI_PROPERTY_SOFTWARE_VERSION} instead.
      */
     public static final String IRDI_ASPECT_SW_VERSION = "0173-1#02-AAS383#001";
     

@@ -411,6 +411,7 @@ public class NameplateSetup {
                             .build();
                         smcb.createPropertyBuilder(PROPERTY_VERSION)
                             .setValue(Type.STRING, null == s.getVersion() ? null : s.getVersion().toString())
+                            .setSemanticId(Irdi.AAS_IRDI_PROPERTY_SOFTWARE_VERSION)
                             .build();
                         smcb.build();
                     }

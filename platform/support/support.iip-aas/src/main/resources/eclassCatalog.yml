@@ -491,3 +491,27 @@ definitions:
         name: version
         structuredName: version
         description: Specification of the development status of a software product at the time of delivery
+  - semanticId: 0173-1#02-ABH333#001
+    version: 1
+    revision: 2
+    naming:
+      de:
+        name: Port
+        structuredName: Netzwerkport
+        description: Als Zahl angegebener Teil einer Netzwerk-Adresse, auf die das System zugreift
+      en:
+        name: port
+        structuredName: port
+        description: Part of a network address specified as a number that the system accesses
+  - semanticId: 0173-1#02-AAK368#003
+    version: 3
+    revision: 2
+    naming:
+      de:
+        name: Netzwerkprotokoll
+        structuredName: Netzwerkprotokoll
+        description: Angabe zum Protokoll des Netzwerks
+      en:
+        name: network protocol
+        structuredName: network protocol
+        description: Information about the protocol of the network
