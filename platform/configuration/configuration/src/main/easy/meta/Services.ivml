@@ -195,7 +195,9 @@ project Services {
    
    abstract compound Service refines ServiceBase {
        String description = ""; // TODO Constraint: must be configured
-       IipVersion ver;
+       assign(semanticId = Eclass_Property_swVersion) to {
+           IipVersion ver;
+       }
        Boolean deployable;
    }
    
@@ -276,7 +278,7 @@ project Services {
     abstract compound Server {
         NonEmptyString id;
         String description = ""; // TODO Constraint: must be configured
-        assign (semanticId = Eclass_Aspect_swVersion) to {
+        assign(semanticId = Eclass_Property_swVersion) to {
             IipVersion ver;
         }
         NonEmptyString host = "127.0.0.1";

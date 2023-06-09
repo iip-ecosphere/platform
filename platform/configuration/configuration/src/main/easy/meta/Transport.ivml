@@ -21,7 +21,9 @@ project Transport {
     	Port localPort = port; // by default, we run the local brokers on the same port, but this may be overridden
     	Port localEcsPort = 8889; // the local broker port for ECS containers  
         SecuritySettings security = null;
-        String brokerVer = ""; // Maven version of the (instantiated default) broker to use
+        assign(semanticId = Eclass_Property_swVersion) to {
+            String brokerVer = ""; // Maven version of the (instantiated default) broker to use
+        }
         assign (semanticId = Eclass_Unit_ms) to {
             Integer actionTimeout = 1000;
         }
