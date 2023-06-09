@@ -44,6 +44,7 @@ import de.iip_ecosphere.platform.support.iip_aas.AasContributor;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
+import de.iip_ecosphere.platform.support.iip_aas.Eclass;
 import de.iip_ecosphere.platform.support.iip_aas.Id;
 import de.iip_ecosphere.platform.support.iip_aas.Irdi;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper;
@@ -325,9 +326,11 @@ public class EcsAas implements AasContributor {
             .build();
         dBuilder.createPropertyBuilder(NAME_PROP_NAME)
             .setValue(Type.STRING, desc.getName())
+            .setSemanticId(Eclass.IRDI_PROPERTY_SOFTWARE_NAME)
             .build();
         dBuilder.createPropertyBuilder(NAME_PROP_VERSION)
             .setValue(Type.STRING, desc.getVersion().toString())
+            .setSemanticId(Eclass.IRDI_PROPERTY_SOFTWARE_VERSION)
             .build();
         dBuilder.createPropertyBuilder(NAME_PROP_STATE)
             .setValue(Type.STRING, desc.getState().toString())
