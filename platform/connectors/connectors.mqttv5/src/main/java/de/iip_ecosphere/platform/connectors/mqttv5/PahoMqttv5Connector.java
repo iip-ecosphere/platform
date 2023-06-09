@@ -179,6 +179,7 @@ public class PahoMqttv5Connector<CO, CI> extends AbstractChannelConnector<byte[]
                     throw new IOException(e);
                 }
             }
+            LoggerFactory.getLogger(getClass()).info("MQTT: connected");
         } catch (MqttException e) {
             throw new IOException(e);
         }
