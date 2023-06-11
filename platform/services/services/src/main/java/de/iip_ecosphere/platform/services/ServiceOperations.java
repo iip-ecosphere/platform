@@ -235,7 +235,7 @@ public interface ServiceOperations {
      * @throws ExecutionException if attaching fails
      */
     public default String streamLog(String serviceId, StreamLogMode mode) throws ExecutionException {
-        return "";
+        return "[]";
     }
 
 }
