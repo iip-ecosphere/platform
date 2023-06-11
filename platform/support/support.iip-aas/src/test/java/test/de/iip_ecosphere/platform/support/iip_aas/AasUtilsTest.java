@@ -75,7 +75,23 @@ public class AasUtilsTest {
         Assert.assertEquals(-1, AasUtils.readDouble(noArgs, 1, -1), 0.01);
         Assert.assertEquals(5.23, AasUtils.readDouble(args, 1, 0), 0.01);
     }
-    
+
+    /**
+     * Tests {@link AasUtils#readBoolean(Object[], int, int)}.
+     */
+    @Test
+    public void testBoolean() {
+        Object[] noArgs = new Object[0];
+        Object[] args = new Object[3];
+        args[0] = "abba";
+        args[1] = true;
+        args[2] = "true";
+        
+        Assert.assertEquals(false, AasUtils.readBoolean(noArgs, 1, false));
+        Assert.assertEquals(true, AasUtils.readBoolean(args, 1, false));
+        Assert.assertEquals(true, AasUtils.readBoolean(args, 2, false));
+    }
+
     /**
      * Tests {@link AasUtils#readUri(Object[], int, URI)}.
      */

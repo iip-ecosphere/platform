@@ -145,6 +145,23 @@ public class AasUtils {
     }
 
     /**
+     * Reads the {@code index} argument from {@code} args as boolean.
+     * 
+     * @param args the array to take the value from 
+     * @param index the 0-based index into {@code} args
+     * @param dflt default value if the {@code index} is wrong, there is no value/null
+     * @return the value
+     */
+    public static boolean readBoolean(Object[] args, int index, boolean dflt) {
+        Object param = index >= 0 && index < args.length ? args[index] : null;
+        boolean result = dflt;
+        if (null != param) {
+            result = Boolean.parseBoolean(param.toString());
+        }
+        return result;
+    }
+
+    /**
      * Reads the {@code index} argument from {@code} args as URI.
      * 
      * @param args the array to take the value from 
