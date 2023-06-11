@@ -36,6 +36,7 @@ import de.iip_ecosphere.platform.services.ServiceDescriptor;
 import de.iip_ecosphere.platform.services.ServiceFactory;
 import de.iip_ecosphere.platform.services.ServiceManager;
 import de.iip_ecosphere.platform.services.ServicesAas;
+import de.iip_ecosphere.platform.services.ServiceOperations.StreamLogMode;
 import de.iip_ecosphere.platform.services.environment.AbstractService;
 import de.iip_ecosphere.platform.services.environment.ServiceMapper;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
@@ -44,12 +45,15 @@ import de.iip_ecosphere.platform.services.environment.Starter;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.meterRepresentation.MeterRepresentation;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsAasConstants;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsAasConstructor;
+import de.iip_ecosphere.platform.services.environment.services.TransportConverter.Watcher;
+import de.iip_ecosphere.platform.services.environment.services.TransportConverterFactory;
 import de.iip_ecosphere.platform.services.spring.ClasspathJavaCommandBuilder;
 import de.iip_ecosphere.platform.services.spring.SpringCloudArtifactDescriptor;
 import de.iip_ecosphere.platform.services.spring.SpringCloudServiceManager;
 import de.iip_ecosphere.platform.services.spring.SpringCloudServiceSetup;
 import de.iip_ecosphere.platform.services.spring.SpringInstances;
 import de.iip_ecosphere.platform.support.CollectionUtils;
+import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.TimeUtils;
@@ -66,11 +70,13 @@ import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.support.iip_aas.config.CmdLine;
+import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
 import de.iip_ecosphere.platform.support.net.ManagedServerAddress;
 import de.iip_ecosphere.platform.support.net.NetworkManager;
 import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
 import de.iip_ecosphere.platform.transport.Transport;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
+import de.iip_ecosphere.platform.transport.serialization.TypeTranslators;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.Meter;
 import test.de.iip_ecosphere.platform.test.amqp.qpid.TestQpidServer;
@@ -103,6 +109,7 @@ public class AbstractTestServiceManager {
     private static AasSetup oldSetup;
     private static Server implServer;
     private static Server aasServer;
+    private static Server gatewayServer;
     @Autowired
     private SpringCloudServiceSetup config;
     private List<String> netKeyToRelease = new ArrayList<>();
@@ -154,6 +161,9 @@ public class AbstractTestServiceManager {
         SpringInstances.setServiceCmdArgs(CollectionUtils.toList(
             CmdLine.composeArgument(Starter.PARAM_IIP_TEST_AAS_PORT, aasPort),
             CmdLine.composeArgument(Starter.PARAM_IIP_TEST_AASREG_PORT, aasRegPort)));
+        
+        System.out.println("Gateway server");
+        gatewayServer = TransportConverterFactory.getInstance().createServer(null, setup).start();
     }
 
     /**
@@ -165,6 +175,9 @@ public class AbstractTestServiceManager {
             server.stop(false);
             aasServer.stop(true);
             implServer.stop(true);
+        }
+        if (null != gatewayServer) {
+            gatewayServer.stop(true);
         }
         AasPartRegistry.setAasSetup(oldSetup);
         ActiveAasBase.setNotificationMode(oldM);
@@ -297,6 +310,7 @@ public class AbstractTestServiceManager {
         System.out.println("STARTING " + mgr + " " + java.util.Arrays.toString(allIds)); // needed on Jenkins...
         mgr.startService(allIds);
         assertServiceState(serviceIds, aDesc, ServiceState.RUNNING);
+        List<Watcher<String>> watcher = loggingOp(mgr, StreamLogMode.START, "simpleStream-log");
 
         Aas aas = AasPartRegistry.retrieveIipAas();
         Submodel sub = aas.getSubmodel(ServicesAas.NAME_SUBMODEL);
@@ -310,6 +324,8 @@ public class AbstractTestServiceManager {
         expectedMetrics.put(MetricsAasConstants.SYSTEM_MEMORY_USAGE, POSITIVE_GAUGE_VALUE);
         assertMetrics(serviceIds, expectedMetrics);
 
+        stopLogging(watcher);
+        loggingOp(mgr, StreamLogMode.STOP, "simpleStream-log");
         asserter.testDeployment(aDesc);
         mgr.stopService(allIds);
         releaseFakeServiceCommandServers();
@@ -324,6 +340,46 @@ public class AbstractTestServiceManager {
         Assert.assertNull(mgr.getArtifact(aId));
         assertReceiverLog();
         MetricsAasConstructor.clear();
+    }
+
+    /**
+     * Performs a log streaming operation on services with given {@code ids}.
+     * 
+     * @param mgr the service manager
+     * @param mode the logging mode
+     * @param ids the service ids
+     * @return the created/started watchers
+     */
+    private static List<Watcher<String>> loggingOp(ServiceManager mgr, StreamLogMode mode, String... ids) {
+        List<Watcher<String>> result = new ArrayList<>();
+        for (String id : ids) {
+            try {
+                String[] logUris = JsonUtils.fromJson(mgr.streamLog(id, mode), String[].class);
+                for (String u: logUris) {
+                    Endpoint ep = Endpoint.valueOf(u);
+                    if (null != ep) {
+                        Watcher<String> w = TransportConverterFactory.getInstance().createWatcher(ep, 
+                            TypeTranslators.STRING, String.class, 0);
+                        w.setConsumer(s -> System.out.println("LOG " + id + ": " + s)); // TODO assert at least one?
+                        result.add(w.start());
+                    }
+                }
+            } catch (ExecutionException e) {
+                Assert.fail("StartingLogging " + id + ":" + e.getMessage());
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Stops running logging watchers.
+     * 
+     * @param watcher the logging watchers
+     */
+    private static void stopLogging(List<Watcher<String>> watcher) {
+        for (Watcher<String> w: watcher) {
+            w.stop();
+        }
     }
 
     /**
@@ -367,8 +423,10 @@ public class AbstractTestServiceManager {
         Assert.assertTrue("Receiver log is empty", f.length() > 0);
         try {
             String str = FileUtils.readFileToString(f, Charset.defaultCharset());
-            Assert.assertTrue(str.contains("Received:"));
-            Assert.assertTrue(str.contains("Received-Async:"));
+            Assert.assertTrue("No Received in:\n " + str, 
+                str.contains("Received:"));
+            Assert.assertTrue("No Received-Async in:\n " + str,
+                str.contains("Received-Async:"));
         } catch (IOException e) {
             Assert.fail("While reading receiver log: " + e.getMessage());
         }

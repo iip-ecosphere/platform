@@ -14,6 +14,7 @@ package de.iip_ecosphere.platform.services.spring;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,9 +28,11 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import org.apache.commons.io.input.Tailer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.deployer.spi.app.AppDeployer;
+import org.springframework.cloud.deployer.spi.app.AppInstanceStatus;
 import org.springframework.cloud.deployer.spi.app.AppStatus;
 import org.springframework.cloud.deployer.spi.app.DeploymentState;
 import org.springframework.cloud.deployer.spi.core.AppDeploymentRequest;
@@ -756,6 +759,101 @@ public class SpringCloudServiceManager
             }
         }
         super.clear();
+    }
+    
+    /**
+     * Returns whether {@code desc} is loggable, i.e., shomehow running and depoyed.
+     * 
+     * @param desc the descriptor
+     * @return {@code true} for loggable, {@code false} else
+     */
+    private boolean isLoggable(SpringCloudServiceDescriptor desc) {
+        boolean result = false;
+        if (null != desc) {
+            result = desc.getDeploymentId() != null;
+            ServiceState state = desc.getState();
+            result &= ServiceState.STARTING == state || ServiceState.RUNNING == state || ServiceState.STOPPING == state;
+        }
+        return result;
+    }
+    
+    @Override
+    public String streamLog(String serviceId, StreamLogMode mode) throws ExecutionException {
+        String result = "[]";
+        SpringCloudServiceDescriptor desc = getService(serviceId);
+        if (mode != StreamLogMode.NONE && isLoggable(desc)) {
+            AppDeployer deployer = getDeployer();
+            String deploymentId = desc.getDeploymentId();
+            AppStatus status = deployer.status(deploymentId);
+            List<URI> uris = new ArrayList<URI>();
+            if (DeploymentState.deployed == status.getState()) {
+                if (StreamLogMode.STOP == mode) {
+                    desc.closeCloseables(s -> isLogStreamCloseable(s), c -> {
+                        return (c instanceof LogTailerListener) && ((LogTailerListener) c).decreaseUsageCount() == 0;
+                    });
+                } else {
+                    desc.iterClosables(s -> isLogStreamCloseable(s), null, c -> {
+                        if (c instanceof LogTailerListener) {
+                            LogTailerListener lt = (LogTailerListener) c;
+                            uris.add(lt.getURI());
+                            lt.increaseUsageCount();
+                        }
+                    });
+                    if (uris.isEmpty()) {
+                        for (AppInstanceStatus inst : status.getInstances().values()) {
+                            attachTailer(inst, "stdout", mode, desc, uris);
+                            attachTailer(inst, "stderr", mode, desc, uris);
+                        }
+                    }
+                }
+            }
+            result = JsonUtils.toJson(uris);
+        }
+        return result;
+    }
+
+    /**
+     * Returns whether {@code key} is a log stream closeable.
+     * 
+     * @param key the key
+     * @return {@code true} for is a closeable, {@code false} else
+     */
+    private static boolean isLogStreamCloseable(String key) {
+        return key.startsWith("stdout_") || key.startsWith("stderr_");
+    }
+    
+    /**
+     * Attaches a tailer to an app instance.
+     * 
+     * @param inst the instance
+     * @param field the field to attach to 
+     * @param mode the streaming mode
+     * @param desc the service descriptor
+     * @param result the result
+     */
+    private void attachTailer(AppInstanceStatus inst, String field, StreamLogMode mode, 
+        SpringCloudServiceDescriptor desc, List<URI> result) {
+        Class<?> cls = inst.getClass();
+        try {
+            Field f = cls.getDeclaredField(field);
+            f.setAccessible(true);
+            Object tmp = f.get(inst);
+            if (tmp instanceof File) {
+                File file = (File) f.get(inst);
+                SpringCloudServiceSetup setup = SpringInstances.getConfig();
+                LogTailerListener listener = new LogTailerListener(setup.getAas(), setup.getTransport(), 
+                    desc.getId().replace(ServiceBase.APPLICATION_SEPARATOR, "/") + "/" + field);
+                Tailer tailer = Tailer.create(file, listener, 300, mode == StreamLogMode.TAIL);
+                listener.attachTailer(tailer);
+                desc.attachCloseable(field + "_" + inst.getId(), listener);
+                URI uri = listener.getURI();
+                if (null != uri) {
+                    result.add(uri);
+                }
+            }
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            LoggerFactory.getLogger(getClass()).error("Attaching logging {}: {}", field, e.getMessage());
+        }
     }
 
 }

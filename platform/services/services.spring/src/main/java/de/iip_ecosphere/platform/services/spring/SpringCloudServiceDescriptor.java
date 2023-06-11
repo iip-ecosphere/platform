@@ -12,15 +12,20 @@
 
 package de.iip_ecosphere.platform.services.spring;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.springframework.cloud.deployer.spi.app.AppDeployer;
@@ -75,6 +80,7 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
     private String serviceProtocol;
     private ManagedServerAddress adminAddr;
     private Server server;
+    private Map<String, Closeable> closeables;
     
     /**
      * Creates an instance.
@@ -233,6 +239,70 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
         }
         portKeys.clear();
         adminAddr = null;
+        if (null != closeables) {
+            closeCloseables(null, null);
+            closeables = null;
+        }
+    }
+
+    /**
+     * Attaches a closable.
+     * 
+     * @param key the key to identify the closeable later
+     * @param closeable the closable (may be <b>null</b>, ignored then)
+     */
+    void attachCloseable(String key, Closeable closeable) {
+        if (closeable != null && null != key && (closeables == null || !closeables.containsKey(key))) {
+            if (null == closeables) {
+                closeables = Collections.synchronizedMap(new HashMap<>());
+            }
+            closeables.put(key, closeable);
+        }
+    }
+    
+    /**
+     * Iterates over attached closeables.
+     * 
+     * @param predKey the predicate to select the closeables by key (may be <b>null</b> for all)
+     * @param predCl the predicate to select the closeables by instance (may be <b>null</b> for all)
+     * @param consumer on identified closeables, for closing them use {@link #closeCloseables(Predicate)}.
+     */
+    void iterClosables(Predicate<String> predKey, Predicate<Closeable> predCl, Consumer<Closeable> consumer) {
+        iterCloseables(predKey, predCl, consumer, null);
+    }
+
+    /**
+     * Iterates over attached closeables.
+     * 
+     * @param predKey the predicate to select the closeables by key (may be <b>null</b> for all)
+     * @param predCl the predicate to select the closeables by instance (may be <b>null</b> for all)
+     * @param consumer on identified closeables, for closing them use {@link #closeCloseables(Predicate)}.
+     * @param iterHandler for actions on the internal closeables iterator
+     */
+    private void iterCloseables(Predicate<String> predKey, Predicate<Closeable> predCl, Consumer<Closeable> consumer, 
+        Consumer<Iterator<?>> iterHandler) {
+        if (closeables != null) {
+            Iterator<Map.Entry<String, Closeable>> iter = closeables.entrySet().iterator();
+            while (iter.hasNext()) {
+                Map.Entry<String, Closeable> e = iter.next();
+                if ((null == predKey || predKey.test(e.getKey())) && (null == predCl || predCl.test(e.getValue()))) {
+                    consumer.accept(e.getValue());
+                    if (null != iterHandler) {
+                        iterHandler.accept(iter);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Closes attached closeables.
+     * 
+     * @param predKey the predicate to select the closeables by key (may be <b>null</b> for all)
+     * @param predCl the predicate to select the closeables by instance (may be <b>null</b> for all)
+     */
+    void closeCloseables(Predicate<String> predKey, Predicate<Closeable> predCl) {
+        iterCloseables(predKey, predCl, c -> FileUtils.closeQuietly(c), i -> i.remove());
     }
 
     /**
