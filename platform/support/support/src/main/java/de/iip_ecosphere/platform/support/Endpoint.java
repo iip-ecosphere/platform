@@ -12,6 +12,11 @@
 
 package de.iip_ecosphere.platform.support;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
+import org.slf4j.LoggerFactory;
+
 /**
  * Implements a reusable server endpoint. 
  * 
@@ -115,6 +120,23 @@ public class Endpoint extends ServerAddress {
     @Override
     public int hashCode() {
         return super.hashCode() ^ endpoint.hashCode();
+    }
+
+    /**
+     * Turns an URI into an endpoint.
+     * 
+     * @param uri the URI
+     * @return the endpoint, may be <b>null</b> if not valid
+     */
+    public static Endpoint valueOf(String uri) {
+        try {
+            URI u = new URI(uri);
+            Schema schema = Schema.valueOf(u.getScheme().toUpperCase());
+            return new Endpoint(schema, u.getHost(), u.getPort(), u.getPath());
+        } catch (URISyntaxException | IllegalArgumentException | NullPointerException e) {
+            LoggerFactory.getLogger(Endpoint.class).error("Cannot construct endpoint: {}", e.getMessage());
+            return null;
+        } 
     }
 
 }

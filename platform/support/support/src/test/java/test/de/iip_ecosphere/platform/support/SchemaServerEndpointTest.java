@@ -121,6 +121,8 @@ public class SchemaServerEndpointTest {
         Assert.assertEquals("/rep", ep1.getEndpoint());
         Assert.assertEquals("http://localhost:1235/rep", ep1.toUri());
         Assert.assertEquals("http://localhost:1235", ep1.toServerUri());
+        Assert.assertEquals(ep1, Endpoint.valueOf(ep1.toUri()));
+        Assert.assertNull(Endpoint.valueOf("abc1"));
         
         Assert.assertEquals(ep, ep1);
         Assert.assertEquals(ep.hashCode(), ep1.hashCode());
