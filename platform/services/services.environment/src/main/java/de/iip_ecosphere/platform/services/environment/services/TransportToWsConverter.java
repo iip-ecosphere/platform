@@ -13,24 +13,9 @@
 package de.iip_ecosphere.platform.services.environment.services;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
-import org.java_websocket.WebSocket;
-import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.exceptions.WebsocketNotConnectedException;
-import org.java_websocket.handshake.ClientHandshake;
-import org.java_websocket.handshake.ServerHandshake;
-import org.java_websocket.server.WebSocketServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,14 +44,14 @@ public class TransportToWsConverter<T> extends TransportConverter<T> {
     public static final Schema SCHEMA = Schema.WS;
     
     private Endpoint endpoint;
-    private SenderClient sender;
+    private Sender<T> sender;
     private boolean notConnectedError = false;
     private TypeTranslator<T, String> typeTranslator;
 
     /**
      * Creates a transport to web socket converter running the server in this instance.
      * The type translator will be the default one from 
-     * {@link #TransportToWsConverter(String, Class, Endpoint, TypeTranslator))}.
+     * {@link #TransportToWsConverter(String, Class, Endpoint, TypeTranslator)}.
      * 
      * @param transportStream the transport stream to listen on
      * @param dataType the data type to listen for
@@ -82,17 +67,14 @@ public class TransportToWsConverter<T> extends TransportConverter<T> {
      * @param transportStream the transport stream to listen on
      * @param dataType the data type to listen for
      * @param endpoint the server endpoint
-     * @param translator the optional type translator; if not given, {@link GenericJsonToStringTranslator} will be used
+     * @param translator the optional type translator
+     * @see TransportConverterFactory#ensureTranslator(TypeTranslator, Class)
      */
     public TransportToWsConverter(String transportStream, Class<T> dataType, Endpoint endpoint, 
         TypeTranslator<T, String> translator) {
         super(transportStream, dataType);
         this.endpoint = endpoint;
-        if (null == translator) {
-            this.typeTranslator = new GenericJsonToStringTranslator<>(dataType);
-        } else {
-            this.typeTranslator = translator;
-        }
+        this.typeTranslator = TransportConverterFactory.ensureTranslator(translator, dataType);
     }
     
     /**
@@ -129,27 +111,7 @@ public class TransportToWsConverter<T> extends TransportConverter<T> {
      * @return the server instance
      */
     public static Server createServer(ServerAddress address) {
-        return new Server() {
-            
-            private BroadcastingWsServer server;
-
-            @Override
-            public Server start() {
-                server = new BroadcastingWsServer(address);
-                new Thread(server).start();
-                return this;
-            }
-
-            @Override
-            public void stop(boolean dispose) {
-                try {
-                    server.stop();
-                } catch (InterruptedException e) {
-                }
-            }
-            
-        };
-        
+        return WsTransportConverterFactory.INSTANCE.createServer(address);
     }
 
     @Override
@@ -169,11 +131,13 @@ public class TransportToWsConverter<T> extends TransportConverter<T> {
     @Override
     public void start(AasSetup aasSetup) {
         super.start(aasSetup);
-        sender = createWithUri(u -> new SenderClient(u));
-        try {
-            sender.connectBlocking();
-        } catch (InterruptedException e) {
-            
+        sender = WsTransportConverterFactory.INSTANCE.createSender(endpoint, typeTranslator, getType());
+        if (null != sender) {
+            try {
+                sender.connectBlocking();
+            } catch (InterruptedException e) {
+                getLogger().error("Connection attempt interrupted: {}", e.getMessage());
+            }
         }
     }
 
@@ -181,193 +145,26 @@ public class TransportToWsConverter<T> extends TransportConverter<T> {
      * Stops the transport, deletes the AAS.
      */
     public void stop() {
-        sender.close();
+        if (null != sender) {
+            sender.close();
+        }
     }
 
     @Override
     protected void handleNew(T data) {
-        try {
-            sender.send(typeTranslator.to(data));
-            notConnectedError = false;
-        } catch (IOException e) {
-            getLogger().error("Cannot write data: {}", e.getMessage());
-        } catch (WebsocketNotConnectedException e) {
-            if (!notConnectedError) {
-                getLogger().error("Cannot write data, not connected: {}", e.getMessage());
-                notConnectedError = true;
-            }
-        }
-    }
-
-    /**
-     * Simple web socket client for sending data.
-     * 
-     * @author Holger Eichelberger, SSE
-     */
-    private class SenderClient extends WebSocketClient {
-
-        /**
-         * Creates the sender.
-         * 
-         * @param serverURI the sender
-         */
-        public SenderClient(URI serverURI) {
-            super(serverURI);
-        }
-        
-        @Override
-        public void onOpen(ServerHandshake handshakedata) {
-        }
-
-        @Override
-        public void onMessage(String message) {
-        }
-
-        @Override
-        public void onClose(int code, String reason, boolean remote) {
-        }
-
-        @Override
-        public void onError(Exception ex) {
-            getLogger().error("Cannot write data: {}", ex.getMessage());
-        }
-        
-    }
-
-    /**
-     * A simple web socket server.
-     * 
-     * @author Holger Eichelberger, SSE
-     */
-    private static class BroadcastingWsServer extends WebSocketServer {
-
-        private ServerAddress address;
-        private Map<String, List<WebSocket>> connections = Collections.synchronizedMap(new HashMap<>());
-        
-        /**
-         * Creates the server instance.
-         * 
-         * @param address the server address
-         */
-        private BroadcastingWsServer(ServerAddress address) {
-            super(new InetSocketAddress(address.getHost(), address.getPort()));
-            this.address = address;
-        }
-        
-        @Override
-        public void onOpen(WebSocket conn, ClientHandshake handshake) {
-            List<WebSocket> cList = connections.get(conn.getResourceDescriptor());
-            if (null == cList) {
-                cList = Collections.synchronizedList(new ArrayList<>());
-                connections.put(conn.getResourceDescriptor(), cList);
-            }
-            cList.add(conn);
-        }
-
-        @Override
-        public void onClose(WebSocket conn, int code, String reason, boolean remote) {
-            List<WebSocket> cList = connections.get(conn.getResourceDescriptor());
-            if (null != cList) {
-                cList.remove(conn);
-                if (cList.isEmpty()) {
-                    connections.remove(conn.getResourceDescriptor());
-                }
-            }
-        }
-
-        @Override
-        public void onMessage(WebSocket conn, String message) {
-            List<WebSocket> cList = connections.get(conn.getResourceDescriptor());
-            if (null != cList) {
-                for (int c = 0; c < cList.size(); c++) {
-                    cList.get(c).send(message);
-                }
-            }            
-            //"topic" specific broadcast(message);
-        }
-
-        @Override
-        public void onError(WebSocket conn, Exception ex) {
-            getLogger().error("Errod on {}: {}", conn.getRemoteSocketAddress(), ex.getMessage());
-        }
-
-        @Override
-        public void onStart() {
-            getLogger().info("Started transport converter websocket server on {}", address.getPort());
-        }
-        
-    }
-    
-    /**
-     * Watcher implementation.
-     * 
-     * @author Holger Eichelberger, SSE
-     */
-    private class WsWatcher extends WebSocketClient implements Watcher<T> {
-
-        private String lastError;
-        private Consumer<T> consumer = d -> { };
-
-        /**
-         * Creates a watcher for the given URI.
-         * 
-         * @param serverUri the URI to watch
-         */
-        public WsWatcher(URI serverUri) {
-            super(serverUri);
-        }
-
-        @Override
-        public Watcher<T> start() {
-            connect();
-            return this;
-        }
-
-        @Override
-        public Watcher<T> stop() {
-            close();
-            return this;
-        }
-        
-        @Override
-        public void onOpen(ServerHandshake handshakedata) {
-        }
-
-        @Override
-        public void onMessage(String message) {
+        if (null != sender) {
             try {
-                T data = typeTranslator.from(message);
-                consumer.accept(data);
+                sender.send(data);
+                notConnectedError = false;
             } catch (IOException e) {
-                getLogger().error("While ingesting result data: {}", e.getMessage());
+                getLogger().error("Cannot write data: {}", e.getMessage());
+            } catch (WebsocketNotConnectedException e) {
+                if (!notConnectedError) {
+                    getLogger().error("Cannot write data, not connected: {}", e.getMessage());
+                    notConnectedError = true;
+                }
             }
         }
-
-        @Override
-        public void onClose(int code, String reason, boolean remote) {
-            if (remote) {
-                getLogger().info("Connection closed by remote peer, code: {} reason: {}", code, reason);
-            }
-        }
-
-        @Override
-        public void onError(Exception ex) {
-            String msg = ex.getMessage();
-            if (null == lastError || !lastError.equals(msg)) {
-                lastError = msg;
-                getLogger().error("While watching: {}", ex.getMessage());
-            }
-        }
-
-        @Override
-        public void setConsumer(Consumer<T> consumer) {
-            if (null == consumer) {
-                this.consumer = d -> { };
-            } else {
-                this.consumer = consumer;
-            }
-        }
-
     }
 
     /**
@@ -378,24 +175,6 @@ public class TransportToWsConverter<T> extends TransportConverter<T> {
     protected static Logger getLogger() {
         return LoggerFactory.getLogger(TransportToWsConverter.class);
     }
-    
-    /**
-     * Creates some instance with a URI.
-     * 
-     * @param <R> the resulting instance type
-     * @param creator the creator function
-     * @return created instance
-     */
-    private <R> R createWithUri(Function<URI, R> creator) {
-        String uri = endpoint.toUri();
-        try {
-            return creator.apply(new URI(uri));
-        } catch (URISyntaxException e) {
-            // static URI, unlikely to fail
-            getLogger().error("URI syntax error: {}", e.getMessage());
-            return null;
-        }
-    }
 
     @Override
     public Endpoint getEndpoint() {
@@ -404,7 +183,16 @@ public class TransportToWsConverter<T> extends TransportConverter<T> {
 
     @Override
     public Watcher<T> createWatcher(int period) {
-        return createWithUri(u -> new WsWatcher(u));
+        return WsTransportConverterFactory.INSTANCE.createWatcher(endpoint, typeTranslator, getType(), period);
+    }
+    
+    /**
+     * Returns the type translator.
+     * 
+     * @return the type translator
+     */
+    public TypeTranslator<T, String> getTypeTranslator() {
+        return typeTranslator;
     }
 
 }
