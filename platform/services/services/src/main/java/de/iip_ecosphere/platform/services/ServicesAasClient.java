@@ -233,6 +233,19 @@ public class ServicesAasClient extends SubmodelElementsCollectionClient implemen
     }
     
     @Override
+    public String streamLog(String serviceId, StreamLogMode mode) throws ExecutionException {
+        String result = "";
+        try {
+            result = fromJson(getOperation(ServicesAas.NAME_OP_SERVICE_STREAM_LOG).invoke(serviceId, mode.name()));
+        } catch (ExecutionException e) {
+            getLogger().error("Requesting service state: " + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            getLogger().error("Requesting service state, illegal response value: " + e.getMessage());
+        }
+        return result;
+    }
+    
+    @Override
     public String[] getServices(String artifactId, boolean topLevelOnly) {
         List<String> result = new ArrayList<String>();
         SubmodelElementCollection coll = getServices();

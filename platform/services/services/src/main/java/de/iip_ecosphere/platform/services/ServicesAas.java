@@ -130,6 +130,7 @@ public class ServicesAas implements AasContributor {
     public static final String NAME_OP_ARTIFACT_REMOVE = "removeArtifact";
     public static final String NAME_OP_SERVICE_INSTANCE_COUNT  = "getServiceInstanceCount";
     public static final String NAME_OP_SERVICE_STATE_COUNT  = "getServiceStateCount";
+    public static final String NAME_OP_SERVICE_STREAM_LOG = "serviceStreamLog";
     
     private static final String ID_SUBMODEL = null; // take the short name, shall become public and an URN later
     
@@ -199,6 +200,7 @@ public class ServicesAas implements AasContributor {
         createIdOp(builder, NAME_OP_SERVICE_STOP, iCreator);
         createIdOp(builder, NAME_OP_SERVICE_STOP_TASK, iCreator, "taskId");
         createIdOp(builder, NAME_OP_SERVICE_GET_STATE, iCreator);
+        createIdOp(builder, NAME_OP_SERVICE_STREAM_LOG, iCreator, "mode");
         createIdOp(builder, NAME_OP_SERVICE_INSTANCE_COUNT, iCreator);
         createIdOp(builder, NAME_OP_SERVICE_SET_STATE, iCreator, "state");
         
@@ -323,6 +325,10 @@ public class ServicesAas implements AasContributor {
         ));
         sBuilder.defineOperation(getQName(NAME_OP_SERVICE_GET_STATE), 
             new JsonResultWrapper(p -> ServiceFactory.getServiceManager().getServiceState(readString(p))
+        ));
+        sBuilder.defineOperation(getQName(NAME_OP_SERVICE_STREAM_LOG), 
+            new JsonResultWrapper(p -> ServiceFactory.getServiceManager().streamLog(readString(p), 
+                ServiceOperations.toMode(readString(p, 1)))
         ));
         sBuilder.defineOperation(getQName(NAME_OP_SERVICE_INSTANCE_COUNT), 
             new JsonResultWrapper(p -> ServiceFactory.getServiceManager().getServiceInstanceCount(readString(p))

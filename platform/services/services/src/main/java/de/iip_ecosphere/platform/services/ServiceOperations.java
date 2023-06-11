@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import de.iip_ecosphere.platform.services.environment.ServiceState;
+import de.iip_ecosphere.platform.services.environment.services.TransportConverterFactory;
 
 /**
  * Basic service operations that shall also be available via an AAS.
@@ -194,5 +195,47 @@ public interface ServiceOperations {
      *    is a service with the same id, the number of instances otherwise
      */
     public int getServiceInstanceCount(String serviceId);
+    
+    /**
+     * Mode for {@link ServiceOperations#streamLog(String, boolean)}.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public enum StreamLogMode {
+        START,
+        TAIL,
+        STOP,
+        NONE
+    }
+
+    /**
+     * Turns a string value to a {@link StreamLogMode}.
+     * 
+     * @param value the string value
+     * @return the mode, fallback is {@link StreamLogMode#NONE}.
+     */
+    public static StreamLogMode toMode(String value) {
+        StreamLogMode result = StreamLogMode.NONE;
+        if (null != value) {
+            try {
+                result = StreamLogMode.valueOf(value);
+            } catch (IllegalArgumentException e) {
+                // -> default
+            }
+        }
+        return result;
+    }
+    
+    /**
+     * Tries to attach the logs of {@code serviceId} to a sender determined by {@link TransportConverterFactory}.
+     * 
+     * @param serviceId the service id
+     * @param mode the mode
+     * @return the URIs where to find the (streamed) log as JSON list or empty
+     * @throws ExecutionException if attaching fails
+     */
+    public default String streamLog(String serviceId, StreamLogMode mode) throws ExecutionException {
+        return "";
+    }
 
 }
