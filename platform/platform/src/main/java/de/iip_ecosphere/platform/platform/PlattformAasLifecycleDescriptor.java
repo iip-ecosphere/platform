@@ -23,12 +23,14 @@ import de.iip_ecosphere.platform.ecsRuntime.EcsCmdLineLifecycleDescriptor;
 import de.iip_ecosphere.platform.ecsRuntime.EcsLifecycleDescriptor;
 import de.iip_ecosphere.platform.services.ServicesAas;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.HeartbeatWatcher;
-import de.iip_ecosphere.platform.services.environment.services.TransportToWsConverter;
+import de.iip_ecosphere.platform.services.environment.services.TransportConverter;
+import de.iip_ecosphere.platform.services.environment.services.TransportConverterFactory;
 import de.iip_ecosphere.platform.support.LifecycleExclude;
 import de.iip_ecosphere.platform.support.iip_aas.AbstractAasLifecycleDescriptor;
 import de.iip_ecosphere.platform.support.iip_aas.IipVersion;
 import de.iip_ecosphere.platform.transport.Transport;
 import de.iip_ecosphere.platform.transport.status.StatusMessage;
+import de.iip_ecosphere.platform.transport.status.StatusMessageSerializer;
 
 /**
  * This descriptor is responsible for creating the AAS of the platform.
@@ -40,7 +42,7 @@ public class PlattformAasLifecycleDescriptor extends AbstractAasLifecycleDescrip
 
     private Timer timer = new Timer();
     private HeartbeatWatcher watcher = new HeartbeatWatcher();
-    private TransportToWsConverter<StatusMessage> traceConverter;
+    private TransportConverter<StatusMessage> traceConverter;
     
     /**
      * Creates AAS an instance for the service manager.
@@ -55,7 +57,8 @@ public class PlattformAasLifecycleDescriptor extends AbstractAasLifecycleDescrip
         super.startup(args);
         ArtifactsManager.startWatching();
 
-        final int watcherTimeout = PlatformSetup.getInstance().getAasHeartbeatTimeout();
+        PlatformSetup setup = PlatformSetup.getInstance();
+        final int watcherTimeout = setup.getAasHeartbeatTimeout();
         if (watcherTimeout > 0) {
             try {
                 watcher.setTimeout(watcherTimeout);
@@ -80,9 +83,10 @@ public class PlattformAasLifecycleDescriptor extends AbstractAasLifecycleDescrip
             }
         }
         
-        final long statusTimeout = PlatformSetup.getInstance().getAasStatusTimeout();
-        traceConverter = new TransportToWsConverter<>(StatusMessage.STATUS_STREAM, StatusMessage.class, 
-            PlatformSetup.getInstance().getStatusGatewayEndpoint());
+        final long statusTimeout = setup.getAasStatusTimeout();
+        traceConverter = TransportConverterFactory.getInstance().createConverter(setup.getAas(), setup.getTransport(), 
+            StatusMessage.STATUS_STREAM, PlatformSetup.GATEWAY_PATH_STATUS, 
+            StatusMessageSerializer.createTypeTranslator(), StatusMessage.class);
         traceConverter.setTimeout(statusTimeout);
         traceConverter.start(getAasSetup());
         /*timer.schedule(new TimerTask() {

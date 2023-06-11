@@ -17,8 +17,6 @@ import java.io.IOException;
 
 import org.slf4j.LoggerFactory;
 
-import de.iip_ecosphere.platform.services.environment.services.TransportToWsConverter;
-import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 
@@ -39,7 +37,7 @@ public class PlatformSetup extends AbstractSetup {
         MONGO // let's see for other types, may be we need some exclusions on the configuration level
     }
     
-    public static final String WS_PATH_STATUS = "/status";
+    public static final String GATEWAY_PATH_STATUS = "/status";
     
     private static PlatformSetup instance;
     private PersistentAasSetup aas = new PersistentAasSetup();
@@ -176,16 +174,6 @@ public class PlatformSetup extends AbstractSetup {
      */
     public void setAasStatusTimeout(int aasStatusTimeout) {
         this.aasStatusTimeout = aasStatusTimeout;
-    }
-
-    /**
-     * Returns the web socket server endpoint for status messages.
-     * 
-     * @return the endpoint
-     * @see #getGatewayServerEndpoint(String)
-     */
-    public Endpoint getStatusGatewayEndpoint() {
-        return getTransport().getGatewayServerEndpoint(TransportToWsConverter.SCHEMA, WS_PATH_STATUS);
     }
 
 }

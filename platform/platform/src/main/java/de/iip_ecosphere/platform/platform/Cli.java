@@ -27,12 +27,16 @@ import de.iip_ecosphere.platform.platform.cli.Level;
 import de.iip_ecosphere.platform.platform.cli.ScannerCommandProvider;
 import de.iip_ecosphere.platform.platform.cli.PrintVisitor.PrintType;
 import de.iip_ecosphere.platform.services.ServicesClient;
-import de.iip_ecosphere.platform.services.environment.services.TransportToWsConverter;
+import de.iip_ecosphere.platform.services.ServiceOperations.StreamLogMode;
 import de.iip_ecosphere.platform.services.environment.services.TransportConverter.Watcher;
+import de.iip_ecosphere.platform.services.environment.services.TransportConverterFactory;
+import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.IipVersion;
+import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
 import de.iip_ecosphere.platform.support.semanticId.SemanticIdResolver;
 import de.iip_ecosphere.platform.transport.Transport;
+import de.iip_ecosphere.platform.transport.serialization.TypeTranslators;
 import de.iip_ecosphere.platform.transport.status.ActionTypes;
 import de.iip_ecosphere.platform.transport.status.StatusMessage;
 import de.iip_ecosphere.platform.transport.status.StatusMessageSerializer;
@@ -94,6 +98,7 @@ public class Cli extends CliBackend {
                 println("  add <path/URI> - adds an artifact");
                 println("  startAll <artifactId> - starts all services in <artifactId>");
                 println("  start <serviceId>+ . - starts the given services, note the \".\" at the end");
+                println("  log <serviceId> - emits the logs of the given service");
                 println("  stopAll <artifactId> - stops all services in <artifactId>");
                 println("  remove <artifactId> - removes <artifactId>");
                 println("  help - prints help for this level");
@@ -198,9 +203,9 @@ public class Cli extends CliBackend {
      */
     private static Watcher<StatusMessage> createStatusWatcher() {
         PlatformSetup setup = PlatformSetup.getInstance();
-        Watcher<StatusMessage> result = new TransportToWsConverter<StatusMessage>(StatusMessage.STATUS_STREAM, 
-            StatusMessage.class, setup.getStatusGatewayEndpoint(), StatusMessageSerializer.createTypeTranslator())
-            .createWatcher(0);
+        Watcher<StatusMessage> result = TransportConverterFactory.getInstance().createWatcher(setup.getAas(), 
+            setup.getTransport(), PlatformSetup.GATEWAY_PATH_STATUS, StatusMessageSerializer.createTypeTranslator(), 
+            StatusMessage.class, 0);
         result.setConsumer(s -> {
             String leadIn = "-"; // for now just all messages
             if (s.getAction() == ActionTypes.PROCESS && s.getAction() == ActionTypes.RESULT) {
@@ -300,6 +305,9 @@ public class Cli extends CliBackend {
                     }
                 }
                 break;
+            case "log":
+                logService(provider);
+                break;
             case "stopall":
                 changedServices = callWithArtifactId(provider, id -> client.stopService(client.getServices(id, true)));
                 break;
@@ -312,7 +320,43 @@ public class Cli extends CliBackend {
             }
             return exit;
         }
-        
+
+        /**
+         * Logs the service given as next command.
+         * 
+         * @param provider the command provider
+         * @throws ExecutionException if execution fails
+         */
+        private void logService(CommandProvider provider) throws ExecutionException {
+            String sId = provider.nextCommand();
+            if (null == sId) {
+                System.out.println("No serviceId given.");
+            } else {
+                String lTmp = client.streamLog(sId, StreamLogMode.START);
+                if (lTmp.length() > 0) {
+                    System.out.print("Starting log watchers on " + lTmp + ".");
+                    System.out.println(provider.isInteractive() ? "Stop with <enter>." : "");
+                    String[] uris = JsonUtils.fromJson(lTmp, String[].class);
+                    List<Watcher<String>> watchers = new ArrayList<Watcher<String>>();
+                    for (String u : uris) {
+                        Endpoint ep = Endpoint.valueOf(u);
+                        if (null != ep) {
+                            Watcher<String> w = TransportConverterFactory.getInstance().createWatcher(ep, 
+                                TypeTranslators.STRING, String.class, 0).start();
+                            w.setConsumer(s -> System.out.println(s));
+                            watchers.add(w);
+                        }
+                    }
+                    provider.waitForAnyKey();
+                    for (Watcher<String> w : watchers) {
+                        w.stop();
+                    }
+                } else {
+                    System.out.println("Streaming not supported, service not running, ...");
+                }
+            }
+        }
+
     }
     
     /**

@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.ecsRuntime.EcsLifecycleDescriptor;
 import de.iip_ecosphere.platform.services.ServicesLifecycleDescriptor;
-import de.iip_ecosphere.platform.services.environment.services.TransportToWsConverter;
+import de.iip_ecosphere.platform.services.environment.services.TransportConverterFactory;
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.LifecycleDescriptor;
 import de.iip_ecosphere.platform.support.LifecycleExclude;
@@ -38,7 +38,7 @@ public class PlatformLifecycleDescriptor implements LifecycleDescriptor, PidLife
 
     private Server registryServer;
     private Server aasServer;
-    private Server wsServer;
+    private Server gatewayServer;
     
     @Override
     public void startup(String[] args) {
@@ -61,14 +61,13 @@ public class PlatformLifecycleDescriptor implements LifecycleDescriptor, PidLife
         aasServer = rcp.createAasServer(aasSetup.getServerEndpoint(), pType, regEndpoint);
         aasServer.start();
         
-        wsServer = TransportToWsConverter.createServer(PlatformSetup.getInstance().getTransport()
-            .getGatewayServerEndpoint(TransportToWsConverter.SCHEMA, ""));
-        wsServer.start();
+        gatewayServer = TransportConverterFactory.getInstance().createServer(aasSetup, setup.getTransport());
+        gatewayServer.start();
     }
 
     @Override
     public void shutdown() {
-        Server.stop(wsServer, false);
+        Server.stop(gatewayServer, false);
         Server.stop(aasServer, false);
         Server.stop(registryServer, false);
     }

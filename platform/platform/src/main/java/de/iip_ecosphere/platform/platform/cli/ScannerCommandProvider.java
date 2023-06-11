@@ -52,6 +52,12 @@ public class ScannerCommandProvider implements CommandProvider {
     }
 
     @Override
+    public void waitForAnyKey() {
+        CommandProvider.anyKey();
+        scanner.reset();
+    }
+
+    @Override
     public boolean isInteractive() {
         return true;
     }
