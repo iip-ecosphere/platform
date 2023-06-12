@@ -25,7 +25,7 @@ template DockerfileBaseAllApps(IIPEcosphere config, FileArtifact target, sequenc
             ''
             '${genTestingMode(config, "Alpine")}'
             ''
-            for (Application app : apps) {
+            for (Application app : apps->sortedBy(a|a.id)) {
                 '${genServersExpose(app)|e}'
             }
             ''
