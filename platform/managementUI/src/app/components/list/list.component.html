@@ -24,7 +24,7 @@ mat-raised-button color="success"
       </div>
       -->
 
-      <div *ngIf="currentTab != ''"> <!--TODO make it visible together with table-->
+      <div *ngIf="currentTab != '' && tab.tabName != 'Setup'">
         <button mat-raised-button color="success"
         style="background-color: rgb(35, 142, 184)"
         (click)="new()">new

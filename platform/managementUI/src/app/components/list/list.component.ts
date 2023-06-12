@@ -72,8 +72,6 @@ export class ListComponent implements OnInit {
     ["address", "Address: ", ""]
   ]
 
-  //addressParams = ["department", "street"] TODO loe
-
   ngOnInit(): void {
   }
 
@@ -126,6 +124,7 @@ export class ListComponent implements OnInit {
       this.rawData = await this.getData("")
       this.filteredData = this.prefilter(metaProject)
     }
+    console.log("# (loadData) ---------- \n filteredData")
     console.log(this.filteredData)
   }
 
