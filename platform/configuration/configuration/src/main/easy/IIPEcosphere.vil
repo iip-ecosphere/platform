@@ -664,7 +664,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                         
                         if (srcJarsPath.endsWith("Jars")) {
                             Path deviceSourcesDf = "${deviceDf}/Jars";
-                            newDevicePath= "${appRoot}/../${srcJarsPath}${deviceSpec}";
+                            newDevicePath = "${appRoot}/../${srcJarsPath}${deviceSpec}";
                             lastDevicePath = "${deviceSourcesDf}/${srcJarsPath}${deviceSpec}";
                             if (newDevicePath.exists()) {
                                 if (not(sameMd5HashJarsFolders(newDevicePath, lastDevicePath))){
@@ -676,7 +676,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                             }
                         } else {
                             Path deviceSourcesDf = "${deviceDf}/sources";
-                            newDevicePath= "${appRoot}/../${srcJarsPath}${deviceSpec}/src";
+                            newDevicePath = "${appRoot}/../${srcJarsPath}${deviceSpec}/src";
                             lastDevicePath = "${deviceSourcesDf}/${srcJarsPath}${deviceSpec}/src";     
                             
                             if (newDevicePath.exists()) {
@@ -1057,7 +1057,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                             
                             if (srcJarsPath.endsWith("Jars")) {
                                 Path deviceSourcesDf = "${deviceDf}/Jars";
-                                newDevicePath= "${target}/${srcJarsPath}${deviceSpec}";
+                                newDevicePath = "${target}/${srcJarsPath}${deviceSpec}";
                                 lastDevicePath = "${deviceSourcesDf}/${srcJarsPath}${deviceSpec}";
                                 if (newDevicePath.exists()) {
                                     if (not(sameMd5HashJarsFolders(newDevicePath, lastDevicePath))){
@@ -1069,7 +1069,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                                 }
                             } else {
                                 Path deviceSourcesDf = "${deviceDf}/sources";
-                                newDevicePath= "${target}/${srcJarsPath}${deviceSpec}/src";
+                                newDevicePath = "${target}/${srcJarsPath}${deviceSpec}/src";
                                 lastDevicePath = "${deviceSourcesDf}/${srcJarsPath}${deviceSpec}/src";     
                                 
                                 if (newDevicePath.exists()) {
@@ -1395,10 +1395,10 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 Path deviceSourcesDf = "${deviceDf}/sources";
         
                 if (srcJarsPath == "mgtUi") {
-                    newDevicePath= "${target}/${srcJarsPath}/dist";
+                    newDevicePath = "${target}/${srcJarsPath}/dist";
                     lastDevicePath = "${deviceSourcesDf}/${srcJarsPath}/dist";
                 } else {
-                    newDevicePath= "${target}/${srcJarsPath}/src";
+                    newDevicePath = "${target}/${srcJarsPath}/src";
                     lastDevicePath = "${deviceSourcesDf}/${srcJarsPath}/src";
                 }
                 
