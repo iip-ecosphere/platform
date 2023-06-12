@@ -8,16 +8,17 @@ Planned:
 * Component upgrades: Spring Cloud Stream [#57](https://github.com/iip-ecosphere/platform/issues/57)
 * Integrated container management for Kubernetes [#39](https://github.com/iip-ecosphere/platform/issues/39)
 * Filtering of monitoring telegrams [#75](https://github.com/iip-ecosphere/platform/issues/75)
+* Tracing in Python Service environment: [#88](https://github.com/iip-ecosphere/platform/issues/88)
 
 ### HM'23: After the fair (Spring 2023):
 
 Planned:
 * Enable tolerant switching: [#26](https://github.com/iip-ecosphere/platform/issues/26)
-* Tracing in Python Service environment: [#88](https://github.com/iip-ecosphere/platform/issues/88)
 * CLI multi-device deployment problem: [#113](https://github.com/iip-ecosphere/platform/issues/113)
 * KODEX: dynamic port assignment: [#14](https://github.com/iip-ecosphere/platform/issues/14), documentation: [#6](https://github.com/iip-ecosphere/platform/issues/6)
 
 In progress:
+* [#147](https://github.com/iip-ecosphere/platform/issues/127): Streaming of service logs to CLI/UI
 * [#127](https://github.com/iip-ecosphere/platform/issues/127): Integration of federated learning 
 * [#70](https://github.com/iip-ecosphere/platform/issues/70): UI progress reporting 
 * [#117](https://github.com/iip-ecosphere/platform/issues/117): Multiple service managers per device
@@ -46,6 +47,7 @@ New features:
 Improvements:
 * [#128](https://github.com/iip-ecosphere/platform/issues/128): Refactor model to move RecordType::path to connector. **May require an upgrade of configuration models using connectors.**
 * [#129](https://github.com/iip-ecosphere/platform/issues/129): Read-only flag for RecordType field
+* [#135](https://github.com/iip-ecosphere/platform/issues/135): Changing Docker configuration for local repository became part of the platform install scripts [#107](https://github.com/iip-ecosphere/platform/issues/107).
 * [#137](https://github.com/iip-ecosphere/platform/issues/132): MQTT authentication on transport/connectors
 * [#139](https://github.com/iip-ecosphere/platform/issues/139): Fixing Python testing issues, better Python test generation based on JSON files
 * [#86](https://github.com/iip-ecosphere/platform/issues/86): UI restructuring larger lists, unifying use and look-and-feel
