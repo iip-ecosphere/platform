@@ -76,7 +76,8 @@ export class ServicesComponent implements OnInit {
     ["version", "Version: ", ""],
     ["resource", "Resource: ", ""],
     ["name", "", ""],
-    ["id", "Id: ", ""]
+    ["id", "Id: ", ""],
+    ["applicationInstanceId", "App instance: ", ""]
   ]
 
   ngOnInit(): void {
@@ -206,7 +207,7 @@ export class ServicesComponent implements OnInit {
         }
 
         for (let param of this.paramToDisplay) {
-          if (rowValues.idShort == param[0]) {
+          if (rowValues.idShort == param[0] && rowValues.value != "") {
             let new_rowValue =  { "value":  param[1] + rowValues.value + param[2]}
             temp.push(new_rowValue)
           }
