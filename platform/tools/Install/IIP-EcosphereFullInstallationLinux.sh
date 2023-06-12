@@ -190,7 +190,7 @@ if [ $yn == "y" ] || [ $yn == "Y" ]; then
         sudo apt autoclean -y
         sudo apt install python3-apt -y
         sudo apt-get install python3-pip -y
-        sudo apt-get install python3-distutils
+        sudo apt-get install python3-distutils -y
         sudo pip install pyflakes
     
     else
@@ -206,7 +206,7 @@ if [ $yn == "y" ] || [ $yn == "Y" ]; then
                     sudo apt autoclean -y;
                     sudo apt install python3-apt -y;
                     sudo apt-get install python3-pip -y;
-                    sudo apt-get install python3-distutils;
+                    sudo apt-get install python3-distutils -y;
                     sudo pip install pyflakes;;
             [Nn]* ) break;;
         esac
