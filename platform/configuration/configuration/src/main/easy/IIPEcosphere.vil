@@ -1099,7 +1099,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
 
                         for (String scriptFile : scriptFiles) {
                             Path scriptFileDf = "${deviceDf}/scriptFiles";
-                            Path newScriptFile = "${appRoot}/../${scriptFile}";
+                            Path newScriptFile = "${target}/${scriptFile}";
                             Path lastScriptFile = "${scriptFileDf}/${scriptFile}";
                             if (not(sameMd5HashFiles(newScriptFile, lastScriptFile))){
                                 copy(newScriptFile, scriptFileDf);
