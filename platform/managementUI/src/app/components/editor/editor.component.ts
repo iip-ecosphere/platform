@@ -1,3 +1,4 @@
+import { firstValueFrom } from 'rxjs';
 import { Component, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
@@ -24,11 +25,11 @@ export class EditorComponent implements OnInit {
   metaTypes = ['metaState', 'metaProject',
     'metaSize', 'metaType', 'metaRefines', 'metaAbstract'];
 
+  //metaTypeKind
+  primitive = 1
+
   datatypes = [
-    {cat: "Setup", value: ["PrimitiveType",
-      "TransportProtocol", "DeviceRegistry"]},
-    {cat: "Constants", value: ["PrimitiveType",
-      "NumericPrimitiveType"]},
+    {cat: "Constants", value: []},
     {cat: "Types", value: ["RecordType", "ArrayType"]},
     {cat: "Dependencies", value: ["Dependency"]},
     {cat: "Nameplates", value: ["NameplateInfo"]},
@@ -36,6 +37,17 @@ export class EditorComponent implements OnInit {
     {cat: "Servers", value: ["Server"]},
     {cat: "Meshes", value: ["ServiceMesh"]},
     {cat: "Applications", value: ["Application"]}
+  ];
+
+  reqTypes = [
+    {cat: "Constants", metaRef: []},
+    {cat: "Types", metaRef: ["RecordType", "ArrayType"]},
+    {cat: "Dependencies", metaRef: ["Dependency"]},
+    {cat: "Nameplates", metaRef: ["NameplateInfo"]},
+    {cat: "Services", metaRef: ["Service"]},
+    {cat: "Servers", metaRef: ["Server"]},
+    {cat: "Meshes", metaRef: ["ServiceMesh"]},
+    {cat: "Applications", metaRef: ["Application"]}
   ];
 
   constructor(private route: ActivatedRoute,
@@ -56,6 +68,127 @@ export class EditorComponent implements OnInit {
     this.meta = await this.api.getMeta();
     this.metaBackup = JSON.parse(JSON.stringify(this.meta)) // deep copy
     this.filterMeta();
+
+  }
+
+  public filterMeta() {
+    console.log("## (filterMeta) \nmeta:")
+    console.log(this.meta)
+    this.meta = JSON.parse(JSON.stringify(this.metaBackup)) // recovering meta from deep copy
+    let filter = this.reqTypes.find(type => type.cat === this.category)
+    let newMetaValues = []
+    if (this.meta && this.meta.value) {
+      for (const item of this.meta.value) {
+        //console.log("item: " + item.idShort + " has metaRef")
+        //console.log(this.hasMetaRef(item))
+        if (this.hasMetaRef(item)) {
+          let metaRefVal = item.value.find((val: { idShort: string; }) => val.idShort === "metaRefines").value
+
+          let abstract = this.isAbstract(item)
+          if(metaRefVal != "") {
+            let x = 0
+          } else {
+            console.log(item.idShort + " is top level, \n\tMetaAstract? " + abstract)
+          }
+
+        } else {
+          // ivml types
+          if (this.isTypeMetaKindEqual(item, this.primitive) && filter?.metaRef.length == 0) {
+            newMetaValues.push(item)
+          }
+        }
+      }
+    }
+    this.meta!.value = newMetaValues
+  }
+
+  /** Returns false if there is no value "metaAbstract" */
+  private isAbstract(item:any) {
+    let abstract = item.value.find((val: { idShort: string; }) => val.idShort === "metaAbstract")?.value
+    if (abstract) {
+      return true
+    } else {
+      return false
+    }
+  }
+
+  private hasMetaRef(item: any) {
+    let value = item.value.find((val: { idShort: string; }) => val.idShort === "metaRefines")
+    if (value) {
+      return true
+    } else {
+      return false
+    }
+  }
+
+  private isTypeMetaKindEqual(item:any, num:number) {
+    let value = item.value.find((val: { idShort: string; }) => val.idShort === "metaTypeKind").value
+    if (value == num) {
+      return true
+    } else {
+      return false
+    }
+  }
+
+  public filterMeta2() {
+    this.meta = JSON.parse(JSON.stringify(this.metaBackup)) // recovering meta from deep copy
+    let newMetaValues = []
+    if (this.meta && this.meta.value) {
+      for (const item of this.meta.value) {
+        if (this.isType(item)) {
+          newMetaValues.push(item)
+        }
+      }
+    }
+    this.meta!.value = newMetaValues
+
+    /*
+    let filter = this.filters.find(item => item.cat === this.category)?.value
+    if (this.meta && filter != "") {
+      let temp = this.meta.value
+      if (temp) {
+        let tempValues = temp.find(
+          item => item.idShort === filter) as ResourceAttribute
+        this.meta!.value = [tempValues] // TODO what if there are more than one values
+      }
+    }
+    */
+  }
+
+  public isType(item:any) {
+    //console.log("# (isType) \n item:")
+    //console.log(item)
+    let requiredTypes = this.datatypes.find(type => type.cat === this.category)?.value
+    if (requiredTypes?.includes(item.idShort)) {
+      return true
+    } else {
+
+      let metaRefinesValue = item.value.find(
+        (val: { idShort: string; }) => val.idShort === "metaRefines" ? item.value : "nic")
+
+
+      if (metaRefinesValue == "nic") {
+        console.log(item.idShort + ", metaRef: " + metaRefinesValue)
+      }
+
+      if (metaRefinesValue == "") {
+        console.log(item.idShort + " toplevel type")
+      }
+
+      if (requiredTypes?.includes(metaRefinesValue)) {
+        return true
+      }
+    }
+    return false
+  }
+
+  public displayName(property: Resource) {
+    let displayName = '';
+    if(property.value) {
+      displayName = property.value.find(
+        item => item.idShort === 'name')?.value;
+    }
+    return displayName;
   }
 
   public generateInputs() {
@@ -165,55 +298,6 @@ export class EditorComponent implements OnInit {
         console.log("ui groups")
         console.log(this.uiGroups);
     }
-  }
-
-  public displayName(property: Resource) {
-    let displayName = '';
-    if(property.value) {
-      displayName = property.value.find(
-        item => item.idShort === 'name')?.value;
-    }
-    return displayName;
-
-  }
-
-  public filterMeta() {
-    this.meta = JSON.parse(JSON.stringify(this.metaBackup))
-    let newMetaValues = []
-    if (this.meta && this.meta.value) {
-      for (const item of this.meta.value) {
-        if (this.isType(item)) {
-          newMetaValues.push(item)
-        }
-      }
-    }
-    this.meta!.value = newMetaValues
-
-    /*
-    let filter = this.filters.find(item => item.cat === this.category)?.value
-    if (this.meta && filter != "") {
-      let temp = this.meta.value
-      if (temp) {
-        let tempValues = temp.find(
-          item => item.idShort === filter) as ResourceAttribute
-        this.meta!.value = [tempValues] // TODO what if there are more than one values
-      }
-    }
-    */
-  }
-
-  public isType(item:any) {
-    let requiredTypes = this.datatypes.find(type => type.cat === this.category)?.value
-    if (requiredTypes?.includes(item.idShort)) {
-      return true
-    } else {
-      let metaRefinesValue = item.value.find(
-        (val: { idShort: string; }) => val.idShort === "metaRefines").value
-      if (requiredTypes?.includes(metaRefinesValue)) {
-        return true
-      }
-    }
-    return false
   }
 
   public create() {

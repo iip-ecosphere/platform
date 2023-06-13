@@ -126,7 +126,7 @@ template Dockerfile_PythonAllApps(IIPEcosphere config, FileArtifact target, sequ
             ''
             '${genTestingMode(config, "Python")}'
             ''
-            for (Application app : apps) {
+            for (Application app : apps->sortedBy(a|a.id)) {
                 '${genServersExpose(app)|e}'
             }
             'WORKDIR /app'

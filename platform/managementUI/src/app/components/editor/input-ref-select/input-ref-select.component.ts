@@ -218,22 +218,31 @@ export class InputRefSelectComponent implements OnInit {
   }
 
   public getDisplayName(element: any) {
-    let displayName = '';
+    let idShort = '';
+        let temp = element.value?.find((item: { idShort: string; }) => item.idShort == 'varValue');
+        if(temp && temp.idShort) {
+          idShort = temp.value;
+        } else {
+          idShort = element.idShort;
+        }
+
+      return idShort;
+    // let displayName = '';
 
 
-      let ele = element.value.find((item: { idShort: string; value: string;}) => item.idShort === 'key');
-      if(!ele) {
-        ele = element.value.find((item: { idShort: string; value: string;}) => item.idShort === 'name');
-      }
-      if(ele && ele.value && typeof(ele.value) != 'string') {
-        displayName = ele.value.find((item: { idShort: string; value: string;}) => item.idShort === 'varValue').value;
-      }
-      if(!displayName || typeof(displayName) != 'string') {
-        displayName = element.idShort;
-      }
+    //   let ele = element.value.find((item: { idShort: string; value: string;}) => item.idShort === 'key');
+    //   if(!ele) {
+    //     ele = element.value.find((item: { idShort: string; value: string;}) => item.idShort === 'name');
+    //   }
+    //   if(ele && ele.value && typeof(ele.value) != 'string') {
+    //     displayName = ele.value.find((item: { idShort: string; value: string;}) => item.idShort === 'varValue').value;
+    //   }
+    //   if(!displayName || typeof(displayName) != 'string') {
+    //     displayName = element.idShort;
+    //   }
 
 
-    return displayName;
+    // return displayName;
   }
 
   //true: left, false: right
