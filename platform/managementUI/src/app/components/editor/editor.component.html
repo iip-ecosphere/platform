@@ -33,11 +33,25 @@
     <div *ngFor="let input of uiGroup.inputs">
       <mat-card class="inputBox" *ngIf="!input.multipleInputs && !input.refTo; else ref">
         <p style="margin-bottom: 1em;">{{ input.name }}</p>
+        <div *ngIf="input.type === 'boolean'; else booleanCase">
           <mat-form-field appearance="outline">
             <mat-label>{{ input.type }}</mat-label>
             <input matInput
               [matTooltip]="input.description[0].text + ' ' + input.description[0].language" type="text" [(ngModel)]=input.value />
           </mat-form-field>
+        </div>
+          <ng-template #booleanCase>
+            <mat-form-field [(ngModel)]=input.value>
+              <mat-select>
+                <mat-option [value]="true">
+                  true
+                </mat-option>
+                <mat-option [value]="false" >
+                  false
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </ng-template>
       </mat-card>
       <div>
         <ng-template #ref>
