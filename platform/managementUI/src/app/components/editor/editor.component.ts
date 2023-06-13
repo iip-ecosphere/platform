@@ -4,6 +4,7 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { ApiService } from 'src/app/services/api.service';
 import { Resource, uiGroup, editorInput, ResourceAttribute } from 'src/interfaces';
+import { NONE_TYPE } from '@angular/compiler';
 
 @Component({
   selector: 'app-editor',
@@ -39,6 +40,10 @@ export class EditorComponent implements OnInit {
     {cat: "Applications", value: ["Application"]}
   ];
 
+  /* metaRef list:
+  empty -> returns ivml types
+  includes names of toplevel types -> returns the toplevel type (if not abstract) and all subtypes
+  */
   reqTypes = [
     {cat: "Constants", metaRef: []},
     {cat: "Types", metaRef: ["RecordType", "ArrayType"]},
@@ -47,7 +52,7 @@ export class EditorComponent implements OnInit {
     {cat: "Services", metaRef: ["Service"]},
     {cat: "Servers", metaRef: ["Server"]},
     {cat: "Meshes", metaRef: ["ServiceMesh"]},
-    {cat: "Applications", metaRef: ["Application"]}
+    {cat: "Applications", metaRef: ["VersionedElement"]}
   ];
 
   constructor(private route: ActivatedRoute,
@@ -81,20 +86,39 @@ export class EditorComponent implements OnInit {
       for (const item of this.meta.value) {
         //console.log("item: " + item.idShort + " has metaRef")
         //console.log(this.hasMetaRef(item))
-        if (this.hasMetaRef(item)) {
-          let metaRefVal = item.value.find((val: { idShort: string; }) => val.idShort === "metaRefines").value
+        let idShort = ""
+        if(item.idShort) {
+          idShort = item.idShort
+        }
 
-          let abstract = this.isAbstract(item)
-          if(metaRefVal != "") {
-            let x = 0
+        if(!this.isAbstract(item)) {
+          //if (this.hasMetaRef(item)) {
+          if (this.getMetaRef(item)) {
+            let metaRefVal = item.value.find((val: { idShort: string; }) => val.idShort === "metaRefines").value
+
+            if(metaRefVal != "") {
+              // sub-type
+              if(filter?.metaRef.includes(metaRefVal)) {
+                // direct inheritance
+                newMetaValues.push(item)
+              } else {
+                // indirect inheritance (recursion)
+                if (this.isSubtype(metaRefVal)) {
+                  newMetaValues.push(item)
+                }
+              }
+            } else {
+              // toplevel type
+              if(filter?.metaRef.includes(idShort)) {
+                newMetaValues.push(item)
+              }
+            }
+
           } else {
-            console.log(item.idShort + " is top level, \n\tMetaAstract? " + abstract)
-          }
-
-        } else {
-          // ivml types
-          if (this.isTypeMetaKindEqual(item, this.primitive) && filter?.metaRef.length == 0) {
-            newMetaValues.push(item)
+            // ivml types
+            if (this.isTypeMetaKindEqualNum(item, this.primitive) && filter?.metaRef.length == 0) {
+              newMetaValues.push(item)
+            }
           }
         }
       }
@@ -111,7 +135,7 @@ export class EditorComponent implements OnInit {
       return false
     }
   }
-
+  /*
   private hasMetaRef(item: any) {
     let value = item.value.find((val: { idShort: string; }) => val.idShort === "metaRefines")
     if (value) {
@@ -119,9 +143,18 @@ export class EditorComponent implements OnInit {
     } else {
       return false
     }
+  }*/
+
+  private getMetaRef(item: any) {
+    let value = item.value.find((val: { idShort: string; }) => val.idShort === "metaRefines")
+    if (value) {
+      return value
+    } else {
+      return null
+    }
   }
 
-  private isTypeMetaKindEqual(item:any, num:number) {
+  private isTypeMetaKindEqualNum(item:any, num:number) {
     let value = item.value.find((val: { idShort: string; }) => val.idShort === "metaTypeKind").value
     if (value == num) {
       return true
@@ -130,6 +163,35 @@ export class EditorComponent implements OnInit {
     }
   }
 
+  private isSubtype(metaRefines_value: any) {
+    let parent_item = this.getParentItem(metaRefines_value)
+    if (parent_item) {
+      console.log("there is a parent")
+      let filter = this.reqTypes.find(type => type.cat === this.category)
+      if (filter?.metaRef.includes(this.getMetaRef(parent_item))) {
+        return true
+      } else {
+        return false // TODO
+      }
+
+    } else {
+      console.log("no parent item")
+      return false
+    }
+  }
+
+  private getParentItem(metaRefines: string) {
+    let result = this.meta?.value?.find(item => item.idShort === metaRefines)
+    if(result) {
+      console.log("# (getParent) for " + metaRefines)
+      console.log(result)
+      return result
+    } else {
+      return null
+    }
+
+  }
+  /*
   public filterMeta2() {
     this.meta = JSON.parse(JSON.stringify(this.metaBackup)) // recovering meta from deep copy
     let newMetaValues = []
@@ -141,18 +203,6 @@ export class EditorComponent implements OnInit {
       }
     }
     this.meta!.value = newMetaValues
-
-    /*
-    let filter = this.filters.find(item => item.cat === this.category)?.value
-    if (this.meta && filter != "") {
-      let temp = this.meta.value
-      if (temp) {
-        let tempValues = temp.find(
-          item => item.idShort === filter) as ResourceAttribute
-        this.meta!.value = [tempValues] // TODO what if there are more than one values
-      }
-    }
-    */
   }
 
   public isType(item:any) {
@@ -180,7 +230,7 @@ export class EditorComponent implements OnInit {
       }
     }
     return false
-  }
+  }*/
 
   public displayName(property: Resource) {
     let displayName = '';
