@@ -3,6 +3,7 @@ project Connectors {
     import OpcUaDataTypes;
     import Transport;
     import Services;
+    import ServerPart*;
     import ServicePart*;
     import Nameplate;
     

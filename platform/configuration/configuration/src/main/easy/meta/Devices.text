@@ -13,6 +13,7 @@ Devices::LxcContainerManager::baseDirectory = The working directory where certif
 Devices::LxcContainerManager::authenticationKey = Refined/default authentication key for LXC container registry.
 Devices::MountVolumeContainerArgument::containerPath = Target path in container where to mount the host path into.
 Devices::MountVolumeContainerArgument::hostPath = Source path on host to be mounted.
+Devices::NumPy1220 = Default, reusable numpy 1.22.0 dependency.
 Devices::tensorflow280 = Default, reusable tensorflow 2.8.0 dependency.
 Devices::tensorflow290 = Default, reusable tensorflow 2.9.0 dependency.
 Devices::tensorflowNoVersion = Default, reusable tensorflow dependency without version.

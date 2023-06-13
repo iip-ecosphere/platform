@@ -3,7 +3,6 @@ project Applications {
     import Connectors;
     import DataTypes;
     import Nameplate;
-    import ServerPart*;
     
     annotate BindingTime bindingTime = BindingTime::compile to .;
 

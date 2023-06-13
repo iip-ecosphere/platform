@@ -1,3 +1,4 @@
+ServerPartFlowerAI::FlowerFederatedAiServer::framework = The AI framework to be used in the generated implementation template.
 ServerPartFlowerAI::FlowerFederatedAiServer::transportChannel = Refined name of transport channel.
 ServerPartFlowerAI::FlowerFederatedAiServer::description = Refined description of the server.
 ServerPartFlowerAI::FlowerFederatedAiServer::ver = Refined version of the server.

@@ -8,25 +8,40 @@ project ServerPartFlowerAI {
        name = "flwr",
        version = "1.2.0"
    };
+
+   compound FlowerAiFramework {
+       setOf(refTo(Dependency)) dependencies;
+   };
+   
+   FlowerAiFramework TensorFlowFlowerAiFramework = {
+       dependencies = {refBy(tensorflow290)}
+   };
+
+   FlowerAiFramework PyTorchFlowerAiFramework = {
+       dependencies = {} // TODO add dependency
+   };
    
    // minimum dependencies
-   setOf(refTo(Dependency)) reqFlowerDependencies = {refBy(PYTHON38), refBy(flowrDependency), refBy(tensorflow290)};
+   setOf(refTo(Dependency)) reqFlowerDependencies = {refBy(PYTHON38), refBy(flowrDependency)};
    
    compound FlowerFederatedAiServer refines PythonServer {
        String transportChannel = "Server-FlowerAi";
        String description = "Flower Federated Learning Server";
-       setOf(refTo(Dependency)) dependencies = reqFlowerDependencies;
+       setOf(refTo(Dependency)) dependencies = reqFlowerDependencies.union(framework.dependencies);
        IipVersion ver = "1.3.0"; 
+       refTo(FlowerAiFramework) framework = refBy(TensorFlowFlowerAiFramework);
        PositiveInteger numServerClients = 1;
        PositiveInteger numServerRounds = 3;
        PositiveInteger numFlClients = 1;
        PositiveInteger numFlRounds = 3;
-       Constraint reqDependenciesOk = dependencies.includesAll(reqFlowerDependencies);
+       Constraint reqDependenciesOk = dependencies.includesAll(reqFlowerDependencies.union(framework.dependencies));
    }
 
    freeze {
        flowrDependency;
        reqFlowerDependencies;
+       TensorFlowFlowerAiFramework;
+       PyTorchFlowerAiFramework;
    };
    
 }

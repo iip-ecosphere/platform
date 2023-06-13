@@ -4,3 +4,7 @@ ServicePartFlowerAI::FlowerFederatedAiService::server = The declaration of the f
 ServicePartFlowerAI::FlowerFederatedAiService::nameplateInfo = AAS nameplate information of this services.
 ServicePartFlowerAI::FlowerFederatedAiService::dependencies = Refined dependencies for Flower.
 ServicePartFlowerAI::FlowerFederatedAiService::reqDependenciesOk = The minimum required dependencies for Flower and selected framework/client must be specified.
+ServicePartFlowerAI::FlowerFederatedAiService::frameworkOk = Client framework must match server framework.
+ServicePartFlowerAI::FlowerAiClient::dependencies = Dependencies for a flower AI client.
+ServicePartFlowerAI::NumpyFlowerAiClient = Flower Client for NumPy.
+ServicePartFlowerAI::FlNumPy1211 = Preliminary NumPy dependency for Flower. 
