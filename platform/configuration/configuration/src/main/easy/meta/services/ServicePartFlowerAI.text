@@ -7,4 +7,5 @@ ServicePartFlowerAI::FlowerFederatedAiService::reqDependenciesOk = The minimum r
 ServicePartFlowerAI::FlowerFederatedAiService::frameworkOk = Client framework must match server framework.
 ServicePartFlowerAI::FlowerAiClient::dependencies = Dependencies for a flower AI client.
 ServicePartFlowerAI::NumpyFlowerAiClient = Flower Client for NumPy.
-ServicePartFlowerAI::FlNumPy1211 = Preliminary NumPy dependency for Flower. 
+ServicePartFlowerAI::FlowerFederatedAiService::kind = the service kind 
+ServicePartFlowerAI::FlowerFederatedAiService::ver = the service version

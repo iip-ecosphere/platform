@@ -10,3 +10,6 @@ ServerPartFlowerAI::FlowerFederatedAiServer::numFlClients = Number of FL clients
 ServerPartFlowerAI::FlowerFederatedAiServer::numFlRounds = Number of FL rounds.
 ServerPartFlowerAI::reqFlowerDependencies = Minimum required dependencies for Flower.
 ServerPartFlowerAI::flowrDependency = Required (re-usable) flower dependency.
+ServerPartFlowerAI::FlowerAiFramework::dependencies = dependencies for flower framework
+ServerPartFlowerAI::PyTorchFlowerAiFramework = pre-defined Flower framework based on pyTorch
+ServerPartFlowerAI::TensorFlowFlowerAiFramework = pre-defined Flower framework based on tensorflow

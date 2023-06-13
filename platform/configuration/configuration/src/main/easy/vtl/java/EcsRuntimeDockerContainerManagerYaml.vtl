@@ -114,8 +114,9 @@ template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, FileArtifact 
     
     def produceTransport(IIPEcosphere config) {
        TransportProtocol tp = config.transportProtocol;
+       String gHost = getStringValueSafe(tp.globalHost, "");
        'transport:
-            host: ${tp.globalHost}
+            host: ${gHost}
             port: ${tp.port}
             actionTimeout: ${getActionTimeout(tp)}
             ${produceTransportSecurity(tp, true)|e}
@@ -124,8 +125,9 @@ template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, FileArtifact 
     
     def produceGateway(TransportProtocol tp) {
         Integer port = getIntegerValueSafe(tp.gatewayPort, 10000);
+        String netmask = getStringValueSafe(tp.netmask, "");
         'gatewayPort: ${port}
-        netmask : ${tp.netmask}'
+        netmask : ${netmask}'
     }    
     
     def produceTransportSecurity(TransportProtocol tp, Boolean userPwdFallback) {
