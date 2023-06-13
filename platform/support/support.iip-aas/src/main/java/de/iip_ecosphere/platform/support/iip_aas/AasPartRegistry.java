@@ -595,7 +595,7 @@ public class AasPartRegistry {
             // make AAS implementation server externally available
             implHost = NetUtils.getOwnIP(NetUtils.getNetMask(impl.getNetmask(), impl.getHost()));
         }
-        LoggerFactory.getLogger(AasPartRegistry.class).info("Using IP {} and port {} for AAS implementation server", 
+        LoggerFactory.getLogger(AasPartRegistry.class).info("Using {}:{} for AAS implementation server", 
             implHost, aasImplPort);
         InvocablesCreator iCreator = factory.createInvocablesCreator(impl.getProtocol(), implHost, aasImplPort, 
             impl.getKeystoreDescriptor());
@@ -616,7 +616,8 @@ public class AasPartRegistry {
         }
         Server protocolServer = null;
         if (startImplServer) {
-            LoggerFactory.getLogger(AasPartRegistry.class).info("Starting implementation server on " + aasImplPort);
+            LoggerFactory.getLogger(AasPartRegistry.class).info("Starting AAS implementation server on {}:{}", 
+                implHost, aasImplPort);
             protocolServer = sBuilder.build().start();
         }
         aas.add(0, aasBuilder.build());
