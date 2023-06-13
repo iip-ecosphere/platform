@@ -41,7 +41,7 @@ public class PlatformSetup extends AbstractSetup {
     
     private static PlatformSetup instance;
     private PersistentAasSetup aas = new PersistentAasSetup();
-    private TransportSetup transport;
+    private TransportSetup transport = new TransportSetup();
     private File artifactsFolder = new File("artifacts");
     private String artifactsUriPrefix = "";
     private int aasHeartbeatTimeout = 10 * 1000;
