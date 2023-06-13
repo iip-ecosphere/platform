@@ -50,8 +50,15 @@ public class Monitor {
      * Starts metrics scheduling. [public for testing]
      */
     public static void startScheduling() {
-        final String id = Id.getDeviceId();
         Transport.createConnector();
+        scheduleMonitoringTask();
+    }
+
+    /**
+     * Schedules the monitoring task an in case of interruption during send tries to re-schedule the task.
+     */
+    private static void scheduleMonitoringTask() {
+        final String id = Id.getDeviceId();
         timer.schedule(new TimerTask() {
 
             @Override
@@ -66,6 +73,9 @@ public class Monitor {
                     } catch (IOException e) {
                         LoggerFactory.getLogger(Monitor.class).error(
                             "Cannot sent monitoring message: " + e.getMessage());
+                        if (Thread.currentThread().isInterrupted()) { // keep heartbeat alive
+                            scheduleMonitoringTask();
+                        }
                     }
                     update = true;
                 }
