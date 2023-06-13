@@ -72,8 +72,8 @@ class BroadcastingWsServer extends WebSocketServer {
 
     @Override
     public void onStart() {
-        TransportToWsConverter.getLogger().info("Started transport converter websocket server on {}", 
-            address.getPort());
+        TransportToWsConverter.getLogger().info("Started websocket broadcasting server on {}:{}", 
+            address.getHost(), address.getPort());
     }
     
 }

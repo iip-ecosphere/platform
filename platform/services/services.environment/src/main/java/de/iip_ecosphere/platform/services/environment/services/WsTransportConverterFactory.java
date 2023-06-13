@@ -12,6 +12,8 @@
 
 package de.iip_ecosphere.platform.services.environment.services;
 
+import org.slf4j.LoggerFactory;
+
 import de.iip_ecosphere.platform.services.environment.services.TransportConverter.Watcher;
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.Schema;
@@ -63,6 +65,8 @@ public class WsTransportConverterFactory extends TransportConverterFactory {
 
             @Override
             public Server start() {
+                LoggerFactory.getLogger(WsTransportConverterFactory.class).info("Starting Websocket broadcasting "
+                    + "server on {}:{}", address.getHost(), address.getPort());
                 server = new BroadcastingWsServer(address);
                 new Thread(server).start();
                 return this;
