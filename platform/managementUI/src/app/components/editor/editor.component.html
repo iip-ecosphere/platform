@@ -33,7 +33,7 @@
     <div *ngFor="let input of uiGroup.inputs">
       <mat-card class="inputBox" *ngIf="!input.multipleInputs && !input.refTo; else ref">
         <p style="margin-bottom: 1em;">{{ input.name }}</p>
-        <div *ngIf="input.type === 'boolean'; else booleanCase">
+        <div *ngIf="input.type != 'Boolean'; else booleanCase">
           <mat-form-field appearance="outline">
             <mat-label>{{ input.type }}</mat-label>
             <input matInput
