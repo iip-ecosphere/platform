@@ -296,7 +296,7 @@ public class Transport {
          * successfully creating a connector, queued messages are sent and removed from the queue. However, there is no 
          * guarantee that a connector can be created.
          * 
-         * @return the (cached) connector, may be <b>null</b> 
+         * @return the (cached) connector, a non-functional dummy instance if no connector can be created
          * 
          * @see #setTransportSetup(Supplier)
          * @see #releaseConnector()
@@ -327,7 +327,7 @@ public class Transport {
                     } catch (IOException e) {
                         LoggerFactory.getLogger(Transport.class).error(
                             "Cannot create transport connector: " + e.getMessage());
-                        connector = null;
+                        connector = TransportFactory.createDummyConnector();
                     }
                 }
             }

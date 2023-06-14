@@ -368,5 +368,13 @@ public class DirectMemoryTransportConnectorTest {
         Assert.assertEquals(4, statusReceivedCount.get());
         Assert.assertEquals(1, traceReceivedCount.get());
     }
+    
+    /**
+     * Asserts that a dummy connector can be created.
+     */
+    @Test
+    public void testDummyConnector() {
+        Assert.assertNotNull(TransportFactory.createDummyConnector());
+    }
 
 }
