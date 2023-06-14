@@ -17,7 +17,14 @@ template DockerfileBaseAllApps_Python(IIPEcosphere config, FileArtifact target, 
 
             'FROM ${mgr.registry}/allapps/appcommendepbaseimage:0.1.0'
 
-            sequenceOf(PythonService) services = elements -> collect(e|e.impl) -> selectByType(PythonService);
+            sequenceOf(PythonService) services = elements -> collect(e|e.impl) -> selectByKind(PythonService);
+            sequenceOf(ServiceFamily) families = elements -> collect(e|e.impl) -> selectByKind(ServiceFamily);
+            for (ServiceFamily family : families) {
+                for (PythonService serviceMember : family.members -> selectByKind(PythonService)) {
+                    services.add(serviceMember);
+                }
+            }
+
             for (PythonService pyService : services) {
                 setOf(Dependency) deps = pyService.dependencies;
                 for (Dependency s : deps) {
@@ -50,8 +57,14 @@ template DockerfileBaseAllApps_Python(IIPEcosphere config, FileArtifact target, 
             for (Dependency d: allDependencies) {
                 installBeforePip(d, tmp);
             }
-            sequenceOf(PythonService) services = elements -> collect(e|e.impl) -> selectByType(PythonService);
-    
+            sequenceOf(PythonService) services = elements -> collect(e|e.impl) -> selectByKind(PythonService);
+            sequenceOf(ServiceFamily) families = elements -> collect(e|e.impl) -> selectByKind(ServiceFamily);
+            for (ServiceFamily family : families) {
+                for (PythonService serviceMember : family.members -> selectByKind(PythonService)) {
+                    services.add(serviceMember);
+                }
+            }
+
             Integer IsPythonInstalled = 0;
             String pythonPipInstalled = "";
             for (PythonService pyService : services) {

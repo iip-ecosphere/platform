@@ -20,7 +20,14 @@ template Dockerfile_Python(IIPEcosphere config, FileArtifact target, sequenceOf(
                 '${containerSettings(config, containerType, device)}'
                 'ENV IIP_INCONTAINER=true'
 
-                sequenceOf(PythonService) services = elements -> collect(e|e.impl) -> selectByType(PythonService);
+                sequenceOf(PythonService) services = elements -> collect(e|e.impl) -> selectByKind(PythonService);
+                sequenceOf(ServiceFamily) families = elements -> collect(e|e.impl) -> selectByKind(ServiceFamily);
+                for (ServiceFamily family : families) {
+                    for (PythonService serviceMember : family.members -> selectByKind(PythonService)) {
+                        services.add(serviceMember);
+                    }
+                }
+                
                 for (PythonService pyService : services) {
                     setOf(Dependency) deps = pyService.dependencies;
                     for (Dependency s : deps) {
@@ -64,8 +71,15 @@ template Dockerfile_Python(IIPEcosphere config, FileArtifact target, sequenceOf(
             for (Dependency d: allDependencies) {
                 installBeforePip(d, tmp);
             }
-            sequenceOf(PythonService) services = elements -> collect(e|e.impl) -> selectByType(PythonService);
+            sequenceOf(PythonService) services = elements -> collect(e|e.impl) -> selectByKind(PythonService);
+            sequenceOf(ServiceFamily) families = elements -> collect(e|e.impl) -> selectByKind(ServiceFamily);
+            for (ServiceFamily family : families) {
+                for (PythonService serviceMember : family.members -> selectByKind(PythonService)) {
+                    services.add(serviceMember);
+                }
+            }
 
+                
             for (PythonService pyService : services) {
                 setOf(Dependency) deps = pyService.dependencies;
 
