@@ -86,7 +86,6 @@ export class InstancesComponent implements OnInit {
     const planId = item.value.find(
       (item: { idShort: string; }) => item.idShort === "planId")?.value;
     if(this.undeployInput
-      && this.undeployInput != []
       && this.undeployInput[0]
       && this.undeployInput[1]) {
       let input = this.undeployInput;
