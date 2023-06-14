@@ -361,9 +361,10 @@ public class ArtifactsManager {
             LoggerFactory.getLogger(ArtifactsManager.class)
                 .info("Watching artifacts folder {}", artifactsFolder.getAbsolutePath());
             INSTANCE.scan(artifactsFolder.toPath());
-            FileAlterationObserver observer = new FileAlterationObserver(artifactsFolder.getAbsolutePath());
+            FileAlterationObserver observer = new FileAlterationObserver(artifactsFolder.getAbsolutePath(), 
+                f -> !f.getParentFile().getName().equals("DeviceDockerfiles"));
             observer.addListener(new ArtifactWatcher());
-            monitor = new FileAlterationMonitor(500, observer);
+            monitor = new FileAlterationMonitor(1000, observer);
             try {
                 monitor.start();
             } catch (Exception e) {
