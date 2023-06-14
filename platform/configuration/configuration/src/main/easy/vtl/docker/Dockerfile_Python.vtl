@@ -20,7 +20,14 @@ template Dockerfile_Python(IIPEcosphere config, FileArtifact target, sequenceOf(
                 '${containerSettings(config, containerType, device)}'
                 'ENV IIP_INCONTAINER=true'
 
-                sequenceOf(PythonService) services = elements -> collect(e|e.impl) -> selectByType(PythonService);
+                sequenceOf(PythonService) services = elements -> collect(e|e.impl) -> selectByKind(PythonService);
+                sequenceOf(ServiceFamily) families = elements -> collect(e|e.impl) -> selectByKind(ServiceFamily);
+                for (ServiceFamily family : families) {
+                    for (PythonService serviceMember : family.members -> selectByKind(PythonService)) {
+                        services.add(serviceMember);
+                    }
+                }
+                
                 for (PythonService pyService : services) {
                     setOf(Dependency) deps = pyService.dependencies;
                     for (Dependency s : deps) {
@@ -64,8 +71,15 @@ template Dockerfile_Python(IIPEcosphere config, FileArtifact target, sequenceOf(
             for (Dependency d: allDependencies) {
                 installBeforePip(d, tmp);
             }
-            sequenceOf(PythonService) services = elements -> collect(e|e.impl) -> selectByType(PythonService);
+            sequenceOf(PythonService) services = elements -> collect(e|e.impl) -> selectByKind(PythonService);
+            sequenceOf(ServiceFamily) families = elements -> collect(e|e.impl) -> selectByKind(ServiceFamily);
+            for (ServiceFamily family : families) {
+                for (PythonService serviceMember : family.members -> selectByKind(PythonService)) {
+                    services.add(serviceMember);
+                }
+            }
 
+                
             for (PythonService pyService : services) {
                 setOf(Dependency) deps = pyService.dependencies;
 
@@ -73,6 +87,7 @@ template Dockerfile_Python(IIPEcosphere config, FileArtifact target, sequenceOf(
                     if (genDependency(s) == 'PYTHON2') {
                         if (IsPythonInstalled == 0) {
                             'FROM python:2.7.10 '
+                            'RUN apt-get update'
                             IsPythonInstalled = 1;
                             pythonPipInstalled = 'RUN python2 -m pip install -r requirements.txt';
                         }
@@ -82,6 +97,7 @@ template Dockerfile_Python(IIPEcosphere config, FileArtifact target, sequenceOf(
                     } else if (genDependency(s) == 'PYTHON38') {
                         if (IsPythonInstalled == 0) {
                             'FROM python:3.8-slim-buster'
+                            'RUN apt-get update'
                             IsPythonInstalled = 1;
                             pythonPipInstalled = 'RUN python3 -m pip install -r requirements.txt';
                         }
@@ -91,6 +107,7 @@ template Dockerfile_Python(IIPEcosphere config, FileArtifact target, sequenceOf(
                     } else if (genDependency(s) == 'PYTHON39') {
                         if (IsPythonInstalled == 0) {
                             'FROM python:3.9-slim'
+                            'RUN apt-get update'
                             IsPythonInstalled = 1;
                             pythonPipInstalled = 'RUN python3 -m pip install -r requirements.txt';
                         }
@@ -106,7 +123,6 @@ template Dockerfile_Python(IIPEcosphere config, FileArtifact target, sequenceOf(
                 '${pythonPipInstalled}'
             }
             ''
-            'RUN apt-get update'
             'RUN apt-get install -y openjdk-11-jre'
             ''
             if (not(collectDependencies(elements)->selectByKind(SystemDependency)->select(d|d.key=='JAVA8').isEmpty())) {
@@ -185,7 +201,7 @@ template Dockerfile_Python(IIPEcosphere config, FileArtifact target, sequenceOf(
     }
 
     def installBeforePip(LinuxSystemDependency d, sequenceOf(String) result) {
-        result.add('RUN apk add ${d.name}');
+        result.add('RUN apt-get install -y ${d.name}');
     }
     
     def installBeforePip(LinuxCommandBasedSystemDependency d, sequenceOf(String) result) {

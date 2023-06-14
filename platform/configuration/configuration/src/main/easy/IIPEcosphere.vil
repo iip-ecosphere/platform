@@ -513,10 +513,19 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
             // Checking if there is any PythonService in app
             Integer isPythonService = 0;        // 0 - false, 1 - true, -1 below ECS only (containerType == C1Ecs_C2Svc_App)
             for (MeshElement elem : elements) {
-                Service service = elem.impl;
-                if (service.isTypeOf(PythonService)) {
-                    isPythonService = 1;
-                }
+                if (elem.impl.isKindOf(ServiceFamily)) {
+                    ServiceFamily family = elem.impl;
+                    for (Service serviceMember: family.members) {
+                        if (serviceMember.isTypeOf(PythonService)) {
+                            isPythonService = 1;
+                        }
+                    }
+                } else {
+                    Service service = elem.impl;
+                    if (service.isTypeOf(PythonService)) {
+                        isPythonService = 1;
+                    }
+               }
             }
 
             String appName = a.name.toIdentifier();
@@ -900,10 +909,19 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
             // Checking if there is any PythonService in app
             Integer isPythonService = 0;        // 0 - false, 1 - true, -1 below ECS only (containerType == C1Ecs_C2Svc_App)
             for (MeshElement elem : allElements) {
-                Service service = elem.impl;
-                if (service.isTypeOf(PythonService)) {
-                    isPythonService = 1;
-                }
+                if (elem.impl.isKindOf(ServiceFamily)) {
+                    ServiceFamily family = elem.impl;
+                    for (Service serviceMember: family.members) {
+                        if (serviceMember.isTypeOf(PythonService)) {
+                            isPythonService = 1;
+                        }
+                    }
+                } else {
+                    Service service = elem.impl;
+                    if (service.isTypeOf(PythonService)) {
+                        isPythonService = 1;
+                    }
+               }
             }
 
             setOf(Application) applications = getApplications();
