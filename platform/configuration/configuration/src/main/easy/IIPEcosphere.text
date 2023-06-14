@@ -24,3 +24,5 @@ IIPEcosphere::monitoringMemLimit = Memory limit for central monitoring service, 
 IIPEcosphere::containerBaseImageMethod = Use container base image method during the container creation (default false).
 IIPEcosphere::containerTestingMode = Add more testing software into the containers (default false).
 IIPEcosphere::forceContainersCreation = Enforce containers creation regardless of the container's fingerprint (default false).
+IIPEcosphere::deviceHeartbeatTimeout = Heartbeat timeout for devices in ms.
+IIPEcosphere::deviceHeartbeatTimeoutDflt = Default heartbeat timeout for devices in ms.

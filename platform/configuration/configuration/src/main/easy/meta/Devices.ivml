@@ -13,6 +13,9 @@ project Devices {
        String authenticationKey;
          // - globally allocated hosts/ports
          // - global AAS location/URN/URI
+       assign (semanticId = Eclass_Unit_ms) to {
+           Integer monitoringUpdatePeriod = 2000;
+       }
     };
     
     compound DockerContainerManager refines ContainerManager {

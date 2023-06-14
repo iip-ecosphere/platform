@@ -45,6 +45,7 @@ template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, FileArtifact 
         if (withDocker) {
         '${produceContainerMgr(config.containerManager)}'
         }
+        'monitoringUpdatePeriod: ${config.containerManager.monitoringUpdatePeriod}'
         'aas:
           server:
             port: ${aasServer.port}
@@ -173,6 +174,7 @@ template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, FileArtifact 
         '${produceAas(config, implLocalEphemerial=config.aasImplServer.devicesAsEphemeral)}'
         '${produceNetMgr(config)}'
         '${produceArtefactInfixes(deviceType)|e}'
+        'monitoringUpdatePeriod: 2000'
     } 
 
     def main(IIPEcosphere config, FileArtifact target, EcsDevice deviceType) {

@@ -27,7 +27,10 @@ template ServiceControlSpringCloudStreamYaml(IIPEcosphere config, FileArtifact t
             serviceProtocol: ${aasProtocolName(config)}
             ${produceTransport(config)}
             ${produceAas(config, implLocalEphemerial=config.aasImplServer.devicesAsEphemeral)}
-            ${produceNetMgr(config)}'
+            ${produceNetMgr(config)}
+        metricsprovider:
+            schedulerrate: ${mgr.monitoringUpdatePeriod}
+            '
         // executables based on target device
     }
 

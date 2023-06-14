@@ -1,3 +1,4 @@
+import Basics;
 import JavaMapping;
 import EcsRuntimeDockerContainerManagerYaml;
 
@@ -92,6 +93,7 @@ template PlatformYaml(IIPEcosphere config, FileArtifact target, String modelName
     }
     
     def main(IIPEcosphere config, FileArtifact target, String modelName) {
+        Integer heartbeatTimeout = getIntegerValueSafe(config.deviceHeartbeatTimeout, config.deviceHeartbeatTimeoutDflt);
         String pers = "${config.aasPersistency}";
         produceTransport(config);
         produceAas(config, pers, false);
@@ -100,7 +102,8 @@ template PlatformYaml(IIPEcosphere config, FileArtifact target, String modelName
         produceCentralMonitoring(config);
         produceEasy(config, modelName);
         'artifactsFolder: ${config.artifactsFolder}
-        artifactsUriPrefix: ${config.artifactsUriPrefix}'
+        artifactsUriPrefix: ${config.artifactsUriPrefix}
+        aasHeartbeatTimeout: ${heartbeatTimeout}'
     }
 
 }

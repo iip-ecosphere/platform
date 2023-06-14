@@ -1,5 +1,6 @@
 Services::serviceManager = The service manager
 Services::ServiceManager = Base of hierarchy of supported service managers
+Services::ServiceManager::monitoringUpdatePeriod = Monitoring update period in ms.
 Services::SpringCloudStream = Service manager based on Spring Cloud Stream
 Services::SpringCloudStream::deleteFilesOnExit = Delete service artifacts at latest on manager exit.
 Services::SpringCloudStream::deleteArtifacts = Delete service artifacts on their release.

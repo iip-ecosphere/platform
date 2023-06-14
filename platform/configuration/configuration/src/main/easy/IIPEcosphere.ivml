@@ -35,7 +35,11 @@ project IIPEcosphere {
     // legacy transition (to be removed)
     Boolean sharedInterfaces = false;
     String sharedArtifact = "de.iip-ecosphere.platform:apps.AppInterfaces:" + iipVer;
-   
+    const Integer deviceHeartbeatTimeoutDflt = 5 * max(containerManager.monitoringUpdatePeriod, serviceManager.monitoringUpdatePeriod);
+    assign (semanticId = Eclass_Unit_ms) to {
+        Integer deviceHeartbeatTimeout = deviceHeartbeatTimeoutDflt;
+    }
+ 
     freeze {
         instDirDflt;
         javaExeDflt;

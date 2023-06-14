@@ -17,6 +17,9 @@ project Services {
        assign (semanticId = Eclass_Unit_MByte) to {
          Integer memLimit = 512; // e.g., JVM memory limit in MBytes
        }
+       assign (semanticId = Eclass_Unit_ms) to {
+           Integer monitoringUpdatePeriod = 2000;
+       }
    };
    
    compound SpringCloudStream refines ServiceManager {
