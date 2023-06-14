@@ -87,6 +87,7 @@ template Dockerfile_PythonAllApps(IIPEcosphere config, FileArtifact target, sequ
                     if (genDependency(s) == 'PYTHON2') {
                         if (IsPythonInstalled == 0) {
                             'FROM python:2.7.10 '
+                            'RUN apt-get update'
                             IsPythonInstalled = 1;
                             pythonPipInstalled = 'RUN python2 -m pip install -r requirements.txt';
                         }
@@ -96,6 +97,7 @@ template Dockerfile_PythonAllApps(IIPEcosphere config, FileArtifact target, sequ
                     } else if (genDependency(s) == 'PYTHON38') {
                         if (IsPythonInstalled == 0) {
                             'FROM python:3.8-slim-buster'
+                            'RUN apt-get update'
                             IsPythonInstalled = 1;
                             pythonPipInstalled = 'RUN python3 -m pip install -r requirements.txt';
                         }
@@ -105,6 +107,7 @@ template Dockerfile_PythonAllApps(IIPEcosphere config, FileArtifact target, sequ
                     } else if (genDependency(s) == 'PYTHON39') {
                         if (IsPythonInstalled == 0) {
                             'FROM python:3.9-slim'
+                            'RUN apt-get update'
                             IsPythonInstalled = 1;
                             pythonPipInstalled = 'RUN python3 -m pip install -r requirements.txt';
                         }
@@ -121,7 +124,6 @@ template Dockerfile_PythonAllApps(IIPEcosphere config, FileArtifact target, sequ
             }
         
             ''
-            'RUN apt-get update'
             'RUN apt-get install -y openjdk-11-jre'
             ''
             '${containerSettings(config, containerType, device)}'
@@ -199,7 +201,7 @@ template Dockerfile_PythonAllApps(IIPEcosphere config, FileArtifact target, sequ
     }
 
     def installBeforePip(LinuxSystemDependency d, sequenceOf(String) result) {
-        result.add('RUN apk add ${d.name}');
+        result.add('RUN apt-get install -y ${d.name}');
     }
     
     def installBeforePip(LinuxCommandBasedSystemDependency d, sequenceOf(String) result) {
