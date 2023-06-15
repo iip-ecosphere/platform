@@ -17,6 +17,7 @@ Devices::MountVolumeContainerArgument::hostPath = Source path on host to be moun
 Devices::NumPy1220 = Default, reusable numpy 1.22.0 dependency.
 Devices::tensorflow280 = Default, reusable tensorflow 2.8.0 dependency.
 Devices::tensorflow290 = Default, reusable tensorflow 2.9.0 dependency.
+Devuces::pytorch201 = Default, reusable pytorch 2.0.1 dependency, might be subject to change.
 Devices::tensorflowNoVersion = Default, reusable tensorflow dependency without version.
 Devices::keras290 = Default, reusable keras 2.9.0 dependency.
 Devices::ContainerManager::memLimit = ECS-Runtime/Container manager memory limit for small devices in MBytes (default 0, none). 
