@@ -134,6 +134,11 @@ project Devices {
        version = "2.9.0"
     };
     
+    PythonDependency pytorch201 = {
+       name = "torch",
+       version = "2.0.1"
+    };
+    
     setOf(refTo(Dependency)) linuxTestingDependencies = {refBy(linuxTestingNetworkUtilsRoute), refBy(linuxTestingNetworkUtilsTraceroute), refBy(linuxTestingNetworkUtilsPing), refBy(linuxTestingNetworkUtilsWget), refBy(linuxTestingFileUtilsLess), refBy(linuxTestingFileUtilsNano), refBy(linuxTestingFileUtilsTail), refBy(linuxTestingProcessUtilsProcps)};
 
     LinuxSystemDependency linuxTestingNetworkUtilsRoute = {
