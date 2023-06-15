@@ -15,3 +15,10 @@ then
 fi
 
 docker system prune -f --volumes
+rm -rf /tmp/tomcat-docbase.*
+rm -rf /tmp/tomcat.*
+rm -rf /tmp/qmProfiling*
+rm -f /tmp/services.spring*.xml
+rm -f /tmp/platform-*.aasx
+rm -f /tmp/librocksdbjni*.so
+rm -f /tmp/examples-test-*.out
