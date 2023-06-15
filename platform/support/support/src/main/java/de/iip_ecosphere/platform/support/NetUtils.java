@@ -42,7 +42,6 @@ public class NetUtils {
     
     public static final String PROP_INCONTAINER = "iip.inContainer";
     public static final String NO_MASK = "";
-    private static String ip = null;
     
     /**
      * Preventing external creation.
@@ -141,17 +140,16 @@ public class NetUtils {
      * @return the preferred own network address
      */
     public static String getOwnIP() {
-        if (null == ip) {
-            //https://stackoverflow.com/questions/9481865/getting-the-ip-address-of-the-current-machine-using-java
-            try (final DatagramSocket socket = new DatagramSocket()) {
-                socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
-                ip = socket.getLocalAddress().getHostAddress();
-                if ("0.0.0.0".equals(ip)) { // strange, happened in a docker container in a VM
-                    ip = findFallbackIP();
-                }
-            } catch (UnknownHostException | SocketException | UncheckedIOException e) {
-                ip = "127.0.0.1";
+        String ip;
+        //https://stackoverflow.com/questions/9481865/getting-the-ip-address-of-the-current-machine-using-java
+        try (final DatagramSocket socket = new DatagramSocket()) {
+            socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
+            ip = socket.getLocalAddress().getHostAddress();
+            if ("0.0.0.0".equals(ip)) { // strange, happened in a docker container in a VM
+                ip = findFallbackIP();
             }
+        } catch (UnknownHostException | SocketException | UncheckedIOException e) {
+            ip = "127.0.0.1";
         }
         return ip;
     }
