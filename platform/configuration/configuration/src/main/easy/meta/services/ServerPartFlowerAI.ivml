@@ -18,7 +18,7 @@ project ServerPartFlowerAI {
    };
 
    FlowerAiFramework PyTorchFlowerAiFramework = {
-       dependencies = {rrfBy(pytorch201)} // TODO add dependency
+       dependencies = {refBy(pytorch201)} // TODO add dependency
    };
    
    // minimum dependencies
