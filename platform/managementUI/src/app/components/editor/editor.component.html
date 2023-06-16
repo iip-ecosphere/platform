@@ -80,8 +80,8 @@
       </div>
     </div>
 
-    <h1 *ngIf="uiGroup.optionalInputs[0]">Optional</h1>
-    <div class="inputGroup">
+    <button mat-raised-button class="toggleButton" *ngIf="uiGroup.optionalInputs[0] || uiGroup.fullLineOptionalInputs[0]" (click)="toggleOptional(uiGroup) ">toggle Optional</button>
+    <div class="inputGroup" *ngIf="uiGroup.toggleOptional">
 
     <div *ngFor="let input of uiGroup.optionalInputs">
       <mat-card class="inputBox">

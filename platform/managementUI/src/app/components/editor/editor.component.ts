@@ -1,10 +1,8 @@
-import { firstValueFrom } from 'rxjs';
 import { Component, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { ApiService } from 'src/app/services/api.service';
-import { Resource, uiGroup, editorInput, ResourceAttribute } from 'src/interfaces';
-import { NONE_TYPE } from '@angular/compiler';
+import { Resource, uiGroup, editorInput } from 'src/interfaces';
 
 @Component({
   selector: 'app-editor',
@@ -296,6 +294,11 @@ export class EditorComponent implements OnInit {
         console.log("ui groups")
         console.log(this.uiGroups);
     }
+  }
+
+  public toggleOptional(uiGroup: uiGroup) {
+    uiGroup.toggleOptional = !uiGroup.toggleOptional;
+
   }
 
   public create() {

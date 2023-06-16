@@ -201,6 +201,7 @@ export interface uiGroup {
   fullLineInputs: editorInput[];
   optionalInputs: editorInput[];
   fullLineOptionalInputs: editorInput[];
+  toggleOptional?: boolean;
 }
 
 export interface editorInput {
@@ -210,4 +211,5 @@ export interface editorInput {
   description: [{language: string, text: string}];
   refTo?: boolean;
   multipleInputs?: boolean;
+
 }
