@@ -10,14 +10,12 @@
  ********************************************************************************/
 package de.iip_ecosphere.platform.transport;
 
-import java.io.IOException;
 import java.util.Optional;
 
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
-import de.iip_ecosphere.platform.transport.connectors.impl.AbstractTransportConnector;
 
 /**
  * A factory for creating transport connector instances. This factory shall
@@ -164,45 +162,6 @@ public class TransportFactory {
     public static TransportConnector createDirectMemoryConnector() {
         initialize();
         return dmCreator.createConnector();
-    }
-    
-    /**
-     * Creates a non-functional connector instance.
-     * 
-     * @return the dummy connector instance
-     */
-    public static TransportConnector createDummyConnector() {
-        return new AbstractTransportConnector() {
-            
-            @Override
-            public void syncSend(String stream, Object data) throws IOException {
-            }
-            
-            @Override
-            public String supportedEncryption() {
-                return null;
-            }
-            
-            @Override
-            public String getName() {
-                return "Dummy connector";
-            }
-            
-            @Override
-            public String enabledEncryption() {
-                return null;
-            }
-            
-            @Override
-            public String composeStreamName(String parent, String name) {
-                return parent + "/" + name;
-            }
-            
-            @Override
-            public void asyncSend(String stream, Object data) throws IOException {
-            }
-            
-        };
     }
     
     /**

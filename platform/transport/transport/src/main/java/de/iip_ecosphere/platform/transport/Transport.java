@@ -327,7 +327,6 @@ public class Transport {
                     } catch (IOException e) {
                         LoggerFactory.getLogger(Transport.class).error(
                             "Cannot create transport connector: " + e.getMessage());
-                        connector = TransportFactory.createDummyConnector();
                     }
                 }
             }
