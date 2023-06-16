@@ -21,10 +21,15 @@ tr:nth-child(odd) {
 }
 
 .singlevaluebox {
-  width: 11em;
+  display: inline-flex;
+  min-width: 9em;
   min-height: 7em;
   border: 2px solid black;
   border-radius: 4px;
   background-color: rgb(199, 199, 199);
   margin-left: 5%;
+}
+
+.inputCard {
+  margin: 0.2em;
 }

@@ -25,7 +25,7 @@
   </div>
   <div [ngClass]="valueboxClass()">
     <div class="flexcontainer">
-      <mat-card *ngFor="let value of input.value; let i=index">
+      <mat-card *ngFor="let value of input.value; let i=index" class="inputCard">
         <table>
           <tr><td colspan="3" style="text-align: center">{{value}}</td></tr>
           <tr>
