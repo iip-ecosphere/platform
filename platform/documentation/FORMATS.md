@@ -16,7 +16,7 @@ This file is supposed to provide a catalogue of various fixed data formats, e.g.
 - Monitoring with [Prometheus](../resources/monitoring.prometheus/README.md)
 - ECS runtime for [Docker](../resources/ecsRuntime.docker/README.md) and (in preparation) [LXC](../resources/ecsRuntime.lxc/README.md)
 - Service manager for [Spring](../services/services.spring/README.md)
-- Device/container software installation paths, aka [InstalledDependencies](../services/services.environment/README.md)
+- Device/container software installation paths, aka [InstalledDependencies](../support/support/README.md)
 - Local [YAML-based Identity store](../support/support.aas/README.md)
 - Distributed testing and evaluation environment
 
