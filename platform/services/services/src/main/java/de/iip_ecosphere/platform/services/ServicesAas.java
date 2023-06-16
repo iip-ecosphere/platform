@@ -713,6 +713,22 @@ public class ServicesAas implements AasContributor {
         }
         return coll;
     }
+    
+    /**
+     * Removes {@code service}.
+     * 
+     * @param service the service
+     * @param sub the submodel for {@link #NAME_SUBMODEL}.
+     */
+    private static void removeService(ServiceDescriptor service, Submodel sub) {
+        String appInstId = service.getApplicationInstanceId();
+        if (appInstId != null && appInstId.length() > 0) {
+            SubmodelElementCollection coll = sub.getSubmodelElementCollection(NAME_COLL_SERVICES);
+            if (null != coll) {
+                coll.deleteElement(fixId(service.getId()));
+            }
+        }
+    }
 
     /**
      * Safely deletes a submodel element in a nested collection.
@@ -782,6 +798,7 @@ public class ServicesAas implements AasContributor {
             } else if ((ServiceState.RUNNING == old  || ServiceState.FAILED == old) 
                 && ServiceState.STOPPED == act) {
                 removeRelations(desc, sub, null);
+                removeService(desc, sub);
                 Transport.sendServiceStatusWithDescription(ActionTypes.REMOVED, desc.getId(), act.name());
             } else if ((ServiceState.RUNNING == old  || ServiceState.FAILED == old) 
                 && ServiceState.STOPPING == act) {

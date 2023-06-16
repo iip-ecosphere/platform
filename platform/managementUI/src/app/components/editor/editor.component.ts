@@ -15,8 +15,8 @@ export class EditorComponent implements OnInit {
 
   category: string = 'all';
   meta: Resource | undefined;
-  // backup needed for data recovery before re-filtering data
-  // for the next tab
+  /* backup needed for data recovery before re-filtering data
+   for the next tab */
   metaBackup: Resource | undefined;
   selectedType: Resource | undefined;
   bool = true;
@@ -26,19 +26,8 @@ export class EditorComponent implements OnInit {
   metaTypes = ['metaState', 'metaProject',
     'metaSize', 'metaType', 'metaRefines', 'metaAbstract'];
 
-  //metaTypeKind
+  /* metaTypeKind */
   primitive = 1
-
-  datatypes = [
-    {cat: "Constants", value: []},
-    {cat: "Types", value: ["RecordType", "ArrayType"]},
-    {cat: "Dependencies", value: ["Dependency"]},
-    {cat: "Nameplates", value: ["NameplateInfo"]},
-    {cat: "Services", value: ["Service"]},
-    {cat: "Servers", value: ["Server"]},
-    {cat: "Meshes", value: ["ServiceMesh"]},
-    {cat: "Applications", value: ["Application"]}
-  ];
 
   /* metaRef list:
   empty -> returns ivml types
@@ -73,26 +62,31 @@ export class EditorComponent implements OnInit {
     this.meta = await this.api.getMeta();
     this.metaBackup = JSON.parse(JSON.stringify(this.meta)) // deep copy
     this.filterMeta();
-
+    /* TODO loe
+    if (this.meta.value) {
+      for (let item of this.meta.value) {
+        console.log(item.idShort)
+      }
+    }
+    */
   }
 
+  /**
+   * Documentation in src/assets/doc/filterMeta.jpg
+   */
   public filterMeta() {
-    console.log("## (filterMeta) \nmeta:")
+    console.log("## (filterMeta-methode) \nmeta:")
     console.log(this.meta)
     this.meta = JSON.parse(JSON.stringify(this.metaBackup)) // recovering meta from deep copy
     let filter = this.reqTypes.find(type => type.cat === this.category)
     let newMetaValues = []
     if (this.meta && this.meta.value) {
       for (const item of this.meta.value) {
-        //console.log("item: " + item.idShort + " has metaRef")
-        //console.log(this.hasMetaRef(item))
         let idShort = ""
         if(item.idShort) {
           idShort = item.idShort
         }
-
         if(!this.isAbstract(item)) {
-          //if (this.hasMetaRef(item)) {
           if (this.getMetaRef(item)) {
             let metaRefVal = item.value.find((val: { idShort: string; }) => val.idShort === "metaRefines").value
 
@@ -113,7 +107,6 @@ export class EditorComponent implements OnInit {
                 newMetaValues.push(item)
               }
             }
-
           } else {
             // ivml types
             if (this.isTypeMetaKindEqualNum(item, this.primitive) && filter?.metaRef.length == 0) {
@@ -126,7 +119,7 @@ export class EditorComponent implements OnInit {
     this.meta!.value = newMetaValues
   }
 
-  /** Returns false if there is no value "metaAbstract" */
+  /** Returns false when metaAbstract is false or there is no attribute "metaAbstract" */
   private isAbstract(item:any) {
     let abstract = item.value.find((val: { idShort: string; }) => val.idShort === "metaAbstract")?.value
     if (abstract) {
@@ -135,20 +128,11 @@ export class EditorComponent implements OnInit {
       return false
     }
   }
-  /*
-  private hasMetaRef(item: any) {
-    let value = item.value.find((val: { idShort: string; }) => val.idShort === "metaRefines")
-    if (value) {
-      return true
-    } else {
-      return false
-    }
-  }*/
 
   private getMetaRef(item: any) {
     let value = item.value.find((val: { idShort: string; }) => val.idShort === "metaRefines")
     if (value) {
-      return value
+      return value.value
     } else {
       return null
     }
@@ -163,19 +147,25 @@ export class EditorComponent implements OnInit {
     }
   }
 
-  private isSubtype(metaRefines_value: any) {
+  /**
+   * Documentation in src/assets/doc/filterMeta.jpg
+   * @returns {boolean}
+   */
+  private isSubtype(metaRefines_value: any):boolean{
     let parent_item = this.getParentItem(metaRefines_value)
     if (parent_item) {
-      console.log("there is a parent")
       let filter = this.reqTypes.find(type => type.cat === this.category)
       if (filter?.metaRef.includes(this.getMetaRef(parent_item))) {
         return true
       } else {
-        return false // TODO
+        let metaRef_val_parent = this.getMetaRef(parent_item)
+        if(metaRef_val_parent) {
+          return this.isSubtype(metaRef_val_parent) //recursion
+        } else {
+          return false
+        }
       }
-
     } else {
-      console.log("no parent item")
       return false
     }
   }
@@ -183,54 +173,12 @@ export class EditorComponent implements OnInit {
   private getParentItem(metaRefines: string) {
     let result = this.meta?.value?.find(item => item.idShort === metaRefines)
     if(result) {
-      console.log("# (getParent) for " + metaRefines)
-      console.log(result)
       return result
     } else {
       return null
     }
-
   }
-  /*
-  public filterMeta2() {
-    this.meta = JSON.parse(JSON.stringify(this.metaBackup)) // recovering meta from deep copy
-    let newMetaValues = []
-    if (this.meta && this.meta.value) {
-      for (const item of this.meta.value) {
-        if (this.isType(item)) {
-          newMetaValues.push(item)
-        }
-      }
-    }
-    this.meta!.value = newMetaValues
-  }
-
-  public isType(item:any) {
-    //console.log("# (isType) \n item:")
-    //console.log(item)
-    let requiredTypes = this.datatypes.find(type => type.cat === this.category)?.value
-    if (requiredTypes?.includes(item.idShort)) {
-      return true
-    } else {
-
-      let metaRefinesValue = item.value.find(
-        (val: { idShort: string; }) => val.idShort === "metaRefines" ? item.value : "nic")
-
-
-      if (metaRefinesValue == "nic") {
-        console.log(item.idShort + ", metaRef: " + metaRefinesValue)
-      }
-
-      if (metaRefinesValue == "") {
-        console.log(item.idShort + " toplevel type")
-      }
-
-      if (requiredTypes?.includes(metaRefinesValue)) {
-        return true
-      }
-    }
-    return false
-  }*/
+// ----------------------------------------------------------------------
 
   public displayName(property: Resource) {
     let displayName = '';

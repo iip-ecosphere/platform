@@ -54,5 +54,7 @@ public class OsUtilsTest {
         Assert.assertEquals("abba", OsUtils.getPropertyOrEnv("iip.nonsense", "abba"));
         // SysUtils.getEnv implicit; but just for non-whitebox :P
         Assert.assertNull(OsUtils.getEnv("iip.nonsense1"));
+        
+        Assert.assertFalse(OsUtils.getBooleanPropertyOrEnv("iip.nonsense1", false));
     }
 }

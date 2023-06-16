@@ -31,7 +31,8 @@ import org.junit.runners.Suite;
     PythonUtilsTest.class,
     NetUtilsTest.class,
     SchemaServerEndpointTest.class,
-    ServerTest.class
+    ServerTest.class,
+    InstalledDependenciesSetupTest.class
 })
 public class AllTests {
 }

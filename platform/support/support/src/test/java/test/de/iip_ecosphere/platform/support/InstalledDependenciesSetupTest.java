@@ -10,7 +10,7 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package test.de.iip_ecosphere.platform.services.environment;
+package test.de.iip_ecosphere.platform.support;
 
 import java.io.File;
 import java.util.concurrent.ExecutionException;
@@ -18,7 +18,7 @@ import java.util.concurrent.ExecutionException;
 import org.junit.Assert;
 import org.junit.Test;
 
-import de.iip_ecosphere.platform.services.environment.InstalledDependenciesSetup;
+import de.iip_ecosphere.platform.support.setup.InstalledDependenciesSetup;
 
 /**
  * Tests {@link InstalledDependenciesSetup}.

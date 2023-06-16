@@ -6,6 +6,12 @@ template PythonReq(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElem
 	
     def main(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, EcsDevice device) {
         sequenceOf(PythonService) services = elements -> collect(e|e.impl) -> selectByKind(PythonService);
+        sequenceOf(ServiceFamily) families = elements -> collect(e|e.impl) -> selectByKind(ServiceFamily);
+        for (ServiceFamily family : families) {
+            for (PythonService serviceMember : family.members -> selectByKind(PythonService)) {
+                services.add(serviceMember);
+            }
+        }
 
         // preliminary fix, just very basic ones, shall also include the remaining -> check versions here
         //'pyyaml

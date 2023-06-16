@@ -87,6 +87,19 @@ public class OsUtils {
     }
 
     /**
+     * Returns a boolean value from the system properties or system environment, either as given or all in capital 
+     * characters with dots replaced by underscores.
+     * 
+     * @param key the key to look for
+     * @param dflt the default value for none
+     * @return the value, may by {@code dflt} for none
+     * @see #getPropertyOrEnv(String)
+     */
+    public static boolean getBooleanPropertyOrEnv(String key, boolean dflt) {
+        return Boolean.valueOf(getPropertyOrEnv(key, String.valueOf(dflt)));
+    }
+
+    /**
      * Returns a value from the system properties or system environment, either as given or all in capital 
      * characters with dots replaced by underscores.
      * 

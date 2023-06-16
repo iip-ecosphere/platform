@@ -513,10 +513,19 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
             // Checking if there is any PythonService in app
             Integer isPythonService = 0;        // 0 - false, 1 - true, -1 below ECS only (containerType == C1Ecs_C2Svc_App)
             for (MeshElement elem : elements) {
-                Service service = elem.impl;
-                if (service.isTypeOf(PythonService)) {
-                    isPythonService = 1;
-                }
+                if (elem.impl.isKindOf(ServiceFamily)) {
+                    ServiceFamily family = elem.impl;
+                    for (Service serviceMember: family.members) {
+                        if (serviceMember.isTypeOf(PythonService)) {
+                            isPythonService = 1;
+                        }
+                    }
+                } else {
+                    Service service = elem.impl;
+                    if (service.isTypeOf(PythonService)) {
+                        isPythonService = 1;
+                    }
+               }
             }
 
             String appName = a.name.toIdentifier();
@@ -539,7 +548,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
             if ((isContainerForOneApp) and (baseImageMethod)){
                 Boolean justCommenDep = true;
                 newChangeOnContainerFiles = false;
-                Path deviceBaseDf = "${artifactsFolder}/DeviceDockerfiles/${appName}/DeviceDockerfile_CommenDepBase";
+                Path deviceBaseDf = "${footprintFolder}/DeviceDockerfiles/${appName}/DeviceDockerfile_CommenDepBase";
 
                 if (isPythonService == 1) {
                     Path req = "${appRoot}/../requirements.txt";
@@ -612,7 +621,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
 
                 if (not(checkDepRequirements)){
                     newChangeOnContainerFiles = false;
-                    deviceBaseDf = "${artifactsFolder}/DeviceDockerfiles/${appName}/DeviceDockerfile_AllDepBase";
+                    deviceBaseDf = "${footprintFolder}/DeviceDockerfiles/${appName}/DeviceDockerfile_AllDepBase";
                     dfName = createContainerBuildBaseScript(mgr, a, elements, appRoot, isPythonService, justCommenDep);
                     Path lastAllDepRequirements = "${deviceBaseDf}/requirements.txt";
                     if (not(sameMd5HashFiles(allDepRequirements, lastAllDepRequirements))){
@@ -640,7 +649,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 ContainerType cntType = device.containerType;
                 String deviceName = getContainerNameDflt(device).toIdentifier();
                 String filePrefix = "${appName}_${deviceName}_";
-                Path deviceDf = "${artifactsFolder}/DeviceDockerfiles/${appName}/DeviceDockerfile_${deviceName}";
+                Path deviceDf = "${footprintFolder}/DeviceDockerfiles/${appName}/DeviceDockerfile_${deviceName}";
 
                 if (not(isAllAppsContainer(cntType))) {
 
@@ -900,10 +909,19 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
             // Checking if there is any PythonService in app
             Integer isPythonService = 0;        // 0 - false, 1 - true, -1 below ECS only (containerType == C1Ecs_C2Svc_App)
             for (MeshElement elem : allElements) {
-                Service service = elem.impl;
-                if (service.isTypeOf(PythonService)) {
-                    isPythonService = 1;
-                }
+                if (elem.impl.isKindOf(ServiceFamily)) {
+                    ServiceFamily family = elem.impl;
+                    for (Service serviceMember: family.members) {
+                        if (serviceMember.isTypeOf(PythonService)) {
+                            isPythonService = 1;
+                        }
+                    }
+                } else {
+                    Service service = elem.impl;
+                    if (service.isTypeOf(PythonService)) {
+                        isPythonService = 1;
+                    }
+               }
             }
 
             setOf(Application) applications = getApplications();
@@ -926,7 +944,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 String appImageId;
                 Boolean justCommenDep = true;
                 String appName = "allApps";
-                Path deviceBaseDf = "${artifactsFolder}/DeviceDockerfiles/${appName}/DeviceDockerfile_CommenDepBase";
+                Path deviceBaseDf = "${footprintFolder}/DeviceDockerfiles/${appName}/DeviceDockerfile_CommenDepBase";
 
                 if (isPythonService == 1) {
                     Path req = "${target}/requirements.txt";
@@ -997,7 +1015,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 baseImageCreated = 1;
 
                 if (not(checkDepRequirements)){
-                    deviceBaseDf = "${artifactsFolder}/DeviceDockerfiles/${appName}/DeviceDockerfile_AllDepBase";
+                    deviceBaseDf = "${footprintFolder}/DeviceDockerfiles/${appName}/DeviceDockerfile_AllDepBase";
                     dfName = createContainerBuildBaseScriptAllApps(mgr, applications, allElements, target, isPythonService, justCommenDep);
                     Path lastAllDepRequirements = "${deviceBaseDf}/requirements.txt";
                     if (not(sameMd5HashFiles(allDepRequirements, lastAllDepRequirements))){
@@ -1028,7 +1046,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     String deviceName = getContainerNameDflt(device).toIdentifier();
                     String appName = "allApps";
                     String filePrefix = "${appName}_${deviceName}_";
-                    Path deviceDf = "${artifactsFolder}/DeviceDockerfiles/${appName}/DeviceDockerfile_${deviceName}";
+                    Path deviceDf = "${footprintFolder}/DeviceDockerfiles/${appName}/DeviceDockerfile_${deviceName}";
 
                     if (isAllAppsContainer(cntType)){
                         String regUser = getProperty("iip.container.user." + mgr.authenticationKey, "");
@@ -1366,7 +1384,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         String filePrefix = "${appName}_${deviceName}_";
         String regUser = getProperty("iip.container.user." + mgr.authenticationKey, "");
         String regPwd = getProperty("iip.container.password." + mgr.authenticationKey, "");
-        Path deviceDf = "${artifactsFolder}/DeviceDockerfiles/${appName}";
+        Path deviceDf = "${footprintFolder}/DeviceDockerfiles/${appName}";
         Boolean newChangeOnContainerFiles = false;
         Boolean newChangeJarFiles = false;
 

@@ -1075,7 +1075,7 @@ public class MetricsProvider {
      * @return meter parsed as a String compatible with a JsonObject
      */
     private String jsonParser(Meter meter) {
-        String description = meter.getId().getDescription();
+        String description = ""; //meter.getId().getDescription();
         if (description != null) {
             description = description.replaceAll("\"", "''");
         }
