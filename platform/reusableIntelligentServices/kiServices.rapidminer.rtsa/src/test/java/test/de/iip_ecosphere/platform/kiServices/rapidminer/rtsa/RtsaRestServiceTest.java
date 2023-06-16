@@ -27,7 +27,6 @@ import org.slf4j.LoggerFactory;
 import com.google.common.io.Files;
 
 import de.iip_ecosphere.platform.kiServices.rapidminer.rtsa.RtsaRestService;
-import de.iip_ecosphere.platform.services.environment.InstalledDependenciesSetup;
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.services.environment.YamlProcess;
@@ -36,6 +35,7 @@ import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.JarUtils;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.iip_aas.Version;
+import de.iip_ecosphere.platform.support.setup.InstalledDependenciesSetup;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
 
