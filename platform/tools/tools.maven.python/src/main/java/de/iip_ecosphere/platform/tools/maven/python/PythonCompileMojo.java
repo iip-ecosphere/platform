@@ -49,6 +49,9 @@ public class PythonCompileMojo extends AbstractMojo {
     @Parameter(property = "python-compile.ignoreText", required = false, 
         defaultValue = "imported but unused;is assigned to but never used;redefinition of unused")
     private String ignoreText;
+    
+    @Parameter(property = "python.binary", required = false, defaultValue = "")
+    private String python;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -61,7 +64,7 @@ public class PythonCompileMojo extends AbstractMojo {
              * python to something else to potentially run multiple version besides each
              * other
              */
-            String pythonExecutable = PythonUtils.getPythonExecutable().toString();
+            String pythonExecutable = PythonUtils.getPythonExecutable(python).toString();
             getLog().info("Using Python " + pythonExecutable);
     
             //search the site_packages of the python for pyflakes! Currently not doable on windows!

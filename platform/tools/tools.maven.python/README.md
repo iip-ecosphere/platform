@@ -36,6 +36,7 @@ The compiler plugin supports the following configuration settings:
   - `failOnError` (default `true`, user property `python-compile.failOnError`): Whether the build process shall fail if Python compile errors are detected.
   - `skip` (default `false`, user property `python-compile.skip`, `maven.test.skip` or `skipTests`) skips the execution of this plugin. 
   - `ignoreText` (default `imported but unused;is assigned to but never used;redefinition of unused`, user property `python-compile.ignoreText`) defines substrings separated by ; that indicate lines of the pyflakes output to not be emitted as result
+  - `python.binary` optional absolute path to python binary (may also be given as environment variable `IIP_PYTHON`)
   
 ## Python test plugin
 
@@ -75,7 +76,8 @@ The test runner plugin supports the following configuration settings:
   - `fileset` (default not given, execute all files directly located in `src/test/python`) is optional and can be used to determine the tests to be executed.
   - `skip` (default `false`, user property `python-test.skip`) skips the execution of this plugin. 
   - `test` (default `empty`, user property `python-test.test`), optional (file) name of the test to be executed. If not given, all tests will be executed.  
-  
+  - `python.binary` optional absolute path to python binary (may also be given as environment variable `IIP_PYTHON`)
+    
 ## Combining the goals
 
 You may specify both goals in different executions with individual configurations. Then an id per execution is required.

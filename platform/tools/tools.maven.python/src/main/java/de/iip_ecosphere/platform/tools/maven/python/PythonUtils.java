@@ -32,7 +32,7 @@ public class PythonUtils {
     public static void setPythonExecutable(File exec) {
         pythonExecutable = exec;
     }
-    
+
     /**
      * Returns the Python executable. We consider the following precedences:
      * <ol>
@@ -47,9 +47,34 @@ public class PythonUtils {
      *     {@link File#getAbsolutePath()} on the result may be misleading - if required, use it as string.
      */
     public static File getPythonExecutable() {
+        return getPythonExecutable(null);
+    }
+    
+    /**
+     * Returns the Python executable. We consider the following precedences:
+     * <ol>
+     *   <li>Local python3 in Linux Jenkins installation (for testing, although this is production code; with 
+     *       installation path)</li>
+     *   <li>Local python3 in default Linux installation ("/usr/bin", with installation path)</li>
+     *   <li>The global python executable {@link #setPythonExecutable(File)} (with installation path)</li>
+     *   <li>The command "python"</li>
+     * </ol>
+     *
+     * @param pythonBinary explicitly given path to python binary
+     * @return the executable, returns at least "python"; the result may be an absolute path but must not be. Calling 
+     *     {@link File#getAbsolutePath()} on the result may be misleading - if required, use it as string.
+     */
+    public static File getPythonExecutable(String pythonBinary) {
         File result = pythonExecutable; 
         // this is not nice, but at the moment it is rather difficult to pass an option via ANT to Maven to Surefire
-        File tmpPath = new File("/var/lib/jenkins/python/active/bin/python3"); // JENKINS
+        String path = System.getenv("IIP_PYTHON");
+        if (null == path) {
+            path = pythonBinary;
+        }
+        if (null == path) {
+            path = "/var/lib/jenkins/python/active/bin/python3"; // JENKINS, still legacy
+        }
+        File tmpPath = new File(path);
         if (tmpPath.exists()) {
             result = tmpPath;
         } else {

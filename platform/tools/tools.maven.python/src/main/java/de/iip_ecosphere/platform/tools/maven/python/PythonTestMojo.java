@@ -57,6 +57,9 @@ public class PythonTestMojo extends AbstractMojo {
     @Parameter(property = "python-test.test", required = false, defaultValue = "")
     private String test;
 
+    @Parameter(property = "python.binary", required = false, defaultValue = "")
+    private String python;
+    
     /**
      * A specific <code>fileSet</code> rule to select files and directories.
      */
@@ -115,7 +118,7 @@ public class PythonTestMojo extends AbstractMojo {
              * python to something else to potentially run multiple version besides each
              * other
              */
-            String pythonExecutable = PythonUtils.getPythonExecutable().toString();
+            String pythonExecutable = PythonUtils.getPythonExecutable(python).toString();
     
             getLog().info("Using Python " + pythonExecutable);
     
