@@ -20,8 +20,8 @@ export class InputRefSelectComponent implements OnInit {
   references: Resource[] = [];
   selectedRef: Resource = {};
 
-  refTypes = ['Dependency', 'Resource', 'DataType', 'Server', 'ServiceMesh', 'MeshConnector', 'MeshElement', 'ServiceBase', 'IOType', 'CReversibleroperty'];
-  metaTypes = ['metaState', 'metaProject', 'metaSize', 'metaType', 'metaRefines', 'metaAbstract'];
+  //refTypes = ['Dependency', 'Resource', 'DataType', 'Server', 'ServiceMesh', 'MeshConnector', 'MeshElement', 'ServiceBase', 'IOType', 'CReversibleroperty'];
+  metaTypes = ['metaState', 'metaProject', 'metaSize', 'metaType', 'metaRefines', 'metaAbstract', 'metaTypeKind'];
 
   constructor(private edit: EditorService) { }
 

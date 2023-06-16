@@ -24,7 +24,7 @@ export class EditorComponent implements OnInit {
   uiGroups: uiGroup[] = [];
 
   metaTypes = ['metaState', 'metaProject',
-    'metaSize', 'metaType', 'metaRefines', 'metaAbstract'];
+    'metaSize', 'metaType', 'metaRefines', 'metaAbstract', 'metaTypeKind'];
 
   /* metaTypeKind */
   primitive = 1
