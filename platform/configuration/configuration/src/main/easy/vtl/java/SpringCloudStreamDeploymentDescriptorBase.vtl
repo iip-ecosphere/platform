@@ -117,6 +117,7 @@ template SpringCloudStreamDeploymentDescriptorBase(Configuration config, FileArt
             executablePath: \\${tmp}/${id}/python
             artifacts:
               - /python_${id}.zip
+              ${genAdditionalArtifacts(service.artifacts)|e}
             ${pythonExecArgs(service)|e}
             cmdArg:
               - --mode
@@ -129,6 +130,17 @@ template SpringCloudStreamDeploymentDescriptorBase(Configuration config, FileArt
               - ${service.id}
               ${pythonDataArg(service)|e}
             started: true'
+    }
+    
+    def genAdditionalArtifacts(setOf(String) artifacts) {
+        if (artifacts.size() > 0) {
+            for (String a : artifacts) {
+                if (!a.startsWith("/")) {
+                    a = "/" + a;
+                }
+                '- {$a}'
+            }
+        }
     }
     
     def pythonExecArgs(PythonService service) {
@@ -521,6 +533,7 @@ template SpringCloudStreamDeploymentDescriptorBase(Configuration config, FileArt
         String id = toFolderName(server.id);
         'artifacts:
           - /python_${id}.zip
+          ${genAdditionalArtifacts(server.artifacts)|e}
         netMgtKey: ${server.id}
         cmdArg:
           - --mode
