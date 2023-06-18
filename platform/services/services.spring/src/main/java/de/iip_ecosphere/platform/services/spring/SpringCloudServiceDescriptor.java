@@ -601,6 +601,16 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
     public Service getSvc() {
         return service;
     }
+    
+    /**
+     * Returns the desired memory for instances of this service.
+     * 
+     * @return the desired memory in <a href="https://en.wikipedia.org/wiki/Mebibyte">Mebibytes</a> (i.e., "m"), ignored
+     *   if not positive
+     */
+    public long getMemory() {
+        return service.getMemory();
+    }
 
     /**
      * Turns typed data connections into a Spring cloud function definition argument.

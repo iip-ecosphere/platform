@@ -198,6 +198,15 @@ public class AbstractTestServiceManager {
      * @author Holger Eichelberger, SSE
      */
     protected class ArtifactAsserter {
+        
+        /**
+         * Returns service start options to use.
+         * 
+         * @return the service start options, may be <b>null</b> for none
+         */
+        public Map<String, String> getOptions() {
+            return null;
+        }
 
         /**
          * Performs specific tests for the given descriptor.
@@ -249,6 +258,27 @@ public class AbstractTestServiceManager {
     protected void doTestStartStop(String descriptorName, ArtifactAsserter asserter, boolean fakeServer) 
         throws ExecutionException, IOException {
         doTestStartStop(descriptorName, asserter, fakeServer, id -> id);
+    }
+
+    /**
+     * Starts {@code allIds} on {@code mgr} eventually considering {@link ArtifactAsserter#getOptions()}.
+     * 
+     * @param mgr the manager to start on
+     * @param asserter the asserter
+     * @param allIds the service ids
+     * @throws ExecutionException the execution exceptions
+     */
+    private void startServices(ServiceManager mgr, ArtifactAsserter asserter, String... allIds) 
+        throws ExecutionException {
+        Map<String, String> options = asserter.getOptions();
+        if (null == options) {
+            System.out.println("STARTING " + mgr + " " + java.util.Arrays.toString(allIds)); // needed on Jenkins...
+            mgr.startService(allIds);
+        } else {
+            System.out.println("STARTING " + mgr + " " + java.util.Arrays.toString(allIds) + " with options " 
+                + options);
+            mgr.startService(options, allIds);
+        }
     }
 
     /**
@@ -307,8 +337,7 @@ public class AbstractTestServiceManager {
             startFakeServiceCommandServers(mgr, serviceIds);
         }
 
-        System.out.println("STARTING " + mgr + " " + java.util.Arrays.toString(allIds)); // needed on Jenkins...
-        mgr.startService(allIds);
+        startServices(mgr, asserter, allIds);
         assertServiceState(serviceIds, aDesc, ServiceState.RUNNING);
         List<Watcher<String>> watcher = loggingOp(mgr, StreamLogMode.START, "simpleStream-log");
 

@@ -493,7 +493,7 @@ public class SpringCloudServiceManager
                 externalServiceArgs.add(determineCloudFunctionArg(sIdEns));
                 externalServiceArgs.addAll(determineSpringConditionals(this, sIdEns));
                 AppDeploymentRequest req = service.createDeploymentRequest(config, externalServiceArgs, 
-                    getMemLimit(options, sId));
+                    getMemLimit(options, sIdEns));
                 boolean started = false;
                 if (null != req) {
                     setState(service, ServiceState.DEPLOYING);
@@ -547,28 +547,43 @@ public class SpringCloudServiceManager
     }
     
     /**
-     * Returns the specified memory limit of {@code sId} given in {@code options}.
+     * Returns the specified memory limit of {@code sIds} given in service descriptors or {@code options}.
      * 
      * @param options the service start options
-     * @param sId the service id
-     * @return the memory limit
+     * @param sIds the service ids of the service and the (optional) ensemble services
+     * @return the memory limit in <a href="https://en.wikipedia.org/wiki/Mebibyte">Mebibytes</a> (i.e., "m"), may 
+     *     be <b>null</b> for none
      */
-    private String getMemLimit(Map<String, String> options, String sId) {
+    private String getMemLimit(Map<String, String> options, String... sIds) {
         String result = null;
-        if (null != options) {
-            String opt = options.get(OPTION_MEMLIMITS);
-            if (null != opt) {
-                Map<?, ?> optMap = JsonUtils.fromJson(opt, Map.class);
-                Object memLimitOpt = optMap.get(sId);
-                if (null != memLimitOpt) {
-                    try {
-                        result = Utils.formatToMeBi(Long.parseLong(sId.toString()), 2);
-                    } catch (NumberFormatException e) {
-                        LoggerFactory.getLogger(SpringCloudServiceManager.class).info(
-                            "Memlimit option for {} not a long value: {}", sId, e.getMessage());
+        long mem = 0;
+        for (String sId: sIds) {
+            long sMem = 0;
+            SpringCloudServiceDescriptor desc = getService(sId);
+            if (null != desc) {
+                sMem = desc.getMemory();
+            }
+            if (null != options) { // overriden value takes precedence
+                String opt = options.get(OPTION_MEMLIMITS);
+                if (null != opt) {
+                    Map<?, ?> optMap = JsonUtils.fromJson(opt, Map.class);
+                    Object memLimitOpt = optMap.get(sId);
+                    if (null != memLimitOpt) {
+                        try {
+                            sMem = Long.parseLong(sId.toString());
+                        } catch (NumberFormatException e) {
+                            LoggerFactory.getLogger(SpringCloudServiceManager.class).info(
+                                "Memlimit option for {} not a long value: {}", sId, e.getMessage());
+                        }
                     }
                 }
             }
+            if (sMem > 0) { // valid only if not negative
+                mem += sMem;
+            }
+        }
+        if (mem > 0) {
+            result = Utils.formatToMeBi(mem, 2);
         }
         return result;
     }
