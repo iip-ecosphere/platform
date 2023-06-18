@@ -50,7 +50,7 @@ public interface ServiceOperations {
     public static final String OPTION_PARAMS = "params";
 
     /**
-     * Service start option, mapping of service ids to memory limits in MBytes.
+     * Service start option, mapping of service ids to memory limits in MBytes given as JSON map.
      */
     public static final String OPTION_MEMLIMITS = "memLimits";
 
