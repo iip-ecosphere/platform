@@ -247,7 +247,7 @@ public class AbstractAasLifecycleDescriptor implements LifecycleDescriptor {
         try { 
             URL regUrl = new URL(regAdr);
             URL serverUrl = new URL(serverAdr);
-            LoggerFactory.getLogger(getClass()).info("Probing AAS registry {} and server{} for {} ms", 
+            LoggerFactory.getLogger(getClass()).info("Probing AAS registry {} and server {} for {} ms", 
                 regAdr, serverAdr, startupTimeout);
             if (!TimeUtils.waitFor(() -> {
                 return !connectionOk(regUrl) || !connectionOk(serverUrl) || !iipAasExists();

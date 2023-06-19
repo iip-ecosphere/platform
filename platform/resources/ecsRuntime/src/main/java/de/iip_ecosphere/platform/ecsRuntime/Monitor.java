@@ -22,6 +22,7 @@ import de.iip_ecosphere.platform.services.environment.metricsProvider.MetricsPro
 import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsAasConstructor;
 import de.iip_ecosphere.platform.support.iip_aas.Id;
 import de.iip_ecosphere.platform.transport.Transport;
+import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
 import de.iip_ecosphere.platform.transport.streams.StreamNames;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 
@@ -67,7 +68,13 @@ public class Monitor {
                 if (null != Transport.getConnector()) {
                     try {
                         String json = provider.toJson(id, update);
-                        Transport.getConnector().asyncSend(TRANSPORT_METRICS_CHANNEL, json);
+                        TransportConnector tc = Transport.getConnector();
+                        if (null != tc) {
+                            tc.asyncSend(TRANSPORT_METRICS_CHANNEL, json);
+                        } else {
+                            LoggerFactory.getLogger(Monitor.class).error(
+                                "Cannot sent monitoring message: No transport connector");
+                        }
                         MetricsAasConstructor.pushToAas(json, EcsAas.NAME_SUBMODEL, 
                             MetricsAasConstructor.DFLT_SUBMODEL_SUPPLIER, update, null);
                     } catch (IOException e) {

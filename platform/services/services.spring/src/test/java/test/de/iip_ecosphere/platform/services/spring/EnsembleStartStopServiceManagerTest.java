@@ -15,6 +15,8 @@ package test.de.iip_ecosphere.platform.services.spring;
 import static org.junit.Assume.assumeTrue;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.lang3.SystemUtils;
@@ -44,6 +46,7 @@ import de.iip_ecosphere.platform.services.spring.StartupApplicationListener;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
+import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
 
 /**
  * Tests {@link SpringCloudServiceManager}. We assume that the test artifacts are prepared for MQTT v3.
@@ -94,7 +97,40 @@ public class EnsembleStartStopServiceManagerTest extends AbstractTestServiceMana
 
         }, false);
     }
-    
+
+    /**
+     * Tests a simple start-stop cycle of the {@link SpringCloudServiceManager} in one process as an ensemble with 
+     * start options.
+     * 
+     * @throws ExecutionException shall not occur for successful test
+     * @throws IOException shall not occur for successful test
+     */
+    @Test
+    public void testEnsembleStartStopOptions() throws ExecutionException, IOException {
+        assumeTrue(SystemUtils.IS_OS_WINDOWS); // unclear failures on Jenkins
+        Map<String, String> options = new HashMap<>();
+        Map<String, Long> memMap = new HashMap<>();
+        memMap.put("simpleStream-log", 256L);
+        memMap.put("simpleStream-create", 256L);
+        options.put(SpringCloudServiceManager.OPTION_MEMLIMITS, JsonUtils.toJson(memMap));
+        Map<String, String> ensembleMap = new HashMap<>();
+        ensembleMap.put("simpleStream-log", "simpleStream-create");
+        options.put(SpringCloudServiceManager.OPTION_ENSEMBLE, JsonUtils.toJson(ensembleMap));
+        doTestStartStop("deployment.yml", new ArtifactAsserter() {
+
+            @Override
+            public Map<String, String> getOptions() {
+                return options;
+            }
+            
+            /*@Override
+            public void testDescriptor(ArtifactDescriptor aDesc) {
+                // more specific tests may go here
+            }*/
+
+        }, false);
+    }
+
     /**
      * Initializes/modifies the spring setup.
      * 

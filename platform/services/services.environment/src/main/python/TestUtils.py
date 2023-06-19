@@ -35,6 +35,17 @@ def serializeDataFromTestFile(rawData, dtype):
     
     return result
 
+"""Shall deserialize all entrys in our data files and return them as a list of obejcts """
+def getListOfDeserializedData(path):
+    rawData = readTestDataJson(path)
+    allPoints = list()
+    for line in rawData:
+        for dtype in list(line):
+            dtype = dtype[0].upper() + dtype[1:]#Python serializers seem to register with uppercase, test data files assume lower case keys!(Seems to be fine in java
+            dataPoint = serializeDataFromTestFile(line, dtype)
+            allPoints.append(dataPoint)
+    return allPoints
+    
 """Runs a single test based on one data point form a test file"""
 def runTestsFromTestFile(sId, rawData):
     for dtype in list(rawData):

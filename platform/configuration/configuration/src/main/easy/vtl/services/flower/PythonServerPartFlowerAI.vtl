@@ -14,7 +14,7 @@ template PythonServerPartFlowerAI(Configuration config, FileArtifact target, Pyt
         '# flower code for set state to STARTING
         print("Starting flower server: ${server.id}")
         self.IP = self.getNetMgtKeyAddress()
-        self.thread = Thread(target=self.runServerMethod, args=(self))
+        self.thread = Thread(target=self.runServerMethod)
         self.thread.start()
         pass'
     }
@@ -44,7 +44,7 @@ template PythonServerPartFlowerAI(Configuration config, FileArtifact target, Pyt
             config = configparser.ConfigParser()
             config.read("config.ini")
 
-            stra = fl.server.strategy.Strategy(   
+            stra = Strategy(   
                 min_evaluate_clients=config["fl"]["clients"],
                 min_available_clients=config["fl"]["clients"],
                 min_fit_clients=config["fl"]["clients"]
