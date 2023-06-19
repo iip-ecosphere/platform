@@ -44,7 +44,7 @@ template PythonServerPartFlowerAI(Configuration config, FileArtifact target, Pyt
             config = configparser.ConfigParser()
             config.read("config.ini")
 
-            stra = fl.server.strategy.Strategy(   
+            stra = Strategy(   
                 min_evaluate_clients=config["fl"]["clients"],
                 min_available_clients=config["fl"]["clients"],
                 min_fit_clients=config["fl"]["clients"]
