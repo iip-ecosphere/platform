@@ -77,7 +77,7 @@ public class AasUtilsTest {
     }
 
     /**
-     * Tests {@link AasUtils#readBoolean(Object[], int, int)}.
+     * Tests {@link AasUtils#readBoolean(Object[], int, boolean)}.
      */
     @Test
     public void testBoolean() {

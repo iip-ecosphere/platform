@@ -17,7 +17,6 @@ import org.junit.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.ServerAddress;
@@ -269,7 +268,8 @@ public class JsonUtilsTest {
     }
     
     /**
-     * Tests {@link JsonUtils#exceptFields(ObjectMapper, String...)} and {@link JsonUtils#toJson(ObjectWriter, Object)}.
+     * Tests {@link JsonUtils#exceptFields(ObjectMapper, String...)} 
+     * and {@link JsonUtils#toJson(ObjectMapper, Object))}.
      */
     @Test
     public void testExceptFields() {

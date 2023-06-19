@@ -147,7 +147,7 @@ public class AbstractAasLifecycleDescriptor implements LifecycleDescriptor {
     
                     @Override
                     public void run() {
-                        boolean hasConn = connectionOk(serverUrl) && iipAasExists();
+                        boolean hasConn = connectionOk(serverUrl); // && iipAasExists();
                         if (offline) {
                             if (hasConn) {
                                 offline = false;
