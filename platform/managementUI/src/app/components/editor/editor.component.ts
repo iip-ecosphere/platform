@@ -1,6 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { MatDialogRef } from '@angular/material/dialog';
-import { ActivatedRoute } from '@angular/router';
+import { Component, Input, OnInit } from '@angular/core';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { ApiService } from 'src/app/services/api.service';
 import { Resource, uiGroup, editorInput } from 'src/interfaces';
 
@@ -11,8 +10,13 @@ import { Resource, uiGroup, editorInput } from 'src/interfaces';
 })
 export class EditorComponent implements OnInit {
 
+  //type to generate editor for, null if type should be selected via dropdown
+  //needed for subeditor functionality
+  @Input() type: editorInput | null = null;
+
   category: string = 'all';
   meta: Resource | undefined;
+  unchangedMeta: Resource | undefined;
   /* backup needed for data recovery before re-filtering data
    for the next tab */
   metaBackup: Resource | undefined;
@@ -23,6 +27,8 @@ export class EditorComponent implements OnInit {
 
   metaTypes = ['metaState', 'metaProject',
     'metaSize', 'metaType', 'metaRefines', 'metaAbstract', 'metaTypeKind'];
+
+  //metatypekind: PRIMITIVE=1, ENUM=2, CONTAINER=3, CONSTRAINT=4, DERIVED=9, COMPOUND=10
 
   /* metaTypeKind */
   primitive = 1
@@ -42,23 +48,27 @@ export class EditorComponent implements OnInit {
     {cat: "Applications", metaRef: ["VersionedElement"]}
   ];
 
-  constructor(private route: ActivatedRoute,
-    private api: ApiService,
-    public dialog: MatDialogRef<EditorComponent>) { }
+  constructor(private api: ApiService,
+    public dialog: MatDialogRef<EditorComponent>,
+    public subDialog: MatDialog) { }
 
   ngOnInit(): void {
-    this.getMeta()
-    /*
-    const category = this.route.snapshot.paramMap.get('ls');
-    if(category && category != '') {
-      this.category = category;
+    if(!this.type) {
+      this.getMeta()
+    } else if(this.meta && this.meta.value && this.type.type){
+      let type = this.cleanTypeName(this.type.type);
+      this.selectedType = this.meta.value.find(item => item.idShort === type);
+      console.log(type);
+      console.log(this.selectedType);
+      console.log(this.meta);
+      this.generateInputs()
     }
-    */
   }
 
   private async getMeta() {
     this.meta = await this.api.getMeta();
-    this.metaBackup = JSON.parse(JSON.stringify(this.meta)) // deep copy
+    this.unchangedMeta = JSON.parse(JSON.stringify(this.meta));
+    this.metaBackup = JSON.parse(JSON.stringify(this.meta)); // deep copy
     this.filterMeta();
     /* TODO loe
     if (this.meta.value) {
@@ -115,6 +125,7 @@ export class EditorComponent implements OnInit {
       }
     }
     this.meta!.value = newMetaValues
+    console.log(this.meta);
   }
 
   /** Returns false when metaAbstract is false or there is no attribute "metaAbstract" */
@@ -178,6 +189,13 @@ export class EditorComponent implements OnInit {
   }
 // ----------------------------------------------------------------------
 
+private cleanTypeName(type: string) {
+  const startIndex = type.lastIndexOf('(') + 1;
+  const endIndex = type.indexOf(')');
+  return type.substring(startIndex, endIndex);
+
+}
+
   public displayName(property: Resource) {
     let displayName = '';
     if(property.value) {
@@ -205,8 +223,6 @@ export class EditorComponent implements OnInit {
           }
           let uiGroupCompare =  this.uiGroups.find(
             item => item.uiGroup === uiGroup);
-          console.log(uiGroup);
-          console.log(uiGroupCompare);
 
 
           let editorInput: editorInput =
@@ -223,7 +239,23 @@ export class EditorComponent implements OnInit {
             editorInput.description = name.description;
           }
           editorInput.type = input.value.find(
-            (item: { idShort: string; }) => item.idShort === 'type')?.value
+            (item: { idShort: string; }) => item.idShort === 'type')?.value;
+
+            let cleanType = this.cleanTypeName(editorInput.type);
+            let type = this.unchangedMeta?.value?.find(type => type.idShort == cleanType);
+            if(type) {
+              editorInput.metaTypeKind = type.value.find(
+                (item: { idShort: string; }) => item.idShort === 'metaTypeKind')?.value;
+            }
+
+            //the metaTypeKind is not included on the values of the types in the configuration/meta collection
+            //therefore this approach doesnt work, but it would be much more performant if it did
+          // editorInput.metaTypeKind = input.value.find(
+          //   (item: { idShort: string; }) => item.idShort === 'metaTypeKind')?.value;
+          //   console.log(editorInput);
+          //   console.log(input.value);
+
+
           if(editorInput.type.indexOf('refTo') >= 0) {
             editorInput.refTo = true;
           }
@@ -291,14 +323,16 @@ export class EditorComponent implements OnInit {
           }
         }
         }
-        console.log("ui groups")
-        console.log(this.uiGroups);
     }
   }
 
   public toggleOptional(uiGroup: uiGroup) {
     uiGroup.toggleOptional = !uiGroup.toggleOptional;
 
+  }
+
+  public addType() {
+    this.dialog.close();
   }
 
   public create() {
@@ -308,5 +342,15 @@ export class EditorComponent implements OnInit {
   public close() {
     this.dialog.close();
   };
+
+  public openSubeditor(type: editorInput) {
+    //this.router.navigateByUrl("list/editor/all");
+    let dialogRef = this.subDialog.open(EditorComponent, {
+      height: '80%',
+      width:  '80%',
+    })
+    dialogRef.componentInstance.type = type;
+    dialogRef.componentInstance.meta = this.unchangedMeta;
+  }
 
 }

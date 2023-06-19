@@ -5,7 +5,7 @@
     (click)="close()"><mat-icon>close</mat-icon></button></span>
 </mat-toolbar>
 
-<mat-card>
+<mat-card *ngIf="!type">
   <table>
     <tr>
       <td>
@@ -34,14 +34,19 @@
       <mat-card class="inputBox" *ngIf="!input.multipleInputs && !input.refTo; else ref">
         <p style="margin-bottom: 1em;">{{ input.name }}</p>
         <div *ngIf="input.type != 'Boolean'; else booleanCase">
-          <mat-form-field appearance="outline">
-            <mat-label>{{ input.type }}</mat-label>
-            <input matInput
-              [matTooltip]="input.description[0].text + ' ' + input.description[0].language" type="text" [(ngModel)]=input.value />
-          </mat-form-field>
+          <div *ngIf="input.metaTypeKind != 10; else subEditor">
+            <mat-form-field appearance="outline" >
+              <mat-label>{{ input.type }}</mat-label>
+              <input matInput
+                [matTooltip]="input.description[0].text + ' ' + input.description[0].language" type="text" ngDefaultControl [(ngModel)]=input.value />
+            </mat-form-field>
+          </div>
+          <ng-template #subEditor>
+            <button mat-raised-button (click)="openSubeditor(input)">open Subeditor</button>
+          </ng-template>
         </div>
           <ng-template #booleanCase>
-            <mat-form-field [(ngModel)]=input.value>
+            <mat-form-field ngDefaultControl [(ngModel)]=input.value>
               <mat-select>
                 <mat-option [value]="true">
                   true
@@ -56,12 +61,10 @@
       <div>
         <ng-template #ref>
           <mat-card [ngClass]="input.multipleInputs? 'inputBox' : 'refInput'">
-
               <p style="margin-bottom: 1em;">{{ input.name }}</p>
               <app-input-ref-select
                 [textfield]="true" [input]="input">
               </app-input-ref-select>
-
           </mat-card>
       </ng-template>
       </div>
@@ -71,27 +74,35 @@
       <div *ngFor="let input of uiGroup.fullLineInputs">
         <mat-card class="refInput">
           <p style="margin-bottom: 1em;">{{ input.name }}</p>
-          <app-input-ref-select
-            [textfield]="true" [input]="input">
+          <app-input-ref-select [textfield]="true" [input]="input">
           </app-input-ref-select>
+          <div #subEditor *ngIf="input.metaTypeKind == 10">
+            <button mat-raised-button (click)="openSubeditor(input)">open Subeditor</button>
+          </div>
         </mat-card>
         <div>
         </div>
       </div>
     </div>
 
-    <button mat-raised-button class="toggleButton" *ngIf="uiGroup.optionalInputs[0] || uiGroup.fullLineOptionalInputs[0]" (click)="toggleOptional(uiGroup) ">toggle Optional</button>
+    <button mat-raised-button class="toggleButton" *ngIf="uiGroup.optionalInputs[0] || uiGroup.fullLineOptionalInputs[0]" (click)="toggleOptional(uiGroup) ">
+      <span *ngIf="!uiGroup.toggleOptional">show</span>
+      <span *ngIf="uiGroup.toggleOptional">hide</span>
+      Optional</button>
     <div class="inputGroup" *ngIf="uiGroup.toggleOptional">
 
     <div *ngFor="let input of uiGroup.optionalInputs">
       <mat-card class="inputBox">
         <mat-card-content *ngIf="!input.multipleInputs && !input.refTo; else refOpt">
           <p style="margin-bottom: 1em;">{{ input.name }}</p>
-          <mat-form-field appearance="outline" >
+          <mat-form-field appearance="outline" *ngIf="input.metaTypeKind != 10; else subEditor">
             <mat-label>{{ input.type }}</mat-label>
             <input matInput
-              [matTooltip]="input.description[0].text + ' ' + input.description[0].language" type="text" [(ngModel)]=input.value />
+              [matTooltip]="input.description[0].text + ' ' + input.description[0].language" type="text" ngDefaultControl [(ngModel)]=input.value />
           </mat-form-field>
+          <ng-template #subEditor>
+            <button mat-raised-button (click)="openSubeditor(input)">open Subeditor</button>
+          </ng-template>
         </mat-card-content>
 
         <ng-template #refOpt>
@@ -123,6 +134,8 @@
 </div>
 
 <div style="display: flex; justify-content: center">
-  <button mat-raised-button class="button"
+  <button mat-raised-button class="button" *ngIf="!type"
     color="success" (click)="create()" disable>Create</button>
+    <button mat-raised-button class="button" *ngIf="type"
+    color="success" (click)="addType()">Add</button>
 </div>

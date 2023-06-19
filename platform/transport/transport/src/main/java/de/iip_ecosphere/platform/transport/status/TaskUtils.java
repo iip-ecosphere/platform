@@ -21,6 +21,7 @@ import de.iip_ecosphere.platform.support.TaskRegistry.TaskData;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper.ExceptionFunction;
 import de.iip_ecosphere.platform.transport.Transport;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
+import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
 
 /**
  * Generic execution of tasks in combination with {@link TaskRegistry}.
@@ -148,7 +149,13 @@ public class TaskUtils {
                     public void received(StatusMessage msg) {
                         if (data.sameTask(msg.getTaskId()) && pred.test(data, msg)) {
                             try {
-                                Transport.getConnector().detachReceptionCallback(StatusMessage.STATUS_STREAM, this);
+                                TransportConnector tc = Transport.getConnector();
+                                if (null != tc) {
+                                    tc.detachReceptionCallback(StatusMessage.STATUS_STREAM, this);
+                                } else {
+                                    LoggerFactory.getLogger(TaskUtils.class).error("Cannot stop tracking task status "
+                                        + "of {} for component {}: No transport connector", data.getId(), componentId);
+                                }
                             } catch (IOException e) {
                                 LoggerFactory.getLogger(TaskUtils.class).error("Cannot stop tracking task status of {} "
                                     + "for component {}: {}", data.getId(), componentId, e.getMessage());
@@ -160,9 +167,16 @@ public class TaskUtils {
                     public Class<StatusMessage> getType() {
                         return StatusMessage.class;
                     }
+
                 };
                 try {
-                    Transport.createConnector().setReceptionCallback(StatusMessage.STATUS_STREAM, cb);
+                    TransportConnector tc = Transport.createConnector();
+                    if (null != tc) {
+                        tc.setReceptionCallback(StatusMessage.STATUS_STREAM, cb);
+                    } else {
+                        LoggerFactory.getLogger(TaskUtils.class).error("Cannot track task status of {} for component "
+                            + "{}: Cannot connect to transport", data.getId(), componentId);
+                    }
                 } catch (IOException e) {
                     LoggerFactory.getLogger(TaskUtils.class).error("Cannot track task status of {} for component "
                         + "{}: {}", data.getId(), componentId, e.getMessage());

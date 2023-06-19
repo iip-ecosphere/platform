@@ -195,6 +195,12 @@ export interface StatusMsg {
   messages?: string[];
 }
 
+export interface status {
+  taskId: string;
+  status: string;
+  messages: string[];
+
+}
 export interface uiGroup {
   uiGroup: number;
   inputs: editorInput[];
@@ -205,11 +211,14 @@ export interface uiGroup {
 }
 
 export interface editorInput {
-  value: string[];
+  value: string[]; //editorInput[]
   type: string;
   name: string;
   description: [{language: string, text: string}];
   refTo?: boolean;
   multipleInputs?: boolean;
+  metaTypeKind?: number;
 
 }
+
+
