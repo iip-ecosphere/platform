@@ -14,7 +14,7 @@ template PythonServerPartFlowerAI(Configuration config, FileArtifact target, Pyt
         '# flower code for set state to STARTING
         print("Starting flower server: ${server.id}")
         self.IP = self.getNetMgtKeyAddress()
-        self.thread = Thread(target=self.runServerMethod, args=(self))
+        self.thread = Thread(target=self.runServerMethod)
         self.thread.start()
         pass'
     }
