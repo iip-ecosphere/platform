@@ -30,7 +30,17 @@ template PythonMeshElementTemplate(Configuration config, FileArtifact target, Me
                 """Initializes the service.""" 
                 super().__init__()
                 ${produceConstructorRest(service)}
-            
+
+            def start(self):
+                """Called when the server shall start.
+                """
+                ${produceSetStateStarting(service)}
+
+            def stop(self):
+                """Called when the server shall stop.
+                """
+
+                ${produceSetStateStopping(service)}
             ${produceReconfigure(service)}
             ${generateDataMethods(elt, true)}
             ${generateFurtherMethods(service)}

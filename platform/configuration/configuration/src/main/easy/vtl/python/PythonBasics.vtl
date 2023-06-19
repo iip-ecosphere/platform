@@ -178,6 +178,16 @@ template PythonBasics(Configuration config, FileArtifact target) {
         }
     }
 
+    def produceSetStateStarting(PythonService service) {
+        '#code for set state to STARTING
+        pass'
+    }
+
+    def produceSetStateStopping(PythonService service) {
+        '#code for set state to STOPPING
+        pass'
+    }
+
     def produceParameterDefault(Parameter p) {
         'None'
     }

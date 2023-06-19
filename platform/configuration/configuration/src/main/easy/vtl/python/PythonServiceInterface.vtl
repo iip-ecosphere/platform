@@ -123,7 +123,29 @@ template PythonServiceInterface(Configuration config, FileArtifact target, Servi
                    """ 
                 if self.ingestor is not None:
                     self.ingestor(data)
-            
+
+            def setState(self, state:ServiceState):
+                """Changes the state. [R133c]
+                
+                Parameters:
+                  - newState -- the new state (ServiceState)
+                """
+                super().setState(state)
+                if (state==ServiceState.STARTING):
+                    self.start()
+                if (state==ServiceState.STOPPING):
+                    self.stop()
+
+            def start(self):
+                """Called when the server shall start.
+                """
+                pass
+
+            def stop(self):
+                """Called when the server shall stop.
+                """
+                pass
+
             ${produceReconfigure(service.parameter)}
             ${produceForInputTypes(service)}
             ${produceForOutputTypes(service)}
