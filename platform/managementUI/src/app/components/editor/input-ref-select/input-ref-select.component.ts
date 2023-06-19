@@ -47,6 +47,9 @@ export class InputRefSelectComponent implements OnInit {
         this.isSequenceOf = true;
       }
     }
+    if(this.input.metaTypeKind == 10) {
+      this.textfield = false;
+    }
   }
 
   private async getReferences(refTo: string) {
