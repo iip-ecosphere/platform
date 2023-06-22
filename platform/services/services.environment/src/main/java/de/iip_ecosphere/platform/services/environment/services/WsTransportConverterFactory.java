@@ -75,7 +75,7 @@ public class WsTransportConverterFactory extends TransportConverterFactory {
             @Override
             public void stop(boolean dispose) {
                 try {
-                    server.stop();
+                    server.stop(1000);
                 } catch (InterruptedException e) {
                 }
             }
