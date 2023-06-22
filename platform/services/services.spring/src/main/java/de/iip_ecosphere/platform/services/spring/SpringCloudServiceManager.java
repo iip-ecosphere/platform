@@ -52,7 +52,6 @@ import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.services.environment.spring.Starter;
 import de.iip_ecosphere.platform.services.environment.switching.ServiceBase;
 import de.iip_ecosphere.platform.services.spring.yaml.YamlArtifact;
-import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.TimeUtils;
@@ -356,6 +355,37 @@ public class SpringCloudServiceManager
     }
     
     /**
+     * Replaces all keys/values in {@code optMap} by substitutes given in {@code subst}.
+     * 
+     * @param optMap the option map
+     * @param subst the substitution table (original-substitute)
+     * @return the copied, substituted {@code optMap}
+     */
+    private static Map<Object, Object> replaceAll(Map<?, ?> optMap, Map<String, String> subst) {
+        Map<Object, Object> result = new HashMap<>();
+        for (Map.Entry<?, ?> ent : optMap.entrySet()) {
+            Object key = substitute(ent.getKey(), subst);
+            Object val = substitute(ent.getValue(), subst);
+            result.put(key, val);
+        }
+        return result;
+    }
+
+    /**
+     * Substitutes {@code val} by the corresponding value in {@code subst}.
+     * 
+     * @param val the value, may be <b>null</b>
+     * @param subst the substitution table (original-substitute)
+     * @return the substituted value, may be <b>null</b> if {@code val} was <b>null</b>
+     */
+    private static Object substitute(Object val, Map<String, String> subst) {
+        if (null != val && subst.containsKey(val)) {
+            val = subst.get(val);
+        }
+        return val;
+    }
+    
+    /**
      * Handles the ensemble option for service start.
      * 
      * @param opt the option as JSON string
@@ -364,10 +394,19 @@ public class SpringCloudServiceManager
      */
     private static void handleOptionEnsemble(String opt, String[] serviceIds, ServiceManager mgr) {
         Map<?, ?> optMap = JsonUtils.fromJson(opt, Map.class);
-        Set<String> actServices = new HashSet<>();
-        CollectionUtils.addAll(actServices, serviceIds);
         if (null != optMap) {
-            for (Map.Entry<?, ?> ent: optMap.entrySet()) {
+            Set<String> actServices = new HashSet<>();
+            Map<String, String> substitution = new HashMap<>();
+            for (String sId : serviceIds) {
+                actServices.add(sId);
+                String simpleId = ServiceBase.getServiceId(sId);
+                String appId = ServiceBase.getApplicationId(sId);
+                String appInstId = ServiceBase.getApplicationInstanceId(sId);
+                if (appId.length() > 0 && appInstId.length() > 0) { // substitute only if we have the additional IDs
+                    substitution.put(simpleId, sId);
+                }
+            }
+            for (Map.Entry<?, ?> ent: replaceAll(optMap, substitution).entrySet()) {
                 String ensemble = ent.getKey().toString();
                 String leader = ent.getValue().toString();
                 if (actServices.contains(ensemble)) { // leader may be null to reset, must not be there
