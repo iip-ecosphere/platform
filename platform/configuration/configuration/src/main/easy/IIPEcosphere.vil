@@ -11,15 +11,18 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     // Paths now in IIPEcosphereBase
     
     Boolean tests = true;
+    Boolean platformInstantiation = false;
     setOf(String) usedServiceTypes = {};
     
     main(Project source, Configuration config, Project target) = {
+        platformInstantiation = true;
         generatePlatform(source, config, target); // first for container
         generateApps(source, config, target);
     }
     
     // called from Platform Instantiator, don't change signature
     mainCli(Project source, Configuration config, Project target) = {
+        platformInstantiation = true;
         tests = false;
         generatePlatform(source, config, target); // first for container
         generateApps(source, config, target);
@@ -173,7 +176,11 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 
                 mvn(appRoot);
 
-                String appArtifact = generateServiceContainer(appRoot, cfg, a, elements);
+                String appArtifact;
+                if (platformInstantiation) {
+                    appArtifact = generateServiceContainer(appRoot, cfg, a, elements);
+                }
+                
                 if (appArtifact == null or appArtifact.length() == 0) {
                     appArtifact = appName + "-" + appVersion + "-bin.jar"; // currently not other packaging
                 }
@@ -239,7 +246,9 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 zip(appRoot, appRoot, "${target}/templates/eclipse/impl.${appName}.zip");
             }
         };
-        generateAllAppsContainers(config, target, allAppsContainersElements);
+        if (platformInstantiation) {
+            generateAllAppsContainers(config, target, allAppsContainersElements);
+        }
     }
     
     // dispatch basis
