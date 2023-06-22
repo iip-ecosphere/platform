@@ -51,6 +51,7 @@ template Dockerfile_Python(IIPEcosphere config, FileArtifact target, sequenceOf(
                 }
 
                 if (IsPythonInstalled == 1) {
+                    '# Install python dependencies'
                     'COPY requirements.txt requirements.txt'
                     '${pythonPipInstalled}'
                 }
@@ -118,10 +119,6 @@ template Dockerfile_Python(IIPEcosphere config, FileArtifact target, sequenceOf(
                 }
             }
 
-            if (IsPythonInstalled == 1) {
-                'COPY requirements.txt requirements.txt'
-                '${pythonPipInstalled}'
-            }
             ''
             'RUN apt-get install -y openjdk-11-jre'
             ''
@@ -138,8 +135,6 @@ template Dockerfile_Python(IIPEcosphere config, FileArtifact target, sequenceOf(
             '# Installed dependencies (shall be in /)'
             'COPY installedDependencies.yml installedDependencies.yml'
             ''
-            '${genTestingMode(config, "Python")}'
-            ''
             '${genServersExpose(app)|e}'
             'WORKDIR /app'
             ''
@@ -150,6 +145,18 @@ template Dockerfile_Python(IIPEcosphere config, FileArtifact target, sequenceOf(
             'COPY broker/brokerJars/ brokerJars'
             'COPY broker/src/ src'
             'COPY broker/broker.sh broker.sh'
+            ''
+            '# Running the script'
+            'COPY wrapper_script.sh wrapper_script.sh'
+            'RUN chmod 777 wrapper_script.sh'
+            ''
+            if (IsPythonInstalled == 1) {
+                '# Install python dependencies'
+                'COPY requirements.txt requirements.txt'
+                '${pythonPipInstalled}'
+            }
+            ''
+            '${genTestingMode(config, "Python")}'
             ''
             // '# App'
             // 'COPY ${getAppMvnName(app)}/target/${getAppMvnName(app)}-${getAppMvnVersion(app)}-bin.jar ${getAppMvnName(app)}-${getAppMvnVersion(app)}-bin.jar'
@@ -183,9 +190,6 @@ template Dockerfile_Python(IIPEcosphere config, FileArtifact target, sequenceOf(
             'COPY serviceMgr.sh serviceMgr.sh'
         }
         ''		
-        '# Running the script'
-        'COPY wrapper_script.sh wrapper_script.sh'
-        'RUN chmod 777 wrapper_script.sh'
         'ENTRYPOINT ["./wrapper_script.sh"]'
     }
     

@@ -48,6 +48,7 @@ template DockerfileBase_Python(IIPEcosphere config, FileArtifact target, sequenc
             }
 
             if (IsPythonInstalled == 1) {
+                '# Install python dependencies'
                 'COPY requirements.txt requirements.txt'
                 '${pythonPipInstalled}'
             }
@@ -104,11 +105,6 @@ template DockerfileBase_Python(IIPEcosphere config, FileArtifact target, sequenc
                     } 
                 }
             }
-
-            if (IsPythonInstalled == 1) {
-                'COPY requirements.txt requirements.txt'
-                '${pythonPipInstalled}'
-            }
             
             ''
             'RUN apt-get install -y openjdk-11-jre'
@@ -125,8 +121,6 @@ template DockerfileBase_Python(IIPEcosphere config, FileArtifact target, sequenc
             '# Installed dependencies (shall be in /)'
             'COPY installedDependencies.yml installedDependencies.yml'
             ''
-            '${genTestingMode(config, "Python")}'
-            ''
             '${genServersExpose(app)|e}'
             'WORKDIR /app'
             ''
@@ -137,6 +131,14 @@ template DockerfileBase_Python(IIPEcosphere config, FileArtifact target, sequenc
             'COPY broker/brokerJars/ brokerJars'
             'COPY broker/src/ src'
             'COPY broker/broker.sh broker.sh'
+            ''
+            if (IsPythonInstalled == 1) {
+                '# Install python dependencies'
+                'COPY requirements.txt requirements.txt'
+                '${pythonPipInstalled}'
+            }
+            ''
+            '${genTestingMode(config, "Python")}'
             ''
         }
     }
