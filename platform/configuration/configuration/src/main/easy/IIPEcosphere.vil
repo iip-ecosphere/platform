@@ -685,12 +685,12 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                             newDevicePath = "${appRoot}/../${srcJarsPath}${deviceSpec}";
                             lastDevicePath = "${deviceSourcesDf}/${srcJarsPath}${deviceSpec}";
                             if (newDevicePath.exists()) {
+                                newDevicePath.rename("${srcJarsPath}${deviceSpec}${tmpFolderName}");
                                 if (not(sameMd5HashJarsFolders(newDevicePath, lastDevicePath))){
-                                    newDevicePath.rename("${srcJarsPath}${deviceSpec}${tmpFolderName}");
                                     copy(newDevicePath, lastDevicePath);
-                                    newDevicePath.rename("${srcJarsPath}${deviceSpec}");
                                     newChangeJarFiles = true;
                                 }
+                                newDevicePath.rename("${srcJarsPath}${deviceSpec}");
                             }
                         } else {
                             Path deviceSourcesDf = "${deviceDf}/sources";
@@ -1087,12 +1087,12 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                                 newDevicePath = "${target}/${srcJarsPath}${deviceSpec}";
                                 lastDevicePath = "${deviceSourcesDf}/${srcJarsPath}${deviceSpec}";
                                 if (newDevicePath.exists()) {
+                                    newDevicePath.rename("${srcJarsPath}${deviceSpec}${tmpFolderName}");
                                     if (not(sameMd5HashJarsFolders(newDevicePath, lastDevicePath))){
-                                        newDevicePath.rename("${srcJarsPath}${deviceSpec}${tmpFolderName}");
                                         copy(newDevicePath, lastDevicePath);
-                                        newDevicePath.rename("${srcJarsPath}${deviceSpec}");
                                         newChangeJarFiles = true;
                                     }
+                                    newDevicePath.rename("${srcJarsPath}${deviceSpec}");
                                 }
                             } else {
                                 Path deviceSourcesDf = "${deviceDf}/sources";
@@ -1322,7 +1322,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         Boolean result = true;
         
         for (FileArtifact file : newPathArtifactsSet){
-            if (not(file.getName().startsWith("de.iip-ecosphere.platform"))) {
+            if (not((file.getName().startsWith("de.iip-ecosphere.platform")) and (file.getName().find(".exec-") != -1))) {
                 FileArtifact findFile;
                 String fileExist = "No";
             
