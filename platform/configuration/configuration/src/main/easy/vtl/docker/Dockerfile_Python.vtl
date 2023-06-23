@@ -146,7 +146,7 @@ template Dockerfile_Python(IIPEcosphere config, FileArtifact target, sequenceOf(
             'COPY broker/src/ src'
             'COPY broker/broker.sh broker.sh'
             ''
-            '# Running the script'
+            '# Copy the run script'
             'COPY wrapper_script.sh wrapper_script.sh'
             'RUN chmod 777 wrapper_script.sh'
             ''
