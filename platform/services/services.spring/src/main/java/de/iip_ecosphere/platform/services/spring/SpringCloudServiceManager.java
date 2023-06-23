@@ -52,6 +52,7 @@ import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.services.environment.spring.Starter;
 import de.iip_ecosphere.platform.services.environment.switching.ServiceBase;
 import de.iip_ecosphere.platform.services.spring.yaml.YamlArtifact;
+import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.TimeUtils;
@@ -386,6 +387,27 @@ public class SpringCloudServiceManager
     }
     
     /**
+     * Creates a default substitution mapping for {@code serviceIds}, i.e., from the simple id to the full id with 
+     * application id and application instance id only if both application ids are given.
+     * 
+     * @param serviceIds the service ids to create the substitution for
+     * @return the substitution mapping
+     * @see #replaceAll(Map, Map)
+     */
+    private static Map<String, String> createServiceAppIdSubstitution(String... serviceIds) {
+        Map<String, String> substitution = new HashMap<>();
+        for (String sId : serviceIds) {
+            String simpleId = ServiceBase.getServiceId(sId);
+            String appId = ServiceBase.getApplicationId(sId);
+            String appInstId = ServiceBase.getApplicationInstanceId(sId);
+            if (appId.length() > 0 && appInstId.length() > 0) { // substitute only if we have the additional IDs
+                substitution.put(simpleId, sId);
+            }
+        }
+        return substitution;
+    }
+    
+    /**
      * Handles the ensemble option for service start.
      * 
      * @param opt the option as JSON string
@@ -395,17 +417,8 @@ public class SpringCloudServiceManager
     private static void handleOptionEnsemble(String opt, String[] serviceIds, ServiceManager mgr) {
         Map<?, ?> optMap = JsonUtils.fromJson(opt, Map.class);
         if (null != optMap) {
-            Set<String> actServices = new HashSet<>();
-            Map<String, String> substitution = new HashMap<>();
-            for (String sId : serviceIds) {
-                actServices.add(sId);
-                String simpleId = ServiceBase.getServiceId(sId);
-                String appId = ServiceBase.getApplicationId(sId);
-                String appInstId = ServiceBase.getApplicationInstanceId(sId);
-                if (appId.length() > 0 && appInstId.length() > 0) { // substitute only if we have the additional IDs
-                    substitution.put(simpleId, sId);
-                }
-            }
+            Set<String> actServices = CollectionUtils.addAll(new HashSet<>(), serviceIds);
+            Map<String, String> substitution = createServiceAppIdSubstitution(serviceIds);
             for (Map.Entry<?, ?> ent: replaceAll(optMap, substitution).entrySet()) {
                 String ensemble = ent.getKey().toString();
                 String leader = ent.getValue().toString();
@@ -596,24 +609,29 @@ public class SpringCloudServiceManager
     private String getMemLimit(Map<String, String> options, String... sIds) {
         String result = null;
         long mem = 0;
+        Map<Object, Object> optMap = null;
+        if (null != options) { // overriden value takes precedence
+            String opt = options.get(OPTION_MEMLIMITS);
+            if (null != opt) {
+                Map<String, String> substitution = createServiceAppIdSubstitution(sIds);
+                optMap = replaceAll(JsonUtils.fromJson(opt, Map.class), substitution);
+            }
+        }
+        
         for (String sId: sIds) {
             long sMem = 0;
             SpringCloudServiceDescriptor desc = getService(sId);
             if (null != desc) {
                 sMem = desc.getMemory();
             }
-            if (null != options) { // overriden value takes precedence
-                String opt = options.get(OPTION_MEMLIMITS);
-                if (null != opt) {
-                    Map<?, ?> optMap = JsonUtils.fromJson(opt, Map.class);
-                    Object memLimitOpt = optMap.get(sId);
-                    if (null != memLimitOpt) {
-                        try {
-                            sMem = Long.parseLong(sId.toString());
-                        } catch (NumberFormatException e) {
-                            LoggerFactory.getLogger(SpringCloudServiceManager.class).info(
-                                "Memlimit option for {} not a long value: {}", sId, e.getMessage());
-                        }
+            if (null != optMap) { // overriden value takes precedence
+                Object memLimitOpt = optMap.get(sId);
+                if (null != memLimitOpt) {
+                    try {
+                        sMem = Long.parseLong(sId.toString());
+                    } catch (NumberFormatException e) {
+                        LoggerFactory.getLogger(SpringCloudServiceManager.class).info(
+                            "Memlimit option for {} not a long value: {}", sId, e.getMessage());
                     }
                 }
             }
