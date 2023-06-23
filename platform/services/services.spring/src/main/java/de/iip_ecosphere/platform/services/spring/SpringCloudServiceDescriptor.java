@@ -356,60 +356,60 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
     AppDeploymentRequest createDeploymentRequest(SpringCloudServiceSetup config, List<String> cmdArgs, String memLimit) 
         throws ExecutionException {
         AppDeploymentRequest result = null;
-        if (null == ensembleLeader) {
-            NetworkManager mgr = NetworkManagerFactory.getInstance();
-            Map<String, String> appProps = new HashMap<String, String>();
+        NetworkManager mgr = NetworkManagerFactory.getInstance();
+        Map<String, String> appProps = new HashMap<String, String>();
 
-            Map<String, String> deployProps = new HashMap<String, String>();
-            Resource res = new FileSystemResource(getArtifact().getJar());
-            deployProps.put(AppDeployer.GROUP_PROPERTY_KEY, getGroup());
-            //deployProps.put("spring.cloud.deployer.local.deleteFilesOnExit ", "false"); // does not work
-            Utils.addPropertyIfPositiveToInt(deployProps, AppDeployer.COUNT_PROPERTY_KEY, service.getInstances(),  "1");
-            deployProps.put(AppDeployer.INDEXED_PROPERTY_KEY, "false"); // index the instances?
-            Utils.addPropertyIfPositiveToMeBi(deployProps, AppDeployer.MEMORY_PROPERTY_KEY, service.getMemory(), 
-                memLimit);
-            Utils.addPropertyIfPositiveToMeBi(deployProps, AppDeployer.DISK_PROPERTY_KEY, service.getDisk(), null);
-            Utils.addPropertyIfPositiveToInt(deployProps, AppDeployer.CPU_PROPERTY_KEY, service.getCpus(), "1");
+        Map<String, String> deployProps = new HashMap<String, String>();
+        Resource res = new FileSystemResource(getArtifact().getJar());
+        deployProps.put(AppDeployer.GROUP_PROPERTY_KEY, getGroup());
+        //deployProps.put("spring.cloud.deployer.local.deleteFilesOnExit ", "false"); // does not work
+        Utils.addPropertyIfPositiveToInt(deployProps, AppDeployer.COUNT_PROPERTY_KEY, service.getInstances(),  "1");
+        deployProps.put(AppDeployer.INDEXED_PROPERTY_KEY, "false"); // index the instances?
+        Utils.addPropertyIfPositiveToMeBi(deployProps, AppDeployer.MEMORY_PROPERTY_KEY, service.getMemory(), 
+            memLimit);
+        Utils.addPropertyIfPositiveToMeBi(deployProps, AppDeployer.DISK_PROPERTY_KEY, service.getDisk(), null);
+        Utils.addPropertyIfPositiveToInt(deployProps, AppDeployer.CPU_PROPERTY_KEY, service.getCpus(), "1");
 
-            ManagedServerAddress springAddr = registerPort(mgr, "spring_" + getId());
-            appProps.put("server.port", String.valueOf(springAddr.getPort())); // shall work, not another cmd arg
-            adminAddr = registerPort(mgr, Starter.getServiceCommandNetworkMgrKey(getId()));
-            serviceProtocol = config.getServiceProtocol();
-            List<String> cmdLine = collectCmdArguments(config, adminAddr.getPort(), serviceProtocol);
-            for (Relation r : service.getRelations()) {
-                Endpoint endpoint = r.getEndpoint();
-                if (r.getChannel().length() == 0) {
-                    DescriptorUtils.addEndpointArgs(cmdLine, endpoint, getTransportPort(config), 
-                        getTransportHost(config));
-                } else {
-                    ManagedServerAddress adr = registerPort(mgr, r.getChannel());
-                    DescriptorUtils.addEndpointArgs(cmdLine, endpoint, adr);
-                }
+        ManagedServerAddress springAddr = registerPort(mgr, "spring_" + getId());
+        appProps.put("server.port", String.valueOf(springAddr.getPort())); // shall work, not another cmd arg
+        adminAddr = registerPort(mgr, Starter.getServiceCommandNetworkMgrKey(getId()));
+        serviceProtocol = config.getServiceProtocol();
+        List<String> cmdLine = collectCmdArguments(config, adminAddr.getPort(), serviceProtocol);
+        for (Relation r : service.getRelations()) {
+            Endpoint endpoint = r.getEndpoint();
+            if (r.getChannel().length() == 0) {
+                DescriptorUtils.addEndpointArgs(cmdLine, endpoint, getTransportPort(config), 
+                    getTransportHost(config));
+            } else {
+                ManagedServerAddress adr = registerPort(mgr, r.getChannel());
+                DescriptorUtils.addEndpointArgs(cmdLine, endpoint, adr);
             }
-            ProcessSpec pSpec = service.getProcess();
-            if (null != pSpec) {
-                ManagedServerAddress adr = registerPort(mgr, getStreamingNetmanagerKey());
-                DescriptorUtils.addEndpointArgs(cmdLine, pSpec.getServiceStreamEndpoint(), adr);
+        }
+        ProcessSpec pSpec = service.getProcess();
+        if (null != pSpec) {
+            ManagedServerAddress adr = registerPort(mgr, getStreamingNetmanagerKey());
+            DescriptorUtils.addEndpointArgs(cmdLine, pSpec.getServiceStreamEndpoint(), adr);
 
-                List<String> procCmdLine = new ArrayList<String>();
-                procCmdLine.addAll(pSpec.getCmdArg());
-                DescriptorUtils.addEndpointArgs(cmdLine, pSpec.getStreamEndpoint(), adr);
+            List<String> procCmdLine = new ArrayList<String>();
+            procCmdLine.addAll(pSpec.getCmdArg());
+            DescriptorUtils.addEndpointArgs(cmdLine, pSpec.getStreamEndpoint(), adr);
 
-                ManagedServerAddress adrAas = registerPort(mgr, getAasNetmanagerKey());
-                DescriptorUtils.addEndpointArgs(cmdLine, pSpec.getAasEndpoint(), adrAas);
-                
-                int procPort = startProcess(config, pSpec);
-                if (procPort > 0) {
-                    cmdLine.add(Starter.composeArgument(Starter.getServicePortName(getId()), procPort));
-                }
+            ManagedServerAddress adrAas = registerPort(mgr, getAasNetmanagerKey());
+            DescriptorUtils.addEndpointArgs(cmdLine, pSpec.getAasEndpoint(), adrAas);
+            
+            int procPort = startProcess(config, pSpec);
+            if (procPort > 0) {
+                cmdLine.add(Starter.composeArgument(Starter.getServicePortName(getId()), procPort));
             }
-            if (null != cmdArgs) {
-                cmdLine.addAll(cmdArgs);
-            }
-            Starter.addAppEnvironment(cmdLine);
-            if (null != getAdditionalArguments()) {
-                cmdLine.addAll(getAdditionalArguments());
-            }
+        }
+        if (null != cmdArgs) {
+            cmdLine.addAll(cmdArgs);
+        }
+        Starter.addAppEnvironment(cmdLine);
+        if (null != getAdditionalArguments()) {
+            cmdLine.addAll(getAdditionalArguments());
+        }
+        if (null == ensembleLeader) { // only if we are the leader, unpack process for the others as usual, ignore rest
             // if cmdLine becomes too long, check whether a Yaml file/stream could be a solution 
             AppDefinition def = new AppDefinition(Starter.getServiceId(getId())
                 .replace(ServiceBase.APPLICATION_SEPARATOR, "_"), appProps);

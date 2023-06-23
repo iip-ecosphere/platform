@@ -120,7 +120,7 @@ public class ServerManager {
                             | NoSuchMethodException e) {
                             LOGGER.error("Starting server {}, cannot invoke constructor: {}", id, e.getMessage());
                         } catch (IOException e) {
-                            LOGGER.error("Starting server {}, unpacking artfiact: {}", id, e.getMessage());
+                            LOGGER.error("Starting server {}, unpacking artifact: {}", id, e.getMessage());
                         }
                     }
                 }
@@ -223,7 +223,7 @@ public class ServerManager {
         
         if (knownServers.size() > 0) {
             LOGGER.info("Preparing server start: Of known servers {} starting {} on this host ({})", knownServers, 
-                servers, thisDevice);
+                servers.keySet(), thisDevice);
         }
         return servers;
     }
