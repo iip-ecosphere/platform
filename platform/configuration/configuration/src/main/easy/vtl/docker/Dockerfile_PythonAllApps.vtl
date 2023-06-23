@@ -148,9 +148,6 @@ template Dockerfile_PythonAllApps(IIPEcosphere config, FileArtifact target, sequ
             'COPY broker/src/ src'
             'COPY broker/broker.sh broker.sh'
             ''
-            '# Copy the run script'
-            'COPY wrapper_script.sh wrapper_script.sh'
-            'RUN chmod 777 wrapper_script.sh'
             ''
             if (IsPythonInstalled == 1) {
                 '# Install python dependencies'
@@ -190,6 +187,9 @@ template Dockerfile_PythonAllApps(IIPEcosphere config, FileArtifact target, sequ
             'COPY serviceMgr.sh serviceMgr.sh'
         }
         ''		
+        '# Copy the run script'
+        'COPY wrapper_script.sh wrapper_script.sh'
+        'RUN chmod 777 wrapper_script.sh'
         'ENTRYPOINT ["./wrapper_script.sh"]'
     }
     
