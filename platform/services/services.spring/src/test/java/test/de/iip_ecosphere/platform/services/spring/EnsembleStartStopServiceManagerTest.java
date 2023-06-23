@@ -41,6 +41,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import de.iip_ecosphere.platform.services.spring.SpringCloudServiceSetup;
+import de.iip_ecosphere.platform.services.environment.switching.ServiceBase;
 import de.iip_ecosphere.platform.services.spring.SpringCloudServiceManager;
 import de.iip_ecosphere.platform.services.spring.StartupApplicationListener;
 import de.iip_ecosphere.platform.support.Schema;
@@ -100,7 +101,8 @@ public class EnsembleStartStopServiceManagerTest extends AbstractTestServiceMana
 
     /**
      * Tests a simple start-stop cycle of the {@link SpringCloudServiceManager} in one process as an ensemble with 
-     * start options.
+     * start options. The test uses appId/appInstanceId service names and relies on the internal mapping 
+     * between simple and complex service names as it would be set up through the CLI/platform operations.
      * 
      * @throws ExecutionException shall not occur for successful test
      * @throws IOException shall not occur for successful test
@@ -128,7 +130,7 @@ public class EnsembleStartStopServiceManagerTest extends AbstractTestServiceMana
                 // more specific tests may go here
             }*/
 
-        }, false);
+        }, false, id -> ServiceBase.composeId(id, "app", "1"));
     }
 
     /**
