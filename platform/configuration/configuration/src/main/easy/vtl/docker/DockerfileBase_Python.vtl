@@ -132,6 +132,10 @@ template DockerfileBase_Python(IIPEcosphere config, FileArtifact target, sequenc
             'COPY broker/src/ src'
             'COPY broker/broker.sh broker.sh'
             ''
+            '# Running the script'
+            'COPY wrapper_script.sh wrapper_script.sh'
+            'RUN chmod 777 wrapper_script.sh'
+            ''
             if (IsPythonInstalled == 1) {
                 '# Install python dependencies'
                 'COPY requirements.txt requirements.txt'
