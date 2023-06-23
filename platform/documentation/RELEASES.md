@@ -19,13 +19,11 @@ Planned:
 
 In progress:
 * [#147](https://github.com/iip-ecosphere/platform/issues/127): Streaming of service logs to CLI/UI
-* [#127](https://github.com/iip-ecosphere/platform/issues/127): Integration of federated learning 
 * [#70](https://github.com/iip-ecosphere/platform/issues/70): UI progress reporting 
 * [#117](https://github.com/iip-ecosphere/platform/issues/117): Multiple service managers per device
 * [#146](https://github.com/iip-ecosphere/platform/issues/146): UI editors for configuration tables
 * [#144](https://github.com/iip-ecosphere/platform/issues/144): Deployment plans and application instances
 * [#143](https://github.com/iip-ecosphere/platform/issues/143): Container testing mode(s)
-* [#141](https://github.com/iip-ecosphere/platform/issues/141): Fix AppAAS performance/resource consumption issue
 * [#115](https://github.com/iip-ecosphere/platform/issues/115): Cleanup, e.g., old build processes
 
 New features:
@@ -45,6 +43,7 @@ New features:
 * [#118](https://github.com/iip-ecosphere/platform/issues/118): Service development video tutorial
 
 Improvements:
+* [#141](https://github.com/iip-ecosphere/platform/issues/141): Fix AppAAS performance/resource consumption issue
 * [#128](https://github.com/iip-ecosphere/platform/issues/128): Refactor model to move RecordType::path to connector. **May require an upgrade of configuration models using connectors.**
 * [#129](https://github.com/iip-ecosphere/platform/issues/129): Read-only flag for RecordType field
 * [#135](https://github.com/iip-ecosphere/platform/issues/135): Changing Docker configuration for local repository became part of the platform install scripts [#107](https://github.com/iip-ecosphere/platform/issues/107).
