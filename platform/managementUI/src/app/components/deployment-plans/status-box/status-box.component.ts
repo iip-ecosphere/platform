@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { Subscription } from 'rxjs';
 import { PlanDeployerService } from 'src/app/services/plan-deployer.service';
-import { Resource, StatusMsg } from 'src/interfaces';
+import { statusCollection, statusMessage } from 'src/interfaces';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { StatusDetailsComponent } from './status-details/status-details.component';
 
 @Component({
   selector: 'app-status-box',
@@ -10,30 +11,33 @@ import { Resource, StatusMsg } from 'src/interfaces';
 })
 export class StatusBoxComponent implements OnInit {
 
-  statusSub: Subscription;
-  status: StatusMsg = {
-    executionState: "",
-    messages: [""]
-  }
+  //statusSub: Subscription;
   hidden =  ["TaskId", "AliasIds", "SubDescription"];
 
-  allStatusSub: Subscription;
-  statusSubmodel: Resource[] = [];
+
+  StatusCollection: statusCollection[];
+
+  showAll = false;
 
 
-  constructor(private deployer: PlanDeployerService) {
-    this.statusSub = this.deployer.emitter.subscribe(
-      (status: StatusMsg) => {this.status = status});
-    this.allStatusSub = this.deployer.allEmitter.subscribe(
-      (status: Resource[]) => {this.statusSubmodel = status});
+  constructor(private deployer: PlanDeployerService,
+    public dialog: MatDialog) {
+    // this.statusSub = this.deployer.emitter.subscribe(
+    //   (status: StatusMsg) => {this.status = status});
+    // this.allStatusSub = this.deployer.allEmitter.subscribe(
+    //   (status: Resource[]) => {this.statusSubmodel = status});
+
+      this.StatusCollection = deployer.StatusCollection;
   }
 
   ngOnInit(): void {
   }
 
-  public dismiss() {
-    this.status.executionState = "";
-    this.status.messages = [""];
+  public dismiss(process: statusCollection) {
+    //let process = this.StatusCollection.find(process => process.taskId = taskId)
+    if(process) {
+      this.StatusCollection.splice(this.StatusCollection.indexOf(process), 1);
+    }
   }
 
   public filter(element: string | undefined) {
@@ -46,4 +50,29 @@ export class StatusBoxComponent implements OnInit {
     return print;
   }
 
+  // public checkForTaskId(id: string) {
+  //   if(this.showAll) {
+  //     return true;
+  //   } else if(this.TaskIDs.indexOf(id) >= 0) {
+  //     return true;
+  //   } else {
+  //     return false;
+  //   }
+
+  // }
+
+  public getLastStatus(status: statusMessage[]) {
+    if(status.length > 0) {
+      return status[status.length - 1];
+    } else {
+      return null;
+    }
+
+  }
+
+  public details(process: statusCollection) {
+      let dialogRef = this.dialog.open(StatusDetailsComponent)
+      dialogRef.componentInstance.process = process;
+
+  }
 }
