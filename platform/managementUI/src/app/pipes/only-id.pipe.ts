@@ -13,7 +13,10 @@ export class OnlyIdPipe implements PipeTransform {
       let i = value.indexOf(':') + 2;
       let j = value.indexOf('}') -1;
 
-      value = value.substring(i, j);
+      if(i > -1 && j > -1) {
+        value = value.substring(i, j);
+      }
+
     }
     return value;
 

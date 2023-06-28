@@ -4,6 +4,7 @@ import { firstValueFrom, Subscription } from 'rxjs';
 import { platformResponse, statusCollection, statusMessage} from 'src/interfaces';
 import { EnvConfigService } from './env-config.service';
 import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
+import { OnlyIdPipe } from '../pipes/only-id.pipe';
 
 @Injectable({
   providedIn: 'root'
@@ -27,7 +28,8 @@ export class PlanDeployerService {
 
 
   constructor(private http: HttpClient,
-    private envConfigService: EnvConfigService) {
+    private envConfigService: EnvConfigService,
+    private onlyId: OnlyIdPipe) {
     const env = this.envConfigService.getEnv();
     //the ip and urn are taken from the json.config
     if(env && env.ip) {
@@ -77,11 +79,28 @@ export class PlanDeployerService {
       "requestId":"1bfeaa30-1512-407a-b8bb-f343ecfa28cf",
       "inoutputArguments":[], "timeout":10000}
       , {responseType: 'json', reportProgress: true}));
+      console.log(response);
+      if(response.outputArguments[0].value && response.outputArguments[0].value.value) {
+        this.requestRecievedMessage(basyxFunc, this.onlyId.transform(response.outputArguments[0].value.value));
+      }
+
     } catch(e) {
       console.log(e);
     }
 
     return response;
+  }
+
+  public async requestRecievedMessage(deploy: string, taskId: string) {
+    let message = "";
+    if(deploy.indexOf("undeploy") >= 0) {
+      message = "undeploy request recieved";
+    } else if(deploy.indexOf("deploy") >= 0) {
+      message="deploy request recieved"
+    }
+    const status: statusMessage = {taskId: taskId, action: "Recieved", aliasIds: [], componentType: "", description: message, deviceId: "", id: "", progress: 0, subDescription: ""};
+    this.StatusCollection.push({taskId: taskId, isFinished: false, messages: [status]});
+
   }
 
 
@@ -125,6 +144,9 @@ export class PlanDeployerService {
       } else {
         this.StatusCollection.push({taskId: Status.taskId, isFinished: isFinished, isSuccesful: isSuccesful, messages: [Status]});
       }
+    } else {
+      console.log("WARNING: Recieved status without taskId: ");
+      console.log(Status);
     }
 
   }
