@@ -88,30 +88,33 @@ export class ServicesComponent implements OnInit {
   public async getDisplayData(tab:string, submodel:any, submodelElement: string) {
     this.currentTab = tab
     console.log("submodel: " + submodel)
-    await this.loadData(submodel, submodelElement)
-    console.log(this.filteredData)
+    if(tab != "instances") {
+      await this.loadData(submodel, submodelElement)
+      console.log(this.filteredData)
 
 
-    switch(this.currentTab) {
-      /*
-      case "deployment plans":
-        this.filterDeplPlans();
-        break;
-      case "instances":
-        this.filterInstances();
-        break;
-      */
-      case "running services":
-        this.filterServices();
-        break;
-      case "running artifacts":
-        this.filterArtifacts();
-        break;
-      default:
-        break;
+      switch(this.currentTab) {
+        /*
+        case "deployment plans":
+          this.filterDeplPlans();
+          break;
+        case "instances":
+          this.filterInstances();
+          break;
+        */
+        case "running services":
+          this.filterServices();
+          break;
+        case "running artifacts":
+          this.filterArtifacts();
+          break;
+        default:
+          break;
+      }
+      //console.log("SERVICES  Filtered data:")
+      //console.log(this.filteredData)
     }
-    //console.log("SERVICES  Filtered data:")
-    //console.log(this.filteredData)
+
   }
 
   public async loadData(submodel: any, submodelElement: any){
