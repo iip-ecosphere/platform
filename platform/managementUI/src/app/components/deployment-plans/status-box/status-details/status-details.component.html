@@ -1,0 +1,10 @@
+<h2>Details</h2>
+<div *ngIf="process">
+  <p *ngFor="let message of process.messages">
+    {{message.action}} {{message.componentType}} {{message.description}}
+  </p>
+
+</div>
+<p><mat-dialog-actions c>
+  <button mat-button mat-dialog-close>Close</button>
+</mat-dialog-actions></p>

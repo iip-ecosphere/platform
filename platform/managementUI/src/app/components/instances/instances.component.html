@@ -9,8 +9,11 @@
       <span class="row-title" >
         <span style="height: 5px; vertical-align: top; margin-right: 10px;">{{item.idShort}}</span>
       </span>
-      <div *ngFor="let property of item.value" class="subtext" >
+
+      <div *ngIf="item.value">
+        <div *ngFor="let property of item.value" class="subtext" >
           {{printDetails(property.idShort, property.value)}}
+      </div>
       </div>
     </td>
 
@@ -25,4 +28,7 @@
 
   </tr>
 </table>
+
+
+
 

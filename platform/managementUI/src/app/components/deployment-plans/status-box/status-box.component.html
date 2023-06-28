@@ -1,50 +1,44 @@
-<!-- <div class="statusContainer">
-  <mat-card *ngFor="let status of statusSubmodel">
-    <h1>{{status.idShort}}</h1>
-    <div *ngFor="let statusDetail of status.value">
-      <p *ngIf="filter(statusDetail.idShort)">{{statusDetail.idShort}}:  {{statusDetail.value}}</p>
-    </div>
 
-  </mat-card>
-</div> -->
+<!-- <button (click)="this.showAll = !this.showAll">showAll</button> -->
 
-<mat-card *ngIf="status && status.executionState != ''"
+<div class="statusContainer">
+  <mat-card *ngFor="let process of StatusCollection"
   style="background: RGB(35, 142, 183);">
 
-  <mat-card-content *ngIf="status.messages" >
-    <div style="display: flex; justify-content: flex-end">
-           <!-- *ngIf="status.executionState == 'Completed'" -->
-      <div>
-        <button mat-raised-button class="button"
-          style="align-self: flex-end"
-          (click)="dismiss()" style="background:red">
-          X
-        </button>
-      </div>
-    </div>
+  <mat-card-content>
     <div style="display: flex; justify-content: center;">
       <div>
-        <div *ngIf="status" >Status: {{ status.executionState }}</div><br>
-        <div *ngFor="let message of status.messages"> {{message}}</div>
+        <div>{{ getLastStatus(process.messages)?.action }} {{ getLastStatus(process.messages)?.componentType }}</div><br>
+        <div>{{ getLastStatus(process.messages)?.description }}</div>
+        <button mat-raised-button (click)="details(process)">more</button>
       </div>
       <div style="width: 50px"></div>
       <mat-card class="status-indicator">
         <mat-progress-spinner
-          *ngIf="status.executionState != 'Completed'
-          && status.executionState != 'ERROR'"
+          *ngIf="!process.isFinished"
           [diameter]="50" mode="indeterminate" >
         </mat-progress-spinner>
-        <mat-icon *ngIf="status.executionState === 'Completed'"
+        <mat-icon *ngIf="process.isFinished && process.isSuccesful"
           class="checkmark">
           check
         </mat-icon>
         <mat-icon
-          *ngIf="status.executionState === 'ERROR'"
+          *ngIf="process.isFinished && !process.isSuccesful"
           class="cross">
           close
         </mat-icon>
       </mat-card>
-
+    </div>
+    <div align="end">
+      <div>
+        <button mat-raised-button class="button"
+          style="align-self: flex-end"
+          (click)="dismiss(process)" style="background:red">
+          dismiss
+        </button>
+      </div>
     </div>
   </mat-card-content>
 </mat-card>
+</div>
+

@@ -150,9 +150,4 @@ export class DeploymentPlansComponent implements OnInit {
 
   }
 
-  public getStatus() {
-    console.log(this.taskId);
-    this.deployer.getStatus(this.taskId)
-  }
-
 }

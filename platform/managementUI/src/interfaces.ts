@@ -190,15 +190,24 @@ export interface AddressPart {
   }]
 }
 
-export interface StatusMsg {
-  executionState?: string;
-  messages?: string[];
+export interface statusCollection {
+  taskId: string;
+  isFinished: boolean;
+  isSuccesful?: boolean;
+  messages: statusMessage[];
 }
 
-export interface status {
+export interface statusMessage {
+  action: string;
+  aliasIds: string[];
+  componentType: string;
+  description: string;
+  deviceId: string;
+  id: string;
+  progress: number;
+  result?: string;
+  subDescription: string;
   taskId: string;
-  status: string;
-  messages: string[];
 
 }
 export interface uiGroup {

@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { Subscription, interval } from 'rxjs';
 import { ApiService } from 'src/app/services/api.service';
 import { PlanDeployerService } from 'src/app/services/plan-deployer.service';
-import { InputVariable, Resource, StatusMsg } from 'src/interfaces';
+import { InputVariable, Resource } from 'src/interfaces';
 
 @Component({
   selector: 'app-instances',
@@ -14,18 +13,10 @@ export class InstancesComponent implements OnInit {
   filteredData: any[]= [];
   deploymentPlans: Resource | undefined;
   undeployInput: InputVariable[] = [];
-  private subscription: Subscription = new Subscription();
 
-  statusSub: Subscription;
-  status: StatusMsg = {
-    executionState: "",
-    messages: [""]
-  }
 
   constructor(private api: ApiService,
     private deployer: PlanDeployerService) {
-      this.statusSub = this.deployer.emitter.subscribe(
-        (status: StatusMsg) => {this.status = status});
 
     }
 
