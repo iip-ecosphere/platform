@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { PlanDeployerService } from 'src/app/services/plan-deployer.service';
 import { statusCollection, statusMessage } from 'src/interfaces';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { StatusDetailsComponent } from './status-details/status-details.component';
 
 @Component({

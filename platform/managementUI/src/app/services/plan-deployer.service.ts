@@ -113,16 +113,17 @@ export class PlanDeployerService {
       if(Status.action === "RESULT") {
         isFinished = true;
       }
-      if(isFinished && Status.result ==="1") {
-        isSuccesful = true;
+      if(Status.action === "ERROR") {
+        isSuccesful = false;
       }
       const process = this.StatusCollection.find(process => process.taskId === Status.taskId)
       if(process) {
         process.messages.push(Status);
         process.isFinished = isFinished;
+        process.isSuccesful = isSuccesful;
 
       } else {
-        this.StatusCollection.push({taskId: Status.taskId, isFinished: isFinished, messages: [Status]});
+        this.StatusCollection.push({taskId: Status.taskId, isFinished: isFinished, isSuccesful: isSuccesful, messages: [Status]});
       }
     }
 
