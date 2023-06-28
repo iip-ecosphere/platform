@@ -1,7 +1,9 @@
 <h2>Details</h2>
 <div *ngIf="process">
   <p *ngFor="let message of process.messages">
-    {{message.action}} {{message.componentType}} {{message.description}}
+    {{message.action}} {{message.componentType}}:
+    <span [matTooltip]="message.id" style="min-width: 2em;">{{message.id}}</span>,
+    <span [matTooltip]="message.description" style="min-width: 2em">{{message.description}}</span>
   </p>
 
 </div>

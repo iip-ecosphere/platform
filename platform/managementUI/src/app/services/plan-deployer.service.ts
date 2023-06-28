@@ -91,6 +91,29 @@ export class PlanDeployerService {
     return response;
   }
 
+  public async undeployPlanById(params: any) {
+    let response;
+    try {
+      response = await firstValueFrom(this.http.post<platformResponse>(
+        this.ip
+        + '/shells/'
+        + this.urn
+        + "/aas/submodels/Artifacts/submodel/undeployPlanWithIdAsync/invoke"
+      ,{"inputArguments": params,
+        "requestId":"1bfeaa30-1512-407a-b8bb-f343ecfa28cf",
+        "inoutputArguments":[], "timeout":10000}
+      , {responseType: 'json'}));
+
+      if(response.outputArguments[0].value && response.outputArguments[0].value.value) {
+        this.requestRecievedMessage("undeploy", this.onlyId.transform(response.outputArguments[0].value.value));
+      }
+    } catch(e) {
+      console.log(e);
+    }
+
+    return response;
+  }
+
   public async requestRecievedMessage(deploy: string, taskId: string) {
     let message = "";
     if(deploy.indexOf("undeploy") >= 0) {
@@ -101,26 +124,6 @@ export class PlanDeployerService {
     const status: statusMessage = {taskId: taskId, action: "Recieved", aliasIds: [], componentType: "", description: message, deviceId: "", id: "", progress: 0, subDescription: ""};
     this.StatusCollection.push({taskId: taskId, isFinished: false, messages: [status]});
 
-  }
-
-
-  public async undeployPlanById(params: any) {
-    let response;
-    try {
-      response = await firstValueFrom(this.http.post<platformResponse>(
-        this.ip
-        + '/shells/'
-        + this.urn
-        + "/aas/submodels/Artifacts/submodel/undeployPlanWithId/invoke"
-      ,{"inputArguments": params,
-        "requestId":"1bfeaa30-1512-407a-b8bb-f343ecfa28cf",
-        "inoutputArguments":[], "timeout":10000}
-      , {responseType: 'json'}));
-    } catch(e) {
-      console.log(e);
-    }
-
-    return response;
   }
 
   private recieveStatus(Status: statusMessage) {
@@ -138,9 +141,14 @@ export class PlanDeployerService {
       const process = this.StatusCollection.find(process => process.taskId === Status.taskId)
       if(process) {
         process.messages.push(Status);
-        process.isFinished = isFinished;
-        process.isSuccesful = isSuccesful;
-
+        //status messages might not be recieved in order of the respective process step occuring,
+        //therefore, once a result or error message was recieved, isFinished must stay true once it was set to true.
+        if(process.isFinished = false) {
+          process.isFinished = isFinished;
+        }
+        if(process.isSuccesful = true) {
+          process.isSuccesful = isSuccesful;
+        }
       } else {
         this.StatusCollection.push({taskId: Status.taskId, isFinished: isFinished, isSuccesful: isSuccesful, messages: [Status]});
       }

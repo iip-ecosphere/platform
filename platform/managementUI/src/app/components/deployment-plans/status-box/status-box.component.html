@@ -3,14 +3,14 @@
 
 <div class="statusContainer">
   <mat-card *ngFor="let process of StatusCollection"
-  style="background: RGB(35, 142, 183);">
+  class="statusCard">
 
   <mat-card-content>
     <div style="display: flex; justify-content: center;">
       <div>
-        <div>{{ getLastStatus(process.messages)?.action }} {{ getLastStatus(process.messages)?.componentType }}</div><br>
-        <div>{{ getLastStatus(process.messages)?.description }}</div>
-        <button mat-raised-button (click)="details(process)">more</button>
+        <div>{{ process.messages[process.messages.length -1].action }} {{ process.messages[process.messages.length -1].componentType }}: <span class="longText" [matTooltip]="process.messages[process.messages.length -1].id">{{ process.messages[process.messages.length -1].id }}</span> </div><br>
+        <div class="longText" [matTooltip]="process.messages[process.messages.length -1].description">{{ process.messages[process.messages.length -1].description }}</div>
+        <button mat-raised-button (click)="details(process)" style="margin-top: 0.5em">more</button>
       </div>
       <div style="width: 50px"></div>
       <mat-card class="status-indicator">
