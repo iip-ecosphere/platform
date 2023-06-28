@@ -185,7 +185,7 @@ public class TaskUtils {
             try {
                 Transport.sendProcessStatus(componentId, ActionTypes.RESULT, func.apply(params));
             } catch (Throwable e) {
-                Transport.sendProcessStatus(componentId, ActionTypes.RESULT, e.getMessage());
+                Transport.sendProcessStatus(componentId, ActionTypes.ERROR, e.getMessage());
             }
             TaskRegistry.stopTask(data.getId());
         }
