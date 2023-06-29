@@ -1,12 +1,15 @@
-<h2>Details</h2>
-<div *ngIf="process">
-  <p *ngFor="let message of process.messages">
-    {{message.action}} {{message.componentType}}:
-    <span [matTooltip]="message.id" style="min-width: 2em;">{{message.id}}</span>,
-    <span [matTooltip]="message.description" style="min-width: 2em">{{message.description}}</span>
-  </p>
+<div>
+  <h2>Details</h2>
+  <div mat-dialog-content *ngIf="process">
+    <p *ngFor="let message of process.messages">
+      {{message.action}} {{message.componentType}}:
+      <span [matTooltip]="message.id" style="min-width: 2em;">{{message.id}}</span>,
+      <span [matTooltip]="message.description" style="min-width: 2em">{{message.description}}</span>
+    </p>
+
+  </div>
+  <p><mat-dialog-actions align="end">
+    <button style="background-color: RGB(35, 142, 183);" mat-button mat-dialog-close>Close</button>
+  </mat-dialog-actions></p>
 
 </div>
-<p><mat-dialog-actions align="end">
-  <button mat-button mat-dialog-close>Close</button>
-</mat-dialog-actions></p>

@@ -71,7 +71,11 @@ export class StatusBoxComponent implements OnInit {
   }
 
   public details(process: statusCollection) {
-      let dialogRef = this.dialog.open(StatusDetailsComponent)
+      let dialogRef = this.dialog.open(StatusDetailsComponent, {
+        maxHeight: '80%',
+        maxWidth:  '80%',
+
+      })
       dialogRef.componentInstance.process = process;
 
   }
