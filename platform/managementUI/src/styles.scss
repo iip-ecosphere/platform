@@ -209,12 +209,7 @@ tr:nth-child(odd) {
   @include mat.elevation(10);
 }
 
-.footer {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  background-color: rgb(136, 128, 128);
-}
+
 
 .container {
   width: 100%;

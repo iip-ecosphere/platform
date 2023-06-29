@@ -193,7 +193,7 @@ export interface AddressPart {
 export interface statusCollection {
   taskId: string;
   isFinished: boolean;
-  isSuccesful?: boolean;
+  isSuccesful: boolean; //should only be false if error message was recieved
   messages: statusMessage[];
 }
 
