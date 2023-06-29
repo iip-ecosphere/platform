@@ -22,16 +22,11 @@ export class InstancesComponent implements OnInit {
 
   async ngOnInit() {
     this.getData();
-
-    // reloading instances every 3 sec
-    /*
-    this.subscription = interval(3000).subscribe(
+    this.deployer.reloadingDataSubject.subscribe(
       (val) => { this.getInstances()});
-      */
   }
 
   public async getData() {
-    console.log("get data")
     this.getInstances();
     const artifacts = await this.api.getArtifacts();
     if(artifacts) {
@@ -41,7 +36,7 @@ export class InstancesComponent implements OnInit {
   }
 
   public async getInstances() {
-    console.log("get instances")
+    console.log("method getInstances")
     const data = await this.api.getInstances();
     if(data) {
       this.filteredData = []
