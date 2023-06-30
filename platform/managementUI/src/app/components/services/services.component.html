@@ -5,7 +5,12 @@
       <ng-template mat-tab-label >
         <span (click)="getDisplayData(tab.tabName, tab.submodel, tab.submodelElement)"
         class="custom-label">
-          {{tab.tabName}}
+          <table>
+            <tr>
+              <td class="tab-label"><img src="/assets/aas.png" class="aas-icon-tab"></td>
+              <td class="tab-label">{{tab.tabName}}</td>
+            </tr>
+          </table>
         </span>
       </ng-template>
 

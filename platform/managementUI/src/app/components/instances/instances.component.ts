@@ -24,6 +24,7 @@ export class InstancesComponent implements OnInit {
     this.getData();
     this.deployer.reloadingDataSubject.subscribe(
       (val) => { this.getInstances()});
+
   }
 
   public async getData() {
@@ -49,6 +50,12 @@ export class InstancesComponent implements OnInit {
         }
       }
     }
+
+    console.log("instances component \n filteredData: ")
+    console.log(this.filteredData)
+
+    console.log("-----------")
+
     /*
     if(data) {
       for(const element of data) {

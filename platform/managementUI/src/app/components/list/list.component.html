@@ -11,7 +11,12 @@ mat-raised-button color="success"
     <mat-tab label="{{tab.tabName}}">
       <ng-template mat-tab-label >
         <span (click)="getDisplayData(tab.tabName, tab.metaProject, tab.submodelElement)" class="custom-label">
-          {{tab.tabName}}
+          <table>
+            <tr>
+              <td class="tab-label"><img src="/assets/aas.png" class="aas-icon-tab"></td>
+              <td class="tab-label">{{tab.tabName}}</td>
+            </tr>
+          </table>
         </span>
       </ng-template>
 

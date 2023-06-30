@@ -92,16 +92,7 @@ export class ServicesComponent implements OnInit {
       await this.loadData(submodel, submodelElement)
       console.log(this.filteredData)
 
-
       switch(this.currentTab) {
-        /*
-        case "deployment plans":
-          this.filterDeplPlans();
-          break;
-        case "instances":
-          this.filterInstances();
-          break;
-        */
         case "running services":
           this.filterServices();
           break;
@@ -118,7 +109,7 @@ export class ServicesComponent implements OnInit {
   }
 
   public async loadData(submodel: any, submodelElement: any){
-
+    console.log("submodel: " + submodel + ", submodelElement: " + submodelElement)
     let response;
     try {
         response = await firstValueFrom(
@@ -132,8 +123,6 @@ export class ServicesComponent implements OnInit {
         console.log(e);
       }
     this.filteredData = response
-    //console.log("resposnse: ")
-    //console.log(response)
 
     if(this.currentTab != "instances") {
       this.filteredData = this.filteredData.value

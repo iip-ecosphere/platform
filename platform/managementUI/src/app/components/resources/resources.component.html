@@ -8,7 +8,9 @@
           <mat-card-content>
             <div id="box">
               <div>
+                <img src="/assets/aas.png" alt="image" class="img-aas">
                 <h1>{{ element.idShort }}</h1>
+
                 <p *ngIf="element.generalInformation && element.generalInformation.ManufacturerName; else noName">
                   {{element.generalInformation.ManufacturerName}}</p>
                 <ng-template #noName>Unknown Manufacturer</ng-template>
