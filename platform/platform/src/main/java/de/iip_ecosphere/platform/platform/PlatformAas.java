@@ -116,7 +116,7 @@ public class PlatformAas implements AasContributor {
         smB.createOperationBuilder(NAME_OPERATION_UNDEPLOY_WITHID_ASYNC)
             .addInputVariable("url", Type.STRING)
             .addInputVariable("instanceId", Type.STRING)
-            .setInvocable(iCreator.createInvocable(NAME_OPERATION_UNDEPLOY_ASYNC))
+            .setInvocable(iCreator.createInvocable(NAME_OPERATION_UNDEPLOY_WITHID_ASYNC))
             .build(Type.STRING);
         smB.createOperationBuilder(NAME_OPERATION_GET_TASK_STATUS)
             .addInputVariable("taskId", Type.STRING)
