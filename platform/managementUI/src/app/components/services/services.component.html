@@ -33,26 +33,28 @@
         *ngIf="tab.tabName == 'running services' || tab.tabName == 'running artifacts'; else elseOption">
         <tr *ngFor="let item of filteredData; let i = index">
 
+          <!-- <td *ngIf="hasCorrectState(item.state)"  style="width: 2%; text-align: center;"> {{i + 1}} </td> -->
           <td style="width: 2%; text-align: center;"> {{i + 1}} </td>
 
           <!-- Item -->
           <td style="width: 100%;">
 
             <span class="row-title" >
-              <span style="height: 5px; vertical-align: top; margin-right: 10px;">{{item.idShort}}</span>
+              <span style="height: 5px; vertical-align: top; margin-right: 10px;">{{item.name}}</span>
             </span>
             <div *ngIf="item.logo">
               <img src={{item.logo}} class="service-icon">
             </div>
             <div *ngFor="let property of item.value" class="subtext" >
-              <div *ngIf="property.value">
-                {{property.value}}
-              </div>
+              {{displayValue(property)}}
             </div>
           </td>
 
           <!-- Buttons -->
           <td class="cell-with-button">
+            <div *ngIf="tab.tabName == 'running services'">
+              <button mat-raised-button class="button" (click)="getLogs(item.idShort)">logs</button>
+            </div>
           </td>
 
         </tr>

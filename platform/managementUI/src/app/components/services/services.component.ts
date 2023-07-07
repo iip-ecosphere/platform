@@ -2,12 +2,14 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from 'src/app/services/api.service';
 import { EnvConfigService } from 'src/app/services/env-config.service';
-import { PlatformArtifacts, Resource, PlatformServices }
+import { PlatformArtifacts, Resource, PlatformServices, InputVariable, platformResponse }
   from 'src/interfaces';
 import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { PlanDeployerService } from 'src/app/services/plan-deployer.service';
 import { OnlyIdPipe } from 'src/app/pipes/only-id.pipe';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
+import { LogsDialogComponent } from './logs/logs-dialog.component';
 
 @Component({
   selector: 'app-services',
@@ -19,7 +21,8 @@ export class ServicesComponent implements OnInit {
   constructor(public http: HttpClient,
     public api: ApiService,
     private router: Router,
-    private envConfigService: EnvConfigService){
+    private envConfigService: EnvConfigService,
+    public dialog: MatDialog){
 
       const env = this.envConfigService.getEnv();
       if(env && env.ip) {
@@ -49,6 +52,12 @@ export class ServicesComponent implements OnInit {
   undeployPlanInput: any;
   undeployPlanByIdInput: any;
   taskId: string = "";
+
+  /* logs stream mode mode="START"|"TAIL"
+  (start=log from start, tail=continue at end as selecter by user)*/
+  mode = "START"
+  serviceMgr:string | undefined;
+  logsData:string | undefined;
 
   tabsParam = [
     {tabName: "deployment plans",
@@ -80,17 +89,88 @@ export class ServicesComponent implements OnInit {
     ["applicationInstanceId", "App instance: ", ""]
   ]
 
+
+
+
   ngOnInit(): void {
     //this.getServices();
     //this.getArtifacts();
   }
 
+  // ---------------------
+
+  public async getLogs(serviceId:string) {
+    console.log("Method <getLogs> with id: " + serviceId)
+
+    /*
+    // getting endpoint
+    const param = await this.getInputVariable(serviceId)
+    //const param = this.getInputVariable(serviceId)
+    console.log("param: ")
+    console.log(param)// --------------------- display ------------------------------
+
+    public displayValue(item: any) {
+      let key = Object.entries(item)[0][0]
+      let value = Object.entries(item)[0][1]
+      let valueToDisplay = value
+      for (let param of this.paramToDisplay) {
+        if(param[0] == key) {
+          valueToDisplay = param[1] + value
+        }
+      }
+      return valueToDisplay
+    }
+      param
+    ) as unknown as platformResponse
+
+    let resp = this.getPlatformResponseResolution(logsDataValue)
+    console.log("exec")
+    console.log(resp)
+    console.log("---")
+
+    // getting stream from websocket
+    */
+
+    // creating dialog
+    const dialogConfig = new MatDialogConfig();
+
+    dialogConfig.data = {
+      serviceId: serviceId,
+      logs: "test logs data from service component",
+      value: this.logsData
+    }
+    //dialogConfig.height = "90%"
+
+    let dialogRef = this.dialog.open(LogsDialogComponent, dialogConfig);
+
+    dialogRef.afterClosed().subscribe(() => {
+      console.log("LogsDialog closed");
+    })
+  }
+
+  public async getPlatformData(submodel: any, submodelElement: any){
+    let response: any;
+
+    try {
+        response = await firstValueFrom(
+          this.http.get(this.ip + '/shells/'
+        + this.urn
+        + "/aas/submodels/"
+        + submodel
+        + "/submodel/submodelElements/"
+        + submodelElement));
+      } catch(e) {
+        console.log(e);
+      }
+    return response
+  }
+
+
   public async getDisplayData(tab:string, submodel:any, submodelElement: string) {
     this.currentTab = tab
-    console.log("submodel: " + submodel)
     if(tab != "instances") {
       await this.loadData(submodel, submodelElement)
-      console.log(this.filteredData)
+      //console.log(this.filteredData)
 
       switch(this.currentTab) {
         case "running services":
@@ -109,8 +189,9 @@ export class ServicesComponent implements OnInit {
   }
 
   public async loadData(submodel: any, submodelElement: any){
-    console.log("submodel: " + submodel + ", submodelElement: " + submodelElement)
     let response;
+    response = await this.getPlatformData(submodel, submodelElement)
+    /*
     try {
         response = await firstValueFrom(
           this.http.get(this.ip + '/shells/'
@@ -122,6 +203,7 @@ export class ServicesComponent implements OnInit {
       } catch(e) {
         console.log(e);
       }
+      */
     this.filteredData = response
 
     if(this.currentTab != "instances") {
@@ -140,18 +222,10 @@ export class ServicesComponent implements OnInit {
       console.log(e);
     }
     this.technicalData = response
-    console.log("# (getTechnicalData) response:")
-    console.log(response)
+    //console.log("# (getTechnicalData) response:")
+    //console.log(response)
   }
-  /*
-  public isNotUrl(value:string) {
-    if(value.startsWith("http")) {
-      return false
-    } else {
-      return true
-    }
-  }
-*/
+
   public async getManufacturerInfo(url:string) {
     console.log("# (getManfInfo)")
     console.log("url: " + url)
@@ -187,25 +261,26 @@ export class ServicesComponent implements OnInit {
   // Filter ------------------------------------
 
   public async filterServices() {
-
     let result = []
     for (let tableRow of this.filteredData) {
       let temp = []
-      let name
+      let itemName
       let imgPath
+      let itemIdShort = tableRow.idShort
       for (let rowValues of tableRow.value) {
         if (rowValues.idShort == "name") {
-          name = rowValues.value
+          itemName = rowValues.value
         }
 
         for (let param of this.paramToDisplay) {
           if (rowValues.idShort == param[0] && rowValues.value != "") {
-            let new_rowValue =  { "value":  param[1] + rowValues.value + param[2]}
+            let new_rowValue =  { [param[0]]: rowValues.value }
             temp.push(new_rowValue)
           }
         }
 
-        // getting manufacturer info
+        // getting manufacturer info TODO
+        /*
         if (rowValues.idShort == "serviceAas") {
           let serviceTechData = this.getManufacturerInfo(rowValues.value)
           for (let value of await serviceTechData) {
@@ -218,9 +293,9 @@ export class ServicesComponent implements OnInit {
             temp.push(new_rowValue)
           }
         }
+        */
       }
-      let new_value = {idShort: name, logo: imgPath, value: temp}
-      //let new_value = {idShort: name, value: temp}
+      let new_value = {name: itemName, idShort: itemIdShort, logo: imgPath, value: temp}
       result.push(new_value)
     }
     this.filteredData = result
@@ -248,67 +323,118 @@ export class ServicesComponent implements OnInit {
     }
     this.filteredData = result
   }
+  correctStates = ["STARTING", "RUNNING", "STOPPING"]
 
-    /*
-  public filterDeplPlans() {
-    let result = []
-    for (let tableRow of this.filteredData) {
-      let temp = []
-      let name
-      for (let rowValues of tableRow.value) {
-        if (rowValues.idShort == "id") {
-          name = rowValues.value
-        }
-        for (let param of this.paramToDisplay) {
-          if (rowValues.idShort == param[0]) {
-            let new_rowValue =  { "value":  param[1] + rowValues.value + param[2]}
-            temp.push(new_rowValue)
-          }
-        }
-      }
-      let new_value = {idShort: name, value: temp, plan: tableRow}
-      result.push(new_value)
+
+  public hasCorrectState(state: string) {
+
+    if (this.correctStates.includes(state)) {
+      return true
+    } else {
+      return false
     }
-    this.filteredData = result
   }
 
-  public filterInstances() {
-    let result = []
-    for (let tableRow of this.filteredData) {
-      let temp = []
-      let name
-      if(tableRow.value) {
-        for (let rowValues of tableRow.value) {
-          if(rowValues.idShort == "appId") {
-            name = rowValues.value
-          }
-          for (let param of this.paramToDisplay) {
-            if (rowValues.idShort == param[0]) {
-              let new_rowValue
-              if(rowValues.idShort == "timestamp") {
-                const temp = Number(rowValues.value);
-                let date = new Date(temp);
-                new_rowValue =  { "value":  param[1] + date}
-              } else {
-                new_rowValue =  { "value":  param[1] + rowValues.value + param[2]}
-              }
-              //let new_rowValue =  { "value":  param[1] + rowValues.value + param[2]}
-              temp.push(new_rowValue)
-            }
-          }
-        }
-      }
-      if (name) { // TODO with this if I remove this strage item with "....max" name
-        let new_value = {idShort: name, value: temp}
-        result.push(new_value)
+  // --------------------- display ------------------------------
+  /** Create a 'human-friendly' string to display
+   * based on values in this.paramToDisplay
+   e.g. instead of '0.1.0' it is 'Version: 0.1.0' */
+  public displayValue(item: any) {
+    let key = Object.entries(item)[0][0]
+    let value = Object.entries(item)[0][1]
+    let valueToDisplay = value
+    for (let param of this.paramToDisplay) {
+      if(param[0] == key) {
+        valueToDisplay = param[1] + value
       }
     }
-    this.filteredData = result
+    return valueToDisplay
   }
-  */
+
 
   // ------------------------- buttons ---------------------------
 
+  // -------------------------- logs-dialog ----------------------
+    /*
+  public getPlatformResponseResolution(response:platformResponse) {
+    let return_value = [null, null];
+    console.log("resposne in getPlat..")
+    console.log(response)
+
+    if(response && response.outputArguments) {
+
+      let output = response.outputArguments[0]?.value?.value;
+      console.log("output")
+      console.log(output)
+      if (output) {
+        let temp = JSON.parse(output);
+        if (temp.result) {
+          let result = JSON.parse(temp.result);
+          if (result.naming.en.description) {
+            return_value = [result.naming.en.name, result.naming.en.description]
+          } else {
+            return_value = [result.naming.en.name, null]
+          }
+        }
+      }
+    }
+    return return_value
+  }
+
+  public async getInputVariable(serviceId:string) {
+    let serviceInfo = this.getServiceInfo("services", "services/" + serviceId)
+    //console.log("service info: " + (await serviceInfo).resource + ", " + (await serviceInfo).serviceMgr)
+
+    let inputVariables: InputVariable[] = [];
+    let input0:InputVariable = {
+      value: {
+        modelType: {
+          //name: "OperationVariable"
+          name: "Property"
+        },
+        valueType: "string",
+        idShort: "id",
+        kind: "Template",
+        value: (await serviceInfo).resource
+      }
+    }
+
+    let input1:InputVariable = {
+      value: {
+        modelType: {
+          //name: "OperationVariable"
+          name: "Property"
+        },
+        valueType: "string",
+        idShort: "mode",
+        kind: "Template",
+        value: this.mode
+      }
+    }
+    inputVariables.push(input0)
+    inputVariables.push(input1)
+
+    return inputVariables
+
+  }
+
+  public async getServiceInfo(submodel: any, submodelElement: any){
+    let response: any;
+    response = await this.getPlatformData(submodel, submodelElement)
+
+    let serviceResource
+    let serviceServiceMgr
+    if (response) {
+      serviceResource = response.value.find(
+        (val: { idShort: string; }) => val.idShort === "resource").value
+      serviceServiceMgr = response.value.find(
+        (val: { idShort: string; }) => val.idShort === "serviceMgr").value
+    }
+    this.serviceMgr = serviceServiceMgr
+    return {resource: serviceResource, serviceMgr: serviceServiceMgr}
+
+  }
+  */
 
 
   //--------------------------------- old ------------------------
