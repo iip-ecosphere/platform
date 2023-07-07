@@ -1,0 +1,12 @@
+<mat-toolbar>
+  <h1>Logs for {{logsData.serviceId}}</h1>
+  <span style="flex: 1 1 auto"></span>
+  <span><button mat-icon-button class="button" color="warning"
+    (click)="close()"><mat-icon>close</mat-icon></button></span>
+</mat-toolbar>
+
+<mat-card *ngIf="logsData.logs">
+  <div>LOGS: {{logs}}</div>
+  <div *ngIf="logsData.value">HIER {{logsData.value.idShort}}</div>
+
+</mat-card>

@@ -40,7 +40,11 @@ import { InstancesComponent } from './components/instances/instances.component';
 import { EditorComponent } from './components/editor/editor.component';
 import { InputRefSelectComponent } from './components/editor/input-ref-select/input-ref-select.component';
 import { MatDialogModule } from '@angular/material/dialog';
-import { StatusDetailsComponent } from './components/deployment-plans/status-box/status-details/status-details.component';
+import { StatusDetailsComponent }
+  from './components/deployment-plans/status-box/status-details/status-details.component';
+import {LogsDialogComponent}
+  from './components/services/logs/logs-dialog.component';
+
 
 @NgModule({
   declarations: [
@@ -59,7 +63,8 @@ import { StatusDetailsComponent } from './components/deployment-plans/status-box
     InstancesComponent,
     EditorComponent,
     InputRefSelectComponent,
-    StatusDetailsComponent
+    StatusDetailsComponent,
+    LogsDialogComponent
   ],
   imports: [
     BrowserModule,
