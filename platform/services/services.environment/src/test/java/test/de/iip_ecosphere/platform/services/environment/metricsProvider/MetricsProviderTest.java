@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.io.StringReader;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
@@ -12,12 +13,14 @@ import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.services.environment.metricsProvider.CapacityBaseUnit;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.MetricsProvider;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.meterRepresentation.MeterRepresentation;
+import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import test.de.iip_ecosphere.platform.services.environment.metricsProvider.utils.TestUtils;
 import static test.de.iip_ecosphere.platform.services.environment.metricsProvider.utils.TestUtils.assertThrows;
@@ -30,6 +33,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Statistic;
 import io.micrometer.core.instrument.Timer;
 import io.micrometer.core.instrument.config.MeterFilter;
+import io.micrometer.core.instrument.search.RequiredSearch;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 
 /**
@@ -328,8 +332,7 @@ public class MetricsProviderTest {
     public void testJson() {
         double gValue = 10;
         Counter counter = Counter
-            .builder("service.sent")
-            .baseUnit("tuple/s")
+            .builder("service.sent").baseUnit("tuple/s")
             .description("Tuples sent out by a service")
             .tags("service", "SimpleReceiver", "application", "SimpleMeshApp", "device", "dev0")
             .register(provider.getRegistry());
@@ -355,11 +358,12 @@ public class MetricsProviderTest {
         MetricsProvider.increaseCounterBy(counter, 1);
         timer.record(() -> { TimeUtils.sleep(400); return "ABBA"; });
         MetricsProvider.recordMsTime(timer, () -> 400, () -> { }); // pretend there were another 400 ms
+        MetricsProvider.recordNsTime(timer, () -> 400, () -> { }); // and some 400 ns
         
         String json = provider.toJson("id0", false,
             MeterFilter.acceptNameStartsWith("service.sent"),
             MeterFilter.denyNameStartsWith("services.received"));
-
+        assertMeters(json, provider.getRegistry());
         JsonObject obj = Json.createReader(new StringReader(json)).readObject();
         String id = obj.getString("id");
         assertEquals("id0", id);
@@ -402,6 +406,34 @@ public class MetricsProviderTest {
                         }
                     }
                 }
+            }
+        }
+    }
+
+    /**
+     * Asserts that the meters in {@code json} are in the originating {@code registry} and of the same meter type.
+     * 
+     * @param json the JSON representation
+     * @param registry the registry to check against
+     */
+    private void assertMeters(String json, MeterRegistry registry) {
+        JsonObject obj = Json.createReader(new StringReader(json)).readObject();
+        String id = obj.getString("id");
+        Assert.assertNotNull(id);
+        Assert.assertTrue(id.length() > 0);
+        for (Map.Entry<String, JsonValue> e : obj.getJsonObject("meters").entrySet()) {
+            Meter meter = MeterRepresentation.parseMeter(e.getValue().toString(), "device:abcd");
+            RequiredSearch s = registry.get(meter.getId().getName());
+            Assert.assertNotNull(s.meter());
+            Assert.assertTrue(meter.getId().getType() == s.meter().getId().getType());
+            List<Measurement> mMeasure = CollectionUtils.toList(meter.measure().iterator());
+            List<Measurement> sMeasure = CollectionUtils.toList(s.meter().measure().iterator());
+            Assert.assertEquals(mMeasure.size(), sMeasure.size());
+            for (int i = 0; i < mMeasure.size(); i++) {
+                Measurement mM = mMeasure.get(i);
+                Measurement sM = sMeasure.get(i);
+                Assert.assertEquals(mM.getValue(), sM.getValue(), 0.01);
+                Assert.assertEquals(mM.getStatistic(), sM.getStatistic());
             }
         }
     }

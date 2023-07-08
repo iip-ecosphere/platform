@@ -30,6 +30,7 @@ class BroadcastingWsServer extends WebSocketServer {
      */
     BroadcastingWsServer(ServerAddress address) {
         super(new InetSocketAddress(address.getHost(), address.getPort()));
+        setReuseAddr(false); // ToTallNate #220 -> allow rebind
         this.address = address;
     }
     
