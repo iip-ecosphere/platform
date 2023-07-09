@@ -863,6 +863,7 @@ public class SpringCloudServiceManager
                     desc.closeCloseables(s -> isLogStreamCloseable(s), c -> {
                         return (c instanceof LogTailerListener) && ((LogTailerListener) c).decreaseUsageCount() == 0;
                     });
+                    LOGGER.info("Stopping log streaming for {}", serviceId);
                 } else {
                     desc.iterClosables(s -> isLogStreamCloseable(s), null, c -> {
                         if (c instanceof LogTailerListener) {
@@ -877,9 +878,16 @@ public class SpringCloudServiceManager
                             attachTailer(inst, "stderr", mode, desc, uris);
                         }
                     }
+                    LOGGER.info("Starting/registering log streaming for {}: {}", serviceId, uris);
                 }
+            } else {
+                LOGGER.info("Log streaming request for {} not fulfilled: deployer state {}", 
+                    serviceId, status.getState());
             }
             result = JsonUtils.toJson(uris);
+        } else {
+            LOGGER.info("Log streaming request for {} not fulfilled: mode {}, loggable {}, desc {}", serviceId, mode, 
+                isLoggable(desc), desc);
         }
         return result;
     }
