@@ -142,6 +142,36 @@
                          <attach>true</attach>
                      </configuration>
                  </execution>
+                 <execution>
+                     <id>myArtifact</id>
+                     <phase>test</phase>
+                     <goals>
+                         <goal>single</goal>
+                     </goals>
+                     <configuration>
+                         <descriptors>
+                             <descriptor>src/main/assembly/myArtifact.xml</descriptor>
+                         </descriptors>
+                         <outputDirectory>${project.build.directory}/artifacts</outputDirectory>
+                         <attach>false</attach>
+                         <finalName>myArtifact</finalName>
+                         <appendAssemblyId>false</appendAssemblyId>
+                     </configuration>
+                 </execution>
+                 <execution>
+                     <id>artifacts</id>
+                     <phase>test</phase>
+                     <goals>
+                         <goal>single</goal>
+                     </goals>
+                     <configuration>
+                         <descriptors>
+                             <descriptor>src/main/assembly/artifacts.xml</descriptor>
+                         </descriptors>
+                         <outputDirectory>${project.build.directory}</outputDirectory>
+                         <attach>true</attach>
+                     </configuration>
+                 </execution>
              </executions>
          </plugin>
      </plugins>
