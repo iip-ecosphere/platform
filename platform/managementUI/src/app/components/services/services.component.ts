@@ -10,6 +10,7 @@ import { PlanDeployerService } from 'src/app/services/plan-deployer.service';
 import { OnlyIdPipe } from 'src/app/pipes/only-id.pipe';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { LogsDialogComponent } from './logs/logs-dialog.component';
+import {MatRadioChange, MatRadioModule} from '@angular/material/radio';
 
 @Component({
   selector: 'app-services',
@@ -42,6 +43,7 @@ export class ServicesComponent implements OnInit {
   ip: string = "";
   urn:string = "";
   filteredData: any;
+  dataToDisplay: any;
   technicalData: any; // manufacture info for services
   currentTab:string = "";
 
@@ -58,6 +60,12 @@ export class ServicesComponent implements OnInit {
   mode = "START"
   serviceMgr:string | undefined;
   logsData:string | undefined;
+
+  // Radio-Button in 'Running Services' tab
+  options: string[] = ["active", "all"]
+  selectedOption: string = this.options[0]; // default option
+  // Service state
+  correctStates = ["STARTING", "RUNNING", "STOPPING"]
 
   tabsParam = [
     {tabName: "deployment plans",
@@ -89,12 +97,13 @@ export class ServicesComponent implements OnInit {
     ["applicationInstanceId", "App instance: ", ""]
   ]
 
-
-
-
   ngOnInit(): void {
     //this.getServices();
     //this.getArtifacts();
+  }
+
+  public onRadioChange(event: MatRadioChange) {
+    this.filterForCorrectState()
   }
 
   // ---------------------
@@ -299,9 +308,31 @@ export class ServicesComponent implements OnInit {
       result.push(new_value)
     }
     this.filteredData = result
+    this.dataToDisplay = result
+    this.filterForCorrectState()
+
+
     console.log("# (filterService) filteredData:")
     console.log(this.filteredData)
+    console.log('# (filterServices) dataToDisplay:')
+    console.log(this.dataToDisplay)
 
+  }
+
+  public filterForCorrectState() {
+    if (this.selectedOption == "all") {
+      this.dataToDisplay = this.filteredData
+    } else {
+      let temp = []
+      for (let item of this.filteredData) {
+        for (let value of item.value) {
+          if (this.correctStates.includes(value["state"])) {
+            temp.push(item)
+          }
+        }
+      }
+      this.dataToDisplay = temp
+    }
   }
 
   public filterArtifacts() {
@@ -323,8 +354,6 @@ export class ServicesComponent implements OnInit {
     }
     this.filteredData = result
   }
-  correctStates = ["STARTING", "RUNNING", "STOPPING"]
-
 
   public hasCorrectState(state: string) {
 
@@ -349,6 +378,22 @@ export class ServicesComponent implements OnInit {
       }
     }
     return valueToDisplay
+  }
+
+  public isDataToDisplayEmpty() {
+    let result = false
+    let i = 0
+    if (typeof this.dataToDisplay === "undefined") {
+      result = true
+    } else {
+      for(let x of this.dataToDisplay) {
+        i++
+      }
+      if (i == 0) {
+        result = true
+      }
+    }
+    return result
   }
 
 
