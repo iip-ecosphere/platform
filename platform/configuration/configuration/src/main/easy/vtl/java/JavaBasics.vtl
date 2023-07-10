@@ -191,9 +191,17 @@ template JavaBasics(Configuration config, FileArtifact target) {
     def String getArtifact(JavaService service) {
         service.artifact;
     }
+    
+    def String getArtifact(PythonService service) {
+        service.artifact;
+    }
 
     def String getArtifact(Connector conn) {
         conn.artifact;
+    }
+
+    def String getArtifact(Server ser) {
+        ser.artifact;
     }
 
     def String getSelectorArtifact(FamilyMemberSelector sel) {
@@ -203,6 +211,27 @@ template JavaBasics(Configuration config, FileArtifact target) {
     def String getSelectorArtifact(ServiceSelectorBasedFamilyMemberSelector sel) {
         sel.artifact;
     }
+    
+    @DispatchBasis
+    def setOf(String) getArtifacts(ServiceBase service) {
+        setOf(String) r = {};
+        r;
+    }
+
+    @DispatchCase
+    def setOf(String) getArtifacts(Service service) {
+        service.artifacts;
+    }
+    
+    @DispatchCase
+    def setOf(String) getArtifacts(PythonService service) {
+        service.artifacts;
+    }
+
+    @DispatchBasis
+    def setOf(String) getArtifacts(Server server) {
+        server.artifacts;
+    }    
     
     // ------------------------------------------ families ----------------------------------
     

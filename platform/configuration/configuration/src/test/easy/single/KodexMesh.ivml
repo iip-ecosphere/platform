@@ -60,7 +60,7 @@ project KodexMesh {
         actions = {{field=refBy(rec1.fields[1]), action=KodexAction::PseudonymizeMerengue}}
     };
     
-    Service myPythonService = PythonService {
+    PythonService myPythonService = PythonService {
         id = "KodexPythonService",
         name = "Kodex Python Service",
         description = "",
@@ -80,7 +80,8 @@ project KodexMesh {
             name="sParam",
             defaultValue="abc"
           }
-        }        
+        }, 
+        artifacts = {"myArtifact.zip"}
     };
     
     Service myReceiverService = JavaService {

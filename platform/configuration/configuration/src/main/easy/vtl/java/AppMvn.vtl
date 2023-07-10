@@ -89,8 +89,12 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
             String fName = "";
             if (tmp.size() > 4) {
                 fName = tmp[4];
-            }            
-            appendAssemblyDescriptor(assemblyPlugin, id, path, attach=true, outputDir=outDir, finalName=fName, phase=phase);
+            }
+            Boolean attach = true;
+            if (tmp.size() > 5) {
+                attach = tmp[5] == "true";
+            }
+            appendAssemblyDescriptor(assemblyPlugin, id, path, attach=attach, outputDir=outDir, finalName=fName, phase=phase);
         }
         //appendIipPythonPlugin(plugins, projectVersion);
         if (springPackaging) {
