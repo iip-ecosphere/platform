@@ -517,9 +517,11 @@ class CliBackend {
         String appInstanceId = null;
         try {
             TaskData taskData = TaskRegistry.getTaskData();
+            String taskId = null;
             if (null != taskData) {
                 int numServices = p.getAssignments().stream().mapToInt(a -> a.getServices().size()).sum();
                 taskData.setMaxEventCount(2 * numServices); // two events per service
+                taskId = taskData.getId();
             }
             if (!p.isMultiExecution()) {
                 ApplicationInstancesAasClient cl = new ApplicationInstancesAasClient();
@@ -538,7 +540,7 @@ class CliBackend {
                     println("Adding artifact '" + art + "' to resource " + a.getResource());
                     ServicesClient client = getServicesFactory().create(a.getResource(), p.getAppId());
                     serviceClients.put(a.getResource(), client);
-                    client.addArtifact(art);
+                    client.addArtifactAsTask(taskId, art); // copes with taskId null
                     printlnDone();
                 } catch (ExecutionException e) {
                     checkAlreadyKnown(e, ServicesClient.EXC_ALREADY_KNOWN, "artifact", art.toString());
@@ -634,8 +636,10 @@ class CliBackend {
             List<ServiceResourceAssignment> assignments = new ArrayList<>(p.getAssignments());
             Collections.reverse(assignments);
             TaskData taskData = TaskRegistry.getTaskData();
+            String taskId = null;
             if (null != taskData) {
                 taskData.setMaxEventCount(assignments.size()); // simplified for now
+                taskId = taskData.getId();
             }
             for (ServiceResourceAssignment a: assignments) {
                 println("Obtaining AAS client for " + a.getResource() + " " + p.getAppId());
@@ -649,11 +653,7 @@ class CliBackend {
                     running += Math.max(client.getServiceInstanceCount(services[i]) - 1, 0); // stopping one
                 }
                 stillRunning.put(a.getResource(), running);
-                if (null != taskData) {
-                    client.stopServiceAsTask(taskData.getId(), services);
-                } else {
-                    client.stopService(services);
-                }
+                client.stopServiceAsTask(taskId, services); // copes with taskId null
             }
             if (p.isOnUndeployRemoveArtifact()) {
                 Set<String> done = new HashSet<String>();
@@ -665,7 +665,7 @@ class CliBackend {
                         URI art = getArtifact(artifact, a);
                         String uri = art.normalize().toString();
                         println("Removing artifact " + art + " from " + resourceId);
-                        serviceClients.get(resourceId).removeArtifact(uri); // works also with Artifact URI
+                        serviceClients.get(resourceId).removeArtifactAsTask(uri, taskId); // works with URI and null
                     } else if (!alreadyDone) {
                         println("Not removing artifact from " + resourceId + " as there is still a running instance");
                     }

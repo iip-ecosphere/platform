@@ -298,6 +298,15 @@ public class CliTest {
         public int getServiceInstanceCount(String serviceId) {
             return 0;
         }
+
+        @Override
+        public String addArtifactAsTask(String taskId, URI location) throws ExecutionException {
+            return null;
+        }
+
+        @Override
+        public void removeArtifactAsTask(String taskId, String artifactId) throws ExecutionException {
+        }
         
     }
 
