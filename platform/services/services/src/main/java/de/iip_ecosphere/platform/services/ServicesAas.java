@@ -127,7 +127,9 @@ public class ServicesAas implements AasContributor {
     public static final String NAME_OP_SERVICE_GET_STATE = "getServiceSate";
     public static final String NAME_OP_SERVICE_SET_STATE = "setServiceSate";
     public static final String NAME_OP_ARTIFACT_ADD = "addArtifact";
+    public static final String NAME_OP_ARTIFACT_ADD_TASK = "addArtifactAsTask";
     public static final String NAME_OP_ARTIFACT_REMOVE = "removeArtifact";
+    public static final String NAME_OP_ARTIFACT_REMOVE_TASK = "removeArtifactAsTask";
     public static final String NAME_OP_SERVICE_INSTANCE_COUNT  = "getServiceInstanceCount";
     public static final String NAME_OP_SERVICE_STATE_COUNT  = "getServiceStateCount";
     public static final String NAME_OP_SERVICE_STREAM_LOG = "serviceStreamLog";
@@ -210,6 +212,13 @@ public class ServicesAas implements AasContributor {
             .addInputVariable("url", Type.STRING)
             .addOutputVariable("result", Type.STRING)
             .build();
+        // probably relevant ops only
+        builder.createOperationBuilder(NAME_OP_ARTIFACT_ADD_TASK)
+            .setInvocable(iCreator.createInvocable(getQName(NAME_OP_ARTIFACT_ADD_TASK)))
+            .addInputVariable("url", Type.STRING)
+            .addInputVariable("taskId", Type.STRING)
+            .addOutputVariable("result", Type.STRING)
+            .build();
         builder.createOperationBuilder(NAME_OP_SERVICE_INSTANCE_COUNT)
             .setInvocable(iCreator.createInvocable(getQName(NAME_OP_SERVICE_INSTANCE_COUNT)))
             .addInputVariable("id", Type.STRING)
@@ -219,6 +228,7 @@ public class ServicesAas implements AasContributor {
             .addInputVariable("state", Type.STRING)
             .build(Type.STRING);
         createIdOp(builder, NAME_OP_ARTIFACT_REMOVE, iCreator);
+        createIdOp(builder, NAME_OP_ARTIFACT_REMOVE_TASK, iCreator, "taskId");
         builder.createPropertyBuilder(NAME_PROP_SUPPORTED_APPIDS)
             .setValue(Type.STRING, String.join(",", ServiceFactory.getSetup().getSupportedAppIds()))
             .build();
@@ -383,11 +393,22 @@ public class ServicesAas implements AasContributor {
                 return ServiceFactory.getServiceManager().addArtifact(readUri(p, 0, EMPTY_URI)); 
             }
         ));
+        sBuilder.defineOperation(getQName(NAME_OP_ARTIFACT_ADD_TASK), 
+            new JsonResultWrapper(p -> { 
+                return ServiceFactory.getServiceManager().addArtifact(readUri(p, 0, EMPTY_URI)); 
+            }, p -> readString(p, 1) // taskId
+        ));
         sBuilder.defineOperation(getQName(NAME_OP_ARTIFACT_REMOVE), 
             new JsonResultWrapper(p -> { 
                 ServiceFactory.getServiceManager().removeArtifact(readString(p)); 
                 return null;
             }
+        ));
+        sBuilder.defineOperation(getQName(NAME_OP_ARTIFACT_REMOVE_TASK), 
+            new JsonResultWrapper(p -> { 
+                ServiceFactory.getServiceManager().removeArtifact(readString(p)); 
+                return null;
+            }, p -> readString(p, 1) // taskId
         ));
     }
 

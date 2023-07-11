@@ -157,9 +157,30 @@ public class ServicesAasClient extends SubmodelElementsCollectionClient implemen
         return fromJson(getOperation(ServicesAas.NAME_OP_ARTIFACT_ADD).invoke(location.toString()));
     }
 
+
+    @Override
+    public String addArtifactAsTask(String taskId, URI location) throws ExecutionException {
+        String result;
+        if (null == taskId) {
+            result = addArtifact(location);
+        } else {
+            result = fromJson(getOperation(ServicesAas.NAME_OP_ARTIFACT_ADD_TASK).invoke(location.toString(), taskId));
+        }
+        return result;
+    }
+
     @Override
     public void removeArtifact(String artifactId) throws ExecutionException {
         fromJson(getOperation(ServicesAas.NAME_OP_ARTIFACT_REMOVE).invoke(artifactId));
+    }
+
+    @Override
+    public void removeArtifactAsTask(String taskId, String artifactId) throws ExecutionException {
+        if (null == taskId) {
+            removeArtifact(artifactId);
+        } else {
+            fromJson(getOperation(ServicesAas.NAME_OP_ARTIFACT_REMOVE_TASK).invoke(artifactId, taskId));
+        }
     }
 
     @Override
@@ -337,24 +358,36 @@ public class ServicesAasClient extends SubmodelElementsCollectionClient implemen
 
     @Override
     public void startServiceAsTask(String taskId, String... serviceId) throws ExecutionException {
-        fromJson(getOperation(ServicesAas.NAME_OP_SERVICE_START_TASK)
-            .invoke(JsonUtils.toJson(serviceId), taskId));
+        if (null == taskId) {
+            startService(serviceId);
+        } else {
+            fromJson(getOperation(ServicesAas.NAME_OP_SERVICE_START_TASK)
+                .invoke(JsonUtils.toJson(serviceId), taskId));
+        }
     }
 
     @Override
     public void startServiceAsTask(String taskId, Map<String, String> options, String... serviceId)
         throws ExecutionException {
-        if (null == options) {
-            options = new HashMap<>();
+        if (null == taskId) {
+            startService(options, serviceId);
+        } else {
+            if (null == options) {
+                options = new HashMap<>();
+            }
+            fromJson(getOperation(ServicesAas.NAME_OP_SERVICE_START_WITH_OPTS_TASK)
+                .invoke(JsonUtils.toJson(serviceId), taskId, writeMap(options)));
         }
-        fromJson(getOperation(ServicesAas.NAME_OP_SERVICE_START_WITH_OPTS_TASK)
-            .invoke(JsonUtils.toJson(serviceId), taskId, writeMap(options)));
     }
 
     @Override
     public void stopServiceAsTask(String taskId, String... serviceId) throws ExecutionException {
-        fromJson(getOperation(ServicesAas.NAME_OP_SERVICE_STOP_TASK)
-            .invoke(JsonUtils.toJson(serviceId), taskId));
+        if (null == taskId) {
+            stopService(serviceId);
+        } else {
+            fromJson(getOperation(ServicesAas.NAME_OP_SERVICE_STOP_TASK)
+                .invoke(JsonUtils.toJson(serviceId), taskId));
+        }
     }
 
     /**

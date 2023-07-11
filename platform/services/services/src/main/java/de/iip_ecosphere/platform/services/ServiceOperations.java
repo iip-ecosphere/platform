@@ -60,8 +60,8 @@ public interface ServiceOperations {
      * management domain of this instance. After a successful execution, the artifact {@code id} is returned, artifact 
      * and service(s) shall be available and the service(s) shall be in state {@link ServiceState#AVAILABLE}.
      * 
-     * @return the id of the artifact
      * @param location the location from where to download the service, e.g., an URL
+     * @return the id of the artifact
      * @throws ExecutionException in case that adding the service fails for some reason
      */
     public String addArtifact(URI location) throws ExecutionException;
