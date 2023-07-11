@@ -735,34 +735,40 @@ public class SpringCloudServiceManager
         handleFamilyProcesses(serviceIds, false);
         NetworkManager netClient = null;
         for (String ids : sortByDependency(serviceIds, false)) {
-            Transport.sendProcessStatus(PROGRESS_COMPONENT_ID, step, serviceIds.length + 1, "Stopping service " + ids);
-            SpringCloudServiceDescriptor service = getService(ids);
-            String id = service.getDeploymentId();
-            if (null != id) {
-                AppStatus status = deployer.status(id);
-                if (null != status) {
-                    DeploymentState state = status.getState();
-                    if (state != null) { // if it was in a failure, also try to get rid of it, #50
-                        setState(service, ServiceState.STOPPING);
-                        LOGGER.info("Stopping " + id + "... ");
-                        deployer.undeploy(id);
-                        state = waitFor(id, state, s -> DeploymentState.deployed == s);
-                        LOGGER.info("Stopping " + id + "... ");
-                        if (null == state || state == DeploymentState.undeployed) {
-                            setState(service, ServiceState.STOPPED); // to be safe, shall be done by service
-                        } else if (state == DeploymentState.error || state == DeploymentState.failed) {
-                            setState(service, ServiceState.FAILED);
+            try {
+                Transport.sendProcessStatus(PROGRESS_COMPONENT_ID, step, serviceIds.length + 1, 
+                    "Stopping service " + ids);
+                SpringCloudServiceDescriptor service = getService(ids);
+                String id = service.getDeploymentId();
+                if (null != id) {
+                    AppStatus status = deployer.status(id);
+                    if (null != status) {
+                        DeploymentState state = status.getState();
+                        if (state != null) { // if it was in a failure, also try to get rid of it, #50
+                            setState(service, ServiceState.STOPPING);
+                            LOGGER.info("Stopping " + id + "... ");
+                            deployer.undeploy(id);
+                            state = waitFor(id, state, s -> DeploymentState.deployed == s);
+                            LOGGER.info("Stopping " + id + "... ");
+                            if (null == state || state == DeploymentState.undeployed) {
+                                setState(service, ServiceState.STOPPED); // to be safe, shall be done by service
+                            } else if (state == DeploymentState.error || state == DeploymentState.failed) {
+                                setState(service, ServiceState.FAILED);
+                            }
+                        } else {
+                            setState(service, ServiceState.STOPPING);
                         }
-                    } else {
-                        setState(service, ServiceState.STOPPING);
                     }
+                } else {
+                    setState(service, ServiceState.STOPPING);
                 }
-            } else {
-                setState(service, ServiceState.STOPPING);
+                service.detachStub();
+                Transport.sendProcessStatus(PROGRESS_COMPONENT_ID, step++, serviceIds.length + 1, 
+                    "Stopped service " + ids);
+                netClient = markServerUse(true, service, false, netClient);
+            } catch (ExecutionException e) {
+                errors.add(e.getMessage());
             }
-            service.detachStub();
-            Transport.sendProcessStatus(PROGRESS_COMPONENT_ID, step++, serviceIds.length + 1, "Stopped service " + ids);
-            netClient = markServerUse(true, service, false, netClient);
         }
         checkErrors(errors);
         LOGGER.info("Stopped services " + Arrays.toString(serviceIds));
