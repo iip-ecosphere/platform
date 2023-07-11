@@ -619,6 +619,8 @@ class CliBackend {
         }
         return instances > 0;
     }
+    
+    // checkstyle: stop method length check
 
     /**
      * Undeploys a {@link ServiceDeploymentPlan} given in terms of an URI.
@@ -629,6 +631,7 @@ class CliBackend {
      */
     protected static void undeployPlan(URI plan, String appInstanceId) throws ExecutionException {
         ServiceDeploymentPlan p = loadPlan(plan);
+        List<ExecutionException> exceptions = new ArrayList<>();
         try {
             URI artifact = toUri(p.getArtifact());
             Map<String, ServicesClient> serviceClients = new HashMap<>();
@@ -653,7 +656,11 @@ class CliBackend {
                     running += Math.max(client.getServiceInstanceCount(services[i]) - 1, 0); // stopping one
                 }
                 stillRunning.put(a.getResource(), running);
-                client.stopServiceAsTask(taskId, services); // copes with taskId null
+                try {
+                    client.stopServiceAsTask(taskId, services); // copes with taskId null
+                } catch (ExecutionException e) {
+                    exceptions.add(e);
+                }
             }
             if (p.isOnUndeployRemoveArtifact()) {
                 Set<String> done = new HashSet<String>();
@@ -665,7 +672,11 @@ class CliBackend {
                         URI art = getArtifact(artifact, a);
                         String uri = art.normalize().toString();
                         println("Removing artifact " + art + " from " + resourceId);
-                        serviceClients.get(resourceId).removeArtifactAsTask(uri, taskId); // works with URI and null
+                        try {
+                            serviceClients.get(resourceId).removeArtifactAsTask(uri, taskId); // works with URI and null
+                        } catch (ExecutionException e) {
+                            exceptions.add(e);
+                        }
                     } else if (!alreadyDone) {
                         println("Not removing artifact from " + resourceId + " as there is still a running instance");
                     }
@@ -679,19 +690,49 @@ class CliBackend {
                     EcsClient client = getEcsFactory().create(resourceId);
                     String cDescUri = toUri(c.getContainerDesc()).normalize().toString();
                     println("Stopping container '" + c.getContainerDesc() + " on resource " + c.getResource());
-                    client.stopContainer(cDescUri);
-                    printlnDone();
+                    try {
+                        client.stopContainer(cDescUri);
+                        printlnDone();
+                    } catch (ExecutionException e) {
+                        exceptions.add(e);
+                    }
                     
                     if (p.isOnUndeployRemoveArtifact()) {
                         println("Removing container '" + c.getContainerDesc() + "' from resource " + c.getResource());
-                        client.undeployContainer(cDescUri);
-                        printlnDone();
+                        try {
+                            client.undeployContainer(cDescUri);
+                            printlnDone();
+                        } catch (ExecutionException e) {
+                            exceptions.add(e);
+                        }
                     }
                 }
             }
             PlatformAas.notifyAppInstanceStopped(p.getAppId(), appInstanceId);
+            handle(exceptions);
         } catch (URISyntaxException | IOException e) {
             throw new ExecutionException(e);
+        }
+    }
+
+    // checkstyle: resume method length check
+
+    /**
+     * Handles a list of exceptions by throwing a joint {@link ExecutionException}.
+     * 
+     * @param exceptions the exceptions
+     * @throws ExecutionException the exception if there are exceptions
+     */
+    private static void handle(List<ExecutionException> exceptions) throws ExecutionException {
+        if (!exceptions.isEmpty()) {
+            String msg = "";
+            for (ExecutionException e : exceptions) {
+                if (msg.length() > 0) {
+                    msg += "; ";
+                }
+                msg += e.getMessage();
+            }
+            throw new ExecutionException(msg, null);
         }
     }
     
