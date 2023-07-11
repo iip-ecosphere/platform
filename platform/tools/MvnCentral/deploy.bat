@@ -51,6 +51,7 @@ REM param2: version of the artifact to deploy
     SET BINZ=%ARTIFACTPREFIX%-bin.zip
     SET BINJ=%ARTIFACTPREFIX%-bin.jar
     SET SPRING_ZIP=%ARTIFACTPREFIX%-spring.zip
+    SET ARTIFACTS=%ARTIFACTPREFIX%-artifacts.zip
     
     REM deploy to central
     if EXIST %FOLDER%\%JAR% (
@@ -95,6 +96,10 @@ REM param2: version of the artifact to deploy
         if EXIST %FOLDER%\%SPRING_ZIP% (
           echo "SPRING %FOLDER%\%SPRING_ZIP%"
           call %DEPLOYCMD% -DpomFile=%FOLDER%\%POM% -Dfile=%FOLDER%\%SPRING_ZIP% -Dfiles=%FOLDER%\%SPRING_ZIP% -Dclassifiers=spring -Dtypes=zip
+        )
+        if EXIST %FOLDER%\%ARTIFACTS% (
+          echo "SPRING %FOLDER%\%ARTIFACTS%"
+          call %DEPLOYCMD% -DpomFile=%FOLDER%\%POM% -Dfile=%FOLDER%\%ARTIFACTS% -Dfiles=%FOLDER%\%ARTIFACTS% -Dclassifiers=artifacts -Dtypes=zip
         )
     ) else (
         echo "POM %FOLDER%\%POM%"

@@ -380,6 +380,13 @@
         <groupId>de.iip-ecosphere.platform</groupId>
         <version>${project.version}</version>
     </dependency>
+    <dependency>
+        <artifactId>apps.ServiceImpl</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+        <classifier>artifacts</classifier>
+        <type>zip</type>
+    </dependency>
 
 
     <dependency>
