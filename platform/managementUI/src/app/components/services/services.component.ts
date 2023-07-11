@@ -11,6 +11,7 @@ import { OnlyIdPipe } from 'src/app/pipes/only-id.pipe';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { LogsDialogComponent } from './logs/logs-dialog.component';
 import {MatRadioChange, MatRadioModule} from '@angular/material/radio';
+import { DialogService } from 'src/app/services/dialog.service';
 
 @Component({
   selector: 'app-services',
@@ -23,7 +24,8 @@ export class ServicesComponent implements OnInit {
     public api: ApiService,
     private router: Router,
     private envConfigService: EnvConfigService,
-    public dialog: MatDialog){
+    public dialog: MatDialog,
+    private dialogService: DialogService){ // todo loe?
 
       const env = this.envConfigService.getEnv();
       if(env && env.ip) {
@@ -97,6 +99,9 @@ export class ServicesComponent implements OnInit {
     ["applicationInstanceId", "App instance: ", ""]
   ]
 
+  winWidth = 800
+  winHeight = 600
+
   ngOnInit(): void {
     //this.getServices();
     //this.getArtifacts();
@@ -106,29 +111,28 @@ export class ServicesComponent implements OnInit {
     this.filterForCorrectState()
   }
 
-  // ---------------------
+  // --------------------- Button
 
-  public async getLogs(serviceId:string) {
-    console.log("Method <getLogs> with id: " + serviceId)
+  public async getLogsDialog(id:string, idShort:string) {
+    console.log("#### getLogsDialog with id: " + id)
+    let windowSize = 'width=' + this.winWidth + ",height=" + this.winHeight
+
+    const dialogWindow = window.open(
+      'http://localhost:4200/#/logs',
+      'Dialog',
+      windowSize);
+
+
+    //const dialog2 = window.open('assets/dialog.html')
+
+
 
     /*
     // getting endpoint
     const param = await this.getInputVariable(serviceId)
     //const param = this.getInputVariable(serviceId)
     console.log("param: ")
-    console.log(param)// --------------------- display ------------------------------
-
-    public displayValue(item: any) {
-      let key = Object.entries(item)[0][0]
-      let value = Object.entries(item)[0][1]
-      let valueToDisplay = value
-      for (let param of this.paramToDisplay) {
-        if(param[0] == key) {
-          valueToDisplay = param[1] + value
-        }
-      }
-      return valueToDisplay
-    }
+    console.log(param)
       param
     ) as unknown as platformResponse
 
@@ -140,11 +144,13 @@ export class ServicesComponent implements OnInit {
     // getting stream from websocket
     */
 
+    /*
     // creating dialog
     const dialogConfig = new MatDialogConfig();
 
     dialogConfig.data = {
-      serviceId: serviceId,
+      id: id,
+      idShort: idShort,
       logs: "test logs data from service component",
       value: this.logsData
     }
@@ -155,6 +161,12 @@ export class ServicesComponent implements OnInit {
     dialogRef.afterClosed().subscribe(() => {
       console.log("LogsDialog closed");
     })
+    */
+
+
+    //this.dialogService.openDialogInNewWindow()
+    //this.dialogService.postMessageToWindow(data)
+
   }
 
   public async getPlatformData(submodel: any, submodelElement: any){
@@ -273,12 +285,12 @@ export class ServicesComponent implements OnInit {
     let result = []
     for (let tableRow of this.filteredData) {
       let temp = []
-      let itemName
+      let id
       let imgPath
       let itemIdShort = tableRow.idShort
       for (let rowValues of tableRow.value) {
-        if (rowValues.idShort == "name") {
-          itemName = rowValues.value
+        if (rowValues.idShort == "id") {
+          id = rowValues.value
         }
 
         for (let param of this.paramToDisplay) {
@@ -304,7 +316,7 @@ export class ServicesComponent implements OnInit {
         }
         */
       }
-      let new_value = {name: itemName, idShort: itemIdShort, logo: imgPath, value: temp}
+      let new_value = {id: id, idShort: itemIdShort, logo: imgPath, value: temp}
       result.push(new_value)
     }
     this.filteredData = result

@@ -69,10 +69,11 @@ export class ApiService {
     return this.meta;
   }
 
-  private async getData(url: string) {
+  public async getData(url: string) {
     let Data;
     try {
-      Data = await firstValueFrom(this.http.get( this.ip + '/shells/' + this.urn + '/' + url));
+      Data = await firstValueFrom(
+        this.http.get( this.ip + '/shells/' + this.urn + '/' + url));
     } catch(e) {
       console.log(e);
       this.errorEmitter.next(e as HttpErrorResponse);
@@ -80,7 +81,9 @@ export class ApiService {
     return Data;
   }
 
-  public async executeFunction(resourceId: string, aasElementURL:string,
+  public async executeFunction(
+    resourceId: string,
+    aasElementURL:string,
     basyxFunc: string, params: any) {
     let response;
     try {

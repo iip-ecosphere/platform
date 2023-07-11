@@ -160,6 +160,9 @@ export class ResourceDetailsComponent implements OnInit {
 
   // Returns an array [name, description]
   public getSemanticInfo(response:platformResponse) {
+    console.log("resposne in getPlat..")
+    console.log(response)
+
     let return_value = [null, null];
     if(response && response.outputArguments) {
       let output = response.outputArguments[0]?.value?.value;
@@ -175,6 +178,8 @@ export class ResourceDetailsComponent implements OnInit {
         }
       }
     }
+    console.log("return value")
+    console.log(return_value)
     return return_value
   }
 

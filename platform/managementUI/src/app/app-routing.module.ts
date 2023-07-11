@@ -16,9 +16,11 @@ import { ResourcesComponent }
   from './components/resources/resources.component';
 import { ServicesComponent }
   from './components/services/services.component';
+import { LogsDialogComponent } from './components/services/logs/logs-dialog.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'resources', pathMatch: `full` },
+  //{ path: '', redirectTo: 'logs', pathMatch: `full` },
   { path: 'resources/:id', component: ResourceDetailsComponent },
   { path: 'resources', component: ResourcesComponent },
   { path: 'containers', component: ContainersComponent },
@@ -29,8 +31,9 @@ const routes: Routes = [
   { path: 'flowchart', component: FlowchartComponent },
   { path: 'list/editor/:ls', component: EditorComponent},
   { path: 'list', component: ListComponent},
-  { path: 'instances', component: InstancesComponent }
+  { path: 'instances', component: InstancesComponent },
   //{ path: 'list/:ls', component: ListComponent }
+  { path: 'logs', component: LogsDialogComponent}
 
 ];
 

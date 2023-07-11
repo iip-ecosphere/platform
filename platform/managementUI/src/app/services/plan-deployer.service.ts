@@ -44,6 +44,7 @@ export class PlanDeployerService {
     wsIp = wsIp.replace('https', 'wws');
     wsIp = wsIp.slice(0, wsIp.indexOf(":", wsIp.indexOf(":") + 1));
     wsIp = wsIp.concat(":10000/status");
+    console.log("wsIp: " + wsIp)
     this.webSocket = webSocket(wsIp);
     this.webSocket.asObservable().subscribe(dataFromServer => this.recieveStatus(dataFromServer));
     // this.webSocket.subscribe(   msg => console.log('message received: ' + msg),
