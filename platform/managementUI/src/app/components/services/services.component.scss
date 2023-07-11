@@ -17,10 +17,11 @@
 }
 
 ::ng-deep.mat-radio-button.mat-accent.mat-radio-checked .mat-radio-outer-circle {
- border-color:rgb(35, 142, 184); /*outer ring color change*/
+ //border-color:rgb(35, 142, 184); /*outer ring color change*/
+ border-color:rgb(173, 171, 172);
 }
 
 ::ng-deep.mat-radio-outer-circle {
-  border-color:rgb(35, 142, 184); /*outer ring color change*/
+  border-color:rgb(173, 171, 172); /*outer ring color change*/
 }
 
