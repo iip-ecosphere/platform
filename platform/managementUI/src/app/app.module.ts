@@ -1,3 +1,4 @@
+import { MatRadioModule } from '@angular/material/radio';
 import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http";
@@ -87,7 +88,8 @@ import {LogsDialogComponent}
     MatListModule,
     MatDividerModule,
     MatTooltipModule,
-    MatDialogModule
+    MatDialogModule,
+    MatRadioModule
   ],
   providers: [{
     provide:HTTP_INTERCEPTORS,

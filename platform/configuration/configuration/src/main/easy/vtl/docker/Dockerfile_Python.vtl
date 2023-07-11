@@ -120,7 +120,7 @@ template Dockerfile_Python(IIPEcosphere config, FileArtifact target, sequenceOf(
             }
 
             ''
-            'RUN apt-get install -y openjdk-11-jre'
+            'RUN apt-get install -y openjdk-11-jdk'
             ''
             if (not(collectDependencies(elements)->selectByKind(SystemDependency)->select(d|d.key=='JAVA8').isEmpty())) {
                 'RUN apt-get install software-properties-common -y'

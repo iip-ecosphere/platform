@@ -20,7 +20,7 @@ template DockerfileAllApps(IIPEcosphere config, FileArtifact target, sequenceOf(
                 'ENV IIP_INCONTAINER=true'
             }
         } else {
-            'FROM alpine:3.14'
+            'FROM alpine'
             '${containerSettings(config, containerType, device)}'
             'ENV IIP_INCONTAINER=true'
             'RUN apk add bash'
@@ -32,12 +32,12 @@ template DockerfileAllApps(IIPEcosphere config, FileArtifact target, sequenceOf(
             '# Installed dependencies (shall be in /)'
             'COPY installedDependencies.yml installedDependencies.yml'
             ''
-            '${genTestingMode(config, "Alpine")}'
-            ''
             for (Application app : apps->sortedBy(a|a.id)) {
                 '${genServersExpose(app)|e}'
             }
             'WORKDIR /app'
+            ''
+            '${genTestingMode(config, "Alpine")}'
             ''
             '# resources/devices'
             'COPY resources/ resources'

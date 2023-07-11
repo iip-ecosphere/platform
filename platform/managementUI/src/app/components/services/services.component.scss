@@ -7,3 +7,20 @@
 .arrow {
   color: black;
 }
+
+.radio-group {
+  background-color: rgb(247, 248, 248);
+}
+
+::ng-deep .mat-radio-button.mat-accent .mat-radio-inner-circle {
+  background-color: rgb(35, 142, 184);   /*inner circle color change*/
+}
+
+::ng-deep.mat-radio-button.mat-accent.mat-radio-checked .mat-radio-outer-circle {
+ border-color:rgb(35, 142, 184); /*outer ring color change*/
+}
+
+::ng-deep.mat-radio-outer-circle {
+  border-color:rgb(35, 142, 184); /*outer ring color change*/
+}
+

@@ -27,13 +27,24 @@
         </ng-template>
       </ng-template>
 
+      <div *ngIf="tab.tabName == 'running services' && !isDataToDisplayEmpty()">
+        <div *ngIf="dataToDisplay != []" class="radio-group">
+          <mat-radio-group [(ngModel)]="selectedOption"
+            (change)="onRadioChange($event)">
+            <mat-radio-button *ngFor="let opt of options" [value]="opt">
+              {{opt}} &nbsp;
+            </mat-radio-button>
+          </mat-radio-group>
+        </div>
+      </div>
+
 
       <!-- Table -->
       <table style="margin: 0px;"
         *ngIf="tab.tabName == 'running services' || tab.tabName == 'running artifacts'; else elseOption">
-        <tr *ngFor="let item of filteredData; let i = index">
+        <!--<tr *ngFor="let item of filteredData; let i = index"> -->
+        <tr *ngFor="let item of dataToDisplay; let i = index">
 
-          <!-- <td *ngIf="hasCorrectState(item.state)"  style="width: 2%; text-align: center;"> {{i + 1}} </td> -->
           <td style="width: 2%; text-align: center;"> {{i + 1}} </td>
 
           <!-- Item -->
