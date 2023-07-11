@@ -551,7 +551,8 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     String generateServiceContainer(Path appRoot, IIPEcosphere config, Application a, sequenceOf(MeshElement) elements) = {
         String appImageId = "";
         String artifactsFolder = getArtifactsFolder(appRoot, config);
-        Integer baseImageCreated = 0; // 0 - Not base images, 1 - All dependencies base image, 2 - All and commen dependencies base images 
+        Integer baseImageCreated = 0; // 0 - Not base images, 1 - commen dependencies base image, 2 - All and commen dependencies base images 
+        Integer checkBaseImageRecreation = 0; // 0 - Not Need, 1 - common dep base image recreation, 2 - All dep base image recreation, 3 - Both base image recreation
         Boolean baseImageMethod = getContainerBaseImageMethodSafe(config.containerBaseImageMethod); 
         Boolean newChangeOnContainerFiles = false;
         Boolean newChangeJarFiles = false;
@@ -661,43 +662,53 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 
                 if ((newChangeOnContainerFiles) or (getForceContainersCreationSafe(config.forceContainersCreation))) {
                     appImageId = createContainerImage(mgr, b, d, appName, "appCommenDepBaseImage", "0.1.0");
+                    checkBaseImageRecreation = 1;
                 }
 
+                baseImageCreated = 1;
                 justCommenDep = false;
                 if (isPythonService == 1) {
                     Path req = "${appRoot}/../requirements.txt";
                     // TODO #130 consider server dependencies here
                     vilTemplateProcessor("PythonBaseReq", config, req, elements=elements, dependencies=dependencies, justCommenDep=justCommenDep);
-                }
 
-                Path commenDepRequirements = "${deviceBaseDf}/requirements.txt";
-                Path allDepRequirements = "${appRoot}/../requirements.txt";
-                Boolean checkDepRequirements = checkFilesEquality(allDepRequirements, commenDepRequirements);
-                baseImageCreated = 1;
+                    Path commenDepRequirements = "${deviceBaseDf}/requirements.txt";
+                    Path allDepRequirements = "${appRoot}/../requirements.txt";
+                    Boolean checkDepRequirements = checkFilesEquality(allDepRequirements, commenDepRequirements);
 
-                if (not(checkDepRequirements)){
-                    newChangeOnContainerFiles = false;
-                    deviceBaseDf = "${footprintFolder}/DeviceDockerfiles/${appName}/DeviceDockerfile_AllDepBase";
-                    dfName = createContainerBuildBaseScript(mgr, a, elements, appRoot, isPythonService, justCommenDep);
-                    Path lastAllDepRequirements = "${deviceBaseDf}/requirements.txt";
-                    if (not(sameMd5HashFiles(allDepRequirements, lastAllDepRequirements))){
-                        copy(allDepRequirements, deviceBaseDf);
-                        newChangeOnContainerFiles = true;
-                    }
+                    if (not(checkDepRequirements)){
+                        newChangeOnContainerFiles = false;
+                        deviceBaseDf = "${footprintFolder}/DeviceDockerfiles/${appName}/DeviceDockerfile_AllDepBase";
+                        dfName = createContainerBuildBaseScript(mgr, a, elements, appRoot, isPythonService, justCommenDep);
+                        Path lastAllDepRequirements = "${deviceBaseDf}/requirements.txt";
+                        if (not(sameMd5HashFiles(allDepRequirements, lastAllDepRequirements))){
+                            copy(allDepRequirements, deviceBaseDf);
+                            newChangeOnContainerFiles = true;
+                        }
                     
-                    Path b = "${appRoot}/../";
-                    Path d = "${appRoot}/../" + dfName;
-                    Path lastDockerfile = "${deviceBaseDf}/${dfName}";
-                    if (not(sameMd5HashFiles(d, lastDockerfile))){
-                        copy(d, deviceBaseDf);
-                        newChangeOnContainerFiles = true;
-                    }
+                        Path b = "${appRoot}/../";
+                        Path d = "${appRoot}/../" + dfName;
+                        Path lastDockerfile = "${deviceBaseDf}/${dfName}";
+                        if (not(sameMd5HashFiles(d, lastDockerfile))){
+                            copy(d, deviceBaseDf);
+                            newChangeOnContainerFiles = true;
+                        }
                     
-                    if ((newChangeOnContainerFiles) or (getForceContainersCreationSafe(config.forceContainersCreation))) {
-                        appImageId = createContainerImage(mgr, b, d, appName, "appAllDepBaseImage", "0.1.0");
-                    }
+                        if (checkBaseImageRecreation == 1) {
+                            newChangeOnContainerFiles = true;
+                        } 
+                        
+                        if ((newChangeOnContainerFiles) or (getForceContainersCreationSafe(config.forceContainersCreation))) {
+                            appImageId = createContainerImage(mgr, b, d, appName, "appAllDepBaseImage", "0.1.0");
+                            if (checkBaseImageRecreation == 0) {
+                                checkBaseImageRecreation = 2;
+                            } else if (checkBaseImageRecreation == 1) {
+                                checkBaseImageRecreation = 3;
+                            }
+                        }
                     
-                    baseImageCreated = 2;
+                        baseImageCreated = 2;
+                    }
                 }
             }
 
@@ -819,7 +830,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                                 // TODO #130 consider server dependencies here
                                 vilTemplateProcessor("PythonReq", config, req, elements=elements, device=device);
                                 Path lastReq = "${deviceDf}/requirements.txt";
-                                if (not(sameMd5HashFiles(req, lastReq))){
+                                if (not(sameMd5HashFiles(req, lastReq)) and (baseImageCreated == 2)){
                                     copy(req, deviceDf);
                                     newChangeOnContainerFiles = true;
                                 }
@@ -889,7 +900,13 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                         copy(d, deviceDf);
                         newChangeOnContainerFiles = true;
                     }
-                  
+
+                    if ((checkBaseImageRecreation == 1) or (checkBaseImageRecreation == 3)) {
+                        newChangeOnContainerFiles = true;
+                    } else if ((checkBaseImageRecreation == 2) and (deviceDependencies.size() == 0)) {
+                        newChangeOnContainerFiles = true;
+                    }
+
                     if ((newChangeOnContainerFiles) or (newChangeJarFiles) or (getForceContainersCreationSafe(config.forceContainersCreation))) {
                         appImageId = createContainerImage(mgr, b, d, a.name.toIdentifier(), deviceName, a.ver);
                     }
@@ -955,7 +972,8 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         setOf(EcsDevice) devices = EcsDevice.allInstances();
         int count = 1;
         String dfName;
-        Integer baseImageCreated = 0; // 0 - Not base images, 1 - All dependencies base image, 2 - All and commen dependencies base images 
+        Integer baseImageCreated = 0; // 0 - Not base images, 1 - common dependencies base image, 2 - All and commen dependencies base images 
+        Integer checkBaseImageRecreation = 0; // 0 - Not Need, 1 - common dep base image recreation, 2 - All dep base image recreation, 3 - Both base image recreation
         Boolean baseImageMethod = getContainerBaseImageMethodSafe(config.containerBaseImageMethod);
         Boolean newChangeOnContainerFiles = false;
         Boolean newChangeJarFiles = false;
@@ -1056,42 +1074,52 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
 
                 if ((newChangeOnContainerFiles) or (getForceContainersCreationSafe(config.forceContainersCreation))) {
                     appImageId = createContainerImage(mgr, b, d, "allapps", "appCommenDepBaseImage", "0.1.0");
+                    checkBaseImageRecreation = 1;
                 }
                 
+                baseImageCreated = 1;
                 justCommenDep = false;
                 if (isPythonService == 1) {
                     Path req = "${target}/requirements.txt";
                     // TODO #130 consider server dependencies here
                     vilTemplateProcessor("PythonBaseReq", config, req, elements=allElements, dependencies=dependencies, justCommenDep=justCommenDep);
-                }
 
-                Path commenDepRequirements = "${deviceBaseDf}/requirements.txt";
-                Path allDepRequirements = "${target}/requirements.txt";
-                Boolean checkDepRequirements = checkFilesEquality(allDepRequirements, commenDepRequirements);
-                baseImageCreated = 1;
+                    Path commenDepRequirements = "${deviceBaseDf}/requirements.txt";
+                    Path allDepRequirements = "${target}/requirements.txt";
+                    Boolean checkDepRequirements = checkFilesEquality(allDepRequirements, commenDepRequirements);
 
-                if (not(checkDepRequirements)){
-                    deviceBaseDf = "${footprintFolder}/DeviceDockerfiles/${appName}/DeviceDockerfile_AllDepBase";
-                    dfName = createContainerBuildBaseScriptAllApps(mgr, applications, allElements, target, isPythonService, justCommenDep);
-                    Path lastAllDepRequirements = "${deviceBaseDf}/requirements.txt";
-                    if (not(sameMd5HashFiles(allDepRequirements, lastAllDepRequirements))){
-                        copy(allDepRequirements, deviceBaseDf);
-                        newChangeOnContainerFiles = true;
-                    }
+                    if (not(checkDepRequirements)){
+                        deviceBaseDf = "${footprintFolder}/DeviceDockerfiles/${appName}/DeviceDockerfile_AllDepBase";
+                        dfName = createContainerBuildBaseScriptAllApps(mgr, applications, allElements, target, isPythonService, justCommenDep);
+                        Path lastAllDepRequirements = "${deviceBaseDf}/requirements.txt";
+                        if (not(sameMd5HashFiles(allDepRequirements, lastAllDepRequirements))){
+                            copy(allDepRequirements, deviceBaseDf);
+                            newChangeOnContainerFiles = true;
+                        }
                     
-                    Path b = "${target}/";
-                    Path d = "${target}/" + dfName;
-                    Path lastDockerfile = "${deviceBaseDf}/${dfName}";
-                    if (not(sameMd5HashFiles(d, lastDockerfile))){
-                        copy(d, deviceBaseDf);
-                        newChangeOnContainerFiles = true;
-                    }
+                        Path b = "${target}/";
+                        Path d = "${target}/" + dfName;
+                        Path lastDockerfile = "${deviceBaseDf}/${dfName}";
+                        if (not(sameMd5HashFiles(d, lastDockerfile))){
+                            copy(d, deviceBaseDf);
+                            newChangeOnContainerFiles = true;
+                        }
+
+                        if (checkBaseImageRecreation == 1) {
+                            newChangeOnContainerFiles = true;
+                        } 
+                        
+                        if ((newChangeOnContainerFiles) or (getForceContainersCreationSafe(config.forceContainersCreation))) {
+                            appImageId = createContainerImage(mgr, b, d, "allapps", "appAllDepBaseImage", "0.1.0");
+                            if (checkBaseImageRecreation == 0) {
+                                checkBaseImageRecreation = 2;
+                            } else if (checkBaseImageRecreation == 1) {
+                                checkBaseImageRecreation = 3;
+                            }
+                        }
                     
-                    if ((newChangeOnContainerFiles) or (getForceContainersCreationSafe(config.forceContainersCreation))) {
-                        appImageId = createContainerImage(mgr, b, d, "allapps", "appAllDepBaseImage", "0.1.0");
+                        baseImageCreated = 2;
                     }
-                    
-                    baseImageCreated = 2;
                 }
                 
             }
@@ -1222,7 +1250,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                                     // TODO #130 consider server dependencies here
                                     vilTemplateProcessor("PythonReq", config, req, elements=allElements, device=device);
                                     Path lastReq = "${deviceDf}/requirements.txt";
-                                    if (not(sameMd5HashFiles(req, lastReq))){
+                                    if (not(sameMd5HashFiles(req, lastReq)) and (baseImageCreated == 2)){
                                         copy(req, deviceDf);
                                         newChangeOnContainerFiles = true;
                                     }
@@ -1293,7 +1321,13 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                             copy(d, deviceDf);
                             newChangeOnContainerFiles = true;
                         }
-                        
+
+                        if ((checkBaseImageRecreation == 1) or (checkBaseImageRecreation == 3)) {
+                            newChangeOnContainerFiles = true;
+                        } else if ((checkBaseImageRecreation == 2) and (deviceDependencies.size() == 0)) {
+                            newChangeOnContainerFiles = true;
+                        }
+
                         if ((newChangeOnContainerFiles) or (newChangeJarFiles) or (getForceContainersCreationSafe(config.forceContainersCreation))) {
                             String appImageId = createContainerImage(mgr, b, d, "allapps", deviceName, "0.1.0");
                         }

@@ -10,9 +10,9 @@ template DockerfileBaseAllApps(IIPEcosphere config, FileArtifact target, sequenc
 
         DockerContainerManager mgr = config.containerManager;
         if (not(justCommenDep)) {
-            'FROM ${mgr.registry}/allapps/appCommenDepBaseImage:0.1.0'
+            'FROM ${mgr.registry}/allapps/appcommendepbaseimage:0.1.0'
         } else {
-            'FROM alpine:3.14'
+            'FROM alpine'
             //'${containerSettings(config, containerType, device)}'
             'RUN apk add bash'
             'RUN apk add openjdk11'
@@ -30,6 +30,9 @@ template DockerfileBaseAllApps(IIPEcosphere config, FileArtifact target, sequenc
             }
             ''
             'WORKDIR /app'
+            ''
+            '${genTestingMode(config, "Alpine")}'
+            ''
             // '# App'
             // 'COPY ${getAppMvnName(app)}/target/${getAppMvnName(app)}-${getAppMvnVersion(app)}-bin.jar ${getAppMvnName(app)}-${getAppMvnVersion(app)}-bin.jar'
             // ''   	

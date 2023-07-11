@@ -107,6 +107,22 @@ template DockerBasics(Configuration config, FileArtifact target) {
                     }
                 }
             }
+            if (config.linuxTestingSoftware.size() > 0){       
+                for (SystemDependency dep: config.linuxTestingSoftware) {
+                    if (dep.key == "mvn"){
+                        if (BaseImage == "Python"){
+                            'RUN apt-get install -y wget'
+                        } else if (BaseImage == "Alpine") {
+                            'RUN apk add wget'
+                        } else if (BaseImage == "Docker") {
+                            'RUN apk add wget'
+                        }
+                        'RUN wget https://archive.apache.org/dist/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz'
+                        'RUN tar xzpvf apache-maven-3.6.3-bin.tar.gz'
+                        'RUN ln -s $PWD/apache-maven-3.6.3/bin/mvn /usr/bin/mvn'
+                    }
+                }
+            }
         }
     }
 }

@@ -120,7 +120,7 @@ template Dockerfile_PythonAllApps(IIPEcosphere config, FileArtifact target, sequ
             }
         
             ''
-            'RUN apt-get install -y openjdk-11-jre'
+            'RUN apt-get install -y openjdk-11-jdk'
             ''
             '${containerSettings(config, containerType, device)}'
             'ENV IIP_INCONTAINER=true'
