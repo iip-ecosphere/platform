@@ -58,6 +58,7 @@ public class PlatformAas implements AasContributor {
     public static final String NAME_PROP_NAME = "name";
     public static final String NAME_PROP_DESCRIPTION = "description";
     public static final String NAME_PROP_URI = "uri";
+    public static final String NAME_PROP_ENABLED = "enabled";
     
     public static final String NAME_OPERATION_DEPLOY = "deployPlan";
     public static final String NAME_OPERATION_UNDEPLOY = "undeployPlan";
@@ -271,6 +272,9 @@ public class PlatformAas implements AasContributor {
                     .build();
                 dBuilder.createPropertyBuilder(NAME_PROP_URI)
                     .setValue(Type.STRING, art.getAccessUri().toString())
+                    .build();
+                dBuilder.createPropertyBuilder(NAME_PROP_ENABLED)
+                    .setValue(Type.BOOLEAN, art.isEnabled())
                     .build();
                 dBuilder.build();
     

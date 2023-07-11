@@ -120,6 +120,15 @@ public class ArtifactsManager {
          */
         public Version getVersion();
         
+        /**
+         * Returns whether this artifact is enabled.
+         * 
+         * @return {@code true} for enabled (default), {@code false} else
+         */
+        public default boolean isEnabled() {
+            return true;
+        }
+        
     }
 
     /**
@@ -237,6 +246,11 @@ public class ArtifactsManager {
         @Override
         public Version getVersion() {
             return plan.getVersion();
+        }
+
+        @Override
+        public boolean isEnabled() {
+            return !plan.isDisabled();
         }
 
     }
