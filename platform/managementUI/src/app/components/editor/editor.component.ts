@@ -39,7 +39,7 @@ export class EditorComponent implements OnInit {
   */
   reqTypes = [
     {cat: "Constants", metaRef: []},
-    {cat: "Types", metaRef: ["RecordType", "ArrayType"]},
+    {cat: "Types", metaRef: ["DataType"]},
     {cat: "Dependencies", metaRef: ["Dependency"]},
     {cat: "Nameplates", metaRef: ["NameplateInfo"]},
     {cat: "Services", metaRef: ["Service"]},

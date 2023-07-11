@@ -35,6 +35,7 @@ export class DeploymentPlansComponent implements OnInit {
 
   public async getArtifacts() {
     const response = await this.api.getArtifacts();
+    console.log("Artifacts: ")
     console.log(response);
     if(response.submodelElements) {
       this.deploymentPlans = response.submodelElements.find(
