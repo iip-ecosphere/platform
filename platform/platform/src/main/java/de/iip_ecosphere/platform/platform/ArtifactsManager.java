@@ -572,7 +572,7 @@ public class ArtifactsManager {
             try {
                 ServiceDeploymentPlan plan = ServiceDeploymentPlan.readFromYaml(
                     ServiceDeploymentPlan.class, new FileInputStream(file));
-                if (plan.getAssignments().size() > 0 && !plan.isDisabled()) {
+                if (plan.getAssignments().size() > 0) { // && !plan.isDisabled() UI decides
                     result = new DeploymentPlanArtifact(plan, accessUri);
                     LoggerFactory.getLogger(ArtifactsManager.class).info("Deployment plan artifact added: {} @ {}",
                         file.getAbsoluteFile(), accessUri);
