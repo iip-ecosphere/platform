@@ -199,10 +199,17 @@ public class TraceToAasService extends AbstractService {
      * 
      * @return the data recorder instance, may be <b>null</b> for none
      * @see #createDataRecorderOrig()
+     * @see Starter#inTest()
      */
     protected final DataRecorder createDataRecorderOrig() {
-        return new DataRecorder(new File("target/recordings/appAas-" + getId() + "-recorded.txt"), 
-            DataRecorder.JSON_FORMATTER);
+        DataRecorder result;
+        if (Starter.inTest()) {
+            result = new DataRecorder(new File("target/recordings/appAas-" + getId() + "-recorded.txt"), 
+                DataRecorder.JSON_FORMATTER);
+        } else {
+            result = null;
+        }
+        return result;
     }
     
     /**
