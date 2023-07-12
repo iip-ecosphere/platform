@@ -18,6 +18,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.platform.cli.ServiceDeploymentPlan;
+import de.iip_ecosphere.platform.platform.cli.ServiceDeploymentPlan.EnsembleStrategy;
 import de.iip_ecosphere.platform.platform.cli.ServiceDeploymentPlan.ServiceResourceAssignment;
 
 /**
@@ -65,6 +66,7 @@ public class ServiceDeploymentPlanTest {
         Assert.assertTrue(plan.getEnsembles().size() == 2);
         Assert.assertNull(plan.getEnsembles().get("Start"));
         Assert.assertEquals("End", plan.getEnsembles().get("AI"));
+        Assert.assertEquals(EnsembleStrategy.MANUAL, plan.getEnsembleStrategy());
         
         Assert.assertFalse(plan.isDisabled());
     }

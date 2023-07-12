@@ -158,6 +158,26 @@ public class ServiceDeploymentPlan extends AbstractSetup {
 
     }
     
+    /**
+     * Ensemble strategies to ease specification of ensembles.
+     *  
+     * @author Holger Eichelberger, SSE
+     */
+    public enum EnsembleStrategy {
+        
+        /**
+         * Assignment happens via explicit mapping, i.e., {@link ServiceDeploymentPlan#setEnsembles(Map)}. Implies
+         * no assignment if no mapping is specified.
+         */
+        MANUAL,
+        
+        /**
+         * Platform selects the first service per device as ensemble leader and assigns the remaining ones.
+         */
+        ALL_ON_FIRST
+        
+    }
+    
     private String application = "";
     private String id = "";
     private String appId = "";
@@ -169,6 +189,7 @@ public class ServiceDeploymentPlan extends AbstractSetup {
     private List<ServiceResourceAssignment> assignments = new ArrayList<>();
     private boolean parallelize = false;
     private boolean onUndeployRemoveArtifact = true;
+    private EnsembleStrategy ensembleStrategy = EnsembleStrategy.MANUAL; 
     private Map<String, String> ensembles = new HashMap<>();
     private boolean disabled = false;
     private boolean allowMultiExecution = true;
@@ -283,6 +304,15 @@ public class ServiceDeploymentPlan extends AbstractSetup {
      */
     public List<ContainerResourceAssignment> getContainer() {
         return container;
+    }
+    
+    /**
+     * Returns the ensemble strategy.
+     * 
+     * @return the ensemble strategy (by default {@link EnsembleStrategy#MANUAL})
+     */
+    public EnsembleStrategy getEnsembleStrategy() {
+        return ensembleStrategy;
     }
     
     /**
@@ -454,6 +484,15 @@ public class ServiceDeploymentPlan extends AbstractSetup {
      */
     public void setOnUndeployRemoveArtifact(boolean onUndeployRemoveArtifact) {
         this.onUndeployRemoveArtifact = onUndeployRemoveArtifact;
+    }
+
+    /**
+     * Defines the ensemble strategy. [required by SnakeYaml]
+     * 
+     * @param ensembleStrategy the ensemble strategy
+     */
+    public void setEnsembleStrategy(EnsembleStrategy ensembleStrategy) {
+        this.ensembleStrategy = ensembleStrategy;
     }
     
     /**

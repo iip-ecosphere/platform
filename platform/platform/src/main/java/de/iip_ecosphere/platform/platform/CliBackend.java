@@ -473,10 +473,7 @@ class CliBackend {
     private static Map<String, String> getStartOptions(ServiceDeploymentPlan plan) {
         Map<String, String> options = new HashMap<String, String>();
 
-        Map<String, String> ensembles = plan.getEnsembles();
-        if (null != ensembles && ensembles.size() > 0) {
-            options.put(ServicesClient.OPTION_ENSEMBLE, JsonUtils.toJson(ensembles));
-        }
+        createEnsembleOptions(plan, options);
         
         List<String> args = plan.getArguments();
         if (null != args && args.size() > 0) {
@@ -503,6 +500,44 @@ class CliBackend {
         }
         
         return options;
+    }
+
+    /**
+     * Creates the ensemble options and considers the ensemble strategy.
+     * 
+     * @param plan the plan to take the information from
+     * @param options the service start options, to be modified as a side effect
+     */
+    private static void createEnsembleOptions(ServiceDeploymentPlan plan, Map<String, String> options) {
+        Map<String, String> ensembles;
+        switch (plan.getEnsembleStrategy()) {
+        case MANUAL:
+            ensembles = plan.getEnsembles();
+            break;
+        case ALL_ON_FIRST:
+            ensembles = new HashMap<>();
+            Map<String, String> leadersByResource = new HashMap<String, String>();
+            for (ServiceResourceAssignment a : plan.getAssignments()) {
+                String resource = a.getResource();
+                String leader = leadersByResource.get(resource);
+                for (String s : a.getServices()) {
+                    if (null == leader) {
+                        leader = s;
+                        leadersByResource.put(resource, s);
+                    }
+                    if (null != leader && !s.equals(leader)) {
+                        ensembles.put(s, leader);
+                    }
+                }
+            }
+            break;
+        default:
+            ensembles = null;
+            break;
+        }
+        if (null != ensembles && ensembles.size() > 0) {
+            options.put(ServicesClient.OPTION_ENSEMBLE, JsonUtils.toJson(ensembles));
+        }
     }
     
     /**

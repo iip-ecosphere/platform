@@ -8,6 +8,7 @@ assignments:
     services:
       - AI
       - End
+ensembleStrategy: MANUAL
 ensembles:
   AI: End
   Start:  

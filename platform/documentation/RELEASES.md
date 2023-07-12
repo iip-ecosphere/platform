@@ -1,6 +1,6 @@
 # IIP-Ecosphere platform: Releases
 
-### At the horizon (Fall 2023):
+### At the horizon (September 2023):
 
 Planned:
 * Measurements in testing environment [#126](https://github.com/iip-ecosphere/platform/issues/126)
@@ -9,10 +9,6 @@ Planned:
 * Integrated container management for Kubernetes [#39](https://github.com/iip-ecosphere/platform/issues/39)
 * Filtering of monitoring telegrams [#75](https://github.com/iip-ecosphere/platform/issues/75)
 * Tracing in Python Service environment: [#88](https://github.com/iip-ecosphere/platform/issues/88)
-
-### HM'23: After the fair (Spring 2023):
-
-Planned:
 * Enable tolerant switching: [#26](https://github.com/iip-ecosphere/platform/issues/26)
 * CLI multi-device deployment problem: [#113](https://github.com/iip-ecosphere/platform/issues/113)
 * KODEX: dynamic port assignment: [#14](https://github.com/iip-ecosphere/platform/issues/14), documentation: [#6](https://github.com/iip-ecosphere/platform/issues/6)
@@ -41,6 +37,7 @@ New features:
 * Application intercommunication support (`AppIntercom`)
 * [#132](https://github.com/iip-ecosphere/platform/issues/132): Bitmotec system monitoring integration
 * [#118](https://github.com/iip-ecosphere/platform/issues/118): Service development video tutorial
+* [#148](https://github.com/iip-ecosphere/platform/issues/148): Ensemble assignment strategies in deployment plans.
 
 Improvements:
 * [#141](https://github.com/iip-ecosphere/platform/issues/141): Fix AppAAS performance/resource consumption issue
