@@ -8,7 +8,7 @@ template Dockerfile_3_ecsAllApps(IIPEcosphere config, FileArtifact target, seque
 	
     def main(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, setOf(Application) apps, ContainerType containerType, EcsDevice device, Integer baseImageExist) {
     	
-    	'FROM docker' 
+    	'FROM docker:24-cli' 
     	'${containerSettings(config, containerType, device)}'
     	'ENV IIP_INCONTAINER=true'
     	''
