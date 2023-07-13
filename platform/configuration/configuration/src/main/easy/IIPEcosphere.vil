@@ -231,7 +231,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     generateTemplateElements(appRoot, config, s, assemblies);
                 }
                 
-                if (assemblies->select(a|a.startsWith("art_")).size() > 0) {
+                if (not(noDeps) and assemblies->select(a|a.startsWith("art_")).size() > 0) {
                     vilTemplateProcessor("TemplatesArtifactsAssembly", config, "${appRoot}/${assemblyRel}/artifacts.xml");
                     assemblies.add("artifacts|${mvnProjectBaseDir}/${assemblyRel}/artifacts.xml|package|${mvnProjectBuildDir}|");
                 }
