@@ -44,7 +44,6 @@ public class DomParserTest {
         // implicit from in to out
         DomParser.setDefaultVerbose(false); // reduce output
         DomParser.setUsingIvmlFolder("target/tmp");
-        DomParser.main(new String[0]);
         DomParser.main(new String[] {in.toString()});
         DomParser.process(in, "MachineTool", out, false);
         
