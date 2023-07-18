@@ -12,7 +12,7 @@ template TemplatesArtifactsAssembly(IIPEcosphere config, XmlFileArtifact target)
             <includeBaseDirectory>false</includeBaseDirectory>
             <fileSets>
                 <fileSet>
-                    <directory>\\${project.basedir}</directory>
+                    <directory>\\${project.build.directory}/artifacts</directory>
                     <outputDirectory/>
                     <includes>
                         <include>*.*</include>
