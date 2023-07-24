@@ -31,7 +31,6 @@ export class DeploymentPlansComponent implements OnInit {
 
   async ngOnInit() {
     await this.getArtifacts();
-    console.log("hier ich bin in deplyoment plans")
   }
 
   public async getArtifacts() {
@@ -47,8 +46,6 @@ export class DeploymentPlansComponent implements OnInit {
 
       this.instanceId.fill("", 0, this.deploymentPlans?.value?.length);
     }
-    console.log("deployment plans:")
-    console.log(this.deploymentPlans)
   }
 
   public isArray(value: any) {
