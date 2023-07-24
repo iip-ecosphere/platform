@@ -13,9 +13,22 @@
         </span><br>
         <span class="subtext"> {{getDescription(plan)}}</span>
       </td>
-      <td style="vertical-align: top;">
-        <button mat-raised-button class="button" (click)="deploy(plan)">deploy</button>
+
+      <td *ngIf="getEnabled(plan)" style="vertical-align: top;">
+        <button  mat-raised-button class="button"
+          style="background-color: rgb(35, 142, 184)"
+          (click)="deploy(plan)">
+          deploy
+        </button>
       </td>
+      <td *ngIf="!getEnabled(plan)" style="vertical-align: top;">
+        <button  mat-raised-button class="button"
+          style="background-color: rgb(35, 142, 184)"
+          (click)="deploy(plan)" disabled>
+          deploy
+        </button>
+      </td>
+
       <!-- <td>
         <mat-form-field appearance="outline" class="input-field">
           <mat-label class="input-dplan" >Undeploy by Id</mat-label>
