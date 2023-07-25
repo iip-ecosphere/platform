@@ -22,7 +22,7 @@ import {MatSidenavModule} from '@angular/material/sidenav';
 import {MatListModule} from '@angular/material/list';
 import {MatDividerModule} from '@angular/material/divider';
 import {MatTooltipModule} from '@angular/material/tooltip';
-
+import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 
 import { ResourcesComponent } from './components/resources/resources.component';
 import { ContainersComponent } from './components/containers/containers.component';
@@ -40,11 +40,11 @@ import { ListComponent } from './components/list/list.component';
 import { InstancesComponent } from './components/instances/instances.component';
 import { EditorComponent } from './components/editor/editor.component';
 import { InputRefSelectComponent } from './components/editor/input-ref-select/input-ref-select.component';
-import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { StatusDetailsComponent }
   from './components/deployment-plans/status-box/status-details/status-details.component';
 import {LogsDialogComponent}
   from './components/services/logs/logs-dialog.component';
+import { DialogService  } from './services/dialog.service';
 
 
 @NgModule({
@@ -104,7 +104,9 @@ import {LogsDialogComponent}
     useFactory: (EnvConfigService: EnvConfigService) => () => EnvConfigService.init(),
     deps: [EnvConfigService],
     multi: true,
-    }
+    },
+    LogsDialogComponent,
+    DialogService
   ],
   bootstrap: [AppComponent]
 })
