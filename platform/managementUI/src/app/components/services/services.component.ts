@@ -7,11 +7,7 @@ import { PlatformArtifacts, Resource, PlatformServices, InputVariable, platformR
   from 'src/interfaces';
 import { Router } from '@angular/router';
 import { Observable, Subscription, firstValueFrom } from 'rxjs';
-import { PlanDeployerService } from 'src/app/services/plan-deployer.service';
-import { OnlyIdPipe } from 'src/app/pipes/only-id.pipe';
-import { LogsDialogComponent } from './logs/logs-dialog.component';
 import {MatRadioChange, MatRadioModule} from '@angular/material/radio';
-import { DialogService } from 'src/app/services/dialog.service';
 
 
 @Component({
@@ -23,20 +19,13 @@ export class ServicesComponent implements OnInit {
 
   constructor(public http: HttpClient,
     public api: ApiService,
-    private router: Router,
     private envConfigService: EnvConfigService,
-    private logsDialog: LogsDialogComponent, // this is causing NullInjectorError: R3InjectorError
-    private dialogService: DialogService,
-    private websocketService: WebsocketService,
+    //private logsDialog: LogsDialogComponent, // this is causing NullInjectorError: R3InjectorError
+    //private dialogService: DialogService,
+    //private websocketService: WebsocketService,
     private zone: NgZone
     )
     {
-
-      // todo loe?
-      /*
-      this.subscription = this.websocketService.getMsg().subscribe((val) =>
-        {this.updateData = val})
-      */
       const env = this.envConfigService.getEnv();
       if(env && env.ip) {
         this.ip = env.ip;
@@ -44,7 +33,6 @@ export class ServicesComponent implements OnInit {
       if (env && env.urn) {
         this.urn = env.urn;
       }
-      //this.logs = websocketService.data
   }
 
   // todo loe?
@@ -112,6 +100,10 @@ export class ServicesComponent implements OnInit {
     ["applicationInstanceId", "App instance: ", ""]
   ]
 
+  // logs type
+  stdout = 'stdout'
+  stderr = 'stderr'
+
   ngOnInit(): void {
   }
 
@@ -121,12 +113,16 @@ export class ServicesComponent implements OnInit {
 
   // --------------------- Button -------------------
 
-  public getDialog(id:string, idShort:string) {
+  public getDialog(id:string, idShort:string, logsType:string) {
+    console.log("[service] getDialog with logs type: " + logsType)
     this.zone.run(() => {
       let data = Date.now()
       let url = document.URL
       url = url.replace('services', 'logs')
-      window.open(url + '?id=' + id + '&idShort=' + idShort,
+      window.open(url
+        + '?id=' + id
+        + '&idShort=' + idShort
+        + '&type=' + logsType,
         'Dialog' + data,
         "height=800,width=700")
     });

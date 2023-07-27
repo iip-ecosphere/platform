@@ -35,11 +35,15 @@ export class LogsDialogComponent implements OnInit{
       }
       this.logs = websocketService.data
       this.subscription = this.websocketService.getMsg().subscribe((val) =>
-        {this.updateData = val})
+        {this.updateData = val;
+        this.data.logs += "\n" + val})
     }
+
+  /*
   transform(value: any, ...args: any[]) {
     throw new Error('Method not implemented.');
-  }
+
+  }*/
 
   ip: string = "";
   urn: string = "";
@@ -58,9 +62,18 @@ export class LogsDialogComponent implements OnInit{
   data:any = {
     id: "",
     idShort: "test_service_id",
-    logs: "test_values"
+    logs: "",
+    type: null
   }
-  updateData: string = "";
+   // logs type
+   stdout = 'stdout'
+   stderr = 'stderr'
+
+  idParam =  'id='
+  idShortParam = 'idShort='
+  typeParam = 'type='
+
+  updateData: string = ""; // todo loe
 
   feedback: string = 'no feedback'; // todo loe
   receivedData: any; // todo loe
@@ -70,60 +83,36 @@ export class LogsDialogComponent implements OnInit{
     console.log("[logs-dialog] ngOnInit has been triggered")
   }
 
-  public async getUrlParams() {
-    let idParam = 'id='
-    let idShortParam = 'idShort='
+  public getUrlParams() {
     let url = window.location.href
-    let resultIdParam = url.match(/id=.*&/);
-    let resultIdShortParam = url.match(/idShort=.*/);
-    console.log('url: ' + url)
+    let params =  url.match(/id=.*/);
 
-    let serviceId = ''
-    if (resultIdParam) {
-      serviceId = resultIdParam[0]
-      serviceId = serviceId.replace(idParam, '')
-      serviceId = serviceId.replace('&', '')
+    if(params) {
+      let paramsList = params[0].split("&", 3)
+      let serviceId = paramsList[0]
+      serviceId = serviceId.replace(this.idParam, '')
       this.data.id = serviceId
-    }
-    let serviceIdShort = ''
-    if (resultIdShortParam) {
-      serviceIdShort = resultIdShortParam[0]
-      serviceIdShort = serviceIdShort.replace(idShortParam, '')
+
+      let serviceIdShort = paramsList[1]
+      serviceIdShort = serviceIdShort.replace(this.idShortParam, '')
       this.data.idShort = serviceIdShort
+
+      let type = paramsList[2]
+      type = type.replace(this.typeParam, '')
+      this.data.type = type
     }
   }
 
-  /* used for passing service id per dialog service
-  public getLogs() {
-    let result = "logs data"
-
-    this.dialogService.data$.subscribe(data => {
-      this.receivedData = data
-    })
-
-    console.log("[logs-dialog] received data: " + this.receivedData)
-    this.data.id = this.receivedData[0]
-    this.data.idShort = this.receivedData[1]
-    console.log("[logs-dialog] \nservice id: " + this.data.id
-      + "\nservice idShort: " + this.data.idShort)
-
-    this.getLogsData(this.data.idShort)
-
-    return result
-  }
-
-  public async getLogsData(serviceIdShort: string) {
-    await this.getWebsocketEndpoint(serviceIdShort)
-    this.websocketService.connect(this.stdoutUrl)
-    this.websocketService.connect(this.stderrUrl)
-  }
-  */
-
-  public test() {
+  public startLogsStream() {
     this.feedback = "test function has been triggered: " + this.data.id
     this.counter += 1
     this.getWebsocketEndpoint(this.data.idShort)
-    this.websocketService.connect(this.stdoutUrl)
+
+    if (this.data.type == this.stdout) {
+      this.websocketService.connect(this.stdoutUrl)
+    } else {
+      this.websocketService.connect(this.stderrUrl)
+    }
   }
 
   public async getWebsocketEndpoint(serviceIdShort: string) {
@@ -224,7 +213,37 @@ export class LogsDialogComponent implements OnInit{
     return response
   }
 
+  public reset() {
+    this.data.logs = ""
+  }
+
   public closeLogsStream() {
     this.websocketService.close()
   }
+
+    /* used for passing service id per dialog service
+  public getLogs() {
+    let result = "logs data"
+
+    this.dialogService.data$.subscribe(data => {
+      this.receivedData = data
+    })
+
+    console.log("[logs-dialog] received data: " + this.receivedData)
+    this.data.id = this.receivedData[0]
+    this.data.idShort = this.receivedData[1]
+    console.log("[logs-dialog] \nservice id: " + this.data.id
+      + "\nservice idShort: " + this.data.idShort)
+
+    this.getLogsData(this.data.idShort)
+
+    return result
+  }
+
+  public async getLogsData(serviceIdShort: string) {
+    await this.getWebsocketEndpoint(serviceIdShort)
+    this.websocketService.connect(this.stdoutUrl)
+    this.websocketService.connect(this.stderrUrl)
+  }
+  */
 }

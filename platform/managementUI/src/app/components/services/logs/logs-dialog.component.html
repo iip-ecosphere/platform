@@ -3,34 +3,44 @@
   <img src="/assets/aas.png" alt="image" class="img-aas">
   Logs ({{data.idShort}})
 
-<br><br><br>
+<br><br>
 <button mat-raised-button class="button"
-  (click)="test()"> get logs
+  (click)="startLogsStream()"> start
+</button>
+<button mat-raised-button class="button"
+  (click)="reset()"> reset
 </button>
 <button mat-raised-button class="button"
   (click)="closeLogsStream()"> stop
 </button>
-<br><br>
-<div style="font-size: 16px; margin-left: 10px;">
-  {{updateData}}
+<div style="overflow: auto;">
+  <pre style="white-space: pre-wrap; font-size: 14px;">
+    {{data.logs}}
+</pre>
 </div>
+
+
+
 <br>
 <br><br>
+
+<!--
 <p>-----------</p>
 </div>
 <br>
-<!--
+
 <div style="font-size: 12px; margin-left: 10px;">
   <p>Service info:</p>
   <p>id: {{data.id}}</p>
   <p>idShort: {{data.idShort}}</p>
+  <p>type: {{data.type}}</p>
 </div>
 <p>{{feedback}}</p>
--->
+
 <div>received data: {{receivedData}}</div>
 
 <p>counter: {{counter}}</p>
-
+-->
 {{getUrlParams()}}
 
 
