@@ -20,7 +20,7 @@ template DockerfileAllApps(IIPEcosphere config, FileArtifact target, sequenceOf(
                 'ENV IIP_INCONTAINER=true'
             }
         } else {
-            'FROM alpine'
+            'FROM alpine:3.18'
             '${containerSettings(config, containerType, device)}'
             'ENV IIP_INCONTAINER=true'
             'RUN apk add bash'

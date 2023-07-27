@@ -1,20 +1,36 @@
-<head>
-  <title>HTML Elements Reference</title>
-</head>
-<h1>Logs {{data.idShort}}</h1>
-<div>{{data.value}}</div>
+<br>
+<div style="font-size: 23px; margin-left: 10px;">
+  <img src="/assets/aas.png" alt="image" class="img-aas">
+  Logs ({{data.idShort}})
+
+<br><br><br>
+<button mat-raised-button class="button"
+  (click)="test()"> get logs
+</button>
+<button mat-raised-button class="button"
+  (click)="closeLogsStream()"> stop
+</button>
+<br><br>
+<div style="font-size: 16px; margin-left: 10px;">
+  {{updateData}}
+</div>
+<br>
+<br><br>
+<p>-----------</p>
+</div>
+<br>
 <!--
-<mat-toolbar>
-  <h1>Logs for {{logsData.serviceId}}</h1>
-  <span style="flex: 1 1 auto"></span>
-  <span><button mat-icon-button class="button" color="warning"
-    (click)="close()"><mat-icon>close</mat-icon></button></span>
-</mat-toolbar>
-
-<mat-card *ngIf="logsData.logs">
-  <div>LOGS: {{logs}}</div>
-  <div *ngIf="logsData.value">HIER {{logsData.value.idShort}}</div>
-  <div>{{temp}}</div>
-
-</mat-card>
+<div style="font-size: 12px; margin-left: 10px;">
+  <p>Service info:</p>
+  <p>id: {{data.id}}</p>
+  <p>idShort: {{data.idShort}}</p>
+</div>
+<p>{{feedback}}</p>
 -->
+<div>received data: {{receivedData}}</div>
+
+<p>counter: {{counter}}</p>
+
+{{getUrlParams()}}
+
+

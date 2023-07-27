@@ -1,17 +1,18 @@
+import { WebsocketService } from './../../websocket.service';
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, NgZone, OnInit } from '@angular/core';
 import { ApiService } from 'src/app/services/api.service';
 import { EnvConfigService } from 'src/app/services/env-config.service';
 import { PlatformArtifacts, Resource, PlatformServices, InputVariable, platformResponse }
   from 'src/interfaces';
 import { Router } from '@angular/router';
-import { firstValueFrom } from 'rxjs';
+import { Observable, Subscription, firstValueFrom } from 'rxjs';
 import { PlanDeployerService } from 'src/app/services/plan-deployer.service';
 import { OnlyIdPipe } from 'src/app/pipes/only-id.pipe';
-import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { LogsDialogComponent } from './logs/logs-dialog.component';
 import {MatRadioChange, MatRadioModule} from '@angular/material/radio';
 import { DialogService } from 'src/app/services/dialog.service';
+
 
 @Component({
   selector: 'app-services',
@@ -24,9 +25,18 @@ export class ServicesComponent implements OnInit {
     public api: ApiService,
     private router: Router,
     private envConfigService: EnvConfigService,
-    public dialog: MatDialog,
-    private dialogService: DialogService){ // todo loe?
+    private logsDialog: LogsDialogComponent, // this is causing NullInjectorError: R3InjectorError
+    private dialogService: DialogService,
+    private websocketService: WebsocketService,
+    private zone: NgZone
+    )
+    {
 
+      // todo loe?
+      /*
+      this.subscription = this.websocketService.getMsg().subscribe((val) =>
+        {this.updateData = val})
+      */
       const env = this.envConfigService.getEnv();
       if(env && env.ip) {
         this.ip = env.ip;
@@ -34,7 +44,16 @@ export class ServicesComponent implements OnInit {
       if (env && env.urn) {
         this.urn = env.urn;
       }
+      //this.logs = websocketService.data
   }
+
+  // todo loe?
+  /*
+  updateData: string = "test data";
+  private subscription!: Subscription;
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
+  }*/
 
   services: PlatformServices = {};
   servicesToggle: boolean[] = [];
@@ -57,11 +76,6 @@ export class ServicesComponent implements OnInit {
   undeployPlanByIdInput: any;
   taskId: string = "";
 
-  /* logs stream mode mode="START"|"TAIL"
-  (start=log from start, tail=continue at end as selecter by user)*/
-  mode = "START"
-  serviceMgr:string | undefined;
-  logsData:string | undefined;
 
   // Radio-Button in 'Running Services' tab
   options: string[] = ["active", "all"]
@@ -82,7 +96,6 @@ export class ServicesComponent implements OnInit {
     {tabName: "running artifacts",
       submodel: "services",
       submodelElement: "artifacts"}
-    //{tabName: "available artifacts"}
   ]
 
   paramToDisplay = [
@@ -99,75 +112,44 @@ export class ServicesComponent implements OnInit {
     ["applicationInstanceId", "App instance: ", ""]
   ]
 
-  winWidth = 800
-  winHeight = 600
-
   ngOnInit(): void {
-    //this.getServices();
-    //this.getArtifacts();
   }
 
   public onRadioChange(event: MatRadioChange) {
     this.filterForCorrectState()
   }
 
-  // --------------------- Button
+  // --------------------- Button -------------------
 
-  public async getLogsDialog(id:string, idShort:string) {
-    console.log("#### getLogsDialog with id: " + id)
-    let windowSize = 'width=' + this.winWidth + ",height=" + this.winHeight
-
-    const dialogWindow = window.open(
-      'http://localhost:4200/#/logs',
-      'Dialog',
-      windowSize);
-
-
-    //const dialog2 = window.open('assets/dialog.html')
-
-
-
-    /*
-    // getting endpoint
-    const param = await this.getInputVariable(serviceId)
-    //const param = this.getInputVariable(serviceId)
-    console.log("param: ")
-    console.log(param)
-      param
-    ) as unknown as platformResponse
-
-    let resp = this.getPlatformResponseResolution(logsDataValue)
-    console.log("exec")
-    console.log(resp)
-    console.log("---")
-
-    // getting stream from websocket
-    */
-
-    /*
-    // creating dialog
-    const dialogConfig = new MatDialogConfig();
-
-    dialogConfig.data = {
-      id: id,
-      idShort: idShort,
-      logs: "test logs data from service component",
-      value: this.logsData
-    }
-    //dialogConfig.height = "90%"
-
-    let dialogRef = this.dialog.open(LogsDialogComponent, dialogConfig);
-
-    dialogRef.afterClosed().subscribe(() => {
-      console.log("LogsDialog closed");
-    })
-    */
-
-
-    //this.dialogService.openDialogInNewWindow()
-    //this.dialogService.postMessageToWindow(data)
-
+  public getDialog(id:string, idShort:string) {
+    this.zone.run(() => {
+      let data = Date.now()
+      let url = document.URL
+      url = url.replace('services', 'logs')
+      window.open(url + '?id=' + id + '&idShort=' + idShort,
+        'Dialog' + data,
+        "height=800,width=700")
+    });
   }
+
+  /** todo - loe
+   * used for testing
+
+  logs: any;
+
+  public getLogs(id:string, idShort:string) {
+    console.log("triggered logs btn")
+
+    let data = [id, idShort]
+    this.dialogService.sendData(data)
+    this.logs = this.logsDialog.getLogs()
+    this.logs = this.websocketService.data
+  }
+
+  public stopLogs(id:string, idShort:string) { // todo - do we need both parameter? any?
+    this.logsDialog.closeLogsStream()
+  }
+   */
 
   public async getPlatformData(submodel: any, submodelElement: any){
     let response: any;
@@ -186,7 +168,6 @@ export class ServicesComponent implements OnInit {
     return response
   }
 
-
   public async getDisplayData(tab:string, submodel:any, submodelElement: string) {
     this.currentTab = tab
     if(tab != "instances") {
@@ -203,10 +184,7 @@ export class ServicesComponent implements OnInit {
         default:
           break;
       }
-      //console.log("SERVICES  Filtered data:")
-      //console.log(this.filteredData)
     }
-
   }
 
   public async loadData(submodel: any, submodelElement: any){
@@ -494,7 +472,7 @@ export class ServicesComponent implements OnInit {
   */
 
 
-  //--------------------------------- old ------------------------
+  //---------------------------------------------------------
 
   public async getServices() {
     this.services = await this.api.getServices();

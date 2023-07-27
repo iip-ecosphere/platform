@@ -147,7 +147,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     
                     for (Server ser: a.servers) {
                         generateServer(config, ser, appRoot, noDeps, assemblies, artifacts);
-                        addArtifacts(ser.artifacts, ser.artifact, bins);                        
+                        addArtifacts(ser.artifacts, ser.artifact, bins, noDeps);                        
                     }
                 };
                 
@@ -1707,7 +1707,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     generateServiceResources(MeshElement no, JavaService service, Path appRoot, setOf(String) bins, setOf(String) assemblies, setOf(String) resources, setOf(String) artifacts, Boolean noDeps) = {
         if (not(noDeps)) {
             artifacts.add(getArtifact(no));
-            addArtifacts(service.artifacts, service.artifact, bins);
+            addArtifacts(service.artifacts, service.artifact, bins, noDeps);
         }
     }
 
@@ -1726,12 +1726,12 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
             vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/python_${serviceFolderName}.xml", withServices=true, dependency=artifact);
             assemblies.add("python_${serviceFolderName}|${assemblyRel}/python_${serviceFolderName}.xml|prepare-package|${mvnProjectBuildDir}/classes|python_${serviceFolderName}");
             artifacts.add(getArtifact(service));
-            addArtifacts(service.artifacts, service.artifact, bins);
+            addArtifacts(service.artifacts, service.artifact, bins, noDeps);
         }
     }
 
-    addArtifacts(setOf(String) artifacts, String artifact, setOf(String) bins) = {
-        if (artifacts.size() > 0) {
+    addArtifacts(setOf(String) artifacts, String artifact, setOf(String) bins, Boolean noDeps) = {
+        if (not(noDeps) and artifacts.size() > 0) {
             bins.add("${artifact}|artifacts|${mvnProjectBuildDir}/classes|artifacts.zip|zip|unpack");
         }
     }

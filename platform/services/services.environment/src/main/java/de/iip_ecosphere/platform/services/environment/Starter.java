@@ -33,6 +33,7 @@ import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.JarUtils;
 import de.iip_ecosphere.platform.support.NetUtils;
+import de.iip_ecosphere.platform.support.OsUtils;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
@@ -66,6 +67,7 @@ public class Starter {
     public static final String ARG_AAS_NOTIFICATION = "iip.test.aas.notification";
     public static final String PROPERTY_JAVA8 = "iip.test.java8";
     public static final String IIP_APP_PREFIX = "iip.app.";
+    public static final String IIP_TEST = "iip.test";
     public static final String IIP_TEST_PREFIX = "iip.test.";
     public static final String IIP_TEST_PLUGIN = "iip.test.plugin";
     
@@ -176,6 +178,15 @@ public class Starter {
             return "prints this help";
         }
         
+    }
+    
+    /**
+     * Returns whether we are in test mode, i.e., system or env property {@value Starter#IIP_TEST} is {@code true}.
+     * 
+     * @return {@code true} for test mode, {@code false} else
+     */
+    public static boolean inTest() {
+        return Boolean.valueOf(OsUtils.getPropertyOrEnv(IIP_TEST, "false"));
     }
     
     /**

@@ -19,12 +19,12 @@ In progress:
 * [#117](https://github.com/iip-ecosphere/platform/issues/117): Multiple service managers per device
 * [#146](https://github.com/iip-ecosphere/platform/issues/146): UI editors for configuration tables
 * [#144](https://github.com/iip-ecosphere/platform/issues/144): Deployment plans and application instances
-* [#143](https://github.com/iip-ecosphere/platform/issues/143): Container testing mode(s)
 * [#115](https://github.com/iip-ecosphere/platform/issues/115): Cleanup, e.g., old build processes
 
 New features:
 * [#130](https://github.com/iip-ecosphere/platform/issues/130): Application/device specific containers.
 * [#127](https://github.com/iip-ecosphere/platform/issues/127): Integration of Flower-based federated learning through generated templates
+* [#143](https://github.com/iip-ecosphere/platform/issues/143): Container testing mode(s)
 * [#100](https://github.com/iip-ecosphere/platform/issues/100): Allowing to start/stop multiple app instances (only via deployment plans)
 * [#59](https://github.com/iip-ecosphere/platform/issues/59): Basic version of distributed testing/evaluation environment for platform and apps (PETE)
 * [#90](https://github.com/iip-ecosphere/platform/issues/90): UI display application service meshes

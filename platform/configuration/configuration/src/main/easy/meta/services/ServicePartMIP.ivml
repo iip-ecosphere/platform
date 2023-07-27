@@ -1,0 +1,7 @@
+project ServicePartMIP {
+
+   import Services;
+   
+   annotate BindingTime bindingTime = BindingTime::compile to .;
+      
+}

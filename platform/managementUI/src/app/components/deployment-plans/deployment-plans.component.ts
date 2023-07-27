@@ -151,4 +151,10 @@ export class DeploymentPlansComponent implements OnInit {
 
   }
 
+  public getEnabled(plan: any) {
+    let enabled = plan.value.find(
+      (item: {idShort: string;}) => item.idShort === "enabled").value
+    return enabled
+  }
+
 }

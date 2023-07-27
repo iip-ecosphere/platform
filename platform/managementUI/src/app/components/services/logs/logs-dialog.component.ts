@@ -1,29 +1,31 @@
 import { WebsocketService } from './../../../websocket.service';
-import { Component, OnInit, Input, Inject } from '@angular/core';
-import { InputVariable, platformResponse, statusCollection, statusMessage } from 'src/interfaces';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { firstValueFrom } from 'rxjs';
+import { Component, OnInit, Input, Inject, Optional, HostListener, NgZone, PipeTransform } from '@angular/core';
+import { InputVariable, platformResponse } from 'src/interfaces';
+import { firstValueFrom, Subscription } from 'rxjs';
 import { EnvConfigService } from 'src/app/services/env-config.service';
 import { HttpClient } from '@angular/common/http';
 import { ApiService } from 'src/app/services/api.service';
 import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
+import { DialogService } from 'src/app/services/dialog.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ChangeDetectionStrategy } from '@angular/compiler';
 
 @Component({
   selector: 'app-logs-dialog',
   templateUrl: './logs-dialog.component.html',
-  //template: '<h1> lalala </h1>',
   styleUrls: ['./logs-dialog.component.scss']
 })
 
-export class LogsDialogComponent implements OnInit {
+export class LogsDialogComponent implements OnInit{
 
   constructor(
-    //private dialogRef: MatDialogRef<LogsDialogComponent>,
-    //@Inject(MAT_DIALOG_DATA) public logsData: any,
     private envConfigService: EnvConfigService,
     public http: HttpClient,
     public api: ApiService,
-    private websocketService: WebsocketService) {
+    private websocketService: WebsocketService,
+    private dialogService: DialogService,
+
+    ) {
       const env = this.envConfigService.getEnv();
       if(env && env.ip) {
         this.ip = env.ip;
@@ -31,15 +33,20 @@ export class LogsDialogComponent implements OnInit {
       if (env && env.urn) {
         this.urn = env.urn;
       }
-
+      this.logs = websocketService.data
+      this.subscription = this.websocketService.getMsg().subscribe((val) =>
+        {this.updateData = val})
     }
+  transform(value: any, ...args: any[]) {
+    throw new Error('Method not implemented.');
+  }
 
   ip: string = "";
   urn: string = "";
   logs:string | undefined;
   serviceMgr: string | undefined; // todo do we need it?
   serviceInfo: any;
-  temp:any; // todo loe
+  private subscription!: Subscription;
 
   /* logs stream mode mode="START"|"TAIL"
   (start=log from start, tail=continue at end as selecter by user)*/
@@ -49,40 +56,91 @@ export class LogsDialogComponent implements OnInit {
   stderrUrl:any
 
   data:any = {
+    id: "",
     idShort: "test_service_id",
-    value: "test values"
+    logs: "test_values"
   }
+  updateData: string = "";
+
+  feedback: string = 'no feedback'; // todo loe
+  receivedData: any; // todo loe
+  counter: number = 0; // todo loe
 
   ngOnInit(): void {
-    console.log("LOGS-DIALOG-COM")
-    /*
-    console.log(this.logsData)
-    console.log("id: " + this.logsData.id)
-    console.log("idShort: " + this.logsData.idShort)
-    console.log("-------")
-    this.getLogsData(this.logsData.idShort)
-    this.logs = "test data"
-    */
+    console.log("[logs-dialog] ngOnInit has been triggered")
   }
 
-  public voice() {
-    console.log("logs dialog component is giving voice")
+  public async getUrlParams() {
+    let idParam = 'id='
+    let idShortParam = 'idShort='
+    let url = window.location.href
+    let resultIdParam = url.match(/id=.*&/);
+    let resultIdShortParam = url.match(/idShort=.*/);
+    console.log('url: ' + url)
+
+    let serviceId = ''
+    if (resultIdParam) {
+      serviceId = resultIdParam[0]
+      serviceId = serviceId.replace(idParam, '')
+      serviceId = serviceId.replace('&', '')
+      this.data.id = serviceId
+    }
+    let serviceIdShort = ''
+    if (resultIdShortParam) {
+      serviceIdShort = resultIdShortParam[0]
+      serviceIdShort = serviceIdShort.replace(idShortParam, '')
+      this.data.idShort = serviceIdShort
+    }
   }
 
-  /*
+  /* used for passing service id per dialog service
+  public getLogs() {
+    let result = "logs data"
+
+    this.dialogService.data$.subscribe(data => {
+      this.receivedData = data
+    })
+
+    console.log("[logs-dialog] received data: " + this.receivedData)
+    this.data.id = this.receivedData[0]
+    this.data.idShort = this.receivedData[1]
+    console.log("[logs-dialog] \nservice id: " + this.data.id
+      + "\nservice idShort: " + this.data.idShort)
+
+    this.getLogsData(this.data.idShort)
+
+    return result
+  }
+
   public async getLogsData(serviceIdShort: string) {
-    this.getWebsocketEndpoint(serviceIdShort)
+    await this.getWebsocketEndpoint(serviceIdShort)
+    this.websocketService.connect(this.stdoutUrl)
     this.websocketService.connect(this.stderrUrl)
+  }
+  */
+
+  public test() {
+    this.feedback = "test function has been triggered: " + this.data.id
+    this.counter += 1
+    this.getWebsocketEndpoint(this.data.idShort)
+    this.websocketService.connect(this.stdoutUrl)
   }
 
   public async getWebsocketEndpoint(serviceIdShort: string) {
+    this.receivedData = "websocket" // todo loe
+
+    serviceIdShort = "SimpleReceiver_Simple_Mesh_Testing_App_1"
     const inputVariable = await this.getInputVar(serviceIdShort)
+
     let resourceId = this.serviceInfo.resource
     let aasElementURL = "/aas/submodels/resources/submodel/submodelElements/"
     let basyxFun = "serviceManagers/a" + this.serviceInfo.serviceMgr.replace("@", "_") + "/serviceStreamLog"
     const response = await this.api.executeFunction(resourceId, aasElementURL, basyxFun, inputVariable) as unknown as platformResponse
+
     this.getPlatformResponseResolution(response)
-    console.log("Endpoints - \nstdout: " + this.stderrUrl + ", \nstderr: " + this.stderrUrl)
+    console.log("[logs-dialog]  Endpoints - \nstdout: " + this.stdoutUrl
+    + ", \nstderr: " + this.stderrUrl)
+    this.receivedData = this.stdoutUrl  // todo loe
   }
 
   public getPlatformResponseResolution(response:platformResponse) {
@@ -112,7 +170,7 @@ export class LogsDialogComponent implements OnInit {
         valueType: "string",
         idShort: "id",
         kind: "Template",
-        value: this.logsData.id
+        value: this.data.id
       }
     }
     let input1:InputVariable = {
@@ -166,8 +224,7 @@ export class LogsDialogComponent implements OnInit {
     return response
   }
 
-  close():void {
-    this.dialogRef.close();
+  public closeLogsStream() {
+    this.websocketService.close()
   }
-  */
 }

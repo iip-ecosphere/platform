@@ -39,13 +39,13 @@ export class EditorComponent implements OnInit {
   */
   reqTypes = [
     {cat: "Constants", metaRef: []},
-    {cat: "Types", metaRef: ["DataType"]},
+    {cat: "Types", metaRef: ["RecordType", "ArrayType"]},
     {cat: "Dependencies", metaRef: ["Dependency"]},
     {cat: "Nameplates", metaRef: ["NameplateInfo"]},
     {cat: "Services", metaRef: ["Service"]},
     {cat: "Servers", metaRef: ["Server"]},
     {cat: "Meshes", metaRef: ["ServiceMesh"]},
-    {cat: "Applications", metaRef: ["VersionedElement"]}
+    {cat: "Applications", metaRef: ["Application"]}
   ];
 
   constructor(private api: ApiService,
@@ -88,7 +88,13 @@ export class EditorComponent implements OnInit {
         if(item.idShort) {
           idShort = item.idShort
         }
+
         if(!this.isAbstract(item)) {
+
+          if(filter?.metaRef.includes(idShort)) {
+            newMetaValues.push(item)
+          }
+
           if (this.getMetaRef(item)) {
             let metaRefVal = item.value.find((val: { idShort: string; }) => val.idShort === "metaRefines").value
 

@@ -884,7 +884,7 @@ public class SpringCloudServiceManager
                             attachTailer(inst, "stderr", mode, desc, uris);
                         }
                     }
-                    LOGGER.info("Starting/registering log streaming for {}: {}", serviceId, uris);
+                    LOGGER.info("Starting/registering log streaming for {} in mode {}: {}", serviceId, mode, uris);
                 }
             } else {
                 LOGGER.info("Log streaming request for {} not fulfilled: deployer state {}", 

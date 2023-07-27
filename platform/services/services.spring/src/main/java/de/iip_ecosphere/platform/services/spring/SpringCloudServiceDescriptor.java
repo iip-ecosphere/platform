@@ -54,6 +54,7 @@ import de.iip_ecosphere.platform.services.spring.descriptor.TypedData;
 import de.iip_ecosphere.platform.services.spring.yaml.YamlProcess;
 import de.iip_ecosphere.platform.services.spring.yaml.YamlService;
 import de.iip_ecosphere.platform.support.FileUtils;
+import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
@@ -310,12 +311,17 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
      * 
      * @param mgr the network manager instance
      * @param key the key to obtain the network address
-     * @return the obtained address
+     * @return the obtained address, may be invalid for ensemble members
      */
     private ManagedServerAddress registerPort(NetworkManager mgr, String key) {
-        ManagedServerAddress result = mgr.obtainPort(key);
-        if (result.isNew()) {
-            portKeys.add(key);
+        ManagedServerAddress result;
+        if (ensembleLeader == null) {
+            result = mgr.obtainPort(key);
+            if (result.isNew()) {
+                portKeys.add(key);
+            }
+        } else {
+            result = new ManagedServerAddress(Schema.IGNORE, ManagedServerAddress.LOCALHOST, 0, false);
         }
         return result;
     }

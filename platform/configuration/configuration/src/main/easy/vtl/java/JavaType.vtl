@@ -48,14 +48,24 @@ template JavaType(Configuration config, FileArtifact target, RecordType type, St
             }
         }
     }
+    
+    def readOnlyHint(Field field) {
+        if (field.readOnly) {
+            '* This field is read only, but needs an accessor for connector serializers. Although you can change it, 
+            * a connector may ignore the value.'
+        } else {
+            ''
+        }
+    }
 
     // generates code for the setters
     def setters(RecordType type) {
         IIPEcosphere cfg = config;
-        for (Field f: type.fields->select(f|not(f.readOnly))) {
+        for (Field f: type.fields) {
             if (emitJavadoc) {
                 '/**
                  * Changes the value of {@code ${asMethodFieldIdentifier(f.name)}}.${prependIfNotEmpty(" ", f.description)}
+                 ${readOnlyHint(f)|e}
                  * 
                  * @param value the new value
                  */'

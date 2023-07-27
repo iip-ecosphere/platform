@@ -1017,6 +1017,9 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
      */
     private void addMetaProperties(IDecisionVariable var, IDatatype varType, 
         SubmodelElementCollectionBuilder varBuilder) {
+        varBuilder.createPropertyBuilder(AasUtils.fixId(metaShortId.apply("variable")))
+            .setValue(Type.STRING, var.getDeclaration().getName())
+            .build();
         varBuilder.createPropertyBuilder(AasUtils.fixId(metaShortId.apply("state")))
             .setValue(Type.STRING, var.getState().toString())
             .build();

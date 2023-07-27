@@ -66,10 +66,23 @@
           <!-- Buttons -->
           <td class="cell-with-button">
             <div *ngIf="tab.tabName == 'running services'">
-              <button mat-raised-button class="button" (click)="getLogsDialog(item.id, item.idShort)">logs</button>
+              <button mat-raised-button class="button"
+                (click)="getDialog(item.id, item.idShort)">
+                logs (stdout)
+              </button>
+              <!-- For testing: getting logs on console (loe later)
+              <button mat-raised-button class="button"
+                (click)="getLogs(item.id, item.idShort)">
+                logs
+              </button>
+
+              <button mat-raised-button class="button"
+                (click)="stopLogs(item.id, item.idShort)">
+                stop
+              </button>
+              -->
             </div>
           </td>
-
         </tr>
       </table>
     </mat-tab>
