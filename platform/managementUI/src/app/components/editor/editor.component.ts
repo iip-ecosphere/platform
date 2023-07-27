@@ -393,12 +393,10 @@ private cleanTypeName(type: string) {
   }
 
     public addType() {
-    console.log(this.uiGroups);
     let complexType: Record<string, any> = {};
     if(this.type) {
       for(let uiGroup of this.uiGroups) {
         for(let input of uiGroup.inputs) {
-          console.log(input.value);
           if(input.meta){
             complexType[input.name] = input.value;
           }
