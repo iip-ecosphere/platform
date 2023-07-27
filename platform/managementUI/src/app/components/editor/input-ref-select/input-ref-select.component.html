@@ -3,7 +3,7 @@
     <table>
       <tr><td>{{input.type}}</td></tr>
       <tr>
-        <td *ngIf="textfield">
+        <td *ngIf="activeTextinput">
           <mat-form-field appearance="outline">
             <input matInput [matTooltip]="input.description[0].language + ' ' + input.description[0].text" [(ngModel)]="textInput">
           </mat-form-field>
@@ -27,7 +27,7 @@
     <div class="flexcontainer">
       <mat-card *ngFor="let value of input.value; let i=index" class="inputCard">
         <table>
-          <tr><td colspan="3" style="text-align: center">{{value}}</td></tr>
+          <tr><td colspan="3" style="text-align: center">{{getDisplayName(value)}}</td></tr>
           <tr>
             <td>
               <button *ngIf="isSequenceOf" mat-icon-button (click)="moveSequenceElement(true, i)"><mat-icon>keyboard_arrow_left</mat-icon></button>

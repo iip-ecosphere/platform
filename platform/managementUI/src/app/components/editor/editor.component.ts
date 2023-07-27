@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { ApiService } from 'src/app/services/api.service';
-import { Resource, uiGroup, editorInput } from 'src/interfaces';
+import { Resource, uiGroup, editorInput, configMetaContainer } from 'src/interfaces';
 
 @Component({
   selector: 'app-editor',
@@ -16,14 +16,14 @@ export class EditorComponent implements OnInit {
 
   category: string = 'all';
   meta: Resource | undefined;
-  unchangedMeta: Resource | undefined;
   /* backup needed for data recovery before re-filtering data
    for the next tab */
   metaBackup: Resource | undefined;
   selectedType: Resource | undefined;
-  bool = true;
 
   uiGroups: uiGroup[] = [];
+
+  showInputs = true;
 
   metaTypes = ['metaState', 'metaProject',
     'metaSize', 'metaType', 'metaRefines', 'metaAbstract', 'metaTypeKind'];
@@ -55,19 +55,15 @@ export class EditorComponent implements OnInit {
   ngOnInit(): void {
     if(!this.type) {
       this.getMeta()
-    } else if(this.meta && this.meta.value && this.type.type){
+    } else if(this.metaBackup && this.metaBackup.value && this.type.type){
       let type = this.cleanTypeName(this.type.type);
-      this.selectedType = this.meta.value.find(item => item.idShort === type);
-      console.log(type);
-      console.log(this.selectedType);
-      console.log(this.meta);
+      this.selectedType = this.metaBackup.value.find(item => item.idShort === type);
       this.generateInputs()
     }
   }
 
   private async getMeta() {
     this.meta = await this.api.getMeta();
-    this.unchangedMeta = JSON.parse(JSON.stringify(this.meta));
     this.metaBackup = JSON.parse(JSON.stringify(this.meta)); // deep copy
     this.filterMeta();
     /* TODO loe
@@ -83,8 +79,6 @@ export class EditorComponent implements OnInit {
    * Documentation in src/assets/doc/filterMeta.jpg
    */
   public filterMeta() {
-    console.log("## (filterMeta-methode) \nmeta:")
-    console.log(this.meta)
     this.meta = JSON.parse(JSON.stringify(this.metaBackup)) // recovering meta from deep copy
     let filter = this.reqTypes.find(type => type.cat === this.category)
     let newMetaValues = []
@@ -125,7 +119,6 @@ export class EditorComponent implements OnInit {
       }
     }
     this.meta!.value = newMetaValues
-    console.log(this.meta);
   }
 
   /** Returns false when metaAbstract is false or there is no attribute "metaAbstract" */
@@ -196,9 +189,11 @@ private cleanTypeName(type: string) {
 
 }
 
-  public displayName(property: Resource) {
+  public displayName(property: Resource | string) {
     let displayName = '';
-    if(property.value) {
+    if(typeof(property) == 'string') {
+      displayName = property;
+    } else if(property.value) {
       displayName = property.value.find(
         item => item.idShort === 'name')?.value;
     }
@@ -207,8 +202,7 @@ private cleanTypeName(type: string) {
 
   public generateInputs() {
     this.uiGroups = [];
-    console.log(this.selectedType);
-    const selectedType = this.selectedType;
+    const selectedType = this.selectedType as configMetaContainer;
     if(selectedType && selectedType.value) {
 
       for(const input of selectedType.value) {
@@ -231,21 +225,28 @@ private cleanTypeName(type: string) {
               refTo: false, multipleInputs: false};
           let name = input.value.find(
             (item: { idShort: string; }) => item.idShort === 'name')
-          editorInput.name = name.value;
-          if(name.description
-            && name.description[0]
-            && name.description[0].text
-            && name.description[0].language) {
-            editorInput.description = name.description;
-          }
+            if(name) {
+              editorInput.name = name.value;
+              if(name.description
+                && name.description[0]
+                && name.description[0].text
+                && name.description[0].language) {
+                editorInput.description = name.description;
+              }
+            }
+
           editorInput.type = input.value.find(
             (item: { idShort: string; }) => item.idShort === 'type')?.value;
 
+          editorInput.meta = input;
             let cleanType = this.cleanTypeName(editorInput.type);
-            let type = this.unchangedMeta?.value?.find(type => type.idShort == cleanType);
+            let type = this.meta?.value?.find(type => type.idShort == cleanType);
             if(type) {
               editorInput.metaTypeKind = type.value.find(
                 (item: { idShort: string; }) => item.idShort === 'metaTypeKind')?.value;
+            } else if(this.metaBackup && this.metaBackup.value) {
+              let temp = this.metaBackup.value.find(item => item.idShort === this.cleanTypeName(editorInput.type));
+               editorInput.metaTypeKind = temp?.value.find((item: { idShort: string; }) => item.idShort === 'metaTypeKind').value
             }
 
             //the metaTypeKind is not included on the values of the types in the configuration/meta collection
@@ -263,6 +264,19 @@ private cleanTypeName(type: string) {
             || editorInput.type.indexOf('sequenceOf') >= 0) {
             editorInput.multipleInputs = true;
           }
+          //assign initial value of inputFields
+          console.log(editorInput);
+          let initial;
+          if(editorInput.multipleInputs) {
+            initial = []
+          } else if(editorInput.type === 'Boolean'){
+            initial = false;
+            console.log(editorInput);
+          } else {
+            initial = '';
+          }
+          editorInput.value = initial;
+
           if(!uiGroupCompare ){
             if(isOptional) {
               if(editorInput.multipleInputs) {
@@ -328,15 +342,12 @@ private cleanTypeName(type: string) {
 
   public toggleOptional(uiGroup: uiGroup) {
     uiGroup.toggleOptional = !uiGroup.toggleOptional;
-
-  }
-
-  public addType() {
-    this.dialog.close();
   }
 
   public create() {
-
+    const creationData = this.prepareCreation();
+    console.log(creationData);
+    //actual creation
   }
 
   public close() {
@@ -350,7 +361,67 @@ private cleanTypeName(type: string) {
       width:  '80%',
     })
     dialogRef.componentInstance.type = type;
-    dialogRef.componentInstance.meta = this.unchangedMeta;
+    dialogRef.componentInstance.metaBackup = this.metaBackup;
+  }
+
+  public prepareCreation() {
+    let complexType: Record<string, any> = {};
+    this.showInputs = false;
+    for(let uiGroup of this.uiGroups) {
+      for(let input of uiGroup.inputs) {
+        if(input.meta){
+          complexType[input.name] = input.value;
+        }
+      }
+      for(let input of uiGroup.optionalInputs) {
+        if(input.meta){
+          complexType[input.name] = input.value;
+        }
+      }
+      for(let input of uiGroup.fullLineInputs) {
+        if(input.meta){
+          complexType[input.name] = input.value;
+        }
+      }
+      for(let input of uiGroup.fullLineOptionalInputs) {
+        if(input.meta){
+          complexType[input.name] = input.value;
+        }
+      }
+    }
+    return complexType;
+  }
+
+    public addType() {
+    console.log(this.uiGroups);
+    let complexType: Record<string, any> = {};
+    if(this.type) {
+      for(let uiGroup of this.uiGroups) {
+        for(let input of uiGroup.inputs) {
+          console.log(input.value);
+          if(input.meta){
+            complexType[input.name] = input.value;
+          }
+        }
+        for(let input of uiGroup.optionalInputs) {
+          if(input.meta){
+            complexType[input.name] = input.value;
+          }
+        }
+        for(let input of uiGroup.fullLineInputs) {
+          if(input.meta){
+            complexType[input.name] = input.value;
+          }
+        }
+        for(let input of uiGroup.fullLineOptionalInputs) {
+          if(input.meta){
+            complexType[input.name] = input.value;
+          }
+        }
+      }
+      this.type.value.push(complexType);
+    }
+    this.dialog.close();
   }
 
 }

@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { EditorService } from 'src/app/services/editor.service';
-import { Resource, editorInput } from 'src/interfaces';
+import { Resource, editorInput, configMeta } from 'src/interfaces';
 
 @Component({
   selector: 'app-input-ref-select',
@@ -9,7 +9,7 @@ import { Resource, editorInput } from 'src/interfaces';
 })
 export class InputRefSelectComponent implements OnInit {
 
-  @Input() textfield = false;
+  @Input() activeTextinput = false;
   @Input() input: editorInput = {name: '', type: '', description: [{text: '', language: ''}], refTo: true, value: []};
 
 
@@ -18,7 +18,7 @@ export class InputRefSelectComponent implements OnInit {
   isSequenceOf = false;
   refTo = '';
   references: Resource[] = [];
-  selectedRef: Resource = {};
+  selectedRef: configMeta | undefined;
 
   //refTypes = ['Dependency', 'Resource', 'DataType', 'Server', 'ServiceMesh', 'MeshConnector', 'MeshElement', 'ServiceBase', 'IOType'];
   metaTypes = ['metaState', 'metaProject', 'metaSize', 'metaType', 'metaRefines', 'metaAbstract', 'metaTypeKind'];
@@ -34,13 +34,14 @@ export class InputRefSelectComponent implements OnInit {
     value = value.toLowerCase();
 
     if(value) {
+      if(value.indexOf('setof') >= 0) {
+        this.isSetOf = true;
+      }
       if(value.indexOf('refto') >= 0) {
-        if(value.indexOf('setof') >= 0) {
-          this.isSetOf = true;
-        }
         const startIndex = value.indexOf('refto') + 6;
         this.refTo = value.substring(startIndex, value.indexOf(')', startIndex));
         this.getReferences(this.refTo);
+        this.activeTextinput = false;
       }
       if(value.indexOf('sequenceof') >= 0) {
         console.log('sequenceOf ' + value);
@@ -48,7 +49,7 @@ export class InputRefSelectComponent implements OnInit {
       }
     }
     if(this.input.metaTypeKind == 10) {
-      this.textfield = false;
+      this.activeTextinput = false;
     }
   }
 
@@ -163,26 +164,16 @@ export class InputRefSelectComponent implements OnInit {
   }
 
   public addFromRef() {
-    let idShort = '';
+    console.log(this.selectedRef);
     if(this.selectedRef && this.selectedRef.idShort) {
-      if(this.selectedRef.value && this.selectedRef.value[0]) {
-        console.log(this.selectedRef);
-        let temp = this.selectedRef.value?.find(item => item.idShort == 'varValue');
-        if(temp && temp.idShort) {
-          idShort = temp.value;
-        } else {
-          idShort = this.selectedRef.idShort;
-        }
-      } else {
-        idShort = this.selectedRef.idShort;
-      }
       if(this.isSetOf) {
-        this.input.value.push(idShort);
+        this.input.value.push('refTo(' + this.selectedRef.idShort + ')');
       } else {
         this.input.value = [];
-        this.input.value.push(idShort);
+        this.input.value.push('refTo(' + this.selectedRef.idShort + ')');
       }
     }
+    console.log(this.input.value);
   }
 
 
@@ -221,31 +212,21 @@ export class InputRefSelectComponent implements OnInit {
   }
 
   public getDisplayName(element: any) {
-    let idShort = '';
-        let temp = element.value?.find((item: { idShort: string; }) => item.idShort == 'varValue');
-        if(temp && temp.idShort) {
-          idShort = temp.value;
-        } else {
-          idShort = element.idShort;
-        }
+    if(typeof(element) === 'string') {
+      return element
+    } else if(element.name){
+      return element.name;
+    } else {
+      let idShort = '';
+      let temp = element.value?.find((item: { idShort: string; }) => item.idShort == 'varValue');
+      if(temp && temp.idShort) {
+        idShort = temp.value;
+      } else {
+        idShort = element.idShort;
+      }
 
       return idShort;
-    // let displayName = '';
-
-
-    //   let ele = element.value.find((item: { idShort: string; value: string;}) => item.idShort === 'key');
-    //   if(!ele) {
-    //     ele = element.value.find((item: { idShort: string; value: string;}) => item.idShort === 'name');
-    //   }
-    //   if(ele && ele.value && typeof(ele.value) != 'string') {
-    //     displayName = ele.value.find((item: { idShort: string; value: string;}) => item.idShort === 'varValue').value;
-    //   }
-    //   if(!displayName || typeof(displayName) != 'string') {
-    //     displayName = element.idShort;
-    //   }
-
-
-    // return displayName;
+    }
   }
 
   //true: left, false: right
