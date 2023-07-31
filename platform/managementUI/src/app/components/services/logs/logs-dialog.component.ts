@@ -1,19 +1,17 @@
 import { WebsocketService } from './../../../websocket.service';
-import { Component, OnInit, Input, Inject, Optional, HostListener, NgZone, PipeTransform } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { InputVariable, platformResponse } from 'src/interfaces';
 import { firstValueFrom, Subscription } from 'rxjs';
 import { EnvConfigService } from 'src/app/services/env-config.service';
 import { HttpClient } from '@angular/common/http';
 import { ApiService } from 'src/app/services/api.service';
-import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
 import { DialogService } from 'src/app/services/dialog.service';
-import { ActivatedRoute, Router } from '@angular/router';
-import { ChangeDetectionStrategy } from '@angular/compiler';
 
 @Component({
   selector: 'app-logs-dialog',
   templateUrl: './logs-dialog.component.html',
-  styleUrls: ['./logs-dialog.component.scss']
+  styleUrls: ['./logs-dialog.component.scss'],
+  host: {'window:beforeunload':'closeLogsStream'}
 })
 
 export class LogsDialogComponent implements OnInit{
@@ -22,9 +20,7 @@ export class LogsDialogComponent implements OnInit{
     private envConfigService: EnvConfigService,
     public http: HttpClient,
     public api: ApiService,
-    private websocketService: WebsocketService,
-    private dialogService: DialogService,
-
+    private websocketService: WebsocketService
     ) {
       const env = this.envConfigService.getEnv();
       if(env && env.ip) {
@@ -35,15 +31,8 @@ export class LogsDialogComponent implements OnInit{
       }
       this.logs = websocketService.data
       this.subscription = this.websocketService.getMsg().subscribe((val) =>
-        {this.updateData = val;
-        this.data.logs += "\n" + val})
-    }
-
-  /*
-  transform(value: any, ...args: any[]) {
-    throw new Error('Method not implemented.');
-
-  }*/
+        {this.data.logs += "\n" + val})
+  }
 
   ip: string = "";
   urn: string = "";
@@ -73,17 +62,33 @@ export class LogsDialogComponent implements OnInit{
   idShortParam = 'idShort='
   typeParam = 'type='
 
-  updateData: string = ""; // todo loe
-
-  feedback: string = 'no feedback'; // todo loe
-  receivedData: any; // todo loe
-  counter: number = 0; // todo loe
+  running:number = 0
 
   ngOnInit(): void {
-    console.log("[logs-dialog] ngOnInit has been triggered")
+    console.log('[logs-dialog | ngOnInit] running: ' + this.running)
+    this.startLogsStream()
+  }
+
+  public async startLogsStream() {
+    this.getUrlParams()
+    console.log('[logs-dialog | startLogsStream] running: ' + this.running
+      + ' idShort: ' + this.data.idShort)
+    if (this.running == 0) {
+      await this.getWebsocketEndpoint(this.data.idShort)
+      if (this.data.type == this.stdout) {
+        this.websocketService.connect(this.stdoutUrl)
+      } else {
+        this.websocketService.connect(this.stderrUrl)
+      }
+      this.running = 1
+    } else {
+      console.log('[logs-dialog.comp | startLogsStream] '
+        + 'stream cannot be started because it is already running. ')
+    }
   }
 
   public getUrlParams() {
+    console.log('[logs-dialog | getUrlParams] triggered ')
     let url = window.location.href
     let params =  url.match(/id=.*/);
 
@@ -103,33 +108,23 @@ export class LogsDialogComponent implements OnInit{
     }
   }
 
-  public startLogsStream() {
-    this.feedback = "test function has been triggered: " + this.data.id
-    this.counter += 1
-    this.getWebsocketEndpoint(this.data.idShort)
-
-    if (this.data.type == this.stdout) {
-      this.websocketService.connect(this.stdoutUrl)
-    } else {
-      this.websocketService.connect(this.stderrUrl)
-    }
-  }
-
   public async getWebsocketEndpoint(serviceIdShort: string) {
-    this.receivedData = "websocket" // todo loe
-
-    serviceIdShort = "SimpleReceiver_Simple_Mesh_Testing_App_1"
     const inputVariable = await this.getInputVar(serviceIdShort)
 
     let resourceId = this.serviceInfo.resource
     let aasElementURL = "/aas/submodels/resources/submodel/submodelElements/"
-    let basyxFun = "serviceManagers/a" + this.serviceInfo.serviceMgr.replace("@", "_") + "/serviceStreamLog"
-    const response = await this.api.executeFunction(resourceId, aasElementURL, basyxFun, inputVariable) as unknown as platformResponse
+    let basyxFun = "serviceManagers/a"
+      + this.serviceInfo.serviceMgr.replace("@", "_")
+      + "/serviceStreamLog"
+    const response = await this.api.executeFunction(
+      resourceId,
+      aasElementURL,
+      basyxFun,
+      inputVariable) as unknown as platformResponse
 
     this.getPlatformResponseResolution(response)
     console.log("[logs-dialog]  Endpoints - \nstdout: " + this.stdoutUrl
     + ", \nstderr: " + this.stderrUrl)
-    this.receivedData = this.stdoutUrl  // todo loe
   }
 
   public getPlatformResponseResolution(response:platformResponse) {
@@ -148,7 +143,6 @@ export class LogsDialogComponent implements OnInit{
 
   public async getInputVar(serviceId:string) {
     this.serviceInfo = await this.getServiceInfo(serviceId)
-   //console.log("service info: " + this.serviceInfo.resource + ", " + this.serviceInfo.serviceMgr)
 
     let inputVariables: InputVariable[] = [];
     let input0:InputVariable = {
@@ -219,31 +213,6 @@ export class LogsDialogComponent implements OnInit{
 
   public closeLogsStream() {
     this.websocketService.close()
+    this.running = 0
   }
-
-    /* used for passing service id per dialog service
-  public getLogs() {
-    let result = "logs data"
-
-    this.dialogService.data$.subscribe(data => {
-      this.receivedData = data
-    })
-
-    console.log("[logs-dialog] received data: " + this.receivedData)
-    this.data.id = this.receivedData[0]
-    this.data.idShort = this.receivedData[1]
-    console.log("[logs-dialog] \nservice id: " + this.data.id
-      + "\nservice idShort: " + this.data.idShort)
-
-    this.getLogsData(this.data.idShort)
-
-    return result
-  }
-
-  public async getLogsData(serviceIdShort: string) {
-    await this.getWebsocketEndpoint(serviceIdShort)
-    this.websocketService.connect(this.stdoutUrl)
-    this.websocketService.connect(this.stderrUrl)
-  }
-  */
 }

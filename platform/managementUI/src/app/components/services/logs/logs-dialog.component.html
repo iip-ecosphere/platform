@@ -1,16 +1,19 @@
+<!-- {{getUrlParams()}} -->
 <br>
 <div style="font-size: 23px; margin-left: 10px;">
   <img src="/assets/aas.png" alt="image" class="img-aas">
-  Logs ({{data.idShort}})
+  Logs ({{data.type}})
+  <p></p>
+  <div style="font-size: 20px;">{{data.idShort}}</div>
 
-<br><br>
-<button mat-raised-button class="button"
+<br>
+<button mat-raised-button class="logs-btn"
   (click)="startLogsStream()"> start
 </button>
-<button mat-raised-button class="button"
+<button mat-raised-button class="logs-btn"
   (click)="reset()"> reset
 </button>
-<button mat-raised-button class="button"
+<button mat-raised-button class="logs-btn"
   (click)="closeLogsStream()"> stop
 </button>
 <div style="overflow: auto;">
@@ -18,14 +21,12 @@
     {{data.logs}}
 </pre>
 </div>
+<br><br><br>
 
 
-
-<br>
-<br><br>
-
-<!--
+<!-- debugging (remove later)
 <p>-----------</p>
+running: {{running}}
 </div>
 <br>
 
@@ -35,12 +36,12 @@
   <p>idShort: {{data.idShort}}</p>
   <p>type: {{data.type}}</p>
 </div>
-<p>{{feedback}}</p>
+
 
 <div>received data: {{receivedData}}</div>
 
 <p>counter: {{counter}}</p>
 -->
-{{getUrlParams()}}
+
 
 

@@ -1,13 +1,12 @@
-import { WebsocketService } from './../../websocket.service';
 import { HttpClient } from '@angular/common/http';
 import { Component, NgZone, OnInit } from '@angular/core';
 import { ApiService } from 'src/app/services/api.service';
 import { EnvConfigService } from 'src/app/services/env-config.service';
-import { PlatformArtifacts, Resource, PlatformServices, InputVariable, platformResponse }
+import { PlatformArtifacts, Resource, PlatformServices}
   from 'src/interfaces';
-import { Router } from '@angular/router';
-import { Observable, Subscription, firstValueFrom } from 'rxjs';
-import {MatRadioChange, MatRadioModule} from '@angular/material/radio';
+import { firstValueFrom } from 'rxjs';
+import {MatRadioChange} from '@angular/material/radio';
+import { DialogService } from 'src/app/services/dialog.service';
 
 
 @Component({
@@ -20,9 +19,6 @@ export class ServicesComponent implements OnInit {
   constructor(public http: HttpClient,
     public api: ApiService,
     private envConfigService: EnvConfigService,
-    //private logsDialog: LogsDialogComponent, // this is causing NullInjectorError: R3InjectorError
-    //private dialogService: DialogService,
-    //private websocketService: WebsocketService,
     private zone: NgZone
     )
     {
@@ -34,14 +30,6 @@ export class ServicesComponent implements OnInit {
         this.urn = env.urn;
       }
   }
-
-  // todo loe?
-  /*
-  updateData: string = "test data";
-  private subscription!: Subscription;
-  ngOnDestroy(): void {
-    this.subscription.unsubscribe();
-  }*/
 
   services: PlatformServices = {};
   servicesToggle: boolean[] = [];
@@ -56,21 +44,13 @@ export class ServicesComponent implements OnInit {
   technicalData: any; // manufacture info for services
   currentTab:string = "";
 
-  //artifacts: PlatformArtifacts = {};
-  //deploymentPlans: Resource | undefined = {};
   selected: Resource | undefined;
   deployPlanInput: any;
   undeployPlanInput: any;
   undeployPlanByIdInput: any;
   taskId: string = "";
 
-
-  // Radio-Button in 'Running Services' tab
-  options: string[] = ["active", "all"]
-  selectedOption: string = this.options[0]; // default option
-  // Service state
-  correctStates = ["STARTING", "RUNNING", "STOPPING"]
-
+  // filtern
   tabsParam = [
     {tabName: "deployment plans",
       submodel: "Artifacts",
@@ -100,6 +80,11 @@ export class ServicesComponent implements OnInit {
     ["applicationInstanceId", "App instance: ", ""]
   ]
 
+  // Radio-Button in 'Running Services' tab
+  options: string[] = ["active", "all"]
+  selectedOption: string = this.options[0]; // default option
+  correctStates = ["STARTING", "RUNNING", "STOPPING"] // Service state
+
   // logs type
   stdout = 'stdout'
   stderr = 'stderr'
@@ -107,45 +92,37 @@ export class ServicesComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  public onRadioChange(event: MatRadioChange) {
-    this.filterForCorrectState()
-  }
 
   // --------------------- Button -------------------
 
+  debug:number = 0
+
   public getDialog(id:string, idShort:string, logsType:string) {
-    console.log("[service] getDialog with logs type: " + logsType)
+    console.log("[serviceComp | getDialog] getDialog with logs type: " + logsType)
     this.zone.run(() => {
       let data = Date.now()
       let url = document.URL
       url = url.replace('services', 'logs')
-      window.open(url
-        + '?id=' + id
-        + '&idShort=' + idShort
-        + '&type=' + logsType,
-        'Dialog' + data,
-        "height=800,width=700")
+
+      if (this.debug == 0) {
+        window.open(
+          url
+          + '?id=' + id
+          + '&idShort=' + idShort
+          + '&type=' + logsType,
+          'Dialog' + data,
+          "height=800,width=700"
+        )
+      } else {
+        window.open(url
+          + '?id=' + id
+          + '&idShort=' + idShort
+          + '&type=' + logsType)
+      }
     });
   }
 
-  /** todo - loe
-   * used for testing
-
-  logs: any;
-
-  public getLogs(id:string, idShort:string) {
-    console.log("triggered logs btn")
-
-    let data = [id, idShort]
-    this.dialogService.sendData(data)
-    this.logs = this.logsDialog.getLogs()
-    this.logs = this.websocketService.data
-  }
-
-  public stopLogs(id:string, idShort:string) { // todo - do we need both parameter? any?
-    this.logsDialog.closeLogsStream()
-  }
-   */
+  // ------------------ Filter -----------------------------------
 
   public async getPlatformData(submodel: any, submodelElement: any){
     let response: any;
@@ -186,19 +163,6 @@ export class ServicesComponent implements OnInit {
   public async loadData(submodel: any, submodelElement: any){
     let response;
     response = await this.getPlatformData(submodel, submodelElement)
-    /*
-    try {
-        response = await firstValueFrom(
-          this.http.get(this.ip + '/shells/'
-        + this.urn
-        + "/aas/submodels/"
-        + submodel
-        + "/submodel/submodelElements/"
-        + submodelElement));
-      } catch(e) {
-        console.log(e);
-      }
-      */
     this.filteredData = response
 
     if(this.currentTab != "instances") {
@@ -206,6 +170,7 @@ export class ServicesComponent implements OnInit {
     }
   }
 
+  // todo not ready yet
   public async getTechnicalData(url:string) {
     let response;
     let technicalDataUrl = url + "/submodels/TechnicalData/submodel"
@@ -253,7 +218,6 @@ export class ServicesComponent implements OnInit {
     console.log(result)
     return result
   }
-  // Filter ------------------------------------
 
   public async filterServices() {
     let result = []
@@ -350,6 +314,10 @@ export class ServicesComponent implements OnInit {
     }
   }
 
+  public onRadioChange(event: MatRadioChange) {
+    this.filterForCorrectState()
+  }
+
   // --------------------- display ------------------------------
   /** Create a 'human-friendly' string to display
    * based on values in this.paramToDisplay
@@ -382,93 +350,7 @@ export class ServicesComponent implements OnInit {
     return result
   }
 
-
-  // ------------------------- buttons ---------------------------
-
-  // -------------------------- logs-dialog ----------------------
-    /*
-  public getPlatformResponseResolution(response:platformResponse) {
-    let return_value = [null, null];
-    console.log("resposne in getPlat..")
-    console.log(response)
-
-    if(response && response.outputArguments) {
-
-      let output = response.outputArguments[0]?.value?.value;
-      console.log("output")
-      console.log(output)
-      if (output) {
-        let temp = JSON.parse(output);
-        if (temp.result) {
-          let result = JSON.parse(temp.result);
-          if (result.naming.en.description) {
-            return_value = [result.naming.en.name, result.naming.en.description]
-          } else {
-            return_value = [result.naming.en.name, null]
-          }
-        }
-      }
-    }
-    return return_value
-  }
-
-  public async getInputVariable(serviceId:string) {
-    let serviceInfo = this.getServiceInfo("services", "services/" + serviceId)
-    //console.log("service info: " + (await serviceInfo).resource + ", " + (await serviceInfo).serviceMgr)
-
-    let inputVariables: InputVariable[] = [];
-    let input0:InputVariable = {
-      value: {
-        modelType: {
-          //name: "OperationVariable"
-          name: "Property"
-        },
-        valueType: "string",
-        idShort: "id",
-        kind: "Template",
-        value: (await serviceInfo).resource
-      }
-    }
-
-    let input1:InputVariable = {
-      value: {
-        modelType: {
-          //name: "OperationVariable"
-          name: "Property"
-        },
-        valueType: "string",
-        idShort: "mode",
-        kind: "Template",
-        value: this.mode
-      }
-    }
-    inputVariables.push(input0)
-    inputVariables.push(input1)
-
-    return inputVariables
-
-  }
-
-  public async getServiceInfo(submodel: any, submodelElement: any){
-    let response: any;
-    response = await this.getPlatformData(submodel, submodelElement)
-
-    let serviceResource
-    let serviceServiceMgr
-    if (response) {
-      serviceResource = response.value.find(
-        (val: { idShort: string; }) => val.idShort === "resource").value
-      serviceServiceMgr = response.value.find(
-        (val: { idShort: string; }) => val.idShort === "serviceMgr").value
-    }
-    this.serviceMgr = serviceServiceMgr
-    return {resource: serviceResource, serviceMgr: serviceServiceMgr}
-
-  }
-  */
-
-
-  //---------------------------------------------------------
+  //------------------------ helpers ------------------------
 
   public async getServices() {
     this.services = await this.api.getServices();

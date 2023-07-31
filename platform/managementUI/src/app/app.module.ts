@@ -105,7 +105,7 @@ import { DialogService  } from './services/dialog.service';
     deps: [EnvConfigService],
     multi: true,
     },
-    LogsDialogComponent,
+    //LogsDialogComponent,
     DialogService
   ],
   bootstrap: [AppComponent]
