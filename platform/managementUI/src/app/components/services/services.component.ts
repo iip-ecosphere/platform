@@ -350,6 +350,16 @@ export class ServicesComponent implements OnInit {
     return result
   }
 
+  // Returns 'true' when service state is 'RUNNING'
+  public isRunning(service:any) {
+    let state = service.value.find((val: any) => val.state).state
+    if (state == 'RUNNING') {
+      return true
+    } else {
+      return false
+    }
+  }
+
   //------------------------ helpers ------------------------
 
   public async getServices() {

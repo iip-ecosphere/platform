@@ -66,13 +66,13 @@
           <!-- Buttons -->
           <td class="cell-with-button">
             <div *ngIf="tab.tabName == 'running services'">
-              <button mat-raised-button class="button"
+              <button mat-raised-button *ngIf="isRunning(item)" class="btn"
                 (click)="getDialog(item.id, item.idShort, stdout)">
-                logs (stdout)
+                stdout logging
               </button>
-              <button mat-raised-button class="button"
+              <button mat-raised-button *ngIf="isRunning(item)" class="btn"
                 (click)="getDialog(item.id, item.idShort, stderr)">
-                logs (stderr)
+                stderr logging
               </button>
             </div>
           </td>
