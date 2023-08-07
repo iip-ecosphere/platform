@@ -366,14 +366,14 @@ export class ListComponent implements OnInit {
     })
     dialogRef.componentInstance.category = this.currentTab;
   }
-
+  /*
   public new2() {
     let dialogRef = this.dialog.open(EditorComponent, {
       height: '90%',
       width:  '90%',
     })
     dialogRef.componentInstance.category = this.currentTab;
-  }
+  }*/
 
   // ---- icons ------------------------------------------------------------------
 

@@ -5,6 +5,40 @@
     (click)="close()"><mat-icon>close</mat-icon></button></span>
 </mat-toolbar>
 
+<!--
+<div *ngIf="numOfItemsInMeta > 1; else singleItem"> multiple items
+  <mat-card *ngIf="!type">
+    <table>
+      <tr>
+        <td>
+          <div *ngIf="meta && meta.value">
+            <mat-form-field appearance="outline">
+              <mat-select [(value)]="selectedType">
+                <mat-option *ngFor="let type of meta.value"
+                [value]="type" (click)="generateInputs()">
+                  {{ type.idShort }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </td>
+        <td>
+          <h2 *ngIf="selectedType && selectedType.idShort">
+            {{selectedType.idShort}}
+          </h2>
+        </td>
+      </tr>
+    </table>
+  </mat-card>
+
+</div>
+<ng-template #singleItem>
+  <span></span>
+  single item
+</ng-template>
+-->
+
+
 <div *ngIf="showInputs">
   <mat-card *ngIf="!type">
     <table>
@@ -146,6 +180,8 @@
     </div>
   </div>
 </div>
+
+
 
 
 <div style="display: flex; justify-content: center">

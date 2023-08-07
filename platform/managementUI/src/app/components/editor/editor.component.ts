@@ -48,6 +48,8 @@ export class EditorComponent implements OnInit {
     {cat: "Applications", metaRef: ["Application"]}
   ];
 
+  numOfItemsInMeta: number = 0;
+
   constructor(private api: ApiService,
     public dialog: MatDialogRef<EditorComponent>,
     public subDialog: MatDialog) { }
@@ -66,13 +68,6 @@ export class EditorComponent implements OnInit {
     this.meta = await this.api.getMeta();
     this.metaBackup = JSON.parse(JSON.stringify(this.meta)); // deep copy
     this.filterMeta();
-    /* TODO loe
-    if (this.meta.value) {
-      for (let item of this.meta.value) {
-        console.log(item.idShort)
-      }
-    }
-    */
   }
 
   /**
@@ -90,14 +85,13 @@ export class EditorComponent implements OnInit {
         }
 
         if(!this.isAbstract(item)) {
-
           if(filter?.metaRef.includes(idShort)) {
             newMetaValues.push(item)
           }
 
           if (this.getMetaRef(item)) {
-            let metaRefVal = item.value.find((val: { idShort: string; }) => val.idShort === "metaRefines").value
-
+            let metaRefVal = item.value.find(
+              (val: { idShort: string; }) => val.idShort === "metaRefines").value
             if(metaRefVal != "") {
               // sub-type
               if(filter?.metaRef.includes(metaRefVal)) {
@@ -117,7 +111,8 @@ export class EditorComponent implements OnInit {
             }
           } else {
             // ivml types
-            if (this.isTypeMetaKindEqualNum(item, this.primitive) && filter?.metaRef.length == 0) {
+            if (this.isTypeMetaKindEqualNum(item, this.primitive)
+                  && filter?.metaRef.length == 0) {
               newMetaValues.push(item)
             }
           }
@@ -125,11 +120,31 @@ export class EditorComponent implements OnInit {
       }
     }
     this.meta!.value = newMetaValues
+
+    // single item
+    if (newMetaValues.length == 1) {
+      this.setInputForSingleItem(newMetaValues[0])
+    }
   }
 
-  /** Returns false when metaAbstract is false or there is no attribute "metaAbstract" */
+  public setInputForSingleItem(item: any) {
+    let editorInputValue = {
+      value: item.value,
+      type: "",
+      name: item.idShort,
+      description: [{language: "", text: ""}]
+    } as editorInput
+
+    this.type = editorInputValue
+    this.selectedType = item
+    this.generateInputs()
+  }
+
+  /** Returns false when metaAbstract is false or
+   * there is no attribute "metaAbstract" */
   private isAbstract(item:any) {
-    let abstract = item.value.find((val: { idShort: string; }) => val.idShort === "metaAbstract")?.value
+    let abstract = item.value.find(
+      (val: { idShort: string; }) => val.idShort === "metaAbstract")?.value
     if (abstract) {
       return true
     } else {
@@ -138,7 +153,8 @@ export class EditorComponent implements OnInit {
   }
 
   private getMetaRef(item: any) {
-    let value = item.value.find((val: { idShort: string; }) => val.idShort === "metaRefines")
+    let value = item.value.find(
+      (val: { idShort: string; }) => val.idShort === "metaRefines")
     if (value) {
       return value.value
     } else {
@@ -147,7 +163,8 @@ export class EditorComponent implements OnInit {
   }
 
   private isTypeMetaKindEqualNum(item:any, num:number) {
-    let value = item.value.find((val: { idShort: string; }) => val.idShort === "metaTypeKind").value
+    let value = item.value.find(
+      (val: { idShort: string; }) => val.idShort === "metaTypeKind").value
     if (value == num) {
       return true
     } else {
@@ -186,6 +203,7 @@ export class EditorComponent implements OnInit {
       return null
     }
   }
+
 // ----------------------------------------------------------------------
 
 private cleanTypeName(type: string) {
@@ -207,6 +225,10 @@ private cleanTypeName(type: string) {
   }
 
   public generateInputs() {
+    console.log("[editor | generateInputs] type:")
+    console.log(this.type)
+    console.log("[editor | generateInputs] selected type:")
+    console.log(this.selectedType)
     this.uiGroups = [];
     const selectedType = this.selectedType as configMetaContainer;
     if(selectedType && selectedType.value) {
@@ -344,6 +366,8 @@ private cleanTypeName(type: string) {
         }
         }
     }
+    console.log("[editor | generateInputs] END uiGroup: ")
+    console.log(this.uiGroups)
   }
 
   public toggleOptional(uiGroup: uiGroup) {
@@ -427,5 +451,4 @@ private cleanTypeName(type: string) {
     }
     this.dialog.close();
   }
-
 }
