@@ -5,7 +5,6 @@ import { firstValueFrom, Subscription } from 'rxjs';
 import { EnvConfigService } from 'src/app/services/env-config.service';
 import { HttpClient } from '@angular/common/http';
 import { ApiService } from 'src/app/services/api.service';
-import { DialogService } from 'src/app/services/dialog.service';
 
 @Component({
   selector: 'app-logs-dialog',
@@ -44,9 +43,8 @@ export class LogsDialogComponent implements OnInit{
   /* logs stream mode mode="START"|"TAIL"
   (start=log from start, tail=continue at end as selecter by user)*/
   mode = "START"
-  // websocket endpoints
-  stdoutUrl:string = "";
-  stderrUrl:any
+  stdoutUrl:string = ""; // websocket endpoints
+  stderrUrl:string = "";
 
   data:any = {
     id: "",
@@ -116,6 +114,7 @@ export class LogsDialogComponent implements OnInit{
     let basyxFun = "serviceManagers/a"
       + this.serviceInfo.serviceMgr.replace("@", "_")
       + "/serviceStreamLog"
+
     const response = await this.api.executeFunction(
       resourceId,
       aasElementURL,
@@ -123,8 +122,11 @@ export class LogsDialogComponent implements OnInit{
       inputVariable) as unknown as platformResponse
 
     this.getPlatformResponseResolution(response)
-    console.log("[logs-dialog]  Endpoints - \nstdout: " + this.stdoutUrl
-    + ", \nstderr: " + this.stderrUrl)
+    console.log("[logs-dialog | getPlatformResponseResolution]"
+      + "Endpoints - \nstdout: "
+      + this.stdoutUrl
+      + ", \nstderr: "
+      + this.stderrUrl)
   }
 
   public getPlatformResponseResolution(response:platformResponse) {

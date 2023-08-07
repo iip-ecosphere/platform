@@ -6,7 +6,6 @@ import { PlatformArtifacts, Resource, PlatformServices}
   from 'src/interfaces';
 import { firstValueFrom } from 'rxjs';
 import {MatRadioChange} from '@angular/material/radio';
-import { DialogService } from 'src/app/services/dialog.service';
 
 
 @Component({

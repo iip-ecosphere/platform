@@ -44,7 +44,6 @@ import { StatusDetailsComponent }
   from './components/deployment-plans/status-box/status-details/status-details.component';
 import {LogsDialogComponent}
   from './components/services/logs/logs-dialog.component';
-import { DialogService  } from './services/dialog.service';
 
 
 @NgModule({
@@ -104,9 +103,7 @@ import { DialogService  } from './services/dialog.service';
     useFactory: (EnvConfigService: EnvConfigService) => () => EnvConfigService.init(),
     deps: [EnvConfigService],
     multi: true,
-    },
-    //LogsDialogComponent,
-    DialogService
+    }
   ],
   bootstrap: [AppComponent]
 })
