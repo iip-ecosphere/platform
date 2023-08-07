@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
-import { Subject} from 'rxjs';
+import { Subject, firstValueFrom} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class WebsocketService {
+  http: any;
 
   constructor() { }
 

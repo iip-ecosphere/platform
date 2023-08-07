@@ -14,11 +14,9 @@ export class StatusBoxComponent implements OnInit {
   //statusSub: Subscription;
   hidden =  ["TaskId", "AliasIds", "SubDescription"];
 
-
   StatusCollection: statusCollection[];
 
   showAll = false;
-
 
   constructor(private deployer: PlanDeployerService,
     public dialog: MatDialog) {

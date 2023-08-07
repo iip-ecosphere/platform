@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
 import { OnlyIdPipe } from 'src/app/pipes/only-id.pipe';
 import { ApiService } from 'src/app/services/api.service';
 import { PlanDeployerService } from 'src/app/services/plan-deployer.service';
@@ -23,6 +24,8 @@ export class DeploymentPlansComponent implements OnInit {
   responseMessage: string | undefined;
 
   taskId: string = "";
+  http: any;
+
 
   constructor(public api: ApiService,
     private deployer: PlanDeployerService,
@@ -47,6 +50,26 @@ export class DeploymentPlansComponent implements OnInit {
       this.instanceId.fill("", 0, this.deploymentPlans?.value?.length);
     }
   }
+
+  // todo get ip and urn from env or loe whole thing
+  /*
+  public async getStatusUri() {
+    let ip = ""
+    let urn = ""
+
+    let response: any;
+    try {
+        response = await firstValueFrom(
+          this.http.get(ip + '/shells/'
+        + urn
+        + "/aas/submodels/Status/submodel/submodelElements/status"));
+    } catch(e) {
+      console.log(e);
+    }
+    let uri = response.value.find(
+      (val: { idShort: string; }) => val.idShort === "uri").value
+    //this.deployer.uri = uri
+  }*/
 
   public isArray(value: any) {
     return Array.isArray(value);

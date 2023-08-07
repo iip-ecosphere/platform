@@ -129,7 +129,7 @@ export class EditorComponent implements OnInit {
 
   public setInputForSingleItem(item: any) {
     let editorInputValue = {
-      value: item.value,
+      value: null,
       type: "",
       name: item.idShort,
       description: [{language: "", text: ""}]

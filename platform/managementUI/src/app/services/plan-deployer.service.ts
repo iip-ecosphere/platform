@@ -10,8 +10,6 @@ import { OnlyIdPipe } from '../pipes/only-id.pipe';
   providedIn: 'root'
 })
 
-
-
 export class PlanDeployerService {
 
   ip: string = "";
@@ -20,7 +18,6 @@ export class PlanDeployerService {
   sub: Subscription | undefined;
 
   statusSubmodel: any;
-
 
   webSocket: WebSocketSubject<any>;
   public StatusCollection: statusCollection[] = [];
@@ -44,9 +41,11 @@ export class PlanDeployerService {
     wsIp = wsIp.replace('https', 'wws');
     wsIp = wsIp.slice(0, wsIp.indexOf(":", wsIp.indexOf(":") + 1));
     wsIp = wsIp.concat(":10000/status");
-    console.log("wsIp: " + wsIp)
+    //let uri = await this.getUri()
+    //this.webSocket = webSocket(uri);
     this.webSocket = webSocket(wsIp);
-    this.webSocket.asObservable().subscribe(dataFromServer => this.recieveStatus(dataFromServer));
+    this.webSocket.asObservable().subscribe(
+      dataFromServer => this.receiveStatus(dataFromServer));
     // this.webSocket.subscribe(   msg => console.log('message received: ' + msg),
     // // Called whenever there is a message from the server
     // err => console.log(err),
@@ -57,7 +56,6 @@ export class PlanDeployerService {
    }
 
   public async deployPlan(params: any, undeploy?: boolean) {
-
     let response;
     let basyxFunc;
 
@@ -83,7 +81,7 @@ export class PlanDeployerService {
     }
 
     if(response && response.outputArguments[0].value && response.outputArguments[0].value.value) {
-      this.requestRecievedMessage(basyxFunc, this.onlyId.transform(response.outputArguments[0].value.value));
+      this.requestReceivedMessage(basyxFunc, this.onlyId.transform(response.outputArguments[0].value.value));
     }
 
     return response;
@@ -109,13 +107,13 @@ export class PlanDeployerService {
 
 
     if(response && response.outputArguments[0].value && response.outputArguments[0].value.value) {
-      this.requestRecievedMessage("undeploy", this.onlyId.transform(response.outputArguments[0].value.value));
+      this.requestReceivedMessage("undeploy", this.onlyId.transform(response.outputArguments[0].value.value));
     }
 
     return response;
   }
 
-  private recieveStatus(Status: statusMessage) {
+  private receiveStatus(Status: statusMessage) {
 
     let isFinished = false;
     let isSuccesful = true;
@@ -150,7 +148,7 @@ export class PlanDeployerService {
 
   }
 
-  public async requestRecievedMessage(deploy: string, taskId: string) {
+  public async requestReceivedMessage(deploy: string, taskId: string) {
     let message = "";
     if(deploy.indexOf("undeploy") >= 0) {
       message = "undeploy request recieved";

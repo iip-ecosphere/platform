@@ -36,7 +36,7 @@ export class LogsDialogComponent implements OnInit{
   ip: string = "";
   urn: string = "";
   logs:string | undefined;
-  serviceMgr: string | undefined; // todo do we need it?
+  serviceMgr: string | undefined;
   serviceInfo: any;
   private subscription!: Subscription;
 
