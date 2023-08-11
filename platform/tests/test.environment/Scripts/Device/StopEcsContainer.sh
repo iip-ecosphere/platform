@@ -1,2 +1,3 @@
-echo $1 | sudo -S $2 exec -d IIPEcs /bin/sh -c  "echo -n -e 'kill ' > kill.sh; cat /run/iip-ecsRuntime.pid >> kill.sh; chmod u+x kill.sh"
-echo $1 | sudo -S $2 exec -d IIPEcs /bin/sh -c /kill.sh
+echo $1 | sudo -S $2 exec -d IIPEcs /bin/sh -c  "echo -n -e 'kill ' > kill.sh; cat /run/iip-serviceMgr.pid >> kill.sh; echo -n -e '\n' >> kill.sh"
+echo $1 | sudo -S $2 exec -d IIPEcs /bin/sh -c  "[ -f /run/iip-ecsRuntime.pid ] && echo -n -e 'kill ' >> kill.sh; [ -f /run/iip-ecsRuntime.pid ] && cat /run/iip-ecsRuntime.pid >> kill.sh; chmod u+x kill.sh"
+echo $1 | sudo -S $2 exec -d IIPEcs /bin/sh -c ./kill.sh 

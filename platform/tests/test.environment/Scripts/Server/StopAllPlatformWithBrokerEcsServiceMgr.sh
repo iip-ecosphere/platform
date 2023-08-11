@@ -2,10 +2,12 @@ cd Files
 
 brokerPID=$(cat ProcessesIDs.info | grep brokerPID | cut -d ' ' -f1)
 platformPID=$(cat ProcessesIDs.info | grep platformPID | cut -d ' ' -f1)
+mgtUiPID=$(cat ProcessesIDs.info | grep mgtUiPID | cut -d ' ' -f1)
+monitoringPID=$(cat ProcessesIDs.info | grep monitoringPID | cut -d ' ' -f1)
 ecsPID=$(cat ProcessesIDs.info | grep ecsPID | cut -d ' ' -f1)
 serviceMgrPID=$(cat ProcessesIDs.info | grep serviceMgrPID | cut -d ' ' -f1)
 
-kill $serviceMgrPID
+echo $1 | sudo -S kill $serviceMgrPID
 
 serviceMgrKilled=$(ps -ef | grep  $serviceMgrPID | grep -v grep)
 while [ -z "$serviceMgrKilled" ]; do
@@ -16,7 +18,7 @@ done
 
 echo "ServiceMgr is stopped"
 
-kill $ecsPID
+echo $1 | sudo -S kill $ecsPID
 
 ecsKilled=$(ps -ef | grep  $ecsPID | grep -v grep)
 while [ -z "$ecsKilled" ]; do
@@ -27,7 +29,29 @@ done
 
 echo "Ecs is stopped"
 
-kill $platformPID
+echo $1 | sudo -S kill $monitoringPID
+
+monitoringKilled=$(ps -ef | grep  $monitoringPID | grep -v grep)
+while [[ $monitoringKilled ]]; do
+  echo "Waiting monitoring to be stopped";
+  monitoringKilled=$(ps -ef | grep  $monitoringPID | grep -v grep);
+  sleep 3;
+done
+
+echo "Monitoring is stopped"
+
+echo $1 | sudo -S kill $mgtUiPID
+
+mgtUiKilled=$(ps -ef | grep  $mgtUiPID | grep -v grep)
+while [[ $mgtUiKilled ]]; do
+  echo "Waiting manage UI to be stopped";
+  mgtUiKilled=$(ps -ef | grep  $mgtUiPID | grep -v grep);
+  sleep 3;
+done
+
+echo "Manage UI is stopped"
+
+echo $1 | sudo -S kill $platformPID
 
 platformKilled=$(ps -ef | grep  $platformPID | grep -v grep)
 while [ -z "$platformKilled" ]; do
@@ -38,7 +62,7 @@ done
 
 echo "Platform is stopped"
 
-kill $brokerPID
+echo $1 | sudo -S kill $brokerPID
 
 brokerKilled=$(ps -ef | grep  $brokerPID | grep -v grep)
 while [ -z "$brokerKilled" ]; do

@@ -62,9 +62,9 @@ echo "ServiceMgr is started"
 echo "Ecs and ServiceMgr are Running... Please don't close it"
 echo "DeviceID: $2"
 
-brokerPID=$(ps -Ao pid,command | grep "java -cp brokerJars/" | grep -v grep | head -1 | xargs | cut -d ' ' -f -1)
-ecsPID=$(ps -Ao pid,command | grep "java -cp ecsJars/" | grep -v grep | head -1 | xargs | cut -d ' ' -f -1)
-serviceMgrPID=$(ps -Ao pid,command | grep "java -cp svcJars/" | grep -v grep | head -1 | xargs | cut -d ' ' -f -1)
+brokerPID=$(ps -Ao pid,command | grep "cp brokerJars/" | grep -v grep | head -1 | xargs | cut -d ' ' -f -1)
+ecsPID=$(ps -Ao pid,command | grep "cp ecsJars/" | grep -v grep | head -1 | xargs | cut -d ' ' -f -1)
+serviceMgrPID=$(ps -Ao pid,command | grep "cp svcJars/" | grep -v grep | head -1 | xargs | cut -d ' ' -f -1)
 
 #brokerPID=$(pgrep -laP $brokerPPID | cut -d ' ' -f1)
 #ecsPID=$(pgrep -laP $ecsPPID | cut -d ' ' -f1)

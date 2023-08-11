@@ -27,7 +27,7 @@ else
 fi
 
 cd ..
-./DownloadExamples.sh
+./DownloadExamples.sh $1
 cd Install
 
 if [ $4 == "True" ]; then
@@ -41,12 +41,12 @@ else
 fi
 
 cd ..
-./CompileExamples.sh
+./CompileExamples.sh $1
 cd Install
 
 if [ $7 == "True" ]; then
 
-    if [ $2 != "Non" ]; then
+    if [ $2 == "True" ]; then
 
         #sed -i '/Application /a \ \ \ \ \ \ \ \ createContainer = true,' src/main/easy/apps/ApplicationPart*.ivml
       
@@ -63,7 +63,7 @@ if [ $7 == "True" ]; then
             sed -i $generationLineNumber' i \ \ \ \ containerManager = DockerContainerManager {' src/main/easy/TechnicalSetup.ivml
             sed -i $generationLineNumber' i \ \ \ \ ' src/main/easy/TechnicalSetup.ivml
         fi
-        sed -i $generationLineNumber' i \ \ \ \ // ---------- Device ------------' src/main/easy/TechnicalSetup.ivml
+        sed -i $generationLineNumber' i \ \ \ \ // ---------- Registry ------------' src/main/easy/TechnicalSetup.ivml
         sed -i $generationLineNumber' i \ \ \ \ ' src/main/easy/TechnicalSetup.ivml
 
         echo "Containers Added"
