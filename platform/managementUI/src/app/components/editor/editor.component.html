@@ -40,7 +40,7 @@
 
 
 <div *ngIf="showInputs">
-  <mat-card *ngIf="!type">
+  <mat-card *ngIf="!type || (meta && meta.value && meta.value.length > 1)">
     <table>
       <tr>
         <td>

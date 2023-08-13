@@ -10,8 +10,7 @@ import { Resource, uiGroup, editorInput, configMetaContainer } from 'src/interfa
 })
 export class EditorComponent implements OnInit {
 
-  //type to generate editor for, null if type should be selected via dropdown
-  //needed for subeditor functionality
+  //type to generate subeditor for, null if this editor instance is not a subeditor
   @Input() type: editorInput | null = null;
 
   category: string = 'all';
@@ -128,14 +127,6 @@ export class EditorComponent implements OnInit {
   }
 
   public setInputForSingleItem(item: any) {
-    let editorInputValue = {
-      value: null,
-      type: "",
-      name: item.idShort,
-      description: [{language: "", text: ""}]
-    } as editorInput
-
-    this.type = editorInputValue
     this.selectedType = item
     this.generateInputs()
   }
