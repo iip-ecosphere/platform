@@ -44,6 +44,8 @@ import { StatusDetailsComponent }
   from './components/deployment-plans/status-box/status-details/status-details.component';
 import {LogsDialogComponent}
   from './components/services/logs/logs-dialog.component';
+import { EnumDropdownComponent } from './components/editor/inputControls/enum-dropdown/enum-dropdown.component';
+import { BooleanDropdownComponent } from './components/editor/inputControls/boolean-dropdown/boolean-dropdown.component';
 
 
 @NgModule({
@@ -64,7 +66,9 @@ import {LogsDialogComponent}
     EditorComponent,
     InputRefSelectComponent,
     StatusDetailsComponent,
-    LogsDialogComponent
+    LogsDialogComponent,
+    EnumDropdownComponent,
+    BooleanDropdownComponent
   ],
   imports: [
     BrowserModule,

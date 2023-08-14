@@ -70,27 +70,23 @@
           <p style="margin-bottom: 1em;">{{ input.name }}</p>
           <div *ngIf="input.type != 'Boolean'; else booleanCase">
             <div *ngIf="input.metaTypeKind != 10; else subEditor">
-              <mat-form-field appearance="outline" >
-                <mat-label>{{ input.type }}</mat-label>
-                <input matInput
-                  [matTooltip]="input.description[0].text + ' ' + input.description[0].language" type="text" ngDefaultControl [(ngModel)]=input.value />
-              </mat-form-field>
+              <div *ngIf="input.metaTypeKind != 2; else enumCase">
+                <mat-form-field appearance="outline" >
+                  <mat-label>{{ input.type }}</mat-label>
+                  <input matInput
+                    [matTooltip]="input.description[0].text + ' ' + input.description[0].language" type="text" ngDefaultControl [(ngModel)]=input.value />
+                </mat-form-field>
+              </div>
             </div>
             <ng-template #subEditor>
               <button mat-raised-button (click)="openSubeditor(input)">open Subeditor</button>
             </ng-template>
           </div>
             <ng-template #booleanCase>
-              <mat-form-field ngDefaultControl>
-                <mat-select [(ngModel)]=input.value>
-                  <mat-option [value]="true">
-                    true
-                  </mat-option>
-                  <mat-option [value]="false" >
-                    false
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
+              <app-boolean-dropdown [input]="input"></app-boolean-dropdown>
+            </ng-template>
+            <ng-template #enumCase>
+              <app-enum-dropdown [meta] ="metaBackup" [input] = "input"></app-enum-dropdown>
             </ng-template>
         </mat-card>
         <div>
@@ -131,23 +127,19 @@
           <mat-card-content *ngIf="!input.multipleInputs && !input.refTo; else refOpt">
             <p style="margin-bottom: 1em;">{{ input.name }}</p>
             <div *ngIf="input.type != 'Boolean'; else optBooleanCase">
-            <mat-form-field appearance="outline" *ngIf="input.metaTypeKind != 10; else subEditor">
-              <mat-label>{{ input.type }}</mat-label>
-              <input matInput
-                [matTooltip]="input.description[0].text + ' ' + input.description[0].language" type="text" ngDefaultControl [(ngModel)]=input.value />
-            </mat-form-field>
+              <div *ngIf="input.metaTypeKind != 2; else optEnumCase">
+                <mat-form-field appearance="outline" *ngIf="input.metaTypeKind != 10; else subEditor">
+                  <mat-label>{{ input.type }}</mat-label>
+                  <input matInput
+                    [matTooltip]="input.description[0].text + ' ' + input.description[0].language" type="text" ngDefaultControl [(ngModel)]=input.value />
+                </mat-form-field>
+              </div>
           </div>
           <ng-template #optBooleanCase>
-            <mat-form-field ngDefaultControl >
-              <mat-select [(ngModel)]=input.value >
-                <mat-option [value]="true">
-                  true
-                </mat-option>
-                <mat-option [value]="false" >
-                  false
-                </mat-option>
-              </mat-select>
-            </mat-form-field>
+            <app-boolean-dropdown [input]="input"></app-boolean-dropdown>
+          </ng-template>
+          <ng-template #optEnumCase>
+            <app-enum-dropdown [meta] ="metaBackup" [input] = "input"></app-enum-dropdown>
           </ng-template>
             <ng-template #subEditor>
               <button mat-raised-button (click)="openSubeditor(input)">open Subeditor</button>
@@ -180,9 +172,6 @@
     </div>
   </div>
 </div>
-
-
-
 
 <div style="display: flex; justify-content: center">
   <button mat-raised-button class="button" *ngIf="!type"

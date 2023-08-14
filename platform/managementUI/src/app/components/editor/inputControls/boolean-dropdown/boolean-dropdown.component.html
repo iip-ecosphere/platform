@@ -1,0 +1,10 @@
+<mat-form-field ngDefaultControl *ngIf="input">
+  <mat-select [(ngModel)]=input.value>
+    <mat-option [value]="true">
+      true
+    </mat-option>
+    <mat-option [value]="false" >
+      false
+    </mat-option>
+  </mat-select>
+</mat-form-field>

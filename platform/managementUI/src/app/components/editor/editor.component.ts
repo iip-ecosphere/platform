@@ -20,6 +20,8 @@ export class EditorComponent implements OnInit {
   metaBackup: Resource | undefined;
   selectedType: Resource | undefined;
 
+  enums: any[] = [];
+
   uiGroups: uiGroup[] = [];
 
   showInputs = true;
@@ -200,20 +202,53 @@ export class EditorComponent implements OnInit {
 private cleanTypeName(type: string) {
   const startIndex = type.lastIndexOf('(') + 1;
   const endIndex = type.indexOf(')');
-  return type.substring(startIndex, endIndex);
+  if(endIndex > 0){
+    return type.substring(startIndex, endIndex);
+  } else {
+    return type;
+  }
+
 
 }
 
-  public displayName(property: Resource | string) {
-    let displayName = '';
-    if(typeof(property) == 'string') {
-      displayName = property;
-    } else if(property.value) {
-      displayName = property.value.find(
-        item => item.idShort === 'name')?.value;
-    }
-    return displayName;
+public displayName(property: Resource | string) {
+  let displayName = '';
+  if(typeof(property) == 'string') {
+    displayName = property;
+  } else if(property.value) {
+    displayName = property.value.find(
+      item => item.idShort === 'name')?.value;
   }
+  return displayName;
+}
+
+public getEnumValue(value: editorInput) {
+  if(this.metaBackup && this.metaBackup.value) {
+    let enumMeta = this.metaBackup.value.find(a => a.idShort === value.type)
+    console.log(enumMeta);
+    let a
+    if(value && Array.isArray(value.value)) {
+      let varValue = value.value.find((a: { idShort: string; }) => a.idShort === "varValue");
+      a = varValue.value
+    }
+    console.log(a);
+    if(typeof(a) == "string") {
+      return a
+    } else {
+      return null
+    }
+  } else {
+    return null
+  }
+}
+
+public getEnums(value: editorInput) {
+  if(this.metaBackup && this.metaBackup.value) {
+    let enumMeta = this.metaBackup.value.find(a => a.idShort === value.type)
+
+  }
+
+}
 
   public generateInputs() {
     console.log("[editor | generateInputs] type:")
@@ -290,7 +325,6 @@ private cleanTypeName(type: string) {
             initial = []
           } else if(editorInput.type === 'Boolean'){
             initial = false;
-            console.log(editorInput);
           } else {
             initial = '';
           }
