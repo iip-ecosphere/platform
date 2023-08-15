@@ -1,0 +1,98 @@
+project ConnectorsPartMIP {
+
+   import Connectors;
+   
+   annotate BindingTime bindingTime = BindingTime::compile to .;
+      
+   compound MipMqttV3Connector refines MqttV3Connector { // Mqtt connector for MIP software
+       String name = "Mip MQTT Data connector";
+       String description = "";
+       String ver = "0.1.0";
+       sequenceOf(IOType) input = {{type=refBy(MipMqttInput), forward=false}};
+       sequenceOf(IOType) output = {{type=refBy(MipMqttOutput)}};
+       IOTypeWithPath inInterface = {type=refBy(MipMqttInput)};
+       IOTypeWithPath outInterface = {type=refBy(MipMqttOutput)};
+       MachineFormatter machineFormatter = JsonFormatter{};
+       MachineParser machineParser = JsonParser{};
+   }
+   
+   RecordType MipMqttInput = {
+       name = "MipMqttInput",
+       fields = {
+           Field {
+               name = "mipcontext",
+               type = refBy(StringType)
+           }, Field {
+               name = "mipdate",
+               type = refBy(StringType)
+           }, Field {
+               name = "mipto",
+               type = refBy(StringType)
+           }, Field {
+               name = "mipfrom",
+               type = refBy(StringType),
+               optional = true
+           }, Field {
+               name = "mipcommand",
+               type = refBy(StringType),
+               optional = true
+           }, Field {
+               name = "mipbitstream_ai_clock",
+               type = refBy(StringType),
+               optional = true
+           }, Field {
+               name = "mipbitstream_ai_data1",
+               type = refBy(StringType),
+               optional = true
+           }, Field {
+               name = "mipbitstream_ai_data2",
+               type = refBy(StringType),
+               optional = true
+           }, Field {
+               name = "mipreader",
+               type = refBy(StringType),
+               optional = true
+           }
+       }
+   };
+
+   RecordType MipMqttOutput = {
+       name = "MipMqttOutput",
+       fields = {
+           Field {
+               name = "mipcontext",
+               type = refBy(StringType)
+           }, Field {
+               name = "mipdate",
+               type = refBy(StringType)
+           }, Field {
+               name = "mipfrom",
+               type = refBy(StringType)
+           }, Field {
+               name = "mipid_tag",
+               type = refBy(StringType)
+           }, Field {
+               name = "mipreader",
+               type = refBy(StringType)
+           }, Field {
+               name = "mipraw_signal_clock",
+               type = refBy(StringType),
+               optional = true
+           }, Field {
+               name = "mipraw_signal_data1",
+               type = refBy(StringType),
+               optional = true
+           }, Field {
+               name = "mipraw_signal_data2",
+               type = refBy(StringType),
+               optional = true
+           }
+       }
+   };
+
+   freeze {
+       MipMqttInput;
+       MipMqttOutput;
+   };
+   
+}
