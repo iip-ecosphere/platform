@@ -31,8 +31,33 @@ template JavaSpringCloudStreamMeshElementPartTraceToAas(Configuration config, Fi
             '${generateOutTransport(service.outTransport)|e}'
         }
     }
-    
+
+    @DispatchCase
+    def generateClassRest(MeshElement elt, TraceToAasJavaService service) {
+        if (isDefined(service.outTransport) and service.outTransport <> null) {
+            '/**
+            * Returns the configured transport parameter.
+            *
+            * @return the transport parameter instance (may be <b>null</b>)
+            */
+            public static TransportParameter createOutTransportParameter() {
+                ${generateOutTransportParams(service.outTransport)|e}
+            }
+            '
+        }
+    }
+
     def generateOutTransport(TraceToAasOutTransport outTransport) {
+        String outTpHost = getStringValueSafe(outTransport.host, "");
+        Integer outTpPort = getIntegerValueSafe(outTransport.port, 0);
+        if (outTpHost <> "" and outTpPort <> "") {
+            'service.setTransportParameter(createOutTransportParameter());'
+        } else {
+            ''
+        }
+    }
+    
+    def generateOutTransportParams(TraceToAasOutTransport outTransport) {
         String outTpHost = getStringValueSafe(outTransport.host, "");
         Integer outTpPort = getIntegerValueSafe(outTransport.port, 0);
         if (outTpHost <> "" and outTpPort <> "") {
@@ -46,9 +71,9 @@ template JavaSpringCloudStreamMeshElementPartTraceToAas(Configuration config, Fi
                 'tpBuilder.setKeyAlias("${outTpSec.keyAlias}");'
                 'tpBuilder.setHostnameVerification(${outTpSec.hostNameVerification});'
             }
-            'service.setTransportParameter(tpBuilder.build());'
+            'return tpBuilder.build();'
         } else {
-            ''
+            'return null;'
         }
     }
     

@@ -611,6 +611,12 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
     def generateReceptionCallback(MeshElement elt, ServiceBase base) {
         ''
     }
+
+    // remaining stuff of class, may be overridden if needed    
+    @DispatchBasis
+    def generateClassRest(MeshElement elt, ServiceBase service) {
+        ''
+    }
     
     // still needed??
     def generateReceptionCallback(MeshProcessor elt, ServiceBase service, String serviceId) {
@@ -1246,6 +1252,7 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
             ${generateReceptionCallback(elt, app)}
             ${generateEventHandlers(elt, impl)|e}
             ${generateServiceBase(implements)|e}
+            ${generateClassRest(elt, impl)|e}
         }'
     }
     
