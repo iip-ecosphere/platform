@@ -90,6 +90,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     public static final String OP_DELETE_GRAPH = "deleteGraph";
     public static final String OP_CREATE_VARIABLE = "createVariable";
     public static final String OP_DELETE_VARIABLE = "deleteVariable";
+    public static final String OP_GEN_INTERFACES = "genInterfacesAsync";
     public static final String OP_GEN_APPS_NO_DEPS = "genAppsNoDepsAsync";
     public static final String OP_GEN_APPS = "genAppsAsync";
     
@@ -320,16 +321,26 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                 return null;
             }, getAasOperationCompletedListener())
         );
+        // generate Interfaces, generate Templates
         sBuilder.defineOperation(OP_GEN_APPS, 
             new JsonResultWrapper(a -> {
                 return TaskUtils.executeAsTask(PROGRESS_COMPONENT_ID, 
-                    p -> getAasIvmlMapper().instantiate(getAasIvmlMapper().createInstantiationConfigurer(false)));
+                    p -> getAasIvmlMapper().instantiate(getAasIvmlMapper().createInstantiationConfigurer(
+                        InstantiationMode.APPS, AasUtils.readString(p), AasUtils.readString(p, 1))));
             })
         );
         sBuilder.defineOperation(OP_GEN_APPS_NO_DEPS, 
             new JsonResultWrapper(a -> {
                 return TaskUtils.executeAsTask(PROGRESS_COMPONENT_ID, 
-                    p -> getAasIvmlMapper().instantiate(getAasIvmlMapper().createInstantiationConfigurer(true)));
+                    p -> getAasIvmlMapper().instantiate(getAasIvmlMapper().createInstantiationConfigurer(
+                        InstantiationMode.APPS_NO_DEPS, AasUtils.readString(p), null)));
+            })
+        );
+        sBuilder.defineOperation(OP_GEN_INTERFACES, 
+            new JsonResultWrapper(a -> {
+                return TaskUtils.executeAsTask(PROGRESS_COMPONENT_ID, 
+                    p -> getAasIvmlMapper().instantiate(getAasIvmlMapper().createInstantiationConfigurer(
+                        InstantiationMode.INTERFACES, null, null)));
             })
         );
     }
@@ -347,19 +358,43 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     }
     
     /**
+     * Instantiation modes.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private enum InstantiationMode {
+        APPS_NO_DEPS,
+        APPS,
+        INTERFACES
+    }
+    
+    /**
      * Creates an instantiation configurer from {@link ConfigurationSetup} to create application code.
      * 
-     * @param noDeps do a no-deps generation or do a full generation
+     * @param mode the instantiation mode
+     * @param appId the id of the application to instantiate, may be empty or <b>null</b> for none
+     * @param fileName the name of the implementation artifact to integrate, may be empty or <b>null</b> for none
      * @return the configurer
      */
-    private InstantiationConfigurer createInstantiationConfigurer(boolean noDeps) {
+    private InstantiationConfigurer createInstantiationConfigurer(InstantiationMode mode, String appId, 
+        String fileName) {
+        // if fileName -> unpack, run maven
         EasySetup ep = ConfigurationSetup.getSetup().getEasyProducer();
         InstantiationConfigurer result = new InstantiationConfigurer(
             ep.getIvmlModelName(), getIvmlConfigFolder(ep), ep.getGenTarget());
-        if (noDeps) {
-            result.setStartRuleName("generateAppsNoDeps");
-        } else {
+        // TODO pass into appId
+        switch (mode) {
+        case APPS:
             result.setStartRuleName("generateApps");
+            break;
+        case APPS_NO_DEPS:
+            result.setStartRuleName("generateAppsNoDeps");
+            break;
+        case INTERFACES:
+            result.setStartRuleName("generateInterfaces");
+            break;
+        default:
+            break;
         }
         return result;
     }
@@ -919,9 +954,15 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             .build(Type.NONE);
         smBuilder.createOperationBuilder(OP_GEN_APPS)
             .setInvocable(iCreator.createInvocable(OP_GEN_APPS))
+            .addInputVariable("appId", Type.STRING)
+            .addInputVariable("codeFile", Type.STRING)
             .build(Type.STRING);
         smBuilder.createOperationBuilder(OP_GEN_APPS_NO_DEPS)
             .setInvocable(iCreator.createInvocable(OP_GEN_APPS_NO_DEPS))
+            .addInputVariable("appId", Type.STRING)
+            .build(Type.STRING);
+        smBuilder.createOperationBuilder(OP_GEN_INTERFACES)
+            .setInvocable(iCreator.createInvocable(OP_GEN_INTERFACES))
             .build(Type.STRING);
     }
     
