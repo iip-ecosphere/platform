@@ -3,6 +3,17 @@ project ConnectorsPartMIP {
    import Connectors;
    
    annotate BindingTime bindingTime = BindingTime::compile to .;
+   
+   Manufacturer manufacturer_mipTech = {
+        manufacturerName = "MIP Technology@de",
+        manufacturerLogo = "MIP-Logo.png",
+        address = {
+            department = "MIP Technology@de",
+            street = "Hollerithallee 17@de",
+            zipCode = "30419@de",
+            cityTown = "Hannover@de"
+        }
+    };
       
    compound MipMqttV3Connector refines MqttV3Connector { // Mqtt connector for MIP software
        String name = "Mip MQTT Data connector";
@@ -14,6 +25,10 @@ project ConnectorsPartMIP {
        IOTypeWithPath outInterface = {type=refBy(MipMqttOutput)};
        MachineFormatter machineFormatter = JsonFormatter{};
        MachineParser machineParser = JsonParser{};
+       NameplateInfo nameplateInfo = {
+           manufacturerProductDesignation = "MIP MQTT connector@en",
+           manufacturer = refBy(manufacturer_sse)
+       };
    }
    
    RecordType MipMqttInput = {
@@ -91,6 +106,7 @@ project ConnectorsPartMIP {
    };
 
    freeze {
+       manufacturer_mipTech;
        MipMqttInput;
        MipMqttOutput;
    };
