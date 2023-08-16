@@ -48,7 +48,7 @@ public class ParameterConfigurer<T> implements ValueConfigurer<T> {
      * @param getter a function returning the actual value of the parameter, used for recovery, may be <b>null</b> 
      *   for disabling recovery on this parameter
      */
-    protected ParameterConfigurer(String name, Class<T> cls, TypeTranslator<String, T> translator, 
+    public ParameterConfigurer(String name, Class<T> cls, TypeTranslator<String, T> translator, 
         ValueConfigurer<T> cfg, Supplier<T> getter) {
         this.name = name;
         this.cls = cls;
