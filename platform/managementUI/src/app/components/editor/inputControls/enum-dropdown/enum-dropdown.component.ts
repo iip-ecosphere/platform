@@ -28,7 +28,6 @@ export class EnumDropdownComponent implements OnInit {
             if(!this.metaTypes.includes(element.idShort)) {
               let value = element.value.find((a: { idShort: string; }) => a.idShort === 'varValue');
               if(value) {
-                console.log(value);
                 this.enum.push(value.value);
               }
             }

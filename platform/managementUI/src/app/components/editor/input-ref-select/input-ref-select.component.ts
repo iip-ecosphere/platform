@@ -26,24 +26,23 @@ export class InputRefSelectComponent implements OnInit {
   constructor(private edit: EditorService) { }
 
   ngOnInit(): void {
-    let type = this.input.type.toLowerCase();
+    let type = this.input.type;
     this.init(type);
   }
 
   private init(value: string) {
-    value = value.toLowerCase();
 
     if(value) {
-      if(value.indexOf('setof') >= 0) {
+      if(value.indexOf('setOf') >= 0) {
         this.isSetOf = true;
       }
-      if(value.indexOf('refto') >= 0) {
-        const startIndex = value.indexOf('refto') + 6;
+      if(value.indexOf('refTo') >= 0) {
+        const startIndex = value.indexOf('refTo') + 6;
         this.refTo = value.substring(startIndex, value.indexOf(')', startIndex));
-        this.getReferences(this.refTo);
+        this.getConfigurationType(this.refTo);
         this.activeTextinput = false;
       }
-      if(value.indexOf('sequenceof') >= 0) {
+      if(value.indexOf('sequenceOf') >= 0) {
         console.log('sequenceOf ' + value);
         this.isSequenceOf = true;
       }
@@ -53,114 +52,16 @@ export class InputRefSelectComponent implements OnInit {
     }
   }
 
-  private async getReferences(refTo: string) {
-    console.log('get ref of ' + refTo);
-    if(refTo === 'dependency') {
-      const response = await this.edit.getDependencies() as Resource;
-      if(response && response.value) {
-        for(let ele of response.value) {
-          this.references.push(ele);
-          // for(let dep of ele.value) {
-          //   if(dep.idShort && this.metaTypes.indexOf(dep.idShort) === -1) {
-          //     this.references.push(dep);
-          //   }
-          // }
-
+  public async getConfigurationType(type: string) {
+    const response = await this.edit.getConfigurationType(type);
+    if(response && response.value) {
+      for(let dep of response.value) {
+        if(dep.idShort && this.metaTypes.indexOf(dep.idShort) === -1) {
+          this.references.push(dep);
         }
 
-      }
-    } else if(refTo === 'server') {
-      const response = await this.edit.getServers() as Resource;
-      if(response && response.value) {
-        for(let dep of response.value) {
-          if(dep.idShort && this.metaTypes.indexOf(dep.idShort) === -1) {
-            this.references.push(dep);
-          }
-
-        }
-      }
-    } else if(refTo === 'application') {
-      const response = await this.edit.getApplications() as Resource;
-      if(response && response.value) {
-        for(let dep of response.value) {
-          if(dep.idShort && this.metaTypes.indexOf(dep.idShort) === -1) {
-            this.references.push(dep);
-          }
-
-        }
-      }
-    } else if(refTo === 'manufacturer') {
-      const response = await this.edit.getManufacturers() as Resource;
-      if(response && response.value) {
-        for(let dep of response.value) {
-          if(dep.idShort && this.metaTypes.indexOf(dep.idShort) === -1) {
-            this.references.push(dep);
-          }
-
-        }
-      }
-    } else if(refTo === 'servicemesh') {
-      const response = await this.edit.getServiceMeshes() as Resource;
-      if(response && response.value) {
-        for(let dep of response.value) {
-          if(dep.idShort && this.metaTypes.indexOf(dep.idShort) === -1) {
-            this.references.push(dep);
-          }
-
-        }
-      }
-    } else if(refTo === 'datatype') {
-      const response = await this.edit.getDataTypess() as Resource;
-      if(response && response.value) {
-        for(let dep of response.value) {
-          if(dep.idShort && this.metaTypes.indexOf(dep.idShort) === -1) {
-            this.references.push(dep);
-          }
-
-        }
-      }
-    } else if(refTo === 'ecsdevice') {
-      const response = await this.edit.getEcsDevices() as Resource;
-      if(response && response.value) {
-        for(let dep of response.value) {
-          if(dep.idShort && this.metaTypes.indexOf(dep.idShort) === -1) {
-            this.references.push(dep);
-          }
-
-        }
-      }
-    } else if(refTo === 'servicebase') {
-      const response = await this.edit.getServiceBases() as Resource;
-      if(response && response.value) {
-        for(let dep of response.value) {
-          if(dep.idShort && this.metaTypes.indexOf(dep.idShort) === -1) {
-            this.references.push(dep);
-          }
-
-        }
-      }
-    } else if(refTo === 'meshelement') {
-      const response = await this.edit.getMeshElements() as Resource;
-      if(response && response.value) {
-        for(let dep of response.value) {
-          if(dep.idShort && this.metaTypes.indexOf(dep.idShort) === -1) {
-            this.references.push(dep);
-          }
-
-        }
-      }
-    } else if(refTo === 'meshconnector') {
-      const response = await this.edit.getMeshConnectors() as Resource;
-      if(response && response.value) {
-        for(let dep of response.value) {
-          if(dep.idShort && this.metaTypes.indexOf(dep.idShort) === -1) {
-            this.references.push(dep);
-          }
-
-        }
       }
     }
-    console.log(this.references);
   }
 
   public addFromRef() {

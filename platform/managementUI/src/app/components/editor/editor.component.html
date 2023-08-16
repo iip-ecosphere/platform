@@ -40,7 +40,7 @@
 
 
 <div *ngIf="showInputs">
-  <mat-card *ngIf="!type || (meta && meta.value && meta.value.length > 1)">
+  <mat-card *ngIf="!type && showDropdown">
     <table>
       <tr>
         <td>
@@ -79,7 +79,8 @@
               </div>
             </div>
             <ng-template #subEditor>
-              <button mat-raised-button (click)="openSubeditor(input)">open Subeditor</button>
+              <app-subeditor-button [meta]="metaBackup" [input]="input"></app-subeditor-button>
+              <!-- <button mat-raised-button (click)="openSubeditor(input)">open Subeditor</button> -->
             </ng-template>
           </div>
             <ng-template #booleanCase>
@@ -108,7 +109,8 @@
             <app-input-ref-select [activeTextinput]="true" [input]="input">
             </app-input-ref-select>
             <div #subEditor *ngIf="input.metaTypeKind == 10">
-              <button mat-raised-button (click)="openSubeditor(input)">open Subeditor</button>
+              <app-subeditor-button [meta]="metaBackup" [input]="input"></app-subeditor-button>
+              <!-- <button mat-raised-button (click)="openSubeditor(input)">open Subeditor</button> -->
             </div>
           </mat-card>
           <div>
@@ -139,10 +141,11 @@
             <app-boolean-dropdown [input]="input"></app-boolean-dropdown>
           </ng-template>
           <ng-template #optEnumCase>
-            <app-enum-dropdown [meta] ="metaBackup" [input] = "input"></app-enum-dropdown>
+            <app-enum-dropdown [meta]="metaBackup" [input]="input"></app-enum-dropdown>
           </ng-template>
             <ng-template #subEditor>
-              <button mat-raised-button (click)="openSubeditor(input)">open Subeditor</button>
+              <app-subeditor-button [meta]="metaBackup" [input]="input"></app-subeditor-button>
+              <!-- <button mat-raised-button (click)="openSubeditor(input)">open Subeditor</button> -->
             </ng-template>
           </mat-card-content>
 
