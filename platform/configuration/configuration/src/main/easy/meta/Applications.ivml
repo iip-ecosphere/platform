@@ -1,6 +1,7 @@
 project Applications {
 
     import Connectors;
+    import ConnectorsPart*;
     import DataTypes;
     import Nameplate;
     

@@ -54,12 +54,19 @@ template JavaSpringCloudStreamStarter(Configuration config, FileArtifact target,
             }
 
             /**
+            * Registers required, generated serializers.
+            */
+            public static void registerSerializers() {
+                ${generateSerializerRegistration(serializers)}
+            }
+
+            /**
              * Starts the service chain.
              *
              * @param args command line arguments
              */        
             public static void main(String[] args) {
-                ${generateSerializerRegistration(serializers)}
+                registerSerializers();
                 main(iip.Starter.class, args);
             }
         
