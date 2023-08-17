@@ -96,17 +96,27 @@ public class JsonOutputFormatter implements OutputFormatter<IOConsumer<JsonGener
 
         @Override
         public IOConsumer<JsonGenerator> fromStringArray(String[] data) throws IOException {
-            return g -> g.writeArray(data, 0, data.length);
+            return g -> {
+                if (null == data) {
+                    g.writeNull();
+                } else {
+                    g.writeArray(data, 0, data.length);
+                }
+            };
         }
 
         @Override
         public IOConsumer<JsonGenerator> fromByteArray(byte[] data) throws IOException {
             return g -> {
-                int[] tmp = new int[data.length];
-                for (int i = 0; i < data.length; i++) {
-                    tmp[i] = data[i];
+                if (null == data) {
+                    g.writeNull();
+                } else {
+                    int[] tmp = new int[data.length];
+                    for (int i = 0; i < data.length; i++) {
+                        tmp[i] = data[i];
+                    }
+                    g.writeArray(tmp, 0, tmp.length);
                 }
-                g.writeArray(tmp, 0, tmp.length);
             };
         }
 
