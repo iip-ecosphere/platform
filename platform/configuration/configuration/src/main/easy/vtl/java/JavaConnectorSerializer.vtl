@@ -230,6 +230,7 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
         for (Field f : srcType.fields) {
             srcFieldTypes.add(f.name, f.type);
         }
+        'if (${q} != null) {\n'
         for (Field f : type.fields) {
             String n = f.name;
             if (name.length() > 0) {
@@ -240,6 +241,7 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
             index = index + 1;
             '${s}'
         }
+        '}'
     }
     
     // ------------------------- parser types ---------------------------
