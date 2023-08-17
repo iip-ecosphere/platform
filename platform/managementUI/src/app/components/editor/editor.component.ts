@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MatDialogRef } from '@angular/material/dialog';
 import { ApiService } from 'src/app/services/api.service';
-import { Resource, uiGroup, editorInput, configMetaContainer } from 'src/interfaces';
+import { Resource, uiGroup, editorInput, configMetaContainer, configMetaEntry, ResourceAttribute } from 'src/interfaces';
 
 @Component({
   selector: 'app-editor',
@@ -20,11 +20,11 @@ export class EditorComponent implements OnInit {
   metaBackup: Resource | undefined;
   selectedType: Resource | undefined;
 
-  enums: any[] = [];
-
   uiGroups: uiGroup[] = [];
 
   showInputs = true;
+  message: string = '';
+  showDropdown = true;
 
   metaTypes = ['metaState', 'metaProject',
     'metaSize', 'metaType', 'metaRefines', 'metaAbstract', 'metaTypeKind'];
@@ -52,8 +52,7 @@ export class EditorComponent implements OnInit {
   numOfItemsInMeta: number = 0;
 
   constructor(private api: ApiService,
-    public dialog: MatDialogRef<EditorComponent>,
-    public subDialog: MatDialog) { }
+    public dialog: MatDialogRef<EditorComponent>) { }
 
   ngOnInit(): void {
     if(!this.type) {
@@ -125,7 +124,9 @@ export class EditorComponent implements OnInit {
     // single item
     if (newMetaValues.length == 1) {
       this.setInputForSingleItem(newMetaValues[0])
+      this.showDropdown = false
     }
+    console.log(this.meta);
   }
 
   public setInputForSingleItem(item: any) {
@@ -207,8 +208,6 @@ private cleanTypeName(type: string) {
   } else {
     return type;
   }
-
-
 }
 
 public displayName(property: Resource | string) {
@@ -220,34 +219,6 @@ public displayName(property: Resource | string) {
       item => item.idShort === 'name')?.value;
   }
   return displayName;
-}
-
-public getEnumValue(value: editorInput) {
-  if(this.metaBackup && this.metaBackup.value) {
-    let enumMeta = this.metaBackup.value.find(a => a.idShort === value.type)
-    console.log(enumMeta);
-    let a
-    if(value && Array.isArray(value.value)) {
-      let varValue = value.value.find((a: { idShort: string; }) => a.idShort === "varValue");
-      a = varValue.value
-    }
-    console.log(a);
-    if(typeof(a) == "string") {
-      return a
-    } else {
-      return null
-    }
-  } else {
-    return null
-  }
-}
-
-public getEnums(value: editorInput) {
-  if(this.metaBackup && this.metaBackup.value) {
-    let enumMeta = this.metaBackup.value.find(a => a.idShort === value.type)
-
-  }
-
 }
 
   public generateInputs() {
@@ -319,7 +290,6 @@ public getEnums(value: editorInput) {
             editorInput.multipleInputs = true;
           }
           //assign initial value of inputFields
-          console.log(editorInput);
           let initial;
           if(editorInput.multipleInputs) {
             initial = []
@@ -393,6 +363,9 @@ public getEnums(value: editorInput) {
     }
     console.log("[editor | generateInputs] END uiGroup: ")
     console.log(this.uiGroups)
+    if(!this.uiGroups[0]) {
+      this.message = 'ERROR: Configuration does not provide ';
+    }
   }
 
   public toggleOptional(uiGroup: uiGroup) {
@@ -401,23 +374,14 @@ public getEnums(value: editorInput) {
 
   public create() {
     const creationData = this.prepareCreation();
+    //TODO: mach ein ivml draus
     console.log(creationData);
-    //actual creation
+    //TODO: platform request
   }
 
   public close() {
     this.dialog.close();
   };
-
-  public openSubeditor(type: editorInput) {
-    //this.router.navigateByUrl("list/editor/all");
-    let dialogRef = this.subDialog.open(EditorComponent, {
-      height: '80%',
-      width:  '80%',
-    })
-    dialogRef.componentInstance.type = type;
-    dialogRef.componentInstance.metaBackup = this.metaBackup;
-  }
 
   public prepareCreation() {
     let complexType: Record<string, any> = {};
@@ -449,11 +413,17 @@ public getEnums(value: editorInput) {
 
     public addType() {
     let complexType: Record<string, any> = {};
+
     if(this.type) {
       for(let uiGroup of this.uiGroups) {
         for(let input of uiGroup.inputs) {
           if(input.meta){
             complexType[input.name] = input.value;
+            let beispiel: Record<string, any> = {};
+            beispiel['key'] = 'value'
+            complexType['InputParameter'] = {
+              beispiel
+            }
           }
         }
         for(let input of uiGroup.optionalInputs) {
