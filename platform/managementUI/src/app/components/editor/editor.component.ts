@@ -453,7 +453,7 @@ export class EditorComponent implements OnInit {
       }
     }
 
-    let varName = "var_name_placeholder"
+    let varName = "var_name_placeholder" // TODO replace with real thing
     let ivml = this.ivmlType + " " + varName + " = {\n"
     let i = 0
 

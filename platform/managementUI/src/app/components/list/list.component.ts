@@ -7,6 +7,7 @@ import { Router } from '@angular/router';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import { MAT_PROGRESS_SPINNER_DEFAULT_OPTIONS_FACTORY } from '@angular/material/progress-spinner';
 import { EditorComponent } from '../editor/editor.component';
+import { InputVariable, platformResponse } from 'src/interfaces';
 //import { table } from 'console';
 
 @Component({
@@ -366,14 +367,73 @@ export class ListComponent implements OnInit {
     })
     dialogRef.componentInstance.category = this.currentTab;
   }
-  /*
-  public new2() {
-    let dialogRef = this.dialog.open(EditorComponent, {
-      height: '90%',
-      width:  '90%',
-    })
-    dialogRef.componentInstance.category = this.currentTab;
-  }*/
+
+  public genTemplate(appId: string) {
+    console.log("[list.comp | genTemplate] appId: " + appId)
+
+    let inputVariables: InputVariable[] = [];
+    let input0:InputVariable = {
+      value: {
+        modelType: {
+          name: "Property"
+        },
+        valueType: "string",
+        idShort: "appId",
+        kind: "Template",
+        value: appId
+      }
+    }
+    inputVariables.push(input0)
+    this.execFunctionInConfig("genAppsNoDepsAsync", inputVariables)
+  }
+
+  public async genApp(appId: string, fileName: string) {
+    console.log("[list.comp | genApp] appId: " + appId
+      + ", file name: " + fileName)
+
+    let inputVariables: InputVariable[] = [];
+    let input0:InputVariable = {
+      value: {
+        modelType: {
+          name: "Property"
+        },
+        valueType: "string",
+        idShort: "appId",
+        kind: "Template",
+        value: appId
+      }
+    }
+
+    let input1:InputVariable = {
+      value: {
+        modelType: {
+          name: "Property"
+        },
+        valueType: "string",
+        idShort: "codeFile",
+        kind: "Template",
+        value: fileName
+      }
+    }
+    inputVariables.push(input0)
+    inputVariables.push(input1)
+    this.execFunctionInConfig("genAppsAsync", inputVariables)
+  }
+
+  public async execFunctionInConfig(basyxFun: string, inputVariables: any) {
+    let resourceId = ""
+    let aasElementURL = "/aas/submodels/Configuration/submodel/submodelElements/"
+
+    const response = await this.api.executeFunction(
+      resourceId,
+      aasElementURL,
+      basyxFun,
+      inputVariables) as unknown as platformResponse
+
+    console.log("[list.comp | execFuncInConfig] function: " + basyxFun
+      + "\nplatform response:")
+    console.log(response)
+  }
 
   // ---- icons ------------------------------------------------------------------
 
