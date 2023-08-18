@@ -58,22 +58,24 @@ mat-raised-button color="success"
           </td>
 
           <!-- Buttons -->
+          <!--
           <td  *ngIf="tab.tabName == 'Applications'" class="cell-with-button">
             <button
               mat-raised-button style="background-color: rgb(35, 142, 184)"
               (click)="createMesh()" disabled>generate interfaces
             </button>
           </td>
+          -->
           <td  *ngIf="tab.tabName == 'Applications'" class="cell-with-button">
             <button
               mat-raised-button style="background-color: rgb(35, 142, 184)"
-              (click)="createMesh()" disabled>generate template
+              (click)="createMesh()" >generate template
             </button>
           </td>
           <td  *ngIf="tab.tabName == 'Applications'" class="cell-with-button">
             <button
               mat-raised-button style="background-color: rgb(35, 142, 184)"
-              (click)="createMesh()" disabled>integrate application
+              (click)="createMesh()" >integrate application
             </button>
           </td>
 

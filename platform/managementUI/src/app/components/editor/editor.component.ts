@@ -34,6 +34,8 @@ export class EditorComponent implements OnInit {
   /* metaTypeKind */
   primitive = 1
 
+  ivmlType:string = "";
+
   /* metaRef list:
   empty -> returns ivml types
   includes names of toplevel types -> returns the toplevel type (if not abstract) and all subtypes
@@ -48,8 +50,6 @@ export class EditorComponent implements OnInit {
     {cat: "Meshes", metaRef: ["ServiceMesh"]},
     {cat: "Applications", metaRef: ["Application"]}
   ];
-
-  numOfItemsInMeta: number = 0;
 
   constructor(private api: ApiService,
     public dialog: MatDialogRef<EditorComponent>) { }
@@ -200,34 +200,33 @@ export class EditorComponent implements OnInit {
 
 // ----------------------------------------------------------------------
 
-private cleanTypeName(type: string) {
-  const startIndex = type.lastIndexOf('(') + 1;
-  const endIndex = type.indexOf(')');
-  if(endIndex > 0){
-    return type.substring(startIndex, endIndex);
-  } else {
-    return type;
+  private cleanTypeName(type: string) {
+    const startIndex = type.lastIndexOf('(') + 1;
+    const endIndex = type.indexOf(')');
+    if(endIndex > 0){
+      return type.substring(startIndex, endIndex);
+    } else {
+      return type;
+    }
   }
-}
 
-public displayName(property: Resource | string) {
-  let displayName = '';
-  if(typeof(property) == 'string') {
-    displayName = property;
-  } else if(property.value) {
-    displayName = property.value.find(
-      item => item.idShort === 'name')?.value;
+  public displayName(property: Resource | string) {
+    let displayName = '';
+    if(typeof(property) == 'string') {
+      displayName = property;
+    } else if(property.value) {
+      displayName = property.value.find(
+        item => item.idShort === 'name')?.value;
+    }
+    return displayName;
   }
-  return displayName;
-}
 
   public generateInputs() {
-    console.log("[editor | generateInputs] type:")
-    console.log(this.type)
-    console.log("[editor | generateInputs] selected type:")
-    console.log(this.selectedType)
+
     this.uiGroups = [];
     const selectedType = this.selectedType as configMetaContainer;
+    this.ivmlType = selectedType.idShort // TODO leave ?
+
     if(selectedType && selectedType.value) {
 
       for(const input of selectedType.value) {
@@ -271,7 +270,7 @@ public displayName(property: Resource | string) {
                 (item: { idShort: string; }) => item.idShort === 'metaTypeKind')?.value;
             } else if(this.metaBackup && this.metaBackup.value) {
               let temp = this.metaBackup.value.find(item => item.idShort === this.cleanTypeName(editorInput.type));
-               editorInput.metaTypeKind = temp?.value.find((item: { idShort: string; }) => item.idShort === 'metaTypeKind').value
+              editorInput.metaTypeKind = temp?.value.find((item: { idShort: string; }) => item.idShort === 'metaTypeKind').value
             }
 
             //the metaTypeKind is not included on the values of the types in the configuration/meta collection
@@ -361,8 +360,6 @@ public displayName(property: Resource | string) {
         }
         }
     }
-    console.log("[editor | generateInputs] END uiGroup: ")
-    console.log(this.uiGroups)
     if(!this.uiGroups[0]) {
       this.message = 'ERROR: Configuration does not provide ';
     }
@@ -376,6 +373,7 @@ public displayName(property: Resource | string) {
     const creationData = this.prepareCreation();
     //TODO: mach ein ivml draus
     console.log(creationData);
+    let ivml = this.getIvmlFormat(creationData)
     //TODO: platform request
   }
 
@@ -411,7 +409,7 @@ public displayName(property: Resource | string) {
     return complexType;
   }
 
-    public addType() {
+  public addType() {
     let complexType: Record<string, any> = {};
 
     if(this.type) {
@@ -445,5 +443,50 @@ public displayName(property: Resource | string) {
       this.type.value.push(complexType);
     }
     this.dialog.close();
+  }
+
+  getIvmlFormat(data: any) {
+    // removing empty entries
+    for(const key in data) {
+      if (data[key] == "") {
+        delete data[key]
+      }
+    }
+
+    let varName = "var_name_placeholder"
+    let ivml = this.ivmlType + " " + varName + " = {\n"
+    let i = 0
+
+    for(const key in data) {
+      // quotes or no qoutes
+      if (typeof data[key] == "string") {
+        ivml += key + " = \"" + data[key] + "\""
+      } else if (typeof data[key] == "object") {
+        ivml += key + " = " + this.createList(data[key])
+      } else {
+        ivml += key + " = " + data[key]
+      }
+
+      // no comma after the last value
+      if (i < (Object.keys(data).length - 1)) {
+        ivml += ",\n"
+      }
+      i += 1
+    }
+    ivml += "\n};"
+    console.log("[editor | getIvamlFormat] returns \n\n" + ivml)
+  }
+
+  createList(data:any) {
+    let result = "{"
+    let i = 0
+    for (let elemt of data) {
+      result += elemt
+      if (i < data.length - 1) {
+        result += ","
+      }
+      i += 1
+    }
+    return result + "}"
   }
 }
