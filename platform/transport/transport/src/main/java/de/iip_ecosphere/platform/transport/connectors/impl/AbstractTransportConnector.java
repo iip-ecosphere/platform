@@ -325,6 +325,7 @@ public abstract class AbstractTransportConnector implements TransportConnector {
      * @throws IOException in case that problems occur during serialization
      */
     protected <T> byte[] serialize(String stream, T data) throws IOException {
+        // replicated with debug output in PrintTransportConnector
         byte[] result;
         @SuppressWarnings("unchecked")
         Class<T> cls = (Class<T>) data.getClass();
@@ -335,6 +336,15 @@ public abstract class AbstractTransportConnector implements TransportConnector {
             result = new byte[0];
         }
         return result;
+    }
+
+    /**
+     * Returns the serializer provider.
+     * 
+     * @return the provider
+     */
+    protected SerializerProvider getSerializerProvider() {
+        return serializerProvider;
     }
     
     @Override

@@ -32,7 +32,8 @@ import org.junit.runners.Suite;
     IipEnumTest.class,
     AlertTest.class,
     GenericJsonSerializerTest.class, 
-    BasicSerializerProviderTest.class
+    BasicSerializerProviderTest.class,
+    PrintTransportConnectorTest.class
 })
 public class AllTests {
 }
