@@ -17,6 +17,8 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimerTask;
 
+import org.slf4j.LoggerFactory;
+
 import de.iip_ecosphere.platform.services.environment.DataIngestors;
 import iip.datatypes.MipMqttInput;
 import iip.datatypes.MipMqttInputImpl;
@@ -98,6 +100,8 @@ public class MipIdentificationSensor {
      */
     public static void sendStartStopCommand(boolean start, String sensorId, DataIngestors<MipMqttInput> ingestors) {
         MipMqttInput cmd = createStartStopCommand(start, sensorId);
+        LoggerFactory.getLogger(MipIdentificationSensor.class).info("Sending MIP sensor command (start: {}, id:{}) "
+            + "via ingestors", start, sensorId);
         ingestors.ingest(cmd);
     }
 
