@@ -55,6 +55,7 @@ public class PlatformInstantiator {
         private String ivmlModelName;
         private File outputFolder;
         private File modelFolder;
+        private File metaModelFolder;
         private String startRuleName = "mainCli";
         
         /**
@@ -80,6 +81,19 @@ public class PlatformInstantiator {
             this.startRuleName = null == startRuleName || startRuleName.length() == 0 ? "main" : startRuleName;
             return this;
         }
+        
+        /**
+         * Changes the meta model folder.
+         * 
+         * @param metaModelFolder the meta model folder (ignored if <b>null</b> or does not exist)
+         * @return the meta model folder
+         */
+        public InstantiationConfigurer setIvmlMetaModelFolder(File metaModelFolder) {
+            if (null != metaModelFolder && metaModelFolder.exists()) {
+                this.metaModelFolder = metaModelFolder;
+            }
+            return this;
+        }
 
         /**
          * Configures the platform instantiation via the given {@link ConfigurationSetup}.
@@ -91,6 +105,9 @@ public class PlatformInstantiator {
             easySetup.setIvmlModelName(ivmlModelName);
             if (null != modelFolder) {
                 easySetup.setIvmlConfigFolder(modelFolder);
+            }
+            if (null != metaModelFolder) {
+                easySetup.setIvmlMetaModelFolder(metaModelFolder);
             }
             if (cleanOutputFolder()) {
                 FileUtils.deleteQuietly(outputFolder);
@@ -273,6 +290,7 @@ public class PlatformInstantiator {
             System.out.println(" - folder the model is located in, src/main/easy is used for the metamodel");
             System.out.println(" - output folder where to place the generated artifacts");
             System.out.println(" - optional VIL start rule name (\"main\", \"generateApps\", \"generateInterfaces\"");
+            System.out.println(" - optional IVML meta model folder");
             System.out.println("   - main: app interfaces, apps, platform components (default)");
             System.out.println("   - generateInterfaces: app interfaces, no apps");
             System.out.println("   - generateAppsNoDeps: app interfaces, apps without artifact dependencies");
@@ -307,6 +325,9 @@ public class PlatformInstantiator {
         InstantiationConfigurer c = new InstantiationConfigurer(args[0], new File(args[1]), new File(args[2]));
         if (args.length == 4) {
             c.setStartRuleName(args[3]);
+        }
+        if (args.length == 5) {
+            c.setIvmlMetaModelFolder(new File(args[4]));
         }
         instantiate(c);
         return exitCode;
