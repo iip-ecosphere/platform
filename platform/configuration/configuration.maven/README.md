@@ -94,7 +94,8 @@ A typical setup (an all-in-one-project implementation), happens in conjunction w
 
 The goals support the following configuration settings: 
   - `model` (`-Dconfiguration.model=...`) the name of the IVML configuration model. This value must be given.
-  - `modelDirectory` the directory the configuration model is located with (currently, usually and by default `src/test/easy`, `-Dconfiguration.modelDirectory=...`). If not absolute, the project base directory will be prepended.
+  - `modelDirectory` the directory where the configuration model is located with (currently, usually and by default `src/test/easy`, `-Dconfiguration.modelDirectory=...`). If not absolute, the project base directory will be prepended.
+  - `metaModelDirectory` the directory where the configuration meta-model is located with (currently, usually and by default `src/main/easy`, `-Dconfiguration.metaModelDirectory=...`). If not absolute, the project base directory will be prepended.
   - `outputDirectory` the directory where to write the generated parts to (usually, `gen` or a sub-directory of it, default `gen`, `-Dconfiguration.outputDirectory=...`). If not absolute, the project base directory will be prepended.
   - `tracingLevel` the level of tracing during instantiation (`ALL` for everything, `TOP` for the top-level calls, `FUNC` for the VIL/VTL function level, default is `TOP`, `-Dconfiguration.tracingLevel=...`)
   - `resourcesDirectory` optional folder containing resources to be included into the application (see platform handbook, default `resources.ipr`, `-Dconfiguration.resourcesDirectory=...`). If given and not absolute, the project base directory will be prepended.
