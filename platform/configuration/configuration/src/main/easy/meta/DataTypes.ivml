@@ -89,6 +89,7 @@ project DataTypes {
             String description = "";
             Boolean optional = false;
             Boolean readOnly = false;
+            Boolean nullable = false;
         }
         Integer cachingTime = CACHE_ALWAYS; 
     }

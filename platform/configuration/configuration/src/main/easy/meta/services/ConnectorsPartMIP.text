@@ -11,4 +11,4 @@ ConnectorsPartMIP::MipMqttV3Connector::machineParser = Parser turning data recei
 ConnectorsPartMIP::MipMqttInput = The Input for MIP Mqtt connector.
 ConnectorsPartMIP::MipMqttOutput = The Output for MIP Mqtt connector.
 ConnectorsPartMIP::MipMqttV3Connector::nameplateInfo = Nameplate information for MIP connector.
-ConnectorsPartMIP::manufacturer_mipTech = MIP manufacturer nameplate
+ConnectorsPartMIP::manufacturer_mipTech = MIP manufacturer nameplate.
