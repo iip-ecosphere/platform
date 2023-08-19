@@ -26,27 +26,12 @@ project TypeCreationCfg {
     };
     aasProtocol = AasProtocolVabTcp{};
     aasAccessControlAllowOrigin = "*";
-
-    // ------------- minimal app ---------------------    
-    
-    Application myApp = {
-        id = "DefaultLibApp",
-        name = "Default Lib App",
-        ver = "0.1.0",
-        description = "",
-        services = {refBy(myMesh)}        
-    };
-    
-    ServiceMesh myMesh = {
-        description = "default lib service net",
-        sources = {} // refBy(mySource)
-    };
     
     // ---------- generation setup ------------
     
     containerGeneration = false;
     sharedInterfaces = true;
-    sharedArtifact = "de.iip-ecosphere.platform:apps.DefaultLibInterfacesKodex:" + iipVer;
+    sharedArtifact = "de.iip-ecosphere.platform:apps.DefaultLibInterfaces:" + iipVer;
 
     // ------------ freezing ------------------
     

@@ -170,6 +170,82 @@
                <outputDirectory>${iip.outputDir}</outputDirectory>
            </configuration>
        </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>${org.apache.maven.jar.version}</version>
+	    <executions>
+	      <execution>
+	        <id>default-jar</id>
+	        <phase>package</phase>
+	        <goals>
+	          <goal>jar</goal>
+	        </goals>
+	        <configuration>
+	          <excludes>
+	            <exclude>iip/**</exclude>
+	          </excludes>
+	        </configuration>
+	      </execution>
+          <execution>
+            <goals>
+              <goal>test-jar</goal>
+            </goals>
+	        <configuration>
+	          <excludes>
+	            <exclude>iip/**</exclude>
+	          </excludes>
+	        </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>3.2.0</version>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <phase>package</phase>
+            <goals>
+              <goal>jar-no-fork</goal>
+              <goal>test-jar</goal>
+            </goals>
+            <configuration>
+              <excludes>
+                <exclude>iip/**</exclude>
+              </excludes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>      
+       <!-- Java 11 complains about links from non-module to module see 
+           https://stackoverflow.com/questions/58836862/jdk-11-and-javadoc -->       
+       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>${org.apache.maven.javadoc.version}</version>
+        <configuration>
+          <show>private</show>
+          <encoding>${java.encoding}</encoding>
+          <source>8</source>
+          <excludePackageNames>*.proto.*:iip.*</excludePackageNames>
+          <failOnError>false</failOnError>
+          <detectJavaApiLink>false</detectJavaApiLink> 
+          <detectOfflineLinks>false</detectOfflineLinks>
+        </configuration>
+        <executions>
+          <execution>
+            <id>default-cli</id>
+            <goals>
+              <goal>javadoc</goal>
+              <goal>test-javadoc</goal>
+              <goal>jar</goal>
+              <goal>test-jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>            
   </build>
 

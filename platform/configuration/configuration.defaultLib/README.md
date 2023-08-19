@@ -7,3 +7,4 @@ The project setup differs a bit from the examples, indicating the future intende
 Contents:
 * Support code for [MIP technology](https://mip-technology.de/) identification reader
 
+The deployable artifacts intentionally do not contain the generated classes as they will be created as part of the interfaces of the application projects.
