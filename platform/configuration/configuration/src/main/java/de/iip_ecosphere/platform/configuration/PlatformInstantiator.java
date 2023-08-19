@@ -323,10 +323,10 @@ public class PlatformInstantiator {
         }
         TracerFactory.setTraceFilter(filter);
         InstantiationConfigurer c = new InstantiationConfigurer(args[0], new File(args[1]), new File(args[2]));
-        if (args.length == 4) {
+        if (args.length >= 4) {
             c.setStartRuleName(args[3]);
         }
-        if (args.length == 5) {
+        if (args.length >= 5) {
             c.setIvmlMetaModelFolder(new File(args[4]));
         }
         instantiate(c);
