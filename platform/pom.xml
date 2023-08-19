@@ -79,6 +79,7 @@
      <module>configuration/configuration</module> <!-- requires next -->
      <module>tests/test.configuration.configuration</module> <!-- requires interface build of tests -->
      <module>configuration/configuration.maven</module>
+     <module>configuration/configuration.defaultLib</module>
      <!-- platform services, CLI, AAS -->
      <module>platform</module>
      <!-- examples -->

@@ -1,0 +1,61 @@
+project TypeCreationCfg {
+
+    import IIPEcosphere;
+
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+   
+    
+    // ------------ component setup ------------------
+
+    serializer = Serializer::Json;
+    // serviceManager, containerManager are already defined    
+        
+    aasServer = {
+        schema = AasSchema::HTTP,
+        port = 9001,
+        host = "127.0.0.1"
+    };
+    aasRegistryServer = {
+        schema = AasSchema::HTTP,
+        port = 9002,
+        host = "127.0.0.1",
+        path = "registry"
+    };
+    aasImplServer = {
+        port = 9003
+    };
+    aasProtocol = AasProtocolVabTcp{};
+    aasAccessControlAllowOrigin = "*";
+
+    // ------------- minimal app ---------------------    
+    
+    Application myApp = {
+        id = "DefaultLibApp",
+        name = "Default Lib App",
+        ver = "0.1.0",
+        description = "",
+        services = {refBy(myMesh)}        
+    };
+    
+    ServiceMesh myMesh = {
+        description = "default lib service net",
+        sources = {} // refBy(mySource)
+    };
+    
+    // ---------- generation setup ------------
+    
+    containerGeneration = false;
+    sharedInterfaces = true;
+    sharedArtifact = "de.iip-ecosphere.platform:apps.DefaultLibInterfacesKodex:" + iipVer;
+
+    // ------------ freezing ------------------
+    
+    freeze {
+        sharedInterfaces;
+        sharedArtifact;
+        containerGeneration;
+        serializer;
+        .; // every variable declared in this project
+    } but (f|f.bindingTime >= BindingTime.runtimeMon);
+
+}
