@@ -293,6 +293,11 @@
         <classifier>easy</classifier>
         <type>zip</type>
     </dependency>
+    <dependency>
+        <artifactId>configuration.defaultLib</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>
 
     <dependency>
         <artifactId>managementUi</artifactId>
