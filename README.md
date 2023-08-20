@@ -7,7 +7,7 @@ The virtual IIP-Ecosphere Industry 4.0/IIoT platform aims at demonstrating new a
 * Preparing an enhanced demonstrator for [EMO 2023](https://emo-hannover.de/), also planning for an integration with [UMATI](https://umati.org/) and sensor technology form [MIP technology](https://mip-technology.de/de/). There will also be the IIP-Ecosphere symposium as closing event for the project.
 * Default library for code based on types or devices defined in the Platform configuration meta-model.
 * IIP-Ecosphere demonstrators from the [IIP-Ecosphere innovation idea competition](https://www.iip-ecosphere.de/ideenwettbewerb/) evolving. Integration of magnetic product identification [MIP technology](https://mip-technology.de/de/) into the platform EMO'23 demonstrator. Preparing alternative federated learning integration [NovoAI](https://novoai.de/de/).
-* Early snapshot of [upcoming platform handbook for version 0.6.0](https://github.com/iip-ecosphere/platform/tree/main/platform/documentation/PlatformHandbook-0.6.0-SNAPSHOT-V0.1.pdf) now online in github.
+* Early snapshot of [upcoming platform handbook for version 0.6.0](https://github.com/iip-ecosphere/platform/tree/main/platform/documentation/PlatformHandbook-0.6.0-SNAPSHOT-V0.1.pdf) now online in github (version as of 2023/08/20). Comments for clarification are welcome.
 * Service development tutorial online on [YouTube](https://www.youtube.com/playlist?list=PL5VSYtiD_PfdxUDXGlX53UsHdQlXcHYK7) and [IIP-Ecosphere](https://www.iip-ecosphere.de/angebote/plattform/).
 * Confirmed compatibility: Phoenix Contact PLCnext (OPC UA, EEM integration), Beckhoff IPC (OPC UA), VDW UMATI (OPC UA), Bitmotec (MQTT), Lenze (MQTT) - and improving...
 
