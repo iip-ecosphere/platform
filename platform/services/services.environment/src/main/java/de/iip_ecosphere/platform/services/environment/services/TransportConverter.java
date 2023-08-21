@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -57,6 +59,7 @@ public abstract class TransportConverter<T> {
     private Predicate<T> handleNewFilter = d -> true;
     private Supplier<Boolean> aasEnabledSupplier;
     private Set<String> excludedFields = new HashSet<>();
+    private ExecutorService executorService = Executors.newFixedThreadPool(10);
 
     /**
      * Represents a pair of server/converter created together.
@@ -265,7 +268,7 @@ public abstract class TransportConverter<T> {
         
         @Override
         public void received(T data) {
-            new Thread(() -> handleNewAndNotify(data)).start(); // thread pool?
+            executorService.submit(() -> handleNewAndNotify(data));
         }
 
         @Override
@@ -401,6 +404,7 @@ public abstract class TransportConverter<T> {
      * Stops the transport, deletes the AAS.
      */
     public void stop() {
+        executorService.shutdown();
         try {
             TransportConnector conn = Transport.getConnector();
             if (null != conn) {
