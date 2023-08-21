@@ -1,9 +1,23 @@
 <mat-toolbar>
-  <h1>Editor <span *ngIf="category">for {{ category }}</span></h1>
+  <h1 *ngIf="category && !type else subeditorHead">Editor <span>for {{ category }}</span></h1>
+  <ng-template #subeditorHead>
+    <h1 >Subeditor <span *ngIf="type">for {{ type.name }}</span></h1>
+  </ng-template>
+
   <span style="flex: 1 1 auto"></span>
   <span><button mat-icon-button class="button" color="warning"
     (click)="close()"><mat-icon>close</mat-icon></button></span>
 </mat-toolbar>
+
+<div>
+  <mat-card>
+    <mat-form-field appearance="outline" >
+      <mat-label>Variable Name</mat-label>
+      <input matInput
+        type="text" ngDefaultControl [(ngModel)]=variableName />
+    </mat-form-field>
+  </mat-card>
+</div>
 
 <!--
 <div *ngIf="numOfItemsInMeta > 1; else singleItem"> multiple items

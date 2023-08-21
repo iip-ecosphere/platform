@@ -22,9 +22,10 @@ export class EditorComponent implements OnInit {
 
   uiGroups: uiGroup[] = [];
 
-  showInputs = true;
-  message: string = '';
   showDropdown = true;
+  showInputs = true;
+
+  variableName = '';
 
   metaTypes = ['metaState', 'metaProject',
     'metaSize', 'metaType', 'metaRefines', 'metaAbstract', 'metaTypeKind'];
@@ -360,9 +361,7 @@ export class EditorComponent implements OnInit {
         }
         }
     }
-    if(!this.uiGroups[0]) {
-      this.message = 'ERROR: Configuration does not provide ';
-    }
+
   }
 
   public toggleOptional(uiGroup: uiGroup) {
@@ -370,6 +369,7 @@ export class EditorComponent implements OnInit {
   }
 
   public create() {
+    const variableName = this.variableName;
     const creationData = this.prepareCreation();
     //TODO: mach ein ivml draus
     console.log(creationData);
@@ -410,6 +410,7 @@ export class EditorComponent implements OnInit {
   }
 
   public addType() {
+    const variableName = this.variableName;
     let complexType: Record<string, any> = {};
 
     if(this.type) {
