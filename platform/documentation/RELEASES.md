@@ -14,18 +14,20 @@ Planned:
 * KODEX: dynamic port assignment: [#14](https://github.com/iip-ecosphere/platform/issues/14), documentation: [#6](https://github.com/iip-ecosphere/platform/issues/6)
 
 In progress:
-* [#147](https://github.com/iip-ecosphere/platform/issues/127): Streaming of service logs to CLI/UI
 * [#70](https://github.com/iip-ecosphere/platform/issues/70): UI progress reporting 
 * [#117](https://github.com/iip-ecosphere/platform/issues/117): Multiple service managers per device
 * [#146](https://github.com/iip-ecosphere/platform/issues/146): UI editors for configuration tables
 * [#115](https://github.com/iip-ecosphere/platform/issues/115): Cleanup, e.g., old build processes
 
 New features:
+* (Optional) Default library for code related to configuration meta model.
+* Explicit MavenDependencies in configuration model.
 * [#130](https://github.com/iip-ecosphere/platform/issues/130): Application/device specific containers.
 * [#127](https://github.com/iip-ecosphere/platform/issues/127): Integration of Flower-based federated learning through generated templates
 * [#143](https://github.com/iip-ecosphere/platform/issues/143): Container testing mode(s)
 * [#100](https://github.com/iip-ecosphere/platform/issues/100): Allowing to start/stop multiple app instances (only via deployment plans)
 * [#59](https://github.com/iip-ecosphere/platform/issues/59): Basic version of distributed testing/evaluation environment for platform and apps (PETE)
+* [#147](https://github.com/iip-ecosphere/platform/issues/127): Streaming of service logs to CLI/UI
 * [#144](https://github.com/iip-ecosphere/platform/issues/144): Deployment plans and application instances management via UI
 * [#90](https://github.com/iip-ecosphere/platform/issues/90): UI display application service meshes
 * [#62](https://github.com/iip-ecosphere/platform/issues/62): Platform component heartbeat and AAS cleanup

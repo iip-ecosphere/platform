@@ -106,6 +106,14 @@ project Devices {
         String version;
         setOf(refTo(Dependency)) dependencies = {};
     }
+    
+    compound MavenDependency refines Dependency {
+        String artifact;
+    }
+
+    MavenDependency mvnDefaultLib = {
+        artifact = mvnIipGroup + ":configuration.defaultLib:" + iipVer
+    };
 
     // ------------------------ typical AI dependencies for all ------------------
     
@@ -292,6 +300,7 @@ project Devices {
         PYTHON3;
         PYTHON38;
         PYTHON39;
+        mvnDefaultLib;        
         tensorflow280;
         tensorflow290;
         keras290;

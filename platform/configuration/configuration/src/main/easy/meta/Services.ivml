@@ -175,7 +175,6 @@ project Services {
            }       
        }
        assign (uiGroup = UiOptionalGroup2) to {
-           refTo(EcsDevice) allocatedTo; // -> BindingTime::runtimeEnact
            Boolean monitorRcvCount = true;
            Boolean monitorSentCount = true;
            Boolean monitorProcessingTime = true;
