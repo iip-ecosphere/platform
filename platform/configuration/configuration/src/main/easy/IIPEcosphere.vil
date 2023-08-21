@@ -143,6 +143,9 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                         for (Service m: mbs) {
                             generateServiceResources(no, m, appRoot, bins, assemblies, resources, artifacts, noDeps);
                         }
+                        for (Dependency d: impl.dependencies) {
+                            collectMavenDependencies(d, artifacts);
+                        }
                     };
                     
                     for (Server ser: a.servers) {
@@ -258,6 +261,15 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
             generateAllAppsContainers(config, target, allAppsContainersElements);
         }
     }
+
+    @DispatchBasis
+    collectMavenDependencies(Dependency d, setOf(String) artifacts) = {
+    }
+
+    @DispatchCase
+    collectMavenDependencies(MavenDependency d, setOf(String) artifacts) = {
+        artifacts.add(d.artifact);
+    }    
     
     // dispatch basis
     generateServer(Configuration config, Server server, Path appRoot, Boolean noDeps, setOf(String) assemblies, setOf(String) artifacts) = {
