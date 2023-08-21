@@ -16,10 +16,11 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.transport.serialization.BasicSerializerProvider;
+import de.iip_ecosphere.platform.transport.serialization.BasicSerializerProviderWithJsonDefault;
 import de.iip_ecosphere.platform.transport.serialization.StringSerializer;
 
 /**
- * Tests {@link BasicSerializerProvider}.
+ * Tests {@link BasicSerializerProvider} and {@link BasicSerializerProviderWithJsonDefault}.
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -29,10 +30,19 @@ public class BasicSerializerProviderTest {
      * Tests {@link BasicSerializerProvider}.
      */
     @Test
-    public void test() {
+    public void testBasicSerializerProvider() {
         BasicSerializerProvider prov = new BasicSerializerProvider();
         Assert.assertNull(prov.getSerializer(String.class));
         prov.registerSerializer(new StringSerializer());
+        Assert.assertNotNull(prov.getSerializer(String.class));
+    }
+
+    /**
+     * Tests {@link BasicSerializerProviderWithJsonDefault}.
+     */
+    @Test
+    public void testBasicSerializerProviderWithJsonDefault() {
+        BasicSerializerProvider prov = new BasicSerializerProviderWithJsonDefault();
         Assert.assertNotNull(prov.getSerializer(String.class));
     }
 
