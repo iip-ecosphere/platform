@@ -84,7 +84,7 @@ template DockerfileBaseAllApps_Python(IIPEcosphere config, FileArtifact target, 
                         }
                     } else if (genDependency(s) == 'PYTHON38') {
                         if (IsPythonInstalled == 0) {
-                            'FROM python:3.8-slim-buster'
+                            'FROM python:3.8.16-slim-buster'
                             'RUN apt-get update'
                             IsPythonInstalled = 1;
                             pythonPipInstalled = 'RUN python3 -m pip install -r requirements.txt';
@@ -94,7 +94,7 @@ template DockerfileBaseAllApps_Python(IIPEcosphere config, FileArtifact target, 
                         }
                     } else if (genDependency(s) == 'PYTHON39') {
                         if (IsPythonInstalled == 0) {
-                            'FROM python:3.9-slim-buster'
+                            'FROM python:3.9.16-slim-buster'
                             'RUN apt-get update'
                             IsPythonInstalled = 1;
                             pythonPipInstalled = 'RUN python3 -m pip install -r requirements.txt';
