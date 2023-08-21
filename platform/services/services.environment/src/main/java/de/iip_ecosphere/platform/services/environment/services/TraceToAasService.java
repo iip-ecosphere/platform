@@ -342,7 +342,7 @@ public class TraceToAasService extends AbstractService {
         }).start();
         
         ServiceState result = super.start();
-        outTransport = createTransport(getConfiguredSerializationProvider());
+        outTransport = createTransport();
         if (null != outTransport) {
             converter.addNotifier(d -> outTransport.asyncSend(getAasTransportChannel(), d));
         }
@@ -419,6 +419,16 @@ public class TraceToAasService extends AbstractService {
      */
     public void setTransportParameter(TransportParameter transportParameter) {
         this.outTransportParameter = transportParameter;
+    }
+
+    /**
+     * Creates a transport connector by combining {@link #createTransport(BasicSerializerProvider)} 
+     * and {@link #getConfiguredSerializationProvider()}.
+     * 
+     * @return the connector
+     */
+    protected TransportConnector createTransport() {
+        return createTransport(getConfiguredSerializationProvider());
     }
     
     /**
