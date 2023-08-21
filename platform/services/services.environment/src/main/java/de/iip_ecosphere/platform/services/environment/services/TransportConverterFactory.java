@@ -203,14 +203,14 @@ public abstract class TransportConverterFactory {
         String transportStream, TypeTranslator<T, String> translator, Class<T> cls);
 
     /**
-     * Ensures the existence of a translator instance.
+     * Ensures the existence of a translator instance. [public for testing]
      * 
      * @param <T> the data type
      * @param translator the type translator; if <b>null</b>, {@link GenericJsonToStringTranslator} is used
      * @param cls the data type class
      * @return the type translator, either {@code tanslator} or a default instance
      */
-    protected static <T> TypeTranslator<T, String> ensureTranslator(TypeTranslator<T, String> translator, 
+    public static <T> TypeTranslator<T, String> ensureTranslator(TypeTranslator<T, String> translator, 
         Class<T> cls) {
         if (null == translator) {
             translator = new GenericJsonToStringTranslator<>(cls);
