@@ -81,10 +81,15 @@ export class ApiService {
     return Data;
   }
 
-  public async executeFunction(
-    resourceId: string,
-    aasElementURL:string,
-    basyxFunc: string, params: any) {
+  public async executeFunction(resourceId: string,
+    aasElementURL:string, basyxFunc: string, params: any) {
+    /*
+    console.log("api: " + this.ip + '/shells/'
+      + this.urn
+      + aasElementURL
+      + resourceId + "/"
+      + basyxFunc + "/invoke")
+      */
     let response;
     try {
       response = await firstValueFrom(this.http.post(
