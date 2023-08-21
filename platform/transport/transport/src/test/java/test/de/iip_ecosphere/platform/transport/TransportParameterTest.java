@@ -56,6 +56,19 @@ public class TransportParameterTest {
         Assert.assertEquals(null, params.getKeystoreKey());
         Assert.assertEquals(MqttQoS.EXACTLY_ONCE, params.getMqttQoS());
         Assert.assertEquals(CloseAction.NONE, params.getCloseAction());
+        
+        params = TransportParameter.TransportParameterBuilder.newBuilder(params)
+            .setMqttQoS(MqttQoS.AT_LEAST_ONCE)
+            .build();
+        Assert.assertEquals(addr.getHost(), params.getHost());
+        Assert.assertEquals(addr.getPort(), params.getPort());
+        Assert.assertEquals(1235, params.getActionTimeout());
+        Assert.assertEquals("app", params.getApplicationId());
+        Assert.assertEquals(false, params.getAutoApplicationId());
+        Assert.assertEquals(1236, params.getKeepAlive());
+        Assert.assertEquals(null, params.getKeystoreKey());
+        Assert.assertEquals(MqttQoS.AT_LEAST_ONCE, params.getMqttQoS());
+        Assert.assertEquals(CloseAction.NONE, params.getCloseAction());
     }
     
     /**
