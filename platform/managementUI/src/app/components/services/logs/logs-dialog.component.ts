@@ -5,7 +5,7 @@ import { firstValueFrom, Subscription } from 'rxjs';
 import { EnvConfigService } from 'src/app/services/env-config.service';
 import { HttpClient} from '@angular/common/http';
 import { ApiService } from 'src/app/services/api.service';
-import * as saveAs from 'file-saver';
+//import * as saveAs from 'file-saver';
 
 @Component({
   selector: 'app-logs-dialog',
