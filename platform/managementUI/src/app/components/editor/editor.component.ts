@@ -369,11 +369,11 @@ export class EditorComponent implements OnInit {
   }
 
   public create() {
-    const variableName = this.variableName;
+    const variableName = this.removeWhitespace(this.variableName)
     const creationData = this.prepareCreation();
     //TODO: mach ein ivml draus
     console.log(creationData);
-    let ivml = this.getIvmlFormat(creationData)
+    let ivml = this.getIvmlFormat(creationData, variableName)
     //TODO: platform request
   }
 
@@ -446,7 +446,7 @@ export class EditorComponent implements OnInit {
     this.dialog.close();
   }
 
-  getIvmlFormat(data: any) {
+  getIvmlFormat(data: any, variableName: string) {
     // removing empty entries
     for(const key in data) {
       if (data[key] == "") {
@@ -454,7 +454,7 @@ export class EditorComponent implements OnInit {
       }
     }
 
-    let varName = "var_name_placeholder" // TODO replace with real thing
+    let varName = variableName
     let ivml = this.ivmlType + " " + varName + " = {\n"
     let i = 0
 
@@ -476,6 +476,11 @@ export class EditorComponent implements OnInit {
     }
     ivml += "\n};"
     console.log("[editor | getIvamlFormat] returns \n\n" + ivml)
+  }
+
+  removeWhitespace(value: string) {
+    let temp = value.split(' ')
+    return temp.join('_')
   }
 
   createList(data:any) {
