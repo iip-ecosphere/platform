@@ -15,6 +15,7 @@ package de.iip_ecosphere.platform.transport.status;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import org.slf4j.LoggerFactory;
@@ -28,6 +29,7 @@ import com.fasterxml.jackson.databind.introspect.AnnotatedMember;
 import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
 import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
 
+import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
 import de.iip_ecosphere.platform.transport.serialization.GenericJsonToStringTranslator;
 import de.iip_ecosphere.platform.transport.serialization.Serializer;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
@@ -40,6 +42,24 @@ import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
 public class TraceRecordSerializer implements Serializer<TraceRecord> {
 
     private static Set<Object> ignore = new HashSet<>();
+    private static TraceRecordFilter filter = new TraceRecordFilter() { };
+    
+    static {
+        Optional<TraceRecordFilter> opt = ServiceLoaderUtils.findFirst(TraceRecordFilter.class);
+        if (opt.isPresent()) {
+            filter = opt.get();
+            filter.initialize();
+        }
+    }
+    
+    /**
+     * Returns the trace record filter.
+     * 
+     * @return the filter
+     */
+    public static TraceRecordFilter getFilter() {
+        return filter;
+    }
     
     /**
      * Creates a specific object mapper that allows for lazy default serialization of unknown types
@@ -85,6 +105,7 @@ public class TraceRecordSerializer implements Serializer<TraceRecord> {
 
     @Override
     public byte[] to(TraceRecord source) throws IOException {
+        source.setPayload(filter.filterPayload(source.getPayload())); // may require a new instance
         return createMapper().writeValueAsBytes(source);
     }
 
@@ -120,6 +141,19 @@ public class TraceRecordSerializer implements Serializer<TraceRecord> {
         } catch (NoSuchFieldException e) {
             LoggerFactory.getLogger(TraceRecordSerializer.class).warn("Field {} not found on class {}", 
                 field, cls.getName());
+        }
+    }
+    
+    /**
+     * Registers fields to be ignored when serializing trace record (payloads).
+     * 
+     * @param cls the class representing the type containing the field
+     * @param fields the fields to be ignored
+     * @see #ignoreField(Class, String)
+     */
+    public static void ignoreFields(Class<?> cls, String... fields) {
+        for (String field: fields) {
+            ignoreField(cls, field);
         }
     }
     

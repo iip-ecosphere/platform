@@ -188,7 +188,17 @@ public class TraceRecord {
     public static void ignoreField(Class<?> cls, String field) {
         TraceRecordSerializer.ignoreField(cls, field);
     }
-    
+
+    /**
+     * Registers fields to be ignored when serializing trace record (payloads). [convenience]
+     * 
+     * @param cls the class representing the type containing the field
+     * @param fields the fields to be ignored
+     */
+    public static void ignoreFields(Class<?> cls, String... fields) {
+        TraceRecordSerializer.ignoreFields(cls, fields);
+    }
+
     /**
      * Clears all ignored types and fields. [convenience]
      */
