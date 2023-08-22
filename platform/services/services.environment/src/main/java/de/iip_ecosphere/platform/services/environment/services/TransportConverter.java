@@ -345,16 +345,16 @@ public abstract class TransportConverter<T> {
     }
     
     /**
-     * Returns whether the AAS functionality shall be enabled.
+     * Returns whether the converter functionality shall be enabled. [requires renaming]
      * 
      * @return {@code true} for enabled, {@code false} else
      */
     protected boolean isAasEnabled() {
-        return aasEnabledSupplier.get();
+        return null == aasEnabledSupplier ? true : aasEnabledSupplier.get();
     }
 
     /**
-     * Changes the optional supplier for the AAS enabled state.
+     * Changes the optional supplier for the AAS enabled state. [requires renaming]
      * 
      * @param enabledSupplier the new supplier, ignored if <b>null</b>
      */
