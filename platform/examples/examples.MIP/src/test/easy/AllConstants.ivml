@@ -1,0 +1,27 @@
+project AllConstants {
+
+    import IIPEcosphere; 
+    
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+    
+    Boolean flowTest = false; // switch to true for local flow testing, changes IP/fqn class names (default false)
+    Boolean overrideInProduction = false; // use mocked PLC connector even if flowTest is true (default false)
+    
+    def Boolean getFlowTest(Boolean override) = 
+        if flowTest or override then
+            true
+        else
+            false
+        endif;
+
+    def String networkAddress(String primary, String mocking, Boolean override) =
+        if ((flowTest or override) and not(overrideInProduction)) then 
+          mocking
+        else 
+          primary
+        endif;
+
+    freeze {
+        .; // every variable declared in this project
+    } but (f|f.bindingTime >= BindingTime.runtimeMon);
+}

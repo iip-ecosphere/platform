@@ -1,0 +1,40 @@
+project ServiceMeshPartMipAppMesh {
+
+    import AllServices;
+
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+
+    ServiceMesh MipMesh = {
+        description = "Mip Service Net",
+        sources = {refBy(MipMqttDataSource)}
+    };
+
+    MeshSource MipMqttDataSource = {
+       impl = refBy(MipMqttDataConn),
+       next = {refBy(MipMqttDataSourcePythonTransformer)}
+    };
+	
+    MeshConnector MipMqttDataSourcePythonTransformer = {
+        name = "Mip Mqtt Data Source->Python Transformer",
+        next = refBy(pythonTransformer)
+    };
+
+    MeshProcessor pythonTransformer = {
+        impl = refBy(myMipAiPythonService),
+        next = {refBy(MipMqttDataConnmyPythonDataReceiver)}
+    };
+
+    MeshConnector MipMqttDataConnmyPythonDataReceiver = {
+        name = "Transformer->Receiver",
+        next = refBy(myPythonDataReceiver)
+    };
+    
+    MeshSink myPythonDataReceiver = {
+       impl = refBy(myPythonReceiverService)
+    };
+
+    freeze {
+        .;
+    }
+
+}

@@ -1,0 +1,44 @@
+project AllTypesPartMip {
+
+    import IIPEcosphere; 
+    
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+
+    RecordType MipAiPythonOutput = {
+        name = "MipAiPythonOutput",
+        fields = {
+            Field {
+                name = "aicontext",
+                type = refBy(StringType)
+            }, Field {
+                name = "aidate",
+                type = refBy(StringType)
+            }, Field {
+                name = "aifrom",
+                type = refBy(StringType)
+            }, Field {
+                name = "aiid_tag",
+                type = refBy(StringType)
+            }, Field {
+                name = "aireader",
+                type = refBy(StringType)
+            }, Field {
+                name = "airaw_signal_clock",
+                type = refBy(StringType),
+                optional = true
+            }, Field {
+                name = "airaw_signal_data1",
+                type = refBy(StringType),
+                optional = true
+            }, Field {
+                name = "airaw_signal_data2",
+                type = refBy(StringType),
+                optional = true
+            }
+        }
+    };
+
+    freeze {
+        .;
+    }
+}
