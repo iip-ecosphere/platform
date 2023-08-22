@@ -8,6 +8,7 @@ To demonstrate and validate the IIP-Ecosphere platform, we collect in this folde
 * [Python service example](https://github.com/iip-ecosphere/platform/tree/main/platform/examples/examples.python/README.md): Integrating an asynchronous Python (pseudo AI) service into a simple service chain/application.
 * [Python service example](https://github.com/iip-ecosphere/platform/tree/main/platform/examples/examples.pythonSync/README.md): Integrating a synchronous Python (pseudo AI) service into a simple service chain/application.
 * [KODEX service example](https://github.com/iip-ecosphere/platform/tree/main/platform/examples/examples.python/README.md): Integrating the platform-provided KODEX pseudonymizer/anonymizer into a simple service chain/application.
+* [MIP sensor connector/AI example](https://github.com/iip-ecosphere/platform/tree/main/platform/examples/examples.MIP/README.md): Using the MIP specific MQTT connector from the configuration meta-model playing a one-step ping pong with a related platform AI service for improving the id detection. Just an example, cannot be executed with a sensor from MIP technologies.
 * [HM'22/TddT'22 demonstrator](https://github.com/iip-ecosphere/platform/tree/main/platform/examples/examples.python/README.md): The source code of the HM'22/TddT'22 demonstrator as an example for a more complex AI-enabled application.
 
 The [examples](https://github.com/iip-ecosphere/platform/tree/main/platform/examples/examples/README.md) component contains helpful reusable basic functionality.
