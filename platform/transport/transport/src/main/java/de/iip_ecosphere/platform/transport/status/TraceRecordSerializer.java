@@ -48,6 +48,8 @@ public class TraceRecordSerializer implements Serializer<TraceRecord> {
         Optional<TraceRecordFilter> opt = ServiceLoaderUtils.findFirst(TraceRecordFilter.class);
         if (opt.isPresent()) {
             filter = opt.get();
+            LoggerFactory.getLogger(TraceRecordSerializer.class).info(
+                "Installed trace record filter {}. Initializing...", filter.getClass().getName());
             filter.initialize();
         }
     }
