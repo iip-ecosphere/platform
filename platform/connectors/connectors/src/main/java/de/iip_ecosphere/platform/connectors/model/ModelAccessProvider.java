@@ -53,8 +53,9 @@ public interface ModelAccessProvider {
          * Executes the function.
          * 
          * @param modelAccess the model access
-         * @throws IOException may be thrown but also caught in {@link #optional(IOVoidFunction)}
-         * @throws IndexOutOfBoundsException may be thrown but also caught in {@link #optional(IOVoidFunction)}
+         * @throws IOException may be thrown but also caught in {@link #optional(ModelAccess, IOVoidFunction)}
+         * @throws IndexOutOfBoundsException may be thrown but also caught in 
+         *     {@link #optional(ModelAccess, IOVoidFunction)}
          */
         public void execute(ModelAccess modelAccess) throws IOException, IndexOutOfBoundsException;
 

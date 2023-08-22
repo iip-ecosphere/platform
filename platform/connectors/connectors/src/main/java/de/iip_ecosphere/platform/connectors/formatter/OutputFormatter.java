@@ -226,7 +226,7 @@ public interface OutputFormatter<T> {
 
     /**
      * Starts an array structure. Following {@link #add(String, Object)} calls will add elements to the array.
-     * Must be closed with {@#link #endStructure()} 
+     * Must be closed with {@link #endStructure()} 
      * 
      * @param name optional data name field holding the array (may be <b>null</b> for none)
      * @throws IOException if starting this structure fails
@@ -235,7 +235,7 @@ public interface OutputFormatter<T> {
     
     /**
      * Starts an object structure. Following {@link #add(String, Object)} calls will add elements to the object.
-     * Must be closed with {@#link #endStructure()} 
+     * Must be closed with {@link #endStructure()} 
      * 
      * @param name optional data name field holding the array (may be <b>null</b> for none)
      * @throws IOException if starting this structure fails

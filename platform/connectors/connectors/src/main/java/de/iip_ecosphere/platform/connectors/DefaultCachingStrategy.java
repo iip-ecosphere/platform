@@ -14,6 +14,8 @@ package de.iip_ecosphere.platform.connectors;
 
 import java.util.Map;
 
+import org.slf4j.LoggerFactory;
+
 import de.iip_ecosphere.platform.connectors.ConnectorParameter.CacheMode;
 
 /**
@@ -31,6 +33,7 @@ public class DefaultCachingStrategy implements CachingStrategy {
     public void setCacheMode(CacheMode mode) {
         if (null != mode) {
             this.mode = mode;
+            LoggerFactory.getLogger(getClass()).info("Setting caching mode to {}", mode);
         }
     }
     
