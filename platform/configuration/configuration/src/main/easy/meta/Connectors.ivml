@@ -8,6 +8,7 @@ project Connectors {
     import Nameplate;
     
     annotate BindingTime bindingTime = BindingTime::compile to .;
+    annotate Integer uiGroup = UiMandatoryGroup1 to .;
 
     enum TextEncoding{ANSI, ASCII, UTF8};
     
@@ -208,7 +209,9 @@ project Connectors {
     compound Connector refines Service {
        setOf(AssignmentOperation) operations = {};
        TextEncoding encoding = TextEncoding::ASCII;
-       setOf(MappingEntry) mapping = {};
+       assign (uiGroup = UiInivisibleGroup) to {
+           setOf(MappingEntry) mapping = {};
+       }
        
        String class;
        String artifact;
