@@ -103,7 +103,7 @@ template ContainerRunScriptAllApps(IIPEcosphere config, FileArtifact target, Con
             '    while :'
             '    do'
             '        SVC_PORT="`shuf -i \\$LOWERPORT-\\$UPPERPORT -n 1`"'
-            '        ss -lpn | grep -q ":$PORT " || break'
+            '        ss -lpn | grep -q ":\\$PORT " || break'
             '    done'
             'fi'
         }
