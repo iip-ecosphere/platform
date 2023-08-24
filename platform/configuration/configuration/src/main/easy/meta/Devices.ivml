@@ -263,6 +263,10 @@ project Devices {
         NonEmptyString containerPath;
     }
     
+    compound GpusContainerArgument refines ContainerArgument {
+        NonEmptyString gpuDevice;
+    }
+    
     // there may be more relevant, e.g., --gpu
 
     // for future    
