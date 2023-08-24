@@ -38,7 +38,20 @@ template DockerBasics(Configuration config, FileArtifact target) {
     def Boolean useFixedPort(IIPEcosphere cfg, EcsDevice device) {
         not(cfg.aasImplServer.devicesAsEphemeral);
     }
+
+    // abstraction workaround, this is a docker descriptor -> generalize?
+    def String getRegistryName(ContainerManager mgr) {
+        "";
+    }
     
+    def String getRegistryName(DockerContainerManager mgr) {
+        String registryName = "";
+        if (isDefined(mgr.registry) and mgr.registry.length() > 0) {
+            registryName = mgr.registry + "/";
+        }
+        registryName;
+    }
+        
     def toDockerImageName(String repo, String registry, String tag) {
         toDockerImageName("${repo}/${registry}:${tag}");
     }
