@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { ApiService } from 'src/app/services/api.service';
-import { Resource, uiGroup, editorInput, configMetaContainer, configMetaEntry, ResourceAttribute } from 'src/interfaces';
+import { Resource, uiGroup, editorInput, configMetaContainer, configMetaEntry, ResourceAttribute, InputVariable } from 'src/interfaces';
 
 @Component({
   selector: 'app-editor',
@@ -202,6 +202,8 @@ export class EditorComponent implements OnInit {
 // ----------------------------------------------------------------------
 
   private cleanTypeName(type: string) {
+    //console.log("[editor | cleanTypeName] triggered, type:")
+    //console.log(type)
     const startIndex = type.lastIndexOf('(') + 1;
     const endIndex = type.indexOf(')');
     if(endIndex > 0){
@@ -222,6 +224,8 @@ export class EditorComponent implements OnInit {
     return displayName;
   }
 
+  primitiveTypes = ["String", "Boolean", "Real", "Integer"]
+
   public generateInputs() {
 
     this.uiGroups = [];
@@ -229,6 +233,28 @@ export class EditorComponent implements OnInit {
     this.ivmlType = selectedType.idShort // TODO leave ?
 
     if(selectedType && selectedType.value) {
+
+      // (Constants) hard-coded in case of primitive types
+      if (this.primitiveTypes.includes(selectedType.idShort)) {
+        let meta_entry:configMetaEntry = {
+          modelType: {name: ""},
+          kind: "",
+          value: "",
+          idShort: "value"
+        }
+        let editorInput:editorInput =
+          {name: "value", type: selectedType.idShort, value:[], description:
+          [{language: '', text: ''}], refTo: false, multipleInputs: false, meta:meta_entry}
+
+        let uiGroup = 1 // TODO what value here?
+        this.uiGroups.push({
+          uiGroup: uiGroup,
+          inputs: [editorInput],
+          optionalInputs: [],
+          fullLineInputs: [],
+          fullLineOptionalInputs: []
+        });
+      }
 
       for(const input of selectedType.value) {
         if(input.idShort && this.metaTypes.indexOf(input.idShort) === -1) {
@@ -243,11 +269,11 @@ export class EditorComponent implements OnInit {
           let uiGroupCompare =  this.uiGroups.find(
             item => item.uiGroup === uiGroup);
 
-
           let editorInput: editorInput =
             {name: '', type: '', value:[], description:
               [{language: '', text: ''}],
               refTo: false, multipleInputs: false};
+
           let name = input.value.find(
             (item: { idShort: string; }) => item.idShort === 'name')
             if(name) {
@@ -264,18 +290,18 @@ export class EditorComponent implements OnInit {
             (item: { idShort: string; }) => item.idShort === 'type')?.value;
 
           editorInput.meta = input;
-            let cleanType = this.cleanTypeName(editorInput.type);
-            let type = this.meta?.value?.find(type => type.idShort == cleanType);
-            if(type) {
-              editorInput.metaTypeKind = type.value.find(
-                (item: { idShort: string; }) => item.idShort === 'metaTypeKind')?.value;
-            } else if(this.metaBackup && this.metaBackup.value) {
-              let temp = this.metaBackup.value.find(item => item.idShort === this.cleanTypeName(editorInput.type));
-              editorInput.metaTypeKind = temp?.value.find((item: { idShort: string; }) => item.idShort === 'metaTypeKind').value
-            }
+          let cleanType = this.cleanTypeName(editorInput.type);
+          let type = this.meta?.value?.find(type => type.idShort == cleanType);
+          if(type) {
+            editorInput.metaTypeKind = type.value.find(
+              (item: { idShort: string; }) => item.idShort === 'metaTypeKind')?.value;
+          } else if(this.metaBackup && this.metaBackup.value) {
+            let temp = this.metaBackup.value.find(item => item.idShort === this.cleanTypeName(editorInput.type));
+            editorInput.metaTypeKind = temp?.value.find((item: { idShort: string; }) => item.idShort === 'metaTypeKind').value
+          }
 
-            //the metaTypeKind is not included on the values of the types in the configuration/meta collection
-            //therefore this approach doesnt work, but it would be much more performant if it did
+          //the metaTypeKind is not included on the values of the types in the configuration/meta collection
+          //therefore this approach doesnt work, but it would be much more performant if it did
           // editorInput.metaTypeKind = input.value.find(
           //   (item: { idShort: string; }) => item.idShort === 'metaTypeKind')?.value;
           //   console.log(editorInput);
@@ -319,7 +345,6 @@ export class EditorComponent implements OnInit {
                   fullLineOptionalInputs: []
                 });
               }
-
             } else {
               if(editorInput.multipleInputs) {
                 this.uiGroups.push({
@@ -338,7 +363,6 @@ export class EditorComponent implements OnInit {
                   fullLineOptionalInputs: []
                 });
               }
-
             }
           } else {
             if(isOptional) {
@@ -354,14 +378,11 @@ export class EditorComponent implements OnInit {
               } else {
                 uiGroupCompare?.inputs.push(editorInput);
               }
-
             }
-
           }
         }
-        }
+      }
     }
-
   }
 
   public toggleOptional(uiGroup: uiGroup) {
@@ -372,9 +393,15 @@ export class EditorComponent implements OnInit {
     const variableName = this.removeWhitespace(this.variableName)
     const creationData = this.prepareCreation();
     //TODO: mach ein ivml draus
-    console.log(creationData);
     let ivml = this.getIvmlFormat(creationData, variableName)
     //TODO: platform request
+    //let inputVar:InputVariable[] = this.getCreateVarInputVar(creationData, variableName)
+  }
+
+  public getCreateVarInputVar(data: any, name: string) {
+
+    let input1 = 4
+
   }
 
   public close() {
@@ -385,10 +412,17 @@ export class EditorComponent implements OnInit {
     let complexType: Record<string, any> = {};
     this.showInputs = false;
     for(let uiGroup of this.uiGroups) {
+
       for(let input of uiGroup.inputs) {
         if(input.meta){
           complexType[input.name] = input.value;
         }
+
+        if(this.primitiveTypes.includes(input.type)) {
+          complexType["type"] = input.type
+          complexType[input.name] = input.value
+        }
+
       }
       for(let input of uiGroup.optionalInputs) {
         if(input.meta){
@@ -449,33 +483,43 @@ export class EditorComponent implements OnInit {
   getIvmlFormat(data: any, variableName: string) {
     // removing empty entries
     for(const key in data) {
-      if (data[key] == "") {
+      if (data[key] === "") {
         delete data[key]
       }
     }
 
     let varName = variableName
-    let ivml = this.ivmlType + " " + varName + " = {\n"
-    let i = 0
+    let ivml = this.ivmlType + " " + varName + " = "
 
-    for(const key in data) {
-      // quotes or no qoutes
-      if (typeof data[key] == "string") {
-        ivml += key + " = \"" + data[key] + "\""
-      } else if (typeof data[key] == "object") {
-        ivml += key + " = " + this.createList(data[key])
+    if (this.primitiveTypes.includes(this.ivmlType)) {
+      if (this.ivmlType === "String") {
+        ivml += "\"" + data["value"] + "\";"
       } else {
-        ivml += key + " = " + data[key]
+        ivml += data["value"] + ";"
       }
 
-      // no comma after the last value
-      if (i < (Object.keys(data).length - 1)) {
-        ivml += ",\n"
+    } else {
+      ivml += "{\n"
+      let i = 0
+      for(const key in data) {
+        // quotes or no qoutes
+        if (typeof data[key] == "string") {
+          ivml += key + " = \"" + data[key] + "\""
+        } else if (typeof data[key] == "object") {
+          ivml += key + " = " + this.createList(data[key])
+        } else {
+          ivml += key + " = " + data[key]
+        }
+
+        // no comma after the last value
+        if (i < (Object.keys(data).length - 1)) {
+          ivml += ",\n"
+        }
+        i += 1
       }
-      i += 1
+      ivml += "\n};"
     }
-    ivml += "\n};"
-    console.log("[editor | getIvamlFormat] returns \n\n" + ivml)
+    console.log("[editor | getIvamlFormat] IVML \n\n" + ivml)
   }
 
   removeWhitespace(value: string) {
