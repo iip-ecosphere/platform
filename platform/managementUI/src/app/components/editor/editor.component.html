@@ -9,17 +9,6 @@
     (click)="close()"><mat-icon>close</mat-icon></button></span>
 </mat-toolbar>
 
-<!-- variable name input field for Constants -->
-<div *ngIf="category=='Constants'">
-  <mat-card>
-    <mat-form-field appearance="outline" >
-      <mat-label>Variable Name</mat-label>
-      <input matInput
-        type="text" ngDefaultControl [(ngModel)]=variableName />
-    </mat-form-field>
-  </mat-card>
-</div>
-
 <!--
 <div *ngIf="numOfItemsInMeta > 1; else singleItem"> multiple items
   <mat-card *ngIf="!type">

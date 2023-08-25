@@ -1,6 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { ApiService } from 'src/app/services/api.service';
+import { primitiveDataTypes } from 'src/app/services/env-config.service';
+import { IvmlFormatterService } from 'src/app/services/ivml-formatter.service';
 import { Resource, uiGroup, editorInput, configMetaContainer, configMetaEntry, ResourceAttribute, InputVariable } from 'src/interfaces';
 
 @Component({
@@ -53,7 +55,8 @@ export class EditorComponent implements OnInit {
   ];
 
   constructor(private api: ApiService,
-    public dialog: MatDialogRef<EditorComponent>) { }
+    public dialog: MatDialogRef<EditorComponent>,
+    public ivmlFormatter: IvmlFormatterService) { }
 
   ngOnInit(): void {
     if(!this.type) {
@@ -224,7 +227,7 @@ export class EditorComponent implements OnInit {
     return displayName;
   }
 
-  primitiveTypes = ["String", "Boolean", "Real", "Integer"]
+  //primitiveTypes = ["String", "Boolean", "Real", "Integer"]
 
   public generateInputs() {
 
@@ -235,7 +238,8 @@ export class EditorComponent implements OnInit {
     if(selectedType && selectedType.value) {
 
       // (Constants) hard-coded in case of primitive types
-      if (this.primitiveTypes.includes(selectedType.idShort)) {
+      //if (this.primitiveTypes.includes(selectedType.idShort)) {
+      if (primitiveDataTypes.includes(selectedType.idShort)) {
         let meta_entry:configMetaEntry = {
           modelType: {name: ""},
           kind: "",
@@ -390,18 +394,12 @@ export class EditorComponent implements OnInit {
   }
 
   public create() {
-    const variableName = this.removeWhitespace(this.variableName)
     const creationData = this.prepareCreation();
     //TODO: mach ein ivml draus
-    let ivml = this.getIvmlFormat(creationData, variableName)
+    let ivml = this.ivmlFormatter.getIvml(this.variableName, creationData, this.ivmlType)
+    //let ivml = this.getIvmlFormat(creationData, variableName)
     //TODO: platform request
     //let inputVar:InputVariable[] = this.getCreateVarInputVar(creationData, variableName)
-  }
-
-  public getCreateVarInputVar(data: any, name: string) {
-
-    let input1 = 4
-
   }
 
   public close() {
@@ -418,7 +416,8 @@ export class EditorComponent implements OnInit {
           complexType[input.name] = input.value;
         }
 
-        if(this.primitiveTypes.includes(input.type)) {
+        //if(this.primitiveTypes.includes(input.type)) {
+        if(primitiveDataTypes.includes(input.type)) {
           complexType["type"] = input.type
           complexType[input.name] = input.value
         }
@@ -478,65 +477,5 @@ export class EditorComponent implements OnInit {
       this.type.value.push(complexType);
     }
     this.dialog.close();
-  }
-
-  getIvmlFormat(data: any, variableName: string) {
-    // removing empty entries
-    for(const key in data) {
-      if (data[key] === "") {
-        delete data[key]
-      }
-    }
-
-    let varName = variableName
-    let ivml = this.ivmlType + " " + varName + " = "
-
-    if (this.primitiveTypes.includes(this.ivmlType)) {
-      if (this.ivmlType === "String") {
-        ivml += "\"" + data["value"] + "\";"
-      } else {
-        ivml += data["value"] + ";"
-      }
-
-    } else {
-      ivml += "{\n"
-      let i = 0
-      for(const key in data) {
-        // quotes or no qoutes
-        if (typeof data[key] == "string") {
-          ivml += key + " = \"" + data[key] + "\""
-        } else if (typeof data[key] == "object") {
-          ivml += key + " = " + this.createList(data[key])
-        } else {
-          ivml += key + " = " + data[key]
-        }
-
-        // no comma after the last value
-        if (i < (Object.keys(data).length - 1)) {
-          ivml += ",\n"
-        }
-        i += 1
-      }
-      ivml += "\n};"
-    }
-    console.log("[editor | getIvamlFormat] IVML \n\n" + ivml)
-  }
-
-  removeWhitespace(value: string) {
-    let temp = value.split(' ')
-    return temp.join('_')
-  }
-
-  createList(data:any) {
-    let result = "{"
-    let i = 0
-    for (let elemt of data) {
-      result += elemt
-      if (i < data.length - 1) {
-        result += ","
-      }
-      i += 1
-    }
-    return result + "}"
   }
 }
