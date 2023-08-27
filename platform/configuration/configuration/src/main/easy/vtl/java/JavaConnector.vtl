@@ -683,6 +683,20 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         }
     }
 
+    @DispatchBasis
+    def getConnectorSchema(Connector conn) {
+        "";
+    }
+    
+    @DispatchCase
+    def getConnectorSchema(AasConnector conn) {
+        String result = "Schema.HTTP";
+        if (isDefined(conn.security) and conn.security <> null) {
+            result = "Schema.HTTPS";
+        }
+        result;
+    }
+
     def getConnectorDeviceServiceKey(Connector conn) {
         if (isDefined(conn.deviceServiceKey)) {
             '"${conn.deviceServiceKey}"';
@@ -692,6 +706,10 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
     }
 
     def generateConnectorParameter(Connector conn, Application app) {
+        String schemaArg = getConnectorSchema(conn);
+        if (schemaArg.length() > 0) {
+            schemaArg = ", " + schemaArg;
+        }
         '/**
         * Creates the connector parameter instance. [public for testing]
         *
@@ -707,7 +725,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
                 port = svc.getPort();
             }
             return ConnectorParameter.ConnectorParameterBuilder
-                .newBuilder(host, port)
+                .newBuilder(host, port${schemaArg})
                 .setService(svc)
                 .setApplicationInformation("${getApplicationInformation(conn, app)}", "${app.description}")
                 .setCacheMode(${getCacheMode(conn)})

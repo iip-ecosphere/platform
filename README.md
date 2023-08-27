@@ -4,12 +4,10 @@ The virtual IIP-Ecosphere Industry 4.0/IIoT platform aims at demonstrating new a
 
 ## News
 
-* Preparing an enhanced demonstrator for [EMO 2023](https://emo-hannover.de/), also planning for an integration with [UMATI](https://umati.org/) and sensor technology form [MIP technology](https://mip-technology.de/de/). There will also be the IIP-Ecosphere symposium as closing event for the project.
+* Preparing an enhanced demonstrator for [EMO 2023](https://emo-hannover.de/), also planning for an integration with [UMATI](https://umati.org/) and sensor technology form [MIP technology](https://mip-technology.de/de/). There will also be the IIP-Ecosphere [symposium as closing event](https://symposium.iip-ecosphere.de/) for the project on 2023/09/19. 
 * Default library for code based on types or devices defined in the Platform configuration meta-model including code for controlling an MIP sensor.
 * New application example: MIP connector and MIP AI improvement ping-pong
-* IIP-Ecosphere demonstrators from the [IIP-Ecosphere innovation idea competition](https://www.iip-ecosphere.de/ideenwettbewerb/) evolving. Integration of magnetic product identification [MIP technology](https://mip-technology.de/de/) into the platform EMO'23 demonstrator. Preparing alternative federated learning integration [NovoAI](https://novoai.de/de/).
 * Early snapshot of [upcoming platform handbook for version 0.6.0](https://github.com/iip-ecosphere/platform/tree/main/platform/documentation/PlatformHandbook-0.6.0-SNAPSHOT-V0.1.pdf) now online in github (version as of 2023/08/20). Comments for clarification are welcome.
-* Service development tutorial online on [YouTube](https://www.youtube.com/playlist?list=PL5VSYtiD_PfdxUDXGlX53UsHdQlXcHYK7) and [IIP-Ecosphere](https://www.iip-ecosphere.de/angebote/plattform/).
 * Confirmed compatibility: Phoenix Contact PLCnext (OPC UA, EEM integration), Beckhoff IPC (OPC UA), VDW UMATI (OPC UA), Bitmotec (MQTT), Lenze (MQTT), MIP (MQTT) - and improving...
 
 ## Public demonstrations
@@ -32,6 +30,7 @@ For more details on how to develop application-specific services for the IIP-Eco
 The platform concepts and realization are developed by the IIP-Ecosphere consortium and are documented in several whitepapers:
   * The IIP-Ecosphere [platform handbook version 0.6.0 preview](https://github.com/iip-ecosphere/platform/tree/main/platform/documentation/PlatformHandbook-0.6.0-SNAPSHOT-V0.1.pdf) - in development, not formatted/reviewed.
   * The IIP-Ecosphere [platform handbook version 0.5.0](https://doi.org/10.5281/zenodo.7695124) [link may be updated some days after platform releases]
+  * Service development tutorial [YouTube](https://www.youtube.com/playlist?list=PL5VSYtiD_PfdxUDXGlX53UsHdQlXcHYK7) and [IIP-Ecosphere](https://www.iip-ecosphere.de/angebote/plattform/).
   * The IIP-Ecosphere [platform requirements (functional and quality view)](https://doi.org/10.5281/zenodo.4485774)
   * The IIP-Ecosphere [platform usage view](https://doi.org/10.5281/zenodo.4485801)
   * The IIP-Ecosphere [Industry 4.0 platform overview](https://doi.org/10.5281/zenodo.4485756)
