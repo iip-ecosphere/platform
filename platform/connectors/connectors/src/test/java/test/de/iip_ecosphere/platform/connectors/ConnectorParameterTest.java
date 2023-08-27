@@ -124,7 +124,24 @@ public class ConnectorParameterTest {
         Assert.assertTrue(tokens.get("i") == params.getIdentityToken("i"));
         Assert.assertTrue(tokens.get("u") == params.getIdentityToken("u"));
         Assert.assertTrue(tokens.get("x") == params.getIdentityToken("x"));
-        
+       
+        params = ConnectorParameterBuilder.newBuilder(params, "local", null, null).build();
+
+        Assert.assertEquals("local", params.getHost());
+        Assert.assertEquals(1234, params.getPort());
+        Assert.assertEquals(Schema.TCP, params.getSchema());
+        Assert.assertEquals("aI", params.getApplicationId());
+        Assert.assertEquals("aD", params.getApplicationDescription());
+        Assert.assertFalse(params.getAutoApplicationId());
+        Assert.assertEquals("epp/", params.getEndpointPath());
+        Assert.assertEquals(2345, params.getKeepAlive());
+        Assert.assertEquals(9999, params.getNotificationInterval());
+        Assert.assertEquals(3421, params.getRequestTimeout());
+        Assert.assertTrue(tokens.get("a") == params.getIdentityToken("a"));
+        Assert.assertTrue(tokens.get("i") == params.getIdentityToken("i"));
+        Assert.assertTrue(tokens.get("u") == params.getIdentityToken("u"));
+        Assert.assertTrue(tokens.get("x") == params.getIdentityToken("x"));
+
         ServerAddress addr = new ServerAddress(Schema.TCP, "aaa", 1234);
         params = ConnectorParameterBuilder
             .newBuilder(addr)

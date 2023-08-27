@@ -90,6 +90,7 @@
      <module>examples/examples.pythonSync</module>
      <module>examples/examples.rtsa</module>
      <!--<module>examples/examples.templates</module>--> <!-- Needs orchestrated pom.xml at this level -->
+     <module>examples/examples.MIP</module>
      <module>examples/examples.vdw</module>
      <module>examples/examples.hm22</module>
   </modules>

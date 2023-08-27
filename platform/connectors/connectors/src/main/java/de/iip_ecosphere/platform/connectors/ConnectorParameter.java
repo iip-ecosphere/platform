@@ -116,7 +116,49 @@ public class ConnectorParameter {
                 builder.instance.schema = schema;
             }
             return builder;
-        }        
+        }
+
+        /**
+         * Creates a new connector parameter builder based on the given {@code params}.
+         * 
+         * @param params the connector params to take information from
+         * @param host the host name to override the value in {@code params}, may be <b>null</b> for the value 
+         *     from {@code params}.
+         * @param port the port number to override the value in {@code params}, may be <b>null</b> for the value 
+         *     from {@code params}.
+         * @param schema the schema to override the value in {@code params}, may be <b>null</b> for the value 
+         *     from {@code params}.
+         * @return the connector parameter builder
+         */
+        public static ConnectorParameterBuilder newBuilder(ConnectorParameter params, String host, Integer port, 
+            Schema schema) {
+            ConnectorParameterBuilder builder = newBuilder(null == host ? params.getHost() : host, 
+                null == port ? params.getPort() : port, null == schema ? params.getSchema() : schema);
+            builder.instance.identityToken = params.identityToken;
+            builder.instance.requestTimeout = params.requestTimeout;
+            builder.instance.endpointPath = params.endpointPath;
+            builder.instance.applicationId = params.applicationId;
+            builder.instance.autoApplicationId = params.autoApplicationId;
+            builder.instance.applicationDescription = params.applicationDescription;
+            builder.instance.notificationInterval = params.notificationInterval;
+            builder.instance.keepAlive = params.keepAlive;
+            builder.instance.keystoreKey = params.keystoreKey;
+            builder.instance.keyAlias = params.keyAlias;
+            builder.instance.hostnameVerification = params.hostnameVerification;
+            builder.instance.cacheMode = params.cacheMode;
+            builder.instance.service = params.service;
+            return builder;
+        }
+
+        /**
+         * Creates a new connector parameter builder based on the given {@code params}.
+         * 
+         * @param params the connector params to take information from
+         * @return the connector parameter builder
+         */
+        public static ConnectorParameterBuilder newBuilder(ConnectorParameter params) {
+            return newBuilder(params, null, null, null);
+        }
 
         /**
          * Creates a new connector parameter builder with required basic information.
