@@ -137,8 +137,8 @@ If there is already a repositories section, please add the contents for the “S
 
 *Symptom:* An error during the instantation due to an installation error in building an image container while installing Java or Python dependencies.
 
-*Reason:* An external modification on an image that we used as based image, e.g., ``python:3.8.17-slim-buster``. Those modification leads to missing or failed to fetch files. An example of some missing files is using ``python:3.8.17-slim-buster`` as base image then install Java 11 on it.
+*Reason:* An external modification on an image that we us as base image, e.g., ``python:3.8.17-slim-buster``. Such modifications may lead to missing files that shall be fetched during an installation of the operating system or of further software components. An example that happened to us in August 2023 was a container using ``python:3.8.17-slim-buster`` as base image into which Java 11 shall be installed.
 
-*Solution:* Change the base image version to an older version with the missing files.  An example of that is changing ``python:3.8.17-slim-buster`` to ``python:3.8.16-slim-buster`` to fix missing files during installation of Java 11.
+*Solution:* Change the base image version to an older (or if available and feasible, newer) version where the issues does not occur. Unfortunately, this may require some tries and may lead to some errors. In the example above, we changed ``python:3.8.17-slim-buster`` to ``python:3.8.16-slim-buster``, which then allowed for an installation of Java 11.
 
 
