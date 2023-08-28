@@ -321,7 +321,7 @@ export class EditorComponent implements OnInit {
           }
           //assign initial value of inputFields
           let initial;
-          if(editorInput.multipleInputs) {
+          if(editorInput.multipleInputs || editorInput.metaTypeKind === 10 || editorInput.metaTypeKind === 2) {
             initial = []
           } else if(editorInput.type === 'Boolean'){
             initial = false;
@@ -451,11 +451,6 @@ export class EditorComponent implements OnInit {
         for(let input of uiGroup.inputs) {
           if(input.meta){
             complexType[input.name] = input.value;
-            let beispiel: Record<string, any> = {};
-            beispiel['key'] = 'value'
-            complexType['InputParameter'] = {
-              beispiel
-            }
           }
         }
         for(let input of uiGroup.optionalInputs) {
@@ -474,6 +469,8 @@ export class EditorComponent implements OnInit {
           }
         }
       }
+      console.log(complexType);
+      console.log(this.type);
       this.type.value.push(complexType);
     }
     this.dialog.close();
