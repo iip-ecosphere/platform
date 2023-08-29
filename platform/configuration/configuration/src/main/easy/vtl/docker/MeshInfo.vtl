@@ -21,6 +21,10 @@ template MeshInfo(IIPEcosphere config, FileArtifact target, Application app, Con
             'dockerImageName: ${registryName}${toDockerImageName(appName, deviceName + "." + "ecs", app.ver)}'
             'dockerImageZipfile: ECS:${getAppMvnVersion(app)}.zip'
             'dood: true'
+            setOf(ContainerArgument) containerGpusArguments = device.containerArguments -> selectByType(GpusContainerArgument);
+            for (GpusContainerArgument arguments : containerGpusArguments) {
+                'gpus: ${arguments.gpuDevice}'
+            }
         } else if (containerType == ContainerType::C1Ecs_C2Svc_App) {
             'id: ${appName}_${deviceName}_NoECS'
             'name: ${getAppMvnName(app)}'
@@ -35,6 +39,10 @@ template MeshInfo(IIPEcosphere config, FileArtifact target, Application app, Con
             'dockerImageName: ${registryName}${toDockerImageName(appName, deviceName, app.ver)}'
             'dockerImageZipfile: ${getAppMvnName(app)}:${getAppMvnVersion(app)}.zip'
             'dood: true'
+            setOf(ContainerArgument) containerGpusArguments = device.containerArguments -> selectByType(GpusContainerArgument);
+            for (GpusContainerArgument arguments : containerGpusArguments) {
+                'gpus: ${arguments.gpuDevice}'
+            }
         }
         Boolean useEphemeralPort = not(useFixedPort(config, device));
         if (useEphemeralPort) { // else instantiated into Dockerfile
