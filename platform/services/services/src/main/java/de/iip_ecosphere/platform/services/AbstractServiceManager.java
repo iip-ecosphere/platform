@@ -182,7 +182,7 @@ public abstract class AbstractServiceManager<A extends AbstractArtifactDescripto
      */
     protected static void checkId(String id, String text) throws ExecutionException {
         if (!isValidId(id)) {
-            throw new ExecutionException(text + "must be given (not null or empty)", null);
+            throw new ExecutionException(text + " must be given (not null or empty)", null);
         }
     }
     
