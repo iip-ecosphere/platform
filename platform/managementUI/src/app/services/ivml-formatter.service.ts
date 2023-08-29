@@ -1,3 +1,4 @@
+//import { type } from 'os';
 import { primitiveDataTypes } from './env-config.service';
 import { Injectable } from '@angular/core';
 
@@ -8,12 +9,25 @@ export class IvmlFormatterService {
 
   constructor() { }
 
+  // ivml data types
+  STRING = "string"
+  REF_TO = "refTo"
+  LIST = "list"
+  BOOL = "boolean"
+
   public getIvml(variableName: string, data: any, type: string) {
     // replacing whitespaces with underline
     variableName = this.replaceWhitespaces(variableName)
+
+    // TODO - it is only for testing
+    //data = this.t
+
     // removing empty entries
     for(const key in data) {
-      if (data[key] === "") { //|| Object.keys(data[key]).length === 0) {
+      if (data[key] === "") {
+        delete data[key]
+      }
+      if (Array.isArray(data[key]) && Object.keys(data[key]).length === 0) {
         delete data[key]
       }
     }
@@ -30,24 +44,63 @@ export class IvmlFormatterService {
         ivml += data["value"] + ";"
       }
     } else {
+      // non-primitive types ---------------------------------------------------------
+
       ivml += "{\n"
       let i = 0
 
-
-      for(const key in data) {
-        //console.log("key: " + key)
-        // quotes or no qoutes
-        if (typeof data[key] == "string") {
+      for (const key in data) {
+        if (typeof data[key] == "string") {  // string inside non-primitive type
           ivml += key + " = \"" + data[key] + "\""
+
         } else if (typeof data[key] == "object") {
-          //console.log("\t value is a object")
-          //console.log(data[key])
-          //this.getObjectType(data[key])
-          ivml += key + " = " + this.createList(data[key])
+          // refTo, setOf, sequenceOf ------------------------------------------------
+
+          ivml += key + " = "
+          if (data[key].length > 1) {
+            ivml += "{"
+            let j = 0
+
+            if (typeof data[key][0] === "object") {
+              // sequence with more than one entry
+              ivml += this.handleIvmlSeq(data[key]) + "}"
+
+            } else {
+              // refTo or setOf
+
+              for (let elemt of data[key]) {
+                let return_val = this.convertToIvml(elemt)
+                ivml += return_val[0]
+
+                // no comma after the last value
+                if (j < (Object.keys(data[key]).length - 1)) {
+                  ivml += ","
+                }
+                j += 1
+              }
+              ivml += "}"
+            }
+          } else {
+            // setOf or sequenceOf with only one element
+            if (typeof data[key][0] === "object") {
+              // ivml sequence
+              ivml += "{" + this.handleIvmlSeq(data[key]) + "}"
+
+            } else {
+              // refTo, string or boolean
+              let elemt = data[key][0]
+              let return_val = this.convertToIvml(elemt)
+              if (return_val[1] === this.LIST) {
+                ivml += "{" + return_val[0] + "}"
+              } else {
+                ivml += return_val[0]
+              }
+            }
+          }
         } else {
+          // integer, real
           ivml += key + " = " + data[key]
         }
-
         // no comma after the last value
         if (i < (Object.keys(data).length - 1)) {
           ivml += ",\n"
@@ -61,11 +114,73 @@ export class IvmlFormatterService {
     return ivml
   }
 
+  private convertToIvml(elemt:any) {
+    let result = ["", null]                   // ivml, type (refTo, string, number, list)
+    if (typeof elemt === this.STRING) {
+      if (elemt.startsWith(this.REF_TO)) {
+        // refTo
+        elemt = elemt.replace("refTo", "refBy")
+        result = [elemt, this.REF_TO]
+
+      } else {
+        // string ''
+        result = ["\"" + elemt + "\"", this.STRING]
+      }
+    } else if (Array.isArray(elemt)) {
+      // probably refTo
+      result = this.convertToIvml(elemt[0]) // TODO do also for array with multipy elements
+    } else if (typeof elemt === 'boolean') {
+      result = [String(elemt), this.BOOL] // TODO do I need this info about boolean?
+    } else {
+      result = elemt
+    }
+
+    //TODO number
+    return result
+  }
+
+  private handleIvmlSeq(seq: any) {
+    let result = ""
+    let i = 0
+    for (let elemt of seq) {
+      let j = 0
+      result += "{"
+      for (const [key, value] of Object.entries(elemt)) {
+
+        let ivml_value = this.convertToIvml(value)[0]
+        result += key + "=" + ivml_value
+
+        // no comma after the last value
+        if (j < (Object.entries(elemt).length - 1)) {
+          result += ","
+        }
+        j += 1
+      }
+      // no comma after the last value
+      if (i < (Object.entries(seq).length - 1)) {
+        result += "}, "
+      }
+      i += 1
+    }
+    return result += "}"
+  }
+  /* only for testing
+  t_str = 'test value'
+  t_ref = ['refTo(dkakak)']
+  t_setOf = ['ddd', 'fff']
+  t_setOf1 = ['ddd']
+  t_setOfRef = ['refTo(d)', 'refTo(a)']
+  t_seq = [{type: ['refTo(a)'], forward: false},
+    {type: ['refTo(b)'], forward: true}]
+  t = {test_value: this.t_str, ex_ref: this.t_ref,
+      ex_setOf_1: this.t_setOf1, ex_setOf: this.t_setOf, ex_setOfRef: this.t_setOfRef}
+    */
+
   replaceWhitespaces(value: string) {
     let temp = value.split(' ')
     return temp.join('_')
   }
-
+  /*
   createList(data:any) {
     let result = "{"
     let i = 0
@@ -77,30 +192,7 @@ export class IvmlFormatterService {
       i += 1
     }
     return result + "}"
-  }
-  /*
-  getObjectType(object: any) {
-    let type = "string"
-    let first_elemt = object[0]
-    console.log("1st elemt: ")
-    console.log(first_elemt)
-    let isString = typeof first_elemt == "string"
-    console.log("Is a string? " + isString)
-    if (isString) {
-      // string or refTo
-      console.log("Is refTo type? " + first_elemt.startsWith("refTo"))
-      if (first_elemt.startsWith("refTo")) {
-        type = "refTo"
-      }
-    } else {
-      // setOf or sequenceOf
-      console.log("1st element is a object? " +  typeof first_elemt == "object")
-      console.log("Length of the object " + first_elemt.length)
-    }
-    console.log("Type is " + type)
-    return type
-  }
-  */
+  }*/
 
   // TODO
   public getCreateVarInputVar(data: any, name: string) {
