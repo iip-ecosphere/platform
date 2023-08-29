@@ -53,7 +53,7 @@ template ContainerRunScript(IIPEcosphere config, FileArtifact target, Applicatio
 
         setOf(ContainerArgument) containerGpusArguments = device.containerArguments -> selectByType(GpusContainerArgument);
         for (GpusContainerArgument arguments : containerGpusArguments) {
-            containerArguments = "--gpus ${arguments.gpuDevice} ";
+            containerArguments = "${containerArguments} --gpus ${arguments.gpuDevice} ";
         }        
         
         ''
