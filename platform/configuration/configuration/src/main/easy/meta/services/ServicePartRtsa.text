@@ -7,3 +7,4 @@ ServicePartRtsa::RtsaService::path = URL access postfix to deployment
 ServicePartRtsa::RtsaService::nameplateInfo = Refined nameplate information for RTSA
 ServicePartRtsa::RtsaService::rtsaInputFlat = RTSA input must not contain nested structures.
 ServicePartRtsa::RtsaService::rtsaOutputFlat = RTSA output must not contain nested structures.
+ServicePartRtsa::RtsaIOType::rtsaField = Field name on RTSA deployment side.
