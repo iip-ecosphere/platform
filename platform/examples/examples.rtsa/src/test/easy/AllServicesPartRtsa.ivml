@@ -24,8 +24,8 @@ project AllServicesPartRtsa {
         description = "Test RapidMiner RTSA integration",
         ver = "0.1.0",
         deployable = true,
-        input = {{type=refBy(RtsaTestInput)}},
-        output = {{type=refBy(RtsaTestOutput)}},
+        input = {RtsaIOType{rtsaField="data", type=refBy(RtsaTestInput)}},
+        output = {RtsaIOType{rtsaField="data", type=refBy(RtsaTestOutput)}},
         path = "iip_basic/score_v1"
     };
 
