@@ -194,8 +194,11 @@
 </div>
 
 <div style="display: flex; justify-content: center">
-  <button mat-raised-button class="button" *ngIf="!type"
+  <button mat-raised-button class="button" *ngIf="!type && !refinedTypes else addButton"
     color="success" (click)="create()" disable>Create</button>
-    <button mat-raised-button class="button" *ngIf="type"
-    color="success" (click)="addType()">Add</button>
+    <ng-template #addButton>
+      <button mat-raised-button class="button"
+      color="success" (click)="addType()">Add</button>
+    </ng-template>
+
 </div>
