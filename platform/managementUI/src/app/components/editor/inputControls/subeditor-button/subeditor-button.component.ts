@@ -13,8 +13,11 @@ export class SubeditorButtonComponent implements OnInit {
   @Input() meta: Resource | undefined;
   @Input() input!: editorInput;
 
-  errorMsg: string = '';
+  errorMsg: string = 'loading...';
   disabled = false;
+
+  refinedTypes: ResourceAttribute[] = [];
+  selectedRefinedType: ResourceAttribute | null = null;
 
   metaTypes = ['metaState', 'metaProject',
   'metaSize', 'metaType', 'metaRefines', 'metaAbstract', 'metaTypeKind'];
@@ -32,7 +35,11 @@ export class SubeditorButtonComponent implements OnInit {
         height: '80%',
         width:  '80%',
       })
-      dialogRef.componentInstance.type = type;
+      if(this.refinedTypes[0]) {
+        dialogRef.componentInstance.refinedTypes = this.refinedTypes;
+      } else {
+        dialogRef.componentInstance.type = type;
+      }
       dialogRef.componentInstance.metaBackup = this.meta;
     }
 
@@ -41,15 +48,50 @@ export class SubeditorButtonComponent implements OnInit {
   public validateEditorInputType(type:editorInput) {
     if(this.meta && this.meta.value) {
       let typeMeta = this.meta.value.find(item => item.idShort === this.cleanTypeName(type.type));
+
       if(!typeMeta) {
         this.errorMsg = 'ERROR: Metadata not found in Configuration'
         return true;
-      } else if(!this.hasInputFields(typeMeta)){
-        this.errorMsg = 'ERROR: Configuration does not provide input fields for type'
-        return true;
+      } else {
+        const Abstract = typeMeta.value.find( (item: { idShort: string; }) => item.idShort === "metaAbstract");
+        if(Abstract.value && typeMeta.idShort) {
+          this.getRefinedReal(typeMeta.idShort);
+          return false;
+        } else if(!this.hasInputFields(typeMeta)){
+          this.errorMsg = 'ERROR: Configuration does not provide input fields for non abstract type'
+          return true;
+        }
       }
     }
+    this.errorMsg = '';
     return false;
+  }
+
+  private getRefinedReal(searchTerm: string) {
+    if(this.meta && this.meta.value) {
+      let refinedTypes = [];
+      console.log(this.meta.value);
+      console.log(searchTerm);
+      for(const type of this.meta.value) {
+        const refined = type.value.find((item: { idShort: string; }) => item.idShort === 'metaRefines');
+        if(refined && refined.value != '') {
+          if(searchTerm === refined.value) {
+            console.log('MATCH');
+            const abstract = type.value.find((item: { idShort: string; }) => item.idShort === 'metaAbstract');
+            if(abstract && abstract.value && type.idShort) {
+              this.getRefinedReal(type.idShort)
+            } else {
+              refinedTypes.push(type);
+            }
+          }
+        }
+      }
+      if(!refinedTypes[0]) {
+        console.log('WARNING: no refined types found for abstract type ' + searchTerm);
+      } else {
+        this.refinedTypes = this.refinedTypes.concat(refinedTypes);
+      }
+    }
   }
 
   private cleanTypeName(type: string) {
@@ -76,6 +118,4 @@ export class SubeditorButtonComponent implements OnInit {
     }
 
   }
-
-
 }

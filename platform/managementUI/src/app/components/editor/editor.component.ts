@@ -14,6 +14,8 @@ export class EditorComponent implements OnInit {
 
   //type to generate subeditor for, null if this editor instance is not a subeditor
   @Input() type: editorInput | null = null;
+  @Input() refinedTypes: ResourceAttribute[] | null = null;
+
 
   category: string = 'all';
   meta: Resource | undefined;
@@ -59,7 +61,13 @@ export class EditorComponent implements OnInit {
     public ivmlFormatter: IvmlFormatterService) { }
 
   ngOnInit(): void {
-    if(!this.type) {
+    if(this.refinedTypes) {
+      console.log(this.refinedTypes);
+      this.meta = {
+        idShort: 'meta',
+        value: this.refinedTypes
+      }
+    } else if(!this.type) {
       this.getMeta()
     } else if(this.metaBackup && this.metaBackup.value && this.type.type){
       let type = this.cleanTypeName(this.type.type);
@@ -130,7 +138,6 @@ export class EditorComponent implements OnInit {
       this.setInputForSingleItem(newMetaValues[0])
       this.showDropdown = false
     }
-    console.log(this.meta);
   }
 
   public setInputForSingleItem(item: any) {
@@ -443,7 +450,6 @@ export class EditorComponent implements OnInit {
   }
 
   public addType() {
-    const variableName = this.variableName;
     let complexType: Record<string, any> = {};
 
     if(this.type) {
@@ -469,8 +475,6 @@ export class EditorComponent implements OnInit {
           }
         }
       }
-      console.log(complexType);
-      console.log(this.type);
       this.type.value.push(complexType);
     }
     this.dialog.close();
