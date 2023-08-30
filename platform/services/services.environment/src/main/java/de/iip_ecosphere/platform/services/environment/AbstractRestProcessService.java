@@ -12,8 +12,6 @@
 
 package de.iip_ecosphere.platform.services.environment;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -156,12 +154,23 @@ public abstract class AbstractRestProcessService<I, O> extends AbstractProcessSe
     
     @Override
     public void process(I data) throws IOException {
+        process(data, "");
+    }
+
+    /**
+     * Processes input.
+     * 
+     * @param data the data to be processed
+     * @param inTypeName the symbolic input type name, may be empty if just one is handled
+     * @throws IOException if processing fails
+     */
+    public void process(I data, String inTypeName) throws IOException {
         executor.execute(new Runnable() {
             public void run() {
                 try {
                     HttpPost post = new HttpPost(getApiPath());
                     String bearer = getBearerToken();
-                    String input = adjustRestQuery(getInputTranslator().to(data));
+                    String input = toSendString(data, inTypeName);
                     StringEntity entity = new StringEntity(input);
                     post.setEntity(entity);
                     post.setHeader("Accept", "application/json");
@@ -169,12 +178,8 @@ public abstract class AbstractRestProcessService<I, O> extends AbstractProcessSe
                     post.setHeader("Authorization", bearer);
                     if (client != null) {
                         CloseableHttpResponse response = client.execute(post);
-                        String result = adjustRestResponse(EntityUtils.toString(response.getEntity()));
-                        try {
-                            notifyCallbacks(getOutputTranslator().to(result));
-                        } catch (IOException e) {
-                            LoggerFactory.getLogger(getClass()).error("Receiving result: {}", e.getMessage());
-                        }
+                        String output = EntityUtils.toString(response.getEntity());
+                        handleReception(output);
                     } else {
                         LoggerFactory.getLogger(getClass()).info("Connection not yet open. Cannot process data.");
                     }
@@ -184,14 +189,43 @@ public abstract class AbstractRestProcessService<I, O> extends AbstractProcessSe
             }
         });
     }
+
+    /**
+     * Turns {@code data} to an input string of the underlying REST service.
+     * 
+     * @param data the data
+     * @param inTypeName the symbolic input type name, may be empty if just one is handled
+     * @return the translated input string, by default via {@link #adjustRestQuery(String)} 
+     *    and {@link #getInputTranslator()}
+     * @throws IOException if processing the input fails
+     */
+    protected String toSendString(I data, String inTypeName) throws IOException {
+        return adjustRestQuery(getInputTranslator().to(data), inTypeName);
+    }
     
+    /**
+     * Handles the reception of {@code data}. By default, applies {@link #adjustRestResponse(String)}, 
+     * {@link #getOutputTranslator()} and {@link #notifyCallbacks(Object)}.
+     * 
+     * @param data the information received from the underlying REST service
+     */
+    protected void handleReception(String data) {
+        String result = adjustRestResponse(data);
+        try {
+            notifyCallbacks(getOutputTranslator().to(result));
+        } catch (IOException e) {
+            LoggerFactory.getLogger(getClass()).error("Receiving result: {}", e.getMessage());
+        }
+    }
+
     /**
      * Adjusts the input produced by {@link #getInputTranslator()} to the actual receiver.
      *  
      * @param input the input
+     * @param inTypeName the symbolic input type name, may be empty if just one is handled
      * @return the adjusted input
      */
-    protected abstract String adjustRestQuery(String input);
+    protected abstract String adjustRestQuery(String input, String inTypeName);
     
     /**
      * The rest response.
@@ -200,47 +234,6 @@ public abstract class AbstractRestProcessService<I, O> extends AbstractProcessSe
      * @return the adjusted response
      */
     protected abstract String adjustRestResponse(String response);
-    
-    /**
-     * Redirects rest answers to the reception callback.
-     * 
-     * @param connection the connection to redirect
-     * @param callback the callback to use
-     * @see #adjustRestResponse(String)
-     */
-    public void redirectRest(final HttpURLConnection connection, ReceptionCallback<O> callback) {
-        if (null != callback) {
-            executor.execute(new Runnable() {
-                public void run() {
-                    try {
-                        BufferedInputStream bis = new BufferedInputStream(connection.getInputStream());
-                        ByteArrayOutputStream buf = new ByteArrayOutputStream();
-                        String result;
-                        int read;
-                        read = bis.read();
-                        while (read != -1) {
-                            buf.write((byte) read);
-                            read = bis.read();
-                        }
-                        result = adjustRestResponse(buf.toString());
-                        try {
-                            callback.received(getOutputTranslator().to(result));
-                            connection.disconnect();
-                        } catch (IOException e) {
-                            if (ServiceState.RUNNING == getState()) {
-                                LoggerFactory.getLogger(getClass()).error("Receiving result: {}", e.getMessage());
-                            }
-                            connection.disconnect();
-                        }
-                    } catch (IOException e1) {
-                        if (ServiceState.RUNNING == getState()) {
-                            LoggerFactory.getLogger(getClass()).error("Receiving result: {}", e1.getMessage());
-                        }
-                    }
-                }
-            });
-        }
-    }
 
     @Override
     protected void handleInputStream(InputStream in) {
