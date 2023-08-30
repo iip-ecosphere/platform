@@ -55,7 +55,7 @@ export class SubeditorButtonComponent implements OnInit {
       } else {
         const Abstract = typeMeta.value.find( (item: { idShort: string; }) => item.idShort === "metaAbstract");
         if(Abstract.value && typeMeta.idShort) {
-          this.getRefinedReal(typeMeta.idShort);
+          this.getRefinedTypes(typeMeta.idShort);
           return false;
         } else if(!this.hasInputFields(typeMeta)){
           this.errorMsg = 'ERROR: Configuration does not provide input fields for non abstract type'
@@ -67,19 +67,16 @@ export class SubeditorButtonComponent implements OnInit {
     return false;
   }
 
-  private getRefinedReal(searchTerm: string) {
+  private getRefinedTypes(searchTerm: string) {
     if(this.meta && this.meta.value) {
       let refinedTypes = [];
-      console.log(this.meta.value);
-      console.log(searchTerm);
       for(const type of this.meta.value) {
         const refined = type.value.find((item: { idShort: string; }) => item.idShort === 'metaRefines');
         if(refined && refined.value != '') {
           if(searchTerm === refined.value) {
-            console.log('MATCH');
             const abstract = type.value.find((item: { idShort: string; }) => item.idShort === 'metaAbstract');
             if(abstract && abstract.value && type.idShort) {
-              this.getRefinedReal(type.idShort)
+              this.getRefinedTypes(type.idShort);
             } else {
               refinedTypes.push(type);
             }

@@ -23,24 +23,44 @@
       </tr>
     </table>
   </div>
-  <div [ngClass]="valueboxClass()">
-    <div class="flexcontainer">
-      <mat-card *ngFor="let value of input.value; let i=index" class="inputCard">
-        <table>
-          <tr><td colspan="3" style="text-align: center">{{getDisplayName(value)}}</td></tr>
-          <tr>
-            <td>
-              <button *ngIf="isSequenceOf" mat-icon-button (click)="moveSequenceElement(true, i)"><mat-icon>keyboard_arrow_left</mat-icon></button>
-          </td>
-          <td>
-            <button mat-raised-button style="background-color: red; margin-left: 0.5em;" (click)="removeInputValue(i)">remove</button>
-          </td>
-          <td>
-            <button *ngIf="isSequenceOf" mat-icon-button (click)="moveSequenceElement(false, i)"><mat-icon>keyboard_arrow_right</mat-icon></button>
-          </td>
-        </tr>
-        </table>
-      </mat-card>
+    <div>
+      <div *ngIf="isArray(input.value) else single" class="valuebox">
+        <div class="flexcontainer">
+          <mat-card *ngFor="let value of input.value; let i=index" class="inputCard">
+            <table>
+              <tr><td colspan="3" style="text-align: center">{{getDisplayName(value)}}</td></tr>
+              <tr>
+                <td>
+                  <button *ngIf="isSequenceOf" mat-icon-button (click)="moveSequenceElement(true, i)"><mat-icon>keyboard_arrow_left</mat-icon></button>
+              </td>
+              <td>
+                <button mat-raised-button style="background-color: red; margin-left: 0.5em;" (click)="removeInputValue(i)">remove</button>
+              </td>
+              <td>
+                <button *ngIf="isSequenceOf" mat-icon-button (click)="moveSequenceElement(false, i)"><mat-icon>keyboard_arrow_right</mat-icon></button>
+              </td>
+            </tr>
+            </table>
+          </mat-card>
+        </div>
+      </div>
+       <ng-template #single>
+        <div class ="singlevaluebox">
+          <mat-card class="inputCard" *ngIf="input.value">
+            <table>
+              <tr>
+                <td colspan="3" style="text-align: center">
+                  {{getDisplayName(input.value)}}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <button mat-raised-button style="background-color: red; margin-left: 0.5em;" (click)="input.value = null">remove</button>
+                </td>
+              </tr>
+            </table>
+          </mat-card>
+        </div>
+      </ng-template>
     </div>
-  </div>
 </div>

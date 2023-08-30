@@ -10,7 +10,7 @@ import { Resource, editorInput, configMeta } from 'src/interfaces';
 export class InputRefSelectComponent implements OnInit {
 
   @Input() activeTextinput = false;
-  @Input() input: editorInput = {name: '', type: '', description: [{text: '', language: ''}], refTo: true, value: []};
+  @Input() input: editorInput = {name: '', type: '', description: [{text: '', language: ''}], refTo: true, value: undefined};
 
 
   textInput = '';
@@ -47,7 +47,12 @@ export class InputRefSelectComponent implements OnInit {
         this.isSequenceOf = true;
       }
     }
-    if(this.input.metaTypeKind == 10) {
+    if(this.isSetOf || this.isSequenceOf) {
+      this.input.value = [];
+    } else {
+      this.input.value = null;
+    }
+    if(this.input.metaTypeKind == 10 || this.input.metaTypeKind == 2) {
       this.activeTextinput = false;
     }
   }
@@ -65,16 +70,13 @@ export class InputRefSelectComponent implements OnInit {
   }
 
   public addFromRef() {
-    console.log(this.selectedRef);
     if(this.selectedRef && this.selectedRef.idShort) {
       if(this.isSetOf) {
         this.input.value.push('refTo(' + this.selectedRef.idShort + ')');
       } else {
-        this.input.value = [];
-        this.input.value.push('refTo(' + this.selectedRef.idShort + ')');
+        this.input.value = 'refTo(' + this.selectedRef.idShort + ')';
       }
     }
-    console.log(this.input.value);
   }
 
 
@@ -83,10 +85,8 @@ export class InputRefSelectComponent implements OnInit {
     if(this.isSetOf || this.isSequenceOf) {
       this.input.value.push(this.textInput);
     } else {
-      this.input.value = [];
-      this.input.value.push(this.textInput);
+      this.input.value = this.textInput;
     }
-    console.log(this.input.value);
   }
 
   public removeInputValue(removeIndex: number) {
@@ -101,16 +101,16 @@ export class InputRefSelectComponent implements OnInit {
     this.input.value = newInputs;
   }
 
-  public valueboxClass() {
-    let cssclass = '';
-    if(this.isSetOf || this.isSequenceOf) {
-      cssclass = 'valuebox';
-    } else {
-      cssclass = 'singlevaluebox';
-    }
+  // public valueboxClass() {
+  //   let cssclass = '';
+  //   if(this.isSetOf || this.isSequenceOf) {
+  //     cssclass = 'valuebox';
+  //   } else {
+  //     cssclass = 'singlevaluebox';
+  //   }
 
-    return cssclass;
-  }
+  //   return cssclass;
+  // }
 
   public getDisplayName(element: any) {
     if(typeof(element) === 'string') {
@@ -132,7 +132,6 @@ export class InputRefSelectComponent implements OnInit {
 
   //true: left, false: right
   public moveSequenceElement(direction: boolean, index: number) {
-    console.log(this.isSequenceOf);
     const inputValues = this.input.value
     if(direction) {
       if(inputValues[index - 1]) {
@@ -146,6 +145,14 @@ export class InputRefSelectComponent implements OnInit {
         inputValues[index + 1] = inputValues[index];
         inputValues[index] = temp;
       }
+    }
+  }
+
+  public isArray(element: any) {
+    if(Array.isArray(element)) {
+      return true;
+    } else {
+      return false;
     }
   }
 

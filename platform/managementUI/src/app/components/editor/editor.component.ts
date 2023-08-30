@@ -328,10 +328,12 @@ export class EditorComponent implements OnInit {
           }
           //assign initial value of inputFields
           let initial;
-          if(editorInput.multipleInputs || editorInput.metaTypeKind === 10 || editorInput.metaTypeKind === 2) {
+          if(editorInput.multipleInputs || editorInput.metaTypeKind === 2) {
             initial = []
           } else if(editorInput.type === 'Boolean'){
             initial = false;
+          } else if(editorInput.metaTypeKind === 10 && !editorInput.multipleInputs) {
+            initial = {};
           } else {
             initial = '';
           }
@@ -475,7 +477,12 @@ export class EditorComponent implements OnInit {
           }
         }
       }
-      this.type.value.push(complexType);
+      if(this.type.multipleInputs) {
+        this.type.value.push(complexType);
+      } else {
+        this. type.value = complexType;
+      }
+
     }
     this.dialog.close();
   }

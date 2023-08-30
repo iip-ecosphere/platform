@@ -37,10 +37,6 @@ export class EditorService {
 
   public async getConfigurationType(type: string) {
     console.log(type);
-    if(type.substring(0,1).match(new RegExp('[a-z]'))) {
-      let upperCaseLetter = type.substring(0,1).toUpperCase();
-      type = upperCaseLetter + type.substring(1);
-    }
     const response = await this.getData('/aas/submodels/Configuration/submodel/submodelElements/' + type) as Resource;
     return response;
 
