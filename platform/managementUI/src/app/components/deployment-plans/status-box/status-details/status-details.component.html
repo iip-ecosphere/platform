@@ -1,6 +1,6 @@
 <div>
   <h2>Details</h2>
-  <div mat-dialog-content *ngIf="process">
+  <div mat-dialog-content *ngIf="process" #scrollContainer>
     <p *ngFor="let message of process.messages">
       {{message.action}} {{message.componentType}}:
       <span [matTooltip]="message.id" style="min-width: 2em;">{{message.id}}</span>,
