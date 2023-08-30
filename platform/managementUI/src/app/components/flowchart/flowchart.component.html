@@ -14,7 +14,7 @@
       <div *ngIf="servicesLoading">Loading...</div>
       <div *ngIf="services && services.value">
         <div *ngFor="let service of services.value">
-          <mat-card *ngIf="!isMeta(service.idShort)" class="element">
+          <mat-card *ngIf="!isMeta(service.idShort)" class="element" (click)="selectService(service)">
             <mat-card-title *ngIf="service.idShort">
               {{ getId(service.value) }}
               <img [src]=assignIcon(getId(service.value)) height="25px" >

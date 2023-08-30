@@ -14,6 +14,8 @@ export class EditorComponent implements OnInit {
 
   //type to generate subeditor for, null if this editor instance is not a subeditor
   @Input() type: editorInput | null = null;
+
+  //for generating dropdown options of abstract type
   @Input() refinedTypes: ResourceAttribute[] | null = null;
 
 
@@ -73,6 +75,18 @@ export class EditorComponent implements OnInit {
       let type = this.cleanTypeName(this.type.type);
       this.selectedType = this.metaBackup.value.find(item => item.idShort === type);
       this.generateInputs()
+    }
+    console.log(this.metaBackup);
+    if(this.metaBackup && this.metaBackup.value) {
+      let searchTerm = 'Field'
+      for(const type of this.metaBackup.value) {
+        const refined = type.value.find((item: { idShort: string; }) => item.idShort === 'metaRefines');
+        if(refined && refined.value != '') {
+          if(searchTerm === refined.value) {
+            console.log(type);
+          }
+        }
+      }
     }
   }
 

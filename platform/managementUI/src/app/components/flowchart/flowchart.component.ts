@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import Drawflow from 'drawflow';
 import { DrawflowService } from 'src/app/services/drawflow.service';
@@ -18,11 +18,16 @@ export class FlowchartComponent implements OnInit {
 
   constructor(private df: DrawflowService, private route: ActivatedRoute) {}
 
+  @Input() inputMesh: any
+
+  // editor: Drawflow | undefined;
   editor: any;
   services: any;
   serviceMeshes: any;
   private displayAttributes = ['kind', 'name', 'ver', 'type'];
-  private meta = ['metaType', 'metaProject', 'metaState', 'metaAas'];
+  private meta = ['metaType', 'metaProject', 'metaState', 'metaAas', 'metaRefined', 'metaAbstract', 'metaTypeKind', 'metaVariable'];
+
+  selectedService: any;
 
   meshUnchanged: any;
   servicesLoading = true;
@@ -52,6 +57,7 @@ export class FlowchartComponent implements OnInit {
       this.editor.force_first_input = false;
       this.editor.line_path = 1;
       this.editor.editor_mode = 'edit';
+      this.editor.on('click',() => (this.addService(event)));
 
       this.editor.createCurvature = function(start_pos_x: number, start_pos_y : number, end_pos_x: number, end_pos_y: number, curvature_value: any, type: any) {
         var line_x = start_pos_x;
@@ -110,9 +116,7 @@ export class FlowchartComponent implements OnInit {
       if(paramMesh) {
         this.getGraph(paramMesh);
       }
-
     }
-
   }
 
   public assignIcon(type: string, htmlTag?: boolean) {
@@ -154,7 +158,6 @@ export class FlowchartComponent implements OnInit {
       let graph = JSON.parse(data?.outputArguments[0].value?.value);
       let graph2 = JSON.parse(graph.result);
       //this.meshUnchanged = JSON.parse(JSON.stringify(graph2)); //for debug purposes
-      console.log(graph2);
       this.mesh = graph2;
       let nodes = graph2.drawflow.Home.data
       let busOut: string[] = [];
@@ -253,6 +256,20 @@ export class FlowchartComponent implements OnInit {
       console.log("x: " + this.editor.getNodeFromId(i).pos_x);
       console.log("y: " + this.editor.getNodeFromId(i).pos_y);
     }
+  }
+
+  public selectService(service: any) {
+    this.selectedService = service;
+    console.log(this.selectedService);
+  }
+
+  public addService(event: any) {
+    console.log(event);
+    if(this.selectedService) {
+      this.editor.addNode(this.selectedService.idShort, 1, 1, event.layerX, event.layerY, '', {}, '<div>' + this.selectedService.idShort + '<div>', false);
+      this.selectedService = undefined;
+    }
+
   }
 
 }

@@ -361,11 +361,16 @@ export class ListComponent implements OnInit {
   }
 
   public new() {
-    let dialogRef = this.dialog.open(EditorComponent, {
-      height: '90%',
-      width:  '90%',
-    })
-    dialogRef.componentInstance.category = this.currentTab;
+    if(this.currentTab = 'Meshes') {
+      this.router.navigateByUrl("flowchart");
+    } else {
+      let dialogRef = this.dialog.open(EditorComponent, {
+        height: '90%',
+        width:  '90%',
+      })
+      dialogRef.componentInstance.category = this.currentTab;
+    }
+
   }
 
   public genTemplate(appId: string) {
