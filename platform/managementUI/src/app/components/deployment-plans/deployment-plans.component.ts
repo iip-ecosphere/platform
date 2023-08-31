@@ -1,9 +1,12 @@
+import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { firstValueFrom } from 'rxjs';
+import { Subscription, firstValueFrom } from 'rxjs';
 import { OnlyIdPipe } from 'src/app/pipes/only-id.pipe';
 import { ApiService } from 'src/app/services/api.service';
+import { EnvConfigService } from 'src/app/services/env-config.service';
 import { PlanDeployerService } from 'src/app/services/plan-deployer.service';
-import { ResourceAttribute, Resource, PlatformArtifacts, InputVariable }
+import { WebsocketService } from 'src/app/websocket.service';
+import { ResourceAttribute, Resource, PlatformArtifacts, InputVariable, PlatformData }
   from 'src/interfaces';
 
 @Component({
@@ -26,14 +29,23 @@ export class DeploymentPlansComponent implements OnInit {
   taskId: string = "";
   http: any;
 
+  private subscription!: Subscription;
 
   constructor(public api: ApiService,
     private deployer: PlanDeployerService,
-    private onlyId: OnlyIdPipe) {
+    private onlyId: OnlyIdPipe,
+    private websocket: WebsocketService) { // 1
+      //this.deployer.StatusCollection = websocket.data // 1
+      //this.subscription = this.websocket.getMsg().subscribe(
+      //  dataFromServer => this.deployer.receiveStatus(dataFromServer))
+
+     // this.deployer = new PlanDeployerService(   http, onlyId,"kkk")
+
   }
 
   async ngOnInit() {
     await this.getArtifacts();
+    this.getStatusUri()
   }
 
   public async getArtifacts() {
@@ -50,6 +62,20 @@ export class DeploymentPlansComponent implements OnInit {
       this.instanceId.fill("", 0, this.deploymentPlans?.value?.length);
     }
   }
+
+  public async getStatusUri() {
+    let url = "/aas/submodels/Status/submodel/submodelElements/status/uri"
+    let resp = await this.api.getData(url) as PlatformData
+    let statusUri: any = ""
+    if(resp) {
+      statusUri = resp.value
+      this.websocket.connect(statusUri)
+    }
+    console.log("[deploy-plan | getUri] status uri: " + resp.value)
+
+
+  }
+
 
   // todo get ip and urn from env or loe whole thing
   /*
@@ -97,9 +123,7 @@ export class DeploymentPlansComponent implements OnInit {
       if(response && response.outputArguments[0] && response.outputArguments[0].value) {
         this.taskId = this.onlyId.transform(response.outputArguments[0].value.value);
       }
-
     }
-
   }
 
   public async undeploy(index: number, plan?: Resource,) {
