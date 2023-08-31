@@ -5,6 +5,7 @@ import { platformResponse, statusCollection, statusMessage} from 'src/interfaces
 import { EnvConfigService } from './env-config.service';
 import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
 import { OnlyIdPipe } from '../pipes/only-id.pipe';
+import { WebsocketService } from '../websocket.service';
 
 @Injectable({
   providedIn: 'root'
@@ -19,14 +20,15 @@ export class PlanDeployerService {
 
   statusSubmodel: any;
 
-  webSocket: WebSocketSubject<any>;
+  //webSocket: WebSocketSubject<any>;
   public StatusCollection: statusCollection[] = [];
 
   public reloadingDataSubject = new Subject<any>();
 
   constructor(private http: HttpClient,
     private envConfigService: EnvConfigService,
-    private onlyId: OnlyIdPipe) {
+    private onlyId: OnlyIdPipe,
+    private websocketService: WebsocketService) {
     const env = this.envConfigService.getEnv();
     //the ip and urn are taken from the json.config
     if(env && env.ip) {
@@ -43,16 +45,27 @@ export class PlanDeployerService {
     wsIp = wsIp.concat(":10000/status");
     //let uri = await this.getUri()
     //this.webSocket = webSocket(uri);
+
+    /*
     this.webSocket = webSocket(wsIp);
     this.webSocket.asObservable().subscribe(
       dataFromServer => this.receiveStatus(dataFromServer));
-    // this.webSocket.subscribe(   msg => console.log('message received: ' + msg),
+    */
+
+      // this.webSocket.subscribe(   msg => console.log('message received: ' + msg),
     // // Called whenever there is a message from the server
     // err => console.log(err),
     // // Called if WebSocket API signals some kind of error
     // () => console.log('complete')
     // // Called when connection is closed (for whatever reason)
     // );
+
+
+    // TODO dynamic status uri
+    this.sub = websocketService.getMsg().subscribe((value: any) =>
+      {console.log("constructor "); console.log(value);
+        console.log(JSON.parse(value)); console.log("-----------");
+        this.receiveStatus(JSON.parse(value)) })
    }
 
   public async deployPlan(params: any, undeploy?: boolean) {
@@ -114,7 +127,8 @@ export class PlanDeployerService {
   }
 
   private receiveStatus(Status: statusMessage) {
-
+    console.log("receiveStatus: msg")
+    console.log(Status)
     let isFinished = false;
     let isSuccesful = true;
     if(Status.taskId) {
