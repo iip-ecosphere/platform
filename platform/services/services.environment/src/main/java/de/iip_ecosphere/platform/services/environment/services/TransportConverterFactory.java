@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.services.environment.services.TransportConverter.Watcher;
 import de.iip_ecosphere.platform.support.Endpoint;
+import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.ServerAddress;
@@ -253,7 +254,8 @@ public abstract class TransportConverterFactory {
     
     /**
      * Creates a converter server instance. The implementing factory is free to choose
-     * which information to take and may fail if required information is not given.
+     * which information to take and may fail if required information is not given. If the configured
+     * port is not positive, an ephemeral port will be used for creating the server.
      * 
      * @param aas the AAS setup for AAS-based senders
      * @param transport the transport setup for transport-based senders
@@ -262,7 +264,13 @@ public abstract class TransportConverterFactory {
      * @see #createServer(ServerAddress)
      */
     public final Server createServer(AasSetup aas, TransportSetup transport) {
-        return createServer(getGatewayEndpoint(aas, transport, ""));
+        Endpoint ep = getGatewayEndpoint(aas, transport, "");
+        int port = ep.getPort();
+        if (port <= 0) {
+            ep = new Endpoint(ep.getSchema(), ep.getHost(), 
+                NetUtils.getEphemeralPort(), ep.getEndpoint());
+        }
+        return createServer(ep);
     }
 
     /**
