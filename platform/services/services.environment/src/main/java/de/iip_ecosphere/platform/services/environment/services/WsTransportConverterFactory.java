@@ -20,6 +20,8 @@ import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
+import de.iip_ecosphere.platform.support.net.ManagedServerAddress;
+import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
 
@@ -42,6 +44,11 @@ public class WsTransportConverterFactory extends TransportConverterFactory {
     @Override
     protected <T> Sender<T> createSenderImpl(Endpoint endpoint, TypeTranslator<T, String> translator, 
         Class<T> cls) {
+        // may be centrally adjusted to ephemeral port; if this is the case, use that information
+        ManagedServerAddress adr = NetworkManagerFactory.getInstance().getPort(GATEWAY_PORT_KEY);
+        if (null != adr) {
+            endpoint = new Endpoint(adr.getSchema(), adr.getHost(), adr.getPort(), endpoint.getEndpoint());
+        }
         return createWithUri(endpoint, u -> new WsSenderClient<T>(u, translator));
     }
 

@@ -25,6 +25,7 @@ import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
+import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 import de.iip_ecosphere.platform.transport.serialization.GenericJsonToStringTranslator;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
@@ -36,6 +37,10 @@ import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
  */
 public abstract class TransportConverterFactory {
 
+    /**
+     * Network manager key for transport gateway.
+     */
+    public static final String GATEWAY_PORT_KEY = "Transport-gatewayPort";
     private static TransportConverterFactory instance = WsTransportConverterFactory.INSTANCE;
 
     /**
@@ -267,8 +272,9 @@ public abstract class TransportConverterFactory {
         Endpoint ep = getGatewayEndpoint(aas, transport, "");
         int port = ep.getPort();
         if (port <= 0) {
-            ep = new Endpoint(ep.getSchema(), ep.getHost(), 
-                NetUtils.getEphemeralPort(), ep.getEndpoint());
+            ep = new Endpoint(ep.getSchema(), ep.getHost(), NetUtils.getEphemeralPort(), ep.getEndpoint());
+            // may be used in different instances on different machines - register
+            NetworkManagerFactory.getInstance().reservePort(GATEWAY_PORT_KEY, ep);
         }
         return createServer(ep);
     }
