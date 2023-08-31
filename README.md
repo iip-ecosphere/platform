@@ -8,7 +8,7 @@ The virtual IIP-Ecosphere Industry 4.0/IIoT platform aims at demonstrating new a
 * Default library for code based on types or devices defined in the Platform configuration meta-model including code for controlling an MIP sensor.
 * New application example: MIP connector and MIP AI improvement ping-pong
 * The [platform FAQ](https://github.com/iip-ecosphere/platform/tree/main/platform/documentation/FAQ.MD) is now in github.
-* Early snapshot of [upcoming platform handbook for version 0.6.0](https://github.com/iip-ecosphere/platform/tree/main/platform/documentation/PlatformHandbook-0.6.0-SNAPSHOT-V0.1.pdf) now online in github (version as of 2023/08/20). Comments for clarification are welcome.
+* Early snapshot of [upcoming platform handbook for version 0.6.0](https://github.com/iip-ecosphere/platform/tree/main/platform/documentation/PlatformHandbook-0.6.0-SNAPSHOT-V0.1.pdf) now online in github (version as of 2023/08/31). Comments for clarification are welcome.
 * Confirmed compatibility: Phoenix Contact PLCnext (OPC UA, EEM integration), Beckhoff IPC (OPC UA), VDW UMATI (OPC UA), Bitmotec (MQTT), Lenze (MQTT), MIP (MQTT) - and improving...
 
 ## Public demonstrations
