@@ -95,6 +95,7 @@ public class KodexRestService<I, O> extends AbstractRestProcessService<I, O>  {
     
     @Override
     protected ServiceState start() throws ExecutionException {
+        KodexService.cleanFiles();
         String executable = getExecutableName("kodex", VERSION);
         YamlProcess sSpec = getProcessSpec();
 

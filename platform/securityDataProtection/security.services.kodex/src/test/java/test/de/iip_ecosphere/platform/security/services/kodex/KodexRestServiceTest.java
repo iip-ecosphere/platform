@@ -182,7 +182,7 @@ public class KodexRestServiceTest {
      * @throws IOException if reading test data fails, shall not occur
      * @throws ExecutionException shall not occur 
      */
-    @Test
+    @Test(timeout = 6 * 60 * 1000)
     public void testKodexRestService() throws IOException, ExecutionException {
         AtomicInteger receivedCount = new AtomicInteger(0);
         ReceptionCallback<OutData> rcp = new ReceptionCallback<OutData>() {

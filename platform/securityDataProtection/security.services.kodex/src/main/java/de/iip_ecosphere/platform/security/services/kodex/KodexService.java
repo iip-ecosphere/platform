@@ -22,6 +22,7 @@ import java.util.concurrent.ExecutionException;
 import org.apache.commons.lang.SystemUtils;
 
 import de.iip_ecosphere.platform.services.environment.YamlService;
+import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.services.environment.AbstractStringProcessService;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.services.environment.YamlProcess;
@@ -39,7 +40,7 @@ public class KodexService<I, O> extends AbstractStringProcessService<I, O>  {
 
     public static final int WAITING_TIME_WIN = 120000; // preliminary
     public static final int WAITING_TIME_OTHER = 100; // preliminary
-    public static final String VERSION = "0.1.5";
+    public static final String VERSION = "0.1.6";
     private static final boolean DEBUG = false;
     
     private String dataSpec;
@@ -74,8 +75,19 @@ public class KodexService<I, O> extends AbstractStringProcessService<I, O>  {
         this.dataSpec = dataSpec;
     }
     
+    /**
+     * Cleans up KODEX files. 
+     */
+    static void cleanFiles() {
+        File kiProtectStore = new File(System.getProperty("user.home"), ".kiprotect");
+        if (kiProtectStore.exists() && kiProtectStore.isDirectory()) {
+            FileUtils.deleteQuietly(new File(kiProtectStore, "parameters.kip"));
+        }
+    }
+    
     @Override
     protected ServiceState start() throws ExecutionException {
+        cleanFiles();
         String executable = getExecutableName("kodex", VERSION);
         YamlProcess sSpec = getProcessSpec();
 
