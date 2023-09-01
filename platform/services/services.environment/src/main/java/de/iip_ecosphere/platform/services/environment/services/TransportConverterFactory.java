@@ -281,7 +281,7 @@ public abstract class TransportConverterFactory {
         int port = ep.getPort();
         if (port <= 0) {
             ep = new Endpoint(ep.getSchema(), ep.getHost(), NetUtils.getEphemeralPort(), ep.getEndpoint());
-            transport.setPort(ep.getPort());
+            transport.setGatewayPort(ep.getPort());
             // may be used in different instances on different machines - register
             NetworkManagerFactory.getInstance().reservePort(GATEWAY_PORT_KEY, ep);
         }

@@ -98,9 +98,10 @@ public class TransportToWsConverter<T> extends TransportConverter<T> {
                 server = createServer(endpoint);
             }
         } else {
-            endpoint = setup.getGatewayServerEndpoint(SCHEMA, path);
+            endpoint = TransportConverterFactory.getInstance().validateGatewayEndpoint(
+                setup.getGatewayServerEndpoint(SCHEMA, path));
             server = null;
-        }
+        }        
         return new ConverterInstances<T>(server, new TransportToWsConverter<T>(transportStream, cls, endpoint));
     }
 
