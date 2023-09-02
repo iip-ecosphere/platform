@@ -45,8 +45,8 @@ public class OsUtilsTest {
     }
 
     /**
-     * Tests {@link SysUtils#getPropertyOrEnv(String, String)}, {@link SysUtils#getPropertyOrEnv(String)} and 
-     * implicitly {@link {@link SysUtils#getEnv(String)}.
+     * Tests {@link OsUtils#getPropertyOrEnv(String, String)}, {@link OsUtils#getPropertyOrEnv(String)} and 
+     * implicitly {@link OsUtils#getEnv(String)}.
      */
     @Test
     public void testSystemPropertyOrEnv() {
