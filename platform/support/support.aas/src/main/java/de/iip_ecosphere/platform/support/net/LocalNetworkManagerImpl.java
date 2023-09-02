@@ -12,6 +12,9 @@
 
 package de.iip_ecosphere.platform.support.net;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,7 +49,7 @@ public class LocalNetworkManagerImpl extends AbstractNetworkManagerImpl {
     private Map<Integer, String> portToKey = new HashMap<>();
     private Map<String, Map<String, Integer>> instances = new HashMap<>();
     private String host;
-    private NetworkManager parent;
+    private transient NetworkManager parent;
 
     /**
      * Create a local network manager instance without delegation.
@@ -78,6 +81,7 @@ public class LocalNetworkManagerImpl extends AbstractNetworkManagerImpl {
                     portToKey.put(port, key);
                     result = new ManagedServerAddress(address, true);
                     LoggerFactory.getLogger(LocalNetworkManagerImpl.class).info("Allocated port " + key + " " + port);
+                    notifyChanged();
                 } else {
                     result = null;
                 }
@@ -133,6 +137,7 @@ public class LocalNetworkManagerImpl extends AbstractNetworkManagerImpl {
             result = new ManagedServerAddress(address, true);
             LoggerFactory.getLogger(LocalNetworkManagerImpl.class).info("Reserved port " + key 
                 + " " + address.getHost() + " " + address.getPort());
+            notifyChanged();
         } 
         return result;
     }
@@ -144,6 +149,7 @@ public class LocalNetworkManagerImpl extends AbstractNetworkManagerImpl {
         if (null != ex) {
             portToKey.remove(ex.getPort());
             LoggerFactory.getLogger(LocalNetworkManagerImpl.class).info("Released port " + key);
+            notifyChanged();
         }
     }
 
@@ -181,6 +187,7 @@ public class LocalNetworkManagerImpl extends AbstractNetworkManagerImpl {
                 count++;
             }
             inst.put(hostId, count);
+            notifyChanged();
         }
     }
 
@@ -199,7 +206,8 @@ public class LocalNetworkManagerImpl extends AbstractNetworkManagerImpl {
                     }
                 }
                 if (inst.isEmpty()) {
-                    instances.remove(key); 
+                    instances.remove(key);
+                    notifyChanged();
                 }
             }
         }
@@ -219,6 +227,44 @@ public class LocalNetworkManagerImpl extends AbstractNetworkManagerImpl {
         }
         return result;
     }
+    
 
+    /**
+     * Is called when some registration has been changed.
+     */
+    protected void notifyChanged() {
+    }
+
+    /**
+     * Writes relevant data to {@code out}. 
+     * 
+     * @param out the stream to write to
+     * @throws IOException if writing fails
+     */
+    public void writeTo(ObjectOutputStream out) throws IOException {
+        // Does not work via "this". Prevents using serializable interface.
+        out.writeObject(keyToAddress);
+        out.writeObject(portToKey);
+        out.writeObject(instances);
+        out.writeUTF(host);
+    }
+
+    /**
+     * Reads from an object input stream.
+     * 
+     * @param in the stream to read from
+     * @throws IOException if reading fails
+     */
+    @SuppressWarnings("unchecked")
+    public void readFrom(ObjectInputStream in) throws IOException {
+        try {
+            keyToAddress = (Map<String, ServerAddress>) in.readObject();
+            portToKey = (Map<Integer, String>) in.readObject();
+            instances = (Map<String, Map<String, Integer>>) in.readObject();
+            host = in.readUTF();
+        } catch (ClassNotFoundException | ClassCastException e) {
+            throw new IOException(e);
+        }
+    }
 
 }

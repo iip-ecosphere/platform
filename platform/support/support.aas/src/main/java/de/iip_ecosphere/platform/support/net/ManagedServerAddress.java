@@ -9,6 +9,7 @@ import de.iip_ecosphere.platform.support.ServerAddress;
  */
 public class ManagedServerAddress extends ServerAddress {
 
+    private static final long serialVersionUID = 5419915024167707030L;
     private boolean isNew;
 
     /**
