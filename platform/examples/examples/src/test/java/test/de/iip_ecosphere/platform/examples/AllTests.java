@@ -20,6 +20,7 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
+    PersistentLocalNetworkManagerTest.class,
     SpringStartupTest.class,
     ConfigurationTests.class
 })
