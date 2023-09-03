@@ -29,10 +29,13 @@ import java.util.function.Supplier;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.Endpoint;
+import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
+import de.iip_ecosphere.platform.support.aas.ElementContainer;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.function.IOConsumer;
 import de.iip_ecosphere.platform.support.iip_aas.AasUtils;
@@ -49,8 +52,15 @@ import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
  */
 public abstract class TransportConverter<T> {
 
-    protected static final String PREFIX_GETTER = "get";
+    public static final String NAME_COLL_ENDPOINTS = "endpoints";
+    public static final String NAME_PROP_SCHEMA = "schema";
+    public static final String NAME_PROP_HOST = "host";
+    public static final String NAME_PROP_PORT = "port";
+    public static final String NAME_PROP_PATH = "path";
+    public static final String NAME_PROP_URI = "uri";
 
+    protected static final String PREFIX_GETTER = "get";
+    
     private TraceRecordReceptionCallback callback;
     private List<IOConsumer<T>> notifier = new ArrayList<>();
     
@@ -442,6 +452,70 @@ public abstract class TransportConverter<T> {
     public abstract Watcher<T> createWatcher(int period);
     
     /**
+     * Returns an AAS submodel element collection representing an endpoint.
+     * 
+     * @param parent the parent submodel or element collection
+     * @param path the URI path used as id to represent the endpoint
+     * @return the submodel element collection or <b>null</b> for none
+     */
+    public static SubmodelElementCollection getEndpoint(ElementContainer parent, String path) {
+        SubmodelElementCollection endpoint = null;
+        SubmodelElementCollection endpoints = parent.getSubmodelElementCollection(NAME_COLL_ENDPOINTS);
+        if (null != endpoints) {
+            endpoint = parent.getSubmodelElementCollection(toAasEndpointId(path));
+        }
+        return endpoint;
+    }
+    
+    /**
+     * Turns a submodel element collection with endpoint information into an endpoint object.
+     * 
+     * @param endpoint the submodel, e.g., from {@link #getEndpoint(ElementContainer, String))}
+     * @return the endpoint object, may be <b>null</b> if the object cannot be created
+     */
+    public static Endpoint getEndpoint(SubmodelElementCollection endpoint) {
+        Endpoint result = null;
+        if (null != endpoint) {
+            String schema = AasUtils.getPropertyValueAsStringSafe(endpoint, TransportConverter.NAME_PROP_SCHEMA, null);
+            String host = AasUtils.getPropertyValueAsStringSafe(endpoint, TransportConverter.NAME_PROP_HOST, null);
+            int port = AasUtils.getPropertyValueAsIntegerSafe(endpoint, TransportConverter.NAME_PROP_PORT, 10000);
+            String path = AasUtils.getPropertyValueAsStringSafe(endpoint, TransportConverter.NAME_PROP_PATH, null);
+            if (null != schema && null != host && null != path) {
+                try {
+                    result = new Endpoint(Schema.valueOf(schema), host, port, path);
+                } catch (IllegalArgumentException e) {
+                    LoggerFactory.getLogger(TransportConverter.class).warn("Cannot convert schema {}: {}", 
+                        schema, e.getMessage());
+                }
+            } else {
+                LoggerFactory.getLogger(TransportConverter.class).warn("Cannot create endpoint object as information "
+                    + "is missing (schema: {}, host: {}, port: {}, path: {})", schema, host, port, path);
+            }
+        } else {
+            LoggerFactory.getLogger(TransportConverter.class).warn("Cannot create endpoint object as submodel "
+                + "element collection is null");
+        }
+        return result;
+    }
+    
+    /**
+     * Turns an URI path into an endpoint AAS idShort.
+     * 
+     * @param path the path
+     * @return the idShort
+     */
+    public static String toAasEndpointId(String path) {
+        String id = path;
+        while (id.startsWith("/")) {
+            id = id.substring(1);
+        }
+        if (id.length() == 0) {
+            id = String.valueOf(System.currentTimeMillis()); // just as fallback
+        }
+        return AasUtils.fixId(id);
+    }
+    
+    /**
      * Adds an endpoint to a given (endpoint) submodel/elements collection.
      * 
      * @param smBuilder the submodel/elements collection builder
@@ -450,32 +524,24 @@ public abstract class TransportConverter<T> {
     public static void addEndpointToAas(SubmodelElementContainerBuilder smBuilder, Endpoint endpoint) {
         if (null != endpoint) {
             SubmodelElementCollectionBuilder endpoints = smBuilder.createSubmodelElementCollectionBuilder(
-                "endpoints", false, false);
-            
-            String id = endpoint.getEndpoint();
-            while (id.startsWith("/")) {
-                id = id.substring(1);
-            }
-            if (id.length() == 0) {
-                id = String.valueOf(System.currentTimeMillis()); // just as fallback
-            }
+                NAME_COLL_ENDPOINTS, false, false);
             
             SubmodelElementCollectionBuilder eBuilder = smBuilder.createSubmodelElementCollectionBuilder(
-                AasUtils.fixId(id), false, false);
+                AasUtils.fixId(toAasEndpointId(endpoint.getEndpoint())), false, false);
             
-            eBuilder.createPropertyBuilder("schema")
+            eBuilder.createPropertyBuilder(NAME_PROP_SCHEMA)
                 .setValue(Type.STRING, endpoint.getSchema().name())
                 .build();
-            eBuilder.createPropertyBuilder("host")
+            eBuilder.createPropertyBuilder(NAME_PROP_HOST)
                 .setValue(Type.STRING, endpoint.getHost())
                 .build();
-            eBuilder.createPropertyBuilder("port")
+            eBuilder.createPropertyBuilder(NAME_PROP_PORT)
                 .setValue(Type.INT32, endpoint.getPort())
                 .build();
-            eBuilder.createPropertyBuilder("path")
+            eBuilder.createPropertyBuilder(NAME_PROP_PATH)
                 .setValue(Type.STRING, endpoint.getEndpoint())
                 .build();
-            eBuilder.createPropertyBuilder("uri")
+            eBuilder.createPropertyBuilder(NAME_PROP_URI)
                 .setValue(Type.STRING, endpoint.toUri())
                 .build();
             
