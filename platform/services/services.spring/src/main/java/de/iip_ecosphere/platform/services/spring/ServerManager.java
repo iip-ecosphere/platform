@@ -106,7 +106,7 @@ public class ServerManager {
                                 sv.start();
                                 DescriptorUtils.setStateSafe(s, ServiceState.STARTING);
                                 ServerAddress adr = new ServerAddress(Schema.IGNORE, myHost, ser.getPort());
-                                adr = netClient.reservePort(id, adr);
+                                adr = netClient.reserveGlobalPort(id, adr);
                                 runningServers.put(s, sv);
                                 DescriptorUtils.setStateSafe(s, ServiceState.RUNNING);
                                 LOGGER.info("Started server {} ", id);
@@ -207,7 +207,7 @@ public class ServerManager {
                 if (null == host) {
                     host = s.getServer().getHost();
                 }
-                if (thisDevice.contains(host)) {
+                if (thisDevice.contains(host) || Starter.inTest()) {
                     servers.put(id, s);
                 }
             }

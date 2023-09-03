@@ -21,6 +21,7 @@ services:
     description: desc desc-0
     deployable: true
     kind: SOURCE_SERVICE
+    netMgtKey: car-aas-server
     parameters:
       - name: param1
         type: String
