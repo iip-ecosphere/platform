@@ -632,10 +632,11 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
     // --------------------------------------- connector parameter -----------------------------------------
     
     def generateConnectorParameter(MeshElement elt, Application app) {
-        generateConnectorParameter(elt.impl, app);
+        generateConnectorParameter(elt, elt.impl, app);
     }
 
-    def generateConnectorParameter(ServiceBase service, Application app) {
+    @DispatchBasis
+    def generateConnectorParameter(MeshElement elt, ServiceBase service, Application app) {
         ''
     }
 
@@ -652,11 +653,12 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
     }
 
     def generateEndpointPath(AasConnector conn) {
+        String regPath = "";
         String url = "http://" + conn.registryHost + ":" + conn.registryPort;
         if (conn.registryPath <> "") {
-            url = url + "/" + conn.registryPath;
+            regPath = "/" + conn.registryPath;
         }
-        '.setEndpointPath("${url}")'
+        '.setEndpointPath(null == hostOverride ? "${url}${regPath}" : "http://" + hostOverride + ":${conn.registryPort}${regPath}")'
     }
     
     def getCacheMode(Connector conn) {
@@ -705,7 +707,8 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         }
     }
 
-    def generateConnectorParameter(Connector conn, Application app) {
+    @DispatchCase
+    def generateConnectorParameter(MeshElement elt, Connector conn, Application app) {
         String schemaArg = getConnectorSchema(conn);
         if (schemaArg.length() > 0) {
             schemaArg = ", " + schemaArg;
@@ -716,30 +719,43 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         * @return the instance to be passed to the connector
         */
         public static ConnectorParameter createConnectorParameter() {
+            ${getYamlServiceFragment("yaml", getClsName(elt), conn.id)}; 
             ${generateConnectorParamSecurityDecls(conn)|e}
             String host = "${getConnectorHost(conn)}";
+            String hostOverride = null;
             int port = ${getConnectorPort(conn)};
-            NameplateSetup.Service svc = NameplateSetup.resolveServiceFromAas(${getConnectorDeviceServiceKey(conn)});
-            if (null != svc) { // device has precedence
-                host = svc.getHost();
-                port = svc.getPort();
+            if (null != yaml.getNetMgtKey() && yaml.getNetMgtKey().length() > 0) {
+                ServerAddress netKeyMgtAddress = NetworkManagerFactory.getInstance().getPort(yaml.getNetMgtKey());
+                if (null != netKeyMgtAddress) {
+                    host = netKeyMgtAddress.getHost();
+                    hostOverride = host;
+                    port = netKeyMgtAddress.getPort();
+                    System.out.println(host+" "+port);
+                }
+            }'
+            String deviceServiceKey = getConnectorDeviceServiceKey(conn);
+            String svcStatement;
+            if (deviceServiceKey.length() > 0 and deviceServiceKey <> "null") { 
+                svcStatement = ".setService(svc)";
+                'NameplateSetup.Service svc = NameplateSetup.resolveServiceFromAas(${getConnectorDeviceServiceKey(conn)});
+                if (null != svc) { // device has precedence
+                    host = svc.getHost();
+                    port = svc.getPort();
+                }'
+            } else {
+                svcStatement = "";
+                '\n'
             }
-            return ConnectorParameter.ConnectorParameterBuilder
+            'return ConnectorParameter.ConnectorParameterBuilder
                 .newBuilder(host, port${schemaArg})
-                .setService(svc)
+                ${svcStatement|e}
                 .setApplicationInformation("${getApplicationInformation(conn, app)}", "${app.description}")
                 .setCacheMode(${getCacheMode(conn)})
+                .setNotificationInterval(${conn.samplingPeriod})
                 ${generateEndpointPath(conn)|e}
                 ${generateConnectorParamSecuritySettings(conn)|e}
-                ${generateNotificationInterval(conn)|e}
                 .build();
         }'
-    }
-    
-    def generateNotificationInterval(Connector conn) {
-        if (conn.samplingPeriod > 0) {
-            '.setNotificationInterval(${conn.samplingPeriod})'
-        }
     }
     
     def generateConnectorParamSecurityDecls(Connector conn) {
