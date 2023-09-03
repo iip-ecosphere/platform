@@ -286,7 +286,7 @@ public class NetworkManagerTest {
     @Test
     public void testStoreLoad() throws IOException {
         LocalNetworkManagerImpl mgr = new LocalNetworkManagerImpl();
-        mgr.reservePort("key", new ServerAddress(Schema.HTTP, 1232));
+        mgr.reserveGlobalPort("key", new ServerAddress(Schema.HTTP, 1232)); // here, same as local
         File f = new File(FileUtils.getTempDirectory(), "mgrTestLoadStore.ser");
 
         ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(f));

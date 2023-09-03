@@ -126,7 +126,18 @@ public class LocalNetworkManagerImpl extends AbstractNetworkManagerImpl {
         }
         return result;
     }
-    
+
+    @Override
+    public ManagedServerAddress reserveGlobalPort(String key, ServerAddress address) {
+        ManagedServerAddress result;
+        if (parent != null) {
+            result = parent.reserveGlobalPort(key, address);
+        } else {
+            result = reservePort(key, address);
+        }
+        return result;
+    }
+
     @Override
     public ManagedServerAddress reservePort(String key, ServerAddress address) {
         checkAddress(address);
@@ -150,6 +161,8 @@ public class LocalNetworkManagerImpl extends AbstractNetworkManagerImpl {
             portToKey.remove(ex.getPort());
             LoggerFactory.getLogger(LocalNetworkManagerImpl.class).info("Released port " + key);
             notifyChanged();
+        } else if (parent != null) {
+            parent.releasePort(key);
         }
     }
 
