@@ -1,4 +1,4 @@
 /**
  * Implementation.
  */
-package de.iip_ecosphere.platform.examples.python;
+package de.iip_ecosphere.platform.examples.MIP;
