@@ -42,6 +42,7 @@ import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.support.iip_aas.config.CmdLine;
+import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 import de.iip_ecosphere.platform.support.setup.InstalledDependenciesSetup;
 import de.iip_ecosphere.platform.transport.Transport;
@@ -200,8 +201,9 @@ public class Starter {
             String key = k.toString();
             if (key != null && key.length() > 0) {
                 String val = System.getProperty(key);
-                if (key.startsWith(IIP_APP_PREFIX) 
-                    || key.startsWith(IIP_TEST_PREFIX)) { // could be dependent on PARAM_IIP_TEST_SERVICE_AUTOSTART
+                // could be dependent on PARAM_IIP_TEST_SERVICE_AUTOSTART
+                if (key.startsWith(IIP_APP_PREFIX) || key.startsWith(IIP_TEST_PREFIX) 
+                    || key.equals(NetworkManagerFactory.PROPERTY)) {
                     args.add("-D" + key + "=" + val);
                 }
             }

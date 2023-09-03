@@ -195,7 +195,7 @@ public abstract class AbstractRestProcessService<I, O> extends AbstractProcessSe
      * 
      * @param data the data
      * @param inTypeName the symbolic input type name, may be empty if just one is handled
-     * @return the translated input string, by default via {@link #adjustRestQuery(String)} 
+     * @return the translated input string, by default via {@link #adjustRestQuery(String, String)} 
      *    and {@link #getInputTranslator()}
      * @throws IOException if processing the input fails
      */
