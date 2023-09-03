@@ -11,15 +11,14 @@ Planned:
 * Tracing in Python Service environment: [#88](https://github.com/iip-ecosphere/platform/issues/88)
 * Enable tolerant switching: [#26](https://github.com/iip-ecosphere/platform/issues/26)
 * CLI multi-device deployment problem: [#113](https://github.com/iip-ecosphere/platform/issues/113)
-* KODEX: dynamic port assignment: [#14](https://github.com/iip-ecosphere/platform/issues/14), documentation: [#6](https://github.com/iip-ecosphere/platform/issues/6)
 
 In progress:
-* [#70](https://github.com/iip-ecosphere/platform/issues/70): UI progress reporting 
 * [#117](https://github.com/iip-ecosphere/platform/issues/117): Multiple service managers per device
 * [#146](https://github.com/iip-ecosphere/platform/issues/146): UI editors for configuration tables
 * [#115](https://github.com/iip-ecosphere/platform/issues/115): Cleanup, e.g., old build processes
 
 New features:
+* Relocatable connector hosts for application server instances.
 * (Optional) Default library for code related to configuration meta model.
 * Explicit MavenDependencies in configuration model.
 * [#130](https://github.com/iip-ecosphere/platform/issues/130): Application/device specific containers.
@@ -29,6 +28,7 @@ New features:
 * [#59](https://github.com/iip-ecosphere/platform/issues/59): Basic version of distributed testing/evaluation environment for platform and apps (PETE)
 * [#147](https://github.com/iip-ecosphere/platform/issues/127): Streaming of service logs to CLI/UI
 * [#144](https://github.com/iip-ecosphere/platform/issues/144): Deployment plans and application instances management via UI
+* [#70](https://github.com/iip-ecosphere/platform/issues/70): UI progress reporting 
 * [#90](https://github.com/iip-ecosphere/platform/issues/90): UI display application service meshes
 * [#62](https://github.com/iip-ecosphere/platform/issues/62): Platform component heartbeat and AAS cleanup
 * [#142](https://github.com/iip-ecosphere/platform/issues/142): AAS resilience for ECS-Runtime/Service Manager
@@ -37,6 +37,7 @@ New features:
 * [#145](https://github.com/iip-ecosphere/platform/issues/145): UI table for nameplate configurations
 * Generic time series data aggregator in data functions
 * Application intercommunication support (`AppIntercom`)
+* [#14](https://github.com/iip-ecosphere/platform/issues/14), [#6](https://github.com/iip-ecosphere/platform/issues/6): KODEX dynamic port assignment, KODEX upgrade and documentation
 * [#132](https://github.com/iip-ecosphere/platform/issues/132): Bitmotec system monitoring integration
 * [#118](https://github.com/iip-ecosphere/platform/issues/118): Service development video tutorial
 * [#148](https://github.com/iip-ecosphere/platform/issues/148): Ensemble assignment strategies in deployment plans.
