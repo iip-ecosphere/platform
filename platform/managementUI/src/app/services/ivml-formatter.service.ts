@@ -15,21 +15,34 @@ export class IvmlFormatterService {
   LIST = "list"
   BOOL = "boolean"
 
+  nonVisibleValues = ["optional"]
+
   public getIvml(variableName: string, data: any, type: string) {
     // replacing whitespaces with underline
     variableName = this.replaceWhitespaces(variableName)
+    console.log("[ivmlFormatter | getIvml] ivml type: " + type)
 
     // TODO - it is only for testing
     //data = this.t
 
     // removing empty entries
     for(const key in data) {
+      console.log("removing key: " + key)
+      console.log(data[key])
+      console.log(typeof data[key])
       if (data[key] === "") {
+        delete data[key]
+      }
+      if (this.nonVisibleValues.includes(key)) {
         delete data[key]
       }
       if (Array.isArray(data[key]) && Object.keys(data[key]).length === 0) {
         delete data[key]
       }
+      /*
+      if (typeof data[key] && Object.keys(data[key]).length === 0) {
+        delete data[key]
+      }*/
     }
     console.log("[ivmlFormatter | getIvml] clean data --------- ")
     console.log(data)
@@ -50,12 +63,18 @@ export class IvmlFormatterService {
       let i = 0
 
       for (const key in data) {
+        console.log("not primitive data")
+        console.log(key + " " + data[key])
         if (typeof data[key] == "string") {  // string inside non-primitive type
-          ivml += key + " = \"" + data[key] + "\""
+          console.log("string")
+          //ivml += key + " = \"" + data[key] + "\""
+          ivml += key + " = " + this.convertToIvml(data[key])
 
         } else if (typeof data[key] == "object") {
           // refTo, setOf, sequenceOf ------------------------------------------------
+          console.log("object")
 
+          /*
           ivml += key + " = "
           if (data[key].length > 1) {
             ivml += "{"
@@ -80,6 +99,7 @@ export class IvmlFormatterService {
               }
               ivml += "}"
             }
+
           } else {
             // setOf or sequenceOf with only one element
             if (typeof data[key][0] === "object") {
@@ -97,6 +117,7 @@ export class IvmlFormatterService {
               }
             }
           }
+          */
         } else {
           // integer, real
           ivml += key + " = " + data[key]

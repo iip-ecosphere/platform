@@ -267,9 +267,12 @@ export class EditorComponent implements OnInit {
           value: "",
           idShort: "value"
         }
+
         let editorInput:editorInput =
-          {name: "value", type: selectedType.idShort, value:[], description:
-          [{language: '', text: ''}], refTo: false, multipleInputs: false, meta:meta_entry}
+          {name: "value", type: selectedType.idShort, value:[],
+          description: [{language: '', text: ''}],
+          refTo: false, multipleInputs: false, meta:meta_entry}
+
 
         let uiGroup = 1 // TODO what value here?
         this.uiGroups.push({
@@ -419,8 +422,7 @@ export class EditorComponent implements OnInit {
   public create() {
     const creationData = this.prepareCreation();
     //TODO: mach ein ivml draus
-    let ivml = this.ivmlFormatter.getIvml(this.variableName, creationData, this.ivmlType)
-    //let ivml = this.getIvmlFormat(creationData, variableName)
+    //let ivml = this.ivmlFormatter.getIvml(this.variableName, creationData, this.ivmlType)
     //TODO: platform request
     //let inputVar:InputVariable[] = this.getCreateVarInputVar(creationData, variableName)
   }
@@ -439,9 +441,7 @@ export class EditorComponent implements OnInit {
           complexType[input.name] = input.value;
         }
 
-        //if(this.primitiveTypes.includes(input.type)) {
         if(primitiveDataTypes.includes(input.type)) {
-          complexType["type"] = input.type
           complexType[input.name] = input.value
         }
 
