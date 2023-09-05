@@ -422,7 +422,7 @@ export class EditorComponent implements OnInit {
   public create() {
     const creationData = this.prepareCreation();
     //TODO: mach ein ivml draus
-    //let ivml = this.ivmlFormatter.getIvml(this.variableName, creationData, this.ivmlType)
+    let ivml = this.ivmlFormatter.getIvml(this.variableName, creationData, this.ivmlType)
     //TODO: platform request
     //let inputVar:InputVariable[] = this.getCreateVarInputVar(creationData, variableName)
   }
