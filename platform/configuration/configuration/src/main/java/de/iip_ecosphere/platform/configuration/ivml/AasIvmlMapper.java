@@ -98,9 +98,11 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         v -> !TypeQueries.isConstraint(v.getType());
     public static final String META_TYPE_NAME = "meta";
     public static final Function<String, String> SHORTID_PREFIX_META = n -> "meta" + PseudoString.firstToUpperCase(n);
+    protected static final String PRJ_NAME_ALLCONSTANTS = "AllConstants";
     protected static final String PRJ_NAME_ALLSERVICES = "AllServices";
     protected static final String PRJ_NAME_ALLTYPES = "AllTypes";
     protected static final String PRJ_NAME_TECHSETUP = "TechnicalSetup";
+    private static final Map<String, String> PROJECT_MAPPING;
     private static final Map<String, String> PARENT_MAPPING;
     private static final TypeVisitor TYPE_VISITOR = new TypeVisitor();
     private static final String PROGRESS_COMPONENT_ID = "configuration.configuration";
@@ -111,6 +113,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     private Map<String, SubmodelElementCollectionBuilder> types = new HashMap<>();
     
     static {
+        // tech settings -> parent
         Map<String, String> parentMap = new HashMap<>();
         parentMap.put("Aas", PRJ_NAME_TECHSETUP);
         parentMap.put("Transport", PRJ_NAME_TECHSETUP);
@@ -118,6 +121,15 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         parentMap.put("Resources", PRJ_NAME_TECHSETUP);
         parentMap.put("UI", PRJ_NAME_TECHSETUP);
         PARENT_MAPPING = Collections.unmodifiableMap(parentMap);
+
+        // new variable parent type -> project
+        Map<String, String> projectMap = new HashMap<>();
+        projectMap.put("ServiceBase", PRJ_NAME_ALLSERVICES);
+        projectMap.put("Server", PRJ_NAME_ALLSERVICES);
+        projectMap.put("Manufacturer", PRJ_NAME_ALLSERVICES);
+        projectMap.put("Dependency", PRJ_NAME_ALLSERVICES);
+        projectMap.put("DataType", PRJ_NAME_ALLTYPES);
+        PROJECT_MAPPING = Collections.unmodifiableMap(projectMap);
     }
     
     /**
@@ -403,22 +415,26 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     protected Project getVariableTarget(Project root, IDatatype type) {
         Project result = null;
         if (null != type) {
-            try {
-                IDatatype serviceType = ModelQuery.findType(root, "ServiceBase", null);
-                if (null != serviceType && serviceType.isAssignableFrom(type)) {
-                    result = ModelQuery.findProject(root, PRJ_NAME_ALLSERVICES);
-                } else {
-                    IDatatype dataType = ModelQuery.findType(root, "DataType", null);
-                    if (null != dataType && dataType.isAssignableFrom(type)) {
-                        result = ModelQuery.findProject(root, PRJ_NAME_ALLTYPES);
-                    }
+            for (Map.Entry<String, String> ent : PROJECT_MAPPING.entrySet()) {
+                try {
+                    IDatatype serviceType = ModelQuery.findType(root, ent.getKey(), null);
+                    if (null != serviceType && serviceType.isAssignableFrom(type)) {
+                        result = ModelQuery.findProject(root, ent.getValue());
+                        if (result != null) {
+                            break;
+                        }
+                    } 
+                } catch (ModelQueryException e) {
+                    LoggerFactory.getLogger(AasIvmlMapper.class).warn(
+                        "Cannot find type {} when checking for target IVML project {}: {}", ent.getKey(), 
+                        ent.getValue(), e.getMessage());
                 }
-            } catch (ModelQueryException e) {
-                LoggerFactory.getLogger(AasIvmlMapper.class).warn(
-                    "Cannot find type. Target of new variable will be the root project. {}", e.getMessage());
+            }
+            if (null == result) { // immediate fallback
+                result = ModelQuery.findProject(root, PRJ_NAME_ALLCONSTANTS);
             }
         }
-        if (null == result) {
+        if (null == result) { // extreme fallback
             result = root;
         }
         return result;
@@ -428,6 +444,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     protected boolean isAllowedForModification(Project prj) {
         String name = prj.getName();
         return PRJ_NAME_ALLTYPES.equals(name) 
+            || PRJ_NAME_ALLCONSTANTS.equals(name) 
             || PRJ_NAME_ALLSERVICES.equals(name) 
             || PRJ_NAME_TECHSETUP.equals(name);
     }
