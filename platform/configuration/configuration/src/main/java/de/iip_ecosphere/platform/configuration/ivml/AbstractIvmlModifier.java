@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
+import org.slf4j.LoggerFactory;
+
 import de.iip_ecosphere.platform.configuration.ivml.IvmlGraphMapper.IvmlGraph;
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.uni_hildesheim.sse.ConstraintSyntaxException;
@@ -351,12 +353,14 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
             }
             throw new ExecutionException(text, null);
         } else {
+            LoggerFactory.getLogger(getClass()).info("Committing IVML changes:");
             history.commit();
             Map<Project, CopiedFile> copies = new HashMap<>();
             for (Project p: projects) {
                 File f = getIvmlFile(p);
                 copies.put(p, copyToTmp(f));
                 saveTo(p, f);
+                LoggerFactory.getLogger(getClass()).info(" - Writing IVML file {}", f);
             }
             reloadAndValidate(copies);
         }

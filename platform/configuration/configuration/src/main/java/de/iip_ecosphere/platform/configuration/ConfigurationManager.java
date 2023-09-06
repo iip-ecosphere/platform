@@ -56,6 +56,8 @@ public class ConfigurationManager {
         private int maxSteps;
         private int steps;
         private String subTask;
+        private int lastSteps = -1;
+        private int lastMaxSteps = -1;
         
         @Override
         public void setTaskName(String name) {
@@ -75,10 +77,14 @@ public class ConfigurationManager {
                 alias = new String[] {taskName};
                 heading = taskName;
             }
-            Transport.sendStatus(
-                new StatusMessage(ActionTypes.PROCESS, "Configuration", alias)
-                    .withProgress(maxSteps > 0 ? steps / maxSteps : 0));
-            getLogger().info("{} : {}", heading, (maxSteps > 0 ? steps / maxSteps : "."));
+            if (lastSteps != steps && lastMaxSteps != maxSteps) {
+                Transport.sendStatus(
+                    new StatusMessage(ActionTypes.PROCESS, "Configuration", alias)
+                        .withProgress(maxSteps > 0 ? steps / maxSteps : 0));
+                getLogger().info("{} : {}", heading, (maxSteps > 0 ? steps / maxSteps : "."));
+                lastSteps = steps;
+                lastMaxSteps = maxSteps;
+            }
         }
         
         @Override
