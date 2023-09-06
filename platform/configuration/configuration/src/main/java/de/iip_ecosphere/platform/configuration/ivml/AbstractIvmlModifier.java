@@ -212,6 +212,12 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
                     msg += "\n";
                 }
                 msg += res.getMessage(m).getDetailedDescription();
+                for (int v = 0; v < res.getAffectedVariablesCount(); v++) {
+                    if (v > 0) {
+                        msg += ", ";
+                    }
+                    msg += res.getAffectedVariable(v).getQualifiedName();
+                }
             }
             throw new ExecutionException(msg, null);
         }
