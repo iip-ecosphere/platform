@@ -102,6 +102,8 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
      * @throws ExecutionException if writing fails
      */
     protected static void saveTo(Project prj, File file) throws ExecutionException {
+        LoggerFactory.getLogger(AbstractIvmlModifier.class).info("Writing IVML project {} to file {}", 
+            prj.getName(), file);
         file.getParentFile().mkdirs();
         try (FileWriter fWriter = new FileWriter(file)) {
             IVMLWriter writer = new IVMLWriter(fWriter);
@@ -163,6 +165,7 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
      * @throws ExecutionException if creating the variable fails
      */
     public void deleteVariable(String varName) throws ExecutionException {
+        LoggerFactory.getLogger(getClass()).info("Deleting IVML variable {}", varName);
         net.ssehub.easy.varModel.confModel.Configuration cfg = getIvmlConfiguration();
         Project root = cfg.getProject();
         try {
@@ -179,6 +182,7 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
                     ReasoningResult res = validateAndPropagate();
                     throwIfFails(res, true);
                     saveTo(prj, getIvmlFile(prj));
+                    LoggerFactory.getLogger(getClass()).info("Deleted IVML variable {}", varName);
                 } else {
                     throw new ExecutionException("Project " + prj.getName() + " is not allowed for modification", null);
                 }
@@ -273,6 +277,7 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
      * @throws ExecutionException if creating the variable fails
      */
     public void createVariable(String varName, String type, String valueEx) throws ExecutionException {
+        LoggerFactory.getLogger(getClass()).info("Creating IVML variable {} {} = {};", type, varName, valueEx);
         net.ssehub.easy.varModel.confModel.Configuration cfg = getIvmlConfiguration();
         Project root = cfg.getProject();
         try {
@@ -292,6 +297,7 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
             ReasoningResult res = validateAndPropagate();
             throwIfFails(res, true);
             saveTo(target, getIvmlFile(target));
+            LoggerFactory.getLogger(getClass()).info("Created IVML variable {}: {}", varName);
         } catch (ModelQueryException | ConfigurationException e) {
             throw new ExecutionException(e);
         }

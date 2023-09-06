@@ -481,6 +481,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
      * @throws ExecutionException if setting the graph structure fails
      */
     public synchronized Object deleteGraph(String appName, String meshName) throws ExecutionException {
+        LoggerFactory.getLogger(getClass()).info("Deleting graph in IVML, app {} mesh {}", appName, meshName);
         net.ssehub.easy.varModel.confModel.Configuration cfg = getIvmlConfiguration();
         Project root = cfg.getProject();
         Project appProject = ModelQuery.findProject(root, getApplicationProjectName(appName));
@@ -514,6 +515,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                     notifyChange(appProject, ConfigurationChangeType.DELETED);
                 }
                 reloadAndValidate(copies);
+                LoggerFactory.getLogger(getClass()).info("Deleted graph in IVML, app {} mesh {}", appName, meshName);
             } catch (ModelQueryException e) {
                 throw new ExecutionException(e);
             }
@@ -567,6 +569,8 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
      */
     public synchronized Object setGraph(String appName, String appValueEx, String meshName, String format, 
         String value) throws ExecutionException {
+        LoggerFactory.getLogger(getClass()).info("Setting graph in IVML app {} = {}, mesh {}, format {}", 
+            appName, appValueEx, meshName, format); // no graph, may become too long
         GraphFormat gFormat = getGraphFormat(format);
         IvmlGraph graph = gFormat.fromString(value, getMapper().getGraphFactory(), this);
         
@@ -583,6 +587,8 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             saveTo(results.meshProject, meshFile);
             saveTo(results.appProject, appFile);
             reloadAndValidate(copies);
+            LoggerFactory.getLogger(getClass()).info("Graph set in IVML app {} = {}, mesh {}, format {}", 
+                appName, appValueEx, meshName, format); // no graph, may become too long
         } catch (ModelQueryException | ModelManagementException e) {
             throw new ExecutionException(e);
         }
