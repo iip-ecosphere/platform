@@ -361,7 +361,7 @@ export class ListComponent implements OnInit {
   }
 
   public new() {
-    if(this.currentTab = 'Meshes') {
+    if(this.currentTab == 'Meshes') {
       this.router.navigateByUrl("flowchart");
     } else {
       let dialogRef = this.dialog.open(EditorComponent, {
