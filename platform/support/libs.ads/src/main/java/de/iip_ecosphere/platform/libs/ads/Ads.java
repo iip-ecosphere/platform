@@ -57,7 +57,7 @@ public class Ads {
                     adsPath += "/win32-x86-32";
                 }
             } else if (Platform.isLinux()) {
-                name = "adslib";
+                name = "ads";
                 adsPath += "/linux-x86-64"; // so far no 32 bit so
             }
             File f = new File(adsPath);
