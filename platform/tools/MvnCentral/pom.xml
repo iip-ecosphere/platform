@@ -59,6 +59,11 @@
     </dependency>    
 
     <dependency>
+        <artifactId>libs.ads</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>
+    <dependency>
         <artifactId>support</artifactId>
         <groupId>de.iip-ecosphere.platform</groupId>
         <version>${project.version}</version>
