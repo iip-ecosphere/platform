@@ -14,8 +14,6 @@ package de.iip_ecosphere.platform.libs.ads;
 
 import java.io.File;
 
-import org.slf4j.LoggerFactory;
-
 import com.sun.jna.Native;
 import com.sun.jna.Platform;
 
