@@ -10,3 +10,6 @@ Basic functionality for the IIP-Ecosphere in terms of:
   * [System metrics for Phoenix Contact/PLCnext](https://github.com/iip-ecosphere/platform/tree/main/platform/support/support.sysMetrics.plcnext/README.md) refining the system monitoring interface in `support.aas`.
   * [System metrics for Bitmotec](https://github.com/iip-ecosphere/platform/tree/main/platform/support/support.sysMetrics.bitmotec/README.md) refining the system monitoring interface in `support.aas`.
   * [Semantic ID resolution based on the ECLASS webservice](https://github.com/iip-ecosphere/platform/tree/main/platform/support/support.semanticId.eclass/README.md) refining the semantic id resolution interface in `support.aas`.
+  
+Also basic (proprietary) libraries belong to the support layer:  
+  * [Beckhoff TwinCat ADS integration library](https://github.com/iip-ecosphere/platform/tree/main/platform/support/libs.ads/README.md).
