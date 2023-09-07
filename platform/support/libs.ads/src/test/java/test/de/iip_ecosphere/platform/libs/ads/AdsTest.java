@@ -12,9 +12,10 @@
 
 package test.de.iip_ecosphere.platform.libs.ads;
 
-import org.apache.commons.lang.SystemUtils;
 import org.junit.Assert;
 import org.junit.Test;
+
+import com.sun.jna.Platform;
 
 import de.iip_ecosphere.platform.libs.ads.Ads;
 import de.iip_ecosphere.platform.libs.ads.TcAds;
@@ -32,7 +33,7 @@ public class AdsTest {
      */
     @Test
     public void testAds() {
-        org.junit.Assume.assumeTrue(SystemUtils.IS_OS_LINUX);
+        org.junit.Assume.assumeTrue(Platform.isLinux());
         
         TcAds ads = Ads.getInstance();
         Assert.assertNotNull("No ADS library found for loading", ads);

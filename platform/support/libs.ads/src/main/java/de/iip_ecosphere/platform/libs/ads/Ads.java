@@ -44,19 +44,24 @@ public class Ads {
         String adsPath = OsUtils.getPropertyOrEnv("iip.libs.ads", null);
         // possible, check default locations
         if (null == adsPath) {
-            adsPath = "./src/main/resources/win32-x86-64"; // fallback for now
+            adsPath = "./src/main/resources"; // fallback for now
         }
         try {
-            // for service... unpack to tmp
-            File f = new File(adsPath);
-            System.setProperty("jna.platform.library.path", f.getAbsolutePath());
             //System.setProperty("jna.debug_load", "true");
             String name = "TcAds";
             if (Platform.isWindows()) {
-                name = "TcAdsDll"; 
+                name = "TcAdsDll";
+                if (Platform.is64Bit()) {
+                    adsPath += "/win32-x86-64";
+                } else {
+                    adsPath += "/win32-x86-32";
+                }
             } else if (Platform.isLinux()) {
                 name = "adslib";
+                adsPath += "/linux-x86-64"; // so far no 32 bit so
             }
+            File f = new File(adsPath);
+            System.setProperty("jna.platform.library.path", f.getAbsolutePath());
             instance = Native.load(name, TcAds.class);
         } catch (UnsatisfiedLinkError e) {
             LoggerFactory.getLogger(Ads.class).error("Cannot load TcAds library");
