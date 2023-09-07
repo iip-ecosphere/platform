@@ -12,6 +12,8 @@
 
 package test.de.iip_ecosphere.platform.libs.ads;
 
+import java.io.File;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -29,16 +31,20 @@ import de.iip_ecosphere.platform.libs.ads.TcAds;
 public class AdsTest {
     
     /**
-     * Template test.
+     * Tests loading the library.
      */
     @Test
     public void testAds() {
-        org.junit.Assume.assumeTrue(Platform.isLinux());
+        File f = new File("./src/main/resources");
+        org.junit.Assume.assumeTrue(Platform.isLinux() 
+            || Platform.isWindows() && (new File(f, "win32-x86-32").exists() || new File(f, "win32-x86-64").exists()));
         
         TcAds ads = Ads.getInstance();
         Assert.assertNotNull("No ADS library found for loading", ads);
-        long ver = ads.AdsGetDllVersion();
-        Assert.assertTrue(ver > 0);
+        if (Platform.isWindows()) {
+            long ver = ads.AdsGetDllVersion();
+            Assert.assertTrue(ver > 0);
+        }
     }
     
 }

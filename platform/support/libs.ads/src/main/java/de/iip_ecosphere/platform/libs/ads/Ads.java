@@ -41,7 +41,7 @@ public class Ads {
     }
     
     static {
-        String adsPath = OsUtils.getPropertyOrEnv("iip.libs.ads", null);
+        String adsPath = OsUtils.getPropertyOrEnv("iip.libs.ads");
         // possible, check default locations
         if (null == adsPath) {
             adsPath = "./src/main/resources"; // fallback for now
@@ -61,10 +61,11 @@ public class Ads {
                 adsPath += "/linux-x86-64"; // so far no 32 bit so
             }
             File f = new File(adsPath);
-            System.setProperty("jna.platform.library.path", f.getAbsolutePath());
+            System.out.println("Loading ADS library " + name + " from " + f.getAbsolutePath());
+            System.setProperty("jna.library.path", f.getAbsolutePath());
             instance = Native.load(name, TcAds.class);
         } catch (UnsatisfiedLinkError e) {
-            LoggerFactory.getLogger(Ads.class).error("Cannot load TcAds library");
+            System.out.println("Cannot load ADS library");
             instance = null;
         }
     }
