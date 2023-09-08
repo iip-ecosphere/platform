@@ -17,8 +17,10 @@ html, body {
   overflow-x: hidden;
   flex-wrap: wrap;
   position: relative;
-  width: 33%;
+  //width: 25%;
+  //width: auto;
   max-width: 40%;
+  display: inline-block;
 }
 
 .outer-container {
@@ -26,7 +28,6 @@ html, body {
   justify-content: stretch;
   overflow-y: hidden;
   height:100%;
-
 }
 
 .drawflow-container {
@@ -35,10 +36,35 @@ html, body {
 }
 
 .element {
-  margin-bottom: 0.5em;
+  margin-bottom: 0.3em;
+  margin-right: 4.5em;
   background-color: rgb(230, 230, 230);
   color: black;
+  width: auto;
 }
+
+
+.subtext {
+  //background-color: aqua;
+  font-size: smaller;
+}
+
+.parent {
+  overflow-y: scroll;
+  display: inline-block; /* This makes the parent width depend on the inner div width */
+  //background-color: rgb(211, 211, 211);
+  padding: 10px;
+  background-color: lightblue;
+}
+
+.child {
+  overflow-y: scroll;
+  display: inline-block;
+  background-color: lightblue;
+  //padding: 1px;
+}
+
+
 /*
 .service-detail {
   font-size: small;
