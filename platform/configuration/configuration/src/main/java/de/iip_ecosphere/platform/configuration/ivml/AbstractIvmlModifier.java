@@ -21,6 +21,7 @@ import net.ssehub.easy.basics.modelManagement.ModelManagementException;
 import net.ssehub.easy.instantiation.core.model.vilTypes.PseudoString;
 import net.ssehub.easy.instantiation.core.model.vilTypes.configuration.ChangeHistory;
 import net.ssehub.easy.instantiation.core.model.vilTypes.configuration.Configuration;
+import net.ssehub.easy.producer.core.mgmt.EasyExecutor;
 import net.ssehub.easy.reasoning.core.frontend.ReasonerFrontend;
 import net.ssehub.easy.reasoning.core.reasoner.Message;
 import net.ssehub.easy.reasoning.core.reasoner.ReasoningResult;
@@ -223,6 +224,7 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
                     msg += res.getAffectedVariable(v).getQualifiedName();
                 }
             }
+            EasyExecutor.printReasoningMessages(res); // preliminary
             throw new ExecutionException(msg, null);
         }
     }
@@ -352,7 +354,8 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
         ReasoningResult result = ReasonerFrontend.getInstance().propagate(cfg.getConfiguration(), null, null);
         if (result.hasConflict()) {
             history.rollback();
-            String text = "";
+            throwIfFails(result, false);
+            /*String text = "";
             for (int m = 0; m < result.getMessageCount(); m++) {
                 if (m > 0) {
                     text += "\n";
@@ -367,7 +370,7 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
                     }
                 }
             }
-            throw new ExecutionException(text, null);
+            throw new ExecutionException(text, null);*/
         } else {
             LoggerFactory.getLogger(getClass()).info("Committing IVML changes:");
             history.commit();
