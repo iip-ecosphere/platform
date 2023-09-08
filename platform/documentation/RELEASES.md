@@ -19,6 +19,7 @@ In progress:
 
 New features:
 * Relocatable connector hosts for application server instances.
+* MIP technologies and NovoAI AVA connector definitions in configuration meta-model.
 * (Optional) Default library for code related to configuration meta model.
 * Explicit MavenDependencies in configuration model.
 * [#130](https://github.com/iip-ecosphere/platform/issues/130): Application/device specific containers.
