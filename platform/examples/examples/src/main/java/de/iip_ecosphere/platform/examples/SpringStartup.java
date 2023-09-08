@@ -143,6 +143,9 @@ public class SpringStartup {
 
         System.setProperty(NetworkManagerFactory.PROPERTY, PersistentLocalNetworkManagerDescriptor.class.getName());
         System.out.println("Spring Startup with args: " + Arrays.toString(args));
+        System.out.println("System environment: " + System.getenv());
+        System.out.println("JVM properties: " + System.getProperties());
+
         SpringInstances.setConfig(new SpringCloudServiceSetup());
         Starter.considerInstalledDependencies(); // if there, transported by createStandalineCommandArgs
         int brokerPort = CmdLine.getIntArg(args, ARG_BROKER_PORT, DFLT_BROKER_PORT);
