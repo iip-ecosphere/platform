@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.services.environment.AbstractPythonProcessService.SyncDataIngestor;
@@ -142,7 +141,7 @@ public class GenericMultiTypeServiceImpl {
          */
         public DataIngestor<T> validateAndGetIngestor(String typeName) {
             if (null == ingestor) {
-                getLogger().info(
+                LoggerFactory.getLogger(getClass()).info(
                     "No ingestor registered for: {}. Registering an internal synchronous ingestor.", typeName);
                 ingestor = new SyncDataIngestor<T>();
             }
@@ -259,15 +258,6 @@ public class GenericMultiTypeServiceImpl {
         TypeTranslator<String, O> outTrans) {
         OutTypeInfo<O> info = obtainOutTypeInfo(outCls, outTypeName);
         info.outTranslator = outTrans;
-    }
-    
-    /**
-     * Returns the logger.
-     * 
-     * @return the logger
-     */
-    protected static Logger getLogger() {
-        return LoggerFactory.getLogger(GenericMultiTypeServiceImpl.class);
     }
     
 }
