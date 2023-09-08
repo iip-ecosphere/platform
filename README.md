@@ -5,6 +5,7 @@ The virtual IIP-Ecosphere Industry 4.0/IIoT platform aims at demonstrating new a
 ## News
 
 * Preparing an enhanced demonstrator for [EMO 2023](https://emo-hannover.de/), also planning for an integration with [UMATI](https://umati.org/) and sensor technology form [MIP technology](https://mip-technology.de/de/). There will also be the IIP-Ecosphere [symposium as closing event](https://symposium.iip-ecosphere.de/) for the project on 2023/09/19. 
+* MIP technologies and NovoAI AVA connector definitions in configuration meta-model.
 * Default library for code based on types or devices defined in the Platform configuration meta-model including code for controlling an MIP sensor.
 * New application example: MIP connector and MIP AI improvement ping-pong
 * Initial Beckhoff ADS integration library for Java.

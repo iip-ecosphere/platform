@@ -57,6 +57,8 @@ import net.ssehub.easy.reasoning.core.reasoner.ReasoningResult;
 import net.ssehub.easy.varModel.confModel.AssignmentState;
 import net.ssehub.easy.varModel.confModel.ConfigurationException;
 import net.ssehub.easy.varModel.confModel.IDecisionVariable;
+import net.ssehub.easy.varModel.cst.ConstraintSyntaxTree;
+import net.ssehub.easy.varModel.cstEvaluation.EvaluationVisitor;
 import net.ssehub.easy.varModel.model.AbstractVariable;
 import net.ssehub.easy.varModel.model.ContainableModelElement;
 import net.ssehub.easy.varModel.model.DecisionVariableDeclaration;
@@ -1071,7 +1073,43 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             varBuilder.build();
         }
     }
-    
+
+    /**
+     * Adds the default value of {@code var} if there is a default value.
+     * 
+     * @param var the variable to take the default value from
+     * @param varBuilder the variable builder to add the meta-value to
+     */
+    private void addMetaDefault(IDecisionVariable var, SubmodelElementCollectionBuilder varBuilder) {
+        addMetaDefault(var.getDeclaration(), varBuilder);
+    }
+
+    /**
+     * Adds the default value of {@code var} if there is a default value.
+     * 
+     * @param decl the variable declaration to take the default value from
+     * @param varBuilder the variable builder to add the meta-value to
+     */
+    private void addMetaDefault(AbstractVariable decl, SubmodelElementCollectionBuilder varBuilder) {
+        ConstraintSyntaxTree dflt = decl.getDefaultValue();
+        if (null != dflt) {
+            EvaluationVisitor eval = new EvaluationVisitor(getIvmlConfiguration(), null, false, null);
+            dflt.accept(eval);
+            Value dfltValue = eval.getResult();
+            eval.clear();
+            if (dfltValue != null) {
+                ValueVisitor valueVisitor = new ValueVisitor();
+                dfltValue.accept(valueVisitor);
+                Object aasValue = valueVisitor.getAasValue();
+                if (null != aasValue) {
+                    varBuilder.createPropertyBuilder(AasUtils.fixId(metaShortId.apply("default")))
+                        .setValue(Type.STRING, aasValue.toString())
+                        .build();
+                }
+            }
+        }
+    }
+
     /**
      * Adds the meta properties of {@code var} of type {@code varType} to {@code varBuilder}.
      * 
@@ -1090,6 +1128,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         varBuilder.createPropertyBuilder(AasUtils.fixId(metaShortId.apply("type")))
             .setValue(Type.STRING, IvmlDatatypeVisitor.getUnqualifiedType(varType))
             .build();
+        addMetaDefault(var, varBuilder);
         if (var.getDeclaration().getParent() instanceof Project) { // top-level only for now
             varBuilder.createPropertyBuilder(AasUtils.fixId(metaShortId.apply("project")))
                 .setValue(Type.STRING, mapParent(var))

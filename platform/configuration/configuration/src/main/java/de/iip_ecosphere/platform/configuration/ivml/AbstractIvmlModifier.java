@@ -279,6 +279,27 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
     protected Project adaptTarget(Project root, Project project) throws ExecutionException {
         return project;
     }
+    
+    /**
+     * Limits valid identifiers.
+     * 
+     * @param name the name
+     * @return {@code true} for valid identifier, {@code false} else
+     */
+    static boolean isValidIdentifier(String name) {
+        if (name.isEmpty()) {
+            return false;
+        }
+        if (!Character.isJavaIdentifierStart(name.charAt(0))) {
+            return false;
+        }
+        for (int i = 1; i < name.length(); i++) {
+            if (!Character.isJavaIdentifierPart(name.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     /**
      * Creates an IVML variable. [public for testing]
@@ -289,6 +310,9 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
      * @throws ExecutionException if creating the variable fails
      */
     public void createVariable(String varName, String type, String valueEx) throws ExecutionException {
+        if (!isValidIdentifier(varName)) {
+            throw new ExecutionException("'" + varName + "' is not a valid identifier", null);
+        }
         LoggerFactory.getLogger(getClass()).info("Creating IVML variable {} {} = {};", type, varName, valueEx);
         net.ssehub.easy.varModel.confModel.Configuration cfg = getIvmlConfiguration();
         Project root = cfg.getProject();
