@@ -41,6 +41,7 @@ New features:
 * [#132](https://github.com/iip-ecosphere/platform/issues/132): Bitmotec system monitoring integration
 * [#118](https://github.com/iip-ecosphere/platform/issues/118): Service development video tutorial
 * [#148](https://github.com/iip-ecosphere/platform/issues/148): Ensemble assignment strategies in deployment plans.
+* Support library for Beckhoff TwinCat ADS integration.
 
 Improvements:
 * [#141](https://github.com/iip-ecosphere/platform/issues/141): Fix AppAAS performance/resource consumption issue
