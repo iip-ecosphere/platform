@@ -10,7 +10,7 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package de.iip_ecosphere.platform.kiServices.rapidminer.rtsa;
+package de.iip_ecosphere.platform.security.services.kodex;
 
 import java.io.IOException;
 import org.slf4j.LoggerFactory;
@@ -21,26 +21,30 @@ import de.iip_ecosphere.platform.services.environment.GenericMultiTypeServiceImp
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslators;
 
 /**
- * Multi-type RTSA service.
+ * Multi-type KODEX Rest service.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class MultiRtsaRestService extends AbstractDelegatingMultiService<RtsaRestService<String, String>> {
+public class MultiKodexRestService extends AbstractDelegatingMultiService<KodexRestService<String, String>> {
+    
+    private String dataSpec;
     
     /**
-     * Extended RTSA service for multi-type queries.
+     * Extended KODEX service for multi-type queries.
      * 
      * @author Holger Eichelberger, SSE
      */
-    protected class ExRtsaRestService extends RtsaRestService<String, String> {
+    protected class ExKodexRestService extends KodexRestService<String, String> {
         
         /**
          * Creates an instance.
          * 
          * @param yaml the string information as YAML
+         * @param dataSpec name of the data spec file (within the process home path) to pass to KODEX; related files 
+         *     such as api or actions must be there as well and referenced from the data spec file 
          */
-        public ExRtsaRestService(YamlService yaml) {
-            super(TypeTranslators.STRING, TypeTranslators.STRING, null, yaml);
+        public ExKodexRestService(YamlService yaml, String dataSpec) {
+            super(TypeTranslators.STRING, TypeTranslators.STRING, null, yaml, dataSpec);
         }
         
         @Override
@@ -50,8 +54,11 @@ public class MultiRtsaRestService extends AbstractDelegatingMultiService<RtsaRes
         
         @Override
         protected void handleReception(String data) {
-            if (data.startsWith("{\"") && data.endsWith("]}")) {
-                data = data.substring(2, data.length() - 2);
+            // simple approach for now, generically parsing to JSON would be better
+            data = data.replace("{\"data\":{\"errors\":[],", "");
+            data = data.replace(",\"messages\":[],\"warnings\":[]}}", "");
+            if (data.startsWith("\"") && data.endsWith("]")) {
+                data = data.substring(1, data.length() - 1);
                 int pos = data.indexOf("\"");
                 if (pos > 0) {
                     String typeName = data.substring(0, pos);
@@ -76,9 +83,18 @@ public class MultiRtsaRestService extends AbstractDelegatingMultiService<RtsaRes
      * Creates an instance.
      * 
      * @param yaml the service description YAML
+     * @param dataSpec name of the data spec file (within the process home path) to pass to KODEX; related files such 
+     *     as api or actions must be there as well and referenced from the data spec file 
      */
-    public MultiRtsaRestService(YamlService yaml) {
+    public MultiKodexRestService(YamlService yaml, String dataSpec) {
         super(yaml);
+        this.dataSpec = dataSpec;
+        assignService(yaml); // force late 
+    }
+
+    @Override
+    protected void initService(YamlService yaml) {
+        // prevent initial creation as dataSpec is not yet set in parent constructor
     }
 
     /**
@@ -87,8 +103,8 @@ public class MultiRtsaRestService extends AbstractDelegatingMultiService<RtsaRes
      * @param yaml the service description YAML
      * @return the service instance
      */
-    protected RtsaRestService<String, String> createService(YamlService yaml) {
-        return new ExRtsaRestService(yaml);
+    protected KodexRestService<String, String> createService(YamlService yaml) {
+        return new ExKodexRestService(yaml, dataSpec);
     }
 
     @Override

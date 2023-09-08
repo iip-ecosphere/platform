@@ -26,6 +26,7 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.*;
 
 import de.iip_ecosphere.platform.security.services.kodex.KodexRestService;
+import de.iip_ecosphere.platform.security.services.kodex.MultiKodexRestService;
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.services.environment.YamlProcess;
@@ -247,4 +248,47 @@ public class KodexRestServiceTest {
         service.passivate();
         createExcelFile(runtime);
     }
+
+    /**
+     * Tests {@link MultiKodexRestService}.
+     * 
+     * @throws ExecutionException shall not occur
+     */
+    @Test
+    public void testMultiKodexRestService() throws ExecutionException {
+        AtomicInteger receivedCount = new AtomicInteger(0);
+
+        // mock the YAML service instance, as if read from a descriptor
+        YamlService sDesc = new YamlService();
+        sDesc.setName("KodexRestTest");
+        sDesc.setVersion(new Version(KodexRestService.VERSION));
+        sDesc.setKind(ServiceKind.TRANSFORMATION_SERVICE);
+        sDesc.setId("KodexRestTest");
+        sDesc.setDeployable(true);
+        YamlProcess pDesc = new YamlProcess();
+        pDesc.setExecutablePath(new File("./src/main/resources/"));
+        pDesc.setHomePath(new File("./src/test/resources"));
+        sDesc.setProcess(pDesc);
+        
+        // just that the constructor is called, throw away
+        MultiKodexRestService service = new MultiKodexRestService(sDesc, "example-data.yml");
+        service.registerInputTypeTranslator(InData.class, "items", new InDataJsonTypeTranslator());
+        service.registerOutputTypeTranslator(OutData.class, "items", new OutDataJsonTypeTranslator());
+        service.attachIngestor(OutData.class, "items", data -> {
+            Assert.assertTrue(data.getId() != null && data.getId().length() > 0);
+            Assert.assertTrue(data.getName() != null && data.getName().length() > 0);
+            Assert.assertTrue(data.getKip() != null && data.getKip().length() > 0);
+            receivedCount.incrementAndGet();
+
+        });
+        service.setState(ServiceState.STARTING);
+        service.processQuiet("items", new InData("test", "test"));
+        service.processQuiet("items", new InData("test", "test"));
+        service.processQuiet("items", new InData("test", "test"));
+        TimeUtils.sleep(2500);
+        LoggerFactory.getLogger(KodexRestServiceTest.class).info("Stopping service, may take two minutes on Windows");
+        service.setState(ServiceState.STOPPING);     
+        Assert.assertTrue(receivedCount.get() > 0); // fluctuating on Jenkins, = max would be desirable
+    }
+    
 }

@@ -43,7 +43,7 @@ import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
  */
 public class KodexRestService<I, O> extends AbstractRestProcessService<I, O>  {
 
-    public static final int WAITING_TIME_WIN = 120000; // preliminary
+    public static final int WAITING_TIME_WIN = 100; // preliminary
     public static final int WAITING_TIME_OTHER = 100; // preliminary
     public static final String VERSION = KodexService.VERSION;
     private static final boolean DEBUG = false;
