@@ -7,7 +7,7 @@ import { Router } from '@angular/router';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import { MAT_PROGRESS_SPINNER_DEFAULT_OPTIONS_FACTORY } from '@angular/material/progress-spinner';
 import { EditorComponent } from '../editor/editor.component';
-import { InputVariable, platformResponse } from 'src/interfaces';
+import { InputVariable, Resource, platformResponse } from 'src/interfaces';
 //import { table } from 'console';
 
 @Component({
@@ -341,6 +341,20 @@ export class ListComponent implements OnInit {
   public edit(item: any) {
     if(this.currentTab === "Meshes") { // TODO
       this.router.navigateByUrl('flowchart/' + item.idShort);
+    } else {
+      console.log("item")
+      console.log(item)
+      let resource: Resource = item
+      let dialogRef = this.dialog.open(EditorComponent, {
+        height: '90%',
+        width:  '90%',
+      })
+      //dialogRef.componentInstance.category = this.currentTab;
+      dialogRef.componentInstance.selectedType = resource
+      if (resource.idShort) {
+        dialogRef.componentInstance.variableName = resource.idShort
+      }
+
     }
   }
 

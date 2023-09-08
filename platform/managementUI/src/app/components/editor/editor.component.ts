@@ -63,6 +63,9 @@ export class EditorComponent implements OnInit {
     public ivmlFormatter: IvmlFormatterService) { }
 
   ngOnInit(): void {
+    console.log("refinedTypes " + this.refinedTypes)
+    console.log("type: " + this.type)
+    console.log("selectedType: " + this.selectedType)
     if(this.refinedTypes) {
       console.log(this.refinedTypes);
       this.meta = {
@@ -70,6 +73,7 @@ export class EditorComponent implements OnInit {
         value: this.refinedTypes
       }
     } else if(!this.type) {
+      console.log("get meta")
       this.getMeta()
     } else if(this.metaBackup && this.metaBackup.value && this.type.type){
       let type = this.cleanTypeName(this.type.type);
@@ -248,8 +252,6 @@ export class EditorComponent implements OnInit {
     return displayName;
   }
 
-  //primitiveTypes = ["String", "Boolean", "Real", "Integer"]
-
   public generateInputs() {
 
     this.uiGroups = [];
@@ -422,7 +424,8 @@ export class EditorComponent implements OnInit {
   public create() {
     const creationData = this.prepareCreation();
     //TODO: mach ein ivml draus
-    let ivml = this.ivmlFormatter.getIvml(this.variableName, creationData, this.ivmlType)
+    this.ivmlFormatter.createVariable(this.variableName, creationData, this.ivmlType)
+    //let ivml = this.ivmlFormatter.getIvml(this.variableName, creationData, this.ivmlType)
     //TODO: platform request
     //let inputVar:InputVariable[] = this.getCreateVarInputVar(creationData, variableName)
   }

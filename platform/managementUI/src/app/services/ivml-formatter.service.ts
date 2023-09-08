@@ -1,13 +1,15 @@
 //import { type } from 'os';
+import { InputVariable, platformResponse } from 'src/interfaces';
 import { primitiveDataTypes } from './env-config.service';
 import { Injectable } from '@angular/core';
+import { ApiService } from './api.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class IvmlFormatterService {
 
-  constructor() { }
+  constructor(public api:ApiService) { }
 
   // ivml data types
   STRING = "string"
@@ -17,10 +19,55 @@ export class IvmlFormatterService {
 
   nonVisibleValues = ["optional"]
 
+  //enums = ["kind", "nodeClass"]
+  enums = ["kind", "traceRcv", "traceSent"]
+  enums_mapping = [["kind", "ServiceKind"],
+            ["traceRcv", "TraceKind"],
+            ["traceSent", "TraceKind"]]
+
+  public async createVariable(variableName: string, data: any, type: string) {
+    let ivmlFormat = this.getIvml(variableName, data, type)
+    let inputVar = this.getCreateVarInputVar(ivmlFormat)
+    console.log("[ivml-formatter | create] input var")
+    console.log(inputVar)
+
+    let resourceId = ""
+    let aasElementURL = "/aas/submodels/Configuration/submodel/submodelElements/"
+    let basyxFun = "/createVariable"
+
+    const response = await this.api.executeFunction(
+      resourceId,
+      aasElementURL,
+      basyxFun,
+      inputVar) as unknown as platformResponse
+
+    console.log("[ivml-formatter | create] response:")
+    console.log(response)
+    console.log(this.getPlatformResponseResolution(response))
+
+  }
+
+  // TODO remove later
+  public getPlatformResponseResolution(response:platformResponse) {
+    if(response && response.outputArguments) {
+      let output = response.outputArguments[0]?.value?.value;
+      console.log("exception:")
+      if (output) {
+        let temp = JSON.parse(output);
+        console.log(output)
+        /*
+        if (temp.result) {
+          let result = JSON.parse(temp.result);
+          return result
+        }*/
+      }
+    }
+  }
+
   public getIvml(variableName: string, data: any, type: string) {
     // replacing whitespaces with underline
     variableName = this.replaceWhitespaces(variableName)
-    console.log("[ivmlFormatter | getIvml] ivml type: " + type)
+    //console.log("[ivmlFormatter | getIvml] ivml type: " + type)
 
     // removing empty entries
     for(const key in data) {
@@ -40,17 +87,20 @@ export class IvmlFormatterService {
         delete data[key]
       }
     }
+    /*
     console.log("[ivmlFormatter | getIvml] clean data --------- ")
     console.log(data)
     console.log("--------------------")
+    */
 
-    let ivml = type + " " + variableName + " = "
+    //let ivml = type + " " + variableName + " = "
+    let ivml = ""
 
     if (primitiveDataTypes.includes(type)) {
       if (type === "String") {
-        ivml += "\"" + data["value"] + "\";"
+        ivml += "\"" + data["value"] + "\""// "\";"
       } else {
-        ivml += data["value"] + ";"
+        ivml += data["value"] // + ";"
       }
     } else {
       // non-primitive types ---------------------------------------------------------
@@ -58,7 +108,18 @@ export class IvmlFormatterService {
       let i = 0
 
       for (const key in data) {
-        if (typeof data[key] == "string") {  // refTo, string inside non-primitive type
+        if (this.enums.includes(key)) {
+          let mapping = this.enums_mapping.find((elemt) => elemt[0] == key)
+          let enum_name = ""
+          if (mapping) {
+            enum_name = mapping[1]
+          }
+
+          ivml += key + " = " + enum_name + "." + data[key]
+        } else if (key == "port") {  // TODO maybe input check will be there some day
+          ivml += key + " = " + Number(data[key])
+
+        } else if (typeof data[key] == "string") {  // refTo, string inside non-primitive type
           ivml += key + " = " + this.convertToIvml(data[key])[0]
 
         } else if (Array.isArray(data[key])) {
@@ -119,10 +180,14 @@ export class IvmlFormatterService {
         }
         i += 1
       }
-      ivml += "\n};"
+      //ivml += "\n};"   // TODO
+      ivml += "\n}"
     }
     console.log("RESULT: \n" + ivml)
-    return ivml
+
+    let result =  [variableName, type, ivml]
+    console.log(result)
+    return result
   }
 
   private convertToIvml(elemt:any) {
@@ -185,11 +250,46 @@ export class IvmlFormatterService {
     return temp.join('_')
   }
 
-  // TODO
-  public getCreateVarInputVar(data: any, name: string) {
+  public getCreateVarInputVar(data: any) {
+    let inputVariables: InputVariable[] = [];
+    let input0:InputVariable = {
+      value: {
+        modelType: {
+          name: "Property"
+        },
+        valueType: "string",
+        idShort: "varName",
+        kind: "Template",
+        value: data[0]
+      }
+    }
+    let input1:InputVariable = {
+      value: {
+        modelType: {
+          name: "Property"
+        },
+        valueType: "string",
+        idShort: "type",
+        kind: "Template",
+        value: data[1]
+      }
+    }
+    let input2:InputVariable = {
+      value: {
+        modelType: {
+          name: "Property"
+        },
+        valueType: "string",
+        idShort: "valExpr",
+        kind: "Template",
+        value: data[2]
+      }
+    }
+    inputVariables.push(input0)
+    inputVariables.push(input1)
+    inputVariables.push(input2)
 
-    let input1 = 4
-
+    return inputVariables
   }
 
 }

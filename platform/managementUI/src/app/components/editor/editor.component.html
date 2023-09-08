@@ -89,9 +89,10 @@
             <div *ngIf="input.metaTypeKind != 10; else subEditor">
               <div *ngIf="input.metaTypeKind != 2; else enumCase">
                 <mat-form-field appearance="outline" >
-                  <mat-label>{{ input.type }}</mat-label>
+                  <mat-label>{{ input.type }} HIER</mat-label>
                   <input matInput
-                    [matTooltip]="input.description[0].text + ' ' + input.description[0].language" type="text" ngDefaultControl [(ngModel)]=input.value />
+                    [matTooltip]="input.description[0].text + ' ' + input.description[0].language"
+                    type="text" ngDefaultControl [(ngModel)]=input.value />
                 </mat-form-field>
               </div>
             </div>
