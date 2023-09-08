@@ -89,7 +89,7 @@
             <div *ngIf="input.metaTypeKind != 10; else subEditor">
               <div *ngIf="input.metaTypeKind != 2; else enumCase">
                 <mat-form-field appearance="outline" >
-                  <mat-label>{{ input.type }} HIER</mat-label>
+                  <mat-label>{{ input.type }}</mat-label>
                   <input matInput
                     [matTooltip]="input.description[0].text + ' ' + input.description[0].language"
                     type="text" ngDefaultControl [(ngModel)]=input.value />
@@ -194,7 +194,7 @@
   </div>
 </div>
 
-<div style="display: flex; justify-content: center">
+<div *ngIf="feedback == ''" style="display: flex; justify-content: center">
   <button mat-raised-button class="button" *ngIf="!type && !refinedTypes else addButton"
     color="success" (click)="create()" disable>Create</button>
     <ng-template #addButton>
@@ -202,4 +202,8 @@
       color="success" (click)="addType()">Add</button>
     </ng-template>
 
+</div>
+
+<div *ngIf="feedback != ''" class="feedback">
+  <p>{{ feedback }}</p>
 </div>

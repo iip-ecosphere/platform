@@ -7,7 +7,7 @@ import { Router } from '@angular/router';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import { MAT_PROGRESS_SPINNER_DEFAULT_OPTIONS_FACTORY } from '@angular/material/progress-spinner';
 import { EditorComponent } from '../editor/editor.component';
-import { InputVariable, Resource, platformResponse } from 'src/interfaces';
+import { InputVariable, Resource, configMetaEntry, editorInput, platformResponse } from 'src/interfaces';
 //import { table } from 'console';
 
 @Component({
@@ -350,9 +350,40 @@ export class ListComponent implements OnInit {
         width:  '90%',
       })
       //dialogRef.componentInstance.category = this.currentTab;
+
+      for (let val of item.value) {
+        console.log(val)
+      }
+
+
+      let temp = []
+      let meta_entry:configMetaEntry = {
+        modelType: {name: ""},
+        kind: "",
+        value: "",
+        idShort: "value"
+      }
+
+      let editorInput:editorInput =
+        {name: "value", type: "String", value:["tutaj"],
+        description: [{language: '', text: ''}],
+        refTo: false, multipleInputs: false, meta:meta_entry}
+
+
+      let uiGroup = 1 // TODO what value here?
+      temp.push({
+        uiGroup: uiGroup,
+        inputs: [editorInput],
+        optionalInputs: [],
+        fullLineInputs: [],
+        fullLineOptionalInputs: []
+      });
+
+
       dialogRef.componentInstance.selectedType = resource
       if (resource.idShort) {
         dialogRef.componentInstance.variableName = resource.idShort
+        dialogRef.componentInstance.uiGroups = temp
       }
 
     }

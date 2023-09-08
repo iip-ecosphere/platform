@@ -19,11 +19,12 @@ export class IvmlFormatterService {
 
   nonVisibleValues = ["optional"]
 
-  //enums = ["kind", "nodeClass"]
   enums = ["kind", "traceRcv", "traceSent"]
   enums_mapping = [["kind", "ServiceKind"],
             ["traceRcv", "TraceKind"],
             ["traceSent", "TraceKind"]]
+
+  success_feedback = "Variable sucessfully created!"
 
   public async createVariable(variableName: string, data: any, type: string) {
     let ivmlFormat = this.getIvml(variableName, data, type)
@@ -41,36 +42,36 @@ export class IvmlFormatterService {
       basyxFun,
       inputVar) as unknown as platformResponse
 
-    console.log("[ivml-formatter | create] response:")
-    console.log(response)
-    console.log(this.getPlatformResponseResolution(response))
-
+    let exception = this.getPlatformResponse(response)
+    console.log("exception: " + exception)
+    return this.getFeedback(exception)
   }
 
-  // TODO remove later
-  public getPlatformResponseResolution(response:platformResponse) {
+  public getPlatformResponse(response:platformResponse) {
+    let output = null
     if(response && response.outputArguments) {
-      let output = response.outputArguments[0]?.value?.value;
-      console.log("exception:")
-      if (output) {
-        let temp = JSON.parse(output);
-        console.log(output)
-        /*
-        if (temp.result) {
-          let result = JSON.parse(temp.result);
-          return result
-        }*/
-      }
+      output = response.outputArguments[0]?.value?.value;
     }
+    return output
+  }
+
+  private getFeedback(exception: any) {
+    let result = this.success_feedback
+    if (exception != "{}") {
+      exception = exception.substring(1, exception.length - 1)
+      let values = exception.split(":")
+      result = "Exception: " + values[1].substring(1, values[1].length - 1)
+    }
+    return result
   }
 
   public getIvml(variableName: string, data: any, type: string) {
     // replacing whitespaces with underline
     variableName = this.replaceWhitespaces(variableName)
-    //console.log("[ivmlFormatter | getIvml] ivml type: " + type)
 
     // removing empty entries
     for(const key in data) {
+      //enums = ["kind", "nodeClass"]
       if (data[key] === "") {
         delete data[key]
       }
@@ -114,8 +115,8 @@ export class IvmlFormatterService {
           if (mapping) {
             enum_name = mapping[1]
           }
-
           ivml += key + " = " + enum_name + "." + data[key]
+
         } else if (key == "port") {  // TODO maybe input check will be there some day
           ivml += key + " = " + Number(data[key])
 
@@ -124,18 +125,15 @@ export class IvmlFormatterService {
 
         } else if (Array.isArray(data[key])) {
           // setOf, sequenceOf ---------------------------------------------
-
           ivml += key + " = {"
           if (data[key].length > 1) {
             let j = 0
 
             if (typeof data[key][0] === "object") {
               // sequence with more than one entry
-
               ivml += this.handleIvmlSeq(data[key])
 
             } else {
-
               for (let elemt of data[key]) {
                 let return_val = this.convertToIvml(elemt)
                 ivml += return_val[0]
@@ -147,7 +145,6 @@ export class IvmlFormatterService {
                 j += 1
               }
             }
-
           } else {
             if (typeof data[key][0] === "object") {
               // ivml sequence
@@ -186,7 +183,6 @@ export class IvmlFormatterService {
     console.log("RESULT: \n" + ivml)
 
     let result =  [variableName, type, ivml]
-    console.log(result)
     return result
   }
 
@@ -209,8 +205,6 @@ export class IvmlFormatterService {
     } else {
       result = elemt
     }
-
-    //TODO number
     return result
   }
 
@@ -291,5 +285,4 @@ export class IvmlFormatterService {
 
     return inputVariables
   }
-
 }

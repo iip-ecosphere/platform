@@ -41,3 +41,14 @@ tr:nth-child(odd) {
   margin-bottom: 0.3em;
   padding: 4px, 4px;
 }
+
+.feedback {
+  background-color: rgb(35, 142, 184); /* Green background color */
+  color: #fff; /* White text color */
+  padding: 10px 20px; /* Padding around the message */
+  border-radius: 4px; /* Rounded corners */
+  margin: 10px 0; /* Margin to create space between messages */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Box shadow for a subtle effect */
+  transition: opacity 0.3s ease-in-out; /* Smooth opacity transition */
+  font-size: large;
+}

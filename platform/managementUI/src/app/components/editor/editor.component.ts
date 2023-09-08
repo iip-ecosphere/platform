@@ -58,14 +58,18 @@ export class EditorComponent implements OnInit {
     {cat: "Applications", metaRef: ["Application"]}
   ];
 
+  feedback: string = ""
+
   constructor(private api: ApiService,
     public dialog: MatDialogRef<EditorComponent>,
     public ivmlFormatter: IvmlFormatterService) { }
 
   ngOnInit(): void {
     console.log("refinedTypes " + this.refinedTypes)
-    console.log("type: " + this.type)
+    console.log("typeasdasd: " + this.type)
     console.log("selectedType: " + this.selectedType)
+    console.log("ui groups -------------")
+    console.log(this.uiGroups)
     if(this.refinedTypes) {
       console.log(this.refinedTypes);
       this.meta = {
@@ -253,15 +257,13 @@ export class EditorComponent implements OnInit {
   }
 
   public generateInputs() {
-
-    this.uiGroups = [];
+    this.uiGroups = [];  // TODO enable
     const selectedType = this.selectedType as configMetaContainer;
-    this.ivmlType = selectedType.idShort // TODO leave ?
+    this.ivmlType = selectedType.idShort
 
     if(selectedType && selectedType.value) {
 
       // (Constants) hard-coded in case of primitive types
-      //if (this.primitiveTypes.includes(selectedType.idShort)) {
       if (primitiveDataTypes.includes(selectedType.idShort)) {
         let meta_entry:configMetaEntry = {
           modelType: {name: ""},
@@ -421,10 +423,10 @@ export class EditorComponent implements OnInit {
     uiGroup.toggleOptional = !uiGroup.toggleOptional;
   }
 
-  public create() {
+  public async create() {
     const creationData = this.prepareCreation();
     //TODO: mach ein ivml draus
-    this.ivmlFormatter.createVariable(this.variableName, creationData, this.ivmlType)
+    this.feedback = await this.ivmlFormatter.createVariable(this.variableName, creationData, this.ivmlType)
     //let ivml = this.ivmlFormatter.getIvml(this.variableName, creationData, this.ivmlType)
     //TODO: platform request
     //let inputVar:InputVariable[] = this.getCreateVarInputVar(creationData, variableName)
