@@ -52,4 +52,4 @@ To use the management UI for the platform, you should install angular version 13
 
   -- Platform installation: Install the required Python libraries, next update the IP address in the ivml configuration file "TechnicalSetup.ivml", finally instantiate the platform.
   
-**For snapshots:** See required EASy-Producer version in [configuration integration and the configuration meta model](https://github.com/iip-ecosphere/platform/tree/main/platform/configuration/configuration/README.md)
+**For snapshots:** See required EASy-Producer version in [configuration integration and the configuration meta model](../configuration/configuration/README.md)
