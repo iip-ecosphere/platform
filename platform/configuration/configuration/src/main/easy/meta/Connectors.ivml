@@ -246,6 +246,8 @@ project Connectors {
        Constraint connectorInputSize = fwdTypes(input).size() < 2;
        Constraint connectorKind = kind == ServiceKind.SOURCE_SERVICE or kind == ServiceKind.SINK_SERVICE;
        Constraint connectorDeployability = deployable == true;
+       Constraint inInterfaceOk = isDefined(inInterface) and inInterface <> null;
+       Constraint outInterfaceOk = isDefined(outInterface) and outInterface <> null;
    }
    
    compound ChannelConnector refines Connector {
