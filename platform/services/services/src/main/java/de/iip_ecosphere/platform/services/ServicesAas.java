@@ -534,7 +534,7 @@ public class ServicesAas implements AasContributor {
         
         serviceBuilder.build();
         Transport.sendServiceStatusWithDescription(ActionTypes.ADDED, desc.getId(), desc.getState().toString());
-        getLogger().error("Service information added for `{}` (idShort: {})", desc.getId(), serviceId);
+        getLogger().info("Service information added for `{}` (idShort: {})", desc.getId(), serviceId);
     }
     
     /**
