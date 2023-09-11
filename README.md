@@ -9,8 +9,8 @@ The virtual IIP-Ecosphere Industry 4.0/IIoT platform aims at demonstrating new a
 * Default library for code based on types or devices defined in the Platform configuration meta-model including code for controlling an MIP sensor.
 * New application example: MIP connector and MIP AI improvement ping-pong
 * Initial Beckhoff ADS integration library for Java.
-* The [platform FAQ](https://github.com/iip-ecosphere/platform/tree/main/platform/documentation/FAQ.MD) is now in github.
-* Early snapshot of [upcoming platform handbook for version 0.6.0](https://github.com/iip-ecosphere/platform/tree/main/platform/documentation/PlatformHandbook-0.6.0-SNAPSHOT-V0.1.pdf) now online in github (version as of 2023/08/31). Comments for clarification are welcome.
+* The [platform FAQ](platform/documentation/FAQ.MD) is now in github.
+* Early snapshot of [upcoming platform handbook for version 0.6.0](platform/documentation/PlatformHandbook-0.6.0-SNAPSHOT-V0.1.pdf) now online in github (version as of 2023/09/11). Comments for clarification are welcome.
 * Confirmed compatibility: Phoenix Contact PLCnext (OPC UA, EEM integration), Beckhoff IPC (OPC UA), VDW UMATI (OPC UA), Bitmotec (MQTT), Lenze (MQTT), MIP (MQTT), Beckhoff ADS (Windows) - and improving...
 
 ## Public demonstrations
@@ -24,16 +24,16 @@ The virtual IIP-Ecosphere Industry 4.0/IIoT platform aims at demonstrating new a
 
 ![Architecture Overview](platform/ArchitectureOverview.png)
 
-For detailed links to the individual components, please refer to the [platform](https://github.com/iip-ecosphere/platform/tree/main/platform/README.md) overview. The platform repository also contains a growing set of [examples and demonstration use cases](https://github.com/iip-ecosphere/platform/tree/main/platform/examples/README.md).
+For detailed links to the individual components, please refer to the [platform](platform/README.md) overview. The platform repository also contains a growing set of [examples and demonstration use cases](platform/examples/README.md).
 
 For more details on how to develop application-specific services for the IIP-Ecosphere platform, please watch our series of video tutorials on [YouTube](https://www.youtube.com/playlist?list=PL5VSYtiD_PfdxUDXGlX53UsHdQlXcHYK7) or [IIP-Ecosphere](https://www.iip-ecosphere.de/angebote/plattform/).
 
 ## Documentation
 
 The platform concepts and realization are developed by the IIP-Ecosphere consortium and are documented in several whitepapers:
-  * The IIP-Ecosphere [platform handbook version 0.6.0 preview](https://github.com/iip-ecosphere/platform/tree/main/platform/documentation/PlatformHandbook-0.6.0-SNAPSHOT-V0.1.pdf) - in development, not formatted/reviewed.
+  * The IIP-Ecosphere [platform handbook version 0.6.0 preview](platform/documentation/PlatformHandbook-0.6.0-SNAPSHOT-V0.1.pdf) - in development, not formatted/reviewed.
   * The IIP-Ecosphere [platform handbook version 0.5.0](https://doi.org/10.5281/zenodo.7695124) [link may be updated some days after platform releases]
-  * The IIP-Ecosphere [platform FAQ](https://github.com/iip-ecosphere/platform/tree/main/platform/documentation/FAQ.MD).
+  * The IIP-Ecosphere [platform FAQ](platform/documentation/FAQ.MD).
   * Service development tutorial [YouTube](https://www.youtube.com/playlist?list=PL5VSYtiD_PfdxUDXGlX53UsHdQlXcHYK7) and [IIP-Ecosphere](https://www.iip-ecosphere.de/angebote/plattform/).
   * The IIP-Ecosphere [platform requirements (functional and quality view)](https://doi.org/10.5281/zenodo.4485774)
   * The IIP-Ecosphere [platform usage view](https://doi.org/10.5281/zenodo.4485801)
@@ -41,7 +41,7 @@ The platform concepts and realization are developed by the IIP-Ecosphere consort
 
 All material is also available from the [IIP-Ecosphere Website](https://www.iip-ecosphere.eu/).
 
-For detailed documentation and development hints see [documentation overview](https://github.com/iip-ecosphere/platform/tree/main/platform/documentation/README.md). For a documentation of the releases of the IIP-Ecosphere platform see [releases overview](https://github.com/iip-ecosphere/platform/tree/main/platform/documentation/RELEASES.md). For information on using/installing the platform, please consult the [installation overview](https://github.com/iip-ecosphere/platform/tree/main/platform/documentation/INSTALL.md). 
+For detailed documentation and development hints see [documentation overview](platform/documentation/README.md). For a documentation of the releases of the IIP-Ecosphere platform see [releases overview](platform/documentation/RELEASES.md). For information on using/installing the platform, please consult the [installation overview](platform/documentation/INSTALL.md). 
 
 ## Publications
 * Holger Eichelberger and Claudia Niederée, Asset Administration Shells, Configuration, Code
@@ -63,7 +63,7 @@ Generation: A power trio for Industry 4.0 Platforms, ETFA'23 (to appear in Septe
 
 ## Building the Platform
 
-The platform consists of some core and many alternative components which can be built locally via the provided Maven multi-module POM. However, to save time, we recommend relying on the pre-built snapshot and release binaries in [Maven Central](https://search.maven.org/search?q=iip-ecosphere) from our Continuous Integration server. To speed up this process when changes to the individual modules occur, the build sequence is incremental and not based on the Maven multi-module build. So we recommend that you install Java, Maven and an IDE (supported/working versions see [documentation overview](https://github.com/iip-ecosphere/platform/tree/main/platform/documentation/README.md)) and let Maven resolve the actual binaries for you. For more detailed information on the build dependencies, please refer to the platform handbook.
+The platform consists of some core and many alternative components which can be built locally via the provided Maven multi-module POM. However, to save time, we recommend relying on the pre-built snapshot and release binaries in [Maven Central](https://search.maven.org/search?q=iip-ecosphere) from our Continuous Integration server. To speed up this process when changes to the individual modules occur, the build sequence is incremental and not based on the Maven multi-module build. So we recommend that you install Java, Maven and an IDE (supported/working versions see [documentation overview](platform/documentation/README.md)) and let Maven resolve the actual binaries for you. For more detailed information on the build dependencies, please refer to the platform handbook.
 
 We've heard about strange problems on Mac OS. So far, we do not have enough information to resolve the potential problems.
 
