@@ -44,4 +44,4 @@ As usual, this component supports a YAML-based setup:
         gatewayPort: <int>
         netmask: <String>
 
-The fields are akin to [EcsRuntime](https://github.com/iip-ecosphere/platform/tree/main/platform/resources/ecsRuntime).
+The fields are akin to [EcsRuntime](../ecsRuntime/README.MD).
