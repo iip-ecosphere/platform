@@ -160,7 +160,7 @@ public class PahoMqttv5Connector<CO, CI> extends AbstractChannelConnector<byte[]
                     connOpts.setUserName(user);
                     connOpts.setPassword(pwd.getBytes());
                     return true;
-                });
+                }, () -> true);
             if (useTls(params)) {
                 try {                
                     connOpts.setSocketFactory(createTlsContext(params).getSocketFactory());

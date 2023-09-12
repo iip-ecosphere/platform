@@ -110,7 +110,7 @@ public class PahoMqttV5TransportConnector extends AbstractMqttTransportConnector
                 connOpts.setUserName(user);
                 connOpts.setPassword(pwd.getBytes());
                 return true;
-            });
+            }, () -> true);
             if (useTls(params)) {
                 try {
                     connOpts.setHttpsHostnameVerificationEnabled(params.getHostnameVerification());

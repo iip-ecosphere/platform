@@ -147,7 +147,7 @@ public class PahoMqttv3Connector<CO, CI> extends AbstractChannelConnector<byte[]
                     connOpts.setUserName(user);
                     connOpts.setPassword(pwd.toCharArray());
                     return true;
-                });
+                }, () -> true);
             if (useTls(params)) {
                 try {                
                     connOpts.setSocketFactory(createTlsContext(params).getSocketFactory());
