@@ -27,7 +27,7 @@ project ConnectorsPartMIP {
        MachineParser machineParser = JsonParser{};
        NameplateInfo nameplateInfo = {
            manufacturerProductDesignation = "MIP MQTT connector@en",
-           manufacturer = refBy(manufacturer_sse)
+           manufacturer = refBy(manufacturer_mipTech)
        };
    }
    

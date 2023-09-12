@@ -27,7 +27,7 @@ project ConnectorsPartNovoAI {
        MachineParser machineParser = JsonParser{};
        NameplateInfo nameplateInfo = {
            manufacturerProductDesignation = "NovoAI MQTT connector@en",
-           manufacturer = refBy(manufacturer_sse)
+           manufacturer = refBy(manufacturer_NovoAITech)
        };
    }
 
