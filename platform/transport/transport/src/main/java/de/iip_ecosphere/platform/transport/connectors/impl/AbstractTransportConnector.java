@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import javax.net.ssl.SSLContext;
 
@@ -96,11 +97,25 @@ public abstract class AbstractTransportConnector implements TransportConnector {
      * @see #applyIdentityToken(IdentityToken, AuthenticationConsumer)
      */
     public static boolean applyAuthenticationKey(String authenticationKey, AuthenticationConsumer consumer) {
+        return applyAuthenticationKey(authenticationKey, consumer, null);
+    }
+
+    /**
+     * Tries to apply the given authentication key to the given consumer.
+     * 
+     * @param authenticationKey the authentication key
+     * @param consumer the consumer
+     * @param anonymousSupplier for anonymous supplier/acceptor, may be <b>null</b> for none
+     * @return {@code true} for applied, {@code false} for ignored/failed
+     * @see #applyIdentityToken(IdentityToken, AuthenticationConsumer)
+     */
+    public static boolean applyAuthenticationKey(String authenticationKey, AuthenticationConsumer consumer, 
+        Supplier<Boolean> anonymousSupplier) {
         boolean authDone = false;
         if (null != authenticationKey) {
             IdentityToken tok = IdentityStore.getInstance().getToken(authenticationKey);
             if (tok != null) {
-                authDone = applyIdentityToken(tok, consumer);
+                authDone = applyIdentityToken(tok, consumer, anonymousSupplier);
             } else {
                 LoggerFactory.getLogger(AbstractTransportConnector.class).info(
                     "Authentication key {} not found. Trying user/password.", authenticationKey);
@@ -110,22 +125,43 @@ public abstract class AbstractTransportConnector implements TransportConnector {
     }
 
     /**
-     * Tries to apply the given identity token to the given consumer.
+     * Tries to apply the given identity token as user/password to the given consumer.
      * 
      * @param tok the identity token
      * @param consumer the consumer
      * @return {@code true} for applied, {@code false} for ignored/failed
-     * @see #applyIdentityToken(IdentityToken, AuthenticationConsumer)
+     * @see #applyIdentityToken(IdentityToken, AuthenticationConsumer, AuthenticationConsumer))
      */
     public static boolean applyIdentityToken(IdentityToken tok, AuthenticationConsumer consumer) {
+        return applyIdentityToken(tok, consumer, null);
+    }
+
+    /**
+     * Tries to apply the given identity token as user/password to the given consumer.
+     * 
+     * @param tok the identity token
+     * @param consumer the consumer for user/password
+     * @param anonymousSupplier for anonymous supplier/acceptor, may be <b>null</b> for none
+     * @return {@code true} for applied, {@code false} for ignored/failed
+     */
+    public static boolean applyIdentityToken(IdentityToken tok, AuthenticationConsumer consumer, 
+        Supplier<Boolean> anonymousSupplier) {
         boolean authDone = false;
         if (tok != null) {
+            boolean handled = false;
             if (IdentityToken.TokenType.USERNAME == tok.getType()) {
                 authDone = consumer.accept(tok.getUserName(), tok.getTokenDataAsString(), 
                     tok.getTokenEncryptionAlgorithm());
-            } else {
+                handled = true;
+            } else if (IdentityToken.TokenType.ANONYMOUS == tok.getType()) {
+                if (null != anonymousSupplier) {
+                    authDone = anonymousSupplier.get();
+                    handled = true;
+                } 
+            }
+            if (!handled) {
                 LoggerFactory.getLogger(AbstractTransportConnector.class).info(
-                    "Cannot handle identity token type {}. Trying user/password.", tok.getType());
+                    "Cannot handle identity token type {}. Falling back to no authentication.", tok.getType());
             }
         }
         return authDone;
