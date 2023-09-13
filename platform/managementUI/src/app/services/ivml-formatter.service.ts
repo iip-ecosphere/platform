@@ -1,6 +1,6 @@
 //import { type } from 'os';
 import { InputVariable, platformResponse } from 'src/interfaces';
-import { primitiveDataTypes } from './env-config.service';
+import { primitiveDataTypes, ivmlEnumeration } from './env-config.service';
 import { Injectable } from '@angular/core';
 import { ApiService } from './api.service';
 
@@ -18,11 +18,6 @@ export class IvmlFormatterService {
   BOOL = "boolean"
 
   nonVisibleValues = ["optional"]
-
-  enums = ["kind", "traceRcv", "traceSent"]
-  enums_mapping = [["kind", "ServiceKind"],
-            ["traceRcv", "TraceKind"],
-            ["traceSent", "TraceKind"]]
 
   success_feedback = "Variable sucessfully created!"
 
@@ -68,6 +63,8 @@ export class IvmlFormatterService {
   public getIvml(variableName: string, data: any, type: string) {
     // replacing whitespaces with underline
     variableName = this.replaceWhitespaces(variableName)
+    console.log("data")
+    console.log(data)
 
     // removing empty entries
     for(const key in data) {
@@ -109,18 +106,11 @@ export class IvmlFormatterService {
       let i = 0
 
       for (const key in data) {
-        if (this.enums.includes(key)) {
-          let mapping = this.enums_mapping.find((elemt) => elemt[0] == key)
-          let enum_name = ""
-          if (mapping) {
-            enum_name = mapping[1]
-          }
-          ivml += key + " = " + enum_name + "." + data[key]
-
-        } else if (key == "port") {  // TODO maybe input check will be there some day
+        if (key == "port") {  // TODO maybe input check will be there some day
           ivml += key + " = " + Number(data[key])
 
-        } else if (typeof data[key] == "string") {  // refTo, string inside non-primitive type
+        } else if (typeof data[key] == "string") {
+          // refTo, string inside non-primitive type, ivml enum
           ivml += key + " = " + this.convertToIvml(data[key])[0]
 
         } else if (Array.isArray(data[key])) {
@@ -194,6 +184,10 @@ export class IvmlFormatterService {
         elemt = elemt.replace("refTo", "refBy")
         result = [elemt, this.REF_TO]
 
+      } else if (elemt.startsWith(ivmlEnumeration)) {
+        // ivml enums
+        elemt = elemt.replace(ivmlEnumeration, "")
+        result = [elemt, null]
       } else {
         // string ''
         result = ["\"" + elemt + "\"", this.STRING]
@@ -285,4 +279,47 @@ export class IvmlFormatterService {
 
     return inputVariables
   }
+
+  // ------------- drawflow to ivml -----------------------------
+
+  serviceKinds = {SOURCE_SERVICE:"MeshSource"}
+
+  public getMeshAsIvml(data:any, allServices:any) {
+    let ivml = ""
+   //console.log("ivml | data")
+    //console.log(data)
+    for (const key in data) {
+      console.log(data[key])
+      let serviceInfo = this.getServiceInfo(data[key].name, allServices)
+
+      let serviceType = "\n\nSERVICE_TYPE" //TODO
+      ivml += serviceType + " " + serviceInfo.name + " = {\n"
+        + "pos_x = " + String(data[key].pos_x) + ",\n"
+        + "pos_y = " + String(data[key].pos_y) + "\n"
+        + "};"
+    }
+    console.log("Ivml format for mesh: \n" + ivml)
+  }
+
+  public getServiceInfo(name:string, allServices:any) {
+    let result = {name:"", impl:"", kind:""}
+    let service = allServices.find((service: { idShort: string; }) => service.idShort == name)
+    //console.log("service with id " + name)
+    //console.log(service)
+
+    result["name"] = this.getVarValue(service, "id")
+    result["kind"] = this.getVarValue(service, "kind")
+    result["impl"] = service.idShort
+    console.log("service info:")
+    console.log(result)
+    return result
+  }
+
+  public getVarValue(service:any, varValueName:string) {
+    let varName = service.value.find((val: { idShort: string; }) => val.idShort == varValueName)
+    let varNameValue = varName.value.find((val: { idShort: string; }) => val.idShort == "varValue").value
+    return varNameValue
+  }
+
+
 }
