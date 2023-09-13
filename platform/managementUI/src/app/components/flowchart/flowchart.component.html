@@ -46,6 +46,15 @@
 
     <div class="drawflow-container">
       <div id="drawflow"></div>
+      <!-- mesh name -->
+      <div>
+        <mat-label style="margin-left: 1%;">mesh name</mat-label>
+        <input matInput type="text"
+          style="font-size:14px; margin-right: 1%; margin-left: 1%;"
+          ngDefaultControl [(ngModel)]=meshName>
+
+        <button mat-raised-button class="button" (click)="create()">create</button>
+      </div>
 
       <mat-card *ngIf="toggleBus" class="footer">
         <div><span  *ngFor="let bus of Busses" [class]="bus.color">{{bus.id}}, </span></div>

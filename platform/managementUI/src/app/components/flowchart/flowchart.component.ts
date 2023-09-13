@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import Drawflow from 'drawflow';
 import { DrawflowService } from 'src/app/services/drawflow.service';
+import { IvmlFormatterService } from 'src/app/services/ivml-formatter.service';
 
 interface Bus {
   id: string;
@@ -16,7 +17,9 @@ interface Bus {
 export class FlowchartComponent implements OnInit {
 
 
-  constructor(private df: DrawflowService, private route: ActivatedRoute) {}
+  constructor(private df: DrawflowService,
+    private route: ActivatedRoute,
+    public ivmlFormatter:IvmlFormatterService) {}
 
   @Input() inputMesh: any
 
@@ -152,6 +155,8 @@ export class FlowchartComponent implements OnInit {
   }
 
   public async getGraph(mesh: string) {
+    console.log(mesh)
+
     let data = await this.df.getGraph(mesh);
     if(data?.outputArguments[0].value?.value) {
       this.Busses = [];
@@ -261,15 +266,33 @@ export class FlowchartComponent implements OnInit {
   public selectService(service: any) {
     this.selectedService = service;
     console.log(this.selectedService);
+    this.selectedServicesArray.push(this.selectedService) // TODO loe
   }
 
   public addService(event: any) {
-    console.log(event);
     if(this.selectedService) {
       this.editor.addNode(this.selectedService.idShort, 1, 1, event.layerX, event.layerY, '', {}, '<div>' + this.selectedService.idShort + '<div>', false);
       this.selectedService = undefined;
     }
+  }
 
+  meshName:string = ""
+  selectedServicesArray:any = [] // TODO loe
+  feedback:string = ""
+  public async create() {
+    /*
+    console.log("create btn chartflow")
+    console.log(this.editor.drawflow)
+    console.log("mesh name: " + this.meshName)
+    console.log("Trace: ")
+    console.log(this.selectedServicesArray)
+    */
+    console.log(typeof this.editor.drawflow.drawflow.Home.data)
+    let drawflow = JSON.stringify(this.editor.drawflow.drawflow.Home.data)
+    console.log("drawflow: " + drawflow)
+    let feedbackInternal = await this.ivmlFormatter.setGraph("", "", this.meshName,
+      drawflow)
+    console.log("Feedback: " + feedbackInternal)
   }
 
 }
