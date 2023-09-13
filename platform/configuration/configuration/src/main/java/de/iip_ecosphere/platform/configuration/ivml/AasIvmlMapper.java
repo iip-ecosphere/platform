@@ -576,40 +576,61 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     }
 
     /**
-     * Changes a graph structure in IVML. [public for testing]
+     * Changes an application/graph structure in IVML. Application/mesh files are dynamically linked and require
+     * a different approach as, e.g., constants. [public for testing]
      * 
      * @param appName the configured name of the application
      * @param appValueEx the application value as IVML expression
-     * @param meshName the configured name of the service mesh
-     * @param format the format of the graph
-     * @param value the value
+     * @param meshName the configured name of the service mesh (may be <b>null</b> or empty for none).
+     * @param format the format of the graph (may be <b>null</b> or empty for none).
+     * @param value the value (may be <b>null</b> or empty for none).
      * @return <b>null</b> always
      * @throws ExecutionException if setting the graph structure fails
      */
     public synchronized Object setGraph(String appName, String appValueEx, String meshName, String format, 
         String value) throws ExecutionException {
-        LoggerFactory.getLogger(getClass()).info("Setting graph in IVML app {} = {}, mesh {}, format {}", 
-            appName, appValueEx, meshName, format); // no graph, may become too long
-        GraphFormat gFormat = getGraphFormat(format);
-        IvmlGraph graph = gFormat.fromString(value, getMapper().getGraphFactory(), this);
-        
-        try {
-            ModelResults results = new ModelResults();
-            createMeshProject(appName, meshName, graph, results);
-            createAppProject(appName, appValueEx, results);
-
-            Map<Project, CopiedFile> copies = new HashMap<>();
-            File meshFile = getIvmlFile(results.meshProject);
-            copies.put(results.meshProject, copyToTmp(meshFile));
-            File appFile = getIvmlFile(results.appProject);
-            copies.put(results.appProject, copyToTmp(appFile));
-            saveTo(results.meshProject, meshFile);
-            saveTo(results.appProject, appFile);
-            reloadAndValidate(copies);
-            LoggerFactory.getLogger(getClass()).info("Graph set in IVML app {} = {}, mesh {}, format {}", 
+        boolean doApp = appName != null && appName.length() > 0;
+        boolean doMesh = meshName != null && meshName.length() > 0;
+        if (doApp || doMesh) {
+            LoggerFactory.getLogger(getClass()).info("Setting graph in IVML app {} = {}, mesh {}, format {}", 
                 appName, appValueEx, meshName, format); // no graph, may become too long
-        } catch (ModelQueryException | ModelManagementException e) {
-            throw new ExecutionException(e);
+            GraphFormat gFormat = getGraphFormat(format);
+            IvmlGraph graph = gFormat.fromString(value, getMapper().getGraphFactory(), this);
+            
+            try {
+                ModelResults results = new ModelResults();
+                if (doApp) {
+                    createMeshProject(appName, meshName, graph, results);
+                }
+                if (doMesh) {
+                    createAppProject(appName, appValueEx, results);
+                }
+    
+                File meshFile = null;
+                File appFile = null;
+                Map<Project, CopiedFile> copies = new HashMap<>();
+                if (doMesh) {
+                    meshFile = getIvmlFile(results.meshProject);
+                    copies.put(results.meshProject, copyToTmp(meshFile));
+                }
+                if (doApp) {
+                    appFile = getIvmlFile(results.appProject);
+                    copies.put(results.appProject, copyToTmp(appFile));
+                }
+                if (meshFile != null) {
+                    saveTo(results.meshProject, meshFile);
+                }
+                if (appFile != null) {
+                    saveTo(results.appProject, appFile);
+                }
+                reloadAndValidate(copies);
+                LoggerFactory.getLogger(getClass()).info("Graph set in IVML app {} = {}, mesh {}, format {}", 
+                    appName, appValueEx, meshName, format); // no graph, may become too long
+            } catch (ModelQueryException | ModelManagementException e) {
+                throw new ExecutionException(e);
+            }
+        } else {
+            LoggerFactory.getLogger(getClass()).info("No model change as both, graph and mesh do not have a name"); 
         }
         return null;
     }
