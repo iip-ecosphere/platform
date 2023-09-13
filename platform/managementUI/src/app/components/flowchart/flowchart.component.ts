@@ -266,7 +266,7 @@ export class FlowchartComponent implements OnInit {
   public selectService(service: any) {
     this.selectedService = service;
     console.log(this.selectedService);
-    this.selectedServicesArray.push(this.selectedService)
+    this.selectedServicesArray.push(this.selectedService) // TODO loe
   }
 
   public addService(event: any) {
@@ -277,8 +277,9 @@ export class FlowchartComponent implements OnInit {
   }
 
   meshName:string = ""
-  selectedServicesArray:any = []
-  public create() {
+  selectedServicesArray:any = [] // TODO loe
+  feedback:string = ""
+  public async create() {
     /*
     console.log("create btn chartflow")
     console.log(this.editor.drawflow)
@@ -286,7 +287,12 @@ export class FlowchartComponent implements OnInit {
     console.log("Trace: ")
     console.log(this.selectedServicesArray)
     */
-    this.ivmlFormatter.getMeshAsIvml(this.editor.drawflow.drawflow.Home.data, this.selectedServicesArray)
+    console.log(typeof this.editor.drawflow.drawflow.Home.data)
+    let drawflow = JSON.stringify(this.editor.drawflow.drawflow.Home.data)
+    console.log("drawflow: " + drawflow)
+    let feedbackInternal = await this.ivmlFormatter.setGraph("", "", this.meshName,
+      drawflow)
+    console.log("Feedback: " + feedbackInternal)
   }
 
 }

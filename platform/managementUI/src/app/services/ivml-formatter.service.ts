@@ -279,9 +279,63 @@ export class IvmlFormatterService {
 
     return inputVariables
   }
+  // ------------- setGraph --------------------------------------------------
+  public async setGraph(appName: string, appValExpr: string,
+    serviceMeshName:string, val:string) {
+    let inputVar = this.getSetGraphInputVar(appName, appValExpr,
+      serviceMeshName, val)
+    console.log("[ivml-formatter | setGraph] input var")
+    console.log(inputVar)
+
+    let resourceId = ""
+    let aasElementURL = "/aas/submodels/Configuration/submodel/submodelElements/"
+    let basyxFun = "/setGraph"
+
+    const response = await this.api.executeFunction(
+      resourceId,
+      aasElementURL,
+      basyxFun,
+      inputVar) as unknown as platformResponse
+
+    let exception = this.getPlatformResponse(response)
+    console.log(response)
+    let result = this.getFeedback(exception)
+    return result
+  }
+
+  public getSetGraphInputVar(appName:string, appValExpr:string,
+    serviceMeshName:string, val:string ) {
+    let inputVariables: InputVariable[] = [];
+    let input0 = this.getInputVar("appName", appName)
+    let input1 = this.getInputVar("appValExpr", appValExpr)
+    let input2 = this.getInputVar("serviceMeshName", serviceMeshName)
+    let input3 = this.getInputVar("format", "drawflow")
+    let input4 = this.getInputVar("val", val)
+
+    inputVariables.push(input0, input1, input2, input3, input4)
+
+    return inputVariables
+  }
+
+  getInputVar(idShort:string, value:any) {
+    let result:InputVariable = {
+      value: {
+        modelType: {
+          name: "Property"
+        },
+        valueType: "string",
+        idShort: idShort,
+        kind: "Template",
+        value: value
+      }
+    }
+    return result
+  }
+
+
 
   // ------------- drawflow to ivml -----------------------------
-
+  /*
   serviceKinds = {SOURCE_SERVICE:"MeshSource"}
 
   public getMeshAsIvml(data:any, allServices:any) {
@@ -320,6 +374,5 @@ export class IvmlFormatterService {
     let varNameValue = varName.value.find((val: { idShort: string; }) => val.idShort == "varValue").value
     return varNameValue
   }
-
-
+  */
 }
