@@ -190,7 +190,9 @@ public class Cli extends CliBackend {
                 callWithUri(provider, uri -> deployPlanEmitId(uri));
                 break;
             case "undeploy":
-                System.out.print("id (empty for none): ");
+                if (provider.isInteractive()) {
+                    System.out.print("id (empty for none): ");
+                }
                 Watcher<StatusMessage> watcher = createStatusWatcher().start();
                 callWithUri(provider, uri -> undeployPlan(uri, provider.nextCommand()));
                 watcher.stop();
