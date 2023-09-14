@@ -10,7 +10,7 @@ The virtual IIP-Ecosphere Industry 4.0/IIoT platform aims at demonstrating new a
 * New application example: MIP connector and MIP AI improvement ping-pong
 * Initial Beckhoff ADS integration library for Java.
 * The [platform FAQ](platform/documentation/FAQ.MD) is now in github.
-* Early snapshot of [upcoming platform handbook for version 0.6.0](platform/documentation/PlatformHandbook-0.6.0-SNAPSHOT-V0.1.pdf) now online in github (version as of 2023/09/13). Comments for clarification are welcome.
+* Early snapshot of [upcoming platform handbook for version 0.6.0](platform/documentation/PlatformHandbook-0.6.0-SNAPSHOT-V0.1.pdf) now online in github (version as of 2023/09/14). Comments for clarification are welcome.
 * Confirmed compatibility: Phoenix Contact PLCnext (OPC UA, EEM integration), Beckhoff IPC (OPC UA), VDW UMATI (OPC UA), Bitmotec (MQTT), Lenze (MQTT), MIP (MQTT), Beckhoff ADS (Windows) - and improving...
 
 ## Public demonstrations

@@ -142,3 +142,10 @@ If there is already a repositories section, please add the contents for the “S
 *Solution:* Change the base image version to an older (or if available and feasible, newer) version where the issues does not occur. Unfortunately, this may require some tries and may lead to some errors. In the example above, we changed ``python:3.8.17-slim-buster`` to ``python:3.8.16-slim-buster``, which then allowed for an installation of Java 11.
 
 
+## Python dependency/module not found
+
+*Symptom:* You are trying to deploy an application with Python services and Python complains about missing dependencies, i.e., module names that cannot be resolved.
+
+*Reason:* When you are deploying an application to a generated container, this symptom shall not occur if all Python services have their required dependencies declared in the configuration model. When deploying an application on a bare operating system, the platform will not touch the installation, i.e., you are responsible for installing the respective packages. Depending on the installation of the platform, even a different user may be in charge of executing your application, e.g., the platform is started automatically via systemd (potentially as root) and you are deploying via CLI from user space. In this case, dependencies may be missing although you already have installed them (into a different account).
+
+*Solution:* For containerized applications, please check the declared dependencies in the configuration model for their completeness. For non-containerized applications, please figure out, which account is executing the platform services, in particular the service manager, and complete the installation of missing dependencies for that user. See also "Considerations for a Permanent or Distributed Installation" in the platform handbook.
