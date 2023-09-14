@@ -599,10 +599,10 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             
             try {
                 ModelResults results = new ModelResults();
-                if (doApp) {
+                if (doMesh) {
                     createMeshProject(appName, meshName, graph, results);
                 }
-                if (doMesh) {
+                if (doApp) {
                     createAppProject(appName, appValueEx, results);
                 }
     
