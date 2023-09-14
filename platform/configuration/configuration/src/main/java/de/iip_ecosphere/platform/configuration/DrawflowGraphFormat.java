@@ -423,6 +423,17 @@ public class DrawflowGraphFormat implements GraphFormat {
             this.factory = factory;
             this.varProvider = varProvider;
         }
+        
+        /**
+         * Returns {@code optional} if this is an object with contents, else {@code base}.
+         * 
+         * @param base the base object to be returned if {@code optional} is no valid object
+         * @param optional the optional object, may also be <b>null</b>
+         * @return {@code base} or {@code optional}
+         */
+        private JSONObject optional(JSONObject base, JSONObject optional) {
+            return null == optional || optional.isEmpty() ? base : optional;
+        }
 
         /**
          * Reads a JSON representation and returns an IVML graph.
@@ -436,9 +447,10 @@ public class DrawflowGraphFormat implements GraphFormat {
             try {
                 JSONParser jsonParser = new JSONParser();
                 JSONObject top = (JSONObject) jsonParser.parse(graph);
-                JSONObject drawflow = getJsonObject(top, "drawflow");
-                JSONObject home = getJsonObject(drawflow, "Home");
-                JSONObject data = getJsonObject(home, "data");
+                // input format differs from output :(
+                JSONObject drawflow = optional(top, getJsonObject(top, "drawflow"));
+                JSONObject home = optional(drawflow, getJsonObject(drawflow, "Home"));
+                JSONObject data = optional(home, getJsonObject(home, "data"));
                 result = factory.createGraph(null); // TODO where does the variable come from
                 for (Object id : data.keySet()) {
                     JSONObject node = getJsonObject(data, id.toString());

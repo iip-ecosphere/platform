@@ -791,6 +791,20 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         }
         return result;
     }
+    
+    /**
+     * Validates the name of a node and if there is none, sets a pseudo name based on {@link count}.
+     * 
+     * @param node the node to validate
+     * @param count unique node counter per mesh
+     * @return the name of {@code node}
+     */
+    private String validateName(IvmlGraphNode node, int count) {
+        if (node.getName().length() == 0) { // just a fallback
+            node.setName(String.valueOf(count));
+        }
+        return node.getName();
+    }
 
     /**
      * Creates a mesh project for {@code graph}.
@@ -810,12 +824,12 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         String meshProjectName = getMeshProjectName(appName, meshName);
         results.meshProject = findOrCreateProject(root, meshProjectName, false); // just overwrite
         addImport(results.meshProject, "Applications", root, null);
-        IDatatype sourceType = ModelQuery.findType(root, "MeshSource", null);
-        IDatatype transformerType = ModelQuery.findType(root, "MeshTransformer", null);
-        IDatatype sinkType = ModelQuery.findType(root, "MeshSink", null);
-        IDatatype connectorType = ModelQuery.findType(root, "MeshConnector", null);
-        IDatatype serviceType = ModelQuery.findType(root, "ServiceBase", null);
-        IDatatype meshType = ModelQuery.findType(root, "ServiceMesh", null);
+        final IDatatype sourceType = ModelQuery.findType(root, "MeshSource", null);
+        final IDatatype processorType = ModelQuery.findType(root, "MeshProcessor", null);
+        final IDatatype sinkType = ModelQuery.findType(root, "MeshSink", null);
+        final IDatatype connectorType = ModelQuery.findType(root, "MeshConnector", null);
+        final IDatatype serviceType = ModelQuery.findType(root, "ServiceBase", null);
+        final IDatatype meshType = ModelQuery.findType(root, "ServiceMesh", null);
         ServiceMap services = collectServices(cfg, serviceType);
         Map<IvmlGraphNode, DecisionVariableDeclaration> nodeMap = new HashMap<>();
         Map<DecisionVariableDeclaration, String> valueMap = new HashMap<>();
@@ -827,21 +841,20 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             } else if (n.getOutEdgesCount() == 0) {
                 type = sinkType;
             } else {
-                type = transformerType; // TODO Probe service
+                type = processorType; // TODO Probe service
             }
-            DecisionVariableDeclaration nodeVar = new DecisionVariableDeclaration("node_" + n.getName(), type, 
-                results.meshProject);
+            DecisionVariableDeclaration nodeVar = new DecisionVariableDeclaration("node_" 
+                + validateName(n, nodeMap.size()), type, results.meshProject);
             String nodeValEx = "{pos_x=" + n.getXPos() + ",pos_y=" + n.getYPos() 
                 + ",impl=" + IvmlUtils.getVarNameSafe(findServiceVar(services, n.getImpl()), "null")
                 + ",next = {";
             valueMap.put(nodeVar, nodeValEx);
             results.meshProject.add(nodeVar);
             nodeMap.put(n, nodeVar);
-            if (type == sourceType) {
+            if (type == sourceType && !sources.contains(nodeVar)) {
                 sources.add(nodeVar);
             }
         }
-        boolean first = true;
         int edgeCounter = 0;
         for (IvmlGraphNode n: graph.nodes()) {
             for (IvmlGraphEdge e: n.outEdges()) {
@@ -858,12 +871,11 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                 String valueEx = "{name=\"" + edgeName + "\", next=refBy(" + end.getName() + ")}";
                 setValue(edgeVar, valueEx);
                 String startNodeValueEx = valueMap.get(nodeMap.get(n));
-                if (!first) {
+                if (!startNodeValueEx.endsWith("{")) {
                     startNodeValueEx += ",";
                 }
                 startNodeValueEx += "refBy(" + edgeVarName + ")";
                 valueMap.put(nodeMap.get(n), startNodeValueEx);
-                first = false;
             }
         }
         for (IvmlGraphNode n: graph.nodes()) {
