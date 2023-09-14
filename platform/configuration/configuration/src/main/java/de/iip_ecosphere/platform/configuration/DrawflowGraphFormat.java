@@ -432,7 +432,9 @@ public class DrawflowGraphFormat implements GraphFormat {
          * @return {@code base} or {@code optional}
          */
         private JSONObject optional(JSONObject base, JSONObject optional) {
-            return null == optional || optional.isEmpty() ? base : optional;
+            return (null == optional || optional.isEmpty()) 
+                && !(base.size() == 1 && base.containsKey("data")) // last selection, leads to base otherwise
+                ? base : optional;
         }
 
         /**
