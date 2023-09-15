@@ -19,7 +19,7 @@ export class IvmlFormatterService {
 
   nonVisibleValues = ["optional"]
 
-  success_feedback = "Variable sucessfully created!"
+  success_feedback = "Object successfully created!"
 
   public async createVariable(variableName: string, data: any, type: string) {
     let ivmlFormat = this.getIvml(variableName, data, type)
@@ -38,7 +38,6 @@ export class IvmlFormatterService {
       inputVar) as unknown as platformResponse
 
     let exception = this.getPlatformResponse(response)
-    console.log("exception: " + exception)
     return this.getFeedback(exception)
   }
 
@@ -54,8 +53,7 @@ export class IvmlFormatterService {
     let result = this.success_feedback
     if (exception != "{}") {
       exception = exception.substring(1, exception.length - 1)
-      let values = exception.split(":")
-      result = "Exception: " + values[1].substring(1, values[1].length - 1)
+      result = "Exception: " + exception.replace("\"exception\":", "")
     }
     return result
   }
@@ -68,7 +66,6 @@ export class IvmlFormatterService {
 
     // removing empty entries
     for(const key in data) {
-      //enums = ["kind", "nodeClass"]
       if (data[key] === "") {
         delete data[key]
       }
@@ -85,20 +82,14 @@ export class IvmlFormatterService {
         delete data[key]
       }
     }
-    /*
-    console.log("[ivmlFormatter | getIvml] clean data --------- ")
-    console.log(data)
-    console.log("--------------------")
-    */
 
-    //let ivml = type + " " + variableName + " = "
     let ivml = ""
 
     if (primitiveDataTypes.includes(type)) {
       if (type === "String") {
-        ivml += "\"" + data["value"] + "\""// "\";"
+        ivml += "\"" + data["value"] + "\""
       } else {
-        ivml += data["value"] // + ";"
+        ivml += data["value"]
       }
     } else {
       // non-primitive types ---------------------------------------------------------
@@ -167,10 +158,9 @@ export class IvmlFormatterService {
         }
         i += 1
       }
-      //ivml += "\n};"   // TODO
       ivml += "\n}"
     }
-    console.log("RESULT: \n" + ivml)
+    console.log("[ivml-formatter | getIvml]: object as ivml:\n" + ivml)
 
     let result =  [variableName, type, ivml]
     return result
@@ -280,11 +270,17 @@ export class IvmlFormatterService {
     return inputVariables
   }
   // ------------- setGraph --------------------------------------------------
+  public createApp(appName:string, data:any) {
+    let ivmlFormat = this.getIvml(appName, data, "")[2]
+    let feedback = this.setGraph(appName, ivmlFormat, "", "")
+    return feedback
+  }
+
   public async setGraph(appName: string, appValExpr: string,
     serviceMeshName:string, val:string) {
     let inputVar = this.getSetGraphInputVar(appName, appValExpr,
       serviceMeshName, val)
-    console.log("[ivml-formatter | setGraph] input var")
+    console.log("[ivml-formatter | setGraph] input variables")
     console.log(inputVar)
 
     let resourceId = ""
@@ -298,7 +294,6 @@ export class IvmlFormatterService {
       inputVar) as unknown as platformResponse
 
     let exception = this.getPlatformResponse(response)
-    console.log(response)
     let result = this.getFeedback(exception)
     return result
   }
@@ -331,48 +326,4 @@ export class IvmlFormatterService {
     }
     return result
   }
-
-
-
-  // ------------- drawflow to ivml -----------------------------
-  /*
-  serviceKinds = {SOURCE_SERVICE:"MeshSource"}
-
-  public getMeshAsIvml(data:any, allServices:any) {
-    let ivml = ""
-   //console.log("ivml | data")
-    //console.log(data)
-    for (const key in data) {
-      console.log(data[key])
-      let serviceInfo = this.getServiceInfo(data[key].name, allServices)
-
-      let serviceType = "\n\nSERVICE_TYPE" //TODO
-      ivml += serviceType + " " + serviceInfo.name + " = {\n"
-        + "pos_x = " + String(data[key].pos_x) + ",\n"
-        + "pos_y = " + String(data[key].pos_y) + "\n"
-        + "};"
-    }
-    console.log("Ivml format for mesh: \n" + ivml)
-  }
-
-  public getServiceInfo(name:string, allServices:any) {
-    let result = {name:"", impl:"", kind:""}
-    let service = allServices.find((service: { idShort: string; }) => service.idShort == name)
-    //console.log("service with id " + name)
-    //console.log(service)
-
-    result["name"] = this.getVarValue(service, "id")
-    result["kind"] = this.getVarValue(service, "kind")
-    result["impl"] = service.idShort
-    console.log("service info:")
-    console.log(result)
-    return result
-  }
-
-  public getVarValue(service:any, varValueName:string) {
-    let varName = service.value.find((val: { idShort: string; }) => val.idShort == varValueName)
-    let varNameValue = varName.value.find((val: { idShort: string; }) => val.idShort == "varValue").value
-    return varNameValue
-  }
-  */
 }

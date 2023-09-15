@@ -279,6 +279,7 @@ export class FlowchartComponent implements OnInit {
   meshName:string = ""
   selectedServicesArray:any = [] // TODO loe
   feedback:string = ""
+  exampleDrawflow:string = ""
   public async create() {
     /*
     console.log("create btn chartflow")
@@ -288,8 +289,10 @@ export class FlowchartComponent implements OnInit {
     console.log(this.selectedServicesArray)
     */
     console.log(typeof this.editor.drawflow.drawflow.Home.data)
-    let drawflow = JSON.stringify(this.editor.drawflow.drawflow.Home.data)
-    console.log("drawflow: " + drawflow)
+    let drawflowRaw = JSON.stringify(this.editor.drawflow.drawflow.Home.data)
+    let drawflow = drawflowRaw.replace("drawflow: ", "")
+    this.exampleDrawflow = drawflow
+    console.log("drawflow as string: " + drawflow)
     let feedbackInternal = await this.ivmlFormatter.setGraph("", "", this.meshName,
       drawflow)
     console.log("Feedback: " + feedbackInternal)

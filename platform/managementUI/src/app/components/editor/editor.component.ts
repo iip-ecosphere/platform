@@ -65,11 +65,13 @@ export class EditorComponent implements OnInit {
     public ivmlFormatter: IvmlFormatterService) { }
 
   ngOnInit(): void {
+    /*
     console.log("refinedTypes " + this.refinedTypes)
     console.log("typeasdasd: " + this.type)
     console.log("selectedType: " + this.selectedType)
     console.log("ui groups -------------")
     console.log(this.uiGroups)
+    */
     if(this.refinedTypes) {
       console.log(this.refinedTypes);
       this.meta = {
@@ -257,7 +259,7 @@ export class EditorComponent implements OnInit {
   }
 
   public generateInputs() {
-    this.uiGroups = [];  // TODO enable
+    this.uiGroups = [];
     const selectedType = this.selectedType as configMetaContainer;
     this.ivmlType = selectedType.idShort
 
@@ -425,11 +427,12 @@ export class EditorComponent implements OnInit {
 
   public async create() {
     const creationData = this.prepareCreation();
-    //TODO: mach ein ivml draus
-    this.feedback = await this.ivmlFormatter.createVariable(this.variableName, creationData, this.ivmlType)
-    //let ivml = this.ivmlFormatter.getIvml(this.variableName, creationData, this.ivmlType)
-    //TODO: platform request
-    //let inputVar:InputVariable[] = this.getCreateVarInputVar(creationData, variableName)
+    if (this.selectedType?.idShort == "Application") {
+      this.feedback = await this.ivmlFormatter.createApp(this.variableName, creationData)
+    } else {
+      this.feedback = await this.ivmlFormatter.createVariable(
+        this.variableName, creationData, this.ivmlType)
+    }
   }
 
   public close() {
@@ -505,4 +508,7 @@ export class EditorComponent implements OnInit {
     }
     this.dialog.close();
   }
+
+
+
 }
