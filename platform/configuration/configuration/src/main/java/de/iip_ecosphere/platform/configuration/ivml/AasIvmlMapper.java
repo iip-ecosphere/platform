@@ -59,6 +59,7 @@ import net.ssehub.easy.varModel.confModel.ConfigurationException;
 import net.ssehub.easy.varModel.confModel.IDecisionVariable;
 import net.ssehub.easy.varModel.cst.ConstraintSyntaxTree;
 import net.ssehub.easy.varModel.cstEvaluation.EvaluationVisitor;
+import net.ssehub.easy.varModel.management.VarModel;
 import net.ssehub.easy.varModel.model.AbstractVariable;
 import net.ssehub.easy.varModel.model.ContainableModelElement;
 import net.ssehub.easy.varModel.model.DecisionVariableDeclaration;
@@ -574,6 +575,16 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         }
         return val;
     }
+    
+    /**
+     * Returns whether {@code string} is a non-empty string.
+     * 
+     * @param string the string to test
+     * @return {@code true} for a non-empty string, {@code false} for an empty string or <b>null</b>
+     */
+    private static boolean isNonEmptyString(String string) {
+        return string != null && string.length() > 0;
+    }
 
     /**
      * Changes an application/graph structure in IVML. Application/mesh files are dynamically linked and require
@@ -581,7 +592,8 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
      * 
      * @param appName the configured name of the application
      * @param appValueEx the application value as IVML expression
-     * @param meshName the configured name of the service mesh (may be <b>null</b> or empty for none).
+     * @param meshName the configured name of the service mesh (may be <b>null</b> or empty for none; used as import 
+     *    resolution if given, existing and {@code format} or {@code value} are not given).
      * @param format the format of the graph (may be <b>null</b> or empty for none).
      * @param value the value (may be <b>null</b> or empty for none).
      * @return <b>null</b> always
@@ -589,19 +601,19 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
      */
     public synchronized Object setGraph(String appName, String appValueEx, String meshName, String format, 
         String value) throws ExecutionException {
-        boolean doApp = appName != null && appName.length() > 0;
-        boolean doMesh = meshName != null && meshName.length() > 0;
+        boolean doApp = isNonEmptyString(appName);
+        boolean doMesh = isNonEmptyString(meshName) && isNonEmptyString(format) && isNonEmptyString(value);
         if (doApp || doMesh) {
             LoggerFactory.getLogger(getClass()).info("Setting graph in IVML app {} = {}, mesh {}, format {}", 
                 appName, appValueEx, meshName, format); // no graph, may become too long
             GraphFormat gFormat = getGraphFormat(format);
-            IvmlGraph graph = gFormat.fromString(value, getMapper().getGraphFactory(), this);
             
             try {
                 ModelResults results = new ModelResults();
                 if (doMesh) {
+                    IvmlGraph graph = gFormat.fromString(value, getMapper().getGraphFactory(), this);
                     createMeshProject(appName, meshName, graph, results);
-                }
+                } 
                 if (doApp) {
                     createAppProject(appName, appValueEx, results);
                 }
@@ -692,7 +704,18 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         String appProjectName = getApplicationProjectName(appName);
         results.appProject = findOrCreateProject(root, appProjectName, true); 
         addImport(results.appProject, "Applications", root, null);
-        addImport(results.appProject, "ServiceMeshPart*", root, results.meshProject);
+        addImport(results.appProject, "AllServices", root, null);
+        // > may go down to easy
+        Project wildcardPrj = new Project("");
+        for (String modelName : VarModel.INSTANCE.getMatchingModelNames("ServiceMeshPart*")) {
+            Project tmp = ModelQuery.findProject(root, modelName);
+            if (null != tmp) {
+                addImport(wildcardPrj, modelName, root, tmp);
+            }
+        }
+        addImport(results.appProject, "ServiceMeshPart*", root, wildcardPrj);
+
+        // < may go down to Easy
         List<Object> meshes = new ArrayList<Object>();
         boolean replaced = false;
         if (results.appProject != null) {
