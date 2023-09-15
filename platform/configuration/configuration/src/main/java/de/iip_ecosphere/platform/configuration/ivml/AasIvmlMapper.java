@@ -828,6 +828,24 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         }
         return node.getName();
     }
+    
+    /**
+     * Turns {@code string} into an identifier, i.e., each non-Java identifier characters into a "_".
+     * 
+     * @param string the string to be checked
+     * @return the validated string, potentially modified to be an id
+     */
+    private static String toId(String string) {
+        StringBuffer result = new StringBuffer();
+        for (int i = 0; i < string.length(); i++) {
+            char c = string.charAt(i);
+            if (!Character.isJavaIdentifierPart(c)) {
+                c = '_';
+            }
+            result.append(c);
+        }
+        return result.toString();
+    }
 
     /**
      * Creates a mesh project for {@code graph}.
@@ -847,6 +865,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         String meshProjectName = getMeshProjectName(appName, meshName);
         results.meshProject = findOrCreateProject(root, meshProjectName, false); // just overwrite
         addImport(results.meshProject, "Applications", root, null);
+        addImport(results.meshProject, "AllServices", root, null);
         final IDatatype sourceType = ModelQuery.findType(root, "MeshSource", null);
         final IDatatype processorType = ModelQuery.findType(root, "MeshProcessor", null);
         final IDatatype sinkType = ModelQuery.findType(root, "MeshSink", null);
@@ -866,8 +885,8 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             } else {
                 type = processorType; // TODO Probe service
             }
-            DecisionVariableDeclaration nodeVar = new DecisionVariableDeclaration("node_" 
-                + validateName(n, nodeMap.size()), type, results.meshProject);
+            DecisionVariableDeclaration nodeVar = new DecisionVariableDeclaration(toId("node_" 
+                + validateName(n, nodeMap.size())), type, results.meshProject);
             String nodeValEx = "{pos_x=" + n.getXPos() + ",pos_y=" + n.getYPos() 
                 + ",impl=" + IvmlUtils.getVarNameSafe(findServiceVar(services, n.getImpl()), "null")
                 + ",next = {";
@@ -891,7 +910,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                     edgeVarName, connectorType, results.meshProject);
                 results.meshProject.add(edgeVar);
                 DecisionVariableDeclaration end = nodeMap.get(e.getEnd());
-                String valueEx = "{name=\"" + edgeName + "\", next=refBy(" + end.getName() + ")}";
+                String valueEx = "{name=\"" + edgeName + "\", next=refBy(" + toId(end.getName()) + ")}";
                 setValue(edgeVar, valueEx);
                 String startNodeValueEx = valueMap.get(nodeMap.get(n));
                 if (!startNodeValueEx.endsWith("{")) {
