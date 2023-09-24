@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -61,19 +62,23 @@ public class Starter {
     public static final String PARAM_IIP_PORT = "iip.port";
     public static final String PARAM_IIP_APP_ID = "iip.appId";
     public static final String PARAM_IIP_TRANSPORT_GLOBAL = "iip.transport.global";
+    public static final String PARAM_IIP_START_SERVER = "iip.start.server";
+    public static final String PARAM_IIP_START_SERVER_ONLY = "iip.start.serverOnly";
+    public static final String IIP_APP_PREFIX = "iip.app.";
+    
     public static final String PARAM_IIP_TEST_TRANSPORT_PORT = "iip.test.transport.port";
     public static final String PARAM_IIP_TEST_AAS_PORT = "iip.test.aas.port";
     public static final String PARAM_IIP_TEST_AASREG_PORT = "iip.test.aasRegistry.port";
     public static final String PARAM_IIP_TEST_SERVICE_AUTOSTART = "iip.test.service.autostart";
     public static final String ARG_AAS_NOTIFICATION = "iip.test.aas.notification";
     public static final String PROPERTY_JAVA8 = "iip.test.java8";
-    public static final String IIP_APP_PREFIX = "iip.app.";
     public static final String IIP_TEST = "iip.test";
     public static final String IIP_TEST_PREFIX = "iip.test.";
     public static final String IIP_TEST_PLUGIN = "iip.test.plugin";
     
     private static ProtocolServerBuilder builder;
-    private static Server server;
+    private static Server cmdServer;
+    private static Server appServer;
     private static Map<String, Integer> servicePorts = new HashMap<>();
     private static Map<String, Service> mappedServices = new HashMap<>();
     private static boolean serviceAutostart = false; // shall be off, done by platform, only for testing
@@ -189,7 +194,7 @@ public class Starter {
     public static boolean inTest() {
         return Boolean.valueOf(OsUtils.getPropertyOrEnv(IIP_TEST, "false"));
     }
-    
+
     /**
      * Adds all environment properties starting with {@link #IIP_APP_PREFIX} or {@link #IIP_TEST_PREFIX} to the command 
      * line of the service to be started.
@@ -243,7 +248,7 @@ public class Starter {
             String prop = System.getProperty(PROPERTY_JAVA8, null);
             if (prop != null) {
                 File java8 = new File(prop);
-                LoggerFactory.getLogger(Starter.class).info("Setting Java8 to: {}", java8);
+                getLogger().info("Setting Java8 to: {}", java8);
                 InstalledDependenciesSetup.getInstance().setLocation(InstalledDependenciesSetup.KEY_JAVA_8, java8);
             }
         }
@@ -273,6 +278,40 @@ public class Starter {
                         System.setProperty(key, value);
                     }
                 }
+            }
+        }
+    }
+
+    /**
+     * Starts a server instance passed in by {@link #PARAM_IIP_START_SERVER}.
+     * 
+     * @param args the command line arguments
+     */
+    protected static void startServer(String[] args) {
+        String clsName = CmdLine.getArg(args, PARAM_IIP_START_SERVER, "");
+        if (clsName.length() > 0) {
+            try {
+                Class<?> cls = Class.forName(clsName); 
+                Object o;
+                try {
+                    o = cls.getConstructor(String[].class).newInstance((Object) args);
+                } catch (NoSuchMethodException e) {
+                    o = cls.getConstructor().newInstance();
+                }
+                if (o instanceof Server) {
+                    getLogger().info("Starting server {} ", clsName);
+                    appServer = (Server) o;
+                    appServer.start();
+                    Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                        Server.stop(appServer, true);
+                        appServer = null;
+                    }));
+                }
+            } catch (ClassNotFoundException  e) {
+                getLogger().error("Starting server {}: Cannot find class {}", clsName, e.getMessage());
+            } catch (InvocationTargetException | IllegalAccessException | InstantiationException 
+                | NoSuchMethodException e) {
+                getLogger().error("Starting server {}, cannot invoke constructor: {}", clsName, e.getMessage());
             }
         }
     }
@@ -403,11 +442,21 @@ public class Starter {
     public static Service getMappedService(String serviceId) {
         return null == serviceId ? null : mappedServices.get(serviceId);
     }
-    
+
+    /**
+     * Returns whether only server instances in {@link #PARAM_IIP_START_SERVER} shall be started.
+     * 
+     * @param args the command line arguments
+     * @return {@code true} for server instances only, {@code false} for fill app with selected services
+     */
+    protected static boolean startServerOnly(String... args) {
+        return getBooleanArg(args, PARAM_IIP_START_SERVER_ONLY, false);
+    }
+
     /**
      * Parses command line arguments. Collects information for {@link #getServicePort(String)}.
      * 
-     * @param args the arguments
+     * @param args the command line arguments
      */
     public static void parse(String... args) {
         transferArgsToEnvironment(args);
@@ -467,6 +516,7 @@ public class Starter {
         getLogger().info("Configuring service command server for protocol '" + protocol 
             + "' (empty means default) and port " + port);
         builder = factory.createProtocolServerBuilder(protocol, port);
+        startServer(args);
     }
     
     /**
@@ -475,8 +525,8 @@ public class Starter {
     public static void start() {
         if (null != builder) {
             getLogger().info("Starting service command server");
-            server = builder.build();
-            server.start();
+            cmdServer = builder.build();
+            cmdServer.start();
         } else {
             getLogger().error("Cannot start service command server as no builder is set.");
         }
@@ -524,7 +574,6 @@ public class Starter {
             if (null != mapper && null != Starter.getProtocolBuilder()) {
                 mapper.mapService(service);
             }
-            // TODO -> ServiceState.DEPLOYED
             if (serviceAutostart && enableAutostart && service.isTopLevel()) {
                 try {
                     getLogger().info("Service autostart: '{}' '{}'", service.getId(), service.getClass().getName());
@@ -646,9 +695,8 @@ public class Starter {
      * Terminates running server instances.
      */
     public static void shutdown() {
-        if (null != server) {
-            server.stop(false); 
-        }
+        Server.stop(cmdServer, false);
+        Server.stop(appServer, true);
     }
     
     /**
@@ -659,7 +707,7 @@ public class Starter {
     public static EnvironmentSetup getSetup() {
         if (null == setup) {
             try {
-                LoggerFactory.getLogger(Starter.class).info("Loading setup");
+                getLogger().info("Loading setup");
                 setup = EnvironmentSetup.readFromYaml(EnvironmentSetup.class, getApplicationSetupAsStream());
                 if (transportPort > 0) {
                     setup.getTransport().setPort(transportPort);
@@ -672,8 +720,7 @@ public class Starter {
                 
                 // globalhost is part of transport setup.
                 TransportSetup globalSetup = setup.getTransport();
-                LoggerFactory.getLogger(Starter.class).info("Global transport {}:{}", 
-                    globalSetup.getHost(), globalSetup.getPort());
+                getLogger().info("Global transport {}:{}", globalSetup.getHost(), globalSetup.getPort());
                 
                 if (!transportGlobal && enablesLocalTransport(globalSetup)) {
                     TransportSetup lSetup = localTransportSetupSupplier.apply(setup);
@@ -683,16 +730,15 @@ public class Starter {
                     }
                     TransportSetup localSetup = lSetup;
                     if (null != localSetup) {
-                        LoggerFactory.getLogger(Starter.class).info("Local transport {}:{}", 
-                            localSetup.getHost(), localSetup.getPort());
+                        getLogger().info("Local transport {}:{}", localSetup.getHost(), localSetup.getPort());
                         Transport.setLocalSetup(() -> localSetup);
                     }
                 } else {
-                    LoggerFactory.getLogger(Starter.class).info("Local transport: use global as it is local");
+                    getLogger().info("Local transport: use global as it is local");
                 }
             } catch (IOException e) {
                 setup = new EnvironmentSetup();
-                LoggerFactory.getLogger(Starter.class).warn("Cannot read application.yml. Aas/Transport setup invalid");
+                getLogger().warn("Cannot read application.yml. Aas/Transport setup invalid");
             }
         }
         return setup;
