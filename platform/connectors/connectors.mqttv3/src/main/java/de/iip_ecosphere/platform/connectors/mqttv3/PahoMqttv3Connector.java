@@ -108,12 +108,22 @@ public class PahoMqttv3Connector<CO, CI> extends AbstractChannelConnector<byte[]
         @Override
         public void connectionLost(Throwable cause) {
             // if reconnect allowed, do nothing else close client
+            LoggerFactory.getLogger(getClass()).error("Connection lost: {}", cause.getMessage(), cause);
         }
 
+        // checkstyle: stop exception type check
+        
         @Override
         public void messageArrived(String topic, MqttMessage message) throws Exception {
-            received(topic, message.getPayload());
+            try {            
+                received(topic, message.getPayload());
+            } catch (Exception e) {
+                LoggerFactory.getLogger(getClass()).error("When receiving MQTT message: {}", e.getMessage(), e);
+                throw e;
+            }
         }
+
+        // checkstyle: resume exception type check
 
         @Override
         public void deliveryComplete(IMqttDeliveryToken token) {

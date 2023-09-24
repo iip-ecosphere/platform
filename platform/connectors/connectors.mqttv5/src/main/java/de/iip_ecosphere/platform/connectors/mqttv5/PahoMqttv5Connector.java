@@ -104,10 +104,19 @@ public class PahoMqttv5Connector<CO, CI> extends AbstractChannelConnector<byte[]
      */
     private class Callback implements MqttCallback {
 
+        // checkstyle: stop exception type check
+
         @Override
         public void messageArrived(String topic, MqttMessage message) throws Exception {
-            received(topic, message.getPayload());
+            try {            
+                received(topic, message.getPayload());
+            } catch (Exception e) {
+                LoggerFactory.getLogger(getClass()).error("When receiving MQTT message: {}", e.getMessage(), e);
+                throw e;
+            }
         }
+
+        // checkstyle: resume exception type check
 
         @Override
         public void disconnected(MqttDisconnectResponse disconnectResponse) {
@@ -117,6 +126,7 @@ public class PahoMqttv5Connector<CO, CI> extends AbstractChannelConnector<byte[]
         @Override
         public void mqttErrorOccurred(MqttException exception) {
             // nothing
+            LoggerFactory.getLogger(getClass()).error("MQTT error: {}", exception.getMessage(), exception);
         }
 
         @Override
