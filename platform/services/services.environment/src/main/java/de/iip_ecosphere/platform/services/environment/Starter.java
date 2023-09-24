@@ -286,34 +286,40 @@ public class Starter {
      * Starts a server instance passed in by {@link #PARAM_IIP_START_SERVER}.
      * 
      * @param args the command line arguments
+     * @return {@code true} for handled, {@code false} for not handled
      */
-    protected static void startServer(String[] args) {
-        String clsName = CmdLine.getArg(args, PARAM_IIP_START_SERVER, "");
-        if (clsName.length() > 0) {
-            try {
-                Class<?> cls = Class.forName(clsName); 
-                Object o;
+    protected static boolean startServer(String[] args) {
+        boolean handled = false;
+        if (getBooleanArg(args, PARAM_IIP_START_SERVER_ONLY, false)) {
+            handled = true;
+            String clsName = CmdLine.getArg(args, PARAM_IIP_START_SERVER, "");
+            if (clsName.length() > 0) {
                 try {
-                    o = cls.getConstructor(String[].class).newInstance((Object) args);
-                } catch (NoSuchMethodException e) {
-                    o = cls.getConstructor().newInstance();
+                    Class<?> cls = Class.forName(clsName); 
+                    Object o;
+                    try {
+                        o = cls.getConstructor(String[].class).newInstance((Object) args);
+                    } catch (NoSuchMethodException e) {
+                        o = cls.getConstructor().newInstance();
+                    }
+                    if (o instanceof Server) {
+                        getLogger().info("Starting server {} ", clsName);
+                        appServer = (Server) o;
+                        appServer.start();
+                        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                            Server.stop(appServer, true);
+                            appServer = null;
+                        }));
+                    }
+                } catch (ClassNotFoundException  e) {
+                    getLogger().error("Starting server {}: Cannot find class {}", clsName, e.getMessage());
+                } catch (InvocationTargetException | IllegalAccessException | InstantiationException 
+                    | NoSuchMethodException e) {
+                    getLogger().error("Starting server {}, cannot invoke constructor: {}", clsName, e.getMessage());
                 }
-                if (o instanceof Server) {
-                    getLogger().info("Starting server {} ", clsName);
-                    appServer = (Server) o;
-                    appServer.start();
-                    Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                        Server.stop(appServer, true);
-                        appServer = null;
-                    }));
-                }
-            } catch (ClassNotFoundException  e) {
-                getLogger().error("Starting server {}: Cannot find class {}", clsName, e.getMessage());
-            } catch (InvocationTargetException | IllegalAccessException | InstantiationException 
-                | NoSuchMethodException e) {
-                getLogger().error("Starting server {}, cannot invoke constructor: {}", clsName, e.getMessage());
             }
         }
+        return handled;
     }
     
     /**
@@ -444,16 +450,6 @@ public class Starter {
     }
 
     /**
-     * Returns whether only server instances in {@link #PARAM_IIP_START_SERVER} shall be started.
-     * 
-     * @param args the command line arguments
-     * @return {@code true} for server instances only, {@code false} for fill app with selected services
-     */
-    protected static boolean startServerOnly(String... args) {
-        return getBooleanArg(args, PARAM_IIP_START_SERVER_ONLY, false);
-    }
-
-    /**
      * Parses command line arguments. Collects information for {@link #getServicePort(String)}.
      * 
      * @param args the command line arguments
@@ -516,7 +512,6 @@ public class Starter {
         getLogger().info("Configuring service command server for protocol '" + protocol 
             + "' (empty means default) and port " + port);
         builder = factory.createProtocolServerBuilder(protocol, port);
-        startServer(args);
     }
     
     /**
@@ -805,8 +800,10 @@ public class Starter {
     public static void main(String[] args) {
         registerDefaultPlugins(a -> Starter.start());
         Starter.parse(args);
-        getSetup(); // ensure instance
-        runPlugin(args);
+        if (!startServer(args)) {
+            getSetup(); // ensure instance
+            runPlugin(args);
+        }
     }
 
 }

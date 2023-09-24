@@ -33,7 +33,7 @@ public abstract class AbstractDelegatingService<S extends Service> implements Se
      * Creates an instance.
      * 
      * @param yaml the service description YAML
-     * @see #initService()
+     * @see #initService(YamlService)
      */
     public AbstractDelegatingService(YamlService yaml) {
         initService(yaml);

@@ -470,7 +470,7 @@ public abstract class TransportConverter<T> {
     /**
      * Turns a submodel element collection with endpoint information into an endpoint object.
      * 
-     * @param endpoint the submodel, e.g., from {@link #getEndpoint(ElementContainer, String))}
+     * @param endpoint the submodel, e.g., from {@link #getEndpoint(ElementContainer, String)}
      * @return the endpoint object, may be <b>null</b> if the object cannot be created
      */
     public static Endpoint getEndpoint(SubmodelElementCollection endpoint) {
