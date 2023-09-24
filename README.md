@@ -1,8 +1,8 @@
-<table border="0">
- <tr>
-  <td><img src="platform/oktoflow.png" alt="oktoflow" width="150"/></td>
-  <td><h1>oktoflow/IIP-Ecosphere AI-enabled Industry 4.0/IIoT platform </h1></td>
-  <td><img src="platform/logo.png" alt="IIP-Ecosphere" width="150"/></td>
+<table style="border:0px;">
+ <tr style="border:0px;">
+  <td style="border:0px;"><img src="platform/oktoflow.png" alt="oktoflow" width="150"/></td>
+  <td style="border:0px;"><h1>oktoflow/IIP-Ecosphere AI-enabled Industry 4.0/IIoT platform </h1></td>
+  <td style="border:0px;"><img src="platform/logo.png" alt="IIP-Ecosphere" width="150"/></td>
  </tr>
 </table>
 
