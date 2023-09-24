@@ -82,7 +82,7 @@ To ease the first steps, we provided Demonstration and Development Docker Contai
 <a href="https://iot.eclipse.org"><img src="https://iot.eclipse.org/iot-logo-social.png" alt="Eclipse IoT" width="100"/></a> 
 <a href="https://www.docker.com"><img src="https://www.docker.com/wp-content/uploads/2022/03/vertical-logo-monochromatic.png" alt="Docker" width="100"/></a> 
 <a href="https://prometheus.io"><img src="https://prometheus.io/assets/favicons/android-chrome-192x192.png" alt="Prometheus Monitoring" width="100"/></a>
-<a href="https://flower.dev"><img src="https://flower.dev/docs/_static/flower-logo.png" width="100"/></a>
+<a href="https://flower.dev"><img src="https://flower.dev/_next/image/?url=%2F_next%2Fstatic%2Fmedia%2Flogo_with_text.be92f189.png&w=256&q=75" width="100"/></a>
 <br/>
 
 <a href="https://spring.io"><img src="https://docs.spring.io/spring-cloud-stream/docs/current/reference/html/img/banner-logo.svg" alt="Spring Cloud Stream" width="200"/></a> 
