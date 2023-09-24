@@ -25,6 +25,8 @@ import de.iip_ecosphere.platform.services.spring.descriptor.Server;
 public class YamlServer extends de.iip_ecosphere.platform.services.environment.YamlServer 
     implements Server {
 
+    private long memory = -1;
+    
     @Override
     public List<String> getCmdArg(int port, String protocol) {
         return YamlProcess.substCmdArg(getCmdArg(), port, protocol);
@@ -48,6 +50,21 @@ public class YamlServer extends de.iip_ecosphere.platform.services.environment.Y
     @Override
     public int getWaitTime() {
         return 0;
+    }
+
+    @Override
+    public long getMemory() {
+        return memory;
+    }
+
+    /**
+     * Defines the desired memory for instances of this service.
+     * 
+     * @param memory the desired memory in <a href="https://en.wikipedia.org/wiki/Mebibyte">Mebibytes</a> (i.e., "m"), 
+     *   ignored if not positive
+     */
+    public void setMemory(long memory) {
+        this.memory = memory;
     }
 
 }

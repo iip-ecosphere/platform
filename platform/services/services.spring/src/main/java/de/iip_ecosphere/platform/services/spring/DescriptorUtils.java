@@ -18,9 +18,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -48,7 +45,6 @@ import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.JarUtils;
 import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.ServerAddress;
-import de.iip_ecosphere.platform.support.ZipUtils;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.support.setup.CmdLine;
@@ -342,79 +338,7 @@ public class DescriptorUtils {
         return launcher.createClassLoader();
     }
 
-    /**
-     * Determines the class loader of the {@code artifact}.
-     * 
-     * @param artifact the artifact to determine the class loader for
-     * @param homeDir process home dir to use for unpacking, may be <b>null</b> for none/unknown
-     * @return the class loader
-     */
-    public static ClassLoader determineArtifactClassLoader(SpringCloudArtifactDescriptor artifact, File homeDir) {
-        ClassLoader loader = SpringCloudServiceManager.class.getClassLoader();
-        String artId = artifact.getId();
-        File jar = artifact.getJar();
-        String jarName = jar.getName();
-        if (jarName.endsWith(".jar")) { 
-            getLogger().info("Creating Spring classloader for {}/{}", artId, jar);
-            try {
-                loader = createClassLoader(jar);
-            } catch (Exception e) {
-                getLogger().warn("Cannot create Spring classloader for {}: {}", jar, e.getMessage());
-                // use loader as fallback
-            }
-        } else if (jarName.endsWith(".zip")) {
-            try {
-                File tmp = homeDir;
-                if (null == tmp) {
-                    tmp = FileUtils.createTmpFolder(FileUtils.sanitizeFileName(artId), true);
-                }
-                getLogger().info("Creating URL classloader for {}/{} unpacked to {}", artId, jar, tmp);
-                tmp.deleteOnExit();
-                ZipUtils.extractZip(new FileInputStream(jar), tmp.toPath());
-                // may look for classpath file and take that into account!
-                List<URL> jars = new ArrayList<URL>();
-                FileUtils.listFiles(tmp, f -> f.isDirectory() || f.getName().endsWith(".jar"), 
-                    f -> addUrlSafe(jars, f));
-                getLogger().info("Jars in classpath for {}: {}", artId, jars);
-                loader = new URLClassLoader(jars.toArray(new URL[jars.size()]));
-            } catch (IOException e) {
-                getLogger().warn("Cannot unpack ZIP {}. Classloading may fail", jar, e.getMessage());
-            }
-        }
-        return loader;
-    }
-
-    /**
-     * Adds the URL of {@code file} to {@code urls}. Emits a warning if URL problems occur.
-     * 
-     * @param urls the URL list to be modified as a side effect
-     * @param file the file to take the URL from
-     */
-    private static void addUrlSafe(List<URL> urls, File file) {
-        if (file.isFile()) {
-            try {
-                urls.add(file.toURI().toURL());
-            } catch (MalformedURLException e) {
-                getLogger().warn("Cannot turn file {} into URL. Classpath may be incomplete: {}", file, e.getMessage());
-            }
-        }
-    }
-
     // checkstyle: resume exception type check
-
-    /**
-     * Determines the class loader of the artifact of {@code service}.
-     * 
-     * @param service the service to determine the class loader for
-     * @return the class loader
-     */
-    public static ClassLoader determineArtifactClassLoader(SpringCloudServiceDescriptor service) {
-        File homePath = null;
-        if (null != service.getSvc() && null != service.getSvc().getProcess()) {
-            homePath = service.getSvc().getProcess().getHomePath();
-        }
-        return determineArtifactClassLoader(service.getArtifact(), homePath);
-    }
 
     /**
      * Returns the logger.

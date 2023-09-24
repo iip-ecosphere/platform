@@ -160,11 +160,11 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
     }
     
     /**
-     * If the service represents a server, return the server specification.
+     * If the service represents a server, return the server specification. [public for testing]
      * 
      * @return the server specification, may be <b>null</b>
      */
-    Server getServer() {
+    public Server getServer() {
         return server;
     }
 

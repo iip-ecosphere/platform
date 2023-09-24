@@ -14,6 +14,7 @@ package de.iip_ecosphere.platform.services.spring;
 
 import static de.iip_ecosphere.platform.services.spring.SpringInstances.getConfig;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -22,6 +23,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -33,12 +35,14 @@ import de.iip_ecosphere.platform.services.ServiceManager;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.services.environment.spring.Starter;
 import de.iip_ecosphere.platform.services.spring.descriptor.Server;
+import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.iip_aas.Id;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
 import de.iip_ecosphere.platform.support.net.NetworkManager;
+import de.iip_ecosphere.platform.support.setup.CmdLine;
 
 /**
  * Manages server instances.
@@ -60,6 +64,90 @@ public class ServerManager {
      */
     public ServerManager(Supplier<NetworkManager> networkManagerSupplier) {
         this.networkManagerSupplier = networkManagerSupplier;
+    }
+
+    /**
+     * Wraps a spawned JVM process into a {@link Server} instance.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static class JvmServerProcess implements de.iip_ecosphere.platform.support.Server {
+        
+        private File home; 
+        private SpringCloudArtifactDescriptor art; 
+        private Server server;
+        private String[] args;
+        private Process process;
+
+        /**
+         * Creates the JVM server process.
+         * 
+         * @param home the process home
+         * @param art the descriptor of the artifact containing the application
+         * @param server the information of the server to be started as JVM
+         * @param args the command line arguments
+         */
+        private JvmServerProcess(File home, SpringCloudArtifactDescriptor art, Server server, String[] args) {
+            this.server = server;
+            this.args = args;
+            this.home = home;
+            this.art = art;
+        }
+
+        @Override
+        public de.iip_ecosphere.platform.support.Server start() {
+            List<String> a = new ArrayList<>();
+            ProcessHandle processHandle = ProcessHandle.current();
+            Optional<String> opt = processHandle.info().command();
+            a.add(opt.orElseGet(() -> "java"));
+            if (server.getMemory() > 0) {
+                a.add("-Xmx" + server.getMemory() + "M");
+            }
+            new ArtifactResolver(art, home).addClasspathArguments(a, home);
+            CollectionUtils.addAll(a, args);
+            a.add(CmdLine.composeArgument(Starter.PARAM_IIP_START_SERVER, server.getCls()));
+            a.add(CmdLine.composeArgument(Starter.PARAM_IIP_START_SERVER_ONLY, true));
+            LOGGER.info("Start server with {} in {}", a, home);
+            try {
+                process = new ProcessBuilder(a)
+                    .inheritIO()
+                    .directory(home)
+                    .start();
+            } catch (IOException e) {
+                LOGGER.error("Cannot start server: {}", e.getMessage());
+            }
+            return this;
+        }
+
+        @Override
+        public void stop(boolean dispose) {
+            if (null != process) {
+                process.destroyForcibly();
+            }
+        }
+        
+    }
+
+    /**
+     * Obtains a class loader from {@code loaders} or adds a new one determined by 
+     * {@link DescriptorUtils#determineArtifactClassLoader(SpringCloudServiceDescriptor)}.
+     * 
+     * @param loaders the class loaders
+     * @param sDesc the service descriptor
+     * @return the class loader
+     */
+    private ClassLoader obtainLoader(Map<SpringCloudArtifactDescriptor, ClassLoader> loaders, 
+        SpringCloudServiceDescriptor sDesc) {
+        ClassLoader loader = loaders.get(sDesc.getArtifact());
+        if (null == loader) {
+            File homePath = null;
+            if (null != sDesc.getSvc() && null != sDesc.getSvc().getProcess()) {
+                homePath = sDesc.getSvc().getProcess().getHomePath();
+            }
+            loader = new ArtifactResolver(sDesc.getArtifact(), homePath).determineArtifactClassLoader();
+            loaders.put(sDesc.getArtifact(), loader);
+        }
+        return loader;
     }
     
     /**
@@ -83,22 +171,23 @@ public class ServerManager {
                     if (null == netClient.getPort(id)) {
                         try {
                             // current assumption: process comes with valid path, temporary path -> cmdLine
-                            Starter.extractProcessArtifacts(id, s.getServer(), s.getArtifact().getJar(), 
-                                SpringInstances.getConfig().getDownloadDir());
                             Server ser = s.getServer();
-                            ClassLoader loader = loaders.get(s.getArtifact());
-                            if (null == loader) {
-                                loader = DescriptorUtils.determineArtifactClassLoader(s);
-                                loaders.put(s.getArtifact(), loader);
-                            }
-                            Class<?> cls = Class.forName(ser.getCls(), true, loader); 
+                            File serverDir = Starter.extractProcessArtifacts(id, s.getServer(), 
+                                s.getArtifact().getJar(), SpringInstances.getConfig().getDownloadDir());
+                            List<String> cmdLine = s.collectCmdArguments(getConfig(), ser.getPort(), "");
                             Object o;
-                            try {
-                                List<String> cmdLine = s.collectCmdArguments(getConfig(), ser.getPort(), "");
-                                o = cls.getConstructor(String[].class).newInstance(
-                                    (Object) cmdLine.toArray(new String[0]));
-                            } catch (NoSuchMethodException e) {
-                                o = cls.getConstructor().newInstance();
+                            if (ser.getAsProcess()) {
+                                o = new JvmServerProcess(serverDir, s.getArtifact(), ser, 
+                                    cmdLine.toArray(new String[0]));
+                            } else {
+                                ClassLoader loader = obtainLoader(loaders, s);
+                                Class<?> cls = Class.forName(ser.getCls(), true, loader); 
+                                try {
+                                    o = cls.getConstructor(String[].class).newInstance(
+                                        (Object) cmdLine.toArray(new String[0]));
+                                } catch (NoSuchMethodException e) {
+                                    o = cls.getConstructor().newInstance();
+                                }
                             }
                             if (o instanceof de.iip_ecosphere.platform.support.Server) {
                                 LOGGER.info("Starting server {} ", id);
@@ -158,6 +247,15 @@ public class ServerManager {
                 }
             }
         }
+    }
+    
+    /**
+     * Returns the number of running servers.
+     * 
+     * @return the number of running servers
+     */
+    public int getRunningServersCount() {
+        return runningServers.size();
     }
 
     /**
