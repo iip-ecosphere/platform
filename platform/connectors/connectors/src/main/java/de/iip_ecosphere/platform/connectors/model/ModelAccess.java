@@ -102,6 +102,142 @@ public interface ModelAccess {
     public default Object get(String qName, int lifetime) throws IOException {
         return get(qName);
     }
+    
+    /**
+     * Returns an int property value.
+     * 
+     * @param qName the qualified name of the property (composed using {@link #getQSeparator()}).
+     * @return the property value
+     * @throws IOException in case that the access/conversion fails or reading properties is not implemented (see 
+     * {@link MachineConnector#supportsModelProperties()} is {@code false})
+     */
+    public default int getInt(String qName) throws IOException {
+        Object tmp = get(qName);
+        if (tmp.getClass() == Integer.class) {
+            return ((Integer) tmp).intValue();
+        } else {
+            throw new IOException("Cannot turn " + tmp + "into an int");
+        }
+    }
+
+    /**
+     * Returns a float property value.
+     * 
+     * @param qName the qualified name of the property (composed using {@link #getQSeparator()}).
+     * @return the property value
+     * @throws IOException in case that the access/conversion fails or reading properties is not implemented (see 
+     * {@link MachineConnector#supportsModelProperties()} is {@code false})
+     */
+    public default float getFloat(String qName) throws IOException {
+        Object tmp = get(qName);
+        if (tmp.getClass() == Float.class) {
+            return ((Float) tmp).floatValue();
+        } else {
+            throw new IOException("Cannot turn " + tmp + "into a double");
+        }
+    }
+
+    /**
+     * Returns a double property value.
+     * 
+     * @param qName the qualified name of the property (composed using {@link #getQSeparator()}).
+     * @return the property value
+     * @throws IOException in case that the access/conversion fails or reading properties is not implemented (see 
+     * {@link MachineConnector#supportsModelProperties()} is {@code false})
+     */
+    public default double getDouble(String qName) throws IOException {
+        Object tmp = get(qName);
+        if (tmp.getClass() == Double.class) {
+            return ((Double) tmp).doubleValue();
+        } else {
+            throw new IOException("Cannot turn " + tmp + "into a double");
+        }
+    }
+
+    /**
+     * Returns a double property value.
+     * 
+     * @param qName the qualified name of the property (composed using {@link #getQSeparator()}).
+     * @return the property value
+     * @throws IOException in case that the access/conversion fails or reading properties is not implemented (see 
+     * {@link MachineConnector#supportsModelProperties()} is {@code false})
+     */
+    public default long getLong(String qName) throws IOException {
+        Object tmp = get(qName);
+        if (tmp.getClass() == Long.class) {
+            return ((Long) tmp).longValue();
+        } else {
+            throw new IOException("Cannot turn " + tmp + "into a long");
+        }
+    }
+
+    /**
+     * Returns a short property value.
+     * 
+     * @param qName the qualified name of the property (composed using {@link #getQSeparator()}).
+     * @return the property value
+     * @throws IOException in case that the access/conversion fails or reading properties is not implemented (see 
+     * {@link MachineConnector#supportsModelProperties()} is {@code false})
+     */
+    public default short getShort(String qName) throws IOException {
+        Object tmp = get(qName);
+        if (tmp.getClass() == Short.class) {
+            return ((Short) tmp).shortValue();
+        } else {
+            throw new IOException("Cannot turn " + tmp + "into a long");
+        }
+    }
+
+    /**
+     * Returns a byte property value.
+     * 
+     * @param qName the qualified name of the property (composed using {@link #getQSeparator()}).
+     * @return the property value
+     * @throws IOException in case that the access/conversion fails or reading properties is not implemented (see 
+     * {@link MachineConnector#supportsModelProperties()} is {@code false})
+     */
+    public default byte getByte(String qName) throws IOException {
+        Object tmp = get(qName);
+        if (tmp.getClass() == Short.class) {
+            return ((Byte) tmp).byteValue();
+        } else {
+            throw new IOException("Cannot turn " + tmp + "into a byte");
+        }
+    }
+
+    /**
+     * Returns a byte property value.
+     * 
+     * @param qName the qualified name of the property (composed using {@link #getQSeparator()}).
+     * @return the property value
+     * @throws IOException in case that the access/conversion fails or reading properties is not implemented (see 
+     * {@link MachineConnector#supportsModelProperties()} is {@code false})
+     */
+    public default boolean getBoolean(String qName) throws IOException {
+        Object tmp = get(qName);
+        if (tmp.getClass() == Short.class) {
+            return ((Boolean) tmp).booleanValue();
+        } else {
+            throw new IOException("Cannot turn " + tmp + "into a boolean");
+        }
+    }
+
+    /**
+     * Returns a byte property value.
+     * 
+     * @param qName the qualified name of the property (composed using {@link #getQSeparator()}).
+     * @return the property value
+     * @throws IOException in case that the access/conversion fails or reading properties is not implemented (see 
+     * {@link MachineConnector#supportsModelProperties()} is {@code false})
+     */
+    public default String getString(String qName) throws IOException {
+        Object tmp = get(qName);
+        if (tmp.getClass() == String.class) {
+            return (String) tmp;
+        } else {
+            throw new IOException("Cannot turn " + tmp + "into a string");
+        }
+    }
 
     /**
      * Changes a property value.
@@ -112,6 +248,102 @@ public interface ModelAccess {
      * {@link MachineConnector#supportsModelProperties()} is {@code false})
      */
     public void set(String qName, Object value) throws IOException;
+
+    /**
+     * Changes an int property value.
+     * 
+     * @param qName the qualified name of the property (composed using {@link #getQSeparator()}).
+     * @param value the new property value
+     * @throws IOException in case that the access fails or setting properties is not implemented (see 
+     * {@link MachineConnector#supportsModelProperties()} is {@code false})
+     */
+    public default void setInt(String qName, int value) throws IOException {
+        set(qName, value);
+    }
+
+    /**
+     * Changes a long property value.
+     * 
+     * @param qName the qualified name of the property (composed using {@link #getQSeparator()}).
+     * @param value the new property value
+     * @throws IOException in case that the access fails or setting properties is not implemented (see 
+     * {@link MachineConnector#supportsModelProperties()} is {@code false})
+     */
+    public default void setLong(String qName, long value) throws IOException {
+        set(qName, value);
+    }
+
+    /**
+     * Changes a byte property value.
+     * 
+     * @param qName the qualified name of the property (composed using {@link #getQSeparator()}).
+     * @param value the new property value
+     * @throws IOException in case that the access fails or setting properties is not implemented (see 
+     * {@link MachineConnector#supportsModelProperties()} is {@code false})
+     */
+    public default void setByte(String qName, byte value) throws IOException {
+        set(qName, value);
+    }
+
+    /**
+     * Changes a short property value.
+     * 
+     * @param qName the qualified name of the property (composed using {@link #getQSeparator()}).
+     * @param value the new property value
+     * @throws IOException in case that the access fails or setting properties is not implemented (see 
+     * {@link MachineConnector#supportsModelProperties()} is {@code false})
+     */
+    public default void setShort(String qName, short value) throws IOException {
+        set(qName, value);
+    }
+
+    /**
+     * Changes a boolean property value.
+     * 
+     * @param qName the qualified name of the property (composed using {@link #getQSeparator()}).
+     * @param value the new property value
+     * @throws IOException in case that the access fails or setting properties is not implemented (see 
+     * {@link MachineConnector#supportsModelProperties()} is {@code false})
+     */
+    public default void setBoolean(String qName, boolean value) throws IOException {
+        set(qName, value);
+    }
+
+    /**
+     * Changes a double property value.
+     * 
+     * @param qName the qualified name of the property (composed using {@link #getQSeparator()}).
+     * @param value the new property value
+     * @throws IOException in case that the access fails or setting properties is not implemented (see 
+     * {@link MachineConnector#supportsModelProperties()} is {@code false})
+     */
+    public default void setDouble(String qName, double value) throws IOException {
+        set(qName, value);
+    }
+
+    /**
+     * Changes a float property value.
+     * 
+     * @param qName the qualified name of the property (composed using {@link #getQSeparator()}).
+     * @param value the new property value
+     * @throws IOException in case that the access fails or setting properties is not implemented (see 
+     * {@link MachineConnector#supportsModelProperties()} is {@code false})
+     */
+    public default void setFloat(String qName, float value) throws IOException {
+        set(qName, value);
+    }
+
+    /**
+     * Changes a string property value.
+     * 
+     * @param qName the qualified name of the property (composed using {@link #getQSeparator()}).
+     * @param value the new property value
+     * @throws IOException in case that the access fails or setting properties is not implemented (see 
+     * {@link MachineConnector#supportsModelProperties()} is {@code false})
+     */
+    public default void setString(String qName, String value) throws IOException {
+        set(qName, value);
+    }
 
     // complex types
     

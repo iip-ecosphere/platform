@@ -80,6 +80,14 @@ public @interface MachineConnector {
      */
     public boolean supportsEvents() default true;
     
+    /**
+     * Whether the machine connector requires data access via types and structs rather than generic object-based
+     * methods like get and set.
+     *  
+     * @return {@code true} for typed access, {@code false} for generic access
+     */
+    public boolean requiresTypedAccess() default false;
+    
     // on further properties, adjust ConnectorsAas/ConnectorsAasTest!
     
 }
