@@ -1,4 +1,4 @@
-<table>
+<table border="0">
  <tr>
   <td><img src="platform/oktoflow.png" alt="oktoflow" width="150"/></td>
   <td><h1>oktoflow/IIP-Ecosphere AI-enabled Industry 4.0/IIoT platform </h1></td>
