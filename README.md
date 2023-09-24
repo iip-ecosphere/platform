@@ -1,20 +1,22 @@
-# IIP-Ecosphere AI-enabled Industry 4.0/IIoT platform 
+# ![IIP-Ecosphere](platform/logo.png)
+ IIP-Ecosphere AI-enabled Industry 4.0/IIoT platform ![oktoflow](platform/oktoflow.png)
 
 The virtual IIP-Ecosphere Industry 4.0/IIoT platform aims at demonstrating new approaches to vendor-independent, interoperable and open platform concepts for easy-to-use AI. In particular, it aims at uniform, distributed deployment of services to heterogeneous (edge) devices, an AI toolkit for the industrial production, consistent configuration support ranging from network to applications as well as the use and application of established and upcoming IIoT standards, e.g., asset administration shells (to be used for all platform interfaces).
 
 ## News
 
-* Preparing an enhanced demonstrator for [EMO 2023](https://emo-hannover.de/), also planning for an integration with [UMATI](https://umati.org/) and sensor technology form [MIP technology](https://mip-technology.de/de/). There will also be the IIP-Ecosphere [symposium as closing event](https://symposium.iip-ecosphere.de/) for the project on 2023/09/19. 
+* New name: The IIP-Ecosphere platform becomes [oktoflow](https://oktoflow.de/).
 * MIP technologies and NovoAI AVA connector definitions in configuration meta-model.
 * Default library for code based on types or devices defined in the Platform configuration meta-model including code for controlling an MIP sensor.
 * New application example: MIP connector and MIP AI improvement ping-pong
 * Initial Beckhoff ADS integration library for Java.
 * The [platform FAQ](platform/documentation/FAQ.MD) is now in github.
 * Early snapshot of [upcoming platform handbook for version 0.6.0](platform/documentation/PlatformHandbook-0.6.0-SNAPSHOT-V0.1.pdf) now online in github (version as of 2023/09/14). Comments for clarification are welcome.
-* Confirmed compatibility: Phoenix Contact PLCnext (OPC UA, EEM integration), Beckhoff IPC (OPC UA), VDW UMATI (OPC UA), Bitmotec (MQTT), Lenze (MQTT), MIP (MQTT), Beckhoff ADS (Windows) - and improving...
+* Confirmed compatibility: Phoenix Contact PLCnext (OPC UA, EEM integration), Beckhoff IPC (OPC UA), VDW UMATI (OPC UA), Bitmotec (MQTT), Lenze (MQTT), MIP (MQTT), Beckhoff ADS (Windows) ...
 
 ## Public demonstrations
 
+* Public demonstration on [EMO 2023](https://emo-hannover.de/) with magnetic identification by [MIP technology](https://mip-technology.de/de/), drive condition monitoring by [Lenze](https://lenze.de/) and AI-based visual quality inspection. 
 * Public demonstrations on 2023/06/29 in [Hildesheim at the "day of computer science"](https://www.uni-hildesheim.de/fb4/veranstaltungen/tag-der-informatik/) as well as at [Nürnberg Digital "The future of intelligent Manufacturing"](https://nuernberg.digital/programm/details/die-zukunft-der-intelligenten-fertigung.html) on 2023/07/07. 
 * Presentation of a federated learning case with two cobots on [HM'23](https://www.iip-ecosphere.de/iip-ecosphere-auf-der-hannover-messe-2023/) in collaboration with Phoenix Contact, Bitmotec/OnLogic, UR including platform-integrated federated learning based on [Flower](https://flower.dev/).
 * Presentation of improved robot-based platform demonstrator at [TddT'22, Berlin](https://www.digitale-technologien.de/DT/Redaktion/DE/Veranstaltungen/2022/DT/220829_Tage_der_digitalen_Technologien.html) 
@@ -69,9 +71,7 @@ We've heard about strange problems on Mac OS. So far, we do not have enough info
 
 To ease the first steps, we provided Demonstration and Development Docker Containers on [Docker Hub](https://hub.docker.com/r/iipecosphere/platform).
 
-![IIP-Ecosphere](platform/logo.png)
-
-Powered by (selection of used tools/frameworks)
+## Powered by (selection of used tools/frameworks)
 
 <a href="https://www.eclipse.org/basyx"><img src="https://www.eclipse.org/basyx/img/basyxlogo.png" alt="BaSyx" width="200"/></a> 
 <a href="https://iot.eclipse.org"><img src="https://iot.eclipse.org/iot-logo-social.png" alt="Eclipse IoT" width="100"/></a> 
