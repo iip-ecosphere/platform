@@ -257,11 +257,9 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
      */
     public static void main(Class<? extends Starter> cls, String[] args) {
         registerDefaultPlugins(a -> {
-            if (!startServerOnly(a)) {
-                // start spring cloud app
-                SpringApplication app = new SpringApplication(cls);
-                ctx = app.run(a);
-            }
+            // start spring cloud app
+            SpringApplication app = new SpringApplication(cls);
+            ctx = app.run(a);
         });
         registerPlugin("springBroker", new TestSpringBroker());
         ResourceLoader.registerResourceResolver(new SpringResourceResolver()); // ensure spring resolution
@@ -281,10 +279,12 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
             return result;
         });
         Starter.parse(args);
-        parseExternConnections(args, e -> Transport.addGlobalRoutingKey(e));
-        getSetup(); // ensure instance
-        args = augmentByAppId(args);
-        runPlugin(args);
+        if (!startServer(args)) {
+            parseExternConnections(args, e -> Transport.addGlobalRoutingKey(e));
+            getSetup(); // ensure instance
+            args = augmentByAppId(args);
+            runPlugin(args);
+        } // else starts server in parse
     }
     
 }
