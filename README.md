@@ -1,4 +1,10 @@
-<img src="platform/oktoflow.png" alt="oktoflow" width="150"/><h1>oktoflow/IIP-Ecosphere AI-enabled Industry 4.0/IIoT platform </h1><img src="platform/logo.png" alt="IIP-Ecosphere" width="150"/><br/>
+<table>
+ <tr>
+  <td><img src="platform/oktoflow.png" alt="oktoflow" width="150"/></td>
+  <td><h1>oktoflow/IIP-Ecosphere AI-enabled Industry 4.0/IIoT platform </h1></td>
+  <td><img src="platform/logo.png" alt="IIP-Ecosphere" width="150"/></td>
+ </tr>
+</table>
 
 The virtual IIP-Ecosphere Industry 4.0/IIoT platform aims at demonstrating new approaches to vendor-independent, interoperable and open platform concepts for easy-to-use AI. In particular, it aims at uniform, distributed deployment of services to heterogeneous (edge) devices, an AI toolkit for the industrial production, consistent configuration support ranging from network to applications as well as the use and application of established and upcoming IIoT standards, e.g., asset administration shells (to be used for all platform interfaces).
 
