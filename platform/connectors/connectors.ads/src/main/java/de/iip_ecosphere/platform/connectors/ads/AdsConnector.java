@@ -120,7 +120,7 @@ public class AdsConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
          * @param name the object name in ADS
          * @param size the object value in case of arrays, ignored for non-arrays
          * @return the object
-         * @throws IOException
+         * @throws IOException in case that reading fails for some reason
          */
         private T read(AdsCommunication comm, String name, int size) throws IOException {
             T value = creator.create(size);
