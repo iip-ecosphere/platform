@@ -289,20 +289,16 @@ export class FlowchartComponent implements OnInit {
       let name = this.getServiceValue(this.selectedService, "name")
       let kind = this.getServiceValue(this.selectedService, "kind")
       let ver = this.getServiceValue(this.selectedService, "ver")
-      this.editor.addNode(this.selectedService.idShort, 1, 1, event.layerX, event.layerY, '', {},
-      '<div>' + this.selectedService.idShort + '<div>'
-      + '<mat-card-content>'
-      + '<p class="subtext"> name: '
-      + '<span *ngIf="property.value">' + name
-      +  '</span> </p>'
-      + '<p class="subtext"> kind: '
-      + '<span *ngIf="property.value">' + kind
-      +  '</span> </p>'
-      + '<p class="subtext"> ver: '
-      + '<span *ngIf="property.value">' + ver
-      +  '</span> </p>'
-      + '</mat-card-content>'
-      , false);
+      let id = this.getServiceValue(this.selectedService, "id")
+
+      console.log("name of the node: " + name)
+      this.editor.addNode(name, 1, 1, event.layerX, event.layerY, '', {},
+        '<div>'
+        + id + '<br><p class="subtext">name: '
+        + name + '</p><p class="subtext">kind: '
+        + kind + '</p><p class="subtext">ver: '
+        + ver + '</p><div>'
+        , false);
       // TODO
       console.log("addService")
       console.log(this.editor)
