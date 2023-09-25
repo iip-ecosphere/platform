@@ -51,12 +51,23 @@ export class DrawflowService {
       }
     }]
 
+    console.log("getGraph | input variable")
+    console.log(input)
+
     try {
-      response = await firstValueFrom(this.http.post(this.ip + '/shells/' + this.urn + "/aas/submodels/Configuration/submodel/submodelElements/getGraph/invoke"
-      ,{"inputArguments": input,"requestId":"1bfeaa30-1512-407a-b8bb-f343ecfa28cf", "inoutputArguments":[], "timeout":10000})) as platformResponse;
+      response = await firstValueFrom(this.http.post(
+        this.ip
+        + '/shells/'
+        + this.urn
+        + "/aas/submodels/Configuration/submodel/submodelElements/getGraph/invoke"
+      ,{"inputArguments": input,
+      "requestId":"1bfeaa30-1512-407a-b8bb-f343ecfa28cf",
+      "inoutputArguments":[], "timeout":10000})) as platformResponse;
     } catch(e) {
       console.log(e);
     }
+    console.log("resposne")
+    console.log(response)
     return response;
   }
 

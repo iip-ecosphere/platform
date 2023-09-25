@@ -45,28 +45,29 @@
     </div>
 
     <div class="drawflow-container">
-      <div id="drawflow"></div>
+      <div id="drawflow" style="height: 74%;"></div>
       <!-- mesh name -->
-      <div>
+      <mat-card class="flowchart-create">
         <mat-label style="margin-left: 1%;">mesh name</mat-label>
         <input matInput type="text"
           style="font-size:14px; margin-right: 1%; margin-left: 1%;"
           ngDefaultControl [(ngModel)]=meshName>
 
         <button mat-raised-button class="button" (click)="create()">create</button>
-      </div>
+      </mat-card>
 
+      <!--
       <mat-card *ngIf="toggleBus" class="footer">
         <div><span  *ngFor="let bus of Busses" [class]="bus.color">{{bus.id}}, </span></div>
       </mat-card>
       <button mat-raised-button class="button" (click)="toggleBus = !toggleBus">Bus</button>
-
+    -->
     </div>
 
     <mat-card class="flowchart-toolbar">
       <mat-icon (click)="zoomIn()">zoom_in</mat-icon>
       <mat-icon (click)="zoomOut()">zoom_out</mat-icon>
-      <mat-icon (click)="false">save</mat-icon>
+      <!-- <mat-icon (click)="false">save</mat-icon> -->
     </mat-card>
   </div>
 
