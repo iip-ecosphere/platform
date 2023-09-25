@@ -300,6 +300,9 @@ project Services {
     compound JavaServer refines Server {
         NonEmptyString class;
         String cmdArg; // for now, comma separated
+        assign (semanticId = Eclass_Unit_MByte) to {
+            Integer memLimit = 256; // e.g., JVM memory limit in MBytes
+        }
     }
 
     // python based server instance, based on PythonServiceEnvironment, may be generated, must implement Server interface
