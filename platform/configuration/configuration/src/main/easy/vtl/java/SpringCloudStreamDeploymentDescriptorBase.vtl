@@ -515,8 +515,19 @@ template SpringCloudStreamDeploymentDescriptorBase(Configuration config, FileArt
               port: ${s.port}
               cls: ${getServerCls(s)}
               started: ${s.running}
+              asProcess: ${asProcess(s)}
               ${generateServer(s)|e}'
         }    
+    }
+
+    @DispatchBasis
+    def asProcess(Server server) {
+        'true'
+    }
+
+    @DispatchCase
+    def asProcess(PythonServer server) {
+        'false' // we wrap this anyway into a Python process, so a Java process shall not be needed
     }
 
     // dispatch basis
@@ -525,6 +536,9 @@ template SpringCloudStreamDeploymentDescriptorBase(Configuration config, FileArt
     }
 
     def generateServer(JavaServer server) {
+        if (server.memLimit > 0) {
+            "memory: ${server.memLimit}"
+        }
         '${generateCmdArg(getStringValueSafe(server.cmdArg, ""), "cmdArg")}'
     }
     
