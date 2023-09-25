@@ -262,6 +262,8 @@ export class EditorComponent implements OnInit {
     this.uiGroups = [];
     const selectedType = this.selectedType as configMetaContainer;
     this.ivmlType = selectedType.idShort
+    console.log("genereateInputs | selectedType:")
+    console.log(selectedType)
 
     if(selectedType && selectedType.value) {
 

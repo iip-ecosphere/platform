@@ -249,3 +249,9 @@ tr:nth-child(odd) {
   width: auto;
   height: auto;
 }
+
+mat-dialog-container {
+  background-color: rgb(230, 230, 230) !important;
+  padding: 0px 0px 0px 0px !important;
+  overflow: hidden !important;
+}

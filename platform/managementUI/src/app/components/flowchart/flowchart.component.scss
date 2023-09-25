@@ -23,6 +23,22 @@ html, body {
   display: inline-block;
 }
 
+.flowchart-create {
+  flex-wrap: wrap;
+  display: flex;
+  position: relative;
+  max-width: 100%;
+  justify-content:right;
+  background-color: rgb(179, 179, 179);
+}
+
+.label-mesh-name {
+  margin-left: 1%;
+  font-size:medium;
+  color:black;
+  align-items: center;
+}
+
 .outer-container {
   display: flex;
   justify-content: stretch;

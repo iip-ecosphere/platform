@@ -3,6 +3,8 @@ import { ActivatedRoute } from '@angular/router';
 import Drawflow from 'drawflow';
 import { DrawflowService } from 'src/app/services/drawflow.service';
 import { IvmlFormatterService } from 'src/app/services/ivml-formatter.service';
+import { MeshFeedbackComponent } from './feedback/mesh-feedback/mesh-feedback.component';
+import { MatDialog } from '@angular/material/dialog';
 
 interface Bus {
   id: string;
@@ -19,7 +21,8 @@ export class FlowchartComponent implements OnInit {
 
   constructor(private df: DrawflowService,
     private route: ActivatedRoute,
-    public ivmlFormatter:IvmlFormatterService) {}
+    public ivmlFormatter:IvmlFormatterService,
+    public dialog: MatDialog) {}
 
   @Input() inputMesh: any
 
@@ -48,9 +51,13 @@ export class FlowchartComponent implements OnInit {
       this.servicesLoading = false;
     }
     this.serviceMeshes = await this.df.getServiceMeshes();
+    console.log("--------------------")
+    console.log("init | services")
     console.log(this.services);
 
     const drawFlowHtmlElement = <HTMLElement>document.getElementById('drawflow');
+    console.log("drawFlowHtmlElem |")
+    console.log(drawFlowHtmlElement)
     if(drawFlowHtmlElement) {
       this.editor = new Drawflow(drawFlowHtmlElement);
       this.editor.reroute = true;
@@ -62,7 +69,9 @@ export class FlowchartComponent implements OnInit {
       this.editor.editor_mode = 'edit';
       this.editor.on('click',() => (this.addService(event)));
 
-      this.editor.createCurvature = function(start_pos_x: number, start_pos_y : number, end_pos_x: number, end_pos_y: number, curvature_value: any, type: any) {
+      this.editor.createCurvature = function(start_pos_x: number,
+        start_pos_y : number, end_pos_x: number, end_pos_y: number,
+        curvature_value: any, type: any) {
         var line_x = start_pos_x;
         var line_y = start_pos_y;
         var x = end_pos_x;
@@ -114,8 +123,9 @@ export class FlowchartComponent implements OnInit {
       }
 
       this.editor.start();
-
+      console.log("editor started")
       const paramMesh = this.route.snapshot.paramMap.get('mesh');
+      console.log("paramMesh: " + paramMesh)
       if(paramMesh) {
         this.getGraph(paramMesh);
       }
@@ -155,10 +165,11 @@ export class FlowchartComponent implements OnInit {
   }
 
   public async getGraph(mesh: string) {
-    console.log(mesh)
+    console.log("getGraph: " + mesh)
 
     let data = await this.df.getGraph(mesh);
     if(data?.outputArguments[0].value?.value) {
+      console.log(data)
       this.Busses = [];
       let graph = JSON.parse(data?.outputArguments[0].value?.value);
       let graph2 = JSON.parse(graph.result);
@@ -272,6 +283,9 @@ export class FlowchartComponent implements OnInit {
   public addService(event: any) {
     if(this.selectedService) {
       this.editor.addNode(this.selectedService.idShort, 1, 1, event.layerX, event.layerY, '', {}, '<div>' + this.selectedService.idShort + '<div>', false);
+      // TODO
+      console.log("addService")
+      console.log(this.editor)
       this.selectedService = undefined;
     }
   }
@@ -296,6 +310,15 @@ export class FlowchartComponent implements OnInit {
     let feedbackInternal = await this.ivmlFormatter.setGraph("", "", this.meshName,
       drawflow)
     console.log("Feedback: " + feedbackInternal)
+    const dialogRef = this.dialog.open(MeshFeedbackComponent, {});
+    dialogRef.componentInstance.feedback = feedbackInternal
+  }
+
+  public test() {
+    const dialogRef = this.dialog.open(MeshFeedbackComponent, {
+      width: '450px',
+    });
+    dialogRef.componentInstance.feedback = "feedbackInternal"
   }
 
 }
