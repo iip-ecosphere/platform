@@ -20,6 +20,7 @@ export class IvmlFormatterService {
   nonVisibleValues = ["optional"]
 
   success_feedback = "Object successfully created!"
+  state_feedback = "The operation \'setGraph\' has been invoked."
 
   public async createVariable(variableName: string, data: any, type: string) {
     let ivmlFormat = this.getIvml(variableName, data, type)
@@ -51,6 +52,17 @@ export class IvmlFormatterService {
 
   private getFeedback(exception: any) {
     let result = this.success_feedback
+    console.log(exception)
+    if (exception != "{}") {
+      exception = exception.substring(1, exception.length - 1)
+      result = "Exception: " + exception.replace("\"exception\":", "")
+    }
+    return result
+  }
+
+  private getGraphFeedback(exception: any) {
+    let result = this.state_feedback
+    console.log(exception)
     if (exception != "{}") {
       exception = exception.substring(1, exception.length - 1)
       result = "Exception: " + exception.replace("\"exception\":", "")
@@ -61,8 +73,6 @@ export class IvmlFormatterService {
   public getIvml(variableName: string, data: any, type: string) {
     // replacing whitespaces with underline
     variableName = this.replaceWhitespaces(variableName)
-    console.log("data")
-    console.log(data)
 
     // removing empty entries
     for(const key in data) {
@@ -280,8 +290,8 @@ export class IvmlFormatterService {
     serviceMeshName:string, val:string) {
     let inputVar = this.getSetGraphInputVar(appName, appValExpr,
       serviceMeshName, val)
-    console.log("[ivml-formatter | setGraph] input variables")
-    console.log(inputVar)
+    //console.log("[ivml-formatter | setGraph] input variables")
+    //console.log(inputVar)
 
     let resourceId = ""
     let aasElementURL = "/aas/submodels/Configuration/submodel/submodelElements/"
@@ -296,7 +306,7 @@ export class IvmlFormatterService {
     console.log("Platform response: ")
     console.log(response)
     let exception = this.getPlatformResponse(response)
-    let result = this.getFeedback(exception)
+    let result = this.getGraphFeedback(exception)
     return result
   }
 

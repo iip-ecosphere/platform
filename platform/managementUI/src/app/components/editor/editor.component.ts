@@ -65,13 +65,6 @@ export class EditorComponent implements OnInit {
     public ivmlFormatter: IvmlFormatterService) { }
 
   ngOnInit(): void {
-    /*
-    console.log("refinedTypes " + this.refinedTypes)
-    console.log("typeasdasd: " + this.type)
-    console.log("selectedType: " + this.selectedType)
-    console.log("ui groups -------------")
-    console.log(this.uiGroups)
-    */
     if(this.refinedTypes) {
       console.log(this.refinedTypes);
       this.meta = {
@@ -236,8 +229,6 @@ export class EditorComponent implements OnInit {
 // ----------------------------------------------------------------------
 
   private cleanTypeName(type: string) {
-    //console.log("[editor | cleanTypeName] triggered, type:")
-    //console.log(type)
     const startIndex = type.lastIndexOf('(') + 1;
     const endIndex = type.indexOf(')');
     if(endIndex > 0){
@@ -262,8 +253,6 @@ export class EditorComponent implements OnInit {
     this.uiGroups = [];
     const selectedType = this.selectedType as configMetaContainer;
     this.ivmlType = selectedType.idShort
-    console.log("genereateInputs | selectedType:")
-    console.log(selectedType)
 
     if(selectedType && selectedType.value) {
 
@@ -282,7 +271,7 @@ export class EditorComponent implements OnInit {
           refTo: false, multipleInputs: false, meta:meta_entry}
 
 
-        let uiGroup = 1 // TODO what value here?
+        let uiGroup = 1
         this.uiGroups.push({
           uiGroup: uiGroup,
           inputs: [editorInput],
@@ -327,10 +316,13 @@ export class EditorComponent implements OnInit {
 
           editorInput.meta = input;
           let cleanType = this.cleanTypeName(editorInput.type);
-          let type = this.meta?.value?.find(type => type.idShort == cleanType);
+          let type = this.meta?.value?.find(type => type.idShort === cleanType);
+          //let type2 = this.metaBackup?.value?.find(type => type.idShort === cleanType);
+
           if(type) {
             editorInput.metaTypeKind = type.value.find(
               (item: { idShort: string; }) => item.idShort === 'metaTypeKind')?.value;
+
           } else if(this.metaBackup && this.metaBackup.value) {
             let temp = this.metaBackup.value.find(item => item.idShort === this.cleanTypeName(editorInput.type));
             editorInput.metaTypeKind = temp?.value.find((item: { idShort: string; }) => item.idShort === 'metaTypeKind').value
@@ -350,6 +342,7 @@ export class EditorComponent implements OnInit {
           if(editorInput.type.indexOf('setOf') >= 0
             || editorInput.type.indexOf('sequenceOf') >= 0) {
             editorInput.multipleInputs = true;
+            console.log("multiple inputs")
           }
           //assign initial value of inputFields
           let initial;
