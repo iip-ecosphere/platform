@@ -106,7 +106,7 @@ public class ConfigurationTests {
         throws IOException {
         File cfg = new File("../../configuration/configuration/gen/tests"); // git
         if (!cfg.exists()) {
-            cfg = new File("../IIP_configuration.configuration/gen/tests"); // Jenkins
+            cfg = new File("../../../../IIP_configuration.configuration/gen/tests"); // Jenkins
         }
         Assert.assertTrue("configuration.configuration must be built before", cfg.exists());
         File f = new File(cfg, folder + "/" + appName + "/target/" + appName + "-0.1.0-SNAPSHOT-bin.jar");
