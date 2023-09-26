@@ -293,6 +293,8 @@ export class IvmlFormatterService {
       basyxFun,
       inputVar) as unknown as platformResponse
 
+    console.log("Platform response: ")
+    console.log(response)
     let exception = this.getPlatformResponse(response)
     let result = this.getFeedback(exception)
     return result

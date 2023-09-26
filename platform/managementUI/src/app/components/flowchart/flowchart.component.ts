@@ -129,6 +129,8 @@ export class FlowchartComponent implements OnInit {
       if(paramMesh) {
         this.getGraph(paramMesh);
       }
+      console.log("Editor: ")
+      console.log(this.editor)
     }
   }
 
@@ -276,13 +278,27 @@ export class FlowchartComponent implements OnInit {
 
   public selectService(service: any) {
     this.selectedService = service;
+    console.log("select service")
     console.log(this.selectedService);
     this.selectedServicesArray.push(this.selectedService) // TODO loe
   }
 
   public addService(event: any) {
     if(this.selectedService) {
-      this.editor.addNode(this.selectedService.idShort, 1, 1, event.layerX, event.layerY, '', {}, '<div>' + this.selectedService.idShort + '<div>', false);
+
+      let name = this.getServiceValue(this.selectedService, "name")
+      let kind = this.getServiceValue(this.selectedService, "kind")
+      let ver = this.getServiceValue(this.selectedService, "ver")
+      let id = this.getServiceValue(this.selectedService, "id")
+
+      console.log("name of the node: " + name)
+      this.editor.addNode(name, 1, 1, event.layerX, event.layerY, '', {},
+        '<div>'
+        + id + '<br><p class="subtext">name: '
+        + name + '</p><p class="subtext">kind: '
+        + kind + '</p><p class="subtext">ver: '
+        + ver + '</p><div>'
+        , false);
       // TODO
       console.log("addService")
       console.log(this.editor)
@@ -290,10 +306,21 @@ export class FlowchartComponent implements OnInit {
     }
   }
 
+  getServiceValue(service: any, idShortValue: string) {
+    let result = null
+    if (service.value) {
+      let values = service.value.find((x: { idShort: string; }) => x.idShort == idShortValue).value
+      let varValue = values.find((x: {idShort: string;}) => x.idShort == "varValue").value
+      result = varValue
+    }
+    return result
+  }
+
   meshName:string = ""
   selectedServicesArray:any = [] // TODO loe
   feedback:string = ""
   exampleDrawflow:string = ""
+
   public async create() {
     /*
     console.log("create btn chartflow")
@@ -305,7 +332,7 @@ export class FlowchartComponent implements OnInit {
     console.log(typeof this.editor.drawflow.drawflow.Home.data)
     let drawflowRaw = JSON.stringify(this.editor.drawflow.drawflow.Home.data)
     let drawflow = drawflowRaw.replace("drawflow: ", "")
-    this.exampleDrawflow = drawflow
+    //this.exampleDrawflow = drawflow
     console.log("drawflow as string: " + drawflow)
     let feedbackInternal = await this.ivmlFormatter.setGraph("", "", this.meshName,
       drawflow)
@@ -314,11 +341,12 @@ export class FlowchartComponent implements OnInit {
     dialogRef.componentInstance.feedback = feedbackInternal
   }
 
-  public test() {
-    const dialogRef = this.dialog.open(MeshFeedbackComponent, {
-      width: '450px',
-    });
-    dialogRef.componentInstance.feedback = "feedbackInternal"
+  show() {
+    let drawflowRaw = JSON.stringify(this.editor.drawflow.drawflow.Home.data)
+    console.log("### Drawflow ###")
+    console.log(drawflowRaw)
+    console.log(this.editor.drawflow.drawflow.Home.data)
+
   }
 
 }

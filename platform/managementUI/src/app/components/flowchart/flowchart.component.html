@@ -45,8 +45,8 @@
     </div>
 
     <div class="drawflow-container">
-      <div id="drawflow" style="height: 74%;"></div>
-      <!-- mesh name -->
+      <div id="drawflow" ></div>
+      <!--<div id="drawflow" style="height: 74%;"></div> -->
       <mat-card class="flowchart-create">
         <mat-label style="margin-left: 1%;">mesh name</mat-label>
         <input matInput type="text"
@@ -54,6 +54,7 @@
           ngDefaultControl [(ngModel)]=meshName>
 
         <button mat-raised-button class="button" (click)="create()">create</button>
+        <button mat-raised-button class="button" (click)="show()">show drawflow</button>
       </mat-card>
 
       <!--
