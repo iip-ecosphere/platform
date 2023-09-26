@@ -31,9 +31,19 @@ public class ModelAccessProviderTest {
      * ModelAccess, de.iip_ecosphere.platform.connectors.model.ModelAccessProvider.IOVoidFunction)}.
      */
     @Test
-    public void testIoVoidFunction() {
+    public void testOptional() {
         Assert.assertTrue(ModelAccessProvider.optional(null, (a) -> { }));
         Assert.assertFalse(ModelAccessProvider.optional(null, (a) -> { throw new IOException(); }));
+    }
+
+    /**
+     * Tests {@link ModelAccessProvider#optionalStep(de.iip_ecosphere.platform.connectors.model.ModelAccess, 
+     * de.iip_ecosphere.platform.connectors.model.ModelAccessProvider.IOModelAccessFunction))}.
+     */
+    @Test
+    public void testOptionalStep() {
+        Assert.assertNull(ModelAccessProvider.optionalStep(null, (a) -> { return a; }));
+        Assert.assertNull(ModelAccessProvider.optionalStep(null, (a) -> { throw new IOException(); }));
     }
 
 }
