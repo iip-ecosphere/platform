@@ -51,13 +51,9 @@ export class FlowchartComponent implements OnInit {
       this.servicesLoading = false;
     }
     this.serviceMeshes = await this.df.getServiceMeshes();
-    console.log("--------------------")
-    console.log("init | services")
-    console.log(this.services);
 
     const drawFlowHtmlElement = <HTMLElement>document.getElementById('drawflow');
-    console.log("drawFlowHtmlElem |")
-    console.log(drawFlowHtmlElement)
+
     if(drawFlowHtmlElement) {
       this.editor = new Drawflow(drawFlowHtmlElement);
       this.editor.reroute = true;
@@ -123,14 +119,10 @@ export class FlowchartComponent implements OnInit {
       }
 
       this.editor.start();
-      console.log("editor started")
       const paramMesh = this.route.snapshot.paramMap.get('mesh');
-      console.log("paramMesh: " + paramMesh)
       if(paramMesh) {
         this.getGraph(paramMesh);
       }
-      console.log("Editor: ")
-      console.log(this.editor)
     }
   }
 
@@ -167,11 +159,9 @@ export class FlowchartComponent implements OnInit {
   }
 
   public async getGraph(mesh: string) {
-    console.log("getGraph: " + mesh)
 
     let data = await this.df.getGraph(mesh);
     if(data?.outputArguments[0].value?.value) {
-      console.log(data)
       this.Busses = [];
       let graph = JSON.parse(data?.outputArguments[0].value?.value);
       let graph2 = JSON.parse(graph.result);
@@ -278,9 +268,6 @@ export class FlowchartComponent implements OnInit {
 
   public selectService(service: any) {
     this.selectedService = service;
-    console.log("select service")
-    console.log(this.selectedService);
-    this.selectedServicesArray.push(this.selectedService) // TODO loe
   }
 
   public addService(event: any) {
@@ -299,9 +286,6 @@ export class FlowchartComponent implements OnInit {
         + kind + '</p><p class="subtext">ver: '
         + ver + '</p><div>'
         , false);
-      // TODO
-      console.log("addService")
-      console.log(this.editor)
       this.selectedService = undefined;
     }
   }
@@ -317,36 +301,14 @@ export class FlowchartComponent implements OnInit {
   }
 
   meshName:string = ""
-  selectedServicesArray:any = [] // TODO loe
-  feedback:string = ""
-  exampleDrawflow:string = ""
 
   public async create() {
-    /*
-    console.log("create btn chartflow")
-    console.log(this.editor.drawflow)
-    console.log("mesh name: " + this.meshName)
-    console.log("Trace: ")
-    console.log(this.selectedServicesArray)
-    */
-    console.log(typeof this.editor.drawflow.drawflow.Home.data)
     let drawflowRaw = JSON.stringify(this.editor.drawflow.drawflow.Home.data)
     let drawflow = drawflowRaw.replace("drawflow: ", "")
-    //this.exampleDrawflow = drawflow
-    console.log("drawflow as string: " + drawflow)
     let feedbackInternal = await this.ivmlFormatter.setGraph("", "", this.meshName,
       drawflow)
-    console.log("Feedback: " + feedbackInternal)
     const dialogRef = this.dialog.open(MeshFeedbackComponent, {});
     dialogRef.componentInstance.feedback = feedbackInternal
-  }
-
-  show() {
-    let drawflowRaw = JSON.stringify(this.editor.drawflow.drawflow.Home.data)
-    console.log("### Drawflow ###")
-    console.log(drawflowRaw)
-    console.log(this.editor.drawflow.drawflow.Home.data)
-
   }
 
 }
