@@ -104,10 +104,8 @@ public class ConfigurationTests {
      */
     private void testInstantiatedExample(String folder, String appName, int stopTime, Consumer<String> asserter) 
         throws IOException {
-        File cfg = new File("../../configuration/configuration/gen/tests"); // git
-        if (!cfg.exists()) {
-            cfg = new File("../IIP_configuration.configuration/gen/tests"); // Jenkins
-        }
+        File cfg = new File(System.getProperty("test.genFolder", "../../configuration/configuration/gen/tests")); // git
+        System.out.println("Using folder " + cfg.getAbsolutePath());
         Assert.assertTrue("configuration.configuration must be built before", cfg.exists());
         File f = new File(cfg, folder + "/" + appName + "/target/" + appName + "-0.1.0-SNAPSHOT-bin.jar");
         File res = File.createTempFile("examples-test-" + appName, ".out");

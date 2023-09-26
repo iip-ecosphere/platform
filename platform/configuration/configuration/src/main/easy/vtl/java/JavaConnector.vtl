@@ -452,12 +452,19 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
             }
             nestedStepCount = nestedStepCount + 1;
             path = substPathEx('"${path}"', topPath, "path");
+            if (field.optional) {
+                'try {'
+            }
             '\n\naccess = access.stepInto(${path});'
         }
         '${produceDataTransfer(type, mapping, typeQual, mapQual, done, indexes, paths)}'
         if (not(genFrom) and optWithStepIn and nestedStepCount > 0) {
             nestedStepCount = nestedStepCount - 1;
             'access = access.stepOut();\n'
+            if (field.optional) {
+                '} catch (IOException e${nestedStepCount}) {
+                }'
+            }
         }
     }
     
