@@ -183,7 +183,7 @@ If you also want to update the configuration meta model, which may upgrade and e
 
 ### Manually
 
-Start the platform server(s) component through the generated scripts in the gen folder. If you run all processes from the console as explained, this requires a separate shell for platform, ECS Runtime, service manager and UI/CLI as the processes run intentionally endless.
+Start the platform server(s) component through the generated scripts in the gen folder. If you run all processes from the console as explained, this requires a separate shell for platform, ECS Runtime, service manager and UI/CLI as the processes run intentionally endless. Make sure to wait for each script to be done bevore starting the next (usually "Running until ctrl+C").
 
     broker.sh
     platform.sh
@@ -226,7 +226,7 @@ Depending on your installation, the application may be distributed/executed by t
 ### Manual deployment
 
 Use the CLI as shown in [the platform installation document](../documentation/INSTALL.md) to add the application artifact from gen/*applicationId*/target to the devices and to start the services. Please note that artifacts and containers are added through their URI, whereby local URIs may differ from system to system, e.g., 
-* Windows: `file:///C:/.../SimpleMeshTestingApp-0.1.0-SNAPSHOT-bin.jar`
+* Windows: `file:///C:/.../SimpleMeshTestingApp-0.1.0-SNAPSHOT-bin.jar` if this fails try `file:///.../SimpleMeshTestingApp-0.1.0-SNAPSHOT-bin.jar` where you just leave the drive part.
 * Linux: `file:/home/user/SimpleMeshTestingApp-0.1.0-SNAPSHOT-bin.jar`
 * Service container: `file:/apps/SimpleMeshTestingApp-0.1.0-SNAPSHOT-bin.jar`
 
