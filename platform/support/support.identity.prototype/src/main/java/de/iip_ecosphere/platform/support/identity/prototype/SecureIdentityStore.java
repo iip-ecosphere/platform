@@ -36,7 +36,6 @@ import org.slf4j.LoggerFactory;
 import de.iip_ecosphere.platform.support.identities.IdentityStore;
 import de.iip_ecosphere.platform.support.identities.IdentityStoreDescriptor;
 import de.iip_ecosphere.platform.support.identities.IdentityToken;
-import de.iip_ecosphere.platform.support.identities.YamlIdentityFile;
 
 /**
  * Extention of the security store with encryption. Tries to load
@@ -47,9 +46,6 @@ import de.iip_ecosphere.platform.support.identities.YamlIdentityFile;
  * @author Lea Gerling, SSE
  */
 public class SecureIdentityStore extends IdentityStore {
-
-    // TODO: This needs a chante to the secure file?
-    private YamlIdentityFile data;
 
     private KeyStore keyStore;
     private String keyStoreName;

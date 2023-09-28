@@ -36,11 +36,10 @@
     </dependency>
    
     <dependency>
-      <groupId>org.yaml</groupId>
-      <artifactId>snakeyaml</artifactId>
-      <scope>compile</scope>
+      <groupId>org.eclipse.milo</groupId>
+      <artifactId>sdk-client</artifactId>
     </dependency>
-
+    
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
@@ -61,13 +60,7 @@
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
-    </dependency>
-    
-<dependency>
-    <groupId>org.bouncycastle</groupId>
-    <artifactId>bcpkix-jdk15on</artifactId>
-    <version>1.58</version>
-</dependency>
+    </dependency>   
     
   </dependencies>
 

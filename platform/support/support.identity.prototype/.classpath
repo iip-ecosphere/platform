@@ -31,5 +31,15 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="C:/Users/Lea/.m2/repository/org/eclipse/milo/stack-core/0.6.4/stack-core-0.6.4.jar" sourcepath="C:/Users/Lea/.m2/repository/org/eclipse/milo/stack-core/0.6.4/stack-core-0.6.4-sources.jar">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.groupId" value="org.eclipse.milo"/>
+			<attribute name="maven.artifactId" value="stack-core"/>
+			<attribute name="maven.version" value="0.6.4"/>
+			<attribute name="maven.scope" value="test"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
