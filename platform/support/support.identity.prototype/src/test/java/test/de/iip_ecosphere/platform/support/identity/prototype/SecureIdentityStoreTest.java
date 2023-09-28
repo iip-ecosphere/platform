@@ -18,6 +18,7 @@ import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
+import java.security.KeyStore.PrivateKeyEntry;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
@@ -145,9 +146,9 @@ public class SecureIdentityStoreTest {
                 store.setPrivateKeyEntry(aliasPrivate, privateKey, password, certificateChain));
 
 
-        // Retrieves the private key entry
+        // Retrieves the private key entry (the entry itself contains more than just the private key)
         assertEquals("Retrieved entry should match the inserted secret", privateKey.toString(),
-                store.getEntry(aliasPrivate, protParam).toString());
+                ((PrivateKeyEntry) store.getEntry(aliasPrivate, protParam)).getPrivateKey().toString());
 
         //Delete
         assertEquals("Successfull deletion should return true", true, store.deleteEntry(aliasPrivate));
