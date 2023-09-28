@@ -20,9 +20,7 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    IdentityTokenTest.class,
-    YamlIdentityFileTest.class,
-    IdentityStoreTest.class
+    SecureIdentityStoreTest.class
 })
 public class AllTests {
 }
