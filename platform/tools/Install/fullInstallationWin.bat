@@ -227,8 +227,8 @@ RegistryRun="Yes"
 if not exist "Install" mkdir "Install"
 cd Install
 
-curl https://jenkins-2.sse.uni-hildesheim.de/view/IIP-Ecosphere/job/IIP_Install/lastSuccessfulBuild/artifact/install.tar.gz -O install.tar.gz
-tar xzpvf install.tar.gz
+curl https://jenkins-2.sse.uni-hildesheim.de/view/IIP-Ecosphere/job/IIP_Install/lastSuccessfulBuild/artifact/platform/tools/Install/install.zip -O install.zip
+tar xzpvf install.zip
 
 cd platformDependencies/
 python -m pip install -r requirements.txt
