@@ -139,8 +139,9 @@ project SerializerConfig1Old {
                 optional = true
             }, Field {
                 name = "nested",
-                type = refBy(myNestedArrayType)
-            }, Field {
+                type = refBy(myNestedArrayType),
+                readOnly = true
+            }, Field { // not mapped into container as not contained in external interface
                 name = "channel",
                 type = refBy(StringType),
                 optional = true, 

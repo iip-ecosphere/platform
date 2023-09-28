@@ -1,17 +1,12 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, NgZone, OnInit } from '@angular/core';
 import { ApiService } from 'src/app/services/api.service';
 import { EnvConfigService } from 'src/app/services/env-config.service';
-import { PlatformArtifacts, Resource, PlatformServices, InputVariable, platformResponse }
+import { PlatformArtifacts, Resource, PlatformServices}
   from 'src/interfaces';
-import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
-import { PlanDeployerService } from 'src/app/services/plan-deployer.service';
-import { OnlyIdPipe } from 'src/app/pipes/only-id.pipe';
-import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
-import { LogsDialogComponent } from './logs/logs-dialog.component';
-import {MatRadioChange, MatRadioModule} from '@angular/material/radio';
-import { DialogService } from 'src/app/services/dialog.service';
+import {MatRadioChange} from '@angular/material/radio';
+
 
 @Component({
   selector: 'app-services',
@@ -22,11 +17,10 @@ export class ServicesComponent implements OnInit {
 
   constructor(public http: HttpClient,
     public api: ApiService,
-    private router: Router,
     private envConfigService: EnvConfigService,
-    public dialog: MatDialog,
-    private dialogService: DialogService){ // todo loe?
-
+    private zone: NgZone
+    )
+    {
       const env = this.envConfigService.getEnv();
       if(env && env.ip) {
         this.ip = env.ip;
@@ -49,26 +43,13 @@ export class ServicesComponent implements OnInit {
   technicalData: any; // manufacture info for services
   currentTab:string = "";
 
-  //artifacts: PlatformArtifacts = {};
-  //deploymentPlans: Resource | undefined = {};
   selected: Resource | undefined;
   deployPlanInput: any;
   undeployPlanInput: any;
   undeployPlanByIdInput: any;
   taskId: string = "";
 
-  /* logs stream mode mode="START"|"TAIL"
-  (start=log from start, tail=continue at end as selecter by user)*/
-  mode = "START"
-  serviceMgr:string | undefined;
-  logsData:string | undefined;
-
-  // Radio-Button in 'Running Services' tab
-  options: string[] = ["active", "all"]
-  selectedOption: string = this.options[0]; // default option
-  // Service state
-  correctStates = ["STARTING", "RUNNING", "STOPPING"]
-
+  // filtern
   tabsParam = [
     {tabName: "deployment plans",
       submodel: "Artifacts",
@@ -82,7 +63,6 @@ export class ServicesComponent implements OnInit {
     {tabName: "running artifacts",
       submodel: "services",
       submodelElement: "artifacts"}
-    //{tabName: "available artifacts"}
   ]
 
   paramToDisplay = [
@@ -99,75 +79,49 @@ export class ServicesComponent implements OnInit {
     ["applicationInstanceId", "App instance: ", ""]
   ]
 
-  winWidth = 800
-  winHeight = 600
+  // Radio-Button in 'Running Services' tab
+  options: string[] = ["active", "all"]
+  selectedOption: string = this.options[0]; // default option
+  correctStates = ["STARTING", "RUNNING", "STOPPING"] // Service state
+
+  // logs type
+  stdout = 'stdout'
+  stderr = 'stderr'
 
   ngOnInit(): void {
-    //this.getServices();
-    //this.getArtifacts();
   }
 
-  public onRadioChange(event: MatRadioChange) {
-    this.filterForCorrectState()
+
+  // --------------------- Button -------------------
+
+  debug:number = 0
+
+  public getDialog(id:string, idShort:string, logsType:string) {
+    console.log("[serviceComp | getDialog] getDialog with logs type: " + logsType)
+    this.zone.run(() => {
+      let data = Date.now()
+      let url = document.URL
+      url = url.replace('services', 'logs')
+
+      if (this.debug == 0) {
+        window.open(
+          url
+          + '?id=' + id
+          + '&idShort=' + idShort
+          + '&type=' + logsType,
+          'Dialog' + data,
+          "height=800,width=700"
+        )
+      } else {
+        window.open(url
+          + '?id=' + id
+          + '&idShort=' + idShort
+          + '&type=' + logsType)
+      }
+    });
   }
 
-  // --------------------- Button
-
-  public async getLogsDialog(id:string, idShort:string) {
-    console.log("#### getLogsDialog with id: " + id)
-    let windowSize = 'width=' + this.winWidth + ",height=" + this.winHeight
-
-    const dialogWindow = window.open(
-      'http://localhost:4200/#/logs',
-      'Dialog',
-      windowSize);
-
-
-    //const dialog2 = window.open('assets/dialog.html')
-
-
-
-    /*
-    // getting endpoint
-    const param = await this.getInputVariable(serviceId)
-    //const param = this.getInputVariable(serviceId)
-    console.log("param: ")
-    console.log(param)
-      param
-    ) as unknown as platformResponse
-
-    let resp = this.getPlatformResponseResolution(logsDataValue)
-    console.log("exec")
-    console.log(resp)
-    console.log("---")
-
-    // getting stream from websocket
-    */
-
-    /*
-    // creating dialog
-    const dialogConfig = new MatDialogConfig();
-
-    dialogConfig.data = {
-      id: id,
-      idShort: idShort,
-      logs: "test logs data from service component",
-      value: this.logsData
-    }
-    //dialogConfig.height = "90%"
-
-    let dialogRef = this.dialog.open(LogsDialogComponent, dialogConfig);
-
-    dialogRef.afterClosed().subscribe(() => {
-      console.log("LogsDialog closed");
-    })
-    */
-
-
-    //this.dialogService.openDialogInNewWindow()
-    //this.dialogService.postMessageToWindow(data)
-
-  }
+  // ------------------ Filter -----------------------------------
 
   public async getPlatformData(submodel: any, submodelElement: any){
     let response: any;
@@ -186,7 +140,6 @@ export class ServicesComponent implements OnInit {
     return response
   }
 
-
   public async getDisplayData(tab:string, submodel:any, submodelElement: string) {
     this.currentTab = tab
     if(tab != "instances") {
@@ -203,28 +156,12 @@ export class ServicesComponent implements OnInit {
         default:
           break;
       }
-      //console.log("SERVICES  Filtered data:")
-      //console.log(this.filteredData)
     }
-
   }
 
   public async loadData(submodel: any, submodelElement: any){
     let response;
     response = await this.getPlatformData(submodel, submodelElement)
-    /*
-    try {
-        response = await firstValueFrom(
-          this.http.get(this.ip + '/shells/'
-        + this.urn
-        + "/aas/submodels/"
-        + submodel
-        + "/submodel/submodelElements/"
-        + submodelElement));
-      } catch(e) {
-        console.log(e);
-      }
-      */
     this.filteredData = response
 
     if(this.currentTab != "instances") {
@@ -232,6 +169,7 @@ export class ServicesComponent implements OnInit {
     }
   }
 
+  // todo not ready yet
   public async getTechnicalData(url:string) {
     let response;
     let technicalDataUrl = url + "/submodels/TechnicalData/submodel"
@@ -279,7 +217,6 @@ export class ServicesComponent implements OnInit {
     console.log(result)
     return result
   }
-  // Filter ------------------------------------
 
   public async filterServices() {
     let result = []
@@ -376,6 +313,10 @@ export class ServicesComponent implements OnInit {
     }
   }
 
+  public onRadioChange(event: MatRadioChange) {
+    this.filterForCorrectState()
+  }
+
   // --------------------- display ------------------------------
   /** Create a 'human-friendly' string to display
    * based on values in this.paramToDisplay
@@ -408,93 +349,17 @@ export class ServicesComponent implements OnInit {
     return result
   }
 
-
-  // ------------------------- buttons ---------------------------
-
-  // -------------------------- logs-dialog ----------------------
-    /*
-  public getPlatformResponseResolution(response:platformResponse) {
-    let return_value = [null, null];
-    console.log("resposne in getPlat..")
-    console.log(response)
-
-    if(response && response.outputArguments) {
-
-      let output = response.outputArguments[0]?.value?.value;
-      console.log("output")
-      console.log(output)
-      if (output) {
-        let temp = JSON.parse(output);
-        if (temp.result) {
-          let result = JSON.parse(temp.result);
-          if (result.naming.en.description) {
-            return_value = [result.naming.en.name, result.naming.en.description]
-          } else {
-            return_value = [result.naming.en.name, null]
-          }
-        }
-      }
+  // Returns 'true' when service state is 'RUNNING'
+  public isRunning(service:any) {
+    let state = service.value.find((val: any) => val.state).state
+    if (state == 'RUNNING') {
+      return true
+    } else {
+      return false
     }
-    return return_value
   }
 
-  public async getInputVariable(serviceId:string) {
-    let serviceInfo = this.getServiceInfo("services", "services/" + serviceId)
-    //console.log("service info: " + (await serviceInfo).resource + ", " + (await serviceInfo).serviceMgr)
-
-    let inputVariables: InputVariable[] = [];
-    let input0:InputVariable = {
-      value: {
-        modelType: {
-          //name: "OperationVariable"
-          name: "Property"
-        },
-        valueType: "string",
-        idShort: "id",
-        kind: "Template",
-        value: (await serviceInfo).resource
-      }
-    }
-
-    let input1:InputVariable = {
-      value: {
-        modelType: {
-          //name: "OperationVariable"
-          name: "Property"
-        },
-        valueType: "string",
-        idShort: "mode",
-        kind: "Template",
-        value: this.mode
-      }
-    }
-    inputVariables.push(input0)
-    inputVariables.push(input1)
-
-    return inputVariables
-
-  }
-
-  public async getServiceInfo(submodel: any, submodelElement: any){
-    let response: any;
-    response = await this.getPlatformData(submodel, submodelElement)
-
-    let serviceResource
-    let serviceServiceMgr
-    if (response) {
-      serviceResource = response.value.find(
-        (val: { idShort: string; }) => val.idShort === "resource").value
-      serviceServiceMgr = response.value.find(
-        (val: { idShort: string; }) => val.idShort === "serviceMgr").value
-    }
-    this.serviceMgr = serviceServiceMgr
-    return {resource: serviceResource, serviceMgr: serviceServiceMgr}
-
-  }
-  */
-
-
-  //--------------------------------- old ------------------------
+  //------------------------ helpers ------------------------
 
   public async getServices() {
     this.services = await this.api.getServices();

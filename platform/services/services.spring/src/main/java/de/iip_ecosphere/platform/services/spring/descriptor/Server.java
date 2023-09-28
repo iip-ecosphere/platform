@@ -63,6 +63,13 @@ public interface Server extends ProcessSpec {
      * @return the class name
      */
     public String getCls();
+    
+    /**
+     * Execute the server as an own process.
+     * 
+     * @return {@code true} for process, {@code false} for in-service-manager execution
+     */
+    public boolean getAsProcess();
 
     /**
      * Turns this server into a temporary (partially default filled) service instance.
@@ -70,5 +77,13 @@ public interface Server extends ProcessSpec {
      * @return the service instance
      */
     public YamlService toService();
+
+    /**
+     * Returns the desired memory for instances of this server. 
+     * 
+     * @return the desired memory in <a href="https://en.wikipedia.org/wiki/Mebibyte">Mebibytes</a> (i.e., "m"), ignored
+     *   if not positive
+     */
+    public long getMemory();
 
 }

@@ -269,7 +269,7 @@ public class JsonUtilsTest {
     
     /**
      * Tests {@link JsonUtils#exceptFields(ObjectMapper, String...)} 
-     * and {@link JsonUtils#toJson(ObjectMapper, Object))}.
+     * and {@link JsonUtils#toJson(ObjectMapper, Object)}.
      */
     @Test
     public void testExceptFields() {

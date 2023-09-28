@@ -19,9 +19,13 @@ template MeshInfoAllApps(IIPEcosphere config, FileArtifact target, ContainerType
             'id: ECS'
             'name: ECS'
             'version: ${appVer}'
-            'dockerImageName: ${registryName}${toDockerImageName(appName, deviceName + "_" + "ecs", appVer)}'
+            'dockerImageName: ${registryName}${toDockerImageName(appName, deviceName + "." + "ecs", appVer)}'
             'dockerImageZipfile: ECS:${appVer}.zip'
             'dood: true'
+            setOf(ContainerArgument) containerGpusArguments = device.containerArguments -> selectByType(GpusContainerArgument);
+            for (GpusContainerArgument arguments : containerGpusArguments) {
+                'gpus: ${arguments.gpuDevice}'
+            }
         } else if (containerType == ContainerType::C1Ecs_C2Svc_App) {
             'id: ${appName}_${deviceName}_NoECS'
             'name: ${appName}_${deviceName}'
@@ -36,6 +40,10 @@ template MeshInfoAllApps(IIPEcosphere config, FileArtifact target, ContainerType
             'dockerImageName: ${registryName}${toDockerImageName(appName, deviceName, appVer)}'
             'dockerImageZipfile: ${appName}_${deviceName}:${appVer}.zip'
             'dood: true'
+            setOf(ContainerArgument) containerGpusArguments = device.containerArguments -> selectByType(GpusContainerArgument);
+            for (GpusContainerArgument arguments : containerGpusArguments) {
+                'gpus: ${arguments.gpuDevice}'
+            }
         }
         Boolean useEphemeralPort = not(useFixedPort(config, device));
         if (useEphemeralPort) { // else instantiated into Dockerfile
@@ -54,19 +62,6 @@ template MeshInfoAllApps(IIPEcosphere config, FileArtifact target, ContainerType
         }
         '    - 22/UDP'
         'networkMode: host'
-    }
-    
-    // abstraction workaround, this is a docker descriptor -> generalize?
-    def String getRegistryName(ContainerManager mgr) {
-        "";
-    }
-    
-    def String getRegistryName(DockerContainerManager mgr) {
-        String registryName = "";
-        if (isDefined(mgr.registry) and mgr.registry.length() > 0) {
-            registryName = mgr.registry + "/";
-        }
-        registryName;
     }
     
 }

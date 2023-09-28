@@ -67,7 +67,7 @@ public abstract class AbstractSerializingConnectorTest {
         ChannelProtocolAdapter<byte[], byte[], Product, Command>... adapter);
 
     /**
-     * Returns the connector descriptor for {@link #createConnector(ChannelProtocolAdapter)}.
+     * Returns the connector descriptor for {@link #createConnector(ChannelProtocolAdapter...)}.
      * 
      * @return the connector descriptor
      */
@@ -91,7 +91,7 @@ public abstract class AbstractSerializingConnectorTest {
 
     /**
      * Configures the transport parameters used to connect the instance from 
-     * {@link #createConnector(ChannelProtocolAdapter)}.
+     * {@link #createConnector(ChannelProtocolAdapter...)}.
      * 
      * @param builder the parameter builder
      * @return {@code builder}

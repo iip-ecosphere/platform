@@ -1,0 +1,14 @@
+ConnectorsPartNovoAI::NovoAIMqttV3Connector = The default MQTT connector for NovoAI.
+ConnectorsPartNovoAI::NovoAIMqttV3Connector::name = The human readable name of the service.
+ConnectorsPartNovoAI::NovoAIMqttV3Connector::description = Description of service functionality.
+ConnectorsPartNovoAI::NovoAIMqttV3Connector::ver = Version of service (numbers separated by a dot).
+ConnectorsPartNovoAI::NovoAIMqttV3Connector::input = Data types forming the input to the service.
+ConnectorsPartNovoAI::NovoAIMqttV3Connector::output = Data types forming the output produced by the service.
+ConnectorsPartNovoAI::NovoAIMqttV3Connector::inInterface = Provided data input to be mapped into adapter, alternative to adapterClass.
+ConnectorsPartNovoAI::NovoAIMqttV3Connector::outInterface = Provided data output to be mapped into adapter, alternative to adapterClass.
+ConnectorsPartNovoAI::NovoAIMqttV3Connector::machineFormatter = Formatter turning data received from application into connector output.
+ConnectorsPartNovoAI::NovoAIMqttV3Connector::machineParser = Parser turning data received from external/connector into application data.
+ConnectorsPartNovoAI::AvaMqttInput = The Input for MIP Mqtt connector.
+ConnectorsPartNovoAI::AvaMqttOutput = The Output for MIP Mqtt connector.
+ConnectorsPartNovoAI::NovoAIMqttV3Connector::nameplateInfo = Nameplate information for MIP connector.
+ConnectorsPartNovoAI::manufacturer_NovoAITech = NovoAI manufacturer nameplate.

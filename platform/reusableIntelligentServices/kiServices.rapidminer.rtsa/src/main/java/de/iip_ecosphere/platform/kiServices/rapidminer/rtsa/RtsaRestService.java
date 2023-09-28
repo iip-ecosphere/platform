@@ -253,7 +253,7 @@ public class RtsaRestService<I, O> extends AbstractRestProcessService<I, O>  {
     }
     
     @Override
-    protected String adjustRestQuery(String input) {
+    protected String adjustRestQuery(String input, String inTypeName) {
         return "{\"data\":[" + input + "]}";
     }
     

@@ -98,9 +98,10 @@ public class TransportToWsConverter<T> extends TransportConverter<T> {
                 server = createServer(endpoint);
             }
         } else {
-            endpoint = setup.getGatewayServerEndpoint(SCHEMA, path);
+            endpoint = TransportConverterFactory.getInstance().validateGatewayEndpoint(
+                setup.getGatewayServerEndpoint(SCHEMA, path));
             server = null;
-        }
+        }        
         return new ConverterInstances<T>(server, new TransportToWsConverter<T>(transportStream, cls, endpoint));
     }
 
@@ -131,12 +132,14 @@ public class TransportToWsConverter<T> extends TransportConverter<T> {
     @Override
     public void start(AasSetup aasSetup) {
         super.start(aasSetup);
-        sender = WsTransportConverterFactory.INSTANCE.createSender(endpoint, typeTranslator, getType());
-        if (null != sender) {
-            try {
-                sender.connectBlocking();
-            } catch (InterruptedException e) {
-                getLogger().error("Connection attempt interrupted: {}", e.getMessage());
+        if (isAasEnabled()) {
+            sender = WsTransportConverterFactory.INSTANCE.createSender(endpoint, typeTranslator, getType());
+            if (null != sender) {
+                try {
+                    sender.connectBlocking();
+                } catch (InterruptedException e) {
+                    getLogger().error("Connection attempt interrupted: {}", e.getMessage());
+                }
             }
         }
     }

@@ -1,6 +1,8 @@
 
 jupyter nbconvert --to python 'TestManagementScript.ipynb'
 
+date
+
 Repetition=$(cat $1 | grep Repetition | rev | cut -d ' ' -f -1)
 
 echo $Repetition
@@ -16,3 +18,5 @@ do
   echo $RunTime
   cp -R Logs AllLogs/Logs$RunTime
 done
+
+date

@@ -6,10 +6,10 @@ This example currently contains two parts:
 
 * A generated connector based on a preliminary model.  
 
-    * Ensure that the Maven platformDependencies are installed (see [install](https://github.com/iip-ecosphere/platform/tree/main/platform/tools/Install))
+    * Ensure that the Maven platformDependencies are installed (see [install](../../tools/Install))
     
     * Execute `mvn -U install` This will perform the interface generation, the code compilation and packaging as well as the final application packaging. Build steps are only executed if the configuration model changes or generate code is not already existing. If a `resources.ipr` folder is present, it will take precendence over the `resources` folder. 
-    * To update/upgrade the model, call `mvn -U generate-sources -Dunpack.force=true`.
+    * To update/upgrade the model, call `mvn -P EasyGen -U generate-sources -Dunpack.force=true`
   
     * Run the generated connector with `mvn -P App exec:java@generatedConnector`
     * The generated connector writes `opcTest.txt` containing measurements provided through a micrometer timing probe.
@@ -22,12 +22,8 @@ Shortcuts for Eclipse:
 
 For all executions, the VDW/UMATI OPC UA server must be accessible via Internet. And, as usual, ** do not modify generated code **.
 
+An explaining overview slide is available [here](docs/Examples_VDW.pdf)
+
 ## Required Updates
 
-See [Platform configuration](https://github.com/iip-ecosphere/platform/tree/main/platform/configuration/configuration) for details on the state of the generation and the required version of EASy-Producer.
-
-## Desirable
-
-Explaining slides, may be a video.
-
-An explaining overview slide is available [here](https://github.com/iip-ecosphere/platform/tree/main/platform/examples/examples.vdw/docs/Examples_VDW.pdf)
+See [Platform configuration](../../configuration/configuration) for details on the state of the generation and the required version of EASy-Producer.

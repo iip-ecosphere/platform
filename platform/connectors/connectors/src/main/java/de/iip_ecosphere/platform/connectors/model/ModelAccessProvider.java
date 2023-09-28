@@ -53,10 +53,32 @@ public interface ModelAccessProvider {
          * Executes the function.
          * 
          * @param modelAccess the model access
-         * @throws IOException may be thrown but also caught in {@link #optional(IOVoidFunction)}
-         * @throws IndexOutOfBoundsException may be thrown but also caught in {@link #optional(IOVoidFunction)}
+         * @throws IOException may be thrown but also caught in {@link #optional(ModelAccess, IOVoidFunction)}
+         * @throws IndexOutOfBoundsException may be thrown but also caught in 
+         *     {@link #optional(ModelAccess, IOVoidFunction)}
          */
         public void execute(ModelAccess modelAccess) throws IOException, IndexOutOfBoundsException;
+
+    }
+
+    /**
+     * A simple (optional) function that may throw an {@link IOException}. {@link IndexOutOfBoundsException}
+     * is also considered as serializer parsers may throw that also.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public interface IOModelAccessFunction {
+        
+        /**
+         * Executes the function.
+         * 
+         * @param modelAccess the model access
+         * @return {@code modelAccess} or some nested model access function to continue with
+         * @throws IOException may be thrown but also caught in {@link #optional(ModelAccess, IOVoidFunction)}
+         * @throws IndexOutOfBoundsException may be thrown but also caught in 
+         *     {@link #optional(ModelAccess, IOVoidFunction)}
+         */
+        public ModelAccess execute(ModelAccess modelAccess) throws IOException, IndexOutOfBoundsException;
 
     }
 
@@ -77,6 +99,25 @@ public interface ModelAccessProvider {
             success = false;
         }
         return success;
+    }
+    
+    /**
+     * Executes {@code func} but consumes {@link IOException} as execution is considered optional.
+     * 
+     * @param modelAccess the model access to be passed into {@code func}
+     * @param func the function to execute
+     * @return {@code modelAccess} or some nested model access function to continue with
+     */
+    public static ModelAccess optionalStep(ModelAccess modelAccess, IOModelAccessFunction func) {
+        ModelAccess result = modelAccess;
+        try {
+            result = func.execute(modelAccess);
+        } catch (IOException | IndexOutOfBoundsException e) {
+            LoggerFactory.getLogger(IOVoidFunction.class).debug(
+                "Function call failed, but considered optional. " + e.getMessage());
+            result = modelAccess;
+        }
+        return result;
     }
     
 }

@@ -20,9 +20,19 @@ import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.net.LocalNetworkManagerImpl;
 import de.iip_ecosphere.platform.support.net.ManagedServerAddress;
 import de.iip_ecosphere.platform.support.net.NetworkManager;
+import de.iip_ecosphere.platform.support.net.NetworkManagerDescriptor;
 import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
 import de.iip_ecosphere.platform.support.net.NetworkManagerSetup;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.Optional;
+
+import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 
 /**
@@ -269,6 +279,31 @@ public class NetworkManagerTest {
     }
     
     /**
+     * Tests loading/storing the local network manager.
+     * 
+     * @throws IOException shall not occur if successful
+     */
+    @Test
+    public void testStoreLoad() throws IOException {
+        LocalNetworkManagerImpl mgr = new LocalNetworkManagerImpl();
+        mgr.reserveGlobalPort("key", new ServerAddress(Schema.HTTP, 1232)); // here, same as local
+        File f = new File(FileUtils.getTempDirectory(), "mgrTestLoadStore.ser");
+
+        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(f));
+        mgr.writeTo(oos);
+        oos.close();
+        
+        LocalNetworkManagerImpl mgr2 = new LocalNetworkManagerImpl();
+        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(f));
+        mgr2.readFrom(ois);
+        ois.close();
+        
+        ManagedServerAddress adr = mgr2.getPort("key");
+        Assert.assertNotNull(adr);
+        Assert.assertEquals(1232, adr.getPort());
+    }
+    
+    /**
      * Tests prefixes.
      * 
      * @param manager the manager instance
@@ -312,6 +347,45 @@ public class NetworkManagerTest {
         setup.setHighPort(10);
         Assert.assertEquals(1, setup.getLowPort());
         Assert.assertEquals(10, setup.getHighPort());
+    }
+ 
+    /**
+     * Does not create anything.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public static class MyDescriptor implements NetworkManagerDescriptor {
+
+        @Override
+        public NetworkManager createInstance() {
+            return null;
+        }
+        
+    }
+
+    /**
+     * Tests {@link NetworkManagerFactory#loadFromProperty()}.
+     */
+    @Test
+    public void testNetMgrLoadFromProperty() {
+        String prop = System.getProperty(NetworkManagerFactory.PROPERTY);
+        Optional<NetworkManagerDescriptor> tmp = NetworkManagerFactory.loadFromProperty();
+        Assert.assertNotNull(tmp);
+        // shall be empty, don't assert further
+        
+        System.setProperty(NetworkManagerFactory.PROPERTY, Object.class.getName());
+        tmp = NetworkManagerFactory.loadFromProperty();
+        Assert.assertNotNull(tmp);
+        Assert.assertTrue(tmp.isEmpty());
+        
+        System.setProperty(NetworkManagerFactory.PROPERTY, MyDescriptor.class.getName());
+        tmp = NetworkManagerFactory.loadFromProperty();
+        Assert.assertNotNull(tmp);
+        Assert.assertFalse(tmp.isEmpty());
+        Assert.assertTrue(tmp.isPresent());
+        Assert.assertTrue(tmp.get() instanceof MyDescriptor);
+
+        System.setProperty(NetworkManagerFactory.PROPERTY, prop == null ? "" : prop);
     }
     
 }

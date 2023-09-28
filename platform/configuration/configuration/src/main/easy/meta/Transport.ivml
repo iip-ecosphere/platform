@@ -28,9 +28,9 @@ project Transport {
             Integer actionTimeout = 1000;
         }
         assign (semanticId = Eclass_Unit_MByte) to {
-            Integer memLimit = 312; // e.g., JVM memory limit in MBytes
+            Integer memLimit = 440; // e.g., JVM memory limit in MBytes
         }
-        Port gatewayPort = 10000;
+        EphemeralPort gatewayPort = 10000;
         String netmask = "";
         //Constraint actionTimeoutValid = isDefined(actionTimeout) and actionTimeout > 0; // currently NPE in EAYs
     };

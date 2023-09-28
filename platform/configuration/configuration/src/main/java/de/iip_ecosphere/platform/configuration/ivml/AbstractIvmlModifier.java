@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
+import org.slf4j.LoggerFactory;
+
 import de.iip_ecosphere.platform.configuration.ivml.IvmlGraphMapper.IvmlGraph;
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.uni_hildesheim.sse.ConstraintSyntaxException;
@@ -19,6 +21,7 @@ import net.ssehub.easy.basics.modelManagement.ModelManagementException;
 import net.ssehub.easy.instantiation.core.model.vilTypes.PseudoString;
 import net.ssehub.easy.instantiation.core.model.vilTypes.configuration.ChangeHistory;
 import net.ssehub.easy.instantiation.core.model.vilTypes.configuration.Configuration;
+import net.ssehub.easy.producer.core.mgmt.EasyExecutor;
 import net.ssehub.easy.reasoning.core.frontend.ReasonerFrontend;
 import net.ssehub.easy.reasoning.core.reasoner.Message;
 import net.ssehub.easy.reasoning.core.reasoner.ReasoningResult;
@@ -100,6 +103,8 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
      * @throws ExecutionException if writing fails
      */
     protected static void saveTo(Project prj, File file) throws ExecutionException {
+        LoggerFactory.getLogger(AbstractIvmlModifier.class).info("Writing IVML project {} to file {}", 
+            prj.getName(), file);
         file.getParentFile().mkdirs();
         try (FileWriter fWriter = new FileWriter(file)) {
             IVMLWriter writer = new IVMLWriter(fWriter);
@@ -161,6 +166,7 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
      * @throws ExecutionException if creating the variable fails
      */
     public void deleteVariable(String varName) throws ExecutionException {
+        LoggerFactory.getLogger(getClass()).info("Deleting IVML variable {}", varName);
         net.ssehub.easy.varModel.confModel.Configuration cfg = getIvmlConfiguration();
         Project root = cfg.getProject();
         try {
@@ -177,6 +183,7 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
                     ReasoningResult res = validateAndPropagate();
                     throwIfFails(res, true);
                     saveTo(prj, getIvmlFile(prj));
+                    LoggerFactory.getLogger(getClass()).info("Deleted IVML variable {}", varName);
                 } else {
                     throw new ExecutionException("Project " + prj.getName() + " is not allowed for modification", null);
                 }
@@ -205,8 +212,19 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
                 if (msg.length() > 0) {
                     msg += "\n";
                 }
-                msg += res.getMessage(m).getDetailedDescription();
+                Message rmsg = res.getMessage(m);
+                msg += rmsg.getDescription();
+                msg += rmsg.getConflictComments();
+                msg += rmsg.getConflictSuggestions();
+                // remove?
+                for (int v = 0; v < res.getAffectedVariablesCount(); v++) {
+                    if (v > 0) {
+                        msg += ", ";
+                    }
+                    msg += res.getAffectedVariable(v).getQualifiedName();
+                }
             }
+            EasyExecutor.printReasoningMessages(res); // preliminary
             throw new ExecutionException(msg, null);
         }
     }
@@ -261,6 +279,27 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
     protected Project adaptTarget(Project root, Project project) throws ExecutionException {
         return project;
     }
+    
+    /**
+     * Limits valid identifiers.
+     * 
+     * @param name the name
+     * @return {@code true} for valid identifier, {@code false} else
+     */
+    static boolean isValidIdentifier(String name) {
+        if (name.isEmpty()) {
+            return false;
+        }
+        if (!Character.isJavaIdentifierStart(name.charAt(0))) {
+            return false;
+        }
+        for (int i = 1; i < name.length(); i++) {
+            if (!Character.isJavaIdentifierPart(name.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     /**
      * Creates an IVML variable. [public for testing]
@@ -271,6 +310,10 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
      * @throws ExecutionException if creating the variable fails
      */
     public void createVariable(String varName, String type, String valueEx) throws ExecutionException {
+        if (!isValidIdentifier(varName)) {
+            throw new ExecutionException("'" + varName + "' is not a valid identifier", null);
+        }
+        LoggerFactory.getLogger(getClass()).info("Creating IVML variable {} {} = {};", type, varName, valueEx);
         net.ssehub.easy.varModel.confModel.Configuration cfg = getIvmlConfiguration();
         Project root = cfg.getProject();
         try {
@@ -290,6 +333,7 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
             ReasoningResult res = validateAndPropagate();
             throwIfFails(res, true);
             saveTo(target, getIvmlFile(target));
+            LoggerFactory.getLogger(getClass()).info("Created IVML variable {}: {}", varName);
         } catch (ModelQueryException | ConfigurationException e) {
             throw new ExecutionException(e);
         }
@@ -334,7 +378,8 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
         ReasoningResult result = ReasonerFrontend.getInstance().propagate(cfg.getConfiguration(), null, null);
         if (result.hasConflict()) {
             history.rollback();
-            String text = "";
+            throwIfFails(result, false);
+            /*String text = "";
             for (int m = 0; m < result.getMessageCount(); m++) {
                 if (m > 0) {
                     text += "\n";
@@ -349,14 +394,16 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
                     }
                 }
             }
-            throw new ExecutionException(text, null);
+            throw new ExecutionException(text, null);*/
         } else {
+            LoggerFactory.getLogger(getClass()).info("Committing IVML changes:");
             history.commit();
             Map<Project, CopiedFile> copies = new HashMap<>();
             for (Project p: projects) {
                 File f = getIvmlFile(p);
                 copies.put(p, copyToTmp(f));
                 saveTo(p, f);
+                LoggerFactory.getLogger(getClass()).info(" - Writing IVML file {}", f);
             }
             reloadAndValidate(copies);
         }

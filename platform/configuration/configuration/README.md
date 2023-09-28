@@ -29,9 +29,9 @@ The setup also may contain a `serviceArtifactStorage`and a `containerImageStorag
 
 ## Configuration model
 
-The configuration model is written in the languages of EASy-Producer, namely Integrated Variability Modeling Language (IVML), Variability Instantiation Language (VIL) and Variability Template/Asset Language (VTL). EASy-Producer is open source on [github](https://github.com/SSEHUB/EASyProducer), also the most [recent specifications of IVML, VIL and VTL](https://github.com/SSEHUB/EASyProducer/tree/master/doc/web/docPreview). The [configuration model](https://github.com/iip-ecosphere/platform/tree/main/platform/configuration/configuration/src/main/easy) is also explained/documented.
+The configuration model is written in the languages of EASy-Producer, namely Integrated Variability Modeling Language (IVML), Variability Instantiation Language (VIL) and Variability Template/Asset Language (VTL). EASy-Producer is open source on [github](https://github.com/SSEHUB/EASyProducer), also the most [recent specifications of IVML, VIL and VTL](https://github.com/SSEHUB/EASyProducer/tree/master/doc/web/docPreview). The [configuration model](/src/main/easy) is also explained/documented.
 
-The regression tests are based on IVML models. Some just serve for structural purposes and regression testing within this component. Some are executable and part of the regression tests in [examples](https://github.com/iip-ecosphere/platform/tree/main/platform/examples/examples/README.md). Implementation components stem from [test.configuration.configuration](https://github.com/iip-ecosphere/platform/tree/main/platform/tests/test.configuration.configuration/README.md) with mutual dependencies to this project. For a graphical documentation of the test cases, see [test case slides](https://github.com/iip-ecosphere/platform/tree/main/platform/configuration/configuration/src/test/easy/summary.pdf).
+The regression tests are based on IVML models. Some just serve for structural purposes and regression testing within this component. Some are executable and part of the regression tests in [examples](../../examples/README.md). Implementation components stem from [test.configuration.configuration](../../tests/test.configuration.configuration/README.md) with mutual dependencies to this project. For a graphical documentation of the test cases, see [test case slides](src/test/easy/summary.pdf).
 
 ## The resources folder
 
@@ -48,7 +48,7 @@ Applications projects containing the configuration model of the application typi
 
 ## Prerequisites
 
-For running the tests locally, you need a Python 3.9 with all IIP-Python dependencies (see platform handbook and [Install Package](https://github.com/iip-ecosphere/platform/tree/main/platform/tools/Install)) installed. On Windows, this can easily be obtained from the Microsoft Store.
+For running the tests locally, you need a Python 3.9 with all IIP-Python dependencies (see platform handbook and [Install Package](../../tools/Install)) installed. On Windows, this can easily be obtained from the Microsoft Store.
 
 For running the container tests, you need Docker and LXC (Linux only). To bypass the container creation in either case, use `-Deasy.docker.failOnError=false` to disable failure reporting during Docker instantiator execution or `-Deasy.lxc.failOnError=false` to disable failure reporting for the LXC instantiator. The instantiation process shall then run anyway and produce the related artifacts, e.g., Dockerfiles or LXC templates, but no container images are created/deployed.
 

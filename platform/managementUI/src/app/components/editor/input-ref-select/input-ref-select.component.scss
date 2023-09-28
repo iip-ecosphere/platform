@@ -2,13 +2,10 @@ tr:nth-child(odd) {
   background-color:initial;
 }
 
-
 .flexcontainer {
-  max-height: 400px;
   display:flex;
   justify-content: flex-start;
   flex-wrap: wrap;
-  //background-color: red;
 }
 
 .valuebox {
@@ -17,7 +14,7 @@ tr:nth-child(odd) {
   border: 2px solid black;
   border-radius: 4px;
   background-color: rgb(199, 199, 199);
-  margin-left: 5%;
+  margin-left: 1em;
 }
 
 .singlevaluebox {
@@ -27,7 +24,7 @@ tr:nth-child(odd) {
   border: 2px solid black;
   border-radius: 4px;
   background-color: rgb(199, 199, 199);
-  margin-left: 5%;
+  margin-left: 1em;
 }
 
 .inputCard {

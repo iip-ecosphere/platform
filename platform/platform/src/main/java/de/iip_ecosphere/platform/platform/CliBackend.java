@@ -708,7 +708,7 @@ class CliBackend {
                         String uri = art.normalize().toString();
                         println("Removing artifact " + art + " from " + resourceId);
                         try {
-                            serviceClients.get(resourceId).removeArtifactAsTask(uri, taskId); // works with URI and null
+                            serviceClients.get(resourceId).removeArtifactAsTask(taskId, uri); // works with URI and null
                         } catch (ExecutionException e) {
                             exceptions.add(e);
                         }

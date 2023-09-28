@@ -1,0 +1,55 @@
+project AllServicesPartMip {
+
+    import AllTypes;  
+    import AllConstants;
+    
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+
+    //String MqttBrokerServer = networkAddress("192.168.2.12", "192.168.2.12", false);
+    String MqttBrokerServer = networkAddress("192.168.81.209", "192.168.81.209", false);
+
+    MipMqttV3Connector MipMqttDataConn = {
+        id = "MipMqttDataConn",
+        host = MqttBrokerServer,
+        port = 1883,
+        mock = getFlowTest(false), 
+        traceRcv = TraceKind::TRACE,
+        traceSent = TraceKind::TRACE,
+        security = {
+            authenticationKey = "MqttBroker:1883",
+            hostNameVerification = false   
+        },
+        inChannel = "/mip/reader/ATML2589/IIP",
+        outChannel = "/mip/reader/ATML2589/IIP"
+    };
+       
+    Service myMipAiPythonService = PythonService {
+        id = "MipAiPythonService",
+        name = "Mip Ai Python Service",
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+        input = {{type=refBy(MipMqttOutput)}},
+        output = {{type=refBy(MipAiPythonOutput)}, {type=refBy(MipMqttInput), forward=false}},
+        artifact = "de.iip-ecosphere.platform:examples.MIP:" + iipVer,
+        kind = ServiceKind::TRANSFORMATION_SERVICE,
+        dependencies = {refBy(PYTHON39)},
+        integrationMode = PythonIntegrationMode::websocket_continuous
+    };
+
+    Service myPythonReceiverService = JavaService {
+        id = "SimplePythonReceiver",
+        name = "Simple Python Data Receiver",
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+        class = "de.iip_ecosphere.platform.examples.MIP.SimplePythonReceiverImpl",
+        artifact = "de.iip-ecosphere.platform:examples.MIP:" + iipVer,
+        kind = ServiceKind::SINK_SERVICE,
+        input = {{type=refBy(MipAiPythonOutput)}}
+    };
+
+    freeze {
+        .;
+    }
+}

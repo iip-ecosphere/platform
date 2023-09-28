@@ -5,6 +5,7 @@ project DataTypes {
     annotate BindingTime bindingTime = BindingTime::compile to .;
     
     NonEmptyString iipVer = "0.6.0-SNAPSHOT"; // Maven version of platform
+    const String mvnIipGroup = "de.iip-ecosphere.platform";
     
     typedef EphemeralPort Integer with (EphemeralPort >= -1 and EphemeralPort <= 65535);
     typedef NonEmptyEphemeralPort EphemeralPort with (isDefined(NonEmptyEphemeralPort));
@@ -89,6 +90,7 @@ project DataTypes {
             String description = "";
             Boolean optional = false;
             Boolean readOnly = false;
+            Boolean nullable = false;
         }
         Integer cachingTime = CACHE_ALWAYS; 
     }

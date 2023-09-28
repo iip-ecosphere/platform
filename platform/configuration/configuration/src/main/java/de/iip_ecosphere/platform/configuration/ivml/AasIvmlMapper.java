@@ -57,6 +57,9 @@ import net.ssehub.easy.reasoning.core.reasoner.ReasoningResult;
 import net.ssehub.easy.varModel.confModel.AssignmentState;
 import net.ssehub.easy.varModel.confModel.ConfigurationException;
 import net.ssehub.easy.varModel.confModel.IDecisionVariable;
+import net.ssehub.easy.varModel.cst.ConstraintSyntaxTree;
+import net.ssehub.easy.varModel.cstEvaluation.EvaluationVisitor;
+import net.ssehub.easy.varModel.management.VarModel;
 import net.ssehub.easy.varModel.model.AbstractVariable;
 import net.ssehub.easy.varModel.model.ContainableModelElement;
 import net.ssehub.easy.varModel.model.DecisionVariableDeclaration;
@@ -90,6 +93,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     public static final String OP_DELETE_GRAPH = "deleteGraph";
     public static final String OP_CREATE_VARIABLE = "createVariable";
     public static final String OP_DELETE_VARIABLE = "deleteVariable";
+    public static final String OP_GEN_INTERFACES = "genInterfacesAsync";
     public static final String OP_GEN_APPS_NO_DEPS = "genAppsNoDepsAsync";
     public static final String OP_GEN_APPS = "genAppsAsync";
     
@@ -97,9 +101,11 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         v -> !TypeQueries.isConstraint(v.getType());
     public static final String META_TYPE_NAME = "meta";
     public static final Function<String, String> SHORTID_PREFIX_META = n -> "meta" + PseudoString.firstToUpperCase(n);
+    protected static final String PRJ_NAME_ALLCONSTANTS = "AllConstants";
     protected static final String PRJ_NAME_ALLSERVICES = "AllServices";
     protected static final String PRJ_NAME_ALLTYPES = "AllTypes";
     protected static final String PRJ_NAME_TECHSETUP = "TechnicalSetup";
+    private static final Map<String, String> PROJECT_MAPPING;
     private static final Map<String, String> PARENT_MAPPING;
     private static final TypeVisitor TYPE_VISITOR = new TypeVisitor();
     private static final String PROGRESS_COMPONENT_ID = "configuration.configuration";
@@ -110,6 +116,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     private Map<String, SubmodelElementCollectionBuilder> types = new HashMap<>();
     
     static {
+        // tech settings -> parent
         Map<String, String> parentMap = new HashMap<>();
         parentMap.put("Aas", PRJ_NAME_TECHSETUP);
         parentMap.put("Transport", PRJ_NAME_TECHSETUP);
@@ -117,6 +124,15 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         parentMap.put("Resources", PRJ_NAME_TECHSETUP);
         parentMap.put("UI", PRJ_NAME_TECHSETUP);
         PARENT_MAPPING = Collections.unmodifiableMap(parentMap);
+
+        // new variable parent type -> project
+        Map<String, String> projectMap = new HashMap<>();
+        projectMap.put("ServiceBase", PRJ_NAME_ALLSERVICES);
+        projectMap.put("Server", PRJ_NAME_ALLSERVICES);
+        projectMap.put("Manufacturer", PRJ_NAME_ALLSERVICES);
+        projectMap.put("Dependency", PRJ_NAME_ALLSERVICES);
+        projectMap.put("DataType", PRJ_NAME_ALLTYPES);
+        PROJECT_MAPPING = Collections.unmodifiableMap(projectMap);
     }
     
     /**
@@ -320,16 +336,26 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                 return null;
             }, getAasOperationCompletedListener())
         );
+        // generate Interfaces, generate Templates
         sBuilder.defineOperation(OP_GEN_APPS, 
             new JsonResultWrapper(a -> {
                 return TaskUtils.executeAsTask(PROGRESS_COMPONENT_ID, 
-                    p -> getAasIvmlMapper().instantiate(getAasIvmlMapper().createInstantiationConfigurer(false)));
+                    p -> getAasIvmlMapper().instantiate(getAasIvmlMapper().createInstantiationConfigurer(
+                        InstantiationMode.APPS, AasUtils.readString(p), AasUtils.readString(p, 1))));
             })
         );
         sBuilder.defineOperation(OP_GEN_APPS_NO_DEPS, 
             new JsonResultWrapper(a -> {
                 return TaskUtils.executeAsTask(PROGRESS_COMPONENT_ID, 
-                    p -> getAasIvmlMapper().instantiate(getAasIvmlMapper().createInstantiationConfigurer(true)));
+                    p -> getAasIvmlMapper().instantiate(getAasIvmlMapper().createInstantiationConfigurer(
+                        InstantiationMode.APPS_NO_DEPS, AasUtils.readString(p), null)));
+            })
+        );
+        sBuilder.defineOperation(OP_GEN_INTERFACES, 
+            new JsonResultWrapper(a -> {
+                return TaskUtils.executeAsTask(PROGRESS_COMPONENT_ID, 
+                    p -> getAasIvmlMapper().instantiate(getAasIvmlMapper().createInstantiationConfigurer(
+                        InstantiationMode.INTERFACES, null, null)));
             })
         );
     }
@@ -347,19 +373,43 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     }
     
     /**
+     * Instantiation modes.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private enum InstantiationMode {
+        APPS_NO_DEPS,
+        APPS,
+        INTERFACES
+    }
+    
+    /**
      * Creates an instantiation configurer from {@link ConfigurationSetup} to create application code.
      * 
-     * @param noDeps do a no-deps generation or do a full generation
+     * @param mode the instantiation mode
+     * @param appId the id of the application to instantiate, may be empty or <b>null</b> for none
+     * @param fileName the name of the implementation artifact to integrate, may be empty or <b>null</b> for none
      * @return the configurer
      */
-    private InstantiationConfigurer createInstantiationConfigurer(boolean noDeps) {
+    private InstantiationConfigurer createInstantiationConfigurer(InstantiationMode mode, String appId, 
+        String fileName) {
+        // if fileName -> unpack, run maven
         EasySetup ep = ConfigurationSetup.getSetup().getEasyProducer();
         InstantiationConfigurer result = new InstantiationConfigurer(
             ep.getIvmlModelName(), getIvmlConfigFolder(ep), ep.getGenTarget());
-        if (noDeps) {
-            result.setStartRuleName("generateAppsNoDeps");
-        } else {
+        // TODO pass into appId
+        switch (mode) {
+        case APPS:
             result.setStartRuleName("generateApps");
+            break;
+        case APPS_NO_DEPS:
+            result.setStartRuleName("generateAppsNoDeps");
+            break;
+        case INTERFACES:
+            result.setStartRuleName("generateInterfaces");
+            break;
+        default:
+            break;
         }
         return result;
     }
@@ -368,22 +418,26 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     protected Project getVariableTarget(Project root, IDatatype type) {
         Project result = null;
         if (null != type) {
-            try {
-                IDatatype serviceType = ModelQuery.findType(root, "ServiceBase", null);
-                if (null != serviceType && serviceType.isAssignableFrom(type)) {
-                    result = ModelQuery.findProject(root, PRJ_NAME_ALLSERVICES);
-                } else {
-                    IDatatype dataType = ModelQuery.findType(root, "DataType", null);
-                    if (null != dataType && dataType.isAssignableFrom(type)) {
-                        result = ModelQuery.findProject(root, PRJ_NAME_ALLTYPES);
-                    }
+            for (Map.Entry<String, String> ent : PROJECT_MAPPING.entrySet()) {
+                try {
+                    IDatatype serviceType = ModelQuery.findType(root, ent.getKey(), null);
+                    if (null != serviceType && serviceType.isAssignableFrom(type)) {
+                        result = ModelQuery.findProject(root, ent.getValue());
+                        if (result != null) {
+                            break;
+                        }
+                    } 
+                } catch (ModelQueryException e) {
+                    LoggerFactory.getLogger(AasIvmlMapper.class).warn(
+                        "Cannot find type {} when checking for target IVML project {}: {}", ent.getKey(), 
+                        ent.getValue(), e.getMessage());
                 }
-            } catch (ModelQueryException e) {
-                LoggerFactory.getLogger(AasIvmlMapper.class).warn(
-                    "Cannot find type. Target of new variable will be the root project. {}", e.getMessage());
+            }
+            if (null == result) { // immediate fallback
+                result = ModelQuery.findProject(root, PRJ_NAME_ALLCONSTANTS);
             }
         }
-        if (null == result) {
+        if (null == result) { // extreme fallback
             result = root;
         }
         return result;
@@ -393,6 +447,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     protected boolean isAllowedForModification(Project prj) {
         String name = prj.getName();
         return PRJ_NAME_ALLTYPES.equals(name) 
+            || PRJ_NAME_ALLCONSTANTS.equals(name) 
             || PRJ_NAME_ALLSERVICES.equals(name) 
             || PRJ_NAME_TECHSETUP.equals(name);
     }
@@ -446,6 +501,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
      * @throws ExecutionException if setting the graph structure fails
      */
     public synchronized Object deleteGraph(String appName, String meshName) throws ExecutionException {
+        LoggerFactory.getLogger(getClass()).info("Deleting graph in IVML, app {} mesh {}", appName, meshName);
         net.ssehub.easy.varModel.confModel.Configuration cfg = getIvmlConfiguration();
         Project root = cfg.getProject();
         Project appProject = ModelQuery.findProject(root, getApplicationProjectName(appName));
@@ -479,6 +535,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                     notifyChange(appProject, ConfigurationChangeType.DELETED);
                 }
                 reloadAndValidate(copies);
+                LoggerFactory.getLogger(getClass()).info("Deleted graph in IVML, app {} mesh {}", appName, meshName);
             } catch (ModelQueryException e) {
                 throw new ExecutionException(e);
             }
@@ -518,38 +575,78 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         }
         return val;
     }
+    
+    /**
+     * Returns whether {@code string} is a non-empty string.
+     * 
+     * @param string the string to test
+     * @return {@code true} for a non-empty string, {@code false} for an empty string or <b>null</b>
+     */
+    private static boolean isNonEmptyString(String string) {
+        return string != null && string.length() > 0;
+    }
 
     /**
-     * Changes a graph structure in IVML. [public for testing]
+     * Changes an application/graph structure in IVML. Application/mesh files are dynamically linked and require
+     * a different approach as, e.g., constants. [public for testing]
      * 
      * @param appName the configured name of the application
      * @param appValueEx the application value as IVML expression
-     * @param meshName the configured name of the service mesh
-     * @param format the format of the graph
-     * @param value the value
+     * @param meshName the configured name of the service mesh (may be <b>null</b> or empty for none; used as import 
+     *    resolution if given, existing and {@code format} or {@code value} are not given).
+     * @param format the format of the graph (may be <b>null</b> or empty for none).
+     * @param value the value (may be <b>null</b> or empty for none).
      * @return <b>null</b> always
      * @throws ExecutionException if setting the graph structure fails
      */
     public synchronized Object setGraph(String appName, String appValueEx, String meshName, String format, 
         String value) throws ExecutionException {
-        GraphFormat gFormat = getGraphFormat(format);
-        IvmlGraph graph = gFormat.fromString(value, getMapper().getGraphFactory(), this);
-        
-        try {
-            ModelResults results = new ModelResults();
-            createMeshProject(appName, meshName, graph, results);
-            createAppProject(appName, appValueEx, results);
-
-            Map<Project, CopiedFile> copies = new HashMap<>();
-            File meshFile = getIvmlFile(results.meshProject);
-            copies.put(results.meshProject, copyToTmp(meshFile));
-            File appFile = getIvmlFile(results.appProject);
-            copies.put(results.appProject, copyToTmp(appFile));
-            saveTo(results.meshProject, meshFile);
-            saveTo(results.appProject, appFile);
-            reloadAndValidate(copies);
-        } catch (ModelQueryException | ModelManagementException e) {
-            throw new ExecutionException(e);
+        boolean doApp = isNonEmptyString(appName);
+        boolean doMesh = isNonEmptyString(meshName) && isNonEmptyString(format) && isNonEmptyString(value);
+        if (doApp || doMesh) {
+            LoggerFactory.getLogger(getClass()).info("Setting graph in IVML app {} = {}, mesh {}, format {}", 
+                appName, appValueEx, meshName, format); // no graph, may become too long
+            GraphFormat gFormat = getGraphFormat(format);
+            
+            try {
+                ModelResults results = new ModelResults();
+                if (doMesh) {
+                    IvmlGraph graph = gFormat.fromString(value, getMapper().getGraphFactory(), this);
+                    createMeshProject(appName, meshName, graph, results);
+                } 
+                if (doApp) {
+                    createAppProject(appName, appValueEx, results);
+                }
+    
+                File meshFile = null;
+                File appFile = null;
+                Map<Project, CopiedFile> copies = new HashMap<>();
+                if (doMesh) {
+                    meshFile = getIvmlFile(results.meshProject);
+                    copies.put(results.meshProject, copyToTmp(meshFile));
+                }
+                if (doApp) {
+                    appFile = getIvmlFile(results.appProject);
+                    copies.put(results.appProject, copyToTmp(appFile));
+                }
+                if (meshFile != null) {
+                    saveTo(results.meshProject, meshFile);
+                }
+                if (appFile != null) {
+                    saveTo(results.appProject, appFile);
+                }
+                reloadAndValidate(copies);
+                LoggerFactory.getLogger(getClass()).info("Graph set in IVML app {} = {}, mesh {}, format {}", 
+                    appName, appValueEx, meshName, format); // no graph, may become too long
+            } catch (ModelQueryException | ModelManagementException e) {
+                e.printStackTrace();
+                throw new ExecutionException(e);
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+                throw new ExecutionException(e);
+            }
+        } else {
+            LoggerFactory.getLogger(getClass()).info("No model change as both, graph and mesh do not have a name"); 
         }
         return null;
     }
@@ -607,7 +704,18 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         String appProjectName = getApplicationProjectName(appName);
         results.appProject = findOrCreateProject(root, appProjectName, true); 
         addImport(results.appProject, "Applications", root, null);
-        addImport(results.appProject, "ServiceMeshPart*", root, results.meshProject);
+        addImport(results.appProject, "AllServices", root, null);
+        // > may go down to easy
+        Project wildcardPrj = new Project("");
+        for (String modelName : VarModel.INSTANCE.getMatchingModelNames("ServiceMeshPart*")) {
+            Project tmp = ModelQuery.findProject(root, modelName);
+            if (null != tmp) {
+                addImport(wildcardPrj, modelName, root, tmp);
+            }
+        }
+        addImport(results.appProject, "ServiceMeshPart*", root, wildcardPrj);
+
+        // < may go down to Easy
         List<Object> meshes = new ArrayList<Object>();
         boolean replaced = false;
         if (results.appProject != null) {
@@ -706,6 +814,38 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         }
         return result;
     }
+    
+    /**
+     * Validates the name of a node and if there is none, sets a pseudo name based on {@link count}.
+     * 
+     * @param node the node to validate
+     * @param count unique node counter per mesh
+     * @return the name of {@code node}
+     */
+    private String validateName(IvmlGraphNode node, int count) {
+        if (node.getName().length() == 0) { // just a fallback
+            node.setName(String.valueOf(count));
+        }
+        return node.getName();
+    }
+    
+    /**
+     * Turns {@code string} into an identifier, i.e., each non-Java identifier characters into a "_".
+     * 
+     * @param string the string to be checked
+     * @return the validated string, potentially modified to be an id
+     */
+    private static String toId(String string) {
+        StringBuffer result = new StringBuffer();
+        for (int i = 0; i < string.length(); i++) {
+            char c = string.charAt(i);
+            if (!Character.isJavaIdentifierPart(c)) {
+                c = '_';
+            }
+            result.append(c);
+        }
+        return result.toString();
+    }
 
     /**
      * Creates a mesh project for {@code graph}.
@@ -725,12 +865,13 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         String meshProjectName = getMeshProjectName(appName, meshName);
         results.meshProject = findOrCreateProject(root, meshProjectName, false); // just overwrite
         addImport(results.meshProject, "Applications", root, null);
-        IDatatype sourceType = ModelQuery.findType(root, "MeshSource", null);
-        IDatatype transformerType = ModelQuery.findType(root, "MeshTransformer", null);
-        IDatatype sinkType = ModelQuery.findType(root, "MeshSink", null);
-        IDatatype connectorType = ModelQuery.findType(root, "MeshConnector", null);
-        IDatatype serviceType = ModelQuery.findType(root, "ServiceBase", null);
-        IDatatype meshType = ModelQuery.findType(root, "ServiceMesh", null);
+        addImport(results.meshProject, "AllServices", root, null);
+        final IDatatype sourceType = ModelQuery.findType(root, "MeshSource", null);
+        final IDatatype processorType = ModelQuery.findType(root, "MeshProcessor", null);
+        final IDatatype sinkType = ModelQuery.findType(root, "MeshSink", null);
+        final IDatatype connectorType = ModelQuery.findType(root, "MeshConnector", null);
+        final IDatatype serviceType = ModelQuery.findType(root, "ServiceBase", null);
+        final IDatatype meshType = ModelQuery.findType(root, "ServiceMesh", null);
         ServiceMap services = collectServices(cfg, serviceType);
         Map<IvmlGraphNode, DecisionVariableDeclaration> nodeMap = new HashMap<>();
         Map<DecisionVariableDeclaration, String> valueMap = new HashMap<>();
@@ -742,21 +883,20 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             } else if (n.getOutEdgesCount() == 0) {
                 type = sinkType;
             } else {
-                type = transformerType; // TODO Probe service
+                type = processorType; // TODO Probe service
             }
-            DecisionVariableDeclaration nodeVar = new DecisionVariableDeclaration("node_" + n.getName(), type, 
-                results.meshProject);
+            DecisionVariableDeclaration nodeVar = new DecisionVariableDeclaration(toId("node_" 
+                + validateName(n, nodeMap.size())), type, results.meshProject);
             String nodeValEx = "{pos_x=" + n.getXPos() + ",pos_y=" + n.getYPos() 
                 + ",impl=" + IvmlUtils.getVarNameSafe(findServiceVar(services, n.getImpl()), "null")
                 + ",next = {";
             valueMap.put(nodeVar, nodeValEx);
             results.meshProject.add(nodeVar);
             nodeMap.put(n, nodeVar);
-            if (type == sourceType) {
+            if (type == sourceType && !sources.contains(nodeVar)) {
                 sources.add(nodeVar);
             }
         }
-        boolean first = true;
         int edgeCounter = 0;
         for (IvmlGraphNode n: graph.nodes()) {
             for (IvmlGraphEdge e: n.outEdges()) {
@@ -770,15 +910,14 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                     edgeVarName, connectorType, results.meshProject);
                 results.meshProject.add(edgeVar);
                 DecisionVariableDeclaration end = nodeMap.get(e.getEnd());
-                String valueEx = "{name=\"" + edgeName + "\", next=refBy(" + end.getName() + ")}";
+                String valueEx = "{name=\"" + edgeName + "\", next=refBy(" + toId(end.getName()) + ")}";
                 setValue(edgeVar, valueEx);
                 String startNodeValueEx = valueMap.get(nodeMap.get(n));
-                if (!first) {
+                if (!startNodeValueEx.endsWith("{")) {
                     startNodeValueEx += ",";
                 }
                 startNodeValueEx += "refBy(" + edgeVarName + ")";
                 valueMap.put(nodeMap.get(n), startNodeValueEx);
-                first = false;
             }
         }
         for (IvmlGraphNode n: graph.nodes()) {
@@ -919,9 +1058,15 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             .build(Type.NONE);
         smBuilder.createOperationBuilder(OP_GEN_APPS)
             .setInvocable(iCreator.createInvocable(OP_GEN_APPS))
+            .addInputVariable("appId", Type.STRING)
+            .addInputVariable("codeFile", Type.STRING)
             .build(Type.STRING);
         smBuilder.createOperationBuilder(OP_GEN_APPS_NO_DEPS)
             .setInvocable(iCreator.createInvocable(OP_GEN_APPS_NO_DEPS))
+            .addInputVariable("appId", Type.STRING)
+            .build(Type.STRING);
+        smBuilder.createOperationBuilder(OP_GEN_INTERFACES)
+            .setInvocable(iCreator.createInvocable(OP_GEN_INTERFACES))
             .build(Type.STRING);
     }
     
@@ -1007,7 +1152,43 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             varBuilder.build();
         }
     }
-    
+
+    /**
+     * Adds the default value of {@code var} if there is a default value.
+     * 
+     * @param var the variable to take the default value from
+     * @param varBuilder the variable builder to add the meta-value to
+     */
+    private void addMetaDefault(IDecisionVariable var, SubmodelElementCollectionBuilder varBuilder) {
+        addMetaDefault(var.getDeclaration(), varBuilder);
+    }
+
+    /**
+     * Adds the default value of {@code var} if there is a default value.
+     * 
+     * @param decl the variable declaration to take the default value from
+     * @param varBuilder the variable builder to add the meta-value to
+     */
+    private void addMetaDefault(AbstractVariable decl, SubmodelElementCollectionBuilder varBuilder) {
+        ConstraintSyntaxTree dflt = decl.getDefaultValue();
+        if (null != dflt) {
+            EvaluationVisitor eval = new EvaluationVisitor(getIvmlConfiguration(), null, false, null);
+            dflt.accept(eval);
+            Value dfltValue = eval.getResult();
+            eval.clear();
+            if (dfltValue != null) {
+                ValueVisitor valueVisitor = new ValueVisitor();
+                dfltValue.accept(valueVisitor);
+                Object aasValue = valueVisitor.getAasValue();
+                if (null != aasValue) {
+                    varBuilder.createPropertyBuilder(AasUtils.fixId(metaShortId.apply("default")))
+                        .setValue(Type.STRING, aasValue.toString())
+                        .build();
+                }
+            }
+        }
+    }
+
     /**
      * Adds the meta properties of {@code var} of type {@code varType} to {@code varBuilder}.
      * 
@@ -1017,12 +1198,16 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
      */
     private void addMetaProperties(IDecisionVariable var, IDatatype varType, 
         SubmodelElementCollectionBuilder varBuilder) {
+        varBuilder.createPropertyBuilder(AasUtils.fixId(metaShortId.apply("variable")))
+            .setValue(Type.STRING, var.getDeclaration().getName())
+            .build();
         varBuilder.createPropertyBuilder(AasUtils.fixId(metaShortId.apply("state")))
             .setValue(Type.STRING, var.getState().toString())
             .build();
         varBuilder.createPropertyBuilder(AasUtils.fixId(metaShortId.apply("type")))
             .setValue(Type.STRING, IvmlDatatypeVisitor.getUnqualifiedType(varType))
             .build();
+        addMetaDefault(var, varBuilder);
         if (var.getDeclaration().getParent() instanceof Project) { // top-level only for now
             varBuilder.createPropertyBuilder(AasUtils.fixId(metaShortId.apply("project")))
                 .setValue(Type.STRING, mapParent(var))

@@ -290,7 +290,11 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
 
     // internal dispatch basis, akin produceDataTransfer(DataType), but carries actual field that is not present at top-level call
     def produceDataTransfer(Field field, DataType type, mapOf(String, Field) mapping, String typeQual, String mapQual, setOf(String) done, String indexes, String paths) {
-        ''
+       if (isKindOf(type, RecordType)) { // fallback for OPC, shall not be needed
+            produceDataTransfer(type, mapping, typeQual, mapQual, done, indexes, paths);
+        } else {
+            '';
+        }
     }
 
     // akin produceDataTransfer(RecordType), but carries actual field that is not present at top-level call, calls produceDataTransfer(RecordType)

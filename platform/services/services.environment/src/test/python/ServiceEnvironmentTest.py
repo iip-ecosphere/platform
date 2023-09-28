@@ -38,8 +38,8 @@ class CmdLineServiceEnvironmentTest(unittest.TestCase):
         
         results = re.sub(r'\n\s*\n', '\n', out[0]).splitlines()
         assert len(results) == 2 # as input
-        assert results[0] == 'S|0|data'
-        assert results[1] == 'S|0|data'
+        assert re.search("S\|[0-9]+\|data", results[0])
+        assert re.search("S\|[0-9]+\|data", results[1])
 
         process.terminate()
         process.wait()

@@ -1,0 +1,19 @@
+project ApplicationPartMipApp {
+
+    import ServiceMeshPartMipAppMesh;
+
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+    
+    Application MipApp = {
+        id = "MipApp",
+        name = "Simple Mip App",
+        ver = "0.1.0",
+        description = "",
+        services = {refBy(MipMesh)}        
+    };
+    
+    freeze {
+        .;
+    }
+
+}

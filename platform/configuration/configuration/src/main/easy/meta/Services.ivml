@@ -147,7 +147,7 @@ project Services {
    
    // aligned to services.environment
    enum ServiceKind {SOURCE_SERVICE, TRANSFORMATION_SERVICE, SINK_SERVICE, PROBE_SERVICE};
-   enum TraceKind {NONE, TRACE, LOG, SYSOUT};
+   enum TraceKind {NONE, TRACE, TRACE_NO_DATA, LOG, LOG_NO_DATA, SYSOUT};
    
    // service base is the parent type of Service and ServiceFamily. They may be used in interchangable manner
    // in some situations while in others it is important to have a service not being a family avoiding potential
@@ -175,7 +175,6 @@ project Services {
            }       
        }
        assign (uiGroup = UiOptionalGroup2) to {
-           refTo(EcsDevice) allocatedTo; // -> BindingTime::runtimeEnact
            Boolean monitorRcvCount = true;
            Boolean monitorSentCount = true;
            Boolean monitorProcessingTime = true;
@@ -301,6 +300,9 @@ project Services {
     compound JavaServer refines Server {
         NonEmptyString class;
         String cmdArg; // for now, comma separated
+        assign (semanticId = Eclass_Unit_MByte) to {
+            Integer memLimit = 256; // e.g., JVM memory limit in MBytes
+        }
     }
 
     // python based server instance, based on PythonServiceEnvironment, may be generated, must implement Server interface

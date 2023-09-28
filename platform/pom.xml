@@ -14,6 +14,7 @@
      <!-- platform dependencies first -->
      <module>platformDependencies</module>
      <module>support/support</module>
+     <module>support/libs.ads</module>
      <!-- maven plugins -->
      <module>tools/tools.maven.python</module>
      <module>tools/tools.maven.invoker</module>
@@ -79,6 +80,7 @@
      <module>configuration/configuration</module> <!-- requires next -->
      <module>tests/test.configuration.configuration</module> <!-- requires interface build of tests -->
      <module>configuration/configuration.maven</module>
+     <module>configuration/configuration.defaultLib</module>
      <!-- platform services, CLI, AAS -->
      <module>platform</module>
      <!-- examples -->
@@ -89,6 +91,7 @@
      <module>examples/examples.pythonSync</module>
      <module>examples/examples.rtsa</module>
      <!--<module>examples/examples.templates</module>--> <!-- Needs orchestrated pom.xml at this level -->
+     <module>examples/examples.MIP</module>
      <module>examples/examples.vdw</module>
      <module>examples/examples.hm22</module>
   </modules>

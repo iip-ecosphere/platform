@@ -197,7 +197,7 @@ public interface ServiceOperations {
     public int getServiceInstanceCount(String serviceId);
     
     /**
-     * Mode for {@link ServiceOperations#streamLog(String, boolean)}.
+     * Mode for {@link ServiceOperations#streamLog(String, StreamLogMode)}.
      * 
      * @author Holger Eichelberger, SSE
      */

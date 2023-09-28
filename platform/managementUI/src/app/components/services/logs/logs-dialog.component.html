@@ -1,20 +1,46 @@
-<head>
-  <title>HTML Elements Reference</title>
-</head>
-<h1>Logs {{data.idShort}}</h1>
-<div>{{data.value}}</div>
-<!--
-<mat-toolbar>
-  <h1>Logs for {{logsData.serviceId}}</h1>
-  <span style="flex: 1 1 auto"></span>
-  <span><button mat-icon-button class="button" color="warning"
-    (click)="close()"><mat-icon>close</mat-icon></button></span>
-</mat-toolbar>
+<br>
+<div style="font-size: 23px; margin-left: 10px;">
+  <img src="/assets/aas.png" alt="image" class="img-aas">
+  Logs ({{data.type}})
+  <p></p>
+  <div style="font-size: 20px;">{{data.idShort}}</div>
 
-<mat-card *ngIf="logsData.logs">
-  <div>LOGS: {{logs}}</div>
-  <div *ngIf="logsData.value">HIER {{logsData.value.idShort}}</div>
-  <div>{{temp}}</div>
+<br>
+<button mat-raised-button class="logs-btn"
+  (click)="startLogsStream()"> start
+</button>
+<button mat-raised-button class="logs-btn"
+  (click)="reset()"> reset
+</button>
+<button mat-raised-button class="logs-btn"
+  (click)="close()"> stop
+</button>
+<div style="overflow: auto;">
+  <pre style="white-space: pre-wrap; font-size: 14px;">
+    {{data.logs}}
+</pre>
+</div>
+<br><br><br>
 
-</mat-card>
+
+<!-- debugging (remove later)
+<p>-----------</p>
+running: {{running}}
+</div>
+<br>
+
+<div style="font-size: 12px; margin-left: 10px;">
+  <p>Service info:</p>
+  <p>id: {{data.id}}</p>
+  <p>idShort: {{data.idShort}}</p>
+  <p>type: {{data.type}}</p>
+</div>
+
+
+<div>received data: {{receivedData}}</div>
+
+<p>counter: {{counter}}</p>
 -->
+
+
+

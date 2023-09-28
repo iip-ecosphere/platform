@@ -75,7 +75,27 @@ public interface NetworkManager {
      *   if {@code address} is <b>null</b>
      */
     public ManagedServerAddress reservePort(String key, ServerAddress address);
-    
+
+    /**
+     * Explicitly reserves a certain address for a given key, if possible in a global scope. If reserved before 
+     * {@link #obtainPort(String)}, this takes precedence. Reserved addresses shall also be 
+     * {@link #releasePort(String) released} if not used anymore. Reserved addresses must not be within 
+     * {@link #getLowPort()} and {@link #getHighPort()}, they must not even be associated with the machine running 
+     * this manager.
+     * 
+     * @param key a key indicating the use (may be a prefix, see {@link #PREFIX_SEPARATOR})
+     * @param address the address to use
+     * @return the server address including the port number (including the server IP), 
+     *   {@link ManagedServerAddress#isNew()} is {@code true} if the key/address was not obtained/reserved before, 
+     *   {@code false} if the key/address is also known. If {@code false} also {@link ManagedServerAddress#getHost()}
+     *   or {@link ManagedServerAddress#getSchema()} may differ from {@code address}.
+     * @throws IllegalArgumentException if the key may not be used, in particular if {@code key} is <b>null</b> or 
+     *   if {@code address} is <b>null</b>
+     */
+    public default ManagedServerAddress reserveGlobalPort(String key, ServerAddress address) {
+        return reservePort(key, address);
+    }
+
     /**
      * Releases the port. When all requesting parties released the port, the port will be ultimately freed. Usuall,
      * only clients with a {@link ManagedServerAddress#isNew() new} address shall call this method.

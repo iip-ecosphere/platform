@@ -220,14 +220,55 @@ export interface uiGroup {
 }
 
 export interface editorInput {
-  value: string[]; //editorInput[]
+  value: any;
   type: string;
   name: string;
   description: [{language: string, text: string}];
   refTo?: boolean;
   multipleInputs?: boolean;
   metaTypeKind?: number;
+  meta?: configMetaEntry;
 
+}
+
+export interface configMetaContainer {
+  modelType: {name: string};
+  dataSpecifications?: any[];
+  embeddedSpecifications?: any[];
+  kind: string;
+  ordered: true;
+  allowDuplicates: boolean;
+  idShort: string;
+  parent: {keys:  {type: string, local: boolean, value: string, idType: string}[]};
+  value: configMeta[];
+}
+
+export interface configMeta {
+  modelType: {name: string};
+  dataSpecifications?: any[];
+  embeddedSpecifications?: any[];
+  kind: string;
+  ordered: true;
+  allowDuplicates: boolean;
+  idShort: string;
+  parent: {keys:  {type: string, local: boolean, value: string, idType: string}[]};
+  value: configMetaEntry[];
+}
+
+export interface configMetaEntry { //name, type, uiGroup
+  modelType: {name: string};
+  dataSpecifications?: any[];
+  embeddedDataSprecifications?: any[];
+  kind: string;
+  value: any;
+  valueType?: string;
+  idShort: string;
+  description?: [{ language: string, text: string }]
+  parent?: {keys:  {type: string, local: boolean, value: string, idType: string}[]};
+}
+
+export interface ivmlTemplate {
+  [key: string]: any
 }
 
 

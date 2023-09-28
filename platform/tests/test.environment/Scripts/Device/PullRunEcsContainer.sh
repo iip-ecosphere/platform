@@ -1,4 +1,4 @@
-EcsContainer=$(curl -s 'http://'$2'/v2/_catalog' | jq -r '.[]' | jq -r '.[] | select(contains("ecs"))')
+EcsContainer=$(curl -s 'http://'$2'/v2/_catalog' | jq -r '.[]' | jq -r '.[] | select(contains("ecs")) | select(contains("'$4'"))')
 
 EcsContainerTags=$(curl -L -s http://$2/v2/$EcsContainer/tags/list | jq '.tags[0]' | sed 's/"//g')
 
@@ -13,7 +13,7 @@ while [ -z "$ecsReady" ]; do
   sleep 3;
 done
 
-deviceID=$(echo "$containerLog" | grep "d.i.p.e.d.AasxDeviceAasProvider - Checking AAS for id" | rev | cut -d ' ' -f1 | rev)
+deviceID=$(echo "$containerLog" | grep "de.iip_ecosphere.platform.support.iip_aas.MacIdProvider" | head -1 | rev | cut -d ' ' -f3- | cut -d ' ' -f1 | rev)
 
 echo "Ecs is Running... Please don't close it"
 echo "DeviceID: $deviceID"

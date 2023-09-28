@@ -62,7 +62,8 @@ public abstract class AbstractRunnablesService extends AbstractService {
 
     @Override
     protected ServiceState stop() {
-        for (RunnableWithStop r : runnables) {
+        List<RunnableWithStop> tmp = new ArrayList<>(runnables);
+        for (RunnableWithStop r : tmp) {
             r.stop();
         }
         runnables.clear();

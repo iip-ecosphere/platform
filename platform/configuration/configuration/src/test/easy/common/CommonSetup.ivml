@@ -32,7 +32,8 @@ project CommonSetup {
         port = 8883,
         security = { // -> identityStore.yml in src/test/ or src/main depending on use
             authenticationKey = "amqp"
-        }
+        },
+        gatewayPort = -1
     };
     
     serviceProtocol = ServiceProtocolAMQP {};

@@ -8,6 +8,12 @@
   color: black;
 }
 
+.btn {
+  background-color:rgb(35, 142, 184);
+  margin-bottom: 5px;
+  width:100%;
+}
+
 .radio-group {
   background-color: rgb(247, 248, 248);
 }
@@ -24,4 +30,5 @@
 ::ng-deep.mat-radio-outer-circle {
   border-color:rgb(173, 171, 172); /*outer ring color change*/
 }
+
 

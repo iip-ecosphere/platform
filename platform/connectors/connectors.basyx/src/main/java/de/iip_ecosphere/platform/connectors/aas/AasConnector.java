@@ -183,6 +183,8 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
             }
             
             registry = factory.obtainRegistry(regEp, schema);
+            LOGGER.info("Connected to AAS registry: {}, notification interval {}", regEp.toUri(), 
+                params.getNotificationInterval());
             String name = params.getApplicationId();
             if (name.indexOf('?') > 0 || name.indexOf('*') > 0) {
                 try {
@@ -405,7 +407,6 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
         
         /**
          * Retrieves a node starting at the root of the OPC UA model based on the node's qualified name {@code qName}.
-         * Takes into account {@link #nodes the nodes cache}.
          * 
          * @param qName the qualified node name
          * @return the node

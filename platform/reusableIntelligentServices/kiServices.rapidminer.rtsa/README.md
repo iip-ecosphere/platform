@@ -6,7 +6,7 @@ So far, the integration is preliminary, i.e., separating mechanisms, ports and t
 
 RTSA usually ships in one ZIP for the agent (to be named RTSA-version.ZIP) and one or multiple deployments (one per service, named according to the service). The RTSA ZIP may contain the RTSA folders directly in the top-level directory or in one singular directory located in the top-level directory. If a special packaging is applied, i.e., RTSA and deployment are shipped together, e.g., for experimental purposes, use an empty RTSA ZIP and an all-encompassing deployment.ZIP including the RTSA.
 
-Testing of this component relies on the [fake version of RTSA](https://github.com/iip-ecosphere/platform/tree/main/platform/reusableIntelligentServices/kiServices.rapidminer.rtsaFake/README.md).
+Testing of this component relies on the [fake version of RTSA](../kiServices.rapidminer.rtsaFake/README.md).
 
 If you are **not running the tests with Java 8**, specify `-Diip.test.java8=<path to java binary for JDK 8>`.
 

@@ -1,0 +1,24 @@
+.close-btn {
+  float: right;
+  color: black;
+}
+
+.feedback2 {
+  color:black;
+  margin-top: 5px;
+  margin-left: 15px;
+  margin-right: 5px;
+  margin-bottom: 5px;
+}
+
+.feedback {
+  //background-color: rgb(35, 142, 184); /* Green background color */
+  color:white;
+  padding: 10px 20px; /* Padding around the message */
+  //border-radius: 4px; /* Rounded corners */
+  margin: 10px 0; /* Margin to create space between messages */
+  //box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Box shadow for a subtle effect */
+  transition: opacity 0.3s ease-in-out; /* Smooth opacity transition */
+  font-size: large;
+}
+

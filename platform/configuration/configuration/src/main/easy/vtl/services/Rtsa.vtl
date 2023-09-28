@@ -17,7 +17,7 @@ template Rtsa(Configuration config, FileArtifact target) {
     }
     
     def String rtsaInstance(RtsaService service) {
-        toFolderName(service.name) + "-" + service.ver + ".zip";
+        getStringValueSafe(service.deployment, toFolderName(service.name) + "-" + service.ver + ".zip");
     }
     
 }

@@ -17,6 +17,11 @@ interface Configuration {
   stage?: Environment;
 }
 
+export const primitiveDataTypes
+  = ["String", "Boolean", "Real", "Integer"]
+
+export const ivmlEnumeration = "IvmlEnumeration:";
+
 @Injectable({
   providedIn: 'root'
 })

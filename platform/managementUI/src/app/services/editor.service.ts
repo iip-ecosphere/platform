@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { EnvConfigService } from './env-config.service';
+import { Resource } from 'src/interfaces';
 
 @Injectable({
   providedIn: 'root'
@@ -31,57 +32,13 @@ export class EditorService {
     } catch(e) {
       console.log(e);
     }
-    console.log(Data);
     return Data;
   }
 
-  public async getApplications() {
-    const response = await this.getData('aas/submodels/Configuration/submodel/submodelElements/Application');
+  public async getConfigurationType(type: string) {
+    console.log(type);
+    const response = await this.getData('/aas/submodels/Configuration/submodel/submodelElements/' + type) as Resource;
     return response;
-   }
 
-   public async getDependencies() {
-    const response = await this.getData('aas/submodels/Configuration/submodel/submodelElements/Dependency');
-    return response;
-   }
-
-   public async getServers() {
-    const response = await this.getData('aas/submodels/Configuration/submodel/submodelElements/Server');
-    return response;
-   }
-
-    public async getManufacturers() {
-    const response = await this.getData('aas/submodels/Configuration/submodel/submodelElements/Manufacturer');
-    return response;
-   }
-
-   public async getServiceMeshes() {
-    const response = await this.getData('aas/submodels/Configuration/submodel/submodelElements/ServiceMesh');
-    return response;
-   }
-
-   public async getDataTypess() {
-    const response = await this.getData('aas/submodels/Configuration/submodel/submodelElements/DataType');
-    return response;
-   }
-
-   public async getEcsDevices() {
-    const response = await this.getData('aas/submodels/Configuration/submodel/submodelElements/EcsDevice');
-    return response;
-   }
-
-      public async getServiceBases() {
-    const response = await this.getData('aas/submodels/Configuration/submodel/submodelElements/ServiceBase');
-    return response;
-   }
-
-   public async getMeshElements() {
-    const response = await this.getData('aas/submodels/Configuration/submodel/submodelElements/MeshElement');
-    return response;
-   }
-
-   public async getMeshConnectors() {
-    const response = await this.getData('aas/submodels/Configuration/submodel/submodelElements/MeshConnector');
-    return response;
-   }
+  }
 }

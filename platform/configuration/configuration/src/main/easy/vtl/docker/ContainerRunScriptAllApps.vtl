@@ -1,0 +1,112 @@
+import Basics;
+import JavaBasics;
+import DockerBasics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template ContainerRunScriptAllApps(IIPEcosphere config, FileArtifact target, ContainerType containerType, EcsDevice device) {
+	
+    def main(IIPEcosphere config, FileArtifact target, ContainerType containerType, EcsDevice device) {
+        '#!/bin/bash'
+        ''
+        String dockerRunCommand = "docker run --rm ";
+        String portOptions = "";
+
+        String appName = "allapps";
+        String deviceName = getContainerNameDflt(device).toIdentifier();
+        if (deviceName.length() == 0) {
+            deviceName = "dflt";
+        }
+        ContainerManager mgr = config.containerManager;
+        String registryName = getRegistryName(mgr);
+
+        String containerSetting = "-d --network=host -v /var/run/docker.sock:/var/run/docker.sock ";
+        String containerName = "";
+        
+        if (containerType == ContainerType::EcsSvc_AllApps) {
+            genPorts("ECS");
+            portOptions = "--expose \\$ECS_PORT --env IIP_PORT=\\$ECS_PORT ";
+            containerName = "--name IIPEcsSvc_AllApps ";
+        } else if (containerType == ContainerType::Ecs_Svc_AllApps) {
+            genPorts("BOTH");
+            portOptions = "--expose \\$ECS_PORT --expose \\$SVC_PORT --env IIP_PORT=\\$ECS_PORT --env IIP_PORT_SVCMGR=\\$SVC_PORT ";
+            containerName = "--name IIPEcs_Svc_AllApps ";
+        } else if (containerType == ContainerType::C1Ecs_C2Svc_AllApps) {
+            genPorts("SVC");
+            portOptions = "--expose \\$SVC_PORT --env IIP_PORT_SVCMGR=\\$SVC_PORT ";
+            containerSetting = "-d --network=host ";
+            containerName = "--name IIPSvc_AllApps ";
+        } else if (containerType == ContainerType::Ecs) {
+            genPorts("ECS");
+            portOptions = "--expose \\$ECS_PORT --env IIP_PORT=\\$ECS_PORT ";
+            deviceName = "${deviceName}.ecs";
+            containerName = "--name IIPEcs_AllApps ";
+        } 
+        
+        String appVer = "0.1.0";
+        String imageName = "${registryName}${toDockerImageName(appName, deviceName, appVer)}";
+        
+        String containerArguments = "";
+        setOf(ContainerArgument) containerMountArguments = device.containerArguments -> selectByType(MountVolumeContainerArgument);
+        for (MountVolumeContainerArgument arguments : containerMountArguments) {
+            containerArguments = "${containerArguments} -v ${arguments.hostPath}:${arguments.containerPath} ";
+        }
+
+        setOf(ContainerArgument) containerGpusArguments = device.containerArguments -> selectByType(GpusContainerArgument);
+        for (GpusContainerArgument arguments : containerGpusArguments) {
+            containerArguments = "${containerArguments} --gpus ${arguments.gpuDevice} ";
+        }        
+        
+        ''
+        '${dockerRunCommand}${portOptions}${containerSetting}${containerArguments}${containerName}${imageName}'
+    }
+    
+    def genPorts(String ports) {
+        if (ports == "ECS") {
+            'ECS_PORT=\\$1'
+            'if [ -z "\\$ECS_PORT" ]'
+            'then'
+            '    read LOWERPORT UPPERPORT < /proc/sys/net/ipv4/ip_local_port_range'
+            '    while :'
+            '    do'
+            '        ECS_PORT="`shuf -i \\$LOWERPORT-\\$UPPERPORT -n 1`"'
+            '        ss -lpn | grep -q ":$PORT " || break'
+            '    done'
+            'fi'            
+        } else if (ports == "SVC") {
+            'SVC_PORT=\\$1'
+            'if [ -z "\\$SVC_PORT" ]'
+            'then'
+            '    read LOWERPORT UPPERPORT < /proc/sys/net/ipv4/ip_local_port_range'
+            '    while :'
+            '    do'
+            '        SVC_PORT="`shuf -i \\$LOWERPORT-\\$UPPERPORT -n 1`"'
+            '        ss -lpn | grep -q ":$PORT " || break'
+            '    done'
+            'fi'            
+        } else if (ports == "BOTH") {
+            'ECS_PORT=\\$1'
+            'if [ -z "\\$ECS_PORT" ]'
+            'then'
+            '    read LOWERPORT UPPERPORT < /proc/sys/net/ipv4/ip_local_port_range'
+            '    while :'
+            '    do'
+            '        ECS_PORT="`shuf -i \\$LOWERPORT-\\$UPPERPORT -n 1`"'
+            '        ss -lpn | grep -q ":$PORT " || break'
+            '    done'
+            'fi'
+            ' '
+            'SVC_PORT=\\$2'
+            'if [ -z "\\$SVC_PORT" ]'
+            'then'
+            '    read LOWERPORT UPPERPORT < /proc/sys/net/ipv4/ip_local_port_range'
+            '    while :'
+            '    do'
+            '        SVC_PORT="`shuf -i \\$LOWERPORT-\\$UPPERPORT -n 1`"'
+            '        ss -lpn | grep -q ":\\$PORT " || break'
+            '    done'
+            'fi'
+        }
+    }
+        
+}

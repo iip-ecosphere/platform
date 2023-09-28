@@ -1,7 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import Drawflow from 'drawflow';
 import { DrawflowService } from 'src/app/services/drawflow.service';
+import { IvmlFormatterService } from 'src/app/services/ivml-formatter.service';
+import { MeshFeedbackComponent } from './feedback/mesh-feedback/mesh-feedback.component';
+import { MatDialog } from '@angular/material/dialog';
 
 interface Bus {
   id: string;
@@ -16,13 +19,21 @@ interface Bus {
 export class FlowchartComponent implements OnInit {
 
 
-  constructor(private df: DrawflowService, private route: ActivatedRoute) {}
+  constructor(private df: DrawflowService,
+    private route: ActivatedRoute,
+    public ivmlFormatter:IvmlFormatterService,
+    public dialog: MatDialog) {}
 
+  @Input() inputMesh: any
+
+  // editor: Drawflow | undefined;
   editor: any;
   services: any;
   serviceMeshes: any;
   private displayAttributes = ['kind', 'name', 'ver', 'type'];
-  private meta = ['metaType', 'metaProject', 'metaState', 'metaAas'];
+  private meta = ['metaType', 'metaProject', 'metaState', 'metaAas', 'metaRefined', 'metaAbstract', 'metaTypeKind', 'metaVariable'];
+
+  selectedService: any;
 
   meshUnchanged: any;
   servicesLoading = true;
@@ -40,9 +51,9 @@ export class FlowchartComponent implements OnInit {
       this.servicesLoading = false;
     }
     this.serviceMeshes = await this.df.getServiceMeshes();
-    console.log(this.services);
 
     const drawFlowHtmlElement = <HTMLElement>document.getElementById('drawflow');
+
     if(drawFlowHtmlElement) {
       this.editor = new Drawflow(drawFlowHtmlElement);
       this.editor.reroute = true;
@@ -52,8 +63,11 @@ export class FlowchartComponent implements OnInit {
       this.editor.force_first_input = false;
       this.editor.line_path = 1;
       this.editor.editor_mode = 'edit';
+      this.editor.on('click',() => (this.addService(event)));
 
-      this.editor.createCurvature = function(start_pos_x: number, start_pos_y : number, end_pos_x: number, end_pos_y: number, curvature_value: any, type: any) {
+      this.editor.createCurvature = function(start_pos_x: number,
+        start_pos_y : number, end_pos_x: number, end_pos_y: number,
+        curvature_value: any, type: any) {
         var line_x = start_pos_x;
         var line_y = start_pos_y;
         var x = end_pos_x;
@@ -105,14 +119,11 @@ export class FlowchartComponent implements OnInit {
       }
 
       this.editor.start();
-
       const paramMesh = this.route.snapshot.paramMap.get('mesh');
       if(paramMesh) {
         this.getGraph(paramMesh);
       }
-
     }
-
   }
 
   public assignIcon(type: string, htmlTag?: boolean) {
@@ -148,13 +159,13 @@ export class FlowchartComponent implements OnInit {
   }
 
   public async getGraph(mesh: string) {
+
     let data = await this.df.getGraph(mesh);
     if(data?.outputArguments[0].value?.value) {
       this.Busses = [];
       let graph = JSON.parse(data?.outputArguments[0].value?.value);
       let graph2 = JSON.parse(graph.result);
       //this.meshUnchanged = JSON.parse(JSON.stringify(graph2)); //for debug purposes
-      console.log(graph2);
       this.mesh = graph2;
       let nodes = graph2.drawflow.Home.data
       let busOut: string[] = [];
@@ -253,6 +264,51 @@ export class FlowchartComponent implements OnInit {
       console.log("x: " + this.editor.getNodeFromId(i).pos_x);
       console.log("y: " + this.editor.getNodeFromId(i).pos_y);
     }
+  }
+
+  public selectService(service: any) {
+    this.selectedService = service;
+  }
+
+  public addService(event: any) {
+    if(this.selectedService) {
+
+      let name = this.getServiceValue(this.selectedService, "name")
+      let kind = this.getServiceValue(this.selectedService, "kind")
+      let ver = this.getServiceValue(this.selectedService, "ver")
+      let id = this.getServiceValue(this.selectedService, "id")
+
+      console.log("name of the node: " + name)
+      this.editor.addNode(name, 1, 1, event.layerX, event.layerY, '', {},
+        '<div>'
+        + id + '<br><p class="subtext">name: '
+        + name + '</p><p class="subtext">kind: '
+        + kind + '</p><p class="subtext">ver: '
+        + ver + '</p><div>'
+        , false);
+      this.selectedService = undefined;
+    }
+  }
+
+  getServiceValue(service: any, idShortValue: string) {
+    let result = null
+    if (service.value) {
+      let values = service.value.find((x: { idShort: string; }) => x.idShort == idShortValue).value
+      let varValue = values.find((x: {idShort: string;}) => x.idShort == "varValue").value
+      result = varValue
+    }
+    return result
+  }
+
+  meshName:string = ""
+
+  public async create() {
+    let drawflowRaw = JSON.stringify(this.editor.drawflow.drawflow.Home.data)
+    let drawflow = drawflowRaw.replace("drawflow: ", "")
+    let feedbackInternal = await this.ivmlFormatter.setGraph("", "", this.meshName,
+      drawflow)
+    const dialogRef = this.dialog.open(MeshFeedbackComponent, {});
+    dialogRef.componentInstance.feedback = feedbackInternal
   }
 
 }

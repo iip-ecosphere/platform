@@ -8,6 +8,7 @@ set -e
 
 npm install
 ng build
+rm -rf pckg
 mkdir pckg
 timestamp=$(date +%Y%m%d%H%M%S)
 zip -r pckg/IIP-Ecosphere-mgtUi-$timestamp.zip dist

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>libs.ads</artifactId>
+  <packaging>jar</packaging>
+  <name>Beckhoff ADS library integration</name>
+  <description>Beckhoff ADS library integration for the IIP-Ecosphere platform.</description>
+
+  <parent>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>platformDependencies</artifactId>
+     <version>0.6.0-SNAPSHOT</version>
+     <relativePath/>
+  </parent>
+
+  <dependencies>
+    <dependency>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>transport</artifactId>
+     <version>${project.version}</version>
+    </dependency>
+    <dependency>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>connectors</artifactId>
+     <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.java.dev.jna</groupId>
+      <artifactId>jna-platform</artifactId>
+      <version>5.12.1</version>
+    </dependency>
+    <dependency>
+      <groupId>net.java.dev.jna</groupId>
+      <artifactId>jna</artifactId>
+      <version>5.12.1</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <scope>test</scope>
+    </dependency>    
+  </dependencies>
+	<build>
+		<plugins>
+            <plugin>
+	            <groupId>org.codehaus.mojo</groupId>
+	            <artifactId>exec-maven-plugin</artifactId>
+	            <version>3.0.0</version>
+	            <executions>
+	                <execution>
+	                    <id>ads</id>
+	                    <configuration>
+	                        <mainClass>test.de.iip_ecosphere.platform.connectors.ads.AdsTestMain</mainClass>
+	                        <classpathScope>test</classpathScope>
+	                    </configuration>
+	                </execution>
+                    <execution>
+                        <id>plc4x</id>
+                        <configuration>
+                            <mainClass>test.de.iip_ecosphere.platform.connectors.ads.Plc4xTestMain</mainClass>
+                            <classpathScope>test</classpathScope>
+                        </configuration>
+                    </execution>
+	            </executions>
+            </plugin>
+            <plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+      			<artifactId>maven-assembly-plugin</artifactId>
+				<version>3.1.1</version>
+				<configuration>
+				  <archive>
+				    <manifest>
+						<mainClass>de.iip_ecosphere.platform.connectors.ads.AdsTestMain</mainClass>
+				    </manifest>
+				  </archive>       
+				  <descriptorRefs>
+          			<descriptorRef>jar-with-dependencies</descriptorRef>
+        		</descriptorRefs>
+				</configuration>
+			    <executions>
+       		 	  <execution>
+		          <id>make-assembly</id> <!-- this is used for inheritance merges -->
+		          <phase>package</phase> <!-- bind to the packaging phase -->
+		          <goals>
+		            <goal>single</goal>
+		          </goals>
+		        </execution>
+		      </executions>
+	    	</plugin>
+        </plugins>
+	</build>
+</project>

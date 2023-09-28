@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+    <configuration>
+<path kind="IVML" value="src/main/easy/;src/test/easy/" />
+<path kind="VIL" value="src/main/easy/;src/test/easy/" />
+    </configuration>

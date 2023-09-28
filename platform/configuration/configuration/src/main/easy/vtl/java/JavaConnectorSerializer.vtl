@@ -189,17 +189,17 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
         index = 0;
         if (formatter <> null) {
             '${imTypeName} tmp = new ${imTypeName}();'
-            genToField("source", "", "", pltfType, imType);
+            genToField("source", "", "", pltfType, imType, false);
         } else {
             ''
         }
     }
 
-    def genToField(String qual, String name, String fieldName, DataType type, DataType srcType) {
+    def genToField(String qual, String name, String fieldName, DataType type, DataType srcType, Boolean nullable) {
         ''
     }
     
-    def genToField(String qual, String name, String fieldName, PrimitiveType type, PrimitiveType srcType) {
+    def genToField(String qual, String name, String fieldName, PrimitiveType type, PrimitiveType srcType, Boolean nullable) {
         String data = "${qual}.get${asMethodNameSuffix(fieldName)}()";
         if (isRecordArray(type) and isRecordArray(srcType)) {
             arrayCount = arrayCount + 1;
@@ -211,7 +211,7 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
             formatter.startObjectStructure(null);
             ${arrayEltTypeName}[] ${arrayName} = ${data};
             for (int i = 0; i < ${arrayName}.length; i++) {
-                ${genToField("${arrayName}[i]", "", "", tgtArrayType.type, srcArrayType.type)}
+                ${genToField("${arrayName}[i]", "", "", tgtArrayType.type, srcArrayType.type, nullable)}
             }
             formatter.endStructure();
             formatter.endStructure();'
@@ -221,7 +221,7 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
         }
     }
     
-    def genToField(String qual, String name, String fieldName, RecordType type, RecordType srcType) {
+    def genToField(String qual, String name, String fieldName, RecordType type, RecordType srcType, Boolean nullable) {
         String q = qual;
         if (fieldName.length() > 0) { // fieldName == "" on top level
            q = q + ".get" + asMethodNameSuffix(fieldName) + "()";
@@ -230,15 +230,21 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
         for (Field f : srcType.fields) {
             srcFieldTypes.add(f.name, f.type);
         }
+        if (nullable) {
+            '\nif (${q} != null) {\n'
+        }
         for (Field f : type.fields) {
             String n = f.name;
             if (name.length() > 0) {
                n = name + "." + n;
             }
             DataType srcFieldType = srcFieldTypes.get(f.name, ObjectType);
-            String s = genToField(q, n, f.name, f.type, srcFieldType);
+            String s = genToField(q, n, f.name, f.type, srcFieldType, f.nullable);
             index = index + 1;
             '${s}'
+        }
+        if (nullable) {
+            '}'
         }
     }
     

@@ -428,18 +428,14 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
                 String arrayEltTypeName = "${asTypeName(at.type.name)}";
                 acc = "(${arrayEltTypeName}[]) " + acc;
             }
-            if (tgt.readOnly) {
-                ''
-            } else {            
-                if (tgt.type.isKindOf(RecordType)) {
-                    String nextPath = getterPath(tgtQual, tgt); // all "vars" before the .set
-                    String cons = "new ${toTypeName(tgt.type)}${add}()";
-                    '\n${createTemporaryVariable(nextPath, mapSourceSeparator(), tgt.type, "${cons}")}
-                    ${wrapOptional(tgt, setterPath(getTemporaryVariable(tgtQual, tgtQual), tgt, getTemporaryVariable(nextPath, cons)), args="access, a", optFind="access.", optReplace="a.")};'
-                } else {
-                    '\n${wrapOptional(tgt, setterPath(getTemporaryVariable(tgtQual, tgtQual), tgt, acc), args="access, a", optFind="access.", optReplace="a.")};'
-                }
-            }     
+            if (tgt.type.isKindOf(RecordType)) {
+                String nextPath = getterPath(tgtQual, tgt); // all "vars" before the .set
+                String cons = "new ${toTypeName(tgt.type)}${add}()";
+                '\n${createTemporaryVariable(nextPath, mapSourceSeparator(), tgt.type, "${cons}")}
+                ${wrapOptional(tgt, setterPath(getTemporaryVariable(tgtQual, tgtQual), tgt, getTemporaryVariable(nextPath, cons)), args="access, a", optFind="access.", optReplace="a.")};'
+            } else {
+                '\n${wrapOptional(tgt, setterPath(getTemporaryVariable(tgtQual, tgtQual), tgt, acc), args="access, a", optFind="access.", optReplace="a.")};'
+            }
         } else {
             '${acc}'
         }
@@ -456,12 +452,19 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
             }
             nestedStepCount = nestedStepCount + 1;
             path = substPathEx('"${path}"', topPath, "path");
+            if (field.optional) {
+                'try {'
+            }
             '\n\naccess = access.stepInto(${path});'
         }
         '${produceDataTransfer(type, mapping, typeQual, mapQual, done, indexes, paths)}'
         if (not(genFrom) and optWithStepIn and nestedStepCount > 0) {
             nestedStepCount = nestedStepCount - 1;
             'access = access.stepOut();\n'
+            if (field.optional) {
+                '} catch (IOException e${nestedStepCount}) {
+                }'
+            }
         }
     }
     
@@ -636,10 +639,11 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
     // --------------------------------------- connector parameter -----------------------------------------
     
     def generateConnectorParameter(MeshElement elt, Application app) {
-        generateConnectorParameter(elt.impl, app);
+        generateConnectorParameter(elt, elt.impl, app);
     }
 
-    def generateConnectorParameter(ServiceBase service, Application app) {
+    @DispatchBasis
+    def generateConnectorParameter(MeshElement elt, ServiceBase service, Application app) {
         ''
     }
 
@@ -656,11 +660,12 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
     }
 
     def generateEndpointPath(AasConnector conn) {
+        String regPath = "";
         String url = "http://" + conn.registryHost + ":" + conn.registryPort;
         if (conn.registryPath <> "") {
-            url = url + "/" + conn.registryPath;
+            regPath = "/" + conn.registryPath;
         }
-        '.setEndpointPath("${url}")'
+        '.setEndpointPath(null == hostOverride ? "${url}${regPath}" : "http://" + hostOverride + ":${conn.registryPort}${regPath}")'
     }
     
     def getCacheMode(Connector conn) {
@@ -687,6 +692,20 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         }
     }
 
+    @DispatchBasis
+    def getConnectorSchema(Connector conn) {
+        "";
+    }
+    
+    @DispatchCase
+    def getConnectorSchema(AasConnector conn) {
+        String result = "Schema.HTTP";
+        if (isDefined(conn.security) and conn.security <> null) {
+            result = "Schema.HTTPS";
+        }
+        result;
+    }
+
     def getConnectorDeviceServiceKey(Connector conn) {
         if (isDefined(conn.deviceServiceKey)) {
             '"${conn.deviceServiceKey}"';
@@ -695,37 +714,55 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         }
     }
 
-    def generateConnectorParameter(Connector conn, Application app) {
+    @DispatchCase
+    def generateConnectorParameter(MeshElement elt, Connector conn, Application app) {
+        String schemaArg = getConnectorSchema(conn);
+        if (schemaArg.length() > 0) {
+            schemaArg = ", " + schemaArg;
+        }
         '/**
         * Creates the connector parameter instance. [public for testing]
         *
         * @return the instance to be passed to the connector
         */
         public static ConnectorParameter createConnectorParameter() {
+            ${getYamlServiceFragment("yaml", getClsName(elt), conn.id)}; 
             ${generateConnectorParamSecurityDecls(conn)|e}
             String host = "${getConnectorHost(conn)}";
+            String hostOverride = null;
             int port = ${getConnectorPort(conn)};
-            NameplateSetup.Service svc = NameplateSetup.resolveServiceFromAas(${getConnectorDeviceServiceKey(conn)});
-            if (null != svc) { // device has precedence
-                host = svc.getHost();
-                port = svc.getPort();
+            if (null != yaml.getNetMgtKey() && yaml.getNetMgtKey().length() > 0) {
+                ServerAddress netKeyMgtAddress = NetworkManagerFactory.getInstance().getPort(yaml.getNetMgtKey());
+                if (null != netKeyMgtAddress) {
+                    host = netKeyMgtAddress.getHost();
+                    hostOverride = host;
+                    port = netKeyMgtAddress.getPort();
+                    System.out.println(host+" "+port);
+                }
+            }'
+            String deviceServiceKey = getConnectorDeviceServiceKey(conn);
+            String svcStatement;
+            if (deviceServiceKey.length() > 0 and deviceServiceKey <> "null") { 
+                svcStatement = ".setService(svc)";
+                'NameplateSetup.Service svc = NameplateSetup.resolveServiceFromAas(${getConnectorDeviceServiceKey(conn)});
+                if (null != svc) { // device has precedence
+                    host = svc.getHost();
+                    port = svc.getPort();
+                }'
+            } else {
+                svcStatement = "";
+                '\n'
             }
-            return ConnectorParameter.ConnectorParameterBuilder
-                .newBuilder(host, port)
-                .setService(svc)
+            'return ConnectorParameter.ConnectorParameterBuilder
+                .newBuilder(host, port${schemaArg})
+                ${svcStatement|e}
                 .setApplicationInformation("${getApplicationInformation(conn, app)}", "${app.description}")
                 .setCacheMode(${getCacheMode(conn)})
+                .setNotificationInterval(${conn.samplingPeriod})
                 ${generateEndpointPath(conn)|e}
                 ${generateConnectorParamSecuritySettings(conn)|e}
-                ${generateNotificationInterval(conn)|e}
                 .build();
         }'
-    }
-    
-    def generateNotificationInterval(Connector conn) {
-        if (conn.samplingPeriod > 0) {
-            '.setNotificationInterval(${conn.samplingPeriod})'
-        }
     }
     
     def generateConnectorParamSecurityDecls(Connector conn) {

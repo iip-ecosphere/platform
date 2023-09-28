@@ -36,7 +36,6 @@ mat-raised-button color="success"
         </button>
       </div>
 
-
       <!-- Table -->
       <table style="margin: 0px;">
         <tr *ngFor="let item of filteredData; let i = index">
@@ -46,7 +45,9 @@ mat-raised-button color="success"
           <td style="width: 100%;">
 
             <span class="row-title" >
-              <span style="height: 5px; vertical-align: top; margin-right: 10px;">{{item.idShort}}</span>
+              <span style="height: 5px; vertical-align: top; margin-right: 10px;">
+                {{item.idShort}}
+              </span>
             </span>
             <div *ngIf="item.logo">
               <img src={{item.logo}} class="service-icon">
@@ -62,19 +63,13 @@ mat-raised-button color="success"
           <td  *ngIf="tab.tabName == 'Applications'" class="cell-with-button">
             <button
               mat-raised-button style="background-color: rgb(35, 142, 184)"
-              (click)="createMesh()" disabled>generate interfaces
+              (click)="genTemplate(item.idShort)" >generate template
             </button>
           </td>
           <td  *ngIf="tab.tabName == 'Applications'" class="cell-with-button">
             <button
               mat-raised-button style="background-color: rgb(35, 142, 184)"
-              (click)="createMesh()" disabled>generate template
-            </button>
-          </td>
-          <td  *ngIf="tab.tabName == 'Applications'" class="cell-with-button">
-            <button
-              mat-raised-button style="background-color: rgb(35, 142, 184)"
-              (click)="createMesh()" disabled>integrate application
+              (click)="genApp(item.idShort, '')" >integrate application
             </button>
           </td>
 
@@ -88,7 +83,7 @@ mat-raised-button color="success"
             <ng-template #elseNotDone>
               <button
                 mat-raised-button style="background-color: rgb(35, 142, 184)"
-                (click)="edit(item)" disabled>edit
+                (click)="edit(item)">edit
               </button>
             </ng-template>
           </td>

@@ -143,6 +143,9 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                         for (Service m: mbs) {
                             generateServiceResources(no, m, appRoot, bins, assemblies, resources, artifacts, noDeps);
                         }
+                        for (Dependency d: impl.dependencies) {
+                            collectMavenDependencies(d, artifacts);
+                        }
                     };
                     
                     for (Server ser: a.servers) {
@@ -258,6 +261,15 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
             generateAllAppsContainers(config, target, allAppsContainersElements);
         }
     }
+
+    @DispatchBasis
+    collectMavenDependencies(Dependency d, setOf(String) artifacts) = {
+    }
+
+    @DispatchCase
+    collectMavenDependencies(MavenDependency d, setOf(String) artifacts) = {
+        artifacts.add(d.artifact);
+    }    
     
     // dispatch basis
     generateServer(Configuration config, Server server, Path appRoot, Boolean noDeps, setOf(String) assemblies, setOf(String) artifacts) = {
@@ -909,6 +921,10 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
 
                     if ((newChangeOnContainerFiles) or (newChangeJarFiles) or (getForceContainersCreationSafe(config.forceContainersCreation))) {
                         appImageId = createContainerImage(mgr, b, d, a.name.toIdentifier(), deviceName, a.ver);
+                        Path containerRunScript = "${appRoot}/../${a.name.toIdentifier()}.${deviceName}.sh";
+                        vilTemplateProcessor("ContainerRunScript", config, containerRunScript, app=a, containerType=cntType, device=device);
+                        FileArtifact f = containerRunScript;
+                        f.setExecutable(true);
                     }
                       
                     // Mesh-Info, Container-Descriptor
@@ -944,7 +960,11 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                             }
                             
                             if ((newChangeOnContainerFiles) or (newChangeJarFiles) or (getForceContainersCreationSafe(config.forceContainersCreation))) {
-                                String ecs_imageId = createContainerImage(mgr, ecsB, ecsD, a.name.toIdentifier(), "ecs", a.ver);
+                                String ecs_imageId = createContainerImage(mgr, ecsB, ecsD, a.name.toIdentifier(), "${deviceName}.ecs", a.ver);
+                                Path containerRunScript = "${appRoot}/../${a.name.toIdentifier()}.${deviceName}.ecs.sh";
+                                vilTemplateProcessor("ContainerRunScript", config, containerRunScript, app=a, containerType=ContainerType::Ecs, device=device);
+                                FileArtifact f = containerRunScript;
+                                f.setExecutable(true);
                             }
                             
                             // Mesh-Info, Container-Descriptor
@@ -970,6 +990,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         String artifactsFolder = getArtifactsFolder(target.getPath(), config);
         ContainerManager mgr = config.containerManager;
         setOf(EcsDevice) devices = EcsDevice.allInstances();
+        String appName = "allApps";
         int count = 1;
         String dfName;
         Integer baseImageCreated = 0; // 0 - Not base images, 1 - common dependencies base image, 2 - All and commen dependencies base images 
@@ -1017,7 +1038,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
             if ((isContainerForAllApps) and (baseImageMethod)){
                 String appImageId;
                 Boolean justCommenDep = true;
-                String appName = "allApps";
                 Path deviceBaseDf = "${footprintFolder}/DeviceDockerfiles/${appName}/DeviceDockerfile_CommenDepBase";
 
                 if (isPythonService == 1) {
@@ -1073,7 +1093,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 }
 
                 if ((newChangeOnContainerFiles) or (getForceContainersCreationSafe(config.forceContainersCreation))) {
-                    appImageId = createContainerImage(mgr, b, d, "allapps", "appCommenDepBaseImage", "0.1.0");
+                    appImageId = createContainerImage(mgr, b, d, appName, "appCommenDepBaseImage", "0.1.0");
                     checkBaseImageRecreation = 1;
                 }
                 
@@ -1110,7 +1130,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                         } 
                         
                         if ((newChangeOnContainerFiles) or (getForceContainersCreationSafe(config.forceContainersCreation))) {
-                            appImageId = createContainerImage(mgr, b, d, "allapps", "appAllDepBaseImage", "0.1.0");
+                            appImageId = createContainerImage(mgr, b, d, appName, "appAllDepBaseImage", "0.1.0");
                             if (checkBaseImageRecreation == 0) {
                                 checkBaseImageRecreation = 2;
                             } else if (checkBaseImageRecreation == 1) {
@@ -1128,7 +1148,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 if (!inTesting or (inTesting and count < 2)) { // inTesting, just produce the first one -> CI roundtrip time
                     ContainerType cntType = device.containerType;
                     String deviceName = getContainerNameDflt(device).toIdentifier();
-                    String appName = "allApps";
                     String filePrefix = "${appName}_${deviceName}_";
                     Path deviceDf = "${footprintFolder}/DeviceDockerfiles/${appName}/DeviceDockerfile_${deviceName}";
 
@@ -1215,7 +1234,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                             }
                         }		
                         				
-                        String appName = "allApps";
                         Path brokerDf = "${deviceDf}/broker/src";
                         Path brokerPath = "${target}/broker/src";
                         if (not(sameMd5HashFolders(brokerPath, brokerDf))){
@@ -1329,7 +1347,11 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                         }
 
                         if ((newChangeOnContainerFiles) or (newChangeJarFiles) or (getForceContainersCreationSafe(config.forceContainersCreation))) {
-                            String appImageId = createContainerImage(mgr, b, d, "allapps", deviceName, "0.1.0");
+                            String appImageId = createContainerImage(mgr, b, d, appName, deviceName, "0.1.0");
+                            Path containerRunScript = "${target}/${appName}.${deviceName}.sh";
+                            vilTemplateProcessor("ContainerRunScriptAllApps", config, containerRunScript, containerType=cntType, device=device);
+                            FileArtifact f = containerRunScript;
+                            f.setExecutable(true);
                         }
                     
                         // Mesh-Info, Container-Descriptor
@@ -1357,7 +1379,11 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                             }
                             
                             if ((newChangeOnContainerFiles) or (newChangeJarFiles) or (getForceContainersCreationSafe(config.forceContainersCreation))) {
-                                String ecs_imageId = createContainerImage(mgr, ecsB, ecsD, "allapps", deviceName + "_" + "ecs", "0.1.0");
+                                String ecs_imageId = createContainerImage(mgr, ecsB, ecsD, appName, "${deviceName}.ecs", "0.1.0");
+                                Path containerRunScript = "${target}/${appName}.${deviceName}.ecs.sh";
+                                vilTemplateProcessor("ContainerRunScriptAllApps", config, containerRunScript, containerType=ContainerType::Ecs, device=device);
+                                FileArtifact f = containerRunScript;
+                                f.setExecutable(true);
                             }
                     
                             // Mesh-Info, Container-Descriptor

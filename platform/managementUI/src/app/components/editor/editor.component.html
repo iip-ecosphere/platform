@@ -1,141 +1,209 @@
 <mat-toolbar>
-  <h1>Editor <span *ngIf="category">for {{ category }}</span></h1>
+  <h1 *ngIf="category && !type else subeditorHead">Editor <span>for {{ category }}</span></h1>
+  <ng-template #subeditorHead>
+    <h1 >Subeditor <span *ngIf="type">for {{ type.name }}</span></h1>
+  </ng-template>
+
   <span style="flex: 1 1 auto"></span>
   <span><button mat-icon-button class="button" color="warning"
     (click)="close()"><mat-icon>close</mat-icon></button></span>
 </mat-toolbar>
 
-<mat-card *ngIf="!type">
-  <table>
-    <tr>
-      <td>
-        <div *ngIf="meta && meta.value">
-          <mat-form-field appearance="outline">
-            <mat-select [(value)]="selectedType">
-              <mat-option *ngFor="let type of meta.value"
-              [value]="type" (click)="generateInputs()">
-                {{ type.idShort }}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-        </div>
-      </td>
-      <td>
-        <h2 *ngIf="selectedType && selectedType.idShort">
-          {{selectedType.idShort}}
-        </h2>
-      </td>
-    </tr>
-  </table>
-</mat-card>
-<div *ngFor="let uiGroup of uiGroups">
-  <div class="inputGroup">
-    <div *ngFor="let input of uiGroup.inputs">
-      <mat-card class="inputBox" *ngIf="!input.multipleInputs && !input.refTo; else ref">
-        <p style="margin-bottom: 1em;">{{ input.name }}</p>
-        <div *ngIf="input.type != 'Boolean'; else booleanCase">
-          <div *ngIf="input.metaTypeKind != 10; else subEditor">
-            <mat-form-field appearance="outline" >
-              <mat-label>{{ input.type }}</mat-label>
-              <input matInput
-                [matTooltip]="input.description[0].text + ' ' + input.description[0].language" type="text" ngDefaultControl [(ngModel)]=input.value />
-            </mat-form-field>
-          </div>
-          <ng-template #subEditor>
-            <button mat-raised-button (click)="openSubeditor(input)">open Subeditor</button>
-          </ng-template>
-        </div>
-          <ng-template #booleanCase>
-            <mat-form-field ngDefaultControl [(ngModel)]=input.value>
-              <mat-select>
-                <mat-option [value]="true">
-                  true
-                </mat-option>
-                <mat-option [value]="false" >
-                  false
+<!--
+<div *ngIf="numOfItemsInMeta > 1; else singleItem"> multiple items
+  <mat-card *ngIf="!type">
+    <table>
+      <tr>
+        <td>
+          <div *ngIf="meta && meta.value">
+            <mat-form-field appearance="outline">
+              <mat-select [(value)]="selectedType">
+                <mat-option *ngFor="let type of meta.value"
+                [value]="type" (click)="generateInputs()">
+                  {{ type.idShort }}
                 </mat-option>
               </mat-select>
             </mat-form-field>
+          </div>
+        </td>
+        <td>
+          <h2 *ngIf="selectedType && selectedType.idShort">
+            {{selectedType.idShort}}
+          </h2>
+        </td>
+      </tr>
+    </table>
+  </mat-card>
+
+</div>
+<ng-template #singleItem>
+  <span></span>
+  single item
+</ng-template>
+-->
+
+<div *ngIf="showInputs">
+  <mat-card *ngIf="!type && showDropdown">
+    <table>
+      <tr>
+        <td>
+          <div *ngIf="meta && meta.value">
+            <mat-form-field appearance="outline">
+              <mat-select [(value)]="selectedType">
+                <mat-option *ngFor="let type of meta.value"
+                [value]="type" (click)="generateInputs()">
+                  {{ type.idShort }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </td>
+        <td>
+          <h2 *ngIf="selectedType && selectedType.idShort" style="margin-left: 10%;">
+            {{selectedType.idShort}}
+          </h2>
+        </td>
+      </tr>
+    </table>
+  </mat-card>
+
+   <!-- variable name -->
+  <div *ngIf="!type && !refinedTypes">
+    <mat-card>
+      <mat-form-field appearance="outline" >
+        <mat-label>Variable Name</mat-label>
+        <input matInput
+          type="text" ngDefaultControl [(ngModel)]=variableName />
+      </mat-form-field>
+    </mat-card>
+  </div>
+
+  <div *ngFor="let uiGroup of uiGroups">
+
+
+    <div class="inputGroup">
+      <div *ngFor="let input of uiGroup.inputs">
+        <mat-card class="inputBox" *ngIf="!input.multipleInputs && !input.refTo; else ref">
+          <p style="margin-bottom: 1em;">{{ input.name }}</p>
+          <div *ngIf="input.type != 'Boolean'; else booleanCase">
+            <div *ngIf="input.metaTypeKind != 10; else subEditor">
+              <div *ngIf="input.metaTypeKind != 2; else enumCase">
+                <mat-form-field appearance="outline" >
+                  <mat-label>{{ input.type }}</mat-label>
+                  <input matInput
+                    [matTooltip]="input.description[0].text + ' ' + input.description[0].language"
+                    type="text" ngDefaultControl [(ngModel)]=input.value />
+                </mat-form-field>
+              </div>
+            </div>
+            <ng-template #subEditor>
+              <app-subeditor-button [meta]="metaBackup" [input]="input"></app-subeditor-button>
+              <!-- <button mat-raised-button (click)="openSubeditor(input)">open Subeditor</button> -->
+            </ng-template>
+          </div>
+            <ng-template #booleanCase>
+              <app-boolean-dropdown [input]="input"></app-boolean-dropdown>
+            </ng-template>
+            <ng-template #enumCase>
+              <app-enum-dropdown [meta] ="metaBackup" [input] = "input"></app-enum-dropdown>
+            </ng-template>
+        </mat-card>
+        <div>
+          <ng-template #ref>
+            <mat-card [ngClass]="input.multipleInputs? 'inputBox' : 'refInput'">
+                <p style="margin-bottom: 1em;">{{ input.name }}</p>
+                <app-input-ref-select
+                  [activeTextinput]="true" [input]="input">
+                </app-input-ref-select>
+            </mat-card>
+        </ng-template>
+        </div>
+      </div>
+      </div>
+      <div class="fullLineInputGroup">
+        <div *ngFor="let input of uiGroup.fullLineInputs">
+          <mat-card class="refInput">
+            <p style="margin-bottom: 1em;">{{ input.name }}</p>
+            <app-input-ref-select [activeTextinput]="true" [input]="input">
+            </app-input-ref-select>
+            <div #subEditor *ngIf="input.metaTypeKind == 10">
+              <app-subeditor-button [meta]="metaBackup" [input]="input"></app-subeditor-button>
+              <!-- <button mat-raised-button (click)="openSubeditor(input)">open Subeditor</button> -->
+            </div>
+          </mat-card>
+          <div>
+          </div>
+        </div>
+      </div>
+
+      <button mat-raised-button class="toggleButton" *ngIf="uiGroup.optionalInputs[0] || uiGroup.fullLineOptionalInputs[0]" (click)="toggleOptional(uiGroup) ">
+        <span *ngIf="!uiGroup.toggleOptional">show</span>
+        <span *ngIf="uiGroup.toggleOptional">hide</span>
+        Optional</button>
+      <div class="inputGroup" *ngIf="uiGroup.toggleOptional">
+
+      <div *ngFor="let input of uiGroup.optionalInputs">
+        <mat-card class="inputBox">
+          <mat-card-content *ngIf="!input.multipleInputs && !input.refTo; else refOpt">
+            <p style="margin-bottom: 1em;">{{ input.name }}</p>
+            <div *ngIf="input.type != 'Boolean'; else optBooleanCase">
+              <div *ngIf="input.metaTypeKind != 2; else optEnumCase">
+                <mat-form-field appearance="outline" *ngIf="input.metaTypeKind != 10; else subEditor">
+                  <mat-label>{{ input.type }}</mat-label>
+                  <input matInput
+                    [matTooltip]="input.description[0].text + ' ' + input.description[0].language" type="text" ngDefaultControl [(ngModel)]=input.value />
+                </mat-form-field>
+              </div>
+          </div>
+          <ng-template #optBooleanCase>
+            <app-boolean-dropdown [input]="input"></app-boolean-dropdown>
           </ng-template>
-      </mat-card>
-      <div>
-        <ng-template #ref>
-          <mat-card [ngClass]="input.multipleInputs? 'inputBox' : 'refInput'">
+          <ng-template #optEnumCase>
+            <app-enum-dropdown [meta]="metaBackup" [input]="input"></app-enum-dropdown>
+          </ng-template>
+            <ng-template #subEditor>
+              <app-subeditor-button [meta]="metaBackup" [input]="input"></app-subeditor-button>
+              <!-- <button mat-raised-button (click)="openSubeditor(input)">open Subeditor</button> -->
+            </ng-template>
+          </mat-card-content>
+
+          <ng-template #refOpt>
+            <mat-card-content class="refInput">
               <p style="margin-bottom: 1em;">{{ input.name }}</p>
               <app-input-ref-select
-                [textfield]="true" [input]="input">
+                [activeTextinput]="true" [input]="input">
               </app-input-ref-select>
-          </mat-card>
-      </ng-template>
-      </div>
-    </div>
-    </div>
-    <div class="fullLineInputGroup">
-      <div *ngFor="let input of uiGroup.fullLineInputs">
-        <mat-card class="refInput">
-          <p style="margin-bottom: 1em;">{{ input.name }}</p>
-          <app-input-ref-select [textfield]="true" [input]="input">
-          </app-input-ref-select>
-          <div #subEditor *ngIf="input.metaTypeKind == 10">
-            <button mat-raised-button (click)="openSubeditor(input)">open Subeditor</button>
-          </div>
-        </mat-card>
-        <div>
-        </div>
-      </div>
-    </div>
-
-    <button mat-raised-button class="toggleButton" *ngIf="uiGroup.optionalInputs[0] || uiGroup.fullLineOptionalInputs[0]" (click)="toggleOptional(uiGroup) ">
-      <span *ngIf="!uiGroup.toggleOptional">show</span>
-      <span *ngIf="uiGroup.toggleOptional">hide</span>
-      Optional</button>
-    <div class="inputGroup" *ngIf="uiGroup.toggleOptional">
-
-    <div *ngFor="let input of uiGroup.optionalInputs">
-      <mat-card class="inputBox">
-        <mat-card-content *ngIf="!input.multipleInputs && !input.refTo; else refOpt">
-          <p style="margin-bottom: 1em;">{{ input.name }}</p>
-          <mat-form-field appearance="outline" *ngIf="input.metaTypeKind != 10; else subEditor">
-            <mat-label>{{ input.type }}</mat-label>
-            <input matInput
-              [matTooltip]="input.description[0].text + ' ' + input.description[0].language" type="text" ngDefaultControl [(ngModel)]=input.value />
-          </mat-form-field>
-          <ng-template #subEditor>
-            <button mat-raised-button (click)="openSubeditor(input)">open Subeditor</button>
+            </mat-card-content>
           </ng-template>
-        </mat-card-content>
+          </mat-card>
+      </div>
 
-        <ng-template #refOpt>
-          <mat-card-content class="refInput">
+      <div class="fullLineInputGroup">
+        <div *ngFor="let input of uiGroup.fullLineOptionalInputs">
+          <mat-card class="refInput">
             <p style="margin-bottom: 1em;">{{ input.name }}</p>
             <app-input-ref-select
-              [textfield]="true" [input]="input">
+              [activeTextinput]="true" [input]="input">
             </app-input-ref-select>
-          </mat-card-content>
-        </ng-template>
-        </mat-card>
-    </div>
-
-    <div class="fullLineInputGroup">
-      <div *ngFor="let input of uiGroup.fullLineOptionalInputs">
-        <mat-card class="refInput">
-          <p style="margin-bottom: 1em;">{{ input.name }}</p>
-          <app-input-ref-select
-            [textfield]="true" [input]="input">
-          </app-input-ref-select>
-        </mat-card>
-        <div>
+          </mat-card>
+          <div>
+          </div>
         </div>
       </div>
     </div>
-
   </div>
+</div>
+
+<div *ngIf="feedback == ''" style="display: flex; justify-content: center">
+  <button mat-raised-button class="button" *ngIf="!type && !refinedTypes else addButton"
+    color="success" (click)="create()" disable>Create</button>
+    <ng-template #addButton>
+      <button mat-raised-button class="button"
+      color="success" (click)="addType()">Add</button>
+    </ng-template>
 
 </div>
 
-<div style="display: flex; justify-content: center">
-  <button mat-raised-button class="button" *ngIf="!type"
-    color="success" (click)="create()" disable>Create</button>
-    <button mat-raised-button class="button" *ngIf="type"
-    color="success" (click)="addType()">Add</button>
+<div *ngIf="feedback != ''" class="feedback">
+  <p>{{ feedback }}</p>
 </div>

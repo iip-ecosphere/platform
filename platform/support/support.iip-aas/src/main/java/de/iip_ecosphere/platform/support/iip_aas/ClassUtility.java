@@ -17,6 +17,8 @@ import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.LoggerFactory;
+
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.Reference;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
@@ -144,13 +146,18 @@ public class ClassUtility {
             result = null;
         } else {
             if (builder.isNew()) {
-                for (Field f: type.getDeclaredFields()) {
-                    if (!Modifier.isStatic(f.getModifiers()) && null == f.getAnnotation(Skip.class)) {
-                        addTypeSubModelElement(builder, fixId(ATTRIBUTE_PREFIX + f.getName()), f.getType());
+                try {
+                    for (Field f: type.getDeclaredFields()) {
+                        if (!Modifier.isStatic(f.getModifiers()) && null == f.getAnnotation(Skip.class)) {
+                            addTypeSubModelElement(builder, fixId(ATTRIBUTE_PREFIX + f.getName()), f.getType());
+                        }
                     }
-                }
-                if (Object.class != type.getSuperclass()) {
-                    addType(builder, type.getSuperclass());
+                    if (Object.class != type.getSuperclass()) {
+                        addType(builder, type.getSuperclass());
+                    }
+                } catch (NoClassDefFoundError e) {
+                    LoggerFactory.getLogger(ClassUtility.class).warn("Class {} not found, ignoring type "
+                        + "in AAS", e.getMessage());
                 }
             }
             result = builder.createReference();

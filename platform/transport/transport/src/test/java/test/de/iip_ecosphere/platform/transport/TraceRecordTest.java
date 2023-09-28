@@ -119,6 +119,11 @@ public class TraceRecordTest {
     @SuppressWarnings("unchecked")
     @Test
     public void testTraceRecordFiltering() throws IOException {
+        Assert.assertTrue(TraceRecordSerializer.getFilter() instanceof TraceRecordTestFilter);
+        TraceRecordTestFilter testFilter = (TraceRecordTestFilter) TraceRecordSerializer.getFilter();
+        Assert.assertTrue(testFilter.getCountInitializeCalls() > 0);
+        testFilter.clear();
+        
         Payload pl = new Payload();
         pl.setField(25);
         pl.setInner(new InnerPayload());
@@ -139,6 +144,15 @@ public class TraceRecordTest {
         Assert.assertNull(payload.get("field"));
         Assert.assertNotNull(payload.get("inner"));
         TraceRecordSerializer.clearIgnores();
+
+        TraceRecord.ignoreFields(Payload.class, "field");
+        record2 = ser.from(ser.to(record));
+        payload = (HashMap<Object, Object>) record2.getPayload(); // object unknown
+        Assert.assertNull(payload.get("field"));
+        Assert.assertNotNull(payload.get("inner"));
+        TraceRecordSerializer.clearIgnores();
+
+        Assert.assertTrue(testFilter.getCountFilterCalls() > 0);
     }
     
     /**
@@ -153,6 +167,9 @@ public class TraceRecordTest {
         pl.setInner(new InnerPayload());
         TraceRecord record = new TraceRecord("src", "act", pl);
         TypeTranslator<TraceRecord, String> tt = TraceRecordSerializer.createTypeTranslator();
+        tt.from(tt.to(record));
+
+        record = new TraceRecord("src", "act", null);
         tt.from(tt.to(record));
     }
     

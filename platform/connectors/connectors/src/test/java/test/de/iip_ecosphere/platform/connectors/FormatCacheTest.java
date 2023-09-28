@@ -30,6 +30,8 @@ public class FormatCacheTest {
 
     /**
      * Tests {@link FormatCache}.
+     * 
+     * @throws IOException shall not occur
      */
     @Test
     public void testFormatCache() throws IOException {

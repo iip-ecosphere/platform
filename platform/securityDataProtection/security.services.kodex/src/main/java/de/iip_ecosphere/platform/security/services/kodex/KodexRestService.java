@@ -15,12 +15,9 @@ package de.iip_ecosphere.platform.security.services.kodex;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -29,9 +26,8 @@ import org.apache.commons.lang.SystemUtils;
 import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
 
-import com.esotericsoftware.yamlbeans.YamlWriter;
-
 import de.iip_ecosphere.platform.services.environment.YamlService;
+import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.services.environment.AbstractRestProcessService;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.services.environment.YamlProcess;
@@ -47,9 +43,9 @@ import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
  */
 public class KodexRestService<I, O> extends AbstractRestProcessService<I, O>  {
 
-    public static final int WAITING_TIME_WIN = 120000; // preliminary
+    public static final int WAITING_TIME_WIN = 100; // preliminary
     public static final int WAITING_TIME_OTHER = 100; // preliminary
-    public static final String VERSION = "0.0.8";
+    public static final String VERSION = KodexService.VERSION;
     private static final boolean DEBUG = false;
    
     private String dataSpec;
@@ -94,11 +90,12 @@ public class KodexRestService<I, O> extends AbstractRestProcessService<I, O>  {
      */
     private void setNetworkDefaults() {
         port = 8000;
-        host = "0.0.0.0";
+        host = "127.0.0.1";
     }
     
     @Override
     protected ServiceState start() throws ExecutionException {
+        KodexService.cleanFiles();
         String executable = getExecutableName("kodex", VERSION);
         YamlProcess sSpec = getProcessSpec();
 
@@ -108,19 +105,7 @@ public class KodexRestService<I, O> extends AbstractRestProcessService<I, O>  {
         exe = new File(exe, executable); 
         exe.setExecutable(true);
         home = home.getAbsoluteFile();
-        Map<String, Object> apiSettings = new HashMap<>();
-        apiSettings.put("port", port);
-        apiSettings.put("host", host);
-        File settingFile = new File(home, "apiSettings.yml");
-        try {
-            YamlWriter writer = new YamlWriter(new FileWriter(settingFile));
-            writer.write(apiSettings);
-            writer.close();
-        } catch (IOException e) {
-            setNetworkDefaults();
-            LoggerFactory.getLogger(getClass()).error("Cannot write kodex setting file '{}': {}. Falling back "
-                + "to KODEX defaults. May clash on used port.", settingFile.getAbsolutePath(), e.getMessage());
-        }
+        port = NetUtils.getEphemeralPort();
         
         List<String> args = new ArrayList<>();
         if (DEBUG) {
@@ -129,6 +114,10 @@ public class KodexRestService<I, O> extends AbstractRestProcessService<I, O>  {
         }
         args.add("api");
         args.add("run");
+        args.add("--host");
+        args.add(host);
+        args.add("--port");
+        args.add(String.valueOf(port));        
         args.add(dataSpec);
         addProcessSpecCmdArg(args);
         
@@ -140,9 +129,6 @@ public class KodexRestService<I, O> extends AbstractRestProcessService<I, O>  {
     
     @Override
     protected void configure(ProcessBuilder builder) {
-        // TODO enable if KODEX works with that
-        //Map<String, String> env = builder.environment();
-        //env.put("KODEX_SETTINGS", "apiSettings.yml");
     }
     
     @Override
@@ -179,7 +165,7 @@ public class KodexRestService<I, O> extends AbstractRestProcessService<I, O>  {
     }
 
     @Override
-    protected String adjustRestQuery(String input) {
+    protected String adjustRestQuery(String input, String inTypeName) {
         return "{\"items\":[" + input + "]}";
     }
     

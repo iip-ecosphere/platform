@@ -12,14 +12,17 @@
 
 package de.iip_ecosphere.platform.support;
 
+import java.io.Serializable;
+
 /**
  * Represents a reusable server address.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class ServerAddress {
+public class ServerAddress implements Serializable {
 
     public static final String LOCALHOST = "localhost";
+    private static final long serialVersionUID = 8156403656922810328L;
     private Schema schema;
     private String host;
     private int port;

@@ -14,7 +14,6 @@ import Registry
 from Service import ServiceState
 from Service import ServiceKind
 import asyncio
-import websockets
 import signal
 import traceback
 
@@ -307,11 +306,13 @@ def wsSendResult(data):
     if result:
         asyncio.create_task(wsSend(result))
         
-async def wsSend(data):        
+async def wsSend(data):
+    import websockets
     global websocket
     await websocket.send(json.dumps(data))
 
 async def wsHandler(ws):
+    import websockets
     global websocket
     websocket = ws
     while True:
@@ -329,6 +330,7 @@ async def wsHandler(ws):
             traceback.print_exc()
 
 async def wsMain(port):
+    import websockets
     log = logger.getLogger('websockets.server')
     log.disabled = True
     print("Starting Websockets server on port " + str(port))

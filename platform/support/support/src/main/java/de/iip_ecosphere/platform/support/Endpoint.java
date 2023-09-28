@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
  */
 public class Endpoint extends ServerAddress {
 
+    private static final long serialVersionUID = 2104143979371261063L;
     private String endpoint;
     
     /**

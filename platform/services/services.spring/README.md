@@ -36,7 +36,7 @@ In addition, service deployment properties are given in a separate descriptor, t
       * `streamEndpoint` and `aasEndpoint` denote (akin to `endpoint` above) communication settings to be appended to the command line arguments, here for the data streaming communication (i.e., the service will delegate the data there and receive input from there) and AAS command communication (typically via VAB). 
       * The Boolean property `started` indicates whether the underlying process is already started (default is `false`), e.g., in case of a database.
       *  `waitTime` defines a time to wait until the process is supposed to be ready before continuing service start activities (default `0`, positive values denote milliseconds to wait).
-* `servers`: An optional list of server instance specifications to be started/stopped with the referencing application. A server has an `id` (denoting its network management key), a `host` name (may be superseded by a deployment plan), a `port` and an executable Java (wrapper) class (`cls`). The remaining fields are similar to `process`. The `netMgrKey` of a service may refer to one of the servers declared here indicating a shared lifecycle. The class stated in `cls`must implement `de.iip_ecosphere.platform.support.Server` and can have a no-arg constructor or a constructor with String[] receiving the server/service command line arguments as described above (port substituted).
+* `servers`: An optional list of server instance specifications to be started/stopped with the referencing application. A server has an `id` (denoting its network management key), a `host` name (may be superseded by a deployment plan), a `port` and an executable Java (wrapper) class (`cls`). The remaining fields are similar to `process`. The `netMgrKey` of a service may refer to one of the servers declared here indicating a shared lifecycle. The class stated in `cls`must implement `de.iip_ecosphere.platform.support.Server` and can have a no-arg constructor or a constructor with String[] receiving the server/service command line arguments as described above (port substituted). Here `asProcess` indicates whether the server shall be started in an own JVM or within the currently running JVM.
 
 The descriptor structure looks as given below (lists are indicates by a single element):
 
@@ -106,6 +106,7 @@ The descriptor structure looks as given below (lists are indicates by a single e
         port: <Integer> 
         homePath: <String>
         transportChannel: <String>
+        asProcess: <boolean>
         artifacts: 
             - <String>
         cmdArg:

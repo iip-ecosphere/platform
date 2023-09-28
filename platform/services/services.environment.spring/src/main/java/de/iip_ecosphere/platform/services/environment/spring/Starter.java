@@ -279,10 +279,12 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
             return result;
         });
         Starter.parse(args);
-        parseExternConnections(args, e -> Transport.addGlobalRoutingKey(e));
-        getSetup(); // ensure instance
-        args = augmentByAppId(args);
-        runPlugin(args);
+        if (!startServer(args)) {
+            parseExternConnections(args, e -> Transport.addGlobalRoutingKey(e));
+            getSetup(); // ensure instance
+            args = augmentByAppId(args);
+            runPlugin(args);
+        } // else starts server in parse
     }
     
 }

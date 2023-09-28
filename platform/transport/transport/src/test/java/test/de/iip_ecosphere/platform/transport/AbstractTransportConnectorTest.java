@@ -182,6 +182,15 @@ public class AbstractTransportConnectorTest {
             Assert.assertNull(e);
             return false;
         }));
+        
+        Assert.assertTrue(AbstractTransportConnector.applyAuthenticationKey("ano", (u, p, e) -> {
+            Assert.fail("shall not be called"); 
+            return false;
+        }, () -> true));
+        Assert.assertFalse(AbstractTransportConnector.applyAuthenticationKey("ano", (u, p, e) -> {
+            Assert.fail("shall not be called"); 
+            return false;
+        }, () -> false));
     }
     
 }

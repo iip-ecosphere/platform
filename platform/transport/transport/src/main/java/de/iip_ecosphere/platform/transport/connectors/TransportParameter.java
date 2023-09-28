@@ -102,6 +102,29 @@ public class TransportParameter {
         public static TransportParameterBuilder newBuilder(ServerAddress addr) {
             return newBuilder(addr.getHost(), addr.getPort());
         }
+        
+        /**
+         * Creates a transport parameter builder from (a copy of) the given transport parameters.
+         * 
+         * @param params the parameters to copy from
+         * @return the transport parameter builder
+         */
+        public static TransportParameterBuilder newBuilder(TransportParameter params) {
+            TransportParameterBuilder builder = new TransportParameterBuilder();
+            builder.instance = new TransportParameter(params.host, params.port);
+            builder.instance.actionTimeout = params.actionTimeout;
+            builder.instance.applicationId = params.applicationId;
+            builder.instance.autoApplicationId = params.autoApplicationId;
+            builder.instance.authenticationKey = params.authenticationKey;
+            builder.instance.keepAlive = params.keepAlive;
+            builder.instance.keyAlias = params.keyAlias;
+            builder.instance.keystoreKey = params.keystoreKey;
+            builder.instance.hostnameVerification = params.hostnameVerification;
+            builder.instance.authenticationKey = params.authenticationKey;
+            builder.instance.qos = params.qos;
+            builder.instance.closeAction = params.closeAction;
+            return builder;
+        }
 
         /**
          * Defines the optional application id. Optional, remains empty if unset.

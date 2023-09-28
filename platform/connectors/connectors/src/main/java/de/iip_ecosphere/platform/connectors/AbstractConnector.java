@@ -45,7 +45,7 @@ import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
 public abstract class AbstractConnector<O, I, CO, CI> implements Connector<O, I, CO, CI>, NotificationChangedListener {
 
     /**
-     * {@see AdapterSelector#DEFAULT_CHANNEL}.
+     * {@link AdapterSelector#DEFAULT_CHANNEL}.
      */
     public static final String DEFAULT_CHANNEL = AdapterSelector.DEFAULT_CHANNEL;
 

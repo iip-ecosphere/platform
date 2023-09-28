@@ -44,6 +44,9 @@ public abstract class AbstractConfigurationMojo extends AbstractMojo {
     @Parameter(property = "configuration.modelDirectory", required = true, defaultValue = "src/test/easy")
     private String modelDirectory;
 
+    @Parameter(property = "configuration.metaModelDirectory", required = true, defaultValue = "src/main/easy")
+    private String metaModelDirectory;
+
     @Parameter(property = "configuration.outputDirectory", required = true, defaultValue = "gen")
     private String outputDirectory;
 
@@ -94,6 +97,15 @@ public abstract class AbstractConfigurationMojo extends AbstractMojo {
      */
     public String getModelDirectory() {
         return modelDirectory;
+    }
+
+    /**
+     * Returns the directory containing the meta model.
+     * 
+     * @return the meta model directory
+     */
+    public String getMetaModelDirectory() {
+        return metaModelDirectory;
     }
 
     /**
@@ -300,7 +312,8 @@ public abstract class AbstractConfigurationMojo extends AbstractMojo {
         }
         String outputDir = adjustOutputDir(makeAbsolute(getOutputDirectory()));
         String modelDir = makeAbsolute(getModelDirectory());
-        String[] args = {getModel(), modelDir, outputDir, getStartRule()};
+        String metaModelDir = makeAbsolute(getMetaModelDirectory());
+        String[] args = {getModel(), modelDir, outputDir, getStartRule(), metaModelDir};
         try {
             if (isModelDirectoryValid()) {
                 if (enableRun(modelDir, outputDir)) {

@@ -96,7 +96,7 @@ public class PahoMqttV3TransportConnector extends AbstractMqttTransportConnector
                 connOpts.setUserName(user);
                 connOpts.setPassword(pwd.toCharArray());
                 return true;
-            });
+            }, () -> true);
             if (useTls(params)) {
                 try {                
                     connOpts.setSocketFactory(createTlsContext(params).getSocketFactory());

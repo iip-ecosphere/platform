@@ -3,6 +3,7 @@ import sys
 # It means the python version has to be at least 3.0 to be true.
 assert sys.version_info[0] > 2, 'Python Version needs to be higher than 2.'
 
+sys.stderr.write("Python ServiceEnvironment [sys.path]: " + str(sys.path) + "\n")
 import ServiceEnvironmentImpl
 
 ServiceEnvironmentImpl.start(sys.argv[1:])

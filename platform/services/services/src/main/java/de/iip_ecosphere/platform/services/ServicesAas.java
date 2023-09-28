@@ -479,9 +479,10 @@ public class ServicesAas implements AasContributor {
         SubmodelElementCollectionBuilder serviceBuilder 
             = smB.createSubmodelElementCollectionBuilder(NAME_COLL_SERVICES, false, false);
 
+        String serviceId = fixId(desc.getId());
         // Ref to artifact
         SubmodelElementCollectionBuilder descriptorBuilder 
-            = serviceBuilder.createSubmodelElementCollectionBuilder(fixId(desc.getId()), false, false);
+            = serviceBuilder.createSubmodelElementCollectionBuilder(serviceId, false, false);
         descriptorBuilder.createPropertyBuilder(NAME_PROP_ID)
             .setValue(Type.STRING, desc.getId())
             .build();
@@ -533,6 +534,7 @@ public class ServicesAas implements AasContributor {
         
         serviceBuilder.build();
         Transport.sendServiceStatusWithDescription(ActionTypes.ADDED, desc.getId(), desc.getState().toString());
+        getLogger().info("Service information added for `{}` (idShort: {})", desc.getId(), serviceId);
     }
     
     /**
@@ -696,6 +698,7 @@ public class ServicesAas implements AasContributor {
             removeRelations(s, sub, coll);
         }
         Transport.sendServiceArtifactStatus(ActionTypes.REMOVED, desc.getId());
+        getLogger().info("Artifact `{}` removed", desc.getId());
     }
     
     /**
@@ -792,7 +795,8 @@ public class ServicesAas implements AasContributor {
             // other approach... link property against service descriptor while creation and reflect state
             // let's try this one for now
             SubmodelElementCollection services = sub.getSubmodelElementCollection(NAME_COLL_SERVICES);
-            SubmodelElementCollection elt = services.getSubmodelElementCollection(fixId(desc.getId()));
+            String serviceId = fixId(desc.getId());
+            SubmodelElementCollection elt = services.getSubmodelElementCollection(serviceId);
             if (null != elt) {
                 Property prop = elt.getProperty(NAME_PROP_STATE);
                 if (null != prop) {
@@ -806,7 +810,8 @@ public class ServicesAas implements AasContributor {
                         NAME_PROP_STATE, desc.getId());
                 }
             } else {
-                getLogger().error("Service state change - cannot find service `{}`", desc.getId());
+                getLogger().error("Service state change - cannot find service `{}` (idShort: {})", 
+                    desc.getId(), serviceId);
             }
             // synchronous execution needed??
             getLogger().info("Handling service state change `{}`: {} -> {}", desc.getId(), old, act);

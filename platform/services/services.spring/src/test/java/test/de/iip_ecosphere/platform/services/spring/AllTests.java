@@ -27,7 +27,8 @@ import org.junit.runners.Suite;
     ServiceMgrAndDescriptorTest.class,
     ServerStartStopServiceManagerTest.class,
     
-    DescriptorUtilsTest.class
+    DescriptorUtilsTest.class,
+    ServerManagerTest.class
 })
 public class AllTests {
 }

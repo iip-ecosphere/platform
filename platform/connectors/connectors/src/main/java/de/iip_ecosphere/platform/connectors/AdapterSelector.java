@@ -36,7 +36,7 @@ public interface AdapterSelector<O, I, CO, CI> {
     /**
      * Returns the responsible protocol adapter for southbound output.
      * 
-     * @param channel the channel {@code data} was received from, may be {@link Ab
+     * @param channel the channel {@code data} was received from, may be {@link AdapterSelector#DEFAULT_CHANNEL}
      * @param data the data object
      * @return the protocol adapter (must not be <b>null</b>)
      */

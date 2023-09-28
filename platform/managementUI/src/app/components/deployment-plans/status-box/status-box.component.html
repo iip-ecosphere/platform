@@ -1,44 +1,52 @@
 
-<!-- <button (click)="this.showAll = !this.showAll">showAll</button> -->
+<div class="status-container">
+  <mat-card *ngFor="let process of StatusCollection" class="status-card">
 
-<div class="statusContainer">
-  <mat-card *ngFor="let process of StatusCollection"
-  class="statusCard">
+    <mat-card-content>
+      <div style="display: flex; justify-content: center;">
 
-  <mat-card-content>
-    <div style="display: flex; justify-content: center;">
-      <div>
-        <div>{{ process.messages[process.messages.length -1].action }} {{ process.messages[process.messages.length -1].componentType }}: <span class="longText" [matTooltip]="process.messages[process.messages.length -1].id">{{ process.messages[process.messages.length -1].id }}</span> </div><br>
-        <div class="longText" [matTooltip]="process.messages[process.messages.length -1].description">{{ process.messages[process.messages.length -1].description }}</div>
-        <button mat-raised-button (click)="details(process)" style="margin-top: 0.5em">more</button>
+        <mat-card class="status-indicator">
+          <mat-progress-spinner
+            *ngIf="!process.isFinished"
+            [diameter]="50" mode="indeterminate" >
+          </mat-progress-spinner>
+          <mat-icon *ngIf="process.isFinished && process.isSuccesful"
+            class="checkmark">
+            check
+          </mat-icon>
+          <mat-icon
+            *ngIf="process.isFinished && !process.isSuccesful"
+            class="cross">
+            close
+          </mat-icon>
+        </mat-card>
+
+        <div>
+          <div>
+            {{ process.messages[process.messages.length -1].action }}
+            {{ process.messages[process.messages.length -1].componentType }}
+            <span [matTooltip]="process.messages[process.messages.length -1].id">
+              {{ process.messages[process.messages.length -1].id }}
+            </span>
+            <div [matTooltip]="process.messages[process.messages.length -1].description">
+              {{ process.messages[process.messages.length -1].description }}
+            </div>
+            <div *ngIf="!process.messages[process.messages.length -1].description"
+              style="height: 27px;">
+            </div>
+          </div>
+
+          <button mat-raised-button (click)="details(process)" class="more-btn">
+            details
+          </button>
+          <button mat-raised-button (click)="dismiss(process)">
+            dismiss
+          </button>
+
+        </div>
+
       </div>
-      <div style="width: 50px"></div>
-      <mat-card class="status-indicator">
-        <mat-progress-spinner
-          *ngIf="!process.isFinished"
-          [diameter]="50" mode="indeterminate" >
-        </mat-progress-spinner>
-        <mat-icon *ngIf="process.isFinished && process.isSuccesful"
-          class="checkmark">
-          check
-        </mat-icon>
-        <mat-icon
-          *ngIf="process.isFinished && !process.isSuccesful"
-          class="cross">
-          close
-        </mat-icon>
-      </mat-card>
-    </div>
-    <div align="end">
-      <div>
-        <button mat-raised-button class="button"
-          style="align-self: flex-end"
-          (click)="dismiss(process)" style="background:red">
-          dismiss
-        </button>
-      </div>
-    </div>
-  </mat-card-content>
-</mat-card>
+    </mat-card-content>
+
+  </mat-card>
 </div>
-

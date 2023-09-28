@@ -22,7 +22,7 @@ A video of a run-though can be found at [youtube](https://youtu.be/36Xtw1L2XkQ).
 
 ## Building
 
-For all Maven executions, please ensure that the Maven platformDependencies are installed (see [install](https://github.com/iip-ecosphere/platform/tree/main/platform/tools/Install)). Maven commands may run into trouble under Powershell. Use a JDK 8 - 13, generation does not run, e.g., on JDK 17. Instantiation process:
+For all Maven executions, please ensure that the Maven platformDependencies are installed (see [install](../../tools/Install)). Maven commands may run into trouble under Powershell. Use a JDK 8 - 13, generation does not run, e.g., on JDK 17. Instantiation process:
 
 - `mvn -P EasyGen generate-sources` downloads and unpacks the actual sources of the configuration model/the instantiation process. Use `-P` to obtain the most recent snapshot. If already build, a short build as described below shall be sufficient.
 - `mvn -P EasyGen exec:java@generateAppsNoDeps` validates the model, generates the application-specific service interfaces (Java, Python), the transport mechanisms and most of the data processing service integration but without dependencies to implementation code (`NoDeps`). This must be done on a fresh checkout as interface artifacts are not deployed via Maven Central/Snapshots.

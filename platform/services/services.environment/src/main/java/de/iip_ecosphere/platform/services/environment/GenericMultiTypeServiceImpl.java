@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.services.environment.AbstractPythonProcessService.SyncDataIngestor;
@@ -57,7 +56,7 @@ public class GenericMultiTypeServiceImpl {
          * 
          * @return the type
          */
-        protected Class<T> getType() {
+        public Class<T> getType() {
             return type;
         }
         
@@ -88,7 +87,7 @@ public class GenericMultiTypeServiceImpl {
          * 
          * @return the type translator, may be <b>null</b>
          */
-        protected TypeTranslator<T, String> getInTranslator() {
+        public TypeTranslator<T, String> getInTranslator() {
             return inTranslator;
         }
         
@@ -120,7 +119,7 @@ public class GenericMultiTypeServiceImpl {
          * 
          * @return the type translator, may be <b>null</b>
          */
-        protected TypeTranslator<String, T> getOutTranslator() {
+        public TypeTranslator<String, T> getOutTranslator() {
             return outTranslator;
         }
         
@@ -140,9 +139,9 @@ public class GenericMultiTypeServiceImpl {
          * @param typeName the data type name as specified in the configuration model
          * @return the ingestor
          */
-        protected DataIngestor<T> validateAndGetIngestor(String typeName) {
+        public DataIngestor<T> validateAndGetIngestor(String typeName) {
             if (null == ingestor) {
-                getLogger().info(
+                LoggerFactory.getLogger(getClass()).info(
                     "No ingestor registered for: {}. Registering an internal synchronous ingestor.", typeName);
                 ingestor = new SyncDataIngestor<T>();
             }
@@ -259,15 +258,6 @@ public class GenericMultiTypeServiceImpl {
         TypeTranslator<String, O> outTrans) {
         OutTypeInfo<O> info = obtainOutTypeInfo(outCls, outTypeName);
         info.outTranslator = outTrans;
-    }
-    
-    /**
-     * Returns the logger.
-     * 
-     * @return the logger
-     */
-    protected static Logger getLogger() {
-        return LoggerFactory.getLogger(GenericMultiTypeServiceImpl.class);
     }
     
 }

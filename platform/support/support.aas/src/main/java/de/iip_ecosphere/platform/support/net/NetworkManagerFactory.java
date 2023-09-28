@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.support.net;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -26,20 +27,37 @@ import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
  */
 public class NetworkManagerFactory {
 
+    public static final String PROPERTY = "iip.networkManager";
     private static NetworkManager instance;
 
     /**
-     * Returns the actual instance.
+     * Returns the actual descriptor.
      * 
      * @return the actual instance
+     * @see #loadFromProperty()
+     */
+    public static Optional<NetworkManagerDescriptor> getDescriptor() {
+        Optional<NetworkManagerDescriptor> first = loadFromProperty();
+        if (first.isEmpty()) {
+            first = ServiceLoaderUtils.findFirst(NetworkManagerDescriptor.class);
+        }
+        return first;
+    }
+
+    /**
+     * Returns the actual instance. Sets {@link #PROPERTY} if created by descriptor.
+     * 
+     * @return the actual instance
+     * @see #getDescriptor()
      */
     public static NetworkManager getInstance() {
         if (null == instance) {
-            Optional<NetworkManagerDescriptor> first = ServiceLoaderUtils.findFirst(NetworkManagerDescriptor.class);
+            Optional<NetworkManagerDescriptor> first = getDescriptor();
             if (first.isPresent()) {
                 instance = first.get().createInstance();
                 if (null != instance) {
-                    getLogger().info("Network manager implementation registered: " + instance.getClass().getName());
+                    System.setProperty(PROPERTY, first.get().getClass().getName());
+                    getLogger().info("Network manager implementation registered: {}", instance.getClass().getName());
                 }
             } else {
                 getLogger().warn("No Network manager descriptor/implementation known. "
@@ -48,6 +66,30 @@ public class NetworkManagerFactory {
             }
         }
         return instance;
+    }
+
+    /**
+     * Loads a descriptor from {@link #PROPERTY} if specified.
+     * 
+     * @return the loaded descriptor if not empty
+     */
+    public static Optional<NetworkManagerDescriptor> loadFromProperty() {
+        String mgrProperty = System.getProperty(PROPERTY);
+        Optional<NetworkManagerDescriptor> result = Optional.empty();
+        if (null != mgrProperty) {
+            try {
+                Class<?> cls = Class.forName(mgrProperty);
+                if (NetworkManagerDescriptor.class.isAssignableFrom(cls)) {
+                    result = Optional.of(NetworkManagerDescriptor.class.cast(cls.getConstructor().newInstance()));
+                }
+            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException 
+                | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException 
+                | ClassCastException e) {
+                
+                getLogger().warn("Cannot instantiate {} as network manager: {}", mgrProperty, e.getMessage());
+            }
+        }
+        return result;
     }
     
     /**

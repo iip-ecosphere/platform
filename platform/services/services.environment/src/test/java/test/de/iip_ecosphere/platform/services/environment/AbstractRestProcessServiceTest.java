@@ -93,7 +93,7 @@ public class AbstractRestProcessServiceTest {
         }
 
         @Override
-        protected String adjustRestQuery(String input) {
+        protected String adjustRestQuery(String input, String inTypeName) {
             return input;
         }
 

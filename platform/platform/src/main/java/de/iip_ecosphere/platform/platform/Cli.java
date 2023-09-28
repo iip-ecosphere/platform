@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
 
+import org.slf4j.LoggerFactory;
+
 import de.iip_ecosphere.platform.ecsRuntime.EcsClient;
 import de.iip_ecosphere.platform.platform.cli.ArgsCommandProvider;
 import de.iip_ecosphere.platform.platform.cli.CommandProvider;
@@ -28,12 +30,18 @@ import de.iip_ecosphere.platform.platform.cli.ScannerCommandProvider;
 import de.iip_ecosphere.platform.platform.cli.PrintVisitor.PrintType;
 import de.iip_ecosphere.platform.services.ServicesClient;
 import de.iip_ecosphere.platform.services.ServiceOperations.StreamLogMode;
+import de.iip_ecosphere.platform.services.environment.services.TransportConverter;
 import de.iip_ecosphere.platform.services.environment.services.TransportConverter.Watcher;
 import de.iip_ecosphere.platform.services.environment.services.TransportConverterFactory;
 import de.iip_ecosphere.platform.support.Endpoint;
+import de.iip_ecosphere.platform.support.aas.Submodel;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
+import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.IipVersion;
+import de.iip_ecosphere.platform.support.iip_aas.SubmodelClient;
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
+import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
 import de.iip_ecosphere.platform.support.semanticId.SemanticIdResolver;
 import de.iip_ecosphere.platform.transport.Transport;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslators;
@@ -182,7 +190,9 @@ public class Cli extends CliBackend {
                 callWithUri(provider, uri -> deployPlanEmitId(uri));
                 break;
             case "undeploy":
-                System.out.print("id (empty for none): ");
+                if (provider.isInteractive()) {
+                    System.out.print("id (empty for none): ");
+                }
                 Watcher<StatusMessage> watcher = createStatusWatcher().start();
                 callWithUri(provider, uri -> undeployPlan(uri, provider.nextCommand()));
                 watcher.stop();
@@ -197,12 +207,49 @@ public class Cli extends CliBackend {
     }
     
     /**
+     * Accessing the status submodel, in particular the gateway endpoint information.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static class StatusClient extends SubmodelClient {
+
+        /**
+         * Creates a status client.
+         * 
+         * @throws IOException if accessing the AAS fails
+         */
+        protected StatusClient() throws IOException {
+            super(ActiveAasBase.getSubmodel(PlatformAas.NAME_SUBMODEL_STATUS));
+        }
+        
+        /**
+         * Registers the status endpoint from the AAS in the network manager if possible.
+         */
+        public void registerGatewayPort() {
+            Submodel submodel = getSubmodel();
+            SubmodelElementCollection endpointEC = TransportConverter.getEndpoint(submodel, 
+                PlatformSetup.GATEWAY_PATH_STATUS);
+            Endpoint endpoint = TransportConverter.getEndpoint(endpointEC);
+            if (null != endpoint) {
+                NetworkManagerFactory.getInstance().reservePort(TransportConverterFactory.GATEWAY_PORT_KEY, endpoint);
+            }
+        }
+        
+    }
+    
+    /**
      * Creates a status message watcher.
      * 
      * @return the watcher instance
      */
     private static Watcher<StatusMessage> createStatusWatcher() {
         PlatformSetup setup = PlatformSetup.getInstance();
+        try {
+            new StatusClient().registerGatewayPort();
+        } catch (IOException e) {
+            LoggerFactory.getLogger(Cli.class).warn("Cannot access status submodel. Proceeding with default "
+                + "status gateway address.");
+        }
         Watcher<StatusMessage> result = TransportConverterFactory.getInstance().createWatcher(setup.getAas(), 
             setup.getTransport(), PlatformSetup.GATEWAY_PATH_STATUS, StatusMessageSerializer.createTypeTranslator(), 
             StatusMessage.class, 0);

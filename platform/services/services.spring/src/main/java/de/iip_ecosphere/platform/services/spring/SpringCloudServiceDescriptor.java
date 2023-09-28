@@ -160,11 +160,11 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
     }
     
     /**
-     * If the service represents a server, return the server specification.
+     * If the service represents a server, return the server specification. [public for testing]
      * 
      * @return the server specification, may be <b>null</b>
      */
-    Server getServer() {
+    public Server getServer() {
         return server;
     }
 
@@ -266,7 +266,7 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
      * 
      * @param predKey the predicate to select the closeables by key (may be <b>null</b> for all)
      * @param predCl the predicate to select the closeables by instance (may be <b>null</b> for all)
-     * @param consumer on identified closeables, for closing them use {@link #closeCloseables(Predicate)}.
+     * @param consumer on identified closeables, for closing them use {@link #closeCloseables(Predicate, Predicate)}
      */
     void iterClosables(Predicate<String> predKey, Predicate<Closeable> predCl, Consumer<Closeable> consumer) {
         iterCloseables(predKey, predCl, consumer, null);
@@ -277,7 +277,7 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
      * 
      * @param predKey the predicate to select the closeables by key (may be <b>null</b> for all)
      * @param predCl the predicate to select the closeables by instance (may be <b>null</b> for all)
-     * @param consumer on identified closeables, for closing them use {@link #closeCloseables(Predicate)}.
+     * @param consumer on identified closeables, for closing them use {@link #closeCloseables(Predicate, Predicate)}.
      * @param iterHandler for actions on the internal closeables iterator
      */
     private void iterCloseables(Predicate<String> predKey, Predicate<Closeable> predCl, Consumer<Closeable> consumer, 

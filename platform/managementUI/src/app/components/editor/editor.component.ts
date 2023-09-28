@@ -1,7 +1,9 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MatDialogRef } from '@angular/material/dialog';
 import { ApiService } from 'src/app/services/api.service';
-import { Resource, uiGroup, editorInput } from 'src/interfaces';
+import { primitiveDataTypes } from 'src/app/services/env-config.service';
+import { IvmlFormatterService } from 'src/app/services/ivml-formatter.service';
+import { Resource, uiGroup, editorInput, configMetaContainer, configMetaEntry, ResourceAttribute, InputVariable } from 'src/interfaces';
 
 @Component({
   selector: 'app-editor',
@@ -10,20 +12,26 @@ import { Resource, uiGroup, editorInput } from 'src/interfaces';
 })
 export class EditorComponent implements OnInit {
 
-  //type to generate editor for, null if type should be selected via dropdown
-  //needed for subeditor functionality
+  //type to generate subeditor for, null if this editor instance is not a subeditor
   @Input() type: editorInput | null = null;
+
+  //for generating dropdown options of abstract type
+  @Input() refinedTypes: ResourceAttribute[] | null = null;
+
 
   category: string = 'all';
   meta: Resource | undefined;
-  unchangedMeta: Resource | undefined;
   /* backup needed for data recovery before re-filtering data
    for the next tab */
   metaBackup: Resource | undefined;
   selectedType: Resource | undefined;
-  bool = true;
 
   uiGroups: uiGroup[] = [];
+
+  showDropdown = true;
+  showInputs = true;
+
+  variableName = '';
 
   metaTypes = ['metaState', 'metaProject',
     'metaSize', 'metaType', 'metaRefines', 'metaAbstract', 'metaTypeKind'];
@@ -32,6 +40,8 @@ export class EditorComponent implements OnInit {
 
   /* metaTypeKind */
   primitive = 1
+
+  ivmlType:string = "";
 
   /* metaRef list:
   empty -> returns ivml types
@@ -48,43 +58,51 @@ export class EditorComponent implements OnInit {
     {cat: "Applications", metaRef: ["Application"]}
   ];
 
+  feedback: string = ""
+
   constructor(private api: ApiService,
     public dialog: MatDialogRef<EditorComponent>,
-    public subDialog: MatDialog) { }
+    public ivmlFormatter: IvmlFormatterService) { }
 
   ngOnInit(): void {
-    if(!this.type) {
+    if(this.refinedTypes) {
+      console.log(this.refinedTypes);
+      this.meta = {
+        idShort: 'meta',
+        value: this.refinedTypes
+      }
+    } else if(!this.type) {
+      console.log("get meta")
       this.getMeta()
-    } else if(this.meta && this.meta.value && this.type.type){
+    } else if(this.metaBackup && this.metaBackup.value && this.type.type){
       let type = this.cleanTypeName(this.type.type);
-      this.selectedType = this.meta.value.find(item => item.idShort === type);
-      console.log(type);
-      console.log(this.selectedType);
-      console.log(this.meta);
+      this.selectedType = this.metaBackup.value.find(item => item.idShort === type);
       this.generateInputs()
+    }
+    console.log(this.metaBackup);
+    if(this.metaBackup && this.metaBackup.value) {
+      let searchTerm = 'Field'
+      for(const type of this.metaBackup.value) {
+        const refined = type.value.find((item: { idShort: string; }) => item.idShort === 'metaRefines');
+        if(refined && refined.value != '') {
+          if(searchTerm === refined.value) {
+            console.log(type);
+          }
+        }
+      }
     }
   }
 
   private async getMeta() {
     this.meta = await this.api.getMeta();
-    this.unchangedMeta = JSON.parse(JSON.stringify(this.meta));
     this.metaBackup = JSON.parse(JSON.stringify(this.meta)); // deep copy
     this.filterMeta();
-    /* TODO loe
-    if (this.meta.value) {
-      for (let item of this.meta.value) {
-        console.log(item.idShort)
-      }
-    }
-    */
   }
 
   /**
    * Documentation in src/assets/doc/filterMeta.jpg
    */
   public filterMeta() {
-    console.log("## (filterMeta-methode) \nmeta:")
-    console.log(this.meta)
     this.meta = JSON.parse(JSON.stringify(this.metaBackup)) // recovering meta from deep copy
     let filter = this.reqTypes.find(type => type.cat === this.category)
     let newMetaValues = []
@@ -96,14 +114,13 @@ export class EditorComponent implements OnInit {
         }
 
         if(!this.isAbstract(item)) {
-
           if(filter?.metaRef.includes(idShort)) {
             newMetaValues.push(item)
           }
 
           if (this.getMetaRef(item)) {
-            let metaRefVal = item.value.find((val: { idShort: string; }) => val.idShort === "metaRefines").value
-
+            let metaRefVal = item.value.find(
+              (val: { idShort: string; }) => val.idShort === "metaRefines").value
             if(metaRefVal != "") {
               // sub-type
               if(filter?.metaRef.includes(metaRefVal)) {
@@ -123,7 +140,8 @@ export class EditorComponent implements OnInit {
             }
           } else {
             // ivml types
-            if (this.isTypeMetaKindEqualNum(item, this.primitive) && filter?.metaRef.length == 0) {
+            if (this.isTypeMetaKindEqualNum(item, this.primitive)
+                  && filter?.metaRef.length == 0) {
               newMetaValues.push(item)
             }
           }
@@ -131,12 +149,24 @@ export class EditorComponent implements OnInit {
       }
     }
     this.meta!.value = newMetaValues
-    console.log(this.meta);
+
+    // single item
+    if (newMetaValues.length == 1) {
+      this.setInputForSingleItem(newMetaValues[0])
+      this.showDropdown = false
+    }
   }
 
-  /** Returns false when metaAbstract is false or there is no attribute "metaAbstract" */
+  public setInputForSingleItem(item: any) {
+    this.selectedType = item
+    this.generateInputs()
+  }
+
+  /** Returns false when metaAbstract is false or
+   * there is no attribute "metaAbstract" */
   private isAbstract(item:any) {
-    let abstract = item.value.find((val: { idShort: string; }) => val.idShort === "metaAbstract")?.value
+    let abstract = item.value.find(
+      (val: { idShort: string; }) => val.idShort === "metaAbstract")?.value
     if (abstract) {
       return true
     } else {
@@ -145,7 +175,8 @@ export class EditorComponent implements OnInit {
   }
 
   private getMetaRef(item: any) {
-    let value = item.value.find((val: { idShort: string; }) => val.idShort === "metaRefines")
+    let value = item.value.find(
+      (val: { idShort: string; }) => val.idShort === "metaRefines")
     if (value) {
       return value.value
     } else {
@@ -154,7 +185,8 @@ export class EditorComponent implements OnInit {
   }
 
   private isTypeMetaKindEqualNum(item:any, num:number) {
-    let value = item.value.find((val: { idShort: string; }) => val.idShort === "metaTypeKind").value
+    let value = item.value.find(
+      (val: { idShort: string; }) => val.idShort === "metaTypeKind").value
     if (value == num) {
       return true
     } else {
@@ -193,18 +225,24 @@ export class EditorComponent implements OnInit {
       return null
     }
   }
+
 // ----------------------------------------------------------------------
 
-private cleanTypeName(type: string) {
-  const startIndex = type.lastIndexOf('(') + 1;
-  const endIndex = type.indexOf(')');
-  return type.substring(startIndex, endIndex);
+  private cleanTypeName(type: string) {
+    const startIndex = type.lastIndexOf('(') + 1;
+    const endIndex = type.indexOf(')');
+    if(endIndex > 0){
+      return type.substring(startIndex, endIndex);
+    } else {
+      return type;
+    }
+  }
 
-}
-
-  public displayName(property: Resource) {
+  public displayName(property: Resource | string) {
     let displayName = '';
-    if(property.value) {
+    if(typeof(property) == 'string') {
+      displayName = property;
+    } else if(property.value) {
       displayName = property.value.find(
         item => item.idShort === 'name')?.value;
     }
@@ -213,9 +251,35 @@ private cleanTypeName(type: string) {
 
   public generateInputs() {
     this.uiGroups = [];
-    console.log(this.selectedType);
-    const selectedType = this.selectedType;
+    const selectedType = this.selectedType as configMetaContainer;
+    this.ivmlType = selectedType.idShort
+
     if(selectedType && selectedType.value) {
+
+      // (Constants) hard-coded in case of primitive types
+      if (primitiveDataTypes.includes(selectedType.idShort)) {
+        let meta_entry:configMetaEntry = {
+          modelType: {name: ""},
+          kind: "",
+          value: "",
+          idShort: "value"
+        }
+
+        let editorInput:editorInput =
+          {name: "value", type: selectedType.idShort, value:[],
+          description: [{language: '', text: ''}],
+          refTo: false, multipleInputs: false, meta:meta_entry}
+
+
+        let uiGroup = 1
+        this.uiGroups.push({
+          uiGroup: uiGroup,
+          inputs: [editorInput],
+          optionalInputs: [],
+          fullLineInputs: [],
+          fullLineOptionalInputs: []
+        });
+      }
 
       for(const input of selectedType.value) {
         if(input.idShort && this.metaTypes.indexOf(input.idShort) === -1) {
@@ -230,32 +294,42 @@ private cleanTypeName(type: string) {
           let uiGroupCompare =  this.uiGroups.find(
             item => item.uiGroup === uiGroup);
 
-
           let editorInput: editorInput =
             {name: '', type: '', value:[], description:
               [{language: '', text: ''}],
               refTo: false, multipleInputs: false};
+
           let name = input.value.find(
             (item: { idShort: string; }) => item.idShort === 'name')
-          editorInput.name = name.value;
-          if(name.description
-            && name.description[0]
-            && name.description[0].text
-            && name.description[0].language) {
-            editorInput.description = name.description;
-          }
+            if(name) {
+              editorInput.name = name.value;
+              if(name.description
+                && name.description[0]
+                && name.description[0].text
+                && name.description[0].language) {
+                editorInput.description = name.description;
+              }
+            }
+
           editorInput.type = input.value.find(
             (item: { idShort: string; }) => item.idShort === 'type')?.value;
 
-            let cleanType = this.cleanTypeName(editorInput.type);
-            let type = this.unchangedMeta?.value?.find(type => type.idShort == cleanType);
-            if(type) {
-              editorInput.metaTypeKind = type.value.find(
-                (item: { idShort: string; }) => item.idShort === 'metaTypeKind')?.value;
-            }
+          editorInput.meta = input;
+          let cleanType = this.cleanTypeName(editorInput.type);
+          let type = this.meta?.value?.find(type => type.idShort === cleanType);
+          //let type2 = this.metaBackup?.value?.find(type => type.idShort === cleanType);
 
-            //the metaTypeKind is not included on the values of the types in the configuration/meta collection
-            //therefore this approach doesnt work, but it would be much more performant if it did
+          if(type) {
+            editorInput.metaTypeKind = type.value.find(
+              (item: { idShort: string; }) => item.idShort === 'metaTypeKind')?.value;
+
+          } else if(this.metaBackup && this.metaBackup.value) {
+            let temp = this.metaBackup.value.find(item => item.idShort === this.cleanTypeName(editorInput.type));
+            editorInput.metaTypeKind = temp?.value.find((item: { idShort: string; }) => item.idShort === 'metaTypeKind').value
+          }
+
+          //the metaTypeKind is not included on the values of the types in the configuration/meta collection
+          //therefore this approach doesnt work, but it would be much more performant if it did
           // editorInput.metaTypeKind = input.value.find(
           //   (item: { idShort: string; }) => item.idShort === 'metaTypeKind')?.value;
           //   console.log(editorInput);
@@ -268,7 +342,21 @@ private cleanTypeName(type: string) {
           if(editorInput.type.indexOf('setOf') >= 0
             || editorInput.type.indexOf('sequenceOf') >= 0) {
             editorInput.multipleInputs = true;
+            console.log("multiple inputs")
           }
+          //assign initial value of inputFields
+          let initial;
+          if(editorInput.multipleInputs || editorInput.metaTypeKind === 2) {
+            initial = []
+          } else if(editorInput.type === 'Boolean'){
+            initial = false;
+          } else if(editorInput.metaTypeKind === 10 && !editorInput.multipleInputs) {
+            initial = {};
+          } else {
+            initial = '';
+          }
+          editorInput.value = initial;
+
           if(!uiGroupCompare ){
             if(isOptional) {
               if(editorInput.multipleInputs) {
@@ -288,7 +376,6 @@ private cleanTypeName(type: string) {
                   fullLineOptionalInputs: []
                 });
               }
-
             } else {
               if(editorInput.multipleInputs) {
                 this.uiGroups.push({
@@ -307,7 +394,6 @@ private cleanTypeName(type: string) {
                   fullLineOptionalInputs: []
                 });
               }
-
             }
           } else {
             if(isOptional) {
@@ -323,40 +409,101 @@ private cleanTypeName(type: string) {
               } else {
                 uiGroupCompare?.inputs.push(editorInput);
               }
-
             }
-
           }
         }
-        }
+      }
     }
   }
 
   public toggleOptional(uiGroup: uiGroup) {
     uiGroup.toggleOptional = !uiGroup.toggleOptional;
-
   }
 
-  public addType() {
-    this.dialog.close();
-  }
-
-  public create() {
-
+  public async create() {
+    const creationData = this.prepareCreation();
+    if (this.selectedType?.idShort == "Application") {
+      this.feedback = await this.ivmlFormatter.createApp(this.variableName, creationData)
+    } else {
+      this.feedback = await this.ivmlFormatter.createVariable(
+        this.variableName, creationData, this.ivmlType)
+    }
   }
 
   public close() {
     this.dialog.close();
   };
 
-  public openSubeditor(type: editorInput) {
-    //this.router.navigateByUrl("list/editor/all");
-    let dialogRef = this.subDialog.open(EditorComponent, {
-      height: '80%',
-      width:  '80%',
-    })
-    dialogRef.componentInstance.type = type;
-    dialogRef.componentInstance.meta = this.unchangedMeta;
+  public prepareCreation() {
+    let complexType: Record<string, any> = {};
+    this.showInputs = false;
+    for(let uiGroup of this.uiGroups) {
+
+      for(let input of uiGroup.inputs) {
+        if(input.meta){
+          complexType[input.name] = input.value;
+        }
+
+        if(primitiveDataTypes.includes(input.type)) {
+          complexType[input.name] = input.value
+        }
+
+      }
+      for(let input of uiGroup.optionalInputs) {
+        if(input.meta){
+          complexType[input.name] = input.value;
+        }
+      }
+      for(let input of uiGroup.fullLineInputs) {
+        if(input.meta){
+          complexType[input.name] = input.value;
+        }
+      }
+      for(let input of uiGroup.fullLineOptionalInputs) {
+        if(input.meta){
+          complexType[input.name] = input.value;
+        }
+      }
+    }
+    return complexType;
   }
+
+  public addType() {
+    let complexType: Record<string, any> = {};
+
+    if(this.type) {
+      for(let uiGroup of this.uiGroups) {
+        for(let input of uiGroup.inputs) {
+          if(input.meta){
+            complexType[input.name] = input.value;
+          }
+        }
+        for(let input of uiGroup.optionalInputs) {
+          if(input.meta){
+            complexType[input.name] = input.value;
+          }
+        }
+        for(let input of uiGroup.fullLineInputs) {
+          if(input.meta){
+            complexType[input.name] = input.value;
+          }
+        }
+        for(let input of uiGroup.fullLineOptionalInputs) {
+          if(input.meta){
+            complexType[input.name] = input.value;
+          }
+        }
+      }
+      if(this.type.multipleInputs) {
+        this.type.value.push(complexType);
+      } else {
+        this. type.value = complexType;
+      }
+
+    }
+    this.dialog.close();
+  }
+
+
 
 }

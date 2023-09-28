@@ -1,0 +1,14 @@
+ConnectorsPartMIP::MipMqttV3Connector = The default MQTT connector for MIP software.
+ConnectorsPartMIP::MipMqttV3Connector::name = The human readable name of the service.
+ConnectorsPartMIP::MipMqttV3Connector::description = Description of service functionality.
+ConnectorsPartMIP::MipMqttV3Connector::ver = Version of service (numbers separated by a dot).
+ConnectorsPartMIP::MipMqttV3Connector::input = Data types forming the input to the service.
+ConnectorsPartMIP::MipMqttV3Connector::output = Data types forming the output produced by the service.
+ConnectorsPartMIP::MipMqttV3Connector::inInterface = Provided data input to be mapped into adapter, alternative to adapterClass.
+ConnectorsPartMIP::MipMqttV3Connector::outInterface = Provided data output to be mapped into adapter, alternative to adapterClass.
+ConnectorsPartMIP::MipMqttV3Connector::machineFormatter = Formatter turning data received from application into connector output.
+ConnectorsPartMIP::MipMqttV3Connector::machineParser = Parser turning data received from external/connector into application data.
+ConnectorsPartMIP::MipMqttInput = The Input for MIP Mqtt connector.
+ConnectorsPartMIP::MipMqttOutput = The Output for MIP Mqtt connector.
+ConnectorsPartMIP::MipMqttV3Connector::nameplateInfo = Nameplate information for MIP connector.
+ConnectorsPartMIP::manufacturer_mipTech = MIP manufacturer nameplate.

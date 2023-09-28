@@ -56,10 +56,10 @@ done
 echo "Monitoring is started"
 echo "Broker and Platform are Running... Please don't close it"
 
-brokerPID=$(ps -Ao pid,command | grep "java -cp brokerJars/" | grep -v grep | head -1 | xargs | cut -d ' ' -f -1)
-platformPID=$(ps -Ao pid,command | grep "java -cp plJars/" | grep -v grep | head -1 | xargs | cut -d ' ' -f -1)
+brokerPID=$(ps -Ao pid,command | grep "cp brokerJars/" | grep -v grep | head -1 | xargs | cut -d ' ' -f -1)
+platformPID=$(ps -Ao pid,command | grep "cp plJars/" | grep -v grep | head -1 | xargs | cut -d ' ' -f -1)
 mgtUiPID=$(ps -Ao pid,command | grep "nodejs server.js" | grep -v grep | head -1 | xargs | cut -d ' ' -f -1)
-monitoringPID=$(ps -Ao pid,command | grep "java -cp monJars/" | grep -v grep | head -1 | xargs | cut -d ' ' -f -1)
+monitoringPID=$(ps -Ao pid,command | grep "cp monJars/" | grep -v grep | head -1 | xargs | cut -d ' ' -f -1)
 
 #brokerPID=$(pgrep -laP $brokerPPID | cut -d ' ' -f1)
 #platformPID=$(pgrep -laP $platformPPID | cut -d ' ' -f1)

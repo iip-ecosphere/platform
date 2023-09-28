@@ -18,6 +18,8 @@ import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 
+import de.iip_ecosphere.platform.support.setup.InstalledDependenciesSetup;
+
 /**
  * If the service is not completely implemented rather than delegates functionality to an additional process that
  * must be started and managed along with the service.

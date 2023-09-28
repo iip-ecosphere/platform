@@ -1,5 +1,6 @@
 echo $1 | sudo -S apt-get update
 sudo apt install unzip -y
+sudo apt install jq -y
 
 sudo apt-get update -y
 sudo apt-get install \

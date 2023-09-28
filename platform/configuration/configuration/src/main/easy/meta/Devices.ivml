@@ -8,7 +8,7 @@ project Devices {
         
     abstract compound ContainerManager {
        assign (semanticId = Eclass_Unit_MByte) to {
-           Integer memLimit = 312; // e.g., JVM memory limit in MBytes
+           Integer memLimit = 440; // e.g., JVM memory limit in MBytes
        }
        String authenticationKey;
          // - globally allocated hosts/ports
@@ -106,6 +106,14 @@ project Devices {
         String version;
         setOf(refTo(Dependency)) dependencies = {};
     }
+    
+    compound MavenDependency refines Dependency {
+        String artifact;
+    }
+
+    MavenDependency mvnDefaultLib = {
+        artifact = mvnIipGroup + ":configuration.defaultLib:" + iipVer
+    };
 
     // ------------------------ typical AI dependencies for all ------------------
     
@@ -255,6 +263,10 @@ project Devices {
         NonEmptyString containerPath;
     }
     
+    compound GpusContainerArgument refines ContainerArgument {
+        NonEmptyString gpuDevice;
+    }
+    
     // there may be more relevant, e.g., --gpu
 
     // for future    
@@ -292,6 +304,7 @@ project Devices {
         PYTHON3;
         PYTHON38;
         PYTHON39;
+        mvnDefaultLib;        
         tensorflow280;
         tensorflow290;
         keras290;

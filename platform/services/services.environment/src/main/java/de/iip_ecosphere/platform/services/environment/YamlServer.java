@@ -29,6 +29,7 @@ public class YamlServer extends YamlProcess {
     private String host;
     private String cls;
     private String transportChannel;
+    private boolean asProcess = false;
 
     /**
      * Returns the id of the server, also to be used as network management key.
@@ -95,6 +96,15 @@ public class YamlServer extends YamlProcess {
     }
     
     /**
+     * Execute the server as an own process.
+     * 
+     * @return {@code true} for process, {@code false} for in-service-manager execution
+     */
+    public boolean getAsProcess() {
+        return asProcess;
+    }
+    
+    /**
      * Returns the id of the server, also to be used as network management key. [required by SnakeYaml]
      * 
      * @param id the id of the server
@@ -158,6 +168,15 @@ public class YamlServer extends YamlProcess {
      */
     public void setTransportChannel(String transportChannel) {
         this.transportChannel = transportChannel;
+    }
+    
+    /**
+     * Changes whether the the server shall be executed as an own process.
+     * 
+     * @param asProcess {@code true} for process, {@code false} for in-service-manager execution
+     */
+    public void setAsProcess(boolean asProcess) {
+        this.asProcess = asProcess;
     }
 
     /**

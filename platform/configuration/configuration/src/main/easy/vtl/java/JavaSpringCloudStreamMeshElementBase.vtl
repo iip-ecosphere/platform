@@ -92,7 +92,11 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
                 }
                 if (base.traceRcv == TraceKind::TRACE) {
                     trace = trace + 'Transport.sendTraceRecord(new TraceRecord("${base.id}", "sending", ${d}));';
+                } else if (base.traceRcv == TraceKind::TRACE_NO_DATA) {
+                    trace = trace + 'Transport.sendTraceRecord(new TraceRecord("${base.id}", "sending", null));';
                 } else if (base.traceRcv == TraceKind::LOG) {
+                    trace = trace + 'LoggerFactory.getLogger(getClass()).debug("sending in {}", "${base.id}");';
+                } else if (base.traceRcv == TraceKind::LOG_NO_DATA) {
                     trace = trace + 'LoggerFactory.getLogger(getClass()).debug("sending in {}: {}", "${base.id}", ${d});';
                 } else { // SYSOUT
                     trace = trace + 'System.out.println("sending in ${base.id}: " + ${d});';
@@ -141,8 +145,12 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
                 }
                 if (base.traceRcv == TraceKind::TRACE) {
                     trace = 'Transport.sendTraceRecord(new TraceRecord("${base.id}", "receiving", ${d}));';
+                } else if (base.traceRcv == TraceKind::TRACE_NO_DATA) {
+                    trace = 'Transport.sendTraceRecord(new TraceRecord("${base.id}", "receiving", null));';
                 } else if (base.traceRcv == TraceKind::LOG) {
                     trace = 'LoggerFactory.getLogger(getClass()).debug("received in {}: {}", "${base.id}", ${d});';
+                } else if (base.traceRcv == TraceKind::LOG_NO_DATA) {
+                    trace = 'LoggerFactory.getLogger(getClass()).debug("received in {}", "${base.id}");';
                 } else { // SYSOUT
                     trace = 'System.out.println("received in ${base.id}: " + ${d});';
                 }
@@ -609,6 +617,12 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
     }
 
     def generateReceptionCallback(MeshElement elt, ServiceBase base) {
+        ''
+    }
+
+    // remaining stuff of class, may be overridden if needed    
+    @DispatchBasis
+    def generateClassRest(MeshElement elt, ServiceBase service) {
         ''
     }
     
@@ -1169,10 +1183,12 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
         import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
         import io.micrometer.core.instrument.*;
         import static de.iip_ecosphere.platform.connectors.model.ModelAccessProvider.optional;
+        import de.iip_ecosphere.platform.support.*;
         import de.iip_ecosphere.platform.support.identities.*;
         import de.iip_ecosphere.platform.support.resources.*;
         import de.iip_ecosphere.platform.support.iip_aas.*;
         import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
+        import de.iip_ecosphere.platform.support.net.*;
         import de.iip_ecosphere.platform.transport.Transport;
         import de.iip_ecosphere.platform.transport.status.TraceRecord;
         import de.iip_ecosphere.platform.transport.serialization.*;
@@ -1246,6 +1262,7 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
             ${generateReceptionCallback(elt, app)}
             ${generateEventHandlers(elt, impl)|e}
             ${generateServiceBase(implements)|e}
+            ${generateClassRest(elt, impl)|e}
         }'
     }
     
