@@ -228,7 +228,7 @@ if [ $yn == "y" ] || [ $yn == "Y" ]; then
 
     mkdir Install && cd Install
     
-    wget https://jenkins-2.sse.uni-hildesheim.de/view/IIP-Ecosphere/job/IIP_Install/lastSuccessfulBuild/artifact/install.tar.gz
+    wget https://jenkins-2.sse.uni-hildesheim.de/view/IIP-Ecosphere/job/IIP_Install/lastSuccessfulBuild/artifact/platform/tools/Install/install.tar.gz
     tar xzpvf install.tar.gz
     
     cd platformDependencies/
@@ -307,7 +307,7 @@ elif [ $yn == "n" ] || [ $yn == "N" ]; then
 
     mkdir Install && cd Install
     
-    wget https://jenkins-2.sse.uni-hildesheim.de/view/IIP-Ecosphere/job/IIP_Install/lastSuccessfulBuild/artifact/install.tar.gz
+    wget https://jenkins-2.sse.uni-hildesheim.de/view/IIP-Ecosphere/job/IIP_Install/lastSuccessfulBuild/artifact/platform/tools/Install/install.tar.gz
     tar xzpvf install.tar.gz
 
     cd platformDependencies/

@@ -9,7 +9,7 @@ if [ $7 == "True" ]; then
     mkdir -p Install
     cd Install
 
-    wget https://jenkins-2.sse.uni-hildesheim.de/view/IIP-Ecosphere/job/IIP_Install/lastSuccessfulBuild/artifact/install.tar.gz
+    wget https://jenkins-2.sse.uni-hildesheim.de/view/IIP-Ecosphere/job/IIP_Install/lastSuccessfulBuild/artifact/platform/tools/Install/install.tar.gz
     tar xzpvf install.tar.gz
         
     sed -i 's/147.172.178.145/'$localIP'/g' src/main/easy/TechnicalSetup.ivml

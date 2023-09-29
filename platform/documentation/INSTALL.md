@@ -4,7 +4,7 @@ This document summarizes how to install and run the IIP-Ecosphere platform. We d
 
 ## Installation from scratch
 
-We recommend a full installation from scratch using the installation package. You can obtain the actual platform install package for [Windows](https://jenkins-2.sse.uni-hildesheim.de/view/IIP-Ecosphere/job/IIP_Install/lastSuccessfulBuild/artifact/install.zip) and for [Linux](https://jenkins-2.sse.uni-hildesheim.de/view/IIP-Ecosphere/job/IIP_Install/lastSuccessfulBuild/artifact/install.tar.gz). 
+We recommend a full installation from scratch using the installation package. You can obtain the actual platform install package for [Windows](https://jenkins-2.sse.uni-hildesheim.de/view/IIP-Ecosphere/job/IIP_Install/lastSuccessfulBuild/artifact/platform/tools/Install/install.zip) and for [Linux](https://jenkins-2.sse.uni-hildesheim.de/view/IIP-Ecosphere/job/IIP_Install/lastSuccessfulBuild/artifact/platform/tools/Install/install.tar.gz). 
 
 Unpack the installation package, e.g., on Linux
 
