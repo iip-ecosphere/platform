@@ -211,12 +211,33 @@ public class SecureIdentityStore extends IdentityStore {
             return false;
         }
     }
-
-    void setCertificateEntry(String alias, Certificate certificate) throws KeyStoreException {
-        keyStore.setCertificateEntry(alias, certificate);
+    
+    /**
+     * Saves a new entry (a certificate) in the security store.
+     * 
+     * @param alias            The name of the new entry.
+     * @param certificate      The content of the new entry (the certificate itself).
+     * @return boolean for testing.
+     */
+    public boolean setCertificateEntry(String alias, Certificate certificate) throws KeyStoreException {     
+        try {
+            keyStore.setCertificateEntry(alias, certificate);
+            return true;
+        } catch (KeyStoreException e) {
+            LoggerFactory.getLogger(getClass()).warn("Error when writing entry into keystore, see stacktrace");
+            e.printStackTrace();
+            return false;
+        }
     }
 
-    Certificate getCertificate(String alias) throws KeyStoreException {
+    /**
+     * Returns an existing certificate entry in the security store by its alias.
+     * 
+     * @param alias               The name of the new entry.
+     * @return Returns either the requested certificate entry or null, if not
+     *         successful.
+     */
+    public Certificate getCertificate(String alias) throws KeyStoreException {
         return keyStore.getCertificate(alias);
     }
 

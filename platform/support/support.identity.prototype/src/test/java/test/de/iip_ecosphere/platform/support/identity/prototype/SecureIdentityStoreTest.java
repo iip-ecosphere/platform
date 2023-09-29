@@ -76,7 +76,7 @@ public class SecureIdentityStoreTest {
     }    
     
     /**
-     * Tests entering and deleting symmetric entries into the secure identity store.
+     * Tests entering, retrieving, and deleting symmetric entries into the secure identity store.
      * 
      */
     @Test
@@ -107,39 +107,23 @@ public class SecureIdentityStoreTest {
     
 
     /**
-     * Tests entering and deleting private entries into the secure identity store.
+     * Tests entering, retrieving, and deleting private entries into the secure identity store.
      * @throws Exception 
      * 
      */
     @Test
-    public void testEnteringRetrievingDeletingPrivateEntries() throws Exception {
-
-        
-        //Create generator with RSA algorithm and 2048 key size
-        KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
-        keyGen.initialize(2048);
-        KeyPair keyPair = keyGen.generateKeyPair();
+    public void testEnteringRetrievingDeletingPrivateEntries() throws Exception {        
+        //Create key pair with RSA algorithm and 2048 key size
+        KeyPair keyPair = getKeyPairFromKeyGenerator("RSA", 2048);
         
         // Get private key and create an alias
         String aliasPrivate = "testEntryPrivate";
-        //PublicKey publicKey = keyPair.getPublic();
         PrivateKey privateKey = keyPair.getPrivate();
         
-        //Copied from /connectors.opcuav1/src/test/java/test/de/iip_ecosphere/platform/connectors/opcuav1/ServerKeystoreLoader.java
-        String applicationUri = "urn:eclipse:milo:examples:server:" + UUID.randomUUID();       
-        SelfSignedCertificateBuilder builder = new SelfSignedCertificateBuilder(keyPair)
-            .setCommonName("Eclipse Milo Example Server")
-            .setOrganization("digitalpetri")
-            .setOrganizationalUnit("dev")
-            .setLocalityName("Folsom")
-            .setStateName("CA")
-            .setCountryCode("US")
-            .setApplicationUri(applicationUri);
-
-
-        //Build the certificates and put them in the chain
-        X509Certificate certificate = builder.build();
+        //Get a new certificate and store it into the chain
+        X509Certificate certificate = getCertificateFromBuilder(keyPair);
         X509Certificate[] certificateChain =  new X509Certificate[]{certificate};
+        
         
         // Inserts a new private key entry
         assertEquals("Successfull insertion should return true", true,
@@ -157,6 +141,82 @@ public class SecureIdentityStoreTest {
         assertEquals("Unsuccessfull retrieval should return null", null, store.getEntry(aliasPrivate, protParam));
 
     }
+    
+    
+    /**
+     * Tests entering, retrieving, and deleting certificate entries into the secure identity store.
+     * @throws Exception 
+     * 
+     */
+    @Test
+    public void testEnteringRetrievingDeletingCertificateEntries() throws Exception {
+        //Create key pair with RSA algorithm and 2048 key size
+        KeyPair keyPair = getKeyPairFromKeyGenerator("RSA", 2048);        
+        
+        //Creates a new certificate and its alias
+        X509Certificate certificate = getCertificateFromBuilder(keyPair);
+        String aliasCert = "testEntryCert";
+  
+        
+        // Inserts a new certificate entry
+        assertEquals("Successfull insertion should return true", true,
+                store.setCertificateEntry(aliasCert, certificate));
+        
+        // Retrieves the certificate entry
+        assertEquals("Retrieved entry should match the inserted secret", certificate.toString(),
+                store.getCertificate(aliasCert).toString());
+        
+        // Deletes the entry
+        assertEquals("Successfull deletion should return true", true, store.deleteEntry(aliasCert));
+        
+        // Retrieve the (no longer existing) entry
+        assertEquals("Unsuccessfull retrieval should return null", null,  store.getCertificate(aliasCert));
+    }
+    
+    /**
+     * Helper method for generating a self-signed certificate.
+     * @param keyPair A pair of a public and private key required to build the certificate
+     * @return A newly generated X509Certificate 
+     * @throws Exception 
+     */
+    private static X509Certificate getCertificateFromBuilder(KeyPair keyPair) throws Exception {               
+        //Copied from /connectors.opcuav1/src/test/java/test/de/iip_ecosphere/platform/connectors/opcuav1/ServerKeystoreLoader.java
+        String applicationUri = "urn:eclipse:milo:examples:server:" + UUID.randomUUID();       
+        SelfSignedCertificateBuilder builder = new SelfSignedCertificateBuilder(keyPair)
+            .setCommonName("Eclipse Milo Example Server")
+            .setOrganization("digitalpetri")
+            .setOrganizationalUnit("dev")
+            .setLocalityName("Folsom")
+            .setStateName("CA")
+            .setCountryCode("US")
+            .setApplicationUri(applicationUri);
+
+        //Build the X509Certificate certificate with the builder and return it               
+        return builder.build();     
+    }
+ 
+    /**
+     * Helper method for generating a key pair (public + private).
+     * 
+     * @param cipher
+     * @param keySize
+     * @return Either the generated SecretKey or null.
+     */
+    private static KeyPair getKeyPairFromKeyGenerator(String cipher, int keySize) {
+        KeyPairGenerator keyGen;
+        try {
+            //Create generator with cipher algorithm and keySize
+            keyGen = KeyPairGenerator.getInstance(cipher);
+            keyGen.initialize(keySize);
+            
+            return keyGen.generateKeyPair();
+        } catch (NoSuchAlgorithmException e) {
+            System.out.println("Problem with key pair generator!");
+            e.printStackTrace();
+            return null;
+        }
+    }    
+    
 
     /**
      * Helper method for generating a key.
