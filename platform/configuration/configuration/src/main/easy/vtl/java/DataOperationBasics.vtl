@@ -12,6 +12,7 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
     Boolean optWithStepIn = true;
     mapOf(String, String) variables = {};
     Integer argsNestingLevel = 0;
+    Integer nestedStepCount = 0;
 
     def translateDataOperations(setOf(AssignmentOperation) assng, DataType src, String srcQual, DataType tgt, String tgtQual, setOf(String) done) {
         mapOf(Field, String) fields = {};
@@ -257,8 +258,12 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
     def produceDataTransfer(RecordType type, mapOf(String, Field) mapping, String typeQual, String mapQual, setOf(String) done, String indexes, String paths) {
         String targetSep = mapTargetSeparator();
         String sourceSep = mapSourceSeparator();
+        boolean isTop = mapQual.rfind(sourceSep) == 0;
         int index = 0;
         String out = "";
+        if (isTop) {
+            '${startTopRecordType(mapQual)}'
+        }
         for (Field f : type.fields) {
             String iq;
             if (indexes.length() > 0) {
@@ -274,13 +279,20 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
             String tn = mapTargetPath(typeQual, f);
             String mq = mapSourcePath(mapQual, f);
             if (not(done.includes(tn)) and mapping.containsKey(mq)) {
-                Integer tnPos = tn.rfind(targetSep);
-                Integer mqPos = mq.rfind(sourceSep);
                 out = appendWithNewline(out, produceDataTransfer(f, prefixPath(tn, targetSep), mapping.get(mq), prefixPath(mq, sourceSep), iq, p));
                 out = appendWithNewline(out, produceDataTransfer(f, f.type, mapping, tn, mq, done, iq, p));
             }
         }
         '${produceDataTransferOutput(type, out, getTemporaryVariable(typeQual, typeQual))}'
+        if (isTop) {
+            '${endTopRecordType(mapQual)}'
+        }
+    }
+
+    def startTopRecordType(String path) {
+    }
+    
+    def endTopRecordType(String path) {
     }
     
     // to be refined by caller; by default, data transfer code is written as one method. if not, output can be redirected

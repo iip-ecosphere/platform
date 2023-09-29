@@ -11,7 +11,6 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
     Boolean genFrom = false; // temporary
     String add = "";
     String topPath = "";
-    Integer nestedStepCount = 0;
     mapOf(Field, Integer) cachingTimes = {};
     Boolean splitTranslatorMethods = true;
     Boolean dataTransferTo = true; // temporary
@@ -301,7 +300,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
             final ModelOutputConverter outConverter = access.getOutputConverter();
             final String path = pathSupplier == null ? "${topPath}" : pathSupplier.get();
             
-            ${coType} result = new ${coType}${add}();
+            ${coType} result = new ${coType}${add}();\n
             ${translateDataOperations(assng, imType, imTypePath, pltfType, "result", done)}
             ${emitAsLines(topTypeOut)}
             
@@ -447,11 +446,13 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
             String path = topPath;
             if (nestedStepCount == 0 and path.length() > 0) {
                 path = path + getFieldNameForPath(field);
+                path = substPathEx('"${path}"', topPath, "path");
             } else {
                 path = getFieldNameForPath(field);
+                path = '"${path}"';
             }
             nestedStepCount = nestedStepCount + 1;
-            path = substPathEx('"${path}"', topPath, "path");
+            //path = substPathEx('"${path}"', topPath, "path");
             if (field.optional) {
                 'try {'
             }
@@ -465,6 +466,25 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
                 '} catch (IOException e${nestedStepCount}) {
                 }'
             }
+        }
+    }
+    
+    @Override
+    def startTopRecordType(String path) {
+        if (optWithStepIn and path.length() > 1) {
+            if (path.startsWith("/")) {
+                path = path.substring(1);
+            }
+            nestedStepCount = nestedStepCount + 1;
+            '\n\naccess = access.stepInto(path + "${path}");\n'
+        }
+    }
+    
+    @Override
+    def endTopRecordType(String path) {
+        if (optWithStepIn and path.length() > 1) {
+            nestedStepCount = nestedStepCount - 1;
+            'access = access.stepOut();\n'
         }
     }
     
