@@ -46,10 +46,10 @@ import de.iip_ecosphere.platform.support.identity.prototype.SecureIdentityStore;
  */
 public class SecureIdentityStoreTest {
     
-    static IdentityStore IStore;
-    static SecureIdentityStore store;
-    static char[] password = "savePassword".toCharArray();
-    KeyStore.ProtectionParameter protParam = new KeyStore.PasswordProtection(password);
+    private static IdentityStore iStore;
+    private static SecureIdentityStore store;
+    private static char[] password = "savePassword".toCharArray();
+    private KeyStore.ProtectionParameter protParam = new KeyStore.PasswordProtection(password);
     
     /**
      * Creates and loads a new SecureIdentityStore for testing.
@@ -57,9 +57,9 @@ public class SecureIdentityStoreTest {
     @BeforeClass
     public static void setup() {
         //Create a new instance of the SecureIdentityStore
-        IStore = IdentityStore.getInstance();
-        Assert.assertTrue(IStore instanceof SecureIdentityStore);
-        store = (SecureIdentityStore) IStore;
+        iStore = IdentityStore.getInstance();
+        Assert.assertTrue(iStore instanceof SecureIdentityStore);
+        store = (SecureIdentityStore) iStore;
         // Creates a new empty store
         assertEquals("Successfull creation should return true", true, store.createEmptyKeyStore());
         // Loads the existing keystore
@@ -105,7 +105,7 @@ public class SecureIdentityStoreTest {
     
     
     
-
+    // checkstyle: stop exception type check
     /**
      * Tests entering, retrieving, and deleting private entries into the secure identity store.
      * @throws Exception 
@@ -180,7 +180,7 @@ public class SecureIdentityStoreTest {
      * @throws Exception 
      */
     private static X509Certificate getCertificateFromBuilder(KeyPair keyPair) throws Exception {               
-        //Copied from /connectors.opcuav1/src/test/java/test/de/iip_ecosphere/platform/connectors/opcuav1/ServerKeystoreLoader.java
+        //Copied from ...de/iip_ecosphere/platform/connectors/opcuav1/ServerKeystoreLoader.java
         String applicationUri = "urn:eclipse:milo:examples:server:" + UUID.randomUUID();       
         SelfSignedCertificateBuilder builder = new SelfSignedCertificateBuilder(keyPair)
             .setCommonName("Eclipse Milo Example Server")

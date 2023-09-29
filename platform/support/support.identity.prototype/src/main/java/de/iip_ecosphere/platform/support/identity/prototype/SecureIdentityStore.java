@@ -64,22 +64,17 @@ public class SecureIdentityStore extends IdentityStore {
             return new SecureIdentityStore();
         }
     }
-
+    
+    /**
+     * Creates a secure identity store. Usually, shall be created via JSL
+     * ({@link IdentityStoreDescriptor}). [testing]
+     */
     public SecureIdentityStore() {
         this.keyStoreName = "secureKeystorePrototype";
         this.keyStoreType = KeyStore.getDefaultType();
         this.keyStorePassword = "pwd".toCharArray();
     }
 
-    /**
-     * Creates a secure identity store. Usually, shall be created via JSL
-     * ({@link IdentityStoreDescriptor}). [testing]
-     */
-//    public SecureIdentityStoreTest() {
-//        //TODO: Change to secure file? Inherit or implement new resolve functions?
-//        //data = YamlIdentityFile.load(resolve("identityStore.yml")); // can cope with null
-//        LoggerFactory.getLogger(YamlIdentityFile.class).info("Loaded secureIdentityStore {}", data.getName());
-//    }
 
     @Override
     public IdentityToken getToken(String identity, boolean defltAnonymous, String... fallback) {
@@ -174,8 +169,8 @@ public class SecureIdentityStore extends IdentityStore {
     /**
      * Returns an existing entry in the security store by its alias.
      * 
-     * @param alias               The name of the new entry.
-     * @param protectionParameter A password used for protection.
+     * @param alias          The name of the new entry.
+     * @param protParam      A password used for protection.
      * @return Keystore.Entry Returns either the requested entry or null, if not
      *         successful.
      */
