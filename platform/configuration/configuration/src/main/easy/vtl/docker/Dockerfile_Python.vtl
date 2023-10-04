@@ -30,7 +30,14 @@ template Dockerfile_Python(IIPEcosphere config, FileArtifact target, sequenceOf(
                 'ENV IIP_INCONTAINER=true'
                 
                 for (PythonService pyService : services) {
-                    if (not(isDefined(pyService.condaEnv) and pyService.condaEnv.length() > 0)) {
+                    Boolean isCondaService = false;
+                    if (isDefined(pyService.condaEnv) and pyService.condaEnv.length() > 0) {
+                        isCondaService = true;
+                    } else {
+                        isCondaService = false;
+                    }
+
+                    if (not(isCondaService)) {
                         setOf(Dependency) deps = pyService.dependencies;
                         for (Dependency s : deps) {
                             if (genDependency(s) == 'PYTHON2') {
@@ -81,7 +88,14 @@ template Dockerfile_Python(IIPEcosphere config, FileArtifact target, sequenceOf(
             }
                 
             for (PythonService pyService : services) {
-                if (not(isDefined(pyService.condaEnv) and pyService.condaEnv.length() > 0)) {
+                Boolean isCondaService = false;
+                if (isDefined(pyService.condaEnv) and pyService.condaEnv.length() > 0) {
+                    isCondaService = true;
+                } else {
+                    isCondaService = false;
+                }
+
+                if (not(isCondaService)) {
                     setOf(Dependency) deps = pyService.dependencies;
 
                     for (Dependency s : deps) {

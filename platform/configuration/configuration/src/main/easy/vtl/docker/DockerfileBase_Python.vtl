@@ -26,7 +26,14 @@ template DockerfileBase_Python(IIPEcosphere config, FileArtifact target, sequenc
             'FROM ${mgr.registry}/${appName}/appcommendepbaseimage:0.1.0'
             
             for (PythonService pyService : services) {
-                if (not(isDefined(pyService.condaEnv) and pyService.condaEnv.length() > 0)) {
+                Boolean isCondaService = false;
+                if (isDefined(pyService.condaEnv) and pyService.condaEnv.length() > 0) {
+                    isCondaService = true;
+                } else {
+                    isCondaService = false;
+                }
+
+                if (not(isCondaService)) {
                     setOf(Dependency) deps = pyService.dependencies;
                     for (Dependency s : deps) {
                         if (genDependency(s) == 'PYTHON2') {
@@ -68,7 +75,14 @@ template DockerfileBase_Python(IIPEcosphere config, FileArtifact target, sequenc
             Integer IsPythonInstalled = 0;
             String pythonPipInstalled = "";
             for (PythonService pyService : services) {
-                if (not(isDefined(pyService.condaEnv) and pyService.condaEnv.length() > 0)) {
+                Boolean isCondaService = false;
+                if (isDefined(pyService.condaEnv) and pyService.condaEnv.length() > 0) {
+                    isCondaService = true;
+                } else {
+                    isCondaService = false;
+                }
+
+                if (not(isCondaService)) {
                     setOf(Dependency) deps = pyService.dependencies;
     
                     for (Dependency s : deps) {
