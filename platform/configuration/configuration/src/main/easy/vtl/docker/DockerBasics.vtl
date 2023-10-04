@@ -138,4 +138,54 @@ template DockerBasics(Configuration config, FileArtifact target) {
             }
         }
     }
+    
+    def genCondePythonEnv(sequenceOf(PythonService) services, Boolean condaInstallMode) {
+        for (PythonService pyService : services) {
+            if (isDefined(pyService.condaEnv) and pyService.condaEnv.length() > 0) {
+                setOf(Dependency) deps = pyService.dependencies;
+                String pythonCondaVersion = "";
+                for (Dependency s : deps) {
+                    if (genDependency(s) == 'PYTHON38') {
+                        pythonCondaVersion = "3.8";
+                    } else if (genDependency(s) == 'PYTHON39') {
+                        pythonCondaVersion = "3.9";
+                    } 
+                }
+                
+                if (condaInstallMode) {
+                    'RUN apt-get -qq update -y && apt-get -qq -y install curl bzip2 && curl -sSL https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -o /tmp/miniconda.sh && bash /tmp/miniconda.sh -bfp /usr/local && rm -rf /tmp/miniconda.sh && conda install -y python=${pythonCondaVersion} && conda update conda && apt-get -qq -y remove curl bzip2 && apt-get -qq -y autoremove && apt-get autoclean && rm -rf /var/lib/apt/lists/* /var/log/dpkg.log && conda clean --all --yes'
+                    'ENV PATH=/opt/conda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
+                    'RUN conda create --name ${pyService.condaEnv} python=${pythonCondaVersion}'
+                }
+                
+                'SHELL ["conda", "run", "-n", "${pyService.condaEnv}", "/bin/bash", "-c"]'
+                'COPY conda.${pyService.condaEnv}.requirements.txt conda.${pyService.condaEnv}.requirements.txt'
+                'RUN python3 -m pip install -r conda.${pyService.condaEnv}.requirements.txt'
+            }
+        }
+    }
+    
+    def genDependency(Dependency d) {
+        '';
+    }
+    
+    def genDependency(SystemDependency d) {
+        '${d.key}';
+    }
+    
+    def installBeforePip(Dependency d, sequenceOf(String) result) {
+    }
+
+    def installBeforePip(LinuxSystemDependency d, sequenceOf(String) result) {
+        result.add('RUN apt-get install -y ${d.name}');
+    }
+    
+    def installBeforePip(LinuxCommandBasedSystemDependency d, sequenceOf(String) result) {
+         // TODO downloads
+         // TODO bashSetups
+        for (String c: d.installCommands) {
+            result.add('RUN ${c}');
+        }
+    }
+    
 }

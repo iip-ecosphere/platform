@@ -14,95 +14,106 @@ template DockerfileBase_Python(IIPEcosphere config, FileArtifact target, sequenc
         DockerContainerManager mgr = config.containerManager;
         String appName = app.name.toIdentifier().toLower();
 
+        sequenceOf(PythonService) services = elements -> collect(e|e.impl) -> selectByKind(PythonService);
+        sequenceOf(ServiceFamily) families = elements -> collect(e|e.impl) -> selectByKind(ServiceFamily);
+        for (ServiceFamily family : families) {
+            for (PythonService serviceMember : family.members -> selectByKind(PythonService)) {
+                services.add(serviceMember);
+            }
+        }
+            
         if (not(justCommenDep)) {
             'FROM ${mgr.registry}/${appName}/appcommendepbaseimage:0.1.0'
-
-            sequenceOf(PythonService) services = elements -> collect(e|e.impl) -> selectByKind(PythonService);
-            sequenceOf(ServiceFamily) families = elements -> collect(e|e.impl) -> selectByKind(ServiceFamily);
-            for (ServiceFamily family : families) {
-                for (PythonService serviceMember : family.members -> selectByKind(PythonService)) {
-                    services.add(serviceMember);
-                }
-            }
             
             for (PythonService pyService : services) {
-                setOf(Dependency) deps = pyService.dependencies;
-                for (Dependency s : deps) {
-                    if (genDependency(s) == 'PYTHON2') {
-                        if (IsPythonInstalled == 0) {
-                            IsPythonInstalled = 1;
-                            pythonPipInstalled = 'RUN python2 -m pip install -r requirements.txt';
-                        }
-                    } else if (genDependency(s) == 'PYTHON38') {
-                        if (IsPythonInstalled == 0) {
-                            IsPythonInstalled = 1;
-                            pythonPipInstalled = 'RUN python3 -m pip install -r requirements.txt';
-                        }
-                    } else if (genDependency(s) == 'PYTHON39') {
-                        if (IsPythonInstalled == 0) {
-                            IsPythonInstalled = 1;
-                            pythonPipInstalled = 'RUN python3 -m pip install -r requirements.txt';
-                        }
-                    } 
+                if (not(isDefined(pyService.condaEnv) and pyService.condaEnv.length() > 0)) {
+                    setOf(Dependency) deps = pyService.dependencies;
+                    for (Dependency s : deps) {
+                        if (genDependency(s) == 'PYTHON2') {
+                            if (IsPythonInstalled == 0) {
+                                IsPythonInstalled = 1;
+                                pythonPipInstalled = 'RUN python2 -m pip install -r requirements.txt';
+                            }
+                        } else if (genDependency(s) == 'PYTHON38') {
+                            if (IsPythonInstalled == 0) {
+                                IsPythonInstalled = 1;
+                                pythonPipInstalled = 'RUN python3 -m pip install -r requirements.txt';
+                            }
+                        } else if (genDependency(s) == 'PYTHON39') {
+                            if (IsPythonInstalled == 0) {
+                                IsPythonInstalled = 1;
+                                pythonPipInstalled = 'RUN python3 -m pip install -r requirements.txt';
+                            }
+                        } 
+                    }
                 }
             }
 
-            if (IsPythonInstalled == 1) {
-                '# Install python dependencies'
-                'COPY requirements.txt requirements.txt'
-                '${pythonPipInstalled}'
-            }
+            if (IsPythonInstalled == 0) {
+                pythonPipInstalled = 'RUN python3 -m pip install -r requirements.txt';
+            } 
+            
+            '# Install python dependencies'
+            'COPY requirements.txt requirements.txt'
+            '${pythonPipInstalled}'
+            '${genCondePythonEnv(services, false)}'
+
         } else {
             setOf(Dependency) allDependencies = collectDependencies(elements);
             sequenceOf(String) tmp = {};
             for (Dependency d: allDependencies) {
                 installBeforePip(d, tmp);
             }
-            sequenceOf(PythonService) services = elements -> collect(e|e.impl) -> selectByKind(PythonService);
-            sequenceOf(ServiceFamily) families = elements -> collect(e|e.impl) -> selectByKind(ServiceFamily);
-            for (ServiceFamily family : families) {
-                for (PythonService serviceMember : family.members -> selectByKind(PythonService)) {
-                    services.add(serviceMember);
-                }
-            }
 
             Integer IsPythonInstalled = 0;
             String pythonPipInstalled = "";
             for (PythonService pyService : services) {
-                setOf(Dependency) deps = pyService.dependencies;
+                if (not(isDefined(pyService.condaEnv) and pyService.condaEnv.length() > 0)) {
+                    setOf(Dependency) deps = pyService.dependencies;
     
-                for (Dependency s : deps) {
-                    if (genDependency(s) == 'PYTHON2') {
-                        if (IsPythonInstalled == 0) {
-                            'FROM python:2.7.10 '
-                            'RUN apt-get update'
-                            IsPythonInstalled = 1;
-                            pythonPipInstalled = 'RUN python2 -m pip install -r requirements.txt';
-                        }
-                        for (String s: tmp) {
-                            '${s}'
-                        }
-                    } else if (genDependency(s) == 'PYTHON38') {
-                        if (IsPythonInstalled == 0) {
-                            'FROM python:3.8.16-slim-buster'
-                            'RUN apt-get update'
-                            IsPythonInstalled = 1;
-                            pythonPipInstalled = 'RUN python3 -m pip install -r requirements.txt';
-                        }
-                        for (String s: tmp) {
-                            '${s}'
-                        }
-                    } else if (genDependency(s) == 'PYTHON39') {
-                        if (IsPythonInstalled == 0) {
-                            'FROM python:3.9.16-slim-buster'
-                            'RUN apt-get update'
-                            IsPythonInstalled = 1;
-                            pythonPipInstalled = 'RUN python3 -m pip install -r requirements.txt';
-                        }
-                        for (String s: tmp) {
-                            '${s}'
-                        }
-                    } 
+                    for (Dependency s : deps) {
+                        if (genDependency(s) == 'PYTHON2') {
+                            if (IsPythonInstalled == 0) {
+                                'FROM python:2.7.10 '
+                                'RUN apt-get update'
+                                IsPythonInstalled = 1;
+                                pythonPipInstalled = 'RUN python2 -m pip install -r requirements.txt';
+                            }
+                            for (String s: tmp) {
+                                '${s}'
+                            }
+                        } else if (genDependency(s) == 'PYTHON38') {
+                            if (IsPythonInstalled == 0) {
+                                'FROM python:3.8.16-slim-buster'
+                                'RUN apt-get update'
+                                IsPythonInstalled = 1;
+                                pythonPipInstalled = 'RUN python3 -m pip install -r requirements.txt';
+                            }
+                            for (String s: tmp) {
+                                '${s}'
+                            }
+                        } else if (genDependency(s) == 'PYTHON39') {
+                            if (IsPythonInstalled == 0) {
+                                'FROM python:3.9.16-slim-buster'
+                                'RUN apt-get update'
+                                IsPythonInstalled = 1;
+                                pythonPipInstalled = 'RUN python3 -m pip install -r requirements.txt';
+                            }
+                            for (String s: tmp) {
+                                '${s}'
+                            }
+                        } 
+                    }
+                }
+            }
+            
+            if (IsPythonInstalled == 0) {
+                'FROM python:3.9.16-slim-buster'
+                'RUN apt-get update'
+                IsPythonInstalled = 1;
+                pythonPipInstalled = 'RUN python3 -m pip install -r requirements.txt';
+                for (String s: tmp) {
+                    '${s}'
                 }
             }
             
@@ -136,33 +147,11 @@ template DockerfileBase_Python(IIPEcosphere config, FileArtifact target, sequenc
                 '# Install python dependencies'
                 'COPY requirements.txt requirements.txt'
                 '${pythonPipInstalled}'
+                '${genCondePythonEnv(services, true)}'
             }
             ''
             '${genTestingMode(config, "Python")}'
             ''
-        }
-    }
-    
-    def genDependency(Dependency d) {
-        '';
-    }
-    
-    def genDependency(SystemDependency d) {
-        '${d.key}';
-    }
-    
-    def installBeforePip(Dependency d, sequenceOf(String) result) {
-    }
-
-    def installBeforePip(LinuxSystemDependency d, sequenceOf(String) result) {
-        result.add('RUN apt-get install -y ${d.name}');
-    }
-    
-    def installBeforePip(LinuxCommandBasedSystemDependency d, sequenceOf(String) result) {
-         // TODO downloads
-         // TODO bashSetups
-        for (String c: d.installCommands) {
-            result.add('RUN ${c}');
         }
     }
     

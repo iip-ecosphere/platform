@@ -13,57 +13,72 @@ template PythonBaseReq(IIPEcosphere config, FileArtifact target, sequenceOf(Mesh
             }
         }
 
+        Integer isCondaReq = 0;
+        Integer isCondaService = 0;
+        if (target.getPath().indexOf("conda.") != -1){
+            isCondaReq = 1;
+        }
+        
         // preliminary fix, just very basic ones, shall also include the remaining -> check versions here
         //'pyyaml
         //pyflakes
         //websockets'
 
+        setOf(Dependency) deps = {};
+        setOf(Dependency) platformDeps = config.basicPlatformDependencies -> selectByType(PythonDependency);
+        for (PythonDependency d : platformDeps) {
+            deps.add(d);
+        }
+        for (PythonService pyService : services) {
+            if ((isDefined(pyService.condaEnv) and pyService.condaEnv.length() > 0)) {
+                isCondaService = 1;
+            }else{
+                isCondaService = 0;
+            }
+            if (isCondaService == isCondaReq) {
+                //setOf(Dependency) deps = pyService.dependencies;
+                setOf(Dependency) pyDeps = pyService.dependencies -> selectByType(PythonDependency);
+                setOf(Dependency) serverDeps = pyService.server.dependencies -> selectByType(PythonDependency);
+                for (PythonDependency d : pyDeps) {
+                   deps.add(d);
+                }
+    
+                for (PythonDependency d : serverDeps) {
+                   deps.add(d);
+                }
+            }
+        }
+        
         setOf(Dependency) existDeps = {};
-        for (PythonService pyService : services) {              
-            //setOf(Dependency) deps = pyService.dependencies;
-            setOf(Dependency) deps = pyService.dependencies -> selectByType(PythonDependency);
-            setOf(Dependency) serverDeps = pyService.server.dependencies -> selectByType(PythonDependency);
-            setOf(Dependency) platformDeps = config.basicPlatformDependencies -> selectByType(PythonDependency);
-            for (PythonDependency d : serverDeps) {
-               deps.add(d);
-            }
+        for (PythonDependency d : deps) {
+           Integer exists = 0;
+           for (PythonDependency existD : existDeps) {
+               if ((existD.name == d.name) and (existD.version == d.version)) {
+                   exists = 1;
+               }
+           }
 
-            for (PythonDependency d : platformDeps) {
-               deps.add(d);
-            }
-            
-            for (PythonDependency d : deps) {
-               Integer exists = 0;
-               for (PythonDependency existD : existDeps) {
-                   if ((existD.name == d.name) and (existD.version == d.version)) {
+           if (justCommenDep) {
+               for (PythonDependency dependency : dependencies) {
+                   if ((dependency.name == d.name) and ((dependency.version == null) or (dependency.version.length() == 0))) {
+                       exists = 1;
+                   }
+
+                   if ((dependency.name == d.name) and (dependency.version == d.version)) {
                        exists = 1;
                    }
                }
+           }
 
-               if (justCommenDep) {
-                   for (PythonDependency dependency : dependencies) {
-                       if ((dependency.name == d.name) and ((dependency.version == null) or (dependency.version.length() == 0))) {
-                           exists = 1;
-                       }
-
-                       if ((dependency.name == d.name) and (dependency.version == d.version)) {
-                           exists = 1;
-                       }
-                   }
+           if (exists == 0) {
+               if (d.version == "") {
+                   '${d.name}'
+               } else {
+                   '${d.name} == ${d.version}'
                }
-
-               if (exists == 0) {
-                   if (d.version == "") {
-                       '${d.name}'
-                   } else {
-                       '${d.name} == ${d.version}'
-                   }
-                   existDeps.add(d);
-               }
-            }
-            if (deps.size() == 0) {
-                   ' '
-            }
+               existDeps.add(d);
+           }
         }
+
     }	
 }

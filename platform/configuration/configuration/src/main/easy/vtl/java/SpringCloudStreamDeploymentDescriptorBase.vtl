@@ -118,6 +118,7 @@ template SpringCloudStreamDeploymentDescriptorBase(Configuration config, FileArt
             artifacts:
               - /python_${id}.zip
               ${genAdditionalArtifacts(service.artifacts)|e}
+            ${locationKey(service)|e}
             ${pythonExecArgs(service)|e}
             cmdArg:
               - --mode
@@ -140,6 +141,16 @@ template SpringCloudStreamDeploymentDescriptorBase(Configuration config, FileArt
                 }
                 '- ${a}'
             }
+        }
+    }
+
+
+    def locationKey(PythonService service) {
+        String condaEnv = getStringValueSafe(service.condaEnv, "");
+        if (condaEnv.trim().length() > 0) {
+            'locationKey: CONDA'
+        } else {
+            ''
         }
     }
     

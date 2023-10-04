@@ -13,17 +13,18 @@ template DockerfileBaseAllApps_Python(IIPEcosphere config, FileArtifact target, 
         String pythonPipInstalled = "";
         DockerContainerManager mgr = config.containerManager;
 
+        sequenceOf(PythonService) services = elements -> collect(e|e.impl) -> selectByKind(PythonService);
+        sequenceOf(ServiceFamily) families = elements -> collect(e|e.impl) -> selectByKind(ServiceFamily);
+        for (ServiceFamily family : families) {
+            for (PythonService serviceMember : family.members -> selectByKind(PythonService)) {
+                services.add(serviceMember);
+            }
+        }
+
         if (not(justCommenDep)) {
 
             'FROM ${mgr.registry}/allapps/appcommendepbaseimage:0.1.0'
 
-            sequenceOf(PythonService) services = elements -> collect(e|e.impl) -> selectByKind(PythonService);
-            sequenceOf(ServiceFamily) families = elements -> collect(e|e.impl) -> selectByKind(ServiceFamily);
-            for (ServiceFamily family : families) {
-                for (PythonService serviceMember : family.members -> selectByKind(PythonService)) {
-                    services.add(serviceMember);
-                }
-            }
 
             for (PythonService pyService : services) {
                 setOf(Dependency) deps = pyService.dependencies;
@@ -46,24 +47,20 @@ template DockerfileBaseAllApps_Python(IIPEcosphere config, FileArtifact target, 
                     } 
                 }
             }
-
-            if (IsPythonInstalled == 1) {
-                '# Install python dependencies'
-                'COPY requirements.txt requirements.txt'
-                '${pythonPipInstalled}'
-            }
+            
+            if (IsPythonInstalled == 0) {
+                pythonPipInstalled = 'RUN python3 -m pip install -r requirements.txt';
+            } 
+            
+            '# Install python dependencies'
+            'COPY requirements.txt requirements.txt'
+            '${pythonPipInstalled}'
+            '${genCondePythonEnv(services, false)}'
         } else {
             setOf(Dependency) allDependencies = collectDependencies(elements);
             sequenceOf(String) tmp = {};
             for (Dependency d: allDependencies) {
                 installBeforePip(d, tmp);
-            }
-            sequenceOf(PythonService) services = elements -> collect(e|e.impl) -> selectByKind(PythonService);
-            sequenceOf(ServiceFamily) families = elements -> collect(e|e.impl) -> selectByKind(ServiceFamily);
-            for (ServiceFamily family : families) {
-                for (PythonService serviceMember : family.members -> selectByKind(PythonService)) {
-                    services.add(serviceMember);
-                }
             }
 
             Integer IsPythonInstalled = 0;
@@ -105,7 +102,17 @@ template DockerfileBaseAllApps_Python(IIPEcosphere config, FileArtifact target, 
                     } 
                 }
             }
-        
+
+            if (IsPythonInstalled == 0) {
+                'FROM python:3.9.16-slim-buster'
+                'RUN apt-get update'
+                IsPythonInstalled = 1;
+                pythonPipInstalled = 'RUN python3 -m pip install -r requirements.txt';
+                for (String s: tmp) {
+                    '${s}'
+                }
+            }
+            
             ''
             'RUN apt-get install -y openjdk-11-jdk'
             ''
@@ -139,33 +146,11 @@ template DockerfileBaseAllApps_Python(IIPEcosphere config, FileArtifact target, 
                 '# Install python dependencies'
                 'COPY requirements.txt requirements.txt'
                 '${pythonPipInstalled}'
+                '${genCondePythonEnv(services, true)}'
             }
             ''
             '${genTestingMode(config, "Python")}'
             ''
-        }
-    }
-
-    def genDependency(Dependency d) {
-        '';
-    }
-    
-    def genDependency(SystemDependency d) {
-        '${d.key}';
-    }
-    
-    def installBeforePip(Dependency d, sequenceOf(String) result) {
-    }
-
-    def installBeforePip(LinuxSystemDependency d, sequenceOf(String) result) {
-        result.add('RUN apt-get install -y ${d.name}');
-    }
-    
-    def installBeforePip(LinuxCommandBasedSystemDependency d, sequenceOf(String) result) {
-         // TODO downloads
-         // TODO bashSetups
-        for (String c: d.installCommands) {
-            result.add('RUN ${c}');
         }
     }
     
