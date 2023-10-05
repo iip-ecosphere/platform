@@ -597,6 +597,14 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                }
             }
 
+            sequenceOf(PythonService) pyServices = elements -> collect(e|e.impl) -> selectByKind(PythonService);
+            sequenceOf(ServiceFamily) families = elements -> collect(e|e.impl) -> selectByKind(ServiceFamily);
+            for (ServiceFamily family : families) {
+                for (PythonService serviceMember : family.members -> selectByKind(PythonService)) {
+                    pyServices.add(serviceMember);
+                }
+            }
+                    
             String appName = a.name.toIdentifier();
             setOf(EcsDevice) devices = EcsDevice.allInstances();
 
@@ -629,6 +637,17 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                         newChangeOnContainerFiles = true;
                     }
                     
+                    for (PythonService py: pyServices) {
+                        if (isDefined(py.condaEnv) and py.condaEnv.length() > 0) {
+                            Path condaReq = "${appRoot}/../conda.${py.condaEnv}.requirements.txt";
+                            vilTemplateProcessor("PythonBaseReq", config, condaReq, elements=elements, dependencies=dependencies, justCommenDep=justCommenDep);
+                            Path lastCondaReq = "${deviceBaseDf}/conda.${py.condaEnv}.requirements.txt";
+                            if (not(sameMd5HashFiles(condaReq, lastCondaReq))){
+                                copy(condaReq, deviceBaseDf);
+                                newChangeOnContainerFiles = true; 
+                            }
+                        }                    
+                    }
                 }
 
                 Path instDep = "${appRoot}/../installedDependencies.yml";
@@ -687,6 +706,19 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     Path commenDepRequirements = "${deviceBaseDf}/requirements.txt";
                     Path allDepRequirements = "${appRoot}/../requirements.txt";
                     Boolean checkDepRequirements = checkFilesEquality(allDepRequirements, commenDepRequirements);
+                    
+                    for (PythonService py: pyServices) { 
+                        if (isDefined(py.condaEnv) and py.condaEnv.length() > 0) {
+                            Path condaReq = "${appRoot}/../conda.${py.condaEnv}.requirements.txt";
+                            vilTemplateProcessor("PythonBaseReq", config, condaReq, elements=elements, dependencies=dependencies, justCommenDep=justCommenDep);
+                            
+                            Path commenDepCondaReq = "${deviceBaseDf}/conda.${py.condaEnv}.requirements.txt";
+                            Path allDepCondaReq = "${appRoot}/../conda.${py.condaEnv}.requirements.txt";
+                            if (not(checkFilesEquality(allDepCondaReq, commenDepCondaReq))) {
+                                checkDepRequirements = false;
+                            }
+                        }                    
+                    }
 
                     if (not(checkDepRequirements)){
                         newChangeOnContainerFiles = false;
@@ -697,7 +729,17 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                             copy(allDepRequirements, deviceBaseDf);
                             newChangeOnContainerFiles = true;
                         }
-                    
+
+                        for (PythonService py: pyServices) {
+                            if (isDefined(py.condaEnv) and py.condaEnv.length() > 0) {                                
+                                Path lastAllDepCondaReq = "${deviceBaseDf}/conda.${py.condaEnv}.requirements.txt";       
+                                Path allDepCondaReq = "${appRoot}/../conda.${py.condaEnv}.requirements.txt";
+                                if (not(checkFilesEquality(allDepCondaReq, lastAllDepCondaReq))) {
+                                    newChangeOnContainerFiles = true;
+                                }
+                            }                    
+                        }
+
                         Path b = "${appRoot}/../";
                         Path d = "${appRoot}/../" + dfName;
                         Path lastDockerfile = "${deviceBaseDf}/${dfName}";
@@ -846,6 +888,18 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                                     copy(req, deviceDf);
                                     newChangeOnContainerFiles = true;
                                 }
+                                
+                                for (PythonService py: pyServices) { 
+                                    if (isDefined(py.condaEnv) and py.condaEnv.length() > 0) {
+                                        Path condaReq = "${appRoot}/../conda.${py.condaEnv}.requirements.txt";
+                                        vilTemplateProcessor("PythonReq", config, condaReq, elements=elements, device=device);
+                                        Path lastCondaReq = "${deviceDf}/conda.${py.condaEnv}.requirements.txt";
+                                        if (not(sameMd5HashFiles(condaReq, lastCondaReq))){
+                                            copy(condaReq, deviceDf);
+                                            newChangeOnContainerFiles = true;
+                                        }
+                                    }
+                                }
                             }
                         }
 
@@ -859,6 +913,18 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                             if (not(sameMd5HashFiles(req, lastReq))){
                                 copy(req, deviceDf);
                                 newChangeOnContainerFiles = true;
+                            }
+                            
+                            for (PythonService py: pyServices) {
+                                if (isDefined(py.condaEnv) and py.condaEnv.length() > 0) {
+                                    Path condaReq = "${appRoot}/../conda.${py.condaEnv}.requirements.txt";
+                                    vilTemplateProcessor("PythonReq", config, condaReq, elements=elements, device=device);
+                                    Path lastCondaReq = "${deviceDf}/conda.${py.condaEnv}.requirements.txt";
+                                    if (not(sameMd5HashFiles(condaReq, lastCondaReq))){
+                                        copy(condaReq, deviceDf);
+                                        newChangeOnContainerFiles = true;
+                                    }
+                                }
                             }
                         }
 
@@ -1018,6 +1084,14 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     }
                }
             }
+            
+            sequenceOf(PythonService) pyServices = allElements -> collect(e|e.impl) -> selectByKind(PythonService);
+            sequenceOf(ServiceFamily) families = allElements -> collect(e|e.impl) -> selectByKind(ServiceFamily);
+            for (ServiceFamily family : families) {
+                for (PythonService serviceMember : family.members -> selectByKind(PythonService)) {
+                    pyServices.add(serviceMember);
+                }
+            }
 
             setOf(Application) applications = getApplications();
 
@@ -1048,6 +1122,18 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     if (not(sameMd5HashFiles(req, lastReq))){
                         copy(req, deviceBaseDf);
                         newChangeOnContainerFiles = true;
+                    }
+                    
+                    for (PythonService py: pyServices) {
+                        if (isDefined(py.condaEnv) and py.condaEnv.length() > 0) {
+                            Path condaReq = "${target}/conda.${py.condaEnv}.requirements.txt";
+                            vilTemplateProcessor("PythonBaseReq", config, condaReq, elements=allElements, dependencies=dependencies, justCommenDep=justCommenDep);
+                            Path lastCondaReq = "${deviceBaseDf}/conda.${py.condaEnv}.requirements.txt";
+                            if (not(sameMd5HashFiles(condaReq, lastCondaReq))){
+                                copy(condaReq, deviceBaseDf);
+                                newChangeOnContainerFiles = true;
+                            }
+                        }                    
                     }
                 }
 
@@ -1107,6 +1193,19 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     Path commenDepRequirements = "${deviceBaseDf}/requirements.txt";
                     Path allDepRequirements = "${target}/requirements.txt";
                     Boolean checkDepRequirements = checkFilesEquality(allDepRequirements, commenDepRequirements);
+                    
+                    for (PythonService py: pyServices) {
+                        if (isDefined(py.condaEnv) and py.condaEnv.length() > 0) {
+                            Path condaReq = "${target}/conda.${py.condaEnv}.requirements.txt";
+                            vilTemplateProcessor("PythonBaseReq", config, condaReq, elements=allElements, dependencies=dependencies, justCommenDep=justCommenDep);
+                            
+                            Path commenDepCondaReq = "${deviceBaseDf}/conda.${py.condaEnv}.requirements.txt";
+                            Path allDepCondaReq = "${target}/conda.${py.condaEnv}.requirements.txt";
+                            if (not(checkFilesEquality(allDepCondaReq, commenDepCondaReq))) {
+                                checkDepRequirements = false;
+                            }
+                        }                    
+                    }
 
                     if (not(checkDepRequirements)){
                         deviceBaseDf = "${footprintFolder}/DeviceDockerfiles/${appName}/DeviceDockerfile_AllDepBase";
@@ -1116,7 +1215,17 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                             copy(allDepRequirements, deviceBaseDf);
                             newChangeOnContainerFiles = true;
                         }
-                    
+
+                        for (PythonService py: pyServices) {
+                            if (isDefined(py.condaEnv) and py.condaEnv.length() > 0) {                                
+                                Path lastAllDepCondaReq = "${deviceBaseDf}/conda.${py.condaEnv}.requirements.txt";       
+                                Path allDepCondaReq = "${target}/conda.${py.condaEnv}.requirements.txt";
+                                if (not(checkFilesEquality(allDepCondaReq, lastAllDepCondaReq))) {
+                                    newChangeOnContainerFiles = true;
+                                }
+                            }                    
+                        }
+                        
                         Path b = "${target}/";
                         Path d = "${target}/" + dfName;
                         Path lastDockerfile = "${deviceBaseDf}/${dfName}";
@@ -1272,8 +1381,20 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                                         copy(req, deviceDf);
                                         newChangeOnContainerFiles = true;
                                     }
+                                    
+                                    for (PythonService py: pyServices) { 
+                                        if (isDefined(py.condaEnv) and py.condaEnv.length() > 0) {
+                                            Path condaReq = "${target}/conda.${py.condaEnv}.requirements.txt";
+                                            vilTemplateProcessor("PythonReq", config, condaReq, elements=allElements, device=device);
+                                            Path lastCondaReq = "${deviceDf}/conda.${py.condaEnv}.requirements.txt";
+                                            if (not(sameMd5HashFiles(condaReq, lastCondaReq))){
+                                                copy(condaReq, deviceDf);
+                                                newChangeOnContainerFiles = true;
+                                            }
+                                        }
+                                    }
                                 }
-                            }
+                            } 
 
                             dfName = createContainerBuildScriptAllApps(mgr, applications, allElements, target, cntType, isPythonService, device, baseImageCreated);
                         } else {
@@ -1286,6 +1407,18 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                                 if (not(sameMd5HashFiles(req, lastReq))){
                                     copy(req, deviceDf);
                                     newChangeOnContainerFiles = true;
+                                }
+                                
+                                for (PythonService py: pyServices) {
+                                    if (isDefined(py.condaEnv) and py.condaEnv.length() > 0) {
+                                        Path condaReq = "${target}/conda.${py.condaEnv}.requirements.txt";
+                                        vilTemplateProcessor("PythonReq", config, condaReq, elements=allElements, device=device);
+                                        Path lastCondaReq = "${deviceDf}/conda.${py.condaEnv}.requirements.txt";
+                                        if (not(sameMd5HashFiles(condaReq, lastCondaReq))){
+                                            copy(condaReq, deviceDf);
+                                            newChangeOnContainerFiles = true;
+                                        }
+                                    }
                                 }
                             }
         

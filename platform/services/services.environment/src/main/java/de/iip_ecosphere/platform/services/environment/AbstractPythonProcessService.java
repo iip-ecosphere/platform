@@ -350,6 +350,11 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
             } 
             File pyExec = getPythonExecutable();
             if ("conda".equals(pyExec.getName())) {
+                File conda = InstalledDependenciesSetup.getInstance().getLocation(
+                        InstalledDependenciesSetup.KEY_PREFIX_CONDA);
+                if (null == conda) {
+                    conda = new File("conda");
+                }
                 boolean foundRun = false;
                 int envNameIndex = -1;
                 for (int i = 0; i < args.size(); i++) {
@@ -362,6 +367,7 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
                 if (foundRun && envNameIndex > 0) {
                     String env = args.get(envNameIndex);
                     args.set(envNameIndex, InstalledDependenciesSetup.getInstance().getEnvironmentMapping(env, env));
+                    args.add(envNameIndex + 1, "python"); // or pyExec?
                 }
             }
             
