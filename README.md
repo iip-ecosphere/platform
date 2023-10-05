@@ -37,18 +37,17 @@ For more details on how to develop application-specific services for the IIP-Eco
 
 ## Documentation
 
-The platform concepts and realization are developed by the IIP-Ecosphere consortium and are documented in several whitepapers:
-  * The IIP-Ecosphere [platform handbook version 0.6.0 preview](platform/documentation/PlatformHandbook-0.6.0-SNAPSHOT-V0.1.pdf) - in development, not formatted/reviewed.
-  * The IIP-Ecosphere [platform handbook version 0.5.0](https://doi.org/10.5281/zenodo.7695124) [link may be updated some days after platform releases]
-  * The IIP-Ecosphere [platform FAQ](platform/documentation/FAQ.MD).
+Platform installation, use and concepts are documented in several documents:
+  * The platform [installation guide](platform/documentation/INSTALL.MD).
+  * The platform [FAQ](platform/documentation/FAQ.MD).
+  * The platform [handbook version 0.6.0 preview](platform/documentation/PlatformHandbook-0.6.0-SNAPSHOT-V0.1.pdf) - in development, not formatted/reviewed.
+  * The platform [handbook version 0.5.0](https://doi.org/10.5281/zenodo.7695124) [link may be updated some days after platform releases]
+  * The platform [releases overview](platform/documentation/RELEASES.md)
   * Service development tutorial [YouTube](https://www.youtube.com/playlist?list=PL5VSYtiD_PfdxUDXGlX53UsHdQlXcHYK7) and [IIP-Ecosphere](https://www.iip-ecosphere.de/angebote/plattform/).
   * The IIP-Ecosphere [platform requirements (functional and quality view)](https://doi.org/10.5281/zenodo.4485774)
   * The IIP-Ecosphere [platform usage view](https://doi.org/10.5281/zenodo.4485801)
   * The IIP-Ecosphere [Industry 4.0 platform overview](https://doi.org/10.5281/zenodo.4485756)
-
-All material is also available from the [IIP-Ecosphere Website](https://www.iip-ecosphere.eu/).
-
-For detailed documentation and development hints see [documentation overview](platform/documentation/README.md). For a documentation of the releases of the IIP-Ecosphere platform see [releases overview](platform/documentation/RELEASES.md). For information on using/installing the platform, please consult the [installation overview](platform/documentation/INSTALL.md). 
+  * For more information, see the IIP-Ecosphere [documentation overview](platform/documentation/README.md)
 
 ## Publications
 * Holger Eichelberger and Claudia Niederée, Asset Administration Shells, Configuration, Code
