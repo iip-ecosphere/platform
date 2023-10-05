@@ -1,18 +1,15 @@
 # IIP-Ecosphere platform documentation
 
-## Further documents 
-* Platform handbook via [Zenodo](https://doi.org/10.5281/zenodo.5168946) and the [IIP-Ecosphere Website](https://www.iip-ecosphere.eu/). The links may become active/updated some days after a release.
-* [Catalogue of formats employed by the platform](../documentation/FORMATS.md).
-* [Listing of typical procedures](../documentation/ACTIONS.md).
-* [Guideline to open the code projects and setup the environment](../documentation/Guideline.pdf?raw=true).
-* [Release guideline](../documentation/RELEASE.md)
+This folder contains the documentation of the IIP-Ecosphere platform.
+
+* Platform handbook via [Zenodo](https://doi.org/10.5281/zenodo.5168946) and the [IIP-Ecosphere Website](https://www.iip-ecosphere.eu/). Early snapshot of [upcoming platform handbook for version 0.6.0](platform/documentation/PlatformHandbook-0.6.0-SNAPSHOT-V0.1.pdf).
 * [Install information](../documentation/INSTALL.md) for own installation, Docker containers and for playing with pre-packaged containers.
 * [Guideline for platform installation under Windows](../documentation/Platform_Installation_Guide_for_Windows.pdf)
 * [Guideline for platform installation under Linux](../documentation/Platform_Installation_Guide_for_Linux.pdf)
-* [Guide for adding EASy-Plugin to Eclipse under Linux](../documentation/Guide_Adding_Eclipse-EASy-Plugin_on_Linux.pdf)
 
-## Guidelines
+## Technical Guidelines
 * There is an overall **architecture** and a **platform handbook** in the IIP-Ecosphere ownCloud. Please consult the architecture first to understand how existing and new parts are related.
+* Please consider the [guideline on how to open the code projects and setup the environment](../documentation/Guideline.pdf?raw=true).
 * Please note that special characters like whitespaces in folder names (in particular on Windows) may cause the installation, platform installation or examples to fail.  
 * **Java projects** are created with Eclipse (2020-12-R). Use iipCodeFormatter.xml from ``platformDependencies`` as formatter. Set text editor print margin to 120 characters. For Python development, please install the `PyDev` Eclipse plugin, which is suppored by our generated application templates.
 * Since version 0.5.0 we use **JDK 11** for execution (soon also for build). In particular, for the lower layers that shall be used on edge devices, code must be executable on JDK 11. For higher layers, this limitation may be relaxed. To achieve exchangeable projects across development installations, use in Eclipse the execution environment ``JavaSE-11`` as JRE system library. This may be relaxed in future. 
@@ -31,3 +28,8 @@
 * **CI and SNAPSHOT deployment** currently are done via SSE-CI/SSE-Maven-Repo. For legacy reasons on the CI server Jenkins, we add a ``build-jk.xml`` ANT file that executes Maven and deploys the artifacts.
 * **Docker deployment**: Currently, basic installation/demonstration containers are built and deployed automatically using a github script. The script can be triggered manually and will be triggered automatically when a new version of the platform is created. Two Docker containers (one including the platform servers and a setup for a resource on the same machine and one for the CLI) are built and deployed automatically with suffix ".latest" to DockerHub. Docker containers of (intermediate) "milestone" builds shall be achieved on DockerHub with the respective date (see [readme](https://github.com/iip-ecosphere/platform/blob/main/platform/tools/Install/container/readme.txt) in the install package).
 
+## Further documents 
+* [Catalogue of formats employed by the platform](../documentation/FORMATS.md).
+* [Listing of administrative actions](../documentation/ACTIONS.md).
+* [Guideline on how to create platform releases](../documentation/RELEASE.md)
+* [Guide for adding EASy-Plugin to Eclipse under Linux](../documentation/Guide_Adding_Eclipse-EASy-Plugin_on_Linux.pdf)
