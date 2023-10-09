@@ -10,7 +10,8 @@ The virtual IIP-Ecosphere Industry 4.0/IIoT platform aims at demonstrating new a
 
 ## News
 
-* New name: The IIP-Ecosphere platform becomes [oktoflow](https://oktoflow.de/).
+* IIP-Ecosphere is over, but the platform will survive. It's new name is [oktoflow](https://oktoflow.de/).
+* Release preparations ongoing. version 0.6.0 shall be released in October, 2023.
 * MIP technologies and NovoAI AVA connector definitions in configuration meta-model.
 * Default library for code based on types or devices defined in the Platform configuration meta-model including code for controlling an MIP sensor.
 * New application example: MIP connector and MIP AI improvement ping-pong
