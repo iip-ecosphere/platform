@@ -40,7 +40,7 @@ For more details on how to develop application-specific services for the IIP-Eco
 Platform installation, use and concepts are documented in several documents:
   * The platform [installation guide](platform/documentation/INSTALL.MD).
   * The platform [FAQ](platform/documentation/FAQ.MD).
-  * The platform [handbook](platform/documentation/PlatformHandbook.pdf) and on [Zenodo](https://doi.org/10.5281/zenodo.8429685)
+  * The platform [handbook](platform/documentation/PlatformHandbook.pdf) and on [Zenodo](https://doi.org/10.5281/zenodo.8429785)
   * The platform [releases overview](platform/documentation/RELEASES.md)
   * Service development tutorial [YouTube](https://www.youtube.com/playlist?list=PL5VSYtiD_PfdxUDXGlX53UsHdQlXcHYK7) and [IIP-Ecosphere](https://www.iip-ecosphere.de/angebote/plattform/).
   * The IIP-Ecosphere [platform requirements (functional and quality view)](https://doi.org/10.5281/zenodo.4485774)
