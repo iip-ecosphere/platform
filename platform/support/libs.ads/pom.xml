@@ -16,12 +16,7 @@
   <dependencies>
     <dependency>
      <groupId>de.iip-ecosphere.platform</groupId>
-     <artifactId>transport</artifactId>
-     <version>${project.version}</version>
-    </dependency>
-    <dependency>
-     <groupId>de.iip-ecosphere.platform</groupId>
-     <artifactId>connectors</artifactId>
+     <artifactId>support</artifactId>
      <version>${project.version}</version>
     </dependency>
     <dependency>
