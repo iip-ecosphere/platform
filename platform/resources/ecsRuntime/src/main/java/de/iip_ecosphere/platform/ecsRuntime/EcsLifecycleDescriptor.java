@@ -45,7 +45,7 @@ public class EcsLifecycleDescriptor extends AbstractAasLifecycleDescriptor imple
 
     @Override
     public void startup(String[] args) {
-        System.out.println("IIP-Ecosphere ECS Runtime " + IipVersion.getInstance().getVersion() + ".");
+        System.out.println("oktoflow ECS Runtime " + IipVersion.getInstance().getVersion() + ".");
         Transport.setTransportSetup(() -> EcsFactory.getSetup().getTransport());
         EcsAas.enable(); // before super.startup/AAS creation!
         super.startup(args);

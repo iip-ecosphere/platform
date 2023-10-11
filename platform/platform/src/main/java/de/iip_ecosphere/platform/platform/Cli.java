@@ -70,7 +70,7 @@ public class Cli extends CliBackend {
         SemanticIdResolver.resolve(""); // warm-up, initialize
         if (0 == args.length) {
             provider = new ScannerCommandProvider(new Scanner(System.in));
-            println("IIP-Ecosphere, interactive platform command line " + IipVersion.getInstance().getVersion() + ".");
+            println("oktoflow, interactive platform command line " + IipVersion.getInstance().getVersion() + ".");
             println("AAS server: " + setup.getAas().getServerEndpoint().toUri());
             println("AAS registry: " + setup.getAas().getRegistryEndpoint().toUri());
             println("Type \"help\" to see commands and their description.");

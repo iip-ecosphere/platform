@@ -75,7 +75,7 @@ public class SpringLifecycleDescriptor implements LifecycleDescriptor {
     @Bean
     public CommandLineRunner commandLineRunner(ApplicationContext ctx) {
         return args -> {
-            System.out.println("IIP-Ecosphere Service Manager (Spring Cloud Streams, " 
+            System.out.println("oktoflow Service Manager (Spring Cloud Streams, " 
                 + IipVersion.getInstance().getVersion() + ").");
             System.out.println("Configuration: " + SpringInstances.getConfig().getClass().getName());
             System.out.println("Deployer: " + SpringInstances.getDeployer().getClass().getName());

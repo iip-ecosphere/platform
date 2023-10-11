@@ -53,7 +53,7 @@ public class PlattformAasLifecycleDescriptor extends AbstractAasLifecycleDescrip
 
     @Override
     public void startup(String[] args) {
-        System.out.println("IIP-Ecosphere Platform Server " + IipVersion.getInstance().getVersion() + ".");
+        System.out.println("oktoflow Platform Server " + IipVersion.getInstance().getVersion() + ".");
         super.startup(args);
         ArtifactsManager.startWatching();
 

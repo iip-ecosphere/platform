@@ -9,14 +9,14 @@
   <parent>
      <groupId>de.iip-ecosphere.platform</groupId>
      <artifactId>platformDependencies</artifactId>
-     <version>0.6.0</version>
+     <version>0.7.0-SNAPSHOT</version>
      <relativePath/>
   </parent>
   
   <properties>
     <maven.compiler.target>8</maven.compiler.target>
     <maven.compiler.source>8</maven.compiler.source>
-    <iip.version>0.6.0</iip.version> <!-- automatically repaced for releases -->
+    <iip.version>0.7.0-SNAPSHOT</iip.version> <!-- automatically repaced for releases -->
   </properties>
 
   <dependencies>

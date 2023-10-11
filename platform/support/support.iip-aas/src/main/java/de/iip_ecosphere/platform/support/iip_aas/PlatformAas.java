@@ -89,11 +89,11 @@ public class PlatformAas implements AasContributor {
             IipVersion versionInfo = IipVersion.getInstance();
             ApplicationSetup setup = new ApplicationSetup();
             setup.setVersion(versionInfo.getVersion());
-            setup.setName("IIP-Ecosphere platform");
-            setup.setManufacturerName("IIP-Ecosphere Consortium@de");
+            setup.setName("oktoflow platform");
+            setup.setManufacturerName("oktoflow team@de");
             setup.setManufacturerLogo("IIP-Ecosphere-Logo.png"); // in software
             setup.setProductImage("IIP-Ecosphere-Platform.png");
-            setup.setDescription("The IIP-Ecosphere AI-enabled I4.0 platform.@de");
+            setup.setDescription("The oktoflow AI-enabled I4.0 platform.@de");
             Address addr = new Address();
             addr.setDepartment("University of Hildesheim, SSE - Software Systems Engineering@de");
             addr.setStreet("Universitätsplatz 1@de");
