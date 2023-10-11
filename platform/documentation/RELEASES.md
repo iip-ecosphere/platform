@@ -1,21 +1,10 @@
 # IIP-Ecosphere platform: Releases
 
-### At the horizon (September 2023):
-
-Planned:
-* Measurements in testing environment [#126](https://github.com/iip-ecosphere/platform/issues/126)
-* RBAC on AAS [#122](https://github.com/iip-ecosphere/platform/issues/122)
-* Component upgrades: Spring Cloud Stream [#57](https://github.com/iip-ecosphere/platform/issues/57)
-* Integrated container management for Kubernetes [#39](https://github.com/iip-ecosphere/platform/issues/39)
-* Filtering of monitoring telegrams [#75](https://github.com/iip-ecosphere/platform/issues/75)
-* Tracing in Python Service environment: [#88](https://github.com/iip-ecosphere/platform/issues/88)
-* Enable tolerant switching: [#26](https://github.com/iip-ecosphere/platform/issues/26)
-* CLI multi-device deployment problem: [#113](https://github.com/iip-ecosphere/platform/issues/113)
-
 In progress:
 * [#117](https://github.com/iip-ecosphere/platform/issues/117): Multiple service managers per device
-* [#146](https://github.com/iip-ecosphere/platform/issues/146): UI editors for configuration tables
 * [#115](https://github.com/iip-ecosphere/platform/issues/115): Cleanup, e.g., old build processes
+
+### Version 0.6.0 (2023/10/11, EMO'23):
 
 New features:
 * Relocatable connector hosts for application server instances.
@@ -27,6 +16,7 @@ New features:
 * [#143](https://github.com/iip-ecosphere/platform/issues/143): Container testing mode(s)
 * [#100](https://github.com/iip-ecosphere/platform/issues/100): Allowing to start/stop multiple app instances (only via deployment plans)
 * [#59](https://github.com/iip-ecosphere/platform/issues/59): Basic version of distributed testing/evaluation environment for platform and apps (PETE)
+* [#146](https://github.com/iip-ecosphere/platform/issues/146): UI editors for configuration tables
 * [#147](https://github.com/iip-ecosphere/platform/issues/127): Streaming of service logs to CLI/UI
 * [#144](https://github.com/iip-ecosphere/platform/issues/144): Deployment plans and application instances management via UI
 * [#70](https://github.com/iip-ecosphere/platform/issues/70): UI progress reporting 
@@ -55,6 +45,7 @@ Improvements:
 * [#79](https://github.com/iip-ecosphere/platform/issues/79): Angular config.json loading problem (ok for now)
 * [#140](https://github.com/iip-ecosphere/platform/issues/140): Generated containers log platform service startup/execution
 * [#131](https://github.com/iip-ecosphere/platform/issues/131): PID file location in generated containers
+* [#113](https://github.com/iip-ecosphere/platform/issues/113): CLI multi-device deployment  
 * Configurable startup waiting time/timeout for AAS resources (ECS-Runtime, serviceManager)
 * Connector improvements for OPC UA and MQTT, improved support for nested data types in transport/Python
 * Connector mocking data with $period and $repeats, preparation for exact JSON field mapping
@@ -63,7 +54,7 @@ Improvements:
 * More reliable artifact file modification watching, in particular for Linux.
 * Build process fixes for examples.
 
-### Release 0.5.0 (2023/03/01):
+### Version 0.5.0 (2023/03/01, HM'23):
 
 New features:
 * Multi-channel connectors for MQTT in the connectors component and the code generation.
