@@ -4,7 +4,9 @@ Python-based environment to test and evaluate the platform and applications runn
 
 We selected Jupyter Project to realize the workbench idea. We created a shell(Linux)/batch(Windows) scripts to automate the installation, testing, and evaluating of the platform and the applications. We created Python scripts in Jupyter to manage the test and run the shell(Linux)/batch(Windows) scripts. 
 
-We created Python scripts in Jupyter Notebook to manage tests. The Python scripts generate command scripts either shell (Linux) or batch (Windows) based on the operating system of the machine that runs the Jupyter Notebook. The generated command scripts execute the actual scripts remotely to interact with the server and devices. Those scripts are shell (Linux) or batch (Windows) based on the operating system of the server and devices. Those scripts are executed remotely to do different actions like installing the prerequisites, Starting a private Docker registry…etc. 
+We created Python scripts in Jupyter Notebook to manage tests. The Python scripts generate command scripts either shell (Linux) or batch (Windows) based on the operating system of the machine that runs the Jupyter Notebook. The generated command scripts execute the actual scripts remotely to interact with the server and devices. Those scripts are shell (Linux) or batch (Windows) based on the operating system of the server and devices. Those scripts are executed remotely to do different actions like installing the prerequisites, Starting a private Docker registry etc. 
+
+## Setup
 
 The folders and files in the testing environment:
   * Setup: A file (TestSetup.yaml) used to manage the testing environment, the available and usable machines/devices, the platform, the applications to execute, and the tests and their properties (e.g., repetitions, testing/evaluation time, etc.). 
@@ -109,3 +111,38 @@ VMsSetup.yaml structure:
     * DockerRegistry: Check if the machine has private docker registry (For Servers).
     * RunAsContainer: Check if the Device is running Normal or Containerized version.
     * ContainerCommandLine: Allow docker command to be customized.
+    
+## Installation
+
+* If you donâ€™t have Python, please install python on your machine.
+    
+    sudo apt install python3.9 -y
+
+* Install Jupyter Notebook from the [official website](https://jupyter.org/install#jupyter-notebook).
+   
+    pip install notebook 
+
+## Running with Jupyter Notebook
+
+To use the PETE as stepwise execution using Jupyter Notebook or a headless execution, you should install Jupyter Notebook. The following steps show how to install Jupyter Notebook:
+
+To run Jupyter Notebook and to use the PETE
+1.  Run Jupyter Notebook, this command will show a URL to use Jupyter Notebook on any browser.
+
+     jupyter notebook
+
+2.  Download the PETE from the [IIP-Ecosphere GitHub](https://github.com/iip-ecosphere/platform/tree/main/platform/tests/test.environment).
+3.  Copy the PETE to the Jupyter Notebook directory. 
+4.  Open Jupyter Notebook with any browser (using the URL from the step 1) and run the test through.
+
+## Running headless
+
+To do a headless execution of the PETE:
+
+1.  Download the PETE from the [IIP-Ecosphere GitHub](https://github.com/iip-ecosphere/platform/tree/main/platform/tests/test.environment).
+2.  Copy the PETE to the Jupyter Notebook directory. 
+3.  Execute the following command in the PETE directory to run the test, you might check the logs for the runs in ``AllLogs`` folder.
+
+```
+    ./RunTheTest.sh TestSetup.yaml
+```

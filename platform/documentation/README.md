@@ -2,7 +2,7 @@
 
 This folder contains the documentation of the IIP-Ecosphere platform.
 
-* Platform handbook via [Zenodo](https://doi.org/10.5281/zenodo.5168946) and the [IIP-Ecosphere Website](https://www.iip-ecosphere.eu/). Early snapshot of [upcoming platform handbook for version 0.6.0](platform/documentation/PlatformHandbook-0.6.0-SNAPSHOT-V0.1.pdf).
+* The platform [handbook](platform/documentation/PlatformHandbook.pdf)
 * [Install information](../documentation/INSTALL.md) for own installation, Docker containers and for playing with pre-packaged containers.
 * [Guideline for platform installation under Windows](../documentation/Platform_Installation_Guide_for_Windows.pdf)
 * [Guideline for platform installation under Linux](../documentation/Platform_Installation_Guide_for_Linux.pdf)

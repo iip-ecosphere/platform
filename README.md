@@ -11,12 +11,12 @@ The virtual IIP-Ecosphere Industry 4.0/IIoT platform aims at demonstrating new a
 ## News
 
 * New name: The IIP-Ecosphere platform becomes [oktoflow](https://oktoflow.de/).
+* [Platform handbook](platform/documentation/PlatformHandbook.pdf) now always at the same URL, including [sources](platform/documentation/src). Comments for clarification are welcome.
 * MIP technologies and NovoAI AVA connector definitions in configuration meta-model.
 * Default library for code based on types or devices defined in the Platform configuration meta-model including code for controlling an MIP sensor.
 * New application example: MIP connector and MIP AI improvement ping-pong
 * Initial Beckhoff ADS integration library for Java.
 * The [platform FAQ](platform/documentation/FAQ.MD) is now in github.
-* Early snapshot of [upcoming platform handbook for version 0.6.0](platform/documentation/PlatformHandbook-0.6.0-SNAPSHOT-V0.1.pdf) now online in github (version as of 2023/09/14). Comments for clarification are welcome.
 * Confirmed compatibility: Phoenix Contact PLCnext (OPC UA, EEM integration), Beckhoff IPC (OPC UA), VDW UMATI (OPC UA), Bitmotec (MQTT), Lenze (MQTT), MIP (MQTT), Beckhoff ADS (Windows) ...
 
 ## Public demonstrations
@@ -40,8 +40,7 @@ For more details on how to develop application-specific services for the IIP-Eco
 Platform installation, use and concepts are documented in several documents:
   * The platform [installation guide](platform/documentation/INSTALL.MD).
   * The platform [FAQ](platform/documentation/FAQ.MD).
-  * The platform [handbook version 0.6.0 preview](platform/documentation/PlatformHandbook-0.6.0-SNAPSHOT-V0.1.pdf) - in development, not formatted/reviewed.
-  * The platform [handbook version 0.5.0](https://doi.org/10.5281/zenodo.7695124) [link may be updated some days after platform releases]
+  * The platform [handbook](platform/documentation/PlatformHandbook.pdf) and on [Zenodo](https://doi.org/10.5281/zenodo.8429685)
   * The platform [releases overview](platform/documentation/RELEASES.md)
   * Service development tutorial [YouTube](https://www.youtube.com/playlist?list=PL5VSYtiD_PfdxUDXGlX53UsHdQlXcHYK7) and [IIP-Ecosphere](https://www.iip-ecosphere.de/angebote/plattform/).
   * The IIP-Ecosphere [platform requirements (functional and quality view)](https://doi.org/10.5281/zenodo.4485774)
