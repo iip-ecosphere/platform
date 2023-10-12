@@ -46,8 +46,8 @@ jobs:
         run: |
           cd ./platform/tools/Install
           sed -i 's/String platformServer = "147.172.178.145";/String platformServer = "172.19.0.22";\nartifactsFolder="\/root\/\/platform\/artifacts";/g' src/main/easy/TechnicalSetup.ivml
-          sed -i 's/containerGeneration = true;/containerGeneration = false/g' src/main/easy/TechnicalSetup.ivml
-          sed -i 's/platformContainerGeneration = true;/platformContainerGeneration = false/g' src/main/easy/TechnicalSetup.ivml
+          sed -i 's/containerGeneration = true;/containerGeneration = false;/g' src/main/easy/TechnicalSetup.ivml
+          sed -i 's/platformContainerGeneration = true;/platformContainerGeneration = false;/g' src/main/easy/TechnicalSetup.ivml
           echo "Using configuration:"
           cat src/main/easy/TechnicalSetup.ivml
           mvn install
