@@ -159,7 +159,26 @@ public class CmdLine {
      * @return the composed argument
      */
     public static String composeArgument(String name, Object value) {
-        return PARAM_PREFIX + name + CmdLine.PARAM_VALUE_SEP + value.toString(); 
+        return PARAM_PREFIX + name + PARAM_VALUE_SEP + value.toString(); 
+    }
+
+    /**
+     * Returns whether there is an argument with/without a no-value argument of the given {@code name}.
+     * 
+     * @param args the arguments
+     * @param argName the argument name (without {@link #PARAM_PREFIX} or {@link #PARAM_VALUE_SEP})
+     * @param includeNoValueArg if a no value argument {@code --name} shall also be considered or 
+     *     only {@code --name=...}
+     * @return {@code true} if found, {@code false} else
+     */
+    public static boolean hasArgument(String[] args, String argName, boolean includeNoValueArg) {
+        boolean found = false;
+        final String noValueArg = PARAM_PREFIX + argName;
+        final String argPrefix = noValueArg + PARAM_VALUE_SEP;
+        for (int i = 0; !found && i < args.length; i++) {
+            found = (includeNoValueArg && args[i].equals(noValueArg)) || args[i].startsWith(argPrefix);
+        }
+        return found;
     }
 
 }

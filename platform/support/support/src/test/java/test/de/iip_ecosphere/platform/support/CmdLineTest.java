@@ -111,4 +111,18 @@ public class CmdLineTest {
         Assert.assertEquals("--iip.app.p=5", CmdLine.composeArgument("iip.app.p", "5"));
     }
     
+    /**
+     * Tests {@link CmdLine#hasArgument(String[], String, boolean)}.
+     */
+    @Test
+    public void testHasArgument() {
+        final String[] arg = {"--repo", "--online=true"};
+        Assert.assertFalse(CmdLine.hasArgument(new String[] {}, "test", false));
+        Assert.assertFalse(CmdLine.hasArgument(new String[] {}, "test", true));
+        Assert.assertTrue(CmdLine.hasArgument(arg, "repo", true));
+        Assert.assertFalse(CmdLine.hasArgument(arg, "repo", false));
+        Assert.assertTrue(CmdLine.hasArgument(arg, "online", true));
+        Assert.assertTrue(CmdLine.hasArgument(arg, "online", false));
+    }
+    
 }
