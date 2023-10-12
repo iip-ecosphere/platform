@@ -200,7 +200,7 @@ public class CleanMvnArtifacts {
     private static boolean isInVersionRange(Version version) {
         boolean result;
         if (version != null) {
-            boolean minVerOk = (null == minVer || minVer.compareTo(version) >= 0);
+            boolean minVerOk = (null == minVer || minVer.compareTo(version) <= 0);
             boolean maxVerOk = (null == maxVer || version.compareTo(maxVer) <= 0);
             result = minVerOk && maxVerOk;
         } else {
