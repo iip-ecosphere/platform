@@ -70,7 +70,7 @@ public class CmdLine {
      * @param args the arguments
      * @param argName the argument name (without {@link #PARAM_PREFIX} or {@link #PARAM_VALUE_SEP})
      * @param dflt the default value if the argument cannot be found
-     * @return the value of argument or {@code deflt}
+     * @return the value of argument or {@code dflt}
      */
     public static String getArg(String[] args, String argName, String dflt) {
         String result = dflt;
@@ -91,7 +91,7 @@ public class CmdLine {
      * @param args the arguments
      * @param argName the argument name (without {@link #PARAM_PREFIX} or {@link #PARAM_VALUE_SEP})
      * @param dflt the default value if the argument cannot be found
-     * @return the value of argument or {@code deflt}
+     * @return the value of argument or {@code dflt}
      */
     public static int getIntArg(String[] args, String argName, int dflt) {
         int result;
@@ -109,7 +109,7 @@ public class CmdLine {
      * @param args the arguments
      * @param argName the argument name (without {@link #PARAM_PREFIX} or {@link #PARAM_VALUE_SEP})
      * @param dflt the default value if the argument cannot be found
-     * @return the value of argument or {@code deflt}
+     * @return the value of argument or {@code dflt}
      */
     public static boolean getBooleanArg(String[] args, String argName, boolean dflt) {
         return Boolean.valueOf(getArg(args, argName, String.valueOf(dflt)));
@@ -167,18 +167,33 @@ public class CmdLine {
      * 
      * @param args the arguments
      * @param argName the argument name (without {@link #PARAM_PREFIX} or {@link #PARAM_VALUE_SEP})
-     * @param includeNoValueArg if a no value argument {@code --name} shall also be considered or 
-     *     only {@code --name=...}
+     * @param includeNoValueArg if a no-value argument {@code --name} be considered
+     * @param includeValueArg if a value argument {@code --name} shall be considered 
      * @return {@code true} if found, {@code false} else
      */
-    public static boolean hasArgument(String[] args, String argName, boolean includeNoValueArg) {
+    public static boolean hasArgument(String[] args, String argName, boolean includeNoValueArg, 
+        boolean includeValueArg) {
         boolean found = false;
         final String noValueArg = PARAM_PREFIX + argName;
         final String argPrefix = noValueArg + PARAM_VALUE_SEP;
         for (int i = 0; !found && i < args.length; i++) {
-            found = (includeNoValueArg && args[i].equals(noValueArg)) || args[i].startsWith(argPrefix);
+            found = (includeNoValueArg && args[i].equals(noValueArg)) 
+                || (includeValueArg && args[i].startsWith(argPrefix));
         }
         return found;
+    }
+
+    /**
+     * Returns a Boolean command line argument including a potential no-value argument.
+     * 
+     * @param args the arguments
+     * @param argName the argument name (without {@link #PARAM_PREFIX} or {@link #PARAM_VALUE_SEP})
+     * @param dflt the default value if the argument cannot be found
+     * @return the value of argument or {@code deft}
+     */
+    public static boolean getBooleanArgNoVal(String[] args, String argName, boolean dflt) {
+        return CmdLine.getBooleanArg(args, argName, false) 
+                || CmdLine.hasArgument(args, argName, true, false);
     }
 
 }

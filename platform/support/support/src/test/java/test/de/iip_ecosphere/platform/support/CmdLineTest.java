@@ -117,12 +117,25 @@ public class CmdLineTest {
     @Test
     public void testHasArgument() {
         final String[] arg = {"--repo", "--online=true"};
-        Assert.assertFalse(CmdLine.hasArgument(new String[] {}, "test", false));
-        Assert.assertFalse(CmdLine.hasArgument(new String[] {}, "test", true));
-        Assert.assertTrue(CmdLine.hasArgument(arg, "repo", true));
-        Assert.assertFalse(CmdLine.hasArgument(arg, "repo", false));
-        Assert.assertTrue(CmdLine.hasArgument(arg, "online", true));
-        Assert.assertTrue(CmdLine.hasArgument(arg, "online", false));
+        
+        Assert.assertFalse(CmdLine.hasArgument(new String[] {}, "test", false, true));
+        Assert.assertFalse(CmdLine.hasArgument(new String[] {}, "test", true, true));
+        Assert.assertTrue(CmdLine.hasArgument(arg, "repo", true, true));
+        Assert.assertFalse(CmdLine.hasArgument(arg, "repo", false, true));
+        Assert.assertTrue(CmdLine.hasArgument(arg, "online", true, true));
+        Assert.assertTrue(CmdLine.hasArgument(arg, "online", false, true));
+        Assert.assertFalse(CmdLine.hasArgument(arg, "online", true, false));
     }
-    
+
+    /**
+     * Tests {@link CmdLine#getBooleanArgNoVal(String[], String, boolean)}.
+     */
+    @Test
+    public void testGetBooleanArgNoVal() {
+        Assert.assertFalse(CmdLine.getBooleanArgNoVal(new String[] {"--repo1"}, "repo", false));
+        Assert.assertTrue(CmdLine.getBooleanArgNoVal(new String[] {"--repo"}, "repo", false));
+        Assert.assertTrue(CmdLine.getBooleanArgNoVal(new String[] {"--repo=true"}, "repo", false));
+        Assert.assertFalse(CmdLine.getBooleanArgNoVal(new String[] {"--repo=false"}, "repo", false));
+    }
+
 }
