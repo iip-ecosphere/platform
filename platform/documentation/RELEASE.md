@@ -23,11 +23,14 @@ For performing a release...
 * Check whether the containers in github were created/are archived with the actual date/version number and tag most recent images.
     * `docker pull iipecosphere/platform:cli.latest`
     * `docker pull iipecosphere/platform:platform_all.latest`
+    * `docker pull iipecosphere/dev-container`
     * `docker image ls`
     * `docker tag <id> iipecosphere/platform:cli.<ver>`
     * `docker tag <id> iipecosphere/platform:platform_all.<ver>`
+    * `docker tag <id> iipecosphere/platform:dev-container.<ver>`
     * `docker login -u iipecosphere`
     * `docker push iipecosphere/platform:cli.<ver>`
     * `docker push iipecosphere/platform:platform_all.<ver>`
+    * `docker push iipecosphere/platform:dev-container.<ver>`
     * `docker logout`
 * Inform all developing parties that the release is done, everybody shall update their workspaces, refresh their Maven dependencies and development can continue.
