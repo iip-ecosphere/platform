@@ -6,7 +6,7 @@ rm -rf gen
 
 #build with broker
 
-mvn -U install
+mvn -U install -Dunpack.force=true
 
 #execute and test
 
