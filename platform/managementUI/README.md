@@ -31,4 +31,8 @@ An installed management UI contains a setup JSON file in `assets/config/config.j
         "urn": "urn%3A%3A%3AAAS%3A%3A%3AiipEcosphere%23"
     }
     
-whereby the `ip` points to the platform AAS server and the the `urn` denotes the URN of the IIP-Ecosphere platform AAS.
+whereby the `ip` points to the platform AAS server and the the `urn` denotes the URN of the platform AAS.
+
+## Building the Management UI
+
+Building happens through ``build.sh`` calling ``build-jk.xml`` in turn calling ``pom.xml``. So far there is no complete windows build process, i.e., if you want to run it, you may have to add ``pckg/IIP-Ecosphere-mgtUi-latest.zip`` from Jenkins or to run maven with `-Dbuildhelper.skipAttach`.
