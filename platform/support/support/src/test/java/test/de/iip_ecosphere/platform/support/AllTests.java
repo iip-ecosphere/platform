@@ -20,6 +20,7 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
+    CollectionUtilsTest.class,
     AbstractSetupTest.class,
     CmdLineTest.class,
     FileUtilsTest.class,
@@ -32,7 +33,8 @@ import org.junit.runners.Suite;
     NetUtilsTest.class,
     SchemaServerEndpointTest.class,
     ServerTest.class,
-    InstalledDependenciesSetupTest.class
+    InstalledDependenciesSetupTest.class,
+    TaskRegistryTests.class
 })
 public class AllTests {
 }
