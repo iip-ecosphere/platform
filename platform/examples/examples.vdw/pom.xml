@@ -207,32 +207,6 @@
                        <outputDirectory>gen/vdw</outputDirectory>
                    </configuration>
                </plugin>
-               <plugin>
-                 <groupId>org.codehaus.mojo</groupId>
-                 <artifactId>exec-maven-plugin</artifactId>
-                 <version>3.0.0</version>
-                 <executions>
-                     <execution>
-                        <id>generateApps</id>
-                        <configuration>
-                            <mainClass>de.iip_ecosphere.platform.configuration.PlatformInstantiator</mainClass>
-                            <cleanupDaemonThreads>false</cleanupDaemonThreads>
-                            <arguments>
-                                <argument>VDW</argument>
-                                <argument>src/test/easy</argument>
-                                <argument>gen/vdw</argument>
-                                <argument>generateApps</argument>
-                            </arguments>
-                         <systemProperties>
-                            <systemProperty>
-                              <key>iip.resources</key>
-                              <value>${project.basedir}/${iip.resources}</value>
-                            </systemProperty>
-                         </systemProperties>
-                        </configuration>
-                     </execution>
-                 </executions>
-               </plugin>
             </plugins>
           </build> 
      </profile>
