@@ -33,9 +33,7 @@ jobs:
           repositories: '[{"id": "central", "name":"Maven Central", "url": "https://repo1.maven.org/maven2", "releases": {"enabled": "true"}, "snapshots": {"enabled": "false"}}, {"id": "SSE", "name":"SSE", "url": "https://projects.sse.uni-hildesheim.de/qm/maven/", "releases": {"enabled": "true"}, "snapshots": {"enabled": "true"}}, {"id": "bintray", "name":"bintray", "url": "https://jcenter.bintray.com", "releases": {"enabled": "true"}, "snapshots": {"enabled": "false"}}]'
       - name: Install the platform basics
         run: |
-          cd ./platform/tools/Install/platformDependencies
-          mvn --batch-mode --update-snapshots install
-          cd ..
+          cd ./platform/tools/Install
           mvn --batch-mode --update-snapshots package -DskipTests
       - name: Build the test app through tests
         run: |
