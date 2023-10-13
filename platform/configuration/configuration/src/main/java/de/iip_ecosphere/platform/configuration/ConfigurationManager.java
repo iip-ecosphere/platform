@@ -18,7 +18,7 @@ import org.slf4j.Logger;
 
 import de.iip_ecosphere.platform.configuration.ConfigurationAas.IipGraphMapper;
 import de.iip_ecosphere.platform.configuration.ivml.AasIvmlMapper;
-import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper.OperationCompletedListener;
+import de.iip_ecosphere.platform.support.json.JsonResultWrapper.OperationCompletedListener;
 import de.iip_ecosphere.platform.transport.Transport;
 import de.iip_ecosphere.platform.transport.status.ActionTypes;
 import de.iip_ecosphere.platform.transport.status.StatusMessage;

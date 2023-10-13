@@ -31,7 +31,6 @@ import test.de.iip_ecosphere.platform.support.net.UriResolverTest;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
     JarUtilsTest.class,
-    CollectionUtilsTest.class,
     NetUtilsTest.class,
     SchemaServerEndpointTest.class,
     FileFormatTest.class,
@@ -49,7 +48,6 @@ import test.de.iip_ecosphere.platform.support.net.UriResolverTest;
     SystemMetricsTest.class,
     IOVoidFunctionTest.class,
     SemanticIdResolverTest.class,
-    TaskRegistryTests.class,
     
     MetricsTests.class,
     test.de.iip_ecosphere.platform.support.identities.AllTests.class,

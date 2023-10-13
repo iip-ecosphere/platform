@@ -18,7 +18,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper;
-import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper.Result;
+import de.iip_ecosphere.platform.support.json.JsonResultWrapper.Result;
 
 import static de.iip_ecosphere.platform.support.iip_aas.AasUtils.*;
 
