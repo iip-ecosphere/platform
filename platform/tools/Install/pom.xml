@@ -115,26 +115,6 @@
          </executions>
        </plugin>
        <plugin>
-         <groupId>org.codehaus.mojo</groupId>
-         <artifactId>exec-maven-plugin</artifactId>
-         <version>1.4.0</version>
-         <configuration>
-           <mainClass>de.iip_ecosphere.platform.configuration.PlatformInstantiator</mainClass>
-           <cleanupDaemonThreads>false</cleanupDaemonThreads>
-           <arguments>
-              <argument>${iip.model}</argument>
-              <argument>src/main/easy</argument>
-              <argument>gen</argument>
-           </arguments>
-           <systemProperties>
-              <systemProperty>
-                <key>iip.resources</key>
-                <value>${project.basedir}/${iip.resources}</value>
-              </systemProperty>
-           </systemProperties>
-         </configuration>
-       </plugin>
-       <plugin>
            <groupId>de.iip-ecosphere.platform</groupId>
            <artifactId>configuration-plugin</artifactId>
            <version>${project.version}</version>

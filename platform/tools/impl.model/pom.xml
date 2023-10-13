@@ -90,13 +90,13 @@
 					<goal>generateBroker</goal>
 				</goals>   		
        		</execution>
-       		       		<execution>
+       		<execution>
 				<id>generateAppsNoDeps</id>    
 				<goals>
 					<goal>generateAppsNoDeps</goal>
 				</goals>   		
        		</execution>
-       		       		<execution>
+       		<execution>
 				<id>generateApps</id>    
 				<goals>
 					<goal>generateApps</goal>
@@ -105,41 +105,8 @@
        	</executions>
        	<configuration>
        		 <model>${iip.model}</model>
-       		 <outputDirectory>gen/py</outputDirectory>      		
+       		 <outputDirectory>gen/impl</outputDirectory>      		
        	</configuration>
-       </plugin>
-       <plugin>
-         <groupId>org.codehaus.mojo</groupId>
-         <artifactId>exec-maven-plugin</artifactId>
-         <version>3.0.0</version>
-         <executions>
-              <execution>
-                 <id>generateAppsNoDeps</id>
-                 <configuration>
-                     <mainClass>de.iip_ecosphere.platform.configuration.PlatformInstantiator</mainClass>
-                     <cleanupDaemonThreads>false</cleanupDaemonThreads>
-                     <arguments>
-                         <argument>${iip.model}</argument>
-                         <argument>src/test/easy</argument>
-                         <argument>gen/test</argument>
-                         <argument>generateAppsNoDeps</argument>
-                     </arguments>
-                 </configuration>
-              </execution>
-              <execution>
-                 <id>generateApps</id>
-                 <configuration>
-                     <mainClass>de.iip_ecosphere.platform.configuration.PlatformInstantiator</mainClass>
-                     <cleanupDaemonThreads>false</cleanupDaemonThreads>
-                     <arguments>
-                         <argument>${iip.model}</argument>
-                         <argument>src/test/easy</argument>
-                         <argument>gen/test</argument>
-                         <argument>generateApps</argument>
-                     </arguments>
-                 </configuration>
-              </execution>
-         </executions>
        </plugin>
     </plugins>
   </build> 
