@@ -22,6 +22,7 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import de.iip_ecosphere.platform.maven.PomReader.PomInfo;
+import de.iip_ecosphere.platform.support.setup.CmdLine;
 
 /**
  * Changes POM versions.
@@ -58,10 +59,7 @@ public class ChangePomVersion {
         newParentPomVersion = getArg(args, "newParentPOMVersion", "");
         String includes = getArg(args, "includes", "");
         String excludes = getArg(args, "excludes", ".*/gen/.*");
-        simulate = Boolean.valueOf(getArg(args, "simulate", "false"));
-        for (int i = 0; !simulate && i < args.length; i++) {
-            simulate = args[i].equals("--simulate"); // safe side...
-        }
+        simulate = CmdLine.getBooleanArgNoVal(args, "simulate", false);
         Collections.addAll(properties, getArg(args, "properties", "").replace(';', ':').split(":"));
         
         if (includes.length() == 0) {

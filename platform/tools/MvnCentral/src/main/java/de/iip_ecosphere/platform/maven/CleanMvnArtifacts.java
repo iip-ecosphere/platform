@@ -58,10 +58,7 @@ public class CleanMvnArtifacts {
             if (minVer == null && maxVer == null) {
                 System.err.println("Either minVer or maxVer must be given. Else, we would delete everything.");
             }
-            simulate = CmdLine.getBooleanArg(args, "simulate", false);
-            for (int i = 0; !simulate && i < args.length; i++) {
-                simulate = args[i].equals("--simulate"); // safe side...
-            }
+            simulate = CmdLine.getBooleanArgNoVal(args, "simulate", false);
             if (onRepo) {
                 cleanRepo(base);
             } else {
