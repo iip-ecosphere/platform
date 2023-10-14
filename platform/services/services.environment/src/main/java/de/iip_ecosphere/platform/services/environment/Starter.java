@@ -32,11 +32,11 @@ import de.iip_ecosphere.platform.services.environment.switching.ServiceBase;
 import de.iip_ecosphere.platform.services.environment.testing.TestBroker;
 import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.FileUtils;
-import de.iip_ecosphere.platform.support.JarUtils;
 import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.OsUtils;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.ServerAddress;
+import de.iip_ecosphere.platform.support.ZipUtils;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
@@ -628,10 +628,10 @@ public class Starter {
             InputStream artifact = null; 
             try { // spring packaging
                 fis = new FileInputStream(artFile);
-                artifact = JarUtils.findFile(fis, "BOOT-INF/classes/" + artPath);
+                artifact = ZipUtils.findFile(fis, "BOOT-INF/classes/" + artPath);
                 if (null == artifact) {
                     fis = new FileInputStream(artFile); // TODO preliminary, use predicate
-                    artifact = JarUtils.findFile(fis, artPath);
+                    artifact = ZipUtils.findFile(fis, artPath);
                     if (null != artifact) {
                         getLogger().info("Found " + artPath + " in " + artFile + " " 
                             + artifact.getClass().getSimpleName());
@@ -652,7 +652,7 @@ public class Starter {
             if (null == artifact) {
                 throw new IOException("Cannot find artifact '" + artPath + "' in actual service JAR");
             }
-            JarUtils.extractZip(artifact, processDir.toPath());
+            ZipUtils.extractZip(artifact, processDir.toPath());
             getLogger().info("Extracted process artifact " + artPath + " to " + processDir);
             FileUtils.closeQuietly(artifact);
             FileUtils.closeQuietly(fis);

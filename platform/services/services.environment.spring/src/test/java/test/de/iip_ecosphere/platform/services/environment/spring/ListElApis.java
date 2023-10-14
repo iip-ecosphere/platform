@@ -17,7 +17,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 import de.iip_ecosphere.platform.support.FileUtils;
-import de.iip_ecosphere.platform.support.JarUtils;
+import de.iip_ecosphere.platform.support.ZipUtils;
 
 /**
  * Lists available javax.el APIs.
@@ -37,7 +37,7 @@ public class ListElApis {
             f -> f.isDirectory() || f.getName().endsWith(".jar"), 
             f -> {
                 try {
-                    JarUtils.listFiles(new FileInputStream(f), 
+                    ZipUtils.listFiles(new FileInputStream(f), 
                         e -> !e.isDirectory() && (
                             (e.getName().contains("/services/") && !e.getName().endsWith(".class")) // service spec 
                                 || e.getName().contains("ExpressionFactory")), // factory class

@@ -32,8 +32,8 @@ import org.slf4j.LoggerFactory;
 import de.iip_ecosphere.platform.ecsRuntime.BasicContainerDescriptor;
 import de.iip_ecosphere.platform.platform.cli.ServiceDeploymentPlan;
 import de.iip_ecosphere.platform.services.environment.YamlArtifact;
-import de.iip_ecosphere.platform.support.JarUtils;
 import de.iip_ecosphere.platform.support.Version;
+import de.iip_ecosphere.platform.support.ZipUtils;
 
 /**
  * A class holding/providing information about available artifacts.
@@ -530,7 +530,7 @@ public class ArtifactsManager {
         Artifact result = null;
         try {
             FileInputStream fis = new FileInputStream(path.toFile());
-            InputStream is = JarUtils.findFile(fis, "deployment.yml");
+            InputStream is = ZipUtils.findFile(fis, "deployment.yml");
             if (null != is) {
                 YamlArtifact yml = YamlArtifact.readFromYaml(is); // closes is
                 result = new ServiceArtifact(yml, accessUri);

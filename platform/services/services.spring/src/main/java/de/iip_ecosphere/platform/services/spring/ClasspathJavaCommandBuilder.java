@@ -40,7 +40,7 @@ import org.springframework.cloud.deployer.spi.local.LocalDeployerProperties;
 import org.springframework.core.io.Resource;
 
 import de.iip_ecosphere.platform.support.FileUtils;
-import de.iip_ecosphere.platform.support.JarUtils;
+import de.iip_ecosphere.platform.support.ZipUtils;
 
 /**
  * A command builder that excepts classpath-based Spring service starting for ZIP service artifacts as well as JAR 
@@ -262,7 +262,7 @@ public class ClasspathJavaCommandBuilder extends JavaCommandBuilder {
                 FileInputStream zis = new FileInputStream(path);
                 File workDir = findWorkingDirectory();
                 getLogger().info("Unpacking Jars into " + workDir.getAbsolutePath());
-                JarUtils.extractZip(zis, workDir.toPath());
+                ZipUtils.extractZip(zis, workDir.toPath());
                 zis.close();
 
                 File cpFile = new File(workDir, "classpath");

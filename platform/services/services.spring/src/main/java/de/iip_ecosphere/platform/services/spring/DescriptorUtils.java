@@ -42,9 +42,9 @@ import de.iip_ecosphere.platform.services.spring.yaml.YamlArtifact;
 import de.iip_ecosphere.platform.services.spring.yaml.YamlProcess;
 import de.iip_ecosphere.platform.services.spring.yaml.YamlService;
 import de.iip_ecosphere.platform.support.FileUtils;
-import de.iip_ecosphere.platform.support.JarUtils;
 import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.ServerAddress;
+import de.iip_ecosphere.platform.support.ZipUtils;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.support.setup.CmdLine;
@@ -104,9 +104,9 @@ public class DescriptorUtils {
             try {
                 String descName = getDescriptorName();
                 getLogger().info("Reading artifact " + file + ", descriptor " + descName);
-                InputStream descStream = JarUtils.findFile(new FileInputStream(file), "BOOT-INF/classes/" + descName);
+                InputStream descStream = ZipUtils.findFile(new FileInputStream(file), "BOOT-INF/classes/" + descName);
                 if (null == descStream) {
-                    descStream = JarUtils.findFile(new FileInputStream(file), descName);                    
+                    descStream = ZipUtils.findFile(new FileInputStream(file), descName);                    
                 }
                 if (null != descStream) {
                     result = YamlArtifact.readFromYaml(descStream);

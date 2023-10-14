@@ -16,8 +16,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
-import de.iip_ecosphere.platform.support.JarUtils;
 import de.iip_ecosphere.platform.support.Server;
+import de.iip_ecosphere.platform.support.ZipUtils;
 
 /**
  * A basic abstract server for testing/experiments.
@@ -85,7 +85,7 @@ public abstract class AbstractTestServer implements Server {
         cfgDir.mkdirs();
         InputStream in = loader.getResourceAsStream(location);
         if (null != in) {
-            JarUtils.extractZip(in, cfgDir.toPath());
+            ZipUtils.extractZip(in, cfgDir.toPath());
         } else {
             throw new IOException("Location '" + location + "' cannot be found");
         }

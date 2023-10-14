@@ -38,10 +38,10 @@ import de.iip_ecosphere.platform.monitoring.prometheus.PrometheusMonitoringSetup
 import de.iip_ecosphere.platform.services.environment.AbstractProcessService;
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.FileUtils;
-import de.iip_ecosphere.platform.support.JarUtils;
 import de.iip_ecosphere.platform.support.LifecycleDescriptor;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.TimeUtils;
+import de.iip_ecosphere.platform.support.ZipUtils;
 import de.iip_ecosphere.platform.support.iip_aas.config.ServerAddressHolder;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 import de.iip_ecosphere.platform.transport.Transport;
@@ -242,7 +242,7 @@ public class PrometheusLifecycleDescriptor implements LifecycleDescriptor {
                 updateConfiguration(new ConfigModifier(getDefaultScrapePoints(), null), false);
 
                 in = getResource(zipName);
-                JarUtils.extractZip(in, prometheusWorkingDirectory.toPath());
+                ZipUtils.extractZip(in, prometheusWorkingDirectory.toPath());
                 in.close();
                 prometheusFile.setExecutable(true);
 

@@ -26,8 +26,8 @@ import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.services.environment.AbstractProcessService.RunnableWithStop;
 import de.iip_ecosphere.platform.support.FileUtils;
-import de.iip_ecosphere.platform.support.JarUtils;
 import de.iip_ecosphere.platform.support.PythonUtils;
+import de.iip_ecosphere.platform.support.ZipUtils;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 
 /**
@@ -203,7 +203,7 @@ public class ProcessSupport {
                 } else {
                     File tmp = FileUtils.createTmpFolder(owner.getTmpFolderName());
                     try {
-                        JarUtils.extractZip(in, tmp.toPath());
+                        ZipUtils.extractZip(in, tmp.toPath());
                         owner.setPythonFolder(tmp);
                     } catch (IOException e) {
                         LoggerFactory.getLogger(ProcessSupport.class).error(
