@@ -125,7 +125,7 @@
                  </artifactItem>
                </artifactItems>
                <cleanup>
-                   <directory>${project.basedir}/src/main/easy</directory>
+                   <directory>${project.build.directory}/easy</directory>
                    <includes>
                        <include>cfg</include>
                        <include>files</include>
