@@ -22,7 +22,7 @@ import de.iip_ecosphere.platform.connectors.ConnectorParameter.ConnectorParamete
 import de.iip_ecosphere.platform.connectors.mqtt.MqttConnectorFactory;
 import de.iip_ecosphere.platform.connectors.mqttv3.PahoMqttv3Connector;
 import de.iip_ecosphere.platform.connectors.mqttv5.PahoMqttv5Connector;
-import de.iip_ecosphere.platform.support.iip_aas.Version;
+import de.iip_ecosphere.platform.support.Version;
 import test.de.iip_ecosphere.platform.connectors.ConnectorFactoryTest;
 import de.iip_ecosphere.platform.support.iip_aas.NameplateSetup.Service;
 
