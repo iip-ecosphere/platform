@@ -16,7 +16,7 @@ import java.io.IOException;
 
 import de.iip_ecosphere.platform.monitoring.MonitoringSetup;
 import de.iip_ecosphere.platform.support.Schema;
-import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
+import de.iip_ecosphere.platform.support.setup.AbstractSetup;
 import de.iip_ecosphere.platform.support.iip_aas.config.ServerAddressHolder;
 
 /**

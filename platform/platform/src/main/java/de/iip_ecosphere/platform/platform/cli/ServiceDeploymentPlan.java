@@ -19,8 +19,8 @@ import java.util.List;
 import java.util.Map;
 
 import de.iip_ecosphere.platform.services.environment.switching.ServiceBase;
-import de.iip_ecosphere.platform.support.iip_aas.Version;
-import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
+import de.iip_ecosphere.platform.support.Version;
+import de.iip_ecosphere.platform.support.setup.AbstractSetup;
 
 /**
  * Describes a simple YAML deployment plan assigning services from an artifact to resources.
