@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.ecsRuntime.EcsSetup;
 import de.iip_ecosphere.platform.ecsRuntime.EcsFactoryDescriptor;
-import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
+import de.iip_ecosphere.platform.support.setup.AbstractSetup;
 
 /**
  * A test service factory descriptor.

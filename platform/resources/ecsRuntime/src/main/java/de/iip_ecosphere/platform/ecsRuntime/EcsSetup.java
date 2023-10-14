@@ -18,7 +18,7 @@ import java.util.List;
 
 import de.iip_ecosphere.platform.support.identities.IdentityStore;
 import de.iip_ecosphere.platform.support.iip_aas.AasBasedSetup;
-import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
+import de.iip_ecosphere.platform.support.setup.AbstractSetup;
 import de.iip_ecosphere.platform.support.net.NetworkManagerSetup;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 

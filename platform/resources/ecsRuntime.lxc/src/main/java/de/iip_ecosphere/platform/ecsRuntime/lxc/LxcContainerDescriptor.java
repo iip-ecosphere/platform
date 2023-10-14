@@ -25,8 +25,8 @@ import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.ecsRuntime.BasicContainerDescriptor;
 import de.iip_ecosphere.platform.support.iip_aas.Id;
-import de.iip_ecosphere.platform.support.iip_aas.Version;
-import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
+import de.iip_ecosphere.platform.support.Version;
+import de.iip_ecosphere.platform.support.setup.AbstractSetup;
 
 /**
  * Implements a container descriptor for lxc-based container management.

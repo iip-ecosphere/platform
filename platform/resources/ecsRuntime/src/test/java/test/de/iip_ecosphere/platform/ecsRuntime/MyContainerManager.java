@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.ecsRuntime.AbstractContainerManager;
 import de.iip_ecosphere.platform.ecsRuntime.ContainerState;
-import de.iip_ecosphere.platform.support.iip_aas.Version;
+import de.iip_ecosphere.platform.support.Version;
 
 /**
  * A test container manager.

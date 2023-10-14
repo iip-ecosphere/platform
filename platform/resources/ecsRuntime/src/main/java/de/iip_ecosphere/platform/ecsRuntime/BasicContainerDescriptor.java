@@ -22,8 +22,8 @@ import java.net.URI;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.services.environment.ServiceState;
-import de.iip_ecosphere.platform.support.iip_aas.Version;
-import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
+import de.iip_ecosphere.platform.support.Version;
+import de.iip_ecosphere.platform.support.setup.AbstractSetup;
 
 /**
  * Basic {@link ContainerDescriptor} implementation, e.g., including a representation of the {@link ServiceState} 

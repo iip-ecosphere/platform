@@ -16,7 +16,7 @@ import java.net.URI;
 
 import de.iip_ecosphere.platform.ecsRuntime.BasicContainerDescriptor;
 import de.iip_ecosphere.platform.ecsRuntime.ContainerState;
-import de.iip_ecosphere.platform.support.iip_aas.Version;
+import de.iip_ecosphere.platform.support.Version;
 
 /**
  * Implements a container descriptor for Kubernetes-based container management.

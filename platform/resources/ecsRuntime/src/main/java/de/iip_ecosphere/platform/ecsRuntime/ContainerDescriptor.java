@@ -14,7 +14,7 @@ package de.iip_ecosphere.platform.ecsRuntime;
 
 import java.net.URI;
 
-import de.iip_ecosphere.platform.support.iip_aas.Version;
+import de.iip_ecosphere.platform.support.Version;
 
 /**
  * Describes a container.
