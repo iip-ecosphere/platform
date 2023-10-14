@@ -7,7 +7,9 @@
 	
     <!-- deploy to SSE Mvn repo -->
 	<target name="maven"> 
-	    <maven pomFile="pom.xml" goal="package"/>
+	    <maven pomFile="pom.xml" goal="package">
+            <arg value="-Dunpack.force=true"/>
+        </maven>
 		<mvnDeployResolveArtifact folderName="IIP-configuration.defaultLib" pomFile="pom.xml" jarFolder="target" artifactPattern="configuration.defaultLib-*.*.*.jar" />
 	</target>
 </project>
