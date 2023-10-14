@@ -27,7 +27,7 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
 
-import static de.iip_ecosphere.platform.support.iip_aas.AasUtils.*;
+import static de.iip_ecosphere.platform.support.aas.AasUtils.*;
 
 /**
  * Utility functions for representing types in AAS. A Java type is turned into

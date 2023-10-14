@@ -20,7 +20,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.ServerAddress;
-import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
+import de.iip_ecosphere.platform.support.iip_aas.config.ServerAddressHolder;
+import de.iip_ecosphere.platform.support.json.JsonUtils;
 import iip.datatypes.Abc;
 import iip.datatypes.AbcImpl;
 
@@ -159,12 +160,12 @@ public class JsonUtilsTest {
     public void testServerAddress() {
         ServerAddress addr = null;
         String json = JsonUtils.toJson(addr);
-        ServerAddress tmp = JsonUtils.serverAddressFromJson(json);
+        ServerAddress tmp = ServerAddressHolder.serverAddressFromJson(json);
         Assert.assertNull(tmp);
         
         addr = new ServerAddress(Schema.TCP, "me.here", 10321);
         json = JsonUtils.toJson(addr);
-        tmp = JsonUtils.serverAddressFromJson(json);
+        tmp = ServerAddressHolder.serverAddressFromJson(json);
         Assert.assertNotNull(tmp);
         Assert.assertEquals(addr.getSchema(), tmp.getSchema());
         Assert.assertEquals(addr.getHost(), tmp.getHost());

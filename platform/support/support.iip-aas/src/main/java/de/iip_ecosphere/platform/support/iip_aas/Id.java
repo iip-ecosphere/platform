@@ -12,7 +12,7 @@
 
 package de.iip_ecosphere.platform.support.iip_aas;
 
-import static de.iip_ecosphere.platform.support.iip_aas.AasUtils.fixId;
+import static de.iip_ecosphere.platform.support.aas.AasUtils.fixId;
 
 import java.io.IOException;
 import java.lang.management.ManagementFactory;

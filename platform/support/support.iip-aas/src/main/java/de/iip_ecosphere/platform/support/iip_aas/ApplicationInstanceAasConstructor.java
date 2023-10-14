@@ -16,6 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import de.iip_ecosphere.platform.support.OsUtils;
+import de.iip_ecosphere.platform.support.aas.AasUtils;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
@@ -25,7 +26,7 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelE
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 
-import static de.iip_ecosphere.platform.support.iip_aas.AasUtils.fixId;
+import static de.iip_ecosphere.platform.support.aas.AasUtils.fixId;
 
 /**
  * A class to construct the AAS submodel for application instances. This class is intentionally not an AAS rather

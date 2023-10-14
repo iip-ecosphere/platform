@@ -23,12 +23,11 @@ import de.iip_ecosphere.platform.support.aas.Property.PropertyBuilder;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.iip_aas.config.ServerAddressHolder;
-import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
 import de.iip_ecosphere.platform.support.net.ManagedServerAddress;
 import de.iip_ecosphere.platform.support.net.NetworkManager;
 import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
 
-import static de.iip_ecosphere.platform.support.iip_aas.AasUtils.*;
+import static de.iip_ecosphere.platform.support.aas.AasUtils.*;
 
 /**
  * Builds an active AAS for the {@link NetworkManager}.
@@ -111,7 +110,7 @@ public class NetworkManagerAas implements AasContributor {
     public void contributeTo(ProtocolServerBuilder sBuilder) {
         sBuilder.defineOperation(getQName(OP_RESERVE_PORT), 
             p -> toJson(NetworkManagerFactory.getInstance().reservePort(readString(p, 0, null), 
-                JsonUtils.serverAddressFromJson(readString(p, 1, null)))));
+                ServerAddressHolder.serverAddressFromJson(readString(p, 1, null)))));
         sBuilder.defineOperation(getQName(OP_OBTAIN_PORT), 
             p -> toJson(NetworkManagerFactory.getInstance().obtainPort(readString(p, 0, null))));
         sBuilder.defineOperation(getQName(OP_GET_PORT), 
@@ -119,7 +118,8 @@ public class NetworkManagerAas implements AasContributor {
         sBuilder.defineOperation(getQName(OP_IS_IN_USE_PORT), 
             p -> NetworkManagerFactory.getInstance().isInUse(readInt(p, 0, -1)));
         sBuilder.defineOperation(getQName(OP_IS_IN_USE_ADR), 
-            p -> NetworkManagerFactory.getInstance().isInUse(JsonUtils.serverAddressFromJson(readString(p, 0, null))));
+            p -> NetworkManagerFactory.getInstance().isInUse(
+                ServerAddressHolder.serverAddressFromJson(readString(p, 0, null))));
         sBuilder.defineOperation(getQName(OP_RELEASE_PORT), 
             p -> { 
                 NetworkManagerFactory.getInstance().releasePort(readString(p, 0, null)); 

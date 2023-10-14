@@ -12,12 +12,12 @@
 
 package de.iip_ecosphere.platform.support.iip_aas;
 
-import static de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper.fromJson;
+import static de.iip_ecosphere.platform.support.json.JsonResultWrapper.fromJson;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
-import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
+import de.iip_ecosphere.platform.support.json.JsonUtils;
 import de.iip_ecosphere.platform.support.semanticId.DefaultSemanticIdResolutionResult;
 import de.iip_ecosphere.platform.support.semanticId.SemanticIdResolutionResult;
 

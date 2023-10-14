@@ -1,6 +1,8 @@
 package de.iip_ecosphere.platform.support.iip_aas.config;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.Schema;
@@ -13,6 +15,7 @@ import de.iip_ecosphere.platform.support.ServerAddress;
  */
 public class ServerAddressHolder {
     
+    private static final ObjectMapper MAPPER = new ObjectMapper();
     private int port; // negative leads to ephemerial
     private String host;
     private Schema schema;
@@ -130,5 +133,45 @@ public class ServerAddressHolder {
     public ServerAddress getServerAddress() {
         return new ServerAddress(schema, host, port < 0 ? NetUtils.getEphemeralPort() : port);
     }
+
+    /**
+     * Reads a {@link ServerAddress} from a JSON string.
+     * 
+     * @param json the JSON value, usually a String
+     * @return the server address or <b>null</b> if reading fails
+     * @see #toJson(ServerAddress)
+     */
+    public static ServerAddress serverAddressFromJson(Object json) {
+        ServerAddress result = null;
+        if (null != json) {
+            try {
+                ServerAddressHolder tmp = MAPPER.readValue(json.toString(), ServerAddressHolder.class);
+                result = new ServerAddress(tmp.getSchema(), tmp.getHost(), tmp.getPort());
+            } catch (JsonProcessingException e) {
+                // result = null;
+            }
+        }
+        return result;        
+    }
     
+    /**
+     * Turns a {@link ServerAddress} into JSON.
+     * 
+     * @param address the address (may be <b>null</b>)
+     * @return the JSON string or an empty string in case of problems/no address
+     * @see #serverAddressFromJson(Object)
+     */
+    public static String toJson(ServerAddress address) {
+        String result = "";
+        if (null != address) {
+            try {
+                ServerAddressHolder tmp = new ServerAddressHolder(address);
+                result = MAPPER.writeValueAsString(tmp);
+            } catch (JsonProcessingException e) {
+                // handled by default value
+            }
+        } 
+        return result;
+    }
+
 }
