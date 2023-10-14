@@ -22,7 +22,6 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({
     IipVersionTest.class,
     IdTest.class,
-    VersionTest.class,
     ClassUtilityTest.class,
     AasPartRegistryTest.class,
     JsonUtilsTest.class,
