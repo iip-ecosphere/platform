@@ -41,7 +41,7 @@ import de.iip_ecosphere.platform.services.spring.SpringCloudServiceDescriptor;
 import de.iip_ecosphere.platform.services.spring.SpringCloudServiceManager;
 import de.iip_ecosphere.platform.services.spring.yaml.YamlArtifact;
 import de.iip_ecosphere.platform.support.CollectionUtils;
-import de.iip_ecosphere.platform.support.iip_aas.config.CmdLine;
+import de.iip_ecosphere.platform.support.setup.CmdLine;
 
 /**
  * Tests selected service manager functionality based on simplified instances of a service manager loaded from 

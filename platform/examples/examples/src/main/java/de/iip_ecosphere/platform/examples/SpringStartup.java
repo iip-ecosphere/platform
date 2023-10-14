@@ -32,7 +32,7 @@ import de.iip_ecosphere.platform.services.spring.SpringInstances;
 import de.iip_ecosphere.platform.services.spring.yaml.YamlArtifact;
 import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
-import de.iip_ecosphere.platform.support.iip_aas.config.CmdLine;
+import de.iip_ecosphere.platform.support.setup.CmdLine;
 import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
 
 /**

@@ -18,7 +18,7 @@ import java.util.List;
 import de.iip_ecosphere.platform.services.environment.AbstractYamlService;
 import de.iip_ecosphere.platform.services.spring.descriptor.Endpoint;
 import de.iip_ecosphere.platform.services.spring.descriptor.Service;
-import de.iip_ecosphere.platform.support.iip_aas.config.CmdLine;
+import de.iip_ecosphere.platform.support.setup.CmdLine;
 
 /**
  * Information about a single service.
