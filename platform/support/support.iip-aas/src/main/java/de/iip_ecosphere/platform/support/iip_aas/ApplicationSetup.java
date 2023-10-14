@@ -12,6 +12,8 @@
 
 package de.iip_ecosphere.platform.support.iip_aas;
 
+import de.iip_ecosphere.platform.support.Version;
+
 /**
  * Describes static information about an application, e.g., taken from the configuration. May be read from yaml,
  * therefore already in snakeyaml style.

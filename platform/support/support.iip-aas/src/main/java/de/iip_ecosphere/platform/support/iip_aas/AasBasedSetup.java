@@ -13,7 +13,7 @@
 package de.iip_ecosphere.platform.support.iip_aas;
 
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
-import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
+import de.iip_ecosphere.platform.support.setup.AbstractSetup;
 
 /**
  * ECS runtime configuration (poor man's spring approach). Implementing components shall extend this class and add

@@ -18,7 +18,7 @@ import java.util.concurrent.ExecutionException;
 
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.aas.Submodel;
-import de.iip_ecosphere.platform.support.json.JsonUtils;
+import de.iip_ecosphere.platform.support.iip_aas.config.ServerAddressHolder;
 import de.iip_ecosphere.platform.support.net.AbstractNetworkManagerImpl;
 import de.iip_ecosphere.platform.support.net.ManagedServerAddress;
 
@@ -83,7 +83,7 @@ public class NetworkManagerAasClient extends AbstractNetworkManagerImpl {
             checkKey(key);
             checkAddress(address);
             String tmp = checkString(getOperation(submodel, NetworkManagerAas.OP_RESERVE_PORT).invoke(key, 
-                JsonUtils.toJson(checkNotNull(address))));
+                ServerAddressHolder.toJson(checkNotNull(address))));
             return checkNotNull(NetworkManagerAas.managedServerAddressFromJson(tmp));
         } catch (ExecutionException e) {
             throw new IllegalArgumentException(e.getMessage());
@@ -105,7 +105,8 @@ public class NetworkManagerAasClient extends AbstractNetworkManagerImpl {
         checkAddress(address);
         boolean result = false;
         try {
-            Object tmp = getOperation(submodel, NetworkManagerAas.OP_IS_IN_USE_ADR).invoke(JsonUtils.toJson(address));
+            Object tmp = getOperation(submodel, NetworkManagerAas.OP_IS_IN_USE_ADR).invoke(
+                ServerAddressHolder.toJson(address));
             if (tmp instanceof Boolean) {
                 result = ((Boolean) tmp).booleanValue();
             }

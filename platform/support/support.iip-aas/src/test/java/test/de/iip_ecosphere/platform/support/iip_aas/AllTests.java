@@ -28,7 +28,6 @@ import org.junit.runners.Suite;
     JsonUtilsTest.class,
     NetworkManagerAasTest.class,
     PlatformAasTest.class,
-    AbstractSetupTest.class,
     YamlSemanticIdResolverDescriptorTest.class,
     NameplateSetupTest.class,
     YamlFileTest.class,

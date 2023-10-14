@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.NetUtils;
+import de.iip_ecosphere.platform.support.Version;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.AasUtils;
@@ -48,7 +49,7 @@ import de.iip_ecosphere.platform.support.aas.types.technicaldata.FurtherInformat
 import de.iip_ecosphere.platform.support.aas.types.technicaldata.GeneralInformation.GeneralInformationBuilder;
 import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodel.TechnicalDataSubmodelBuilder;
 import de.iip_ecosphere.platform.support.iip_aas.ApplicationSetup.Address;
-import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
+import de.iip_ecosphere.platform.support.setup.AbstractSetup;
 
 /**
  * Describes static information about a device in the style of an ZVEI Digital Nameplate for industrial equipment V1.0.
