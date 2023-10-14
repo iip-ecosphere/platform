@@ -27,7 +27,7 @@ import java.io.InputStream;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
-import de.iip_ecosphere.platform.support.iip_aas.AasUtils;
+import de.iip_ecosphere.platform.support.aas.AasUtils;
 import de.iip_ecosphere.platform.support.iip_aas.Id;
 import de.iip_ecosphere.platform.support.iip_aas.NameplateSetup;
 import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;

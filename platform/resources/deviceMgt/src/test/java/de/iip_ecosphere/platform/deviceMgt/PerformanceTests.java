@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import static de.iip_ecosphere.platform.support.iip_aas.AasUtils.fixId;
+import static de.iip_ecosphere.platform.support.aas.AasUtils.fixId;
 
 /**
  * Performance tests.

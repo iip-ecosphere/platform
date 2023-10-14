@@ -16,12 +16,12 @@ import de.iip_ecosphere.platform.support.aas.*;
 import de.iip_ecosphere.platform.support.iip_aas.AasContributor;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
-import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper;
-import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
+import de.iip_ecosphere.platform.support.json.JsonResultWrapper;
+import de.iip_ecosphere.platform.support.json.JsonUtils;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 
-import static de.iip_ecosphere.platform.support.iip_aas.AasUtils.fixId;
-import static de.iip_ecosphere.platform.support.iip_aas.AasUtils.readString;
+import static de.iip_ecosphere.platform.support.aas.AasUtils.fixId;
+import static de.iip_ecosphere.platform.support.aas.AasUtils.readString;
 
 /**
  * A Asset Administration Shell for device registry functionalities.

@@ -24,7 +24,7 @@ import com.jsoniter.any.Any;
 import com.jsoniter.any.Any.EntryIterator;
 import com.jsoniter.spi.JsonException;
 
-import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
+import de.iip_ecosphere.platform.support.json.JsonUtils;
 import de.iip_ecosphere.platform.support.function.IOConsumer;
 
 /**

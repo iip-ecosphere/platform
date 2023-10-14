@@ -20,11 +20,11 @@ import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.iip_aas.AasContributor;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
-import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper;
+import de.iip_ecosphere.platform.support.json.JsonResultWrapper;
 
 import java.util.concurrent.ExecutionException;
 
-import static de.iip_ecosphere.platform.support.iip_aas.AasUtils.readString;
+import static de.iip_ecosphere.platform.support.aas.AasUtils.readString;
 
 /**
  * A Asset Administration Shell for device management functionalities.

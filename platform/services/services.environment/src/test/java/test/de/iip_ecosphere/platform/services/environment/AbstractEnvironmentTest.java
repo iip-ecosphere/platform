@@ -33,7 +33,7 @@ import de.iip_ecosphere.platform.support.aas.Operation;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.iip_aas.Version;
-import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper;
+import de.iip_ecosphere.platform.support.json.JsonResultWrapper;
 import test.de.iip_ecosphere.platform.services.environment.AasCreator.AasResult;
 
 /**

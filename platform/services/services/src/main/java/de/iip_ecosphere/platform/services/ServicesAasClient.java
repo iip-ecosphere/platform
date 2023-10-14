@@ -21,18 +21,18 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import de.iip_ecosphere.platform.services.environment.ServiceState;
+import de.iip_ecosphere.platform.support.aas.AasUtils;
 import de.iip_ecosphere.platform.support.aas.Operation;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
-import de.iip_ecosphere.platform.support.iip_aas.AasUtils;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.SubmodelElementsCollectionClient;
-import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
+import de.iip_ecosphere.platform.support.json.JsonUtils;
 
-import static de.iip_ecosphere.platform.support.iip_aas.AasUtils.*;
-import static de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper.*;
+import static de.iip_ecosphere.platform.support.aas.AasUtils.*;
+import static de.iip_ecosphere.platform.support.json.JsonResultWrapper.*;
 
 /**
  * A client for {@link ServicesAas} for accessing the operations provided by a certain resource.

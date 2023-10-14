@@ -25,7 +25,7 @@ import java.util.stream.StreamSupport;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import static de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper.fromJson;
+import static de.iip_ecosphere.platform.support.json.JsonResultWrapper.fromJson;
 
 /**
  * An AasClient which implements a {@link SubmodelElementsCollectionClient} and provides easy

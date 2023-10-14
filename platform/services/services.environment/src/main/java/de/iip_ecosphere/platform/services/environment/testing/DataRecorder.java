@@ -20,7 +20,7 @@ import java.util.function.Function;
 
 import org.slf4j.LoggerFactory;
 
-import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
+import de.iip_ecosphere.platform.support.json.JsonUtils;
 
 /**
  * A simple, customizable data recorder for testing.

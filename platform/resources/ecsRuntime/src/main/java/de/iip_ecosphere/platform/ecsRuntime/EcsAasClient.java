@@ -12,7 +12,7 @@
 
 package de.iip_ecosphere.platform.ecsRuntime;
 
-import static de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper.fromJson;
+import static de.iip_ecosphere.platform.support.json.JsonResultWrapper.fromJson;
 
 import java.io.IOException;
 import java.net.URI;

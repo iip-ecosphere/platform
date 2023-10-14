@@ -12,7 +12,7 @@
 
 package de.iip_ecosphere.platform.ecsRuntime;
 
-import static de.iip_ecosphere.platform.support.iip_aas.AasUtils.*;
+import static de.iip_ecosphere.platform.support.aas.AasUtils.*;
 
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
@@ -47,7 +47,7 @@ import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.support.iip_aas.Eclass;
 import de.iip_ecosphere.platform.support.iip_aas.Id;
 import de.iip_ecosphere.platform.support.iip_aas.Irdi;
-import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper;
+import de.iip_ecosphere.platform.support.json.JsonResultWrapper;
 import de.iip_ecosphere.platform.support.metrics.SystemMetrics;
 import de.iip_ecosphere.platform.support.metrics.SystemMetricsFactory;
 import de.iip_ecosphere.platform.transport.Transport;
