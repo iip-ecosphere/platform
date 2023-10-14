@@ -123,16 +123,6 @@
                    <destFileName>model.jar</destFileName>
                    <excludes>cfg/*.*</excludes>
                  </artifactItem>
-                 <artifactItem>
-                   <groupId>de.iip-ecosphere.platform</groupId>
-                   <artifactId>services.environment</artifactId>
-                   <version>${project.version}</version>
-                   <classifier>python</classifier>
-                   <type>zip</type>
-                   <overWrite>true</overWrite>
-                   <outputDirectory>${project.basedir}/src/test/python</outputDirectory>
-                   <destFileName>serviceEnv-py.zip</destFileName>
-                 </artifactItem>
                </artifactItems>
                <cleanup>
                    <directory>${project.basedir}/src/main/easy</directory>
