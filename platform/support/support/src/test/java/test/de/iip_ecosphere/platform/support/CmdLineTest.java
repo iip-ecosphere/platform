@@ -112,7 +112,7 @@ public class CmdLineTest {
     }
     
     /**
-     * Tests {@link CmdLine#hasArgument(String[], String, boolean)}.
+     * Tests {@link CmdLine#hasArgument(String[], String, boolean, boolean)}.
      */
     @Test
     public void testHasArgument() {

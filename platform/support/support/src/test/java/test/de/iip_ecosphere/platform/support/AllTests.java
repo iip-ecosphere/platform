@@ -13,8 +13,6 @@ package test.de.iip_ecosphere.platform.support;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
-import com.fasterxml.jackson.core.Version;
-
 /**
  * Defines the tests to be executed.
  * 
@@ -23,7 +21,7 @@ import com.fasterxml.jackson.core.Version;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
     CollectionUtilsTest.class,
-    Version.class,
+    VersionTest.class,
     AbstractSetupTest.class,
     CmdLineTest.class,
     FileUtilsTest.class,
