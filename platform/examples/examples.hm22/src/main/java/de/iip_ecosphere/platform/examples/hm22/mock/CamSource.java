@@ -16,7 +16,7 @@ import java.io.InputStream;
 import java.util.concurrent.atomic.AtomicReference;
 
 import de.iip_ecosphere.platform.examples.hm22.Commands;
-import de.iip_ecosphere.platform.support.iip_aas.AasUtils;
+import de.iip_ecosphere.platform.support.aas.AasUtils;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 import iip.datatypes.ImageInput;
 import iip.datatypes.ImageInputImpl;
