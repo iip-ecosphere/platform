@@ -33,9 +33,9 @@ import de.iip_ecosphere.platform.configuration.EasyLogLevel;
 import de.iip_ecosphere.platform.configuration.EasySetup;
 import de.iip_ecosphere.platform.configuration.PlatformInstantiator.InstantiationConfigurer;
 import de.iip_ecosphere.platform.services.environment.YamlArtifact;
-import de.iip_ecosphere.platform.support.JarUtils;
 import de.iip_ecosphere.platform.support.LifecycleDescriptor;
 import de.iip_ecosphere.platform.support.OsUtils;
+import de.iip_ecosphere.platform.support.ZipUtils;
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
 import net.ssehub.easy.reasoning.core.reasoner.ReasoningResult;
 import net.ssehub.easy.varModel.confModel.Configuration;
@@ -209,7 +209,7 @@ public abstract class AbstractIvmlTests {
      */
     protected void extractPythonServiceEnv(File srcMainPython) throws IOException {
         FileInputStream zip = new FileInputStream(new File("target/python/services.environment-python.zip"));
-        JarUtils.extractZip(zip, srcMainPython.toPath());
+        ZipUtils.extractZip(zip, srcMainPython.toPath());
         zip.close();
     }
     
