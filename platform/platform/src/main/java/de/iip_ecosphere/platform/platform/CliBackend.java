@@ -56,7 +56,7 @@ import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.iip_aas.ApplicationInstancesAasClient;
-import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
+import de.iip_ecosphere.platform.support.json.JsonUtils;
 import de.iip_ecosphere.platform.support.net.UriResolver;
 
 /**

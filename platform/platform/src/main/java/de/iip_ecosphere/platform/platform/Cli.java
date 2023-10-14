@@ -40,7 +40,7 @@ import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.IipVersion;
 import de.iip_ecosphere.platform.support.iip_aas.SubmodelClient;
-import de.iip_ecosphere.platform.support.iip_aas.json.JsonUtils;
+import de.iip_ecosphere.platform.support.json.JsonUtils;
 import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
 import de.iip_ecosphere.platform.support.semanticId.SemanticIdResolver;
 import de.iip_ecosphere.platform.transport.Transport;

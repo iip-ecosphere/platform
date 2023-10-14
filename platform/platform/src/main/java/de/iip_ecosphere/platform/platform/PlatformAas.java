@@ -12,7 +12,7 @@
 
 package de.iip_ecosphere.platform.platform;
 
-import static de.iip_ecosphere.platform.support.iip_aas.AasUtils.fixId;
+import static de.iip_ecosphere.platform.support.aas.AasUtils.fixId;
 
 import java.net.URISyntaxException;
 import java.util.Map;
@@ -32,11 +32,11 @@ import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.Type;
+import de.iip_ecosphere.platform.support.aas.AasUtils;
 import de.iip_ecosphere.platform.support.iip_aas.AasContributor;
-import de.iip_ecosphere.platform.support.iip_aas.AasUtils;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.ApplicationInstanceAasConstructor;
-import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper;
+import de.iip_ecosphere.platform.support.json.JsonResultWrapper;
 import de.iip_ecosphere.platform.transport.status.ActionTypes;
 import de.iip_ecosphere.platform.transport.status.TaskUtils;
 import de.iip_ecosphere.platform.transport.status.TaskUtils.TaskCompletedPredicate;
