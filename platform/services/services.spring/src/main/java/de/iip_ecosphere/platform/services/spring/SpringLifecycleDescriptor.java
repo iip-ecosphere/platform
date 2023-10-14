@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
 import de.iip_ecosphere.platform.services.ServicesAas;
 import de.iip_ecosphere.platform.support.LifecycleDescriptor;
 import de.iip_ecosphere.platform.support.iip_aas.IipVersion;
-import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
+import de.iip_ecosphere.platform.support.setup.AbstractSetup;
 
 /**
  * The lifecycle descriptor for the spring cloud service manager. Requires service management implementation and AAS 

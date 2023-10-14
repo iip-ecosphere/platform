@@ -27,7 +27,7 @@ import java.util.function.Supplier;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.ServerAddress;
-import de.iip_ecosphere.platform.support.iip_aas.Version;
+import de.iip_ecosphere.platform.support.Version;
 import de.iip_ecosphere.platform.support.net.ManagedServerAddress;
 import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
 import de.iip_ecosphere.platform.support.resources.FolderResourceResolver;

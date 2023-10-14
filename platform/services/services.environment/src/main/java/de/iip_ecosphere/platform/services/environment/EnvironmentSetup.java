@@ -13,7 +13,7 @@
 package de.iip_ecosphere.platform.services.environment;
 
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
-import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
+import de.iip_ecosphere.platform.support.setup.AbstractSetup;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 
 /**

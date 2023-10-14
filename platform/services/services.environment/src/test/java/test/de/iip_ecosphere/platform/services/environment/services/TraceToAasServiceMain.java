@@ -33,7 +33,7 @@ import de.iip_ecosphere.platform.support.aas.ServerRecipe.LocalPersistenceType;
 import de.iip_ecosphere.platform.support.aas.ServerRecipe.PersistenceType;
 import de.iip_ecosphere.platform.support.iip_aas.AbstractAasLifecycleDescriptor;
 import de.iip_ecosphere.platform.support.iip_aas.ApplicationSetup;
-import de.iip_ecosphere.platform.support.iip_aas.Version;
+import de.iip_ecosphere.platform.support.Version;
 import de.iip_ecosphere.platform.support.setup.CmdLine;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;

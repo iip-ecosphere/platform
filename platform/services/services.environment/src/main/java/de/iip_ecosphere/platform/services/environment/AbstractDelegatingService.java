@@ -16,7 +16,7 @@ import java.net.URI;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-import de.iip_ecosphere.platform.support.iip_aas.Version;
+import de.iip_ecosphere.platform.support.Version;
 
 /**
  * A service that delegates it's core operations to a nested service.

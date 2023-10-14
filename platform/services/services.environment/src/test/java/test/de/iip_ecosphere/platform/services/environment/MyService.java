@@ -18,7 +18,7 @@ import java.util.concurrent.ExecutionException;
 
 import de.iip_ecosphere.platform.services.environment.AbstractService;
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
-import de.iip_ecosphere.platform.support.iip_aas.Version;
+import de.iip_ecosphere.platform.support.Version;
 
 /**
  * Test service, values and behavior aligned with Python.

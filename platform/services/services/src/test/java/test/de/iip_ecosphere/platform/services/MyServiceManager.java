@@ -22,7 +22,7 @@ import java.util.function.Predicate;
 import de.iip_ecosphere.platform.services.AbstractServiceManager;
 import de.iip_ecosphere.platform.services.TypedDataConnectorDescriptor;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
-import de.iip_ecosphere.platform.support.iip_aas.Version;
+import de.iip_ecosphere.platform.support.Version;
 
 /**
  * A test service manager.

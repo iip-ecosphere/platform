@@ -19,7 +19,7 @@ import java.util.concurrent.ExecutionException;
 
 import de.iip_ecosphere.platform.services.environment.switching.ServiceBase;
 import de.iip_ecosphere.platform.support.ServerAddress;
-import de.iip_ecosphere.platform.support.iip_aas.Version;
+import de.iip_ecosphere.platform.support.Version;
 
 /**
  * Defines the (administrative) interface of an IIP-Ecosphere service.

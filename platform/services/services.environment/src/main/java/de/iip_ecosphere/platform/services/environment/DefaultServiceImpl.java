@@ -5,7 +5,7 @@ import java.net.URI;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-import de.iip_ecosphere.platform.support.iip_aas.Version;
+import de.iip_ecosphere.platform.support.Version;
 
 /**
  * Default service implementation realizing the left open methods of {@link AbstractService} empty. Uses 

@@ -20,7 +20,7 @@ import org.apache.commons.text.StringTokenizer;
 import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
 
-import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
+import de.iip_ecosphere.platform.support.setup.AbstractSetup;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 
 /**

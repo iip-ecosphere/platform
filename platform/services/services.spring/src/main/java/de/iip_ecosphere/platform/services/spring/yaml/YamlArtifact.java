@@ -20,7 +20,7 @@ import java.util.List;
 import de.iip_ecosphere.platform.services.environment.AbstractYamlArtifact;
 import de.iip_ecosphere.platform.services.spring.descriptor.Artifact;
 import de.iip_ecosphere.platform.services.spring.descriptor.Validator;
-import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
+import de.iip_ecosphere.platform.support.setup.AbstractSetup;
 import de.iip_ecosphere.platform.support.iip_aas.config.YamlFile;
 
 /**

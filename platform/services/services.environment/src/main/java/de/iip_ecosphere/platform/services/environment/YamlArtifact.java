@@ -19,7 +19,7 @@ import java.util.List;
 
 import org.slf4j.LoggerFactory;
 
-import de.iip_ecosphere.platform.support.iip_aas.config.AbstractSetup;
+import de.iip_ecosphere.platform.support.setup.AbstractSetup;
 
 /**
  * Information about an artifact containing services. The artifact is to be deployed. We assume that the underlying

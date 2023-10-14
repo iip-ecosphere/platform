@@ -14,7 +14,7 @@ package de.iip_ecosphere.platform.services.spring.descriptor;
 
 import java.util.List;
 
-import de.iip_ecosphere.platform.support.iip_aas.Version;
+import de.iip_ecosphere.platform.support.Version;
 
 /**
  * Information about an artifact containing services. The artifact is to be deployed. {@link #getId()} and 

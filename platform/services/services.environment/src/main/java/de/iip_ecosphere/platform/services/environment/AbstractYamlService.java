@@ -13,7 +13,7 @@
 package de.iip_ecosphere.platform.services.environment;
 
 import de.iip_ecosphere.platform.services.environment.switching.ServiceBase;
-import de.iip_ecosphere.platform.support.iip_aas.Version;
+import de.iip_ecosphere.platform.support.Version;
 
 /**
  * Basic information about a service, abstract because template-based service objects do not

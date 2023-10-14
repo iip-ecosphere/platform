@@ -24,7 +24,7 @@ import java.util.function.Supplier;
 
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.AasUtils;
-import de.iip_ecosphere.platform.support.iip_aas.Version;
+import de.iip_ecosphere.platform.support.Version;
 import de.iip_ecosphere.platform.support.json.JsonResultWrapper;
 
 /**

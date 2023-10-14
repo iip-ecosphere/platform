@@ -13,7 +13,7 @@
 package de.iip_ecosphere.platform.services.environment;
 
 import de.iip_ecosphere.platform.support.iip_aas.ApplicationSetup;
-import de.iip_ecosphere.platform.support.iip_aas.Version;
+import de.iip_ecosphere.platform.support.Version;
 
 /**
  * Basic information about an artifact containing services, abstract because template-based service objects do not

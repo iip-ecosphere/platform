@@ -13,7 +13,7 @@
 package de.iip_ecosphere.platform.services.spring.descriptor;
 
 import de.iip_ecosphere.platform.services.environment.YamlService;
-import de.iip_ecosphere.platform.support.iip_aas.Version;
+import de.iip_ecosphere.platform.support.Version;
 
 /**
  * Server process specification of servers to be started/stopped with an application.
