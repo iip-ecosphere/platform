@@ -30,10 +30,8 @@ import test.de.iip_ecosphere.platform.support.net.UriResolverTest;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    JarUtilsTest.class,
     NetUtilsTest.class,
     SchemaServerEndpointTest.class,
-    FileFormatTest.class,
     FactoryTest.class, // we do not go for a sub-suite for now as Maven may execute both
     PrintVisitorTest.class,
     NetworkManagerTest.class,
@@ -44,7 +42,6 @@ import test.de.iip_ecosphere.platform.support.net.UriResolverTest;
     ServiceLoaderUtilsTest.class,
     NoOpServerTest.class,
     LocalInvocationTest.class, 
-    ClassLoaderUtilsTest.class,
     SystemMetricsTest.class,
     IOVoidFunctionTest.class,
     SemanticIdResolverTest.class,
