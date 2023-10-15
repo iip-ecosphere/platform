@@ -20,7 +20,10 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
+    ClassLoaderUtilsTest.class,
     CollectionUtilsTest.class,
+    NoOpServerTest.class,
+    FileFormatTest.class,
     VersionTest.class,
     AbstractSetupTest.class,
     CmdLineTest.class,
