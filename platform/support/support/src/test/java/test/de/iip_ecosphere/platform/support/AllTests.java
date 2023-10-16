@@ -21,6 +21,7 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
     ClassLoaderUtilsTest.class,
+    ServiceLoaderUtilsTest.class,
     CollectionUtilsTest.class,
     NoOpServerTest.class,
     FileFormatTest.class,
