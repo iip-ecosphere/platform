@@ -93,13 +93,13 @@ public class PlatformTest {
         PersistentAasSetup aasSetup = AasSetup.createLocalEphemeralSetup(new PersistentAasSetup(), false, 
             () -> new PersistentAasSetup());
         aasSetup.setPersistence(ConfiguredPersistenceType.INMEMORY);
+        aasSetup.setAccessControlAllowOrigin("*");
         AasSetup oldSetup = AasPartRegistry.setAasSetup(aasSetup);
         PlatformSetup.getInstance().setAas(aasSetup);
 
         LifecycleHandler.startup(new String[] {});
 
-        testArtifactManager();
-        
+        testArtifactManager();        
         LifecycleHandler.shutdown();
 
         AasPartRegistry.setAasSetup(oldSetup);

@@ -1,6 +1,6 @@
 /**
  * ******************************************************************************
- * Copyright (c) {2020} The original author or authors
+ * Copyright (c) {2023} The original author or authors
  *
  * All rights reserved. This program and the accompanying materials are made 
  * available under the terms of the Eclipse Public License 2.0 which is available 
@@ -10,23 +10,22 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package de.iip_ecosphere.platform.support;
+package de.iip_ecosphere.platform.support.aas;
 
 /**
- * Defines the usual builder interface. Instance-specific configuring methods are supposed to return an instance of 
- * the builder. {@link #build()} finally builds the instance and disposes the builder instance.
- * 
- * @param <I> The type of the instance to build.
+ * A receipe that can take a CORS origin specification.
  * 
  * @author Holger Eichelberger, SSE
  */
-public interface Builder<I> {
+public interface CorsEnabledRecipe {
     
     /**
-     * Builds the instance under construction. The work of the builder instance shall be done by this call.
+     * Sets the access control to allow cross origin.
      * 
-     * @return the instance.
+     * @param accessControlAllowOrigin the information to be placed in the HTTP header field 
+     * "Access-Control-Allow-Origin"; the specific server or {@link #ANY_CORS_ORIGIN}
+     * @return an instance of the sub-recipe
      */
-    public I build();
+    public CorsEnabledRecipe setAccessControlAllowOrigin(String accessControlAllowOrigin);
 
 }

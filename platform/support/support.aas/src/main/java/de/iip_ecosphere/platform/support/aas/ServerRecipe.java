@@ -22,7 +22,7 @@ import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
  * 
  * @author Holger Eichelberger, SSE
  */
-public interface ServerRecipe {
+public interface ServerRecipe extends CorsEnabledRecipe {
 
     /**
      * Declares the type for persistence constants.

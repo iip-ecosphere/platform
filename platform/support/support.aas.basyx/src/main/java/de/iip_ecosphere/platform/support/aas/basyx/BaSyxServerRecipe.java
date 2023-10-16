@@ -34,6 +34,8 @@ public class BaSyxServerRecipe implements ServerRecipe {
 
     // currently this does not allow to run registry and server on the same port...
     
+    private String accessControlAllowOrigin;
+    
     @Override
     public PersistenceType toPersistenceType(String type) {
         PersistenceType result = LocalPersistenceType.INMEMORY;
@@ -54,20 +56,34 @@ public class BaSyxServerRecipe implements ServerRecipe {
     @Override
     public AasServer createAasServer(Endpoint serverEndpoint, PersistenceType persistence, Endpoint registryEndpoint, 
         KeyStoreDescriptor kstore, String... options) {
-        return new BaSyxRegistryDeploymentAasServer(new DeploymentSpec(serverEndpoint, kstore), 
-            registryEndpoint.toUri(), translateForServer(persistence), options);
+        DeploymentSpec spec = applyAccessControlAllowOrigin(new DeploymentSpec(serverEndpoint, kstore));
+        return new BaSyxRegistryDeploymentAasServer(spec, registryEndpoint.toUri(), translateForServer(persistence), 
+            options);
     }
     
     @Override
     public Server createRegistryServer(Endpoint endpoint, PersistenceType persistence, String... options) {
         return createRegistryServer(endpoint, persistence, null, options);
     }
+    
+    /**
+     * Applies {@link #accessControlAllowOrigin} to {@code spec}.
+     * 
+     * @param spec the specification to modify
+     * @return {@code spec}
+     */
+    private DeploymentSpec applyAccessControlAllowOrigin(DeploymentSpec spec) {
+        if (null != accessControlAllowOrigin) {
+            spec.setAccessControlAllowOrigin(accessControlAllowOrigin);
+        }
+        return spec;
+    }
 
     @Override
     public Server createRegistryServer(Endpoint endpoint, PersistenceType persistence, KeyStoreDescriptor kstore, 
         String... options) {
         // registries are not encrypted in BaSyx
-        DeploymentSpec spec = new DeploymentSpec(endpoint, (KeyStoreDescriptor) null);
+        DeploymentSpec spec = applyAccessControlAllowOrigin(new DeploymentSpec(endpoint, (KeyStoreDescriptor) null));
         RegistryBackend backend = Tools.getOption(options, translateForRegistry(persistence), RegistryBackend.class);
         BaSyxRegistryConfiguration registryConfig = new BaSyxRegistryConfiguration(backend);
         final IComponent component = new RegistryComponent(spec.getContextConfiguration(), registryConfig);
@@ -124,6 +140,12 @@ public class BaSyxServerRecipe implements ServerRecipe {
                 + "' is not supported as server backend" );
         }
         return result;
+    }
+    
+    @Override
+    public ServerRecipe setAccessControlAllowOrigin(String accessControlAllowOrigin) {
+        this.accessControlAllowOrigin = accessControlAllowOrigin;
+        return this;
     }
 
 }

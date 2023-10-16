@@ -15,6 +15,7 @@ package test.de.iip_ecosphere.platform.support.fakeAas;
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.aas.AasServer;
+import de.iip_ecosphere.platform.support.aas.CorsEnabledRecipe;
 import de.iip_ecosphere.platform.support.aas.ServerRecipe;
 import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
 
@@ -51,6 +52,11 @@ public class FakeServerReceipe implements ServerRecipe {
     @Override
     public PersistenceType toPersistenceType(String type) {
         return LocalPersistenceType.INMEMORY;
+    }
+
+    @Override
+    public CorsEnabledRecipe setAccessControlAllowOrigin(String accessControlAllowOrigin) {
+        return null;
     }
 
 }

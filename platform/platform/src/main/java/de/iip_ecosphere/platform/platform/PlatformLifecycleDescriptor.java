@@ -25,6 +25,7 @@ import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.ServerRecipe;
 import de.iip_ecosphere.platform.support.aas.ServerRecipe.PersistenceType;
+import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.transport.Transport;
 
@@ -45,7 +46,7 @@ public class PlatformLifecycleDescriptor implements LifecycleDescriptor, PidLife
         PlatformSetup setup = PlatformSetup.getInstance();
         Transport.setTransportSetup(() -> setup.getTransport());
         AasSetup aasSetup = setup.getAas();
-        ServerRecipe rcp = AasFactory.getInstance().createServerRecipe();
+        ServerRecipe rcp = AasPartRegistry.applyCorsOrigin(AasFactory.getInstance().createServerRecipe(), aasSetup);
         Endpoint regEndpoint = aasSetup.adaptEndpoint(aasSetup.getRegistryEndpoint());
         LoggerFactory.getLogger(getClass()).info("ServerHost " + aasSetup.getServerHost()
             + " " + regEndpoint.toUri());

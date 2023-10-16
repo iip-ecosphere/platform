@@ -36,6 +36,7 @@ import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.AasUtils;
 import de.iip_ecosphere.platform.support.aas.AssetKind;
+import de.iip_ecosphere.platform.support.aas.CorsEnabledRecipe;
 import de.iip_ecosphere.platform.support.aas.DeploymentRecipe;
 import de.iip_ecosphere.platform.support.aas.DeploymentRecipe.ImmediateDeploymentRecipe;
 import de.iip_ecosphere.platform.support.aas.DeploymentRecipe.RegistryDeploymentRecipe;
@@ -725,11 +726,12 @@ public class AasPartRegistry {
     /**
      * Helper to apply the {@link AasSetup#getAccessControlAllowOrigin()} from {@code setup} to {@code rcp}.
      * 
+     * @param <T> the receipt type
      * @param rcp the recipe
      * @param setup the setup to take the information from
      * @return the rcp
      */
-    static DeploymentRecipe applyCorsOrigin(DeploymentRecipe rcp, AasSetup setup) {
+    public static <T extends CorsEnabledRecipe> T applyCorsOrigin(T rcp, AasSetup setup) {
         String acao = setup.getAccessControlAllowOrigin();
         if (null != acao && acao.length() > 0) {
             rcp.setAccessControlAllowOrigin(acao);
