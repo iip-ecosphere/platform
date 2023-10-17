@@ -1,0 +1,20 @@
+application: HM'23 demonstration application (All on Server)
+id: HM23-PC
+appId: Hm23FlApp
+disabled: true
+version: 0.1.0
+description: All on Server
+artifact: http://192.168.2.1:4200/download/DemonstrationFederatedLearningAppHM23-0.1.0-SNAPSHOT-bin.jar
+parallelize: false
+onUndeployRemoveArtifact: true
+assignments:
+  - resource: hm
+    services:
+      - MdzhAasConn
+      - AppAas
+      - ActionDecider
+      - PlcNextOpcConn
+      - FlowerAiServiceClient
+      - PythonAi
+      - PlcBeckhoffOpcConn
+      - CamSource

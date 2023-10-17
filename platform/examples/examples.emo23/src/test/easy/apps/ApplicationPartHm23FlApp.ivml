@@ -1,0 +1,22 @@
+project ApplicationPartHm23FlApp {
+
+    import ServiceMeshPartHm23FlAppHm23FlMesh;
+
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+
+    Application hm23FlApp = {
+        id = "Hm23FlApp",
+        name = "Demonstration Federated Learning App HM23",
+        ver = "0.1.0",
+        description = "",
+        services = {refBy(hm23FlMesh)},
+        servers = {refBy(flAasServer), refBy(myFlwrAiServer)},
+        cmdArg = appCmdArg("", "-Diip.app.hm23.mock.callRobot=false"),
+        createContainer = true
+    };
+    
+    freeze {
+        .;
+    }
+
+}

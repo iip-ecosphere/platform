@@ -1,0 +1,652 @@
+project AllServices {
+    
+    import AllTypes;
+    
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+    
+    MipMqttV3Connector MipMqttDataConn = {
+        id = "MipMqttDataConn",
+        host = onlogicServer,
+        port = 1883,
+        mock = getFlowTest(false), 
+        traceRcv = TraceKind::TRACE,
+        traceSent = TraceKind::TRACE,
+        security = {
+            authenticationKey = "onlogic:1883",
+            hostNameVerification = false   
+        },
+        inChannel = "/mip/reader/ATML2589/IIP",
+        outChannel = "/mip/reader/ATML2589/IIP"
+    };
+       
+    Service myMipAiPythonService = PythonService {
+        id = "MipAiPythonService",
+        name = "Mip Ai Python Service",
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+        nameplateInfo = {
+            manufacturerProductDesignation = "Improvement AI for MIP sensor@en",
+            manufacturer = refBy(manufacturer_l3s)
+        },
+        servicesPackageName = "servicesMip",
+        input = {{type=refBy(MipMqttOutput)}},
+        output = {{type=refBy(MipAiPythonOutput)}, {type=refBy(MipMqttInput), forward=false}},
+        artifact = "de.iip-ecosphere.platform:examples.hm23:" + iipVer,
+        kind = ServiceKind::TRANSFORMATION_SERVICE,
+        dependencies = {refBy(PYTHON39)},
+        integrationMode = PythonIntegrationMode::websocket_continuous
+    };
+    
+    // TODO sampling period   -> set in connector parameters, connector.useNotifications(false)  
+    OpcUaV1Connector myPlcOpcUaConn = {
+        id = "PlcNextOpcConn",
+        name = "PLCnext OPC connector",
+        description = "",
+        ver = "0.1.0",
+        host = opcUaServer,
+        port = 4840,
+        samplingPeriod = samplingPeriod(500, 500),
+        cacheMode = CacheMode::NONE,
+        mock = getFlowTest(overrideInProduction), 
+        security = {
+            keyAlias = "device",
+            keystoreKey = "edgeOpc:keystore",
+            authenticationKey = "edgeOpc:4840",
+            hostNameVerification = false   
+        },
+        
+        input = {{type=refBy(PlcInput), forward=false}},
+        output = {{type=refBy(PlcOutput)}},
+        inInterface = {type=refBy(PlcInput), path="Objects/PLCnext/Arp.Plc.Eclr/RobInstance01/"},
+        outInterface = {type=refBy(PlcOutput), path="Objects/PLCnext/Arp.Plc.Eclr/RobInstance01/"},
+        traceRcv = TraceKind::TRACE,
+        traceSent = TraceKind::TRACE
+    };
+
+    AasConnector myMdzhAasConn = {
+        id = "MdzhAasConn",
+        name = "MDZH AAS connector",
+        description = "",
+        ver = "0.1.0",
+        host = carAasServer,
+        idShortSpec = "iri:.*car.*",
+        port = 9989,
+        server = refBy(flAasServer),
+        //samplingPeriod = samplingPeriod(10000, 10000),
+        registryHost = carAasServer,
+        registryPort = 9989,
+        registryPath = "registry",
+        mock = getFlowTest(false), 
+        inputHandlers = {ConnectorInputHandler{
+            type=refBy(Command), 
+            class="de.iip_ecosphere.platform.examples.hm23.MdzhInputHandler",
+            artifact="de.iip-ecosphere.platform:examples.hm23:" + iipVer
+        }},
+        
+        input = {{type=refBy(MdzhInput)}, {type=refBy(Command), forward=false}},
+        output = {{type=refBy(MdzhOutput)}},
+        inInterface = {type=refBy(MdzhInput)}, 
+        outInterface = {type=refBy(MdzhOutput), path="ProductData/"},
+        traceRcv = TraceKind::TRACE,
+        traceSent = TraceKind::TRACE
+    };
+    
+    Service mySourceService = JavaService {
+        id = "CamSource",
+        name = "Cam Image Source",
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+        asynchronous = true,
+        nameplateInfo = {
+            manufacturerProductDesignation = "HM'23 Cam input source@en",
+            manufacturer = refBy(manufacturer_sse)
+        },
+        class = fqnClassName("CamSource", overrideInProduction), 
+        artifact = "de.iip-ecosphere.platform:examples.hm23:" + iipVer,
+        kind = ServiceKind::SOURCE_SERVICE,
+        output = {{type=refBy(ImageInput)}},
+        input = {{type=refBy(Command), forward=false}},
+        parameter = {
+          StringParameter {
+            name="camIP", 
+            defaultValue=camIP,
+            systemProperty="iip.app.hm23.camIP"
+          },IntegerParameter {
+            name="camPort", 
+            defaultValue=-1,
+            systemProperty="iip.app.hm23.camPort"
+          },IntegerParameter {
+            name="robotId", 
+            defaultValue=1,
+            systemProperty="iip.app.hm23.robotId"
+          }
+        },
+        traceRcv = TraceKind::TRACE,
+        traceSent = TraceKind::TRACE
+    };
+    
+    Service myPythonAi = PythonService {
+        id = "PythonAi",
+        name = "Python-based AI",
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+        nameplateInfo = {
+            manufacturerProductDesignation = "HM'23 Python-based AI@en",
+            manufacturer = refBy(manufacturer_l3s)
+        },
+        servicesPackageName = "servicesTF",
+        //servicesPackageName = "servicesMock",
+        //servicesPackageName = pythonServicePackageName(false),
+        kind = ServiceKind::TRANSFORMATION_SERVICE,
+        input = {{type=refBy(ImageInput)}, {type=refBy(Command), forward=false}},
+        output = {{type=refBy(AiResult)}},
+        parameter = {
+          StringParameter {
+            name="aiId", 
+            defaultValue=aiId_static
+          }, IntegerParameter {
+             name="robotId", 
+             defaultValue=1,
+             systemProperty="iip.app.hm23.robotId"
+          }
+        },
+        artifact = "de.iip-ecosphere.platform:examples.hm23:" + iipVer,
+        dependencies = {refBy(PYTHON38), refBy(ScipPy141), refBy(NumPy1220), refBy(Tflite_Runtime28), refBy(Pandas153), refBy(Sklearn), refBy(Pillow940), refBy(KreasApplications108), refBy(Psutil594), refBy(Glob2), refBy(OpenCVPython47072)},
+        integrationMode = PythonIntegrationMode::websocket_continuous,
+        traceRcv = TraceKind::TRACE,
+        traceSent = TraceKind::TRACE
+    };
+
+    // Causing a dependencies conflict with flowrDependency (flwr ==1.2.0 depends on numpy<2.0.0 and >=1.21.0)
+    // Change the version from NumPy==1.20.1 to NumPy==1.21.1
+    // Lenze used 1.22.0
+    // moved into meta model
+
+    //collision! Lenze has a 1.7.3
+    PythonDependency ScipPy141 = {
+       name = "scipy",
+       version = "1.7.3"
+    };
+
+    PythonDependency ScikitLearn122 = {
+       name = "scikit-learn",
+       version = "1.2.2"
+    };
+    
+    // probably this needs a system dependency, don't remember
+    
+    PythonDependency Tflite_Runtime28 = {
+       name = "tflite_runtime",
+       version = "2.8"
+    };
+
+    // Causing a dependencies conflict with Pandas153
+    // Change myPythonAi Python Dependency to Pandas153
+    //Lenze "only" needs a 1.4.3
+    PythonDependency Pandas153 = {
+       name = "pandas",
+       version = "1.5.3"
+    };
+    
+    PythonDependency Sklearn = {
+       name = "sklearn",
+       version = "0.0"
+    };
+
+    // Causing a dependencies conflict with Pillow940
+    // Change myPythonAi Python Dependency to Pillow940    
+    PythonDependency Pillow940 = {
+       name = "Pillow",
+       version = "9.4.0"
+    };
+    
+    PythonDependency KreasApplications108 = {
+       name = "Keras-Applications",
+       version = "1.0.8"
+    };
+
+    // Causing a dependencies conflict with Psutil594
+    // Change myPythonAi Python Dependency to Psutil594    
+    PythonDependency Psutil594 = {
+       name = "psutil",
+       version = "5.9.4"
+    };
+    
+    PythonDependency Glob2 = {
+       name = "glob2",
+       version = "0.7"
+    };
+
+    // Causing a dependencies conflict with OpenCVPython47072
+    // Change myPythonAi Python Dependency to OpenCVPython47072        
+    PythonDependency OpenCVPython47072 = {
+       name = "opencv-python",
+       version = "4.7.0.72"
+    };
+
+    PythonDependency Grpcio1430 = {
+       name = "grpcio",
+       version = "1.43.0"
+    };
+
+    PythonDependency Matplotlib371 = {
+       name = "matplotlib",
+       version = "3.7.1"
+    };
+
+    PythonDependency MemoryProfiler0610 = {
+       name = "memory-profiler",
+       version = "0.61.0"
+    };
+
+    Service myFlowerAiService = FlowerFederatedAiService {
+        id = "FlowerAiServiceClient",
+        name = "Flower AI Service Client",
+        server = refBy(myFlwrAiServer),
+        description = "",
+        ver = "0.1.0",
+        framework = refBy(TensorFlowFlowerAiFramework),
+        client = refBy(NumpyFlowerAiClient),
+        servicesPackageName = "services",
+        //servicesPackageName = pythonServicePackageName(false),
+        deployable = true,
+        nameplateInfo = {
+            manufacturerProductDesignation = "HM'23 federated learning client@en",
+            manufacturer = refBy(manufacturer_l3s)
+        },
+        input = {{type=refBy(ImageInput)}, {type=refBy(Command), forward=false}},
+        output = {{type=refBy(AiResult)}},
+        parameter = {
+          StringParameter {
+            name="aiId", 
+            defaultValue=aiId_FL
+          }
+        },
+        kind = ServiceKind::TRANSFORMATION_SERVICE,
+        artifact = "de.iip-ecosphere.platform:examples.hm23:" + iipVer,
+        dependencies = {refBy(PYTHON38), refBy(flowrDependency), refBy(tensorflow290), refBy(keras290), 
+          refBy(Pandas153), refBy(Pillow940), refBy(KreasApplications108), refBy(NumPy1220), refBy(Grpcio1430),
+          refBy(Matplotlib371), refBy(Psutil594), refBy(MemoryProfiler0610), refBy(ScipPy141), refBy(ScikitLearn122),
+          refBy(OpenCVPython47072)},
+        integrationMode = PythonIntegrationMode::websocket_continuous,
+        traceRcv = TraceKind::TRACE,
+        traceSent = TraceKind::TRACE
+    };
+        
+    FlowerFederatedAiServer myFlwrAiServer = FlowerFederatedAiServer {
+        id = "FlowerAIServer",
+        description = "",
+        ver = "0.1.0",
+        host = platformServer,
+        port = 8063,
+        nameplateInfo = {
+            manufacturerProductDesignation = "HM'23 federated learning server@en",
+            manufacturer = refBy(manufacturer_l3s)
+        },
+        servicesPackageName = "services",
+        //servicesPackageName = pythonServicePackageName(false),
+        artifact = "de.iip-ecosphere.platform:examples.hm23:" + iipVer,
+        parameter = {},
+        transportChannel = ""
+        //transportChannel  = "Server-FlowerAi",
+        //dependencies = {refBy(PYTHON38), refBy(flowrDependency)}
+    };    
+    
+    Service myDeciderService = JavaService {
+        id = "ActionDecider",
+        name = "ActionDecider",
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+        asynchronous = true, // due to I/O type/entry difference 
+        nameplateInfo = {
+            manufacturerProductDesignation = "HM'23 AI decider@en",
+            manufacturer = refBy(manufacturer_sse)
+        },
+        class = fqnClassName("ActionDecider", true),
+        artifact = "de.iip-ecosphere.platform:examples.hm23:" + iipVer,
+        kind = ServiceKind::TRANSFORMATION_SERVICE,
+        input = {{type=refBy(AiResult)}, {type=refBy(PlcOutput)}, {type=refBy(MdzhOutput)}, {type=refBy(BeckhoffOutput)}, {type=refBy(Command), forward=false}},
+        output = {{type=refBy(DecisionResult)}, {type=refBy(Command), forward=false}, {type=refBy(PlcInput), forward=false}, {type=refBy(BeckhoffInput), forward=false}},
+        parameter = {
+          StringParameter {
+             name="robotIP", 
+             defaultValue=robotIP,
+             systemProperty="iip.app.hm23.robotIP"
+          }, IntegerParameter {
+             name="robotId", 
+             defaultValue=1,
+             systemProperty="iip.app.hm23.robotId"
+          }, RealParameter {
+             name="errorThreshold", 
+             defaultValue=0.8,
+             systemProperty="iip.app.hm23.errorThreshold"
+          }, StringParameter { // comma separated
+             name="inputAiId", 
+             defaultValue=aiId_static
+          }
+        },
+        traceRcv = TraceKind::TRACE,
+        traceSent = TraceKind::TRACE
+    };
+
+    Service myReceiverService = TraceToAasJavaService {
+        id = "AppAas",
+        name = "AppAas",
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+        nameplateInfo = {
+            manufacturerProductDesignation = "HM'23 Robot App AAS@en",
+            manufacturer = refBy(manufacturer_sse)
+        },
+        outTransport = {
+            host = onlogicServer,
+            port = 1883,
+            security = {
+                authenticationKey = "onlogic:1883",
+                hostNameVerification = false   
+            }
+        },
+        parameter = {
+          LongParameter{name="timeout", defaultValue=3600000},
+          IntegerParameter {
+             name="robotId", 
+             defaultValue=1,
+             systemProperty="iip.app.hm23.robotId"
+          }
+        },
+        //class = fqnClassName("AppAas", true), // for now for testing
+        server = refBy(flAasServer),
+        class = "de.iip_ecosphere.platform.examples.hm23.mock.AppAas",
+        artifact = "de.iip-ecosphere.platform:examples.hm23:" + iipVer,
+        kind = ServiceKind::SINK_SERVICE,
+        input = {{type=refBy(DecisionResult)}, {type=refBy(MdzhOutput)}, {type=refBy(Command), forward=false}},
+        output = {{type=refBy(Command), forward=false}},
+        traceRcv = TraceKind::TRACE,
+        traceSent = TraceKind::TRACE
+    };
+    
+    JavaServer flAasServer = {
+      id = "car-aas-server",
+      description = "AAS car server",
+      ver = "0.0.1",
+      host = carAasServer,
+      port = 9989,
+      class = "de.iip_ecosphere.platform.examples.hm23.carAas.CarsAasServer",
+      cmdArg = "--port=${port}"
+    };    
+    
+    OpcUaV1Connector myBeckhoffOpcUaConn = {
+        id = "PlcBeckhoffOpcConn",
+        name = "Beckhoff OPC connector",
+        description = "",
+        ver = "0.1.0",
+        host = beckhoffServer,
+        port = 4840,
+        samplingPeriod = samplingPeriod(500, 500),
+        cacheMode = CacheMode::NONE,
+        mock = getFlowTest(false), 
+        security = {
+            authenticationKey = "beckhoffOpc:4840",
+            hostNameVerification = false   
+        },
+        
+        input = {{type=refBy(BeckhoffInput), forward=false}},
+        output = {{type=refBy(BeckhoffOutput)}},
+        inInterface = {type=refBy(BeckhoffInput), path="Objects/PLC1/GVL_OPCIMG_1/"},
+        outInterface = {type=refBy(BeckhoffOutput), path="Objects/PLC1/GVL_OPCIMG_1/"},
+        traceRcv = TraceKind::TRACE,
+        traceSent = TraceKind::TRACE
+    };
+    
+    // ------------------------- drive app ----------------------
+
+    Manufacturer manufacturer_lenze = {
+        manufacturerName = "Lenze SE@de",
+        manufacturerLogo = "lenze_logo.png",
+        address = {
+            department = "Innovation@de",
+            street = "Hans-Lenze-Straße 1@de",
+            zipCode = "31855@de",
+            cityTown = "Aerzen@de"
+        }
+    };
+
+    OpcUaV1Connector driveBeckhoffOpcUaConn = {
+        id = "DriveBeckhoffOpcConn",
+        name = "Drive Beckhoff OPC connector",
+        description = "",
+        ver = "0.1.0",
+        host = beckhoffServer,
+        port = 4840,
+        samplingPeriod = 500,
+        cacheMode = CacheMode::NONE,
+        mock = getFlowTest(overrideInProduction), 
+        security = {
+            authenticationKey = "beckhoffOpc:4840",
+            hostNameVerification = false   
+        },
+        
+        input = {{type=refBy(DriveCommand), forward=false}},
+        output = {{type=refBy(DriveBeckhoffOutput)}},
+        inInterface = {type=refBy(DriveCommand), path="Objects/PLC1/GVL_AxisOPC/"},
+        outInterface = {type=refBy(DriveBeckhoffOutput), path="Objects/PLC1/GVL_AxisOPC/"},
+        traceRcv = TraceKind::TRACE,
+        traceSent = TraceKind::TRACE
+    };
+    
+    MqttV3Connector driveLenzeMqttConn = {
+        id = "DriveLenzeMqttConn",
+        name = "Lenze MQTT connector",
+        description = "",
+        ver = "0.1.0",
+        host = beckhoffServer, // although Lenze, the drive data hub runs on Beckhoff
+        port = 1883,
+        mock = getFlowTest(false), 
+        
+        input = {{type=refBy(Dummy)}},
+        output = {{type=refBy(LenzeDriveMeasurement)}},
+        inChannel = "Oscillogram_1",
+        outChannel = "Oscillogram_1",
+        inInterface = {type=refBy(Dummy)},
+        outInterface = {type=refBy(LenzeDriveMeasurement)},
+        traceRcv = TraceKind::TRACE,
+        traceSent = TraceKind::TRACE,
+        machineFormatter = JsonFormatter{},
+        machineParser = JsonParser{}
+    };
+    
+    MqttV3Connector driveMqttEnergyConn = {
+        id = "mqttEnergyConn",
+        name = "mqttEnergyConn",
+        description = "",
+        ver = "0.1.0",
+        port = 1883,
+        host = onlogicServer, //energyMqttServer, 
+        mock = getFlowTest(false),
+        cacheMode = CacheMode::NONE, // there are always small fluctuations
+        security = {
+            authenticationKey = "onlogic:1883",
+            hostNameVerification = false   
+        }, 
+        
+        input = {{type=refBy(PlcEnergyIn)}},
+        //output = {{type=refBy(PlcEnergyMeasurement)}},
+        output = {{type=refBy(PlcEnergyMeasurementJson)}},
+        inChannel = "IN",
+        //outChannel = "energy/EEM-MA370/+",
+        outChannel = "energy/EEM-MA370J",
+        //outChannels = {"energy/EEM-EM375/Current_L1", "energy/EEM-EM375/Voltage_L1", "energy/EEM-EM375/Current_L2", "energy/EEM-EM375/Voltage_L2", "energy/EEM-EM375/Current_L3", "energy/EEM-EM375/Voltage_L3", "energy/EEM-EM375/Voltage_U12", "energy/EEM-EM375/Voltage_U23", "energy/EEM-EM375/Voltage_U31", "energy/EEM-EM375/Real_PE_L1", "energy/EEM-EM375/Real_PE_L2", "energy/EEM-EM375/Real_PE_L3"},
+        inInterface = {type=refBy(PlcEnergyIn)},
+        //outInterface = {type=refBy(PlcEnergyMeasurement)},
+        outInterface = {type=refBy(PlcEnergyMeasurementJson)},
+        machineFormatter = JsonFormatter{},
+        machineParser = JsonParser{}
+        /*machineFormatter = TextLineFormatter{separator="/"}, 
+        machineParser = TextLineParser{separator="/"},
+        operations = {
+          FieldAssignmentOperation{field=refBy(PlcEnergyMeasurement.fields[2]), 
+            operation=OutChannelDataOperation{}
+          }
+        }*/
+    };
+    
+    Service driveChannelTimeSeriesAggregatorService = JavaService {
+        id = "ChannelToTimeSeriesAggregator",
+        name = "ChannelToTimeSeriesAggregator",
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+        asynchronous = true,
+        nameplateInfo = {
+            manufacturerProductDesignation = "HM'23 drive energy aggregator@en",
+            manufacturer = refBy(manufacturer_sse)
+        },
+        class = fqnClassNameDrive("ChannelToTimeSeriesAggregator", true),
+        artifact = "de.iip-ecosphere.platform:examples.hm23:" + iipVer,
+        kind = ServiceKind::TRANSFORMATION_SERVICE,
+        input = {{type=refBy(PlcEnergyMeasurementJson)}, {type=refBy(DriveCommand), forward=false}},
+        output = {{type=refBy(AggregatedPlcEnergyMeasurement)}},
+        parameter = {
+          IntegerParameter {
+            name="samples", 
+            defaultValue=mockingIntArg(12, 3)
+          },IntegerParameter {
+            name="sampleRate", 
+            defaultValue=250 // in ms
+          }
+        },
+        traceRcv = TraceKind::TRACE,
+        traceSent = TraceKind::TRACE
+    };
+    
+    Service driveLenzePythonAiService = PythonService {
+        id = "DriveLenzePythonAi",
+        name = "Drive path Python-based AI by Lenze",
+        description = "Drive path Python-based AI by Lenze",
+        ver = "0.1.0",
+        deployable = true,
+        kind = ServiceKind::TRANSFORMATION_SERVICE,
+        nameplateInfo = {
+            manufacturerProductDesignation = "HM'23 Lenze AI@en",
+            manufacturer = refBy(manufacturer_lenze)
+        },
+        servicesPackageName = pythonServicePackageName(false),
+        input = {{type=refBy(LenzeDriveMeasurement)}, {type=refBy(AggregatedPlcEnergyMeasurement)}},
+        output = {{type=refBy(DriveAiResult)}},
+        parameter = {
+          StringParameter {
+            name="aiId", 
+            defaultValue="Lenze-AI"
+          }
+        },
+        artifact = "de.iip-ecosphere.platform:examples.hm23:" + iipVer,
+        dependencies = {refBy(PYTHON38)}, // TODO dependencies
+        traceRcv = TraceKind::TRACE,
+        traceSent = TraceKind::TRACE
+    };
+    
+    // incomplete
+    
+    /*Service driveRtsaAiService = RtsaService {
+        id = "driveRtsaAi",
+        name = "Drive path AI by RapidMiner",
+        description = "RapidMiner AI",
+        ver = "0.1.0",
+        deployable = true,
+        includesRtsa = true, // true for IPR experiment, // false else
+        input = {{type=refBy(ImageInput)}, {type=refBy(Command), forward=false}},
+        output = {{type=refBy(AiResult)}},
+        parameter = {
+          StringParameter {
+            name="aiId", 
+            defaultValue="RapidMiner-AI"
+          }
+        },
+        path = "iip_basic/score_v1",
+        traceRcv = TraceKind::TRACE,
+        traceSent = TraceKind::TRACE
+    };*/
+
+    /*
+    Manufacturer manufacturer_ismll = {
+        manufacturerName = "Universitaet Hildesheim@de",
+        manufacturerLogo = "ismll_logo.jpg",
+        address = {
+            department = "ISMLL@de",
+            street = "Universitaetsplatz 1@de",
+            zipCode = "31141@de",
+            cityTown = "Hildesheim@de"
+        }
+    };
+
+    Service driveIsmllPythonAiService = PythonService {
+        id = "DriveIsmllPythonAi",
+        name = "Drive path Python-based AI by Ismll",
+        description = "Drive path Python-based AI by Ismll",
+        ver = "0.1.0",
+        deployable = true,
+        kind = ServiceKind::TRANSFORMATION_SERVICE,
+        nameplateInfo = {
+            manufacturerProductDesignation = "HM'23 ISMLL AI@en",
+            manufacturer = refBy(manufacturer_ismll)
+        },
+        servicesPackageName = pythonServicePackageName(true),
+        input = {{type=refBy(LenzeDriveMeasurement)}, {type=refBy(AggregatedPlcEnergyMeasurement)}},
+        output = {{type=refBy(DriveAiResult)}},
+        parameter = {
+          StringParameter {
+            name="aiId", 
+            defaultValue="ISMLL-AI"
+          }
+        },
+        artifact = "de.iip-ecosphere.platform:examples.hm23:" + iipVer,
+        dependencies = {refBy(PYTHON38)}, // TODO dependencies
+        traceRcv = TraceKind::TRACE,
+        traceSent = TraceKind::TRACE
+    };*/
+
+    Service driveAppAas = TraceToAasJavaService {
+        id = "DriveAppAas",
+        name = "DriveAppAas",
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+        asynchronous = true,
+        nameplateInfo = {
+            manufacturerProductDesignation = "HM'23 drive app@en",
+            manufacturer = refBy(manufacturer_sse)
+        },
+        outTransport = {
+            host = onlogicServer,
+            port = 1883,
+            security = {
+                authenticationKey = "onlogic:1883",
+                hostNameVerification = false   
+            }
+        },
+        parameter = {
+          StringParameter {
+            name="mipSensorId", 
+            defaultValue="ATML2589040200002054",
+            systemProperty="iip.app.hm23.mipId"
+          }
+        },
+        class = fqnClassNameDrive("DriveAppAas", true),
+        artifact = "de.iip-ecosphere.platform:examples.hm23:" + iipVer,
+        dependencies = {refBy(mvnDefaultLib)},
+        kind = ServiceKind::SINK_SERVICE,
+        output = {{type=refBy(DriveCommand), forward=false}, {type=refBy(PlcInput), forward=false}, {type=refBy(Command), forward=false}, {type=refBy(MipMqttInput), forward=false}},
+        input = {{type=refBy(DriveBeckhoffOutput)}, {type=refBy(DriveAiResult)}, {type=refBy(PlcOutput)}, {type=refBy(MipAiPythonOutput)}, {type=refBy(Command), forward=false}},
+        traceRcv = TraceKind::TRACE,
+        traceSent = TraceKind::TRACE
+    }; 
+   
+    freeze {
+        .;
+    }
+}

@@ -1,0 +1,145 @@
+project ServiceMeshPartHm23DriveAppHm23DriveMesh {
+
+    import AllServices;
+
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+
+    ServiceMesh hm23DriveMesh = {
+        description = "HM23 Drive demo mesh",
+        sources = {refBy(drivePlcOpc), refBy(driveBeckhoffOpc), refBy(driveLenzeMqtt), refBy(driveMqttEnergy), refBy(MipMqttDataSource)}
+    };
+    
+    // ------------------ MIP part ------------------
+    
+    MeshSource MipMqttDataSource = {
+       impl = refBy(MipMqttDataConn),
+       next = {refBy(MipMqttDataSourcePythonTransformer)},
+       pos_x = 390,
+       pos_y = 700
+    };
+    
+    MeshConnector MipMqttDataSourcePythonTransformer = {
+        name = "Mip Mqtt Data Source->Python Transformer",
+        next = refBy(pythonTransformer)
+    };
+
+    MeshProcessor pythonTransformer = {
+        impl = refBy(myMipAiPythonService),
+        next = {refBy(MipMqttDataConnmyPythonDataReceiver)},
+        pos_x = 790,
+        pos_y = 700
+    };
+
+    MeshConnector MipMqttDataConnmyPythonDataReceiver = {
+        name = "Transformer->Receiver",
+        next = refBy(driveAppAasSink)
+    };    
+    
+    // ----------------------------------------------
+
+    MeshSource drivePlcOpc = {
+       impl = refBy(myPlcOpcUaConn),
+       next = {refBy(drivePlcOpcUaConnMyDecider)},
+       pos_x = 390,
+       pos_y = 565
+    };
+
+    MeshConnector drivePlcOpcUaConnMyDecider = {
+        name = "PLC Source->Drive App AAS",
+        next = refBy(driveAppAasSink)
+    };
+    
+    MeshSource driveBeckhoffOpc = {
+        impl = refBy(driveBeckhoffOpcUaConn),
+        next = {refBy(driveBeckhoffOpcDriveAppAas)},
+        pos_x = 820,
+        pos_y = 5
+    };
+
+    MeshConnector driveBeckhoffOpcDriveAppAas = {
+        name = "Beckhoff OPC->AppAas",
+        next = refBy(driveAppAasSink)
+    };
+
+    MeshSource driveLenzeMqtt = {
+       impl = refBy(driveLenzeMqttConn),
+       next = {refBy(driveLenzeMqttDriveAiPythonLenze)},
+       pos_x = 505,
+       pos_y = 65
+    };
+
+    MeshConnector driveLenzeMqttDriveAiPythonLenze = {
+        name = "Lenze MQTT->Python AI Lenze",
+        next = refBy(driveLenzePythonAi)
+    };
+
+    MeshSource driveMqttEnergy = {
+       impl = refBy(driveMqttEnergyConn),
+       next = {refBy(driveMqttEnergyAggregator)},
+       pos_x = 150,
+       pos_y = 285
+    };
+    
+    MeshConnector driveMqttEnergyAggregator = {
+        name = "Phoenix Energy MQTT->Energy Aggregator",
+        next = refBy(driveEnergyAggregator)
+    };
+
+    MeshProcessor driveEnergyAggregator = {
+        impl = refBy(driveChannelTimeSeriesAggregatorService),
+        pos_x = 445,
+        pos_y = 285,
+        next = {refBy(driveEnergyAggregatorDriveAiPythonLenze)
+          /*, refBy(driveEnergyAggregatorDriveRapidminerAi)*/
+          /*, refBy(driveEnergyAggregatorDriveRapidminerAi)*/
+        }
+    };
+
+    MeshConnector driveEnergyAggregatorDriveAiPythonLenze = {
+        name = "Energy Aggregator->Python AI Lenze",
+        next = refBy(driveLenzePythonAi)
+    };
+
+    /*MeshConnector driveEnergyAggregatorDriveRapidminerAi = {
+        name = "Energy Aggregator->RapidMiner AI",
+        next = refBy(driveRapidminerAi)
+    };*/
+    
+    /*MeshConnector driveEnergyAggregatorDriveIsmllAi = {
+        name = "Energy Aggregator->Python ISMLL AI",
+        next = refBy(driveIsmllAi)
+    };*/
+
+    MeshProcessor driveLenzePythonAi = {
+        impl = refBy(driveLenzePythonAiService),
+        next = {refBy(driveAiDriveAppAasSink)},
+        pos_x = 790,
+        pos_y = 190
+    };
+
+    /*MeshProcessor driveRapidminerAi = {
+        impl = refBy(driveRtsaAiService),
+        next = {refBy(driveAiDriveAppAasSink)}
+    };*/
+
+    /*MeshProcessor driveIsmllAi = {
+        impl = refBy(driveIsmllPythonAiService),
+        next = {refBy(driveAiDriveAppAasSink)}
+    };*/
+
+    MeshConnector driveAiDriveAppAasSink = {
+        name = "Drive AI->Drive App AAS",
+        next = refBy(driveAppAasSink)
+    };
+
+    MeshSink driveAppAasSink = {
+       impl = refBy(driveAppAas),
+       pos_x = 1110,
+       pos_y = 75
+    };
+
+    freeze {
+        .;
+    }
+
+}

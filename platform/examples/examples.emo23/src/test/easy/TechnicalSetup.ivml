@@ -1,0 +1,146 @@
+project TechnicalSetup {
+
+    import IIPEcosphere;
+    import DataTypes;
+    import AllConstants;
+
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+
+    // ------------ component setup ------------------
+
+    serializer = Serializer::Json;
+    // serviceManager, containerManager are already defined    
+        
+    aasServer = {
+        schema = AasSchema::HTTP,
+        port = 9001,
+        host = platformServer,
+        serverHost = "localhost" // allow Tomcat to serve all IPs
+    };
+    aasRegistryServer = {
+        schema = AasSchema::HTTP,
+        port = 9002,
+        host = platformServer,
+        serverHost = "localhost", // allow Tomcat to serve all IPs
+        path = "registry"
+    };
+    aasImplServer = {
+        port = 9003,
+        netmask = netpattern
+    };
+    aasProtocol = AasProtocolVabTcp{};
+    aasAccessControlAllowOrigin = "*";
+    aasStartupTimeout = 300000; // 5 min in ms
+    
+    // ------------------ transport --------------------------
+    
+    transportProtocol = TransportProtocolAMQP {
+        port = 8883,
+        globalHost = platformServer,
+        localPort = 8884, 
+        brokerVer = "9.0.0",
+        netmask = netpattern,
+        security = { // -> identityStore.yml in src/test/ or src/main depending on use
+            authenticationKey = "amqp"
+        },
+        gatewayPort = -1, // ephemeral
+        memLimit = 440
+    };
+    
+    serviceProtocol = ServiceProtocolAMQP {};
+    
+    // ------------------ resources/devicemgt ----------------
+    
+    deviceRegistry = BasicDeviceRegistry {
+    };
+    
+    deviceMgtStorage = S3MockDeviceMgtStorage {
+        host = "localhost",
+        port = 8885,
+        region = "local"
+    };
+    
+    // just for testing, this instantiates app rather than platform
+    deviceMgtStorageServer = S3MockDeviceMgtStorageServer{
+        port = 8885    
+    };
+    
+    // requires installation, see platform handbook section 8.6
+    containerManager = DockerContainerManager {
+        registry = "192.168.2.1:5001",
+        memLimit = 440
+    };
+
+    deviceIdProvider = HostnameDeviceIdProvider{};
+
+    // --------------------- monitoring ---------------------------
+    
+    platformMonitoring = PrometheusPlatformMonitoring {
+        schema = PrometheusSchema::HTTP,
+        host = platformServer,
+        port = 9090,
+        running = false,
+        exporterPort = -1, // ephemeral
+        exporterHost = "127.0.0.1",
+        exporterRunning = false,
+        alertMgrPort = 9091,
+        alertMgrHost = platformServer,
+        alertMgrRunning = false,
+        scrapeInterval = 1001,
+        scrapeTimeout = 1000
+    };
+    
+    // ------------------------- UI -------------------------------
+    
+    managementUi = AngularManagementUI {
+        port = managementUiPort
+    };
+    
+    // ---------- generation setup ------------
+    
+    sharedInterfaces = true;
+    sharedArtifact = "de.iip-ecosphere.platform:apps.ExampleHm23AppInterfaces:" + iipVer; // for testing all-in-one
+    artifactsFolder = "/iip/actual/artifacts";
+    artifactsUriPrefix = "http://" + platformServer + ":" + toString(managementUiPort) + "/download"; // TODO compose
+    instDir = "/iip/actual";
+    javaExe = "/iip/jdk/bin/java";
+    modelBaseFolder = "/iip/actual";
+    modelName = "PlatformConfiguration";
+    footprintFolder = "/iip/actual/footprints";
+
+    // ------------ freezing ------------------
+    
+    freeze {
+        aas;
+        aasServer;
+        aasRegistryServer;
+        aasImplServer;
+        aasPersistency;
+        aasProtocol;
+        aasAccessControlAllowOrigin;
+        aasStartupTimeout;
+        deviceIdProvider;
+        serializer;
+        transportProtocol;
+        serviceManager;
+        serviceProtocol;
+        containerManager;
+        deviceMgtStorageServer;
+        deviceMgtStorage;
+        deviceRegistry;
+        javaModuleOpts;
+        javaOpts;
+        pidDir;
+        sharedInterfaces;
+        sharedArtifact;
+        platformMonitoring; // preliminary no monitoring
+        managementUi;
+        artifactsFolder;
+        artifactsUriPrefix;
+        modelBaseFolder;
+        modelName;
+        footprintFolder;
+        .; // every variable declared in this project
+    } but (f|f.bindingTime >= BindingTime.runtimeMon);
+
+}

@@ -1,0 +1,26 @@
+application: Drive demonstration application (All on Server)
+id: Drive-PC
+appId: Hm23DriveApp
+disabled: false
+version: 0.1.0
+description: Drive - All on Server
+artifact: http://192.168.2.1:4200/download/DemonstrationDriveAppHM23-0.1.0-SNAPSHOT-bin.jar
+parallelize: false
+onUndeployRemoveArtifact: true
+assignments:
+  - resource: hm
+    services:
+      - MipMqttDataConn
+      - MipAiPythonService
+      - PlcNextOpcConn
+      - DriveBeckhoffOpcConn
+      - DriveLenzeMqttConn
+      - mqttEnergyConn
+      - ChannelToTimeSeriesAggregator
+      - DriveLenzePythonAi
+      - DriveAppAas
+arguments:
+  - -Diip.app.hm23.driveBypassLockRequest=false
+  - -Diip.app.hm23.driveBypassMIP=true 
+  - -Diip.app.hm23.driveRotateObstacles=true
+      

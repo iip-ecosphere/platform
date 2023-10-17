@@ -1,0 +1,101 @@
+project ServiceMeshPartHm23FlAppHm23FlMesh {
+
+    import AllServices;
+
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+
+    ServiceMesh hm23FlMesh = {
+        description = "HM23 FL demo mesh",
+        sources = {refBy(myImgSource), refBy(myPlcOpc), refBy(myMdzhAas), refBy(myBeckhoffOpc)}
+    };
+
+    MeshSource myBeckhoffOpc = {
+       impl = refBy(myBeckhoffOpcUaConn),
+       pos_x = 370,
+       pos_y = 35,
+	   next = {refBy(myPlcOpcUaConnMyDecider)}
+    };
+    
+    MeshSource myPlcOpc = {
+       impl = refBy(myPlcOpcUaConn),
+       next = {refBy(myPlcOpcUaConnMyDecider)},
+       pos_x = 390,
+       pos_y = 595
+    };
+
+    MeshConnector myPlcOpcUaConnMyDecider = {
+        name = "OPC Source->Decider",
+        next = refBy(myDecider)
+    };
+    
+    MeshSource myMdzhAas = {
+       impl = refBy(myMdzhAasConn),
+       next = {refBy(myMdyzAasConnMyDecider)},
+       pos_x = 400,
+       pos_y = 780
+    };
+    
+    MeshConnector myMdyzAasConnMyDecider = {
+        name = "MDZH AAS->Decider",
+        next = refBy(myDecider)
+    };
+    
+    MeshSource myImgSource = {
+       impl = refBy(mySourceService),
+       next = {refBy(myConnMySourceMyAi), refBy(myConnMySourceMyFlowerAi)},
+       pos_x = 50,
+       pos_y = 300
+    };
+
+    MeshConnector myConnMySourceMyAi = {
+        name = "Img Source->Ai",
+        next = refBy(myAi)
+    };
+
+    MeshConnector myConnMySourceMyFlowerAi = {
+        name = "Img Source->FlowerAi",
+        next = refBy(myFlowerAi)
+    };
+
+    MeshProcessor myAi = {
+        impl = refBy(myPythonAi),
+        next = {refBy(myConnMyAiMyDecider)},
+        pos_x = 320,
+        pos_y = 210
+    };
+
+    MeshProcessor myFlowerAi = {
+        impl = refBy(myFlowerAiService),
+        next = {refBy(myConnMyAiMyDecider)},
+        pos_x = 315,
+        pos_y = 405
+    };
+
+    MeshConnector myConnMyAiMyDecider = {
+        name = "Ai->Decider",
+        next = refBy(myDecider)
+    };
+
+    MeshProcessor myDecider = {
+        impl = refBy(myDeciderService),
+        next = {refBy(myConnMyDeciderMyReceiver)},
+        pos_x = 700,
+        pos_y = 300
+    };
+
+    MeshConnector myConnMyDeciderMyReceiver = {
+        name = "Decider->Receiver",
+        next = refBy(myReceiver)
+    };
+    
+    MeshSink myReceiver = {
+       impl = refBy(myReceiverService),
+       pos_x = 1015,
+       pos_y = 300
+    };
+
+    freeze {
+        .;
+    }
+
+}

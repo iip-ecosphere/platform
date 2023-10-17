@@ -1,0 +1,21 @@
+project ApplicationPartHm23DriveApp {
+
+    import ServiceMeshPartHm23DriveAppHm23DriveMesh;
+
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+
+    Application hm23DriveApp = {
+        id = "Hm23DriveApp",
+        name = "Demonstration Drive App HM23",
+        ver = "0.1.0",
+        description = "",
+        services = {refBy(hm23DriveMesh)},
+        cmdArg = appCmdArg("", "-Diip.app.hm23.mock.callDrive=false"),
+        createContainer = true
+    };
+        
+    freeze {
+        .;
+    }
+
+}

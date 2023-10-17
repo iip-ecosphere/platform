@@ -1,0 +1,44 @@
+application: HM'23 demonstration application (AI on Onlogic)
+id: HM23-Onlogic-1
+disabled: false
+appId: Hm23FlApp
+version: 0.1.0
+description: All on Onlogic (Cobot 2)
+artifact: http://192.168.2.1:4200/download/DemonstrationFederatedLearningAppHM23-0.1.0-SNAPSHOT-bin.jar
+parallelize: false
+onUndeployRemoveArtifact: true
+assignments:
+  - resource: iip-gpu
+    services:
+      - MdzhAasConn
+      - AppAas
+      - ActionDecider
+      - PlcNextOpcConn
+      - FlowerAiServiceClient
+      - PythonAi
+      - PlcBeckhoffOpcConn
+      - CamSource
+servers:
+  car-aas-server: iip-gpu
+  FlowerAIServer: iip-gpu
+serviceParams:
+  CamSource:
+      robotId: "2"
+  ActionDecider:
+      robotId: "2"
+  AppAas:
+      robotId: "2"
+  PythonAi:
+      robotId: "2"
+  PlcNextOpcConn:
+      inPath: Objects/PLCnext/Arp.Plc.Eclr/RobInstance02/
+      outPath: Objects/PLCnext/Arp.Plc.Eclr/RobInstance02/
+  PlcBeckhoffOpcConn:
+      inPath: Objects/PLC1/GVL_OPCIMG_2/
+      outPath: Objects/PLC1/GVL_OPCIMG_2/
+arguments:
+  - -Diip.app.hm23.robotId=2
+  - -Diip.app.PlcNextOpcConn.inPath=Objects/PLCnext/Arp.Plc.Eclr/RobInstance02/
+  - -Diip.app.PlcNextOpcConn.outPath=Objects/PLCnext/Arp.Plc.Eclr/RobInstance02/
+  - -Diip.app.PlcBeckhoffOpcConn.inPath=Objects/PLC1/GVL_OPCIMG_2/
+  - -Diip.app.PlcBeckhoffOpcConn.outPath=Objects/PLC1/GVL_OPCIMG_2/

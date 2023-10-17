@@ -1,0 +1,105 @@
+project AllConstants {
+
+    import IIPEcosphere;
+    import DataTypes;
+
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+
+    const String aiId_static = "Static-AI";
+    const String aiId_FL = "FL-AI";
+    
+    containerGeneration = false;
+    containerBaseImageMethod = true;
+    containerTestingMode = false;
+    platformContainerGeneration = false;
+    forceContainersCreation = false;
+
+    // ------------------------ network addresses -----------------------------
+
+    String netpattern = networkAddress("192.168.2.255", "", false);
+    String platformServer = networkAddress("192.168.2.1", "127.0.0.1", false); // 147.172.178.145
+    String carAasServer = networkAddress("192.168.2.13", "127.0.0.1", false); // 147.172.178.145
+    String opcUaServer = networkAddress("192.168.2.10", "192.168.2.10", false);
+    String driveServer = networkAddress("192.168.2.11", "192.168.2.11", false);
+    String beckhoffServer = networkAddress("192.168.2.80", "192.168.2.80", false);
+    String onlogicServer = networkAddress("192.168.2.12", "192.168.2.12", false);
+    String camIP = networkAddress("192.168.2.80", "127.0.0.1", false);
+    String robotIP = networkAddress("192.168.2.21", "127.0.0.1", false);
+    String energyMqttServer = networkAddress("192.168.2.81", "192.168.2.81", false);
+    Integer managementUiPort = 4200;
+
+    // ------------------------ helper -----------------------------
+
+    Boolean flowTest = true; // switch to true for local flow testing, changes IP/fqn class names (default false)
+    Boolean overrideInProduction = false; // use mocked PLC connector even if flowTest is true (default false)
+    // overrides in functions below allow for incremental testing 
+    // -> shall mocking value be kept although we are not in testing mode
+    
+    def Boolean getFlowTest(Boolean override) = 
+        if flowTest or override then
+            true
+        else
+            false
+        endif;
+
+    def String fqnClassName(String simpleClassName, Boolean override) =
+        if flowTest or override then 
+          "de.iip_ecosphere.platform.examples.hm23.mock." + simpleClassName
+        else 
+          "de.iip_ecosphere.platform.examples.hm23." + simpleClassName 
+        endif;
+
+    def String fqnClassNameDrive(String simpleClassName, Boolean override) =
+        if flowTest or override then 
+          "de.iip_ecosphere.platform.examples.hm23.drive.mock." + simpleClassName
+        else 
+          "de.iip_ecosphere.platform.examples.hm23.drive." + simpleClassName 
+        endif;
+
+    def String pythonServicePackageName(Boolean override) =
+        if flowTest or override then 
+          "servicesMock"
+        else 
+          "services"
+        endif;
+        
+    def Integer samplingPeriod(Integer period, Integer mocking) = 
+        if flowTest then 
+          mocking
+        else 
+          period
+        endif;
+
+    def String networkAddress(String primary, String mocking, Boolean override) =
+        if ((flowTest or override) and not(overrideInProduction)) then 
+          mocking
+        else 
+          primary
+        endif;
+        
+    def String appCmdArg(String primary, String mocking) = 
+        if flowTest then 
+          mocking
+        else 
+          primary
+        endif;
+
+    def Integer mockingIntArg(Integer primary, Integer mocking) = 
+        if flowTest then 
+          mocking
+        else 
+          primary
+        endif;
+
+    // ------------ freezing ------------------
+    
+    freeze {
+        containerGeneration;
+        platformContainerGeneration;
+        containerBaseImageMethod;
+        containerTestingMode;
+        forceContainersCreation;
+        .; // every variable declared in this project
+    } but (f|f.bindingTime >= BindingTime.runtimeMon);
+
+}

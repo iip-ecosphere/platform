@@ -1,0 +1,23 @@
+application: HM'23 demonstration application (All on Server)
+id: HM23-PC-test
+appId: Hm23FlApp
+disabled: false
+version: 0.1.0
+description: All on Server
+artifact: file:/W:/offlineFiles/git/iip-ecosphere-app-hm22/examples.hm22/gen/hm23/DemonstrationFederatedLearningAppHM23/target/DemonstrationFederatedLearningAppHM23-0.1.0-SNAPSHOT-bin.jar
+parallelize: false
+onUndeployRemoveArtifact: true
+assignments:
+  - resource: 72A8D3D50B3D
+    services:
+      - MdzhAasConn
+      - AppAas
+      - ActionDecider
+      - PlcNextOpcConn
+      - FlowerAiServiceClient
+      - PythonAi
+      - PlcBeckhoffOpcConn
+      - CamSource
+ensembleStrategy: ALL_ON_FIRST
+arguments:
+  - -Diip.app.hm23.imgBypassBeckhoff=true

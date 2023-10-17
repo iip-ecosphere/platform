@@ -1,0 +1,603 @@
+project AllTypes {
+
+    import AllConstants;
+
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+
+    RecordType MipAiPythonOutput = {
+        name = "MipAiPythonOutput",
+        fields = {
+            Field {
+                name = "aicontext",
+                type = refBy(StringType)
+            }, Field {
+                name = "aidate",
+                type = refBy(StringType)
+            }, Field {
+                name = "aifrom",
+                type = refBy(StringType)
+            }, Field {
+                name = "aiid_tag",
+                type = refBy(StringType)
+            }, Field {
+                name = "aimip_id_tag",
+                type = refBy(StringType)
+            }, Field {
+                name = "aireader",
+                type = refBy(StringType)
+            }, Field {
+                name = "airaw_signal_clock",
+                type = refBy(StringType),
+                optional = true
+            }, Field {
+                name = "airaw_signal_data1",
+                type = refBy(StringType),
+                optional = true
+            }, Field {
+                name = "airaw_signal_data2",
+                type = refBy(StringType),
+                optional = true
+            }
+        }
+    };
+
+    RecordType PlcOutput = {
+        name = "PlcOutput",
+        //path = "Objects/PLCnext/Arp.Plc.Eclr/RobInstance01/",
+        fields = {
+            Field {
+                name = "HW_Btn0",
+                type = refBy(BooleanType),
+                cachingTime = CACHE_NONE 
+            }, Field {
+                name = "HW_Btn1",
+                type = refBy(BooleanType),
+                cachingTime = CACHE_NONE 
+            }, Field {
+                name = "HW_Btn2",
+                type = refBy(BooleanType),
+                cachingTime = CACHE_NONE 
+            }, Field {
+                name = "PC_ReadyForRequest",
+                type = refBy(BooleanType), 
+                cachingTime = CACHE_NONE
+            }, Field {
+                name = "UR_BusyOperating",
+                type = refBy(BooleanType),
+                cachingTime = CACHE_NONE
+            }, Field {
+                name = "PC_RobotBusyOperatingAddInfo",
+                type = refBy(ShortType),
+                optional = true, // yet not there
+                cachingTime = CACHE_NONE
+            }, Field {
+                name = "SafetyOk",
+                type = refBy(BooleanType),
+                optional = true, // during transition to EMO'23
+                cachingTime = CACHE_NONE
+            }, Field {
+                name = "UR_InSafePosition",
+                type = refBy(BooleanType),
+                optional = true, // during transition to EMO'23
+                cachingTime = CACHE_NONE
+            }
+        }
+    };
+
+    RecordType PlcInput = {
+        name = "PlcInput",
+        //path = "Objects/PLCnext/Arp.Plc.Eclr/RobInstance01/",
+        fields = {
+            Field {
+                name = "PC_Command01",
+                type = refBy(Integer16Type)
+            }, Field {
+                name = "PC_Quit",
+                type = refBy(BooleanType)
+            }, Field { // must be last
+                name = "PC_StartOperation",
+                type = refBy(BooleanType)
+            }
+        }
+    };
+
+    RecordType MdzhOutput = { 
+        name = "MdzhOutput",
+        //path = "ProductData/",
+        fields = {
+            Field {
+                name = "ProductId",
+                type = refBy(StringType),
+                cachingTime = CACHE_NONE
+            }, Field {
+                name = "HardwareRevision",
+                type = refBy(StringType),
+                cachingTime = CACHE_NONE
+            }, Field {
+                name = "Windows",
+                type = refBy(IntegerType),
+                cachingTime = CACHE_NONE
+            }, Field {
+                name = "TiresColor",
+                type = refBy(StringType),
+                cachingTime = CACHE_NONE
+            }, Field {
+                name = "Pattern",
+                type = refBy(BooleanType),
+                cachingTime = CACHE_NONE
+            }, Field {
+                name = "EngravingText",
+                type = refBy(StringType),
+                cachingTime = CACHE_NONE
+            }, Field {
+                name = "Thickness",
+                type = refBy(StringType),
+                cachingTime = CACHE_NONE
+            }, Field {
+                name = "Weight",
+                type = refBy(StringType),
+                cachingTime = CACHE_NONE
+            }, Field {
+                name = "Length",
+                type = refBy(StringType),
+                cachingTime = CACHE_NONE
+            }, Field {
+                name = "Diagnosis",
+                type = refBy(StringType),
+                cachingTime = CACHE_NONE
+            }
+        }
+    };
+
+    RecordType MdzhInput = {
+        name = "MdzhInput",
+        fields = {
+            // we do not write anything to MDZH
+        }
+    };
+
+    RecordType ImageInput = {
+        name = "ImageInput",
+        fields = {
+            Field {
+                name = "image",
+                type = refBy(StringBase64Type)
+            }, Field {
+                name = "imageUri",
+                type = refBy(StringType)
+            }, Field {
+                name = "side",
+                type = refBy(StringType)
+            }, Field {
+                name = "robotId",
+                type = refBy(IntegerType)
+            }
+        }
+    };
+
+    RecordType AiResult = {
+        name = "AiResult",
+        fields = {
+            Field {
+                name = "error",
+                type = refBy(StringArrayType),
+                description = "Error class names (TBD)."
+            }, Field {
+                name = "errorConfidence",
+                type = refBy(DoubleArrayType),
+                description = "Confidence values (0;1) for error classes in errors."
+            }, Field {
+                name = "imageUri",
+                type = refBy(StringType)
+            }, Field {
+                name = "robotId",
+                type = refBy(IntegerType)
+            }, Field {
+                name = "aiId",
+                type = refBy(StringType),
+                description = "Unique id of AI (e.g., static, flower)."
+            }, Field {
+                name = "modelId",
+                type = refBy(StringType),
+                description = "Active AI model id."
+            }
+        }
+    };
+
+    RecordType DecisionResult = {
+        name = "DecisionResult",
+        fields = {
+            Field {
+                name = "io",
+                type = refBy(BooleanType)
+            }, Field {
+                name = "ioReason", // 0 = io, 1 = errors over thresholds found
+                type = refBy(IntegerType)
+            }, Field {
+                name = "error",
+                type = refBy(StringArrayType),
+                description = "Error class names (TBD)."
+            }, Field {
+                name = "errorConfidence",
+                type = refBy(DoubleArrayType),
+                description = "Confidence values (0;1) for error classes in errors."
+            }, Field {
+                name = "img1Error",
+                type = refBy(StringArrayType),
+                description = "Error class names for image 1 (TBD)."
+            }, Field {
+                name = "img2Error",
+                type = refBy(StringArrayType),
+                description = "Error class names for image 2 (TBD)."
+            }, Field {
+                name = "img3Error",
+                type = refBy(StringArrayType),
+                description = "Error class names for image 3 (TBD)."
+            }, Field {
+                name = "imageUri",
+                type = refBy(StringArrayType)
+            }, Field {
+                name = "robotId",
+                type = refBy(IntegerType)
+            }, Field {
+                name = "aiId",
+                type = refBy(StringType),
+                description = "Unique id of AI (Lenze, ISMLL, RapidMiner)."
+            }, Field {
+                name = "modelId",
+                type = refBy(StringType),
+                description = "Active AI model id."
+            }
+        }
+    };
+   
+    RecordType Command = {
+        name = "Command",
+        fields = {
+            Field {
+                name = "command",
+                type = refBy(StringType)
+            }, Field {
+                name = "stringParam",
+                type = refBy(StringType)
+            }
+        }
+    };
+
+    RecordType BeckhoffInput = {
+        name = "BeckhoffInput",
+        //path = "Objects/PLC1/GVL_OPCIMG_1/",
+        fields = {
+            Field {
+                name = "iPicScene",
+                type = refBy(ShortType),
+                cachingTime = CACHE_NONE,
+                optional = true
+            }, Field { // must be last
+                name = "bPicTrigger",
+                type = refBy(BooleanType),
+                cachingTime = CACHE_NONE,
+                optional = true
+            }
+        }
+    };
+
+    RecordType BeckhoffOutput = {
+        name = "BeckhoffOutput",
+        //path = "Objects/PLC1/GVL_OPCIMG_1/",
+        fields = {
+            Field {
+                name = "iPicCounter",
+                type = refBy(ShortType),
+                cachingTime = CACHE_NONE
+            }, Field {
+                name = "iPicScene",
+                type = refBy(ShortType),
+                cachingTime = CACHE_NONE
+            }, Field {
+                name = "bPicTrigger",
+                type = refBy(BooleanType),
+                cachingTime = CACHE_NONE 
+            }
+        }
+    };
+
+    RecordType Dummy = {
+        name = "Dummy",
+        fields = {
+        }
+    };
+    
+    // ---------------------------- drive --------------------------------------
+    
+    RecordType LenzeDriveMeasurement = {
+        name = "LenzeDriveMeasurement",
+        fields = {
+            Field {
+                name = "PROCESS",
+                type = refBy(LenzeDriveMeasurementProcess),
+                nullable = true // app trace -> stream
+            }
+        }
+    };
+
+    RecordType LenzeDriveMeasurementProcess = {
+        name = "LenzeDriveMeasurementProcess",
+        fields = {
+            Field {
+                name = "channelcount",
+                type = refBy(IntegerType),
+                description = "number of channels in following array"
+            }, Field {
+                name = "channels",
+                type = refBy(LenzeDriveMeasurementChannelArrayType),
+                description = "measurements of process factor, one per channel",
+                nullable = true // app trace -> stream
+            }
+        }
+    };
+    
+    ArrayType LenzeDriveMeasurementChannelArrayType = {
+        name = "LenzeDriveMeasurementChannel[]",
+        type = refBy(LenzeDriveMeasurementChannel)
+    }; 
+    
+    RecordType LenzeDriveMeasurementChannel = {
+        name = "LenzeDriveMeasurementChannel",
+        fields = {
+            Field {
+                name = "channelNo",
+                type = refBy(IntegerType)
+            }, Field {
+                name = "timestamp",
+                type = refBy(StringType), // preliminary
+                description = "recording point in time"
+            }, Field {
+                name = "timebase",
+                type = refBy(DoubleType),
+                description = "not relevant"
+            }, Field {
+                name = "samplerate",
+                type = refBy(DoubleType),
+                description = "sample rate in (fraction of) seconds, time period between two measurements"
+            }, Field {
+                name = "connection",
+                type = refBy(StringType),
+                description = "unique ID, IP address of source (converter)" 
+            }, Field {
+                name = "ParameterID",
+                type = refBy(StringType),
+                description = "unique naming of recorded state variable for this channel"
+            }, Field {
+                name = "name",
+                type = refBy(StringType),
+                description = "name of the parameter"
+            }, Field {
+                name = "unit",
+                type = refBy(StringType),
+                description = "unit of recorded data"
+            }, Field {
+                name = "data",
+                //type = refBy(DoubleArrayType),
+                type = refBy(StringType), // seems to be written as String
+                description = "array of measurements, time axis can be calculated via sample rate"
+            }
+        }
+    };
+    
+    RecordType PlcEnergyIn = {
+        name = "PlcEnergyIn",
+        fields = {
+        }
+    };
+    
+    RecordType PlcEnergyMeasurement = {
+        name = "PlcEnergyMeasurement",
+        fields = {
+            Field {
+                name = "value",
+                type = refBy(StringType)
+            }, Field {
+                name = "timestamp",
+                type = refBy(IEC61131_3DateTimeType)
+            }, Field {
+                name = "channel",
+                type = refBy(StringType),
+                optional = true // must be optional as added by connector
+            }
+        }
+    };
+
+    RecordType PlcEnergyMeasurementJson = {
+        name = "PlcEnergyMeasurementJson",
+        fields = {
+            Field {
+                name = "DataPoints",
+                type = refBy(PlcEnergyMeasurementDatapointsJson)
+            }
+        }
+    };
+
+    RecordType PlcEnergyMeasurementDatapointsJson = {
+        name = "PlcEnergyMeasurementDatapointsJson",
+        fields = {
+            Field {
+                name = "Timestamp",
+                type = refBy(IEC61131_3DateTimeType)
+            }, Field {
+                name = "Device",
+                type = refBy(StringType)
+            }, Field {
+                name = "ListOfDataPoints",
+                type = refBy(PlcEnergyMeasurementListOfDataPointsArrayTypeJson)
+            }
+        }
+    };
+
+    ArrayType PlcEnergyMeasurementListOfDataPointsArrayTypeJson = {
+        name = "PlcEnergyMeasurementListOfDataPointJson[]",
+        type = refBy(PlcEnergyMeasurementListOfDataPointJson)
+    }; 
+
+
+    RecordType PlcEnergyMeasurementListOfDataPointJson = {
+        name = "PlcEnergyMeasurementListOfDataPointJson",
+        fields = {
+            Field {
+                name = "Datapoint",
+                type = refBy(StringType)
+            }, Field {
+                name = "Value",
+                type = refBy(StringType)
+            }, Field {
+                name = "Unit",
+                type = refBy(StringType)
+            }, Field {
+                name = "DataType",
+                type = refBy(StringType)
+            }
+        }
+    };
+    
+    RecordType AggregatedPlcEnergyMeasurement = {
+        name = "AggregatedPlcEnergyMeasurement",
+        fields = {
+            Field {
+                name = "channels",
+                type = refBy(PlcEnergyMeasurementChannelArrayType)
+            }
+        }
+    };
+
+    ArrayType PlcEnergyMeasurementChannelArrayType = {
+        name = "PlcEnergyMeasurementChannel[]",
+        type = refBy(PlcEnergyMeasurementChannel)
+    }; 
+    
+    RecordType PlcEnergyMeasurementChannel = {
+        name = "PlcEnergyMeasurementChannel",
+        fields = {
+            Field {
+                name = "values",
+                type = refBy(DoubleArrayType)
+            }, Field {
+                name = "timestamp",
+                type = refBy(IEC61131_3DateTimeType)
+            }, Field {
+                name = "channel",
+                type = refBy(StringType)
+            }, Field {
+                name = "samplerate",
+                type = refBy(DoubleType),
+                description = "sample rate in (fraction of) seconds, time period between two measurements"
+            }
+        }
+    };
+    
+    RecordType DriveAiResult = {
+        name = "DriveAiResult",
+        fields = {
+            Field {
+                name = "io",
+                type = refBy(BooleanType),
+                description = "Overall result: Is drive run ok or not."
+            }, Field {
+                name = "error",
+                type = refBy(StringArrayType),
+                description = "Error class names (TBD)."
+            }, Field {
+                name = "errorConfidence",
+                type = refBy(DoubleArrayType),
+                description = "Confidence values (0;1) for error classes in errors."
+            }, Field {
+                name = "aiId",
+                type = refBy(StringType),
+                description = "Unique id of AI (Lenze, ISMLL, RapidMiner)."
+            }, Field {
+                name = "energy",
+                type = refBy(AggregatedPlcEnergyMeasurement),
+                description = "Pass through input of energy data for UI/visu.",
+                nullable = true // app trace -> stream
+            }, Field {
+                name = "drive",
+                type = refBy(LenzeDriveMeasurement),
+                description = "Pass through input of drive data for UI/visu.",
+                nullable = true // app trace -> stream
+            }
+        }
+    };
+    
+    RecordType DriveBeckhoffOutput = {
+        name = "DriveBeckhoffOutput",
+        fields = {
+            Field {
+                name = "bWaitForCommand",
+                type = refBy(BooleanType),
+                cachingTime = CACHE_NONE,
+                description = "Combination of Enabled, waiting for command."
+            }, Field {
+                name = "iFriction_actual",
+                type = refBy(Integer16Type),
+                cachingTime = CACHE_NONE,
+                readOnly = true,
+                description = "Actual friction incident (read-only)"
+            }, Field {
+                name = "iTension_actual",
+                type = refBy(Integer16Type),
+                cachingTime = CACHE_NONE,
+                readOnly = true, // TODO readonly not working
+                description = "Actual tension incident (read-only)"
+            }, Field {
+                name = "Error",
+                type = refBy(BooleanType),
+                cachingTime = CACHE_NONE,
+                description = "Becomes true in case of an error. See ErrorID."
+            }, Field {
+                name = "ErrorID",
+                type = refBy(UnsignedInteger32Type),
+                cachingTime = CACHE_NONE,
+                description = "If error is true, returns an error identification code."
+            }, Field {
+                name = "rPosition_actual",
+                type = refBy(DoubleType),
+                cachingTime = CACHE_NONE,
+                description = "Actual position in mm +/- 1mm, may be negative although 0"
+            }, Field {
+                name = "sAxisMessage",
+                type = refBy(StringType),
+                cachingTime = CACHE_NONE,
+                description = "Status message from drive"
+            }
+        }
+    };
+
+    RecordType DriveCommand = {
+        name = "DriveCommand",
+        fields = {
+            Field {
+                name = "iFriction_set",
+                type = refBy(Integer16Type),
+                description = "Desired friction incident in percentage, 0 is normal"
+            }, Field {
+                name = "iTension_set",
+                type = refBy(Integer16Type),
+                description = "Desired tension incident in percentage, 100 is normal"
+            }, Field {
+                name = "rPosition",
+                type = refBy(DoubleType),
+                description = "Target position in mm"
+            }, Field {
+                name = "rVelocity",
+                type = refBy(DoubleType),
+                description = "Movement velocity position in mm/min, always 100"
+            }, Field { // must be last
+                name = "bExecute",
+                type = refBy(BooleanType)
+            }  
+        }
+    };
+    
+    freeze {
+        .;
+    }
+}
