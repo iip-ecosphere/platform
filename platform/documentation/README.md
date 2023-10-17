@@ -8,6 +8,7 @@ This folder contains the documentation of the IIP-Ecosphere platform.
 * [Guideline for platform installation under Linux](../documentation/Platform_Installation_Guide_for_Linux.pdf)
 
 ## Technical Guidelines
+* Please note that several python models exceed the permitted file size of github, thus, [GIT Large File Support](https://git-lfs.com/) is required.
 * There is an overall **architecture** and a **platform handbook** in the IIP-Ecosphere ownCloud. Please consult the architecture first to understand how existing and new parts are related.
 * Please consider the [guideline on how to open the code projects and setup the environment](../documentation/Guideline.pdf?raw=true).
 * Please note that special characters like whitespaces in folder names (in particular on Windows) may cause the installation, platform installation or examples to fail.  

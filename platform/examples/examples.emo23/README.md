@@ -22,6 +22,8 @@ This example consists of the
 - IVML model `src/test/easy` (in testing/mocking mode for regression tests, container generation is switched off, see `AllConstants.ivml`)
 - Documentation and deployment plans: `docs`. There, you can find a picture of the physical setup, a wiring diagram as well as a service interconnection diagram in [Overview.pdf](docs/Overview.pptx). Deployment plans need adjustments to your physical setup.
 
+Please note that several python models exceed the permitted file size of github, thus, [GIT Large File Support](https://git-lfs.com/) is required.
+
 ## Building
 
 Running the applications on **Windows** may fail as Tensorflow lite may fail if there is no adequate version of Tensorflow lite for Windows. For all Maven executions, please use **Java 11 or 13, Maven 3.6.3 or 3.8.5, Python 3.9. Maven commands may run into trouble under Windows Powershell. Generation does not run, e.g., on JDK 17. Please ensure that all Python prerequisites (see ``AllServices.ivml``) are installed, otherwise tests may fail.

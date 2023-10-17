@@ -75,6 +75,8 @@ We've heard about strange problems on Mac OS. So far, we do not have enough info
 
 To ease the first steps, we provided Demonstration and Development Docker Containers on [Docker Hub](https://hub.docker.com/r/iipecosphere/platform).
 
+Please note that several python models exceed the permitted file size of github, thus, [GIT Large File Support](https://git-lfs.com/) is required.
+
 ## Powered by (selection of used tools/frameworks)
 
 <a href="https://www.eclipse.org/basyx"><img src="https://www.eclipse.org/basyx/img/basyxlogo.png" alt="BaSyx" width="200"/></a> 
