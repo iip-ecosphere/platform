@@ -1,0 +1,146 @@
+cars:
+  - id: 4039
+    length: 78 mm
+    thickness: 24.4 mm
+    weight: 115 g
+    hardwareRevision: MobileFabrik_v0.1
+    diagnosis: scatter
+    windows: 0
+    tiresColor: none
+    pattern: false
+    engravingText: ""
+    manufacturerLogo: "https://digitalzentrum-hannover.de/wp-content/uploads/2021/07/MD_zentrum_hannover_schutzzone_RGB.svg"
+    productImage: "http://aas.ifw.uni-hannover.de:8080/aas/mdzh_31r.png"
+  - id: 2011
+    length: 78 mm
+    thickness: 24.7 mm
+    weight: 112 g
+    hardwareRevision: MobileFabrik_v0.1
+    diagnosis: ok
+    windows: 0
+    tiresColor: none
+    pattern: false
+    engravingText: ""
+    manufacturerLogo: "https://digitalzentrum-hannover.de/wp-content/uploads/2021/07/MD_zentrum_hannover_schutzzone_RGB.svg"
+    productImage: "http://aas.ifw.uni-hannover.de:8080/aas/mdzh_31r.png"
+  - id: 3032
+    length: 78.1 mm
+    thickness: 24.6 mm
+    weight: 111 g
+    hardwareRevision: MobileFabrik_v0.1
+    diagnosis: scatter
+    windows: 0
+    tiresColor: none
+    pattern: false
+    engravingText: ""
+    manufacturerLogo: "https://digitalzentrum-hannover.de/wp-content/uploads/2021/07/MD_zentrum_hannover_schutzzone_RGB.svg"
+    productImage: "http://aas.ifw.uni-hannover.de:8080/aas/mdzh_31r.png"
+  - id: 5012
+    length: 78.2 mm
+    thickness: 23.9 mm
+    weight: 109 g
+    hardwareRevision: MobileFabrik_v0.1
+    diagnosis: scatter
+    windows: 0
+    tiresColor: none
+    pattern: false
+    engravingText: ""
+    manufacturerLogo: "https://digitalzentrum-hannover.de/wp-content/uploads/2021/07/MD_zentrum_hannover_schutzzone_RGB.svg"
+    productImage: "http://aas.ifw.uni-hannover.de:8080/aas/mdzh_31r.png"
+  - id: 4008
+    length: 77.8 mm
+    thickness: 24.2 mm
+    weight: 113 g
+    hardwareRevision: MobileFabrik_v0.1
+    diagnosis: scratch
+    windows: 0
+    tiresColor: none
+    pattern: false
+    engravingText: ""
+    manufacturerLogo: "https://digitalzentrum-hannover.de/wp-content/uploads/2021/07/MD_zentrum_hannover_schutzzone_RGB.svg"
+    productImage: "http://aas.ifw.uni-hannover.de:8080/aas/mdzh_31r.png"
+  - id: 4015
+    length: 78.1 mm
+    thickness: 24.3 mm
+    weight: 112 g
+    hardwareRevision: MobileFabrik_v0.1
+    diagnosis: scratch
+    windows: 0
+    tiresColor: none
+    pattern: false
+    engravingText: ""
+    manufacturerLogo: "https://digitalzentrum-hannover.de/wp-content/uploads/2021/07/MD_zentrum_hannover_schutzzone_RGB.svg"
+    productImage: "http://aas.ifw.uni-hannover.de:8080/aas/mdzh_31r.png"
+  - id: 2028
+    length: 78 mm
+    thickness: 24.5 mm
+    weight: 111 g
+    hardwareRevision: MobileFabrik_v0.1
+    diagnosis: scatter
+    windows: 0
+    tiresColor: none
+    pattern: false
+    engravingText: ""
+    manufacturerLogo: "https://digitalzentrum-hannover.de/wp-content/uploads/2021/07/MD_zentrum_hannover_schutzzone_RGB.svg"
+    productImage: "http://aas.ifw.uni-hannover.de:8080/aas/mdzh_31r.png"
+  - id: 3025
+    length: 78.1 mm
+    thickness: 24.4 mm
+    weight: 110 g
+    hardwareRevision: MobileFabrik_v0.1
+    diagnosis: ok
+    windows: 2
+    tiresColor: green
+    pattern: true
+    engravingText: "mitunsdigital Mobile Fabrik"
+    manufacturerLogo: "https://digitalzentrum-hannover.de/wp-content/uploads/2021/07/MD_zentrum_hannover_schutzzone_RGB.svg"
+    productImage: "http://aas.ifw.uni-hannover.de:8080/aas/mdzh_31r.png"
+  - id: 2035
+    length: 79.0 mm
+    thickness: 24.4 mm
+    weight: 110 g
+    hardwareRevision: MobileFabrik_v0.1
+    diagnosis: scratch
+    windows: 0
+    tiresColor: none
+    pattern: false
+    engravingText: ""
+    manufacturerLogo: "https://digitalzentrum-hannover.de/wp-content/uploads/2021/07/MD_zentrum_hannover_schutzzone_RGB.svg"
+    productImage: "http://aas.ifw.uni-hannover.de:8080/aas/mdzh_31r.png"
+  - id: 4022
+    length: 77.9 mm
+    thickness: 24.6 mm
+    weight: 112 g
+    hardwareRevision: MobileFabrik_v0.1
+    diagnosis: scatter
+    windows: 0
+    tiresColor: none
+    pattern: false
+    engravingText: ""
+    manufacturerLogo: "https://digitalzentrum-hannover.de/wp-content/uploads/2021/07/MD_zentrum_hannover_schutzzone_RGB.svg"
+    productImage: "http://aas.ifw.uni-hannover.de:8080/aas/mdzh_31r.png"
+  - id: 1007
+    length: 78.2 mm
+    thickness: 24.4 mm
+    weight: 111 g
+    hardwareRevision: MobileFabrik_v0.1
+    diagnosis: scratch
+    windows: 0
+    tiresColor: none
+    pattern: false
+    engravingText: ""
+    manufacturerLogo: "https://digitalzentrum-hannover.de/wp-content/uploads/2021/07/MD_zentrum_hannover_schutzzone_RGB.svg"
+    productImage: "http://aas.ifw.uni-hannover.de:8080/aas/mdzh_31r.png"
+  - id: 1014
+    length: 78.3 mm
+    thickness: 24.2 mm
+    weight: 109 g
+    hardwareRevision: MobileFabrik_v0.1
+    diagnosis: scratch
+    windows: 0
+    tiresColor: none
+    pattern: false
+    engravingText: ""
+    manufacturerLogo: "https://digitalzentrum-hannover.de/wp-content/uploads/2021/07/MD_zentrum_hannover_schutzzone_RGB.svg"
+    productImage: "http://aas.ifw.uni-hannover.de:8080/aas/mdzh_31r.png"
+    

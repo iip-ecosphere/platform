@@ -1,0 +1,23 @@
+cars:
+  - id: 12345
+    length: 78 mm
+    thickness: 24.5 mm
+    weight: 110 g
+    hardwareRevision: MobileFabrik_v0.1
+    windows: 1
+    tiresColor: blue
+    pattern: true
+    engravingText: Asset Administration Shell
+    manufacturerLogo: ifw.png
+    productImage: http://ifw.de/cars/12345.png
+  - id: 12346
+    length: 78 mm
+    thickness: 24.5 mm
+    weight: 110 g
+    hardwareRevision: MobileFabrik_v0.1
+    windows: 1
+    tiresColor: blue
+    pattern: true
+    engravingText: Asset Administration Shell
+    manufacturerLogo: ifw.png
+    productImage:

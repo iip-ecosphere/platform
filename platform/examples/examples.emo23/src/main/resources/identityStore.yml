@@ -1,0 +1,29 @@
+name: HM'22
+identities:
+    "amqp": 
+        type: USERNAME
+        userName: user
+        tokenData: pwd
+        tokenEncryptionAlgorithm: UTF-8
+    "edgeOpc:4840": 
+        type: USERNAME
+        userName: Visu
+        tokenData: iip-ecosphere
+        tokenEncryptionAlgorithm: UTF-8
+    "beckhoffOpc:4840": 
+        type: USERNAME
+        userName: Administrator
+        tokenData: iipproki
+        tokenEncryptionAlgorithm: UTF-8
+    "edgeOpc:keystore":
+        type: USERNAME
+        userName: 
+        tokenData: 123456
+        tokenEncryptionAlgorithm: UTF-8
+        file: k2.jks
+    "onlogic:1883": 
+        type: USERNAME
+        userName: user
+        tokenData: user
+        tokenEncryptionAlgorithm: UTF-8
+        
