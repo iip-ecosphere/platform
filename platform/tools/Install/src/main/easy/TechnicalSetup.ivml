@@ -30,6 +30,7 @@ project TechnicalSetup {
         // default netmask is empty, not selecting any network in case of multiple IP addresses
     };
     aasProtocol = AasProtocolVabTcp{};
+    aasAccessControlAllowOrigin = "*";
     
     // ------------------ transport --------------------------
     
@@ -101,6 +102,7 @@ project TechnicalSetup {
         aasImplServer;
         aasPersistency;
         aasProtocol;
+        aasAccessControlAllowOrigin;
         serializer;
         transportProtocol;
         serviceManager;
