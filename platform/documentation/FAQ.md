@@ -156,3 +156,19 @@ If there is already a repositories section, please add the contents for the “S
 *Reason:* When you are deploying an application to a generated container, this symptom shall not occur if all Python services have their required dependencies declared in the configuration model. When deploying an application on a bare operating system, the platform will not touch the installation, i.e., you are responsible for installing the respective packages. Depending on the installation of the platform, even a different user may be in charge of executing your application, e.g., the platform is started automatically via systemd (potentially as root) and you are deploying via CLI from user space. In this case, dependencies may be missing although you already have installed them (into a different account).
 
 *Solution:* For containerized applications, please check the declared dependencies in the configuration model for their completeness. For non-containerized applications, please figure out, which account is executing the platform services, in particular the service manager, and complete the installation of missing dependencies for that user or as global dependencies. If multiple Python versions are installed on your target system, you may have to set the environment variable ``IIP_PYTHON`` to the respective Python binary. See also "Considerations for a Permanent or Distributed Installation" in the platform handbook.
+
+
+## How do I upgrade platform/examples/applications
+
+*Symptom:* There is a new version of the platform. How can I upgrade?
+
+*Reason:* The platform changes and we publish a release form time to time. Both, applications and applications need to be re-instantiated so that new dependencies are taken up and potentially changed interfaces can be addressed correctly. In seldom cases, the also application-specific code must be adjusted manually.
+
+*Solution:* The platform version depends on the version in the Maven POMs and the configuration meta model. In following cases, adjustments to the platform configuration may be needed depending on the changes that were applied in the upgrade.
+ 
+  * Platform:  
+    * Grab a new install package, transfer your configuration into that package and run `mvn install`. This will obtain the most recent configuration meta model corresponding to the platform version.
+    * Change the version in the Maven POM of your platform, run `mvn -U install -Dunpack.force=true` in the main folder of your platform installation.
+  * Application: Change the version in the Maven POM of your platform, run `mvn -U install -Dunpack.force=true` in the main folder of the application.
+  * Example: Update the code via git and then run `mvn -U install -Dunpack.force=true` in the main folder of the example.
+    
