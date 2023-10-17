@@ -1,0 +1,14 @@
+[Unit]
+Description=MIP Scanning Software
+
+[Service]
+WorkingDirectory=/home/gpu/mip_reader_bin
+Type=simple
+Restart=on-failure
+KillMode=control-group
+Requires=multi-user.target
+After=multi-user.target
+ExecStart=/usr/bin/bash ./mip_reader.sh
+
+[Install]
+WantedBy=multi-user.target
