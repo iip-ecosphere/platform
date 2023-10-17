@@ -107,6 +107,9 @@ public class AbstractInvokerMojo extends AbstractMojo {
     private boolean disablePython;
 
     @Parameter(defaultValue = "false") 
+    private boolean disablePythonTests;
+
+    @Parameter(defaultValue = "false") 
     private boolean disableBuild;
 
     @Component
@@ -153,6 +156,9 @@ public class AbstractInvokerMojo extends AbstractMojo {
         }
         if (disablePython || disableBuild) {
             sysProperties.put("python-compile.skip", "true");
+            sysProperties.put("python-test.skip", "true");
+        }
+        if (disablePythonTests) {
             sysProperties.put("python-test.skip", "true");
         }
         request.setProperties(sysProperties);
