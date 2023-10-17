@@ -10,14 +10,14 @@ The virtual IIP-Ecosphere Industry 4.0/IIoT platform aims at demonstrating new a
 
 ## News
 
-* Release 0.6.0 (2021/10/11)
+* Release 0.6.0 (2021/10/11, see [release documentation](platform/documentation/RELEASES.md))
 * New name: The IIP-Ecosphere platform becomes [oktoflow](https://oktoflow.de/).
 * [Platform handbook](platform/documentation/PlatformHandbook.pdf) now always at the same URL, including [sources](platform/documentation/src). Comments for clarification are welcome.
 * MIP technologies and NovoAI AVA connector definitions in configuration meta-model.
 * Default library for code based on types or devices defined in the Platform configuration meta-model including code for controlling an MIP sensor.
 * New application example: MIP connector and MIP AI improvement ping-pong
 * Initial Beckhoff ADS integration library for Java.
-* The [platform FAQ](platform/documentation/FAQ.MD) is now in github.
+* The [platform FAQ](platform/documentation/FAQ.md) is now in github.
 * Confirmed compatibility: Phoenix Contact PLCnext (OPC UA, EEM integration), Beckhoff IPC (OPC UA), VDW UMATI (OPC UA), Bitmotec (MQTT), Lenze (MQTT), MIP (MQTT), Beckhoff ADS (Windows) ...
 
 ## Public demonstrations
