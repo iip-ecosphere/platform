@@ -1,5 +1,12 @@
-# IIP-Ecosphere platform FAQ
+# oktoflow/IIP-Ecosphere platform FAQ
 
+## Management UI does not show information
+
+*Symptom:* The management UI does not show information rather than a text about CORS.
+
+*Reason:* The Cross origin resource security (CORS) is not configured correctly. Your browser tries to access the platform AAS (registry and server running on different ports) from the webapp and fails.
+
+*Solution:* Add the variable ``aasAccessControlAllowOrigin`` to your configuration model, usually to ``TechnicalSettings.ivml``. Typical value for this variable is ``"*"``, but you may want to set something more specific here. By default, this variable is currently not set in the configuration meta model, but we added it to the install package in version 0.7.0. Please note that CORS settings are not completely passed to the AAS infrastructure until version 0.6.0, i.e., you need to have version 0.7.0.
 
 ## Error parsing HTTP header
 

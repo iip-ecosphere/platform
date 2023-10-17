@@ -47,7 +47,7 @@ Platform installation, use and concepts are documented in several documents:
   * The IIP-Ecosphere [platform requirements (functional and quality view)](https://doi.org/10.5281/zenodo.4485774)
   * The IIP-Ecosphere [platform usage view](https://doi.org/10.5281/zenodo.4485801)
   * The IIP-Ecosphere [Industry 4.0 platform overview](https://doi.org/10.5281/zenodo.4485756)
-  * For more information, see the IIP-Ecosphere [documentation overview](platform/documentation/README.md)
+  * For more information, see the [documentation overview](platform/documentation/README.md)
 
 ## Publications
 * Holger Eichelberger and Claudia Niederée, [Asset Administration Shells, Configuration, Code
