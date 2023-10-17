@@ -11,7 +11,7 @@ The virtual IIP-Ecosphere Industry 4.0/IIoT platform aims at demonstrating new a
 ## News
 
 * Release 0.6.0 (2021/10/11, see [release documentation](platform/documentation/RELEASES.md))
-* New name: The IIP-Ecosphere platform becomes [oktoflow](https://oktoflow.de/).
+* New name: The IIP-Ecosphere platform becomes [oktoflow](http://oktoflow.de/).
 * [Platform handbook](platform/documentation/PlatformHandbook.pdf) now always at the same URL, including [sources](platform/documentation/src). Comments for clarification are welcome.
 * MIP technologies and NovoAI AVA connector definitions in configuration meta-model.
 * Default library for code based on types or devices defined in the Platform configuration meta-model including code for controlling an MIP sensor.
@@ -39,8 +39,8 @@ For more details on how to develop application-specific services for the IIP-Eco
 ## Documentation
 
 Platform installation, use and concepts are documented in several documents:
-  * The platform [installation guide](platform/documentation/INSTALL.MD).
-  * The platform [FAQ](platform/documentation/FAQ.MD).
+  * The platform [installation guide](platform/documentation/INSTALL.md).
+  * The platform [FAQ](platform/documentation/FAQ.md).
   * The platform [handbook](platform/documentation/PlatformHandbook.pdf) and on [Zenodo](https://doi.org/10.5281/zenodo.8429785)
   * The platform [releases overview](platform/documentation/RELEASES.md)
   * Service development tutorial [YouTube](https://www.youtube.com/playlist?list=PL5VSYtiD_PfdxUDXGlX53UsHdQlXcHYK7) and [IIP-Ecosphere](https://www.iip-ecosphere.de/angebote/plattform/).
