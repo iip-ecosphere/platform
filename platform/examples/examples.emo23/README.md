@@ -4,6 +4,8 @@ Demonstrates an IIP-Ecosphere platform application for assessing the quality of 
  - quality assessment with federated learning. For the HM'23 demo, start two instances of this application through different deployment plans.
  - magnetic identification and drive condition monitoring. For the EMO'23 demo, start one instance of the dederated learning and one instance of the drive/condition monitoring application.
 
+Please note that some python model files exceed the permitted file size of github, thus, [GIT Large File Support](https://git-lfs.com/) is required, see also the (platform readme)[../../documentation/README.md].
+
 ## Project Structure
 
 This example consists of the
