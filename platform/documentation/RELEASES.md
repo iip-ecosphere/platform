@@ -8,6 +8,7 @@ In progress:
 
 New features:
 * [#153](https://github.com/iip-ecosphere/platform/issues/153): MD5 hashes for Python "compilation", offline for mvn install 
+* [#154](https://github.com/iip-ecosphere/platform/issues/154): Application packaging scheme in configuration meta-model 
 
 Improvements:
 * [#115](https://github.com/iip-ecosphere/platform/issues/115): Cleanup, e.g., old build processes. AasUtils is now in support.aas, Version, AbstractSetup, JsonUtils are now in support. Duplicate classes were removed.

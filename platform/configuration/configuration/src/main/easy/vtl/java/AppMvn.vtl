@@ -4,7 +4,7 @@ import JavaMapping;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedServiceTypes, setOf(String) artifacts, setOf(String) bins, setOf(String) assemblies, setOf(String) resources, String starterCls, String appName, String appVersion, String appDescription, Boolean tests, Boolean springPackaging=true, String groupId="", Boolean ifArtifact=false) {
+template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedServiceTypes, setOf(String) artifacts, setOf(String) bins, setOf(String) assemblies, setOf(String) resources, String starterCls, String appName, String appVersion, String appDescription, Boolean tests, Boolean springPackaging=true, String groupId="", Boolean ifArtifact=false, Boolean copyRuntimeDependencies=true) {
 
     def XmlElement appendSpringBootPlugin(XmlElement plugins, String version="2.4.2", String mainClass="") {
         XmlElement plugin = appendPlugin(plugins, "org.springframework.boot", "spring-boot-maven-plugin", version, false);
@@ -20,7 +20,7 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
         }
     }
 
-    def main(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedServiceTypes, setOf(String) artifacts, setOf(String) bins, setOf(String) assemblies, setOf(String) resources, String starterCls, String appName, String appVersion, String appDescription, Boolean tests, Boolean springPackaging=true, String groupId="", Boolean ifArtifact=false) {
+    def main(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedServiceTypes, setOf(String) artifacts, setOf(String) bins, setOf(String) assemblies, setOf(String) resources, String starterCls, String appName, String appVersion, String appDescription, Boolean tests, Boolean springPackaging=true, String groupId="", Boolean ifArtifact=false, Boolean copyRuntimeDependencies=true) {
         String iipGroup = "de.iip-ecosphere.platform";
         String gId = groupId;
         if (length(gId) == 0) {
@@ -145,10 +145,12 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
         appendMavenResourcesCopyResourcesExecution(rExecs, "copy-resources", mavenBuildOutputResourcesDir(), getResourcesFolder()+"/platform", files, id="platf-res");
         appendMavenResourcesCopyResourcesExecution(rExecs, "copy-resources", mavenBuildOutputResourcesDir(), getResourcesFolder()+"/software", files, id="sw-res");
         
-        // prependGroupId as in Spring, fails otherwise with jakarta.el, zip excludes required for now
-        String zipExcludes = "tomcat-catalina, tomcat-coyote, tomcat-util, tomcat-api, tomcat-annotations-api, tomcat-util, tomcat-jaspic-api, tomcat-jni, tomcat-juli, tomcat-servlet-api, tomcat-util, tomcat-util-scan, tomcat-el-api";
-        appendMavenDependencyPluginCopyDepsExecution(execs, jarDir="\\${project.build.directory}/jars", copyOwn=false, 
-            phase="prepare-package", prependGroupId=false, excludeIds=zipExcludes, includeScope="runtime"); 
+        if (copyRuntimeDependencies) {
+            // prependGroupId as in Spring, fails otherwise with jakarta.el, zip excludes required for now
+            String zipExcludes = "tomcat-catalina, tomcat-coyote, tomcat-util, tomcat-api, tomcat-annotations-api, tomcat-util, tomcat-jaspic-api, tomcat-jni, tomcat-juli, tomcat-servlet-api, tomcat-util, tomcat-util-scan, tomcat-el-api";
+            appendMavenDependencyPluginCopyDepsExecution(execs, jarDir="\\${project.build.directory}/jars", copyOwn=false, 
+                phase="prepare-package", prependGroupId=false, excludeIds=zipExcludes, includeScope="runtime");
+        } 
         appendMavenDependencyPluginBuildClasspathExecution(execs, outputFile="\\${project.build.directory}/classes/classpath", 
             prependGroupId=false, prefix="jars", fileSeparator="/", pathSeparator=":", includeScope="runtime"); 
             

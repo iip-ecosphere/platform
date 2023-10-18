@@ -7,8 +7,15 @@ This folder contains the documentation of the IIP-Ecosphere platform.
 * [Guideline for platform installation under Windows](../documentation/Platform_Installation_Guide_for_Windows.pdf)
 * [Guideline for platform installation under Linux](../documentation/Platform_Installation_Guide_for_Linux.pdf)
 
+## Git LFS
+
+* Please note that several Python models exceed the permitted file size of github, thus, [GIT Large File Support](https://git-lfs.com/) is required. We manage ``*.pickle``, ``*.h5``, ``*.tflite`` with LFS. 
+
+  * On the local repository, ``git lfs install`` must be executed. 
+  * For pushing (after a git commit/push), an additional command is needed, e.g. ``git lfs push origin main --all``. If it hangs, restart the command. 
+  * Receiving files requires ``git lfs pull``.
+
 ## Technical Guidelines
-* Please note that several python models exceed the permitted file size of github, thus, [GIT Large File Support](https://git-lfs.com/) is required.
 * There is an overall **architecture** and a **platform handbook** in the IIP-Ecosphere ownCloud. Please consult the architecture first to understand how existing and new parts are related.
 * Please consider the [guideline on how to open the code projects and setup the environment](../documentation/Guideline.pdf?raw=true).
 * Please note that special characters like whitespaces in folder names (in particular on Windows) may cause the installation, platform installation or examples to fail.  

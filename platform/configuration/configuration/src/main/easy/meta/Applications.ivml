@@ -7,6 +7,8 @@ project Applications {
     
     annotate BindingTime bindingTime = BindingTime::compile to .;
 
+    enum AppPackagingSchema {SpringFat, ZipWithClasspath};
+
     compound Application refines VersionedElement {
         Id id;
         NonEmptyNameString name;
@@ -17,9 +19,11 @@ project Applications {
         Boolean createContainer = false;
         Boolean debug = false;
         String cmdArg; // for now, comma separated
-        setOf(refTo(Server)) servers = {}; // additional server instances to be started 
+        setOf(refTo(Server)) servers = {}; // additional server instances to be started
+        setOf(AppPackagingSchema) packaging = { AppPackagingSchema::SpringFat };
         
         Constraint idOk = matches(id, "^[^@]+$");
+        Constraint packagingOk = packaging.size() >= 1;
     }
     
     // deprecated, use mvnVersion from DataTypes instead

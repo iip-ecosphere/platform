@@ -332,6 +332,7 @@ project SerializerConfig1 {
         services = {refBy(myMesh)},
         servers = {refBy(pyServer)},
         debug = true,
+        packaging = {AppPackagingSchema::SpringFat, AppPackagingSchema::ZipWithClasspath}, // default is one, test with two
         nameplateInfo = {
             manufacturerProductDesignation = "IIP-Ecosphere plattform test application@de",
             manufacturer = refBy(manufacturer_sse)}

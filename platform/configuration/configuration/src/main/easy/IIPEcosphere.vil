@@ -160,8 +160,10 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     
                 vilTemplateProcessor("JavaSpringCloudStreamYaml", config, "${resourcesSrc}/application.yml", mappedMesh=mappedMesh, nodes=elements, app=a);
                 vilTemplateProcessor("SpringCloudStreamDeploymentDescriptor", config, "${resourcesSrc}/deployment.yml", app=a, elements=elements);
-                vilTemplateProcessor("JavaSpringCloudStreamAssembly", config, "${assemblySrc}/spring.xml");
-                //assemblies.add("spring|${assemblyRel}/spring.xml|package|${mvnProjectBuildDir}");
+                if (enablesPackaging(a, AppPackagingSchema::ZipWithClasspath)) {
+                    vilTemplateProcessor("JavaSpringCloudStreamAssembly", config, "${assemblySrc}/spring.xml");
+                    assemblies.add("spring|${assemblyRel}/spring.xml|package|${mvnProjectBuildDir}");
+                }
                 vilTemplateProcessor("JavaLogbackXml", config, "${resourcesSrc}/logback.xml");
                 identityStoreJsl(resourcesSrc, cfg);
                 deviceIdProviderJsl(resourcesSrc, cfg);
@@ -175,9 +177,10 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     }
                 }
                 
+                Boolean copyDependencies = enablesPackaging(a, AppPackagingSchema::ZipWithClasspath); // may be more...
                 // partition according to container strategy
                 String appVersion = getAppMvnVersion(a);
-                vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", usedServiceTypes=usedServiceTypes, artifacts=artifacts, bins=bins, assemblies=assemblies, resources=resources, starterCls="iip.Starter", appName=appName, appVersion=appVersion, appDescription=a.description, tests=tests);
+                vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", usedServiceTypes=usedServiceTypes, artifacts=artifacts, bins=bins, assemblies=assemblies, resources=resources, starterCls="iip.Starter", appName=appName, appVersion=appVersion, appDescription=a.description, tests=tests, copyRuntimeDependencies=copyDependencies);
                 vilTemplateProcessor("AppAnt", config, "${appRoot}/build-jk.xml", artifactPrefix=appName, srvFolderName="IIP-apps-${appName}");
                 
                 mvn(appRoot);
@@ -260,6 +263,17 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         if (platformInstantiation) {
             generateAllAppsContainers(config, target, allAppsContainersElements);
         }
+    }
+    
+    // EASy bug, enums not identical in set
+    Boolean enablesPackaging(Application app, AppPackagingSchema packaging) = {
+        Boolean result = false;
+        for (AppPackagingSchema aps : app.packaging) {
+            if (aps == packaging and result == false) {
+                result = true;
+            }
+        }        
+        result;
     }
 
     @DispatchBasis
