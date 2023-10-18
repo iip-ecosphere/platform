@@ -35,7 +35,7 @@ import org.apache.maven.shared.model.fileset.util.FileSetManager;
  */
 @Mojo(name = "test-python", defaultPhase = LifecyclePhase.TEST)
 public class PythonTestMojo extends AbstractMojo {
-
+    
     @Parameter(defaultValue = "${project}", required = true, readonly = true)
     private MavenProject project;
 
@@ -110,14 +110,6 @@ public class PythonTestMojo extends AbstractMojo {
                     new File(baseDir, "/src/test/python/").getAbsolutePath(), false);
             }
     
-            /*
-             * This call just goes through some locations known to contain the python3
-             * executable. i.e. "/usr/bin/python3" not perfect as the last option, the one
-             * most likely for windows, will not return a path to look into the
-             * side-packages! Also only working for as long windows user did not rename
-             * python to something else to potentially run multiple version besides each
-             * other
-             */
             String pythonExecutable = PythonUtils.getPythonExecutable(python).toString();
     
             getLog().info("Using Python " + pythonExecutable);

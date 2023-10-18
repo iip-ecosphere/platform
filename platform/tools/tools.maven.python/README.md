@@ -1,4 +1,4 @@
-# IIP-Ecosphere platform: Python plugins for Maven
+# oktoflow platform: Python plugins for Maven
 
 Maven is the build system for the IIP-Ecosphere platform, in particular also for generated code, applications and generated application templates. However, so far we did not find suitable Maven plugins for Python code. This component provides two plugins, one for Python "compilation" (compile time syntax checking with pyflakes) and for executing Python unit test suites.
 
@@ -36,6 +36,8 @@ The compiler plugin supports the following configuration settings:
   - `failOnError` (default `true`, user property `python-compile.failOnError`): Whether the build process shall fail if Python compile errors are detected.
   - `skip` (default `false`, user property `python-compile.skip`, `maven.test.skip` or `skipTests`) skips the execution of this plugin. 
   - `ignoreText` (default `imported but unused;is assigned to but never used;redefinition of unused`, user property `python-compile.ignoreText`) defines substrings separated by ; that indicate lines of the pyflakes output to not be emitted as result
+  - `useHash` (default `true`, user property `python-compile.useHash`) use hash file to identify whether python files have changed to speed up testing
+  - `hashDir` (default ``, user property `python-compile.hashDir`) use the given directory to store the file (named according to artifact) for ``useHash``.
   - `python.binary` optional absolute path to python binary (may also be given as environment variable `IIP_PYTHON`)
   
 ## Python test plugin

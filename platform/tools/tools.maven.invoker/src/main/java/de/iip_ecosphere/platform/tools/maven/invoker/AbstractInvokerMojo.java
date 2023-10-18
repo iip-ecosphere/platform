@@ -94,23 +94,26 @@ public class AbstractInvokerMojo extends AbstractMojo {
     @Parameter
     private File pom;
     
-    @Parameter(defaultValue = "false")
+    @Parameter(defaultValue = "${session.offline}")
     private boolean offline;
     
     @Parameter(property = "unpack.force", required = false, defaultValue = "false") 
     private boolean unpackForce;
     
-    @Parameter(defaultValue = "false") 
+    @Parameter(property = "disableJava", defaultValue = "false") 
     private boolean disableJava;
 
-    @Parameter(defaultValue = "false") 
+    @Parameter(property = "disablePython", defaultValue = "false") 
     private boolean disablePython;
 
-    @Parameter(defaultValue = "false") 
+    @Parameter(property = "disablePythonTests", defaultValue = "false") 
     private boolean disablePythonTests;
 
-    @Parameter(defaultValue = "false") 
+    @Parameter(property = "disableBuild", defaultValue = "false") 
     private boolean disableBuild;
+
+    @Parameter(property = "python-compile.hashDir", defaultValue = "") 
+    private String pythonCompileHashDir;
 
     @Component
     private Invoker invoker;
@@ -161,12 +164,16 @@ public class AbstractInvokerMojo extends AbstractMojo {
         if (disablePythonTests) {
             sysProperties.put("python-test.skip", "true");
         }
+        String hashDir = pythonCompileHashDir;
+        if (null == hashDir || hashDir.length() == 0) {
+            hashDir = project.getBuild().getDirectory();
+        }
+        sysProperties.put("python-compile.hashDir", hashDir);
         request.setProperties(sysProperties);
         File pomFile = pom;
         if (null == pomFile) {
             pomFile = project.getFile();
         }
-        
         request.setBaseDirectory(pomFile.getParentFile());
         request.setPomFile(pomFile);
         request.setGoals(invokeGoals);
@@ -188,6 +195,9 @@ public class AbstractInvokerMojo extends AbstractMojo {
                 if (result.getExecutionException() != null) {
                     throw new MojoExecutionException( "The Maven invocation failed. "
                         + result.getExecutionException().getMessage());
+                } else if (result.getExitCode() != 0) {
+                    throw new MojoExecutionException( "The Maven invocation failed. Exit code: " 
+                        + result.getExitCode());
                 }
             } catch (MavenInvocationException ex) {
                 getLog().debug("Error invoking Maven: " + ex.getMessage(), ex);
