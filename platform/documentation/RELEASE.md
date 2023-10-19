@@ -1,9 +1,9 @@
-# IIP-Ecosphere platform release guideline
+# oktoflow platform release guideline
 
 For performing a release...
 * Get gnupgp and obtain a public/private keypair.
 * Prepare your maven `settings.xml` so that a server entry for `ossrh-iip` with credentials from the project administration and a profile for `ossrh-iip` pointing to your GPG installation are defined.
-* Download the [`MavenCentral`](../tools/MvnCentral) deployment project from the tools folder in the IIP-Ecosphere github repository.
+* Download the [`MavenCentral`](../tools/MvnCentral) deployment project from the tools folder in the github repository.
     * Check the `pom.xml` so that all relevant top-level components are mentioned.
     * Check the `deploy.bat`.
 * Release/deploy EASy-Producer and change the snapshot versions in the platform to that version

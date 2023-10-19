@@ -1,6 +1,6 @@
-# IIP-Ecosphere platform documentation
+# oktoflow platform documentation
 
-This folder contains the documentation of the IIP-Ecosphere platform.
+This folder contains the documentation of the okotflow platform.
 
 * The platform [handbook](platform/documentation/PlatformHandbook.pdf)
 * [Install information](../documentation/INSTALL.md) for own installation, Docker containers and for playing with pre-packaged containers.
@@ -16,7 +16,7 @@ This folder contains the documentation of the IIP-Ecosphere platform.
   * Receiving files requires ``git lfs pull``.
 
 ## Technical Guidelines
-* There is an overall **architecture** and a **platform handbook** in the IIP-Ecosphere ownCloud. Please consult the architecture first to understand how existing and new parts are related.
+* There is an overall **architecture** described in the (**platform handbook**)[PlatformHandbook.pdf]. Please consult the architecture first to understand how existing and new parts are related.
 * Please consider the [guideline on how to open the code projects and setup the environment](../documentation/Guideline.pdf?raw=true).
 * Please note that special characters like whitespaces in folder names (in particular on Windows) may cause the installation, platform installation or examples to fail.  
 * **Java projects** are created with Eclipse (2020-12-R). Use iipCodeFormatter.xml from ``platformDependencies`` as formatter. Set text editor print margin to 120 characters. For Python development, please install the `PyDev` Eclipse plugin, which is suppored by our generated application templates.
@@ -29,7 +29,7 @@ This folder contains the documentation of the IIP-Ecosphere platform.
 * Building Java parts happens with **Maven** (based on a parent POM, tested with 3.6.3 and 3.8.5). Groups are or start with ``de.iip-ecosphere.platform`` to comply with Maven central deployment. Use basic information from the parent POM as far as possible, e.g., valid URL, description, licenses, developers and SCM section. Redefine parts only if 
   needed except for dependencies - please define explicitly your minimum set of required dependencies (easing later deployment) Use existing test artifacts for reuse and, where possible, build your tests on existing functionality. In some cases, Eclipse shows errors on the parent POM, which cannot be validated with a standalone command line Maven installation. In theses cases, often, a refresh of the Maven information in Eclipse (project context menu, Maven sub-menu), a restart of Eclipse to refresh internal Maven caches or even the execution of a command line Maven on the respective project and a restart of Eclipse may resolve the issue.
 * Specific functional components (with pre-scribed versions in the overall platform dependencies)
-  * For *logging*, we use SLF4J. Typically, lower level dependency such as Spring or BaSyx ship with a respective logging setup, e.g., logback. Thus, individual IIP-Ecosphere projects may only specify a SLF4J implementation dependency for the testing scope but not for the production code.
+  * For *logging*, we use SLF4J. Typically, lower level dependency such as Spring or BaSyx ship with a respective logging setup, e.g., logback. Thus, individual projects of the platform may only specify a SLF4J implementation dependency for the testing scope but not for the production code.
   * For JSON encoding/decoding in the platform code we use jackson (core, preferred data-bind). However, for data processing along service chains, different (faster) libraries may be used. These dependencies are then introduced by the code generation.
 * For new components, please write a **brief documentation** in terms of a ``README.md`` and hook that component appropriately into the parent documentations. Add the new project to the top-level platform POM and to the CentralMaven dependencies for release deployment.
 * For **tests with network**, e.g., communication protocols or AAS servers, please do not rely always on the same ports as subsequent tests may unexpectedly fail. Check the other tests for their port numbers or, better, use free ephemeral ports (see basic support component, ``NetUtils``) instead. Spring-based tests may require a specific initializer to override static configuration settings with dynamic information such as an ephemeral port. See tests in ``transport.spring.*`` for an example.

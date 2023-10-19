@@ -1,4 +1,4 @@
-# oktoflow/IIP-Ecosphere platform FAQ
+# oktoflow platform FAQ
 
 ## Management UI does not show information
 
@@ -23,7 +23,7 @@
 
 *Reason:* Although we carefully check the artifacts before a release, it may be the case that the automatic deployment (script) missed some.
 
-*Solution:* Please let us know about the problem via the IIP-Ecosphere website or via GitHub. 
+*Solution:* Please let us know about the problem via GitHub. 
 
 ## *XXX* has been compiled by a more recent version of the Java Runtime
 
@@ -31,7 +31,7 @@
 
 *Reason:* Maven tends to resolve dependencies to the most recent version using a given version number as minimum, in particular if version ranges are allowed. As long as dependencies do not change or the specified version range is feasible, no such problems shall occur. It may occur upon the first resolution, i.e., during installation or when dependencies are updated, e.g., during Continuous Integration (CI) when Maven is requested to search for more recent snapshots. However, in particular for Eclipse components which declare version ranges, compiler settings currently seem to be changed from JDK 8 to JDK 11, i.e., even a minor version change may suddenly (upon an unintended update) lead to this failure.
 
-*Solution:* As quick fix, use the JDK version indicated by the class version number to execute the respective platform component, i.e., usually JDK 11. Alternatively, you may force Maven to download a compatible, previous version number by creating a simple POM and deleting the failing version. In any case, please let us know about the problem via the IIP-Ecosphere website or via GitHub. We will try to fix the version numbers for central parts such as Eclipse components to a version range that allows for safe execution.
+*Solution:* As quick fix, use the JDK version indicated by the class version number to execute the respective platform component, i.e., usually JDK 11. Alternatively, you may force Maven to download a compatible, previous version number by creating a simple POM and deleting the failing version. In any case, please let us know about the problem via GitHub. We will try to fix the version numbers for central parts such as Eclipse components to a version range that allows for safe execution.
 
 ## Platform code cannot be setup in Eclipse, e.g., parent POM missing
 
@@ -61,7 +61,7 @@
 
 *Symptom:* An app is built correctly but when starting it, a Java CompileError occurs and prevents the app from starting up. The messages indicate that packages are missing that are actually in the app fat jar.
 
-*Reason:* We observed this, if app implementation projects override compile settings defined by the platform dependencies. In more details, when you create a new app implementation project, your IDE initially does not know that you will rely on the IIP-Ecosphere platform dependencies and may sets up the compile settings according to your local IDE compile settings. When inheriting your POM from the platform dependencies to rely on IIP-Ecosphere build setup, the IDE compile settings remain in your POM and in extreme cases may conflict with class files included from the generation. This can lead to a Java CompileError (a kind of class loading link error).
+*Reason:* We observed this, if app implementation projects override compile settings defined by the platform dependencies. In more details, when you create a new app implementation project, your IDE initially does not know that you will rely on the platform dependencies and may sets up the compile settings according to your local IDE compile settings. When inheriting your POM from the platform dependencies to rely on the platform's build setup, the IDE compile settings remain in your POM and in extreme cases may conflict with class files included from the generation. This can lead to a Java CompileError (a kind of class loading link error).
 
 *Solution:* Please remove any local compiler setup from your POM files and run Maven on app implementation and app project again.
 
@@ -82,13 +82,13 @@
 2.	Communication failures as the network communication is not set up correctly, e.g., required ports are already used or not accessible (firewall, not declared as external ports in containers, container is not running in host network mode, etc.)
 3.	Timing issues in particular when services are started (the first time) in a container.
 
-*Solution:* Depending on the actual reason, e.g., failures in service code must be solved or communication failures can be addressed by correct network configuration (including the respective settings in IIP-Ecosphere container descriptors). Timing issues often occur when the waitingTime for the service manager is not set correctly. The default value is 1 minute, but on resource-constrained devices, 2 or 3 minutes may be more adequate.
+*Solution:* Depending on the actual reason, e.g., failures in service code must be solved or communication failures can be addressed by correct network configuration (including the respective settings in container descriptors). Timing issues often occur when the waitingTime for the service manager is not set correctly. The default value is 1 minute, but on resource-constrained devices, 2 or 3 minutes may be more adequate.
 
 ## Why do platform scripts always check for recent dependency snapshots
 
 *Symptom:* When starting platform services/applications or executing build commands, the Maven build process always checks for most recent snapshots. This is time consuming and leads to long console output.
 
-*Reason:* As long as the platform is in development, it is convenient for us to have the most recent snapshot builds available. This is in particular true for the continuous integration. Always checking for the most recent snapshots is only enabled on the IIP-Ecosphere Maven snapshot repository, not for other Maven repositories.
+*Reason:* As long as the platform is in development, it is convenient for us to have the most recent snapshot builds available. This is in particular true for the continuous integration. Always checking for the most recent snapshots is only enabled on the SSE Maven snapshot repository, not for other Maven repositories.
 
 *Solution:* You can disable this behavior allowing Maven, e.g., to check for snapshots only once a day. Go to your local Maven repository (usually in your home directory in the folder ``.m2``) and modify the settings file there. If there is no settings file, you can create a new one as shown below.
 
@@ -127,7 +127,7 @@ If there is already a repositories section, please add the contents for the “S
 
 *Reason:* The build process accidentally defines build steps on the project itself rather than the profiles (usually ``App`` or ``EasyGen``). Although you do not see any build steps, they may be inherited from a parent Maven POM, e.g., the platform dependencies POM.
 
-*Solution:* Disable these build steps on top level. If you rely on the multi-step execution of the IIP-Ecosphere invoker-plugin, then typically placing system properties in the configuration of the respective execution disables the problematic build steps, e.g.,
+*Solution:* Disable these build steps on top level. If you rely on the multi-step execution of the oktoflow invoker-plugin, then typically placing system properties in the configuration of the respective execution disables the problematic build steps, e.g.,
 
       <systemProperties>
        <systemProperty>

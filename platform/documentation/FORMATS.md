@@ -1,8 +1,6 @@
-# IIP-Ecosphere platform: Data formats
+# oktoflow platform: Data formats
 
-This file is supposed to provide a catalogue of various fixed data formats, e.g., setup, descriptors, that the IIP-Ecosphere platform is employing. While the individual formats shall be discussed in/through the README.md of the individual components, this catalog shall provide an easy access through listing the names of the respective formats and giving a hyperlink to the documentation.
-
-**The catalogue is being setup and currently not meant to be complete. Please feel free to add missing entries.**
+This file is supposed to provide a catalogue of various fixed data formats, e.g., setup, descriptors, that the oktoflow platform is employing. While the individual formats shall be discussed in/through the README.md of the individual components, this catalog shall provide an easy access through listing the names of the respective formats and giving a hyperlink to the documentation.
 
 ## Descriptors
 

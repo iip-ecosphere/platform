@@ -1,4 +1,4 @@
-# IIP-Ecosphere platform: Administrative actions
+# oktoflow platform: Administrative actions
 
 This document is intended for maintainers and developers. It is currently not linked from other documents.
 

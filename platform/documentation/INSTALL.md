@@ -1,6 +1,6 @@
-# IIP-Ecosphere platform: Installation
+# oktoflow platform: Installation
 
-This document summarizes how to install and run the IIP-Ecosphere platform. We discuss the usual installation from scratch but also the use of the pre-package example containers on Dockerhub.
+This document summarizes how to install and run the oktoflow platform. We discuss the usual installation from scratch but also the use of the pre-package example containers on Dockerhub.
 
 ## Installation from scratch
 
@@ -38,9 +38,9 @@ The service artifact that is needed to add/start services is available under the
 
 This setup uses port `8883` for the AMQP broker, `9001` for the Platform Asset Administration Shell (AAS) and `9002` for the AAS registry.
 
-We discuss now a simple scenario on how the IIP-Ecosphere platform can be used through the command line interface:
+We discuss now a simple scenario on how the platform can be used through the command line interface:
 
-    IIP-Ecosphere, interactive platform command line
+    oktoflow, interactive platform command line
     AAS server: http://127.0.0.1:9001
     AAS registry: http://127.0.0.1:9002/registry
     Type "help" for help.
