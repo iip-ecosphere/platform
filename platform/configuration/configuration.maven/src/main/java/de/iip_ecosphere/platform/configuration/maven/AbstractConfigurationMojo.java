@@ -319,7 +319,10 @@ public abstract class AbstractConfigurationMojo extends AbstractMojo {
                 if (enableRun(modelDir, outputDir)) {
                     getLog().info("Calling platform instantiator with " + java.util.Arrays.toString(args) + ", tracing "
                         + getTracingLevel() + (null == resourcesDir ? "" : " and resources dir " + resourcesDir));
-                    PlatformInstantiator.mainImpl(args);
+                    int exitCode = PlatformInstantiator.mainImpl(args);
+                    if (exitCode != 0) {
+                        throw new MojoExecutionException("Instantiation failed with exit code: " + exitCode);
+                    }
                 } else {
                     getLog().info("Skipped as code in output directory is newer than IVML model.");
                 }
