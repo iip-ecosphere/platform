@@ -2,16 +2,17 @@
 
 In progress:
 * [#117](https://github.com/iip-ecosphere/platform/issues/117): Multiple service managers per device
-* [#152](https://github.com/iip-ecosphere/platform/issues/152): Provide EMO'23 example
 * [#151](https://github.com/iip-ecosphere/platform/issues/151): UI CORS
 * [#150](https://github.com/iip-ecosphere/platform/issues/150): Connect instantiation process
 
 New features:
 * [#153](https://github.com/iip-ecosphere/platform/issues/153): MD5 hashes for Python "compilation", offline for mvn install 
 * [#154](https://github.com/iip-ecosphere/platform/issues/154): Application packaging scheme in configuration meta-model 
+* [#152](https://github.com/iip-ecosphere/platform/issues/152): EMO'23 example added to repository
 
 Improvements:
 * [#115](https://github.com/iip-ecosphere/platform/issues/115): Cleanup, e.g., old build processes. AasUtils is now in support.aas, Version, AbstractSetup, JsonUtils are now in support. Duplicate classes were removed.
+* Build process terminates immediately on error.
 
 ### Version 0.6.0 (2023/10/11, EMO'23):
 
