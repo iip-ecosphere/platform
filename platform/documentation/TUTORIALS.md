@@ -9,8 +9,10 @@ We prepared several videos on the oktoflow platform, in particular how to design
   <source src="https://www.youtube.com/embed/4P64iwDqqdE" type="video/mp4">
 </video>-->
 
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/4P64iwDqqdE/0.jpg)](https://www.youtube.com/watch?v=4P64iwDqqdE)
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/4P64iwDqqdE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+<!--
+<iframe width="560" height="315" src="https://www.youtube.com/embed/4P64iwDqqdE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>-->
 
 
 <!--
