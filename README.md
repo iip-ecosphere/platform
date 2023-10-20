@@ -10,6 +10,7 @@ The virtual IIP-Ecosphere Industry 4.0/IIoT platform aims at demonstrating new a
 
 ## News
 
+* [Tutorial videos](platform/documentation/TUTORIALS.md) (with platform update information) linked now from github.
 * New application example: [HM'23/EMO'23](platform/examples/examples.emo23/README.md) excluding IPR protected code
 * Release 0.6.0 (2021/10/11, see [release documentation](platform/documentation/RELEASES.md))
 * New name: The IIP-Ecosphere platform becomes [oktoflow](http://oktoflow.de/).
