@@ -136,7 +136,6 @@ public class AbstractInvokerMojo extends AbstractMojo {
         request.setShowVersion(showVersion);
         request.setJavaHome(javaHome);
         request.setMavenHome(mavenHome);
-
         Properties sysProperties = new Properties();
         if (null != systemProperties) {
             for (SystemProperty prop : systemProperties) {
@@ -169,6 +168,7 @@ public class AbstractInvokerMojo extends AbstractMojo {
             hashDir = project.getBuild().getDirectory();
         }
         sysProperties.put("python-compile.hashDir", hashDir);
+        request.addShellEnvironment("PYTHON_COMPILE_HASHDIR", hashDir); // invoker -D not correct?
         request.setProperties(sysProperties);
         File pomFile = pom;
         if (null == pomFile) {

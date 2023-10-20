@@ -251,8 +251,12 @@ public class PythonCompileMojo extends AbstractMojo {
      */
     public File getHashFile() {
         File result = null;
-        if (hashDir != null && hashDir.length() > 0) {
-            result = new File(hashDir, project.getArtifactId() + "-" + MD5_FILE);
+        String dir = hashDir;
+        if (null == dir || dir.length() == 0) {
+            dir = System.getenv("PYTHON_COMPILE_HASHDIR"); // invoker -D not correct?
+        }
+        if (dir != null && dir.length() > 0) {
+            result = new File(dir, project.getArtifactId() + "-" + MD5_FILE);
         }
         if (null == result) {
             result = new File(project.getBuild().getDirectory(), MD5_FILE);
