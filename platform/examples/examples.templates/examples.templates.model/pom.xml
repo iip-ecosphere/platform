@@ -58,13 +58,13 @@
                    <classifier>easy</classifier>
                    <type>zip</type>
                    <overWrite>true</overWrite>
-                   <outputDirectory>${project.basedir}/src/main/easy</outputDirectory>
+                   <outputDirectory>${project.build.directory}/easy</outputDirectory>
                    <destFileName>model.jar</destFileName>
                    <excludes>cfg/*.*</excludes>
                  </artifactItem>
                </artifactItems>
 			    <cleanup>
-                   <directory>${project.basedir}/src/main/easy</directory>
+                   <directory>${project.build.directory}/easy</directory>
                    <includes>
                        <include>cfg</include>
                        <include>files</include>
@@ -107,54 +107,9 @@
           <configuration>
               <model>${iip.model}</model>
               <outputDirectory>gen/py</outputDirectory>
+              <metaModelDirectory>${project.build.directory}/easy</metaModelDirectory>
           </configuration>
       </plugin>
-       <plugin>
-         <groupId>org.codehaus.mojo</groupId>
-         <artifactId>exec-maven-plugin</artifactId>
-         <version>3.0.0</version>
-         <executions>
-              <execution>
-                 <id>generateAppsNoDeps</id>
-                 <configuration>
-                     <mainClass>de.iip_ecosphere.platform.configuration.PlatformInstantiator</mainClass>
-                     <cleanupDaemonThreads>false</cleanupDaemonThreads>
-                     <arguments>
-                         <argument>${iip.model}</argument>
-                         <argument>src/test/easy</argument>
-                         <argument>gen/test</argument>
-                         <argument>generateAppsNoDeps</argument>
-                     </arguments>
-                 </configuration>
-              </execution>
-			  <execution>
-                       <id>generateBroker</id>
-                       <configuration>
-                           <mainClass>de.iip_ecosphere.platform.configuration.PlatformInstantiator</mainClass>
-                           <cleanupDaemonThreads>false</cleanupDaemonThreads>
-                           <arguments>
-                               <argument>${iip.model}</argument>
-                               <argument>src/test/easy</argument>
-                               <argument>gen/broker</argument>
-                               <argument>generateBroker</argument>
-                           </arguments>
-                       </configuration>
-                </execution>
-              <execution>
-                 <id>generateApps</id>
-                 <configuration>
-                     <mainClass>de.iip_ecosphere.platform.configuration.PlatformInstantiator</mainClass>
-                     <cleanupDaemonThreads>false</cleanupDaemonThreads>
-                     <arguments>
-                         <argument>${iip.model}</argument>
-                         <argument>src/test/easy</argument>
-                         <argument>gen/test</argument>
-                         <argument>generateApps</argument>
-                     </arguments>
-                 </configuration>
-              </execution>
-         </executions>
-       </plugin>
     </plugins>
     <pluginManagement>
         <plugins>

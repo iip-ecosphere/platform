@@ -170,12 +170,12 @@
                            <classifier>easy</classifier>
                            <type>zip</type>
                            <overWrite>true</overWrite>
-                           <outputDirectory>${project.basedir}/src/main/easy</outputDirectory>
+                           <outputDirectory>${project.build.directory}/easy</outputDirectory>
                            <destFileName>model.jar</destFileName>
                          </artifactItem>
                        </artifactItems>
                        <cleanup>
-                          <directory>${project.basedir}/src/main/easy</directory>
+                          <directory>${project.build.directory}/easy</directory>
                           <includes>
                              <include>cfg</include>
                              <include>files</include>
@@ -205,6 +205,7 @@
                    <configuration>
                        <model>VDW</model>
                        <outputDirectory>gen/vdw</outputDirectory>
+                       <metaModelDirectory>${project.build.directory}/easy</metaModelDirectory>
                    </configuration>
                </plugin>
             </plugins>
