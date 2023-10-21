@@ -16,6 +16,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -96,7 +97,10 @@ public class AbstractInvokerMojo extends AbstractMojo {
     
     @Parameter(defaultValue = "${session.offline}")
     private boolean offline;
-    
+
+    @Parameter(defaultValue = "${session.request}")
+    private MavenExecutionRequest execRequest;
+
     @Parameter(property = "unpack.force", required = false, defaultValue = "false") 
     private boolean unpackForce;
     
@@ -127,8 +131,12 @@ public class AbstractInvokerMojo extends AbstractMojo {
         enabled = false;
     }
     
-    @Override
-    public void execute() throws MojoExecutionException, MojoFailureException {
+    /**
+     * Creates the actual invocation request.
+     * 
+     * @return the request
+     */
+    private InvocationRequest createInvocationRequest() {
         final InvocationRequest request = new DefaultInvocationRequest();
         request.setBatchMode(true);
         request.setLocalRepositoryDirectory(localRepositoryPath);
@@ -169,6 +177,16 @@ public class AbstractInvokerMojo extends AbstractMojo {
         }
         sysProperties.put("python-compile.hashDir", hashDir);
         request.addShellEnvironment("PYTHON_COMPILE_HASHDIR", hashDir); // invoker -D not correct?
+        request.setGlobalSettingsFile(execRequest.getGlobalSettingsFile());
+        request.setUserSettingsFile(execRequest.getUserSettingsFile());
+        File settings = execRequest.getUserSettingsFile();
+        if (null == settings) {
+            settings = execRequest.getGlobalSettingsFile();
+        }
+        if (null != settings) {
+            request.addShellEnvironment("MAVEN_SETTINGS_PATH", settings.getAbsolutePath());
+            getLog().info("Passing on env setting MAVEN_SETTINGS_PATH=" + settings.getAbsolutePath());
+        }
         request.setProperties(sysProperties);
         File pomFile = pom;
         if (null == pomFile) {
@@ -181,7 +199,13 @@ public class AbstractInvokerMojo extends AbstractMojo {
         request.setOffline(offline);
         request.setMavenExecutable(mavenExecutable);
         request.setTimeoutInSeconds(timeoutInSeconds);
-
+        
+        return request;
+    }
+    
+    @Override
+    public void execute() throws MojoExecutionException, MojoFailureException {
+        final InvocationRequest request = createInvocationRequest();
         if (enabled) {
             try {
                 getLog().info(">>> Maven invoker: Using MAVEN_OPTS: " + request.getMavenOpts());
