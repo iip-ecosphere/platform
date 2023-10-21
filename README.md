@@ -50,7 +50,8 @@ Platform installation, use and concepts are documented in several documents:
 
 ## Publications
 * Holger Eichelberger and Claudia Niederée, [Asset Administration Shells, Configuration, Code
-Generation: A power trio for Industry 4.0 Platforms](https://ieeexplore.ieee.org/document/10275339), ETFA'23
+Generation: A power trio for Industry 4.0 Platforms](https://ieeexplore.ieee.org/document/10275339), 
+IEEE 28th International Conference on Emerging Technologies and Factory Automation (ETFA'23), pp. 1-8, doi: 10.1109/ETFA54631.2023.10275339.
 * Christian Sauer and Holger Eichelberger: Experiences in Collecting Requirements for an AI-enabled Industry 4.0 Platform, GI Fachgruppe Requirements Engineering (to appear in November 2023)
 * Kevin Feichtinger, Kristof Meixner, Felix Rinker, István Koren, Holger Eichelberger, Tonja Heinemann, Jörg Holtmann, Marco Konersmann, Judith Michael, Eva-Maria Neumann, Jérôme Pfeiffer, Rick Rabiser, Matthias Riebisch and Klaus Schmid (2023): [Software in Cyberphysischen Produktionssystemen - Herausforderungen zur Umsetzung in der Industrie](https://ojs.di-verlag.de/index.php/atp_edition/article/view/2646) In: ATP-Magazin, 2023 (4): 62-68. 
 * Holger Eichelberger, Gregory Palmer, Svenja Reimer, Tat Trong Vu, Hieu Do, Sofiane Laridi, Alexander Weber, Claudia Niederée, Thomas Hildebrandt in Thais Batista, Tomás Bures, Claudia Raibulet and Henry Muccini (Hrsg.) (2023): [Developing an AI-Enabled IIoT Platform - Lessons Learned from Early Use Case Validation](https://www.springerprofessional.de/developing-an-ai-enabled-iiot-platform-lessons-learned-from-earl/25802260) In: Software Architecture. ECSA 2022 Tracks and Workshops Bd. 13928. S. 265-283. Springer International Publishing.
