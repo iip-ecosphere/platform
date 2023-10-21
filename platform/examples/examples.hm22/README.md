@@ -14,7 +14,7 @@ This example consists of the
   - Python: `src/main/python/servicesMock`
 - Example-specific assembly descriptors in `src/main/assembly`
 - Custom docker container setup in `src/main/docker`
-- IVML model `src/test/easy` (including the currently separated platform setup)
+- IVML configuration `src/main/easy` (including the currently separated platform setup)
 - Java Testing `src/test/java`
 - Documentation and deployment plans: `docs`. There, you can find a picture of the physical setup, a wiring diagram as well as a service interconnection diagram in [Overview.pdf](docs/Overview.pptx).
 

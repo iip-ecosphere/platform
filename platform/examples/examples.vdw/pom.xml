@@ -206,6 +206,7 @@
                        <model>VDW</model>
                        <outputDirectory>gen/vdw</outputDirectory>
                        <metaModelDirectory>${project.build.directory}/easy</metaModelDirectory>
+                       <modelDirectory>src/main/easy</modelDirectory>
                    </configuration>
                </plugin>
             </plugins>

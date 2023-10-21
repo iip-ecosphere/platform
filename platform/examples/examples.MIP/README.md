@@ -9,7 +9,7 @@ The application consists of two (micro)-services and one MIP MQTT connector, whi
 An explaining overview slide is available [here](docs/Examples_MIP.pdf)
 
 This example consists of several pieces:
-  * An IVML configurations for the application in `src/test/easy/`.
+  * An IVML configurations for the application in `src/main/easy/`.
   * An implementation of the Java services used in the application in `src/main/java`
   * `src/main/python/MipAiPythonService.py` the "AI" service realized in Python. Executing this example requires ***Python installed in your path***. As example, the service states a system dependency to Python 3.9, the minimum required version for the IIP-Ecosphere service environment. No further framework, e.g., numpy or tensorflow is required here (this will be subject to automatic container creation).
   * A Maven assembly descriptor `src/main/assembly/python.xml` for packaging the Python service code into a ZIP (to be deployed, basis for the automated integration).

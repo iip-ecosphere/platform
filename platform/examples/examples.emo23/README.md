@@ -21,7 +21,7 @@ This example consists of the
 - NodeRed, grafana (on Bitmotec/Onlogic): `src/main/grafana`
 - Example-specific assembly descriptors in `src/main/assembly`
 - Java Testing and mocking `src/test/java` including simple programs for connection checking in the package `connectivity`
-- IVML model `src/test/easy` (in testing/mocking mode for regression tests, container generation is switched off, see `AllConstants.ivml`)
+- IVML configuration `src/main/easy` (in testing/mocking mode for regression tests, container generation is switched off, see `AllConstants.ivml`)
 - Documentation and deployment plans: `docs`. There, you can find a picture of the physical setup, a wiring diagram as well as a service interconnection diagram in [Overview.pdf](docs/Overview.pptx). Deployment plans need adjustments to your physical setup.
 
 Please note that several python models exceed the permitted file size of github, thus, [GIT Large File Support](https://git-lfs.com/) is required.

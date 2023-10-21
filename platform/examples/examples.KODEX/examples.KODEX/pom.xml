@@ -168,6 +168,7 @@
                         <model>${iip.model}</model>
                         <outputDirectory>gen/KODEX</outputDirectory>
                         <metaModelDirectory>${project.build.directory}/easy</metaModelDirectory>
+                        <modelDirectory>src/main/easy</modelDirectory>
                     </configuration>
                 </plugin>
             </plugins>

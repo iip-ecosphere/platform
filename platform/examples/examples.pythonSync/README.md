@@ -9,7 +9,7 @@ The application consists of three (micro)-services, which are composed in the co
 The communication in this example happens via MQTT v3. The instantiated broker requires JDK 11.
 
 This example consists of several pieces:
-  * An IVML configuration for the application in `src/test/easy/ExamplePython.ivml`.
+  * An IVML configuration for the application in `src/main/easy/ExamplePython.ivml`.
   * An implementation of the Java services used in the application in `src/main/java`
   * `src/main/python/ExamplePythonService.py` the "AI" service realized in Python. Executing this example requires ***Python installed in your path***. As example, the service states a system dependency to Python 3.9, the minimum required version for the IIP-Ecosphere service environment. No further framework, e.g., numpy or tensorflow is required here (this will be subject to automatic container creation).
   * `src/test/python` contains the IIP-Ecosphere service environment (from Maven, see below).
