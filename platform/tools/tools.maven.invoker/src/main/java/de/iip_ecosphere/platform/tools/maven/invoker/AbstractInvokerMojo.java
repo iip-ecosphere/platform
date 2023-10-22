@@ -119,6 +119,9 @@ public class AbstractInvokerMojo extends AbstractMojo {
     @Parameter(property = "python-compile.hashDir", defaultValue = "") 
     private String pythonCompileHashDir;
 
+    @Parameter(property = "enableJavadoc", defaultValue = "false") 
+    private boolean enableJavadoc;
+    
     @Component
     private Invoker invoker;
     
@@ -155,6 +158,7 @@ public class AbstractInvokerMojo extends AbstractMojo {
                 }
             }
         }
+        sysProperties.put("maven.javadoc.skip", Boolean.valueOf(!enableJavadoc));
         if (unpackForce && !sysProperties.containsKey("unpack.force")) {
             sysProperties.put("unpack.force", "true");
         }

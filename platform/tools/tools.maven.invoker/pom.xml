@@ -58,7 +58,7 @@
 
   <repositories>       
     <repository>
-      <id>SSE</id>
+      <id>SSE-mvn</id> <!-- same ID as in easy-maven-settings.xml -->
       <name>SSE</name>
       <url>https://projects.sse.uni-hildesheim.de/qm/maven/</url>
       <layout>default</layout>
