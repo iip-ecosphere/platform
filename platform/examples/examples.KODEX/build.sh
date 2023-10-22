@@ -7,7 +7,7 @@ rm -rf gen
 
 #build with broker
 
-mvn -U install
+ant -f build-jk.xml
 
 cd ..
 
