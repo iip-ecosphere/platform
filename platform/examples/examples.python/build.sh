@@ -11,6 +11,7 @@ if [ -f ~/easy-maven-settings.xml ]; then
    mavenOpts="-s ~/easy-maven-settings.xml"
 fi
 mvn -U $mavenOpts install -Dunpack.force=true
+#ant -f build-jk.xml
 
 #execute and test
 
