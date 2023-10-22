@@ -6,7 +6,7 @@ rm -rf gen
 
 #build with broker
 
-mvn -U install -Dunpack.force=true
+ant -f build-jk.xml
 
 #execution not possible without MIP sensor or massive mocking
 

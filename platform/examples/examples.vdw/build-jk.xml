@@ -8,5 +8,9 @@
     <!-- intentionally nothing here; shall not be deployed, shall not be tested as unsnure whether VDW server is 
     operational at that point in time; only manual testing so far -->
 	<target name="maven"> 
+        <maven pomFile="pom.xml" goal="install">
+            <arg value="-Dunpack.force=true"/>
+            <arg value="-DskipTests"/>
+        </maven>
 	</target>
 </project>

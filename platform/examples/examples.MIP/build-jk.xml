@@ -7,19 +7,8 @@
 	
     <!-- intentionally no deployment here -->
 	<target name="maven"> 
-        <maven pomFile="pom-model.xml" goal="generate-sources"/>
-        <maven pomFile="pom-model.xml" goal="exec:java">
-            <arg value='-Dexec.args="ExampleMIP src/test/easy gen/py generateAppsNoDeps"'/>
-        </maven>
         <maven pomFile="pom.xml" goal="install">
-            <arg value="-DskipTests"/>
+            <arg value="-Dunpack.force=true"/>
         </maven>
-        <maven pomFile="pom-model.xml" goal="exec:java">
-            <arg value='-Dexec.args="ExampleMIP src/test/easy gen/py generateApps"'/>
-        </maven>        
-        <!-- Runs endless...
-        <maven pomFile="pom.xml" goal="exec:java">
-            <arg value="-DskipTests"/>
-        </maven>-->	
 	</target>
 </project>

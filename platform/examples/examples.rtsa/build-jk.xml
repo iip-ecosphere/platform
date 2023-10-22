@@ -7,21 +7,8 @@
 	
     <!-- intentionally no deployment here -->
 	<target name="maven"> 
-	    <maven pomFile="pom-model.xml" goal="generate-sources"/>
-		<maven pomFile="pom-model.xml" goal="exec:java">
-			<arg value='-Dexec.args="ExampleRTSA src/test/easy gen/rtsa generateAppsNoDeps"'/>
-			<arg value="-Diip.resources=${basedir}/resources"/>
-		</maven>
-		<maven pomFile="pom.xml" goal="install">
-			<arg value="-DskipTests"/>
-	    </maven>
-        <maven pomFile="pom-model.xml" goal="exec:java">
-            <arg value='-Dexec.args="ExampleRTSA src/test/easy gen/rtsa generateApps"'/>
-            <arg value="-Diip.resources=${basedir}/resources"/>
-        </maven>		
-        <!-- Currently runs endless
-        <maven pomFile="pom.xml" goal="exec:java">
-            <arg value="-DskipTests"/>
-        </maven>-->
+        <maven pomFile="pom.xml" goal="install">
+            <arg value="-Dunpack.force=true"/>
+        </maven>
 	</target>
 </project>

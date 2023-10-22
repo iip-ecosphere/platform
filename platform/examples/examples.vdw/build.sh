@@ -6,11 +6,7 @@ rm -rf gen
 
 #build with broker
 
-#mvn -P EasyGen generate-sources
-#mvn -P EasyGen exec:java@generateApps
-#mvn -P App compile
-
-mvn -U install
+ant -f build-jk.xml
 
 #execute and 'test'
 
