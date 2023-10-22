@@ -7,8 +7,8 @@ rm -rf gen
 #build with broker
 
 mavenOpts=""
-if [ -f ~/easy-maven-settings.xml ]; then
-   mavenOpts="-s ~/easy-maven-settings.xml"
+if [ -f $HOME/easy-maven-settings.xml ]; then
+   mavenOpts="-s $HOME/easy-maven-settings.xml"
 fi
 mvn -U $mavenOpts install -Dunpack.force=true
 #ant -f build-jk.xml
