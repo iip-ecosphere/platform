@@ -199,7 +199,7 @@
 
   <repositories>       
     <repository>
-      <id>SSE</id>
+      <id>SSE-mvn</id> <!-- same ID as in easy-maven-settings.xml -->
       <name>SSE</name>
       <url>https://projects.sse.uni-hildesheim.de/qm/maven/</url>
       <layout>default</layout>
@@ -207,6 +207,17 @@
           <updatePolicy>always</updatePolicy>
       </snapshots>
     </repository>
+    
+	<repository>
+	    <id>central</id> <!-- same ID as in easy-maven-settings.xml -->
+	    <url>https://repo1.maven.org/maven2</url>
+	    <releases>
+	        <enabled>true</enabled>
+	    </releases>
+	    <snapshots>
+	        <enabled>false</enabled> <!-- as long as on SSE-mvn -->
+	    </snapshots>
+	</repository>
     
     <repository>
 	    <id>bintray</id>
