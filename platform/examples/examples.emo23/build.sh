@@ -6,7 +6,12 @@ rm -rf gen
 
 #build with broker
 
-mvn -U install -Dunpack.force=true -DdisablePythonTests=true
+mavenOpts=""
+if [ -f $HOME/easy-maven-settings.xml ]; then
+   mavenOpts="-s $HOME/easy-maven-settings.xml"
+fi
+mvn -U $mavenOpts install -Dunpack.force=true -DdisablePythonTests=true
+#ant -f build-jk.xml
 
 #execute and test
 

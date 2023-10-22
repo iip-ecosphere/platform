@@ -9,7 +9,6 @@
 	<target name="maven"> 
         <maven pomFile="pom.xml" goal="install">
             <arg value="-Dunpack.force=true"/>
-            <arg value="-DdisablePythonTests=true"/>
         </maven>
 	</target>
 </project>

@@ -6,7 +6,7 @@ This package binds with `invoke` in life-cycle phase `validate`, with `install` 
 
 The following example demonstrates the application of this plugin. We declare two profiles, `EasyGen` and `Main`. `EasyGen` shall be executed from `Main` (and explicitly via command line). The `Main` profile is declared to be activated by default and uses this plugin to define an execution on the `EasyGen` profile for phase `process-sources`. When executing `mvn`, the `Main` profile will be executed, which in turn executes `EasyGen`. Please be careful to not invoke the profile in which this plugin is declared, which may lead to an endless loop.
 
-This plugin passes through the property `python-compile.hashDir` (also as environment setting ``PYTHON_COMPILE_HASHDIR``) for our Python "compiler" and the global and local Maven settings paths as well as ``MAVEN_SETTINGS_PATH`` either being the local Maven settings path if given or the global.
+This plugin passes through the property `python-compile.hashDir` (also as environment variable ``PYTHON_COMPILE_HASHDIR``) for our Python "compiler" and the environment variable ``MAVEN_SETTINGS_PATH`` or local Maven settings paths as new value of ``MAVEN_SETTINGS_PATH`` (passing through global and local Maven settings path if ``MAVEN_SETTINGS_PATH`` is not given).
 
 
   ```xml

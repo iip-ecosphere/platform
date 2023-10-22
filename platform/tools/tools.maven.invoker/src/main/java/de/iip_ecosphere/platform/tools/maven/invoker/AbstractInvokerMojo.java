@@ -177,15 +177,23 @@ public class AbstractInvokerMojo extends AbstractMojo {
         }
         sysProperties.put("python-compile.hashDir", hashDir);
         request.addShellEnvironment("PYTHON_COMPILE_HASHDIR", hashDir); // invoker -D not correct?
-        request.setGlobalSettingsFile(execRequest.getGlobalSettingsFile());
-        request.setUserSettingsFile(execRequest.getUserSettingsFile());
-        File settings = execRequest.getUserSettingsFile();
+        String settings = System.getenv("MAVEN_SETTINGS_PATH");
         if (null == settings) {
-            settings = execRequest.getGlobalSettingsFile();
+            request.setGlobalSettingsFile(execRequest.getGlobalSettingsFile());
+            request.setUserSettingsFile(execRequest.getUserSettingsFile());
+            File tmp = execRequest.getUserSettingsFile();
+            if (null == settings) {
+                tmp = execRequest.getGlobalSettingsFile();
+            }
+            if (null != tmp) {
+                settings = tmp.getAbsolutePath();
+            }
+        } else {
+            request.setUserSettingsFile(new File(settings));
         }
         if (null != settings) {
-            request.addShellEnvironment("MAVEN_SETTINGS_PATH", settings.getAbsolutePath());
-            getLog().info("Passing on env setting MAVEN_SETTINGS_PATH=" + settings.getAbsolutePath());
+            request.addShellEnvironment("MAVEN_SETTINGS_PATH", settings);
+            getLog().info("Passing on env setting MAVEN_SETTINGS_PATH=" + settings);
         }
         request.setProperties(sysProperties);
         File pomFile = pom;
