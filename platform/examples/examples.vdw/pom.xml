@@ -154,6 +154,12 @@
                    <artifactId>configuration-plugin</artifactId>
                    <version>${project.version}</version>
                    <executions>
+	                   <execution>
+	                      <id>generateAppsNoDeps</id>
+	                      <goals>
+	                          <goal>generateAppsNoDeps</goal>
+	                      </goals>
+	                   </execution>
                        <execution>
                          <id>generateApps</id>
                          <goals>
