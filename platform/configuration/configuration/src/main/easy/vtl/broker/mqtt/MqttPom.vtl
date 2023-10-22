@@ -31,10 +31,13 @@ template MqttPom(IIPEcosphere config, FileArtifact target, String ver) {
       
         <repositories>       
           <repository>
-            <id>SSE</id>
+            <id>SSE-mvn</id> <!-- same ID as in easy-maven-settings.xml -->
             <name>SSE</name>
             <url>https://projects.sse.uni-hildesheim.de/qm/maven/</url>
             <layout>default</layout>
+            <snapshots>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
           </repository>
         
           <repository>
@@ -42,6 +45,7 @@ template MqttPom(IIPEcosphere config, FileArtifact target, String ver) {
             <url>https://jcenter.bintray.com</url>
             <releases>
               <enabled>true</enabled>
+              <updatePolicy>never</updatePolicy>
             </releases>
             <snapshots>
               <enabled>false</enabled>

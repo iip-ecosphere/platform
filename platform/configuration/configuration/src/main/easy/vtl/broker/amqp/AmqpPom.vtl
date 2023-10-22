@@ -29,9 +29,9 @@ template AmqpPom(IIPEcosphere config, FileArtifact target, String ver) {
           </dependency>    
         </dependencies>
       
-        <repositories>       
+        <repositories>
           <repository>
-            <id>SSE</id>
+            <id>SSE-mvn</id>
             <name>SSE</name>
             <url>https://projects.sse.uni-hildesheim.de/qm/maven/</url>
             <layout>default</layout>
@@ -42,6 +42,7 @@ template AmqpPom(IIPEcosphere config, FileArtifact target, String ver) {
             <url>https://jcenter.bintray.com</url>
             <releases>
               <enabled>true</enabled>
+              <updatePolicy>never</updatePolicy>
             </releases>
             <snapshots>
               <enabled>false</enabled>
@@ -53,6 +54,7 @@ template AmqpPom(IIPEcosphere config, FileArtifact target, String ver) {
             <url>https://download.dcache.org/nexus/repository/berkeleydb-je/</url>
             <releases>
               <enabled>true</enabled>
+              <updatePolicy>never</updatePolicy>
             </releases>
             <snapshots>
               <enabled>false</enabled>
