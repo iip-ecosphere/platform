@@ -1,15 +1,20 @@
 #!/bin/bash
 #Explanation see README.MD
 rm -rf gen
+
+mavenOpts=""
+if [ -f $HOME/easy-maven-settings.xml ]; then
+   mavenOpts="-s $HOME/easy-maven-settings.xml"
+fi
 dir=$PWD
 #build until interfaces (obtain model, generateAppsNoDeps)
-mvn -U generate-sources
+mvn -U $mavenOpts generate-sources
 #build/deploy service implementation
 cd ../examples.templates.impl
-mvn install
+mvn $mavenOpts install
 #return and build full application
 cd $dir
-mvn install
+mvn $mavenOpts install -Dunpack.force=true
 
 #execute and test
 
