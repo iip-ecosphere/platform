@@ -19,7 +19,7 @@
   <!-- required for container building on github when release is not already in Mvn central -->  
   <repositories>       
     <repository>
-      <id>SSE</id>
+      <id>SSE-mvn</id> <!-- same ID as in easy-maven-settings.xml -->
       <name>SSE</name>
       <url>https://projects.sse.uni-hildesheim.de/qm/maven/</url>
       <layout>default</layout>
@@ -29,13 +29,28 @@
     </repository>
     
     <repository>
+        <id>central</id> <!-- same ID as in easy-maven-settings.xml -->
+        <url>https://repo1.maven.org/maven2</url>
+        <releases>
+            <enabled>true</enabled>
+            <updatePolicy>never</updatePolicy>
+        </releases>
+        <snapshots>
+            <enabled>false</enabled> <!-- as long as on SSE-mvn -->
+            <updatePolicy>daily</updatePolicy>
+        </snapshots>
+    </repository>
+    
+    <repository>
         <id>bintray</id>
         <url>https://jcenter.bintray.com</url>
         <releases>
-          <enabled>true</enabled>
+            <enabled>true</enabled>
+            <updatePolicy>never</updatePolicy>
         </releases>
         <snapshots>
-          <enabled>false</enabled>
+            <enabled>false</enabled>
+            <updatePolicy>daily</updatePolicy>
         </snapshots>
     </repository>
   </repositories>
@@ -92,13 +107,13 @@
                    <classifier>easy</classifier>
                    <type>zip</type>
                    <overWrite>true</overWrite>
-                   <outputDirectory>${project.basedir}/src/main/easy</outputDirectory>
+                   <outputDirectory>${project.build.directory}/easy</outputDirectory>
                    <destFileName>model.jar</destFileName>
                    <excludes>cfg/*.*</excludes>
                  </artifactItem>
                </artifactItems>
                <cleanup>
-                   <directory>${project.basedir}/src/main/easy</directory>
+                   <directory>${project.build.directory}/easy</directory>
                    <includes>
                        <include>cfg</include>
                        <include>files</include>
@@ -130,6 +145,7 @@
                <model>${iip.model}</model>
                <modelDirectory>${iip.modelDir}</modelDirectory>
                <outputDirectory>${iip.outputDir}</outputDirectory>
+               <metaModelDirectory>${project.build.directory}/easy</metaModelDirectory>
            </configuration>
        </plugin>
     </plugins>
