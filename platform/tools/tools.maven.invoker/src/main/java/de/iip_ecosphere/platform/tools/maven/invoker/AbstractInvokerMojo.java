@@ -119,6 +119,9 @@ public class AbstractInvokerMojo extends AbstractMojo {
     @Parameter(property = "python-compile.hashDir", defaultValue = "") 
     private String pythonCompileHashDir;
 
+    @Parameter(property = "maven.javadoc.skip", defaultValue = "false") 
+    private boolean mavenJavadocSkip;
+
     @Parameter(property = "enableJavadoc", defaultValue = "false") 
     private boolean enableJavadoc;
     
@@ -158,7 +161,7 @@ public class AbstractInvokerMojo extends AbstractMojo {
                 }
             }
         }
-        if (!enableJavadoc) {
+        if (!enableJavadoc || mavenJavadocSkip) {
             request.addShellEnvironment("MAVEN_ARGS", "-Dmaven.javadoc.skip=true"); // pass on 2 mvn levels
             sysProperties.put("maven.javadoc.skip", "true");
         }
