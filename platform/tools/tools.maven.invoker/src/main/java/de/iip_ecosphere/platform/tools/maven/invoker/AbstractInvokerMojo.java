@@ -158,6 +158,9 @@ public class AbstractInvokerMojo extends AbstractMojo {
                 }
             }
         }
+        if (!enableJavadoc) {
+            request.addShellEnvironment("MAVEN_ARGS", "-Dmaven.javadoc.skip=true"); // pass on 2 mvn levels
+        }
         sysProperties.put("maven.javadoc.skip", Boolean.valueOf(!enableJavadoc));
         if (unpackForce && !sysProperties.containsKey("unpack.force")) {
             sysProperties.put("unpack.force", "true");
@@ -180,7 +183,7 @@ public class AbstractInvokerMojo extends AbstractMojo {
             hashDir = project.getBuild().getDirectory();
         }
         sysProperties.put("python-compile.hashDir", hashDir);
-        request.addShellEnvironment("PYTHON_COMPILE_HASHDIR", hashDir); // invoker -D not correct?
+        request.addShellEnvironment("PYTHON_COMPILE_HASHDIR", hashDir); // invoker -D not correct?, pass on 2 mvn levels
         String settings = System.getenv("MAVEN_SETTINGS_PATH");
         if (null == settings) {
             request.setGlobalSettingsFile(execRequest.getGlobalSettingsFile());
