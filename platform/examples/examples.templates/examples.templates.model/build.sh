@@ -8,7 +8,7 @@ if [ -f $HOME/easy-maven-settings.xml ]; then
 fi
 dir=$PWD
 #build until interfaces (obtain model, generateAppsNoDeps)
-mvn -U $mavenOpts generate-sources
+mvn $mavenOpts generate-sources
 #build/deploy service implementation
 cd ../examples.templates.impl
 mvn $mavenOpts install
