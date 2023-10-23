@@ -160,6 +160,7 @@ public class AbstractInvokerMojo extends AbstractMojo {
         }
         if (!enableJavadoc) {
             request.addShellEnvironment("MAVEN_ARGS", "-Dmaven.javadoc.skip=true"); // pass on 2 mvn levels
+            sysProperties.put("maven.javadoc.skip", "true");
         }
         if (unpackForce && !sysProperties.containsKey("unpack.force")) {
             sysProperties.put("unpack.force", "true");
