@@ -4,7 +4,6 @@ In progress:
 * [#117](https://github.com/iip-ecosphere/platform/issues/117): Multiple service managers per device
 * [#151](https://github.com/iip-ecosphere/platform/issues/151): UI CORS
 * [#150](https://github.com/iip-ecosphere/platform/issues/150): Connect instantiation process
-* [#155](https://github.com/iip-ecosphere/platform/issues/155): Align model locations to Maven
 
 New features:
 * [#153](https://github.com/iip-ecosphere/platform/issues/153): MD5 hashes for Python "compilation", offline for mvn install 
@@ -12,6 +11,7 @@ New features:
 * [#152](https://github.com/iip-ecosphere/platform/issues/152): EMO'23 example added to repository
 
 Improvements:
+* [#155](https://github.com/iip-ecosphere/platform/issues/155): Align model locations to Maven
 * [#115](https://github.com/iip-ecosphere/platform/issues/115): Cleanup, e.g., old build processes. AasUtils is now in support.aas, Version, AbstractSetup, JsonUtils are now in support. Duplicate classes were removed.
 * Build process terminates immediately on error.
 
