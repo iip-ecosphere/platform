@@ -199,8 +199,8 @@ public class AbstractInvokerMojo extends AbstractMojo {
         }
         if (null != settings) {
             request.addShellEnvironment("MAVEN_SETTINGS_PATH", settings);
-            getLog().info("Passing on env setting MAVEN_SETTINGS_PATH=" + settings);
         }
+        getLog().info("Passing on env settings " + request.getShellEnvironments());
         request.setProperties(sysProperties);
         File pomFile = pom;
         if (null == pomFile) {
