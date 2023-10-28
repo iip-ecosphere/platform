@@ -241,6 +241,20 @@
                      <attach>true</attach>
                  </configuration>
               </execution>
+             <execution>
+                 <id>easy-test</id>
+                 <phase>package</phase>
+                 <goals>
+                     <goal>single</goal>
+                 </goals>
+                 <configuration>
+                     <descriptors>
+                         <descriptor>src/test/assembly/easy-test.xml</descriptor>
+                     </descriptors>
+                     <outputDirectory>${project.build.directory}</outputDirectory>
+                     <attach>true</attach>
+                 </configuration>
+              </execution>
          </executions>
         </plugin>
 

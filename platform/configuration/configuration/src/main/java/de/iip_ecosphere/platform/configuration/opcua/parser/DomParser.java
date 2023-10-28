@@ -1115,7 +1115,7 @@ public class DomParser {
 
     /**
      * Retrieves the element types and nested attributes via
-     * {@link #retrieveAttributes(Element, ArrayList, ElementType)}.
+     * {@link #retrieveAttributes(Element, ArrayList, ElementType, String)}.
      */
     private void retrieveElementTypes() {
 

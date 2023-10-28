@@ -816,7 +816,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     }
     
     /**
-     * Validates the name of a node and if there is none, sets a pseudo name based on {@link count}.
+     * Validates the name of a node and if there is none, sets a pseudo name based on {@code count}.
      * 
      * @param node the node to validate
      * @param count unique node counter per mesh

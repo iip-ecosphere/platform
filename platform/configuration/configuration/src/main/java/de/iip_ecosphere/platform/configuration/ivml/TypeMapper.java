@@ -67,7 +67,7 @@ class TypeMapper {
      * 
      * @param cfg the configuration to map the declared types for
      * @param variableFilter a variable filter to exclude certain variables/types
-     * @param builder the builder for {@link #META_TYPE_NAME}
+     * @param builder the builder to place AAS elements into
      */
     TypeMapper(Configuration cfg, Predicate<AbstractVariable> variableFilter, 
         SubmodelElementCollectionBuilder builder) {
@@ -135,8 +135,7 @@ class TypeMapper {
     }
 
     /**
-     * Maps a compound type into the SMEC {@value #META_TYPE_NAME}. May be called for duplicates but leads only to
-     * one entry.
+     * Maps a compound type. May be called for duplicates but leads only to one entry.
      * 
      * @param type the compound type
      */
@@ -160,8 +159,7 @@ class TypeMapper {
     }
 
     /**
-     * Maps an IVML type into the SMEC {@value #META_TYPE_NAME}. May be called for duplicates but leads only to
-     * one entry.
+     * Maps an IVML type. May be called for duplicates but leads only to one entry.
      * 
      * @param type the IVML type
      */
@@ -209,7 +207,7 @@ class TypeMapper {
     }
     
     /**
-     * Returns whether {@code typeId} represents a done type (in {@link #doneTypes}). If not, adds {@cpde typeId} 
+     * Returns whether {@code typeId} represents a done type (in {@link #doneTypes}). If not, adds {@code typeId} 
      * to {@link #doneTypes}.
      * 
      * @param typeId the type id to search for
@@ -224,8 +222,7 @@ class TypeMapper {
     }
 
     /**
-     * Maps a derived type into the SMEC {@value #META_TYPE_NAME}. May be called for duplicates but leads only to
-     * one entry.
+     * Maps a derived type. May be called for duplicates but leads only to one entry.
      * 
      * @param type the derived type
      */
