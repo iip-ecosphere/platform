@@ -31,7 +31,7 @@ The setup also may contain a `serviceArtifactStorage`and a `containerImageStorag
 
 The configuration model is written in the languages of EASy-Producer, namely Integrated Variability Modeling Language (IVML), Variability Instantiation Language (VIL) and Variability Template/Asset Language (VTL). EASy-Producer is open source on [github](https://github.com/SSEHUB/EASyProducer), also the most [recent specifications of IVML, VIL and VTL](https://github.com/SSEHUB/EASyProducer/tree/master/doc/web/docPreview). The [configuration model](/src/main/easy) is also explained/documented.
 
-The regression tests are based on IVML models. Some just serve for structural purposes and regression testing within this component. Some are executable and part of the regression tests in [examples](../../examples/README.md). Implementation components stem from [test.configuration.configuration](../../tests/test.configuration.configuration/README.md) with mutual dependencies to this project. For a graphical documentation of the test cases, see [test case slides](src/test/easy/summary.pdf).
+The regression tests are based on IVML models. Some just serve for structural purposes and regression testing within this component. Some are executable and part of the regression tests in [examples](../../examples/README.md). Implementation components stem from [test.configuration.configuration](../../tests/test.configuration.configuration/README.md), which is built through the ANT build file within this project. Tests that involve the components for the [management UI](../../managmementUI) and [platform services](../../platform) are defined here, packaged as test-easy artifact and executed in [examples](../../examples/examples). For a graphical documentation of the test cases, see [test case slides](src/test/easy/summary.pdf).
 
 ## The resources folder
 
@@ -58,4 +58,4 @@ Some of the test models include the RapidMiner RTSA integration. As RTSA is an I
 
 **Hint:** If tests are failing on your side due to a missing Docker installation, you may prevent this by `-Deasy.docker.failOnError=false`.
 
-**For snapshots:** EASy-Producer 1.3.4-SNAPSHOT built on **2023/01/03** or newer is required. Use `mvn -U exec:java ...`
+**For snapshots:** EASy-Producer 1.3.6-SNAPSHOT built on **2023/10/22** or newer is required. Use `mvn -U exec:java ...`

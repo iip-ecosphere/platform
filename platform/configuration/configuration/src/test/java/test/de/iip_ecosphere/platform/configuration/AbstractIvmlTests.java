@@ -52,6 +52,8 @@ public abstract class AbstractIvmlTests {
     private static final Set<String> ASSERT_FILE_EXTENSIONS = new HashSet<>();
     private static final Set<String> ASSERT_FILE_NAME_EXCLUSIONS = new HashSet<>();
     private static Boolean isIipBuildInitial;
+    private static File testModelBase = null;
+    private static File testMetaModelFolder;
 
     static  {
         ASSERT_FILE_EXTENSIONS.add(".java");
@@ -67,6 +69,35 @@ public abstract class AbstractIvmlTests {
             f = new File("resources");
         }
         System.setProperty("iip.resources", f.getAbsolutePath());
+    }
+    
+    /**
+     * Returns {@code file} relocated into {@link #testModelBase} if not <b>null</b>.
+     * 
+     * @param file the file to relocate
+     * @return {@code file} or file relocated into {@link #testModelBase}.
+     */
+    protected static File relocateTestModel(File file) {
+        return null == testModelBase ? file : new File(testModelBase, file.getPath());
+    }
+
+    /**
+     * Sets {@code #testModelBase}.
+     * 
+     * @param base the base folder, may be <b>null</b> for none
+     * @see #relocateTestModel(File)
+     */
+    public static void setTestModelBase(File base) {
+        testModelBase = base;
+    }
+    
+    /**
+     * Sets the {@code #metaModelFolder}.
+     * 
+     * @param folder the meta model folder, may be <b>null</b> for "./src/main/easy"
+     */
+    public static void setTestMetaModelFolder(File folder) {
+        testMetaModelFolder = folder;
     }
     
     /**
@@ -129,11 +160,11 @@ public abstract class AbstractIvmlTests {
          * @param outputFolder the output folder for code generation
          */
         public TestConfigurer(String ivmlModelName, File modelFolder, File outputFolder) {
-            super(ivmlModelName, modelFolder, outputFolder);
+            super(ivmlModelName, relocateTestModel(modelFolder), outputFolder);
             if (isIipBuildInitial()) {
                 super.setStartRuleName("generateInterfaces");
             }
-            final String srcName = "./src/main/easy";
+            String srcName = null == testMetaModelFolder ? "./src/main/easy" : testMetaModelFolder.getPath();
             final String srcCfgName = (srcName + "/cfg/").replace('/', File.separatorChar);
             File src = new File(srcName);
             File tgt = new File("./target/ivml");
@@ -146,7 +177,7 @@ public abstract class AbstractIvmlTests {
             } catch (IOException e) {
                 Assert.fail("Cannot copy IVML meta model from " + src + " to " + tgt);
             }
-            File commonIvml = new File(modelFolder.getParentFile(), "common");
+            File commonIvml = relocateTestModel(new File(modelFolder.getParentFile(), "common"));
             if (commonIvml.exists()) {
                 additionalIvmlFolders = new ArrayList<>();
                 additionalIvmlFolders.add(commonIvml);

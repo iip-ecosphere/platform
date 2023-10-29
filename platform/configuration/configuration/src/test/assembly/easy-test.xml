@@ -13,10 +13,11 @@
             <directory>${project.basedir}/src/test/easy</directory>
             <outputDirectory/>
             <includes>
-                <include>common/**/*.*</include>
-                <include>simpleMesh/**/*.*</include>
-                <include>simpleMesh3/**/*.*</include>
+                <include>**/*.*</include>
             </includes>
+            <excludes>
+                <exclude>summary.*</exclude>
+            </excludes>
             <useDefaultExcludes>true</useDefaultExcludes>
         </fileSet>
     </fileSets>
