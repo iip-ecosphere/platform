@@ -10,8 +10,16 @@
  ********************************************************************************/
 package test.de.iip_ecosphere.platform.examples;
 
+import java.io.File;
+
+import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
+
+import test.de.iip_ecosphere.platform.configuration.AbstractIvmlTests;
+import test.de.iip_ecosphere.platform.configuration.IvmlContainerLxcTests;
+import test.de.iip_ecosphere.platform.configuration.IvmlContainerTests;
+import test.de.iip_ecosphere.platform.configuration.IvmlSerializerConfig1Tests;
 
 /**
  * Defines the tests to be executed.
@@ -22,7 +30,24 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({
     PersistentLocalNetworkManagerTest.class,
     SpringStartupTest.class,
+
+    // from configuration.configuration -> to allow for platform/mangementUi build before
+    IvmlSerializerConfig1Tests.class,
+    IvmlContainerTests.class,
+    IvmlContainerLxcTests.class,
+
     ConfigurationTests.class
 })
 public class AllTests {
+
+    /**
+     * Initializes the test suite.
+     */
+    @BeforeClass
+    public static void init() {
+        AbstractIvmlTests.setTestMetaModelFolder(new File("./target/easy"));
+        AbstractIvmlTests.setTestModelBase(new File("./target/easy-test"));
+        System.out.println("Sets test model base to target/easy-test and meta model folder to target/easy");
+    }
+    
 }
