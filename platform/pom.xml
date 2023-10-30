@@ -83,6 +83,7 @@
      <module>configuration/configuration.defaultLib</module>
      <!-- platform services, CLI, AAS -->
      <module>platform</module>
+     <module>managementUI</module>
      <!-- examples -->
      <module>examples/examples</module>
      <module>examples/examples.KODEX/examples.KODEX.db</module>
