@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="configuration.configuration" default="maven" basedir=".">
+<project name="configuration.configuration" default="maven" basedir="." xmlns:artifact="antlib:org.apache.maven.artifact.ant">
     <!-- import of the global SSE Jenkins properties -->
     <property file="${user.home}/global-build.properties"/>
     <property file="${user.home}/qualimaster-build.properties"/>
@@ -7,31 +7,56 @@
 	<property environment="env"/>
 	<property name="iip.build.initial" value="${env.iipbuildinitial}"/>
 	
+    <!-- Check - no typedef shall be required as installed in ANT/lib -->
+    <path id="maven-ant-tasks.classpath" path="${ant-maven.lib}" />
+    <typedef resource="org/apache/maven/artifact/ant/antlib.xml"
+       uri="antlib:org.apache.maven.artifact.ant"
+       classpathref="maven-ant-tasks.classpath" />
+
     <!-- deploy to SSE Mvn repo -->
     <target name="maven">
         <exec executable="/bin/bash">
           <arg value="${basedir}/cleanup.sh"/>
         </exec>
-        
+    	
+    	<artifact:pom id="configPom" file="pom.xml" />
+    	<echo>The version is ${configPom.version}</echo>
+    	<property name="genInterfacesMarkerFile" value="target/genInterfaces-${configPom.version}"/>
+    	<available file="${genInterfacesMarkerFile}" property="genInterfacesExist"/>
+
+        <antcall target="genInterfacesIfNeeded"/>
+        <ant dir="${home.base.dir}/IIP_test.configuration.configuration/platform/tests/test.configuration.configuration" antfile="build-jk.xml" />
         <maven pomFile="pom.xml" goal="install">
     	    <arg value="-Diip.tests=true"/>
     	</maven>
         <mvnDeployResolveArtifact folderName="IIP-configuration.configuration" pomFile="pom.xml" jarFolder="target" artifactPattern="configuration.configuration-*.*.*.jar" />
         
+        <antcall target="deployInterfaces"/>
+        <antcall target="deployApps"/>
+    </target>
+	
+	<target name="deployInterfaces">
         <ant dir="gen/tests/SimpleMesh/ApplicationInterfaces" antfile="build-jk.xml" />
         <ant dir="gen/tests/SimpleMesh3/ApplicationInterfaces" antfile="build-jk.xml" />
         <ant dir="gen/tests/KodexMesh/ApplicationInterfaces" antfile="build-jk.xml" />
         <ant dir="gen/tests/ContainerCreation/ApplicationInterfaces" antfile="build-jk.xml" />
         <ant dir="gen/tests/RoutingTest/ApplicationInterfaces" antfile="build-jk.xml" />
+	</target>
 
-        <antcall target="deployApps"/>
-    </target>
-
-    <target name="deployApps" unless="iip.build.initial">
+    <target name="deployApps">
         <ant dir="gen/tests/SimpleMesh/SimpleMeshTestingApp" antfile="build-jk.xml" />
         <ant dir="gen/tests/SimpleMesh3/SimpleMeshTestingApp3" antfile="build-jk.xml" />
         <ant dir="gen/tests/KodexMesh/SimpleKodexTestingApp" antfile="build-jk.xml" />
         <ant dir="gen/tests/RoutingTest/RoutingTestApp" antfile="build-jk.xml" />
     </target>
 
+    <target name="genInterfacesIfNeeded" unless="genInterfacesExist">
+        <maven pomFile="pom.xml" goal="install">
+            <arg value="-Diip.tests=true"/>
+            <arg value="-Diip.build.initial=true"/>
+        </maven>
+        <antcall target="deployInterfaces"/>
+    	<touch file="${genInterfacesMarkerFile}"/>
+    </target> 
+	
 </project>
