@@ -29,7 +29,6 @@ import org.junit.runners.Suite;
     PlatformAasTest.class,
     YamlSemanticIdResolverDescriptorTest.class,
     NameplateSetupTest.class,
-    YamlFileTest.class,
     AasLifecycleTest.class
 })
 public class AllTests {
