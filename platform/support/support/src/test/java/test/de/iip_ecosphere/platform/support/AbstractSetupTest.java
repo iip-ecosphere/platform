@@ -113,6 +113,10 @@ public class AbstractSetupTest {
         cfg = Cfg.readFromYaml(Cfg.class, "/" + AbstractSetup.DEFAULT_FNAME);
         Assert.assertNotNull(cfg);
         Assert.assertEquals(42, cfg.getProperty());
+        
+        cfg = Cfg.readFromYaml(Cfg.class, "/iipecosphere-over.yml");
+        Assert.assertNotNull(cfg);
+        Assert.assertEquals(43, cfg.getProperty());
     }
     
     /**

@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Iterator;
+import java.util.Map;
 
 import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
@@ -66,13 +67,35 @@ public abstract class AbstractSetup {
      * @throws IOException if the file cannot be read/found, the configuration class cannot be instantiated
      */
     public static <C> C readFromYaml(Class<C> cls, String filename) throws IOException {
+        return readFromYaml(cls, filename, null);
+    }
+
+    /**
+     * Reads a configuration from the root folder of the JAR/classpath. Unknown properties are ignored.
+     *
+     * @param <C> the specific type of configuration to read
+     * @param cls the class of configuration to read
+     * @param filename the filename (a leading "/" is added if missing for JAR/classpath resource access)
+     * @param overwrite the name of a file (a leading "/" is added if missing for JAR/classpath resource access) 
+     *     overwriting values in {@code filename}, may be <b>null</b> for none
+     * @return the configuration instance
+     * @throws IOException if the file cannot be read/found, the configuration class cannot be instantiated
+     */
+    public static <C> C readFromYaml(Class<C> cls, String filename, String overwrite) throws IOException {
         InputStream in = ResourceLoader.getResourceAsStream(filename);
         if (null == in) {
             throw new IOException("Cannot read " + filename);
         }
-        return readFromYaml(cls, in);  
+        InputStream over = null;
+        if (null != overwrite) {
+            over = ResourceLoader.getResourceAsStream(overwrite);
+            if (null == over) {
+                throw new IOException("Cannot read " + overwrite);
+            }
+        }
+        return readFromYaml(cls, in, over);  
     }
-    
+
     /**
      * Returns if a string is valid, i.e. not <b>null</b> and not empty.
      *
@@ -100,11 +123,25 @@ public abstract class AbstractSetup {
      *
      * @param <C> the specific type of configuration to read
      * @param cls the class of configuration to read
-     * @param in the stream to read from (ignored if <b>null</b>)
+     * @param in the stream to read from (ignored if <b>null</b>, else being closed)
      * @return the configuration instance
      * @throws IOException if the data cannot be read, the configuration class cannot be instantiated
      */
     public static <C> C readFromYaml(Class<C> cls, InputStream in) throws IOException {
+        return readFromYaml(cls, in, null);
+    }
+
+    /**
+     * Reads a instance from {@code in}. Unknown properties are ignored.
+     *
+     * @param <C> the specific type of configuration to read
+     * @param cls the class of configuration to read
+     * @param in the stream to read from (ignored if <b>null</b>, else being closed)
+     * @param overwrite optional stream to overwrite values taken from {@code in} 
+     * @return the configuration instance
+     * @throws IOException if the data cannot be read, the configuration class cannot be instantiated
+     */
+    public static <C> C readFromYaml(Class<C> cls, InputStream in, InputStream overwrite) throws IOException {
         C result = null;
         if (in != null) {
             try {
@@ -131,6 +168,18 @@ public abstract class AbstractSetup {
                 throw new IOException(e);
             }
         } 
+        if (null != overwrite) {
+            try {
+                Yaml yaml = new Yaml();
+                @SuppressWarnings("unchecked")
+                Map<String, Object> data = (Map<String, Object>) yaml.load(in);
+                result = YamlFile.overwrite(result, cls, data);
+                overwrite.close();
+            } catch (IOException e) {
+                overwrite.close();
+                throw new IOException(e);
+            }
+        }
         return result;
     }
 

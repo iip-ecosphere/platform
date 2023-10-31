@@ -1,0 +1,60 @@
+amqp:
+    host: localhost
+    port: 8883
+    authenticationKey: amqp
+transport:
+    host: localhost
+    port: 8883
+    authenticationKey: amqp
+aas:
+  server:
+    port: 9001
+    host: 127.0.0.1
+    schema: HTTP
+    path: 
+  registry:
+    port: 9002
+    host: 127.0.0.1
+    schema: HTTP
+    path: registry
+  implementation:
+    port: -1
+    host: 127.0.0.1
+    netmask: 
+    schema: TCP
+    protocol: VAB-TCP
+spring:
+    main:
+        banner-mode: off
+    cloud:
+        function:
+            definition: createRec1_SimpleSource;receiveRec1_SimpleReceiver
+        stream:
+            default:
+                contentType: application/iip
+            defaultBinder: internal
+            bindings:
+             receiveRec1_SimpleReceiver-in-0:
+                destination: processRec1_SimpleTransformer
+                producer: 
+                  useNativeEncoding: true
+             receiveRec1_SimpleReceiver-in-1:
+                destination: processRec1_SimpleTransformer
+                producer: 
+                  useNativeEncoding: true
+            binders:
+                properties:
+                   internal:
+                       type: amqpBinder
+                       environment:
+                           amqp:
+                               host: localhost
+                               port: 8883
+                               authenticationKey: amqp
+                   external:
+                       type: amqpBinder
+                       environment:
+                           amqp:
+                               host: localhost
+                               port: 8883
+                               authenticationKey: amqp

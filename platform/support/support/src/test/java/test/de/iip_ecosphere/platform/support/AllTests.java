@@ -39,6 +39,7 @@ import org.junit.runners.Suite;
     SchemaServerEndpointTest.class,
     ServerTest.class,
     InstalledDependenciesSetupTest.class,
+    YamlFileTest.class,
     TaskRegistryTests.class
 })
 public class AllTests {
