@@ -76,6 +76,15 @@ public final class PidFile {
     public static PidFile createInDefaultDir(String name, boolean deleteOnExit) throws IOException {
         return createInDefaultDir(name, deleteOnExit, true);
     }
+    
+    /**
+     * Returns the path of the PID directory via {@link #PID_DIR_PROPERTY_NAME} or temp directory.
+     * 
+     * @return the path
+     */
+    public static String getPidDirectory() {
+        return System.getProperty(PID_DIR_PROPERTY_NAME, FileUtils.getTempDirectoryPath());
+    }
 
     /**
      * Creates a new PidFile in the system's temporary directory as a file with given {@code name} and writes the 
@@ -92,7 +101,7 @@ public final class PidFile {
      */
     public static PidFile createInDefaultDir(String name, boolean deleteOnExit, boolean deleteIfExists) 
         throws IOException {
-        File f = new File(System.getProperty(PID_DIR_PROPERTY_NAME, FileUtils.getTempDirectoryPath()), name);
+        File f = new File(getPidDirectory(), name);
         if (deleteIfExists) {
             FileUtils.deleteQuietly(f);
         }
