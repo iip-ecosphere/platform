@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
 
 import de.iip_ecosphere.platform.support.setup.AbstractSetup;
+import de.iip_ecosphere.platform.support.setup.YamlFile;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 
 /**
@@ -95,11 +96,11 @@ public class YamlSetup {
                 @SuppressWarnings("unchecked")
                 Map<String, Object> setup = (Map<String, Object>) yaml.load(in);
                 substArgs(setup, args);
-                Map<String, Object> env = getMap(setup, 
+                Map<String, Object> env = YamlFile.getMap(setup, 
                     "spring", "cloud", "stream", "binders", "properties", binder, "environment");
                 if (null != env && env.size() > 0) {
                     String binderEnvKey = env.keySet().iterator().next();
-                    Map<String, Object> tmp = getMap(env, binderEnvKey);
+                    Map<String, Object> tmp = YamlFile.getMap(env, binderEnvKey);
                     String tmpYml = yaml.dump(tmp);
                     result = AbstractSetup
                         .createYaml(TransportSetup.class)
@@ -134,7 +135,7 @@ public class YamlSetup {
                     if (keys.length > 1) {
                         String[] path = new String[keys.length - 1];
                         System.arraycopy(keys, 0, path, 0, path.length);
-                        Map<String, Object> parent = getMap(setup, path);
+                        Map<String, Object> parent = YamlFile.getMap(setup, path);
                         if (null != parent) {
                             parent.put(keys[keys.length - 1], val);
                         }
@@ -142,28 +143,6 @@ public class YamlSetup {
                 }
             }
         }
-    }
-
-    /**
-     * Returns a map from a YAML structure given as map object.
-     * 
-     * @param yaml the YAML structure
-     * @param path the key-name path into the YAML structure
-     * @return the found YAML sub-structure or <b>null</b> if not found
-     */
-    @SuppressWarnings("unchecked")
-    public static Map<String, Object> getMap(Map<String, Object> yaml, String... path) {
-        Map<String, Object> result = null;
-        for (String n: path) {
-            if (null != yaml) {
-                Object tmp = yaml.get(n);
-                if (tmp instanceof Map) {
-                    result = (Map<String, Object>) tmp;
-                }
-            }
-            yaml = result;
-        }
-        return result;
     }
 
 }
