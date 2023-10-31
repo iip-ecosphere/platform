@@ -22,6 +22,14 @@ import java.util.List;
  */
 public class MultiResourceResolver implements ResourceResolver {
 
+    /**
+     * Resolver for setup (override) files.
+     */
+    public static final ResourceResolver SETUP_RESOLVER = new MultiResourceResolver(
+        new FolderResourceResolver("."), 
+        new FolderResourceResolver("/etc"), 
+        new FolderResourceResolver());
+    
     private ResourceResolver[] resolvers;
 
     /**

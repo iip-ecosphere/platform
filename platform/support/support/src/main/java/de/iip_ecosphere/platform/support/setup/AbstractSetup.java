@@ -24,6 +24,7 @@ import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.error.YAMLException;
 import org.yaml.snakeyaml.representer.Representer;
 
+import de.iip_ecosphere.platform.support.resources.MultiResourceResolver;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 
 /**
@@ -35,15 +36,20 @@ import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 public abstract class AbstractSetup {
     
     /**
-     * Just the name of the default configuration file, no extension, no path.
+     * The name of the default setup file, no extension, no path.
      */
-    public static final String DEFAULT_NAME = "iipecosphere";
+    public static final String DEFAULT_NAME = "iipecosphere"; // TODO turn to oktoflow, VTL -> both
     
     /**
-     * Name of the default configuration file with extension (no path).
+     * Name of the default setup file with extension (no path).
      */
     public static final String DEFAULT_FNAME = DEFAULT_NAME + ".yml";
 
+    /**
+     * Name of the default setup override file with extension (no path).
+     */
+    public static final String DEFAULT_OVERRIDE_FNAME = "oktoflow-local" + ".yml"; // TODO use DEFAULT_NAME 
+    
     /**
      * Reads a configurationfrom {@link #DEFAULT_FNAME} in the  root folder of the JAR/classpath. Unknown properties 
      * are ignored.
@@ -54,7 +60,7 @@ public abstract class AbstractSetup {
      * @throws IOException if the file cannot be read/found, the configuration class cannot be instantiated
      */
     public static <C> C readFromYaml(Class<C> cls) throws IOException {
-        return readFromYaml(cls, DEFAULT_FNAME);
+        return readFromYaml(cls, DEFAULT_FNAME, DEFAULT_OVERRIDE_FNAME);
     }
     
     /**
@@ -76,8 +82,9 @@ public abstract class AbstractSetup {
      * @param <C> the specific type of configuration to read
      * @param cls the class of configuration to read
      * @param filename the filename (a leading "/" is added if missing for JAR/classpath resource access)
-     * @param overwrite the name of a file (a leading "/" is added if missing for JAR/classpath resource access) 
-     *     overwriting values in {@code filename}, may be <b>null</b> for none
+     * @param overwrite the name of an optional file (a leading "/" is added if missing for JAR/classpath 
+     *     resource access, using {@link MultiResourceResolver#SETUP_RESOLVER}) overwriting values in 
+     *     {@code filename}, may be <b>null</b> for none, does not lead to an exception if file does not exist
      * @return the configuration instance
      * @throws IOException if the file cannot be read/found, the configuration class cannot be instantiated
      */
@@ -88,10 +95,7 @@ public abstract class AbstractSetup {
         }
         InputStream over = null;
         if (null != overwrite) {
-            over = ResourceLoader.getResourceAsStream(overwrite);
-            if (null == over) {
-                throw new IOException("Cannot read " + overwrite);
-            }
+            over = ResourceLoader.getResourceAsStream(overwrite, MultiResourceResolver.SETUP_RESOLVER);
         }
         return readFromYaml(cls, in, over);  
     }
