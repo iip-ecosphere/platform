@@ -13,6 +13,7 @@
 package de.iip_ecosphere.platform.support;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -101,6 +102,38 @@ public class CollectionUtils {
             result.add(iterator.next());
         }
         return result;
+    }
+    
+    /**
+     * Turns a collection into a string with configurable lead-in, separator and lead-out.
+     * 
+     * @param collection the collection
+     * @param leadIn the lead-in
+     * @param leadOut the lead-out
+     * @param separator the separator
+     * @return the string representation
+     */
+    public static String toString(Collection<?> collection, String leadIn, String leadOut, String separator) {
+        String result = leadIn;
+        boolean first = true;
+        for (Object o: collection) {
+            if (!first) {
+                result += separator;
+            }
+            result += o.toString();
+            first = false;
+        }
+        return result + leadOut;
+    }
+
+    /**
+     * Turns a collection into a string with no lead-in, one space as separator and no lead-out.
+     * 
+     * @param collection the collection
+     * @return the string representation
+     */
+    public static String toStringSpaceSeparated(Collection<?> collection) {
+        return toString(collection, "", "", " ");
     }
     
 }

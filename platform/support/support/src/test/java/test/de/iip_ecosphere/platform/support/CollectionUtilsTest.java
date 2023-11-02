@@ -140,5 +140,24 @@ public class CollectionUtilsTest {
         Assert.assertTrue(tmp.contains("a"));
         Assert.assertTrue(tmp.contains("b"));
     }
+    
+    /**
+     * Tests {@link CollectionUtils#toString(java.util.Collection, String, String, String)} and 
+     * {@link CollectionUtils#toStringSpaceSeparated(java.util.Collection)}.
+     */
+    @Test
+    public void testToString() {
+        List<Integer> list = CollectionUtils.toList();
+        Assert.assertEquals("", CollectionUtils.toStringSpaceSeparated(list));
+        Assert.assertEquals("[]", CollectionUtils.toString(list, "[", "]", ", "));
+        
+        list = CollectionUtils.toList(1);
+        Assert.assertEquals("1", CollectionUtils.toStringSpaceSeparated(list));
+        Assert.assertEquals("[1]", CollectionUtils.toString(list, "[", "]", ", "));
+        
+        list = CollectionUtils.toList(1, 2);
+        Assert.assertEquals("1 2", CollectionUtils.toStringSpaceSeparated(list));
+        Assert.assertEquals("[1, 2]", CollectionUtils.toString(list, "[", "]", ", "));
+    }
 
 }
