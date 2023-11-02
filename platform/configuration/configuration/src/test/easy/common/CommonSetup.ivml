@@ -61,6 +61,13 @@ project CommonSetup {
     // ------------------------- UI -------------------------------
     
     // current default: no UI configured
+    
+    // ------------------------- UI -------------------------------
+    
+    // managed model, not needed for tests but for testing managementUI
+    
+    modelBaseFolder = "./target/easy-test";
+    modelName = "PlatformConfiguration";
 
     // ------------ freezing ------------------
     
