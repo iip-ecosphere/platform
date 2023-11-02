@@ -2,7 +2,7 @@
 
 We use the `maven-dependency-plugin` for various tasks, e.g., to unpack Python code or the configuration model.  However, we do not limit ourselves to the target directory which may be cleaned up with `mvn clean` and other cleaning procedures do not work. So we decided a cleanup specification with the `unpack` goal of maven-dependency-plugin provided by this package. For convenience, we include further goals of the original plugin as they are used frequently in conjunction with `unpack`. Basic properties of the underlying maven dependendency plugin can be applied although not explicitly discussed here.
 
-## Extended unpack goal
+## unpack goal
 
 The extended `unpack` goal behaves like the original goal offering all configuration options, but in addition the `cleanup` option. Unpacking only happens if the output directory given in the respective artifact item does not exist, it only contains files listed in `initiallyAllowed` or if `force` is specified, usually via command line.
 
@@ -49,11 +49,46 @@ The extended unpack goal supports the following additional configuration setting
   
 ## copy-dependencies goal
 
-The copy-dependencies goal is the same as in the original plugin and included here just for convenience.
+The ``copy-dependencies`` goal is the same as in the original plugin and included here just for convenience.
 
 ## build-classpath goal
 
-The build-classpath goal is the same as in the original plugin and included here just for convenience.
+The ``build-classpath`` goal is the same as in the original plugin and included here just for convenience.
+
+## delete goal
+
+The delete goal allows to just delete files and directories. At it's core, it is similar to the
+``cleanup`` part of the ``unpack`` goal discussed above. Starting at a given ``directory`` it deletes all 
+``includes`` (included files and folders) while skipping the ``excludes`` (excluded files and folders).
+
+  ```xml
+  <build>
+      <plugins>
+         <plugin>
+            <groupId>de.iip-ecosphere.platform</groupId>
+            <artifactId>dependency-plugin</artifactId>
+            <version>${project.version}</version>
+            <executions>
+                <execution>
+                    <id>delete</id>
+                    <goals>
+                        <goal>delete</goal>
+                    </goals>
+                    <phase>initialize</phase>
+                    <configuration>
+                        <files>
+                            <directory>${project.basedir}/src/main/python</directory>
+                            <includes>
+                                <include>HelloWorld.py</include>
+                            </includes>
+                        </files>
+                    </configuration>
+                </execution>
+            <executions>
+        </plugin>
+     </plugins>
+  </build>
+  ```
 
 ## Missing
 
