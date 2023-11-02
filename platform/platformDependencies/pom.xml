@@ -635,7 +635,7 @@
                                         <goal>copy</goal>
                                         <goal>build-classpath</goal>                                        
                                         <goal>unpack-dependencies</goal>
-                                        <goal>copy-dependencies</goal>&gt;
+                                        <goal>copy-dependencies</goal>
                                     </goals>
                                 </pluginExecutionFilter>
                                 <action>
