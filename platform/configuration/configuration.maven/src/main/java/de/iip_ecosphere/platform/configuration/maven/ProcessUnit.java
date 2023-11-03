@@ -88,14 +88,13 @@ public class ProcessUnit {
                 
                 @Override
                 public void run() {
-                    timeoutTask = null;
                     if (null != listener) {
                         listener.notifyTermination(TerminationReason.TIMEOUT);
                     }
                     stop();
                 }
             };
-            timer.schedule(timeoutTask, timeout, timeout);
+            timer.schedule(timeoutTask, timeout);
         }
     }
 

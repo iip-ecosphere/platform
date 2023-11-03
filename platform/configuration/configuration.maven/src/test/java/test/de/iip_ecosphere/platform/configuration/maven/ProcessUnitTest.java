@@ -13,6 +13,7 @@
 package test.de.iip_ecosphere.platform.configuration.maven;
 
 import java.io.File;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
 import org.junit.Test;
@@ -100,12 +101,13 @@ public class ProcessUnitTest {
      */
     @Test
     public void testTimeoutProcess() {
+        AtomicInteger terminationCount = new AtomicInteger();
         System.out.println("Testing process with timeout:");
         ProcessUnit unit = new ProcessUnit.ProcessUnitBuilder("p", null)
             .addArguments("java " + DummyApp.class.getName())
             .setHome(new File("./target/test-classes"))
             .setTimeout(1000)
-            .setListener(r -> System.out.println("Termination: " + r))
+            .setListener(r -> terminationCount.incrementAndGet())
             .build();
         TimeUtils.sleep(500);
         Assert.assertTrue(unit.isRunning());
@@ -114,6 +116,7 @@ public class ProcessUnitTest {
         Assert.assertFalse(unit.isRunning());
         Assert.assertEquals("p", unit.getDescription());
         Assert.assertFalse(unit.hasCheckRegEx());
+        Assert.assertEquals(1, terminationCount.get());
     }
 
     /**
