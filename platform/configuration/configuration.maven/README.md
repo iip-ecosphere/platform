@@ -1,4 +1,4 @@
-# oktoflow/IIP-Ecosphere platform: Maven plugins for application/platform instantiation and testing
+# oktoflow platform: Maven plugins for application/platform instantiation and testing
 
 Maven plugin for the following platform configuration tasks (represented as Maven goals in untypical notation).
 
@@ -139,7 +139,7 @@ Testing a generated application typically requires starting the communication br
   </build>
   ```
   
-The ``testApp`` goal (default phase ``test``) supports the following configuration settings: 
+The ``testApp`` goal (default phase ``integration-test``) supports the following configuration settings: 
   - `testCmd` (`-Dconfiguration.testApp.testCmd=...`, default ``""``) the command to be executed for testing instead of an oktoflow application. If not given, an application is tested via ``maven exec:java@app``.
   - `appId` (`-Dconfiguration.testApp.appId=...`, default ``app``) the id for executing the application in test mode in the POM.
   - `appArgs` (`-Dconfiguration.testApp.appArgs=...`, default ``""``) additional arguments to be passed to the application.
