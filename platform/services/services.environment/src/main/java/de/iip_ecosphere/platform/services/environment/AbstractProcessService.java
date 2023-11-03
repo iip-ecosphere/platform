@@ -33,6 +33,7 @@ import org.apache.commons.lang.SystemUtils;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.services.environment.metricsProvider.MetricsProvider;
+import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
@@ -362,8 +363,9 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractRunna
             tmp.addAll(args);
         }
         
-        System.out.println("Cmd line: " + tmp + " in " + dir); // preliminary
-        //LoggerFactory.getLogger(AbstractProcessService.class).info("Cmd line: " + tmp + " in " + dir);
+        System.out.println("Cmd line: " + CollectionUtils.toStringSpaceSeparated(tmp) + " in " + dir);
+        //LoggerFactory.getLogger(AbstractProcessService.class).info("Cmd line: {} in {}", 
+        //     CollectionUtils.toStringSpaceSeparated(tmp), dir);
         ProcessBuilder processBuilder = new ProcessBuilder(tmp);
         processBuilder.directory(dir);
         if (null != customizer) {
