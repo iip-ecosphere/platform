@@ -45,7 +45,7 @@ import de.iip_ecosphere.platform.support.CollectionUtils;
 public class ProcessUnit {
     
     public static final String WIN_BASH_PREFIX = "cmd /s /c ";
-    public static final String UNIX_SHELL_PREFIX = "./";
+    public static final String UNIX_SHELL_PREFIX = "sh ./";
     public static final int UNKOWN_EXIT_STATUS = Integer.MIN_VALUE;
     private static Timer timer;
     
