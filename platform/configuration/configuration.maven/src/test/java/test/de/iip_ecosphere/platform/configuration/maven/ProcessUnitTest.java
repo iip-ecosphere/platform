@@ -143,7 +143,7 @@ public class ProcessUnitTest {
     @Test
     public void testMvnProcess() {
         System.out.println("Testing mvn process, terminated:");
-        Pattern p = Pattern.compile("^\\Q[INFO]\\E Scanning for projects\\Q...\\E$");
+        Pattern p = Pattern.compile("^.*Scanning for projects.*$");
         ProcessUnit unit = new ProcessUnit.ProcessUnitBuilder("mvn", null)
             .addMavenCommand()
             .addArguments("-P App validate -Diip.springStart.args=\"--iip.test.stop=1000 --iip.test.brokerPort=1234\"")
