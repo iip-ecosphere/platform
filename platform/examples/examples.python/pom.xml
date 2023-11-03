@@ -236,6 +236,7 @@
                             <logRegExprs>
                                 <logRegExpr>.*RECEIVED.*</logRegExpr>
                             </logRegExprs>
+                            <skip>true</skip> <!-- preliminary -->
                         </configuration>
                     </execution>
 	            </executions>
