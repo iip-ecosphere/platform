@@ -65,6 +65,9 @@ public class SpringStartup {
         String sysArgs = System.getProperty(PROPERTY_ARGS, null);
         if (null != sysArgs) {
             List<String> tmp = CollectionUtils.toList(args);
+            if (sysArgs.startsWith("\"") && sysArgs.endsWith("\"") && sysArgs.length() > 1) {
+                sysArgs = sysArgs.substring(1, sysArgs.length() - 1);
+            }
             CollectionUtils.addAll(tmp, CmdLine.toArgs(sysArgs));
             args = tmp.toArray(new String[0]);
         }
