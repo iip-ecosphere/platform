@@ -168,4 +168,26 @@ public class ProcessUnitTest {
         Assert.assertTrue(unit.hasCheckRegEx());
     }
 
+    /**
+     * Tests a maven process.
+     */
+    @Test
+    public void testMvnProcess2() {
+        System.out.println("Testing mvn process, terminated:");
+        Pattern p = Pattern.compile("^.*gen.*$");
+        ProcessUnit unit = new ProcessUnit.ProcessUnitBuilder("mvn", null)
+            .addMavenCommand()
+            .addArgument("exec:java@app")
+            .addArgument("-Diip.springStart.args=\"--iip.test.stop=1000 --iip.test.brokerPort=1234\"")
+            .addCheckRegEx(p)
+            .logTo(null)
+            .build();
+        Assert.assertTrue(unit.isRunning());
+        unit.waitFor(); // exit value may differ :/
+        Assert.assertTrue(unit.getLogMatches());
+        Assert.assertFalse(unit.isRunning());
+        Assert.assertEquals("mvn", unit.getDescription());
+        Assert.assertTrue(unit.hasCheckRegEx());
+    }
+
 }

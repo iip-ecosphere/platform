@@ -4,7 +4,7 @@
   <artifactId>configuration-plugin</artifactId>
   <packaging>maven-plugin</packaging>
   <name>Maven Configuration Plugin</name>
-  <description>Integrates the platform instantiator as Maven plugin.</description>
+  <description>Integrates the configuration commands as Maven plugin.</description>
 
   <properties>
 	  <maven.version>3.6.0</maven.version>
@@ -79,6 +79,20 @@
 		    </plugin>
 	      </plugins>
       </pluginManagement>
+      <plugins>
+          <plugin>
+              <groupId>org.codehaus.mojo</groupId>
+              <artifactId>exec-maven-plugin</artifactId>
+              <version>3.0.0</version>
+              <configuration>
+                  <mainClass>test.de.iip_ecosphere.platform.configuration.maven.DummyApp</mainClass>
+                  <arguments>
+                    <argument>gen/py/myApp/target/myApp-0.1.0-SNAPSHOT-bin.jar</argument>
+                  </arguments>
+                  <classpathScope>test</classpathScope>
+              </configuration>
+          </plugin>
+      </plugins>
   </build>
 
 </project>

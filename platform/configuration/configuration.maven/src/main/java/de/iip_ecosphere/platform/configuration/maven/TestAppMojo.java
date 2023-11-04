@@ -57,7 +57,13 @@ public class TestAppMojo extends AbstractMojo {
 
     @Parameter(property = "configuration.testApp.appArgs", required = false)
     private List<String> appArgs;
-    
+
+    @Parameter(property = "configuration.testApp.mvnArgs", required = false)
+    private List<String> mvnArgs;
+
+    @Parameter(property = "configuration.testApp.mvnPluginArgs", required = false)
+    private List<String> mvnPluginArgs;
+
     @Parameter(property = "configuration.testApp.logFile", required = false, defaultValue = "")
     private File logFile;
 
@@ -213,6 +219,45 @@ public class TestAppMojo extends AbstractMojo {
             executeImpl();
         }
     }
+
+    /**
+     * Adds the command line arguments for a maven call.
+     * 
+     * @param testBuilder the process unit builder for the call
+     * @return {@code testBuilder}, builder style
+     */
+    private ProcessUnitBuilder addMavenTestCall(ProcessUnitBuilder testBuilder) {
+        String tmpAppArgs = "";
+        if (null != appArgs && appArgs.size() > 0) {
+            tmpAppArgs = " " + CollectionUtils.toStringSpaceSeparated(appArgs);
+        }
+        testBuilder.addMavenCommand();
+        if (offline) {
+            testBuilder.addArgument("-o");
+        }
+        String sPath = System.getenv("MAVEN_SETTINGS_PATH");
+        if (null == sPath) {
+            sPath = null != request.getUserSettingsFile() ? request.getUserSettingsFile().getPath() : null;
+        }
+        if (null != sPath) {
+            testBuilder.addArgument("-s");
+            testBuilder.addArgument(sPath);
+        }
+        testBuilder.addArgument("-P");
+        testBuilder.addArgument("App");
+        if (null != mvnArgs) {
+            testBuilder.addArgument(mvnArgs);
+        }
+        testBuilder.addArgument("exec:java@" + appId);
+        if (null != mvnPluginArgs) {
+            testBuilder.addArgument(mvnPluginArgs);
+        }
+        testBuilder.addArgument(
+            "-Diip.springStart.args=\"--iip.test.stop=" + testTime 
+            + " --iip.test.brokerPort=" + brokerPort 
+            + tmpAppArgs + "\"");
+        return testBuilder;
+    }
     
     /**
      * Implements the test execution.
@@ -244,29 +289,7 @@ public class TestAppMojo extends AbstractMojo {
                 .addArgument(testCmd)
                 .addArguments(appArgs);
         } else {
-            String tmpAppArgs = "";
-            if (null != appArgs && appArgs.size() > 0) {
-                tmpAppArgs = " " + CollectionUtils.toStringSpaceSeparated(appArgs);
-            }
-            testBuilder.addMavenCommand();
-            if (offline) {
-                testBuilder.addArgument("-o");
-            }
-            String sPath = System.getenv("MAVEN_SETTINGS_PATH");
-            if (null == sPath) {
-                sPath = null != request.getUserSettingsFile() ? request.getUserSettingsFile().getPath() : null;
-            }
-            if (null != sPath) {
-                testBuilder.addArgument("-s");
-                testBuilder.addArgument(sPath);
-            }
-            testBuilder.addArgument("-P");
-            testBuilder.addArgument("App");
-            testBuilder.addArgument("exec:java@" + appId);
-            testBuilder.addArgument(
-                "-Diip.springStart.args=\"--iip.test.stop=" + testTime 
-                + " --iip.test.brokerPort=" + brokerPort 
-                + tmpAppArgs + "\"");
+            addMavenTestCall(testBuilder);
         }
         testBuilder.setRegExConjunction(logRegExConjunction);
         if (null != logRegExprs) {

@@ -1,6 +1,6 @@
 # oktoflow platform: Maven plugins for application/platform instantiation and testing
 
-Maven plugin for the following platform configuration tasks (represented as Maven goals in untypical notation).
+Maven plugin for the following platform configuration tasks (represented as Maven goals in atypical notation).
 
 # Platform instantiation
 
@@ -145,6 +145,8 @@ The ``testApp`` goal (default phase ``package``, can be seen as integration test
   - `testCmd` (`-Dconfiguration.testApp.testCmd=...`, default ``""``) the command to be executed for testing instead of an oktoflow application. Arguments are in ``appArgs``. If not given, an application is tested via ``mvn exec:java@app``.
   - `appId` (`-Dconfiguration.testApp.appId=...`, default ``app``) the id for executing the application through ``mvn exec:java@app`` in test mode as given in the POM.
   - `appArgs` (`-Dconfiguration.testApp.appArgs=...`, default ``""``) additional arguments given as individual `appArg` entries to be passed to the application.
+  - `mvnArgs` (`-Dconfiguration.testApp.mvnArgs=...`, default ``""``) additional arguments given as individual `mvnArg` entries to be passed to a maven execution.
+  - `mvnPluginArgs` (`-Dconfiguration.testApp.mvnPluginArgs=...`, default ``""``) additional arguments given as individual `mvnPluginArg` entries to be passed to a maven plugin execution.
   - `logFile` (`-Dconfiguration.testApp.logFile=...`, default ``""``) if given, the name/location of the file where to write the output of the tested application to. Per default, the output is merged into the output of this plugin.
   - `logRegExprs` (`-Dconfiguration.testApp.logRegExprs=...`, default ``""``) if given, regular expressions indicating in the application log that the application execution was successful (see also ``logRegExConjunction``).
   - `logRegExConjunction` (`-Dconfiguration.testApp.logRegExConjunction=...`, default ``true``) whether all specified regular expressions must match or at least one.

@@ -12,13 +12,19 @@
 
 package test.de.iip_ecosphere.platform.configuration.maven;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * A testing application for {@link ProcessUnitTest}.
  * 
  * @author Holger Eichelberger, SSE
  */
 public class DummyApp {
+    
+    // for non-maven tests, replicate parts here
 
+    public static final String PROPERTY_ARGS = "iip.springStart.args";
     public static final String PARAM_PREFIX = "--";
     public static final String PARAM_VALUE_SEP = "=";
 
@@ -74,6 +80,74 @@ public class DummyApp {
     }
     
     /**
+     * Turns given {@code elements} into a list.
+     * 
+     * @param <T> the element type
+     * @param elements the elements
+     * @return the list containing all {@code elements}
+     */
+    @SafeVarargs
+    public static <T> List<T> toList(T... elements) {
+        List<T> result = new ArrayList<T>();
+        for (T e : elements) {
+            result.add(e);
+        }
+        return result;
+    }
+    
+    /**
+     * Turns a command line string into arguments. Considers usual quotes.
+     * 
+     * @param args the arguments as string
+     * @return the parsed arguments
+     */
+    public static String[] toArgs(String args) {
+        if (args == null) {
+            args = "";
+        }
+        List<String> result = new ArrayList<>();
+        boolean inQuote = false;
+        int lastPos = 0;
+        for (int i = 0; i < args.length(); i++) {
+            char c = args.charAt(i);
+            if ('\'' == c || '"' == c) {
+                inQuote = !inQuote;
+            } else if (' ' == c && !inQuote) {
+                if (lastPos != i) {
+                    String tmp = args.substring(lastPos, i).trim();
+                    if (tmp.length() > 0) {
+                        result.add(tmp);
+                    }
+                }
+                lastPos = i + 1;
+            }
+        }
+        if (lastPos < args.length()) {
+            String tmp = args.substring(lastPos, args.length()).trim();
+            if (tmp.length() > 0) {
+                result.add(tmp);
+            }
+        }
+        return result.toArray(new String[0]);
+    }
+    
+    /**
+     * Turns given {@code elements} to {@code list}.
+     * 
+     * @param <T> the element type
+     * @param list the list to be modified as a side effect
+     * @param elements the elements
+     * @return the list with all {@code elements} added
+     */
+    @SafeVarargs
+    public static <T> List<T> addAll(List<T> list, T... elements) {
+        for (T e : elements) {
+            list.add(e);
+        }
+        return list;
+    }
+    
+    /**
      * Simple test program.
      * 
      * @param args command line arguments; 
@@ -82,6 +156,17 @@ public class DummyApp {
      *     {@code --modulo=int} indicates the group size for the second output on the error stream (default {@code 5})
      */
     public static void main(String[] args) {
+        String sysArgs = System.getProperty(PROPERTY_ARGS, null);
+        if (null != sysArgs) {
+            if (sysArgs.startsWith("\"") && sysArgs.endsWith("\"") && sysArgs.length() > 1) {
+                sysArgs = sysArgs.substring(1, sysArgs.length() - 1);
+            }
+            System.out.println(PROPERTY_ARGS + "=" + sysArgs);
+            List<String> tmp = toList(args);
+            addAll(tmp, toArgs(sysArgs));
+            System.out.println(tmp);
+        }
+        
         int start = getIntArg(args, "start", 1);
         int max = getIntArg(args, "max", 10);
         int modulo = getIntArg(args, "modulo", 5);
