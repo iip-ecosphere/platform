@@ -44,8 +44,7 @@ import de.iip_ecosphere.platform.support.CollectionUtils;
  */
 public class ProcessUnit {
     
-    public static final String WIN_BASH_PREFIX = "cmd /s /c ";
-    public static final String UNIX_SHELL_PREFIX = "sh ./";
+    public static final String[] WIN_BAT_PREFIX = {"cmd", "/s", "/c"};
     public static final int UNKOWN_EXIT_STATUS = Integer.MIN_VALUE;
     private static Timer timer;
     
@@ -330,10 +329,10 @@ public class ProcessUnit {
          */
         public ProcessUnitBuilder addMavenCommand() {
             if (SystemUtils.IS_OS_WINDOWS) {
-                addArguments(ProcessUnit.WIN_BASH_PREFIX);
+                addArguments(ProcessUnit.WIN_BAT_PREFIX);
                 enableArgumentAggregation();
             }
-            addArguments("mvn");
+            addArgument("mvn");
             return this;
         }
 
@@ -368,11 +367,11 @@ public class ProcessUnit {
                 cmd += e;
             }
             if (SystemUtils.IS_OS_WINDOWS) {
-                addArguments(ProcessUnit.WIN_BASH_PREFIX);
+                addArguments(ProcessUnit.WIN_BAT_PREFIX);
                 enableArgumentAggregation();
-                addArguments(cmd);
+                addArgument(cmd);
             } else {
-                addArguments(ProcessUnit.UNIX_SHELL_PREFIX + cmd);
+                addArguments("sh", "./" + cmd);
             }
             return this;
         }
@@ -441,19 +440,6 @@ public class ProcessUnit {
          */
         public ProcessUnitBuilder addArguments(String... arguments) {
             return addArguments(CollectionUtils.toList(arguments));            
-        }
-
-        /**
-         * Adds command line arguments.
-         * 
-         * @param arguments the arguments
-         * @return <b>this</b> (builder style)
-         */
-        public ProcessUnitBuilder addArguments(String arguments) {
-            if (appendByAggregation(arguments)) {
-                splitArgs(arguments, args);
-            }
-            return this;
         }
         
         /**
@@ -619,31 +605,6 @@ public class ProcessUnit {
         }
         return getExitValue();
     }
-    
-    /**
-     * Splits {@code args} into individual params and adds them to {@code params}. {@code args} may contain quotes.
-     * 
-     * @param args the arguments, may be <b>null</b> or empty
-     * @param params the parameters, modified as side effect by adding
-     */
-    public static void splitArgs(String args, List<String> params) {
-        if (args != null && args.length() > 0) {
-            boolean inQuote = false;
-            int lastPos = 0;
-            for (int i = 0; i < args.length(); i++) {
-                char c = args.charAt(i);
-                if (Character.isWhitespace(c) && !inQuote) {
-                    params.add(args.substring(lastPos, i).trim());
-                    lastPos = i + 1;
-                } else if (c == '"') {
-                    inQuote = !inQuote;
-                }
-            }
-            if (lastPos < args.length()) {
-                params.add(args.substring(lastPos, args.length()).trim());
-            }
-        }
-    }    
     
     /**
      * Handles an input stream.

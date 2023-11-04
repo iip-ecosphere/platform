@@ -140,10 +140,11 @@ Testing a generated application typically requires starting the communication br
   </build>
   ```
   
-The ``testApp`` goal (default phase ``package``, can be seen as integration test but our invoker disables tests to avoid conflicts with app in one-shot-projects) supports the following configuration settings: 
-  - `testCmd` (`-Dconfiguration.testApp.testCmd=...`, default ``""``) the command to be executed for testing instead of an oktoflow application. If not given, an application is tested via ``maven exec:java@app``.
-  - `appId` (`-Dconfiguration.testApp.appId=...`, default ``app``) the id for executing the application in test mode in the POM.
-  - `appArgs` (`-Dconfiguration.testApp.appArgs=...`, default ``""``) additional arguments to be passed to the application.
+The ``testApp`` goal (default phase ``package``, can be seen as integration test but our invoker disables tests to avoid conflicts with app in one-shot-projects) allows for testing an oktoflow application either via ``mvn exec:java@app`` or through a given command. In case of maven, passes on the value of the environment variable ``MAVEN_SETTINGS_PATH`` or if not given the maven user settings as user settings file location. Starts the required broker and may start platform services. This goal supports the following configuration settings: 
+
+  - `testCmd` (`-Dconfiguration.testApp.testCmd=...`, default ``""``) the command to be executed for testing instead of an oktoflow application. Arguments are in ``appArgs``. If not given, an application is tested via ``mvn exec:java@app``.
+  - `appId` (`-Dconfiguration.testApp.appId=...`, default ``app``) the id for executing the application through ``mvn exec:java@app`` in test mode as given in the POM.
+  - `appArgs` (`-Dconfiguration.testApp.appArgs=...`, default ``""``) additional arguments given as individual `appArg` entries to be passed to the application.
   - `logFile` (`-Dconfiguration.testApp.logFile=...`, default ``""``) if given, the name/location of the file where to write the output of the tested application to. Per default, the output is merged into the output of this plugin.
   - `logRegExprs` (`-Dconfiguration.testApp.logRegExprs=...`, default ``""``) if given, regular expressions indicating in the application log that the application execution was successful (see also ``logRegExConjunction``).
   - `logRegExConjunction` (`-Dconfiguration.testApp.logRegExConjunction=...`, default ``true``) whether all specified regular expressions must match or at least one.

@@ -21,6 +21,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -30,6 +31,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 
 import de.iip_ecosphere.platform.configuration.maven.ProcessUnit.ProcessUnitBuilder;
 import de.iip_ecosphere.platform.configuration.maven.ProcessUnit.TerminationReason;
+import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.TimeUtils;
 
@@ -44,19 +46,22 @@ public class TestAppMojo extends AbstractMojo {
     @Parameter(defaultValue = "${session.offline}")
     private boolean offline;
     
+    @Parameter(defaultValue = "${session.request}")
+    private MavenExecutionRequest request;
+    
     @Parameter(property = "configuration.testApp.testCmd", required = false, defaultValue = "")
     private String testCmd;
 
     @Parameter(property = "configuration.testApp.appId", required = false, defaultValue = "app")
     private String appId;
 
-    @Parameter(property = "configuration.testApp.appArgs", required = false, defaultValue = "")
-    private String appArgs;
+    @Parameter(property = "configuration.testApp.appArgs", required = false)
+    private List<String> appArgs;
     
     @Parameter(property = "configuration.testApp.logFile", required = false, defaultValue = "")
     private File logFile;
 
-    @Parameter(property = "configuration.testApp.logRegExprs", required = false, defaultValue = "")
+    @Parameter(property = "configuration.testApp.logRegExprs", required = false)
     private List<String> logRegExprs;
 
     @Parameter(property = "configuration.testApp.logRegExConjunction", required = false, defaultValue = "true")
@@ -236,20 +241,32 @@ public class TestAppMojo extends AbstractMojo {
         }
         if (null != testCmd && testCmd.length() > 0) {
             testBuilder
-                .addArguments(testCmd)
+                .addArgument(testCmd)
                 .addArguments(appArgs);
         } else {
             String tmpAppArgs = "";
-            if (null != appArgs && appArgs.length() > 0) {
-                tmpAppArgs = " " + appArgs;
+            if (null != appArgs && appArgs.size() > 0) {
+                tmpAppArgs = " " + CollectionUtils.toStringSpaceSeparated(appArgs);
             }
             testBuilder.addMavenCommand();
             if (offline) {
                 testBuilder.addArgument("-o");
             }
-            testBuilder.addArguments(
-                "-P App exec:java@" + appId + " -Diip.springStart.args=\"--iip.test.stop=" + testTime 
-                + " --iip.test.brokerPort=" + brokerPort + " -Diip.app.hm22.mock.callRobot=false" + tmpAppArgs + "\"");
+            String sPath = System.getenv("MAVEN_SETTINGS_PATH");
+            if (null == sPath) {
+                sPath = null != request.getUserSettingsFile() ? request.getUserSettingsFile().getPath() : null;
+            }
+            if (null != sPath) {
+                testBuilder.addArgument("-s");
+                testBuilder.addArgument(sPath);
+            }
+            testBuilder.addArgument("-P");
+            testBuilder.addArgument("App");
+            testBuilder.addArgument("exec:java@" + appId);
+            testBuilder.addArgument(
+                "-Diip.springStart.args=\"--iip.test.stop=" + testTime 
+                + " --iip.test.brokerPort=" + brokerPort 
+                + tmpAppArgs + "\"");
         }
         testBuilder.setRegExConjunction(logRegExConjunction);
         if (null != logRegExprs) {
@@ -273,7 +290,6 @@ public class TestAppMojo extends AbstractMojo {
         TimeUtils.waitFor(() -> !testTerminated.get(), testTime, 300);
         
         boolean failed = stopProcessUnits();
-        
         if (testUnit.hasCheckRegEx()) {
             if (!testUnit.getLogMatches()) {
                 throw new MojoFailureException("Specified regular expressions do not match. Test did not succeed.");

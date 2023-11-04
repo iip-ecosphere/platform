@@ -38,7 +38,8 @@ public class ProcessUnitTest {
         System.out.println("Testing process with successful regex terminating on match:");
         Pattern p = Pattern.compile("^DONE: \\d+$");
         ProcessUnit unit = new ProcessUnit.ProcessUnitBuilder("p", null)
-            .addArguments("java " + DummyApp.class.getName())
+            .addArgument("java")
+            .addArgument(DummyApp.class.getName())
             .setHome(new File("./target/test-classes"))
             .setTerminateByLogMatch(true)
             .addCheckRegEx(p)
@@ -60,7 +61,8 @@ public class ProcessUnitTest {
         System.out.println("Testing process with failing regex terminating itself when over:");
         Pattern p = Pattern.compile("^XYZ: \\d+$");
         ProcessUnit unit = new ProcessUnit.ProcessUnitBuilder("p2", null)
-            .addArguments("java " + DummyApp.class.getName())
+            .addArgument("java")
+            .addArgument(DummyApp.class.getName())
             .setHome(new File("./target/test-classes"))
             .setTerminateByLogMatch(false)
             .addCheckRegEx(p)
@@ -83,7 +85,8 @@ public class ProcessUnitTest {
     public void testTerminatedProcess() {
         System.out.println("Testing process being explicitly terminated:");
         ProcessUnit unit = new ProcessUnit.ProcessUnitBuilder("", null)
-            .addArguments("java " + DummyApp.class.getName())
+            .addArgument("java")
+            .addArgument(DummyApp.class.getName())
             .setHome(new File("./target/test-classes"))
             .build();
         TimeUtils.sleep(500);
@@ -104,7 +107,8 @@ public class ProcessUnitTest {
         AtomicInteger terminationCount = new AtomicInteger();
         System.out.println("Testing process with timeout:");
         ProcessUnit unit = new ProcessUnit.ProcessUnitBuilder("p", null)
-            .addArguments("java " + DummyApp.class.getName())
+            .addArgument("java")
+            .addArgument(DummyApp.class.getName())
             .setHome(new File("./target/test-classes"))
             .setTimeout(1000)
             .setListener(r -> terminationCount.incrementAndGet())
@@ -149,7 +153,10 @@ public class ProcessUnitTest {
         Pattern p = Pattern.compile("^.*Scanning for projects.*$");
         ProcessUnit unit = new ProcessUnit.ProcessUnitBuilder("mvn", null)
             .addMavenCommand()
-            .addArguments("-P App validate -Diip.springStart.args=\"--iip.test.stop=1000 --iip.test.brokerPort=1234\"")
+            .addArgument("-P")
+            .addArgument("App")
+            .addArgument("validate")
+            .addArgument("-Diip.springStart.args=\"--iip.test.stop=1000 --iip.test.brokerPort=1234\"")
             .addCheckRegEx(p)
             .logTo(null)
             .build();
