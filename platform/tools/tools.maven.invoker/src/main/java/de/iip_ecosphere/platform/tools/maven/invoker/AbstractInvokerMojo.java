@@ -124,7 +124,10 @@ public class AbstractInvokerMojo extends AbstractMojo {
 
     @Parameter(property = "enableJavadoc", defaultValue = "false") 
     private boolean enableJavadoc;
-    
+
+    @Parameter(property = "invoker.debug", defaultValue = "false") 
+    private boolean debug;
+
     @Component
     private Invoker invoker;
     
@@ -215,6 +218,7 @@ public class AbstractInvokerMojo extends AbstractMojo {
         request.setGoals(invokeGoals);
         request.setProfiles(invokeProfiles);
         request.setOffline(offline);
+        request.setDebug(debug);        
         request.setMavenExecutable(mavenExecutable);
         request.setTimeoutInSeconds(timeoutInSeconds);
         
