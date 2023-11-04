@@ -38,7 +38,7 @@ import de.iip_ecosphere.platform.support.TimeUtils;
  * 
  * @author Holger Eichelberger, SSE
  */
-@Mojo(name = "testApp", defaultPhase = LifecyclePhase.INTEGRATION_TEST)
+@Mojo(name = "testApp", defaultPhase = LifecyclePhase.PACKAGE)
 public class TestAppMojo extends AbstractMojo {
 
     @Parameter(defaultValue = "${session.offline}")
