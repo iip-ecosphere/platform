@@ -246,11 +246,11 @@ public class TestAppMojo extends AbstractMojo {
         testBuilder.addArgument("-P");
         testBuilder.addArgument("App");
         if (null != mvnArgs) {
-            testBuilder.addArgument(mvnArgs);
+            testBuilder.addArguments(mvnArgs);
         }
         testBuilder.addArgument("exec:java@" + appId);
         if (null != mvnPluginArgs) {
-            testBuilder.addArgument(mvnPluginArgs);
+            testBuilder.addArguments(mvnPluginArgs);
         }
         testBuilder.addArgument(
             "-Diip.springStart.args=\"--iip.test.stop=" + testTime 

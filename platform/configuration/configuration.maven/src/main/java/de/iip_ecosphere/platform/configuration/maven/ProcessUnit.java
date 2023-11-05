@@ -396,7 +396,7 @@ public class ProcessUnit {
          *     not need further aggregation
          */
         private boolean appendByAggregation(String arg) {
-            if (argAggregate != null) {
+            if (argAggregate != null && arg.length() > 0) {
                 if (argAggregate.length() > 0) {
                     argAggregate += " ";
                 }
