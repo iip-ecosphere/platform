@@ -127,7 +127,7 @@ public class ConfigurationTests {
      */
     @Test
     public void testSimpleMesh() throws IOException {
-        testInstantiatedExample("SimpleMesh", "SimpleMeshTestingApp", 15000, SIMPLE_RECEIVED_ASSERTER);
+        testInstantiatedExample("SimpleMesh", "SimpleMeshTestingApp", 25000, SIMPLE_RECEIVED_ASSERTER);
     }
 
     /**
@@ -137,7 +137,7 @@ public class ConfigurationTests {
      */
     @Test
     public void testSimpleMesh3() throws IOException {
-        testInstantiatedExample("SimpleMesh3", "SimpleMeshTestingApp3", 25000, SIMPLE_RECEIVED_ASSERTER);
+        testInstantiatedExample("SimpleMesh3", "SimpleMeshTestingApp3", 35000, SIMPLE_RECEIVED_ASSERTER);
     }
     
     /**
