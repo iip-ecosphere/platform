@@ -174,9 +174,10 @@
 	                        <!-- WARNING: Jenkins cannot contact UMATI OPCUA service. Disabling execution! -->
 	                        <configuration>
 	                            <appId>generatedConnector</appId>
-	                            <appArgs>
-	                                <appArg>--skip</appArg>
-	                            </appArgs>
+	                            <mvnArgs>
+	                                <mvnArg>-Dexec.args="--skip"</mvnArg>
+	                            </mvnArgs>
+	                            <brokerPort>0</brokerPort>
 	                            <logRegExprs>
 	                                <logRegExpr>.*UMATI OPCUA Connector test.*</logRegExpr>
 	                            </logRegExprs>
