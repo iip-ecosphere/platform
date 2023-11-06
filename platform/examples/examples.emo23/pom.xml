@@ -462,6 +462,7 @@
                             <goal>generateApps</goal>
                         </goals>
                     </execution>
+                    <!-- so far no regression test prepared/defined -->
                 </executions>
                 <configuration>
                     <model>${iip.model}</model>
