@@ -24,10 +24,10 @@ import org.apache.maven.plugins.annotations.Parameter;
  */
 public class BasicProcessSpec {
     
-    @Parameter(required = true, defaultValue = "")
+    @Parameter(required = true)
     private String description;
 
-    @Parameter(required = true, defaultValue = "")
+    @Parameter(required = true)
     private String cmd;
 
     @Parameter(required = false, defaultValue = "false")

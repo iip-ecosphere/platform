@@ -218,6 +218,48 @@ The goal can be configured as follows
     - `args` optional arguments of the process, as above
     - `home` optional home directory of the process
 
+# Text file modifications
+
+This artifact also contains a simple goal (`textFile`) for line-based text file modifications.
+
+  ```xml
+  <build>
+      <plugins>
+         <plugin>
+            <groupId>de.iip-ecosphere.platform</groupId>
+            <artifactId>configuration-plugin</artifactId>
+            <version>${project.version}</version>
+            <executions>
+                <!-- executions from above above where applicable -->
+                <execution>
+                    <id>modFile</id>
+                    <goals>
+                        <goal>textFile</goal>
+                    </goals>
+                    <configuration>
+                        <file>...</file>
+                        <prepends>
+                            <prepend>...</prepend>
+                        </prepends>
+                        <appends>
+                            <append>...</append>
+                        </append>
+                        <deletions>
+                            <deletion>...</deletion>
+                        </deletions>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+     </plugins>
+  </build>
+  ```
+It can be set up as follows:
+ - `file` (`-Dconfiguration.textFile.file=...`, no default) the name of the file to modify
+ - `prepends` (`-Dconfiguration.textFile.prepends=...`, default empty) lines to be pretended, may contain property extrapolations to be applied before calling this plugin
+ - `appends` (`-Dconfiguration.textFile.appends=...`, default empty) lines to be appended, may contain property extrapolations to be applied before calling this plugin
+ - `deletions` (`-Dconfiguration.textFile.deletions=...`, default empty) line numbers of the original file to be deleted
+
 # Angular build
 
 For pragmatic reasons, this artifact also contains the `ngBuild` goal (default `compile` phase) for building angular applications.
