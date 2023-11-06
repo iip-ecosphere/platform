@@ -152,7 +152,7 @@ The `testApp` goal (default phase `package`, can be seen as integration test but
   - `logRegExprs` (`-Dconfiguration.testApp.logRegExprs=...`, default `""`) if given, regular expressions indicating in the application log that the application execution was successful (see also `logRegExConjunction`).
   - `logRegExConjunction` (`-Dconfiguration.testApp.logRegExConjunction=...`, default `true`) whether all specified regular expressions must match or at least one.
   - `skip` (`-Dconfiguration.testApp.skip=...`, default `false`) skips the execution of this plugin.
-  - `brokerPort` (`-Dconfiguration.testApp.brokerPort=...`, default `-1`) the port to use for the communication broker, an ephemeral one is used if not positive.
+  - `brokerPort` (`-Dconfiguration.testApp.brokerPort=...`, default `-1`) the port to use for the communication broker, an ephemeral one is used if not positive, execution of broker and platform are skipped if `0`.
   - `brokerWaitTime` (`-Dconfiguration.testApp.brokerWaitTime=...`, default `3000`) time in ms to wait for the broker to be safely up.
   - `testTime` (`-Dconfiguration.testApp.testTime=...`, default `120000`) time in ms to wait until the test shall be terminated as a failure (if not a log pattern match occurred before).
   - `platformDir` (`-Dconfiguration.testApp.platformDir=...`, default `""`) directory into which an optional platform was instantiated. If not given, no platform services will be executed at all. 

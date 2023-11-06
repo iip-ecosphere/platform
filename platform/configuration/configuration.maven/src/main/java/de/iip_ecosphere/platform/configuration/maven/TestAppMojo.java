@@ -363,14 +363,15 @@ public class TestAppMojo extends AbstractLoggingMojo {
         if (brokerPort < 0) {
             brokerPort = NetUtils.getEphemeralPort();
         }
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> stopProcessUnits()));
-        getLog().info("Using broker port: " + brokerPort);
-        buildAndRegister(createPlatformBuilder("broker", new File("gen/broker/broker"), "broker", 
-            String.valueOf(brokerPort))
-            .setTimeout(testTime));
-        TimeUtils.sleep(brokerWaitTime); // broker may take a while
-
-        startPlatform(brokerPort); 
+        if (brokerPort > 0) {
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> stopProcessUnits()));
+            getLog().info("Using broker port: " + brokerPort);
+            buildAndRegister(createPlatformBuilder("broker", new File("gen/broker/broker"), "broker", 
+                String.valueOf(brokerPort))
+                .setTimeout(testTime));
+            TimeUtils.sleep(brokerWaitTime); // broker may take a while
+            startPlatform(brokerPort);
+        }
         startProcesses();
         
         ProcessUnitBuilder testBuilder = new ProcessUnit.ProcessUnitBuilder("test app", this);
