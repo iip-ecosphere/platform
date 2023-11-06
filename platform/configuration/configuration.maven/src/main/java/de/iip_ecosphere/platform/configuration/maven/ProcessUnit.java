@@ -413,7 +413,9 @@ public class ProcessUnit {
          * @return <b>this</b> (builder style)
          */
         public ProcessUnitBuilder addArgumentOrScriptCommand(boolean cmdAsScript, String cmd) {
-            if (cmdAsScript || SCRIPT_NAMES.contains(cmd)) {
+            if (!SystemUtils.IS_OS_WINDOWS && SCRIPT_NAMES.contains(cmd)) {
+                addArgument(cmd);
+            } else if (cmdAsScript) {
                 addShellScriptCommand(cmd);
             } else {
                 addArgument(cmd);
