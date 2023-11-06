@@ -41,7 +41,23 @@ public class CollectionUtils {
         }
         return result;
     }
-    
+
+    /**
+     * Turns given {@code elements} into a list.
+     * 
+     * @param <T> the element type
+     * @param elements the elements
+     * @return the list containing all {@code elements}
+     */
+    @SafeVarargs
+    public static <T> Set<T> toSet(T... elements) {
+        Set<T> result = new HashSet<T>();
+        for (T e : elements) {
+            result.add(e);
+        }
+        return result;
+    }
+
     /**
      * Turns given {@code elements} to {@code list}.
      * 

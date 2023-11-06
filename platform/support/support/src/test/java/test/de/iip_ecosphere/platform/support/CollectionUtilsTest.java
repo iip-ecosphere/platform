@@ -67,6 +67,11 @@ public class CollectionUtilsTest {
         for (String s : data) {
             Assert.assertTrue(result.contains(s));
         }
+        
+        result = CollectionUtils.toSet("1", "2", "2");
+        Assert.assertTrue(result.contains("1"));
+        Assert.assertTrue(result.contains("2"));
+        Assert.assertEquals(2, result.size());
     }
     
     /**
