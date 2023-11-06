@@ -227,6 +227,18 @@
 	                        <goal>generateApps</goal>
 	                    </goals>
 	                </execution>
+                    <execution>
+                        <id>testApp</id>
+                        <goals>
+                            <goal>testApp</goal>
+                        </goals>
+                        <configuration>
+                            <logRegExprs>
+                                <logRegExpr>.*RECEIVED.*</logRegExpr>
+                            </logRegExprs>
+                            <testTime>120000</testTime>
+                        </configuration>
+                    </execution>
 	            </executions>
 	            <configuration>
 	                <model>${iip.model}</model>

@@ -15,10 +15,12 @@ This example consists of several pieces:
   * `src/test/python` contains the IIP-Ecosphere service environment (from Maven, see below).
   * A Maven assembly descriptor `src/main/assembly/python.xml` for packaging the Python service code into a ZIP (to be deployed, basis for the automated integration).
   * Two Maven profiles, one for obtaining the configuration meta-model / performing the instantiation as well as one for the application itself (executes the assembly descriptor). 
+
+An explaining overview slide is available [here](docs/Examples_PythonSync.pdf)
   
 Regarding Python code, we make the assumption that the module of the Python Service Environment `iip` and the generated modules `datatypes`, `interfaces`, `serializers` and `services` are visible to Python within the same folder (physically or virtually).
   
-As stated above, directly after obtaining this project, the application will not run and even show compile errors. This is due to the fact that generated parts and even the configuration meta model are missing. We will add them through the following steps (as explained in more details in the Platform Handbook). As usual with Maven projects, you may add the argument `-U` to update snapshots if parts are already in place (see also `build.sh`):
+As stated above, directly after obtaining this project, the application will not run and even show compile errors. This is due to the fact that generated parts and even the configuration meta model are missing. We will add them through the following steps (as explained in more details in the Platform Handbook). As usual with Maven projects, you may add the argument `-U` to update snapshots if parts are already in place:
 
   * Ensure that the Maven platformDependencies are installed (see [install](../../tools/Install))
   * Execute `mvn -U install` This will perform the broker-instantiation, the interface generation, the code compilation and packaging as well as the final application packaging. Build steps are only executed if the configuration model changes or generate code is not already existing. If a `resources.ipr` folder is present, it will take precendence over the `resources` folder. 
@@ -43,10 +45,3 @@ Service implementations must follow some rules to be taken up by the service env
 ## Required Updates
 
 See [Platform configuration](../../configuration/configuration) for details on the state of the generation and the required version of EASy-Producer (at least from the day of the last commit of this example). If the configuration meta model shall be updated, add `-Dunpack.force=true`.
-
-## Desirable
-
-* Explaining slides, may be a video. 
-* Explicit Python dependencies to be considered during automated Container generation.
-
-An explaining overview slide is available [here](docs/Examples_PythonSync.pdf)
