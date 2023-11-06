@@ -13,9 +13,11 @@ This example consists of several pieces:
   * A fake implementation of RapidMiner RTSA in `resources`. If you have an RTSA at hands, just overwrite the packaged RTSA as well as the deployment with respective files in `resources`. Please note that the **original RTSA** requires **exactly JDK 8** while the **fake RTSA** runs with **JDK 8 and newer**. Execution may require `-Diip.test.java8=<location of java 8 jvm executable>`
   * `pom.xml` for the application. 
 
+An explaining overview slide is available [here](docs/Examples_RTSA.pdf)
+
 In case you have to change the resources folder, e.g., to utilize licensed resources, you should add `-Diip.resources="NewFolderName"` to the commands (default value is `resources`). For example `mvn -P EasyGen exec:java@generateApps -Diip.resources="NewFolderName"`.
   
-As stated above, directly after obtaining this project, the application will not run and even show compile errors. This is due to the fact that generated parts and even the configuration meta model are missing. We will add them through the following steps (as explained in more details in the Platform Handbook). As usual with Maven projects, you may add the argument `-U` to update snapshots if parts are already in place (see also `build.sh`):
+As stated above, directly after obtaining this project, the application will not run and even show compile errors. This is due to the fact that generated parts and even the configuration meta model are missing. We will add them through the following steps (as explained in more details in the Platform Handbook). As usual with Maven projects, you may add the argument `-U` to update snapshots if parts are already in place:
 
   * Ensure that the Maven platformDependencies are installed (see [install](../../tools/Install))
   * Execute `mvn -U install` This will perform the broker-instantiation, the interface generation, the code compilation and packaging as well as the final application packaging. Build steps are only executed if the configuration model changes or generate code is not already existing. If a `resources.ipr` folder is present, it will take precendence over the `resources` folder. 
@@ -28,12 +30,10 @@ If you want to execute the example in a platform installation, add `gen/rtsa/Sim
 
 Hint: Without advanced service control of the platform, it may be the case that when the (fake) RTSA takes longer to start, the first data items cannot be processed and a `Processing failed: Connection refused: connect` message occurs. And, as usual, ** do not modify generated code **.
 
+The application tests are disabled as Java8 is needed and the installation location is unclear. To enable them, use `-Dconfiguration.testApp.skip=false` and your location of java8 in `-Djava8.home=/usr/lib/jvm/java-8-openjdk-amd64/bin/java`.
+
+
 ## Required Updates
 
 See [Platform configuration](../../configuration/configuration) for details on the state of the generation and the required version of EASy-Producer (at least from the day of the last commit of this example). 
 
-## Desirable
-
-Explaining slides, may be a video.
-
-An explaining overview slide is available [here](docs/Examples_RTSA.pdf)

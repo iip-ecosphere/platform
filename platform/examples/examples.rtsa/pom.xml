@@ -50,6 +50,7 @@
   <properties>
         <iip.resources>resources</iip.resources>
         <iip.model>PlatformConfiguration</iip.model>
+        <java8.java>/usr/lib/jvm/java-8-openjdk-amd64/bin/java</java8.java> <!-- set to jenkins, may be overridden -->
   </properties>
   
   <profiles>
@@ -168,6 +169,21 @@
 	                        <goal>generateApps</goal>
 	                    </goals>
 	                </execution>
+                    <execution>
+                        <id>testApp</id>
+                        <goals>
+                            <goal>testApp</goal>
+                        </goals>
+                        <configuration>
+                            <logRegExprs>
+                                <logRegExpr>.*RECEIVED.*</logRegExpr>
+                            </logRegExprs>
+                            <mvnPluginArgs>
+                                <mvnPluginArg>-Diip.test.java8=${java8.java}</mvnPluginArg>
+                            </mvnPluginArgs>
+                            <skip>true</skip> <!-- as JAVA 8 may not be there -->
+                        </configuration>
+                    </execution>
 	            	</executions>
 	            	<configuration>
 	                	<model>${iip.model}</model>

@@ -9,6 +9,8 @@
 	<target name="maven"> 
         <maven pomFile="pom.xml" goal="install">
             <arg value="-Dunpack.force=true"/>
+            <arg value="-Dconfiguration.testApp.skip=false"/>
+            <arg value="-Djava8.home=/usr/lib/jvm/java-8-openjdk-amd64/bin/java"/>
         </maven>
 	</target>
 </project>
