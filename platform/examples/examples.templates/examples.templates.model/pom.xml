@@ -102,7 +102,19 @@
                       <goal>generateApps</goal>
                   </goals>
               </execution>
-			  
+               <execution>
+                   <id>testApp</id>
+                   <goals>
+                       <goal>testApp</goal>
+                   </goals>
+                   <configuration>
+                       <appPom>../examples.templates.impl/pom.xml</appPom>
+                       <appId>App</appId>
+                       <logRegExprs>
+                           <logRegExpr>.*Output:.*</logRegExpr>
+                       </logRegExprs>
+                   </configuration>
+               </execution>
           </executions>
           <configuration>
               <model>${iip.model}</model>

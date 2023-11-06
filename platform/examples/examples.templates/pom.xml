@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>examples.templates-main</artifactId>
+  <packaging>jar</packaging>
+  <name>Model setup project (main)</name>
+  <description>Example project for implementing an application (main).</description>
+
+  <parent>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>platformDependencies</artifactId>
+     <version>0.7.0-SNAPSHOT</version>
+	 <relativePath/>
+  </parent>
+
+  <build>
+      <plugins>
+         <plugin>
+            <groupId>de.iip-ecosphere.platform</groupId>
+            <artifactId>invoker-plugin</artifactId>
+            <version>${project.version}</version>
+            <executions>
+                <execution>
+                    <id>genInterfaces</id>
+                    <goals>
+                        <goal>install</goal>
+                    </goals>
+                    <configuration>
+                        <!-- <invokeProfiles>
+                            <invokeProfile>default</invokeProfile>
+                        </invokeProfiles> -->
+                        <invokeGoals>
+                            <invokeGoal>generate-sources</invokeGoal>
+                        </invokeGoals>
+                        <pom>examples.templates.model/pom.xml</pom>
+                        <disableBuild>true</disableBuild>
+                    </configuration>
+                </execution>
+                <execution>
+                    <id>installServices</id>
+                    <goals>
+                        <goal>install</goal>
+                    </goals>
+                    <configuration>
+                        <!-- <invokeProfiles>
+                            <invokeProfile>default</invokeProfile>
+                        </invokeProfiles> -->
+                        <invokeGoals>
+                            <invokeGoal>install</invokeGoal>
+                        </invokeGoals>
+                        <pom>examples.templates.impl/pom.xml</pom>
+                    </configuration>
+                </execution>
+                <execution>
+                    <id>integrateApp</id>
+                    <goals>
+                        <goal>install</goal>
+                    </goals>
+                    <configuration>
+                        <!-- <invokeProfiles>
+                            <invokeProfile>EasyGen</invokeProfile>
+                        </invokeProfiles> -->
+                        <invokeGoals>
+                            <invokeGoal>package</invokeGoal>
+                        </invokeGoals> 
+                        <disableBuild>true</disableBuild>
+                        <pom>examples.templates.model/pom.xml</pom>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
+  </build>
+  
+  
+</project>
