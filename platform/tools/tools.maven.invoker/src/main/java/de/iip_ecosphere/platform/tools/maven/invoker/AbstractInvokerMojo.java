@@ -13,9 +13,11 @@
 package de.iip_ecosphere.platform.tools.maven.invoker;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -128,6 +130,9 @@ public class AbstractInvokerMojo extends AbstractMojo {
     @Parameter(property = "invoker.debug", defaultValue = "false") 
     private boolean debug;
 
+    @Parameter(property = "invoker.skipIfExists", defaultValue = "") 
+    private File skipIfExists;
+    
     @Component
     private Invoker invoker;
     
@@ -228,7 +233,8 @@ public class AbstractInvokerMojo extends AbstractMojo {
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         final InvocationRequest request = createInvocationRequest();
-        if (enabled) {
+        boolean enableOnExists = null == skipIfExists ? true : !skipIfExists.exists(); 
+        if (enabled && enableOnExists) {
             try {
                 getLog().info(">>> Maven invoker: Using MAVEN_OPTS: " + request.getMavenOpts());
                 getLog().info(">>> Executing: " + new MavenCommandLineBuilder().build(request));
@@ -250,8 +256,19 @@ public class AbstractInvokerMojo extends AbstractMojo {
                 throw new MojoExecutionException( "Maven invocation failed. " + ex.getMessage());
             }
             getLog().info("<<< Maven invoker completed");
+            if (skipIfExists != null) {
+                try {
+                    FileUtils.touch(skipIfExists);
+                } catch (IOException e) {
+                    getLog().warn("Cannot touch " + skipIfExists + ": " + e.getMessage());
+                }
+            }
         } else {
-            getLog().info("Maven invoker disabled, not executing.");
+            if (enabled && !enableOnExists) {
+                getLog().info("Maven invoker skipped as " + skipIfExists + " exists.");
+            } else {
+                getLog().info("Maven invoker disabled, not executing.");
+            }
         }
     }
     

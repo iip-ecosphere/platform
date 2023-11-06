@@ -66,6 +66,7 @@ This plugin passes through the property `python-compile.hashDir` (also as enviro
 The plugin supports the following configuration settings:
   - `invokeGoals` the mandatory goals to be invoked, each stated in an own element `invokeGoal`
   - `invokeProfiles` optional profiles to be invoked, each stated in an own element `invokeProfile` (default: not given)
+  - `skipIfExists` (default ``, user property `invoker.skipIfExists`) skips the execution if the file exists. If it does not exist, touch the file after successful execution.
   - `disableJava` (default `false`, user property `disableJava`) sets system properties to disable Java compilation, Java test compilation, test execution and Javadoc generation. Helpful shortcut for executing generation profiles.
   - `enableJavadoc` (default `false`, user property `enableJava`) enables JavaDoc generation
   - `disablePython` (default `false`, user property `disablePython`) sets system properties to disable platform Python "compilation" and testing.
