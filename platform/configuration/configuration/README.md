@@ -4,7 +4,7 @@ IIP-Ecosphere aims at an encompassing and consistent configuration of the whole 
 
 As configuration technology, we rely on [EASy-Producer](https://sse.uni-hildesheim.de/forschung/projekte/easy-producer/), it's variability modeling language IVML and its instantiation languages VIL/VTL. All languages are described on the EASy-Producer website. We integrate EASy-Producer here through it's Maven artifacts, define the variability model in IVML, the variability instantiation in VTL and perform respective tests.
 
-It is important to understand that the configuration model and the related code generation are evolving. For the actual release, we did not aim at a complete model rather than a model that can serve for initial tests and demonstrators. Thus, for now, advanced capabilities such as the assignment of services to resources, the respective partitioning (strategy) of the generated artifacts, or a mapping of external data types through the model/generation are intentionally missing. In particular data type mapping is currently considered as application-specific code that must be provided as application artifact. Further, services are currently loaded at runtime, which may turn into an IVML/VIL extension in the future.
+It is important to understand that the configuration model and the related code generation are evolving, i.e., modeling capabilities, properties, mechanisms and code generation may change over time. A graphical user interface is also evolving in terms of the webbased [management UI](../../managementUI).
 
 So far there is no graphical user interface which shall be located one layer above this component, i.e., use the interface the component provides. For initial instantiation, we provide the PlatformInstantiator class which executes the configuration process from command line.
 
@@ -53,8 +53,6 @@ For running the tests locally, you need a Python 3.9 with all IIP-Python depende
 For running the container tests, you need Docker and LXC (Linux only). To bypass the container creation in either case, use `-Deasy.docker.failOnError=false` to disable failure reporting during Docker instantiator execution or `-Deasy.lxc.failOnError=false` to disable failure reporting for the LXC instantiator. The instantiation process shall then run anyway and produce the related artifacts, e.g., Dockerfiles or LXC templates, but no container images are created/deployed.
 
 Some of the test models include the RapidMiner RTSA integration. As RTSA is an IPR-protected commercial production, we cannot package it with its integration and must integrate its artifacts here. For this purpose, the folder `resources` contains resources that shall be packaged during platform/application installation. The RTSA files committed there contain fake RTSA implementation for testing built by the RTSA integration package. However, if you have a real RTSA at hands, create a similar directory called resources.ipr with the actual files and the instantiation will take it up.
-
-**First CI build:** Run this with `-Diip.build.initial=true` or system environment property `iipbuildinitial=true` for obtaining and deploying the interface artifacts.
 
 **Hint:** If tests are failing on your side due to a missing Docker installation, you may prevent this by `-Deasy.docker.failOnError=false`.
 

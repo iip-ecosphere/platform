@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>apps.ServiceImpl</artifactId>
+  <packaging>jar</packaging>
+  <name>GeneratedStreamImpl</name>
+  <description>Implementation components for generated test streams (configuration.configuration).</description>
+
+  <parent>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>platformDependencies</artifactId>
+     <version>0.7.0-SNAPSHOT</version>
+  </parent>
+
+  <dependencies>
+    <dependency>
+        <groupId>commons-io</groupId>
+        <artifactId>commons-io</artifactId>
+    </dependency>
+    <dependency>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>services.environment</artifactId>
+     <version>${project.version}</version>
+    </dependency>
+    <dependency>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>connectors</artifactId>
+     <version>${project.version}</version>
+    </dependency>
+    <dependency>
+     <!-- shared plattform app interfaces, here just for lazy testing in different artifact -->
+     <artifactId>apps.AppInterfacesSimpleMesh</artifactId>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <version>${project.version}</version>
+    </dependency>
+    <dependency>
+     <!-- shared plattform app interfaces, here just for lazy testing in different artifact -->
+     <artifactId>apps.AppInterfacesSimpleMesh3</artifactId>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <version>${project.version}</version>
+    </dependency>
+    <dependency>
+     <!-- shared plattform app interfaces, here just for lazy testing in different artifact -->
+     <artifactId>apps.AppInterfacesKodex</artifactId>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <version>${project.version}</version>
+    </dependency>    
+    <dependency>
+     <!-- shared plattform app interfaces, here just for lazy testing in different artifact -->
+     <artifactId>apps.AppInterfacesContainerCreation</artifactId>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <version>${project.version}</version>
+    </dependency>    
+    <dependency>
+     <!-- shared plattform app interfaces, here just for lazy testing in different artifact -->
+     <artifactId>apps.AppInterfacesRoutingTest</artifactId>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <version>${project.version}</version>
+    </dependency>    
+  
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  
+  <build>
+     <!-- Basic puild process inherited from platformDependencies. -->
+     <plugins>
+        <plugin>
+            <!-- Obtain generated python sources from Maven repository (shall be deployed there) -->
+            <groupId>de.iip-ecosphere.platform</groupId>
+            <artifactId>dependency-plugin</artifactId>
+            <version>${project.version}</version>
+            <executions>
+                <execution>
+                    <id>unpack python</id>
+                    <goals>
+                        <goal>unpack</goal>
+                    </goals>
+                    <phase>process-sources</phase>
+                    <configuration>
+                        <artifactItems>
+                            <!-- List the artifacts to unpack. We just do that for the SimpleKodexTestingApp.
+                                 This project is a multi-app/multi-service testing project, a rather unusual
+                                 but for CI testing convenient form. Typically there shall be just one project
+                                 per app so that the python sources cannot overlap/interfere. -->
+                            <artifactItem>
+                                <groupId>de.iip-ecosphere.platform</groupId>
+                                <artifactId>apps.AppInterfacesKodex</artifactId>
+                                <version>${project.version}</version>
+                                <type>zip</type>
+                                <classifier>python</classifier>
+                                <overWrite>true</overWrite>
+                                <outputDirectory>${project.basedir}/src/main/python</outputDirectory>
+                                <destFileName>pythonEnv.zip</destFileName>
+                            </artifactItem>
+                            <artifactItem>
+                                <groupId>de.iip-ecosphere.platform</groupId>
+                                <artifactId>apps.AppInterfacesContainerCreation</artifactId>
+                                <version>${project.version}</version>
+                                <type>zip</type>
+                                <classifier>python</classifier>
+                                <overWrite>true</overWrite>
+                                <outputDirectory>${project.basedir}/src/main/python</outputDirectory>
+                                <destFileName>pythonEnv.zip</destFileName>
+                            </artifactItem>
+                        </artifactItems>
+                        <cleanup>
+                            <directory>${project.basedir}/src/main/python</directory>
+                            <includes>
+                                <include>datatypes</include>
+                                <include>iip</include>
+                                <include>interfaces</include>
+                                <include>serializers</include>
+                            </includes>
+                        </cleanup>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+         <plugin>
+             <!-- When the usual build process is done, package also the implementing Python code. As this will
+                  be automatically integrated with the generated code, we exclude in the assembly descriptor the
+                  generated python sources, i.e., do not modify these sources, just the Python files in "services". -->
+             <groupId>org.apache.maven.plugins</groupId>
+             <artifactId>maven-assembly-plugin</artifactId>
+             <version>3.1.1</version>
+             <executions>
+                 <execution>
+                     <id>python</id>
+                     <phase>test</phase>
+                     <goals>
+                         <goal>single</goal>
+                     </goals>
+                     <configuration>
+                         <descriptors>
+                             <descriptor>src/main/assembly/python.xml</descriptor>
+                         </descriptors>
+                         <outputDirectory>${project.build.directory}</outputDirectory>
+                         <attach>true</attach>
+                     </configuration>
+                 </execution>
+                 <execution>
+                     <id>myArtifact</id>
+                     <phase>test</phase>
+                     <goals>
+                         <goal>single</goal>
+                     </goals>
+                     <configuration>
+                         <descriptors>
+                             <descriptor>src/main/assembly/myArtifact.xml</descriptor>
+                         </descriptors>
+                         <outputDirectory>${project.build.directory}/artifacts</outputDirectory>
+                         <attach>false</attach>
+                         <finalName>myArtifact</finalName>
+                         <appendAssemblyId>false</appendAssemblyId>
+                     </configuration>
+                 </execution>
+                 <execution>
+                     <id>artifacts</id>
+                     <phase>test</phase>
+                     <goals>
+                         <goal>single</goal>
+                     </goals>
+                     <configuration>
+                         <descriptors>
+                             <descriptor>src/main/assembly/artifacts.xml</descriptor>
+                         </descriptors>
+                         <outputDirectory>${project.build.directory}</outputDirectory>
+                         <attach>true</attach>
+                     </configuration>
+                 </execution>
+             </executions>
+         </plugin>
+     </plugins>
+  </build>
+
+</project>
