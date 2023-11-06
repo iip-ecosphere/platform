@@ -50,6 +50,8 @@ Platform installation, use and concepts are documented in several documents:
   * For more information, see the [documentation overview](platform/documentation/README.md)
 
 ## Publications
+* Alexander Weber, Holger Eichelberger, Per Schreiber and Svenja Wienrich, Performance comparison of TwinCat ADS for Python and Java, [Symposium on Software Performance (SSP'23)](https://www.performance-symposium.org/2023/program/), 2023
+* Ahmad Alamoush and Holger Eichelberger, Analyzing and Improving the Performance of Continuous Container Creation and Deployment, [Symposium on Software Performance (SSP'23)](https://www.performance-symposium.org/2023/program/), 2023
 * Holger Eichelberger and Claudia Niederée, [Asset Administration Shells, Configuration, Code
 Generation: A power trio for Industry 4.0 Platforms](https://ieeexplore.ieee.org/document/10275339), 
 IEEE 28th International Conference on Emerging Technologies and Factory Automation (ETFA'23), pp. 1-8, doi: 10.1109/ETFA54631.2023.10275339.
