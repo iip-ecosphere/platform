@@ -227,6 +227,7 @@
 	                        <goal>generateApps</goal>
 	                    </goals>
 	                </execution>
+	                <!-- no test here, cannot be tested without sensor hardware, no digi twin so far -->
 	            </executions>
 	            <configuration>
 	                <model>${iip.model}</model>
