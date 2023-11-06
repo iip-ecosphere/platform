@@ -30,9 +30,6 @@ import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.SystemUtils;
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.logging.Log;
-import org.apache.maven.plugin.logging.SystemStreamLog;
 
 import de.iip_ecosphere.platform.support.Builder;
 import de.iip_ecosphere.platform.support.CollectionUtils;
@@ -44,6 +41,8 @@ import de.iip_ecosphere.platform.support.CollectionUtils;
  */
 public class ProcessUnit {
     
+    public static final Set<String> SCRIPT_NAMES = Collections.unmodifiableSet(
+        CollectionUtils.toSet("ant", "ng", "npm", "mvn"));
     public static final String[] WIN_BAT_PREFIX = {"cmd", "/s", "/c"};
     public static final int UNKOWN_EXIT_STATUS = Integer.MIN_VALUE;
     private static Timer timer;
@@ -54,7 +53,7 @@ public class ProcessUnit {
     private List<Closeable> closeables;
     private boolean logMatches;
     private List<Pattern> checkRegEx;
-    private Log log;
+    private Logger logger;
     private TerminationListener listener;
 
     // checkstyle: stop parameter number check
@@ -67,15 +66,15 @@ public class ProcessUnit {
      * @param timeout maximum lifetime of {@code process} in milliseconds, ignored if not positive
      * @param listener optional listener to be called when the execution/testing termination is reached, 
      *     <b>null</b> for none
-     * @param log the logging instance
+     * @param logger the logging instance
      * @param checkRegEx the regular expressions to be applied to the log output
      */
     private ProcessUnit(String description, Process process, long timeout, TerminationListener listener, 
-        List<Pattern> checkRegEx, Log log) {
+        List<Pattern> checkRegEx, Logger logger) {
         this.description = description;
         this.process = process;
         this.listener = listener;
-        this.log = log;
+        this.logger = logger;
         if (checkRegEx != null) {
             this.checkRegEx = Collections.unmodifiableList(checkRegEx);
         }
@@ -253,7 +252,7 @@ public class ProcessUnit {
         private String description;
         private List<String> args = new ArrayList<>();
         private File home;
-        private AbstractMojo origin;
+        private Logger logger;
         private long timeout;
         private File logFile;
         private List<Pattern> checkRegEx;
@@ -268,11 +267,11 @@ public class ProcessUnit {
          * Creates a process builder instance.
          *
          * @param description the description of the unit
-         * @param origin the hosting mojo, may be <b>null</b>
+         * @param logger the logger, may be <b>null</b> then a {@link StandardLogger} is used
          */
-        public ProcessUnitBuilder(String description, AbstractMojo origin) {
+        public ProcessUnitBuilder(String description, Logger logger) {
             this.description = description;
-            this.origin = origin;
+            this.logger = null == logger ? new StandardLogger() : logger;
         }
 
         /**
@@ -406,6 +405,37 @@ public class ProcessUnit {
         }
 
         /**
+         * Adds {@code cmd} is a script (also if in {@link ProcessUnit#SCRIPT_NAMES}) 
+         * or as argument.
+         * 
+         * @param cmdAsScript is {@code cmd} is a script command
+         * @param cmd the script name
+         * @return <b>this</b> (builder style)
+         */
+        public ProcessUnitBuilder addArgumentOrScriptCommand(boolean cmdAsScript, String cmd) {
+            if (cmdAsScript || SCRIPT_NAMES.contains(cmd)) {
+                addShellScriptCommand(cmd);
+            } else {
+                addArgument(cmd);
+            }
+            return this;
+        }
+        
+        /**
+         * Adds a conditional command line argument.
+         * 
+         * @param enable the condition result
+         * @param argument the argument
+         * @return <b>this</b> (builder style)
+         */
+        public ProcessUnitBuilder addArgument(boolean enable, Object argument) {
+            if (enable) {
+                addArgument(argument);
+            }
+            return this;
+        }
+        
+        /**
          * Adds a command line argument.
          * 
          * @param argument the argument
@@ -426,8 +456,10 @@ public class ProcessUnit {
          * @return <b>this</b> (builder style)
          */
         public ProcessUnitBuilder addArguments(List<String> arguments) {
-            if (appendByAggregation(CollectionUtils.toStringSpaceSeparated(arguments))) {
-                args.addAll(arguments);
+            if (null != arguments) {
+                if (appendByAggregation(CollectionUtils.toStringSpaceSeparated(arguments))) {
+                    args.addAll(arguments);
+                }
             }
             return this;
         }
@@ -479,7 +511,6 @@ public class ProcessUnit {
         @Override
         public ProcessUnit build() {
             String info = "";
-            Log log = origin == null ? new SystemStreamLog() : origin.getLog();
             if (null != argAggregate) {
                 args.add(argAggregateStart + argAggregate + argAggregateEnd);
                 argAggregate = null;
@@ -491,15 +522,15 @@ public class ProcessUnit {
                 builder.directory(home);
                 info =  " in " + home;
             }
-            log.info("Starting " + CollectionUtils.toStringSpaceSeparated(args) + info);
+            logger.info("Starting " + CollectionUtils.toStringSpaceSeparated(args) + info);
             Process proc;
             try {
                 proc = builder.start();
             } catch (IOException e) {
                 proc = null;
-                log.error(e);
+                logger.error(e);
             }
-            ProcessUnit result = new ProcessUnit(description, proc, timeout, listener, checkRegEx, log);
+            ProcessUnit result = new ProcessUnit(description, proc, timeout, listener, checkRegEx, logger);
             if (null != proc) {
                 Consumer<String> inConsumer = null;
                 Consumer<String> errConsumer = null;
@@ -510,14 +541,14 @@ public class ProcessUnit {
                         errConsumer = inConsumer;
                         result.attach(logWriter);
                     } catch (IOException e) {
-                        log.error(e);
+                        logger.error(e);
                     }
                 }
                 if (null == inConsumer) {
-                    inConsumer = l -> log.info(l);
+                    inConsumer = l -> logger.info(l);
                 }
                 if (null == errConsumer) {
-                    errConsumer = l -> log.error(l);
+                    errConsumer = l -> logger.error(l);
                 }
                 Consumer<Pattern> matchConsumer;
                 if (conjunctLogMatches) {
@@ -584,7 +615,7 @@ public class ProcessUnit {
             timeoutTask = null;
         }
         if (null != process) {
-            log.info("Stopping process '" + description + "'");
+            logger.info("Stopping process '" + description + "'");
             // since Java 9
             ProcessHandle
                 .of(process.pid())
@@ -658,6 +689,72 @@ public class ProcessUnit {
         @Override
         public void close() throws IOException {
             logger = null;
+        }
+        
+    }
+    
+    /**
+     * Simple logger interface to avoid maven classes in here.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public interface Logger {
+
+        /**
+         * Logs a warning.
+         * 
+         * @param warning the warning
+         */
+        public void warn(String warning);
+
+        /**
+         * Logs an error.
+         * 
+         * @param error the error
+         */
+        public void error(String error);
+
+        /**
+         * Logs a throwable.
+         * 
+         * @param throwable the throwable
+         */
+        public void error(Throwable throwable);
+
+        /**
+         * Logs an information.
+         * 
+         * @param info the information
+         */
+        public void info(String info);
+
+    }
+    
+    /**
+     * Simple logger implementation, e.g., for tests.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public static class StandardLogger implements Logger {
+
+        @Override
+        public void warn(String warning) {
+            System.out.println("[WARN] " + warning);
+        }
+
+        @Override
+        public void error(String error) {
+            System.err.println("[ERROR] " + error);
+        }
+
+        @Override
+        public void error(Throwable throwable) {
+            System.err.println("[ERROR] " + throwable.getMessage());
+        }
+
+        @Override
+        public void info(String info) {
+            System.out.println("[INFO] " + info);
         }
         
     }

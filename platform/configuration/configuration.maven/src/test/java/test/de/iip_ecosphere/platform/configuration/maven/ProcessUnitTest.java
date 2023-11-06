@@ -177,7 +177,8 @@ public class ProcessUnitTest {
         Pattern p = Pattern.compile("^.*gen.*$");
         ProcessUnit unit = new ProcessUnit.ProcessUnitBuilder("mvn", null)
             .addMavenCommand()
-            .addArgument("exec:java@app")
+            .addArgument(true, "exec:java@app")
+            .addArgument(false, "xyz") // disabled, shall not occur
             .addArgument("-Diip.springStart.args=\"--iip.test.stop=1000 --iip.test.brokerPort=1234\"")
             .addCheckRegEx(p)
             .logTo(null)

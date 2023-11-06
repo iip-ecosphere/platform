@@ -22,12 +22,12 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.MavenProject;
 
 import de.iip_ecosphere.platform.configuration.maven.ProcessUnit.ProcessUnitBuilder;
 import de.iip_ecosphere.platform.configuration.maven.ProcessUnit.TerminationReason;
@@ -41,8 +41,11 @@ import de.iip_ecosphere.platform.support.TimeUtils;
  * @author Holger Eichelberger, SSE
  */
 @Mojo(name = "testApp", defaultPhase = LifecyclePhase.PACKAGE)
-public class TestAppMojo extends AbstractMojo {
+public class TestAppMojo extends AbstractLoggingMojo {
 
+    @Parameter(defaultValue = "${project}", readonly = true)
+    private MavenProject project;
+    
     @Parameter(defaultValue = "${session.offline}")
     private boolean offline;
     
@@ -51,6 +54,9 @@ public class TestAppMojo extends AbstractMojo {
     
     @Parameter(property = "configuration.testApp.testCmd", required = false, defaultValue = "")
     private String testCmd;
+
+    @Parameter(property = "configuration.testApp.testCmdAsScript", required = false, defaultValue = "false")
+    private boolean testCmdAsScript;
 
     @Parameter(property = "configuration.testApp.appId", required = false, defaultValue = "app")
     private String appId;
@@ -99,6 +105,15 @@ public class TestAppMojo extends AbstractMojo {
 
     @Parameter(property = "configuration.testApp.startEcsServiceMgr", required = false, defaultValue = "true")
     private boolean startEcsServiceManager;
+
+    @Parameter(property = "configuration.testApp.deploymentPlan", required = false)
+    private File deploymentPlan;
+
+    @Parameter(property = "configuration.testApp.deploymentResource", required = false, defaultValue = "local")
+    private String deploymentResource;
+
+    @Parameter(property = "configuration.testApp.befores", required = false)
+    private List<TestProcessSpec> befores;
     
     private List<ProcessUnit> units = new ArrayList<>();
     
@@ -145,7 +160,7 @@ public class TestAppMojo extends AbstractMojo {
      * @see #startServiceManager
      */
     private void startPlatform(int brokerPort) {
-        if (null != platformDir && platformDir.getPath().length() > 0) {
+        if (isValidFile(platformDir)) {
             File local = new File("gen/oktoflow-local.yml");
             File gen = new File("gen");
             try (PrintStream setupLocal = new PrintStream(local)) {
@@ -157,19 +172,97 @@ public class TestAppMojo extends AbstractMojo {
             } catch (IOException e) {
                 getLog().error("Cannot write " + local);
             }
+            final String iipId = "--iip.id=" + deploymentResource;
             if (startPlatform) {
                 buildAndRegister(createPlatformBuilder("platform central services", gen, "platform"));
             }
             if (startEcsServiceManager) {
-                buildAndRegister(createPlatformBuilder("ECS-Runtime & service manager", gen, "ecsServiceMgr"));
+                buildAndRegister(createPlatformBuilder("ECS-Runtime & service manager", gen, "ecsServiceMgr", iipId));
             } else {
                 if (startEcsRuntime) {
-                    buildAndRegister(createPlatformBuilder("ECS-Runtime", gen, "ecs"));
+                    buildAndRegister(createPlatformBuilder("ECS-Runtime", gen, "ecs", iipId));
                 }
                 if (startServiceManager) {
                     int iipPort = NetUtils.getEphemeralPort(); // usually set by container
                     buildAndRegister(createPlatformBuilder("service manager", gen, "serviceMgr", 
-                        "--iip.port=" + iipPort));
+                        "--iip.port=" + iipPort, iipId));
+                }
+            }
+        }
+    }
+    
+    /**
+     * Returns if {@code file} is a valid file.
+     * 
+     * @param file the file
+     * @return {@code true} for valid, {@code false}
+     */
+    private static boolean isValidFile(File file) {
+        return null != file && file.exists();
+    }
+    
+    /**
+     * Deploys an application via deployment descriptor if specified and case of a {@link #testCmd}.
+     * The resource in the deployment descriptor must be {@link #RESOURCE}.
+     * 
+     * @param deploy deploy or undeploy
+     * @throws MojoExecutionException if deployment/undeployment fails
+     */
+    private void deployApp(boolean deploy) throws MojoExecutionException {
+        if (isValidFile(platformDir) && isValidFile(deploymentPlan)) {
+            File gen = new File("gen");
+            ProcessUnit pu = new ProcessUnitBuilder(deploy ? "deploy app" : "undeploy app", this)
+                .setHome(gen)
+                .addShellScriptCommand("cli")
+                .addArgument(deploy ? "deploy" : "undeploy")
+                .addArgument(deploymentPlan.getAbsolutePath())
+                .build();
+            int status = pu.waitFor();
+            if (status != ProcessUnit.UNKOWN_EXIT_STATUS && status != 0) {
+                throw new MojoExecutionException(pu.getDescription() + " terminated with status: " + status);
+            }
+        }
+        
+    }
+
+    /**
+     * Starts defined processes.
+     * 
+     * @throws MojoExecutionException if process execution fails
+     */
+    private void startProcesses() throws MojoExecutionException {
+        if (befores != null) {
+            for (TestProcessSpec p : befores) {
+                int port = p.getNetworkPort();
+                String property = p.getNetworkPortProperty();
+                if (port < 0) {
+                    port = NetUtils.getEphemeralPort();
+                }
+                boolean hasPortAndProperty = port > 0 && property != null && property.length() > 0;
+                String sPort = String.valueOf(port);
+                if (hasPortAndProperty) {
+                    project.getProperties().setProperty(property, sPort);
+                }
+                ProcessUnitBuilder builder = new ProcessUnitBuilder(p.getDescription(), this);
+                builder.addArgumentOrScriptCommand(p.isCmdAsScript(), p.getCmd());
+                if (null != p.getHome()) {
+                    builder.setHome(p.getHome());
+                }
+                List<String> args = new ArrayList<>();
+                if (hasPortAndProperty) {
+                    for (String a: p.getArgs()) {
+                        args.add(a.replaceAll("${" + property + "}", sPort));
+                    }
+                } else {
+                    args.addAll(p.getArgs());
+                }
+                builder.addArguments(args);
+                ProcessUnit pu = buildAndRegister(builder);
+                if (p.isWaitFor()) {
+                    int status = pu.waitFor();
+                    if (status != ProcessUnit.UNKOWN_EXIT_STATUS && status != 0) {
+                        throw new MojoExecutionException(pu.getDescription() + " terminated with status: " + status);
+                    }
                 }
             }
         }
@@ -278,16 +371,17 @@ public class TestAppMojo extends AbstractMojo {
         TimeUtils.sleep(brokerWaitTime); // broker may take a while
 
         startPlatform(brokerPort); 
-
+        startProcesses();
+        
         ProcessUnitBuilder testBuilder = new ProcessUnit.ProcessUnitBuilder("test app", this);
         if (null != logFile) {
             getLog().info("Logging test output to " + logFile);
             testBuilder.logTo(logFile);
         }
         if (null != testCmd && testCmd.length() > 0) {
-            testBuilder
-                .addArgument(testCmd)
-                .addArguments(appArgs);
+            deployApp(true);
+            testBuilder.addArgumentOrScriptCommand(testCmdAsScript, testCmd);
+            testBuilder.addArguments(appArgs);
         } else {
             addMavenTestCall(testBuilder);
         }
@@ -308,9 +402,11 @@ public class TestAppMojo extends AbstractMojo {
             testBuilder.logTo(logFile);
         }
         ProcessUnit testUnit = buildAndRegister(testBuilder);
-
         getLog().info("Waiting for test end, at maximum specified test time: " + testTime + " ms");
         TimeUtils.waitFor(() -> !testTerminated.get(), testTime, 300);
+        if (null != testCmd && testCmd.length() > 0) {
+            deployApp(false);
+        }
         
         boolean failed = stopProcessUnits();
         if (testUnit.hasCheckRegEx()) {
