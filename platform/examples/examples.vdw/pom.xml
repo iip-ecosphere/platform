@@ -166,6 +166,22 @@
                            <goal>generateApps</goal>
                          </goals>
                        </execution>
+	                    <execution>
+	                        <id>testApp</id>
+	                        <goals>
+	                            <goal>testApp</goal>
+	                        </goals>
+	                        <!-- WARNING: Jenkins cannot contact UMATI OPCUA service. Disabling execution! -->
+	                        <configuration>
+	                            <appId>generatedConnector</appId>
+	                            <appArgs>
+	                                <appArg>--skip</appArg>
+	                            </appArgs>
+	                            <logRegExprs>
+	                                <logRegExpr>.*UMATI OPCUA Connector test.*</logRegExpr>
+	                            </logRegExprs>
+	                        </configuration>
+	                    </execution>
                    </executions>
                    <configuration>
                        <model>VDW</model>
