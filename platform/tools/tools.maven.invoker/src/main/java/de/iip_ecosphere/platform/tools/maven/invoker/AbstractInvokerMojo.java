@@ -105,7 +105,10 @@ public class AbstractInvokerMojo extends AbstractMojo {
 
     @Parameter(property = "unpack.force", required = false, defaultValue = "false") 
     private boolean unpackForce;
-    
+
+    @Parameter(property = "configuration.force", required = false, defaultValue = "false") 
+    private boolean configForce;
+
     @Parameter(property = "disableJava", defaultValue = "false") 
     private boolean disableJava;
 
@@ -144,13 +147,13 @@ public class AbstractInvokerMojo extends AbstractMojo {
     public void disable() {
         enabled = false;
     }
-    
+
     /**
-     * Creates the actual invocation request.
+     * Creates a basic invocation request by taking over data.
      * 
      * @return the request
      */
-    private InvocationRequest createInvocationRequest() {
+    private InvocationRequest createBasicInvocationRequest() {
         final InvocationRequest request = new DefaultInvocationRequest();
         request.setBatchMode(true);
         request.setLocalRepositoryDirectory(localRepositoryPath);
@@ -158,6 +161,23 @@ public class AbstractInvokerMojo extends AbstractMojo {
         request.setShowVersion(showVersion);
         request.setJavaHome(javaHome);
         request.setMavenHome(mavenHome);
+        request.setGoals(invokeGoals);
+        request.setProfiles(invokeProfiles);
+        request.setOffline(offline);
+        request.setDebug(debug);        
+        request.setMavenExecutable(mavenExecutable);
+        request.setTimeoutInSeconds(timeoutInSeconds);
+        return request;
+    }
+    
+    /**
+     * Creates the actual invocation request.
+     * 
+     * @return the request
+     * @see #createBasicInvocationRequest()
+     */
+    private InvocationRequest createInvocationRequest() {
+        final InvocationRequest request = createBasicInvocationRequest();
         Properties sysProperties = new Properties();
         if (null != systemProperties) {
             for (SystemProperty prop : systemProperties) {
@@ -175,6 +195,9 @@ public class AbstractInvokerMojo extends AbstractMojo {
         }
         if (unpackForce && !sysProperties.containsKey("unpack.force")) {
             sysProperties.put("unpack.force", "true");
+        }
+        if (configForce && !sysProperties.containsKey("configuration.force")) {
+            sysProperties.put("configuration.force", "true");
         }
         if (disableJava || disableBuild) {
             sysProperties.put("maven.main.skip", "true");
@@ -218,15 +241,9 @@ public class AbstractInvokerMojo extends AbstractMojo {
         if (null == pomFile) {
             pomFile = project.getFile();
         }
+        getLog().info("Actual POM: " + pomFile);
         request.setBaseDirectory(pomFile.getParentFile());
         request.setPomFile(pomFile);
-        request.setGoals(invokeGoals);
-        request.setProfiles(invokeProfiles);
-        request.setOffline(offline);
-        request.setDebug(debug);        
-        request.setMavenExecutable(mavenExecutable);
-        request.setTimeoutInSeconds(timeoutInSeconds);
-        
         return request;
     }
     
