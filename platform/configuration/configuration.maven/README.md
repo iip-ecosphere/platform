@@ -142,9 +142,11 @@ Testing a generated application typically requires starting the communication br
   
 The `testApp` goal (default phase `package`, can be seen as integration test but our invoker disables tests to avoid conflicts with app in one-shot-projects) allows for testing an oktoflow application either via `mvn exec:java@app` or through a given command. In case of maven, passes on the value of the environment variable `MAVEN_SETTINGS_PATH` or if not given the maven user settings as user settings file location. Starts the required broker and may start platform services. This goal supports the following configuration settings: 
 
-  - `testCmd` (`-Dconfiguration.testApp.testCmd=...`, default `""`) the command to be executed for testing instead of an oktoflow application. Arguments are in `appArgs`. If not given, an application is tested via `mvn exec:java@app`.
+  - `testCmd` (`-Dconfiguration.testApp.testCmd=...`, default `""`) the command to be executed for testing instead of an oktoflow application. Arguments are in `appArgs`. If not given, a test  application is tested via `mvn exec:java@app` (further settings see below).
   - `testCmdAsScript` (`-Dconfiguration.testApp.testCmdAsScript=...`, default `false`) to indicate that the command is a script and may need special treatment, e.g., on windows (automatically set `true` for `ant`, `mvn` or `npm` or `ng`)
-  - `appId` (`-Dconfiguration.testApp.appId=...`, default `app`) the id for executing the application through `mvn exec:java@app` in test mode as given in the POM.
+  - `appId` (`-Dconfiguration.testApp.appId=...`, default `app`) the id for executing the test application through `mvn exec:java@app` in test mode as given in the POM.
+  - `appProfile` (`-Dconfiguration.testApp.appProfile=...`, default `App`) the profile name for executing the test application through `mvn exec:java@app` in test mode as given in the POM. The profile name may be `-`, then none will be set.
+  - `appPom` (`-Dconfiguration.testApp.appPom=...`, default ``) the POM the app execution definition is contained within, if not given the same this test plugin is executed within.
   - `appArgs` (`-Dconfiguration.testApp.appArgs=...`, default `""`) additional arguments given as individual `appArg` entries to be passed to the application.
   - `mvnArgs` (`-Dconfiguration.testApp.mvnArgs=...`, default `""`) additional arguments given as individual `mvnArg` entries to be passed to a maven execution.
   - `mvnPluginArgs` (`-Dconfiguration.testApp.mvnPluginArgs=...`, default `""`) additional arguments given as individual `mvnPluginArg` entries to be passed to a maven plugin execution.

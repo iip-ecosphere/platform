@@ -61,6 +61,12 @@ public class TestAppMojo extends AbstractLoggingMojo {
     @Parameter(property = "configuration.testApp.appId", required = false, defaultValue = "app")
     private String appId;
 
+    @Parameter(property = "configuration.testApp.appProfile", required = false, defaultValue = "App")
+    private String appProfile;
+
+    @Parameter(property = "configuration.testApp.appPom", required = false)
+    private File appPom;
+
     @Parameter(property = "configuration.testApp.appArgs", required = false)
     private List<String> appArgs;
 
@@ -203,7 +209,7 @@ public class TestAppMojo extends AbstractLoggingMojo {
     
     /**
      * Deploys an application via deployment descriptor if specified and case of a {@link #testCmd}.
-     * The resource in the deployment descriptor must be {@link #RESOURCE}.
+     * The resource in the deployment descriptor must be {@link #deploymentResource}.
      * 
      * @param deploy deploy or undeploy
      * @throws MojoExecutionException if deployment/undeployment fails
@@ -336,8 +342,14 @@ public class TestAppMojo extends AbstractLoggingMojo {
             testBuilder.addArgument("-s");
             testBuilder.addArgument(sPath);
         }
-        testBuilder.addArgument("-P");
-        testBuilder.addArgument("App");
+        if (isValidFile(appPom)) {
+            testBuilder.addArgument("-f");
+            testBuilder.addArgument(appPom);
+        }
+        if (appProfile != null && appProfile.trim().length() > 0 && !appProfile.equals("-")) {
+            testBuilder.addArgument("-P");
+            testBuilder.addArgument(appProfile);
+        }
         if (null != mvnArgs) {
             testBuilder.addArguments(mvnArgs);
         }
@@ -404,7 +416,7 @@ public class TestAppMojo extends AbstractLoggingMojo {
         }
         ProcessUnit testUnit = buildAndRegister(testBuilder);
         getLog().info("Waiting for test end, at maximum specified test time: " + testTime + " ms");
-        TimeUtils.waitFor(() -> !testTerminated.get(), testTime, 300);
+        TimeUtils.waitFor(() -> !testTerminated.get() && testUnit.isRunning(), testTime, 300);
         if (null != testCmd && testCmd.length() > 0) {
             deployApp(false);
         }
