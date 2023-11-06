@@ -355,6 +355,21 @@
                            <goal>generateApps</goal>
                        </goals>
                    </execution>
+                   <execution>
+                       <id>testApp</id>
+                       <goals>
+                           <goal>testApp</goal>
+                       </goals>
+                       <configuration>
+                           <logRegExprs>
+                               <logRegExpr>.*APP: DecisionResultImpl.*</logRegExpr>
+                           </logRegExprs>
+                           <appArgs>
+                               <appArg>-Diip.app.hm22.mock.callRobot=false</appArg>
+                           </appArgs>
+                           <testTime>180000</testTime>
+                       </configuration>
+                   </execution>
                </executions>
                <configuration>
                    <model>${iip.model}</model>
