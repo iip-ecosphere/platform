@@ -26,9 +26,6 @@
                         <goal>install</goal>
                     </goals>
                     <configuration>
-                        <!-- <invokeProfiles>
-                            <invokeProfile>default</invokeProfile>
-                        </invokeProfiles> -->
                         <invokeGoals>
                             <invokeGoal>generate-sources</invokeGoal>
                         </invokeGoals>
@@ -42,9 +39,6 @@
                         <goal>install</goal>
                     </goals>
                     <configuration>
-                        <!-- <invokeProfiles>
-                            <invokeProfile>default</invokeProfile>
-                        </invokeProfiles> -->
                         <invokeGoals>
                             <invokeGoal>install</invokeGoal>
                         </invokeGoals>
@@ -57,9 +51,6 @@
                         <goal>install</goal>
                     </goals>
                     <configuration>
-                        <!-- <invokeProfiles>
-                            <invokeProfile>EasyGen</invokeProfile>
-                        </invokeProfiles> -->
                         <invokeGoals>
                             <invokeGoal>package</invokeGoal>
                         </invokeGoals> 
