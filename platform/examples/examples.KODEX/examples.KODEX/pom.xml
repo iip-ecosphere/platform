@@ -163,6 +163,30 @@
                             <goal>generateApps</goal>
                           </goals>
                         </execution>
+	                   <execution>
+	                       <id>testApp</id>
+	                       <goals>
+	                           <goal>testApp</goal>
+	                       </goals>
+	                       <configuration>
+	                           <logRegExprs>
+	                               <logRegExpr>.*RECEIVED.*</logRegExpr>
+	                           </logRegExprs>
+	                           <befores>
+	                               <before>
+	                                   <description>DB</description>
+	                                   <cmd>mvn</cmd>
+	                                   <args>
+	                                       <arg>exec:java</arg>
+                                           <arg>-Dexec.args="${DBServerPort}"</arg>
+	                                   </args>
+	                               </before>
+	                           </befores>
+	                           <mvnArgs>
+	                              <mvnArg>-Diip.app.db.server.port=${DBServerPort}</mvnArg>
+	                           </mvnArgs>
+	                       </configuration>
+	                   </execution>
                     </executions>
                     <configuration>
                         <model>${iip.model}</model>

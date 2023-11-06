@@ -5,6 +5,8 @@ This example aims at running the anonymizer/pseudonymizer KODEX as part of an II
   * An implementation of the Java services used in the application in `src/main/java`
   * `pom.xml` for the application itself. 
   
+An explaining overview slide is available [here](docs/Examples_KODEX.pdf).
+  
 As stated above, directly after obtaining this project, the application will not run and even show compile errors. This is due to the fact that generated parts and even the configuration meta model are missing. We will add them through the following steps (as explained in more details in the Platform Handbook). As usual with Maven projects, you may add the argument `-U` to update snapshots if parts are already in place (see also `build.sh`):
 
   * Ensure that the Maven platformDependencies are installed and up to date (see [install](https://github.com/iip-ecosphere/platform/tree/main/platform/tools/Install))
@@ -21,9 +23,3 @@ If you want to execute the example in a platform installation, add `gen/KODEX/Si
 ## Required Updates
 
 See [Platform configuration](https://github.com/iip-ecosphere/platform/tree/main/platform/configuration/configuration) for details on the state of the generation and the required version of EASy-Producer (at least from the day of the last commit of this example). 
-
-## Desirable
-
-Explaining slides, may be a video.
-
-An explaining overview slide is available [here](https://github.com/iip-ecosphere/platform/tree/main/platform/examples/examples.KODEX/docs/Examples_KODEX.pdf)
