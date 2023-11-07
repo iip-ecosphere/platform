@@ -737,6 +737,9 @@
                                         <goal>generateInterfaces</goal>
                                         <goal>generatePlatform</goal>
                                         <goal>generateAll</goal>
+                                        <goal>textFile</goal>
+                                        <goal>ngBuild</goal>
+                                        <goal>ngTest</goal>
                                     </goals>
                                 </pluginExecutionFilter>
                                 <action>
