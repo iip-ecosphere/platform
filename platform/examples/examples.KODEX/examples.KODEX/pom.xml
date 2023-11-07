@@ -60,8 +60,10 @@
   </dependencies>
 
   <properties>
-        <iip.resources>resources</iip.resources>
-        <iip.model>PlatformConfiguration</iip.model>
+      <iip.resources>resources</iip.resources>
+      <iip.model>PlatformConfiguration</iip.model>
+      <DBPort>8585</DBPort>
+      <DBServerPort>9595</DBServerPort>
   </properties>
     
   <profiles>

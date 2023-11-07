@@ -20,76 +20,9 @@
       <maven.javadoc.skip>true</maven.javadoc.skip>
       <DBPort>8585</DBPort>
       <DBServerPort>9595</DBServerPort>
-  </properties>       
+  </properties>
 
   <profiles>
-     <profile>
-        <id>prepareDB</id>
-        <properties>
-           <maven.main.skip>true</maven.main.skip>
-           <maven.test.skip>true</maven.test.skip>
-           <python-compile.skip>true</python-compile.skip>
-           <maven.javadoc.skip>true</maven.javadoc.skip>
-        </properties>
-        <build>
-          <plugins>
-                <plugin>
-                    <groupId>de.iip-ecosphere.platform</groupId>
-                    <artifactId>configuration-plugin</artifactId>
-                    <version>${project.version}</version>
-                    <executions>
-                        <execution>
-                          <id>insertProperty</id>
-                          <goals>
-                            <goal>textFile</goal>
-                          </goals>
-                          <phase>validate</phase>
-                          <configuration>
-                              <file>examples.KODEX.db/src/main/resources/application.properties</file>
-                              <prepends>
-                                  <prepend>server.port=${DBPort}</prepend>
-                              </prepends>
-                          </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
-          </plugins>
-        </build>
-     </profile>
-
-     <profile>
-        <id>clearDB</id>
-        <properties>
-           <maven.main.skip>true</maven.main.skip>
-           <maven.test.skip>true</maven.test.skip>
-           <python-compile.skip>true</python-compile.skip>
-           <maven.javadoc.skip>true</maven.javadoc.skip>
-        </properties>
-        <build>
-          <plugins>
-                <plugin>
-                    <groupId>de.iip-ecosphere.platform</groupId>
-                    <artifactId>configuration-plugin</artifactId>
-                    <version>${project.version}</version>
-                    <executions>
-                        <execution>
-                          <id>removeProperty</id>
-                          <goals>
-                            <goal>textFile</goal>
-                          </goals>
-                          <phase>validate</phase>
-                          <configuration>
-                              <file>examples.KODEX.db/src/main/resources/application.properties</file>
-                              <deletions>
-                                  <delete>1</delete>
-                              </deletions>
-                          </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
-          </plugins>
-        </build>
-     </profile>
 
      <profile>
         <id>Main</id>
@@ -107,9 +40,71 @@
 	        <plugins>
 	           <plugin>
 	              <groupId>de.iip-ecosphere.platform</groupId>
+	              <artifactId>configuration-plugin</artifactId>
+	              <version>${project.version}</version>
+	              <executions>
+	                  <execution>
+	                    <id>insertProperty</id>
+	                    <goals>
+	                      <goal>textFile</goal>
+	                    </goals>
+	                    <phase>validate</phase>
+	                    <configuration>
+	                        <file>examples.KODEX.DB/src/main/resources/application.properties</file>
+	                        <prepends>
+	                            <prepend>server.port=${DBPort}</prepend>
+	                        </prepends>
+	                        <skip>true</skip> <!-- disabled in normal builds, reconfigures DB for testing -->
+	                    </configuration>
+	                  </execution>
+                      <execution>
+                        <id>removeProperty</id>
+                        <goals>
+                          <goal>textFile</goal>
+                        </goals>
+                        <phase>deploy</phase>
+                        <configuration>
+                            <file>examples.KODEX.db/src/main/resources/application.properties</file>
+                            <deletions>
+                                <delete>1</delete>
+                            </deletions>
+                            <skip>true</skip> <!-- disabled in normal builds, reconfigures DB for testing -->
+                        </configuration>
+                      </execution>
+	              </executions>
+	            </plugin>
+	        
+	           <plugin>
+	              <groupId>de.iip-ecosphere.platform</groupId>
 	              <artifactId>invoker-plugin</artifactId>
 	              <version>${project.version}</version>
 	              <executions>
+                      <execution>
+                          <id>installDB</id>
+                          <goals>
+                              <goal>install</goal>
+                          </goals>
+                          <configuration>
+                              <pom>examples.KODEX.db/pom.xml</pom>
+                              <invokeGoals>
+                                  <invokeGoal>install</invokeGoal>
+                              </invokeGoals>
+                              <systemProperties>
+                                  <systemProperty>
+                                      <key>configuration.textFile.skip</key>
+                                      <value>false</value>
+                                  </systemProperty>
+                                  <systemProperty>
+                                      <key>DBPort</key>
+                                      <value>${DBPort}</value>
+                                  </systemProperty>
+                                  <systemProperty>
+                                      <key>DBServerPort</key>
+                                      <value>${DBServerPort}</value>
+                                  </systemProperty>
+                              </systemProperties>
+                          </configuration>
+                      </execution>
                       <execution>
                           <id>installApp</id>
                           <goals>
@@ -120,46 +115,20 @@
                               <invokeGoals>
                                   <invokeGoal>install</invokeGoal>
                               </invokeGoals>
-                          </configuration>
-                      </execution>
-                      <execution>
-                          <id>prepareDB</id>
-                          <goals>
-                              <goal>install</goal>
-                          </goals>
-                          <configuration>
-                              <invokeProfiles>
-                                  <invokeProfile>prepareDB</invokeProfile>
-                              </invokeProfiles>
-                              <invokeGoals>
-                                  <invokeGoal>validate</invokeGoal>
-                              </invokeGoals>
-                          </configuration>
-                      </execution>
-	                  <execution>
-	                      <id>installDB</id>
-	                      <goals>
-	                          <goal>install</goal>
-	                      </goals>
-	                      <configuration>
-	                          <pom>examples.KODEX.db/pom.xml</pom>
-	                          <invokeGoals>
-	                              <invokeGoal>install</invokeGoal>
-	                          </invokeGoals>
-	                      </configuration>
-	                  </execution>
-                      <execution>
-                          <id>clearDB</id>
-                          <goals>
-                              <goal>install</goal>
-                          </goals>
-                          <configuration>
-                              <invokeProfiles>
-                                  <invokeProfile>clearDB</invokeProfile>
-                              </invokeProfiles>
-                              <invokeGoals>
-                                  <invokeGoal>validate</invokeGoal>
-                              </invokeGoals>
+                              <systemProperties>
+                                  <systemProperty>
+                                      <key>configuration.textFile.skip</key>
+                                      <value>false</value>
+                                  </systemProperty>
+                                  <systemProperty>
+                                      <key>DBPort</key>
+                                      <value>${DBPort}</value>
+                                  </systemProperty>
+                                  <systemProperty>
+                                      <key>DBServerPort</key>
+                                      <value>${DBServerPort}</value>
+                                  </systemProperty>
+                              </systemProperties>
                           </configuration>
                       </execution>
 	              </executions>

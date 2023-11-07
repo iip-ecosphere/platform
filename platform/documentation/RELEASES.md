@@ -17,6 +17,7 @@ Improvements:
 * [#157](https://github.com/iip-ecosphere/platform/issues/157): Clean up and untangle the configuration build flow, also for releases
 * [#115](https://github.com/iip-ecosphere/platform/issues/115): Cleanup, e.g., old build processes. AasUtils is now in support.aas, Version, AbstractSetup, JsonUtils are now in support. Duplicate classes were removed.
 * Build process terminates immediately on error.
+* Example tests are executed uniformely through maven.
 
 ### Version 0.6.0 (2023/10/11, EMO'23):
 
