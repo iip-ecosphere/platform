@@ -239,30 +239,13 @@ public class TestAppMojo extends AbstractLoggingMojo {
     private void startProcesses() throws MojoExecutionException {
         if (befores != null) {
             for (TestProcessSpec p : befores) {
-                int port = p.getNetworkPort();
-                String property = p.getNetworkPortProperty();
-                if (port < 0) {
-                    port = NetUtils.getEphemeralPort();
-                }
-                boolean hasPortAndProperty = port > 0 && property != null && property.length() > 0;
-                String sPort = String.valueOf(port);
-                if (hasPortAndProperty) {
-                    project.getProperties().setProperty(property, sPort);
-                }
+                p.allocatePorts(project, getLog());
                 ProcessUnitBuilder builder = new ProcessUnitBuilder(p.getDescription(), this);
                 builder.addArgumentOrScriptCommand(p.isCmdAsScript(), p.getCmd());
                 if (null != p.getHome()) {
                     builder.setHome(p.getHome());
                 }
-                List<String> args = new ArrayList<>();
-                if (hasPortAndProperty) {
-                    for (String a: p.getArgs()) {
-                        args.add(a.replaceAll("${" + property + "}", sPort));
-                    }
-                } else {
-                    args.addAll(p.getArgs());
-                }
-                builder.addArguments(args);
+                builder.addArguments(p.extrapolateArgs());
                 ProcessUnit pu = buildAndRegister(builder);
                 if (p.isWaitFor()) {
                     int status = pu.waitFor();
@@ -351,17 +334,36 @@ public class TestAppMojo extends AbstractLoggingMojo {
             testBuilder.addArgument(appProfile);
         }
         if (null != mvnArgs) {
-            testBuilder.addArguments(mvnArgs);
+            testBuilder.addArguments(extrapolate(mvnArgs, befores));
         }
         testBuilder.addArgument("exec:java@" + appId);
         if (null != mvnPluginArgs) {
-            testBuilder.addArguments(mvnPluginArgs);
+            testBuilder.addArguments(extrapolate(mvnPluginArgs, befores));
         }
         testBuilder.addArgument(
             "-Diip.springStart.args=\"--iip.test.stop=" + testTime 
             + " --iip.test.brokerPort=" + brokerPort 
             + tmpAppArgs + "\"");
         return testBuilder;
+    }
+    
+    /**
+     * Extrapolates the given arguments for the given processes.
+     * 
+     * @param args the command line arguments, may be <b>null</b>
+     * @param processes the processes, may be <b>null</b>
+     * @return the extrapolated arguments
+     */
+    private List<String> extrapolate(List<String> args, List<TestProcessSpec> processes) {
+        List<String> result = null;
+        if (null != args && null != processes) {
+            result = new ArrayList<>();
+            result.addAll(args);
+            for (TestProcessSpec p : processes) {
+                p.extrapolateArgs(result);
+            }
+        }
+        return result;
     }
     
     /**

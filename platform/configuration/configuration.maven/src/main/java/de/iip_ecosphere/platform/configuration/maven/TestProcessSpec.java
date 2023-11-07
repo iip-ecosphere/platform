@@ -21,50 +21,8 @@ import org.apache.maven.plugins.annotations.Parameter;
  */
 public class TestProcessSpec extends BasicProcessSpec {
     
-    @Parameter(required = false, defaultValue = "0")
-    private int networkPort;
-
-    @Parameter(required = false, defaultValue = "")
-    private String networkPortProperty;
-    
     @Parameter(required = false, defaultValue = "true")
     private boolean waitFor;
-
-    /**
-     * Returns the network port.
-     * 
-     * @return the networkPort: negative ephemeral, 0 disabled, positive given port
-     */
-    public int getNetworkPort() {
-        return networkPort;
-    }
-
-    /**
-     * Defines the network port. [mvn]
-     * 
-     * @param networkPort the networkPort to set: negative ephemeral, 0 disabled, positive given port
-     */
-    public void setNetworkPort(int networkPort) {
-        this.networkPort = networkPort;
-    }
-
-    /**
-     * Returns the maven property name for the network port.
-     * 
-     * @return the networkPortProperty (may be <b>null</b> or empty for none)
-     */
-    public String getNetworkPortProperty() {
-        return networkPortProperty;
-    }
-
-    /**
-     * Sets the maven property name for the network port. [mvn]
-     * 
-     * @param networkPortProperty the networkPortProperty to set (may be <b>null</b> or empty for none)
-     */
-    public void setNetworkPortProperty(String networkPortProperty) {
-        this.networkPortProperty = networkPortProperty;
-    }
 
     /**
      * Returns whether the process shall be completely executed before continuing.

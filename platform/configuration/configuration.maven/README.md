@@ -169,8 +169,7 @@ The `testApp` goal (default phase `package`, can be seen as integration test but
     - `cmd` the command to be executed
     - `cmdAsScript` optional flag whether `cmd` is a script (automatically set `true` for `ant`, `mvn` or `npm` or `ng`, default `false`)
     - `args` optional arguments of the process, as above
-    - `networkPort` optional network port to be assigned, ephemeral if negative, ignored if 0 (default `0`)
-    - `networkPortProperty` optional name of the maven property to be set and to be made available, substituted in args `${networkPortProperty}`
+    - `ports` optional network ports to be assigned, consisting of `port` and `property` entry; ephemeral if negative; substituted in extrapolated in ´$${}´ property expressions in `args`
     - `home` optional home directory of the process
     - `waitFor` whether the process shall be executed and completed before continuing (default `true`)
 
@@ -216,6 +215,7 @@ The goal can be configured as follows
     - `cmd` the command to be executed
     - `cmdAsScript` optional flag whether `cmd` is a script (automatically set `true` for `ant`, `mvn` or `npm` or `ng`, default `false`)
     - `args` optional arguments of the process, as above
+    - `ports` optional network ports to be assigned, consisting of `port` and `property` entry; ephemeral if negative; substituted in extrapolated ´$${}´ expressions in `args`
     - `home` optional home directory of the process
 
 # Text file modifications

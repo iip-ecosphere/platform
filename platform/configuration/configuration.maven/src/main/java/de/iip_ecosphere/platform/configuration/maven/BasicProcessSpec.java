@@ -13,9 +13,14 @@
 package de.iip_ecosphere.platform.configuration.maven;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.MavenProject;
+
+import de.iip_ecosphere.platform.support.NetUtils;
 
 /**
  * Defines an additional process to be executed in the build process.
@@ -38,6 +43,26 @@ public class BasicProcessSpec {
     
     @Parameter(required = false, defaultValue = "")
     private File home;
+    
+    @Parameter(required = false)
+    private List<PortSpec> ports;
+    
+    /**
+     * Port allocation/mapping specification.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public static class PortSpec {
+        
+        @Parameter(required = false, defaultValue = "-1")
+        private int port;
+
+        @Parameter(required = false, defaultValue = "")
+        private String property;
+
+        private int allocatedPort;
+        
+    }
 
     /**
      * Returns the description.
@@ -127,6 +152,62 @@ public class BasicProcessSpec {
      */
     public void setHome(File home) {
         this.home = home;
+    }
+
+    /**
+     * Allocates the ports.
+     * 
+     * @param project the maven project to be modified
+     * @param log the log
+     */
+    void allocatePorts(MavenProject project, Log log) {
+        if (null != ports) {
+            for (PortSpec p : ports) {
+                p.allocatedPort = p.port;
+                if (p.allocatedPort <= 0) {
+                    p.allocatedPort = NetUtils.getEphemeralPort();
+                }
+                if (p.property != null && p.property.length() > 0) {
+                    project.getProperties().setProperty(p.property, String.valueOf(p.allocatedPort));
+                    log.info("Assigned " + p.property + "=" + p.allocatedPort);
+                } else {
+                    log.info("Allocated port " + p.allocatedPort);
+                }
+            }
+        }
+    }
+
+    /**
+     * Extrapolates the property expressions.
+     * 
+     * @return the extrapolated arguments
+     */
+    List<String> extrapolateArgs() {
+        return extrapolateArgs(args);
+    }
+
+    /**
+     * Extrapolates the property expressions.
+     * 
+     * @param args the arguments to interpret the expressions for
+     * @return the extrapolated arguments
+     */
+    List<String> extrapolateArgs(List<String> args) {
+        List<String> result = null;
+        if (null != args) {
+            result = new ArrayList<>();
+            for (String a: args) {
+                if (null != ports) {
+                    for (PortSpec p : ports) {
+                        if (p.property != null && p.property.length() > 0) {
+                            a = a.replace("${" + p.property + "}", String.valueOf(p.allocatedPort));
+                        }
+                    }
+                }
+                result.add(a);
+            }
+        }
+        return result;
     }
 
 }

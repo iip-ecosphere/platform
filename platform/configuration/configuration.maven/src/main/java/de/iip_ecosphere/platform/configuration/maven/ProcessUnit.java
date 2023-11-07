@@ -458,7 +458,7 @@ public class ProcessUnit {
         /**
          * Adds command line arguments.
          * 
-         * @param arguments the arguments
+         * @param arguments the arguments (may be <b>null</b>, ignored)
          * @return <b>this</b> (builder style)
          */
         public ProcessUnitBuilder addArguments(List<String> arguments) {

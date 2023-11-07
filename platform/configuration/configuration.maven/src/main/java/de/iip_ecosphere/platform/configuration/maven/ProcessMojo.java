@@ -19,6 +19,7 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.MavenProject;
 
 import de.iip_ecosphere.platform.configuration.maven.ProcessUnit.ProcessUnitBuilder;
 
@@ -29,6 +30,9 @@ import de.iip_ecosphere.platform.configuration.maven.ProcessUnit.ProcessUnitBuil
  */
 @Mojo(name = "process", defaultPhase = LifecyclePhase.COMPILE)
 public class ProcessMojo extends AbstractLoggingMojo {
+
+    @Parameter(defaultValue = "${project}", readonly = true)
+    private MavenProject project;
 
     @Parameter(property = "configuration.process.skip", required = false, defaultValue = "false")
     private boolean skip;
@@ -45,7 +49,8 @@ public class ProcessMojo extends AbstractLoggingMojo {
                 if (null != p.getHome()) {
                     builder.setHome(p.getHome());
                 }
-                builder.addArguments(p.getArgs());
+                p.allocatePorts(project, getLog());
+                builder.addArguments(p.extrapolateArgs());
                 ProcessUnit pu = builder.build();
                 int status = pu.waitFor();
                 if (status != ProcessUnit.UNKOWN_EXIT_STATUS && status != 0) {
