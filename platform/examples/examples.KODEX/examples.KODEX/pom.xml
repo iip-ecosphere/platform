@@ -62,8 +62,6 @@
   <properties>
       <iip.resources>resources</iip.resources>
       <iip.model>PlatformConfiguration</iip.model>
-      <DBPort>8585</DBPort>
-      <DBServerPort>9595</DBServerPort>
   </properties>
     
   <profiles>
@@ -178,14 +176,19 @@
 	                               <before>
 	                                   <description>DB</description>
 	                                   <cmd>mvn</cmd>
+	                                   <ports>
+	                                       <port><property>DBPort</property></port>
+                                           <port><property>DBServerPort</property></port>
+	                                   </ports>
 	                                   <args>
 	                                       <arg>exec:java</arg>
-                                           <arg>-Dexec.args="${DBServerPort}"</arg>
+                                           <arg>-Dexec.args="$${DBServerPort}"</arg>
+                                           <arg>-Dserver.port="$${DBPort}"</arg>
 	                                   </args>
 	                               </before>
 	                           </befores>
 	                           <mvnArgs>
-	                              <mvnArg>-Diip.app.db.server.port=${DBServerPort}</mvnArg>
+	                              <mvnArg>-Diip.app.db.server.port=$${DBServerPort}</mvnArg>
 	                           </mvnArgs>
 	                       </configuration>
 	                   </execution>
