@@ -68,6 +68,7 @@ project CommonSetup {
     
     modelBaseFolder = "./target/easy-test";
     modelName = "PlatformConfiguration";
+    footprintFolder = "gen/footprints";
 
     // ------------ freezing ------------------
     
@@ -92,6 +93,7 @@ project CommonSetup {
         pidDir;
         artifactsFolder;
         artifactsUriPrefix;
+        footprintFolder;
         .; // every variable declared in this project
     } but (f|f.bindingTime >= BindingTime.runtimeMon);
 
