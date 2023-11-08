@@ -40,7 +40,8 @@ import org.junit.runners.Suite;
     ServerTest.class,
     InstalledDependenciesSetupTest.class,
     YamlFileTest.class,
-    TaskRegistryTests.class
+    TaskRegistryTests.class,
+    CollectorTest.class
 })
 public class AllTests {
 }

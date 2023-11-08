@@ -26,6 +26,9 @@ import de.iip_ecosphere.platform.support.FileUtils;
  */
 public class FolderResourceResolver implements ResourceResolver {
     
+    public static final FolderResourceResolver SYSTEM_ROOT = new FolderResourceResolver();
+    public static final FolderResourceResolver USER_HOME = new FolderResourceResolver(System.getProperty("user.home"));
+    
     private File basePath;
     private String removePrefix;
     
