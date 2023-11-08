@@ -34,6 +34,7 @@ import de.iip_ecosphere.platform.configuration.maven.ProcessUnit.TerminationReas
 import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.TimeUtils;
+import de.iip_ecosphere.platform.support.collector.Collector;
 
 /**
  * A platform application testing MOJO. May start an entire (local) platform
@@ -122,6 +123,8 @@ public class TestAppMojo extends AbstractLoggingMojo {
     private List<TestProcessSpec> befores;
     
     private List<ProcessUnit> units = new ArrayList<>();
+    
+    private long testStart;
     
     /**
      * Builds the process unit of {@code builder} and registers it for shutdown.
@@ -288,6 +291,9 @@ public class TestAppMojo extends AbstractLoggingMojo {
             break;
         case MATCH_COMPLETE:
             getLog().info("Required regEx matches complete. Stopping test.");
+            Collector.collect(project.getArtifactId())
+                .addExecutionTimeMs(System.currentTimeMillis() - testStart)
+                .close();
             break;
         default:
             break;
@@ -416,6 +422,7 @@ public class TestAppMojo extends AbstractLoggingMojo {
         if (logFile != null && logFile.getPath().length() > 0) {
             testBuilder.logTo(logFile);
         }
+        testStart = System.currentTimeMillis();
         ProcessUnit testUnit = buildAndRegister(testBuilder);
         getLog().info("Waiting for test end, at maximum specified test time: " + testTime + " ms");
         TimeUtils.waitFor(() -> !testTerminated.get() && testUnit.isRunning(), testTime, 300);
