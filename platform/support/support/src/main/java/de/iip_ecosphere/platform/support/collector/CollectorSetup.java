@@ -10,7 +10,7 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package test.de.iip_ecosphere.platform.support.collector;
+package de.iip_ecosphere.platform.support.collector;
 
 import org.apache.commons.io.FileUtils;
 

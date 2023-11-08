@@ -21,8 +21,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.support.TimeUtils;
-import test.de.iip_ecosphere.platform.support.collector.Collector;
-import test.de.iip_ecosphere.platform.support.collector.CollectorSetup;
+import de.iip_ecosphere.platform.support.collector.Collector;
+import de.iip_ecosphere.platform.support.collector.CollectorSetup;
 
 /**
  * Tests {@link Collector}.
