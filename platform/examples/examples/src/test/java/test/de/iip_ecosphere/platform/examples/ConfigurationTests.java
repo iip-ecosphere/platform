@@ -26,6 +26,7 @@ import org.junit.Test;
 import de.iip_ecosphere.platform.examples.SpringStartup;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.ServerAddress;
+import de.iip_ecosphere.platform.support.collector.Collector;
 import test.de.iip_ecosphere.platform.test.amqp.qpid.TestQpidServer;
 
 /**
@@ -104,6 +105,7 @@ public class ConfigurationTests {
      */
     private void testInstantiatedExample(String folder, String appName, int stopTime, Consumer<String> asserter) 
         throws IOException {
+        long start = System.currentTimeMillis();
         File cfg = new File(System.getProperty("test.genFolder", "../../configuration/configuration/gen/tests")); // git
         if (!cfg.exists()) {
             cfg = new File( // jenkins path, property does not work so far
@@ -118,6 +120,7 @@ public class ConfigurationTests {
         asserter.accept(FileUtils.readFileAsString(res));
         //res.deleteOnExit();
         //res.delete();
+        Collector.collect("examples." + folder).addExecutionTimeMs(System.currentTimeMillis() - start);
     }
 
     /**
