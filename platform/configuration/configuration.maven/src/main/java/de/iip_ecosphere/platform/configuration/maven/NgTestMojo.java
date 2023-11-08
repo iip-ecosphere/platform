@@ -42,14 +42,15 @@ public class NgTestMojo extends AbstractLoggingMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
         if (!skip) {
             ProcessUnit pu = new ProcessUnit.ProcessUnitBuilder("ng test", this)
-                .addShellScriptCommand("ng")
+                .addArgumentOrScriptCommand("ng")
                 .addArgument("test")
                 .addArgument(noWatch, "--no-watch")
                 .addArgument(noProgress, "--no-progress")
                 .addArgument(headless, "--browsers=ChromeHeadless")
+                .redirectErr2In()
                 .build();
             int status = pu.waitFor();
-            if (status != 0) {
+            if (ProcessUnit.isFailed(status)) {
                 throw new MojoExecutionException(pu.getDescription() + " failed with status: " + status);
             }
             

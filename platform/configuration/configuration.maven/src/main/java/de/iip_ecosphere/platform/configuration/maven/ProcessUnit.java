@@ -190,6 +190,26 @@ public class ProcessUnit {
     }
     
     /**
+     * Returns whether a process failed ({@code status} is not {@link #UNKOWN_EXIT_STATUS} and not {@code 0}).
+     *
+     * @param status the status to check
+     * @return {@code true} if failed, {@code false} may be running, not started or successful
+     */
+    public static boolean isFailed(int status) {
+        return status != ProcessUnit.UNKOWN_EXIT_STATUS && status != 0;        
+    }
+
+    /**
+     * Returns whether a process failed ({@code status} is not {@link #UNKOWN_EXIT_STATUS} and {@code 0}).
+     *
+     * @param status the status to check
+     * @return {@code true} if successful, {@code false} if running, not started or failed
+     */
+    public static boolean isSuccess(int status) {
+        return status != ProcessUnit.UNKOWN_EXIT_STATUS && status == 0;        
+    }
+
+    /**
      * Returns the description of the unit.
      * 
      * @return the description
@@ -262,6 +282,7 @@ public class ProcessUnit {
         private String argAggregate;
         private String argAggregateStart;
         private String argAggregateEnd;
+        private boolean err2In = false;
 
         /**
          * Creates a process builder instance.
@@ -318,6 +339,16 @@ public class ProcessUnit {
          */
         public ProcessUnitBuilder setHome(File home) {
             this.home = home;
+            return this;
+        }
+        
+        /**
+         * Redirects the process error stream so that it appears as input stream.
+         * 
+         * @return <b>this</b> (builder style)
+         */
+        public ProcessUnitBuilder redirectErr2In() {
+            this.err2In = true;
             return this;
         }
         
@@ -405,7 +436,19 @@ public class ProcessUnit {
         }
 
         /**
-         * Adds {@code cmd} is a script (also if in {@link ProcessUnit#SCRIPT_NAMES}) 
+         * Adds {@code cmd} as a script (also if in {@link ProcessUnit#SCRIPT_NAMES}) 
+         * or as argument.
+         * 
+         * @param cmd the script name
+         * @return <b>this</b> (builder style)
+         * @see #addArgumentOrScriptCommand(boolean, String)
+         */
+        public ProcessUnitBuilder addArgumentOrScriptCommand(String cmd) {
+            return addArgumentOrScriptCommand(false, cmd);
+        }
+
+        /**
+         * Adds {@code cmd} as a script (also if in {@link ProcessUnit#SCRIPT_NAMES}) 
          * or as argument.
          * 
          * @param cmdAsScript is {@code cmd} is a script command
@@ -554,7 +597,11 @@ public class ProcessUnit {
                     inConsumer = l -> logger.info(l);
                 }
                 if (null == errConsumer) {
-                    errConsumer = l -> logger.error(l);
+                    if (err2In) {
+                        errConsumer = l -> logger.info(l);
+                    } else {
+                        errConsumer = l -> logger.error(l);
+                    }
                 }
                 Consumer<Pattern> matchConsumer;
                 if (conjunctLogMatches) {

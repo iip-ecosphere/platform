@@ -47,6 +47,9 @@ public class BasicProcessSpec {
     @Parameter(required = false)
     private List<PortSpec> ports;
     
+    @Parameter(required = false, defaultValue = "false")
+    private boolean errToIn;
+    
     /**
      * Port allocation/mapping specification.
      * 
@@ -154,6 +157,24 @@ public class BasicProcessSpec {
         this.home = home;
     }
 
+    /**
+     * Returns whether the error stream of the process shall be redirected to the input stream.
+     * 
+     * @return {@code true} for redirect, {@code false} for no redirect
+     */
+    public boolean isErrToIn() {
+        return errToIn;
+    }
+
+    /**
+     * Defines whether the error stream of the process shall be redirected to the input stream.
+     * 
+     * @param errToIn {@code true} for redirect, {@code false} for no redirect
+     */
+    public void setErrToIn(boolean errToIn) {
+        this.errToIn = errToIn;
+    }
+    
     /**
      * Allocates the ports.
      * 

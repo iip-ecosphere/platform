@@ -227,7 +227,7 @@ public class TestAppMojo extends AbstractLoggingMojo {
                 .addArgument(deploymentPlan.getAbsolutePath())
                 .build();
             int status = pu.waitFor();
-            if (status != ProcessUnit.UNKOWN_EXIT_STATUS && status != 0) {
+            if (ProcessUnit.isFailed(status)) {
                 throw new MojoExecutionException(pu.getDescription() + " terminated with status: " + status);
             }
         }
@@ -245,6 +245,9 @@ public class TestAppMojo extends AbstractLoggingMojo {
                 p.allocatePorts(project, getLog());
                 ProcessUnitBuilder builder = new ProcessUnitBuilder(p.getDescription(), this);
                 builder.addArgumentOrScriptCommand(p.isCmdAsScript(), p.getCmd());
+                if (p.isErrToIn()) {
+                    builder.redirectErr2In();
+                }
                 if (null != p.getHome()) {
                     builder.setHome(p.getHome());
                 }

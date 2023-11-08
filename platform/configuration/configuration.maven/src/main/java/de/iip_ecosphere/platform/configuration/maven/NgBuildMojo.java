@@ -33,19 +33,21 @@ public class NgBuildMojo extends AbstractLoggingMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
         if (!skip) {
             ProcessUnit pu = new ProcessUnit.ProcessUnitBuilder("npm install", this)
-                .addArgument("npm")
+                .addArgumentOrScriptCommand("npm")
                 .addArgument("install")
+                .addArgument("--no-progress")
                 .build();
             int status = pu.waitFor();
-            if (status != 0) {
+            if (ProcessUnit.isFailed(status)) {
                 throw new MojoExecutionException(pu.getDescription() + " failed with status: " + status);
             }
             pu = new ProcessUnit.ProcessUnitBuilder("ng build", this)
-                .addShellScriptCommand("ng")
+                .addArgumentOrScriptCommand("ng")
                 .addArgument("build")
+                .redirectErr2In()
                 .build();
             status = pu.waitFor();
-            if (status != 0) {
+            if (ProcessUnit.isFailed(status)) {
                 throw new MojoExecutionException(pu.getDescription() + " failed with status: " + status);
             }
         }
