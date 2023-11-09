@@ -7,7 +7,7 @@
 	
     <!-- deploy to SSE Mvn repo -->
 	<target name="maven"> 
-	    <maven pomFile="pom.xml" goal="package"/>
+	    <maven pomFile="pom.xml" goal="install"/>
 		<mvnDeployResolveArtifact folderName="IIP-ecsRuntime" pomFile="pom.xml" jarFolder="target" artifactPattern="ecsRuntime-*.*.*.jar" />
 	</target>
 </project>

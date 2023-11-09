@@ -7,7 +7,7 @@
     
     <!-- deploy to SSE Mvn repo -->
     <target name="maven"> 
-        <maven pomFile="pom.xml" goal="package"/>
+        <maven pomFile="pom.xml" goal="install"/>
         <mvnDeployResolveArtifact folderName="test-amqp-qpid" pomFile="pom.xml" jarFolder="target" artifactPattern="test.amqp.qpid*.*.*.jar" />
     </target>
 </project>

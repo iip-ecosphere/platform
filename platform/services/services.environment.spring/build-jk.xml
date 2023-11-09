@@ -7,7 +7,7 @@
 	
     <!-- deploy to SSE Mvn repo -->
 	<target name="maven"> 
-	    <maven pomFile="pom.xml" goal="package"/>
+	    <maven pomFile="pom.xml" goal="install"/>
 		<mvnDeployResolveArtifact folderName="IIP-services.environment.spring" pomFile="pom.xml" jarFolder="target" artifactPattern="services.environment.spring-*.*.*.jar" />
 	</target>
 </project>

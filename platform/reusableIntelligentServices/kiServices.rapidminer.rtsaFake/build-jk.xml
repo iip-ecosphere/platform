@@ -7,7 +7,7 @@
 	
     <!-- deploy to SSE Mvn repo -->
 	<target name="maven"> 
-	    <maven pomFile="pom.xml" goal="package"/>
+	    <maven pomFile="pom.xml" goal="install"/>
 		<mvnDeployResolveArtifact folderName="IIP-ki.rapidminer.rtsa.fake" pomFile="pom.xml" jarFolder="target" artifactPattern="kiServices.rapidminer.rtsaFake-*.*.*.jar" />
 	</target>
 </project>

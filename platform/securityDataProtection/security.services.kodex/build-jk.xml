@@ -7,7 +7,7 @@
 	
     <!-- deploy to SSE Mvn repo -->
 	<target name="maven"> 
-	    <maven pomFile="pom.xml" goal="package"/>
+	    <maven pomFile="pom.xml" goal="install"/>
 		<mvnDeployResolveArtifact folderName="IIP-security.services.kodex" pomFile="pom.xml" jarFolder="target" artifactPattern="security.services.kodex-*.*.*.jar" />
 	</target>
 </project>
