@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { OperationQueryComponent } from './operation-query.component';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('OperationQueryComponent', () => {
   let component: OperationQueryComponent;
@@ -8,6 +9,7 @@ describe('OperationQueryComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
+      imports: [ HttpClientTestingModule ],
       declarations: [ OperationQueryComponent ]
     })
     .compileComponents();

@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SubeditorButtonComponent } from './subeditor-button.component';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 
 describe('SubeditorButtonComponent', () => {
   let component: SubeditorButtonComponent;
@@ -8,7 +10,12 @@ describe('SubeditorButtonComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ SubeditorButtonComponent ]
+      imports: [ HttpClientTestingModule, MatDialogModule ],
+      declarations: [ SubeditorButtonComponent ],
+      providers: [
+          {provide: MatDialogRef, useValue: {}},
+          {provide: MAT_DIALOG_DATA, useValue: []},
+      ]
     })
     .compileComponents();
 

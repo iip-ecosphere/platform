@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ListComponent } from './list.component';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 
 describe('ListComponent', () => {
   let component: ListComponent;
@@ -8,7 +10,12 @@ describe('ListComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ListComponent ]
+      imports: [ HttpClientTestingModule, MatDialogModule ],
+      declarations: [ ListComponent ],
+      providers: [
+          {provide: MatDialogRef, useValue: {}},
+          {provide: MAT_DIALOG_DATA, useValue: []},
+      ]
     })
     .compileComponents();
 
