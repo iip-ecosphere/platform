@@ -135,7 +135,10 @@ public class AbstractInvokerMojo extends AbstractMojo {
 
     @Parameter(property = "invoker.skipIfExists", defaultValue = "") 
     private File skipIfExists;
-    
+
+    @Parameter(property = "iip.ciBuildId", defaultValue = "") 
+    private String buildId;
+
     @Component
     private Invoker invoker;
     
@@ -211,6 +214,9 @@ public class AbstractInvokerMojo extends AbstractMojo {
         }
         if (disablePythonTests) {
             sysProperties.put("python-test.skip", "true");
+        }
+        if (buildId != null && buildId.length() > 0) {
+            sysProperties.put("iip.ciBuildId", buildId);
         }
         String hashDir = pythonCompileHashDir;
         if (null == hashDir || hashDir.length() == 0) {
