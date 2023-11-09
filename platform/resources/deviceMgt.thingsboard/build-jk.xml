@@ -7,7 +7,7 @@
 	
     <!-- deploy to SSE Mvn repo -->
 	<target name="maven"> 
-	    <maven pomFile="pom.xml" goal="package"/>
+	    <maven pomFile="pom.xml" goal="install"/>
 		<mvnDeployResolveArtifact folderName="IIP-deviceMgt.thingsboard" pomFile="pom.xml" jarFolder="target" artifactPattern="deviceMgt.thingsboard-*.*.*.jar" />
 	</target>
 </project>

@@ -7,7 +7,7 @@
 	
     <!-- deploy to SSE Mvn repo -->
 	<target name="maven"> 
-	    <maven pomFile="pom.xml" goal="package"/>
+	    <maven pomFile="pom.xml" goal="install"/>
 		<mvnDeployResolveArtifact folderName="IIP-transport-spring-hivemq" pomFile="pom.xml" jarFolder="target" artifactPattern="transport.spring*.*.*.jar" />
 	</target>
 </project>

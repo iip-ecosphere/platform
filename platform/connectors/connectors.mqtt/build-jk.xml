@@ -7,7 +7,7 @@
 	
     <!-- deploy to SSE Mvn repo -->
 	<target name="maven"> 
-	    <maven pomFile="pom.xml" goal="package"/>
+	    <maven pomFile="pom.xml" goal="install"/>
 		<mvnDeployResolveArtifact folderName="IIP-connectors.mqtt" pomFile="pom.xml" jarFolder="target" artifactPattern="connectors.mqtt-*.*.*.jar" />
 	</target>
 </project>
