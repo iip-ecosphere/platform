@@ -13,9 +13,6 @@
 package de.iip_ecosphere.platform.platform;
 
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Properties;
 
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +30,7 @@ import de.iip_ecosphere.platform.support.aas.ServerRecipe;
 import de.iip_ecosphere.platform.support.aas.ServerRecipe.PersistenceType;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
+import de.iip_ecosphere.platform.support.iip_aas.config.RuntimeSetup;
 import de.iip_ecosphere.platform.transport.Transport;
 
 /**
@@ -53,7 +51,7 @@ public class PlatformLifecycleDescriptor implements LifecycleDescriptor, PidLife
     
     @Override
     public void startup(String[] args) {
-        Properties props = new Properties();
+        RuntimeSetup rSetup = new RuntimeSetup();
         PlatformSetup setup = PlatformSetup.getInstance();
         Transport.setTransportSetup(() -> setup.getTransport());
         AasSetup aasSetup = setup.getAas();
@@ -63,12 +61,12 @@ public class PlatformLifecycleDescriptor implements LifecycleDescriptor, PidLife
         PersistenceType pType = rcp.toPersistenceType(setup.getAas().getPersistence().name());
         String fullRegUri = AasFactory.getInstance().getFullRegistryUri(regEndpoint);
         LoggerFactory.getLogger(getClass()).info("Starting {} AAS registry on {}", pType, fullRegUri);
-        props.put(PROP_AAS_REGISTRY, fullRegUri);
+        rSetup.setAasRegistry(fullRegUri);
         registryServer = rcp.createRegistryServer(regEndpoint, pType);
         registryServer.start();
         Endpoint serverEndpoint = aasSetup.adaptEndpoint(aasSetup.getServerEndpoint());
         LoggerFactory.getLogger(getClass()).info("ServerHost {} {}", aasSetup.getServerHost(), serverEndpoint.toUri());
-        props.put(PROP_ASS_SERVER, serverEndpoint.toUri());
+        rSetup.setAasServer(serverEndpoint.toUri());
         LoggerFactory.getLogger(getClass()).info("Starting {} AAS server on {}", pType, serverEndpoint.toUri());
         aasServer = rcp.createAasServer(aasSetup.getServerEndpoint(), pType, regEndpoint);
         aasServer.start();
@@ -76,14 +74,7 @@ public class PlatformLifecycleDescriptor implements LifecycleDescriptor, PidLife
         gatewayServer = TransportConverterFactory.getInstance().createServer(aasSetup, setup.getTransport());
         gatewayServer.start();
         
-        File propFile = getPropertiesFile();
-        try (FileWriter fw = new FileWriter(propFile)) {
-            props.store(fw, "");
-            LoggerFactory.getLogger(getClass()).info("Wrote platform properties to {}", propFile);
-        } catch (IOException e) {
-            LoggerFactory.getLogger(getClass()).warn("Failed writing platform properties to {}: {}", 
-                propFile, e.getMessage());
-        }
+        rSetup.store();
     }
     
     /**
