@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { MeshFeedbackComponent } from './mesh-feedback.component';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 describe('MeshFeedbackComponent', () => {
   let component: MeshFeedbackComponent;
@@ -8,7 +9,8 @@ describe('MeshFeedbackComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ MeshFeedbackComponent ]
+      declarations: [ MeshFeedbackComponent ],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA]
     })
     .compileComponents();
 

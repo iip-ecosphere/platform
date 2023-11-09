@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { StatusDetailsComponent } from './status-details.component';
 
 describe('StatusDetailsComponent', () => {
@@ -8,7 +9,8 @@ describe('StatusDetailsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ StatusDetailsComponent ]
+      declarations: [ StatusDetailsComponent ],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA]
     })
     .compileComponents();
 

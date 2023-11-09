@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { EditorComponent } from './editor.component';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -15,7 +16,8 @@ describe('EditorComponent', () => {
       providers: [
           {provide: MatDialogRef, useValue: {}},
           {provide: MAT_DIALOG_DATA, useValue: []},
-      ]
+      ],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA]
     })
     .compileComponents();
 
