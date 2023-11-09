@@ -4,6 +4,7 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { EditorComponent } from './editor.component';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import {FormsModule} from "@angular/forms";
 
 describe('EditorComponent', () => {
   let component: EditorComponent;
@@ -11,7 +12,7 @@ describe('EditorComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ HttpClientTestingModule ],
+      imports: [ HttpClientTestingModule, FormsModule ],
       declarations: [ EditorComponent ],
       providers: [
           {provide: MatDialogRef, useValue: {}},
