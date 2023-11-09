@@ -342,6 +342,10 @@ public class TestAppMojo extends AbstractLoggingMojo {
             testBuilder.addArgument("-P");
             testBuilder.addArgument(appProfile);
         }
+        String buildId = System.getProperty(Collector.PROPERTY_BUILDID);
+        if (buildId != null) {
+            testBuilder.addArgument("-D" + Collector.PROPERTY_BUILDID + "=" + buildId);
+        }
         if (null != mvnArgs) {
             testBuilder.addArguments(extrapolate(mvnArgs, befores));
         }
