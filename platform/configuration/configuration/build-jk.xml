@@ -21,6 +21,7 @@
     	
         <maven pomFile="pom.xml" goal="install">
     	    <arg value="-Diip.tests=true"/>
+            <arg value="-Diip.ciBuildId=${build_num}"/> <!-- must be set in jenkins ANT build step -->
     	</maven>
     	
         <mvnDeployResolveArtifact folderName="IIP-configuration.configuration" pomFile="pom.xml" jarFolder="target" artifactPattern="configuration.configuration-*.*.*.jar" />
