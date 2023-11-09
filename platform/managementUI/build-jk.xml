@@ -8,6 +8,12 @@
     <!-- deploy to SSE Mvn repo -->
 	<target name="maven"> 
         <maven pomFile="pom.xml" goal="install"/>
+		<tstamp>
+		    <format property="NOW" pattern="yyyyMMddHHmmss" locale="en,GB"/>
+		</tstamp>
+        <mkdir dir="pckg"/>
+        <copy file="target/mgtUI.zip" tofile="pckg/IIP-Ecosphere-mgtUi-latest.zip"/>
+        <copy file="target/mgtUI.tgz" tofile="pckg/IIP-Ecosphere-mgtUi-latest.tgz"/>
 		<mvnDeployResolveArtifact folderName="IIP-mgtUi" pomFile="pom.xml" jarFolder="target" artifactPattern="managementUi-*.*.*.zip" />
 	</target>
 </project>

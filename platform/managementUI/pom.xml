@@ -23,25 +23,185 @@
   
   <build>
     <plugins>
+
       <plugin>
-        <groupId>com.coderplus.maven.plugins</groupId>
-        <artifactId>copy-rename-maven-plugin</artifactId>
-        <version>1.0</version>
-        <executions>
-          <execution>
-            <id>copy-file</id>
-            <phase>generate-sources</phase>
-            <goals>
-              <goal>copy</goal>
-            </goals>
-            <configuration>
-              <sourceFile>pckg/IIP-Ecosphere-mgtUi-latest.zip</sourceFile>
-              <destinationFile>${project.build.directory}/${project.build.finalName}-bin.zip</destinationFile>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      
+         <groupId>de.iip-ecosphere.platform</groupId>
+         <artifactId>dependency-plugin</artifactId>
+         <version>${project.version}</version>
+         <executions>
+           <execution>
+             <id>unpack</id>
+             <phase>validate</phase>
+             <goals>
+               <goal>unpack</goal>
+             </goals>
+             <configuration>
+               <artifactItems>
+                 <artifactItem>
+                   <groupId>de.iip-ecosphere.platform</groupId>
+                   <artifactId>configuration.configuration</artifactId>
+                   <version>${project.version}</version>
+                   <classifier>easy</classifier>
+                   <type>zip</type>
+                   <overWrite>true</overWrite>
+                   <outputDirectory>${project.build.directory}/easy</outputDirectory>
+                   <destFileName>model.jar</destFileName>
+                   <excludes>cfg/*.*</excludes>
+                 </artifactItem>
+               </artifactItems>
+               <cleanup>
+                   <directory>${project.build.directory}/easy</directory>
+                   <includes>
+                       <include>cfg</include>
+                       <include>files</include>
+                       <include>meta</include>
+                       <include>vtl</include>
+                       <include>IIPEcosphere*.*</include>
+                   </includes>
+               </cleanup>
+               <overWriteReleases>false</overWriteReleases>
+               <overWriteSnapshots>true</overWriteSnapshots>
+             </configuration>
+           </execution>
+           <execution>
+             <id>unpack-easy-test</id>
+             <phase>validate</phase>
+             <goals>
+               <goal>unpack</goal>
+             </goals>
+             <configuration>
+               <artifactItems>
+                 <artifactItem>
+                   <groupId>de.iip-ecosphere.platform</groupId>
+                   <artifactId>configuration.configuration</artifactId>
+                   <version>${project.version}</version>
+                   <classifier>easy-test</classifier>
+                   <type>zip</type>
+                   <overWrite>true</overWrite>
+                   <outputDirectory>${project.build.directory}/easy-test</outputDirectory>
+                   <destFileName>model-test.jar</destFileName>
+                   <includes>common/**/*.*, simpleMesh/**/*.*</includes>
+                 </artifactItem>
+               </artifactItems>
+               <cleanup>
+                   <directory>${project.build.directory}/easy-test</directory>
+                   <excludes>
+                       <exclude>simpleMesh</exclude>
+                   </excludes>
+               </cleanup>
+               <overWriteReleases>false</overWriteReleases>
+               <overWriteSnapshots>true</overWriteSnapshots>
+             </configuration>
+           </execution>
+         </executions>
+       </plugin>
+
+       <!-- AAS configuration to ephemeral, real uris at runtime in <piddir>/iip-platform.properties -->
+       <!-- <plugin>
+         <groupId>com.google.code.maven-replacer-plugin</groupId>
+         <artifactId>replacer</artifactId>
+         <version>1.5.3</version>
+         <executions>
+             <execution>
+                 <phase>process-sources</phase>
+                 <goals>
+                     <goal>replace</goal>
+                 </goals>
+             </execution>
+         </executions>
+         <configuration>
+             <file>${project.build.directory}/easy-test/common/CommonSetup.ivml</file>
+                 <replacements>
+                     <replacement>
+                         <token>port = 9001,</token>
+                         <value>port = -1,</value>
+                     </replacement>
+                     <replacement>
+                         <token>port = 9002,</token>
+                         <value>port = -1,</value>
+                     </replacement>
+                 </replacements>
+         </configuration>
+       </plugin> -->
+       
+       <!-- instantiate platform before tests and after replacements -->
+       <plugin>
+           <groupId>de.iip-ecosphere.platform</groupId>
+           <artifactId>configuration-plugin</artifactId>
+           <version>${project.version}</version>
+           <executions>
+               <execution>
+                   <id>generateBroker</id>
+                   <phase>generate-test-sources</phase>
+                   <goals>
+                       <goal>generateBroker</goal>
+                   </goals>
+               </execution>
+               <execution>
+                   <id>generatePlatform</id>
+                   <phase>generate-test-sources</phase>
+                   <goals>
+                       <goal>generatePlatform</goal>
+                   </goals>
+               </execution>
+               <execution>
+                   <id>ngBuild</id>
+                   <goals>
+                       <goal>ngBuild</goal>
+                   </goals>
+               </execution>
+               <execution>
+                   <id>testApp</id>
+                   <goals>
+                       <goal>testApp</goal>
+                   </goals>
+                   <configuration>
+                       <testCmd>ng</testCmd>
+                       <testCmdAsScript>true</testCmdAsScript>
+                       <appArgs>
+                           <appArg>test</appArg>
+                           <appArg>--no-watch</appArg>
+                           <appArg>--no-progress</appArg>
+                           <appArg>--browsers=ChromeHeadless</appArg>
+                           <appArg>--code-coverage</appArg>
+                       </appArgs>
+                       <errToIn>true</errToIn>
+                   </configuration>
+               </execution>
+           </executions>
+           <configuration>
+               <model>PlatformConfiguration</model>
+               <outputDirectory>gen/platform</outputDirectory>
+               <metaModelDirectory>${project.build.directory}/easy</metaModelDirectory>
+               <modelDirectory>${project.build.directory}/easy-test</modelDirectory>
+           </configuration>
+       </plugin>
+
+       <plugin>
+           <groupId>org.apache.maven.plugins</groupId>
+           <artifactId>maven-assembly-plugin</artifactId>
+           <version>3.1.1</version>
+           <executions>
+               <execution>
+                   <id>angular</id>
+                   <phase>package</phase>
+                   <goals>
+                       <goal>single</goal>
+                   </goals>
+                   <configuration>
+                       <descriptors>
+                           <descriptor>src/main/assembly/angular.xml</descriptor>
+                       </descriptors>
+                       <outputDirectory>${project.build.directory}</outputDirectory>
+                       <finalName>mgtUI</finalName>
+                       <appendAssemblyId>false</appendAssemblyId>
+                       <attach>true</attach>
+                       <tarLongFileMode>posix</tarLongFileMode>
+                   </configuration>
+               </execution>
+           </executions>
+       </plugin>
+       
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>
@@ -65,8 +225,64 @@
           </execution>
         </executions>
       </plugin>
+
+      <plugin>
+        <groupId>com.coderplus.maven.plugins</groupId>
+        <artifactId>copy-rename-maven-plugin</artifactId>
+        <version>1.0</version>
+        <executions>
+          <execution>
+            <id>copy-file</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <sourceFile>pckg/IIP-Ecosphere-mgtUi-latest.zip</sourceFile>
+              <destinationFile>${project.build.directory}/${project.build.finalName}-bin.zip</destinationFile>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       
     </plugins>
+    
+    <pluginManagement>
+        <plugins>
+            <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+            <plugin>
+                <groupId>org.eclipse.m2e</groupId>
+                <artifactId>lifecycle-mapping</artifactId>
+                <version>1.0.0</version>
+                <configuration>
+                    <lifecycleMappingMetadata>
+                        <pluginExecutions>
+                            <pluginExecution>
+                                <pluginExecutionFilter>
+                                    <groupId>
+                                        com.google.code.maven-replacer-plugin
+                                    </groupId>
+                                    <artifactId>
+                                        replacer
+                                    </artifactId>
+                                    <versionRange>
+                                        [1.5.0,)
+                                    </versionRange>
+                                    <goals>
+                                        <goal>replace</goal>
+                                    </goals>
+                                </pluginExecutionFilter>
+                                <action>
+                                    <ignore/>
+                                </action>
+                            </pluginExecution>
+                        </pluginExecutions>
+                    </lifecycleMappingMetadata>
+                </configuration>
+            </plugin>
+        </plugins>
+    </pluginManagement>
+    
   </build>
 
 </project>

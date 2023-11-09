@@ -2,14 +2,10 @@
 
 ## Prerequisites (for Ubuntu Server, CI)
 
-- install node.js and node package manager (npm): `sudo apt install nodejs npm`
-- install Angular CLI: `sudo npm install -g @angular/cli@latest`
+- install node.js and node package manager (npm)
+- install Angular CLI
 
-If you have an older version installed, you may have to execute
-
-- `npm update -g`
-
-Currently, we build the UI with npm version 9.5.1 and Angular 14.2.10.
+Currently, we build the UI with node.js version 16.10.0, npm version 7.24.0 (or 9.5.1) and Angular 14.2.10. More recent versions may not be compatible. Please see also (Angular version compatibility matrix)[https://angular.io/guide/versions].
 
 ## Running Management UI from Code
 
@@ -19,8 +15,10 @@ Currently, we build the UI with npm version 9.5.1 and Angular 14.2.10.
 
 ## Building the Management UI
 
-- install dependencies: change directory to /managementUi and run `npm install` 
-- Angular Projekt build: `ng build --base-href ./` creates a build and stores it in folder `dist`
+Handled now through `mvn compile`. On the first try, we recommend running the following two steps manually
+  - `npm install` 
+  - `ng build` 
+  - `ng test` 
 
 ## Setting up the Management UI
 
@@ -31,8 +29,4 @@ An installed management UI contains a setup JSON file in `assets/config/config.j
         "urn": "urn%3A%3A%3AAAS%3A%3A%3AiipEcosphere%23"
     }
     
-whereby the `ip` points to the platform AAS server and the the `urn` denotes the URN of the platform AAS. Usually, CORS needs to be enabled, either in your browser or in the platform configuration variable ``aasAccessControlAllowOrigin``.
-
-## Building the Management UI
-
-Building happens through ``build.sh`` calling ``build-jk.xml`` in turn calling ``pom.xml``. So far there is no complete windows build process, i.e., if you want to run it, you may have to add ``pckg/IIP-Ecosphere-mgtUi-latest.zip`` from Jenkins or to run maven with `-Dbuildhelper.skipAttach`.
+whereby the `ip` points to the platform AAS server and the the `urn` denotes the URN of the platform AAS.

@@ -44,3 +44,5 @@ Thumbs.db
 
 /target/
 /pckg/
+/gen/
+log
