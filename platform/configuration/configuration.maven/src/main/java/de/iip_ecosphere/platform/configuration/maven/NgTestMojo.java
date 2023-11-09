@@ -38,6 +38,9 @@ public class NgTestMojo extends AbstractLoggingMojo {
     @Parameter(property = "configuration.ngTest.headless", required = false, defaultValue = "true")
     private boolean headless;
 
+    @Parameter(property = "configuration.ngTest.coverage", required = false, defaultValue = "true")
+    private boolean coverage;
+
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         if (!skip) {
@@ -47,6 +50,7 @@ public class NgTestMojo extends AbstractLoggingMojo {
                 .addArgument(noWatch, "--no-watch")
                 .addArgument(noProgress, "--no-progress")
                 .addArgument(headless, "--browsers=ChromeHeadless")
+                .addArgument(coverage, "--code-coverage")
                 .redirectErr2In()
                 .build();
             int status = pu.waitFor();

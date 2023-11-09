@@ -15,6 +15,8 @@ package de.iip_ecosphere.platform.configuration.maven;
 
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
+
+import de.iip_ecosphere.platform.support.collector.Collector;
 /**
  * Generates the configured applications including dependencies to the implementing services.
  * 
@@ -33,5 +35,15 @@ public class GenerateAppsMojo extends AbstractAppsConfigurationMojo {
         return true;
     }
 
+    /**
+     * Called to record the execution time.
+     * 
+     * @param time the passed time in ms
+     */
+    protected void recordExecutionTime(long time) {
+        Collector.collect(getProject().getArtifactId() + "-" + getModel() + "-generateApps")
+            .addExecutionTimeMs(time)
+            .close();
+    }
 
 }

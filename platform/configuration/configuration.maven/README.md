@@ -319,4 +319,5 @@ It can be configured by:
   - `noWatch` (`-Dconfiguration.ngTest.noWatch=...`, default `true`) disables watching.
   - `noProgress` (`-Dconfiguration.ngTest.noProgress=...`, default `true`) disables progress output.
   - `headless` (`-Dconfiguration.ngTest.headless=...`, default `true`) enables headless mode.
+  - `coverage` (`-Dconfiguration.ngTest.coverage=...`, default `true`) enables code coverage analysis.
   
