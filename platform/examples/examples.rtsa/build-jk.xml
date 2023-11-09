@@ -11,6 +11,7 @@
             <arg value="-Dunpack.force=true"/>
             <arg value="-Dconfiguration.testApp.skip=false"/>
             <arg value="-Djava8.home=/usr/lib/jvm/java-8-openjdk-amd64/bin/java"/>
+            <arg value="-Diip.ciBuildId=${build_num}"/> <!-- must be set in jenkins ANT build step -->
         </maven>
 	</target>
 </project>
