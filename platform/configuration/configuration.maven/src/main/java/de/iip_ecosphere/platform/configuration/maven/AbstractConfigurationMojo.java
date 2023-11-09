@@ -14,7 +14,14 @@ package de.iip_ecosphere.platform.configuration.maven;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.PathMatcher;
+import java.util.Arrays;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Stream;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
@@ -171,9 +178,11 @@ public abstract class AbstractConfigurationMojo extends AbstractMojo {
         boolean result = false;
         File modelDir = new File(getModelDirectory());
         if (modelDir.exists() ) {
-            String[] files = modelDir.list((d, n) -> n.endsWith(".ivml"));
-            if (null != files && files.length > 0) {
-                result = true;
+            PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:*.ivml");
+            try (Stream<Path> stream = Files.walk(modelDir.toPath())) {
+                result = stream.anyMatch(f -> matcher.matches(f.getFileName()));
+            } catch (IOException e) {
+                // ignore
             }
         }
         return result;
@@ -272,11 +281,10 @@ public abstract class AbstractConfigurationMojo extends AbstractMojo {
         long result = -1;
         File d = new File(dir);
         if (d.exists()) {
-            File[] files = d.listFiles(filter);
-            if (files != null) {
-                for (File f : files) {
-                    result = Math.max(result, f.lastModified());
-                }
+            try (Stream<Path> stream = Files.walk(d.toPath())) {
+                result = stream.map(p -> p.toFile().lastModified()).max(Long::compare).get();
+            } catch (IOException e) {
+                // ignore
             }
         }
         return result;
@@ -328,6 +336,8 @@ public abstract class AbstractConfigurationMojo extends AbstractMojo {
                 } else {
                     getLog().info("Skipped as code in output directory is newer than IVML model.");
                 }
+            } else {
+                getLog().info("Model directory is not valid. No IVML files found in " + getModelDirectory());
             }
         } catch (ExecutionException e) {
             throw new MojoExecutionException(e.getMessage());
