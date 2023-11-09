@@ -50,6 +50,7 @@
      <module>connectors/connectors.mqtt</module>
      <module>connectors/connectors.basyx</module>
      <module>connectors/connectors.opcuav1</module>
+     <module>connectors/connectors.ads</module>
      <!-- services layer -->
      <module>services/services.environment</module>
      <module>services/services.environment.spring</module>
@@ -78,7 +79,6 @@
      <module>reusableIntelligentServices/kiServices.rapidminer.rtsa</module>
      <!-- configuration -->
      <module>configuration/configuration</module> <!-- requires next -->
-     <module>tests/test.configuration.configuration</module> <!-- requires interface build of tests -->
      <module>configuration/configuration.maven</module>
      <module>configuration/configuration.defaultLib</module>
      <!-- platform services, CLI, AAS -->
@@ -86,15 +86,15 @@
      <module>managementUI</module>
      <!-- examples -->
      <module>examples/examples</module>
-     <module>examples/examples.KODEX/examples.KODEX.db</module>
-	 <module>examples/examples.KODEX/examples.KODEX</module>
-     <module>examples/examples.python</module>
+     <module>examples/examples.KODEX</module>
+	 <module>examples/examples.python</module>
      <module>examples/examples.pythonSync</module>
      <module>examples/examples.rtsa</module>
-     <!--<module>examples/examples.templates</module>--> <!-- Needs orchestrated pom.xml at this level -->
+     <module>examples/examples.templates</module>
      <module>examples/examples.MIP</module>
      <module>examples/examples.vdw</module>
      <module>examples/examples.hm22</module>
+     <module>examples/examples.emo23</module>
   </modules>
 
 </project>

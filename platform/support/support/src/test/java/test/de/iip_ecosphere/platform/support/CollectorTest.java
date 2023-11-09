@@ -36,7 +36,8 @@ public class CollectorTest {
      */
     @Test
     public void testCollector() throws IOException {
-        CollectorSetup orig = Collector.setSetup(null);
+        CollectorSetup setup = new CollectorSetup();
+        CollectorSetup orig = Collector.setSetup(setup);
         
         Collector
             .collect("tag")
@@ -48,7 +49,6 @@ public class CollectorTest {
         File tagFile = new File(tmp, "tag.csv");
         FileUtils.deleteQuietly(tagFile);
         
-        CollectorSetup setup = new CollectorSetup();
         setup.setDataDir(FileUtils.getTempDirectoryPath());
         Collector.setSetup(setup);
         Collector
