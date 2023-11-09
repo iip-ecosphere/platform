@@ -51,6 +51,18 @@ public class ServerAddressHolder {
         host = addr.getHost();
         schema = addr.getSchema();
     }
+
+    /**
+     * Creates an instance by copying data from a given instance.
+     * 
+     * @param holder the holder to copy from
+     */
+    public ServerAddressHolder(ServerAddressHolder holder) {
+        port = holder.port;
+        host = holder.host;
+        schema = holder.schema;
+        running = holder.running;
+    }
     
     /**
      * Returns the port value.
@@ -78,6 +90,16 @@ public class ServerAddressHolder {
     public String getHost() {
         return host;
     }
+    
+    /**
+     * Returns whether the port is set to be determined dynamically.
+     * 
+     * @return {@code true} for ephemeral, {@code false} else
+     */
+    @JsonIgnore
+    public boolean isEphmemeral() {
+        return port < 0;
+    }    
     
     /**
      * Defines the {@link #host} value.  [required by data mapper]

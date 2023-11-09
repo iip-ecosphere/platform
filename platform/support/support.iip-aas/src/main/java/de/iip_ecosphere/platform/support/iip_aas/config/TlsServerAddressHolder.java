@@ -54,6 +54,18 @@ public class TlsServerAddressHolder extends ServerAddressHolder {
     public TlsServerAddressHolder(ServerAddress addr) {
         super(addr);
     }
+    
+    /**
+     * Creates an instance by copying data from a given instance.
+     * 
+     * @param holder the holder to copy from
+     */
+    public TlsServerAddressHolder(TlsServerAddressHolder holder) {
+        super(holder);
+        keyAlias = holder.keyAlias;
+        keyPassword = holder.keyPassword;
+        keystore = holder.keystore;
+    }
 
     /**
      * Returns the optional TLS keystore.

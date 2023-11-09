@@ -49,6 +49,7 @@ import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.iip_aas.config.EndpointHolder;
 import de.iip_ecosphere.platform.support.iip_aas.config.ProtocolAddressHolder;
+import de.iip_ecosphere.platform.support.iip_aas.config.RuntimeSetupEndpointValidator;
 import de.iip_ecosphere.platform.support.jsl.ExcludeFirst;
 
 /**
@@ -149,10 +150,10 @@ public class AasPartRegistry {
          * @param setup the setup to copy from
          */
         public AasSetup(AasSetup setup) {
-            this.server = setup.server;
-            this.registry = setup.registry;
-            this.implementation = setup.implementation;
-            this.mode = setup.mode;
+            setServer(setup.server);
+            setRegistry(setup.registry);
+            setImplementation(setup.implementation);
+            setMode(setup.mode);
         }
         
         /**
@@ -210,7 +211,8 @@ public class AasPartRegistry {
          * @param aas the AAS server information
          */
         public void setServer(EndpointHolder aas) {
-            this.server = aas;
+            this.server = new EndpointHolder(aas);
+            this.server.setValidator(RuntimeSetupEndpointValidator.create(r -> r.getAasServer()));
         }
 
         /**
@@ -304,7 +306,8 @@ public class AasPartRegistry {
          * @param registry the registry information
          */
         public void setRegistry(EndpointHolder registry) {
-            this.registry = registry;
+            this.registry = new EndpointHolder(registry);
+            this.registry.setValidator(RuntimeSetupEndpointValidator.create(r -> r.getAasRegistry()));
         }
 
         /**
