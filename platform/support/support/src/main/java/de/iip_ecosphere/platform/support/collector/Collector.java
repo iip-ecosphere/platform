@@ -28,6 +28,8 @@ import de.iip_ecosphere.platform.support.resources.ResourceLoader;
  * Simple data collector for test performance/regression. Build IDs are taken from the environment/system 
  * property {@value #PROPERTY_BUILDID}. Setup is read from {@value #SETUP_NAME} in the user's home directory.
  * 
+ * Initial quick and dirty solution, may be replaced, e.g., by Kieker.
+ * 
  * @author Holger Eichelberger, SSE
  */
 public class Collector {
@@ -104,9 +106,13 @@ public class Collector {
         @Override
         public void close() {
             if (setup != null) {
-                File dataFile = new File(setup.getDataDir(), tag + ".csv");
+                File dataDir = new File(setup.getDataDir());
+                if (!dataDir.exists()) {
+                    dataDir.mkdirs();
+                }
+                File dataFile = new File(dataDir, tag + ".csv");
                 boolean dataFileExists = dataFile.exists();
-                try (PrintWriter out = new PrintWriter(new FileWriter(dataFile))) {
+                try (PrintWriter out = new PrintWriter(new FileWriter(dataFile, true))) {
                     if (!dataFileExists) {
                         out.println(compose("timestamp", "buildId", "execTimeMs"));
                     }
