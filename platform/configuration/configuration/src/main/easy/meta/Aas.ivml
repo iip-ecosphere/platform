@@ -48,7 +48,7 @@ project Aas {
         NonEmptyPort port;
     }
 
-    compound EndpointAddress refines ServerAddress {
+    compound EndpointAddress refines EphemeralServerAddress {
         String path = "";
         String serverHost = null; // overwrites host on the server, e.g., to allow for multiple IP listening
     }
