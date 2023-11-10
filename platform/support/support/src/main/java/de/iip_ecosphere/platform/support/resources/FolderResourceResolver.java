@@ -77,6 +77,11 @@ public class FolderResourceResolver implements ResourceResolver {
         this.basePath = basePath;
         this.removePrefix = removePrefix;
     }
+    
+    @Override
+    public String getName() {
+        return "Folder " + basePath;
+    }
 
     @Override
     public InputStream resolve(ClassLoader loader, String resource) {

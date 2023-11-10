@@ -176,12 +176,13 @@ public abstract class AbstractSetup {
             try {
                 Yaml yaml = new Yaml();
                 @SuppressWarnings("unchecked")
-                Map<String, Object> data = (Map<String, Object>) yaml.load(in);
+                Map<String, Object> data = (Map<String, Object>) yaml.load(overwrite);
                 result = YamlFile.overwrite(result, cls, data);
                 overwrite.close();
-            } catch (IOException e) {
+            } catch (YAMLException | IOException e) {
                 overwrite.close();
-                throw new IOException(e);
+                LoggerFactory.getLogger(AbstractSetup.class).error("Cannot overwrite setup: {} Ignoring.", 
+                    e.getMessage());
             }
         }
         return result;
