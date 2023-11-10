@@ -98,35 +98,44 @@ Go to your local Maven repository (usually in your home directory in the folder 
      xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.1.0
       http://maven.apache.org/xsd/settings-1.1.0.xsd">
     
-      <repositories>       
-       <repository>
-         <id>SSE-mvn</id>
-         <name>SSE</name>
-         <url>https://projects.sse.uni-hildesheim.de/qm/maven/</url>
-         <layout>default</layout>
-         <releases>
-            <enabled>true</enabled>
-         </releases>
-         <snapshots>
-            <enabled>true</enabled>
-            <updatePolicy>always</updatePolicy>
-         </snapshots>
-       </repository>
-      <repositories>
-      <pluginRepositories>
-        <pluginRepository>
-         <id>SSE-mvn-plugins</id>
-         <name>SSE Maven</name>
-         <url>https://projects.sse.uni-hildesheim.de/qm/maven</url>
-         <releases>
-            <enabled>true</enabled>
-         </releases>
-         <snapshots>
-            <enabled>true</enabled>
-            <updatePolicy>always</updatePolicy>
-         </snapshots>
-        </pluginRepository>
-      </pluginRepositories>
+      <activeProfiles>
+        <activeProfile>github</activeProfile>
+      </activeProfiles>
+    
+      <profiles>
+        <profile>
+          <id>github</id>
+          <repositories>       
+           <repository>
+             <id>SSE-mvn</id>
+             <name>SSE</name>
+             <url>https://projects.sse.uni-hildesheim.de/qm/maven/</url>
+             <layout>default</layout>
+             <releases>
+                <enabled>true</enabled>
+             </releases>
+             <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+             </snapshots>
+           </repository>
+          <repositories>
+          <pluginRepositories>
+            <pluginRepository>
+             <id>SSE-mvn-plugins</id>
+             <name>SSE Maven</name>
+             <url>https://projects.sse.uni-hildesheim.de/qm/maven</url>
+             <releases>
+                <enabled>true</enabled>
+             </releases>
+             <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+             </snapshots>
+            </pluginRepository>
+          </pluginRepositories>
+        </profile>
+       </profiles>
      </settings>
 
 If there is already a repositories section, please add the contents for the “SSE” repository as shown above. 
