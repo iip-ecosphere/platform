@@ -84,13 +84,14 @@
 
 *Solution:* Depending on the actual reason, e.g., failures in service code must be solved or communication failures can be addressed by correct network configuration (including the respective settings in container descriptors). Timing issues often occur when the waitingTime for the service manager is not set correctly. The default value is 1 minute, but on resource-constrained devices, 2 or 3 minutes may be more adequate.
 
-## Why do platform scripts always check for recent dependency snapshots
+## Why do platform scripts always/not check for recent dependency snapshots
 
-*Symptom:* When starting platform services/applications or executing build commands, the Maven build process always checks for most recent snapshots. This is time consuming and leads to long console output.
+*Symptom:* When starting platform services/applications or executing build commands, the Maven build process may check for most recent snapshots. 
 
-*Reason:* As long as the platform is in development, it is convenient for us to have the most recent snapshot builds available. This is in particular true for the continuous integration. Always checking for the most recent snapshots is only enabled on the SSE Maven snapshot repository, not for other Maven repositories.
+*Reason:* As long as the platform is in development, it is convenient have the most recent snapshot builds available. By default, snapshots are enabled only on the SSE Maven snapshot repository, not for other used Maven repositories. Over the time, we changed our strategy and in particular since version 0.7.0 fall back to the default update strategies (daily).
 
-*Solution:* You can disable this behavior allowing Maven, e.g., to check for snapshots only once a day. Go to your local Maven repository (usually in your home directory in the folder ``.m2``) and modify the settings file there. If there is no settings file, you can create a new one as shown below.
+*Solution:* You can decide on the update behavior, per build process using the maven switch `-U` or globally via the maven settings file.
+Go to your local Maven repository (usually in your home directory in the folder ``.m2``) and modify the settings file there. If there is no settings file, you can create a new one as shown below (for always updating snapshots on the SSE maven repositories). To become effective, it is important that the repository ids are stated as in the platform dependencies pom.
 
     <settings xmlns=http://maven.apache.org/SETTINGS/1.1.0
      xmlns:xsi=http://www.w3.org/2001/XMLSchema-instance
@@ -99,18 +100,36 @@
     
       <repositories>       
        <repository>
-         <id>SSE</id>
+         <id>SSE-mvn</id>
          <name>SSE</name>
          <url>https://projects.sse.uni-hildesheim.de/qm/maven/</url>
          <layout>default</layout>
+         <releases>
+            <enabled>true</enabled>
+         </releases>
          <snapshots>
-              <updatePolicy>daily</updatePolicy>
+            <enabled>true</enabled>
+            <updatePolicy>always</updatePolicy>
          </snapshots>
        </repository>
       <repositories>
+      <pluginRepositories>
+        <pluginRepository>
+         <id>SSE-mvn-plugins</id>
+         <name>SSE Maven</name>
+         <url>https://projects.sse.uni-hildesheim.de/qm/maven</url>
+         <releases>
+            <enabled>true</enabled>
+         </releases>
+         <snapshots>
+            <enabled>true</enabled>
+            <updatePolicy>always</updatePolicy>
+         </snapshots>
+        </pluginRepository>
+      </pluginRepositories>
      </settings>
 
-If there is already a repositories section, please add the contents for the “SSE” repository as shown above. The important setting is the update policy, set this to daily (by default, from the platform dependency, the value is always).
+If there is already a repositories section, please add the contents for the “SSE” repository as shown above. 
 
 ## My configuration settings do not affect the instantiation
 
