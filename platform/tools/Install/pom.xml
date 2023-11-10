@@ -23,7 +23,12 @@
       <name>SSE</name>
       <url>https://projects.sse.uni-hildesheim.de/qm/maven/</url>
       <layout>default</layout>
+      <releases>
+          <enabled>true</enabled>
+          <updatePolicy>never</updatePolicy>
+      </releases>
       <snapshots>
+          <enabled>true</enabled>
           <updatePolicy>always</updatePolicy>
       </snapshots>
     </repository>
@@ -36,7 +41,7 @@
             <updatePolicy>never</updatePolicy>
         </releases>
         <snapshots>
-            <enabled>false</enabled> <!-- as long as on SSE-mvn -->
+            <enabled>false</enabled>
             <updatePolicy>daily</updatePolicy>
         </snapshots>
     </repository>
@@ -61,7 +66,12 @@
        <name>SSE</name>
        <url>https://projects.sse.uni-hildesheim.de/qm/maven/</url>
        <layout>default</layout>
+       <releases>
+          <enabled>true</enabled>
+          <updatePolicy>never</updatePolicy>
+       </releases>
        <snapshots>
+          <enabled>true</enabled>
           <updatePolicy>always</updatePolicy>
        </snapshots>
      </pluginRepository>
