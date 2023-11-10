@@ -120,7 +120,7 @@ public class ConfigurationTests {
         asserter.accept(FileUtils.readFileAsString(res));
         //res.deleteOnExit();
         //res.delete();
-        Collector.collect("examples." + folder).addExecutionTimeMs(System.currentTimeMillis() - start);
+        Collector.collect("examples." + folder).addExecutionTimeMs(System.currentTimeMillis() - start).close();
     }
 
     /**
