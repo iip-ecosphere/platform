@@ -18,6 +18,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -35,6 +36,7 @@ import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.collector.Collector;
+import de.iip_ecosphere.platform.tools.maven.python.AbstractLoggingMojo;
 
 /**
  * A platform application testing MOJO. May start an entire (local) platform
@@ -85,6 +87,9 @@ public class TestAppMojo extends AbstractLoggingMojo {
 
     @Parameter(property = "configuration.testApp.logRegExConjunction", required = false, defaultValue = "true")
     private boolean logRegExConjunction;
+
+    @Parameter(property = "configuration.testApp.logRegExMatchCount", required = false, defaultValue = "1")
+    private int logRegExMatchCount;
 
     @Parameter(property = "configuration.testApp.skip", required = false, defaultValue = "false")
     private boolean skip;
@@ -286,22 +291,33 @@ public class TestAppMojo extends AbstractLoggingMojo {
      * 
      * @param reason the termination reason
      * @param terminated the terminated flag to change as a side effect
+     * @param testTerminatedCount how often was a termination indicated so far
+     * @return stop the process or not
      */
-    private void handleTermination(TerminationReason reason, AtomicBoolean terminated) {
+    private boolean handleTermination(TerminationReason reason, AtomicBoolean terminated, 
+        AtomicInteger testTerminatedCount) {
+        boolean stop = true;
         switch (reason) {
         case TIMEOUT:
             getLog().info("Test timeout");
             break;
         case MATCH_COMPLETE:
-            getLog().info("Required regEx matches complete. Stopping test.");
-            Collector.collect(project.getArtifactId())
-                .addExecutionTimeMs(System.currentTimeMillis() - testStart)
-                .close();
+            int tCount = testTerminatedCount.incrementAndGet();
+            if (tCount >= Math.max(logRegExMatchCount, 1)) {
+                getLog().info("Required regEx matches complete. Stopping test.");
+                Collector.collect(project.getArtifactId())
+                    .addExecutionTimeMs(System.currentTimeMillis() - testStart)
+                    .close();
+            } else {
+                getLog().info("Required regEx matched " + tCount + " times.");
+                stop = false;
+            }
             break;
         default:
             break;
         }
-        terminated.set(true);
+        terminated.set(stop);
+        return stop;
     }
     
     @Override
@@ -386,6 +402,7 @@ public class TestAppMojo extends AbstractLoggingMojo {
      * @throws MojoFailureException if the Mojo failed
      */
     public void executeImpl() throws MojoExecutionException, MojoFailureException {
+        AtomicInteger testTerminatedCount = new AtomicInteger();
         AtomicBoolean testTerminated = new AtomicBoolean(false); 
         if (brokerPort < 0) {
             brokerPort = NetUtils.getEphemeralPort();
@@ -425,7 +442,7 @@ public class TestAppMojo extends AbstractLoggingMojo {
         }
         testBuilder
             .setTimeout(testTime)
-            .setListener(r -> handleTermination(r, testTerminated));
+            .setListener(r -> handleTermination(r, testTerminated, testTerminatedCount));
         if (logFile != null && logFile.getPath().length() > 0) {
             testBuilder.logTo(logFile);
         }

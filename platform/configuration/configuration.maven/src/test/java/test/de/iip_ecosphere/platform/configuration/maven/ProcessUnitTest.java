@@ -103,6 +103,33 @@ public class ProcessUnitTest {
      * Tests a process with timeout.
      */
     @Test
+    public void testProcessMultiPattern() {
+        Pattern p = Pattern.compile("^DONE: \\d+$");
+        AtomicInteger terminationCount = new AtomicInteger();
+        System.out.println("Testing process with timeout and multi patterns:");
+        ProcessUnit unit = new ProcessUnit.ProcessUnitBuilder("p", null)
+            .addArgument("java")
+            .addArgument(DummyApp.class.getName())
+            .addArgument("--modulo=2")
+            .setHome(new File("./target/test-classes"))
+            .setTerminateByLogMatch(true)
+            .addCheckRegEx(p)
+            .setListener(r -> terminationCount.incrementAndGet() > 2)
+            .build();
+        TimeUtils.sleep(500);
+        Assert.assertTrue(unit.isRunning());
+        TimeUtils.sleep(3500); // shall be terminated
+        Assert.assertTrue(unit.getLogMatches());
+        Assert.assertFalse(unit.isRunning());
+        Assert.assertEquals("p", unit.getDescription());
+        Assert.assertTrue(unit.hasCheckRegEx());
+        Assert.assertEquals(3, terminationCount.get());
+    }
+    
+    /**
+     * Tests a process with timeout.
+     */
+    @Test
     public void testTimeoutProcess() {
         AtomicInteger terminationCount = new AtomicInteger();
         System.out.println("Testing process with timeout:");
@@ -111,7 +138,8 @@ public class ProcessUnitTest {
             .addArgument(DummyApp.class.getName())
             .setHome(new File("./target/test-classes"))
             .setTimeout(1000)
-            .setListener(r -> terminationCount.incrementAndGet())
+            .setListener(r -> { 
+                terminationCount.incrementAndGet(); return true; })
             .build();
         TimeUtils.sleep(500);
         Assert.assertTrue(unit.isRunning());
@@ -122,6 +150,7 @@ public class ProcessUnitTest {
         Assert.assertFalse(unit.hasCheckRegEx());
         Assert.assertEquals(1, terminationCount.get());
     }
+    
 
     /**
      * Tests a process started/executed by a shell script to be terminated.

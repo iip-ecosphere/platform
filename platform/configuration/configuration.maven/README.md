@@ -153,6 +153,7 @@ The `testApp` goal (default phase `package`, can be seen as integration test but
   - `logFile` (`-Dconfiguration.testApp.logFile=...`, default `""`) if given, the name/location of the file where to write the output of the tested application to. Per default, the output is merged into the output of this plugin.
   - `logRegExprs` (`-Dconfiguration.testApp.logRegExprs=...`, default `""`) if given, regular expressions indicating in the application log that the application execution was successful (see also `logRegExConjunction`).
   - `logRegExConjunction` (`-Dconfiguration.testApp.logRegExConjunction=...`, default `true`) whether all specified regular expressions must match or at least one.
+  - `logRegExMatchCount` (`-Dconfiguration.testApp.logRegExMatchCount=...`, default `1`) the number of required matches, per default `1`, non-positive values are ignored
   - `skip` (`-Dconfiguration.testApp.skip=...`, default `false`) skips the execution of this plugin.
   - `brokerPort` (`-Dconfiguration.testApp.brokerPort=...`, default `-1`) the port to use for the communication broker, an ephemeral one is used if not positive, execution of broker and platform are skipped if `0`.
   - `brokerWaitTime` (`-Dconfiguration.testApp.brokerWaitTime=...`, default `3000`) time in ms to wait for the broker to be safely up.

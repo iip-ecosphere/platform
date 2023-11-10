@@ -22,6 +22,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
 import de.iip_ecosphere.platform.configuration.maven.ProcessUnit.ProcessUnitBuilder;
+import de.iip_ecosphere.platform.tools.maven.python.AbstractLoggingMojo;
 
 /**
  * An generic process execution MOJO.

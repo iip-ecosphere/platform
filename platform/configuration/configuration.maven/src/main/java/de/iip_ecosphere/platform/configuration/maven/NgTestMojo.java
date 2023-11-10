@@ -18,6 +18,8 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
+import de.iip_ecosphere.platform.tools.maven.python.AbstractLoggingMojo;
+
 /**
  * An Angular build MOJO. Part of this project due to pragmatic reasons.
  * 

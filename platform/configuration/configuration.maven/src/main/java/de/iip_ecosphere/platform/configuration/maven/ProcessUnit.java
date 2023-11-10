@@ -33,6 +33,8 @@ import org.apache.commons.lang.SystemUtils;
 
 import de.iip_ecosphere.platform.support.Builder;
 import de.iip_ecosphere.platform.support.CollectionUtils;
+import de.iip_ecosphere.platform.tools.maven.python.Logger;
+import de.iip_ecosphere.platform.tools.maven.python.StandardLogger;
 
 /**
  * Represents a process.
@@ -86,10 +88,7 @@ public class ProcessUnit {
                 
                 @Override
                 public void run() {
-                    if (null != listener) {
-                        listener.notifyTermination(TerminationReason.TIMEOUT);
-                    }
-                    stop();
+                    handleListenerNotification(TerminationReason.TIMEOUT);
                 }
             };
             timer.schedule(timeoutTask, timeout);
@@ -108,12 +107,33 @@ public class ProcessUnit {
         /**
          * Termination by timeout.
          */
-        TIMEOUT,
+        TIMEOUT(true),
         
         /**
          * Termination when all required log regular expressions are matched.
          */
-        MATCH_COMPLETE
+        MATCH_COMPLETE(false);
+        
+        private boolean stopRequired;
+        
+        /**
+         * Creates a constant.
+         * 
+         * @param stopRequired is process stop required when this reason occurs
+         */
+        private TerminationReason(boolean stopRequired) {
+            this.stopRequired = stopRequired;
+        }
+        
+        /**
+         * Returns whether process stop required when this reason occurs.
+         * 
+         * @return {@code true} for stop, {@code false} not required
+         */
+        public boolean isStopRequired() {
+            return stopRequired;
+        }
+
     }
     
     /**
@@ -127,8 +147,10 @@ public class ProcessUnit {
          * Called when an in-process termination occurred.
          * 
          * @param reason the reason for the termination
+         * @return {@code} true if the process shall be stopped, {@code false} else; 
+         *  ignored for {@link TerminationReason#TIMEOUT}.
          */
-        public void notifyTermination(TerminationReason reason);
+        public boolean notifyTermination(TerminationReason reason);
 
     }
     
@@ -162,9 +184,24 @@ public class ProcessUnit {
     private void notifyLogMatches(boolean terminateByLogMatch) {
         logMatches = true;
         if (terminateByLogMatch) {
-            if (null != listener) {
-                listener.notifyTermination(TerminationReason.MATCH_COMPLETE);
-            }
+            handleListenerNotification(TerminationReason.MATCH_COMPLETE);
+        }
+    }
+    
+    /**
+     * Handles a listener notification and decides about stopping the process, either as the reason requires 
+     * immediate stop or as the listener decides.
+     * 
+     * @param reason the reason for the notification.
+     */
+    private void handleListenerNotification(TerminationReason reason) {
+        boolean stop = reason.isStopRequired();
+        if (null != listener) {
+            stop |= listener.notifyTermination(reason);
+        } else {
+            stop = true;
+        }
+        if (stop) {
             stop();
         }
     }
@@ -624,6 +661,7 @@ public class ProcessUnit {
      */
     private static class ConjunctiveLogRegExConsumer implements Consumer<Pattern> {
 
+        private List<Pattern> requiredPatterns;
         private Set<Pattern> patterns;
         private ProcessUnit unit;
         private boolean terminateByLogMatch;
@@ -640,8 +678,8 @@ public class ProcessUnit {
             this.unit = unit;
             this.terminateByLogMatch = terminateByLogMatch;
             if (patterns != null && patterns.size() > 0) {
+                this.requiredPatterns = Collections.unmodifiableList(patterns);
                 this.patterns = new HashSet<>();
-                this.patterns.addAll(patterns);
             }
         }
         
@@ -651,6 +689,7 @@ public class ProcessUnit {
                 patterns.remove(pattern);
                 if (patterns.isEmpty()) {
                     unit.notifyLogMatches(terminateByLogMatch);
+                    patterns.addAll(requiredPatterns); // reset for next round
                 }
             }
         }
@@ -746,70 +785,4 @@ public class ProcessUnit {
         
     }
     
-    /**
-     * Simple logger interface to avoid maven classes in here.
-     * 
-     * @author Holger Eichelberger, SSE
-     */
-    public interface Logger {
-
-        /**
-         * Logs a warning.
-         * 
-         * @param warning the warning
-         */
-        public void warn(String warning);
-
-        /**
-         * Logs an error.
-         * 
-         * @param error the error
-         */
-        public void error(String error);
-
-        /**
-         * Logs a throwable.
-         * 
-         * @param throwable the throwable
-         */
-        public void error(Throwable throwable);
-
-        /**
-         * Logs an information.
-         * 
-         * @param info the information
-         */
-        public void info(String info);
-
-    }
-    
-    /**
-     * Simple logger implementation, e.g., for tests.
-     * 
-     * @author Holger Eichelberger, SSE
-     */
-    public static class StandardLogger implements Logger {
-
-        @Override
-        public void warn(String warning) {
-            System.out.println("[WARN] " + warning);
-        }
-
-        @Override
-        public void error(String error) {
-            System.err.println("[ERROR] " + error);
-        }
-
-        @Override
-        public void error(Throwable throwable) {
-            System.err.println("[ERROR] " + throwable.getMessage());
-        }
-
-        @Override
-        public void info(String info) {
-            System.out.println("[INFO] " + info);
-        }
-        
-    }
-
 }
