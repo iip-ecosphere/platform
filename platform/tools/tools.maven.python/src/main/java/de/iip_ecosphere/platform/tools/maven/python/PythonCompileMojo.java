@@ -14,21 +14,12 @@ package de.iip_ecosphere.platform.tools.maven.python;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -43,9 +34,9 @@ import org.apache.maven.project.MavenProject;
  * @author Holger Eichelberger, SSE
  */
 @Mojo(name = "compile-python", defaultPhase = LifecyclePhase.COMPILE)
-public class PythonCompileMojo extends AbstractMojo {
+public class PythonCompileMojo extends AbstractLoggingMojo {
 
-    public static final String MD5_FILE = "python-compile.fpf";
+    public static final String MD5_FILE = "python-compile." + FileChangeDetector.FILE_EXTENSION;
 
     @Parameter(defaultValue = "${project}", required = true, readonly = true)
     private MavenProject project;
@@ -80,12 +71,14 @@ public class PythonCompileMojo extends AbstractMojo {
             File baseDir = project.getBasedir();
             List<File> pythonFiles = getAllPythonFiles(new File(baseDir, "/src/main/python/").getAbsolutePath(), true); 
             pythonFiles.addAll(getAllPythonFiles(new File(baseDir, "/src/test/python/").getAbsolutePath(), true));
-            Map<String, String> md5Hashes = readHashFile();
+            FileChangeDetector fcd = new FileChangeDetector(getHashFile(), this, "Python syntax check")
+                .useHash(useHash);
+            fcd.readHashFile();
             
             String output = "";
             String errorLine = "";
             boolean pyflakesExists = true;
-            for (File f : checkHashes(pythonFiles, md5Hashes)) {
+            for (File f : fcd.checkHashes(pythonFiles)) {
                 getLog().info("Testing Python syntax: " + f.getAbsolutePath());
                 if (pyflakesExists) {
                     String[] cmd = {pythonExecutable, "-m", "pyflakes",  f.getAbsolutePath()}; 
@@ -128,13 +121,13 @@ public class PythonCompileMojo extends AbstractMojo {
                         getLog().info(filteredOutput);
                     }
                     if (failure && failOnError) {
-                        md5Hashes.remove(getHashFilePath(f));
-                        writeHashFile(md5Hashes); // only if ok
+                        fcd.remove(f);
+                        fcd.writeHashFile(); // only if ok
                         throw new MojoExecutionException(errorLine);
                     }
                 }
             }
-            writeHashFile(md5Hashes); // only if ok
+            fcd.writeHashFile(); // only if ok
         } else {
             getLog().info("Skipping Python compiler execution");
         }
@@ -225,26 +218,6 @@ public class PythonCompileMojo extends AbstractMojo {
     }
 
     /**
-     * Reads the MD5 hash file.
-     * 
-     * @return the hash file
-     */
-    @SuppressWarnings("unchecked")
-    private Map<String, String> readHashFile() {
-        Map<String, String> md5Hashes = new HashMap<>();
-        File md5File = getHashFile();
-        if (md5File.exists() && useHash) {
-            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(md5File))) {
-                md5Hashes = (Map<String, String>) ois.readObject();
-                getLog().info("Using hash file " + md5File);
-            } catch (IOException | ClassNotFoundException | ClassCastException e) {
-                getLog().warn("Cannot read existing fingerprint file '" + md5File.getName() + "': " + e.getMessage());
-            }
-        }
-        return md5Hashes;
-    }
-    
-    /**
      * Returns the file containing the MD5 hashes of known Python files.
      * 
      * @return the hash
@@ -264,73 +237,5 @@ public class PythonCompileMojo extends AbstractMojo {
         return result;
     }
     
-    /**
-     * Writes {@code md5Hashes} to the hash file.
-     * 
-     * @param md5Hashes the hashes to write
-     */
-    private void writeHashFile(Map<String, String> md5Hashes) {
-        if (useHash) {
-            File md5File = getHashFile();
-            md5File.getParentFile().mkdirs();
-            try (ObjectOutputStream ois = new ObjectOutputStream(new FileOutputStream(md5File))) {
-                ois.writeObject(md5Hashes);
-                getLog().info("Wrote hash file " + md5File);
-            } catch (IOException | ClassCastException e) {
-                getLog().warn("Write fingerprint file '" + md5File + "': " + e.getMessage());
-            }
-        }
-    }
-    
-    /**
-     * Returns the file path to be used for MD5 hashing of {@code file}.
-     * 
-     * @param file the file
-     * @return the file path
-     */
-    private String getHashFilePath(File file) {
-        String path;
-        try {
-            path = file.getCanonicalPath();
-        } catch (IOException e) {
-            path = file.getAbsolutePath();
-        }
-        return path;
-    }
-    
-    /**
-     * Checks {@code files} for existing/known hashes.
-     * 
-     * @param files the files
-     * @param md5Hashes the hashes, may be updated as a side effect
-     * @return a subset of {@code files} to process
-     */
-    private List<File> checkHashes(List<File> files, Map<String, String> md5Hashes) {
-        List<File> result = new ArrayList<>();
-        for (File f: files) {
-            if (f.exists()) {
-                String path = getHashFilePath(f);
-                String knownMd5 = md5Hashes.get(path);
-                String md5 = null;
-                try (InputStream is = Files.newInputStream(f.toPath())) {
-                    md5 = DigestUtils.md5Hex(is);
-                } catch (IOException e) {
-                }
-                if (md5 != null) {
-                    md5Hashes.put(path, md5);
-                }
-                if (knownMd5 != null) {
-                    if (!knownMd5.equals(md5)) {
-                        result.add(f);
-                    } else {
-                        getLog().info("Skipping Python syntax check for " + f + " as unchanged.");
-                    }
-                } else {
-                    result.add(f);
-                }
-            }
-        }
-        return result;
-    }    
 
 }

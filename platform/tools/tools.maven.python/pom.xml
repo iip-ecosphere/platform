@@ -62,9 +62,6 @@
       <name>SSE</name>
       <url>https://projects.sse.uni-hildesheim.de/qm/maven/</url>
       <layout>default</layout>
-      <snapshots>
-          <updatePolicy>always</updatePolicy>
-      </snapshots>
     </repository>
   </repositories>
 
@@ -74,9 +71,6 @@
        <name>SSE</name>
        <url>https://projects.sse.uni-hildesheim.de/qm/maven/</url>
        <layout>default</layout>
-       <snapshots>
-          <updatePolicy>always</updatePolicy>
-       </snapshots>
      </pluginRepository>
   </pluginRepositories>
 
