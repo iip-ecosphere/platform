@@ -45,7 +45,7 @@ public class RuntimeSetupEndpointValidator extends BasicEndpointValidator {
      */
     public static EndpointValidator create(Function<RuntimeSetup, String> accessor) {
         EndpointValidator result;
-        RuntimeSetup setup = RuntimeSetup.load(() -> null);
+        RuntimeSetup setup = RuntimeSetup.load(() -> null, false);
         if (null == setup) {
             result = new BasicEndpointValidator();
         } else {

@@ -104,22 +104,25 @@ public class RuntimeSetup extends AbstractSetup {
      * @return the runtime setup, may be a default instance
      */
     public static RuntimeSetup load() {
-        return load(() -> new RuntimeSetup());
+        return load(() -> new RuntimeSetup(), true);
     }
     
     /**
      * Loads the runtime setup from {@link #getFile()}.
      * 
      * @param onFailure supplies the instance to be returned in case of a failure
+     * @param logOnFailure if failures shall be logged
      * @return the runtime setup, may be a default instance
      */
-    public static RuntimeSetup load(Supplier<RuntimeSetup> onFailure) {
+    public static RuntimeSetup load(Supplier<RuntimeSetup> onFailure, boolean logOnFailure) {
         RuntimeSetup result;
         try (FileInputStream in = new FileInputStream(getFile())) {
             result = AbstractSetup.readFromYaml(RuntimeSetup.class, in);
         } catch (IOException e) {
-            LoggerFactory.getLogger(RuntimeSetup.class).warn("Cannot read platform runtime setup {}: {} "
-                + "Ephemeral AAS ports may not work.", getFile(), e.getMessage());
+            if (logOnFailure) {
+                LoggerFactory.getLogger(RuntimeSetup.class).warn("Cannot read platform runtime setup {}: {} "
+                    + "Ephemeral AAS ports may not work.", getFile(), e.getMessage());
+            }
             result = onFailure.get();
         }
         return result;
