@@ -19,24 +19,27 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
 import de.iip_ecosphere.platform.configuration.PlatformInstantiator;
+import de.iip_ecosphere.platform.tools.maven.python.AbstractLoggingMojo;
+import de.iip_ecosphere.platform.tools.maven.python.FileChangeDetector;
 
 /**
  * Abstract configuration Mojo with settings for all configuration Mojos.
  * 
  * @author Holger Eichelberger, SSE
  */
-public abstract class AbstractConfigurationMojo extends AbstractMojo {
+public abstract class AbstractConfigurationMojo extends AbstractLoggingMojo {
 
     @Parameter(defaultValue = "${project}", required = true, readonly = true)
     private MavenProject project;
@@ -73,6 +76,9 @@ public abstract class AbstractConfigurationMojo extends AbstractMojo {
     
     @Parameter(property = "configuration.force", required = false, defaultValue = "")
     private boolean force;
+    
+    @Parameter(property = "configuration.checkChanged", required = false, defaultValue = "false")
+    private boolean checkChanged;
 
     // different name, hook up with unpack
     @Parameter(property = "unpack.force", required = false, defaultValue = "false") 
@@ -159,6 +165,15 @@ public abstract class AbstractConfigurationMojo extends AbstractMojo {
      */
     protected boolean getUnpackForce() {
         return unpackForce;
+    }
+    
+    /**
+     * Returns whether changed models shall be considered.
+     * 
+     * @return {@code true} for consider, {@code false} else (default, depends on goal)
+     */
+    protected boolean checkChanged() {
+        return checkChanged;
     }
     
     /**
@@ -259,14 +274,56 @@ public abstract class AbstractConfigurationMojo extends AbstractMojo {
     /**
      * Returns whether {@code modelDir} is considered to be newer than {@code outDir}.
      * 
+     * @param metaModelDir the meta-model directory
      * @param modelDir the model directory
      * @param outDir the output directory
      * @return {@code true} if {@code modelDir} is considered to be newer than {@code outDir}, {@code false} else
      */
-    protected boolean modelNewerThanOut(String modelDir, String outDir) {
-        long maxModel = getMaxLastModified(modelDir, f -> f.getName().endsWith(".ivml"));
-        long maxOut = getMaxLastModified(outDir, f -> true);
-        return maxOut < 0 || maxModel > maxOut;
+    protected boolean modelNewerThanOut(String metaModelDir, String modelDir, String outDir) {
+        boolean result = false;
+        List<File> metaModelFiles = checkFilesByHash("easy-meta", metaModelDir, "IVML meta model");
+        List<File> modelFiles = checkFilesByHash("easy", modelDir, "IVML model");
+        if (enabled(modelFiles) || enabled(metaModelFiles)) { 
+            long maxModel = getMaxLastModified(modelDir, f -> f.getName().endsWith(".ivml"));
+            long maxOut = getMaxLastModified(outDir, f -> true);
+            result = maxOut < 0 || maxModel > maxOut;
+        }
+        return result;
+    }
+
+    /**
+     * Returns whether a list of files from hash checking enables further execution.
+     * 
+     * @param files the files
+     * @return {@code true} for enabled, {@code false} else
+     */
+    private boolean enabled(List<File> files) {
+        return null == files || files.size() > 0; // no model, no files found, newer files identified
+    }
+    
+    /**
+     * Checks files by MD5 change hashes.
+     * 
+     * @param hashFileName the name of the has file (extension will be added)
+     * @param modelDir the directory of files to analyze
+     * @param info logging information on the task
+     * @return the changed files or <b>null</b> for unsure/none detected
+     */
+    private List<File> checkFilesByHash(String hashFileName, String modelDir, String info) {
+        File hashFile = new File(project.getBuild().getDirectory(), hashFileName + FileChangeDetector.FILE_EXTENSION);
+        List<File> modelFiles = null;
+        File model = new File(modelDir);
+        try (Stream<Path> stream = Files.walk(model.toPath())) {
+            FileChangeDetector fcd = new FileChangeDetector(hashFile, this, info);
+            fcd.readHashFile();
+            modelFiles = stream.map(p -> p.toFile()).filter(f->f.isFile()).collect(Collectors.toList());
+            modelFiles = fcd.checkHashes(modelFiles);
+            fcd.writeHashFile();
+        } catch (IOException e) {
+            // ignore
+        }
+        getLog().info("Changed " + info + " files: " + modelFiles);
+        return modelFiles;
     }
     
     /**
@@ -294,12 +351,13 @@ public abstract class AbstractConfigurationMojo extends AbstractMojo {
      * instantiation will be enabled if IVML files in {@code modelDir} are newer than files in {@code 
      * output directory} or if output directory is empty or missing.
      * 
+     * @param metaModelDir the meta model directory
      * @param modelDir the model directory
      * @param outputDir the output directory
      * @return {@code true} for instantiation, {@code false} for no instantiation
      */
-    protected boolean enableRun(String modelDir, String outputDir) {
-        return modelNewerThanOut(modelDir, outputDir) || force;
+    protected boolean enableRun(String metaModelDir, String modelDir, String outputDir) {
+        return modelNewerThanOut(metaModelDir, modelDir, outputDir) || force;
     }
 
     @Override
@@ -323,7 +381,7 @@ public abstract class AbstractConfigurationMojo extends AbstractMojo {
         String[] args = {getModel(), modelDir, outputDir, getStartRule(), metaModelDir};
         try {
             if (isModelDirectoryValid()) {
-                if (enableRun(modelDir, outputDir)) {
+                if (enableRun(metaModelDir, modelDir, outputDir)) {
                     getLog().info("Calling platform instantiator with " + java.util.Arrays.toString(args) + ", tracing "
                         + getTracingLevel() + (null == resourcesDir ? "" : " and resources dir " + resourcesDir));
                     long start = System.currentTimeMillis();

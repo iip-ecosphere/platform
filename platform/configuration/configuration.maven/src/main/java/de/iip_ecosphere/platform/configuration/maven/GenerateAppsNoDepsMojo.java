@@ -29,8 +29,8 @@ public class GenerateAppsNoDepsMojo extends AbstractAppsConfigurationMojo {
     }
     
     @Override
-    protected boolean enableRun(String modelDir, String outputDir) { 
-        return getUnpackForce() || super.enableRun(modelDir, outputDir);
+    protected boolean enableRun(String metaModelDir, String modelDir, String outputDir) { 
+        return getUnpackForce() || super.enableRun(metaModelDir, modelDir, outputDir);
     }
 
 }

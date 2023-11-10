@@ -314,7 +314,7 @@ public class ProcessUnit {
         private File logFile;
         private List<Pattern> checkRegEx;
         private TerminationListener listener;
-        private boolean terminateByLogMatch = true;
+        private boolean notifyByLogMatch = true;
         private boolean conjunctLogMatches = true;
         private String argAggregate;
         private String argAggregateStart;
@@ -572,14 +572,14 @@ public class ProcessUnit {
         }
 
         /**
-         * Sets whether the process shall be terminated if a log regEx matches. Then no exit status 
-         * of the process will be returned.
+         * Sets whether the process listener shall be informed on a complete log regEx match, terminating the process
+         * if there is no listener. 
          * 
-         * @param terminateByLogMatch terminate the process by a log match or not (default is <code>true</code>)
+         * @param notifyByLogMatch notify the listener by a complete log match or not (default is <code>true</code>)
          * @return <b>this</b> (builder style)
          */
-        public ProcessUnitBuilder setTerminateByLogMatch(boolean terminateByLogMatch) {
-            this.terminateByLogMatch = terminateByLogMatch;
+        public ProcessUnitBuilder setNotifyListenerByLogMatch(boolean notifyByLogMatch) {
+            this.notifyByLogMatch = notifyByLogMatch;
             return this;
         }
         
@@ -642,9 +642,9 @@ public class ProcessUnit {
                 }
                 Consumer<Pattern> matchConsumer;
                 if (conjunctLogMatches) {
-                    matchConsumer = new ConjunctiveLogRegExConsumer(checkRegEx, result, terminateByLogMatch); 
+                    matchConsumer = new ConjunctiveLogRegExConsumer(checkRegEx, result, notifyByLogMatch); 
                 } else {
-                    matchConsumer = m -> result.notifyLogMatches(terminateByLogMatch);
+                    matchConsumer = m -> result.notifyLogMatches(notifyByLogMatch);
                 }
                 result.attach(new InputStreamHandler(proc.getInputStream(), inConsumer, checkRegEx, matchConsumer));
                 result.attach(new InputStreamHandler(proc.getErrorStream(), errConsumer, checkRegEx, matchConsumer));
@@ -664,7 +664,7 @@ public class ProcessUnit {
         private List<Pattern> requiredPatterns;
         private Set<Pattern> patterns;
         private ProcessUnit unit;
-        private boolean terminateByLogMatch;
+        private boolean notifyByLogMatch;
         
         /**
          * Creates a consumer.
@@ -672,11 +672,11 @@ public class ProcessUnit {
          * @param patterns the patterns that must be matched; may be <b>null</b> or empty for any, i.e., {@code unit} 
          *     will never be informed then 
          * @param unit the process unit instance
-         * @param terminateByLogMatch whether the process in {@code unit} shall be terminated on a conjunctive match
+         * @param notifyByLogMatch whether the listener in {@code unit} shall be informed on a conjunctive match
          */
-        ConjunctiveLogRegExConsumer(List<Pattern> patterns, ProcessUnit unit, boolean terminateByLogMatch) {
+        ConjunctiveLogRegExConsumer(List<Pattern> patterns, ProcessUnit unit, boolean notifyByLogMatch) {
             this.unit = unit;
-            this.terminateByLogMatch = terminateByLogMatch;
+            this.notifyByLogMatch = notifyByLogMatch;
             if (patterns != null && patterns.size() > 0) {
                 this.requiredPatterns = Collections.unmodifiableList(patterns);
                 this.patterns = new HashSet<>();
@@ -688,7 +688,7 @@ public class ProcessUnit {
             if (patterns != null) {
                 patterns.remove(pattern);
                 if (patterns.isEmpty()) {
-                    unit.notifyLogMatches(terminateByLogMatch);
+                    unit.notifyLogMatches(notifyByLogMatch);
                     patterns.addAll(requiredPatterns); // reset for next round
                 }
             }

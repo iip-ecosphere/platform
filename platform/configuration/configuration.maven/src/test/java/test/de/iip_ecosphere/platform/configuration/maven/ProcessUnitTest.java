@@ -41,7 +41,7 @@ public class ProcessUnitTest {
             .addArgument("java")
             .addArgument(DummyApp.class.getName())
             .setHome(new File("./target/test-classes"))
-            .setTerminateByLogMatch(true)
+            .setNotifyListenerByLogMatch(true)
             .addCheckRegEx(p)
             .build();
         TimeUtils.sleep(500);
@@ -64,7 +64,7 @@ public class ProcessUnitTest {
             .addArgument("java")
             .addArgument(DummyApp.class.getName())
             .setHome(new File("./target/test-classes"))
-            .setTerminateByLogMatch(false)
+            .setNotifyListenerByLogMatch(false)
             .addCheckRegEx(p)
             .setRegExConjunction(false) // no difference here
             .build();
@@ -112,7 +112,7 @@ public class ProcessUnitTest {
             .addArgument(DummyApp.class.getName())
             .addArgument("--modulo=2")
             .setHome(new File("./target/test-classes"))
-            .setTerminateByLogMatch(true)
+            .setNotifyListenerByLogMatch(true)
             .addCheckRegEx(p)
             .setListener(r -> terminationCount.incrementAndGet() > 2)
             .build();

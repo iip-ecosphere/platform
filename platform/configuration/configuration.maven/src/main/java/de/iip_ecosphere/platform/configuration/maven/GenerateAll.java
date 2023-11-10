@@ -15,6 +15,7 @@ package de.iip_ecosphere.platform.configuration.maven;
 
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
+
 /**
  * Generates everything.
  * 
@@ -29,9 +30,8 @@ public class GenerateAll extends AbstractConfigurationMojo {
     }
     
     @Override
-    protected boolean enableRun(String modelDir, String outputDir) {
-        return true;
+    protected boolean enableRun(String metaModelDir, String modelDir, String outputDir) {
+        return !checkChanged() || super.enableRun(metaModelDir, modelDir, outputDir);
     }
-
 
 }

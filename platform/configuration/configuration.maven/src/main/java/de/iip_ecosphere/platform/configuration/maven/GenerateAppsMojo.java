@@ -15,6 +15,7 @@ package de.iip_ecosphere.platform.configuration.maven;
 
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 import de.iip_ecosphere.platform.support.collector.Collector;
 /**
@@ -25,14 +26,17 @@ import de.iip_ecosphere.platform.support.collector.Collector;
 @Mojo(name = "generateApps", defaultPhase = LifecyclePhase.PACKAGE)
 public class GenerateAppsMojo extends AbstractAppsConfigurationMojo {
 
+    @Parameter(property = "configuration.checkChanged", required = false, defaultValue = "false")
+    private boolean checkChanged;
+    
     @Override
     public String getStartRule() {
         return "generateApps";
     }
     
     @Override
-    protected boolean enableRun(String modelDir, String outputDir) {
-        return true;
+    protected boolean enableRun(String metaModelDir, String modelDir, String outputDir) {
+        return !checkChanged() || super.enableRun(metaModelDir, modelDir, outputDir);
     }
 
     /**

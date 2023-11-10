@@ -13,8 +13,13 @@
 package de.iip_ecosphere.platform.configuration.maven;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -22,6 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -31,11 +37,15 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
 import de.iip_ecosphere.platform.configuration.maven.ProcessUnit.ProcessUnitBuilder;
+import de.iip_ecosphere.platform.configuration.maven.ProcessUnit.TerminationListener;
 import de.iip_ecosphere.platform.configuration.maven.ProcessUnit.TerminationReason;
 import de.iip_ecosphere.platform.support.CollectionUtils;
+import de.iip_ecosphere.platform.support.LifecycleHandler;
 import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.collector.Collector;
+import de.iip_ecosphere.platform.support.iip_aas.config.RuntimeSetup;
+import de.iip_ecosphere.platform.support.setup.AbstractSetup;
 import de.iip_ecosphere.platform.tools.maven.python.AbstractLoggingMojo;
 
 /**
@@ -124,6 +134,12 @@ public class TestAppMojo extends AbstractLoggingMojo {
     @Parameter(property = "configuration.testApp.deploymentResource", required = false, defaultValue = "local")
     private String deploymentResource;
 
+    @Parameter(property = "configuration.testApp.mgtUiSetupFileTemplate", required = false, defaultValue = "")
+    private File mgtUiSetupFileTemplate;
+
+    @Parameter(property = "configuration.testApp.mgtUiSetupFile", required = false, defaultValue = "")
+    private File mgtUiSetupFile;
+
     @Parameter(property = "configuration.testApp.befores", required = false)
     private List<TestProcessSpec> befores;
     
@@ -149,16 +165,43 @@ public class TestAppMojo extends AbstractLoggingMojo {
      * @param description the description of the process
      * @param home the home directory of the script
      * @param scriptName the script name (without extension)
+     * @param listener optional listener to be informed when the process terminates or a match happens, 
+     *    may be <b>null</b>
      * @param args additional optional arguments
      * @return the process unit builder
      */
     private ProcessUnitBuilder createPlatformBuilder(String description, File home, String scriptName, 
-        String... args) {
+        TerminationListener listener, String... args) {
+        Pattern p = Pattern.compile("^.*" + LifecycleHandler.MSG_STARTUP_COMPLETED + ".*$");
         ProcessUnitBuilder builder = new ProcessUnit.ProcessUnitBuilder(description, this)
             .setHome(home)
             .addShellScriptCommand(scriptName)
-            .addArguments(args);
+            .addArguments(args)
+            .addCheckRegEx(p)
+            .setListener(listener)
+            .setNotifyListenerByLogMatch(true);
         return builder;
+    }
+    
+    /**
+     * Starts a platform service and waits for startup completion.
+     * 
+     * @param description the description of the process
+     * @param home the home directory of the script
+     * @param scriptName the script name (without extension)
+     * @param args additional optional arguments
+     * @return the process unit builder
+     */
+    private ProcessUnit startPlatformService(String description, File home, String scriptName, String... args) {
+        AtomicBoolean started = new AtomicBoolean();
+        ProcessUnit pu = buildAndRegister(createPlatformBuilder(description, home, scriptName, r -> {
+            if (TerminationReason.MATCH_COMPLETE == r) {
+                started.set(true); 
+            }
+            return false;
+        }, args));
+        TimeUtils.waitFor(() -> !started.get(), 10000, 300);
+        return pu;
     }
     
     /**
@@ -166,6 +209,7 @@ public class TestAppMojo extends AbstractLoggingMojo {
      * created processes via {@link #buildAndRegister(ProcessUnitBuilder)}.
      * 
      * @param brokerPort the port the broker is running on
+     * @return the runtime setup instance of the platform, may be <b>null</b> in case of failures
      * 
      * @see #platformDir
      * @see #startPlatform
@@ -173,10 +217,12 @@ public class TestAppMojo extends AbstractLoggingMojo {
      * @see #startEcsRuntime
      * @see #startServiceManager
      */
-    private void startPlatform(int brokerPort) {
+    private RuntimeSetup startPlatform(int brokerPort) {
+        RuntimeSetup result = null;
         if (isValidFile(platformDir)) {
-            File local = new File("gen/oktoflow-local.yml");
-            File gen = new File("gen");
+            File rtSetup = RuntimeSetup.getFile();
+            FileUtils.deleteQuietly(rtSetup);
+            File local = new File(platformDir, AbstractSetup.DEFAULT_OVERRIDE_FNAME);
             try (PrintStream setupLocal = new PrintStream(local)) {
                 setupLocal.println("transport: ");
                 setupLocal.println("  port: " + brokerPort);
@@ -188,21 +234,24 @@ public class TestAppMojo extends AbstractLoggingMojo {
             }
             final String iipId = "--iip.id=" + deploymentResource;
             if (startPlatform) {
-                buildAndRegister(createPlatformBuilder("platform central services", gen, "platform"));
+                startPlatformService("platform central services", platformDir, "platform");
             }
             if (startEcsServiceManager) {
-                buildAndRegister(createPlatformBuilder("ECS-Runtime & service manager", gen, "ecsServiceMgr", iipId));
+                startPlatformService("ECS-Runtime & service manager", platformDir, "ecsServiceMgr", iipId);
             } else {
                 if (startEcsRuntime) {
-                    buildAndRegister(createPlatformBuilder("ECS-Runtime", gen, "ecs", iipId));
+                    startPlatformService("ECS-Runtime", platformDir, "ecs", iipId);
                 }
                 if (startServiceManager) {
                     int iipPort = NetUtils.getEphemeralPort(); // usually set by container
-                    buildAndRegister(createPlatformBuilder("service manager", gen, "serviceMgr", 
-                        "--iip.port=" + iipPort, iipId));
+                    startPlatformService("service manager", platformDir, "serviceMgr", "--iip.port=" + iipPort, iipId);
                 }
             }
+            if (TimeUtils.waitFor(() -> !rtSetup.exists(), 2000, 300)) {
+                result = RuntimeSetup.load();
+            }
         }
+        return result;
     }
     
     /**
@@ -236,7 +285,6 @@ public class TestAppMojo extends AbstractLoggingMojo {
                 throw new MojoExecutionException(pu.getDescription() + " terminated with status: " + status);
             }
         }
-        
     }
 
     /**
@@ -375,6 +423,43 @@ public class TestAppMojo extends AbstractLoggingMojo {
             + tmpAppArgs + "\"");
         return testBuilder;
     }
+
+    /**
+     * If {@code setup} is given, turn {@link #mgtUiSetupFileTemplate} into {@link #mgtUiSetupFile} by 
+     * replacing {@code ${aasRegistryUri}}.
+     * 
+     * @param setup the setup file
+     */
+    private void writeMgtUiSetup(RuntimeSetup setup) {
+        boolean mgtOutFileDefined = mgtUiSetupFile != null && mgtUiSetupFile.getPath().length() > 0; 
+        if (null != setup && isValidFile(mgtUiSetupFileTemplate) && mgtOutFileDefined) {
+            String reg = setup.getAasRegistry();
+            if (null != reg) {
+                try {
+                    URI uri = new URI(reg);
+                    uri = new URI(uri.getScheme(), null, uri.getHost(), uri.getPort(), null, null, null);
+                    String contents = FileUtils.readFileToString(mgtUiSetupFileTemplate, Charset.defaultCharset());
+                    contents = contents.replace("${aasRegistryUri}", uri.toString());
+                    try (PrintWriter out = new PrintWriter(new FileWriter(mgtUiSetupFile))) {
+                        out.println(contents);
+                    }
+                    getLog().info("Wrote management UI setup file " + mgtUiSetupFile);
+                } catch (URISyntaxException | IOException e) {
+                    getLog().error("Cannot process managment UI setup template/file: " + e.getMessage());
+                }
+            } else {
+                getLog().warn("No AAS registry URI stated in runtime setup");
+            }
+        } else {
+            if (null == setup) {
+                getLog().warn("No platform runtime setup found");
+            } else if (!isValidFile(mgtUiSetupFileTemplate)) {
+                getLog().warn("No management UI setup template defined/found: " + mgtUiSetupFileTemplate);
+            } else if (!mgtOutFileDefined) {
+                getLog().warn("No management UI setup output file defined");
+            }
+        }
+    }
     
     /**
      * Extrapolates the given arguments for the given processes.
@@ -410,11 +495,12 @@ public class TestAppMojo extends AbstractLoggingMojo {
         if (brokerPort > 0) {
             Runtime.getRuntime().addShutdownHook(new Thread(() -> stopProcessUnits()));
             getLog().info("Using broker port: " + brokerPort);
-            buildAndRegister(createPlatformBuilder("broker", new File("gen/broker/broker"), "broker", 
+            buildAndRegister(createPlatformBuilder("broker", new File("gen/broker/broker"), "broker", null, 
                 String.valueOf(brokerPort))
                 .setTimeout(testTime));
-            TimeUtils.sleep(brokerWaitTime); // broker may take a while
-            startPlatform(brokerPort);
+            // broker may take a while; regEx would be ok, but we do not know the broker here -> generation?
+            TimeUtils.sleep(brokerWaitTime);
+            writeMgtUiSetup(startPlatform(brokerPort));
         }
         startProcesses();
         

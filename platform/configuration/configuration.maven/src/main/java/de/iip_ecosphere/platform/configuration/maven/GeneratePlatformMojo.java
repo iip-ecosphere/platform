@@ -25,6 +25,11 @@ import org.apache.maven.plugins.annotations.Mojo;
 public class GeneratePlatformMojo extends AbstractConfigurationMojo {
 
     @Override
+    protected boolean enableRun(String metaModelDir, String modelDir, String outputDir) {
+        return !checkChanged() || super.enableRun(metaModelDir, modelDir, outputDir);
+    }
+    
+    @Override
     public String getStartRule() {
         return "generatePlatform";
     }

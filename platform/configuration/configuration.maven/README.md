@@ -110,6 +110,9 @@ All goals take over the maven offline mode and pass it on to the instantiation f
 In addition, the goals `generateApps` and `generateAppsNoDeps` consider
   - `apps` (`-Dconfiguration.apps=...`) a comma separated list of application ids (as defined in the IVML configuration) to be build
 
+In addition, the goals `generateAll`, `generateApps` and `generatePlatform` consider
+  - `checkChanged` in order to figure out whether the model, the meta model have changed to trigger an execution
+
 # Application testing
 
 Testing a generated application typically requires starting the communication broker (possibly on an emphemeral port) and the the application in a time-framed manner and to check the application output for some patterns indicating that the application is working. Within the configuration plugin, a minimal Maven setup looks like:
@@ -165,7 +168,9 @@ The `testApp` goal (default phase `package`, can be seen as integration test but
   - `startEcsServiceMgr` (`-Dconfiguration.testApp.startEcsServiceMgr=...`, default `true`) if `platformDir` is given, try to start the combined ECS-Runtime/service manager (transport adjusted to the `brokerPort`). 
   - `deploymentPlan` (`-Dconfiguration.testApp.deploymentPlan=...`, default `""`) if `testCmd` and `platformDir` are set, defines a deployment plan to be started with the platform around the test, resource in deployment plan must be `deploymentResource`
   - `deploymentResource` (`-Dconfiguration.testApp.deploymentResource=...`, default `local`) the resource to be used in `deploymentPlan`
-  - `befores` (`-Dconfiguration.testApp.befores=...`, default `""`) specifies additional processes to be started before the test and to be stopped afterwards
+  - `mgtUiSetupFileTemplate` (`-Dconfiguration.testApp.mgtUiSetupFileTemplate=...`, default `""`) the template on how to derive the management UI setup JSON file
+  - `mgtUiSetupFile` (`-Dconfiguration.testApp.mgtUiSetupFileTemplate=...`, default `""`) the management UI setup JSON file for an angular test based on runtime information of a started platform, requires `platformDir`, `mgtUiSetupFileTemplate` and `mgtUiSetupFile` set
+    - `befores` (`-Dconfiguration.testApp.befores=...`, default `""`) specifies additional processes to be started before the test and to be stopped afterwards
     - `description` the description of the process
     - `cmd` the command to be executed
     - `cmdAsScript` optional flag whether `cmd` is a script (automatically set `true` for `ant`, `mvn` or `npm` or `ng`, default `false`)
