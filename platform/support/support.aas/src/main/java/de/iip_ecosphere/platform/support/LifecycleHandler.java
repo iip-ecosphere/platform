@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory;
  */
 public class LifecycleHandler {
 
+    public static final String MSG_STARTUP_COMPLETED = "Startup completed.";
     private static final String CMD_ARG = "--iip.profile=";
     
     /**
@@ -161,7 +162,7 @@ public class LifecycleHandler {
         if (waiting) {
             add = " Running until Ctrl-C.";
         }
-        LoggerFactory.getLogger(LifecycleHandler.class).info("Startup completed.{}", add);
+        LoggerFactory.getLogger(LifecycleHandler.class).info("{}{}", MSG_STARTUP_COMPLETED, add);
     }
     
     /**

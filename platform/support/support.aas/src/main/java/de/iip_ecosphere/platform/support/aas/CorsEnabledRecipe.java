@@ -23,7 +23,7 @@ public interface CorsEnabledRecipe {
      * Sets the access control to allow cross origin.
      * 
      * @param accessControlAllowOrigin the information to be placed in the HTTP header field 
-     * "Access-Control-Allow-Origin"; the specific server or {@link #ANY_CORS_ORIGIN}
+     * "Access-Control-Allow-Origin"; the specific server or {@link DeploymentRecipe#ANY_CORS_ORIGIN}
      * @return an instance of the sub-recipe
      */
     public CorsEnabledRecipe setAccessControlAllowOrigin(String accessControlAllowOrigin);
