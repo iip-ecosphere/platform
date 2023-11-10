@@ -13,6 +13,10 @@
      <relativePath/>
   </parent>
   
+  <properties>
+    <platformDir>gen/platform</platformDir>
+  </properties>
+  
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -96,8 +100,8 @@
          </executions>
        </plugin>
 
-       <!-- AAS configuration to ephemeral, real uris at runtime in <piddir>/iip-platform.properties -->
-       <!-- <plugin>
+       <!-- AAS configuration to ephemeral, real uris at runtime in <piddir>/oktoflow.yml -->
+       <plugin>
          <groupId>com.google.code.maven-replacer-plugin</groupId>
          <artifactId>replacer</artifactId>
          <version>1.5.3</version>
@@ -122,7 +126,7 @@
                      </replacement>
                  </replacements>
          </configuration>
-       </plugin> -->
+       </plugin>
        
        <!-- instantiate platform before tests and after replacements -->
        <plugin>
@@ -131,18 +135,14 @@
            <version>${project.version}</version>
            <executions>
                <execution>
-                   <id>generateBroker</id>
+                   <id>generateAll</id>
                    <phase>generate-test-sources</phase>
                    <goals>
-                       <goal>generateBroker</goal>
+                       <goal>generateAll</goal>
                    </goals>
-               </execution>
-               <execution>
-                   <id>generatePlatform</id>
-                   <phase>generate-test-sources</phase>
-                   <goals>
-                       <goal>generatePlatform</goal>
-                   </goals>
+                   <configuration>
+                       <checkChanged>true</checkChanged>
+                   </configuration>
                </execution>
                <execution>
                    <id>ngBuild</id>
@@ -166,12 +166,16 @@
                            <appArg>--code-coverage</appArg>
                        </appArgs>
                        <errToIn>true</errToIn>
+                       <platformDir>${platformDir}</platformDir>
+                       <mgtUiSetupFileTemplate>src/assets/config/configTemplate.json</mgtUiSetupFileTemplate>
+                       <mgtUiSetupFile>target/mgtUi.json</mgtUiSetupFile> <!-- preliminary -->
+                       <!-- <deploymentPlan>src/test/resources/deployment.yaml</deploymentPlan> -->
                    </configuration>
                </execution>
            </executions>
            <configuration>
                <model>PlatformConfiguration</model>
-               <outputDirectory>gen/platform</outputDirectory>
+               <outputDirectory>${platformDir}</outputDirectory>
                <metaModelDirectory>${project.build.directory}/easy</metaModelDirectory>
                <modelDirectory>${project.build.directory}/easy-test</modelDirectory>
            </configuration>

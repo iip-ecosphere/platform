@@ -1,0 +1,15 @@
+application: SimpleMesh UI testing application
+id: SimpleMesh
+appId: SimpleMeshApp
+disabled: false
+version: 0.1.0
+description: SimpleMesh UI testing application
+artifact: ./gen/platform/SimpleMesh/SimpleMeshTestingApp/target/SimpleMeshTestingApp-0.1.0-SNAPSHOT-bin.jar
+parallelize: false
+onUndeployRemoveArtifact: true
+assignments:
+  - resource: local
+    services:
+      - SimpleSource
+      - SimpleReceiver
+ensembleStrategy: ALL_ON_FIRST
