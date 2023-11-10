@@ -37,7 +37,7 @@ public class FileChangeDetector {
     public static final String FILE_EXTENSION = "fpf"; 
     
     private File md5File;
-    private boolean useHash;
+    private boolean useHash = true;
     private Logger logger;
     private String task;
     private transient Map<String, String> md5Hashes = new HashMap<>();
