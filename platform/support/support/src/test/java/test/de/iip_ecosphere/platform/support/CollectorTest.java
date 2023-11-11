@@ -22,6 +22,7 @@ import org.junit.Test;
 
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.collector.Collector;
+import de.iip_ecosphere.platform.support.collector.Collector.Field;
 import de.iip_ecosphere.platform.support.collector.CollectorSetup;
 
 /**
@@ -38,6 +39,7 @@ public class CollectorTest {
     public void testCollector() throws IOException {
         CollectorSetup setup = new CollectorSetup();
         CollectorSetup orig = Collector.setSetup(setup);
+        Field[] origFields = Collector.getFields();
         
         Collector
             .collect("tag")
@@ -60,11 +62,47 @@ public class CollectorTest {
         String tagFileContents = FileUtils.readFileToString(tagFile, Charset.defaultCharset());
         String[] tagFileLines = tagFileContents.split("\\r?\\n");
         Assert.assertEquals(2, tagFileLines.length);
-        Assert.assertTrue(tagFileLines[0].matches("^\".*\"$"));
+        assertHeader(tagFileLines[0], origFields);
         Assert.assertTrue(tagFileLines[1].matches("^\\d+,\"9999\",\\d+$"));
+        
+        Field[] fields = new Field[origFields.length + 1];
+        System.arraycopy(origFields, 0, fields, 0, origFields.length);
+        fields[origFields.length] = new Field("myField", -1);
+        Collector.setFields(fields);
+        Collector
+            .collect("tag")
+            .measureMs(() -> TimeUtils.sleep(1000))
+            .close();
+
+        tagFileContents = FileUtils.readFileToString(tagFile, Charset.defaultCharset());
+        tagFileLines = tagFileContents.split("\\r?\\n");
+        Assert.assertEquals(3, tagFileLines.length);
+        assertHeader(tagFileLines[0], fields);
+        Assert.assertTrue(tagFileLines[1].matches("^\\d+,\"9999\",\\d+,-1$"));
+        Assert.assertTrue(tagFileLines[2].matches("^\\d+,\"9999\",\\d+,-1$"));
+
+        Collector.setFields(origFields);
         
         FileUtils.deleteQuietly(tagFile);
         Collector.setSetup(orig);
     }
-
+    
+    /**
+     * Asserts a file header.
+     * 
+     * @param text the text from the file
+     * @param fields the expected fields
+     */
+    private void assertHeader(String text, Field[] fields) {
+        String[] line = text.split(",");
+        Assert.assertEquals(fields.length, line.length);
+        for (int l = 0; l < line.length; l++) {
+            String e = line[l];
+            if (e.startsWith("\"") && e.endsWith("\"")) {
+                e = e.substring(1, e.length() - 1);
+            }
+            Assert.assertEquals(e, fields[l].getName());
+        }
+    }
+    
 }
