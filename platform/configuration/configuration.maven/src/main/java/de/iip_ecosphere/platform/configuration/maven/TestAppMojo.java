@@ -331,6 +331,7 @@ public class TestAppMojo extends AbstractLoggingMojo {
             }
         }
         units.clear();
+        FileUtils.deleteQuietly(mgtUiSetupFile);
         return failed;
     }
 
