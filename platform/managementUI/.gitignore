@@ -42,6 +42,7 @@ testem.log
 Thumbs.db
 /bin/
 
+/src/test/tmp/
 /target/
 /pckg/
 /gen/

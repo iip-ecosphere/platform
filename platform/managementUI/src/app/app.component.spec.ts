@@ -4,19 +4,22 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterTestingModule } from '@angular/router/testing';
 import { AppComponent } from './app.component';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { EnvConfigService } from './services/env-config.service';
 
 describe('AppComponent', () => {
+
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [
         RouterTestingModule, 
-        HttpClientTestingModule
+        EnvConfigService.imp(HttpClientTestingModule, HttpClientTestingModule)
       ],
       declarations: [
         AppComponent
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     }).compileComponents();
+    return EnvConfigService.initAsync();
   });
 
   it('should create the app', () => {
@@ -37,4 +40,24 @@ describe('AppComponent', () => {
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelector('div[class="main-title"]')?.textContent).toContain('IIP Ecosphere Management UI');
   });
+
+  if (EnvConfigService.inPlatformTest()) {
+
+    it('shall have version information'), () => {
+      const fixture = TestBed.createComponent(AppComponent);
+      fixture.detectChanges();
+      const compiled = fixture.nativeElement as HTMLElement;
+      expect(compiled.querySelector('p[id="version"]')?.textContent).toMatch(/^\d+\.\d+\.\d+(-SNAPSHOT)?$/);
+    }
+
+    it('shall have build identification'), () => {
+      const fixture = TestBed.createComponent(AppComponent);
+      fixture.detectChanges();
+      const compiled = fixture.nativeElement as HTMLElement;
+      expect(compiled.querySelector('p[id="buildId"]')?.textContent).toMatch(/^\d+$/);
+    }
+
+
+  }
+
 });

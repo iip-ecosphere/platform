@@ -11,6 +11,9 @@
             <directory>dist</directory>
             <outputDirectory>dist</outputDirectory>
             <useDefaultExcludes>false</useDefaultExcludes>
+            <excludes>
+              <exclude>**/assets/config/configTemplate.json</exclude>
+            </excludes>
         </fileSet>
     </fileSets>
 </assembly>

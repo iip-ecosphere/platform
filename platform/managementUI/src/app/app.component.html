@@ -14,11 +14,11 @@
   <span style="flex: 1 1 auto"></span>
 
   <div style="font-size:x-small;">
-    <p style="line-height: 0.5">Version: {{Data.version}}
+    <p style="line-height: 0.5" id="version">Version: {{Data.version}}
       <span *ngIf="Data.isRelease == false">(S)</span>
       <span *ngIf="Data.isRelease == undefined">(?)</span>
     </p>
-    <p style="line-height: 0.5">Build-Id: {{Data.buildId}}</p>
+    <p style="line-height: 0.5" id="buildId">Build-Id: {{Data.buildId}}</p>
   </div>
 
 </mat-toolbar>

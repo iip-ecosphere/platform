@@ -145,12 +145,6 @@
                    </configuration>
                </execution>
                <execution>
-                   <id>ngBuild</id>
-                   <goals>
-                       <goal>ngBuild</goal>
-                   </goals>
-               </execution>
-               <execution>
                    <id>testApp</id>
                    <goals>
                        <goal>testApp</goal>
@@ -168,9 +162,15 @@
                        <errToIn>true</errToIn>
                        <platformDir>${platformDir}</platformDir>
                        <mgtUiSetupFileTemplate>src/assets/config/configTemplate.json</mgtUiSetupFileTemplate>
-                       <mgtUiSetupFile>target/mgtUi.json</mgtUiSetupFile> <!-- preliminary -->
+                       <mgtUiSetupFile>src/test/tmp/config.json</mgtUiSetupFile>
                        <!-- <deploymentPlan>src/test/resources/deployment.yaml</deploymentPlan> -->
                    </configuration>
+               </execution>
+               <execution>
+                   <id>ngBuild</id>
+                   <goals>
+                       <goal>ngBuild</goal>
+                   </goals>
                </execution>
            </executions>
            <configuration>
@@ -207,6 +207,25 @@
        </plugin>
        
       <plugin>
+        <groupId>com.coderplus.maven.plugins</groupId>
+        <artifactId>copy-rename-maven-plugin</artifactId>
+        <version>1.0</version>
+        <executions>
+          <execution>
+            <id>copy-file</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <sourceFile>pckg/IIP-Ecosphere-mgtUi-latest.zip</sourceFile>
+              <destinationFile>${project.build.directory}/${project.build.finalName}-bin.zip</destinationFile>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>
         <version>3.4.0</version>
@@ -225,25 +244,6 @@
                   <classifier>bin</classifier>
                 </artifact>
               </artifacts>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>com.coderplus.maven.plugins</groupId>
-        <artifactId>copy-rename-maven-plugin</artifactId>
-        <version>1.0</version>
-        <executions>
-          <execution>
-            <id>copy-file</id>
-            <phase>package</phase>
-            <goals>
-              <goal>copy</goal>
-            </goals>
-            <configuration>
-              <sourceFile>pckg/IIP-Ecosphere-mgtUi-latest.zip</sourceFile>
-              <destinationFile>${project.build.directory}/${project.build.finalName}-bin.zip</destinationFile>
             </configuration>
           </execution>
         </executions>

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { from, map } from 'rxjs';
-import  * as environment  from '../../assets/config/config.json';
+import  * as environment  from '../../assets/config/config.json'; // TODO needed?
+export type { Configuration };
 declare var window: any;
 
 export enum Environment {
@@ -15,6 +16,7 @@ interface Configuration {
   ip: string;
   urn?: string;
   stage?: Environment;
+  inTest?: boolean;
 }
 
 export const primitiveDataTypes
@@ -27,39 +29,55 @@ export const ivmlEnumeration = "IvmlEnumeration:";
 })
 export class EnvConfigService {
 
-  private readonly configUrl = 'assets/config/config.json';
+  private static readonly configLocations = ['../../test/tmp/config.json', '../../assets/config/config.json'];
 
     constructor() {}
 
-    private env: Configuration | undefined;
+    private static env: Configuration | undefined;
 
-    // public load(): Configuration {
-    //   console.log('loading ip');
-    //   this.env = environment;
-    //   console.log(environment);
-    //   return this.env;
-    // }
-
-    public init() {
-      return from(
-          fetch('../../assets/config/config.json').then(function(response) {
-            return response.json();
-          })
-        ).pipe(
-          map((config) => {
-          window.config = config;
-
-          return
-        })).toPromise();
+    private static async load() {
+      for(let location of this.configLocations) {
+        var cfg = await fetch(location).then(
+          (response) => {
+            if (response.ok) {
+              return response.json();
+            } else {
+              return undefined;
+            }
+          }
+        )
+        if (cfg != undefined && EnvConfigService.env == undefined) {
+          console.log("Loading setup from " + location);
+          EnvConfigService.env = cfg;
+          window.config = cfg;
+        }
+      }
     }
 
+    public static async initAsync() {
+      if (EnvConfigService.env == undefined) {
+        await EnvConfigService.load();
+      }
+    }
+
+    public init() {
+      EnvConfigService.initAsync();      
+    }
+
+    public static getConfig() : Configuration | undefined {
+      return EnvConfigService.env;
+    }
+
+    public static imp(importNoPlatform: any, importPlatform: any): any {
+      return EnvConfigService.inPlatformTest() ? importPlatform : importNoPlatform;
+    }
+
+    public static inPlatformTest() : boolean {
+      return EnvConfigService.env == undefined ? false : 
+        EnvConfigService.env?.inTest == undefined ? false : EnvConfigService.env?.inTest;
+    }
 
     public getEnv() {
       return window.config
-      // if(!this.env) {
-      //   return this.load();
-      // } else {
-      //   return this.env;
-      // }
     }
 }
