@@ -441,6 +441,7 @@ public class TestAppMojo extends AbstractLoggingMojo {
                     uri = new URI(uri.getScheme(), null, uri.getHost(), uri.getPort(), null, null, null);
                     String contents = FileUtils.readFileToString(mgtUiSetupFileTemplate, Charset.defaultCharset());
                     contents = contents.replace("${aasRegistryUri}", uri.toString());
+                    mgtUiSetupFile.getParentFile().mkdirs();
                     try (PrintWriter out = new PrintWriter(new FileWriter(mgtUiSetupFile))) {
                         out.println(contents);
                     }

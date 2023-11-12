@@ -25,7 +25,7 @@ import de.iip_ecosphere.platform.tools.maven.python.AbstractLoggingMojo;
  * 
  * @author Holger Eichelberger, SSE
  */
-@Mojo(name = "ngBuild", defaultPhase = LifecyclePhase.COMPILE)
+@Mojo(name = "ngBuild", defaultPhase = LifecyclePhase.PACKAGE)
 public class NgBuildMojo extends AbstractLoggingMojo {
 
     @Parameter(property = "configuration.ngBuild.skip", required = false, defaultValue = "false")
