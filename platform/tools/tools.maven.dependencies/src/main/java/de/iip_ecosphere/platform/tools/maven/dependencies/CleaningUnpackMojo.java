@@ -33,6 +33,8 @@ import org.apache.maven.plugins.dependency.fromConfiguration.ArtifactItem;
 import org.apache.maven.plugins.dependency.fromConfiguration.UnpackMojo;
 import org.apache.maven.shared.model.fileset.FileSet;
 
+import de.iip_ecosphere.platform.tools.maven.python.FilesetUtils;
+
 /**
  * Extended unpack Mojo.
  * 

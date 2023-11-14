@@ -1,6 +1,6 @@
 # IIP-Ecosphere platform: Extended dependency plugin for Maven
 
-We use the `maven-dependency-plugin` for various tasks, e.g., to unpack Python code or the configuration model.  However, we do not limit ourselves to the target directory which may be cleaned up with `mvn clean` and other cleaning procedures do not work. So we decided a cleanup specification with the `unpack` goal of maven-dependency-plugin provided by this package. For convenience, we include further goals of the original plugin as they are used frequently in conjunction with `unpack`. Basic properties of the underlying maven dependendency plugin can be applied although not explicitly discussed here.
+We use the `maven-dependency-plugin` for various tasks, e.g., to unpack Python code or the configuration model.  However, we do not limit ourselves to the target directory which may be cleaned up with `mvn clean` and other cleaning procedures do not work. So we decided to add a cleanup specification to `unpack` goal of maven-dependency-plugin provided by this package. Similarly, we need to add further non-classpath files to `build-classpath` when creating classpath files for platform instances. For convenience, we include further goals such as `delete` or `copy` of the original plugin we use them frequently in conjunction with `unpack`. Basic properties of the underlying maven dependendency plugin can be applied although not explicitly discussed here.
 
 ## unpack goal
 
@@ -53,7 +53,13 @@ The ``copy-dependencies`` goal is the same as in the original plugin and include
 
 ## build-classpath goal
 
-The ``build-classpath`` goal is the same as in the original plugin and included here just for convenience.
+The ``build-classpath`` goal is the same as in the original plugin and allows for adding further entries at the beginning or ending of a classpath file.
+- `prepends` is a list of `prepend` string entries specifying complete classpath entries to be prepended to the `outputFile` concatenated by `pathSeparator`
+- `appends` is a list of `append` string entries specifying  complete classpath entries to be prepended to the `outputFile` concatenated by `pathSeparator`
+
+## copy goal
+
+The ``copy`` goal is the same as in the original plugin and included here just for convenience.
 
 ## delete goal
 

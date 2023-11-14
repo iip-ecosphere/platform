@@ -8,6 +8,8 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.shared.model.fileset.FileSet;
 
+import de.iip_ecosphere.platform.tools.maven.python.FilesetUtils;
+
 @Mojo(name = "delete", defaultPhase = LifecyclePhase.INITIALIZE)
 public class DeleteMojo extends AbstractMojo {
 
