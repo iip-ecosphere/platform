@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.maven.project.MavenProject;
 
 /**
  * A simple MD5-hash based file change detector.
@@ -47,7 +48,7 @@ public class FileChangeDetector {
      * 
      * @param md5File the file where the hashes are/shall be stored
      * @param logger the logger instance
-     * @param task a task description for logging
+     * @param task a task description for logging (may be <b>null</b> or empty for no logging)
      */
     public FileChangeDetector(File md5File, Logger logger, String task) {
         this.md5File = md5File;
@@ -146,7 +147,9 @@ public class FileChangeDetector {
                     if (!knownMd5.equals(md5)) {
                         result.add(f);
                     } else {
-                        logger.info("Skipping " + task + " for " + f + " as unchanged.");
+                        if (task != null && task.length() > 0) {
+                            logger.info("Skipping " + task + " for " + f + " as unchanged.");
+                        }
                     }
                 } else {
                     result.add(f);
@@ -154,6 +157,17 @@ public class FileChangeDetector {
             }
         }
         return result;
-    }    
+    }
+
+    /**
+     * Returns the name of a hash file with {@code #FILE_EXTENSION} in the maven target folder.
+     * 
+     * @param project the project determining the maven target folder
+     * @param hashFileName the name of the hash file
+     * @return the hash file
+     */
+    public static File getHashFileInTarget(MavenProject project, String hashFileName) {
+        return new File(project.getBuild().getDirectory(), hashFileName + FILE_EXTENSION);
+    }
 
 }
