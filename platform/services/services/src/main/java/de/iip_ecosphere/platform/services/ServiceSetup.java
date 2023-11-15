@@ -19,6 +19,7 @@ import java.util.List;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.net.NetworkManagerSetup;
+import de.iip_ecosphere.platform.support.setup.EnableSetupMerge;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 
 /**
@@ -26,6 +27,7 @@ import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
  * 
  * @author Holger Eichelberger, SSE
  */
+@EnableSetupMerge
 public class ServiceSetup {
 
     public static final String ENV_SUPPORTED_APPIDS = "IIP_SUPPORTED_APPIDS";

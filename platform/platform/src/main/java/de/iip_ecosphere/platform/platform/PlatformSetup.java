@@ -18,6 +18,7 @@ import java.io.IOException;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.setup.AbstractSetup;
+import de.iip_ecosphere.platform.support.setup.EnableSetupMerge;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 
 /**
@@ -25,6 +26,7 @@ import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
  * 
  * @author Holger Eichelberger, SSE
  */
+@EnableSetupMerge
 public class PlatformSetup extends AbstractSetup {
 
     /**
