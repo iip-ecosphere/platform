@@ -67,6 +67,7 @@ The plugin supports the following configuration settings:
   - `invokeGoals` the mandatory goals to be invoked, each stated in an own element `invokeGoal`
   - `invokeProfiles` optional profiles to be invoked, each stated in an own element `invokeProfile` (default: not given)
   - `skipIfExists` (default ``, user property `invoker.skipIfExists`) skips the execution if the file exists. If it does not exist, touch the file after successful execution.
+  - `executeIfExists` (default ``, user property `invoker.executeIfExists`) enforces the execution if the file exists. The file will be deleted after successful execution.
   - `disableJava` (default `false`, user property `disableJava`) sets system properties to disable Java compilation, Java test compilation, test execution and Javadoc generation. Helpful shortcut for executing generation profiles.
   - `enableJavadoc` (default `false`, user property `enableJava`) enables JavaDoc generation
   - `disablePython` (default `false`, user property `disablePython`) sets system properties to disable platform Python "compilation" and testing.
@@ -82,6 +83,8 @@ The plugin supports the following configuration settings:
   - `javaHome` the home directory of the JDK/JRE to execute (default not set, using the one Maven was called on)
   - `mavenHome` the home directory of Maven to execute (default not set, using the one Maven was called on)
   - `timeoutInSeconds` a timeout when the invocation shall be terminated as failed execution (default `0`)
+  - `changeTracking` a fileset with directory, includes, excludes of files for which changes shall enable/prevent an execution. If not given, a default set will be assumed including `pom.xml`, `src/**/*.java`, `src/**/*.py`, `src/**/*.yaml`, `src/**/*.yml`, `src/**/*.json`. Will be considered only, if `changeTrackingHashFile` is given.
+  - `changeTrackingHashFile` the file storing the MD5 hashes for `changeTracking`.
   - `invoker.debug` pass through Maven debug flag (default `false`)
   
 The plugin takes over the system properties of the original request, in particular `-Dunpack.force` and passes them to the invoked maven processes.

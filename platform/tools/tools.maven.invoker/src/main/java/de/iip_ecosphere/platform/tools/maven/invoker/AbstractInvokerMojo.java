@@ -13,7 +13,6 @@
 package de.iip_ecosphere.platform.tools.maven.invoker;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 
@@ -32,13 +31,18 @@ import org.apache.maven.shared.invoker.InvocationResult;
 import org.apache.maven.shared.invoker.Invoker;
 import org.apache.maven.shared.invoker.MavenCommandLineBuilder;
 import org.apache.maven.shared.invoker.MavenInvocationException;
+import org.apache.maven.shared.model.fileset.FileSet;
+
+import de.iip_ecosphere.platform.tools.maven.python.FileChangeDetector;
+import de.iip_ecosphere.platform.tools.maven.python.FilesetUtils;
+import de.iip_ecosphere.platform.tools.maven.python.Logger;
 
 /**
  * Maven POM invoker plugin. This plugin is largely inspired by the maven-invoker plugin.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class AbstractInvokerMojo extends AbstractMojo {
+public class AbstractInvokerMojo extends AbstractMojo implements Logger { // AbstractLoggingMojo is incompatible
 
     @Parameter(defaultValue = "${project}", readonly = true)
     private MavenProject project;
@@ -136,8 +140,23 @@ public class AbstractInvokerMojo extends AbstractMojo {
     @Parameter(property = "invoker.skipIfExists", defaultValue = "") 
     private File skipIfExists;
 
+    @Parameter(property = "invoker.executeIfExists", defaultValue = "") 
+    private File executeIfExists;
+
     @Parameter(property = "iip.ciBuildId", defaultValue = "") 
     private String buildId;
+    
+    /**
+     * A specific <code>fileSet</code> rule to select files and directories.
+     */
+    @Parameter(required = false)
+    private FileSet changeTracking;
+
+    @Parameter(required = false)
+    private String changeTrackingHashFile;
+
+    @Parameter(property = "invoker.touchIfExecuted", required = false, defaultValue = "") 
+    private File touchIfExecuted;
 
     @Component
     private Invoker invoker;
@@ -253,11 +272,45 @@ public class AbstractInvokerMojo extends AbstractMojo {
         return request;
     }
     
+    /**
+     * Returns the change tracking file set.
+     * 
+     * @return the change tracking file set, if not specified a default one
+     */
+    private FileSet getChangeTrackingFileSet() {
+        FileSet result = changeTracking;
+        if (null == result) {
+            result = new FileSet();
+            result.setDirectory(".");
+            result.addInclude("src/**/*.java");
+            result.addInclude("src/**/*.py");
+            result.addInclude("pom.xml");
+            result.addInclude("**/*.yml");
+            result.addInclude("**/*.yaml");
+            result.addInclude("**/*.json");
+        }
+        return result;
+    }
+    
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         final InvocationRequest request = createInvocationRequest();
-        boolean enableOnExists = null == skipIfExists ? true : !skipIfExists.exists(); 
-        if (enabled && enableOnExists) {
+        boolean enableOnSkip = null == skipIfExists ? true : !skipIfExists.exists(); 
+        boolean enableOnExecute = null == executeIfExists ? false : executeIfExists.exists(); 
+        boolean enableOnFile = enableOnSkip || enableOnExecute; 
+        
+        List<File> trackedFiles = null;
+        if (null != changeTrackingHashFile && changeTrackingHashFile.length() > 0) {
+            File hashFile = FileChangeDetector.getHashFileInTarget(project, changeTrackingHashFile);
+            trackedFiles = FilesetUtils.listFiles(getChangeTrackingFileSet(), false);
+            FileChangeDetector fcd = new FileChangeDetector(hashFile, this, "invoker");
+            fcd.readHashFile();
+            trackedFiles = fcd.checkHashes(trackedFiles);
+            fcd.writeHashFile();
+        }
+        boolean enableOnChangeTracking = trackedFiles != null && trackedFiles.size() > 0; 
+        
+        if (enabled && (enableOnFile || enableOnChangeTracking)) {
             try {
                 getLog().info(">>> Maven invoker: Using MAVEN_OPTS: " + request.getMavenOpts());
                 getLog().info(">>> Executing: " + new MavenCommandLineBuilder().build(request));
@@ -278,21 +331,42 @@ public class AbstractInvokerMojo extends AbstractMojo {
                 getLog().debug("Error invoking Maven: " + ex.getMessage(), ex);
                 throw new MojoExecutionException( "Maven invocation failed. " + ex.getMessage());
             }
+            FilesetUtils.touch(skipIfExists, getLog());
+            FilesetUtils.touch(touchIfExecuted, getLog());
+            FileUtils.deleteQuietly(executeIfExists);
             getLog().info("<<< Maven invoker completed");
-            if (skipIfExists != null) {
-                try {
-                    FileUtils.touch(skipIfExists);
-                } catch (IOException e) {
-                    getLog().warn("Cannot touch " + skipIfExists + ": " + e.getMessage());
-                }
-            }
         } else {
-            if (enabled && !enableOnExists) {
-                getLog().info("Maven invoker skipped as " + skipIfExists + " exists.");
+            FileUtils.deleteQuietly(touchIfExecuted);
+            if (enabled) {
+                if (!enableOnSkip) {
+                    getLog().info("Maven invoker skipped as " + skipIfExists + " exists.");
+                } else if (!enableOnChangeTracking && !enableOnExecute) {
+                    getLog().info("Maven invoker skipped as tracked files did not change.");
+                }
             } else {
                 getLog().info("Maven invoker disabled, not executing.");
             }
         }
+    }
+    
+    @Override
+    public void warn(String warning) {
+        getLog().warn(warning);
+    }
+
+    @Override
+    public void error(String error) {
+        getLog().error(error);
+    }
+    
+    @Override
+    public void error(Throwable throwable) {
+        getLog().error(throwable);
+    }
+
+    @Override
+    public void info(String info) {
+        getLog().info(info);
     }
     
 }
