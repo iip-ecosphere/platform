@@ -56,6 +56,7 @@ public class EndpointHolderTest {
         Assert.assertEquals(holder.getPath(), "myPath");
 
         FileUtils.deleteQuietly(file);
+        RuntimeSetup.clear();
     }
 
 }

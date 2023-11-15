@@ -55,6 +55,7 @@ public class RuntimeSetupTest {
         Assert.assertEquals(expected.getAasServer(), actual.getAasServer());
         
         FileUtils.deleteQuietly(file);
+        RuntimeSetup.clear();
     }
 
 }

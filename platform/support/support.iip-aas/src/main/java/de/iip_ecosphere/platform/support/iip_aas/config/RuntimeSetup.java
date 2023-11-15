@@ -98,6 +98,13 @@ public class RuntimeSetup extends AbstractSetup {
                 + "Ephemeral AAS ports may not work.", getFile(), e.getMessage());
         }
     }
+    
+    /**
+     * Clears the instance. [testing]
+     */
+    public static void clear() {
+        instance = null;
+    }
 
     /**
      * Loads the runtime setup from {@link #getFile()}.
