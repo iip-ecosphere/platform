@@ -103,6 +103,14 @@ template Basics(Configuration config, FileArtifact target) {
         }
     }
 
+    def String appendIfNotEmpty(String text, String postfix) {
+        if (text.length() > 0) {
+            text + postfix;
+        } else {
+            "";
+        }
+    }
+
     def String appendWithNewline(String text1, String text2) {
         appendWithSeparator(text1, "\n", text2);
     }

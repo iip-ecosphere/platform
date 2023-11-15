@@ -11,9 +11,10 @@ template EcsServiceControlMvn(IIPEcosphere config, XmlFileArtifact target, Strin
         String iipGroup = "de.iip-ecosphere.platform";
         String springGroup = "org.springframework.boot";
         String projectVersion = "\\${project.version}";
+        String artifactId = "ecsServices.exec${getContainerNameInfix(deviceType)}";
         
         XmlElement project = createMavenRoot(target);
-        createMavenProjectAttributes(project, "ecsServices.exec${getContainerNameInfix(deviceType)}", "ConfiguredEcsServiceControl", "Configured ECS Runtime for small resources, no container manager, but service control");
+        createMavenProjectAttributes(project, artifactId, "ConfiguredEcsServiceControl", "Configured ECS Runtime for small resources, no container manager, but service control");
         createMavenParent(project, iipGroup, "platformDependencies", "${config.iipVer}");
         
         XmlElement dep = createDependencies(project);
@@ -37,10 +38,13 @@ template EcsServiceControlMvn(IIPEcosphere config, XmlFileArtifact target, Strin
         
         XmlElement plugins = createMavenBuildElement(project, "", true);
         appendMavenJarPlugin(plugins, "2.3", false, main);
-        appendMavenDependencyPluginCopyDeps(plugins, jarDir="../${dir}", copyOwn=true);
+XmlElement dPlug = appendMavenIipDependencyPlugin(plugins);
+XmlElement ex2 = appendExecutionsParent(dPlug);
+appendMavenDependencyPluginCopyDepsExecution(ex2, jarDir="../${dir}", copyOwn=true);
+appendWinLinuxDependencyPluginBuildClasspathExecution(ex2, dir, ownArtifact="${iipGroup}.${artifactId}-${config.iipVer}");
 
         sequenceOf(String) files = {"*.yml", "*.png", "*.jpg"};
-        XmlElement ex2 = appendMavenResourcesCopyResources(plugins, mavenBuildOutputResourcesDir(), getResourcesFolder()+"/devices", files, id="dev-res");
+        ex2 = appendMavenResourcesCopyResources(plugins, mavenBuildOutputResourcesDir(), getResourcesFolder()+"/devices", files, id="dev-res");
         appendMavenResourcesCopyResourcesExecution(ex2, "copy-resources", mavenBuildOutputResourcesDir(), getResourcesFolder()+"/platform", files, id="platf-res");
     }
 

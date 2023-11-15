@@ -10,9 +10,10 @@ template ServiceControlMvn(IIPEcosphere config, XmlFileArtifact target, String d
         String iipGroup = "de.iip-ecosphere.platform";
         String springGroup = "org.springframework.boot";
         String projectVersion = "\\${project.version}";
+        String artifactId = "services.exec";
         
         XmlElement project = createMavenRoot(target);
-        createMavenProjectAttributes(project, "services.exec", "ConfiguredServiceControl", "Configured service control");
+        createMavenProjectAttributes(project, artifactId, "ConfiguredServiceControl", "Configured service control");
         createMavenParent(project, iipGroup, "platformDependencies", "${config.iipVer}");
         
         XmlElement dep = createDependencies(project);
@@ -32,7 +33,10 @@ template ServiceControlMvn(IIPEcosphere config, XmlFileArtifact target, String d
         
         XmlElement plugins = createMavenBuildElement(project, "", true);
         appendMavenJarPlugin(plugins, "2.3", false, main);
-        appendMavenDependencyPluginCopyDeps(plugins, jarDir="../${dir}", copyOwn=true);
+XmlElement dPlug = appendMavenIipDependencyPlugin(plugins);
+ex = appendExecutionsParent(dPlug);
+appendMavenDependencyPluginCopyDepsExecution(ex, jarDir="../${dir}", copyOwn=true);
+appendWinLinuxDependencyPluginBuildClasspathExecution(ex, dir, ownArtifact="${iipGroup}.${artifactId}-${config.iipVer}");
 
         sequenceOf(String) files = {"*.yml", "*.png", "*.jpg"};
         ex = appendMavenResourcesCopyResources(plugins, mavenBuildOutputResourcesDir(), getResourcesFolder()+"/devices", files, id="dev-res");

@@ -10,12 +10,15 @@ template PlatformMvn(IIPEcosphere config, XmlFileArtifact target, String dir, St
         String iipGroup = "de.iip-ecosphere.platform";
         String springGroup = "org.springframework.boot";
         String projectVersion = "\\${project.version}";
+        String artifactId;
         
         XmlElement project = createMavenRoot(target);
         if (monitoring) {
-            createMavenProjectAttributes(project, "monitoring.exec", "ConfiguredPlatformMonitoringInstance", "Configured platform monitoring instance");
+            artifactId = "monitoring.exec";
+            createMavenProjectAttributes(project, artifactId, "ConfiguredPlatformMonitoringInstance", "Configured platform monitoring instance");
         } else {
-            createMavenProjectAttributes(project, "platform.exec", "ConfiguredPlatformInstance", "Configured platform instance");
+            artifactId = "platform.exec";
+            createMavenProjectAttributes(project, artifactId, "ConfiguredPlatformInstance", "Configured platform instance");
         }
         createMavenParent(project, iipGroup, "platformDependencies", "${config.iipVer}");
         
@@ -51,12 +54,15 @@ template PlatformMvn(IIPEcosphere config, XmlFileArtifact target, String dir, St
         
         XmlElement plugins = createMavenBuildElement(project, "", true);
         appendMavenJarPlugin(plugins, "2.3", false, main);
-        appendMavenDependencyPluginCopyDeps(plugins, jarDir="../${dir}", copyOwn=true);
+XmlElement dPlug = appendMavenIipDependencyPlugin(plugins);
+XmlElement ex2 = appendExecutionsParent(dPlug);
+appendMavenDependencyPluginCopyDepsExecution(ex2, jarDir="../${dir}", copyOwn=true);
+appendWinLinuxDependencyPluginBuildClasspathExecution(ex2, dir, ownArtifact="${iipGroup}.${artifactId}-${config.iipVer}");
         appendCompilerPlugin(plugins);
         appendSurefirePlugin(plugins, tests=tests);
 
         sequenceOf(String) files = {"*.yml", "*.png", "*.jpg"};
-        XmlElement ex2 = appendMavenResourcesCopyResources(plugins, mavenBuildOutputResourcesDir(), getResourcesFolder()+"/software", files, id="sw-res");
+        ex2 = appendMavenResourcesCopyResources(plugins, mavenBuildOutputResourcesDir(), getResourcesFolder()+"/software", files, id="sw-res");
         appendMavenResourcesCopyResourcesExecution(ex2, "copy-resources", mavenBuildOutputResourcesDir(), getResourcesFolder()+"/platform", files, id="platf-res");
     }
 

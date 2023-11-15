@@ -245,11 +245,11 @@ template MavenBasics(Configuration config, FileArtifact target) {
     
     def XmlElement appendMavenDependencyPluginCopyDeps(XmlElement plugins, String ver="3.2.0", String jarDir="", Boolean copyOwn=false, Boolean prependGroupId=true) {
         XmlElement plugin = appendMavenDependencyPlugin(plugins, ver);
+        XmlElement execs = new XmlElement(plugin, "executions");
         if (jarDir.length() > 0) {
-            XmlElement execs = new XmlElement(plugin, "executions");
             appendMavenDependencyPluginCopyDepsExecution(execs, jarDir, copyOwn, prependGroupId);
         }
-        plugin;
+        execs;
     }
     
     def XmlElement appendMavenDependencyPluginCopyDepsExecution(XmlElement execs, String jarDir="", 
@@ -295,7 +295,7 @@ template MavenBasics(Configuration config, FileArtifact target) {
     def XmlElement appendMavenDependencyPluginBuildClasspathExecution(XmlElement execs, String id="build-classpath", 
         String phase="prepare-package", String outputFile="\\${project.build.directory}/classes/classpath", 
         Boolean prependGroupId=true, String prefix="", String fileSeparator="", String pathSeparator="", 
-        String includeScope="") {
+        String includeScope="", String prepend="") {
         
         XmlElement exec = new XmlElement(execs, "execution");
         new XmlElement(exec, "id", id);
@@ -318,7 +318,20 @@ template MavenBasics(Configuration config, FileArtifact target) {
         if (includeScope.length() > 0) {
             new XmlElement(config, "includeScope", "${includeScope}");
         }
+        if (prepend.length() > 0) {
+            XmlElement prep = new XmlElement(config, "prepends");
+            new XmlElement(prep, "prepend", "${prepend}");
+        }
         exec;
+    }
+    
+    def appendWinLinuxDependencyPluginBuildClasspathExecution(XmlElement execs, String folder, String ownArtifact="") {
+        appendMavenDependencyPluginBuildClasspathExecution(execs, outputFile="../${folder}/classpath.win", 
+            prependGroupId=true, prefix=folder, fileSeparator="\\", pathSeparator=";", includeScope="runtime", 
+            id="build-classpath-win", prepend="${folder}\\" + "${ownArtifact}.jar"); 
+        appendMavenDependencyPluginBuildClasspathExecution(execs, outputFile="../${folder}/classpath.ux", 
+            prependGroupId=true, prefix=folder, fileSeparator="/", pathSeparator=":", includeScope="runtime", 
+            id="build-classpath-ux", prepend="${folder}/${ownArtifact}.jar"); 
     }
     
     // ------------------------------------------- maven shade plugin --------------------------------------------
