@@ -52,7 +52,7 @@ public class ProcessMojo extends AbstractLoggingMojo {
                 }
                 p.allocatePorts(project, getLog());
                 builder.addArguments(p.extrapolateArgs());
-                ProcessUnit pu = builder.build();
+                ProcessUnit pu = builder.build4Mvn();
                 int status = pu.waitFor();
                 if (status != ProcessUnit.UNKOWN_EXIT_STATUS && status != 0) {
                     throw new MojoExecutionException(pu.getDescription() + " terminated with status: " + status);

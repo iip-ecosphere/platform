@@ -13,6 +13,7 @@
 package test.de.iip_ecosphere.platform.configuration.maven;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
@@ -32,9 +33,11 @@ public class ProcessUnitTest {
 
     /**
      * Tests a successfully terminating process with timeout and regEx match.
+     * 
+     * @throws IOException shall not happen if successful
      */
     @Test
-    public void testTerminatingMatchingProcess() {
+    public void testTerminatingMatchingProcess() throws IOException {
         System.out.println("Testing process with successful regex terminating on match:");
         Pattern p = Pattern.compile("^DONE: \\d+$");
         ProcessUnit unit = new ProcessUnit.ProcessUnitBuilder("p", null)
@@ -55,9 +58,11 @@ public class ProcessUnitTest {
 
     /**
      * Tests a successfully terminating process with timeout and failing regEx match.
+     * 
+     * @throws IOException shall not happen if successful
      */
     @Test
-    public void testTerminatingNonMatchingProcess() {
+    public void testTerminatingNonMatchingProcess() throws IOException {
         System.out.println("Testing process with failing regex terminating itself when over:");
         Pattern p = Pattern.compile("^XYZ: \\d+$");
         ProcessUnit unit = new ProcessUnit.ProcessUnitBuilder("p2", null)
@@ -80,9 +85,11 @@ public class ProcessUnitTest {
 
     /**
      * Tests a process with timeout.
+     * 
+     * @throws IOException shall not happen if successful
      */
     @Test
-    public void testTerminatedProcess() {
+    public void testTerminatedProcess() throws IOException {
         System.out.println("Testing process being explicitly terminated:");
         ProcessUnit unit = new ProcessUnit.ProcessUnitBuilder("", null)
             .addArgument("java")
@@ -101,9 +108,11 @@ public class ProcessUnitTest {
 
     /**
      * Tests a process with timeout.
+     * 
+     * @throws IOException shall not happen if successful
      */
     @Test
-    public void testProcessMultiPattern() {
+    public void testProcessMultiPattern() throws IOException {
         Pattern p = Pattern.compile("^DONE: \\d+$");
         AtomicInteger terminationCount = new AtomicInteger();
         System.out.println("Testing process with timeout and multi patterns:");
@@ -128,9 +137,11 @@ public class ProcessUnitTest {
     
     /**
      * Tests a process with timeout.
+     * 
+     * @throws IOException shall not happen if successful
      */
     @Test
-    public void testTimeoutProcess() {
+    public void testTimeoutProcess() throws IOException {
         AtomicInteger terminationCount = new AtomicInteger();
         System.out.println("Testing process with timeout:");
         ProcessUnit unit = new ProcessUnit.ProcessUnitBuilder("p", null)
@@ -154,9 +165,11 @@ public class ProcessUnitTest {
 
     /**
      * Tests a process started/executed by a shell script to be terminated.
+     * 
+     * @throws IOException shall not happen if successful
      */
     @Test
-    public void testShellProcess() {
+    public void testShellProcess() throws IOException {
         System.out.println("Testing process in script, terminated:");
         ProcessUnit unit = new ProcessUnit.ProcessUnitBuilder("", null)
             .addShellScriptCommand("test")
@@ -175,9 +188,11 @@ public class ProcessUnitTest {
 
     /**
      * Tests a maven process. Applies (not needed) additional arguments to test more complex (Windows) command lines.
+     * 
+     * @throws IOException shall not happen if successful
      */
     @Test
-    public void testMvnProcess() {
+    public void testMvnProcess() throws IOException {
         System.out.println("Testing mvn process, terminated:");
         Pattern p = Pattern.compile("^.*Scanning for projects.*$");
         ProcessUnit unit = new ProcessUnit.ProcessUnitBuilder("mvn", null)
@@ -199,9 +214,11 @@ public class ProcessUnitTest {
 
     /**
      * Tests a maven process.
+     * 
+     * @throws IOException shall not happen if successful
      */
     @Test
-    public void testMvnProcess2() {
+    public void testMvnProcess2() throws IOException {
         System.out.println("Testing mvn process, terminated:");
         Pattern p = Pattern.compile("^.*gen.*$");
         ProcessUnit unit = new ProcessUnit.ProcessUnitBuilder("mvn", null)

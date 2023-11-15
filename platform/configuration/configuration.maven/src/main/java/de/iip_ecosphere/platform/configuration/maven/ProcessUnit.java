@@ -30,8 +30,8 @@ import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.SystemUtils;
+import org.apache.maven.plugin.MojoExecutionException;
 
-import de.iip_ecosphere.platform.support.Builder;
 import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.tools.maven.python.Logger;
 import de.iip_ecosphere.platform.tools.maven.python.StandardLogger;
@@ -304,7 +304,7 @@ public class ProcessUnit {
      * 
      * @author Holger Eichelberger, SSE
      */
-    public static class ProcessUnitBuilder implements Builder<ProcessUnit> {
+    public static class ProcessUnitBuilder {
         
         private String description;
         private List<String> args = new ArrayList<>();
@@ -593,9 +593,28 @@ public class ProcessUnit {
             this.listener = listener;
             return this;
         }
+        
+        /**
+         * Builds the process.
+         * 
+         * @return the process unit
+         * @throws MojoExecutionException if creating the process fails
+         */
+        public ProcessUnit build4Mvn() throws MojoExecutionException {
+            try {
+                return build();
+            } catch (IOException e) {
+                throw new MojoExecutionException(e.getMessage(), e);
+            }
+        }
 
-        @Override
-        public ProcessUnit build() {
+        /**
+         * Builds the process.
+         * 
+         * @return the process unit
+         * @throws IOException if creating the process fails
+         */
+        public ProcessUnit build() throws IOException {
             String info = "";
             if (null != argAggregate) {
                 args.add(argAggregateStart + argAggregate + argAggregateEnd);
@@ -609,13 +628,7 @@ public class ProcessUnit {
                 info =  " in " + home;
             }
             logger.info("Starting " + CollectionUtils.toStringSpaceSeparated(args) + info);
-            Process proc;
-            try {
-                proc = builder.start();
-            } catch (IOException e) {
-                proc = null;
-                logger.error(e);
-            }
+            Process proc = builder.start();
             ProcessUnit result = new ProcessUnit(description, proc, timeout, listener, checkRegEx, logger);
             if (null != proc) {
                 Consumer<String> inConsumer = null;

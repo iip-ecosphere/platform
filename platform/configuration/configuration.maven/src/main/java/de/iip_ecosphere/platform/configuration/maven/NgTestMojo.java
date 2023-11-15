@@ -54,7 +54,7 @@ public class NgTestMojo extends AbstractLoggingMojo {
                 .addArgument(headless, "--browsers=ChromeHeadless")
                 .addArgument(coverage, "--code-coverage")
                 .redirectErr2In()
-                .build();
+                .build4Mvn();
             int status = pu.waitFor();
             if (ProcessUnit.isFailed(status)) {
                 throw new MojoExecutionException(pu.getDescription() + " failed with status: " + status);

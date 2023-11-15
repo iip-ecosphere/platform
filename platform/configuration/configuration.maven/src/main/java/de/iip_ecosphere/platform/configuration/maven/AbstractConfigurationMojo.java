@@ -281,7 +281,7 @@ public abstract class AbstractConfigurationMojo extends AbstractLoggingMojo {
      */
     protected boolean modelNewerThanOut(String metaModelDir, String modelDir, String outDir) {
         boolean result = false;
-        List<File> metaModelFiles = checkFilesByHash("easy-meta", metaModelDir, "IVML meta model");
+        List<File> metaModelFiles = checkFilesByHash("easy-meta", metaModelDir, null);
         List<File> modelFiles = checkFilesByHash("easy", modelDir, "IVML model");
         if (enabled(modelFiles) || enabled(metaModelFiles)) { 
             long maxModel = getMaxLastModified(modelDir, f -> f.getName().endsWith(".ivml"));
@@ -310,7 +310,7 @@ public abstract class AbstractConfigurationMojo extends AbstractLoggingMojo {
      * @return the changed files or <b>null</b> for unsure/none detected
      */
     private List<File> checkFilesByHash(String hashFileName, String modelDir, String info) {
-        File hashFile = new File(project.getBuild().getDirectory(), hashFileName + FileChangeDetector.FILE_EXTENSION);
+        File hashFile = FileChangeDetector.getHashFileInTarget(project, hashFileName);
         List<File> modelFiles = null;
         File model = new File(modelDir);
         try (Stream<Path> stream = Files.walk(model.toPath())) {

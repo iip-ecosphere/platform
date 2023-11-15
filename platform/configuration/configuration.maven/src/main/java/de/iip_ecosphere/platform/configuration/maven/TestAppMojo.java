@@ -152,9 +152,10 @@ public class TestAppMojo extends AbstractLoggingMojo {
      * 
      * @param builder the builder
      * @return the created process unit
+     * @throws MojoExecutionException if creating the process fails
      */
-    private ProcessUnit buildAndRegister(ProcessUnitBuilder builder) {
-        ProcessUnit result = builder.build();
+    private ProcessUnit buildAndRegister(ProcessUnitBuilder builder) throws MojoExecutionException {
+        ProcessUnit result = builder.build4Mvn();
         units.add(0, result);
         return result;
     }
@@ -191,8 +192,10 @@ public class TestAppMojo extends AbstractLoggingMojo {
      * @param scriptName the script name (without extension)
      * @param args additional optional arguments
      * @return the process unit builder
+     * @throws MojoExecutionException if starting the service fails
      */
-    private ProcessUnit startPlatformService(String description, File home, String scriptName, String... args) {
+    private ProcessUnit startPlatformService(String description, File home, String scriptName, String... args) 
+        throws MojoExecutionException {
         AtomicBoolean started = new AtomicBoolean();
         ProcessUnit pu = buildAndRegister(createPlatformBuilder(description, home, scriptName, r -> {
             if (TerminationReason.MATCH_COMPLETE == r) {
@@ -200,7 +203,10 @@ public class TestAppMojo extends AbstractLoggingMojo {
             }
             return false;
         }, args));
-        TimeUtils.waitFor(() -> !started.get(), 10000, 300);
+        TimeUtils.waitFor(() -> !started.get(), 50 * 1000, 300);
+        if (!started.get()) {
+            throw new MojoExecutionException("Start of " + pu.getDescription() + " did not emit expected regEx");
+        }
         return pu;
     }
     
@@ -216,8 +222,9 @@ public class TestAppMojo extends AbstractLoggingMojo {
      * @see #startEcsServiceManager
      * @see #startEcsRuntime
      * @see #startServiceManager
+     * @throws MojoExecutionException if starting the service fails
      */
-    private RuntimeSetup startPlatform(int brokerPort) {
+    private RuntimeSetup startPlatform(int brokerPort) throws MojoExecutionException {
         RuntimeSetup result = null;
         if (isValidFile(platformDir)) {
             File rtSetup = RuntimeSetup.getFile();
@@ -279,7 +286,7 @@ public class TestAppMojo extends AbstractLoggingMojo {
                 .addShellScriptCommand("cli")
                 .addArgument(deploy ? "deploy" : "undeploy")
                 .addArgument(deploymentPlan.getAbsolutePath())
-                .build();
+                .build4Mvn();
             int status = pu.waitFor();
             if (ProcessUnit.isFailed(status)) {
                 throw new MojoExecutionException(pu.getDescription() + " terminated with status: " + status);
@@ -426,6 +433,43 @@ public class TestAppMojo extends AbstractLoggingMojo {
     }
 
     /**
+     * Replaces a placeholder in the UI configuration template by a String value.
+     * 
+     * @param contents the contents to apply the replacement on
+     * @param placeholder the placeholder name
+     * @param value the value to replace the placeholder with
+     * @return the modified contents
+     */
+    private String replacePlaceholder(String contents, String placeholder, String value) {
+        return null == value ? contents : contents.replace("${" + placeholder + "}", value);
+    }
+
+    /**
+     * Replaces a placeholder in the UI configuration template by a URI value.
+     * 
+     * @param contents the contents to apply the replacement on
+     * @param placeholder the placeholder name
+     * @param value the value to replace the placeholder with
+     * @param info information on the placeholder/value for logging
+     * @return the modified contents
+     */
+    private String replaceAsUri(String contents, String placeholder, String value, String info) {
+        String result = contents;
+        if (null != value) {
+            try {
+                URI uri = new URI(value);
+                uri = new URI(uri.getScheme(), null, uri.getHost(), uri.getPort(), null, null, null);
+                result = replacePlaceholder(contents, placeholder, uri.toString());
+            } catch (URISyntaxException  e) {
+                getLog().error("Cannot process " + info + ": " + e.getMessage());
+            }
+        } else {
+            getLog().warn("No " + info + " stated in runtime setup");
+        }
+        return result;
+    }
+
+    /**
      * If {@code setup} is given, turn {@link #mgtUiSetupFileTemplate} into {@link #mgtUiSetupFile} by 
      * replacing {@code ${aasRegistryUri}}.
      * 
@@ -434,23 +478,18 @@ public class TestAppMojo extends AbstractLoggingMojo {
     private void writeMgtUiSetup(RuntimeSetup setup) {
         boolean mgtOutFileDefined = mgtUiSetupFile != null && mgtUiSetupFile.getPath().length() > 0; 
         if (null != setup && isValidFile(mgtUiSetupFileTemplate) && mgtOutFileDefined) {
-            String reg = setup.getAasRegistry();
-            if (null != reg) {
-                try {
-                    URI uri = new URI(reg);
-                    uri = new URI(uri.getScheme(), null, uri.getHost(), uri.getPort(), null, null, null);
-                    String contents = FileUtils.readFileToString(mgtUiSetupFileTemplate, Charset.defaultCharset());
-                    contents = contents.replace("${aasRegistryUri}", uri.toString());
-                    mgtUiSetupFile.getParentFile().mkdirs();
-                    try (PrintWriter out = new PrintWriter(new FileWriter(mgtUiSetupFile))) {
-                        out.println(contents);
-                    }
-                    getLog().info("Wrote management UI setup file " + mgtUiSetupFile);
-                } catch (URISyntaxException | IOException e) {
-                    getLog().error("Cannot process managment UI setup template/file: " + e.getMessage());
+            
+            try {
+                String contents = FileUtils.readFileToString(mgtUiSetupFileTemplate, Charset.defaultCharset());
+                contents = replaceAsUri(contents, "aasRegistryUri", setup.getAasRegistry(), "AAS registry");
+                contents = replaceAsUri(contents, "aasServerUri", setup.getAasServer(), "AAS server");
+                mgtUiSetupFile.getParentFile().mkdirs();
+                try (PrintWriter out = new PrintWriter(new FileWriter(mgtUiSetupFile))) {
+                    out.println(contents);
                 }
-            } else {
-                getLog().warn("No AAS registry URI stated in runtime setup");
+                getLog().info("Wrote processed management UI setup file " + mgtUiSetupFile);
+            } catch (IOException e) {
+                getLog().error("Cannot process managment UI setup template/file: " + e.getMessage());
             }
         } else {
             if (null == setup) {
@@ -545,7 +584,7 @@ public class TestAppMojo extends AbstractLoggingMojo {
         boolean failed = stopProcessUnits();
         if (testUnit.hasCheckRegEx()) {
             if (!testUnit.getLogMatches()) {
-                throw new MojoFailureException("Specified regular expressions do not match. Test did not succeed.");
+                throw new MojoExecutionException("Specified regular expressions do not match. Test did not succeed.");
             }
         }
         if (failed) {

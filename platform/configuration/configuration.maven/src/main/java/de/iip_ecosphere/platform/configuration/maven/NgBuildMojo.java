@@ -38,7 +38,7 @@ public class NgBuildMojo extends AbstractLoggingMojo {
                 .addArgumentOrScriptCommand("npm")
                 .addArgument("install")
                 .addArgument("--no-progress")
-                .build();
+                .build4Mvn();
             int status = pu.waitFor();
             if (ProcessUnit.isFailed(status)) {
                 throw new MojoExecutionException(pu.getDescription() + " failed with status: " + status);
@@ -47,7 +47,7 @@ public class NgBuildMojo extends AbstractLoggingMojo {
                 .addArgumentOrScriptCommand("ng")
                 .addArgument("build")
                 .redirectErr2In()
-                .build();
+                .build4Mvn();
             status = pu.waitFor();
             if (ProcessUnit.isFailed(status)) {
                 throw new MojoExecutionException(pu.getDescription() + " failed with status: " + status);
