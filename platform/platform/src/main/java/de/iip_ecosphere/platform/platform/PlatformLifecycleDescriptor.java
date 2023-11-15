@@ -61,7 +61,7 @@ public class PlatformLifecycleDescriptor implements LifecycleDescriptor, PidLife
         PersistenceType pType = rcp.toPersistenceType(setup.getAas().getPersistence().name());
         String fullRegUri = AasFactory.getInstance().getFullRegistryUri(regEndpoint);
         LoggerFactory.getLogger(getClass()).info("Starting {} AAS registry on {}", pType, fullRegUri);
-        rSetup.setAasRegistry(fullRegUri);
+        rSetup.setAasRegistry(regEndpoint.toUri());
         registryServer = rcp.createRegistryServer(regEndpoint, pType);
         registryServer.start();
         Endpoint serverEndpoint = aasSetup.adaptEndpoint(aasSetup.getServerEndpoint());
