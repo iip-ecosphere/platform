@@ -294,8 +294,28 @@ public class YamlFile {
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         @SuppressWarnings("unchecked")
         Map<String, Object> myObjectMap = mapper.convertValue(obj, HashMap.class);
-        data.forEach((k, v)-> myObjectMap.merge(k, v, (v1, v2)-> v2));
-        return mapper.convertValue(myObjectMap , cls);        
+        data.forEach((k, v) -> map(k, v, myObjectMap));
+        return mapper.convertValue(myObjectMap, cls);        
     }
 
+    /**
+     * Maps {@code key} with value {@code value} to target. Performs a nested, recursive mapping
+     * if {@code value} and the value of {@code key} in {@code target} are of type {@link Map} (assuming 
+     * String-Object maps).
+     * 
+     * @param key the key to map
+     * @param value the value associated to {@code key}
+     * @param target the target map to override
+     */
+    @SuppressWarnings("unchecked")
+    private static void map(String key, Object value, Map<String, Object> target) {
+        if (value instanceof Map && target.get(key) instanceof Map) {
+            Map<String, Object> src = (Map<String, Object>) value;
+            Map<String, Object> tgt = (Map<String, Object>) target.get(key);
+            src.forEach((k, v) -> map(k, v, tgt));
+        } else {
+            target.merge(key, value, (v1, v2) -> v2);
+        }
+    }
+    
 }

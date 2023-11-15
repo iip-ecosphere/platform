@@ -34,6 +34,8 @@ public class CollectorTest {
 
     /**
      * Tests the collector.
+     * 
+     * @throws IOException shall not occur
      */
     @Test
     public void testCollector() throws IOException {

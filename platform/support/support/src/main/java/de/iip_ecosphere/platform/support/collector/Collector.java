@@ -251,8 +251,8 @@ public class Collector {
     /**
      * Checks the file for data migration.
      * 
-     * @param dataFile
-     * @param toString
+     * @param dataFile the data file to be migrated
+     * @param toString function object implementing the toString operation
      */
     private static void checkMigration(File dataFile, Function<Object, String> toString) {
         File tmpFile = null;
