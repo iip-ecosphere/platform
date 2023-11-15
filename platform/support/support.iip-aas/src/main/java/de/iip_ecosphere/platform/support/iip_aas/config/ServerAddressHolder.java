@@ -153,7 +153,10 @@ public class ServerAddressHolder {
      */
     @JsonIgnore
     public ServerAddress getServerAddress() {
-        return new ServerAddress(schema, host, port < 0 ? NetUtils.getEphemeralPort() : port);
+        if (getPort() < 0) {
+            setPort(NetUtils.getEphemeralPort());
+        }
+        return new ServerAddress(getSchema(), getHost(), getPort());
     }
 
     /**

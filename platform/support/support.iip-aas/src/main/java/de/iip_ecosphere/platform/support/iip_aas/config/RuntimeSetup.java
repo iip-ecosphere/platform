@@ -33,6 +33,7 @@ import de.iip_ecosphere.platform.support.setup.AbstractSetup;
  */
 public class RuntimeSetup extends AbstractSetup {
     
+    private static RuntimeSetup instance;
     private String aasRegistry;
     private String aasServer;
 
@@ -114,18 +115,20 @@ public class RuntimeSetup extends AbstractSetup {
      * @param logOnFailure if failures shall be logged
      * @return the runtime setup, may be a default instance
      */
-    public static RuntimeSetup load(Supplier<RuntimeSetup> onFailure, boolean logOnFailure) {
-        RuntimeSetup result;
-        try (FileInputStream in = new FileInputStream(getFile())) {
-            result = AbstractSetup.readFromYaml(RuntimeSetup.class, in);
-        } catch (IOException e) {
-            if (logOnFailure) {
-                LoggerFactory.getLogger(RuntimeSetup.class).warn("Cannot read platform runtime setup {}: {} "
-                    + "Ephemeral AAS ports may not work.", getFile(), e.getMessage());
+    public static synchronized RuntimeSetup load(Supplier<RuntimeSetup> onFailure, boolean logOnFailure) {
+        if (null == instance) {
+            try (FileInputStream in = new FileInputStream(getFile())) {
+                instance = AbstractSetup.readFromYaml(RuntimeSetup.class, in);
+                LoggerFactory.getLogger(RuntimeSetup.class).info("Considering runtime setup from {}", getFile());
+            } catch (IOException e) {
+                if (logOnFailure) {
+                    LoggerFactory.getLogger(RuntimeSetup.class).warn("Cannot read platform runtime setup {}: {} "
+                        + "Ephemeral AAS ports may not work.", getFile(), e.getMessage());
+                }
+                instance = onFailure.get();
             }
-            result = onFailure.get();
         }
-        return result;
+        return instance;
     }
 
 }
