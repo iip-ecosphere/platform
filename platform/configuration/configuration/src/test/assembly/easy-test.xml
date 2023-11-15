@@ -20,5 +20,13 @@
             </excludes>
             <useDefaultExcludes>true</useDefaultExcludes>
         </fileSet>
+        <fileSet>
+            <directory>${project.basedir}</directory>
+            <outputDirectory/>
+            <includes>
+                <include>resources/**/*.*</include>
+            </includes>
+            <useDefaultExcludes>true</useDefaultExcludes>
+        </fileSet>
     </fileSets>
 </assembly>

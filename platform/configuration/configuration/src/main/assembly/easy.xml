@@ -17,13 +17,5 @@
             </includes>
             <useDefaultExcludes>true</useDefaultExcludes>
         </fileSet>
-        <fileSet>
-            <directory>${project.basedir}/resources</directory>
-            <outputDirectory/>
-            <includes>
-                <include>**/*.*</include>
-            </includes>
-            <useDefaultExcludes>true</useDefaultExcludes>
-        </fileSet>
     </fileSets>
 </assembly>
