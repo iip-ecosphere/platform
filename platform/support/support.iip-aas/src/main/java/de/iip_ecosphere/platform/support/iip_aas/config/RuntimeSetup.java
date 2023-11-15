@@ -92,7 +92,6 @@ public class RuntimeSetup extends AbstractSetup {
         Yaml yaml = new Yaml(constructor);
         try (FileWriter writer = new FileWriter(getFile())) {
             yaml.dump(this, writer);      
-            System.out.println(writer.toString()); 
         } catch (IOException e) {
             LoggerFactory.getLogger(RuntimeSetup.class).warn("Cannot write platform runtime setup {}: {} "
                 + "Ephemeral AAS ports may not work.", getFile(), e.getMessage());
