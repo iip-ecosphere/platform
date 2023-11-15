@@ -42,6 +42,7 @@ import de.iip_ecosphere.platform.configuration.maven.ProcessUnit.TerminationReas
 import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.LifecycleHandler;
 import de.iip_ecosphere.platform.support.NetUtils;
+import de.iip_ecosphere.platform.support.PidFile;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.collector.Collector;
 import de.iip_ecosphere.platform.support.iip_aas.config.RuntimeSetup;
@@ -178,6 +179,7 @@ public class TestAppMojo extends AbstractLoggingMojo {
             .setHome(home)
             .addShellScriptCommand(scriptName)
             .addArguments(args)
+            .addArgument("-D" + PidFile.PID_DIR_PROPERTY_NAME + "=" + FileUtils.getTempDirectoryPath())
             .addCheckRegEx(p)
             .setListener(listener)
             .setNotifyListenerByLogMatch(true);
