@@ -1,4 +1,4 @@
-import { TestBed } from '@angular/core/testing';
+import { TestBed, waitForAsync } from '@angular/core/testing';
 
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -41,23 +41,26 @@ describe('AppComponent', () => {
     expect(compiled.querySelector('div[class="main-title"]')?.textContent).toContain('IIP Ecosphere Management UI');
   });
 
-  if (EnvConfigService.inPlatformTest()) {
-
-    it('shall have version information'), () => {
-      const fixture = TestBed.createComponent(AppComponent);
-      fixture.detectChanges();
-      const compiled = fixture.nativeElement as HTMLElement;
-      expect(compiled.querySelector('p[id="version"]')?.textContent).toMatch(/^\d+\.\d+\.\d+(-SNAPSHOT)?$/);
+  it('shall have version information', () => {
+    if (EnvConfigService.inPlatformTest()) { // not outside, evaluated before, may not be loaded
+      waitForAsync(() => {
+        const fixture = TestBed.createComponent(AppComponent);
+        fixture.detectChanges();
+        const compiled = fixture.nativeElement as HTMLElement;
+        expect(compiled.querySelector('p[id="version"]')?.textContent).toMatch(/^\d+\.\d+\.\d+(-SNAPSHOT)?$/);
+      });
     }
+  });
 
-    it('shall have build identification'), () => {
-      const fixture = TestBed.createComponent(AppComponent);
-      fixture.detectChanges();
-      const compiled = fixture.nativeElement as HTMLElement;
-      expect(compiled.querySelector('p[id="buildId"]')?.textContent).toMatch(/^\d+$/);
+  it('shall have build identification', () => {
+    if (EnvConfigService.inPlatformTest()) { // not outside, evaluated before, may not be loaded
+      waitForAsync(() => {
+        const fixture = TestBed.createComponent(AppComponent);
+        fixture.detectChanges();
+        const compiled = fixture.nativeElement as HTMLElement;
+        expect(compiled.querySelector('p[id="buildId"]')?.textContent).toMatch(/^\d+$/);
+      });
     }
-
-
-  }
+  });
 
 });

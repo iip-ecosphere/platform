@@ -30,3 +30,30 @@ An installed management UI contains a setup JSON file in `assets/config/config.j
     }
     
 whereby the `ip` points to the platform AAS server and the the `urn` denotes the URN of the platform AAS.
+
+## Running the test suite
+
+The full test suite requires a running platform instance. This is automatically set up when running `mvn install`, as usual with `-Dunpack.force=true` to update the models or `-Dconfiguration.force` to rebuild the platform.
+
+## Developing with the test suite
+
+Repeatedly running the full test suite with platform setup may be time consuming. You may split up the two parts, running the platform instance and running the test suite so that you can keep the platform instance running an execute the tests on demand. However, you have to decide for either one until explicitly switching back. Assuming that your next execution of maven would execute the full test suite, call
+
+`mvn generate-test-sources -Dskip.replacement=true -Dunpack.force=true` 
+
+And in separate shells
+
+- `cd gen/platform`
+- `./platform.sh`
+
+as well as
+
+- `cd gen/platform`
+- `./ecsSvcMgr.sh`
+
+Ensure that the temporary file `src/test/tmp/config.json` does not exist (must be in `src` due to Angular conventions), i.e., delete it if it exist, and run then
+
+`ng test` or for more "headless" execution
+`ng test --no-watch --no-progress --browsers=ChromeHeadless` if desirable also with `--code-coverage` or further arguments.
+
+To re-enable the full tests, execute `mvn install -Dunpack.force=true`.

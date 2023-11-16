@@ -47,8 +47,8 @@ export class EnvConfigService {
           }
         )
         if (cfg != undefined && EnvConfigService.env == undefined) {
-          console.log("Loading setup from " + location);
           EnvConfigService.env = cfg;
+          console.log("Loading setup from " + location + ": " + JSON.stringify(cfg));
           window.config = cfg;
         }
       }
@@ -73,6 +73,16 @@ export class EnvConfigService {
     }
 
     public static inPlatformTest() : boolean {
+      console.log("Determining inTest");
+      if (EnvConfigService.env == undefined) {
+        console.log("EnvConfigService.env == undefined");
+      } else {
+        if (EnvConfigService.env?.inTest == undefined) {
+          console.log("EnvConfigService.env?.inTest == undefined");
+        } else {
+          console.log("IN TEST " + EnvConfigService.env?.inTest)
+        }
+      }
       return EnvConfigService.env == undefined ? false : 
         EnvConfigService.env?.inTest == undefined ? false : EnvConfigService.env?.inTest;
     }

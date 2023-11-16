@@ -14,7 +14,9 @@
   </parent>
   
   <properties>
+    <iip.resources>${project.build.directory}/easy-test/resources</iip.resources>
     <platformDir>gen/platform</platformDir>
+    <skip.replacement>false</skip.replacement>
   </properties>
   
   <dependencies>
@@ -84,7 +86,7 @@
                    <overWrite>true</overWrite>
                    <outputDirectory>${project.build.directory}/easy-test</outputDirectory>
                    <destFileName>model-test.jar</destFileName>
-                   <includes>common/**/*.*, simpleMesh/**/*.*</includes>
+                   <includes>common/**/*.*, simpleMesh/**/*.*, resources/**/*.*</includes>
                  </artifactItem>
                </artifactItems>
                <cleanup>
@@ -115,16 +117,21 @@
          </executions>
          <configuration>
              <file>${project.build.directory}/easy-test/common/CommonSetup.ivml</file>
-                 <replacements>
-                     <replacement>
-                         <token>port = 9001,</token>
-                         <value>port = -1,</value>
-                     </replacement>
-                     <replacement>
-                         <token>port = 9002,</token>
-                         <value>port = -1,</value>
-                     </replacement>
-                 </replacements>
+             <replacements>
+                 <replacement>
+                     <token>port = 9001,</token>
+                     <value>port = -1,</value>
+                 </replacement>
+                 <replacement>
+                     <token>port = 9002,</token>
+                     <value>port = -1,</value>
+                 </replacement>
+                 <replacement>
+                     <token>pidDir = "/run";</token>
+                     <value>pidDir = "${java.io.tmpdir}";</value>
+                 </replacement>
+             </replacements>
+             <skip>${skip.replacement}</skip>
          </configuration>
        </plugin>
        
@@ -134,6 +141,16 @@
            <artifactId>configuration-plugin</artifactId>
            <version>${project.version}</version>
            <executions>
+                <execution>
+                   <id>generateBroker</id>
+                   <phase>generate-test-sources</phase>
+                   <goals>
+                       <goal>generateBroker</goal>
+                   </goals>
+                   <configuration>
+                       <checkChanged>true</checkChanged>
+                   </configuration>
+                </execution>
                <execution>
                    <id>generateAll</id>
                    <phase>generate-test-sources</phase>
@@ -142,6 +159,7 @@
                    </goals>
                    <configuration>
                        <checkChanged>true</checkChanged>
+                       <resourcesDirectory>${iip.resources}</resourcesDirectory>
                    </configuration>
                </execution>
                <execution>

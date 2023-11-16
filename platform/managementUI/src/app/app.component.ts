@@ -20,7 +20,9 @@ export class AppComponent implements OnInit{
   constructor(private api: ApiService) {}
 
   async ngOnInit() {
+console.log("NGONINIT");    
     const response = await this.api.getPlatformData();
+console.log("NGONINIT: " + response);    
     if(response) {
       const version = response.find(
         item => item.idShort === 'version');
