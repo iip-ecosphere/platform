@@ -64,11 +64,8 @@ project CommonSetup {
     
     // ------------------------- UI -------------------------------
     
-    // managed model, not needed for tests but for testing managementUI
+    // generation/path setup, not needed for tests but for testing managementUI
     
-    metaModelFolder = "../../target/easy";
-    modelBaseFolder = "../../target/easy-test";
-    modelName = "PlatformConfiguration";
     footprintFolder = "gen/footprints";
     pidDir = "/run";
 
@@ -95,9 +92,6 @@ project CommonSetup {
         pidDir;
         artifactsFolder;
         artifactsUriPrefix;
-        metaModelFolder;
-        modelBaseFolder;
-        modelName;
         footprintFolder;
         .; // every variable declared in this project
     } but (f|f.bindingTime >= BindingTime.runtimeMon);

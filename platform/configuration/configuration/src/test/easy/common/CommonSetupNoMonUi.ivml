@@ -5,10 +5,19 @@ project CommonSetupNoMonUi {
     annotate BindingTime bindingTime = BindingTime::compile to .;
 
     // ------------ freezing ------------------
+
+    // managed model, not needed for tests but for testing managementUI
+    
+    metaModelFolder = "../../target/easy";
+    modelBaseFolder = "../../target/easy-test";
+    modelName = "PlatformConfiguration";
     
     freeze {
         platformMonitoring;
         managementUi;
+        metaModelFolder;
+        modelBaseFolder;
+        modelName;
         .; // every variable declared in this project
     } but (f|f.bindingTime >= BindingTime.runtimeMon);
 
