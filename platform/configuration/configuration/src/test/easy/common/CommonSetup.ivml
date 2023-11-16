@@ -70,6 +70,7 @@ project CommonSetup {
     modelBaseFolder = "../../target/easy-test";
     modelName = "PlatformConfiguration";
     footprintFolder = "gen/footprints";
+    pidDir = "/run";
 
     // ------------ freezing ------------------
     
