@@ -247,6 +247,13 @@ This artifact also contains a simple goal (`textFile`) for line-based text file 
                         <prepends>
                             <prepend>...</prepend>
                         </prepends>
+                        <replacements>
+                            <replacement>...
+                              <token>...</token>
+                              <value>...</value>
+                              <escapeValueIn>...</escapeValueIn>
+                            </replacement>
+                        </replacements>
                         <appends>
                             <append>...</append>
                         </append>
@@ -263,6 +270,7 @@ This artifact also contains a simple goal (`textFile`) for line-based text file 
 It can be set up as follows:
  - `file` (`-Dconfiguration.textFile.file=...`, no default) the name of the file to modify
  - `prepends` (`-Dconfiguration.textFile.prepends=...`, default empty) lines to be pretended, may contain property extrapolations to be applied before calling this plugin
+ - `replacements` on the original text lines, consisting of `replacement` entries with a `token` to search for (so far simple text, no regular expressions), the `value` to replace the token, and an escape mode (`escapeValueIn`) for `value`. `escapeValueIn` may be empty for none, or `backslashes` (just backslashes into Java style double backslashes), full `java` string escapes, full `ecma`/javascript string escapes or full `json` string escapes.
  - `appends` (`-Dconfiguration.textFile.appends=...`, default empty) lines to be appended, may contain property extrapolations to be applied before calling this plugin
  - `deletions` (`-Dconfiguration.textFile.deletions=...`, default empty) line numbers of the original file to be deleted
 
