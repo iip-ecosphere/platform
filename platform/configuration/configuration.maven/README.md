@@ -112,6 +112,7 @@ In addition, the goals `generateApps` and `generateAppsNoDeps` consider
 
 In addition, the goals `generateAll`, `generateApps` and `generatePlatform` consider
   - `checkChanged` in order to figure out whether the model, the meta model have changed to trigger an execution
+  - `chanceCheckArtifacts`, an optional list of `chanceCheckArtifact` maven coordinates whose snapshots may trigger an execution if changed since the last build
 
 # Application testing
 

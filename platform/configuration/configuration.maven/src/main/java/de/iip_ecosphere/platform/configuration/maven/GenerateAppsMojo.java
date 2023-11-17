@@ -18,6 +18,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
 import de.iip_ecosphere.platform.support.collector.Collector;
+
 /**
  * Generates the configured applications including dependencies to the implementing services.
  * 

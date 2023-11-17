@@ -21,16 +21,23 @@ import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.ProjectBuilder;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.repository.RemoteRepository;
 
 import de.iip_ecosphere.platform.configuration.PlatformInstantiator;
+import de.iip_ecosphere.platform.configuration.maven.DependencyResolver.Caller;
 import de.iip_ecosphere.platform.tools.maven.python.AbstractLoggingMojo;
 import de.iip_ecosphere.platform.tools.maven.python.FileChangeDetector;
 
@@ -39,13 +46,25 @@ import de.iip_ecosphere.platform.tools.maven.python.FileChangeDetector;
  * 
  * @author Holger Eichelberger, SSE
  */
-public abstract class AbstractConfigurationMojo extends AbstractLoggingMojo {
+public abstract class AbstractConfigurationMojo extends AbstractLoggingMojo implements Caller {
 
     @Parameter(defaultValue = "${project}", required = true, readonly = true)
     private MavenProject project;
 
     @Parameter(defaultValue = "${session}", required = true, readonly = true)
     private MavenSession session;
+    
+    @Component
+    private ProjectBuilder projectBuilder;
+
+    @Component
+    private ArtifactResolver resolver;
+    
+    @Parameter(defaultValue = "${project.remotePluginRepositories}", readonly = true)
+    private List<RemoteRepository> remoteRepos;
+    
+    @Component
+    private RepositorySystem repoSystem;    
     
     @Parameter(property = "configuration.model", required = true)
     private String model;
@@ -80,15 +99,14 @@ public abstract class AbstractConfigurationMojo extends AbstractLoggingMojo {
     @Parameter(property = "configuration.checkChanged", required = false, defaultValue = "false")
     private boolean checkChanged;
 
+    @Parameter(property = "configuration.changeCheckArtifacts", required = false, defaultValue = "")
+    private List<String> changeCheckArtifacts;
+
     // different name, hook up with unpack
     @Parameter(property = "unpack.force", required = false, defaultValue = "false") 
     private boolean unpackForce;
 
-    /**
-     * Returns the actual Maven project.
-     * 
-     * @return the project
-     */
+    @Override
     public MavenProject getProject() {
         return project;
     }
@@ -280,15 +298,35 @@ public abstract class AbstractConfigurationMojo extends AbstractLoggingMojo {
      * @return {@code true} if {@code modelDir} is considered to be newer than {@code outDir}, {@code false} else
      */
     protected boolean modelNewerThanOut(String metaModelDir, String modelDir, String outDir) {
-        boolean result = false;
-        List<File> metaModelFiles = checkFilesByHash("easy-meta", metaModelDir, null);
-        List<File> modelFiles = checkFilesByHash("easy", modelDir, "IVML model");
-        if (enabled(modelFiles) || enabled(metaModelFiles)) { 
+        boolean newer = false;
+        File metaHashFile = FileChangeDetector.getHashFileInTarget(project, "easy-meta");
+        File modelHashFile = FileChangeDetector.getHashFileInTarget(project, "easy");
+        List<File> metaModelFiles = checkFilesByHash(metaHashFile, metaModelDir, null);
+        List<File> modelFiles = checkFilesByHash(modelHashFile, modelDir, "IVML model");
+        boolean enabled = enabled(modelFiles) || enabled(metaModelFiles);
+        if (metaHashFile.exists() || modelHashFile.exists()) {
+            if (null != changeCheckArtifacts && !changeCheckArtifacts.isEmpty()) {
+                Predicate<File> pred = f -> isNewer(f, metaHashFile) || isNewer(f, modelHashFile);
+                enabled |= new DependencyResolver(this).haveDependenciesChangedSince(changeCheckArtifacts, pred);
+            }
+        }
+        if (enabled) { 
             long maxModel = getMaxLastModified(modelDir, f -> f.getName().endsWith(".ivml"));
             long maxOut = getMaxLastModified(outDir, f -> true);
-            result = maxOut < 0 || maxModel > maxOut;
+            newer = maxOut < 0 || maxModel > maxOut;
         }
-        return result;
+        return newer;
+    }
+    
+    /**
+     * Returns whether {@code artifact} is newer than {@code hash}.
+     * 
+     * @param artifact the artifact file
+     * @param hash the hash file
+     * @return if {@code artifact} is newer than {@code hash}
+     */
+    private boolean isNewer(File artifact, File hash) {
+        return hash != null && artifact.lastModified() > hash.lastModified();
     }
 
     /**
@@ -304,13 +342,12 @@ public abstract class AbstractConfigurationMojo extends AbstractLoggingMojo {
     /**
      * Checks files by MD5 change hashes.
      * 
-     * @param hashFileName the name of the has file (extension will be added)
+     * @param hashFile the hash file
      * @param modelDir the directory of files to analyze
      * @param info logging information on the task
      * @return the changed files or <b>null</b> for unsure/none detected
      */
-    private List<File> checkFilesByHash(String hashFileName, String modelDir, String info) {
-        File hashFile = FileChangeDetector.getHashFileInTarget(project, hashFileName);
+    private List<File> checkFilesByHash(File hashFile, String modelDir, String info) {
         List<File> modelFiles = null;
         File model = new File(modelDir);
         try (Stream<Path> stream = Files.walk(model.toPath())) {
@@ -409,4 +446,19 @@ public abstract class AbstractConfigurationMojo extends AbstractLoggingMojo {
     protected void recordExecutionTime(long time) {
     }
     
+    @Override
+    public MavenSession getSession() {
+        return session;
+    }
+
+    @Override
+    public ProjectBuilder getProjectBuilder() {
+        return projectBuilder;
+    }
+
+    @Override
+    public RepositorySystem getRepoSystem() {
+        return repoSystem;
+    }
+
 }
