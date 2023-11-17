@@ -145,6 +145,9 @@
                    </goals>
                    <configuration>
                        <checkChanged>true</checkChanged>
+                       <changeCheckArtifacts>                       
+                           <changeCheckArtifact>${project.groupId}:platform.exec:${project.version}</changeCheckArtifact>
+                       </changeCheckArtifacts>
                    </configuration>
                 </execution>
                <execution>
@@ -155,6 +158,9 @@
                    </goals>
                    <configuration>
                        <checkChanged>true</checkChanged>
+                       <changeCheckArtifacts>                       
+                           <changeCheckArtifact>${project.groupId}:platform.exec:${project.version}</changeCheckArtifact>
+                       </changeCheckArtifacts>
                        <resourcesDirectory>${iip.resources}</resourcesDirectory>
                    </configuration>
                </execution>
