@@ -173,16 +173,24 @@ public abstract class AbstractSetup {
             }
         } 
         if (null != overwrite) {
-            try {
-                Yaml yaml = new Yaml();
-                @SuppressWarnings("unchecked")
-                Map<String, Object> data = (Map<String, Object>) yaml.load(overwrite);
-                result = YamlFile.overwrite(result, cls, data);
-                overwrite.close();
-            } catch (YAMLException | IOException e) {
-                overwrite.close();
-                LoggerFactory.getLogger(AbstractSetup.class).error("Cannot overwrite setup: {} Ignoring.", 
-                    e.getMessage());
+            boolean hasAnnotation = false;
+            Class<?> iter = cls;
+            while (iter != null && iter != Object.class && !hasAnnotation) {
+                hasAnnotation = iter.getAnnotation(EnableSetupMerge.class) != null;
+                iter = iter.getSuperclass();
+            }
+            if (hasAnnotation) {
+                try {
+                    Yaml yaml = new Yaml();
+                    @SuppressWarnings("unchecked")
+                    Map<String, Object> data = (Map<String, Object>) yaml.load(overwrite);
+                    result = YamlFile.overwrite(result, cls, data);
+                    overwrite.close();
+                } catch (YAMLException | IOException e) {
+                    overwrite.close();
+                    LoggerFactory.getLogger(AbstractSetup.class).error("Cannot overwrite setup: {} Ignoring.", 
+                        e.getMessage());
+                }
             }
         }
         return result;
