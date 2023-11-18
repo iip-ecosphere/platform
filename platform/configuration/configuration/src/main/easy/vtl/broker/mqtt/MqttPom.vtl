@@ -40,6 +40,14 @@ template MqttPom(IIPEcosphere config, FileArtifact target, String ver) {
           <repository>
             <id>bintray</id>
             <url>https://jcenter.bintray.com</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+                <updatePolicy>never</updatePolicy> <!-- local installs -->
+            </snapshots>
           </repository>
         </repositories>
     
