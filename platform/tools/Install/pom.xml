@@ -23,40 +23,16 @@
       <name>SSE</name>
       <url>https://projects.sse.uni-hildesheim.de/qm/maven/</url>
       <layout>default</layout>
-      <releases>
-          <enabled>true</enabled>
-          <updatePolicy>never</updatePolicy>
-      </releases>
-      <snapshots>
-          <enabled>true</enabled>
-          <updatePolicy>always</updatePolicy>
-      </snapshots>
     </repository>
     
     <repository>
         <id>central</id> <!-- same ID as in easy-maven-settings.xml -->
         <url>https://repo1.maven.org/maven2</url>
-        <releases>
-            <enabled>true</enabled>
-            <updatePolicy>never</updatePolicy>
-        </releases>
-        <snapshots>
-            <enabled>false</enabled>
-            <updatePolicy>daily</updatePolicy>
-        </snapshots>
     </repository>
     
     <repository>
         <id>bintray</id>
         <url>https://jcenter.bintray.com</url>
-        <releases>
-            <enabled>true</enabled>
-            <updatePolicy>never</updatePolicy>
-        </releases>
-        <snapshots>
-            <enabled>false</enabled>
-            <updatePolicy>daily</updatePolicy>
-        </snapshots>
     </repository>
   </repositories>
 
