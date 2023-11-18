@@ -25,17 +25,37 @@
     <repository>
         <id>central</id> <!-- same ID as in easy-maven-settings.xml -->
         <url>https://repo1.maven.org/maven2</url>
+        <snapshots>
+            <enabled>false</enabled>
+            <updatePolicy>never</updatePolicy> <!-- local installs -->
+        </snapshots>
     </repository>
     
     <repository>
         <id>bintray</id>
         <url>https://jcenter.bintray.com</url>
+        <releases>
+            <enabled>true</enabled>
+            <updatePolicy>never</updatePolicy>
+        </releases>
+        <snapshots>
+            <enabled>false</enabled>
+            <updatePolicy>never</updatePolicy> <!-- local installs -->
+        </snapshots>
     </repository>
     
     <!-- not needed on Windows but Linux complains without -->
     <repository>
         <id>dcache</id>
         <url>https://download.dcache.org/nexus/repository/berkeleydb-je/</url>
+        <releases>
+            <enabled>true</enabled>
+            <updatePolicy>never</updatePolicy>
+        </releases>
+        <snapshots>
+            <enabled>false</enabled>
+            <updatePolicy>never</updatePolicy> <!-- local installs -->
+        </snapshots>
     </repository>
   </repositories>
   
