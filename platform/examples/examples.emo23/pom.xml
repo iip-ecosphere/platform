@@ -20,49 +20,22 @@
       <name>SSE</name>
       <url>https://projects.sse.uni-hildesheim.de/qm/maven/</url>
       <layout>default</layout>
-      <snapshots>
-          <updatePolicy>always</updatePolicy>
-      </snapshots>
     </repository>
     
     <repository>
         <id>central</id> <!-- same ID as in easy-maven-settings.xml -->
         <url>https://repo1.maven.org/maven2</url>
-        <releases>
-            <enabled>true</enabled>
-            <updatePolicy>never</updatePolicy>
-        </releases>
-        <snapshots>
-            <enabled>false</enabled> <!-- as long as on SSE-mvn -->
-            <updatePolicy>daily</updatePolicy>
-        </snapshots>
     </repository>
     
     <repository>
         <id>bintray</id>
         <url>https://jcenter.bintray.com</url>
-        <releases>
-            <enabled>true</enabled>
-            <updatePolicy>never</updatePolicy>
-        </releases>
-        <snapshots>
-            <enabled>false</enabled>
-            <updatePolicy>daily</updatePolicy>
-        </snapshots>
     </repository>
     
     <!-- not needed on Windows but Linux complains without -->
     <repository>
         <id>dcache</id>
         <url>https://download.dcache.org/nexus/repository/berkeleydb-je/</url>
-        <releases>
-            <enabled>true</enabled>
-            <updatePolicy>never</updatePolicy>
-        </releases>
-        <snapshots>
-            <enabled>false</enabled>
-            <updatePolicy>daily</updatePolicy>
-        </snapshots>
     </repository>
   </repositories>
   
