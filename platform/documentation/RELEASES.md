@@ -17,7 +17,10 @@ Improvements:
 * [#157](https://github.com/iip-ecosphere/platform/issues/157): Clean up and untangle the configuration build flow, also for releases
 * [#115](https://github.com/iip-ecosphere/platform/issues/115): Cleanup, e.g., old build processes. AasUtils is now in support.aas, Version, AbstractSetup, JsonUtils are now in support. Duplicate classes were removed.
 * Build process terminates immediately on error.
-* Example tests are executed uniformely through maven.
+* Example tests are executed uniformly through maven. Maven based tests can start/stop entire platform (used in managemt UI as test environment).
+* Platform maven plugins can detect platform model and maven component changes. 
+* Platform runtime properties in pidDir/oktoflow.yaml.
+* Partial setup override in oktoflow-local.yml.
 
 ### Version 0.6.0 (2023/10/11, EMO'23):
 
