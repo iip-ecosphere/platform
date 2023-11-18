@@ -17,6 +17,14 @@
     <repository>
         <id>thingsboard</id>
         <url>https://repo.thingsboard.io/artifactory/libs-release-public</url>
+        <releases>
+            <enabled>true</enabled>
+            <updatePolicy>never</updatePolicy>
+        </releases>
+        <snapshots>
+            <enabled>false</enabled>
+            <updatePolicy>never</updatePolicy> <!-- local installs -->
+        </snapshots>
     </repository>
   </repositories>
 
