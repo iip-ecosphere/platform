@@ -80,6 +80,9 @@ public class TestAppMojo extends AbstractLoggingMojo {
     @Parameter(property = "configuration.testApp.appPom", required = false)
     private File appPom;
 
+    @Parameter(property = "configuration.testApp.appOffline", required = false, defaultValue = "true")
+    private boolean appOffline;
+
     @Parameter(property = "configuration.testApp.appArgs", required = false)
     private List<String> appArgs;
 
@@ -396,7 +399,7 @@ public class TestAppMojo extends AbstractLoggingMojo {
             tmpAppArgs = " " + CollectionUtils.toStringSpaceSeparated(appArgs);
         }
         testBuilder.addMavenCommand();
-        if (offline) {
+        if (offline || appOffline) {
             testBuilder.addArgument("-o");
         }
         String sPath = System.getenv("MAVEN_SETTINGS_PATH");
