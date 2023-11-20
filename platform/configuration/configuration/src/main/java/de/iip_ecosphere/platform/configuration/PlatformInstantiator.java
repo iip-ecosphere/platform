@@ -304,6 +304,20 @@ public class PlatformInstantiator {
             System.exit(exitCode);
         }
     }
+
+    /**
+     * Sets the trace filter based on the system property {@link #KEY_PROPERTY_TRACING}.
+     */
+    public static void setTraceFilter() {
+        String tracing = System.getProperty(KEY_PROPERTY_TRACING, "TOP").toUpperCase();
+        ITraceFilter filter = TopLevelExecutionTraceFilter.INSTANCE;
+        if ("FUNC".equals(tracing)) {
+            filter = new FunctionLevelTraceFilter();
+        } else if ("ALL".equals(tracing)) {
+            filter = NoTraceFilter.INSTANCE;
+        }
+        TracerFactory.setTraceFilter(filter);
+    }
     
     /**
      * Main functionality without returning exit code/output of help for re-use. Could be with explicit parameters...
@@ -314,14 +328,7 @@ public class PlatformInstantiator {
      *     default {@link InstantiationConfigurer}
      */
     public static int mainImpl(String[] args) throws ExecutionException {
-        String tracing = System.getProperty(KEY_PROPERTY_TRACING, "TOP").toUpperCase();
-        ITraceFilter filter = TopLevelExecutionTraceFilter.INSTANCE;
-        if ("FUNC".equals(tracing)) {
-            filter = new FunctionLevelTraceFilter();
-        } else if ("ALL".equals(tracing)) {
-            filter = NoTraceFilter.INSTANCE;
-        }
-        TracerFactory.setTraceFilter(filter);
+        setTraceFilter();
         InstantiationConfigurer c = new InstantiationConfigurer(args[0], new File(args[1]), new File(args[2]));
         if (args.length >= 4) {
             c.setStartRuleName(args[3]);

@@ -48,6 +48,8 @@ Applications projects containing the configuration model of the application typi
 
 ## Prerequisites
 
+Tracing for tests is set to `TOP` since version 0.7.0. Tracing can be enabled via the system property `iip.easy.tracing` using the values `ALL`, `FUNC` or `TOP`.
+
 For running the tests locally, you need a Python 3.9 with all IIP-Python dependencies (see platform handbook and [Install Package](../../tools/Install)) installed. On Windows, this can easily be obtained from the Microsoft Store.
 
 For running the container tests, you need Docker and LXC (Linux only). To bypass the container creation in either case, use `-Deasy.docker.failOnError=false` to disable failure reporting during Docker instantiator execution or `-Deasy.lxc.failOnError=false` to disable failure reporting for the LXC instantiator. The instantiation process shall then run anyway and produce the related artifacts, e.g., Dockerfiles or LXC templates, but no container images are created/deployed.

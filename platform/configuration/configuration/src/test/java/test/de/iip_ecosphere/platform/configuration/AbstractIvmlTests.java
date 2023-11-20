@@ -31,6 +31,7 @@ import de.iip_ecosphere.platform.configuration.ConfigurationLifecycleDescriptor;
 import de.iip_ecosphere.platform.configuration.ConfigurationSetup;
 import de.iip_ecosphere.platform.configuration.EasyLogLevel;
 import de.iip_ecosphere.platform.configuration.EasySetup;
+import de.iip_ecosphere.platform.configuration.PlatformInstantiator;
 import de.iip_ecosphere.platform.configuration.PlatformInstantiator.InstantiationConfigurer;
 import de.iip_ecosphere.platform.services.environment.YamlArtifact;
 import de.iip_ecosphere.platform.support.LifecycleDescriptor;
@@ -69,6 +70,7 @@ public abstract class AbstractIvmlTests {
             f = new File("resources");
         }
         System.setProperty("iip.resources", f.getAbsolutePath());
+        PlatformInstantiator.setTraceFilter();
     }
     
     /**
