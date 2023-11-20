@@ -18,6 +18,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.io.PrintWriter;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -52,11 +53,17 @@ public class TextFileMojo extends AbstractMojo {
 
     @Parameter(property = "configuration.textFile.deletions", required = false)
     private Set<String> deletions;
+    
+    @Parameter(property = "configuration.textFile.disabled", required = false)
+    private Set<String> disabled;
 
     @Parameter
     private List<ReplacementSpec> replacements;
 
     public static class ReplacementSpec {
+        
+        @Parameter(required = false)
+        private String id;
         
         @Parameter(required = true)
         private String token;
@@ -70,6 +77,20 @@ public class TextFileMojo extends AbstractMojo {
     }
     
     /**
+     * Checks whether the given {@code spec} is disabled.
+     * 
+     * @param spec the replacement specification
+     * @return {@code true} for disabled, {@code false} else
+     */
+    private boolean isDisabled(ReplacementSpec spec) {
+        boolean result = false;
+        if (spec.id != null && spec.id.length() > 0 && disabled != null) {
+            result = disabled.contains(spec.id);
+        }
+        return result;
+    }
+    
+    /**
      * Applies the specified replacements to {@code line}.
      * 
      * @param line the line to apply the replacements to
@@ -78,7 +99,7 @@ public class TextFileMojo extends AbstractMojo {
     private String applyReplacements(String line) {
         if (null != replacements) {
             for (ReplacementSpec r : replacements) {
-                if (r.token != null && r.value != null) {
+                if (r.token != null && r.value != null && !isDisabled(r)) {
                     String val = r.value;
                     if (r.escapeValueIn != null) {
                         switch (r.escapeValueIn.toLowerCase()) {
@@ -105,9 +126,22 @@ public class TextFileMojo extends AbstractMojo {
         return line;
     }
     
+    /**
+     * Returns whether a collection is not <b>null</b> and not empty.
+     * 
+     * @param coll the collection to test
+     * @return {@code true} for not empty, {@code false} else
+     */
+    private static boolean isNonEmpty(Collection<?> coll) {
+        return coll != null && coll.size() > 0;
+    }
+    
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         if (!skip) {
+            if (isNonEmpty(replacements) && isNonEmpty(disabled)) {
+                getLog().info("Disabled replacement specs: " + disabled);
+            }
             File tmp = FileUtils.createTempFile("mvnTextFile", ".txt", null);
             try {
                 FileUtils.copyFile(file, tmp);
