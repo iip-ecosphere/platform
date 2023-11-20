@@ -37,7 +37,6 @@ export class InstancesComponent implements OnInit {
   }
 
   public async getInstances() {
-    console.log("method getInstances")
     const data = await this.api.getInstances();
     if(data) {
       this.filteredData = []

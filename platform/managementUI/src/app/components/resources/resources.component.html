@@ -7,7 +7,7 @@
         <mat-card tabindex="0" class="device" >
           <mat-card-content>
             <div id="box">
-              <div>
+              <div id="head">
                 <img src="/assets/aas.png" alt="image" class="img-aas">
                 <h1>{{ element.idShort }}</h1>
 
@@ -15,7 +15,7 @@
                   {{element.generalInformation.ManufacturerName}}</p>
                 <ng-template #noName>Unknown Manufacturer</ng-template>
               </div>
-              <div>
+              <div id="picture">
                 <img *ngIf="!element.generalInformation?.picture; else pictureAvailable"
                   src="../../../assets/deviceDefault.jpg"
                   [alt]="element.idShort" width="120px" height="120px">
@@ -25,7 +25,7 @@
                 </ng-template>
               </div>
             </div>
-            <div class="bottom">
+            <div class="bottom" id="bottom">
               <button mat-raised-button class="button" (click)="details(element.idShort)">
                 resource details
               </button>

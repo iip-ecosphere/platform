@@ -120,10 +120,12 @@
                           <piddir>/oktoflow.yml -->
 		             <replacements>
 		                 <replacement>
+		                     <id>full</id>
 		                     <token>port = 9001,</token>
 		                     <value>port = -1,</value>
 		                 </replacement>
 		                 <replacement>
+		                     <id>full</id>
 		                     <token>port = 9002,</token>
 		                     <value>port = -1,</value>
 		                 </replacement>

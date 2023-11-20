@@ -21,8 +21,7 @@ export class DrawflowService {
     if (env && env.urn) {
       this.urn = env.urn;
     }
-    console.log( "ip: " + this.ip)
-   }
+  }
 
   public async getGraph(mesh: string) {
     let response;

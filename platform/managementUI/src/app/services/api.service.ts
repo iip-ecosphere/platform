@@ -26,7 +26,6 @@ export class ApiService {
     if (env && env.urn) {
       this.urn = env.urn;
     }
-    console.log( "ip: " + this.ip)
    }
 
   resources: PlatformResources = {};

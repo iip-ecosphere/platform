@@ -72,7 +72,6 @@ export class EditorComponent implements OnInit {
         value: this.refinedTypes
       }
     } else if(!this.type) {
-      console.log("get meta")
       this.getMeta()
     } else if(this.metaBackup && this.metaBackup.value && this.type.type){
       let type = this.cleanTypeName(this.type.type);
