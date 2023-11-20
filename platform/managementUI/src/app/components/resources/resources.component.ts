@@ -51,9 +51,7 @@ export class ResourcesComponent implements OnInit {
     if(this.Data && this.Data.submodelElements) {
       this.tech.getTechnicalData(this.Data.submodelElements);
     }
-    this.filterSubmodelElements()
-
-    console.log(this.Data)
+    this.filterSubmodelElements();
   }
 
   elementsToFilter = ["deviceManager", "deviceRegistry", "containers"]
