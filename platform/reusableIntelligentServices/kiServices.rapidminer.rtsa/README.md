@@ -8,5 +8,5 @@ RTSA usually ships in one ZIP for the agent (to be named RTSA-version.ZIP) and o
 
 Testing of this component relies on the [fake version of RTSA](../kiServices.rapidminer.rtsaFake/README.md).
 
-If you are **not running the tests with Java 8**, specify `-Diip.test.java8=<path to java binary for JDK 8>`.
+If you are **not running the tests with Java 8**, specify `-Diip.test.java8=<path to java binary for JDK 8>`. If you may want to force fake RTSA, please specify `-Diip.rtsa.forceFake=true`;
 

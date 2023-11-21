@@ -233,7 +233,7 @@ public class RtsaRestServiceTest {
      * @return {@code true} for forcing fake RTSA, {@code false} for real RTSA if available (default)
      */
     private boolean forceFake() {
-        return false; // just for debugging
+        return Boolean.valueOf(System.getProperty("iip.rtsa.forceFake", "false")); // just for debugging
     }
     
     /**
