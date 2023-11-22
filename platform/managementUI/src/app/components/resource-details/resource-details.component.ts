@@ -23,16 +23,20 @@ export class ResourceDetailsComponent implements OnInit {
     public route: ActivatedRoute) { }
 
   ngOnInit(): void {
+    this.init();
+  }
+
+  // for testing, may be replaced by async ngOnInit
+  async init() {
     this.id = this.route.snapshot.paramMap.get('id')
     if (this.id) {
-      this.getResource(this.id);
+      await this.getResource(this.id);
     }
   }
 
   private async getResource(id: string) {
     this.resource = await this.api.getResource(id);
     this.resolveSemanticId();
-    console.log(this.resource)
   }
 
   public isObject(value: any) {
@@ -160,9 +164,6 @@ export class ResourceDetailsComponent implements OnInit {
 
   // Returns an array [name, description]
   public getSemanticInfo(response:platformResponse) {
-    console.log("resposne in getPlat..")
-    console.log(response)
-
     let return_value = [null, null];
     if(response && response.outputArguments) {
       let output = response.outputArguments[0]?.value?.value;
@@ -178,8 +179,6 @@ export class ResourceDetailsComponent implements OnInit {
         }
       }
     }
-    console.log("return value")
-    console.log(return_value)
     return return_value
   }
 

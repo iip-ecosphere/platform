@@ -18,7 +18,7 @@ import { ServicesComponent }
   from './components/services/services.component';
 import { LogsDialogComponent } from './components/services/logs/logs-dialog.component';
 
-const routes: Routes = [
+export const routes: Routes = [
   { path: '', redirectTo: 'resources', pathMatch: `full` },
   //{ path: '', redirectTo: 'logs', pathMatch: `full` },
   { path: 'resources/:id', component: ResourceDetailsComponent },

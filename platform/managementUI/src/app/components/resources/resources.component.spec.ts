@@ -4,17 +4,23 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ResourcesComponent } from './resources.component';
 import { HttpClientModule } from '@angular/common/http';
 import { EnvConfigService } from '../../services/env-config.service';
+import { Location } from "@angular/common";
+import { RouterTestingModule } from "@angular/router/testing";
+import { Router } from "@angular/router";
+import { routes } from "../../app-routing.module";
 
 describe('ResourcesComponent', () => {
   
   let fixture: ComponentFixture<ResourcesComponent>;
   let component: ResourcesComponent;
+  let location: Location;
+  let router: Router;
 
   beforeEach(async () => {
     await EnvConfigService.initAsync();
     await TestBed
       .configureTestingModule({
-        imports: [ HttpClientModule ],
+        imports: [ HttpClientModule, RouterTestingModule.withRoutes(routes) ],
         declarations: [ ResourcesComponent ],
         schemas: [CUSTOM_ELEMENTS_SCHEMA]
       })
@@ -22,7 +28,9 @@ describe('ResourcesComponent', () => {
       .then(() => {
         fixture = TestBed.createComponent(ResourcesComponent);
         component = fixture.componentInstance;
-        fixture.detectChanges();
+        fixture.detectChanges();        
+        router = TestBed.inject(Router);
+        location = TestBed.inject(Location);
       });
     await component.getData(); // could be ngOnInit but not async in original code
   });
@@ -51,12 +59,11 @@ describe('ResourcesComponent', () => {
       expect(divBottom).toBeTruthy();
       expect(divBottom.querySelector('button')).toBeTruthy();
 
-      //spyOn(component, 'onEditButtonClick');
+      let navigateSpy = spyOn(router, 'navigateByUrl');
       let button = compiled.querySelector('div[id="bottom"] button') as HTMLElement;
       expect(button?.innerText).toEqual('resource details');
       button.click();
-
-      // nothing happens
+      expect(navigateSpy).toHaveBeenCalledWith('/resources/local');
   });
 
 });
