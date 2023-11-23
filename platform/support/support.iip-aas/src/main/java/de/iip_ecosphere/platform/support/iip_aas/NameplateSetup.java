@@ -432,12 +432,11 @@ public class NameplateSetup {
     }
 
     /**
-     * Preliminary way to find the nameplate YML.
+     * Basic way of resolving a nameplate setup.
      * 
-     * @return the setup representing the nameplate YML
-     * @throws IOException if the setup file cannot be read
+     * @return the input stream containing the setup, may be <b>null</b> for none
      */
-    public static NameplateSetup obtainNameplateSetup() throws IOException {
+    public static InputStream resolveNameplateSetup() {
         InputStream is = AasUtils.CLASSPATH_RESOURCE_RESOLVER.resolve("nameplate.yml"); // preliminary
         if (null == is) {
             try {
@@ -447,7 +446,18 @@ public class NameplateSetup {
                 is = AasUtils.CLASSPATH_RESOURCE_RESOLVER.resolve(Id.getDeviceId().toUpperCase() + ".yml");
             }
         }
-        return AbstractSetup.readFromYaml(NameplateSetup.class, is); // closes is
+        return is;
+    }
+
+    /**
+     * Preliminary way to find the nameplate YML.
+     * 
+     * @return the setup representing the nameplate YML
+     * @throws IOException if the setup file cannot be read
+     * @see #resolveNameplateSetup()
+     */
+    public static NameplateSetup obtainNameplateSetup() throws IOException {
+        return AbstractSetup.readFromYaml(NameplateSetup.class, resolveNameplateSetup()); // closes stream
     }
     
     /**
