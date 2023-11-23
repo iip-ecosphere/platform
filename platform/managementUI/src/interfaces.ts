@@ -31,6 +31,8 @@ export interface ResourceAttribute {
   semanticDescription?: any;
 }
 
+export class CResourceAttribute implements ResourceAttribute {};
+
 //The submodelElements are either basyx functions (i.e. deploy plan) or collections (i.e. KnownServices)
 export interface PlatformArtifacts {
   submodelElements?: Artifact[]

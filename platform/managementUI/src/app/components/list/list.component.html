@@ -10,8 +10,8 @@ mat-raised-button color="success"
   <div *ngFor="let tab of tabsParam">
     <mat-tab label="{{tab.tabName}}">
       <ng-template mat-tab-label >
-        <span (click)="getDisplayData(tab.tabName, tab.metaProject, tab.submodelElement)" class="custom-label">
-          <table>
+        <span (click)="getDisplayData(tab.tabName, tab.metaProject, tab.submodelElement)" class="custom-label" id="menuClick.{{tab.tabName}}">
+          <table id="menu.{{tab.tabName}}">
             <tr>
               <td class="tab-label"><img src="/assets/aas.png" class="aas-icon-tab"></td>
               <td class="tab-label">{{tab.tabName}}</td>
@@ -30,30 +30,30 @@ mat-raised-button color="success"
       -->
 
       <div *ngIf="currentTab != '' && tab.tabName != 'Setup'">
-        <button mat-raised-button color="success"
+        <button mat-raised-button color="success" id="btnNew"
         style="background-color: rgb(35, 142, 184)"
         (click)="new()">new
         </button>
       </div>
 
       <!-- Table -->
-      <table style="margin: 0px;">
+      <table style="margin: 0px;" id="data">
         <tr *ngFor="let item of filteredData; let i = index">
-          <td style="width: 2%; text-align: center;"> {{i + 1}} </td>
+          <td style="width: 2%; text-align: center;" id="data.index"> {{i + 1}} </td>
 
           <!-- Item -->
-          <td style="width: 100%;">
+          <td style="width: 100%;" id="data.item">
 
             <span class="row-title" >
-              <span style="height: 5px; vertical-align: top; margin-right: 10px;">
+              <span style="height: 5px; vertical-align: top; margin-right: 10px;" id="data.item.idShort">
                 {{item.idShort}}
               </span>
             </span>
             <div *ngIf="item.logo">
-              <img src={{item.logo}} class="service-icon">
+              <img src={{item.logo}} class="service-icon" id="data.item.logo">
             </div>
             <div *ngFor="let property of item.value" class="subtext" >
-              <div *ngIf="property.value">
+              <div *ngIf="property.value" id="data.item.value">
                 {{property.value}}
               </div>
             </div>
@@ -61,13 +61,13 @@ mat-raised-button color="success"
 
           <!-- Buttons -->
           <td  *ngIf="tab.tabName == 'Applications'" class="cell-with-button">
-            <button
+            <button id="data.btnGenTemplate"
               mat-raised-button style="background-color: rgb(35, 142, 184)"
               (click)="genTemplate(item.idShort)" >generate template
             </button>
           </td>
           <td  *ngIf="tab.tabName == 'Applications'" class="cell-with-button">
-            <button
+            <button id="data.btnGenApp"
               mat-raised-button style="background-color: rgb(35, 142, 184)"
               (click)="genApp(item.idShort, '')" >integrate application
             </button>
@@ -75,13 +75,13 @@ mat-raised-button color="success"
 
           <td class="cell-with-button">
             <div *ngIf="tab.tabName == 'Meshes'; else elseNotDone">
-              <button
+              <button id="data.btnEdit"
                 mat-raised-button style="background-color: rgb(35, 142, 184)"
                 (click)="edit(item)">edit
               </button>
             </div>
             <ng-template #elseNotDone>
-              <button
+              <button id="data.btnEdit"
                 mat-raised-button style="background-color: rgb(35, 142, 184)"
                 (click)="edit(item)">edit
               </button>
@@ -89,7 +89,7 @@ mat-raised-button color="success"
           </td>
 
           <td class="cell-with-button">
-            <button
+            <button id="data.btnDelete"
               mat-raised-button style="background-color: rgb(97, 95, 96)"
               (click)="del(item)" disabled>
               delete

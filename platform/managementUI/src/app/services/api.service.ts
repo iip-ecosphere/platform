@@ -72,7 +72,7 @@ export class ApiService {
     let Data;
     try {
       Data = await firstValueFrom(
-        this.http.get( this.ip + '/shells/' + this.urn + '/' + url));
+        this.http.get(this.ip + '/shells/' + this.urn + '/' + url));
     } catch(e) {
       console.log(e);
       this.errorEmitter.next(e as HttpErrorResponse);

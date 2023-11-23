@@ -73,7 +73,7 @@ export class ListComponent implements OnInit {
     ["address", "Address: ", ""]
   ]
 
-  ngOnInit(): void {
+  async ngOnInit() {
   }
 
   public async getDisplayData(tabName:string, metaProject: string | null, submodelElement: string | null) {
@@ -113,20 +113,21 @@ export class ListComponent implements OnInit {
     default:
         break;
     }
-    console.log("filteredData")
-    console.log(this.filteredData)
   }
 
   public async loadData(metaProject: any, submodelElement: any){
     if (submodelElement) {
       this.rawData = await this.getData(submodelElement);
-      this.filteredData = this.rawData.value
+      if (this.rawData) {
+        this.filteredData = this.rawData.value
+      } else {
+        this.rawData = []
+        this.filteredData = []
+      }
     } else {
       this.rawData = await this.getData("")
       this.filteredData = this.prefilter(metaProject)
     }
-    //console.log("# (loadData) ---------- \n filteredData")
-    //console.log(this.filteredData)
   }
 
   /**
@@ -269,8 +270,6 @@ export class ListComponent implements OnInit {
   }
 
   public filterManufacturer() {
-    console.log("methode filterMan")
-    console.log(this.filteredData)
     let result = []
     for (let tableRow of this.filteredData) {
       let temp = []
@@ -342,19 +341,12 @@ export class ListComponent implements OnInit {
     if(this.currentTab === "Meshes") { // TODO
       this.router.navigateByUrl('flowchart/' + item.idShort);
     } else {
-      console.log("item")
-      console.log(item)
       let resource: Resource = item
       let dialogRef = this.dialog.open(EditorComponent, {
         height: '90%',
         width:  '90%',
       })
       //dialogRef.componentInstance.category = this.currentTab;
-
-      for (let val of item.value) {
-        console.log(val)
-      }
-
 
       let temp = []
       let meta_entry:configMetaEntry = {
@@ -419,8 +411,6 @@ export class ListComponent implements OnInit {
   }
 
   public genTemplate(appId: string) {
-    console.log("[list.comp | genTemplate] appId: " + appId)
-
     let inputVariables: InputVariable[] = [];
     let input0:InputVariable = {
       value: {
@@ -438,9 +428,6 @@ export class ListComponent implements OnInit {
   }
 
   public async genApp(appId: string, fileName: string) {
-    console.log("[list.comp | genApp] appId: " + appId
-      + ", file name: " + fileName)
-
     let inputVariables: InputVariable[] = [];
     let input0:InputVariable = {
       value: {
@@ -479,10 +466,6 @@ export class ListComponent implements OnInit {
       aasElementURL,
       basyxFun,
       inputVariables) as unknown as platformResponse
-
-    console.log("[list.comp | execFuncInConfig] function: " + basyxFun
-      + "\nplatform response:")
-    console.log(response)
   }
 
   // ---- icons ------------------------------------------------------------------

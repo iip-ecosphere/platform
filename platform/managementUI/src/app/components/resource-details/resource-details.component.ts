@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ApiService } from 'src/app/services/api.service';
-import { Resource, ResourceAttribute, InputVariable, platformResponse } from 'src/interfaces';
+import { Resource, ResourceAttribute, CResourceAttribute, InputVariable, platformResponse } from 'src/interfaces';
 
 @Component({
   selector: 'app-resource-details',
@@ -109,6 +109,9 @@ export class ResourceDetailsComponent implements OnInit {
     }
     let j = 0;
     for(const value of resolvedInfo) {
+      if (!this.resource!.value![j]) { // TODO workaround for testing, check async chain
+        this.resource!.value![j] = new CResourceAttribute();
+      }
       if(value[0]=="byte") {
         this.convertByte(j, 1000000000, "GB")
       } else {
@@ -185,6 +188,9 @@ export class ResourceDetailsComponent implements OnInit {
   // Converts byte value of resource attribute:
   // e.g. conversion to GB - dominator: 1000000000, unitName: GB
   public convertByte(index:any, dominator:any, unitName:string) {
+    if (!this.resource!.value![index]) { // TODO workaround for testing, check async chain
+      this.resource!.value![index] = new CResourceAttribute();
+    }
     this.resource!.value![index].semanticName =  unitName;
         let temp_value = this.resource!.value![index].value;
         temp_value = (temp_value/dominator).toFixed(2)
