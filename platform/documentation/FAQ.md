@@ -199,4 +199,19 @@ If there is already a repositories section, please add the contents for the “S
     * Change the version in the Maven POM of your platform, run `mvn -U install -Dunpack.force=true` in the main folder of your platform installation.
   * Application: Change the version in the Maven POM of your platform, run `mvn -U install -Dunpack.force=true` in the main folder of the application.
   * Example: Update the code via git and then run `mvn -U install -Dunpack.force=true` in the main folder of the example.
-    
+
+## There is a strange warning about illegal access operations. Is this problematic or dangerous?
+
+*Symptom:* When starting platform services, there is output like (*XXX*, *YYY*, *ZZZ* substituted accordingly) like
+
+    ```WARNING: An illegal reflective access operation has occurred
+    WARNING: Illegal reflective access by XXX(file:/YYY) to ZZZ
+    WARNING: Please consider reporting this to the maintainers of XXX
+    WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+    WARNING: All illegal access operations will be denied in a future release```
+
+Is this problematic or dangerous?
+
+*Reason:* The platform is based on more than 20 libraries and frameworks, of which some are not on the most recent state for your installed JDK. Some integrated dependencies even prevent the use of more recent JDKs (see [installation](INSTALL.MD) and [development](README.MD) guidelines).
+
+*Solution:* With your actual JDK, the output is just a warning and not a problem. If you would use a more recent JDK (more recent than JDK 17), the warning may turn into an error and prevent the execution. At the moment, the only solution is to upgrade the respective dependencies and to do intensive testing (see [#161](https://github.com/iip-ecosphere/platform/issues/161), [#106](https://github.com/iip-ecosphere/platform/issues/106), [#57](https://github.com/iip-ecosphere/platform/issues/57)). However, component upgrades can be extremely tricky, as they require transitive updates and also related upgrades of the Continuous Integration. We plan to do these upgrades in one of the next releases, but it will require time and effort on or side. So the only thing that you can do at the moment is... to wait and to stay with the indicated versions of JDK, Maven and Python (or to support us in doing the upgrades and the testing).
