@@ -109,6 +109,8 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     private static final Map<String, String> PARENT_MAPPING;
     private static final TypeVisitor TYPE_VISITOR = new TypeVisitor();
     private static final String PROGRESS_COMPONENT_ID = "configuration.configuration";
+    private static final String[] TOP_FOLDERS = {META_TYPE_NAME, "Dependency", "Manufacturer", "ServiceBase", 
+        "Server", "ServiceMesh", "Application"}; // top level SM folders, mostly meta-model type names -> mgtUI
 
     private Supplier<Configuration> cfgSupplier;
     private Function<String, String> metaShortId = SHORTID_PREFIX_META;
@@ -203,7 +205,9 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     public void mapByType(SubmodelBuilder smBuilder, InvocablesCreator iCreator) {
         Configuration cfg = cfgSupplier.get();
         if (null != cfg) { // as long as we are in transition from platform without contained model to this
-            types.put(META_TYPE_NAME, createTypeCollectionBuilder(smBuilder, META_TYPE_NAME));
+            for (String name : TOP_FOLDERS) {
+                types.put(name, createTypeCollectionBuilder(smBuilder, name));
+            }
             IDatatype primitiveType = null; 
             try {
                 primitiveType = ModelQuery.findType(cfg.getConfiguration().getProject(), "PrimitiveType", null);

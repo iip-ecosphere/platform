@@ -1,0 +1,12 @@
+project AllConstants {
+
+    import IIPEcosphere; 
+    
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+    
+    const String UNUSED = "UNUSED"; // unused, just for mgtUI testing
+    
+    freeze {
+        .;
+    }
+}

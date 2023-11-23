@@ -4,7 +4,7 @@ project AllServicesPartSimpleMesh {
     
     annotate BindingTime bindingTime = BindingTime::compile to .;
    
-       Service mySourceService = JavaService {
+    Service mySourceService = JavaService {
         id = "SimpleSource",
         name = "Simple Data Source",
         description = "",
@@ -27,6 +27,17 @@ project AllServicesPartSimpleMesh {
         artifact = "de.iip-ecosphere.platform:apps.ServiceImpl:" + iipVer,
         kind = ServiceKind::SINK_SERVICE,
         input = {{type=refBy(rec1)}}
+    };
+
+    // just the type for mgtUI testing    
+    Server myServer = JavaServer {
+      id = "myServer",
+      description = "Unneeded server",
+      ver = "0.0.1",
+      host = "localhost",
+      port = 9989,
+      class = "java.lang.Object", // placeholder, will not work -> Server interface
+      cmdArg = "--port=${port}"
     };
    
     freeze {

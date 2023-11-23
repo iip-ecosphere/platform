@@ -1,6 +1,7 @@
 project AllTypes {
 
     import AllTypesPart*; 
+    import AllConstants;
     
     // unusual for managed model structure but required for reuse in testing/evaluation environment
     
