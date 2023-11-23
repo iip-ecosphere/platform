@@ -20,7 +20,6 @@ import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.Registry;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -93,7 +92,7 @@ public class YamlDeviceAasProvider extends DeviceAasProvider {
             Aas aas = null;
 
             try {
-                NameplateSetup nSetup = NameplateSetup.obtainNameplateSetup(); 
+                NameplateSetup nSetup = obtainNameplateSetup(); 
                 aas = nSetup.createAas(urn, id, ab -> {
                     SubmodelBuilder smb = ab.createSubmodelBuilder("metrics", null);
                     MetricsAasConstructor.addProviderMetricsToAasSubmodel(smb, null, Monitor.TRANSPORT_METRICS_CHANNEL, 
@@ -125,12 +124,14 @@ public class YamlDeviceAasProvider extends DeviceAasProvider {
      * @throws IOException if the setup file cannot be read
      */
     public static NameplateSetup obtainNameplateSetup() throws IOException {
-        InputStream is = AasUtils.CLASSPATH_RESOURCE_RESOLVER.resolve("nameplate.yml"); // preliminary
+        InputStream is = NameplateSetup.resolveNameplateSetup();
         if (null == is) {
-            try {
-                is = new FileInputStream("src/test/resources/nameplate.yml");
-            } catch (IOException e) {
-                String fName = Id.getDeviceId().toUpperCase() + ".yml";
+            String fName = Id.getDeviceId().toUpperCase() + ".yml";
+            LoggerFactory.getLogger(YamlDeviceAasProvider.class).info("Checking AAS for id {} in resource file {}", 
+                Id.getDeviceId(), fName);
+            is = AasUtils.CLASSPATH_RESOURCE_RESOLVER.resolve(fName);
+            if (null == is) {
+                fName = Id.getDeviceId().toLowerCase() + ".yml";
                 LoggerFactory.getLogger(YamlDeviceAasProvider.class).info("Checking AAS for id {} in resource file {}", 
                     Id.getDeviceId(), fName);
                 is = AasUtils.CLASSPATH_RESOURCE_RESOLVER.resolve(fName);
