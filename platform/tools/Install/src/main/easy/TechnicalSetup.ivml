@@ -85,7 +85,7 @@ project TechnicalSetup {
     
     // ---------- generation setup ------------
     
-    containerGeneration = true;
+    containerGeneration = false;
     platformContainerGeneration = true;
     sharedInterfaces = true;
     //sharedArtifact = "de.iip-ecosphere.platform:apps.AppInterfacesSimpleMeshInstall:" + iipVer; // for testing all-in-one

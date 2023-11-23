@@ -20,6 +20,7 @@
     	<maven pomFile="pom.xml" goal="package">
     		<arg value="-Dupdate.force=true"/>
     	</maven>
+    	<delete dir="./null"/> <!-- unconfigured fingerprint directory in test -->
         <chmod dir="." perm="u+x" includes="**/*.sh"/>
         <zip destFile="install.zip">
             <fileset dir="." includes="pom.xml README.md"/>
