@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ListComponent } from './list.component';
 import { HttpClientModule } from '@angular/common/http';
-import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatTabsModule } from '@angular/material/tabs';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { EnvConfigService } from '../../services/env-config.service';
@@ -10,6 +10,7 @@ import { RouterTestingModule } from "@angular/router/testing";
 import { Router } from "@angular/router";
 import { Location } from "@angular/common";
 import { routes } from "../../app-routing.module";
+import { of } from 'rxjs';
 
 describe('ListComponent', () => {
 
@@ -17,6 +18,9 @@ describe('ListComponent', () => {
   let fixture: ComponentFixture<ListComponent>;
   let location: Location;
   let router: Router;
+  let dialogSpy: jasmine.Spy;
+  let dialogRefSpyObj = jasmine.createSpyObj({ afterClosed : of({}), close: null, 
+    componentInstance: {selectedType:null, variableName:null, uiGroups:null}});
 
   beforeEach(async () => {
     await EnvConfigService.initAsync();
@@ -39,7 +43,8 @@ describe('ListComponent', () => {
       router = TestBed.inject(Router);
       location = TestBed.inject(Location);
     });
-    component.ngOnInit();
+    await component.ngOnInit();
+    dialogSpy = spyOn(TestBed.inject(MatDialog), 'open').and.returnValue(dialogRefSpyObj);
   });
 
   it('should create', () => {
@@ -68,57 +73,57 @@ describe('ListComponent', () => {
       "aasSemanticIdResolver", "aasPersistency", "serializer", "aasProtocol", "aasServer", "aasRegistryServer", 
       "aasImplServer"];
 
-    await test(fixture, component, 0, expectedDataIdShort);
+    await test(fixture, component, router, dialogSpy, dialogRefSpyObj, 0, expectedDataIdShort);
   });
 
   it('should provided Constants tab/data', async() => {
     const expectedDataIdShort = ["UNUSED"] as string[];
 
-    await test(fixture, component, 1, expectedDataIdShort);
+    await test(fixture, component, router, dialogSpy, dialogRefSpyObj, 1, expectedDataIdShort);
   });
 
   it('should provided Types tab/data', async() => {
     const expectedDataIdShort = ["rec1"] as string[];
 
-    await test(fixture, component, 2, expectedDataIdShort);
+    await test(fixture, component, router, dialogSpy, dialogRefSpyObj, 2, expectedDataIdShort);
   });
 
   it('should provided Dependencies tab/data', async() => {
     const expectedDataIdShort = ["PYTHON3", "CONDA", "websocketsNoVersion", "flowrDependency", 
       "lxLibc6Compat"] as string[]; // just some
 
-    await test(fixture, component, 3, expectedDataIdShort);
+    await test(fixture, component, router, dialogSpy, dialogRefSpyObj, 3, expectedDataIdShort);
   });
 
   it('should provided Nameplates tab/data', async() => {
     const expectedDataIdShort = ["manufacturer_kiprotect", "manufacturer_rapidminer", "manufacturer_sse",
        "manufacturer_l3s", "manufacturer_mipTech", "manufacturer_NovoAITech"] as string[];
 
-    await test(fixture, component, 4, expectedDataIdShort);
+    await test(fixture, component, router, dialogSpy, dialogRefSpyObj, 4, expectedDataIdShort);
   });
 
   it('should provided Services tab/data', async() => {
     const expectedDataIdShort = ["mySourceService", "myReceiverService"] as string[];
 
-    await test(fixture, component, 5, expectedDataIdShort);
+    await test(fixture, component, router, dialogSpy, dialogRefSpyObj, 5, expectedDataIdShort);
   });
 
   it('should provided Servers tab/data', async() => {
     const expectedDataIdShort = ["myServer"] as string[];
 
-    await test(fixture, component, 6, expectedDataIdShort);
+    await test(fixture, component, router, dialogSpy, dialogRefSpyObj, 6, expectedDataIdShort);
   });
 
   it('should provided Meshes tab/data', async() => {
     const expectedDataIdShort = ["myMesh"] as string[];
 
-    await test(fixture, component, 7, expectedDataIdShort);
+    await test(fixture, component, router, dialogSpy, dialogRefSpyObj, 7, expectedDataIdShort);
   });
 
   it('should provided Applications tab/data', async() => {
     const expectedDataIdShort = ["myApp"] as string[];
 
-    await test(fixture, component, 8, expectedDataIdShort);
+    await test(fixture, component, router, dialogSpy, dialogRefSpyObj, 8, expectedDataIdShort,);
   });
 
   it('shall survive requesting non-existing information', async() => {
@@ -132,15 +137,16 @@ describe('ListComponent', () => {
 
 });
 
-async function test(fixture: ComponentFixture<ListComponent>, component: ListComponent, tabIndex: number, 
-  expectedDataIdShort: string[]) {
+async function test(fixture: ComponentFixture<ListComponent>, component: ListComponent, router: Router, 
+  dialogSpy: jasmine.Spy, dialogRefSpyObj: any, tabIndex: number, expectedDataIdShort: string[]) {
   
   await fixture.detectChanges();
   let compiled = fixture.nativeElement as HTMLElement;
   let tabName = component.tabsParam[tabIndex].tabName;
   let expIdShort = new Set<string>(expectedDataIdShort);
   let tabContext = "in table " + tabName;
-
+  let navigateSpy = spyOn(router, 'navigateByUrl');
+  
   let menuClick = compiled.querySelector(`span[id="menuClick.${tabName}"]`) as HTMLElement;
   expect(menuClick).withContext(tabContext).toBeTruthy();
   menuClick.click(); // TODO mock?
@@ -165,22 +171,32 @@ async function test(fixture: ComponentFixture<ListComponent>, component: ListCom
     let item = tabDataRow.querySelector('span[id="data.item.idShort"]') as HTMLElement;
     expect(item).withContext(context).toBeTruthy();
     expect(item.innerText).toMatch(/\S+/);
-    expIdShort.has(item.innerText.trim());        
+    let itemIdShort = item.innerText.trim();
+    expIdShort.has(itemIdShort);
 
     item = tabDataRow.querySelector('div[id="data.item.value"]') as HTMLElement;
     expect(item).withContext(context).toBeTruthy();
     expect(item.innerText).withContext(context).toMatch(/\S+/);
 
-    /*if (tabName == "Applications") { // TODO not there
-        expect(tabDataRow.querySelector('button[id="data.btnGenTemplate"]')).withContext(`genTemplate button of table ${tabName}`).toBeTruthy();
+    if (tabName == "Applications") { // TODO not there
+        expect(compiled.querySelector('button[id="data.btnGenTemplate"]')).withContext(`genTemplate button of table ${tabName}`).toBeTruthy();
         // click: not implemented/tested
-        expect(tabDataRow.querySelector('button[id="data.btnGenApp"]')).withContext(`genApp button of table ${tabName}`).toBeTruthy();
+        expect(compiled.querySelector('button[id="data.btnGenApp"]')).withContext(`genApp button of table ${tabName}`).toBeTruthy();
         // click: not implemented/tested
-    }*/
-    expect(tabDataRow.querySelector('button[id="data.btnEdit"]')).withContext(`edit button of table ${tabName}`).toBeTruthy();
+    }
+    item = tabDataRow.querySelector('button[id="data.btnEdit"]') as HTMLElement;
+    expect(item).withContext(`edit button of table ${tabName}`).toBeTruthy();
+    item.click();
+    if (tabName == "Meshes") {
+      expect(navigateSpy).toHaveBeenCalledWith('flowchart/' + itemIdShort);
+    } else {
+      expect(dialogSpy).toHaveBeenCalled();
+      expect(dialogRefSpyObj.componentInstance).toBeTruthy(); // dialog close code did something
+    }
     // click: may be router, may be dialog
-    expect(tabDataRow.querySelector('button[id="data.btnDelete"]')).withContext(`delete button of table ${tabName}`).toBeTruthy();
-    // click: not implemented
+    item = tabDataRow.querySelector('button[id="data.btnDelete"]') as HTMLElement;
+    expect(item).withContext(`delete button of table ${tabName}`).toBeTruthy();
+    // click: not implemented so far
     i++;
   }
   if (tabName != "Setup" && i > 0) { // TODO button new shall also be there if empty       
