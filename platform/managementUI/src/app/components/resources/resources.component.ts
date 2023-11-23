@@ -20,6 +20,7 @@ export class ResourcesComponent implements OnInit {
   errorMsg: string | undefined;
 
   clicked: boolean = false;
+  techDataResolved: boolean | undefined;
   test = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
   defaultImageUrl = '../../../assets/devideDefault.jpg';
@@ -37,15 +38,19 @@ export class ResourcesComponent implements OnInit {
   }
 
   public async getData() {
+    this.techDataResolved = undefined;
     this.tech.emitter.subscribe( item => {
+      let resolved = false;
       this.ResourcePictures.push(item)
-      if(this.Data && this.Data.submodelElements && item.resourceIdShort && item.picture) {
+      if (this.Data && this.Data.submodelElements && item.resourceIdShort) {
         let a = this.Data.submodelElements.find(
           item2 => item2.idShort === item.resourceIdShort)
-        if(a) {
+        if (a) {
           a.generalInformation = item;
+          resolved = true;
         }
       }
+      this.techDataResolved = resolved;
     });
     this.Data = await this.api.getResources();
     if(this.Data && this.Data.submodelElements) {
@@ -60,8 +65,8 @@ export class ResourcesComponent implements OnInit {
     let temp = []
     if (this.Data.submodelElements) {
       for(let elemt of this.Data.submodelElements) {
-        if(elemt.idShort && !(this.elementsToFilter.includes(elemt.idShort))) {
-            temp.push(elemt)
+        if (elemt.idShort && !(this.elementsToFilter.includes(elemt.idShort))) {
+          temp.push(elemt)
         }
       }
     }

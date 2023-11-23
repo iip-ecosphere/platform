@@ -29,7 +29,7 @@ export class TechnicalDataRetrieverService {
             this.Subscriptions.push(obs.subscribe((item: TechnicalDataResponse) => {
               this.TechnicalResponses.push(item);
               const GeneralInformation = item.submodelElements.find(item => item.idShort === 'GeneralInformation');
-              if(GeneralInformation && GeneralInformation.value) {
+              if (GeneralInformation && GeneralInformation.value) {
                 const ProductImage = GeneralInformation.value.find(item => item.idShort.includes('ProductImage'));
                 const ManufacturerName = GeneralInformation.value.find(item => item.idShort.includes('ManufacturerName'));
                 const Address = GeneralInformation.value.find(item => item.idShort.includes('Address'));
@@ -41,7 +41,6 @@ export class TechnicalDataRetrieverService {
                   };
                   this.ResourcePictures.push(GeneralInfo); //make it so that generalInformation is stored in the api services resource array
                   this.emitter.next(GeneralInfo);
-
               }
             } ));
           }
