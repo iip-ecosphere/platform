@@ -93,8 +93,8 @@ export class ListComponent implements OnInit {
         this.filterTypes();
         break;
       case "Dependencies":
-          this.filterDependencies();
-          break;
+        this.filterDependencies();
+        break;
       case "Nameplates":
         this.filterManufacturer();
         break;
@@ -155,7 +155,9 @@ export class ListComponent implements OnInit {
       if(submodelElement.value) {
         for(const elemtSubmodelElement of submodelElement.value) {
           for(const valElemtSubmodelElement of elemtSubmodelElement.value) {
-            if(valElemtSubmodelElement.idShort == "metaProject" && valElemtSubmodelElement.value == metaProject) {
+            let val = String(valElemtSubmodelElement.value);
+            if(valElemtSubmodelElement.idShort == "metaProject" && 
+                (val == metaProject || val.startsWith(metaProject + "Part")) ) { // part check for testing models
                 result.push(elemtSubmodelElement)
             }
           }

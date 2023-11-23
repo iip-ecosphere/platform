@@ -72,13 +72,13 @@ describe('ListComponent', () => {
   });
 
   it('should provided Constants tab/data', async() => {
-    const expectedDataIdShort = [] as string[]; // TODO add a constant to model
+    const expectedDataIdShort = ["UNUSED"] as string[];
 
     await test(fixture, component, 1, expectedDataIdShort);
   });
 
   it('should provided Types tab/data', async() => {
-    const expectedDataIdShort = [] as string[]; // TODO no types found
+    const expectedDataIdShort = ["rec1"] as string[];
 
     await test(fixture, component, 2, expectedDataIdShort);
   });
@@ -104,9 +104,9 @@ describe('ListComponent', () => {
   });
 
   it('should provided Servers tab/data', async() => {
-    const expectedDataIdShort = [] as string[];
+    const expectedDataIdShort = ["myServer"] as string[];
 
-    await test(fixture, component, 6, expectedDataIdShort); // TODO no servers
+    await test(fixture, component, 6, expectedDataIdShort);
   });
 
   it('should provided Meshes tab/data', async() => {
@@ -121,6 +121,15 @@ describe('ListComponent', () => {
     await test(fixture, component, 8, expectedDataIdShort);
   });
 
+  it('shall survive requesting non-existing information', async() => {
+    // inspired by initially empty server structure
+  
+    await component.loadData(null, "ABC"); // log output is ok
+    await fixture.detectChanges();
+    await fixture.whenRenderingDone();
+    expect(fixture).toBeTruthy(); // to not really test, it just shall run through
+  });  
+
 });
 
 async function test(fixture: ComponentFixture<ListComponent>, component: ListComponent, tabIndex: number, 
@@ -134,48 +143,48 @@ async function test(fixture: ComponentFixture<ListComponent>, component: ListCom
 
   let menuClick = compiled.querySelector(`span[id="menuClick.${tabName}"]`) as HTMLElement;
   expect(menuClick).withContext(tabContext).toBeTruthy();
-  menuClick.click(); // sufficient?
+  menuClick.click(); // TODO mock?
   await component.loadData(component.tabsParam[tabIndex].metaProject, component.tabsParam[tabIndex].submodelElement);
 
   await fixture.detectChanges();
   await fixture.whenRenderingDone();
-    compiled = fixture.nativeElement as HTMLElement;
-    let tabData = compiled.querySelector('table[id="data"]') as HTMLElement;
-    expect(tabData).withContext(tabContext).toBeTruthy();
-    let i = 0;
-    
-    for (let d of component.filteredData) {
-      let tabDataRow = tabData.querySelector(`tr:nth-child(${i + 1})`) as HTMLElement;
-      let context = `in table row ${i + 1} of ${tabName}`;
+  compiled = fixture.nativeElement as HTMLElement;
+  let tabData = compiled.querySelector('table[id="data"]') as HTMLElement;
+  expect(tabData).withContext(tabContext).toBeTruthy();
+  let i = 0;
+  
+  for (let d of component.filteredData) {
+    let tabDataRow = tabData.querySelector(`tr:nth-child(${i + 1})`) as HTMLElement;
+    let context = `in table row ${i + 1} of ${tabName}`;
 
-      expect(tabDataRow).withContext(context).toBeTruthy();
-      let td = tabDataRow.querySelector('td[id="data.index"]') as HTMLElement;
-      expect(td).withContext(context).toBeTruthy();
-      expect(td.innerText).withContext(context).toContain(`${i + 1}`);
-      // data.item.logo ?
-      let item = tabDataRow.querySelector('span[id="data.item.idShort"]') as HTMLElement;
-      expect(item).withContext(context).toBeTruthy();
-      expect(item.innerText).toMatch(/\S+/);
-      expIdShort.has(item.innerText.trim());        
+    expect(tabDataRow).withContext(context).toBeTruthy();
+    let td = tabDataRow.querySelector('td[id="data.index"]') as HTMLElement;
+    expect(td).withContext(context).toBeTruthy();
+    expect(td.innerText).withContext(context).toContain(`${i + 1}`);
+    // data.item.logo ?
+    let item = tabDataRow.querySelector('span[id="data.item.idShort"]') as HTMLElement;
+    expect(item).withContext(context).toBeTruthy();
+    expect(item.innerText).toMatch(/\S+/);
+    expIdShort.has(item.innerText.trim());        
 
-      item = tabDataRow.querySelector('div[id="data.item.value"]') as HTMLElement;
-      expect(item).withContext(context).toBeTruthy();
-      expect(item.innerText).withContext(context).toMatch(/\S+/);
+    item = tabDataRow.querySelector('div[id="data.item.value"]') as HTMLElement;
+    expect(item).withContext(context).toBeTruthy();
+    expect(item.innerText).withContext(context).toMatch(/\S+/);
 
-      /*if (tabName == "Applications") { // TODO not there
-          expect(tabDataRow.querySelector('button[id="data.btnGenTemplate"]')).withContext(`genTemplate button of table ${tabName}`).toBeTruthy();
-          // click: not implemented/tested
-          expect(tabDataRow.querySelector('button[id="data.btnGenApp"]')).withContext(`genApp button of table ${tabName}`).toBeTruthy();
-          // click: not implemented/tested
-      }*/
-      expect(tabDataRow.querySelector('button[id="data.btnEdit"]')).withContext(`edit button of table ${tabName}`).toBeTruthy();
-      // click: may be router, may be dialog
-      expect(tabDataRow.querySelector('button[id="data.btnDelete"]')).withContext(`delete button of table ${tabName}`).toBeTruthy();
-      // click: not implemented
-      i++;
-    }
-    if (tabName != "Setup" && i > 0) { // TODO button new shall also be there if empty       
-      let btnNew = compiled.querySelector(`button[id="btnNew"]`) as HTMLElement;
-      expect(btnNew).withContext(`new button of table ${tabName}`).toBeTruthy();
-    }
+    /*if (tabName == "Applications") { // TODO not there
+        expect(tabDataRow.querySelector('button[id="data.btnGenTemplate"]')).withContext(`genTemplate button of table ${tabName}`).toBeTruthy();
+        // click: not implemented/tested
+        expect(tabDataRow.querySelector('button[id="data.btnGenApp"]')).withContext(`genApp button of table ${tabName}`).toBeTruthy();
+        // click: not implemented/tested
+    }*/
+    expect(tabDataRow.querySelector('button[id="data.btnEdit"]')).withContext(`edit button of table ${tabName}`).toBeTruthy();
+    // click: may be router, may be dialog
+    expect(tabDataRow.querySelector('button[id="data.btnDelete"]')).withContext(`delete button of table ${tabName}`).toBeTruthy();
+    // click: not implemented
+    i++;
+  }
+  if (tabName != "Setup" && i > 0) { // TODO button new shall also be there if empty       
+    let btnNew = compiled.querySelector(`button[id="btnNew"]`) as HTMLElement;
+    expect(btnNew).withContext(`new button of table ${tabName}`).toBeTruthy();
+  }
 } 
