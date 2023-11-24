@@ -64,28 +64,26 @@ export class EditorComponent implements OnInit {
     public dialog: MatDialogRef<EditorComponent>,
     public ivmlFormatter: IvmlFormatterService) { }
 
-  ngOnInit(): void {
+  async ngOnInit() {
     if(this.refinedTypes) {
-      console.log(this.refinedTypes);
       this.meta = {
         idShort: 'meta',
         value: this.refinedTypes
       }
     } else if(!this.type) {
-      this.getMeta()
+      await this.getMeta()
     } else if(this.metaBackup && this.metaBackup.value && this.type.type){
       let type = this.cleanTypeName(this.type.type);
       this.selectedType = this.metaBackup.value.find(item => item.idShort === type);
       this.generateInputs()
     }
-    console.log(this.metaBackup);
     if(this.metaBackup && this.metaBackup.value) {
       let searchTerm = 'Field'
       for(const type of this.metaBackup.value) {
         const refined = type.value.find((item: { idShort: string; }) => item.idShort === 'metaRefines');
         if(refined && refined.value != '') {
           if(searchTerm === refined.value) {
-            console.log(type);
+            console.log("TYPE " + type);
           }
         }
       }
@@ -252,9 +250,7 @@ export class EditorComponent implements OnInit {
     this.uiGroups = [];
     const selectedType = this.selectedType as configMetaContainer;
     this.ivmlType = selectedType.idShort
-
-    if(selectedType && selectedType.value) {
-
+    if (selectedType && selectedType.value) {
       // (Constants) hard-coded in case of primitive types
       if (primitiveDataTypes.includes(selectedType.idShort)) {
         let meta_entry:configMetaEntry = {
@@ -341,7 +337,6 @@ export class EditorComponent implements OnInit {
           if(editorInput.type.indexOf('setOf') >= 0
             || editorInput.type.indexOf('sequenceOf') >= 0) {
             editorInput.multipleInputs = true;
-            console.log("multiple inputs")
           }
           //assign initial value of inputFields
           let initial;

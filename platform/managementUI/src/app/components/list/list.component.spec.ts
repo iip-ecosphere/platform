@@ -20,7 +20,7 @@ describe('ListComponent', () => {
   let router: Router;
   let dialogSpy: jasmine.Spy;
   let dialogRefSpyObj = jasmine.createSpyObj({ afterClosed : of({}), close: null, 
-    componentInstance: {selectedType:null, variableName:null, uiGroups:null}});
+    componentInstance: {selectedType:null, variableName:null, uiGroups:null, category:null}});
 
   beforeEach(async () => {
     await EnvConfigService.initAsync();
@@ -172,8 +172,8 @@ async function test(fixture: ComponentFixture<ListComponent>, component: ListCom
     expect(item).withContext(context).toBeTruthy();
     expect(item.innerText).toMatch(/\S+/);
     let itemIdShort = item.innerText.trim();
-    expIdShort.has(itemIdShort);
-
+    expIdShort.delete(itemIdShort);
+    
     item = tabDataRow.querySelector('div[id="data.item.value"]') as HTMLElement;
     expect(item).withContext(context).toBeTruthy();
     expect(item.innerText).withContext(context).toMatch(/\S+/);
@@ -191,7 +191,8 @@ async function test(fixture: ComponentFixture<ListComponent>, component: ListCom
       expect(navigateSpy).toHaveBeenCalledWith('flowchart/' + itemIdShort);
     } else {
       expect(dialogSpy).toHaveBeenCalled();
-      expect(dialogRefSpyObj.componentInstance).toBeTruthy(); // dialog close code did something
+      expect(dialogRefSpyObj.componentInstance).toBeTruthy();
+      expect(dialogRefSpyObj.componentInstance.selectedType).toBeTruthy(); // dialog close code did something
     }
     // click: may be router, may be dialog
     item = tabDataRow.querySelector('button[id="data.btnDelete"]') as HTMLElement;
@@ -199,8 +200,16 @@ async function test(fixture: ComponentFixture<ListComponent>, component: ListCom
     // click: not implemented so far
     i++;
   }
+  expect(expIdShort.size).withContext("Expected items").toBe(0);
   if (tabName != "Setup" && i > 0) { // TODO button new shall also be there if empty       
     let btnNew = compiled.querySelector(`button[id="btnNew"]`) as HTMLElement;
     expect(btnNew).withContext(`new button of table ${tabName}`).toBeTruthy();
+    btnNew.click();
+    if (tabName == "Meshes") {
+      expect(navigateSpy).toHaveBeenCalledWith('flowchart');
+    } else {
+      expect(dialogSpy).toHaveBeenCalled();
+      expect(dialogRefSpyObj.componentInstance.category).toBeTruthy(); // dialog close code did something
+    }
   }
 } 

@@ -49,7 +49,7 @@
         <td>
           <div *ngIf="meta && meta.value">
             <mat-form-field appearance="outline">
-              <mat-select [(value)]="selectedType">
+              <mat-select id="typeSelect" [(value)]="selectedType">
                 <mat-option *ngFor="let type of meta.value"
                 [value]="type" (click)="generateInputs()">
                   {{ type.idShort }}
@@ -84,7 +84,7 @@
     <div class="inputGroup">
       <div *ngFor="let input of uiGroup.inputs">
         <mat-card class="inputBox" *ngIf="!input.multipleInputs && !input.refTo; else ref">
-          <p style="margin-bottom: 1em;">{{ input.name }}</p>
+          <p id="inputName" style="margin-bottom: 1em;">{{ input.name }}</p>
           <div *ngIf="input.type != 'Boolean'; else booleanCase">
             <div *ngIf="input.metaTypeKind != 10; else subEditor">
               <div *ngIf="input.metaTypeKind != 2; else enumCase">
@@ -123,7 +123,7 @@
       <div class="fullLineInputGroup">
         <div *ngFor="let input of uiGroup.fullLineInputs">
           <mat-card class="refInput">
-            <p style="margin-bottom: 1em;">{{ input.name }}</p>
+            <p id="inputName" style="margin-bottom: 1em;">{{ input.name }}</p>
             <app-input-ref-select [activeTextinput]="true" [input]="input">
             </app-input-ref-select>
             <div #subEditor *ngIf="input.metaTypeKind == 10">

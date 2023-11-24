@@ -17,6 +17,7 @@
     <iip.resources>${project.build.directory}/easy-test/resources</iip.resources>
     <platformDir>gen/platform</platformDir>
     <skip.replacement>false</skip.replacement>
+    <check.artifacts>${project.groupId}:platform.exec:${project.version} ${project.groupId}:configuration.configuration:zip:easy:${project.version} ${project.groupId}:configuration.configuration:zip:easy-test:${project.version}</check.artifacts>
   </properties>
   
   <dependencies>
@@ -147,9 +148,7 @@
                    </goals>
                    <configuration>
                        <checkChanged>true</checkChanged>
-                       <changeCheckArtifacts>                       
-                           <changeCheckArtifact>${project.groupId}:platform.exec:${project.version}</changeCheckArtifact>
-                       </changeCheckArtifacts>
+                       <changeCheckArtifacts>${check.artifacts}</changeCheckArtifacts>
                    </configuration>
                 </execution>
                <execution>
@@ -160,9 +159,7 @@
                    </goals>
                    <configuration>
                        <checkChanged>true</checkChanged>
-                       <changeCheckArtifacts>                       
-                           <changeCheckArtifact>${project.groupId}:platform.exec:${project.version}</changeCheckArtifact>
-                       </changeCheckArtifacts>
+                       <changeCheckArtifacts>${check.artifacts}</changeCheckArtifacts>
                        <resourcesDirectory>${iip.resources}</resourcesDirectory>
                    </configuration>
                </execution>

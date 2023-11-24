@@ -64,7 +64,6 @@ export class ApiService {
         this.meta = Data;
       }
     }
-    //console.log(this.meta);
     return this.meta;
   }
 
