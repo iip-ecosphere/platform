@@ -19,7 +19,9 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -100,7 +102,7 @@ public abstract class AbstractConfigurationMojo extends AbstractLoggingMojo impl
     private boolean checkChanged;
 
     @Parameter(property = "configuration.changeCheckArtifacts", required = false, defaultValue = "")
-    private List<String> changeCheckArtifacts;
+    private String changeCheckArtifacts;
 
     // different name, hook up with unpack
     @Parameter(property = "unpack.force", required = false, defaultValue = "false") 
@@ -307,7 +309,12 @@ public abstract class AbstractConfigurationMojo extends AbstractLoggingMojo impl
         if (metaHashFile.exists() || modelHashFile.exists()) {
             if (null != changeCheckArtifacts && !changeCheckArtifacts.isEmpty()) {
                 Predicate<File> pred = f -> isNewer(f, metaHashFile) || isNewer(f, modelHashFile);
-                enabled |= new DependencyResolver(this).haveDependenciesChangedSince(changeCheckArtifacts, pred);
+                StringTokenizer tokenizer = new StringTokenizer(changeCheckArtifacts);
+                List<String> arts = new ArrayList<>();
+                while (tokenizer.hasMoreTokens()) {
+                    arts.add(tokenizer.nextToken());
+                }
+                enabled |= new DependencyResolver(this).haveDependenciesChangedSince(arts, pred);
             }
         }
         if (enabled) { 

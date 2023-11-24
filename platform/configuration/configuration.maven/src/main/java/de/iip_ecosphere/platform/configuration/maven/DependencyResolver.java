@@ -199,9 +199,24 @@ public class DependencyResolver {
         boolean changed = false;
         for (String a : artifacts) {
             String[] tmp = a.split(":");
-            if (tmp.length >= 3) {
-                DefaultArtifact artifact = new DefaultArtifact(tmp[0], tmp[1], tmp[2], "compile", "jar", "", 
-                    JAR_HANDLER);    
+            if (tmp.length >= 3) { //groupId:artifactId[:type[:classifier]]:version
+                String groupId = tmp[0];
+                String artifactId = tmp[1];
+                String version;
+                String type = "jar";
+                String classifier = "";
+                if (tmp.length == 3) {
+                    version = tmp[2];
+                } else if (tmp.length == 4) {
+                    type = tmp[2];
+                    version = tmp[3];
+                } else {
+                    type = tmp[2];
+                    classifier = tmp [3];
+                    version = tmp[4];
+                }
+                DefaultArtifact artifact = new DefaultArtifact(groupId, artifactId, version, "compile", 
+                    type, classifier, JAR_HANDLER);    
                 changed = hasChanged(artifact, since);
             }
         }
