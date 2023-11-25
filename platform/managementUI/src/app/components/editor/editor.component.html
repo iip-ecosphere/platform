@@ -111,7 +111,7 @@
         <div>
           <ng-template #ref>
             <mat-card [ngClass]="input.multipleInputs? 'inputBox' : 'refInput'">
-                <p style="margin-bottom: 1em;">{{ input.name }}</p>
+                <p style="margin-bottom: 1em;" id="inputName">{{ input.name }}</p>
                 <app-input-ref-select
                   [activeTextinput]="true" [input]="input">
                 </app-input-ref-select>
