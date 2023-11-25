@@ -65,15 +65,22 @@ public class PlattformAasLifecycleDescriptor extends AbstractAasLifecycleDescrip
                 watcher.installInto(Transport.createConnector());
                 timer.schedule(new TimerTask() {
                     
+                    private long lastRun;
+                    
                     @Override
                     public void run() {
-                        watcher.deleteOutdated(devId -> {
-                            LoggerFactory.getLogger(PlattformAasLifecycleDescriptor.class)
-                                .info("Device {} outdated. Trying to delete AAS parts.", devId);
-                            EcsAas.removeDevice(devId, 
-                                sm -> ServicesAas.setCleanup(sm, devId), 
-                                sm -> ServicesAas.removeDevice(sm, devId));
-                        });
+                        long now = System.currentTimeMillis();
+                        // second part, sleep heuristic, allow for "recovery"
+                        if (lastRun < 0 || now - lastRun <= 3 * watcherTimeout) {
+                            watcher.deleteOutdated(devId -> {
+                                LoggerFactory.getLogger(PlattformAasLifecycleDescriptor.class)
+                                    .info("Device {} outdated. Trying to delete AAS parts.", devId);
+                                EcsAas.removeDevice(devId, 
+                                    sm -> ServicesAas.setCleanup(sm, devId), 
+                                    sm -> ServicesAas.removeDevice(sm, devId));
+                            });
+                        }
+                        lastRun = now;
                     }
                 }, watcherTimeout, watcherTimeout);
             } catch (IOException e) {
