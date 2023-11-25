@@ -114,7 +114,7 @@ In addition, the goals `generateAll`, `generateApps` and `generatePlatform` cons
   - `checkChanged` in order to figure out whether the model, the meta model have changed to trigger an execution
   - `changeCheckArtifacts`, an optional String of space separated maven coordinates in format *groupId:artifactId[:type[:classifier]]:version* whose snapshots may trigger an execution if changed since the last build
 
-# Application testing
+# Platform application testing
 
 Testing a generated application typically requires starting the communication broker (possibly on an emphemeral port) and the the application in a time-framed manner and to check the application output for some patterns indicating that the application is working. Within the configuration plugin, a minimal Maven setup looks like:
 
@@ -180,6 +180,7 @@ The `testApp` goal (default phase `package`, can be seen as integration test but
     - `ports` optional network ports to be assigned, consisting of `port` and `property` entry; ephemeral if negative; substituted in extrapolated in ´$${}´ property expressions in `args`
     - `home` optional home directory of the process
     - `waitFor` whether the process shall be executed and completed before continuing (default `true`)
+  - `artifacts` file set of files to be copied into `platformDir` artifacts directory before starting platform processes, considered only if `platformDir` is given.
 
 # Process execution
 

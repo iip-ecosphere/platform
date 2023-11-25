@@ -35,6 +35,9 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.shared.model.fileset.FileSet;
+
+import com.google.common.io.Files;
 
 import de.iip_ecosphere.platform.configuration.maven.ProcessUnit.ProcessUnitBuilder;
 import de.iip_ecosphere.platform.configuration.maven.ProcessUnit.TerminationListener;
@@ -47,6 +50,7 @@ import de.iip_ecosphere.platform.support.collector.Collector;
 import de.iip_ecosphere.platform.support.iip_aas.config.RuntimeSetup;
 import de.iip_ecosphere.platform.support.setup.AbstractSetup;
 import de.iip_ecosphere.platform.tools.maven.python.AbstractLoggingMojo;
+import de.iip_ecosphere.platform.tools.maven.python.FilesetUtils;
 
 /**
  * A platform application testing MOJO. May start an entire (local) platform
@@ -146,6 +150,9 @@ public class TestAppMojo extends AbstractLoggingMojo {
     @Parameter(property = "configuration.testApp.befores", required = false)
     private List<TestProcessSpec> befores;
     
+    @Parameter(required = false)
+    private FileSet artifacts;
+    
     private List<ProcessUnit> units = new ArrayList<>();
     
     private long testStart;
@@ -231,6 +238,15 @@ public class TestAppMojo extends AbstractLoggingMojo {
     private RuntimeSetup startPlatform(int brokerPort) throws MojoExecutionException {
         RuntimeSetup result = null;
         if (isValidFile(platformDir)) {
+            FilesetUtils.streamFiles(artifacts, false).forEach(f -> {
+                File target = new File(new File(platformDir, "artifacts"), f.getName());
+                try {
+                    getLog().error("Copying artifact " + f + " to " + target);
+                    Files.copy(f, target);
+                } catch (IOException e) {
+                    getLog().error("Cannot copy artifact " + f + ":" + e.getMessage());
+                }
+            });
             File rtSetup = RuntimeSetup.getFile();
             FileUtils.deleteQuietly(rtSetup);
             File local = new File(platformDir, AbstractSetup.DEFAULT_OVERRIDE_FNAME);
@@ -264,7 +280,7 @@ public class TestAppMojo extends AbstractLoggingMojo {
         }
         return result;
     }
-    
+
     /**
      * Returns if {@code file} is a valid file.
      * 
