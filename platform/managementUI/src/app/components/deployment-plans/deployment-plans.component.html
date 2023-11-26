@@ -4,25 +4,25 @@
     Deployment Plans
   </div>
 
-  <table *ngIf="deploymentPlans; else noPlans" style="margin: 0px;" >
+  <table id="data" *ngIf="deploymentPlans; else noPlans" style="margin: 0px;" >
     <tr *ngFor="let plan of deploymentPlans.value; let i = index">
-      <td style="width: 2%; text-align: center;"> {{i + 1}} </td>
+      <td style="width: 2%; text-align: center;" id="data.index"> {{i + 1}} </td>
       <td style="width: 100%;">
-        <span class="row-title">
+        <span class="row-title" id="data.idShort">
           {{getId(plan)}}
         </span><br>
-        <span class="subtext"> {{getDescription(plan)}}</span>
+        <span class="subtext" id="data.description"> {{getDescription(plan)}}</span>
       </td>
 
       <td *ngIf="getEnabled(plan)" style="vertical-align: top;">
-        <button  mat-raised-button class="button"
+        <button  mat-raised-button class="button" id="data.btnDeploy"
           style="background-color: rgb(35, 142, 184)"
           (click)="deploy(plan)">
           deploy
         </button>
       </td>
       <td *ngIf="!getEnabled(plan)" style="vertical-align: top;">
-        <button  mat-raised-button class="button"
+        <button  mat-raised-button class="button" id="data.btnDeploy"
           style="background-color: rgb(35, 142, 184)"
           (click)="deploy(plan)" disabled>
           deploy

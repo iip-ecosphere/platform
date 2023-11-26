@@ -50,10 +50,10 @@ export class InstancesComponent implements OnInit {
       }
     }
 
-    console.log("instances component \n filteredData: ")
-    console.log(this.filteredData)
+    //console.log("instances component \n filteredData: ")
+    //console.log(this.filteredData)
 
-    console.log("-----------")
+    //console.log("-----------")
 
     /*
     if(data) {

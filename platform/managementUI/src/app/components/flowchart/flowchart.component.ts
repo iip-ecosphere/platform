@@ -174,7 +174,6 @@ export class FlowchartComponent implements OnInit {
       for(let node in nodes) {
 
         const a = nodes[node];
-        console.log(a)
         if(a.data["bus-receive"]) {
           busIn = a.data["bus-receive"];
         }

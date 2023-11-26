@@ -50,8 +50,6 @@ export class DeploymentPlansComponent implements OnInit {
 
   public async getArtifacts() {
     const response = await this.api.getArtifacts();
-    console.log("Artifacts: ")
-    console.log(response);
     if(response.submodelElements) {
       this.deploymentPlans = response.submodelElements.find(
         item => item.idShort === "DeploymentPlans");
@@ -71,9 +69,6 @@ export class DeploymentPlansComponent implements OnInit {
       statusUri = resp.value
       this.websocket.connect(statusUri)
     }
-    console.log("[deploy-plan | getUri] status uri: " + resp.value)
-
-
   }
 
 

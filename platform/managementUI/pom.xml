@@ -180,6 +180,12 @@
                        </appArgs>
                        <errToIn>true</errToIn>
                        <platformDir>${platformDir}</platformDir>
+                       <artifacts>
+                           <directory>src/test/resources</directory>
+                           <includes>
+                               <include>deployment.yaml</include>
+                           </includes>
+                       </artifacts>
                        <mgtUiSetupFileTemplate>src/assets/config/configTemplate.json</mgtUiSetupFileTemplate>
                        <mgtUiSetupFile>src/test/tmp/config.json</mgtUiSetupFile>
                        <!-- <deploymentPlan>src/test/resources/deployment.yaml</deploymentPlan> -->

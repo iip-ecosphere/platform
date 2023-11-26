@@ -3,7 +3,7 @@
     <div *ngIf="serviceMeshes">
       <span *ngFor="let mesh of serviceMeshes.value">
         <span *ngIf="!isMeta(mesh.idShort)">
-          <a mat-tab-link (click)="selectMesh(mesh.idShort)"> {{mesh.idShort}}</a>
+          <a id="nav-link" mat-tab-link (click)="selectMesh(mesh.idShort)"> {{mesh.idShort}}</a>
         </span>
       </span>
     </div>
@@ -23,11 +23,11 @@
                 <img [src]=assignIcon(getId(service.value)) height="25px">
               </mat-card-title>
               -->
-              <mat-card-content *ngIf="service.idShort" style="font-size: medium;">
+              <mat-card-content id="service.id" *ngIf="service.idShort" style="font-size: medium;">
                 {{ getId(service.value) }}
                 <img [src]=assignIcon(getId(service.value)) height="25px">
               </mat-card-content>
-              <mat-card-content>
+              <mat-card-content id="service.details">
                 <div *ngFor="let property of service.value">
                   <p *ngIf="displayAttribute(property.idShort)"
                   class="subtext">

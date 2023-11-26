@@ -200,7 +200,6 @@ async function test(fixture: ComponentFixture<EditorComponent>, component: Edito
   await component.ngOnInit();
   await fixture.detectChanges();
 
-  expect(component).toBeTruthy();
   let compiled = fixture.nativeElement as HTMLElement;
 
   if (typeProps.length > 1) { // only selection if multiple
