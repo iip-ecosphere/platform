@@ -358,6 +358,9 @@ public class TestAppMojo extends AbstractLoggingMojo {
             }
         }
         units.clear();
+        if (isValidFile(platformDir)) {
+            FileUtils.deleteQuietly(new File(platformDir, AbstractSetup.DEFAULT_OVERRIDE_FNAME));
+        }
         FileUtils.deleteQuietly(mgtUiSetupFile);
         return failed;
     }
