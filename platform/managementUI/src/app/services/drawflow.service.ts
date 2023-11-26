@@ -50,8 +50,8 @@ export class DrawflowService {
       }
     }]
 
-    console.log("getGraph | input variable")
-    console.log(input)
+    console.debug("getGraph | input variable")
+    console.debug(input)
 
     try {
       response = await firstValueFrom(this.http.post(
@@ -63,10 +63,10 @@ export class DrawflowService {
       "requestId":"1bfeaa30-1512-407a-b8bb-f343ecfa28cf",
       "inoutputArguments":[], "timeout":10000})) as platformResponse;
     } catch(e) {
-      console.log(e);
+      console.error(e);
     }
-    console.log("resposne")
-    console.log(response)
+    console.debug("response")
+    console.debug(response)
     return response;
   }
 

@@ -83,7 +83,7 @@ export class EditorComponent implements OnInit {
         const refined = type.value.find((item: { idShort: string; }) => item.idShort === 'metaRefines');
         if(refined && refined.value != '') {
           if(searchTerm === refined.value) {
-            console.log("TYPE " + type);
+            console.debug("TYPE " + type);
           }
         }
       }

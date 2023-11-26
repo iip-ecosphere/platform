@@ -73,7 +73,7 @@ export class ApiService {
       Data = await firstValueFrom(
         this.http.get(this.ip + '/shells/' + this.urn + '/' + url));
     } catch(e) {
-      console.log(e);
+      console.error(e);
       this.errorEmitter.next(e as HttpErrorResponse);
     }
     return Data;
@@ -101,7 +101,7 @@ export class ApiService {
       "requestId":"1bfeaa30-1512-407a-b8bb-f343ecfa28cf",
       "inoutputArguments":[], "timeout":10000}));
     } catch(e) {
-      console.log(e);
+      console.error(e);
     }
     return response;
   }
@@ -137,7 +137,7 @@ export class ApiService {
       response = await firstValueFrom(this.http.post(this.ip + '/shells/' + this.urn + "/aas/submodels/Configuration/submodel/submodelElements/getGraph/invoke"
       ,{"inputArguments": input,"requestId":"1bfeaa30-1512-407a-b8bb-f343ecfa28cf", "inoutputArguments":[], "timeout":10000})) as platformResponse;
     } catch(e) {
-      console.log(e);
+      console.error(e);
     }
     return response;
   }

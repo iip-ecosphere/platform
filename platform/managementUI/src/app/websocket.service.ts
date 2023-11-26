@@ -17,14 +17,14 @@ export class WebsocketService {
 
 
   public connect(url:string): void {
-    console.log('[websocketService | connect] url: ' +  url + "#")
+    console.debug('[websocketService | connect] url: ' +  url + "#")
     this.socket = new WebSocket(url);
     this.socket.onopen = () => {
       console.log("Websocket connected with url: "
         + url);
     }
     this.socket.onmessage = (event) => {
-      console.log('Received message:', event.data);
+      console.debug('Received message:', event.data);
       this.messageSubject.next(event.data);
     };
   }

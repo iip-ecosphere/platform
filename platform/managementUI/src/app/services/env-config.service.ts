@@ -17,6 +17,10 @@ interface Configuration {
   urn?: string;
   stage?: Environment;
   inTest?: boolean;
+  enableDebug? : boolean;
+  enableInfo? : boolean;
+  enableLog? : boolean;
+  enableWarn? : boolean;
 }
 
 export const primitiveDataTypes
@@ -57,6 +61,21 @@ export class EnvConfigService {
     public static async initAsync() {
       if (EnvConfigService.env == undefined) {
         await EnvConfigService.load();
+        if (EnvConfigService.env) {
+          let env = EnvConfigService.env as Configuration; 
+          if (env.enableDebug == false) {
+            window.console.debug = function() {};
+          }
+          if (env.enableInfo == false) {
+            window.console.info = function() {};
+          }
+          if (env.enableLog == false) {
+            window.console.log = function() {};
+          }
+          if (env.enableWarn == false) {
+            window.console.warn = function() {};
+          }
+        }
       }
     }
 
