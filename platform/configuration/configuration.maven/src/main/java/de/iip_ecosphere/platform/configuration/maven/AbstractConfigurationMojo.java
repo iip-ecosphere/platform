@@ -29,6 +29,7 @@ import java.util.stream.Stream;
 
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
@@ -66,7 +67,10 @@ public abstract class AbstractConfigurationMojo extends AbstractLoggingMojo impl
     private List<RemoteRepository> remoteRepos;
     
     @Component
-    private RepositorySystem repoSystem;    
+    private RepositorySystem repoSystem;
+    
+    @Parameter(defaultValue = "${mojoExecution}", readonly = true, required = true)
+    private MojoExecution mojoExecution;
     
     @Parameter(property = "configuration.model", required = true)
     private String model;
@@ -301,8 +305,9 @@ public abstract class AbstractConfigurationMojo extends AbstractLoggingMojo impl
      */
     protected boolean modelNewerThanOut(String metaModelDir, String modelDir, String outDir) {
         boolean newer = false;
-        File metaHashFile = FileChangeDetector.getHashFileInTarget(project, "easy-meta");
-        File modelHashFile = FileChangeDetector.getHashFileInTarget(project, "easy");
+        String execId = null == mojoExecution.getExecutionId() ? "" : "-" + mojoExecution.getExecutionId();
+        File metaHashFile = FileChangeDetector.getHashFileInTarget(project, "easy-meta" + execId);
+        File modelHashFile = FileChangeDetector.getHashFileInTarget(project, "easy" + execId);
         List<File> metaModelFiles = checkFilesByHash(metaHashFile, metaModelDir, null);
         List<File> modelFiles = checkFilesByHash(modelHashFile, modelDir, "IVML model");
         boolean enabled = enabled(modelFiles) || enabled(metaModelFiles);
