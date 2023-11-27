@@ -22,6 +22,7 @@ import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
@@ -119,6 +120,7 @@ public class TestAppMojo extends AbstractLoggingMojo {
     
     @Parameter(property = "configuration.testApp.testTime", required = true, defaultValue = "120000")
     private int testTime;
+    private int testTimePlatform;
 
     @Parameter(property = "configuration.testApp.platformDir", required = false, defaultValue = "")
     private File platformDir;
@@ -190,7 +192,7 @@ public class TestAppMojo extends AbstractLoggingMojo {
             .addArguments(args)
             .addCheckRegEx(p)
             .setListener(listener)
-            .setTimeout(testTime)
+            .setTimeout(testTimePlatform)
             .setNotifyListenerByLogMatch(true);
         return builder;
     }
@@ -296,17 +298,24 @@ public class TestAppMojo extends AbstractLoggingMojo {
      * The resource in the deployment descriptor must be {@link #deploymentResource}.
      * 
      * @param deploy deploy or undeploy
+     * @param id the undeployment id
      * @throws MojoExecutionException if deployment/undeployment fails
      */
-    private void deployApp(boolean deploy) throws MojoExecutionException {
+    private void deployApp(boolean deploy, String id) throws MojoExecutionException {
         if (isValidFile(platformDir) && isValidFile(deploymentPlan)) {
-            File gen = new File("gen");
-            ProcessUnit pu = new ProcessUnitBuilder(deploy ? "deploy app" : "undeploy app", this)
-                .setHome(gen)
+            String name = deploy ? "deploy app" : "undeploy app";
+            if (id.length() > 0) {
+                name += " " + id;
+            }
+            ProcessUnitBuilder pub = new ProcessUnitBuilder(name, this)
+                .setHome(platformDir)
                 .addShellScriptCommand("cli")
                 .addArgument(deploy ? "deploy" : "undeploy")
-                .addArgument(deploymentPlan.getAbsolutePath())
-                .build4Mvn();
+                .addArgument(deploymentPlan.getAbsolutePath());
+            if (!deploy) {
+                pub.addArgument(id);
+            }
+            ProcessUnit pu = pub.build4Mvn();
             int status = pu.waitFor();
             if (ProcessUnit.isFailed(status)) {
                 throw new MojoExecutionException(pu.getDescription() + " terminated with status: " + status);
@@ -402,6 +411,14 @@ public class TestAppMojo extends AbstractLoggingMojo {
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         if (!skip) {
+            testTimePlatform = testTime; 
+            // extend platform processes timeout over test time if we running a platform/app
+            if (isValidFile(platformDir)) {
+                testTimePlatform += TimeUnit.MINUTES.toMillis(2);
+            }
+            if (isValidFile(deploymentPlan)) {
+                testTimePlatform += TimeUnit.MINUTES.toMillis(3); // start and shutdown
+            }
             executeImpl();
         }
     }
@@ -561,7 +578,7 @@ public class TestAppMojo extends AbstractLoggingMojo {
             getLog().info("Using broker port: " + brokerPort);
             buildAndRegister(createPlatformBuilder("broker", new File("gen/broker/broker"), "broker", null, 
                 String.valueOf(brokerPort))
-                .setTimeout(testTime));
+                .setTimeout(testTimePlatform));
             // broker may take a while; regEx would be ok, but we do not know the broker here -> generation?
             TimeUtils.sleep(brokerWaitTime);
             writeMgtUiSetup(startPlatform(brokerPort));
@@ -574,7 +591,7 @@ public class TestAppMojo extends AbstractLoggingMojo {
             testBuilder.logTo(logFile);
         }
         if (null != testCmd && testCmd.length() > 0) {
-            deployApp(true);
+            deployApp(true, "");
             testBuilder.addArgumentOrScriptCommand(testCmdAsScript, testCmd);
             testBuilder.addArguments(appArgs);
         } else {
@@ -601,7 +618,7 @@ public class TestAppMojo extends AbstractLoggingMojo {
         getLog().info("Waiting for test end, at maximum specified test time: " + testTime + " ms");
         TimeUtils.waitFor(() -> !testTerminated.get() && testUnit.isRunning(), testTime, 300);
         if (null != testCmd && testCmd.length() > 0) {
-            deployApp(false);
+            deployApp(false, "1");
         }
         int testUnitExitStatus = testUnit.getExitValue();
         boolean failed = stopProcessUnits();
