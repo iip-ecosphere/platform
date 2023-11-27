@@ -10,8 +10,11 @@
  ********************************************************************************/
 package test.de.iip_ecosphere.platform.platform;
 
+import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
+
+import de.iip_ecosphere.platform.services.environment.Starter;
 
 /**
  * Defines the tests to be executed.
@@ -27,4 +30,13 @@ import org.junit.runners.Suite;
     PlatformAasTest.class
 })
 public class AllTests {
+    
+    /**
+     * Prevent System.exit vs. shurefire.
+     */
+    @BeforeClass
+    public static void startup() {
+        System.setProperty(Starter.IIP_TEST, String.valueOf(true));
+    }
+    
 }

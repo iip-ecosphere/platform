@@ -30,6 +30,7 @@ import de.iip_ecosphere.platform.platform.cli.ScannerCommandProvider;
 import de.iip_ecosphere.platform.platform.cli.PrintVisitor.PrintType;
 import de.iip_ecosphere.platform.services.ServicesClient;
 import de.iip_ecosphere.platform.services.ServiceOperations.StreamLogMode;
+import de.iip_ecosphere.platform.services.environment.Starter;
 import de.iip_ecosphere.platform.services.environment.services.TransportConverter;
 import de.iip_ecosphere.platform.services.environment.services.TransportConverter.Watcher;
 import de.iip_ecosphere.platform.services.environment.services.TransportConverterFactory;
@@ -79,7 +80,9 @@ public class Cli extends CliBackend {
         }
         TopLevelCommandInterpreter tci = new TopLevelCommandInterpreter();
         tci.interpret(provider, Level.TOP);
-        System.exit(tci.hadException() ? 1 : 0);
+        if (!Boolean.valueOf(System.getProperty(Starter.IIP_TEST, String.valueOf(false)))) {
+            System.exit(tci.hadException() ? 1 : 0);
+        }
     }
     
     /**
