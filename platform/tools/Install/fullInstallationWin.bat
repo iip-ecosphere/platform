@@ -40,7 +40,8 @@ if %dockerVersionCheck% == "Non" (
 )
 
 :answerDocker
-set /P c=Do you want to stop the Platform installation until you install Docker? - You might skip this step [y/n]
+echo =====================================================
+set /P c=Terminates the Platform installation until you install Docker? (You might skip Docker and Docker Private Registry) [y/n]
 if /I "%c%" EQU "Y" goto :installEndNow
 if /I "%c%" EQU "N" goto :endDockerCheck
 goto :answerDocker
@@ -51,7 +52,10 @@ if not exist "Platform" mkdir "Platform"
 cd Platform
 
 :prerequisites
-set /P c=Do you want to install the prerequisites (Java 13, Maven version 3.6.3, and Python version 3.9)? [Y/N]?
+echo =====================================================
+echo "-- This action will set and use windows Environment Variables --"
+echo "-- It is recommended to use the following versions for the prerequisites --"
+set /P c=Do you want to install the prerequisites (Java 13, Maven version 3.6.3, and Python version 3.9)? (You might skip the prerequisites installation) [y/n]
 if /I "%c%" EQU "Y" goto :prerequisitesYes
 if /I "%c%" EQU "N" goto :prerequisitesNo
 goto :prerequisites
@@ -131,7 +135,7 @@ goto :answerJava
 
 :installJava
 
-curl https://download.java.net/openjdk/jdk13/ri/openjdk-13+33_windows-x64_bin.zip -O openjdk-13+33_windows-x64_bin.zip
+curl https://download.java.net/openjdk/jdk13/ri/openjdk-13+33_windows-x64_bin.zip -o openjdk-13+33_windows-x64_bin.zip
 tar xzpvf openjdk-13+33_windows-x64_bin.zip
 setx /M JAVA_HOME "%cd%\jdk-13"
 SET JAVA_HOME=%cd%\jdk-13
@@ -158,7 +162,7 @@ goto :answerMaven
 
 :installMaven
 
-curl https://archive.apache.org/dist/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.zip -O apache-maven-3.6.3-bin.zip
+curl https://archive.apache.org/dist/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.zip -o apache-maven-3.6.3-bin.zip
 tar xzpvf apache-maven-3.6.3-bin.zip
 setx /M MAVEN_HOME "%cd%\apache-maven-3.6.3"
 SET MAVEN_HOME=%cd%\apache-maven-3.6.3
@@ -184,7 +188,7 @@ goto :answerMaven
 
 :installPython
 
-curl https://www.python.org/ftp/python/3.9.6/python-3.9.6-amd64.exe -O python-3.9.6-amd64.exe
+curl https://www.python.org/ftp/python/3.9.6/python-3.9.6-amd64.exe -o python-3.9.6-amd64.exe
 python-3.9.6-amd64.exe InstallAllUsers=1 PrependPath=1 Include_test=0 /quiet
 SET Path=%Path%;C:\Program Files\Python39\Scripts\;C:\Program Files\Python39\
 pip install pyflakes
@@ -227,7 +231,7 @@ RegistryRun="Yes"
 if not exist "Install" mkdir "Install"
 cd Install
 
-curl https://jenkins-2.sse.uni-hildesheim.de/view/IIP-Ecosphere/job/IIP_Install/lastSuccessfulBuild/artifact/platform/tools/Install/install.zip -O install.zip
+curl https://jenkins-2.sse.uni-hildesheim.de/view/IIP-Ecosphere/job/IIP_Install/lastSuccessfulBuild/artifact/platform/tools/Install/install.zip -o install.zip
 tar xzpvf install.zip
 
 cd platformDependencies/

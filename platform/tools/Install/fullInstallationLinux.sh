@@ -1,5 +1,7 @@
 mkdir -p Platform && cd Platform
 
+echo "-- This action will set and use Environment Variables --"
+echo "-- It is recommended to use the following versions for the prerequisites --"
 read -p "Do you want to install the prerequisites (Java 13, Maven version 3.6.3, Docker version 20.10.7, and Python version 3.9)? (y/n) " yn
 if [ $yn == "y" ] || [ $yn == "Y" ]; then 
     
