@@ -68,18 +68,18 @@ public class Cli extends CliBackend {
         Transport.setTransportSetup(() -> setup.getTransport());
         CommandProvider provider;
         SemanticIdResolver.resolve(""); // warm-up, initialize
+        println("oktoflow, interactive platform command line " + IipVersion.getInstance().getVersion() + ".");
+        println("AAS server: " + setup.getAas().getServerEndpoint().toUri());
+        println("AAS registry: " + setup.getAas().getRegistryEndpoint().toUri());
         if (0 == args.length) {
             provider = new ScannerCommandProvider(new Scanner(System.in));
-            println("oktoflow, interactive platform command line " + IipVersion.getInstance().getVersion() + ".");
-            println("AAS server: " + setup.getAas().getServerEndpoint().toUri());
-            println("AAS registry: " + setup.getAas().getRegistryEndpoint().toUri());
             println("Type \"help\" to see commands and their description.");
         } else {
             provider = new ArgsCommandProvider(args);
         }
         TopLevelCommandInterpreter tci = new TopLevelCommandInterpreter();
         tci.interpret(provider, Level.TOP);
-        //interpretTopLevel(provider);
+        System.exit(tci.hadException() ? 1 : 0);
     }
     
     /**

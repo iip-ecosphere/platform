@@ -128,6 +128,8 @@ class CliBackend {
      */
     protected abstract static class AbstractCommandInterpreter {
 
+        private boolean hadException = false;
+        
         /**
          * Prints the help.
          * 
@@ -155,6 +157,7 @@ class CliBackend {
                     prompt(level, provider);
                     cmd = provider.nextCommand();
                     if (null != cmd) {
+                        boolean withException = false;
                         switch (cmd.toLowerCase()) {
                         case "help":
                             printHelp(provider, level);
@@ -178,16 +181,28 @@ class CliBackend {
                             try {
                                 exit = interpretFurther(provider, level, cmd);
                             } catch (ExecutionException | URISyntaxException e) {
+                                withException = true;
                                 println(e);
                             }
                             break;
                         }
+                        hadException = withException;
                     }
                 } while (null != cmd && !exit);
             } catch (IOException e) {
                 println(e);
+                hadException = true;
             }
             return exit;
+        }
+        
+        /**
+         * Returns whether this interpreter had an exception.
+         * 
+         * @return {@code true} for exception, {@code false} else
+         */
+        protected boolean hadException() {
+            return hadException;
         }
 
         /**
@@ -895,9 +910,9 @@ class CliBackend {
         if (null == text) {
             text = ""; // shall result in an URISyntaxException, not an NPE  
         }
-        if (text.indexOf(':') < 0) {
-            File f = new File(text).getAbsoluteFile();
-            result = f.toURI();
+        File f = new File(text);
+        if (f.isFile()) {
+            result = f.getAbsoluteFile().toURI();
         } else {
             result = new URI(text);
         }
