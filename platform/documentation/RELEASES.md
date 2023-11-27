@@ -1,5 +1,7 @@
 # oktoflow platform: Releases
 
+### Version 0.7.0 (consolidation):
+
 In progress:
 * [#117](https://github.com/iip-ecosphere/platform/issues/117): Multiple service managers per device
 * [#156](https://github.com/iip-ecosphere/platform/issues/156): UI regression tests
