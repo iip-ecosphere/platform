@@ -58,7 +58,18 @@ as well as
 
 Ensure that the temporary file `src/test/tmp/config.json` does not exist (must be in `src` due to Angular conventions), i.e., delete it if it exist, and run then
 
+If you also need a running application (all tests shall be developed so that executing an application is optional although decreasing the test coverage), please execute in an own shell
+
+- `cd gen/platform`
+- `cli.sh deploy artifacts/deployment.yaml`
+
 `ng test` or for more "headless" execution
 `ng test --no-watch --no-progress --browsers=ChromeHeadless` if desirable also with `--code-coverage` or further arguments.
 
 To re-enable the full tests, execute `mvn install -Dunpack.force=true`.
+
+For shutdown, consider executing `cli.sh undeploy artifacts/deployment.yaml`.
+
+## Development hints
+
+Use `console.debug`, `console.warn`, `console.info`, `console.log`, `console.error` where appropriate, not only `console.log`. Except for `console.error`, the others can be switched off via `assets/config/config.json`.

@@ -3,6 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { InstancesComponent } from './instances.component';
 import { HttpClientModule } from '@angular/common/http';
 import { EnvConfigService } from '../../services/env-config.service';
+import { retry } from '../../services/utils.service';
 
 describe('InstancesComponent', () => {
 
@@ -20,6 +21,14 @@ describe('InstancesComponent', () => {
     fixture = TestBed.createComponent(InstancesComponent);
     component = fixture.componentInstance;
     await component.ngOnInit();
+    await retry({ // techData resolved asynchronously
+      fn: function () {
+        return component?.filteredData?.length > 0;
+      },
+      maxAttempts: 3,
+      delay: 500,
+    }).catch(e => {});
+    await fixture.detectChanges();        
   });
 
   it('should create', () => {
@@ -28,10 +37,41 @@ describe('InstancesComponent', () => {
 
   it('should show app instances', async() => {
     await fixture.detectChanges();
+    await fixture.whenRenderingDone();
     let compiled = fixture.nativeElement as HTMLElement;
+    let rows = compiled.querySelectorAll("table tr") as NodeListOf<Element>;
+    expect(rows).toBeTruthy();
+    let button = undefined as HTMLElement | undefined;
+    // if not app is running, there may not be any instance; there may also be two
+    rows.forEach((r) => {
+      let td = r.querySelector('td[id="data.nr"]') as HTMLElement;
+      expect(td).toBeTruthy();
+      expect(td.innerText).toMatch(/\d+/);
 
-    // TODO requires started instance from deployment-plans and test frame
-    expect(component).toBeTruthy();
+      td = r.querySelector('span[id="data.idShort"]') as HTMLElement;
+      expect(td).toBeTruthy();
+      let tmp = td.innerText.trim(); 
+      expect(tmp).toMatch(/\S+/);
+      let parts = tmp.split("_");
+      let idShort;
+      if (parts.length == 1) {
+        idShort = tmp;
+      } else {
+        idShort = parts[0];
+      }
+
+      // item.value may be there or not
+
+      let btn  = r.querySelector('button[id="data.btnUndeploy"]') as HTMLElement;
+      expect(btn).toBeTruthy();
+      if (idShort === 'myApp') {
+        button = btn;
+      }
+    });
+
+    if (button) {
+      // TODO undeploy first
+    }
   });
 
 });

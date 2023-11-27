@@ -6,17 +6,17 @@
   <div style="font-size: 20px;">{{data.idShort}}</div>
 
 <br>
-<button mat-raised-button class="logs-btn"
+<button mat-raised-button class="logs-btn" id="btn.start"
   (click)="startLogsStream()"> start
 </button>
-<button mat-raised-button class="logs-btn"
+<button mat-raised-button class="logs-btn" id="btn.reset"
   (click)="reset()"> reset
 </button>
-<button mat-raised-button class="logs-btn"
+<button mat-raised-button class="logs-btn" id="btn.stop"
   (click)="close()"> stop
 </button>
 <div style="overflow: auto;">
-  <pre style="white-space: pre-wrap; font-size: 14px;">
+  <pre style="white-space: pre-wrap; font-size: 14px;" id="log">
     {{data.logs}}
 </pre>
 </div>

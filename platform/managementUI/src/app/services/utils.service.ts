@@ -27,7 +27,7 @@ export function retry({ fn, maxAttempts = 1, delay = 1000, attempts = 1 }: Retry
               .catch((err) => reject(err)),
           delay
         )
-      } else reject('Could not resolve function.')
+      } else reject('Could not finally resolve promise - retry failed.')
     }
   })
 }

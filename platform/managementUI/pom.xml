@@ -17,7 +17,6 @@
     <iip.resources>${project.build.directory}/easy-test/resources</iip.resources>
     <platformDir>gen/platform</platformDir>
     <skip.replacement>false</skip.replacement>
-    <check.artifacts>${project.groupId}:platform.exec:${project.version} ${project.groupId}:configuration.configuration:zip:easy:${project.version} ${project.groupId}:configuration.configuration:zip:easy-test:${project.version}</check.artifacts>
   </properties>
   
   <dependencies>
@@ -148,7 +147,7 @@
                    </goals>
                    <configuration>
                        <checkChanged>true</checkChanged>
-                       <changeCheckArtifacts>${check.artifacts}</changeCheckArtifacts>
+                       <changeCheckArtifacts>${project.groupId}:InstallBroker:${project.version}</changeCheckArtifacts>
                    </configuration>
                 </execution>
                <execution>
@@ -159,7 +158,7 @@
                    </goals>
                    <configuration>
                        <checkChanged>true</checkChanged>
-                       <changeCheckArtifacts>${check.artifacts}</changeCheckArtifacts>
+                       <changeCheckArtifacts>${project.groupId}:platform.exec:${project.version}</changeCheckArtifacts>
                        <resourcesDirectory>${iip.resources}</resourcesDirectory>
                    </configuration>
                </execution>
@@ -181,14 +180,15 @@
                        <errToIn>true</errToIn>
                        <platformDir>${platformDir}</platformDir>
                        <artifacts>
-                           <directory>src/test/resources</directory>
+                           <directory>.</directory>
                            <includes>
-                               <include>deployment.yaml</include>
+                               <include>src/test/resources/deployment.yaml</include>
+                               <include>gen/SimpleMeshTestingApp/target/SimpleMeshTestingApp-0.1.0-SNAPSHOT-bin.jar</include>
                            </includes>
                        </artifacts>
                        <mgtUiSetupFileTemplate>src/assets/config/configTemplate.json</mgtUiSetupFileTemplate>
                        <mgtUiSetupFile>src/test/tmp/config.json</mgtUiSetupFile>
-                       <!-- <deploymentPlan>src/test/resources/deployment.yaml</deploymentPlan> -->
+                       <deploymentPlan>${platformDir}/artifacts/deployment.yaml</deploymentPlan>
                    </configuration>
                </execution>
                <execution>
@@ -205,6 +205,34 @@
                <modelDirectory>${project.build.directory}/easy-test</modelDirectory>
            </configuration>
        </plugin>
+       
+       <!-- to be on the safe side if only platform shall be built -->
+       <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>3.3.1</version>
+        <executions>
+          <execution>
+            <id>copy-resources</id>
+            <!-- here the phase you need -->
+            <phase>generate-test-sources</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>gen/platform/artifacts</outputDirectory>
+              <resources>          
+                <resource>
+                  <directory>src/test/resources</directory>
+                  <includes>
+                    <include>deployment.yaml</include>
+                  </includes>
+                  <filtering>false</filtering>
+                </resource>
+              </resources>              
+            </configuration>            
+          </execution>
+        </executions>
+      </plugin>
 
        <plugin>
            <groupId>org.apache.maven.plugins</groupId>

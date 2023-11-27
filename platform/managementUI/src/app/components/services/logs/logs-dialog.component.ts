@@ -40,6 +40,7 @@ export class LogsDialogComponent implements OnInit{
   serviceMgr: string | undefined;
   serviceInfo: any;
   private subscription!: Subscription;
+  getUrl: () => string = () => window.location.href;
 
   /* logs stream mode mode="START"|"TAIL"
   (start=log from start, tail=continue at end as selecter by user)*/
@@ -64,13 +65,13 @@ export class LogsDialogComponent implements OnInit{
   running:number = 0
 
   ngOnInit(): void {
-    console.log('[logs-dialog | ngOnInit] running: ' + this.running)
+    console.debug('[logs-dialog | ngOnInit] running: ' + this.running)
     this.startLogsStream()
   }
 
   public async startLogsStream() {
     this.getUrlParams()
-    console.log('[logs-dialog | startLogsStream] running: ' + this.running
+    console.debug('[logs-dialog | startLogsStream] running: ' + this.running
       + ' idShort: ' + this.data.idShort)
     if (this.running == 0) {
       const inputVariable = await this.getInputVar(this.data.idShort, this.mode)
@@ -82,14 +83,14 @@ export class LogsDialogComponent implements OnInit{
       }
       this.running = 1
     } else {
-      console.log('[logs-dialog.comp | startLogsStream] '
+      console.warn('[logs-dialog.comp | startLogsStream] '
         + 'stream cannot be started because it is already running. ')
     }
   }
 
   public getUrlParams() {
-    console.log('[logs-dialog | getUrlParams] triggered ')
-    let url = window.location.href
+    console.debug('[logs-dialog | getUrlParams] triggered ')
+    let url = this.getUrl();
     let params =  url.match(/id=.*/);
 
     if(params) {
@@ -122,7 +123,7 @@ export class LogsDialogComponent implements OnInit{
       inputVariable) as unknown as platformResponse
 
     this.getPlatformResponseResolution(response)
-    console.log("[logs-dialog | getPlatformResponseResolution]"
+    console.debug("[logs-dialog | getPlatformResponseResolution]"
       + "Endpoints - \nstdout: "
       + this.stdoutUrl
       + ", \nstderr: "
@@ -205,7 +206,7 @@ export class LogsDialogComponent implements OnInit{
         + "/submodel/submodelElements/"
         + submodelElement));
       } catch(e) {
-        console.log(e);
+        console.error(e);
       }
     return response
   }
@@ -215,7 +216,7 @@ export class LogsDialogComponent implements OnInit{
   }
 
   public close() {
-    console.log("[log-dialog | close] triggered")
+    console.debug("[log-dialog | close] triggered")
     this.websocketService.close()
     if (this.running != 0) {
       this.closeLogsStream()
@@ -226,7 +227,7 @@ export class LogsDialogComponent implements OnInit{
   inputVarPlaceholder: InputVariable[] | undefined
 
   public async closeLogsStream() {
-    console.log("[log-dialog | closeLogs Async] triggered")
+    console.debug("[log-dialog | closeLogs Async] triggered")
     let inputVar = await this.getInputVar(this.data.idShort, "STOP")
 
     let resourceId = this.serviceInfo.resource
@@ -241,15 +242,15 @@ export class LogsDialogComponent implements OnInit{
       basyxFun,
       inputVar) as unknown as platformResponse
 
-    console.log("[log-dialog | closeStreamLog] platform response: ")
-    console.log(response.executionState)
+    console.debug("[log-dialog | closeStreamLog] platform response: ")
+    console.debug(response.executionState)
   }
 
   // ----------- sync -----------------
 
 
   public closeLogsStreamSync() {
-    console.log("[log-dialog | closeLogs Sync] triggered")
+    console.debug("[log-dialog | closeLogs Sync] triggered")
 
     let inputVariable = this.inputVarPlaceholder
     if(inputVariable) {
@@ -276,7 +277,7 @@ export class LogsDialogComponent implements OnInit{
       if(request.readyState === XMLHttpRequest.DONE) {
         if(request.status === 200) {
           const response = JSON.parse(request.responseText)
-          console.log('Response: ' + response)
+          console.debug('Response: ' + response)
         } else {
           console.error('Error ' + request.status, request.statusText)
         }
@@ -297,7 +298,7 @@ export class LogsDialogComponent implements OnInit{
 
   @HostListener('window:beforeunload', ['$event'])
   beforeunloadHandler(event: any) {
-    console.log("[log-dialog | beforeunloadHandler] triggered")
+    console.debug("[log-dialog | beforeunloadHandler] triggered")
     if (this.running != 0) {
       this.closeLogsStreamSync()
 

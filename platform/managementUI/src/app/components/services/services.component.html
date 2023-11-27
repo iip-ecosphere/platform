@@ -7,8 +7,8 @@
         class="custom-label">
           <table>
             <tr>
-              <td class="tab-label"><img src="/assets/aas.png" class="aas-icon-tab"></td>
-              <td class="tab-label">{{tab.tabName}}</td>
+              <td id="tab.img" class="tab-label"><img src="/assets/aas.png" class="aas-icon-tab"></td>
+              <td id="tab.text" class="tab-label">{{tab.tabName}}</td>
             </tr>
           </table>
         </span>
@@ -40,10 +40,10 @@
 
 
       <!-- Table -->
-      <table style="margin: 0px;"
+      <table id="data" style="margin: 0px;"
         *ngIf="tab.tabName == 'running services' || tab.tabName == 'running artifacts'; else elseOption">
         <!--<tr *ngFor="let item of filteredData; let i = index"> -->
-        <tr *ngFor="let item of dataToDisplay; let i = index">
+        <tr id="data.row" *ngFor="let item of dataToDisplay; let i = index">
 
           <td style="width: 2%; text-align: center;"> {{i + 1}} </td>
 
@@ -51,14 +51,14 @@
           <td style="width: 100%;">
 
             <span class="row-title" >
-              <span style="height: 5px; vertical-align: top; margin-right: 10px;">
+              <span id="data.idShort" style="height: 5px; vertical-align: top; margin-right: 10px;">
                 {{item.idShort}}
               </span>
             </span>
-            <div *ngIf="item.logo">
+            <div id="data.logo" *ngIf="item.logo">
               <img src={{item.logo}} class="service-icon">
             </div>
-            <div *ngFor="let property of item.value" class="subtext" >
+            <div id="data.value" *ngFor="let property of item.value" class="subtext" >
               {{displayValue(property)}}
             </div>
           </td>
@@ -66,11 +66,11 @@
           <!-- Buttons -->
           <td class="cell-with-button">
             <div *ngIf="tab.tabName == 'running services'">
-              <button mat-raised-button *ngIf="isRunning(item)" class="btn"
+              <button id="data.btnStdout" mat-raised-button *ngIf="isRunning(item)" class="btn"
                 (click)="getDialog(item.id, item.idShort, stdout)">
                 stdout logging
               </button>
-              <button mat-raised-button *ngIf="isRunning(item)" class="btn"
+              <button id="data.btnStderr" mat-raised-button *ngIf="isRunning(item)" class="btn"
                 (click)="getDialog(item.id, item.idShort, stderr)">
                 stderr logging
               </button>

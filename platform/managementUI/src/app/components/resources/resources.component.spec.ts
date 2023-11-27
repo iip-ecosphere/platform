@@ -44,7 +44,7 @@ describe('ResourcesComponent', () => {
       },
       maxAttempts: 3,
       delay: 500,
-    }).catch();
+    }).catch(e => {});
     await fixture.detectChanges();        
   });
 

@@ -97,7 +97,7 @@ export class ServicesComponent implements OnInit {
   debug:number = 0
 
   public getDialog(id:string, idShort:string, logsType:string) {
-    console.log("[serviceComp | getDialog] getDialog with logs type: " + logsType)
+    console.debug("[serviceComp | getDialog] getDialog with logs type: " + logsType)
     this.zone.run(() => {
       let data = Date.now()
       let url = document.URL
@@ -135,7 +135,7 @@ export class ServicesComponent implements OnInit {
         + "/submodel/submodelElements/"
         + submodelElement));
       } catch(e) {
-        console.log(e);
+        console.error(e);
       }
     return response
   }
@@ -173,7 +173,7 @@ export class ServicesComponent implements OnInit {
   public async getTechnicalData(url:string) {
     let response;
     let technicalDataUrl = url + "/submodels/TechnicalData/submodel"
-    console.log("# (getTechnicalData) \nURL: " + technicalDataUrl)
+    console.debug("# (getTechnicalData) \nURL: " + technicalDataUrl)
     try {
       response = await firstValueFrom(this.http.get(technicalDataUrl));
 
@@ -261,10 +261,10 @@ export class ServicesComponent implements OnInit {
     this.filterForCorrectState()
 
 
-    console.log("# (filterService) filteredData:")
-    console.log(this.filteredData)
-    console.log('# (filterServices) dataToDisplay:')
-    console.log(this.dataToDisplay)
+    console.debug("# (filterService) filteredData:")
+    console.debug(this.filteredData)
+    console.debug('# (filterServices) dataToDisplay:')
+    console.debug(this.dataToDisplay)
 
   }
 

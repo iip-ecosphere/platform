@@ -4,7 +4,7 @@ appId: SimpleMeshApp
 disabled: false
 version: 0.1.0
 description: SimpleMesh UI testing application
-artifact: ./gen/platform/SimpleMesh/SimpleMeshTestingApp/target/SimpleMeshTestingApp-0.1.0-SNAPSHOT-bin.jar
+artifact: ./SimpleMeshTestingApp/target/SimpleMeshTestingApp-0.1.0-SNAPSHOT-bin.jar
 parallelize: false
 onUndeployRemoveArtifact: true
 assignments:
