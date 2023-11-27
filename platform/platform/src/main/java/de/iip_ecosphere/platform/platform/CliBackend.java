@@ -910,11 +910,13 @@ class CliBackend {
         if (null == text) {
             text = ""; // shall result in an URISyntaxException, not an NPE  
         }
-        File f = new File(text);
-        if (f.isFile()) {
-            result = f.getAbsoluteFile().toURI();
-        } else {
+        try {
             result = new URI(text);
+            if (!result.isAbsolute()) {
+                throw new URISyntaxException(text, "URI is not absolute"); // -> file
+            }
+        } catch (URISyntaxException e) {
+            result = new File(text).getAbsoluteFile().toURI();
         }
         return result;
     }

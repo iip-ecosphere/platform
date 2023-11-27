@@ -69,10 +69,12 @@ public class Cli extends CliBackend {
         Transport.setTransportSetup(() -> setup.getTransport());
         CommandProvider provider;
         SemanticIdResolver.resolve(""); // warm-up, initialize
-        println("oktoflow, interactive platform command line " + IipVersion.getInstance().getVersion() + ".");
+        boolean interactive = args.length == 0;
+        println("oktoflow" + (interactive ? " interactive" : "") + " platform command line, version " 
+            + IipVersion.getInstance().getVersion() + ".");
         println("AAS server: " + setup.getAas().getServerEndpoint().toUri());
         println("AAS registry: " + setup.getAas().getRegistryEndpoint().toUri());
-        if (0 == args.length) {
+        if (interactive) {
             provider = new ScannerCommandProvider(new Scanner(System.in));
             println("Type \"help\" to see commands and their description.");
         } else {
