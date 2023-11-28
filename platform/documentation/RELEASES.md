@@ -23,6 +23,7 @@ Improvements:
 * Platform maven plugins can detect platform model and maven component changes. 
 * Platform runtime properties in pidDir/oktoflow.yaml.
 * Partial setup override in oktoflow-local.yml.
+* Platform CLI file/URI support and artifactsPrefixURI substitution
 
 ### Version 0.6.0 (2023/10/11, EMO'23):
 

@@ -1,10 +1,10 @@
-# IIP-Ecosphere platform
+# oktoflow platform: Central Platform Services and CLI
 
 The platform component for configuring and starting platform services. The platform component consists of the AAS abstraction as well as the abstract services and the abstract ECSruntime components for the AAS clients. Currently, this component just provides a command line interface (CLI) as basic access to platform functionality.
 
-## Configuration
+## Setup
 
-The basic YAML configuration of the platform services (in ``iipecosphere.yml``) provide the following settings:
+The basic YAML setup of the platform services (in ``iipecosphere.yml``) provides the following settings:
 
     aas:
       server:
@@ -90,7 +90,7 @@ Deploying multiple services, in particular across devices, can be tedious and er
     memLimits:
       <String>: <Long>
 
-A deployment plan may specify the `application` (name), the plan `id`, the application `id` (e.g., to retrieve the application AAS), the `version` of the plan as well as the `description` of the application/plan, all five optional and indented for display in the CLI/UI. Further, a deployment plan specifies the service implementation `artifact` containing the services, either as local path or as URI. The execution of the plan can be done sequentially (the default) or in parallel (set `parallelize` to `true`). If sequential, the author of the plan has the responsibility to state the resources/services in the sequence that they can be started through the installed/configured service manager. A plan can also enable/prevent the execution of multiple instances of the specified deployment/application (`allowMultiExecution` default `true`). For the Spring Cloud Stream service manager, currently, all pre-requisite services must be started before an upstream service can be started, i.e., resources and services shall be given in their flow sequence from sources to sinks. Service implementation artifacts can be automatically removed from the respective resources upon undeployment (`onUndeployRemoveArtifact`, default is `true`). Within `assignments` the target resources with their respective ids and within the resources the services to be started with their respective service ids must be given. If not otherwise specified by an assignment-specific `artifact` (within `assignments` as shown above), the global `artifact` will be used. As indicated above, multiple services and resources can be given, a single resource can also be mentioned multiple times if required. 
+A deployment plan may specify the `application` (name), the plan `id`, the application `id` (e.g., to retrieve the application AAS), the `version` of the plan as well as the `description` of the application/plan, all five optional and indented for display in the CLI/UI. Further, a deployment plan specifies the service implementation `artifact` containing the services, either as absolute/relative local path or as URI (with `${artifactsUriPrefix}` substituted by `artifactsUriPrefix` defined in the platform configuration/reflected in the setup file above). The execution of the plan can be done sequentially (the default) or in parallel (set `parallelize` to `true`). If sequential, the author of the plan has the responsibility to state the resources/services in the sequence that they can be started through the installed/configured service manager. A plan can also enable/prevent the execution of multiple instances of the specified deployment/application (`allowMultiExecution` default `true`). For the Spring Cloud Stream service manager, currently, all pre-requisite services must be started before an upstream service can be started, i.e., resources and services shall be given in their flow sequence from sources to sinks. Service implementation artifacts can be automatically removed from the respective resources upon undeployment (`onUndeployRemoveArtifact`, default is `true`). Within `assignments` the target resources with their respective ids and within the resources the services to be started with their respective service ids must be given. If not otherwise specified by an assignment-specific `artifact` (within `assignments` as shown above), the global `artifact` will be used. As indicated above, multiple services and resources can be given, a single resource can also be mentioned multiple times if required. 
 
 A deployment plan can be set to `disabled` (default `false`, i.e., enabled). While the CLI will still execute such a plan, a disabled plan shall indicate a plan for testing/debugging, i.e., UIs shall not display it/it shall not be visible through the artifacts manager.
 
@@ -113,4 +113,3 @@ Also the `memLimits`, the memory limits per service (ensemble) are optional and 
 
 ## Missing
 - AAS discovery, currently we rely on the full IP specification instantiated through the configuration
-- Higher level commands for higher level components

@@ -416,7 +416,7 @@ class CliBackend {
      */
     private static URI getArtifact(URI artifact, ServiceResourceAssignment assng) throws URISyntaxException {
         URI result = artifact;
-        String art = assng.getArtifact();
+        String art = ServiceDeploymentPlan.getArtifactSubstituted(assng.getArtifact());
         if (art != null && art.length() > 0) {
             result = toUri(art);
         }
@@ -582,7 +582,7 @@ class CliBackend {
             }
             appInstanceId = PlatformAas.notifyAppNewInstance(p.getAppId(), p.getId());
             deployContainers(p);
-            URI artifact = toUri(p.getArtifact());
+            URI artifact = toUri(ServiceDeploymentPlan.getArtifactSubstituted(p.getArtifact()));
             Map<String, ServicesClient> serviceClients = new HashMap<>();
             for (ServiceResourceAssignment a: p.getAssignments()) {
                 URI art = getArtifact(artifact, a);
@@ -683,7 +683,7 @@ class CliBackend {
         ServiceDeploymentPlan p = loadPlan(plan);
         List<ExecutionException> exceptions = new ArrayList<>();
         try {
-            URI artifact = toUri(p.getArtifact());
+            URI artifact = toUri(ServiceDeploymentPlan.getArtifactSubstituted(p.getArtifact()));
             Map<String, ServicesClient> serviceClients = new HashMap<>();
             Map<String, Integer> stillRunning = new HashMap<>();
             List<ServiceResourceAssignment> assignments = new ArrayList<>(p.getAssignments());

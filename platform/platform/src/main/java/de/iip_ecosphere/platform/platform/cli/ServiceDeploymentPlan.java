@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.iip_ecosphere.platform.platform.PlatformSetup;
 import de.iip_ecosphere.platform.services.environment.switching.ServiceBase;
 import de.iip_ecosphere.platform.support.Version;
 import de.iip_ecosphere.platform.support.setup.AbstractSetup;
@@ -251,7 +252,23 @@ public class ServiceDeploymentPlan extends AbstractSetup {
     public String getArtifact() {
         return artifact;
     }
-    
+
+    /**
+     * Returns the path/URI of the artifact, {@code ${artifactsUriPrefix}} substituted by 
+     * {@link PlatformSetup#getArtifactsUriPrefix()}.
+     * 
+     * @param artifact the artifact
+     * @return the path/URI
+     */
+    public static String getArtifactSubstituted(String artifact) {
+        String result = artifact;
+        if (result != null) {
+            result = result
+                .replace("${artifactsUriPrefix}", PlatformSetup.getInstance().getArtifactsUriPrefix());
+        }
+        return result;
+    }
+
     /**
      * Returns whether the plan shall be executed in parallel.
      * 
