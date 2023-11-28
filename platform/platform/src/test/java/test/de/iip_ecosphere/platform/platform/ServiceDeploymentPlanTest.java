@@ -71,4 +71,16 @@ public class ServiceDeploymentPlanTest {
         Assert.assertFalse(plan.isDisabled());
     }
 
+    /**
+     * Tests {@link ServiceDeploymentPlan#getArtifactSubstituted(String)}.
+     */
+    @Test
+    public void substituteTest() {
+        Assert.assertNull(ServiceDeploymentPlan.replace(null, null, null));
+        Assert.assertEquals("text", ServiceDeploymentPlan.replace("text", null, null));
+        Assert.assertEquals("text", ServiceDeploymentPlan.replace("text", "text", null));
+        Assert.assertEquals("aaa", ServiceDeploymentPlan.replace("text", "text", "aaa"));
+        Assert.assertEquals("artifact", ServiceDeploymentPlan.getArtifactSubstituted("artifact"));
+    }
+    
 }

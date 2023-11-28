@@ -261,14 +261,25 @@ public class ServiceDeploymentPlan extends AbstractSetup {
      * @return the path/URI
      */
     public static String getArtifactSubstituted(String artifact) {
-        String result = artifact;
-        if (result != null) {
-            result = result
-                .replace("${artifactsUriPrefix}", PlatformSetup.getInstance().getArtifactsUriPrefix());
+        return replace(artifact, "${artifactsUriPrefix}", PlatformSetup.getInstance().getArtifactsUriPrefix());
+    }
+
+    /**
+     * Returns {@code find} replaced in {@code text} by {@code replacement}.
+     * 
+     * @param text the text to replace within (may be <b>null</b>, then nothing happens)
+     * @param find the text to find (may be <b>null</b>, then nothing happens)
+     * @param replacement the replacement text (may be <b>null</b>, then nothing happens)
+     * @return {@code text} or {@code text} with {@code find} replaced by {@code replacement}
+     */
+    public static String replace(String text, String find, String replacement) {
+        String result = text;
+        if (result != null && find != null && replacement != null) {
+            result = result.replace(find, replacement); 
         }
         return result;
     }
-
+ 
     /**
      * Returns whether the plan shall be executed in parallel.
      * 
