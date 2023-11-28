@@ -1,4 +1,4 @@
-# oktoflow platform Management UI
+# oktoflow platform: Management UI
 
 ## Prerequisites (for Ubuntu Server, CI)
 

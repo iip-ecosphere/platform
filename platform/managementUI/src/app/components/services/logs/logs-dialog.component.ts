@@ -77,11 +77,20 @@ export class LogsDialogComponent implements OnInit{
       const inputVariable = await this.getInputVar(this.data.idShort, this.mode)
       await this.getWebsocketEndpoint(inputVariable)
       if (this.data.type == this.stdout) {
-        this.websocketService.connect(this.stdoutUrl)
+        if (this.stdoutUrl && this.stdoutUrl.length > 0) {
+            this.websocketService.connect(this.stdoutUrl)
+            this.running = 1
+        } else {
+          console.warn("No stdoutUrl available. Cannot start log stream websocket.");
+        }
       } else {
-        this.websocketService.connect(this.stderrUrl)
+        if (this.stderrUrl && this.stderrUrl.length > 0) {
+          this.websocketService.connect(this.stderrUrl)
+          this.running = 1
+        } else {
+          console.warn("No stdoutUrl available. Cannot start log stream websocket.");
+        }
       }
-      this.running = 1
     } else {
       console.warn('[logs-dialog.comp | startLogsStream] '
         + 'stream cannot be started because it is already running. ')
@@ -131,6 +140,7 @@ export class LogsDialogComponent implements OnInit{
   }
 
   public getPlatformResponseResolution(response:platformResponse) {
+    let done = false;
     if(response && response.outputArguments) {
       let output = response.outputArguments[0]?.value?.value;
       if (output) {
@@ -139,8 +149,12 @@ export class LogsDialogComponent implements OnInit{
           let result = JSON.parse(temp.result);
           this.stdoutUrl = result[0]
           this.stderrUrl = result[1]
+          done = true;
         }
       }
+    }
+    if (!done) {
+      console.warn("No valid platform response, no stream URLs available.");
     }
   }
 
