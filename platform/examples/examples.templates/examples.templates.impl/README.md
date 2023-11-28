@@ -1,4 +1,4 @@
-# Service implementation project for impl.ExampleTemplatesProject.
+# oktoflow platform examples: Service implementation project for impl.ExampleTemplatesProject.
 
 Contains a template project for service implementations for impl.ExampleTemplatesProject. The configuration model is assumed to be 
 managed by the platform. Although generated, this code is intended to be imported into your Eclipse IDE and modified. 

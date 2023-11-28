@@ -1,11 +1,11 @@
-# IIP-Ecosphere support layer
+# oktoflow platform: Support Layer
 
-Basic functionality for the IIP-Ecosphere in terms of:
+Basic functionality for the oktoflow platform in terms of:
   * Basic [support functions](support/README.md)
   * Asset Administration Shell (AAS) [abstraction](support.aas/README.md) with visitor, communication protocol support and useful recipes for deployment and I/O
   * [Default AAS client abstraction implementation](support.aas.basyx/README.md) for [Eclipse Basyx](https://www.eclipse.org/basyx/)
   * [Default AAS server abstraction implementation](support.aas.basyx.server/README.md) for [Eclipse Basyx](https://www.eclipse.org/basyx/)
-  * Additional [AAS support functionality for the IIP-Ecosphere platform](support.iip-aas/README.md)
+  * Additional [AAS support functionality for the oktoflow platform](support.iip-aas/README.md)
   * Simple default [system metrics implementation](support.dfltSysMetrics/README.md) refining the system monitoring interface in `support.aas`.
   * [System metrics for Phoenix Contact/PLCnext](support.sysMetrics.plcnext/README.md) refining the system monitoring interface in `support.aas`.
   * [System metrics for Bitmotec](support.sysMetrics.bitmotec/README.md) refining the system monitoring interface in `support.aas`.

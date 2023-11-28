@@ -1,6 +1,6 @@
-# IIP-Ecosphere platform: Examples and demo use cases
+# oktoflow platform: Examples and demo use cases
 
-To demonstrate and validate the IIP-Ecosphere platform, we collect in this folder a set of examples and demo use cases.
+To demonstrate and validate the oktoflow platform, we collect in this folder a set of examples and demo use cases.
 
 * Assembling and executing platform containers on [PHOENIX CONTACT](https://www.phoenixcontact.com) AXC 3152 successful. Trying to improve container sizes. Specific code may follow when internal MQTT/OPC UA sources are connected.
 * [VDW OPC-UA](examples/examples.vdw/README.md): Utilizing the [VDW](https://vdw.de/) OPC-UA server through the respective platform connector.

@@ -1,4 +1,4 @@
-# IIP-Ecosphere platform examples: RTSA
+# oktoflow platform examples: RTSA
 
 Utilizes the RTSA platform service in a simple service chain. If compile errors show up, e.g., in Eclipse, this means that the generated code is not yet in place. Run the instantiation/connector generation as described below (generated classes are intentionally not in github, generated example components are intentionally not deployed to Maven).
 

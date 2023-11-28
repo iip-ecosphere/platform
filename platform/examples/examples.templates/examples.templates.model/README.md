@@ -1,4 +1,4 @@
-# IIP-Ecosphere platform: Setup for an implementation project.
+# oktoflow platform: Setup for an implementation project.
 
 Project for the application model. There is a second project in the same folder called `impl.impl` that is also required.
 

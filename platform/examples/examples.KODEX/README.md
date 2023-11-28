@@ -1,6 +1,6 @@
-# IIP-Ecosphere platform examples: KODEX
+# oktoflow platform examples: KODEX
 
-This example aims at running the anonymizer/pseudonymizer KODEX as part of an IIP-Ecosphere pipeliner. The example consists of several pieces:
+This example aims at running the anonymizer/pseudonymizer KODEX as part of an oktoflow pipeline. The example consists of several pieces:
   * An IVML configuration for the application in `src/main/easy/ExampleKODEX.ivml`.
   * An implementation of the Java services used in the application in `src/main/java`
   * `pom.xml` for the application itself. 
@@ -17,7 +17,7 @@ As stated above, directly after obtaining this project, the application will not
 If you want to execute the example in a platform installation, add `gen/KODEX/SimpleKodexTestingApp/target/SimpleKodexTestingApp-0.1.0-SNAPSHOT-bin.jar` to the devices and execute the application (Platform CLI, deployment script, etc. see Platform Handbook for details). If you want to execute the application standalone without platform:
     
   * Start the broker (in an own shell, in Linux call `broker.sh`, in Windows `broker.bat` in `gen/broker`)
-  * Execute `mvn -P App exec:java`which utilizes a starter class required to run the example (micro-)service based application standalone in one JVM on the actual computer. This requires some additional code to prepare a setup as the platform would do, e.g., unpack the Python service code and the IIP-Ecosphere Python service environment, set the communication ports, switch the services into running state, etc. Most of the code is part of the Spring Cloud Stream manager extension of the platform (as this code depends on Spring related assumptions, we break here the platform architecture rule to not include extension components - this is just for running the example standalone, not for implementing the services). Ultimately, the application shall emit tuples of values received by the Fake Python "AI" service and the receiver service.
+  * Execute `mvn -P App exec:java`which utilizes a starter class required to run the example (micro-)service based application standalone in one JVM on the actual computer. This requires some additional code to prepare a setup as the platform would do, e.g., unpack the Python service code and the oktoflow Python service environment, set the communication ports, switch the services into running state, etc. Most of the code is part of the Spring Cloud Stream manager extension of the platform (as this code depends on Spring related assumptions, we break here the platform architecture rule to not include extension components - this is just for running the example standalone, not for implementing the services). Ultimately, the application shall emit tuples of values received by the Fake Python "AI" service and the receiver service.
   * In case that In-Memory H2 Database Server Execute port is change pass it by adding `-Diip.app.db.server.port=DBSERVERPORT` to the previous command (`mvn -P App exec:java -Diip.app.db.server.port=DBSERVERPORT`)
   
 ## Required Updates

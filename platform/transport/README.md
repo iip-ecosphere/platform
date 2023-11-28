@@ -1,4 +1,4 @@
-# IIP-Ecosphere transport
+# oktoflow platform: Transport Component
 
 Basic functionality for flexibly transporting data through the platform
 * [Interfaces](transport/README.md), management and transport AAS

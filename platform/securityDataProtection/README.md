@@ -1,4 +1,4 @@
-# IIP-Ecosphere Security and Data Protection Components
+# oktoflow platform: Security and Data Protection Components
 
 In software, security is typically a cross-cutting concern. This "layer" contains supporting components as well as security-enhancing or data-protecting platform services.
 

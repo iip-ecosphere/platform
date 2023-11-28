@@ -1,4 +1,4 @@
-# IIP-Ecosphere Reusable Intelligent Services
+# oktoflow platform: Reusable Intelligent Services
 
 Integrated software services around artificial intelligence.
 

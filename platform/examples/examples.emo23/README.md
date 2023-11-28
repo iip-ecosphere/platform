@@ -1,6 +1,6 @@
-# IIP-Ecosphere platform examples: EMO'23/HM'23
+# oktoflow platform examples: EMO'23/HM'23
 
-Demonstrates an IIP-Ecosphere platform application for assessing the quality of produced cars. This demonstration ships in terms of two applications, 
+Demonstrates an oktoflow platform application for assessing the quality of produced cars. This demonstration ships in terms of two applications, 
  - quality assessment with federated learning. For the HM'23 demo, start two instances of this application through different deployment plans.
  - magnetic identification and drive condition monitoring. For the EMO'23 demo, start one instance of the dederated learning and one instance of the drive/condition monitoring application.
 

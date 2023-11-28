@@ -1,14 +1,14 @@
-# IIP-Ecosphere platform components overview
+# oktoflow platform: Components overview
 
 ![Architecture Overview](ArchitectureOverview.png)
 
-The following layers and components of the IIP-Ecosphere are available in this platform:
+The following layers and components are available in the oktoflow platform:
 * Managed [Platform dependencies](platformDependencies/README.md) (parent POM)
 * [Support Layer](support/README.md) (with links to contained parts)
     * [Asset Administration Shell (AAS) abstraction](support/support.aas.basyx/README.md) with Visitor, communication protocol support and useful recipes for deployment and I/O. Further, extensible identity management and semantic id resolution.
     * [Default Basyx AAS client abstraction](support/support.aas.basxy/README.md) implementation for [Eclipse Basyx](https://www.eclipse.org/basyx/)
     * [Default Basyx AAS server abstraction](support/support.aas.basxy.server/README.md) implementation for [Eclipse Basyx](https://www.eclipse.org/basyx/)
-    * [AAS support](support/support.iip-aas/README.md) functionality for the IIP-Ecosphere platform, including extensible mechanisms for uniform device ids.
+    * [AAS support](support/support.iip-aas/README.md) functionality for the oktoflow platform, including extensible mechanisms for uniform device ids.
 * Transport Layer
     * [Transport component](transport/README.md) (with links to contained parts)
          * Transport connector for MQTT v3 and v5 based on [Eclipse Paho](https://www.eclipse.org/paho/)
@@ -41,6 +41,6 @@ The following layers and components of the IIP-Ecosphere are available in this p
 
 Released components are made available via [Maven Central](https://search.maven.org/search?q=iip-ecosphere) and example installations in terms of Docker Containers via [Docker Hub](https://hub.docker.com/r/iipecosphere/platform).
 
-![IIP-Ecosphere](logo.png)
+![oktoflow](oktoflow.png)
 
 __The main page was moved one level up to the new [platform main page](../README.md).__

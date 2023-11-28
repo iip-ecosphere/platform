@@ -1,4 +1,4 @@
-# IIP-Ecosphere platform: Resources
+# oktoflow platform: Resources Component
 
 Interfaces (SPI) and alternative implementations for managing containers and services on compute resources.
 

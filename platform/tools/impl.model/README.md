@@ -1,4 +1,4 @@
-# IIP-Ecosphere platform: Setup for an implementation project.
+# oktoflow platform: Setup for an implementation project.
 
 Project for the application model. It will generate a template project in ``gen/impl/templates`` that you can copy-import into Eclipse to implement the services..
 
