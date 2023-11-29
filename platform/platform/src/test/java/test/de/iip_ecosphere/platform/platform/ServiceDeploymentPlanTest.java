@@ -20,6 +20,7 @@ import org.junit.Test;
 import de.iip_ecosphere.platform.platform.cli.ServiceDeploymentPlan;
 import de.iip_ecosphere.platform.platform.cli.ServiceDeploymentPlan.EnsembleStrategy;
 import de.iip_ecosphere.platform.platform.cli.ServiceDeploymentPlan.ServiceResourceAssignment;
+import de.iip_ecosphere.platform.support.iip_aas.Id;
 
 /**
  * Tests {@link ServiceDeploymentPlan}.
@@ -69,6 +70,11 @@ public class ServiceDeploymentPlanTest {
         Assert.assertEquals(EnsembleStrategy.MANUAL, plan.getEnsembleStrategy());
         
         Assert.assertFalse(plan.isDisabled());
+        
+        assng = new ServiceResourceAssignment();
+        assng.setResource(ServiceDeploymentPlan.THIS_RESOURCE);
+        Assert.assertEquals(ServiceDeploymentPlan.THIS_RESOURCE, assng.getResource());
+        Assert.assertEquals(Id.getDeviceId(), assng.getResourceSubstituted());
     }
 
     /**

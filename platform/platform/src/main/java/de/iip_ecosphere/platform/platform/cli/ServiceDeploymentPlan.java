@@ -21,6 +21,7 @@ import java.util.Map;
 import de.iip_ecosphere.platform.platform.PlatformSetup;
 import de.iip_ecosphere.platform.services.environment.switching.ServiceBase;
 import de.iip_ecosphere.platform.support.Version;
+import de.iip_ecosphere.platform.support.iip_aas.Id;
 import de.iip_ecosphere.platform.support.setup.AbstractSetup;
 
 /**
@@ -31,6 +32,8 @@ import de.iip_ecosphere.platform.support.setup.AbstractSetup;
  * @author Holger Eichelberger, SSE
  */
 public class ServiceDeploymentPlan extends AbstractSetup {
+    
+    public static final String THIS_RESOURCE = ".";
 
     /**
      * Base class for something that shall be assigned to a resource.
@@ -49,7 +52,20 @@ public class ServiceDeploymentPlan extends AbstractSetup {
         public String getResource() {
             return resource;
         }
-        
+
+        /**
+         * Returns the name/id of the resource.
+         * 
+         * @return the name/id
+         */
+        public String getResourceSubstituted() {
+            String result = getResource();
+            if (THIS_RESOURCE.equals(result.trim())) {
+                result = Id.getDeviceId();
+            }
+            return result;
+        }
+
         /**
          * Sets the name/id of the resource. [required by SnakeYaml]
          * 

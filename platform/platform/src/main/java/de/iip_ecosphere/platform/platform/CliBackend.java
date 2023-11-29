@@ -453,7 +453,7 @@ class CliBackend {
         IOException, URISyntaxException {
         for (ContainerResourceAssignment c : plan.getContainer()) {
             try {
-                EcsClient client = getEcsFactory().create(c.getResource());
+                EcsClient client = getEcsFactory().create(c.getResourceSubstituted());
                 println("Adding container '" + c.getContainerDesc() + "' to resource " + c.getResource());
                 URI contURI = toUri(c.getContainerDesc());
                 ContainerState contState = client.getState(contURI.toString());
@@ -533,7 +533,7 @@ class CliBackend {
             ensembles = new HashMap<>();
             Map<String, String> leadersByResource = new HashMap<String, String>();
             for (ServiceResourceAssignment a : plan.getAssignments()) {
-                String resource = a.getResource();
+                String resource = a.getResourceSubstituted();
                 String leader = leadersByResource.get(resource);
                 for (String s : a.getServices()) {
                     if (null == leader) {
@@ -588,8 +588,8 @@ class CliBackend {
                 URI art = getArtifact(artifact, a);
                 try {
                     println("Adding artifact '" + art + "' to resource " + a.getResource());
-                    ServicesClient client = getServicesFactory().create(a.getResource(), p.getAppId());
-                    serviceClients.put(a.getResource(), client);
+                    ServicesClient client = getServicesFactory().create(a.getResourceSubstituted(), p.getAppId());
+                    serviceClients.put(a.getResourceSubstituted(), client);
                     client.addArtifactAsTask(taskId, art); // copes with taskId null
                     printlnDone();
                 } catch (ExecutionException e) {
@@ -600,8 +600,8 @@ class CliBackend {
             List<StartServicesRunnable> runnables = new ArrayList<>();
             Map<String, String> opt = getStartOptions(p);
             for (ServiceResourceAssignment a: p.getAssignments()) {
-                StartServicesRunnable r = new StartServicesRunnable(a.getResource(),
-                    serviceClients.get(a.getResource()),
+                StartServicesRunnable r = new StartServicesRunnable(a.getResourceSubstituted(),
+                    serviceClients.get(a.getResourceSubstituted()),
                     a.getServicesAsArray(p.getAppId(), appInstanceId), opt, taskData);
                 runnables.add(r);
                 if (null != es) {
@@ -696,8 +696,8 @@ class CliBackend {
             }
             for (ServiceResourceAssignment a: assignments) {
                 println("Obtaining AAS client for " + a.getResource() + " " + p.getAppId());
-                ServicesClient client = getServicesFactory().create(a.getResource(), p.getAppId());
-                serviceClients.put(a.getResource(), client);
+                ServicesClient client = getServicesFactory().create(a.getResourceSubstituted(), p.getAppId());
+                serviceClients.put(a.getResourceSubstituted(), client);
                 String[] services = a.getServicesAsArray(p.getAppId(), appInstanceId);
                 ArrayUtils.reverse(services);
                 println("Stopping services " + Arrays.toString(services) + " on " + a.getResource());
@@ -705,7 +705,7 @@ class CliBackend {
                 for (int i = 0; i < services.length; i++) {
                     running += Math.max(client.getServiceInstanceCount(services[i]) - 1, 0); // stopping one
                 }
-                stillRunning.put(a.getResource(), running);
+                stillRunning.put(a.getResourceSubstituted(), running);
                 try {
                     client.stopServiceAsTask(taskId, services); // copes with taskId null
                 } catch (ExecutionException e) {
@@ -715,27 +715,28 @@ class CliBackend {
             if (p.isOnUndeployRemoveArtifact()) {
                 Set<String> done = new HashSet<String>();
                 for (ServiceResourceAssignment a: p.getAssignments()) {
-                    String resourceId = a.getResource();
+                    String resourceId = a.getResourceSubstituted();
                     boolean alreadyDone = done.contains(resourceId);
                     if (!alreadyDone && !isStillRunning(stillRunning, resourceId)) {
                         done.add(resourceId);
                         URI art = getArtifact(artifact, a);
                         String uri = art.normalize().toString();
-                        println("Removing artifact " + art + " from " + resourceId);
+                        println("Removing artifact " + art + " from " + a.getResource());
                         try {
                             serviceClients.get(resourceId).removeArtifactAsTask(taskId, uri); // works with URI and null
                         } catch (ExecutionException e) {
                             exceptions.add(e);
                         }
                     } else if (!alreadyDone) {
-                        println("Not removing artifact from " + resourceId + " as there is still a running instance");
+                        println("Not removing artifact from " + a.getResource() 
+                            + " as there is still a running instance");
                     }
                 }
             }
             List<ContainerResourceAssignment> container = new ArrayList<>(p.getContainer());
             Collections.reverse(container);
             for (ContainerResourceAssignment c : container) {
-                String resourceId = c.getResource();
+                String resourceId = c.getResourceSubstituted();
                 if (!isStillRunning(stillRunning, resourceId)) {
                     EcsClient client = getEcsFactory().create(resourceId);
                     String cDescUri = toUri(c.getContainerDesc()).normalize().toString();
