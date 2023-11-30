@@ -323,6 +323,7 @@
                                       <value>true</value>
                                   </systemProperty>
                               </systemProperties>
+                              <checkChanged>true</checkChanged>
                               <skipIfExists>target/genInterfaces-${project.version}</skipIfExists>
                           </configuration>
                       </execution>
