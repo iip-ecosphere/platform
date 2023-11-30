@@ -313,11 +313,12 @@ public class TestAppMojo extends AbstractLoggingMojo {
                 .addArgument(deploy ? "deploy" : "undeploy")
                 .addArgument(deploymentPlan.getAbsolutePath());
             if (!deploy) {
-                pub.addArgument(id);
+                pub.addArgument(id)
+                    .setTimeout(20000); // may already be gone
             }
             ProcessUnit pu = pub.build4Mvn();
             int status = pu.waitFor();
-            if (ProcessUnit.isFailed(status)) {
+            if (deploy && ProcessUnit.isFailed(status)) {
                 throw new MojoExecutionException(pu.getDescription() + " terminated with status: " + status);
             }
         }
