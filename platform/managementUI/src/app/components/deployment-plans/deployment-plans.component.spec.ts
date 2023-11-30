@@ -3,6 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DeploymentPlansComponent } from './deployment-plans.component';
 import { HttpClientModule } from '@angular/common/http';
 import { EnvConfigService } from '../../services/env-config.service';
+import { retry } from '../../services/utils.service';
 
 describe('DeploymentPlansComponent', () => {
 
@@ -62,8 +63,22 @@ describe('DeploymentPlansComponent', () => {
       }
     }
     if (deployButton) {
-      // TODO try deploy? what about stopping app?
+      let finished = false;
+      component.setFinishedNotifier((success) => {
+        console.log("deployment finished, success: " + success); 
+        finished = true;
+      });
+      // start deployment
+      deployButton.click();
+      await fixture.detectChanges();
+      await fixture.whenRenderingDone();
+      compiled = fixture.nativeElement as HTMLElement;
+      console.log("Test: Waiting for deployment completion...");
+      await retry({ // wait until deployment done
+        fn: () => finished,
+        maxAttempts: 2 * 60,
+        delay: 1000
+      }).catch(e=>{});
     }
-  });
-
+  }, 3 * 60 * 1000);
 });

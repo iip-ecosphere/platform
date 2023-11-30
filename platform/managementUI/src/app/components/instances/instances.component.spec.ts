@@ -41,7 +41,7 @@ describe('InstancesComponent', () => {
     let compiled = fixture.nativeElement as HTMLElement;
     let rows = compiled.querySelectorAll("table tr") as NodeListOf<Element>;
     expect(rows).toBeTruthy();
-    let button = undefined as HTMLElement | undefined;
+    let undeployButton = undefined as HTMLElement | undefined;
     // if not app is running, there may not be any instance; there may also be two
     rows.forEach((r) => {
       let td = r.querySelector('td[id="data.nr"]') as HTMLElement;
@@ -64,14 +64,26 @@ describe('InstancesComponent', () => {
 
       let btn  = r.querySelector('button[id="data.btnUndeploy"]') as HTMLElement;
       expect(btn).toBeTruthy();
-      if (idShort === 'myApp') {
-        button = btn;
+      if (idShort === 'SimpleMeshApp') {
+        undeployButton = btn;
       }
     });
 
-    if (button) {
-      // TODO undeploy first
+    if (undeployButton) {
+      let finished = false;
+      component.setFinishedNotifier((success) => {
+        console.log("undeployment finished, success: " + success); 
+        finished = true; 
+      });
+      undeployButton.click();
+
+      console.log("Test: Waiting for undeployment completion...");
+      await retry({ // wait until undeployment done
+        fn: () => finished,
+        maxAttempts: 1 * 60,
+        delay: 1000
+      }).catch(e=>{});
     }
-  });
+  }, 3 * 60 * 1000);
 
 });

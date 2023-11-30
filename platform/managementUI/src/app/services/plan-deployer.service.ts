@@ -19,6 +19,7 @@ export class PlanDeployerService {
   sub: Subscription | undefined;
 
   statusSubmodel: any;
+  finishedNotifier: PlanDeployerServiceNotifier = ()=> {};
 
   //webSocket: WebSocketSubject<any>;
   public StatusCollection: statusCollection[] = [];
@@ -63,9 +64,9 @@ export class PlanDeployerService {
 
     // TODO dynamic status uri
     this.sub = websocketService.getMsg().subscribe((value: any) =>
-      {console.log("constructor "); console.log(value);
-        console.log(JSON.parse(value)); console.log("-----------");
-        this.receiveStatus(JSON.parse(value)) })
+      {
+        this.receiveStatus(JSON.parse(value)) 
+      })
    }
 
   public async deployPlan(params: any, undeploy?: boolean) {
@@ -90,7 +91,7 @@ export class PlanDeployerService {
       "inoutputArguments":[], "timeout":10000}
       , {responseType: 'json', reportProgress: true}));
     } catch(e) {
-      console.log(e);
+      console.error(e);
     }
 
     if(response && response.outputArguments[0].value && response.outputArguments[0].value.value) {
@@ -102,7 +103,6 @@ export class PlanDeployerService {
 
 
   public async undeployPlanById(params: any) {
-    console.log("undeploy be id")
     let response;
     try {
       response = await firstValueFrom(this.http.post<platformResponse>(
@@ -115,7 +115,7 @@ export class PlanDeployerService {
         "inoutputArguments":[], "timeout":10000}
       , {responseType: 'json'}));
     } catch(e) {
-      console.log(e);
+      console.error(e);
     }
 
 
@@ -127,18 +127,18 @@ export class PlanDeployerService {
   }
 
   private receiveStatus(Status: statusMessage) {
-    console.log("receiveStatus: msg")
-    console.log(Status)
     let isFinished = false;
     let isSuccesful = true;
     if(Status.taskId) {
       if(Status.action === "RESULT") {
         isFinished = true;
+        this.finishedNotifier(true);
         // reload page
         this.triggerDataReloadingAction();
       }
       if(Status.action === "ERROR") {
         isSuccesful = false;
+        this.finishedNotifier(false);
       }
       const process = this.StatusCollection.find(process => process.taskId === Status.taskId)
       if(process) {
@@ -154,12 +154,10 @@ export class PlanDeployerService {
       } else {
         this.StatusCollection.push({taskId: Status.taskId, isFinished: isFinished, isSuccesful: isSuccesful, messages: [Status]});
       }
-      console.log(process);
     } else {
-      console.log("WARNING: Recieved status without taskId: ");
-      console.log(Status);
+      console.warn("WARNING: Recieved status without taskId: ");
+      console.warn(Status);
     }
-
   }
 
   public async requestReceivedMessage(deploy: string, taskId: string) {
@@ -182,8 +180,10 @@ export class PlanDeployerService {
   }
 
   public triggerDataReloadingAction() {
-    console.log("Data reloading has been triggered.")
+    console.debug("Data reloading has been triggered.")
     this.reloadingDataSubject.next(null);
   }
 
 }
+
+export type PlanDeployerServiceNotifier = (success:boolean) => void; 

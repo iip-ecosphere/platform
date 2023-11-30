@@ -19,7 +19,7 @@ export class StatusDetailsComponent implements OnInit {
 
   ngAfterViewChecked() {
     this.scrollToBottom();
-}
+  }
 
   scrollToBottom(): void {
     if (this.scrollContainer) {

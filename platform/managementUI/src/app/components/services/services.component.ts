@@ -361,7 +361,7 @@ export class ServicesComponent implements OnInit {
 
   //------------------------ helpers ------------------------
 
-  public async getServices() {
+  /*public async getServices() {
     this.services = await this.api.getServices();
     if(this.services && this.services.submodelElements) {
       this.servicesToggle = new Array(
@@ -404,5 +404,5 @@ export class ServicesComponent implements OnInit {
       result = true
     }
     return result
-  }
+  }*/
 }

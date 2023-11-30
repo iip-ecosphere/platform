@@ -81,14 +81,14 @@ export class ResourceDetailsComponent implements OnInit {
     }
   }
 
-  public isNonEmptyString(value: any) {
+  /*public isNonEmptyString(value: any) {
 
     let result = false
     if (typeof value == "string" && value.length > 0) {
       result = true
     }
     return result
-  }
+  }*/
 
   // ---------- Semantic Id -------------------------
   public async resolveSemanticId() {

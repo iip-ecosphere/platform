@@ -178,6 +178,7 @@
                            <appArg>--code-coverage</appArg>
                        </appArgs>
                        <errToIn>true</errToIn>
+                       <testTime>300000</testTime>
                        <platformDir>${platformDir}</platformDir>
                        <artifacts>
                            <directory>.</directory>
@@ -213,7 +214,6 @@
         <executions>
           <execution>
             <id>copy-resources</id>
-            <!-- here the phase you need -->
             <phase>generate-test-sources</phase>
             <goals>
               <goal>copy-resources</goal>

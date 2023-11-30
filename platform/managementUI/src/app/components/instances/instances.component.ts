@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from 'src/app/services/api.service';
-import { PlanDeployerService } from 'src/app/services/plan-deployer.service';
+import { PlanDeployerService, PlanDeployerServiceNotifier } from 'src/app/services/plan-deployer.service';
 import { InputVariable, Resource } from 'src/interfaces';
 
 @Component({
@@ -68,6 +68,11 @@ export class InstancesComponent implements OnInit {
     }*/
   }
 
+  // for testing
+  public setFinishedNotifier(notifier: PlanDeployerServiceNotifier) {
+    this.deployer.finishedNotifier = notifier;
+  }
+
   public isElement(elem: any, list: any) {
     let result = false;
     for(let val of list) {
@@ -99,10 +104,8 @@ export class InstancesComponent implements OnInit {
             break;
           }
         }
-        console.log(input);
       }
       const response = this.deployer.undeployPlanById(input);
-      console.log(response);
     }
   }
 

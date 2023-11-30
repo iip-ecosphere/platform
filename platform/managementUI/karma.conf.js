@@ -41,6 +41,7 @@ module.exports = function (config) {
     browsers: ['Chrome'],
     singleRun: false,
     restartOnFileChange: true,
-    failOnFailingTestSuite: true
+    failOnFailingTestSuite: true,
+    browserNoActivityTimeout: 200000
   });
 };

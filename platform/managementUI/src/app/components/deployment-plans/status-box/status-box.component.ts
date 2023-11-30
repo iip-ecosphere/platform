@@ -56,7 +56,7 @@ export class StatusBoxComponent implements OnInit {
     }
   }
 
-  public filter(element: string | undefined) {
+  /*public filter(element: string | undefined) {
     let print = true;
     if(element) {
       if(this.hidden.indexOf(element) >= 0) {
@@ -64,7 +64,7 @@ export class StatusBoxComponent implements OnInit {
       }
     }
     return print;
-  }
+  }*/
 
   // public checkForTaskId(id: string) {
   //   if(this.showAll) {
@@ -77,14 +77,13 @@ export class StatusBoxComponent implements OnInit {
 
   // }
 
-  public getLastStatus(status: statusMessage[]) {
+  /*public getLastStatus(status: statusMessage[]) {
     if(status.length > 0) {
       return status[status.length - 1];
     } else {
       return null;
     }
-
-  }
+  }*/
 
   public details(process: statusCollection) {
       let dialogRef = this.dialog.open(StatusDetailsComponent, {
@@ -132,10 +131,10 @@ export class StatusBoxComponent implements OnInit {
     }
   }*/
 
-  public reloadingDataSubject = new Subject<any>();
+  /*public reloadingDataSubject = new Subject<any>();
 
   public triggerDataReloadingAction() {
-    console.log("Data reloading has been triggered.")
+    console.debug("Data reloading has been triggered.")
     this.reloadingDataSubject.next(null);
   }
 
@@ -151,5 +150,5 @@ export class StatusBoxComponent implements OnInit {
       this.statusUri = resp.value
     }
     console.log("[status-box | getUri] status uri: " + this.statusUri)
-  }
+  }*/
 }

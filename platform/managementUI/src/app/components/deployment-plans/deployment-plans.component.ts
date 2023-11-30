@@ -4,7 +4,7 @@ import { Subscription, firstValueFrom } from 'rxjs';
 import { OnlyIdPipe } from 'src/app/pipes/only-id.pipe';
 import { ApiService } from 'src/app/services/api.service';
 import { EnvConfigService } from 'src/app/services/env-config.service';
-import { PlanDeployerService } from 'src/app/services/plan-deployer.service';
+import { PlanDeployerService, PlanDeployerServiceNotifier } from 'src/app/services/plan-deployer.service';
 import { WebsocketService } from 'src/app/websocket.service';
 import { ResourceAttribute, Resource, PlatformArtifacts, InputVariable, PlatformData }
   from 'src/interfaces';
@@ -46,6 +46,11 @@ export class DeploymentPlansComponent implements OnInit {
   async ngOnInit() {
     await this.getArtifacts();
     this.getStatusUri()
+  }
+
+  // for testing
+  public setFinishedNotifier(notifier: PlanDeployerServiceNotifier) {
+    this.deployer.finishedNotifier = notifier;
   }
 
   public async getArtifacts() {
@@ -97,8 +102,6 @@ export class DeploymentPlansComponent implements OnInit {
   }
 
   public async deploy(plan?: Resource) {
-    console.log("Plan")
-    console.log(plan)
     let params = this.deployPlanInput;
     if(!plan && this.selected && this.selected.value) {
        let value = this.selected.value.find(item => item.idShort === "uri");
@@ -110,8 +113,6 @@ export class DeploymentPlansComponent implements OnInit {
     } else if(plan && plan.value) {
       let value = plan.value.find(item => item.idShort === "uri");
       if(value) {
-
-        console.log("value " + value.value)
         params[0].value.value = value.value;
       }
       const response = await this.deployer.deployPlan(params);
@@ -121,6 +122,8 @@ export class DeploymentPlansComponent implements OnInit {
     }
   }
 
+  // now via instances
+  /*
   public async undeploy(index: number, plan?: Resource,) {
     if(plan && this.instanceId[index] && this.instanceId[index] != "" ) {
       this.undeployById(plan, index);
@@ -142,7 +145,6 @@ export class DeploymentPlansComponent implements OnInit {
         const response = await this.deployer.deployPlan(params, true);
       }
     }
-
   }
 
   public async undeployById(plan: Resource, index: number) {
@@ -155,11 +157,11 @@ export class DeploymentPlansComponent implements OnInit {
     if(response) {
       this.responseMessage = response.outputArguments[0].value?.value;
     }
-  }
+  }*/
 
   //this method gets called multiple times when the select in the template is clicked, this is not desired
   //select is currently not in use
-  public getName(plan: ResourceAttribute[]) {
+  /*public getName(plan: ResourceAttribute[]) {
     // console.log(plan);
     let name: any = plan.find(item => item.idShort === 'name');
     if(!name) {
@@ -168,7 +170,7 @@ export class DeploymentPlansComponent implements OnInit {
       name = name.value;
     }
     return name;
-  }
+  }*/
 
   public getDescription(plan: any) {
     let desc = plan.value.find(
@@ -182,7 +184,7 @@ export class DeploymentPlansComponent implements OnInit {
     return id
   }
 
-  public applyLineStyle(index: number) {
+  /*public applyLineStyle(index: number) {
 
     let style = "white-line";
 
@@ -191,7 +193,7 @@ export class DeploymentPlansComponent implements OnInit {
     }
     return (style);
 
-  }
+  }*/
 
   public getEnabled(plan: any) {
     let enabled = plan.value.find(
