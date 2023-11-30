@@ -1,4 +1,4 @@
-# IIP-Ecosphere platform: Configuration default library
+# oktoflow platform: Configuration Default Library
 
 Basic code for devices or services integrated into the configuration meta-model. This project contains a simple/minimal configuration file to create the code for the data types defined in the platform configuration meta-model. The classes implemented in this project are based on the generated type classes.
 
