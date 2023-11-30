@@ -9,8 +9,6 @@ import { EnvConfigService } from './env-config.service';
 })
 export class ApiService {
 
-  ip: string = "";
-  urn: string = "";
 
   errorMsg : any;
 
@@ -18,14 +16,15 @@ export class ApiService {
 
   constructor(public http: HttpClient, private envConfigService: EnvConfigService) {
     this.errorEmitter = new Subject();
-    const env = this.envConfigService.getEnv();
+    this.envConfigService.init();
+    /*const env = this.envConfigService.getEnv();
     //the ip and urn are taken from the json.config
     if(env && env.ip) {
       this.ip = env.ip;
     }
     if (env && env.urn) {
       this.urn = env.urn;
-    }
+    }*/
    }
 
   resources: PlatformResources = {};
@@ -70,8 +69,10 @@ export class ApiService {
   public async getData(url: string) {
     let Data;
     try {
+      await EnvConfigService.initAsync();
+      let cfg = EnvConfigService.getConfig();
       Data = await firstValueFrom(
-        this.http.get(this.ip + '/shells/' + this.urn + '/' + url));
+        this.http.get(cfg?.ip + '/shells/' + cfg?.urn + '/' + url));
     } catch(e) {
       console.error(e);
       this.errorEmitter.next(e as HttpErrorResponse);
@@ -90,10 +91,12 @@ export class ApiService {
       */
     let response;
     try {
+      await EnvConfigService.initAsync();
+      let cfg = EnvConfigService.getConfig();
       response = await firstValueFrom(this.http.post(
-        this.ip
+        cfg?.ip
         + '/shells/'
-        + this.urn
+        + cfg?.urn
         + aasElementURL
         + resourceId + "/"
         + basyxFunc + "/invoke"
@@ -134,7 +137,9 @@ export class ApiService {
     }]
 
     try {
-      response = await firstValueFrom(this.http.post(this.ip + '/shells/' + this.urn + "/aas/submodels/Configuration/submodel/submodelElements/getGraph/invoke"
+      await EnvConfigService.initAsync();
+      let cfg = EnvConfigService.getConfig();
+      response = await firstValueFrom(this.http.post(cfg?.ip + '/shells/' + cfg?.urn + "/aas/submodels/Configuration/submodel/submodelElements/getGraph/invoke"
       ,{"inputArguments": input,"requestId":"1bfeaa30-1512-407a-b8bb-f343ecfa28cf", "inoutputArguments":[], "timeout":10000})) as platformResponse;
     } catch(e) {
       console.error(e);

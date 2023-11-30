@@ -43,7 +43,7 @@ describe('AppComponent', () => {
 
   it('should render title', () => {
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('div[class="main-title"]')?.textContent).toContain('IIP Ecosphere Management UI');
+    expect(compiled.querySelector('div[class="main-title"]')?.textContent).toContain('oktoflow Management UI');
   });
 
   it('shall have version information', () => {

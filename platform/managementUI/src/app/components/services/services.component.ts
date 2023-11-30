@@ -170,27 +170,26 @@ export class ServicesComponent implements OnInit {
   }
 
   // todo not ready yet
-  public async getTechnicalData(url:string) {
+  /*public async getTechnicalData(url:string) {
     let response;
     let technicalDataUrl = url + "/submodels/TechnicalData/submodel"
     console.debug("# (getTechnicalData) \nURL: " + technicalDataUrl)
     try {
       response = await firstValueFrom(this.http.get(technicalDataUrl));
-
     } catch(e) {
-      console.log(e);
+      console.error(e);
     }
     this.technicalData = response
     //console.log("# (getTechnicalData) response:")
     //console.log(response)
-  }
+  }*/
 
-  public async getManufacturerInfo(url:string) {
+  /*public async getManufacturerInfo(url:string) {
     console.log("# (getManfInfo)")
     console.log("url: " + url)
     //let dummyUrl = "http://192.168.2.1:9001/shells/urn%3A%3A%3AAAS%3A%3A%3Aservice_CamSource%23/aas"
     //url = dummyUrl
-    await this.getTechnicalData(url)
+    await this.getTechnicalData(url)*/
 
     // for local testing
     /*
@@ -205,7 +204,7 @@ export class ServicesComponent implements OnInit {
     console.log("dummy")
     console.log(this.technicalData)
     */
-    let result = []
+  /*  let result = []
     if (this.technicalData) {
       for (let value of this.technicalData.submodelElements) {
         console.log("# (getManfInfo) single values from response:")
@@ -216,7 +215,7 @@ export class ServicesComponent implements OnInit {
     console.log("# (getManfInfo) result:")
     console.log(result)
     return result
-  }
+  }*/
 
   public async filterServices() {
     let result = []

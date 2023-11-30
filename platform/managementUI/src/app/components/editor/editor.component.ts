@@ -5,6 +5,16 @@ import { primitiveDataTypes } from 'src/app/services/env-config.service';
 import { IvmlFormatterService } from 'src/app/services/ivml-formatter.service';
 import { Resource, uiGroup, editorInput, configMetaContainer, configMetaEntry, ResourceAttribute, InputVariable } from 'src/interfaces';
 
+  //metatypekind: PRIMITIVE=1, ENUM=2, CONTAINER=3, CONSTRAINT=4, DERIVED=9, COMPOUND=10
+
+  /* metaTypeKind */
+const MTK_primitive = 1;
+const MTK_enum = 2;
+const MTK_container = 3;
+const MTK_constraint = 4;
+const MTK_derived = 9;
+const MTK_compound = 10;
+
 @Component({
   selector: 'app-editor',
   templateUrl: './editor.component.html',
@@ -35,11 +45,6 @@ export class EditorComponent implements OnInit {
 
   metaTypes = ['metaState', 'metaProject',
     'metaSize', 'metaType', 'metaRefines', 'metaAbstract', 'metaTypeKind'];
-
-  //metatypekind: PRIMITIVE=1, ENUM=2, CONTAINER=3, CONSTRAINT=4, DERIVED=9, COMPOUND=10
-
-  /* metaTypeKind */
-  primitive = 1
 
   ivmlType:string = "";
 
@@ -137,7 +142,7 @@ export class EditorComponent implements OnInit {
             }
           } else {
             // ivml types
-            if (this.isTypeMetaKindEqualNum(item, this.primitive)
+            if (this.isTypeMetaKindEqualNum(item, MTK_primitive)
                   && filter?.metaRef.length == 0) {
               newMetaValues.push(item)
             }
@@ -313,16 +318,24 @@ export class EditorComponent implements OnInit {
           let cleanType = this.cleanTypeName(editorInput.type);
           let type = this.meta?.value?.find(type => type.idShort === cleanType);
           //let type2 = this.metaBackup?.value?.find(type => type.idShort === cleanType);
-
           if(type) {
             editorInput.metaTypeKind = type.value.find(
               (item: { idShort: string; }) => item.idShort === 'metaTypeKind')?.value;
 
           } else if(this.metaBackup && this.metaBackup.value) {
-            let temp = this.metaBackup.value.find(item => item.idShort === this.cleanTypeName(editorInput.type));
-            editorInput.metaTypeKind = temp?.value.find((item: { idShort: string; }) => item.idShort === 'metaTypeKind').value
+            let iterType = editorInput.type;
+            do {
+              let temp = this.metaBackup.value.find(item => item.idShort === this.cleanTypeName(iterType));
+              editorInput.metaTypeKind = temp?.value.find((item: { idShort: string; }) => item.idShort === 'metaTypeKind').value;
+              editorInput.type = iterType;
+              if (editorInput.metaTypeKind == MTK_derived) {
+                iterType = temp?.value.find((item: { idShort: string; }) => item.idShort === 'metaRefines').value;
+                if (!iterType) {
+                  break;
+                }
+              }
+            } while (editorInput.metaTypeKind == MTK_derived);
           }
-
           //the metaTypeKind is not included on the values of the types in the configuration/meta collection
           //therefore this approach doesnt work, but it would be much more performant if it did
           // editorInput.metaTypeKind = input.value.find(
@@ -340,11 +353,11 @@ export class EditorComponent implements OnInit {
           }
           //assign initial value of inputFields
           let initial;
-          if(editorInput.multipleInputs || editorInput.metaTypeKind === 2) {
+          if(editorInput.multipleInputs || editorInput.metaTypeKind === MTK_enum) {
             initial = []
           } else if(editorInput.type === 'Boolean'){
             initial = false;
-          } else if(editorInput.metaTypeKind === 10 && !editorInput.multipleInputs) {
+          } else if(editorInput.metaTypeKind === MTK_compound && !editorInput.multipleInputs) {
             initial = {};
           } else {
             initial = '';

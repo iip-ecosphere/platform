@@ -65,7 +65,7 @@ describe('EditorComponent', () => {
         {name: "name", kind: InputKind.text}, {name: "type", kind: InputKind.ref}
       ]}, 
       {name: "RecordType", input:[
-        {name: "name", kind: InputKind.text}, {name: "fields", kind: InputKind.text} // TODO fix
+        {name: "name", kind: InputKind.text}, {name: "fields", kind: InputKind.sub}
       ]}, 
       {name: "ByteArrayTypeType"}, 
       {name: "IntegerArrayTypeType"}, 
