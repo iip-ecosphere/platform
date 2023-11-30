@@ -108,7 +108,7 @@ import { MeshFeedbackComponent } from './components/flowchart/feedback/mesh-feed
     },
     {
     provide: APP_INITIALIZER,
-    useFactory: (EnvConfigService: EnvConfigService) => () => EnvConfigService.init(),
+    useFactory: (envConfigService: EnvConfigService) => () => EnvConfigService.init(),
     deps: [EnvConfigService],
     multi: true,
     }

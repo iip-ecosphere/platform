@@ -18,16 +18,7 @@ export class ServicesComponent implements OnInit {
   constructor(public http: HttpClient,
     public api: ApiService,
     private envConfigService: EnvConfigService,
-    private zone: NgZone
-    )
-    {
-      const env = this.envConfigService.getEnv();
-      if(env && env.ip) {
-        this.ip = env.ip;
-      }
-      if (env && env.urn) {
-        this.urn = env.urn;
-      }
+    private zone: NgZone) {
   }
 
   services: PlatformServices = {};
@@ -36,8 +27,6 @@ export class ServicesComponent implements OnInit {
   artifacts: PlatformArtifacts = {};
   artifactsToggle: boolean[] = [];
 
-  ip: string = "";
-  urn:string = "";
   filteredData: any;
   dataToDisplay: any;
   technicalData: any; // manufacture info for services
@@ -127,9 +116,10 @@ export class ServicesComponent implements OnInit {
     let response: any;
 
     try {
+        let cfg = await this.envConfigService.initAndGetCfg();
         response = await firstValueFrom(
-          this.http.get(this.ip + '/shells/'
-        + this.urn
+          this.http.get(cfg?.ip + '/shells/'
+        + cfg?.urn
         + "/aas/submodels/"
         + submodel
         + "/submodel/submodelElements/"

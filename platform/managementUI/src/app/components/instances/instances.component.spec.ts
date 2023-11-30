@@ -11,7 +11,7 @@ describe('InstancesComponent', () => {
   let fixture: ComponentFixture<InstancesComponent>;
 
   beforeEach(async () => {
-    await EnvConfigService.initAsync();
+    await EnvConfigService.init();
     await TestBed.configureTestingModule({
       imports: [ HttpClientModule ],
       declarations: [ InstancesComponent ]

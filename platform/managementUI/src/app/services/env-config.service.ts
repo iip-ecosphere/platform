@@ -58,7 +58,7 @@ export class EnvConfigService {
       }
     }
 
-    public static async initAsync() {
+    public static async init() {
       if (EnvConfigService.env == undefined) {
         await EnvConfigService.load();
         if (EnvConfigService.env) {
@@ -79,10 +79,6 @@ export class EnvConfigService {
       }
     }
 
-    public init() {
-      EnvConfigService.initAsync();      
-    }
-
     public static getConfig() : Configuration | undefined {
       return EnvConfigService.env;
     }
@@ -96,7 +92,12 @@ export class EnvConfigService {
         EnvConfigService.env?.inTest == undefined ? false : EnvConfigService.env?.inTest;
     }
 
-    public getEnv() {
-      return window.config
+    public getCfg() {
+      return EnvConfigService.env;      
+    }
+
+    public async initAndGetCfg() {
+      await EnvConfigService.init(); // only if needed
+      return EnvConfigService.env;
     }
 }

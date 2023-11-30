@@ -16,16 +16,7 @@ export class ApiService {
 
   constructor(public http: HttpClient, private envConfigService: EnvConfigService) {
     this.errorEmitter = new Subject();
-    this.envConfigService.init();
-    /*const env = this.envConfigService.getEnv();
-    //the ip and urn are taken from the json.config
-    if(env && env.ip) {
-      this.ip = env.ip;
-    }
-    if (env && env.urn) {
-      this.urn = env.urn;
-    }*/
-   }
+  }
 
   resources: PlatformResources = {};
   //services: PlatformServices = {};
@@ -69,8 +60,7 @@ export class ApiService {
   public async getData(url: string) {
     let Data;
     try {
-      await EnvConfigService.initAsync();
-      let cfg = EnvConfigService.getConfig();
+      let cfg = await this.envConfigService.initAndGetCfg();
       Data = await firstValueFrom(
         this.http.get(cfg?.ip + '/shells/' + cfg?.urn + '/' + url));
     } catch(e) {
@@ -91,8 +81,7 @@ export class ApiService {
       */
     let response;
     try {
-      await EnvConfigService.initAsync();
-      let cfg = EnvConfigService.getConfig();
+      let cfg = await this.envConfigService.initAndGetCfg();
       response = await firstValueFrom(this.http.post(
         cfg?.ip
         + '/shells/'
@@ -137,8 +126,7 @@ export class ApiService {
     }]
 
     try {
-      await EnvConfigService.initAsync();
-      let cfg = EnvConfigService.getConfig();
+      let cfg = await this.envConfigService.initAndGetCfg();
       response = await firstValueFrom(this.http.post(cfg?.ip + '/shells/' + cfg?.urn + "/aas/submodels/Configuration/submodel/submodelElements/getGraph/invoke"
       ,{"inputArguments": input,"requestId":"1bfeaa30-1512-407a-b8bb-f343ecfa28cf", "inoutputArguments":[], "timeout":10000})) as platformResponse;
     } catch(e) {

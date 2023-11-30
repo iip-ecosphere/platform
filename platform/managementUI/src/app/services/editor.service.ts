@@ -9,26 +9,16 @@ import { Resource } from 'src/interfaces';
 })
 export class EditorService {
 
-  ip: string = "";
-  urn: string = "";
-
   dependencies: any;
 
   constructor(public http: HttpClient, private envConfigService: EnvConfigService) {
-    const env = this.envConfigService.getEnv();
-    //the ip and urn are taken from the json.config
-    if(env && env.ip) {
-      this.ip = env.ip;
-    }
-    if (env && env.urn) {
-      this.urn = env.urn;
-    }
-   }
+  }
 
-   private async getData(url: string) {
+  private async getData(url: string) {
     let Data;
     try {
-      Data = await firstValueFrom(this.http.get( this.ip + '/shells/' + this.urn + '/' + url));
+      let cfg = await this.envConfigService.initAndGetCfg();
+      Data = await firstValueFrom(this.http.get( cfg?.ip + '/shells/' + cfg?.urn + '/' + url));
     } catch(e) {
       console.log(e);
     }
@@ -39,6 +29,6 @@ export class EditorService {
     console.log(type);
     const response = await this.getData('/aas/submodels/Configuration/submodel/submodelElements/' + type) as Resource;
     return response;
-
   }
+
 }

@@ -13,7 +13,7 @@ describe('StatusDetailsComponent', () => {
   };
 
   beforeEach(async () => {
-    await EnvConfigService.initAsync();
+    await EnvConfigService.init();
     await TestBed.configureTestingModule({
       imports: [ MatDialogModule ],
       declarations: [ StatusDetailsComponent ],

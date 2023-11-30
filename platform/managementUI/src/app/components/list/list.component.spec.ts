@@ -23,7 +23,7 @@ describe('ListComponent', () => {
     componentInstance: {selectedType:null, variableName:null, uiGroups:null, category:null}});
 
   beforeEach(async () => {
-    await EnvConfigService.initAsync();
+    await EnvConfigService.init();
     await TestBed.configureTestingModule({
       imports: [ HttpClientModule, 
         MatTabsModule, 

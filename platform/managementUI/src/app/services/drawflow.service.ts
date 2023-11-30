@@ -9,18 +9,7 @@ import { EnvConfigService } from './env-config.service';
 })
 export class DrawflowService {
 
-  ip: string = "";
-  urn: string = "";
-
   constructor(private http: HttpClient, private envConfigService: EnvConfigService) {
-    const env = this.envConfigService.getEnv();
-    //the ip and urn are taken from the json.config
-    if(env && env.ip) {
-      this.ip = env.ip;
-    }
-    if (env && env.urn) {
-      this.urn = env.urn;
-    }
   }
 
   public async getGraph(mesh: string) {
@@ -54,10 +43,11 @@ export class DrawflowService {
     console.debug(input)
 
     try {
+      let cfg = await this.envConfigService.initAndGetCfg();
       response = await firstValueFrom(this.http.post(
-        this.ip
+        cfg?.ip
         + '/shells/'
-        + this.urn
+        + cfg?.urn
         + "/aas/submodels/Configuration/submodel/submodelElements/getGraph/invoke"
       ,{"inputArguments": input,
       "requestId":"1bfeaa30-1512-407a-b8bb-f343ecfa28cf",
@@ -70,10 +60,11 @@ export class DrawflowService {
     return response;
   }
 
-  public async  getServices() {
+  public async getServices() {
     let response;
     try {
-      response = await firstValueFrom(this.http.get(this.ip + '/shells/' + this.urn + "/aas/submodels/Configuration/submodel/submodelElements/ServiceBase"));
+      let cfg = await this.envConfigService.initAndGetCfg();
+      response = await firstValueFrom(this.http.get(cfg?.ip + '/shells/' + cfg?.urn + "/aas/submodels/Configuration/submodel/submodelElements/ServiceBase"));
     } catch(e) {
       console.log(e);
     }
@@ -83,7 +74,8 @@ export class DrawflowService {
   public async getServiceMeshes() {
     let response;
     try {
-      response = await firstValueFrom(this.http.get(this.ip + '/shells/' + this.urn + "/aas/submodels/Configuration/submodel/submodelElements/ServiceMesh"));
+      let cfg = await this.envConfigService.initAndGetCfg();
+      response = await firstValueFrom(this.http.get(cfg?.ip + '/shells/' + cfg?.urn + "/aas/submodels/Configuration/submodel/submodelElements/ServiceMesh"));
     } catch(e) {
       console.log(e);
     }

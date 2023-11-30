@@ -14,7 +14,7 @@ describe('ResourceDetailsComponent', () => {
   let fixture: ComponentFixture<ResourceDetailsComponent>;
 
   beforeEach(async () => {
-    await EnvConfigService.initAsync();
+    await EnvConfigService.init();
     await TestBed.configureTestingModule({
       imports: [ HttpClientModule, MatCardModule,RouterTestingModule ],
       declarations: [ ResourceDetailsComponent, TidyPipe ],

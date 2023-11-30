@@ -12,7 +12,7 @@ describe('AppComponent', () => {
   let component: AppComponent;
 
   beforeEach(async () => {
-    await EnvConfigService.initAsync();
+    await EnvConfigService.init();
     await TestBed
       .configureTestingModule({
         imports: [

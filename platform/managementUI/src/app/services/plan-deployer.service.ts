@@ -13,9 +13,6 @@ import { WebsocketService } from '../websocket.service';
 
 export class PlanDeployerService {
 
-  ip: string = "";
-  urn: string = "";
-
   sub: Subscription | undefined;
 
   statusSubmodel: any;
@@ -30,39 +27,7 @@ export class PlanDeployerService {
     private envConfigService: EnvConfigService,
     private onlyId: OnlyIdPipe,
     private websocketService: WebsocketService) {
-    const env = this.envConfigService.getEnv();
-    //the ip and urn are taken from the json.config
-    if(env && env.ip) {
-      this.ip = env.ip;
-    }
-    if (env && env.urn) {
-      this.urn = env.urn;
-    }
 
-    let wsIp = this.ip;
-    wsIp = wsIp.replace('http', 'ws');
-    wsIp = wsIp.replace('https', 'wws');
-    wsIp = wsIp.slice(0, wsIp.indexOf(":", wsIp.indexOf(":") + 1));
-    wsIp = wsIp.concat(":10000/status");
-    //let uri = await this.getUri()
-    //this.webSocket = webSocket(uri);
-
-    /*
-    this.webSocket = webSocket(wsIp);
-    this.webSocket.asObservable().subscribe(
-      dataFromServer => this.receiveStatus(dataFromServer));
-    */
-
-      // this.webSocket.subscribe(   msg => console.log('message received: ' + msg),
-    // // Called whenever there is a message from the server
-    // err => console.log(err),
-    // // Called if WebSocket API signals some kind of error
-    // () => console.log('complete')
-    // // Called when connection is closed (for whatever reason)
-    // );
-
-
-    // TODO dynamic status uri
     this.sub = websocketService.getMsg().subscribe((value: any) =>
       {
         this.receiveStatus(JSON.parse(value)) 
@@ -79,10 +44,11 @@ export class PlanDeployerService {
       basyxFunc = "deployPlanAsync";
     }
     try {
+      let cfg = await this.envConfigService.initAndGetCfg();
       response = await firstValueFrom(this.http.post<platformResponse>(
-        this.ip
+        cfg?.ip
         + '/shells/'
-        + this.urn
+        + cfg?.urn
         + "/aas/submodels/Artifacts/submodel/"
         + basyxFunc
         + "/invoke"
@@ -105,10 +71,11 @@ export class PlanDeployerService {
   public async undeployPlanById(params: any) {
     let response;
     try {
+      let cfg = await this.envConfigService.initAndGetCfg();
       response = await firstValueFrom(this.http.post<platformResponse>(
-        this.ip
+        cfg?.ip
         + '/shells/'
-        + this.urn
+        + cfg?.urn
         + "/aas/submodels/Artifacts/submodel/undeployPlanWithIdAsync/invoke"
       ,{"inputArguments": params,
         "requestId":"1bfeaa30-1512-407a-b8bb-f343ecfa28cf",

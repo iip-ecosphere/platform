@@ -19,7 +19,7 @@ describe('ResourcesComponent', () => {
   let expectedManufacturer : string = "Unknown Manufacturer";
 
   beforeEach(async () => {
-    await EnvConfigService.initAsync();
+    await EnvConfigService.init();
     await TestBed
       .configureTestingModule({
         imports: [ HttpClientModule, RouterTestingModule.withRoutes(routes) ],

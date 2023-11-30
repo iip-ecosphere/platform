@@ -8,7 +8,7 @@ describe('EnvConfigurationServiceService', () => {
   beforeAll(() => {
     TestBed.configureTestingModule({});
     service = TestBed.inject(EnvConfigService);
-    return EnvConfigService.initAsync();
+    return EnvConfigService.init();
   });
 
   beforeEach(() => {
@@ -18,10 +18,8 @@ describe('EnvConfigurationServiceService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should have setup/configuration', () => {
-    expect(service.getEnv()).toBeTruthy();
-
-    let cfg : Configuration | undefined = EnvConfigService.getConfig();
+  it('should have setup/configuration', async() => {
+    let cfg = await service.initAndGetCfg();
     expect(cfg).toBeTruthy();
     expect(cfg?.ip && cfg?.ip?.length > 0).toBeTrue();
     expect(cfg?.urn && cfg?.urn?.length > 0).toBeTrue();

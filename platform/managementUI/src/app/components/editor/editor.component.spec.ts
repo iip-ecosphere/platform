@@ -15,7 +15,7 @@ describe('EditorComponent', () => {
   let fixture: ComponentFixture<EditorComponent>;
 
   beforeEach(async () => {
-    await EnvConfigService.initAsync();
+    await EnvConfigService.init();
     await TestBed.configureTestingModule({
       imports: [ HttpClientModule, FormsModule, MatTooltipModule ],
       declarations: [ EditorComponent ],

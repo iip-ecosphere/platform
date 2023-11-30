@@ -16,7 +16,7 @@ describe('FlowchartComponent', () => {
   let fixture: ComponentFixture<FlowchartComponent>;
 
   beforeEach(async () => {
-    await EnvConfigService.initAsync();
+    await EnvConfigService.init();
     await TestBed.configureTestingModule({
       imports: [ HttpClientModule, 
           RouterTestingModule, 

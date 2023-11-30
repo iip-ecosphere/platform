@@ -16,26 +16,15 @@ import { ApiService } from 'src/app/services/api.service';
 
 export class LogsDialogComponent implements OnInit{
 
-  constructor(
-    private envConfigService: EnvConfigService,
+  constructor(private envConfigService: EnvConfigService,
     public http: HttpClient,
     public api: ApiService,
-    private websocketService: WebsocketService
-    ) {
-      const env = this.envConfigService.getEnv();
-      if(env && env.ip) {
-        this.ip = env.ip;
-      }
-      if (env && env.urn) {
-        this.urn = env.urn;
-      }
+    private websocketService: WebsocketService) {
       this.logs = websocketService.data
       this.subscription = this.websocketService.getMsg().subscribe((val) =>
         {this.data.logs += "\n" + val})
   }
 
-  ip: string = "";
-  urn: string = "";
   logs:string | undefined;
   serviceMgr: string | undefined;
   serviceInfo: any;
@@ -212,9 +201,10 @@ export class LogsDialogComponent implements OnInit{
     let response: any;
 
     try {
+        let cfg = await this.envConfigService.initAndGetCfg();
         response = await firstValueFrom(
-          this.http.get(this.ip + '/shells/'
-        + this.urn
+          this.http.get(cfg?.ip + '/shells/'
+        + cfg?.urn
         + "/aas/submodels/"
         + submodel
         + "/submodel/submodelElements/"
@@ -273,7 +263,8 @@ export class LogsDialogComponent implements OnInit{
       }
     }
 
-    var url = this.ip + '/shells/' + this.urn
+    let cfg = this.envConfigService.getCfg();
+    var url = cfg?.ip + '/shells/' + cfg?.urn
       + "/aas/submodels/resources/submodel/submodelElements/"
       + this.serviceInfo.resource + "/"
       + "serviceManagers/a"

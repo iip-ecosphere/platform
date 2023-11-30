@@ -11,7 +11,7 @@ describe('ServicesComponent', () => {
   let fixture: ComponentFixture<LogsDialogComponent>;
 
   beforeEach(async () => {
-    await EnvConfigService.initAsync();
+    await EnvConfigService.init();
     await TestBed.configureTestingModule({
       imports: [ HttpClientModule ],
       declarations: [ LogsDialogComponent ],

@@ -16,8 +16,6 @@ import { InputVariable, Resource, configMetaEntry, editorInput, platformResponse
   styleUrls: ['./list.component.scss']
 })
 export class ListComponent implements OnInit {
-  ip: string = "";
-  urn: string = "";
   //currentTab: string | null = null;
   currentTab = "";
   rawData: any;
@@ -30,14 +28,6 @@ export class ListComponent implements OnInit {
     private envConfigService: EnvConfigService,
     public api: ApiService,
     public dialog: MatDialog) {
-      const env = this.envConfigService.getEnv();
-       //the ip and urn are taken from the json.config
-      if(env && env.ip) {
-        this.ip = env.ip;
-      }
-      if (env && env.urn) {
-        this.urn = env.urn;
-      }
     }
 
   // Filter ---------------------------------------------------------------------
@@ -136,9 +126,10 @@ export class ListComponent implements OnInit {
   public async getData(submodelElement: string) {
     let response;
     try {
+        let cfg = await this.envConfigService.initAndGetCfg();
         response = await firstValueFrom(
-          this.http.get(this.ip + '/shells/'
-        + this.urn
+          this.http.get(cfg?.ip + '/shells/'
+        + cfg?.urn
         + "/aas/submodels/Configuration/submodel/submodelElements/"
         + submodelElement));
       } catch(e) {
