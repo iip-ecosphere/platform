@@ -21,6 +21,7 @@ import de.iip_ecosphere.platform.services.environment.DataIngestor;
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
 import iip.datatypes.Rec1;
 import iip.datatypes.Rec1Impl;
+import iip.datatypes.Feedback;
 import iip.impl.SimpleDataSourceImpl;
 
 /**
@@ -85,6 +86,10 @@ public class SimpleSourceImpl extends SimpleDataSourceImpl {
                 }
             }, 0, 1000);
         }
+    }
+
+    @Override
+    public void processFeedback(Feedback data) {
     }
 
 }

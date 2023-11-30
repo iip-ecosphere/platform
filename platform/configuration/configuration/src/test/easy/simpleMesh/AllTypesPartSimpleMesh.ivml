@@ -16,6 +16,16 @@ project AllTypesPartSimpleMesh {
             }
         }
     };
+    
+    RecordType feedback = {
+        name = "Feedback",
+        fields = {
+            Field {
+                name = "data",
+                type = refBy(StringType)
+            }
+        }
+    };
 
     freeze {
         .;

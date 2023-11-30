@@ -1,4 +1,4 @@
-# IIP-Ecosphere platform: Configuration component
+# oktoflow platform: Configuration Component and Configuration Model
 
 IIP-Ecosphere aims at an encompassing and consistent configuration of the whole platform in order to enable model-based platform instantiation, i.e., to include relevant parts and to exclude unwanted parts. This is the point in the platform where optional components such as transport protocols, connectors, service execution managers, container managers, service chains and applications etc. are combined, configured, validated and ultimately turned into instantiated code and installable artifacts.
 

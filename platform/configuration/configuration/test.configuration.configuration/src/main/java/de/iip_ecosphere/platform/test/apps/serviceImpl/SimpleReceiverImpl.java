@@ -14,8 +14,10 @@ package de.iip_ecosphere.platform.test.apps.serviceImpl;
 
 import java.io.InputStream;
 
+import de.iip_ecosphere.platform.services.environment.DataIngestor;
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
 import iip.datatypes.Rec1;
+import iip.datatypes.Feedback;
 import iip.impl.SimpleDataReceiverImpl;
 
 /**
@@ -45,6 +47,10 @@ public class SimpleReceiverImpl extends SimpleDataReceiverImpl {
     @Override
     public void processRec1(Rec1 data) {
         System.out.println("RECEIVED " + data.getStringField() + " " + data.getIntField());
+    }
+    
+    @Override
+    public void attachFeedbackIngestor(DataIngestor<Feedback> ingestor) {
     }
 
 }
