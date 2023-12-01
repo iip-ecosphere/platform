@@ -77,7 +77,7 @@ describe('ListComponent', () => {
   });
 
   it('should provided Constants tab/data', async() => {
-    const expectedDataIdShort = ["UNUSED"] as string[];
+    const expectedDataIdShort = ["UNUSED_String", "UNUSED_Boolean", "UNUSED_Integer", "UNUSED_Real"] as string[];
 
     await test(fixture, component, router, dialogSpy, dialogRefSpyObj, 1, expectedDataIdShort);
   });
