@@ -192,7 +192,7 @@ async function test(fixture: ComponentFixture<ListComponent>, component: ListCom
     } else {
       expect(dialogSpy).toHaveBeenCalled();
       expect(dialogRefSpyObj.componentInstance).toBeTruthy();
-      expect(dialogRefSpyObj.componentInstance.selectedType).toBeTruthy(); // dialog close code did something
+      expect(dialogRefSpyObj.componentInstance.category).toBeTruthy(); // dialog open code did something
     }
     // click: may be router, may be dialog
     item = tabDataRow.querySelector('button[id="data.btnDelete"]') as HTMLElement;
