@@ -1208,8 +1208,9 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         varBuilder.createPropertyBuilder(AasUtils.fixId(metaShortId.apply("state")))
             .setValue(Type.STRING, var.getState().toString())
             .build();
+        IDatatype type = var.getValue() != null ? var.getValue().getType() : varType;
         varBuilder.createPropertyBuilder(AasUtils.fixId(metaShortId.apply("type")))
-            .setValue(Type.STRING, IvmlDatatypeVisitor.getUnqualifiedType(varType))
+            .setValue(Type.STRING, IvmlDatatypeVisitor.getUnqualifiedType(type))
             .build();
         addMetaDefault(var, varBuilder);
         if (var.getDeclaration().getParent() instanceof Project) { // top-level only for now
