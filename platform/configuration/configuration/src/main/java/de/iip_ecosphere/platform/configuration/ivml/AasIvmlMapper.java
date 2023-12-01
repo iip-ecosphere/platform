@@ -1127,7 +1127,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                     mapVariable(var.getNestedElement(member), varBuilder, "var_" + member);
                 }
                 PropertyBuilder pb = varBuilder.createPropertyBuilder(AasUtils.fixId(metaShortId.apply("size")))
-                    .setDescription(new LangString(ModelInfo.getCommentSafe(decl), lang))
+                    .setDescription(new LangString(lang, ModelInfo.getCommentSafe(decl)))
                     .setValue(Type.INTEGER, var.getNestedElementsCount());
                 setSemanticId(pb, semanticId);
                 pb.build();
