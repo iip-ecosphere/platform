@@ -1,5 +1,5 @@
-<mat-form-field ngDefaultControl *ngIf="input">
-  <mat-select [(ngModel)]=input.value>
+<mat-form-field ngDefaultControl *ngIf="input" appearance="outline">
+  <mat-select [(ngModel)]="selected">
     <mat-option [value]="true">
       true
     </mat-option>

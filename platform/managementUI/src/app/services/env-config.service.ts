@@ -23,11 +23,6 @@ interface Configuration {
   enableWarn? : boolean;
 }
 
-export const primitiveDataTypes
-  = ["String", "Boolean", "Real", "Integer"]
-
-export const ivmlEnumeration = "IvmlEnumeration:";
-
 @Injectable({
   providedIn: 'root'
 })
@@ -49,7 +44,7 @@ export class EnvConfigService {
               return undefined;
             }
           }
-        )
+        ).catch(e => {});
         if (cfg != undefined && EnvConfigService.env == undefined) {
           EnvConfigService.env = cfg;
           console.log("Loading setup from " + location + ": " + JSON.stringify(cfg));

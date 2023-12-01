@@ -1,5 +1,5 @@
-<mat-form-field ngDefaultControl *ngIf="input && meta">
-  <mat-select [(ngModel)]=input.value>
+<mat-form-field ngDefaultControl *ngIf="input && meta" appearance="outline">
+  <mat-select [(ngModel)]="selected" (selectionChange)="selectionChanged($event.value)">
       <mat-option *ngFor="let element of enum" [value]="element">{{element}}</mat-option>
   </mat-select>
 </mat-form-field>

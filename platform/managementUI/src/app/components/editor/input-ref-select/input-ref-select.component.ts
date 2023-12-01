@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { EditorService } from 'src/app/services/editor.service';
-import { Resource, editorInput, configMeta } from 'src/interfaces';
+import { Resource, editorInput, configMeta, metaTypes } from 'src/interfaces';
 
 @Component({
   selector: 'app-input-ref-select',
@@ -19,9 +19,6 @@ export class InputRefSelectComponent implements OnInit {
   refTo = '';
   references: Resource[] = [];
   selectedRef: configMeta | undefined;
-
-  //refTypes = ['Dependency', 'Resource', 'DataType', 'Server', 'ServiceMesh', 'MeshConnector', 'MeshElement', 'ServiceBase', 'IOType'];
-  metaTypes = ['metaState', 'metaProject', 'metaSize', 'metaType', 'metaRefines', 'metaAbstract', 'metaTypeKind'];
 
   constructor(private edit: EditorService) { }
 
@@ -43,7 +40,6 @@ export class InputRefSelectComponent implements OnInit {
         this.activeTextinput = false;
       }
       if(value.indexOf('sequenceOf') >= 0) {
-        console.log('sequenceOf ' + value);
         this.isSequenceOf = true;
       }
     }
@@ -61,10 +57,9 @@ export class InputRefSelectComponent implements OnInit {
     const response = await this.edit.getConfigurationType(type);
     if(response && response.value) {
       for(let dep of response.value) {
-        if(dep.idShort && this.metaTypes.indexOf(dep.idShort) === -1) {
+        if(dep.idShort && metaTypes.indexOf(dep.idShort) === -1) {
           this.references.push(dep);
         }
-
       }
     }
   }

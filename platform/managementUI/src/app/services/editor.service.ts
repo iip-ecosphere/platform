@@ -26,7 +26,6 @@ export class EditorService {
   }
 
   public async getConfigurationType(type: string) {
-    console.log(type);
     const response = await this.getData('/aas/submodels/Configuration/submodel/submodelElements/' + type) as Resource;
     return response;
   }

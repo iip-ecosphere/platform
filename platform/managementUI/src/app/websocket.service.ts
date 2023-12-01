@@ -10,7 +10,7 @@ export class WebsocketService {
 
   constructor() { }
 
-  public socket: WebSocket = new WebSocket("ws://localhost:10000/status");
+  public socket: WebSocket | undefined;// = new WebSocket("ws://localhost:10000/status");
   data: any;
   //messageSubject: Subject<string> = new Subject<string>();
   messageSubject: Subject<any> = new Subject<any>();
@@ -20,8 +20,7 @@ export class WebsocketService {
     console.debug('[websocketService | connect] url: ' +  url + "#")
     this.socket = new WebSocket(url);
     this.socket.onopen = () => {
-      console.log("Websocket connected with url: "
-        + url);
+      console.info("Websocket connected with url: " + url);
     }
     this.socket.onmessage = (event) => {
       console.debug('Received message:', event.data);
@@ -39,7 +38,7 @@ export class WebsocketService {
   }
 
   public close() {
-    console.log('[WebSocket] closing socket');
-    this.socket.close()
+    console.info('[WebSocket] closing socket');
+    this.socket?.close()
   }
 }

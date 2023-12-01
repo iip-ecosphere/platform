@@ -1,6 +1,5 @@
 //import { type } from 'os';
-import { InputVariable, platformResponse } from 'src/interfaces';
-import { primitiveDataTypes, ivmlEnumeration } from './env-config.service';
+import { InputVariable, platformResponse, primitiveDataTypes, ivmlEnumeration } from 'src/interfaces';
 import { Injectable } from '@angular/core';
 import { ApiService } from './api.service';
 

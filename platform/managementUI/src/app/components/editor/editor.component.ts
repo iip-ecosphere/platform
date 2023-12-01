@@ -1,19 +1,9 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { ApiService } from 'src/app/services/api.service';
-import { primitiveDataTypes } from 'src/app/services/env-config.service';
 import { IvmlFormatterService } from 'src/app/services/ivml-formatter.service';
-import { Resource, uiGroup, editorInput, configMetaContainer, configMetaEntry, ResourceAttribute, InputVariable } from 'src/interfaces';
-
-  //metatypekind: PRIMITIVE=1, ENUM=2, CONTAINER=3, CONSTRAINT=4, DERIVED=9, COMPOUND=10
-
-  /* metaTypeKind */
-const MTK_primitive = 1;
-const MTK_enum = 2;
-const MTK_container = 3;
-const MTK_constraint = 4;
-const MTK_derived = 9;
-const MTK_compound = 10;
+import { Resource, uiGroup, editorInput, configMetaContainer, configMetaEntry, ResourceAttribute, InputVariable, metaTypes, 
+  MTK_primitive, MTK_derived, MTK_enum, MTK_compound, MT_metaRefines, MT_metaTypeKind, MT_metaAbstract, primitiveDataTypes } from 'src/interfaces';
 
 @Component({
   selector: 'app-editor',
@@ -42,9 +32,6 @@ export class EditorComponent implements OnInit {
   showInputs = true;
 
   variableName = '';
-
-  metaTypes = ['metaState', 'metaProject',
-    'metaSize', 'metaType', 'metaRefines', 'metaAbstract', 'metaTypeKind'];
 
   ivmlType:string = "";
 
@@ -77,15 +64,20 @@ export class EditorComponent implements OnInit {
       }
     } else if(!this.type) {
       await this.getMeta()
-    } else if(this.metaBackup && this.metaBackup.value && this.type.type){
-      let type = this.cleanTypeName(this.type.type);
-      this.selectedType = this.metaBackup.value.find(item => item.idShort === type);
-      this.generateInputs()
+    } else if (this.type.type){
+      if(!this.metaBackup || !this.metaBackup.value) {
+        await this.getMeta()
+      }
+      if(this.metaBackup && this.metaBackup.value) {
+        let type = this.cleanTypeName(this.type.type);
+        this.selectedType = this.metaBackup.value.find(item => item.idShort === type);
+        this.generateInputs()
+      }
     }
     if(this.metaBackup && this.metaBackup.value) {
       let searchTerm = 'Field'
       for(const type of this.metaBackup.value) {
-        const refined = type.value.find((item: { idShort: string; }) => item.idShort === 'metaRefines');
+        const refined = type.value.find((item: { idShort: string; }) => item.idShort === MT_metaRefines);
         if(refined && refined.value != '') {
           if(searchTerm === refined.value) {
             console.debug("TYPE " + type);
@@ -122,7 +114,7 @@ export class EditorComponent implements OnInit {
 
           if (this.getMetaRef(item)) {
             let metaRefVal = item.value.find(
-              (val: { idShort: string; }) => val.idShort === "metaRefines").value
+              (val: { idShort: string; }) => val.idShort === MT_metaRefines).value
             if(metaRefVal != "") {
               // sub-type
               if(filter?.metaRef.includes(metaRefVal)) {
@@ -168,7 +160,7 @@ export class EditorComponent implements OnInit {
    * there is no attribute "metaAbstract" */
   private isAbstract(item:any) {
     let abstract = item.value.find(
-      (val: { idShort: string; }) => val.idShort === "metaAbstract")?.value
+      (val: { idShort: string; }) => val.idShort === MT_metaAbstract)?.value
     if (abstract) {
       return true
     } else {
@@ -178,7 +170,7 @@ export class EditorComponent implements OnInit {
 
   private getMetaRef(item: any) {
     let value = item.value.find(
-      (val: { idShort: string; }) => val.idShort === "metaRefines")
+      (val: { idShort: string; }) => val.idShort === MT_metaRefines)
     if (value) {
       return value.value
     } else {
@@ -188,7 +180,7 @@ export class EditorComponent implements OnInit {
 
   private isTypeMetaKindEqualNum(item:any, num:number) {
     let value = item.value.find(
-      (val: { idShort: string; }) => val.idShort === "metaTypeKind").value
+      (val: { idShort: string; }) => val.idShort === MT_metaTypeKind).value
     if (value == num) {
       return true
     } else {
@@ -257,19 +249,20 @@ export class EditorComponent implements OnInit {
     this.ivmlType = selectedType.idShort
     if (selectedType && selectedType.value) {
       // (Constants) hard-coded in case of primitive types
-      if (primitiveDataTypes.includes(selectedType.idShort)) {
+      let selMetaTypeKind = this.getPropertyValue(selectedType.value, MT_metaTypeKind);
+      if (primitiveDataTypes.includes(selectedType.idShort) || selMetaTypeKind == MTK_enum) {
         let meta_entry:configMetaEntry = {
           modelType: {name: ""},
           kind: "",
           value: "",
           idShort: "value"
         }
-
+        let val = [this.type?.value] || []; // TODO take value from below
         let editorInput:editorInput =
-          {name: "value", type: selectedType.idShort, value:[],
+          {name: "value", type: selectedType.idShort, value:val,
           description: [{language: '', text: ''}],
-          refTo: false, multipleInputs: false, meta:meta_entry}
-
+          refTo: false, multipleInputs: false, meta:meta_entry};
+        editorInput.metaTypeKind = selMetaTypeKind;
 
         let uiGroup = 1
         this.uiGroups.push({
@@ -279,148 +272,155 @@ export class EditorComponent implements OnInit {
           fullLineInputs: [],
           fullLineOptionalInputs: []
         });
-      }
+      } else {
+        for (const input of selectedType.value) {
+          if (input.idShort && metaTypes.indexOf(input.idShort) === -1) {
+            let isOptional = false;
+            let uiGroup: number = this.getPropertyValue(input.value, 'uiGroup');
 
-      for(const input of selectedType.value) {
-        if(input.idShort && this.metaTypes.indexOf(input.idShort) === -1) {
-          let isOptional = false;
-          let uiGroup: number = input.value.find(
-            (item: { idShort: string; }) => item.idShort === 'uiGroup')?.value
+            if (uiGroup < 0) {
+              isOptional = true;
+              uiGroup = uiGroup * -1;
+            }
+            let uiGroupCompare =  this.uiGroups.find(
+              item => item.uiGroup === uiGroup);
 
-          if(uiGroup < 0) {
-            isOptional = true;
-            uiGroup = uiGroup * -1;
-          }
-          let uiGroupCompare =  this.uiGroups.find(
-            item => item.uiGroup === uiGroup);
+            let editorInput: editorInput =
+              {name: '', type: '', value:[], description:
+                [{language: '', text: ''}],
+                refTo: false, multipleInputs: false};
 
-          let editorInput: editorInput =
-            {name: '', type: '', value:[], description:
-              [{language: '', text: ''}],
-              refTo: false, multipleInputs: false};
-
-          let name = input.value.find(
-            (item: { idShort: string; }) => item.idShort === 'name')
-            if(name) {
+            let name = this.getProperty(input.value, 'name');
+            if (name) {
               editorInput.name = name.value;
-              if(name.description
+              if (name.description
                 && name.description[0]
                 && name.description[0].text
                 && name.description[0].language) {
-                editorInput.description = name.description;
+                  editorInput.description = name.description;
               }
             }
 
-          editorInput.type = input.value.find(
-            (item: { idShort: string; }) => item.idShort === 'type')?.value;
+            editorInput.type = this.getPropertyValue(input.value, 'type');
 
-          editorInput.meta = input;
-          let cleanType = this.cleanTypeName(editorInput.type);
-          let type = this.meta?.value?.find(type => type.idShort === cleanType);
-          //let type2 = this.metaBackup?.value?.find(type => type.idShort === cleanType);
-          if(type) {
-            editorInput.metaTypeKind = type.value.find(
-              (item: { idShort: string; }) => item.idShort === 'metaTypeKind')?.value;
+            editorInput.meta = input;
+            let cleanType = this.cleanTypeName(editorInput.type);
 
-          } else if(this.metaBackup && this.metaBackup.value) {
-            let iterType = editorInput.type;
-            do {
-              let temp = this.metaBackup.value.find(item => item.idShort === this.cleanTypeName(iterType));
-              editorInput.metaTypeKind = temp?.value.find((item: { idShort: string; }) => item.idShort === 'metaTypeKind').value;
-              editorInput.type = iterType;
-              if (editorInput.metaTypeKind == MTK_derived) {
-                iterType = temp?.value.find((item: { idShort: string; }) => item.idShort === 'metaRefines').value;
-                if (!iterType) {
-                  break;
+            let type = this.meta?.value?.find(type => type.idShort === cleanType);
+            //let type2 = this.metaBackup?.value?.find(type => type.idShort === cleanType);
+            if(type) {
+              editorInput.metaTypeKind = this.getPropertyValue(type.value, MT_metaTypeKind);
+            } else if(this.metaBackup && this.metaBackup.value) {
+              let iterType = editorInput.type;
+              do {
+                let temp = this.metaBackup.value.find(item => item.idShort === this.cleanTypeName(iterType));
+                editorInput.metaTypeKind = this.getPropertyValue(temp?.value, MT_metaTypeKind);
+                editorInput.type = iterType;
+                if (editorInput.metaTypeKind == MTK_derived) {
+                  iterType = this.getPropertyValue(temp?.value, MT_metaRefines);
+                  if (!iterType) {
+                    break;
+                  }
+                }
+              } while (editorInput.metaTypeKind == MTK_derived);
+            }
+            //the metaTypeKind is not included on the values of the types in the configuration/meta collection
+            //therefore this approach doesnt work, but it would be much more performant if it did
+            // editorInput.metaTypeKind = input.value.find(
+            //   (item: { idShort: string; }) => item.idShort === 'metaTypeKind')?.value;
+            //   console.log(editorInput);
+            //   console.log(input.value);
+
+
+            if(editorInput.type.indexOf('refTo') >= 0) {
+              editorInput.refTo = true;
+            }
+            if(editorInput.type.indexOf('setOf') >= 0
+              || editorInput.type.indexOf('sequenceOf') >= 0) {
+              editorInput.multipleInputs = true;
+            }
+            let ivmlValue = this.type?.value || ""; // this.getPropertyValue(temp?.value, 'defaultValue') // may not be there
+            let initial;
+            if(editorInput.multipleInputs || editorInput.metaTypeKind === MTK_enum) {
+              initial = [ivmlValue] // TODO unclear
+            } else if(editorInput.type === 'Boolean'){
+              initial = String(ivmlValue).toLowerCase() === 'true';
+            } else if(editorInput.metaTypeKind === MTK_compound && !editorInput.multipleInputs) {
+              initial = {}; // TODO unclear
+            } else {
+              initial = ivmlValue;
+            }
+            editorInput.value = initial;
+
+            if(!uiGroupCompare ){
+              if(isOptional) {
+                if(editorInput.multipleInputs) {
+                  this.uiGroups.push({
+                    uiGroup: uiGroup,
+                    inputs: [],
+                    optionalInputs: [],
+                    fullLineInputs: [],
+                    fullLineOptionalInputs: [editorInput]
+                  });
+                } else {
+                  this.uiGroups.push({
+                    uiGroup: uiGroup,
+                    inputs: [],
+                    optionalInputs: [editorInput],
+                    fullLineInputs: [],
+                    fullLineOptionalInputs: []
+                  });
+                }
+              } else {
+                if(editorInput.multipleInputs) {
+                  this.uiGroups.push({
+                    uiGroup: uiGroup,
+                    inputs: [],
+                    optionalInputs: [],
+                    fullLineInputs: [editorInput],
+                    fullLineOptionalInputs: []
+                  });
+                } else {
+                  this.uiGroups.push({
+                    uiGroup: uiGroup,
+                    inputs: [editorInput],
+                    optionalInputs: [],
+                    fullLineInputs: [],
+                    fullLineOptionalInputs: []
+                  });
                 }
               }
-            } while (editorInput.metaTypeKind == MTK_derived);
-          }
-          //the metaTypeKind is not included on the values of the types in the configuration/meta collection
-          //therefore this approach doesnt work, but it would be much more performant if it did
-          // editorInput.metaTypeKind = input.value.find(
-          //   (item: { idShort: string; }) => item.idShort === 'metaTypeKind')?.value;
-          //   console.log(editorInput);
-          //   console.log(input.value);
-
-
-          if(editorInput.type.indexOf('refTo') >= 0) {
-            editorInput.refTo = true;
-          }
-          if(editorInput.type.indexOf('setOf') >= 0
-            || editorInput.type.indexOf('sequenceOf') >= 0) {
-            editorInput.multipleInputs = true;
-          }
-          //assign initial value of inputFields
-          let initial;
-          if(editorInput.multipleInputs || editorInput.metaTypeKind === MTK_enum) {
-            initial = []
-          } else if(editorInput.type === 'Boolean'){
-            initial = false;
-          } else if(editorInput.metaTypeKind === MTK_compound && !editorInput.multipleInputs) {
-            initial = {};
-          } else {
-            initial = '';
-          }
-          editorInput.value = initial;
-
-          if(!uiGroupCompare ){
-            if(isOptional) {
-              if(editorInput.multipleInputs) {
-                this.uiGroups.push({
-                  uiGroup: uiGroup,
-                  inputs: [],
-                  optionalInputs: [],
-                  fullLineInputs: [],
-                  fullLineOptionalInputs: [editorInput]
-                });
-              } else {
-                this.uiGroups.push({
-                  uiGroup: uiGroup,
-                  inputs: [],
-                  optionalInputs: [editorInput],
-                  fullLineInputs: [],
-                  fullLineOptionalInputs: []
-                });
-              }
             } else {
-              if(editorInput.multipleInputs) {
-                this.uiGroups.push({
-                  uiGroup: uiGroup,
-                  inputs: [],
-                  optionalInputs: [],
-                  fullLineInputs: [editorInput],
-                  fullLineOptionalInputs: []
-                });
-              } else {
-                this.uiGroups.push({
-                  uiGroup: uiGroup,
-                  inputs: [editorInput],
-                  optionalInputs: [],
-                  fullLineInputs: [],
-                  fullLineOptionalInputs: []
-                });
-              }
-            }
-          } else {
-            if(isOptional) {
-              if(editorInput.multipleInputs) {
-                uiGroupCompare?.fullLineOptionalInputs.push(editorInput);
-              } else {
-                uiGroupCompare?.optionalInputs.push(editorInput);
-              }
+              if(isOptional) {
+                if(editorInput.multipleInputs) {
+                  uiGroupCompare?.fullLineOptionalInputs.push(editorInput);
+                } else {
+                  uiGroupCompare?.optionalInputs.push(editorInput);
+                }
 
-            } else {
-              if(editorInput.multipleInputs) {
-                uiGroupCompare?.fullLineInputs.push(editorInput);
               } else {
-                uiGroupCompare?.inputs.push(editorInput);
+                if(editorInput.multipleInputs) {
+                  uiGroupCompare?.fullLineInputs.push(editorInput);
+                } else {
+                  uiGroupCompare?.inputs.push(editorInput);
+                }
               }
             }
           }
         }
       }
     }
+  }
+
+  getProperty(data: configMetaEntry[], id: string) {
+    if (data) {
+      return data.find((item: { idShort: string; }) => item.idShort === id);
+    } else {
+      return undefined
+    }
+  }
+  getPropertyValue(data: configMetaEntry[], id: string) {
+    return this.getProperty(data, id)?.value;
   }
 
   public toggleOptional(uiGroup: uiGroup) {
@@ -435,6 +435,10 @@ export class EditorComponent implements OnInit {
       this.feedback = await this.ivmlFormatter.createVariable(
         this.variableName, creationData, this.ivmlType)
     }
+  }
+
+  public async edit() {
+    // TODO ivmlFormatter set values
   }
 
   public close() {

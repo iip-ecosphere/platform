@@ -133,7 +133,7 @@ export class ListComponent implements OnInit {
         + "/aas/submodels/Configuration/submodel/submodelElements/"
         + submodelElement));
       } catch(e) {
-        console.log(e);
+        console.error(e);
         //this.noData = true;
       }
     return response;
@@ -167,22 +167,38 @@ export class ListComponent implements OnInit {
       let temp = []
       let rowValues = tableRow.value[0].value
       // string
+      let type
+      let val
       if((typeof rowValues) == "string") {
-
         for (let rowValues of tableRow.value) {
           if (rowValues.idShort == "varValue") {
             let new_rowValue = {"value": rowValues.value}
+            val = rowValues.value
             temp.push(new_rowValue)
+          } else if (rowValues.idShort == "metaType") {
+            type = rowValues.value
           }
         }
       // number
       } else if((typeof rowValues) == "number") {
+        for (let rowValues of tableRow.value) {
+          if (rowValues.idShort == "metaType") {
+            type = rowValues.value
+          } else if (rowValues.idShort == "varValue") {
+            val = rowValues.value
+          }
+        }
         // AAS  startup timeout
-        let new_rowValue = {"value": rowValues + " sec"} // TODO is it true?
+        let new_rowValue = {"value": rowValues  + " sec"} // TODO is it true?
         temp.push(new_rowValue)
       // object
       } else {
         for (let rowValues of tableRow.value) {
+          if (rowValues.idShort == "metaType") {
+            type = rowValues.value
+          } else if (rowValues.idShort == "varValue") {
+            val = rowValues.value
+          }
           for (let param of this.paramToDisplay) {
             if (rowValues.idShort == param[0]) {
               let new_rowValue = this.getValue(rowValues, param)
@@ -191,7 +207,7 @@ export class ListComponent implements OnInit {
           }
         }
       }
-      let row = {idShort: tableRow.idShort, value: temp}
+      let row = {idShort: tableRow.idShort, value: temp, varName: tableRow.idShort, varType: type, varValue: val}
       result.push(row)
     }
     this.filteredData = result
@@ -200,7 +216,16 @@ export class ListComponent implements OnInit {
   public filterTypes() {
     let result = []
     for (let tableRow of this.filteredData) {
-      let new_value = {idShort: tableRow.idShort}
+      let type
+      let val
+      for (let value of tableRow.value) {
+        if (value.idShort == "metaType") {
+          type = value.value
+        } else if (value.idShort == "varValue") {
+          val = value.value
+        }
+      }
+      let new_value = {idShort: tableRow.idShort, varName: tableRow.idShort, varType: type, varValue: val}
       result.push(new_value)
     }
     this.filteredData = result
@@ -211,6 +236,8 @@ export class ListComponent implements OnInit {
     for (let tableRow of this.filteredData) {
       let temp = []
       let name = tableRow.idShort
+      let type
+      let val
       for (let value of tableRow.value) {
         if (value.idShort == "version") {
           let new_value = value.value.find(
@@ -218,9 +245,13 @@ export class ListComponent implements OnInit {
           if(new_value != "") {
             temp.push({ "value":  "Version: " + new_value})
           }
+        } else if (value.idShort == "metaType") {
+          type = value.value
+        } else if (value.idShort == "varValue") {
+          val = value.value
         }
       }
-      let new_value = {idShort: name, value:temp}
+      let new_value = {idShort: name, value:temp, varName: tableRow.idShort, varType: type, varValue: val}
       result.push(new_value)
     }
     this.filteredData = result
@@ -230,14 +261,19 @@ export class ListComponent implements OnInit {
     let result = []
     for (let tableRow of this.filteredData) {
       let temp = []
+      let type
+      let val
       for (let rowValues of tableRow.value) {
-        if (rowValues.idShort == this.varValue) {
+        if (rowValues.idShort == "metaType") {
+          type = rowValues.value
+        } else if (rowValues.idShort == this.varValue) {
           let new_rowValue = {
             "value": rowValues.value}
           temp.push(new_rowValue)
+          val = rowValues.value
         }
       }
-      let new_value = {idShort: tableRow.idShort, value: temp}
+      let new_value = {idShort: tableRow.idShort, value: temp, varName: tableRow.idShort, varType: type, varValue: val}
       result.push(new_value)
     }
     this.filteredData = result
@@ -247,7 +283,14 @@ export class ListComponent implements OnInit {
     let result = []
     for (let tableRow of this.filteredData) {
       let temp = []
+      let type
+      let val
       for (let rowValues of tableRow.value) {
+        if (rowValues.idShort == "metaType") {
+          type = rowValues.value
+        } else if (rowValues.idShort == "varValue") {
+          val = rowValues.value
+        }
         for (let param of this.paramToDisplay) {
           if (rowValues.idShort == param[0]) {
             let new_rowValue = this.getValue(rowValues, param)
@@ -255,7 +298,7 @@ export class ListComponent implements OnInit {
           }
         }
       }
-      let new_value = {idShort: tableRow.idShort, value: temp}
+      let new_value = {idShort: tableRow.idShort, value: temp, varName: tableRow.idShort, varType: type, varValue: val}
       result.push(new_value)
 
     }
@@ -267,10 +310,16 @@ export class ListComponent implements OnInit {
     for (let tableRow of this.filteredData) {
       let temp = []
       let name
+      let type
+      let val
       let logo = null
       for (let rowValues of tableRow.value) {
         if (rowValues.idShort == "manufacturerName") {
           name = rowValues.value[0].value
+        } else if (rowValues.idShort == "metaType") {
+          type = rowValues.value
+        } else if (rowValues.idShort == "varValue") {
+          val = rowValues.value
         }
         for (let param of this.paramToDisplay) {
           if (rowValues.idShort == param[0]) {
@@ -290,7 +339,7 @@ export class ListComponent implements OnInit {
           }
         }
       }
-      let new_value = {idShort: this.removeChar('@de', name), logo: logo, value: temp}
+      let new_value = {idShort: this.removeChar('@de', name), logo: logo, value: temp, varName: tableRow.idShort, varType: type, varValue: val}
       result.push(new_value)
     }
     this.filteredData = result
@@ -305,9 +354,15 @@ export class ListComponent implements OnInit {
     for (let tableRow of this.filteredData) {
       let temp = []
       let name
+      let type
+      let val
       for (let rowValues of tableRow.value) {
         if (rowValues.idShort == "id") {
           name = rowValues.value[0].value
+        } else if (rowValues.idShort == "metaType") {
+          type = rowValues.value
+        } else if (rowValues.idShort == "varValue") {
+          val = rowValues.value
         }
         for (let param of this.paramToDisplay) {
           if (rowValues.idShort == param[0]) {
@@ -316,7 +371,7 @@ export class ListComponent implements OnInit {
           }
         }
       }
-      let new_value = {idShort: name, value: temp}
+      let new_value = {idShort: name, value: temp, varName: tableRow.idShort, varType: type, varValue: val}
       result.push(new_value)
     }
     this.filteredData = result
@@ -334,43 +389,28 @@ export class ListComponent implements OnInit {
     if(this.currentTab === "Meshes") { // TODO
       this.router.navigateByUrl('flowchart/' + item.idShort);
     } else {
-      let resource: Resource = item
       let dialogRef = this.dialog.open(EditorComponent, {
         height: '90%',
         width:  '90%',
       })
-      //dialogRef.componentInstance.category = this.currentTab;
 
-      let temp = []
       let meta_entry:configMetaEntry = {
         modelType: {name: ""},
         kind: "",
         value: "",
         idShort: "value"
       }
-
       let editorInput:editorInput =
-        {name: "value", type: "String", value:["tutaj"],
+        {name: "value", type: item.varType, value:item.varValue,
         description: [{language: '', text: ''}],
         refTo: false, multipleInputs: false, meta:meta_entry}
 
-
-      let uiGroup = 1 // TODO what value here?
-      temp.push({
-        uiGroup: uiGroup,
-        inputs: [editorInput],
-        optionalInputs: [],
-        fullLineInputs: [],
-        fullLineOptionalInputs: []
-      });
-
-
-      dialogRef.componentInstance.selectedType = resource
-      if (resource.idShort) {
-        dialogRef.componentInstance.variableName = resource.idShort
-        dialogRef.componentInstance.uiGroups = temp
-      }
-
+      let component = dialogRef.componentInstance;
+      editorInput.name = item.idShort;
+      component.variableName = item.varName;
+      component.type = editorInput; 
+      component.showDropdown = false;
+      component.category = this.currentTab;
     }
   }
 
@@ -400,7 +440,6 @@ export class ListComponent implements OnInit {
       })
       dialogRef.componentInstance.category = this.currentTab;
     }
-
   }
 
   public genTemplate(appId: string) {

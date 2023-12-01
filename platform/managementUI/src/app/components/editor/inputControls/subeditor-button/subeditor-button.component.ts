@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { Resource, ResourceAttribute, editorInput } from 'src/interfaces';
+import { Resource, ResourceAttribute, editorInput, metaTypes } from 'src/interfaces';
 import { EditorComponent } from '../../editor.component';
 
 @Component({
@@ -18,9 +18,6 @@ export class SubeditorButtonComponent implements OnInit {
 
   refinedTypes: ResourceAttribute[] = [];
   selectedRefinedType: ResourceAttribute | null = null;
-
-  metaTypes = ['metaState', 'metaProject',
-  'metaSize', 'metaType', 'metaRefines', 'metaAbstract', 'metaTypeKind'];
 
   constructor(public subDialog: MatDialog) { }
 
@@ -104,7 +101,7 @@ export class SubeditorButtonComponent implements OnInit {
   private hasInputFields(meta: ResourceAttribute) {
     if(Array.isArray(meta.value)) {
       for(let element of meta.value) {
-        if(!this.metaTypes.includes(element.idShort)) {
+        if(!metaTypes.includes(element.idShort)) {
           return true;
         }
       }
@@ -113,6 +110,6 @@ export class SubeditorButtonComponent implements OnInit {
       console.log('ERROR: meta value is not an Array');
       return false;
     }
-
   }
+  
 }

@@ -1,7 +1,7 @@
 <mat-toolbar>
-  <h1 *ngIf="category && !type else subeditorHead">Editor <span>for {{ category }}</span></h1>
+  <h1 *ngIf="category && !type else subeditorHead"><span>{{ category }}</span></h1>
   <ng-template #subeditorHead>
-    <h1 >Subeditor <span *ngIf="type">for {{ type.name }}</span></h1>
+    <h1 ><span *ngIf="type">{{ type.name }}</span></h1>
   </ng-template>
 
   <span style="flex: 1 1 auto"></span>
@@ -46,9 +46,11 @@
   <mat-card *ngIf="!type && showDropdown">
     <table>
       <tr>
+        <!-- variable type -->
         <td>
           <div *ngIf="meta && meta.value">
             <mat-form-field appearance="outline">
+              <mat-label>Type</mat-label>
               <mat-select id="typeSelect" [(value)]="selectedType">
                 <mat-option *ngFor="let type of meta.value"
                 [value]="type" (click)="generateInputs()">
@@ -59,24 +61,24 @@
           </div>
         </td>
         <td>
-          <h2 *ngIf="selectedType && selectedType.idShort" style="margin-left: 10%;">
-            {{selectedType.idShort}}
+          <h2 *ngIf="(!meta || !meta.value) && selectedType && selectedType.idShort" style="margin-left: 10%;">
+            {{ selectedType.idShort }}
           </h2>
+        </td>
+          <!-- variable name -->
+        <td>
+          <div *ngIf="!type && !refinedTypes">
+              <mat-form-field appearance="outline" >
+                <mat-label>Variable Name</mat-label>
+                <input matInput
+                  type="text" ngDefaultControl [(ngModel)]=variableName [disabled]="!showDropdown"/>
+              </mat-form-field>
+          </div>
         </td>
       </tr>
     </table>
   </mat-card>
 
-   <!-- variable name -->
-  <div *ngIf="!type && !refinedTypes">
-    <mat-card>
-      <mat-form-field appearance="outline" >
-        <mat-label>Variable Name</mat-label>
-        <input matInput
-          type="text" ngDefaultControl [(ngModel)]=variableName />
-      </mat-form-field>
-    </mat-card>
-  </div>
 
   <div *ngFor="let uiGroup of uiGroups">
 
@@ -89,9 +91,8 @@
             <div *ngIf="input.metaTypeKind != 10; else subEditor">
               <div *ngIf="input.metaTypeKind != 2; else enumCase">
                 <mat-form-field appearance="outline" >
-                  <mat-label>{{ input.type }}</mat-label>
                   <input matInput
-                    [matTooltip]="input.description[0].text + ' ' + input.description[0].language"
+                    [matTooltip]="input.description[0].text"
                     type="text" ngDefaultControl [(ngModel)]=input.value />
                 </mat-form-field>
               </div>
@@ -195,11 +196,11 @@
 </div>
 
 <div *ngIf="feedback == ''" style="display: flex; justify-content: center">
-  <button mat-raised-button class="button" *ngIf="!type && !refinedTypes else addButton"
+  <button mat-raised-button class="button" *ngIf="!type && !refinedTypes && showDropdown else addButton"
     color="success" (click)="create()" disable>Create</button>
     <ng-template #addButton>
       <button mat-raised-button class="button"
-      color="success" (click)="addType()">Add</button>
+      color="success" (click)="addType()">Save</button>
     </ng-template>
 
 </div>

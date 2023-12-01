@@ -31,8 +31,6 @@ export interface ResourceAttribute {
   semanticDescription?: any;
 }
 
-export class CResourceAttribute implements ResourceAttribute {};
-
 //The submodelElements are either basyx functions (i.e. deploy plan) or collections (i.e. KnownServices)
 export interface PlatformArtifacts {
   submodelElements?: Artifact[]
@@ -273,4 +271,28 @@ export interface ivmlTemplate {
   [key: string]: any
 }
 
+// from platform, IVML mapper
+export const MTK_primitive = 1;
+export const MTK_enum = 2;
+export const MTK_container = 3;
+export const MTK_constraint = 4;
+export const MTK_derived = 9;
+export const MTK_compound = 10;
 
+// from platform, IVML mapper
+export const MT_metaState = 'metaState';
+export const MT_metaProject = 'metaProject';
+export const MT_metaSize = 'metaSize';
+export const MT_metaType = 'metaType';
+export const MT_metaRefines = 'metaRefines';
+export const MT_metaAbstract = 'metaAbstract';
+export const MT_metaTypeKind = 'metaTypeKind';
+export const MT_varValue = 'varValue';
+
+export const metaTypes = [MT_metaState, MT_metaProject,
+  MT_metaSize, MT_metaType, MT_metaRefines, MT_metaAbstract, MT_metaTypeKind];
+
+export const primitiveDataTypes
+  = ["String", "Boolean", "Real", "Integer"]
+
+export const ivmlEnumeration = "IvmlEnumeration:";  

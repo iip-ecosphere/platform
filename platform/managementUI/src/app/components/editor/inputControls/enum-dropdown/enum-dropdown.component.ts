@@ -1,6 +1,5 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { Resource, editorInput } from 'src/interfaces';
-import { ivmlEnumeration } from 'src/app/services/env-config.service';
+import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
+import { Resource, editorInput, metaTypes, MT_varValue, ivmlEnumeration } from 'src/interfaces';
 
 @Component({
   selector: 'app-enum-dropdown',
@@ -11,34 +10,36 @@ export class EnumDropdownComponent implements OnInit {
 
   @Input() input: editorInput | undefined
   @Input() meta: Resource | undefined
+  @Output() resultEmitter = new EventEmitter<string>();
 
-  enum: string[] = []
-
-  metaTypes = ['metaState', 'metaProject',
-  'metaSize', 'metaType', 'metaRefines', 'metaAbstract', 'metaTypeKind'];
+  enum: string[] = [];
+  selected: string = "";
 
   constructor() { }
 
   ngOnInit(): void {
-    if(this.meta && this.input) {
-      if(this.meta.value) {
+    if (this.meta && this.input) {
+      if (this.meta.value) {
+        this.selected = String(this.input.value); // input.value is of type any, not matched by mat-select
         let enumMeta = this.meta.value.find(a => a.idShort === this.input?.type);
-        if(enumMeta) {
-          for(let element of enumMeta.value) {
-            if(!this.metaTypes.includes(element.idShort)) {
-              let value = element.value.find((a: { idShort: string; }) => a.idShort === 'varValue');
-              if(value) {
-                this.enum.push(ivmlEnumeration + this.input.type + '.' + value.value);
+        if (enumMeta) {
+          for (let element of enumMeta.value) {
+            if (!metaTypes.includes(element.idShort)) {
+              let value = element.value.find((a: { idShort: string; }) => a.idShort === MT_varValue);
+              if (value) {
+                //this.enum.push(ivmlEnumeration + this.input.type + '.' + value.value);
+                this.enum.push(value.value);
               }
             }
           }
         }
-
       }
-
     }
+  }
 
-
+  selectionChanged(item: any) {
+    let type = this.input?.type || "";
+    this.resultEmitter.emit(ivmlEnumeration + type + '.' + item);
   }
 
 }
