@@ -6,19 +6,20 @@ import { PlatformArtifacts, Resource, PlatformServices}
   from 'src/interfaces';
 import { firstValueFrom } from 'rxjs';
 import {MatRadioChange} from '@angular/material/radio';
-
+import { Utils } from 'src/app/services/utils.service';
 
 @Component({
   selector: 'app-services',
   templateUrl: './services.component.html',
   styleUrls: ['./services.component.scss']
 })
-export class ServicesComponent implements OnInit {
+export class ServicesComponent extends Utils implements OnInit {
 
   constructor(public http: HttpClient,
     public api: ApiService,
     private envConfigService: EnvConfigService,
     private zone: NgZone) {
+      super();
   }
 
   services: PlatformServices = {};
@@ -376,22 +377,6 @@ export class ServicesComponent implements OnInit {
     if(this.artifactsToggle) {
       this.artifactsToggle[index] = !this.artifactsToggle[index]
     }
-  }
-
-  public isArray(value: any) {
-    const bo = Array.isArray(value);
-    return bo;
-  }
-
-  public isObject(value: any) {
-    return (typeof value === 'object');
-  }
-
-  public isNonEmptyString(value: any) {
-    let result = false
-    if (typeof value == "string" && value.length > 0) {
-      result = true
-    }
-    return result
   }*/
+  
 }

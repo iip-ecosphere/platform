@@ -3,14 +3,15 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { ApiService } from 'src/app/services/api.service';
 import { IvmlFormatterService } from 'src/app/services/ivml-formatter.service';
 import { Resource, uiGroup, editorInput, configMetaContainer, configMetaEntry, ResourceAttribute, InputVariable, metaTypes, 
-  MTK_primitive, MTK_derived, MTK_enum, MTK_compound, MT_metaRefines, MT_metaTypeKind, MT_metaAbstract, primitiveDataTypes } from 'src/interfaces';
+  MTK_primitive, MTK_derived, MTK_enum, MTK_compound, MT_metaRefines, MT_metaTypeKind, MT_metaAbstract, primitiveDataTypes, MT_metaDefault } from 'src/interfaces';
+import { Utils } from 'src/app/services/utils.service';
 
 @Component({
   selector: 'app-editor',
   templateUrl: './editor.component.html',
   styleUrls: ['./editor.component.scss']
 })
-export class EditorComponent implements OnInit {
+export class EditorComponent extends Utils implements OnInit {
 
   //type to generate subeditor for, null if this editor instance is not a subeditor
   @Input() type: editorInput | null = null;
@@ -54,7 +55,9 @@ export class EditorComponent implements OnInit {
 
   constructor(private api: ApiService,
     public dialog: MatDialogRef<EditorComponent>,
-    public ivmlFormatter: IvmlFormatterService) { }
+    public ivmlFormatter: IvmlFormatterService) {
+      super();
+  }
 
   async ngOnInit() {
     if(this.refinedTypes) {
@@ -77,7 +80,7 @@ export class EditorComponent implements OnInit {
     if(this.metaBackup && this.metaBackup.value) {
       let searchTerm = 'Field'
       for(const type of this.metaBackup.value) {
-        const refined = type.value.find((item: { idShort: string; }) => item.idShort === MT_metaRefines);
+        const refined = this.getProperty(type.value, MT_metaRefines);
         if(refined && refined.value != '') {
           if(searchTerm === refined.value) {
             console.debug("TYPE " + type);
@@ -113,8 +116,7 @@ export class EditorComponent implements OnInit {
           }
 
           if (this.getMetaRef(item)) {
-            let metaRefVal = item.value.find(
-              (val: { idShort: string; }) => val.idShort === MT_metaRefines).value
+            let metaRefVal = this.getPropertyValue(item.value, MT_metaRefines)
             if(metaRefVal != "") {
               // sub-type
               if(filter?.metaRef.includes(metaRefVal)) {
@@ -159,8 +161,7 @@ export class EditorComponent implements OnInit {
   /** Returns false when metaAbstract is false or
    * there is no attribute "metaAbstract" */
   private isAbstract(item:any) {
-    let abstract = item.value.find(
-      (val: { idShort: string; }) => val.idShort === MT_metaAbstract)?.value
+    let abstract = this.getPropertyValue(item.value, MT_metaAbstract);
     if (abstract) {
       return true
     } else {
@@ -169,8 +170,7 @@ export class EditorComponent implements OnInit {
   }
 
   private getMetaRef(item: any) {
-    let value = item.value.find(
-      (val: { idShort: string; }) => val.idShort === MT_metaRefines)
+    let value = this.getProperty(item.value, MT_metaRefines);
     if (value) {
       return value.value
     } else {
@@ -179,8 +179,7 @@ export class EditorComponent implements OnInit {
   }
 
   private isTypeMetaKindEqualNum(item:any, num:number) {
-    let value = item.value.find(
-      (val: { idShort: string; }) => val.idShort === MT_metaTypeKind).value
+    let value = this.getPropertyValue(item.value, MT_metaTypeKind);
     if (value == num) {
       return true
     } else {
@@ -257,7 +256,7 @@ export class EditorComponent implements OnInit {
           value: "",
           idShort: "value"
         }
-        let val = [this.type?.value] || []; // TODO take value from below
+        let val = [this.type?.value] || []; 
         let editorInput:editorInput =
           {name: "value", type: selectedType.idShort, value:val,
           description: [{language: '', text: ''}],
@@ -308,7 +307,7 @@ export class EditorComponent implements OnInit {
 
             let type = this.meta?.value?.find(type => type.idShort === cleanType);
             //let type2 = this.metaBackup?.value?.find(type => type.idShort === cleanType);
-            if(type) {
+            if (type) {
               editorInput.metaTypeKind = this.getPropertyValue(type.value, MT_metaTypeKind);
             } else if(this.metaBackup && this.metaBackup.value) {
               let iterType = editorInput.type;
@@ -339,7 +338,10 @@ export class EditorComponent implements OnInit {
               || editorInput.type.indexOf('sequenceOf') >= 0) {
               editorInput.multipleInputs = true;
             }
-            let ivmlValue = this.type?.value || ""; // this.getPropertyValue(temp?.value, 'defaultValue') // may not be there
+            let ivmlValue = this.type?.value || this.getPropertyValue(input.value, MT_metaDefault) || ""; 
+            if (selMetaTypeKind === MTK_compound && this.isArray(ivmlValue)) {
+              ivmlValue = this.getPropertyValue(ivmlValue, input.idShort);
+            }
             let initial;
             if(editorInput.multipleInputs || editorInput.metaTypeKind === MTK_enum) {
               initial = [ivmlValue] // TODO unclear
@@ -410,17 +412,6 @@ export class EditorComponent implements OnInit {
         }
       }
     }
-  }
-
-  getProperty(data: configMetaEntry[], id: string) {
-    if (data) {
-      return data.find((item: { idShort: string; }) => item.idShort === id);
-    } else {
-      return undefined
-    }
-  }
-  getPropertyValue(data: configMetaEntry[], id: string) {
-    return this.getProperty(data, id)?.value;
   }
 
   public toggleOptional(uiGroup: uiGroup) {

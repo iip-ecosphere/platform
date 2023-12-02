@@ -5,13 +5,14 @@ import { Subscription } from 'rxjs';
 import { ApiService } from 'src/app/services/api.service';
 import { TechnicalDataRetrieverService } from 'src/app/services/technical-data-retriever.service';
 import { PlatformResources, GeneralInformation } from 'src/interfaces';
+import { Utils } from 'src/app/services/utils.service';
 
 @Component({
   selector: 'app-resources',
   templateUrl: './resources.component.html',
   styleUrls: ['./resources.component.scss']
 })
-export class ResourcesComponent implements OnInit {
+export class ResourcesComponent extends Utils implements OnInit  {
 
   Data: PlatformResources = {};
   ResourcePictures: GeneralInformation[] = [];
@@ -29,8 +30,8 @@ export class ResourcesComponent implements OnInit {
     public api: ApiService,
     public router: Router,
     private tech: TechnicalDataRetrieverService) {
-    this.errorSub
-      = this.api.errorEmitter.subscribe((error: HttpErrorResponse) => {this.errorMsg = error.message});
+      super();
+      this.errorSub= this.api.errorEmitter.subscribe((error: HttpErrorResponse) => {this.errorMsg = error.message});
   }
 
   ngOnInit(): void {
@@ -71,11 +72,6 @@ export class ResourcesComponent implements OnInit {
       }
     }
     this.Data.submodelElements = temp
-  }
-
-  public isArray(value: any) {
-    const bo = Array.isArray(value);
-    return bo;
   }
 
   public async details(resource: string | undefined) {

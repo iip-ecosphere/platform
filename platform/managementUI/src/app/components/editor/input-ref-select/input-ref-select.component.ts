@@ -1,13 +1,14 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { EditorService } from 'src/app/services/editor.service';
 import { Resource, editorInput, configMeta, metaTypes } from 'src/interfaces';
+import { Utils } from 'src/app/services/utils.service';
 
 @Component({
   selector: 'app-input-ref-select',
   templateUrl: './input-ref-select.component.html',
   styleUrls: ['./input-ref-select.component.scss']
 })
-export class InputRefSelectComponent implements OnInit {
+export class InputRefSelectComponent extends Utils implements OnInit {
 
   @Input() activeTextinput = false;
   @Input() input: editorInput = {name: '', type: '', description: [{text: '', language: ''}], refTo: true, value: undefined};
@@ -20,7 +21,9 @@ export class InputRefSelectComponent implements OnInit {
   references: Resource[] = [];
   selectedRef: configMeta | undefined;
 
-  constructor(private edit: EditorService) { }
+  constructor(private edit: EditorService) { 
+    super();
+  }
 
   ngOnInit(): void {
     let type = this.input.type;
@@ -140,14 +143,6 @@ export class InputRefSelectComponent implements OnInit {
         inputValues[index + 1] = inputValues[index];
         inputValues[index] = temp;
       }
-    }
-  }
-
-  public isArray(element: any) {
-    if(Array.isArray(element)) {
-      return true;
-    } else {
-      return false;
     }
   }
 

@@ -7,15 +7,23 @@ import { Router } from '@angular/router';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import { MAT_PROGRESS_SPINNER_DEFAULT_OPTIONS_FACTORY } from '@angular/material/progress-spinner';
 import { EditorComponent } from '../editor/editor.component';
-import { InputVariable, Resource, configMetaEntry, editorInput, platformResponse } from 'src/interfaces';
-//import { table } from 'console';
+import { InputVariable, MT_varValue, Resource, allMetaTypes, configMetaEntry, editorInput, metaTypes, platformResponse } from 'src/interfaces';
+import { Utils } from 'src/app/services/utils.service';
+
+/*class RowEntry {
+  idShort: any; 
+  value: any;
+  varName: any; 
+  varType: any;
+  varValue: any;
+}*/
 
 @Component({
   selector: 'app-list',
   templateUrl: './list.component.html',
   styleUrls: ['./list.component.scss']
 })
-export class ListComponent implements OnInit {
+export class ListComponent extends Utils implements OnInit {
   //currentTab: string | null = null;
   currentTab = "";
   rawData: any;
@@ -28,6 +36,7 @@ export class ListComponent implements OnInit {
     private envConfigService: EnvConfigService,
     public api: ApiService,
     public dialog: MatDialog) {
+      super();
     }
 
   // Filter ---------------------------------------------------------------------
@@ -217,12 +226,13 @@ export class ListComponent implements OnInit {
     let result = []
     for (let tableRow of this.filteredData) {
       let type
-      let val
-      for (let value of tableRow.value) {
-        if (value.idShort == "metaType") {
-          type = value.value
-        } else if (value.idShort == "varValue") {
-          val = value.value
+      let val = []
+      for (let rowValues of tableRow.value) {
+        if (rowValues.idShort == "metaType") {
+          type = rowValues.value
+        } 
+        if (!allMetaTypes.includes(rowValues.idShort) && this.isArray(rowValues.value)) {
+          val.push({idShort: rowValues.idShort, value:this.getPropertyValue(rowValues.value, MT_varValue)})
         }
       }
       let new_value = {idShort: tableRow.idShort, varName: tableRow.idShort, varType: type, varValue: val}
@@ -237,18 +247,18 @@ export class ListComponent implements OnInit {
       let temp = []
       let name = tableRow.idShort
       let type
-      let val
-      for (let value of tableRow.value) {
-        if (value.idShort == "version") {
-          let new_value = value.value.find(
-            (elemt: { idShort: string; }) => elemt.idShort === this.varValue).value
+      let val = []
+      for (let rowValues of tableRow.value) {
+        if (rowValues.idShort == "version") {
+          let new_value = this.getPropertyValue(rowValues.value, this.varValue);
           if(new_value != "") {
             temp.push({ "value":  "Version: " + new_value})
           }
-        } else if (value.idShort == "metaType") {
-          type = value.value
-        } else if (value.idShort == "varValue") {
-          val = value.value
+        } else if (rowValues.idShort == "metaType") {
+          type = rowValues.value
+        }
+        if (!allMetaTypes.includes(rowValues.idShort) && this.isArray(rowValues.value)) {
+          val.push({idShort: rowValues.idShort, value:this.getPropertyValue(rowValues.value, MT_varValue)})
         }
       }
       let new_value = {idShort: name, value:temp, varName: tableRow.idShort, varType: type, varValue: val}
@@ -284,12 +294,13 @@ export class ListComponent implements OnInit {
     for (let tableRow of this.filteredData) {
       let temp = []
       let type
-      let val
+      let val = []
       for (let rowValues of tableRow.value) {
         if (rowValues.idShort == "metaType") {
           type = rowValues.value
-        } else if (rowValues.idShort == "varValue") {
-          val = rowValues.value
+        } 
+        if (!allMetaTypes.includes(rowValues.idShort) && this.isArray(rowValues.value)) {
+          val.push({idShort: rowValues.idShort, value:this.getPropertyValue(rowValues.value, MT_varValue)})
         }
         for (let param of this.paramToDisplay) {
           if (rowValues.idShort == param[0]) {
@@ -311,15 +322,16 @@ export class ListComponent implements OnInit {
       let temp = []
       let name
       let type
-      let val
+      let val = []
       let logo = null
       for (let rowValues of tableRow.value) {
         if (rowValues.idShort == "manufacturerName") {
           name = rowValues.value[0].value
         } else if (rowValues.idShort == "metaType") {
           type = rowValues.value
-        } else if (rowValues.idShort == "varValue") {
-          val = rowValues.value
+        } 
+        if (!allMetaTypes.includes(rowValues.idShort) && this.isArray(rowValues.value)) {
+          val.push({idShort: rowValues.idShort, value:this.getPropertyValue(rowValues.value, MT_varValue)})
         }
         for (let param of this.paramToDisplay) {
           if (rowValues.idShort == param[0]) {
@@ -355,14 +367,15 @@ export class ListComponent implements OnInit {
       let temp = []
       let name
       let type
-      let val
+      let val = []
       for (let rowValues of tableRow.value) {
         if (rowValues.idShort == "id") {
           name = rowValues.value[0].value
         } else if (rowValues.idShort == "metaType") {
           type = rowValues.value
-        } else if (rowValues.idShort == "varValue") {
-          val = rowValues.value
+        } 
+        if (!allMetaTypes.includes(rowValues.idShort) && this.isArray(rowValues.value)) {
+          val.push({idShort: rowValues.idShort, value:this.getPropertyValue(rowValues.value, MT_varValue)})
         }
         for (let param of this.paramToDisplay) {
           if (rowValues.idShort == param[0]) {
@@ -378,8 +391,7 @@ export class ListComponent implements OnInit {
   }
 
   private getValue(rowVal: any, param:any) {
-    let value = rowVal.value.find(
-      (elemt: { idShort: string; }) => elemt.idShort === this.varValue).value
+    let value = this.getPropertyValue(rowVal.value, this.varValue);
     return { "value":  param[1] + value + param[2]}
   }
 

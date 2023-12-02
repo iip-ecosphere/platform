@@ -39,10 +39,6 @@ export class ResourceDetailsComponent implements OnInit {
     this.resolveSemanticId();
   }
 
-  public isObject(value: any) {
-    return (typeof value === 'object');
-  }
-
   // col 0: attribute name from AAS
   // col 1: name displayed in UI
   // col 2: category of the attribute in UI
@@ -80,15 +76,6 @@ export class ResourceDetailsComponent implements OnInit {
       return null
     }
   }
-
-  /*public isNonEmptyString(value: any) {
-
-    let result = false
-    if (typeof value == "string" && value.length > 0) {
-      result = true
-    }
-    return result
-  }*/
 
   // ---------- Semantic Id -------------------------
   public async resolveSemanticId() {

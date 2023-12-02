@@ -8,13 +8,14 @@ import { PlanDeployerService, PlanDeployerServiceNotifier } from 'src/app/servic
 import { WebsocketService } from 'src/app/websocket.service';
 import { ResourceAttribute, Resource, PlatformArtifacts, InputVariable, PlatformData }
   from 'src/interfaces';
+import { Utils } from 'src/app/services/utils.service';
 
 @Component({
   selector: 'app-deployment-plans',
   templateUrl: './deployment-plans.component.html',
   styleUrls: ['./deployment-plans.component.scss']
 })
-export class DeploymentPlansComponent implements OnInit {
+export class DeploymentPlansComponent extends Utils implements OnInit {
 
   artifacts: PlatformArtifacts = {};
   deploymentPlans: Resource | undefined = {};
@@ -35,6 +36,7 @@ export class DeploymentPlansComponent implements OnInit {
     private deployer: PlanDeployerService,
     private onlyId: OnlyIdPipe,
     private websocket: WebsocketService) { // 1
+      super();
       //this.deployer.StatusCollection = websocket.data // 1
       //this.subscription = this.websocket.getMsg().subscribe(
       //  dataFromServer => this.deployer.receiveStatus(dataFromServer))
@@ -96,10 +98,6 @@ export class DeploymentPlansComponent implements OnInit {
       (val: { idShort: string; }) => val.idShort === "uri").value
     //this.deployer.uri = uri
   }*/
-
-  public isArray(value: any) {
-    return Array.isArray(value);
-  }
 
   public async deploy(plan?: Resource) {
     let params = this.deployPlanInput;

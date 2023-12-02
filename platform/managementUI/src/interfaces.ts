@@ -287,11 +287,16 @@ export const MT_metaType = 'metaType';
 export const MT_metaRefines = 'metaRefines';
 export const MT_metaAbstract = 'metaAbstract';
 export const MT_metaTypeKind = 'metaTypeKind';
+export const MT_metaDefault = 'metaDefault';
+export const MT_metaVariable = 'metaVariable';
 export const MT_varValue = 'varValue';
 
 export const metaTypes = [MT_metaState, MT_metaProject,
-  MT_metaSize, MT_metaType, MT_metaRefines, MT_metaAbstract, MT_metaTypeKind];
+  MT_metaSize, MT_metaType, MT_metaRefines, MT_metaAbstract, MT_metaTypeKind]; // TODO same as allMetaTypes???
 
+export const allMetaTypes = [MT_metaState, MT_metaProject,
+    MT_metaSize, MT_metaType, MT_metaRefines, MT_metaAbstract, MT_metaTypeKind, MT_metaDefault, MT_metaVariable];
+  
 export const primitiveDataTypes
   = ["String", "Boolean", "Real", "Integer"]
 
