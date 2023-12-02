@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 import de.iip_ecosphere.platform.configuration.ModelInfo;
@@ -29,6 +30,7 @@ import net.ssehub.easy.varModel.confModel.IDecisionVariable;
 import net.ssehub.easy.varModel.cst.ConstantValue;
 import net.ssehub.easy.varModel.cst.ConstraintSyntaxTree;
 import net.ssehub.easy.varModel.cst.Variable;
+import net.ssehub.easy.varModel.cstEvaluation.EvaluationVisitor;
 import net.ssehub.easy.varModel.model.AbstractVariable;
 import net.ssehub.easy.varModel.model.Attribute;
 import net.ssehub.easy.varModel.model.AttributeAssignment;
@@ -61,6 +63,7 @@ class TypeMapper {
     private SubmodelElementCollectionBuilder builder;
     private Predicate<AbstractVariable> variableFilter;
     private Stack<Map<String, Object>> assignments = new Stack<>();
+    private Function<String, String> metaShortId;
     
     /**
      * Creates a type mapper instance.
@@ -68,12 +71,14 @@ class TypeMapper {
      * @param cfg the configuration to map the declared types for
      * @param variableFilter a variable filter to exclude certain variables/types
      * @param builder the builder to place AAS elements into
+     * @param metaShortId function to build a meta shortId property name
      */
     TypeMapper(Configuration cfg, Predicate<AbstractVariable> variableFilter, 
-        SubmodelElementCollectionBuilder builder) {
+        SubmodelElementCollectionBuilder builder, Function<String, String> metaShortId) {
         this.cfg = cfg;
         this.builder = builder;
         this.variableFilter = variableFilter;
+        this.metaShortId = metaShortId;
     }
     
     /**
@@ -313,6 +318,55 @@ class TypeMapper {
     }
 
     /**
+     * Adds the default value of {@code var} if there is a default value.
+     * 
+     * @param var the variable to take the default value from
+     * @param varBuilder the variable builder to add the meta-value to
+     * @param metaShortId function to build a meta shortId property name
+     */
+    static void addMetaDefault(IDecisionVariable var, SubmodelElementCollectionBuilder varBuilder, 
+        Function<String, String> metaShortId) {
+        addMetaDefault(var.getConfiguration(), var.getDeclaration(), varBuilder, metaShortId);
+    }
+    
+    // checkstyle: stop exception type check
+
+    /**
+     * Adds the default value of {@code var} if there is a default value.
+     * 
+     * @param cfg the configuration to use for reasoning/expression evaluation
+     * @param decl the variable declaration to take the default value from
+     * @param varBuilder the variable builder to add the meta-value to
+     * @param metaShortId function to build a meta shortId property name
+     */
+    static void addMetaDefault(net.ssehub.easy.varModel.confModel.Configuration cfg, AbstractVariable decl, 
+        SubmodelElementCollectionBuilder varBuilder, Function<String, String> metaShortId) {
+        ConstraintSyntaxTree dflt = decl.getDefaultValue();
+        if (null != dflt) {
+            EvaluationVisitor eval = new EvaluationVisitor(cfg, null, false, null);
+            try {
+                dflt.accept(eval);
+                Value dfltValue = eval.getResult();
+                eval.clear();
+                if (dfltValue != null) {
+                    ValueVisitor valueVisitor = new ValueVisitor();
+                    dfltValue.accept(valueVisitor);
+                    Object aasValue = valueVisitor.getAasValue();
+                    if (null != aasValue) {
+                        varBuilder.createPropertyBuilder(AasUtils.fixId(metaShortId.apply("default")))
+                            .setValue(Type.STRING, aasValue.toString())
+                            .build();
+                    }
+                }
+            } catch (Throwable t) {
+                // preliminary, cfg may not be complete, not a problem of "self"
+            }
+        }
+    }
+
+    // checkstyle: resume exception type check
+
+    /**
      * Map a compound slot.
      * 
      * @param slot the slot to map
@@ -352,6 +406,7 @@ class TypeMapper {
             propB.createPropertyBuilder("uiGroup")
                 .setValue(Type.INTEGER, uiGroup)
                 .build();
+            addMetaDefault(cfg.getConfiguration(), slot, propB, metaShortId);
             propB.build();
             if (slotType != type) {
                 mapType(slotType);
