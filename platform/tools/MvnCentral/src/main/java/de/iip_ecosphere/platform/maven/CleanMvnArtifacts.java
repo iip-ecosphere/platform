@@ -17,7 +17,7 @@ import java.io.IOException;
 
 import org.apache.maven.shared.utils.io.FileUtils;
 
-import de.iip_ecosphere.platform.support.iip_aas.Version;
+import de.iip_ecosphere.platform.support.Version;
 import de.iip_ecosphere.platform.support.setup.CmdLine;
 
 /**
