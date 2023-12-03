@@ -1093,7 +1093,8 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         if (variableFilter.test(var.getDeclaration())) {
             AbstractVariable decl = var.getDeclaration();
             String varName = decl.getName();
-            IDatatype varType = decl.getType();
+            IDatatype varType = null == var.getValue() ? decl.getType() : var.getValue().getType();
+            varType = DerivedDatatype.resolveToBasis(varType);
             String lang = getLang();
             String semanticId = null;
             for (int a = 0; a < var.getAttributesCount(); a++) {

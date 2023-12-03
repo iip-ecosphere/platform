@@ -66,6 +66,10 @@ public class TestAasIvmlModel {
             ep.setIvmlMetaModelFolder(modelFolder);
             ep.setIvmlConfigFolder(cfgFolder);
             ep.setIvmlModelName(args[0]);
+            File commonFolder = new File(cfgFolder.getParent(), "common");
+            if (commonFolder.exists()) { // config.config test setup
+                ep.setAdditionalIvmlFolders(CollectionUtils.toList(commonFolder));
+            }
 
             ConfigurationLifecycleDescriptor lc = new ConfigurationLifecycleDescriptor();
             lc.startup(new String[0]); // shall register executor
