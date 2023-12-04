@@ -310,12 +310,12 @@ move TechnicalSetup.ivml src\main\easy\TechnicalSetup.ivml
 
 :noRegistryExist
 
-mvn install -Diip.easy.tracing=TOP
+call mvn install -Diip.easy.tracing=TOP
 
 REM Angular version check missing
 echo "To use the management UI for the platform, you should install angular version 14."
 set /P c=Do you want to continue with the Angular installation (else terminate)? [y/n]
-if /I "%c%" EQU "N" goto :installEndNow
+if /I "%c%" EQU "N" goto :installEndHint
 if /I "%c%" EQU "Y" goto :installAngular
 
 :installAngular
@@ -327,6 +327,8 @@ SET Path=%Path%;C:\Program Files\nodejs
 npm install -g @angular/cli@14.2.11
 npm install -g express@4.18.1
 npm install -g cors@2.8.5
+
+:installEndHint
 
 echo "The following commands were created in Platform\Install\gen:"
 echo "- broker.bat starts the configured communication broker"
