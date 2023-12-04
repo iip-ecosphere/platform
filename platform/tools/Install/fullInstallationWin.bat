@@ -321,6 +321,7 @@ if /I "%c%" EQU "Y" goto :installAngular
 :installAngular
 
 curl https://nodejs.org/download/release/v16.10.0/node-v16.10.0-x64.msi -o node-v16.10.0-x64.msi
+echo "Installing node.js. This may take a while..."
 node-v16.10.0-x64.msi
 setx /M Path "%Path%;C:\Program Files\nodejs"
 SET Path=%Path%;C:\Program Files\nodejs
