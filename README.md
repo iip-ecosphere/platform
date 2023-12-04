@@ -8,19 +8,17 @@
 
 The virtual IIP-Ecosphere Industry 4.0/IIoT platform aims at demonstrating new approaches to vendor-independent, interoperable and open platform concepts for easy-to-use AI. In particular, it aims at uniform, distributed deployment of services to heterogeneous (edge) devices, an AI toolkit for the industrial production, consistent configuration support ranging from network to applications as well as the use and application of established and upcoming IIoT standards, e.g., asset administration shells (to be used for all platform interfaces).
 
-Installation: See [install guide](platform/documentation/INSTALL.md) (in revision).
+For installation and first steps, see [install guide](platform/documentation/INSTALL.md).
 
 ## News
 
+* Ongoing revision of the management UI and the installation.
 * In 0.7.0, the model locations of examples and templates have been aligned with Maven conventions, i.e., configuration in src/main/easy, updatable meta-model in target/easy.
 * [Tutorial videos](platform/documentation/TUTORIALS.md) (with platform update information) linked now from github.
 * New application example: [HM'23/EMO'23](platform/examples/examples.emo23/README.md) excluding IPR protected code
-* Release 0.6.0 (2021/10/11, see [release documentation](platform/documentation/RELEASES.md))
-* New name: The IIP-Ecosphere platform becomes [oktoflow](http://oktoflow.de/).
+* New name: The IIP-Ecosphere platform is now [oktoflow](http://oktoflow.de/).
 * [Platform handbook](platform/documentation/PlatformHandbook.pdf) now always at the same URL, including [sources](platform/documentation/src). Comments for clarification are welcome.
 * MIP technologies and NovoAI AVA connector definitions in configuration meta-model.
-* The [platform FAQ](platform/documentation/FAQ.md) is now in github.
-* Confirmed compatibility: Phoenix Contact PLCnext (OPC UA, EEM integration), Beckhoff IPC (OPC UA), VDW UMATI (OPC UA), Bitmotec (MQTT), Lenze (MQTT), MIP (MQTT), Beckhoff ADS (Windows) ...
 
 ## Public demonstrations
 
@@ -29,6 +27,8 @@ Installation: See [install guide](platform/documentation/INSTALL.md) (in revisio
 * Presentation of a federated learning case with two cobots on [HM'23](https://www.iip-ecosphere.de/iip-ecosphere-auf-der-hannover-messe-2023/) in collaboration with Phoenix Contact, Bitmotec/OnLogic, UR including platform-integrated federated learning based on [Flower](https://flower.dev/).
 * Presentation of improved robot-based platform demonstrator at [TddT'22, Berlin](https://www.digitale-technologien.de/DT/Redaktion/DE/Veranstaltungen/2022/DT/220829_Tage_der_digitalen_Technologien.html) 
 * Presentation of robot-based visual quality inspection app on [HM'22](https://www.hannovermesse.de/de/) (with 3 sources, Python-based AI, AAS-based Angular application).
+
+The public demonstrations confirmed compatibility with Phoenix Contact PLCnext (OPC UA, EEM integration), Beckhoff IPC (OPC UA), VDW UMATI (OPC UA), Bitmotec (MQTT), Lenze (MQTT), MIP (MQTT), Beckhoff ADS (Windows) ...
 
 ## Overview
 
