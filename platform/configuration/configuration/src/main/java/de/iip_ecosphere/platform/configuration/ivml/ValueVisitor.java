@@ -90,7 +90,7 @@ class ValueVisitor implements IValueVisitor {
     @Override
     public void visitReferenceValue(ReferenceValue referenceValue) {
         if (referenceValue.getValue() != null) {
-            aasValue = referenceValue.getValue().getName();
+            aasValue = "refTo(" + referenceValue.getValue().getName() + ")";
         } else if (referenceValue.getValueEx() != null) {
             aasValue = null; // do not represent this
         } else {

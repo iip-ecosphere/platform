@@ -122,9 +122,21 @@ class TypeMapper {
         if (!isDoneType(typeId)) {
             SubmodelElementCollectionBuilder typeB = builder.createSubmodelElementCollectionBuilder(
                 typeId, false, false);
-            addTypeKind(typeB, IvmlTypeKind.PRIMITIVE);
+            addTypeKind(typeB, IvmlTypeKind.PRIMITIVE, metaShortId);
             typeB.build();
         }
+    }
+
+    /**
+     * Adds an AAS type kind property.
+     * 
+     * @param typeB the type builder
+     * @param type the type
+     * @param metaShortId function to build a meta shortId property name
+     */
+    public static void addTypeKind(SubmodelElementCollectionBuilder typeB, IDatatype type, 
+        Function<String, String> metaShortId) {
+        addTypeKind(typeB, IvmlTypeKind.asTypeKind(type), metaShortId);
     }
     
     /**
@@ -132,9 +144,11 @@ class TypeMapper {
      * 
      * @param typeB the type builder
      * @param kind the type kind
+     * @param metaShortId function to build a meta shortId property name
      */
-    private void addTypeKind(SubmodelElementCollectionBuilder typeB, IvmlTypeKind kind) {
-        typeB.createPropertyBuilder(AasUtils.fixId(AasIvmlMapper.SHORTID_PREFIX_META.apply("typeKind")))
+    public static void addTypeKind(SubmodelElementCollectionBuilder typeB, IvmlTypeKind kind, 
+        Function<String, String> metaShortId) {
+        typeB.createPropertyBuilder(AasUtils.fixId(metaShortId.apply("typeKind")))
             .setValue(Type.INTEGER, kind.getId())
             .build();
     }
@@ -152,13 +166,13 @@ class TypeMapper {
             Set<String> doneSlots = new HashSet<>();
             mapCompoundSlots(type, type, typeB, doneSlots);
             mapRefines(type, typeB, doneSlots);
-            typeB.createPropertyBuilder(AasIvmlMapper.SHORTID_PREFIX_META.apply("abstract"))
+            typeB.createPropertyBuilder(metaShortId.apply("abstract"))
                 .setValue(Type.BOOLEAN, type.isAbstract())
                 .build();
-            typeB.createPropertyBuilder(AasIvmlMapper.SHORTID_PREFIX_META.apply("refines"))
+            typeB.createPropertyBuilder(metaShortId.apply("refines"))
                 .setValue(Type.STRING, getRefines(type))
                 .build();
-            addTypeKind(typeB, IvmlTypeKind.COMPOUND);
+            addTypeKind(typeB, IvmlTypeKind.COMPOUND, metaShortId);
             typeB.build();
         }
     }
@@ -206,7 +220,7 @@ class TypeMapper {
                     .build();
                 litB.build();
             }
-            addTypeKind(typeB, IvmlTypeKind.ENUM);
+            addTypeKind(typeB, IvmlTypeKind.ENUM, metaShortId);
             typeB.build();
         }
     }
@@ -237,10 +251,10 @@ class TypeMapper {
         if (!isDoneType(typeId)) {
             SubmodelElementCollectionBuilder typeB = builder.createSubmodelElementCollectionBuilder(
                 typeId, false, false);
-            typeB.createPropertyBuilder(AasIvmlMapper.SHORTID_PREFIX_META.apply("refines"))
+            typeB.createPropertyBuilder(metaShortId.apply("refines"))
                 .setValue(Type.STRING, IvmlDatatypeVisitor.getUnqualifiedType(baseType))
                 .build();
-            addTypeKind(typeB, IvmlTypeKind.asTypeKind(type));
+            addTypeKind(typeB, type, metaShortId);
             typeB.build();
         }
         mapType(baseType);

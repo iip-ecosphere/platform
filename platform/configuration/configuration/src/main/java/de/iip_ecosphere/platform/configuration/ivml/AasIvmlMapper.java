@@ -1094,7 +1094,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             AbstractVariable decl = var.getDeclaration();
             String varName = decl.getName();
             IDatatype varType = null == var.getValue() ? decl.getType() : var.getValue().getType();
-            varType = DerivedDatatype.resolveToBasis(varType);
+            IDatatype rVarType = DerivedDatatype.resolveToBasis(varType);
             String lang = getLang();
             String semanticId = null;
             for (int a = 0; a < var.getAttributesCount(); a++) {
@@ -1110,14 +1110,14 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                 }
             }
             SubmodelElementCollectionBuilder varBuilder;
-            if (TypeQueries.isCompound(varType)) {
+            if (TypeQueries.isCompound(rVarType)) {
                 varBuilder = builder.createSubmodelElementCollectionBuilder(
                     AasUtils.fixId(varName), false, false);
                 for (int member = 0; member < var.getNestedElementsCount(); member++) {
                     mapVariable(var.getNestedElement(member), varBuilder, null);
                 }
-            } else if (TypeQueries.isContainer(varType)) {
-                boolean isSequence = TypeQueries.isSequence(varType);
+            } else if (TypeQueries.isContainer(rVarType)) {
+                boolean isSequence = TypeQueries.isSequence(rVarType);
                 boolean isOrdered = isSequence; // just to clarify
                 boolean allowsDuplicates = isSequence; // just to clarify
                 varBuilder = builder.createSubmodelElementCollectionBuilder(
@@ -1135,7 +1135,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                 varBuilder = builder.createSubmodelElementCollectionBuilder(
                     AasUtils.fixId(propName), false, false);
                 Object aasValue = getValue(var);
-                varType.getType().accept(TYPE_VISITOR);
+                varType.getType().accept(TYPE_VISITOR); // resolved anyway
                 Type aasType = TYPE_VISITOR.getAasType();
                 // value is reserved by BaSyx/AAS
                 PropertyBuilder pb = varBuilder.createPropertyBuilder(AasUtils.fixId("varValue")); 
