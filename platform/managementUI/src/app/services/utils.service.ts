@@ -33,33 +33,6 @@ export class Utils {
   }
 
   /**
-   * Returns an AAS-style property, i.e., searches for an item in data with idShort property and value id.
-   * 
-   * @param data the data to search
-   * @param id the expected value of the idShort property 
-   * @returns the item (as property) or undefined
-   */
-  public getProperty(data: any[], id: string) {
-    if (data) {
-      return data.find((item: { idShort: string; }) => item.idShort === id);
-    } else {
-      return undefined;
-    }
-  }
-
-  /**
-   * Returns the value of an AAS-style property , i.e., searches for an item in data with idShort property and value 
-   * id and returns the item's  value property.
-   * 
-   * @param data the data to search
-   * @param id the expected value of the idShort property 
-   * @returns the value or undefined
-   */
-  public getPropertyValue(data: any[], id: string) {
-    return this.getProperty(data, id)?.value;
-  }
-
-  /**
    * Detect whether value is an "object" (null, prototype instance, array but not number, string or undefined).
    * 
    * @param value the value to test 
@@ -81,6 +54,117 @@ export class UtilsService extends Utils {
 
   constructor() { 
     super();
+  }
+
+}
+
+/**
+ * Data utility functions that must not be visible in the scope of a component/template.
+ */
+export class DataUtils {
+
+  /**
+   * Returns an AAS-style property, i.e., searches for an item in data with idShort property and value id.
+   * 
+   * @param data the data to search
+   * @param id the expected value of the idShort property 
+   * @returns the item (as property) or undefined
+   */
+  public static getProperty(data: any[], id: string) {
+    if (data) {
+      return data.find((item: { idShort: string; }) => item.idShort === id);
+    } else {
+      return undefined;
+    }
+  }
+
+  /**
+   * Returns the value of an AAS-style property , i.e., searches for an item in data with idShort property and value 
+   * id and returns the item's  value property.
+   * 
+   * @param data the data to search
+   * @param id the expected value of the idShort property 
+   * @returns the value or undefined
+   */
+  public static getPropertyValue(data: any[], id: string) {
+    return DataUtils.getProperty(data, id)?.value;
+  }
+
+  /**
+   * Returns whether the given value starts with string.
+   * 
+   * @param value the value to check 
+   * @param prefix the prefix to check for
+   * @returns true for a starting with prefix, false else
+   */
+  public static startsWith(value: any, prefix: string) {
+    return String(value).trim().startsWith(prefix);
+  }
+
+  /**
+   * Returns whether the given value denotes an IVML set type.
+   * 
+   * @param value the value to check 
+   * @returns true for a set, false else
+   */
+  public static isIvmlSet(value: any) {
+    return DataUtils.startsWith(value,'setOf(');
+  }
+  
+  /**
+   * Returns whether the given value denotes an IVML sequence type.
+   * 
+   * @param value the value to check 
+   * @returns true for a sequence, false else
+   */
+  public static isIvmlSequence(value: any) {
+    return DataUtils.startsWith(value,'sequenceOf(');
+  }
+  
+  /**
+   * Returns whether the given value denotes an IVML set/sequence type.
+   * 
+   * @param value the value to check 
+   * @returns true for a collection, false else
+   */
+  public static isIvmlCollection(value: any) {
+    return DataUtils.isIvmlSet(value) || DataUtils.isIvmlSequence(value);
+  }
+
+    /**
+   * Returns whether the given value denotes an IVML reference (type).
+   * 
+   * @param value the value to check 
+   * @returns true for a reference, false else
+   */
+  public static isIvmlRefTo(value: any) {
+    return DataUtils.startsWith(value,'refTo(');
+  }
+
+  /**
+   * Strips the generic type name, returning the generics.
+   * 
+   * @param type the type 
+   * @returns the generics, or type if there are no generics
+   */
+  public static stripGenericType(type: string) {
+    const startIndex = type.indexOf('(');
+    const endIndex = type.lastIndexOf(')');
+    if (endIndex > 0) {
+      return type.substring(startIndex + 1, endIndex);
+    } else {
+      return type;
+    }
+  }
+  
+  /**
+   * Creates a deep copy of value.
+   * 
+   * @param value the value to copy 
+   * @returns the deep copy
+   */
+  public static deepCopy<T>(value: T): T {
+    return JSON.parse(JSON.stringify(value)); // there might be better ways
   }
 
 }

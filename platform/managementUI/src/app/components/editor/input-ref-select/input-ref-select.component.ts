@@ -1,7 +1,9 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { EditorService } from 'src/app/services/editor.service';
 import { Resource, editorInput, configMeta, metaTypes } from 'src/interfaces';
-import { Utils } from 'src/app/services/utils.service';
+import { DataUtils, Utils } from 'src/app/services/utils.service';
+import { EditorComponent } from '../editor.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-input-ref-select',
@@ -12,7 +14,7 @@ export class InputRefSelectComponent extends Utils implements OnInit {
 
   @Input() activeTextinput = false;
   @Input() input: editorInput = {name: '', type: '', description: [{text: '', language: ''}], refTo: true, value: undefined};
-
+  @Input() meta: Resource | undefined;
 
   textInput = '';
   isSetOf = false;
@@ -21,7 +23,7 @@ export class InputRefSelectComponent extends Utils implements OnInit {
   references: Resource[] = [];
   selectedRef: configMeta | undefined;
 
-  constructor(private edit: EditorService) { 
+  constructor(private edit: EditorService, public subDialog: MatDialog) { 
     super();
   }
 
@@ -30,26 +32,27 @@ export class InputRefSelectComponent extends Utils implements OnInit {
     this.init(type);
   }
 
-  private init(value: string) {
-
-    if(value) {
-      if(value.indexOf('setOf') >= 0) {
+  private init(type: string) {
+    if(type) {
+      if(type.indexOf('setOf') >= 0) {
         this.isSetOf = true;
       }
-      if(value.indexOf('refTo') >= 0) {
-        const startIndex = value.indexOf('refTo') + 6;
-        this.refTo = value.substring(startIndex, value.indexOf(')', startIndex));
+      if(type.indexOf('refTo') >= 0) {
+        const startIndex = type.indexOf('refTo') + 6;
+        this.refTo = type.substring(startIndex, type.indexOf(')', startIndex));
         this.getConfigurationType(this.refTo);
         this.activeTextinput = false;
       }
-      if(value.indexOf('sequenceOf') >= 0) {
+      if(type.indexOf('sequenceOf') >= 0) {
         this.isSequenceOf = true;
       }
     }
-    if(this.isSetOf || this.isSequenceOf) {
-      this.input.value = [];
-    } else {
-      this.input.value = null;
+    if (!this.input.value) {
+      if (this.isSetOf || this.isSequenceOf) {
+        this.input.value = [];
+      } else {
+        this.input.value = null;
+      }
     }
     if(this.input.metaTypeKind == 10 || this.input.metaTypeKind == 2) {
       this.activeTextinput = false;
@@ -77,8 +80,6 @@ export class InputRefSelectComponent extends Utils implements OnInit {
     }
   }
 
-
-
   public addFromTextfield() {
     if(this.isSetOf || this.isSequenceOf) {
       this.input.value.push(this.textInput);
@@ -87,11 +88,22 @@ export class InputRefSelectComponent extends Utils implements OnInit {
     }
   }
 
+  public editInputValue(editIndex: number) {
+    let dialogRef = this.subDialog.open(EditorComponent, {
+      height: '80%',
+      width:  '80%',
+    })
+    let input = DataUtils.deepCopy(this.input);
+    input.value = this.input.value[editIndex];
+    dialogRef.componentInstance.type = input;
+    dialogRef.componentInstance.metaBackup = this.meta;
+  }
+
   public removeInputValue(removeIndex: number) {
     let newInputs = [];
     let index = 0;
-    for(const input of this.input.value) {
-      if(index != removeIndex) {
+    for (const input of this.input.value) {
+      if (index != removeIndex) {
         newInputs.push(this.input.value[index]);
       }
       index++;

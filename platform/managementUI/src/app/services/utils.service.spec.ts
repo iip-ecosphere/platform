@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 
-import { UtilsService, retry } from './utils.service';
+import { UtilsService, DataUtils, retry } from './utils.service';
 
 describe('UtilsService', () => {
 
@@ -24,18 +24,18 @@ describe('UtilsService', () => {
   });
 
   it('should implement getProperty', () => {
-    expect(service.getProperty(data, "xx")).toBeUndefined();
-    expect(service.getPropertyValue(data, "xx")).toBeUndefined();
+    expect(DataUtils.getProperty(data, "xx")).toBeUndefined();
+    expect(DataUtils.getPropertyValue(data, "xx")).toBeUndefined();
 
     let d: any[] = [];
-    expect(service.getProperty(d, "xx")).toBeUndefined();
-    expect(service.getPropertyValue(d, "xx")).toBeUndefined();
+    expect(DataUtils.getProperty(d, "xx")).toBeUndefined();
+    expect(DataUtils.getPropertyValue(d, "xx")).toBeUndefined();
     d = [{idShort: "xx"}, {idShort: "yy"}];
-    expect(service.getProperty(d, "xx")).toBeDefined();
-    expect(service.getPropertyValue(d, "xx")).toBeUndefined();
+    expect(DataUtils.getProperty(d, "xx")).toBeDefined();
+    expect(DataUtils.getPropertyValue(d, "xx")).toBeUndefined();
     d = [{idShort: "xx", value:"abc"}, {idShort: "yy", value:"def"}];
-    expect(service.getProperty(d, "xx")).toBeDefined();
-    expect(service.getPropertyValue(d, "xx")).toBe("abc");
+    expect(DataUtils.getProperty(d, "xx")).toBeDefined();
+    expect(DataUtils.getPropertyValue(d, "xx")).toBe("abc");
   });
 
   it('should implement isObject', () => {
@@ -53,6 +53,45 @@ describe('UtilsService', () => {
     expect(service.isNonEmptyString(1)).toBeFalsy();
     expect(service.isNonEmptyString("")).toBeFalsy();
     expect(service.isNonEmptyString("abba")).toBeTruthy();
+  });
+
+  it('should implement IVML type helpers', () => {
+    expect(DataUtils.isIvmlSet(undefined)).toBeFalsy();
+    expect(DataUtils.isIvmlSequence(undefined)).toBeFalsy();
+    expect(DataUtils.isIvmlCollection(undefined)).toBeFalsy();
+    expect(DataUtils.isIvmlRefTo(undefined)).toBeFalse();
+
+    let type = "setOf(Integer)";
+    expect(DataUtils.isIvmlSet(type)).toBeTrue();
+    expect(DataUtils.isIvmlSequence(type)).toBeFalse();
+    expect(DataUtils.isIvmlCollection(type)).toBeTrue();
+    expect(DataUtils.isIvmlRefTo(type)).toBeFalse();
+
+    type = "sequenceOf(Integer)";
+    expect(DataUtils.isIvmlSet(type)).toBeFalse();
+    expect(DataUtils.isIvmlSequence(type)).toBeTrue();
+    expect(DataUtils.isIvmlCollection(type)).toBeTrue();
+    expect(DataUtils.isIvmlRefTo(type)).toBeFalse();
+
+    type = "refTo(RecordType)";
+    expect(DataUtils.isIvmlSet(type)).toBeFalse();
+    expect(DataUtils.isIvmlSequence(type)).toBeFalse();
+    expect(DataUtils.isIvmlCollection(type)).toBeFalse();
+    expect(DataUtils.isIvmlRefTo(type)).toBeTrue();
+  });
+
+  it('should implement IVML strip generic type', () => {
+    let type = "setOf(Integer)";
+    expect(DataUtils.stripGenericType("setOf(Integer)")).toBe("Integer");
+    expect(DataUtils.stripGenericType("Integer")).toBe("Integer");
+    expect(DataUtils.stripGenericType("setOf(setOf(Integer))")).toBe("setOf(Integer)");
+  });
+
+  it('should implement IVML type helpers', () => {
+    let val = {id:"25"};
+    let copy = DataUtils.deepCopy(val);
+    expect(copy).toBeTruthy();
+    expect(copy.id).toBe(val.id);
   });
 
   it('should fail 3 times', async() => {

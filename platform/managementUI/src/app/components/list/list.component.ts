@@ -7,16 +7,23 @@ import { Router } from '@angular/router';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import { MAT_PROGRESS_SPINNER_DEFAULT_OPTIONS_FACTORY } from '@angular/material/progress-spinner';
 import { EditorComponent } from '../editor/editor.component';
-import { InputVariable, MT_varValue, Resource, allMetaTypes, configMetaEntry, editorInput, metaTypes, platformResponse } from 'src/interfaces';
-import { Utils } from 'src/app/services/utils.service';
+import { InputVariable, MT_metaSize, MT_metaState, MT_metaType, MT_varValue, Resource, allMetaTypes, configMetaEntry, editorInput, metaTypes, platformResponse } from 'src/interfaces';
+import { Utils, DataUtils } from 'src/app/services/utils.service';
 
-/*class RowEntry {
+class RowEntry {
+
   idShort: any; 
+  logo: any;
   value: any;
   varName: any; 
   varType: any;
   varValue: any;
-}*/
+
+  constructor(init?:Partial<RowEntry>) {
+    Object.assign(this, init);
+  }
+
+}
 
 @Component({
   selector: 'app-list',
@@ -97,19 +104,15 @@ export class ListComponent extends Utils implements OnInit {
       case "Nameplates":
         this.filterManufacturer();
         break;
-      case "Services":
-        this.filterServices();
-        break;
-      case "Servers":
-        this.filterServices();
-        break;
-    case "Meshes":
+      case "Meshes":
         this.filterMeshes();
         break;
-    case "Applications":
-        this.filterServices();
+      case "Services":
+      case "Servers":
+      case "Applications":
+        this.filterServicesServersApps();
         break;
-    default:
+      default:
         break;
     }
   }
@@ -173,27 +176,27 @@ export class ListComponent extends Utils implements OnInit {
     let result = []
 
     for (let tableRow of this.filteredData) {
-      let temp = []
+      let temp: any = []
       let rowValues = tableRow.value[0].value
       // string
       let type
       let val
-      if((typeof rowValues) == "string") {
+      if ((typeof rowValues) == "string") {
         for (let rowValues of tableRow.value) {
-          if (rowValues.idShort == "varValue") {
+          if (rowValues.idShort == MT_varValue) {
             let new_rowValue = {"value": rowValues.value}
             val = rowValues.value
             temp.push(new_rowValue)
-          } else if (rowValues.idShort == "metaType") {
+          } else if (rowValues.idShort == MT_metaType) {
             type = rowValues.value
           }
         }
       // number
-      } else if((typeof rowValues) == "number") {
+      } else if ((typeof rowValues) == "number") {
         for (let rowValues of tableRow.value) {
-          if (rowValues.idShort == "metaType") {
+          if (rowValues.idShort == MT_metaType) {
             type = rowValues.value
-          } else if (rowValues.idShort == "varValue") {
+          } else if (rowValues.idShort == MT_varValue) {
             val = rowValues.value
           }
         }
@@ -203,17 +206,12 @@ export class ListComponent extends Utils implements OnInit {
       // object
       } else {
         for (let rowValues of tableRow.value) {
-          if (rowValues.idShort == "metaType") {
+          if (rowValues.idShort == MT_metaType) {
             type = rowValues.value
-          } else if (rowValues.idShort == "varValue") {
+          } else if (rowValues.idShort == MT_varValue) {
             val = rowValues.value
           }
-          for (let param of this.paramToDisplay) {
-            if (rowValues.idShort == param[0]) {
-              let new_rowValue = this.getValue(rowValues, param)
-              temp.push(new_rowValue)
-            }
-          }
+          this.composeValueByFilter(rowValues, temp, this.paramToDisplay);
         }
       }
       let row = {idShort: tableRow.idShort, value: temp, varName: tableRow.idShort, varType: type, varValue: val}
@@ -222,126 +220,142 @@ export class ListComponent extends Utils implements OnInit {
     this.filteredData = result
   }
 
-  public filterTypes() {
-    let result = []
-    for (let tableRow of this.filteredData) {
-      let type
-      let val = []
-      for (let rowValues of tableRow.value) {
-        if (rowValues.idShort == "metaType") {
-          type = rowValues.value
-        } 
-        if (!allMetaTypes.includes(rowValues.idShort) && this.isArray(rowValues.value)) {
-          val.push({idShort: rowValues.idShort, value:this.getPropertyValue(rowValues.value, MT_varValue)})
+  /**
+   * Recursive function to turn a single AAS JSON data row into an internal data structure. Considers (recursive) IVML collection sub-structures. 
+   * Nested IVML compound sub-structures are still missing. Takes metaType, metaSize and varValue from the platform generated AAS entries
+   * into account.
+   * 
+   * @param values the row values as AAS JSON 
+   * @param result to accumulate the result of this row, a RowEntry on top level, a array on nested level
+   * @param top is this call a top level call or a nested recursive call
+   * @param rowFn additional function to apply on row data to extract further data
+   */
+  createRowValue(values: any, result: any, top:boolean, rowFn: (row:any) => void) {
+    for (let value of values) {
+      let fieldName = value.idShort;
+      rowFn(value);
+      if (!allMetaTypes.includes(fieldName)) {
+        let val: any;
+        if (this.isArray(value.value)) {
+          let fieldType = DataUtils.getPropertyValue(value.value, MT_metaType);
+          if (DataUtils.isIvmlCollection(fieldType)) {
+            let fieldSize = DataUtils.getPropertyValue(value.value, MT_metaSize);
+            if (fieldSize) {
+              val = [];
+              for (let i = 0; i < fieldSize; i++) {
+                let fVal : any = {}; // TODO not if contained type is primitive
+                let fName = fieldName + "__" + i + "_";
+                let fProp = DataUtils.getProperty(value.value, fName);
+                if (fProp && fProp.value) {
+                  this.createRowValue(fProp.value, fVal, false, v => {});
+                  let fId = fVal["id"] || fVal["name"] || String(i);
+                  fVal["idShort"] = fId;
+                  val.push(fVal);
+                }
+              }
+            }
+          } else {
+            val = DataUtils.getPropertyValue(value.value, MT_varValue);
+          }
+        }
+        if (top) {
+          result.push({idShort: fieldName, value:val});
+        } else {
+          result[fieldName] = val;
         }
       }
-      let new_value = {idShort: tableRow.idShort, varName: tableRow.idShort, varType: type, varValue: val}
-      result.push(new_value)
     }
-    this.filteredData = result
+  }
+
+  /**
+   * Creates an internal table data structure for AAS JSON data.
+   * 
+   * @param data the AAS JSON data
+   * @param rowFn customizing function to process the data per row, e.g., to store information into local variables and
+   *   to add this data to the result in "resultFn"
+   * @param resultFn customizing function to finalize the row result initialized with default information
+   * @returns the data structure as nesting of arrays, objects and values
+   */
+  createRows(data: any, rowFn: (row: any) => void, resultFn: (rowResult: RowEntry) => void) {
+    let result = []
+    for (let tableRow of data) {
+      let val : any = [];
+      let rowEntry = new RowEntry({idShort: tableRow.idShort, varName: tableRow.idShort, varValue: val});
+      this.createRowValue(tableRow.value, val, true, row => {
+        rowFn(row);
+        if (row.idShort == MT_metaType) {
+          rowEntry.varType = row.value
+        } 
+      });
+      rowEntry.varValue = val;
+      resultFn(rowEntry);
+      result.push(rowEntry)
+    }
+    return result;
+  }
+
+  public filterTypes() {
+    this.filteredData = this.createRows(this.filteredData, row => {}, rowResult => {});
   }
 
   public filterDependencies() {
-    let result = []
-    for (let tableRow of this.filteredData) {
-      let temp = []
-      let name = tableRow.idShort
-      let type
-      let val = []
-      for (let rowValues of tableRow.value) {
-        if (rowValues.idShort == "version") {
-          let new_value = this.getPropertyValue(rowValues.value, this.varValue);
-          if(new_value != "") {
-            temp.push({ "value":  "Version: " + new_value})
-          }
-        } else if (rowValues.idShort == "metaType") {
-          type = rowValues.value
-        }
-        if (!allMetaTypes.includes(rowValues.idShort) && this.isArray(rowValues.value)) {
-          val.push({idShort: rowValues.idShort, value:this.getPropertyValue(rowValues.value, MT_varValue)})
+    let temp : any = [];
+    this.filteredData = this.createRows(this.filteredData, row => {
+      if (row.idShort == "version") {
+        let new_value = DataUtils.getPropertyValue(row.value, this.varValue);
+        if(new_value != "") {
+          temp.push({ "value":  "Version: " + new_value})
         }
       }
-      let new_value = {idShort: name, value:temp, varName: tableRow.idShort, varType: type, varValue: val}
-      result.push(new_value)
-    }
-    this.filteredData = result
+    }, rowResult => {
+      rowResult.value = temp; 
+      temp = [];
+    });
   }
 
   public filterConstants() {
-    let result = []
-    for (let tableRow of this.filteredData) {
-      let temp = []
-      let type
-      let val
-      for (let rowValues of tableRow.value) {
-        if (rowValues.idShort == "metaType") {
-          type = rowValues.value
-        } else if (rowValues.idShort == this.varValue) {
-          let new_rowValue = {
-            "value": rowValues.value}
-          temp.push(new_rowValue)
-          val = rowValues.value
-        }
+    let temp : any = [];
+    let val: any;
+    this.filteredData = this.createRows(this.filteredData, row => {
+      if (row.idShort == this.varValue) {
+        let new_rowValue = {"value": row.value};
+        temp.push(new_rowValue);
+        val = row.value;
       }
-      let new_value = {idShort: tableRow.idShort, value: temp, varName: tableRow.idShort, varType: type, varValue: val}
-      result.push(new_value)
-    }
-    this.filteredData = result
+    }, rowResult => {
+      rowResult.value = temp; 
+      temp = [];  
+      rowResult.varValue = val
+    });
   }
 
   public filterMeshes() {
-    let result = []
-    for (let tableRow of this.filteredData) {
-      let temp = []
-      let type
-      let val = []
-      for (let rowValues of tableRow.value) {
-        if (rowValues.idShort == "metaType") {
-          type = rowValues.value
-        } 
-        if (!allMetaTypes.includes(rowValues.idShort) && this.isArray(rowValues.value)) {
-          val.push({idShort: rowValues.idShort, value:this.getPropertyValue(rowValues.value, MT_varValue)})
-        }
-        for (let param of this.paramToDisplay) {
-          if (rowValues.idShort == param[0]) {
-            let new_rowValue = this.getValue(rowValues, param)
-            temp.push(new_rowValue)
-          }
-        }
-      }
-      let new_value = {idShort: tableRow.idShort, value: temp, varName: tableRow.idShort, varType: type, varValue: val}
-      result.push(new_value)
-
-    }
-    this.filteredData = result
+    let temp : any = [];
+    this.filteredData = this.createRows(this.filteredData, row => {
+      this.composeValueByFilter(row, temp, this.paramToDisplay);
+    }, rowResult => {
+      rowResult.value = temp; 
+      temp = [];  
+    });
   }
 
   public filterManufacturer() {
-    let result = []
-    for (let tableRow of this.filteredData) {
-      let temp = []
-      let name
-      let type
-      let val = []
-      let logo = null
-      for (let rowValues of tableRow.value) {
-        if (rowValues.idShort == "manufacturerName") {
-          name = rowValues.value[0].value
-        } else if (rowValues.idShort == "metaType") {
-          type = rowValues.value
-        } 
-        if (!allMetaTypes.includes(rowValues.idShort) && this.isArray(rowValues.value)) {
-          val.push({idShort: rowValues.idShort, value:this.getPropertyValue(rowValues.value, MT_varValue)})
-        }
-        for (let param of this.paramToDisplay) {
-          if (rowValues.idShort == param[0]) {
+    let temp : any = [];
+    let name: any;
+    let logo: any = null;
+    this.filteredData = this.createRows(this.filteredData, row => {
+      if (row.idShort == "manufacturerName") {
+        name = row.value[0].value
+      }
+      for (let param of this.paramToDisplay) {
+          if (row.idShort == param[0]) {
             if (param[0] == "manufacturerLogo") {
-              let logoValue = rowValues.value[0].value
+              let logoValue = row.value[0].value
               if(logoValue !== "") {
                 logo = this.imgPath + logoValue
               }
             } else if (param[0] == "address"){
-              for (let val of rowValues.value) {
+              for (let val of row.value) {
                 if (val.value[0].value) {
                   let addressValue = {"value": this.removeChar('@de', val.value[0].value)}
                   temp.push(addressValue)
@@ -349,50 +363,43 @@ export class ListComponent extends Utils implements OnInit {
               }
             }
           }
-        }
-      }
-      let new_value = {idShort: this.removeChar('@de', name), logo: logo, value: temp, varName: tableRow.idShort, varType: type, varValue: val}
-      result.push(new_value)
-    }
-    this.filteredData = result
+        }      
+    }, rowResult => {
+      rowResult.idShort = this.removeChar('@de', name);
+      rowResult.logo = logo;
+      rowResult.value = temp; 
+      temp = [];
+      logo = null;
+    });
   }
 
-  public removeChar(char:string, str:string){
+  private removeChar(char:string, str:string){
     return str.replace(char, '')
   }
 
-  public filterServices() {
-    let result = []
-    for (let tableRow of this.filteredData) {
-      let temp = []
-      let name
-      let type
-      let val = []
-      for (let rowValues of tableRow.value) {
-        if (rowValues.idShort == "id") {
-          name = rowValues.value[0].value
-        } else if (rowValues.idShort == "metaType") {
-          type = rowValues.value
-        } 
-        if (!allMetaTypes.includes(rowValues.idShort) && this.isArray(rowValues.value)) {
-          val.push({idShort: rowValues.idShort, value:this.getPropertyValue(rowValues.value, MT_varValue)})
-        }
-        for (let param of this.paramToDisplay) {
-          if (rowValues.idShort == param[0]) {
-            let new_rowValue = this.getValue(rowValues, param)
-            temp.push(new_rowValue)
-          }
-        }
-      }
-      let new_value = {idShort: name, value: temp, varName: tableRow.idShort, varType: type, varValue: val}
-      result.push(new_value)
-    }
-    this.filteredData = result
+  public filterServicesServersApps() {
+    let temp : any = [];
+    let name: any;
+    this.filteredData = this.createRows(this.filteredData, value => {
+      if (value.idShort == "id") {
+        name = value.value[0].value
+      } 
+      this.composeValueByFilter(value, temp, this.paramToDisplay);
+    }, r => {
+      r.idShort = name;
+      r.value = temp; 
+      temp = [];  
+    });
   }
 
-  private getValue(rowVal: any, param:any) {
-    let value = this.getPropertyValue(rowVal.value, this.varValue);
-    return { "value":  param[1] + value + param[2]}
+  private composeValueByFilter(value: any, result: any, filter: any[]) {
+    for (let param of filter) {
+      if (value.idShort == param[0]) {
+        let tmp = DataUtils.getPropertyValue(value.value, this.varValue);
+        let new_rowValue = { "value":  param[1] + tmp + param[2]};
+        result.push(new_rowValue);
+      }
+    }
   }
 
   // ---- buttons ---------------------------------------------------------------
@@ -412,6 +419,7 @@ export class ListComponent extends Utils implements OnInit {
         value: "",
         idShort: "value"
       }
+      
       let editorInput:editorInput =
         {name: "value", type: item.varType, value:item.varValue,
         description: [{language: '', text: ''}],

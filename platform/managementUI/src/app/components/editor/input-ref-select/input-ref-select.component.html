@@ -1,7 +1,6 @@
 <div style="width: 100%">
   <div>
     <table>
-      <tr><td>{{input.type}}</td></tr>
       <tr>
         <td *ngIf="activeTextinput">
           <mat-form-field appearance="outline">
@@ -35,6 +34,7 @@
               </td>
               <td>
                 <button mat-raised-button style="background-color: red; margin-left: 0.5em;" (click)="removeInputValue(i)">remove</button>
+                <button mat-raised-button style="background-color: red; margin-left: 0.5em;" (click)="editInputValue(i)">edit</button>
               </td>
               <td>
                 <button *ngIf="isSequenceOf" mat-icon-button (click)="moveSequenceElement(false, i)"><mat-icon>keyboard_arrow_right</mat-icon></button>

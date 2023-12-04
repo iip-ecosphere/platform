@@ -4,7 +4,7 @@ import { ApiService } from 'src/app/services/api.service';
 import { IvmlFormatterService } from 'src/app/services/ivml-formatter.service';
 import { Resource, uiGroup, editorInput, configMetaContainer, configMetaEntry, ResourceAttribute, InputVariable, metaTypes, 
   MTK_primitive, MTK_derived, MTK_enum, MTK_compound, MT_metaRefines, MT_metaTypeKind, MT_metaAbstract, primitiveDataTypes, MT_metaDefault } from 'src/interfaces';
-import { Utils } from 'src/app/services/utils.service';
+import { Utils, DataUtils } from 'src/app/services/utils.service';
 
 @Component({
   selector: 'app-editor',
@@ -72,7 +72,7 @@ export class EditorComponent extends Utils implements OnInit {
         await this.getMeta()
       }
       if(this.metaBackup && this.metaBackup.value) {
-        let type = this.cleanTypeName(this.type.type);
+        let type = DataUtils.stripGenericType(this.type.type);
         this.selectedType = this.metaBackup.value.find(item => item.idShort === type);
         this.generateInputs()
       }
@@ -80,7 +80,7 @@ export class EditorComponent extends Utils implements OnInit {
     if(this.metaBackup && this.metaBackup.value) {
       let searchTerm = 'Field'
       for(const type of this.metaBackup.value) {
-        const refined = this.getProperty(type.value, MT_metaRefines);
+        const refined = DataUtils.getProperty(type.value, MT_metaRefines);
         if(refined && refined.value != '') {
           if(searchTerm === refined.value) {
             console.debug("TYPE " + type);
@@ -116,7 +116,7 @@ export class EditorComponent extends Utils implements OnInit {
           }
 
           if (this.getMetaRef(item)) {
-            let metaRefVal = this.getPropertyValue(item.value, MT_metaRefines)
+            let metaRefVal = DataUtils.getPropertyValue(item.value, MT_metaRefines)
             if(metaRefVal != "") {
               // sub-type
               if(filter?.metaRef.includes(metaRefVal)) {
@@ -161,7 +161,7 @@ export class EditorComponent extends Utils implements OnInit {
   /** Returns false when metaAbstract is false or
    * there is no attribute "metaAbstract" */
   private isAbstract(item:any) {
-    let abstract = this.getPropertyValue(item.value, MT_metaAbstract);
+    let abstract = DataUtils.getPropertyValue(item.value, MT_metaAbstract);
     if (abstract) {
       return true
     } else {
@@ -170,7 +170,7 @@ export class EditorComponent extends Utils implements OnInit {
   }
 
   private getMetaRef(item: any) {
-    let value = this.getProperty(item.value, MT_metaRefines);
+    let value = DataUtils.getProperty(item.value, MT_metaRefines);
     if (value) {
       return value.value
     } else {
@@ -179,7 +179,7 @@ export class EditorComponent extends Utils implements OnInit {
   }
 
   private isTypeMetaKindEqualNum(item:any, num:number) {
-    let value = this.getPropertyValue(item.value, MT_metaTypeKind);
+    let value = DataUtils.getPropertyValue(item.value, MT_metaTypeKind);
     if (value == num) {
       return true
     } else {
@@ -221,16 +221,6 @@ export class EditorComponent extends Utils implements OnInit {
 
 // ----------------------------------------------------------------------
 
-  private cleanTypeName(type: string) {
-    const startIndex = type.lastIndexOf('(') + 1;
-    const endIndex = type.indexOf(')');
-    if(endIndex > 0){
-      return type.substring(startIndex, endIndex);
-    } else {
-      return type;
-    }
-  }
-
   public displayName(property: Resource | string) {
     let displayName = '';
     if(typeof(property) == 'string') {
@@ -248,7 +238,7 @@ export class EditorComponent extends Utils implements OnInit {
     this.ivmlType = selectedType.idShort
     if (selectedType && selectedType.value) {
       // (Constants) hard-coded in case of primitive types
-      let selMetaTypeKind = this.getPropertyValue(selectedType.value, MT_metaTypeKind);
+      let selMetaTypeKind = DataUtils.getPropertyValue(selectedType.value, MT_metaTypeKind);
       if (primitiveDataTypes.includes(selectedType.idShort) || selMetaTypeKind == MTK_enum) {
         let meta_entry:configMetaEntry = {
           modelType: {name: ""},
@@ -275,7 +265,7 @@ export class EditorComponent extends Utils implements OnInit {
         for (const input of selectedType.value) {
           if (input.idShort && metaTypes.indexOf(input.idShort) === -1) {
             let isOptional = false;
-            let uiGroup: number = this.getPropertyValue(input.value, 'uiGroup');
+            let uiGroup: number = DataUtils.getPropertyValue(input.value, 'uiGroup');
 
             if (uiGroup < 0) {
               isOptional = true;
@@ -289,7 +279,7 @@ export class EditorComponent extends Utils implements OnInit {
                 [{language: '', text: ''}],
                 refTo: false, multipleInputs: false};
 
-            let name = this.getProperty(input.value, 'name');
+            let name = DataUtils.getProperty(input.value, 'name');
             if (name) {
               editorInput.name = name.value;
               if (name.description
@@ -300,23 +290,22 @@ export class EditorComponent extends Utils implements OnInit {
               }
             }
 
-            editorInput.type = this.getPropertyValue(input.value, 'type');
+            editorInput.type = DataUtils.getPropertyValue(input.value, 'type');
 
             editorInput.meta = input;
-            let cleanType = this.cleanTypeName(editorInput.type);
+            let typeGenerics = DataUtils.stripGenericType(editorInput.type);
 
-            let type = this.meta?.value?.find(type => type.idShort === cleanType);
-            //let type2 = this.metaBackup?.value?.find(type => type.idShort === cleanType);
+            let type = this.meta?.value?.find(type => type.idShort === typeGenerics);
             if (type) {
-              editorInput.metaTypeKind = this.getPropertyValue(type.value, MT_metaTypeKind);
+              editorInput.metaTypeKind = DataUtils.getPropertyValue(type.value, MT_metaTypeKind);
             } else if(this.metaBackup && this.metaBackup.value) {
               let iterType = editorInput.type;
               do {
-                let temp = this.metaBackup.value.find(item => item.idShort === this.cleanTypeName(iterType));
-                editorInput.metaTypeKind = this.getPropertyValue(temp?.value, MT_metaTypeKind);
+                let temp = this.metaBackup.value.find(item => item.idShort === DataUtils.stripGenericType(iterType));
+                editorInput.metaTypeKind = DataUtils.getPropertyValue(temp?.value, MT_metaTypeKind);
                 editorInput.type = iterType;
                 if (editorInput.metaTypeKind == MTK_derived) {
-                  iterType = this.getPropertyValue(temp?.value, MT_metaRefines);
+                  iterType = DataUtils.getPropertyValue(temp?.value, MT_metaRefines);
                   if (!iterType) {
                     break;
                   }
@@ -338,16 +327,23 @@ export class EditorComponent extends Utils implements OnInit {
               || editorInput.type.indexOf('sequenceOf') >= 0) {
               editorInput.multipleInputs = true;
             }
-            let ivmlValue = this.type?.value || this.getPropertyValue(input.value, MT_metaDefault) || ""; 
+            let ivmlValue = this.type?.value || DataUtils.getPropertyValue(input.value, MT_metaDefault) || ""; 
             if (selMetaTypeKind === MTK_compound && this.isArray(ivmlValue)) {
-              ivmlValue = this.getPropertyValue(ivmlValue, input.idShort);
+              ivmlValue = DataUtils.getPropertyValue(ivmlValue, input.idShort);
             }
             let initial;
-            if(editorInput.multipleInputs || editorInput.metaTypeKind === MTK_enum) {
-              initial = [ivmlValue] // TODO unclear
-            } else if(editorInput.type === 'Boolean'){
+            if (this.isObject(ivmlValue) && input.idShort in ivmlValue) { 
+              // compound instances may be passed in as object with properties, those being undefined are defaults
+              ivmlValue = ivmlValue[input.idShort];
+              if (!ivmlValue) {
+                ivmlValue = DataUtils.getPropertyValue(input.value, MT_metaDefault);
+              }
+            }
+            if (editorInput.multipleInputs || editorInput.metaTypeKind === MTK_enum) {
+              initial = ivmlValue
+            } else if(editorInput.type === 'Boolean') {
               initial = String(ivmlValue).toLowerCase() === 'true';
-            } else if(editorInput.metaTypeKind === MTK_compound && !editorInput.multipleInputs) {
+            } else if (editorInput.metaTypeKind === MTK_compound && !editorInput.multipleInputs) {
               initial = {}; // TODO unclear
             } else {
               initial = ivmlValue;
