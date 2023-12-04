@@ -124,12 +124,13 @@ If you also want to update the configuration meta model, which may upgrade and e
 
 ### Manually
 
-Start the platform server(s) component through the generated scripts in the gen folder. If you run all processes from the console as explained, this requires a separate shell for platform, ECS Runtime, service manager and UI/CLI as the processes run intentionally endless. Make sure to wait for each script to be done bevore starting the next (usually "Running until ctrl+C").
+Start the platform server(s) component through the generated scripts in the gen folder. If you run all processes from the console as explained, this requires a separate shell for platform, ECS Runtime, service manager and UI/CLI as the processes run intentionally endless. Make sure to wait for each script to be done before starting the next (usually "Running until ctrl+C").
 
     broker.sh
     platform.sh
-    monitoring.sh
-    mgtUi.sh
+    ecsServiceMgr.sh
+
+Instead of `ecsServiceMgr.sh` you may also start `ecs.sh` and `serviceMgr.sh` as separate processes in separate shells. If you have installed Angular, you may also start `mgtUi.sh`. For Windows, please use the respective scripts with file extension `.bat`. 
 
 ### Via startup scripts
 
@@ -172,7 +173,7 @@ Deployment of the application happens through
 
 `cli.sh deploy artifacts/deployment.yaml`
 
-undeployment via 
+(`cli.bat` for Windows) undeployment via 
 
 `cli.sh undeploy artifacts/deployment.yaml`
 

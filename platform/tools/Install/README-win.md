@@ -84,6 +84,8 @@ If you intend to use the platform management user interface, Angular 14, express
 
     curl https://nodejs.org/download/release/v16.10.0/node-v16.10.0-x64.msi -o node-v16.10.0-x64.msi
     node-v16.10.0-x64.msi
+    setx /M Path "%Path%;C:\Program Files\nodejs"
+    SET Path=%Path%;C:\Program Files\nodejs
     npm install -g @angular/cli@14.2.11
     npm install -g express@4.18.1 
     npm install -g cors@2.8.5

@@ -1,8 +1,11 @@
+echo "Oktoflow platform installation (Linux)"
+echo "For installing prerequisites, administrator permissions may be required!"
+
 mkdir -p Platform && cd Platform
 
-echo "-- This action will set and use Environment Variables --"
-echo "-- It is recommended to use the following versions for the prerequisites --"
-read -p "Do you want to install the prerequisites (Java 13, Maven version 3.6.3, Docker version 20.10.7, and Python version 3.9)? (y/n) " yn
+echo "Installing prerequisites Java 13, Maven version 3.6.3, and Python version 3.9"
+echo "This action will set and use Environment Variables"
+read -p "Do you want to install the prerequisites (skip only if already installed)? (y/n) " yn
 if [ $yn == "y" ] || [ $yn == "Y" ]; then 
     
     # Check current Java version 
@@ -220,7 +223,9 @@ if [ $yn == "y" ] || [ $yn == "Y" ]; then
         [Yy]* ) sudo curl -sL https://deb.nodesource.com/setup_14.x | sudo bash -;
                 sudo apt -y install nodejs;
                 sudo apt install npm -y;
-                sudo npm install -g @angular/cli@14.2.10;;
+                sudo npm install -g @angular/cli@14.2.10;
+                sudo npm install -g express@4.18.1 
+                sudo npm install -g cors@2.8.5
         [Nn]* ) break;;
     esac
 
@@ -269,7 +274,7 @@ EOF
         [Nn]* ) sudo rm daemon.json;
     esac
     
-    sudo mvn install -Diip.easy.tracing=ALL
+    sudo mvn install -Diip.easy.tracing=TOP
     
     sudo chown -R $USER ../Install
     
@@ -355,3 +360,18 @@ EOF
 else
     echo "Please answer y or n.";
 fi
+
+echo "The following commands were created in Platform\Install\gen:"
+echo "- broker.sh starts the configured communication broker"
+echo "- platform.sh starts the central platform services"
+echo "- mgtUi.sh starts the Angular-based management UI (Angular required, http://localhost:4200)"
+echo "- per device that shall execute services, either ECS-Runtime and service manager or the combined"
+echo "  combined ECS-Runtime-Servicemanager must be executed"
+echo "  - ecs.sh starts the ECS-Runtime"
+echo "  - serviceMgr.sh starts the service manager"
+echo "  - ecsServiceMgr.sh starts the combined ECS-Runtime/Service-Manager"
+echo "- cli.sh starts the platform command line interface"
+echo "In individual shells, start at least the broker, the central services and the device services, then" 
+echo "the included application (cli.sh deploy artifacts/deployment.yaml). On a permanent installation, only" 
+echo "accessing the UI or the CLI is needed."
+echo "Please consult the installation overview for more information."
