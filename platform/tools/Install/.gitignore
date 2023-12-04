@@ -4,6 +4,7 @@
 /gen/*.bat
 /gen/*.service
 /gen/ApplicationInterfaces/
+/gen/artifacts/
 /gen/broker/
 /gen/ecs*/
 /gen/mgtUi/

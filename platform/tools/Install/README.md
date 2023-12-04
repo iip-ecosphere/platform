@@ -1,6 +1,6 @@
-# IIP-Ecosphere platform: Install Support
+# oktoflow platform: Install Support
 
-This project supports the installation of the IIP-Ecosphere platform.
+This project supports the installation of the oktoflow platform.
 
 The platform can be installed on Windows and on Linux. Please note that special characters like whitespaces in folder names (in particular on Windows) may cause the installation, platform installation or examples to fail. We will explain the individual steps for Ubuntu 20.4.1 Linux installed.
 
@@ -23,77 +23,18 @@ For the next steps, we assume that you obtained the installation package and unp
 
 ## Installation by script
 
-The installation package contains installation scripts, which automate the manual installation based on the default setup decisions for the platform and your interactive input. For better understanding the platform and for more flexibility, we recommend the manual installation procedure explained below. Please note that support for installing prerequisites such as Docker through the scripts are based on assumptions for Ubuntu Linux and may be limited for Windows.
+The installation package contains installation scripts, which automate the manual installation based on the default setup decisions for the platform and your interactive input. For better understanding the platform and for more flexibility, we recommend the manual installation procedure explained below. Please note that support for installing prerequisites such as Docker through the scripts are based on assumptions for Ubuntu Linux and may be limited for Windows. Administrator permissions may be required, at least for installing some prerequisites.
 
 * For **Linux**, the script checks whether Java is installed and, if absent, performs an installation of Java JDK 13. If the installed Java version is less than Java 11, the script asks whether to additionally install Java 13. Next, the script checks the installation of Maven, Docker, and Python: if not installed, the script will install the respective program. If the installed versions do not comply with the recommended versions, the script asks whether to install the recommended versions. Finally, the script asks whether to obtain and start a Docker Private Registry that will be used by the platform to store and distribute generated containers. Each installation step may be skipped or existing versions may be used, which, in turn, may affect the the platform instantiation or execution. Next, to use the management UI of the platform, the script asks for installing Angular version 14.2.11, Node.js version 14 and npm package manager for JavaScript. Further, the script will install the required Python libraries and change the IP address in the platform configuration to your local IP address. Further, if docker is installed, the script will setup the platform to create a containerized version and to deploy the containers in the local docker registry. Finally, the script will instantiate or execute the platform.
-* For **Windows**, the same procedure is used as for Linux except for the installation of Docker and the Docker Private Registry. This restriction applies as first the Windows Subsystem for Linux (WSL) must be installed and a (further) unattended installation of Docker on Windows is more complicated and needs extra steps. Nonetheless, the script checks if Docker is installed and then checks the version. If Docker is installed, then the script will ask to obtain and run a Docker Private Registry. However, the script does not install Angular version 14.2.11 on windows since it needs more setup steps. If you wish to use the management UI of the platform, please refer to the manual installation. Usually, it is required to run the script with administrator privileges.
+* For **Windows**, the same procedure is used as for Linux except for the installation of Docker and the Docker Private Registry. This restriction applies as first the Windows Subsystem for Linux (WSL) must be installed and a (further) unattended installation of Docker on Windows is more complicated and needs extra steps. Nonetheless, the script checks if Docker is installed and then checks the version. If Docker is installed, then the script will ask to obtain and run a Docker Private Registry. After installing the platform, the script may install node.js 16.10.0 and Angular 14.2.11. If you wish to use the management UI of the platform, please refer to the manual installation.
+
+Please note that the actual platform installation may run longer, as a specific platform installation is assembled for you during this process. Being able to customize the platform even in terms of used components is a central aspect of oktoflow, i.e., there are no downloadable binaries, which are created in that step for you.
+
+If you already have installed a different version of Python, the platform installation may grab the wrong installation, miss packages and fail. In that case, please set the environment variable ``IIP_PYTHON`` to the intended Python executable and re-instantiate the platform (in the folder `Platform/Install` execute `mvn install`).
 
 ## Manual installation
 
-### Prepare the server
-
-On the server, where we will build and instantiate the platform also for the devices, install the programs unzip, Java JDK (version 11 up to 16 due to some limitations of used dependencies), maven (version 3.6.3) and docker (version 20.10.2):
-
-     sudo apt install unzip
-     sudo apt install openjdk-13-jdk-headless
-     sudo apt install maven
-     sudo apt install docker.io
-
-By default, Docker requires root permissions to execute functions. If you want to use docker as “normal” user , execute
-
-     sudo usermod -aG docker $USER
-
-Log out and log back so that your group membership is re-evaluated. 
-
-For distributing containers created by the platform, we need a local Docker registry, in particular if services contain IPR-protected code. We install the registry on the server on port 5001 as follows:
-
-    docker run -d \
-      --restart=always \
-      --name registry \
-      -e REGISTRY_HTTP_ADDR=0.0.0.0:5001 \
-      -p 5001:5001 \
-      registry:2
-
-In general, we recommend using a distinct server for this and to adjust the settings in the platform configuration as discussed below.
-
-You may check the registry using
-    
-    curl -sS http://192.168.2.1:5001/v2/_catalog
-
-### Prepare the devices
-
-On devices, the installation may differ depending on the desired degree of containerization. If you want to run the fundamental platform components on bare metal, please install also unzip, JDK and maven on the devices. If you plan to run only containers on the devices, docker is sufficient.
-
-Create or edit ``/etc/docker/daemon.json`` in order to access the local Docker registry installed above, here without TLS certificates. For an empty file, this looks like:
-
-    {
-      "insecure-registries" : ["147.172.178.145:5001"]
-    }
-    
-Then execute
-
-    sudo systemctl restart docker
-
-### Prepare Python
-
-Depending on the use of Python in services, the build process for applications may include Python syntax checking and execution of Python unit tests. If you plan to run the platform on bare metal under administrator permissions, e.g., as systemd service, please install the following python dependencies globally, i.e., with administrator permissions.
-
-If Python is utilized, at least Python 3.8.5 with pyflakes and for service execution PyYaml as well as websockets must be installed. 
-
-    python3 -m pip install pyflakes==2.5.0
-    python3 -m pip install PyYAML==6.0
-    python3 -m pip install websockets==11.0.2
- 
-Moreover, depending on the utilized platform functions potentially also pyzbar, opencv-python, numpy, and Pillow are required for the data processing function library:
-
-    python3 -m pip install pyzbar==0.1.9
-    python3 -m pip install opencv-python==4.5.5.64
-    python3 -m pip install numpy==1.20.1
-    python3 -m pip install Pillow==9.1.0
-
-### Prepare Angular
-
-For the platform management user interface, Angular 14, express 4.18.1 and cors 2.8.5 are required. 
+There are two detailed installation descriptions, one for [Windows](README-win.md) and one for [Linux](README-lionux.md).
 
 ## Adjust the platform configuration
 
@@ -130,7 +71,7 @@ To enable these settings, please go into the freeze-part at the end of ``Technic
 Then we need to enable the Angular UI as follows
 
     managementUi = AngularManagementUI {
-        port = managementUiPort
+        port = 4200
     };
 
 and further we need to set the parent folder of the configuration model (called the ``modelBaseFolder``), the folder where downloadable artifacts shall be placed (``artifactsFolder``) and the server URI prefix where the artifacts folder will be made available. Depending on your setup, the URI prefix may point to some web server or in the most simple case to the Javascript server that the platform will instantiate for this purpose.
@@ -213,35 +154,41 @@ Currently, by default, no explicit on/offboarding of devices is needed.
 
 On the devices, run 
 
-    docker pull 147.172.178.145:5001/allapps/plcnext:0.1.0
+    docker pull 147.172.178.145:5001/allapps/dflt:0.1.0
 
-with the address of your server, the port of the local docker registry and the name of the container. [AHMAD schema of container names; above must be the ECS]
-
-AHMAD please add script info here
+with the address of your server, the port of the local docker registry and the name of the container (there are also variants for `plcnext` or `bitmotec`, replacing `dflt` in the container name). The platform may also generate scripts for starting the individual containers.
 
 ## Deploying applications
 
 Depending on your installation, the application may be distributed/executed by the platform or requires manual actions.
 
+### Plan-based deployment
+
+The platform instantiation copies an example deployment plan as well as the application binaries into the configured `artifacts` folder. The example deployment plan starts the services on the actual computer (`.`, assuming that ECS-Runtime and Service Manager or the combined version are running). The application in this plan is taken from the build directory of the application. In a distributed setup, the application artifacts are downloaded through the specified URI prefix via the web server of the management user interface.
+
+In the application, a source service generates random numbers and passes them on to the sink service. The results are only visible in the service logs, which are stored in temporary folders.
+
+Deployment of the application happens through 
+
+`cli.sh deploy artifacts/deployment.yaml`
+
+undeployment via 
+
+`cli.sh undeploy artifacts/deployment.yaml`
+
+Please observe the logs of the service manager for the service logs.
+
+Similarly, on the management UI you may navigate to `runtime` and then to `deployment plans` and select the plan for deployment. In the the `services` tab, you will find the running services. You can request there, e.g., the log of the receiver service. Further, you will find the running applications in the `instances` tab, where you can request an undeployment of the selected instance.
+
+When writing own deployment plans, consider changing the default device identification provider from MAC addresses to network names. In the log of the ECS-Runtime/Service manager for a device, you will find the actual device ID needed in the the deployment plans, e.g., ``USING id 00FFB9A35D2B from de.iip_ecosphere.platform.support.iip_aas.MacIdProvider``. You can also find this information for available devices in the `resources` tab of the management UI.
+
 ### Manual deployment
 
-Use the CLI as shown in [the platform installation document](../documentation/INSTALL.md) to add the application artifact from gen/*applicationId*/target to the devices and to start the services. Please note that artifacts and containers are added through their URI, whereby local URIs may differ from system to system, e.g., 
-* Windows: `file:///C:/.../SimpleMeshTestingApp-0.1.0-SNAPSHOT-bin.jar` if this fails try `file:///.../SimpleMeshTestingApp-0.1.0-SNAPSHOT-bin.jar` where you just leave the drive part.
-* Linux: `file:/home/user/SimpleMeshTestingApp-0.1.0-SNAPSHOT-bin.jar`
-* Service container: `file:/apps/SimpleMeshTestingApp-0.1.0-SNAPSHOT-bin.jar`
-
-### Deployment-plan based deployment
-
-The platform instantiation copies the application binaries into the configured artifacts folder, from where it is available through the specified URI prefix and the server of the management user interface or your server installation.
-
-You may now create a deployment plan for your application (assigning services to devices using their respective device identifications) mentioning the application artifact. 
-* For UI-based deployment, please place the deployment plan into the artifacts directory. The platform will take it up, display it in the deployments plan sections where you can start the plan.
-* For a CLI-based deployment, please use the deploy and undeploy commands with the URI of the plan.
-
+You can use the CLI to start individual services of the application on a certain resource. However, this requires information on the structure of the application, which is better provided through a deployment plan.
 
 # Further contents
   
-Besides the Maven build specifications for the platform dependencies, the test broker and the IIP-Ecosphere platform components, this Installation bundle also contains build information for two containers, namely an application container including the service manager and a simple application as well as a standalone container including the ECS runtime. Both containers can be build upon the artifacts provided through this installation package.
+Besides the Maven build specifications for the platform dependencies, the test broker and the oktoflow platform components, this Installation bundle also contains build information for two containers, namely an application container including the service manager and a simple application as well as a standalone container including the ECS runtime. Both containers can be build upon the artifacts provided through this installation package.
 
 If you need to update the configuration model before instantiating the platform, use `mvn install -Dunpack.force=true`. You may also adjust the name of the model (user property `-Diip.model=`) the directory the model is located in (user property `-Diip.modelDir=`) or the output directory (user property `-Diip.outputDir=`).
 
