@@ -294,7 +294,6 @@ export class EditorComponent extends Utils implements OnInit {
 
             editorInput.meta = input;
             let typeGenerics = DataUtils.stripGenericType(editorInput.type);
-
             let type = this.meta?.value?.find(type => type.idShort === typeGenerics);
             if (type) {
               editorInput.metaTypeKind = DataUtils.getPropertyValue(type.value, MT_metaTypeKind);
@@ -341,12 +340,16 @@ export class EditorComponent extends Utils implements OnInit {
             }
             if (editorInput.multipleInputs || editorInput.metaTypeKind === MTK_enum) {
               initial = ivmlValue
-            } else if(editorInput.type === 'Boolean') {
+            } else if (editorInput.type === 'Boolean') {
               initial = String(ivmlValue).toLowerCase() === 'true';
             } else if (editorInput.metaTypeKind === MTK_compound && !editorInput.multipleInputs) {
-              initial = {}; // TODO unclear
+              initial = ivmlValue; // input comes as object
             } else {
-              initial = ivmlValue;
+              if (typeGenerics == "AasLocalizedString") {
+                initial = DataUtils.stripLangStringLanguage(ivmlValue); // value without language
+              } else {
+                initial = ivmlValue; // input is just the value
+              }
             }
             editorInput.value = initial;
 

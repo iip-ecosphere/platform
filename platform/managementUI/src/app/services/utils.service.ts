@@ -156,6 +156,35 @@ export class DataUtils {
       return type;
     }
   }
+
+  /**
+   * Turns value into a boolean value.
+   * 
+   * @param value the value
+   * @returns the value converted into boolean
+   */
+  public static toBoolean(value: any): boolean {
+    return String(value).toLowerCase() === 'true';
+  }
+
+  /**
+   * Strips the language of an AAS-inspired language string.
+   * 
+   * @param text the AAS-inspired language string 
+   * @returns the string within the AAS-inspired language string without language
+   */
+  public static stripLangStringLanguage(text: string) {
+    let result: string = text;
+    if (text) {
+      const endIndex = text.lastIndexOf('@');
+      if (endIndex > 0) {
+        result = text.substring(0, endIndex);
+      } else {
+        result = text;
+      }
+    }
+    return result;
+  }
   
   /**
    * Creates a deep copy of value.

@@ -152,7 +152,7 @@
                 <mat-form-field appearance="outline" *ngIf="input.metaTypeKind != 10; else subEditor">
                   <mat-label>{{ input.type }}</mat-label>
                   <input matInput
-                    [matTooltip]="input.description[0].text + ' ' + input.description[0].language" type="text" ngDefaultControl [(ngModel)]=input.value />
+                    [matTooltip]="input.description[0].text" type="text" ngDefaultControl [(ngModel)]=input.value />
                 </mat-form-field>
               </div>
           </div>

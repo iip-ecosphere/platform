@@ -18,13 +18,13 @@ export class SubeditorButtonComponent implements OnInit {
 
   refinedTypes: ResourceAttribute[] = [];
   selectedRefinedType: ResourceAttribute | null = null;
+  value = "";
 
   constructor(public subDialog: MatDialog) { }
 
   ngOnInit(): void {
     this.disabled = this.validateEditorInputType(this.input)
   }
-
 
   public openSubeditor(type: editorInput) {
     if(this.meta) {

@@ -7,7 +7,7 @@ import { Router } from '@angular/router';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import { MAT_PROGRESS_SPINNER_DEFAULT_OPTIONS_FACTORY } from '@angular/material/progress-spinner';
 import { EditorComponent } from '../editor/editor.component';
-import { InputVariable, MT_metaSize, MT_metaState, MT_metaType, MT_varValue, Resource, allMetaTypes, configMetaEntry, editorInput, metaTypes, platformResponse } from 'src/interfaces';
+import { InputVariable, MTK_compound, MTK_container, MT_metaSize, MT_metaState, MT_metaType, MT_metaTypeKind, MT_varValue, Resource, allMetaTypes, configMetaEntry, editorInput, metaTypes, platformResponse } from 'src/interfaces';
 import { Utils, DataUtils } from 'src/app/services/utils.service';
 
 class RowEntry {
@@ -222,8 +222,7 @@ export class ListComponent extends Utils implements OnInit {
 
   /**
    * Recursive function to turn a single AAS JSON data row into an internal data structure. Considers (recursive) IVML collection sub-structures. 
-   * Nested IVML compound sub-structures are still missing. Takes metaType, metaSize and varValue from the platform generated AAS entries
-   * into account.
+   * Takes metaType, metaSize and varValue from the platform generated AAS entries into account.
    * 
    * @param values the row values as AAS JSON 
    * @param result to accumulate the result of this row, a RowEntry on top level, a array on nested level
@@ -238,7 +237,8 @@ export class ListComponent extends Utils implements OnInit {
         let val: any;
         if (this.isArray(value.value)) {
           let fieldType = DataUtils.getPropertyValue(value.value, MT_metaType);
-          if (DataUtils.isIvmlCollection(fieldType)) {
+          let fieldTypeKind = DataUtils.getPropertyValue(value.value, MT_metaTypeKind);
+          if (fieldTypeKind == MTK_container) { //(DataUtils.isIvmlCollection(fieldType)) {
             let fieldSize = DataUtils.getPropertyValue(value.value, MT_metaSize);
             if (fieldSize) {
               val = [];
@@ -254,6 +254,9 @@ export class ListComponent extends Utils implements OnInit {
                 }
               }
             }
+          } else if (fieldTypeKind == MTK_compound) {
+            val = {};
+            this.createRowValue(value.value, val, false, v => {});
           } else {
             val = DataUtils.getPropertyValue(value.value, MT_varValue);
           }
@@ -354,10 +357,10 @@ export class ListComponent extends Utils implements OnInit {
               if(logoValue !== "") {
                 logo = this.imgPath + logoValue
               }
-            } else if (param[0] == "address"){
+            } else if (param[0] == "address") {
               for (let val of row.value) {
-                if (val.value[0].value) {
-                  let addressValue = {"value": this.removeChar('@de', val.value[0].value)}
+                if (this.isArray(val.value) && val.value[0].value) {
+                  let addressValue = {"value": DataUtils.stripLangStringLanguage(val.value[0].value)}
                   temp.push(addressValue)
                 }
               }
@@ -365,7 +368,7 @@ export class ListComponent extends Utils implements OnInit {
           }
         }      
     }, rowResult => {
-      rowResult.idShort = this.removeChar('@de', name);
+      rowResult.idShort = DataUtils.stripLangStringLanguage(name);
       rowResult.logo = logo;
       rowResult.value = temp; 
       temp = [];

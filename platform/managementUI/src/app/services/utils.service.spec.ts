@@ -23,21 +23,6 @@ describe('UtilsService', () => {
     expect(service.isArray(["a"])).toBeTruthy();
   });
 
-  it('should implement getProperty', () => {
-    expect(DataUtils.getProperty(data, "xx")).toBeUndefined();
-    expect(DataUtils.getPropertyValue(data, "xx")).toBeUndefined();
-
-    let d: any[] = [];
-    expect(DataUtils.getProperty(d, "xx")).toBeUndefined();
-    expect(DataUtils.getPropertyValue(d, "xx")).toBeUndefined();
-    d = [{idShort: "xx"}, {idShort: "yy"}];
-    expect(DataUtils.getProperty(d, "xx")).toBeDefined();
-    expect(DataUtils.getPropertyValue(d, "xx")).toBeUndefined();
-    d = [{idShort: "xx", value:"abc"}, {idShort: "yy", value:"def"}];
-    expect(DataUtils.getProperty(d, "xx")).toBeDefined();
-    expect(DataUtils.getPropertyValue(d, "xx")).toBe("abc");
-  });
-
   it('should implement isObject', () => {
     expect(service.isObject(undefined)).toBeFalsy();
     expect(service.isObject(null)).toBeTruthy();
@@ -53,6 +38,23 @@ describe('UtilsService', () => {
     expect(service.isNonEmptyString(1)).toBeFalsy();
     expect(service.isNonEmptyString("")).toBeFalsy();
     expect(service.isNonEmptyString("abba")).toBeTruthy();
+  });
+
+  // -------------------------- Data Utils -----------------------------------
+
+  it('should implement getProperty', () => {
+    expect(DataUtils.getProperty(data, "xx")).toBeUndefined();
+    expect(DataUtils.getPropertyValue(data, "xx")).toBeUndefined();
+
+    let d: any[] = [];
+    expect(DataUtils.getProperty(d, "xx")).toBeUndefined();
+    expect(DataUtils.getPropertyValue(d, "xx")).toBeUndefined();
+    d = [{idShort: "xx"}, {idShort: "yy"}];
+    expect(DataUtils.getProperty(d, "xx")).toBeDefined();
+    expect(DataUtils.getPropertyValue(d, "xx")).toBeUndefined();
+    d = [{idShort: "xx", value:"abc"}, {idShort: "yy", value:"def"}];
+    expect(DataUtils.getProperty(d, "xx")).toBeDefined();
+    expect(DataUtils.getPropertyValue(d, "xx")).toBe("abc");
   });
 
   it('should implement IVML type helpers', () => {
@@ -87,12 +89,29 @@ describe('UtilsService', () => {
     expect(DataUtils.stripGenericType("setOf(setOf(Integer))")).toBe("setOf(Integer)");
   });
 
-  it('should implement IVML type helpers', () => {
+  it('should implement deepCopy', () => {
     let val = {id:"25"};
     let copy = DataUtils.deepCopy(val);
     expect(copy).toBeTruthy();
     expect(copy.id).toBe(val.id);
   });
+
+  it('should implement toBoolean', () => {
+    expect(DataUtils.toBoolean(null)).toBeFalse();
+    expect(DataUtils.toBoolean(undefined)).toBeFalse();
+    expect(DataUtils.toBoolean("text")).toBeFalse();
+    expect(DataUtils.toBoolean("true")).toBeTrue();
+    expect(DataUtils.toBoolean("True")).toBeTrue();
+    expect(DataUtils.toBoolean(true)).toBeTrue();
+    expect(DataUtils.toBoolean("false")).toBeFalse();
+  });
+
+  it('should implement IVML strip languageString language', () => {
+    expect(DataUtils.stripLangStringLanguage("text")).toBe("text");
+    expect(DataUtils.stripLangStringLanguage("text@de")).toBe("text");
+  });
+
+  // -------------------------- retry -----------------------------------
 
   it('should fail 3 times', async() => {
     let count = 0;
