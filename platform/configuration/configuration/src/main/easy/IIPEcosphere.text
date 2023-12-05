@@ -26,3 +26,4 @@ IIPEcosphere::containerTestingMode = Add more testing software into the containe
 IIPEcosphere::forceContainersCreation = Enforce containers creation regardless of the container's fingerprint (default false).
 IIPEcosphere::deviceHeartbeatTimeout = Heartbeat timeout for devices in ms.
 IIPEcosphere::deviceHeartbeatTimeoutDflt = Default heartbeat timeout for devices in ms.
+IIPEcosphere::zipBinaries = Optional switch to enable creation of device platform binaries (default false).

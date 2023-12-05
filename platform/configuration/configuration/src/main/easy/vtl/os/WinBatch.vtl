@@ -1,3 +1,4 @@
+import Basics;
 import JavaOsBasics;
 
 @advice(IIPEcosphere)
@@ -6,7 +7,7 @@ template WinBatch(Configuration config, FileArtifact target, String dir, String 
 	
     def main(Configuration config, FileArtifact target, String dir, String main, Boolean withModuleOpts=true, String addJavaOpts="") {
         IIPEcosphere cfg = config;
-        'java -cp "${dir}/*;common/*" ${javaOpts(cfg, withModuleOpts, addJavaOpts)} ${main} %*'
+        'java -cp @${dir}\\classpath.win ${javaOpts(cfg, withModuleOpts, addJavaOpts)} ${main} %*'
     }
 	
 }

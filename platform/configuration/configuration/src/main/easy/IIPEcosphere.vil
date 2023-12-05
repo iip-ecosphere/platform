@@ -2058,6 +2058,12 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
             Integer svcMemLimit = getIntegerValueSafe(cfg.serviceManager.memLimit, 0);
             Integer cntMgmLimit = getIntegerValueSafe(cfg.containerManager.memLimit, 0);
             generateOsScripts(config, "${target}/ecs", "ecsJars", dfltMain, "IIP-Ecosphere ECSRuntime", "iip-ecsRuntime", "iip-platform.service", addJavaOpts=toJvmMemLimitOpt(max(svcMemLimit, cntMgmLimit)), sysd="${target}/iip-ecs");
+
+            if (getBooleanValueSafe(cfg.zipBinaries, false)) {
+              zip("${target}", "${target}/ecsJars", "${target}/ecs-bin.zip");
+              zip("${target}", "${target}/ecs.*", "${target}/ecs-bin.zip");
+              zip("${target}", "${target}/iip-ecs.service", "${target}/ecs-bin.zip");
+            }
         }
     }
     
@@ -2080,6 +2086,12 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         if (deviceType == defaultDeviceType) {
           generateOsScripts(config, "${target}/ecsServiceMgr", "ecsSvcJars", dfltMain, "IIP-Ecosphere Ecs Runtime/Service Manager", "iip-ecsServiceMgr", "", 
             addJavaOpts=toJvmMemLimitOpt(cfg.serviceManager.memLimit), sysd="${target}/iip-ecsServiceMgr");
+
+          if (getBooleanValueSafe(cfg.zipBinaries, false)) {
+            zip("${target}", "${target}/ecsSvcJars", "${target}/ecsSvcMgr-bin.zip");
+            zip("${target}", "${target}/ecsServiceMgr.*", "${target}/ecsSvcMgr-bin.zip");
+            zip("${target}", "${target}/iip-ecsServiceMgr.service", "${target}/ecsSvcMgr-bin.zip");
+          }
         }
     }
     
@@ -2111,6 +2123,11 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         mvn(serviceMgrRoot);
         generateOsScripts(config, "${target}/serviceMgr", "svcJars", dfltMain, "IIP-Ecosphere Service Manager", "iip-serviceMgr", "iip-ecs.service", 
             addJavaOpts=toJvmMemLimitOpt(cfg.serviceManager.memLimit), sysd="${target}/iip-serviceMgr");
+        if (getBooleanValueSafe(cfg.zipBinaries, false)) {
+          zip("${target}", "${target}/svcJars", "${target}/svcMgr-bin.zip");
+          zip("${target}", "${target}/serviceMgr.*", "${target}/svcMgr-bin.zip");
+          zip("${target}", "${target}/iip-serviceMgr*.service", "${target}/svcMgr-bin.zip");
+        }
         
         platformRoot.mkdir();
         p = "${platformRoot}/src/main/resources";
