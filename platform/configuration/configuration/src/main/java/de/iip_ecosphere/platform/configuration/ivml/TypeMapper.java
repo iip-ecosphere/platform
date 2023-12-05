@@ -400,7 +400,7 @@ class TypeMapper {
                 true, false);
             propB.createPropertyBuilder("name")
                 .setValue(Type.STRING, slotName)
-                .setDescription(new LangString(ModelInfo.getCommentSafe(slot), lang))
+                .setDescription(new LangString(lang, ModelInfo.getCommentSafe(slot)))
                 .build();
             propB.createPropertyBuilder("type")
                 .setValue(Type.STRING, IvmlDatatypeVisitor.getUnqualifiedType(slotType))
