@@ -7,7 +7,7 @@ import { Router } from '@angular/router';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import { MAT_PROGRESS_SPINNER_DEFAULT_OPTIONS_FACTORY } from '@angular/material/progress-spinner';
 import { EditorComponent } from '../editor/editor.component';
-import { InputVariable, MTK_compound, MTK_container, MT_metaSize, MT_metaState, MT_metaType, MT_metaTypeKind, MT_varValue, Resource, allMetaTypes, configMetaEntry, editorInput, metaTypes, platformResponse } from 'src/interfaces';
+import { InputVariable, MTK_compound, MTK_container, MT_metaSize, MT_metaType, MT_metaTypeKind, MT_varValue, allMetaTypes, configMetaEntry, editorInput, platformResponse } from 'src/interfaces';
 import { Utils, DataUtils } from 'src/app/services/utils.service';
 
 class RowEntry {
@@ -236,7 +236,6 @@ export class ListComponent extends Utils implements OnInit {
       if (!allMetaTypes.includes(fieldName)) {
         let val: any;
         if (this.isArray(value.value)) {
-          let fieldType = DataUtils.getPropertyValue(value.value, MT_metaType);
           let fieldTypeKind = DataUtils.getPropertyValue(value.value, MT_metaTypeKind);
           if (fieldTypeKind == MTK_container) { //(DataUtils.isIvmlCollection(fieldType)) {
             let fieldSize = DataUtils.getPropertyValue(value.value, MT_metaSize);
@@ -360,7 +359,7 @@ export class ListComponent extends Utils implements OnInit {
             } else if (param[0] == "address") {
               for (let val of row.value) {
                 if (this.isArray(val.value) && val.value[0].value) {
-                  let addressValue = {"value": DataUtils.stripLangStringLanguage(val.value[0].value)}
+                  let addressValue = {"value": DataUtils.getLangStringText(val.value[0].value)}
                   temp.push(addressValue)
                 }
               }
@@ -368,7 +367,7 @@ export class ListComponent extends Utils implements OnInit {
           }
         }      
     }, rowResult => {
-      rowResult.idShort = DataUtils.stripLangStringLanguage(name);
+      rowResult.idShort = DataUtils.getLangStringText(name);
       rowResult.logo = logo;
       rowResult.value = temp; 
       temp = [];

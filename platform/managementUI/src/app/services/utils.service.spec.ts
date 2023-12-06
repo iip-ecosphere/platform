@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 
 import { UtilsService, DataUtils, retry } from './utils.service';
+import { editorInput } from 'src/interfaces';
 
 describe('UtilsService', () => {
 
@@ -38,6 +39,13 @@ describe('UtilsService', () => {
     expect(service.isNonEmptyString(1)).toBeFalsy();
     expect(service.isNonEmptyString("")).toBeFalsy();
     expect(service.isNonEmptyString("abba")).toBeTruthy();
+  });
+
+  it('should implement getValue', () => {
+    let input: editorInput = {value: 10, name:"var", type:"Integer", description: [{language:"de", text: "abc"}]};
+    expect(service.getValue(input)).toBe(10);
+    input.valueTransform = i => i.value + 10;
+    expect(service.getValue(input)).toBe(20);
   });
 
   // -------------------------- Data Utils -----------------------------------
@@ -106,9 +114,20 @@ describe('UtilsService', () => {
     expect(DataUtils.toBoolean("false")).toBeFalse();
   });
 
-  it('should implement IVML strip languageString language', () => {
-    expect(DataUtils.stripLangStringLanguage("text")).toBe("text");
-    expect(DataUtils.stripLangStringLanguage("text@de")).toBe("text");
+  it('should implement IVML langString operations', () => {
+    expect(DataUtils.getLangStringText("text")).toBe("text");
+    expect(DataUtils.getLangStringText("text@de")).toBe("text");
+
+    expect(DataUtils.getLangStringLang("text@de")).toBe("de");
+    expect(DataUtils.getLangStringLang("text")).toBeUndefined();
+
+    expect(DataUtils.composeLangString("text", undefined)).toBe("text");
+    expect(DataUtils.composeLangString("text", "en")).toBe("text@en");
+  });
+
+  it('should implement userLanguage operation', () => {
+    expect(DataUtils.getUserLanguage()).toBeDefined();
+    expect(DataUtils.getUserLanguage().length).toBeGreaterThan(0);
   });
 
   // -------------------------- retry -----------------------------------

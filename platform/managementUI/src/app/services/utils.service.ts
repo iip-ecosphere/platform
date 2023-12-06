@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { editorInput } from 'src/interfaces';
 
 // for naming conventions, keep utility methods here
 /**
@@ -40,6 +41,23 @@ export class Utils {
    */
   public isObject(value: any) {
     return (typeof value === 'object');
+  }
+
+  /**
+   * Returns the value of input considering the value transformation function of input.
+   * 
+   * @param input the input 
+   * @returns the value of input
+   */
+  public getValue(input: editorInput | undefined) {
+    let result = undefined;
+    if (input) {
+      result = input.value;
+      if (input.valueTransform) {
+        result = input.valueTransform(input);
+      }
+    }
+    return result;
   }
 
 }
@@ -168,12 +186,12 @@ export class DataUtils {
   }
 
   /**
-   * Strips the language of an AAS-inspired language string.
+   * Returns the description text of an AAS-inspired language string.
    * 
    * @param text the AAS-inspired language string 
-   * @returns the string within the AAS-inspired language string without language
+   * @returns the description text, i.e., the language indicator stripped off
    */
-  public static stripLangStringLanguage(text: string) {
+  public static getLangStringText(text: string) {
     let result: string = text;
     if (text) {
       const endIndex = text.lastIndexOf('@');
@@ -184,6 +202,56 @@ export class DataUtils {
       }
     }
     return result;
+  }
+
+  /**
+   * Returns the language indicator of an AAS-inspired language string.
+   * 
+   * @param text the AAS-inspired language string 
+   * @returns the language indicator, i.e., the description text stripped off; may be 
+   * undefined if there is no language indicator 
+   */
+  public static getLangStringLang(text: string): string | undefined {
+    let result: string | undefined = text;
+    if (text) {
+      const endIndex = text.lastIndexOf('@');
+      if (endIndex > 0) {
+        result = text.substring(endIndex + 1);
+      } else {
+        result = undefined;
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Composes an AAS-inspired langString from the given parameters.
+   * 
+   * @param text the text/description
+   * @param lang the optional language
+   * @returns the composed language string
+   */
+  public static composeLangString(text: string, lang?: string): string {
+    let result: string = text;
+    if (lang) {
+      result += "@" + lang;
+    }
+    return result;
+  }
+
+  /**
+   * Returns the user language, so far based on the user language of the browser.
+   * 
+   * @returns the user language, "en" as default
+   */
+  public static getUserLanguage(): string {
+    let userLang = navigator.language;
+    if (!userLang) {
+      userLang = "en"
+    } else {
+      userLang = userLang.split('-')[0];
+    }
+    return userLang;
   }
   
   /**

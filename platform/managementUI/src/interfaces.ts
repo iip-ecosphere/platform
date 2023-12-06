@@ -219,16 +219,50 @@ export interface uiGroup {
   toggleOptional?: boolean;
 }
 
+/**
+ * Data structure representing the input to AAS-based editors, sub-editors and editor components.
+ */
 export interface editorInput {
+  /**
+   * Value to be displayed by the editor. May be a primitive value (string, boolean), an object or an array of objects.
+   */
   value: any;
-  type: string;
-  name: string;
-  description: [{language: string, text: string}];
-  refTo?: boolean;
-  multipleInputs?: boolean;
-  metaTypeKind?: number;
-  meta?: configMetaEntry;
+  /**
+   * Optional language of the value if the value is an AasLocalizedString. 
+   */
+  valueLang?: string;
 
+  valueTransform?: (x: editorInput) => any;
+
+  /**
+   * The (resolved) IVML type of the value from the model.
+   */
+  type: string;
+  /**
+   * The IVML variable name as declared in the model.
+   */
+  name: string;
+  /**
+   * Description of the IVML variable given in terms of an AAS LangString.
+   */
+  description: [{language: string, text: string}];
+  /**
+   * Does the variable/value represent an IVML reference. Then the value/name is the resolved IVML variable.
+   */
+  refTo?: boolean;
+  /**
+   * Shall the editor represent multiple selectable/modifiable inputs.
+   */
+  multipleInputs?: boolean;
+  /**
+   * The optional metaTypeKind, a categorization of the IVML type as provided by the platform. One of the MTK_constants 
+   * exported from this unit.
+   */
+  metaTypeKind?: number;
+  /**
+   * The associated AAS meta/type entry.
+   */
+  meta?: configMetaEntry;
 }
 
 export interface configMetaContainer {

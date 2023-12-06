@@ -33,7 +33,6 @@ export class InputRefSelectComponent extends Utils implements OnInit {
   }
 
   private init(type: string) {
-console.log("INPUT-REF " + type);    
     if(type) {
       if(type.indexOf('setOf') >= 0) {
         this.isSetOf = true;

@@ -3,7 +3,7 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { ApiService } from 'src/app/services/api.service';
 import { IvmlFormatterService } from 'src/app/services/ivml-formatter.service';
 import { Resource, uiGroup, editorInput, configMetaContainer, configMetaEntry, ResourceAttribute, InputVariable, metaTypes, 
-  MTK_primitive, MTK_derived, MTK_enum, MTK_compound, MT_metaRefines, MT_metaTypeKind, MT_metaAbstract, primitiveDataTypes, MT_metaDefault } from 'src/interfaces';
+  MTK_primitive, MTK_derived, MTK_enum, MTK_compound, MT_metaRefines, MT_metaTypeKind, MT_metaAbstract, primitiveDataTypes, MT_metaDefault, ivmlEnumeration } from 'src/interfaces';
 import { Utils, DataUtils } from 'src/app/services/utils.service';
 
 @Component({
@@ -338,15 +338,20 @@ export class EditorComponent extends Utils implements OnInit {
                 ivmlValue = DataUtils.getPropertyValue(input.value, MT_metaDefault);
               }
             }
-            if (editorInput.multipleInputs || editorInput.metaTypeKind === MTK_enum) {
+            if (editorInput.multipleInputs) {
               initial = ivmlValue
+            } else if (editorInput.metaTypeKind === MTK_enum) {
+              initial = ivmlValue
+              editorInput.valueTransform = input => ivmlEnumeration + (input.type || "") + '.' + input.value;
             } else if (editorInput.type === 'Boolean') {
               initial = String(ivmlValue).toLowerCase() === 'true';
             } else if (editorInput.metaTypeKind === MTK_compound && !editorInput.multipleInputs) {
               initial = ivmlValue; // input comes as object
             } else {
               if (typeGenerics == "AasLocalizedString") {
-                initial = DataUtils.stripLangStringLanguage(ivmlValue); // value without language
+                initial = DataUtils.getLangStringText(ivmlValue);
+                editorInput.valueLang = DataUtils.getLangStringLang(ivmlValue);
+                editorInput.valueTransform = input => DataUtils.composeLangString(input.value, DataUtils.getUserLanguage());
               } else {
                 initial = ivmlValue; // input is just the value
               }
@@ -417,8 +422,13 @@ export class EditorComponent extends Utils implements OnInit {
     uiGroup.toggleOptional = !uiGroup.toggleOptional;
   }
 
+  /**
+   * Called when creating a new variable is requested from the editor.
+   */
   public async create() {
-    const creationData = this.prepareCreation();
+    let creationData: Record<string, any> = {};
+    this.showInputs = false;
+    this.transferUiGroups(this.uiGroups, creationData);
     if (this.selectedType?.idShort == "Application") {
       this.feedback = await this.ivmlFormatter.createApp(this.variableName, creationData)
     } else {
@@ -427,84 +437,61 @@ export class EditorComponent extends Utils implements OnInit {
     }
   }
 
-  public async edit() {
-    // TODO ivmlFormatter set values
-  }
-
+  /**
+   * Called to close the editor.
+   */
   public close() {
     this.dialog.close();
   };
 
-  public prepareCreation() {
-    let complexType: Record<string, any> = {};
-    this.showInputs = false;
-    for(let uiGroup of this.uiGroups) {
-
-      for(let input of uiGroup.inputs) {
-        if(input.meta){
-          complexType[input.name] = input.value;
-        }
-
-        if(primitiveDataTypes.includes(input.type)) {
-          complexType[input.name] = input.value
-        }
-
-      }
-      for(let input of uiGroup.optionalInputs) {
-        if(input.meta){
-          complexType[input.name] = input.value;
-        }
-      }
-      for(let input of uiGroup.fullLineInputs) {
-        if(input.meta){
-          complexType[input.name] = input.value;
-        }
-      }
-      for(let input of uiGroup.fullLineOptionalInputs) {
-        if(input.meta){
-          complexType[input.name] = input.value;
-        }
-      }
-    }
-    return complexType;
-  }
-
-  public addType() {
+  /**
+   * Called from the editor to save the entered values into type.value.
+   */
+  public async save() {
     let complexType: Record<string, any> = {};
 
-    if(this.type) {
-      for(let uiGroup of this.uiGroups) {
-        for(let input of uiGroup.inputs) {
-          if(input.meta){
-            complexType[input.name] = input.value;
-          }
-        }
-        for(let input of uiGroup.optionalInputs) {
-          if(input.meta){
-            complexType[input.name] = input.value;
-          }
-        }
-        for(let input of uiGroup.fullLineInputs) {
-          if(input.meta){
-            complexType[input.name] = input.value;
-          }
-        }
-        for(let input of uiGroup.fullLineOptionalInputs) {
-          if(input.meta){
-            complexType[input.name] = input.value;
-          }
-        }
-      }
+    if (this.type) {
+      this.transferUiGroups(this.uiGroups, complexType);
       if(this.type.multipleInputs) {
         this.type.value.push(complexType);
       } else {
-        this. type.value = complexType;
+        this.type.value = complexType;
       }
-
     }
     this.dialog.close();
   }
 
+  /**
+   * Transfers all inputs from uiGroups to result.
+   * Calls {@link this.transferInputs}.
+   * 
+   * @param uiGroups the UI groups 
+   * @param result the results object to be modified as a side effect
+   */
+  private transferUiGroups(uiGroups: uiGroup[], result: Record<string, any>) {
+    for (let uiGroup of this.uiGroups) {
+      this.transferInputs(uiGroup.inputs, result);
+      this.transferInputs(uiGroup.optionalInputs, result);
+      this.transferInputs(uiGroup.fullLineInputs, result);
+      this.transferInputs(uiGroup.fullLineOptionalInputs, result);
+    }
+  }
 
+  /**
+   * Transfers the values in the given inputs into properties of result.
+   * Calls {@link this.getValue}.
+   * 
+   * @param inputs the editor inputs to process 
+   * @param result the results object to be modified as a side effect
+   */
+  private transferInputs(inputs: editorInput[], result: Record<string, any>) {
+    for (let input of inputs) {
+      if (input.meta){
+        result[input.name] = this.getValue(input);
+      } else if (primitiveDataTypes.includes(input.type)) { // was only in prepareCreation and only for uiGroup.inputs
+        result[input.name] = this.getValue(input);
+      }
+    }
+  }
 
 }
