@@ -106,7 +106,7 @@
               <app-boolean-dropdown [input]="input"></app-boolean-dropdown>
             </ng-template>
             <ng-template #enumCase>
-              <app-enum-dropdown [meta] ="metaBackup" [input] = "input"></app-enum-dropdown>
+              <app-enum-dropdown [meta]="metaBackup" [input]="input"></app-enum-dropdown>
             </ng-template>
         </mat-card>
         <div>
@@ -200,7 +200,7 @@
     color="success" (click)="create()" disable>Create</button>
     <ng-template #addButton>
       <button mat-raised-button class="button"
-      color="success" (click)="addType()">Save</button>
+      color="success" (click)="save()">Save</button>
     </ng-template>
 
 </div>

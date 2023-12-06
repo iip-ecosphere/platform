@@ -10,7 +10,6 @@ export class EnumDropdownComponent implements OnInit {
 
   @Input() input: editorInput | undefined
   @Input() meta: Resource | undefined
-  @Output() resultEmitter = new EventEmitter<string>();
 
   enum: string[] = [];
   selected: string = "";
@@ -35,11 +34,6 @@ export class EnumDropdownComponent implements OnInit {
         }
       }
     }
-  }
-
-  selectionChanged(item: any) {
-    let type = this.input?.type || "";
-    this.resultEmitter.emit(ivmlEnumeration + type + '.' + item);
   }
 
 }

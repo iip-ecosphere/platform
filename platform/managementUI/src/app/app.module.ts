@@ -49,7 +49,6 @@ import { BooleanDropdownComponent } from './components/editor/inputControls/bool
 import { SubeditorButtonComponent } from './components/editor/inputControls/subeditor-button/subeditor-button.component';
 import { MeshFeedbackComponent } from './components/flowchart/feedback/mesh-feedback/mesh-feedback.component';
 
-
 @NgModule({
   declarations: [
     AppComponent,
