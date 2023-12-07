@@ -4,7 +4,7 @@ cd %~dp0
 setlocal ENABLEDELAYEDEXPANSION
 
 echo "Oktoflow platform installation (Windows)"
-echo "For installing prerequisites, administrator permissions may be required!"
+echo "For installing prerequisites or Angular, administrator permissions may be required!"
 
 REM Check current Docker 
 
@@ -314,6 +314,7 @@ call mvn install -Diip.easy.tracing=TOP
 
 REM Angular version check missing
 echo "To use the management UI for the platform, you should install angular version 14."
+echo "This step requires administrator permissions."
 set /P c=Do you want to continue with the Angular installation (else terminate)? [y/n]
 if /I "%c%" EQU "N" goto :installEndHint
 if /I "%c%" EQU "Y" goto :installAngular
