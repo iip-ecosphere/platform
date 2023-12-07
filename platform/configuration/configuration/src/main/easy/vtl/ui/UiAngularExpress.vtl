@@ -9,6 +9,7 @@ template UiAngularExpress(IIPEcosphere config, FileArtifact target) {
         'const express = require("express");
         const path = require("path");
         const cors = require("cors");
+        const fs = require("fs");
         const app = express(),
               bodyParser = require("body-parser");
               port = ${port};
@@ -24,6 +25,10 @@ template UiAngularExpress(IIPEcosphere config, FileArtifact target) {
                file = path.join(`${config.artifactsFolder}`, pathSuffix);
           } else {
                file = path.join(__dirname, `${config.artifactsFolder}`, pathSuffix);
+               // we start this in mgtUI, line above is legacy
+               if (!fs.existsSync(file)) {
+                   file = path.join(__dirname, '..', `${config.artifactsFolder}`, pathSuffix);
+               }               
           }
           res.download(file);
         });
