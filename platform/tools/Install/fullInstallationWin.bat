@@ -326,9 +326,9 @@ echo "Installing node.js. This may take a while..."
 node-v16.10.0-x64.msi
 setx Path "%Path%;C:\Program Files\nodejs"
 SET Path=%Path%;C:\Program Files\nodejs
-npm install -g @angular/cli@14.2.11
-npm install -g express@4.18.1
-npm install -g cors@2.8.5
+call npm install -g @angular/cli@14.2.11
+call npm install -g express@4.18.1
+call npm install -g cors@2.8.5
 
 :installEndHint
 
