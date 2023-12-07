@@ -137,9 +137,9 @@ goto :answerJava
 
 curl https://download.java.net/openjdk/jdk13/ri/openjdk-13+33_windows-x64_bin.zip -o openjdk-13+33_windows-x64_bin.zip
 tar xzpvf openjdk-13+33_windows-x64_bin.zip
-setx /M JAVA_HOME "%cd%\jdk-13"
+setx JAVA_HOME "%cd%\jdk-13"
 SET JAVA_HOME=%cd%\jdk-13
-setx /M Path "%Path%;%JAVA_HOME%\bin"
+setx Path "%Path%;%JAVA_HOME%\bin"
 SET Path=%Path%;%JAVA_HOME%\bin
 netsh advfirewall firewall add rule name="Java" dir=in action=allow program="%JAVA_HOME%\bin\java.exe" enable=yes
 
@@ -164,9 +164,9 @@ goto :answerMaven
 
 curl https://archive.apache.org/dist/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.zip -o apache-maven-3.6.3-bin.zip
 tar xzpvf apache-maven-3.6.3-bin.zip
-setx /M MAVEN_HOME "%cd%\apache-maven-3.6.3"
+setx MAVEN_HOME "%cd%\apache-maven-3.6.3"
 SET MAVEN_HOME=%cd%\apache-maven-3.6.3
-setx /M Path "%Path%;%MAVEN_HOME%\bin"
+setx Path "%Path%;%MAVEN_HOME%\bin"
 SET Path=%Path%;%MAVEN_HOME%\bin
 
 :skipMaven
@@ -324,7 +324,7 @@ if /I "%c%" EQU "Y" goto :installAngular
 curl https://nodejs.org/download/release/v16.10.0/node-v16.10.0-x64.msi -o node-v16.10.0-x64.msi
 echo "Installing node.js. This may take a while..."
 node-v16.10.0-x64.msi
-setx /M Path "%Path%;C:\Program Files\nodejs"
+setx Path "%Path%;C:\Program Files\nodejs"
 SET Path=%Path%;C:\Program Files\nodejs
 npm install -g @angular/cli@14.2.11
 npm install -g express@4.18.1
@@ -333,7 +333,7 @@ npm install -g cors@2.8.5
 :installEndHint
 
 echo "The following commands were created in Platform\Install\gen:"
-echo "- broker.bat starts the configured communication broker"
+echo "- broker\broker.bat starts the configured communication broker (cd needed)"
 echo "- platform.bat starts the central platform services"
 echo "- mgtUi.bat starts the Angular-based management UI (Angular required, http://localhost:4200)"
 echo "- per device that shall execute services, either ECS-Runtime and service manager or the combined"

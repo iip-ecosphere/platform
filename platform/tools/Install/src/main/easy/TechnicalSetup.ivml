@@ -94,8 +94,9 @@ project TechnicalSetup {
     //sharedArtifact = "de.iip-ecosphere.platform:apps.AppInterfacesSimpleMeshInstall:" + iipVer; // for testing all-in-one
 
     //setup instDir, javaExe if you plan to use the Linux service descriptors - list variables in freeze block
-    modelBaseFolder = "../src/main/easy"; // base folder for metaModel folder and configFolder
-    metaModelFolder = "../target/easy";
+    modelBaseFolder = ".."; // base folder for metaModel folder and configFolder
+    metaModelFolder = "target/easy";
+    configFolder = "src/main/easy"
     artifactsUriPrefix = "http://" + platformServer + ":" + toString(mgtUiPort) + "/download";    
 
     // ------------ freezing ------------------

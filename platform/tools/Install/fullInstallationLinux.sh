@@ -362,7 +362,7 @@ else
 fi
 
 echo "The following commands were created in Platform\Install\gen:"
-echo "- broker.sh starts the configured communication broker"
+echo "- broker/broker.sh starts the configured communication broker (cd needed)"
 echo "- platform.sh starts the central platform services"
 echo "- mgtUi.sh starts the Angular-based management UI (Angular required, http://localhost:4200)"
 echo "- per device that shall execute services, either ECS-Runtime and service manager or the combined"
