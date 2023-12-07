@@ -84,7 +84,9 @@ project TechnicalSetup {
     };
     
     // ---------- generation setup ------------
-    
+
+    zipBinaries = true;
+        
     containerGeneration = false;
     platformContainerGeneration = true;
     sharedInterfaces = true;
@@ -120,6 +122,7 @@ project TechnicalSetup {
         managementUi;
         artifactsFolder;
         artifactsUriPrefix;
+        zipBinaries;
         containerGeneration;
         platformContainerGeneration;
         .; // every variable declared in this project
