@@ -7,6 +7,7 @@ project TechnicalSetup {
     annotate BindingTime bindingTime = BindingTime::compile to .;
 
     String platformServer = "147.172.178.145";
+    Integer mgtUiPort = 4200;
 
     // ------------ component setup ------------------
 
@@ -80,7 +81,7 @@ project TechnicalSetup {
     // ------------------------- UI -------------------------------
     
     managementUi = AngularManagementUI {
-        port = 4200
+        port = mgtUiPort
     };
     
     // ---------- generation setup ------------
@@ -95,7 +96,7 @@ project TechnicalSetup {
     //setup instDir, javaExe if you plan to use the Linux service descriptors - list variables in freeze block
     modelBaseFolder = "../src/main/easy"; // base folder for metaModel folder and configFolder
     metaModelFolder = "../target/easy";
-    artifactsUriPrefix = "http://" + platformServer + ":" + toString(managementUi.port) + "/download";    
+    artifactsUriPrefix = "http://" + platformServer + ":" + toString(mgtUiPort) + "/download";    
 
     // ------------ freezing ------------------
     
