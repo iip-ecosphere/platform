@@ -2036,6 +2036,12 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
 
         brokerRoot.mkdir();
         generateBrokerScripts(cfg, cfg.transportProtocol);
+
+        if (getBooleanValueSafe(cfg.zipBinaries, false)) {
+          zip("${target}", "${brokerRoot}/brokerJars", "${target}/broker-bin.zip");
+          zip("${target}", "${brokerRoot}/broker.*", "${target}/broker-bin.zip");
+          zip("${target}", "${brokerRoot}/iip-broker.service", "${target}/broker-bin.zip");
+        }
     }
     
     generateEcsRuntime(Path path, Configuration config, EcsDevice deviceType) = {
