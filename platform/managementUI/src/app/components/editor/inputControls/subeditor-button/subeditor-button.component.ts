@@ -1,7 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { Resource, ResourceAttribute, editorInput, metaTypes } from 'src/interfaces';
+import { MT_metaAbstract, MT_metaRefines, Resource, ResourceAttribute, editorInput, metaTypes } from 'src/interfaces';
 import { EditorComponent } from '../../editor.component';
+import { DataUtils } from 'src/app/services/utils.service';
 
 @Component({
   selector: 'app-subeditor-button',
@@ -44,13 +45,12 @@ export class SubeditorButtonComponent implements OnInit {
 
   public validateEditorInputType(type:editorInput) {
     if(this.meta && this.meta.value) {
-      let typeMeta = this.meta.value.find(item => item.idShort === this.cleanTypeName(type.type));
-
+      let typeMeta = DataUtils.getProperty(this.meta.value, DataUtils.stripGenericType(type.type));
       if(!typeMeta) {
         this.errorMsg = 'ERROR: Metadata not found in Configuration'
         return true;
       } else {
-        const Abstract = typeMeta.value.find( (item: { idShort: string; }) => item.idShort === "metaAbstract");
+        const Abstract = DataUtils.getProperty(typeMeta.value, MT_metaAbstract);
         if(Abstract.value && typeMeta.idShort) {
           this.getRefinedTypes(typeMeta.idShort);
           return false;
@@ -68,10 +68,10 @@ export class SubeditorButtonComponent implements OnInit {
     if(this.meta && this.meta.value) {
       let refinedTypes = [];
       for(const type of this.meta.value) {
-        const refined = type.value.find((item: { idShort: string; }) => item.idShort === 'metaRefines');
+        const refined = DataUtils.getProperty(type.value, MT_metaRefines);
         if(refined && refined.value != '') {
           if(searchTerm === refined.value) {
-            const abstract = type.value.find((item: { idShort: string; }) => item.idShort === 'metaAbstract');
+            const abstract = DataUtils.getProperty(type.value, MT_metaAbstract);
             if(abstract && abstract.value && type.idShort) {
               this.getRefinedTypes(type.idShort);
             } else {
@@ -85,16 +85,6 @@ export class SubeditorButtonComponent implements OnInit {
       } else {
         this.refinedTypes = this.refinedTypes.concat(refinedTypes);
       }
-    }
-  }
-
-  private cleanTypeName(type: string) {
-    const startIndex = type.lastIndexOf('(') + 1;
-    const endIndex = type.indexOf(')');
-    if(endIndex > 0){
-      return type.substring(startIndex, endIndex);
-    } else {
-      return type;
     }
   }
 

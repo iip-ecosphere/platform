@@ -7,7 +7,7 @@ import { Router } from '@angular/router';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import { MAT_PROGRESS_SPINNER_DEFAULT_OPTIONS_FACTORY } from '@angular/material/progress-spinner';
 import { EditorComponent } from '../editor/editor.component';
-import { InputVariable, MTK_compound, MTK_container, MT_metaSize, MT_metaType, MT_metaTypeKind, MT_varValue, allMetaTypes, configMetaEntry, editorInput, platformResponse } from 'src/interfaces';
+import { InputVariable, MTK_compound, MTK_container, MT_metaSize, MT_metaType, MT_metaTypeKind, MT_metaVariable, MT_varValue, allMetaTypes, configMetaEntry, editorInput, platformResponse } from 'src/interfaces';
 import { Utils, DataUtils } from 'src/app/services/utils.service';
 
 class RowEntry {
@@ -172,52 +172,43 @@ export class ListComponent extends Utils implements OnInit {
 
   // Filter ---------------------------------------------------------------------------
 
+  /**
+   * Filters the row data/display data for the setup category.
+   */
   public filterSetup() {
-    let result = []
-
-    for (let tableRow of this.filteredData) {
-      let temp: any = []
-      let rowValues = tableRow.value[0].value
-      // string
-      let type
-      let val
-      if ((typeof rowValues) == "string") {
-        for (let rowValues of tableRow.value) {
-          if (rowValues.idShort == MT_varValue) {
-            let new_rowValue = {"value": rowValues.value}
-            val = rowValues.value
-            temp.push(new_rowValue)
-          } else if (rowValues.idShort == MT_metaType) {
-            type = rowValues.value
-          }
+    let temp : any = [];
+    let val: any;
+    this.filteredData = this.createRows(this.filteredData, (row, rowType) => {
+      let goOn = false;
+      if ((typeof rowType) == "string") {
+        if (row.idShort == MT_varValue) {
+          let new_rowValue = {"value": row.value}
+          val = row.value
+          temp.push(new_rowValue)
         }
-      // number
-      } else if ((typeof rowValues) == "number") {
-        for (let rowValues of tableRow.value) {
-          if (rowValues.idShort == MT_metaType) {
-            type = rowValues.value
-          } else if (rowValues.idShort == MT_varValue) {
-            val = rowValues.value
-          }
+      } else if ((typeof rowType) == "number") {
+        if (row.idShort == MT_varValue) {
+          val = row.value
         }
         // AAS  startup timeout
-        let new_rowValue = {"value": rowValues  + " sec"} // TODO is it true?
+        let new_rowValue = {"value": rowType  + " sec"} // TODO is it true?
         temp.push(new_rowValue)
-      // object
       } else {
-        for (let rowValues of tableRow.value) {
-          if (rowValues.idShort == MT_metaType) {
-            type = rowValues.value
-          } else if (rowValues.idShort == MT_varValue) {
-            val = rowValues.value
-          }
-          this.composeValueByFilter(rowValues, temp, this.paramToDisplay);
-        }
+        goOn = true;
+        /*if (row.idShort == MT_varValue) {
+          val = row.value
+        }*/
+        this.composeValueByFilter(row, temp, this.paramToDisplay);
       }
-      let row = {idShort: tableRow.idShort, value: temp, varName: tableRow.idShort, varType: type, varValue: val}
-      result.push(row)
-    }
-    this.filteredData = result
+      return goOn;
+    }, rowResult => {
+      if (val) { // do this only for string and number, do not override compound/array values
+        rowResult.varValue = val;
+      }
+      rowResult.value = temp; 
+      temp = [];  
+      val = undefined;
+    });
   }
 
   /**
@@ -229,11 +220,11 @@ export class ListComponent extends Utils implements OnInit {
    * @param top is this call a top level call or a nested recursive call
    * @param rowFn additional function to apply on row data to extract further data
    */
-  createRowValue(values: any, result: any, top:boolean, rowFn: (row:any) => void) {
+  createRowValue(values: any, result: any, top:boolean, rowFn: (row:any) => boolean) {
     for (let value of values) {
       let fieldName = value.idShort;
-      rowFn(value);
-      if (!allMetaTypes.includes(fieldName)) {
+      let goOn = rowFn(value);
+      if (goOn && !allMetaTypes.includes(fieldName)) {
         let val: any;
         if (this.isArray(value.value)) {
           let fieldTypeKind = DataUtils.getPropertyValue(value.value, MT_metaTypeKind);
@@ -246,7 +237,7 @@ export class ListComponent extends Utils implements OnInit {
                 let fName = fieldName + "__" + i + "_";
                 let fProp = DataUtils.getProperty(value.value, fName);
                 if (fProp && fProp.value) {
-                  this.createRowValue(fProp.value, fVal, false, v => {});
+                  this.createRowValue(fProp.value, fVal, false, v => true);
                   let fId = fVal["id"] || fVal["name"] || String(i);
                   fVal["idShort"] = fId;
                   val.push(fVal);
@@ -255,7 +246,7 @@ export class ListComponent extends Utils implements OnInit {
             }
           } else if (fieldTypeKind == MTK_compound) {
             val = {};
-            this.createRowValue(value.value, val, false, v => {});
+            this.createRowValue(value.value, val, false, v => true);
           } else {
             val = DataUtils.getPropertyValue(value.value, MT_varValue);
           }
@@ -278,16 +269,19 @@ export class ListComponent extends Utils implements OnInit {
    * @param resultFn customizing function to finalize the row result initialized with default information
    * @returns the data structure as nesting of arrays, objects and values
    */
-  createRows(data: any, rowFn: (row: any) => void, resultFn: (rowResult: RowEntry) => void) {
+  createRows(data: any, rowFn: (row: any, rowType: any) => boolean, resultFn: (rowResult: RowEntry) => void) {
     let result = []
     for (let tableRow of data) {
       let val : any = [];
-      let rowEntry = new RowEntry({idShort: tableRow.idShort, varName: tableRow.idShort, varValue: val});
+      let varName = DataUtils.getPropertyValue(tableRow.value, MT_metaVariable) || tableRow.idShort;
+      let rowEntry = new RowEntry({idShort: tableRow.idShort, varName: varName, varValue: val});
+      let rowType = tableRow.value[0].value
       this.createRowValue(tableRow.value, val, true, row => {
-        rowFn(row);
+        let result = rowFn(row, rowType);
         if (row.idShort == MT_metaType) {
           rowEntry.varType = row.value
-        } 
+        }
+        return result;
       });
       rowEntry.varValue = val;
       resultFn(rowEntry);
@@ -296,34 +290,45 @@ export class ListComponent extends Utils implements OnInit {
     return result;
   }
 
+  /**
+   * Filters the row data/display data for the types category.
+   */
   public filterTypes() {
-    this.filteredData = this.createRows(this.filteredData, row => {}, rowResult => {});
+    this.filteredData = this.createRows(this.filteredData, (row, rowType) => true, rowResult => {});
   }
 
+  /**
+   * Filters the row data/display data for the dependencies category.
+   */
   public filterDependencies() {
     let temp : any = [];
-    this.filteredData = this.createRows(this.filteredData, row => {
+    this.filteredData = this.createRows(this.filteredData, (row, rowType) => {
       if (row.idShort == "version") {
         let new_value = DataUtils.getPropertyValue(row.value, this.varValue);
         if(new_value != "") {
           temp.push({ "value":  "Version: " + new_value})
         }
       }
+      return true;
     }, rowResult => {
       rowResult.value = temp; 
       temp = [];
     });
   }
 
+  /**
+   * Filters the row data/display data for the constants category.
+   */
   public filterConstants() {
     let temp : any = [];
     let val: any;
-    this.filteredData = this.createRows(this.filteredData, row => {
+    this.filteredData = this.createRows(this.filteredData, (row, rowType) => {
       if (row.idShort == this.varValue) {
         let new_rowValue = {"value": row.value};
         temp.push(new_rowValue);
         val = row.value;
       }
+      return true;
     }, rowResult => {
       rowResult.value = temp; 
       temp = [];  
@@ -331,41 +336,49 @@ export class ListComponent extends Utils implements OnInit {
     });
   }
 
+  /**
+   * Filters the row data/display data for the meshes category.
+   */
   public filterMeshes() {
     let temp : any = [];
-    this.filteredData = this.createRows(this.filteredData, row => {
+    this.filteredData = this.createRows(this.filteredData, (row, rowType) => {
       this.composeValueByFilter(row, temp, this.paramToDisplay);
+      return true;
     }, rowResult => {
       rowResult.value = temp; 
       temp = [];  
     });
   }
 
+  /**
+   * Filters the row data/display data for the manufacturer category.
+   */
   public filterManufacturer() {
     let temp : any = [];
     let name: any;
     let logo: any = null;
-    this.filteredData = this.createRows(this.filteredData, row => {
+    this.filteredData = this.createRows(this.filteredData, (row, rowType) => {
       if (row.idShort == "manufacturerName") {
         name = row.value[0].value
       }
       for (let param of this.paramToDisplay) {
-          if (row.idShort == param[0]) {
-            if (param[0] == "manufacturerLogo") {
-              let logoValue = row.value[0].value
-              if(logoValue !== "") {
-                logo = this.imgPath + logoValue
-              }
-            } else if (param[0] == "address") {
-              for (let val of row.value) {
-                if (this.isArray(val.value) && val.value[0].value) {
-                  let addressValue = {"value": DataUtils.getLangStringText(val.value[0].value)}
-                  temp.push(addressValue)
-                }
+        if (row.idShort == param[0]) {
+          if (param[0] == "manufacturerLogo") {
+            let logoValue = row.value[0].value
+            if(logoValue !== "") {
+              logo = this.imgPath + logoValue
+            }
+          } else if (param[0] == "address") {
+            for (let val of row.value) {
+              if (this.isArray(val.value) && val.value[0].value) {
+                let addressValue = {"value": DataUtils.getLangStringText(val.value[0].value)}
+                temp.push(addressValue)
               }
             }
           }
-        }      
+        }
+      }
+      return true;      
     }, rowResult => {
       rowResult.idShort = DataUtils.getLangStringText(name);
       rowResult.logo = logo;
@@ -379,14 +392,18 @@ export class ListComponent extends Utils implements OnInit {
     return str.replace(char, '')
   }
 
+  /**
+   * Filters the row data/display data for the services, servers and apps category.
+   */
   public filterServicesServersApps() {
     let temp : any = [];
     let name: any;
-    this.filteredData = this.createRows(this.filteredData, value => {
-      if (value.idShort == "id") {
-        name = value.value[0].value
+    this.filteredData = this.createRows(this.filteredData, (row, rowType) => {
+      if (row.idShort == "id") {
+        name = row.value[0].value
       } 
-      this.composeValueByFilter(value, temp, this.paramToDisplay);
+      this.composeValueByFilter(row, temp, this.paramToDisplay);
+      return true;
     }, r => {
       r.idShort = name;
       r.value = temp; 
@@ -394,7 +411,14 @@ export class ListComponent extends Utils implements OnInit {
     });
   }
 
-  private composeValueByFilter(value: any, result: any, filter: any[]) {
+  /**
+   * Composes a display value by filter.
+   * 
+   * @param value the AAS value to take as basis 
+   * @param result the result array containing the lines to display
+   * @param filter  the filtering idShorts
+   */
+  private composeValueByFilter(value: any, result: any[], filter: any[]) {
     for (let param of filter) {
       if (value.idShort == param[0]) {
         let tmp = DataUtils.getPropertyValue(value.value, this.varValue);
@@ -406,8 +430,13 @@ export class ListComponent extends Utils implements OnInit {
 
   // ---- buttons ---------------------------------------------------------------
 
+  /**
+   * Called when an edit button in a row is pressed.
+   * 
+   * @param item the editor row item where the button was pressed  
+   */
   public edit(item: any) {
-    if(this.currentTab === "Meshes") { // TODO
+    if (this.currentTab === "Meshes") {
       this.router.navigateByUrl('flowchart/' + item.idShort);
     } else {
       let dialogRef = this.dialog.open(EditorComponent, {
@@ -524,7 +553,7 @@ export class ListComponent extends Utils implements OnInit {
 
   // ---- icons ------------------------------------------------------------------
 
-  icons = [
+  /*icons = [ // TODO too specific, used at all=
     ["opc.png", ["PlcNextOpcConn", "PlcBeckhoffOpcConn", "DriveBeckhoffOpcConn"]],
     ["java.png", ["CamSource", "AppAas", "ActionDecider", "DriveAppAas"]],
     ["py.png", ["PythonAi", "DriveLenzePythonAi"]],
@@ -539,8 +568,7 @@ export class ListComponent extends Utils implements OnInit {
       icon_path = "../../../assets/" + row[0]
     }
     return icon_path
-  }
-
+  }*/
 
    /*
   public getId(serviceValue: any[]) {
