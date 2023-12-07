@@ -27,7 +27,7 @@ template UiAngularExpress(IIPEcosphere config, FileArtifact target) {
                file = path.join(__dirname, `${config.artifactsFolder}`, pathSuffix);
                // we start this in mgtUI, line above is legacy
                if (!fs.existsSync(file)) {
-                   file = path.join(__dirname, '..', `${config.artifactsFolder}`, pathSuffix);
+                   file = path.join(__dirname, `..`, `${config.artifactsFolder}`, pathSuffix);
                }               
           }
           res.download(file);
