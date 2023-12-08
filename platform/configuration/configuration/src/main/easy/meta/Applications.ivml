@@ -127,7 +127,7 @@ project Applications {
    // data ignored for now, only tracing   
    compound TraceToAasService refines CompleteService {
        ServiceKind kind = ServiceKind::SINK_SERVICE;
-       IipVersion ver = "0.1.0";
+       OktoVersion ver = "0.1.0";
        String artifact = ""; // ships with platform in service environment
        refTo(Application) application;
        TraceToAasOutTransport outTransport = null;
@@ -161,7 +161,7 @@ project Applications {
        NonEmptyString name;
        refTo(Application) application;
        NonEmptyString id;
-       IipVersion ver = "0.0.0";
+       OktoVersion ver = "0.0.0";
        String description = "";
        sequenceOf(ServiceAssignment) assignments = {};
        sequenceOf(EnsembleSpec) ensembles;

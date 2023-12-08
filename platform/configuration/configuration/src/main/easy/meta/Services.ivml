@@ -168,7 +168,7 @@ project Services {
            Parameters parameter = {};
            refTo(Server) server;
        }
-       assign (uiGroup = UiInivisibleGroup) to {
+       assign (uiGroup = UiInvisibleGroup) to {
            setOf(refTo(EcsDevice)) requires;
            assign(bindingTime = BindingTime::runtimeEnact) to {
                 refTo(EcsDevice) allocatedTo;
@@ -198,7 +198,7 @@ project Services {
    abstract compound Service refines ServiceBase {
        String description = ""; // TODO Constraint: must be configured
        assign(semanticId = Eclass_Property_swVersion) to {
-           IipVersion ver;
+           OktoVersion ver;
        }
        Boolean deployable;
        setOf(String) artifacts = {};
@@ -282,7 +282,7 @@ project Services {
         NonEmptyString id;
         String description = ""; // TODO Constraint: must be configured
         assign(semanticId = Eclass_Property_swVersion) to {
-            IipVersion ver;
+            OktoVersion ver;
         }
         NonEmptyString host = "127.0.0.1";
         NonEmptyEphemeralPort port;

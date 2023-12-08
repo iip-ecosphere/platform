@@ -15,7 +15,7 @@ project ServicePartFlowerAI {
    
    compound FlowerFederatedAiService refines PythonService {
        ServiceKind kind = ServiceKind::TRANSFORMATION_SERVICE;
-       IipVersion ver = "1.3.0";
+       OktoVersion ver = "1.3.0";
        refTo(FlowerAiFramework) framework = refBy(TensorFlowFlowerAiFramework);
        refTo(FlowerAiClient) client = refBy(NumpyFlowerAiClient);
        refTo(FlowerFederatedAiServer) server;

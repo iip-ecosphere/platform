@@ -11,7 +11,7 @@ project DataTypes {
     typedef NonEmptyEphemeralPort EphemeralPort with (isDefined(NonEmptyEphemeralPort));
     typedef Port EphemeralPort with (Port >= 0);
     typedef NonEmptyPort Port with (isDefined(NonEmptyPort));
-    typedef IipVersion NonEmptyString with (matches(IipVersion, "^\\d+(\\.\\d+)*$"));
+    typedef OktoVersion NonEmptyString with (matches(OktoVersion, "^\\d+(\\.\\d+)*$"));
     typedef Id NonEmptyString with (matches(Id, "^[^\\s*]+$")); // non whitespace
     typedef NonEmptyNameString NonEmptyString with (matches(NonEmptyNameString, "^[\\w \\[\\]\\-\\Q$_\\E]+$")); // non whitespace
     typedef ArtifactString String with (size(ArtifactString) == 0 or (size(ArtifactString) > 0 and matches(ArtifactString, ".+:.+:.+"))); 
@@ -22,17 +22,17 @@ project DataTypes {
     const String Eclass_Property_swVersion = "0173-1#02-AAM737#002";
     const String Eclass_Property_swName = "0173-1#02-AAO247#002";
     
-    const Integer UiInivisibleGroup = 0;
+    const Integer UiInvisibleGroup = 0;
     const Integer UiMandatoryGroup1 = 1;
     const Integer UiOptionalGroup1 = -1;
     const Integer UiMandatoryGroup2 = 2;
     const Integer UiOptionalGroup2 = -2;
     
-    def String mvnVersion(IipVersion ver, Boolean snapshot) = 
+    def String mvnVersion(OktoVersion ver, Boolean snapshot) = 
        if (snapshot) then ver + "-SNAPSHOT" else ver endif;
        
     compound VersionedElement {
-        IipVersion ver;
+        OktoVersion ver;
         Boolean snapshot = true;
     }
     

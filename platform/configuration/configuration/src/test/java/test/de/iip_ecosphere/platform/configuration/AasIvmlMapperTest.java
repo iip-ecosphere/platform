@@ -168,7 +168,7 @@ public class AasIvmlMapperTest {
         mySource.setYPos(10);
         IvmlGraphNode myReceiver = new AbstractGraphTest.TestNode();
         myReceiver.setName("Simple Data Receiver");
-        myReceiver.setXPos(50);
+        myReceiver.setXPos(300);
         myReceiver.setYPos(10);
         IvmlGraphEdge myEdge = new AbstractGraphTest.TestEdge(mySource, myReceiver);
         myEdge.setName("Source->Receiver");

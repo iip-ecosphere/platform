@@ -97,6 +97,9 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     
     public static final Predicate<AbstractVariable> FILTER_NO_CONSTRAINT_VARIABLES = 
         v -> !TypeQueries.isConstraint(v.getType());
+    // exclude unrefined fields from MetaConcepts, do we need that for refTo(Any)
+    public static final Predicate<AbstractVariable> FILTER_NO_ANY = 
+        v -> !"Any".equals(IvmlDatatypeVisitor.getUnqualifiedType(v.getType()));
     public static final String META_TYPE_NAME = "meta";
     public static final Function<String, String> SHORTID_PREFIX_META = n -> "meta" + PseudoString.firstToUpperCase(n);
     protected static final String PRJ_NAME_ALLCONSTANTS = "AllConstants";
@@ -112,7 +115,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
 
     private Supplier<Configuration> cfgSupplier;
     private Function<String, String> metaShortId = SHORTID_PREFIX_META;
-    private Predicate<AbstractVariable> variableFilter = FILTER_NO_CONSTRAINT_VARIABLES;
+    private Predicate<AbstractVariable> variableFilter = FILTER_NO_CONSTRAINT_VARIABLES.and(FILTER_NO_ANY);
     private Map<String, SubmodelElementCollectionBuilder> types = new HashMap<>();
     
     static {
@@ -1082,6 +1085,24 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     }
     
     /**
+     * Returns the string value of {@code var}. If the value is empty, return <b>null</b>.
+     * 
+     * @param var the variable to read the string value from
+     * @return the string value or <b>null</b>
+     */
+    static String getStringValueEmptyNull(IDecisionVariable var) {
+        String result = null;
+        Object val = getValue(var);
+        if (null != val) {
+            result = val.toString();
+            if (result.length() == 0) {
+                result = null;
+            }
+        }
+        return result;
+    }
+    
+    /**
      * Maps a single variable {@code var} into {@code builder}.
      * 
      * @param var the variable to map as source
@@ -1097,16 +1118,14 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             IDatatype rVarType = DerivedDatatype.resolveToBasis(varType);
             String lang = getLang();
             String semanticId = null;
+            String displayName = null;
             for (int a = 0; a < var.getAttributesCount(); a++) {
                 IDecisionVariable attribute = var.getAttribute(a);
-                if ("semanticId".equals(attribute.getDeclaration().getName())) {
-                    Object val = getValue(attribute);
-                    if (null != val) {
-                        semanticId = val.toString();
-                        if (semanticId.length() == 0) {
-                            semanticId = null;
-                        }
-                    }
+                String attributeName = attribute.getDeclaration().getName();
+                if ("semanticId".equals(attributeName)) {
+                    semanticId = getStringValueEmptyNull(attribute);
+                } else if ("displayName".equals(attributeName)) {
+                    displayName = getStringValueEmptyNull(attribute);
                 }
             }
             SubmodelElementCollectionBuilder varBuilder;
@@ -1151,7 +1170,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                 setSemanticId(pb, semanticId);
                 pb.build();
             }
-            addMetaProperties(var, varType, varBuilder);
+            addMetaProperties(var, varType, varBuilder, displayName);
             varBuilder.build();
         }
     }
@@ -1162,9 +1181,10 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
      * @param var the variable to take the meta-properties from
      * @param varType the type of {@code var} (as we already have determined it)
      * @param varBuilder the AAS builder representing {@code var} to add the AAS properties to
+     * @param displayName the displac name of {@code var}, may be <b>null</b> for none
      */
     private void addMetaProperties(IDecisionVariable var, IDatatype varType, 
-        SubmodelElementCollectionBuilder varBuilder) {
+        SubmodelElementCollectionBuilder varBuilder, String displayName) {
         varBuilder.createPropertyBuilder(AasUtils.fixId(metaShortId.apply("variable")))
             .setValue(Type.STRING, var.getDeclaration().getName())
             .build();
@@ -1172,14 +1192,25 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             .setValue(Type.STRING, var.getState().toString())
             .build();
         IDatatype type = var.getValue() != null ? var.getValue().getType() : varType;
+        String declaredTypeName = IvmlDatatypeVisitor.getUnqualifiedType(var.getDeclaration().getType());
+        String varName = var.getDeclaration().getName();
         varBuilder.createPropertyBuilder(AasUtils.fixId(metaShortId.apply("type")))
             .setValue(Type.STRING, IvmlDatatypeVisitor.getUnqualifiedType(type))
             .build();
+        if (null == displayName && "OktoVersion".equals(declaredTypeName) && "ver".equals(varName)) {
+            // mitigate field misnomer for now
+            displayName = "version";
+        }
         TypeMapper.addMetaDefault(var, varBuilder, metaShortId);
         TypeMapper.addTypeKind(varBuilder, DerivedDatatype.resolveToBasis(type), metaShortId);
         if (var.getDeclaration().getParent() instanceof Project) { // top-level only for now
             varBuilder.createPropertyBuilder(AasUtils.fixId(metaShortId.apply("project")))
                 .setValue(Type.STRING, mapParent(var))
+                .build();
+        }
+        if (null != displayName) {
+            varBuilder.createPropertyBuilder(AasUtils.fixId(metaShortId.apply("displayName")))
+                .setValue(Type.STRING, displayName)
                 .build();
         }
         try {

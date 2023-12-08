@@ -25,7 +25,7 @@ project ServicePartKodex {
    compound KodexService refines CompleteService {
        setOf(KodexFieldAction) actions;
        ServiceKind kind = ServiceKind::TRANSFORMATION_SERVICE;
-       IipVersion ver = "0.7.0";
+       OktoVersion ver = "0.7.0";
        String artifact = "de.iip-ecosphere.platform:security.services.kodex:" + iipVer;
        setOf(refTo(Dependency)) dependencies = {refBy(lxLibc6Compat)};
        NameplateInfo nameplateInfo = {

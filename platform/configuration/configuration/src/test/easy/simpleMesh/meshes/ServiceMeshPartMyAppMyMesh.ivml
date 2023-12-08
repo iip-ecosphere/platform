@@ -24,7 +24,7 @@ project ServiceMeshPartMyAppMyMesh {
 
     MeshSink myReceiver = {
         impl = refBy(myReceiverService),
-        pos_x = 50,
+        pos_x = 300,
         pos_y = 10
     };
 

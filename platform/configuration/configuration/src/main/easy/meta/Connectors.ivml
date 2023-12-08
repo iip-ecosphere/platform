@@ -209,7 +209,7 @@ project Connectors {
     compound Connector refines Service {
        setOf(AssignmentOperation) operations = {};
        TextEncoding encoding = TextEncoding::ASCII;
-       assign (uiGroup = UiInivisibleGroup) to {
+       assign (uiGroup = UiInvisibleGroup) to {
            setOf(MappingEntry) mapping = {};
        }
        

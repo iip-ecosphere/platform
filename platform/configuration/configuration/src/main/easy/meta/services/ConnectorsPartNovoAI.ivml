@@ -18,7 +18,7 @@ project ConnectorsPartNovoAI {
    compound NovoAIMqttV3Connector refines MqttV3Connector { // Mqtt connector for NovoAI
        String name = "NovoAI MQTT Data connector";
        String description = "";
-       String ver = "0.1.0";
+       OktoVersion ver = "0.1.0";
        sequenceOf(IOType) input = {{type=refBy(AvaMqttOutput)}};
        sequenceOf(IOType) output = {{type=refBy(AvaMqttOutput)}};
        IOTypeWithPath inInterface = {type=refBy(AvaMqttOutput)};
