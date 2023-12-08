@@ -231,9 +231,13 @@ export interface editorInput {
    * Optional language of the value if the value is an AasLocalizedString. 
    */
   valueLang?: string;
-
+  /**
+   * Optional function, may transform value.
+   * 
+   * @param the actual editor input 
+   * @returns the actual value
+   */
   valueTransform?: (x: editorInput) => any;
-
   /**
    * The (resolved) IVML type of the value from the model.
    */
@@ -242,6 +246,10 @@ export interface editorInput {
    * The IVML variable name as declared in the model.
    */
   name: string;
+  /**
+   * Optional display name overriding name, but only on UI.
+   */
+  displayName?: string;
   /**
    * Description of the IVML variable given in terms of an AAS LangString.
    */
@@ -323,15 +331,28 @@ export const MT_metaAbstract = 'metaAbstract';
 export const MT_metaTypeKind = 'metaTypeKind';
 export const MT_metaDefault = 'metaDefault';
 export const MT_metaVariable = 'metaVariable';
+export const MT_metaDisplayName = 'metaDisplayName';
 export const MT_varValue = 'varValue';
 
 export const metaTypes = [MT_metaState, MT_metaProject,
   MT_metaSize, MT_metaType, MT_metaRefines, MT_metaAbstract, MT_metaTypeKind]; // TODO same as allMetaTypes???
 
 export const allMetaTypes = [MT_metaState, MT_metaProject,
-    MT_metaSize, MT_metaType, MT_metaRefines, MT_metaAbstract, MT_metaTypeKind, MT_metaDefault, MT_metaVariable];
+    MT_metaSize, MT_metaType, MT_metaRefines, MT_metaAbstract, MT_metaTypeKind, MT_metaDefault, MT_metaVariable, MT_metaDisplayName];
   
 export const primitiveDataTypes
   = ["String", "Boolean", "Real", "Integer"]
 
 export const ivmlEnumeration = "IvmlEnumeration:";  
+
+/*
+* On data rows/entries, indicate the actual IVML type.
+*/
+export const DR_type ="_type";
+
+export const DR_displayName ="_displayName";
+
+/*
+* On data rows/entries, indicate the identification/name of the entry.
+*/
+export const DR_idShort ="idShort";

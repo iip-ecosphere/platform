@@ -7,7 +7,7 @@ import { Router } from '@angular/router';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import { MAT_PROGRESS_SPINNER_DEFAULT_OPTIONS_FACTORY } from '@angular/material/progress-spinner';
 import { EditorComponent } from '../editor/editor.component';
-import { InputVariable, MTK_compound, MTK_container, MT_metaSize, MT_metaType, MT_metaTypeKind, MT_metaVariable, MT_varValue, allMetaTypes, configMetaEntry, editorInput, platformResponse } from 'src/interfaces';
+import { DR_displayName, DR_idShort, DR_type, InputVariable, MTK_compound, MTK_container, MT_metaDisplayName, MT_metaSize, MT_metaType, MT_metaTypeKind, MT_metaVariable, MT_varValue, allMetaTypes, configMetaEntry, editorInput, platformResponse } from 'src/interfaces';
 import { Utils, DataUtils } from 'src/app/services/utils.service';
 
 class RowEntry {
@@ -225,10 +225,12 @@ export class ListComponent extends Utils implements OnInit {
       let fieldName = value.idShort;
       let goOn = rowFn(value);
       if (goOn && !allMetaTypes.includes(fieldName)) {
-        let val: any;
+        let displayName = null;
+        let val: any = null;
         if (this.isArray(value.value)) {
+          displayName = DataUtils.getPropertyValue(value.value, MT_metaDisplayName);
           let fieldTypeKind = DataUtils.getPropertyValue(value.value, MT_metaTypeKind);
-          if (fieldTypeKind == MTK_container) { //(DataUtils.isIvmlCollection(fieldType)) {
+          if (fieldTypeKind == MTK_container) {
             let fieldSize = DataUtils.getPropertyValue(value.value, MT_metaSize);
             if (fieldSize) {
               val = [];
@@ -239,7 +241,8 @@ export class ListComponent extends Utils implements OnInit {
                 if (fProp && fProp.value) {
                   this.createRowValue(fProp.value, fVal, false, v => true);
                   let fId = fVal["id"] || fVal["name"] || String(i);
-                  fVal["idShort"] = fId;
+                  fVal[DR_idShort] = fId;
+                  this.addPropertyFromData(fVal, DR_type, fProp.value, MT_metaType);
                   val.push(fVal);
                 }
               }
@@ -252,11 +255,22 @@ export class ListComponent extends Utils implements OnInit {
           }
         }
         if (top) {
-          result.push({idShort: fieldName, value:val});
+          let instance: any = {idShort: fieldName, value:val};
+          if (displayName) {
+            instance[DR_displayName] = displayName;
+          }
+          result.push(instance);
         } else {
           result[fieldName] = val;
         }
       }
+    }
+  }
+
+  private addPropertyFromData(object: any, propertyName: string, data: any[], dataPropertyName: string) {
+    let value = DataUtils.getPropertyValue(data, dataPropertyName);
+    if (value) {
+      object[propertyName] = value;
     }
   }
 

@@ -60,6 +60,20 @@ export class Utils {
     return result;
   }
 
+  /**
+   * Returns the display name of input, if defined the display name else the name.
+   * 
+   * @param input the input 
+   * @returns the (display) name
+   */
+  public getDisplayName(input: editorInput) {
+    let result = input.name;
+    if (input.displayName) {
+      result = input.displayName;
+    }
+    return result;
+  }
+
 }
 
 /**
@@ -89,10 +103,10 @@ export class DataUtils {
    * @returns the item (as property) or undefined
    */
   public static getProperty(data: any[], id: string) {
-    if (data) {
+    if (data && Array.isArray(data)) {
       return data.find((item: { idShort: string; }) => item.idShort === id);
     } else {
-      return undefined;
+      return undefined; // null?
     }
   }
 

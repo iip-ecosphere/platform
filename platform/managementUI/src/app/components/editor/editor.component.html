@@ -86,7 +86,7 @@
     <div class="inputGroup">
       <div *ngFor="let input of uiGroup.inputs">
         <mat-card class="inputBox" *ngIf="!input.multipleInputs && !input.refTo; else ref">
-          <p id="inputName" style="margin-bottom: 1em;">{{ input.name }}</p>
+          <p id="inputName" style="margin-bottom: 1em;">{{ getDisplayName(input) }}</p>
           <div *ngIf="input.type != 'Boolean'; else booleanCase">
             <div *ngIf="input.metaTypeKind != 10; else subEditor">
               <div *ngIf="input.metaTypeKind != 2; else enumCase">
@@ -112,7 +112,7 @@
         <div>
           <ng-template #ref>
             <mat-card [ngClass]="input.multipleInputs? 'inputBox' : 'refInput'">
-                <p style="margin-bottom: 1em;" id="inputName">{{ input.name }}</p>
+                <p style="margin-bottom: 1em;" id="inputName">{{ getDisplayName(input) }}</p>
                 <app-input-ref-select
                   [activeTextinput]="true" [input]="input">
                 </app-input-ref-select>
@@ -124,7 +124,7 @@
       <div class="fullLineInputGroup">
         <div *ngFor="let input of uiGroup.fullLineInputs">
           <mat-card class="refInput">
-            <p id="inputName" style="margin-bottom: 1em;">{{ input.name }}</p>
+            <p id="inputName" style="margin-bottom: 1em;">{{ getDisplayName(input) }}</p>
             <app-input-ref-select [activeTextinput]="true" [input]="input">
             </app-input-ref-select>
             <div #subEditor *ngIf="input.metaTypeKind == 10">
@@ -146,7 +146,7 @@
       <div *ngFor="let input of uiGroup.optionalInputs">
         <mat-card class="inputBox">
           <mat-card-content *ngIf="!input.multipleInputs && !input.refTo; else refOpt">
-            <p style="margin-bottom: 1em;">{{ input.name }}</p>
+            <p style="margin-bottom: 1em;">{{ getDisplayName(input) }}</p>
             <div *ngIf="input.type != 'Boolean'; else optBooleanCase">
               <div *ngIf="input.metaTypeKind != 2; else optEnumCase">
                 <mat-form-field appearance="outline" *ngIf="input.metaTypeKind != 10; else subEditor">
@@ -170,7 +170,7 @@
 
           <ng-template #refOpt>
             <mat-card-content class="refInput">
-              <p style="margin-bottom: 1em;">{{ input.name }}</p>
+              <p style="margin-bottom: 1em;">{{ getDisplayName(input) }}</p>
               <app-input-ref-select
                 [activeTextinput]="true" [input]="input">
               </app-input-ref-select>
@@ -182,7 +182,7 @@
       <div class="fullLineInputGroup">
         <div *ngFor="let input of uiGroup.fullLineOptionalInputs">
           <mat-card class="refInput">
-            <p style="margin-bottom: 1em;">{{ input.name }}</p>
+            <p style="margin-bottom: 1em;">{{ getDisplayName(input) }}</p>
             <app-input-ref-select
               [activeTextinput]="true" [input]="input">
             </app-input-ref-select>

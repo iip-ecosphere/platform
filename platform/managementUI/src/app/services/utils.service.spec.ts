@@ -48,6 +48,13 @@ describe('UtilsService', () => {
     expect(service.getValue(input)).toBe(20);
   });
 
+  it('should implement getDisplayName', () => {
+    let input: editorInput = {value: 10, name:"var", type:"Integer", description: [{language:"de", text: "abc"}]};
+    expect(service.getDisplayName(input)).toBe("var");
+    input.displayName = "dName";
+    expect(service.getDisplayName(input)).toBe("dName");
+  });
+
   // -------------------------- Data Utils -----------------------------------
 
   it('should implement getProperty', () => {

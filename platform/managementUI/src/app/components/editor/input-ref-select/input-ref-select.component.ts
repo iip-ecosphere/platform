@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { EditorService } from 'src/app/services/editor.service';
-import { Resource, editorInput, configMeta, metaTypes } from 'src/interfaces';
+import { Resource, editorInput, configMeta, metaTypes, DR_type } from 'src/interfaces';
 import { DataUtils, Utils } from 'src/app/services/utils.service';
 import { EditorComponent } from '../editor.component';
 import { MatDialog } from '@angular/material/dialog';
@@ -95,6 +95,10 @@ export class InputRefSelectComponent extends Utils implements OnInit {
     })
     let input = DataUtils.deepCopy(this.input);
     input.value = this.input.value[editIndex];
+    input.type = DataUtils.stripGenericType(input.type);
+    if (input.value[DR_type]) { // override with dynamic IVML type if known
+      input.type = input.value[DR_type];
+    }
     dialogRef.componentInstance.type = input;
     dialogRef.componentInstance.metaBackup = this.meta;
   }
@@ -122,7 +126,7 @@ export class InputRefSelectComponent extends Utils implements OnInit {
   //   return cssclass;
   // }
 
-  public getDisplayName(element: any) {
+  public getElementDisplayName(element: any) {
     if(typeof(element) === 'string') {
       return element
     } else if(element.name){

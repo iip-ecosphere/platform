@@ -13,7 +13,7 @@
             <mat-form-field appearance="outline">
               <mat-select [(value)]="selectedRef">
                 <mat-option *ngFor="let ref of references" [value]="ref" (click)="addFromRef()">
-                  {{ getDisplayName(ref) }}
+                  {{ getElementDisplayName(ref) }}
                 </mat-option>
               </mat-select>
             </mat-form-field>
@@ -27,7 +27,7 @@
         <div class="flexcontainer">
           <mat-card *ngFor="let value of input.value; let i=index" class="inputCard">
             <table>
-              <tr><td colspan="3" style="text-align: center">{{getDisplayName(value)}}</td></tr>
+              <tr><td colspan="3" style="text-align: center">{{getElementDisplayName(value)}}</td></tr>
               <tr>
                 <td>
                   <button *ngIf="isSequenceOf" mat-icon-button (click)="moveSequenceElement(true, i)"><mat-icon>keyboard_arrow_left</mat-icon></button>
@@ -50,7 +50,7 @@
             <table>
               <tr>
                 <td colspan="3" style="text-align: center">
-                  {{getDisplayName(input.value)}}
+                  {{getElementDisplayName(input.value)}}
                 </td>
               </tr>
               <tr>

@@ -3,7 +3,7 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { ApiService } from 'src/app/services/api.service';
 import { IvmlFormatterService } from 'src/app/services/ivml-formatter.service';
 import { Resource, uiGroup, editorInput, configMetaContainer, configMetaEntry, ResourceAttribute, InputVariable, metaTypes, 
-  MTK_primitive, MTK_derived, MTK_enum, MTK_compound, MT_metaRefines, MT_metaTypeKind, MT_metaAbstract, primitiveDataTypes, MT_metaDefault, ivmlEnumeration } from 'src/interfaces';
+  MTK_primitive, MTK_derived, MTK_enum, MTK_compound, MT_metaRefines, MT_metaTypeKind, MT_metaAbstract, primitiveDataTypes, MT_metaDefault, ivmlEnumeration, MT_metaDisplayName, DR_displayName } from 'src/interfaces';
 import { Utils, DataUtils } from 'src/app/services/utils.service';
 
 @Component({
@@ -289,7 +289,10 @@ export class EditorComponent extends Utils implements OnInit {
                   editorInput.description = name.description;
               }
             }
-
+            let val = DataUtils.getProperty(this.type?.value, input.idShort); // TODO may need object access for nested objects
+            if (val) {
+              editorInput.displayName = val[DR_displayName];
+            }
             editorInput.type = DataUtils.getPropertyValue(input.value, 'type');
 
             editorInput.meta = input;
@@ -311,13 +314,12 @@ export class EditorComponent extends Utils implements OnInit {
                 }
               } while (editorInput.metaTypeKind == MTK_derived);
             }
-            //the metaTypeKind is not included on the values of the types in the configuration/meta collection
+            //the metaTypeKind was so far not included on the values of the types in the configuration/meta collection
             //therefore this approach doesnt work, but it would be much more performant if it did
             // editorInput.metaTypeKind = input.value.find(
             //   (item: { idShort: string; }) => item.idShort === 'metaTypeKind')?.value;
             //   console.log(editorInput);
             //   console.log(input.value);
-
 
             if(editorInput.type.indexOf('refTo') >= 0) {
               editorInput.refTo = true;
@@ -331,7 +333,7 @@ export class EditorComponent extends Utils implements OnInit {
               ivmlValue = DataUtils.getPropertyValue(ivmlValue, input.idShort);
             }
             let initial;
-            if (this.isObject(ivmlValue) && input.idShort in ivmlValue) { 
+            if (this.isObject(ivmlValue) && ivmlValue && input.idShort in ivmlValue) { 
               // compound instances may be passed in as object with properties, those being undefined are defaults
               ivmlValue = ivmlValue[input.idShort];
               if (!ivmlValue) {
