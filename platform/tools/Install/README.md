@@ -34,7 +34,7 @@ If you already have installed a different version of Python, the platform instal
 
 ## Manual installation
 
-There are two detailed installation descriptions, one for [Windows](README-win.md) and one for [Linux](README-lionux.md).
+There are two detailed installation descriptions, one for [Windows](README-win.md) and one for [Linux](README-linux.md).
 
 ## Adjust the platform configuration
 
@@ -196,7 +196,7 @@ Deployment of the application happens through
 
 Please observe the logs of the service manager for the service logs.
 
-*Under development:* On the management UI you may navigate to `runtime` and then to `deployment plans` and select the plan for deployment. In the the `running services` tab, you will find the running services. You can request there, e.g., the log of the receiver service. Further, you will find the running applications in the `instances` tab, where you can request an undeployment of the selected instance.
+On the management UI you may navigate to `runtime` and then to `deployment plans` and select the plan for deployment. In the the `running services` tab, you will find the running services. You can request there, e.g., the log of the receiver service. Further, you will find the running applications in the `instances` tab, where you can request an undeployment of the selected instance.
 
 When writing own deployment plans, consider changing the default device identification provider from MAC addresses to network names. In the log of the ECS-Runtime/Service manager for a device, you will find the actual device ID needed in the the deployment plans, e.g., ``USING id 00FFB9A35D2B from de.iip_ecosphere.platform.support.iip_aas.MacIdProvider``. You can also find this information for available devices in the `resources` tab of the management UI.
 
