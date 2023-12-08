@@ -4,7 +4,6 @@
 
 In progress:
 * [#117](https://github.com/iip-ecosphere/platform/issues/117): Multiple service managers per device
-* [#162](https://github.com/iip-ecosphere/platform/issues/156): Revise installation
 * [#163](https://github.com/iip-ecosphere/platform/issues/156): UI functional improvements
 * [#150](https://github.com/iip-ecosphere/platform/issues/150): Connect instantiation process
 
@@ -20,6 +19,7 @@ Improvements:
 * [#155](https://github.com/iip-ecosphere/platform/issues/155): Align model locations to Maven, examples now use ''target/easy'' for the meta model and ''src/main/easy'' for the production configuration model. **For old example checkouts, delete all uncommitted files in ''src/main/easy'' that are also in ''target/easy''**.
 * [#157](https://github.com/iip-ecosphere/platform/issues/157): Clean up and untangle the configuration build flow, also for releases
 * [#115](https://github.com/iip-ecosphere/platform/issues/115): Cleanup, e.g., old build processes. AasUtils is now in support.aas, Version, AbstractSetup, JsonUtils are now in support. Duplicate classes were removed.
+* [#162](https://github.com/iip-ecosphere/platform/issues/156): Installation scripts revised, Angular also considered on Windows, more information during installation, generic deployment script added, mgt UI can be started.
 * Build process terminates immediately on error.
 * Example tests are executed uniformly through maven. Maven based tests can start/stop entire platform (used in managemt UI as test environment).
 * Platform maven plugins can detect platform model and maven component changes. 
