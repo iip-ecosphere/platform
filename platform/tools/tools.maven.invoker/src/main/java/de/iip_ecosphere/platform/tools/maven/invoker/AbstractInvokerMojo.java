@@ -107,6 +107,12 @@ public class AbstractInvokerMojo extends AbstractMojo implements Logger { // Abs
     @Parameter(defaultValue = "${session.request}")
     private MavenExecutionRequest execRequest;
 
+    @Parameter(property = "skipTests", required = false, defaultValue = "false") 
+    private boolean skipTests;
+
+    @Parameter(property = "maven.test.skip", required = false, defaultValue = "false") 
+    private boolean mavenTestSkip;
+
     @Parameter(property = "unpack.force", required = false, defaultValue = "false") 
     private boolean unpackForce;
 
@@ -223,9 +229,11 @@ public class AbstractInvokerMojo extends AbstractMojo implements Logger { // Abs
         }
         if (disableJava || disableBuild) {
             sysProperties.put("maven.main.skip", "true");
+            sysProperties.put("maven.javadoc.skip", "true");
+        }
+        if (skipTests || mavenTestSkip || disableJava || disableBuild) {
             sysProperties.put("maven.test.skip", "true");
             sysProperties.put("skipTests", "true"); // maven.test.skip might be sufficient
-            sysProperties.put("maven.javadoc.skip", "true");
         }
         if (disablePython || disableBuild) {
             sysProperties.put("python-compile.skip", "true");
