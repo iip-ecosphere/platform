@@ -141,6 +141,9 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
             doLogging = !doFilterLogs;
             loader.startup();
             doLogging = true;
+            getLogger().info("Setting up configuration base: {}", easySetup.getBase());
+            getLogger().info("Setting up configuration meta model: {}", easySetup.getIvmlMetaModelFolder());
+            getLogger().info("Setting up configuration model name: {}", easySetup.getIvmlModelName());
             EasyExecutor exec = new EasyExecutor(
                 easySetup.getBase(), 
                 easySetup.getIvmlMetaModelFolder(), 
@@ -150,14 +153,17 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
             exec.setVilModelName(EasySetup.PLATFORM_META_MODEL_NAME);
             // self-instantiation into gen, assumed to be empty, may be cleaned up
             //exec.setVtlFolder(new File(setup.getIvmlMetaModelFolder(), "vtl")); // can be, but not needed
+            getLogger().info("Setting up generation target: {}", easySetup.getGenTarget());
             exec.setVilSource(easySetup.getGenTarget());
             exec.setVilTarget(easySetup.getGenTarget());
             File ivmlCfg = easySetup.getIvmlConfigFolder();
             if (null != ivmlCfg && !ivmlCfg.equals(easySetup.getIvmlMetaModelFolder())) {
+                getLogger().info("Setting up configuration folder: {}", ivmlCfg);
                 exec.prependIvmlFolder(ivmlCfg);
             }
             if (null != easySetup.getAdditionalIvmlFolders()) {
                 for (File f : easySetup.getAdditionalIvmlFolders()) {
+                    getLogger().info("Setting up additional configuration folder: {}", f);
                     exec.addIvmlFolder(f);
                 }
             }

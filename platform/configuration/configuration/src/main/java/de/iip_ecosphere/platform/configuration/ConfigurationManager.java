@@ -15,9 +15,14 @@ package de.iip_ecosphere.platform.configuration;
 import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.configuration.ConfigurationAas.IipGraphMapper;
 import de.iip_ecosphere.platform.configuration.ivml.AasIvmlMapper;
+import de.iip_ecosphere.platform.configuration.ivml.IvmlUtils;
+import de.iip_ecosphere.platform.support.identities.IdentityStore;
+import de.iip_ecosphere.platform.support.identities.IdentityToken;
+import de.iip_ecosphere.platform.support.identities.IdentityToken.TokenType;
 import de.iip_ecosphere.platform.support.json.JsonResultWrapper.OperationCompletedListener;
 import de.iip_ecosphere.platform.transport.Transport;
 import de.iip_ecosphere.platform.transport.status.ActionTypes;
@@ -29,6 +34,8 @@ import net.ssehub.easy.instantiation.core.model.vilTypes.configuration.NoVariabl
 import net.ssehub.easy.producer.core.mgmt.EasyExecutor;
 import net.ssehub.easy.reasoning.core.reasoner.ReasoningResult;
 import net.ssehub.easy.varModel.confModel.Configuration;
+import net.ssehub.easy.varModel.confModel.IDecisionVariable;
+import net.ssehub.easy.varModel.model.ModelQueryException;
 
 /**
  * Holds the platform configuration and provides operations on the configuration. The 
@@ -44,6 +51,7 @@ public class ConfigurationManager {
     private static BasicProgressObserver observer = new BasicProgressObserver();
     private static AasIvmlMapper aasIvmlMapper;
     private static OperationCompletedListener aasOpListener;
+    private static boolean standalone = false;
 
     /**
      * Bridges between EASy progress monitoring and IIP progress notifications.
@@ -77,11 +85,20 @@ public class ConfigurationManager {
                 alias = new String[] {taskName};
                 heading = taskName;
             }
-            if (lastSteps != steps && lastMaxSteps != maxSteps) {
-                Transport.sendStatus(
-                    new StatusMessage(ActionTypes.PROCESS, "Configuration", alias)
-                        .withProgress(maxSteps > 0 ? steps / maxSteps : 0));
-                getLogger().info("{} : {}", heading, (maxSteps > 0 ? steps / maxSteps : "."));
+            if (lastSteps != steps || lastMaxSteps != maxSteps) {
+                int progress = 0;
+                if (steps > 0 && maxSteps > 0) {
+                    progress = (int) ((steps / (double) maxSteps) * 100);
+                }
+                if (!standalone) {
+                    StatusMessage msg = new StatusMessage(ActionTypes.PROCESS, "Configuration", alias);
+                    if (maxSteps > 0) {
+                        msg.withProgress(progress);
+                    }
+                    msg.withDescription(heading);
+                    Transport.sendStatus(msg);
+                }
+                getLogger().info("{}: {}%", heading, (maxSteps > 0 ? progress : "?"));
                 lastSteps = steps;
                 lastMaxSteps = maxSteps;
             }
@@ -92,7 +109,7 @@ public class ConfigurationManager {
             this.taskName = name;
             this.subTask = null;
             this.maxSteps = max;
-            this.steps = 0;
+            this.steps = -1;
             sendStatus();
         }
 
@@ -127,6 +144,16 @@ public class ConfigurationManager {
         } else {
             executor.setProgressObserver(observer);
         }
+    }
+    
+    /**
+     * Defines whether the hosting process is running as part of an installed platform (requiring transport, 
+     * e.g., for status notifications) or standalone, e.g., in a build process.
+     * 
+     * @param isStandalone {@code true} if we run standalone, {@code false} for platorm process (the default)
+     */
+    static void setStandalone(boolean isStandalone) {
+        standalone = isStandalone;
     }
     
     /**
@@ -185,6 +212,34 @@ public class ConfigurationManager {
     public static Configuration getIvmlConfiguration() {
         init();
         return executor != null ? executor.getConfiguration() : null;
+    }
+    
+    /**
+     * Sets up container properties for local deployment.
+     */
+    public static void setupContainerProperties() {
+        Configuration cfg = getIvmlConfiguration();
+        final String containerAuthKeyDecName = "containerManager.authenticationKey";
+        try {
+            IDecisionVariable varAuthKey = cfg.getDecision(containerAuthKeyDecName, false);
+            String authKey = IvmlUtils.getStringValue(varAuthKey, "");
+            if (authKey.length() > 0) {
+                IdentityToken tok = IdentityStore.getInstance().getToken(authKey);
+                if (null != tok && TokenType.USERNAME == tok.getType()) {
+                    System.setProperty("iip.container.user." + authKey, tok.getUserName());
+                    System.setProperty("iip.container.password." + authKey, tok.getTokenDataAsString());
+                } else {
+                    LoggerFactory.getLogger(ConfigurationManager.class).warn("No (username) identity token for key "
+                        + "'{}' found. Container deployment may fail", authKey);
+                }
+            } else {
+                LoggerFactory.getLogger(ConfigurationManager.class).warn("No autentication key/value for decision "
+                    + "variable '{}' found. Container deployment may fail", containerAuthKeyDecName);
+            }
+        } catch (ModelQueryException e) {
+            LoggerFactory.getLogger(ConfigurationManager.class).warn("No decision "
+                + "variable '{}' found. Container deployment may fail. {}", containerAuthKeyDecName, e.getMessage());
+        }
     }
     
     /**

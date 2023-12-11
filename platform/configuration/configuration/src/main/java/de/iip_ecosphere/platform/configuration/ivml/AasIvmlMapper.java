@@ -13,6 +13,10 @@
 package de.iip_ecosphere.platform.configuration.ivml;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -31,7 +35,6 @@ import de.iip_ecosphere.platform.configuration.ConfigurationSetup;
 import de.iip_ecosphere.platform.configuration.EasySetup;
 import de.iip_ecosphere.platform.configuration.ModelInfo;
 import de.iip_ecosphere.platform.configuration.PlatformInstantiator;
-import de.iip_ecosphere.platform.configuration.PlatformInstantiator.InstantiationConfigurer;
 import de.iip_ecosphere.platform.configuration.ivml.IvmlGraphMapper.IvmlGraph;
 import de.iip_ecosphere.platform.configuration.ivml.IvmlGraphMapper.IvmlGraphEdge;
 import de.iip_ecosphere.platform.configuration.ivml.IvmlGraphMapper.IvmlGraphNode;
@@ -47,12 +50,15 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
+import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.aas.AasUtils;
 import de.iip_ecosphere.platform.support.json.JsonResultWrapper;
+import de.iip_ecosphere.platform.support.json.JsonUtils;
 import de.iip_ecosphere.platform.transport.status.TaskUtils;
 import net.ssehub.easy.basics.modelManagement.ModelManagementException;
 import net.ssehub.easy.instantiation.core.model.vilTypes.PseudoString;
 import net.ssehub.easy.instantiation.core.model.vilTypes.configuration.Configuration;
+import net.ssehub.easy.producer.core.mgmt.EasyExecutor;
 import net.ssehub.easy.reasoning.core.reasoner.ReasoningResult;
 import net.ssehub.easy.varModel.confModel.AssignmentState;
 import net.ssehub.easy.varModel.confModel.ConfigurationException;
@@ -345,22 +351,20 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         sBuilder.defineOperation(OP_GEN_APPS, 
             new JsonResultWrapper(a -> {
                 return TaskUtils.executeAsTask(PROGRESS_COMPONENT_ID, 
-                    p -> getAasIvmlMapper().instantiate(getAasIvmlMapper().createInstantiationConfigurer(
-                        InstantiationMode.APPS, AasUtils.readString(p), AasUtils.readString(p, 1))));
+                    p -> getAasIvmlMapper().instantiate(InstantiationMode.APPS, AasUtils.readString(p), 
+                        AasUtils.readString(p, 1)));
             })
         );
         sBuilder.defineOperation(OP_GEN_APPS_NO_DEPS, 
             new JsonResultWrapper(a -> {
                 return TaskUtils.executeAsTask(PROGRESS_COMPONENT_ID, 
-                    p -> getAasIvmlMapper().instantiate(getAasIvmlMapper().createInstantiationConfigurer(
-                        InstantiationMode.APPS_NO_DEPS, AasUtils.readString(p), null)));
+                    p -> getAasIvmlMapper().instantiate(InstantiationMode.APPS_NO_DEPS, AasUtils.readString(p), null));
             })
         );
         sBuilder.defineOperation(OP_GEN_INTERFACES, 
             new JsonResultWrapper(a -> {
                 return TaskUtils.executeAsTask(PROGRESS_COMPONENT_ID, 
-                    p -> getAasIvmlMapper().instantiate(getAasIvmlMapper().createInstantiationConfigurer(
-                        InstantiationMode.INTERFACES, null, null)));
+                    p -> getAasIvmlMapper().instantiate(InstantiationMode.INTERFACES, null, null));
             })
         );
     }
@@ -368,13 +372,69 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     /**
      * Instantiates according to the given {@code configurer}.
      * 
-     * @param configurer the configurer
-     * @return <b>null</b>
+     * @param mode the instantiation mode
+     * @param appId the app to build
+     * @param codeFile the code file containing the implementation
+     * @return summary of instantiation results depending on {@code mode}, e.g., list of generted and downloadable 
+     *     template URIs for {@link InstantiationMode#APPS_NO_DEPS} else <b>null</b>
      * @throws ExecutionException when the instantiation fails
      */
-    private Object instantiate(InstantiationConfigurer configurer) throws ExecutionException {
-        PlatformInstantiator.instantiate(configurer);
-        return null;
+    private Object instantiate(InstantiationMode mode, String appId, String codeFile) throws ExecutionException {
+        // TODO if fileName -> unpack, run maven
+        long start = System.currentTimeMillis();
+        if (null != appId) {
+            System.setProperty(PlatformInstantiator.KEY_PROPERTY_APPS, appId);
+        }
+        ReasoningResult rRes = ConfigurationManager.validateAndPropagate();
+        if (null == rRes) {
+            throw new ExecutionException("No valid IVML model loaded/found.", null);
+        }
+        EasyExecutor.printReasoningMessages(rRes);
+        ConfigurationManager.setupContainerProperties();
+        ConfigurationManager.instantiate(mode.getStartRuleName()); // throws exception if it fails
+        if (null != appId) {
+            System.setProperty(PlatformInstantiator.KEY_PROPERTY_APPS, "");
+        }
+        Object result = null;
+        switch (mode) {
+        case APPS_NO_DEPS:
+            result = collectTemplates(start);
+            break;
+        case APPS:
+        case INTERFACES:
+            break;
+        default:
+            break;
+        }
+        return result;
+    }
+
+    /**
+     * Collects the generated templates, copies them to {@link ConfigurationSetup#getArtifactsFolder()} and returns 
+     * the file names prefixed by {@link ConfigurationSetup#getArtifactsUriPrefix()} as JSON.
+     * 
+     * @param startTime the time the generation started (as ms timestamp)
+     * @return the generated template archives
+     */
+    private Object collectTemplates(long startTime) {
+        List<String> tmp = new ArrayList<>();
+        ConfigurationSetup setup = ConfigurationSetup.getSetup();
+        Path artifactsPath = setup.getArtifactsFolder().toPath();
+        EasySetup easySetup = setup.getEasyProducer();
+        File gen = easySetup.getGenTarget();
+        File templatesFolder = new File(gen, "templates");
+        FileUtils.listFiles(templatesFolder, 
+            f -> f.getName().startsWith("impl.") && f.getName().endsWith(".zip") && f.lastModified() > startTime, 
+            f -> {
+                try {
+                    Files.copy(f.toPath(), artifactsPath, StandardCopyOption.REPLACE_EXISTING);
+                    tmp.add(setup.getArtifactsUriPrefix() + f.getName());
+                } catch (IOException e) {
+                    LoggerFactory.getLogger(AasIvmlMapper.class).error("Cannot copy generated template {} to {}: {}", 
+                        f, artifactsPath, e.getMessage());
+                }
+            });
+        return JsonUtils.toJson(tmp);
     }
     
     /**
@@ -383,40 +443,31 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
      * @author Holger Eichelberger, SSE
      */
     private enum InstantiationMode {
-        APPS_NO_DEPS,
-        APPS,
-        INTERFACES
-    }
-    
-    /**
-     * Creates an instantiation configurer from {@link ConfigurationSetup} to create application code.
-     * 
-     * @param mode the instantiation mode
-     * @param appId the id of the application to instantiate, may be empty or <b>null</b> for none
-     * @param fileName the name of the implementation artifact to integrate, may be empty or <b>null</b> for none
-     * @return the configurer
-     */
-    private InstantiationConfigurer createInstantiationConfigurer(InstantiationMode mode, String appId, 
-        String fileName) {
-        // if fileName -> unpack, run maven
-        EasySetup ep = ConfigurationSetup.getSetup().getEasyProducer();
-        InstantiationConfigurer result = new InstantiationConfigurer(
-            ep.getIvmlModelName(), getIvmlConfigFolder(ep), ep.getGenTarget());
-        // TODO pass into appId
-        switch (mode) {
-        case APPS:
-            result.setStartRuleName("generateApps");
-            break;
-        case APPS_NO_DEPS:
-            result.setStartRuleName("generateAppsNoDeps");
-            break;
-        case INTERFACES:
-            result.setStartRuleName("generateInterfaces");
-            break;
-        default:
-            break;
+        
+        APPS_NO_DEPS("generateAppsNoDeps"),
+        APPS("generateApps"),
+        INTERFACES("generateInterfaces");
+        
+        private String startRuleName;
+
+        /**
+         * Creates an instantiation mode constant.
+         * 
+         * @param startRuleName the start rule name
+         */
+        private InstantiationMode(String startRuleName) {
+            this.startRuleName = startRuleName;
         }
-        return result;
+        
+        /**
+         * Returns the start rule name.
+         * 
+         * @return the start rule name
+         */
+        public String getStartRuleName() {
+            return startRuleName;
+        }
+        
     }
 
     @Override

@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.configuration;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.slf4j.LoggerFactory;
@@ -31,6 +32,8 @@ public class ConfigurationSetup extends AbstractSetup {
     private EasySetup easyProducer = new EasySetup();
     private PackageStorageSetup serviceArtifactStorage;
     private PackageStorageSetup containerImageStorage;
+    private File artifactsFolder = new File("artifacts");
+    private String artifactsUriPrefix = "";
 
     /**
      * Creates an instance.
@@ -91,6 +94,42 @@ public class ConfigurationSetup extends AbstractSetup {
      */
     public void setContainerImageStorage(PackageStorageSetup containerImageStorage) {
         this.containerImageStorage = containerImageStorage;
+    }
+    
+    /**
+     * Returns the folder containing installable artifacts.
+     * 
+     * @return the folder
+     */
+    public File getArtifactsFolder() {
+        return artifactsFolder;
+    }
+
+    /**
+     * Changes the folder containing installable artifacts. [snakeyaml]
+     * 
+     * @param artifactsFolder the folder
+     */
+    public void setArtifactsFolder(File artifactsFolder) {
+        this.artifactsFolder = artifactsFolder;
+    }
+    
+    /**
+     * Returns the artifacts URI prefix.
+     * 
+     * @return the prefix with protocol, may be empty for none
+     */
+    public String getArtifactsUriPrefix() {
+        return artifactsUriPrefix;
+    }
+
+    /**
+     * Changes the artifacts URI prefix. [snakeyaml]
+     * 
+     * @param artifactsUriPrefix the prefix with protocol, may be empty for none
+     */
+    public void setArtifactsUriPrefix(String artifactsUriPrefix) {
+        this.artifactsUriPrefix = artifactsUriPrefix;
     }
 
     /**

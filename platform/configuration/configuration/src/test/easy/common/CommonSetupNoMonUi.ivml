@@ -11,6 +11,7 @@ project CommonSetupNoMonUi {
     metaModelFolder = "../../target/easy";
     modelBaseFolder = "../../target/easy-test";
     modelName = "PlatformConfiguration";
+    genTarget = "../../target/gen";
     
     freeze {
         platformMonitoring;
@@ -18,6 +19,7 @@ project CommonSetupNoMonUi {
         metaModelFolder;
         modelBaseFolder;
         modelName;
+        genTarget;
         .; // every variable declared in this project
     } but (f|f.bindingTime >= BindingTime.runtimeMon);
 
