@@ -204,6 +204,10 @@ When writing own deployment plans, consider changing the default device identifi
 
 You can use the CLI to start individual services of the application on a certain resource. However, this requires information on the structure of the application, which is better provided through a deployment plan.
 
+## Developing applications
+
+Application development is currently not fully supported by the management UI but we are working on that. This install package contains a [simple example application](summary.pdf) with two services. For creating an application we recommend for now consulting the platform handbook.
+
 # Further contents
   
 Besides the Maven build specifications for the platform dependencies, the test broker and the oktoflow platform components, this Installation bundle also contains build information for two containers, namely an application container including the service manager and a simple application as well as a standalone container including the ECS runtime. Both containers can be build upon the artifacts provided through this installation package.

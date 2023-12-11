@@ -31,6 +31,7 @@
             <fileset dir="." includes="resources/**/*.*" />
             <fileset dir="." includes="fullInstallationLinux.sh" />
             <fileset dir="." includes="fullInstallationWin.bat" />
+            <fileset dir="." includes="summary.pdf" />
         </zip>
         <tar destfile="install.tar.gz" compression="gzip">
             <fileset dir="." includes="pom.xml README.md"/>
@@ -42,6 +43,7 @@
             <fileset dir="." includes="resources/**/*.*" />
             <tarfileset dir="." filemode="755" includes="fullInstallationLinux.sh" />
             <fileset dir="." includes="fullInstallationWin.bat" />
+            <fileset dir="." includes="summary.pdf" />
         </tar>
     </target>
 </project>
