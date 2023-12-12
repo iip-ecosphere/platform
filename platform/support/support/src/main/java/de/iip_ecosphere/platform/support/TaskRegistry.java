@@ -84,7 +84,7 @@ public class TaskRegistry {
             if (TaskStatus.STOPPED == status) {
                 stopCallCount++;
             }
-            if ((TaskStatus.STOPPED == status && stopCallCount == requiredStopCalls) || status != TaskStatus.STOPPED) {
+            if ((TaskStatus.STOPPED == status && stopCallCount >= requiredStopCalls) || status != TaskStatus.STOPPED) {
                 this.status = status;
                 this.timestamp = System.currentTimeMillis();
             }
