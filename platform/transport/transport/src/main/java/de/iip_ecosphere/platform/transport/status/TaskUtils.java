@@ -30,6 +30,8 @@ import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
  */
 public class TaskUtils {
     
+    private static Task lastTask;
+    
     /**
      * Executes {@code func} as task within this thread and sends respective {@link StatusMessage}s.
      * 
@@ -103,13 +105,23 @@ public class TaskUtils {
         TaskCompletedPredicate pred, Object... params) {
         Task task = new Task(componentId, func, pred, params);
         Thread thread = new Thread(task);
-        if (null == data) {
+        if (null == data || TaskRegistry.NO_TASK == data) {
             data = TaskRegistry.registerTask(thread);
             data.setRequiredStopCalls(2);
         }
         task.data = data;
         thread.start();
         return data.getId();        
+    }
+    
+    /**
+     * Returns the data of the last task created in 
+     * {@link #executeAsTask(TaskData, String, ExceptionFunction, TaskCompletedPredicate, Object...)}.
+     * 
+     * @return the last task data, may be <b>null</b>
+     */
+    public static TaskData getLastTaskData() {
+        return lastTask != null ? lastTask.data : null;
     }
 
     /**
@@ -136,6 +148,7 @@ public class TaskUtils {
             this.func = func;
             this.pred = pred;
             this.params = params;
+            lastTask = this;
         }
  
         // checkstyle: stop exception type check

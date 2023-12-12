@@ -130,7 +130,7 @@ public abstract class AbstractTransportConnector implements TransportConnector {
      * @param tok the identity token
      * @param consumer the consumer
      * @return {@code true} for applied, {@code false} for ignored/failed
-     * @see #applyIdentityToken(IdentityToken, AuthenticationConsumer, AuthenticationConsumer))
+     * @see #applyIdentityToken(IdentityToken, AuthenticationConsumer, Supplier)
      */
     public static boolean applyIdentityToken(IdentityToken tok, AuthenticationConsumer consumer) {
         return applyIdentityToken(tok, consumer, null);
