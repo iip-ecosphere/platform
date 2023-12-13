@@ -12,14 +12,18 @@
 
 package de.iip_ecosphere.platform.configuration;
 
+import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.configuration.ConfigurationAas.IipGraphMapper;
 import de.iip_ecosphere.platform.configuration.ivml.AasIvmlMapper;
 import de.iip_ecosphere.platform.configuration.ivml.IvmlUtils;
+import de.iip_ecosphere.platform.support.TaskRegistry;
+import de.iip_ecosphere.platform.support.TaskRegistry.TaskData;
 import de.iip_ecosphere.platform.support.identities.IdentityStore;
 import de.iip_ecosphere.platform.support.identities.IdentityToken;
 import de.iip_ecosphere.platform.support.identities.IdentityToken.TokenType;
@@ -52,13 +56,14 @@ public class ConfigurationManager {
     private static AasIvmlMapper aasIvmlMapper;
     private static OperationCompletedListener aasOpListener;
     private static boolean standalone = false;
+    private static OktoProgressMonitor progressMonitor = new OktoProgressMonitor();
 
     /**
-     * Bridges between EASy progress monitoring and IIP progress notifications.
+     * Bridges between EASy progress monitoring and oktoflow (UI) progress notifications.
      * 
      * @author Holger Eichelberger, SSE
      */
-    private static class IipProgressMonitor implements BasicProgressObserver.IProgressMonitor {
+    private static class OktoProgressMonitor implements BasicProgressObserver.IProgressMonitor {
 
         private String taskName;
         private int maxSteps;
@@ -66,10 +71,23 @@ public class ConfigurationManager {
         private String subTask;
         private int lastSteps = -1;
         private int lastMaxSteps = -1;
+        private TaskData taskData;
         
         @Override
         public void setTaskName(String name) {
             // ignore
+        }
+        
+        /**
+         * Defines the task data to not rely on Easy notifications which may come from a different thread.
+         * 
+         * @param taskData the task data, may be <b>null</b> for none/clearing data
+         * @return the current task data object before the call, may be <b>null</b> for none
+         */
+        TaskData setTaskData(TaskData taskData) {
+            TaskData result = this.taskData;
+            this.taskData = taskData;
+            return result;
         }
 
         /**
@@ -92,6 +110,11 @@ public class ConfigurationManager {
                 }
                 if (!standalone) {
                     StatusMessage msg = new StatusMessage(ActionTypes.PROCESS, "Configuration", alias);
+                    if (taskData != null) {
+                        msg.withTask(taskData);
+                    } else { // try anyway
+                        msg.withTask();
+                    }
                     if (maxSteps > 0) {
                         msg.withProgress(progress);
                     }
@@ -101,15 +124,20 @@ public class ConfigurationManager {
                 getLogger().info("{}: {}%", heading, (maxSteps > 0 ? progress : "?"));
                 lastSteps = steps;
                 lastMaxSteps = maxSteps;
+                if (steps >= maxSteps && null != taskData) { // to be sure, to bypass the 2 required stop calls
+                    TaskRegistry.stopTask(taskData.getId());
+                }
             }
         }
         
         @Override
         public void beginTask(String name, int max) {
-            this.taskName = name;
-            this.subTask = null;
+            if (null != name) {
+                this.steps = -1;
+                this.subTask = null;
+                this.taskName = name;
+            } // else just reset max
             this.maxSteps = max;
-            this.steps = -1;
             sendStatus();
         }
 
@@ -129,7 +157,17 @@ public class ConfigurationManager {
     
     static {
         observer = new BasicProgressObserver();
-        observer.register(new IipProgressMonitor());
+        observer.register(progressMonitor);
+    }
+
+    /**
+     * Defines the task data to not rely on Easy notifications which may come from a different thread.
+     * 
+     * @param taskData the task data, may be <b>null</b> for none/clearing data
+     * @return the current task data object before the call, may be <b>null</b> for none
+     */
+    public static TaskData setTaskData(TaskData taskData) {
+        return progressMonitor.setTaskData(taskData);
     }
     
     /**
@@ -274,6 +312,22 @@ public class ConfigurationManager {
             getLogger().error(e.getMessage());
             e.printStackTrace();
             return null;
+        }
+    }
+    
+    /**
+     * Cleans the generation target.
+     * 
+     * @throws ExecutionException if cleaning fails for some reason
+     */
+    public static void cleanGenTarget() throws ExecutionException {
+        EasySetup easySetup = ConfigurationSetup.getSetup().getEasyProducer();
+        try {
+            if (easySetup.getGenTarget().exists()) {
+                FileUtils.deleteDirectory(easySetup.getGenTarget());
+            }
+        } catch (IOException e) {
+            throw new ExecutionException(e);
         }
     }
     

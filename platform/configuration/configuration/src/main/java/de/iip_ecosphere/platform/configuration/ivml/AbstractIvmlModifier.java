@@ -108,6 +108,7 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
         file.getParentFile().mkdirs();
         try (FileWriter fWriter = new FileWriter(file)) {
             IVMLWriter writer = new IVMLWriter(fWriter);
+            writer.setFormatInitializer(true);
             prj.accept(writer);
             fWriter.close();
         } catch (IOException e) {

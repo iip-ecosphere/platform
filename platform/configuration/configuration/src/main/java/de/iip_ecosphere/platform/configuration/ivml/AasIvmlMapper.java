@@ -51,6 +51,8 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelE
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.FileUtils;
+import de.iip_ecosphere.platform.support.TaskRegistry;
+import de.iip_ecosphere.platform.support.TaskRegistry.TaskData;
 import de.iip_ecosphere.platform.support.aas.AasUtils;
 import de.iip_ecosphere.platform.support.json.JsonResultWrapper;
 import de.iip_ecosphere.platform.support.json.JsonUtils;
@@ -380,7 +382,13 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
      * @throws ExecutionException when the instantiation fails
      */
     private Object instantiate(InstantiationMode mode, String appId, String codeFile) throws ExecutionException {
+        TaskData lastTaskData = TaskUtils.getLastTaskData(); // may be wrong thread
+        if (null == lastTaskData) { // fallback
+            lastTaskData = TaskRegistry.getTaskData();
+        }
+        TaskData beforeTaskData = ConfigurationManager.setTaskData(lastTaskData);
         // TODO if fileName -> unpack, run maven
+        ConfigurationManager.cleanGenTarget();
         long start = System.currentTimeMillis();
         if (null != appId) {
             System.setProperty(PlatformInstantiator.KEY_PROPERTY_APPS, appId);
@@ -406,6 +414,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         default:
             break;
         }
+        ConfigurationManager.setTaskData(beforeTaskData);
         return result;
     }
 
