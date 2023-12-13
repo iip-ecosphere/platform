@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.TaskRegistry;
 import de.iip_ecosphere.platform.support.TaskRegistry.TaskData;
+import de.iip_ecosphere.platform.support.iip_aas.Id;
 import de.iip_ecosphere.platform.support.json.JsonResultWrapper.ExceptionFunction;
 import de.iip_ecosphere.platform.transport.Transport;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
@@ -196,14 +197,28 @@ public class TaskUtils {
                 }
             }
             try {
-                Transport.sendProcessStatus(componentId, ActionTypes.RESULT, func.apply(params));
+                Transport.sendStatus(createStatusMessage(componentId, ActionTypes.RESULT, func.apply(params)));
             } catch (Throwable e) {
-                Transport.sendProcessStatus(componentId, ActionTypes.ERROR, e.getMessage());
+                Transport.sendStatus(createStatusMessage(componentId, ActionTypes.ERROR, e.getMessage()));
             }
             TaskRegistry.stopTask(data.getId());
         }
 
         // checkstyle: resume exception type check
+        
+        /**
+         * Creates a status message a task-based process. Attaches the actual task data if available.
+         * 
+         * @param componentId the component id
+         * @param type shall be {@link ActionTypes#RESULT} or {@link ActionTypes#ERROR}
+         * @param result a serializable result, may be <b>null</b> 
+         * @return the screated status message
+         */
+        private StatusMessage createStatusMessage(String componentId, ActionTypes type, Object result) {
+            return new StatusMessage(type, componentId, Id.getDeviceId())
+                .withTask(data)
+                .withResult(result);
+        }
 
     }
 
