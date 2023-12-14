@@ -1,47 +1,36 @@
-import { PlatformData, PlatformResources, platformResponse } from './../../../../interfaces';
+import { PlatformData, PlatformResources, ST_ERROR, ST_RESULT, platformResponse } from './../../../../interfaces';
 import { ApiService } from 'src/app/services/api.service';
-import { Component, OnInit } from '@angular/core';
-import { PlanDeployerService } from 'src/app/services/plan-deployer.service';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { StatusCollectionService } from 'src/app/services/status-collection.service';
 import { statusCollection, statusMessage } from 'src/interfaces';
 import { MatDialog } from '@angular/material/dialog';
 import { StatusDetailsComponent } from './status-details/status-details.component';
 import { WebsocketService } from 'src/app/websocket.service';
 import { Subject, Subscription } from 'rxjs';
+import { Utils } from 'src/app/services/utils.service';
 
 @Component({
   selector: 'app-status-box',
   templateUrl: './status-box.component.html',
   styleUrls: ['./status-box.component.scss']
 })
-export class StatusBoxComponent implements OnInit {
+export class StatusBoxComponent extends Utils implements OnInit {
 
-  //statusSub: Subscription;
-  hidden =  ["TaskId", "AliasIds", "SubDescription"];
+  //hidden =  ["TaskId", "AliasIds", "SubDescription"];
 
   StatusCollection: statusCollection[];
-  //StatusCollection2: statusCollection[];
   private subscription!: Subscription;
-
+  statusUri:any
   showAll = false;
+  @ViewChild('result') private resultContainer!: ElementRef;
 
-  constructor(private deployer: PlanDeployerService,
+  constructor(private collector: StatusCollectionService,
     public dialog: MatDialog,
     public api: ApiService,
     private websocketService: WebsocketService) {
-    // this.statusSub = this.deployer.emitter.subscribe(
-    //   (status: StatusMsg) => {this.status = status});
-    // this.allStatusSub = this.deployer.allEmitter.subscribe(
-    //   (status: Resource[]) => {this.statusSubmodel = status});
-
-      this.StatusCollection = deployer.StatusCollection;
-      /*
-      this.StatusCollection2 = websocketService.data
-      this.subscription = this.websocketService.getMsg().subscribe(
-        dataFromServer => this.receiveStatus(dataFromServer)
-      )*/
+      super();
+      this.StatusCollection = collector.StatusCollection;
   }
-
-  statusUri:any
 
   ngOnInit(): void {
     //this.getStatusData()
@@ -77,78 +66,46 @@ export class StatusBoxComponent implements OnInit {
 
   // }
 
-  /*public getLastStatus(status: statusMessage[]) {
-    if(status.length > 0) {
-      return status[status.length - 1];
+  public getLastStatus(process: statusCollection) {
+    let len = process.messages.length;
+    if (len > 0) {
+      let last = process.messages[len - 1];
+      let text = "";
+      if (process.isFinished && process.isSuccesful) {
+        if (last.action == ST_RESULT) {
+          if (last.id == "Configuration") {
+            if (last.result && this.isNonEmptyString(last.result)) {
+              let tmp = JSON.parse(last.result);
+              if (Array.isArray(tmp) && tmp.length > 0) {
+                text = "Template download: " + 
+                  tmp.flatMap(u => `<a href="${u}">${u.substring(u.lastIndexOf('/') + 1)}</a>`)
+                    .join(", ");
+              }
+            }
+          }
+        } else if (last.action == ST_ERROR) {
+          if (this.isNonEmptyString(last.result)) {
+            text = "Error: " + last.result;
+          } else {
+            text = "Error: unknown";
+          }
+        }
+      }
+      if (this.resultContainer && this.resultContainer.nativeElement && text.length > 0) {
+        this.resultContainer.nativeElement.innerHTML = text;
+      }
+      return last;
     } else {
       return null;
     }
-  }*/
+  }
 
   public details(process: statusCollection) {
-      let dialogRef = this.dialog.open(StatusDetailsComponent, {
-        maxHeight: '80%',
-        maxWidth:  '80%',
-
-      })
-      dialogRef.componentInstance.process = process;
-  }
-  /*
-  private receiveStatus(Status: statusMessage) {
-
-    let isFinished = false;
-    let isSuccesful = true;
-    if(Status.taskId) {
-      if(Status.action === "RESULT") {
-        isFinished = true;
-        // reload page
-        this.triggerDataReloadingAction();
-      }
-      if(Status.action === "ERROR") {
-        isSuccesful = false;
-      }
-      //const process = this.StatusCollection.find(process => process.taskId === Status.taskId)
-      const process = this.StatusCollection2.find(process => process.taskId === Status.taskId)
-      if(process) {
-        process.messages.push(Status);
-        //status messages might not be recieved in order of the respective process step occuring,
-        //therefore, once a result or error message was recieved, isFinished must stay true once it was set to true.
-        if(process.isFinished === false) {
-          process.isFinished = isFinished;
-        }
-        if(process.isSuccesful === true) {
-          process.isSuccesful = isSuccesful;
-        }
-      } else {
-        //this.StatusCollection.push({taskId: Status.taskId, isFinished: isFinished, isSuccesful: isSuccesful, messages: [Status]});
-        this.StatusCollection2.push({taskId: Status.taskId, isFinished: isFinished, isSuccesful: isSuccesful, messages: [Status]});
-      }
-      console.log("[status-box | receive] process ")
-      console.log(process);
-    } else {
-      console.log("WARNING: Recieved status without taskId: ");
-      console.log(Status);
-    }
-  }*/
-
-  /*public reloadingDataSubject = new Subject<any>();
-
-  public triggerDataReloadingAction() {
-    console.debug("Data reloading has been triggered.")
-    this.reloadingDataSubject.next(null);
+    let dialogRef = this.dialog.open(StatusDetailsComponent, {
+      maxHeight: '80%',
+      maxWidth:  '80%',
+    })
+    dialogRef.componentInstance.process = process;
   }
 
-  public async getStatusData() {
-    await this.getStatusUri()
-    this.websocketService.connect(this.statusUri)
-  }
-
-  public async getStatusUri() {
-    let url = "/aas/submodels/Status/submodel/submodelElements/status/uri"
-    let resp = await this.api.getData(url) as PlatformData
-    if(resp) {
-      this.statusUri = resp.value
-    }
-    console.log("[status-box | getUri] status uri: " + this.statusUri)
-  }*/
 }

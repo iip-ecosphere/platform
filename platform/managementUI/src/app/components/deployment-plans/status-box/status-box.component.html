@@ -3,7 +3,7 @@
   <mat-card *ngFor="let process of StatusCollection" class="status-card">
 
     <mat-card-content>
-      <div style="display: flex; justify-content: center;">
+      <div style="display: flex; justify-content: center;" *ngVar="getLastStatus(process); let status">
 
         <mat-card class="status-indicator">
           <mat-progress-spinner
@@ -22,16 +22,22 @@
         </mat-card>
 
         <div>
-          <div>
-            {{ process.messages[process.messages.length -1].action }}
-            {{ process.messages[process.messages.length -1].componentType }}
-            <span [matTooltip]="process.messages[process.messages.length -1].id">
-              {{ process.messages[process.messages.length -1].id }}
-            </span>
-            <div [matTooltip]="process.messages[process.messages.length -1].description">
-              {{ process.messages[process.messages.length -1].description }}
+          <div *ngIf="status">
+            <div *ngIf="status.action === 'ERROR'">
+              {{ status.action }}
             </div>
-            <div *ngIf="!process.messages[process.messages.length -1].description"
+            {{ status.componentType }}
+            <span [matTooltip]="status.id">
+              {{ status.id }}
+            </span>
+            <div [matTooltip]="status.description">
+              {{ status.description }}
+            </div>
+            <div *ngIf="status.progress >= 0">
+              {{ status.progress }} %
+            </div>
+            <div #result></div>
+            <div *ngIf="!status.description"
               style="height: 27px;">
             </div>
           </div>

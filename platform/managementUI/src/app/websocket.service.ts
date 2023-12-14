@@ -1,7 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Subject, firstValueFrom} from 'rxjs';
 import { statusCollection } from 'src/interfaces';
+import { ApiService } from './services/api.service';
 
+/**
+ * Subscribes to a given websocket. User calles getMsgSubject and subscribes to it.
+ */
 @Injectable({
   providedIn: 'root'
 })
@@ -15,6 +19,14 @@ export class WebsocketService {
   //messageSubject: Subject<string> = new Subject<string>();
   messageSubject: Subject<any> = new Subject<any>();
 
+  /**
+   * Creates a new instance of this service, for local use.
+   * 
+   * @returns the new instance
+   */
+  public createInstance(): WebsocketService {
+    return new WebsocketService();
+  }
 
   public connect(url:string): void {
     console.debug('[websocketService | connect] url: ' +  url + "#")
@@ -28,7 +40,19 @@ export class WebsocketService {
     };
   }
 
-  getMsg() {
+  /**
+   * Obtains the status URI from the platform and connects to it.
+   * 
+   * @param api the ApiService to obtain the URI from
+   */
+  public async connectToStatusUri(api: ApiService) {
+    let statusUri = await api.getStatusUri();
+    if (statusUri.length > 0) {
+      this.connect(statusUri)
+    }
+  }
+
+  getMsgSubject() {
     return this.messageSubject;
   }
 
@@ -41,4 +65,5 @@ export class WebsocketService {
     console.info('[WebSocket] closing socket');
     this.socket?.close()
   }
+
 }

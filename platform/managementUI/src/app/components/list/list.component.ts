@@ -1,7 +1,7 @@
 import { ApiService } from 'src/app/services/api.service';
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { firstValueFrom } from 'rxjs';
+import { Subscription, firstValueFrom } from 'rxjs';
 import { EnvConfigService } from 'src/app/services/env-config.service';
 import { Router } from '@angular/router';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
@@ -9,6 +9,8 @@ import { MAT_PROGRESS_SPINNER_DEFAULT_OPTIONS_FACTORY } from '@angular/material/
 import { EditorComponent } from '../editor/editor.component';
 import { DR_displayName, DR_idShort, DR_type, InputVariable, MTK_compound, MTK_container, MT_metaDisplayName, MT_metaSize, MT_metaType, MT_metaTypeKind, MT_metaVariable, MT_varValue, allMetaTypes, configMetaEntry, editorInput, platformResponse } from 'src/interfaces';
 import { Utils, DataUtils } from 'src/app/services/utils.service';
+import { WebsocketService } from 'src/app/websocket.service';
+import { StatusCollectionService } from 'src/app/services/status-collection.service';
 
 class RowEntry {
 
@@ -37,13 +39,19 @@ export class ListComponent extends Utils implements OnInit {
   filteredData: any;
   varValue = "varValue"
   imgPath = "../../../assets/"
+  sub: Subscription | undefined;
 
   constructor(private router: Router,
     public http: HttpClient,
     private envConfigService: EnvConfigService,
     public api: ApiService,
-    public dialog: MatDialog) {
+    public dialog: MatDialog,
+    private websocketService: WebsocketService, 
+    private collector: StatusCollectionService) {
       super();
+      this.sub = websocketService.getMsgSubject().subscribe((value: any) => {
+        collector.receiveStatus(JSON.parse(value)) 
+      })      
     }
 
   // Filter ---------------------------------------------------------------------
@@ -80,6 +88,7 @@ export class ListComponent extends Utils implements OnInit {
   ]
 
   async ngOnInit() {
+    this.websocketService.connectToStatusUri(this.api);
   }
 
   public async getDisplayData(tabName:string, metaProject: string | null, submodelElement: string | null) {

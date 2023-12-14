@@ -1,6 +1,6 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { PlatformArtifacts, PlatformResources, PlatformServices, ResourceAttribute, InputVariable, platformResponse, Resource } from 'src/interfaces';
+import { PlatformArtifacts, PlatformResources, PlatformServices, ResourceAttribute, InputVariable, platformResponse, Resource, PlatformData } from 'src/interfaces';
 import { firstValueFrom, Subject } from 'rxjs';
 import { EnvConfigService } from './env-config.service';
 
@@ -140,6 +140,21 @@ export class ApiService {
       await this.getResources();
     }
     return this.resources.submodelElements?.find(resource => resource.idShort === id);
+  }
+
+  /**
+   * Returns the platform WS status URI.
+   * 
+   * @returns the platform WS status URI
+   */
+  public async getStatusUri() {
+    const url = "/aas/submodels/Status/submodel/submodelElements/status/uri"
+    let resp = await this.getData(url) as PlatformData
+    let statusUri: any = ""
+    if (resp) {
+      statusUri = resp.value
+    }
+    return statusUri;
   }
 
 }

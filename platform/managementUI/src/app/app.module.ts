@@ -48,6 +48,7 @@ import { EnumDropdownComponent } from './components/editor/inputControls/enum-dr
 import { BooleanDropdownComponent } from './components/editor/inputControls/boolean-dropdown/boolean-dropdown.component';
 import { SubeditorButtonComponent } from './components/editor/inputControls/subeditor-button/subeditor-button.component';
 import { MeshFeedbackComponent } from './components/flowchart/feedback/mesh-feedback/mesh-feedback.component';
+import { NgVar } from './directives/ng-var.directive';
 
 @NgModule({
   declarations: [
@@ -71,7 +72,8 @@ import { MeshFeedbackComponent } from './components/flowchart/feedback/mesh-feed
     EnumDropdownComponent,
     BooleanDropdownComponent,
     SubeditorButtonComponent,
-    MeshFeedbackComponent
+    MeshFeedbackComponent,
+    NgVar
   ],
   imports: [
     BrowserModule,

@@ -8,6 +8,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { NgVar } from 'src/app/directives/ng-var.directive';
 
 describe('StatusBoxComponent', () => {
   let component: StatusBoxComponent;
@@ -21,7 +22,7 @@ describe('StatusBoxComponent', () => {
         MatCardModule, 
         MatProgressSpinnerModule,
         MatTooltipModule ],
-      declarations: [ StatusBoxComponent ],
+      declarations: [ StatusBoxComponent, NgVar ],
       providers: [
           {provide: MatDialogRef, useValue: {}},
           {provide: MAT_DIALOG_DATA, useValue: []},

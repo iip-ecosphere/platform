@@ -190,6 +190,8 @@ export interface AddressPart {
   }]
 }
 
+// -------------  collection of status messages -----------------
+
 export interface statusCollection {
   taskId: string;
   isFinished: boolean;
@@ -197,19 +199,94 @@ export interface statusCollection {
   messages: statusMessage[];
 }
 
-export interface statusMessage {
-  action: string;
-  aliasIds: string[];
-  componentType: string;
-  description: string;
-  deviceId: string;
-  id: string;
-  progress: number;
-  result?: string;
-  subDescription: string;
-  taskId: string;
+// ------------------- status message --------------------------
 
+/**
+ * StatusMessage: A device/component was added/created.
+ */
+export const ST_ADDED = "ADDED";
+
+/**
+ * StatusMessage: A device/component was changed.
+ */
+export const ST_CHANGED = "CHANGED";
+
+/**
+ * StatusMessage: A device/component was removed.
+ */
+export const ST_REMOVED = "REMOVED";
+
+/**
+ * Something task is being processed for a longer time (progress display indicated, usually with 
+ * taskId and progress).
+ */
+export const ST_PROCESS = "PROCESS";
+
+/**
+ * Result of an execution/ST_PROCESS usually with taskId.
+ */
+export const ST_RESULT = "RESULT";
+
+/**
+ * Result of an execution/ST_PROCESS usually with taskId.
+ */
+export const ST_ERROR = "ERROR";
+
+/**
+ * UI internal status message created/received.
+ */
+export const ST_RECEIVED = "Recieved"; // typo taken over from intial implementation
+
+/**
+ * Status message from the platform.
+ */
+export interface statusMessage {
+  /**
+   * The (ids of the) action being carried out (ST_* constants).
+   */
+  action: string;
+  /**
+   * Type of component where the message originated from.
+   */
+  componentType: string;
+  /**
+   * Description in case of a progress action (action == progress).
+   */
+  description: string;
+  /**
+   * Subordinate, detailing description in case of a progress action (action == progress).
+   */
+  subDescription: string;
+  /**
+   * Optional id of the device where the message originated at.
+   */
+  deviceId: string;
+  /**
+   * Component id where the message originated at.
+   */
+  id: string;
+  /**
+   * Optional aliases for the id whereh the message originated at.
+   */
+  aliasIds: string[];
+  /**
+   * Unique id if the related execution was started as a task. Status messages with the same 
+   * taskId belong to the same execution until there is a result.
+   */
+  taskId: string;
+  /**
+   * Optional percentage of completion, not given if negative, else if given [0-100]. 
+   * With action==PROGRESS, usually with given taskId.
+   */
+  progress: number;
+  /**
+   * If a taskId is given, the result at the end of the execution, usually in JSON.
+   */
+  result?: string;
 }
+
+// ------------------- UI gropus, grouping in editors --------------------------
+
 export interface uiGroup {
   uiGroup: number;
   inputs: editorInput[];
@@ -219,6 +296,8 @@ export interface uiGroup {
   toggleOptional?: boolean;
 }
 
+// ------------------- editor input data structure --------------------------
+
 /**
  * Data structure representing the input to AAS-based editors, sub-editors and editor components.
  */
@@ -227,6 +306,10 @@ export interface editorInput {
    * Value to be displayed by the editor. May be a primitive value (string, boolean), an object or an array of objects.
    */
   value: any;
+  /**
+   * Default value from the meta model to be displayed instead of value.
+   */
+  defaultValue?: any;
   /**
    * Optional language of the value if the value is an AasLocalizedString. 
    */
@@ -312,6 +395,8 @@ export interface configMetaEntry { //name, type, uiGroup
 export interface ivmlTemplate {
   [key: string]: any
 }
+
+// ------------------- IVML (meta) AAS constants --------------------------
 
 // from platform, IVML mapper
 export const MTK_primitive = 1;

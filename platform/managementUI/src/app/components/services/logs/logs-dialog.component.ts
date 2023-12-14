@@ -20,8 +20,9 @@ export class LogsDialogComponent implements OnInit{
     public http: HttpClient,
     public api: ApiService,
     private websocketService: WebsocketService) {
+      this.websocketService = this.websocketService.createInstance();
       this.logs = websocketService.data
-      this.subscription = this.websocketService.getMsg().subscribe((val) =>
+      this.subscription = this.websocketService.getMsgSubject().subscribe((val) =>
         {this.data.logs += "\n" + val})
   }
 

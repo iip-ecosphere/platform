@@ -328,7 +328,8 @@ export class EditorComponent extends Utils implements OnInit {
               || editorInput.type.indexOf('sequenceOf') >= 0) {
               editorInput.multipleInputs = true;
             }
-            let ivmlValue = this.type?.value || DataUtils.getPropertyValue(input.value, MT_metaDefault) || ""; 
+            editorInput.defaultValue = DataUtils.getPropertyValue(input.value, MT_metaDefault);
+            let ivmlValue = this.type?.value || editorInput.defaultValue || ""; 
             if (selMetaTypeKind === MTK_compound && this.isArray(ivmlValue)) {
               ivmlValue = DataUtils.getPropertyValue(ivmlValue, input.idShort);
             }
@@ -337,7 +338,7 @@ export class EditorComponent extends Utils implements OnInit {
               // compound instances may be passed in as object with properties, those being undefined are defaults
               ivmlValue = ivmlValue[input.idShort];
               if (!ivmlValue) {
-                ivmlValue = DataUtils.getPropertyValue(input.value, MT_metaDefault);
+                ivmlValue = editorInput.defaultValue;
               }
             }
             if (editorInput.multipleInputs) {

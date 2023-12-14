@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from 'src/app/services/api.service';
-import { PlanDeployerService, PlanDeployerServiceNotifier } from 'src/app/services/plan-deployer.service';
+import { PlanDeployerService } from 'src/app/services/plan-deployer.service';
+import { StatusCollectionNotifier } from 'src/app/services/status-collection.service';
 import { InputVariable, Resource } from 'src/interfaces';
 
 @Component({
@@ -17,7 +18,6 @@ export class InstancesComponent implements OnInit {
 
   constructor(private api: ApiService,
     private deployer: PlanDeployerService) {
-
     }
 
   async ngOnInit() {
@@ -69,8 +69,8 @@ export class InstancesComponent implements OnInit {
   }
 
   // for testing
-  public setFinishedNotifier(notifier: PlanDeployerServiceNotifier) {
-    this.deployer.finishedNotifier = notifier;
+  public setFinishedNotifier(notifier: StatusCollectionNotifier) {
+    this.deployer.setFinishedNotifier(notifier);
   }
 
   public isElement(elem: any, list: any) {

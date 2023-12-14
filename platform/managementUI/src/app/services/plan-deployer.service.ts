@@ -1,38 +1,32 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { firstValueFrom, Subject, Subscription } from 'rxjs';
-import { platformResponse, statusCollection, statusMessage} from 'src/interfaces';
+import { platformResponse } from 'src/interfaces';
 import { EnvConfigService } from './env-config.service';
-import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
 import { OnlyIdPipe } from '../pipes/only-id.pipe';
 import { WebsocketService } from '../websocket.service';
+import { StatusCollectionNotifier, StatusCollectionService } from './status-collection.service';
 
 @Injectable({
   providedIn: 'root'
 })
-
 export class PlanDeployerService {
 
-  sub: Subscription | undefined;
-
+  wsSubscription: Subscription | undefined;
   statusSubmodel: any;
-  finishedNotifier: PlanDeployerServiceNotifier = ()=> {};
-
-  //webSocket: WebSocketSubject<any>;
-  public StatusCollection: statusCollection[] = [];
 
   public reloadingDataSubject = new Subject<any>();
 
   constructor(private http: HttpClient,
     private envConfigService: EnvConfigService,
     private onlyId: OnlyIdPipe,
-    private websocketService: WebsocketService) {
+    private websocketService: WebsocketService,
+    private collector: StatusCollectionService) {
 
-    this.sub = websocketService.getMsg().subscribe((value: any) =>
-      {
-        this.receiveStatus(JSON.parse(value)) 
-      })
-   }
+    this.wsSubscription = websocketService.getMsgSubject().subscribe((value: any) => {
+      collector.receiveStatus(JSON.parse(value)) 
+    })
+  }
 
   public async deployPlan(params: any, undeploy?: boolean) {
     let response;
@@ -93,40 +87,6 @@ export class PlanDeployerService {
     return response;
   }
 
-  private receiveStatus(Status: statusMessage) {
-    let isFinished = false;
-    let isSuccesful = true;
-    if(Status.taskId) {
-      if(Status.action === "RESULT") {
-        isFinished = true;
-        this.finishedNotifier(true);
-        // reload page
-        this.triggerDataReloadingAction();
-      }
-      if(Status.action === "ERROR") {
-        isSuccesful = false;
-        this.finishedNotifier(false);
-      }
-      const process = this.StatusCollection.find(process => process.taskId === Status.taskId)
-      if(process) {
-        process.messages.push(Status);
-        //status messages might not be recieved in order of the respective process step occuring,
-        //therefore, once a result or error message was recieved, isFinished must stay true once it was set to true.
-        if(process.isFinished === false) {
-          process.isFinished = isFinished;
-        }
-        if(process.isSuccesful === true) {
-          process.isSuccesful = isSuccesful;
-        }
-      } else {
-        this.StatusCollection.push({taskId: Status.taskId, isFinished: isFinished, isSuccesful: isSuccesful, messages: [Status]});
-      }
-    } else {
-      console.warn("WARNING: Recieved status without taskId: ");
-      console.warn(Status);
-    }
-  }
-
   public async requestReceivedMessage(deploy: string, taskId: string) {
     let message = "";
     if(deploy.indexOf("undeploy") >= 0) {
@@ -134,23 +94,20 @@ export class PlanDeployerService {
     } else if(deploy.indexOf("deploy") >= 0) {
       message="deploy request recieved"
     }
-    const status: statusMessage = {taskId: taskId, action: "Recieved", aliasIds: [], componentType: "", description: message, deviceId: "", id: "", progress: 0, subDescription: ""};
-    this.StatusCollection.push({taskId: taskId, isFinished: false, isSuccesful: true, messages: [status]});
-
+    this.collector.addReceivedMessage(message, taskId);
   }
 
-  public dismissStatus(taskId: string) {
-    let process = this.StatusCollection.find(process => process.taskId = taskId)
-    if(process) {
-      this.StatusCollection.splice(this.StatusCollection.indexOf(process), 1);
-    }
+  /*public dismissStatus(taskId: string) {
+    this.collector.dismissStatus(taskId);
   }
 
   public triggerDataReloadingAction() {
-    console.debug("Data reloading has been triggered.")
-    this.reloadingDataSubject.next(null);
+    this.collector.triggerDataReloadingAction();
+  }*/
+
+  // for testing
+  public setFinishedNotifier(notifier: StatusCollectionNotifier) {
+    this.collector.setFinishedNotifier(notifier);
   }
 
 }
-
-export type PlanDeployerServiceNotifier = (success:boolean) => void; 
