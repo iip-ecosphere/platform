@@ -18,7 +18,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     
     main(Project source, Configuration config, Project target) = {
         platformInstantiation = true;
-        setMaxSteps(true, 1, 7);
+        setMaxSteps(config, true, 1, 7);
         generatePlatform(source, config, target); // first for container
         generateApps(source, config, target);
     }
@@ -27,14 +27,14 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     mainCli(Project source, Configuration config, Project target) = {
         platformInstantiation = true;
         tests = false;
-        setMaxSteps(true, 1, 7);
+        setMaxSteps(config, true, 1, 7);
         generatePlatform(source, config, target); // first for container
         generateApps(source, config, target);
     }
     
     // ------------------------------------------ progress reporting -------------------------------------
     
-    setMaxSteps(Boolean genApps, Integer furtherAppSteps, Integer platformSteps) = {
+    setMaxSteps(IIPEcosphere cfg, Boolean genApps, Integer furtherAppSteps, Integer platformSteps) = {
         if (maxSteps == 0) { // if call from multiple entry points, take the first call
             currentStep = -1;
             // platformSteps usually 7 // broker, ecs, ecsSvc, svc, monitoring, ui, platform
@@ -42,6 +42,9 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 maxSteps = maxSteps + platformSteps; 
             }
             if (genApps) {
+                if (cfg.sharedInterfaces) {
+                    maxSteps = maxSteps + 1;
+                }
                 Integer appCount = getApplications().size();
                 Integer appSteps = 1 + 1 + furtherAppSteps; // interfaces, templates, app
                 maxSteps = maxSteps + appSteps * appCount;
@@ -60,19 +63,19 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
 
     // called from tests/platform instantiator, don't change signature
     generateInterfaces(Project source, Configuration config, Project target) = {
-        setMaxSteps(true, 0, 7);
+        setMaxSteps(config, true, 0, 7);
         generateApps(source, config, target, false, false);
     }
 
     // called from tests/platform instantiator, don't change signature
     generateApps(Project source, Configuration config, Project target) = {
-        setMaxSteps(true, 1, 7);
+        setMaxSteps(config, true, 1, 7);
         generateApps(source, config, target, true, false);
     }
 
     // called from tests/platform instantiator, don't change signature
     generateAppsNoDeps(Project source, Configuration config, Project target) = {
-        setMaxSteps(true, 1, 7);
+        setMaxSteps(config, true, 1, 7);
         generateApps(source, config, target, true, true);
     }
     
@@ -87,11 +90,12 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         setOf(String) javaSerializersShared = {};
         setOf(String) artifactsShared = {};
         if (cfg.sharedInterfaces) {
+            advanceProgress("Instantiating shared interfaces");
             generateSharedInterfaces(config, target, javaSerializersShared, artifactsShared);
         }
         
         for (Application a : applications->sortedBy(a|a.id)) { // sortedBy for testing
-            advanceProgress("Instantiating app interfaces'" + a.name + "'");
+            advanceProgress("Instantiating app interfaces '" + a.name + "'");
 
             // shared serializers/artifacts shall remain "immutable"
             setOf(String) javaSerializers = {};
@@ -237,7 +241,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
             
             Boolean withTemplate = true; // preliminary
             if (withTemplate) {
-                advanceProgress("Instantiating app template'" + a.name + "'");
+                advanceProgress("Instantiating app template '" + a.name + "'");
                 appRoot = "${target}/templates/eclipse/impl.${appName}";
                 appRoot.mkdir();
                 javaSrc = "${appRoot}/src/main/java";
@@ -2020,6 +2024,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         vilTemplateProcessor("AppAnt", config, "${appRoot}/build-jk.xml", artifactPrefix=artList[1], srvFolderName="IIP-apps-${artList[1]}");
             
         mvn(appRoot);
+        zip(appRoot, appRoot, "${target}/ApplicationInterfaces.zip");
 
         artifacts.add(cfg.sharedArtifact);
     }
@@ -2067,7 +2072,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     // ------------------------------------------ generating instantiated platform artifacts -------------------------------------------------------
 
     generateBroker(Project source, Configuration config, Project target) = {
-        setMaxSteps(false, 0, 1);
+        setMaxSteps(config, false, 0, 1);
         IIPEcosphere cfg = config;
 
         brokerRoot.mkdir();

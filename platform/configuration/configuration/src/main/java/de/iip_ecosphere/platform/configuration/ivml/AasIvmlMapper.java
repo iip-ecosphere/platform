@@ -15,7 +15,6 @@ package de.iip_ecosphere.platform.configuration.ivml;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -110,6 +109,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         v -> !"Any".equals(IvmlDatatypeVisitor.getUnqualifiedType(v.getType()));
     public static final String META_TYPE_NAME = "meta";
     public static final Function<String, String> SHORTID_PREFIX_META = n -> "meta" + PseudoString.firstToUpperCase(n);
+    public static final String PROGRESS_COMPONENT_ID = "Configuration";
     protected static final String PRJ_NAME_ALLCONSTANTS = "AllConstants";
     protected static final String PRJ_NAME_ALLSERVICES = "AllServices";
     protected static final String PRJ_NAME_ALLTYPES = "AllTypes";
@@ -117,7 +117,6 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     private static final Map<String, String> PROJECT_MAPPING;
     private static final Map<String, String> PARENT_MAPPING;
     private static final TypeVisitor TYPE_VISITOR = new TypeVisitor();
-    private static final String PROGRESS_COMPONENT_ID = "configuration.configuration";
     private static final String[] TOP_FOLDERS = {META_TYPE_NAME, "Dependency", "Manufacturer", "ServiceBase", 
         "Server", "ServiceMesh", "Application"}; // top level SM folders, mostly meta-model type names -> mgtUI
 
@@ -428,22 +427,45 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     private Object collectTemplates(long startTime) {
         List<String> tmp = new ArrayList<>();
         ConfigurationSetup setup = ConfigurationSetup.getSetup();
-        Path artifactsPath = setup.getArtifactsFolder().toPath();
         EasySetup easySetup = setup.getEasyProducer();
         File gen = easySetup.getGenTarget();
-        File templatesFolder = new File(gen, "templates");
-        FileUtils.listFiles(templatesFolder, 
-            f -> f.getName().startsWith("impl.") && f.getName().endsWith(".zip") && f.lastModified() > startTime, 
+        FileUtils.listFiles(gen, 
+            f -> acceptTemplateFile(f, startTime), 
             f -> {
-                try {
-                    Files.copy(f.toPath(), artifactsPath, StandardCopyOption.REPLACE_EXISTING);
-                    tmp.add(setup.getArtifactsUriPrefix() + f.getName());
-                } catch (IOException e) {
-                    LoggerFactory.getLogger(AasIvmlMapper.class).error("Cannot copy generated template {} to {}: {}", 
-                        f, artifactsPath, e.getMessage());
+                if (f.isFile()) { // don't package directories as we accept them
+                    File target = new File(setup.getArtifactsFolder(), f.getName());
+                    try {
+                        Files.copy(f.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                        String prefix = setup.getArtifactsUriPrefix();
+                        if (null == prefix) { // not correctly configured
+                            prefix = "";
+                        } else if (!prefix.endsWith("/")) {
+                            prefix += "/";
+                        }
+                        tmp.add(prefix + f.getName());
+                    } catch (IOException e) {
+                        LoggerFactory.getLogger(AasIvmlMapper.class).error("Cannot copy generated "
+                            + "template {} to {}: {}", f, target, e.getMessage());
+                    }
                 }
             });
         return JsonUtils.toJson(tmp);
+    }
+    
+    /**
+     * Returns whether {@code file} is acceptable for template copying/publishing.
+     * 
+     * @param file the file to check
+     * @param startTime the start timestamp of the generation
+     * @return {@code true} for acceptable, {@code false} else
+     */
+    private static boolean acceptTemplateFile(File file, long startTime) {
+        boolean accept = file.isDirectory();
+        if (!accept && file.getName().endsWith(".zip")) {
+            accept = file.getName().startsWith("impl.") || file.getName().startsWith("ApplicationInterfaces.");
+            //accept &= file.lastModified() > startTime;
+        }
+        return accept;
     }
     
     /**

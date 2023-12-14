@@ -109,7 +109,8 @@ public class ConfigurationManager {
                     progress = (int) ((steps / (double) maxSteps) * 100);
                 }
                 if (!standalone) {
-                    StatusMessage msg = new StatusMessage(ActionTypes.PROCESS, "Configuration", alias);
+                    StatusMessage msg = new StatusMessage(ActionTypes.PROCESS, 
+                        AasIvmlMapper.PROGRESS_COMPONENT_ID, alias);
                     if (taskData != null) {
                         msg.withTask(taskData);
                     } else { // try anyway
