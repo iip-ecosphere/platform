@@ -12,7 +12,8 @@ For installation and first steps, see [install guide](platform/documentation/INS
 
 ## News
 
-* Ongoing revision of the management UI and the installation.
+* Ongoing revision of the management UI: Application implementation templates can be created and downloaded from the management UI (December 2023).
+* Improved installation scripts including Angular and the management UI.
 * In 0.7.0, the model locations of examples and templates have been aligned with Maven conventions, i.e., configuration in src/main/easy, updatable meta-model in target/easy.
 * [Tutorial videos](platform/documentation/TUTORIALS.md) (with platform update information) linked now from github.
 * New application example: [HM'23/EMO'23](platform/examples/examples.emo23/README.md) excluding IPR protected code
