@@ -12,8 +12,12 @@
 
 package test.de.iip_ecosphere.platform.platform;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.Base64;
+import java.util.concurrent.ExecutionException;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -21,6 +25,7 @@ import org.junit.Test;
 
 import de.iip_ecosphere.platform.ecsRuntime.EcsAas;
 import de.iip_ecosphere.platform.ecsRuntime.EcsFactory;
+import de.iip_ecosphere.platform.platform.ArtifactsManager.ArtifactKind;
 import de.iip_ecosphere.platform.platform.PersistentAasSetup;
 import de.iip_ecosphere.platform.platform.PlatformAas;
 import de.iip_ecosphere.platform.platform.PlatformSetup;
@@ -29,10 +34,13 @@ import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.ServerAddress;
+import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
+import de.iip_ecosphere.platform.support.aas.Operation;
 import de.iip_ecosphere.platform.support.aas.ServerRecipe;
 import de.iip_ecosphere.platform.support.aas.ServerRecipe.LocalPersistenceType;
 import de.iip_ecosphere.platform.support.aas.ServerRecipe.PersistenceType;
+import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
@@ -76,9 +84,10 @@ public class PlatformAasTest {
      * Tests {@link PlatformAas}.
      * 
      * @throws IOException shall not occur in a successful test
+     * @throws ExecutionException shall not occur, if AAS operations fail
      */
     @Test
-    public void testPlatformAas() throws IOException {
+    public void testPlatformAas() throws IOException, ExecutionException {
         NotificationMode oldM = ActiveAasBase.setNotificationMode(NotificationMode.SYNCHRONOUS);
         Assert.assertTrue(AasPartRegistry.contributorClasses().contains(EcsAas.class));
         
@@ -119,6 +128,9 @@ public class PlatformAasTest {
         Assert.assertEquals(1, count); // already one gone
         count = PlatformAas.notifyAppInstanceStopped("app-1", id1);
         Assert.assertEquals(0, count); // both gone
+        
+        Assert.assertTrue(res.getAas().size() > 0); 
+        testUpload(res.getAas().get(0));
 
         aasServer.stop(true);
         implServer.stop(true);
@@ -126,6 +138,72 @@ public class PlatformAasTest {
         ActiveAasBase.setNotificationMode(oldM);
         MetricsAasConstructor.clear();
         PlatformSetup.getInstance().setAas(oldPSetup);
+    }
+    
+    /**
+     * Tests uploading a single-chunk and a multi-chunk file.
+     * 
+     * @param aas the AAS to use
+     * @throws IOException in case that reading a file fails.
+     * @throws ExecutionException shall not occur, if AAS operations fail
+     */
+    private static void testUpload(Aas aas) throws IOException, ExecutionException {
+        // ensure setup
+        PlatformSetup setup = PlatformSetup.getInstance();
+        File origArtifactsFolder = setup.getArtifactsFolder();
+        File origUploadFolder = setup.getUploadFolder();
+        File artifactsFolder = new File(FileUtils.getTempDirectory(), "okto-artifacts-test");
+        File uploadFolder = new File(FileUtils.getTempDirectory(), "okto-uploads-test");
+        FileUtils.deleteQuietly(uploadFolder);
+        FileUtils.deleteQuietly(artifactsFolder);
+        artifactsFolder.mkdirs();
+        uploadFolder.mkdirs();
+        setup.setArtifactsFolder(artifactsFolder);
+        setup.setUploadFolder(null); // use artifacts folder first
+        
+        // get/ensure AAS operation
+        Submodel sm = aas.getSubmodel(PlatformAas.NAME_SUBMODEL_ARTIFACTS);
+        Assert.assertNotNull(sm);
+        Operation op = sm.getOperation(PlatformAas.NAME_OPERATION_UPLOAD);
+        Assert.assertNotNull(op);
+        
+        // single chunk upload
+        String fName = "deployment_plan.yaml";
+        File source = new File("src/test/resources", fName);
+        byte[] data = FileUtils.readFileToByteArray(source);
+        String utfData = Base64.getEncoder().encodeToString(data);
+        op.invoke(ArtifactKind.DEPLOYMENT_PLAN.name(), 0, fName, utfData);
+        File target = new File(artifactsFolder, fName);
+        Assert.assertTrue(target.exists());
+        Assert.assertTrue(FileUtils.contentEquals(source, target));
+        
+        // small chunk upload
+        setup.setUploadFolder(uploadFolder);
+        fName = "service2.zip";
+        source = new File("src/test/resources/artifacts", fName);
+        data = FileUtils.readFileToByteArray(source);
+        int pos = 0;
+        int chunkCount = 1;
+        final int chunkLength = 100;
+        while (pos < data.length) {
+            int actChunkLength = Math.min(chunkLength, data.length - pos);
+            byte[] chunk = new byte[actChunkLength];
+            int seqNr = actChunkLength < chunkLength ? -chunkCount : chunkCount;
+            System.arraycopy(data, pos, chunk, 0, actChunkLength);
+            utfData = Base64.getEncoder().encodeToString(chunk);
+            op.invoke(ArtifactKind.IMPLEMENTATION_ARTIFACT.name(), seqNr, fName, utfData);
+            pos += chunk.length;
+            chunkCount++;
+        }
+        target = new File(uploadFolder, fName);
+        Assert.assertTrue(target.exists());
+        Assert.assertTrue(FileUtils.contentEquals(source, target));
+        
+        // cleanup, reset setup
+        FileUtils.deleteQuietly(uploadFolder);
+        FileUtils.deleteQuietly(artifactsFolder);
+        setup.setArtifactsFolder(origArtifactsFolder);
+        setup.setUploadFolder(origUploadFolder);
     }
     
 }

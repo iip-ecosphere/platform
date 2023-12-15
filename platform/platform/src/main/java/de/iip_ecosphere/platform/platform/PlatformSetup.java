@@ -45,6 +45,7 @@ public class PlatformSetup extends AbstractSetup {
     private PersistentAasSetup aas = new PersistentAasSetup();
     private TransportSetup transport = new TransportSetup();
     private File artifactsFolder = new File("artifacts");
+    private File uploadFolder; // default on getter
     private String artifactsUriPrefix = "";
     private int aasHeartbeatTimeout = 10 * 1000;
     private int aasStatusTimeout = 2 * 60 * 1000;
@@ -77,6 +78,15 @@ public class PlatformSetup extends AbstractSetup {
     }
     
     /**
+     * Returns the folder containing uploaded artifacts.
+     * 
+     * @return the folder
+     */
+    public File getUploadFolder() {
+        return null == uploadFolder ? artifactsFolder : uploadFolder;
+    }
+    
+    /**
      * Returns the artifacts URI prefix.
      * 
      * @return the prefix with protocol, may be empty for none
@@ -102,7 +112,16 @@ public class PlatformSetup extends AbstractSetup {
     public void setAas(PersistentAasSetup aas) {
         this.aas = aas;
     }
-    
+
+    /**
+     * Changes the folder containing uploaded artifacts. [snakeyaml]
+     * 
+     * @param uploadFolder the folder
+     */
+    public void setUploadFolder(File uploadFolder) {
+        this.uploadFolder = uploadFolder;
+    }
+
     /**
      * Changes the folder containing installable artifacts. [snakeyaml]
      * 

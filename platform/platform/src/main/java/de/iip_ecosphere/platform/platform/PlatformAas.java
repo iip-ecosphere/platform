@@ -14,11 +14,20 @@ package de.iip_ecosphere.platform.platform;
 
 import static de.iip_ecosphere.platform.support.aas.AasUtils.fixId;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.util.Base64;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
+import org.apache.commons.io.FileUtils;
+import org.slf4j.LoggerFactory;
+
 import de.iip_ecosphere.platform.platform.ArtifactsManager.Artifact;
+import de.iip_ecosphere.platform.platform.ArtifactsManager.ArtifactKind;
 import de.iip_ecosphere.platform.services.ServiceManager;
 import de.iip_ecosphere.platform.services.environment.services.TransportConverter;
 import de.iip_ecosphere.platform.services.environment.services.TransportConverterFactory;
@@ -67,6 +76,7 @@ public class PlatformAas implements AasContributor {
     public static final String NAME_OPERATION_UNDEPLOY_ASYNC = "undeployPlanAsync";
     public static final String NAME_OPERATION_UNDEPLOY_WITHID_ASYNC = "undeployPlanWithIdAsync";
     public static final String NAME_OPERATION_GET_TASK_STATUS = "getTaskStatus";
+    public static final String NAME_OPERATION_UPLOAD = "upload";
     
     private static final String PROGRESS_COMPONENT_ID = "IIP-Ecosphere Platform";
     
@@ -123,6 +133,13 @@ public class PlatformAas implements AasContributor {
             .addInputVariable("taskId", Type.STRING)
             .setInvocable(iCreator.createInvocable(NAME_OPERATION_GET_TASK_STATUS))
             .build(Type.STRING);
+        smB.createOperationBuilder(NAME_OPERATION_UPLOAD)
+            .addInputVariable("kind", Type.STRING)
+            .addInputVariable("sequenceNr", Type.INTEGER)
+            .addInputVariable("name", Type.STRING)
+            .addInputVariable("data", Type.STRING)
+            .setInvocable(iCreator.createInvocable(NAME_OPERATION_UPLOAD))
+            .build(Type.NONE);
         smB.build();
         
         // just that they are there
@@ -162,7 +179,79 @@ public class PlatformAas implements AasContributor {
             TaskData data = TaskRegistry.getTaskData(AasUtils.readString(p));
             return data != null && data != TaskRegistry.NO_TASK ? data.getStatus().toString() : null;
         }));
-        
+        sBuilder.defineOperation(NAME_OPERATION_UPLOAD, new JsonResultWrapper(p -> {
+            try {
+                upload(ArtifactKind.valueOf(AasUtils.readString(p)), AasUtils.readInt(p, 1, -1), 
+                    AasUtils.readString(p, 2), AasUtils.readString(p, 3));
+                return null;
+            } catch (IllegalArgumentException e) {
+                throw new ExecutionException("kind: " + e.getMessage(), null);
+            }
+        }));
+    }
+
+    /**
+     * Implements the upload of an artifact kind, possibly as chunks into the platform.
+     * 
+     * @param kind the kind of artifact being uploaded so that the platform can decide about the (final) 
+     *   uploading location; deployment plans go into the {@link PlatformSetup#getArtifactsFolder() artifacts folder}, 
+     *   all other kinds for now into the {@link PlatformSetup#getUploadFolder() upload folder}
+     * @param sequenceNr the sequence number for transferring a larger file in chunks; 0 indicates a complete file to 
+     *   be stored with the given {@code name} directly into the target folder determined by {@code kind}; a positive
+     *   number indicates a chunk which may be transferred out of sequence. a negative number indicates the last chunk
+     *   of the corresponding positive number and requests composing the chunks to a file which shall be stored  
+     * @param name the name of the file with extension but without path
+     * @param data the data chunk, UTF-8 encoded
+     * @throws ExecutionException if uploading files for some reason
+     */
+    static void upload(ArtifactKind kind, int sequenceNr, String name, String data) throws ExecutionException {
+        File temp = FileUtils.getTempDirectory();
+        File uploadFolder;
+        if (ArtifactKind.DEPLOYMENT_PLAN == kind) {
+            uploadFolder = PlatformSetup.getInstance().getArtifactsFolder();
+        } else {
+            uploadFolder = PlatformSetup.getInstance().getUploadFolder();
+        }
+        File target = new File(uploadFolder, name);
+
+        byte[] bytes = Base64.getDecoder().decode(data);
+        try {
+            if (0 == sequenceNr) {
+                FileUtils.writeByteArrayToFile(target, bytes);
+                LoggerFactory.getLogger(PlatformAas.class).info("Upload of {} completed." + target);
+            } else if (sequenceNr > 0) {
+                FileUtils.writeByteArrayToFile(getChunkFile(temp, name, sequenceNr), bytes);
+            } else {
+                sequenceNr = -sequenceNr;
+                File tmpFile = new File(temp, name);
+                for (int i = 1; i < sequenceNr; i++) {
+                    File chunkFile = getChunkFile(temp, name, i);
+                    byte[] fileBytes = FileUtils.readFileToByteArray(chunkFile);
+                    FileUtils.writeByteArrayToFile(tmpFile, fileBytes, i > 1);
+                    FileUtils.deleteQuietly(chunkFile); // may fail
+                }
+                FileUtils.writeByteArrayToFile(tmpFile, bytes, true);
+                // make visible if complete
+                Files.copy(tmpFile.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING); 
+                FileUtils.deleteQuietly(tmpFile); // may fail
+                LoggerFactory.getLogger(PlatformAas.class).info("Upload of {} completed." + target);
+            }
+        } catch (IOException e) {
+            throw new ExecutionException("Uploading file (" + kind + " seqNr " + sequenceNr + " " + name + "):" 
+                + e.getMessage(), null);
+        }
+    }
+    
+    /**
+     * Returns the file object of a chunk file.
+     * 
+     * @param folder the folder where the chunk file is/will be stored
+     * @param name the name of the file
+     * @param sequenceNr the sequence number
+     * @return the file object
+     */
+    private static File getChunkFile(File folder, String name, int sequenceNr) {
+        return new File(folder, name + "-" + sequenceNr);        
     }
         
     /**

@@ -68,7 +68,12 @@ public class ArtifactsManager {
         /**
          * Deployment plan for multiple services/resources, like in the CLI.
          */
-        DEPLOYMENT_PLAN;
+        DEPLOYMENT_PLAN,
+        
+        /**
+         * Service implementation artifact for integration. 
+         */
+        IMPLEMENTATION_ARTIFACT;
     }
 
     /**
