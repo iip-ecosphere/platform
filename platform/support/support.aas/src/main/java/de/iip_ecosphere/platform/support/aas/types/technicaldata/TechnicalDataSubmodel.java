@@ -65,7 +65,7 @@ public interface TechnicalDataSubmodel extends Submodel {
          * Creates a further information builder.
          * 
          * @param validDate denotes a date on which the data specified in the submodel was valid from for the 
-         *     associated asset
+         *     associated asset, may be <b>null</b> for now
          * @return the builder
          */
         public FurtherInformationBuilder createFurtherInformationBuilder(XMLGregorianCalendar validDate);

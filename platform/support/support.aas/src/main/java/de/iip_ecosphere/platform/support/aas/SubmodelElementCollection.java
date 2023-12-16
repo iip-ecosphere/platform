@@ -34,6 +34,14 @@ public interface SubmodelElementCollection extends SubmodelElement, ElementsAcce
          */
         public Reference createReference();
         
+        /**
+         * Sets the semantic ID of the submodel element collection in terms of a reference.
+         * 
+         * @param refValue the reference value (supported: irdi:<i>irdiValue</i>)
+         * @return <b>this</b>
+         */
+        public SubmodelElementCollectionBuilder setSemanticId(String refValue);
+        
     }
 
     /**

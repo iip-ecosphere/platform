@@ -186,6 +186,12 @@ public class FakeSubmodelElementCollection extends FakeElement implements Submod
             return instance.elements.containsKey(idShort);
         }
 
+        @Override
+        public SubmodelElementCollectionBuilder setSemanticId(String refValue) {
+            // ignore for now
+            return this;
+        }
+
     }
     
     /**
