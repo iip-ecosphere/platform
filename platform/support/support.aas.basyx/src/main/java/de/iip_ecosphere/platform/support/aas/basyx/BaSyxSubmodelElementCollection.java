@@ -23,6 +23,7 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
+import org.eclipse.basyx.submodel.metamodel.api.reference.IReference;
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElementCollection;
 
 import de.iip_ecosphere.platform.support.aas.Reference;
@@ -146,6 +147,18 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
          */
         protected BaSyxSubmodelElementCollection getCollectionInstance() {
             return instance;
+        }
+        
+        @Override
+        public SubmodelElementCollectionBuilder setSemanticId(String refValue) {
+            if (collection instanceof org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElement) {
+                IReference ref = Tools.translateReference(refValue);
+                if (ref != null) {
+                    ((org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElement) collection)
+                        .setSemanticId(ref);
+                }
+            }
+            return this;
         }
 
         @Override

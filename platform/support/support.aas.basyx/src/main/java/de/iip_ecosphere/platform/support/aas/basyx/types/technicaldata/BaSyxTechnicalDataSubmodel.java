@@ -12,6 +12,10 @@
 
 package de.iip_ecosphere.platform.support.aas.basyx.types.technicaldata;
 
+import java.util.GregorianCalendar;
+
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.eclipse.basyx.submodel.metamodel.map.identifier.Identifier;
@@ -195,6 +199,13 @@ public class BaSyxTechnicalDataSubmodel extends BaSyxSubmodel implements
         public FurtherInformationBuilder createFurtherInformationBuilder(XMLGregorianCalendar validDate) {
             FurtherInformationBuilder result;
             if (null == furtherInformation) {
+                if (null == validDate) {
+                    try {
+                        GregorianCalendar now = new GregorianCalendar();
+                        validDate = DatatypeFactory.newInstance().newXMLGregorianCalendar(now);
+                    } catch (DatatypeConfigurationException e) {
+                    }
+                }
                 result = new BaSyxFurtherInformation.BaSyxFurtherInformationBuilder(this, validDate);
             } else {
                 result = new BaSyxFurtherInformation.BaSyxFurtherInformationBuilder(this, 
