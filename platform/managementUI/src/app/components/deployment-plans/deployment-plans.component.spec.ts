@@ -36,7 +36,7 @@ describe('DeploymentPlansComponent', () => {
     let tabData = compiled.querySelector('table[id="data"]') as HTMLElement;
     expect(tabData).toBeTruthy();
   
-    let deployButton = undefined;
+    let deployButton = null;
     if (component?.deploymentPlans?.value) {
       let i = 0;
       for (let d of component?.deploymentPlans?.value) {
@@ -83,4 +83,23 @@ describe('DeploymentPlansComponent', () => {
       }).catch(e=>{});
     }
   }, 3 * 60 * 1000);
+
+  it('should have upload button', async() => {
+    await fixture.detectChanges();
+    let compiled = fixture.nativeElement as HTMLElement;
+    let button = compiled.querySelector('button[class="upload-btn"]') as HTMLElement;
+    expect(button).toBeTruthy();
+    // click does not help much here due to input
+    const dataBase64 = "VEhJUyBJUyBUSEUgQU5TV0VSCg==";
+    const arrayBuffer = Uint8Array.from(window.atob(dataBase64), c => c.charCodeAt(0));
+    var f = new File([arrayBuffer], "test.yml", {type: 'text/yaml'});
+    component.uploadFile(f);
+    console.log("Waiting for upload...");
+    await retry({
+      fn: () => component.uploadEnabled,
+      maxAttempts: 4,
+      delay: 300
+    }).catch(e=>{});
+  });
+
 });

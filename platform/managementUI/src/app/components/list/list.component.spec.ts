@@ -13,6 +13,7 @@ import { Location } from "@angular/common";
 import { routes } from "../../app-routing.module";
 import { of } from 'rxjs';
 import { FileUploadComponent } from '../file-upload/file-upload.component';
+import { retry } from 'src/app/services/utils.service';
 
 describe('ListComponent', () => {
 
@@ -42,6 +43,7 @@ describe('ListComponent', () => {
     .compileComponents().then(() => {
       fixture = TestBed.createComponent(ListComponent);
       component = fixture.componentInstance;
+      component.websocketService.emitInfo = false;
       fixture.detectChanges();
       router = TestBed.inject(Router);
       location = TestBed.inject(Location);
@@ -127,7 +129,7 @@ describe('ListComponent', () => {
     const expectedDataIdShort = ["myApp"] as string[];
 
     await test(fixture, component, router, dialogSpy, dialogRefSpyObj, 8, expectedDataIdShort,);
-  });
+  }, 120 * 60 * 1000);
 
   it('shall survive requesting non-existing information', async() => {
     // inspired by initially empty server structure
@@ -181,11 +183,38 @@ async function test(fixture: ComponentFixture<ListComponent>, component: ListCom
     expect(item).withContext(context).toBeTruthy();
     expect(item.innerText).withContext(context).toMatch(/\S+/);
 
-    if (tabName == "Applications") { // TODO not there
-        expect(compiled.querySelector('button[id="data.btnGenTemplate"]')).withContext(`genTemplate button of table ${tabName}`).toBeTruthy();
-        // click: not implemented/tested
-        expect(compiled.querySelector('button[id="data.btnGenApp"]')).withContext(`genApp button of table ${tabName}`).toBeTruthy();
-        // click: not implemented/tested
+    if (tabName == "Applications") {
+        let uploadBtn = compiled.querySelector('button[class="upload-btn"]');
+        expect(uploadBtn).withContext(`upload button of table ${tabName}`).toBeTruthy();
+        // click does not help much here due to input
+        const dataBase64 = "VEhJUyBJUyBUSEUgQU5TV0VSCg==";
+        const arrayBuffer = Uint8Array.from(window.atob(dataBase64), c => c.charCodeAt(0));
+        var f = new File([arrayBuffer], "test.impl", {type: 'text/yaml'});
+        expect(component.isUploading(itemIdShort)).withContext(`uploading state of ${itemIdShort} shall be false`).toBeFalse();
+        component.uploadAppFile(itemIdShort, f);
+        console.log("Waiting for upload...");
+        await retry({
+          fn: () => !component.isUploading(itemIdShort),
+          maxAttempts: 4,
+          delay: 300
+        }).catch(e=>{});
+
+        let done = false;
+        component.collector.setFinishedNotifier(succ => done = true);
+        let genTemplateBtn = compiled.querySelector('button[id="data.btnGenTemplate"]') as HTMLElement;
+        expect(genTemplateBtn).withContext(`genTemplate button of table ${tabName}`).toBeTruthy();
+        genTemplateBtn.click();
+        console.log("Waiting for tempate instantiation...");
+        await retry({
+          fn: () => done,
+          maxAttempts: 40,
+          delay: 1000
+        }).catch(e=>{});
+        expect(done).withContext("Template instantiation of ${itemIdShort} failed").toBeTrue();
+
+        let getAppBtn = compiled.querySelector('button[id="data.btnGenApp"]');
+        expect(getAppBtn).withContext(`genApp button of table ${tabName}`).toBeTruthy();
+        // TODO: click not implemented/tested
     }
     item = tabDataRow.querySelector('button[id="data.btnEdit"]') as HTMLElement;
     expect(item).withContext(`edit button of table ${tabName}`).toBeTruthy();

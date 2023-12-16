@@ -18,6 +18,7 @@ export class WebsocketService {
   data: any;
   //messageSubject: Subject<string> = new Subject<string>();
   messageSubject: Subject<any> = new Subject<any>();
+  public emitInfo = true;
 
   /**
    * Creates a new instance of this service, for local use.
@@ -32,7 +33,9 @@ export class WebsocketService {
     console.debug('[websocketService | connect] url: ' +  url + "#")
     this.socket = new WebSocket(url);
     this.socket.onopen = () => {
-      console.info("Websocket connected with url: " + url);
+      if (this.emitInfo) {
+        console.info("Websocket connected with url: " + url);
+      }
     }
     this.socket.onmessage = (event) => {
       console.debug('Received message:', event.data);

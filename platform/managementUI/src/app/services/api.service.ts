@@ -179,7 +179,6 @@ public async uploadFileAsArrayBuffer(kind: ArtifactKind, sequenceNr: number, fil
       ApiService.createAasOperationParameter("name", AAS_TYPE_STRING, fileName),
       ApiService.createAasOperationParameter("data", AAS_TYPE_STRING, DataUtils.arrayBufferToBase64(data))
     ];
-console.log("UPLOADING" + kind+" "+sequenceNr+" "+fileName);        
     return await this.executeAasJsonOperation(IDSHORT_SUBMODEL_ARTIFACTS, IDSHORT_OPERATION_ARTIFACTS_UPLOAD, params);
   } else {
     return Promise.resolve();

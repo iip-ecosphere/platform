@@ -66,8 +66,8 @@ export class ListComponent extends Utils implements OnInit {
     private envConfigService: EnvConfigService,
     public api: ApiService,
     public dialog: MatDialog,
-    private websocketService: WebsocketService, 
-    private collector: StatusCollectionService) {
+    public websocketService: WebsocketService, 
+    public collector: StatusCollectionService) {
       super();
       this.sub = websocketService.getMsgSubject().subscribe((value: any) => {
         collector.receiveStatus(JSON.parse(value)) 
