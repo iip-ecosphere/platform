@@ -1,14 +1,13 @@
-import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { Subscription, firstValueFrom } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { OnlyIdPipe } from 'src/app/pipes/only-id.pipe';
-import { ApiService } from 'src/app/services/api.service';
-import { EnvConfigService } from 'src/app/services/env-config.service';
+import { ApiService, ArtifactKind } from 'src/app/services/api.service';
 import { PlanDeployerService } from 'src/app/services/plan-deployer.service';
 import { WebsocketService } from 'src/app/websocket.service';
-import { ResourceAttribute, Resource, PlatformArtifacts, InputVariable, PlatformData } from 'src/interfaces';
+import { Resource, PlatformArtifacts, DEFAULT_UPLOAD_CHUNK } from 'src/interfaces';
 import { Utils } from 'src/app/services/utils.service';
 import { StatusCollectionNotifier } from 'src/app/services/status-collection.service';
+import { chunkInput } from '../file-upload/file-upload.component';
 
 @Component({
   selector: 'app-deployment-plans',
@@ -27,6 +26,8 @@ export class DeploymentPlansComponent extends Utils implements OnInit {
   responseMessage: string | undefined;
   taskId: string = "";
   http: any;
+  uploadFileType = ".yaml, .yml"; // suggested file extensions in browser upload dialog
+  uploadEnabled = true;
 
   private subscription!: Subscription;
 
@@ -93,21 +94,24 @@ export class DeploymentPlansComponent extends Utils implements OnInit {
     return id
   }
 
-  /*public applyLineStyle(index: number) {
-
-    let style = "white-line";
-
-    if(index % 2 === 0) {
-      style = "grey-line";
-    }
-    return (style);
-
-  }*/
-
   public getEnabled(plan: any) {
     let enabled = plan.value.find(
       (item: {idShort: string;}) => item.idShort === "enabled").value
     return enabled
+  }
+
+  /**
+   * Called when a deployment plan shall be uploaded.
+   * 
+   * @param file the file to upload
+   */
+  public uploadFile(file: File) {
+    this.uploadEnabled = false;
+    chunkInput(file, DEFAULT_UPLOAD_CHUNK, (chunk, seqNr) => {
+      this.api.uploadFileAsArrayBuffer(ArtifactKind.DEPLOYMENT_PLAN, seqNr, file.name, chunk);
+    }, () => {
+      this.uploadEnabled = true;
+    });
   }
 
 }

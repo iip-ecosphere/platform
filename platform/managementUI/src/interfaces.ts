@@ -441,3 +441,9 @@ export const DR_displayName ="_displayName";
 * On data rows/entries, indicate the identification/name of the entry.
 */
 export const DR_idShort ="idShort";
+
+/**
+ * Default file upload chunk from user computer via AAS to platform.
+ */
+export const DEFAULT_UPLOAD_CHUNK = 1024 * 1024;
+export const DEFAULT_AAS_OPERATION_TIMEOUT = 10000;

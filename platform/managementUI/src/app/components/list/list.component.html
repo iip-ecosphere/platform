@@ -62,27 +62,31 @@ mat-raised-button color="success"
           <!-- Buttons -->
           <td  *ngIf="tab.tabName == 'Applications'" class="cell-with-button">
             <button id="data.btnGenTemplate"
-              mat-raised-button style="background-color: rgb(35, 142, 184)"
+              mat-raised-button class="okto-button-enabled"
               (click)="genTemplate(item.idShort)" >generate template
             </button>
           </td>
-          <td  *ngIf="tab.tabName == 'Applications'" class="cell-with-button">
+          <td *ngIf="tab.tabName == 'Applications'" class="cell-with-button">
+            <app-file-upload (result)="uploadAppFile(item.idShort, $event)" [accept]="uploadFileTypes" 
+              [enabled]="!isUploading(item.idShort)"></app-file-upload>
+            &nbsp;
             <button id="data.btnGenApp"
-              mat-raised-button style="background-color: rgb(35, 142, 184)"
-              (click)="genApp(item.idShort, '')" >integrate application
+              mat-raised-button class="okto-button-enabled"
+              [disabled]="isUploading(item.idShort)"
+              (click)="genApp(item.idShort)" >integrate application
             </button>
           </td>
 
           <td class="cell-with-button">
             <div *ngIf="tab.tabName == 'Meshes'; else elseNotDone">
               <button id="data.btnEdit"
-                mat-raised-button style="background-color: rgb(35, 142, 184)"
+                mat-raised-button class="okto-button-enabled"
                 (click)="edit(item)">edit
               </button>
             </div>
             <ng-template #elseNotDone>
               <button id="data.btnEdit"
-                mat-raised-button style="background-color: rgb(35, 142, 184)"
+                mat-raised-button class="okto-button-enabled"
                 (click)="edit(item)">edit
               </button>
             </ng-template>

@@ -278,6 +278,60 @@ export class DataUtils {
     return JSON.parse(JSON.stringify(value)); // there might be better ways
   }
 
+  /**
+   * Turns an array buffer to a base64 encoded string.
+   * 
+   * @param buffer the buffer
+   * @returns the base64 encoded string
+   */
+  public static arrayBufferToBase64( buffer: ArrayBuffer ) {
+    // https://www.isummation.com/blog/convert-arraybuffer-to-base64-string-and-vice-versa/
+    var binary = '';
+    var bytes = new Uint8Array( buffer );
+    var len = bytes.byteLength;
+    for (var i = 0; i < len; i++) {
+      binary += String.fromCharCode( bytes[ i ] );
+    }
+    return window.btoa( binary );
+  }
+
+  /**
+   * Turns abase64 encoded string to an array buffer.
+   * 
+   * @param base64 the base64 encoded string
+   * @returns the array buffer
+   */
+  public static base64ToArrayBuffer(base64: string) {
+    // https://www.isummation.com/blog/convert-arraybuffer-to-base64-string-and-vice-versa/
+    var binary_string =  window.atob(base64);
+    var len = binary_string.length;
+    var bytes = new Uint8Array( len );
+    for (var i = 0; i < len; i++)        {
+        bytes[i] = binary_string.charCodeAt(i);
+    }
+    return bytes.buffer;
+  }
+
+  /**
+   * Turns an array buffer to a string.
+   * 
+   * @param buf the array buffer
+   * @returns the string
+   */
+  public static arrayBufferToString(buf: ArrayBuffer) {
+    return new TextDecoder().decode(buf);
+  }
+
+  /**
+   * Turns a string to an array buffer.
+   * 
+   * @param str the string
+   * @returns the array buffer
+   */
+  public static stringToArrayBuffer(str: string): ArrayBuffer {
+    return new TextEncoder().encode(str);
+  }
+
 }
 
 /**

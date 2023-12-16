@@ -4,6 +4,7 @@ import { ListComponent } from './list.component';
 import { HttpClientModule } from '@angular/common/http';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatTabsModule } from '@angular/material/tabs';
+import { MatIconModule } from '@angular/material/icon';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { EnvConfigService } from '../../services/env-config.service';
 import { RouterTestingModule } from "@angular/router/testing";
@@ -11,6 +12,7 @@ import { Router } from "@angular/router";
 import { Location } from "@angular/common";
 import { routes } from "../../app-routing.module";
 import { of } from 'rxjs';
+import { FileUploadComponent } from '../file-upload/file-upload.component';
 
 describe('ListComponent', () => {
 
@@ -27,10 +29,11 @@ describe('ListComponent', () => {
     await TestBed.configureTestingModule({
       imports: [ HttpClientModule, 
         MatTabsModule, 
+        MatIconModule,
         BrowserAnimationsModule, 
         MatDialogModule, 
         RouterTestingModule.withRoutes(routes) ],
-      declarations: [ ListComponent ],
+      declarations: [ ListComponent, FileUploadComponent ],
       providers: [
           {provide: MatDialogRef, useValue: {}},
           {provide: MAT_DIALOG_DATA, useValue: []},

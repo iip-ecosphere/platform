@@ -137,6 +137,19 @@ describe('UtilsService', () => {
     expect(DataUtils.getUserLanguage().length).toBeGreaterThan(0);
   });
 
+  it('should implement string to ArrayBuffer to base64 and back encoding/decoding', () => {
+    let text = "My input text";
+    let buf = DataUtils.stringToArrayBuffer(text);
+    expect(buf).toBeTruthy();
+    let base64 = DataUtils.arrayBufferToBase64(buf);
+    expect(base64).toBeTruthy();
+    let buf2 = DataUtils.base64ToArrayBuffer(base64);
+    expect(buf2).toBeTruthy();
+    let text2 = DataUtils.arrayBufferToString(buf2);
+    expect(text).toBe(text2);
+  });
+
+
   // -------------------------- retry -----------------------------------
 
   it('should fail 3 times', async() => {

@@ -49,6 +49,7 @@ import { BooleanDropdownComponent } from './components/editor/inputControls/bool
 import { SubeditorButtonComponent } from './components/editor/inputControls/subeditor-button/subeditor-button.component';
 import { MeshFeedbackComponent } from './components/flowchart/feedback/mesh-feedback/mesh-feedback.component';
 import { NgVar } from './directives/ng-var.directive';
+import { FileUploadComponent } from './components/file-upload/file-upload.component';
 
 @NgModule({
   declarations: [
@@ -73,7 +74,8 @@ import { NgVar } from './directives/ng-var.directive';
     BooleanDropdownComponent,
     SubeditorButtonComponent,
     MeshFeedbackComponent,
-    NgVar
+    NgVar,
+    FileUploadComponent
   ],
   imports: [
     BrowserModule,

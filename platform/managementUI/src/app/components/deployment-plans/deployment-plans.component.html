@@ -2,6 +2,7 @@
   <div class="header">
     <!-- <img src="/assets/aas.png" alt="image" class="img-aas"> -->
     Deployment Plans
+    <app-file-upload (result)="uploadFile($event)" [enabled]="uploadEnabled" [accept]="uploadFileType"></app-file-upload>
   </div>
 
   <table id="data" *ngIf="deploymentPlans; else noPlans" style="margin: 0px;" >

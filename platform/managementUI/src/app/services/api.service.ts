@@ -1,8 +1,9 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { PlatformArtifacts, PlatformResources, PlatformServices, ResourceAttribute, InputVariable, platformResponse, Resource, PlatformData } from 'src/interfaces';
+import { PlatformArtifacts, PlatformResources, PlatformServices, ResourceAttribute, InputVariable, platformResponse, Resource, PlatformData, DEFAULT_AAS_OPERATION_TIMEOUT } from 'src/interfaces';
 import { firstValueFrom, Subject } from 'rxjs';
 import { EnvConfigService } from './env-config.service';
+import { DataUtils } from './utils.service';
 
 @Injectable({
   providedIn: 'root'
@@ -70,6 +71,7 @@ export class ApiService {
     return Data;
   }
 
+  // TODO unify with executeAasJsonOperation
   public async executeFunction(resourceId: string,
     aasElementURL:string, basyxFunc: string, params: any) {
     /*
@@ -97,6 +99,92 @@ export class ApiService {
     }
     return response;
   }
+
+/**
+ * Creates an AAS operation input parameter.
+ * 
+ * @param idShort the idShort of the parameter
+ * @param aasType the AAS type of the parameter, see AAS_TYPE_STRING
+ * @param value the value of the parameter
+ * @returns the input parameter instance
+ */
+public static createAasOperationParameter(idShort: string, aasType: string, value: any) : InputVariable {
+  let result : InputVariable = {
+    value: {
+      modelType: {
+        name: "Property"
+      },
+      valueType: aasType,
+      idShort: idShort,
+      kind: "Template",
+      value: value
+    }
+  }
+  return result;
+}
+
+/**
+ * Executes an AAS operation with default timeout DEFAULT_AAS_OPERATION_TIMEOUT (response type JSON, reporting progress).
+ * 
+ * @param submodel the submodel defining the operation
+ * @param operationName the name of the operation, may also be a sub-path within the submodel
+ * @param params the parameters for the operation
+ * @returns the response as platformResponse
+ */
+public async executeAasJsonOperation(submodel: string, operationName: string, params: any) {
+  return this.executeAasJsonOperationWithTimeout(submodel, operationName, DEFAULT_AAS_OPERATION_TIMEOUT, params);
+}
+
+/**
+ * Executes an AAS operation with given timeout (response type JSON, reporting progress).
+ * 
+ * @param submodel the submodel defining the operation
+ * @param operationName the name of the operation, may also be a sub-path within the submodel
+ * @param timeout the call timeout in ms
+ * @param params the parameters for the operation
+ * @returns the response as platformResponse
+ */
+public async executeAasJsonOperationWithTimeout(submodel: string, operationName: string, timeout: number, params: any) {
+  let response;
+
+  try {
+    let cfg = await this.envConfigService.initAndGetCfg();
+    response = await firstValueFrom(this.http.post<platformResponse>(
+      `${cfg?.ip}/shells/${cfg?.urn}/aas/submodels/${submodel}/submodel/${operationName}/invoke`,
+      {"inputArguments": params,
+      "requestId":"1bfeaa30-1512-407a-b8bb-f343ecfa28cf", // generate ???
+      "inoutputArguments":[], "timeout":timeout}, 
+      {responseType: 'json', 
+      reportProgress: true}));
+  } catch(e) {
+    console.error(e);
+  }
+  return response;
+}
+
+/**
+ * Calls the platform file upload operation.
+ * 
+ * @param kind the kind of 
+ * @param sequenceNr 
+ * @param fileName 
+ * @param data 
+ * @returns 
+ */
+public async uploadFileAsArrayBuffer(kind: ArtifactKind, sequenceNr: number, fileName: string, data: ArrayBuffer | null) {
+  if (data) {
+    let params: InputVariable[] = [
+      ApiService.createAasOperationParameter("kind", AAS_TYPE_STRING, "" + kind),
+      ApiService.createAasOperationParameter("sequenceNr", AAS_TYPE_INTEGER, sequenceNr),
+      ApiService.createAasOperationParameter("name", AAS_TYPE_STRING, fileName),
+      ApiService.createAasOperationParameter("data", AAS_TYPE_STRING, DataUtils.arrayBufferToBase64(data))
+    ];
+console.log("UPLOADING" + kind+" "+sequenceNr+" "+fileName);        
+    return await this.executeAasJsonOperation(IDSHORT_SUBMODEL_ARTIFACTS, IDSHORT_OPERATION_ARTIFACTS_UPLOAD, params);
+  } else {
+    return Promise.resolve();
+  }
+}
 
   public async getGraph() {
     let response;
@@ -157,4 +245,20 @@ export class ApiService {
     return statusUri;
   }
 
+}
+
+export const AAS_TYPE_STRING = "string";
+export const AAS_TYPE_INTEGER = "integer";
+
+export const IDSHORT_SUBMODEL_ARTIFACTS = "Artifacts";
+export const IDSHORT_OPERATION_ARTIFACTS_UNDEPLOYPLANASYNC = "undeployPlanAsync";
+export const IDSHORT_OPERATION_ARTIFACTS_DEPLOYPLANASYNC = "deployPlanAsync";
+export const IDSHORT_OPERATION_ARTIFACTS_DEPLOYPLANWITHIDASYNC = "undeployPlanWithIdAsync";
+export const IDSHORT_OPERATION_ARTIFACTS_UPLOAD = "upload";
+
+export enum ArtifactKind {
+  SERVICE_ARTIFACT = "SERVICE_ARTIFACT",
+  CONTAINER = "CONTAINER",
+  DEPLOYMENT_PLAN = "DEPLOYMENT_PLAN",
+  IMPLEMENTATION_ARTIFACT = "IMPLEMENTATION_ARTIFACT"
 }

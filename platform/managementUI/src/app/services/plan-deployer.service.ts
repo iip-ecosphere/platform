@@ -1,11 +1,11 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { firstValueFrom, Subject, Subscription } from 'rxjs';
-import { platformResponse } from 'src/interfaces';
+import { Subject, Subscription } from 'rxjs';
 import { EnvConfigService } from './env-config.service';
 import { OnlyIdPipe } from '../pipes/only-id.pipe';
 import { WebsocketService } from '../websocket.service';
 import { StatusCollectionNotifier, StatusCollectionService } from './status-collection.service';
+import { ApiService, IDSHORT_OPERATION_ARTIFACTS_DEPLOYPLANASYNC, IDSHORT_OPERATION_ARTIFACTS_DEPLOYPLANWITHIDASYNC, IDSHORT_OPERATION_ARTIFACTS_UNDEPLOYPLANASYNC, IDSHORT_SUBMODEL_ARTIFACTS } from './api.service';
 
 @Injectable({
   providedIn: 'root'
@@ -17,7 +17,8 @@ export class PlanDeployerService {
 
   public reloadingDataSubject = new Subject<any>();
 
-  constructor(private http: HttpClient,
+  constructor(private api: ApiService,
+    private http: HttpClient,
     private envConfigService: EnvConfigService,
     private onlyId: OnlyIdPipe,
     private websocketService: WebsocketService,
@@ -29,15 +30,15 @@ export class PlanDeployerService {
   }
 
   public async deployPlan(params: any, undeploy?: boolean) {
-    let response;
+    //let response;
     let basyxFunc;
 
     if (undeploy) {
-      basyxFunc = "undeployPlanAsync";
+      basyxFunc = IDSHORT_OPERATION_ARTIFACTS_UNDEPLOYPLANASYNC;
     } else {
-      basyxFunc = "deployPlanAsync";
+      basyxFunc = IDSHORT_OPERATION_ARTIFACTS_DEPLOYPLANASYNC;
     }
-    try {
+    /*try {
       let cfg = await this.envConfigService.initAndGetCfg();
       response = await firstValueFrom(this.http.post<platformResponse>(
         cfg?.ip
@@ -52,7 +53,9 @@ export class PlanDeployerService {
       , {responseType: 'json', reportProgress: true}));
     } catch(e) {
       console.error(e);
-    }
+    }*/
+
+    let response = await this.api.executeAasJsonOperation(IDSHORT_SUBMODEL_ARTIFACTS, basyxFunc, params);
 
     if(response && response.outputArguments[0].value && response.outputArguments[0].value.value) {
       this.requestReceivedMessage(basyxFunc, this.onlyId.transform(response.outputArguments[0].value.value));
@@ -63,8 +66,8 @@ export class PlanDeployerService {
 
 
   public async undeployPlanById(params: any) {
-    let response;
-    try {
+    let response = await this.api.executeAasJsonOperation(IDSHORT_SUBMODEL_ARTIFACTS, IDSHORT_OPERATION_ARTIFACTS_DEPLOYPLANWITHIDASYNC, params);
+    /*try {
       let cfg = await this.envConfigService.initAndGetCfg();
       response = await firstValueFrom(this.http.post<platformResponse>(
         cfg?.ip
@@ -77,8 +80,7 @@ export class PlanDeployerService {
       , {responseType: 'json'}));
     } catch(e) {
       console.error(e);
-    }
-
+    }*/
 
     if(response && response.outputArguments[0].value && response.outputArguments[0].value.value) {
       this.requestReceivedMessage("undeploy", this.onlyId.transform(response.outputArguments[0].value.value));

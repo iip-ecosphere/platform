@@ -1,4 +1,4 @@
-import { ApiService } from 'src/app/services/api.service';
+import { ApiService, ArtifactKind } from 'src/app/services/api.service';
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Subscription, firstValueFrom } from 'rxjs';
@@ -7,10 +7,28 @@ import { Router } from '@angular/router';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import { MAT_PROGRESS_SPINNER_DEFAULT_OPTIONS_FACTORY } from '@angular/material/progress-spinner';
 import { EditorComponent } from '../editor/editor.component';
-import { DR_displayName, DR_idShort, DR_type, InputVariable, MTK_compound, MTK_container, MT_metaDisplayName, MT_metaSize, MT_metaType, MT_metaTypeKind, MT_metaVariable, MT_varValue, allMetaTypes, configMetaEntry, editorInput, platformResponse } from 'src/interfaces';
+import { DEFAULT_UPLOAD_CHUNK, DR_displayName, DR_idShort, DR_type, InputVariable, MTK_compound, MTK_container, MT_metaDisplayName, MT_metaSize, MT_metaType, MT_metaTypeKind, MT_metaVariable, MT_varValue, allMetaTypes, configMetaEntry, editorInput, platformResponse } from 'src/interfaces';
 import { Utils, DataUtils } from 'src/app/services/utils.service';
 import { WebsocketService } from 'src/app/websocket.service';
 import { StatusCollectionService } from 'src/app/services/status-collection.service';
+import { chunkInput } from '../file-upload/file-upload.component';
+
+/**
+ * Information on a file being uploaded.
+ */
+interface FileUploadInfo {
+  
+  /**
+   * File object representing the data to upload.
+   */
+  file: File,
+
+  /**
+   * User flag to indicate processing on this file info.
+   */
+  uploading: boolean
+
+}
 
 class RowEntry {
 
@@ -40,6 +58,8 @@ export class ListComponent extends Utils implements OnInit {
   varValue = "varValue"
   imgPath = "../../../assets/"
   sub: Subscription | undefined;
+  uploadFileTypes = ".zip"; // suggested file extensions in browser upload dialog
+  private appFiles = new Map<string, FileUploadInfo>();
 
   constructor(private router: Router,
     public http: HttpClient,
@@ -533,7 +553,26 @@ export class ListComponent extends Utils implements OnInit {
     this.execFunctionInConfig("genAppsNoDepsAsync", inputVariables)
   }
 
-  public async genApp(appId: string, fileName: string) {
+  public isUploading(appId: string) {
+    let info = this.appFiles.get(appId);
+    if (info) {
+      return info.uploading;
+    } else {
+      return false;
+    }
+  }
+
+  public uploadAppFile(appId: string, file: File) {
+    let info : FileUploadInfo = {file: file, uploading: true};
+    this.appFiles.set(appId, info);
+    chunkInput(file, DEFAULT_UPLOAD_CHUNK, (chunk, seqNr) => {
+      this.api.uploadFileAsArrayBuffer(ArtifactKind.IMPLEMENTATION_ARTIFACT, seqNr, file.name, chunk);
+    }, () => {
+      info.uploading = false;
+    });
+  }
+
+  public async genApp(appId: string) {
     let inputVariables: InputVariable[] = [];
     let input0:InputVariable = {
       value: {
@@ -546,6 +585,11 @@ export class ListComponent extends Utils implements OnInit {
         value: appId
       }
     }
+
+    let fileInfo = this.appFiles.get(appId);
+    let fileName = fileInfo?.file.name  || '';
+
+    // TODO UPLOAD SOMEHOW, AAS?
 
     let input1:InputVariable = {
       value: {
