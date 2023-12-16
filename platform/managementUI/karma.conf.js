@@ -11,6 +11,7 @@ module.exports = function (config) {
       require('karma-jasmine-html-reporter'),
       require('karma-coverage'),
       require('@angular-devkit/build-angular/plugins/karma')
+      //,require('karma-spec-reporter')      // for debugging
     ],
     client: {
       jasmine: {
@@ -34,6 +35,7 @@ module.exports = function (config) {
         { type: 'cobertura', subdir: '.', file: 'cobertura.xml' }
       ]
     },
+    //reporters: ['spec'],    // for debugging
     reporters: ['progress', 'kjhtml'],
     port: 9876,
     colors: true,

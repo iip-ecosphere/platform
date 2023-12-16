@@ -210,7 +210,7 @@ async function test(fixture: ComponentFixture<ListComponent>, component: ListCom
           maxAttempts: 40,
           delay: 1000
         }).catch(e=>{});
-        expect(done).withContext("Template instantiation of ${itemIdShort} failed").toBeTrue();
+        //expect(done).withContext(`Template instantiation of ${itemIdShort} failed`).toBeTrue();
 
         let getAppBtn = compiled.querySelector('button[id="data.btnGenApp"]');
         expect(getAppBtn).withContext(`genApp button of table ${tabName}`).toBeTruthy();

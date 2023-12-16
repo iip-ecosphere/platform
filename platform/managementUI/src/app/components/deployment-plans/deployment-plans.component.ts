@@ -34,7 +34,7 @@ export class DeploymentPlansComponent extends Utils implements OnInit {
   constructor(public api: ApiService,
     private deployer: PlanDeployerService,
     private onlyId: OnlyIdPipe,
-    private websocket: WebsocketService) {
+    public websocket: WebsocketService) {
       super();
   }
 

@@ -21,6 +21,7 @@ describe('DeploymentPlansComponent', () => {
     .compileComponents();
     fixture = TestBed.createComponent(DeploymentPlansComponent);
     component = fixture.componentInstance;
+    component.websocket.emitInfo = false;
     await component.ngOnInit();
   });
 
