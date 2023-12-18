@@ -35,6 +35,30 @@ template Basics(Configuration config, FileArtifact target) {
 	    String tmp = s.replace("<", "Lt").replace(">", "Rt");
 	    tmp.toIdentifier("id");
 	}
+	
+	/**
+	* Turns the given string into HTML. Very basic version. May be, we need an EASy-Extension in PseudoString there.
+	*
+    * input: string
+    * output: potentially modified string
+	*/
+	def String htmlize(String s) {
+	    s.replace("<", "&lt;").replace(">", "&gt;").replace("@", "&commat;");
+	}
+	
+	/**
+	* Strips off a potential language string postfix.
+    *
+    * input: string
+    * output: potentially modified string
+    */
+    def String stripLang(String s) {
+        Integer pos = s.rfind("@");
+        if (pos >= s.length() - 4) { // probably the LangString notation
+            s = s.substring(0, pos);
+        }
+        s;
+    }
 
     /**
     * Turns a string into a folder name.

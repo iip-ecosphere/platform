@@ -330,7 +330,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         String topTypeOut = typeOut.get(pltfType);
         typeOut.remove(pltfType);
         for (RecordType t : typeOut.keys()->sortedBy(m|m.name)) {
-            'private void from${toTypeName(t)}(ModelAccess access, ModelOutputConverter outConverter, ${ciType} data) throws IOException {
+            'private void from${toTypeName(t)}(ModelAccess access, ModelOutputConverter outConverter, ${ciType} data, String path) throws IOException {
                 ${emitAsLines(typeOut.get(t))}
             }\n'
         }
