@@ -45,6 +45,9 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 if (cfg.sharedInterfaces) {
                     maxSteps = maxSteps + 1;
                 }
+                if (getProperty("iip.easy.impl", "") <> "") {
+                    maxSteps = maxSteps + 1;
+                }
                 Integer appCount = getApplications().size();
                 Integer appSteps = 1 + 1 + furtherAppSteps; // interfaces, templates, app
                 maxSteps = maxSteps + appSteps * appCount;
@@ -142,6 +145,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
             }
 
             if (apps) {
+                buildServices(a, target);
                 advanceProgress("Instantiating app '" + a.name + "'");
                 // generate service classes and service integration
                 setOf(String) bins = {}; 
@@ -301,6 +305,17 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         };
         if (platformInstantiation) {
             generateAllAppsContainers(config, target, allAppsContainersElements);
+        }
+    }
+
+    // currently only one, no naming of apps    
+    buildServices(Application app, Project target) = {
+        String impl = getProperty("iip.easy.impl", "");
+        if (impl <> "") {
+            advanceProgress("Compiling and installing implementation");
+            Path implRoot = "${target}/svcImpl";
+            unzip(impl, implRoot);
+            mvn(implRoot);
         }
     }
     

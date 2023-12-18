@@ -36,6 +36,7 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
         createMavenParent(project, iipGroup, "platformDependencies", "${config.iipVer}");
         XmlElement properties = new XmlElement(project, "properties");
         new XmlElement(properties, "maven.jar.forceCreation", "true"); // spring-boot-plugin result grows if not re-built, clean plugin prevents creating the result jar
+        addDistributionManagement(project, config);
         
         XmlElement dep = new XmlElement(project, "dependencies");
         appendDependency(dep, "org.apache.logging.log4j", "log4j-api", "2.15.0"); // override due to CVE-2021-44228
@@ -155,6 +156,7 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
             prependGroupId=false, prefix="jars", fileSeparator="/", pathSeparator=":", includeScope="runtime"); 
             
         appendCleanPlugin(plugins, include="*-bin.jar,*-spring.jar");
+        appendDeploymentPlugins(plugins, config);        
     }
 
 }

@@ -8,7 +8,6 @@ import MeshBasics;
 template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedServiceTypes, sequenceOf(MeshElement) nodes, String appName, String appVersion, String appDescription, Boolean tests, setOf(String) assemblies, Boolean springPackaging=true, String groupId="") {
 
     def main(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedServiceTypes, sequenceOf(MeshElement) nodes, String appName, String appVersion, String appDescription, Boolean tests, setOf(String) assemblies, Boolean springPackaging=true, String groupId="") {
-        IIPEcosphere cfg = config;
         String iipGroup = "de.iip-ecosphere.platform";
         String gId = groupId;
         if (length(gId) == 0) {
@@ -28,6 +27,7 @@ template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, setOf(String) u
         new XmlElement(project, "version", "${appVersion}");
         // app version cannot be used with maven parent, use import??
         createMavenParent(project, iipGroup, "platformDependencies", "${config.iipVer}");
+        addDistributionManagement(project, config);
         
         new XmlComment(project, "Template application/service implementation POM.");
         XmlElement properties = new XmlElement(project, "properties");
@@ -42,7 +42,7 @@ template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, setOf(String) u
         
         XmlElement dep = createDependencies(profile);
         
-        XmlElement d = appendArtifact(dep, cfg.sharedArtifact, projectVersion);
+        XmlElement d = appendArtifact(dep, config.sharedArtifact, projectVersion);
         XmlElement e = appendExclusions(d);
         appendExclusion(e, "org.springframework.boot", "spring-boot-starter-web");
         appendExclusion(e, "org.springframework.boot", "spring-boot-starter-actuator"); 
@@ -63,7 +63,7 @@ template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, setOf(String) u
         XmlElement unpackItems = appendMavenDependencyPluginExecution(execs, "unpack", 
             "de.iip-ecosphere.platform:services.environment:" + projectVersion, "python", 
             "\\${project.build.directory}/pyEnv", "pyEnv.zip", type="zip", id="pythonSources", phase="validate");
-        appendMavenDependencyPluginArtifactItem(unpackItems, cfg.sharedArtifact + ":" + projectVersion, "python", 
+        appendMavenDependencyPluginArtifactItem(unpackItems, config.sharedArtifact + ":" + projectVersion, "python", 
             "\\${project.build.directory}/pySrc", "pyIf.zip", type="zip");
         //appendIipPythonPlugin(plugins, projectVersion);
         //XmlElement pluginMgt = createPlugins(createPluginManagement(build));
@@ -103,7 +103,7 @@ template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, setOf(String) u
         XmlElement exec = new XmlElement(execPluginExecs, "execution");
         new XmlElement(exec, "id", "App");
         XmlElement execCfg = new XmlElement(exec, "configuration");
-        new XmlElement(execCfg, "mainClass", getStarterMainClass(cfg.serviceManager));
+        new XmlElement(execCfg, "mainClass", getStarterMainClass(config.serviceManager));
         XmlElement execArgs = new XmlElement(execCfg, "arguments");
         new XmlElement(execArgs, "argument", "<put relative location of integrated, generated application here>");
         new XmlElement(execCfg, "classpathScope", "test");
@@ -133,8 +133,10 @@ template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, setOf(String) u
         appendDependency(dep, iipGroup, "transport", projectVersion, scope="test", type="test-jar");
         appendDependency(dep, iipGroup, transportProtocolModule(config), projectVersion);
         appendDependency(dep, iipGroup, serviceManagerModule(config), projectVersion, scope="test");
-        appendServiceManagerDeps(dep, cfg.serviceManager);
-        new XmlComment(dep, "Remaining test dependencies go here."); 
+        appendServiceManagerDeps(dep, config.serviceManager);
+        new XmlComment(dep, "Remaining test dependencies go here.");
+        
+        appendDeploymentPlugins(plugins, config); 
     }
 
     // dispatch basis

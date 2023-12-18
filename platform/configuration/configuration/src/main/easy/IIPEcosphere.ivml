@@ -15,6 +15,7 @@ project IIPEcosphere {
     String artifactsFolderDflt = "artifacts";
     String artifactsFolder = artifactsFolderDflt;
     String artifactsUriPrefix = "";
+    String uploadFolder; // if not given, same as artifactsFolder
     String footprintFolderDflt = "footprints";
     String footprintFolder = footprintFolderDflt;
     String modelBaseFolder = "."; // base folder for metaModel folder and configFolder
@@ -31,7 +32,21 @@ project IIPEcosphere {
     Boolean containerBaseImageMethod = false; // Use container base image method during the container creation.
     Boolean containerTestingMode = false; // Add more testing software into the containers.
     Boolean forceContainersCreation = false; // Enforce containers creation regardless of the container's fingerprint.
-    Boolean zipBinaries = false; 
+    Boolean zipBinaries = false;
+    MavenRepository mavenReleaseRepository;
+    MavenRepository mavenSnapshotRepository;
+    MavenDeployType mavenDeployType = MavenDeployType::MAVEN;
+    
+    enum MavenDeployType {
+        MAVEN,
+        NEXUS
+    }; 
+    
+    compound MavenRepository {
+        NonEmptyString id;
+        NonEmptyString name = "oktoflow repository";
+        NonEmptyString url;
+    };
     
     // legacy transition (to be removed)
     Boolean sharedInterfaces = false;

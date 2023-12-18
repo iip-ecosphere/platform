@@ -92,6 +92,15 @@ template PlatformYaml(IIPEcosphere config, FileArtifact target, String modelName
         '
     }
     
+    def uploadFolder(IIPEcosphere config) {
+        String up = getStringValueSafe(config.uploadFolder, "");
+        if (up <> "") {
+            "uploadFolder: {$up}"
+        } else {
+            ""
+        }
+    }
+    
     def main(IIPEcosphere config, FileArtifact target, String modelName) {
         Integer heartbeatTimeout = getIntegerValueSafe(config.deviceHeartbeatTimeout, config.deviceHeartbeatTimeoutDflt);
         String pers = "${config.aasPersistency}";
@@ -103,6 +112,7 @@ template PlatformYaml(IIPEcosphere config, FileArtifact target, String modelName
         produceEasy(config, modelName);
         'artifactsFolder: ${config.artifactsFolder}
         artifactsUriPrefix: ${config.artifactsUriPrefix}
+        ${uploadFolder(config)|e}
         aasHeartbeatTimeout: ${heartbeatTimeout}'
     }
 

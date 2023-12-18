@@ -467,8 +467,18 @@ template MavenBasics(Configuration config, FileArtifact target) {
     def String mavenBuildOutputResourcesDir() {
         mavenBuildOutputDir() + "/resources";
     }
+
+    // ---------------------------- deployment ------------------------
     
-    // ---------------------------- specific for IIP-Ecosphere ------------------------
+    def addDistributionManagement(XmlElement dm, String repo, String id, String name, String url) {
+        XmlElement repository = new XmlElement(dm, repo);
+        new XmlElement(repository, "id", id);
+        new XmlElement(repository, "name", name);
+        new XmlElement(repository, "url", url);
+        dm;
+    }
+    
+    // ---------------------------- specific for oktoflow ------------------------
 
     // append some common base dependencies to avoid repetition
     def appendIipBaseDependencies(XmlElement parent, Boolean forAas=true, Boolean includeJUnit=true) {
@@ -476,6 +486,43 @@ template MavenBasics(Configuration config, FileArtifact target) {
         appendDependency(parent, "javax.activation", "javax.activation-api");
         if (includeJUnit) {
             appendDependency(parent, "junit", "junit", "4.12", scope="test");
+        }
+    }
+
+    def addDistributionManagement(XmlElement project, IIPEcosphere cfg) {
+        Boolean hasReleaseRepo = (isDefined(cfg.mavenReleaseRepository) and cfg.mavenReleaseRepository <> null);
+        Boolean hasSnapshotRepo = (isDefined(cfg.mavenSnapshotRepository) and cfg.mavenSnapshotRepository <> null);
+        if (hasReleaseRepo or hasSnapshotRepo) { 
+            XmlElement dm = new XmlElement(project, "distributionManagement");
+            if (hasReleaseRepo) {
+                MavenRepository repo = cfg.mavenReleaseRepository;
+                addDistributionManagement(project, "repository", repo.id, repo.name, repo.url);
+            }
+            if (hasSnapshotRepo) {
+                MavenRepository repo = cfg.mavenSnapshotRepository;
+                addDistributionManagement(project, "snapshotRepository", repo.id, repo.name, repo.url);
+            }
+        }
+    } 
+    
+    def appendDeploymentPlugins(XmlElement plugins, IIPEcosphere cfg) {
+        Boolean hasSnapshotRepo = (isDefined(cfg.mavenSnapshotRepository) and cfg.mavenSnapshotRepository <> null);
+        if (isDefined(cfg.mavenDeployType) and cfg.mavenDeployType <> null) {
+            if (hasSnapshotRepo and cfg.mavenDeployType == MavenDeployType::NEXUS) {
+                MavenRepository repo = cfg.mavenSnapshotRepository; // first guess/shot
+                XmlElement deployPlugin = appendPlugin(plugins, "", "maven-deploy-plugin", "2.8.2", true);
+                new XmlElement(deployPlugin, "skip", "true");
+                XmlElement nexusPlugin = appendPlugin(plugins, "org.sonatype.plugins", "nexus-staging-maven-plugin", "1.5.1", false);
+                XmlElement execs = appendExecutionsParent(nexusPlugin);
+                XmlElement exec = new XmlElement(execs, "execution");
+                new XmlElement(exec, "id", "default-deploy");
+                new XmlElement(exec, "phase", "deploy");
+                appendGoal(exec, "deploy");
+                XmlElement plCfg = appendConfiguration(nexusPlugin);
+                new XmlElement(plCfg, "serverId", repo.id);
+                new XmlElement(plCfg, "nexusUrl", repo.url);
+                new XmlElement(plCfg, "skipStaging", "true");
+            }
         }
     }
     

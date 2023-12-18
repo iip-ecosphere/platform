@@ -376,7 +376,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
      * @param mode the instantiation mode
      * @param appId the app to build
      * @param codeFile the code file containing the implementation
-     * @return summary of instantiation results depending on {@code mode}, e.g., list of generted and downloadable 
+     * @return summary of instantiation results depending on {@code mode}, e.g., list of generated and downloadable 
      *     template URIs for {@link InstantiationMode#APPS_NO_DEPS} else <b>null</b>
      * @throws ExecutionException when the instantiation fails
      */
@@ -386,6 +386,12 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             lastTaskData = TaskRegistry.getTaskData();
         }
         TaskData beforeTaskData = ConfigurationManager.setTaskData(lastTaskData);
+        if (codeFile != null && codeFile.length() > 0 && codeFile.endsWith(".zip")) {
+            File f = new File(ConfigurationSetup.getSetup().getUploadFolder(), codeFile);
+            if (f.exists()) {
+                System.setProperty("iip.easy.impl", f.getAbsolutePath());
+            }
+        }
         // TODO if fileName -> unpack, run maven
         ConfigurationManager.cleanGenTarget();
         long start = System.currentTimeMillis();

@@ -34,6 +34,7 @@ public class ConfigurationSetup extends AbstractSetup {
     private PackageStorageSetup containerImageStorage;
     private File artifactsFolder = new File("artifacts");
     private String artifactsUriPrefix = "";
+    private File uploadFolder; // default on getter
 
     /**
      * Creates an instance.
@@ -104,7 +105,7 @@ public class ConfigurationSetup extends AbstractSetup {
     public File getArtifactsFolder() {
         return artifactsFolder;
     }
-
+    
     /**
      * Changes the folder containing installable artifacts. [snakeyaml]
      * 
@@ -130,6 +131,24 @@ public class ConfigurationSetup extends AbstractSetup {
      */
     public void setArtifactsUriPrefix(String artifactsUriPrefix) {
         this.artifactsUriPrefix = artifactsUriPrefix;
+    }
+
+    /**
+     * Returns the folder containing uploaded artifacts.
+     * 
+     * @return the folder
+     */
+    public File getUploadFolder() {
+        return null == uploadFolder ? artifactsFolder : uploadFolder;
+    }
+
+    /**
+     * Changes the folder containing uploaded artifacts. [snakeyaml]
+     * 
+     * @param uploadFolder the folder
+     */
+    public void setUploadFolder(File uploadFolder) {
+        this.uploadFolder = uploadFolder;
     }
 
     /**
