@@ -7,14 +7,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.Predicate;
 
 import de.iip_ecosphere.platform.services.environment.metricsProvider.meterRepresentation.MeterRepresentation;
-import de.iip_ecosphere.platform.support.aas.Aas;
-import de.iip_ecosphere.platform.support.aas.AasVisitor;
-import de.iip_ecosphere.platform.support.aas.Asset;
-import de.iip_ecosphere.platform.support.aas.DataElement;
-import de.iip_ecosphere.platform.support.aas.Operation;
+import de.iip_ecosphere.platform.support.aas.BasicAasVisitor;
 import de.iip_ecosphere.platform.support.aas.Property;
-import de.iip_ecosphere.platform.support.aas.ReferenceElement;
-import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.semanticId.SemanticIdResolutionResult;
 import de.iip_ecosphere.platform.support.semanticId.SemanticIdResolver;
@@ -27,7 +21,7 @@ import io.micrometer.core.instrument.Meter;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class PrintVisitor implements AasVisitor {
+public class PrintVisitor extends BasicAasVisitor {
     
     /**
      * Print types for controlling nested collection output.
@@ -132,26 +126,6 @@ public class PrintVisitor implements AasVisitor {
     }
 
     @Override
-    public void visitAas(Aas aas) {
-    }
-
-    @Override
-    public void endAas(Aas aas) {
-    }
-
-    @Override
-    public void visitAsset(Asset asset) {
-    }
-
-    @Override
-    public void visitSubmodel(Submodel submodel) {
-    }
-
-    @Override
-    public void endSubmodel(Submodel submodel) {
-    }
-
-    @Override
     public void visitProperty(Property property) {
         CollectionInfo info;
         if (collectionLevel.isEmpty()) {
@@ -232,14 +206,6 @@ public class PrintVisitor implements AasVisitor {
     }
 
     @Override
-    public void visitOperation(Operation operation) {
-    }
-
-    @Override
-    public void visitReferenceElement(ReferenceElement referenceElement) {
-    }
-
-    @Override
     public void visitSubmodelElementCollection(SubmodelElementCollection collection) {
         CollectionInfo info = new CollectionInfo(skipEntireCollection(collection));
         collectionLevel.push(info);
@@ -269,9 +235,5 @@ public class PrintVisitor implements AasVisitor {
         }
         collectionLevel.pop();
     }
-
-    @Override
-    public void visitDataElement(DataElement dataElement) {
-    }
-    
+   
 }
