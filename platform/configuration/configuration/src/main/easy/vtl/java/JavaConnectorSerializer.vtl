@@ -422,7 +422,7 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
 
     def generateFormatterTo(String imTypeName, String pltfTypeName) {
         if (formatter <> null) {
-            genFrom = true;
+            genFrom = false;
             clearTemporaryVariables();
             '${getFormatterConverterType(formatter)} outConverter = formatter.getConverter();
             ${genTo(imType, imTypeName, pltfType, pltfTypeName)}
