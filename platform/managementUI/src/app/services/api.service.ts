@@ -84,6 +84,7 @@ export class ApiService {
     let response;
     try {
       let cfg = await this.envConfigService.initAndGetCfg();
+console.log(JSON.stringify(params));      
       response = await firstValueFrom(this.http.post(
         cfg?.ip
         + '/shells/'
@@ -249,11 +250,15 @@ public async uploadFileAsArrayBuffer(kind: ArtifactKind, sequenceNr: number, fil
 export const AAS_TYPE_STRING = "string";
 export const AAS_TYPE_INTEGER = "integer";
 
+export const AAS_OP_PREFIX_SME = "submodelElements/";
+
 export const IDSHORT_SUBMODEL_ARTIFACTS = "Artifacts";
 export const IDSHORT_OPERATION_ARTIFACTS_UNDEPLOYPLANASYNC = "undeployPlanAsync";
 export const IDSHORT_OPERATION_ARTIFACTS_DEPLOYPLANASYNC = "deployPlanAsync";
 export const IDSHORT_OPERATION_ARTIFACTS_DEPLOYPLANWITHIDASYNC = "undeployPlanWithIdAsync";
 export const IDSHORT_OPERATION_ARTIFACTS_UPLOAD = "upload";
+
+export const IDSHORT_SUBMODEL_CONFIGURATION = "Configuration";
 
 export enum ArtifactKind {
   SERVICE_ARTIFACT = "SERVICE_ARTIFACT",

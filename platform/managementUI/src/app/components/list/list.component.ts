@@ -1,4 +1,4 @@
-import { ApiService, ArtifactKind } from 'src/app/services/api.service';
+import { AAS_OP_PREFIX_SME, AAS_TYPE_STRING, ApiService, ArtifactKind, IDSHORT_SUBMODEL_CONFIGURATION } from 'src/app/services/api.service';
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Subscription, firstValueFrom } from 'rxjs';
@@ -538,18 +538,7 @@ export class ListComponent extends Utils implements OnInit {
 
   public genTemplate(appId: string) {
     let inputVariables: InputVariable[] = [];
-    let input0:InputVariable = {
-      value: {
-        modelType: {
-          name: "Property"
-        },
-        valueType: "string",
-        idShort: "appId",
-        kind: "Template",
-        value: appId
-      }
-    }
-    inputVariables.push(input0)
+    inputVariables.push(ApiService.createAasOperationParameter("appId", AAS_TYPE_STRING, appId));
     this.execFunctionInConfig("genAppsNoDepsAsync", inputVariables)
   }
 
@@ -574,48 +563,16 @@ export class ListComponent extends Utils implements OnInit {
 
   public async genApp(appId: string) {
     let inputVariables: InputVariable[] = [];
-    let input0:InputVariable = {
-      value: {
-        modelType: {
-          name: "Property"
-        },
-        valueType: "string",
-        idShort: "appId",
-        kind: "Template",
-        value: appId
-      }
-    }
-
+    inputVariables.push(ApiService.createAasOperationParameter("appId", AAS_TYPE_STRING, appId));
     let fileInfo = this.appFiles.get(appId);
     let fileName = fileInfo?.file.name  || '';
-
-    // TODO UPLOAD SOMEHOW, AAS?
-
-    let input1:InputVariable = {
-      value: {
-        modelType: {
-          name: "Property"
-        },
-        valueType: "string",
-        idShort: "codeFile",
-        kind: "Template",
-        value: fileName
-      }
-    }
-    inputVariables.push(input0)
-    inputVariables.push(input1)
+    this.appFiles.delete(appId);
+    inputVariables.push(ApiService.createAasOperationParameter("codeFile", AAS_TYPE_STRING, fileName));
     this.execFunctionInConfig("genAppsAsync", inputVariables)
   }
 
   public async execFunctionInConfig(basyxFun: string, inputVariables: any) {
-    let resourceId = ""
-    let aasElementURL = "/aas/submodels/Configuration/submodel/submodelElements/"
-
-    const response = await this.api.executeFunction(
-      resourceId,
-      aasElementURL,
-      basyxFun,
-      inputVariables) as unknown as platformResponse
+      await this.api.executeAasJsonOperation(IDSHORT_SUBMODEL_CONFIGURATION, AAS_OP_PREFIX_SME + basyxFun, inputVariables);
   }
 
   // ---- icons ------------------------------------------------------------------
