@@ -1,9 +1,11 @@
 package de.iip_ecosphere.platform.support.aas.basyx;
 
+import org.eclipse.basyx.submodel.metamodel.api.reference.IReference;
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.dataelement.IReferenceElement;
 import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
 
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
+import de.iip_ecosphere.platform.support.aas.LangString;
 import de.iip_ecosphere.platform.support.aas.Reference;
 import de.iip_ecosphere.platform.support.aas.ReferenceElement;
 
@@ -60,6 +62,21 @@ public class BaSyxReferenceElement extends BaSyxSubmodelElement implements Refer
                 throw new IllegalArgumentException("value must be of type reference");
             }
             reference.setValue(((BaSyxReference) value).getReference()); 
+            return this;
+        }
+        
+        @Override
+        public ReferenceElementBuilder setSemanticId(String refValue) {
+            IReference ref = Tools.translateReference(refValue);
+            if (ref != null) {
+                reference.setSemanticId(ref);
+            }
+            return this;
+        }
+
+        @Override
+        public ReferenceElementBuilder setDescription(LangString... description) {
+            reference.setDescription(Tools.translate(description));
             return this;
         }
         

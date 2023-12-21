@@ -83,8 +83,8 @@ class BaSyxPersistenceRecipe implements PersistenceRecipe {
     }
     
     @Override
-    public void writeTo(List<Aas> aas, File file) throws IOException {
-        findMatching(file).writeTo(aas, file);
+    public void writeTo(List<Aas> aas, File thumbnail, List<FileResource> resources, File file) throws IOException {
+        findMatching(file).writeTo(aas, thumbnail, resources, file);
     }
 
     @Override

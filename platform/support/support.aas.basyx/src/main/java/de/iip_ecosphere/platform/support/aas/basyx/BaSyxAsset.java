@@ -17,6 +17,8 @@ import org.eclipse.basyx.aas.metamodel.api.parts.asset.IAsset;
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
 import de.iip_ecosphere.platform.support.aas.Asset;
 import de.iip_ecosphere.platform.support.aas.AssetKind;
+import de.iip_ecosphere.platform.support.aas.LangString;
+import de.iip_ecosphere.platform.support.aas.Reference;
 import de.iip_ecosphere.platform.support.aas.basyx.AbstractAas.BaSyxAbstractAasBuilder;
 
 /**
@@ -37,6 +39,7 @@ public class BaSyxAsset implements Asset {
         
         private BaSyxAbstractAasBuilder parent;
         private BaSyxAsset instance;
+        private org.eclipse.basyx.aas.metamodel.map.parts.Asset asset;
         
         /**
          * Creates an asset builder.
@@ -50,14 +53,26 @@ public class BaSyxAsset implements Asset {
         BaSyxAssetBuilder(BaSyxAbstractAasBuilder parent, String idShort, String identifier, AssetKind kind) {
             this.parent = parent;
             this.instance = new BaSyxAsset();
-            this.instance.asset = new org.eclipse.basyx.aas.metamodel.map.parts.Asset(idShort,
+            this.asset = new org.eclipse.basyx.aas.metamodel.map.parts.Asset(idShort,
                 Tools.translateIdentifier(identifier, idShort), Tools.translate(kind));
+            this.instance.asset = this.asset;
         }
 
         @Override
         public Asset build() {
             parent.setAsset(this.instance);
             return this.instance;
+        }
+
+        @Override
+        public AssetBuilder setDescription(LangString... description) {
+            this.asset.setDescription(Tools.translate(description));
+            return this;
+        }
+
+        @Override
+        public Reference createReference() {
+            return new BaSyxReference(asset.getReference());
         }
 
     }
@@ -99,6 +114,11 @@ public class BaSyxAsset implements Asset {
     @Override
     public void accept(AasVisitor visitor) {
         visitor.visitAsset(this);
+    }
+
+    @Override
+    public Reference createReference() {
+        return new BaSyxReference(asset.getReference());
     }
 
 }

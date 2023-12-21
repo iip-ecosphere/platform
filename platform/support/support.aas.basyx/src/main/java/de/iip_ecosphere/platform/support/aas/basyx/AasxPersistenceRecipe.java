@@ -13,8 +13,10 @@
 package de.iip_ecosphere.platform.support.aas.basyx;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -28,6 +30,8 @@ import org.eclipse.basyx.aas.factory.aasx.AASXPackageExplorerConformantHelper;
 import org.eclipse.basyx.aas.factory.aasx.AASXToMetamodelConverter;
 import org.eclipse.basyx.aas.factory.aasx.InMemoryFile;
 import org.eclipse.basyx.aas.factory.aasx.MetamodelToAASXConverter;
+import org.eclipse.basyx.aas.factory.aasx.Thumbnail;
+import org.eclipse.basyx.aas.factory.aasx.Thumbnail.ThumbnailExtension;
 import org.eclipse.basyx.aas.metamodel.api.IAssetAdministrationShell;
 import org.eclipse.basyx.aas.metamodel.api.parts.asset.IAsset;
 import org.eclipse.basyx.aas.metamodel.exception.MetamodelConstructionException;
@@ -39,6 +43,7 @@ import org.xml.sax.SAXException;
 
 import de.iip_ecosphere.platform.support.ExtensionBasedFileFormat;
 import de.iip_ecosphere.platform.support.FileFormat;
+import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 
@@ -62,7 +67,7 @@ class AasxPersistenceRecipe extends AbstractPersistenceRecipe {
     // checkstyle: stop exception type check
     
     @Override
-    public void writeTo(List<Aas> aas, File file) throws IOException {
+    public void writeTo(List<Aas> aas, File thumbnail, List<FileResource> resources, File file) throws IOException {
         if (aas.size() > 1) {
             LOGGER.warn("Writing multiple AAS to a single file may not be read back as "
                 + "BaSyx currently just supports one AAS to be read from an AASX package.");
@@ -71,17 +76,17 @@ class AasxPersistenceRecipe extends AbstractPersistenceRecipe {
         List<ISubmodel> basyxSubmodels = new ArrayList<ISubmodel>();
         Collection<IAsset> assetList = new ArrayList<IAsset>();
         Collection<IConceptDescription> conceptDescriptionList = new ArrayList<IConceptDescription>();
+        List<InMemoryFile> inMemoryFiles = new ArrayList<InMemoryFile>();
         for (Aas a : aas) {
             IAssetAdministrationShell origAas = ((AbstractAas<?>) a).getAas();
             if (null == origAas.getAsset()) {  // as of BaSyx 0.0.1
-                LOGGER.warn("AAS '" + a.getIdShort() 
-                    + "' may not be read back correctly as it does not have an Asset.");
+                LOGGER.warn("AAS '{}' may not be read back correctly as it does not have an Asset.", a.getIdShort());
             } else {
                 assetList.add(origAas.getAsset());
             }
             if (null == origAas.getAssetReference()) { // as of BaSyx 0.1.0
-                LOGGER.warn("AAS '" + a.getIdShort() + "' may not be read back correctly as it does not have "
-                    + "an Asset Reference.");
+                LOGGER.warn("AAS '{}' may not be read back correctly as it does not have "
+                    + "an Asset Reference.", a.getIdShort());
             }
             origAas = ensureLocal(origAas);
             basyxAas.add(origAas);
@@ -91,15 +96,39 @@ class AasxPersistenceRecipe extends AbstractPersistenceRecipe {
                 basyxSubmodels.add(submodel);
             }
         }
+        Thumbnail tn = null;
+        InputStream thumbnailStream = null;
+        if (null != thumbnail && thumbnail.exists()) {
+            String name = thumbnail.getName();
+            String extension = "";
+            int pos = name.lastIndexOf(".");
+            if (pos > 0 && pos < name.length() - 1) {
+                extension = name.substring(pos + 1);
+            }
+            try {
+                ThumbnailExtension tnExt = Thumbnail.ThumbnailExtension.valueOf(extension.toUpperCase());
+                thumbnailStream = new FileInputStream(thumbnail);
+                tn = new Thumbnail(tnExt, thumbnailStream);
+            } catch (IllegalArgumentException e) {
+                LOGGER.warn("Unknown thumbnail extension {}, ignoring thumbnail.", extension);
+            }
+        }
+        
+        if (null != resources) {
+            for (FileResource f: resources) {
+                inMemoryFiles.add(new InMemoryFile(f.getFileContent(), f.getPath()));
+            }
+        }
 
         try (FileOutputStream out = new FileOutputStream(file)) {
             AASXPackageExplorerConformantHelper.adapt(basyxAas, assetList, conceptDescriptionList, basyxSubmodels);
             MetamodelToAASXConverter.buildAASX(basyxAas, assetList, conceptDescriptionList, basyxSubmodels, 
-                new ArrayList<InMemoryFile>(), out);
+                inMemoryFiles, tn, out);
             out.close();
         } catch (Throwable e) { // BaSyx may fail with connected AAS. Catch this here.
             throw new IOException(e);
         }
+        FileUtils.closeQuietly(thumbnailStream);
     }
 
     // checkstyle: resume exception type check

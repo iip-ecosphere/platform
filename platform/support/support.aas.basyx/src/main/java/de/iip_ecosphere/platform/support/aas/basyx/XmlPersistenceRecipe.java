@@ -54,7 +54,7 @@ class XmlPersistenceRecipe extends AbstractPersistenceRecipe {
     }
 
     @Override
-    public void writeTo(List<Aas> aas, File file) throws IOException {
+    public void writeTo(List<Aas> aas, File thumbnail, List<FileResource> resources, File file) throws IOException {
         List<IAssetAdministrationShell> basyxAas = new ArrayList<IAssetAdministrationShell>();
         List<ISubmodel> basyxSubmodels = new ArrayList<ISubmodel>();
         Collection<IAsset> assetList = new ArrayList<IAsset>();

@@ -91,6 +91,33 @@ public abstract class AbstractSubmodel<S extends ISubmodel> implements Submodel,
     }
 
     @Override
+    public BaSyxRelationshipElement register(BaSyxRelationshipElement relationship) {
+        String id = relationship.getIdShort();
+        submodelElements.put(id, relationship);
+        return relationship;
+    }
+    
+    @Override
+    public <T extends SubmodelElement> T registerElement(T elt) {
+        String id = elt.getIdShort();
+        if (submodelElements.containsKey(id)) {
+            warn("There is already a collection/element with short id '" + id + "'. "
+                + "The collection/element may be redefined.");
+        }
+        submodelElements.put(id, elt);
+        return elt;
+    }
+    
+    // TODO cleanup
+    
+    @Override
+    public BaSyxEntity register(BaSyxEntity entity) {
+        String id = entity.getIdShort();
+        submodelElements.put(id, entity);
+        return entity;
+    }
+
+    @Override
     public BaSyxOperation register(BaSyxOperation operation) {
         String id = operation.getIdShort();
         if (operations.containsKey(id) || submodelElements.containsKey(id)) {
@@ -113,7 +140,18 @@ public abstract class AbstractSubmodel<S extends ISubmodel> implements Submodel,
         submodelElements.put(id, property);
         return property;
     }
-    
+
+    @Override
+    public BaSyxMultiLanguageProperty register(BaSyxMultiLanguageProperty property) {
+        String id = property.getIdShort();
+        if (properties.containsKey(id) || submodelElements.containsKey(id)) {
+            warn("There is already a property/element with short id '" + id + "'. "
+                + "The property/element may be redefined.");
+        }
+        submodelElements.put(id, property);
+        return property;
+    }
+
     @Override
     public BaSyxReferenceElement register(BaSyxReferenceElement reference) {
         String id = reference.getIdShort();

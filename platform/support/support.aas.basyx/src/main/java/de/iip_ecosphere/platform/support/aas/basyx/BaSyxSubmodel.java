@@ -17,6 +17,7 @@ import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import java.util.function.Consumer;
 
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
+import org.eclipse.basyx.submodel.metamodel.api.reference.IReference;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.aas.Submodel;
@@ -158,6 +159,15 @@ public class BaSyxSubmodel extends AbstractSubmodel<org.eclipse.basyx.submodel.m
         @Override
         public boolean hasElement(String idShort) {
             return instance.getSubmodelElement(idShort) != null;
+        }
+        
+        @Override
+        public SubmodelBuilder setSemanticId(String refValue) {
+            IReference ref = Tools.translateReference(refValue);
+            if (ref != null) {
+                instance.getSubmodel().setSemanticId(ref);
+            }
+            return this;
         }
 
     }

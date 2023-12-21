@@ -48,7 +48,7 @@ public class BaSyxGeneralInformation extends BaSyxSubmodelElementCollection impl
         private BaSyxFile manufacturerLogo;
 
         /**
-         * Creates a sub-model element collection builder. The parent builder must be set by the calling
+         * Creates a general information builder. The parent builder must be set by the calling
          * constructor.
          * 
          * @param parentBuilder the parent builder

@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.support.aas.basyx;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -54,12 +55,23 @@ public class BaSyxElementTranslator {
     interface SubmodelElementsRegistrar {
 
         /**
+         * Registers an element. Default for all remaining registration functions in this interface.
+         * 
+         * @param <T> the actual type of the element
+         * @param elt the element
+         * @return {@code elt}
+         */
+        public <T extends SubmodelElement> T registerElement(T elt);
+        
+        /**
          * Registers a property.
          * 
          * @param property the property
          * @return {@code property}
          */
-        BaSyxProperty register(BaSyxProperty property);
+        public default BaSyxProperty register(BaSyxProperty property)  {
+            return registerElement(property);
+        }
 
         /**
          * Registers a file data element.
@@ -67,15 +79,49 @@ public class BaSyxElementTranslator {
          * @param file the file data element
          * @return {@code file}
          */
-        BaSyxFile register(BaSyxFile file);
+        public default BaSyxFile register(BaSyxFile file)  {
+            return registerElement(file);
+        }
 
+        /**
+         * Registers a multi-language property.
+         * 
+         * @param property the property
+         * @return {@code property}
+         */
+        public default BaSyxMultiLanguageProperty register(BaSyxMultiLanguageProperty property) {
+            return registerElement(property);
+        }
+
+        /**
+         * Registers a relationship element.
+         * 
+         * @param relationship the relationship element
+         * @return {@code relationship}
+         */
+        public default BaSyxRelationshipElement register(BaSyxRelationshipElement relationship) {
+            return registerElement(relationship);
+        }
+
+        /**
+         * Registers an entity.
+         * 
+         * @param entity the entity
+         * @return {@code entity}
+         */
+        public default BaSyxEntity register(BaSyxEntity entity) {
+            return registerElement(entity);
+        }
+        
         /**
          * Registers an operation.
          * 
          * @param operation the operation
          * @return {@code operation}
          */
-        BaSyxOperation register(BaSyxOperation operation);
+        public default BaSyxOperation register(BaSyxOperation operation) {
+            return registerElement(operation);
+        }
         
         /**
          * Registers a reference element.
@@ -83,7 +129,9 @@ public class BaSyxElementTranslator {
          * @param reference the reference
          * @return {@code reference}
          */
-        BaSyxReferenceElement register(BaSyxReferenceElement reference);
+        public default BaSyxReferenceElement register(BaSyxReferenceElement reference) {
+            return registerElement(reference);
+        }
         
         /**
          * Registers a sub-model element collection.
@@ -91,7 +139,9 @@ public class BaSyxElementTranslator {
          * @param collection the collection
          * @return {@code collection}
          */
-        BaSyxSubmodelElementCollection register(BaSyxSubmodelElementCollection collection);
+        public default BaSyxSubmodelElementCollection register(BaSyxSubmodelElementCollection collection) {
+            return registerElement(collection);
+        }
         
         /**
          * Registers a data element.
@@ -100,7 +150,9 @@ public class BaSyxElementTranslator {
          * @param dataElement the element to register
          * @return {@code dataElement}
          */
-        <D extends DataElement> BaSyxDataElement<D> register(BaSyxDataElement<D> dataElement);
+        public default <D extends DataElement> BaSyxDataElement<D> register(BaSyxDataElement<D> dataElement) {
+            return registerElement(dataElement);
+        }
 
     }
     
@@ -111,11 +163,21 @@ public class BaSyxElementTranslator {
      * @param reg the remaining registrar
      */
     static void registerSubmodelElements(Map<String, ISubmodelElement> elements, SubmodelElementsRegistrar reg) {
-        for (ISubmodelElement se : elements.values()) {
+        registerSubmodelElements(elements.values(), reg);
+    }
+
+    /**
+     * Registers all sub-model elements, i.e., none of those handled by the other methods/interfaces.
+     * 
+     * @param elements the elements to be processed (as declared by BaSyx)
+     * @param reg the remaining registrar
+     */
+    static void registerSubmodelElements(Collection<ISubmodelElement> elements, SubmodelElementsRegistrar reg) {
+        for (ISubmodelElement se : elements) {
             registerSubmodelElement(se, reg);
         }        
     }
-    
+
     /**
      * Registers a single submodel element with {@code reg}.
      * 
@@ -208,6 +270,11 @@ public class BaSyxElementTranslator {
         }
         
         @Override
+        public <E extends SubmodelElement> E registerElement(E elt) {
+            return accept(elt);
+        }
+        
+        @Override
         public BaSyxProperty register(BaSyxProperty property) {
             return accept(property);
         }
@@ -218,8 +285,23 @@ public class BaSyxElementTranslator {
         }
 
         @Override
+        public BaSyxMultiLanguageProperty register(BaSyxMultiLanguageProperty property) {
+            return accept(property);
+        }
+
+        @Override
         public BaSyxOperation register(BaSyxOperation operation) {
             return accept(operation);
+        }
+
+        @Override
+        public BaSyxRelationshipElement register(BaSyxRelationshipElement relationship) {
+            return accept(relationship);
+        }
+
+        @Override
+        public BaSyxEntity register(BaSyxEntity entity) {
+            return accept(entity);
         }
 
         @Override

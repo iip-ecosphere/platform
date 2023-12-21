@@ -214,10 +214,27 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
         @Override
         protected BaSyxProperty register(BaSyxProperty property) {
             this.collection.addSubmodelElement(property.getSubmodelElement());
-            BaSyxProperty p = instance.register(property);
-            return p;
+            return instance.register(property);
         }
 
+        @Override
+        protected BaSyxMultiLanguageProperty register(BaSyxMultiLanguageProperty property) {
+            this.collection.addSubmodelElement(property.getSubmodelElement());
+            return instance.register(property);
+        }
+
+        @Override
+        protected BaSyxRelationshipElement register(BaSyxRelationshipElement relationship) {
+            this.collection.addSubmodelElement(relationship.getSubmodelElement());
+            return instance.register(relationship);
+        }
+
+        @Override
+        protected BaSyxEntity register(BaSyxEntity entity) {
+            this.collection.addSubmodelElement(entity.getSubmodelElement());
+            return instance.register(entity);
+        }
+        
         @Override
         protected BaSyxReferenceElement register(BaSyxReferenceElement reference) {
             this.collection.addSubmodelElement(reference.getSubmodelElement());
@@ -514,7 +531,17 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
     }
 
     @Override
+    public <T extends SubmodelElement> T registerElement(T elt) {
+        return add(elt); // TODO move add here?
+    }
+    
+    @Override
     public BaSyxProperty register(BaSyxProperty property) {
+        return add(property);
+    }
+
+    @Override
+    public BaSyxMultiLanguageProperty register(BaSyxMultiLanguageProperty property) {
         return add(property);
     }
 
@@ -529,7 +556,17 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
     }
 
     @Override
+    public BaSyxRelationshipElement register(BaSyxRelationshipElement relationship) {
+        return add(relationship);
+    }
+
+    @Override
     public BaSyxReferenceElement register(BaSyxReferenceElement reference) {
+        return add(reference);
+    }
+
+    @Override
+    public BaSyxEntity register(BaSyxEntity reference) {
         return add(reference);
     }
 

@@ -28,6 +28,7 @@ import org.eclipse.basyx.submodel.metamodel.api.reference.enums.KeyType;
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElement;
 import org.eclipse.basyx.submodel.metamodel.map.identifier.Identifier;
 import org.eclipse.basyx.submodel.metamodel.map.qualifier.LangString;
+import org.eclipse.basyx.submodel.metamodel.map.qualifier.LangStrings;
 import org.eclipse.basyx.submodel.metamodel.map.reference.Key;
 import org.eclipse.basyx.submodel.metamodel.map.reference.Reference;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.property.valuetype.ValueType;
@@ -37,6 +38,7 @@ import com.google.gson.JsonSyntaxException;
 
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.aas.AssetKind;
+import de.iip_ecosphere.platform.support.aas.Entity.EntityType;
 import de.iip_ecosphere.platform.support.aas.IdentifierType;
 import de.iip_ecosphere.platform.support.aas.Type;
 
@@ -168,6 +170,48 @@ public class Tools {
             throw new IllegalArgumentException("idShort shall not be \"" + idShort + "\"");
         }
         return idShort;
+    }
+
+    /**
+     * Translates a implementation-specific entity type to an implementation-independent type.
+     * 
+     * @param type the implementation-independent type
+     * @return the implementation-specific type
+     */
+    public static EntityType translate(
+        org.eclipse.basyx.submodel.metamodel.api.submodelelement.entity.EntityType type) {
+        EntityType result;
+        switch (type) {
+        case COMANAGEDENTITY:
+            result = EntityType.COMANAGEDENTITY;
+            break;
+        case SELFMANAGEDENTITY:
+        default:
+            result = EntityType.SELFMANAGEDENTITY;
+            break;
+        }
+        return result;
+    }
+
+    /**
+     * Translates a implementation-independent entity type to an implementation-specific type.
+     * 
+     * @param type the implementation-independent type
+     * @return the implementation-specific type
+     */
+    public static org.eclipse.basyx.submodel.metamodel.api.submodelelement.entity.EntityType translate(
+        EntityType type) {
+        org.eclipse.basyx.submodel.metamodel.api.submodelelement.entity.EntityType result;
+        switch (type) {
+        case COMANAGEDENTITY:
+            result = org.eclipse.basyx.submodel.metamodel.api.submodelelement.entity.EntityType.COMANAGEDENTITY;
+            break;
+        case SELFMANAGEDENTITY:
+        default:
+            result = org.eclipse.basyx.submodel.metamodel.api.submodelelement.entity.EntityType.SELFMANAGEDENTITY;
+            break;
+        }
+        return result;
     }
 
     /**
@@ -411,6 +455,37 @@ public class Tools {
      */
     public static de.iip_ecosphere.platform.support.aas.LangString translate(LangString ls) {
         return new de.iip_ecosphere.platform.support.aas.LangString(ls.getLanguage(), ls.getDescription());
+    }
+    
+    /**
+     * Transfprms the given descriptions.
+     * 
+     * @param description the description(s) as language string(s)
+     * @return the translated BaSyx instance
+     */
+    public static LangStrings translate(de.iip_ecosphere.platform.support.aas.LangString... description) {
+        LangStrings l = new LangStrings();
+        for (de.iip_ecosphere.platform.support.aas.LangString d: description) {
+            l.add(Tools.translate(d));
+        }
+        return l;
+    }
+    
+    /**
+     * Translates BaSyx LangStrings back.
+     * 
+     * @param ls the LangStrings
+     * @return the translation into a map
+     */
+    public static Map<String, de.iip_ecosphere.platform.support.aas.LangString> translate(LangStrings ls) {
+        Map<String, de.iip_ecosphere.platform.support.aas.LangString> result = null;
+        if (null != ls && !ls.isEmpty()) {
+            result = new HashMap<>();
+            for (String lang : ls.getLanguages()) {
+                result.put(lang, new de.iip_ecosphere.platform.support.aas.LangString(lang, ls.get(lang)));
+            }
+        }
+        return result;
     }
 
     /**

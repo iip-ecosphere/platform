@@ -49,7 +49,7 @@ public class JsonPersistenceRecipe extends AbstractPersistenceRecipe {
     }
     
     @Override
-    public void writeTo(List<Aas> aas, File file) throws IOException {
+    public void writeTo(List<Aas> aas, File thumbnail, List<FileResource> resources, File file) throws IOException {
         List<AssetAdministrationShell> basyxAas = new ArrayList<AssetAdministrationShell>();
         List<org.eclipse.basyx.submodel.metamodel.map.Submodel> basyxSubmodels 
             = new ArrayList<org.eclipse.basyx.submodel.metamodel.map.Submodel>();

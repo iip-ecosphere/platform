@@ -16,6 +16,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.eclipse.basyx.submodel.metamodel.api.qualifier.haskind.ModelingKind;
@@ -27,7 +28,9 @@ import org.eclipse.basyx.submodel.metamodel.map.submodelelement.operation.Operat
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
+import de.iip_ecosphere.platform.support.aas.LangString;
 import de.iip_ecosphere.platform.support.aas.Operation;
+import de.iip_ecosphere.platform.support.aas.Property.PropertyBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
 
 /**
@@ -92,42 +95,48 @@ public class BaSyxOperation extends BaSyxSubmodelElement implements Operation {
          * 
          * @param idShort the short id of the variable
          * @param type the type of the variable (may be <b>null</b> for left undefined)
+         * @param init optional initializer in builder style, may be <b>null</b> for none
          * @return the operation variable
          */
-        private OperationVariable createOperationVariable(String idShort, Type type) {
+        private OperationVariable createOperationVariable(String idShort, Type type, 
+            Consumer<PropertyBuilder> init) {
             Property prop = new Property();
             prop.setIdShort(idShort);
             prop.setKind(ModelingKind.TEMPLATE); // required with BaSyx 1.0.0
             if (null != type) { // let's see whether this makes sense
                 prop.setValueType(Tools.translate(type));
             }
+            if (null != init) {
+                PropertyBuilder builder = new BaSyxProperty.BaSyxPropertyBuilder(null, new BaSyxProperty(prop));
+                init.accept(builder);
+            }
             return new OperationVariable(prop);
         }
         
         @Override
-        public OperationBuilder addInputVariable(String idShort, Type type) {
+        public OperationBuilder addInputVariable(String idShort, Type type, Consumer<PropertyBuilder> init) {
             if (null == inputVariables) {
                 inputVariables = new ArrayList<>();                
             }
-            inputVariables.add(createOperationVariable(idShort, type));
+            inputVariables.add(createOperationVariable(idShort, type, init));
             return this;
         }
 
         @Override
-        public OperationBuilder addOutputVariable(String idShort, Type type) {
+        public OperationBuilder addOutputVariable(String idShort, Type type, Consumer<PropertyBuilder> init) {
             if (null == outputVariables) {
                 outputVariables = new ArrayList<>();                
             }
-            outputVariables.add(createOperationVariable(idShort, type));
+            outputVariables.add(createOperationVariable(idShort, type, init));
             return this;
         }
 
         @Override
-        public OperationBuilder addInOutVariable(String idShort, Type type) {
+        public OperationBuilder addInOutVariable(String idShort, Type type, Consumer<PropertyBuilder> init) {
             if (null == outputVariables) {
                 outputVariables = new ArrayList<>();                
             }
-            inOutVariables.add(createOperationVariable(idShort, type));
+            inOutVariables.add(createOperationVariable(idShort, type, init));
             return this;
         }
 
@@ -146,6 +155,12 @@ public class BaSyxOperation extends BaSyxSubmodelElement implements Operation {
             return this;
         }
 
+        @Override
+        public OperationBuilder setDescription(LangString... description) {
+            operation.setDescription(Tools.translate(description));
+            return this;
+        }
+                
         @Override
         public Operation build() {
             if (null != inputVariables) {
@@ -167,7 +182,7 @@ public class BaSyxOperation extends BaSyxSubmodelElement implements Operation {
             instance.operation = operation;
             return parentBuilder.register(instance);
         }
-                
+
     }
     
     /**

@@ -20,8 +20,13 @@ import de.iip_ecosphere.platform.support.aas.ReferenceElement.ReferenceElementBu
 import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
 
 import de.iip_ecosphere.platform.support.aas.DeferredBuilder;
+import de.iip_ecosphere.platform.support.aas.Entity.EntityBuilder;
+import de.iip_ecosphere.platform.support.aas.Entity.EntityType;
 import de.iip_ecosphere.platform.support.aas.FileDataElement.FileDataElementBuilder;
+import de.iip_ecosphere.platform.support.aas.MultiLanguageProperty.MultiLanguagePropertyBuilder;
 import de.iip_ecosphere.platform.support.aas.Reference;
+import de.iip_ecosphere.platform.support.aas.SubmodelElement;
+import de.iip_ecosphere.platform.support.aas.RelationshipElement.RelationshipElementBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
 
 /**
@@ -42,8 +47,24 @@ public abstract class BaSyxSubmodelElementContainerBuilder<S extends ISubmodel>
     }
 
     @Override
+    public MultiLanguagePropertyBuilder createMultiLanguagePropertyBuilder(String idShort) {
+        return new BaSyxMultiLanguageProperty.BaSyxMultiLanguagePropertyBuilder(this, idShort);
+    }
+    
+    @Override
+    public RelationshipElementBuilder createRelationshipElementBuilder(String idShort, 
+        Reference first, Reference second) {
+        return new BaSyxRelationshipElement.BaSyxRelationshipElementBuilder(this, idShort, first, second);
+    }
+
+    @Override
     public ReferenceElementBuilder createReferenceElementBuilder(String idShort) {
         return new BaSyxReferenceElement.BaSyxReferenceElementBuilder(this, idShort);
+    }
+    
+    @Override
+    public EntityBuilder createEntityBuilder(String idShort, EntityType type, Reference asset) {
+        return new BaSyxEntity.BaSyxEntityBuilder(this, idShort, type, asset);
     }
     
     @Override
@@ -73,6 +94,45 @@ public abstract class BaSyxSubmodelElementContainerBuilder<S extends ISubmodel>
     protected abstract AbstractSubmodel<S> getInstance();
 
     /**
+     * Registers a relationship element.
+     * 
+     * @param relationship the relationship element
+     * @return {@code relationship}
+     */
+    BaSyxRelationshipElement register(BaSyxRelationshipElement relationship) {
+        getInstance().getSubmodel().addSubmodelElement(relationship.getSubmodelElement());
+        return getInstance().register(relationship);
+    }
+
+    /**
+     * Registers an element. Default for all remaining registration functions.
+     * 
+     * @param <T> the actual type of the element
+     * @param elt the element
+     * @return {@code elt}
+     */
+    <T extends SubmodelElement> T registerElement(T elt) {
+        if (elt instanceof BaSyxSubmodelElement) {
+            BaSyxSubmodelElement bse = (BaSyxSubmodelElement) elt;
+            getInstance().getSubmodel().addSubmodelElement(bse.getSubmodelElement());
+        }
+        return getInstance().registerElement(elt); // fallback stays on fallback
+    }
+    
+    // TODO cleanup
+
+    /**
+     * Registers a entity element.
+     * 
+     * @param entity the entity
+     * @return {@code reference}
+     */
+    BaSyxEntity register(BaSyxEntity entity) {
+        getInstance().getSubmodel().addSubmodelElement(entity.getSubmodelElement());
+        return getInstance().register(entity);
+    }
+
+    /**
      * Registers a file data element.
      * 
      * @param file the file data element
@@ -82,7 +142,7 @@ public abstract class BaSyxSubmodelElementContainerBuilder<S extends ISubmodel>
         getInstance().getSubmodel().addSubmodelElement(file.getSubmodelElement());
         return getInstance().register(file);
     }
-
+    
     /**
      * Registers an operation.
      * 
@@ -101,6 +161,17 @@ public abstract class BaSyxSubmodelElementContainerBuilder<S extends ISubmodel>
      * @return {@code property}
      */
     BaSyxProperty register(BaSyxProperty property) {
+        getInstance().getSubmodel().addSubmodelElement(property.getSubmodelElement());
+        return getInstance().register(property);
+    }
+    
+    /**
+     * Registers a multi-language property.
+     * 
+     * @param property the property
+     * @return {@code property}
+     */
+    BaSyxMultiLanguageProperty register(BaSyxMultiLanguageProperty property) {
         getInstance().getSubmodel().addSubmodelElement(property.getSubmodelElement());
         return getInstance().register(property);
     }

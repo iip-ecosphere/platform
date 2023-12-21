@@ -14,7 +14,6 @@ package de.iip_ecosphere.platform.support.aas.basyx;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
@@ -76,6 +75,19 @@ public class BaSyxProperty extends BaSyxSubmodelElement implements Property {
             property.setEmbeddedDataSpecifications(new ArrayList<>());
         }
         
+        /**
+         * Creates an instance for modifying an existing property. Prevents external creation.
+         * 
+         * @param parentBuilder the parent builder
+         * @param instance the existing property
+         */
+        BaSyxPropertyBuilder(BaSyxSubmodelElementContainerBuilder<?> parentBuilder, BaSyxProperty instance) {
+            this.parentBuilder = parentBuilder;
+            this.instance = instance;
+            this.property = (org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.property.Property)
+                instance.property;
+        }
+        
         @Override
         public BaSyxSubmodelElementContainerBuilder<?> getParentBuilder() {
             return parentBuilder;
@@ -121,11 +133,7 @@ public class BaSyxProperty extends BaSyxSubmodelElement implements Property {
         
         @Override
         public PropertyBuilder setDescription(LangString... description) {
-            LangStrings l = new LangStrings();
-            for (LangString d: description) {
-                l.add(Tools.translate(d));
-            }
-            property.setDescription(l);
+            property.setDescription(Tools.translate(description));
             return this;
         }
 
@@ -147,7 +155,7 @@ public class BaSyxProperty extends BaSyxSubmodelElement implements Property {
         @Override
         public Property build() {
             instance.property = property;
-            return parentBuilder.register(instance);
+            return null != parentBuilder ? parentBuilder.register(instance) : instance;
         }
 
         @Override
@@ -226,15 +234,7 @@ public class BaSyxProperty extends BaSyxSubmodelElement implements Property {
     
     @Override
     public Map<String, LangString> getDescription() {
-        LangStrings l = property.getDescription();
-        Map<String, LangString> result = null;
-        if (null != l && !l.isEmpty()) {
-            result = new HashMap<>();
-            for (String lang : l.getLanguages()) {
-                result.put(lang, new LangString(lang, l.get(lang)));
-            }
-        }
-        return result;
+        return Tools.translate(property.getDescription());
     }
     
 }

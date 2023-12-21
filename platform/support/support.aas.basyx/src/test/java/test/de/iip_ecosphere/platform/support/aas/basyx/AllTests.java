@@ -25,7 +25,8 @@ import org.junit.runners.Suite;
     BaSyxPersistenceTest.class,
     BaSyxDeploymentTest.class,
     BaSyxCodecTest.class,
-    BaSyxTechnicalDataSubmodelTest.class
+    BaSyxTechnicalDataSubmodelTest.class,
+    BaSyxXmasAas.class
 })
 public class AllTests {
 }

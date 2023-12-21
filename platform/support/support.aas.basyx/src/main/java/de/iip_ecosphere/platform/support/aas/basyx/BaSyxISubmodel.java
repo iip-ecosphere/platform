@@ -15,6 +15,7 @@ package de.iip_ecosphere.platform.support.aas.basyx;
 import java.util.function.Consumer;
 
 import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
+import org.eclipse.basyx.submodel.metamodel.api.reference.IReference;
 
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel;
@@ -113,6 +114,18 @@ public class BaSyxISubmodel extends AbstractSubmodel<ISubmodel> {
         @Override
         public boolean hasElement(String idShort) {
             return instance.getSubmodelElement(idShort) != null;
+        }
+
+        @Override
+        public SubmodelBuilder setSemanticId(String refValue) {
+            IReference ref = Tools.translateReference(refValue);
+            if (ref != null) {
+                ISubmodel sm = instance.getSubmodel();
+                if (sm instanceof org.eclipse.basyx.submodel.metamodel.map.Submodel) {
+                    ((org.eclipse.basyx.submodel.metamodel.map.Submodel) sm).setSemanticId(ref);
+                }
+            }
+            return this;
         }
 
     }
