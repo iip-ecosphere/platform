@@ -218,7 +218,7 @@ public class PlatformAas implements AasContributor {
         try {
             if (0 == sequenceNr) {
                 FileUtils.writeByteArrayToFile(target, bytes);
-                LoggerFactory.getLogger(PlatformAas.class).info("Upload of {} completed." + target);
+                LoggerFactory.getLogger(PlatformAas.class).info("Upload of {} to {} completed.", name, target);
             } else if (sequenceNr > 0) {
                 FileUtils.writeByteArrayToFile(getChunkFile(temp, name, sequenceNr), bytes);
             } else {
@@ -234,7 +234,7 @@ public class PlatformAas implements AasContributor {
                 // make visible if complete
                 Files.copy(tmpFile.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING); 
                 FileUtils.deleteQuietly(tmpFile); // may fail
-                LoggerFactory.getLogger(PlatformAas.class).info("Upload of {} completed.", target);
+                LoggerFactory.getLogger(PlatformAas.class).info("Upload to {} completed.", name, target);
             }
         } catch (IOException e) {
             throw new ExecutionException("Uploading file (" + kind + " seqNr " + sequenceNr + " " + name + "):" 
