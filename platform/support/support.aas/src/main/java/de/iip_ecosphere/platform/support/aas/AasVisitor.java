@@ -89,6 +89,27 @@ public interface AasVisitor {
     public void visitProperty(Property property);
 
     /**
+     * Visits a multi-language property.
+     * 
+     * @param property the property
+     */
+    public void visitMultiLanguageProperty(MultiLanguageProperty property);
+
+    /**
+     * Visits an entity.
+     * 
+     * @param entity the entity
+     */
+    public void visitEntity(Entity entity);
+
+    /**
+     * Visits a relationship element.
+     * 
+     * @param relationship the relationship
+     */
+    public void visitRelationshipElement(RelationshipElement relationship);
+    
+    /**
      * Visits a operation.
      * 
      * @param operation the operation

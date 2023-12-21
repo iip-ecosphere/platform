@@ -167,7 +167,7 @@ public class FactoryTest {
         Assert.assertNull(instance.obtainRegistry(ep, Schema.HTTPS));
         Assert.assertNull(instance.createDeploymentRecipe(ep));
 
-        Assert.assertNull(instance.createPersistenceRecipe());
+        Assert.assertNotNull(instance.createPersistenceRecipe());
         
         Assert.assertNotNull(instance.getProtocols());
         Assert.assertTrue(instance.getProtocols().length > 0);

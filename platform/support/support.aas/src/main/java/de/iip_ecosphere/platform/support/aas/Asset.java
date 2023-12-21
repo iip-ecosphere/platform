@@ -28,9 +28,24 @@ public interface Asset {
      */
     public interface AssetBuilder extends Builder<Asset> {
         
+        // TODO update to AssetInformation after BaSyx upgrade
+
+        /**
+         * Sets the description in terms of language strings.
+         * 
+         * @param description the description
+         * @return <b>this</b>
+         */
+        public AssetBuilder setDescription(LangString... description);
+
+        /**
+         * Returns the reference to the AAS.
+         * 
+         * @return the reference
+         */
+        public Reference createReference();
+
     }
-    
-    // incomplete
     
     /**
      * Returns the type of the asset.
@@ -54,5 +69,12 @@ public interface Asset {
      * @param visitor the visitor instance
      */
     public void accept(AasVisitor visitor);
-    
+
+    /**
+     * Returns the reference to the AAS.
+     * 
+     * @return the reference
+     */
+    public Reference createReference();
+
 }

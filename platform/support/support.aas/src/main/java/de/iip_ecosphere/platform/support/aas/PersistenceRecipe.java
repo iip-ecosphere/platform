@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
+
 import de.iip_ecosphere.platform.support.FileFormat;
 
 /**
@@ -25,6 +27,59 @@ import de.iip_ecosphere.platform.support.FileFormat;
  * @author Holger Eichelberger, SSE
  */
 public interface PersistenceRecipe {
+    
+    /**
+     * Represents a packageable resource.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public static class FileResource {
+        
+        private byte[] fileContent;
+        private String path;
+
+        /**
+         * Creates a file resource.
+         * 
+         * @param file the file to be turned into a resource
+         * @param path the local (target) path
+         * @throws IOException if {@code file} cannot be read
+         */
+        public FileResource(File file, String path) throws IOException {
+            this(FileUtils.readFileToByteArray(file), path);
+        }
+
+        /**
+         * Creates a file resource.
+         * 
+         * @param fileContent the file content to be used as a resource
+         * @param path the local (target) path
+         * @throws IOException if {@code file} cannot be read
+         */
+        public FileResource(byte[] fileContent, String path) {
+            this.fileContent = fileContent;
+            this.path = path;
+        }
+
+        /**
+         * Returns the file content.
+         * 
+         * @return the file content
+         */
+        public byte[] getFileContent() {
+            return fileContent;
+        }
+
+        /**
+         * Returns the relative path.
+         * 
+         * @return the relative path
+         */
+        public String getPath() {
+            return path;
+        }
+        
+    }
 
     /**
      * Returns the supported file formats.
@@ -32,7 +87,7 @@ public interface PersistenceRecipe {
      * @return the supported file formats
      */
     public Collection<FileFormat> getSupportedFormats();
-    
+
     /**
      * Writes the given AAS to {@code file}.
      * 
@@ -41,7 +96,21 @@ public interface PersistenceRecipe {
      * @throws IOException in case of I/O problems
      * @throws IllegalArgumentException if {@code file} represents an unknown format, see {@link #getSupportedFormats()}
      */
-    public void writeTo(List<Aas> aas, File file) throws IOException;
+    public default void writeTo(List<Aas> aas, File file) throws IOException {
+        writeTo(aas, null, null, file);
+    }
+    
+    /**
+     * Writes the given AAS to {@code file}.
+     * 
+     * @param aas the AAS to write
+     * @param file the file to write to
+     * @param thumbnail optional file to a PNG/JPG/JPEG thumbnail
+     * @param resources file resources to be stored in the AAS, resolving the file elements, may be <b>null</b> for none
+     * @throws IOException in case of I/O problems
+     * @throws IllegalArgumentException if {@code file} represents an unknown format, see {@link #getSupportedFormats()}
+     */
+    public void writeTo(List<Aas> aas, File thumbnail, List<FileResource> resources, File file) throws IOException;
     
     /**
      * Reads AAS from the given {@code file}.

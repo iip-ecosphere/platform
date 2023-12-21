@@ -13,6 +13,7 @@
 package test.de.iip_ecosphere.platform.support.fakeAas;
 
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
+import de.iip_ecosphere.platform.support.aas.LangString;
 import de.iip_ecosphere.platform.support.aas.Reference;
 import de.iip_ecosphere.platform.support.aas.ReferenceElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
@@ -50,6 +51,18 @@ public class FakeReferenceElement extends FakeElement implements ReferenceElemen
         @Override
         public ReferenceElementBuilder setValue(Reference value) {
             instance.value = value;
+            return this;
+        }
+
+        @Override
+        public ReferenceElementBuilder setSemanticId(String refValue) {
+            // ignoring for now
+            return this;
+        }
+        
+        @Override
+        public ReferenceElementBuilder setDescription(LangString... description) {
+            // ignoring for now
             return this;
         }
 

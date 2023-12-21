@@ -65,4 +65,16 @@ public class BasicAasVisitor implements AasVisitor {
     public void visitDataElement(DataElement dataElement) {
     }
 
+    @Override
+    public void visitMultiLanguageProperty(MultiLanguageProperty property) {
+    }
+
+    @Override
+    public void visitRelationshipElement(RelationshipElement relationship) {
+    }
+
+    @Override
+    public void visitEntity(Entity entity) {
+    }
+    
 }

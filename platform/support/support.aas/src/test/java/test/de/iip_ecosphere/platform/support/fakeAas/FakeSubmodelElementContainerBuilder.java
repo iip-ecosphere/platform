@@ -13,10 +13,17 @@
 package test.de.iip_ecosphere.platform.support.fakeAas;
 
 import de.iip_ecosphere.platform.support.Builder;
+import de.iip_ecosphere.platform.support.aas.Reference;
+import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
+import de.iip_ecosphere.platform.support.aas.Entity.EntityBuilder;
+import de.iip_ecosphere.platform.support.aas.Entity.EntityType;
+import de.iip_ecosphere.platform.support.aas.FileDataElement.FileDataElementBuilder;
+import de.iip_ecosphere.platform.support.aas.MultiLanguageProperty.MultiLanguagePropertyBuilder;
 import de.iip_ecosphere.platform.support.aas.Operation.OperationBuilder;
 import de.iip_ecosphere.platform.support.aas.Property.PropertyBuilder;
 import de.iip_ecosphere.platform.support.aas.ReferenceElement.ReferenceElementBuilder;
+import de.iip_ecosphere.platform.support.aas.RelationshipElement.RelationshipElementBuilder;
 
 /**
  * Basic implementation for a container-based model element.
@@ -31,38 +38,75 @@ public abstract class FakeSubmodelElementContainerBuilder implements SubmodelEle
     }
 
     @Override
+    public MultiLanguagePropertyBuilder createMultiLanguagePropertyBuilder(String idShort) {
+        return new FakeMultiLanguageProperty.FakeMultiLanguagePropertyBuilder(this, idShort);
+    }
+
+    @Override
     public ReferenceElementBuilder createReferenceElementBuilder(String idShort) {
         return new FakeReferenceElement.FakeReferenceElementBuilder(this, idShort);
     }
-    
+
+    @Override
+    public EntityBuilder createEntityBuilder(String idShort, EntityType type, Reference asset) {
+        return new FakeEntity.FakeEntityBuilder(this, idShort, type, asset);
+    }
+
     @Override
     public OperationBuilder createOperationBuilder(String idShort) {
         return new FakeOperation.FakeOperationBuilder(this, idShort);
     }
 
+    @Override
+    public FileDataElementBuilder createFileDataElementBuilder(String idShort, String contents, String mimeType) {
+        return new FakeFileDataElement.FakeFileDataElementBuilder(this, idShort, contents, mimeType);
+    }
+
+
+    @Override
+    public RelationshipElementBuilder createRelationshipElementBuilder(String idShort, Reference first,
+        Reference second) {
+        return new FakeRelationshipElement.FakeRelationshipElementBuilder(this, idShort, first, second);
+    }
+    
+    /**
+     * Registers an element. Default for all remaining registration functions in this interface.
+     * 
+     * @param <T> the actual type of the element
+     * @param elt the element
+     * @return {@code elt}
+     */
+    abstract <T extends SubmodelElement> T registerElement(T elt);
+    
     /**
      * Registers an element.
      * 
      * @param element the element
      * @return {@code element}
      */
-    abstract FakeFileDataElement register(FakeFileDataElement element);
-    
+    FakeFileDataElement register(FakeFileDataElement element) {
+        return registerElement(element);
+    }
+
     /**
-     * Registers an operation.
+     * Registers a relationship element.
      * 
-     * @param operation the operation
-     * @return {@code operation}
+     * @param relationship the relationship element
+     * @return {@code relationship}
      */
-    abstract FakeOperation register(FakeOperation operation);
-    
+    FakeRelationshipElement register(FakeRelationshipElement relationship) {
+        return registerElement(relationship);
+    }
+
     /**
-     * Registers a property.
+     * Registers an entity.
      * 
-     * @param property the property
-     * @return {@code property}
+     * @param entity the entity
+     * @return {@code entity}
      */
-    abstract FakeProperty register(FakeProperty property);
+    FakeEntity register(FakeEntity entity) {
+        return registerElement(entity);
+    }
 
     /**
      * Registers a reference element.
@@ -70,7 +114,39 @@ public abstract class FakeSubmodelElementContainerBuilder implements SubmodelEle
      * @param reference the reference
      * @return {@code reference}
      */
-    abstract FakeReferenceElement register(FakeReferenceElement reference);
+    FakeReferenceElement register(FakeReferenceElement reference) {
+        return registerElement(reference);
+    }
+
+    /**
+     * Registers an operation.
+     * 
+     * @param operation the operation
+     * @return {@code operation}
+     */
+    FakeOperation register(FakeOperation operation) {
+        return registerElement(operation);
+    }
+    
+    /**
+     * Registers a property.
+     * 
+     * @param property the property
+     * @return {@code property}
+     */
+    FakeProperty register(FakeProperty property) {
+        return registerElement(property);
+    }
+
+    /**
+     * Registers a multi-language property.
+     * 
+     * @param property the property
+     * @return {@code property}
+     */
+    FakeMultiLanguageProperty register(FakeMultiLanguageProperty property)  {
+        return registerElement(property);
+    }
 
     /**
      * Registers a sub-model element collection.
@@ -78,7 +154,9 @@ public abstract class FakeSubmodelElementContainerBuilder implements SubmodelEle
      * @param collection the collection
      * @return {@code collection}
      */
-    abstract FakeSubmodelElementCollection register(FakeSubmodelElementCollection collection);
+    FakeSubmodelElementCollection register(FakeSubmodelElementCollection collection)  {
+        return registerElement(collection);
+    }
 
     /**
      * Registers a sub-build as deferred.

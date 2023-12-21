@@ -39,6 +39,14 @@ public interface Submodel extends Element, HasSemantics, Identifiable, Qualifiab
          */
         public Reference createReference();
 
+        /**
+         * Sets the semantic ID of the property in terms of a reference.
+         * 
+         * @param refValue the reference value (supported: irdi:<i>irdiValue</i>)
+         * @return <b>this</b>
+         */
+        public SubmodelBuilder setSemanticId(String refValue);
+
     }
 
     /**

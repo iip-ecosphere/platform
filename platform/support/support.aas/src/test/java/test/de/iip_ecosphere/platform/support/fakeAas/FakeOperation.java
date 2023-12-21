@@ -13,12 +13,15 @@
 package test.de.iip_ecosphere.platform.support.fakeAas;
 
 import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
+import de.iip_ecosphere.platform.support.aas.LangString;
 import de.iip_ecosphere.platform.support.aas.Operation;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
+import de.iip_ecosphere.platform.support.aas.Property.PropertyBuilder;
 
 /**
  * A simple fake operation. No real arguments/parameters, just fake.
@@ -58,19 +61,19 @@ public class FakeOperation extends FakeElement implements Operation {
         }
 
         @Override
-        public OperationBuilder addInputVariable(String name, Type type) {
+        public OperationBuilder addInputVariable(String name, Type type, Consumer<PropertyBuilder> init) {
             instance.inArgs++;
             return this;
         }
 
         @Override
-        public OperationBuilder addOutputVariable(String name, Type type) {
+        public OperationBuilder addOutputVariable(String name, Type type, Consumer<PropertyBuilder> init) {
             instance.outArgs++;
             return this;
         }
 
         @Override
-        public OperationBuilder addInOutVariable(String name, Type type) {
+        public OperationBuilder addInOutVariable(String name, Type type, Consumer<PropertyBuilder> init) {
             instance.inOutArgs++;
             return this;
         }
@@ -78,6 +81,12 @@ public class FakeOperation extends FakeElement implements Operation {
         @Override
         public OperationBuilder setInvocable(Function<Object[], Object> invocable) {
             return this; // we ignore this for now until we go even for dynamic AAS here
+        }
+
+        @Override
+        public OperationBuilder setDescription(LangString... description) {
+            // ignore for now
+            return this;
         }
 
         @Override

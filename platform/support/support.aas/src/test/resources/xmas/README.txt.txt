@@ -1,0 +1,1 @@
+Files for the Santa-BOM-AAS. All images are either CC-BY-NC or modified free vector graphics from Pixabay.

@@ -28,6 +28,7 @@ import de.iip_ecosphere.platform.support.aas.Operation;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.Reference;
 import de.iip_ecosphere.platform.support.aas.ReferenceElement;
+import de.iip_ecosphere.platform.support.aas.RelationshipElement.RelationshipElementBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
@@ -137,37 +138,13 @@ public class FakeSubmodel extends FakeElement implements Submodel {
         public Submodel build() {
             return parent.register(instance);
         }
-
+        
         @Override
-        FakeFileDataElement register(FakeFileDataElement element) {
-            instance.elements.put(element.getIdShort(), element);
-            return element;
+        <T extends SubmodelElement> T registerElement(T elt) {
+            instance.elements.put(elt.getIdShort(), elt);
+            return elt;
         }
-
-        @Override
-        FakeOperation register(FakeOperation operation) {
-            instance.elements.put(operation.getIdShort(), operation);
-            return operation;
-        }
-
-        @Override
-        FakeProperty register(FakeProperty property) {
-            instance.elements.put(property.getIdShort(), property);
-            return property;
-        }
-
-        @Override
-        FakeReferenceElement register(FakeReferenceElement reference) {
-            instance.elements.put(reference.getIdShort(), reference);
-            return reference;
-        }
-
-        @Override
-        FakeSubmodelElementCollection register(FakeSubmodelElementCollection collection) {
-            instance.elements.put(collection.getIdShort(), collection);
-            return collection;
-        }
-
+        
         @Override
         public SubmodelElementContainerBuilder getParentBuilder() {
             return null;
@@ -197,10 +174,31 @@ public class FakeSubmodel extends FakeElement implements Submodel {
         void buildMyDeferred() {
             instance.buildDeferred();
         }
+        
+        /**
+         * Returns the instance.
+         * 
+         * @return the instance
+         */
+        protected FakeSubmodel getInstance() {
+            return instance;
+        }
 
         @Override
         public FileDataElementBuilder createFileDataElementBuilder(String idShort, String contents, String mimeType) {
             return new FakeFileDataElement.FakeFileDataElementBuilder(this, idShort, contents, mimeType);
+        }
+
+        @Override
+        public SubmodelBuilder setSemanticId(String refValue) {
+            // ignored for now
+            return this;
+        }
+
+        @Override
+        public RelationshipElementBuilder createRelationshipElementBuilder(String idShort, Reference first,
+                Reference second) {
+            return new FakeRelationshipElement.FakeRelationshipElementBuilder(this, idShort, first, second);
         }
 
     }

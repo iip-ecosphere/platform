@@ -136,7 +136,7 @@ public class FakeAas extends FakeElement implements Aas {
 
         @Override
         public TechnicalDataSubmodelBuilder createTechnicalDataSubmodelBuilder(String identifier) {
-            return null; 
+            return new FakeTechnicalDataSubmodel.FakeTechnicalDataSubmodelBuilder(this, identifier); 
         }
         
     }

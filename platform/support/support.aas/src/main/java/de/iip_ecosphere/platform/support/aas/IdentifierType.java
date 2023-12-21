@@ -39,4 +39,44 @@ public interface IdentifierType {
      */
     public static final String IRI_PREFIX = "iri:";
     
+    /**
+     * Creates an {@link #URN_PREFIX urn-prefixed} string.
+     * 
+     * @param text the trailing text
+     * @return the urn-prefixed string
+     */
+    public static String urn(String text) {
+        return URN_PREFIX + text;
+    }
+
+    /**
+     * Creates an {@link #urn-text-prefixed} string.
+     * 
+     * @param text the trailing text
+     * @return the urn-text-prefixed string
+     */
+    public static String urnText(String text) {
+        return URN_TEXT_PREFIX + text;
+    }
+
+    /**
+     * Creates an {@link #IRDI_PREFIX irdi-prefixed} string.
+     * 
+     * @param text the trailing text
+     * @return the irdi-prefixed string
+     */
+    public static String irdi(String text) {
+        return IRDI_PREFIX + text;
+    }
+
+    /**
+     * Creates an {@link #IRI_PREFIX iri-prefixed} string.
+     * 
+     * @param text the trailing text
+     * @return the iri-prefixed string
+     */
+    public static String iri(String text) {
+        return IRI_PREFIX + text;
+    }
+
 }

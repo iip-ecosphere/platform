@@ -15,6 +15,8 @@ package test.de.iip_ecosphere.platform.support.fakeAas;
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
 import de.iip_ecosphere.platform.support.aas.Asset;
 import de.iip_ecosphere.platform.support.aas.AssetKind;
+import de.iip_ecosphere.platform.support.aas.LangString;
+import de.iip_ecosphere.platform.support.aas.Reference;
 import test.de.iip_ecosphere.platform.support.fakeAas.FakeAas.FakeAasBuilder;
 
 /**
@@ -50,6 +52,17 @@ public class FakeAsset implements Asset {
             parent.getInstance().setAsset(instance);
             return instance;
         }
+
+        @Override
+        public AssetBuilder setDescription(LangString... description) {
+            // ignore for now
+            return this;
+        }
+
+        @Override
+        public Reference createReference() {
+            return new FakeReference();
+        }
         
     }
     
@@ -77,6 +90,11 @@ public class FakeAsset implements Asset {
     @Override
     public void accept(AasVisitor visitor) {
         visitor.visitAsset(this);
+    }
+
+    @Override
+    public Reference createReference() {
+        return new FakeReference();
     }
 
 }

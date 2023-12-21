@@ -21,7 +21,7 @@ import java.util.function.Supplier;
 import de.iip_ecosphere.platform.support.Builder;
 
 /**
- * Represents an AAS.
+ * Represents an AAS Property.
  * 
  * @author Holger Eichelberger, SSE
  */

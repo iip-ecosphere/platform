@@ -113,7 +113,7 @@ public class FakeAasFactory extends AasFactory {
 
     @Override
     public PersistenceRecipe createPersistenceRecipe() {
-        return null;
+        return new FakePersistencyRecipe();
     }
 
     @Override

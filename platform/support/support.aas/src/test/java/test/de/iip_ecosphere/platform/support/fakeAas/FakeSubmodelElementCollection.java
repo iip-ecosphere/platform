@@ -14,13 +14,14 @@ package test.de.iip_ecosphere.platform.support.fakeAas;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.Builder;
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
 import de.iip_ecosphere.platform.support.aas.DataElement;
 import de.iip_ecosphere.platform.support.aas.DeferredBuilder;
-import de.iip_ecosphere.platform.support.aas.FileDataElement.FileDataElementBuilder;
 import de.iip_ecosphere.platform.support.aas.Operation;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.Reference;
@@ -103,35 +104,11 @@ public class FakeSubmodelElementCollection extends FakeElement implements Submod
         public Reference createReference() {
             return new FakeReference();
         }
-
+        
         @Override
-        FakeFileDataElement register(FakeFileDataElement element) {
-            instance.elements.put(element.getIdShort(), element);
-            return element;
-        }
-
-        @Override
-        FakeOperation register(FakeOperation operation) {
-            instance.elements.put(operation.getIdShort(), operation);
-            return operation;
-        }
-
-        @Override
-        FakeProperty register(FakeProperty property) {
-            instance.elements.put(property.getIdShort(), property);
-            return property;
-        }
-
-        @Override
-        FakeReferenceElement register(FakeReferenceElement reference) {
-            instance.elements.put(reference.getIdShort(), reference);
-            return reference;
-        }
-
-        @Override
-        FakeSubmodelElementCollection register(FakeSubmodelElementCollection collection) {
-            instance.elements.put(collection.getIdShort(), collection);
-            return collection;
+        <T extends SubmodelElement> T registerElement(T elt) {
+            instance.elements.put(elt.getIdShort(), elt);
+            return elt;
         }
 
         @Override
@@ -148,12 +125,7 @@ public class FakeSubmodelElementCollection extends FakeElement implements Submod
         public boolean isNew() {
             return isNew;
         }
-        
-        @Override
-        public FileDataElementBuilder createFileDataElementBuilder(String idShort, String contents, String mimeType) {
-            return new FakeFileDataElement.FakeFileDataElementBuilder(this, idShort, contents, mimeType);
-        }
-        
+
         @Override
         void defer(String shortId, Builder<?> builder) {
             instance.deferred = DeferredBuilder.defer(shortId, builder, instance.deferred);
@@ -242,6 +214,18 @@ public class FakeSubmodelElementCollection extends FakeElement implements Submod
             }
         }
         return result;
+    }
+    
+    /**
+     * Returns a type-filtered stream.
+     * 
+     * @param <T> the actual type of submodel element
+     * @param type the type to filter for
+     * @return the stream of filtered elements
+     */
+    protected <T extends SubmodelElement> Stream<T> stream(Class<T> type) {
+        Predicate<SubmodelElement> filter = null == type ? e -> true : e -> type.isInstance(e);
+        return elements.values().stream().filter(filter).map(e -> type.cast(e));
     }
 
     @Override

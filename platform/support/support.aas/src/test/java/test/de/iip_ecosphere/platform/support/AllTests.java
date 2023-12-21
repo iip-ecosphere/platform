@@ -13,8 +13,10 @@ package test.de.iip_ecosphere.platform.support;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
+import test.de.iip_ecosphere.platform.support.aas.IdentifierTypeTest;
 import test.de.iip_ecosphere.platform.support.aas.LangStringTest;
 import test.de.iip_ecosphere.platform.support.aas.LocalInvocationTest;
+import test.de.iip_ecosphere.platform.support.aas.XmasAas;
 import test.de.iip_ecosphere.platform.support.fakeAas.FactoryTest;
 import test.de.iip_ecosphere.platform.support.fakeAas.PrintVisitorTest;
 import test.de.iip_ecosphere.platform.support.metrics.MetricsTests;
@@ -45,12 +47,14 @@ import test.de.iip_ecosphere.platform.support.net.UriResolverTest;
     SystemMetricsTest.class,
     IOVoidFunctionTest.class,
     SemanticIdResolverTest.class,
+    IdentifierTypeTest.class,
     
     MetricsTests.class,
     test.de.iip_ecosphere.platform.support.identities.AllTests.class,
     
     // non-generic AAS 
-    LangStringTest.class
+    LangStringTest.class,
+    XmasAas.class
 })
 public class AllTests {
 }

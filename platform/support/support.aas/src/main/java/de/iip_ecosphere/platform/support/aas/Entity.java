@@ -19,14 +19,26 @@ import de.iip_ecosphere.platform.support.Builder;
  * 
  * @author Holger Eichelberger, SSE
  */
-public interface ReferenceElement extends SubmodelElement {
+public interface Entity extends SubmodelElement, SubmodelElementCollection {
 
+    /**
+     * Denotes the entity type.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public enum EntityType {
+        
+       COMANAGEDENTITY(),
+       SELFMANAGEDENTITY();
+        
+    }
+    
     /**
      * Defines the interface for a reference element builder.
      * 
      * @author Holger Eichelberger, SSE
      */
-    public interface ReferenceElementBuilder extends Builder<ReferenceElement> {
+    public interface EntityBuilder extends SubmodelElementContainerBuilder, Builder<Entity> {
 
         /**
          * Returns the parent builder.
@@ -36,20 +48,12 @@ public interface ReferenceElement extends SubmodelElement {
         public SubmodelElementContainerBuilder getParentBuilder();
         
         /**
-         * Defines the value.
-         * 
-         * @param value the value
-         * @return <b>this</b>
-         */
-        public ReferenceElementBuilder setValue(Reference value);
-
-        /**
          * Sets the description in terms of language strings.
          * 
          * @param description the description
          * @return <b>this</b>
          */
-        public ReferenceElementBuilder setDescription(LangString... description);
+        public EntityBuilder setDescription(LangString... description);
 
         
         /**
@@ -58,15 +62,22 @@ public interface ReferenceElement extends SubmodelElement {
          * @param refValue the reference value (supported: irdi:<i>irdiValue</i>)
          * @return <b>this</b>
          */
-        public ReferenceElementBuilder setSemanticId(String refValue);
+        public EntityBuilder setSemanticId(String refValue);
+        
+        /**
+         * Creates a reference to the entity under creation.
+         * 
+         * @return the reference
+         */
+        public Reference createReference();
 
     }
-
+    
     /**
-     * Returns the reference.
+     * Returns the entity type.
      * 
-     * @return the reference
+     * @return the entity type
      */
-    public Reference getValue();
+    public EntityType getType();
 
 }

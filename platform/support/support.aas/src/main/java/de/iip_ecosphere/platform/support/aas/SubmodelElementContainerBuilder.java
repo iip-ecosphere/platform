@@ -1,10 +1,14 @@
 package de.iip_ecosphere.platform.support.aas;
 
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
+import de.iip_ecosphere.platform.support.aas.Entity.EntityBuilder;
+import de.iip_ecosphere.platform.support.aas.Entity.EntityType;
 import de.iip_ecosphere.platform.support.aas.FileDataElement.FileDataElementBuilder;
+import de.iip_ecosphere.platform.support.aas.MultiLanguageProperty.MultiLanguagePropertyBuilder;
 import de.iip_ecosphere.platform.support.aas.Operation.OperationBuilder;
 import de.iip_ecosphere.platform.support.aas.Property.PropertyBuilder;
 import de.iip_ecosphere.platform.support.aas.ReferenceElement.ReferenceElementBuilder;
+import de.iip_ecosphere.platform.support.aas.RelationshipElement.RelationshipElementBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 
 /**
@@ -23,6 +27,37 @@ public interface SubmodelElementContainerBuilder {
      */
     public PropertyBuilder createPropertyBuilder(String idShort);
 
+    /**
+     * Creates a builder for a multi-language property.
+     * 
+     * @param idShort the short name of the property
+     * @return the property builder
+     * @throws IllegalArgumentException if {@code idShort} is <b>null</b> or empty
+     */
+    public MultiLanguagePropertyBuilder createMultiLanguagePropertyBuilder(String idShort);
+
+    /**
+     * Creates a builder for a relationship element.
+     * 
+     * @param idShort the short name of the reference
+     * @param first the first reference
+     * @param second the second reference
+     * @return the property builder
+     * @throws IllegalArgumentException if {@code idShort} is <b>null</b> or empty
+     */
+    public RelationshipElementBuilder createRelationshipElementBuilder(String idShort, 
+        Reference first, Reference second);
+
+    /**
+     * Creates an Entity builder.
+     * 
+     * @param idShort the idShort of the entity
+     * @param type the entity type
+     * @param asset optional reference to asset, may be <b>null</b> for none
+     * @return the entity builder
+     */
+    public EntityBuilder createEntityBuilder(String idShort, EntityType type, Reference asset);
+    
     /**
      * Creates a builder for a contained reference element.
      * 
@@ -50,7 +85,7 @@ public interface SubmodelElementContainerBuilder {
      * @return the data element builder
      */
     public FileDataElementBuilder createFileDataElementBuilder(String idShort, String contents, String mimeType);
-
+    
     /**
      * Creates a builder for a contained sub-model element collection. Calling this method again with the same name 
      * shall lead to a builder that allows for modifying the sub-model.

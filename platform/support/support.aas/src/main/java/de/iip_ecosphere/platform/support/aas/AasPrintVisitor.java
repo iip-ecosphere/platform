@@ -120,5 +120,20 @@ public class AasPrintVisitor implements AasVisitor {
     public void visitDataElement(DataElement dataElement) {
         log("DATAELT " + dataElement.getIdShort());
     }
+    
+    @Override
+    public void visitMultiLanguageProperty(MultiLanguageProperty property) {
+        log("MLP " + property.getIdShort());
+    }
+
+    @Override
+    public void visitRelationshipElement(RelationshipElement relationship) {
+        log("RELATIONSHIP " + relationship.getIdShort());
+    }
+
+    @Override
+    public void visitEntity(Entity entity) {
+        log("ENTITY " + entity.getIdShort());
+    }
 
 }

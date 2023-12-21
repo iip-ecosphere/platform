@@ -13,9 +13,11 @@
 package de.iip_ecosphere.platform.support.aas;
 
 import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import de.iip_ecosphere.platform.support.Builder;
+import de.iip_ecosphere.platform.support.aas.Property.PropertyBuilder;
 
 /**
  * Represents an AAS operation.
@@ -47,7 +49,9 @@ public interface Operation extends Element, SubmodelElement {
          * @param type the type of the variable (may be <b>null</b> for left undefined)
          * @return <b>this</b>
          */
-        public OperationBuilder addInputVariable(String idShort, Type type);
+        public default OperationBuilder addInputVariable(String idShort, Type type) {
+            return addInputVariable(idShort, type, null);
+        }
         
         /**
          * Adds an output variable to the operation.
@@ -56,7 +60,9 @@ public interface Operation extends Element, SubmodelElement {
          * @param type the type of the variable (may be <b>null</b> for left undefined)
          * @return <b>this</b>
          */
-        public OperationBuilder addOutputVariable(String idShort, Type type);
+        public default OperationBuilder addOutputVariable(String idShort, Type type) {
+            return addOutputVariable(idShort, type, null);
+        }
         
         /**
          * Adds an input-output variable to the operation.
@@ -65,7 +71,47 @@ public interface Operation extends Element, SubmodelElement {
          * @param type the type of the variable (may be <b>null</b> for left undefined)
          * @return <b>this</b>
          */
-        public OperationBuilder addInOutVariable(String idShort, Type type);
+        public default OperationBuilder addInOutVariable(String idShort, Type type) {
+            return addInOutVariable(idShort, type, null);
+        }
+
+        /**
+         * Adds an input variable to the operation.
+         * 
+         * @param idShort the short id of the variable
+         * @param type the type of the variable (may be <b>null</b> for left undefined)
+         * @param init optional initializer in builder style, may be <b>null</b> for none
+         * @return <b>this</b>
+         */
+        public OperationBuilder addInputVariable(String idShort, Type type, Consumer<PropertyBuilder> init);
+        
+        /**
+         * Adds an output variable to the operation.
+         * 
+         * @param idShort the short id of the variable
+         * @param type the type of the variable (may be <b>null</b> for left undefined)
+         * @param init optional initializer in builder style, may be <b>null</b> for none
+         * @return <b>this</b>
+         */
+        public OperationBuilder addOutputVariable(String idShort, Type type, Consumer<PropertyBuilder> init);
+        
+        /**
+         * Adds an input-output variable to the operation.
+         * 
+         * @param idShort the short id of the variable
+         * @param type the type of the variable (may be <b>null</b> for left undefined)
+         * @param init optional initializer in builder style, may be <b>null</b> for none
+         * @return <b>this</b>
+         */
+        public OperationBuilder addInOutVariable(String idShort, Type type, Consumer<PropertyBuilder> init);
+        
+        /**
+         * Sets the description in terms of language strings.
+         * 
+         * @param description the description
+         * @return <b>this</b>
+         */
+        public OperationBuilder setDescription(LangString... description);
         
         /**
          * Sets the invocable of this operation. May apply tests to avoid known failures, 
