@@ -92,6 +92,7 @@ public class XmasAas {
         FileUtils.deleteQuietly(tmpFolder);
         createCompositeAas();
         File aasx = getTargetFile();
+        aasx.getParentFile().mkdirs();
         AasFactory.getInstance().createPersistenceRecipe().writeTo(aasList, 
             getFileResource("santaSleigh.png"), resources, aasx);
         FileUtils.deleteQuietly(tmpFolder);
