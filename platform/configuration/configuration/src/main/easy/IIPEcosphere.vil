@@ -314,8 +314,19 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         if (impl <> "") {
             advanceProgress("Compiling and installing implementation");
             Path implRoot = "${target}/svcImpl";
+            if (implRoot.exists()) {
+                implRoot.delete();
+            }
             unzip(impl, implRoot);
-            mvn(implRoot);
+            // ZIP upload convention, either all in root or a single folder with same name as file
+            Path implPath = "${impl}";
+            impl = implPath.getName();
+            impl = impl.substring(0, impl.length() - 4);
+            Path eclipsePath = "${implRoot}/${impl}";
+            if (eclipsePath.exists()) {
+                implRoot = eclipsePath;
+            }
+            mvn(implRoot, "-DskipTests");
         }
     }
     

@@ -13,15 +13,19 @@
 package de.iip_ecosphere.platform.configuration.ivml;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -51,6 +55,7 @@ import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.TaskRegistry;
+import de.iip_ecosphere.platform.support.ZipUtils;
 import de.iip_ecosphere.platform.support.TaskRegistry.TaskData;
 import de.iip_ecosphere.platform.support.aas.AasUtils;
 import de.iip_ecosphere.platform.support.json.JsonResultWrapper;
@@ -353,19 +358,22 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             new JsonResultWrapper(a -> {
                 return TaskUtils.executeAsTask(PROGRESS_COMPONENT_ID, 
                     p -> getAasIvmlMapper().instantiate(InstantiationMode.APPS, AasUtils.readString(p), 
-                        AasUtils.readString(p, 1)));
+                        AasUtils.readString(p, 1))
+                    , a);
             })
         );
         sBuilder.defineOperation(OP_GEN_APPS_NO_DEPS, 
             new JsonResultWrapper(a -> {
                 return TaskUtils.executeAsTask(PROGRESS_COMPONENT_ID, 
-                    p -> getAasIvmlMapper().instantiate(InstantiationMode.APPS_NO_DEPS, AasUtils.readString(p), null));
+                    p -> getAasIvmlMapper().instantiate(InstantiationMode.APPS_NO_DEPS, AasUtils.readString(p), null)
+                    , a);
             })
         );
         sBuilder.defineOperation(OP_GEN_INTERFACES, 
             new JsonResultWrapper(a -> {
                 return TaskUtils.executeAsTask(PROGRESS_COMPONENT_ID, 
-                    p -> getAasIvmlMapper().instantiate(InstantiationMode.INTERFACES, null, null));
+                    p -> getAasIvmlMapper().instantiate(InstantiationMode.INTERFACES, null, null)
+                    , a);
             })
         );
     }
@@ -386,13 +394,16 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             lastTaskData = TaskRegistry.getTaskData();
         }
         TaskData beforeTaskData = ConfigurationManager.setTaskData(lastTaskData);
-        if (codeFile != null && codeFile.length() > 0 && codeFile.endsWith(".zip")) {
+        if (InstantiationMode.APPS == mode && codeFile != null && codeFile.endsWith(".zip")) {
             File f = new File(ConfigurationSetup.getSetup().getUploadFolder(), codeFile);
             if (f.exists()) {
+                f = fixZipConvention(f);
+                LoggerFactory.getLogger(AasIvmlMapper.class).info("Integrating {} in {}", codeFile, f);
                 System.setProperty("iip.easy.impl", f.getAbsolutePath());
             }
         }
-        // TODO if fileName -> unpack, run maven
+        System.setProperty("KEY_PROPERTY_TRACING", "TOP");
+        PlatformInstantiator.setTraceFilter();
         ConfigurationManager.cleanGenTarget();
         long start = System.currentTimeMillis();
         if (null != appId) {
@@ -420,6 +431,53 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             break;
         }
         ConfigurationManager.setTaskData(beforeTaskData);
+        return result;
+    }
+    
+    /**
+     * Checking and fixing ZIP file conventions for instantiation. The instantiation requires that
+     * either the project is directly located in the root folder of the ZIP or in a single contained
+     * folder having the same name as the ZIP file. If possible, through renaming/copying, we fix the 
+     * second situation here.
+     * 
+     * @param file the original ZIP file
+     * @return the fixed ZIP file, may be {@code file}
+     */
+    private static File fixZipConvention(File file) {
+        File result = file;
+        Set<String> folders = new HashSet<String>();
+        Set<String> files = new HashSet<String>();
+        try {
+            ZipUtils.listFiles(new FileInputStream(file), f -> true, f -> {
+                String path = f.toString();
+                int pos = path.indexOf("/");
+                if (pos > 0) {
+                    folders.add(path.substring(0, pos));
+                } else {
+                    files.add(path);
+                }
+            });
+        } catch (IOException e) {
+            LoggerFactory.getLogger(AasIvmlMapper.class).warn("Cannot scan ZIP: {}", e.getMessage());
+        }
+        if (folders.size() == 1 && files.size() == 0) {
+            String name = file.getName();
+            if (name.endsWith(".zip")) {
+                name = name.substring(0, name.length() - 4);
+            }
+            Optional<String> folder = folders.stream().findAny();
+            if (folder.isPresent() && !name.equals(folder.get())) {
+                result = new File(FileUtils.getTempDirectory(), folder.get() + ".zip");
+                try {
+                    Files.copy(file.toPath(), result.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    LoggerFactory.getLogger(AasIvmlMapper.class).info("Zip convention: Using {} instead of {}", 
+                        result, file);
+                } catch (IOException e) {
+                    LoggerFactory.getLogger(AasIvmlMapper.class).warn("Cannot copy ZIP: {}", e.getMessage());
+                    result = file; // stay with the original
+                }
+            }
+        }
         return result;
     }
 

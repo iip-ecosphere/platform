@@ -129,10 +129,17 @@ vilScript IIPEcosphereBase (Project source, Configuration config, Project target
 
     
     // ---------------------------- maven -----------------------------------
-    
+
     mvn(Path path) = {
-        sequenceOf(String) args = getProperty("iip.easy.mvnArgs", "")
-            .split(",")->reject(s|s.trim().length()==0);
+        mvn(path, "");
+    }
+    
+    mvn(Path path, String addArgs) = {
+        String a = getProperty("iip.easy.mvnArgs", "");
+        if (addArgs.length() > 0) {
+            a = appendWithSeparator(a, ",", addArgs);
+        }
+        sequenceOf(String) args = a.split(",")->reject(s|s.trim().length()==0);
         maven("${path}", args, false);
     }
     
