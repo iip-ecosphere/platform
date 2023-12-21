@@ -12,6 +12,7 @@ For installation and first steps, see [install guide](platform/documentation/INS
 
 ## News
 
+* XMas AAS abstraction/integration upgrade: referenceElement, multiLanguageProperties, entity, more semanticIds, [IDTA 02004-1-2 Handover Documentation](https://industrialdigitaltwin.org/wp-content/uploads/2023/03/IDTA-02004-1-2_Submodel_Handover-Documentation.pdf), [IDTA 02011-1-0 Hierarchical Structures enabling Bills of Material](https://industrialdigitaltwin.org/wp-content/uploads/2023/04/IDTA-02011-1-0_Submodel_HierarchicalStructuresEnablingBoM.pdf), XMAS AAS/test
 * Ongoing revision of the management UI: Application implementation templates can be created and downloaded from the management UI (December 2023).
 * Improved installation scripts including Angular and the management UI.
 * In 0.7.0, the model locations of examples and templates have been aligned with Maven conventions, i.e., configuration in src/main/easy, updatable meta-model in target/easy.

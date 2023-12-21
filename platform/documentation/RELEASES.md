@@ -12,6 +12,7 @@ New features:
 * [#153](https://github.com/iip-ecosphere/platform/issues/153): MD5 hashes for Python "compilation", offline for mvn install 
 * [#154](https://github.com/iip-ecosphere/platform/issues/154): Application packaging scheme in configuration meta-model 
 * [#152](https://github.com/iip-ecosphere/platform/issues/152): EMO'23 example added to repository
+* AAS abstraction/integration: referenceElement, multiLanguageProperties, entity, more semanticIds, [IDTA 02004-1-2 Handover Documentation](https://industrialdigitaltwin.org/wp-content/uploads/2023/03/IDTA-02004-1-2_Submodel_Handover-Documentation.pdf), [IDTA 02011-1-0 Hierarchical Structures enabling Bills of Material](https://industrialdigitaltwin.org/wp-content/uploads/2023/04/IDTA-02011-1-0_Submodel_HierarchicalStructuresEnablingBoM.pdf), XMAS AAS/test
 
 Improvements:
 * [#156](https://github.com/iip-ecosphere/platform/issues/156): UI regression tests including in-test execution of platform, (un)deployment of app
