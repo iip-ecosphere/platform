@@ -122,7 +122,6 @@ public class ConfigurationManager {
                     msg.withDescription(heading);
                     Transport.sendStatus(msg);
                 }
-                getLogger().info("{}: {}%", heading, (maxSteps > 0 ? progress : "?"));
                 lastSteps = steps;
                 lastMaxSteps = maxSteps;
                 if (steps >= maxSteps && null != taskData) { // to be sure, to bypass the 2 required stop calls

@@ -89,7 +89,17 @@ template PlatformYaml(IIPEcosphere config, FileArtifact target, String modelName
           genTarget: ${genTarget}
           ivmlMetaModelFolder: ${base}/${metaModelFolder}
           ivmlConfigFolder: ${base}/${configFolder}
+          ${additionalEasyModelFolders(config)|e}
         '
+    }
+    
+    def additionalEasyModelFolders(IIPEcosphere config) {
+        if (isDefined(config.additionalModelFolders) and config.additionalModelFolders <> null and config.additionalModelFolders.size() > 0) {
+            'additionalIvmlFolders:'
+            for (String a: config.additionalModelFolders) {
+                '  - ${a}'
+            }
+        }
     }
     
     def uploadFolder(IIPEcosphere config) {

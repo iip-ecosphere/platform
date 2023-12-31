@@ -20,6 +20,7 @@ project IIPEcosphere {
     String footprintFolder = footprintFolderDflt;
     String modelBaseFolder = "."; // base folder for metaModel folder and configFolder
     String metaModelFolder = "src/main/easy";
+    setOf(String) additionalModelFolders;
     String configFolder = null;
     String genTarget = "gen";
     String modelName = "PlatformConfiguration";
