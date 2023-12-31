@@ -46,10 +46,10 @@ export class StatusCollectionService {
       } else {
         this.StatusCollection.push({taskId: Status.taskId, isFinished: isFinished, isSuccesful: isSuccesful, messages: [Status]});
       }
-    } else {
+    } /*else {
       console.warn("WARNING: Recieved status without taskId: ");
       console.warn(Status);
-    }
+    }*/
   }
 
   public async addReceivedMessage(message: string, taskId: string) {

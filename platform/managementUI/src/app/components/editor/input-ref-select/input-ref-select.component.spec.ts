@@ -3,6 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { InputRefSelectComponent } from './input-ref-select.component';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
 
 describe('InputRefSelectComponent', () => {
   let component: InputRefSelectComponent;
@@ -10,7 +11,7 @@ describe('InputRefSelectComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ HttpClientTestingModule, MatDialogModule ],
+      imports: [ HttpClientTestingModule, MatDialogModule, MatIconModule ],
       declarations: [ InputRefSelectComponent ],
       providers: [
         {provide: MatDialogRef, useValue: {}},

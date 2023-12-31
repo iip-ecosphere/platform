@@ -27,7 +27,7 @@ export class Utils {
    */
   public isNonEmptyString(value: any) {
     let result = false
-    if (typeof value == "string" && value.length > 0) {
+    if (this.isString(value) && value.length > 0) {
       result = true
     }
     return result
@@ -41,6 +41,36 @@ export class Utils {
    */
   public isObject(value: any) {
     return (typeof value === 'object');
+  }
+
+  /**
+   * Detect whether value is an "string".
+   * 
+   * @param value the value to test 
+   * @returns true for string, false else
+   */
+  public isString(value: any) {
+    return (typeof value === 'string');
+  }
+
+   /**
+   * Detect whether value is a number.
+   * 
+   * @param value the value to test 
+   * @returns true for number, false else
+   */
+  public isNumber(value: any) {
+    return typeof value === 'number' && !Number.isNaN(value);
+  }
+
+  /**
+   * Detect whether value is a boolean.
+   * 
+   * @param value the value to test 
+   * @returns true for boolean, false else
+   */
+  public isBoolean(value: any) {
+    return typeof value === 'boolean';
   }
 
   /**

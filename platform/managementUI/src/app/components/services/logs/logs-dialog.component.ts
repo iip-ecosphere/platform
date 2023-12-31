@@ -65,20 +65,22 @@ export class LogsDialogComponent implements OnInit{
       + ' idShort: ' + this.data.idShort)
     if (this.running == 0) {
       const inputVariable = await this.getInputVar(this.data.idShort, this.mode)
-      await this.getWebsocketEndpoint(inputVariable)
-      if (this.data.type == this.stdout) {
-        if (this.stdoutUrl && this.stdoutUrl.length > 0) {
-            this.websocketService.connect(this.stdoutUrl)
+      if (inputVariable) {
+        await this.getWebsocketEndpoint(inputVariable)
+        if (this.data.type == this.stdout) {
+          if (this.stdoutUrl && this.stdoutUrl.length > 0) {
+              this.websocketService.connect(this.stdoutUrl)
+              this.running = 1
+          } else {
+            console.warn("No stdoutUrl available. Cannot start log stream websocket.");
+          }
+        } else {
+          if (this.stderrUrl && this.stderrUrl.length > 0) {
+            this.websocketService.connect(this.stderrUrl)
             this.running = 1
-        } else {
-          console.warn("No stdoutUrl available. Cannot start log stream websocket.");
-        }
-      } else {
-        if (this.stderrUrl && this.stderrUrl.length > 0) {
-          this.websocketService.connect(this.stderrUrl)
-          this.running = 1
-        } else {
-          console.warn("No stdoutUrl available. Cannot start log stream websocket.");
+          } else {
+            console.warn("No stdoutUrl available. Cannot start log stream websocket.");
+          }
         }
       }
     } else {
@@ -149,35 +151,41 @@ export class LogsDialogComponent implements OnInit{
   }
 
   public async getInputVar(serviceId:string, mode:string) {
-    this.serviceInfo = await this.getServiceInfo(serviceId)
+    this.serviceInfo = await this.getServiceInfo(serviceId);
 
-    let inputVariables: InputVariable[] = [];
-    let input0:InputVariable = {
-      value: {
-        modelType: {
-          name: "Property"
-        },
-        valueType: "string",
-        idShort: "id",
-        kind: "Template",
-        value: this.data.id
+    let inputVariables: InputVariable[] | null;
+    if (this.serviceInfo && this.serviceInfo.serviceMgr) {
+      inputVariables = [];
+      let input0:InputVariable = {
+        value: {
+          modelType: {
+            name: "Property"
+          },
+          valueType: "string",
+          idShort: "id",
+          kind: "Template",
+          value: this.data.id
+        }
       }
-    }
-    let input1:InputVariable = {
-      value: {
-        modelType: {
-          name: "Property"
-        },
-        valueType: "string",
-        idShort: "mode",
-        kind: "Template",
-        value: mode
+      let input1:InputVariable = {
+        value: {
+          modelType: {
+            name: "Property"
+          },
+          valueType: "string",
+          idShort: "mode",
+          kind: "Template",
+          value: mode
+        }
       }
-    }
-    inputVariables.push(input0)
-    inputVariables.push(input1)
+      inputVariables.push(input0)
+      inputVariables.push(input1)
 
-    this.inputVarPlaceholder = inputVariables
+      this.inputVarPlaceholder = inputVariables
+    } else {
+      inputVariables = null;
+      console.warn(`No service info for ${serviceId} available.`);
+    }
     return inputVariables
   }
 
@@ -234,21 +242,22 @@ export class LogsDialogComponent implements OnInit{
   public async closeLogsStream() {
     console.debug("[log-dialog | closeLogs Async] triggered")
     let inputVar = await this.getInputVar(this.data.idShort, "STOP")
+    if (inputVar) {
+      let resourceId = this.serviceInfo.resource
+      let aasElementURL = "/aas/submodels/resources/submodel/submodelElements/"
+      let basyxFun = "serviceManagers/a"
+        + this.serviceInfo.serviceMgr.replace("@", "_")
+        + "/serviceStreamLog"
 
-    let resourceId = this.serviceInfo.resource
-    let aasElementURL = "/aas/submodels/resources/submodel/submodelElements/"
-    let basyxFun = "serviceManagers/a"
-      + this.serviceInfo.serviceMgr.replace("@", "_")
-      + "/serviceStreamLog"
+      const response = await this.api.executeFunction(
+        resourceId,
+        aasElementURL,
+        basyxFun,
+        inputVar) as unknown as platformResponse
 
-    const response = await this.api.executeFunction(
-      resourceId,
-      aasElementURL,
-      basyxFun,
-      inputVar) as unknown as platformResponse
-
-    console.debug("[log-dialog | closeStreamLog] platform response: ")
-    console.debug(response.executionState)
+      console.debug("[log-dialog | closeStreamLog] platform response: ")
+      console.debug(response.executionState)
+    }
   }
 
   // ----------- sync -----------------

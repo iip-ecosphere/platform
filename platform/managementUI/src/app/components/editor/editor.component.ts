@@ -2,8 +2,9 @@ import { Component, Input, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { ApiService } from 'src/app/services/api.service';
 import { IvmlFormatterService } from 'src/app/services/ivml-formatter.service';
-import { Resource, uiGroup, editorInput, configMetaContainer, configMetaEntry, ResourceAttribute, InputVariable, metaTypes, 
-  MTK_primitive, MTK_derived, MTK_enum, MTK_compound, MT_metaRefines, MT_metaTypeKind, MT_metaAbstract, primitiveDataTypes, MT_metaDefault, ivmlEnumeration, MT_metaDisplayName, DR_displayName } from 'src/interfaces';
+import { Resource, uiGroup, editorInput, configMetaContainer, configMetaEntry, ResourceAttribute, metaTypes, 
+  MTK_primitive, MTK_derived, MTK_enum, MTK_compound, MT_metaRefines, MT_metaTypeKind, MT_metaAbstract, 
+  primitiveDataTypes, MT_metaDefault, IVML_TYPE_PREFIX_enumeration, DR_displayName, IvmlRecordValue, IvmlValue} from 'src/interfaces';
 import { Utils, DataUtils } from 'src/app/services/utils.service';
 
 @Component({
@@ -345,7 +346,7 @@ export class EditorComponent extends Utils implements OnInit {
               initial = ivmlValue
             } else if (editorInput.metaTypeKind === MTK_enum) {
               initial = ivmlValue
-              editorInput.valueTransform = input => ivmlEnumeration + (input.type || "") + '.' + input.value;
+              editorInput.valueTransform = input => IVML_TYPE_PREFIX_enumeration + (input.type || "") + '.' + input.value;
             } else if (editorInput.type === 'Boolean') {
               initial = String(ivmlValue).toLowerCase() === 'true';
             } else if (editorInput.metaTypeKind === MTK_compound && !editorInput.multipleInputs) {
@@ -429,14 +430,15 @@ export class EditorComponent extends Utils implements OnInit {
    * Called when creating a new variable is requested from the editor.
    */
   public async create() {
-    let creationData: Record<string, any> = {};
+    let creationData: IvmlRecordValue = {};
     this.showInputs = false;
     this.transferUiGroups(this.uiGroups, creationData);
     if (this.selectedType?.idShort == "Application") {
-      this.feedback = await this.ivmlFormatter.createApp(this.variableName, creationData)
+      let fdb = await this.ivmlFormatter.createApp(this.variableName, creationData);
+      this.feedback = fdb.feedback;
     } else {
-      this.feedback = await this.ivmlFormatter.createVariable(
-        this.variableName, creationData, this.ivmlType)
+      let fdb = await this.ivmlFormatter.createVariable(this.variableName, creationData, this.ivmlType);
+      this.feedback = fdb.feedback;
     }
   }
 
@@ -451,7 +453,7 @@ export class EditorComponent extends Utils implements OnInit {
    * Called from the editor to save the entered values into type.value.
    */
   public async save() {
-    let complexType: Record<string, any> = {};
+    let complexType: IvmlRecordValue = {};
 
     if (this.type) {
       this.transferUiGroups(this.uiGroups, complexType);
@@ -471,7 +473,7 @@ export class EditorComponent extends Utils implements OnInit {
    * @param uiGroups the UI groups 
    * @param result the results object to be modified as a side effect
    */
-  private transferUiGroups(uiGroups: uiGroup[], result: Record<string, any>) {
+  private transferUiGroups(uiGroups: uiGroup[], result: IvmlRecordValue) {
     for (let uiGroup of this.uiGroups) {
       this.transferInputs(uiGroup.inputs, result);
       this.transferInputs(uiGroup.optionalInputs, result);
@@ -481,18 +483,24 @@ export class EditorComponent extends Utils implements OnInit {
   }
 
   /**
-   * Transfers the values in the given inputs into properties of result.
+   * Transfers the values in the given inputs into properties of result filtering out unchanged IVML default values.
    * Calls {@link this.getValue}.
    * 
    * @param inputs the editor inputs to process 
    * @param result the results object to be modified as a side effect
    */
-  private transferInputs(inputs: editorInput[], result: Record<string, any>) {
+  private transferInputs(inputs: editorInput[], result: IvmlRecordValue) {
     for (let input of inputs) {
-      if (input.meta){
-        result[input.name] = this.getValue(input);
+      let tmp: any = null;
+      if (input.meta) {
+        tmp = this.getValue(input);
       } else if (primitiveDataTypes.includes(input.type)) { // was only in prepareCreation and only for uiGroup.inputs
-        result[input.name] = this.getValue(input);
+        tmp = this.getValue(input);
+      }
+      if (tmp && tmp != input.defaultValue) { // don't write back IVML default values
+        let val : IvmlValue = {value: tmp, _type: input.type};
+        result[input.name] = val;
+        //result[input.name] = tmp;
       }
     }
   }

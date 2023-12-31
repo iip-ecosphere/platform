@@ -1,6 +1,6 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { PlatformArtifacts, PlatformResources, PlatformServices, ResourceAttribute, InputVariable, platformResponse, Resource, PlatformData, DEFAULT_AAS_OPERATION_TIMEOUT } from 'src/interfaces';
+import { PlatformArtifacts, PlatformResources, PlatformServices, ResourceAttribute, InputVariable, platformResponse, Resource, PlatformData, DEFAULT_AAS_OPERATION_TIMEOUT, JsonPlatformOperationResult } from 'src/interfaces';
 import { firstValueFrom, Subject } from 'rxjs';
 import { EnvConfigService } from './env-config.service';
 import { DataUtils } from './utils.service';
@@ -84,7 +84,6 @@ export class ApiService {
     let response;
     try {
       let cfg = await this.envConfigService.initAndGetCfg();
-console.log(JSON.stringify(params));      
       response = await firstValueFrom(this.http.post(
         cfg?.ip
         + '/shells/'
@@ -133,7 +132,7 @@ public static createAasOperationParameter(idShort: string, aasType: string, valu
  * @returns the response as platformResponse
  */
 public async executeAasJsonOperation(submodel: string, operationName: string, params: any) {
-  return this.executeAasJsonOperationWithTimeout(submodel, operationName, DEFAULT_AAS_OPERATION_TIMEOUT, params);
+  return await this.executeAasJsonOperationWithTimeout(submodel, operationName, DEFAULT_AAS_OPERATION_TIMEOUT, params);
 }
 
 /**
@@ -147,7 +146,6 @@ public async executeAasJsonOperation(submodel: string, operationName: string, pa
  */
 public async executeAasJsonOperationWithTimeout(submodel: string, operationName: string, timeout: number, params: any) {
   let response;
-
   try {
     let cfg = await this.envConfigService.initAndGetCfg();
     response = await firstValueFrom(this.http.post<platformResponse>(
@@ -158,9 +156,23 @@ public async executeAasJsonOperationWithTimeout(submodel: string, operationName:
       {responseType: 'json', 
       reportProgress: true}));
   } catch(e) {
-    console.error(e);
+    console.error(e); // TODO create failing response?
   }
   return response;
+}
+
+/**
+ * Returns the value returned by a JSON platform operation call.
+ * 
+ * @param response the response returned from an execution function 
+ * @returns the value as JsonPlatformOperationResult
+ */
+public getPlatformResponse(response:platformResponse | undefined): JsonPlatformOperationResult | null {
+  let output : JsonPlatformOperationResult | null = null
+  if (response && response.outputArguments) {
+    output = response.outputArguments[0]?.value?.value as JsonPlatformOperationResult;
+  }
+  return output;
 }
 
 /**

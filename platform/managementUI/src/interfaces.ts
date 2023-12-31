@@ -56,12 +56,23 @@ export interface InputVariable {
   }
 }
 
+/**
+ * Return result of an AAS operation call.
+ */
 export interface outputArgument {
   value?: {
     idShort?: string;
     kind?: string;
     value?: string;
   }
+}
+
+/**
+ * Value usually returned by an AAS platform operation call.
+ */
+export interface JsonPlatformOperationResult {
+  result?: string;
+  exception?: string;
 }
 
 export interface PlatformServices {
@@ -396,6 +407,32 @@ export interface ivmlTemplate {
   [key: string]: any
 }
 
+export type IvmlValue = {
+  value: any;
+  _type: string;
+}
+
+export interface IvmlRecordValue {
+  [key: string]: IvmlValue;
+};
+
+//export type IvmlRecordValue = Record<string, any>;
+
+/**
+ * Represents user feedback created by a service operation to be displayed on the UI.
+ */
+export interface UserFeedback {
+  /**
+   * The feedback text.
+   */
+  feedback: string;
+
+  /**
+   * Successful or failed.
+   */
+  successful: boolean;
+}
+
 // ------------------- IVML (meta) AAS constants --------------------------
 
 // from platform, IVML mapper
@@ -425,10 +462,13 @@ export const metaTypes = [MT_metaState, MT_metaProject,
 export const allMetaTypes = [MT_metaState, MT_metaProject,
     MT_metaSize, MT_metaType, MT_metaRefines, MT_metaAbstract, MT_metaTypeKind, MT_metaDefault, MT_metaVariable, MT_metaDisplayName];
   
-export const primitiveDataTypes
-  = ["String", "Boolean", "Real", "Integer"]
+export const IVML_TYPE_String = "String";
+export const IVML_TYPE_Boolean = "Boolean";
+export const IVML_TYPE_Real = "Real";
+export const IVML_TYPE_Integer = "Integer";
+export const primitiveDataTypes = [IVML_TYPE_String, IVML_TYPE_Boolean, IVML_TYPE_Real, IVML_TYPE_Integer];
 
-export const ivmlEnumeration = "IvmlEnumeration:";  
+export const IVML_TYPE_PREFIX_enumeration = "IvmlEnumeration:";  
 
 /*
 * On data rows/entries, indicate the actual IVML type.

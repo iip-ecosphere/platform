@@ -12,6 +12,7 @@ import { Utils, DataUtils } from 'src/app/services/utils.service';
 import { WebsocketService } from 'src/app/websocket.service';
 import { StatusCollectionService } from 'src/app/services/status-collection.service';
 import { chunkInput } from '../file-upload/file-upload.component';
+import { IvmlFormatterService } from 'src/app/services/ivml-formatter.service';
 
 /**
  * Information on a file being uploaded.
@@ -67,7 +68,8 @@ export class ListComponent extends Utils implements OnInit {
     public api: ApiService,
     public dialog: MatDialog,
     public websocketService: WebsocketService, 
-    public collector: StatusCollectionService) {
+    public collector: StatusCollectionService, 
+    private ivmlFormatter: IvmlFormatterService) {
       super();
       this.sub = websocketService.getMsgSubject().subscribe((value: any) => {
         collector.receiveStatus(JSON.parse(value)) 
@@ -508,12 +510,19 @@ export class ListComponent extends Utils implements OnInit {
     }
   }
 
-  public del(item: any) {
-
+  public async del(item: any) {
+    if (this.currentTab === "Meshes") {
+      console.log("IMPLEMENT DELETE " + JSON.stringify(item));
+      //TODO this.ivmlFormatter.deleteMesh();
+    } else {
+      await this.ivmlFormatter.deleteVariable(item.varName);
+    }
+    // TODO feedback
   }
 
   public createMesh() {
-
+    console.log("IMPLEMENT CREATE MESH");
+    // TODO
   }
 
   public create() {

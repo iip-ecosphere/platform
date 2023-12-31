@@ -18,19 +18,49 @@ describe('UtilsService', () => {
   });
 
   it('should implement isArray', () => {
-    expect(service.isArray(null)).toBeFalsy();
-    expect(service.isArray(1)).toBeFalsy();
-    expect(service.isArray([])).toBeTruthy();
-    expect(service.isArray(["a"])).toBeTruthy();
+    expect(service.isArray(null)).toBeFalse();
+    expect(service.isArray(1)).toBeFalse();
+    expect(service.isArray([])).toBeTrue();
+    expect(service.isArray(["a"])).toBeTrue();
   });
 
   it('should implement isObject', () => {
-    expect(service.isObject(undefined)).toBeFalsy();
-    expect(service.isObject(null)).toBeTruthy();
-    expect(service.isObject(1)).toBeFalsy();
-    expect(service.isObject({a:"b"})).toBeTruthy();
-    expect(service.isObject([])).toBeTruthy();
-    expect(service.isObject("abba")).toBeFalsy();
+    expect(service.isObject(undefined)).toBeFalse();
+    expect(service.isObject(null)).toBeTrue();
+    expect(service.isObject(1)).toBeFalse();
+    expect(service.isObject({a:"b"})).toBeTrue();
+    expect(service.isObject([])).toBeTrue();
+    expect(service.isObject("abba")).toBeFalse();
+  });
+
+  it('should implement isNumber', () => {
+    expect(service.isNumber(undefined)).toBeFalse();
+    expect(service.isNumber(null)).toBeFalse();
+    expect(service.isNumber(1)).toBeTrue();
+    expect(service.isNumber({a:"b"})).toBeFalse();
+    expect(service.isNumber([])).toBeFalse();
+    expect(service.isNumber("abba")).toBeFalse();
+    expect(service.isNumber(true)).toBeFalse();
+  });
+
+  it('should implement isBoolean', () => {
+    expect(service.isBoolean(undefined)).toBeFalse();
+    expect(service.isBoolean(null)).toBeFalse();
+    expect(service.isBoolean(1)).toBeFalse();
+    expect(service.isBoolean({a:"b"})).toBeFalse();
+    expect(service.isBoolean([])).toBeFalse();
+    expect(service.isBoolean("abba")).toBeFalse();
+    expect(service.isBoolean(true)).toBeTrue();
+  });
+
+  it('should implement isString', () => {
+    expect(service.isString(undefined)).toBeFalse();
+    expect(service.isString(null)).toBeFalse();
+    expect(service.isString(1)).toBeFalse();
+    expect(service.isString({a:"b"})).toBeFalse();
+    expect(service.isString([])).toBeFalse();
+    expect(service.isString("abba")).toBeTrue();
+    expect(service.isString(true)).toBeFalse();
   });
 
   it('should implement isNonEmptyString', () => {

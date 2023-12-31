@@ -1,5 +1,5 @@
-import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
-import { Resource, editorInput, metaTypes, MT_varValue, ivmlEnumeration } from 'src/interfaces';
+import { Component, Input, OnInit } from '@angular/core';
+import { Resource, editorInput, metaTypes, MT_varValue } from 'src/interfaces';
 
 @Component({
   selector: 'app-enum-dropdown',

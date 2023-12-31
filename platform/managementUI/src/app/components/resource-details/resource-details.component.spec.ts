@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ResourceDetailsComponent } from './resource-details.component';
 import { MatCardModule } from '@angular/material/card';
+import { MatIconModule } from '@angular/material/icon';
 import { TidyPipe } from '../../pipes/tidy.pipe';
 import { HttpClientModule } from '@angular/common/http';
 import { RouterTestingModule } from "@angular/router/testing";
@@ -16,7 +17,7 @@ describe('ResourceDetailsComponent', () => {
   beforeEach(async () => {
     await EnvConfigService.init();
     await TestBed.configureTestingModule({
-      imports: [ HttpClientModule, MatCardModule,RouterTestingModule ],
+      imports: [ HttpClientModule, MatCardModule,RouterTestingModule, MatIconModule ],
       declarations: [ ResourceDetailsComponent, TidyPipe ],
       providers: [ResourceDetailsComponent, {
         provide: ActivatedRoute,

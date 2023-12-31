@@ -302,12 +302,11 @@ export class FlowchartComponent implements OnInit {
   meshName:string = ""
 
   public async create() {
-    let drawflowRaw = JSON.stringify(this.editor.drawflow.drawflow.Home.data)
-    let drawflow = drawflowRaw.replace("drawflow: ", "")
-    let feedbackInternal = await this.ivmlFormatter.setGraph("", "", this.meshName,
-      drawflow)
+    let drawflowRaw = JSON.stringify(this.editor.drawflow.drawflow.Home.data);
+    let drawflow = drawflowRaw.replace("drawflow: ", "");
+    let feedbackInternal = await this.ivmlFormatter.setMesh("", "", this.meshName, drawflow);
     const dialogRef = this.dialog.open(MeshFeedbackComponent, {});
-    dialogRef.componentInstance.feedback = feedbackInternal
+    dialogRef.componentInstance.feedback = feedbackInternal.feedback;
   }
 
 }
