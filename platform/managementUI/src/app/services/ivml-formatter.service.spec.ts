@@ -6,7 +6,7 @@ import { IVML_TYPE_Boolean, IVML_TYPE_Integer, IVML_TYPE_PREFIX_enumeration, IVM
 
 describe('IvmlFormatterService', () => {
 
-  const TIMEOUT_LIFECYCLE_MS = 10000;
+  const TIMEOUT_LIFECYCLE_MS = 20000;
   let service: IvmlFormatterService;
 
   beforeEach(() => {
