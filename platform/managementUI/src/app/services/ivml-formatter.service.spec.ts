@@ -95,14 +95,14 @@ describe('IvmlFormatterService', () => {
         name: {value: "Test Application", _type:IVML_TYPE_String}
       } as IvmlRecordValue;
       let uf = await service.createApp("testApp", appData);
-      expect(uf.successful).toBeTruthy();
+      expect(uf.successful).withContext(uf.feedback).toBeTruthy();
       uf = await service.setMesh("testApp", "", "testMesh", opRes.result);
-      expect(uf.successful).toBeTruthy();
+      expect(uf.successful).withContext(uf.feedback).toBeTruthy();
       // delete mesh and app
       uf = await service.deleteMesh("testApp", "testMesh");
-      expect(uf.successful).toBeTruthy;
+      expect(uf.successful).withContext(uf.feedback).toBeTruthy;
       uf = await service.deleteMesh("testApp", "");
-      expect(uf.successful).toBeTruthy;
+      expect(uf.successful).withContext(uf.feedback).toBeTruthy;
     }
   }, 2 * TIMEOUT_LIFECYCLE_MS);
 
@@ -125,9 +125,9 @@ function toIvmlRecordValue(val: any, varType: string) {
 
 async function testVarLifecycle(service: IvmlFormatterService, varName: string, val1: any, val2: any, varType: string) {
   let uf = await service.createVariable(varName, toIvmlRecordValue(val1, varType), varType);
-  expect(uf.successful).toBeTrue();
+  expect(uf.successful).withContext(uf.feedback).toBeTrue();
   uf = await service.setVariable(varName, toIvmlRecordValue(val1, varType), varType);
-  expect(uf.successful).toBeTrue();
+  expect(uf.successful).withContext(uf.feedback).toBeTrue();
   uf = await service.deleteVariable(varName);
-  expect(uf.successful).toBeTrue();
+  expect(uf.successful).withContext(uf.feedback).toBeTrue();
 }
