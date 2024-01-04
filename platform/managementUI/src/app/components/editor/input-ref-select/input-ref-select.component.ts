@@ -1,9 +1,9 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { EditorService } from 'src/app/services/editor.service';
 import { Resource, editorInput, configMeta, metaTypes, DR_type } from 'src/interfaces';
 import { DataUtils, Utils } from 'src/app/services/utils.service';
 import { EditorComponent } from '../editor.component';
 import { MatDialog } from '@angular/material/dialog';
+import { ApiService } from 'src/app/services/api.service';
 
 @Component({
   selector: 'app-input-ref-select',
@@ -23,7 +23,7 @@ export class InputRefSelectComponent extends Utils implements OnInit {
   references: Resource[] = [];
   selectedRef: configMeta | undefined;
 
-  constructor(private edit: EditorService, public subDialog: MatDialog) { 
+  constructor(private api: ApiService, public subDialog: MatDialog) { 
     super();
   }
 
@@ -33,17 +33,17 @@ export class InputRefSelectComponent extends Utils implements OnInit {
   }
 
   private init(type: string) {
-    if(type) {
-      if(type.indexOf('setOf') >= 0) {
+    if (type) {
+      if (type.indexOf('setOf') >= 0) {
         this.isSetOf = true;
       }
-      if(type.indexOf('refTo') >= 0) {
+      if (type.indexOf('refTo') >= 0) {
         const startIndex = type.indexOf('refTo') + 6;
         this.refTo = type.substring(startIndex, type.indexOf(')', startIndex));
         this.getConfigurationType(this.refTo);
         this.activeTextinput = false;
       }
-      if(type.indexOf('sequenceOf') >= 0) {
+      if (type.indexOf('sequenceOf') >= 0) {
         this.isSequenceOf = true;
       }
     }
@@ -54,16 +54,16 @@ export class InputRefSelectComponent extends Utils implements OnInit {
         this.input.value = null;
       }
     }
-    if(this.input.metaTypeKind == 10 || this.input.metaTypeKind == 2) {
+    if (this.input.metaTypeKind == 10 || this.input.metaTypeKind == 2) {
       this.activeTextinput = false;
     }
   }
 
   public async getConfigurationType(type: string) {
-    const response = await this.edit.getConfigurationType(type);
-    if(response && response.value) {
-      for(let dep of response.value) {
-        if(dep.idShort && metaTypes.indexOf(dep.idShort) === -1) {
+    const response = await this.api.getConfiguredElements(type);
+    if (response && response.value) {
+      for (let dep of response.value) {
+        if (dep.idShort && metaTypes.indexOf(dep.idShort) === -1) {
           this.references.push(dep);
         }
       }
@@ -71,8 +71,8 @@ export class InputRefSelectComponent extends Utils implements OnInit {
   }
 
   public addFromRef() {
-    if(this.selectedRef && this.selectedRef.idShort) {
-      if(this.isSetOf) {
+    if (this.selectedRef && this.selectedRef.idShort) {
+      if (this.isSetOf) {
         this.input.value.push('refTo(' + this.selectedRef.idShort + ')');
       } else {
         this.input.value = 'refTo(' + this.selectedRef.idShort + ')';
@@ -81,7 +81,7 @@ export class InputRefSelectComponent extends Utils implements OnInit {
   }
 
   public addFromTextfield() {
-    if(this.isSetOf || this.isSequenceOf) {
+    if (this.isSetOf || this.isSequenceOf) {
       this.input.value.push(this.textInput);
     } else {
       this.input.value = this.textInput;
@@ -127,7 +127,7 @@ export class InputRefSelectComponent extends Utils implements OnInit {
   // }
 
   public getElementDisplayName(element: any) {
-    if(typeof(element) === 'string') {
+    if (typeof(element) === 'string') {
       return element
     } else if(element.name){
       return element.name;
@@ -147,7 +147,7 @@ export class InputRefSelectComponent extends Utils implements OnInit {
   //true: left, false: right
   public moveSequenceElement(direction: boolean, index: number) {
     const inputValues = this.input.value
-    if(direction) {
+    if (direction) {
       if(inputValues[index - 1]) {
         const temp = inputValues[index - 1];
         inputValues[index - 1] = inputValues[index];

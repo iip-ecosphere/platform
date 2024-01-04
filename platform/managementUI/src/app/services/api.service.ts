@@ -30,7 +30,7 @@ export class ApiService extends UtilsService {
   }
 
   public async getServices() {
-      const Data = await this.getData('aas/submodels/services/submodel')as PlatformServices;
+      const Data = await this.getData('aas/submodels/services/submodel') as PlatformServices;
       return Data;
   }
   

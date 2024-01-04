@@ -9,6 +9,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { NgVar } from 'src/app/directives/ng-var.directive';
+import { FileUploadComponent } from '../../file-upload/file-upload.component';
 
 describe('StatusBoxComponent', () => {
   let component: StatusBoxComponent;
@@ -22,7 +23,7 @@ describe('StatusBoxComponent', () => {
         MatCardModule, 
         MatProgressSpinnerModule,
         MatTooltipModule ],
-      declarations: [ StatusBoxComponent, NgVar ],
+      declarations: [ StatusBoxComponent, NgVar, FileUploadComponent ],
       providers: [
           {provide: MatDialogRef, useValue: {}},
           {provide: MAT_DIALOG_DATA, useValue: []},
