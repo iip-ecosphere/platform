@@ -652,14 +652,15 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
      * @throws ExecutionException if setting the graph structure fails
      */
     public synchronized Object deleteGraph(String appName, String meshName) throws ExecutionException {
-        LoggerFactory.getLogger(getClass()).info("Deleting graph in IVML, app {} mesh {}", appName, meshName);
         net.ssehub.easy.varModel.confModel.Configuration cfg = getIvmlConfiguration();
         Project root = cfg.getProject();
         Project appProject = ModelQuery.findProject(root, getApplicationProjectName(appName));
+        LoggerFactory.getLogger(getClass()).info("Deleting graph in IVML, app '{}' mesh '{}', found {}", 
+            appName, meshName, appProject != null);
         if (null != appProject) {
             try {
                 Map<Project, CopiedFile> copies = new HashMap<>();
-                if (meshName != null) {
+                if (isNonEmptyString(meshName)) {
                     Project meshProject = ModelQuery.findProject(root, getMeshProjectName(appName, meshName));
                     IDatatype meshType = ModelQuery.findType(root, "ServiceMesh", null);
                     DecisionVariableDeclaration meshVarDecl = ModelQuery.findDeclaration(
@@ -679,14 +680,15 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                     f.delete();
                     notifyChange(meshProject, ConfigurationChangeType.DELETED);
                 }
-                if (null == meshName) {
+                if (null == meshName || meshName.length() == 0) {
                     File f = getIvmlFile(appProject);
                     copies.put(appProject, copyToTmp(f));
                     f.delete();
                     notifyChange(appProject, ConfigurationChangeType.DELETED);
                 }
                 reloadAndValidate(copies);
-                LoggerFactory.getLogger(getClass()).info("Deleted graph in IVML, app {} mesh {}", appName, meshName);
+                LoggerFactory.getLogger(getClass()).info("Deleted graph in IVML, app '{}' mesh '{}'", 
+                    appName, meshName);
             } catch (ModelQueryException e) {
                 throw new ExecutionException(e);
             }
@@ -742,7 +744,8 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
      * a different approach as, e.g., constants. [public for testing]
      * 
      * @param appName the configured name of the application
-     * @param appValueEx the application value as IVML expression
+     * @param appValueEx the application value as IVML expression, may be empty or <b>null</b> to indicate that just 
+     *    a mesh shall be modified
      * @param meshName the configured name of the service mesh (may be <b>null</b> or empty for none; used as import 
      *    resolution if given, existing and {@code format} or {@code value} are not given).
      * @param format the format of the graph (may be <b>null</b> or empty for none).
@@ -752,10 +755,10 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
      */
     public synchronized Object setGraph(String appName, String appValueEx, String meshName, String format, 
         String value) throws ExecutionException {
-        boolean doApp = isNonEmptyString(appName);
+        boolean doApp = isNonEmptyString(appName) && isNonEmptyString(appValueEx);
         boolean doMesh = isNonEmptyString(meshName) && isNonEmptyString(format) && isNonEmptyString(value);
         if (doApp || doMesh) {
-            LoggerFactory.getLogger(getClass()).info("Setting graph in IVML app {} = {}, mesh {}, format {}", 
+            LoggerFactory.getLogger(getClass()).info("Setting graph in IVML app {} = {}, mesh '{}', format {}", 
                 appName, appValueEx, meshName, format); // no graph, may become too long
             GraphFormat gFormat = getGraphFormat(format);
             
@@ -897,7 +900,9 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         DecisionVariableDeclaration appVar = new DecisionVariableDeclaration(
             toIdentifier(appName), applicationType, results.appProject);
         results.appProject.add(appVar);
-        setValue(appVar, appValueEx);
+        if (appValueEx.length() > 0) {
+            setValue(appVar, appValueEx);
+        }
         notifyChange(results.appProject, ConfigurationChangeType.CREATED); // may be modified, shall work anyway
     }
 
