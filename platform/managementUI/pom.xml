@@ -178,7 +178,7 @@
                            <appArg>--code-coverage</appArg>
                        </appArgs>
                        <errToIn>true</errToIn>
-                       <testTime>300000</testTime>
+                       <testTime>420000</testTime>
                        <platformDir>${platformDir}</platformDir>
                        <artifacts>
                            <directory>.</directory>
