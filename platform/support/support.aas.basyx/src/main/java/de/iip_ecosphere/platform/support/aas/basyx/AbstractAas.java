@@ -168,7 +168,7 @@ public abstract class AbstractAas<A extends IAssetAdministrationShell> implement
         if (null != asset) {
             asset.accept(visitor);
         }
-        for (Submodel sm : submodels.values()) {
+        for (Submodel sm : visitor.sortSubmodels(submodels.values())) {
             sm.accept(visitor);
         }
         visitor.endAas(this);

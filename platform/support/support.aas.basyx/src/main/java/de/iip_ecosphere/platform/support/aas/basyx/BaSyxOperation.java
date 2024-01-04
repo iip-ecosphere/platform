@@ -20,6 +20,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.eclipse.basyx.submodel.metamodel.api.qualifier.haskind.ModelingKind;
+import org.eclipse.basyx.submodel.metamodel.api.reference.IReference;
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElement;
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.operation.IOperation;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.property.Property;
@@ -182,6 +183,15 @@ public class BaSyxOperation extends BaSyxSubmodelElement implements Operation {
             instance.operation = operation;
             return parentBuilder.register(instance);
         }
+        
+        @Override
+        public OperationBuilder setSemanticId(String refValue) {
+            IReference ref = Tools.translateReference(refValue);
+            if (ref != null) {
+                operation.setSemanticId(ref);
+            }
+            return this;
+        }
 
     }
     
@@ -248,6 +258,11 @@ public class BaSyxOperation extends BaSyxSubmodelElement implements Operation {
     @Override
     public void accept(AasVisitor visitor) {
         visitor.visitOperation(this);
+    }
+
+    @Override
+    public String getSemanticId(boolean stripPrefix) {
+        return Tools.translateReference(operation.getSemanticId(), stripPrefix);
     }
 
 }

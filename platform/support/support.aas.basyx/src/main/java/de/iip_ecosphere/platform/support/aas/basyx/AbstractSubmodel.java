@@ -91,6 +91,18 @@ public abstract class AbstractSubmodel<S extends ISubmodel> implements Submodel,
     }
 
     @Override
+    public BaSyxBlob register(BaSyxBlob blob) {
+        String id = blob.getIdShort();
+        if (dataElements.containsKey(id) || submodelElements.containsKey(id)) {
+            warn("There is already an element with short id '" + id + "'. "
+                + "The element may be redefined.");
+        }
+        dataElements.put(id, blob);
+        submodelElements.put(id, blob);
+        return blob;
+    }
+
+    @Override
     public BaSyxRelationshipElement register(BaSyxRelationshipElement relationship) {
         String id = relationship.getIdShort();
         submodelElements.put(id, relationship);
@@ -148,7 +160,7 @@ public abstract class AbstractSubmodel<S extends ISubmodel> implements Submodel,
             warn("There is already a property/element with short id '" + id + "'. "
                 + "The property/element may be redefined.");
         }
-        submodelElements.put(id, property);
+        dataElements.put(id, property);
         return property;
     }
 
@@ -283,15 +295,18 @@ public abstract class AbstractSubmodel<S extends ISubmodel> implements Submodel,
     @Override
     public void accept(AasVisitor visitor) {
         visitor.visitSubmodel(this);
-        for (DataElement de : dataElements.values()) {
+        for (Property prop : visitor.sortSubmodelElements(properties.values())) {
+            prop.accept(visitor);
+        }
+        for (DataElement de : visitor.sortSubmodelElements(dataElements.values())) {
             de.accept(visitor);
         }
-        for (Operation op : operations.values()) {
+        for (Operation op : visitor.sortSubmodelElements(operations.values())) {
             op.accept(visitor);
         }
-        for (SubmodelElement se : submodelElements.values()) {
+        for (SubmodelElement se : visitor.sortSubmodelElements(submodelElements.values())) {
             // remaining elements, don't iterate over them again
-            if (!(se instanceof DataElement || se instanceof Operation)) {
+            if (!(se instanceof Property || se instanceof DataElement || se instanceof Operation)) {
                 se.accept(visitor);
             }
         }
@@ -395,4 +410,9 @@ public abstract class AbstractSubmodel<S extends ISubmodel> implements Submodel,
      */
     abstract BaSyxSubmodelParent getAas();
 
+    @Override
+    public String getSemanticId(boolean stripPrefix) {
+        return Tools.translateReference(submodel.getSemanticId(), stripPrefix);
+    }
+    
 }

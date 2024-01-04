@@ -84,6 +84,16 @@ public class BaSyxElementTranslator {
         }
 
         /**
+         * Registers a BLOB data element.
+         * 
+         * @param blob the BLOB data element
+         * @return {@code blob}
+         */
+        public default BaSyxBlob register(BaSyxBlob blob)  {
+            return registerElement(blob);
+        }
+
+        /**
          * Registers a multi-language property.
          * 
          * @param property the property
@@ -282,6 +292,11 @@ public class BaSyxElementTranslator {
         @Override
         public BaSyxFile register(BaSyxFile file) {
             return accept(file);
+        }
+
+        @Override
+        public BaSyxBlob register(BaSyxBlob blob) {
+            return accept(blob);
         }
 
         @Override

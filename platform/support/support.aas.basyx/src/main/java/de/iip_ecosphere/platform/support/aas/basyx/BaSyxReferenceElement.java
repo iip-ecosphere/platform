@@ -137,5 +137,10 @@ public class BaSyxReferenceElement extends BaSyxSubmodelElement implements Refer
     public void accept(AasVisitor visitor) {
         visitor.visitReferenceElement(this);
     }
+    
+    @Override
+    public String getSemanticId(boolean stripPrefix) {
+        return Tools.translateReference(reference.getSemanticId(), stripPrefix);
+    }
 
 }

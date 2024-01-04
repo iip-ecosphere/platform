@@ -15,6 +15,7 @@ package de.iip_ecosphere.platform.support.aas.basyx;
 import org.eclipse.basyx.submodel.metamodel.api.reference.IReference;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.File;
 
+import de.iip_ecosphere.platform.support.aas.AasVisitor;
 import de.iip_ecosphere.platform.support.aas.FileDataElement;
 
 /**
@@ -54,8 +55,8 @@ public class BaSyxFile extends BaSyxDataElement<File> implements FileDataElement
         }
 
         @Override
-        public FileDataElementBuilder setSemanticId(String refValue) {
-            IReference ref = Tools.translateReference(refValue);
+        public FileDataElementBuilder setSemanticId(String semanticId) {
+            IReference ref = Tools.translateReference(semanticId);
             if (ref != null) {
                 instance.getDataElement().setSemanticId(ref);
             }
@@ -103,6 +104,11 @@ public class BaSyxFile extends BaSyxDataElement<File> implements FileDataElement
     @Override
     public void setMimeType(String mimeType) {
         getDataElement().setMimeType(mimeType);
+    }
+    
+    @Override
+    public void accept(AasVisitor visitor) {
+        visitor.visitFileDataElement(this);
     }
     
 }

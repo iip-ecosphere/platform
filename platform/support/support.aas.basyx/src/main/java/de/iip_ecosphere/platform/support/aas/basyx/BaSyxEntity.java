@@ -165,6 +165,12 @@ public class BaSyxEntity extends BaSyxSubmodelElement implements Entity, Submode
         }
 
         @Override
+        protected BaSyxBlob register(BaSyxBlob blob) {
+            statements.add(blob.getSubmodelElement());
+            return instance.add(blob);
+        }
+
+        @Override
         protected BaSyxOperation register(BaSyxOperation operation) {
             statements.add(operation.getSubmodelElement());
             return instance.add(operation);
@@ -264,6 +270,10 @@ public class BaSyxEntity extends BaSyxSubmodelElement implements Entity, Submode
     @Override
     public void accept(AasVisitor visitor) {
         visitor.visitEntity(this);
+        for (SubmodelElement se : visitor.sortSubmodelElements(statementsList)) {
+            se.accept(visitor);
+        }
+        visitor.endVisitEntity(this);
     }
 
     @Override
@@ -384,6 +394,11 @@ public class BaSyxEntity extends BaSyxSubmodelElement implements Entity, Submode
     }
 
     @Override
+    public BaSyxBlob register(BaSyxBlob blob) {
+        return add(blob);
+    }
+
+    @Override
     public BaSyxFile register(BaSyxFile file) {
         return add(file);
     }
@@ -422,6 +437,11 @@ public class BaSyxEntity extends BaSyxSubmodelElement implements Entity, Submode
     public <D extends org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.DataElement> 
         BaSyxDataElement<D> register(BaSyxDataElement<D> dataElement) {
         return add(dataElement);
-    }    
+    }
+
+    @Override
+    public String getSemanticId(boolean stripPrefix) {
+        return Tools.translateReference(entity.getSemanticId(), stripPrefix);
+    }
 
 }

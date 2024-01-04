@@ -13,6 +13,7 @@
 package de.iip_ecosphere.platform.support.aas.basyx;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -206,6 +207,12 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
         }
 
         @Override
+        protected BaSyxBlob register(BaSyxBlob blob) {
+            this.collection.addSubmodelElement(blob.getSubmodelElement());
+            return instance.register(blob);
+        }
+
+        @Override
         protected BaSyxOperation register(BaSyxOperation operation) {
             this.collection.addSubmodelElement(operation.getSubmodelElement());
             return instance.register(operation);
@@ -371,18 +378,28 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
     
     @Override
     public Iterable<SubmodelElement> elements() {
+        return elementsCollection();
+    }
+
+    /**
+     * Returns the elements as collection.
+     * 
+     * @return the collection
+     */
+    private Collection<SubmodelElement> elementsCollection() {
         initialize();
         return null == elementsMap ? elementsList : elementsMap.values();
     }
+    
     
     /**
      * Returns the elements as stream.
      * 
      * @return the stream
+     * @see #elementsCollection()
      */
     private Stream<SubmodelElement> elementsStream() {
-        initialize();
-        return null == elementsMap ? elementsList.stream() : elementsMap.values().stream();
+        return elementsCollection().stream();
     }
     
     /**
@@ -546,6 +563,11 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
     }
 
     @Override
+    public BaSyxBlob register(BaSyxBlob blob) {
+        return add(blob);
+    }
+
+    @Override
     public BaSyxFile register(BaSyxFile file) {
         return add(file);
     }
@@ -585,7 +607,9 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
     public void accept(AasVisitor visitor) {
         initialize();
         visitor.visitSubmodelElementCollection(this);
-        elementsStream().forEach(se -> se.accept(visitor));
+        for (SubmodelElement se : visitor.sortSubmodelElements(elementsCollection())) {
+            se.accept(visitor);
+        }
         visitor.endSubmodelElementCollection(this);
     }
 
@@ -618,6 +642,11 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
     public void update() {
         elementsMap = null;
         elementsList = null;
+    }
+    
+    @Override
+    public String getSemanticId(boolean stripPrefix) {
+        return Tools.translateReference(collection.getSemanticId(), stripPrefix);
     }
 
 }

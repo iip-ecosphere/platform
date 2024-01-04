@@ -12,15 +12,14 @@
 
 package test.de.iip_ecosphere.platform.support.aas.basyx;
 
-import test.de.iip_ecosphere.platform.support.aas.XmasAas;
+import test.de.iip_ecosphere.platform.support.aas.TimeSeriesData;
 
 /**
- * Sets up the {@link XmasAas} for BaSyx. You will find the persisted AAS in the {@code output} folder.
+ * Sets up the {@link TimeSeriesData} for BaSyx. You will find the persisted AAS in the {@code output} folder.
  * 
  * @author Holger Eichelberger, SSE
- * @author Claudia Niederée, L3S
  */
-public class BaSyxXmasAas extends XmasAas {
+public class BaSyxTimeSeriesData extends TimeSeriesData {
 
     /**
      * Executes the test standalone.
@@ -29,7 +28,7 @@ public class BaSyxXmasAas extends XmasAas {
      *   enable the creation of operations
      */
     public static void main(String[] args) {
-        BaSyxExampleUtils.execute(new BaSyxXmasAas(), args);
+        BaSyxExampleUtils.execute(new BaSyxTimeSeriesData(), args);
     }
 
 }

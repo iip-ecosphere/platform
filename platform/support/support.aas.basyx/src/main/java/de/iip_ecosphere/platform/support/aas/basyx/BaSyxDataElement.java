@@ -1,10 +1,3 @@
-package de.iip_ecosphere.platform.support.aas.basyx;
-
-import org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElement;
-
-import de.iip_ecosphere.platform.support.aas.AasVisitor;
-import de.iip_ecosphere.platform.support.aas.DataElement;
-
 /**
  * ******************************************************************************
  * Copyright (c) {2021} The original author or authors
@@ -16,6 +9,13 @@ import de.iip_ecosphere.platform.support.aas.DataElement;
  *
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
+
+package de.iip_ecosphere.platform.support.aas.basyx;
+
+import org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElement;
+
+import de.iip_ecosphere.platform.support.aas.AasVisitor;
+import de.iip_ecosphere.platform.support.aas.DataElement;
 
 /**
  * Wraps a BaSyx data element. Shall be created by respective builder methods.
@@ -60,6 +60,11 @@ public class BaSyxDataElement<D extends
      */
     public D getDataElement() {
         return dataElement;
+    }
+
+    @Override
+    public String getSemanticId(boolean stripPrefix) {
+        return Tools.translateReference(dataElement.getSemanticId(), stripPrefix);
     }
 
 }

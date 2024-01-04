@@ -19,6 +19,7 @@ import de.iip_ecosphere.platform.support.aas.ReferenceElement.ReferenceElementBu
 
 import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
 
+import de.iip_ecosphere.platform.support.aas.BlobDataElement.BlobDataElementBuilder;
 import de.iip_ecosphere.platform.support.aas.DeferredBuilder;
 import de.iip_ecosphere.platform.support.aas.Entity.EntityBuilder;
 import de.iip_ecosphere.platform.support.aas.Entity.EntityType;
@@ -76,7 +77,12 @@ public abstract class BaSyxSubmodelElementContainerBuilder<S extends ISubmodel>
     public FileDataElementBuilder createFileDataElementBuilder(String idShort, String contents, String mimeType) {
         return new BaSyxFile.BaSyxFileDataElementBuilder(this, idShort, contents, mimeType);
     }
-    
+
+    @Override
+    public BlobDataElementBuilder createBlobDataElementBuilder(String idShort, String content, String mimeType) {
+        return new BaSyxBlob.BaSyxBlobDataElementBuilder(this, idShort, content, mimeType);
+    }
+
     /**
      * Creates a reference to the sub-model under creation.
      * 
@@ -142,7 +148,18 @@ public abstract class BaSyxSubmodelElementContainerBuilder<S extends ISubmodel>
         getInstance().getSubmodel().addSubmodelElement(file.getSubmodelElement());
         return getInstance().register(file);
     }
-    
+
+    /**
+     * Registers a file data element.
+     * 
+     * @param blob the BLOB data element
+     * @return {@code blob}
+     */
+    BaSyxBlob register(BaSyxBlob blob) {
+        getInstance().getSubmodel().addSubmodelElement(blob.getSubmodelElement());
+        return getInstance().register(blob);
+    }
+
     /**
      * Registers an operation.
      * 
