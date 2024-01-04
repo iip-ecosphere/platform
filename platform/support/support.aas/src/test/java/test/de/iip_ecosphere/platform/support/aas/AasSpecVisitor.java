@@ -260,7 +260,7 @@ public class AasSpecVisitor implements AasVisitor {
         if (null == resourcePrefix) {
             resourcePrefix = "";
         }
-        String resourceName = resourcePrefix + aas.getIdShort() + ".spec";
+        String resourceName = resourcePrefix + aas.getIdShort().toLowerCase() + ".spec";
         try {
             InputStream in = ResourceLoader.getResourceAsStream(resourceName);
             String spec = IOUtils.toString(in, cs).trim();
