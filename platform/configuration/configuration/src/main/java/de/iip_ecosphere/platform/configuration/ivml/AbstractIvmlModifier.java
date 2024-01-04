@@ -44,13 +44,15 @@ import net.ssehub.easy.varModel.model.Project;
 import net.ssehub.easy.varModel.model.ProjectImport;
 import net.ssehub.easy.varModel.model.datatypes.IDatatype;
 import net.ssehub.easy.varModel.model.datatypes.OclKeyWords;
+import net.ssehub.easy.varModel.model.datatypes.Reference;
+import net.ssehub.easy.varModel.model.datatypes.Sequence;
 import net.ssehub.easy.varModel.model.datatypes.TypeQueries;
 import net.ssehub.easy.varModel.model.values.Value;
 import net.ssehub.easy.varModel.model.values.ValueDoesNotMatchTypeException;
 import net.ssehub.easy.varModel.persistency.IVMLWriter;
 
 /**
- * Maps an IVML configuration generically into an AAS without referencing to IIP-Ecosphere.
+ * Maps an IVML configuration generically into an AAS.
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -318,7 +320,7 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
         net.ssehub.easy.varModel.confModel.Configuration cfg = getIvmlConfiguration();
         Project root = cfg.getProject();
         try {
-            IDatatype t = ModelQuery.findType(root, type, null);
+            IDatatype t = findType(root, type);
             Project target = adaptTarget(root, getVariableTarget(root, t));
             if (null != t) {
                 DecisionVariableDeclaration var = new DecisionVariableDeclaration(toIdentifier(varName), t, target);
@@ -329,15 +331,102 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
                 IDecisionVariable dVar = cfg.createDecision(var);
                 notifyChange(dVar, ConfigurationChangeType.CREATED);
             } else {
-                throw new ExecutionException("No such type " + t, null);
+                throw new ExecutionException("No such type " + type, null);
             }
             ReasoningResult res = validateAndPropagate();
             throwIfFails(res, true);
             saveTo(target, getIvmlFile(target));
-            LoggerFactory.getLogger(getClass()).info("Created IVML variable {}: {}", varName);
+            LoggerFactory.getLogger(getClass()).info("Created IVML variable {} in {}", varName, target.getName());
         } catch (ModelQueryException | ConfigurationException e) {
             throw new ExecutionException(e);
         }
+    }
+
+    /**
+     * Defines an internal type creation function.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private interface TypeCreationFunction {
+
+        /**
+         * Creates the type.
+         * 
+         * @param name the type name
+         * @param type the generic type
+         * @param scope the containing scope
+         * @return the type
+         */
+        public IDatatype createType(String name, IDatatype type, Project scope);
+    }
+
+    /**
+     * Generic IVML type indicators.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private enum GenericTypeIndicator {
+        
+        REF_TO("refTo(", (n, t, s) -> new Reference(n, t, s)),
+        SET_OF("setOf(", (n, t, s) -> new net.ssehub.easy.varModel.model.datatypes.Set(n, t, s)),
+        SEQUENCE_OF("sequenceOf(", (n, t, s) -> new Sequence(n, t, s));
+        
+        private String prefix;
+        private TypeCreationFunction creator;
+
+        /**
+         * Creates a constant.
+         * 
+         * @param prefix the prefix
+         * @param creator the associated type creator
+         */
+        private GenericTypeIndicator(String prefix, TypeCreationFunction creator) {
+            this.prefix = prefix;
+            this.creator = creator;
+        }
+        
+        /**
+         * Returns the prefix.
+         * 
+         * @return the prefix
+         */
+        public String getPrefix() {
+            return prefix;
+        }
+        
+        /**
+         * Returns the type creator.
+         * 
+         * @return the creator
+         */
+        public TypeCreationFunction getCreator() {
+            return creator;
+        }
+        
+    }
+    
+    /**
+     * Finds an IVML type by also resolving {@link GenericTypeIndicator}.
+     * 
+     * @param scope the scope
+     * @param type the type as string
+     * @return the found type
+     * @throws ModelQueryException if finding the type fails
+     */
+    private IDatatype findType(Project scope, String type) throws ModelQueryException {
+        IDatatype result = null;
+        for (GenericTypeIndicator indicator: GenericTypeIndicator.values()) {
+            String prefix = indicator.getPrefix();
+            if (type.startsWith(prefix) && type.endsWith(")")) {
+                String t = type.substring(prefix.length(), type.length() - 1);
+                result = indicator.getCreator().createType(type, findType(scope, t), scope);
+                break;
+            }
+        }
+        if (null == result) {
+            result = ModelQuery.findType(scope, type, null);
+        }
+        return result;
     }
 
     /**

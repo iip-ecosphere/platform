@@ -1,6 +1,6 @@
 project ApplicationPartMyApp {
 
-    import ServiceMeshPartMyApp*;
+    import ServiceMeshPart*;
 
     annotate BindingTime bindingTime = BindingTime::compile to .;
     

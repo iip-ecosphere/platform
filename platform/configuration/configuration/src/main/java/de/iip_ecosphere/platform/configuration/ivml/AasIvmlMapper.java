@@ -645,7 +645,8 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     /**
      * Deletes a graph structure in IVML. [public for testing]
      * 
-     * @param appName the configured name of the application
+     * @param appName the configured name of the application, may be empty or <b>null</b> to delete an individual mesh 
+     *     that is not yet linked into an app (will fail if still linked and deletion happens without {@code appName}
      * @param meshName the configured name of the service mesh to delete a specific mesh in {@code appName}, 
      *     may be <b>null</b> or empty to delete the entire app
      * @return <b>null</b> always
@@ -657,41 +658,39 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         Project appProject = ModelQuery.findProject(root, getApplicationProjectName(appName));
         LoggerFactory.getLogger(getClass()).info("Deleting graph in IVML, app '{}' mesh '{}', found {}", 
             appName, meshName, appProject != null);
-        if (null != appProject) {
-            try {
-                Map<Project, CopiedFile> copies = new HashMap<>();
-                if (isNonEmptyString(meshName)) {
-                    Project meshProject = ModelQuery.findProject(root, getMeshProjectName(appName, meshName));
-                    IDatatype meshType = ModelQuery.findType(root, "ServiceMesh", null);
-                    DecisionVariableDeclaration meshVarDecl = ModelQuery.findDeclaration(
-                        meshProject, new FirstDeclTypeSelector(meshType));
-                    if (null != meshVarDecl) {
-                        IDatatype appType = ModelQuery.findType(root, "Application", null);
-                        DecisionVariableDeclaration appVarDecl = ModelQuery.findDeclaration(
-                            appProject, new FirstDeclTypeSelector(appType));
-                        if (null != appVarDecl) {
-                            IDecisionVariable var = cfg.getDecision(appVarDecl);
-                            IDecisionVariable svc = var.getNestedElement("services");
-                            deleteReferenceFromContainerValue(svc, meshVarDecl); 
-                        }
+        try {
+            Map<Project, CopiedFile> copies = new HashMap<>();
+            if (isNonEmptyString(meshName)) {
+                Project meshProject = ModelQuery.findProject(root, getMeshProjectName(appName, meshName));
+                IDatatype meshType = ModelQuery.findType(root, "ServiceMesh", null);
+                DecisionVariableDeclaration meshVarDecl = ModelQuery.findDeclaration(
+                    meshProject, new FirstDeclTypeSelector(meshType));
+                if (null != meshVarDecl && appProject != null) {
+                    IDatatype appType = ModelQuery.findType(root, "Application", null);
+                    DecisionVariableDeclaration appVarDecl = ModelQuery.findDeclaration(
+                        appProject, new FirstDeclTypeSelector(appType));
+                    if (null != appVarDecl) {
+                        IDecisionVariable var = cfg.getDecision(appVarDecl);
+                        IDecisionVariable svc = var.getNestedElement("services");
+                        deleteReferenceFromContainerValue(svc, meshVarDecl); 
                     }
-                    File f = getIvmlFile(meshProject);
-                    copies.put(meshProject, copyToTmp(f));
-                    f.delete();
-                    notifyChange(meshProject, ConfigurationChangeType.DELETED);
                 }
-                if (null == meshName || meshName.length() == 0) {
-                    File f = getIvmlFile(appProject);
-                    copies.put(appProject, copyToTmp(f));
-                    f.delete();
-                    notifyChange(appProject, ConfigurationChangeType.DELETED);
-                }
-                reloadAndValidate(copies);
-                LoggerFactory.getLogger(getClass()).info("Deleted graph in IVML, app '{}' mesh '{}'", 
-                    appName, meshName);
-            } catch (ModelQueryException e) {
-                throw new ExecutionException(e);
+                File f = getIvmlFile(meshProject);
+                copies.put(meshProject, copyToTmp(f));
+                f.delete();
+                notifyChange(meshProject, ConfigurationChangeType.DELETED);
             }
+            if (null != appProject && null == meshName || meshName.length() == 0) {
+                File f = getIvmlFile(appProject);
+                copies.put(appProject, copyToTmp(f));
+                f.delete();
+                notifyChange(appProject, ConfigurationChangeType.DELETED);
+            }
+            reloadAndValidate(copies);
+            LoggerFactory.getLogger(getClass()).info("Deleted graph in IVML, app '{}' mesh '{}'", 
+                appName, meshName);
+        } catch (ModelQueryException e) {
+            throw new ExecutionException(e);
         }
         return null;
     }
@@ -836,7 +835,8 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
      * @return the project name
      */
     private String getMeshProjectName(String appName, String meshName) {
-        return "ServiceMeshPart" + toIdentifierFirstUpper(appName) + toIdentifierFirstUpper(meshName);
+        return "ServiceMeshPart" //+ toIdentifierFirstUpper(appName) // mesh can be part of many applications
+            + toIdentifierFirstUpper(meshName);
     }
     
     /**

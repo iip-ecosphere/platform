@@ -1,4 +1,4 @@
-project ServiceMeshPartSimpleMesh3MyMesh {
+project ServiceMeshPartMyMesh {
 
     import AllServices;
 

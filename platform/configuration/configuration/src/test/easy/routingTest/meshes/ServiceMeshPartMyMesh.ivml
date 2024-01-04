@@ -1,4 +1,4 @@
-project ServiceMeshPartRoutingTestAppMyMesh {
+project ServiceMeshPartMyMesh {
 
     import AllServices;
 

@@ -469,7 +469,7 @@ public class AasIvmlMapperTest {
 
         assertIvmlFileChange("AllTypes", false, "rec1");
         assertIvmlFileChange("AllServices", false, "src", "snk");
-        assertIvmlFileChange("meshes/ServiceMeshPartMyAppMyMesh", false, "myMesh", "src", "Sink");
+        assertIvmlFileChange("meshes/ServiceMeshPartMyMesh", false, "myMesh", "src", "Sink");
         assertIvmlFileChange("apps/ApplicationPartMyApp", false, "myApp");
 
         mapper.deleteGraph("myApp", "myMesh");

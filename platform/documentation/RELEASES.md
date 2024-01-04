@@ -19,6 +19,7 @@ Improvements:
 * [#156](https://github.com/iip-ecosphere/platform/issues/156): UI regression tests including in-test execution of platform, (un)deployment of app
 * [#151](https://github.com/iip-ecosphere/platform/issues/151): UI CORS
 * [#155](https://github.com/iip-ecosphere/platform/issues/155): Align model locations to Maven, examples now use ''target/easy'' for the meta model and ''src/main/easy'' for the production configuration model. **For old example checkouts, delete all uncommitted files in ''src/main/easy'' that are also in ''target/easy''**.
+* Name convention change for service meshes in managed configurations: **The application name is not part of a service mesh name anymore** to enable more flexibility and reuse.
 * [#157](https://github.com/iip-ecosphere/platform/issues/157): Clean up and untangle the configuration build flow, also for releases
 * [#115](https://github.com/iip-ecosphere/platform/issues/115): Cleanup, e.g., old build processes. AasUtils is now in support.aas, Version, AbstractSetup, JsonUtils are now in support. Duplicate classes were removed.
 * [#162](https://github.com/iip-ecosphere/platform/issues/156): Installation scripts revised, Angular also considered on Windows, more information during installation, generic deployment script added, mgt UI can be started.

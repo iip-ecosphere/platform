@@ -1,4 +1,4 @@
-project ServiceMeshPartMyAppMyMesh {
+project ServiceMeshPartMyMesh {
 
     import AllServices;
 
