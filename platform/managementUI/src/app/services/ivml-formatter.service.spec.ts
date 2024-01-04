@@ -2,7 +2,9 @@ import { TestBed } from '@angular/core/testing';
 
 import { IvmlFormatterService } from './ivml-formatter.service';
 import { HttpClientModule } from '@angular/common/http';
-import { IVML_TYPE_Boolean, IVML_TYPE_Integer, IVML_TYPE_PREFIX_enumeration, IVML_TYPE_Real, IVML_TYPE_String } from 'src/interfaces';
+import { IVML_TYPE_Boolean, IVML_TYPE_Integer, IVML_TYPE_PREFIX_enumeration, IVML_TYPE_Real, IVML_TYPE_String, IvmlRecordValue, MT_metaVariable } from 'src/interfaces';
+import { GRAPHFORMAT_DRAWFLOW } from './api.service';
+import { Utils } from './utils.service';
 
 describe('IvmlFormatterService', () => {
 
@@ -83,6 +85,27 @@ describe('IvmlFormatterService', () => {
       "MavenRepository");
   }, 1 * TIMEOUT_LIFECYCLE_MS);
 
+  it('should create/edit/delete IVML variables with application/mesh type', async() => {
+    let opRes = await service.api.getConfiguredServiceMeshGraph("myMesh", GRAPHFORMAT_DRAWFLOW);
+    expect(opRes).toBeTruthy();
+    expect(opRes?.result).toBeTruthy();
+    if (opRes && opRes.result) {
+      let appData = {
+        id: {value: "testApp", _type:IVML_TYPE_String},
+        name: {value: "Test Application", _type:IVML_TYPE_String}
+      } as IvmlRecordValue;
+      let uf = await service.createApp("testApp", appData);
+      expect(uf.successful).toBeTruthy();
+      uf = await service.setMesh("testApp", "", "testMesh", opRes.result);
+      expect(uf.successful).toBeTruthy();
+      // delete mesh and app
+      uf = await service.deleteMesh("testApp", "testMesh");
+      expect(uf.successful).toBeTruthy;
+      uf = await service.deleteMesh("testApp", "");
+      expect(uf.successful).toBeTruthy;
+    }
+  }, 2 * TIMEOUT_LIFECYCLE_MS);
+
 });
 
 function exp(data: string[], varName: string, type: string, ivml: string):void {
@@ -91,10 +114,19 @@ function exp(data: string[], varName: string, type: string, ivml: string):void {
   expect(String(data[2]).replace(/[\s\r\n]/g, "")).toBe(ivml.replace(/[\s\r\n]/g, ""));
 }
 
+function toIvmlRecordValue(val: any, varType: string) {
+  let utils = new Utils(); 
+  if (utils.isArray(val) || utils.isString(val) || utils.isBoolean(val) || utils.isNumber(val)) {
+    return {value:{value:val, _type:varType}} as IvmlRecordValue;
+  } else {
+    return val as IvmlRecordValue;
+  }
+}
+
 async function testVarLifecycle(service: IvmlFormatterService, varName: string, val1: any, val2: any, varType: string) {
-  let uf = await service.createVariable(varName, {value:{value:val1, _type:varType}}, varType);
+  let uf = await service.createVariable(varName, toIvmlRecordValue(val1, varType), varType);
   expect(uf.successful).toBeTrue();
-  uf = await service.setVariable(varName, {value:{value:val2, _type:varType}}, varType);
+  uf = await service.setVariable(varName, toIvmlRecordValue(val1, varType), varType);
   expect(uf.successful).toBeTrue();
   uf = await service.deleteVariable(varName);
   expect(uf.successful).toBeTrue();

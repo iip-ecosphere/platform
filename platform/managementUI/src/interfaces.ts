@@ -144,6 +144,14 @@ export interface TechnicalDataResponse {
   submodelElements: TechnicalDataElement[];
 }
 
+export interface SubmodelElementCollection {
+  semanticId?: SemanticId;
+  idShort?: string;
+  kind?: string;
+  dataSpecification?: any[];
+  value: any[];
+}
+
 export interface TechnicalDataElement {
   ordered?: boolean;
   semanticId?: SemanticId;

@@ -1,7 +1,7 @@
 //import { type } from 'os';
 import { InputVariable, primitiveDataTypes, IVML_TYPE_PREFIX_enumeration, JsonPlatformOperationResult, IvmlRecordValue, IVML_TYPE_String, IVML_TYPE_Boolean, IvmlValue, UserFeedback } from 'src/interfaces';
 import { Injectable } from '@angular/core';
-import { AAS_OP_PREFIX_SME, AAS_TYPE_STRING, ApiService, IDSHORT_SUBMODEL_CONFIGURATION } from './api.service';
+import { AAS_OP_PREFIX_SME, AAS_TYPE_STRING, ApiService, GRAPHFORMAT_DRAWFLOW, IDSHORT_SUBMODEL_CONFIGURATION } from './api.service';
 import { DataUtils, UtilsService } from './utils.service';
 
 @Injectable({
@@ -72,7 +72,7 @@ export class IvmlFormatterService extends UtilsService {
   public async deleteVariable(variableName: string) {
     let params: InputVariable[] = [];
     params.push(ApiService.createAasOperationParameter("varName", AAS_TYPE_STRING, variableName));
-    return await this.callConfigOperation("deleteVariable", params, "Configuration entry has been successfully deleted!");
+    return await this.callConfigOperation("deleteVariable", params, "Configuration entry has been deleted!");
   }
 
   /**
@@ -125,7 +125,11 @@ export class IvmlFormatterService extends UtilsService {
         if (!first) {
           result += ",";
         }
-        result += this.toIvml(elemt);
+        if (elemt.hasOwnProperty('_type')) { // IVML "value" or primitive
+          result += this.toIvml(elemt);
+        } else {
+          result += elemt;
+        }
         first = false;
       }
       result += "}";
@@ -365,9 +369,9 @@ export class IvmlFormatterService extends UtilsService {
   /**
    * Creates/changes a graph/mesh in a given application.
    * 
-   * @param appName the (configured) application name
-   * @param appValExpr the IVML value expression for the application
-   * @param serviceMeshName the (configured) service mesh name
+   * @param appName the (configured) application name (app part ignored if empty)
+   * @param appValExpr the IVML value expression for the application (app part ignored if empty)
+   * @param serviceMeshName the (configured) service mesh name (mesh part ignored if empty), linked into the app if appName is given
    * @param val the graph in drawflow format
    * @returns the user feedback
    */
@@ -376,7 +380,7 @@ export class IvmlFormatterService extends UtilsService {
     params.push(ApiService.createAasOperationParameter("appName", AAS_TYPE_STRING, appName));
     params.push(ApiService.createAasOperationParameter("appValExpr", AAS_TYPE_STRING, appValExpr));
     params.push(ApiService.createAasOperationParameter("serviceMeshName", AAS_TYPE_STRING, serviceMeshName));
-    params.push(ApiService.createAasOperationParameter("format", AAS_TYPE_STRING, "drawflow"));
+    params.push(ApiService.createAasOperationParameter("format", AAS_TYPE_STRING, GRAPHFORMAT_DRAWFLOW));
     params.push(ApiService.createAasOperationParameter("val", AAS_TYPE_STRING, val));
     return this.callConfigOperation("setGraph", params, `Service mesh '${serviceMeshName}' was stored.`)
     /*const response = await this.api.executeAasJsonOperation(IDSHORT_SUBMODEL_CONFIGURATION, 
@@ -388,17 +392,23 @@ export class IvmlFormatterService extends UtilsService {
   }
 
   /**
-   * Deletes a graph/mesh.
+   * Deletes a graph/mesh. Deletes app if no mesh is given.
    * 
-   * @param appName the (configured) application name 
-   * @param meshName the (configured) mesh name
+   * @param appName the (configured) application name (app part ignored if empty) 
+   * @param meshName the (configured) mesh name (mesh part ignored if empty), link from app is removed if appName is given
    * @returns the user feedback
    */
   public async deleteMesh(appName: string, meshName: string) {
     let params: InputVariable[] = [];
     params.push(ApiService.createAasOperationParameter("appName", AAS_TYPE_STRING, appName));
     params.push(ApiService.createAasOperationParameter("serviceMeshName", AAS_TYPE_STRING, meshName));
-    return await this.callConfigOperation("deleteGraph", params, `Mesh '${meshName}' has been deleted!`);
+    let text;
+    if (meshName.length > 0) {
+      text = `Mesh '${meshName}' has been deleted!`;
+    } else {
+      text = `App '${appName}' has been deleted!`;
+    }
+    return await this.callConfigOperation("deleteGraph", params, text);
   }
 
 }

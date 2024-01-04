@@ -513,7 +513,7 @@ export class ListComponent extends Utils implements OnInit {
   public async del(item: any) {
     if (this.currentTab === "Meshes") {
       console.log("IMPLEMENT DELETE " + JSON.stringify(item));
-      //TODO this.ivmlFormatter.deleteMesh();
+      //TODO this.ivmlFormatter.deleteMesh(); // needs appName
     } else {
       await this.ivmlFormatter.deleteVariable(item.varName);
     }

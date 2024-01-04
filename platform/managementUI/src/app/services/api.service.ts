@@ -1,14 +1,14 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { PlatformArtifacts, PlatformResources, PlatformServices, ResourceAttribute, InputVariable, platformResponse, Resource, PlatformData, DEFAULT_AAS_OPERATION_TIMEOUT, JsonPlatformOperationResult } from 'src/interfaces';
+import { PlatformArtifacts, PlatformResources, PlatformServices, ResourceAttribute, InputVariable, platformResponse, Resource, PlatformData, DEFAULT_AAS_OPERATION_TIMEOUT, JsonPlatformOperationResult, SubmodelElementCollection } from 'src/interfaces';
 import { firstValueFrom, Subject } from 'rxjs';
-import { EnvConfigService } from './env-config.service';
-import { DataUtils } from './utils.service';
+import { Configuration, EnvConfigService } from './env-config.service';
+import { DataUtils, UtilsService } from './utils.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class ApiService {
+export class ApiService extends UtilsService {
 
 
   errorMsg : any;
@@ -16,6 +16,7 @@ export class ApiService {
   errorEmitter: Subject<HttpErrorResponse>;
 
   constructor(public http: HttpClient, private envConfigService: EnvConfigService) {
+    super();
     this.errorEmitter = new Subject();
   }
 
@@ -32,7 +33,7 @@ export class ApiService {
       const Data = await this.getData('aas/submodels/services/submodel')as PlatformServices;
       return Data;
   }
-
+  
   public async getArtifacts() {
     const Data = await this.getData('aas/submodels/Artifacts/submodel') as PlatformArtifacts;
     return Data;
@@ -51,7 +52,7 @@ export class ApiService {
   public async getMeta() {
     if(!this.meta || !this.meta.value) {
       const Data = await this.getData('aas/submodels/Configuration/submodel/submodelElements/meta') as Resource;
-      if(Data) {
+      if (Data) {
         this.meta = Data;
       }
     }
@@ -149,16 +150,49 @@ public async executeAasJsonOperationWithTimeout(submodel: string, operationName:
   try {
     let cfg = await this.envConfigService.initAndGetCfg();
     response = await firstValueFrom(this.http.post<platformResponse>(
-      `${cfg?.ip}/shells/${cfg?.urn}/aas/submodels/${submodel}/submodel/${operationName}/invoke`,
-      {"inputArguments": params,
-      "requestId":"1bfeaa30-1512-407a-b8bb-f343ecfa28cf", // generate ???
-      "inoutputArguments":[], "timeout":timeout}, 
-      {responseType: 'json', 
-      reportProgress: true}));
+      ApiService.constructOperationCallUrl(cfg, submodel, operationName),
+      ApiService.constructOperationCallBodyWithTimeout(timeout, params), 
+      {responseType: 'json', reportProgress: true}));
   } catch(e) {
     console.error(e); // TODO create failing response?
   }
   return response;
+}
+
+/**
+ * Constructs an operation call URL.
+ * 
+ * @param cfg the configuration from the configuration service
+ * @param submodel the submodel defining the operation
+ * @param operationName the name of the operation, may also be a sub-path within the submodel
+ * @returns the URL
+ */
+public static constructOperationCallUrl(cfg: Configuration | undefined, submodel: string, operationName: string) {
+  return `${cfg?.ip}/shells/${cfg?.urn}/aas/submodels/${submodel}/submodel/${operationName}/invoke`;
+}
+
+/**
+ * Constructs an operation call body with DEFAULT_AAS_OPERATION_TIMEOUT.
+ * 
+ * @param timeout the call timeout in ms
+ * @param params the parameters for the operation
+ * @returns the body
+ */
+public static constructOperationCallBody(params: any) {
+  return ApiService.constructOperationCallBodyWithTimeout(DEFAULT_AAS_OPERATION_TIMEOUT, params);
+}
+
+/**
+ * Constructs an operation call body with given timeout.
+ * 
+ * @param timeout the call timeout in ms
+ * @param params the parameters for the operation
+ * @returns the body
+ */
+public static constructOperationCallBodyWithTimeout(timeout: number, params: any) {
+  return {"inputArguments": params,
+      "requestId":"1bfeaa30-1512-407a-b8bb-f343ecfa28cf", // generate ???
+      "inoutputArguments":[], "timeout":timeout}
 }
 
 /**
@@ -170,7 +204,12 @@ public async executeAasJsonOperationWithTimeout(submodel: string, operationName:
 public getPlatformResponse(response:platformResponse | undefined): JsonPlatformOperationResult | null {
   let output : JsonPlatformOperationResult | null = null
   if (response && response.outputArguments) {
-    output = response.outputArguments[0]?.value?.value as JsonPlatformOperationResult;
+    let tmp = response.outputArguments[0]?.value?.value; 
+    if (tmp && this.isString(tmp)) {
+      output = JSON.parse(tmp) as JsonPlatformOperationResult;
+    } else {
+      output = tmp as JsonPlatformOperationResult;
+    }
   }
   return output;
 }
@@ -198,7 +237,85 @@ public async uploadFileAsArrayBuffer(kind: ArtifactKind, sequenceNr: number, fil
   }
 }
 
-  public async getGraph() {
+/**
+ * Returns a configured service mesh as JSON.
+ * 
+ * @param mesh the IVML variable name of the mesh to return  
+ * @param format the format, usually GRAPHFORMAT_DRAWFLOW
+ * @returns a JsonPlatformOperationResult or null
+ */
+public async getConfiguredServiceMeshGraph(mesh: string, format: string) {
+  let response;
+  let input: InputVariable[] = [{
+    modelType: {name: "OperationVariable"},
+    value: {
+      idShort: "varName",
+      kind: "Template",
+      valueType: "string",
+      modelType: {
+        name: "Property"
+      },
+      value: mesh
+    }
+  },
+  {
+    modelType: {name: "OperationVariable"},
+    value: {
+      idShort: "format",
+      kind: "Template",
+      valueType: "string",
+      modelType: {
+        name: "Property"
+      },
+      value: format
+    }
+  }]
+
+  try {
+    let cfg = await this.envConfigService.initAndGetCfg();
+    response = await firstValueFrom(this.http.post(
+      cfg?.ip
+      + '/shells/'
+      + cfg?.urn
+      + "/aas/submodels/Configuration/submodel/submodelElements/getGraph/invoke"
+    ,{"inputArguments": input,
+    "requestId":"1bfeaa30-1512-407a-b8bb-f343ecfa28cf",
+    "inoutputArguments":[], "timeout":10000})) as platformResponse;
+  } catch(e) {
+    console.error(e);
+  }
+  return this.getPlatformResponse(response);
+}
+
+/**
+ * Returns instances of configured elements.
+ * 
+ * @param typeName the IVML type name of the elements to return 
+ * @returns the elements
+ */
+public async getConfiguredElements(typeName: string) {
+  return await this.getData(`aas/submodels/Configuration/submodel/submodelElements/${typeName}`) as SubmodelElementCollection;
+}
+
+/**
+ * Returns configured services.
+ * 
+ * @returns configured services (of type ServiceBase)
+ */
+public async getConfiguredServices() {
+  return await this.getConfiguredElements('ServiceBase');
+}
+
+/**
+ * Returns configured service meshes.
+ * 
+ * @returns configured service meshes (of type ServiceMesh)
+ */
+public async getConfiguredServiceMeshes() {
+  return await this.getConfiguredElements('ServiceMesh');
+}
+
+/*  public async getGraph() {
     let response;
     let input: InputVariable[] = [{
       modelType: {name: "OperationVariable"},
@@ -233,7 +350,7 @@ public async uploadFileAsArrayBuffer(kind: ArtifactKind, sequenceNr: number, fil
       console.error(e);
     }
     return response;
-  }
+  }*/
 
   public async getResource(id: string) {
     if(!this.resources || !this.resources.submodelElements) {
@@ -271,6 +388,8 @@ export const IDSHORT_OPERATION_ARTIFACTS_DEPLOYPLANWITHIDASYNC = "undeployPlanWi
 export const IDSHORT_OPERATION_ARTIFACTS_UPLOAD = "upload";
 
 export const IDSHORT_SUBMODEL_CONFIGURATION = "Configuration";
+
+export const GRAPHFORMAT_DRAWFLOW = "drawflow";
 
 export enum ArtifactKind {
   SERVICE_ARTIFACT = "SERVICE_ARTIFACT",

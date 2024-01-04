@@ -4,7 +4,7 @@ import { InputVariable, platformResponse } from 'src/interfaces';
 import { firstValueFrom, Subscription } from 'rxjs';
 import { EnvConfigService } from 'src/app/services/env-config.service';
 import { HttpClient} from '@angular/common/http';
-import { ApiService } from 'src/app/services/api.service';
+import { AAS_OP_PREFIX_SME, AAS_TYPE_STRING, ApiService } from 'src/app/services/api.service';
 //import * as saveAs from 'file-saver';
 
 @Component({
@@ -156,31 +156,8 @@ export class LogsDialogComponent implements OnInit{
     let inputVariables: InputVariable[] | null;
     if (this.serviceInfo && this.serviceInfo.serviceMgr) {
       inputVariables = [];
-      let input0:InputVariable = {
-        value: {
-          modelType: {
-            name: "Property"
-          },
-          valueType: "string",
-          idShort: "id",
-          kind: "Template",
-          value: this.data.id
-        }
-      }
-      let input1:InputVariable = {
-        value: {
-          modelType: {
-            name: "Property"
-          },
-          valueType: "string",
-          idShort: "mode",
-          kind: "Template",
-          value: mode
-        }
-      }
-      inputVariables.push(input0)
-      inputVariables.push(input1)
-
+      inputVariables.push(ApiService.createAasOperationParameter("id", AAS_TYPE_STRING, this.data.id));
+      inputVariables.push(ApiService.createAasOperationParameter("mode", AAS_TYPE_STRING, mode))
       this.inputVarPlaceholder = inputVariables
     } else {
       inputVariables = null;
@@ -206,8 +183,9 @@ export class LogsDialogComponent implements OnInit{
 
   }
 
-  public async getPlatformData(submodel: any, submodelElement: any){
-    let response: any;
+  public async getPlatformData(submodel: any, submodelElement: any) {
+    return await this.api.getData(`/aas/submodels/${submodel}/submodel/submodelElements/${submodelElement}`);
+    /*let response: any;
 
     try {
         let cfg = await this.envConfigService.initAndGetCfg();
@@ -221,7 +199,7 @@ export class LogsDialogComponent implements OnInit{
       } catch(e) {
         console.error(e);
       }
-    return response
+    return response*/
   }
 
   public async reset() {
@@ -243,20 +221,19 @@ export class LogsDialogComponent implements OnInit{
     console.debug("[log-dialog | closeLogs Async] triggered")
     let inputVar = await this.getInputVar(this.data.idShort, "STOP")
     if (inputVar) {
-      let resourceId = this.serviceInfo.resource
-      let aasElementURL = "/aas/submodels/resources/submodel/submodelElements/"
+      //let resourceId = this.serviceInfo.resource
+      //let aasElementURL = "/aas/submodels/resources/submodel/submodelElements/"
       let basyxFun = "serviceManagers/a"
         + this.serviceInfo.serviceMgr.replace("@", "_")
         + "/serviceStreamLog"
-
-      const response = await this.api.executeFunction(
+      /*const response = await this.api.executeFunction(
         resourceId,
         aasElementURL,
         basyxFun,
-        inputVar) as unknown as platformResponse
-
+        inputVar) as unknown as platformResponse*/
+      const response = await this.api.executeAasJsonOperation("resources", AAS_OP_PREFIX_SME + basyxFun, inputVar);
       console.debug("[log-dialog | closeStreamLog] platform response: ")
-      console.debug(response.executionState)
+      console.debug(response?.executionState)
     }
   }
 
@@ -267,47 +244,48 @@ export class LogsDialogComponent implements OnInit{
     console.debug("[log-dialog | closeLogs Sync] triggered")
 
     let inputVariable = this.inputVarPlaceholder
-    if(inputVariable) {
-      if(inputVariable[1].value) {
+    if (inputVariable) {
+      if (inputVariable[1].value) {
         inputVariable[1].value.value = "STOP"
       }
-    }
-
-    let cfg = this.envConfigService.getCfg();
-    var url = cfg?.ip + '/shells/' + cfg?.urn
-      + "/aas/submodels/resources/submodel/submodelElements/"
-      + this.serviceInfo.resource + "/"
-      + "serviceManagers/a"
-      + this.serviceInfo.serviceMgr.replace("@", "_")
-      + "/serviceStreamLog/invoke"
-
-    let data = {"inputArguments": inputVariable,
-    "requestId":"1bfeaa30-1512-407a-b8bb-f343ecfa28cf",
-    "inoutputArguments":[], "timeout":10000}
-
-    var request = new XMLHttpRequest()
-    request.open('POST', url, false)
-    request.setRequestHeader("Content-Type", "application/json")
-    request.onreadystatechange = function() {
-      if(request.readyState === XMLHttpRequest.DONE) {
-        if(request.status === 200) {
-          const response = JSON.parse(request.responseText)
-          console.debug('Response: ' + response)
-        } else {
-          console.error('Error ' + request.status, request.statusText)
+      let cfg = this.envConfigService.getCfg();
+      var url = ApiService.constructOperationCallUrl(cfg, "resources", AAS_OP_PREFIX_SME + this.serviceInfo.resource + "/"
+        + "serviceManagers/a" + this.serviceInfo.serviceMgr.replace("@", "_") + "/serviceStreamLog");
+      /*var url = cfg?.ip + '/shells/' + cfg?.urn
+        + "/aas/submodels/resources/submodel/submodelElements/"
+        + this.serviceInfo.resource + "/"
+        + "serviceManagers/a"
+        + this.serviceInfo.serviceMgr.replace("@", "_")
+        + "/serviceStreamLog/invoke"*/
+      let data = ApiService.constructOperationCallBody(inputVariable);
+      /*let data = {"inputArguments": inputVariable,
+      "requestId":"1bfeaa30-1512-407a-b8bb-f343ecfa28cf",
+      "inoutputArguments":[], "timeout":10000}*/
+  
+      var request = new XMLHttpRequest()
+      request.open('POST', url, false)
+      request.setRequestHeader("Content-Type", "application/json")
+      request.onreadystatechange = function() {
+        if (request.readyState === XMLHttpRequest.DONE) {
+          if (request.status === 200) {
+            const response = JSON.parse(request.responseText)
+            console.debug('Response: ' + response)
+          } else {
+            console.error('Error ' + request.status, request.statusText)
+          }
         }
       }
-    }
-    request.send(JSON.stringify(data))
-
-    if (request.status === 200) {
-      this.running = 0
-      return request.response
-    } else if (request.status === 201) {
-      this.running = 0
-      return "HTTP status 201"
-    } else {
-      throw new Error("request failed " + request.response )
+      request.send(JSON.stringify(data))
+  
+      if (request.status === 200) {
+        this.running = 0
+        return request.response
+      } else if (request.status === 201) {
+        this.running = 0
+        return "HTTP status 201"
+      } else {
+        throw new Error("request failed " + request.response )
+      }
     }
   }
 
@@ -316,7 +294,6 @@ export class LogsDialogComponent implements OnInit{
     console.debug("[log-dialog | beforeunloadHandler] triggered")
     if (this.running != 0) {
       this.closeLogsStreamSync()
-
     }
   }
 }

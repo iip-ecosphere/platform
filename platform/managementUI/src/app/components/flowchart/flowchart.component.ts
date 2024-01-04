@@ -1,10 +1,10 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import Drawflow from 'drawflow';
-import { DrawflowService } from 'src/app/services/drawflow.service';
 import { IvmlFormatterService } from 'src/app/services/ivml-formatter.service';
 import { MeshFeedbackComponent } from './feedback/mesh-feedback/mesh-feedback.component';
 import { MatDialog } from '@angular/material/dialog';
+import { ApiService, GRAPHFORMAT_DRAWFLOW } from 'src/app/services/api.service';
 
 interface Bus {
   id: string;
@@ -19,7 +19,7 @@ interface Bus {
 export class FlowchartComponent implements OnInit {
 
 
-  constructor(private df: DrawflowService,
+  constructor(private api: ApiService, 
     private route: ActivatedRoute,
     public ivmlFormatter:IvmlFormatterService,
     public dialog: MatDialog) {}
@@ -46,11 +46,11 @@ export class FlowchartComponent implements OnInit {
 
 
   async ngOnInit() {
-    this.services = await this.df.getServices();
+    this.services = await this.api.getConfiguredServices();
     if(this.services) {
       this.servicesLoading = false;
     }
-    this.serviceMeshes = await this.df.getServiceMeshes();
+    this.serviceMeshes = await this.api.getConfiguredServiceMeshes();
 
     const drawFlowHtmlElement = <HTMLElement>document.getElementById('drawflow');
 
@@ -159,12 +159,10 @@ export class FlowchartComponent implements OnInit {
   }
 
   public async getGraph(mesh: string) {
-
-    let data = await this.df.getGraph(mesh);
-    if(data?.outputArguments[0].value?.value) {
+    let opRes = await this.api.getConfiguredServiceMeshGraph(mesh, GRAPHFORMAT_DRAWFLOW);
+    if (opRes && opRes.result) {
       this.Busses = [];
-      let graph = JSON.parse(data?.outputArguments[0].value?.value);
-      let graph2 = JSON.parse(graph.result);
+      let graph2 = JSON.parse(opRes.result);
       //this.meshUnchanged = JSON.parse(JSON.stringify(graph2)); //for debug purposes
       this.mesh = graph2;
       let nodes = graph2.drawflow.Home.data
