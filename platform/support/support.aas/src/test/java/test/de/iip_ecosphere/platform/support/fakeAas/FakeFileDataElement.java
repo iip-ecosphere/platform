@@ -25,6 +25,7 @@ public class FakeFileDataElement implements FileDataElement {
     private String idShort;
     private String contents;
     private String mimeType;
+    private String semanticId;
     
     /**
      * The element builder.
@@ -57,7 +58,7 @@ public class FakeFileDataElement implements FileDataElement {
 
         @Override
         public FileDataElementBuilder setSemanticId(String refValue) {
-            // ignored here for now
+            instance.semanticId = refValue;
             return this;
         }
         
@@ -83,7 +84,7 @@ public class FakeFileDataElement implements FileDataElement {
 
     @Override
     public void accept(AasVisitor visitor) {
-        visitor.visitDataElement(this);
+        visitor.visitFileDataElement(this);
     }
 
     @Override
@@ -108,6 +109,11 @@ public class FakeFileDataElement implements FileDataElement {
     @Override
     public void setMimeType(String mimeType) {
         this.mimeType = mimeType;
+    }
+
+    @Override
+    public String getSemanticId(boolean stripPrefix) {
+        return semanticId;
     }
 
 }

@@ -47,6 +47,7 @@ public class FakeSubmodel extends FakeElement implements Submodel {
     private Map<String, SubmodelElement> elements = new HashMap<>();
     private Map<String, Builder<?>> deferred;
     private String identifier;
+    private String semanticId;
     
     /**
      * A fake sub-model builder.
@@ -190,8 +191,8 @@ public class FakeSubmodel extends FakeElement implements Submodel {
         }
 
         @Override
-        public SubmodelBuilder setSemanticId(String refValue) {
-            // ignored for now
+        public SubmodelBuilder setSemanticId(String semanticId) {
+            instance.semanticId = semanticId;
             return this;
         }
 
@@ -218,9 +219,23 @@ public class FakeSubmodel extends FakeElement implements Submodel {
     @Override
     public void accept(AasVisitor visitor) {
         visitor.visitSubmodel(this);
-        for (SubmodelElement elt : elements.values()) {
+        for (SubmodelElement elt : visitor.sortSubmodelElements(filter(Property.class))) {
             elt.accept(visitor);
         }
+        for (SubmodelElement elt : visitor.sortSubmodelElements(filter(DataElement.class))) {
+            if (!(elt instanceof Property)) {
+                elt.accept(visitor);
+            }
+        }
+        for (SubmodelElement elt : visitor.sortSubmodelElements(filter(Operation.class))) {
+            elt.accept(visitor);
+        }
+        for (SubmodelElement se : visitor.sortSubmodelElements(elements.values())) {
+            // remaining elements, don't iterate over them again
+            if (!(se instanceof Property || se instanceof DataElement || se instanceof Operation)) {
+                se.accept(visitor);
+            }
+        }        
         visitor.endSubmodel(this);
     }
 
@@ -395,6 +410,11 @@ public class FakeSubmodel extends FakeElement implements Submodel {
     @Override
     public <T extends SubmodelElement> boolean iterate(IteratorFunction<T> func, Class<T> cls, String... path) {
         return false;
+    }
+
+    @Override
+    public String getSemanticId(boolean stripPrefix) {
+        return semanticId;
     }
 
 }

@@ -122,6 +122,16 @@ public class AasPrintVisitor implements AasVisitor {
     }
     
     @Override
+    public void visitFileDataElement(FileDataElement dataElement) {
+        log("FILEDATAELT " + dataElement.getIdShort());
+    }
+
+    @Override
+    public void visitBlobDataElement(BlobDataElement dataElement) {
+        log("BLOBDATAELT " + dataElement.getIdShort());
+    }
+    
+    @Override
     public void visitMultiLanguageProperty(MultiLanguageProperty property) {
         log("MLP " + property.getIdShort());
     }
@@ -134,6 +144,12 @@ public class AasPrintVisitor implements AasVisitor {
     @Override
     public void visitEntity(Entity entity) {
         log("ENTITY " + entity.getIdShort());
+        increaseIndentation();
+    }
+
+    @Override
+    public void endVisitEntity(Entity entity) {
+        decreaseIndentation();
     }
 
 }

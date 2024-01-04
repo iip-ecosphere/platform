@@ -16,6 +16,8 @@ import org.junit.runners.Suite;
 import test.de.iip_ecosphere.platform.support.aas.IdentifierTypeTest;
 import test.de.iip_ecosphere.platform.support.aas.LangStringTest;
 import test.de.iip_ecosphere.platform.support.aas.LocalInvocationTest;
+import test.de.iip_ecosphere.platform.support.aas.PCF;
+import test.de.iip_ecosphere.platform.support.aas.TimeSeriesData;
 import test.de.iip_ecosphere.platform.support.aas.XmasAas;
 import test.de.iip_ecosphere.platform.support.fakeAas.FactoryTest;
 import test.de.iip_ecosphere.platform.support.fakeAas.PrintVisitorTest;
@@ -54,7 +56,9 @@ import test.de.iip_ecosphere.platform.support.net.UriResolverTest;
     
     // non-generic AAS 
     LangStringTest.class,
-    XmasAas.class
+    XmasAas.class,
+    TimeSeriesData.class,
+    PCF.class
 })
 public class AllTests {
 }

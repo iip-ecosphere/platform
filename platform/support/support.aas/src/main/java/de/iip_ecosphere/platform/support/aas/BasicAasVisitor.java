@@ -76,5 +76,17 @@ public class BasicAasVisitor implements AasVisitor {
     @Override
     public void visitEntity(Entity entity) {
     }
-    
+
+    @Override
+    public void endVisitEntity(Entity entity) {
+    }
+
+    @Override
+    public void visitFileDataElement(FileDataElement dataElement) {
+    }
+
+    @Override
+    public void visitBlobDataElement(BlobDataElement dataElement) {
+    }
+
 }

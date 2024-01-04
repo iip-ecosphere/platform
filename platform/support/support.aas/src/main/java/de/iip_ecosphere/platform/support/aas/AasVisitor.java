@@ -12,6 +12,8 @@
 
 package de.iip_ecosphere.platform.support.aas;
 
+import java.util.Collection;
+
 /**
  * Defines a visitor over the so far defined AAS elements. Just to briefly summarize the relations:
  * <ul>
@@ -66,6 +68,28 @@ public interface AasVisitor {
      * @param asset the asset
      */
     public void visitAsset(Asset asset);
+
+    /**
+     * Returns a sorted collection of submodels determined by this visitor.
+     * 
+     * @param <T> the type of submodels
+     * @param elements the elements
+     * @return {@code elements}
+     */
+    public default <T extends Submodel> Collection<T> sortSubmodels(Collection<T> elements) {
+        return elements;
+    }
+
+    /**
+     * Returns a sorted collection of submodel elements determined by this visitor.
+     * 
+     * @param <T> the type of submodel element
+     * @param elements the elements
+     * @return {@code elements}
+     */
+    public default <T extends SubmodelElement> Collection<T> sortSubmodelElements(Collection<T> elements) {
+        return elements;
+    }
     
     /**
      * Visits a sub-model.
@@ -101,6 +125,13 @@ public interface AasVisitor {
      * @param entity the entity
      */
     public void visitEntity(Entity entity);
+
+    /**
+     * Indicates the end of visiting an entity.
+     * 
+     * @param entity the entity
+     */
+    public void endVisitEntity(Entity entity);
 
     /**
      * Visits a relationship element.
@@ -140,8 +171,22 @@ public interface AasVisitor {
     /**
      * Visits a data element.
      * 
-     * @param dataElement the reference element
+     * @param dataElement the data element
      */
     public void visitDataElement(DataElement dataElement);
-    
+
+    /**
+     * Visits a file data element.
+     * 
+     * @param dataElement the file data element
+     */
+    public void visitFileDataElement(FileDataElement dataElement);
+
+    /**
+     * Visits a BLOB data element.
+     * 
+     * @param dataElement the BLOB data element
+     */
+    public void visitBlobDataElement(BlobDataElement dataElement);
+
 }

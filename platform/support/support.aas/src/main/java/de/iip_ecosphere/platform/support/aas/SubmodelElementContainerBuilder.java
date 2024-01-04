@@ -1,6 +1,7 @@
 package de.iip_ecosphere.platform.support.aas;
 
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
+import de.iip_ecosphere.platform.support.aas.BlobDataElement.BlobDataElementBuilder;
 import de.iip_ecosphere.platform.support.aas.Entity.EntityBuilder;
 import de.iip_ecosphere.platform.support.aas.Entity.EntityType;
 import de.iip_ecosphere.platform.support.aas.FileDataElement.FileDataElementBuilder;
@@ -77,7 +78,7 @@ public interface SubmodelElementContainerBuilder {
     public OperationBuilder createOperationBuilder(String idShort);
     
     /**
-     * Adds an image data element.
+     * Creates a nested file data element builder.
      * 
      * @param idShort the short id of the data element
      * @param contents the file contents/value
@@ -85,6 +86,16 @@ public interface SubmodelElementContainerBuilder {
      * @return the data element builder
      */
     public FileDataElementBuilder createFileDataElementBuilder(String idShort, String contents, String mimeType);
+
+    /**
+     * Creates a nested BLOB data element builder.
+     * 
+     * @param idShort the short id of the data element
+     * @param contents the file contents/value (may be <b>null</b> for none)
+     * @param mimeType the mime type of the file
+     * @return the data element builder
+     */
+    public BlobDataElementBuilder createBlobDataElementBuilder(String idShort, String contents, String mimeType);
     
     /**
      * Creates a builder for a contained sub-model element collection. Calling this method again with the same name 

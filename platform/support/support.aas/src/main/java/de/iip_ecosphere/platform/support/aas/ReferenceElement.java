@@ -51,7 +51,6 @@ public interface ReferenceElement extends SubmodelElement {
          */
         public ReferenceElementBuilder setDescription(LangString... description);
 
-        
         /**
          * Sets the semantic ID of the property in terms of a reference.
          * 

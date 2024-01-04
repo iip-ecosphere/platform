@@ -55,6 +55,7 @@ public class FakeTechnicalDataSubmodel extends FakeSubmodel implements Technical
          */
         protected FakeTechnicalDataSubmodelBuilder(FakeAasBuilder parent, String identifier) {
             super(parent, "TechnicalData", identifier);
+            setSemanticId("iri:http://admin-shell.io/ZVEI/TechnicalData/Submodel/1/1");
         }
 
         /**
@@ -108,7 +109,7 @@ public class FakeTechnicalDataSubmodel extends FakeSubmodel implements Technical
 
         @Override
         public FurtherInformationBuilder createFurtherInformationBuilder(XMLGregorianCalendar validDate) {
-            return new FakeFurtherInformation.FakeFurtherInformationBuilder(this);
+            return new FakeFurtherInformation.FakeFurtherInformationBuilder(this, validDate);
         }
         
     }

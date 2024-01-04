@@ -16,6 +16,7 @@ import de.iip_ecosphere.platform.support.Builder;
 import de.iip_ecosphere.platform.support.aas.Reference;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
+import de.iip_ecosphere.platform.support.aas.BlobDataElement.BlobDataElementBuilder;
 import de.iip_ecosphere.platform.support.aas.Entity.EntityBuilder;
 import de.iip_ecosphere.platform.support.aas.Entity.EntityType;
 import de.iip_ecosphere.platform.support.aas.FileDataElement.FileDataElementBuilder;
@@ -62,6 +63,10 @@ public abstract class FakeSubmodelElementContainerBuilder implements SubmodelEle
         return new FakeFileDataElement.FakeFileDataElementBuilder(this, idShort, contents, mimeType);
     }
 
+    @Override
+    public BlobDataElementBuilder createBlobDataElementBuilder(String idShort, String value, String mimeType) {
+        return new FakeBlobDataElement.FakeBlobDataElementBuilder(this, idShort, value, mimeType);
+    }
 
     @Override
     public RelationshipElementBuilder createRelationshipElementBuilder(String idShort, Reference first,
@@ -77,7 +82,17 @@ public abstract class FakeSubmodelElementContainerBuilder implements SubmodelEle
      * @return {@code elt}
      */
     abstract <T extends SubmodelElement> T registerElement(T elt);
-    
+
+    /**
+     * Registers an element.
+     * 
+     * @param element the element
+     * @return {@code element}
+     */
+    FakeBlobDataElement register(FakeBlobDataElement element) {
+        return registerElement(element);
+    }
+
     /**
      * Registers an element.
      * 

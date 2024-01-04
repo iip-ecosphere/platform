@@ -20,6 +20,8 @@ import java.util.Map;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import de.iip_ecosphere.platform.support.aas.LangString;
+import de.iip_ecosphere.platform.support.aas.Type;
+import de.iip_ecosphere.platform.support.aas.types.common.Utils;
 import de.iip_ecosphere.platform.support.aas.types.technicaldata.FurtherInformation;
 
 /**
@@ -46,9 +48,20 @@ public class FakeFurtherInformation extends FakeSubmodelElementCollection implem
          * Creates an instance.
          * 
          * @param parent the parent builder
+         * @param validDate the valid date
          */
-        protected FakeFurtherInformationBuilder(FakeSubmodelElementContainerBuilder parent) {
+        protected FakeFurtherInformationBuilder(FakeSubmodelElementContainerBuilder parent, 
+            XMLGregorianCalendar validDate) {
             super(parent, "FurtherInformation", false, false);
+            setSemanticId("iri:https://admin-shell.io/ZVEI/TechnicalData/FurtherInformation/1/1");
+            if (null == validDate) {
+                validDate = Utils.parse(null);
+            }
+            instance.setValidDate(validDate);
+            createPropertyBuilder("ValidDate")
+                .setValue(Type.DATE_TIME, validDate)
+                .setSemanticId("iri:https://admin-shell.io/ZVEI/TechnicalData/ValidDate/1/1")
+                .build();
         }
 
         @Override

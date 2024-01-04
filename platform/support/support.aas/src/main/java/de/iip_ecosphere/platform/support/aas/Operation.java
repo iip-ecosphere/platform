@@ -41,7 +41,15 @@ public interface Operation extends Element, SubmodelElement {
          * @return the parent builder
          */
         public SubmodelElementContainerBuilder getParentBuilder();
-        
+
+        /**
+         * Sets the semantic ID of the property in terms of a reference.
+         * 
+         * @param semanticId the reference value (supported: irdi:<i>irdiValue</i>)
+         * @return <b>this</b>
+         */
+        public OperationBuilder setSemanticId(String semanticId);
+
         /**
          * Adds an input variable to the operation.
          * 

@@ -33,6 +33,7 @@ public class FakeOperation extends FakeElement implements Operation {
     private int inArgs;
     private int outArgs;
     private int inOutArgs;
+    private String semanticId;
     
     /**
      * A fake operation builder.
@@ -91,8 +92,17 @@ public class FakeOperation extends FakeElement implements Operation {
 
         @Override
         public Operation build() {
+            if (0 == instance.outArgs) {
+                instance.outArgs++; // default NONE
+            }
             parent.register(instance);
             return instance;
+        }
+
+        @Override
+        public OperationBuilder setSemanticId(String semanticId) {
+            instance.semanticId = semanticId;
+            return this;
         }
         
     }
@@ -137,6 +147,11 @@ public class FakeOperation extends FakeElement implements Operation {
     @Override
     public Object invoke(Object... args) throws ExecutionException {
         return null; //we do not invoke here
+    }
+
+    @Override
+    public String getSemanticId(boolean stripPrefix) {
+        return semanticId;
     }
 
 }

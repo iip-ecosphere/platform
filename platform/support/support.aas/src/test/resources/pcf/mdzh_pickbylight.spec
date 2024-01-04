@@ -1,0 +1,2 @@
+AAS mdzh_pickbylight
+ ASSET mdzh_pickbylight INSTANCE

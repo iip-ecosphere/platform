@@ -60,7 +60,7 @@ public interface FurtherInformation {
      *     associated asset
      */
     public void setValidDate(XMLGregorianCalendar validDate);
-
+    
     /**
      * Returns the text statements with potentially prefixed ids.
      * 

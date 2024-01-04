@@ -19,6 +19,26 @@ package de.iip_ecosphere.platform.support.aas;
  */
 public interface HasSemantics {
 
-    // TODO public IReference getSemanticId();
+
+    /**
+     * Returns the semantic id of the element.
+     * 
+     * @return the semantic id in textual format, e.g., with identifier prefix, or <b>null</b> if there is no 
+     *     semantic id or no translation to string
+     * @see #getSemanticId(boolean)
+     */
+    public default String getSemanticId() {
+        return getSemanticId(false);
+    }
+
+    /**
+     * Returns the semantic id of the element.
+     * 
+     * @param stripPrefix if the plain semantic id or the prefix shall also be emitted
+     * @return the semantic id in textual format, e.g., with/out identifier prefix, or <b>null</b> if there is no 
+     *     semantic id or no translation to string
+     * @see #getSemanticId()
+     */
+    public String getSemanticId(boolean stripPrefix);
     
 }

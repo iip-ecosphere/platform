@@ -13,6 +13,7 @@
 package de.iip_ecosphere.platform.support.aas.types.hierarchicalStructure;
 
 import static de.iip_ecosphere.platform.support.aas.IdentifierType.iri;
+import static de.iip_ecosphere.platform.support.aas.types.common.Utils.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +23,7 @@ import de.iip_ecosphere.platform.support.aas.Reference;
 import de.iip_ecosphere.platform.support.aas.RelationshipElement.RelationshipElementBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.Type;
+import de.iip_ecosphere.platform.support.aas.types.common.DelegatingSubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.Entity;
 import de.iip_ecosphere.platform.support.aas.Entity.EntityBuilder;
@@ -40,7 +42,7 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class HierarchicalStructureBuilder implements Builder<Submodel> {
+public class HierarchicalStructureBuilder extends DelegatingSubmodelBuilder {
 
     /**
      * Defines the structure archetypes.
@@ -74,7 +76,6 @@ public class HierarchicalStructureBuilder implements Builder<Submodel> {
         
     }
     
-    private SubmodelBuilder smBuilder;
     private int entryNodeCount = 0;
     
     /**
@@ -86,9 +87,9 @@ public class HierarchicalStructureBuilder implements Builder<Submodel> {
      * @param archeType the archetype
      */
     public HierarchicalStructureBuilder(AasBuilder aasBuilder, String idShort, String identifier, ArcheType archeType) {
-        smBuilder = aasBuilder.createSubmodelBuilder(idShort, identifier);
-        smBuilder.setSemanticId(iri("https://admin-shell.io/idta/HierarchicalStructures/1/0/Submodel"));
-        smBuilder.createPropertyBuilder("ArcheType")
+        super(aasBuilder.createSubmodelBuilder(idShort, identifier));
+        setSemanticId(iri("https://admin-shell.io/idta/HierarchicalStructures/1/0/Submodel"));
+        createPropertyBuilder("ArcheType")
             .setSemanticId(iri("https://admin-shell.io/idta/HierarchicalStructures/ArcheType/1/0"))
             .setValue(Type.STRING, archeType.getValue())
             .build();
@@ -104,7 +105,7 @@ public class HierarchicalStructureBuilder implements Builder<Submodel> {
      */
     public EntryNodeBuilder createEntryNodeBuilder(String idShort, EntityType type, Reference asset) {
         entryNodeCount++; // in build?
-        return new EntryNodeBuilder(smBuilder, idShort, type, asset);
+        return new EntryNodeBuilder(getDelegate(), idShort, type, asset);
     }
     
     /**
@@ -167,7 +168,7 @@ public class HierarchicalStructureBuilder implements Builder<Submodel> {
         private AbstractNodeBuilder addRel(Reference first, Reference second, String idShortPrefix, 
             List<RelationshipElementBuilder> builders, String semanticId) {
             builders.add(builder
-                .createRelationshipElementBuilder(idShortPrefix + String.format("%02d", builders.size() + 1), 
+                .createRelationshipElementBuilder(getCountingIdShort(idShortPrefix, builders.size() + 1), 
                     first, second)
                 .setSemanticId(semanticId));
             return this;
@@ -334,24 +335,10 @@ public class HierarchicalStructureBuilder implements Builder<Submodel> {
         
     }
     
-    /**
-     * Assert that {@code valid} else emits an {@link IllegalArgumentException} with text 
-     * {@code exception}.
-     * 
-     * @param valid the validity criteria
-     * @param exception the exception text
-     * @throws IllegalArgumentException if not {@code valid}
-     */
-    private static void assertThat(boolean valid, String exception) {
-        if (!valid) {
-            throw new IllegalArgumentException(exception);
-        }
-    }
-    
     @Override
     public Submodel build() {
         assertThat(entryNodeCount == 1, "There must be exactly one EntryNode");
-        return smBuilder.build();
+        return super.build();
     }
 
 }

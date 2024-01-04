@@ -159,7 +159,7 @@ public class FakeAas extends FakeElement implements Aas {
         if (null != asset) {
             asset.accept(visitor);
         }
-        for (Submodel sm : submodels()) {
+        for (Submodel sm : visitor.sortSubmodels(submodels.values())) {
             sm.accept(visitor);
         }
         visitor.endAas(this);

@@ -12,6 +12,7 @@
 
 package test.de.iip_ecosphere.platform.support.fakeAas;
 
+import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.types.technicaldata.ProductClassificationItem;
 import de.iip_ecosphere.platform.support.aas.types.technicaldata.ProductClassificationItem.ProductClassificationItemBuilder;
 import de.iip_ecosphere.platform.support.aas.types.technicaldata.ProductClassifications;
@@ -38,6 +39,14 @@ public class FakeProductClassifications extends FakeSubmodelElementCollection im
          */
         protected FakeProductClassificationsBuilder(FakeSubmodelElementContainerBuilder parent) {
             super(parent, "ProductClassifications", false, false);
+        }
+        
+        @Override
+        <T extends SubmodelElement> T registerElement(T elt) {
+            if (!elt.getIdShort().equals("ProductClassification")) { // bug in BaSyx sync
+                super.registerElement(elt);
+            }
+            return elt;
         }
 
         @Override

@@ -39,6 +39,7 @@ public class FakeSubmodelElementCollection extends FakeElement implements Submod
 
     private Map<String, SubmodelElement> elements = new HashMap<>();
     private Map<String, Builder<?>> deferred;
+    private String semanticId;
     
     /**
      * The builder.
@@ -159,8 +160,8 @@ public class FakeSubmodelElementCollection extends FakeElement implements Submod
         }
 
         @Override
-        public SubmodelElementCollectionBuilder setSemanticId(String refValue) {
-            // ignore for now
+        public SubmodelElementCollectionBuilder setSemanticId(String semanticId) {
+            instance.semanticId = semanticId;
             return this;
         }
 
@@ -178,7 +179,7 @@ public class FakeSubmodelElementCollection extends FakeElement implements Submod
     @Override
     public void accept(AasVisitor visitor) {
         visitor.visitSubmodelElementCollection(this);
-        for (SubmodelElement sm : elements.values()) {
+        for (SubmodelElement sm : visitor.sortSubmodelElements(elements.values())) {
             sm.accept(visitor);
         }
         visitor.endSubmodelElementCollection(this);
@@ -271,6 +272,11 @@ public class FakeSubmodelElementCollection extends FakeElement implements Submod
     @Override
     public Operation getOperation(String idShort) {
         return filter(idShort, Operation.class);
+    }
+
+    @Override
+    public String getSemanticId(boolean stripPrefix) {
+        return semanticId;
     }
 
 }

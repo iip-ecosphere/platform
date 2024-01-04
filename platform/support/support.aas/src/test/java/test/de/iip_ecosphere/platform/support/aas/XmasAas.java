@@ -14,14 +14,6 @@ package test.de.iip_ecosphere.platform.support.aas;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
-import org.apache.commons.io.FileUtils;
-import org.junit.Test;
 
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
@@ -34,6 +26,7 @@ import de.iip_ecosphere.platform.support.aas.LangString;
 import de.iip_ecosphere.platform.support.aas.PersistenceRecipe.FileResource;
 import de.iip_ecosphere.platform.support.aas.Reference;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
+import de.iip_ecosphere.platform.support.aas.types.common.Utils;
 import de.iip_ecosphere.platform.support.aas.types.documentation.HandoverDocumentationBuilder;
 import de.iip_ecosphere.platform.support.aas.types.documentation.HandoverDocumentationBuilder.DocumentBuilder;
 import de.iip_ecosphere.platform.support.aas.types.documentation.HandoverDocumentationBuilder.DocumentStatus;
@@ -45,7 +38,6 @@ import de.iip_ecosphere.platform.support.aas.types.technicaldata.GeneralInformat
 import de.iip_ecosphere.platform.support.aas.types.technicaldata.ProductClassificationItem.ProductClassificationItemBuilder;
 import de.iip_ecosphere.platform.support.aas.types.technicaldata.ProductClassifications.ProductClassificationsBuilder;
 import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodel.TechnicalDataSubmodelBuilder;
-import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 import de.iip_ecosphere.platform.support.aas.Type;
 
 import static de.iip_ecosphere.platform.support.aas.IdentifierType.*;
@@ -56,9 +48,7 @@ import static de.iip_ecosphere.platform.support.aas.IdentifierType.*;
  * @author Holger Eichelberger, SSE
  * @author Claudia Niederée, L3S
  */
-public class XmasAas {
-    
-    // TODO images
+public class XmasAas extends AbstractAasExample {
     
     private static final String MALE = "male";
     private static final String FEMALE = "female";
@@ -66,92 +56,18 @@ public class XmasAas {
     private static final String NOSE_RED = RAL_RED;
     private static final String NOSE_BROWN = "8014"; // sepia brown
 
-    private List<Aas> aasList = new ArrayList<Aas>();
-    private Map<String, Aas> parts = new TreeMap<>();
-    private List<FileResource> resources = new ArrayList<FileResource>();
-    private boolean createOperations = true;
-    private boolean createMultiLanguageProperties = true;
-    private File tmpFolder = new File(FileUtils.getTempDirectory(), "xmas");
-    
-    /**
-     * Returns the target file.
-     * 
-     * @return the target file
-     */
-    protected File getTargetFile() {
-        return new File("./output/santaAas.aasx");
+    @Override
+    protected String getFolderName() {
+        return "xmas";
     }
     
-    /**
-     * Tests creating and storing the Xmas AAS.
-     * 
-     * @throws IOException if persisting does not work.
-     */
-    @Test
-    public void testCreateAndStore() throws IOException {
-        FileUtils.deleteQuietly(tmpFolder);
-        createCompositeAas();
-        File aasx = getTargetFile();
-        aasx.getParentFile().mkdirs();
-        AasFactory.getInstance().createPersistenceRecipe().writeTo(aasList, 
-            getFileResource("santaSleigh.png"), resources, aasx);
-        FileUtils.deleteQuietly(tmpFolder);
+    @Override
+    public File[] getTargetFiles() {
+        return new File[] {new File("./output/santaAas.aasx")};
     }
     
-    /**
-     * Enables/disables creating operations.
-     * 
-     * @param createOperations shall we create operations
-     */
-    protected void setCreateOperations(boolean createOperations) {
-        this.createOperations = createOperations;
-    }
-
-    /**
-     * Enables/disables creating multi-language properties.
-     * 
-     * @param createMultiLanguageProperties shall we create multi-language properties
-     */
-    protected void setCreateMultiLanguageProperties(boolean createMultiLanguageProperties) {
-        this.createMultiLanguageProperties = createMultiLanguageProperties;
-    }
-    /**
-     * Returns a resource as a file. As we store resources on the class path and test execution happens in the
-     * specific AAS implementations, we need store a copy in the temporary folder.
-     * 
-     * @param name the name of the resource
-     * @return the file or <b>null</b> if the ressource cannot be found/stored temporarily
-     */
-    private static File getFileResource(String name) {
-        File result = null;
-        InputStream in = ResourceLoader.getResourceAsStream("xmas/" + name);
-        if (null != in) {
-            File parent = new File(FileUtils.getTempDirectory(), "xmas");
-            parent.mkdirs();
-            File tmp = new File(parent, name);
-            if (tmp.exists()) { // we assume it's the right one then
-                result = tmp;
-            } else {
-                try {
-                    FileUtils.copyInputStreamToFile(in, tmp);
-                    result = tmp;
-                    result.deleteOnExit();
-                } catch (IOException e) {
-                    System.err.println("Cannot write resource to temporary folder. Ignoring resource " + name);
-                }
-            }
-        } else {
-            System.err.println("Cannot find resource on classpath. Ignoring resource " + name);
-        }
-        return result;
-    }
-    
-    /**
-     * Creates the all-over composite Santa's sleight AAS.
-     * 
-     * @return the created AAS
-     */
-    private Aas createCompositeAas() {
+    @Override
+    protected void createAas() {
         createSantaAas();
         createSleigh();
         int onSuffix = 0;
@@ -172,7 +88,7 @@ public class XmasAas {
             "urn:::SM:::SantasSleighBOM#", ArcheType.ONE_DOWN);
         EntryNodeBuilder enb = hsb.createEntryNodeBuilder("SantaSleigh_EntryNode", EntityType.SELFMANAGEDENTITY, null);
         Reference enbRef = enb.createReference();
-        parts.forEach((id, part) -> {
+        forEachPart((id, part) -> {
             Entity ent = enb.createNodeBuilder(id, EntityType.SELFMANAGEDENTITY, part.createReference()).build();
             enb.addHasPartOf(enbRef, ent.createReference());
         });
@@ -183,32 +99,7 @@ public class XmasAas {
             LangString.create("Instantiated every year on Christmas"), "MSS-001", "MSS-2023", 
             "santaSleigh.png", "0173-1#01-AIZ481#021");
         
-        return registerAas(aasBuilder.build());
-    }
-
-    /**
-     * Registers a created AAS (for persisting it).
-     * 
-     * @param aas the AAS
-     * @return {@code aas}
-     */
-    private Aas registerAas(Aas aas) {
-        aasList.add(aas);
-        parts.put("node_" + aas.getIdShort(), aas);
-        return aas;
-    }
-    
-    /**
-     * Registers a resource (once).
-     * 
-     * @param resource the resource to be registered
-     * @return {@code resource}
-     */
-    private FileResource registerResource(FileResource resource) {
-        if (!resources.stream().anyMatch(r -> resource.getPath().equals(r.getPath()))) {
-            resources.add(resource);
-        }
-        return resource;
+        registerAas(aasBuilder);
     }
 
     /**
@@ -217,7 +108,7 @@ public class XmasAas {
      * @return the created AAS
      * @see #createSleighDocumentation(AasBuilder)
      * @see #createTechnicalDataSubmodel(AasBuilder, String, LangString, String, String, String, String)
-     * @see #registerAas(Aas)
+     * @see #registerAas(AasBuilder)
      */
     private Aas createSleigh() {
         AasBuilder aasBuilder = AasFactory.getInstance().createAasBuilder("Sleigh", "urn:::AAS:::Sleigh#");
@@ -241,7 +132,7 @@ public class XmasAas {
             .setSemanticId(irdi("0173-1#02-AAB173#006"))
             .setValue(Type.INTEGER, 339)
             .build();
-        if (createOperations) {
+        if (isCreateOperations()) {
             smBuilder.createOperationBuilder("start")
                 .build();
             smBuilder.createOperationBuilder("stop")
@@ -262,7 +153,7 @@ public class XmasAas {
         
         createSleighDocumentation(aasBuilder);
 
-        return registerAas(aasBuilder.build());
+        return registerAas(aasBuilder);
     }
     
     /**
@@ -282,7 +173,7 @@ public class XmasAas {
         }
         
         HandoverDocumentationBuilder hdb = new HandoverDocumentationBuilder(aasBuilder, 
-            createMultiLanguageProperties, "urn:::SM:::productDataSleighDocs#");
+            isCreateMultiLanguageProperties(), "urn:::SM:::productDataSleighDocs#");
         DocumentBuilder db = hdb.createDocumentBuilder();
         db.createDocumentIdBuilder()
             .setIsPrimary(true)
@@ -295,7 +186,7 @@ public class XmasAas {
             .setTitle(new LangString("en", "Sleigh Operation Manual"))
             .setSummary(new LangString("en", "<missing>"))
             .setKeywords(new LangString("en", "sleigh, reindeers, santa, customized"))
-            .setStatus("2023-12-17T00:00:00.000+00:00", DocumentStatus.RELEASED)
+            .setStatus("2023-12-17T00:00:00.000Z", DocumentStatus.RELEASED)
             .setOrganizationName("North Pole Wood", "North Pole Wood Company Ltd")
             .addDigitalFile(resource, toMimeType(documentFile))
             .build();
@@ -368,7 +259,8 @@ public class XmasAas {
             }
         }
         giBuilder.build();
-        FurtherInformationBuilder fiBuilder = tdBuilder.createFurtherInformationBuilder(null);
+        FurtherInformationBuilder fiBuilder = tdBuilder.createFurtherInformationBuilder(
+            Utils.parse("2023-12-24T23:59:59.000+00:00"));
         fiBuilder.build();
         tdBuilder.createTechnicalPropertiesBuilder().build();
         ProductClassificationsBuilder pcBuilder = tdBuilder.createProductClassificationsBuilder();
@@ -386,7 +278,7 @@ public class XmasAas {
      * Creates the Santa AAS.
      * 
      * @return the created AAS
-     * @see #registerAas(Aas)
+     * @see #registerAas(AasBuilder)
      * @see #createTechnicalDataSubmodel(AasBuilder, String, LangString, String, String, String, String)
      */
     private Aas createSantaAas() {
@@ -412,7 +304,7 @@ public class XmasAas {
             LangString.create("The one and only Santa Claus"), "SC-001", "SC-001", 
             "santa.png", "0173-1#01-ADT348#005");
 
-        return registerAas(aasBuilder.build());
+        return registerAas(aasBuilder);
     }
     
     /**
@@ -424,7 +316,7 @@ public class XmasAas {
      * @param orderNumberSuffix numerical suffix to order number
      * @param productResourceName the resource name of the product image
      * @return the created AAS
-     * @see #registerAas(Aas)
+     * @see #registerAas(AasBuilder)
      * @see #createTechnicalDataSubmodel(AasBuilder, String, LangString, String, String, String, String)
      */
     private Aas createReindeerAas(String name, String noseColor, String sex, int orderNumberSuffix, 
@@ -452,7 +344,12 @@ public class XmasAas {
             LangString.create("Traditional (magical) reindeer"), "Reindeer-1923#13", "MR-" + orderNumberSuffix, 
             productResourceName, "0173-1#01-AGN230#002");
 
-        return registerAas(aasBuilder.build());
+        return registerAas(aasBuilder);
+    }
+
+    @Override
+    protected File getThumbnail() {
+        return getFileResource("santaSleigh.png");
     }
 
 }

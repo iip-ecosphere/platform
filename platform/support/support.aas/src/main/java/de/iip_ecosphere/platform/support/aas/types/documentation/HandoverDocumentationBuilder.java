@@ -13,20 +13,21 @@
 package de.iip_ecosphere.platform.support.aas.types.documentation;
 
 import static de.iip_ecosphere.platform.support.aas.IdentifierType.irdi;
+import static de.iip_ecosphere.platform.support.aas.types.common.Utils.*;
 
 import java.util.function.Supplier;
 
 import de.iip_ecosphere.platform.support.Builder;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.LangString;
-import de.iip_ecosphere.platform.support.aas.MultiLanguageProperty.MultiLanguagePropertyBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
+import de.iip_ecosphere.platform.support.aas.types.common.DelegatingSubmodelBuilder;
+import de.iip_ecosphere.platform.support.aas.types.common.DelegatingSubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.aas.PersistenceRecipe.FileResource;
 import de.iip_ecosphere.platform.support.aas.Reference;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
-import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 
 /**
@@ -36,10 +37,9 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelE
  * 
  * @author Holger Eichelberger, SSE
  */
-public class HandoverDocumentationBuilder implements Builder<Submodel> {
+public class HandoverDocumentationBuilder extends DelegatingSubmodelBuilder {
 
     private boolean createMultiLanguageProperties;
-    private SubmodelBuilder smBuilder;
     private int documentCount = 0;
     private int primaryCount = 0;
 
@@ -97,9 +97,9 @@ public class HandoverDocumentationBuilder implements Builder<Submodel> {
      */
     public HandoverDocumentationBuilder(AasBuilder aasBuilder, boolean createMultiLanguageProperties, 
         String identifier) {
+        super(aasBuilder.createSubmodelBuilder("Documentation", identifier));
         this.createMultiLanguageProperties = createMultiLanguageProperties;
-        smBuilder = aasBuilder.createSubmodelBuilder("Documentation", identifier);
-        smBuilder.setSemanticId(irdi("0173-1#01-AHF578#001"));
+        setSemanticId(irdi("0173-1#01-AHF578#001"));
     }
 
     /**
@@ -108,14 +108,18 @@ public class HandoverDocumentationBuilder implements Builder<Submodel> {
      * @return the document builder
      */
     public DocumentBuilder createDocumentBuilder() {
-        return new DocumentBuilder(smBuilder, documentCount++);
+        return new DocumentBuilder(getDelegate(), documentCount++);
     }
 
     // based on Figure 3 (not fully compliant) of IDTA 02004-1-2 
     
-    public class DocumentBuilder implements Builder<SubmodelElementCollection> {
+    /**
+     * The document builder.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public class DocumentBuilder extends DelegatingSubmodelElementCollectionBuilder {
         
-        private SubmodelElementCollectionBuilder docBuilder;
         private int documentIdCount = 0;
         private int documentClassificationCount = 0;
         private int documentVersionCount = 0;
@@ -123,13 +127,13 @@ public class HandoverDocumentationBuilder implements Builder<Submodel> {
         /**
          * Creates a document builder.
          * 
-         * @param smBuilder the parend submodel builder
+         * @param smBuilder the parent submodel builder
          * @param documentNr the document number
          */
         private DocumentBuilder(SubmodelBuilder smBuilder, int documentNr) {
-            docBuilder = smBuilder.createSubmodelElementCollectionBuilder(
-                "Document" + String.format("%02d", documentNr), false, false);
-            docBuilder.setSemanticId(irdi("0173-1#01-AHF579#001"));
+            super(smBuilder.createSubmodelElementCollectionBuilder(
+                getCountingIdShort("Document", documentNr), false, false));
+            setSemanticId(irdi("0173-1#01-AHF579#001"));
         }
 
         /**
@@ -138,7 +142,7 @@ public class HandoverDocumentationBuilder implements Builder<Submodel> {
          * @return the builder, {@link Builder#build()} must be called
          */
         public DocumentIdBuilder createDocumentIdBuilder() {
-            return new DocumentIdBuilder(docBuilder, documentIdCount++);
+            return new DocumentIdBuilder(getDelegate(), documentIdCount++);
         }
 
         /**
@@ -147,7 +151,7 @@ public class HandoverDocumentationBuilder implements Builder<Submodel> {
          * @return the builder, {@link Builder#build()} must be called
          */
         public DocumentClassificationBuilder createDocumentClassificationBuilder() {
-            return new DocumentClassificationBuilder(docBuilder, documentClassificationCount++);
+            return new DocumentClassificationBuilder(getDelegate(), documentClassificationCount++);
         }
 
         /**
@@ -156,12 +160,13 @@ public class HandoverDocumentationBuilder implements Builder<Submodel> {
          * @return the builder, {@link Builder#build()} must be called
          */
         public DocumentVersionBuilder createDocumentVersionBuilder() {
-            return new DocumentVersionBuilder(docBuilder, documentVersionCount++);
+            return new DocumentVersionBuilder(getDelegate(), documentVersionCount++);
         }
 
         @Override
         public SubmodelElementCollection build() {
-            return docBuilder.build();
+            // no tests
+            return super.build();
         }
 
         /**
@@ -169,9 +174,8 @@ public class HandoverDocumentationBuilder implements Builder<Submodel> {
          * 
          * @author Holger Eichelberger, SSE
          */
-        public class DocumentIdBuilder implements Builder<SubmodelElementCollection> {
+        public class DocumentIdBuilder extends DelegatingSubmodelElementCollectionBuilder {
             
-            private SubmodelElementCollectionBuilder docBuilder;
             private boolean domainIdPresent = false;
             private boolean valueIdPresent = false;
 
@@ -182,9 +186,9 @@ public class HandoverDocumentationBuilder implements Builder<Submodel> {
              * @param nr the structure number
              */
             private DocumentIdBuilder(SubmodelElementCollectionBuilder smBuilder, int nr) {
-                docBuilder = smBuilder.createSubmodelElementCollectionBuilder(
-                    "DocumentId" + String.format("%02d", nr), false, false);
-                docBuilder.setSemanticId(irdi("0173-1#02-ABI501#001/0173-1#01-AHF580#001"));
+                super(smBuilder.createSubmodelElementCollectionBuilder(
+                    getCountingIdShort("DocumentId", nr), false, false));
+                setSemanticId(irdi("0173-1#02-ABI501#001/0173-1#01-AHF580#001"));
             }
 
             /**
@@ -195,7 +199,7 @@ public class HandoverDocumentationBuilder implements Builder<Submodel> {
              */
             public DocumentIdBuilder setDocumentDomainId(String id) {
                 domainIdPresent = true;
-                docBuilder.createPropertyBuilder("DocumentDomainId")
+                createPropertyBuilder("DocumentDomainId")
                     .setSemanticId(irdi("0173-1#02-ABH994#001"))
                     .setValue(Type.STRING, id).build();
                 return this;
@@ -209,7 +213,7 @@ public class HandoverDocumentationBuilder implements Builder<Submodel> {
              */
             public DocumentIdBuilder setValueId(String id) {
                 valueIdPresent = true;
-                docBuilder.createPropertyBuilder("ValueId")
+                createPropertyBuilder("ValueId")
                     .setSemanticId(irdi("0173-1#02-AAO099#002"))
                     .setValue(Type.STRING, id).build();
                 return this;
@@ -225,7 +229,7 @@ public class HandoverDocumentationBuilder implements Builder<Submodel> {
                 if (isPrimary) {
                     primaryCount++;
                 }
-                docBuilder.createPropertyBuilder("IsPrimary")
+                createPropertyBuilder("IsPrimary")
                     .setSemanticId(irdi("0173-1#02-ABH995#001"))
                     .setValue(Type.BOOLEAN, isPrimary).build();
                 return this;
@@ -235,9 +239,8 @@ public class HandoverDocumentationBuilder implements Builder<Submodel> {
             public SubmodelElementCollection build() {
                 assertThat(domainIdPresent, "The DomainId must be specified.");
                 assertThat(valueIdPresent, "The ValueId must be specified.");
-                return docBuilder.build();
+                return super.build();
             }
-            
             
         }
 
@@ -246,9 +249,8 @@ public class HandoverDocumentationBuilder implements Builder<Submodel> {
          * 
          * @author Holger Eichelberger, SSE
          */
-        public class DocumentClassificationBuilder implements Builder<SubmodelElementCollection> {
+        public class DocumentClassificationBuilder extends DelegatingSubmodelElementCollectionBuilder {
             
-            private SubmodelElementCollectionBuilder docBuilder;
             private boolean classPresent = false;
 
             /**
@@ -258,9 +260,9 @@ public class HandoverDocumentationBuilder implements Builder<Submodel> {
              * @param nr the structure number
              */
             private DocumentClassificationBuilder(SubmodelElementCollectionBuilder smBuilder, int nr) {
-                docBuilder = smBuilder.createSubmodelElementCollectionBuilder(
-                    "DocumentClassification" + String.format("%02d", nr), false, false);
-                docBuilder.setSemanticId(irdi("0173-1#02-ABI502#001/0173-1#01-AHF581#001"));
+                super(smBuilder.createSubmodelElementCollectionBuilder(
+                    getCountingIdShort("DocumentClassification", nr) , false, false));
+                setSemanticId(irdi("0173-1#02-ABI502#001/0173-1#01-AHF581#001"));
             }
 
             /**
@@ -274,11 +276,12 @@ public class HandoverDocumentationBuilder implements Builder<Submodel> {
             public DocumentClassificationBuilder setDocumentClass(String id, String classificationSystem, 
                 LangString... classNames) {
                 classPresent = true;
-                docBuilder.createPropertyBuilder("DocumentClassId")
+                createPropertyBuilder("DocumentClassId")
                     .setSemanticId(irdi("0173-1#02-ABH996#001"))
                     .setValue(Type.STRING, id).build();
-                createMultiLanguageProperty(docBuilder, "DocumentClassName", irdi("0173-1#02-AAO102#003"), classNames);
-                docBuilder.createPropertyBuilder("ClassificationSystem")
+                createMultiLanguageProperty(getDelegate(), createMultiLanguageProperties, "DocumentClassName", 
+                    irdi("0173-1#02-AAO102#003"), classNames);
+                createPropertyBuilder("ClassificationSystem")
                     .setSemanticId(irdi("0173-1#02-ABH997#001"))
                     .setValue(Type.STRING, classificationSystem).build();
                 return this;
@@ -287,30 +290,9 @@ public class HandoverDocumentationBuilder implements Builder<Submodel> {
             @Override
             public SubmodelElementCollection build() {
                 assertThat(classPresent, "The document class information must be specified.");
-                return docBuilder.build();
+                return super.build();
             }
             
-        }
-        
-        /**
-         * Creates a multi-language property.
-         * 
-         * @param builder the parent builder
-         * @param idShort the idShort
-         * @param semanticId the semanticId of the property
-         * @param texts the values of the property
-         */
-        private void createMultiLanguageProperty(SubmodelElementContainerBuilder builder, String idShort, 
-            String semanticId, LangString... texts) {
-            if (createMultiLanguageProperties) {
-                MultiLanguagePropertyBuilder mlpb = builder
-                    .createMultiLanguagePropertyBuilder(idShort)
-                    .setSemanticId(semanticId);
-                for (LangString t: texts) {
-                    mlpb.addText(t);
-                }
-                mlpb.build();
-            }
         }
 
         /**
@@ -318,9 +300,8 @@ public class HandoverDocumentationBuilder implements Builder<Submodel> {
          * 
          * @author Holger Eichelberger, SSE
          */
-        public class DocumentVersionBuilder implements Builder<SubmodelElementCollection> {
+        public class DocumentVersionBuilder extends DelegatingSubmodelElementCollectionBuilder {
 
-            private SubmodelElementCollectionBuilder docVerBuilder;
             private int languageCount = 0;
             private int digitalFileCount = 0;
             private int previewFileCount = 0;
@@ -342,9 +323,9 @@ public class HandoverDocumentationBuilder implements Builder<Submodel> {
              * @param nr the structure number
              */
             private DocumentVersionBuilder(SubmodelElementCollectionBuilder smBuilder, int nr) {
-                docVerBuilder = smBuilder.createSubmodelElementCollectionBuilder(
-                    "DocumentVersion" + String.format("%02d", nr), false, false);
-                docVerBuilder.setSemanticId(irdi("0173-1#02-ABI503#001/0173-1#01-AHF582#001"));
+                super(smBuilder.createSubmodelElementCollectionBuilder(
+                    getCountingIdShort("DocumentVersion", nr), false, false));
+                setSemanticId(irdi("0173-1#02-ABI503#001/0173-1#01-AHF582#001"));
             }
 
             /**
@@ -355,7 +336,7 @@ public class HandoverDocumentationBuilder implements Builder<Submodel> {
              */
             public DocumentVersionBuilder setLanguage(String language) {
                 languageCount++;
-                docVerBuilder.createPropertyBuilder("Language" + String.format("%02d", languageCount))
+                createPropertyBuilder(getCountingIdShort("Language", languageCount))
                     .setSemanticId(irdi("0173-1#02-AAN468#006"))
                     .setValue(Type.STRING, language)
                     .build();
@@ -370,7 +351,7 @@ public class HandoverDocumentationBuilder implements Builder<Submodel> {
              */
             public DocumentVersionBuilder setDocumentVersionId(String version) {
                 documentVersionPresent = true;
-                docVerBuilder.createPropertyBuilder("DocumentVersionId")
+                createPropertyBuilder("DocumentVersionId")
                     .setSemanticId(irdi("0173-1#02-AAO100#002"))
                     .setValue(Type.STRING, version)
                     .build();
@@ -385,7 +366,8 @@ public class HandoverDocumentationBuilder implements Builder<Submodel> {
              */
             public DocumentVersionBuilder setTitle(LangString... titles) {
                 titelPresent = titles.length > 0;
-                createMultiLanguageProperty(docVerBuilder, "Title", "0173-1#02-AAO105#002", titles);
+                createMultiLanguageProperty(getDelegate(), createMultiLanguageProperties, "Title", 
+                    irdi("0173-1#02-AAO105#002"), titles);
                 return this;
             }
             
@@ -397,7 +379,8 @@ public class HandoverDocumentationBuilder implements Builder<Submodel> {
              */
             public DocumentVersionBuilder setSummary(LangString... summaries) {
                 summaryPresent = summaries.length > 0;
-                createMultiLanguageProperty(docVerBuilder, "Summary", irdi("0173-1#02-AAO106#002"), summaries);
+                createMultiLanguageProperty(getDelegate(), createMultiLanguageProperties, "Summary", 
+                    irdi("0173-1#02-AAO106#002"), summaries);
                 return this;
             }
 
@@ -409,7 +392,8 @@ public class HandoverDocumentationBuilder implements Builder<Submodel> {
              */
             public DocumentVersionBuilder setKeywords(LangString... keywords) {
                 keyWordsPresent = keywords.length > 0;
-                createMultiLanguageProperty(docVerBuilder, "KeyWords", irdi("0173-1#02-ABH999#001"), keywords);
+                createMultiLanguageProperty(getDelegate(), createMultiLanguageProperties, "KeyWords", 
+                    irdi("0173-1#02-ABH999#001"), keywords);
                 return this;
             }
             
@@ -422,10 +406,10 @@ public class HandoverDocumentationBuilder implements Builder<Submodel> {
              */
             public DocumentVersionBuilder setStatus(String date, DocumentStatus value) {
                 statusPresent = true;
-                docVerBuilder.createPropertyBuilder("StatusSetDate")
-                .setSemanticId(irdi("0173-1#02-ABI000#001"))
-                .setValue(Type.DATE_TIME, date).build();
-                docVerBuilder.createPropertyBuilder("StatusValue")
+                createPropertyBuilder("StatusSetDate")
+                    .setSemanticId(irdi("0173-1#02-ABI000#001"))
+                    .setValue(Type.DATE_TIME, date).build();
+                createPropertyBuilder("StatusValue")
                     .setSemanticId(irdi("0173-1#02-ABI001#001"))
                     .setValue(Type.STRING, value.getValue())
                     .build();
@@ -442,12 +426,12 @@ public class HandoverDocumentationBuilder implements Builder<Submodel> {
             public DocumentVersionBuilder setOrganizationName(String organizationName, 
                 String organizationOfficialName) {
                 organizationNamePresent = true;
-                docVerBuilder.createPropertyBuilder("OrganizationName")
+                createPropertyBuilder("OrganizationName")
                     .setSemanticId(irdi("0173-1#02-ABI002#001"))
                     .setValue(Type.STRING, organizationName)
                     .build();
                 organizationOfficialNamePresent = true;
-                docVerBuilder.createPropertyBuilder("OrganizationOfficialName")
+                createPropertyBuilder("OrganizationOfficialName")
                     .setSemanticId(irdi("0173-1#02-ABI004#001"))
                     .setValue(Type.STRING, organizationOfficialName)
                     .build();
@@ -466,7 +450,7 @@ public class HandoverDocumentationBuilder implements Builder<Submodel> {
             public DocumentVersionBuilder addDigitalFile(FileResource file, String mimeType) {
                 if (null != file) {
                     digitalFileCount++;
-                    docVerBuilder.createFileDataElementBuilder("DigitalFile" + String.format("%02d", digitalFileCount), 
+                    createFileDataElementBuilder(getCountingIdShort("DigitalFile", digitalFileCount), 
                         file.getPath(), mimeType)
                         .setSemanticId(irdi("0173-1#02-ABI504#001/0173-1#01-AHF583#001"))
                         .build();
@@ -484,7 +468,7 @@ public class HandoverDocumentationBuilder implements Builder<Submodel> {
             public DocumentVersionBuilder setPreviewFile(FileResource file, String mimeType) {
                 if (null != file) {
                     previewFileCount++;
-                    docVerBuilder.createFileDataElementBuilder("PreviewFile" + String.format("%02d", previewFileCount), 
+                    createFileDataElementBuilder(getCountingIdShort("PreviewFile", previewFileCount), 
                         file.getPath(), mimeType)
                         .setSemanticId(irdi("0173-1#02-ABI505#001/0173-1#01-AHF584#001"))
                         .build();
@@ -536,7 +520,7 @@ public class HandoverDocumentationBuilder implements Builder<Submodel> {
             private void addReferences(String idShortPrefix, Supplier<Integer> nr, String semanticId, 
                 Reference... references) {
                 for (Reference ref: references) {
-                    docVerBuilder.createReferenceElementBuilder(idShortPrefix + String.format("%02d", nr.get()))
+                    createReferenceElementBuilder(getCountingIdShort(idShortPrefix, nr.get()))
                         .setValue(ref)
                         .setSemanticId("0173-1#02-ABI006#001")
                         .build();
@@ -555,25 +539,11 @@ public class HandoverDocumentationBuilder implements Builder<Submodel> {
                 assertThat(organizationOfficialNamePresent, "The organization official name must be specified.");
                 assertThat(digitalFileCount >= 1, "There must be at least a digital file.");
                 assertThat(previewFileCount < 2, "Not more than one preview file supported.");
-                return docVerBuilder.build();
+                return super.build();
             }
             
         }
 
-    }
-
-    /**
-     * Assert that {@code valid} else emits an {@link IllegalArgumentException} with text 
-     * {@code exception}.
-     * 
-     * @param valid the validity criteria
-     * @param exception the exception text
-     * @throws IllegalArgumentException if not {@code valid}
-     */
-    private static void assertThat(boolean valid, String exception) {
-        if (!valid) {
-            throw new IllegalArgumentException(exception);
-        }
     }
 
     @Override
@@ -581,7 +551,7 @@ public class HandoverDocumentationBuilder implements Builder<Submodel> {
         if (documentCount > 0) {
             assertThat(primaryCount > 0, "There must be at least one primary document");
         }
-        return smBuilder.build();
+        return super.build();
     }
     
 }

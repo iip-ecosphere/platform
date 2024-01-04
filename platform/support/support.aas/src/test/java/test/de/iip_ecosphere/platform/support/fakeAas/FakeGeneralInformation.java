@@ -59,6 +59,7 @@ public class FakeGeneralInformation extends FakeSubmodelElementCollection implem
             instance.manufacturerProductDesignation.add(manufacturerProductDesignation); 
             instance.manufacturerPartNumber = manufacturerPartNumber;
             instance.manufacturerOrderCode = manufacturerOrderCode;
+            setSemanticId("iri:https://admin-shell.io/ZVEI/TechnicalData/GeneralInformation/1/1");
         }
         
         @Override
@@ -69,11 +70,14 @@ public class FakeGeneralInformation extends FakeSubmodelElementCollection implem
 
         @Override
         public GeneralInformationBuilder addProductImageFile(String name, String file, String mimeType) {
+            createFileDataElementBuilder(name == null || name.length() == 0 ? "ProductImage" : name, file, mimeType)
+                .build();
             return this; // ignored for now
         }
 
         @Override
         public GeneralInformationBuilder setManufacturerLogo(String file, String mimeType) {
+            createFileDataElementBuilder("ManufacturerLogo", file, mimeType).build();
             return this; // ignored for now
         }
         
