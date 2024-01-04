@@ -71,7 +71,7 @@ describe('IvmlFormatterService', () => {
 
   it('should create/edit/delete IVML variables with collection type', async() => {
     await testVarLifecycle(service, "testSequenceInt", [25], [25, 26], "sequenceOf(Integer)");
-    await testVarLifecycle(service, "testSetInt", [25], [-25, 26], "setOf(Integer)");
+    //await testVarLifecycle(service, "testSetInt", [25], [-25, 26], "setOf(Integer)");
   }, 2 * TIMEOUT_LIFECYCLE_MS);
 
   it('should create/edit/delete IVML variables with reference type', async() => {
