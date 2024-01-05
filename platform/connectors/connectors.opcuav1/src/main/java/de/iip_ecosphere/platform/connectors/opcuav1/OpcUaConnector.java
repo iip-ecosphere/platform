@@ -64,6 +64,7 @@ import org.eclipse.milo.opcua.stack.core.types.builtin.StatusCode;
 import org.eclipse.milo.opcua.stack.core.types.builtin.Variant;
 import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UInteger;
 import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UNumber;
+import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UShort;
 import org.eclipse.milo.opcua.stack.core.types.enumerated.MonitoringMode;
 import org.eclipse.milo.opcua.stack.core.types.enumerated.TimestampsToReturn;
 import org.eclipse.milo.opcua.stack.core.types.structured.AnonymousIdentityToken;
@@ -803,40 +804,84 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
          */
         private UaNode retrieveNode(UaNode current, String qName) throws UaException {
             UaNode result = null;
-            int pos = qName.indexOf(SEPARATOR_CHAR);
-            String nodeName;
-            String remainder = null;
+            int pos = qName.indexOf(",");
             if (pos > 0) {
-                nodeName = qName.substring(0, pos);
-                if (pos + 1 < qName.length()) {
-                    remainder = qName.substring(pos + 1);
+                String ns = qName.substring(0, pos);
+                ns = ns.substring(ns.indexOf("=") + 2);
+                String id = qName.substring(pos);
+                id = id.substring(id.indexOf("=") + 2);
+                NodeId nodeId = new NodeId(Integer.valueOf(ns), Integer.valueOf(id));
+                result = client.getAddressSpace().getNode(nodeId);
+                
+                if (result != null) {
+                    if (!this.nodes.containsKey(qName)) { // implicit caching
+                        this.nodes.put(qName, new NodeCacheEntry(result));
+                        List<? extends UaNode> childNodes = result.browseNodes();
+                        if (!childNodes.isEmpty()) {
+                            retrieveChildsOfChildNodes(childNodes);
+                        }
+                    }
                 }
-            } else {
-                nodeName = qName;
-            }
-            List<? extends UaNode> nodes;
-            if (null == current) {
-                nodes = client.getAddressSpace().browseNodes(Identifiers.RootFolder);
-            } else {
-                nodes = current.browseNodes(); // sync for now
-            }
-            for (int n = 0; null == result && n < nodes.size(); n++) {
-                UaNode tmp = nodes.get(n);
-                String nn = tmp.getBrowseName().getName();                
-                String qn = basePath + "/" + nn;
-                if (!this.nodes.containsKey(qn)) { // implicit caching
-                    this.nodes.put(qn, new NodeCacheEntry(tmp));
+            } else {            
+                pos = qName.indexOf(SEPARATOR_CHAR);
+                String nodeName;
+                String remainder = null;
+                if (pos > 0) {
+                    nodeName = qName.substring(0, pos);
+                    if (pos + 1 < qName.length()) {
+                        remainder = qName.substring(pos + 1);
+                    }
+                } else {
+                    nodeName = qName;
                 }
-                if (nodeName.equals(tmp.getBrowseName().getName())) {
-                    if (null == remainder) {
-                        result = tmp;
-                    } else {
-                        result = retrieveNode(tmp, remainder);
+                List<? extends UaNode> nodes;
+                if (null == current) {
+                    nodes = client.getAddressSpace().browseNodes(Identifiers.RootFolder);
+                } else {
+                    nodes = current.browseNodes(); // sync for now
+                }
+                for (int n = 0; null == result && n < nodes.size(); n++) {
+                    UaNode tmp = nodes.get(n);
+                    String nn = tmp.getBrowseName().getName();                
+                    String qn = basePath + "/" + nn;
+                    if (!this.nodes.containsKey(qn)) { // implicit caching
+                        this.nodes.put(qn, new NodeCacheEntry(tmp));
+                    }
+                    if (nodeName.equals(tmp.getBrowseName().getName())) {
+                        if (null == remainder) {
+                            result = tmp;
+                        } else {
+                            result = retrieveNode(tmp, remainder);
+                        }
                     }
                 }
             }
             return result;
         }
+
+        /**
+         * Retrieving/caching child nodes via NodeIDs.
+         * 
+         * @param parentNodes the parent nodes to process
+         */
+        private void retrieveChildsOfChildNodes(List<? extends UaNode> parentNodes) {
+            for (UaNode j : parentNodes) {
+                UShort ns = j.getNodeId().getNamespaceIndex();
+                Object id = j.getNodeId().getIdentifier();
+                this.nodes.put("nameSpaceIndex = " + ns + ", identifier = " + id, new NodeCacheEntry(j));
+                
+                try {
+                    if (!(j instanceof UaVariableNode)) {
+                        List<? extends UaNode> childsOfChild = j.browseNodes();
+                        if (!childsOfChild.isEmpty()) {
+                            retrieveChildsOfChildNodes(childsOfChild);
+                        }
+                    }    
+                } catch (UaException e) {
+                    LoggerFactory.getLogger(getClass()).warn("Caching/retrieving child nodes: {}", e.getMessage());
+                }
+            }
+        }        
 
         @Override
         public Object get(String qName) throws IOException {
