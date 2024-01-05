@@ -159,13 +159,13 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
     
     // called via produceDataTransfer
     def produceDataTransfer(Field field, RecordType type, mapOf(String, Field) mapping, String typeQual, String mapQual, setOf(String) done, String indexes, String paths) {
-        if (not(genFrom) and optWithStepIn) {
+        if (optWithStepIn) {
             nestedStepCount = nestedStepCount + 1;
             String pathEx = substPathEx('"${field.name}"', topPath, "path");
             '\n\npr = pr.stepInto(${pathEx}, ${suffixPath(indexes, ",")});' !<CR>;
         }
         '${produceDataTransfer(type, mapping, typeQual, mapQual, done, indexes, paths)}'
-        if (not(genFrom) and optWithStepIn and nestedStepCount > 0) {
+        if (optWithStepIn and nestedStepCount > 0) {
             nestedStepCount = nestedStepCount - 1;
             'pr = pr.stepOut();\n'
         } else {
@@ -422,7 +422,7 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
 
     def generateFormatterTo(String imTypeName, String pltfTypeName) {
         if (formatter <> null) {
-            genFrom = false;
+            genFrom = true;
             clearTemporaryVariables();
             '${getFormatterConverterType(formatter)} outConverter = formatter.getConverter();
             ${genTo(imType, imTypeName, pltfType, pltfTypeName)}
