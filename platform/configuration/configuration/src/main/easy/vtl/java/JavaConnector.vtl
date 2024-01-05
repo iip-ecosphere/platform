@@ -397,7 +397,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
                ''
            } else {
                if (not(genFrom)) {
-                   wrapOptional(field, path + ".set" + asMethodNameSuffix(getFieldName(field, field.name)) + "(" + value + ")", args="access, a", optFind="access.", optReplace="a.") + "${setEnd}"; 
+                   wrapOptional(field, path + ".set" + asMethodNameSuffix(field.name) + "(" + value + ")", args="access, a", optFind="access.", optReplace="a.") + "${setEnd}"; 
                } else {
                    if (convName(field.type) <> "") { // is there a conversion?
                        wrapOptional(field, "access.set(${getFieldName(field, p)}, " + genConvertOp("outConverter", field.type, "from", value) + ")", args="access, a", optFind="access.", optReplace="a.") + "${setEnd}"; 
