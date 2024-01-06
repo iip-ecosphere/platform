@@ -12,48 +12,34 @@
 
 package de.iip_ecosphere.platform.support.aas.types.technicaldata;
 
+import static de.iip_ecosphere.platform.support.aas.IdentifierType.iri;
+import static de.iip_ecosphere.platform.support.aas.types.common.Utils.*;
+
+import java.util.stream.Collectors;
+
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
+import de.iip_ecosphere.platform.support.aas.types.common.DelegatingSubmodelElementCollection;
 
 /**
  * Defines the interface to the technical properties.
  * 
  * @author Holger Eichelberger, SSE
  */
-public interface TechnicalProperties extends SubmodelElementCollection {
-
+public class TechnicalProperties extends DelegatingSubmodelElementCollection {
+    
+    public static final String ID_SHORT = "TechnicalProperties";
+    public static final String IRI_SEMANTIC_NOT_AVAILABLE = iri("https://admin-shell.io/SemanticIdNotAvailable/1/1");
+    public static final String IRI_MAIN_SECTION = iri("https://admin-shell.io/ZVEI/TechnicalData/MainSection/1/1");
+    public static final String IRI_SUB_SECTION = iri("https://admin-shell.io/ZVEI/TechnicalData/SubSection/1/1");
+    
     /**
-     * The general information builder. There are no specific sub-builders for SmePropertyNotDescribedBySemanticId
-     * and arbitrary elements as these are just projections of the elements.
+     * Creates an instance.
      * 
-     * @author Holger Eichelberger, SSE
+     * @param sme the delegate submodel element collection
      */
-    public interface TechnicalPropertiesBuilder extends SubmodelElementCollectionBuilder {
-
-        /**
-         * Creates a main section builder.
-         * 
-         * @param name the name of the section that may be prefixed by the underlying implementation
-         * @param ordered whether the collection is ordered
-         * @param allowDuplicates whether the collection allows duplicates
-         * @return the main section builder
-         * @throws IllegalArgumentException if {@code idShort} is <b>null</b> or empty
-         */
-        public SubmodelElementCollectionBuilder createMainSectionBuilder(String name, boolean ordered, 
-            boolean allowDuplicates);
-
-        /**
-         * Creates a sub section builder.
-         * 
-         * @param name the name of the section that may be prefixed by the underlying implementation
-         * @param ordered whether the collection is ordered
-         * @param allowDuplicates whether the collection allows duplicates
-         * @return the sub section builder
-         * @throws IllegalArgumentException if {@code idShort} is <b>null</b> or empty
-         */
-        public SubmodelElementCollectionBuilder createSubSectionBuilder(String name, boolean ordered, 
-            boolean allowDuplicates);
-        
+    TechnicalProperties(SubmodelElementCollection sme) {
+        super(sme);
     }
     
     /**
@@ -61,27 +47,43 @@ public interface TechnicalProperties extends SubmodelElementCollection {
      * 
      * @return the main sections
      */
-    public Iterable<SubmodelElementCollection> mainSections();
+    public Iterable<SubmodelElementCollection> mainSections() {
+        return stream(elements(), SubmodelElementCollection.class, 
+            e -> IRI_MAIN_SECTION.equals(e.getSemanticId()))
+            .collect(Collectors.toList());
+    }
 
     /**
      * Returns the sub sections as iterable.
      * 
      * @return the sub sections
      */
-    public Iterable<SubmodelElementCollection> subSections();
+    public Iterable<SubmodelElementCollection> subSections() {
+        return stream(elements(), SubmodelElementCollection.class, 
+            e -> IRI_SUB_SECTION.equals(e.getSemanticId()))
+            .collect(Collectors.toList());
+    }
 
     /**
      * Returns the submodel elements that are not described by a semantic id of a common classification system.
      * 
      * @return the submodel elements
      */
-    public Iterable<SubmodelElement> sMENotDescribedBySemanticId();
+    public Iterable<SubmodelElement> sMENotDescribedBySemanticId() {
+        return stream(elements(), SubmodelElementCollection.class, 
+            e -> e.getSemanticId() == null)
+            .collect(Collectors.toList());
+    }
 
     /**
      * Returns the submodel elements that have arbitrary semanticId but are not defined in a classification system.
      * 
      * @return the submodel elements
      */
-    public Iterable<SubmodelElement> arbitrary();
+    public Iterable<SubmodelElement> arbitrary() {
+        return stream(elements(), SubmodelElementCollection.class, 
+            e -> !IRI_MAIN_SECTION.equals(e.getSemanticId()) && !IRI_SUB_SECTION.equals(e.getSemanticId()))
+            .collect(Collectors.toList());
+    }
     
 }

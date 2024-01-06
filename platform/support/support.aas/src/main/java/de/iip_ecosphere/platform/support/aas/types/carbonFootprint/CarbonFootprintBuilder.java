@@ -54,7 +54,7 @@ public class CarbonFootprintBuilder extends DelegatingSubmodelBuilder {
      * @return the builder
      */
     public ProductCarbonFootprintBuilder createProductCarbonFootprintBuilder() {
-        return new ProductCarbonFootprintBuilder(getDelegate(), pcfCount++);
+        return new ProductCarbonFootprintBuilder(getDelegate(), ++pcfCount);
     }
 
     /**
@@ -63,7 +63,7 @@ public class CarbonFootprintBuilder extends DelegatingSubmodelBuilder {
      * @return the builder
      */
     public TransportCarbonFootprintBuilder createTransportCarbonFootprintBuilder() {
-        return new TransportCarbonFootprintBuilder(getDelegate(), tcfCount++);
+        return new TransportCarbonFootprintBuilder(getDelegate(), ++tcfCount);
     }
     
     /**
@@ -465,7 +465,7 @@ public class CarbonFootprintBuilder extends DelegatingSubmodelBuilder {
          * @return <b>this</b>
          */
         public ProductCarbonFootprintBuilder addPCFLiveCyclePhase(PcfLiveCyclePhase phase) {
-            createPropertyBuilder(Utils.getCountingIdShort("PCFLiveCyclePhase", livecyclePhaseCounter++))
+            createPropertyBuilder(Utils.getCountingIdShort("PCFLiveCyclePhase", ++livecyclePhaseCounter))
                 .setSemanticId(irdi("0173-1#02-ABG858#001"))
                 .setValue(Type.STRING, phase.getValue())
                 .build();
@@ -479,7 +479,7 @@ public class CarbonFootprintBuilder extends DelegatingSubmodelBuilder {
          */
         public AddressBuilder createPCFGoodsAddressHandoverBuilder() {
             hasAddress = true;
-            return new AddressBuilder(this, "PCFGoodsAddressHandoverBuilder", irdi("0173-1#02-ABI497#001"));
+            return new AddressBuilder(this, "PCFGoodsAddressHandover", irdi("0173-1#02-ABI497#001"));
         }
         
         @Override

@@ -12,92 +12,78 @@
 
 package de.iip_ecosphere.platform.support.aas.types.technicaldata;
 
-import javax.xml.datatype.XMLGregorianCalendar;
-
+import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Submodel;
-import de.iip_ecosphere.platform.support.aas.types.technicaldata.FurtherInformation.FurtherInformationBuilder;
-import de.iip_ecosphere.platform.support.aas.types.technicaldata.GeneralInformation.GeneralInformationBuilder;
-import de.iip_ecosphere.platform.support.aas.types.technicaldata.ProductClassifications.ProductClassificationsBuilder;
-import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalProperties.TechnicalPropertiesBuilder;
+import de.iip_ecosphere.platform.support.aas.types.common.DelegatingSubmodel;
+import de.iip_ecosphere.platform.support.aas.types.common.Utils;
 
 /**
- * Defines the interface to the technical data submodel that can be used as-is.
+ * Support for <a href="https://industrialdigitaltwin.org/wp-content/uploads/2022/10/
+ * IDTA-02003-1-2_Submodel_TechnicalData.pdf">IDTA 02003-1-2 Generic Frame for Technical Data for
+ * Industrial Equipment in Manufacturing</a>.
  * 
  * @author Holger Eichelberger, SSE
  */
-public interface TechnicalDataSubmodel extends Submodel {
+public class TechnicalDataSubmodel extends DelegatingSubmodel {
     
+    public static final String ID_SHORT = "TechnicalData";
+
     /**
-     * The general information builder.
+     * Creates an instance.
      * 
-     * @author Holger Eichelberger, SSE
+     * @param aas the parent AAS
      */
-    public interface TechnicalDataSubmodelBuilder extends SubmodelBuilder {
-        
-        /**
-         * Creates a technical properties builder.
-         * 
-         * @return the builder
-         */
-        public TechnicalPropertiesBuilder createTechnicalPropertiesBuilder();
-
-        /**
-         * Creates a product classifications builder.
-         * 
-         * @return the builder
-         */
-        public ProductClassificationsBuilder createProductClassificationsBuilder();
-        
-        /**
-         * Creates a general information builder.
-         * 
-         * @param manufacturerName the manufacturer name
-         * @param manufacturerProductDesignation the manufacturer product designation
-         * @param manufacturerPartNumber the manufacturer part number
-         * @param manufacturerOrderCode the manufacturer order code
-         * @return the builder
-         */
-        public GeneralInformationBuilder createGeneralInformationBuilder(String manufacturerName, 
-            de.iip_ecosphere.platform.support.aas.LangString manufacturerProductDesignation, 
-            String manufacturerPartNumber, String manufacturerOrderCode);
-
-        /**
-         * Creates a further information builder.
-         * 
-         * @param validDate denotes a date on which the data specified in the submodel was valid from for the 
-         *     associated asset, may be <b>null</b> for now
-         * @return the builder
-         */
-        public FurtherInformationBuilder createFurtherInformationBuilder(XMLGregorianCalendar validDate);
-
+    public TechnicalDataSubmodel(Aas aas) {
+        super(aas.getSubmodel(ID_SHORT));
     }
-    
+
+    /**
+     * Creates an instance.
+     * 
+     * @param delegate the submodel delegate
+     */
+    public TechnicalDataSubmodel(Submodel delegate) {
+        super(delegate);
+    }
+
     /**
      * Returns the technical properties classifications.
      * 
      * @return the technical properties, may be <b>null</b> if not created by a builder before
      */
-    public TechnicalProperties getTechnicalProperties();
+    public TechnicalProperties getTechnicalProperties() {
+        return Utils.wrapSubmodelElementCollection(this, TechnicalProperties.ID_SHORT, 
+            s -> new TechnicalProperties(s));
+    }
 
     /**
      * Returns the product classifications.
      * 
      * @return the product classifications, may be <b>null</b> if not created by a builder before
      */
-    public ProductClassifications getProductClassifications();
+    public ProductClassifications getProductClassifications() {
+        return Utils.wrapSubmodelElementCollection(this, ProductClassifications.ID_SHORT, 
+            s -> new ProductClassifications(s));
+    }
     
     /**
      * Returns the general information.
      * 
      * @return the general information, may be <b>null</b> if not created by a builder before
      */
-    public GeneralInformation getGeneralInformation();
+    public GeneralInformation getGeneralInformation()  {
+        return Utils.wrapSubmodelElementCollection(this, GeneralInformation.ID_SHORT, 
+            s -> new GeneralInformation(s));
+    }
 
     /**
      * Returns the further information.
      * 
      * @return the further information, may be <b>null</b> if not created by a builder before
      */
-    public FurtherInformation getFurtherInformation();
+    public FurtherInformation getFurtherInformation() {
+        return Utils.wrapSubmodelElementCollection(this, FurtherInformation.ID_SHORT, 
+            s -> new FurtherInformation(s));
+    }
     
 }

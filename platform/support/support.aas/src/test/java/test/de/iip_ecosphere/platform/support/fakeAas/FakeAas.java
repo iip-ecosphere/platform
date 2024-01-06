@@ -25,8 +25,6 @@ import de.iip_ecosphere.platform.support.aas.DeferredBuilder;
 import de.iip_ecosphere.platform.support.aas.Reference;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
-import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodel;
-import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodel.TechnicalDataSubmodelBuilder;
 
 /**
  * Implements a fake AAS for testing.
@@ -134,11 +132,6 @@ public class FakeAas extends FakeElement implements Aas {
             getInstance().buildDeferred();
         }
 
-        @Override
-        public TechnicalDataSubmodelBuilder createTechnicalDataSubmodelBuilder(String identifier) {
-            return new FakeTechnicalDataSubmodel.FakeTechnicalDataSubmodelBuilder(this, identifier); 
-        }
-        
     }
     
     /**
@@ -248,11 +241,6 @@ public class FakeAas extends FakeElement implements Aas {
     @Override
     public AasBuilder createAasBuilder() {
         return new FakeAasBuilder(this);
-    }
-
-    @Override
-    public TechnicalDataSubmodel getTechnicalDataSubmodel() {
-        return null;
     }
 
     @Override

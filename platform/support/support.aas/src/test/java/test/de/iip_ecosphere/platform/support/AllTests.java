@@ -17,6 +17,7 @@ import test.de.iip_ecosphere.platform.support.aas.IdentifierTypeTest;
 import test.de.iip_ecosphere.platform.support.aas.LangStringTest;
 import test.de.iip_ecosphere.platform.support.aas.LocalInvocationTest;
 import test.de.iip_ecosphere.platform.support.aas.PCF;
+import test.de.iip_ecosphere.platform.support.aas.TechnicalDataSubmodelTest;
 import test.de.iip_ecosphere.platform.support.aas.TimeSeriesData;
 import test.de.iip_ecosphere.platform.support.aas.XmasAas;
 import test.de.iip_ecosphere.platform.support.fakeAas.FactoryTest;
@@ -53,6 +54,7 @@ import test.de.iip_ecosphere.platform.support.net.UriResolverTest;
     
     MetricsTests.class,
     test.de.iip_ecosphere.platform.support.identities.AllTests.class,
+    TechnicalDataSubmodelTest.class,
     
     // non-generic AAS 
     LangStringTest.class,

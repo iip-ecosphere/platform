@@ -12,37 +12,36 @@
 
 package de.iip_ecosphere.platform.support.aas.types.technicaldata;
 
-import java.util.Collection;
-import java.util.Map;
+import static de.iip_ecosphere.platform.support.aas.IdentifierType.iri;
+import static de.iip_ecosphere.platform.support.aas.types.common.Utils.*;
+
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import de.iip_ecosphere.platform.support.aas.LangString;
-import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
+import de.iip_ecosphere.platform.support.aas.MultiLanguageProperty;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
+import de.iip_ecosphere.platform.support.aas.types.common.DelegatingSubmodelElementCollection;
 
 /**
  * Defines the interface to the further information.
  * 
  * @author Holger Eichelberger, SSE
  */
-public interface FurtherInformation {
+public class FurtherInformation extends DelegatingSubmodelElementCollection {
 
+    public static final String ID_SHORT = "FurtherInformation";
+    public static final String IRI_TEXT_STATEMENT = iri("https://admin-shell.io/ZVEI/TechnicalData/TextStatement/1");
+    public static final String TEXT_STATEMENT_PREFIX = "TextStatement";
+    
     /**
-     * The further information builder.
+     * Creates an instance.
      * 
-     * @author Holger Eichelberger, SSE
+     * @param delegate the SMC delegate
      */
-    public interface FurtherInformationBuilder extends SubmodelElementCollectionBuilder {
-
-        /**
-         * Sets the text statements.
-         * 
-         * @param name the name to be used as short identifier, may be prefixed by the underlying implementation
-         * @param statement the language-annotated statement
-         * @return <b>this</b>
-         */
-        public FurtherInformationBuilder addStatement(String name, LangString statement);
-
+    FurtherInformation(SubmodelElementCollection delegate) {
+        super(delegate);
     }
     
     /**
@@ -50,16 +49,26 @@ public interface FurtherInformation {
      * 
      * @return denotes a date on which the data specified in the submodel was valid from for the 
      *     associated asset
+     * @throws ExecutionException if accessing the valid date fails
      */
-    public XMLGregorianCalendar getValidDate();
+    public XMLGregorianCalendar getValidDate() throws ExecutionException {
+        try {
+            return (XMLGregorianCalendar) getProperty("ValidDate").getValue();
+        } catch (ClassCastException e) { // preliminary
+            throw new ExecutionException(e.getMessage(), null);
+        }
+    }
     
     /**
      * Sets the valid date.
      * 
      * @param validDate denotes a date on which the data specified in the submodel was valid from for the 
      *     associated asset
+     * @throws ExecutionException if setting the data fails
      */
-    public void setValidDate(XMLGregorianCalendar validDate);
+    public void setValidDate(XMLGregorianCalendar validDate) throws ExecutionException {
+        getProperty("ValidDate").setValue(validDate);
+    }
     
     /**
      * Returns the text statements with potentially prefixed ids.
@@ -67,13 +76,25 @@ public interface FurtherInformation {
      * @return statements the statements, first level maps short_ids to (language, text), may be <b>null</b> if 
      * the original value was <b>null</b> 
      */
-    public Map<String, Collection<LangString>> getStatements();
+    public Iterable<MultiLanguageProperty> getStatements() {
+        return stream(elements(), MultiLanguageProperty.class, 
+            e -> IRI_TEXT_STATEMENT.equals(e.getSemanticId()))
+            .collect(Collectors.toList());
+    }
     
     /**
-     * Adds the given the text statements.
+     * Returns a specific statement.
      * 
-     * @param statements the statements, first level maps short_ids to (language, text) 
+     * @param nr the nr of the statement
+     * @return the statement or <b>null</b> for none
+     * @throws ExecutionException if the statement cannot be accessed
      */
-    public void setStatements(Map<String, Collection<LangString>> statements);
-
+    public MultiLanguageProperty getStatement(int nr) throws ExecutionException {
+        try {
+            return (MultiLanguageProperty) getElement(getCountingIdShort(TEXT_STATEMENT_PREFIX, nr));
+        } catch (ClassCastException e) {
+            throw new ExecutionException(e.getMessage(), null);
+        }
+    }
+    
 }

@@ -1,0 +1,121 @@
+/**
+ * ******************************************************************************
+ * Copyright (c) {2024} The original author or authors
+ *
+ * All rights reserved. This program and the accompanying materials are made 
+ * available under the terms of the Eclipse Public License 2.0 which is available 
+ * at http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
+ ********************************************************************************/
+
+package de.iip_ecosphere.platform.support.aas.types.common;
+
+import de.iip_ecosphere.platform.support.aas.AasVisitor;
+import de.iip_ecosphere.platform.support.aas.DataElement;
+import de.iip_ecosphere.platform.support.aas.Operation;
+import de.iip_ecosphere.platform.support.aas.Property;
+import de.iip_ecosphere.platform.support.aas.Reference;
+import de.iip_ecosphere.platform.support.aas.ReferenceElement;
+import de.iip_ecosphere.platform.support.aas.SubmodelElement;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
+
+/**
+ * A delegating submodel elements collection.
+ * 
+ * @author Holger Eichelberger, SSE
+ */
+public class DelegatingSubmodelElementCollection implements SubmodelElementCollection {
+    
+    private SubmodelElementCollection delegate;
+
+    /**
+     * Creates an instance based on the given delegate.
+     * 
+     * @param delegate the delegate
+     */
+    protected DelegatingSubmodelElementCollection(SubmodelElementCollection delegate) {
+        this.delegate = delegate;
+    }
+    
+    /**
+     * Returns the delegate.
+     * 
+     * @return the delegate
+     */
+    protected SubmodelElementCollection getDelegate() {
+        return delegate;
+    }
+    
+    @Override
+    public String getIdShort() {
+        return delegate.getIdShort();
+    }
+
+    @Override
+    public void accept(AasVisitor visitor) {
+        delegate.accept(visitor);
+    }
+
+    @Override
+    public void update() {
+        delegate.update();
+    }
+
+    @Override
+    public String getSemanticId(boolean stripPrefix) {
+        return delegate.getSemanticId(stripPrefix);
+    }
+
+    @Override
+    public SubmodelElementCollection getSubmodelElementCollection(String idShort) {
+        return delegate.getSubmodelElementCollection(idShort);
+    }
+
+    @Override
+    public DataElement getDataElement(String idShort) {
+        return delegate.getDataElement(idShort);
+    }
+
+    @Override
+    public Property getProperty(String idShort) {
+        return delegate.getProperty(idShort);
+    }
+
+    @Override
+    public Operation getOperation(String idShort) {
+        return delegate.getOperation(idShort);
+    }
+
+    @Override
+    public ReferenceElement getReferenceElement(String idShort) {
+        return delegate.getReferenceElement(idShort);
+    }
+
+    @Override
+    public void deleteElement(String idShort) {
+        delegate.deleteElement(idShort);
+    }
+
+    @Override
+    public Iterable<SubmodelElement> elements() {
+        return delegate.elements();
+    }
+
+    @Override
+    public int getElementsCount() {
+        return delegate.getElementsCount();
+    }
+
+    @Override
+    public SubmodelElement getElement(String idShort) {
+        return delegate.getElement(idShort);
+    }
+
+    @Override
+    public Reference createReference() {
+        return delegate.createReference();
+    }
+
+}

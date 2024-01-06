@@ -12,38 +12,49 @@
 
 package de.iip_ecosphere.platform.support.aas.types.technicaldata;
 
+import static de.iip_ecosphere.platform.support.aas.types.common.Utils.*;
+
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
-import de.iip_ecosphere.platform.support.aas.types.technicaldata.ProductClassificationItem.ProductClassificationItemBuilder;
+import de.iip_ecosphere.platform.support.aas.types.common.DelegatingSubmodelElementCollection;
 
 /**
  * Defines the interface to the product classifications.
  * 
  * @author Holger Eichelberger, SSE
  */
-public interface ProductClassifications extends SubmodelElementCollection {
+public class ProductClassifications extends DelegatingSubmodelElementCollection {
+
+    public static final String ID_SHORT = "ProductClassifications";
 
     /**
-     * The general information builder.
+     * Creates an instance.
      * 
-     * @author Holger Eichelberger, SSE
+     * @param delegate the underlying delegate
      */
-    public interface ProductClassificationsBuilder extends SubmodelElementCollectionBuilder {
+    ProductClassifications(SubmodelElementCollection delegate) {
+        super(delegate);
+    }
 
-        /**
-         * Creates a product classification item builder. 
-         * 
-         * @param idShort the short id of this item
-         * @param productClassificationSystem the common name of the product classification system, e.g., 
-         *   "ECLASS" or "IEC CDD".
-         * @param productClassId the class of the associated product or industrial equipment in the classification 
-         *   system according to the notation of the system. Ideally, the Property/valueId is used to reference the 
-         *   IRI/ IRDI of the product class.
-         * @return the builder
-         * @throws IllegalArgumentException may be thrown if {@code idShort} is not given
-         */
-        public ProductClassificationItemBuilder createProductClassificationItemBuilder(String idShort, 
-            String productClassificationSystem, String productClassId);
+    /**
+     * Returns the items as SME.
+     * 
+     * @return the items
+     */
+    private Stream<SubmodelElementCollection> itemsSME() {
+        return stream(elements(), SubmodelElementCollection.class, 
+            e -> ProductClassificationItem.SEMANTIC_ID.equals(e.getSemanticId()));
+    }
 
+    /**
+     * Returns the items as {@link ProductClassificationItem}.
+     * 
+     * @return the items
+     */
+    private Stream<ProductClassificationItem> items() {
+        return itemsSME().map(e -> new ProductClassificationItem(e));
     }
 
     /**
@@ -51,21 +62,28 @@ public interface ProductClassifications extends SubmodelElementCollection {
      * 
      * @return the number of product classification items
      */
-    public int getProductClassificationItemsCount();
+    public int getProductClassificationItemsCount() {
+        return (int) itemsSME().count();
+    }
 
     /**
      * Returns a product classification item based on its short id.
      * 
-     * @param shortId the short id
-     * @return the product classification item
+     * @param nr the product classification number
+     * @return the product classification item, may be <b>null</b> if the item does not exist
      */
-    public ProductClassificationItem getProductClassificationItem(String shortId);
+    public ProductClassificationItem getProductClassificationItem(int nr) {
+        return wrapSubmodelElementCollection(this, getCountingIdShort("ProductClassificationItem", nr), 
+            s -> new ProductClassificationItem(s));
+    }
 
     /**
      * Returns the product classification items.
      * 
      * @return the product classification items
      */
-    public Iterable<ProductClassificationItem> productClassificationItems();
+    public Iterable<ProductClassificationItem> productClassificationItems() {
+        return items().collect(Collectors.toList());
+    }
     
 }

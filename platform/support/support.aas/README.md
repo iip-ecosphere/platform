@@ -1,13 +1,10 @@
-# Basic support and AAS abstraction Component in the Support Layer of the IIP-Ecosphere platform
+# Basic support and AAS abstraction Component in the Support Layer of the oktoflow platform
 
 ## Asset Administration Shell (AAS)
 
-Asset Administration Shell (AAS) abstraction to ease use of AAS in IIP-Ecosphere and to make the integration
-of AAS implementations more flexible/stable. For now, we not aim to be complete here rather than useful for the the 
-project at the actual point in time. Also provides explicit support for distributed/deferred building of AAS parts.
+Asset Administration Shell (AAS) abstraction to ease use of AAS in oktoflow and to make the integration of AAS implementations more flexible/stable. For now, we not aim to be complete here rather than useful for the the project at the actual point in time. Also provides explicit support for distributed/deferred building of AAS parts.
 
-For now, this component also contains the most basic utility classes of the 
-IIP-Ecosphere platform. Might be that we factor them out in a future version, but so far it is just a single class
+For now, this component also contains the most basic utility classes of the oktoflow platform. Might be that we factor them out in a future version, but so far it is just a single class
 and its test.
 
 We apply the following principles (with links also in the package description of ``de.iip_ecosphere.platform.support.aas``:
@@ -57,10 +54,9 @@ The structure of an identity YAML file (must be resolvable as `identityStore.yml
 The identity mechanism currently supports 4 different token types, namely USERNAME (and password), ISSUED, X509 and ANONYMOUS. The required entries are illustrated above, while the first entries below `identities` denote the respective identity keys and must be unique within this file. The `tokenEncryptionAlgorithm` for discouraged USERNAME tokens is usually `UTF-8`. The identity keys can be used in respective configuration elements of the configuration model while in background the identity mechanism is queried for the token. One specific case is the last entry, a USERNAME token with attached `file` (may be a file or an URI) representing a keystore to be opened with `tokenData` as password. The `name` of an identity store is optional, but recommended to better identify, whether the intended store has been loaded.
  
 **Missing**
-- AAS concepts (AAS, sub-model, sub-model elements, properties [with semantic ids] and operations do exist; others will be added incrementally on demand)
+- specific AAS concepts
 - Authentication/RBAC
 - AAS Events (currently occurring in BaSyx)
 
 **Open questions**
 - How to resolve references to their target?
-

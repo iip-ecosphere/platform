@@ -31,9 +31,9 @@ import de.iip_ecosphere.platform.support.aas.types.common.Utils;
 import de.iip_ecosphere.platform.support.aas.types.hierarchicalStructure.HierarchicalStructureBuilder;
 import de.iip_ecosphere.platform.support.aas.types.hierarchicalStructure.HierarchicalStructureBuilder.ArcheType;
 import de.iip_ecosphere.platform.support.aas.types.hierarchicalStructure.HierarchicalStructureBuilder.EntryNodeBuilder;
-import de.iip_ecosphere.platform.support.aas.types.technicaldata.ProductClassifications.ProductClassificationsBuilder;
-import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodel.TechnicalDataSubmodelBuilder;
-import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalProperties.TechnicalPropertiesBuilder;
+import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodelBuilder;
+import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodelBuilder.ProductClassificationsBuilder;
+import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodelBuilder.TechnicalPropertiesBuilder;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 
 /**
@@ -152,18 +152,19 @@ public class PCF extends AbstractAasExample {
      * @param aasBuilder the AAS builder
      */
     private void createTechnicalDataSubmodel(AasBuilder aasBuilder) {
-        TechnicalDataSubmodelBuilder tdBuilder = aasBuilder.createTechnicalDataSubmodelBuilder("urn:::SM:::TD#");
+        TechnicalDataSubmodelBuilder tdBuilder = new TechnicalDataSubmodelBuilder(aasBuilder, "urn:::SM:::TD#", 
+            isCreateMultiLanguageProperties());
         
         tdBuilder.createFurtherInformationBuilder(Utils.parse("2024-01-04T10:00:00.000+00:00"))
             .build();
 
         tdBuilder.createGeneralInformationBuilder("Mittelstand-Digital Zentrum Hannover", 
-            new LangString("de", "Kugelschreiber"), "K01", "K01")
+            "K01", "K01", new LangString("de", "Kugelschreiber"))
             .build();
 
         ProductClassificationsBuilder pcBuilder = tdBuilder.createProductClassificationsBuilder();
         pcBuilder
-            .createProductClassificationItemBuilder("ProductClassification", "ECLASS", "24-24-05-01")
+            .createProductClassificationItemBuilder("ECLASS", "24-24-05-01")
             .setClassificationSystemVersion("12.0 (BASIC)")
             .build();
         pcBuilder.build();

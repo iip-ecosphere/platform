@@ -25,10 +25,18 @@ AAS Santa_s_Sleigh
    ENTITY node_Sleigh (semanticId: iri:https://admin-shell.io/idta/HierarchicalStructures/Node/1/0)
    ENTITY node_Vixen (semanticId: iri:https://admin-shell.io/idta/HierarchicalStructures/Node/1/0)
    ENTITY node_santa (semanticId: iri:https://admin-shell.io/idta/HierarchicalStructures/Node/1/0)
- SUBMODEL TechnicalData (semanticId: iri:http://admin-shell.io/ZVEI/TechnicalData/Submodel/1/1)
+ SUBMODEL TechnicalData (semanticId: iri:https://admin-shell.io/ZVEI/TechnicalData/Submodel/1/2)
   SMC FurtherInformation (semanticId: iri:https://admin-shell.io/ZVEI/TechnicalData/FurtherInformation/1/1)
    PROPERTY ValidDate = 2023-12-24T23:59:59.000Z (semanticId: iri:https://admin-shell.io/ZVEI/TechnicalData/ValidDate/1/1)
   SMC GeneralInformation (semanticId: iri:https://admin-shell.io/ZVEI/TechnicalData/GeneralInformation/1/1)
-   FILE ProductImage length 43
-  SMC ProductClassifications
-  SMC TechnicalProperties
+   PROPERTY ManufacturerArticleNumber = MSS-001 (semanticId: irdi:0173-1#02-AAO676#003)
+   PROPERTY ManufacturerName = Christmas (semanticId: irdi:0173-1#02-AAO677#002)
+   PROPERTY ManufacturerOrderCode = MSS-2023 (semanticId: irdi:0173-1#02-AAO227#002)
+   MLP ManufacturerProductDesignation (semanticId: irdi:0173-1#02-AAW338#001)
+   FILE ProductImage01 (semanticId: iri:https://admin-shell.io/ZVEI/TechnicalData/ProductImage/1/1) length 43
+  SMC ProductClassifications (semanticId: iri:https://admin-shell.io/ZVEI/TechnicalData/ProductClassifications/1/1)
+   SMC ProductClassificationItem01 (semanticId: iri:https://admin-shell.io/ZVEI/TechnicalData/ProductClassificationItem/1/1)
+    PROPERTY ClassificationSystemVersion = 13 (semanticId: iri:https://admin-shell.io/ZVEI/TechnicalData/ClassificationSystemVersion/1/1)
+    PROPERTY ProductClassId = 0173-1#01-AIZ481#021 (semanticId: iri:https://admin-shell.io/ZVEI/TechnicalData/ProductClassId/1/1)
+    PROPERTY ProductClassificationSystem = ECLASS (semanticId: iri:https://admin-shell.io/ZVEI/TechnicalData/ProductClassificationSystem/1/1)
+  SMC TechnicalProperties (semanticId: iri:https://admin-shell.io/ZVEI/TechnicalData/TechnicalProperties/1/1)

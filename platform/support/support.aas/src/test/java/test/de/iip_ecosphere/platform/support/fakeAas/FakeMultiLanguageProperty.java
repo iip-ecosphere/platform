@@ -28,8 +28,7 @@ import de.iip_ecosphere.platform.support.aas.MultiLanguageProperty;
 public class FakeMultiLanguageProperty extends FakeElement implements MultiLanguageProperty {
 
     private String semanticId;
-    private Map<String, LangString> value = new HashMap<>();
-    private Map<String, LangString> description;
+    private Map<String, LangString> description = new HashMap<>();;
     
     /**
      * A fake property builder.
@@ -78,7 +77,7 @@ public class FakeMultiLanguageProperty extends FakeElement implements MultiLangu
 
         @Override
         public MultiLanguagePropertyBuilder addText(LangString text) {
-            instance.value.put(text.getLanguage(), text);
+            instance.description.put(text.getLanguage(), text);
             return this;
         }
         

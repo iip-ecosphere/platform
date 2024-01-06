@@ -33,11 +33,11 @@ import de.iip_ecosphere.platform.support.aas.types.documentation.HandoverDocumen
 import de.iip_ecosphere.platform.support.aas.types.hierarchicalStructure.HierarchicalStructureBuilder;
 import de.iip_ecosphere.platform.support.aas.types.hierarchicalStructure.HierarchicalStructureBuilder.ArcheType;
 import de.iip_ecosphere.platform.support.aas.types.hierarchicalStructure.HierarchicalStructureBuilder.EntryNodeBuilder;
-import de.iip_ecosphere.platform.support.aas.types.technicaldata.FurtherInformation.FurtherInformationBuilder;
-import de.iip_ecosphere.platform.support.aas.types.technicaldata.GeneralInformation.GeneralInformationBuilder;
-import de.iip_ecosphere.platform.support.aas.types.technicaldata.ProductClassificationItem.ProductClassificationItemBuilder;
-import de.iip_ecosphere.platform.support.aas.types.technicaldata.ProductClassifications.ProductClassificationsBuilder;
-import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodel.TechnicalDataSubmodelBuilder;
+import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodelBuilder;
+import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodelBuilder.FurtherInformationBuilder;
+import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodelBuilder.GeneralInformationBuilder;
+import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodelBuilder.ProductClassificationItemBuilder;
+import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodelBuilder.ProductClassificationsBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
 
 import static de.iip_ecosphere.platform.support.aas.IdentifierType.*;
@@ -244,15 +244,16 @@ public class XmasAas extends AbstractAasExample {
     private void createTechnicalDataSubmodel(AasBuilder aasBuilder, String manufacturerName, 
         LangString productDesignation, String partNumber, String orderCode, String productResourceName, 
         String productClassId) {
-        TechnicalDataSubmodelBuilder tdBuilder = aasBuilder.createTechnicalDataSubmodelBuilder(
-             iri("TechData_" + productDesignation + "_" + partNumber + "_" + orderCode));
+        TechnicalDataSubmodelBuilder tdBuilder = new TechnicalDataSubmodelBuilder(aasBuilder,
+             iri("TechData_" + productDesignation + "_" + partNumber + "_" + orderCode), 
+             isCreateMultiLanguageProperties());
         GeneralInformationBuilder giBuilder = tdBuilder.createGeneralInformationBuilder(manufacturerName, 
-            productDesignation, partNumber, orderCode);
+            partNumber, orderCode, productDesignation);
         if (productResourceName != null && productResourceName.length() > 0) {
             try {
                 registerResource(new FileResource(getFileResource(productResourceName), 
                     "/aasx/TechnicalDataSubmodel/" + productResourceName));
-                giBuilder.addProductImageFile("", "/aasx/TechnicalDataSubmodel/" + productResourceName, 
+                giBuilder.addProductImageFile("/aasx/TechnicalDataSubmodel/" + productResourceName, 
                     toMimeType(productResourceName)); // no idShort needed, -> postfix off ProductImage
             } catch (IOException e) {
                 System.err.println("Cannot create file resource, ignoring: " + e.getMessage());
@@ -265,7 +266,7 @@ public class XmasAas extends AbstractAasExample {
         tdBuilder.createTechnicalPropertiesBuilder().build();
         ProductClassificationsBuilder pcBuilder = tdBuilder.createProductClassificationsBuilder();
         ProductClassificationItemBuilder pcIBuilder = pcBuilder
-            .createProductClassificationItemBuilder("ProductClassification", "ECLASS", productClassId)
+            .createProductClassificationItemBuilder("ECLASS", productClassId)
             .setClassificationSystemVersion("13");
         pcIBuilder.build();
         pcBuilder.build();

@@ -40,8 +40,8 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelE
 public class HandoverDocumentationBuilder extends DelegatingSubmodelBuilder {
 
     private boolean createMultiLanguageProperties;
-    private int documentCount = 0;
-    private int primaryCount = 0;
+    private int documentCount;
+    private int primaryCount;
 
     /**
      * Denotes the permissible document status.
@@ -108,7 +108,7 @@ public class HandoverDocumentationBuilder extends DelegatingSubmodelBuilder {
      * @return the document builder
      */
     public DocumentBuilder createDocumentBuilder() {
-        return new DocumentBuilder(getDelegate(), documentCount++);
+        return new DocumentBuilder(getDelegate(), ++documentCount);
     }
 
     // based on Figure 3 (not fully compliant) of IDTA 02004-1-2 
@@ -120,9 +120,9 @@ public class HandoverDocumentationBuilder extends DelegatingSubmodelBuilder {
      */
     public class DocumentBuilder extends DelegatingSubmodelElementCollectionBuilder {
         
-        private int documentIdCount = 0;
-        private int documentClassificationCount = 0;
-        private int documentVersionCount = 0;
+        private int documentIdCount;
+        private int documentClassificationCount;
+        private int documentVersionCount;
         
         /**
          * Creates a document builder.
@@ -142,7 +142,7 @@ public class HandoverDocumentationBuilder extends DelegatingSubmodelBuilder {
          * @return the builder, {@link Builder#build()} must be called
          */
         public DocumentIdBuilder createDocumentIdBuilder() {
-            return new DocumentIdBuilder(getDelegate(), documentIdCount++);
+            return new DocumentIdBuilder(getDelegate(), ++documentIdCount);
         }
 
         /**
@@ -151,7 +151,7 @@ public class HandoverDocumentationBuilder extends DelegatingSubmodelBuilder {
          * @return the builder, {@link Builder#build()} must be called
          */
         public DocumentClassificationBuilder createDocumentClassificationBuilder() {
-            return new DocumentClassificationBuilder(getDelegate(), documentClassificationCount++);
+            return new DocumentClassificationBuilder(getDelegate(), ++documentClassificationCount);
         }
 
         /**
@@ -160,7 +160,7 @@ public class HandoverDocumentationBuilder extends DelegatingSubmodelBuilder {
          * @return the builder, {@link Builder#build()} must be called
          */
         public DocumentVersionBuilder createDocumentVersionBuilder() {
-            return new DocumentVersionBuilder(getDelegate(), documentVersionCount++);
+            return new DocumentVersionBuilder(getDelegate(), ++documentVersionCount);
         }
 
         @Override
@@ -302,9 +302,9 @@ public class HandoverDocumentationBuilder extends DelegatingSubmodelBuilder {
          */
         public class DocumentVersionBuilder extends DelegatingSubmodelElementCollectionBuilder {
 
-            private int languageCount = 0;
-            private int digitalFileCount = 0;
-            private int previewFileCount = 0;
+            private int languageCount;
+            private int digitalFileCount;
+            private int previewFileCount;
             private boolean documentVersionPresent = false;
             private boolean titelPresent = false;
             private boolean summaryPresent = false;
@@ -312,9 +312,9 @@ public class HandoverDocumentationBuilder extends DelegatingSubmodelBuilder {
             private boolean statusPresent = false;
             private boolean organizationNamePresent = false;
             private boolean organizationOfficialNamePresent = false;
-            private int refersToCount = 0;
-            private int basedOnCount = 0;
-            private int translationOfCount = 0;
+            private int refersToCount;
+            private int basedOnCount;
+            private int translationOfCount;
 
             /**
              * Creates the builder.
@@ -335,8 +335,7 @@ public class HandoverDocumentationBuilder extends DelegatingSubmodelBuilder {
              * @return <b>this</b>
              */
             public DocumentVersionBuilder setLanguage(String language) {
-                languageCount++;
-                createPropertyBuilder(getCountingIdShort("Language", languageCount))
+                createPropertyBuilder(getCountingIdShort("Language", ++languageCount))
                     .setSemanticId(irdi("0173-1#02-AAN468#006"))
                     .setValue(Type.STRING, language)
                     .build();
@@ -449,8 +448,7 @@ public class HandoverDocumentationBuilder extends DelegatingSubmodelBuilder {
              */
             public DocumentVersionBuilder addDigitalFile(FileResource file, String mimeType) {
                 if (null != file) {
-                    digitalFileCount++;
-                    createFileDataElementBuilder(getCountingIdShort("DigitalFile", digitalFileCount), 
+                    createFileDataElementBuilder(getCountingIdShort("DigitalFile", ++digitalFileCount), 
                         file.getPath(), mimeType)
                         .setSemanticId(irdi("0173-1#02-ABI504#001/0173-1#01-AHF583#001"))
                         .build();
@@ -467,8 +465,7 @@ public class HandoverDocumentationBuilder extends DelegatingSubmodelBuilder {
              */
             public DocumentVersionBuilder setPreviewFile(FileResource file, String mimeType) {
                 if (null != file) {
-                    previewFileCount++;
-                    createFileDataElementBuilder(getCountingIdShort("PreviewFile", previewFileCount), 
+                    createFileDataElementBuilder(getCountingIdShort("PreviewFile", ++previewFileCount), 
                         file.getPath(), mimeType)
                         .setSemanticId(irdi("0173-1#02-ABI505#001/0173-1#01-AHF584#001"))
                         .build();
@@ -483,7 +480,7 @@ public class HandoverDocumentationBuilder extends DelegatingSubmodelBuilder {
              * @return <b>this</b>
              */
             public DocumentVersionBuilder addRefersTo(Reference... references) {
-                addReferences("RefersTo", () -> refersToCount++, irdi("0173-1#02-ABI006#001"), references);
+                addReferences("RefersTo", () -> ++refersToCount, irdi("0173-1#02-ABI006#001"), references);
                 return this;
             }
 
@@ -494,7 +491,7 @@ public class HandoverDocumentationBuilder extends DelegatingSubmodelBuilder {
              * @return <b>this</b>
              */
             public DocumentVersionBuilder addBasedOn(Reference... references) {
-                addReferences("BasedOn", () -> basedOnCount++, irdi("0173-1#02-ABI007#001"), references);
+                addReferences("BasedOn", () -> ++basedOnCount, irdi("0173-1#02-ABI007#001"), references);
                 return this;
             }
 
@@ -505,7 +502,7 @@ public class HandoverDocumentationBuilder extends DelegatingSubmodelBuilder {
              * @return <b>this</b>
              */
             public DocumentVersionBuilder addTranslationOf(Reference... references) {
-                addReferences("TranslationOf", () -> translationOfCount++, irdi("0173-1#02-ABI008#001"), references);
+                addReferences("TranslationOf", () -> ++translationOfCount, irdi("0173-1#02-ABI008#001"), references);
                 return this;
             }
 

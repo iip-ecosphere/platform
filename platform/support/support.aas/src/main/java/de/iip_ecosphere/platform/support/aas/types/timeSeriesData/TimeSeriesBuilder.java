@@ -177,7 +177,7 @@ public class TimeSeriesBuilder extends DelegatingSubmodelBuilder {
      */
     public static class RecordBuilder extends DelegatingSubmodelElementCollectionBuilder {
         
-        private int timeCount = 0;
+        private int timeCount;
         
         /**
          * Creates a metadata builder.
@@ -247,7 +247,7 @@ public class TimeSeriesBuilder extends DelegatingSubmodelBuilder {
          * @see #addTime(String, Type, Object)
          */
         private RecordBuilder addTime(String semanticId, Type type, Object value) {
-            createPropertyBuilder(Utils.getCountingIdShort("Time", timeCount++))
+            createPropertyBuilder(Utils.getCountingIdShort("Time", ++timeCount))
                 .setSemanticId(semanticId)
                 .setValue(type, value)
                 .build();
@@ -285,7 +285,7 @@ public class TimeSeriesBuilder extends DelegatingSubmodelBuilder {
          * @return the builder
          */
         public ExternalSegmentBuilder createExternalSegmentBuilder() {
-            return new ExternalSegmentBuilder(getDelegate(), externalSegmentsCount++);
+            return new ExternalSegmentBuilder(getDelegate(), ++externalSegmentsCount);
         }
 
         /**
@@ -294,7 +294,7 @@ public class TimeSeriesBuilder extends DelegatingSubmodelBuilder {
          * @return the builder
          */
         public LinkedSegmentBuilder createLinkedSegmentBuilder() {
-            return new LinkedSegmentBuilder(getDelegate(), linkedSegmentsCount++);
+            return new LinkedSegmentBuilder(getDelegate(), ++linkedSegmentsCount);
         }
 
         /**
@@ -303,7 +303,7 @@ public class TimeSeriesBuilder extends DelegatingSubmodelBuilder {
          * @return the builder
          */
         public InternalSegmentBuilder createInternalSegmentBuilder() {
-            return new InternalSegmentBuilder(getDelegate(), internalSegmentsCount++);
+            return new InternalSegmentBuilder(getDelegate(), ++internalSegmentsCount);
         }
 
     }
