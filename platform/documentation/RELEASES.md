@@ -14,7 +14,6 @@ New features:
 * [#152](https://github.com/iip-ecosphere/platform/issues/152): EMO'23 example added to repository
 * AAS abstraction/integration: referenceElement, multiLanguageProperties, entity, more semanticIds, [IDTA 02004-1-2 Handover Documentation](https://industrialdigitaltwin.org/wp-content/uploads/2023/03/IDTA-02004-1-2_Submodel_Handover-Documentation.pdf), [IDTA 02011-1-0 Hierarchical Structures enabling Bills of Material](https://industrialdigitaltwin.org/wp-content/uploads/2023/04/IDTA-02011-1-0_Submodel_HierarchicalStructuresEnablingBoM.pdf),  [IDTA 2023-01-24 Draft Submodel PCF](https://github.com/admin-shell-io/submodel-templates/tree/main/development/Carbon%20Footprint/1/0), [IDTA 02008-1-1 Time Series Data](https://industrialdigitaltwin.org/en/wp-content/uploads/sites/2/2023/03/IDTA-02008-1-1_Submodel_TimeSeriesData.pdf) and related examples including the XMAS AAS
 
-
 Improvements:
 * [#156](https://github.com/iip-ecosphere/platform/issues/156): UI regression tests including in-test execution of platform, (un)deployment of app
 * [#151](https://github.com/iip-ecosphere/platform/issues/151): UI CORS
@@ -29,6 +28,7 @@ Improvements:
 * Platform runtime properties in pidDir/oktoflow.yaml.
 * Partial setup override in oktoflow-local.yml.
 * Platform CLI file/URI support and artifactsPrefixURI substitution
+* Replacement of BaSyx based mapping of IDTA generic frame for technical data to abstract implementation based on AAS abstraction realizing [IDTA 02003-1-2 Generic Frame for Technical Data for Industrial Equipment in Manufacturing](https://industrialdigitaltwin.org/wp-content/uploads/2022/10/IDTA-02003-1-2_Submodel_TechnicalData.pdf) (**interface change**)
 
 ### Version 0.6.0 (2023/10/11, EMO'23):
 
