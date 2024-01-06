@@ -31,10 +31,10 @@ import de.iip_ecosphere.platform.support.aas.LangString;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.DeploymentRecipe.ImmediateDeploymentRecipe;
 import de.iip_ecosphere.platform.support.aas.Type;
+import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodelBuilder;
+import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodelBuilder.FurtherInformationBuilder;
+import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodelBuilder.GeneralInformationBuilder;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
-import de.iip_ecosphere.platform.support.aas.types.technicaldata.FurtherInformation.FurtherInformationBuilder;
-import de.iip_ecosphere.platform.support.aas.types.technicaldata.GeneralInformation.GeneralInformationBuilder;
-import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodel.TechnicalDataSubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.AasUtils;
 
 /**
@@ -63,12 +63,12 @@ public class CarAas {
         
         // standard stuff
         
-        TechnicalDataSubmodelBuilder tdBuilder = aasB.createTechnicalDataSubmodelBuilder(null);
+        TechnicalDataSubmodelBuilder tdBuilder = new TechnicalDataSubmodelBuilder(aasB, null, true);
         GeneralInformationBuilder giBuilder = tdBuilder.createGeneralInformationBuilder(
-            "Mittelstandszentrum Digital Hannover", 
-            LangString.create("HM'22 Demonstration car"), "", "");
+            "Mittelstandszentrum Digital Hannover", "", "", 
+            LangString.create("HM'22 Demonstration car"));
         AasUtils.resolveImage(car.getProductImage(), AasUtils.CLASSPATH_RESOURCE_RESOLVER, false, 
-            (n, r, m) -> giBuilder.addProductImageFile(n, r, m));
+            (n, r, m) -> giBuilder.addProductImageFile(r, m));
         AasUtils.resolveImage(car.getManufacturerLogo(), AasUtils.CLASSPATH_RESOURCE_RESOLVER, true, 
             (n, r, m) -> giBuilder.setManufacturerLogo(r, m));
         giBuilder.build();
