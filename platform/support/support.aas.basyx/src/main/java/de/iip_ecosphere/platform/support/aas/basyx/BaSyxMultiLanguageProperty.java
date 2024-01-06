@@ -110,7 +110,7 @@ public class BaSyxMultiLanguageProperty extends BaSyxSubmodelElement implements 
 
     @Override
     public Map<String, LangString> getDescription() {
-        return Tools.translate(property.getDescription());
+        return Tools.translate(property.getValue());
     }
 
 }

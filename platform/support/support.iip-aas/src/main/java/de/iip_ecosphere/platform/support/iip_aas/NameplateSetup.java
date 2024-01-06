@@ -42,12 +42,12 @@ import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.Type;
+import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodelBuilder;
+import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodelBuilder.FurtherInformationBuilder;
+import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodelBuilder.GeneralInformationBuilder;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
-import de.iip_ecosphere.platform.support.aas.types.technicaldata.FurtherInformation.FurtherInformationBuilder;
-import de.iip_ecosphere.platform.support.aas.types.technicaldata.GeneralInformation.GeneralInformationBuilder;
-import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodel.TechnicalDataSubmodelBuilder;
 import de.iip_ecosphere.platform.support.iip_aas.ApplicationSetup.Address;
 import de.iip_ecosphere.platform.support.setup.AbstractSetup;
 
@@ -377,13 +377,14 @@ public class NameplateSetup {
             // not there, ok
             try {
                 AasBuilder aasBuilder = factory.createAasBuilder(id, urn);
-                TechnicalDataSubmodelBuilder tdBuilder = aasBuilder.createTechnicalDataSubmodelBuilder(null);
+                TechnicalDataSubmodelBuilder tdBuilder = new TechnicalDataSubmodelBuilder(aasBuilder, null, true);
                 GeneralInformationBuilder giBuilder = tdBuilder.createGeneralInformationBuilder(
+                    "", "",
                     LangString.create(getManufacturerName()).getDescription(), 
-                    LangString.create(getManufacturerProductDesignation()), "", "");
+                    LangString.create(getManufacturerProductDesignation()));
                 PlatformAas.createAddress(giBuilder, getAddress()); // inofficial, not in Generic Frame
                 AasUtils.resolveImage(getProductImage(), AasUtils.CLASSPATH_RESOURCE_RESOLVER, false, 
-                    (n, r, m) -> giBuilder.addProductImageFile(n, r, m));
+                    (n, r, m) -> giBuilder.addProductImageFile(r, m));
                 AasUtils.resolveImage(getManufacturerLogo(), AasUtils.CLASSPATH_RESOURCE_RESOLVER, true, 
                     (n, r, m) -> giBuilder.setManufacturerLogo(r, m));
                 giBuilder.build();

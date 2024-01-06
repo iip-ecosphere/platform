@@ -13,6 +13,8 @@ package test.de.iip_ecosphere.platform.support.aas.basyx;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
+import test.de.iip_ecosphere.platform.support.aas.TechnicalDataSubmodelTest;
+
 /**
  * Defines the tests to be executed.
  * 
@@ -25,7 +27,7 @@ import org.junit.runners.Suite;
     BaSyxPersistenceTest.class,
     BaSyxDeploymentTest.class,
     BaSyxCodecTest.class,
-    BaSyxTechnicalDataSubmodelTest.class,
+    TechnicalDataSubmodelTest.class,
     
     BaSyxXmasAas.class,
     BaSyxTimeSeriesData.class,
