@@ -103,7 +103,7 @@ public class TimeSeriesBuilder extends DelegatingSubmodelBuilder {
          */
         public MetadataBuilder setName(LangString... name) {
             hasName = true;
-            createMultiLanguageProperty(getParentBuilder(), createMultiLanguageProperties, "Name", 
+            createMultiLanguageProperty(getDelegate(), createMultiLanguageProperties, "Name", 
                 iri("https://admin-shell.io/idta/TimeSeries/Metadata/Name/1/1"), name);
             return this;
         }
@@ -115,7 +115,7 @@ public class TimeSeriesBuilder extends DelegatingSubmodelBuilder {
          * @return <b>this</b>
          */
         public MetadataBuilder setDescription(LangString... description) {
-            createMultiLanguageProperty(getParentBuilder(), createMultiLanguageProperties, "Description", 
+            createMultiLanguageProperty(getDelegate(), createMultiLanguageProperties, "Description", 
                 iri("https://admin-shell.io/idta/TimeSeries/Metadata/Description/1/1"), description);
             return this;
         }
@@ -483,7 +483,7 @@ public class TimeSeriesBuilder extends DelegatingSubmodelBuilder {
          * @return <b>this</b>
          */
         public T setName(LangString... name) {
-            createMultiLanguageProperty(getParentBuilder(), createMultiLanguageProperties, "Name", 
+            createMultiLanguageProperty(getDelegate(), createMultiLanguageProperties, "Name", 
                 iri("https://admin-shell.io/idta/TimeSeries/Segment/Name/1/1"), name);
             return self;
         }
@@ -495,7 +495,7 @@ public class TimeSeriesBuilder extends DelegatingSubmodelBuilder {
          * @return <b>this</b>
          */
         public T setDescription(LangString... description) {
-            createMultiLanguageProperty(getParentBuilder(), createMultiLanguageProperties, "Description", 
+            createMultiLanguageProperty(getDelegate(), createMultiLanguageProperties, "Description", 
                 iri("https://admin-shell.io/idta/TimeSeries/Segment/Description/1/1"), description);
             return self;
         }

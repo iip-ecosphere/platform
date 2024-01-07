@@ -34,6 +34,8 @@ import de.iip_ecosphere.platform.support.aas.types.hierarchicalStructure.Hierarc
 import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodelBuilder.ProductClassificationsBuilder;
 import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodelBuilder.TechnicalPropertiesBuilder;
+import de.iip_ecosphere.platform.support.aas.types.timeSeriesData.TimeSeriesBuilder;
+import de.iip_ecosphere.platform.support.aas.types.timeSeriesData.TimeSeriesBuilder.SegmentsBuilder;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 
 /**
@@ -244,6 +246,35 @@ public class PCF extends AbstractAasExample {
             .build();
         // intentionally no further submodels
         createNodeHasPartOf(enb, "Station 3 - Turning", b);
+        TimeSeriesBuilder tsd = new TimeSeriesBuilder(b, iri("https://aas2.uni-h.de/aas/DMG_NEF400/tsd"), 
+                    isCreateMultiLanguageProperties());
+        tsd.createMetadataBuilder()
+            .setName(new LangString("en", "Turning Power Time Series"))
+            .setDescription(new LangString("en", "Contains time series of the machine"))
+            .build();
+        SegmentsBuilder sb = tsd.createSegmentsBuilder();
+        sb.createLinkedSegmentBuilder()
+            .setName(new LangString("en", "PowerUsage"))
+            .setDescription(new LangString("en", "Power usage of the machine in Watts, averaged per minute"))
+            .setEndpoint("https://mnestix-dev.azurewebsites.net/influx/api/v2/query?org=LNIAAS")
+            .setQuery("import \"experimental/aggregate\" from(bucket: \"MDZHannover\") |> range(start: -12h) "
+                    + "|> filter(fn: (r) => r[\"_measurement\"] == \"eventhub_consumer\") "
+                    + "|> filter(fn: (r) => r[\"_field\"] == \"Messages_0_Payload_Energy_Body\") "
+                    + "|> filter(fn: (r) => r[\"host\"] == \"145370d6156b\") |> aggregate.rate(every: 10m, unit: 1m) "
+                    + "|> yield()")
+            .build();
+        sb.createLinkedSegmentBuilder()
+            .setName(new LangString("en", "Total Energy Consumption"))
+            .setDescription(new LangString("en", "Energy consumption of the machine in W/h"))
+            .setEndpoint("https://mnestix-dev.azurewebsites.net/influx/api/v2/query?org=LNIAAS")
+            .setQuery("from(bucket: \"MDZHannover\") |> range(start: -12h) "
+                    + "|> filter(fn: (r) => r[\"_measurement\"] == \"eventhub_consumer\") "
+                    + "|> filter(fn: (r) => r[\"_field\"] == \"Messages_0_Payload_Energy_Body\") "
+                    + "|> filter(fn: (r) => r[\"host\"] == \"145370d6156b\") "
+                    + "|> aggregateWindow(every: 10m, fn: mean, createEmpty: false) |> yield()")
+            .build();
+        sb.build();
+        tsd.build();
         registerAas(b);
         
         b = f.createAasBuilder("mdzh_drill", 

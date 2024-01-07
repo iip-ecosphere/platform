@@ -1,2 +1,17 @@
 AAS aas_DMG_NEF400
  ASSET DMG_NEF400 INSTANCE
+ SUBMODEL TimeSeries (semanticId: iri:https://admin-shell.io/idta/TimeSeries/1/1)
+  SMC Metadata (semanticId: iri:https://admin-shell.io/idta/TimeSeries/Metadata/1/1)
+   MLP Description (semanticId: iri:https://admin-shell.io/idta/TimeSeries/Metadata/Description/1/1)
+   MLP Name (semanticId: iri:https://admin-shell.io/idta/TimeSeries/Metadata/Name/1/1)
+  SMC Segments (semanticId: iri:https://admin-shell.io/idta/TimeSeries/Segments/1/1)
+   SMC LinkedSegment01 (semanticId: iri:https://admin-shell.io/idta/TimeSeries/Segments/LinkedSegment/1/1)
+    MLP Description (semanticId: iri:https://admin-shell.io/idta/TimeSeries/Segment/Description/1/1)
+    PROPERTY Endpoint = https://mnestix-dev.azurewebsites.net/influx/api/v2/query?org=LNIAAS (semanticId: iri:https://admin-shell.io/idta/TimeSeries/Endpoint/1/1)
+    MLP Name (semanticId: iri:https://admin-shell.io/idta/TimeSeries/Segment/Name/1/1)
+    PROPERTY Query = import "experimental/aggregate" from(bucket: "MDZHannover") |> range(start: -12h) |> filter(fn: (r) => r["_measurement"] == "eventhub_consumer") |> filter(fn: (r) => r["_field"] == "Messages_0_Payload_Energy_Body") |> filter(fn: (r) => r["host"] == "145370d6156b") |> aggregate.rate(every: 10m, unit: 1m) |> yield() (semanticId: iri:https://admin-shell.io/idta/TimeSeries/Query/1/1)
+   SMC LinkedSegment02 (semanticId: iri:https://admin-shell.io/idta/TimeSeries/Segments/LinkedSegment/1/1)
+    MLP Description (semanticId: iri:https://admin-shell.io/idta/TimeSeries/Segment/Description/1/1)
+    PROPERTY Endpoint = https://mnestix-dev.azurewebsites.net/influx/api/v2/query?org=LNIAAS (semanticId: iri:https://admin-shell.io/idta/TimeSeries/Endpoint/1/1)
+    MLP Name (semanticId: iri:https://admin-shell.io/idta/TimeSeries/Segment/Name/1/1)
+    PROPERTY Query = from(bucket: "MDZHannover") |> range(start: -12h) |> filter(fn: (r) => r["_measurement"] == "eventhub_consumer") |> filter(fn: (r) => r["_field"] == "Messages_0_Payload_Energy_Body") |> filter(fn: (r) => r["host"] == "145370d6156b") |> aggregateWindow(every: 10m, fn: mean, createEmpty: false) |> yield() (semanticId: iri:https://admin-shell.io/idta/TimeSeries/Query/1/1)
