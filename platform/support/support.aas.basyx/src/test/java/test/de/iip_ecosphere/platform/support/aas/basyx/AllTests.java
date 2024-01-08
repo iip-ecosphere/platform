@@ -30,8 +30,9 @@ import test.de.iip_ecosphere.platform.support.aas.TechnicalDataSubmodelTest;
     TechnicalDataSubmodelTest.class,
     
     BaSyxXmasAas.class,
-    BaSyxTimeSeriesData.class,
-    BaSyxPCF.class
+    BaSyxTimeSeriesDataTest.class,
+    BaSyxPCF.class,
+    BaSyxContactInformationsTest.class
 })
 public class AllTests {
 }
