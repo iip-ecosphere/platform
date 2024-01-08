@@ -63,5 +63,15 @@ public class NameplateSetupTest {
         Assert.assertNotNull(s.getVersion());
         Assert.assertEquals("5", s.getVersion().toString());
     }
+    
+    /**
+     * Tests {@link NameplateSetup#expandUrn(String, String)}.
+     */
+    @Test
+    public void testExpandUrn() {
+        Assert.assertEquals("", NameplateSetup.expandUrn("", "-local"));
+        Assert.assertEquals("aaa", NameplateSetup.expandUrn("aaa", "-local"));
+        Assert.assertEquals("urn:::AAS:::myDevice-local#", NameplateSetup.expandUrn("urn:::AAS:::myDevice#", "-local"));
+    }
 
 }

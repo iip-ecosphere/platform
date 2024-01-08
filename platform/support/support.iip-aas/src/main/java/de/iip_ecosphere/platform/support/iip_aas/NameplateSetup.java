@@ -361,6 +361,21 @@ public class NameplateSetup {
     // incomplete
 
     /**
+     * Expands the last part of an URN by the given {@code expansion}.
+     * 
+     * @param urn the URN to expand
+     * @param expansion the expansion
+     * @return the expanded URN
+     */
+    public static String expandUrn(String urn, String expansion) {
+        String result = urn;
+        if (urn.endsWith("#")) {
+            result = urn.substring(0, urn.length() - 1) + expansion  + "#";
+        }
+        return result;
+    }
+    
+    /**
      * Creates an AAS for this nameplate setup.
      * 
      * @param urn the URN of the AAS to create
@@ -377,10 +392,10 @@ public class NameplateSetup {
             // not there, ok
             try {
                 AasBuilder aasBuilder = factory.createAasBuilder(id, urn);
-                TechnicalDataSubmodelBuilder tdBuilder = new TechnicalDataSubmodelBuilder(aasBuilder, null, true);
+                TechnicalDataSubmodelBuilder tdBuilder = new TechnicalDataSubmodelBuilder(aasBuilder, 
+                    expandUrn(urn, "-technicalData"), true);
                 GeneralInformationBuilder giBuilder = tdBuilder.createGeneralInformationBuilder(
-                    "", "",
-                    LangString.create(getManufacturerName()).getDescription(), 
+                    LangString.create(getManufacturerName()).getDescription(), "", "",
                     LangString.create(getManufacturerProductDesignation()));
                 PlatformAas.createAddress(giBuilder, getAddress()); // inofficial, not in Generic Frame
                 AasUtils.resolveImage(getProductImage(), AasUtils.CLASSPATH_RESOURCE_RESOLVER, false, 
