@@ -420,7 +420,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
     def getFieldName(UAFieldType field, String nameOrPath) {
         if (getProperty("iip.experimental.opcNodeId", "").length() > 0 and isDefined(field.nodeId) and field.nodeId <> null) {
             NodeId nid = field.nodeId;
-            'nameSpaceIndex = ${nid.nameSpaceIndex}, identifier = ${nid.identifier}';
+            '"nameSpaceIndex = ${nid.nameSpaceIndex}, identifier = ${nid.identifier}"';
         } else {
             nameOrPath;
         }
