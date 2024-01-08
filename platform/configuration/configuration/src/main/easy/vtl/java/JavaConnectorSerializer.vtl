@@ -132,7 +132,8 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
                 String outerPrName = "prArray${arrayCount}";
                 String pathEx = substPathEx('"${src.name}"', topPath, "path");
                 prVariableName.add("prElement");
-                '${getParserResultType(parser)} ${outerPrName} = pr.stepInto(${pathEx}, ${suffixPath(indexes, ",")});
+                String fieldPath = getFieldPath(src, pathEx);
+                '${getParserResultType(parser)} ${outerPrName} = pr.stepInto(${fieldPath}, ${suffixPath(indexes, ",")});
                 ${tgtArrayEltTypeName}[] ${arrayName} = new ${tgtArrayEltTypeName}[${outerPrName}.getArraySize()];
                 for (int i = 0, size = ${outerPrName}.getArraySize(); i < size; i++) {
                     ${getParserResultType(parser)} prElement = ${outerPrName}.stepInto("", i);
@@ -162,7 +163,8 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
         if (optWithStepIn) {
             nestedStepCount = nestedStepCount + 1;
             String pathEx = substPathEx('"${field.name}"', topPath, "path");
-            '\n\npr = pr.stepInto(${pathEx}, ${suffixPath(indexes, ",")});' !<CR>;
+            String fieldPath = getFieldPath(field, pathEx);
+            '\n\npr = pr.stepInto(${fieldPath}, ${suffixPath(indexes, ",")});' !<CR>;
         }
         '${produceDataTransfer(type, mapping, typeQual, mapQual, done, indexes, paths)}'
         if (optWithStepIn and nestedStepCount > 0) {

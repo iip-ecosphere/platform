@@ -400,30 +400,14 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
                    wrapOptional(field, path + ".set" + asMethodNameSuffix(field.name) + "(" + value + ")", args="access, a", optFind="access.", optReplace="a.") + "${setEnd}"; 
                } else {
                    if (convName(field.type) <> "") { // is there a conversion?
-                       wrapOptional(field, "access.set(${getFieldName(field, p)}, " + genConvertOp("outConverter", field.type, "from", value) + ")", args="access, a", optFind="access.", optReplace="a.") + "${setEnd}"; 
+                       wrapOptional(field, "access.set(${getFieldPath(field, p)}, " + genConvertOp("outConverter", field.type, "from", value) + ")", args="access, a", optFind="access.", optReplace="a.") + "${setEnd}"; 
                    }
                }
            }
        } else {
-           String ex = "access.get(${getFieldName(field, p)}, ${cachingTime(field)})";
+           String ex = "access.get(${getFieldPath(field, p)}, ${cachingTime(field)})";
            '${genConvertOp("inConverter", field.type, "to", ex)}';
        }
-    }
-
-    @DispatchBasis
-    def getFieldName(Field field, String nameOrPath) {
-        nameOrPath;
-    }
-
-    // initial/experimental
-    @DispatchCase
-    def getFieldName(UAFieldType field, String nameOrPath) {
-        if (getProperty("iip.experimental.opcNodeId", "").length() > 0 and isDefined(field.nodeId) and field.nodeId <> null) {
-            NodeId nid = field.nodeId;
-            '"nameSpaceIndex = ${nid.nameSpaceIndex}, identifier = ${nid.identifier}"';
-        } else {
-            nameOrPath;
-        }
     }
     
     def cachingTime(Field field) {
@@ -472,7 +456,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
             if (field.optional) {
                 'try {'
             }
-            '\n\naccess = access.stepInto(${path});'
+            '\n\naccess = access.stepInto(${getFieldPath(field, path)});'
         }
         '${produceDataTransfer(type, mapping, typeQual, mapQual, done, indexes, paths)}'
         if (optWithStepIn and nestedStepCount > 0) {
@@ -486,13 +470,15 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
     }
     
     @Override
-    def startTopRecordType(String path) {
+    def startTopRecordType(RecordType type, String path) {
         if (optWithStepIn and path.length() > 1) {
             if (path.startsWith("/")) {
                 path = path.substring(1);
             }
             nestedStepCount = nestedStepCount + 1;
-            '\n\naccess = access.stepInto(path + "${path}");\n'
+            String pathEx = 'path + "${path}"';
+            String topPath = getTypePath(type, pathEx);
+            '\n\naccess = access.stepInto(${topPath});\n'
         }
     }
     

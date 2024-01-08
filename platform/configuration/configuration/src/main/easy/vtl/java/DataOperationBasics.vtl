@@ -262,7 +262,7 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
         int index = 0;
         String out = "";
         if (isTop) {
-            '${startTopRecordType(mapQual)}'
+            '${startTopRecordType(type, mapQual)}'
         }
         for (Field f : type.fields) {
             String iq;
@@ -289,7 +289,7 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
         }
     }
 
-    def startTopRecordType(String path) {
+    def startTopRecordType(RecordType type, String path) {
     }
     
     def endTopRecordType(String path) {
@@ -553,4 +553,36 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
         resultEx;
     }
 
+    @DispatchBasis
+    def getFieldPath(Field field, String nameOrPath) {
+        nameOrPath;
+    }
+
+    // initial/experimental
+    @DispatchCase
+    def getFieldPath(UAFieldType field, String nameOrPath) {
+        if (getProperty("iip.experimental.opcNodeId", "").length() > 0 and isDefined(field.nodeId) and field.nodeId <> null) {
+            NodeId nid = field.nodeId;
+            '"nameSpaceIndex = ${nid.nameSpaceIndex}, identifier = ${nid.identifier}"';
+        } else {
+            nameOrPath;
+        }
+    }
+    
+    @DispatchBasis
+    def getTypePath(RecordType type, String nameOrPath) {
+        nameOrPath;
+    }
+
+    // initial/experimental
+    @DispatchCase
+    def getTypePath(UABaseType type, String nameOrPath) {
+        if (getProperty("iip.experimental.opcNodeId", "").length() > 0 and isDefined(type.nodeId) and type.nodeId <> null) {
+            NodeId nid = type.nodeId;
+            '"nameSpaceIndex = ${nid.nameSpaceIndex}, identifier = ${nid.identifier}"';
+        } else {
+            nameOrPath;
+        }
+    }
+    
 }
