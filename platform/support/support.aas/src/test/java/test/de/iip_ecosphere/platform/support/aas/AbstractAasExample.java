@@ -20,8 +20,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.BiConsumer;
+import java.util.function.Predicate;
 
 import org.apache.commons.io.FileUtils;
+import org.junit.Assert;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.support.aas.Aas;
@@ -246,4 +248,17 @@ public abstract class AbstractAasExample {
         }
     }
 
+    /**
+     * Asserts properties on enum values.
+     * 
+     * @param <T> the enum type
+     * @param values the values
+     * @param asserter the asserter function
+     */
+    public static <T extends Enum<T>> void assertEnum(T[] values, Predicate<T> asserter) {
+        for (T value: values) {
+            Assert.assertTrue(asserter.test(value));
+        }
+    }
+    
 }

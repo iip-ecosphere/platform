@@ -29,7 +29,7 @@ import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class TimeSeriesData extends AbstractAasExample {
+public class TimeSeriesDataTest extends AbstractAasExample {
 
     @Override
     protected String getFolderName() {
@@ -46,7 +46,7 @@ public class TimeSeriesData extends AbstractAasExample {
         AasBuilder aasBuilder = AasFactory.getInstance().createAasBuilder("TimeseriesExample", 
             "urn:::AAS:::TimeseriesExample#");
         aasBuilder.createAssetBuilder("tsd", "urn:::Asset:::tsd#", AssetKind.INSTANCE).build();
-        TimeSeriesBuilder tsdBuilder = new TimeSeriesBuilder(aasBuilder, "ExampleTimeseries", 
+        TimeSeriesBuilder tsdBuilder = new TimeSeriesBuilder(aasBuilder, "urn:::SM:::TimeSeries#", 
             isCreateMultiLanguageProperties());
         tsdBuilder.createMetadataBuilder()
             .setName(new LangString("en", "Example data"))

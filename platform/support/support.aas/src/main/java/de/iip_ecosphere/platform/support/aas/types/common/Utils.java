@@ -26,7 +26,9 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 import de.iip_ecosphere.platform.support.aas.LangString;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
+import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.aas.MultiLanguageProperty.MultiLanguagePropertyBuilder;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
@@ -67,13 +69,15 @@ public class Utils {
     /**
      * Creates a multi-language property.
      * 
+     * @param <B> the (parent) builder type
      * @param builder the parent builder
      * @param enable whether the creation of multi-language properties is enabled (incompatibility with AASX Explorer)
      * @param idShort the idShort
      * @param semanticId the semanticId of the property
      * @param texts the values of the property
+     * @return {@code builde}
      */
-    public static void createMultiLanguageProperty(SubmodelElementContainerBuilder builder, boolean enable, 
+    public static <B extends SubmodelElementContainerBuilder> B createMultiLanguageProperty(B builder, boolean enable, 
         String idShort, String semanticId, LangString... texts) {
         if (enable) {
             MultiLanguagePropertyBuilder mlpb = builder
@@ -84,6 +88,7 @@ public class Utils {
             }
             mlpb.build();
         }
+        return builder;
     }
 
     /**
@@ -183,6 +188,26 @@ public class Utils {
         } catch (ClassCastException e) {
             throw new ExecutionException(e.getMessage(), null);
         }
+    }
+    
+    /**
+     * Creates a property.
+     * 
+     * @param <B> the (parent) builder type
+     * @param builder the (parent) builder instance
+     * @param idShort the idShort of the property
+     * @param semanticId the semantic id of the property
+     * @param type the type of the property value
+     * @param value the value
+     * @return {@code builder}
+     */
+    public static <B extends SubmodelElementCollectionBuilder> B createProperty(B builder, String idShort, 
+        String semanticId, Type type, Object value ) {
+        builder.createPropertyBuilder(idShort)
+            .setSemanticId(semanticId)
+            .setValue(type, value)
+            .build();
+        return builder;
     }
 
 }
