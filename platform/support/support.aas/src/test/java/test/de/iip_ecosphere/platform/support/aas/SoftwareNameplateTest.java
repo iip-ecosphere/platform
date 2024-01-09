@@ -15,8 +15,6 @@ package test.de.iip_ecosphere.platform.support.aas;
 import static de.iip_ecosphere.platform.support.aas.types.common.Utils.parseCalendar;
 
 import java.io.File;
-import java.net.URI;
-import java.net.URISyntaxException;
 
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.AssetKind;
@@ -94,31 +92,6 @@ public class SoftwareNameplateTest extends AbstractAasExample {
         snp.build();
         
         registerAas(aasBuilder);
-    }
-
-    /**
-     * Creates a URI treating the given text {@code file} as File and handles exceptions.
-     * 
-     * @param file the file location
-     * @return the URI instance
-     */
-    private static URI createFileURI(String file) {
-        return new File(file).toURI();
-    }
-    
-    /**
-     * Creates a URI and handles exceptions.
-     * 
-     * @param uri the URI text
-     * @return the URI instance
-     */
-    private static URI createURI(String uri) {
-        try {
-            return new URI(uri);
-        } catch (URISyntaxException e) {
-            System.err.println("Cannot create URI:" + e.getMessage());
-            return null;
-        }
     }
 
     @Override

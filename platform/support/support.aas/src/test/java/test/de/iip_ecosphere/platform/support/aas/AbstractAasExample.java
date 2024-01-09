@@ -15,6 +15,8 @@ package test.de.iip_ecosphere.platform.support.aas;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -247,7 +249,32 @@ public abstract class AbstractAasExample {
             AasSpecVisitor.assertEquals(aas, getResourceFolder());
         }
     }
-
+    
+    /**
+     * Creates a URI treating the given text {@code file} as File and handles exceptions.
+     * 
+     * @param file the file location
+     * @return the URI instance
+     */
+    public static URI createFileURI(String file) {
+        return createURI("file:/" + file.replace("\\", "/").replace(" ", "%20")); // newFile fails on Linux
+    }
+    
+    /**
+     * Creates a URI and handles exceptions.
+     * 
+     * @param uri the URI text
+     * @return the URI instance
+     */
+    public static URI createURI(String uri) {
+        try {
+            return new URI(uri);
+        } catch (URISyntaxException e) {
+            System.err.println("Cannot create URI:" + e.getMessage());
+            return null;
+        }
+    }
+    
     /**
      * Asserts properties on enum values.
      * 
