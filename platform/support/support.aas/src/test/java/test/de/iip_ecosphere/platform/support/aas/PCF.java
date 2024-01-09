@@ -157,7 +157,7 @@ public class PCF extends AbstractAasExample {
         TechnicalDataSubmodelBuilder tdBuilder = new TechnicalDataSubmodelBuilder(aasBuilder, "urn:::SM:::TD#", 
             isCreateMultiLanguageProperties());
         
-        tdBuilder.createFurtherInformationBuilder(Utils.parse("2024-01-04T10:00:00.000+00:00"))
+        tdBuilder.createFurtherInformationBuilder(Utils.parseCalendar("2024-01-04T10:00:00.000+00:00"))
             .build();
 
         tdBuilder.createGeneralInformationBuilder("Mittelstand-Digital Zentrum Hannover", 

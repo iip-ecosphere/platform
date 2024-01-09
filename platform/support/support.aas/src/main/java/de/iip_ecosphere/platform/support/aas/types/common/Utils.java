@@ -94,10 +94,10 @@ public class Utils {
     /**
      * Helper to create a Gregorian calendar.
      * 
-     * @param date may be <b>null</b> for now or in format YYY-MM-DDThh:mm:ss.SSS+hh:mm
+     * @param date may be <b>null</b> for now or in format YYYY-MM-DDThh:mm:ss.SSS+hh:mm
      * @return the Gregorian calendar, <b>null</b> if the creation fails
      */
-    public static XMLGregorianCalendar parse(String date) {
+    public static XMLGregorianCalendar parseCalendar(String date) {
         XMLGregorianCalendar result = null;
         if (null == date) {
             try {
@@ -202,7 +202,7 @@ public class Utils {
      * @return {@code builder}
      */
     public static <B extends SubmodelElementCollectionBuilder> B createProperty(B builder, String idShort, 
-        String semanticId, Type type, Object value ) {
+        String semanticId, Type type, Object value) {
         builder.createPropertyBuilder(idShort)
             .setSemanticId(semanticId)
             .setValue(type, value)

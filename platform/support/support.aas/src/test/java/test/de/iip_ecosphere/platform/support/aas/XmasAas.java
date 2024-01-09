@@ -261,7 +261,7 @@ public class XmasAas extends AbstractAasExample {
         }
         giBuilder.build();
         FurtherInformationBuilder fiBuilder = tdBuilder.createFurtherInformationBuilder(
-            Utils.parse("2023-12-24T23:59:59.000+00:00"));
+            Utils.parseCalendar("2023-12-24T23:59:59.000+00:00"));
         fiBuilder.build();
         tdBuilder.createTechnicalPropertiesBuilder().build();
         ProductClassificationsBuilder pcBuilder = tdBuilder.createProductClassificationsBuilder();

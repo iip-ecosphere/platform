@@ -51,7 +51,19 @@ public class ContactInformationsTest extends AbstractAasExample {
         aasBuilder.createAssetBuilder("ci", "urn:::Asset:::ci#", AssetKind.INSTANCE).build();
         ContactInformationsBuilder cis = new ContactInformationsBuilder(aasBuilder, "urn:::SM:::ContactInformations#", 
             isCreateMultiLanguageProperties());
-        ContactInformationBuilder ci = cis.createContactInformationBuilder();
+        populate(cis.createContactInformationBuilder()).build();
+        cis.build();
+        
+        registerAas(aasBuilder);
+    }
+
+    /**
+     * Populates an example contact information builder.
+     * 
+     * @param ci the builder
+     * @return {@code ci}
+     */
+    public static ContactInformationBuilder populate(ContactInformationBuilder ci) {
         ci.setNameOfContact(new LangString("en", "Doe"));
         ci.setFirstName(new LangString("en", "John"));
         ci.setMiddleNames(new LangString("en", "M."));
@@ -87,10 +99,7 @@ public class ContactInformationsTest extends AbstractAasExample {
             .setAvailableTime(new LangString("en", "8-17"))
             .setTypeOfCommunication("SIP phone")
             .build();
-        ci.build();
-        cis.build();
-        
-        registerAas(aasBuilder);
+        return ci;
     }
 
     @Override

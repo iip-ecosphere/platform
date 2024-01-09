@@ -18,6 +18,7 @@ import test.de.iip_ecosphere.platform.support.aas.IdentifierTypeTest;
 import test.de.iip_ecosphere.platform.support.aas.LangStringTest;
 import test.de.iip_ecosphere.platform.support.aas.LocalInvocationTest;
 import test.de.iip_ecosphere.platform.support.aas.PCF;
+import test.de.iip_ecosphere.platform.support.aas.SoftwareNameplateTest;
 import test.de.iip_ecosphere.platform.support.aas.TechnicalDataSubmodelTest;
 import test.de.iip_ecosphere.platform.support.aas.TimeSeriesDataTest;
 import test.de.iip_ecosphere.platform.support.aas.XmasAas;
@@ -62,7 +63,8 @@ import test.de.iip_ecosphere.platform.support.net.UriResolverTest;
     XmasAas.class,
     TimeSeriesDataTest.class,
     PCF.class,
-    ContactInformationsTest.class
+    ContactInformationsTest.class,
+    SoftwareNameplateTest.class
 })
 public class AllTests {
 }

@@ -55,7 +55,7 @@ public class ContactInformationsBuilder extends DelegatingSubmodelBuilder {
      * @return the builder instance
      */
     public ContactInformationBuilder createContactInformationBuilder() {
-        return new ContactInformationBuilder(getDelegate(), ++contactInformationCount);
+        return new ContactInformationBuilder(getDelegate(), ++contactInformationCount, createMultiLanguageProperties);
     }
     
     @Override
@@ -251,24 +251,52 @@ public class ContactInformationsBuilder extends DelegatingSubmodelBuilder {
     }
     
     /**
-     * The contact information builder.
+     * The contact information builder. Static for reuse.
      * 
      * @author Holger Eichelberger, SSE
      */
-    public class ContactInformationBuilder extends DelegatingSubmodelElementCollectionBuilder {
+    public static class ContactInformationBuilder extends DelegatingSubmodelElementCollectionBuilder {
 
+        private boolean createMultiLanguageProperties;
         private int languageCount;
         private int ipCommunicationCount;
-        
+
+        /**
+         * Creates a builder instance. Public for reuse.
+         * 
+         * @param parent the parent builder
+         * @param idShort the id short to use
+         * @param createMultiLanguageProperties whether multi-language properties shall be created, taints compliance 
+         *     if {@code false}
+         */
+        public ContactInformationBuilder(SubmodelElementCollectionBuilder parent, String idShort, 
+            boolean createMultiLanguageProperties) {
+            super(parent.createSubmodelElementCollectionBuilder(idShort, false, false));
+            initialize(createMultiLanguageProperties);
+        }
+
         /**
          * Creates a builder instance.
          * 
          * @param parent the parent builder
          * @param nr the contact information number
+         * @param createMultiLanguageProperties whether multi-language properties shall be created, taints compliance 
+         *     if {@code false}
          */
-        protected ContactInformationBuilder(SubmodelBuilder parent, int nr) {
+        private ContactInformationBuilder(SubmodelBuilder parent, int nr, boolean createMultiLanguageProperties) {
             super(parent.createSubmodelElementCollectionBuilder(getCountingIdShort("ContactInformation", nr), 
                 false, false));
+            initialize(createMultiLanguageProperties);
+        }
+
+        /**
+         * Initializes the builder.
+         * 
+         * @param createMultiLanguageProperties whether multi-language properties shall be created, taints compliance 
+         *     if {@code false}
+         */
+        private void initialize(boolean createMultiLanguageProperties) {
+            this.createMultiLanguageProperties = createMultiLanguageProperties;
             setSemanticId(iri("https://admin-shell.io/zvei/nameplate/1/0/ContactInformations/ContactInformation"));
         }
 
@@ -540,7 +568,7 @@ public class ContactInformationsBuilder extends DelegatingSubmodelBuilder {
              * @param telephoneNumber the telephone number
              */
             protected PhoneBuilder(SubmodelElementCollectionBuilder parent, LangString telephoneNumber) {
-                super(parent.createSubmodelElementCollectionBuilder("", false, false));
+                super(parent.createSubmodelElementCollectionBuilder("Phone", false, false));
                 setSemanticId(iri("https://admin-shell.io/zvei/nameplate/1/0/ContactInformations/"
                     + "ContactInformation/Phone"));
                 createMultiLanguageProperty(this, createMultiLanguageProperties, "TelephoneNumber", 
@@ -554,7 +582,7 @@ public class ContactInformationsBuilder extends DelegatingSubmodelBuilder {
              * @return <b>this</b>
              */
             public PhoneBuilder setTypeOfTelephone(TypeOfTelephone type) {
-                return createProperty(this, "TelephoneNumber", 
+                return createProperty(this, "TypeOfTelephone", 
                     irdi("0173-1#02-AAO137#003"), Type.STRING, type.getValueId()); // preferable, see spec
             }        
 
@@ -586,7 +614,7 @@ public class ContactInformationsBuilder extends DelegatingSubmodelBuilder {
              * @param faxNumber the fax number
              */
             protected FaxBuilder(SubmodelElementCollectionBuilder parent, LangString faxNumber) {
-                super(parent.createSubmodelElementCollectionBuilder("", false, false));
+                super(parent.createSubmodelElementCollectionBuilder("Fax", false, false));
                 setSemanticId(irdi("0173-1#02-AAQ834#005"));
                 createMultiLanguageProperty(this, createMultiLanguageProperties, "FaxNumber", 
                     irdi("0173-1#02-AAO195#002"), faxNumber);
@@ -619,7 +647,7 @@ public class ContactInformationsBuilder extends DelegatingSubmodelBuilder {
              * @param emailAddress address the email address
              */
             protected EmailBuilder(SubmodelElementCollectionBuilder parent, String emailAddress) {
-                super(parent.createSubmodelElementCollectionBuilder("", false, false));
+                super(parent.createSubmodelElementCollectionBuilder("Email", false, false));
                 setSemanticId(irdi("0173-1#02-AAQ836#005"));
                 createProperty(this, "EmailAddress",
                     irdi("0173-1#02-AAO198#002"), Type.STRING, emailAddress); 
@@ -675,7 +703,8 @@ public class ContactInformationsBuilder extends DelegatingSubmodelBuilder {
              * @param webSiteAddress the address of the communication web site
              */
             protected IPCommunicationBuilder(SubmodelElementCollectionBuilder parent, int nr, String webSiteAddress) {
-                super(parent.createSubmodelElementCollectionBuilder(getCountingIdShort("", nr), false, false));
+                super(parent.createSubmodelElementCollectionBuilder(
+                    getCountingIdShort("IPCommunication", nr), false, false));
                 setSemanticId(iri("https://admin-shell.io/zvei/nameplate/1/0/ContactInformations/ContactInformation/"
                     + "IPCommunication/"));
                 createProperty(this, "AddressOfAdditionalLink",
