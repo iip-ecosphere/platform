@@ -12,14 +12,14 @@
 
 package test.de.iip_ecosphere.platform.support.aas.basyx;
 
-import test.de.iip_ecosphere.platform.support.aas.ContactInformationsTest;
+import test.de.iip_ecosphere.platform.support.aas.SoftwareNameplateTest;
 
 /**
- * Sets up the {@link ContactInformationsTest} for BaSyx. You will find the persisted AAS in the {@code output} folder.
+ * Sets up the {@link SoftwareNameplateTest} for BaSyx. You will find the persisted AAS in the {@code output} folder.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class BaSyxContactInformationsTest extends ContactInformationsTest {
+public class BaSyxSoftwareNameplateTest extends SoftwareNameplateTest {
 
     /**
      * Executes the test standalone.
@@ -28,7 +28,7 @@ public class BaSyxContactInformationsTest extends ContactInformationsTest {
      *   enable the creation of operations
      */
     public static void main(String[] args) {
-        BaSyxExampleUtils.execute(new BaSyxContactInformationsTest(), args);
+        BaSyxExampleUtils.execute(new BaSyxSoftwareNameplateTest(), args);
     }
 
 }
