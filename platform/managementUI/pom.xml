@@ -146,7 +146,7 @@
                        <goal>generateBroker</goal>
                    </goals>
                    <configuration>
-                       <checkChanged>true</checkChanged>
+                       <checkChanged>false</checkChanged>
                        <changeCheckArtifacts>${project.groupId}:InstallBroker:${project.version}</changeCheckArtifacts>
                    </configuration>
                 </execution>
@@ -157,7 +157,7 @@
                        <goal>generateAll</goal>
                    </goals>
                    <configuration>
-                       <checkChanged>true</checkChanged>
+                       <checkChanged>false</checkChanged>
                        <changeCheckArtifacts>${project.groupId}:platform.exec:${project.version}</changeCheckArtifacts>
                        <resourcesDirectory>${iip.resources}</resourcesDirectory>
                    </configuration>
