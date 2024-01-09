@@ -94,7 +94,8 @@ public class YamlDeviceAasProvider extends DeviceAasProvider {
             try {
                 NameplateSetup nSetup = obtainNameplateSetup(); 
                 aas = nSetup.createAas(urn, id, ab -> {
-                    SubmodelBuilder smb = ab.createSubmodelBuilder("metrics", null);
+                    SubmodelBuilder smb = ab.createSubmodelBuilder("metrics", 
+                        NameplateSetup.expandUrn(urn, "-metrics"));
                     MetricsAasConstructor.addProviderMetricsToAasSubmodel(smb, null, Monitor.TRANSPORT_METRICS_CHANNEL, 
                         Id.getDeviceId(), EcsFactory.getSetup().getTransport());
                     smb.build();
