@@ -93,7 +93,7 @@ export class EditorComponent extends Utils implements OnInit {
 
   private async getMeta() {
     this.meta = await this.api.getMeta();
-    this.metaBackup = JSON.parse(JSON.stringify(this.meta)); // deep copy
+    this.metaBackup = DataUtils.deepCopy(this.meta);
     this.filterMeta();
   }
 
@@ -101,7 +101,7 @@ export class EditorComponent extends Utils implements OnInit {
    * Documentation in src/assets/doc/filterMeta.jpg
    */
   public filterMeta() {
-    this.meta = JSON.parse(JSON.stringify(this.metaBackup)) // recovering meta from deep copy
+    this.meta = DataUtils.deepCopy(this.metaBackup) // recovering meta
     let filter = this.reqTypes.find(type => type.cat === this.category)
     let newMetaValues = []
     if (this.meta && this.meta.value) {

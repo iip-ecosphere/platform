@@ -59,6 +59,10 @@ export class ApiService extends UtilsService {
     return this.meta;
   }
 
+  public async getSubmodelElement(submodel: any, submodelElement: any) {
+    return await this.getData(`/aas/submodels/${submodel}/submodel/submodelElements/${submodelElement}`);
+  }
+
   public async getData(url: string) {
     let Data;
     try {

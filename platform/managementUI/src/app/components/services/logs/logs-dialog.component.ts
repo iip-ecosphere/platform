@@ -116,14 +116,23 @@ export class LogsDialogComponent implements OnInit{
     let basyxFun = "serviceManagers/a"
       + this.serviceInfo.serviceMgr.replace("@", "_")
       + "/serviceStreamLog"
-
-    const response = await this.api.executeFunction(
+    const response = await this.api.executeAasJsonOperation("resources", AAS_OP_PREFIX_SME + basyxFun, inputVariable);
+    const platfResponse = this.api.getPlatformResponse(response);
+    let valid = false;
+    if (platfResponse && platfResponse?.result) {
+      let result = JSON.parse(platfResponse.result);
+      this.stdoutUrl = result[0];
+      this.stderrUrl = result[1];
+    } else {
+      console.warn("No valid platform response, no stream URLs available.");
+    }
+    /*const response = await this.api.executeFunction(
       resourceId,
       aasElementURL,
       basyxFun,
       inputVariable) as unknown as platformResponse
 
-    this.getPlatformResponseResolution(response)
+    this.getPlatformResponseResolution(response)*/
     console.debug("[logs-dialog | getPlatformResponseResolution]"
       + "Endpoints - \nstdout: "
       + this.stdoutUrl
@@ -131,7 +140,7 @@ export class LogsDialogComponent implements OnInit{
       + this.stderrUrl)
   }
 
-  public getPlatformResponseResolution(response:platformResponse) {
+  /*public getPlatformResponseResolution(response:platformResponse) {
     let done = false;
     if(response && response.outputArguments) {
       let output = response.outputArguments[0]?.value?.value;
@@ -148,7 +157,7 @@ export class LogsDialogComponent implements OnInit{
     if (!done) {
       console.warn("No valid platform response, no stream URLs available.");
     }
-  }
+  }*/
 
   public async getInputVar(serviceId:string, mode:string) {
     this.serviceInfo = await this.getServiceInfo(serviceId);
@@ -168,7 +177,7 @@ export class LogsDialogComponent implements OnInit{
 
   public async getServiceInfo(serviceId: string){
     let response: any;
-    response = await this.getPlatformData("services", "services/" + serviceId)
+    response = await this.api.getSubmodelElement("services", "services/" + serviceId)
 
     let serviceResource
     let serviceServiceMgr
@@ -181,25 +190,6 @@ export class LogsDialogComponent implements OnInit{
     this.serviceMgr = serviceServiceMgr
     return {resource: serviceResource, serviceMgr: serviceServiceMgr}
 
-  }
-
-  public async getPlatformData(submodel: any, submodelElement: any) {
-    return await this.api.getData(`/aas/submodels/${submodel}/submodel/submodelElements/${submodelElement}`);
-    /*let response: any;
-
-    try {
-        let cfg = await this.envConfigService.initAndGetCfg();
-        response = await firstValueFrom(
-          this.http.get(cfg?.ip + '/shells/'
-        + cfg?.urn
-        + "/aas/submodels/"
-        + submodel
-        + "/submodel/submodelElements/"
-        + submodelElement));
-      } catch(e) {
-        console.error(e);
-      }
-    return response*/
   }
 
   public async reset() {

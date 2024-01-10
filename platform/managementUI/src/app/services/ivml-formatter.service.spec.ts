@@ -80,8 +80,8 @@ describe('IvmlFormatterService', () => {
 
   it('should create/edit/delete IVML variables with compound type', async() => {
     await testVarLifecycle(service, "testMvnRepo", 
-      {id:{value:"myRepo", _type:IVML_TYPE_String}, url:{value:"127.0.0.1:8ß8ß", _type:IVML_TYPE_String}}, 
-      {id:{value:"myRepo", _type:IVML_TYPE_String}, name:{value:"MyRepo", _type:IVML_TYPE_String}, url:{value:"127.0.0.1:8ß81", _type:IVML_TYPE_String}}, 
+      {id:{value:"myRepo", _type:IVML_TYPE_String}, url:{value:"127.0.0.1:8080", _type:IVML_TYPE_String}}, 
+      {id:{value:"myRepo", _type:IVML_TYPE_String}, name:{value:"MyRepo", _type:IVML_TYPE_String}, url:{value:"127.0.0.1:8081", _type:IVML_TYPE_String}}, 
       "MavenRepository");
   }, 1 * TIMEOUT_LIFECYCLE_MS);
 
