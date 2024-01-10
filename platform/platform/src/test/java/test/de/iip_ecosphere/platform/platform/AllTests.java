@@ -26,7 +26,6 @@ import de.iip_ecosphere.platform.services.environment.Starter;
     PlatformTest.class,
     CliTest.class,
     ServiceDeploymentPlanTest.class,
-    ServiceAasTest.class,
     PlatformAasTest.class
 })
 public class AllTests {

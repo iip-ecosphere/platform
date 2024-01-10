@@ -20,7 +20,6 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.Base64;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.io.FileUtils;
@@ -94,14 +93,6 @@ public class PlatformAas implements AasContributor {
         smB.createSubmodelElementCollectionBuilder(NAME_COLL_SERVICE_ARTIFACTS, false, false).build();
         smB.createSubmodelElementCollectionBuilder(NAME_COLL_CONTAINER, false, false).build();
         smB.createSubmodelElementCollectionBuilder(NAME_COLL_DEPLOYMENT_PLANS, false, false).build();
-        SubmodelElementCollectionBuilder b = smB.createSubmodelElementCollectionBuilder(
-            NAME_COLL_KNOWN_SERVICES, false, false);
-        for (Map.Entry<String, String> ep : ServiceAas.createAas().entrySet()) {
-            b.createPropertyBuilder(fixId(ep.getKey()))
-                .setValue(Type.STRING, ep.getValue())
-                .build();
-        }
-        b.build();
 
         smB.createOperationBuilder(NAME_OPERATION_DEPLOY)
             .addInputVariable("url", Type.STRING)
