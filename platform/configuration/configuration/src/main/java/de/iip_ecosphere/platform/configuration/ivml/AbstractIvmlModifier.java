@@ -228,6 +228,7 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
                 }
             }
             EasyExecutor.printReasoningMessages(res); // preliminary
+            LoggerFactory.getLogger(getClass()).error("Reasoning failed: {}", msg);
             throw new ExecutionException(msg, null);
         }
     }

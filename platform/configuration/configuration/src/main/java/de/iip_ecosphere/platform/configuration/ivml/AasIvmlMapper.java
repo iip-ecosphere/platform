@@ -792,9 +792,13 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                 LoggerFactory.getLogger(getClass()).info("Graph set in IVML app {} = {}, mesh {}, format {}", 
                     appName, appValueEx, meshName, format); // no graph, may become too long
             } catch (ModelQueryException | ModelManagementException e) {
+                LoggerFactory.getLogger(getClass()).info("Setting graph in IVML app {} = {}, mesh '{}', format {}: {}", 
+                    appName, appValueEx, meshName, format, e.getMessage()); // no graph, may become too long
                 e.printStackTrace();
                 throw new ExecutionException(e);
             } catch (ExecutionException e) {
+                LoggerFactory.getLogger(getClass()).info("Setting graph in IVML app {} = {}, mesh '{}', format {}: {}", 
+                    appName, appValueEx, meshName, format, e.getMessage()); // no graph, may become too long
                 e.printStackTrace();
                 throw new ExecutionException(e);
             }

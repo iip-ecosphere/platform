@@ -2213,7 +2213,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         vilTemplateProcessor("PlatformYaml", config, "${p}/iipecosphere.yml", modelName=getName(config));
         vilTemplateProcessor("JavaYamlTest", config, "${platformRoot}/src/test/java/test/iip/AllTests.java", pkg="test.iip", fqnCls="de.iip_ecosphere.platform.platform.PlatformSetup", cfgFile="src/main/resources/iipecosphere.yml");
         vilTemplateProcessor("JavaLogbackXml", config, "${p}/logback.xml");
-        vilTemplateProcessor("ServicesYaml", config, "${p}/services.yml");
         vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.net.NetworkManagerDescriptor", descriptor="de.iip_ecosphere.platform.support.net.LocalNetworkManagerImpl$"+"Descriptor");
         deviceIdProviderJsl(p, cfg);
         identityStoreJsl(p, cfg);
