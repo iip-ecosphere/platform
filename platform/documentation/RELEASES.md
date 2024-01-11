@@ -3,12 +3,13 @@
 ### Version 0.7.0 (consolidation):
 
 In progress:
+* [#164](https://github.com/iip-ecosphere/platform/issues/164): UI design revision
 * [#117](https://github.com/iip-ecosphere/platform/issues/117): Multiple service managers per device
-* [#163](https://github.com/iip-ecosphere/platform/issues/156): UI functional improvements
-* [#150](https://github.com/iip-ecosphere/platform/issues/150): Connect instantiation process
 
 New features:
 * Maven plugins/goals: explicit resource deletion and oktoflow application testing/platform starting
+* [#163](https://github.com/iip-ecosphere/platform/issues/163): UI regression testing, cleanup, editing, uploads 
+* [#150](https://github.com/iip-ecosphere/platform/issues/150): Connect instantiation process to UI
 * [#153](https://github.com/iip-ecosphere/platform/issues/153): MD5 hashes for Python "compilation", offline for mvn install 
 * [#154](https://github.com/iip-ecosphere/platform/issues/154): Application packaging scheme in configuration meta-model 
 * [#152](https://github.com/iip-ecosphere/platform/issues/152): EMO'23 example added to repository
