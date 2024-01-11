@@ -32,7 +32,6 @@ import { EnvConfigService } from './services/env-config.service';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DeploymentPlansComponent } from './components/deployment-plans/deployment-plans.component';
 import { ResourceDetailsComponent } from './components/resource-details/resource-details.component';
-import { OperationQueryComponent } from './components/resource-details/operation-query/operation-query.component';
 import { OnlyIdPipe } from './pipes/only-id.pipe';
 import { StatusBoxComponent } from './components/deployment-plans/status-box/status-box.component';
 import { FlowchartComponent } from './components/flowchart/flowchart.component';
@@ -60,7 +59,6 @@ import { FileUploadComponent } from './components/file-upload/file-upload.compon
     TidyPipe,
     DeploymentPlansComponent,
     ResourceDetailsComponent,
-    OperationQueryComponent,
     OnlyIdPipe,
     StatusBoxComponent,
     FlowchartComponent,
