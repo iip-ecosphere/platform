@@ -19,12 +19,7 @@ export class ResourceDetailsComponent implements OnInit {
   constructor(public http: HttpClient, public api: ApiService, public resolver: SemanticResolutionService,
     public route: ActivatedRoute) { }
 
-  ngOnInit(): void {
-    this.init();
-  }
-
-  // for testing, may be replaced by async ngOnInit
-  async init() {
+  async ngOnInit() {
     this.id = this.route.snapshot.paramMap.get('id')
     if (this.id) {
       await this.getResource(this.id);
@@ -84,109 +79,52 @@ export class ResourceDetailsComponent implements OnInit {
       }
       let resolvedInfo = await this.resolver.resolveSemanticIds(semanticIds, LANG_ENGLISH);
 
-    /*await this.setInputValues();
-
-    let i = 0;
-    for(const value of this.inputVariables) {
-      const input:InputVariable[] = [value]
-      const response = await this.api.executeFunction(
-        "",
-        this.platformURL,
-        "resolveSemanticId",
-        input) as platformResponse;
-
-      resolvedInfo.push(this.getSemanticInfo(response))
-      i++;
-    }*/
       let j = 0;
-      for(const value of resolvedInfo) {
+      for (const semInfo of resolvedInfo) {
         if (!this.resource!.value![j]) { // TODO workaround for testing, check async chain
           this.resource!.value![j] = {} as ResourceAttribute;
         }
-        if(value.name=="byte") {
-          this.convertByte(j, 1000000000, "GB")
+        let attr = this.resource!.value![j];
+        if (semInfo.name == "Percent") {
+          ResourceDetailsComponent.convertPercent(attr);
+        } else if (semInfo.name == "byte") {
+          ResourceDetailsComponent.convertGByte(attr);
         } else {
-          this.resource!.value![j].semanticName = value.name;
+          attr.semanticName = semInfo.name;
         }
-        this.resource!.value![j].semanticDescription = value.description;
+        attr.semanticDescription = semInfo.description;
         j++;
       }
     }
   }
 
-  // Creates a list of input parameters for the aas operation "resolveSemanticId"
-  // based on the semanticId of the resource attributes.
-  /*public setInputValues() {
-    if(this.resource && this.resource.value) {
-      this.resourceAttributes = this.resource.value;
-
-      let i = 0;
-      for(const attribute of this.resourceAttributes ) {
-        let input_value:InputVariable = {
-          value: {
-            modelType: {
-              name: "Property"
-            },
-            valueType: "string",
-            idShort: "semanticId",
-            kind: "Template",
-            value: this.resource.value[i].semanticId?.keys[0].value
-          }
-        }
-        this.inputVariables.push(input_value);
-        i++;
-      }
-    }
-  }*/
-
-  // Retrieves a semantic name from the platform response and give it back as string
-  // (or null if there is none).
-  /*public getResolvedId(response:platformResponse) {
-    if(response && response.outputArguments) {
-      let output = response.outputArguments[0]?.value?.value;
-      if (output) {
-        let temp = JSON.parse(output);
-        if (temp.result) {
-
-          let result = JSON.parse(temp.result);
-          return result.naming.en.name
-        } else {
-          return null
-        }
-      }
-    }
-  }*/
-
-  // Returns an array [name, description]
-  /*public getSemanticInfo(response:platformResponse) {
-    let return_value = [null, null];
-    if(response && response.outputArguments) {
-      let output = response.outputArguments[0]?.value?.value;
-      if (output) {
-        let temp = JSON.parse(output);
-        if (temp.result) {
-          let result = JSON.parse(temp.result);
-          if (result.naming.en.description) {
-            return_value = [result.naming.en.name, result.naming.en.description]
-          } else {
-            return_value = [result.naming.en.name, null]
-          }
-        }
-      }
-    }
-    return return_value
-  }*/
+  /**
+   * Converts a resource attribute for display to percent.
+   * 
+   * @param attr the attribute
+   */
+  private static convertPercent(attr: ResourceAttribute) {
+    attr.semanticName = "%";
+    attr.value = (attr.value * 100).toFixed(1);
+  }
 
   // Converts byte value of resource attribute:
   // e.g. conversion to GB - dominator: 1000000000, unitName: GB
-  public convertByte(index:any, dominator:any, unitName:string) {
-    if (!this.resource!.value![index]) { // TODO workaround for testing, check async chain
-      this.resource!.value![index] = {} as ResourceAttribute;
-    }
-    this.resource!.value![index].semanticName = unitName;
-    let temp_value = this.resource!.value![index].value;
+
+  private static convertGByte(attr: ResourceAttribute) {
+    ResourceDetailsComponent.convertByte(attr, 1000000000, "GB");
+  }
+
+    /**
+   * Converts a resource attribute for display from byte to GB.
+   * 
+   * @param attr the attribute
+   */
+  private static convertByte(attr: ResourceAttribute, dominator:any, unitName:string) {
+    attr.semanticName = unitName;
+    let temp_value = attr.value;
     temp_value = (temp_value/dominator).toFixed(2)
-    this.resource!.value![index].value = temp_value
+    attr.value = temp_value
   }
 
 }

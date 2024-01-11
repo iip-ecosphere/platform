@@ -30,7 +30,7 @@ describe('ResourceDetailsComponent', () => {
       component = fixture.componentInstance;
       fixture.detectChanges();
     });
-    await component.init();
+    await component.ngOnInit();
   });
 
   it('should create', () => {
