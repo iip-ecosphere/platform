@@ -1,10 +1,6 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { firstValueFrom, Subject, Subscription } from 'rxjs';
-import { platformResponse, ST_ERROR, ST_RECEIVED, ST_RESULT, statusCollection, statusMessage} from 'src/interfaces';
-import { EnvConfigService } from './env-config.service';
-import { OnlyIdPipe } from '../pipes/only-id.pipe';
-import { WebsocketService } from '../websocket.service';
+import { Subject } from 'rxjs';
+import { ST_ERROR, ST_RECEIVED, ST_RESULT, statusCollection, statusMessage} from 'src/interfaces';
 
 @Injectable({
   providedIn: 'root'

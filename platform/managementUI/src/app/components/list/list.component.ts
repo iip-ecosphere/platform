@@ -2,10 +2,8 @@ import { AAS_OP_PREFIX_SME, AAS_TYPE_STRING, ApiService, ArtifactKind, IDSHORT_S
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Subscription, firstValueFrom } from 'rxjs';
-import { EnvConfigService } from 'src/app/services/env-config.service';
 import { Router } from '@angular/router';
-import { MatDialog, MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
-import { MAT_PROGRESS_SPINNER_DEFAULT_OPTIONS_FACTORY } from '@angular/material/progress-spinner';
+import { MatDialog } from '@angular/material/dialog';
 import { EditorComponent } from '../editor/editor.component';
 import { DEFAULT_UPLOAD_CHUNK, DR_displayName, DR_idShort, DR_type, InputVariable, MTK_compound, MTK_container, MT_metaDisplayName, MT_metaSize, MT_metaType, MT_metaTypeKind, MT_metaVariable, MT_varValue, allMetaTypes, configMetaEntry, editorInput, platformResponse } from 'src/interfaces';
 import { Utils, DataUtils } from 'src/app/services/utils.service';
@@ -64,7 +62,6 @@ export class ListComponent extends Utils implements OnInit {
 
   constructor(private router: Router,
     public http: HttpClient,
-    private envConfigService: EnvConfigService,
     public api: ApiService,
     public dialog: MatDialog,
     public websocketService: WebsocketService, 
@@ -150,7 +147,7 @@ export class ListComponent extends Utils implements OnInit {
 
   public async loadData(metaProject: any, submodelElement: any){
     if (submodelElement) {
-      this.rawData = await this.getData(submodelElement);
+      this.rawData = await this.api.getConfiguredElements(submodelElement);
       if (this.rawData) {
         this.filteredData = this.rawData.value
       } else {
@@ -158,28 +155,9 @@ export class ListComponent extends Utils implements OnInit {
         this.filteredData = []
       }
     } else {
-      this.rawData = await this.getData("")
+      this.rawData = await this.api.getConfiguredElements("")
       this.filteredData = this.prefilter(metaProject)
     }
-  }
-
-  /**
-   * It returns the whole "Configuration" submodel or only one submodelElement
-   * (depending on the submodelElement parameter e.g. "Application") */
-  public async getData(submodelElement: string) {
-    let response;
-    try {
-        let cfg = await this.envConfigService.initAndGetCfg();
-        response = await firstValueFrom(
-          this.http.get(cfg?.ip + '/shells/'
-        + cfg?.urn
-        + "/aas/submodels/Configuration/submodel/submodelElements/"
-        + submodelElement));
-      } catch(e) {
-        console.error(e);
-        //this.noData = true;
-      }
-    return response;
   }
 
   /**It returns items with given metaProject */
@@ -583,151 +561,5 @@ export class ListComponent extends Utils implements OnInit {
   public async execFunctionInConfig(basyxFun: string, inputVariables: InputVariable[]) {
       await this.api.executeAasJsonOperation(IDSHORT_SUBMODEL_CONFIGURATION, AAS_OP_PREFIX_SME + basyxFun, inputVariables);
   }
-
-  // ---- icons ------------------------------------------------------------------
-
-  /*icons = [ // TODO too specific, used at all=
-    ["opc.png", ["PlcNextOpcConn", "PlcBeckhoffOpcConn", "DriveBeckhoffOpcConn"]],
-    ["java.png", ["CamSource", "AppAas", "ActionDecider", "DriveAppAas"]],
-    ["py.png", ["PythonAi", "DriveLenzePythonAi"]],
-    ["flower.png", ["FlowerAiServiceClient"]],
-    ["mqtt.png", ["DriveLenzeMqttConn", "mqttEnergyConn", "GraphanaMqttConn"]]
-  ]
-
-  public getIcon(serviceId:string) {
-    let icon_path = null
-    let row = this.icons.find(item => item[1].includes(serviceId))
-    if(row != undefined) {
-      icon_path = "../../../assets/" + row[0]
-    }
-    return icon_path
-  }*/
-
-   /*
-  public getId(serviceValue: any[]) {
-    return serviceValue.find(item => item.idShort === 'id').value;
-  }
-  */
-
-  // old version
-  /*
-  public async getData(type: string) {
-    let response;
-    let path;
-    if (this.ls == "artifact") {
-      path = "/aas/submodels/services/submodel/submodelElements/";
-      this.ls = "services"
-    } else {
-      path = "/aas/submodels/Configuration/submodel/submodelElements/";
-    }
-    try {
-        response = await firstValueFrom(
-          this.http.get(this.ip + '/shells/'
-        + this.urn
-        + path
-        + this.ls));
-      } catch(e) {
-        console.log(e);
-        this.noData = true;
-      }
-    return response;
-  }
-  */
-
-
-  //help method to instantly read all idShort of submodelElement collections in configuration
-  /*
-  public async getSubmodelElements() {
-    let response;
-    try {
-      response = await firstValueFrom(this.http.get(
-        this.ip + '/shells/'
-      + this.urn
-      + "/aas/submodels/Configuration/submodel/submodelElements"));
-    } catch(e) {
-      console.log(e);
-      this.noData = true;
-    }
-    return response;
-  }
-  */
-
-
-  /*
-  ip: string = "";
-  urn: string = "";
-
-  ls: string | null = null; //the idShort of the collection to get from the configuration
-  noData: boolean = false;
-  data: any;
-  submodelElements: any; //help
-  unwantedTypes = ["metaState", "metaType", "metaProject"];
-
-  constructor(public http: HttpClient,
-    private envConfigService: EnvConfigService,
-    private route: ActivatedRoute) {
-    const env = this.envConfigService.getEnv();
-    //the ip and urn are taken from the json.config
-    if(env && env.ip) {
-      this.ip = env.ip;
-    }
-    if (env && env.urn) {
-      this.urn = env.urn;
-    }
-   }
-
-  async ngOnInit() {
-    this.ls = this.route.snapshot.paramMap.get('ls');
-    if(this.ls) {
-      this.data = await this.getData(this.ls);
-      console.log(this.data)
-      this.filter();
-    }
-    this.submodelElements = await this.getSubmodelElements();
-
-  }
-
-  public filter() {
-    const relevantValues = []
-    let indicesToRemove = []
-    let i = 0;
-    for(const item of this.data.value) {
-      if(!this.unwantedTypes.includes(item.idShort)) {
-        indicesToRemove.push(i)
-        relevantValues.push(item)
-      }
-      i++;
-    }
-    this.data.value = relevantValues
-  }
-
-  public async getData(list: string) {
-    let response;
-    try {
-      response = await firstValueFrom(
-        this.http.get(this.ip + '/shells/'
-      + this.urn
-      + "/aas/submodels/Configuration/submodel/submodelElements/"
-      + list));
-    } catch(e) {
-      console.log(e);
-      this.noData = true;
-    }
-    return response;
-  }
-
-  //help method to instantly read all idShort of submodelElement collections in configuration
-  public async getSubmodelElements() {
-    let response;
-    try {
-      response = await firstValueFrom(this.http.get(this.ip + '/shells/'
-      + this.urn + "/aas/submodels/Configuration/submodel/submodelElements"));
-    } catch(e) {
-      console.log(e);
-      this.noData = true;
-    }
-    return response;
-  }
-  */
 
 }

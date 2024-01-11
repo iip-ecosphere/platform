@@ -1,7 +1,7 @@
 import { WebsocketService } from './../../../websocket.service';
 import { Component, OnInit, HostListener} from '@angular/core';
-import { InputVariable, platformResponse } from 'src/interfaces';
-import { firstValueFrom, Subscription } from 'rxjs';
+import { InputVariable } from 'src/interfaces';
+import { Subscription } from 'rxjs';
 import { EnvConfigService } from 'src/app/services/env-config.service';
 import { HttpClient} from '@angular/common/http';
 import { AAS_OP_PREFIX_SME, AAS_TYPE_STRING, ApiService } from 'src/app/services/api.service';
@@ -126,38 +126,12 @@ export class LogsDialogComponent implements OnInit{
     } else {
       console.warn("No valid platform response, no stream URLs available.");
     }
-    /*const response = await this.api.executeFunction(
-      resourceId,
-      aasElementURL,
-      basyxFun,
-      inputVariable) as unknown as platformResponse
-
-    this.getPlatformResponseResolution(response)*/
     console.debug("[logs-dialog | getPlatformResponseResolution]"
       + "Endpoints - \nstdout: "
       + this.stdoutUrl
       + ", \nstderr: "
       + this.stderrUrl)
   }
-
-  /*public getPlatformResponseResolution(response:platformResponse) {
-    let done = false;
-    if(response && response.outputArguments) {
-      let output = response.outputArguments[0]?.value?.value;
-      if (output) {
-        let temp = JSON.parse(output);
-        if (temp.result) {
-          let result = JSON.parse(temp.result);
-          this.stdoutUrl = result[0]
-          this.stderrUrl = result[1]
-          done = true;
-        }
-      }
-    }
-    if (!done) {
-      console.warn("No valid platform response, no stream URLs available.");
-    }
-  }*/
 
   public async getInputVar(serviceId:string, mode:string) {
     this.serviceInfo = await this.getServiceInfo(serviceId);
@@ -211,16 +185,9 @@ export class LogsDialogComponent implements OnInit{
     console.debug("[log-dialog | closeLogs Async] triggered")
     let inputVar = await this.getInputVar(this.data.idShort, "STOP")
     if (inputVar) {
-      //let resourceId = this.serviceInfo.resource
-      //let aasElementURL = "/aas/submodels/resources/submodel/submodelElements/"
       let basyxFun = "serviceManagers/a"
         + this.serviceInfo.serviceMgr.replace("@", "_")
         + "/serviceStreamLog"
-      /*const response = await this.api.executeFunction(
-        resourceId,
-        aasElementURL,
-        basyxFun,
-        inputVar) as unknown as platformResponse*/
       const response = await this.api.executeAasJsonOperation("resources", AAS_OP_PREFIX_SME + basyxFun, inputVar);
       console.debug("[log-dialog | closeStreamLog] platform response: ")
       console.debug(response?.executionState)
@@ -241,16 +208,7 @@ export class LogsDialogComponent implements OnInit{
       let cfg = this.envConfigService.getCfg();
       var url = ApiService.constructOperationCallUrl(cfg, "resources", AAS_OP_PREFIX_SME + this.serviceInfo.resource + "/"
         + "serviceManagers/a" + this.serviceInfo.serviceMgr.replace("@", "_") + "/serviceStreamLog");
-      /*var url = cfg?.ip + '/shells/' + cfg?.urn
-        + "/aas/submodels/resources/submodel/submodelElements/"
-        + this.serviceInfo.resource + "/"
-        + "serviceManagers/a"
-        + this.serviceInfo.serviceMgr.replace("@", "_")
-        + "/serviceStreamLog/invoke"*/
       let data = ApiService.constructOperationCallBody(inputVariable);
-      /*let data = {"inputArguments": inputVariable,
-      "requestId":"1bfeaa30-1512-407a-b8bb-f343ecfa28cf",
-      "inoutputArguments":[], "timeout":10000}*/
   
       var request = new XMLHttpRequest()
       request.open('POST', url, false)

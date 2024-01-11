@@ -1,7 +1,5 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Subject, Subscription } from 'rxjs';
-import { EnvConfigService } from './env-config.service';
 import { OnlyIdPipe } from '../pipes/only-id.pipe';
 import { WebsocketService } from '../websocket.service';
 import { StatusCollectionNotifier, StatusCollectionService } from './status-collection.service';
@@ -19,8 +17,6 @@ export class PlanDeployerService {
   public reloadingDataSubject = new Subject<any>();
 
   constructor(private api: ApiService,
-    private http: HttpClient,
-    private envConfigService: EnvConfigService,
     private onlyId: OnlyIdPipe,
     private websocketService: WebsocketService,
     private collector: StatusCollectionService) {

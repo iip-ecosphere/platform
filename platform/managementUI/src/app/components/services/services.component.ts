@@ -1,11 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, NgZone, OnInit } from '@angular/core';
 import { ApiService } from 'src/app/services/api.service';
-import { EnvConfigService } from 'src/app/services/env-config.service';
-import { PlatformArtifacts, Resource, PlatformServices}
-  from 'src/interfaces';
+import { PlatformArtifacts, Resource, PlatformServices} from 'src/interfaces';
 import { firstValueFrom } from 'rxjs';
-import {MatRadioChange} from '@angular/material/radio';
+import { MatRadioChange } from '@angular/material/radio';
 import { Utils } from 'src/app/services/utils.service';
 
 @Component({
@@ -17,7 +15,6 @@ export class ServicesComponent extends Utils implements OnInit {
 
   constructor(public http: HttpClient,
     public api: ApiService,
-    private envConfigService: EnvConfigService,
     private zone: NgZone) {
       super();
   }
@@ -113,24 +110,6 @@ export class ServicesComponent extends Utils implements OnInit {
 
   // ------------------ Filter -----------------------------------
 
-  public async getPlatformData(submodel: any, submodelElement: any){
-    let response: any;
-
-    try {
-        let cfg = await this.envConfigService.initAndGetCfg();
-        response = await firstValueFrom(
-          this.http.get(cfg?.ip + '/shells/'
-        + cfg?.urn
-        + "/aas/submodels/"
-        + submodel
-        + "/submodel/submodelElements/"
-        + submodelElement));
-      } catch(e) {
-        console.error(e);
-      }
-    return response
-  }
-
   public async getDisplayData(tab:string, submodel:any, submodelElement: string) {
     this.currentTab = tab
     if(tab != "instances") {
@@ -152,7 +131,7 @@ export class ServicesComponent extends Utils implements OnInit {
 
   public async loadData(submodel: any, submodelElement: any){
     let response;
-    response = await this.getPlatformData(submodel, submodelElement)
+    response = await this.api.getSubmodelElement(submodel, submodelElement)
     this.filteredData = response
 
     if(this.currentTab != "instances") {

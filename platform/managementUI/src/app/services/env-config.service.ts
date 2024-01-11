@@ -1,6 +1,4 @@
 import { Injectable } from '@angular/core';
-import { from, map } from 'rxjs';
-import  * as environment  from '../../assets/config/config.json'; // TODO needed?
 export type { Configuration };
 declare var window: any;
 
