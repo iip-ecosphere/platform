@@ -580,7 +580,7 @@ export class ListComponent extends Utils implements OnInit {
     this.execFunctionInConfig("genAppsAsync", inputVariables)
   }
 
-  public async execFunctionInConfig(basyxFun: string, inputVariables: any) {
+  public async execFunctionInConfig(basyxFun: string, inputVariables: InputVariable[]) {
       await this.api.executeAasJsonOperation(IDSHORT_SUBMODEL_CONFIGURATION, AAS_OP_PREFIX_SME + basyxFun, inputVariables);
   }
 

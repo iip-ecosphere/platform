@@ -1,10 +1,9 @@
-//import { PlatformData, SemanticId, Resource } from './../../../interfaces';
-//import { SemanticId, outputArgument } from './../../../interfaces';
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ApiService } from 'src/app/services/api.service';
-import { Resource, ResourceAttribute, InputVariable, platformResponse } from 'src/interfaces';
+import { LANG_ENGLISH, SemanticResolutionService } from 'src/app/services/semantic-resolution.service';
+import { Resource, ResourceAttribute } from 'src/interfaces';
 
 @Component({
   selector: 'app-resource-details',
@@ -15,11 +14,9 @@ export class ResourceDetailsComponent implements OnInit {
 
   id: string | null = null;
   resource: Resource | undefined;
-  inputVariables: InputVariable[] = [];
-  resourceAttributes: ResourceAttribute[] = [];
   platformURL:string = "/aas/submodels/platform/submodel/submodelElements/";
 
-  constructor(public http: HttpClient, public api: ApiService,
+  constructor(public http: HttpClient, public api: ApiService, public resolver: SemanticResolutionService,
     public route: ActivatedRoute) { }
 
   ngOnInit(): void {
@@ -79,9 +76,16 @@ export class ResourceDetailsComponent implements OnInit {
 
   // ---------- Semantic Id -------------------------
   public async resolveSemanticId() {
-    await this.setInputValues();
+    if (this.resource && this.resource.value) {
+      let resourceAttributes = this.resource.value;
+      let semanticIds = [] as string[];
+      for (const attribute of resourceAttributes) {
+        semanticIds.push(SemanticResolutionService.validateId(attribute.semanticId?.keys[0].value));
+      }
+      let resolvedInfo = await this.resolver.resolveSemanticIds(semanticIds, LANG_ENGLISH);
 
-    let resolvedInfo = []
+    /*await this.setInputValues();
+
     let i = 0;
     for(const value of this.inputVariables) {
       const input:InputVariable[] = [value]
@@ -93,25 +97,26 @@ export class ResourceDetailsComponent implements OnInit {
 
       resolvedInfo.push(this.getSemanticInfo(response))
       i++;
-    }
-    let j = 0;
-    for(const value of resolvedInfo) {
-      if (!this.resource!.value![j]) { // TODO workaround for testing, check async chain
-        this.resource!.value![j] = {} as ResourceAttribute;
+    }*/
+      let j = 0;
+      for(const value of resolvedInfo) {
+        if (!this.resource!.value![j]) { // TODO workaround for testing, check async chain
+          this.resource!.value![j] = {} as ResourceAttribute;
+        }
+        if(value.name=="byte") {
+          this.convertByte(j, 1000000000, "GB")
+        } else {
+          this.resource!.value![j].semanticName = value.name;
+        }
+        this.resource!.value![j].semanticDescription = value.description;
+        j++;
       }
-      if(value[0]=="byte") {
-        this.convertByte(j, 1000000000, "GB")
-      } else {
-        this.resource!.value![j].semanticName = value[0];
-      }
-      this.resource!.value![j].semanticDescription = value[1];
-      j++;
     }
   }
 
   // Creates a list of input parameters for the aas operation "resolveSemanticId"
   // based on the semanticId of the resource attributes.
-  public setInputValues() {
+  /*public setInputValues() {
     if(this.resource && this.resource.value) {
       this.resourceAttributes = this.resource.value;
 
@@ -132,11 +137,11 @@ export class ResourceDetailsComponent implements OnInit {
         i++;
       }
     }
-  }
+  }*/
 
   // Retrieves a semantic name from the platform response and give it back as string
   // (or null if there is none).
-  public getResolvedId(response:platformResponse) {
+  /*public getResolvedId(response:platformResponse) {
     if(response && response.outputArguments) {
       let output = response.outputArguments[0]?.value?.value;
       if (output) {
@@ -150,10 +155,10 @@ export class ResourceDetailsComponent implements OnInit {
         }
       }
     }
-  }
+  }*/
 
   // Returns an array [name, description]
-  public getSemanticInfo(response:platformResponse) {
+  /*public getSemanticInfo(response:platformResponse) {
     let return_value = [null, null];
     if(response && response.outputArguments) {
       let output = response.outputArguments[0]?.value?.value;
@@ -170,7 +175,7 @@ export class ResourceDetailsComponent implements OnInit {
       }
     }
     return return_value
-  }
+  }*/
 
   // Converts byte value of resource attribute:
   // e.g. conversion to GB - dominator: 1000000000, unitName: GB
@@ -178,9 +183,10 @@ export class ResourceDetailsComponent implements OnInit {
     if (!this.resource!.value![index]) { // TODO workaround for testing, check async chain
       this.resource!.value![index] = {} as ResourceAttribute;
     }
-    this.resource!.value![index].semanticName =  unitName;
-        let temp_value = this.resource!.value![index].value;
-        temp_value = (temp_value/dominator).toFixed(2)
-        this.resource!.value![index].value = temp_value
+    this.resource!.value![index].semanticName = unitName;
+    let temp_value = this.resource!.value![index].value;
+    temp_value = (temp_value/dominator).toFixed(2)
+    this.resource!.value![index].value = temp_value
   }
+
 }

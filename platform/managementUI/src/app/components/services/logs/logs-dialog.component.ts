@@ -110,7 +110,7 @@ export class LogsDialogComponent implements OnInit{
     }
   }
 
-  public async getWebsocketEndpoint(inputVariable: any) {
+  public async getWebsocketEndpoint(inputVariable: InputVariable[]) {
     let resourceId = this.serviceInfo.resource
     let aasElementURL = "/aas/submodels/resources/submodel/submodelElements/"
     let basyxFun = "serviceManagers/a"

@@ -136,7 +136,7 @@ public static createAasOperationParameter(idShort: string, aasType: string, valu
  * @param params the parameters for the operation
  * @returns the response as platformResponse
  */
-public async executeAasJsonOperation(submodel: string, operationName: string, params: any) {
+public async executeAasJsonOperation(submodel: string, operationName: string, params: InputVariable[]) {
   return await this.executeAasJsonOperationWithTimeout(submodel, operationName, DEFAULT_AAS_OPERATION_TIMEOUT, params);
 }
 
@@ -149,7 +149,7 @@ public async executeAasJsonOperation(submodel: string, operationName: string, pa
  * @param params the parameters for the operation
  * @returns the response as platformResponse
  */
-public async executeAasJsonOperationWithTimeout(submodel: string, operationName: string, timeout: number, params: any) {
+public async executeAasJsonOperationWithTimeout(submodel: string, operationName: string, timeout: number, params: InputVariable[]) {
   let response;
   try {
     let cfg = await this.envConfigService.initAndGetCfg();
@@ -390,6 +390,9 @@ export const IDSHORT_OPERATION_ARTIFACTS_UNDEPLOYPLANASYNC = "undeployPlanAsync"
 export const IDSHORT_OPERATION_ARTIFACTS_DEPLOYPLANASYNC = "deployPlanAsync";
 export const IDSHORT_OPERATION_ARTIFACTS_DEPLOYPLANWITHIDASYNC = "undeployPlanWithIdAsync";
 export const IDSHORT_OPERATION_ARTIFACTS_UPLOAD = "upload";
+
+export const IDSHORT_SUBMODEL_PLATFORM = "platform";
+export const IDSHORT_OPERATION_PLATFORM_RESOLVESEMANTICID = "resolveSemanticId";
 
 export const IDSHORT_SUBMODEL_CONFIGURATION = "Configuration";
 

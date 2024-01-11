@@ -6,6 +6,7 @@ import { OnlyIdPipe } from '../pipes/only-id.pipe';
 import { WebsocketService } from '../websocket.service';
 import { StatusCollectionNotifier, StatusCollectionService } from './status-collection.service';
 import { ApiService, IDSHORT_OPERATION_ARTIFACTS_DEPLOYPLANASYNC, IDSHORT_OPERATION_ARTIFACTS_DEPLOYPLANWITHIDASYNC, IDSHORT_OPERATION_ARTIFACTS_UNDEPLOYPLANASYNC, IDSHORT_SUBMODEL_ARTIFACTS } from './api.service';
+import { InputVariable } from 'src/interfaces';
 
 @Injectable({
   providedIn: 'root'
@@ -29,7 +30,7 @@ export class PlanDeployerService {
     })
   }
 
-  public async deployPlan(params: any, undeploy?: boolean) {
+  public async deployPlan(params: InputVariable[], undeploy?: boolean) {
     let basyxFunc;
 
     if (undeploy) {
@@ -48,7 +49,7 @@ export class PlanDeployerService {
   }
 
 
-  public async undeployPlanById(params: any) {
+  public async undeployPlanById(params: InputVariable[]) {
     let response = await this.api.executeAasJsonOperation(IDSHORT_SUBMODEL_ARTIFACTS, IDSHORT_OPERATION_ARTIFACTS_DEPLOYPLANWITHIDASYNC, params);
 
     if (response && response.outputArguments[0].value && response.outputArguments[0].value.value) {
