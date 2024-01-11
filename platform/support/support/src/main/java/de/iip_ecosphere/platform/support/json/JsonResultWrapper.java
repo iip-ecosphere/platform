@@ -16,6 +16,8 @@ import java.io.Serializable;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -114,7 +116,7 @@ public class JsonResultWrapper implements Function<Object[], Object>, Serializab
          * 
          * @param ex the exception
          */
-        private Result(Exception ex) {
+        private Result(Throwable ex) {
             exception = ex.getMessage();
         }
 
@@ -204,7 +206,9 @@ public class JsonResultWrapper implements Function<Object[], Object>, Serializab
             if (null != taskId) {
                 TaskRegistry.stopTask(taskId);
             }
-        } catch (Exception e) { // including AasExecutionException
+        } catch (Throwable e) { // including AasExecutionException, NPE
+            LoggerFactory.getLogger(getClass()).error("Operation execution failed", e);
+            e.printStackTrace(); // for now, to be on the safe side
             result = new Result(e);
             if (null != listener) {
                 listener.operationFailed();
