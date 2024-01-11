@@ -266,7 +266,8 @@ export class EditorComponent extends Utils implements OnInit {
         for (const input of selectedType.value) {
           if (input.idShort && metaTypes.indexOf(input.idShort) === -1) {
             let isOptional = false;
-            let uiGroup: number = DataUtils.getPropertyValue(input.value, 'uiGroup');
+            let uiVal: number = DataUtils.getPropertyValue(input.value, 'uiGroup') || 100;
+            let uiGroup = uiVal / 100;
 
             if (uiGroup < 0) {
               isOptional = true;
