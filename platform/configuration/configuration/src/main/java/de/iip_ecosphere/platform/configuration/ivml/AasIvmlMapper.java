@@ -1422,7 +1422,9 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
      */
     private static void deleteAasVariableMapping(Submodel sm, String typeName, String varName) {
         SubmodelElementCollection c = sm.getSubmodelElementCollection(AasUtils.fixId(typeName));
-        c.deleteElement(AasUtils.fixId(varName));
+        if (null != c) {
+            c.deleteElement(AasUtils.fixId(varName));
+        }
     }
 
     /**
