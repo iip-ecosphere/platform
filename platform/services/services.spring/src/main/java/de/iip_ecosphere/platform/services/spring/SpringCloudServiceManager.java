@@ -785,7 +785,7 @@ public class SpringCloudServiceManager
     public void removeArtifact(String artifactId) throws ExecutionException {
         checkId(artifactId, "artifactId");
         SpringCloudArtifactDescriptor desc = getArtifact(artifactId);
-        if (desc.decreaseUsageCount() > 0) {
+        if (null != desc && desc.decreaseUsageCount() > 0) {
             LOGGER.info("Decreased usage of artifact {}", artifactId);
         } else {
             LOGGER.info("Removing artifact {}", artifactId);
