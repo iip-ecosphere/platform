@@ -23,10 +23,10 @@ project DataTypes {
     const String Eclass_Property_swName = "0173-1#02-AAO247#002";
     
     const Integer UiInvisibleGroup = 0;
-    const Integer UiMandatoryGroup1 = 1;
-    const Integer UiOptionalGroup1 = -1;
-    const Integer UiMandatoryGroup2 = 2;
-    const Integer UiOptionalGroup2 = -2;
+    const Integer UiMandatoryGroup1 = 100;
+    const Integer UiOptionalGroup1 = -100;
+    const Integer UiMandatoryGroup2 = 200;
+    const Integer UiOptionalGroup2 = -200;
     
     def String mvnVersion(OktoVersion ver, Boolean snapshot) = 
        if (snapshot) then ver + "-SNAPSHOT" else ver endif;

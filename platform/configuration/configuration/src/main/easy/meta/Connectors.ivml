@@ -207,41 +207,41 @@ project Connectors {
       
     // IIP-Ecosphere provided connectors
     compound Connector refines Service {
-       setOf(AssignmentOperation) operations = {};
-       TextEncoding encoding = TextEncoding::ASCII;
-       assign (uiGroup = UiInvisibleGroup) to {
-           setOf(MappingEntry) mapping = {};
-       }
-       
        String class;
        String artifact;
-       String inAdapterClass = ""; // if given, use adapter; may be "*" to use generated transport serializer
-       String outAdapterClass = ""; // if given, use adapter; may be "*" to use generated transport serializer
-       // may collapse into one, to be supported by configurable mapping
        IOTypeWithPath inInterface; // provided data input to be mapped into adapter, alternative to adapterClass
        IOTypeWithPath outInterface; // provided data output to be mapped into adapter, alternative to adapterClass
-       setOf(ConnectorInputHandler) inputHandlers = {};
-       Constraint inputHandlersOk = inputHandlers->forAll(h|handlerOk(h, self));
-       
        NonEmptyString host = "localhost";
        Port port;
        Integer samplingPeriod = 0; // no sampling by default
        SecuritySettings security = null;
-       Boolean mock = false; // in-vivo testing, enable a mocking connector service wrapper
-       CacheMode cacheMode = CacheMode::NONE;
-       String deviceServiceKey;
-       ServiceKind kind = ServiceKind.SOURCE_SERVICE;
-       Parameters parameter = {
-           StringParameter {
-              name="outPath", // default parameter, changes machine output data path
-              defaultValue="" // interpreted by ConnectorServiceWrapper as not set
-           }, StringParameter {
-              name="inPath",  // default parameter, changes machine input data path
-              defaultValue="" // interpreted by ConnectorServiceWrapper as not set
-           }
-       };
-       
 
+       assign (uiGroup = UiOptionalGroup1) to {
+           setOf(AssignmentOperation) operations = {};
+           TextEncoding encoding = TextEncoding::ASCII;
+           String inAdapterClass = ""; // if given, use adapter; may be "*" to use generated transport serializer
+           String outAdapterClass = ""; // if given, use adapter; may be "*" to use generated transport serializer
+           setOf(ConnectorInputHandler) inputHandlers = {};
+           CacheMode cacheMode = CacheMode::NONE;
+           ServiceKind kind = ServiceKind.SOURCE_SERVICE;
+           Parameters parameter = {
+               StringParameter {
+                  name="outPath", // default parameter, changes machine output data path
+                  defaultValue="" // interpreted by ConnectorServiceWrapper as not set
+               }, StringParameter {
+                  name="inPath",  // default parameter, changes machine input data path
+                  defaultValue="" // interpreted by ConnectorServiceWrapper as not set
+               }
+           };
+       }
+       Constraint inputHandlersOk = inputHandlers->forAll(h|handlerOk(h, self));
+       assign (uiGroup = UiOptionalGroup2) to {
+           Boolean mock = false; // in-vivo testing, enable a mocking connector service wrapper
+           String deviceServiceKey;
+       }
+       assign (uiGroup = UiInvisibleGroup) to {
+           setOf(MappingEntry) mapping = {};
+       }
        Constraint connectorOutputSize = fwdTypes(output).size() < 2;
        Constraint connectorInputSize = fwdTypes(input).size() < 2;
        Constraint connectorKind = kind == ServiceKind.SOURCE_SERVICE or kind == ServiceKind.SINK_SERVICE;
@@ -251,72 +251,100 @@ project Connectors {
    }
    
    compound ChannelConnector refines Connector {
-       String inSerializerClass = ""; // if not given, use registry
-       String outSerializerClass = ""; // if not given, use registry
        String inChannel = "";
        String outChannel = "";
-       setOf(String) outChannels; // additional out channels towards platform, unified with outChannel; may also be used instead of outChannel
        MachineFormatter machineFormatter = null;
        MachineParser machineParser = null;
+       assign (uiGroup = UiOptionalGroup1) to {
+           setOf(String) outChannels; // additional out channels towards platform, unified with outChannel; may also be used instead of outChannel
+           String inSerializerClass = ""; // if not given, use registry
+           String outSerializerClass = ""; // if not given, use registry
+       }
        
        Constraint noModelCallOperation = collectOperations(operations)->selectByKind(ModelCallOperation).isEmpty();
    }
    
    compound OpcUaV1Connector refines Connector { // fixed template types see JavaConnector.vtl
-       String class = "de.iip_ecosphere.platform.connectors.opcuav1.OpcUaConnector";
-       String artifact ="de.iip-ecosphere.platform:connectors.opcuav1:";
-       Port port = 4840;
-       String deviceServiceKey = "opcua";
-       NameplateInfo nameplateInfo = {
-           manufacturerProductDesignation = "Generic OPC UA connector@en",
-           manufacturer = refBy(manufacturer_sse)
-       };
+       assign (uiGroup = UiInvisibleGroup) to {
+           String class = "de.iip_ecosphere.platform.connectors.opcuav1.OpcUaConnector";
+           String artifact ="de.iip-ecosphere.platform:connectors.opcuav1:";
+           NameplateInfo nameplateInfo = {
+               manufacturerProductDesignation = "Generic OPC UA connector@en",
+               manufacturer = refBy(manufacturer_sse)
+           };
+       }
+       assign (uiGroup = UiOptionalGroup1) to {
+           Port port = 4840;
+       }
+       assign (uiGroup = UiOptionalGroup2) to {
+           String deviceServiceKey = "opcua";
+       }
    }
 
    compound AasConnector refines Connector {  // fixed template types see JavaConnector.vtl
-        String class = "de.iip_ecosphere.platform.connectors.aas.AasConnector";
-        String artifact ="de.iip-ecosphere.platform:connectors.aas:";
+       assign (uiGroup = UiInvisibleGroup) to {
+            String class = "de.iip_ecosphere.platform.connectors.aas.AasConnector";
+            String artifact ="de.iip-ecosphere.platform:connectors.aas:";
+            NameplateInfo nameplateInfo = {
+               manufacturerProductDesignation = "Generic AAS connector@en",
+               manufacturer = refBy(manufacturer_sse)
+            };
+        }
         NonEmptyString idShortSpec; // name or java regex pattern, shall start with iri:urn:...
         NonEmptyString registryHost = "localhost";
         Port registryPort;
         String registryPath;
-        NameplateInfo nameplateInfo = {
-           manufacturerProductDesignation = "Generic AAS connector@en",
-           manufacturer = refBy(manufacturer_sse)
-        };
    }
    
    compound MqttV3Connector refines ChannelConnector { // fixed template types see JavaConnector.vtl
-       String class = "de.iip_ecosphere.platform.connectors.mqttv3.PahoMqttv3Connector";
-       String artifact ="de.iip-ecosphere.platform:connectors.mqttv3:";
-       Port port = 1883;
-       String deviceServiceKey = "mqttv3";
-       NameplateInfo nameplateInfo = {
-          manufacturerProductDesignation = "Generic MQTT v3 connector@en",
-          manufacturer = refBy(manufacturer_sse)
-       };
+       assign (uiGroup = UiInvisibleGroup) to {
+           String class = "de.iip_ecosphere.platform.connectors.mqttv3.PahoMqttv3Connector";
+           String artifact ="de.iip-ecosphere.platform:connectors.mqttv3:";
+           NameplateInfo nameplateInfo = {
+              manufacturerProductDesignation = "Generic MQTT v3 connector@en",
+              manufacturer = refBy(manufacturer_sse)
+           };
+       }
+       assign (uiGroup = UiOptionalGroup1) to {
+           Port port = 1883;
+       }
+       assign (uiGroup = UiOptionalGroup2) to {
+           String deviceServiceKey = "mqttv3";
+       }
    }
    
    compound MqttV5Connector refines ChannelConnector { // fixed template types see JavaConnector.vtl
-       String class = "de.iip_ecosphere.platform.connectors.mqttv5.PahoMqttv5Connector";
-       String artifact ="de.iip-ecosphere.platform:connectors.mqttv5:";
-       Port port = 1883;
-       String deviceServiceKey = "mqttv5";
-       NameplateInfo nameplateInfo = {
-          manufacturerProductDesignation = "Generic MQTT v5 connector@en",
-          manufacturer = refBy(manufacturer_sse)
-       };
+       assign (uiGroup = UiInvisibleGroup) to {
+           String class = "de.iip_ecosphere.platform.connectors.mqttv5.PahoMqttv5Connector";
+           String artifact ="de.iip-ecosphere.platform:connectors.mqttv5:";
+           NameplateInfo nameplateInfo = {
+              manufacturerProductDesignation = "Generic MQTT v5 connector@en",
+              manufacturer = refBy(manufacturer_sse)
+           };
+       }
+       assign (uiGroup = UiOptionalGroup1) to {
+           Port port = 1883;
+       }
+       assign (uiGroup = UiOptionalGroup2) to {
+           String deviceServiceKey = "mqttv5";
+       }
    }
 
    compound MqttConnector refines ChannelConnector { // fixed template types see JavaConnector.vtl
-       String class = "de.iip_ecosphere.platform.connectors.mqtt.MqttConnectorFactory";
-       String artifact ="de.iip-ecosphere.platform:connectors.mqtt:";
-       Port port = 1883;
-       String deviceServiceKey = "mqtt";
-       NameplateInfo nameplateInfo = {
-          manufacturerProductDesignation = "Generic MQTT connector@en",
-          manufacturer = refBy(manufacturer_sse)
-       };
+       assign (uiGroup = UiInvisibleGroup) to {
+           String class = "de.iip_ecosphere.platform.connectors.mqtt.MqttConnectorFactory";
+           String artifact ="de.iip-ecosphere.platform:connectors.mqtt:";
+           NameplateInfo nameplateInfo = {
+              manufacturerProductDesignation = "Generic MQTT connector@en",
+              manufacturer = refBy(manufacturer_sse)
+           };
+       }
+       assign (uiGroup = UiOptionalGroup1) to {
+           Port port = 1883;
+       }
+       assign (uiGroup = UiOptionalGroup2) to {
+           String deviceServiceKey = "mqtt";
+       }
    }
     
 }
