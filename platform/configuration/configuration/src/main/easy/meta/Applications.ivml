@@ -6,21 +6,26 @@ project Applications {
     import Nameplate;
     
     annotate BindingTime bindingTime = BindingTime::compile to .;
+    annotate Integer uiGroup = UiMandatoryGroup1 to .;
 
     enum AppPackagingSchema {SpringFat, ZipWithClasspath};
 
     compound Application refines VersionedElement {
         Id id;
         NonEmptyNameString name;
-        String description = "";
-        String artifact = "";
+        assign (uiGroup = UiOptionalGroup1) to {
+            String description = "";
+            String artifact = "";
+        }
         setOf(refTo(ServiceMesh)) services; // no services is ok, then the artifact must have hand-crafted services
         NameplateInfo nameplateInfo;
-        Boolean createContainer = false;
-        Boolean debug = false;
-        String cmdArg; // for now, comma separated
-        setOf(refTo(Server)) servers = {}; // additional server instances to be started
-        setOf(AppPackagingSchema) packaging = { AppPackagingSchema::SpringFat };
+        assign (uiGroup = UiOptionalGroup1) to {
+            Boolean createContainer = false;
+            Boolean debug = false;
+            String cmdArg; // for now, comma separated
+            setOf(refTo(Server)) servers = {}; // additional server instances to be started
+            setOf(AppPackagingSchema) packaging = { AppPackagingSchema::SpringFat };
+        }
         
         Constraint idOk = matches(id, "^[^@]+$");
         Constraint packagingOk = packaging.size() >= 1;

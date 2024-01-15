@@ -1288,7 +1288,8 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                 varBuilder = builder.createSubmodelElementCollectionBuilder(
                     AasUtils.fixId(varName), false, false);
                 for (int member = 0; member < var.getNestedElementsCount(); member++) {
-                    mapVariable(var.getNestedElement(member), varBuilder, null);
+                    IDecisionVariable elt = var.getNestedElement(member);
+                    mapVariable(elt, varBuilder, null);
                 }
             } else if (TypeQueries.isContainer(rVarType)) {
                 boolean isSequence = TypeQueries.isSequence(rVarType);
@@ -1379,7 +1380,6 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             LoggerFactory.getLogger(AasIvmlMapper.class).warn(
                 "Cannot find type ServiceBase. No service will have a AAS URL. {}", e.getMessage());
         }
-        
     }
     
     /**

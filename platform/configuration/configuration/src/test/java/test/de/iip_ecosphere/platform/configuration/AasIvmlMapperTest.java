@@ -519,6 +519,11 @@ public class AasIvmlMapperTest {
         assertIvmlFileChange("AllTypes", false, "rec1");
         assertIvmlFileChange("AllServices", true, "test1");
 
+        mapper.createVariable("test2", "setOf(Integer)", "{25, 27}");
+        assertIvmlFileChange("AllConstants", false, "test2");
+        mapper.deleteVariable("test2");
+        assertIvmlFileChange("AllConstants", true, "test2");
+        
         stopEasy(lcd);
         setupIvmlFiles(); // revert changes
     }

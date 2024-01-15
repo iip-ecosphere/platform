@@ -46,7 +46,6 @@ import net.ssehub.easy.varModel.model.datatypes.IDatatype;
 import net.ssehub.easy.varModel.model.datatypes.OclKeyWords;
 import net.ssehub.easy.varModel.model.datatypes.Reference;
 import net.ssehub.easy.varModel.model.datatypes.Sequence;
-import net.ssehub.easy.varModel.model.datatypes.TypeQueries;
 import net.ssehub.easy.varModel.model.values.Value;
 import net.ssehub.easy.varModel.model.values.ValueDoesNotMatchTypeException;
 import net.ssehub.easy.varModel.persistency.IVMLWriter;
@@ -514,7 +513,7 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
     protected void setValue(IDecisionVariable var, String expression, EvaluationVisitor eval, AssignmentState state) 
         throws ExecutionException {
         try {
-            ConstraintSyntaxTree cst = createExpression(expression, var.getConfiguration().getProject());
+            ConstraintSyntaxTree cst = createExpression(null, expression, var.getConfiguration().getProject());
             if (null == eval) {
                 eval = new EvaluationVisitor();
             }
@@ -531,19 +530,23 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
     /**
      * Creates an IVML expression syntax tree for {@code expression}.
      * 
+     * @param type the target type, may be <b>null</b> for none
      * @param expression the expression
      * @param scope the resolution scope, may be <b>null</b> for the root project
      * @return the syntax tree
      * @throws ExecutionException if the expression cannot be created, e.g., due to syntactic or semantic errors
      */
-    protected ConstraintSyntaxTree createExpression(String expression, Project scope) throws ExecutionException {
+    protected ConstraintSyntaxTree createExpression(IDatatype type, String expression, Project scope) 
+        throws ExecutionException {
         try {
             if (null == scope) {
                 scope = getIvmlConfiguration().getProject();
             }
-            return ModelUtility.INSTANCE.createExpression(expression, scope);
-        } catch (ConstraintSyntaxException | CSTSemanticException e) {
-            throw new ExecutionException(e.getMessage(), null);
+            return ModelUtility.INSTANCE.createExpression(type, expression, scope);
+        } catch (CSTSemanticException e) {
+            throw new ExecutionException("IVML expression semantic error: " + e.getMessage(), null);
+        } catch (ConstraintSyntaxException e) {
+            throw new ExecutionException("IVML expression syntax error: " + e.getMessage(), null);
         }
     }
 
@@ -559,7 +562,7 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
     protected Constraint createAssignment(AbstractVariable varDecl, String valueEx, Project prj) 
         throws ExecutionException {
         try {
-            Constraint c = new Constraint(createExpression(varDecl.getName() + "=" + valueEx, prj), prj);
+            Constraint c = new Constraint(createExpression(null, varDecl.getName() + "=" + valueEx, prj), prj);
             prj.add(c);
             return c;
         } catch (CSTSemanticException e) {
@@ -577,10 +580,8 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
      */
     protected void setValue(AbstractVariable var, String expression) throws ExecutionException {
         try {
-            if (TypeQueries.isCompound(var.getType()) && expression.trim().startsWith("{")) {
-                expression = IvmlDatatypeVisitor.getUnqualifiedType(var.getType()) + expression;
-            } // container type may require special treatment
-            ConstraintSyntaxTree cst = createExpression(expression, var.getProject());
+            IDatatype type = var.getType();
+            ConstraintSyntaxTree cst = createExpression(type, expression, var.getProject());
             cst.inferDatatype();
             var.setValue(cst);
         } catch (ValueDoesNotMatchTypeException | CSTSemanticException e) {

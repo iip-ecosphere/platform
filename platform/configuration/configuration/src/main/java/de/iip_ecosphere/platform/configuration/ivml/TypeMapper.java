@@ -12,8 +12,10 @@
 
 package de.iip_ecosphere.platform.configuration.ivml;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
@@ -64,6 +66,7 @@ class TypeMapper {
     private Predicate<AbstractVariable> variableFilter;
     private Stack<Map<String, Object>> assignments = new Stack<>();
     private Function<String, String> metaShortId;
+    private Map<String, Integer> uiGroups = new HashMap<>();
     
     /**
      * Creates a type mapper instance.
@@ -163,9 +166,12 @@ class TypeMapper {
         if (!isDoneType(typeId)) {
             SubmodelElementCollectionBuilder typeB = builder.createSubmodelElementCollectionBuilder(
                 typeId, false, false);
-            Set<String> doneSlots = new HashSet<>();
-            mapCompoundSlots(type, type, typeB, doneSlots);
-            mapRefines(type, typeB, doneSlots);
+            Map<String, SubmodelElementCollectionBuilder> doneSlots = new HashMap<>();
+            mapCompoundSlots(type, type, type, typeB, doneSlots);
+            mapRefines(type, type, typeB, doneSlots);
+            for (SubmodelElementCollectionBuilder builder : sortMembers(type, doneSlots)) {
+                builder.build();
+            }
             typeB.createPropertyBuilder(metaShortId.apply("abstract"))
                 .setValue(Type.BOOLEAN, type.isAbstract())
                 .build();
@@ -174,6 +180,101 @@ class TypeMapper {
                 .build();
             addTypeKind(typeB, IvmlTypeKind.COMPOUND, metaShortId);
             typeB.build();
+        }
+    }
+    
+    /**
+     * Sort members for display sequence in UI.
+     * 
+     * @param type the type to sort the members for
+     * @param slots the SME builders per slot
+     * @return the sorted members
+     */
+    private List<SubmodelElementCollectionBuilder> sortMembers(Compound type, 
+        Map<String, SubmodelElementCollectionBuilder> slots) {
+        List<SubmodelElementCollectionBuilder> result = new ArrayList<>();
+        Set<String> done = null;
+        if (type instanceof Compound) {
+            List<String> names = new ArrayList<String>();
+            done = new HashSet<>();
+            collectMemberNames((Compound) type, names, done);
+            Map<Integer, List<SubmodelElementCollectionBuilder>> namesByUiGroups = new HashMap<>();
+            for (String name : names) {
+                SubmodelElementCollectionBuilder elt = slots.get(name);
+                if (null != elt) {
+                    int uiGroup = getUiGroup(type.getName(), name) / 100;
+                    List<SubmodelElementCollectionBuilder> tmp = namesByUiGroups.get(uiGroup);
+                    if (null == tmp) {
+                        tmp = new ArrayList<>();
+                        namesByUiGroups.put(uiGroup, tmp);
+                    }
+                    tmp.add(elt);
+                    done.remove(name);
+                } // EASy problems with Any
+            }
+            add(namesByUiGroups, result, 1, 1);   // mandatory UI groups
+            add(namesByUiGroups, result, 0, 0);   // invisible UI group (optional, may not be there)
+            add(namesByUiGroups, result, -1, -1); // optional UI groups
+        } 
+        return result;
+    }
+
+   /**
+    * Adds all entries from {@code src} with matching key to {@code tgt}. Assumption: There are no holes between the 
+    * groups.
+    * 
+    * @param src source structure
+    * @param tgt target structure
+    * @param start the start ui group/key
+    * @param inc the increment, terminate immediately after first transfer if {@code 0}
+    */
+    private void add(Map<Integer, List<SubmodelElementCollectionBuilder>> src, 
+        List<SubmodelElementCollectionBuilder> tgt, int start, int inc) {
+        int u = start;
+        while (src.get(u) != null) {
+            tgt.addAll(src.get(u));
+            if (inc == 0) {
+                break;
+            }
+            u += inc;
+        }
+    }
+
+    /**
+     * Collects the member names for type.
+     * 
+     * @param type the compound type
+     * @param result the resulting name sequence
+     * @param done the done names
+     */
+    private void collectMemberNames(Compound type, List<String> result, Set<String> done) {
+        if (!type.getProject().getName().equals("MetaConcepts")) {
+            for (int r = 0; r < type.getRefinesCount(); r++) { // important: parents go first
+                collectMemberNames(type.getRefines(r), result, done);
+            }
+            collectMemberNamesContainer(type, result, done);
+        }
+    }
+
+    /**
+     * Collects the member names for the given container.
+     * 
+     * @param cnt the container
+     * @param result the resulting name sequence
+     * @param done the done names
+     */
+    private void collectMemberNamesContainer(IDecisionVariableContainer cnt, List<String> result, Set<String> done) {
+        for (int e = 0; e < cnt.getModelElementCount(); e++) { // important: keep sequence
+            ContainableModelElement element = cnt.getModelElement(e);
+            if (element instanceof AbstractVariable) {
+                String name = element.getName();
+                if (!done.contains(name)) {
+                    done.add(name);
+                    result.add(name); // uiGroup % 100 might affect position here
+                }
+            } else if (element instanceof AttributeAssignment) {
+                collectMemberNamesContainer((AttributeAssignment) element, result, done);
+            }
         }
     }
 
@@ -281,14 +382,16 @@ class TypeMapper {
      * Maps refines of a compound type.
      * 
      * @param type the type
+     * @param topType the top-level type the mapping started with
      * @param typeB the type builder
      * @param doneSlots already done slot names
      */
-    private void mapRefines(Compound type, SubmodelElementCollectionBuilder typeB, Set<String> doneSlots) {
+    private void mapRefines(Compound type, Compound topType, SubmodelElementCollectionBuilder typeB, 
+        Map<String, SubmodelElementCollectionBuilder> doneSlots) {
         for (int r = 0; r < type.getRefinesCount(); r++) {
             Compound refines = type.getRefines(r);
-            mapCompoundSlots(refines, refines, typeB, doneSlots);
-            mapRefines(refines, typeB, doneSlots);
+            mapCompoundSlots(refines, refines, topType, typeB, doneSlots);
+            mapRefines(refines, topType, typeB, doneSlots);
         }
     }
 
@@ -297,13 +400,14 @@ class TypeMapper {
      * 
      * @param cnt the container (compound or annotation assignment)
      * @param type the containing compound type
+     * @param topType the top-level type the mapping started with
      * @param typeB the type builder
      * @param doneSlots already done slot names
      */
-    private void mapCompoundSlots(IDecisionVariableContainer cnt, Compound type, SubmodelElementCollectionBuilder typeB,
-        Set<String> doneSlots) {
+    private void mapCompoundSlots(IDecisionVariableContainer cnt, Compound type, Compound topType, 
+        SubmodelElementCollectionBuilder typeB, Map<String, SubmodelElementCollectionBuilder> doneSlots) {
         for (int i = 0; i < cnt.getElementCount(); i++) {
-            mapCompoundSlot(cnt.getElement(i), type, typeB, doneSlots);
+            mapCompoundSlot(cnt.getElement(i), type, topType, typeB, doneSlots);
         }
         for (int a = 0; a < cnt.getAssignmentCount(); a++) {
             AttributeAssignment assng = cnt.getAssignment(a);
@@ -326,7 +430,7 @@ class TypeMapper {
                 }
             }
             assignments.push(thisLevelAssignments);
-            mapCompoundSlots(assng, type, typeB, doneSlots);
+            mapCompoundSlots(assng, type, topType, typeB, doneSlots);
             assignments.pop();
         }
     }
@@ -385,19 +489,20 @@ class TypeMapper {
      * 
      * @param slot the slot to map
      * @param type the containing compound type
+     * @param topType the top-level type the mapping started with
      * @param typeB the type builder
      * @param doneSlots already done slot names
      */
-    private void mapCompoundSlot(DecisionVariableDeclaration slot, Compound type, 
-        SubmodelElementCollectionBuilder typeB, Set<String> doneSlots) {
+    private void mapCompoundSlot(DecisionVariableDeclaration slot, Compound type, Compound topType,
+        SubmodelElementCollectionBuilder typeB, Map<String, SubmodelElementCollectionBuilder> doneSlots) {
         // if we get into trouble with property ids, we have to sub-structure that
         String slotName = AasUtils.fixId(slot.getName());
-        if (!doneSlots.contains(slotName) && variableFilter.test(slot)) {
-            doneSlots.add(slotName);
+        if (!doneSlots.containsKey(slotName) && variableFilter.test(slot)) {
             String lang = AasIvmlMapper.getLang();
             IDatatype slotType = slot.getType();
             SubmodelElementCollectionBuilder propB = typeB.createSubmodelElementCollectionBuilder(slotName, 
                 true, false);
+            doneSlots.put(slotName, propB);
             propB.createPropertyBuilder("name")
                 .setValue(Type.STRING, slotName)
                 .setDescription(new LangString(lang, ModelInfo.getCommentSafe(slot)))
@@ -405,7 +510,7 @@ class TypeMapper {
             propB.createPropertyBuilder("type")
                 .setValue(Type.STRING, IvmlDatatypeVisitor.getUnqualifiedType(slotType))
                 .build();
-            int uiGroup = 1; // default, always there, mandatory
+            int uiGroup = 100; // default, always there, mandatory
             Object tmp = getAssignmentValue("uiGroup"); 
             if (tmp instanceof Integer) {
                 uiGroup = (Integer) tmp;
@@ -417,17 +522,32 @@ class TypeMapper {
                     }
                 }
             }
+            uiGroups.put(topType.getName() + "." + slotName, uiGroup);
+            if (uiGroup >= 100 || uiGroup <= 100) {
+                uiGroup /= 100;
+            }
             propB.createPropertyBuilder("uiGroup")
                 .setValue(Type.INTEGER, uiGroup)
                 .build();
             addMetaDefault(cfg.getConfiguration(), slot, propB, metaShortId);
-            propB.build();
             if (slotType != type) {
                 mapType(slotType);
             }
         }
     }
 
+    /**
+     * Returns the recorded UI group.
+     * 
+     * @param type the type name
+     * @param slot the name of the slot within {@code type}
+     * @return the uiGroup value, defaults to 100
+     */
+    public int getUiGroup(String type, String slot) {
+        Integer tmp = uiGroups.get(type + "." + slot);
+        return null == tmp ? 100 : tmp;
+    }
+    
     /**
      * Returns the top-most collected assignment value.
      * 
