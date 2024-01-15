@@ -465,11 +465,12 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
         }
         
         /**
-         * Retrieves a node starting at the root of the OPC UA model based on the node's qualified name {@code qName}.
+         * Retrieves an element starting at the root of the AAS model based on the elements's qualified 
+         * name {@code qName}.
          * 
-         * @param qName the qualified node name
+         * @param qName the qualified element name
          * @return the element
-         * @throws IOException if no node can be found for {@code qName}
+         * @throws IOException if no element can be found for {@code qName}
          */
         private ElementsAccess retrieveElement(String qName) throws IOException {
             String aasId = pollingThread == Thread.currentThread() ? pollingAas : nonPollingAas;
