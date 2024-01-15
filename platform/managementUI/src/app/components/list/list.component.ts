@@ -247,6 +247,10 @@ export class ListComponent extends Utils implements OnInit {
                 let fVal : any = {}; // TODO not if contained type is primitive
                 let fName = fieldName + "__" + i + "_";
                 let fProp = DataUtils.getProperty(value.value, fName);
+                if (!fProp) {
+                  fName = "var_" + i;
+                  fProp = DataUtils.getProperty(value.value, fName);
+                }
                 if (fProp && fProp.value) {
                   this.createRowValue(fProp.value, fVal, false, v => true);
                   let fId = fVal["id"] || fVal["name"] || String(i);
@@ -411,10 +415,6 @@ export class ListComponent extends Utils implements OnInit {
     });
   }
 
-  private removeChar(char:string, str:string){
-    return str.replace(char, '')
-  }
-
   /**
    * Filters the row data/display data for the services, servers and apps category.
    */
@@ -473,7 +473,6 @@ export class ListComponent extends Utils implements OnInit {
         value: "",
         idShort: "value"
       }
-      
       let editorInput:editorInput =
         {name: "value", type: item.varType, value:item.varValue,
         description: [{language: '', text: ''}],

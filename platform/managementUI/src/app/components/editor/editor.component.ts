@@ -69,10 +69,10 @@ export class EditorComponent extends Utils implements OnInit {
     } else if(!this.type) {
       await this.getMeta()
     } else if (this.type.type){
-      if(!this.metaBackup || !this.metaBackup.value) {
+      if (!this.metaBackup || !this.metaBackup.value) {
         await this.getMeta()
       }
-      if(this.metaBackup && this.metaBackup.value) {
+      if (this.metaBackup && this.metaBackup.value) {
         let type = DataUtils.stripGenericType(this.type.type);
         this.selectedType = this.metaBackup.value.find(item => item.idShort === type);
         this.generateInputs()
@@ -107,11 +107,11 @@ export class EditorComponent extends Utils implements OnInit {
     if (this.meta && this.meta.value) {
       for (const item of this.meta.value) {
         let idShort = ""
-        if(item.idShort) {
+        if (item.idShort) {
           idShort = item.idShort
         }
 
-        if(!this.isAbstract(item)) {
+        if (!this.isAbstract(item)) {
           if(filter?.metaRef.includes(idShort)) {
             newMetaValues.push(item)
           }
@@ -266,154 +266,159 @@ export class EditorComponent extends Utils implements OnInit {
         for (const input of selectedType.value) {
           if (input.idShort && metaTypes.indexOf(input.idShort) === -1) {
             let isOptional = false;
-            let uiVal: number = DataUtils.getPropertyValue(input.value, 'uiGroup') || 100;
-            let uiGroup = uiVal / 100;
+            let uiGroup: number = DataUtils.getPropertyValue(input.value, 'uiGroup'); // translated 100 -> 1
 
             if (uiGroup < 0) {
               isOptional = true;
               uiGroup = uiGroup * -1;
             }
-            let uiGroupCompare =  this.uiGroups.find(
-              item => item.uiGroup === uiGroup);
+            if (uiGroup > 0) { // 0 == invisible
+              let uiGroupCompare =  this.uiGroups.find(item => item.uiGroup === uiGroup);
 
-            let editorInput: editorInput =
-              {name: '', type: '', value:[], description:
-                [{language: '', text: ''}],
-                refTo: false, multipleInputs: false};
+              let editorInput: editorInput =
+                {name: '', type: '', value:[], description:
+                  [{language: '', text: ''}],
+                  refTo: false, multipleInputs: false};
 
-            let name = DataUtils.getProperty(input.value, 'name');
-            if (name) {
-              editorInput.name = name.value;
-              if (name.description
-                && name.description[0]
-                && name.description[0].text
-                && name.description[0].language) {
-                  editorInput.description = name.description;
+              let name = DataUtils.getProperty(input.value, 'name');
+              if (name) {
+                editorInput.name = name.value;
+                if (name.description
+                  && name.description[0]
+                  && name.description[0].text
+                  && name.description[0].language) {
+                    editorInput.description = name.description;
+                }
               }
-            }
-            let val = DataUtils.getProperty(this.type?.value, input.idShort); // TODO may need object access for nested objects
-            if (val) {
-              editorInput.displayName = val[DR_displayName];
-            }
-            editorInput.type = DataUtils.getPropertyValue(input.value, 'type');
+              let val = DataUtils.getProperty(this.type?.value, input.idShort); // TODO may need object access for nested objects
+              if (val) {
+                editorInput.displayName = val[DR_displayName];
+              }
+              editorInput.type = DataUtils.getPropertyValue(input.value, 'type');
 
-            editorInput.meta = input;
-            let typeGenerics = DataUtils.stripGenericType(editorInput.type);
-            let type = this.meta?.value?.find(type => type.idShort === typeGenerics);
-            if (type) {
-              editorInput.metaTypeKind = DataUtils.getPropertyValue(type.value, MT_metaTypeKind);
-            } else if(this.metaBackup && this.metaBackup.value) {
-              let iterType = editorInput.type;
-              do {
-                let temp = this.metaBackup.value.find(item => item.idShort === DataUtils.stripGenericType(iterType));
-                editorInput.metaTypeKind = DataUtils.getPropertyValue(temp?.value, MT_metaTypeKind);
-                editorInput.type = iterType;
-                if (editorInput.metaTypeKind == MTK_derived) {
-                  iterType = DataUtils.getPropertyValue(temp?.value, MT_metaRefines);
-                  if (!iterType) {
-                    break;
+              editorInput.meta = input;
+              let typeGenerics = DataUtils.stripGenericType(editorInput.type);
+              let type = this.meta?.value?.find(type => type.idShort === typeGenerics);
+              if (type) {
+                editorInput.metaTypeKind = DataUtils.getPropertyValue(type.value, MT_metaTypeKind);
+              } else if(this.metaBackup && this.metaBackup.value) {
+                let iterType = editorInput.type;
+                do {
+                  let temp = this.metaBackup.value.find(item => item.idShort === DataUtils.stripGenericType(iterType));
+                  editorInput.metaTypeKind = DataUtils.getPropertyValue(temp?.value, MT_metaTypeKind);
+                  editorInput.type = iterType;
+                  if (editorInput.metaTypeKind == MTK_derived) {
+                    iterType = DataUtils.getPropertyValue(temp?.value, MT_metaRefines);
+                    if (!iterType) {
+                      break;
+                    }
+                  }
+                } while (editorInput.metaTypeKind == MTK_derived);
+              }
+              //the metaTypeKind was so far not included on the values of the types in the configuration/meta collection
+              //therefore this approach doesnt work, but it would be much more performant if it did
+              // editorInput.metaTypeKind = input.value.find(
+              //   (item: { idShort: string; }) => item.idShort === 'metaTypeKind')?.value;
+              //   console.log(editorInput);
+              //   console.log(input.value);
+
+              if (editorInput.type.indexOf('refTo') >= 0) {
+                editorInput.refTo = true;
+              }
+              if (editorInput.type.indexOf('setOf') >= 0
+                || editorInput.type.indexOf('sequenceOf') >= 0) {
+                editorInput.multipleInputs = true;
+              }
+              editorInput.defaultValue = DataUtils.getPropertyValue(input.value, MT_metaDefault);
+console.log(input.idShort);              
+console.log(input.value);              
+console.log(editorInput.defaultValue);              
+              let ivmlValue = this.type?.value || editorInput.defaultValue || ""; 
+              if (selMetaTypeKind === MTK_compound && this.isArray(ivmlValue)) {
+                ivmlValue = DataUtils.getPropertyValue(ivmlValue, input.idShort);
+              }
+              let initial;
+              if (this.isObject(ivmlValue) && ivmlValue && input.idShort in ivmlValue) { 
+                // compound instances may be passed in as object with properties, those being undefined are defaults
+                ivmlValue = ivmlValue[input.idShort];
+                if (!ivmlValue) {
+                  ivmlValue = editorInput.defaultValue;
+                }
+              }
+console.log(ivmlValue);              
+              if (editorInput.multipleInputs) {
+                initial = ivmlValue
+              } else if (editorInput.metaTypeKind === MTK_enum) {
+                initial = ivmlValue
+                editorInput.valueTransform = input => IVML_TYPE_PREFIX_enumeration + (input.type || "") + '.' + input.value;
+              } else if (editorInput.type === 'Boolean') {
+                initial = String(ivmlValue).toLowerCase() === 'true';
+              } else if (editorInput.metaTypeKind === MTK_compound && !editorInput.multipleInputs) {
+                initial = ivmlValue; // input comes as object
+              } else {
+                if (typeGenerics == "AasLocalizedString") {
+                  initial = DataUtils.getLangStringText(ivmlValue);
+                  editorInput.valueLang = DataUtils.getLangStringLang(ivmlValue);
+                  editorInput.valueTransform = input => DataUtils.composeLangString(input.value, DataUtils.getUserLanguage());
+                } else {
+                  initial = ivmlValue; // input is just the value
+                }
+              }
+              editorInput.value = initial;
+console.log(initial);              
+
+              if (!uiGroupCompare ){
+                if (isOptional) {
+                  if (editorInput.multipleInputs) {
+                    this.uiGroups.push({
+                      uiGroup: uiGroup,
+                      inputs: [],
+                      optionalInputs: [],
+                      fullLineInputs: [],
+                      fullLineOptionalInputs: [editorInput]
+                    });
+                  } else {
+                    this.uiGroups.push({
+                      uiGroup: uiGroup,
+                      inputs: [],
+                      optionalInputs: [editorInput],
+                      fullLineInputs: [],
+                      fullLineOptionalInputs: []
+                    });
+                  }
+                } else {
+                  if (editorInput.multipleInputs) {
+                    this.uiGroups.push({
+                      uiGroup: uiGroup,
+                      inputs: [],
+                      optionalInputs: [],
+                      fullLineInputs: [editorInput],
+                      fullLineOptionalInputs: []
+                    });
+                  } else {
+                    this.uiGroups.push({
+                      uiGroup: uiGroup,
+                      inputs: [editorInput],
+                      optionalInputs: [],
+                      fullLineInputs: [],
+                      fullLineOptionalInputs: []
+                    });
                   }
                 }
-              } while (editorInput.metaTypeKind == MTK_derived);
-            }
-            //the metaTypeKind was so far not included on the values of the types in the configuration/meta collection
-            //therefore this approach doesnt work, but it would be much more performant if it did
-            // editorInput.metaTypeKind = input.value.find(
-            //   (item: { idShort: string; }) => item.idShort === 'metaTypeKind')?.value;
-            //   console.log(editorInput);
-            //   console.log(input.value);
-
-            if(editorInput.type.indexOf('refTo') >= 0) {
-              editorInput.refTo = true;
-            }
-            if(editorInput.type.indexOf('setOf') >= 0
-              || editorInput.type.indexOf('sequenceOf') >= 0) {
-              editorInput.multipleInputs = true;
-            }
-            editorInput.defaultValue = DataUtils.getPropertyValue(input.value, MT_metaDefault);
-            let ivmlValue = this.type?.value || editorInput.defaultValue || ""; 
-            if (selMetaTypeKind === MTK_compound && this.isArray(ivmlValue)) {
-              ivmlValue = DataUtils.getPropertyValue(ivmlValue, input.idShort);
-            }
-            let initial;
-            if (this.isObject(ivmlValue) && ivmlValue && input.idShort in ivmlValue) { 
-              // compound instances may be passed in as object with properties, those being undefined are defaults
-              ivmlValue = ivmlValue[input.idShort];
-              if (!ivmlValue) {
-                ivmlValue = editorInput.defaultValue;
-              }
-            }
-            if (editorInput.multipleInputs) {
-              initial = ivmlValue
-            } else if (editorInput.metaTypeKind === MTK_enum) {
-              initial = ivmlValue
-              editorInput.valueTransform = input => IVML_TYPE_PREFIX_enumeration + (input.type || "") + '.' + input.value;
-            } else if (editorInput.type === 'Boolean') {
-              initial = String(ivmlValue).toLowerCase() === 'true';
-            } else if (editorInput.metaTypeKind === MTK_compound && !editorInput.multipleInputs) {
-              initial = ivmlValue; // input comes as object
-            } else {
-              if (typeGenerics == "AasLocalizedString") {
-                initial = DataUtils.getLangStringText(ivmlValue);
-                editorInput.valueLang = DataUtils.getLangStringLang(ivmlValue);
-                editorInput.valueTransform = input => DataUtils.composeLangString(input.value, DataUtils.getUserLanguage());
               } else {
-                initial = ivmlValue; // input is just the value
-              }
-            }
-            editorInput.value = initial;
+                if (isOptional) {
+                  if(editorInput.multipleInputs) {
+                    uiGroupCompare?.fullLineOptionalInputs.push(editorInput);
+                  } else {
+                    uiGroupCompare?.optionalInputs.push(editorInput);
+                  }
 
-            if(!uiGroupCompare ){
-              if(isOptional) {
-                if(editorInput.multipleInputs) {
-                  this.uiGroups.push({
-                    uiGroup: uiGroup,
-                    inputs: [],
-                    optionalInputs: [],
-                    fullLineInputs: [],
-                    fullLineOptionalInputs: [editorInput]
-                  });
                 } else {
-                  this.uiGroups.push({
-                    uiGroup: uiGroup,
-                    inputs: [],
-                    optionalInputs: [editorInput],
-                    fullLineInputs: [],
-                    fullLineOptionalInputs: []
-                  });
-                }
-              } else {
-                if(editorInput.multipleInputs) {
-                  this.uiGroups.push({
-                    uiGroup: uiGroup,
-                    inputs: [],
-                    optionalInputs: [],
-                    fullLineInputs: [editorInput],
-                    fullLineOptionalInputs: []
-                  });
-                } else {
-                  this.uiGroups.push({
-                    uiGroup: uiGroup,
-                    inputs: [editorInput],
-                    optionalInputs: [],
-                    fullLineInputs: [],
-                    fullLineOptionalInputs: []
-                  });
-                }
-              }
-            } else {
-              if(isOptional) {
-                if(editorInput.multipleInputs) {
-                  uiGroupCompare?.fullLineOptionalInputs.push(editorInput);
-                } else {
-                  uiGroupCompare?.optionalInputs.push(editorInput);
-                }
-
-              } else {
-                if(editorInput.multipleInputs) {
-                  uiGroupCompare?.fullLineInputs.push(editorInput);
-                } else {
-                  uiGroupCompare?.inputs.push(editorInput);
+                  if (editorInput.multipleInputs) {
+                    uiGroupCompare?.fullLineInputs.push(editorInput);
+                  } else {
+                    uiGroupCompare?.inputs.push(editorInput);
+                  }
                 }
               }
             }

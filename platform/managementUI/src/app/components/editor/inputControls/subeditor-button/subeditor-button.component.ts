@@ -28,12 +28,12 @@ export class SubeditorButtonComponent implements OnInit {
   }
 
   public openSubeditor(type: editorInput) {
-    if(this.meta) {
+    if (this.meta) {
       let dialogRef = this.subDialog.open(EditorComponent, {
         height: '80%',
         width:  '80%',
       })
-      if(this.refinedTypes[0]) {
+      if (this.refinedTypes[0]) {
         dialogRef.componentInstance.refinedTypes = this.refinedTypes;
       } else {
         dialogRef.componentInstance.type = type;
@@ -44,9 +44,9 @@ export class SubeditorButtonComponent implements OnInit {
   }
 
   public validateEditorInputType(type:editorInput) {
-    if(this.meta && this.meta.value) {
+    if (this.meta && this.meta.value) {
       let typeMeta = DataUtils.getProperty(this.meta.value, DataUtils.stripGenericType(type.type));
-      if(!typeMeta) {
+      if (!typeMeta) {
         this.errorMsg = 'ERROR: Metadata not found in Configuration'
         return true;
       } else {
@@ -65,12 +65,12 @@ export class SubeditorButtonComponent implements OnInit {
   }
 
   private getRefinedTypes(searchTerm: string) {
-    if(this.meta && this.meta.value) {
+    if (this.meta && this.meta.value) {
       let refinedTypes = [];
-      for(const type of this.meta.value) {
+      for (const type of this.meta.value) {
         const refined = DataUtils.getProperty(type.value, MT_metaRefines);
-        if(refined && refined.value != '') {
-          if(searchTerm === refined.value) {
+        if (refined && refined.value != '') {
+          if (searchTerm === refined.value) {
             const abstract = DataUtils.getProperty(type.value, MT_metaAbstract);
             if(abstract && abstract.value && type.idShort) {
               this.getRefinedTypes(type.idShort);
@@ -80,7 +80,7 @@ export class SubeditorButtonComponent implements OnInit {
           }
         }
       }
-      if(!refinedTypes[0]) {
+      if (!refinedTypes[0]) {
         console.log('WARNING: no refined types found for abstract type ' + searchTerm);
       } else {
         this.refinedTypes = this.refinedTypes.concat(refinedTypes);
@@ -89,9 +89,9 @@ export class SubeditorButtonComponent implements OnInit {
   }
 
   private hasInputFields(meta: ResourceAttribute) {
-    if(Array.isArray(meta.value)) {
-      for(let element of meta.value) {
-        if(!metaTypes.includes(element.idShort)) {
+    if (Array.isArray(meta.value)) {
+      for (let element of meta.value) {
+        if (!metaTypes.includes(element.idShort)) {
           return true;
         }
       }

@@ -69,7 +69,7 @@ describe('IvmlFormatterService', () => {
     await testVarLifecycle(service, "testStringVar", "ab", "cd", IVML_TYPE_String);
   }, 4 * TIMEOUT_LIFECYCLE_MS);
 
-  xit('should create/edit/delete IVML variables with collection type', async() => { // failing on Jenkins, unclear
+  it('should create/edit/delete IVML variables with collection type', async() => { // failing on Jenkins, unclear
     await testVarLifecycle(service, "testSequenceInt", [25], [25, 26], "sequenceOf(Integer)");
     await testVarLifecycle(service, "testSetInt", [25], [-25, 26], "setOf(Integer)");
   }, 2 * TIMEOUT_LIFECYCLE_MS);
