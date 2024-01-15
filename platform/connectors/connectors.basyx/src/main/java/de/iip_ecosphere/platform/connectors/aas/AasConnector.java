@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -33,6 +34,7 @@ import de.iip_ecosphere.platform.connectors.MachineConnector;
 import de.iip_ecosphere.platform.connectors.events.ConnectorTriggerQuery;
 import de.iip_ecosphere.platform.connectors.events.PatternTriggerQuery;
 import de.iip_ecosphere.platform.connectors.model.AbstractModelAccess;
+import de.iip_ecosphere.platform.connectors.model.ModelInputConverter;
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.Schema;
@@ -44,6 +46,7 @@ import de.iip_ecosphere.platform.support.aas.Operation;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.Registry;
 import de.iip_ecosphere.platform.support.aas.Submodel;
+import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 
 /**
@@ -334,6 +337,50 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
     protected void error(String message, Throwable th) {
         LOGGER.error(message + ": " + th.getMessage());
     }
+    
+    /**
+     * Specialized model input converter.
+     * 
+     * @author Jan Cepok, SSE
+     */
+    private static class AasInputConverter extends ModelInputConverter {
+        
+        @Override
+        public long toLong(Object data) throws IOException {
+            if (data.getClass() == Long.class) {
+                return (long) data;
+            } else if (data.getClass() == Integer.class) { // AAS declares long but BaSyx uses int
+                return (int) data;
+            } else if (data instanceof Number) { // just in case
+                return ((Number) data).longValue();
+            } else {
+                return 0; // no number???
+            }
+        }
+        
+        @Override
+        public byte toByte(Object data) throws IOException {
+            if (data.getClass() == Byte.class) {
+                return (byte) data;
+            } else if (data instanceof Number) { // AAS declares byte but BaSyx uses int
+                return ((Number) data).byteValue();
+            } else {
+                return 0; // no number???
+            }  
+        }
+   
+        @Override
+        public short toShort(Object data) throws IOException {
+            if (data.getClass() == Short.class) {
+                return (short) data;
+            } else if (data instanceof Number) { // AAS declares short but BaSyx uses int
+                return ((Number) data).shortValue();
+            } else {
+                return 0; // no number???
+            }  
+        }
+   
+    }    
 
     /**
      * Implements the model access for AAS.
@@ -345,7 +392,9 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
         private static final char SEPARATOR_CHAR = '/';
         private static final String SEPARATOR_STRING = "/";
         private ElementsAccess base;
+        private String basePath;
         private AasModelAccess parent;
+        private AasInputConverter inputConverter = new AasInputConverter();
         private Map<String, Map<String, ElementsAccess>> elements = new HashMap<>();
 
         /**
@@ -361,13 +410,23 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
          * 
          * @param base the element to resolve on
          * @param parent the return parent for {@link #stepOut()}
+         * @param basePath the base path this context represente
+         * @param elements the (parent) elements cache to use
          */
-        protected AasModelAccess(ElementsAccess base, AasModelAccess parent) {
+        protected AasModelAccess(ElementsAccess base, AasModelAccess parent, String basePath, 
+            Map<String, Map<String, ElementsAccess>> elements) {
             this();
             this.base = base;
             this.parent = parent;
+            this.basePath = basePath;
+            this.elements = elements;
         }
-        
+
+        @Override
+        public ModelInputConverter getInputConverter() {
+            return inputConverter;
+        }
+       
         @Override
         public String topInstancesQName() {
             return ""; // none
@@ -409,7 +468,7 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
          * Retrieves a node starting at the root of the OPC UA model based on the node's qualified name {@code qName}.
          * 
          * @param qName the qualified node name
-         * @return the node
+         * @return the element
          * @throws IOException if no node can be found for {@code qName}
          */
         private ElementsAccess retrieveElement(String qName) throws IOException {
@@ -438,24 +497,24 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
                 if (null == result) {
                     throw new IOException("No element found for " + qName);
                 } else {
-                    if (null == cache) {
-                        cache = new HashMap<>();
-                        elements.put(aasId, cache);
+                    if (elements.get(aasId) != null) {
+                        elements.get(aasId).put(qName, result);
                     }
-                    cache.put(qName, result);
                 }
             }
             return result;
         }
         
+
         /**
-         * Retrieves a node starting at {@code current} recursively following the path given by {@code qName}.
+         * Retrieves a element starting at {@code current} recursively following the path given by {@code qName}.
          * 
-         * @param current the current not to start searching for
-         * @param qName the qualified node name
-         * @return the node or <b>null</b> for none found
+         * @param current the current element to start searching for
+         * @param qName the qualified element name
+         * @return the element or <b>null</b> for none found
          */
         private ElementsAccess retrieveElement(ElementsAccess current, String qName) {
+            String aasId = pollingThread == Thread.currentThread() ? pollingAas : nonPollingAas;
             ElementsAccess result = null;
             int pos = qName.indexOf(SEPARATOR_CHAR);
             String nodeName;
@@ -468,10 +527,12 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
             } else {
                 nodeName = qName;
             }
-            ElementsAccess tmp = current.getSubmodelElementCollection(nodeName);
+            SubmodelElementCollection tmp = current.getSubmodelElementCollection(nodeName);
             if (null != tmp) {
                 if (null == remainder) {
                     result = tmp;
+                    Iterator<SubmodelElement> testIterator = tmp.elements().iterator();
+                    retrieveUnderlyingElements(testIterator, basePath, aasId);
                 } else {
                     result = retrieveElement(tmp, remainder);
                 }
@@ -480,6 +541,30 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
         }
         
         // checkstyle: stop exception type check
+
+        /**
+         * Retrieving/caching underlying elements via path.
+         * 
+         * @param subModelsIterator the iterator of the current submodelelement
+         * @param actualPath the current path to be attached
+         * @param aasId the id of the aas
+         */
+        private void retrieveUnderlyingElements(Iterator<SubmodelElement> subModelsIterator, String actualPath, 
+            String aasId) {
+            Map<String, ElementsAccess> cachedElements = elements.get(aasId);
+            if  (cachedElements == null) {
+                cachedElements = new HashMap<>();
+            }
+            while   (subModelsIterator.hasNext()) {
+                SubmodelElement e = subModelsIterator.next();
+                if (!(e instanceof Property)) {
+                    cachedElements.put(actualPath + "/" + e.getIdShort(), (ElementsAccess) e);
+                    elements.put(aasId, cachedElements);
+                    SubmodelElementCollection tmp = (SubmodelElementCollection) e;
+                    retrieveUnderlyingElements(tmp.elements().iterator(), actualPath + "/" + e.getIdShort(), aasId);
+                }
+            }
+        }
         
         @Override
         public Object call(String qName, Object... args) throws IOException {
@@ -562,22 +647,39 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
         @Override
         public AasModelAccess stepInto(String name) throws IOException {
             AasModelAccess result = null;
+            if  (!name.contains("/") && basePath == null) {
+                if (null == base) {
+                    Aas aas = connectedAAS.get(pollingThread == Thread.currentThread() ? pollingAas : nonPollingAas);
+                    if (null == aas) {
+                        throw new IOException("AAS " + pollingAas + " not found. Cannot resolve further.");
+                    }
+                    Submodel submodel = aas.getSubmodel(name);
+                    if (null == submodel) {
+                        throw new IOException("Submodel " + name + " not found. Cannot resolve further.");
+                    }
+                    result = new AasModelAccess(submodel, this, null, null);
+                } else {
+                    SubmodelElementCollection coll = base.getSubmodelElementCollection(name);
+                    if (null == coll) {
+                        throw new IOException("Collection " + name + " not found. Cannot resolve further.");
+                    }
+                    result = new AasModelAccess(coll, this, null, null);
+                }
+                return result;
+            } else if (!name.contains("/")) {
+                name = basePath + "/" + name;
+            }
+            if (!elements.isEmpty()) {
+                String aasId = pollingThread == Thread.currentThread() ? pollingAas : nonPollingAas;
+                if (elements.get(aasId).containsKey(name)) {
+                    return new AasModelAccess(elements.get(aasId).get(name), this, name, elements);
+                }
+            }
             if (null == base) {
-                Aas aas = connectedAAS.get(pollingThread == Thread.currentThread() ? pollingAas : nonPollingAas);
-                if (null == aas) {
-                    throw new IOException("AAS " + pollingAas + " not found. Cannot resolve further.");
-                }
-                Submodel submodel = aas.getSubmodel(name);
-                if (null == submodel) {
-                    throw new IOException("Submodel " + name + " not found. Cannot resolve further.");
-                }
-                result = new AasModelAccess(submodel, this);
+                basePath = name;
+                result = new AasModelAccess(retrieveElement(name), this, basePath, elements);
             } else {
-                SubmodelElementCollection coll = base.getSubmodelElementCollection(name);
-                if (null == coll) {
-                    throw new IOException("Collection " + name + " not found. Cannot resolve further.");
-                }
-                result = new AasModelAccess(coll, this);
+                result = new AasModelAccess(null, this, basePath, elements);
             }
             return result;
         }
