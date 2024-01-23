@@ -1,5 +1,36 @@
+@import "../../../styles.scss";
+
 tr:nth-child(odd) {
   background-color: initial;
+}
+
+.inputEditor {
+  margin-bottom: 0em;
+}
+
+:host ::ng-deep .mat-form-field-wrapper {
+  margin: 0 !important;
+  padding: 0;
+}
+
+// default material color is white
+:host ::ng-deep .mat-select-value {    
+  color: black !important;  
+}
+
+// default material color is white
+:host ::ng-deep .mat-select-arrow {    
+  color: black !important;  
+}
+
+.custom.mat-card {
+  margin: 0.3em;
+  padding: 0.3em;
+}
+
+.inputLabel {
+  min-height: 2em;
+  margin-bottom: 0.2em;
 }
 
 .inputGroup {
@@ -7,9 +38,9 @@ tr:nth-child(odd) {
   justify-content: flex-start;
   flex-wrap: wrap;
   overflow-y:hidden;
-  gap: 1em;
-  background-color: rgb(145, 145, 145);
-  margin-bottom: 2em;
+  gap: 0.5em;
+  background-color: $color_seaBlue;
+  margin-bottom: 0.2em;
 }
 
 .fullLineInputGroup {
@@ -19,31 +50,42 @@ tr:nth-child(odd) {
   flex-wrap: wrap;
   overflow-x:hidden;
   gap: 0.5em;
-  background-color: rgb(145, 145, 145);
-  margin-bottom: 2em;
+  background-color: $color_seaBlue;
+  margin-bottom: 0.2em;
+}
+
+.inputField {
+  min-width: $editorInputFieldWidth;
 }
 
 .inputBox {
   min-height: 8em;
-  min-width: 16em;
-  margin: 0.5em;
+  min-width: calc(1.1em + #{$editorInputFieldWidth});
+  margin: 0.2em;
+  background-color: $color_poolBlue_light;
+  border: 3px solid $color_lakeGreen;
+  color: black;
 }
 
 .refInput {
-    min-height: 11em;
-    min-width: 32em;
+    min-height: 8em;
+    min-width: 16em;
     margin: 0.5em;
+    padding: 0.5em;
+    background-color: $color_poolBlue_light;
+    border: 3px solid $color_lakeGreen;
+    color: black;
 }
 
 .toggleButton {
-  background-color: white;
+  @extend .okto-button;
   color: black;
   margin-bottom: 0.3em;
   padding: 4px, 4px;
 }
 
 .feedback {
-  background-color: rgb(35, 142, 184); /* Green background color */
+  background-color: $color_spaBlue; /* Green background color */
   color: #fff; /* White text color */
   padding: 10px 20px; /* Padding around the message */
   border-radius: 4px; /* Rounded corners */

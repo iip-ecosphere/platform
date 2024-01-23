@@ -1,5 +1,21 @@
-<div [matTooltip]="errorMsg" [matTooltipDisabled]="!disabled">
-  <p>{{value}}</p>
-  <button #button mat-raised-button [disabled]="disabled" (click)="openSubeditor(input)">edit</button>
-</div>
+<span [matTooltip]="errorMsg" [matTooltipDisabled]="!disabled">
+  <span id="editorButton.value" *ngIf="showValue == 'true'">
+    <span *ngIf="getDisplayValue() else noInput">
+      {{getDisplayValue()}} 
+    </span>
+    <ng-template #noInput>
+      <i>no value</i>
+    </ng-template>
+  </span>
+  <span *ngIf="matIcon && matIcon.length > 0 else noIcon">
+    <button #button mat-icon-button class="itemButton" [disabled]="disabled" (click)="openSubeditor(input)">
+      <mat-icon>{{matIcon}}</mat-icon>
+    </button>
+  </span>
+  <ng-template #noIcon>
+    <button #button mat-raised-button class="okto-button" [disabled]="disabled" (click)="openSubeditor(input)">
+      {{buttonText}}
+    </button>
+  </ng-template>
+</span>
 

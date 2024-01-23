@@ -1,4 +1,6 @@
 
+@import "../../../styles.scss";
+
 .container {
   background-color: rgb(230, 230, 230);
   color: black;
@@ -9,7 +11,7 @@
 }
 
 .btn {
-  background-color:rgb(35, 142, 184);
+  background-color:$color_spaBlue;
   margin-bottom: 5px;
   width:100%;
 }
@@ -19,7 +21,7 @@
 }
 
 ::ng-deep .mat-radio-button.mat-accent .mat-radio-inner-circle {
-  background-color: rgb(35, 142, 184);   /*inner circle color change*/
+  background-color: $color_spaBlue;   /*inner circle color change*/
 }
 
 ::ng-deep.mat-radio-button.mat-accent.mat-radio-checked .mat-radio-outer-circle {

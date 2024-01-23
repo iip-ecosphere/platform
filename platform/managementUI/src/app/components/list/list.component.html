@@ -29,20 +29,29 @@ mat-raised-button color="success"
       </div>
       -->
 
-      <div *ngIf="currentTab != '' && tab.tabName != 'Setup'">
-        <button mat-raised-button color="success" id="btnNew"
-        style="background-color: rgb(35, 142, 184)"
-        (click)="new()">new
+      <span *ngIf="currentTab != '' && tab.tabName != 'Setup'" [matTooltip]="getTooltipText('Create')">
+        <span *ngIf="meta && meta.value">
+          <mat-form-field appearance="outline">
+            <mat-select id="typeSelect" [(value)]="selectedType">
+              <mat-option *ngFor="let type of meta.value" [value]="type">
+                {{ type.idShort }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </span>
+        &nbsp;
+        <button mat-icon-button color="success" id="btnNew" class="okto-button" (click)="new()">
+          <mat-icon>add</mat-icon>
         </button>
-      </div>
+      </span>
 
       <!-- Table -->
-      <table style="margin: 0px;" id="data">
+      <table style="margin: 0px;width: 100%; table-layout: auto;" id="data">
         <tr *ngFor="let item of filteredData; let i = index">
           <td style="width: 2%; text-align: center;" id="data.index"> {{i + 1}} </td>
 
           <!-- Item -->
-          <td style="width: 100%;" id="data.item">
+          <td id="data.item">
 
             <span class="row-title" >
               <span style="height: 5px; vertical-align: top; margin-right: 10px;" id="data.item.idShort">
@@ -60,44 +69,41 @@ mat-raised-button color="success"
           </td>
 
           <!-- Buttons -->
-          <td  *ngIf="tab.tabName == 'Applications'" class="cell-with-button">
-            <button id="data.btnGenTemplate"
-              mat-raised-button class="okto-button-enabled"
-              (click)="genTemplate(item.idShort)" >generate template
+          <td *ngIf="tab.tabName == 'Applications'" class="cell-with-button" style="width:3%;">
+            <button id="data.btnGenTemplate" mat-icon-button class="okto-button" 
+              (click)="genTemplate(item.idShort)" matTooltip="Generate application template">
+              <mat-icon>code</mat-icon>
             </button>
           </td>
-          <td *ngIf="tab.tabName == 'Applications'" class="cell-with-button">
+          <td *ngIf="tab.tabName == 'Applications'" class="cell-with-button" style="width:6%;">
             <app-file-upload (result)="uploadAppFile(item.idShort, $event)" [accept]="uploadFileTypes" 
-              [enabled]="!isUploading(item.idShort)"></app-file-upload>
+                [enabled]="!isUploading(item.idShort)" tooltip="Upload implemented application template">
+            </app-file-upload>
             &nbsp;
-            <button id="data.btnGenApp"
-              mat-raised-button class="okto-button-enabled"
-              [disabled]="isUploading(item.idShort)"
-              (click)="genApp(item.idShort)" >integrate application
+            <button id="data.btnGenApp" mat-icon-button class="okto-button" [disabled]="isUploading(item.idShort)" 
+              (click)="genApp(item.idShort)" matTooltip="Integrate application">
+              <mat-icon>flight_takeoff</mat-icon>
             </button>
           </td>
 
-          <td class="cell-with-button">
-            <div *ngIf="tab.tabName == 'Meshes'; else elseNotDone">
-              <button id="data.btnEdit"
-                mat-raised-button class="okto-button-enabled"
-                (click)="edit(item)">edit
+          <td class="cell-with-button" style="width:3%;">
+            <button id="data.btnEdit" mat-icon-button class="okto-button" (click)="edit(item)" [matTooltip]="getTooltipText('Edit')">
+              <mat-icon>menu_open</mat-icon>
+            </button>
+          </td>
+
+          <td class="cell-with-button" style="width:3%;">
+            <span *ngIf="tab.tabName == 'Meshes'; else elseNotDone">
+              <button id="data.btnDelete" mat-icon-button class="okto-button-disabled" (click)="del(item)" 
+                disabled matTooltip="Delete mesh yet not implemented">
+                <mat-icon>delete</mat-icon>
               </button>
-            </div>
+            </span>
             <ng-template #elseNotDone>
-              <button id="data.btnEdit"
-                mat-raised-button class="okto-button-enabled"
-                (click)="edit(item)">edit
+              <button id="data.btnDelete" mat-icon-button class="okto-button" (click)="del(item)" [matTooltip]="getTooltipText('Delete')">
+                <mat-icon>delete</mat-icon>
               </button>
             </ng-template>
-          </td>
-
-          <td class="cell-with-button">
-            <button id="data.btnDelete"
-              mat-raised-button style="background-color: rgb(97, 95, 96)"
-              (click)="del(item)" disabled>
-              delete
-            </button>
           </td>
 
         </tr>

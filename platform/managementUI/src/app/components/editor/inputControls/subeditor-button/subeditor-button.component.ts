@@ -2,26 +2,31 @@ import { Component, Input, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MT_metaAbstract, MT_metaRefines, Resource, ResourceAttribute, editorInput, metaTypes } from 'src/interfaces';
 import { EditorComponent } from '../../editor.component';
-import { DataUtils } from 'src/app/services/utils.service';
+import { DataUtils, Utils } from 'src/app/services/utils.service';
+import { IvmlFormatterService } from 'src/app/services/ivml-formatter.service';
 
 @Component({
   selector: 'app-subeditor-button',
   templateUrl: './subeditor-button.component.html',
   styleUrls: ['./subeditor-button.component.scss']
 })
-export class SubeditorButtonComponent implements OnInit {
+export class SubeditorButtonComponent extends Utils implements OnInit {
 
   @Input() meta: Resource | undefined;
   @Input() input!: editorInput;
+  @Input() buttonText: string = "edit";
+  @Input() matIcon: string = "";
+  @Input() showValue: string = "false";
 
   errorMsg: string = 'loading...';
   disabled = false;
 
   refinedTypes: ResourceAttribute[] = [];
   selectedRefinedType: ResourceAttribute | null = null;
-  value = "";
-
-  constructor(public subDialog: MatDialog) { }
+  
+  constructor(public subDialog: MatDialog, private ivmlFormatter: IvmlFormatterService) { 
+    super();
+  }
 
   ngOnInit(): void {
     this.disabled = this.validateEditorInputType(this.input)
@@ -29,10 +34,9 @@ export class SubeditorButtonComponent implements OnInit {
 
   public openSubeditor(type: editorInput) {
     if (this.meta) {
-      let dialogRef = this.subDialog.open(EditorComponent, {
-        height: '80%',
-        width:  '80%',
-      })
+      let uiGroups = this.ivmlFormatter.calculateUiGroupsInf(type, this.meta);
+      let parts = this.ivmlFormatter.partitionUiGroups(uiGroups);
+      let dialogRef = this.subDialog.open(EditorComponent, this.configureDialog('80%', '80%', parts));
       if (this.refinedTypes[0]) {
         dialogRef.componentInstance.refinedTypes = this.refinedTypes;
       } else {
@@ -40,7 +44,6 @@ export class SubeditorButtonComponent implements OnInit {
       }
       dialogRef.componentInstance.metaBackup = this.meta;
     }
-
   }
 
   public validateEditorInputType(type:editorInput) {
@@ -99,6 +102,15 @@ export class SubeditorButtonComponent implements OnInit {
     } else {
       console.log('ERROR: meta value is not an Array');
       return false;
+    }
+  }
+
+  // preliminary
+  getDisplayValue() {
+    if (this.input.value) {
+      return this.getElementDisplayName(this.input.value, true);
+    } else {
+      return "";      
     }
   }
   

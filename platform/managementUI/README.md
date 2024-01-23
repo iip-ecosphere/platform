@@ -72,4 +72,40 @@ For shutdown, consider executing `cli.sh undeploy artifacts/deployment.yaml`.
 
 ## Development hints
 
-Use `console.debug`, `console.warn`, `console.info`, `console.log`, `console.error` where appropriate, not only `console.log`. Except for `console.error`, the others can be switched off via `assets/config/config.json`.
+Use `console.debug`, `console.warn`, `console.info`, `console.log`, `console.error` where appropriate, not only `console.log`. Except for `console.error`, the others can be switched off via `assets/config/config.json`. 
+
+## Material Icons (Styleguide)
+
+Use the colors from the (internal) oktoflow styleguide as defined in ``styles.scss``, if needed lighter variations or basic grey variants, white or black.
+
+* Create/New: ``check_circle``
+* Save: ``done`` 
+* Close/Cancel: ``close``
+* Expand: ``expand_more``
+* Collapse: ``expand_less``
+* Done/Ok: ``check``
+* Add: ``add``
+* Edit: ``menu_open``
+* Upload: ``upload`` 
+* Generate app: ``flight_takeoff``
+* Code/generate template: ``code``
+* Delete: ``delete``
+* Shift left: ``keyboard_arrow_left``
+* Shift left: ``keyboard_arrow_right``
+* Deploy: ``start``
+* Undeploy: ``delete``
+
+For more material icons, see [Google Fonts Icons](https://fonts.google.com/icons).
+
+## TODO
+
+* Delete meshes.
+* Input ref select default values for nameplate.
+* Dynamic dialog sizes
+* Offline icons
+* Generated variable names
+
+## Further details
+
+Configuration model filtering process:
+![Filtering process](src/assets/doc/filterMeta.jpg)

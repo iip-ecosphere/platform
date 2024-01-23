@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { editorInput } from 'src/interfaces';
+import { editorInput, uiGroup } from 'src/interfaces';
 
 // for naming conventions, keep utility methods here
 /**
@@ -102,6 +102,106 @@ export class Utils {
       result = input.displayName;
     }
     return result;
+  }
+
+  /**
+   * Returns the display name of an element/value.
+   * 
+   * @param element the element/value
+   * @param refTo is element supposed to be an IVML reference, i.e., refTo(x)
+   * @returns the display name
+   */
+  public getElementDisplayName(element: any, refTo: boolean | undefined) {
+    if (typeof(element) === 'string') {
+      // plain string value
+      if (refTo) {
+        return DataUtils.stripGenericType(element);
+      } else {
+        return element
+      }
+    } else if(element.name){
+      // object with name
+      return element.name;
+    } else {
+      // neseted AAS config value
+      let idShort = '';
+      if (this.isArray(element.value)) {
+        let temp = element.value?.find((item: { idShort: string; }) => item.idShort == 'varValue');
+        if (temp && temp.idShort) {
+          idShort = temp.value;
+        } else {
+          idShort = element.idShort;
+        }
+      } else if (element.idShort) {
+        // AAS top-level value
+        idShort = element.idShort;
+      } else if (element.value && element._type) {
+        // editor IVML value
+        if (DataUtils.isIvmlRefTo(element._type)) {
+          idShort = this.getElementDisplayName(element.value, true);
+        } else {
+          idShort = element.value;
+        }
+      } else if (element.hasOwnProperty("productImage") || element.hasOwnProperty("manufacturerProductDesignation") || element.manufacturer) {
+        // nameplate
+        if (element.manufacturer) {
+          idShort = this.getElementDisplayName(element.manufacturer, true); // shall find manufacturer and return name
+        } // else empty
+      } else if (this.isArray(element)) {
+        // array of editor IVML values
+        for (let e of element) {
+          if (idShort.length > 0) {
+            idShort += ", ";
+          }
+          idShort += this.getElementDisplayName(e, true);
+        }
+      } else {
+        console.log("Unconsidered alternative in getElementDisplayName " + JSON.stringify(element));
+      }
+      return idShort;
+    }
+  }
+
+  /**
+   * Returns a material dialog configuration. May derive a feasible size from a potential layout of the given groups, in particular
+   * for smaller windows where larger default values may lead to superflous dialog window sizes.
+   * 
+   * @param width the default width as HTML specification (e.g., '90%')
+   * @param height the default height as HTML specification (e.g., '90%')
+   * @param input the actual input sub-editor partitions for the dialog to open, may be null
+   * @returns the configuration object
+   */
+  public configureDialog(width: string, height: string, input: EditorPartition[] | null) {
+    if (input) {
+      let cols = 0;
+      let rows = 0;      
+      for (let part of input) {
+        let r = 1;
+        let c = 1;
+        if (part.count > 1) { // more columns not yet considered!
+          if (part.columns == 2) {
+            c = 2;
+            r = part.count;
+          } else { // part.columns == 1
+            c = 2; // simple fixed two column layout for now
+            r = Math.ceil(part.count / c);
+          }
+        }
+        rows += r;
+        cols = Math.max(c, cols);
+      }
+      let w = 0;
+      let h = 0;
+      w = Math.max(WIDTH_DIALOG_MIN, cols * WIDTH_CARD + (cols - 1) * WIDTH_CARD_GRID + 3);
+      h = Math.max(HEIGHT_DIALOG_MIN, HEIGHT_HEADER + rows * HEIGHT_CARD + (rows - 1) * HEIGHT_CARD_GRID + 2);
+      width = `${w}em`
+      height = `${h}em`
+    }
+    return {
+      width: width,
+      height: height,
+      panelClass: 'custom-dialog-container'
+    };
   }
 
 }
@@ -230,6 +330,26 @@ export class DataUtils {
   }
 
   /**
+   * Deliberately considers text as string or as IvmlValue.
+   * 
+   * @param text the text
+   * @returns text or its value
+   */
+  private static textOrValue(text: any) : string {
+    let result;
+    if (typeof text === 'string') {
+      result = String(text);
+    } else {
+      if (text.hasOwnProperty("value")) {
+        result = text["value"];
+      } else {
+        result = JSON.stringify(text);
+      }
+    }
+    return result;
+  }
+
+  /**
    * Returns the description text of an AAS-inspired language string.
    * 
    * @param text the AAS-inspired language string 
@@ -238,6 +358,7 @@ export class DataUtils {
   public static getLangStringText(text: string) {
     let result: string = text;
     if (text) {
+      text = DataUtils.textOrValue(text);
       const endIndex = text.lastIndexOf('@');
       if (endIndex > 0) {
         result = text.substring(0, endIndex);
@@ -258,6 +379,7 @@ export class DataUtils {
   public static getLangStringLang(text: string): string | undefined {
     let result: string | undefined = text;
     if (text) {
+      text = DataUtils.textOrValue(text);
       const endIndex = text.lastIndexOf('@');
       if (endIndex > 0) {
         result = text.substring(endIndex + 1);
@@ -396,3 +518,20 @@ export function retry({ fn, maxAttempts = 1, delay = 1000, attempts = 1 }: Retry
     }
   })
 }
+
+/**
+ * Abstracted form of irregular grid/cards representing sub-editors.
+ */
+export interface EditorPartition {
+  count: number;
+  columns: number;
+  // rows
+}
+
+export const WIDTH_CARD = 20 + 0.9; // em
+export const WIDTH_CARD_GRID = 3;   // em
+export const HEIGHT_CARD = 8; // em
+export const HEIGHT_HEADER = 5; // em
+export const HEIGHT_CARD_GRID = 3;   // em
+export const WIDTH_DIALOG_MIN = 25; // em
+export const HEIGHT_DIALOG_MIN = 6; // em 

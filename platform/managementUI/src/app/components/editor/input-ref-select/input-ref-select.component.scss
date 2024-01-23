@@ -1,32 +1,79 @@
+@import "../editor.component.scss";
+
 tr:nth-child(odd) {
   background-color:initial;
 }
 
+// default material color is white
+:host ::ng-deep .mat-select-value {    
+  color: black !important;  
+}
+
+// default material color is white
+:host ::ng-deep .mat-select-arrow {    
+  color: black !important;  
+}
+
+.valuecontainer {
+  border: 3px solid white;
+  background-color: $color_seaBlue;
+  border-radius: 4px;
+  box-shadow: none;
+}
+
 .flexcontainer {
+  @extend .valuecontainer;
   display:flex;
   justify-content: flex-start;
   flex-wrap: wrap;
 }
 
-.valuebox {
-  width: 90%;
-  min-height: 7em;
-  border: 2px solid black;
+.flexcontainer-background {
+  @extend .flexcontainer;
+  background-color: $color_seaBlue;
+  border: 0px none $color_seaBlue !important;
   border-radius: 4px;
-  background-color: rgb(199, 199, 199);
-  margin-left: 1em;
+}
+
+.custom.mat-card{
+  margin: 0.3em;
+  padding: 0.3em;
+  background-clip: content-box;
+  box-shadow: none;
+}
+
+.valuebox {
+  min-height: 4em;
+  border: 2px none black;
+  border-radius: 4px;
+  background-color: $color_seaBlue;
+  margin-left: 0em;
 }
 
 .singlevaluebox {
   display: inline-flex;
   min-width: 9em;
-  min-height: 7em;
+  min-height: 4em;
   border: 2px solid black;
   border-radius: 4px;
-  background-color: rgb(199, 199, 199);
-  margin-left: 1em;
+  background-color: $color_seaBlue;
+  margin-left: 0em;
 }
 
 .inputCard {
   margin: 0.2em;
+}
+
+/**
+* Tables in input cards, invisible for formatting.
+*/
+.inputCard table {
+  tr {
+    td {
+      border: 0px solid white; // debugging
+      padding: 0;
+    }
+  }
+  border-spacing: 0;
+  border-collapse: collapse;
 }

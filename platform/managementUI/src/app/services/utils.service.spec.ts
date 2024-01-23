@@ -85,6 +85,53 @@ describe('UtilsService', () => {
     expect(service.getDisplayName(input)).toBe("dName");
   });
 
+  it('should implement getElementDisplayName', () => {
+    // plain string value
+    expect(service.getElementDisplayName("", false)).toBe("");
+    expect(service.getElementDisplayName("name", false)).toBe("name");
+    expect(service.getElementDisplayName("refTo(xyz)", false)).toBe("refTo(xyz)");
+    expect(service.getElementDisplayName("refTo(xyz)", true)).toBe("xyz");
+    // object with name
+    expect(service.getElementDisplayName({name:"abc"}, false)).toBe("abc");
+    // AAS config value
+    expect(service.getElementDisplayName({value:[{idShort:"name"}, {idShort:"varValue", value: "abc"}]}, false)).toBe("abc");
+    expect(service.getElementDisplayName({idShort:"outer", value:[{idShort:"name"}]}, false)).toBe("outer");
+    expect(service.getElementDisplayName({idShort:"name"}, false)).toBe("name");
+    // editor IVML value
+    expect(service.getElementDisplayName({value:"name", _type:"type"}, false)).toBe("name");
+    expect(service.getElementDisplayName({value:"refTo(abc)", _type:"refTo(ABC)"}, false)).toBe("abc");
+    // nameplate
+    expect(service.getElementDisplayName({manufacturer:"refTo(SSE)"}, false)).toBe("SSE"); // preliminary
+    expect(service.getElementDisplayName({productImage:"xyz"}, false)).toBe(""); // preliminary
+    // array of editor IVML values
+    // [{"type":"feedback","forward":false,"idShort":"feedback","_type":"IOType"}]
+    expect(service.getElementDisplayName([
+      {type: "feedback", forward: false, idShort: "feedback", _type: "IOType"}
+      ], false)).toBe("feedback");
+    expect(service.getElementDisplayName([
+      {type: "fb", forward: false, idShort: "feedback", _type: "IOType"}, 
+      {type: "te", forward: false, idShort: "test", _type: "IOType"}
+      ], false)).toBe("feedback, test");
+  });
+
+  it('should implement configureDialog', () => {
+    // defaults if no groups given
+    let res = service.configureDialog("90%", "70%", null);
+    expect(res).toBeTruthy();
+    expect(res.width).toBe("90%");
+    expect(res.height).toBe("70%");
+    expect(res.panelClass).toBeTruthy();
+    expect(res.panelClass.length).toBeGreaterThan(0);
+
+    // TODO size based on groups
+    res = service.configureDialog("90%", "70%", [{count : 1, columns : 1}]);
+    expect(res).toBeTruthy();
+    res = service.configureDialog("90%", "70%", [{count : 2, columns : 1}]);
+    expect(res).toBeTruthy();
+    res = service.configureDialog("90%", "70%", [{count : 3, columns : 1}]);
+    expect(res).toBeTruthy();
+  });
+
   // -------------------------- Data Utils -----------------------------------
 
   it('should implement getProperty', () => {

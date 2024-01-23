@@ -15,18 +15,16 @@
         <span class="subtext" id="data.description"> {{getDescription(plan)}}</span>
       </td>
 
-      <td *ngIf="getEnabled(plan)" style="vertical-align: top;">
-        <button  mat-raised-button class="button" id="data.btnDeploy"
-          style="background-color: rgb(35, 142, 184)"
+      <td *ngIf="getEnabled(plan)" class="cell-with-button">
+        <button mat-icon-button class="button okto-button" id="data.btnDeploy"
           (click)="deploy(plan)">
-          deploy
+          <mat-icon>start</mat-icon>
         </button>
       </td>
-      <td *ngIf="!getEnabled(plan)" style="vertical-align: top;">
-        <button  mat-raised-button class="button" id="data.btnDeploy"
-          style="background-color: rgb(35, 142, 184)"
+      <td *ngIf="!getEnabled(plan)" class="cell-with-button">
+        <button mat-icon-button class="button okto-button-disabled" id="data.btnDeploy"
           (click)="deploy(plan)" disabled>
-          deploy
+          <mat-icon>start</mat-icon>
         </button>
       </td>
 

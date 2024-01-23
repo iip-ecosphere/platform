@@ -19,10 +19,8 @@
 
     <!-- Buttons -->
     <td class="cell-with-button">
-      <button id="data.btnUndeploy"
-        mat-raised-button style="background-color: rgb(97, 95, 96)"
-        (click)="undeploy(item)">
-        undeploy
+      <button id="data.btnUndeploy" mat-icon-button class="okto-button" (click)="undeploy(item)" matTooltip="Undeploy">
+        <mat-icon>delete</mat-icon>
       </button>
     </td>
 

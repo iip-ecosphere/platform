@@ -1,11 +1,11 @@
 import { AAS_OP_PREFIX_SME, AAS_TYPE_STRING, ApiService, ArtifactKind, IDSHORT_SUBMODEL_CONFIGURATION } from 'src/app/services/api.service';
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Subscription, firstValueFrom } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { EditorComponent } from '../editor/editor.component';
-import { DEFAULT_UPLOAD_CHUNK, DR_displayName, DR_idShort, DR_type, InputVariable, MTK_compound, MTK_container, MT_metaDisplayName, MT_metaSize, MT_metaType, MT_metaTypeKind, MT_metaVariable, MT_varValue, allMetaTypes, configMetaEntry, editorInput, platformResponse } from 'src/interfaces';
+import { DEFAULT_UPLOAD_CHUNK, DR_displayName, DR_idShort, DR_type, InputVariable, MTK_compound, MTK_container, MT_metaDisplayName, MT_metaSize, MT_metaType, MT_metaTypeKind, MT_metaVariable, MT_varValue, Resource, allMetaTypes, configMetaEntry, editorInput } from 'src/interfaces';
 import { Utils, DataUtils } from 'src/app/services/utils.service';
 import { WebsocketService } from 'src/app/websocket.service';
 import { StatusCollectionService } from 'src/app/services/status-collection.service';
@@ -58,7 +58,10 @@ export class ListComponent extends Utils implements OnInit {
   imgPath = "../../../assets/"
   sub: Subscription | undefined;
   uploadFileTypes = ".zip"; // suggested file extensions in browser upload dialog
+  selectedType: Resource | undefined;
   private appFiles = new Map<string, FileUploadInfo>();
+  meta: Resource | undefined;
+  metaBackup: Resource | undefined;
 
   constructor(private router: Router,
     public http: HttpClient,
@@ -107,11 +110,24 @@ export class ListComponent extends Utils implements OnInit {
   ]
 
   async ngOnInit() {
-    this.websocketService.connectToStatusUri(this.api);
+    await this.websocketService.connectToStatusUri(this.api);
+    this.populateMeta();
+  }
+
+  private async populateMeta() {
+    this.metaBackup = await this.api.getMeta();
+    this.meta = this.ivmlFormatter.filterMeta(this.metaBackup, this.currentTab);
   }
 
   public async getDisplayData(tabName:string, metaProject: string | null, submodelElement: string | null) {
     this.currentTab = tabName
+    this.selectedType = undefined;
+    if (this.metaBackup) {
+      this.meta = this.ivmlFormatter.filterMeta(this.metaBackup, this.currentTab);
+      if (this.meta && this.meta.value && this.meta.value?.length > 0) {
+        this.selectedType = this.meta.value[0]; // TODO sort, select most frequent/plausible
+      }
+    }
 
     await this.loadData(metaProject, submodelElement)
 
@@ -253,7 +269,7 @@ export class ListComponent extends Utils implements OnInit {
                 }
                 if (fProp && fProp.value) {
                   this.createRowValue(fProp.value, fVal, false, v => true);
-                  let fId = fVal["id"] || fVal["name"] || String(i);
+                  let fId = fVal["id"] || fVal["name"] || fVal["type"] || String(i);
                   fVal[DR_idShort] = fId;
                   this.addPropertyFromData(fVal, DR_type, fProp.value, MT_metaType);
                   val.push(fVal);
@@ -462,28 +478,27 @@ export class ListComponent extends Utils implements OnInit {
     if (this.currentTab === "Meshes") {
       this.router.navigateByUrl('flowchart/' + item.idShort);
     } else {
-      let dialogRef = this.dialog.open(EditorComponent, {
-        height: '90%',
-        width:  '90%',
-      })
-
       let meta_entry:configMetaEntry = {
         modelType: {name: ""},
         kind: "",
         value: "",
         idShort: "value"
-      }
-      let editorInput:editorInput =
-        {name: "value", type: item.varType, value:item.varValue,
+      };
+      let editorInput:editorInput = {name: "value", 
+        type: item.varType, value:item.varValue,
         description: [{language: '', text: ''}],
-        refTo: false, multipleInputs: false, meta:meta_entry}
+        refTo: false, multipleInputs: false, meta:meta_entry};
 
+      let uiGroups = this.ivmlFormatter.calculateUiGroupsInf(editorInput, this.meta);
+      let parts = this.ivmlFormatter.partitionUiGroups(uiGroups);
+      let dialogRef = this.dialog.open(EditorComponent, this.configureDialog('90%', '90%', parts));
       let component = dialogRef.componentInstance;
       editorInput.name = item.idShort;
       component.variableName = item.varName;
       component.type = editorInput; 
-      component.showDropdown = false;
+      //component.showDropdown = false;
       component.category = this.currentTab;
+      component.selectedType = this.selectedType;
     }
   }
 
@@ -497,28 +512,43 @@ export class ListComponent extends Utils implements OnInit {
     // TODO feedback
   }
 
-  public createMesh() {
+  /**
+   * Returns the tab-specific tooltip text for the given action (prefixed).
+   * 
+   * @param action the action 
+   * @returns the tooltip text
+   */
+  public getTooltipText(action: string) {
+    let entryType = this.currentTab.toLowerCase();
+    if (entryType.endsWith("es")) {
+      entryType = entryType.substring(0, entryType.length - 2);
+    } else if (entryType.endsWith("s")) {
+      entryType = entryType.substring(0, entryType.length - 1);
+    }
+    return `${action} ${entryType}`;
+  }
+
+  /*public createMesh() {
     console.log("IMPLEMENT CREATE MESH");
     // TODO
-  }
+  }*/
 
-  public create() {
+  /*public create() {
     //this.router.navigateByUrl("list/editor/all");
-    let dialogRef = this.dialog.open(EditorComponent, {
-      height: '90%',
-      width:  '90%',
-    })
-  }
+    let dialogRef = this.dialog.open(EditorComponent, this.configureDialog('90%', '90%', null));
+  }*/
 
   public new() {
-    if(this.currentTab == 'Meshes') {
+    if (this.currentTab == 'Meshes') {
       this.router.navigateByUrl("flowchart");
     } else {
-      let dialogRef = this.dialog.open(EditorComponent, {
-        height: '90%',
-        width:  '90%',
-      })
-      dialogRef.componentInstance.category = this.currentTab;
+      let dialogRef = this.dialog.open(EditorComponent, this.configureDialog('90%', '90%', null));
+      let component = dialogRef.componentInstance;
+      component.category = this.currentTab;
+      component.selectedType = this.selectedType;
+      if (component.generateInputs) { // fails in tests
+        component.generateInputs();
+      }
     }
   }
 

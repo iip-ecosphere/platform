@@ -1,8 +1,8 @@
 //import { type } from 'os';
-import { InputVariable, primitiveDataTypes, IVML_TYPE_PREFIX_enumeration, JsonPlatformOperationResult, IvmlRecordValue, IVML_TYPE_String, IVML_TYPE_Boolean, IvmlValue, UserFeedback } from 'src/interfaces';
+import { InputVariable, primitiveDataTypes, IVML_TYPE_PREFIX_enumeration, JsonPlatformOperationResult, IvmlRecordValue, IVML_TYPE_String, IVML_TYPE_Boolean, IvmlValue, UserFeedback, uiGroup, configMetaContainer, MT_metaTypeKind, MTK_enum, configMetaEntry, editorInput, Resource, metaTypes, DR_displayName, MTK_derived, MT_metaRefines, MT_metaDefault, MTK_compound, MT_metaAbstract, MTK_primitive } from 'src/interfaces';
 import { Injectable } from '@angular/core';
 import { AAS_OP_PREFIX_SME, AAS_TYPE_STRING, ApiService, GRAPHFORMAT_DRAWFLOW, IDSHORT_SUBMODEL_CONFIGURATION } from './api.service';
-import { DataUtils, UtilsService } from './utils.service';
+import { DataUtils, EditorPartition, UtilsService } from './utils.service';
 
 @Injectable({
   providedIn: 'root'
@@ -411,7 +411,382 @@ export class IvmlFormatterService extends UtilsService {
     return await this.callConfigOperation("deleteGraph", params, text);
   }
 
+  /**
+   * Calculates UI groups based on inferred (selected type) information.
+   * 
+   * @param type the editor input type
+   * @param meta the filtered type definitions for selectedType
+   * @returns the UI groups
+   */
+  public calculateUiGroupsInf(type: editorInput | null, meta: Resource | undefined) {
+    let uiGroups : uiGroup[] = [];
+    if (type && type.type && meta) {
+      let t = DataUtils.stripGenericType(type.type);
+      let sel = meta.value?.find(item => item.idShort === t) as configMetaContainer;
+      uiGroups = this.calculateUiGroups(sel, type, meta, meta);
+    }
+    return uiGroups;
+  }
+
+  /**
+   * Calculates UI groups. Refactored from EditorComponent where both, (filtered) meta and (full) metaBackup are available.
+   * 
+   * @param selectedType the selected type
+   * @param type the editor input type
+   * @param meta the filtered type definitions for selectedType
+   * @param metaBackup all type definitions, may be the same as meta
+   * @returns the UI groups
+   */
+  public calculateUiGroups(selectedType: configMetaContainer | undefined, type: editorInput | null, meta: Resource | undefined, metaBackup: Resource | undefined) {
+    let uiGroups : uiGroup[] = [];
+    if (selectedType && selectedType.value) {
+      // (Constants) hard-coded in case of primitive types
+      let selMetaTypeKind = DataUtils.getPropertyValue(selectedType.value, MT_metaTypeKind);
+      if (primitiveDataTypes.includes(selectedType.idShort) || selMetaTypeKind == MTK_enum) {
+        let meta_entry:configMetaEntry = {
+          modelType: {name: ""},
+          kind: "",
+          value: "",
+          idShort: "value"
+        }
+        let val = [type?.value] || []; 
+        let editorInput:editorInput =
+          {name: "value", type: selectedType.idShort, value:val,
+          description: [{language: '', text: ''}],
+          refTo: false, multipleInputs: false, meta:meta_entry};
+        editorInput.metaTypeKind = selMetaTypeKind;
+
+        let uiGroup = 1
+        uiGroups.push({
+          uiGroup: uiGroup,
+          inputs: [editorInput],
+          optionalInputs: [],
+          fullLineInputs: [],
+          fullLineOptionalInputs: []
+        });
+      } else {
+        for (const input of selectedType.value) {
+          if (input.idShort && metaTypes.indexOf(input.idShort) === -1) {
+            let isOptional = false;
+            let uiGroup: number = DataUtils.getPropertyValue(input.value, 'uiGroup'); // translated 100 -> 1
+
+            if (uiGroup < 0) {
+              isOptional = true;
+              uiGroup = uiGroup * -1;
+            }
+            if (uiGroup > 0) { // 0 == invisible
+              let uiGroupCompare =  uiGroups.find(item => item.uiGroup === uiGroup);
+
+              let editorInput: editorInput =
+                {name: '', type: '', value:[], description:
+                  [{language: '', text: ''}],
+                  refTo: false, multipleInputs: false};
+
+              let name = DataUtils.getProperty(input.value, 'name');
+              if (name) {
+                editorInput.name = name.value;
+                if (name.description
+                  && name.description[0]
+                  && name.description[0].text
+                  && name.description[0].language) {
+                    editorInput.description = name.description;
+                }
+              }
+              let val = DataUtils.getProperty(type?.value, input.idShort); // TODO may need object access for nested objects
+              if (val) {
+                editorInput.displayName = val[DR_displayName];
+              }
+              editorInput.type = DataUtils.getPropertyValue(input.value, 'type');
+
+              editorInput.meta = input;
+              let typeGenerics = DataUtils.stripGenericType(editorInput.type);
+              let foundType = meta?.value?.find(type => type.idShort === typeGenerics);
+              if (foundType) {
+                editorInput.metaTypeKind = DataUtils.getPropertyValue(foundType.value, MT_metaTypeKind);
+              } else if(metaBackup && metaBackup.value) {
+                let iterType = editorInput.type;
+                do {
+                  let temp = metaBackup.value.find(item => item.idShort === DataUtils.stripGenericType(iterType));
+                  editorInput.metaTypeKind = DataUtils.getPropertyValue(temp?.value, MT_metaTypeKind);
+                  editorInput.type = iterType;
+                  if (editorInput.metaTypeKind == MTK_derived) {
+                    iterType = DataUtils.getPropertyValue(temp?.value, MT_metaRefines);
+                    if (!iterType) {
+                      break;
+                    }
+                  }
+                } while (editorInput.metaTypeKind == MTK_derived);
+              }
+              //the metaTypeKind was so far not included on the values of the types in the configuration/meta collection
+              //therefore this approach doesnt work, but it would be much more performant if it did
+              // editorInput.metaTypeKind = input.value.find(
+              //   (item: { idShort: string; }) => item.idShort === 'metaTypeKind')?.value;
+              //   console.log(editorInput);
+              //   console.log(input.value);
+
+              if (editorInput.type.indexOf('refTo') >= 0) {
+                editorInput.refTo = true;
+              }
+              if (editorInput.type.indexOf('setOf') >= 0
+                || editorInput.type.indexOf('sequenceOf') >= 0) {
+                editorInput.multipleInputs = true;
+              }
+              editorInput.defaultValue = DataUtils.getPropertyValue(input.value, MT_metaDefault);
+              let ivmlValue = type?.value || editorInput.defaultValue || ""; 
+              if (selMetaTypeKind === MTK_compound && this.isArray(ivmlValue)) {
+                ivmlValue = DataUtils.getPropertyValue(ivmlValue, input.idShort);
+              }
+              let initial;
+              if (this.isObject(ivmlValue) && ivmlValue && input.idShort in ivmlValue) { 
+                // compound instances may be passed in as object with properties, those being undefined are defaults
+                ivmlValue = ivmlValue[input.idShort];
+                if (!ivmlValue) {
+                  ivmlValue = editorInput.defaultValue;
+                }
+              }
+              if (editorInput.multipleInputs) {
+                initial = ivmlValue
+              } else if (editorInput.metaTypeKind === MTK_enum) {
+                initial = ivmlValue
+                editorInput.valueTransform = input => IVML_TYPE_PREFIX_enumeration + (input.type || "") + '.' + input.value;
+              } else if (editorInput.type === 'Boolean') {
+                initial = String(ivmlValue).toLowerCase() === 'true';
+              } else if (editorInput.metaTypeKind === MTK_compound && !editorInput.multipleInputs) {
+                initial = ivmlValue; // input comes as object
+              } else {
+                if (typeGenerics == "AasLocalizedString") {
+                  initial = DataUtils.getLangStringText(ivmlValue);
+                  editorInput.valueLang = DataUtils.getLangStringLang(ivmlValue);
+                  editorInput.valueTransform = input => DataUtils.composeLangString(input.value, DataUtils.getUserLanguage());
+                } else {
+                  initial = ivmlValue; // input is just the value
+                }
+              }
+              editorInput.value = initial;
+
+              if (!uiGroupCompare ){
+                if (isOptional) {
+                  if (editorInput.multipleInputs) {
+                    uiGroups.push({
+                      uiGroup: uiGroup,
+                      inputs: [],
+                      optionalInputs: [],
+                      fullLineInputs: [],
+                      fullLineOptionalInputs: [editorInput]
+                    });
+                  } else {
+                    uiGroups.push({
+                      uiGroup: uiGroup,
+                      inputs: [],
+                      optionalInputs: [editorInput],
+                      fullLineInputs: [],
+                      fullLineOptionalInputs: []
+                    });
+                  }
+                } else {
+                  if (editorInput.multipleInputs) {
+                    uiGroups.push({
+                      uiGroup: uiGroup,
+                      inputs: [],
+                      optionalInputs: [],
+                      fullLineInputs: [editorInput],
+                      fullLineOptionalInputs: []
+                    });
+                  } else {
+                    uiGroups.push({
+                      uiGroup: uiGroup,
+                      inputs: [editorInput],
+                      optionalInputs: [],
+                      fullLineInputs: [],
+                      fullLineOptionalInputs: []
+                    });
+                  }
+                }
+              } else {
+                if (isOptional) {
+                  if(editorInput.multipleInputs) {
+                    uiGroupCompare?.fullLineOptionalInputs.push(editorInput);
+                  } else {
+                    uiGroupCompare?.optionalInputs.push(editorInput);
+                  }
+
+                } else {
+                  if (editorInput.multipleInputs) {
+                    uiGroupCompare?.fullLineInputs.push(editorInput);
+                  } else {
+                    uiGroupCompare?.inputs.push(editorInput);
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    return uiGroups;
+  }
+
+  public partitionUiGroups(uiGroups: uiGroup[]) {
+    let result : EditorPartition[] = [];
+    let actual : EditorPartition | null = null;
+    let group = 1;
+    let cols = 1;
+    for (let u of uiGroups) {
+        // well, it was defined that way :/
+        for (let ei of u.inputs.concat(u.optionalInputs, u.fullLineInputs, u.fullLineOptionalInputs)) {
+        if (ei) {
+          let c = 1;
+          if (DataUtils.isIvmlCollection(ei.type)) {
+            c = 2;
+          }
+          if (!actual || u.uiGroup != group || c != cols) {
+            actual = { count : 1, columns : c};
+            result.push(actual);
+            group = u.uiGroup;
+            cols = c;
+          } else {
+            actual.count++;
+          }
+        }
+      }
+    }
+    return result;
+  }
+
+  public generateVariableName(type: string) {
+    // TODO API call to make variable unique
+    return type; // preliminary
+  }
+
+  /**
+   * Documentation in src/assets/doc/filterMeta.jpg
+   */
+  public filterMeta(metaBackup: Resource, category: string = 'all') {
+    let meta = DataUtils.deepCopy(metaBackup) // recovering meta
+    let filter = reqTypes.find(type => type.cat === category)
+    let newMetaValues = []
+    if (meta && meta.value) {
+      for (const item of meta.value) {
+        let idShort = ""
+        if (item.idShort) {
+          idShort = item.idShort
+        }
+
+        if (!this.isAbstract(item)) {
+          if(filter?.metaRef.includes(idShort)) {
+            newMetaValues.push(item)
+          }
+
+          if (this.getMetaRef(item)) {
+            let metaRefVal = DataUtils.getPropertyValue(item.value, MT_metaRefines)
+            if(metaRefVal != "") {
+              // sub-type
+              if(filter?.metaRef.includes(metaRefVal)) {
+                // direct inheritance
+                newMetaValues.push(item)
+              } else {
+                // indirect inheritance (recursion)
+                if (this.isSubtype(meta, metaRefVal, category)) {
+                  newMetaValues.push(item)
+                }
+              }
+            } else {
+              // toplevel type
+              if (filter?.metaRef.includes(idShort)) {
+                newMetaValues.push(item)
+              }
+            }
+          } else {
+            // ivml types
+            if (this.isTypeMetaKindEqualNum(item, MTK_primitive)
+                  && filter?.metaRef.length == 0) {
+              newMetaValues.push(item)
+            }
+          }
+        }
+      }
+    }
+    meta!.value = newMetaValues;
+    return meta;
+  }
+
+  /** Returns false when metaAbstract is false or
+   * there is no attribute "metaAbstract" */
+  private isAbstract(item:any) {
+    let abstract = DataUtils.getPropertyValue(item.value, MT_metaAbstract);
+    if (abstract) {
+      return true
+    } else {
+      return false
+    }
+  }
+
+  private getMetaRef(item: any) {
+    let value = DataUtils.getProperty(item.value, MT_metaRefines);
+    if (value) {
+      return value.value
+    } else {
+      return null
+    }
+  }
+
+  private isTypeMetaKindEqualNum(item:any, num:number) {
+    let value = DataUtils.getPropertyValue(item.value, MT_metaTypeKind);
+    if (value == num) {
+      return true
+    } else {
+      return false
+    }
+  }
+
+  /**
+   * Documentation in src/assets/doc/filterMeta.jpg
+   * @returns {boolean}
+   */
+  private isSubtype(meta: Resource, metaRefines_value: any, category: string):boolean{
+    let parent_item = this.getParentItem(meta, metaRefines_value)
+    if (parent_item) {
+      let filter = reqTypes.find(type => type.cat === category)
+      if (filter?.metaRef.includes(this.getMetaRef(parent_item))) {
+        return true
+      } else {
+        let metaRef_val_parent = this.getMetaRef(parent_item)
+        if(metaRef_val_parent) {
+          return this.isSubtype(meta, metaRef_val_parent, category) //recursion
+        } else {
+          return false
+        }
+      }
+    } else {
+      return false
+    }
+  }
+
+  private getParentItem(meta: Resource, metaRefines: string) {
+    let result = meta?.value?.find(item => item.idShort === metaRefines)
+    if(result) {
+      return result
+    } else {
+      return null
+    }
+  }
+
 }
+
+/* metaRef list:
+  empty -> returns ivml types
+  includes names of toplevel types -> returns the toplevel type (if not abstract) and all subtypes
+  */
+const reqTypes = [
+    {cat: "Constants", metaRef: []},
+    {cat: "Types", metaRef: ["RecordType", "ArrayType"]},
+    {cat: "Dependencies", metaRef: ["Dependency"]},
+    {cat: "Nameplates", metaRef: ["NameplateInfo"]},
+    {cat: "Services", metaRef: ["Service"]},
+    {cat: "Servers", metaRef: ["Server"]},
+    {cat: "Meshes", metaRef: ["ServiceMesh"]},
+    {cat: "Applications", metaRef: ["Application"]}
+  ];
 
   // ivml data types
 //const REF_TO = "refTo";

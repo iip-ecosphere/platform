@@ -1,6 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { BooleanDropdownComponent } from './boolean-dropdown.component';
+import { editorInput } from 'src/interfaces';
+import { MatSelectModule } from '@angular/material/select';
+import { FormsModule } from '@angular/forms';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 describe('BooleanDropdownComponent', () => {
   let component: BooleanDropdownComponent;
@@ -8,16 +12,45 @@ describe('BooleanDropdownComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
+      imports: [ MatSelectModule, FormsModule, BrowserAnimationsModule ],
       declarations: [ BooleanDropdownComponent ]
     })
     .compileComponents();
 
     fixture = TestBed.createComponent(BooleanDropdownComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
+    // detect changes after setting value
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('should handle Boolean', async() => {
+    component.input = {
+      name: "asynchronous", 
+      type: "Boolean", 
+      value: true, 
+      description: [{
+        language: "en",
+        text: "Asynchronous (return at any time) or synchronous (immediate return on input) service."
+      }],
+      refTo: false,
+	    multipleInputs: false,
+      metaTypeKind: 1,
+	    defaultValue: "true"
+      // meta left out
+    } as editorInput;
+    fixture.detectChanges();
+    expect(component.selected).toBeTrue();
+
+    let compiled = fixture.debugElement.nativeElement as HTMLElement;
+    let selector = compiled.querySelector('mat-select') as HTMLSelectElement;
+    expect(selector).toBeTruthy();
+    selector.value = "false"; // clicking selector or the contained divs as described in internet does not lead to value change
+    fixture.detectChanges;
+    await fixture.whenStable();
+    //expect(component.selected).toBeFalse();
+  });
+
 });

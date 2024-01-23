@@ -1,13 +1,37 @@
+@import "../../../styles.scss";
+
 :host ::ng-deep .mat-tab-header-pagination-chevron {
-  border-color:rgb(0, 0, 0);
+  border-color: black;
  }
+
+ // default material color is white
+:host ::ng-deep .mat-select-value {    
+  color: black !important;  
+}
+
+// default material color is white
+:host ::ng-deep .mat-select-arrow {    
+  color: black !important;  
+}
+
+// default material color is white
+::ng-deep .mat-select-panel {    
+  background: white !important;  
+}
+
+::ng-deep .mat-option.mat-selected:not(.mat-option-disabled) {
+  color: $color_lakeGreen !important;
+}
+
+::ng-deep .mat-option {    
+  color: black !important;
+}
 
 
 .item {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-
   color: black;
 }
 
@@ -26,12 +50,4 @@
 
 .file-input {
   display: none;
-}
-
-.okto-button-enabled {
-  background-color: rgb(35, 142, 184)
-}
-
-.okto-button-disabled {
-  background-color: rgb(97, 95, 96)
 }

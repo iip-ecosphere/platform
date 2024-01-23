@@ -40,7 +40,7 @@
 
 
       <!-- Table -->
-      <table id="data" style="margin: 0px;"
+      <table id="data" style="margin: 0px; width: 100%; table-layout: auto;"
         *ngIf="tab.tabName == 'running services' || tab.tabName == 'running artifacts'; else elseOption">
         <!--<tr *ngFor="let item of filteredData; let i = index"> -->
         <tr id="data.row" *ngFor="let item of dataToDisplay; let i = index">
@@ -48,8 +48,7 @@
           <td style="width: 2%; text-align: center;"> {{i + 1}} </td>
 
           <!-- Item -->
-          <td style="width: 100%;">
-
+          <td>
             <span class="row-title" >
               <span id="data.idShort" style="height: 5px; vertical-align: top; margin-right: 10px;">
                 {{item.idShort}}
@@ -64,17 +63,19 @@
           </td>
 
           <!-- Buttons -->
-          <td class="cell-with-button">
-            <div *ngIf="tab.tabName == 'running services'">
-              <button id="data.btnStdout" mat-raised-button *ngIf="isRunning(item)" class="btn"
-                (click)="getDialog(item.id, item.idShort, stdout)">
-                stdout logging
-              </button>
-              <button id="data.btnStderr" mat-raised-button *ngIf="isRunning(item)" class="btn"
-                (click)="getDialog(item.id, item.idShort, stderr)">
-                stderr logging
-              </button>
-            </div>
+          <td class="cell-with-button" style="width: 5%;" *ngIf="tab.tabName == 'running services'">
+            <button id="data.btnStdout" mat-flat-button *ngIf="isRunning(item)" class="okto-button"
+              (click)="getDialog(item.id, item.idShort, stdout)" matTooltip="Stdout logging">
+              <mat-icon>manage_search</mat-icon>
+              <span>out</span>
+            </button>
+          </td>
+          <td class="cell-with-button" style="width: 5%;" *ngIf="tab.tabName == 'running services'">
+            <button id="data.btnStderr" mat-flat-button *ngIf="isRunning(item)" class="okto-button"
+              (click)="getDialog(item.id, item.idShort, stderr)" matTooltip="Stderr logging">
+              <mat-icon>manage_search</mat-icon>
+              <span>err</span>
+            </button>
           </td>
         </tr>
       </table>

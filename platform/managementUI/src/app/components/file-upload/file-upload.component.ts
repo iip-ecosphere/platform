@@ -24,6 +24,7 @@ export class FileUploadComponent extends Utils {
    */
   @Output() result = new EventEmitter<File>();
   @Input() enabled = true;
+  @Input() tooltip = "Upload";
 
   constructor() {
     super();

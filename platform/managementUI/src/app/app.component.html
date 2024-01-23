@@ -1,15 +1,11 @@
 
-<mat-toolbar style="background: RGB(35, 142, 183);">
+<mat-toolbar class="hmiHeader">
   <div class="logo-container">
     <img src="../assets/oktoflow.png" alt="Logo" class="main-logo" >
   </div>
   <div class="main-title">
     <span>  oktoflow Management UI</span>
   </div>
-  <div class="logo-container">
-    <img src="../assets/PlatformLogoBig.png" alt="Logo" class="main-logo">
-  </div>
-
 
   <span style="flex: 1 1 auto"></span>
 
@@ -24,7 +20,7 @@
 </mat-toolbar>
 
 
-<nav mat-tab-nav-bar style="background: RGB(35, 142, 183);">
+<nav mat-tab-nav-bar class="mainMenu">
   <a mat-tab-link [routerLink]="'resources'"> resources </a>
   <a mat-tab-link [routerLink]="'list'"> configuration </a>
   <a mat-tab-link [routerLink]="'services'"> runtime </a>

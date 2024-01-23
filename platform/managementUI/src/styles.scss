@@ -4,10 +4,21 @@
 @use '@angular/material' as mat;
 @import "drawflow.scss";
 
+$color_lakeGreen: #036070;
+$color_seaBlue_orig: rgb(135,161,177);
+$color_seaBlue: rgb(116,162,174);
+$color_deepSea: #003e4c;
+$color_spaBlue: #067f8c;
+$color_octoRed: #d76a63;
+$color_poolBlue: #9cc5d2;
+$color_poolBlue_light: rgb(226,242,244);
+$color_gray: rgb(97, 95, 96);
+$editorInputFieldWidth: 20em;
+
 :root {
-  --primary-color: RGB(35, 142, 183);
+  --primary-color: $color_poolBlue;
   --primary-color-contrast:(#001d3c);
-  --secondary-color: RGB(157,157,157);
+  --secondary-color: $color_seaBlue;
   --secondary-colo-contrast:(#343434);
 }
 
@@ -27,17 +38,18 @@ tr:nth-child(odd) {
 }
 
 .cell-with-button {
-  vertical-align: top;
+  text-align: center;
   white-space: nowrap;
-  vertical-align:middle;
+  vertical-align: middle;
 }
 
 .row-title {
   font-size: medium;
   line-height: 1.7;
 }
+
 .subtext{
-  color: rgb(97, 95, 96);
+  color: $color_gray;
   //font-size: small;
   //margin: 5px;
   margin-left: 5px;
@@ -45,7 +57,7 @@ tr:nth-child(odd) {
 }
 
 .subtext-small{
-  color: rgb(97, 95, 96);
+  color: $color_gray;
   font-size: 2.5em;
 }
 
@@ -112,18 +124,18 @@ tr:nth-child(odd) {
 }
 
 .input-dplan {
-  color: rgb(97, 95, 96);
+  color: $color_gray;
   font-size: small;
 }
 
 // outline
 .mat-form-field-appearance-outline .mat-form-field-outline {
   //color: black;
-  color: rgb(97, 95, 96);
+  color: $color_gray;
 }
 // focused outline
 .mat-form-field-appearance-outline.mat-focused .mat-form-field-outline-thick {
-  color:rgb(35, 142, 184);
+  color:$color_poolBlue;
 }
 
 //-----------
@@ -132,15 +144,15 @@ tr:nth-child(odd) {
 .mat-tab-label {
   color: rgb(0,0,0) !important;
   //background-color: rgb(203, 203, 203);
-  background-color: rgb(125, 214, 255);
+  background-color: $color_poolBlue;
 }
 
 .mat-tab-group.mat-primary .mat-ink-bar, .mat-tab-nav-bar.mat-primary .mat-ink-bar {
-  background-color:RGB(35, 142, 183);
+  background-color:$color_poolBlue;
 }
 
 .tab-label {
-  background-color: rgb(125, 214, 255);
+  background-color: $color_poolBlue;
 }
 
 .aas-icon-tab {
@@ -155,12 +167,20 @@ tr:nth-child(odd) {
   padding-bottom: 10px;
   width: 120px;
   //background-color: rgb(203, 203, 203);
-  background-color: rgb(125, 214, 255);
+  background-color: $color_poolBlue;
   color: black;
 }
 
+.okto-button-enabled {
+  background-color: $color_spaBlue;
+}
+
+.okto-button-disabled {
+  background-color: $color_gray;
+}
+
 .create-button {
-  background-color:rgb(35, 142, 184);
+  background-color:$color_poolBlue;
   //background-color:rgb(132, 137, 143);
   margin-right: 1vw;
   color: white;
@@ -172,7 +192,7 @@ tr:nth-child(odd) {
 }
 
 .blue-button {
-  background-color:rgb(35, 142, 184);
+  background-color:$color_poolBlue;
 }
 
 .black-button {
@@ -184,7 +204,7 @@ tr:nth-child(odd) {
 }
 
 .service {
-  background-color:rgb(35, 142, 184);
+  background-color:$color_poolBlue;
 }
 
 .logo {
@@ -199,6 +219,7 @@ tr:nth-child(odd) {
   width: 55px;
   position: relative;
 }
+
 .main-logo {
   width: 50px;
   height: 50px;
@@ -220,7 +241,6 @@ tr:nth-child(odd) {
 
 .button {
   background-color: var(--primary-color);
-
 }
 
 .background {
@@ -258,3 +278,37 @@ mat-dialog-container {
   overflow: hidden !important;
 }
 */
+
+/*
+Generic button
+*/
+.okto-button {
+  color: white !important;
+  background-color:$color_spaBlue;
+}
+
+/*
+Round icon button in item, scaled for inner editors.
+*/
+.itemButton {
+  color: white;
+  background-color: $color_spaBlue;
+  transform: scale(0.6);
+}
+
+.hmiHeader {
+  background: $color_lakeGreen;
+}
+
+.mainMenu {
+  background: $color_lakeGreen;
+}
+
+.subMenu {
+  background: RGB(003, 161, 177);
+}
+
+.custom-dialog-container .mat-dialog-container {
+  background-color: $color_seaBlue;
+  padding: 2px;
+}
