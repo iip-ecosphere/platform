@@ -1,9 +1,6 @@
 <mat-toolbar class="hmiHeader">
   <h1 *ngIf="category && !type else subeditorHead">
-    <span>{{ category }}</span>
-    <span *ngIf="selectedType">
-      ({{ selectedType.idShort }})
-    </span>
+    <span>{{ getDisplayTitle() }}</span>
   </h1>
   <ng-template #subeditorHead>
     <h1>
@@ -129,7 +126,7 @@
         <div>
           <ng-template #ref>
             <mat-card [ngClass]="input.multipleInputs? 'inputBox custom' : 'refInput custom'">
-                <span class="visibility:hidden" id="inputName">{{ getDisplayName(input) }}</span> <!-- for tests -->
+                <span hidden id="inputName">{{ getDisplayName(input) }}</span> <!-- for tests -->
                 <app-input-ref-select [activeTextinput]="true" [input]="input" [meta]="metaBackup">
                 </app-input-ref-select>
             </mat-card>
@@ -139,7 +136,7 @@
       <div class="fullLineInputGroup">
         <div *ngFor="let input of uiGroup.fullLineInputs">
           <mat-card class="refInput custom">
-            <span id="inputName" class="visibility:hidden"> <!-- for tests -->
+            <span hidden id="inputName"> <!-- for tests -->
               {{ getDisplayName(input) }} 
             </span>
             <app-input-ref-select [meta]="metaBackup" [activeTextinput]="true" [input]="input">

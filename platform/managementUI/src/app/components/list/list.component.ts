@@ -542,7 +542,22 @@ export class ListComponent extends Utils implements OnInit {
     if (this.currentTab == 'Meshes') {
       this.router.navigateByUrl("flowchart");
     } else {
-      let dialogRef = this.dialog.open(EditorComponent, this.configureDialog('90%', '90%', null));
+      let type = this.selectedType?.idShort || "";
+      let meta_entry:configMetaEntry = {
+        modelType: {name: ""},
+        kind: "",
+        value: "",
+        idShort: "value"
+      };
+      let editorInput:editorInput = {name: "value", 
+        type: type, value : "",
+        description: [{language: '', text: ''}],
+        refTo: false, multipleInputs: false, meta:meta_entry};
+
+      let uiGroups = this.ivmlFormatter.calculateUiGroupsInf(editorInput, this.meta);
+      let parts = this.ivmlFormatter.partitionUiGroups(uiGroups);
+
+      let dialogRef = this.dialog.open(EditorComponent, this.configureDialog('90%', '90%', parts));
       let component = dialogRef.componentInstance;
       component.category = this.currentTab;
       component.selectedType = this.selectedType;

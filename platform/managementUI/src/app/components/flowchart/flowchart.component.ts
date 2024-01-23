@@ -5,6 +5,7 @@ import { IvmlFormatterService } from 'src/app/services/ivml-formatter.service';
 import { MeshFeedbackComponent } from './feedback/mesh-feedback/mesh-feedback.component';
 import { MatDialog } from '@angular/material/dialog';
 import { ApiService, GRAPHFORMAT_DRAWFLOW } from 'src/app/services/api.service';
+import { MT_metaType, MT_varValue } from 'src/interfaces';
 
 interface Bus {
   id: string;
@@ -30,7 +31,7 @@ export class FlowchartComponent implements OnInit {
   editor: any;
   services: any;
   serviceMeshes: any;
-  private displayAttributes = ['kind', 'name', 'ver', 'type'];
+  private displayAttributes = ['ver', 'type'];
   private meta = ['metaType', 'metaProject', 'metaState', 'metaAas', 'metaRefined', 'metaAbstract', 'metaTypeKind', 'metaVariable'];
 
   selectedService: any;
@@ -130,20 +131,21 @@ export class FlowchartComponent implements OnInit {
     type = type.toLowerCase();
     let icon: string = '';
     let iconHtml = '';
-    if(type.includes("java")) {
+    
+    if (type.includes("java")) {
       icon = "../../../assets/java.png";
-    } else if(type.includes("flower")) {
+    } else if (type.includes("flower")) {
       icon = "../../../assets/flower.png";
-    } else if(type.includes("opc")) {
+    } else if (type.includes("opc")) {
       icon = "../../../assets/opc.png";
-    } else if(type.includes("mqtt")) {
+    } else if (type.includes("mqtt")) {
       icon = "../../../assets/mqtt.png";
-    } else if(type.includes("py")) {
+    } else if (type.includes("py")) {
       icon = "../../../assets/py.png";
     }
-    if(icon != '' && htmlTag) {
+    if (icon != '' && htmlTag) {
       iconHtml= "<img src=\""+ icon +"\" height=\"25px\">";
-    } else if(icon != '') {
+    } else if (icon != '') {
       iconHtml= icon;
     }
     return iconHtml;
@@ -233,7 +235,7 @@ export class FlowchartComponent implements OnInit {
 
   public displayAttribute(attribute: string) {
     let contains = false;
-    if(this.displayAttributes.includes(attribute)){
+    if (this.displayAttributes.includes(attribute)){
       contains = true;
     }
     return contains;
@@ -241,7 +243,7 @@ export class FlowchartComponent implements OnInit {
 
   public isMeta(input: string) {
     let isMeta = false;
-    if(this.meta.includes(input)) {
+    if (this.meta.includes(input)) {
       isMeta = true;
     }
     return isMeta;
@@ -249,8 +251,11 @@ export class FlowchartComponent implements OnInit {
 
   public getId(serviceValue: any[]) {
     let value = serviceValue.find(item => item.idShort === 'id').value;
-    return value.find(
-      (item: { idShort: string; }) => item.idShort === 'varValue').value;
+    return value.find((item: { idShort: string; }) => item.idShort === MT_varValue).value;
+  }
+ 
+  public getType(serviceValue: any[]) {
+    return serviceValue.find(item => item.idShort === MT_metaType).value;
   }
 
   //to be removed, keeping in case i need to get the coordinates of a mesh again

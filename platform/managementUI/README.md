@@ -101,11 +101,9 @@ For more material icons, see [Google Fonts Icons](https://fonts.google.com/icons
 
 * Delete meshes.
 * Input ref select default values for nameplate.
-* Dynamic dialog sizes
 * Offline icons
-* Generated variable names
+* Generated variable names (backend API call)
 * Logging output
-* Mesh editor styling
 
 ## Further details
 

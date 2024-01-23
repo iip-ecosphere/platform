@@ -86,7 +86,18 @@ export class EditorComponent extends Utils implements OnInit {
     }
   }
 
-// ----------------------------------------------------------------------
+  /**
+   * Returns the display title of the dialog.
+   * 
+   * @returns the display title
+   */
+  public getDisplayTitle() {
+    let result = this.category;
+    if (this.selectedType && this.selectedType.idShort) {
+      result = this.selectedType.idShort;
+    }
+    return result;
+  }
 
   public displayName(property: Resource | string) {
     let displayName = '';
@@ -116,7 +127,7 @@ export class EditorComponent extends Utils implements OnInit {
     let creationData: IvmlRecordValue = {};
     this.showInputs = false;
     this.transferUiGroups(this.uiGroups, creationData);
-    let variableName = this.ivmlFormatter.generateVariableName(this.ivmlType);
+    let variableName = this.ivmlFormatter.generateVariableName(this.ivmlType, creationData);
     if (this.selectedType?.idShort == "Application") {
       this.handleFeedback(await this.ivmlFormatter.createApp(variableName, creationData));
     } else {

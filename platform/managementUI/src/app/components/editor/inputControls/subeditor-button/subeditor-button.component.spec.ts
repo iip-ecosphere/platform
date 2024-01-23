@@ -62,18 +62,7 @@ describe('SubeditorButtonComponent', () => {
       metaTypeKind : MTK_compound
       // meta left out
     };
-    component.meta = await apiService.getMeta();
-    /*{
-      kind: "Instance",
-      value: [ {
-        kind: "Instance",
-        value: [ 
-          createField("name", "The actual implementing data type.", "refTo(DataType)", 1, null),
-          createField("forward", "Type will be transported forward to next service. Opposite, backward broadcasting of data.", "Boolean", 1, "true"),
-        ],
-        idShort: "IOType"
-      }]
-    };*/
+    component.meta = await apiService.getMeta(); // we could construct it, easier as e2e test
     component.buttonText = "edit";
     component.matIcon = "add";
     component.showValue = "false";
@@ -104,42 +93,3 @@ describe('SubeditorButtonComponent', () => {
 
 });
 
-function createField(name: string, description: string, type: string, uiGroup: number, dflt: string | null) {
-  let result = {
-    kind: "Instance",
-    value: [ {
-      kind: "Instance",
-      value: [
-        {
-          kind: "Instance",
-          value: "type",
-          valueType: "string",
-          idShort: name,
-          description: [{language: "de", text: description}]
-        }, {
-          kind: "Instance",
-          value: type,
-          valueType: "string",
-          idShort: "type",
-          description: [],
-        }, {
-          kind: "Instance",
-          value: uiGroup,
-          valueType: "int",
-          idShort: "uiGroup",
-          description: [],
-        }
-      ]
-    } ]
-  };
-  if (dflt) {
-    result.value[0].value.push({
-      kind: "Instance",
-      value: dflt,
-      valueType: "int",
-      idShort: "metaDefault",
-      description: [],
-    });
-  }
-  return result;
-}

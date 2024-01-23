@@ -5,6 +5,8 @@ import { EnvConfigService } from 'src/app/services/env-config.service';
 import { retry } from 'src/app/services/utils.service';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { FormsModule } from '@angular/forms';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('FileUploadComponent', () => {
 
@@ -14,8 +16,9 @@ describe('FileUploadComponent', () => {
   beforeEach(async () => {
     await EnvConfigService.init();
     await TestBed.configureTestingModule({
-      imports: [ MatIconModule, MatTooltipModule ],
-      declarations: [ ],
+      imports: [ MatIconModule, MatTooltipModule, FormsModule ],
+      declarations: [ FileUploadComponent ],
+      schemas: [NO_ERRORS_SCHEMA] // complains about matTooltip although imported
     })
     .compileComponents().then(() => {
       fixture = TestBed.createComponent(FileUploadComponent);

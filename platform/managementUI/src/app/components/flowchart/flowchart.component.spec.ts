@@ -58,14 +58,14 @@ describe('FlowchartComponent', () => {
     let services = servicePanel.querySelectorAll('mat-card');
     expect(services).toBeTruthy();
     services.forEach((s) => {
-      let service = s.querySelector('mat-card-content[id="service.id"]') as HTMLElement;
+      let service = s.querySelector('td[id="service.id"]') as HTMLElement;
       if (service) {
         let serviceName = service.innerText.trim();
-        expect(expectedServiceNames.has(serviceName)).toBeTrue();
+        expect(expectedServiceNames.has(serviceName)).withContext(`Expected service name ${serviceName} not found`).toBeTrue();
         checkSet.delete(serviceName);
       }
     });
-    expect(checkSet.size).toBe(0);
+    expect(checkSet.size).withContext("Not all expected services found").toBe(0);
 
     let simpleMeshLink = undefined as HTMLElement | undefined;
     let navPanel = compiled.querySelectorAll('a[id="nav-link"]')

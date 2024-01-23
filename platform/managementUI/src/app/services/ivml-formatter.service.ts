@@ -653,8 +653,25 @@ export class IvmlFormatterService extends UtilsService {
     return result;
   }
 
-  public generateVariableName(type: string) {
+  /**
+   * Derives for the given IVML type and the value structure an available/usable IVML variable name.
+   * 
+   * @param type the IVML type name
+   * @param data the data to be used as IVML value
+   * @returns the variable name
+   */
+  public generateVariableName(type: string, data: IvmlRecordValue | null) {
+    let result = type;    
     // TODO API call to make variable unique
+    if (data) {
+      let name = data["name"];
+      if (name) {
+        type += "_" + name.value;
+      }
+    }
+    if (type.length > 0) {
+      type = type[0].toLowerCase() + type.substring(1);       
+    }
     return type; // preliminary
   }
 

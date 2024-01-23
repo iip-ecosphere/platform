@@ -1,9 +1,11 @@
 <div class="outermost-container">
-  <nav mat-tab-nav-bar style="background: RGB(35, 142, 183);">
+  <nav mat-tab-nav-bar class="secondary-menu">
     <div *ngIf="serviceMeshes">
       <span *ngFor="let mesh of serviceMeshes.value">
-        <span *ngIf="!isMeta(mesh.idShort)">
-          <a id="nav-link" mat-tab-link (click)="selectMesh(mesh.idShort)"> {{mesh.idShort}}</a>
+        <span *ngIf="!isMeta(mesh.idShort)" class="custom-label">
+          <a id="nav-link" mat-tab-link (click)="selectMesh(mesh.idShort)" class="secondary-tab-label">
+            <img src="/assets/aas.png" class="aas-icon-tab">&nbsp;{{mesh.idShort}}
+          </a>
         </span>
       </span>
     </div>
@@ -23,21 +25,33 @@
                 <img [src]=assignIcon(getId(service.value)) height="25px">
               </mat-card-title>
               -->
-              <mat-card-content id="service.id" *ngIf="service.idShort" style="font-size: medium;">
-                {{ getId(service.value) }}
-                <img [src]=assignIcon(getId(service.value)) height="25px">
+              <mat-card-content *ngIf="service.idShort">
+                <table>
+                  <tr><td id="service.id" style="font-size: medium; text-align: center;">{{ getId(service.value) }}</td></tr>
+                  <tr><td style="text-align: left;">
+                    <span *ngFor="let property of service.value">
+                      <span *ngIf="displayAttribute(property.idShort)" class="subtext">
+                        {{property.idShort}}:
+                        <span *ngIf="property.value">
+                          {{property.value[0].value}}
+                        </span>
+                      </span>
+                    </span>
+                  </td></tr>
+                  <tr><td style="text-align: center;"><img [src]=assignIcon(getType(service.value)) height="25px"></td></tr>
+                </table>
               </mat-card-content>
-              <mat-card-content id="service.details">
+              <!--<mat-card-content id="service.details" style="justify-content: left;">
                 <div *ngFor="let property of service.value">
-                  <p *ngIf="displayAttribute(property.idShort)"
-                  class="subtext">
+                  <p *ngIf="displayAttribute(property.idShort)" class="subtext">
                     {{property.idShort}}:
                     <span *ngIf="property.value">
                       {{property.value[0].value}}
                     </span>
                   </p>
                 </div>
-              </mat-card-content>
+                <img [src]=assignIcon(getType(service.value)) height="25px">
+              </mat-card-content>-->
             </mat-card>
           </div>
         </div>
