@@ -4,6 +4,7 @@ import { FileUploadComponent, chunkInput } from './file-upload.component';
 import { EnvConfigService } from 'src/app/services/env-config.service';
 import { retry } from 'src/app/services/utils.service';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 describe('FileUploadComponent', () => {
 
@@ -13,7 +14,7 @@ describe('FileUploadComponent', () => {
   beforeEach(async () => {
     await EnvConfigService.init();
     await TestBed.configureTestingModule({
-      imports: [ MatIconModule ],
+      imports: [ MatIconModule, MatTooltipModule ],
       declarations: [ ],
     })
     .compileComponents().then(() => {

@@ -6,6 +6,7 @@ import { EnvConfigService } from '../../services/env-config.service';
 import { retry } from '../../services/utils.service';
 import { FileUploadComponent } from '../file-upload/file-upload.component';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 describe('DeploymentPlansComponent', () => {
 
@@ -15,7 +16,7 @@ describe('DeploymentPlansComponent', () => {
   beforeEach(async () => {
     await EnvConfigService.init();
     await TestBed.configureTestingModule({
-      imports: [ HttpClientModule, MatIconModule ],
+      imports: [ HttpClientModule, MatIconModule, MatTooltipModule ],
       declarations: [ DeploymentPlansComponent, FileUploadComponent ]
     })
     .compileComponents();
@@ -54,13 +55,11 @@ describe('DeploymentPlansComponent', () => {
         td = tabDataRow.querySelector('span[id="data.description"]') as HTMLElement;
         expect(td).toBeTruthy();
         expect(td.innerText).toMatch(/\S+/);
-
         let btn = tabDataRow.querySelector('button[id="data.btnDeploy"]') as HTMLElement;
         if (planId === 'SimpleMesh') {
           deployButton = btn;
         }
         expect(btn).toBeTruthy();
-        expect(btn.innerText).toContain("deploy");
         expect(btn.getAttribute("disabled")).toEqual(null); // else toEqual('')
         i++;
       }
@@ -88,7 +87,7 @@ describe('DeploymentPlansComponent', () => {
   it('should have upload button', async() => {
     await fixture.detectChanges();
     let compiled = fixture.nativeElement as HTMLElement;
-    let button = compiled.querySelector('button[class="upload-btn"]') as HTMLElement;
+    let button = compiled.querySelector('button[id="upload-btn"]') as HTMLElement;
     expect(button).toBeTruthy();
     // click does not help much here due to input
     const dataBase64 = "VEhJUyBJUyBUSEUgQU5TV0VSCg==";

@@ -104,6 +104,8 @@ For more material icons, see [Google Fonts Icons](https://fonts.google.com/icons
 * Dynamic dialog sizes
 * Offline icons
 * Generated variable names
+* Logging output
+* Mesh editor styling
 
 ## Further details
 

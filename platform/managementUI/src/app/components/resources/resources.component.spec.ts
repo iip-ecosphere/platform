@@ -76,7 +76,7 @@ describe('ResourcesComponent', () => {
 
       let navigateSpy = spyOn(router, 'navigateByUrl');
       let button = compiled.querySelector('div[id="bottom"] button') as HTMLElement;
-      expect(button?.innerText).toEqual('resource details');
+      expect(button?.innerText).toMatch('resource details');
       button.click();
       expect(navigateSpy).toHaveBeenCalledWith('/resources/local');
   });

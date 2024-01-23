@@ -4,6 +4,7 @@ import { InstancesComponent } from './instances.component';
 import { HttpClientModule } from '@angular/common/http';
 import { EnvConfigService } from '../../services/env-config.service';
 import { retry } from '../../services/utils.service';
+import { MatIconModule } from '@angular/material/icon';
 
 describe('InstancesComponent', () => {
 
@@ -13,7 +14,7 @@ describe('InstancesComponent', () => {
   beforeEach(async () => {
     await EnvConfigService.init();
     await TestBed.configureTestingModule({
-      imports: [ HttpClientModule ],
+      imports: [ HttpClientModule, MatIconModule ],
       declarations: [ InstancesComponent ]
     })
     .compileComponents();

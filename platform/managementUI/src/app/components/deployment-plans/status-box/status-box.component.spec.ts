@@ -10,6 +10,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { NgVar } from 'src/app/directives/ng-var.directive';
 import { FileUploadComponent } from '../../file-upload/file-upload.component';
+import { MatIconModule } from '@angular/material/icon';
 
 describe('StatusBoxComponent', () => {
   let component: StatusBoxComponent;
@@ -21,6 +22,7 @@ describe('StatusBoxComponent', () => {
         MatDialogModule, 
         BrowserAnimationsModule, 
         MatCardModule, 
+        MatIconModule,
         MatProgressSpinnerModule,
         MatTooltipModule ],
       declarations: [ StatusBoxComponent, NgVar, FileUploadComponent ],

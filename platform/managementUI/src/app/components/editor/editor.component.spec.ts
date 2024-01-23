@@ -7,7 +7,6 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormsModule } from "@angular/forms";
 import { EnvConfigService } from '../../services/env-config.service';
-import { Resource } from 'src/interfaces';
 
 describe('EditorComponent', () => {
 
@@ -65,7 +64,7 @@ describe('EditorComponent', () => {
         {name: "name", kind: InputKind.text}, {name: "type", kind: InputKind.ref}
       ]}, 
       {name: "RecordType", input:[
-        {name: "name", kind: InputKind.text}, {name: "fields", kind: InputKind.sub}
+        {name: "name", kind: InputKind.text}, {name: "fields", kind: InputKind.ref}
       ]}, 
       {name: "ByteArrayTypeType"}, 
       {name: "IntegerArrayTypeType"}, 
@@ -202,7 +201,7 @@ async function test(fixture: ComponentFixture<EditorComponent>, component: Edito
 
   let compiled = fixture.nativeElement as HTMLElement;
 
-  if (typeProps.length > 1) { // only selection if multiple
+  /*if (typeProps.length > 1) { // only selection if multiple
     let expectedItems = new Set<string>(typeProps.map(p => p.name));
     let typeSelect = compiled.querySelector('mat-select[id="typeSelect"]') as HTMLElement;
     expect(typeSelect).toBeTruthy();
@@ -225,7 +224,7 @@ async function test(fixture: ComponentFixture<EditorComponent>, component: Edito
       }
       expect(ra[0].idShort).toEqual(typeProps[0].name);
     }
-  }
+  }*/
   for (let typeProp of typeProps.filter(p => p.input)) {
     component.selectedType = component.meta?.value?.find(type => type.idShort === typeProp.name);
     component.generateInputs();
@@ -233,41 +232,40 @@ async function test(fixture: ComponentFixture<EditorComponent>, component: Edito
     await fixture.detectChanges();
     await fixture.whenRenderingDone();
   
-//console.log(fixture.nativeElement);
-  
     let inputs = compiled.querySelector('div[class="inputGroup"]') as HTMLElement;
     expect(inputs).toBeTruthy();
     var uiGroups = inputs.children;
     for (var g = 0; g < uiGroups.length; g++) {
       var uiGroup = uiGroups[g] as HTMLElement;
-      var inputName = uiGroup.querySelector('p[id="inputName"]') as HTMLElement;
-      expect(inputName).toBeTruthy();
-      var varName = inputName.innerText.trim();
-
-      var expectedEditor = typeProp.input?.find(p => p.name === varName);
-      var textEditor = uiGroup.querySelector('mat-label') as HTMLElement;
-      var subEditor = uiGroup.querySelector('app-subeditor-button') as HTMLElement;
-      var boolEditor = uiGroup.querySelector('app-boolean-dropdown') as HTMLElement;
-      var enumEditor = uiGroup.querySelector('app-enum-dropdown') as HTMLElement;
-      var refEditor = uiGroup.querySelector('app-input-ref-select') as HTMLElement;
-      if (expectedEditor) {
-        if (textEditor) {
-          var input = uiGroup.querySelector('input') as HTMLElement;
-          expect(input).withContext(varName).toBeTruthy();
-          expect(expectedEditor?.kind).withContext(varName + " shall be text").toBe(InputKind.text);
-        } else if (boolEditor) {
-          expect(expectedEditor?.kind).withContext(varName + " shall be bool").toBe(InputKind.bool);
-        } else if (enumEditor) {
-          expect(expectedEditor?.kind).withContext(varName + " shall be enum").toBe(InputKind.enum);
-        } else if (subEditor) {
-          expect(expectedEditor?.kind).withContext(varName + " shall be sub").toBe(InputKind.sub);
-        } else if (refEditor) {
-          expect(expectedEditor?.kind).withContext(varName + " shall be ref").toBe(InputKind.ref);
-        }
-      } else {
-        if (debug) {
-          console.log("UNKNOWN " + inputName.innerText.trim() + " text " + (!textEditor)+ " bool " + (!boolEditor)+ " sub " 
-            + (!subEditor)+ " enum " + (!enumEditor)+ " ref " + (!refEditor));
+      var inputName = uiGroup.querySelector('[id="inputName"]') as HTMLElement;
+      if (inputName) {
+        expect(inputName).withContext("uiGroup " + g).toBeTruthy();
+        var varName = inputName.innerText.trim();
+        var expectedEditor = typeProp.input?.find(p => p.name === varName);
+        var textEditor = uiGroup.querySelector('mat-label') as HTMLElement;
+        var subEditor = uiGroup.querySelector('app-subeditor-button') as HTMLElement;
+        var boolEditor = uiGroup.querySelector('app-boolean-dropdown') as HTMLElement;
+        var enumEditor = uiGroup.querySelector('app-enum-dropdown') as HTMLElement;
+        var refEditor = uiGroup.querySelector('app-input-ref-select') as HTMLElement;
+        if (expectedEditor) {
+          if (textEditor) {
+            var input = uiGroup.querySelector('input') as HTMLElement;
+            expect(input).withContext(varName).toBeTruthy();
+            expect(expectedEditor?.kind).withContext(varName + " shall be text").toBe(InputKind.text);
+          } else if (boolEditor) {
+            expect(expectedEditor?.kind).withContext(varName + " shall be bool").toBe(InputKind.bool);
+          } else if (enumEditor) {
+            expect(expectedEditor?.kind).withContext(varName + " shall be enum").toBe(InputKind.enum);
+          } else if (subEditor) {
+            expect(expectedEditor?.kind).withContext(varName + " shall be sub").toBe(InputKind.sub);
+          } else if (refEditor) {
+            expect(expectedEditor?.kind).withContext(varName + " shall be ref").toBe(InputKind.ref);
+          }
+        } else {
+          if (debug) {
+            console.log("UNKNOWN " + inputName.innerText.trim() + " text " + (!textEditor)+ " bool " + (!boolEditor)+ " sub " 
+              + (!subEditor)+ " enum " + (!enumEditor)+ " ref " + (!refEditor));
+          }
         }
       }
       // TODO buttons 

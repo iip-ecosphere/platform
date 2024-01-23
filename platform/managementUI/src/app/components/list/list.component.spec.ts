@@ -14,6 +14,10 @@ import { routes } from "../../app-routing.module";
 import { of } from 'rxjs';
 import { FileUploadComponent } from '../file-upload/file-upload.component';
 import { retry } from 'src/app/services/utils.service';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatSelectModule } from '@angular/material/select';
+import { EditorComponent } from '../editor/editor.component';
+import { FormsModule } from '@angular/forms';
 
 describe('ListComponent', () => {
 
@@ -33,8 +37,11 @@ describe('ListComponent', () => {
         MatIconModule,
         BrowserAnimationsModule, 
         MatDialogModule, 
+        MatTooltipModule,
+        MatSelectModule,
+        FormsModule,
         RouterTestingModule.withRoutes(routes) ],
-      declarations: [ ListComponent, FileUploadComponent ],
+      declarations: [ ListComponent, FileUploadComponent, EditorComponent ],
       providers: [
           {provide: MatDialogRef, useValue: {}},
           {provide: MAT_DIALOG_DATA, useValue: []},
@@ -184,7 +191,7 @@ async function test(fixture: ComponentFixture<ListComponent>, component: ListCom
     expect(item.innerText).withContext(context).toMatch(/\S+/);
 
     if (tabName == "Applications") {
-        let uploadBtn = compiled.querySelector('button[class="upload-btn"]');
+        let uploadBtn = compiled.querySelector('button[id="upload-btn"]');
         expect(uploadBtn).withContext(`upload button of table ${tabName}`).toBeTruthy();
         // click does not help much here due to input
         const dataBase64 = "VEhJUyBJUyBUSEUgQU5TV0VSCg==";
