@@ -15,11 +15,12 @@
 <div style="padding: 0;">
   <span id="inputName" class="inputLabel" *ngIf="!selector">
     {{ getDisplayName(input) }} 
-    <span #subEditor *ngIf="input.metaTypeKind == 10 && input.multipleInputs else other"> 
+    <span #subEditor *ngIf="input.metaTypeKind == 10 && input.multipleInputs else other" 
+      id="ref-select.inputName.subEd"> 
       <app-subeditor-button [meta]="meta" [input]="input" matIcon="add"></app-subeditor-button>
     </span>
     <ng-template #other>
-      <button mat-icon-button class="itemButton" (click)="selectElement()">
+      <button mat-icon-button class="itemButton" (click)="selectElement()" id="ref-select.inputName.btn-add">
         <mat-icon>add</mat-icon>
       </button>
     </ng-template>
@@ -53,29 +54,33 @@
   </div>
 
   <div *ngIf="isArray(input.value) else single" class="valuebox">
-    <div class="flexcontainer-background" [style.width]="getContainerWidth()">
+    <div class="flexcontainer-background" [style.width]="getContainerWidth()" id="ref-select.container">
       <mat-card *ngFor="let value of input.value; let i=index" class="inputCard custom">
         <div class="flexcontainer">
           <table>
             <tr>
               <td>
-                <button *ngIf="isSequenceOf" mat-icon-button class="itemButton" (click)="moveSequenceElement(true, i)" matTooltip="Shift to left">
+                <button *ngIf="isSequenceOf" mat-icon-button class="itemButton" (click)="moveSequenceElement(true, i)" 
+                  matTooltip="Shift to left" id="ref-select.container.bnt-shiftLeft">
                   <mat-icon>keyboard_arrow_left</mat-icon>
                 </button>
               </td>
               <td style="width:8em;">{{getElementDisplayName(value, true)}}</td>
               <td>
-                <button mat-icon-button class="itemButton" (click)="editInputValue(i)" matTooltip="Edit value">
+                <button mat-icon-button class="itemButton" (click)="editInputValue(i)" matTooltip="Edit value" 
+                  id="ref-select.container.bnt-edit">
                   <mat-icon>menu_open</mat-icon>
                 </button>
               </td>
               <td>
-                <button mat-icon-button class="itemButton" (click)="removeInputValue(i)" matTooltip="Delete value">
+                <button mat-icon-button class="itemButton" (click)="removeInputValue(i)" matTooltip="Delete value" 
+                  id="ref-select.container.bnt-delete">
                   <mat-icon>delete</mat-icon>
                 </button>
               </td>
               <td>
-                <button *ngIf="isSequenceOf" mat-icon-button class="itemButton" (click)="moveSequenceElement(false, i)" matTooltip="Shift to right">
+                <button *ngIf="isSequenceOf" mat-icon-button class="itemButton" (click)="moveSequenceElement(false, i)" 
+                  matTooltip="Shift to right" id="ref-select.container.bnt-shiftRight">
                   <mat-icon>keyboard_arrow_right</mat-icon>
                 </button>
               </td>
@@ -88,14 +93,15 @@
     
   <ng-template #single>
     <div class ="valuebox" *ngIf="!selector">
-      <div class="flexcontainer-background" [style.width]="getContainerWidth()">
+      <div class="flexcontainer-background" [style.width]="getContainerWidth()" id="ref-select.single">
       <mat-card class="inputCard custom" *ngIf="input.value">
         <div class="valuecontainer">
           <table>
             <tr>
               <td>&nbsp;{{getElementDisplayName(input.value, input.refTo)}}</td>
               <td>
-                <button mat-icon-button class="itemButton" (click)="input.value = null" matTooltip="Delete value">
+                <button mat-icon-button class="itemButton" (click)="input.value = null" 
+                  matTooltip="Delete value" id="ref-select.single.bnt-delete">
                   <mat-icon>delete</mat-icon>
                 </button>
               </td>

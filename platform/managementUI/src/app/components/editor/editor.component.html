@@ -12,7 +12,7 @@
   <span>
     <span *ngIf="feedback == ''">
       <button mat-icon-button class="button okto-button" *ngIf="!type && !refinedTypes else addButton" color="success" (click)="create()" disable>
-        <mat-icon>check_circle</mat-icon>
+        <mat-icon>done</mat-icon>
       </button>
       <ng-template #addButton>
         <button mat-icon-button class="button okto-button" color="warning" (click)="save()" matTooltip="Save values">

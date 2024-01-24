@@ -78,8 +78,7 @@ Use `console.debug`, `console.warn`, `console.info`, `console.log`, `console.err
 
 Use the colors from the (internal) oktoflow styleguide as defined in ``styles.scss``, if needed lighter variations or basic grey variants, white or black.
 
-* Create/New: ``check_circle``
-* Save: ``done`` 
+* Save/Create/New: ``done``
 * Close/Cancel: ``close``
 * Expand: ``expand_more``
 * Collapse: ``expand_less``
