@@ -2,11 +2,13 @@
   <h1><span>Editing {{ getDisplayName(input) }}</span></h1>
   <span style="flex: 1 1 auto"></span>
   <span>
-    <button mat-icon-button class="button okto-button" color="warning" (click)="closeSelector(true)" matTooltip="Save values">
+    <button mat-icon-button class="button okto-button" color="warning" (click)="closeSelector(true)" 
+      matTooltip="Save values" id="ref-select.btn-save">
       <mat-icon>done</mat-icon>
     </button>
     &nbsp;
-    <button mat-icon-button class="button okto-button" color="success" (click)="closeSelector(false)" matTooltip="Close dialog">
+    <button mat-icon-button class="button okto-button" color="success" (click)="closeSelector(false)" 
+      matTooltip="Cancel dialog" id="ref-select.btn-cancel">
       <mat-icon>close</mat-icon>
     </button>
   </span>
@@ -27,20 +29,21 @@
   </span> 
 
   <div *ngIf="selector">
-    <mat-card class="inputBox custom">
+    <mat-card class="inputBox custom" id="ref-select.input">
       {{ getDisplayName(input) }}      
       <table>
         <tr>
           <td *ngIf="activeTextinput">
             <mat-form-field appearance="outline">
-              <input matInput [matTooltip]="input.description[0].language + ' ' + input.description[0].text" [(ngModel)]="textInput">
+              <input matInput [matTooltip]="input.description[0].language + ' ' + input.description[0].text" 
+                [(ngModel)]="textInput" id="ref-select.input.text">
             </mat-form-field>
             <!--<button mat-raised-button (click)="addFromTextfield()">add</button>-->
           </td>
           <td>
             <div *ngIf="references[0]">
               <mat-form-field appearance="outline" class="inputField">
-                <mat-select [(value)]="selectedRef">
+                <mat-select [(value)]="selectedRef" id="ref-select.input.select">
                   <mat-option *ngFor="let ref of references" [value]="ref"> <!-- (click)="addFromRef()" -->
                     {{ getElementDisplayName(ref, false) }}
                   </mat-option>

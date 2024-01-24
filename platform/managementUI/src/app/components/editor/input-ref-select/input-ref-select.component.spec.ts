@@ -9,16 +9,33 @@ import { SubeditorButtonComponent } from '../inputControls/subeditor-button/sube
 import { MatCardModule } from '@angular/material/card';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MTK_compound, MTK_primitive } from 'src/interfaces';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { FormsModule } from '@angular/forms';
 
-describe('InputRefSelectComponent', () => {
+fdescribe('InputRefSelectComponent', () => {
   let component: InputRefSelectComponent;
   let fixture: ComponentFixture<InputRefSelectComponent>;
   let apiService: ApiService;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ HttpClientModule, MatDialogModule, MatIconModule, MatCardModule, MatTooltipModule ],
-      declarations: [ InputRefSelectComponent, SubeditorButtonComponent ],
+      imports: [ 
+        HttpClientModule, 
+        MatDialogModule, 
+        MatIconModule, 
+        MatCardModule, 
+        MatTooltipModule, 
+        MatToolbarModule,
+        MatFormFieldModule,
+        MatInputModule, // required via MatFormFieldModule
+        FormsModule, // required via MatFormFieldModule
+        BrowserAnimationsModule ],
+      declarations: [ 
+        InputRefSelectComponent, 
+        SubeditorButtonComponent ],
       providers: [
         {provide: MatDialogRef, useValue: {}},
         {provide: MAT_DIALOG_DATA, useValue: []},
@@ -70,10 +87,14 @@ describe('InputRefSelectComponent', () => {
     expect(container).toBeTruthy();
     let matCard = container?.querySelector('mat-card');
     expect(matCard).toBeTruthy();
-    expect(matCard?.querySelector('button[id="ref-select.container.bnt-shiftLeft"]')).toBeTruthy();
+    let btn = matCard?.querySelector('button[id="ref-select.container.bnt-shiftLeft"]') as HTMLElement;
+    expect(btn).toBeTruthy();
+    btn.click();
     expect(matCard?.querySelector('button[id="ref-select.container.bnt-edit"]')).toBeTruthy();
     expect(matCard?.querySelector('button[id="ref-select.container.bnt-delete"]')).toBeTruthy();
-    expect(matCard?.querySelector('button[id="ref-select.container.bnt-shiftRight"]')).toBeTruthy();
+    btn = matCard?.querySelector('button[id="ref-select.container.bnt-shiftRight"]') as HTMLElement;
+    expect(btn).toBeTruthy();
+    btn.click();
   });
 
   it('should handle refTo(Server)', async() => {
@@ -109,7 +130,7 @@ describe('InputRefSelectComponent', () => {
   });
 
   it('should handle setOf(String)', async() => {
-    component.activeTextinput = false;
+    component.activeTextinput = true;
     component.meta = await apiService.getMeta(); // we could construct it, easier as e2e test
     component.rows = -1;
     component.input = {
@@ -138,9 +159,25 @@ describe('InputRefSelectComponent', () => {
     let container = compiled.querySelector('div[id="ref-select.container"]');
     expect(container).toBeTruthy();
     expect(container?.querySelector('mat-card')).toBeFalsy(); // array is empty
-    if (addBtn) {
-      addBtn.click();
-    }
+    addBtn.click();
+
+    // this setup allows for an entry editor that uses the InputRefSelectComponent recursively -> selector
+    fixture.detectChanges();
+    fixture.whenRenderingDone();
+    let modalHeader = document.body.querySelector('.hmiHeader') as HTMLElement; // this header is only there with selector
+    expect(modalHeader).toBeTruthy();
+    let modalInput = document.body.querySelector('mat-card[id="ref-select.input"]') as HTMLElement; // this mat-card is only there with selector
+    expect(modalInput).toBeTruthy();
+    let input = modalInput.querySelector('input[id="ref-select.input.text"]') as HTMLInputElement;
+    expect(input).toBeTruthy();
+    input.value = "xyz"; // value does not seem to be taken over, just an empty string, see below
+    fixture.detectChanges();
+    expect(modalHeader.querySelector('button[id="ref-select.btn-cancel"]')).toBeTruthy;
+    let saveBtn = modalHeader.querySelector('button[id="ref-select.btn-save"') as HTMLInputElement;
+    expect(saveBtn).toBeTruthy();
+    saveBtn.click(); 
+    fixture.detectChanges();
+    expect(component.input.value.length).toBeGreaterThan(0); // value is not taken over
   });
 
 });
