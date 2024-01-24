@@ -15,7 +15,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { FormsModule } from '@angular/forms';
 
-fdescribe('InputRefSelectComponent', () => {
+describe('InputRefSelectComponent', () => {
   let component: InputRefSelectComponent;
   let fixture: ComponentFixture<InputRefSelectComponent>;
   let apiService: ApiService;
