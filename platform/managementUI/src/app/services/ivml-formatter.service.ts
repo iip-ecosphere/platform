@@ -1,5 +1,5 @@
 //import { type } from 'os';
-import { InputVariable, primitiveDataTypes, IVML_TYPE_PREFIX_enumeration, JsonPlatformOperationResult, IvmlRecordValue, IVML_TYPE_String, IVML_TYPE_Boolean, IvmlValue, UserFeedback, uiGroup, configMetaContainer, MT_metaTypeKind, MTK_enum, configMetaEntry, editorInput, Resource, metaTypes, DR_displayName, MTK_derived, MT_metaRefines, MT_metaDefault, MTK_compound, MT_metaAbstract, MTK_primitive } from 'src/interfaces';
+import { InputVariable, primitiveDataTypes, IVML_TYPE_PREFIX_enumeration, JsonPlatformOperationResult, IvmlRecordValue, IVML_TYPE_String, IVML_TYPE_Boolean, IvmlValue, UserFeedback, uiGroup, configMetaContainer, MT_metaTypeKind, MTK_enum, configMetaEntry, editorInput, Resource, metaTypes, DR_displayName, MTK_derived, MT_metaRefines, MT_metaDefault, MTK_compound, MT_metaAbstract, MTK_primitive, MTK_langString } from 'src/interfaces';
 import { Injectable } from '@angular/core';
 import { AAS_OP_PREFIX_SME, AAS_TYPE_STRING, ApiService, GRAPHFORMAT_DRAWFLOW, IDSHORT_SUBMODEL_CONFIGURATION } from './api.service';
 import { DataUtils, EditorPartition, UtilsService } from './utils.service';
@@ -555,9 +555,11 @@ export class IvmlFormatterService extends UtilsService {
                 initial = ivmlValue; // input comes as object
               } else {
                 if (typeGenerics == "AasLocalizedString") {
-                  initial = DataUtils.getLangStringText(ivmlValue);
+                  editorInput.metaTypeKind = MTK_langString;
+                  initial = ivmlValue; // handled by LangStringInputComponent
+                  /*initial = DataUtils.getLangStringText(ivmlValue);
                   editorInput.valueLang = DataUtils.getLangStringLang(ivmlValue);
-                  editorInput.valueTransform = input => DataUtils.composeLangString(input.value, DataUtils.getUserLanguage());
+                  editorInput.valueTransform = input => DataUtils.composeLangString(input.value, DataUtils.getUserLanguage());*/
                 } else {
                   initial = ivmlValue; // input is just the value
                 }

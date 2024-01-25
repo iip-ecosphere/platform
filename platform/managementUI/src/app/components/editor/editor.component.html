@@ -105,15 +105,17 @@
           <div *ngIf="input.type != 'Boolean'; else booleanCase">
             <div *ngIf="input.metaTypeKind != 10; else subEditor">
               <div *ngIf="input.metaTypeKind != 2; else enumCase">
-                <mat-form-field appearance="outline" class="formField inputField">
-                  <input matInput class="inputEditor"
-                    [matTooltip]="input.description[0].text"
-                    type="text" ngDefaultControl [(ngModel)]=input.value />
-                </mat-form-field>
+                <div *ngIf="input.metaTypeKind != 100; else langStringCase">
+                  <mat-form-field appearance="outline" class="formField inputField">
+                    <input matInput class="inputEditor"
+                      [matTooltip]="input.description[0].text"
+                      type="text" ngDefaultControl [(ngModel)]=input.value />
+                  </mat-form-field>
+                </div>
               </div>
             </div>
             <ng-template #subEditor>              
-              <app-subeditor-button [meta]="metaBackup" [input]="input" matIcon="menu_open" showValue="true"></app-subeditor-button>
+              <app-subeditor-button [meta]="metaBackup" [input]="input" matIcon="menu_open" showValue="true" (saveEvent)="saveEventHandler($event)"></app-subeditor-button>
             </ng-template>
           </div>
           <ng-template #booleanCase>
@@ -121,6 +123,9 @@
           </ng-template>
           <ng-template #enumCase>
             <app-enum-dropdown [meta]="metaBackup" [input]="input"></app-enum-dropdown>
+          </ng-template>
+          <ng-template #langStringCase>
+            <app-lang-string-input [meta]="metaBackup" [input]="input"></app-lang-string-input>
           </ng-template>
         </mat-card>
         <div>
@@ -157,11 +162,13 @@
               <p class="inputLabel">{{ getDisplayName(input) }}</p>
               <div *ngIf="input.type != 'Boolean'; else optBooleanCase">
                 <div *ngIf="input.metaTypeKind != 2; else optEnumCase">
-                  <mat-form-field appearance="outline" *ngIf="input.metaTypeKind != 10; else subEditor" class="formField inputField">
-                    <!--<mat-label>{{ input.type }}</mat-label>-->
-                    <input matInput class="inputEditor" 
-                      [matTooltip]="input.description[0].text" type="text" ngDefaultControl [(ngModel)]=input.value />
-                  </mat-form-field>
+                  <div *ngIf="input.metaTypeKind != 100; else optLangStringCase">
+                    <mat-form-field appearance="outline" *ngIf="input.metaTypeKind != 10; else subEditor" class="formField inputField">
+                      <!--<mat-label>{{ input.type }}</mat-label>-->
+                      <input matInput class="inputEditor" 
+                        [matTooltip]="input.description[0].text" type="text" ngDefaultControl [(ngModel)]=input.value />
+                    </mat-form-field>
+                  </div>
                 </div>
               </div>
               <ng-template #optBooleanCase>
@@ -170,8 +177,11 @@
               <ng-template #optEnumCase>
                 <app-enum-dropdown [meta]="metaBackup" [input]="input"></app-enum-dropdown>
               </ng-template>
+              <ng-template #optLangStringCase>
+                <app-lang-string-input [meta]="metaBackup" [input]="input"></app-lang-string-input>
+              </ng-template>
               <ng-template #subEditor>
-                <app-subeditor-button [meta]="metaBackup" [input]="input" matIcon="menu_open" showValue="true"></app-subeditor-button>
+                <app-subeditor-button [meta]="metaBackup" [input]="input" matIcon="menu_open" showValue="true" (saveEvent)="saveEventHandler($event)"></app-subeditor-button>
               </ng-template>
             </mat-card-content>
 

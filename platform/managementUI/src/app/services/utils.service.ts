@@ -156,7 +156,9 @@ export class Utils {
           idShort += this.getElementDisplayName(e, true);
         }
       } else {
-        console.log("Unconsidered alternative in getElementDisplayName " + JSON.stringify(element));
+        if (element && !DataUtils.isEmpty(element)) {
+          console.log("Unconsidered alternative in getElementDisplayName " + JSON.stringify(element));
+        }
       }
       return idShort;
     }
@@ -301,6 +303,20 @@ export class DataUtils {
    */
   public static isIvmlRefTo(value: any) {
     return DataUtils.startsWith(value,'refTo(');
+  }
+
+  /**
+   * Returns whether the given value is empty.
+   * 
+   * @param value the value, in particular an object
+   * @returns true for an empty object, false else (in particular null, undefined)
+   */
+  public static isEmpty(value: any) {
+    if (value) {
+      return Object.keys(value).length === 0;
+    } else {
+      return false;
+    }
   }
 
   /**

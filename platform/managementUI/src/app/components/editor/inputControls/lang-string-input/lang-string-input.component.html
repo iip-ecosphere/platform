@@ -1,0 +1,15 @@
+<mat-form-field ngDefaultControl *ngIf="input && meta" appearance="outline" class="inputField">
+  <table style="margin: 0px;width: 100%; table-layout: auto;">
+    <tr>
+      <td>
+        <input matInput class="inputEditor" [matTooltip]="input.description[0].text"
+          type="text" ngDefaultControl [(ngModel)]=textInput (input)="inputChanged($event)" />
+        </td>
+      <td style="width:10%;">
+        <mat-select [(ngModel)]="langSelected" (selectionChange)="inputChanged($event)">
+            <mat-option *ngFor="let element of langEnum" [value]="element">{{element}}</mat-option>
+        </mat-select>
+      </td>
+    </tr>
+  </table>
+</mat-form-field>

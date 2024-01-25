@@ -18,7 +18,7 @@ export class InputRefSelectComponent extends Utils implements OnInit {
   @Input() meta: Resource | undefined;
   @Input() rows: number = -1; // unset, calculate
 
-  textInput = '';
+  textInput: string | null = null;
   isSetOf = false;
   isSequenceOf = false;
   refTo = '';
@@ -33,10 +33,10 @@ export class InputRefSelectComponent extends Utils implements OnInit {
     super();
   }
 
-  ngOnInit(): void {
+  async ngOnInit() {
     if (!this.selector) {
       let type = this.input.type;
-      this.init(type);
+      await this.init(type);
     }
   }
 
@@ -90,18 +90,17 @@ export class InputRefSelectComponent extends Utils implements OnInit {
     }
   }
 
-  private init(type: string) {
+  private async init(type: string) {
     if (type) {
-      if (type.indexOf('setOf') >= 0) {
+      if (DataUtils.isIvmlSet(type)) {
         this.isSetOf = true;
       }
-      if (type.indexOf('refTo') >= 0) {
-        const startIndex = type.indexOf('refTo') + 6;
-        this.refTo = type.substring(startIndex, type.indexOf(')', startIndex));
-        this.getConfigurationType(this.refTo);
+      if (DataUtils.isIvmlRefTo(type)) {
+        this.refTo = DataUtils.stripGenericType(type);
+        await this.getConfigurationType(this.refTo);
         this.activeTextinput = false;
       }
-      if (type.indexOf('sequenceOf') >= 0) {
+      if (DataUtils.isIvmlSequence(type)) {
         this.isSequenceOf = true;
       }
     }
@@ -153,10 +152,12 @@ export class InputRefSelectComponent extends Utils implements OnInit {
    * Adds a text value to the collection/reference value. 
    */
   public addFromTextfield() {
-    if (this.isSetOf || this.isSequenceOf) {
-      this.input.value.push(this.textInput);
-    } else {
-      this.input.value = this.textInput;
+    if (this.textInput) {
+      if (this.isSetOf || this.isSequenceOf) {
+        this.input.value.push(this.textInput);
+      } else {
+        this.input.value = this.textInput;
+      }
     }
   }
 

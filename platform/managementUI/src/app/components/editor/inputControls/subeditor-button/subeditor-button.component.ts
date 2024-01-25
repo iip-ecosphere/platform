@@ -1,6 +1,6 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { MT_metaAbstract, MT_metaRefines, Resource, ResourceAttribute, editorInput, metaTypes } from 'src/interfaces';
+import { IvmlRecordValue, MT_metaAbstract, MT_metaRefines, Resource, ResourceAttribute, editorInput, metaTypes } from 'src/interfaces';
 import { EditorComponent } from '../../editor.component';
 import { DataUtils, Utils } from 'src/app/services/utils.service';
 import { IvmlFormatterService } from 'src/app/services/ivml-formatter.service';
@@ -17,6 +17,7 @@ export class SubeditorButtonComponent extends Utils implements OnInit {
   @Input() buttonText: string = "edit";
   @Input() matIcon: string = "";
   @Input() showValue: string = "false";
+  @Output() saveEvent = new EventEmitter<SaveEvent>();
 
   errorMsg: string = 'loading...';
   disabled = false;
@@ -37,12 +38,16 @@ export class SubeditorButtonComponent extends Utils implements OnInit {
       let uiGroups = this.ivmlFormatter.calculateUiGroupsInf(type, this.meta);
       let parts = this.ivmlFormatter.partitionUiGroups(uiGroups);
       let dialogRef = this.subDialog.open(EditorComponent, this.configureDialog('80%', '80%', parts));
+      let component = dialogRef.componentInstance;
       if (this.refinedTypes[0]) {
-        dialogRef.componentInstance.refinedTypes = this.refinedTypes;
+        component.refinedTypes = this.refinedTypes;
       } else {
-        dialogRef.componentInstance.type = type;
+        component.type = type;
       }
-      dialogRef.componentInstance.metaBackup = this.meta;
+      component.metaBackup = this.meta;
+      component.dialog = dialogRef;
+      component.topLevel = false;
+      component.saveEvent = this.saveEvent;
     }
   }
 
@@ -114,4 +119,10 @@ export class SubeditorButtonComponent extends Utils implements OnInit {
     }
   }
   
+}
+
+export interface SaveEvent {
+  idShort: string;
+  value: IvmlRecordValue; 
+  multipleInputs?: boolean;
 }

@@ -450,6 +450,8 @@ export const MTK_container = 3;
 export const MTK_constraint = 4;
 export const MTK_derived = 9;
 export const MTK_compound = 10;
+// internal, not platform defined
+export const MTK_langString = 100;
 
 // from platform, IVML mapper
 export const MT_metaState = 'metaState';

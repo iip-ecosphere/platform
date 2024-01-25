@@ -49,6 +49,7 @@ import { SubeditorButtonComponent } from './components/editor/inputControls/sube
 import { MeshFeedbackComponent } from './components/flowchart/feedback/mesh-feedback/mesh-feedback.component';
 import { NgVar } from './directives/ng-var.directive';
 import { FileUploadComponent } from './components/file-upload/file-upload.component';
+import { LangStringInputComponent } from './components/editor/inputControls/lang-string-input/lang-string-input.component';
 
 @NgModule({
   declarations: [
@@ -66,6 +67,7 @@ import { FileUploadComponent } from './components/file-upload/file-upload.compon
     InstancesComponent,
     EditorComponent,
     InputRefSelectComponent,
+    LangStringInputComponent,
     StatusDetailsComponent,
     LogsDialogComponent,
     EnumDropdownComponent,

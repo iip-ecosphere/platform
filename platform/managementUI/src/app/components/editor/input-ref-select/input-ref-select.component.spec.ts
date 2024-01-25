@@ -14,6 +14,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { FormsModule } from '@angular/forms';
+import { MatSelectModule } from '@angular/material/select';
 
 describe('InputRefSelectComponent', () => {
   let component: InputRefSelectComponent;
@@ -30,6 +31,7 @@ describe('InputRefSelectComponent', () => {
         MatTooltipModule, 
         MatToolbarModule,
         MatFormFieldModule,
+        MatSelectModule,
         MatInputModule, // required via MatFormFieldModule
         FormsModule, // required via MatFormFieldModule
         BrowserAnimationsModule ],
@@ -75,7 +77,8 @@ describe('InputRefSelectComponent', () => {
       metaTypeKind: MTK_compound
     };
     fixture.detectChanges();
-    fixture.whenRenderingDone();
+    await fixture.whenStable();
+    await fixture.whenRenderingDone();
 
     let compiled = fixture.debugElement.nativeElement as HTMLElement;
     let inputSection = compiled.querySelector('span[id="inputName"]');
@@ -115,18 +118,44 @@ describe('InputRefSelectComponent', () => {
       metaTypeKind: MTK_compound
     };
     fixture.detectChanges();
-    fixture.whenRenderingDone();
-
+    await fixture.whenStable();
+    await fixture.whenRenderingDone();
     let compiled = fixture.debugElement.nativeElement as HTMLElement;
     let inputSection = compiled.querySelector('span[id="inputName"]');
     expect(inputSection).toBeTruthy();
-    expect(inputSection?.querySelector('button[id="ref-select.inputName.btn-add"]')).toBeTruthy();
+    let addBtn = inputSection?.querySelector('button[id="ref-select.inputName.btn-add"]') as HTMLElement;
+    expect(addBtn).toBeTruthy();
     expect(inputSection?.querySelector('span[id="ref-select.inputName.subEd"]')).toBeFalsy();
     expect(compiled.querySelector('div[id="ref-select.container"]')).toBeFalsy();
     let container = compiled.querySelector('div[id="ref-select.single"]');
     expect(container).toBeTruthy();
     let matCard = container?.querySelector('mat-card');
     expect(matCard).toBeFalsy();
+    addBtn.click();
+
+    // this setup allows for an entry editor that uses the InputRefSelectComponent recursively -> selector
+    fixture.detectChanges();
+    await fixture.whenStable();
+    await fixture.whenRenderingDone();
+    let modalHeader = document.body.querySelector('.hmiHeader') as HTMLElement; // this header is only there with selector
+    expect(modalHeader).toBeTruthy();
+    let modalInput = document.body.querySelector('mat-card[id="ref-select.input"]') as HTMLElement; // this mat-card is only there with selector
+    expect(modalInput).toBeTruthy();
+    let input = modalInput.querySelector('mat-select[id="ref-select.input.select"]') as HTMLSelectElement;
+    expect(input).toBeTruthy();
+    input.value = "myServer"; // value does not seem to be taken over, just an empty string, see below
+    input.dispatchEvent(new Event('change')); // notify change
+
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(modalHeader.querySelector('button[id="ref-select.btn-cancel"]')).toBeTruthy;
+    let saveBtn = modalHeader.querySelector('button[id="ref-select.btn-save"') as HTMLInputElement;
+    expect(saveBtn).toBeTruthy();
+    saveBtn.click(); 
+    fixture.detectChanges();
+    await fixture.whenStable();
+    //expect(component.input.value.length).toBeGreaterThan(0); // value is not taken over in test -> Material TestHarness
   });
 
   it('should handle setOf(String)', async() => {
@@ -147,7 +176,8 @@ describe('InputRefSelectComponent', () => {
       metaTypeKind: MTK_primitive
     };
     fixture.detectChanges();
-    fixture.whenRenderingDone();
+    await fixture.whenStable();
+    await fixture.whenRenderingDone();
 
     let compiled = fixture.debugElement.nativeElement as HTMLElement;
     let inputSection = compiled.querySelector('span[id="inputName"]');
@@ -163,21 +193,28 @@ describe('InputRefSelectComponent', () => {
 
     // this setup allows for an entry editor that uses the InputRefSelectComponent recursively -> selector
     fixture.detectChanges();
-    fixture.whenRenderingDone();
+    await fixture.whenStable();
+    await fixture.whenRenderingDone();
     let modalHeader = document.body.querySelector('.hmiHeader') as HTMLElement; // this header is only there with selector
     expect(modalHeader).toBeTruthy();
     let modalInput = document.body.querySelector('mat-card[id="ref-select.input"]') as HTMLElement; // this mat-card is only there with selector
     expect(modalInput).toBeTruthy();
     let input = modalInput.querySelector('input[id="ref-select.input.text"]') as HTMLInputElement;
     expect(input).toBeTruthy();
-    input.value = "xyz"; // value does not seem to be taken over, just an empty string, see below
+    input.value = "xyz";
+    input.dispatchEvent(new Event('input')); // notify change
+
     fixture.detectChanges();
+    await fixture.whenStable();
+
     expect(modalHeader.querySelector('button[id="ref-select.btn-cancel"]')).toBeTruthy;
     let saveBtn = modalHeader.querySelector('button[id="ref-select.btn-save"') as HTMLInputElement;
     expect(saveBtn).toBeTruthy();
     saveBtn.click(); 
     fixture.detectChanges();
-    expect(component.input.value.length).toBeGreaterThan(0); // value is not taken over
+    await fixture.whenStable();
+    expect(component.input.value.length).toBe(1);
+    expect(component.input.value[0]).toBe("xyz");
   });
 
 });

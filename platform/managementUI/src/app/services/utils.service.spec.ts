@@ -226,6 +226,12 @@ describe('UtilsService', () => {
     expect(text).toBe(text2);
   });
 
+  it('should implement isEmpty', () => {
+    expect(DataUtils.isEmpty({})).toBeTrue();
+    expect(DataUtils.isEmpty({value: 1})).toBeFalse();
+    expect(DataUtils.isEmpty(null)).toBeFalse();
+    expect(DataUtils.isEmpty(undefined)).toBeFalse();
+  });
 
   // -------------------------- retry -----------------------------------
 
