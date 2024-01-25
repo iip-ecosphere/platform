@@ -101,6 +101,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     public static final String OP_GET_GRAPH = "getGraph";
     public static final String OP_SET_GRAPH = "setGraph";
     public static final String OP_DELETE_GRAPH = "deleteGraph";
+    public static final String OP_GET_VARIABLE_NAME = "getVariableName";
     public static final String OP_CREATE_VARIABLE = "createVariable";
     public static final String OP_DELETE_VARIABLE = "deleteVariable";
     public static final String OP_GEN_INTERFACES = "genInterfacesAsync";
@@ -340,6 +341,11 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                 getAasIvmlMapper().deleteGraph(AasUtils.readString(a, 0), AasUtils.readString(a, 1)), 
                 getAasOperationCompletedListener()
             ));
+        sBuilder.defineOperation(OP_GET_VARIABLE_NAME, 
+            new JsonResultWrapper(a -> {
+                return getAasIvmlMapper().getVariableName(AasUtils.readString(a, 0), AasUtils.readString(a, 1));
+            }, getAasOperationCompletedListener())
+        );
         sBuilder.defineOperation(OP_CREATE_VARIABLE, 
             new JsonResultWrapper(a -> {
                 getAasIvmlMapper().createVariable(AasUtils.readString(a, 0), AasUtils.readString(a, 1), 
@@ -1206,6 +1212,11 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             .addInputVariable("serviceMeshName", Type.STRING)
             .setInvocable(iCreator.createInvocable(OP_DELETE_GRAPH))
             .build(Type.NONE);
+        smBuilder.createOperationBuilder(OP_GET_VARIABLE_NAME)
+            .addInputVariable("type", Type.STRING)
+            .addInputVariable("elementName", Type.STRING)
+            .setInvocable(iCreator.createInvocable(OP_GET_VARIABLE_NAME))
+            .build(Type.STRING);
         smBuilder.createOperationBuilder(OP_CREATE_VARIABLE)
             .addInputVariable("varName", Type.STRING)
             .addInputVariable("type", Type.STRING)

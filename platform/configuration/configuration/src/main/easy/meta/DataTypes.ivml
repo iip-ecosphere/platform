@@ -16,6 +16,7 @@ project DataTypes {
     typedef NonEmptyNameString NonEmptyString with (matches(NonEmptyNameString, "^[\\w \\[\\]\\-\\Q$_\\E]+$")); // non whitespace
     typedef ArtifactString String with (size(ArtifactString) == 0 or (size(ArtifactString) > 0 and matches(ArtifactString, ".+:.+:.+"))); 
     typedef PositiveInteger Integer with (PositiveInteger > 0);
+    typedef Description String with (Description <> null);
     
     const String Eclass_Unit_MByte = "0173-1#05-AAA042#005";
     const String Eclass_Unit_ms = "0173-1#05-AAA114#003";

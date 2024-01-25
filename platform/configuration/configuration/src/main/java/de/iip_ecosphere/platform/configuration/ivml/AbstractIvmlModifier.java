@@ -60,6 +60,7 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
     private IvmlGraphMapper graphMapper;
     private Map<String, GraphFormat> graphFormats = new HashMap<>();
     private ConfigurationChangeListener changeListener;
+    private Set<String> reservedVariableNames = new HashSet<String>();
 
     /**
      * Creates a mapper with default settings.
@@ -303,6 +304,46 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
         }
         return true;
     }
+    
+    /**
+     * Turns a type name and an element name into a valid IVML variable name. Potentially adds a number.
+     * 
+     * @param type the IVML type name to use, may but shall not contain whitespaces an non-identifier characters
+     * @param elementName the element name to use, may contain whitespaces an non-identifier characters
+     * @return the usable variable name
+     */
+    public String getVariableName(String type, String elementName) {
+        final String separator = "_";
+        String varName = type + separator + elementName;
+        StringBuilder builder = new StringBuilder(varName);
+        for (int i = builder.length() - 1; i >= 0; i--) {
+            if (!Character.isJavaIdentifierPart(builder.charAt(i))) {
+                builder.deleteCharAt(i);
+            }
+        }
+        varName = builder.toString();
+        if (separator.equals(varName)) { // unlikely but possible
+            varName = "unknown";
+        }
+        if (!Character.isJavaIdentifierStart(varName.charAt(0))) { // unlikely but possible
+            varName = "a" + varName;
+        }
+        if (Character.isUpperCase(varName.charAt(0))) { // convention
+            varName = Character.toLowerCase(varName.charAt(0)) + varName.substring(1);
+        }
+        net.ssehub.easy.varModel.confModel.Configuration cfg = getIvmlConfiguration();
+        try {
+            String baseName = varName + separator;
+            int count = 1;
+            while (cfg.getDecision(varName, false) != null || reservedVariableNames.contains(varName)) {
+                varName = baseName + String.format("%02d", count++);
+            }
+        } catch (ModelQueryException e) {
+            // ignore
+        }
+        reservedVariableNames.add(varName); // TODO lock only for a certain time?
+        return varName;
+    }
 
     /**
      * Creates an IVML variable. [public for testing]
@@ -337,6 +378,7 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
             throwIfFails(res, true);
             saveTo(target, getIvmlFile(target));
             LoggerFactory.getLogger(getClass()).info("Created IVML variable {} in {}", varName, target.getName());
+            reservedVariableNames.remove(varName);
         } catch (ModelQueryException | ConfigurationException e) {
             throw new ExecutionException(e);
         }

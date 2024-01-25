@@ -26,7 +26,7 @@ project ServerPartFlowerAI {
    
    compound FlowerFederatedAiServer refines PythonServer {
        String transportChannel = "Server-FlowerAi";
-       String description = "Flower Federated Learning Server";
+       Description description = "Flower Federated Learning Server";
        setOf(refTo(Dependency)) dependencies = reqFlowerDependencies.union(framework.dependencies);
        OktoVersion ver = "1.3.0"; 
        refTo(FlowerAiFramework) framework = refBy(TensorFlowFlowerAiFramework);

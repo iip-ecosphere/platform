@@ -17,7 +17,9 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -77,6 +79,7 @@ public class AasIvmlMapperTest {
     private static File origIvmlMeta;
     private static File origIvmlConfig;
     private static String origIvmlModelName;
+    private static Set<String> varNames = new HashSet<>();
     
     /**
      * Sets up the tests.
@@ -600,6 +603,45 @@ public class AasIvmlMapperTest {
         } catch (IOException e) {
             Assert.fail("Cannot read " + file + ": " + e.getMessage());
         }
+    }
+    
+    /**
+     * Tests {@link AasIvmlMapper#getVariableName(String, String)}.
+     */
+    @Test
+    public void testGetVariableName() {
+        varNames.clear();
+        InstantiationConfigurer configurer = new NonCleaningInstantiationConfigurer(MODEL_NAME, 
+            ivmlFolder, FileUtils.getTempDirectory());
+        ConfigurationLifecycleDescriptor lcd = startEasyValidate(configurer);
+        
+        AasIvmlMapper mapper = getInstance(false);
+        assertVariableName(mapper.getVariableName("", ""));
+        assertVariableName(mapper.getVariableName("String", "test my String"));
+        assertVariableName(mapper.getVariableName("String", "test my String"));
+        assertVariableName(mapper.getVariableName("String", "test my String"));
+
+        stopEasy(lcd);
+        varNames.clear();
+    }
+    
+    /**
+     * Asserts the validity of a variable name, stores it internally and tries to figure out, whether repeated ones
+     * were created.
+     * 
+     * @param variableName the variable name to assert
+     */
+    private static void assertVariableName(String variableName) {
+        Assert.assertNotNull(variableName);
+        Assert.assertTrue(variableName.length() > 0);
+        boolean hasValidChars = true;
+        for (int i = 0; i < variableName.length(); i++) {
+            hasValidChars &= Character.isJavaIdentifierPart(variableName.charAt(i)); 
+        }
+        Assert.assertTrue(hasValidChars);
+        Assert.assertTrue(Character.isJavaIdentifierStart(variableName.charAt(0)));
+        Assert.assertFalse(varNames.contains(variableName));
+        varNames.add(variableName);
     }
 
 }

@@ -196,7 +196,9 @@ project Services {
    def sequenceOf(IOType) bwdTypes(sequenceOf(IOType) types) = types->select(t|not(t.forward));
    
    abstract compound Service refines ServiceBase {
-       String description = ""; // TODO Constraint: must be configured
+       assign (uiGroup = UiOptionalGroup1) to {
+           Description description = "";
+       }
        assign(semanticId = Eclass_Property_swVersion) to {
            OktoVersion ver;
        }
@@ -272,7 +274,7 @@ project Services {
        Constraint typeCheck = members->collect(refTo(Service) s | s.kind).toSet().size() < 2;
        FamilyMemberSelector selector;
        assign (uiGroup = UiOptionalGroup1) to {
-           String description = "";
+           Description description = "";
        }
        Constraint familyKind = kind == members.asSequence().first().kind; // propagate
        Constraint familySelectorOk = selector <> null implies selectorTypeOk(selector, self);
@@ -296,7 +298,7 @@ project Services {
         NonEmptyString executable;
         assign (uiGroup = UiOptionalGroup1) to {
             NameplateInfo nameplateInfo;
-            String description = ""; // TODO Constraint: must be configured
+            Description description = "";
             String artifact = ""; // optional maven artifact
             Boolean running = false; // running somewhere else, do we have to start it
             Parameters parameter = {};

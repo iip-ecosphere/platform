@@ -14,7 +14,7 @@ project Applications {
         Id id;
         NonEmptyNameString name;
         assign (uiGroup = UiOptionalGroup1) to {
-            String description = "";
+            Description description = "";
             String artifact = "";
         }
         setOf(refTo(ServiceMesh)) services; // no services is ok, then the artifact must have hand-crafted services

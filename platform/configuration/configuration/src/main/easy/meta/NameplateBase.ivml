@@ -12,8 +12,8 @@ project NameplateBase {
     typedef AasResource String; // URL or local -> resources
     
     compound NameplateInfo {
-        AasLocalizedString productImage = ""; // URL or local -> resources
-        AasResource manufacturerProductDesignation = "";
+        AasResource productImage = ""; // URL or local -> resources
+        AasLocalizedString manufacturerProductDesignation = "";
         refTo(Manufacturer) manufacturer;
         
         productImage.semanticId = "https://admin-shell.io/ZVEI/TechnicalData/ProductImage/1/1";

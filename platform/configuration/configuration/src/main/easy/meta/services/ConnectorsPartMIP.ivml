@@ -17,7 +17,7 @@ project ConnectorsPartMIP {
       
    compound MipMqttV3Connector refines MqttV3Connector { // Mqtt connector for MIP software
        String name = "Mip MQTT Data connector";
-       String description = "";
+       Description description = "";
        OktoVersion ver = "0.1.0";
        sequenceOf(IOType) input = {{type=refBy(MipMqttInput), forward=false}};
        sequenceOf(IOType) output = {{type=refBy(MipMqttOutput)}};
