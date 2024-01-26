@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<extension-configuration>
+
+    <!-- Reload interval for credentials in seconds -->
+    <credentials-reload-interval>60</credentials-reload-interval>
+
+    <!-- Optional list of names of listeners this extension is used for
+    <listener-names>
+        <listener-name>my-listener</listener-name>
+        <listener-name>my-listener-2</listener-name>
+    </listener-names> -->
+
+    <!-- If the credentials file is using HASHED or PLAIN passwords -->
+    <password-type>PLAIN</password-type>
+
+    <!-- Use this option to toggle the behaviour in case authentication by this extension failed.
+         false (default) -> client don't get authenticated
+         true            -> instead of failing the authentication we delegate the decision to the next extension with an
+                            authentication implemented (with lower priority), in case no other extension exists we fail
+                            the authentication -->
+    <!--next-extension-instead-of-fail>true</next-extension-instead-of-fail-->
+
+</extension-configuration>
