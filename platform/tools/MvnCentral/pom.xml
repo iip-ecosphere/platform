@@ -196,6 +196,11 @@
         <groupId>de.iip-ecosphere.platform</groupId>
         <version>${project.version}</version>
     </dependency>
+    <dependency>
+        <artifactId>connectors.serial</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>
     
     <dependency>
         <artifactId>services.environment</artifactId>
