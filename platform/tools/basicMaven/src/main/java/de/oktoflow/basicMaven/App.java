@@ -10,7 +10,7 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package de.iip_ecosphere.platform.basicMaven;
+package de.oktoflow.basicMaven;
 
 /**
  * Template.
