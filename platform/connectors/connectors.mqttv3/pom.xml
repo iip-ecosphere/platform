@@ -4,7 +4,7 @@
   <artifactId>connectors.mqttv3</artifactId>
   <packaging>jar</packaging>
   <name>connectors MQTT v3</name>
-  <description>The MQTT v3 connectors component in the transport layer of the IIP-Ecosphere platform.</description>
+  <description>The MQTT v3 connectors component in the transport layer of the oktoflow platform.</description>
 
   <parent>
      <groupId>de.iip-ecosphere.platform</groupId>
