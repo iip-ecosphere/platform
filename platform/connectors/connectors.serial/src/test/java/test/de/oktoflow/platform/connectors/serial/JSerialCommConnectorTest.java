@@ -44,7 +44,7 @@ import test.de.iip_ecosphere.platform.transport.CommandJsonSerializer;
 /**
  * Implements a test for {@link JSerialCommConnector}, app and machine playing ping-ping via two bridged a virtual 
  * serial ports. Requires a virtual port emulator on windows (bridging COM1 and COM2) like HDD Virtual Serial 
- * Port Tools. 
+ * Port Tools. Testing under Linux requires an installed ``socat``.
  * 
  * @author Holger Eichelberger, SSE
  */
