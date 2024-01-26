@@ -1,4 +1,4 @@
 /**
  * Tests.
  */
-package test.de.oktoflow.basicMaven;
+package test.de.oktoflow.platform.basicMaven;

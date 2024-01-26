@@ -1,4 +1,4 @@
 /**
  * Implementation.
  */
-package de.oktoflow.basicMaven;
+package de.oktoflow.platform.basicMaven;

@@ -9,7 +9,7 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package test.de.oktoflow.basicMaven;
+package test.de.oktoflow.platform.basicMaven;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
