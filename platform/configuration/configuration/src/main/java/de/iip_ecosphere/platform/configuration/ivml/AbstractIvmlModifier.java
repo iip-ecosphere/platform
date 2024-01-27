@@ -310,11 +310,15 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
      * 
      * @param type the IVML type name to use, may but shall not contain whitespaces an non-identifier characters
      * @param elementName the element name to use, may contain whitespaces an non-identifier characters
+     * @param elementVersion the element version to use, may contain whitespaces an non-identifier characters
      * @return the usable variable name
      */
-    public String getVariableName(String type, String elementName) {
+    public String getVariableName(String type, String elementName, String elementVersion) {
         final String separator = "_";
         String varName = type + separator + elementName;
+        if (elementVersion.length() > 0) {
+            varName += separator + elementVersion;
+        }
         StringBuilder builder = new StringBuilder(varName);
         for (int i = builder.length() - 1; i >= 0; i--) {
             if (!Character.isJavaIdentifierPart(builder.charAt(i))) {

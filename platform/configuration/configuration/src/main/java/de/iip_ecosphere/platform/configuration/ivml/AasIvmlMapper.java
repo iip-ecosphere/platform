@@ -343,8 +343,9 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             ));
         sBuilder.defineOperation(OP_GET_VARIABLE_NAME, 
             new JsonResultWrapper(a -> {
-                return getAasIvmlMapper().getVariableName(AasUtils.readString(a, 0), AasUtils.readString(a, 1));
-            }, getAasOperationCompletedListener())
+                return getAasIvmlMapper().getVariableName(AasUtils.readString(a, 0), AasUtils.readString(a, 1), 
+                    AasUtils.readString(a, 2));
+            })
         );
         sBuilder.defineOperation(OP_CREATE_VARIABLE, 
             new JsonResultWrapper(a -> {
@@ -1215,6 +1216,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         smBuilder.createOperationBuilder(OP_GET_VARIABLE_NAME)
             .addInputVariable("type", Type.STRING)
             .addInputVariable("elementName", Type.STRING)
+            .addInputVariable("elementVersion", Type.STRING)
             .setInvocable(iCreator.createInvocable(OP_GET_VARIABLE_NAME))
             .build(Type.STRING);
         smBuilder.createOperationBuilder(OP_CREATE_VARIABLE)

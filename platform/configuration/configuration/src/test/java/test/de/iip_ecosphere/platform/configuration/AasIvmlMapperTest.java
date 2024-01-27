@@ -616,10 +616,10 @@ public class AasIvmlMapperTest {
         ConfigurationLifecycleDescriptor lcd = startEasyValidate(configurer);
         
         AasIvmlMapper mapper = getInstance(false);
-        assertVariableName(mapper.getVariableName("", ""));
-        assertVariableName(mapper.getVariableName("String", "test my String"));
-        assertVariableName(mapper.getVariableName("String", "test my String"));
-        assertVariableName(mapper.getVariableName("String", "test my String"));
+        assertVariableName(mapper.getVariableName("", "", ""));
+        assertVariableName(mapper.getVariableName("String", "test my String", "1.01"));
+        assertVariableName(mapper.getVariableName("String", "test my String", "1.01"));
+        assertVariableName(mapper.getVariableName("String", "test my String", "1.01"));
 
         stopEasy(lcd);
         varNames.clear();
