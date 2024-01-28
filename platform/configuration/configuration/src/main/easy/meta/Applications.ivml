@@ -7,6 +7,7 @@ project Applications {
     
     annotate BindingTime bindingTime = BindingTime::compile to .;
     annotate Integer uiGroup = UiMandatoryGroup1 to .;
+    annotate String displayName = "" to .;
 
     enum AppPackagingSchema {SpringFat, ZipWithClasspath};
 
@@ -29,6 +30,7 @@ project Applications {
         
         Constraint idOk = matches(id, "^[^@]+$");
         Constraint packagingOk = packaging.size() >= 1;
+        services.displayName = "meshes";
     }
     
     // deprecated, use mvnVersion from DataTypes instead

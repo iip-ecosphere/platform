@@ -206,7 +206,7 @@ project Connectors {
     enum CacheMode {NONE, HASH, EQUALS};
       
     // IIP-Ecosphere provided connectors
-    compound Connector refines Service {
+    abstract compound Connector refines Service {
        String class;
        String artifact;
        IOTypeWithPath inInterface; // provided data input to be mapped into adapter, alternative to adapterClass
@@ -250,7 +250,7 @@ project Connectors {
        Constraint outInterfaceOk = isDefined(outInterface) and outInterface <> null;
    }
    
-   compound ChannelConnector refines Connector {
+   abstract compound ChannelConnector refines Connector {
        String inChannel = "";
        String outChannel = "";
        MachineFormatter machineFormatter = null;
