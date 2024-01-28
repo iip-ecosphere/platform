@@ -103,6 +103,7 @@ describe('UtilsService', () => {
     // nameplate
     expect(service.getElementDisplayName({manufacturer:"refTo(SSE)"}, false)).toBe("SSE"); // preliminary
     expect(service.getElementDisplayName({productImage:"xyz"}, false)).toBe(""); // preliminary
+    expect(service.getElementDisplayName({department:"dep"}, false)).toBe("dep"); // preliminary
     // array of editor IVML values
     // [{"type":"feedback","forward":false,"idShort":"feedback","_type":"IOType"}]
     expect(service.getElementDisplayName([

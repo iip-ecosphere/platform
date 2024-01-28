@@ -1,6 +1,6 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { PlatformArtifacts, PlatformResources, PlatformServices, ResourceAttribute, InputVariable, platformResponse, Resource, PlatformData, DEFAULT_AAS_OPERATION_TIMEOUT, JsonPlatformOperationResult, SubmodelElementCollection } from 'src/interfaces';
+import { PlatformArtifacts, PlatformResources, PlatformServices, ResourceAttribute, InputVariable, platformResponse, Resource, PlatformData, DEFAULT_AAS_OPERATION_TIMEOUT, JsonPlatformOperationResult, SubmodelElementCollection, allMetaTypes, MT_metaDisplayName, MT_metaTypeKind, MTK_container, MT_metaSize, DR_idShort, DR_type, MT_metaType, MTK_compound, MT_varValue, DR_displayName } from 'src/interfaces';
 import { firstValueFrom, Subject } from 'rxjs';
 import { Configuration, EnvConfigService } from './env-config.service';
 import { DataUtils, UtilsService } from './utils.service';
@@ -277,6 +277,81 @@ export class ApiService extends UtilsService {
     }
     return statusUri;
   }
+
+  /**
+   * Recursive function to turn a single AAS JSON data row into an internal data structure. Considers (recursive) IVML collection sub-structures. 
+   * Takes metaType, metaSize and varValue from the platform generated AAS entries into account.
+   * 
+   * @param values the row values as AAS JSON 
+   * @param result to accumulate the result of this row, a RowEntry on top level, a array on nested level
+   * @param top is this call a top level call or a nested recursive call
+   * @param rowFn additional function to apply on row data to extract further data
+   */
+  createRowValue(values: any, result: any, top:boolean, rowFn: (row:any) => boolean) {
+    for (let value of values) {
+      let fieldName = value.idShort;
+      let goOn = rowFn(value);
+      if (goOn && !allMetaTypes.includes(fieldName)) {
+        let displayName = null;
+        let val: any = null;
+        if (this.isArray(value.value)) {
+          displayName = DataUtils.getPropertyValue(value.value, MT_metaDisplayName);
+          let fieldTypeKind = DataUtils.getPropertyValue(value.value, MT_metaTypeKind);
+          if (fieldTypeKind == MTK_container) {
+            let fieldSize = DataUtils.getPropertyValue(value.value, MT_metaSize);
+            if (fieldSize) {
+              val = [];
+              for (let i = 0; i < fieldSize; i++) {
+                let fVal : any = {}; // TODO not if contained type is primitive
+                let fName = fieldName + "__" + i + "_";
+                let fProp = DataUtils.getProperty(value.value, fName);
+                if (!fProp) {
+                  fName = "var_" + i;
+                  fProp = DataUtils.getProperty(value.value, fName);
+                }
+                if (fProp && fProp.value) {
+                  this.createRowValue(fProp.value, fVal, false, v => true);
+                  if (!fVal[DR_idShort]) { // if already set from else below, don't overwrite
+                    let fId = fVal["id"] || fVal["name"] || fVal["type"] || String(i);
+                    fVal[DR_idShort] = fId;
+                  }
+                  this.addPropertyFromData(fVal, DR_type, fProp.value, MT_metaType);
+                  val.push(fVal);
+                }
+              }
+            }
+          } else if (fieldTypeKind == MTK_compound) {
+            val = {};
+            this.createRowValue(value.value, val, false, v => true);
+          } else {
+            val = DataUtils.getPropertyValue(value.value, MT_varValue);
+          }
+        } else {
+          result.idShort = value.value;
+          result.value = value.value;
+          fieldName = null; // prevent adding varValue as field below
+          this.addPropertyFromData(result, DR_type, values, MT_metaType);
+        }
+        if (top) {
+          let instance: any = {idShort: fieldName, value:val};
+          if (displayName) {
+            instance[DR_displayName] = displayName;
+          }
+          result.push(instance);
+        } else if (fieldName) {
+          result[fieldName] = val;
+        }
+      }
+    }
+console.log(result);    
+  }
+
+  private addPropertyFromData(object: any, propertyName: string, data: any[], dataPropertyName: string) {
+    let value = DataUtils.getPropertyValue(data, dataPropertyName);
+    if (value) {
+      object[propertyName] = value;
+    }
+  }  
 
 }
 

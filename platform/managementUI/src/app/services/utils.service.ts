@@ -147,6 +147,11 @@ export class Utils {
         if (element.manufacturer) {
           idShort = this.getElementDisplayName(element.manufacturer, true); // shall find manufacturer and return name
         } // else empty
+      } else if (element.hasOwnProperty("department")) {
+        // nameplate
+        if (element.department) {
+          idShort = this.getElementDisplayName(element.department, true); // shall find department and return name
+        } // else empty
       } else if (this.isArray(element)) {
         // array of editor IVML values
         for (let e of element) {
@@ -174,7 +179,7 @@ export class Utils {
    * @returns the configuration object
    */
   public configureDialog(width: string, height: string, input: EditorPartition[] | null) {
-    if (input) {
+    if (input && input.length > 0) {
       let cols = 0;
       let rows = 0;      
       for (let part of input) {

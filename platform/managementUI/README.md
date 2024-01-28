@@ -37,9 +37,11 @@ The full test suite requires a running platform instance. This is automatically 
 
 ## Developing with the test suite
 
-Repeatedly running the full test suite with platform setup may be time consuming. You may split up the two parts, running the platform instance and running the test suite so that you can keep the platform instance running an execute the tests on demand. However, you have to decide for either one until explicitly switching back. Assuming that your next execution of maven would execute the full test suite, call
+Repeatedly running the full test suite with platform setup may be time consuming. You may split up the two parts, running the platform instance and running the test suite so that you can keep the platform instance running an execute the tests on demand. However, you have to decide for either one until explicitly switching back. If you want to build the platform for developing against it, call
 
 `mvn generate-test-sources -Dconfiguration.textFile.disabled="full" -Dunpack.force=true` 
+
+This obtains the most recent components, instantiates the platform and updates the configuration meta-model as well as the configuration used for testing.
 
 And in separate shells (exemplified for Linux, use `.bat` extensions and backslashes in paths for Windows)
 
@@ -58,6 +60,8 @@ as well as
 
 Ensure that the temporary file `src/test/tmp/config.json` does not exist (must be in `src` due to Angular conventions), i.e., delete it if it exist, and run then
 
+`ng serve` in the project folder of the management UI.
+
 If you also need a running application (all tests shall be developed so that executing an application is optional although decreasing the test coverage), please execute in an own shell
 
 - `cd gen/platform`
@@ -66,9 +70,11 @@ If you also need a running application (all tests shall be developed so that exe
 `ng test` or for more "headless" execution
 `ng test --no-watch --no-progress --browsers=ChromeHeadless` if desirable also with `--code-coverage` or further arguments.
 
-To re-enable the full tests, execute `mvn install -Dunpack.force=true`.
+For shutdown of the running application, consider executing `cli.sh undeploy artifacts/deployment.yaml` or an undeployment via the UI.
 
-For shutdown, consider executing `cli.sh undeploy artifacts/deployment.yaml`.
+When re-building/re-instantiating the platform, e.g., after functional or model changes, please ensure that all running platform instances started above are stopped (`CTRL-C` in each of the shells) and run then the maven command from the beginning of this section.
+
+To re-enable and execute the full tests, run `mvn install -Dunpack.force=true`.
 
 ## Development hints
 

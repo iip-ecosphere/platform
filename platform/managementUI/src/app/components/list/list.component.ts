@@ -5,7 +5,7 @@ import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { EditorComponent } from '../editor/editor.component';
-import { DEFAULT_UPLOAD_CHUNK, DR_displayName, DR_idShort, DR_type, InputVariable, MTK_compound, MTK_container, MT_metaDisplayName, MT_metaSize, MT_metaType, MT_metaTypeKind, MT_metaVariable, MT_varValue, Resource, allMetaTypes, configMetaEntry, editorInput } from 'src/interfaces';
+import { DEFAULT_UPLOAD_CHUNK, InputVariable, MT_metaType, MT_metaVariable, MT_varValue, Resource, configMetaEntry, editorInput } from 'src/interfaces';
 import { Utils, DataUtils } from 'src/app/services/utils.service';
 import { WebsocketService } from 'src/app/websocket.service';
 import { StatusCollectionService } from 'src/app/services/status-collection.service';
@@ -236,72 +236,7 @@ export class ListComponent extends Utils implements OnInit {
     });
   }
 
-  /**
-   * Recursive function to turn a single AAS JSON data row into an internal data structure. Considers (recursive) IVML collection sub-structures. 
-   * Takes metaType, metaSize and varValue from the platform generated AAS entries into account.
-   * 
-   * @param values the row values as AAS JSON 
-   * @param result to accumulate the result of this row, a RowEntry on top level, a array on nested level
-   * @param top is this call a top level call or a nested recursive call
-   * @param rowFn additional function to apply on row data to extract further data
-   */
-  createRowValue(values: any, result: any, top:boolean, rowFn: (row:any) => boolean) {
-    for (let value of values) {
-      let fieldName = value.idShort;
-      let goOn = rowFn(value);
-      if (goOn && !allMetaTypes.includes(fieldName)) {
-        let displayName = null;
-        let val: any = null;
-        if (this.isArray(value.value)) {
-          displayName = DataUtils.getPropertyValue(value.value, MT_metaDisplayName);
-          let fieldTypeKind = DataUtils.getPropertyValue(value.value, MT_metaTypeKind);
-          if (fieldTypeKind == MTK_container) {
-            let fieldSize = DataUtils.getPropertyValue(value.value, MT_metaSize);
-            if (fieldSize) {
-              val = [];
-              for (let i = 0; i < fieldSize; i++) {
-                let fVal : any = {}; // TODO not if contained type is primitive
-                let fName = fieldName + "__" + i + "_";
-                let fProp = DataUtils.getProperty(value.value, fName);
-                if (!fProp) {
-                  fName = "var_" + i;
-                  fProp = DataUtils.getProperty(value.value, fName);
-                }
-                if (fProp && fProp.value) {
-                  this.createRowValue(fProp.value, fVal, false, v => true);
-                  let fId = fVal["id"] || fVal["name"] || fVal["type"] || String(i);
-                  fVal[DR_idShort] = fId;
-                  this.addPropertyFromData(fVal, DR_type, fProp.value, MT_metaType);
-                  val.push(fVal);
-                }
-              }
-            }
-          } else if (fieldTypeKind == MTK_compound) {
-            val = {};
-            this.createRowValue(value.value, val, false, v => true);
-          } else {
-            val = DataUtils.getPropertyValue(value.value, MT_varValue);
-          }
-        }
-        if (top) {
-          let instance: any = {idShort: fieldName, value:val};
-          if (displayName) {
-            instance[DR_displayName] = displayName;
-          }
-          result.push(instance);
-        } else {
-          result[fieldName] = val;
-        }
-      }
-    }
-  }
 
-  private addPropertyFromData(object: any, propertyName: string, data: any[], dataPropertyName: string) {
-    let value = DataUtils.getPropertyValue(data, dataPropertyName);
-    if (value) {
-      object[propertyName] = value;
-    }
-  }
 
   /**
    * Creates an internal table data structure for AAS JSON data.
@@ -319,7 +254,7 @@ export class ListComponent extends Utils implements OnInit {
       let varName = DataUtils.getPropertyValue(tableRow.value, MT_metaVariable) || tableRow.idShort;
       let rowEntry = new RowEntry({idShort: tableRow.idShort, varName: varName, varValue: val});
       let rowType = tableRow.value[0].value
-      this.createRowValue(tableRow.value, val, true, row => {
+      this.api.createRowValue(tableRow.value, val, true, row => {
         let result = rowFn(row, rowType);
         if (row.idShort == MT_metaType) {
           rowEntry.varType = row.value
@@ -489,7 +424,7 @@ export class ListComponent extends Utils implements OnInit {
         description: [{language: '', text: ''}],
         refTo: false, multipleInputs: false, meta:meta_entry};
 
-      let uiGroups = this.ivmlFormatter.calculateUiGroupsInf(editorInput, this.meta);
+      let uiGroups = this.ivmlFormatter.calculateUiGroupsInf(editorInput, this.metaBackup);
       let parts = this.ivmlFormatter.partitionUiGroups(uiGroups);
       let dialogRef = this.dialog.open(EditorComponent, this.configureDialog('90%', '90%', parts));
       let component = dialogRef.componentInstance;
@@ -554,7 +489,7 @@ export class ListComponent extends Utils implements OnInit {
         description: [{language: '', text: ''}],
         refTo: false, multipleInputs: false, meta:meta_entry};
 
-      let uiGroups = this.ivmlFormatter.calculateUiGroupsInf(editorInput, this.meta);
+      let uiGroups = this.ivmlFormatter.calculateUiGroupsInf(editorInput, this.metaBackup);
       let parts = this.ivmlFormatter.partitionUiGroups(uiGroups);
 
       let dialogRef = this.dialog.open(EditorComponent, this.configureDialog('90%', '90%', parts));

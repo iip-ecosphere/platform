@@ -66,7 +66,7 @@ export class EditorComponent extends Utils implements OnInit {
       let searchTerm = 'Field'
       for(const type of this.metaBackup.value) {
         const refined = DataUtils.getProperty(type.value, MT_metaRefines);
-        if(refined && refined.value != '') {
+        if (refined && refined.value != '') {
           if(searchTerm === refined.value) {
             console.debug("TYPE " + type);
           }
@@ -128,7 +128,7 @@ export class EditorComponent extends Utils implements OnInit {
     let creationData: IvmlRecordValue = {};
     this.showInputs = false;
     this.transferUiGroups(this.uiGroups, creationData);
-    let variableName = this.ivmlFormatter.generateVariableName(this.ivmlType, creationData);
+    let variableName = await this.ivmlFormatter.generateVariableName(this.ivmlType, creationData);
     if (this.selectedType?.idShort == "Application") {
       this.handleFeedback(await this.ivmlFormatter.createApp(variableName, creationData));
     } else {

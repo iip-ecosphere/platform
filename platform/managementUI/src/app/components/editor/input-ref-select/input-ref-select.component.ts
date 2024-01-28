@@ -161,9 +161,21 @@ export class InputRefSelectComponent extends Utils implements OnInit {
     }
   }
 
-  public editInputValue(editIndex: number) {
+  public async editInputValue(editIndex: number) {
+    let varName = null;
     let input = DataUtils.deepCopy(this.input);
     input.value = this.input.value[editIndex];
+    if (input.value._type && input.value.value) { // IVMLValue -> extract
+      let type = input.value._type;
+      if (DataUtils.isIvmlRefTo(type)) { // we have a reference, resolve to ease UI
+        varName = input.value.value;
+        let data = await this.api.getConfiguredElements(DataUtils.stripGenericType(type));
+        input.value = {};
+        this.api.createRowValue(DataUtils.getPropertyValue(data.value, varName), input.value, false, r => true);
+      } else {
+        input.value = input.value.value;
+      }
+    }
     input.type = DataUtils.stripGenericType(input.type);
     if (input.value[DR_type]) { // override with dynamic IVML type if known
       input.type = input.value[DR_type];
@@ -173,6 +185,9 @@ export class InputRefSelectComponent extends Utils implements OnInit {
     let dialogRef = this.subDialog.open(EditorComponent, this.configureDialog('80%', '80%', parts));
     dialogRef.componentInstance.type = input;
     dialogRef.componentInstance.metaBackup = this.meta;
+    if (varName) {
+      dialogRef.componentInstance.variableName = varName;
+    }
   }
 
   public removeInputValue(removeIndex: number) {

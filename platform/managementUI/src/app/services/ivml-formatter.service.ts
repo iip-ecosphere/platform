@@ -30,21 +30,7 @@ export class IvmlFormatterService extends UtilsService {
     params.push(ApiService.createAasOperationParameter("type", AAS_TYPE_STRING, ivmlFormat[1]));
     params.push(ApiService.createAasOperationParameter("valExpr", AAS_TYPE_STRING, ivmlFormat[2]));
     return await this.callConfigOperation("createVariable", params, "Values have been stored!");
-    /*const response = await this.api.executeAasJsonOperation(IDSHORT_SUBMODEL_CONFIGURATION, 
-      AAS_OP_PREFIX_SME + "createVariable", inputVar);
-
-    let exception = this.api.getPlatformResponse(response);
-    return this.getFeedback(exception, "Values have been successfully stored!");*/
   }
-
-  /*
-    private getCreateVarInputVar(data: any) {
-    let inputVariables: InputVariable[] = [];
-    inputVariables.push(ApiService.createAasOperationParameter("varName", AAS_TYPE_STRING, data[0]));
-    inputVariables.push(ApiService.createAasOperationParameter("type", AAS_TYPE_STRING, data[1]));
-    inputVariables.push(ApiService.createAasOperationParameter("valExpr", AAS_TYPE_STRING, data[2]));
-    return inputVariables
-  }*/
 
   /**
    * Changes a configuration variable.
@@ -469,7 +455,6 @@ export class IvmlFormatterService extends UtilsService {
           if (input.idShort && metaTypes.indexOf(input.idShort) === -1) {
             let isOptional = false;
             let uiGroup: number = DataUtils.getPropertyValue(input.value, 'uiGroup'); // translated 100 -> 1
-
             if (uiGroup < 0) {
               isOptional = true;
               uiGroup = uiGroup * -1;
@@ -549,7 +534,7 @@ export class IvmlFormatterService extends UtilsService {
               } else if (editorInput.metaTypeKind === MTK_enum) {
                 initial = ivmlValue
                 editorInput.valueTransform = input => IVML_TYPE_PREFIX_enumeration + (input.type || "") + '.' + input.value;
-              } else if (editorInput.type === 'Boolean') {
+              } else if (editorInput.type === IVML_TYPE_Boolean) {
                 initial = String(ivmlValue).toLowerCase() === 'true';
               } else if (editorInput.metaTypeKind === MTK_compound && !editorInput.multipleInputs) {
                 initial = ivmlValue; // input comes as object
@@ -565,8 +550,7 @@ export class IvmlFormatterService extends UtilsService {
                 }
               }
               editorInput.value = initial;
-
-              if (!uiGroupCompare ){
+              if (!uiGroupCompare){
                 if (isOptional) {
                   if (editorInput.multipleInputs) {
                     uiGroups.push({
@@ -611,7 +595,6 @@ export class IvmlFormatterService extends UtilsService {
                   } else {
                     uiGroupCompare?.optionalInputs.push(editorInput);
                   }
-
                 } else {
                   if (editorInput.multipleInputs) {
                     uiGroupCompare?.fullLineInputs.push(editorInput);
@@ -628,14 +611,20 @@ export class IvmlFormatterService extends UtilsService {
     return uiGroups;
   }
 
+  /**
+   * Partitions the given uiGroups into a pseudo layout to calculate the expected size of dialogs from.
+   * 
+   * @param uiGroups the UI groups to partition
+   * @returns the partitioned UI groups, currently as maximal two column layout per uiGroup
+   */
   public partitionUiGroups(uiGroups: uiGroup[]) {
     let result : EditorPartition[] = [];
     let actual : EditorPartition | null = null;
     let group = 1;
     let cols = 1;
     for (let u of uiGroups) {
-        // well, it was defined that way :/
-        for (let ei of u.inputs.concat(u.optionalInputs, u.fullLineInputs, u.fullLineOptionalInputs)) {
+      // well, it was defined that way :/
+      for (let ei of u.inputs.concat(u.optionalInputs, u.fullLineInputs, u.fullLineOptionalInputs)) {
         if (ei) {
           let c = 1;
           if (DataUtils.isIvmlCollection(ei.type)) {
@@ -660,19 +649,42 @@ export class IvmlFormatterService extends UtilsService {
    * 
    * @param type the IVML type name
    * @param data the data to be used as IVML value
-   * @returns the variable name
+   * @returns a promise on the variable name
    */
-  public generateVariableName(type: string, data: IvmlRecordValue | null) {
-    let result = type;    
-    // TODO API call to make variable unique
+  public async generateVariableName(type: string, data: IvmlRecordValue | null) {
+    let result;
+    let elementName = "";
+    let elementVersion = "";
     if (data) {
-      let name = data["name"];
-      if (name) {
-        type += "_" + name.value;
+      if (data["name"]) {
+        elementName = data["name"].value;
+      }
+      if (data["version"]) {
+        elementVersion = data["version"].value;
       }
     }
-    if (type.length > 0) {
-      type = type[0].toLowerCase() + type.substring(1);       
+
+    let params: InputVariable[] = [];
+    params.push(ApiService.createAasOperationParameter("type", AAS_TYPE_STRING, type));
+    params.push(ApiService.createAasOperationParameter("elementName", AAS_TYPE_STRING, elementName));
+    params.push(ApiService.createAasOperationParameter("elementVersion", AAS_TYPE_STRING, elementVersion));
+    const response = await this.api.executeAasJsonOperation(IDSHORT_SUBMODEL_CONFIGURATION, 
+      AAS_OP_PREFIX_SME + "getVariableName", params);
+    let opResult = this.api.getPlatformResponse(response);
+    if (opResult?.result) {
+      result = opResult?.result;
+    } else { // a bit fallback
+      result = type;    
+      if (data) {
+        let name = data["name"];
+        if (name) {
+          type += "_" + name.value;
+        }
+      }
+      if (type.length > 0) {
+        type = type[0].toLowerCase() + type.substring(1);       
+      }
+      result = type;
     }
     return type; // preliminary
   }
