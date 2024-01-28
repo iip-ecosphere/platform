@@ -343,7 +343,6 @@ export class ApiService extends UtilsService {
         }
       }
     }
-console.log(result);    
   }
 
   private addPropertyFromData(object: any, propertyName: string, data: any[], dataPropertyName: string) {

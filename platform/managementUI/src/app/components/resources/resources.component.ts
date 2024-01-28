@@ -81,7 +81,7 @@ export class ResourcesComponent extends Utils implements OnInit  {
       this.router.navigateByUrl("/resources/" + id);
 
     } else {
-      console.log("ERROR: invlalid idShort");
+      console.error("Inalid idShort");
     }
 
   }

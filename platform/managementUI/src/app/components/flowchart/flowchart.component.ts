@@ -186,7 +186,7 @@ export class FlowchartComponent implements OnInit {
             this.Busses.push({id: bus, color: this.busColors[count]});
             count++;
           } else if(count >= 7) {
-            console.log("ERROR: maximum amount of busses exceeded (7)");
+            console.error("Maximum amount of busses exceeded (7)");
           }
         }
 

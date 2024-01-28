@@ -89,7 +89,7 @@ export class SubeditorButtonComponent extends Utils implements OnInit {
         }
       }
       if (!refinedTypes[0]) {
-        console.log('WARNING: no refined types found for abstract type ' + searchTerm);
+        console.warn('No refined types found for abstract type ' + searchTerm);
       } else {
         this.refinedTypes = this.refinedTypes.concat(refinedTypes);
       }
@@ -105,7 +105,7 @@ export class SubeditorButtonComponent extends Utils implements OnInit {
       }
       return false;
     } else {
-      console.log('ERROR: meta value is not an Array');
+      console.error('Meta value is not an Array');
       return false;
     }
   }
