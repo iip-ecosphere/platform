@@ -18,7 +18,9 @@ project Applications {
             Description description = "";
             String artifact = "";
         }
-        setOf(refTo(ServiceMesh)) services; // no services is ok, then the artifact must have hand-crafted services
+        assign (displayName = "meshes") to {
+            setOf(refTo(ServiceMesh)) services; // no services is ok, then the artifact must have hand-crafted services
+        }
         NameplateInfo nameplateInfo;
         assign (uiGroup = UiOptionalGroup1) to {
             Boolean createContainer = false;
@@ -30,7 +32,6 @@ project Applications {
         
         Constraint idOk = matches(id, "^[^@]+$");
         Constraint packagingOk = packaging.size() >= 1;
-        services.displayName = "meshes";
     }
     
     // deprecated, use mvnVersion from DataTypes instead

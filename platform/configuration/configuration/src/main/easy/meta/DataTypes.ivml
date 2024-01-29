@@ -24,7 +24,8 @@ project DataTypes {
     const String Eclass_Property_swName = "0173-1#02-AAO247#002";
     
     const Integer UiInvisibleGroup = 0;
-    const Integer UiMandatoryGroup1 = 100;
+    const Integer UiMandatoryGroup1 = 100; // between = specific positions, 99 = first
+    const Integer UiMandatoryGroup1First = 199;
     const Integer UiOptionalGroup1 = -100;
     const Integer UiMandatoryGroup2 = 200;
     const Integer UiOptionalGroup2 = -200;

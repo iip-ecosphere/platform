@@ -262,6 +262,7 @@ project Connectors {
        }
        
        Constraint noModelCallOperation = collectOperations(operations)->selectByKind(ModelCallOperation).isEmpty();
+       samplingPeriod.uiGroup = UiInvisibleGroup;
    }
    
    compound OpcUaV1Connector refines Connector { // fixed template types see JavaConnector.vtl
@@ -358,10 +359,13 @@ project Connectors {
            Port port = 1;
            NonEmptyString host;
        }
-       NonEmptyString portDescriptor;
+       assign (uiGroup = UiMandatoryGroup1First) to {
+           NonEmptyString portDescriptor;
+       }
        assign (uiGroup = UiOptionalGroup2) to {
            String deviceServiceKey = "serial";
        }
+       
        Constraint hostEqPortDesc = host == portDescriptor;
    }
     

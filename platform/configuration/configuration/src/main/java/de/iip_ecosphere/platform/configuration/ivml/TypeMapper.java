@@ -58,6 +58,9 @@ import net.ssehub.easy.varModel.model.values.Value;
  * @author Holger Eichelberger, SSE
  */
 class TypeMapper {
+    
+    public static final int UIGROUP_SPACING = 100;
+    public static final int UIGROUP_POS_FRONT = 99;
 
     private Configuration cfg;
     private Set<Project> doneProjects = new HashSet<>();
@@ -202,13 +205,22 @@ class TypeMapper {
             for (String name : names) {
                 SubmodelElementCollectionBuilder elt = slots.get(name);
                 if (null != elt) {
-                    int uiGroup = getUiGroup(type.getName(), name) / 100;
+                    int uiGroup = getUiGroup(type.getName(), name);
+                    int uiPos = uiGroup % UIGROUP_SPACING;
+                    uiGroup /= UIGROUP_SPACING;
                     List<SubmodelElementCollectionBuilder> tmp = namesByUiGroups.get(uiGroup);
                     if (null == tmp) {
                         tmp = new ArrayList<>();
                         namesByUiGroups.put(uiGroup, tmp);
                     }
-                    tmp.add(elt);
+                    if (uiPos == UIGROUP_POS_FRONT) {
+                        uiPos = 0;
+                    }
+                    if (0 <= uiPos && uiPos < tmp.size()) {
+                        tmp.add(uiPos, elt);
+                    } else {
+                        tmp.add(elt);
+                    }
                     done.remove(name);
                 } // EASy problems with Any
             }
