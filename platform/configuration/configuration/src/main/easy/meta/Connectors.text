@@ -44,7 +44,7 @@ Connectors::Connector::inputHandlersOk = Input handlers must map to the connecto
 Connectors::Connector::host = The network host name to connect to (may be superseded in ad-hoc manner if executing device AAS declares service data via "deviceServiceKey").
 Connectors::Connector::port = The network port on host to connect to (may be superseded in ad-hoc manner if executing device AAS declares service data via "deviceServiceKey").
 Connectors::Connector::deviceServiceKey = Logical name for the underlying service, e.g., "opcua" to consider from executing device AAS for ad-hoc connections. May supersede host/port.
-Connectors::Connector::samplingPeriod = For non-event based connectors, the period in ms to retrive new data.
+Connectors::Connector::samplingPeriod = For non-event based connectors, the period in ms to retrieve new data.
 Connectors::Connector::security = Connector security settings pointing to the platform identity store.
 Connectors::Connector::mock = In-vivo testing, enable a mocking connector service wrapper reading data from a JSON file in src/test/resources.
 Connectors::Connector::cacheMode = Whether only new data shall be ingested and according to which strategy equal data shall be detected.
@@ -63,6 +63,7 @@ Connectors::ChannelConnector::outChannels = Output channel names (for multi-chan
 Connectors::ChannelConnector::machineFormatter = Formatter turning data received from application into connector output.
 Connectors::ChannelConnector::machineParser = Parser turning data received from external/connector into application data.
 Connectors::ChannelConnector::noModelCallOperation = Channel connectors do not support model call operations. Please remove the model call operation from your operation expressions.
+Connectors::ChannelConnector::samplingPeriod = For non-event based connectors, the period in ms to retrieve new data (refeind to default = 0 as usually event-triggered).
 Connectors::OpcUaV1Connector::class = Refined/predefined class for the platform OPC connector.
 Connectors::OpcUaV1Connector::artifact = Refined/predefined Mvn coordinates for the platform OPC connector.
 Connectors::OpcUaV1Connector::port = Refined/predefined default OPC port.

@@ -260,9 +260,11 @@ project Connectors {
            String inSerializerClass = ""; // if not given, use registry
            String outSerializerClass = ""; // if not given, use registry
        }
+       assign (uiGroup = UiInvisibleGroup) to {
+           Integer samplingPeriod = 0; // no sampling by default
+       }
        
        Constraint noModelCallOperation = collectOperations(operations)->selectByKind(ModelCallOperation).isEmpty();
-       samplingPeriod.uiGroup = UiInvisibleGroup;
    }
    
    compound OpcUaV1Connector refines Connector { // fixed template types see JavaConnector.vtl
