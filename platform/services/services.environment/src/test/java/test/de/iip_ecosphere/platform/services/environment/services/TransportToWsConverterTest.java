@@ -84,7 +84,7 @@ public class TransportToWsConverterTest {
         converter.stop();
         converterServer.stop(true);
         
-        Assert.assertTrue(count.get() > 3); // actually 4, one may get "lost" under pressur
+        Assert.assertTrue(count.get() > 3); // actually 4, one may get "lost" under pressure
                 
         qpid.stop(true);
         Transport.releaseConnector(false); // allow for reuse, next test
