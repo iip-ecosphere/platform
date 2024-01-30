@@ -63,7 +63,7 @@ public class CarAas {
         
         // standard stuff
         
-        TechnicalDataSubmodelBuilder tdBuilder = new TechnicalDataSubmodelBuilder(aasB, null, true);
+        TechnicalDataSubmodelBuilder tdBuilder = new TechnicalDataSubmodelBuilder(aasB, null);
         GeneralInformationBuilder giBuilder = tdBuilder.createGeneralInformationBuilder(
             "Mittelstandszentrum Digital Hannover", "", "", 
             LangString.create("HM'22 Demonstration car"));

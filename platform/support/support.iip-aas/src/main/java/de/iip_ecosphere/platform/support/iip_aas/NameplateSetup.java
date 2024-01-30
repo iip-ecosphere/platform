@@ -393,7 +393,7 @@ public class NameplateSetup {
             try {
                 AasBuilder aasBuilder = factory.createAasBuilder(id, urn);
                 TechnicalDataSubmodelBuilder tdBuilder = new TechnicalDataSubmodelBuilder(aasBuilder, 
-                    expandUrn(urn, "-technicalData"), true);
+                    expandUrn(urn, "-technicalData"));
                 GeneralInformationBuilder giBuilder = tdBuilder.createGeneralInformationBuilder(
                     LangString.create(getManufacturerName()).getDescription(), "", "",
                     LangString.create(getManufacturerProductDesignation()));

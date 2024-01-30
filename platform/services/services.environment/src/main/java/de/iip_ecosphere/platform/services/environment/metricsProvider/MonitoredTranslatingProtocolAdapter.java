@@ -14,6 +14,9 @@ package de.iip_ecosphere.platform.services.environment.metricsProvider;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryMXBean;
+import java.lang.management.MemoryUsage;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.LoggerFactory;
@@ -40,6 +43,7 @@ public class MonitoredTranslatingProtocolAdapter<O, I, CO, CI> extends ChannelTr
     public static final String ADAPT_OUTPUT_TIME = "adaptOutputTime";
     private MetricsProvider metrics;
     private Clock clock;
+    private MemoryMXBean memBean;
     private LogRunnable logger;
 
     /**
@@ -75,6 +79,7 @@ public class MonitoredTranslatingProtocolAdapter<O, I, CO, CI> extends ChannelTr
         super(outputChannel, outputTranslator, inputChannel, inputTranslator);
         this.metrics = metrics;
         this.clock = metrics.getClock();
+        this.memBean = ManagementFactory.getMemoryMXBean();
         if (null != log) {
             try {
                 logger = new LogRunnable(log);
@@ -105,12 +110,22 @@ public class MonitoredTranslatingProtocolAdapter<O, I, CO, CI> extends ChannelTr
     public I adaptInput(final CI data) throws IOException {
         // no obvious way to combine lambda with super, measurement from micrometer
         final long s = clock.monotonicTime();
+        //invoke garbage collection, so only the space that is occupied by living objects is counted
+        System.gc();
+        MemoryUsage beforeHeapMemoryUsage = memBean.getHeapMemoryUsage();
         try {
             return super.adaptInput(data);
         } finally {
             final long duration = clock.monotonicTime() - s;
             metrics.recordWithTimer(ADAPT_INPUT_TIME, duration, TimeUnit.NANOSECONDS);
             log(ADAPT_INPUT_TIME, duration);
+            
+            //invoke garbage collection, so only the space that is occupied by living objects is counted
+            System.gc();
+            MemoryUsage afterHeapMemoryUsage = memBean.getHeapMemoryUsage();
+            //difference of memory consumed before and after the code
+            long heapConsumed = afterHeapMemoryUsage.getUsed() - beforeHeapMemoryUsage.getUsed();
+            log("adaptInputHeapConsumed", heapConsumed);            
         }
     }
 
@@ -118,12 +133,22 @@ public class MonitoredTranslatingProtocolAdapter<O, I, CO, CI> extends ChannelTr
     public CO adaptOutput(String channel, O data) throws IOException {
         // no obvious way to combine lambda with super, measurement from micrometer
         final long s = clock.monotonicTime();
+        //invoke garbage collection, so only the space that is occupied by living objects is counted
+        System.gc();
+        MemoryUsage beforeHeapMemoryUsage = memBean.getHeapMemoryUsage();        
         try {
             return super.adaptOutput(channel, data);
         } finally {
             final long duration = clock.monotonicTime() - s;
             metrics.recordWithTimer(ADAPT_OUTPUT_TIME, duration, TimeUnit.NANOSECONDS);
             log(ADAPT_OUTPUT_TIME, duration);
+
+            //invoke garbage collection, so only the space that is occupied by living objects is counted
+            System.gc();
+            MemoryUsage afterHeapMemoryUsage = memBean.getHeapMemoryUsage();
+            //difference of memory consumed before and after the code
+            long heapConsumed = afterHeapMemoryUsage.getUsed() - beforeHeapMemoryUsage.getUsed();
+            log("adaptOutputHeapConsumed", heapConsumed);
         }
     }
 
