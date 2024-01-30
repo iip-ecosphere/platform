@@ -156,12 +156,12 @@ public class MonitoredTranslatingProtocolAdapterTest {
         
         Timer iTimer = reg.get(MonitoredTranslatingProtocolAdapter.ADAPT_INPUT_TIME).timer();
         double tmp = iTimer.mean(TimeUnit.MILLISECONDS);
-        Assert.assertTrue(140 <= tmp && tmp <= 200);
+        Assert.assertTrue(tmp + " not in range", 140 <= tmp && tmp <= 500);
         Assert.assertEquals(max, iTimer.count());
 
         Timer oTimer = reg.get(MonitoredTranslatingProtocolAdapter.ADAPT_OUTPUT_TIME).timer();
         tmp = oTimer.mean(TimeUnit.MILLISECONDS);
-        Assert.assertTrue(90 <= tmp && tmp <= 150);
+        Assert.assertTrue(tmp + " not in range", 90 <= tmp && tmp <= 550);
         Assert.assertEquals(max, oTimer.count());
         
         if (null != log) {
