@@ -173,7 +173,8 @@ public class XmasAas extends AbstractAasExample {
         }
         
         HandoverDocumentationBuilder hdb = new HandoverDocumentationBuilder(aasBuilder, 
-            isCreateMultiLanguageProperties(), "urn:::SM:::productDataSleighDocs#");
+            "urn:::SM:::productDataSleighDocs#");
+        hdb.setCreateMultiLanguageProperties(isCreateMultiLanguageProperties());
         DocumentBuilder db = hdb.createDocumentBuilder();
         db.createDocumentIdBuilder()
             .setIsPrimary(true)
@@ -245,8 +246,8 @@ public class XmasAas extends AbstractAasExample {
         LangString productDesignation, String partNumber, String orderCode, String productResourceName, 
         String productClassId) {
         TechnicalDataSubmodelBuilder tdBuilder = new TechnicalDataSubmodelBuilder(aasBuilder,
-             iri("TechData_" + productDesignation + "_" + partNumber + "_" + orderCode), 
-             isCreateMultiLanguageProperties());
+             iri("TechData_" + productDesignation + "_" + partNumber + "_" + orderCode));
+        tdBuilder.setCreateMultiLanguageProperties(isCreateMultiLanguageProperties());
         GeneralInformationBuilder giBuilder = tdBuilder.createGeneralInformationBuilder(manufacturerName, 
             partNumber, orderCode, productDesignation);
         if (productResourceName != null && productResourceName.length() > 0) {

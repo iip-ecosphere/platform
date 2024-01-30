@@ -154,8 +154,8 @@ public class PCF extends AbstractAasExample {
      * @param aasBuilder the AAS builder
      */
     private void createTechnicalDataSubmodel(AasBuilder aasBuilder) {
-        TechnicalDataSubmodelBuilder tdBuilder = new TechnicalDataSubmodelBuilder(aasBuilder, "urn:::SM:::TD#", 
-            isCreateMultiLanguageProperties());
+        TechnicalDataSubmodelBuilder tdBuilder = new TechnicalDataSubmodelBuilder(aasBuilder, "urn:::SM:::TD#");
+        tdBuilder.setCreateMultiLanguageProperties(isCreateMultiLanguageProperties());
         
         tdBuilder.createFurtherInformationBuilder(Utils.parseCalendar("2024-01-04T10:00:00.000+00:00"))
             .build();
@@ -246,8 +246,8 @@ public class PCF extends AbstractAasExample {
             .build();
         // intentionally no further submodels
         createNodeHasPartOf(enb, "Station 3 - Turning", b);
-        TimeSeriesBuilder tsd = new TimeSeriesBuilder(b, iri("https://aas2.uni-h.de/aas/DMG_NEF400/tsd"), 
-                    isCreateMultiLanguageProperties());
+        TimeSeriesBuilder tsd = new TimeSeriesBuilder(b, iri("https://aas2.uni-h.de/aas/DMG_NEF400/tsd"));
+        tsd.setCreateMultiLanguageProperties(isCreateMultiLanguageProperties());
         tsd.createMetadataBuilder()
             .setName(new LangString("en", "Turning Power Time Series"))
             .setDescription(new LangString("en", "Contains time series of the machine"))

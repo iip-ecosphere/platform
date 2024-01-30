@@ -33,21 +33,28 @@ import de.iip_ecosphere.platform.support.aas.types.common.DelegatingSubmodelElem
 public class ContactInformationsBuilder extends DelegatingSubmodelBuilder {
     
     private int contactInformationCount;
-    private boolean createMultiLanguageProperties;
+    private boolean createMultiLanguageProperties = true;
 
     /**
      * Creates a builder instance.
      * 
      * @param aas the parent AAS
      * @param identifier the identifier of this submodel
+     */
+    public ContactInformationsBuilder(AasBuilder aas, String identifier) {
+        super(aas.createSubmodelBuilder("ContactInformations", identifier));
+        setSemanticId(iri("https://admin-shell.io/zvei/nameplate/1/0/ContactInformations"));
+    }
+    
+    /**
+     * Defines whether multi-language properties shall be created. AASPackageExplorer compliance.
+     *
      * @param createMultiLanguageProperties whether multi-language properties shall be created, taints compliance 
      *     if {@code false}
      */
-    public ContactInformationsBuilder(AasBuilder aas, String identifier, boolean createMultiLanguageProperties) {
-        super(aas.createSubmodelBuilder("ContactInformations", identifier));
+    public void setCreateMultiLanguageProperties(boolean createMultiLanguageProperties) {
         this.createMultiLanguageProperties = createMultiLanguageProperties;
-        setSemanticId(iri("https://admin-shell.io/zvei/nameplate/1/0/ContactInformations"));
-    }
+    } 
 
     /**
      * Creates a contact information builder.

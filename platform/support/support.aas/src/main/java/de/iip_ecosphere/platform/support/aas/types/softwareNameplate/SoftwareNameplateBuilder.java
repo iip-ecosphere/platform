@@ -36,22 +36,29 @@ import de.iip_ecosphere.platform.support.aas.types.contactInformations.ContactIn
  */
 public class SoftwareNameplateBuilder extends DelegatingSubmodelBuilder {
 
-    private boolean createMultiLanguageProperties;
+    private boolean createMultiLanguageProperties = true;
 
     /**
      * Creates the nameplate builder.
      * 
      * @param parent the parent AAS
      * @param identifier the submodel identifier
-     * @param createMultiLanguageProperties whether multi-language properties shall be created, taints compliance 
-     *     if {@code false}
      */
-    public SoftwareNameplateBuilder(AasBuilder parent, String identifier, boolean createMultiLanguageProperties) {
+    public SoftwareNameplateBuilder(AasBuilder parent, String identifier) {
         super(parent.createSubmodelBuilder("SoftwareNameplate", identifier));
-        this.createMultiLanguageProperties = createMultiLanguageProperties;
         setSemanticId(iri("https://admin-shell.io/idta/SoftwareNameplate/1/0"));
     }
 
+    /**
+     * Defines whether multi-language properties shall be created. AASPackageExplorer compliance.
+     *
+     * @param createMultiLanguageProperties whether multi-language properties shall be created, taints compliance 
+     *     if {@code false}
+     */
+    public void setCreateMultiLanguageProperties(boolean createMultiLanguageProperties) {
+        this.createMultiLanguageProperties = createMultiLanguageProperties;
+    } 
+    
     /**
      * Creates the software nameplate type builder.
      * 

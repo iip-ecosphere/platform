@@ -33,7 +33,7 @@ import de.iip_ecosphere.platform.support.aas.types.common.Utils;
  */
 public class TechnicalDataSubmodelBuilder extends DelegatingSubmodelBuilder {
 
-    private boolean createMultiLanguageProperties;
+    private boolean createMultiLanguageProperties = true;
     private boolean hasGeneralInformation;
     private boolean hasTechnicalProperties;
 
@@ -42,15 +42,21 @@ public class TechnicalDataSubmodelBuilder extends DelegatingSubmodelBuilder {
      * 
      * @param aasBuilder the parent builder
      * @param identification the identification of the submodel
+     */
+    public TechnicalDataSubmodelBuilder(AasBuilder aasBuilder, String identification) {
+        super(aasBuilder.createSubmodelBuilder(TechnicalDataSubmodel.ID_SHORT, identification));
+        setSemanticId(iri("https://admin-shell.io/ZVEI/TechnicalData/Submodel/1/2"));
+    }
+
+    /**
+     * Defines whether multi-language properties shall be created. AASPackageExplorer compliance.
+     *
      * @param createMultiLanguageProperties whether multi-language properties shall be created, taints compliance 
      *     if {@code false}
      */
-    public TechnicalDataSubmodelBuilder(AasBuilder aasBuilder, String identification, 
-        boolean createMultiLanguageProperties) {
-        super(aasBuilder.createSubmodelBuilder(TechnicalDataSubmodel.ID_SHORT, identification));
+    public void setCreateMultiLanguageProperties(boolean createMultiLanguageProperties) {
         this.createMultiLanguageProperties = createMultiLanguageProperties;
-        setSemanticId(iri("https://admin-shell.io/ZVEI/TechnicalData/Submodel/1/2"));
-    }
+    } 
     
     /**
      * Creates a technical properties builder.

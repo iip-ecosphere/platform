@@ -96,7 +96,7 @@ public class TechnicalDataSubmodelTest {
     public void testTechnicalDataSubmodel() throws DatatypeConfigurationException, ExecutionException {
         AasFactory factory = AasFactory.getInstance();
         AasBuilder aasBuilder = factory.createAasBuilder("MyAas", null);
-        TechnicalDataSubmodelBuilder tdSmBuilder = new TechnicalDataSubmodelBuilder(aasBuilder, null, true);
+        TechnicalDataSubmodelBuilder tdSmBuilder = new TechnicalDataSubmodelBuilder(aasBuilder, null);
         assertBuildFail(tdSmBuilder);
         createFurtherInformation(tdSmBuilder);
         assertBuildFail(tdSmBuilder);

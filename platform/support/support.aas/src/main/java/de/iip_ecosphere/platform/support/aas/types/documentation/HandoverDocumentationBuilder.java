@@ -39,7 +39,7 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelE
  */
 public class HandoverDocumentationBuilder extends DelegatingSubmodelBuilder {
 
-    private boolean createMultiLanguageProperties;
+    private boolean createMultiLanguageProperties = true;
     private int documentCount;
     private int primaryCount;
 
@@ -91,17 +91,23 @@ public class HandoverDocumentationBuilder extends DelegatingSubmodelBuilder {
      * Creates a handover documentation builder.
      * 
      * @param aasBuilder the parent AAS
-     * @param createMultiLanguageProperties whether multi-language properties shall be created, taints compliance 
-     *     if {@code false}
      * @param identifier the submodel identifier
      */
-    public HandoverDocumentationBuilder(AasBuilder aasBuilder, boolean createMultiLanguageProperties, 
-        String identifier) {
+    public HandoverDocumentationBuilder(AasBuilder aasBuilder, String identifier) {
         super(aasBuilder.createSubmodelBuilder("Documentation", identifier));
-        this.createMultiLanguageProperties = createMultiLanguageProperties;
         setSemanticId(irdi("0173-1#01-AHF578#001"));
     }
 
+    /**
+     * Defines whether multi-language properties shall be created. AASPackageExplorer compliance.
+     *
+     * @param createMultiLanguageProperties whether multi-language properties shall be created, taints compliance 
+     *     if {@code false}
+     */
+    public void setCreateMultiLanguageProperties(boolean createMultiLanguageProperties) {
+        this.createMultiLanguageProperties = createMultiLanguageProperties;
+    } 
+    
     /**
      * Creates a document builder.
      * 

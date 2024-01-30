@@ -46,8 +46,8 @@ public class SoftwareNameplateTest extends AbstractAasExample {
         AasBuilder aasBuilder = AasFactory.getInstance().createAasBuilder("SoftwareNameplateExample", 
             "urn:::AAS:::SoftwareNameplateExample#");
         aasBuilder.createAssetBuilder("ci", "urn:::Asset:::sn#", AssetKind.INSTANCE).build();
-        SoftwareNameplateBuilder snp = new SoftwareNameplateBuilder(aasBuilder, "urn:::SM:::SwNp#", 
-            isCreateMultiLanguageProperties());
+        SoftwareNameplateBuilder snp = new SoftwareNameplateBuilder(aasBuilder, "urn:::SM:::SwNp#");
+        snp.setCreateMultiLanguageProperties(isCreateMultiLanguageProperties());
         snp.createSoftwareNameplateTypeBuilder()
             .setUriOfTheProduct("ZVEI.I40.ITinAutomation.DemoSW_123456")
             .setManufacturerName(new LangString("de", "ZVEI AK IT in Automation"))

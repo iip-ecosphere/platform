@@ -40,21 +40,28 @@ public class TimeSeriesBuilder extends DelegatingSubmodelBuilder {
     
     private int metadataCount = 0;
     private int segmentsCount = 0;
-    private boolean createMultiLanguageProperties;
+    private boolean createMultiLanguageProperties = true;
 
     /**
      * Creates a timeseries builder.
      * 
      * @param aasBuilder the parent AAS
      * @param identifier the submodel identifier
+     */
+    public TimeSeriesBuilder(AasBuilder aasBuilder, String identifier) {
+        super(aasBuilder.createSubmodelBuilder("TimeSeries", identifier));
+        setSemanticId(iri("https://admin-shell.io/idta/TimeSeries/1/1"));
+    }
+    
+    /**
+     * Defines whether multi-language properties shall be created. AASPackageExplorer compliance.
+     *
      * @param createMultiLanguageProperties whether multi-language properties shall be created, taints compliance 
      *     if {@code false}
      */
-    public TimeSeriesBuilder(AasBuilder aasBuilder, String identifier, boolean createMultiLanguageProperties) {
-        super(aasBuilder.createSubmodelBuilder("TimeSeries", identifier));
+    public void setCreateMultiLanguageProperties(boolean createMultiLanguageProperties) {
         this.createMultiLanguageProperties = createMultiLanguageProperties;
-        setSemanticId(iri("https://admin-shell.io/idta/TimeSeries/1/1"));
-    }
+    } 
     
     /**
      * Creates a metadata builder.
