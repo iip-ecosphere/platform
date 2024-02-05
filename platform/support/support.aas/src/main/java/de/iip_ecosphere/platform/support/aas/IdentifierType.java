@@ -46,7 +46,7 @@ public interface IdentifierType {
      * @return the urn-prefixed string
      */
     public static String urn(String text) {
-        return URN_PREFIX + text;
+        return compose(URN_PREFIX, text);
     }
 
     /**
@@ -56,7 +56,7 @@ public interface IdentifierType {
      * @return the urn-text-prefixed string
      */
     public static String urnText(String text) {
-        return URN_TEXT_PREFIX + text;
+        return compose(URN_TEXT_PREFIX, text);
     }
 
     /**
@@ -66,7 +66,7 @@ public interface IdentifierType {
      * @return the irdi-prefixed string
      */
     public static String irdi(String text) {
-        return IRDI_PREFIX + text;
+        return compose(IRDI_PREFIX, text);
     }
 
     /**
@@ -76,7 +76,18 @@ public interface IdentifierType {
      * @return the iri-prefixed string
      */
     public static String iri(String text) {
-        return IRI_PREFIX + text;
+        return compose(IRI_PREFIX, text);
+    }
+    
+    /**
+     * Composes a prefix defined in this class with the text to be prefixed.
+     * 
+     * @param prefix the prefix
+     * @param text the text to be prefixed
+     * @return the composed text representing an identifier
+     */
+    public static String compose(String prefix, String text) {
+        return prefix + text;
     }
 
 }
