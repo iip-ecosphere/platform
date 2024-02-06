@@ -67,6 +67,7 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
  * @param <CI> the input type from the IIP-Ecosphere platform
  *
  * @author Holger Eichelberger, SSE
+ * @author Jan Cepok, SSE
  */
 @MachineConnector(hasModel = true, supportsModelStructs = false, supportsEvents = false)
 public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, CI> {
@@ -386,6 +387,7 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
      * Implements the model access for AAS.
      * 
      * @author Holger Eichelberger, SSE
+     * @author Jan Cepok, SSE
      */
     private class AasModelAccess extends AbstractModelAccess {
 
