@@ -54,7 +54,7 @@ public class PluginManager {
     public static <T> Plugin<T> getPlugin(String id, Class<T> cls) {
         Plugin<T> result = null;
         Plugin<?> tmp = getPlugin(id);
-        if (cls.isAssignableFrom(tmp.getInstanceClass())) {
+        if (null != tmp && cls.isAssignableFrom(tmp.getInstanceClass())) {
             result = (Plugin<T>) tmp;
         } else if (tmp != null) {
             LoggerFactory.getLogger(PluginManager.class).warn(
