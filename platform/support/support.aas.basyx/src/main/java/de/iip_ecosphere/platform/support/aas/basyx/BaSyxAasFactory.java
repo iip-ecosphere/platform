@@ -34,6 +34,8 @@ import de.iip_ecosphere.platform.support.aas.ServerRecipe;
 import de.iip_ecosphere.platform.support.aas.SimpleLocalProtocolCreator;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
+import de.iip_ecosphere.platform.support.plugins.Plugin;
+import de.iip_ecosphere.platform.support.plugins.PluginDescriptor;
 
 /**
  * AAS factory for BaSyx. Do not rename, this class is referenced in {@code META-INF/services}.
@@ -52,11 +54,21 @@ public class BaSyxAasFactory extends AasFactory {
      * 
      * @author Holger Eichelberger, SSE
      */
-    public static class Descriptor implements AasFactoryDescriptor {
+    public static class Descriptor implements AasFactoryDescriptor, PluginDescriptor {
 
         @Override
         public AasFactory createInstance() {
             return new BaSyxAasFactory();
+        }
+
+        @Override
+        public String getId() {
+            return DEFAULT_PLUGIN_ID;
+        }
+
+        @Override
+        public Plugin<?> createPlugin() {
+            return new Plugin<AasFactory>(DEFAULT_PLUGIN_ID, AasFactory.class, () -> createInstance());
         }
         
     }
