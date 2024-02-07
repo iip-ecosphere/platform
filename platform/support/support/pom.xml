@@ -98,6 +98,29 @@
              <encoding>${java.encoding}</encoding>
            </configuration>
        </plugin>
+       <plugin>
+         <groupId>org.apache.maven.plugins</groupId>
+         <artifactId>maven-antrun-plugin</artifactId>
+         <version>1.8</version>
+ 		 <executions>
+	        <execution>
+	            <id>test-plugin</id>
+	            <phase>generate-test-resources</phase>
+	            <goals>
+	                <goal>run</goal>
+	            </goals>         
+	            <configuration>
+	              <target>
+	                <jar destfile="target/pluginTest.jar">
+					    <fileset dir="target/test-classes"
+					             includes="test/**/plugins/*.class"/>
+                        <fileset dir="src/test/plugins/resources"/>
+	                </jar>
+	              </target>
+                </configuration>
+            </execution>
+         </executions>
+       </plugin>
      </plugins>
    </build>  
 

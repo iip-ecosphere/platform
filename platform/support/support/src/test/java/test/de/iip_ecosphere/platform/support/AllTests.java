@@ -41,7 +41,8 @@ import org.junit.runners.Suite;
     InstalledDependenciesSetupTest.class,
     YamlFileTest.class,
     TaskRegistryTests.class,
-    CollectorTest.class
+    CollectorTest.class,
+    PluginManagerTest.class
 })
 public class AllTests {
 }

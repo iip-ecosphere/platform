@@ -30,12 +30,12 @@ import de.iip_ecosphere.platform.support.CollectionUtils;
 public class CollectionUtilsTest {
 
     /**
-     * Tests {@link CollectionUtils#toList(java.util.Iterator)}.
+     * Tests {@link CollectionUtils#toList(java.util.Iterator)} and {@link CollectionUtils#toList(Iterable)}.
      */
     @Test
     public void testToList() {
         List<String> data = new ArrayList<String>();
-        List<String> result = CollectionUtils.toList(data.iterator());
+        List<String> result = CollectionUtils.toList(data);
         Assert.assertNotNull(result);
         Assert.assertTrue(result.isEmpty());
         
@@ -49,12 +49,12 @@ public class CollectionUtilsTest {
     }
 
     /**
-     * Tests {@link CollectionUtils#toSet(java.util.Iterator)}.
+     * Tests {@link CollectionUtils#toSet(java.util.Iterator)} and {@link CollectionUtils#toSet(Iterable)}.
      */
     @Test
     public void testToSet() {
         List<String> data = new ArrayList<String>();
-        Set<String> result = CollectionUtils.toSet(data.iterator());
+        Set<String> result = CollectionUtils.toSet(data);
         Assert.assertNotNull(result);
         Assert.assertTrue(result.isEmpty());
         

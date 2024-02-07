@@ -91,6 +91,17 @@ public class CollectionUtils {
     }
     
     /**
+     * Turns the elements in the iterable into a list.
+     * 
+     * @param <T> the element type
+     * @param iterable the iterable
+     * @return the list with all elements in {@code iterable}
+     */
+    public static <T> List<T> toList(Iterable<T> iterable) {
+        return toList(iterable.iterator());
+    }
+    
+    /**
      * Turns the elements in the iterator into a list.
      * 
      * @param <T> the element type
@@ -103,6 +114,17 @@ public class CollectionUtils {
             result.add(iterator.next());
         }
         return result;
+    }
+
+    /**
+     * Turns the elements in the iterable into a set.
+     * 
+     * @param <T> the element type
+     * @param iterable the iterable
+     * @return the set with all elements in {@code iterable}
+     */
+    public static <T> Set<T> toSet(Iterable<T> iterable) {
+        return toSet(iterable.iterator());
     }
 
     /**
