@@ -29,6 +29,8 @@ import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.jsl.ExcludeFirst;
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
 import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
+import de.iip_ecosphere.platform.support.plugins.Plugin;
+import de.iip_ecosphere.platform.support.plugins.PluginManager;
 
 /**
  * A customizable factory for creating AAS instances independent of the underlying implementation.
@@ -53,6 +55,11 @@ public abstract class AasFactory {
      * a local protocol.
      */
     public static final String LOCAL_PROTOCOL = "local";
+    
+    /**
+     * The plugin ID of the default AAS implementation.
+     */
+    public static final String DEFAULT_PLUGIN_ID = "aas-default";
     
     /**
      * A dummy AAS factory instance that intentionally does nothing. This is the default implementation,
@@ -273,18 +280,24 @@ public abstract class AasFactory {
      */
     public static AasFactory getInstance() {
         if (DUMMY == instance) {
-            Optional<AasFactoryDescriptor> first = ServiceLoaderUtils.filterExcluded(AasFactoryDescriptor.class);
-            if (first.isPresent()) {
-                instance = first.get().createInstance();
-                if (null != instance) {
-                    LOGGER.fine("AAS factory implementation registered: " + instance.getClass().getName());
-                }
-            } else {
-                if (!noInstanceWarningEmitted) {
-                    noInstanceWarningEmitted = true;
-                    LOGGER.warning("No AAS factory implementation known. This may be intended in a simple testing "
-                        + "setup where AAS operations are optional, but also a severe misconfiguration if this occurs "
-                        + "in the context of a full platform instance where AAS operations are mandatory.");
+            Plugin<AasFactory> plugin = PluginManager.getPlugin(DEFAULT_PLUGIN_ID, AasFactory.class);
+            if (null != plugin) {
+                instance = plugin.getInstance();
+            } 
+            if (DUMMY == instance || null == instance) {
+                Optional<AasFactoryDescriptor> first = ServiceLoaderUtils.filterExcluded(AasFactoryDescriptor.class);
+                if (first.isPresent()) {
+                    instance = first.get().createInstance();
+                    if (null != instance) {
+                        LOGGER.fine("AAS factory implementation registered: " + instance.getClass().getName());
+                    }
+                } else {
+                    if (!noInstanceWarningEmitted) {
+                        noInstanceWarningEmitted = true;
+                        LOGGER.warning("No AAS factory implementation known. This may be intended in a simple testing "
+                            + "setup where AAS operations are optional, but also a severe misconfiguration if this "
+                            + "occurs in the context of a full platform instance where AAS operations are mandatory.");
+                    }
                 }
             }
         }
