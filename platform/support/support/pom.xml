@@ -113,9 +113,10 @@
 	              <target>
 	                <jar destfile="target/pluginTest.jar">
 					    <fileset dir="target/test-classes"
-					             includes="test/**/plugins/*.class"/>
+					        includes="test/iip_ecosphere/platform/support/plugins/*.class"/>
                         <fileset dir="src/test/plugins/resources"/>
 	                </jar>
+	                <delete dir="target/test-classes/test/iip_ecosphere/platform/support/plugins"/>
 	              </target>
                 </configuration>
             </execution>

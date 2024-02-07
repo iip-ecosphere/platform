@@ -40,7 +40,29 @@ public class PluginManager {
     public static Plugin<?> getPlugin(String id) {
         return plugins.get(id);
     }
-    
+
+    /**
+     * Returns a specific plugin.
+     * 
+     * @param <T> the type of plugin to return
+     * @param id the unique id of the plugin
+     * @param cls the class the plugin shall be of
+     * 
+     * @return the plugin, may be <b>null</b> for none
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> Plugin<T> getPlugin(String id, Class<T> cls) {
+        Plugin<T> result = null;
+        Plugin<?> tmp = getPlugin(id);
+        if (cls.isAssignableFrom(tmp.getInstanceClass())) {
+            result = (Plugin<T>) tmp;
+        } else if (tmp != null) {
+            LoggerFactory.getLogger(PluginManager.class).warn(
+                "Plugin for id '{}' found, but not compatible with {}", id, cls);
+        }
+        return result;
+    }
+
     /**
      * Returns all known plugins.
      * 

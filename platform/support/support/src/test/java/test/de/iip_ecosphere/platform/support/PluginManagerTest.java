@@ -126,7 +126,13 @@ public class PluginManagerTest {
         Assert.assertNotNull(plServer);
         plServer.start();
         plServer.stop(false);
-        
+
+        Plugin<Server> plugin2 = PluginManager.getPlugin(id, Server.class); // must not reference class directly!
+        Assert.assertNotNull(plugin2);
+        plServer = plugin2.getInstance();
+        plServer.start();
+        plServer.stop(false);
+
         PluginManager.loadPlugins(); // nothing shall happen
         PluginManager.cleanup();
     }
