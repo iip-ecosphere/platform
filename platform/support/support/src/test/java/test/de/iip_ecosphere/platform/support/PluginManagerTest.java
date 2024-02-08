@@ -25,6 +25,7 @@ import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.plugins.Plugin;
 import de.iip_ecosphere.platform.support.plugins.PluginManager;
+import de.iip_ecosphere.platform.support.plugins.ResourceClasspathPluginSetupDescriptor;
 
 /**
  * Tests {@link PluginManager}.
@@ -32,6 +33,8 @@ import de.iip_ecosphere.platform.support.plugins.PluginManager;
  * @author Holger Eichelberger, SSE
  */
 public class PluginManagerTest {
+    
+    private static final String JAR = "target/pluginTest.jar";
     
     /**
      * Declares a configured plugin classpath.
@@ -45,7 +48,7 @@ public class PluginManagerTest {
          * Creates and configures the descriptor.
          */
         public MyPluginSetupDescriptor() {
-            super(toURLSafe(new File("target/pluginTest.jar"))); // built by Maven before testing
+            super(toURLSafe(new File(JAR))); // built by Maven before testing
         }
         
     }
@@ -107,6 +110,21 @@ public class PluginManagerTest {
         tmp = URLPluginSetupDescriptor.toURLSafe(testFile);
         Assert.assertNotNull(tmp);
         Assert.assertTrue(tmp.length == 1);
+    }
+    
+    /**
+     * Tests {@link ResourceClasspathPluginSetupDescriptor}.
+     */
+    @Test
+    public void testResourceClasspathPluginSetupDescriptor() {
+        String resourceName = "test-plugin.classpath";
+        URL[] url = ResourceClasspathPluginSetupDescriptor.loadResourceSafe(resourceName);
+        Assert.assertNotNull(url);
+        Assert.assertEquals(1, url.length);
+        Assert.assertTrue(url[0].toString().contains(JAR));
+
+        // the URL-based setup descriptor is used above, would lead to same result
+        new ResourceClasspathPluginSetupDescriptor(resourceName);
     }
 
     /**

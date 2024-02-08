@@ -20,7 +20,8 @@ import java.net.URLClassLoader;
 import org.slf4j.LoggerFactory;
 
 /**
- * Default URL-based plugin setup descriptor.
+ * Default URL-based plugin setup descriptor. Typically, a specific descriptor inherits from this class and sets
+ * up the required information in a constructor without arguments.
  * 
  * @author Holger Eichelberger, SSE
  */
