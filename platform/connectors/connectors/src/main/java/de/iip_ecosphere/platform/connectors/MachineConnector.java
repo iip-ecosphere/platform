@@ -88,6 +88,13 @@ public @interface MachineConnector {
      */
     public boolean requiresTypedAccess() default false;
     
+    /**
+     * List of specific setting names supported by the connector.
+     * 
+     * @return specific setting names
+     */
+    public String[] specificSettings() default {};
+    
     // on further properties, adjust ConnectorsAas/ConnectorsAasTest!
     
 }

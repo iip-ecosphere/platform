@@ -40,6 +40,8 @@ public class ConnectorParameterTest {
     public void testDefaultConnectorParameter() {
         ConnectorParameter params = ConnectorParameterBuilder
             .newBuilder("aaa", 1234)
+            .setSpecificSetting("XYZ", 1)
+            .setSpecificSetting("XY0", "1")
             .build();
         Assert.assertEquals("aaa", params.getHost());
         Assert.assertEquals(1234, params.getPort());
@@ -50,6 +52,14 @@ public class ConnectorParameterTest {
         Assert.assertEquals(ConnectorParameter.DEFAULT_KEEP_ALIVE, params.getKeepAlive());
         Assert.assertEquals(ConnectorParameter.DEFAULT_NOTIFICATION_INTERVAL, params.getNotificationInterval());
         Assert.assertNull(params.getIdentityToken(ConnectorParameter.ANY_ENDPOINT));
+        Assert.assertEquals(1, params.getSpecificSetting("XYZ"));
+        Assert.assertNull(params.getSpecificSetting("XY1"));
+        Assert.assertEquals("1", params.getSpecificStringSetting("XYZ"));
+        Assert.assertNull(params.getSpecificStringSetting("XY1"));
+        Assert.assertEquals(1, params.getSpecificIntSetting("XYZ").intValue());
+        Assert.assertEquals(1, params.getSpecificIntSetting("XY0").intValue());
+        Assert.assertNull(params.getSpecificIntSetting("XY1"));
+        params.setSpecificIntSetting("XY0", i -> Assert.assertEquals(1, i.intValue()));
     }
     
     /**

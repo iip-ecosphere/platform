@@ -12,7 +12,11 @@
 
 package de.iip_ecosphere.platform.connectors;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
+
+import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.ServerAddress;
@@ -72,6 +76,7 @@ public class ConnectorParameter {
     private boolean hostnameVerification = false;
     private CacheMode cacheMode = CacheMode.NONE;
     private NameplateSetup.Service service;
+    private Map<String, Object> specificSettings = new HashMap<>();
     
     /**
      * Builds a connector parameter object.
@@ -147,6 +152,8 @@ public class ConnectorParameter {
             builder.instance.hostnameVerification = params.hostnameVerification;
             builder.instance.cacheMode = params.cacheMode;
             builder.instance.service = params.service;
+            builder.instance.specificSettings.clear();
+            builder.instance.specificSettings.putAll(params.specificSettings);
             return builder;
         }
 
@@ -312,6 +319,18 @@ public class ConnectorParameter {
             if (null != cacheMode) {
                 instance.cacheMode = cacheMode;
             }
+            return this;
+        }
+        
+        /**
+         * Adds connector specific settings.
+         * 
+         * @param key the key of the setting as defined by the connect
+         * @param value the value of the setting
+         * @return <b>this</b> (builder style)
+         */
+        public ConnectorParameterBuilder setSpecificSetting(String key, Object value) {
+            instance.specificSettings.put(key, value);
             return this;
         }
 
@@ -513,5 +532,66 @@ public class ConnectorParameter {
     public NameplateSetup.Service getService() {
         return service;
     }
+    
+    /**
+     * Returns a connector specific setting.
+     * 
+     * @param key the key of the setting as defined by the connect
+     * @return the value, may be <b>null</b>
+     */
+    public Object getSpecificSetting(String key) {
+        return specificSettings.get(key);
+    }
+    
+    /**
+     * Returns a connector specific setting as String.
+     * 
+     * @param key the key of the setting as defined by the connect
+     * @return the value, may be <b>null</b>
+     */
+    public String getSpecificStringSetting(String key) {
+        String result = null;
+        Object setting = specificSettings.get(key);
+        if (null != setting) {
+            result = setting.toString();
+        }
+        return result;
+    }
+
+    /**
+     * Returns a connector specific setting as Integer.
+     * 
+     * @param key the key of the setting as defined by the connect
+     * @return the value, may be <b>null</b>
+     */
+    public Integer getSpecificIntSetting(String key) {
+        Integer result = null;
+        Object setting = specificSettings.get(key);
+        if (setting instanceof Integer) {
+            result = (Integer) setting;
+        } else if (setting != null) {
+            try {
+                result = Integer.valueOf(setting.toString());
+            } catch (NumberFormatException e) {
+                LoggerFactory.getLogger(ConnectorParameter.class).warn(
+                    "Value {} of specific setting {} is not an integer.", setting, key);
+            }
+        }
+        return result;
+    }
+    
+    /**
+     * Applies the connector specific setting in {@link key} if specified to {@code setter}.
+     *  
+     * @param key the key of the setting as defined by the connect
+     * @param setter the value setter
+     */
+    public void setSpecificIntSetting(String key, Consumer<Integer> setter) {
+        Integer value = getSpecificIntSetting(key);
+        if (null != value) {
+            setter.accept(value);
+        }
+    }
+    
 
 }
