@@ -137,6 +137,7 @@ public class AasPartRegistry {
         private AasMode mode = AasMode.REMOTE_DEPLOY;
         private String accessControlAllowOrigin = DeploymentRecipe.ANY_CORS_ORIGIN;
         private int aasStartupTimeout = 120000;
+        private String pluginId; // default of AasFactory
 
         /**
          * Default constructor.
@@ -342,12 +343,30 @@ public class AasPartRegistry {
         /**
          * Returns the access control to allow cross origin.
          * 
-         * @return  the information to be placed in the HTTP header field 
+         * @return the information to be placed in the HTTP header field 
          * "Access-Control-Allow-Origin"; the specific server or {@link DeploymentRecipe#ANY_CORS_ORIGIN}, 
          * may be <b>null</b> or empty
          */
         public String getAccessControlAllowOrigin() {
             return accessControlAllowOrigin;
+        }
+
+        /**
+         * Sets the plugin id of the AAS implementation. [Snakeyaml]
+         * 
+         * @param pluginId the plugin id of the AAS implementation
+         */
+        public void setPluginId(String pluginId) {
+            this.pluginId = pluginId;
+        }
+
+        /**
+         * Returns the plugin id of the AAS implementation.
+         * 
+         * @return the plugin id, by default <b>null</b> leading to the default id in {@link AasFactory}
+         */
+        public String getPluginId() {
+            return pluginId;
         }
 
         /**
@@ -428,6 +447,7 @@ public class AasPartRegistry {
     public static AasSetup setAasSetup(AasSetup aasSetup) {
         AasSetup old = aasSetup;
         setup = aasSetup;
+        AasFactory.setPluginId(setup.getPluginId());
         return old;
     }
     
