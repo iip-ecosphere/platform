@@ -37,12 +37,21 @@ import de.iip_ecosphere.platform.support.TimeUtils;
  * 
  * This implementation is potentially not thread-safe, i.e., it may require a sending queue.
  * 
- * @param <CO> the output type to the IIP-Ecosphere platform
- * @param <CI> the input type from the IIP-Ecosphere platform
+ * Accepts the following specific settings:
+ * <ul>
+ *   <li>BAUDRATE: Integer (default 9600)</li>
+ *   <li>DATABITS: Integer (default 8)</li>
+ *   <li>STOPBITS: Integer (default 1)</li>
+ *   <li>PARITY: "NO", "EVEN", "ODD", "MARK", "SPACE" (default "NO")</li>
+ * </ul>
+ * 
+ * @param <CO> the output type to the oktoflow platform
+ * @param <CI> the input type from the oktoflow platform
  * @author Holger Eichelberger, SSE
  */
 @MachineConnector(hasModel = false, supportsEvents = true, supportsHierarchicalQNames = false, 
-    supportsModelCalls = false, supportsModelProperties = false, supportsModelStructs = false)
+    supportsModelCalls = false, supportsModelProperties = false, supportsModelStructs = false,
+    specificSettings = {"BAUDRATE", "DATABITS", "STOPBITS", "PARITY"})
 public class JSerialCommConnector<CO, CI> extends AbstractChannelConnector<byte[], byte[], CO, CI> {
 
     public static final String NAME = "Serial";
@@ -133,6 +142,7 @@ public class JSerialCommConnector<CO, CI> extends AbstractChannelConnector<byte[
 
     }
     
+    
     @Override
     protected void connectImpl(ConnectorParameter params) throws IOException {
         try {
@@ -142,12 +152,37 @@ public class JSerialCommConnector<CO, CI> extends AbstractChannelConnector<byte[
             port.addDataListener(new Callback(portDescriptor));
             port.setFlowControl(SerialPort.FLOW_CONTROL_RTS_ENABLED);
             port.setComPortTimeouts(SerialPort.TIMEOUT_WRITE_BLOCKING, 500, 500);
+            params.setSpecificIntSetting("BAUDRATE", i -> port.setBaudRate(i));
+            params.setSpecificIntSetting("DATABITS", i -> port.setNumDataBits(i));
+            params.setSpecificIntSetting("STOPBITS", i -> port.setNumStopBits(i));
+            String parity = params.getSpecificStringSetting("PARITY");
+            if (null != parity && parity.length() > 0) {
+                switch (parity) {
+                case "NO":
+                    port.setParity(SerialPort.NO_PARITY);
+                    break;
+                case "EVEN":
+                    port.setParity(SerialPort.EVEN_PARITY);
+                    break;
+                case "ODD":
+                    port.setParity(SerialPort.ODD_PARITY);
+                    break;
+                case "MARK":
+                    port.setParity(SerialPort.MARK_PARITY);
+                    break;
+                case "SPACE":
+                    port.setParity(SerialPort.SPACE_PARITY);
+                    break;
+                default:
+                    LoggerFactory.getLogger(JSerialCommConnector.class).warn("Unsupported party value: {}" + parity);
+                    break;
+                }
+            }
             boolean connected = port.openPort();
             if (!connected) {
                 throw new IOException("Not connected to serial port: " + portDescriptor);
             }
             LoggerFactory.getLogger(getClass()).info("Connected to serial port: {}", portDescriptor);
-            // TODO set parameters
         } catch (SerialPortInvalidPortException e) {
             throw new IOException(e);
         }
