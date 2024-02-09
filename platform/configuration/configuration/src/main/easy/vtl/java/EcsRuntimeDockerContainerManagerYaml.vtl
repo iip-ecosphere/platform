@@ -22,6 +22,15 @@ template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, FileArtifact 
         }
     }
 
+    def produceAasPluginId(IIPEcosphere config) {
+        String aasPluginId = getStringValueSafe(config.aasPluginId, "");
+        if (aasPluginId <> "") {
+            'pluginId: "${aasPluginId}"'
+        } else {
+            ''
+        }
+    }
+
     def produceAasStartupTimeout(IIPEcosphere config) {
         Integer timeout = getIntegerValueSafe(config.aasStartupTimeout, 0);
         if (timeout > 0) {
@@ -66,7 +75,8 @@ template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, FileArtifact 
           ${serverHost(aasServer)|e}
           ${produceAasCors(config)|e}
           ${produceAasStartupTimeout(config)|e}
-          ${produceAasPersistence(aasPersistence)|e}'
+          ${produceAasPersistence(aasPersistence)|e}
+          ${produceAasPluginId(config)|e}'
     }
 
     def produceContainerMgr(ContainerManager containerManager) {

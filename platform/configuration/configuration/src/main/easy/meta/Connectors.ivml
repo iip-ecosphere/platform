@@ -349,6 +349,8 @@ project Connectors {
            String deviceServiceKey = "mqtt";
        }
    }
+   
+   enum SerialConnectorParity {NO, EVEN, ODD, MARK, SPACE};
 
    compound SerialConnector refines ChannelConnector { // fixed template types see JavaConnector.vtl
        assign (uiGroup = UiInvisibleGroup) to {
@@ -360,6 +362,10 @@ project Connectors {
            };
            Port port = 1;
            NonEmptyString host;
+           Integer baudRate;
+           Integer dataBits;
+           Integer stopBits;
+           SerialConnectorParity parity;
        }
        assign (uiGroup = UiMandatoryGroup1First) to {
            NonEmptyString portDescriptor;

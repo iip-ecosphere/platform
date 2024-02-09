@@ -32,6 +32,7 @@ project Aas {
     
     AasProtocol aasProtocol = AasProtocolVabTcp{}; // the global default protocol
     isDefined(aasProtocol);
+    String aasPluginId;
     
     enum AasSchema {HTTP, HTTPS, TCP};
     enum Persistency {INMEMORY, MONGO};

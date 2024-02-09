@@ -98,3 +98,7 @@ Connectors::SerialConnector::deviceServiceKey = Refined/predefined default OPC s
 Connectors::SerialConnector::nameplateInfo = Refined/predefined AAS nameplate information for connector AAS.
 Connectors::SerialConnector::host = Refined/predefined host name used as serial port descriptor.
 Connectors::SerialConnector::portDescriptor = The operating system specific name of the serial port to use.
+Connectors::SerialConnector::baudRate = The serial baud rate (default 9600).
+Connectors::SerialConnector::dataBits = The number of data bits (default 8).
+Connectors::SerialConnector::stopBits = The number of stop bits (default 1).
+Connectors::SerialConnector::parity = The parity error-detection scheme (default NO).

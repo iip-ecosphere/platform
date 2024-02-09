@@ -7,6 +7,10 @@ template JavaBasics(Configuration config, FileArtifact target) {
     def String asIdentifier(String s) {
         substNonIdCharacters(s);
     }
+
+    def String asPackageName(String s) {
+        substNonIdCharacters(s.replace("-", "_"));
+    }
     
     def String asMethodFieldIdentifier(String s) {
         substNonIdCharacters(s.replace(".", "_"));
@@ -44,97 +48,122 @@ template JavaBasics(Configuration config, FileArtifact target) {
         toTypeName(type.type);
     }
     
+    @DispatchBasis
     def String toTypeName(DataType type) {
         asTypeName(type.name);
     }
     
+    @DispatchCase
     def String toTypeName(PrimitiveType type) {
         type.name; // fallback
     }
+
+    @DispatchCase
+    def String toTypeName(AliasType type) {
+        toTypeName(type.represents);
+    }
     
+    @DispatchCase
     def String toTypeName(EnumType type) {
         asTypeName(type.name);
     }
 
+    @DispatchCase
     def String toTypeName(ShortTypeType type) {
         "short";
     }
     
+    @DispatchCase
     def String toTypeName(IntegerTypeType type) {
         "int";
     }
 
+    @DispatchCase
     def String toTypeName(LongTypeType type) {
         "long";
     }
     
+    @DispatchCase
     def String toTypeName(StringTypeType type) {
         "String";
     }
 
+    @DispatchCase
     def String toTypeName(BooleanTypeType type) {
         "boolean";
     }
 
+    @DispatchCase
     def String toTypeName(FloatTypeType type) {
         "float";
     }
 
+    @DispatchCase
     def String toTypeName(DoubleTypeType type) {
         "double";
     }
 
+    @DispatchCase
     def String toTypeName(ByteTypeType type) {
         "byte";
     }
 
+    @DispatchCase
     def String toTypeName(ObjectTypeType type) {
         "Object";
     }
     
-    // Start - Added types OPC UA - by Ahmad
+    @DispatchCase
 	def String toTypeName(Integer16TypeType type) {
         "short";
     }
     
+    @DispatchCase
     def String toTypeName(Integer32TypeType type) {
         "int";
     }
     
+    @DispatchCase
     def String toTypeName(Integer64TypeType type) {
         "long";
     }
     
+    @DispatchCase
     def String toTypeName(SByteTypeType type) {
         "byte";
     }
     
+    @DispatchCase
     def String toTypeName(UnsignedInteger16TypeType type) {
         "short";
     }
 
+    @DispatchCase
     def String toTypeName(UnsignedInteger32TypeType type) {
         "int";
     }
     
+    @DispatchCase
     def String toTypeName(UnsignedInteger64TypeType type) {
         "long";
     }
     
-    //NOT READY!! might need convertion to byte array com.google.protobuf.ByteString
+    @DispatchCase
     def String toTypeName(ByteStringTypeType type) {
         "byte[]";
     }
     
+    @DispatchCase
     def String toTypeName(DateTimeTypeType type) {
         "java.time.LocalDateTime";
     }
-	// End - Added types OPC UA - by Ahmad
 	
+    @DispatchCase
     def String toTypeName(ArrayType type) {
         toTypeName(type.type) + "[]";
     } // implies ByteArrayTypeType, IntegerArrayTypeType, DoubleArrayTypeType, StringArrayTypeType
 
+    @DispatchCase
     def String toTypeName(IEC61131_3DateTimeTypeType type) {
         "java.util.Date";
     }

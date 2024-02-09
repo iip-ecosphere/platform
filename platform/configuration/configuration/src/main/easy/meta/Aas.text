@@ -35,3 +35,4 @@ Aas::AasProtocolVabTcp::schema = Refined protocol schema of AAS implementation p
 Aas::AasProtocolVabHttp::schema = Refined protocol schema of AAS implementation protocol (HTTPS)
 Aas::AasProtocolDefault::schema = Refined protocol schema of AAS implementation protocol (TCP)
 Aas::aasProtocol = The global AAS implementation protocol.
+Aas::aasPluginId = The AAS implementation plugin id. If not set, use the platform default.

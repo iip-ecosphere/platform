@@ -783,6 +783,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
                 .setNotificationInterval(${conn.samplingPeriod})
                 ${generateEndpointPath(conn)|e}
                 ${generateConnectorParamSecuritySettings(conn)|e}
+                ${generateSpecificSettings(conn)|e}
                 .build();
         }'
     }
@@ -820,4 +821,30 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         }
     }
 
+    @DispatchBasis
+    def generateSpecificSettings(Connector conn) {
+        ''
+    }
+    
+    @DispatchCase
+    def generateSpecificSettings(SerialConnector conn) {
+        Integer baudRate = getIntegerValueSafe(conn.baudRate, -1);
+        if (baudRate > 0) {
+            '.setSpecificSetting("BAUDRATE", ${baudRate})'
+        }
+        Integer dataBits = getIntegerValueSafe(conn.dataBits, -1);
+        if (dataBits > 0) {
+            '.setSpecificSetting("DATABITS", ${dataBits})'
+        }
+        Integer stopBits = getIntegerValueSafe(conn.stopBits, -1);
+        if (stopBits > 0) {
+            '.setSpecificSetting("STOPBITS", ${stopBits})'
+        }
+        String parity = getStringValueSafe(conn.parity, "");
+        if (parity <> "") {
+            '.setSpecificSetting("PARITY", ${parity})'
+        }
+        
+    }
+    
 }

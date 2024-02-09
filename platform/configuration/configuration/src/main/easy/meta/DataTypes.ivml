@@ -45,6 +45,10 @@ project DataTypes {
         NonEmptyNameString name;
     }
     
+    compound AliasType refines DataType {
+        refTo(DataType) represents;
+    }
+    
     // allow for unique selection on UI, not necessarily needed for code generation
     Constraint dataTypeNamesUnique = allInstances(DataType)->isUnique(t|t.name); 
 

@@ -68,3 +68,4 @@ DataTypes::UiMandatoryGroup1First = UI hint for mandatory settings in primary gr
 DataTypes::UiMandatoryGroup2 = UI hint for mandatory settings in secondary group.
 DataTypes::UiOptionalGroup1 = UI hint for optional settings in primary group.
 DataTypes::UiOptionalGroup2 = UI hint for optional settings in secondary group.
+DataTypes::AliasType::represents = The underlying type this alias represents.
