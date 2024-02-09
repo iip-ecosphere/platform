@@ -107,6 +107,8 @@ public class AasTest {
      */
     public static Server createOperationsServer(int port, TestMachine machine, String protocol, 
         KeyStoreDescriptor kstore) {
+        AasFactory.setPluginId("unknown"); // forth and back that it has been called once
+        AasFactory.setPluginId(AasFactory.DEFAULT_PLUGIN_ID);
         AasFactory factory = AasFactory.getInstance();
         ProtocolServerBuilder builder = factory.createProtocolServerBuilder(protocol, port, kstore);
         builder.defineProperty(NAME_VAR_LOTSIZE, () -> {

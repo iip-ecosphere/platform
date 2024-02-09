@@ -221,6 +221,7 @@ public abstract class AasFactory {
     private static final Logger LOGGER = Logger.getLogger(AasFactory.class.getName());
     // instance-based to allow later dependency injection
     private static AasFactory instance = DUMMY;
+    private static String pluginId = DEFAULT_PLUGIN_ID;
     private static boolean noInstanceWarningEmitted = false;
     
     private Map<String, ProtocolCreator> protocolCreators = new HashMap<>();
@@ -274,13 +275,25 @@ public abstract class AasFactory {
     }
     
     /**
+     * Sets the id of the plugin to load as AAS implementation. By default, {@link #DEFAULT_PLUGIN_ID}.
+     * 
+     * @param id the id, ignored if <b>null</b> or empty
+     */
+    public static void setPluginId(String id) {
+        if (id != null && id.length() > 0 && !id.equals(pluginId)) {
+            pluginId = id;
+            instance = DUMMY; // reset for getInstance()
+        }
+    }
+    
+    /**
      * Returns the actual instance.
      * 
      * @return the actual instance
      */
     public static AasFactory getInstance() {
         if (DUMMY == instance) {
-            Plugin<AasFactory> plugin = PluginManager.getPlugin(DEFAULT_PLUGIN_ID, AasFactory.class);
+            Plugin<AasFactory> plugin = PluginManager.getPlugin(pluginId, AasFactory.class);
             if (null != plugin) {
                 instance = plugin.getInstance();
             } 
