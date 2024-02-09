@@ -1,7 +1,7 @@
 # oktoflow platform examples: KODEX
 
 This example aims at running the anonymizer/pseudonymizer KODEX as part of an oktoflow pipeline. The example consists of several pieces:
-  * An IVML configuration for the application in `src/main/easy/ExampleKODEX.ivml`.
+  * An IVML configuration for the application in `src/main/easy`.
   * An implementation of the Java services used in the application in `src/main/java`
   * `pom.xml` for the application itself. 
   
