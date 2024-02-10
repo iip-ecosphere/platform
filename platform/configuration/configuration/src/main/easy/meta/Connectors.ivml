@@ -1,7 +1,6 @@
 project Connectors {
 
     import OpcUaDataTypes;
-    import AASDataTypes;
     import Transport;
     import Services;
     import ServerPart*;
