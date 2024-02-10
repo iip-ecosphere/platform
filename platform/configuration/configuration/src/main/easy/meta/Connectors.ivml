@@ -1,6 +1,7 @@
 project Connectors {
 
     import OpcUaDataTypes;
+    import AASDataTypes;
     import Transport;
     import Services;
     import ServerPart*;
@@ -9,6 +10,7 @@ project Connectors {
     
     annotate BindingTime bindingTime = BindingTime::compile to .;
     annotate Integer uiGroup = UiMandatoryGroup1 to .;
+    annotate String displayName = "" to .;
 
     enum TextEncoding{ANSI, ASCII, UTF8};
     
@@ -50,7 +52,7 @@ project Connectors {
     // represents parser.TestLineParser
     // reads text line and splits according to separator, serves also for TSV, CSV
     compound TextLineParser refines GenericMachineParser {
-        NonEmptyString separator;
+        String separator;
     }
 
     compound JsonParser refines GenericMachineParser {
@@ -75,7 +77,7 @@ project Connectors {
     // represents formatter.TestLineFormatter
     // composes text lines using separator, serves also for TSV, CSV
     compound TextLineFormatter refines GenericMachineFormatter {
-        NonEmptyString separator;
+        String separator;
     }
 
     compound JsonFormatter refines GenericMachineFormatter {
@@ -265,6 +267,8 @@ project Connectors {
        }
        
        Constraint noModelCallOperation = collectOperations(operations)->selectByKind(ModelCallOperation).isEmpty();
+       Constraint mustHaveParser = machineParser <> null;
+       Constraint mustHaveFormatter = machineFormatter <> null;
    }
    
    compound OpcUaV1Connector refines Connector { // fixed template types see JavaConnector.vtl
@@ -356,25 +360,25 @@ project Connectors {
        assign (uiGroup = UiInvisibleGroup) to {
            String class = "de.oktoflow.platform.connectors.serial.JSerialCommConnector";
            String artifact ="de.iip-ecosphere.platform:connectors.serial:";
+           String inChannel = "in"; // not needed, fix
+           String outChannel = "out"; // not needed, fix
+           setOf(String) outChannels; // not needed, hide
            NameplateInfo nameplateInfo = {
               manufacturerProductDesignation = "Generic serial connector@en",
               manufacturer = refBy(manufacturer_sse)
            };
            Port port = 1;
+       }
+       assign (displayName = "portDescriptor") to {
            NonEmptyString host;
-           Integer baudRate;
-           Integer dataBits;
-           Integer stopBits;
-           SerialConnectorParity parity;
        }
-       assign (uiGroup = UiMandatoryGroup1First) to {
-           NonEmptyString portDescriptor;
-       }
+       PositiveInteger baudRate;
+       PositiveInteger dataBits;
+       PositiveInteger stopBits;
+       SerialConnectorParity parity;
        assign (uiGroup = UiOptionalGroup2) to {
            String deviceServiceKey = "serial";
        }
-       
-       Constraint hostEqPortDesc = host == portDescriptor;
    }
     
 }
