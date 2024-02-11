@@ -47,5 +47,23 @@ public interface EventHandlingConnector {
      * @param query specification what to ingest; capabilities depend on connector
      */
     public void trigger(ConnectorTriggerQuery query);
+    
+    /**
+     * Sets intermediate information that can be read out by while transforming results
+     * by configured transformation functions.
+     * 
+     * @param key the key of the value to set
+     * @param value the actual value
+     */
+    public void setStorageValue(String key, Object value);
+
+    /**
+     * Returns intermediate information that may be useful while transforming the results 
+     * by configured transformation functions.
+     * 
+     * @param key the key of the value to set
+     * @return the value, may be <b>null</b>
+     */
+    public Object getStorageValue(String key);
 
 }

@@ -13,6 +13,8 @@
 package de.iip_ecosphere.platform.connectors;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -57,6 +59,7 @@ public abstract class AbstractConnector<O, I, CO, CI> implements Connector<O, I,
     private ConnectorParameter params;
     private boolean enablePolling = true; // enable by default
     private CachingStrategy cachingStrategy;
+    private Map<String, Object> storage;
 
     /**
      * Creates an instance and installs the protocol adapter(s) with a default
@@ -511,6 +514,21 @@ public abstract class AbstractConnector<O, I, CO, CI> implements Connector<O, I,
 
     @Override
     public void notifyReconfigured(String parameterName, String value) {
+    }
+    
+    @Override
+    public void setStorageValue(String key, Object value) {
+        if (null != key) {
+            if (null == storage) {
+                storage = new HashMap<>();
+            }
+            storage.put(key, value);
+        }
+    }
+    
+    @Override
+    public Object getStorageValue(String key) {
+        return null == storage || null == key ? null : storage.get(key);
     }
 
 }
