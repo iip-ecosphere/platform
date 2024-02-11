@@ -1,6 +1,7 @@
 project Connectors {
 
     import OpcUaDataTypes;
+    import AASDataTypes;
     import Transport;
     import Services;
     import ServerPart*;
@@ -245,7 +246,7 @@ project Connectors {
        }
        Constraint connectorOutputSize = fwdTypes(output).size() < 2;
        Constraint connectorInputSize = fwdTypes(input).size() < 2;
-       Constraint connectorKind = kind == ServiceKind.SOURCE_SERVICE or kind == ServiceKind.SINK_SERVICE;
+       Constraint connectorKind = kind <> ServiceKind.PROBE_SERVICE;
        Constraint connectorDeployability = deployable == true;
        Constraint inInterfaceOk = isDefined(inInterface) and inInterface <> null;
        Constraint outInterfaceOk = isDefined(outInterface) and outInterface <> null;

@@ -357,6 +357,11 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
         String expr = '${fallbackToNull(proc, "service.${methodName}(data)", false)}';
         'return data -> ${genRcvProbe(base, expr, type, "data")};'
     }
+    
+    def generateAsyncProcessorBody(MeshElement proc, Connector conn, String methodSuffix, String methodSuffixWithServiceId, String type) {
+        String expr = '${fallbackToNull(proc, "service.send(data)", false)}';
+        'return data -> ${genRcvProbe(conn, expr, type, "data")};'
+    }
 
     // called via MeshBasics.generateDataMethods for synch MeshProcessor
     def generateSyncProcessorMethod(MeshProcessor proc, String inType, String outType, String methodSuffix, String methodSuffixWithServiceId) {
@@ -383,6 +388,10 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
             methodName = methodSuffix;
         }
         'return data -> ${fallbackToNull(proc, "service.${methodName}(data)", true)};'
+    }
+
+    def generateSyncProcessorBody(MeshProcessor proc, Connector conn, String methodSuffix, String methodSuffixWithServiceId, String inType, String outType) {
+        'return data -> ${fallbackToNull(proc, "service.send(data)", true)};'
     }
     
     // called via MeshBasics.generateDataMethods for MeshSink

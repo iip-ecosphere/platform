@@ -1,0 +1,92 @@
+project AASDataTypes {
+
+    import DataTypes;
+
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+
+    typedef LangString String;
+    
+    compound AasLangStringTypeType refines StringTypeType {
+    }
+    AliasType AasLangStringType = {
+        name = "AasLangString",
+        represents = refBy(StringType)
+    };
+
+    compound AasReferenceTypeType refines PrimitiveType {
+    }
+    AliasType AasReferenceType = {
+        name = "AasReference",
+        represents = refBy(StringType)
+    };
+
+    AliasType AasFileResourceType = {
+        name = "FileResource",
+        represents = refBy(StringType)
+    };
+    
+    compound AasMultiLangStringTypeType refines AliasType {
+    }
+    
+    AasMultiLangStringTypeType AasMultiLangStringType = {
+    	name = "LangStrings",
+        represents = refBy(StringType)
+    };
+
+    compound AasEnumLiteral refines EnumLiteral {
+        String semanticId;
+        String value;
+        String identifier;
+    }
+    
+    compound AasEnumType refines EnumType {
+        sequenceOf(AasEnumLiteral) literals;
+        String description;
+        String versionIdentifier;
+    }
+
+    typedef AasFields sequenceOf(AasField) with (AasFields->collect(f|f.name).hasDuplicates() == false);
+
+    compound AasSubmodelType refines RecordType {
+        String semanticId;
+        String description;
+        AasFields fields;
+        String versionIdentifier;
+    }
+    
+    compound AasSubmodelElementCollectionType refines RecordType {
+        String semanticId;
+        String description;
+        AasFields fields;
+        Boolean ordered = false;
+        Boolean allowDuplicates = false;
+        String versionIdentifier;
+    }
+    
+    // for now, unclear
+    /*AasSubmodelElementCollectionType AasGenericSubmodelElementCollection {
+    };*/
+    
+    compound AasEntityType refines RecordType {
+        String semanticId;
+        AasFields fields;
+    }
+    
+    compound AasField refines Field {
+        String semanticId;
+        String description;
+        String groupWith = null;
+        Boolean counting = false;
+        Boolean countInstanceOnValue = false;
+        Integer minimumInstances = -1;
+        Integer maximumInstances = -1;
+        setOf(String) examples;
+    }
+    
+
+    // freeze all primitives
+    freeze {
+    	.;
+    };
+    
+}
