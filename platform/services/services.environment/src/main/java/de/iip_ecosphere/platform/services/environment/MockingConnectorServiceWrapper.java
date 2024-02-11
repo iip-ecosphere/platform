@@ -16,6 +16,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Supplier;
 
@@ -59,6 +61,7 @@ public class MockingConnectorServiceWrapper<O, I, CO, CI> extends ConnectorServi
     private CachingStrategy cachingStrategy;
     private IOIterator<? extends CO> triggerIterator;
     private DataRecorder recorder;    
+    private Map<String, Object> storage;
     
     /**
      * Creates a service wrapper instance.
@@ -358,6 +361,21 @@ public class MockingConnectorServiceWrapper<O, I, CO, CI> extends ConnectorServi
     @Override
     public void trigger(ConnectorTriggerQuery query) {
         trigger(); // preliminary, ignore query, take data from file
+    }
+
+    @Override
+    public void setStorageValue(String key, Object value) {
+        if (null != key) {
+            if (null == storage) {
+                storage = new HashMap<>();
+            }
+            storage.put(key, value);
+        }
+    }
+
+    @Override
+    public Object getStorageValue(String key) {
+        return null == storage || null == key ? null : storage.get(key);
     }
         
 }
