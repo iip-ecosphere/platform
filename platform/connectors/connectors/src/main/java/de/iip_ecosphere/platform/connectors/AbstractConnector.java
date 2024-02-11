@@ -530,5 +530,10 @@ public abstract class AbstractConnector<O, I, CO, CI> implements Connector<O, I,
     public Object getStorageValue(String key) {
         return null == storage || null == key ? null : storage.get(key);
     }
+    
+    @Override
+    public void dispose() {
+        storage = null;
+    }
 
 }

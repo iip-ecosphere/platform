@@ -13,6 +13,8 @@ package de.iip_ecosphere.platform.connectors;
 
 import java.io.IOException;
 
+import org.slf4j.LoggerFactory;
+
 import de.iip_ecosphere.platform.connectors.events.EventHandlingConnector;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 
@@ -75,6 +77,17 @@ public interface Connector <O, I, CO, CI> extends EventHandlingConnector {
      * @throws IOException in case that connecting fails
      */
     public void disconnect() throws IOException;
+    
+    /**
+     * Disconnects the connector from the underlying machine/platform. Logs exceptions was warning.
+     */
+    public default void disconnectSafe() {
+        try {
+            disconnect();
+        } catch (IOException e) {
+            LoggerFactory.getLogger(getClass()).warn("While disconnecting: {}", e.getMessage());
+        }
+    }
     
     /**
      * Final cleanup when platform shuts down, e.g., for shared resources.

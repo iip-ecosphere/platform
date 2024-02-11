@@ -485,7 +485,13 @@ public class ConnectorTest {
         Assert.assertNotNull("nothing received", received);
         Assert.assertEquals(inData.getCommand(), received.getCommand());
         assertInstance(instance, true);
-        instance.disconnect();
+        
+        instance.setStorageValue(null, "xyz"); // shall survive
+        instance.setStorageValue("MyData", "xyz");
+        Assert.assertNull(instance.getStorageValue(null)); // shall survive
+        Assert.assertEquals("xyz", instance.getStorageValue("MyData"));
+        
+        instance.disconnectSafe();
         assertInstance(instance, false);
         instance.dispose();
     }
