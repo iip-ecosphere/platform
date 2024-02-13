@@ -383,5 +383,25 @@ template JavaBasics(Configuration config, FileArtifact target) {
     def getPath(IOTypeWithPath type) {
         type.path;
     }
+    
+    /**
+     * Turns a qualified (package) plugin name into a class name.
+     */
+    def pluginToClassName(String plugin) {
+        String result = "";
+        boolean nextUpper = true;
+        for (String c: plugin.characters()) {
+            if (c=="." or c ==":") {
+                nextUpper = true;
+            } else {
+                if (nextUpper) {
+                    c = c.firstToUpper();
+                    nextUpper = false;
+                }
+                result = result + c;
+             }
+        }
+        asIdentifier(result);
+    }    
 
 }

@@ -1,3 +1,6 @@
+import Basics;
+import JavaBasics;
+
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
 template MavenBasics(Configuration config, FileArtifact target) {
@@ -295,12 +298,13 @@ template MavenBasics(Configuration config, FileArtifact target) {
     def XmlElement appendMavenDependencyPluginBuildClasspathExecution(XmlElement execs, String id="build-classpath", 
         String phase="prepare-package", String outputFile="\\${project.build.directory}/classes/classpath", 
         Boolean prependGroupId=true, String prefix="", String fileSeparator="", String pathSeparator="", 
-        String includeScope="", String prepend="") {
+        String includeScope="", String prepend="", String goal="build-classpath", String baseFile="", 
+        String includeArtifactIds="", String excludeArtifactIds="", String rootCoordinates="") {
         
         XmlElement exec = new XmlElement(execs, "execution");
         new XmlElement(exec, "id", id);
         new XmlElement(exec, "phase", phase);
-        appendGoal(exec, "build-classpath");
+        appendGoal(exec, goal);
         XmlElement config = appendConfiguration(exec);
         new XmlElement(config, "outputFile", outputFile);
         new XmlElement(config, "prependGroupId", "${prependGroupId}");
@@ -322,18 +326,47 @@ template MavenBasics(Configuration config, FileArtifact target) {
             XmlElement prep = new XmlElement(config, "prepends");
             new XmlElement(prep, "prepend", "${prepend}");
         }
+        if (baseFile.length() > 0) {
+            new XmlElement(config, "baseFile", "${baseFile}");
+        }
+        if (includeArtifactIds.length() > 0) {
+            new XmlElement(config, "includeArtifactIds", "${includeArtifactIds}");
+        }
+        if (excludeArtifactIds.length() > 0) {
+            new XmlElement(config, "excludeArtifactIds", "${excludeArtifactIds}");
+        }
+        if (rootCoordinates.length() > 0) {
+            new XmlElement(config, "rootCoordinates", "${rootCoordinates}");
+        }
         exec;
     }
     
-    def appendWinLinuxDependencyPluginBuildClasspathExecution(XmlElement execs, String folder, String ownArtifact="") {
+    def appendWinLinuxDependencyPluginBuildClasspathExecution(XmlElement execs, String folder, String ownArtifact="", sequenceOf(String) plugins={}) {
+        String exclude = "";
+        for (String plugin: plugins) {
+            exclude = appendWithSeparator(exclude, ",", "${plugin}"); // "${}" easy resolution bug 
+        }
+        // TODO add excludeElementsId
         appendMavenDependencyPluginBuildClasspathExecution(execs, outputFile="../${folder}/classpath.win", 
             prependGroupId=true, prefix=folder, fileSeparator="\\", pathSeparator=";", includeScope="runtime", 
             id="build-classpath-win", prepend="${folder}\\" + "${ownArtifact}.jar"); 
         appendMavenDependencyPluginBuildClasspathExecution(execs, outputFile="../${folder}/classpath.ux", 
             prependGroupId=true, prefix=folder, fileSeparator="/", pathSeparator=":", includeScope="runtime", 
             id="build-classpath-ux", prepend="${folder}/${ownArtifact}.jar"); 
+        for (String plugin: plugins) {
+            String clsName = pluginToClassName("${plugin}");
+            String artifactId = "${plugin}";
+            /*sequenceOf(String) artList = artifactId.split(":");
+            if (artList.size() == 3) {
+                artifactId = artList[1];
+            }*/
+            appendMavenDependencyPluginBuildClasspathExecution(execs, outputFile="src/main/resources/${clsName}.plugin", 
+                prependGroupId=true, prefix=folder, fileSeparator="/", pathSeparator=":", includeScope="runtime", 
+                id="build-plugin-classpath-${clsName}", goal="diff-classpath", 
+                rootCoordinates=artifactId, baseFile="../${folder}/classpath.win"); 
+        }
     }
-    
+
     // ------------------------------------------- maven shade plugin --------------------------------------------
 
     def XmlElement appendMavenShadePlugin(XmlElement plugins, String ver="2.3", String mainClass="") {

@@ -2210,6 +2210,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         platformRoot.mkdir();
         p = "${platformRoot}/src/main/resources";
         p.mkdir();
+        generatePlugins(cfg, platformRoot);
         vilTemplateProcessor("PlatformYaml", config, "${p}/iipecosphere.yml", modelName=getName(config));
         vilTemplateProcessor("JavaYamlTest", config, "${platformRoot}/src/test/java/test/iip/AllTests.java", pkg="test.iip", fqnCls="de.iip_ecosphere.platform.platform.PlatformSetup", cfgFile="src/main/resources/iipecosphere.yml");
         vilTemplateProcessor("JavaLogbackXml", config, "${p}/logback.xml");
@@ -2263,6 +2264,15 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
             generatePlatformContainers(config, target);
         }
     }
+    
+    generatePlugins(IIPEcosphere cfg, Path componentRoot)= {
+        for (String plugin: getPlugins(cfg)) {
+            String pl = "${plugin}";
+            String clsName = pluginToClassName(pl);
+            vilTemplateProcessor("JavaPluginSetupDescriptor", config, "${componentRoot}/src/main/java/de/oktoflow/plugins/${clsName}PluginSetupDescriptor.java", plugin=pl, pkg="de.oktoflow.plugins");
+            // TODO plugin JSLs
+        }
+    }    
     
     generateBrokerScripts(Configuration config, TransportProtocol protocol) = {
         vilTemplateProcessor("NoBroker", config, "${brokerRoot}/README.txt");
