@@ -57,6 +57,11 @@ The ``build-classpath`` goal is the same as in the original plugin and allows fo
 - `prepends` is a list of `prepend` string entries specifying complete classpath entries to be prepended to the `outputFile` concatenated by `pathSeparator`
 - `appends` is a list of `append` string entries specifying  complete classpath entries to be prepended to the `outputFile` concatenated by `pathSeparator`
 
+## diff-classpath goal
+
+The ``diff-classpath`` goal based on the original plugin and for diffing actual project dependencies against some container root dependencies, i.e., deliver the specific dependency tree.
+- `rootCoordinates` comma separated list of root dependencies to diff against.
+
 ## copy goal
 
 The ``copy`` goal is the same as in the original plugin and included here just for convenience.
