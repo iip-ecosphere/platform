@@ -458,7 +458,7 @@ public class Tools {
     }
     
     /**
-     * Transfprms the given descriptions.
+     * Transforms the given descriptions.
      * 
      * @param description the description(s) as language string(s)
      * @return the translated BaSyx instance

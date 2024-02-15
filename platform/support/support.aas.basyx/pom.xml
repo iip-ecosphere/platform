@@ -186,4 +186,51 @@
       </exclusions>
     </dependency>
   </dependencies>
+  
+  <build>
+      <plugins>
+         <plugin>
+             <groupId>de.iip-ecosphere.platform</groupId>
+             <artifactId>dependency-plugin</artifactId>
+             <version>${project.version}</version>
+             <executions>
+                 <execution>
+                     <id>copy-dependencies</id>
+                     <goals>
+                         <goal>copy-dependencies</goal>
+                     </goals>
+                     <phase>package</phase>
+                     <configuration>
+                         <prependGroupId>true</prependGroupId>
+                         <outputDirectory>target/jars</outputDirectory>
+                         <overWriteReleases>false</overWriteReleases>
+                         <overWriteSnapshots>true</overWriteSnapshots>
+                         <overWriteIfNewer>true</overWriteIfNewer>
+                     </configuration>
+                 </execution>
+                 <execution>
+                     <id>build-classpath-plugin</id>
+                     <phase>prepare-package</phase>
+                     <goals>
+                         <goal>build-classpath</goal>
+                     </goals>
+                     <configuration>
+                         <outputFile>target/classes/classpath</outputFile>
+                         <prependGroupId>true</prependGroupId>
+                         <overWriteIfNewer>true</overWriteIfNewer>
+                         <localRepoProperty>target/jars</localRepoProperty>
+                         <prefix>target/jars</prefix>
+                         <fileSeparator>/</fileSeparator>
+                         <pathSeparator>:</pathSeparator>
+                         <includeScope>runtime</includeScope>
+                         <prepends>
+                             <prepend>target\${project.artifactId}-${project.version}.jar</prepend>
+                         </prepends>
+                     </configuration>
+                 </execution>
+             </executions>
+         </plugin>
+      </plugins>
+  </build>
+  
 </project>
