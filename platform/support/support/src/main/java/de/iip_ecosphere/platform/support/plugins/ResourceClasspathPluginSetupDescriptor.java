@@ -46,7 +46,7 @@ public class ResourceClasspathPluginSetupDescriptor extends URLPluginSetupDescri
     }
 
     /**
-     * Loads a resource in classpath format and returns the specified classpath entires as URLs. Logs errors and 
+     * Loads a resource in classpath format and returns the specified classpath entries as URLs. Logs errors and 
      * exceptions.
      * 
      * @param resourceName the name of the resource

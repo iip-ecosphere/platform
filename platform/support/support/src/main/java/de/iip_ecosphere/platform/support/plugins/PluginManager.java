@@ -103,6 +103,18 @@ public class PluginManager {
             .stream(ServiceLoader.load(PluginSetupDescriptor.class))
             .forEach(d -> registerPlugin(d, onlyNew));
     }
+    
+    /**
+     * Explicitly registers the given plugin (setup) descriptor. Obtains the class loader
+     * of the descriptor and loads the known {@link PluginDescriptor plugin descriptors}.
+     * 
+     * @param desc the plugin setup descriptor
+     * @see #registerPlugin(PluginSetupDescriptor, boolean)
+     * @see #registerPlugin(PluginDescriptor, boolean)
+     */
+    public static void registerPlugin(PluginSetupDescriptor desc) {
+        registerPlugin(desc, false);
+    }
 
     /**
      * Registers the given plugin (setup) descriptor. Obtains the class loader
