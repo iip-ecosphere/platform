@@ -122,7 +122,6 @@ import de.iip_ecosphere.platform.support.identities.IdentityToken.TokenType;
  * 
  * @param <CO> the output type to the IIP-Ecosphere platform
  * @param <CI> the input type from the IIP-Ecosphere platform
- * 
  * @author Holger Eichelberger, SSE
  * @author Jan Cepok, SSE
  */
@@ -600,6 +599,7 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
     /**
      * Specialized model output converter.
      * 
+     * @author Holger Eichelberger, SSE
      * @author Jan Cepok, SSE
      */
     private static class OpcOutputConverter extends ModelOutputConverter {
@@ -608,22 +608,22 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
         public Object fromLocalDateTime(LocalDateTime data, String format) throws IOException {
             return new DateTime((Date) fromDate(FormatCache.toDate(data), format));
         }
-        
+
         @Override
         public Object fromLong(long data) throws IOException {
             return ULong.valueOf(data);
         }
-        
+
         @Override
         public Object fromByte(byte data) throws IOException {
             return UByte.valueOf(data);
         }
-        
+
         @Override
         public Object fromShort(short data) throws IOException {
             return UShort.valueOf(data);
-        }        
-        
+        }
+
     }
     
     /**
@@ -707,7 +707,7 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
                     String nodeName = qName.substring(0, pos);
                     UaNode node = retrieveCacheEntry(nodeName).node;
                     String methodName = qName.substring(pos + 1);
-                    UaNode methodNode = retrieveNode(node, methodName);
+                    UaNode methodNode = retrieveNode(node, methodName, methodName);
                     if (null == methodNode) {
                         throw new IOException("Method " + methodName + " does not exist on " + nodeName);
                     }
@@ -799,26 +799,26 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
          */
         private NodeCacheEntry retrieveCacheEntry(String qName) throws UaException, IOException {
             NodeCacheEntry cached = nodes.get(qName);
-            int pos = qName.indexOf(",");
-            if (pos == 0) {            
+            boolean isNodeId = qName.contains(",");
+            if (!isNodeId) {
                 if (null == cached && basePath.length() > 0) {
                     cached = nodes.get(basePath + "/" + qName);
                 }
             }
             if (null == cached) {
                 UaNode result = null;
-                if (pos > 0) {
-                    result = retrieveNode(null == base ? null : base.node, qName);
-                } else if (qName.contains("/")) {                
-                    result = retrieveNode(null == base ? null : base.node, qName);
+                if (isNodeId) {
+                    result = retrieveNode(qName);
+                } else if (qName.contains("/")) {
+                    result = retrieveNode(null == base ? null : base.node, qName, qName);
                 } else {
                     result = retrieveNode(null == base ? null : base.node, qName, basePath + "/" + qName);
                 }
+
                 if (null == result) {
                     throw new IOException("No node found for " + qName);
                 } else {
                     cached = new NodeCacheEntry(result);
-                    nodes.put(qName, cached);
                 }
             }
             return cached;
@@ -827,12 +827,11 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
         /**
          * Retrieves a node starting at {@code current} recursively following the path given by {@code qName}.
          * 
-         * @param current the current node to start searching for, may be <b>null</b> for top-level
          * @param qName the qualified node name
          * @return the node or <b>null</b> for none found
          * @throws UaException if accessing/browsing the OPC UA model fails
          */
-        private UaNode retrieveNode(UaNode current, String qName) throws UaException {
+        private UaNode retrieveNode(String qName) throws UaException {
             UaNode result = null;
             int pos = qName.indexOf(",");
             if (pos > 0) {
@@ -852,48 +851,17 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
                         }
                     }
                 }
-            } else {            
-                pos = qName.indexOf(SEPARATOR_CHAR);
-                String nodeName;
-                String remainder = null;
-                if (pos > 0) {
-                    nodeName = qName.substring(0, pos);
-                    if (pos + 1 < qName.length()) {
-                        remainder = qName.substring(pos + 1);
-                    }
-                } else {
-                    nodeName = qName;
-                }
-                List<? extends UaNode> nodes;
-                if (null == current) {
-                    nodes = client.getAddressSpace().browseNodes(Identifiers.RootFolder);
-                } else {
-                    nodes = current.browseNodes(); // sync for now
-                }
-                for (int n = 0; null == result && n < nodes.size(); n++) {
-                    UaNode tmp = nodes.get(n);
-                    String nn = tmp.getBrowseName().getName();                
-                    String qn = basePath + "/" + nn;
-                    if (!this.nodes.containsKey(qn)) { // implicit caching
-                        this.nodes.put(qn, new NodeCacheEntry(tmp));
-                    }
-                    if (nodeName.equals(tmp.getBrowseName().getName())) {
-                        if (null == remainder) {
-                            result = tmp;
-                        } else {
-                            result = retrieveNode(tmp, remainder);
-                        }
-                    }
-                }
-            }
+            } 
             return result;
         }
 
         /**
-         * Retrieves a node starting at {@code current} recursively following the path given by {@code qName}.
+         * Retrieves a node starting at {@code current} recursively following the path
+         * given by {@code qName}.
          * 
-         * @param current the current node to start searching for, may be <b>null</b> for top-level
-         * @param qName the qualified node name
+         * @param current    the current node to start searching for, may be <b>null</b>
+         *                   for top-level
+         * @param qName      the qualified node name
          * @param constqName the initial qualified node name of first method call
          * @return the node or <b>null</b> for none found
          * @throws UaException if accessing/browsing the OPC UA model fails
@@ -912,30 +880,32 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
                 nodeName = qName;
             }
             pos = constqName.lastIndexOf(qName);
-            String currentPath = constqName.substring(0, pos);
-            List<? extends UaNode> nodes;
-            if (null == current) {
-                nodes = client.getAddressSpace().browseNodes(Identifiers.RootFolder);
-            } else {
-                nodes = current.browseNodes(); // sync for now
-            }
-            for (int n = 0; null == result && n < nodes.size(); n++) {
-                UaNode tmp = nodes.get(n);
-                String nn = tmp.getBrowseName().getName();
-                String qn = currentPath + nn;
-                if (!this.nodes.containsKey(qn) && qn.contains(qName)) {
-                    this.nodes.put(qn, new NodeCacheEntry(tmp));
+            if (pos >= 0) {
+                String currentPath = constqName.substring(0, pos);
+                List<? extends UaNode> nodes;
+                if (null == current) {
+                    nodes = client.getAddressSpace().browseNodes(Identifiers.RootFolder);
+                } else {
+                    nodes = current.browseNodes(); // sync for now
                 }
-                if (nodeName.equals(tmp.getBrowseName().getName())) {
-                    if (null == remainder) {
-                        List<? extends UaNode> childNodes = tmp.browseNodes();
-                        // recursive approach
-                        if (!childNodes.isEmpty()) {
-                            retrieveChildsOfChildNodes(qn, childNodes);
-                        }             
-                        result = tmp;
-                    } else {
-                        result = retrieveNode(tmp, remainder, constqName);
+                for (int n = 0; null == result && n < nodes.size(); n++) {
+                    UaNode tmp = nodes.get(n);
+                    String nn = tmp.getBrowseName().getName();
+                    String qn = currentPath + nn;
+                    if (!this.nodes.containsKey(qn) && qn.contains(qName)) { // implicit caching
+                        this.nodes.put(qn, new NodeCacheEntry(tmp));
+                    }
+                    if (nodeName.equals(tmp.getBrowseName().getName())) {
+                        if (null == remainder) {
+                            List<? extends UaNode> childNodes = tmp.browseNodes();
+                            // recursive approach
+                            if (!childNodes.isEmpty()) {
+                                retrieveChildsOfChildNodes(qn, childNodes);
+                            }
+                            result = tmp;
+                        } else {
+                            result = retrieveNode(tmp, remainder, constqName);
+                        }
                     }
                 }
             }
@@ -948,23 +918,24 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
          * @param currentPath the current path to be attached
          * @param parentNodes the parent nodes to process
          */
-        private void retrieveChildsOfChildNodes(String currentPath, List<? extends UaNode> parentNodes) {
+        public void retrieveChildsOfChildNodes(String currentPath, List<? extends UaNode> parentNodes) {
             for (UaNode j : parentNodes) {
                 String child = j.getBrowseName().getName();
-                this.nodes.put(currentPath + "/" + child, new NodeCacheEntry(j));                
+                this.nodes.put(currentPath + "/" + child, new NodeCacheEntry(j));
                 try {
                     if (!(j instanceof UaVariableNode)) {
                         List<? extends UaNode> childsOfChild = j.browseNodes();
                         if (!childsOfChild.isEmpty()) {
                             retrieveChildsOfChildNodes(currentPath + "/" + child, childsOfChild);
                         }
-                    }    
+                    }
                 } catch (UaException e) {
                     LoggerFactory.getLogger(getClass()).warn("Caching/retrieving child nodes: {}", e.getMessage());
+                    e.printStackTrace();
                 }
             }
-        }        
-
+        }
+        
         /**
          * Retrieving/caching child nodes via NodeIDs.
          * 
@@ -1323,19 +1294,21 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
 
         @Override
         public OpcUaModelAccess stepInto(String name) throws IOException {
+            OpcUaModelAccess result = null;
             try {
-                int pos = name.indexOf(",");
-                if (pos > 0) {
-                    return new OpcUaModelAccess(retrieveCacheEntry(name), null, this, nodes);
-                } else {                
+                if (name.contains(",")) {
+                    result = new OpcUaModelAccess(retrieveCacheEntry(name), null, this, nodes);
+
+                } else {
                     String n = basePath;
                     if (n.length() == 0) {
                         n = name;
                     } else {
                         n = n + "/" + name;
                     }
-                    return new OpcUaModelAccess(retrieveCacheEntry(name), n, this, nodes);
+                    result = new OpcUaModelAccess(retrieveCacheEntry(name), n, this, nodes);
                 }
+                return result;
             } catch (UaException e) {
                 throw new IOException(e);
             }
