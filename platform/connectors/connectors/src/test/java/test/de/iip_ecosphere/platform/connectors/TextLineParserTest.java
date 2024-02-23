@@ -197,4 +197,17 @@ public class TextLineParserTest {
         Assert.assertEquals("UTF-8", ((CustomExBaseParser) p).getEncoding());
     }
 
+    
+    /**
+     * Tests basic successful text line parsing with empty separator.
+     * 
+     * @throws IOException shall not occur
+     */
+    @Test
+    public void testTextLineParserEmptySeparator() throws IOException {
+        final String charset = StandardCharsets.UTF_8.name();
+        final String[] parts = new String[]{"123 bbb true"};
+        testTextLineParser(parts, charset, "");
+    }
+
 }

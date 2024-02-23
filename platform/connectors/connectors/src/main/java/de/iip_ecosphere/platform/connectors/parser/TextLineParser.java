@@ -79,7 +79,8 @@ public class TextLineParser implements InputParser<String> {
      * Creates a new text line parser.
      * 
      * @param charset the charset of the text encoding (preliminary as string)
-     * @param separator the separator to be used between data fields
+     * @param separator the separator to be used between data fields; the separator may be empty returning then 
+     *     the entire input strings instead of splitting them 
      */
     public TextLineParser(String charset, String separator) {
         this.charset = charset;
