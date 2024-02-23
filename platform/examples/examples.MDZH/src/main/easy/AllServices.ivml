@@ -1,0 +1,125 @@
+project AllServices {
+    
+    import AllTypes; 
+    
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+    
+    SerialConnector myEanScanner = SerialConnector {
+        id = "EanScanner",
+        name = "Serial EAN Code Scanner",
+        description = "",
+        ver = "0.1.0",
+        host = eanComPort,
+        cacheMode = CacheMode::NONE,
+        baudRate = 115200,
+        dataBits = 8,
+        stopBits = 1,
+        parity = SerialConnectorParity::NO,
+        
+        input = {{type=refBy(Empty)}},
+        output = {{type=refBy(EanScannerOutput)}},
+        inInterface = {type=refBy(Empty)},
+        outInterface = {type=refBy(EanScannerOutput)},
+        traceRcv = TraceKind::SYSOUT,
+        traceSent = TraceKind::SYSOUT,
+        inChannel = "in",
+        outChannel = "out",
+        machineFormatter = TextLineFormatter{separator=""},
+        machineParser = TextLineParser{separator=""}
+    }; 
+    
+    AasConnector myConfigAasConn = {
+        id = "ConfigurationAasConn",
+        name = "MDZH Configuration AAS connector",
+        description = "",
+        ver = "0.1.0",
+        host = configAasServer,
+        idShortSpec = configAasSpec,
+        port = 9989,
+        //samplingPeriod = samplingPeriod(10000, 10000),
+        registryHost = configAasServer,
+        registryPort = 9989,
+        registryPath = "registry",
+        mock = false, 
+        inputHandlers = {ConnectorInputHandler{
+            type=refBy(EanScannerOutput), 
+            class="de.oktoflow.platform.examples.mdzh.MdzhConfigInputHandler",
+            artifact="de.iip-ecosphere.platform.apps:examples.mdzh:" + iipVer
+        }},
+        kind = ServiceKind::TRANSFORMATION_SERVICE,
+        input = {{type=refBy(EanScannerOutput)}},
+        output = {{type=refBy(MdzhConfigOutput)}},
+        inInterface = {type=refBy(Empty)}, 
+        outInterface = {type=refBy(MdzhConfigOutput), path="ProductData/"},
+        // TODO translation operations
+        traceRcv = TraceKind::SYSOUT,
+        traceSent = TraceKind::SYSOUT
+    };
+    
+    OpcUaV1Connector laserOpcUaConn = {
+        id = "EngravingLaserOpcConn",
+        name = "Engraving Laser OPC connector",
+        description = "",
+        ver = "0.1.0",
+        host = laser,
+        port = 4840,
+        samplingPeriod = 500,
+        cacheMode = CacheMode::NONE,
+        mock = false, 
+        /*security = {
+            authenticationKey = "beckhoffOpc:4840",
+            hostNameVerification = false   
+        },*/
+        kind = ServiceKind::TRANSFORMATION_SERVICE,
+        input = {{type=refBy(MdzhConfigOutput)}},
+        output = {{type=refBy(LaserOutput)}},
+        inInterface = {type=refBy(MdzhConfigOutput), path="Objects/PLC1/GVL_AxisOPC/"},
+        outInterface = {type=refBy(LaserOutput), path="Objects/PLC1/GVL_AxisOPC/"},
+        traceRcv = TraceKind::SYSOUT,
+        traceSent = TraceKind::SYSOUT
+    };
+    
+    JavaService myPcfService = JavaService {
+        id = "PcfService",
+        name = "PcfService",
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+        input = {{type=refBy(LaserOutput)}, {type=refBy(PcfAasOutput)}},
+        output = {{type=refBy(PcfOutput)}},
+        artifact = "de.iip-ecosphere.platform.apps:examples.mdzh:" + iipVer,
+        kind = ServiceKind::TRANSFORMATION_SERVICE,
+        traceRcv = TraceKind::SYSOUT,
+        traceSent = TraceKind::SYSOUT,
+        class = "de.oktoflow.platform.examples.mdzh.PcfService"
+        //dependencies = {refBy(PYTHON39)},
+        //integrationMode = PythonIntegrationMode::websocket_continuous
+    };
+
+    AasConnector myEnergyConn = {
+        id = "EnergyAasConn",
+        name = "Energy Configuration AAS connector",
+        description = "",
+        ver = "0.1.0",
+        host = energyAasServer,
+        idShortSpec = energyAasSpec,
+        port = 9989,
+        //samplingPeriod = samplingPeriod(10000, 10000),
+        registryHost = energyAasServer,
+        registryPort = 9989,
+        registryPath = "registry",
+        mock = false, 
+        input = {{type=refBy(PcfOutput)}},
+        output = {{type=refBy(PcfAasOutput)}},
+        inInterface = {type=refBy(PcfOutput)}, 
+        outInterface = {type=refBy(PcfAasOutput), path="ProductData/"},
+        kind = ServiceKind::TRANSFORMATION_SERVICE,
+        // TODO translation operations
+        traceRcv = TraceKind::SYSOUT,
+        traceSent = TraceKind::SYSOUT
+    };
+   
+    freeze {
+        .;
+    }
+}

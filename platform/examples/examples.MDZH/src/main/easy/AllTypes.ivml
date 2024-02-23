@@ -1,0 +1,91 @@
+project AllTypes {
+
+    import AllConstants; 
+    
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+    
+    RecordType Empty = {
+        name = "Empty",
+        fields = {}
+    };
+    
+    RecordType EanScannerOutput = {
+        name = "EanScannerOutput",
+        fields = {
+            Field {
+                name = "data",
+                type = refBy(StringType)
+            }
+        }
+    };
+
+    RecordType MdzhConfigInput = {
+        name = "MdzhConfigInput",
+        fields = {}
+    };
+
+    RecordType MdzhConfigOutput = {
+        name = "MdzhConfigOutput",
+        fields = {}
+    };
+
+    RecordType LaserOutput = {
+        name = "LaserOutput",
+        fields = {}
+    };
+
+    RecordType PcfOutput = {
+        name = "PcfOutput",
+        fields = {}
+    };
+    
+    RecordType PcfAasOutput = {
+        name = "PcfAasOutput",
+        fields = {}
+    };
+    
+    
+    // ----------------- outdated - remove/replace -------------------------
+    
+    RecordType PythonTestInput = {
+        name = "PythonTestInput",
+        fields = {
+            Field {
+                name = "id",
+                type = refBy(IntegerType)
+            }, Field {
+                name = "value1",
+                type = refBy(DoubleType)
+            }, Field {
+                name = "value2",
+                type = refBy(DoubleType)
+            }
+        }
+    };
+
+    RecordType PythonTestOutput = {
+        name = "PythonTestOutput",
+        fields = {
+            Field {
+                name = "id",
+                type = refBy(IntegerType)
+            }, Field {
+                name = "value1",
+                type = refBy(DoubleType)
+            }, Field {
+                name = "value2",
+                type = refBy(DoubleType)
+            }, Field {
+                name = "confidence",
+                type = refBy(DoubleType)
+            }, Field {
+                name = "prediction",
+                type = refBy(BooleanType)
+            }
+        }
+    };    
+    
+    freeze {
+        .;
+    }
+}

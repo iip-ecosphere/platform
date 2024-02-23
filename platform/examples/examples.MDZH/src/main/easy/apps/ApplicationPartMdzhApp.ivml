@@ -1,0 +1,19 @@
+project ApplicationPartMdzhApp {
+
+    import ServiceMeshPart*;
+
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+    
+    Application myPythonApp = {
+        id = "MdzhApp",
+        name = "MDZH PCF app",
+        ver = "0.1.0",
+        description = "",
+        services = {refBy(myMdzhMesh)}        
+    };
+    
+    freeze {
+        .;
+    }
+
+}

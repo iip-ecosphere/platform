@@ -1,0 +1,21 @@
+project AllConstants {
+
+    import IIPEcosphere;
+    import DataTypes;
+
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+
+    String eanComPort = "COM9";
+    String laser = "192.168.2.100";
+    String configAasServer = "192.168.2.101";
+    String configAasSpec = "iri:.*car.*";
+    String energyAasServer = "192.168.2.101";
+    String energyAasSpec = "iri:.*car.*";
+
+    // ------------ freezing ------------------
+    
+    freeze {
+        .; // every variable declared in this project
+    } but (f|f.bindingTime >= BindingTime.runtimeMon);
+
+}

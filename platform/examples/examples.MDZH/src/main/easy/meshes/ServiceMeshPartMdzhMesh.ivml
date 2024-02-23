@@ -1,0 +1,66 @@
+project ServiceMeshPartMdzhMesh {
+
+    import AllServices;
+
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+
+    ServiceMesh myMdzhMesh = {
+        description = "MDZH mesh",
+        sources = {refBy(myEanSource)}
+    };
+    
+    MeshSource myEanSource = {
+       impl = refBy(myEanScanner),
+       next = {refBy(myEanScannerMyConfigAasSource)}
+    };
+
+    MeshConnector myEanScannerMyConfigAasSource = {
+        name = "EAN Source->Config AAS",
+        next = refBy(myConfigAasSource)
+    };
+
+    MeshProcessor myConfigAasSource = {
+       impl = refBy(myConfigAasConn),
+       next = {refBy(myConfigAasSourcemyLaserOpcTransformer)}
+    };
+
+    MeshConnector myConfigAasSourcemyLaserOpcTransformer = {
+        name = "Config AAS Source->Laser OPC Conn",
+        next = refBy(myLaserOpcTransformer)
+    };
+
+    MeshProcessor myLaserOpcTransformer = {
+        impl = refBy(laserOpcUaConn),
+        next = {refBy(myLaserOpcTransformerMyPcfTransformer)}
+    };
+
+    MeshConnector myLaserOpcTransformerMyPcfTransformer = {
+        name = "Laser OPC Conn->PCF transformer",
+        next = refBy(myPcfTransformer)
+    };
+
+    MeshProcessor myPcfTransformer = {
+        impl = refBy(myPcfService),
+        next = {refBy(myPcfServiceMyEnergyAasConn)}
+    };
+
+    MeshConnector myPcfServiceMyEnergyAasConn = {
+        name = "PCF Transformer->Energy AAS conn",
+        next = refBy(myEnergyAasConn)
+    };
+    
+    MeshProcessor myEnergyAasConn = {
+        impl = refBy(myEnergyConn),
+        next = {refBy(myEnergyAasConnMyPcfTransformer)}
+    };
+
+    MeshConnector myEnergyAasConnMyPcfTransformer = {
+        name = "Energy AAS sink -> PCF Transformer",
+        next = refBy(myPcfTransformer)
+    };
+
+    freeze {
+        .;
+    }
+
+}
