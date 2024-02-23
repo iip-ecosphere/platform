@@ -12,7 +12,6 @@
 
 package test.de.oktoflow.platform.connectors.serial;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,8 +27,6 @@ import de.iip_ecosphere.platform.connectors.types.ChannelTranslatingProtocolAdap
 import de.iip_ecosphere.platform.connectors.types.ConnectorInputTypeAdapter;
 import de.iip_ecosphere.platform.connectors.types.ConnectorOutputTypeAdapter;
 import de.iip_ecosphere.platform.support.CollectionUtils;
-import de.iip_ecosphere.platform.support.Server;
-import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.serialization.Serializer;
