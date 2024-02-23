@@ -61,6 +61,8 @@ public class JSerialCommConnectorTest {
     
     /**
      * Creates the connector parameters.
+     * 
+     * @throws IOException if creating the parameters fails
      */
     private void createParameters() throws IOException {
         String appPortDescriptor = "COM1";
@@ -82,8 +84,7 @@ public class JSerialCommConnectorTest {
     
     /**
      * Tests the connector through explicitly setting/resetting the factory
-     * implementation. Builds up a {@link Server} based on {@link #createTestServer(ServerAddress, File)} that the 
-     * test is self-contained.
+     * implementation.
      * 
      * @throws IOException in case that connection/communication fails
      */
