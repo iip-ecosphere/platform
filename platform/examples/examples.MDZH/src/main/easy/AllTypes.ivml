@@ -1,6 +1,7 @@
 project AllTypes {
 
     import AllConstants; 
+    import OpcUaDataTypes;
     
     annotate BindingTime bindingTime = BindingTime::compile to .;
     
@@ -24,14 +25,73 @@ project AllTypes {
         fields = {}
     };
 
+    // into Laser
     RecordType MdzhConfigOutput = {
         name = "MdzhConfigOutput",
-        fields = {}
+        fields = {
+            Field { // UAFieldVariableType
+                name="DMCData",
+                type=refBy(StringType),
+                cachingTime=CACHE_NONE
+            },
+            Field {
+                name="DoubleMarking",
+                type=refBy(BooleanType),
+                cachingTime=CACHE_NONE
+            },
+            Field {
+                name="OrderId",
+                type=refBy(Integer32Type), 
+                cachingTime=CACHE_NONE
+            },
+            Field {
+                name="PenType",
+                type=refBy(Integer32Type),
+                cachingTime=CACHE_NONE
+            },
+            Field {
+                name="TextData",
+                type=refBy(StringType),
+                cachingTime=CACHE_NONE
+            },
+            Field {
+                name="TextData2",
+                type=refBy(StringType),
+                cachingTime=CACHE_NONE
+            }
+        }
     };
 
+    // from Laser
     RecordType LaserOutput = {
         name = "LaserOutput",
-        fields = {}
+        fields = {
+            Field { 
+                name="EndTime",
+                type=refBy(StringType),
+                cachingTime=CACHE_NONE
+            },
+            Field {
+                name="OrderId",
+                type=refBy(Integer32Type),
+                cachingTime=CACHE_NONE
+            },
+            Field {
+                name="OrderState",
+                type=refBy(StringType),
+                cachingTime=CACHE_NONE
+            },
+            Field {
+                name="StartTime",
+                type=refBy(StringType),
+                cachingTime=CACHE_NONE
+            },
+            Field {
+                name="SystemState",
+                type=refBy(StringType),
+                cachingTime=CACHE_NONE
+            }
+        }
     };
 
     RecordType PcfOutput = {

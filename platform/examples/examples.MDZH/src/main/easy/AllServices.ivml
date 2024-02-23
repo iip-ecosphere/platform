@@ -73,8 +73,8 @@ project AllServices {
         kind = ServiceKind::TRANSFORMATION_SERVICE,
         input = {{type=refBy(MdzhConfigOutput)}},
         output = {{type=refBy(LaserOutput)}},
-        inInterface = {type=refBy(MdzhConfigOutput), path="Objects/PLC1/GVL_AxisOPC/"},
-        outInterface = {type=refBy(LaserOutput), path="Objects/PLC1/GVL_AxisOPC/"},
+        inInterface = {type=refBy(MdzhConfigOutput), path="Objects/LasPaintControl/Inputs/"},
+        outInterface = {type=refBy(LaserOutput), path="Objects/LasPaintControl/Outputs/"},
         traceRcv = TraceKind::SYSOUT,
         traceSent = TraceKind::SYSOUT
     };

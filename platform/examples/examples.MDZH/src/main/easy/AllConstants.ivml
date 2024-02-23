@@ -5,8 +5,8 @@ project AllConstants {
 
     annotate BindingTime bindingTime = BindingTime::compile to .;
 
-    String eanComPort = "COM9";
-    String laser = "192.168.2.100";
+    String eanComPort = "COM3";
+    String laser = "192.168.0.2";
     String configAasServer = "192.168.2.101";
     String configAasSpec = "iri:.*car.*";
     String energyAasServer = "192.168.2.101";
