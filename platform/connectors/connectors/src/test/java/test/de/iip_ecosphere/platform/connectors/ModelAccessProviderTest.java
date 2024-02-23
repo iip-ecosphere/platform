@@ -38,7 +38,7 @@ public class ModelAccessProviderTest {
 
     /**
      * Tests {@link ModelAccessProvider#optionalStep(de.iip_ecosphere.platform.connectors.model.ModelAccess, 
-     * de.iip_ecosphere.platform.connectors.model.ModelAccessProvider.IOModelAccessFunction))}.
+     * de.iip_ecosphere.platform.connectors.model.ModelAccessProvider.IOModelAccessFunction)}.
      */
     @Test
     public void testOptionalStep() {

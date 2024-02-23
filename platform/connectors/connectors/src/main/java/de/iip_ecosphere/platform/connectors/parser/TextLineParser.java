@@ -88,8 +88,14 @@ public class TextLineParser implements InputParser<String> {
     
     @Override
     public TextLineParseResult parse(byte[] data) throws IOException {
+        TextLineParseResult result;
         String s = new String(data, charset); // unsupportedencoding -> IOException
-        return new TextLineParseResult(s.split(separator)); // we may pool this...
+        if (separator.length() == 0) {
+            result = new TextLineParseResult(new String[] {s});
+        } else {
+            result = new TextLineParseResult(s.split(separator)); // we may pool this...
+        }
+        return result;
     }
 
     @Override

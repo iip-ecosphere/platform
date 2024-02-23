@@ -581,7 +581,7 @@ public class ConnectorParameter {
     }
     
     /**
-     * Applies the connector specific setting in {@link key} if specified to {@code setter}.
+     * Applies the connector specific setting in {@code key} if specified to {@code setter}.
      *  
      * @param key the key of the setting as defined by the connect
      * @param setter the value setter
