@@ -2,6 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>examples.mdzh</artifactId>
+  <groupId>de.iip-ecosphere.platform.apps</groupId>
   <packaging>jar</packaging>
   <name>MDZH PCF demonstrator</name>
   <description>MDZH PCF demonstrator with serial, AAS and OPC connector.</description>
