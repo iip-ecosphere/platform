@@ -749,6 +749,9 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
     }
     
     def generateImports(ServiceBase base) {
+        if (base.isKindOf(JavaService)) {
+            'import iip.interfaces.*;'
+        }
         if (base.kind == ServiceKind::SOURCE_SERVICE) {
             'import reactor.core.publisher.Flux;'
         } else {
@@ -1217,7 +1220,6 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
         import de.iip_ecosphere.platform.connectors.types.*;
         import de.iip_ecosphere.platform.connectors.model.*;
         import iip.datatypes.*;
-        import iip.interfaces.*;
         import iip.serializers.*;
         ${generateImports(impl)|e}
 

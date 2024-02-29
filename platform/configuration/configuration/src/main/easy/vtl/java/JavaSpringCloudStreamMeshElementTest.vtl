@@ -37,6 +37,12 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
 
     // --------------------- imports ---------------------------
 
+    def generateImports(ServiceBase base) {
+        if (base.isKindOf(JavaService)) {
+            'import iip.interfaces.*;'
+        }
+    }
+
     def genImports(MeshElement elt, ServiceBase service) {
         'import org.springframework.boot.SpringBootConfiguration;
         import org.springframework.boot.test.context.SpringBootTest;
@@ -746,9 +752,9 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
         import org.hamcrest.core.IsAnything;
         
         import iip.datatypes.*;
-        import iip.interfaces.*;
         import iip.serializers.*;
         import iip.nodes.*;
+        ${genImports(elt.impl)|e}
 
         /**
         * Implements tests for "${clsName}". The generated class is meant to be re-usable and extensible, e.g.,
