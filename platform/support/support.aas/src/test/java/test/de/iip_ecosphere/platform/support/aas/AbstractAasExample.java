@@ -18,11 +18,15 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
@@ -41,6 +45,9 @@ import de.iip_ecosphere.platform.support.resources.ResourceLoader;
  */
 public abstract class AbstractAasExample {
 
+    private static final Pattern[] INT_PATTERN = {Pattern.compile("^\\D*(?<value>\\d+)(\\.\\d+)?.*$")};
+    private static final Pattern[] DBL_PATTERN = {Pattern.compile("^\\D*(?<value>\\d+(\\.\\d+)?).*$")};
+    
     private List<Aas> aasList = new ArrayList<Aas>();
     private Map<String, Aas> parts = new TreeMap<>();
     private List<FileResource> resources = new ArrayList<FileResource>();
@@ -288,4 +295,193 @@ public abstract class AbstractAasExample {
         }
     }
     
+    /**
+     * Turns a string tolerantly to a test value. May remove usual issues from spec parsing/analysis.
+     * 
+     * @param value the value
+     * @param dflt the default value to use if an empty String or <b>null</b> is given
+     * @return the test value
+     */
+    public static String toTestString(String value, String dflt) {
+        String result;
+        if (value == null || value.length() == 0) {
+            result = dflt;
+        } else {
+            result = value; // tolerance needed here?
+        }
+        return result;
+    }
+
+    /**
+     * Turns a string tolerantly to multi-language a test value. May remove usual issues from spec parsing/analysis.
+     * 
+     * @param value the value
+     * @param dfltLang the default language to use if none is found, also selects the value to return in case of a 
+     *     true multi-language value
+     * @param dflt the default value to use if an empty String or <b>null</b> is given
+     * @return the test value
+     */
+    public static String toTestMLString(String value, String dfltLang, String dflt) {
+        String result;
+        if (value == null || value.length() == 0) {
+            result = dflt;
+        } else {
+            result = parseMLString(value, dfltLang, dflt);
+        }
+        int pos = result.lastIndexOf("@");
+        if (pos < 0) {
+            while (dfltLang.startsWith("@")) {
+                dfltLang = dfltLang.substring(1);
+            }
+            result += "@" + dfltLang; 
+        }
+        return result;
+    }
+    
+    /**
+     * Tolerantly parses a multi-language string into language-annotated texts.
+     *  
+     * @param value the value
+     * @param dfltLang the default language to use if none is found, also selects the value to return in case of a 
+     *     true multi-language value
+     * @param dflt the default value to use if an empty String or <b>null</b> is given
+     * @return the specified language string or <b>null</b>
+     */
+    private static String parseMLString(String value, String dfltLang, String dflt) {
+        String result;
+        value = value.trim();
+        Map<String, String> values = new HashMap<>();
+        boolean textBefore = value.indexOf("@") > 0;
+        int lastPos = 0;
+        int pos;
+        do {
+            pos = value.indexOf("@", lastPos);
+            if (pos >= 0) {
+                int endPos = value.indexOf(" ", pos);
+                if (endPos < 0) {
+                    endPos = value.length();
+                }
+                if (endPos - pos <= 4) {
+                    String lang = value.substring(pos + 1, endPos);
+                    if (lang.endsWith(":")) {
+                        lang = lang.substring(0, lang.length() - 1);
+                    }
+                    String text = null;
+                    if (textBefore) {
+                        text = value.substring(lastPos, pos);
+                        lastPos = endPos + 1;
+                    } else {
+                        pos = value.indexOf("@", pos + 1);
+                        if (pos < 0) {
+                            text = value.substring(endPos + 1);
+                        } else {
+                            text = value.substring(endPos + 1, pos);
+                        }
+                        lastPos = pos - 1;
+                    }
+                    if (lang != null && text != null) {
+                        values.put(lang.trim(), text.trim());
+                    }
+                } else {
+                    lastPos = pos + 1;
+                }
+            }
+        } while (pos > 0);
+        result = values.get(dfltLang);
+        if (null == result) {
+            result = dflt;
+        } else {
+            result += "@" + dfltLang;
+        }
+        return result;
+    }
+
+    /**
+     * Generic function to turn a test value into a typed value.
+     * 
+     * @param <T> the value type
+     * @param value the value
+     * @param dflt the default value to use if an empty String or <b>null</b> is given
+     * @param converter the value converter from a preprocessed string to a typed value
+     * @param patterns additional fallback patterns to extract a string value, must indicate the value by 
+     *     <code>(?&lt;value&gt;...)</code>
+     * @return the extracted and converted value
+     */
+    public static <T> T toTestValue(String value, T dflt, Function<String, T> converter, Pattern... patterns) {
+        T result;
+        if (value == null || value.length() == 0) {
+            result = dflt;
+        } else {
+            try {
+                result = converter.apply(value); // find for
+            } catch (NumberFormatException e) {
+                result = dflt;
+                for (Pattern p: patterns) {
+                    Matcher m = p.matcher(value);
+                    if (m.matches()) {
+                        try {
+                            result = converter.apply(m.group("value"));
+                        } catch (NumberFormatException e1) {
+                        }
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Turns a string tolerantly to an integer test value. May remove usual issues from spec parsing/analysis.
+     * 
+     * @param value the value
+     * @param dflt the default value to use if no integer was found
+     * @return the test value
+     */
+    public static int toTestInt(String value, int dflt) {
+        return toTestValue(value, dflt, v -> Integer.parseInt(v), INT_PATTERN);
+    }
+
+    /**
+     * Turns a string tolerantly to a double test value. May remove usual issues from spec parsing/analysis.
+     * 
+     * @param value the value
+     * @param dflt the default value to use if no integer was found
+     * @return the test value
+     */
+    public static double toTestDouble(String value, double dflt) {
+        return toTestValue(value, dflt, v -> Double.parseDouble(v), DBL_PATTERN);
+    }
+
+    /**
+     * Turns a string tolerantly to a boolean test value. May remove usual issues from spec parsing/analysis.
+     * 
+     * @param value the value
+     * @param dflt the default value to use if no integer was found
+     * @return the test value
+     */
+    public static boolean toTestBoolean(String value, boolean dflt) {
+        boolean result;
+        if (value == null || value.length() == 0) {
+            result = dflt;
+        } else {
+            value = value.replace("\r\n", " ")
+                .replace("\n", " ")
+                .replace("\r", " ")
+                .toLowerCase()
+                .trim();
+            if (value.equals("true")) {
+                result = true;
+            } else if (value.equals("false")) {
+                result = false;
+            } else if (value.contains("true ") || value.contains(" true ") || value.contains(" true")) {
+                result = true;
+            } else if (value.contains("false ") || value.contains(" false ") || value.contains(" false")) {
+                result = false;
+            } else {
+                result = dflt;
+            }
+        }
+        return result;
+    }
+
 }
