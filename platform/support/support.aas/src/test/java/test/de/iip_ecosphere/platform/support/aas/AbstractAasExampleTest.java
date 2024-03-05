@@ -14,6 +14,8 @@ package test.de.iip_ecosphere.platform.support.aas;
 
 import org.junit.Test;
 
+import de.iip_ecosphere.platform.support.aas.LangString;
+
 import org.junit.Assert;
 
 /**
@@ -87,5 +89,99 @@ public class AbstractAasExampleTest {
         Assert.assertEquals(false, AbstractAasExample.toTestBoolean("false", true));
         Assert.assertEquals(true, AbstractAasExample.toTestBoolean("bla true bli", false));
     }
+    
+    /**
+     * A simple testing enumeration.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private enum E1 {
+        VAL1,
+        VAL2;
+    }
 
+    /**
+     * A testing enumeration.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private enum E2 {
+        VAL1(0, "iri:semId-v01", "Value One"),
+        VAL2(0, "iri:semId-v02", "Value Two");
+        
+        private int valueId;
+        private String semanticId;
+        private String value;
+    
+        /**
+         * Creates a constant.
+         * 
+         * @param valueId the value id/given ordinal
+         * @param semanticId the semantic id
+         * @param value the value
+         */
+        private E2(int valueId, String semanticId, String value) {
+            this.valueId = valueId;
+            this.semanticId = semanticId;
+            this.value = value;
+        }
+    
+        /**
+         * Returns the value id/given ordinal.
+         * 
+         * @return the value id/given ordinal
+         */
+        @SuppressWarnings("unused")
+        public int getValueId() {
+            return valueId;
+        }
+        
+        /**
+         * Returns the semantic id.
+         * 
+         * @return the semantic id
+         */
+        @SuppressWarnings("unused")
+        public String getSemanticId() {
+            return semanticId;
+        }
+        
+        /**
+         * Returns the value to be used in the AAS.
+         * 
+         * @return the value to be used in the AAS
+         */
+        @SuppressWarnings("unused")
+        public String getValue() {
+            return value;
+        }
+        
+    }
+
+    /**
+     * Tests {@link AbstractAasExample#toTestEnum(Class, String, Enum)}.
+     */
+    @Test
+    public void testToTestEnum() {
+        Assert.assertEquals(E1.VAL2, AbstractAasExample.toTestEnum(E1.class, "VAL", E1.VAL2));
+        Assert.assertEquals(E1.VAL1, AbstractAasExample.toTestEnum(E1.class, "VAL")); // first declared as default
+
+        Assert.assertEquals(E1.VAL1, AbstractAasExample.toTestEnum(E1.class, "VAL1", E1.VAL2));
+        Assert.assertEquals(E2.VAL2, AbstractAasExample.toTestEnum(E2.class, "VAL2", E2.VAL2));
+        Assert.assertEquals(E2.VAL2, AbstractAasExample.toTestEnum(E2.class, "Value Two", E2.VAL1));
+        Assert.assertEquals(E2.VAL2, AbstractAasExample.toTestEnum(E2.class, "iri:semId-v02", E2.VAL1));
+    }
+
+    /**
+     * Tests {@link AbstractAasExample#toTestLangString(String, String)}.
+     */
+    @Test
+    public void testToLangString() {
+        Assert.assertArrayEquals(new LangString[0], AbstractAasExample.toTestLangString(null, null));
+        Assert.assertArrayEquals(new LangString[] {new LangString("de", "test")}, 
+            AbstractAasExample.toTestLangString(null, "test@de"));
+        Assert.assertArrayEquals(new LangString[] {new LangString("en", "test1")}, 
+            AbstractAasExample.toTestLangString("test1@en", "test@de"));
+    }
+    
 }

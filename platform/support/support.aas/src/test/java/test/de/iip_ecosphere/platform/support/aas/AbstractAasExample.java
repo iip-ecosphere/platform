@@ -15,6 +15,10 @@ package test.de.iip_ecosphere.platform.support.aas;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -34,6 +38,8 @@ import org.junit.Test;
 
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
+import de.iip_ecosphere.platform.support.aas.IdentifierType;
+import de.iip_ecosphere.platform.support.aas.LangString;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.PersistenceRecipe.FileResource;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
@@ -294,9 +300,126 @@ public abstract class AbstractAasExample {
             Assert.assertTrue(asserter.test(value));
         }
     }
+
+    /**
+     * Turns a string tolerantly to a test enum value. May prevent usual issues from spec parsing/analysis.
+     * Considers values of a {@code getValue} method if defined. Uses the first value of the enum as default value.
+     * 
+     * @param <T> the enum type
+     * @param cls the enum class type
+     * @param value the value
+     * @return the test enum value
+     */
+    public static <T extends Enum<T>> T toTestEnum(Class<T> cls, String value) {
+        return toTestEnum(cls, value, null, true);        
+    }
+
+    /**
+     * Turns a string tolerantly to a test enum value. May prevent usual issues from spec parsing/analysis.
+     * Considers values of a {@code getValue} method if defined.
+     * 
+     * @param <T> the enum type
+     * @param cls the enum class type
+     * @param value the value
+     * @param dflt the default value to use if there is no matching enum value <b>null</b> is given
+     * @return the test enum value
+     */
+    public static <T extends Enum<T>> T toTestEnum(Class<T> cls, String value, T dflt) {
+        return toTestEnum(cls, value, dflt, false);
+    }
     
     /**
-     * Turns a string tolerantly to a test value. May remove usual issues from spec parsing/analysis.
+     * Turns a string tolerantly to a test enum value. May prevent usual issues from spec parsing/analysis.
+     * Considers values of a {@code getValue} method if defined.
+     * 
+     * @param <T> the enum type
+     * @param cls the enum class type
+     * @param value the value
+     * @param dflt the default value to use if there is no matching enum value <b>null</b> is given
+     * @param firstAsDefault take the first value of the enum as default
+     * @return the test enum value
+     */
+    @SuppressWarnings("unchecked")
+    public static <T extends Enum<T>> T toTestEnum(Class<T> cls, String value, T dflt, boolean firstAsDefault) {
+        T result = dflt;
+        value = value.trim().toLowerCase();
+        List<T> values = new ArrayList<>();
+        for (Field f : cls.getDeclaredFields()) {
+            int mod = f.getModifiers();
+            if (cls.isAssignableFrom(f.getType()) &&  Modifier.isStatic(mod) && Modifier.isFinal(mod) 
+                && Modifier.isPublic(mod)) {
+                try {
+                    values.add((T) f.get(null));
+                } catch (IllegalAccessException e) {
+                }
+            }
+        }
+        boolean matched = false;
+        Method[] methods = new Method[] {
+            getDeclaredMethodSafe(cls, "getValue"),
+            getDeclaredMethodSafe(cls, "getSemanticId")};
+        for (T v: values) {
+            boolean matches = matchesEnum(value, v.name().toLowerCase());
+            for (Method m : methods) {
+                if (!matches && null != m) {
+                    try {
+                        matches = matchesEnum(value, m.invoke(v));
+                    } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+                    }
+                }
+                if (matches) {
+                    break;
+                }
+            }
+            if (matches) {
+                matched = true;
+                result = v;
+                break;
+            }
+        }
+        if (firstAsDefault && !matched && !values.isEmpty()) {
+            result = values.get(0);
+        }
+        return result;
+    }
+
+    /**
+     * Returns a declared method without throwing an exception.
+     * 
+     * @param cls the class to look within
+     * @param name the name of the method
+     * @return the method, <b>null</b> for none
+     */
+    private static Method getDeclaredMethodSafe(Class<?> cls, String name) {
+        Method result = null;
+        try {
+            result = cls.getDeclaredMethod(name);
+        } catch (NoSuchMethodException e) {
+        }
+        return result;
+    }
+    
+    /**
+     * Returns whether {@code enumValue} matches {@code value}.
+     * 
+     * @param value the provided value to return an enum
+     * @param enumValue the value from the enum to match against {@code value}
+     * @return {@code true} if the value matches, {@code false} else
+     */
+    private static boolean matchesEnum(String value, Object enumValue) {
+        boolean matches = false;
+        if (enumValue != null) {
+            String ev = enumValue.toString().toLowerCase();
+            matches = value.contains(ev);
+            if (!matches && (ev.startsWith(IdentifierType.IRI_PREFIX) || ev.startsWith(IdentifierType.IRDI_PREFIX))) {
+                matches = ev.contains(value);
+            }
+        }
+        return matches;
+    }
+    
+    /**
+     * Turns a string tolerantly to a test value. May prevent usual issues from spec parsing/analysis.
      * 
      * @param value the value
      * @param dflt the default value to use if an empty String or <b>null</b> is given
@@ -313,7 +436,28 @@ public abstract class AbstractAasExample {
     }
 
     /**
-     * Turns a string tolerantly to multi-language a test value. May remove usual issues from spec parsing/analysis.
+     * Turns a string tolerantly to multi-language a test lang-string value. May prevent usual issues from spec 
+     * parsing/analysis.
+     * 
+     * @param value the value
+     * @param dflt the default value as text@lang
+     * @return the test value
+     */
+    public static LangString[] toTestLangString(String value, String dflt) {
+        if (null == dflt) {
+            dflt = "";
+        }
+        Map<String, String> values = parseMLString(value == null || value.length() == 0 ? dflt : value);
+        LangString[] result = new LangString[values.size()];
+        int count = 0;
+        for (Map.Entry<String, String> v : values.entrySet()) {
+            result[count++] = new LangString(v.getKey(), v.getValue());
+        }
+        return result;
+    }
+
+    /**
+     * Turns a string tolerantly to multi-language a test value. May prevent usual issues from spec parsing/analysis.
      * 
      * @param value the value
      * @param dfltLang the default language to use if none is found, also selects the value to return in case of a 
@@ -326,7 +470,13 @@ public abstract class AbstractAasExample {
         if (value == null || value.length() == 0) {
             result = dflt;
         } else {
-            result = parseMLString(value, dfltLang, dflt);
+            Map<String, String> values = parseMLString(value);
+            result = values.get(dfltLang);
+            if (null == result) {
+                result = dflt;
+            } else {
+                result += "@" + dfltLang;
+            }
         }
         int pos = result.lastIndexOf("@");
         if (pos < 0) {
@@ -342,13 +492,9 @@ public abstract class AbstractAasExample {
      * Tolerantly parses a multi-language string into language-annotated texts.
      *  
      * @param value the value
-     * @param dfltLang the default language to use if none is found, also selects the value to return in case of a 
-     *     true multi-language value
-     * @param dflt the default value to use if an empty String or <b>null</b> is given
      * @return the specified language string or <b>null</b>
      */
-    private static String parseMLString(String value, String dfltLang, String dflt) {
-        String result;
+    private static Map<String, String> parseMLString(String value) {
         value = value.trim();
         Map<String, String> values = new HashMap<>();
         boolean textBefore = value.indexOf("@") > 0;
@@ -387,13 +533,7 @@ public abstract class AbstractAasExample {
                 }
             }
         } while (pos > 0);
-        result = values.get(dfltLang);
-        if (null == result) {
-            result = dflt;
-        } else {
-            result += "@" + dfltLang;
-        }
-        return result;
+        return values;
     }
 
     /**
@@ -431,7 +571,7 @@ public abstract class AbstractAasExample {
     }
 
     /**
-     * Turns a string tolerantly to an integer test value. May remove usual issues from spec parsing/analysis.
+     * Turns a string tolerantly to an integer test value. May prevent usual issues from spec parsing/analysis.
      * 
      * @param value the value
      * @param dflt the default value to use if no integer was found
@@ -442,7 +582,7 @@ public abstract class AbstractAasExample {
     }
 
     /**
-     * Turns a string tolerantly to a double test value. May remove usual issues from spec parsing/analysis.
+     * Turns a string tolerantly to a double test value. May prevent usual issues from spec parsing/analysis.
      * 
      * @param value the value
      * @param dflt the default value to use if no integer was found
@@ -453,7 +593,7 @@ public abstract class AbstractAasExample {
     }
 
     /**
-     * Turns a string tolerantly to a boolean test value. May remove usual issues from spec parsing/analysis.
+     * Turns a string tolerantly to a boolean test value. May prevent usual issues from spec parsing/analysis.
      * 
      * @param value the value
      * @param dflt the default value to use if no integer was found
