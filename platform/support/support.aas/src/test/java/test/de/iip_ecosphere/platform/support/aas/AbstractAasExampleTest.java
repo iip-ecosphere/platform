@@ -16,6 +16,10 @@ import org.junit.Test;
 
 import de.iip_ecosphere.platform.support.aas.LangString;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
+
 import org.junit.Assert;
 
 /**
@@ -177,11 +181,60 @@ public class AbstractAasExampleTest {
      */
     @Test
     public void testToLangString() {
-        Assert.assertArrayEquals(new LangString[0], AbstractAasExample.toTestLangString(null, null));
-        Assert.assertArrayEquals(new LangString[] {new LangString("de", "test")}, 
+        AbstractAasExample.assertLangStringsEquals(new LangString[0], AbstractAasExample.toTestLangString(null, null));
+        AbstractAasExample.assertLangStringsEquals(new LangString[] {new LangString("de", "test")}, 
             AbstractAasExample.toTestLangString(null, "test@de"));
-        Assert.assertArrayEquals(new LangString[] {new LangString("en", "test1")}, 
+        AbstractAasExample.assertLangStringsEquals(new LangString[] {new LangString("en", "test1")}, 
             AbstractAasExample.toTestLangString("test1@en", "test@de"));
+        AbstractAasExample.assertLangStringsEquals(new LangString[] {new LangString("en", "test1"), 
+            new LangString("de", "test")}, AbstractAasExample.toTestLangString("test1@en test@de", "t@de"));
+    }
+    
+    /**
+     * Tests {@link AbstractAasExample#toTestResourceFile(String, String)} and 
+     * {@link AbstractAasExample#toTestResourceMimeType(String, String)}. 
+     */
+    @Test
+    public void testFileResource() {
+        Assert.assertEquals("ab", AbstractAasExample.toTestResourceFile(null, "ab"));
+        Assert.assertEquals("ab", AbstractAasExample.toTestResourceFile("", "ab"));
+
+        Assert.assertEquals("ab", AbstractAasExample.toTestResourceMimeType(null, "ab"));
+        Assert.assertEquals("ab", AbstractAasExample.toTestResourceMimeType("", "ab"));
+
+        String mimeTest = "MimeType = image/png";
+        String valueTest = "Value = /aasx/TechnicalData/logo.png";
+        String test = mimeTest + " " + valueTest;
+        Assert.assertEquals(mimeTest, AbstractAasExample.toTestResourceMimeType(test, "ab"));
+        Assert.assertEquals(valueTest, AbstractAasExample.toTestResourceFile(test, "ab"));
+
+        test = valueTest + " " + mimeTest; 
+        Assert.assertEquals(mimeTest, AbstractAasExample.toTestResourceMimeType(test, "ab"));
+        Assert.assertEquals(valueTest, AbstractAasExample.toTestResourceFile(test, "ab"));
+    }
+
+    /**
+     * Tests {@link AbstractAasExample#toTestDate(String, java.util.Date)}. 
+     */
+    @Test
+    public void testDate() {
+        Date dflt = new Date();
+        Assert.assertEquals(dflt, AbstractAasExample.toTestDate(null, dflt));
+        Assert.assertEquals(dflt, AbstractAasExample.toTestDate("", dflt));
+        
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.YEAR, 2024);
+        cal.set(Calendar.MONTH, 0);
+        cal.set(Calendar.DAY_OF_MONTH, 1);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 1);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        cal.setTimeZone(TimeZone.getTimeZone("GMT"));
+        Date test = cal.getTime();
+        
+        Assert.assertEquals(test, AbstractAasExample.toTestDate("1.1.2024", dflt));
+        Assert.assertEquals(test, AbstractAasExample.toTestDate("2024/1/1", dflt));
     }
     
 }

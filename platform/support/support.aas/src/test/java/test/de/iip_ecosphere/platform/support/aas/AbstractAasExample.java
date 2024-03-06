@@ -21,10 +21,17 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -53,6 +60,9 @@ public abstract class AbstractAasExample {
 
     private static final Pattern[] INT_PATTERN = {Pattern.compile("^\\D*(?<value>\\d+)(\\.\\d+)?.*$")};
     private static final Pattern[] DBL_PATTERN = {Pattern.compile("^\\D*(?<value>\\d+(\\.\\d+)?).*$")};
+    private static final DateFormat[] TIME_FORMATTER = {createDateFormat("dd.mm.yyyy"), 
+        createDateFormat("yyyy/mm/dd")};
+    private static final Date DATE_OF_TEST;
     
     private List<Aas> aasList = new ArrayList<Aas>();
     private Map<String, Aas> parts = new TreeMap<>();
@@ -61,6 +71,31 @@ public abstract class AbstractAasExample {
     private boolean createMultiLanguageProperties = true;
     private File tempFolder = new File(FileUtils.getTempDirectory(), getFolderName());
 
+    /**
+     * Creates a date format.
+     * 
+     * @param format format in the form of simple date format
+     * @return the date format, in GMT
+     */
+    private static DateFormat createDateFormat(String format) {
+        SimpleDateFormat result = new SimpleDateFormat(format);
+        result.setTimeZone(TimeZone.getTimeZone("GMT"));
+        return result;
+    }
+    
+    static {
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.YEAR, 2024);
+        cal.set(Calendar.MONTH, 0);
+        cal.set(Calendar.DAY_OF_MONTH, 1);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 1);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        cal.setTimeZone(TimeZone.getTimeZone("GMT"));
+        DATE_OF_TEST = cal.getTime();
+    }
+    
     /**
      * Returns the temporary folder.
      * 
@@ -585,7 +620,7 @@ public abstract class AbstractAasExample {
      * Turns a string tolerantly to a double test value. May prevent usual issues from spec parsing/analysis.
      * 
      * @param value the value
-     * @param dflt the default value to use if no integer was found
+     * @param dflt the default value to use if no double was found
      * @return the test value
      */
     public static double toTestDouble(String value, double dflt) {
@@ -596,7 +631,7 @@ public abstract class AbstractAasExample {
      * Turns a string tolerantly to a boolean test value. May prevent usual issues from spec parsing/analysis.
      * 
      * @param value the value
-     * @param dflt the default value to use if no integer was found
+     * @param dflt the default value to use if no boolean was found
      * @return the test value
      */
     public static boolean toTestBoolean(String value, boolean dflt) {
@@ -622,6 +657,119 @@ public abstract class AbstractAasExample {
             }
         }
         return result;
+    }
+    
+    /**
+     * Turns a string tolerantly to resource mime type. May prevent usual issues from spec parsing/analysis.
+     * 
+     * @param value the value
+     * @param dflt the default value to use if no mime type was found
+     * @return the mime type or {@code dflt} if none found in {@code value}
+     */
+    public static String toTestResourceMimeType(String value, String dflt) {
+        String result;
+        if (value == null || value.length() == 0) {
+            result = dflt;
+        } else {
+            int mimePos = value.indexOf("MimeType =");
+            int valuePos = value.indexOf("Value =");
+            if (mimePos >= 0 && valuePos >= 0) {
+                if (mimePos > valuePos) {
+                    result = value.substring(mimePos);
+                } else {
+                    result = value.substring(0, valuePos);
+                }
+                result = result.trim();
+            } else {
+                result = dflt;
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Turns a string tolerantly to resource file/value. May prevent usual issues from spec parsing/analysis.
+     * 
+     * @param value the value
+     * @param dflt the default value to use if no file was found
+     * @return the file/value or {@code dflt} if none found in {@code value}
+     */
+    public static String toTestResourceFile(String value, String dflt) {
+        String result;
+        if (value == null || value.length() == 0) {
+            result = dflt;
+        } else {
+            int mimePos = value.indexOf("MimeType =");
+            int valuePos = value.indexOf("Value =");
+            if (mimePos >= 0 && valuePos >= 0) {
+                if (mimePos > valuePos) {
+                    result = value.substring(0, mimePos);
+                } else {
+                    result = value.substring(valuePos);
+                }
+                result = result.trim();
+            } else {
+                result = dflt;
+            }
+        }
+        return result;
+    }
+    
+    /**
+     * Returns a constant date for testing.
+     * 
+     * @return a date
+     */
+    public static Date getDateOfTest() {
+        return DATE_OF_TEST;
+    }
+
+    /**
+     * Turns a string tolerantly to a date instance. May prevent usual issues from spec parsing/analysis.
+     * 
+     * @param value the value
+     * @param dflt the default value to use if no date was found
+     * @return the date instance or {@code dflt} if none found in {@code value}
+     */
+    public static Date toTestDate(String value, Date dflt) {
+        Date result = null;
+        if (value != null && value.length() > 0) {
+            for (DateFormat f: TIME_FORMATTER) {
+                try {
+                    result = f.parse(value);
+                    break;
+                } catch (ParseException e) {
+                }
+            }
+        }
+        if (null == result) {
+            result = dflt;
+        }
+        return result;
+    }
+    
+    /**
+     * Asserts language strings independent of their sequence.
+     * 
+     * @param expected the expected language strings
+     * @param actual the actual language strings
+     */
+    public static void assertLangStringsEquals(LangString[] expected, LangString[] actual) {
+        Assert.assertTrue("One is missing. Expected: " + Arrays.toString(expected) + " Actual: " 
+            + Arrays.toString(actual), (expected != null && actual != null) || (expected == null && actual == null));
+        if (expected != null && actual != null) {
+            Assert.assertEquals("LangStrings differ in size: Expected: " + expected.length + " Actual: " 
+                + actual.length, expected.length, actual.length);
+            Map<String, LangString> act = new HashMap<>();
+            for (LangString a : actual) {
+                act.put(a.getLanguage(), a);
+            }
+            for (LangString e : expected) {
+                LangString a = act.remove(e.getLanguage());
+                Assert.assertNotNull("Expacted LangString for language " + e.getLanguage() + " missing.", a);
+                Assert.assertEquals("LangStrings differ. Expected:" + e + " Actual: " + a, e, a);
+            }
+        }
     }
 
 }
