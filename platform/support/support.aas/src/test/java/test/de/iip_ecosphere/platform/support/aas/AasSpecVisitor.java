@@ -17,9 +17,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.nio.charset.Charset;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.io.IOUtils;
@@ -52,6 +56,8 @@ import org.junit.Assert;
  */
 public class AasSpecVisitor implements AasVisitor {
 
+    public static final DateFormat DATE_FORMATTER = createDateFormat("yyyy/mm/dd HH:mm:ss");
+    
     private String indentation = "";
     private PrintStream out;
     
@@ -62,6 +68,18 @@ public class AasSpecVisitor implements AasVisitor {
      */
     public AasSpecVisitor(PrintStream out) {
         this.out = out;
+    }
+    
+    /**
+     * Creates a date format.
+     * 
+     * @param format format in the form of simple date format
+     * @return the date format, in GMT
+     */
+    public static DateFormat createDateFormat(String format) {
+        SimpleDateFormat result = new SimpleDateFormat(format);
+        result.setTimeZone(TimeZone.getTimeZone("GMT"));
+        return result;
     }
     
     /**
@@ -148,7 +166,11 @@ public class AasSpecVisitor implements AasVisitor {
         String value;
         try {
             Object obj = property.getValue();
-            value = String.valueOf(obj);
+            if (obj instanceof Date) {
+                value = DATE_FORMATTER.format((Date) obj);
+            } else {
+                value = String.valueOf(obj);
+            }
         } catch (ExecutionException e) {
             value = "?";
         }
@@ -261,12 +283,14 @@ public class AasSpecVisitor implements AasVisitor {
             resourcePrefix = "";
         }
         String resourceName = resourcePrefix + aas.getIdShort().toLowerCase() + ".spec";
+        System.out.println(">-- test-out --");
+        System.out.println(testSpec);
+        System.out.println("<-- test-out --");
         try {
             InputStream in = ResourceLoader.getResourceAsStream(resourceName);
             String spec = IOUtils.toString(in, cs).trim();
             Assert.assertEquals(spec, testSpec);
         } catch (NullPointerException | IOException e) {
-            System.out.println(testSpec);
             Assert.fail(null == e.getMessage() ? "Cannot read resource " + resourceName : e.getMessage());
         }
     }

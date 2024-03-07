@@ -317,7 +317,7 @@ public class FakeSubmodel extends FakeElement implements Submodel {
 
     @Override
     public DataElement getDataElement(String idShort) {
-        return null;
+        return filter(idShort, DataElement.class);
     }
 
     @Override

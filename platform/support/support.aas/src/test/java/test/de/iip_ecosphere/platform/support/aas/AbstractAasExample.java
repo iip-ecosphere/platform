@@ -23,12 +23,12 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
@@ -51,6 +51,8 @@ import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.PersistenceRecipe.FileResource;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 
+import static test.de.iip_ecosphere.platform.support.aas.AasSpecVisitor.createDateFormat;
+
 /**
  * Base class for AAS examples/tests.
  * 
@@ -70,18 +72,6 @@ public abstract class AbstractAasExample {
     private boolean createOperations = true;
     private boolean createMultiLanguageProperties = true;
     private File tempFolder = new File(FileUtils.getTempDirectory(), getFolderName());
-
-    /**
-     * Creates a date format.
-     * 
-     * @param format format in the form of simple date format
-     * @return the date format, in GMT
-     */
-    private static DateFormat createDateFormat(String format) {
-        SimpleDateFormat result = new SimpleDateFormat(format);
-        result.setTimeZone(TimeZone.getTimeZone("GMT"));
-        return result;
-    }
     
     static {
         Calendar cal = Calendar.getInstance();
@@ -671,13 +661,15 @@ public abstract class AbstractAasExample {
         if (value == null || value.length() == 0) {
             result = dflt;
         } else {
-            int mimePos = value.indexOf("MimeType =");
-            int valuePos = value.indexOf("Value =");
+            final String mimeMarker = "MimeType =";
+            final String valueMarker = "Value =";
+            int mimePos = value.indexOf(mimeMarker);
+            int valuePos = value.indexOf(valueMarker);
             if (mimePos >= 0 && valuePos >= 0) {
                 if (mimePos > valuePos) {
-                    result = value.substring(mimePos);
+                    result = value.substring(mimePos + mimeMarker.length());
                 } else {
-                    result = value.substring(0, valuePos);
+                    result = value.substring(mimeMarker.length(), valuePos);
                 }
                 result = result.trim();
             } else {
@@ -699,13 +691,15 @@ public abstract class AbstractAasExample {
         if (value == null || value.length() == 0) {
             result = dflt;
         } else {
-            int mimePos = value.indexOf("MimeType =");
-            int valuePos = value.indexOf("Value =");
+            final String mimeMarker = "MimeType =";
+            final String valueMarker = "Value =";
+            int mimePos = value.indexOf(mimeMarker);
+            int valuePos = value.indexOf(valueMarker);
             if (mimePos >= 0 && valuePos >= 0) {
                 if (mimePos > valuePos) {
-                    result = value.substring(0, mimePos);
+                    result = value.substring(valueMarker.length(), mimePos);
                 } else {
-                    result = value.substring(valuePos);
+                    result = value.substring(valuePos + valueMarker.length());
                 }
                 result = result.trim();
             } else {
@@ -770,6 +764,43 @@ public abstract class AbstractAasExample {
                 Assert.assertEquals("LangStrings differ. Expected:" + e + " Actual: " + a, e, a);
             }
         }
+    }
+    
+    /**
+     * Returns the first element, i.e., {@code obj}. Fallback of {@link #first(Iterator)}.
+     * 
+     * @param <T> the element type
+     * @param obj the object
+     * @return {@code obj}
+     */
+    public static <T> T first(T obj) {
+        return obj;
+    }
+
+    /**
+     * Returns the first element of {@code iter}.
+     * 
+     * @param <T> the element type
+     * @param iter the iterator
+     * @return the first element or <b>null</b> if there is none
+     */
+    public static <T> T first(Iterable<T> iter) {
+        return first(iter.iterator());
+    }
+
+    /**
+     * Returns the first element of {@code iter}.
+     * 
+     * @param <T> the element type
+     * @param iter the iterator
+     * @return the first element or <b>null</b> if there is none
+     */
+    public static <T> T first(Iterator<T> iter) {
+        T result = null;
+        if (iter.hasNext()) {
+            result = iter.next();
+        }
+        return result;
     }
 
 }

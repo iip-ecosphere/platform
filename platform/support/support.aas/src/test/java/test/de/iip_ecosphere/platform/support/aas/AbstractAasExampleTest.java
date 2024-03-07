@@ -202,15 +202,17 @@ public class AbstractAasExampleTest {
         Assert.assertEquals("ab", AbstractAasExample.toTestResourceMimeType(null, "ab"));
         Assert.assertEquals("ab", AbstractAasExample.toTestResourceMimeType("", "ab"));
 
-        String mimeTest = "MimeType = image/png";
-        String valueTest = "Value = /aasx/TechnicalData/logo.png";
+        String mimeValue = "image/png";
+        String mimeTest = "MimeType = " + mimeValue;
+        String valueValue = "/aasx/TechnicalData/logo.png";
+        String valueTest = "Value = " + valueValue;
         String test = mimeTest + " " + valueTest;
-        Assert.assertEquals(mimeTest, AbstractAasExample.toTestResourceMimeType(test, "ab"));
-        Assert.assertEquals(valueTest, AbstractAasExample.toTestResourceFile(test, "ab"));
+        Assert.assertEquals(mimeValue, AbstractAasExample.toTestResourceMimeType(test, "ab"));
+        Assert.assertEquals(valueValue, AbstractAasExample.toTestResourceFile(test, "ab"));
 
         test = valueTest + " " + mimeTest; 
-        Assert.assertEquals(mimeTest, AbstractAasExample.toTestResourceMimeType(test, "ab"));
-        Assert.assertEquals(valueTest, AbstractAasExample.toTestResourceFile(test, "ab"));
+        Assert.assertEquals(mimeValue, AbstractAasExample.toTestResourceMimeType(test, "ab"));
+        Assert.assertEquals(valueValue, AbstractAasExample.toTestResourceFile(test, "ab"));
     }
 
     /**
