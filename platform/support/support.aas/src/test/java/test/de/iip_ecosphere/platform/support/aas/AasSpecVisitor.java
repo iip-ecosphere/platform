@@ -200,7 +200,7 @@ public class AasSpecVisitor implements AasVisitor {
 
     @Override
     public void visitReferenceElement(ReferenceElement referenceElement) {
-        log("REFERENCE " + referenceElement.getIdShort() + " = " + referenceElement.getValue()
+        log("REFERENCE " + referenceElement.getIdShort() + " -> " + (referenceElement.getValue() != null)
             + getSemanticId(referenceElement));
     }
 

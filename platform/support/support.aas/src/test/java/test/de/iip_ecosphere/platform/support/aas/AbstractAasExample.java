@@ -49,6 +49,8 @@ import de.iip_ecosphere.platform.support.aas.IdentifierType;
 import de.iip_ecosphere.platform.support.aas.LangString;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.PersistenceRecipe.FileResource;
+import de.iip_ecosphere.platform.support.aas.Reference;
+import de.iip_ecosphere.platform.support.aas.ReferenceElement;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 
 import static test.de.iip_ecosphere.platform.support.aas.AasSpecVisitor.createDateFormat;
@@ -443,6 +445,10 @@ public abstract class AbstractAasExample {
         return matches;
     }
     
+    // methods to tolerantly translate value extracted from an AAS spec into a test value of a certain type.
+    // Naming convention: toTest<AasType>(String value, <AasType> dflt) except for methods that are explicity
+    // called by non-generic generation parts. 
+    
     /**
      * Turns a string tolerantly to a test value. May prevent usual issues from spec parsing/analysis.
      * 
@@ -710,6 +716,18 @@ public abstract class AbstractAasExample {
     }
     
     /**
+     * Turns value tolerantly into a reference if possible.
+     * 
+     * @param value the value
+     * @param dflt the default value if {@code value} does not point to an AAS element
+     * @return {@code dflt} for now
+     */
+    public static final Reference toTestReferenceElement(String value, Reference dflt) {
+        // may search in AasList for something that looks like value; shall consider value = null || value.length() ==0
+        return dflt;
+    }
+    
+    /**
      * Returns a constant date for testing.
      * 
      * @return a date
@@ -767,7 +785,26 @@ public abstract class AbstractAasExample {
     }
     
     /**
-     * Returns the first element, i.e., {@code obj}. Fallback of {@link #first(Iterator)}.
+     * Asserts the (value of) the {@code actual} reference element compared to the given {@code expected} reference.
+     * 
+     * @param expected the expected reference
+     * @param actual the actual reference element
+     */
+    public static void assertReferenceEquals(Reference expected, ReferenceElement actual) {
+        // TODO check with multiSemId!
+        /*if (null != expected) {
+            Assert.assertNotNull(actual);
+            Assert.assertEquals(expected, actual.getValue());
+        } else {
+            Assert.assertNull(actual);
+        }*/
+    }
+    
+    // generic methods in test applied on a given value, set, iterator to obtain the "first" for assertions
+    
+    /**
+     * Returns the "first" element, i.e., {@code obj}. Basic fallback of the other "first" methods. Selection
+     * is made statically during compilation!
      * 
      * @param <T> the element type
      * @param obj the object
@@ -775,6 +812,20 @@ public abstract class AbstractAasExample {
      */
     public static <T> T first(T obj) {
         return obj;
+    }
+
+    /**
+     * Returns the "first" element, i.e., value of {@code elt}. 
+     * 
+     * @param elt the reference element
+     * @return the reference, possibly <b>null</b>
+     */
+    public static Reference first(ReferenceElement elt) {
+        Reference result = null;
+        if (null != elt) {
+            result = elt.getValue();
+        }
+        return result;
     }
 
     /**
