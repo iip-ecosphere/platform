@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -177,6 +178,58 @@ public class Utils {
         }
         return tmp.stream();
     }
+
+    /**
+     * Filters and collects {@code elements}.
+     * 
+     * @param <E> the element type
+     * @param elements the elements
+     * @param eltCls the type to filter for
+     * @param semanticId the semanticId to filter further
+     * @return the filtered elements as iterable
+     */
+    public static <E extends SubmodelElement> Iterable<E> collect(Iterable<SubmodelElement> elements, Class<E> eltCls, 
+        String semanticId) {
+        return collect(elements, eltCls, semanticId, e -> e);
+    }
+
+    /**
+     * Filters, translates and collects {@code elements}.
+     * 
+     * @param <E> the element type
+     * @param <T> the target value type
+     * @param elements the elements
+     * @param eltCls the type to filter for
+     * @param semanticId the semanticId to filter further
+     * @param translate translates elements to the target value (type) 
+     * @return the filtered elements as iterable
+     */
+    public static <T, E extends SubmodelElement> Iterable<T> collect(Iterable<SubmodelElement> elements, 
+        Class<E> eltCls, String semanticId, Function <E, T> translate) {
+        return stream(elements, eltCls, e -> semanticId.equals(e.getSemanticId()))
+            .map(e -> translate.apply(e))
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * Casts a property value to {@code cls} if possible.
+     * 
+     * @param <T> the value type
+     * @param prop the property
+     * @param cls the value type class
+     * @return the value or <b>null</b>
+     */
+    public static <T> T cast(Property prop, Class<T> cls) {
+        T result = null;
+        try {
+            Object v = prop.getValue();
+            if (cls.isInstance(v)) {
+                result = cls.cast(v);
+            }
+        } catch (ExecutionException e) {
+        }
+        return result;
+    }
     
     /**
      * Returns a string value from the specified property in {@code parent}.
@@ -324,11 +377,21 @@ public class Utils {
         LangString[] result = null;
         DataElement elt = parent.getDataElement(idShort);
         if (elt instanceof MultiLanguageProperty) {
-            MultiLanguageProperty mlElt = (MultiLanguageProperty) elt;
-            Collection<LangString> ls = mlElt.getDescription().values();
-            result = ls.toArray(new LangString[ls.size()]);
+            result = getLangStringValue((MultiLanguageProperty) elt);
         }
         return result;
+    }
+    
+    /**
+     * Returns LangString values from the given multi-language property.
+     * 
+     * @param property the property
+     * @return the LangString values, may be <b>null</b> if there is no property
+     * @throws ExecutionException if accessing the property value fails
+     */
+    public static LangString[] getLangStringValue(MultiLanguageProperty property) {
+        Collection<LangString> ls = property.getDescription().values();
+        return ls.toArray(new LangString[ls.size()]);
     }
     
     /**
