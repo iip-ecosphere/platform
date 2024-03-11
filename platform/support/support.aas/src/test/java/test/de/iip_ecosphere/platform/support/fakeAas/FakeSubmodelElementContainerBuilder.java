@@ -16,6 +16,7 @@ import de.iip_ecosphere.platform.support.Builder;
 import de.iip_ecosphere.platform.support.aas.Reference;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
+import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.aas.BlobDataElement.BlobDataElementBuilder;
 import de.iip_ecosphere.platform.support.aas.Entity.EntityBuilder;
 import de.iip_ecosphere.platform.support.aas.Entity.EntityType;
@@ -23,6 +24,7 @@ import de.iip_ecosphere.platform.support.aas.FileDataElement.FileDataElementBuil
 import de.iip_ecosphere.platform.support.aas.MultiLanguageProperty.MultiLanguagePropertyBuilder;
 import de.iip_ecosphere.platform.support.aas.Operation.OperationBuilder;
 import de.iip_ecosphere.platform.support.aas.Property.PropertyBuilder;
+import de.iip_ecosphere.platform.support.aas.Range.RangeBuilder;
 import de.iip_ecosphere.platform.support.aas.ReferenceElement.ReferenceElementBuilder;
 import de.iip_ecosphere.platform.support.aas.RelationshipElement.RelationshipElementBuilder;
 
@@ -64,6 +66,11 @@ public abstract class FakeSubmodelElementContainerBuilder implements SubmodelEle
     }
 
     @Override
+    public RangeBuilder createRangeBuilder(String idShort, Type type, Object min, Object max) {
+        return new FakeRange.FakeRangeBuilder(this, idShort, type, min, max);
+    }
+
+    @Override
     public BlobDataElementBuilder createBlobDataElementBuilder(String idShort, String value, String mimeType) {
         return new FakeBlobDataElement.FakeBlobDataElementBuilder(this, idShort, value, mimeType);
     }
@@ -101,6 +108,16 @@ public abstract class FakeSubmodelElementContainerBuilder implements SubmodelEle
      */
     FakeFileDataElement register(FakeFileDataElement element) {
         return registerElement(element);
+    }
+
+    /**
+     * Registers a range.
+     * 
+     * @param range the range
+     * @return {@code range}
+     */
+    FakeRange register(FakeRange range) {
+        return registerElement(range);
     }
 
     /**

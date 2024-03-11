@@ -27,6 +27,7 @@ import de.iip_ecosphere.platform.support.aas.Operation;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.Reference;
 import de.iip_ecosphere.platform.support.aas.ReferenceElement;
+import de.iip_ecosphere.platform.support.aas.RelationshipElement;
 import test.de.iip_ecosphere.platform.support.fakeAas.FakeSubmodelElementCollection.FakeSubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
@@ -193,6 +194,11 @@ public class FakeEntity extends FakeElement implements Entity {
         return filter(idShort, SubmodelElementCollection.class);
     }
 
+    @Override
+    public Entity getEntity(String idShort) {
+        return filter(idShort, Entity.class);
+    }
+    
     /**
      * Filters {@code #elements()} for the given short id and type.
      * 
@@ -229,6 +235,11 @@ public class FakeEntity extends FakeElement implements Entity {
     @Override
     public ReferenceElement getReferenceElement(String idShort) {
         return filter(idShort, ReferenceElement.class);
+    }
+    
+    @Override
+    public RelationshipElement getRelationshipElement(String idShort) {
+        return filter(idShort, RelationshipElement.class);
     }
 
     @Override

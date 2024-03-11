@@ -14,8 +14,14 @@ package test.de.iip_ecosphere.platform.support.aas;
 
 import org.junit.Test;
 
+import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
+import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.LangString;
+import de.iip_ecosphere.platform.support.aas.Range;
+import de.iip_ecosphere.platform.support.aas.Type;
+import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 
+import java.math.BigInteger;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
@@ -188,6 +194,8 @@ public class AbstractAasExampleTest {
             AbstractAasExample.toTestLangString("test1@en", "test@de"));
         AbstractAasExample.assertLangStringsEquals(new LangString[] {new LangString("en", "test1"), 
             new LangString("de", "test")}, AbstractAasExample.toTestLangString("test1@en test@de", "t@de"));
+        AbstractAasExample.assertLangStringsEquals(new LangString[] {new LangString("en", "test")},
+            AbstractAasExample.toTestLangString("ZVEI AK IT in Automation", "test@en"));
     }
     
     /**
@@ -237,6 +245,47 @@ public class AbstractAasExampleTest {
         
         Assert.assertEquals(test, AbstractAasExample.toTestDate("1.1.2024", dflt));
         Assert.assertEquals(test, AbstractAasExample.toTestDate("2024/1/1", dflt));
+    }
+    
+    /**
+     * Tests {@link AbstractAasExample#toTestBigInteger(String, long)}.
+     */
+    @Test
+    public void testBigInteger() {
+        Assert.assertEquals(BigInteger.valueOf(1234), AbstractAasExample.toTestBigInteger(null, 1234));
+        Assert.assertEquals(BigInteger.valueOf(1234), AbstractAasExample.toTestBigInteger("", 1234));
+        Assert.assertEquals(BigInteger.valueOf(1234), AbstractAasExample.toTestBigInteger("1234", 0));
+        Assert.assertEquals(BigInteger.valueOf(1234), AbstractAasExample.toTestBigInteger("xxx 1234 yyy", 0));
+    }
+    
+    /**
+     * Tests {@link AbstractAasExample#toTestRange(String, Range, String, 
+     * de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder)}.
+     */
+    @Test
+    public void testRange() {
+        AasFactory factory = AasFactory.getInstance();
+        AasBuilder aasBuilder = factory.createAasBuilder("aas", null);
+        SubmodelBuilder smBuilder = aasBuilder.createSubmodelBuilder("sm", null);
+        Range dflt = smBuilder.createRangeBuilder("dflt", Type.AAS_INTEGER, 1, 2).build();
+        
+        AbstractAasExample.assertEquals(dflt, AbstractAasExample.toTestRange(null, dflt, "xyz", smBuilder));
+        AbstractAasExample.assertEquals(dflt, AbstractAasExample.toTestRange("", dflt, "xyz", smBuilder));
+        AbstractAasExample.assertEquals(dflt, AbstractAasExample.toTestRange("xyz", dflt, "xyz", smBuilder));
+        AbstractAasExample.assertEquals(smBuilder.createRangeBuilder("xyz", Type.AAS_INTEGER, 7, 20).build(), 
+            AbstractAasExample.toTestRange("7-20", dflt, "xyz", smBuilder));
+        AbstractAasExample.assertEquals(smBuilder.createRangeBuilder("xyz", Type.DOUBLE, 7.0, 20.1).build(), 
+            AbstractAasExample.toTestRange("7-20.1", dflt, "xyz", smBuilder));
+        AbstractAasExample.assertEquals(smBuilder.createRangeBuilder("xyz", Type.DOUBLE, 7.2, 20.0).build(), 
+            AbstractAasExample.toTestRange("7.2-20", dflt , "xyz", smBuilder));
+        AbstractAasExample.assertEquals(smBuilder.createRangeBuilder("xyz", Type.DOUBLE, -7.2, -20.0).build(), 
+            AbstractAasExample.toTestRange("-7.2--20", dflt, "xyz", smBuilder));
+        AbstractAasExample.assertEquals(smBuilder.createRangeBuilder("xyz", Type.FLOAT, 12.0f, 56.0f).build(), 
+            AbstractAasExample.toTestRange("or [float] 12..56 or 0..9.99", dflt, "xyz", smBuilder));
+        AbstractAasExample.assertEquals(smBuilder.createRangeBuilder("xyz", Type.FLOAT, 0f, 9.99f).build(), 
+            AbstractAasExample.toTestRange("or [float] 0..9.99 or 12..56", dflt, "xyz", smBuilder));
+        AbstractAasExample.assertEquals(smBuilder.createRangeBuilder("xyz", Type.AAS_INTEGER, 10, 23).build(), 
+            AbstractAasExample.toTestRange("10 - 23", dflt, "xyz", smBuilder));
     }
     
 }

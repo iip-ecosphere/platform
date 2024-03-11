@@ -86,6 +86,10 @@ public class BasicAasVisitor implements AasVisitor {
     }
 
     @Override
+    public void visitRange(Range range) {
+    }
+
+    @Override
     public void visitBlobDataElement(BlobDataElement dataElement) {
     }
 

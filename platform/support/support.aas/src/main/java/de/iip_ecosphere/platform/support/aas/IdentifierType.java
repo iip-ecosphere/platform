@@ -50,7 +50,7 @@ public interface IdentifierType {
     }
 
     /**
-     * Creates an {@link #urn-text-prefixed} string.
+     * Creates an {@link #URN_TEXT_PREFIX} string.
      * 
      * @param text the trailing text
      * @return the urn-text-prefixed string

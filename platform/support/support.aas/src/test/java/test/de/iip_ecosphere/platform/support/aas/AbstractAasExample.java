@@ -19,6 +19,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.math.BigInteger;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.DateFormat;
@@ -49,8 +50,11 @@ import de.iip_ecosphere.platform.support.aas.IdentifierType;
 import de.iip_ecosphere.platform.support.aas.LangString;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.PersistenceRecipe.FileResource;
+import de.iip_ecosphere.platform.support.aas.Range;
 import de.iip_ecosphere.platform.support.aas.Reference;
 import de.iip_ecosphere.platform.support.aas.ReferenceElement;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
+import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 
 import static test.de.iip_ecosphere.platform.support.aas.AasSpecVisitor.createDateFormat;
@@ -62,8 +66,8 @@ import static test.de.iip_ecosphere.platform.support.aas.AasSpecVisitor.createDa
  */
 public abstract class AbstractAasExample {
 
-    private static final Pattern[] INT_PATTERN = {Pattern.compile("^\\D*(?<value>\\d+)(\\.\\d+)?.*$")};
-    private static final Pattern[] DBL_PATTERN = {Pattern.compile("^\\D*(?<value>\\d+(\\.\\d+)?).*$")};
+    private static final Pattern[] INT_PATTERN = {Pattern.compile("^\\D*(?<value>-?\\d+)(\\.\\d+)?.*$")};
+    private static final Pattern[] DBL_PATTERN = {Pattern.compile("^\\D*(?<value>-?\\d+(\\.\\d+)?).*$")};
     private static final DateFormat[] TIME_FORMATTER = {createDateFormat("dd.mm.yyyy"), 
         createDateFormat("yyyy/mm/dd")};
     private static final Date DATE_OF_TEST;
@@ -437,7 +441,7 @@ public abstract class AbstractAasExample {
         boolean matches = false;
         if (enumValue != null) {
             String ev = enumValue.toString().toLowerCase();
-            matches = value.contains(ev);
+            matches = value.contains(ev)/* || ev.contains(value)*/;
             if (!matches && (ev.startsWith(IdentifierType.IRI_PREFIX) || ev.startsWith(IdentifierType.IRDI_PREFIX))) {
                 matches = ev.contains(value);
             }
@@ -479,6 +483,9 @@ public abstract class AbstractAasExample {
             dflt = "";
         }
         Map<String, String> values = parseMLString(value == null || value.length() == 0 ? dflt : value);
+        if (values.isEmpty()) {
+            values = parseMLString(dflt);
+        }
         LangString[] result = new LangString[values.size()];
         int count = 0;
         for (Map.Entry<String, String> v : values.entrySet()) {
@@ -624,6 +631,142 @@ public abstract class AbstractAasExample {
     }
 
     /**
+     * Turns a string tolerantly to a float test value. May prevent usual issues from spec parsing/analysis.
+     * 
+     * @param value the value
+     * @param dflt the default value to use if no float was found
+     * @return the test value
+     */
+    public static float toTestFloat(String value, float dflt) {
+        return toTestValue(value, dflt, v -> Float.parseFloat(v), DBL_PATTERN);
+    }
+
+    /**
+     * Turns a string tolerantly to a long test value. May prevent usual issues from spec parsing/analysis.
+     * 
+     * @param value the value
+     * @param dflt the default value to use if no long was found
+     * @return the test value
+     */
+    public static long toTestLong(String value, long dflt) {
+        return toTestValue(value, dflt, v -> Long.parseLong(v), INT_PATTERN);
+    }
+    
+    /**
+     * Turns a string tolerantly to a BigInteger test value. May prevent usual issues from spec parsing/analysis.
+     * 
+     * @param value the value
+     * @param dflt the default value to use if no long was found
+     * @return the test value
+     */
+    public static BigInteger toTestBigInteger(String value, long dflt) {
+        return toTestValue(value, BigInteger.valueOf(dflt), v -> new BigInteger(v), INT_PATTERN);
+    }
+    
+    /**
+     * Turns a string tolerantly to a range element. May prevent usual issues from spec parsing/analysis.
+     * 
+     * @param value the value
+     * @param dflt the default value to use if no long was found
+     * @param idShort the idshort of the range element to create
+     * @param builder the builder to use if a new range element shall be created
+     * @return the range test value
+     */
+    public static Range toTestRange(String value, Range dflt, String idShort, SubmodelElementContainerBuilder builder) {
+        Range result;
+        if (value == null || value.length() == 0) {
+            result = dflt;
+        } else {
+            value = value.trim();
+            int markerLen = 1;
+            Type type = null;
+            int pos = value.indexOf("[");
+            if (pos > 0) {
+                int end = value.indexOf("]" , pos + 1);
+                if (end > 0) {
+                    String t = value.substring(pos + 1, end).toUpperCase();
+                    try {
+                        type = Type.valueOf(t);
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("Warn: Range type " + t + "not known, ignoring.");
+                    }
+                    value = value.substring(end + 1).trim();
+                }
+            }
+            pos = value.indexOf("-");
+            if (pos == 0) { // not a -1
+                pos = value.indexOf("-", 1);
+            }
+            if (pos < 0) {
+                pos = value.indexOf("..");
+                markerLen = 2;
+            }
+            if (pos > 0) {
+                String minVal = value.substring(0, pos).trim();
+                String maxVal = value.substring(pos + markerLen).trim();
+                Object min = null;
+                Object max = null;
+                if (Type.FLOAT == type) {
+                    min = toTestFloat(minVal, 0);
+                    max = toTestFloat(maxVal, 0);
+                } else {
+                    Matcher minIntMatch = findMatcher(INT_PATTERN, minVal, minVal.contains("."));
+                    Matcher maxIntMatch = findMatcher(INT_PATTERN, maxVal, maxVal.contains("."));
+                    Matcher minDblMatch = findMatcher(DBL_PATTERN, minVal, false);
+                    Matcher maxDblMatch = findMatcher(DBL_PATTERN, maxVal, false);
+                    if (minIntMatch != null && maxIntMatch != null) {
+                        type = Type.AAS_INTEGER;
+                        min = toTestInt(minVal, 0);
+                        max = toTestInt(maxVal, 0);
+                    } else if (minDblMatch != null && maxDblMatch != null) {
+                        type = Type.DOUBLE;
+                        min = toTestDouble(minVal, 0);
+                        max = toTestDouble(maxVal, 0);
+                    } else if (minDblMatch != null && maxIntMatch != null) {
+                        type = Type.DOUBLE;
+                        min = toTestDouble(minVal, 0);
+                        max = toTestDouble(maxVal, 0);
+                    } else if (minIntMatch != null && maxDblMatch != null) {
+                        type = Type.DOUBLE;
+                        min = toTestDouble(minVal, 0);
+                        max = toTestDouble(maxVal, 0);
+                    }
+                }
+                if (null != type && min != null && max != null) {
+                    result = builder.createRangeBuilder(idShort, type, min, max).build();
+                } else {
+                    result = dflt;
+                }
+                
+            } else {
+                result = dflt;
+            }
+        }
+        return result;
+    }
+    
+    /**
+     * Returns a matcher for {@code value} in {@code pattern}.
+     * 
+     * @param pattern the patterns
+     * @param value the value
+     * @param skip to skip the evaluation and to directly return <b>null</b>
+     * @return a matcher out of {@code patterns} or <b>null</b>
+     */
+    private static Matcher findMatcher(Pattern[] pattern, String value, boolean skip) {
+        Matcher result = null;
+        if (!skip) {
+            for (int p = 0; null == result && p < pattern.length; p++) {
+                Matcher m = pattern[p].matcher(value);
+                if (m.matches()) {
+                    result = m;
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
      * Turns a string tolerantly to a boolean test value. May prevent usual issues from spec parsing/analysis.
      * 
      * @param value the value
@@ -726,7 +869,29 @@ public abstract class AbstractAasExample {
         // may search in AasList for something that looks like value; shall consider value = null || value.length() ==0
         return dflt;
     }
-    
+
+    /**
+     * Turns value tolerantly into the first reference of a relationship element if possible.
+     * 
+     * @param value the value
+     * @param dflt the default value if {@code value} does not point to an AAS element
+     * @return {@code dflt} for now
+     */
+    public static final Reference toTestRelationshipElementFirst(String value, Reference dflt) {
+        return dflt;
+    }
+
+    /**
+     * Turns value tolerantly into the second reference of a relationship element if possible.
+     * 
+     * @param value the value
+     * @param dflt the default value if {@code value} does not point to an AAS element
+     * @return {@code dflt} for now
+     */
+    public static final Reference toTestRelationshipElementSecond(String value, Reference dflt) {
+        return dflt;
+    }
+
     /**
      * Returns a constant date for testing.
      * 
@@ -791,14 +956,30 @@ public abstract class AbstractAasExample {
      * @param actual the actual reference element
      */
     public static void assertReferenceEquals(Reference expected, ReferenceElement actual) {
-        // TODO check with multiSemId!
-        /*if (null != expected) {
+        if (null != expected) {
             Assert.assertNotNull(actual);
             Assert.assertEquals(expected, actual.getValue());
         } else {
             Assert.assertNull(actual);
-        }*/
+        }
     }
+    
+    /**
+     * Asserts the equality of two range elements.
+     * 
+     * @param expected the expected element
+     * @param actual the actual element
+     */
+    public static void assertEquals(Range expected, Range actual) {
+        if (null == expected) {
+            Assert.assertNull(actual);
+        } else {
+            Assert.assertNotNull(actual);
+            Assert.assertEquals(expected.getType(), actual.getType());
+            Assert.assertEquals(expected.getMin(), actual.getMin());
+            Assert.assertEquals(expected.getMax(), actual.getMax());
+        }
+    }    
     
     // generic methods in test applied on a given value, set, iterator to obtain the "first" for assertions
     
@@ -815,17 +996,13 @@ public abstract class AbstractAasExample {
     }
 
     /**
-     * Returns the "first" element, i.e., value of {@code elt}. 
+     * Returns the "first" element, enforcing as fallback primitive int output. 
      * 
-     * @param elt the reference element
-     * @return the reference, possibly <b>null</b>
+     * @param value the primitive value
+     * @return {@code value}
      */
-    public static Reference first(ReferenceElement elt) {
-        Reference result = null;
-        if (null != elt) {
-            result = elt.getValue();
-        }
-        return result;
+    public static int first(int value) {
+        return value;
     }
 
     /**

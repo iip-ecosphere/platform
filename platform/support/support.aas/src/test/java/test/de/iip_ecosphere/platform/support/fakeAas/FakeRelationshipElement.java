@@ -111,20 +111,12 @@ public class FakeRelationshipElement extends FakeElement implements Relationship
         return Collections.unmodifiableMap(description);
     }
 
-    /**
-     * Returns the first reference.
-     * 
-     * @return the first reference
-     */
+    @Override
     public Reference getFirst() {
         return first;
     }
 
-    /**
-     * Returns the second reference.
-     * 
-     * @return the second reference
-     */
+    @Override
     public Reference getSecond() {
         return second;
     }

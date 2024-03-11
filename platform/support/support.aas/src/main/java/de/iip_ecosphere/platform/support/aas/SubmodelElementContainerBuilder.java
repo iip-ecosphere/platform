@@ -8,6 +8,7 @@ import de.iip_ecosphere.platform.support.aas.FileDataElement.FileDataElementBuil
 import de.iip_ecosphere.platform.support.aas.MultiLanguageProperty.MultiLanguagePropertyBuilder;
 import de.iip_ecosphere.platform.support.aas.Operation.OperationBuilder;
 import de.iip_ecosphere.platform.support.aas.Property.PropertyBuilder;
+import de.iip_ecosphere.platform.support.aas.Range.RangeBuilder;
 import de.iip_ecosphere.platform.support.aas.ReferenceElement.ReferenceElementBuilder;
 import de.iip_ecosphere.platform.support.aas.RelationshipElement.RelationshipElementBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
@@ -86,6 +87,17 @@ public interface SubmodelElementContainerBuilder {
      * @return the data element builder
      */
     public FileDataElementBuilder createFileDataElementBuilder(String idShort, String contents, String mimeType);
+
+    /**
+     * Creates a nested range builder.
+     * 
+     * @param idShort the short id of the data element
+     * @param type the value type
+     * @param min the minimum value
+     * @param max the maximum value
+     * @return the range builder
+     */
+    public RangeBuilder createRangeBuilder(String idShort, Type type, Object min, Object max);
 
     /**
      * Creates a nested BLOB data element builder.

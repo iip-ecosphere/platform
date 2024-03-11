@@ -26,8 +26,7 @@ import de.iip_ecosphere.platform.support.aas.types.common.DelegatingSubmodelElem
 import de.iip_ecosphere.platform.support.aas.types.common.Utils;
 
 /**
- * A PCF submodel builder for <a href="https://github.com/admin-shell-io/submodel-templates/
- * tree/main/development/Carbon%20Footprint/1/0">IDTA 2023-01-24 Draft Submodel PCF</a>.
+ * A PCF submodel builder for IDTA 2023-01-24 Draft Submodel PCF.
  * 
  * @author Holger Eichelberger, SSE
  */

@@ -40,6 +40,7 @@ import de.iip_ecosphere.platform.support.aas.HasSemantics;
 import de.iip_ecosphere.platform.support.aas.MultiLanguageProperty;
 import de.iip_ecosphere.platform.support.aas.Operation;
 import de.iip_ecosphere.platform.support.aas.Property;
+import de.iip_ecosphere.platform.support.aas.Range;
 import de.iip_ecosphere.platform.support.aas.ReferenceElement;
 import de.iip_ecosphere.platform.support.aas.RelationshipElement;
 import de.iip_ecosphere.platform.support.aas.Submodel;
@@ -236,6 +237,11 @@ public class AasSpecVisitor implements AasVisitor {
         String contents = dataElement.getContents();
         int len = contents == null ? 0 : contents.length();
         log(getHeader("FILE", dataElement) + " length " + len);
+    }
+
+    @Override
+    public void visitRange(Range range) {
+        log(getHeader("RANGE", range) + " min " + range.getMin() + " max " + range.getMax());
     }
 
     @Override

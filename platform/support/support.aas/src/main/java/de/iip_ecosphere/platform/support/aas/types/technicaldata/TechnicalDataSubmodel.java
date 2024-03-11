@@ -18,9 +18,8 @@ import de.iip_ecosphere.platform.support.aas.types.common.DelegatingSubmodel;
 import de.iip_ecosphere.platform.support.aas.types.common.Utils;
 
 /**
- * Support for <a href="https://industrialdigitaltwin.org/wp-content/uploads/2022/10/
- * IDTA-02003-1-2_Submodel_TechnicalData.pdf">IDTA 02003-1-2 Generic Frame for Technical Data for
- * Industrial Equipment in Manufacturing</a>.
+ * Support for IDTA 02003-1-2 Generic Frame for Technical Data for
+ * Industrial Equipment in Manufacturing.
  * 
  * @author Holger Eichelberger, SSE
  */

@@ -14,9 +14,11 @@ package de.iip_ecosphere.platform.support.aas.types.common;
 
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.BlobDataElement.BlobDataElementBuilder;
+import de.iip_ecosphere.platform.support.aas.Entity;
 import de.iip_ecosphere.platform.support.aas.Entity.EntityBuilder;
 import de.iip_ecosphere.platform.support.aas.Entity.EntityType;
 import de.iip_ecosphere.platform.support.aas.FileDataElement.FileDataElementBuilder;
+import de.iip_ecosphere.platform.support.aas.LangString;
 import de.iip_ecosphere.platform.support.aas.MultiLanguageProperty.MultiLanguagePropertyBuilder;
 import de.iip_ecosphere.platform.support.aas.Operation.OperationBuilder;
 import de.iip_ecosphere.platform.support.aas.Property.PropertyBuilder;
@@ -25,29 +27,28 @@ import de.iip_ecosphere.platform.support.Builder;
 import de.iip_ecosphere.platform.support.aas.Reference;
 import de.iip_ecosphere.platform.support.aas.ReferenceElement.ReferenceElementBuilder;
 import de.iip_ecosphere.platform.support.aas.RelationshipElement.RelationshipElementBuilder;
-import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
 
 /**
- * Implements a (basic) SMC builder, which delegates all work to an internally created builder. This class shall be 
- * used , if a template submodel shall allow for extensible addition
+ * Implements a (basic) entity , which delegates all work to an internally created builder. This class shall be 
+ * used, if a template submodel shall allow for extensible addition
  * of further submodel elements other than those defined in a template. If this is not intended,
- * directly use {@link Builder} of {@link SubmodelElementCollection}.
+ * directly use {@link Builder} of {@link Entity}.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class DelegatingSubmodelElementCollectionBuilder implements SubmodelElementCollectionBuilder {
+public class DelegatingEntityBuilder implements EntityBuilder {
 
-    private SubmodelElementCollectionBuilder delegate;
+    private EntityBuilder delegate;
     
     /**
-     * Creates a delegating SMC builder.
+     * Creates a delegating Entity builder.
      * 
      * @param delegate the builder to delegate to
      */
-    protected DelegatingSubmodelElementCollectionBuilder(SubmodelElementCollectionBuilder delegate) {
+    protected DelegatingEntityBuilder(EntityBuilder delegate) {
         this.delegate = delegate;
     }
     
@@ -56,7 +57,7 @@ public class DelegatingSubmodelElementCollectionBuilder implements SubmodelEleme
      * 
      * @return the builder
      */
-    protected SubmodelElementCollectionBuilder getDelegate() {
+    protected EntityBuilder getDelegate() {
         return delegate;
     }
 
@@ -100,7 +101,7 @@ public class DelegatingSubmodelElementCollectionBuilder implements SubmodelEleme
     public RangeBuilder createRangeBuilder(String idShort, Type type, Object min, Object max) {
         return delegate.createRangeBuilder(idShort, type, min, max);
     }
-    
+
     @Override
     public BlobDataElementBuilder createBlobDataElementBuilder(String idShort, String contents, String mimeType) {
         return delegate.createBlobDataElementBuilder(idShort, contents, mimeType);
@@ -133,27 +134,22 @@ public class DelegatingSubmodelElementCollectionBuilder implements SubmodelEleme
     }
 
     @Override
-    public void defer() {
-        delegate.defer();
-    }
-
-    @Override
-    public void buildDeferred() {
-        delegate.buildDeferred();
-    }
-
-    @Override
-    public SubmodelElementCollection build() {
-        return delegate.build();
-    }
-
-    @Override
     public Reference createReference() {
         return delegate.createReference();
     }
 
     @Override
-    public SubmodelElementCollectionBuilder setSemanticId(String refValue) {
+    public Entity build() {
+        return delegate.build();
+    }
+
+    @Override
+    public EntityBuilder setDescription(LangString... description) {
+        return delegate.setDescription(description);
+    }
+
+    @Override
+    public EntityBuilder setSemanticId(String refValue) {
         return delegate.setSemanticId(refValue);
     }
 

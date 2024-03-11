@@ -54,7 +54,6 @@ public interface PersistenceRecipe {
          * 
          * @param fileContent the file content to be used as a resource
          * @param path the local (target) path
-         * @throws IOException if {@code file} cannot be read
          */
         public FileResource(byte[] fileContent, String path) {
             this.fileContent = fileContent;

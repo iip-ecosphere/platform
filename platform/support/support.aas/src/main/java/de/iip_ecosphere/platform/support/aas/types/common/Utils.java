@@ -16,6 +16,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -31,6 +32,7 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import de.iip_ecosphere.platform.support.aas.BlobDataElement;
 import de.iip_ecosphere.platform.support.aas.DataElement;
 import de.iip_ecosphere.platform.support.aas.ElementsAccess;
 import de.iip_ecosphere.platform.support.aas.FileDataElement;
@@ -41,6 +43,9 @@ import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.aas.MultiLanguageProperty.MultiLanguagePropertyBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.aas.Property;
+import de.iip_ecosphere.platform.support.aas.Range;
+import de.iip_ecosphere.platform.support.aas.ReferenceElement;
+import de.iip_ecosphere.platform.support.aas.RelationshipElement;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
@@ -239,11 +244,20 @@ public class Utils {
      * @return the string value, may be <b>null</b> if there is no property
      * @throws ExecutionException if accessing the property value fails
      */
-    public static String getStringValue(ElementsAccess parent, String idShort) 
-        throws ExecutionException {
+    public static String getStringValue(ElementsAccess parent, String idShort) throws ExecutionException {
+        return getStringValue(parent.getProperty(idShort));
+    }
+
+    /**
+     * Returns a string value from the specified property.
+     * 
+     * @param prop the property
+     * @return the string value, may be <b>null</b> if there is no property
+     * @throws ExecutionException if accessing the property value fails
+     */
+    public static String getStringValue(Property prop) throws ExecutionException {
         try {
             String result = null;
-            Property prop = parent.getProperty(idShort);
             if (null != prop) {
                 result = (String) prop.getValue();
             }
@@ -252,7 +266,7 @@ public class Utils {
             throw new ExecutionException(e.getMessage(), null);
         }
     }
-    
+
     /**
      * Returns an int value from the specified property in {@code parent}.
      * 
@@ -261,13 +275,58 @@ public class Utils {
      * @return the int value
      * @throws ExecutionException if accessing the property value fails
      */
-    public static int getIntValue(ElementsAccess parent, String idShort) 
-        throws ExecutionException {
+    public static int getIntValue(ElementsAccess parent, String idShort) throws ExecutionException {
         try {
             int result = 0;
             Property prop = parent.getProperty(idShort);
             if (null != prop) {
                 result = (Integer) prop.getValue();
+            } else {
+                throw new ExecutionException("Property " + idShort + " does not exist", null);
+            }
+            return result;
+        } catch (ClassCastException e) {
+            throw new ExecutionException(e.getMessage(), null);
+        }
+    }
+
+    /**
+     * Returns a double value from the specified property in {@code parent}.
+     * 
+     * @param parent the parent access to elements
+     * @param idShort the idShort of the property
+     * @return the double value
+     * @throws ExecutionException if accessing the property value fails
+     */
+    public static double getDoubleValue(ElementsAccess parent, String idShort) throws ExecutionException {
+        try {
+            double result = 0;
+            Property prop = parent.getProperty(idShort);
+            if (null != prop) {
+                result = (Double) prop.getValue();
+            } else {
+                throw new ExecutionException("Property " + idShort + " does not exist", null);
+            }
+            return result;
+        } catch (ClassCastException e) {
+            throw new ExecutionException(e.getMessage(), null);
+        }
+    }
+
+    /**
+     * Returns a float value from the specified property in {@code parent}.
+     * 
+     * @param parent the parent access to elements
+     * @param idShort the idShort of the property
+     * @return the float value
+     * @throws ExecutionException if accessing the property value fails
+     */
+    public static float getFloatValue(ElementsAccess parent, String idShort) throws ExecutionException {
+        try {
+            float result = 0;
+            Property prop = parent.getProperty(idShort);
+            if (null != prop) {
+                result = (Float) prop.getValue();
             } else {
                 throw new ExecutionException("Property " + idShort + " does not exist", null);
             }
@@ -285,13 +344,12 @@ public class Utils {
      * @return the double value
      * @throws ExecutionException if accessing the property value fails
      */
-    public static double getDoubleValue(ElementsAccess parent, String idShort) 
-        throws ExecutionException {
+    public static long getLongValue(ElementsAccess parent, String idShort) throws ExecutionException {
         try {
-            double result = 0;
+            long result = 0;
             Property prop = parent.getProperty(idShort);
             if (null != prop) {
-                result = (Double) prop.getValue();
+                result = (Long) prop.getValue();
             } else {
                 throw new ExecutionException("Property " + idShort + " does not exist", null);
             }
@@ -300,6 +358,29 @@ public class Utils {
             throw new ExecutionException(e.getMessage(), null);
         }
     }
+    
+    /**
+     * Returns an double value from the specified property in {@code parent}.
+     * 
+     * @param parent the parent access to elements
+     * @param idShort the idShort of the property
+     * @return the double value
+     * @throws ExecutionException if accessing the property value fails
+     */
+    public static BigInteger getBigIntegerValue(ElementsAccess parent, String idShort) throws ExecutionException {
+        try {
+            BigInteger result = BigInteger.ZERO;
+            Property prop = parent.getProperty(idShort);
+            if (null != prop) {
+                result = (BigInteger) prop.getValue();
+            } else {
+                throw new ExecutionException("Property " + idShort + " does not exist", null);
+            }
+            return result;
+        } catch (ClassCastException e) {
+            throw new ExecutionException(e.getMessage(), null);
+        }
+    }    
 
     /**
      * Returns an Boolean value from the specified property in {@code parent}.
@@ -339,12 +420,29 @@ public class Utils {
             Date result = null;
             Property prop = parent.getProperty(idShort);
             if (null != prop) {
-                result = (Date) prop.getValue();
+                Object value = prop.getValue();
+                if (value instanceof Date) {
+                    result = (Date) value;
+                } else if (value instanceof XMLGregorianCalendar) { 
+                    result = ((XMLGregorianCalendar) value).toGregorianCalendar().getTime();
+                }
             }
             return result;
         } catch (ClassCastException e) {
             throw new ExecutionException(e.getMessage(), null);
         }
+    }
+    
+    /**
+     * Returns a URI as string value from the specified property in {@code parent}.
+     * 
+     * @param parent the parent access to elements
+     * @param idShort the idShort of the property
+     * @return the string value, may be <b>null</b> if there is no property
+     * @throws ExecutionException if accessing the property value fails
+     */
+    public static String getAnyUriValue(ElementsAccess parent, String idShort) throws ExecutionException {
+        return getStringValue(parent, idShort);
     }
 
     /**
@@ -364,6 +462,66 @@ public class Utils {
         }
     }
     
+    /**
+     * Returns a {@link Range} from the specified property in {@code parent}.
+     * 
+     * @param parent the parent access to elements
+     * @param idShort the idShort of the property
+     * @return the {@link Range} value, may be <b>null</b> if there is no property
+     * @throws ExecutionException if accessing/converting the property value fails
+     */
+    public static Range getRangeValue(ElementsAccess parent, String idShort) 
+        throws ExecutionException {
+        try {
+            return (Range) parent.getDataElement(idShort);
+        } catch (ClassCastException e) {
+            throw new ExecutionException(e.getMessage(), null);
+        }
+    }
+
+    /**
+     * Returns a {@link BlobDataElement} from the specified property in {@code parent}.
+     * 
+     * @param parent the parent access to elements
+     * @param idShort the idShort of the property
+     * @return the {@link BlobDataElement} value, may be <b>null</b> if there is no property
+     * @throws ExecutionException if accessing/converting the property value fails
+     */
+    public static BlobDataElement getBlobDataElementValue(ElementsAccess parent, String idShort) 
+        throws ExecutionException {
+        try {
+            return (BlobDataElement) parent.getDataElement(idShort);
+        } catch (ClassCastException e) {
+            throw new ExecutionException(e.getMessage(), null);
+        }
+    }
+
+    /**
+     * Returns a {@link ReferenceElement} from the specified property in {@code parent}.
+     * 
+     * @param parent the parent access to elements
+     * @param idShort the idShort of the property
+     * @return the {@link ReferenceElement} value, may be <b>null</b> if there is no property
+     * @throws ExecutionException if accessing/converting the property value fails
+     */
+    public static ReferenceElement getReferenceElementValue(ElementsAccess parent, String idShort) 
+        throws ExecutionException {
+        return parent.getReferenceElement(idShort);
+    }
+
+    /**
+     * Returns a {@link RelationshipElement} from the specified property in {@code parent}.
+     * 
+     * @param parent the parent access to elements
+     * @param idShort the idShort of the property
+     * @return the {@link RelationshipElement} value, may be <b>null</b> if there is no property
+     * @throws ExecutionException if accessing/converting the property value fails
+     */
+    public static RelationshipElement getRelationshipElementValue(ElementsAccess parent, String idShort) 
+        throws ExecutionException {
+        return parent.getRelationshipElement(idShort);
+    }
+
     /**
      * Returns LangString values from the specified (multi-language) property in {@code parent}.
      * 
@@ -387,13 +545,12 @@ public class Utils {
      * 
      * @param property the property
      * @return the LangString values, may be <b>null</b> if there is no property
-     * @throws ExecutionException if accessing the property value fails
      */
     public static LangString[] getLangStringValue(MultiLanguageProperty property) {
         Collection<LangString> ls = property.getDescription().values();
         return ls.toArray(new LangString[ls.size()]);
     }
-    
+
     /**
      * Turns a string tolerantly to a test enum value. May prevent usual issues from spec parsing/analysis.
      * Considers values of a {@code getValue} method if defined.
@@ -403,12 +560,44 @@ public class Utils {
      * @param idShort the idShort of the property
      * @param cls the enum class type
      * @return the test enum value
+     * @throws ExecutionException if accessing the property value fails
      */
-    @SuppressWarnings("unchecked")
     public static <T extends Enum<T>> T getEnumValue(ElementsAccess parent, String idShort, Class<T> cls) 
         throws ExecutionException {
+        return getEnumValue(getStringValue(parent, idShort), cls);
+    }
+
+    /**
+     * Turns a string tolerantly to a test enum value. May prevent usual issues from spec parsing/analysis.
+     * Considers values of a {@code getValue} method if defined.
+     * 
+     * @param <T> the enum type
+     * @param property the property to take the actual value from
+     * @param cls the enum class type
+     * @return the test enum value
+     */
+    public static <T extends Enum<T>> T getEnumValue(Property property, Class<T> cls) {
+        T result;
+        try {
+            result = getEnumValue(getStringValue(property), cls);
+        } catch (ExecutionException e) {
+            result = null;
+        }
+        return result;
+    }
+
+    /**
+     * Turns a string tolerantly to a test enum value. May prevent usual issues from spec parsing/analysis.
+     * Considers values of a {@code getValue} method if defined.
+     * 
+     * @param <T> the enum type
+     * @param value the value to be matched against the enum literals
+     * @param cls the enum class type
+     * @return the test enum value
+     */
+    @SuppressWarnings("unchecked")
+    public static <T extends Enum<T>> T getEnumValue(String value, Class<T> cls) {
         T result = null;
-        String value = getStringValue(parent, idShort);
         value = value.trim().toLowerCase();
         List<T> values = new ArrayList<>();
         for (Field f : cls.getDeclaredFields()) {

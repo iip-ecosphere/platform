@@ -33,7 +33,15 @@ public interface ElementsAccess {
      * @return the sub-model collection element, <b>null</b> for none
      */
     public SubmodelElementCollection getSubmodelElementCollection(String idShort);
-    
+
+    /**
+     * Returns an entity with the given name.
+     * 
+     * @param idShort the short id of the property
+     * @return the entity, <b>null</b> for none
+     */
+    public Entity getEntity(String idShort);
+
     /**
      * Returns a data element with the given name.
      * 
@@ -62,9 +70,17 @@ public interface ElementsAccess {
      * Returns a reference element with the given name.
      * 
      * @param idShort the short id of the reference element
-     * @return the property, <b>null</b> for none
+     * @return the element, <b>null</b> for none
      */
     public ReferenceElement getReferenceElement(String idShort);
+
+    /**
+     * Returns a relationship element with the given name.
+     * 
+     * @param idShort the short id of the relationship element
+     * @return the element, <b>null</b> for none
+     */
+    public RelationshipElement getRelationshipElement(String idShort);
 
     /**
      * Deletes a sub-model element.

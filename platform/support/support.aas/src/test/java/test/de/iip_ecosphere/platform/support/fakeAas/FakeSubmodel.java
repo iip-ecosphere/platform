@@ -23,11 +23,13 @@ import de.iip_ecosphere.platform.support.Builder;
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
 import de.iip_ecosphere.platform.support.aas.DataElement;
 import de.iip_ecosphere.platform.support.aas.DeferredBuilder;
+import de.iip_ecosphere.platform.support.aas.Entity;
 import de.iip_ecosphere.platform.support.aas.FileDataElement.FileDataElementBuilder;
 import de.iip_ecosphere.platform.support.aas.Operation;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.Reference;
 import de.iip_ecosphere.platform.support.aas.ReferenceElement;
+import de.iip_ecosphere.platform.support.aas.RelationshipElement;
 import de.iip_ecosphere.platform.support.aas.RelationshipElement.RelationshipElementBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
@@ -329,6 +331,11 @@ public class FakeSubmodel extends FakeElement implements Submodel {
     public ReferenceElement getReferenceElement(String idShort) {
         return filter(idShort, ReferenceElement.class);
     }
+    
+    @Override
+    public RelationshipElement getRelationshipElement(String idShort) {
+        return filter(idShort, RelationshipElement.class);
+    }
 
     @Override
     public Operation getOperation(String idShort) {
@@ -345,6 +352,11 @@ public class FakeSubmodel extends FakeElement implements Submodel {
         return filter(idShort, SubmodelElementCollection.class);
     }
 
+    @Override
+    public Entity getEntity(String idShort) {
+        return filter(idShort, Entity.class);
+    }
+    
     @Override
     public SubmodelElementCollectionBuilder createSubmodelElementCollectionBuilder(String idShort, boolean ordered,
         boolean allowDuplicates) {

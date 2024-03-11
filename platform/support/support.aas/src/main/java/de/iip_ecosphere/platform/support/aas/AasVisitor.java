@@ -183,6 +183,13 @@ public interface AasVisitor {
     public void visitFileDataElement(FileDataElement dataElement);
 
     /**
+     * Visits a range data element.
+     * 
+     * @param range the range
+     */
+    public void visitRange(Range range);
+
+    /**
      * Visits a BLOB data element.
      * 
      * @param dataElement the BLOB data element

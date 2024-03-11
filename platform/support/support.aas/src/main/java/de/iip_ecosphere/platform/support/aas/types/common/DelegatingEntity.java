@@ -24,20 +24,20 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 
 /**
- * A delegating submodel elements collection.
+ * A delegating entity.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class DelegatingSubmodelElementCollection implements SubmodelElementCollection {
+public class DelegatingEntity implements Entity {
     
-    private SubmodelElementCollection delegate;
+    private Entity delegate;
 
     /**
      * Creates an instance based on the given delegate.
      * 
      * @param delegate the delegate
      */
-    protected DelegatingSubmodelElementCollection(SubmodelElementCollection delegate) {
+    protected DelegatingEntity(Entity delegate) {
         this.delegate = delegate;
     }
     
@@ -128,6 +128,11 @@ public class DelegatingSubmodelElementCollection implements SubmodelElementColle
     @Override
     public Reference createReference() {
         return delegate.createReference();
+    }
+
+    @Override
+    public EntityType getType() {
+        return delegate.getType();
     }
 
 }

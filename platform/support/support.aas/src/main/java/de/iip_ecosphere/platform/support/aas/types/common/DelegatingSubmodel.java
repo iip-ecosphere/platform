@@ -16,10 +16,12 @@ import java.util.function.Consumer;
 
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
 import de.iip_ecosphere.platform.support.aas.DataElement;
+import de.iip_ecosphere.platform.support.aas.Entity;
 import de.iip_ecosphere.platform.support.aas.Operation;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.Reference;
 import de.iip_ecosphere.platform.support.aas.ReferenceElement;
+import de.iip_ecosphere.platform.support.aas.RelationshipElement;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
@@ -51,6 +53,15 @@ public class DelegatingSubmodel implements Submodel {
      */
     protected Submodel getDelegate() {
         return delegate;
+    }
+    
+    /**
+     * Returns all sub-model elements in the element container.
+     * 
+     * @return all sub-model elements
+     */
+    public Iterable<SubmodelElement> elements() {
+        return submodelElements();
     }
 
     @Override
@@ -124,6 +135,11 @@ public class DelegatingSubmodel implements Submodel {
     }
 
     @Override
+    public Entity getEntity(String idShort) {
+        return delegate.getEntity(idShort);
+    }
+    
+    @Override
     public DataElement getDataElement(String idShort) {
         return delegate.getDataElement(idShort);
     }
@@ -143,6 +159,11 @@ public class DelegatingSubmodel implements Submodel {
         return delegate.getReferenceElement(idShort);
     }
 
+    @Override
+    public RelationshipElement getRelationshipElement(String idShort) {
+        return delegate.getRelationshipElement(idShort);
+    }
+    
     @Override
     public void deleteElement(String idShort) {
         delegate.deleteElement(idShort);

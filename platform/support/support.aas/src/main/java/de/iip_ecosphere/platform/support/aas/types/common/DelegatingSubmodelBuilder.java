@@ -21,6 +21,7 @@ import de.iip_ecosphere.platform.support.aas.FileDataElement.FileDataElementBuil
 import de.iip_ecosphere.platform.support.aas.MultiLanguageProperty.MultiLanguagePropertyBuilder;
 import de.iip_ecosphere.platform.support.aas.Operation.OperationBuilder;
 import de.iip_ecosphere.platform.support.aas.Property.PropertyBuilder;
+import de.iip_ecosphere.platform.support.aas.Range.RangeBuilder;
 import de.iip_ecosphere.platform.support.aas.Reference;
 import de.iip_ecosphere.platform.support.aas.ReferenceElement.ReferenceElementBuilder;
 import de.iip_ecosphere.platform.support.aas.RelationshipElement.RelationshipElementBuilder;
@@ -28,6 +29,7 @@ import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
+import de.iip_ecosphere.platform.support.aas.Type;
 
 /**
  * A reusable delegating submodel builder, if a template submodel shall allow for extensible addition
@@ -92,6 +94,11 @@ public class DelegatingSubmodelBuilder implements SubmodelBuilder {
     @Override
     public FileDataElementBuilder createFileDataElementBuilder(String idShort, String contents, String mimeType) {
         return delegate.createFileDataElementBuilder(idShort, contents, mimeType);
+    }
+    
+    @Override
+    public RangeBuilder createRangeBuilder(String idShort, Type type, Object min, Object max) {
+        return delegate.createRangeBuilder(idShort, type, min, max);
     }
 
     @Override

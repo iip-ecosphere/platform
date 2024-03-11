@@ -52,5 +52,19 @@ public interface RelationshipElement extends SubmodelElement {
      * @return the description, may be empty or <b>null</b>
      */
     public Map<String, LangString> getDescription();
+    
+    /**
+     * Returns the first reference of this relationship.
+     * 
+     * @return the first reference, may be <b>null</b>
+     */
+    public Reference getFirst();
+
+    /**
+     * Returns the second reference of this relationship.
+     * 
+     * @return the second reference, may be <b>null</b>
+     */
+    public Reference getSecond();
 
 }

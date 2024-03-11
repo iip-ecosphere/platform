@@ -127,6 +127,11 @@ public class AasPrintVisitor implements AasVisitor {
     }
 
     @Override
+    public void visitRange(Range range) {
+        log("RANGE " + range.getMin() + " " + range.getMax());
+    }
+    
+    @Override
     public void visitBlobDataElement(BlobDataElement dataElement) {
         log("BLOBDATAELT " + dataElement.getIdShort());
     }
