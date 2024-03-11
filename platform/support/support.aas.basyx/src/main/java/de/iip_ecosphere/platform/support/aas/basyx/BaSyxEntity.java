@@ -23,6 +23,7 @@ import de.iip_ecosphere.platform.support.aas.Operation;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.Reference;
 import de.iip_ecosphere.platform.support.aas.ReferenceElement;
+import de.iip_ecosphere.platform.support.aas.RelationshipElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 
@@ -337,6 +338,11 @@ public class BaSyxEntity extends BaSyxSubmodelElement implements Entity, Submode
     }
 
     @Override
+    public Entity getEntity(String idShort) {
+        return getElement(idShort, Entity.class);
+    }
+    
+    @Override
     public DataElement getDataElement(String idShort) {
         return getElement(idShort, DataElement.class);
     }
@@ -354,6 +360,11 @@ public class BaSyxEntity extends BaSyxSubmodelElement implements Entity, Submode
     @Override
     public ReferenceElement getReferenceElement(String idShort) {
         return getElement(idShort, ReferenceElement.class);
+    }
+    
+    @Override
+    public RelationshipElement getRelationshipElement(String idShort) {
+        return getElement(idShort, RelationshipElement.class);
     }
 
     @Override

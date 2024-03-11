@@ -503,7 +503,15 @@ public class Tools {
             if (value instanceof de.iip_ecosphere.platform.support.aas.LangString) {
                 value = Tools.translate((de.iip_ecosphere.platform.support.aas.LangString) value);
             }
-        }
+        } /*else if (type == ValueType.DateTime || type == ValueType.DateTimeStamp) {
+            if (value instanceof Date) {
+                try {
+                    Instant i = ((Date) value).toInstant();
+                    value = DatatypeFactory.newInstance().newXMLGregorianCalendar(i.toString());
+                } catch (DatatypeConfigurationException e) {
+                }
+            }
+        }*/
         return value;
     }
     

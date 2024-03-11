@@ -38,11 +38,13 @@ import de.iip_ecosphere.platform.support.Builder;
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
 import de.iip_ecosphere.platform.support.aas.DataElement;
 import de.iip_ecosphere.platform.support.aas.DeferredBuilder;
+import de.iip_ecosphere.platform.support.aas.Entity;
 import de.iip_ecosphere.platform.support.aas.Operation;
 import de.iip_ecosphere.platform.support.aas.Operation.OperationBuilder;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.Property.PropertyBuilder;
 import de.iip_ecosphere.platform.support.aas.ReferenceElement.ReferenceElementBuilder;
+import de.iip_ecosphere.platform.support.aas.RelationshipElement;
 
 /**
  * Wrapper for the BaSyx sub-model element collection.
@@ -204,6 +206,12 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
         protected BaSyxFile register(BaSyxFile file) {
             this.collection.addSubmodelElement(file.getSubmodelElement());
             return instance.register(file);
+        }
+
+        @Override
+        protected BaSyxRange register(BaSyxRange range) {
+            this.collection.addSubmodelElement(range.getSubmodelElement());
+            return instance.register(range);
         }
 
         @Override
@@ -511,6 +519,11 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
     }
 
     @Override
+    public RelationshipElement getRelationshipElement(String idShort) {
+        return getElement(idShort, RelationshipElement.class);
+    }
+    
+    @Override
     public SubmodelElement getElement(String idShort) {
         initialize();
         SubmodelElement result = null;
@@ -546,6 +559,11 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
     public SubmodelElementCollection getSubmodelElementCollection(String idShort) {
         return getElement(idShort, SubmodelElementCollection.class);
     }
+    
+    @Override
+    public Entity getEntity(String idShort) {
+        return getElement(idShort, Entity.class);
+    }
 
     @Override
     public <T extends SubmodelElement> T registerElement(T elt) {
@@ -571,6 +589,11 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
     public BaSyxFile register(BaSyxFile file) {
         return add(file);
     }
+    
+    @Override
+    public BaSyxRange register(BaSyxRange range) {
+        return add(range);
+    }    
 
     @Override
     public BaSyxOperation register(BaSyxOperation operation) {

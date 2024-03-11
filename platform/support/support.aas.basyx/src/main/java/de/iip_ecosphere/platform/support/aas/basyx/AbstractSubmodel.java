@@ -25,12 +25,14 @@ import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
 import de.iip_ecosphere.platform.support.aas.DataElement;
 import de.iip_ecosphere.platform.support.aas.DeferredBuilder;
+import de.iip_ecosphere.platform.support.aas.Entity;
 import de.iip_ecosphere.platform.support.aas.IdentifierType;
 import de.iip_ecosphere.platform.support.aas.Operation;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.Reference;
 import de.iip_ecosphere.platform.support.aas.ReferenceElement;
 import de.iip_ecosphere.platform.support.aas.Registry;
+import de.iip_ecosphere.platform.support.aas.RelationshipElement;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
@@ -89,6 +91,18 @@ public abstract class AbstractSubmodel<S extends ISubmodel> implements Submodel,
         submodelElements.put(id, file);
         return file;
     }
+    
+    @Override
+    public BaSyxRange register(BaSyxRange file) {
+        String id = file.getIdShort();
+        if (dataElements.containsKey(id) || submodelElements.containsKey(id)) {
+            warn("There is already an element with short id '" + id + "'. "
+                + "The element may be redefined.");
+        }
+        dataElements.put(id, file);
+        submodelElements.put(id, file);
+        return file;
+    }    
 
     @Override
     public BaSyxBlob register(BaSyxBlob blob) {
@@ -271,7 +285,21 @@ public abstract class AbstractSubmodel<S extends ISubmodel> implements Submodel,
         }
         return found;
     }
-    
+
+    @Override
+    public RelationshipElement getRelationshipElement(String idShort) {
+        // looping may not be efficient, let's see
+        RelationshipElement found = null;
+        try {
+            SubmodelElement elt = submodelElements.get(idShort);
+            if (elt instanceof RelationshipElement) {
+                found = (RelationshipElement) elt;
+            }
+        } catch (ResourceNotFoundException e) {
+        }
+        return found;
+    }
+
     @Override
     public Operation getOperation(String idShort) {
         return operations.get(idShort);
@@ -288,6 +316,16 @@ public abstract class AbstractSubmodel<S extends ISubmodel> implements Submodel,
         SubmodelElement tmp = getSubmodelElement(idShort);
         if (tmp instanceof SubmodelElementCollection) {
             result = (SubmodelElementCollection) tmp;
+        }
+        return result;
+    }
+    
+    @Override
+    public Entity getEntity(String idShort) {
+        Entity result = null;
+        SubmodelElement tmp = getSubmodelElement(idShort);
+        if (tmp instanceof Entity) {
+            result = (Entity) tmp;
         }
         return result;
     }

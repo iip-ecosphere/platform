@@ -15,6 +15,7 @@ package de.iip_ecosphere.platform.support.aas.basyx;
 import de.iip_ecosphere.platform.support.Builder;
 import de.iip_ecosphere.platform.support.aas.Operation.OperationBuilder;
 import de.iip_ecosphere.platform.support.aas.Property.PropertyBuilder;
+import de.iip_ecosphere.platform.support.aas.Range.RangeBuilder;
 import de.iip_ecosphere.platform.support.aas.ReferenceElement.ReferenceElementBuilder;
 
 import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
@@ -29,6 +30,7 @@ import de.iip_ecosphere.platform.support.aas.Reference;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.RelationshipElement.RelationshipElementBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
+import de.iip_ecosphere.platform.support.aas.Type;
 
 /**
  * Basic implementation for a container-based model element. Subclasses must call {@link #buildMyDeferred()} in an 
@@ -76,6 +78,11 @@ public abstract class BaSyxSubmodelElementContainerBuilder<S extends ISubmodel>
     @Override
     public FileDataElementBuilder createFileDataElementBuilder(String idShort, String contents, String mimeType) {
         return new BaSyxFile.BaSyxFileDataElementBuilder(this, idShort, contents, mimeType);
+    }
+
+    @Override
+    public RangeBuilder createRangeBuilder(String idShort, Type type, Object min, Object max) {
+        return new BaSyxRange.BaSyxRangeBuilder(this, idShort, type, min, max);
     }
 
     @Override
@@ -147,6 +154,17 @@ public abstract class BaSyxSubmodelElementContainerBuilder<S extends ISubmodel>
     BaSyxFile register(BaSyxFile file) {
         getInstance().getSubmodel().addSubmodelElement(file.getSubmodelElement());
         return getInstance().register(file);
+    }
+
+    /**
+     * Registers a range element.
+     * 
+     * @param range the range element
+     * @return {@code range}
+     */
+    BaSyxRange register(BaSyxRange range) {
+        getInstance().getSubmodel().addSubmodelElement(range.getSubmodelElement());
+        return getInstance().register(range);
     }
 
     /**

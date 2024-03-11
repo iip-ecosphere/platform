@@ -99,6 +99,15 @@ public class BaSyxBlob extends BaSyxDataElement<
             setValue(value);
         }
     }
+    
+    /**
+     * Crates a wrapper instance.
+     * 
+     * @param blob the BaSyx blob
+     */
+    public BaSyxBlob(org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.Blob blob) {
+        super(blob);
+    }        
 
     @Override
     public String getValue() {

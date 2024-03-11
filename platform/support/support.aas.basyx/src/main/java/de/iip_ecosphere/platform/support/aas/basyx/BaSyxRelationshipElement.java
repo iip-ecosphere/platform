@@ -16,6 +16,7 @@ import java.util.Map;
 
 import org.eclipse.basyx.submodel.metamodel.api.reference.IReference;
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElement;
+import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
 
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
 import de.iip_ecosphere.platform.support.aas.LangString;
@@ -89,6 +90,22 @@ public class BaSyxRelationshipElement extends BaSyxSubmodelElement implements Re
 
     }
 
+    /**
+     * Creates a relationship element.
+     */
+    public BaSyxRelationshipElement() {
+    }
+    
+    /**
+     * Creates a relationship element.
+     * 
+     * @param relationship the relationship
+     */
+    public BaSyxRelationshipElement(org.eclipse.basyx.submodel.metamodel.map.submodelelement.
+        relationship.RelationshipElement relationship) {
+        this.relationship = relationship;
+    }
+
     @Override
     public String getIdShort() {
         return relationship.getIdShort();
@@ -112,6 +129,24 @@ public class BaSyxRelationshipElement extends BaSyxSubmodelElement implements Re
     @Override
     public Map<String, LangString> getDescription() {
         return Tools.translate(relationship.getDescription());
+    }
+
+    @Override
+    public Reference getFirst() {
+        try {
+            return new BaSyxReference(relationship.getFirst());
+        } catch (ResourceNotFoundException e) { 
+            return null;
+        }
+    }
+
+    @Override
+    public Reference getSecond() {
+        try {
+            return new BaSyxReference(relationship.getSecond());
+        } catch (ResourceNotFoundException e) { 
+            return null;
+        }
     }
 
 }

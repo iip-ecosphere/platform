@@ -22,8 +22,11 @@ import org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElement
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.dataelement.IProperty;
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.dataelement.IReferenceElement;
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.operation.IOperation;
+import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.Blob;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.DataElement;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.File;
+import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.range.Range;
+import org.eclipse.basyx.submodel.metamodel.map.submodelelement.relationship.RelationshipElement;
 import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
 
 import de.iip_ecosphere.platform.support.aas.FileDataElement;
@@ -82,6 +85,16 @@ public class BaSyxElementTranslator {
         public default BaSyxFile register(BaSyxFile file)  {
             return registerElement(file);
         }
+        
+        /**
+         * Registers a range element.
+         * 
+         * @param range the range element
+         * @return {@code range}
+         */
+        public default BaSyxRange register(BaSyxRange range)  {
+            return registerElement(range);
+        }        
 
         /**
          * Registers a BLOB data element.
@@ -205,6 +218,12 @@ public class BaSyxElementTranslator {
             reg.register(new BaSyxSubmodelElementCollection((ISubmodelElementCollection) se));
         } else if (se instanceof File) {
             reg.register(new BaSyxFile((File) se));
+        } else if (se instanceof Blob) {
+            reg.register(new BaSyxBlob((Blob) se));
+        } else if (se instanceof Range) {
+            reg.register(new BaSyxRange((Range) se));
+        } else if (se instanceof RelationshipElement) {
+            reg.register(new BaSyxRelationshipElement((RelationshipElement) se));
         } // TODO else
     }
     
@@ -292,6 +311,11 @@ public class BaSyxElementTranslator {
         @Override
         public BaSyxFile register(BaSyxFile file) {
             return accept(file);
+        }
+
+        @Override
+        public BaSyxRange register(BaSyxRange range) {
+            return accept(range);
         }
 
         @Override
