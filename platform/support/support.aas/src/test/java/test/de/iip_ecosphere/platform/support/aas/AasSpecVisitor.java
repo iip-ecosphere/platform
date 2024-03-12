@@ -277,9 +277,10 @@ public class AasSpecVisitor implements AasVisitor {
      * the spec is (considering resourcePrefix as prefix).
      * 
      * @param aas the AAS
+     * @param fileName the test specification file within {@code resourcePrefix}
      * @param resourcePrefix optional resource prefix, may be empty or <b>null</b> for none
      */
-    public static void assertEquals(Aas aas, String resourcePrefix) {
+    public static void assertEquals(Aas aas, String resourcePrefix, String fileName) {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         AasSpecVisitor v = new AasSpecVisitor(new PrintStream(bos));
         aas.accept(v);
@@ -288,7 +289,10 @@ public class AasSpecVisitor implements AasVisitor {
         if (null == resourcePrefix) {
             resourcePrefix = "";
         }
-        String resourceName = resourcePrefix + aas.getIdShort().toLowerCase() + ".spec";
+        if (null == fileName) {
+            fileName = aas.getIdShort().toLowerCase() + ".spec";
+        }
+        String resourceName = resourcePrefix + fileName;
         System.out.println(">-- test-out --");
         System.out.println(testSpec);
         System.out.println("<-- test-out --");

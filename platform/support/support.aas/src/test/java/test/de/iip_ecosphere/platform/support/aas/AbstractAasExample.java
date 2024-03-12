@@ -290,8 +290,18 @@ public abstract class AbstractAasExample {
      */
     protected void assertAllAas() {
         for (Aas aas : aasList) {
-            AasSpecVisitor.assertEquals(aas, getResourceFolder());
+            AasSpecVisitor.assertEquals(aas, getResourceFolder(), getTestFileName(aas));
         }
+    }
+    
+    /**
+     * Returns the name of the test file within {@link #getResourceFolder()}.
+     * 
+     * @param aas the name of the test file
+     * @return by default, based on the idShort of the {@code aas}
+     */
+    protected String getTestFileName(Aas aas) {
+        return aas.getIdShort().toLowerCase() + ".spec";
     }
     
     /**

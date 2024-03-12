@@ -553,33 +553,39 @@ public class Utils {
 
     /**
      * Turns a string tolerantly to a test enum value. May prevent usual issues from spec parsing/analysis.
-     * Considers values of a {@code getValue} method if defined.
+     * Considers values of a {@code getValue} method if defined. Considers registered extending enums
+     * in {@link EnumRegistry} with compatible type.
      * 
-     * @param <T> the enum type
+     * @param <T> the unbound interface-of-enum type
+     * @param <E> the enum type
      * @param parent the parent access to elements
      * @param idShort the idShort of the property
-     * @param cls the enum class type
-     * @return the test enum value
+     * @param ifCls the interface-of-enum type
+     * @param eCls the enum class type
+     * @return the test enum value, may be <b>null</b> for not found/compatible
      * @throws ExecutionException if accessing the property value fails
      */
-    public static <T extends Enum<T>> T getEnumValue(ElementsAccess parent, String idShort, Class<T> cls) 
-        throws ExecutionException {
-        return getEnumValue(getStringValue(parent, idShort), cls);
+    public static <T, E extends Enum<E>> T getEnumValue(ElementsAccess parent, String idShort, Class<T> ifCls, 
+        Class<E> eCls) throws ExecutionException {
+        return getEnumValue(getStringValue(parent, idShort), ifCls, eCls);
     }
 
     /**
      * Turns a string tolerantly to a test enum value. May prevent usual issues from spec parsing/analysis.
-     * Considers values of a {@code getValue} method if defined.
+     * Considers values of a {@code getValue} method if defined. Considers registered extending enums
+     * in {@link EnumRegistry} with compatible type.
      * 
-     * @param <T> the enum type
+     * @param <T> the unbound interface-of-enum type
+     * @param <E> the enum type
      * @param property the property to take the actual value from
-     * @param cls the enum class type
-     * @return the test enum value
+     * @param ifCls the interface-of-enum type
+     * @param eCls the enum class type
+     * @return the test enum value, may be <b>null</b> for not found/compatible
      */
-    public static <T extends Enum<T>> T getEnumValue(Property property, Class<T> cls) {
+    public static <T, E extends Enum<E>> T getEnumValue(Property property, Class<T> ifCls, Class<E> eCls) {
         T result;
         try {
-            result = getEnumValue(getStringValue(property), cls);
+            result = getEnumValue(getStringValue(property), ifCls, eCls);
         } catch (ExecutionException e) {
             result = null;
         }
@@ -588,46 +594,56 @@ public class Utils {
 
     /**
      * Turns a string tolerantly to a test enum value. May prevent usual issues from spec parsing/analysis.
-     * Considers values of a {@code getValue} method if defined.
+     * Considers values of a {@code getValue} method if defined. Considers registered extending enums
+     * in {@link EnumRegistry} with compatible type.
      * 
-     * @param <T> the enum type
+     * @param <T> the unbound interface-of-enum type
+     * @param <E> the enum type
      * @param value the value to be matched against the enum literals
-     * @param cls the enum class type
-     * @return the test enum value
+     * @param ifCls the interface-of-enum type
+     * @param eCls the enum class type
+     * @return the test enum value, may be <b>null</b> for not found/compatible
      */
     @SuppressWarnings("unchecked")
-    public static <T extends Enum<T>> T getEnumValue(String value, Class<T> cls) {
+    public static <T, E extends Enum<E>> T getEnumValue(String value, Class<T> ifCls, Class<E> eCls) {
         T result = null;
         value = value.trim().toLowerCase();
-        List<T> values = new ArrayList<>();
-        for (Field f : cls.getDeclaredFields()) {
-            int mod = f.getModifiers();
-            if (cls.isAssignableFrom(f.getType()) &&  Modifier.isStatic(mod) && Modifier.isFinal(mod) 
-                && Modifier.isPublic(mod)) {
-                try {
-                    values.add((T) f.get(null));
-                } catch (IllegalAccessException e) {
+        List<E> values = new ArrayList<>();
+        for (Class<?> cls: EnumRegistry.getEnums(ifCls, eCls)) {
+            for (Field f : cls.getDeclaredFields()) {
+                int mod = f.getModifiers();
+                if (cls.isAssignableFrom(f.getType()) && Modifier.isStatic(mod) && Modifier.isFinal(mod) 
+                    && Modifier.isPublic(mod)) {
+                    try {
+                        values.add((E) f.get(null));
+                    } catch (IllegalAccessException e) {
+                    }
                 }
             }
-        }
-        Method[] methods = new Method[] {
-            getDeclaredMethodSafe(cls, "getValue"),
-            getDeclaredMethodSafe(cls, "getSemanticId")};
-        for (T v: values) {
-            boolean matches = matchesEnum(value, v.name().toLowerCase());
-            for (Method m : methods) {
-                if (!matches && null != m) {
-                    try {
-                        matches = matchesEnum(value, m.invoke(v));
-                    } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+            Method[] methods = new Method[] {
+                getDeclaredMethodSafe(cls, "getValue"),
+                getDeclaredMethodSafe(cls, "getSemanticId")};
+            for (E v: values) {
+                boolean matches = matchesEnum(value, v.name().toLowerCase());
+                for (Method m : methods) {
+                    if (!matches && null != m) {
+                        try {
+                            matches = matchesEnum(value, m.invoke(v));
+                        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+                        }
+                    }
+                    if (matches) {
+                        break;
                     }
                 }
                 if (matches) {
+                    if (ifCls.isInstance(v)) {
+                        result = ifCls.cast(v);
+                    }
                     break;
                 }
             }
-            if (matches) {
-                result = v;
+            if (null != result) {
                 break;
             }
         }

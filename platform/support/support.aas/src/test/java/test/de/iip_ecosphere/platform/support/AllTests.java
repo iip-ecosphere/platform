@@ -22,6 +22,7 @@ import test.de.iip_ecosphere.platform.support.aas.PCF;
 import test.de.iip_ecosphere.platform.support.aas.SoftwareNameplateTest;
 import test.de.iip_ecosphere.platform.support.aas.TechnicalDataSubmodelTest;
 import test.de.iip_ecosphere.platform.support.aas.TimeSeriesDataTest;
+import test.de.iip_ecosphere.platform.support.aas.UtilsTest;
 import test.de.iip_ecosphere.platform.support.aas.XmasAas;
 import test.de.iip_ecosphere.platform.support.fakeAas.FactoryTest;
 import test.de.iip_ecosphere.platform.support.fakeAas.PrintVisitorTest;
@@ -59,6 +60,7 @@ import test.de.iip_ecosphere.platform.support.net.UriResolverTest;
     test.de.iip_ecosphere.platform.support.identities.AllTests.class,
     TechnicalDataSubmodelTest.class,
     AbstractAasExampleTest.class,
+    UtilsTest.class,
     
     // non-generic AAS 
     LangStringTest.class,
