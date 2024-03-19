@@ -919,12 +919,12 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
          * @param parentNodes the parent nodes to process
          */
         public void retrieveChildsOfChildNodes(String currentPath, List<? extends UaNode> parentNodes) {
-            for (UaNode j : parentNodes) {
-                String child = j.getBrowseName().getName();
-                this.nodes.put(currentPath + "/" + child, new NodeCacheEntry(j));
+            for (UaNode n : parentNodes) {
+                String child = n.getBrowseName().getName();
+                this.nodes.put(currentPath + "/" + child, new NodeCacheEntry(n));
                 try {
-                    if (!(j instanceof UaVariableNode)) {
-                        List<? extends UaNode> childsOfChild = j.browseNodes();
+                    if (!(n instanceof UaVariableNode)) {
+                        List<? extends UaNode> childsOfChild = n.browseNodes();
                         if (!childsOfChild.isEmpty()) {
                             retrieveChildsOfChildNodes(currentPath + "/" + child, childsOfChild);
                         }
@@ -942,14 +942,14 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
          * @param parentNodes the parent nodes to process
          */
         private void retrieveChildsOfChildNodes(List<? extends UaNode> parentNodes) {
-            for (UaNode j : parentNodes) {
-                UShort ns = j.getNodeId().getNamespaceIndex();
-                Object id = j.getNodeId().getIdentifier();
-                this.nodes.put("nameSpaceIndex = " + ns + ", identifier = " + id, new NodeCacheEntry(j));
+            for (UaNode n : parentNodes) {
+                UShort ns = n.getNodeId().getNamespaceIndex();
+                Object id = n.getNodeId().getIdentifier();
+                this.nodes.put("nameSpaceIndex = " + ns + ", identifier = " + id, new NodeCacheEntry(n));
                 
                 try {
-                    if (!(j instanceof UaVariableNode)) {
-                        List<? extends UaNode> childsOfChild = j.browseNodes();
+                    if (!(n instanceof UaVariableNode)) {
+                        List<? extends UaNode> childsOfChild = n.browseNodes();
                         if (!childsOfChild.isEmpty()) {
                             retrieveChildsOfChildNodes(childsOfChild);
                         }
@@ -974,9 +974,9 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
                 if (null == result) {
                     UaVariableNode node = retrieveVariableNode(qName, cached);
                     DataValue value = node.readValue();
-                    Variant r = value.getValue();                    
-                    if (null != r) {
-                        result = r.getValue();
+                    Variant valueValue = value.getValue();                    
+                    if (null != valueValue) {
+                        result = valueValue.getValue();
                         if (result instanceof UNumber) { // simplified
                             result = ((UNumber) result).intValue();
                         } else if (result instanceof NodeId) {
@@ -1008,9 +1008,9 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
                     if (null == tmp) {
                         UaVariableNode node = retrieveVariableNode(nodeName, cached);
                         DataValue value = node.getValue();
-                        Variant r = value.getValue();
-                        if (null != r) {
-                            tmp = r.getValue();
+                        Variant valueValue = value.getValue();
+                        if (null != valueValue) {
+                            tmp = valueValue.getValue();
                         }
                     }
                     if (tmp instanceof LocalizedText) {
@@ -1300,13 +1300,13 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
                     result = new OpcUaModelAccess(retrieveCacheEntry(name), null, this, nodes);
 
                 } else {
-                    String n = basePath;
-                    if (n.length() == 0) {
-                        n = name;
+                    String tmpName = basePath;
+                    if (tmpName.length() == 0) {
+                        tmpName = name;
                     } else {
-                        n = n + "/" + name;
+                        tmpName = tmpName + "/" + name;
                     }
-                    result = new OpcUaModelAccess(retrieveCacheEntry(name), n, this, nodes);
+                    result = new OpcUaModelAccess(retrieveCacheEntry(name), tmpName, this, nodes);
                 }
                 return result;
             } catch (UaException e) {

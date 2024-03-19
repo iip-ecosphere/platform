@@ -569,12 +569,12 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
                 cachedElements = new HashMap<>();
             }
             while (subModelsIterator.hasNext()) {
-                SubmodelElement e = subModelsIterator.next();
-                if (!(e instanceof Property)) {
-                    cachedElements.put(actualPath + "/" + e.getIdShort(), (ElementsAccess) e);
+                SubmodelElement elt = subModelsIterator.next();
+                if (!(elt instanceof Property)) {
+                    cachedElements.put(actualPath + "/" + elt.getIdShort(), (ElementsAccess) elt);
                     elements.put(aasId, cachedElements);
-                    SubmodelElementCollection tmp = (SubmodelElementCollection) e;
-                    retrieveUnderlyingElements(tmp.elements().iterator(), actualPath + "/" + e.getIdShort(), aasId);
+                    SubmodelElementCollection tmp = (SubmodelElementCollection) elt;
+                    retrieveUnderlyingElements(tmp.elements().iterator(), actualPath + "/" + elt.getIdShort(), aasId);
                 }
             }
         }
