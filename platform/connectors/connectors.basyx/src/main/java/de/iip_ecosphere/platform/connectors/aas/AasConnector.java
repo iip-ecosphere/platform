@@ -471,6 +471,15 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
         }
         
         /**
+         * Returns the current AAS id depending on whether polling or (parallel) non-polling accesses happen.
+         * 
+         * @return the AAS id
+         */
+        private String getAasId() {
+            return pollingThread == Thread.currentThread() ? pollingAas : nonPollingAas;
+        }
+        
+        /**
          * Retrieves a node starting at the root of the OPC UA model based on the node's qualified name {@code qName}.
          * 
          * @param qName the qualified node name
@@ -478,7 +487,7 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
          * @throws IOException if no node can be found for {@code qName}
          */
         private ElementsAccess retrieveElement(String qName) throws IOException {
-            String aasId = pollingThread == Thread.currentThread() ? pollingAas : nonPollingAas;
+            String aasId = getAasId();
             Map<String, ElementsAccess> cache = elements.get(aasId);
             ElementsAccess result = null == cache ? null : cache.get(qName);
             if (null == result) {
@@ -520,7 +529,7 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
          * @return the node or <b>null</b> for none found
          */
         private ElementsAccess retrieveElement(ElementsAccess current, String qName) {
-            String aasId = pollingThread == Thread.currentThread() ? pollingAas : nonPollingAas;
+            String aasId = getAasId();
             ElementsAccess result = null;
             int pos = qName.indexOf(SEPARATOR_CHAR);
             String nodeName;
@@ -656,7 +665,7 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
             
             if (!name.contains("/") && basePath == null) {
                 if (null == base) {
-                    Aas aas = connectedAAS.get(pollingThread == Thread.currentThread() ? pollingAas : nonPollingAas);
+                    Aas aas = connectedAAS.get(getAasId());
                     if (null == aas) {
                         throw new IOException("AAS " + pollingAas + " not found. Cannot resolve further.");
                     }
@@ -677,7 +686,7 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
                     name = basePath + "/" + name;
                 }
                 if (!elements.isEmpty()) {
-                    String aasId = pollingThread == Thread.currentThread() ? pollingAas : nonPollingAas;
+                    String aasId = getAasId();
                     if (elements.get(aasId).containsKey(name)) {
                         result = new AasModelAccess(elements.get(aasId).get(name), this, name, elements);
                     }
