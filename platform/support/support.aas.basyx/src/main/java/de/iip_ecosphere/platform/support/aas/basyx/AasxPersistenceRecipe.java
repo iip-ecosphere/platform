@@ -34,7 +34,6 @@ import org.eclipse.basyx.aas.factory.aasx.Thumbnail;
 import org.eclipse.basyx.aas.factory.aasx.Thumbnail.ThumbnailExtension;
 import org.eclipse.basyx.aas.metamodel.api.IAssetAdministrationShell;
 import org.eclipse.basyx.aas.metamodel.api.parts.asset.IAsset;
-import org.eclipse.basyx.aas.metamodel.exception.MetamodelConstructionException;
 import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
 import org.eclipse.basyx.submodel.metamodel.api.parts.IConceptDescription;
 import org.slf4j.Logger;
@@ -131,8 +130,6 @@ class AasxPersistenceRecipe extends AbstractPersistenceRecipe {
         FileUtils.closeQuietly(thumbnailStream);
     }
 
-    // checkstyle: resume exception type check
-
     @Override
     public List<Aas> readFrom(File file) throws IOException {
         List<Aas> result = new ArrayList<Aas>();
@@ -150,11 +147,12 @@ class AasxPersistenceRecipe extends AbstractPersistenceRecipe {
                 aas.clear();
                 submodels.clear();
             }
-        } catch (SAXException | ParserConfigurationException | InvalidFormatException 
-            | MetamodelConstructionException | IllegalArgumentException e) {
+        } catch (SAXException | ParserConfigurationException | InvalidFormatException | RuntimeException e) {
             throw new IOException(e);
         }
         return result;
     }
+
+    // checkstyle: resume exception type check
 
 }

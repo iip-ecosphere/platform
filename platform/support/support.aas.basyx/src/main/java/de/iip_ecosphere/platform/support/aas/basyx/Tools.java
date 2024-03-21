@@ -14,9 +14,14 @@ package de.iip_ecosphere.platform.support.aas.basyx;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
 
 import org.eclipse.basyx.aas.metamodel.map.descriptor.CustomId;
 import org.eclipse.basyx.aas.metamodel.map.descriptor.ModelUrn;
@@ -503,7 +508,7 @@ public class Tools {
             if (value instanceof de.iip_ecosphere.platform.support.aas.LangString) {
                 value = Tools.translate((de.iip_ecosphere.platform.support.aas.LangString) value);
             }
-        } /*else if (type == ValueType.DateTime || type == ValueType.DateTimeStamp) {
+        } else if (type == ValueType.DateTime || type == ValueType.DateTimeStamp) {
             if (value instanceof Date) {
                 try {
                     Instant i = ((Date) value).toInstant();
@@ -511,7 +516,7 @@ public class Tools {
                 } catch (DatatypeConfigurationException e) {
                 }
             }
-        }*/
+        }
         return value;
     }
     

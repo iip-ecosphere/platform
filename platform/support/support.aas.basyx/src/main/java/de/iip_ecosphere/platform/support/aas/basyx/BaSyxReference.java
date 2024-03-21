@@ -53,4 +53,25 @@ public class BaSyxReference implements Reference {
         return reference != null;
     }
     
+    // does not return a value, may fail in tests otherwise
+    
+    @Override
+    public boolean equals(Object object) {
+        boolean result = false;
+        if (object instanceof BaSyxReference) {
+            BaSyxReference ref = (BaSyxReference) object;
+            if (null == reference) {
+                result = ref.reference == null;
+            } else {
+                result = reference.equals(ref.reference);
+            }
+        }
+        return result;
+    }
+    
+    @Override
+    public int hashCode() {
+        return null == reference ? 0 : reference.hashCode(); 
+    }
+    
 }

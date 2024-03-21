@@ -15,6 +15,7 @@ package de.iip_ecosphere.platform.support.aas.basyx;
 import org.eclipse.basyx.submodel.metamodel.api.reference.IReference;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.range.RangeValue;
 
+import de.iip_ecosphere.platform.support.aas.AasVisitor;
 import de.iip_ecosphere.platform.support.aas.Range;
 import de.iip_ecosphere.platform.support.aas.Type;
 
@@ -113,6 +114,11 @@ public class BaSyxRange extends BaSyxDataElement<org.eclipse.basyx.submodel.meta
     @Override
     public Type getType() {
         return Tools.translate(getDataElement().getValueType());
+    }
+    
+    @Override
+    public void accept(AasVisitor visitor) {
+        visitor.visitRange(this);
     }
 
 }
