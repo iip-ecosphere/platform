@@ -6,7 +6,7 @@ AAS Rudolph
   PROPERTY noseColor = 3000 (semanticId: irdi:0173-1#02-AAH022#001)
  SUBMODEL TechnicalData (semanticId: iri:https://admin-shell.io/ZVEI/TechnicalData/Submodel/1/2)
   SMC FurtherInformation (semanticId: iri:https://admin-shell.io/ZVEI/TechnicalData/FurtherInformation/1/1)
-   PROPERTY ValidDate = 2023-12-24T23:59:59.000Z (semanticId: iri:https://admin-shell.io/ZVEI/TechnicalData/ValidDate/1/1)
+   PROPERTY ValidDate = 2023/12/24 23:59:59 (semanticId: iri:https://admin-shell.io/ZVEI/TechnicalData/ValidDate/1/1)
   SMC GeneralInformation (semanticId: iri:https://admin-shell.io/ZVEI/TechnicalData/GeneralInformation/1/1)
    PROPERTY ManufacturerArticleNumber = Reindeer-1923#13 (semanticId: irdi:0173-1#02-AAO676#003)
    PROPERTY ManufacturerName = Northpole Magic Reindeer Family (semanticId: irdi:0173-1#02-AAO677#002)

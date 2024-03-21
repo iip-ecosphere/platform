@@ -187,7 +187,7 @@ public class XmasAas extends AbstractAasExample {
             .setTitle(new LangString("en", "Sleigh Operation Manual"))
             .setSummary(new LangString("en", "<missing>"))
             .setKeywords(new LangString("en", "sleigh, reindeers, santa, customized"))
-            .setStatus("2023-12-17T00:00:00.000Z", DocumentStatus.RELEASED)
+            .setStatus(Utils.parseCalendar("2023-12-17T00:00:00.000Z"), DocumentStatus.RELEASED)
             .setOrganizationName("North Pole Wood", "North Pole Wood Company Ltd")
             .addDigitalFile(resource, toMimeType(documentFile))
             .build();

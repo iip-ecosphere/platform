@@ -27,7 +27,7 @@ AAS Santa_s_Sleigh
    ENTITY node_santa (semanticId: iri:https://admin-shell.io/idta/HierarchicalStructures/Node/1/0)
  SUBMODEL TechnicalData (semanticId: iri:https://admin-shell.io/ZVEI/TechnicalData/Submodel/1/2)
   SMC FurtherInformation (semanticId: iri:https://admin-shell.io/ZVEI/TechnicalData/FurtherInformation/1/1)
-   PROPERTY ValidDate = 2023-12-24T23:59:59.000Z (semanticId: iri:https://admin-shell.io/ZVEI/TechnicalData/ValidDate/1/1)
+   PROPERTY ValidDate = 2023/12/24 23:59:59 (semanticId: iri:https://admin-shell.io/ZVEI/TechnicalData/ValidDate/1/1)
   SMC GeneralInformation (semanticId: iri:https://admin-shell.io/ZVEI/TechnicalData/GeneralInformation/1/1)
    PROPERTY ManufacturerArticleNumber = MSS-001 (semanticId: irdi:0173-1#02-AAO676#003)
    PROPERTY ManufacturerName = Christmas (semanticId: irdi:0173-1#02-AAO677#002)

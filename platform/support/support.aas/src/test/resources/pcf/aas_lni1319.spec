@@ -74,7 +74,7 @@ AAS aas_lni1319
    RELATIONSHIP hasPart_05 (semanticId: iri:https://admin-shell.io/idta/HierarchicalStructures/HasPart/1/0)
  SUBMODEL TechnicalData (semanticId: iri:https://admin-shell.io/ZVEI/TechnicalData/Submodel/1/2)
   SMC FurtherInformation (semanticId: iri:https://admin-shell.io/ZVEI/TechnicalData/FurtherInformation/1/1)
-   PROPERTY ValidDate = 2024-01-04T10:00:00.000Z (semanticId: iri:https://admin-shell.io/ZVEI/TechnicalData/ValidDate/1/1)
+   PROPERTY ValidDate = 2024/01/04 10:00:00 (semanticId: iri:https://admin-shell.io/ZVEI/TechnicalData/ValidDate/1/1)
   SMC GeneralInformation (semanticId: iri:https://admin-shell.io/ZVEI/TechnicalData/GeneralInformation/1/1)
    PROPERTY ManufacturerArticleNumber = K01 (semanticId: irdi:0173-1#02-AAO676#003)
    PROPERTY ManufacturerName = Mittelstand-Digital Zentrum Hannover (semanticId: irdi:0173-1#02-AAO677#002)

@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.TimeZone;
 import java.util.concurrent.ExecutionException;
 
+import javax.xml.datatype.XMLGregorianCalendar;
+
 import org.apache.commons.io.IOUtils;
 
 import de.iip_ecosphere.platform.support.CollectionUtils;
@@ -57,7 +59,7 @@ import org.junit.Assert;
  */
 public class AasSpecVisitor implements AasVisitor {
 
-    public static final DateFormat DATE_FORMATTER = createDateFormat("yyyy/mm/dd HH:mm:ss");
+    public static final DateFormat DATE_FORMATTER = createDateFormat("yyyy/MM/dd HH:mm:ss");
     
     private String indentation = "";
     private PrintStream out;
@@ -167,6 +169,9 @@ public class AasSpecVisitor implements AasVisitor {
         String value;
         try {
             Object obj = property.getValue();
+            if (obj instanceof XMLGregorianCalendar) {
+                obj = ((XMLGregorianCalendar) obj).toGregorianCalendar().getTime();
+            }
             if (obj instanceof Date) {
                 value = DATE_FORMATTER.format((Date) obj);
             } else {

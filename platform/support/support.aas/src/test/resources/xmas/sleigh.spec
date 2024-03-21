@@ -17,7 +17,7 @@ AAS Sleigh
     PROPERTY Language01 = en (semanticId: irdi:0173-1#02-AAN468#006)
     PROPERTY OrganizationName = North Pole Wood (semanticId: irdi:0173-1#02-ABI002#001)
     PROPERTY OrganizationOfficialName = North Pole Wood Company Ltd (semanticId: irdi:0173-1#02-ABI004#001)
-    PROPERTY StatusSetDate = 2023-12-17T00:00:00.000Z (semanticId: irdi:0173-1#02-ABI000#001)
+    PROPERTY StatusSetDate = 2023/12/17 00:00:00 (semanticId: irdi:0173-1#02-ABI000#001)
     PROPERTY StatusValue = released (semanticId: irdi:0173-1#02-ABI001#001)
     MLP Summary (semanticId: irdi:0173-1#02-AAO106#002)
     MLP Title (semanticId: irdi:0173-1#02-AAO105#002)
@@ -31,7 +31,7 @@ AAS Sleigh
   OPERATION stop #args 1
  SUBMODEL TechnicalData (semanticId: iri:https://admin-shell.io/ZVEI/TechnicalData/Submodel/1/2)
   SMC FurtherInformation (semanticId: iri:https://admin-shell.io/ZVEI/TechnicalData/FurtherInformation/1/1)
-   PROPERTY ValidDate = 2023-12-24T23:59:59.000Z (semanticId: iri:https://admin-shell.io/ZVEI/TechnicalData/ValidDate/1/1)
+   PROPERTY ValidDate = 2023/12/24 23:59:59 (semanticId: iri:https://admin-shell.io/ZVEI/TechnicalData/ValidDate/1/1)
   SMC GeneralInformation (semanticId: iri:https://admin-shell.io/ZVEI/TechnicalData/GeneralInformation/1/1)
    PROPERTY ManufacturerArticleNumber = Sleigh-007/03 (semanticId: irdi:0173-1#02-AAO676#003)
    PROPERTY ManufacturerName = North Pole Wood Company Ltd. (semanticId: irdi:0173-1#02-AAO677#002)

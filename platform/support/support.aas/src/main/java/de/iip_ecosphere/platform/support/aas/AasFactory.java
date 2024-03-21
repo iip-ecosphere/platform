@@ -23,6 +23,7 @@ import java.util.ServiceLoader;
 import java.util.logging.Logger;
 
 import de.iip_ecosphere.platform.support.Endpoint;
+import de.iip_ecosphere.platform.support.OsUtils;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
@@ -221,7 +222,7 @@ public abstract class AasFactory {
     private static final Logger LOGGER = Logger.getLogger(AasFactory.class.getName());
     // instance-based to allow later dependency injection
     private static AasFactory instance = DUMMY;
-    private static String pluginId = DEFAULT_PLUGIN_ID;
+    private static String pluginId = OsUtils.getPropertyOrEnv("okto.aasFactoryId", DEFAULT_PLUGIN_ID);
     private static boolean noInstanceWarningEmitted = false;
     
     private Map<String, ProtocolCreator> protocolCreators = new HashMap<>();
@@ -296,14 +297,13 @@ public abstract class AasFactory {
             Plugin<AasFactory> plugin = PluginManager.getPlugin(pluginId, AasFactory.class);
             if (null != plugin) {
                 instance = plugin.getInstance();
+                emitFactoryInstanceNotice();
             } 
             if (DUMMY == instance || null == instance) {
                 Optional<AasFactoryDescriptor> first = ServiceLoaderUtils.filterExcluded(AasFactoryDescriptor.class);
                 if (first.isPresent()) {
                     instance = first.get().createInstance();
-                    if (null != instance) {
-                        LOGGER.fine("AAS factory implementation registered: " + instance.getClass().getName());
-                    }
+                    emitFactoryInstanceNotice();
                 } else {
                     if (!noInstanceWarningEmitted) {
                         noInstanceWarningEmitted = true;
@@ -315,6 +315,15 @@ public abstract class AasFactory {
             }
         }
         return instance;
+    }
+
+    /**
+     * Logs a notice which factory is being used.
+     */
+    private static void emitFactoryInstanceNotice() {
+        if (null != instance) {
+            LOGGER.fine("Using AAS factory implementation: " + instance.getClass().getName());
+        }
     }
     
     /**

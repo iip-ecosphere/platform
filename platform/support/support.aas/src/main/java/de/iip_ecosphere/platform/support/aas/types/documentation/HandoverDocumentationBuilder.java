@@ -17,6 +17,8 @@ import static de.iip_ecosphere.platform.support.aas.types.common.Utils.*;
 
 import java.util.function.Supplier;
 
+import javax.xml.datatype.XMLGregorianCalendar;
+
 import de.iip_ecosphere.platform.support.Builder;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.LangString;
@@ -407,7 +409,7 @@ public class HandoverDocumentationBuilder extends DelegatingSubmodelBuilder {
              * @param value the status value
              * @return <b>this</b>
              */
-            public DocumentVersionBuilder setStatus(String date, DocumentStatus value) {
+            public DocumentVersionBuilder setStatus(XMLGregorianCalendar date, DocumentStatus value) {
                 statusPresent = true;
                 createPropertyBuilder("StatusSetDate")
                     .setSemanticId(irdi("0173-1#02-ABI000#001"))
