@@ -12,22 +12,28 @@
 
 package de.iip_ecosphere.platform.support.plugins;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ServiceLoader;
+import java.util.StringTokenizer;
 
 import org.slf4j.LoggerFactory;
 
+import de.iip_ecosphere.platform.support.OsUtils;
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
 
 /**
  * Manages plugins to separate overlapping classpaths and dependencies of alternatives and optionals.
- * The plugin descriptor
+ * Identifies plugins via {@link PluginSetupDescriptor} and loads plugin on demand and via the plugin 
+ * id. Additionally, considers comma/semicolon separated paths in env/system property 
+ * {@value #FILE_PLUGINS_PROPERTY} to be loaded as unpacked plugins.
  * 
  * @author Holger Eichelberger, SSE
  */
 public class PluginManager {
-    
+
+    public static final String FILE_PLUGINS_PROPERTY = "okto.plugins";
     private static Map<String, Plugin<?>> plugins = new HashMap<>();
     
     /**
@@ -102,6 +108,19 @@ public class PluginManager {
         ServiceLoaderUtils
             .stream(ServiceLoader.load(PluginSetupDescriptor.class))
             .forEach(d -> registerPlugin(d, onlyNew));
+
+        String plugins = OsUtils.getPropertyOrEnv(FILE_PLUGINS_PROPERTY, "");
+        StringTokenizer tokens = new StringTokenizer(plugins, ":;");
+        while (tokens.hasMoreTokens()) {
+            String token = tokens.nextToken();
+            File file = new File(token);
+            if (file.exists() && file.isDirectory()) {
+                registerPlugin(new FolderClasspathPluginSetupDescriptor(file), onlyNew);
+            } else {
+                LoggerFactory.getLogger(PluginManager.class).warn("While reading unpacked plugins from -D{}, "
+                    + "{} does not exist/is no directory.", FILE_PLUGINS_PROPERTY, file);
+            }
+        }
     }
     
     /**

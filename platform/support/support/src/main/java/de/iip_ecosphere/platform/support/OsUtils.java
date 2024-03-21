@@ -79,7 +79,7 @@ public class OsUtils {
      * @see #getEnv(String)
      */
     public static String getPropertyOrEnv(String key, String dflt) {
-        String result = System.getProperty(key, dflt);
+        String result = System.getProperty(key);
         if (null == result) {
             result = getEnv(key); 
         }

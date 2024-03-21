@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.LoggerFactory;
 
@@ -28,8 +29,9 @@ import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 import de.iip_ecosphere.platform.support.resources.ResourceResolver;
 
 /**
- * Default resource-based plugin setup descriptor, reading the required URLs from a classpath file. Typically, a 
- * specific descriptor inherits from this class and sets up the required information in a constructor without arguments.
+ * Default resource-based plugin setup descriptor, reading the required URLs from a classpath file. Tries to resolve and
+ * localize the individual classpath entries. Typically, a specific descriptor inherits from this class and sets up the 
+ * required information in a constructor without arguments.
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -46,8 +48,8 @@ public class ResourceClasspathPluginSetupDescriptor extends URLPluginSetupDescri
     }
 
     /**
-     * Loads a resource in classpath format and returns the specified classpath entries as URLs. Logs errors and 
-     * exceptions.
+     * Loads a resource in classpath format and returns the specified classpath entries as URLs. Tries to resolve and 
+     * localize the individual classpath entries. Logs errors and exceptions.
      * 
      * @param resourceName the name of the resource
      * @param resolvers optional further, optional on-the fly resolvers
@@ -62,7 +64,23 @@ public class ResourceClasspathPluginSetupDescriptor extends URLPluginSetupDescri
                 String contents = IOUtils.toString(in, Charset.defaultCharset());
                 StringTokenizer tokenizer = new StringTokenizer(contents, ":;");
                 while (tokenizer.hasMoreTokens()) {
-                    entries.add(new File(tokenizer.nextToken()));
+                    String tok = tokenizer.nextToken();
+                    File file = new File(tok);
+                    if (!file.exists()) {
+                        InputStream tis = ResourceLoader.getResourceAsStream(tok, resolvers);
+                        if (tis != null) {
+                            File target = new File(FileUtils.getTempDirectory(), tok);
+                            target.getParentFile().mkdirs();
+                            try {
+                                FileUtils.copyInputStreamToFile(tis, target);
+                                file = target;
+                            } catch (IOException e1) {
+                                LoggerFactory.getLogger(URLPluginSetupDescriptor.class).error(
+                                    "While stpring resource '{}': {} Ignoring.", resourceName, e1.getMessage());
+                            }
+                        }
+                    }
+                    entries.add(file);
                 }
                 result = toURLSafe(entries.toArray(new File[entries.size()]));
             } catch (IOException e) {
