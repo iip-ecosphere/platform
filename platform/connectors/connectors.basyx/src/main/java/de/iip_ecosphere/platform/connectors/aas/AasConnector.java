@@ -48,6 +48,8 @@ import de.iip_ecosphere.platform.support.aas.Registry;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
+import de.iip_ecosphere.platform.support.plugins.Plugin;
+import de.iip_ecosphere.platform.support.plugins.PluginManager;
 
 /**
  * A generic Asset Administration Shell connector. We use hierarchical names to identify sub-models
@@ -69,7 +71,8 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
  * @author Holger Eichelberger, SSE
  * @author Jan Cepok, SSE
  */
-@MachineConnector(hasModel = true, supportsModelStructs = false, supportsEvents = false)
+@MachineConnector(hasModel = true, supportsModelStructs = false, supportsEvents = false, 
+    specificSettings = {"PLUGINID"})
 public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, CI> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AasConnector.class);
@@ -156,6 +159,13 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
             this.params = params;
             Schema schema = params.getSchema();
             String epPath = params.getEndpointPath();
+            String pluginId = params.getSpecificStringSetting("PLUGINID");
+            if (null != pluginId) {
+                Plugin<AasFactory> plugin = PluginManager.getPlugin(pluginId, AasFactory.class);
+                if (null != plugin) {
+                    this.factory = plugin.getInstance();
+                }
+            }
             
             // endpoint handling is a bit mixed, old and new stuff
             int pos = epPath.indexOf(':');
