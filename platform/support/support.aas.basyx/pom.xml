@@ -230,6 +230,25 @@
                  </execution>
              </executions>
          </plugin>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <version>${org.apache.maven.assembly.version}</version>
+            <executions>
+                <execution>
+                    <id>plugin</id>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>single</goal>
+                    </goals>
+                    <configuration>
+                        <descriptors>
+                            <descriptor>src/main/assembly/plugin.xml</descriptor>
+                        </descriptors>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
       </plugins>
   </build>
   
