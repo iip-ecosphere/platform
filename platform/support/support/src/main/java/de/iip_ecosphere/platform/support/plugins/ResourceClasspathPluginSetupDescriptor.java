@@ -13,6 +13,7 @@
 package de.iip_ecosphere.platform.support.plugins;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -25,6 +26,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.LoggerFactory;
 
+import de.iip_ecosphere.platform.support.ZipUtils;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 import de.iip_ecosphere.platform.support.resources.ResourceResolver;
 
@@ -57,7 +59,28 @@ public class ResourceClasspathPluginSetupDescriptor extends URLPluginSetupDescri
      */
     public static URL[] loadResourceSafe(String resourceName, ResourceResolver... resolvers) {
         URL[] result = null;
+        String folderName = resourceName;
+        int pos = folderName.lastIndexOf('.');
+        if (pos > 0) {
+            folderName = folderName.substring(0, pos);
+        }
+        File dir = new File(FileUtils.getTempDirectory(), folderName);
+        dir.deleteOnExit();
+        dir.mkdirs();
+        boolean zipExtracted = false;
         InputStream in = ResourceLoader.getResourceAsStream(resourceName, resolvers);
+        if (null != in && resourceName.endsWith(".zip")) {
+            try {
+                ZipUtils.extractZip(in, dir.toPath());
+                de.iip_ecosphere.platform.support.FileUtils.closeQuietly(in);
+                in = new FileInputStream(new File(dir, "classpath"));
+                zipExtracted = true;
+            } catch (IOException e) {
+                in = null;
+                LoggerFactory.getLogger(URLPluginSetupDescriptor.class).error(
+                    "While reading resource, extracting ZIP '{}': {} Ignoring.", resourceName, e.getMessage());
+            }
+        }
         if (null != in) {
             try {
                 List<File> entries = new ArrayList<File>();
@@ -66,21 +89,23 @@ public class ResourceClasspathPluginSetupDescriptor extends URLPluginSetupDescri
                 while (tokenizer.hasMoreTokens()) {
                     String tok = tokenizer.nextToken();
                     File file = new File(tok);
-                    if (!file.exists()) {
+                    File target = new File(dir, tok);
+                    if (!zipExtracted && file.exists()) { // local, relative
+                        entries.add(file);
+                    } else if (zipExtracted && target.exists()) { // unpacked
+                        entries.add(target);
+                    } else if (!file.exists() && !target.exists()) { // else, try unpacking
                         InputStream tis = ResourceLoader.getResourceAsStream(tok, resolvers);
                         if (tis != null) {
-                            File target = new File(FileUtils.getTempDirectory(), tok);
-                            target.getParentFile().mkdirs();
                             try {
                                 FileUtils.copyInputStreamToFile(tis, target);
-                                file = target;
+                                entries.add(target);
                             } catch (IOException e1) {
                                 LoggerFactory.getLogger(URLPluginSetupDescriptor.class).error(
                                     "While stpring resource '{}': {} Ignoring.", resourceName, e1.getMessage());
                             }
                         }
                     }
-                    entries.add(file);
                 }
                 result = toURLSafe(entries.toArray(new File[entries.size()]));
             } catch (IOException e) {

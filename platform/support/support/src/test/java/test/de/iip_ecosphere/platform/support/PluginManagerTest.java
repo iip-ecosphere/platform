@@ -125,6 +125,12 @@ public class PluginManagerTest {
 
         // the URL-based setup descriptor is used above, would lead to same result
         new ResourceClasspathPluginSetupDescriptor(resourceName);
+        
+        // plugin jar extracted to temp, further contained files extracted there and classpath based on those
+        url = ResourceClasspathPluginSetupDescriptor.loadResourceSafe("test-plugin.zip");
+        Assert.assertNotNull(url);
+        Assert.assertEquals(1, url.length);
+        Assert.assertTrue(url[0].toString().contains(JAR));
     }
 
     /**
