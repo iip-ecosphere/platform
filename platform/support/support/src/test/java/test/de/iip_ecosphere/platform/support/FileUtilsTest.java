@@ -70,14 +70,14 @@ public class FileUtilsTest {
             fileCount.incrementAndGet();
         });
         
-        Assert.assertEquals(13, fileCount.get());
+        Assert.assertEquals(14, fileCount.get());
         fileCount.set(0);
 
         FileUtils.listFiles(f, g -> !g.getName().equals("services"), g -> {
             fileCount.incrementAndGet();
         });
 
-        Assert.assertEquals(10, fileCount.get());
+        Assert.assertEquals(11, fileCount.get());
     }
     
     /**
