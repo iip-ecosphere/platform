@@ -66,6 +66,10 @@ The ``diff-classpath`` goal based on the original plugin and for diffing actual 
 
 The ``copy`` goal is the same as in the original plugin and included here just for convenience.
 
+## tree goal
+
+The ``tree`` goal is the same as in the original plugin and included here just for convenience.
+
 ## delete goal
 
 The delete goal allows to just delete files and directories. At it's core, it is similar to the
