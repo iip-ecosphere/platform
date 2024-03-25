@@ -15,8 +15,10 @@ package test.de.iip_ecosphere.platform.support.aas;
 import java.io.IOException;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Stream;
 
 import org.junit.Test;
 
@@ -107,8 +109,10 @@ public class AasTest {
      */
     public static Server createOperationsServer(int port, TestMachine machine, String protocol, 
         KeyStoreDescriptor kstore) {
+        AasFactory instance = AasFactory.getInstance();
         AasFactory.setPluginId("unknown"); // forth and back that it has been called once
         AasFactory.setPluginId(AasFactory.DEFAULT_PLUGIN_ID);
+        AasFactory.setInstance(instance);
         AasFactory factory = AasFactory.getInstance();
         ProtocolServerBuilder builder = factory.createProtocolServerBuilder(protocol, port, kstore);
         builder.defineProperty(NAME_VAR_LOTSIZE, () -> {
@@ -200,8 +204,14 @@ public class AasTest {
      */
     @Test
     public void testVabQuery() throws SocketException, UnknownHostException, ExecutionException, IOException {
-        for (String sProto : getServerProtocols()) {
-            for (String proto : AasFactory.getInstance().getProtocols()) {
+        String[] desiredProtocols = getServerProtocols();
+        String[] providedProtocols = AasFactory.getInstance().getProtocols();
+        desiredProtocols = Stream.of(desiredProtocols) // only intersection counts, test only what is provided
+            .filter(Arrays.asList(providedProtocols)::contains)
+            .toArray(String[]::new);
+
+        for (String sProto : desiredProtocols) {
+            for (String proto : providedProtocols) {
                 if (!AasFactory.LOCAL_PROTOCOL.equals(proto) && !excludeProtocol(proto)) { // VAB only
                     System.out.println("Testing VAB protocol: " + proto 
                         + (sProto.length() > 0 ? " on server protocol " + sProto : ""));
