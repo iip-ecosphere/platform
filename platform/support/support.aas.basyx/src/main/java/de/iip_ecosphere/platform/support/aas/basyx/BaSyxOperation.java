@@ -103,7 +103,7 @@ public class BaSyxOperation extends BaSyxSubmodelElement implements Operation {
             Consumer<PropertyBuilder> init) {
             Property prop = new Property();
             prop.setIdShort(idShort);
-            prop.setKind(ModelingKind.TEMPLATE); // required with BaSyx 1.0.0
+            VersionAdjustment.setPropertyKind(prop, ModelingKind.TEMPLATE); // required with BaSyx 1.0.0
             if (null != type) { // let's see whether this makes sense
                 prop.setValueType(Tools.translate(type));
             }
@@ -242,7 +242,7 @@ public class BaSyxOperation extends BaSyxSubmodelElement implements Operation {
                 }
             }
             // TODO param translate needed but sequence of in/inout unclear
-            return Tools.translateValueFromBaSyx(operation.invokeSimple(args), type);
+            return Tools.translateValueFromBaSyx(VersionAdjustment.operationInvoke(operation, args), type);
         } catch (Exception e) {
             throw new ExecutionException(e);
         }

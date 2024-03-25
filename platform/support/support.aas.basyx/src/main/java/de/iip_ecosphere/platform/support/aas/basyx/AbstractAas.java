@@ -120,7 +120,7 @@ public abstract class AbstractAas<A extends IAssetAdministrationShell> implement
      * 
      * @return the AAS instance
      */
-    A getAas() {
+    public A getAas() {
         return aas;
     }
     

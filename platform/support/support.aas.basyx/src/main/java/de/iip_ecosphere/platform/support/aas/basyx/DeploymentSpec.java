@@ -3,12 +3,9 @@ package de.iip_ecosphere.platform.support.aas.basyx;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.Nullable;
-
 import org.eclipse.basyx.aas.registration.api.IAASRegistry;
 import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
-import org.eclipse.basyx.vab.protocol.http.server.JwtBearerTokenAuthenticationConfiguration;
 
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
@@ -105,11 +102,13 @@ class DeploymentSpec {
     /**
      * Sets the bearer authentication configuration.
      * 
-     * @param conf the bearer authentication configuration
+     * @param issuerUri the URI of the issuer
+     * @param jwkSetUri unclear
+     * @param requiredAud unclear (may be <b>null</b>)
+     * @throws IllegalArgumentException if the passed in information is invalid
      */
-    public void setJwtBearerTokenAuthenticationConfiguration(
-        @Nullable final JwtBearerTokenAuthenticationConfiguration conf) {
-        context.setJwtBearerTokenAuthenticationConfiguration(conf);
+    public void setBearerTokenAuthenticationConfiguration(String issuerUri, String jwkSetUri, String requiredAud) {
+        VersionAdjustment.setBearerTokenAuthenticationConfiguration(context, issuerUri, jwkSetUri, requiredAud);
     }
     
     /**

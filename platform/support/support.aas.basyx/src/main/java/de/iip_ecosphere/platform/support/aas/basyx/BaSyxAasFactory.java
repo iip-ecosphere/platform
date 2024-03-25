@@ -12,28 +12,15 @@
 
 package de.iip_ecosphere.platform.support.aas.basyx;
 
-import java.io.IOException;
+import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration;
+import org.eclipse.basyx.submodel.metamodel.connected.submodelelement.operation.ConnectedOperation;
+import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.property.Property;
+import org.eclipse.basyx.submodel.metamodel.map.submodelelement.operation.Operation;
+import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
+import org.eclipse.basyx.vab.protocol.http.server.JwtBearerTokenAuthenticationConfiguration;
 
-import org.eclipse.basyx.submodel.metamodel.api.submodelelement.SubmodelElementIdShortBlacklist;
-import org.eclipse.basyx.vab.protocol.api.IConnectorFactory;
-import org.eclipse.basyx.vab.protocol.http.connector.HTTPConnectorFactory;
-import org.eclipse.basyx.vab.protocol.https.HTTPSConnectorProvider;
-
-import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
-import de.iip_ecosphere.platform.support.Endpoint;
-import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.AasFactoryDescriptor;
-import de.iip_ecosphere.platform.support.aas.DeploymentRecipe;
-import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
-import de.iip_ecosphere.platform.support.aas.OperationsProvider;
-import de.iip_ecosphere.platform.support.aas.PersistenceRecipe;
-import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
-import de.iip_ecosphere.platform.support.aas.Registry;
-import de.iip_ecosphere.platform.support.aas.ServerRecipe;
-import de.iip_ecosphere.platform.support.aas.SimpleLocalProtocolCreator;
-import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
-import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
 import de.iip_ecosphere.platform.support.plugins.Plugin;
 import de.iip_ecosphere.platform.support.plugins.PluginDescriptor;
 
@@ -42,13 +29,10 @@ import de.iip_ecosphere.platform.support.plugins.PluginDescriptor;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class BaSyxAasFactory extends AasFactory {
+public class BaSyxAasFactory extends AbstractBaSyxAasFactory {
 
-    // public for testing, do not reference from outside
-    public static final String PROTOCOL_VAB_TCP = "VAB-TCP";
-    public static final String PROTOCOL_VAB_HTTP = "VAB-HTTP";
-    public static final String PROTOCOL_VAB_HTTPS = "VAB-HTTPS";
-    
+    static final boolean ENABLE_PROPERTY_LAMBDA = true;
+
     /**
      * Factory descriptor for Java Service Loader.
      * 
@@ -74,152 +58,45 @@ public class BaSyxAasFactory extends AasFactory {
     }
     
     /**
-     * The VAB-TCP Protocol creator.
-     * 
-     * @author Holger Eichelberger, SSE
-     */
-    private static class VabTcpProtocolCreator implements ProtocolCreator {
-
-        @Override
-        public InvocablesCreator createInvocablesCreator(String host, int port, KeyStoreDescriptor kstore) {
-            return new VabTcpInvocablesCreator(host, port); 
-        }
-
-        @Override
-        public ProtocolServerBuilder createProtocolServerBuilder(int port, KeyStoreDescriptor kstore) {
-            return new VabOperationsProvider.VabTcpOperationsBuilder(port);
-        }
-        
-    }
-    
-    /**
-     * The VAB-HTTP Protocol creator.
-     * 
-     * @author Holger Eichelberger, SSE
-     */
-    private static class VabHttpProtocolCreator implements ProtocolCreator {
-
-        @Override
-        public InvocablesCreator createInvocablesCreator(String host, int port, KeyStoreDescriptor kstore) {
-            return new VabHttpInvocablesCreator("http://" + host + ":" + port);
-        }
-
-        @Override
-        public ProtocolServerBuilder createProtocolServerBuilder(int port, KeyStoreDescriptor kstore) {
-            return new VabOperationsProvider.VabHttpOperationsBuilder(port, Schema.HTTP, null);
-        }
-        
-    }
-    
-    /**
-     * The VAB-HTTPS Protocol creator.
-     * 
-     * @author Holger Eichelberger, SSE
-     */
-    private static class VabHttpsProtocolCreator implements ProtocolCreator {
-        
-        @Override
-        public InvocablesCreator createInvocablesCreator(String host, int port, KeyStoreDescriptor kstore) {
-            return new VabHttpsInvocablesCreator("https://" + host + ":" + port, kstore);
-        }
-
-        @Override
-        public ProtocolServerBuilder createProtocolServerBuilder(int port, KeyStoreDescriptor kstore) {
-            return new VabOperationsProvider.VabHttpOperationsBuilder(port, Schema.HTTPS, kstore);
-        }
-        
-    }
-    
-    /**
      * Creates an instance.
      */
     public BaSyxAasFactory() {
-        registerProtocolCreator(LOCAL_PROTOCOL, new SimpleLocalProtocolCreator() {
-            
-            @Override
-            protected OperationsProvider createOperationsProvider() {
-                return new VabOperationsProvider();
-            }
-            
-        });
-        
-        VabTcpProtocolCreator tcp = new VabTcpProtocolCreator();
-        registerProtocolCreator(DEFAULT_PROTOCOL, tcp);
-        registerProtocolCreator(PROTOCOL_VAB_TCP, tcp);
-        registerProtocolCreator(PROTOCOL_VAB_HTTP, new VabHttpProtocolCreator());
         registerProtocolCreator(PROTOCOL_VAB_HTTPS, new VabHttpsProtocolCreator());
+        registerPersistenceRecipe(new AasxPersistenceRecipe());
+        // use new method, prevent deprecated
+        VersionAdjustment.registerSetPropertyKind(Property.class, (p, k) -> p.setKind(k));
+        // use new method, prevent deprecated
+        VersionAdjustment.registerOperationInvoke(Operation.class, (o, a) -> o.invokeSimple(a));
+        VersionAdjustment.registerOperationInvoke(ConnectedOperation.class, (o, a) -> o.invokeSimple(a));
+        // CORS available
+        VersionAdjustment.registerSetBearerTokenAuthenticationConfiguration(BaSyxContext.class, (c, i, j, r) -> 
+            c.setJwtBearerTokenAuthenticationConfiguration(
+                JwtBearerTokenAuthenticationConfiguration.of(i, j, r)));
+        // switch off data mapper
+        VersionAdjustment.registerSetupBaSyxAASServerConfiguration(BaSyxAASServerConfiguration.class, c -> setup(c));
+    }
+    
+    /**
+     * Sets up a server configuration for lambda properties.
+     * 
+     * @param cfg the configuration
+     */
+    private static void setup(BaSyxAASServerConfiguration cfg) {
+        if (ENABLE_PROPERTY_LAMBDA) { // enables user lambdas, disables data mapper
+            cfg.disablePropertyDelegation();
+        } else { // enables data mapper, disables user lambdas
+            cfg.enablePropertyDelegation();
+        }        
     }
     
     @Override
-    public AasBuilder createAasBuilder(String idShort, String identifier) {
-        return new BaSyxAas.BaSyxAasBuilder(idShort, identifier);
-    }
-
-    @Override
-    public SubmodelBuilder createSubmodelBuilder(String idShort, String identifier) {
-        return new BaSyxSubmodel.BaSyxSubmodelBuilder(null, idShort, identifier);
-    }
-
-    @Override
-    protected ServerRecipe createDefaultServerRecipe() {
-        return new BaSyxServerRecipe();
-    }
-    
-    @Override
-    public Registry obtainRegistry(Endpoint endpoint) throws IOException {
-        return obtainRegistry(endpoint, endpoint.getSchema());
-    }
-    
-    @Override
-    public Registry obtainRegistry(Endpoint endpoint, Schema aasSchema) throws IOException {
-        IConnectorFactory cFactory;
-        if (Schema.HTTPS == aasSchema) {
-            cFactory = new HTTPSConnectorProvider();
-        } else {
-            cFactory = new HTTPConnectorFactory();
-        }
-        return new BaSyxRegistry(endpoint, cFactory);
-    }
-    
-    @Override
-    public String getFullRegistryUri(Endpoint regEndpoint) {
-        return regEndpoint.toUri() + "/api/v1/registry";
-    }
-    
-    @Override
-    public String getServerBaseUri(Endpoint serverEndpoint) {
-        return serverEndpoint.toUri() + "/shells";
-    }
-
-    @Override
-    public DeploymentRecipe createDeploymentRecipe(Endpoint endpoint) {
-        return new BaSyxDeploymentRecipe(endpoint);
-    }
-    
-    @Override
-    public DeploymentRecipe createDeploymentRecipe(Endpoint endpoint, KeyStoreDescriptor kstore) {
-        return new BaSyxDeploymentRecipe(endpoint, kstore);
-    }
+    public boolean supportsPropertyFunctions() {
+        return ENABLE_PROPERTY_LAMBDA;
+    }    
 
     @Override
     public String getName() {
         return "AAS/BaSyx v1.3.0 (2022/12/15)";
-    }
-
-    @Override
-    public PersistenceRecipe createPersistenceRecipe() {
-        return new BaSyxPersistenceRecipe();
-    }
-
-    @Override
-    protected boolean needsIdFix(String id) {
-        // for now it's ok that it may mapply more global than just to submodel element
-        return SubmodelElementIdShortBlacklist.isBlacklisted(id);
-    }
-
-    @Override
-    public boolean supportsPropertyFunctions() {
-        return BaSyxRegistryDeploymentAasServer.ENABLE_PROPERTY_LAMBDA;
     }
 
 }

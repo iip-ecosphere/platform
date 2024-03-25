@@ -67,7 +67,7 @@ public abstract class AbstractSubmodel<S extends ISubmodel> implements Submodel,
      * 
      * @return the sub-model instance
      */
-    S getSubmodel() {
+    public S getSubmodel() {
         return submodel;
     }
     
