@@ -206,6 +206,7 @@
                          <overWriteReleases>false</overWriteReleases>
                          <overWriteSnapshots>true</overWriteSnapshots>
                          <overWriteIfNewer>true</overWriteIfNewer>
+                         <includeScope>compile</includeScope>
                      </configuration>
                  </execution>
                  <execution>
@@ -244,6 +245,7 @@
                     <configuration>
                         <descriptors>
                             <descriptor>src/main/assembly/plugin.xml</descriptor>
+                            <descriptor>src/main/assembly/core.xml</descriptor>
                         </descriptors>
                     </configuration>
                 </execution>
