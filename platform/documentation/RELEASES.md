@@ -16,6 +16,7 @@ New features:
 * Connectors now also usable as mesh transformers
 * Connectors with temporary data storage for transformation expressions
 * Serial connector, e.g., for EAN code scanners
+* MODBUS/TCP connector by Christian Nikolajew
 * Plugins for alternative components with conflicting classpaths, e.g, BaSyx 1.0.
 * AAS abstraction/integration: referenceElement, multiLanguageProperties, entity, more semanticIds, [IDTA 02004-1-2 Handover Documentation](https://industrialdigitaltwin.org/wp-content/uploads/2023/03/IDTA-02004-1-2_Submodel_Handover-Documentation.pdf), [IDTA 02011-1-0 Hierarchical Structures enabling Bills of Material](https://industrialdigitaltwin.org/wp-content/uploads/2023/04/IDTA-02011-1-0_Submodel_HierarchicalStructuresEnablingBoM.pdf),  [IDTA 2023-01-24 Draft Submodel PCF](https://github.com/admin-shell-io/submodel-templates/tree/main/development/Carbon%20Footprint/1/0), [IDTA 02008-1-1 Time Series Data](https://industrialdigitaltwin.org/en/wp-content/uploads/sites/2/2023/03/IDTA-02008-1-1_Submodel_TimeSeriesData.pdf), [IDTA 02002-1-0 Submodel for Contact Information](https://industrialdigitaltwin.org/wp-content/uploads/2022/10/IDTA-02002-1-0_Submodel_ContactInformation.pdf), [IDTA 02007-1-0 Nameplate for Software in Manufacturing](https://industrialdigitaltwin.org/wp-content/uploads/2023/08/IDTA-02007-1-0_Submodel_Software-Nameplate.pdf) and related examples/tests including the XMAS AAS
 
