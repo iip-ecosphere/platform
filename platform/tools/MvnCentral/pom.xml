@@ -82,7 +82,30 @@
         <artifactId>support.aas.basyx</artifactId>
         <groupId>de.iip-ecosphere.platform</groupId>
         <version>${project.version}</version>
-    </dependency>    
+    </dependency>
+    <dependency>
+        <artifactId>support.aas.basyx</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+        <classifier>core</classifier>
+    </dependency>
+    <dependency>
+        <artifactId>support.aas.basyx</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+        <classifier>plugin</classifier>
+    </dependency>
+    <dependency>
+        <artifactId>support.aas.basyx1_0</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>
+    <dependency>
+        <artifactId>support.aas.basyx1_0</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+        <classifier>plugin</classifier>
+    </dependency>
     <dependency>
         <artifactId>support.aas.basyx.server</artifactId>
         <groupId>de.iip-ecosphere.platform</groupId>
