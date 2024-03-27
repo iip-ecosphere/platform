@@ -42,8 +42,13 @@ project DataTypes {
        if (v.snapshot) then v.ver + "-SNAPSHOT" else v.ver endif;
     
     abstract compound DataType {
-        NonEmptyNameString name;
+        NonEmptyString name;
+        Constraint isNameOk = isNameOk(self);
     }
+    
+    @DispatchBasis
+    def Boolean isNameOk(DataType t) = 
+        matches(t.name, "^[\\w \\[\\]\\-\\Q$_\\E]+$");
     
     compound AliasType refines DataType {
         refTo(DataType) represents;
@@ -83,7 +88,7 @@ project DataTypes {
     
     compound RecordType refines CDataProperty, DataType {
         Fields fields;
-        Constraint fieldNamesUnique = fields->isUnique(l|l.name);
+        Constraint fieldNamesUnique = fields->select(f|isRelevant(f))->isUnique(l|l.name);
     }
     
     const Integer CACHE_ALWAYS = -1;
@@ -91,17 +96,26 @@ project DataTypes {
     
     compound Field {
         assign(bindingTime = BindingTime::specify) to { // may require staged freezing
-            NonEmptyNameString name;
+            NonEmptyString name;
             refTo(DataType) type;
             String description = "";
             Boolean optional = false;
             Boolean readOnly = false;
             Boolean nullable = false;
         }
-        Integer cachingTime = CACHE_ALWAYS; 
+        Integer cachingTime = CACHE_ALWAYS;
+        Constraint isNameOk = isNameOk(self);
     }
+    
+    @DispatchBasis
+    def Boolean isRelevant(Field f) = 
+        true;
+        
+    @DispatchBasis
+    def Boolean isNameOk(Field f) = 
+        matches(f.name, "^[\\w \\[\\]\\-\\Q$_\\E]+$");
 
-    typedef Fields sequenceOf(Field) with (Fields->collect(f|f.name).hasDuplicates() == false);
+    typedef Fields sequenceOf(Field) with (Fields->select(f|isRelevant(f))->collect(f|f.name).hasDuplicates() == false);
 
     def Boolean isFlatDataType(DataType type) = 
         true;
@@ -322,6 +336,24 @@ project DataTypes {
     
     IdentityStore identityStore = YamlFileIdentityStore{}; // default if null
     
+    // ------------------------------- Platform Plugins -------------------------------------------
+
+    enum PluginKind {AAS, OTHER};
+    
+    compound Plugin {
+        NonEmptyString id;
+        String description;
+        ArtifactString artifact;
+        PluginKind kind = PluginKind::OTHER;
+    }
+    
+    Plugin BaSyx10Plugin = {
+        id = "aas.basyx-1.0", // must be the same as in code
+        description = "BySyx 1.0 retrofitting AAS plugin",
+        artifact = mvnIipGroup + ":support.aas.basyx1_0:" + iipVer,
+        kind = PluginKind::AAS
+    };
+    
     // -------------------------------- freeze fixed stuff ----------------------------------------
     
     // freeze all primitives
@@ -348,6 +380,7 @@ project DataTypes {
         StringArrayType;
         IEC61131_3DateTimeType;
         iipVer;
+        BaSyx10Plugin;
     };
     
 }

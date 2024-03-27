@@ -1,0 +1,422 @@
+import Basics;
+import JavaBasics;
+import AasBasics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template AasAccessorImpl(Configuration config, FileArtifact target, AasSubmodelType type, String pkg) {
+
+    setOf(String) done = {};
+    setOf(String) doneMethods = {};
+
+    def produceMethodsForFields(AasFields fields, String class) {
+        for (AasField field: fields) {
+            '${produceMethods(field.type, class, field, 0)|e}'
+        }
+    }
+
+    // mode == 0: full method code
+    // mode == 1: inner method code
+    // mode == 2: Java type
+
+    @DispatchBasis    
+    def produceMethods(DataType type, String class, AasField field, Integer mode) {
+        if (type == AasGenericSubmodelElementCollection) {
+            AasElementType t = type;
+            '${produceElementMethods(t, class, field, mode, "getSubmodelElementCollection")}'
+        } else if (type == AasGenericEntityType) {
+            AasElementType t = type;
+            '${produceElementMethods(t, class, field, mode, "getEntity")}'
+        } else {
+            '// TODO unconsidered type in produceMethods: ${type.name} ${type}'
+        }
+    }
+    
+    @DispatchCase
+    def produceMethods(StringTypeType type, String class, AasField field, Integer mode) {
+        '${produceGetter(field, class, "String", "String", "", "Property", "getProperty")}'
+    }
+
+    @DispatchCase
+    def produceMethods(IntegerTypeType type, String class, AasField field, Integer mode) {
+        '${produceGetter(field, class, "int", "Int", "", "Property", "getProperty")}'
+    }
+
+    @DispatchCase
+    def produceMethods(LongTypeType type, String class, AasField field, Integer mode) {
+        '${produceGetter(field, class, "long", "Long", "", "Property", "getProperty")}'
+    }
+    
+    @DispatchCase
+    def produceMethods(UnsignedInteger64TypeType type, String class, AasField field, Integer mode) {
+        '${produceGetter(field, class, "java.math.BigInteger", "BigInteger", "", "Property", "getProperty")}'
+    }
+
+    @DispatchCase
+    def produceMethods(FloatTypeType type, String class, AasField field, Integer mode) {
+        '${produceGetter(field, class, "float", "Float", "", "Property", "getProperty")}'
+    }
+
+    @DispatchCase
+    def produceMethods(DoubleTypeType type, String class, AasField field, Integer mode) {
+        '${produceGetter(field, class, "double", "Double", "", "Property", "getProperty")}'
+    }
+
+    @DispatchCase
+    def produceMethods(BooleanTypeType type, String class, AasField field, Integer mode) {
+        '${produceGetter(field, class, "boolean", "Boolean", "", "Property", "getProperty")}'
+    }
+
+    @DispatchCase
+    def produceMethods(DateTimeTypeType type, String class, AasField field, Integer mode) {
+        '${produceGetter(field, class, "java.util.Date", "Date", "", "Property", "getProperty")}'
+    }
+
+    @DispatchCase
+    def produceMethods(AasEnumType type, String class, AasField field, Integer mode) {
+        String clsName = asTypeName(type.name);
+        '${produceGetter(field, class, clsName, "Enum", ", ${clsName}.class", "Property", "getProperty")}'
+    }
+    
+    // AasLangStringType
+
+    @DispatchCase
+    def produceMethods(AasAnyURITypeType type, String class, AasField field, Integer mode) {
+        '${produceGetter(field, class, "String", "AnyUri", "", "Property", "getProperty")}'
+    }
+
+    @DispatchCase
+    def produceMethods(AasFileResourceTypeType type, String class, AasField field, Integer mode) {
+        '${produceGetter(field, class, "FileDataElement", "FileDataElement", "", "FileDataElement", "getDataElement")}'
+    }
+
+    @DispatchCase
+    def produceMethods(AasRangeTypeType type, String class, AasField field, Integer mode) {
+        '${produceGetter(field, class, "Range", "Range", "", "Range", "getDataElement")}'
+    }
+
+    @DispatchCase
+    def produceMethods(AasBlobTypeType type, String class, AasField field, Integer mode) {
+        '${produceGetter(field, class, "BlobDataElement", "BlobDataElement", "", "BlobDataElement", "getDataElement")}'
+    }
+
+    @DispatchCase
+    def produceMethods(AasReferenceTypeType type, String class, AasField field, Integer mode) {
+        '${produceGetter(field, class, "ReferenceElement", "ReferenceElement", "", "ReferenceElement", "getReferenceElement")}'
+    }
+    
+    @DispatchCase
+    def produceMethods(AasRelationTypeType type, String class, AasField field, Integer mode) {
+        '${produceGetter(field, class, "RelationshipElement", "RelationshipElement", "", "RelationshipElement", "getRelationshipElement")}'
+    }
+
+    @DispatchCase
+    def produceMethods(AasMultiLangStringTypeType type, String class, AasField field, Integer mode) {
+        '${produceGetter(field, class, "LangString[]", "LangString", "", "MultiLanguageProperty", "getDataElement")}'
+    }
+    
+    @DispatchCase
+    def produceMethods(AasSubmodelType type, String class, AasField field, Integer mode) {
+        '// TODO unconsidered submodel ${type}'
+        /*if (!doneMethods.includes(type.name)) {
+            doneMethods.add(type.name);
+            String result = '${produceMethodsForFields(type.fields, class)}';
+            doneMethods.remove(type.name);
+            '${result|e}'
+        }*/
+    }
+    
+    @DispatchCase
+    def produceMethods(AasSubmodelElementCollectionType type, String class, AasField field, Integer mode) {
+        if (!doneMethods.includes(type.name)) {
+            doneMethods.add(type.name);
+            String result = produceElementMethods(type, class, field, mode, "getSubmodelElementCollection");
+            doneMethods.remove(type.name);
+            result;
+        }
+    }
+    
+    @DispatchCase
+    def produceMethods(AasEntityType type, String class, AasField field, Integer mode) {
+        if (!doneMethods.includes(type.name)) {
+            doneMethods.add(type.name);
+            String result = produceElementMethods(type, class, field, mode, "getEntity");
+            doneMethods.remove(type.name);
+            result;
+        }
+    }
+    
+    def produceElementMethods(AasElementType type, String class, AasField field, Integer mode, String methodName) {
+        if (notSkip(field)) {
+            String clsName = asTypeName(type.name);
+            String fldName = asTypeName(validateName(field.name));
+            String param = "";
+            String comment = "";
+            String commentIdShort = "";
+            String commentSemId = "";
+            String idShortParam = "";
+            if (field.isGeneric) {
+                param = "String idShort";
+                commentIdShort = "* @param idShort the actual idShort";
+                idShortParam = "idShort";
+            }
+            String accessEx = getFieldNameEx(field, "index", idShortParam);
+            if (isFieldCounting(field)) {
+                param = appendWithSeparator(param, ", ", "int index");
+                comment = "* @param index 0-based index to access a specific instance";
+            }
+            if (hasMultiSemId(field)) {
+                param = appendWithSeparator(param, ", ", "String semanticId");
+                commentSemId = "* @param semanticId the actual semanticId";
+            }
+            String constructorStart = "new ${clsName}(";
+            String constructorEnd = ")";
+            if (isImplementedByAPI(type)) {
+                constructorStart = "";
+                constructorEnd = "";
+            } 
+            '/**
+            * Gets an instance of ${field.name}.
+            *
+            ${commentIdShort|e}
+            ${comment|e}
+            ${commentSemId|e}
+            * @return the instance or <b>null</b> for none
+            */
+            public ${clsName} get${fldName}(${param}) {
+                return ${constructorStart}super.${methodName}(${accessEx})${constructorEnd};
+            }
+            '
+        }
+    }    
+    
+    def produceGetter(AasField field, String class, String type, String infix, String params, String aasType, String aasAccess) {
+        if (notSkip(field)) {
+            String fldName = validateName(field.name);
+            String valueEx;
+            String idShortComment = "";
+            String propParam = "";
+            String valParam = "";
+            String idShortEx = '"${field.name}"';
+            String fieldNameOverride = "";
+            if (field.isGeneric) {
+                idShortEx = "idShort";
+                fieldNameOverride = "idShort";
+                propParam = "String idShort";
+                valParam = "String idShort";
+                idShortComment = "* @param idShort the actual idShort";
+            }
+            if (infix == "Enum") {
+                if (isOpen(field.type)) {
+                    params = ", I" + type + ".class" + params;
+                } else {
+                    params = params + params;
+                }
+            }
+            if (isFieldCounting(field) or field.maximumInstances > 1) {
+                String transformEx = "";
+                String collectType = type;
+                if (aasType == "Property") {
+                    if (infix == "Enum") {
+                        String specificType = collectType;
+                        if (isOpen(field.type)) {
+                            specificType = "I" + collectType;
+                        }
+                        transformEx = ", p -> getEnumValue(p, ${collectType}.class, ${specificType}.class)";
+                    } else {
+                        transformEx = ", p -> cast(p, ${type}.class)";
+                    }
+                    collectType = aasType;
+                } else if (aasType == "MultiLanguageProperty") {
+                    transformEx = ", p -> getLangStringValue(p)";
+                    collectType = aasType;
+                }
+                String semIdEx = getSemanticIdExpr(field.semanticId, "<no semId given>");
+                if (hasMultiSemId(field)) {
+                    semIdEx = 'semanticId != null && semanticId.length() > 0 ? semanticId : ${semIdEx}';
+                }
+                valueEx = 'collect(elements(), ${collectType}.class, ${semIdEx}${transformEx})';
+                type = "Iterable<${type}>";
+            } else {
+                valueEx = 'get${infix}Value(this, ${idShortEx}${params})';
+            }
+            String cast = "";
+            if (aasType == "MultiLanguageProperty") {
+                cast = "(MultiLanguageProperty) ";
+            } else if (aasType == "FileDataElement") {
+                cast = "(FileDataElement) ";
+            } else if (aasType == "ReferenceElement") {
+                cast = "(ReferenceElement) ";
+            } else if (aasType == "BlobDataElement") {
+                cast = "(BlobDataElement) ";
+            } else if (aasType == "Range") {
+                cast = "(Range) ";
+            }
+            String countingComment = "";
+            if (isFieldCounting(field)) {
+                countingComment = "* @param index the index of the field";
+                propParam = appendWithSeparator(propParam, ", ", "int index");
+            }
+            String semIdComment = "";
+            if (hasMultiSemId(field)) {
+                valParam = appendWithSeparator(valParam, ", ", "String semanticId");
+                semIdComment = "* @param semanticId the actual semanticId";
+            }
+            String valueType = type;
+            if (isOpen(field.type)) {
+                valueType = "I" + valueType;
+            }
+
+            '/**
+            * Returns the property ${field.name}.
+            *
+            ${idShortComment|e}
+            ${countingComment|e}
+            * @return the property
+            */
+            public ${aasType} get${fldName.firstToUpper()}Property(${propParam}) {
+                return ${cast}${aasAccess}(${getFieldNameEx(field, "index", fieldNameOverride)});
+            }
+            
+            /**
+            * Returns the value of property ${field.name}.
+            *
+            ${idShortComment|e}
+            ${semIdComment|e}
+            * @return the value
+            * @throws ExecutionException if the property cannot be accessed or the contained value cannot be converted
+            */
+            public ${valueType} get${fldName.firstToUpper()}(${valParam}) throws ExecutionException {
+                return ${valueEx};
+            }
+            '
+        } else {
+            ''
+        }
+    }
+    
+    def produceGetterComment(DecisionVariable var, String name) {
+        String comment = getStringValueSafe(var, "");
+        if (comment.length() > 0) {
+            comment = "Returns " + comment;
+        } else {
+            comment = "Returns the value of ${name}";
+        }
+        '/**
+        * ${comment}.
+        *
+        * @return the value
+        */'
+    }
+    
+    // ------------------------------ classes -----------------------------------------
+    
+    def produceClassesForFields(AasFields fields, Boolean top) {
+        for (AasField field: fields) {
+            '${produceClasses(field.type, isFieldCounting(field), top)|e}'
+        }
+    }
+    
+    @DispatchBasis    
+    def produceClasses(DataType type, Boolean counting, Boolean top) {
+        ''
+    }
+
+    @DispatchCase
+    def produceClasses(AasSubmodelElementCollectionType type, Boolean counting, Boolean top) {
+        String clsName = asTypeName(type.name);
+        if (!done.includes(clsName) and !isImplementedByAPI(type) and notSkip(type)) {
+            done.add(clsName);
+            
+            '${produceClassComment(type.description, "Accessor", "AAS accessor implementation")}
+            public static class ${clsName} extends DelegatingSubmodelElementCollection {
+                
+                /**
+                * Creates a wrapping instance for ${getIdShort(type)}.
+                *
+                * @param parent the parent submodel element collection builder
+                */
+                protected ${clsName}(SubmodelElementCollection parent) {
+                    super(parent);
+                }
+                
+                ${produceMethodsForFields(type.fields, "${clsName}")|e}
+            }
+            '
+            '${produceClassesForFields(type.fields, false)|e}'
+        }
+    }
+    
+    @DispatchCase
+    def produceClasses(AasEntityType type, Boolean counting, Boolean top) {
+        String clsName = asTypeName(type.name);
+        if (!done.includes(clsName) and !isImplementedByAPI(type) and notSkip(type)) {
+            done.add(clsName);
+            
+            '${produceClassComment(type.description, "Accessor", "AAS accessor implementation")}
+            public static class ${clsName} extends DelegatingEntity {
+                
+                /**
+                * Creates a wrapping instance for ${getIdShort(type)}.
+                *
+                * @param parent the parent submodel element collection builder
+                */
+                protected ${clsName}(Entity parent) {
+                    super(parent);
+                }
+                
+                ${produceMethodsForFields(type.fields, "${clsName}")|e}
+            }
+            '
+            '${produceClassesForFields(type.fields, false)|e}'
+        }
+    }
+    
+    @DispatchCase
+    def produceClasses(AasSubmodelType type, Boolean counting) {
+        '// TODO unconsidered submodel ${type}'
+        //'${produceClassesForFields(type.fields, true)}'
+    }
+
+    // ------------------------------- main -------------------------------------------
+    
+    def main(Configuration config, FileArtifact target, AasSubmodelType type, String pkg) {
+        String clsName = asTypeName(type.name);
+        doneMethods.add(type.name);
+       'package ${pkg};
+        
+        import static de.iip_ecosphere.platform.support.aas.IdentifierType.*;
+        import static de.iip_ecosphere.platform.support.aas.types.common.Utils.*;
+        
+        import java.io.IOException;
+        import java.util.concurrent.ExecutionException;
+        import java.util.stream.Collectors;
+
+        import de.iip_ecosphere.platform.support.aas.Aas;
+        import de.iip_ecosphere.platform.support.aas.Registry;
+        import de.iip_ecosphere.platform.support.aas.Submodel;
+        import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
+        import de.iip_ecosphere.platform.support.aas.*;
+        import de.iip_ecosphere.platform.support.aas.types.common.*;
+        
+        import ${pkg}.${clsName}Builder.*;
+        
+        ${produceClassComment(type.description, "Accessor", "AAS Accessor implementation")}
+        public class ${clsName} extends DelegatingSubmodel {
+
+            /**
+            * Creates a wrapping ${getIdShort(type)} submodel instance.
+            * 
+            * @param aas the parent AAS
+            */            
+            public ${clsName}(Aas aas){
+                super(aas.getSubmodel("${getIdShort(type)}"));
+            }
+            
+            ${produceMethodsForFields(type.fields, "${clsName}")|e}
+            ${produceClassesForFields(type.fields, true)|e}
+
+        }'
+    }
+        
+}

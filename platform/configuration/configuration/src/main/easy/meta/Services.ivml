@@ -167,6 +167,7 @@ project Services {
            }
            Parameters parameter = {};
            refTo(Server) server;
+           sequenceOf(refTo(Plugin)) plugins = {};
        }
        assign (uiGroup = UiInvisibleGroup) to {
            setOf(refTo(EcsDevice)) requires;

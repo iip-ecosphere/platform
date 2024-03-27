@@ -61,6 +61,41 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         currentStep = currentStep + 1;
         notifyProgress(currentStep, maxSteps, description);
     }
+    
+    // ---------------------------------------- generating AAS impls -------------------------------------
+    
+    protected generateAasImpl(Project source, Configuration config, Project target) = {
+        Path appRoot = "${target}/api";
+        appRoot.mkdir();
+        setOf(AasSubmodelType) submodelTypes = AasSubmodelType.allInstances();
+        String javaAasPackage = "de.iip_ecosphere.platform.support.aas.types"; // TODO package name
+        String javaAasTestPackage = javaAasPackage;
+        Path javaSrc = "${appRoot}/src/main/java";
+        Path javaTestSrc = "${appRoot}/src/test/java";
+        Path javaAasSrc = "${javaSrc}/${toPath(javaAasPackage)}";
+        Path javaAasTestSrc = "${javaTestSrc}/${toPath(javaAasPackage)}";
+        setOf(String) tests = {};
+        for (AasSubmodelType sm : submodelTypes->sortedBy(s|s.name)) { // sortedBy for testing
+            String clsName = asTypeName(sm.name);
+            vilTemplateProcessor("AasBuilderImpl", config, "${javaAasSrc}/${clsName}Builder.java", type=sm, 
+                pkg=javaAasPackage);
+            vilTemplateProcessor("AasAccessorImpl", config, "${javaAasSrc}/${clsName}.java", type=sm, 
+                pkg=javaAasPackage);
+            String testClsName = "${clsName}BuilderTest";
+            vilTemplateProcessor("AasImplTest", config, "${javaAasTestSrc}/${testClsName}.java", type=sm, 
+                apiPkg=javaAasPackage, pkg=javaAasTestPackage);
+            tests.add(javaAasTestPackage + "." + testClsName);
+        }
+        vilTemplateProcessor("JavaAllTestsTemplate", config, "${javaAasTestSrc}/AllTests.java", javaTests=tests, 
+            pkg=javaAasTestPackage);
+        vilTemplateProcessor("ApiMvn", config, "${appRoot}/pom.xml");
+        mvn(appRoot);
+    }
+    
+    // called from tests/platform instantiator, don't change signature
+    generateApi(Project source, Configuration config, Project target) = {
+        generateAasImpl(source, config, target);
+    }
 
     // ------------------------------------------ generating apps ----------------------------------------
 
@@ -149,6 +184,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 advanceProgress("Instantiating app '" + a.name + "'");
                 // generate service classes and service integration
                 setOf(String) bins = {}; 
+                setOf(Plugin) plugins = {};
                 setOf(String) assemblies = {}; 
                 setOf(String) resources = {}; 
                 sequenceOf(MeshElement) elements = {};
@@ -188,6 +224,9 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                         for (Dependency d: impl.dependencies) {
                             collectMavenDependencies(d, artifacts);
                         }
+                        for (Plugin plugin: impl.plugins) {
+                            plugins.add(plugin);
+                        }
                     };
                     
                     for (Server ser: a.servers) {
@@ -195,6 +234,17 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                         addArtifacts(ser.artifacts, ser.artifact, bins, noDeps);                        
                     }
                 };
+                sequenceOf(String) pluginDescriptors = {};
+                for (Plugin plugin: plugins->sortedBy(p|p.id)) {
+                    sequenceOf(String) tmp = plugin.artifact.split(":");
+                    String fName = tmp[1]+"-"+tmp[2]+".zip";
+                    bins.add("${plugin.artifact}|plugin|${mvnProjectBuildDir}/classes|${fName}|zip|copy");
+                    String clsName = asIdentifier(tmp[1]).firstToUpper();
+                    vilTemplateProcessor("JavaPluginSetupDescriptor", config, "${javaSrc}/de/oktoflow/plugins/${clsName}PluginSetupDescriptor.java", 
+                        clsName=clsName, plugin=plugin.id, resource="${fName}", pkg="de.oktoflow.plugins");
+                    pluginDescriptors.add('de.oktoflow.plugins.${clsName}PluginSetupDescriptor');
+                }
+                vilTemplateProcessor("JavaServices", cfg, "${resourcesSrc}/META-INF/services/de.iip_ecosphere.platform.support.plugins.PluginSetupDescriptor", descriptors=pluginDescriptors);
                 
                 elements = elements->sortedBy(n|n.name).toSequence(); // for testing
                 
@@ -224,7 +274,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 String appVersion = getAppMvnVersion(a);
                 vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", usedServiceTypes=usedServiceTypes, artifacts=artifacts, bins=bins, assemblies=assemblies, resources=resources, starterCls="iip.Starter", appName=appName, appVersion=appVersion, appDescription=a.description, tests=tests, copyRuntimeDependencies=copyDependencies);
                 vilTemplateProcessor("AppAnt", config, "${appRoot}/build-jk.xml", artifactPrefix=appName, srvFolderName="IIP-apps-${appName}");
-                
+                generatePlugins(cfg, appRoot);
                 mvn(appRoot);
 
                 String appArtifact;
@@ -1995,6 +2045,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         Path javaInterfacesSrc = "${javaSrc}/${toPath(javaInterfacesPackage)}";
 
         javaDatatypesSrc.mkdir();
+        javaInterfacesSrc.mkdir();
         javaSerializersSrc.mkdir();
         assemblySrc.mkdir();
         
@@ -2116,6 +2167,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         path.mkdir();
         Path p = "${path}/src/main/resources";
         p.mkdir();
+        generatePlugins(cfg, path);
         vilTemplateProcessor("EcsRuntimeDockerContainerManagerYaml", config, "${p}/iipecosphere.yml", deviceType=deviceType);
         vilTemplateProcessor("JavaYamlTest", config, "${path}/src/test/java/test/iip/AllTests.java", pkg="test.iip", fqnCls=containerManagerCfgClass(config), cfgFile="src/main/resources/iipecosphere.yml");
         vilTemplateProcessor("JavaLogbackXml", config, "${p}/logback.xml");
@@ -2145,6 +2197,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         path.mkdir();
         Path p = "${path}/src/main/resources";
         p.mkdir();
+        generatePlugins(cfg, path);
         vilTemplateProcessor("EcsServiceControlSpringCloudStreamYaml", config, "${p}/iipecosphere.yml", deviceType=deviceType);
         // cfg test requires spring
         vilTemplateProcessor("JavaLogbackXml", config, "${p}/logback.xml");
@@ -2189,6 +2242,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         serviceMgrRoot.mkdir();
         Path p = "${serviceMgrRoot}/src/main/resources";
         p.mkdir();
+        generatePlugins(cfg, serviceMgrRoot);
         vilTemplateProcessor("ServiceControlSpringCloudStreamYaml", config, "${p}/iipecosphere.yml");
         // cfg test requires spring
         vilTemplateProcessor("JavaLogbackXml", config, "${p}/logback.xml");
@@ -2229,6 +2283,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         monitoringRoot.mkdir();
         p = "${monitoringRoot}/src/main/resources";
         p.mkdir();
+        generatePlugins(cfg, monitoringRoot);
         vilTemplateProcessor("PlatformYaml", config, "${p}/iipecosphere.yml");
         vilTemplateProcessor("JavaYamlTest", config, "${monitoringRoot}/src/test/java/test/iip/AllTests.java", pkg="test.iip", fqnCls="de.iip_ecosphere.platform.monitoring.MonitoringSetup", cfgFile="src/main/resources/iipecosphere.yml");
         vilTemplateProcessor("JavaLogbackXml", config, "${p}/logback.xml");
@@ -2265,13 +2320,16 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         }
     }
     
-    generatePlugins(IIPEcosphere cfg, Path componentRoot)= {
-        for (String plugin: getPlugins(cfg)) {
-            String pl = "${plugin}";
+    generatePlugins(IIPEcosphere cfg, Path componentRoot) = {
+        // app only for now
+        /*sequenceOf(Plugin) plugins = Plugin.allInstances()->sortedBy(p|p.id).toSequence();
+        for (Plugin plugin: plugins) {
+            String pl = "${plugin.artifact}";
             String clsName = pluginToClassName(pl);
-            vilTemplateProcessor("JavaPluginSetupDescriptor", config, "${componentRoot}/src/main/java/de/oktoflow/plugins/${clsName}PluginSetupDescriptor.java", plugin=pl, pkg="de.oktoflow.plugins");
+            vilTemplateProcessor("JavaPluginSetupDescriptor", config, "${componentRoot}/src/main/java/de/oktoflow/plugins/${clsName}PluginSetupDescriptor.java", 
+                clsName=clsName, plugin=pl, resource="${clsName}.plugin", pkg="de.oktoflow.plugins");
             // TODO plugin JSLs
-        }
+        }*/
     }    
     
     generateBrokerScripts(Configuration config, TransportProtocol protocol) = {

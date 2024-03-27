@@ -29,37 +29,63 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
     }
     
     // qualified/unqualified Java types to be used as template parameter for data from machine in connector generation, 
-    // dispatch basis
+    @DispatchBasis
     def String getMachineOutputTypeName(Connector conn) {
         "Object"; // generic, to be overridden
     }
 
+    @DispatchCase
     def String getMachineOutputTypeName(ChannelConnector conn) {
         "byte[]"; // taken from code
     }
 
+    @DispatchCase
     def String getMachineOutputTypeName(OpcUaV1Connector conn) {
         "de.iip_ecosphere.platform.connectors.opcuav1.DataItem"; // taken from code
     }
 
+    @DispatchCase
+    def String getMachineOutputTypeName(ModbusTcpV1Connector conn) {
+        "de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusItem"; // taken from code
+    }
+
+    @DispatchCase
+    def String getMachineOutputTypeName(AdsConnector conn) {
+        "Object"; // taken from code
+    }
+
+    @DispatchCase
     def String getMachineOutputTypeName(AasConnector conn) {
         "Object"; // taken from code
     }
 
     // qualified/unqualified Java types to be used as template parameter for data to machine in connector generation, 
-    // dispatch basis
+    @DispatchBasis
     def String getMachineInputTypeName(Connector conn) {
         "Object"; // generic, to be overridden
     }
 
+    @DispatchCase
     def String getMachineInputTypeName(ChannelConnector conn) {
         "byte[]"; // generic, to be overridden
     }
 
+    @DispatchCase
     def String getMachineInputTypeName(OpcUaV1Connector conn) {
         "Object"; // generic, to be overridden
     }
 
+    @DispatchCase
+    def String getMachineInputTypeName(ModbusTcpV1Connector conn) {
+        "Object"; // generic, to be overridden
+    }
+
+    @DispatchCase
+    def String getMachineInputTypeName(AdsConnector conn) {
+        "Object"; // generic, to be overridden
+    }
+
+    @DispatchCase
     def String getMachineInputTypeName(AasConnector conn) {
         "Object"; // taken from code
     }
@@ -823,6 +849,17 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
     @DispatchBasis
     def generateSpecificSettings(Connector conn) {
         ''
+    }
+    
+    @DispatchCase
+    def generateSpecificSettings(AasConnector conn) {
+        sequenceOf(Plugin) aasPlugins = conn.plugins->select(p|p.kind==PluginKind::AAS).toSequence();
+        if (aasPlugins.size() > 0) {
+            Plugin plugin = aasPlugins[0];
+            '.setSpecificSetting("PLUGINID", "${plugin.id}")\n'
+        } else {
+            ''
+        }
     }
     
     @DispatchCase

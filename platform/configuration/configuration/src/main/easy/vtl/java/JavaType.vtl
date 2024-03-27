@@ -141,6 +141,10 @@ template JavaType(Configuration config, FileArtifact target, RecordType type, St
         '${considerWrapper(toTypeName(type))}.hashCode(${access})'
     }
 
+    def genHashCode(String access, AliasType type, Boolean optional) {
+        genHashCode(access, type.represents, optional);
+    }
+
     def genHashCode(String access, EnumType type, Boolean optional) {
         '${access} != null ? ${access}.hashCode() : 0'
     }

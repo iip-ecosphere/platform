@@ -1,0 +1,615 @@
+import Basics;
+import JavaBasics;
+import AasBasics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template AasImplTest(Configuration config, FileArtifact target, AasSubmodelType type, String apiPkg, String pkg) {
+
+    String mainTypeClsName;
+    Integer eltCounter = 0;
+    setOf(String) doneMethods = {};
+    setOf(String) usedEnums = {};
+    DataType currentType = IntegerType;
+
+    def getGenericIdEx(boolean inc, boolean addComma) { // inc in case that we need differing values, skipped
+        String result = '"generic"';
+        if (addComma) {
+           result = result + ", ";
+        }
+        result;
+    }
+    
+    def getRangeIdEx(boolean inc) { // inc in case that we need differing values, skipped 
+        '"test_rng"';
+    }
+
+    // ----------------------------- populate fields --------------------------------------------
+    
+    // mode 1 = populate setter, mode 2 = populate tests, mode 3 = top-level populate tests
+
+    def genPopulate(sequenceOf(AasField) fields, Integer mode, DataType origin) {
+        DataType currentBefore = currentType;
+        currentType = origin; 
+        String result = "";
+        for (AasField f: fields) {
+            result = appendWithNewline(result, '${genPopulateField(f, f.type, mode)}');
+        }
+        currentType = currentBefore;
+        '${result|e}'
+    }
+
+    /*def genPopulate(AasSubmodelElementCollectionType type, Integer mode) {
+        for (AasField f: fields) {
+            '${genPopulateField(f, f.type, mode)|e}'
+        }
+    }*/
+    
+    @DispatchBasis
+    def genPopulateField(AasField field, DataType type, Integer mode) {
+        '// TODO unconsidered type in genPopulateField: ${type.name} ${type}'      
+    }
+
+    def getExample(AasField field) {
+        String result = "";
+        if (isDefined(field.examples) and field.examples <> null) {
+            for (String e: field.examples) {
+                if (result.length() == 0) {
+                    result = '${e}'; // VTL bug, keeps "reference"
+                }
+            }
+        }
+        result.replace("\\", "\\\\"); // -> Java representation
+    }
+    
+    def getSemIdParam(AasField field, Boolean withSep) {
+        String semIdParam = "";
+        if (hasMultiSemId(field)) {
+            if (withSep) {
+                semIdParam = ", ";
+            }
+            semIdParam = semIdParam + '"iri:https://oktoflow.de/semId-${field.name}"';
+        }
+        semIdParam;     
+    }
+    
+    def genField(AasField field, String typeInfix, String toTestParam, String dflt, Integer mode) {
+        if (notSkip(field)) {
+            String toTestParamEx = "";
+            if (toTestParam.length() > 0) {
+                toTestParamEx = toTestParam + ", ";
+            }
+            String dfltEx = "";
+            if (dflt.length() > 0) {
+                dfltEx = ", " + dflt;
+            }
+            String idShortEx = "";
+            String idShortEx2 = "";
+            if (field.isGeneric) {
+                idShortEx = getGenericIdEx(true, true);
+                idShortEx2 = getGenericIdEx(false, false);
+            }
+            String testValueEx = 'toTest${typeInfix}(${toTestParamEx}"${getExample(field)}"${dfltEx})';
+            String methodNameSuffix = asMethodNameSuffix(validateName(field.name));
+            if (mode == 1) {
+                'builder.set${methodNameSuffix}(${idShortEx}${testValueEx}${getSemIdParam(field, true)});'
+            } else {
+                String assertCast = "";
+                String assertParam = "";
+                String assertMethod = "Assert.assertEquals";
+                if (typeInfix == "LangString") {
+                    assertMethod = "assertLangStringsEquals";
+                } else if (typeInfix == "ReferenceElement") {
+                    assertMethod = "assertReferenceEquals";
+                } else if (typeInfix == "Double" or typeInfix == "Float") {
+                    assertParam = ", 0.01";
+                } else if (typeInfix == "Long") {
+                    assertCast = "(long) ";
+                }
+                String param = "";
+                if (isFieldCounting(field)) {
+                    param = "${idShortEx}1";
+                } else {
+                    param = idShortEx2;
+                }
+                '${assertMethod}(${assertCast}${testValueEx}, ${assertCast}first(instance.get${methodNameSuffix}(${idShortEx2}${getSemIdParam(field, idShortEx2.length() > 0)}))${assertParam});'
+                'Assert.assertNotNull(instance.get${methodNameSuffix}Property($param));'
+            } 
+        }
+    }
+    
+    def getSetterParam(AasField field, String typeInfix, String toTestParamEx, String dfltEx) {
+        'toTest${typeInfix}(${toTestParamEx}"${getExample(field)}"${dfltEx})';
+    }
+
+    @DispatchCase
+    def genPopulateField(AasField field, StringTypeType type, Integer mode) {
+        genField(field, "String", "", '"TEST"', mode);
+    }
+
+    @DispatchCase
+    def genPopulateField(AasField field, IntegerTypeType type, Integer mode) {
+        genField(field, "Int", "", "0", mode);
+    }
+
+    @DispatchCase
+    def genPopulateField(AasField field, DoubleTypeType type, Integer mode) {
+        genField(field, "Double", "", "0.0", mode);
+    }
+
+    @DispatchCase
+    def genPopulateField(AasField field, LongTypeType type, Integer mode) {
+        genField(field, "Long", "", "0", mode);
+    }
+
+    @DispatchCase
+    def genPopulateField(AasField field, UnsignedInteger64TypeType type, Integer mode) {
+        genField(field, "BigInteger", "", "0", mode);
+    }
+    
+    @DispatchCase
+    def genPopulateField(AasField field, FloatTypeType type, Integer mode) {
+        genField(field, "Float", "", "0.0f", mode);
+    }
+
+    @DispatchCase
+    def genPopulateField(AasField field, BooleanTypeType type, Integer mode) {
+        genField(field, "Boolean", "", "false", mode);
+    }
+    
+    @DispatchCase
+    def genPopulateField(AasField field, DateTimeTypeType type, Integer mode) {
+        genField(field, "Date", "", "getDateOfTest()", mode);
+    }
+
+    @DispatchCase
+    def genPopulateField(AasField field, AasEnumType type, Integer mode) {
+        usedEnums.add(type.name);
+        String clsName = asTypeName(type.name);
+        genField(field, "Enum", "${clsName}.class", "", mode);
+    }
+
+    @DispatchCase
+    def genPopulateField(AasField field, AasMultiLangStringTypeType type, Integer mode) {
+        genField(field, "LangString", "", '"test@en"', mode);
+    }
+    
+    @DispatchCase
+    def genPopulateField(AasField field, AasRelationTypeType type, Integer mode) {
+        if (notSkip(field)) {
+            Reference firstEx = 'toTestRelationshipElementFirst("${getExample(field)}", getTestReference())';
+            Reference secondEx = 'toTestRelationshipElementSecond("${getExample(field)}", getTestReference())';
+            String methodNameSuffix = asMethodNameSuffix(field.name);
+            String idShortEx = "";
+            String idShortEx2 = "";
+            if (field.isGeneric) {
+                idShortEx = getGenericIdEx(true, true);
+                idShortEx2 = getGenericIdEx(false, false);
+            }
+            if (mode == 1) {
+                'builder.set${methodNameSuffix}(${idShortEx}${firstEx}, ${secondEx}${getSemIdParam(field, true)});'
+            } else {
+                eltCounter = eltCounter + 1;
+                String eltVar = "elt${eltCounter}";
+                'RelationshipElement ${eltVar} = first(instance.get${methodNameSuffix}(${idShortEx2}${getSemIdParam(field, idShortEx2.length() > 0)}));
+                Assert.assertNotNull(${eltVar});
+                Assert.assertEquals(${firstEx}, ${eltVar}.getFirst());
+                Assert.assertEquals(${secondEx}, ${eltVar}.getSecond());'
+            }
+        }
+    }
+    
+
+    @DispatchCase
+    def genPopulateField(AasField field, AasFileResourceTypeType type, Integer mode) {
+        if (notSkip(field)) {
+            String testResourceFileEx = 'toTestResourceFile("${getExample(field)}", "")';
+            String testResourceMimeTypeEx = 'toTestResourceMimeType("${getExample(field)}", "")';
+            String methodNameSuffix = asMethodNameSuffix(field.name);
+            String idShortEx = "";
+            String idShortEx2 = "";
+            if (field.isGeneric) {
+                idShortEx = getGenericIdEx(true, true);
+                idShortEx2 = getGenericIdEx(false, false);
+            }
+            if (mode == 1) {
+                'builder.set${methodNameSuffix}(${idShortEx}${testResourceFileEx}, ${testResourceMimeTypeEx}${getSemIdParam(field, true)});'
+            } else {
+                eltCounter = eltCounter + 1;
+                String eltVar = "elt${eltCounter}";
+                'FileDataElement ${eltVar} = first(instance.get${methodNameSuffix}(${idShortEx2}${getSemIdParam(field, idShortEx2.length() > 0)}));
+                Assert.assertNotNull(${eltVar});
+                Assert.assertEquals(${testResourceFileEx}, ${eltVar}.getContents());
+                Assert.assertEquals(${testResourceMimeTypeEx}, ${eltVar}.getMimeType());'
+            }
+        }
+    }
+
+    @DispatchCase
+    def genPopulateField(AasField field, AasRangeTypeType type, Integer mode) {
+        if (notSkip(field)) {
+            String testEx = 'toTestRange("${getExample(field)}", getTestRange(), ${getRangeIdEx(true)}, getSmBuilder())';
+            String methodNameSuffix = asMethodNameSuffix(field.name);
+            String idShortEx = "";
+            String idShortEx2 = "";
+            if (field.isGeneric) {
+                idShortEx = getGenericIdEx(true, true);
+                idShortEx2 = getGenericIdEx(false, false);
+            }
+            if (mode == 1) {
+                eltCounter = eltCounter + 1;
+                String eltVar = "elt${eltCounter}";
+                'Range ${eltVar} = ${testEx};
+                builder.set${methodNameSuffix}(${idShortEx}${eltVar}.getType(), ${eltVar}.getMin(), ${eltVar}.getMax()${getSemIdParam(field, true)});'
+            } else {
+                eltCounter = eltCounter + 1;
+                String eltVar = "elt${eltCounter}";
+                'Range ${eltVar} = first(instance.get${methodNameSuffix}(${idShortEx2}${getSemIdParam(field, idShortEx2.length() > 0)}));
+                Assert.assertNotNull(${eltVar});
+                assertEquals(${testEx}, ${eltVar});'
+            }
+        }
+    }
+    
+    @DispatchCase
+    def genPopulateField(AasField field, AasBlobTypeType type, Integer mode) {
+        if (notSkip(field)) {
+            String testResourceFileEx = 'toTestResourceFile("${getExample(field)}", "")';
+            String testResourceMimeTypeEx = 'toTestResourceMimeType("${getExample(field)}", "")';
+            String methodNameSuffix = asMethodNameSuffix(field.name);
+            String idShortEx = "";
+            String idShortEx2 = "";
+            if (field.isGeneric) {
+                idShortEx = getGenericIdEx(true, true);
+                idShortEx2 = getGenericIdEx(false, false);
+            }
+            if (mode == 1) {
+                'builder.set${methodNameSuffix}(${idShortEx}${testResourceFileEx}, ${testResourceMimeTypeEx}${getSemIdParam(field, true)});'
+            } else {
+                eltCounter = eltCounter + 1;
+                String eltVar = "elt${eltCounter}";
+                'BlobDataElement ${eltVar} = first(instance.get${methodNameSuffix}(${idShortEx2}${getSemIdParam(field, idShortEx2.length() > 0)}));
+                Assert.assertNotNull(${eltVar});
+                Assert.assertEquals(${testResourceFileEx}, ${eltVar}.getValue());
+                Assert.assertEquals(${testResourceMimeTypeEx}, ${eltVar}.getMimeType());'
+            }
+        }
+    }
+
+    @DispatchCase
+    def genPopulateField(AasField field, AasReferenceTypeType type, Integer mode) {
+        genField(field, "ReferenceElement", "", 'getTestReference()', mode);
+    }
+
+    @DispatchCase
+    def genPopulateField(AasField field, AasAnyURITypeType type, Integer mode) {
+        genField(field, "String", "", '"http://me.here.de"', mode);
+    }
+    
+    // AasRangeTypeType,  AasLangStringType
+    
+    def genSubStructure(AasField field, String typeName, Integer mode) {
+        DataType type = field.type;
+        String clsName = asTypeName(typeName);
+        String fldName = asTypeName(field.name);
+        // for mode 2, 3
+        String params = "";
+        if (field.isGeneric) {
+            params = '"generic"';
+        }
+        if (isFieldCounting(field)) {
+            params = appendWithSeparator(params, ", ", "1");
+        }
+        if (hasMultiSemId(field)) { // type before
+            params = appendWithSeparator(params, ", ", '"${getSemId(type)}"');
+        }
+        if (mode == 1) {
+            // overwrite params
+            if (notSkip(field)) {
+                String builderName = fldName.firstToLowerCase() + "Builder";
+                String populateStmt = "";
+                if (type == AasGenericSubmodelElementCollection) {
+                    params = "false, false"; // ordered, allowsDuplicates
+                } else if (type == AasGenericEntityType) {
+                    params = 'Entity.EntityType.SELFMANAGEDENTITY'; // preliminary default
+                } else {
+                    params = "";
+                    populateStmt = 'populate(${builderName}, depth + 1);';
+                    populateStmt = injectRecursionControl(field, 3, populateStmt);
+                }
+                if (hasMultiSemId(type)) {
+                    params = appendWithSeparator(params, ", ", '"${getSemId(type)}"');
+                }
+                if (field.isGeneric) {
+                    if (params.length() > 0) {
+                        params = appendWithSeparator('"generic"', ", ", params);
+                    } else {
+                        params = '"generic"';
+                    }
+                }
+                '${clsName}Builder ${builderName} = builder.create${fldName}Builder(${params});
+                ${populateStmt|e}
+                ${builderName}.build();'
+            }
+        } else if (mode == 2) {
+            if (!isImplementedByAPI(field.type) and notSkip(field)) {
+                String stmt = 'test(instance.get${fldName}(${params}), depth + 1);';
+                '${injectRecursionControl(field, 2, stmt)}'
+            }
+        } else if (mode == 3) {
+            if (!isImplementedByAPI(field.type) and notSkip(field)) {
+                String stmt = 'test(instance.get${fldName}(${params}), depth + 1);';
+                '${injectRecursionControl(field, 2, stmt)}'
+            }
+        }
+    }
+    
+    def injectRecursionControl(Field field, int maxDepth, String stmt) {
+        if (currentType == field.type) {
+            stmt = "if (depth < ${maxDepth}) {\n    ${stmt}\n}";
+        } else {
+            String type = field.type.name;
+            stmt = 'if (!stack.contains("${type}")) {\n    stack.add("${type}");\n    ${stmt}\n    stack.remove("${type}");\n}';
+        }
+        stmt;
+    }
+
+    @DispatchCase
+    def genPopulateField(AasField field, AasEntityType type, Integer mode) {
+        '${genSubStructure(field, type.name, mode)}'
+    }
+
+    @DispatchCase
+    def genPopulateField(AasField field, AasSubmodelElementCollectionType type, Integer mode) {
+        '${genSubStructure(field, type.name, mode)}'
+    }
+    
+    @DispatchCase
+    def genPopulateField(AasField field, AasSubmodelType type, Integer mode) {
+        '// TODO unconsidered submodel ${type}'
+        //'${genSubStructure(field, type.name, mode)}'
+    }
+
+    // methods
+
+    def genPopulateMethods(sequenceOf(AasField) fields, Integer mode) {
+        for (AasField f: fields) {
+            '${genPopulateMethods(f, f.type, mode)|e}'
+        }
+    }
+    
+    @DispatchBasis
+    def genPopulateMethods(AasField field, DataType type, Integer mode) {
+        ''
+    }
+
+    @DispatchCase
+    def genPopulateMethods(AasField field, AasEntityType type, Integer mode) {
+        genMethod(field, type.name, type.fields, "Entity", mode);
+    }
+
+    @DispatchCase
+    def genPopulateMethods(AasField field, AasSubmodelElementCollectionType type, Integer mode) {
+        genMethod(field, type.name, type.fields, "SMEC", mode);
+    }
+    
+    def genMethod(AasField field, String typeName, sequenceOf(AasField) fields, String aasType, Integer mode) {
+        String key = typeName + ":" + mode; // unclear!
+        if (!isImplementedByAPI(field.type) and notSkip(field) and doneMethods.excludes(key)) {
+            doneMethods.add(key);
+            String methodName;
+            String typeSuffix;
+            String comment1;
+            String comment2; 
+            String varName;
+            String throwsEx;
+            String throwsComment;
+            if (mode == 1) {
+                methodName = "populate";
+                typeSuffix = "Builder";
+                comment1 = "Populates";
+                comment2 = "populate";
+                varName = "builder";
+                throwsEx = "";
+                throwsComment = "";
+            } else {
+                methodName = "test";
+                typeSuffix = "";
+                comment1 = "Tests";
+                comment2 = "test";
+                varName = "instance";
+                throwsEx = " throws ExecutionException";
+                throwsComment = "* @throws ExecutionException if property accesses/conversions fail";
+            }
+            
+            String clsName = asTypeName(typeName);
+            '/**
+            * ${comment1} the ${aasType} ${typeName}.
+            *
+            * @param ${varName} the ${varName} to ${comment2}
+            * @param depth recursion depth starting at 1
+            ${throwsComment|e}
+            */
+            private static void ${methodName}(${clsName}${typeSuffix} ${varName}, int depth)${throwsEx} {
+                ${genPopulate(fields, mode, field.type)}
+            }
+            
+            ${genPopulateMethods(fields, mode)|e}'
+        } else {
+            ''
+        }
+    }
+    
+    // ------------------------------------------ enum tests -------------------------------------
+
+    def genEnumTests(AasSubmodelType type) {
+        String clsName = asTypeName(type.name);
+        setOf(AasEnumType) enumTypes = AasEnumType.allInstances();
+        for (AasEnumType e: enumTypes) {
+            if (e.versionIdentifier == type.versionIdentifier and usedEnums.includes(e.name)) {
+                String enumName = asTypeName(e.name);
+                'assertEnum(${clsName}Builder.${enumName}.values(), 
+                    v -> v.getValue() != null && v.getValueId() >= 0 && v.getSemanticId() != null);\n'
+            }
+        }
+    }
+    
+    // ------------------------------------------ main --------------------------------------------
+
+    def main(Configuration config, FileArtifact target, AasSubmodelType type, String apiPkg, String pkg) {
+        String clsName = asTypeName(type.name);
+        mainTypeClsName = clsName;
+        String fileName = toFolderName(getIdShort(type)).firstToLower();
+        String aasName = asTypeName(getIdShort(type));
+        String rangeIdEx = getRangeIdEx(true);
+        String specFileName = aasName + "-" + getStringValueSafe(type.versionIdentifier, "unknown").replace(" ", "") 
+            + ".spec";
+        
+       'package ${pkg};
+        
+        import static de.iip_ecosphere.platform.support.aas.IdentifierType.*;
+        import static de.iip_ecosphere.platform.support.aas.types.common.Utils.*;
+
+        import java.io.File;
+        import java.util.Set;
+        import java.util.HashSet;
+        import java.util.concurrent.ExecutionException;
+
+        import de.iip_ecosphere.platform.support.Builder;
+        import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
+        import de.iip_ecosphere.platform.support.aas.Entity.EntityBuilder;
+        import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
+        import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
+        import de.iip_ecosphere.platform.support.aas.*;
+        import de.iip_ecosphere.platform.support.aas.types.common.*;
+        
+        import ${apiPkg}.${clsName}Builder;
+        import ${apiPkg}.${clsName}Builder.*;
+        import ${apiPkg}.${clsName}.*;
+
+        import org.junit.Test;
+        import org.junit.Assert;
+        import test.de.iip_ecosphere.platform.support.aas.AbstractAasExample;
+        
+        /**
+        * Tests {@link ${clsName}Builder}.
+        */
+        public class ${clsName}BuilderTest extends AbstractAasExample {
+
+            private static Reference testReference;
+            private static Range testRange;
+            private static SubmodelBuilder testSmBuilder;
+            private static Set<String> stack = new HashSet<>();
+            
+            /**
+            * Returns the test reference.
+            *
+            * @return the test reference
+            */
+            protected static Reference getTestReference() {
+                return testReference;
+            }
+            
+            /**
+            * Returns the test range.
+            *
+            * @return the test range
+            */
+            protected static Range getTestRange() {
+                return testRange;
+            } 
+
+            /**
+            * Returns the a submodel builder, e.g., for ranges.
+            *
+            * @return the a submodel builder, e.g., for ranges
+            */
+            protected static SubmodelBuilder getSmBuilder() {
+                return testSmBuilder;
+            }
+            
+            @Override
+            protected String getTestFileName(Aas aas) {
+                return "${specFileName}";
+            }
+
+            @Override
+            protected String getFolderName() {
+                return "${fileName}-gen";
+            }
+            
+            @Override
+            public File[] getTargetFiles() {
+                return new File[] {new File("./output/${fileName}.aasx")};
+            }
+
+            @Override
+            protected void createAas() {
+                Aas refAas = AasFactory.getInstance().createAasBuilder("${aasName}ExampleRef", 
+                    "urn:::AAS:::${aasName}RefExample#").build();
+                testReference = refAas.createReference(); // just for test instances, do not registerAas
+                testSmBuilder = refAas.createSubmodelBuilder("test_sm", null);
+                testRange = testSmBuilder.createRangeBuilder(${rangeIdEx}, Type.AAS_INTEGER, 1, 2).build();
+                
+                AasBuilder aasBuilder = AasFactory.getInstance().createAasBuilder("${aasName}Example", 
+                    "urn:::AAS:::${aasName}Example#");
+                aasBuilder.createAssetBuilder("ci", "urn:::Asset:::ci#", AssetKind.INSTANCE).build();
+
+                ${clsName}Builder smBuilder = new ${clsName}Builder(aasBuilder, "urn:::SM:::${aasName}#");
+                smBuilder.setCreateMultiLanguageProperties(isCreateMultiLanguageProperties());
+                populate(smBuilder, 1);
+                smBuilder.build();
+                
+                try {
+                    testAas(registerAas(aasBuilder));
+                } catch (ExecutionException e) {
+                    e.printStackTrace(System.out);
+                    Assert.fail(e.getMessage());
+                }
+            }
+            
+            /**
+             * Populates an example contact information builder.
+             * 
+             * @param builder the instance to populate
+             * @param depth initialization recursion depth
+             * @return {@code builder}
+             */
+            public static ${clsName}Builder populate(${clsName}Builder builder, int depth) {
+                ${genPopulate(type.fields, 1, type)}
+                return builder;
+            }
+            
+            ${genPopulateMethods(type.fields, 1)|e}
+            
+            @Override
+            protected File getThumbnail() {
+                return null;
+            }
+            
+            /**
+            * Tests the created AAS.
+            *
+            * @param aas the top-level AAS instance to test
+            * @throws ExecutionException if property accesses fail during the test execution
+            */
+            private void testAas(Aas aas) throws ExecutionException {
+                ${mainTypeClsName} instance = new ${mainTypeClsName}(aas);
+                int depth = 0;
+                ${genPopulate(type.fields, 3, type)}
+            }
+
+            ${genPopulateMethods(type.fields, 2)|e}
+            
+            /**
+            * Tests declared enums.
+            */
+            @Test
+            public void testEnums() {
+                ${genEnumTests(type)}
+            }
+
+        }'
+    }
+
+}

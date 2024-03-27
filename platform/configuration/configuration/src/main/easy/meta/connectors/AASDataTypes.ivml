@@ -13,15 +13,51 @@ project AASDataTypes {
         represents = refBy(StringType)
     };
 
-    compound AasReferenceTypeType refines PrimitiveType {
+    compound AasReferenceTypeType refines AliasType {
     }
-    AliasType AasReferenceType = {
+    
+    AasReferenceTypeType AasReferenceType = {
         name = "AasReference",
         represents = refBy(StringType)
     };
 
-    AliasType AasFileResourceType = {
+    compound AasRelationTypeType refines AliasType {
+    }
+
+    AasRelationTypeType AasRelationType = {
+        name = "AasRelation",
+        represents = refBy(StringType)
+    };
+
+    compound AasFileResourceTypeType refines AliasType {
+    }
+
+    AasFileResourceTypeType AasFileResourceType = {
         name = "FileResource",
+        represents = refBy(StringType)
+    };
+
+    compound AasBlobTypeType refines AliasType {
+    }
+
+    AasBlobTypeType AasBlobType = {
+        name = "BlobResource",
+        represents = refBy(StringType)
+    };
+
+    compound AasAnyURITypeType refines AliasType {
+    }
+
+    AasAnyURITypeType AasAnyURIType = {
+        name = "AnyURI",
+        represents = refBy(StringType)
+    };
+
+    compound AasRangeTypeType refines AliasType {
+    }
+
+    AasRangeTypeType AasRangeType = {
+        name = "Range",
         represents = refBy(StringType)
     };
     
@@ -37,43 +73,64 @@ project AASDataTypes {
         String semanticId;
         String value;
         String identifier;
+        String description;
     }
     
     compound AasEnumType refines EnumType {
         sequenceOf(AasEnumLiteral) literals;
         String description;
         String versionIdentifier;
+        Boolean isOpen = false;
     }
 
-    typedef AasFields sequenceOf(AasField) with (AasFields->collect(f|f.name).hasDuplicates() == false);
-
-    compound AasSubmodelType refines RecordType {
+    typedef AasFields sequenceOf(AasField) with (AasFields->select(f|isRelevant(f))->collect(f|f.name).hasDuplicates() == false);
+    
+    abstract compound AasElementType refines RecordType {
+        String idShort;
         String semanticId;
+        Boolean multiSemanticIds = false;        
         String description;
-        AasFields fields;
+        Boolean fixedName = false;
+        Boolean isGeneric = false;
         String versionIdentifier;
     }
     
-    compound AasSubmodelElementCollectionType refines RecordType {
-        String semanticId;
-        String description;
+    @DispatchBasis
+    def Boolean isNameOk(AasElementType t) = 
+        matches(t.name, "^[\\w <>\\{\\}\\[\\]\\-\\Q$_\\E]+$");
+
+    compound AasSubmodelType refines AasElementType {
+        AasFields fields;
+    }
+    
+    compound AasSubmodelElementCollectionType refines AasElementType {
         AasFields fields;
         Boolean ordered = false;
         Boolean allowDuplicates = false;
-        String versionIdentifier;
     }
     
-    // for now, unclear
-    /*AasSubmodelElementCollectionType AasGenericSubmodelElementCollection {
-    };*/
+    // preliminary, as long as platform is not based on BaSyx 2
+    compound AasSubmodelListType refines AasSubmodelElementCollectionType {
+        Boolean ordered = true;
+        Boolean allowDuplicates = true;
+    }
+
+    // preliminary, as long as platform is not based on BaSyx 2
+    compound AasSubmodelElementListType refines AasSubmodelElementCollectionType {
+        Boolean ordered = true;
+        Boolean allowDuplicates = true;
+    }
     
-    compound AasEntityType refines RecordType {
-        String semanticId;
+    enum AasEntityKind { COMANAGEDENTITY, SELFMANAGEDENTITY }; // same name as in code, kind as AasEntityType is used
+    
+    compound AasEntityType refines AasElementType {
         AasFields fields;
+        AasEntityKind type = AasEntityKind::SELFMANAGEDENTITY;
     }
     
     compound AasField refines Field {
         String semanticId;
+        Boolean multiSemanticIds = false;        
         String description;
         String groupWith = null;
         Boolean counting = false;
@@ -81,10 +138,32 @@ project AASDataTypes {
         Integer minimumInstances = -1;
         Integer maximumInstances = -1;
         setOf(String) examples;
+        Boolean isGeneric = false;
+        String aspect = null;
+        String displayName = null;
     }
-    
 
-    // freeze all primitives
+    @DispatchCase    
+    def Boolean isRelevant(AasField f) = 
+        not(f.isGeneric) and not(f.counting);
+
+    @DispatchCase
+    def Boolean isNameOk(AasField f) = 
+        f.isGeneric or matches(f.name, "^[\\w <>\\{\\}\\[\\]\\-\\Q$_\\E]+$");    
+
+    AasSubmodelElementCollectionType AasGenericSubmodelElementCollection = {
+        name = "SubmodelElementCollection",
+        fields = {
+        }
+    };
+    
+    AasEntityType AasGenericEntityType = {
+        name = "Entity", 
+        fields = {
+        }
+    };
+        
+    // freeze all variables
     freeze {
     	.;
     };

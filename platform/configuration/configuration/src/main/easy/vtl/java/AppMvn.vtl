@@ -42,6 +42,7 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
         appendDependency(dep, "org.apache.logging.log4j", "log4j-api", "2.15.0"); // override due to CVE-2021-44228
         appendDependency(dep, "org.apache.logging.log4j", "log4j-core", "2.15.0"); // override due to CVE-2021-44228
         appendDependency(dep, iipGroup, "support", projectVersion);
+        appendDependency(dep, iipGroup, "support.aas", projectVersion);
         appendDependency(dep, iipGroup, "transport", projectVersion);
         appendDependency(dep, iipGroup, "connectors", projectVersion);
         appendDependency(dep, iipGroup, "services.environment", projectVersion);
@@ -102,7 +103,7 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
             appendSpringBootPlugin(plugins, "2.4.2", "${starterCls}");
         }
 
-        XmlElement dependencyPlugin = appendMavenDependencyPlugin(plugins);
+        XmlElement dependencyPlugin = appendMavenIipDependencyPlugin(plugins, ver=config.iipVer); // otherwise project's appVer
         XmlElement execs = new XmlElement(dependencyPlugin, "executions");
         if (isPythonUsed(usedServiceTypes)) {
             appendMavenDependencyPluginExecution(execs, "unpack", "${iipGroup}:services.environment:${projectVersion}", "python", "\\${project.basedir}/src/main/python", "pythonEnv.zip", type="zip");
@@ -117,7 +118,7 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
             String type = tmp[4];
             String goal = tmp[5];
             if (goalItems.containsKey(goal)) {
-               appendMavenDependencyPluginArtifactItem(goalItems.get(goal), artifact, classifier, outputDir, destFileName, type=type);
+                appendMavenDependencyPluginArtifactItem(goalItems.get(goal), artifact, classifier, outputDir, destFileName, type=type);
             } else {
                 XmlElement items = appendMavenDependencyPluginExecution(execs, goal, artifact, classifier, outputDir, destFileName, type=type, id=goal + "-unpack");
                 goalItems.add(goal, items);

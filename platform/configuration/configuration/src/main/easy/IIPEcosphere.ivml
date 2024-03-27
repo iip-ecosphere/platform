@@ -38,10 +38,7 @@ project IIPEcosphere {
     MavenRepository mavenReleaseRepository;
     MavenRepository mavenSnapshotRepository;
     MavenDeployType mavenDeployType = MavenDeployType::MAVEN;
-    
-    setOf(String) pluginsDflt = { "de.iip-ecosphere.platform:support.aas.basyx:" + iipVer };
-    setOf(String) plugins = pluginsDflt;
-    
+        
     enum MavenDeployType {
         MAVEN,
         NEXUS
@@ -66,6 +63,5 @@ project IIPEcosphere {
         javaExeDflt;
         artifactsFolderDflt;
         footprintFolderDflt;
-        pluginsDflt;
     }
 }

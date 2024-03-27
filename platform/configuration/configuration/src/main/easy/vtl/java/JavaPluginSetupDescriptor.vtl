@@ -3,11 +3,9 @@ import JavaBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template JavaPluginSetupDescriptor(Configuration config, FileArtifact target, String plugin, String pkg) {
+template JavaPluginSetupDescriptor(Configuration config, FileArtifact target, String clsName, String plugin, String resource, String pkg) {
 
-
-    def main(Configuration config, FileArtifact target, String plugin, String pkg) {
-        String clsName = pluginToClassName(plugin);
+    def main(Configuration config, FileArtifact target, String clsName, String plugin, String resource, String pkg) {
         'package ${pkg};
         
         import de.iip_ecosphere.platform.support.plugins.ResourceClasspathPluginSetupDescriptor;
@@ -22,7 +20,7 @@ template JavaPluginSetupDescriptor(Configuration config, FileArtifact target, St
             * Creates an instance.
             */        
             public ${clsName}PluginSetupDescriptor() {
-                super("${clsName}.plugin");
+                super("${resource}");
             }
 
         }'

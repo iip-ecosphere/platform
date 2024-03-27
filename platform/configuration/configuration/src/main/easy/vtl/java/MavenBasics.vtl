@@ -257,7 +257,7 @@ template MavenBasics(Configuration config, FileArtifact target) {
     
     def XmlElement appendMavenDependencyPluginCopyDepsExecution(XmlElement execs, String jarDir="", 
         Boolean copyOwn=false, Boolean prependGroupId=true, String phase="package", String excludeIds="", 
-        String includeScope="") {
+        String includeScope="", String includeIds="", String rootCoords="") {
         
         XmlElement exec = new XmlElement(execs, "execution");
 
@@ -270,11 +270,17 @@ template MavenBasics(Configuration config, FileArtifact target) {
         new XmlElement(config, "overWriteReleases", "false");
         new XmlElement(config, "overWriteSnapshots", "true");
         new XmlElement(config, "overWriteIfNewer", "true");
+        if (includeIds.length() > 0) {
+            new XmlElement(config, "includeArtifactIds", "${includeIds}");
+        }
         if (excludeIds.length() > 0) {
             new XmlElement(config, "excludeArtifactIds", "${excludeIds}");
         }
         if (includeScope.length() > 0) {
             new XmlElement(config, "includeScope", "${includeScope}");
+        }
+        if (rootCoords.length() > 0) {
+            new XmlElement(config, "rootCoordinates", "${rootCoords}");
         }
 
         if (copyOwn) {
@@ -341,30 +347,13 @@ template MavenBasics(Configuration config, FileArtifact target) {
         exec;
     }
     
-    def appendWinLinuxDependencyPluginBuildClasspathExecution(XmlElement execs, String folder, String ownArtifact="", sequenceOf(String) plugins={}) {
-        String exclude = "";
-        for (String plugin: plugins) {
-            exclude = appendWithSeparator(exclude, ",", "${plugin}"); // "${}" easy resolution bug 
-        }
-        // TODO add excludeElementsId
+    def appendWinLinuxDependencyPluginBuildClasspathExecution(XmlElement execs, String folder, String ownArtifact="") {
         appendMavenDependencyPluginBuildClasspathExecution(execs, outputFile="../${folder}/classpath.win", 
             prependGroupId=true, prefix=folder, fileSeparator="\\", pathSeparator=";", includeScope="runtime", 
             id="build-classpath-win", prepend="${folder}\\" + "${ownArtifact}.jar"); 
         appendMavenDependencyPluginBuildClasspathExecution(execs, outputFile="../${folder}/classpath.ux", 
             prependGroupId=true, prefix=folder, fileSeparator="/", pathSeparator=":", includeScope="runtime", 
             id="build-classpath-ux", prepend="${folder}/${ownArtifact}.jar"); 
-        for (String plugin: plugins) {
-            String clsName = pluginToClassName("${plugin}");
-            String artifactId = "${plugin}";
-            /*sequenceOf(String) artList = artifactId.split(":");
-            if (artList.size() == 3) {
-                artifactId = artList[1];
-            }*/
-            appendMavenDependencyPluginBuildClasspathExecution(execs, outputFile="src/main/resources/${clsName}.plugin", 
-                prependGroupId=true, prefix=folder, fileSeparator="/", pathSeparator=":", includeScope="runtime", 
-                id="build-plugin-classpath-${clsName}", goal="diff-classpath", 
-                rootCoordinates=artifactId, baseFile="../${folder}/classpath.win"); 
-        }
     }
 
     // ------------------------------------------- maven shade plugin --------------------------------------------

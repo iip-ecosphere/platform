@@ -271,6 +271,8 @@ project Connectors {
        Constraint mustHaveFormatter = machineFormatter <> null;
    }
    
+   // ------------------------------------ OPC UA -----------------------------------------
+   
    compound OpcUaV1Connector refines Connector { // fixed template types see JavaConnector.vtl
        assign (uiGroup = UiInvisibleGroup) to {
            String class = "de.iip_ecosphere.platform.connectors.opcuav1.OpcUaConnector";
@@ -288,6 +290,8 @@ project Connectors {
        }
    }
 
+   // ------------------------------------ AAS -----------------------------------------
+
    compound AasConnector refines Connector {  // fixed template types see JavaConnector.vtl
        assign (uiGroup = UiInvisibleGroup) to {
             String class = "de.iip_ecosphere.platform.connectors.aas.AasConnector";
@@ -302,6 +306,8 @@ project Connectors {
         Port registryPort;
         String registryPath;
    }
+
+   // ------------------------------------ MQTT -----------------------------------------
    
    compound MqttV3Connector refines ChannelConnector { // fixed template types see JavaConnector.vtl
        assign (uiGroup = UiInvisibleGroup) to {
@@ -354,6 +360,8 @@ project Connectors {
        }
    }
    
+   // ---------------------------- serial ---------------------------------------
+   
    enum SerialConnectorParity {NO, EVEN, ODD, MARK, SPACE};
 
    compound SerialConnector refines ChannelConnector { // fixed template types see JavaConnector.vtl
@@ -378,6 +386,41 @@ project Connectors {
        SerialConnectorParity parity;
        assign (uiGroup = UiOptionalGroup2) to {
            String deviceServiceKey = "serial";
+       }
+   }
+   
+   // ------------------------ MODBUS / TCP ----------------------------------
+    
+   compound ModbusTcpV1Connector refines Connector { // fixed template types see JavaConnector.vtl
+       assign (uiGroup = UiInvisibleGroup) to {
+           String class = "de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusTcpIpConnector";
+           String artifact ="de.iip-ecosphere.platform:connectors.modbustcpipv1:";
+           NameplateInfo nameplateInfo = {
+               manufacturerProductDesignation = "Generic MODBUS/TCP connector@en",
+               manufacturer = refBy(manufacturer_sse)
+           };
+       }
+       assign (uiGroup = UiOptionalGroup1) to {
+           Port port = 502;
+       }
+       assign (uiGroup = UiOptionalGroup2) to {
+           String deviceServiceKey = "modbus/tcp";
+       }
+   }
+
+   // ------------------------ MODBUS / TCP ----------------------------------
+    
+   compound AdsConnector refines Connector { // fixed template types see JavaConnector.vtl
+       assign (uiGroup = UiInvisibleGroup) to {
+           String class = "de.iip_ecosphere.platform.connectors.ads.AdsConnector";
+           String artifact ="de.iip-ecosphere.platform:connectors.ads:";
+           NameplateInfo nameplateInfo = {
+               manufacturerProductDesignation = "Generic Beckhoff ADS connector@en",
+               manufacturer = refBy(manufacturer_sse)
+           };
+       }
+       assign (uiGroup = UiOptionalGroup2) to {
+           String deviceServiceKey = "ADS";
        }
    }
     

@@ -229,15 +229,5 @@ template Basics(Configuration config, FileArtifact target) {
     def getForceContainersCreationSafe(DecisionVariable var) {
         getBooleanValueSafe(var, false);
     }
-    
-    def sequenceOf(String) getPlugins(IIPEcosphere config) {
-        setOf(String) plugins;
-        if (isDefined(config.plugins) and config.plugins <> null) {
-            plugins = config.plugins;
-        } else {
-            plugins = config.pluginsDflt;
-        }
-        plugins->sortedBy(p|p).toSequence();
-    }
-    
+        
 }

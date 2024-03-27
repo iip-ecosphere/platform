@@ -35,5 +35,3 @@ IIPEcosphere::MavenRepository::id = The id of the maven repository, linking to m
 IIPEcosphere::MavenRepository::name = Name of the repository (default name given).
 IIPEcosphere::MavenRepository::url = URL of the repository, may be http, ftp, scpexe depending on repository installation.
 IIPEcosphere::mavenDeployType = Type of maven deployment indicating additionally required maven build plugins.
-IIPEcosphere::pluginsDflt = The default maven coordinates of the plugins to be considered during platform instantiation.
-IIPEcosphere::plugins = The maven coordinates of the plugins to be considered during platform instantiation.
