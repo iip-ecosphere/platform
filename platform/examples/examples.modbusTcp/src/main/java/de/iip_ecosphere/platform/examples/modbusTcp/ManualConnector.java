@@ -16,7 +16,6 @@ import java.io.IOException;
 
 import de.iip_ecosphere.platform.connectors.Connector;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
-import de.iip_ecosphere.platform.connectors.ConnectorParameter.ConnectorParameterBuilder;
 import de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusItem;
 import de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusTcpIpConnector;
 import de.iip_ecosphere.platform.connectors.types.TranslatingProtocolAdapter;
