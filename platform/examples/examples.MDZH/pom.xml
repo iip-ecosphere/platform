@@ -104,16 +104,16 @@
                                  <outputDirectory>${project.build.directory}/pyEnv</outputDirectory>
                                  <destFileName>pyEnv.zip</destFileName>
                              </artifactItem>
-                             <artifactItem>
-                                 <groupId>de.iip-ecosphere.platform</groupId>
-                                 <artifactId>apps.AppInterfacesContainerCreation</artifactId>
+                             <!--<artifactItem>
+                                 <groupId>de.iip-ecosphere.platform.apps</groupId>
+                                 <artifactId>examples.mdzh</artifactId>
                                  <version>${project.version}</version>
                                  <type>zip</type>
                                  <classifier>python</classifier>
                                  <overWrite>true</overWrite>
                                  <outputDirectory>${project.build.directory}/pySrc</outputDirectory>
                                  <destFileName>pyIf.zip</destFileName>
-                             </artifactItem>
+                             </artifactItem>-->
                          </artifactItems>
                      </configuration>
                  </execution>
