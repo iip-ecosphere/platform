@@ -22,7 +22,7 @@ import org.apache.maven.plugins.annotations.Mojo;
  * @author Holger Eichelberger, SSE
  */
 @Mojo(name = "generateAll", defaultPhase = LifecyclePhase.PACKAGE)
-public class GenerateAll extends AbstractConfigurationMojo {
+public class GenerateAllMojo extends AbstractConfigurationMojo {
 
     @Override
     public String getStartRule() {

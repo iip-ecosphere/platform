@@ -4,12 +4,13 @@ Maven plugin for the following platform configuration tasks (represented as Mave
 
 # Platform instantiation
 
-* generateInterfaces (default lifecycle phase `generate-sources`): generate app interfaces, but no apps - executed only if `outputDirectory` is empty or IVML files in `modelDirectory`are newer than `outputDirectory`
-* generateAppsNoDeps (default lifecycle phase `generate-sources`): app interfaces with apps, but without dependencies to artifacts - executed only if `outputDirectory` is empty or IVML files in `modelDirectory` are newer than `outputDirectory`
-* generateApps (default lifecycle phase `package`): app interfaces with apps including artifact dependencies - executed always
-* generateBroker (default lifecycle phase `package`): create a sample broker - executed only if `outputDirectory` is empty or IVML files in `modelDirectory` are newer than `outputDirectory`
-* generatePlatform (default lifecycle phase `package`): exclusively platform components - executed only if `outputDirectory` is empty or IVML files in `modelDirectory` are newer than `outputDirectory`
-* generateAll (default lifecycle phase `package`): generate everything
+* ``generateInterfaces`` (default lifecycle phase `generate-sources`): generate app interfaces, but no apps - executed only if `outputDirectory` is empty or IVML files in `modelDirectory`are newer than `outputDirectory`
+* ``generateAppsNoDeps`` (default lifecycle phase `generate-sources`): app interfaces with apps, but without dependencies to artifacts - executed only if `outputDirectory` is empty or IVML files in `modelDirectory` are newer than `outputDirectory`
+* ``generateApps`` (default lifecycle phase `package`): app interfaces with apps including artifact dependencies - executed always
+* ``generateBroker`` (default lifecycle phase `package`): create a sample broker - executed only if `outputDirectory` is empty or IVML files in `modelDirectory` are newer than `outputDirectory`
+* ``generatePlatform`` (default lifecycle phase `package`): exclusively platform components - executed only if `outputDirectory` is empty or IVML files in `modelDirectory` are newer than `outputDirectory`
+* ``generateAll`` (default lifecycle phase `package`): generate everything (except for ``generateApi``)
+* ``generateApi`` (default lifecycle phase `generate-sources`): optional API generation for platform development, e.g. AAS APIs
 
 When you added this plugin to your POM, you may also execute the goals individually, e.g., using `mvn configuration:generateApps`. Depending on your setup it may be required that you may have to add a profile, e.g, in the platform examples `mvn -P EasyGen configuration:generateApps`.
 
