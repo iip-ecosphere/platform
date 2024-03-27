@@ -1,0 +1,872 @@
+project VDW {
+
+    import IIPEcosphere;
+    import OpcUaDataTypes;
+    import OpcMachineTool;
+
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+
+    // ------------ component setup ------------------
+
+    serializer = Serializer::Json;
+    // serviceManager, containerManager are already defined    
+
+    aasServer = {
+        schema = AasSchema::HTTP,
+        port = 9001,
+        host = "127.0.0.1"
+    };
+    aasRegistryServer = {
+        schema = AasSchema::HTTP,
+        port = 9002,
+        host = "127.0.0.1",
+        path = "registry"
+    };
+    aasImplServer = {
+        port = 9003
+    };
+    aasProtocol = AasProtocolVabTcp{};
+
+    // ------------------ transport --------------------------
+
+    transportProtocol = TransportProtocolMQTTv5 {
+        port = 8883
+    };
+
+    serviceProtocol = ServiceProtocolMQTTv5 {};
+
+    // ------------------ resources/devicemgt ----------------
+
+    deviceRegistry = BasicDeviceRegistry {
+    };
+
+    deviceMgtStorage = S3MockDeviceMgtStorage {
+        host = "localhost",
+        port = 8884,
+        region = "local"
+    };
+
+    // just for testing, this instantiates app rather than platform
+    deviceMgtStorageServer = S3MockDeviceMgtStorageServer{};
+
+    // ------------ data types ------------------
+
+    RecordType opcIn = {
+        name = "OpcIn",
+        fields = {
+        }
+    };    
+    RecordType opcOut = {
+        path = "PLACEHOLDER",
+        name = "OpcOut",
+
+        fields = {
+            Field {
+                name = "opcBaseToolTypeLocation",
+                type = refBy(opcBaseToolTypeLocation),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcMultiToolTypeTool",
+                type = refBy(opcMultiToolTypeTool),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcToolTypeToolLife",
+                type = refBy(opcToolTypeToolLife),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcChannelMonitoringTypeChannelModifiers",
+                type = refBy(opcChannelMonitoringTypeChannelModifiers),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcEquipmentTypeTools",
+                type = refBy(opcEquipmentTypeTools),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcMachineToolIdentificationTypeSoftwareIdentification",
+                type = refBy(opcMachineToolIdentificationTypeSoftwareIdentification),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcMachineToolTypeEquipment",
+                type = refBy(opcMachineToolTypeEquipment),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcMachineToolTypeIdentification",
+                type = refBy(opcMachineToolTypeIdentification),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcMachineToolTypeMonitoring",
+                type = refBy(opcMachineToolTypeMonitoring),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcMachineToolTypeNotification",
+                type = refBy(opcMachineToolTypeNotification),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcMachineToolTypeProduction",
+                type = refBy(opcMachineToolTypeProduction),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcMonitoringTypeMonitoredElement",
+                type = refBy(opcMonitoringTypeMonitoredElement),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcMonitoringTypeMachineTool",
+                type = refBy(opcMonitoringTypeMachineTool),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcMonitoringTypeStacklight",
+                type = refBy(opcMonitoringTypeStacklight),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcNotificationTypeMessages",
+                type = refBy(opcNotificationTypeMessages),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcNotificationTypePrognoses",
+                type = refBy(opcNotificationTypePrognoses),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionJobListTypeOrderedObject",
+                type = refBy(opcProductionJobListTypeOrderedObject),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionJobTypePartSets",
+                type = refBy(opcProductionJobTypePartSets),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionJobTypeProductionPrograms",
+                type = refBy(opcProductionJobTypeProductionPrograms),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionJobTypeState",
+                type = refBy(opcProductionJobTypeState),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionPartSetTypePartsPerRun",
+                type = refBy(opcProductionPartSetTypePartsPerRun),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionPartTypeState",
+                type = refBy(opcProductionPartTypeState),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionProgramTypeState",
+                type = refBy(opcProductionProgramTypeState),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionActiveProgramTypeState",
+                type = refBy(opcProductionActiveProgramTypeState),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionTypeActiveProgram",
+                type = refBy(opcProductionTypeActiveProgram),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionTypeProductionPlan",
+                type = refBy(opcProductionTypeProductionPlan),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionTypeStatistics",
+                type = refBy(opcProductionTypeStatistics),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcPrognosisListTypePrognosis",
+                type = refBy(opcPrognosisListTypePrognosis),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionStateMachineTypeAborted",
+                type = refBy(opcProductionStateMachineTypeAborted),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionStateMachineTypeAbortedToInitializing",
+                type = refBy(opcProductionStateMachineTypeAbortedToInitializing),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionStateMachineTypeEnded",
+                type = refBy(opcProductionStateMachineTypeEnded),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionStateMachineTypeEndedToInitializing",
+                type = refBy(opcProductionStateMachineTypeEndedToInitializing),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionStateMachineTypeInitializing",
+                type = refBy(opcProductionStateMachineTypeInitializing),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionStateMachineTypeInitializingToAborted",
+                type = refBy(opcProductionStateMachineTypeInitializingToAborted),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionStateMachineTypeInitializingToRunning",
+                type = refBy(opcProductionStateMachineTypeInitializingToRunning),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionStateMachineTypeInterrupted",
+                type = refBy(opcProductionStateMachineTypeInterrupted),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionStateMachineTypeInterruptedToAborted",
+                type = refBy(opcProductionStateMachineTypeInterruptedToAborted),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionStateMachineTypeInterruptedToRunning",
+                type = refBy(opcProductionStateMachineTypeInterruptedToRunning),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionStateMachineTypeRunning",
+                type = refBy(opcProductionStateMachineTypeRunning),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionStateMachineTypeRunningToAborted",
+                type = refBy(opcProductionStateMachineTypeRunningToAborted),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionStateMachineTypeRunningToEnded",
+                type = refBy(opcProductionStateMachineTypeRunningToEnded),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionStateMachineTypeRunningToInterrupted",
+                type = refBy(opcProductionStateMachineTypeRunningToInterrupted),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionStateMachineTypeRunningToRunning",
+                type = refBy(opcProductionStateMachineTypeRunningToRunning),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionJobStateMachineTypeAbortedToInitializing",
+                type = refBy(opcProductionJobStateMachineTypeAbortedToInitializing),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionJobStateMachineTypeEndedToInitializing",
+                type = refBy(opcProductionJobStateMachineTypeEndedToInitializing),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionJobStateMachineTypeInitializingToAborted",
+                type = refBy(opcProductionJobStateMachineTypeInitializingToAborted),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionJobStateMachineTypeInitializingToRunning",
+                type = refBy(opcProductionJobStateMachineTypeInitializingToRunning),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionJobStateMachineTypeInterruptedToAborted",
+                type = refBy(opcProductionJobStateMachineTypeInterruptedToAborted),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionJobStateMachineTypeInterruptedToRunning",
+                type = refBy(opcProductionJobStateMachineTypeInterruptedToRunning),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionJobStateMachineTypeRunningToAborted",
+                type = refBy(opcProductionJobStateMachineTypeRunningToAborted),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionJobStateMachineTypeRunningToEnded",
+                type = refBy(opcProductionJobStateMachineTypeRunningToEnded),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionJobStateMachineTypeRunningToInterrupted",
+                type = refBy(opcProductionJobStateMachineTypeRunningToInterrupted),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionJobStateMachineTypeRunningToRunning",
+                type = refBy(opcProductionJobStateMachineTypeRunningToRunning),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionPartStateMachineTypeAbortedToInitializing",
+                type = refBy(opcProductionPartStateMachineTypeAbortedToInitializing),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionPartStateMachineTypeEndedToInitializing",
+                type = refBy(opcProductionPartStateMachineTypeEndedToInitializing),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionPartStateMachineTypeInitializingToAborted",
+                type = refBy(opcProductionPartStateMachineTypeInitializingToAborted),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionPartStateMachineTypeInitializingToRunning",
+                type = refBy(opcProductionPartStateMachineTypeInitializingToRunning),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionPartStateMachineTypeInterruptedToAborted",
+                type = refBy(opcProductionPartStateMachineTypeInterruptedToAborted),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionPartStateMachineTypeInterruptedToRunning",
+                type = refBy(opcProductionPartStateMachineTypeInterruptedToRunning),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionPartStateMachineTypeRunningToAborted",
+                type = refBy(opcProductionPartStateMachineTypeRunningToAborted),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionPartStateMachineTypeRunningToEnded",
+                type = refBy(opcProductionPartStateMachineTypeRunningToEnded),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionPartStateMachineTypeRunningToInterrupted",
+                type = refBy(opcProductionPartStateMachineTypeRunningToInterrupted),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionPartStateMachineTypeRunningToRunning",
+                type = refBy(opcProductionPartStateMachineTypeRunningToRunning),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionProgramStateMachineTypeAbortedToInitializing",
+                type = refBy(opcProductionProgramStateMachineTypeAbortedToInitializing),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionProgramStateMachineTypeEndedToInitializing",
+                type = refBy(opcProductionProgramStateMachineTypeEndedToInitializing),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionProgramStateMachineTypeInitializingToAborted",
+                type = refBy(opcProductionProgramStateMachineTypeInitializingToAborted),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionProgramStateMachineTypeInitializingToRunning",
+                type = refBy(opcProductionProgramStateMachineTypeInitializingToRunning),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionProgramStateMachineTypeInterruptedToAborted",
+                type = refBy(opcProductionProgramStateMachineTypeInterruptedToAborted),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionProgramStateMachineTypeInterruptedToRunning",
+                type = refBy(opcProductionProgramStateMachineTypeInterruptedToRunning),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionProgramStateMachineTypeRunningToAborted",
+                type = refBy(opcProductionProgramStateMachineTypeRunningToAborted),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionProgramStateMachineTypeRunningToEnded",
+                type = refBy(opcProductionProgramStateMachineTypeRunningToEnded),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionProgramStateMachineTypeRunningToInterrupted",
+                type = refBy(opcProductionProgramStateMachineTypeRunningToInterrupted),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionProgramStateMachineTypeRunningToRunning",
+                type = refBy(opcProductionProgramStateMachineTypeRunningToRunning),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcToolListTypeTool",
+                type = refBy(opcToolListTypeTool),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcAlertTypeErrorCode",
+                type = refBy(opcAlertTypeErrorCode),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcInterruptionConditionTypeIsAutomated",
+                type = refBy(opcInterruptionConditionTypeIsAutomated),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcNotificationEventTypeIdentifier",
+                type = refBy(opcNotificationEventTypeIdentifier),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionJobTransitionEventTypeCustomerOrderIdentifier",
+                type = refBy(opcProductionJobTransitionEventTypeCustomerOrderIdentifier),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionJobTransitionEventTypeIdentifier",
+                type = refBy(opcProductionJobTransitionEventTypeIdentifier),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionJobTransitionEventTypeOrderIdentifier",
+                type = refBy(opcProductionJobTransitionEventTypeOrderIdentifier),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionJobTransitionEventTypeRunsCompleted",
+                type = refBy(opcProductionJobTransitionEventTypeRunsCompleted),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionJobTransitionEventTypeRunsPlanned",
+                type = refBy(opcProductionJobTransitionEventTypeRunsPlanned),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionPartTransitionEventTypeCustomerOrderIdentifier",
+                type = refBy(opcProductionPartTransitionEventTypeCustomerOrderIdentifier),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionPartTransitionEventTypeIdentifier",
+                type = refBy(opcProductionPartTransitionEventTypeIdentifier),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionPartTransitionEventTypeJobIdentifier",
+                type = refBy(opcProductionPartTransitionEventTypeJobIdentifier),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionPartTransitionEventTypeName",
+                type = refBy(opcProductionPartTransitionEventTypeName),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionPartTransitionEventTypePartQuality",
+                type = refBy(opcProductionPartTransitionEventTypePartQuality),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionPartTransitionEventTypeProcessIrregularity",
+                type = refBy(opcProductionPartTransitionEventTypeProcessIrregularity),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionProgramTransitionEventTypeJobIdentifier",
+                type = refBy(opcProductionProgramTransitionEventTypeJobIdentifier),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionProgramTransitionEventTypeName",
+                type = refBy(opcProductionProgramTransitionEventTypeName),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcBaseToolTypeIdentifier",
+                type = refBy(opcBaseToolTypeIdentifier),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcBaseToolTypeName",
+                type = refBy(opcBaseToolTypeName),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcToolTypeControlIdentifier1",
+                type = refBy(opcToolTypeControlIdentifier1),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcToolTypeControlIdentifier2",
+                type = refBy(opcToolTypeControlIdentifier2),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcToolTypeControlIdentifierInterpretation",
+                type = refBy(opcToolTypeControlIdentifierInterpretation),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcToolTypeLastUsage",
+                type = refBy(opcToolTypeLastUsage),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcToolTypeLocked",
+                type = refBy(opcToolTypeLocked),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcToolTypePlannedForOperating",
+                type = refBy(opcToolTypePlannedForOperating),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcChannelModifierTypeBlockSkip",
+                type = refBy(opcChannelModifierTypeBlockSkip),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcChannelModifierTypeDryRun",
+                type = refBy(opcChannelModifierTypeDryRun),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcChannelModifierTypeOptionalStop",
+                type = refBy(opcChannelModifierTypeOptionalStop),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcChannelModifierTypeSingleStep",
+                type = refBy(opcChannelModifierTypeSingleStep),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcChannelModifierTypeTestMode",
+                type = refBy(opcChannelModifierTypeTestMode),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcElementMonitoringTypeName",
+                type = refBy(opcElementMonitoringTypeName),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcChannelMonitoringTypeChannelMode",
+                type = refBy(opcChannelMonitoringTypeChannelMode),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcChannelMonitoringTypeChannelState",
+                type = refBy(opcChannelMonitoringTypeChannelState),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcChannelMonitoringTypeFeedOverride",
+                type = refBy(opcChannelMonitoringTypeFeedOverride),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcChannelMonitoringTypeRapidOverride",
+                type = refBy(opcChannelMonitoringTypeRapidOverride),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcEDMGeneratorMonitoringTypeEDMGeneratorState",
+                type = refBy(opcEDMGeneratorMonitoringTypeEDMGeneratorState),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcEDMGeneratorMonitoringTypeIsOn",
+                type = refBy(opcEDMGeneratorMonitoringTypeIsOn),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcLaserMonitoringTypeControllerIsOn",
+                type = refBy(opcLaserMonitoringTypeControllerIsOn),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcLaserMonitoringTypeLaserState",
+                type = refBy(opcLaserMonitoringTypeLaserState),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcSpindleMonitoringTypeIsRotating",
+                type = refBy(opcSpindleMonitoringTypeIsRotating),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcSpindleMonitoringTypeIsUsedAsAxis",
+                type = refBy(opcSpindleMonitoringTypeIsUsedAsAxis),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcSpindleMonitoringTypeOverride",
+                type = refBy(opcSpindleMonitoringTypeOverride),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcMachineOperationMonitoringTypeFeedOverride",
+                type = refBy(opcMachineOperationMonitoringTypeFeedOverride),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcMachineOperationMonitoringTypeIsWarmUp",
+                type = refBy(opcMachineOperationMonitoringTypeIsWarmUp),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcMachineOperationMonitoringTypeOperationMode",
+                type = refBy(opcMachineOperationMonitoringTypeOperationMode),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcMachineOperationMonitoringTypePowerOnDuration",
+                type = refBy(opcMachineOperationMonitoringTypePowerOnDuration),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionJobTypeCustomerOrderIdentifier",
+                type = refBy(opcProductionJobTypeCustomerOrderIdentifier),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionJobTypeIdentifier",
+                type = refBy(opcProductionJobTypeIdentifier),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionJobTypeNumberInList",
+                type = refBy(opcProductionJobTypeNumberInList),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionJobTypeOrderIdentifier",
+                type = refBy(opcProductionJobTypeOrderIdentifier),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionJobTypeRunsCompleted",
+                type = refBy(opcProductionJobTypeRunsCompleted),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionJobTypeRunsPlanned",
+                type = refBy(opcProductionJobTypeRunsPlanned),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionPartSetTypeContainsMixedParts",
+                type = refBy(opcProductionPartSetTypeContainsMixedParts),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionPartSetTypeName",
+                type = refBy(opcProductionPartSetTypeName),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionPartSetTypePartsCompletedPerRun",
+                type = refBy(opcProductionPartSetTypePartsCompletedPerRun),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionPartSetTypePartsPlannedPerRun",
+                type = refBy(opcProductionPartSetTypePartsPlannedPerRun),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionPartTypeCustomerOrderIdentifier",
+                type = refBy(opcProductionPartTypeCustomerOrderIdentifier),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionPartTypeIdentifier",
+                type = refBy(opcProductionPartTypeIdentifier),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionPartTypeName",
+                type = refBy(opcProductionPartTypeName),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionPartTypePartQuality",
+                type = refBy(opcProductionPartTypePartQuality),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionPartTypeProcessIrregularity",
+                type = refBy(opcProductionPartTypeProcessIrregularity),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionProgramTypeName",
+                type = refBy(opcProductionProgramTypeName),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionProgramTypeNumberInList",
+                type = refBy(opcProductionProgramTypeNumberInList),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionActiveProgramTypeJobIdentifier",
+                type = refBy(opcProductionActiveProgramTypeJobIdentifier),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionActiveProgramTypeJobNodeId",
+                type = refBy(opcProductionActiveProgramTypeJobNodeId),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionStatisticsTypePartsProducedInLifetime",
+                type = refBy(opcProductionStatisticsTypePartsProducedInLifetime),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcPrognosisListTypeNodeVersion",
+                type = refBy(opcPrognosisListTypeNodeVersion),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcPrognosisTypePredictedTime",
+                type = refBy(opcPrognosisTypePredictedTime),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcMaintenancePrognosisTypeActivity",
+                type = refBy(opcMaintenancePrognosisTypeActivity),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcManualActivityPrognosisTypeActivity",
+                type = refBy(opcManualActivityPrognosisTypeActivity),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcPartLoadPrognosisTypeLocation",
+                type = refBy(opcPartLoadPrognosisTypeLocation),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcPartLoadPrognosisTypePartIdentifier",
+                type = refBy(opcPartLoadPrognosisTypePartIdentifier),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcPartLoadPrognosisTypePartName",
+                type = refBy(opcPartLoadPrognosisTypePartName),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcPartLoadPrognosisTypePartNodeId",
+                type = refBy(opcPartLoadPrognosisTypePartNodeId),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcPartUnloadPrognosisTypeLocation",
+                type = refBy(opcPartUnloadPrognosisTypeLocation),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcPartUnloadPrognosisTypePartIdentifier",
+                type = refBy(opcPartUnloadPrognosisTypePartIdentifier),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcPartUnloadPrognosisTypePartName",
+                type = refBy(opcPartUnloadPrognosisTypePartName),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcPartUnloadPrognosisTypePartNodeId",
+                type = refBy(opcPartUnloadPrognosisTypePartNodeId),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProcessChangeoverPrognosisTypeActivity",
+                type = refBy(opcProcessChangeoverPrognosisTypeActivity),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProcessChangeoverPrognosisTypeLocation",
+                type = refBy(opcProcessChangeoverPrognosisTypeLocation),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionJobEndPrognosisTypeJobNodeId",
+                type = refBy(opcProductionJobEndPrognosisTypeJobNodeId),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionJobEndPrognosisTypeSourceIdentifier",
+                type = refBy(opcProductionJobEndPrognosisTypeSourceIdentifier),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcToolChangePrognosisTypeLocation",
+                type = refBy(opcToolChangePrognosisTypeLocation),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcToolChangePrognosisTypeToolIdentifier",
+                type = refBy(opcToolChangePrognosisTypeToolIdentifier),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcToolChangePrognosisTypeToolName",
+                type = refBy(opcToolChangePrognosisTypeToolName),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcToolChangePrognosisTypeToolNodeId",
+                type = refBy(opcToolChangePrognosisTypeToolNodeId),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcToolLoadPrognosisTypeLocation",
+                type = refBy(opcToolLoadPrognosisTypeLocation),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcToolLoadPrognosisTypeToolIdentifier",
+                type = refBy(opcToolLoadPrognosisTypeToolIdentifier),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcToolLoadPrognosisTypeToolName",
+                type = refBy(opcToolLoadPrognosisTypeToolName),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcToolUnloadPrognosisTypeLocation",
+                type = refBy(opcToolUnloadPrognosisTypeLocation),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcToolUnloadPrognosisTypeToolIdentifier",
+                type = refBy(opcToolUnloadPrognosisTypeToolIdentifier),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcToolUnloadPrognosisTypeToolName",
+                type = refBy(opcToolUnloadPrognosisTypeToolName),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcToolUnloadPrognosisTypeToolNodeId",
+                type = refBy(opcToolUnloadPrognosisTypeToolNodeId),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcUtilityChangePrognosisTypeUtilityName",
+                type = refBy(opcUtilityChangePrognosisTypeUtilityName),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcSoftwareIdentificationTypeIdentifier",
+                type = refBy(opcSoftwareIdentificationTypeIdentifier),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcSoftwareIdentificationTypeManufacturer",
+                type = refBy(opcSoftwareIdentificationTypeManufacturer),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcSoftwareIdentificationTypeSoftwareRevision",
+                type = refBy(opcSoftwareIdentificationTypeSoftwareRevision),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionStateMachineTypeCurrentState",
+                type = refBy(opcProductionStateMachineTypeCurrentState),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcProductionStateMachineTypeLastTransition",
+                type = refBy(opcProductionStateMachineTypeLastTransition),
+                cachingTime = CACHE_ALWAYS
+            },            Field {
+                name = "opcToolListTypeNodeVersion",
+                type = refBy(opcToolListTypeNodeVersion),
+                cachingTime = CACHE_ALWAYS
+            }        
+}
+    };
+
+    // ------------ individual, reusable services ------------------
+
+    OpcUaV1Connector myOpcUaConn = {
+        id = "myOpcConn",
+        name = "myOpcConn example",
+        description = "",
+        ver = "0.1.0",
+        host = "opcua.umati.app",
+        port = 4840, // default localhost
+        
+        input = {{type=refBy(opcIn)}},
+        output = {{type=refBy(opcOut)}},
+        inInterface = refBy(opcIn), 
+        outInterface = refBy(opcOut)
+        /*operations = {
+          FieldAssignmentOperation{field=myConnPltfIn.fields[1], 
+            operation=AddDataTranslationOperation{
+                arguments={
+                    DataFieldAccess{field=myConnMachineOut.fields[0]},
+                    IntegerConstantDataOperation{value=100}}
+            }
+          }
+        }*/
+    };
+
+    // not really needed except for populating the interfaces package
+    Service myReceiverService = JavaService {
+        id = "OpcReceiver",
+        name = "OPC Receiver",
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+        class = "ReceiverImpl",
+        artifact = "",
+        kind = ServiceKind::SINK_SERVICE,
+        input = {{type=refBy(opcOut)}}
+    };
+
+    // --------------------- monitoring ---------------------------
+
+    // current default: no monitoring configured
+
+    // ------------------------- UI -------------------------------
+
+    // current default: no UI configured
+
+    // ------------ application and service nets ------------------
+
+    Application myApp = {
+        id = "VdwOpcApp",
+        name = "Simple VDW OPC Demo App",
+        ver = "0.1.0",
+        description = "",
+        services = {refBy(myMesh)}        
+    };
+
+    ServiceMesh myMesh = {
+        description = "VDW Service Net",
+        sources = {refBy(mqttOpcSource)}
+    };
+
+    MeshSource mqttOpcSource = {
+       impl = refBy(myOpcUaConn),
+       next = {refBy(myConnMySourceMyReceiver)}
+    };
+
+    // needed to form a graph
+
+    MeshConnector myConnMySourceMyReceiver = {
+        name = "Source->Receiver",
+        next = refBy(myReceiver)
+    };
+
+    MeshSink myReceiver = {
+        impl = refBy(myReceiverService)
+    };
+
+    // ---------- generation setup ------------
+
+    sharedInterfaces = true;
+    sharedArtifact = "de.iip-ecosphere.platform:apps.VdwOpcAppInterfaces:" + iipVer;
+
+    // ------------ freezing ------------------
+
+    freeze {
+        aas;
+        aasServer;
+        aasRegistryServer;
+        aasImplServer;
+        aasPersistency;
+        aasProtocol;
+        serializer;
+        transportProtocol;
+        serviceManager;
+        serviceProtocol;
+        containerManager;
+        deviceMgtStorageServer;
+        deviceMgtStorage;
+        deviceRegistry;
+        javaModuleOpts;
+        javaOpts;
+        pidDir;
+        sharedInterfaces;
+        sharedArtifact;
+        platformMonitoring;
+        managementUi;
+        artifactsFolder;
+        artifactsUriPrefix;
+        OpcMachineTool; // now freeze also cachingTime
+        .; // every variable declared in this project
+    } but (f|f.bindingTime >= BindingTime.runtimeMon);
+
+}

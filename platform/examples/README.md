@@ -9,7 +9,10 @@ To demonstrate and validate the oktoflow platform, we collect in this folder a s
 * [Python service example](examples.pythonSync/README.md): Integrating a synchronous Python (pseudo AI) service into a simple service chain/application.
 * [KODEX service example](examples.python/README.md): Integrating the platform-provided KODEX pseudonymizer/anonymizer into a simple service chain/application.
 * [MIP sensor connector/AI example](examples.MIP/README.md): Using the MIP specific MQTT connector from the configuration meta-model playing a one-step ping pong with a related platform AI service for improving the id detection. Just an example, cannot be executed with a sensor from MIP technologies.
+* [Tutorial example](examples.templates/README.md): The source code of the tutorial examples with a model and an implementation project.
 * [HM'22/TddT'22 demonstrator](examples.python/README.md): The source code of the HM'22/TddT'22 demonstrator as an example for a more complex AI-enabled application.
+* [EMO'23/HM'23 demonstrator](examples.python/emo23.md): The source code of the EMO'23/HM'23 demonstrator as an example for a more complex AI-enabled application with three AI services.
+* [MODBUS/TCP example](examples.modbusTcp/README.md): Integrating a MODBUS/TCP connector into a simple service mesh.
 
 The [examples](examples/README.md) component contains helpful reusable basic functionality for examples and apps.
 
