@@ -88,8 +88,8 @@ project Modbus {
 
     // not really needed except for populating the interfaces package
     Service myReceiverService = JavaService {
-        id = "OpcReceiver",
-        name = "OPC Receiver",
+        id = "ModbusReceiver",
+        name = "Modbus Receiver",
         description = "",
         ver = "0.1.0",
         deployable = true,

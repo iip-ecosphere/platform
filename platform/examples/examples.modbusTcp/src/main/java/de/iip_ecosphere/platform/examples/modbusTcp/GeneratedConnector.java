@@ -45,8 +45,8 @@ public class GeneratedConnector {
      */
     public static void main(String[] args) throws IOException {
         if (args.length > 0 && "--skip".equals(args[0])) {
-            // our Jenkins cannot contact the umati server. well let's figure out whether it could run at all
-            System.out.println("UMATI OPCUA Connector test");
+            // when server is set up, regex in POM may become more specific and this part may be removed
+            System.out.println("MODBUS Connector test");
             System.exit(0);
         }
         ActiveAasBase.setNotificationMode(NotificationMode.NONE); // disable AAS connector registration

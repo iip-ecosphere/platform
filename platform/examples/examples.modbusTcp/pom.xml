@@ -51,8 +51,8 @@
   </dependencies>
 
   <properties>
-        <generated.class>de.iip_ecosphere.platform.examples.modbus.GeneratedConnector</generated.class>
-        <manual.class>de.iip_ecosphere.platform.examples.modbus.ManualConnector</manual.class>
+        <generated.class>de.iip_ecosphere.platform.examples.modbusTcp.GeneratedConnector</generated.class>
+        <manual.class>de.iip_ecosphere.platform.examples.modbusTcp.ManualConnector</manual.class>
         <iip.resources>resources</iip.resources>
         <test.docker.skip>true</test.docker.skip> <!-- default for local execution -->
         <test.exec.args>--skip</test.exec.args>
@@ -146,52 +146,6 @@
                    </execution>
                  </executions>
                </plugin>
-               <!-- <plugin>
-				   <groupId>io.fabric8</groupId>
-				   <artifactId>docker-maven-plugin</artifactId>
-				   <version>0.43.4</version>
-				   <executions>
-                     <execution>
-                       <id>start</id>
-                       <phase>package</phase>
-                       <goals>
-                         <goal>start</goal>
-                       </goals>
-                     </execution>
-                     <execution>
-                       <id>stop</id>
-                       <phase>verify</phase>
-                       <goals>
-                         <goal>stop</goal>
-                       </goals>
-                     </execution>
-                     <execution>
-                       <id>build</id>
-                       <phase></phase>
-                       <goals>
-                         <goal>prepare-package</goal>
-                       </goals>
-                     </execution>
-                   </executions>
-                   <configuration>
-                       <skip>${test.docker.skip}</skip>
-                   </configuration>
-                   <images>
-                       <image>
-                           <name>NAME</name>
-                           <build>
-                             <dockerFileDir>src/test/docker</dockerFileDir>
-                           </build>
-                           <run>
-	                           <wait>
-	                             <http>
-	                               <url></url>
-	                             </http>
-	                           </wait>
-                           </run>
-                       </image>
-                   </images>
-               </plugin> -->
                <plugin>
                    <groupId>de.iip-ecosphere.platform</groupId>
                    <artifactId>configuration-plugin</artifactId>
@@ -214,15 +168,14 @@
 	                        <goals>
 	                            <goal>testApp</goal>
 	                        </goals>
-	                        <!-- WARNING: Jenkins cannot contact UMATI OPCUA service. Disabling execution! -->
 	                        <configuration>
 	                            <appId>generatedConnector</appId>
 	                            <mvnArgs>
 	                                <mvnArg>-Dexec.args="${test.exec.args}"</mvnArg>
 	                            </mvnArgs>
 	                            <brokerPort>0</brokerPort>
-	                            <logRegExprs>
-	                                <logRegExpr>.*UMATI OPCUA Connector test.*</logRegExpr>
+	                            <logRegExprs> 
+	                                <logRegExpr>.*MODBUS Connector test.*</logRegExpr>
 	                            </logRegExprs>
 	                        </configuration>
 	                    </execution>
