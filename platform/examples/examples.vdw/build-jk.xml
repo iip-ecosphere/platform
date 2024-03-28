@@ -11,6 +11,8 @@
         <maven pomFile="pom.xml" goal="install">
             <arg value="-Dunpack.force=true"/>
             <arg value="-Diip.ciBuildId=${build_num}"/> <!-- must be set in jenkins ANT build step -->
+        	<arg value="-Dtest.docker.skip=true"/>
+        	<arg value="-Dtest.exec.args=--skip"/>
         </maven>
 	</target>
 </project>

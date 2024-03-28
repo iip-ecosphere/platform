@@ -22,12 +22,7 @@ import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
-import iip.datatypes.OpcBwIdentification;
-import iip.datatypes.OpcBwStateMachine;
-import iip.datatypes.OpcBwStateMachineFlags;
-import iip.datatypes.OpcBwStateMachineOverview;
 import iip.datatypes.OpcIn;
-import iip.datatypes.OpcLocalizedText;
 import iip.datatypes.OpcOut;
 import iip.nodes.MyOpcConnExample;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
@@ -60,9 +55,8 @@ public class GeneratedConnector {
 
             @Override
             public void received(OpcOut data) {
-                System.out.println("RCV " 
-                    + GeneratedConnector.toString(data.getState().getMachine()) + "\n" 
-                    + GeneratedConnector.toString(data.getIdentification()));
+                System.out.println("RCV " + data.getState().getMachine() + "\n" 
+                    + data.getIdentification());
                 count.incrementAndGet();
             }
             
@@ -101,73 +95,6 @@ public class GeneratedConnector {
         conn.connect(MyOpcConnExample.createConnectorParameter());
         conn.setReceptionCallback(callback);
         return conn;
-    }
-
-    /**
-     * Turns a machine state into a string for display.
-     * 
-     * @param machine the machine instance
-     * @return the string representation
-     */
-    public static String toString(OpcBwStateMachine machine) {
-        return toString(machine.getFlags()) + "\n" + toString(machine.getOverview());
-    }
-    
-    /**
-     * Turns a machine flags instance into a string for display.
-     * 
-     * @param flags the machine flags instance
-     * @return the string representation
-     */
-    public static String toString(OpcBwStateMachineFlags flags) {
-        return "flags:\n" 
-            + " - alarm: " + flags.getAlarm() + "\n" 
-            + " - cal: " + flags.getCalibrated() + "\n" 
-            + " - emergency:" + flags.getEmergency() + "\n" 
-            + " - error:" + flags.getError() + "\n" 
-            + " - init:" + flags.getMachineInitialized() + "\n" 
-            + " - on:" + flags.getMachineOn() + "\n" 
-            + " - power:" + flags.getPowerPresent() + "\n" 
-            + " - recInRun:" + flags.getRecipeInRun() + "\n" 
-            + " - warning:" + flags.getWarning();
-    }
-    
-    /**
-     * Turns an identification instance into a string for display.
-     * 
-     * @param id the identification instance
-     * @return the string representation
-     */
-    public static String toString(OpcBwIdentification id) {
-        return "id:\n"
-            + " - manufacturer: " + toString(id.getManufacturer()) + "\n"
-            + " - model: " + toString(id.getModel()) + "\n"
-            + " - deviceCls: " + id.getDeviceClass() + "\n" 
-            + " - instanceUri: " + id.getProductInstanceUri() + "\n" 
-            + " - serNr: " + id.getSerialNumber() + "\n"
-            + " - yearOfConstr: " + id.getYearOfConstruction();
-    }
-
-    /**
-     * Turns a localized text instance into a string for display.
-     * 
-     * @param text the localized text instance
-     * @return the string representation
-     */
-    public static String toString(OpcLocalizedText text) {
-        return "(loc " + text.getLocale() + " text " + text.getText() + ")";
-    }
-
-    /**
-     * Turns a machine overview instance into a string for display.
-     * 
-     * @param overview the machine overview instance
-     * @return the string representation
-     */
-    public static String toString(OpcBwStateMachineOverview overview) {
-        return "overview:\n"
-            + " - mode: " + overview.getCurrentMode() + "\n"
-            + " - state: " + overview.getCurrentState();
     }
 
 }

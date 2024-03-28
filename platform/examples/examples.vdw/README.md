@@ -13,11 +13,12 @@ This example currently contains two parts:
   
     * Run the generated connector with `mvn -P App exec:java@generatedConnector`
     * The generated connector writes `opcTest.txt` containing measurements provided through a micrometer timing probe.
+    * By default, full test execution is disabled as a specifically prepared docker container is required. If this docker container shall be built/executed, set ``-Dtest.docker.skip=true -Dtest.exec.args=--all``
 * A hand-crafted connector for comparison: `mvn -P App exec:java@manualConnector`
 
 Shortcuts for Eclipse: 
-  * Run `de.iip_ecosphere.platform.examples.vdw.OpcUaModelTest` as JUnit test to execute the model instantiation/code generation. Generation may require in Eclipse a Maven update of the project (including Snapshots). 
-  * Run then `de.iip_ecosphere.platform.examples.vdw.OpcUaModelTest` 
+  * Run `test.de.iip_ecosphere.platform.examples.vdw.OpcUaModelTest` as JUnit test to execute the model instantiation/code generation. Generation may require in Eclipse a Maven update of the project (including Snapshots). 
+  * Run then `test.de.iip_ecosphere.platform.examples.vdw.OpcUaConnectorTest` 
   as Java program to execute the generated connector.
 
 For all executions, the VDW/UMATI OPC UA server must be accessible via Internet. And, as usual, ** do not modify generated code **.

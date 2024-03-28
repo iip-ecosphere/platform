@@ -1,8 +1,7 @@
 project VDW {
 
     import IIPEcosphere;
-    import DataTypes;
-    
+    import OpcUaDataTypes;
     import OpcWoodworking;
 
     annotate BindingTime bindingTime = BindingTime::compile to .;
@@ -11,7 +10,7 @@ project VDW {
 
     serializer = Serializer::Json;
     // serviceManager, containerManager are already defined    
-        
+
     aasServer = {
         schema = AasSchema::HTTP,
         port = 9001,
@@ -27,73 +26,103 @@ project VDW {
         port = 9003
     };
     aasProtocol = AasProtocolVabTcp{};
-    
+
     // ------------------ transport --------------------------
-    
+
     transportProtocol = TransportProtocolMQTTv5 {
-        port = 8883,
-        security = { // replaces user/password, requires identityStore.yml in src/test/ or src/main depeding on use
-            authenticationKey = "amqp"
-        }
+        port = 8883
     };
-    
+
     serviceProtocol = ServiceProtocolMQTTv5 {};
-    
+
     // ------------------ resources/devicemgt ----------------
-    
+
     deviceRegistry = BasicDeviceRegistry {
     };
-    
+
     deviceMgtStorage = S3MockDeviceMgtStorage {
         host = "localhost",
         port = 8884,
         region = "local"
     };
-    
+
     // just for testing, this instantiates app rather than platform
     deviceMgtStorageServer = S3MockDeviceMgtStorageServer{};
 
     // ------------ data types ------------------
-    
+
     RecordType opcIn = {
         name = "OpcIn",
         fields = {
+          Field {
+          name = "Events",
+          type = refBy(opcWwMachineTypeEvents),
+        //cachingTime = CACHE_NONE
+          cachingTime = CACHE_ALWAYS
+          }, Field {
+                name = "Identification",
+                type = refBy(opcWwMachineTypeIdentification),
+//              //cachingTime = CACHE_NONE
+              cachingTime = CACHE_ALWAYS
+            }, Field {
+        name = "ManufacturerSpecific",
+        type = refBy(opcWwMachineTypeManufacturerSpecific),
+//          //cachingTime = CACHE_NONE
+        cachingTime = CACHE_ALWAYS
+            }, Field {
+                  name = "State",           
+                  type = refBy(opcWwMachineTypeState),
+//                //cachingTime = CACHE_NONE
+                  cachingTime = CACHE_ALWAYS  
+            }
         }
-    };
-    
+    };    
     RecordType opcOut = {
-        //path = "Objects/Machines/BasicWoodworking/",
+        //path = "Objects/Machines/FullWoodworking/",
         name = "OpcOut",
+
         fields = {
             Field {
-                name = "State",
-                type = refBy(opcBwState),
-                cachingTime = CACHE_ALWAYS
-            }, Field {
+          name = "Events",
+          type = refBy(opcWwMachineTypeEvents),
+        //cachingTime = CACHE_NONE
+          cachingTime = CACHE_ALWAYS
+          }, Field {
                 name = "Identification",
-                type = refBy(opcBwIdentification),
-                cachingTime = CACHE_ALWAYS
+                type = refBy(opcWwMachineTypeIdentification),
+//              //cachingTime = CACHE_NONE
+              cachingTime = CACHE_ALWAYS
+              }, Field {
+        name = "ManufacturerSpecific",
+        type = refBy(opcWwMachineTypeManufacturerSpecific),
+//          //cachingTime = CACHE_NONE
+        cachingTime = CACHE_ALWAYS
+              }, Field {
+                  name = "State",           
+                  type = refBy(opcWwMachineTypeState),
+//                //cachingTime = CACHE_NONE
+                  cachingTime = CACHE_ALWAYS  
             }
         }
     };
-    
+
     // ------------ individual, reusable services ------------------
-    
-    fields(type(type(type(opcOut, "State"), "Machine"), "Flags"))->forAll(Field f | f.cachingTime = 500);
-    fields(type(type(type(opcOut, "State"), "Machine"), "Overview"))->forAll(Field f | f.cachingTime = 500);
-    
+
     OpcUaV1Connector myOpcUaConn = {
         id = "myOpcConn",
         name = "myOpcConn example",
         description = "",
         ver = "0.1.0",
-        host = "opcua.umati.app",
+        host = "127.0.0.1",
+    //host = "opcua.umati.app",
         port = 4840, // default localhost
         
         input = {{type=refBy(opcIn)}},
         output = {{type=refBy(opcOut)}},
-        inInterface = {type=refBy(opcIn)}, 
-        outInterface = {type=refBy(opcOut), path="Objects/Machines/BasicWoodworking/"}
+    //inInterface = refBy(opcIn), 
+        //outInterface = refBy(opcOut)
+    inInterface = {type=refBy(opcIn), path="Objects/Machines/FullWoodworking/"}, 
+        outInterface = {type=refBy(opcOut), path="Objects/Machines/FullWoodworking/"}
         /*operations = {
           FieldAssignmentOperation{field=myConnPltfIn.fields[1], 
             operation=AddDataTranslationOperation{
@@ -104,7 +133,7 @@ project VDW {
           }
         }*/
     };
-    
+
     // not really needed except for populating the interfaces package
     Service myReceiverService = JavaService {
         id = "OpcReceiver",
@@ -117,17 +146,17 @@ project VDW {
         kind = ServiceKind::SINK_SERVICE,
         input = {{type=refBy(opcOut)}}
     };
-    
+
     // --------------------- monitoring ---------------------------
-    
+
     // current default: no monitoring configured
-    
+
     // ------------------------- UI -------------------------------
-    
+
     // current default: no UI configured
 
     // ------------ application and service nets ------------------
-    
+
     Application myApp = {
         id = "VdwOpcApp",
         name = "Simple VDW OPC Demo App",
@@ -135,7 +164,7 @@ project VDW {
         description = "",
         services = {refBy(myMesh)}        
     };
-    
+
     ServiceMesh myMesh = {
         description = "VDW Service Net",
         sources = {refBy(mqttOpcSource)}
@@ -145,9 +174,9 @@ project VDW {
        impl = refBy(myOpcUaConn),
        next = {refBy(myConnMySourceMyReceiver)}
     };
-    
-    // this is not really needed, but in the future, topological constraints will prevent incomplete graphs
-    
+
+    // needed to form a graph
+
     MeshConnector myConnMySourceMyReceiver = {
         name = "Source->Receiver",
         next = refBy(myReceiver)
@@ -156,14 +185,14 @@ project VDW {
     MeshSink myReceiver = {
         impl = refBy(myReceiverService)
     };
-    
+
     // ---------- generation setup ------------
-    
+
     sharedInterfaces = true;
-    sharedArtifact = "de.iip-ecosphere.platform:apps.VdwOpcAppInterfaces:" + iipVer; // for testing all-in-one
+    sharedArtifact = "de.iip-ecosphere.platform:apps.VdwOpcAppInterfaces:" + iipVer;
 
     // ------------ freezing ------------------
-    
+
     freeze {
         aas;
         aasServer;
@@ -188,7 +217,6 @@ project VDW {
         managementUi;
         artifactsFolder;
         artifactsUriPrefix;
-        Opc; // now freeze also cachingTime
         OpcWoodworking; // now freeze also cachingTime
         .; // every variable declared in this project
     } but (f|f.bindingTime >= BindingTime.runtimeMon);
