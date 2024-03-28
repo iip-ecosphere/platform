@@ -108,11 +108,9 @@ public class MonitoredTranslatingProtocolAdapter<O, I, CO, CI> extends ChannelTr
     
     @Override
     public I adaptInput(final CI data) throws IOException {
+        MemoryUsage beforeHeapMemoryUsage = memBean.getHeapMemoryUsage();
         // no obvious way to combine lambda with super, measurement from micrometer
         final long s = clock.monotonicTime();
-        //invoke garbage collection, so only the space that is occupied by living objects is counted
-        System.gc();
-        MemoryUsage beforeHeapMemoryUsage = memBean.getHeapMemoryUsage();
         try {
             return super.adaptInput(data);
         } finally {
@@ -131,11 +129,9 @@ public class MonitoredTranslatingProtocolAdapter<O, I, CO, CI> extends ChannelTr
 
     @Override
     public CO adaptOutput(String channel, O data) throws IOException {
+        MemoryUsage beforeHeapMemoryUsage = memBean.getHeapMemoryUsage();        
         // no obvious way to combine lambda with super, measurement from micrometer
         final long s = clock.monotonicTime();
-        //invoke garbage collection, so only the space that is occupied by living objects is counted
-        System.gc();
-        MemoryUsage beforeHeapMemoryUsage = memBean.getHeapMemoryUsage();        
         try {
             return super.adaptOutput(channel, data);
         } finally {
