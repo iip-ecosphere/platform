@@ -25,6 +25,21 @@ public interface ElementsAccess {
      * @return the short id
      */
     public String getIdShort();
+
+    /**
+     * Returns a sub-model element with the given name.
+     * 
+     * @param idShort the short id of the property
+     * @return the sub-model element, <b>null</b> for none
+     */
+    public SubmodelElement getSubmodelElement(String idShort);
+
+    /**
+     * Returns all sub-model elements in the element container.
+     * 
+     * @return all sub-model elements
+     */
+    public Iterable<SubmodelElement> submodelElements();
     
     /**
      * Returns a sub-model element collection with the given name.

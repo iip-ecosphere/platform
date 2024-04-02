@@ -49,7 +49,6 @@ public class FakeSubmodel extends FakeElement implements Submodel {
     private Map<String, SubmodelElement> elements = new HashMap<>();
     private Map<String, Builder<?>> deferred;
     private String identifier;
-    private String semanticId;
     
     /**
      * A fake sub-model builder.
@@ -194,7 +193,7 @@ public class FakeSubmodel extends FakeElement implements Submodel {
 
         @Override
         public SubmodelBuilder setSemanticId(String semanticId) {
-            instance.semanticId = semanticId;
+            instance.setSemanticId(semanticId);
             return this;
         }
 
@@ -422,11 +421,6 @@ public class FakeSubmodel extends FakeElement implements Submodel {
     @Override
     public <T extends SubmodelElement> boolean iterate(IteratorFunction<T> func, Class<T> cls, String... path) {
         return false;
-    }
-
-    @Override
-    public String getSemanticId(boolean stripPrefix) {
-        return semanticId;
     }
 
 }

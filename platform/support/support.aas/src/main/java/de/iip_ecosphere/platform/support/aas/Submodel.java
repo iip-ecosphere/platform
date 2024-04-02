@@ -50,14 +50,6 @@ public interface Submodel extends Element, HasSemantics, Identifiable, Qualifiab
     }
 
     /**
-     * Returns a sub-model element with the given name.
-     * 
-     * @param idShort the short id of the property
-     * @return the sub-model element, <b>null</b> for none
-     */
-    public SubmodelElement getSubmodelElement(String idShort);
-
-    /**
      * Returns a sub-model elements collection builder either by providing access to an existing collection or through 
      * a builder to add a new sub-model elements collection (ultimately only if {@link Builder#build()} was called).
      * 

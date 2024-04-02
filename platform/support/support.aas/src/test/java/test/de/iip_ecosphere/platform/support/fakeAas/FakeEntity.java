@@ -43,7 +43,6 @@ public class FakeEntity extends FakeElement implements Entity {
     private EntityType type;
     private Map<String, SubmodelElement> elements = new HashMap<>();
     private Map<String, Builder<?>> deferred;
-    private String semanticId;
    
     static class FakeEntityBuilder extends FakeSubmodelElementContainerBuilder implements EntityBuilder {
 
@@ -86,7 +85,7 @@ public class FakeEntity extends FakeElement implements Entity {
 
         @Override
         public EntityBuilder setSemanticId(String semanticId) {
-            instance.semanticId = semanticId;
+            instance.setSemanticId(semanticId);
             return this;
         }
         
@@ -170,6 +169,16 @@ public class FakeEntity extends FakeElement implements Entity {
     }
 
     @Override
+    public Iterable<SubmodelElement> submodelElements() {
+        return elements.values();
+    }
+    
+    @Override
+    public SubmodelElement getSubmodelElement(String idShort) {
+        return elements.get(idShort);
+    }
+    
+    @Override
     public Iterable<SubmodelElement> elements() {
         return elements.values();
     }
@@ -250,11 +259,6 @@ public class FakeEntity extends FakeElement implements Entity {
     @Override
     public EntityType getType() {
         return type;
-    }
-
-    @Override
-    public String getSemanticId(boolean stripPrefix) {
-        return semanticId;
     }
 
 }

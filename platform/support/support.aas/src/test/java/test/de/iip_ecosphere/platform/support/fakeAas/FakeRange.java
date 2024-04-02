@@ -21,10 +21,8 @@ import de.iip_ecosphere.platform.support.aas.Type;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class FakeRange implements Range {
+public class FakeRange extends FakeElement implements Range {
 
-    private String idShort;
-    private String semanticId;
     private Type type;
     private Object min;
     private Object max;
@@ -60,8 +58,8 @@ public class FakeRange implements Range {
         }
 
         @Override
-        public RangeBuilder setSemanticId(String refValue) {
-            instance.semanticId = refValue;
+        public RangeBuilder setSemanticId(String semanticId) {
+            instance.setSemanticId(semanticId);
             return this;
         }
         
@@ -76,17 +74,12 @@ public class FakeRange implements Range {
      * @param max the maximum value
      */
     FakeRange(String idShort, Type type, Object min, Object max) {
-        this.idShort = idShort;
+        super(idShort);
         this.type = type;
         this.min = min;
         this.max = max;
     }
     
-    @Override
-    public String getIdShort() {
-        return idShort;
-    }
-
     @Override
     public void accept(AasVisitor visitor) {
         visitor.visitRange(this);
@@ -94,11 +87,6 @@ public class FakeRange implements Range {
 
     @Override
     public void update() {
-    }
-
-    @Override
-    public String getSemanticId(boolean stripPrefix) {
-        return semanticId;
     }
 
     @Override

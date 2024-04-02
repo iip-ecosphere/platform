@@ -85,6 +85,11 @@ public class DelegatingSubmodel implements Submodel {
     }
 
     @Override
+    public void setSemanticId(String semanticId) {
+        delegate.setSemanticId(semanticId);
+    }
+
+    @Override
     public String getIdentification() {
         return delegate.getIdentification();
     }

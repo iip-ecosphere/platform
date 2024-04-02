@@ -35,8 +35,6 @@ public class FakeProperty extends FakeElement implements Property {
     private Object value;
     @SuppressWarnings("unused")
     private Type type;
-    @SuppressWarnings("unused")
-    private String semanticId;
     private Map<String, LangString> description;
     
     /**
@@ -91,8 +89,8 @@ public class FakeProperty extends FakeElement implements Property {
         }
 
         @Override
-        public PropertyBuilder setSemanticId(String refValue) {
-            instance.semanticId = refValue;
+        public PropertyBuilder setSemanticId(String semanticId) {
+            instance.setSemanticId(semanticId);
             return this;
         }
         
@@ -143,11 +141,6 @@ public class FakeProperty extends FakeElement implements Property {
     @Override
     public void setValue(Object value) throws ExecutionException {
         this.value = value;
-    }
-
-    @Override
-    public String getSemanticId(boolean stripPrefix) {
-        return semanticId;
     }
 
     @Override

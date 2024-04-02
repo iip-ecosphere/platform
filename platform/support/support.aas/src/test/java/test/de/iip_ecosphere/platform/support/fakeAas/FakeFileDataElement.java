@@ -20,12 +20,10 @@ import de.iip_ecosphere.platform.support.aas.FileDataElement;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class FakeFileDataElement implements FileDataElement {
+public class FakeFileDataElement extends FakeElement implements FileDataElement {
 
-    private String idShort;
     private String contents;
     private String mimeType;
-    private String semanticId;
     
     /**
      * The element builder.
@@ -57,8 +55,8 @@ public class FakeFileDataElement implements FileDataElement {
         }
 
         @Override
-        public FileDataElementBuilder setSemanticId(String refValue) {
-            instance.semanticId = refValue;
+        public FileDataElementBuilder setSemanticId(String semanticId) {
+            instance.setSemanticId(semanticId);
             return this;
         }
         
@@ -72,16 +70,11 @@ public class FakeFileDataElement implements FileDataElement {
      * @param mimeType the mime type
      */
     FakeFileDataElement(String idShort, String contents, String mimeType) {
-        this.idShort = idShort;
+        super(idShort);
         this.contents = contents;
         this.mimeType = mimeType;
     }
     
-    @Override
-    public String getIdShort() {
-        return idShort;
-    }
-
     @Override
     public void accept(AasVisitor visitor) {
         visitor.visitFileDataElement(this);
@@ -109,11 +102,6 @@ public class FakeFileDataElement implements FileDataElement {
     @Override
     public void setMimeType(String mimeType) {
         this.mimeType = mimeType;
-    }
-
-    @Override
-    public String getSemanticId(boolean stripPrefix) {
-        return semanticId;
     }
 
 }

@@ -26,7 +26,6 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
 public class FakeReferenceElement extends FakeElement implements ReferenceElement {
    
     private Reference value;
-    private String semanticId;
     
     /**
      * The builder.
@@ -62,7 +61,7 @@ public class FakeReferenceElement extends FakeElement implements ReferenceElemen
 
         @Override
         public ReferenceElementBuilder setSemanticId(String semanticId) {
-            instance.semanticId = semanticId;
+            instance.setSemanticId(semanticId);
             return this;
         }
         
@@ -99,11 +98,6 @@ public class FakeReferenceElement extends FakeElement implements ReferenceElemen
     @Override
     public Reference getValue() {
         return value;
-    }
-
-    @Override
-    public String getSemanticId(boolean stripPrefix) {
-        return semanticId;
     }
 
 }

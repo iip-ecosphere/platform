@@ -143,4 +143,9 @@ public class FakeBlobDataElement implements BlobDataElement {
         return semanticId;
     }
 
+    @Override
+    public void setSemanticId(String semanticId) {
+        this.semanticId = semanticId;
+    }
+
 }

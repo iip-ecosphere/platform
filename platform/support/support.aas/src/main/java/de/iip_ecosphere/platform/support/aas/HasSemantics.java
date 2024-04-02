@@ -19,7 +19,6 @@ package de.iip_ecosphere.platform.support.aas;
  */
 public interface HasSemantics {
 
-
     /**
      * Returns the semantic id of the element.
      * 
@@ -40,5 +39,13 @@ public interface HasSemantics {
      * @see #getSemanticId()
      */
     public String getSemanticId(boolean stripPrefix);
-    
+
+    /**
+     * Changes the semantic id of the element.
+     * 
+     * @param semanticId the semantic id in textual format with identifier prefix, or <b>null</b> if there is no 
+     *     semantic id or no translation to string
+     */
+    public void setSemanticId(String semanticId);
+
 }

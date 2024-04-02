@@ -4,13 +4,6 @@ package de.iip_ecosphere.platform.support.aas;
  * Represents an element container.
  */
 public interface ElementContainer extends ElementsAccess {
-
-    /**
-     * Returns all sub-model elements in the element container.
-     * 
-     * @return all sub-model elements
-     */
-    public Iterable<SubmodelElement> submodelElements();
     
     /**
      * Returns the number of sub-model elements in the element container.

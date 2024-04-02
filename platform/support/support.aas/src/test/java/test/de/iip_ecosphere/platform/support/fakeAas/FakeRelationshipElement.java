@@ -30,7 +30,6 @@ public class FakeRelationshipElement extends FakeElement implements Relationship
 
     private FakeReference first;
     private FakeReference second;
-    private String semanticId;
     private Map<String, LangString> description;
     
     /**
@@ -58,8 +57,8 @@ public class FakeRelationshipElement extends FakeElement implements Relationship
         }
  
         @Override
-        public RelationshipElementBuilder setSemanticId(String refValue) {
-            instance.semanticId = refValue;
+        public RelationshipElementBuilder setSemanticId(String semanticId) {
+            instance.setSemanticId(semanticId);
             return this;
         }
         
@@ -99,11 +98,6 @@ public class FakeRelationshipElement extends FakeElement implements Relationship
     @Override
     public void accept(AasVisitor visitor) {
         visitor.visitRelationshipElement(this);
-    }
-
-    @Override
-    public String getSemanticId(boolean stripPrefix) {
-        return semanticId;
     }
 
     @Override

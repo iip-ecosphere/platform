@@ -51,6 +51,16 @@ public class DelegatingSubmodelElementCollection implements SubmodelElementColle
     }
     
     @Override
+    public Iterable<SubmodelElement> submodelElements() {
+        return delegate.submodelElements();
+    }    
+
+    @Override
+    public SubmodelElement getSubmodelElement(String idShort) {
+        return delegate.getSubmodelElement(idShort);
+    }
+
+    @Override
     public String getIdShort() {
         return delegate.getIdShort();
     }
@@ -68,6 +78,11 @@ public class DelegatingSubmodelElementCollection implements SubmodelElementColle
     @Override
     public String getSemanticId(boolean stripPrefix) {
         return delegate.getSemanticId(stripPrefix);
+    }
+
+    @Override
+    public void setSemanticId(String semanticId) {
+        delegate.setSemanticId(semanticId);
     }
 
     @Override
