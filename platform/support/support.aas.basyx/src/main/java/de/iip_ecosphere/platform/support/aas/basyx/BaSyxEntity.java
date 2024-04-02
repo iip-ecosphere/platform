@@ -278,6 +278,11 @@ public class BaSyxEntity extends BaSyxSubmodelElement implements Entity, Submode
     }
 
     @Override
+    public Iterable<SubmodelElement> submodelElements() {
+        return elements();
+    }
+
+    @Override
     public Iterable<SubmodelElement> elements() {
         initialize();
         return statementsList;
@@ -297,6 +302,11 @@ public class BaSyxEntity extends BaSyxSubmodelElement implements Entity, Submode
     private Stream<SubmodelElement> elementsStream() {
         initialize();
         return statementsList.stream();
+    }
+
+    @Override
+    public SubmodelElement getSubmodelElement(String idShort) {
+        return getElement(idShort);
     }
 
     @Override
@@ -453,6 +463,14 @@ public class BaSyxEntity extends BaSyxSubmodelElement implements Entity, Submode
     @Override
     public String getSemanticId(boolean stripPrefix) {
         return Tools.translateReference(entity.getSemanticId(), stripPrefix);
+    }
+
+    @Override
+    public void setSemanticId(String semanticId) {
+        IReference ref = Tools.translateReference(semanticId);
+        if (ref != null) {
+            entity.setSemanticId(ref);
+        }
     }
 
 }

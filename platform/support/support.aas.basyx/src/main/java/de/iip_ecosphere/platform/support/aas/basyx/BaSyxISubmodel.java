@@ -183,5 +183,13 @@ public class BaSyxISubmodel extends AbstractSubmodel<ISubmodel> {
     BaSyxSubmodelParent getAas() {
         return parent;
     }
+    
+    @Override
+    public void setSemanticId(String semanticId) {
+        IReference ref = Tools.translateReference(semanticId);
+        if (ref != null && getSubmodel() instanceof org.eclipse.basyx.submodel.metamodel.map.Submodel) {
+            ((org.eclipse.basyx.submodel.metamodel.map.Submodel) getSubmodel()).setSemanticId(ref);
+        }
+    }
 
 }

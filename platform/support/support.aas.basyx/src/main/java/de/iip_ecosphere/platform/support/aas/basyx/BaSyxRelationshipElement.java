@@ -149,4 +149,12 @@ public class BaSyxRelationshipElement extends BaSyxSubmodelElement implements Re
         }
     }
 
+    @Override
+    public void setSemanticId(String semanticId) {
+        IReference ref = Tools.translateReference(semanticId);
+        if (ref != null) {
+            relationship.setSemanticId(ref);
+        }
+    }    
+
 }

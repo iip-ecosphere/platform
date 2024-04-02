@@ -383,7 +383,12 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
         initialize();
         return null == elementsMap ? elementsList.size() : elementsMap.size();
     }
-    
+
+    @Override
+    public Iterable<SubmodelElement> submodelElements() {
+        return elements();
+    }
+
     @Override
     public Iterable<SubmodelElement> elements() {
         return elementsCollection();
@@ -522,7 +527,12 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
     public RelationshipElement getRelationshipElement(String idShort) {
         return getElement(idShort, RelationshipElement.class);
     }
-    
+
+    @Override
+    public SubmodelElement getSubmodelElement(String idShort) {
+        return getElement(idShort);
+    }
+
     @Override
     public SubmodelElement getElement(String idShort) {
         initialize();
@@ -672,4 +682,14 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
         return Tools.translateReference(collection.getSemanticId(), stripPrefix);
     }
 
+    @Override
+    public void setSemanticId(String semanticId) {
+        IReference ref = Tools.translateReference(semanticId);
+        if (ref != null && collection instanceof org.eclipse.basyx.submodel.metamodel.map.submodelelement
+            .SubmodelElementCollection) {
+            ((org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElementCollection) collection)
+                .setSemanticId(ref);
+        }
+    }
+    
 }

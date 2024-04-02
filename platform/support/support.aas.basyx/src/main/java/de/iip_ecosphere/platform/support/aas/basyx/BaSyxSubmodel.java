@@ -248,4 +248,12 @@ public class BaSyxSubmodel extends AbstractSubmodel<org.eclipse.basyx.submodel.m
         return parent;
     }
 
+    @Override
+    public void setSemanticId(String semanticId) {
+        IReference ref = Tools.translateReference(semanticId);
+        if (ref != null) {
+            getSubmodel().setSemanticId(ref);
+        }
+    }
+
 }

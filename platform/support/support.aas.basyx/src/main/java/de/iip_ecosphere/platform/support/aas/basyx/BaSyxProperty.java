@@ -237,4 +237,14 @@ public class BaSyxProperty extends BaSyxSubmodelElement implements Property {
         return Tools.translate(property.getDescription());
     }
     
+    @Override
+    public void setSemanticId(String semanticId) {
+        IReference ref = Tools.translateReference(semanticId);
+        if (ref != null && property instanceof org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.
+            property.Property) {
+            ((org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.property.Property) property)
+                .setSemanticId(ref);
+        }
+    }
+    
 }

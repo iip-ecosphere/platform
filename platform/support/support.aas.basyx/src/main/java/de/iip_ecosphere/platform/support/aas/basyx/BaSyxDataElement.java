@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.support.aas.basyx;
 
+import org.eclipse.basyx.submodel.metamodel.api.reference.IReference;
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElement;
 
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
@@ -65,6 +66,14 @@ public class BaSyxDataElement<D extends
     @Override
     public String getSemanticId(boolean stripPrefix) {
         return Tools.translateReference(dataElement.getSemanticId(), stripPrefix);
+    }
+
+    @Override
+    public void setSemanticId(String semanticId) {
+        IReference ref = Tools.translateReference(semanticId);
+        if (ref != null) {
+            dataElement.setSemanticId(ref);
+        }
     }
 
 }

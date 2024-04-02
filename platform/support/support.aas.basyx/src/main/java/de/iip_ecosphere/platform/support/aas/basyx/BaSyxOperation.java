@@ -264,5 +264,15 @@ public class BaSyxOperation extends BaSyxSubmodelElement implements Operation {
     public String getSemanticId(boolean stripPrefix) {
         return Tools.translateReference(operation.getSemanticId(), stripPrefix);
     }
+    
+    @Override
+    public void setSemanticId(String semanticId) {
+        IReference ref = Tools.translateReference(semanticId);
+        if (ref != null && operation instanceof org.eclipse.basyx.submodel.metamodel.map.submodelelement.operation
+                .Operation) {
+            ((org.eclipse.basyx.submodel.metamodel.map.submodelelement.operation.Operation) 
+                operation).setSemanticId(ref);
+        }
+    }
 
 }

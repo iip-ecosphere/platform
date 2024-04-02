@@ -142,5 +142,15 @@ public class BaSyxReferenceElement extends BaSyxSubmodelElement implements Refer
     public String getSemanticId(boolean stripPrefix) {
         return Tools.translateReference(reference.getSemanticId(), stripPrefix);
     }
+    
+    @Override
+    public void setSemanticId(String semanticId) {
+        IReference ref = Tools.translateReference(semanticId);
+        if (ref != null && reference instanceof org.eclipse.basyx.submodel.metamodel.map.submodelelement.
+            dataelement.ReferenceElement) {
+            ((org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.ReferenceElement) reference)
+                .setSemanticId(ref);
+        }
+    }    
 
 }

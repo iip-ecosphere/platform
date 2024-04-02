@@ -112,5 +112,13 @@ public class BaSyxMultiLanguageProperty extends BaSyxSubmodelElement implements 
     public Map<String, LangString> getDescription() {
         return Tools.translate(property.getValue());
     }
+    
+    @Override
+    public void setSemanticId(String semanticId) {
+        IReference ref = Tools.translateReference(semanticId);
+        if (ref != null) {
+            property.setSemanticId(ref);
+        }
+    }
 
 }
