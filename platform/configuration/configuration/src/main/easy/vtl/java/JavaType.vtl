@@ -226,7 +226,7 @@ template JavaType(Configuration config, FileArtifact target, RecordType type, St
     
     def genRecHashCode(RecordType type) {
         for (Field f: type.fields) {
-            genHashCodeField(f);
+            '${genHashCodeField(f)}'
         }
     }
 
