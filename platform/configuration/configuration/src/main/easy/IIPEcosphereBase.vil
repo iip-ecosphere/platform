@@ -153,5 +153,12 @@ vilScript IIPEcosphereBase (Project source, Configuration config, Project target
         }
         applications;        
     }
+    
+    setOf(RecordType) getRecordTypes() = {
+        setOf(RecordType) recordTypes = RecordType.allInstances();
+        recordTypes.remove(AasGenericSubmodelElementCollection);
+        recordTypes.remove(AasGenericEntityType);
+        recordTypes;
+    }
 
 }

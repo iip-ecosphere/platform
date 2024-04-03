@@ -119,7 +119,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     
     protected generateApps(Project source, Configuration config, Project target, Boolean apps, Boolean noDeps) = {
         IIPEcosphere cfg = config;
-        setOf(RecordType) recordTypes = RecordType.allInstances();
+        setOf(RecordType) recordTypes = getRecordTypes();
         setOf(Application) applications = getApplications();
         sequenceOf(MeshElement) allElements = {};
         sequenceOf(MeshElement) allAppsContainersElements = {};
@@ -2033,7 +2033,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         Path appRoot = "${target}/ApplicationInterfaces";
         appRoot.mkdir();
 
-        setOf(RecordType) recordTypes = RecordType.allInstances();
+        setOf(RecordType) recordTypes = getRecordTypes();
         setOf(ServiceBase) serviceTypes = ServiceBase.allInstances();
         setOf(Server) serverTypes = Server.allInstances();
         Path javaSrc = "${appRoot}/src/main/java";

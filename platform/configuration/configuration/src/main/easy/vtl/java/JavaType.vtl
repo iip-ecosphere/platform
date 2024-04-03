@@ -7,6 +7,27 @@ template JavaType(Configuration config, FileArtifact target, RecordType type, St
 
     String ending = " {";
     Boolean emitJavadoc = true;
+
+    @DispatchBasis
+    def getTypeName(Field field) {
+        toTypeName(field.type);
+    }
+    
+    def isMultiField(AasField field) {
+        Integer minInst = getIntegerValueSafe(field.minimumInstances, -1);
+        Integer maxInst = getIntegerValueSafe(field.maximumInstances, -1);
+        maxInst > 1 or (minInst >= 0 and maxInst < 0);
+    }
+    
+    @DispatchCase
+    def getTypeName(AasField field) {
+        String result = toTypeName(field.type);
+        if (isMultiField(field)) {
+            'java.util.List<Element<${considerWrapper(result)}>>';
+        } else {
+            result;
+        }
+    }
     
     // generates code for the individual attributes
     def attributes(RecordType type) {
@@ -15,7 +36,7 @@ template JavaType(Configuration config, FileArtifact target, RecordType type, St
             for (Field f: type.fields) {
                 '@JsonProperty("${f.name}")'  // unconditional -> service integrations
                 '@ConfiguredName("${f.name}")'
-                'private ${toTypeName(f.type)} ${asMethodFieldIdentifier(f.name)};\n'
+                'private ${getTypeName(f)} ${asMethodFieldIdentifier(f.name)};\n'
             }
         }
     }
@@ -41,7 +62,7 @@ template JavaType(Configuration config, FileArtifact target, RecordType type, St
                 '@Override'
             }
             '@JsonIgnore' // unconditional -> service integrations
-            'public ${toTypeName(f.type)} get${asMethodNameSuffix(f.name)}()${ending}'
+            'public ${getTypeName(f)} get${asMethodNameSuffix(f.name)}()${ending}'
             if (not(interface)) {
                 '
                     return ${asMethodFieldIdentifier(f.name)};
@@ -74,7 +95,7 @@ template JavaType(Configuration config, FileArtifact target, RecordType type, St
                 '@Override'
             }
             '@JsonIgnore' // unconditional -> service integrations
-            'public void set${asMethodNameSuffix(f.name)}(${toTypeName(f.type)} value)${ending}'
+            'public void set${asMethodNameSuffix(f.name)}(${getTypeName(f)} value)${ending}'
             if (not(interface)) {
                 '
                     this.${asMethodFieldIdentifier(f.name)} = value;
@@ -181,9 +202,31 @@ template JavaType(Configuration config, FileArtifact target, RecordType type, St
         '${access} != null ? ${access}.hashCode() : 0'
     }
     
+    @DispatchBasis
+    def genHashCodeField(Field field) {
+        genHashCodeBasis(field);
+    }
+    
+    @DispatchCase
+    def genHashCodeField(AasField field) {
+        if (isMultiField(field)) {
+            'hc += ${genHashCodeObject(getHashCodeAccess(field), field.optional)};';
+        } else {
+            genHashCodeBasis(field);
+        }
+    }
+    
+    def getHashCodeAccess(Field f) {
+        "get${asMethodNameSuffix(f.name)}()";
+    }
+    
+    def genHashCodeBasis(Field f) {
+       'hc += ${genHashCode(getHashCodeAccess(f), f.type, f.optional)};'
+    }
+    
     def genRecHashCode(RecordType type) {
         for (Field f: type.fields) {
-            'hc += ${genHashCode("get${asMethodNameSuffix(f.name)}()", f.type, f.optional)};'
+            genHashCodeField(f);
         }
     }
 
@@ -229,14 +272,41 @@ template JavaType(Configuration config, FileArtifact target, RecordType type, St
         }
     }
     
-    def genImports() {
+    def genImports(RecordType type) {
         IIPEcosphere cfg = config;
+        if (typeNeedsAasElement(type)) {
+            'import de.iip_ecosphere.platform.support.aas.types.common.Element;'
+        }
         if (cfg.serializer==Serializer::Json) {
             'import com.fasterxml.jackson.annotation.JsonProperty;'
             'import com.fasterxml.jackson.annotation.JsonIgnore;'
         } else {
             ''
         }
+    }
+    
+    @DispatchBasis
+    def Boolean typeNeedsAasElement(DataType type) {
+        false;
+    }
+
+    @DispatchCase
+    def Boolean typeNeedsAasElement(RecordType type) {
+        Boolean result = false;
+        for (Field field: type.fields) {
+            result = result or fieldNeedsAasElement(field);
+        }
+        result;
+    }
+
+    @DispatchBasis
+    def Boolean fieldNeedsAasElement(Field field) {
+        false;
+    }
+    
+    @DispatchCase
+    def Boolean fieldNeedsAasElement(AasField field) {
+        isMultiField(field);
     }
 
     def main(Configuration config, FileArtifact target, RecordType type, String pkg, Boolean interface, Boolean sharedInterfaces, Boolean impl) {
@@ -272,7 +342,7 @@ template JavaType(Configuration config, FileArtifact target, RecordType type, St
         
         ${imp|e}
         import de.iip_ecosphere.platform.support.iip_aas.ConfiguredName;
-        ${genImports()|e}
+        ${genImports(type)|e}
 
         /**
          * ${comment} of the application data type ${clsName}.

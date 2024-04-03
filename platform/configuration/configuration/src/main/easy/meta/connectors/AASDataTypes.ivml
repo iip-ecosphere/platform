@@ -151,6 +151,8 @@ project AASDataTypes {
     def Boolean isNameOk(AasField f) = 
         f.isGeneric or matches(f.name, "^[\\w <>\\{\\}\\[\\]\\-\\Q$_\\E]+$");    
 
+    // generic -> VIL, getRecordTypes()
+
     AasSubmodelElementCollectionType AasGenericSubmodelElementCollection = {
         name = "SubmodelElementCollection",
         fields = {
