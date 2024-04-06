@@ -33,7 +33,8 @@ import org.junit.runners.Suite;
     AlertTest.class,
     GenericJsonSerializerTest.class, 
     BasicSerializerProviderTest.class,
-    PrintTransportConnectorTest.class
+    PrintTransportConnectorTest.class,
+    QualifiedElementFactoryTest.class
 })
 public class AllTests {
 }

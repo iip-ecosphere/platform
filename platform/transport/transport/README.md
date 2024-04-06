@@ -26,6 +26,7 @@ prepared in terms of specifying a keystore (JKS, PCK12) and a keystore password,
 * Select a protocol and set up the server/broker side.
 * Include the transport component and the specific transport protocol component (`transport.*`) into your project, preferably using Maven.
 * Select a wire format and set up the type-based serialization classes (in platform: generated). Register the serializer with the `SerializerRegistry` (along with default serializers, e.g. for Strings).
+* If needed for the serialization, create an implementation of `QualifiedElement` and register an own creator with the `QualifiedElementFactory`. Usually, the default implementation shall work.
 * Create a transport parameter instance via its builder class (`TransportParameter.TransportParameterBuilder`)
 * Create a connector instance
     * Typical platform approach: Use the `TransportFactory`, which is automatically set up via Java Service Loader (JSL) for the included transport component, e.g., transport.mqttv3 (just for one, not for multiple ones).
