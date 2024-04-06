@@ -141,6 +141,7 @@ project AASDataTypes {
         Boolean isGeneric = false;
         String aspect = null;
         String displayName = null;
+        //Constraint isCountingTypeOk = counting or maximumInstances > 1 or (minimumInstances >= 0 and maximumInstances < 0) implies refBy(type).isKindOf(ListType);
     }
 
     @DispatchCase    

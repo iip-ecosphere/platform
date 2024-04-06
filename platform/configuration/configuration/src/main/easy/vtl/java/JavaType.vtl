@@ -13,17 +13,15 @@ template JavaType(Configuration config, FileArtifact target, RecordType type, St
         toTypeName(field.type);
     }
     
-    def isMultiField(AasField field) {
-        Integer minInst = getIntegerValueSafe(field.minimumInstances, -1);
-        Integer maxInst = getIntegerValueSafe(field.maximumInstances, -1);
-        maxInst > 1 or (minInst >= 0 and maxInst < 0);
-    }
-    
     @DispatchCase
     def getTypeName(AasField field) {
         String result = toTypeName(field.type);
-        if (isMultiField(field)) {
-            'java.util.List<Element<${considerWrapper(result)}>>';
+        if (isMultiField(field)) { // convention, type must be list type and we return a list of elements anyway
+            if (field.type.isKindOf(ListType)) {
+                ListType listType = field.type;
+                result = toTypeName(listType.type);
+            }
+            'java.util.List<QualifiedElement<${considerWrapper(result)}>>';
         } else {
             result;
         }
@@ -275,7 +273,7 @@ template JavaType(Configuration config, FileArtifact target, RecordType type, St
     def genImports(RecordType type) {
         IIPEcosphere cfg = config;
         if (typeNeedsAasElement(type)) {
-            'import de.iip_ecosphere.platform.support.aas.types.common.Element;'
+            'import de.iip_ecosphere.platform.transport.serialization.QualifiedElement;'
         }
         if (cfg.serializer==Serializer::Json) {
             'import com.fasterxml.jackson.annotation.JsonProperty;'

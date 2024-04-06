@@ -425,14 +425,41 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
                    wrapOptional(field, path + ".set" + asMethodNameSuffix(field.name) + "(" + value + ")", args="access, a", optFind="access.", optReplace="a.") + "${setEnd}"; 
                } else {
                    if (convName(field.type) <> "") { // is there a conversion?
-                       wrapOptional(field, "access.set(${getFieldPath(field, p)}, " + genConvertOp("outConverter", field.type, "from", value) + ")", args="access, a", optFind="access.", optReplace="a.") + "${setEnd}"; 
+                       String convOp = genConvertOp("outConverter", field.type, "from", value);
+                       if (isMultiField(field)) {
+                           AasField fld = field;
+                           convOp = convOp.replace(".fromList(", ".fromElementList(");
+                           wrapOptional(field, 'access.setMultiValue("${field.name}", ${fld.counting}, ${convOp})') + "${setEnd}";
+                       } else {                       
+                           wrapOptional(field, "access.set(${getFieldPath(field, p)}, " + convOp + ")", args="access, a", optFind="access.", optReplace="a.") + "${setEnd}"; 
+                       }
                    }
                }
            }
        } else {
-           String ex = "access.get(${getFieldPath(field, p)}, ${cachingTime(field)})";
-           '${genConvertOp("inConverter", field.type, "to", ex)}';
+           '${genFieldGetCall(field, p)}'
        }
+    }
+
+    @DispatchBasis    
+    def genFieldGetCall(Field field, String p) {
+        String ex = "access.get(${getFieldPath(field, p)}, ${cachingTime(field)})";
+        '${genConvertOp("inConverter", field.type, "to", ex)}';
+    }
+    
+    def genFieldGetCall(AasField field, String p) {
+        if (isMultiField(field)) {
+            String cls = considerWrapper(toTypeName(getElementType(field.type)));
+            String qualifier = getQualifier(field);
+            'access.getMultiValue(${cls}.class, "${field.name}", ${field.counting}${qualifier})'
+        } else {
+            String ex = "access.get(${getFieldPath(field, p)}, ${cachingTime(field)})";
+            String convOp = genConvertOp("inConverter", field.type, "to", ex);
+            if (field.type.isKindOf(ListType) and convOp.startsWith("toList(")) {
+                convOp = convOpt.replace(".toList(", ".toElementList(");
+            }
+            '${convOp}';
+        }
     }
     
     def cachingTime(Field field) {

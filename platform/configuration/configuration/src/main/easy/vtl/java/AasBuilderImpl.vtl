@@ -225,7 +225,7 @@ template AasBuilderImpl(Configuration config, FileArtifact target, AasSubmodelTy
                     addComment = "* @param idShort the actual idShort";
                 }
                 for (AasField p : params) {
-                    String pType = produceMethods(p.type, class, p, grouped, 2);
+                    String pType = produceMethods(stripMultiListType(p), class, p, grouped, 2);
                     String param = produceParameter(p.type, pType, getFieldNameIdentifier(p));
                     paramList = appendWithSeparator(paramList, ", ", param);
                 }
@@ -253,7 +253,7 @@ template AasBuilderImpl(Configuration config, FileArtifact target, AasSubmodelTy
 
     def produceSetterInner(sequenceOf(AasField) params, String class) {
         for (AasField p : params) {
-            '${produceMethods(p.type, class, p, params, 1)}'
+            '${produceMethods(stripMultiListType(p), class, p, params, 1)}'
         }
     }
 
@@ -541,7 +541,7 @@ template AasBuilderImpl(Configuration config, FileArtifact target, AasSubmodelTy
         for (AasField field: fields) {
             if (!inGrouping.includes(field.name)) {
                 sequenceOf(AasField) grouped = fields->select(AasField f | f.groupWith == field.name);
-                '${produceMethods(field.type, class, field, grouped, 0)|e}'
+                '${produceMethods(stripMultiListType(field), class, field, grouped, 0)|e}'
             }
         }
     }

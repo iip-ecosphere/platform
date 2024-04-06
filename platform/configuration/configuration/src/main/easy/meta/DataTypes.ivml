@@ -86,6 +86,31 @@ project DataTypes {
         refTo(DataType) type;
     }
     
+    ListType IntegerListType = {
+        name = "IntegerListType",
+        type = refBy(IntegerType)
+    };
+
+    ListType BooleanListType = {
+        name = "BooleanListType",
+        type = refBy(BooleanType)
+    };
+
+    ListType StringListType = {
+        name = "StringListType",
+        type = refBy(StringType)
+    };
+
+    ListType DoubleListType = {
+        name = "DoubleListType",
+        type = refBy(DoubleType)
+    };
+
+    ListType FloatListType = {
+        name = "FloatListType",
+        type = refBy(FloatType)
+    };
+    
     compound RecordType refines CDataProperty, DataType {
         Fields fields;
         Constraint fieldNamesUnique = fields->select(f|isRelevant(f))->isUnique(l|l.name);
@@ -379,6 +404,11 @@ project DataTypes {
         DoubleArrayType;
         StringArrayType;
         IEC61131_3DateTimeType;
+        IntegerListType;
+        BooleanListType;
+        StringListType;
+        DoubleListType;
+        FloatListType;
         iipVer;
         BaSyx10Plugin;
     };

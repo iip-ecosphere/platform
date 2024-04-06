@@ -11,7 +11,7 @@ template AasAccessorImpl(Configuration config, FileArtifact target, AasSubmodelT
 
     def produceMethodsForFields(AasFields fields, String class) {
         for (AasField field: fields) {
-            '${produceMethods(field.type, class, field, 0)|e}'
+            '${produceMethods(stripMultiListType(field), class, field, 0)|e}'
         }
     }
 

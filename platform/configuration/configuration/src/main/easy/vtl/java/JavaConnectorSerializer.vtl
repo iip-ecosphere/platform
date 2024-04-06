@@ -115,8 +115,21 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
            } else {
                ex = path + ".get" + asMethodNameSuffix(field.name) + "()";
            }
-           '${genConvertOp("inConverter", field.type, "to", ex)}';
+           '${adjustConvertOp(field, genConvertOp("inConverter", field.type, "to", ex))}';
        }
+    }
+    
+    @DispatchBasis
+    def adjustConvertOp(Field field, String convOp) {
+        '${convOp}'
+    }
+
+    @DispatchCase
+    def adjustConvertOp(AasField field, String convOp) {
+        if (isMultiField(field) and field.type.isKindOf(ListType)) {
+            convOp = convOp.replace(".toList(", ".toElementList(");
+        }
+        '${convOp}'
     }
 
     def produceDataTransfer(Field tgt, String tgtQual, Field src, String srcQual, String indexes, String paths) {

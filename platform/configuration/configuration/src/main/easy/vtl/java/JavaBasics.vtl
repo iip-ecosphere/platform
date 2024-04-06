@@ -193,7 +193,8 @@ template JavaBasics(Configuration config, FileArtifact target) {
     }
     
     def String toTypeName(ListType type) {
-        String t = considerWrapper(toTypeName(type));
+        DataType eltType = type.type;
+        String t = considerWrapper(toTypeName(eltType));
         "java.util.List<${t}>"
     }
     
@@ -402,6 +403,43 @@ template JavaBasics(Configuration config, FileArtifact target) {
              }
         }
         asIdentifier(result);
-    }    
+    }
+    
+    @DispatchBasis
+    def getQualifier(Field field) {
+        "";
+    }
+    
+    @DispatchCase
+    def getQualifier(AasField field) {
+        String semId = getStringValueSafe(field.semanticId, "");
+        if (semId <> "") {
+            ', "${semId}"';
+        } else {
+            "";
+        }
+    }
+    
+    @DispatchBasis
+    def isMultiField(Field field) {
+        false;
+    }
+        
+    @DispatchCase
+    def isMultiField(AasField field) {
+        Integer minInst = getIntegerValueSafe(field.minimumInstances, -1);
+        Integer maxInst = getIntegerValueSafe(field.maximumInstances, -1);
+        field.counting or maxInst > 1 or (minInst >= 0 and maxInst < 0); // counting: IDTA 2001 ApplicationUri
+    }
+    
+    @DispatchBasis
+    def DataType getElementType(DataType type) {
+        type;
+    }
+
+    @DispatchCase    
+    def DataType getElementType(ListType type) {
+        type.type;
+    }
 
 }

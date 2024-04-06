@@ -165,5 +165,14 @@ template AasBasics(Configuration config, FileArtifact target) {
     def isOpen(AasEnumType elt) {
         elt.isOpen == true;
     }
+    
+    
+    def DataType stripMultiListType(Field field) {
+        DataType type = field.type;
+        if (isMultiField(field)) {
+            type = getElementType(type);
+        }
+        type;
+    }
 
 }

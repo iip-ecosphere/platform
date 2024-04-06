@@ -342,89 +342,109 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
     
     // convName is the infix of InputConverter/OutputFormatter conversion functions, e.g., toShort/fromShort
     // types defined in JavaBasic must match these functions; confParam in particular for date must match also
-    
+    @DispatchBasis    
     def convName(DataType type) {
         ""
     }
     
     // to/from will be prefixed, must map to method names in Input/OutputConverter
+    @DispatchCase
     def convName(PrimitiveType type) {
         "/* NOT DEFINED */"
     }
 
+    @DispatchCase
     def convName(ObjectTypeType type) {
         "Object"
     }
 
+    @DispatchCase
     def convName(ShortTypeType type) {
         "Short"
     }
     
+    @DispatchCase
     def convName(IntegerTypeType type) {
         "Integer"
     }
     
+    @DispatchCase
     def convName(LongTypeType type) {
         "Long"
     }
 
+    @DispatchCase
     def convName(StringTypeType type) {
         "String"
     }
     
+    @DispatchCase
     def convName(BooleanTypeType type) {
         "Boolean"
     }
 
+    @DispatchCase
     def convName(FloatTypeType type) {
         "Float"
     }
 
+    @DispatchCase
     def convName(DoubleTypeType type) {
          "Double"
     }
 
+    @DispatchCase
     def convName(ByteTypeType type) {
          "Byte"
     }
 
+    @DispatchCase
     def convName(EnumType type) {
          "Enum"
     }
 
     // Start - Added types OPC UA - by Ahmad
+    @DispatchCase
     def convName(Integer16TypeType type) {
          "Short"
     }
 
+    @DispatchCase
     def convName(Integer32TypeType type) {
          "Integer"
     }
     
+    @DispatchCase
     def convName(Integer64TypeType type) {
          "Long"
     }
     
+    @DispatchCase
     def convName(SByteTypeType type) {
          "Byte"
     }
     
+    @DispatchCase
     def convName(UnsignedInteger16TypeType type) {
          "Short"
     }
 
+    @DispatchCase
     def convName(UnsignedInteger32TypeType type) {
          "Integer"
     }
     
+    @DispatchCase
     def convName(UnsignedInteger64TypeType type) {
          "Long"
     }
     
+    @DispatchCase
     def convName(ByteStringTypeType type) {
          "ByteArray"
     }
     
+    @DispatchCase
     def convName(DateTimeTypeType type) {
          "LocalDateTime"
     }
@@ -433,44 +453,67 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
     /*def convName(ByteArrayTypeType type) { // currently no method in interface, needed?
     }*/
 
+    @DispatchCase
     def convName(StringArrayTypeType type) {
         "StringArray"
     }
 
+    @DispatchCase
     def convName(IntegerArrayTypeType type) {
         "IntegerArray"
     }
 
+    @DispatchCase
     def convName(DoubleArrayTypeType type) {
         "DoubleArray"
     }
 
+    @DispatchCase
     def convName(ArrayType type) {
         "Object" // fallback
     }
 
+    @DispatchCase
+    def convName(ListType type) {
+        "List"
+    }
+
+    @DispatchCase
     def convName(IEC61131_3DateTimeTypeType type) {
         "Date"
     }
     
     // dispatch basis, additional parameter to be passed to the parser/formatter conversion method, usually empty
+    @DispatchBasis
     def convParam(DataType type, Boolean convFrom) {
         "" // no param
     }
 
+    @DispatchCase
     def convParam(DateTimeTypeType type, Boolean convFrom) {
         "\"ISO8601\""
     }
 
+    @DispatchCase
     def convParam(IEC61131_3DateTimeTypeType type, Boolean convFrom) {
         "\"'DT#'YYYY-MM-dd-HH:mm:ss.SS\""
     }
     
+    @DispatchCase
     def convParam(EnumType type, Boolean convFrom) {
         if (convFrom) {
             ""
         } else {
             toTypeName(type) + ".class";
+        }
+    }
+
+    @DispatchCase
+    def convParam(ListType type, Boolean convFrom) {
+        if (convFrom) {
+            ""
+        } else {
+            toTypeName(type.type) + ".class";
         }
     }
     

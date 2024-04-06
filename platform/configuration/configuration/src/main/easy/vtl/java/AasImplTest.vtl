@@ -33,7 +33,7 @@ template AasImplTest(Configuration config, FileArtifact target, AasSubmodelType 
         currentType = origin; 
         String result = "";
         for (AasField f: fields) {
-            result = appendWithNewline(result, '${genPopulateField(f, f.type, mode)}');
+            result = appendWithNewline(result, '${genPopulateField(f, stripMultiListType(f), mode)}');
         }
         currentType = currentBefore;
         '${result|e}'
