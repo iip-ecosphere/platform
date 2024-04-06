@@ -1,0 +1,17 @@
+AAS ReliabilityExample
+ ASSET ci INSTANCE
+ SUBMODEL Reliability (semanticId: irdi:0112/2///62683#ACC008#001)
+  PROPERTY NumberOfReliabilitySets = 1 (semanticId: irdi:0112/2///62683#ACE006#001)
+  SMC OperatingConditionsOfReliabilityCharacteristics01 (semanticId: irdi:0112/2///62683#ACG071#001)
+   PROPERTY MaximumRatedVoltage = 30.0 (semanticId: irdi:0112/2///61987#ABD462#004)
+   PROPERTY MinimumRatedVoltage = 15.0 (semanticId: irdi:0112/2///61987#ABD461#004)
+   PROPERTY OtherOperatingConditions = Duty in number of operations per hour, 50% of normal current (semanticId: irdi:0112/2///62683#ACE070#001)
+   PROPERTY RatedOperationalCurrent = 300.0 (semanticId: iri:https://admin-shell.io/idta/Reliabliity/RatedOperationalCurrent/1/0)
+   PROPERTY RatedVoltage = 24.0 (semanticId: irdi:0112/2///61987#ABA588#004)
+   PROPERTY TypeOfVoltage = DC (semanticId: irdi:0112/2///61987#ABA969#007)
+   PROPERTY UsefulLifeInNumberOfOperations = 50 (semanticId: irdi:0112/2///62683#ACE055#001)
+   PROPERTY UsefulLifeInTimeInterval = 10.0 (semanticId: irdi:0112/2///62683#ACE054#001)
+  SMC ReliabilityCharacteristics01 (semanticId: irdi:0112/2///62683#ACG080#001)
+   PROPERTY B10 = 500000 (semanticId: iri:https://admin-shell.io/idta/Reliabliit/B10/1/0)
+   PROPERTY MTBF = 0 (semanticId: irdi:0112/2///62683#ACE062#001)
+   PROPERTY MTTF = 0 (semanticId: irdi:0112/2///62683#ACE061#001)

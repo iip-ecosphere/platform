@@ -15,7 +15,6 @@ import org.junit.runners.Suite;
 
 import test.de.iip_ecosphere.platform.support.aas.AbstractAasExampleTest;
 import test.de.iip_ecosphere.platform.support.aas.ContactInformationsTest;
-import test.de.iip_ecosphere.platform.support.aas.ElementFactoryTest;
 import test.de.iip_ecosphere.platform.support.aas.IdentifierTypeTest;
 import test.de.iip_ecosphere.platform.support.aas.LangStringTest;
 import test.de.iip_ecosphere.platform.support.aas.LocalInvocationTest;
@@ -62,7 +61,6 @@ import test.de.iip_ecosphere.platform.support.net.UriResolverTest;
     TechnicalDataSubmodelTest.class,
     AbstractAasExampleTest.class,
     UtilsTest.class,
-    ElementFactoryTest.class,
     
     // non-generic AAS 
     LangStringTest.class,

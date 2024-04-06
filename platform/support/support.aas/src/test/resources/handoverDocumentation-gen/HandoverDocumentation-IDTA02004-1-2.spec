@@ -1,0 +1,30 @@
+AAS HandoverDocumentationExample
+ ASSET ci INSTANCE
+ SUBMODEL HandoverDocumentation (semanticId: irdi:0173-1#01-AHF578#001)
+  SMC Document01 (semanticId: irdi:0173-1#01-AHF579#001)
+   SMC DocumentClassification01 (semanticId: irdi:0173-1#01-AHF581#001)
+    PROPERTY ClassId = 03-02 (semanticId: irdi:0173-1#02-ABH996#001)
+    MLP ClassName (semanticId: irdi:0173-1#02-AAO102#003)
+    PROPERTY ClassificationSystem = VDI2770 Blatt 1:2020 (semanticId: irdi:0173-1#02-ABH997#001)
+   SMC DocumentId01 (semanticId: irdi:0173-1#01-AHF580#001)
+    PROPERTY DocumentDomainId = 1213455566 (semanticId: irdi:0173-1#02-ABH994#001)
+    PROPERTY IsPrimary = true (semanticId: irdi:0173-1#02-ABH995#001)
+    PROPERTY ValueId = 1213455566 (semanticId: irdi:0173-1#02-AAO099#002)
+   SMC DocumentVersion01 (semanticId: irdi:0173-1#01-AHF582#001)
+    REFERENCE BasedOn01 -> true (semanticId: irdi:0173-1#02-ABI007#001)
+    FILE DigitalFile01 (semanticId: iri:https://oktoflow.de/semId-DigitalFile) length 0
+    PROPERTY DocumentVersionId = V1.2 (semanticId: irdi:0173-1#02-AAO100#002)
+    MLP KeyWords (semanticId: irdi:0173-1#02-ABH999#001)
+    PROPERTY Language01 = en (semanticId: irdi:0173-1#02-AAN468#006)
+    PROPERTY OrganizationName = Example company (semanticId: irdi:0173-1#02-ABI002#001)
+    PROPERTY OrganizationOfficialName = Example company Ltd. (semanticId: irdi:0173-1#02-ABI004#001)
+    FILE PreviewFile01 (semanticId: iri:https://oktoflow.de/semId-PreviewFile) length 0
+    REFERENCE RefersTo01 -> true (semanticId: irdi:0173-1#02-ABI006#001)
+    PROPERTY StatusSetDate = 2024/01/01 00:01:00 (semanticId: irdi:0173-1#02-ABI000#001)
+    PROPERTY StatusValue = released (semanticId: irdi:0173-1#02-ABI001#001)
+    MLP SubTitle (semanticId: irdi:0173-1#02-ABH998#001)
+    MLP Summary (semanticId: irdi:0173-1#02-AAO106#002)
+    MLP Title (semanticId: irdi:0173-1#02-AAO105#002)
+    REFERENCE TranslationOf01 -> true (semanticId: irdi:0173-1#02-ABI008#001)
+   REFERENCE DocumentedEntity01 -> true (semanticId: iri:https://oktoflow.de/semId-DocumentedEntity)
+  ENTITY Entity01
