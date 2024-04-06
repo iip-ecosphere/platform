@@ -15,10 +15,12 @@ package de.iip_ecosphere.platform.connectors.aas;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -36,6 +38,7 @@ import de.iip_ecosphere.platform.connectors.events.PatternTriggerQuery;
 import de.iip_ecosphere.platform.connectors.model.AbstractModelAccess;
 import de.iip_ecosphere.platform.connectors.model.ModelInputConverter;
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
+import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.TimeUtils;
@@ -48,8 +51,11 @@ import de.iip_ecosphere.platform.support.aas.Registry;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
+import de.iip_ecosphere.platform.support.aas.types.common.Utils;
 import de.iip_ecosphere.platform.support.plugins.Plugin;
 import de.iip_ecosphere.platform.support.plugins.PluginManager;
+import de.iip_ecosphere.platform.transport.serialization.QualifiedElement;
+import de.iip_ecosphere.platform.transport.serialization.QualifiedElementFactory;
 
 /**
  * A generic Asset Administration Shell connector. We use hierarchical names to identify sub-models
@@ -63,7 +69,9 @@ import de.iip_ecosphere.platform.support.plugins.PluginManager;
  * </ol>
  * If the application id starts with a known AAS identifier schema, the id is parsed into that and utilized to obtain 
  * the AAS, e.g., iri:urn:... Without, the connector tries to obtain a registry based on an AAS short id, which 
- * currently may fail.
+ * currently may fail. 
+ * 
+ * This class is based on {@link ElementFactory} for IDTA-style property "lists".
  * 
  * @param <CO> the output type to the IIP-Ecosphere platform
  * @param <CI> the input type from the IIP-Ecosphere platform
@@ -72,7 +80,7 @@ import de.iip_ecosphere.platform.support.plugins.PluginManager;
  * @author Jan Cepok, SSE
  */
 @MachineConnector(hasModel = true, supportsModelStructs = false, supportsEvents = false, 
-    specificSettings = {"PLUGINID"})
+    specificSettings = {"PLUGINID"}, supportsMultiValued = true)
 public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, CI> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AasConnector.class);
@@ -148,7 +156,17 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
         } else {
             this.factory = factory;
         }
-        configureModelAccess(new AasModelAccess());
+        configureModelAccess(new AasModelAccess(this));
+    }
+    
+    /**
+     * Returns the AAS for {@code aasId}.
+     * 
+     * @param aasId the AASid
+     * @return the AAS or <b>null</b>
+     */
+    private Aas getAas(String aasId) {
+        return connectedAAS.get(aasId);
     }
 
     // checkstyle: stop exception type check
@@ -399,7 +417,7 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
      * @author Holger Eichelberger, SSE
      * @author Jan Cepok, SSE
      */
-    private class AasModelAccess extends AbstractModelAccess {
+    private static class AasModelAccess extends AbstractModelAccess {
 
         private static final char SEPARATOR_CHAR = '/';
         private static final String SEPARATOR_STRING = "/";
@@ -408,26 +426,31 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
         private AasModelAccess parent;
         private AasInputConverter inputConverter = new AasInputConverter();
         private Map<String, Map<String, ElementsAccess>> elements = new HashMap<>();
+        private AasConnector<?, ?> conn;
         
         /**
          * Creates the instance and binds the listener to the creating connector instance.
+         * 
+         * @param conn the connector
          */
-        protected AasModelAccess() {
-            super(AasConnector.this);
+        protected AasModelAccess(AasConnector<?, ?> conn) {
+            super(conn);
+            this.conn = conn;
         }
         
         /**
          * Creates the instance and binds the listener to the creating connector
          * instance. Sets a resolution context by the given submodel/collection.
          * 
+         * @param conn     the parent connector
          * @param base     the element to resolve on
          * @param parent   the return parent for {@link #stepOut()}
          * @param basePath the base path
          * @param elements already known elements
          */
-        protected AasModelAccess(ElementsAccess base, AasModelAccess parent, String basePath,
+        protected AasModelAccess(AasConnector<?, ?> conn, ElementsAccess base, AasModelAccess parent, String basePath,
             Map<String, Map<String, ElementsAccess>> elements) {
-            this();
+            this(conn);
             this.base = base;
             this.parent = parent;
             this.basePath = basePath;
@@ -451,6 +474,15 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
          */
         public ModelInputConverter getInputConverter() {
             return inputConverter;
+        }
+
+        /**
+         * Returns the base access instance.
+         * 
+         * @return the base instance
+         */
+        ElementsAccess getBase() {
+            return base;
         }
         
         /**
@@ -486,7 +518,7 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
          * @return the AAS id
          */
         private String getAasId() {
-            return pollingThread == Thread.currentThread() ? pollingAas : nonPollingAas;
+            return conn.pollingThread == Thread.currentThread() ? conn.pollingAas : conn.nonPollingAas;
         }
         
         /**
@@ -505,7 +537,7 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
                 String path = qName;
                 if (null == result) {
                     int pos = qName.indexOf(SEPARATOR_CHAR);
-                    Aas aas = connectedAAS.get(aasId);
+                    Aas aas = conn.getAas(aasId);
                     if (null != aas) {
                         if (pos > 0) {
                             result = aas.getSubmodel(qName.substring(0, pos));
@@ -640,7 +672,7 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
         // checkstyle: resume exception type check
 
         @Override
-        public <T> T getStruct(String qName, Class<T> type) throws IOException {
+        public <C> C getStruct(String qName, Class<C> type) throws IOException {
             throw new IOException("Structs are not implemented in AAS"); // see @MachineConnector
         }
 
@@ -666,7 +698,7 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
 
         @Override
         protected ConnectorParameter getConnectorParameter() {
-            return params;
+            return conn.params;
         }
 
         @Override
@@ -675,21 +707,21 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
             
             if (!name.contains("/") && basePath == null) {
                 if (null == base) {
-                    Aas aas = connectedAAS.get(getAasId());
+                    Aas aas = conn.getAas(getAasId());
                     if (null == aas) {
-                        throw new IOException("AAS " + pollingAas + " not found. Cannot resolve further.");
+                        throw new IOException("AAS " + conn.pollingAas + " not found. Cannot resolve further.");
                     }
                     Submodel submodel = aas.getSubmodel(name);
                     if (null == submodel) {
                         throw new IOException("Submodel " + name + " not found. Cannot resolve further.");
                     }
-                    result = new AasModelAccess(submodel, this, null, elements);
+                    result = new AasModelAccess(conn, submodel, this, null, elements);
                 } else {
                     SubmodelElementCollection coll = base.getSubmodelElementCollection(name);
                     if (null == coll) {
                         throw new IOException("Collection " + name + " not found. Cannot resolve further.");
                     }
-                    result = new AasModelAccess(coll, this, null, elements);
+                    result = new AasModelAccess(conn, coll, this, null, elements);
                 }
             } else {
                 if (!name.contains("/")) {
@@ -698,24 +730,127 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
                 if (!elements.isEmpty()) {
                     String aasId = getAasId();
                     if (elements.get(aasId).containsKey(name)) {
-                        result = new AasModelAccess(elements.get(aasId).get(name), this, name, elements);
+                        result = new AasModelAccess(conn, elements.get(aasId).get(name), this, name, elements);
                     }
                 }
                 if (result == null) {
                     if (null == base) {
                         basePath = name;
-                        result = new AasModelAccess(retrieveElement(name), this, basePath, elements);
+                        result = new AasModelAccess(conn, retrieveElement(name), this, basePath, elements);
                     }
                 }
             }
             return result;    
         }
-            
-          
 
         @Override
         public AasModelAccess stepOut() {
             return parent;
+        }
+        
+        @Override
+        public <C> List<QualifiedElement<C>> getMultiValue(Class<C> eltCls, String name, 
+            boolean enumerated, String... qualifier) throws IOException {
+            ElementsAccess eltAccess = getBase();
+            List<QualifiedElement<C>> result = null;
+            if (enumerated) {
+                int index = 1;
+                Object value;
+                do {
+                    try {
+                        String idShort = Utils.getCountingIdShort(name, index);
+                        value = get(idShort);
+                        String semId = null;
+                        if (null != eltAccess) {
+                            SubmodelElement elt = eltAccess.getSubmodelElement(idShort);
+                            if (null != elt) {
+                                semId = elt.getSemanticId();
+                            }
+                        }
+                        result = addResult(result, eltCls, value, semId);
+                        index++;
+                    } catch (IOException e) {
+                        if (index == 1) {
+                            throw e;
+                        }
+                        break;
+                    }
+                } while (value != null);
+            } else if (null != eltAccess) {
+                Set<String> semId = CollectionUtils.toSet(qualifier);
+                for (SubmodelElement elt : eltAccess.submodelElements()) {
+                    if (semId.contains(elt.getSemanticId())) {
+                        try {
+                            Object value = get(elt.getIdShort());
+                            result = addResult(result, eltCls, value, elt.getSemanticId());
+                        } catch (IOException e) {
+                            throw e;
+                        }
+                    }
+                }
+            }
+            return result;
+        }
+
+        /**
+         * Adds a result {@code value} to {@code result} if {@code value} complies with {@code cls}.
+         * 
+         * @param <C> the element value type
+         * @param result the result list, may be <b>null</b>
+         * @param eltCls the class of the element value type
+         * @param value the value to add
+         * @param qualifier the semantic id of the value/property
+         * @return {@code result} or a new instance, possibly containing {@code value}
+         */
+        private static <C> List<QualifiedElement<C>> addResult(List<QualifiedElement<C>> result, Class<C> eltCls, 
+            Object value, String qualifier) {
+            if (value != null) {
+                if (null == result) {
+                    result = new ArrayList<QualifiedElement<C>>();
+                }
+                if (eltCls.isInstance(value)) {
+                    QualifiedElement<C> elt = QualifiedElementFactory.createElement(eltCls);
+                    elt.setValue(eltCls.cast(value));
+                    elt.setQualifier(qualifier);
+                    result.add(elt); // converter?
+                } else {
+                    result.add(null);
+                }
+            }
+            return result;
+        }
+        
+        @Override
+        public void setMultiValue(String name, boolean enumerated, List<QualifiedElement<?>> elements) 
+            throws IOException {
+            ElementsAccess eltAccess = getBase();
+            // unclear how to write it otherways
+            for (int i = 0; i < elements.size(); i++) {
+                String idShort = Utils.getCountingIdShort(name, i);
+                set(idShort, elements.get(i));
+                if (null != eltAccess) {
+                    String semId = elements.get(i).getQualifier();
+                    if (null != semId) {
+                        SubmodelElement elt = eltAccess.getSubmodelElement(idShort);
+                        if (null != elt) {
+                            elt.setSemanticId(semId);
+                        }
+                    }
+                }
+            }
+            
+            if (null != eltAccess) { // assumes subsequent listing
+                int i = elements.size();
+                SubmodelElement elt;
+                do {
+                    String idShort = Utils.getCountingIdShort(name, i);
+                    elt = eltAccess.getSubmodelElement(idShort);
+                    if (null != eltAccess) {
+                        eltAccess.deleteElement(idShort);
+                    }
+                    i++;
+                } while (elt != null);
+            }
         }
         
     }
@@ -729,5 +864,5 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
     public String enabledEncryption() {
         return null;
     }
-
+    
 }
