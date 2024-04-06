@@ -15,10 +15,12 @@ package de.iip_ecosphere.platform.connectors.parser;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 
 import de.iip_ecosphere.platform.connectors.formatter.FormatCache;
 import de.iip_ecosphere.platform.support.function.IOConsumer;
 import de.iip_ecosphere.platform.transport.serialization.IipEnum;
+import de.iip_ecosphere.platform.transport.serialization.QualifiedElement;
 
 /**
  * Interfaces for generic named/indexed input parsers. Custom implementations must have a constructor with a single 
@@ -354,6 +356,28 @@ public interface InputParser<T> {
             return result;
         }
         
+        /**
+         * Converts parsed data returned by {@link ParseResult} to a list instance.
+         *  
+         * @param <E> the element type
+         * @param data the obtained data
+         * @param eltCls the element type class
+         * @return the converted list instance
+         * @throws IOException if the conversion fails
+         */
+        public <E> List<E> toList(T data, Class<E> eltCls) throws IOException;
+
+        /**
+         * Converts parsed data returned by {@link ParseResult} to a list instance.
+         *  
+         * @param <E> the element type
+         * @param data the obtained data
+         * @param eltCls the element type class
+         * @return the converted list instance
+         * @throws IOException if the conversion fails
+         */
+        public <E> List<QualifiedElement<E>> toElementList(T data, Class<E> eltCls) throws IOException;
+
         /**
          * Converts parsed data returned by {@link ParseResult} to an object. [fallback dummy]
          * 

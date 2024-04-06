@@ -13,10 +13,12 @@
 package de.iip_ecosphere.platform.connectors.model;
 
 import java.io.IOException;
+import java.util.List;
 
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.MachineConnector;
 import de.iip_ecosphere.platform.connectors.types.ConnectorOutputTypeTranslator;
+import de.iip_ecosphere.platform.transport.serialization.QualifiedElement;
 
 /**
  * Provides access to a model-based protocol such as OPC UA or AAS. This interface shall be implemented by the connector
@@ -238,6 +240,25 @@ public interface ModelAccess {
             throw new IOException("Cannot turn " + tmp + "into a string");
         }
     }
+    
+    /**
+     * Returns the value of a multi-valued property in IDTA style.
+     * 
+     * @param <C> the type of the element value
+     * @param eltCls the class of the element value type
+     * @param name the (basic, generic) name of the property
+     * @param enumerated whether the name used for identifying multi-values in a sequence or whether their 
+     *     qualifiers shall be used
+     * @param qualifiers the qualifier(s) denoting the properties to return if {@code enumerated} is false
+     * @return the value(s), may be <b>null</b> for none, may be <b>null</b> at individual positions if casting to 
+     *     {@code cls} fails
+     * @throws IOException an exception if accessing a relevant property/value fails (always, see 
+     *     {@link MachineConnector#supportsMultiValued()})
+     */
+    public default <C> List<QualifiedElement<C>> getMultiValue(Class<C> eltCls, String name, 
+        boolean enumerated, String... qualifiers) throws IOException {
+        throw new IOException("Multi-valued operations are not implemented");
+    }    
 
     /**
      * Changes a property value.
@@ -345,6 +366,46 @@ public interface ModelAccess {
         set(qName, value);
     }
 
+    /**
+     * Sets a multi-value represented by multiple entities.
+     * 
+     * @param name the (basic, generic) name of the property
+     * @param enumerated whether the name used for identifying multi-values in a sequence or whether their 
+     *     qualifiers shall be used
+     * @param elements the elements/values to be set
+     * @throws IOException an exception if accessing a relevant property/value fails (always, see 
+     *     {@link MachineConnector#supportsMultiValued()})
+     */
+    @SuppressWarnings("unchecked")
+    public default void setMultiValue(String name, boolean enumerated, Object elements) 
+        throws IOException {
+        if (elements instanceof List) {
+            List<?> tmp = (List<?>) elements;
+            boolean allElements = true;
+            for (int i = 0; i < tmp.size(); i++) {
+                allElements = tmp.get(i) instanceof QualifiedElement;
+            }
+            if (allElements) {
+                setMultiValue(name, enumerated, (List<QualifiedElement<?>>) elements);
+            }
+        }
+    }
+
+    /**
+     * Sets a multi-value represented by multiple entities.
+     * 
+     * @param name the (basic, generic) name of the property
+     * @param enumerated whether the name used for identifying multi-values in a sequence or whether their 
+     *     qualifiers shall be used
+     * @param elements the elements/values to be set
+     * @throws IOException an exception if accessing a relevant property/value fails (always, see 
+     *     {@link MachineConnector#supportsMultiValued()})
+     */
+    public default void setMultiValue(String name, boolean enumerated, List<QualifiedElement<?>> elements) 
+        throws IOException {
+        throw new IOException("Multi-valued operations are not implemented");
+    }
+    
     // complex types
     
     /**

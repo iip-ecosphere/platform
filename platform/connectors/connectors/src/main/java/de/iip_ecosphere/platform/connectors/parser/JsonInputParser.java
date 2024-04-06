@@ -14,7 +14,9 @@ package de.iip_ecosphere.platform.connectors.parser;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.slf4j.LoggerFactory;
 
@@ -25,6 +27,8 @@ import com.jsoniter.any.Any.EntryIterator;
 import com.jsoniter.spi.JsonException;
 
 import de.iip_ecosphere.platform.support.json.JsonUtils;
+import de.iip_ecosphere.platform.transport.serialization.QualifiedElement;
+import de.iip_ecosphere.platform.transport.serialization.QualifiedElementFactory;
 import de.iip_ecosphere.platform.support.function.IOConsumer;
 
 /**
@@ -530,7 +534,43 @@ public final class JsonInputParser implements InputParser<Any> {
         public Object toObject(Any data) throws IOException {
             return null; // preliminary
         }
-        
+
+        @Override
+        public <E> List<E> toList(Any data, Class<E> eltCls) throws IOException {
+            List<E> result = new ArrayList<>(data.size());
+            for (int i = 0; i < data.size(); i++) {
+                Object obj = data.get(i);
+                if (obj instanceof QualifiedElement) {
+                    obj = ((QualifiedElement<?>) obj).getValue();
+                }
+                if (eltCls.isInstance(obj)) {
+                    result.add(eltCls.cast(obj));
+                } else {
+                    throw new IOException("Element " + i + " " + obj + " is not of type " + eltCls.getName());
+                }
+            }
+            return result;
+        }
+
+        @Override
+        public <E> List<QualifiedElement<E>> toElementList(Any data, Class<E> eltCls) throws IOException {
+            List<QualifiedElement<E>> result = new ArrayList<>(data.size());
+            for (int i = 0; i < data.size(); i++) {
+                Object obj = data.get(i);
+                if (obj instanceof QualifiedElement) { // AAS element conversion
+                    obj = ((QualifiedElement<?>) obj).getValue();
+                }
+                if (eltCls.isInstance(obj)) {
+                    QualifiedElement<E> elt = QualifiedElementFactory.createElement(eltCls);
+                    elt.setValue(eltCls.cast(obj));
+                    result.add(elt);                    
+                } else {
+                    throw new IOException("Element " + i + " " + obj + " is not of type " + eltCls.getName());
+                }
+            }
+            return result;
+        }
+
     }
     
     @Override

@@ -13,8 +13,10 @@
 package de.iip_ecosphere.platform.connectors.parser;
 
 import java.io.IOException;
+import java.util.List;
 
 import de.iip_ecosphere.platform.connectors.parser.InputParser.InputConverter;
+import de.iip_ecosphere.platform.transport.serialization.QualifiedElement;
 
 /**
  * A basic String to primitive types converter.
@@ -109,6 +111,16 @@ public class ConverterFromString implements InputConverter<String> {
 
     @Override
     public Object toObject(String data) throws IOException {
+        throw new IOException("currently not implemented");
+    }
+
+    @Override
+    public <E> List<E> toList(String data, Class<E> eltCls) throws IOException {
+        throw new IOException("currently not implemented");
+    }
+
+    @Override
+    public <E> List<QualifiedElement<E>> toElementList(String data, Class<E> eltCls) throws IOException {
         throw new IOException("currently not implemented");
     }
 

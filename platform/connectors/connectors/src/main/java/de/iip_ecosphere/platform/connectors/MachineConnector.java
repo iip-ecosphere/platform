@@ -95,6 +95,14 @@ public @interface MachineConnector {
      */
     public String[] specificSettings() default {};
     
+    /**
+     * Returns whether a connector with {@link #hasModel() information model} supports multi-valued
+     * entries.
+     * 
+     * @return {@code true} for multi-valued, {@code false} else
+     */
+    public boolean supportsMultiValued() default false;
+    
     // on further properties, adjust ConnectorsAas/ConnectorsAasTest!
     
 }

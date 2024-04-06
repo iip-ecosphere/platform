@@ -14,8 +14,10 @@ package de.iip_ecosphere.platform.connectors.formatter;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 
 import de.iip_ecosphere.platform.connectors.formatter.OutputFormatter.OutputConverter;
+import de.iip_ecosphere.platform.transport.serialization.QualifiedElement;
 
 /**
  * Converts primitive data to string format.
@@ -92,6 +94,16 @@ public class ConverterToString implements OutputConverter<String> {
     @Override
     public String fromDate(Date data, String format) throws IOException {
         return FormatCache.format(data, format);
+    }
+
+    @Override
+    public String fromList(List<?> data) throws IOException {
+        throw new IOException("currently not supported");
+    }
+
+    @Override
+    public <E> String fromElementList(List<QualifiedElement<E>> data) throws IOException {
+        throw new IOException("currently not supported");
     }
 
 }

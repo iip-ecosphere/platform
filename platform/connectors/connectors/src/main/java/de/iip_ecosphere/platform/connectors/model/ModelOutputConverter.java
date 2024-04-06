@@ -13,10 +13,13 @@
 package de.iip_ecosphere.platform.connectors.model;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import de.iip_ecosphere.platform.connectors.formatter.OutputFormatter;
 import de.iip_ecosphere.platform.connectors.formatter.OutputFormatter.OutputConverter;
+import de.iip_ecosphere.platform.transport.serialization.QualifiedElement;
 
 /**
  * Output converter implementing the {@link ModelAccess} conversion conventions. An
@@ -104,6 +107,23 @@ public class ModelOutputConverter implements OutputConverter<Object> {
     @Override
     public Object fromObject(Object data) throws IOException {
         return data;
+    }
+
+    @Override
+    public Object fromList(List<?> data) throws IOException {
+        List<Object> result = new ArrayList<>(data.size());
+        for (Object o : data) {
+            if (o instanceof QualifiedElement) {
+                o = ((QualifiedElement<?>) o).getValue();
+            }
+            result.add(o);
+        }
+        return result;
+    }
+
+    @Override
+    public <E> Object fromElementList(List<QualifiedElement<E>> data) throws IOException {
+        return data; // intended
     }
 
 }

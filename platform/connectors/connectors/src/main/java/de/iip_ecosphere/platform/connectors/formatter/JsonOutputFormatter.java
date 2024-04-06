@@ -15,6 +15,7 @@ package de.iip_ecosphere.platform.connectors.formatter;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Date;
+import java.util.List;
 import java.util.Stack;
 
 import com.fasterxml.jackson.core.JsonFactory;
@@ -22,6 +23,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.iip_ecosphere.platform.support.function.IOConsumer;
+import de.iip_ecosphere.platform.transport.serialization.QualifiedElement;
 
 /**
  * JSON output formatter (preliminary).
@@ -117,6 +119,31 @@ public class JsonOutputFormatter implements OutputFormatter<IOConsumer<JsonGener
                     }
                     g.writeArray(tmp, 0, tmp.length);
                 }
+            };
+        }
+
+        @Override
+        public IOConsumer<JsonGenerator> fromList(List<?> data) throws IOException {
+            return g -> {
+                g.writeStartArray();
+                for (Object o : data) {
+                    if (o instanceof QualifiedElement) {
+                        o = ((QualifiedElement<?>) o).getValue();
+                    }
+                    g.writeObject(o);
+                }
+                g.writeEndArray();
+            };
+        }
+
+        @Override
+        public <E> IOConsumer<JsonGenerator> fromElementList(List<QualifiedElement<E>> data) throws IOException {
+            return g -> {
+                g.writeStartArray();
+                for (QualifiedElement<E> e : data) {
+                    g.writeObject(e.getValue());
+                }
+                g.writeEndArray();
             };
         }
 

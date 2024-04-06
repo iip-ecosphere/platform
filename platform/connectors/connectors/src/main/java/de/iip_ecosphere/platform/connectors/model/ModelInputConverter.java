@@ -13,9 +13,13 @@
 package de.iip_ecosphere.platform.connectors.model;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import de.iip_ecosphere.platform.connectors.parser.InputParser;
 import de.iip_ecosphere.platform.connectors.parser.InputParser.InputConverter;
+import de.iip_ecosphere.platform.transport.serialization.QualifiedElement;
+import de.iip_ecosphere.platform.transport.serialization.QualifiedElementFactory;
 
 /**
  * Input converter implementing the {@link ModelAccess} conversion conventions. An
@@ -98,6 +102,52 @@ public class ModelInputConverter implements InputConverter<Object> {
     @Override
     public Object toObject(Object data) throws IOException {
         return data;
+    }
+
+    @Override
+    public <E> List<E> toList(Object data, Class<E> eltCls) throws IOException {
+        if (data instanceof List) {
+            List<?> src = (List<?>) data;
+            List<E> result = new ArrayList<>(src.size());
+            for (int i = 0; i < src.size(); i++) {
+                Object obj = src.get(i);
+                if (obj instanceof QualifiedElement) { // AAS element conversion
+                    obj = ((QualifiedElement<?>) obj).getValue();
+                }
+                if (eltCls.isInstance(obj)) {
+                    result.add(eltCls.cast(obj));
+                } else {
+                    throw new IOException("Element " + i + " " + obj + " is not of type " + eltCls.getName());
+                }
+            }
+            return result;
+        } else {
+            throw new IOException("Cannot handle " + data + " as list.");
+        }
+    }
+
+    @Override
+    public <E> List<QualifiedElement<E>> toElementList(Object data, Class<E> eltCls) throws IOException {
+        if (data instanceof List) {
+            List<?> src = (List<?>) data;
+            List<QualifiedElement<E>> result = new ArrayList<>(src.size());
+            for (int i = 0; i < src.size(); i++) {
+                Object obj = src.get(i);
+                if (obj instanceof QualifiedElement) { // AAS element conversion
+                    obj = ((QualifiedElement<?>) obj).getValue();
+                }
+                if (eltCls.isInstance(obj)) {
+                    QualifiedElement<E> elt = QualifiedElementFactory.createElement(eltCls);
+                    elt.setValue(eltCls.cast(obj));
+                    result.add(elt);
+                } else {
+                    throw new IOException("Element " + i + " " + obj + " is not of type " + eltCls.getName());
+                }
+            }
+            return result;
+        } else {
+            throw new IOException("Cannot handle " + data + " as list.");
+        }
     }
 
 }
