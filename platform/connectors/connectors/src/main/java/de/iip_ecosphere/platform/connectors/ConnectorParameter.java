@@ -12,17 +12,24 @@
 
 package de.iip_ecosphere.platform.connectors;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import org.apache.commons.io.IOUtils;
 import org.slf4j.LoggerFactory;
 
+import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.identities.IdentityStore;
 import de.iip_ecosphere.platform.support.identities.IdentityToken;
 import de.iip_ecosphere.platform.support.iip_aas.NameplateSetup;
+import de.iip_ecosphere.platform.support.resources.ResourceLoader;
+import de.iip_ecosphere.platform.support.resources.ResourceResolver;
 
 /**
  * Defines the connection parameters for a {@link Connector}. Specific connectors shall document required parameter.
@@ -325,12 +332,52 @@ public class ConnectorParameter {
         /**
          * Adds connector specific settings.
          * 
-         * @param key the key of the setting as defined by the connect
+         * @param key the key of the setting as defined by the connector
          * @param value the value of the setting
          * @return <b>this</b> (builder style)
          */
         public ConnectorParameterBuilder setSpecificSetting(String key, Object value) {
             instance.specificSettings.put(key, value);
+            return this;
+        }
+
+        /**
+         * Adds connector specific settings by reading the setting value from a given resource.
+         * 
+         * @param key the key of the setting as defined by the connector
+         * @param resource the resource to read from
+         * @param resolver optional resource resolver
+         * @return <b>this</b> (builder style)
+         */
+        public ConnectorParameterBuilder setSpecificSettingFromResource(String key, String resource, 
+            ResourceResolver... resolver) throws IOException {
+            InputStream res = ResourceLoader.getResourceAsStream(resource, resolver);
+            if (null != res) {
+                String contents = IOUtils.toString(res, StandardCharsets.UTF_8.name());
+                instance.specificSettings.put(key, contents);
+                FileUtils.closeQuietly(res);
+            }
+            return this;
+        }
+        
+        /**
+         * Adds connector specific settings by reading the setting value as the contents of a given resource. Emits an 
+         * error in case of an exception.
+         * 
+         * @param key the key of the setting as defined by the connector
+         * @param resource the resource to read from
+         * @param resolver optional resource resolver
+         * @return <b>this</b> (builder style)
+         * @see #setSpecificSettingFromResource(String, String, ResourceResolver...)
+         */
+        public ConnectorParameterBuilder setSpecificSettingFromResourceSafe(String key, String resource, 
+                ResourceResolver... resolver) {
+            try {
+                setSpecificSettingFromResource(key, resource, resolver);
+            } catch (IOException e) {
+                LoggerFactory.getLogger(getClass()).error("Cannot determine value of specific setting '{}': {}", 
+                    key, e.getMessage());
+            }
             return this;
         }
 
