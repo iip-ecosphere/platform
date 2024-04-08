@@ -1,6 +1,7 @@
 project Modbus {
 
     import IIPEcosphere;
+    import ModbusPhoenixEEM;
 
     annotate BindingTime bindingTime = BindingTime::compile to .;
 
@@ -52,7 +53,8 @@ project Modbus {
     RecordType dataIn = {
         name = "DataIn",
         fields = {
-          Field {
+          ModbusField {
+            offset = 1234,
             name = "Data",
             type = refBy(IntegerType),
             cachingTime = CACHE_NONE
@@ -61,12 +63,19 @@ project Modbus {
     };    
     RecordType dataOut = {
         name = "DataOut",
-        fields = {
-            Field {
+        fields = // plan: just use imported sequence, EASy exception modbusPhoenixEEMFields
+        {
+          ModbusField {
+            offset = 1234,
             name = "Data",
             type = refBy(IntegerType),
             cachingTime = CACHE_NONE
-          } 
+          }, ModbusField {
+            offset = 1235,
+            name = "Data1",
+            type = refBy(StringType),
+            cachingTime = CACHE_NONE
+          }
        }
     };
 
@@ -81,9 +90,9 @@ project Modbus {
         //port = 502, // default localhost
         
         input = {{type=refBy(dataIn)}},
-        output = {{type=refBy(dataOut)}},
+        output = {{type=refBy(modbusPhoenixEEM)}},
         inInterface = {type=refBy(dataIn)}, 
-        outInterface = {type=refBy(dataOut)}
+        outInterface = {type=refBy(modbusPhoenixEEM)}
     };
 
     // not really needed except for populating the interfaces package
@@ -96,7 +105,7 @@ project Modbus {
         class = "ReceiverImpl",
         artifact = "",
         kind = ServiceKind::SINK_SERVICE,
-        input = {{type=refBy(dataOut)}}
+        input = {{type=refBy(modbusPhoenixEEM)}}
     };
 
     // --------------------- monitoring ---------------------------

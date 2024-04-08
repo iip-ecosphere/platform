@@ -23,7 +23,7 @@ import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import iip.datatypes.DataIn;
-import iip.datatypes.DataOut;
+import iip.datatypes.ModbusPhoenixEEM;
 import iip.nodes.MyModbusConnExample;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 
@@ -51,21 +51,21 @@ public class GeneratedConnector {
         }
         ActiveAasBase.setNotificationMode(NotificationMode.NONE); // disable AAS connector registration
         AtomicInteger count = new AtomicInteger(0);
-        ReceptionCallback<DataOut> cb = new ReceptionCallback<DataOut>() {
+        ReceptionCallback<ModbusPhoenixEEM> cb = new ReceptionCallback<>() {
 
             @Override
-            public void received(DataOut data) {
+            public void received(ModbusPhoenixEEM data) {
                 System.out.println("RCV " + data);
                 count.incrementAndGet();
             }
             
             @Override
-            public Class<DataOut> getType() {
-                return DataOut.class;
+            public Class<ModbusPhoenixEEM> getType() {
+                return ModbusPhoenixEEM.class;
             }
             
         };
-        ModbusTcpIpConnector<DataOut, DataIn> conn = createPlatformConnector(cb);
+        ModbusTcpIpConnector<ModbusPhoenixEEM, DataIn> conn = createPlatformConnector(cb);
         final int maxRequests = 10;
         for (int i = 0; i < maxRequests; i++) {
             System.out.println("REQUEST " + i);
@@ -86,9 +86,9 @@ public class GeneratedConnector {
      * @return the connector instance
      * @throws IOException if creating the connector fails
      */
-    public static ModbusTcpIpConnector<DataOut, DataIn> createPlatformConnector(
-        ReceptionCallback<DataOut> callback) throws IOException {
-        ModbusTcpIpConnector<DataOut, DataIn> conn = new ModbusTcpIpConnector<>(
+    public static ModbusTcpIpConnector<ModbusPhoenixEEM, DataIn> createPlatformConnector(
+        ReceptionCallback<ModbusPhoenixEEM> callback) throws IOException {
+        ModbusTcpIpConnector<ModbusPhoenixEEM, DataIn> conn = new ModbusTcpIpConnector<>(
             MyModbusConnExample.createConnectorAdapter(metrics, new File("modbusTest.txt")));
         conn.connect(MyModbusConnExample.createConnectorParameter());
         conn.setReceptionCallback(callback);
