@@ -394,6 +394,16 @@ project Connectors {
    compound ModbusField refines Field {
        Integer offset;
    } 
+   
+   AliasType Modbus_dword = {
+       name = "Modbus_dword",
+       represents = refBy(Integer32Type)
+   };
+   AliasType Modbus_integer = {
+       name = "Modbus_integer",
+       represents = refBy(Integer16Type)
+   };
+   // more missing, don't forget freezing and mapping in ConnectorResource.vtl!
     
    compound ModbusTcpV1Connector refines Connector { // fixed template types see JavaConnector.vtl
        assign (uiGroup = UiInvisibleGroup) to {
@@ -428,5 +438,10 @@ project Connectors {
            String deviceServiceKey = "ADS";
        }
    }
+   
+   freeze {
+       Modbus_dword;
+       Modbus_integer;
+   };
     
 }

@@ -4,6 +4,8 @@ import JavaBasics;
 @indent(indentation = 4, additional = 0)
 template ConnectorResource(Configuration config, FileArtifact target, Connector conn) {
 
+	mapOf(String, String) modbusTypes = {{"int", "integer"}, {"short", "dword"}}; // incomplete 
+
     @DispatchBasis
     def genContents(Connector conn) {
     }
@@ -51,6 +53,7 @@ template ConnectorResource(Configuration config, FileArtifact target, Connector 
     @DispatchCase
     def collectField(ModbusField field, mapOf(String, String) res) {
         String type = toTypeName(field.type);
+        type = modbusTypes.get(type, type);
         if (type <> "") {
             res.add(field.name, '{"offset" : ${field.offset}, "type" : "${type}"}');
         }

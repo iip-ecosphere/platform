@@ -354,6 +354,12 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
     }
 
     @DispatchCase
+    def convName(AliasType type) {
+        DataType dt = type.represents;
+        convName(dt);
+    }
+
+    @DispatchCase
     def convName(ObjectTypeType type) {
         "Object"
     }
