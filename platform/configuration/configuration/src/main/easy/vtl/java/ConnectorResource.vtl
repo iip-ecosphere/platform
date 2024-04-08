@@ -20,7 +20,7 @@ template ConnectorResource(Configuration config, FileArtifact target, Connector 
         '{'
         for (String field: fields.keys() -> sortedBy(k|k), ",") {
            String val = fields.get(field);
-           ' ${field} : ${fields.get(field)}'
+           ' "${field}" : ${fields.get(field)}'
         }
         '}'
     }
