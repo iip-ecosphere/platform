@@ -908,5 +908,11 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
             '.setSpecificSetting("PARITY", "${parity}")\n'
         }
     }
+
+    @DispatchCase
+    def generateSpecificSettings(ModbusTcpV1Connector conn) {
+        String connectorName = toIdentifier(conn.name);
+        '.setSpecificSettingFromResourceSafe("SERVER_STRUCTURE", "${connectorName}.server")'
+    }
     
 }

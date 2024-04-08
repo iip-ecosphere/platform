@@ -1987,8 +1987,16 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     }
 
     @DispatchCase
-    generateServiceResources(MeshElement no, Connector base, Path appRoot, setOf(String) bins, setOf(String) assemblies, setOf(String) resources, setOf(String) artifacts, Boolean noDeps) = {
-        artifacts.add(getArtifact(base)); // connectors are (currently) platform-supplied
+    generateServiceResources(MeshElement no, Connector conn, Path appRoot, setOf(String) bins, setOf(String) assemblies, setOf(String) resources, setOf(String) artifacts, Boolean noDeps) = {
+        artifacts.add(getArtifact(conn)); // connectors are (currently) platform-supplied
+    }
+
+    @DispatchCase
+    generateServiceResources(MeshElement no, ModbusTcpV1Connector conn, Path appRoot, setOf(String) bins, setOf(String) assemblies, setOf(String) resources, setOf(String) artifacts, Boolean noDeps) = {
+        artifacts.add(getArtifact(conn)); // connectors are (currently) platform-supplied
+        Path resourcesSrc = "${appRoot}/src/main/resources";
+        String connectorName = toIdentifier(conn.name);
+        vilTemplateProcessor("ConnectorResource", config, "${resourcesSrc}/${connectorName}.server", conn=conn);
     }
     
     @DispatchCase

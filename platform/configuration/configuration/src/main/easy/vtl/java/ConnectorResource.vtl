@@ -1,0 +1,63 @@
+import JavaBasics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template ConnectorResource(Configuration config, FileArtifact target, Connector conn) {
+
+    @DispatchBasis
+    def genContents(Connector conn) {
+    }
+    
+    @DispatchBasis
+    def genContents(ModbusTcpV1Connector conn) {
+        mapOf(String, String) fields = {};
+        collectIOTypes(conn.input, fields);
+        collectIOTypes(conn.output, fields);
+        collectIOType(conn.inInterface, fields);
+        collectIOType(conn.outInterface, fields);
+        '{'
+        for (String field: fields.keys() -> sortedBy(k|k), ",") {
+           String val = fields.get(field);
+           ' ${field} : ${fields.get(field)}'
+        }
+        '}'
+    }
+    
+    def collectIOTypes(sequenceOf(IOType) types, mapOf(String, String) res) {
+        for (IOType t: types) {
+            collectIOType(t, res);
+        }
+    }
+    
+    def collectIOType(IOType t, mapOf(String, String) res) {
+        collectFields(t.type, res);
+    }
+
+    @DispatchBasis
+    def collectFields(DataType t, mapOf(String, String) res) {
+    }
+
+    @DispatchCase
+    def collectFields(RecordType t, mapOf(String, String) res) {
+       for (Field f: t.fields) {
+           collectField(f, res);
+       }
+    }
+    
+    @DispatchBasis
+    def collectField(Field field, mapOf(String, String) res) {
+    }
+
+    @DispatchCase
+    def collectField(ModbusField field, mapOf(String, String) res) {
+        String type = toTypeName(field.type);
+        if (type <> "") {
+            res.add(field.name, '{"offset" : ${field.offset}, "type" : "${type}"}');
+        }
+    }
+
+    def main(Configuration config, FileArtifact target, Connector conn) {
+        genContents(conn);
+    }
+    
+}

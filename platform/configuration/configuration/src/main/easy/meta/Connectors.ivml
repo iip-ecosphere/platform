@@ -390,6 +390,10 @@ project Connectors {
    }
    
    // ------------------------ MODBUS / TCP ----------------------------------
+
+   compound ModbusField refines Field {
+       Integer offset;
+   } 
     
    compound ModbusTcpV1Connector refines Connector { // fixed template types see JavaConnector.vtl
        assign (uiGroup = UiInvisibleGroup) to {
@@ -406,10 +410,11 @@ project Connectors {
        assign (uiGroup = UiOptionalGroup2) to {
            String deviceServiceKey = "modbus/tcp";
        }
+       // CONSTRAINTS for FieldTypes -> ModbusField, non-nested
    }
-
+   
    // ------------------------ MODBUS / TCP ----------------------------------
-    
+
    compound AdsConnector refines Connector { // fixed template types see JavaConnector.vtl
        assign (uiGroup = UiInvisibleGroup) to {
            String class = "de.iip_ecosphere.platform.connectors.ads.AdsConnector";
