@@ -208,7 +208,7 @@ public class ConnectorImpl<CO, CI> extends AbstractConnector<Object, Object, CO,
         }
 
         @Override
-        protected ConnectorParameter getConnectorParameter() {
+        public ConnectorParameter getConnectorParameter() {
             return ConnectorImpl.this.getConnectorParameter();
         }
     }
