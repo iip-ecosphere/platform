@@ -54,7 +54,7 @@ public class ModbusTcpIpConnectorTest extends AbstractModbusTcpIpConnectorTest {
      */
     @BeforeClass
     public static void init() {
-        testServer = new TestServer(true);
+        testServer = new TestServer(false);
         testServer.start();
         LOGGER.info("MODBUS TCP/IP server started");
     }
