@@ -31,6 +31,7 @@ import org.junit.runners.Suite;
     //IvmlContainerLxcTests.class,  // -> examples to allow for platform/mangementUi build before
     StorageFactoryTest.class,
     FallbackLoggerTest.class,
+    IvmlApiTests.class,
     
     DataflowGraphFormatTest.class,
     AasIvmlMapperTest.class,

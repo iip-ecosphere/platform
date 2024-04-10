@@ -27,11 +27,26 @@ The setup for this component defines the `base` folder for the model, which typi
 The setup also may contain a `serviceArtifactStorage`and a `containerImageStorage` PackageStorageSetup specification from [deviceMgt](../../resources/deviceMgt/README.md), which are currently not used.
 
 
-## Configuration model
+## Configuration meta-model
 
-The configuration model is written in the languages of EASy-Producer, namely Integrated Variability Modeling Language (IVML), Variability Instantiation Language (VIL) and Variability Template/Asset Language (VTL). EASy-Producer is open source on [github](https://github.com/SSEHUB/EASyProducer), also the most [recent specifications of IVML, VIL and VTL](https://github.com/SSEHUB/EASyProducer/tree/master/doc/web/docPreview). The [configuration model](/src/main/easy) is also explained/documented.
+The configuration meta-model and its instantiation are written in the languages of EASy-Producer, namely Integrated Variability Modeling Language (IVML), Variability Instantiation Language (VIL) and Variability Template/Asset Language (VTL). EASy-Producer is open source on [github](https://github.com/SSEHUB/EASyProducer), also the most [recent specifications of IVML, VIL and VTL](https://github.com/SSEHUB/EASyProducer/tree/master/doc/web/docPreview). The [configuration model](/src/main/easy) is also explained/documented.
 
 The regression tests are based on IVML models. Some just serve for structural purposes and regression testing within this component. Some are executable and part of the regression tests in [examples](../../examples/README.md). Implementation components stem from [test.configuration.configuration](../../tests/test.configuration.configuration/README.md), which is built through the ANT build file within this project. Tests that involve the components for the [management UI](../../managmementUI) and [platform services](../../platform) are defined here, packaged as test-easy artifact and executed in [examples](../../examples/examples). For a graphical documentation of the test cases, see [test case slides](src/test/easy/summary.pdf).
+
+## Meta-model extensions
+
+The platform meta-model ships with various extensions. Some are loaded into the meta-model by default, others must be imported explicity.
+
+* PhoenixContact devices
+* Bitmotec devices
+* Federated learning based on Flower
+* KIProtect KODEX
+* Rapidminer RTSA
+* Example connector models for MIP magentic sensors and NovoAI AVA.
+
+In addition, the meta-model contains two specialized type models for OPC UA (companion specifications) and AAS IDTA specifications. The configuration project contains specialized parsers/model-translators for OPC XML to IVML as well as IDTA (PDF/AASX) to IVML. 
+
+The IDTA tools are meant to be proof-of-context implementations as the specifications/formats allow for many variations. The IDTA tools also contain a program to structurally compare models as well as a program to load AASX files via multiple versions of BaSyx.
 
 ## The resources folder
 

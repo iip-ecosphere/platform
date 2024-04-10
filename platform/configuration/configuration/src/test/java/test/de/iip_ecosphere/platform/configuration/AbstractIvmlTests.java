@@ -502,6 +502,16 @@ public abstract class AbstractIvmlTests {
     }
 
     /**
+     * Helper method to configure for partial instantiation, i.e., generated platform APIs only.
+     * 
+     * @param cfg the configurer instance
+     * @return {@code cfg}
+     */
+    public static InstantiationConfigurer genApi(InstantiationConfigurer cfg) {
+        return cfg.setStartRuleName("generateApi");
+    }
+    
+    /**
      * Helper method to configure for partial instantiation, i.e., apps only and no platform components.
      * 
      * @param cfg the configurer instance

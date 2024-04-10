@@ -1,0 +1,24 @@
+project TechnicalSetup {
+
+    import CommonSetupNoMonUi;
+
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+    
+    // unusual for managed model structure, but reuse common setup here
+
+    // ---------- generation setup ------------
+    
+    containerGeneration = false;
+    sharedInterfaces = true;
+    sharedArtifact = "de.iip-ecosphere.platform:apps.AppInterfacesApi:" + iipVer; // for testing all-in-one
+
+    // ------------ freezing ------------------
+    
+    freeze {
+        sharedInterfaces;
+        sharedArtifact;
+        containerGeneration;
+        .; // every variable declared in this project
+    } but (f|f.bindingTime >= BindingTime.runtimeMon);
+
+}
