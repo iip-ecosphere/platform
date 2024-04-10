@@ -323,7 +323,7 @@ public class ConnectorTest {
             }
 
             @Override
-            protected ConnectorParameter getConnectorParameter() {
+            public ConnectorParameter getConnectorParameter() {
                 return null; // unused
             }
 

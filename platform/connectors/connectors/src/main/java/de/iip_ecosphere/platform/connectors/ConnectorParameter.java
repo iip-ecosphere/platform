@@ -17,6 +17,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import org.apache.commons.io.IOUtils;
@@ -588,6 +589,15 @@ public class ConnectorParameter {
      */
     public Object getSpecificSetting(String key) {
         return specificSettings.get(key);
+    }
+    
+    /**
+     * Returns all defined specific setting keys.
+     * 
+     * @return the specific setting keys
+     */
+    public Set<String> getSpecificSettingKeys() {
+        return specificSettings.keySet();
     }
     
     /**

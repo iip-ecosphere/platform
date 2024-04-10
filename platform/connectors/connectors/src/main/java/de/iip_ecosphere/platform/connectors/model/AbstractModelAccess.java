@@ -135,6 +135,6 @@ public abstract class AbstractModelAccess implements ModelAccess {
      * 
      * @return the connector parameters
      */
-    protected abstract ConnectorParameter getConnectorParameter();
+    public abstract ConnectorParameter getConnectorParameter();
     
 }

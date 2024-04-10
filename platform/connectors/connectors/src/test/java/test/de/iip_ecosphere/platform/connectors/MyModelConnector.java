@@ -263,7 +263,7 @@ public class MyModelConnector<CO, CI> extends AbstractConnector<Object, Object, 
         }
 
         @Override
-        protected ConnectorParameter getConnectorParameter() {
+        public ConnectorParameter getConnectorParameter() {
             return params;
         }
 
