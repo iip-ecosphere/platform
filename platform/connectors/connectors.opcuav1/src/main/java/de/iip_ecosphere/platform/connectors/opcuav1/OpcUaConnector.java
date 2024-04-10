@@ -1144,7 +1144,7 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
         }
         
         @Override
-        protected ConnectorParameter getConnectorParameter() {
+        public ConnectorParameter getConnectorParameter() {
             return params;
         }
 

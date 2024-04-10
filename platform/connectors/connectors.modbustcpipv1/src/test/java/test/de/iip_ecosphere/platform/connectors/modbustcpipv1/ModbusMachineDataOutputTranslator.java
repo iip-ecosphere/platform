@@ -1,8 +1,12 @@
 package test.de.iip_ecosphere.platform.connectors.modbustcpipv1;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
-import de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusNamespace;
+import de.iip_ecosphere.platform.connectors.ConnectorParameter;
+import de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusKeys;
+import de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusVarItem;
+import de.iip_ecosphere.platform.connectors.model.AbstractModelAccess;
 import de.iip_ecosphere.platform.connectors.model.ModelAccess;
 import de.iip_ecosphere.platform.connectors.types.AbstractConnectorOutputTypeTranslator;
 import test.de.iip_ecosphere.platform.connectors.MachineDataOutputTranslator.OutputCustomizer;
@@ -36,28 +40,25 @@ public class ModbusMachineDataOutputTranslator<S>  extends AbstractConnectorOutp
 
     @Override
     public ModbusMachineData to(Object source) throws IOException {
-        
-        ModelAccess access = getModelAccess();
 
-        String varShort = ModbusNamespace.NAME_VAR_SHORT_VALUE;
-        String varInt = ModbusNamespace.NAME_VAR_INT_VALUE;
-        String varFloat = ModbusNamespace.NAME_VAR_FLOAT_VALUE;
-        String varLong = ModbusNamespace.NAME_VAR_LONG_VALUE;
-        String varDouble = ModbusNamespace.NAME_VAR_DOUBLE_VALUE;
+        AbstractModelAccess access = (AbstractModelAccess) getModelAccess();  
+        ConnectorParameter params = access.getConnectorParameter();
         
-        short lShort = access.getInputConverter().toShort(access.get(varShort));
-        int lInt = access.getInputConverter().toInteger(access.get(varInt));
-        float lFloat = access.getInputConverter().toFloat(access.get(varFloat));
-        long lLong = access.getInputConverter().toLong(access.get(varLong));
-        double lDouble = access.getInputConverter().toDouble(access.get(varDouble));
+        String[] keys = ModbusKeys.getKeys();
+        
+        ArrayList<ModbusVarItem> items = new ArrayList<ModbusVarItem>();
+        
+        for (int i = 0; i < keys.length; i++) {
+            items.add((ModbusVarItem) params.getSpecificSetting(keys[i]));  
+        }
         
         ModbusMachineData lResult = new ModbusMachineData();
-        lResult.setShortValue(lShort);
-        lResult.setIntValue(lInt);
-        lResult.setFloatValue(lFloat);
-        lResult.setLongValue(lLong);
-        lResult.setDoubleValue(lDouble);
-
+        
+        
+        for (int i = 0; i < items.size(); i++) {
+            lResult.addValue(items.get(i), access.get(keys[i]));
+        }
+       
         return lResult;
     }
 

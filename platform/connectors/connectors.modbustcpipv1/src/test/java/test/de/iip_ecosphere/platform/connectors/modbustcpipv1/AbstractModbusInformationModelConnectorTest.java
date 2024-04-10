@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import de.iip_ecosphere.platform.connectors.Connector;
 import de.iip_ecosphere.platform.connectors.ConnectorDescriptor;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
+import de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusKeys;
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
 import de.iip_ecosphere.platform.connectors.types.TranslatingProtocolAdapter;
 import de.iip_ecosphere.platform.support.TimeUtils;
@@ -60,14 +61,17 @@ public abstract class AbstractModbusInformationModelConnectorTest<D> implements 
      */
     public void testConnector(boolean withNotifications) throws IOException {
         ConnectorTest.assertDescriptorRegistration(getConnectorDescriptor());
+        
         AtomicReference<ModbusMachineData> md = new AtomicReference<ModbusMachineData>();
         AtomicInteger count = new AtomicInteger(0);
 
         Connector<D, Object, ModbusMachineData, ModbusMachineCommand> connector = createConnector(
                 new TranslatingProtocolAdapter<D, Object, ModbusMachineData, ModbusMachineCommand>(
-                        new ModbusMachineDataOutputTranslator<D>(withNotifications, dataType, this),
+                        new ModbusMachineDataOutputTranslator<D>(withNotifications, dataType, 
+                                this),
                         new ModbusMachineCommandInputTranslator<Object>(Object.class)));
-                
+         
+        
         ConnectorTest.assertInstance(connector, false);
         ConnectorTest.assertConnectorProperties(connector);
         connector.setReceptionCallback(new ReceptionCallback<ModbusMachineData>() {
@@ -94,28 +98,20 @@ public abstract class AbstractModbusInformationModelConnectorTest<D> implements 
         Assert.assertNotNull("We shall have received some data although the machine is not running", tmp);
         
         //All values should be 0
-        Assert.assertEquals(0, tmp.getShortValue());
-        Assert.assertEquals(0, tmp.getIntValue());
-        Assert.assertEquals(0, tmp.getLongValue());
+        String[] keys = ModbusKeys.getKeys();
         
-        Assert.assertTrue(tmp.getFloatValue() < 1);
-        Assert.assertTrue(tmp.getDoubleValue() < 1);
-            
-        /*
-        System.out.println(tmp.getShortValue());
-        System.out.println(tmp.getIntValue());
-        System.out.println(tmp.getLongValue());
-        
-        System.out.println(tmp.getFloatValue());
-        System.out.println(tmp.getDoubleValue());
-        */
-        
-        testShort(connector, count, md);
-        testInt(connector, count, md);
-        testFloat(connector, count, md);
-        testLong(connector, count, md);
-        testDouble(connector, count, md);
-        testAllToZero(connector, count, md);
+        Assert.assertEquals((short) 0, tmp.getValue(keys[0]));
+        Assert.assertEquals((int) 0, tmp.getValue(keys[1]));
+        Assert.assertTrue((float) tmp.getValue(keys[2]) < 1);
+        Assert.assertEquals((long) 0, tmp.getValue(keys[3]));
+        Assert.assertTrue((double) tmp.getValue(keys[4]) < 1);
+
+        testShort(connector, count, md, keys);
+        testInt(connector, count, md, keys);
+        testFloat(connector, count, md, keys);
+        testLong(connector, count, md, keys);
+        testDouble(connector, count, md, keys);
+        testAllToZero(connector, count, md, keys);
         
         ConnectorTest.assertInstance(connector, true);
         connector.disconnect();
@@ -129,34 +125,29 @@ public abstract class AbstractModbusInformationModelConnectorTest<D> implements 
      * @param connector the connector
      * @param count the test counter
      * @param md the machine data
+     * @param keys the ModbusKeys 
      * @throws IOException if an I/O problem occurs
      */
     private void testShort(Connector<D, Object, ModbusMachineData, ModbusMachineCommand> connector, 
-        AtomicInteger count, AtomicReference<ModbusMachineData> md) throws IOException {
+        AtomicInteger count, AtomicReference<ModbusMachineData> md, String[] keys) throws IOException {
+        
         // try to write a short value to the machine
+        Object value = (short) 1;
+        
         ModbusMachineCommand cmd = new ModbusMachineCommand();
-        cmd.setShortValue((short) 1);
+        cmd.set(keys[0], value);
         connector.write(cmd);
         
         block(count, 3);
         
         ModbusMachineData tmp = md.get();
         
-        Assert.assertEquals(1, tmp.getShortValue());
-        Assert.assertEquals(0, tmp.getIntValue());
-        Assert.assertEquals(0, tmp.getLongValue());
-        
-        Assert.assertTrue(tmp.getFloatValue() < 1);
-        Assert.assertTrue(tmp.getDoubleValue() < 1);
-        
-        /*
-        System.out.println(tmp.getShortValue());
-        System.out.println(tmp.getIntValue());
-        System.out.println(tmp.getLongValue());
-        
-        System.out.println(tmp.getFloatValue());
-        System.out.println(tmp.getDoubleValue());
-        */
+        Assert.assertEquals(value, tmp.getValue(keys[0]));
+        Assert.assertEquals((int) 0, tmp.getValue(keys[1]));
+        Assert.assertTrue((float) tmp.getValue(keys[2]) < 1);
+        Assert.assertEquals((long) 0, tmp.getValue(keys[3]));
+        Assert.assertTrue((double) tmp.getValue(keys[4]) < 1);
+
     }
 
     /**
@@ -165,34 +156,29 @@ public abstract class AbstractModbusInformationModelConnectorTest<D> implements 
      * @param connector the connector
      * @param count the test counter
      * @param md the machine data
+     * @param keys the ModbusKeys 
      * @throws IOException if an I/O problem occurs
      */
     private void testInt(Connector<D, Object, ModbusMachineData, ModbusMachineCommand> connector, 
-        AtomicInteger count, AtomicReference<ModbusMachineData> md) throws IOException {
+        AtomicInteger count, AtomicReference<ModbusMachineData> md, String[] keys) throws IOException {
+        
         // try to write a int value to the machine
+        Object value = (int) 5;
+        
         ModbusMachineCommand cmd = new ModbusMachineCommand();
-        cmd.setIntValue(5);
+        cmd.set(keys[1], value);
         connector.write(cmd);
         
         block(count, 4);
         
         ModbusMachineData tmp = md.get();
         
-        Assert.assertEquals(1, tmp.getShortValue());
-        Assert.assertEquals(5, tmp.getIntValue());
-        Assert.assertEquals(0, tmp.getLongValue());
-        
-        Assert.assertTrue(tmp.getFloatValue() < 1);
-        Assert.assertTrue(tmp.getDoubleValue() < 1);
-        
-        /*
-        System.out.println(tmp.getShortValue());
-        System.out.println(tmp.getIntValue());
-        System.out.println(tmp.getLongValue());
-        
-        System.out.println(tmp.getFloatValue());
-        System.out.println(tmp.getDoubleValue());
-        */
+        Assert.assertEquals((short) 1, tmp.getValue(keys[0]));
+        Assert.assertEquals(value, tmp.getValue(keys[1]));
+        Assert.assertTrue((float) tmp.getValue(keys[2]) < 1);
+        Assert.assertEquals((long) 0, tmp.getValue(keys[3]));
+        Assert.assertTrue((double) tmp.getValue(keys[4]) < 1);
+
     }
 
     /**
@@ -201,34 +187,29 @@ public abstract class AbstractModbusInformationModelConnectorTest<D> implements 
      * @param connector the connector
      * @param count the test counter
      * @param md the machine data
+     * @param keys the ModbusKeys 
      * @throws IOException if an I/O problem occurs
      */
     private void testFloat(Connector<D, Object, ModbusMachineData, ModbusMachineCommand> connector, 
-        AtomicInteger count, AtomicReference<ModbusMachineData> md) throws IOException {
+        AtomicInteger count, AtomicReference<ModbusMachineData> md, String[] keys) throws IOException {
+        
         // try to write a float value to the machine
+        Object value = (float) 17.23;
+        
         ModbusMachineCommand cmd = new ModbusMachineCommand();
-        cmd.setFloatValue((float) 17.23);
+        cmd.set(keys[2], value);
         connector.write(cmd);
         
         block(count, 5);
         
         ModbusMachineData tmp = md.get();
         
-        Assert.assertEquals(1, tmp.getShortValue());
-        Assert.assertEquals(5, tmp.getIntValue());
-        Assert.assertEquals(0, tmp.getLongValue());
-        
-        Assert.assertTrue(tmp.getFloatValue() > 17);
-        Assert.assertTrue(tmp.getDoubleValue() < 1);
-        
-        /*
-        System.out.println(tmp.getShortValue());
-        System.out.println(tmp.getIntValue());
-        System.out.println(tmp.getLongValue());
-        
-        System.out.println(tmp.getFloatValue());
-        System.out.println(tmp.getDoubleValue());
-        */
+        Assert.assertEquals((short) 1, tmp.getValue(keys[0]));
+        Assert.assertEquals((int) 5, tmp.getValue(keys[1]));
+        Assert.assertTrue((float) tmp.getValue(keys[2]) > 17);
+        Assert.assertEquals((long) 0, tmp.getValue(keys[3]));
+        Assert.assertTrue((double) tmp.getValue(keys[4]) < 1);
+
     }
 
     /**
@@ -237,34 +218,29 @@ public abstract class AbstractModbusInformationModelConnectorTest<D> implements 
      * @param connector the connector
      * @param count the test counter
      * @param md the machine data
+     * @param keys the ModbusKeys 
      * @throws IOException if an I/O problem occurs
      */
     private void testLong(Connector<D, Object, ModbusMachineData, ModbusMachineCommand> connector, 
-        AtomicInteger count, AtomicReference<ModbusMachineData> md) throws IOException {
+        AtomicInteger count, AtomicReference<ModbusMachineData> md, String[] keys) throws IOException {
+        
         //try to write a long value to the machine
+        Object value = (long) 21;
+        
         ModbusMachineCommand cmd = new ModbusMachineCommand();
-        cmd.setLongValue((long) 21);
+        cmd.set(keys[3], value);
         connector.write(cmd);
         
         block(count, 6);
         
         ModbusMachineData tmp = md.get();
         
-        Assert.assertEquals(1, tmp.getShortValue());
-        Assert.assertEquals(5, tmp.getIntValue());
-        Assert.assertEquals(21, tmp.getLongValue());
-        
-        Assert.assertTrue(tmp.getFloatValue() > 17);
-        Assert.assertTrue(tmp.getDoubleValue() < 1);
-        
-        /*
-        System.out.println(tmp.getShortValue());
-        System.out.println(tmp.getIntValue());
-        System.out.println(tmp.getLongValue());
-        
-        System.out.println(tmp.getFloatValue());
-        System.out.println(tmp.getDoubleValue());
-        */
+        Assert.assertEquals((short) 1, tmp.getValue(keys[0]));
+        Assert.assertEquals((int) 5, tmp.getValue(keys[1]));
+        Assert.assertTrue((float) tmp.getValue(keys[2]) > 17);
+        Assert.assertEquals(value, tmp.getValue(keys[3]));
+        Assert.assertTrue((double) tmp.getValue(keys[4]) < 1);
+
     }
 
     /**
@@ -273,34 +249,29 @@ public abstract class AbstractModbusInformationModelConnectorTest<D> implements 
      * @param connector the connector
      * @param count the test counter
      * @param md the machine data
+     * @param keys the ModbusKeys 
      * @throws IOException if an I/O problem occurs
      */
     private void testDouble(Connector<D, Object, ModbusMachineData, ModbusMachineCommand> connector, 
-        AtomicInteger count, AtomicReference<ModbusMachineData> md) throws IOException {
+        AtomicInteger count, AtomicReference<ModbusMachineData> md, String[] keys) throws IOException {
+        
         // try to write a double value to the machine
+        Object value = (double) 12345.6789;
+        
         ModbusMachineCommand cmd = new ModbusMachineCommand();
-        cmd.setDoubleValue(12345.6789);
+        cmd.set(keys[4], value);
         connector.write(cmd);
         
         block(count, 7);
         
         ModbusMachineData tmp = md.get();
         
-        Assert.assertEquals(1, tmp.getShortValue());
-        Assert.assertEquals(5, tmp.getIntValue());
-        Assert.assertEquals(21, tmp.getLongValue());
-        
-        Assert.assertTrue(tmp.getFloatValue() > 17);
-        Assert.assertTrue(tmp.getDoubleValue() > 12345);
-        
-        /*
-        System.out.println(tmp.getShortValue());
-        System.out.println(tmp.getIntValue());
-        System.out.println(tmp.getLongValue());
-        
-        System.out.println(tmp.getFloatValue());
-        System.out.println(tmp.getDoubleValue());
-        */
+        Assert.assertEquals((short) 1, tmp.getValue(keys[0]));
+        Assert.assertEquals((int) 5, tmp.getValue(keys[1]));
+        Assert.assertTrue((float) tmp.getValue(keys[2]) > 17);
+        Assert.assertEquals((long) 21, tmp.getValue(keys[3]));
+        Assert.assertTrue((double) tmp.getValue(keys[4]) > 12345);
+
     }
 
     /**
@@ -309,38 +280,33 @@ public abstract class AbstractModbusInformationModelConnectorTest<D> implements 
      * @param connector the connector
      * @param count the test counter
      * @param md the machine data
+     * @param keys the ModbusKeys 
      * @throws IOException if an I/O problem occurs
      */
     private void testAllToZero(Connector<D, Object, ModbusMachineData, ModbusMachineCommand> connector, 
-        AtomicInteger count, AtomicReference<ModbusMachineData> md) throws IOException {
+        AtomicInteger count, AtomicReference<ModbusMachineData> md, String[] keys) throws IOException {
+
         // try to write all values to 0
+        Object value = 0;
+        
         ModbusMachineCommand cmd = new ModbusMachineCommand();
-        cmd.setShortValue((short) 0);
-        cmd.setIntValue(0);
-        cmd.setFloatValue(0);
-        cmd.setLongValue(0);
-        cmd.setDoubleValue(0);
+        
+        for (int i = 0; i < keys.length; i++) {
+            cmd.set(keys[i], value);
+        }
+
         connector.write(cmd);
         
         block(count, 7); 
         
         ModbusMachineData tmp = md.get();
         
-        Assert.assertEquals(0, tmp.getShortValue());
-        Assert.assertEquals(0, tmp.getIntValue());
-        Assert.assertEquals(0, tmp.getLongValue());
-        
-        Assert.assertTrue(tmp.getFloatValue() < 1);
-        Assert.assertTrue(tmp.getDoubleValue() < 1);
-            
-        /*
-        System.out.println(tmp.getShortValue());
-        System.out.println(tmp.getIntValue());
-        System.out.println(tmp.getLongValue());
-        
-        System.out.println(tmp.getFloatValue());
-        System.out.println(tmp.getDoubleValue());
-        */
+        Assert.assertEquals((short) 0, tmp.getValue(keys[0]));
+        Assert.assertEquals((int) 0, tmp.getValue(keys[1]));
+        Assert.assertTrue((float) tmp.getValue(keys[2]) < 1);
+        Assert.assertEquals((long) 0, tmp.getValue(keys[3]));
+        Assert.assertTrue((double) tmp.getValue(keys[4]) < 1);
+
     }
     
     /**

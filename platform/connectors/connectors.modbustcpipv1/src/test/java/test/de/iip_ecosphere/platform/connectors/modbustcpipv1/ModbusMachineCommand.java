@@ -12,168 +12,68 @@
 
 package test.de.iip_ecosphere.platform.connectors.modbustcpipv1;
 
+import java.util.ArrayList;
+
+
 /**
  * Some Modbus machine command for testing.
  * 
  * @author Christian Nikolajew
  */
 public class ModbusMachineCommand {
-
-    private boolean changeShortValue;
-    private boolean changeIntValue;
-    private boolean changeFloatValue;
-    private boolean changeLongValue;
-    private boolean changeDoubleValue;
-
-    private short shortValue;
-    private int intValue;
-    private float floatValue;
-    private long longValue;
-    private double doubleValue;
+    
+    private ArrayList<String> keysToChange;
+    private ArrayList<Object> valuesToWrite;
 
     /**
      * Creates an instance.
      */
     public ModbusMachineCommand() {
+        
+        keysToChange = new ArrayList<String>();
+        valuesToWrite = new ArrayList<Object>();
+    }
+    
+    /**
+     * Get the amount of keys. 
+     * 
+     * @return the number of keys to change
+     */
+    public int getKeyCount() {
+        return keysToChange.size();
+    }
+    
+    /**
+     * Getter for key.
+     * 
+     * @param index of the key to return 
+     * @return the key at index
+     */
+    public String getKey(int index) {
+        return keysToChange.get(index);
+    }
+    
+    /**
+     * Getter for value.
+     * 
+     * @param index of the value to return
+     * @return value at index
+     */
+    public Object getValue(int index) {
+        return valuesToWrite.get(index);
+    }
+    
+    /**
+     * Setter for key and value.
+     * 
+     * @param key that's value should be changed
+     * @param value that should be set for key 
+     */
+    public void set(String key, Object value) {
+        
+        keysToChange.add(key);
+        valuesToWrite.add(value);
+        
     }
 
-    /**
-     * Returns whether the short value was changed.
-     * 
-     * @return {@code true} for change, {@code false} else
-     */
-    public boolean getChangeShortValue() {
-        return changeShortValue;
-    }
-
-    /**
-     * Returns whether the int value was changed.
-     * 
-     * @return {@code true} for change, {@code false} else
-     */
-    public boolean getChangeIntValue() {
-        return changeIntValue;
-    }
-
-    /**
-     * Returns whether the short float was changed.
-     * 
-     * @return {@code true} for change, {@code false} else
-     */
-    public boolean getChangeFloatValue() {
-        return changeFloatValue;
-    }
-
-    /**
-     * Returns whether the long value was changed.
-     * 
-     * @return {@code true} for change, {@code false} else
-     */
-    public boolean getChangeLongValue() {
-        return changeLongValue;
-    }
-
-    /**
-     * Returns whether the double value was changed.
-     * 
-     * @return {@code true} for change, {@code false} else
-     */
-    public boolean getChangeDoubleValue() {
-        return changeDoubleValue;
-    }
-
-    /**
-     * Returns the short value.
-     * 
-     * @return the value
-     */
-    public short getShortValue() {
-        return shortValue;
-    }
-
-    /**
-     * Returns the int value.
-     * 
-     * @return the value
-     */
-    public int getIntValue() {
-        return intValue;
-    }
-
-    /**
-     * Returns the float value.
-     * 
-     * @return the value
-     */
-    public float getFloatValue() {
-        return floatValue;
-    }
-
-    /**
-     * Returns the long value.
-     * 
-     * @return the value
-     */
-    public long getLongValue() {
-        return longValue;
-    }
-
-    /**
-     * Returns the double value.
-     * 
-     * @return the value
-     */
-    public double getDoubleValue() {
-        return doubleValue;
-    }
-
-    /**
-     * Changes the short value. Changes {@link #changeShortValue}.
-     * 
-     * @param value the value
-     */
-    public void setShortValue(short value) {
-        shortValue = value;
-        changeShortValue = true;
-    }
-
-    /**
-     * Changes the int value. Changes {@link #changeIntValue}.
-     * 
-     * @param value the value
-     */
-    public void setIntValue(int value) {
-        intValue = value;
-        changeIntValue = true;
-    }
-
-    /**
-     * Changes the float value. Changes {@link #changeFloatValue}.
-     * 
-     * @param value the value
-     */
-    public void setFloatValue(float value) {
-        floatValue = value;
-        changeFloatValue = true;
-    }
-
-    /**
-     * Changes the long value. Changes {@link #changeLongValue}.
-     * 
-     * @param value the value
-     */
-    public void setLongValue(long value) {
-        longValue = value;
-        changeLongValue = true;
-    }
-
-    /**
-     * Changes the double value. Changes {@link #changeDoubleValue}.
-     * 
-     * @param value the value
-     */
-    public void setDoubleValue(double value) {
-        doubleValue = value;
-        changeDoubleValue = true;
-    }
 }

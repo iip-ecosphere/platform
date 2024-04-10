@@ -14,12 +14,11 @@ package test.de.iip_ecosphere.platform.connectors.modbustcpipv1;
 
 import java.io.IOException;
 
-import de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusNamespace;
-import de.iip_ecosphere.platform.connectors.model.ModelAccess;
+import de.iip_ecosphere.platform.connectors.model.AbstractModelAccess;
 import de.iip_ecosphere.platform.connectors.types.AbstractConnectorInputTypeTranslator;
 
 /**
- * The modbus machine command input translator tests.
+ * The modbus machine command input translator for tests.
  * 
  * @param <O> the output datatype
  * 
@@ -42,27 +41,11 @@ public class ModbusMachineCommandInputTranslator<O>
 
     @Override
     public O from(ModbusMachineCommand data) throws IOException {
+        
+        AbstractModelAccess access = (AbstractModelAccess) getModelAccess();  
 
-        ModelAccess access = getModelAccess();
-
-        if (data.getChangeShortValue()) {
-            access.call(ModbusNamespace.NAME_VAR_SHORT_VALUE, data.getShortValue());
-        }
-
-        if (data.getChangeIntValue()) {
-            access.call(ModbusNamespace.NAME_VAR_INT_VALUE, data.getIntValue());
-        }
-
-        if (data.getChangeFloatValue()) {
-            access.call(ModbusNamespace.NAME_VAR_FLOAT_VALUE, data.getFloatValue());
-        }
-
-        if (data.getChangeLongValue()) {
-            access.call(ModbusNamespace.NAME_VAR_LONG_VALUE, data.getLongValue());
-        }
-
-        if (data.getChangeDoubleValue()) {
-            access.call(ModbusNamespace.NAME_VAR_DOUBLE_VALUE, data.getDoubleValue());
+        for (int i = 0; i < data.getKeyCount(); i++) {
+            access.call(data.getKey(i), data.getValue(i));
         }
 
         return null;

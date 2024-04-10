@@ -12,113 +12,64 @@
 
 package test.de.iip_ecosphere.platform.connectors.modbustcpipv1;
 
+import java.util.ArrayList;
+
+import de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusKeys;
+import de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusVarItem;
+
 /**
  * Machine data from the ModbusTcpIpModelAccess.
  * 
  * @author Christian Nikolajew
  */
 public class ModbusMachineData {
-
-    private short shortValue;
-    private int intValue;
-    private float floatValue;
-    private long longValue;
-    private double doubleValue;
-
+    
+    private ArrayList<ModbusVarItem> valueTypesAndOffsets;
+    private ArrayList<Object> values;
+    
     /**
      * Creates an instance.
      */
     public ModbusMachineData() {
+        
+        valueTypesAndOffsets = new ArrayList<ModbusVarItem>();
+        values = new ArrayList<Object>();
     }
-
+    
     /**
-     * Returns the value as short.
+     * Adds a value to the ModbusMachineData.
      * 
-     * @return the short value
+     * @param valueTypeAndOffset to add
+     * @param value as Object
      */
-    public short getShortValue() {
-        return shortValue;
+    public void addValue(ModbusVarItem valueTypeAndOffset, Object value) {
+        
+        valueTypesAndOffsets.add(valueTypeAndOffset);
+        values.add(value);
+
     }
-
+    
     /**
-     * Returns the value as int.
+     * Returns the value for a given key.
      * 
-     * @return the int value
+     * @param key
+     * @return the value for key
      */
-    public int getIntValue() {
-        return intValue;
-    }
-
-    /**
-     * Returns the value as float.
-     * 
-     * @return the float value
-     */
-    public float getFloatValue() {
-        return floatValue;
-    }
-
-    /**
-     * Returns the value as long.
-     * 
-     * @return the long value
-     */
-    public long getLongValue() {
-        return longValue;
-    }
-
-    /**
-     * Returns the value as double.
-     * 
-     * @return the double value
-     */
-    public double getDoubleValue() {
-        return doubleValue;
-    }
-
-    /**
-     * Sets the value as short.
-     * 
-     * @param value the short value
-     */
-    public void setShortValue(short value) {
-        shortValue = value;
-    }
-
-    /**
-     * Sets the value as int.
-     * 
-     * @param value  the int value
-     */
-    public void setIntValue(int value) {
-        intValue = value;
-    }
-
-    /**
-     * Sets the value as float.
-     * 
-     * @param value the float value
-     */
-    public void setFloatValue(float value) {
-        floatValue = value;
-    }
-
-    /**
-     * Sets the value as long.
-     * 
-     * @param value the long value
-     */
-    public void setLongValue(long value) {
-        longValue = value;
-    }
-
-    /**
-     * Sets the value as double.
-     * 
-     * @param value the double value
-     */
-    public void setDoubleValue(double value) {
-        doubleValue = value;
+    public Object getValue(String key) {
+        
+        String[] keys = ModbusKeys.getKeys();
+        
+        Object result = new Object();
+        
+        for (int i = 0; i < keys.length; i++) {
+            
+            if (key.equals(keys[i])) {
+                
+                result = values.get(i);
+            }
+        }
+        
+        return result;
     }
     
 }

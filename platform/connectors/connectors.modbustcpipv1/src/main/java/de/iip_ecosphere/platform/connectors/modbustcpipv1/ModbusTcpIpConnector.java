@@ -26,6 +26,7 @@ import de.iip_ecosphere.platform.connectors.ConnectorDescriptor;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.MachineConnector;
 import de.iip_ecosphere.platform.connectors.events.ConnectorTriggerQuery;
+import de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusVarItem.ModbusVarItemType;
 import de.iip_ecosphere.platform.connectors.model.AbstractModelAccess;
 import de.iip_ecosphere.platform.connectors.model.ModelAccess;
 import de.iip_ecosphere.platform.connectors.model.ModelInputConverter;
@@ -101,7 +102,7 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
             ProtocolAdapter<ModbusItem, Object, CO, CI>... adapter) {
         super(selector, adapter);
         configureModelAccess(new ModbusTcpIpModelAccess());
-        mItem = new ModbusItem();
+        //mItem = new ModbusItem();
     }
 
     @Override
@@ -118,7 +119,7 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
      */
     private String getEndpointUrl(ConnectorParameter params) {
 
-        String result = params.getSchema() + "://" + params.getHost() + ":" + params.getPort(); // + "/" +
+        String result = params.getSchema() + "://" + params.getHost() + ":" + params.getPort(); 
         return result;
     }
     
@@ -129,6 +130,8 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
 
         if (mConnection == null) {
             this.mParams = params;
+            
+            mItem = new ModbusItem(params);
 
             String endpointURL = getEndpointUrl(params);
 
@@ -178,7 +181,7 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
 
     @Override
     protected ModbusItem read() throws IOException {
-    
+        
         readFromMachine();
         
         return mItem;
@@ -290,23 +293,25 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
 
         @Override
         public Object call(String qName, Object... arg1) throws IOException {
-
-            if (qName.equals(ModbusNamespace.NAME_VAR_SHORT_VALUE)) {
+            
+            ModbusVarItem item = (ModbusVarItem) mParams.getSpecificSetting(qName);
+            
+            if (item.getType() == ModbusVarItemType.Short) {
                 
-                mItem.setHoldingRegister((short) 0, Short.valueOf(arg1[0].toString()));
+                short s = Short.valueOf(arg1[0].toString());
+                mItem.setHoldingRegister(item.getOffset(), s);
                 
-            } else  if (qName.equals(ModbusNamespace.NAME_VAR_INT_VALUE)) {
+            } else if (item.getType() == ModbusVarItemType.Integer) {
                 
                 int intToWrite = Integer.valueOf(arg1[0].toString());
                 
                 short highShort = (short) (intToWrite >> 16);
                 short lowShort = (short) (intToWrite & 0xFFFF);
 
-                mItem.setHoldingRegister((short) 1, lowShort);
-                mItem.setHoldingRegister((short) 2, highShort);
-               
+                mItem.setHoldingRegister(item.getOffset(), lowShort);
+                mItem.setHoldingRegister(item.getOffset() + 1, highShort);
                 
-            } else  if (qName.equals(ModbusNamespace.NAME_VAR_FLOAT_VALUE)) {
+            } else if (item.getType() == ModbusVarItemType.Float) {
                 
                 float floatToWrite = Float.valueOf(arg1[0].toString());
                 int floatAsInt = Float.floatToIntBits(floatToWrite);
@@ -317,7 +322,7 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
                 mItem.setHoldingRegister((short) 3, lowShort);
                 mItem.setHoldingRegister((short) 4, highShort);
                 
-            } else  if (qName.equals(ModbusNamespace.NAME_VAR_LONG_VALUE)) {
+            } else if (item.getType() == ModbusVarItemType.Long) {
                 
                 long longToWrite = Long.valueOf(arg1[0].toString());
                 
@@ -331,8 +336,8 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
                 mItem.setHoldingRegister((short) 7, highShort);
                 mItem.setHoldingRegister((short) 8, highestShort);
                 
-            } else  if (qName.equals(ModbusNamespace.NAME_VAR_DOUBLE_VALUE)) {
-              
+            } else if (item.getType() == ModbusVarItemType.Double) {
+                
                 double doubleToWrite = Double.valueOf(arg1[0].toString());
 
                 ByteBuffer buffer = ByteBuffer.allocate(8);
@@ -347,9 +352,8 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
                 mItem.setHoldingRegister((short) 10, short2);
                 mItem.setHoldingRegister((short) 11, short3);
                 mItem.setHoldingRegister((short) 12, short4);
+            }
 
-            } 
-            
             writeImpl(mItem);
             doPolling();
 
@@ -358,50 +362,51 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
 
         @Override
         public Object get(String qName) throws IOException {
+
+            Object result = new Object();   
+            ModbusVarItem item = (ModbusVarItem) mParams.getSpecificSetting(qName);
             
-            Object result = new Object();
+            if (item.getType() == ModbusVarItemType.Short) {
+                
+                result = mItem.getHoldingRegister(item.getOffset());
+                
+            } else if (item.getType() == ModbusVarItemType.Integer) {
             
-            if (qName.equals(ModbusNamespace.NAME_VAR_SHORT_VALUE)) {
-                
-                result = mItem.getHoldingRegister(0);
-                
-            } else  if (qName.equals(ModbusNamespace.NAME_VAR_INT_VALUE)) {
-                
-                short lowShort = mItem.getHoldingRegister(1);
-                short highShort = mItem.getHoldingRegister(2);
+                short lowShort = mItem.getHoldingRegister(item.getOffset());
+                short highShort = mItem.getHoldingRegister(item.getOffset() + 1);
                 
                 int intRes = ((highShort & 0xFFFF) << 16) | (lowShort & 0xFFFF);
 
                 result = intRes;
                 
-            } else  if (qName.equals(ModbusNamespace.NAME_VAR_FLOAT_VALUE)) {
+            } else if (item.getType() == ModbusVarItemType.Float) {
                 
-                short lowShort = mItem.getHoldingRegister(3);
-                short highShort = mItem.getHoldingRegister(4);
+                short lowShort = mItem.getHoldingRegister(item.getOffset());
+                short highShort = mItem.getHoldingRegister(item.getOffset() + 1);
                 
                 int intRes = ((highShort & 0xFFFF) << 16) | (lowShort & 0xFFFF);
                 float floatRes = Float.intBitsToFloat(intRes);
                 
                 result = floatRes;
                 
-            } else  if (qName.equals(ModbusNamespace.NAME_VAR_LONG_VALUE)) {
+            } else if (item.getType() == ModbusVarItemType.Long) {
                 
-                short lowestShort = mItem.getHoldingRegister(5);
-                short lowShort = mItem.getHoldingRegister(6); 
-                short highShort = mItem.getHoldingRegister(7);
-                short highestShort = mItem.getHoldingRegister(8);
+                short lowestShort = mItem.getHoldingRegister(item.getOffset());
+                short lowShort = mItem.getHoldingRegister(item.getOffset() + 1); 
+                short highShort = mItem.getHoldingRegister(item.getOffset() + 2);
+                short highestShort = mItem.getHoldingRegister(item.getOffset() + 3);
                 
                 long longRes = ((long) highestShort << 48) | ((long) highShort << 32) 
                     | ((long) lowShort << 16) | lowestShort;
                 
                 result = longRes;
                 
-            } else  if (qName.equals(ModbusNamespace.NAME_VAR_DOUBLE_VALUE)) {
-              
-                short short1 = mItem.getHoldingRegister(9);
-                short short2 = mItem.getHoldingRegister(10);
-                short short3 = mItem.getHoldingRegister(11);
-                short short4 = mItem.getHoldingRegister(12);
+            } else if (item.getType() == ModbusVarItemType.Double) {
+                
+                short short1 = mItem.getHoldingRegister(item.getOffset());
+                short short2 = mItem.getHoldingRegister(item.getOffset() + 1);
+                short short3 = mItem.getHoldingRegister(item.getOffset() + 2);
+                short short4 = mItem.getHoldingRegister(item.getOffset() + 3);
                 
                 ByteBuffer buffer = ByteBuffer.allocate(8);
                 buffer.putShort(0, short1);
@@ -479,7 +484,7 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
         }
 
         @Override
-        protected ConnectorParameter getConnectorParameter() {
+        public ConnectorParameter getConnectorParameter() {
             return mParams;
         }
 

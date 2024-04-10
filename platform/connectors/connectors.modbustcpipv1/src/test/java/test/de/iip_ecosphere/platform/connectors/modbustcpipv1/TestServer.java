@@ -15,6 +15,9 @@ package test.de.iip_ecosphere.platform.connectors.modbustcpipv1;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusKeys;
+import de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusMap;
+import de.iip_ecosphere.platform.support.NetUtils;
 import net.wimpi.modbus.Modbus;
 import net.wimpi.modbus.ModbusCoupler;
 import net.wimpi.modbus.net.ModbusTCPListener;
@@ -32,18 +35,31 @@ public class TestServer {
 
     /**
      * Determines the amount of holding registers for the TestServer.
+     * The TestServer has 4 16bit registers per key, so we can store 
+     * a 64bit value for each key if needed.
      */
-    private static final int TEST_SIZE = 20;
+    private static final int TEST_SIZE = ModbusKeys.getKeys().length * 4;
 
     private ModbusTCPListener mListener = null;
 
     private InetAddress mHost;
-    private int mPort = Modbus.DEFAULT_PORT;
+    private int mPort; 
+    
+    private ModbusMap map;
 
     /**
      * Creates a TestServer instance.
+     * 
+     * @param defaultPort : true -> Modbus default port 502 is used
+     *                     false -> Free port from NetUtils.getEphemeralPort() is used.
      */
-    public TestServer() {
+    public TestServer(boolean defaultPort) {
+        
+        if (!defaultPort) {
+            mPort = NetUtils.getEphemeralPort();
+        } else {
+            mPort = Modbus.DEFAULT_PORT;
+        }
 
         SimpleProcessImage spi = null;
         spi = new SimpleProcessImage();
@@ -65,7 +81,10 @@ public class TestServer {
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
+        
+        map = new ModbusMap();
     }
+   
 
     /**
      * Starts the server.
@@ -105,6 +124,15 @@ public class TestServer {
      */
     public int getPort() {
         return mPort;
+    }
+    
+    /**
+     * Returns the map.
+     * 
+     * @return the map
+     */
+    public ModbusMap getMap() {
+        return map; 
     }
 
 }

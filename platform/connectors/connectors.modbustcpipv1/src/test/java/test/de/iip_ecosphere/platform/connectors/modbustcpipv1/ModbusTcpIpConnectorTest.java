@@ -25,7 +25,9 @@ import de.iip_ecosphere.platform.connectors.ConnectorDescriptor;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter.ConnectorParameterBuilder;
 import de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusItem;
+import de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusMap;
 import de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusTcpIpConnector;
+import de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusVarItem;
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.Schema;
@@ -52,7 +54,7 @@ public class ModbusTcpIpConnectorTest extends AbstractModbusTcpIpConnectorTest {
      */
     @BeforeClass
     public static void init() {
-        testServer = new TestServer();
+        testServer = new TestServer(true);
         testServer.start();
         LOGGER.info("MODBUS TCP/IP server started");
     }
@@ -84,10 +86,19 @@ public class ModbusTcpIpConnectorTest extends AbstractModbusTcpIpConnectorTest {
     @Override
     protected ConnectorParameter getConnectorParameter() {
         Endpoint registryEndpoint = new Endpoint(Schema.TCP, testServer.getHost(), testServer.getPort(), "");
+        ConnectorParameterBuilder test = ConnectorParameterBuilder.newBuilder(registryEndpoint);
+        test.setApplicationInformation("App_Id", "App_Description");
+        test.setEndpointPath(registryEndpoint.getSchema() + ":" + registryEndpoint.getEndpoint());
+        
+        ModbusMap map = testServer.getMap();
+        
+        for (ModbusMap.Entry<String, ModbusVarItem> entry : map.entrySet()) {
+            
+            test.setSpecificSetting(entry.getKey(), entry.getValue());
+        }
+        
+        return test.build();
 
-        return ConnectorParameterBuilder.newBuilder(registryEndpoint)
-                .setApplicationInformation("App_Id", "App_Description")
-                .setEndpointPath(registryEndpoint.getSchema() + ":" + registryEndpoint.getEndpoint()).build();
     }
 
     @Override

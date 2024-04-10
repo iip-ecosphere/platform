@@ -697,7 +697,7 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
         }
 
         @Override
-        protected ConnectorParameter getConnectorParameter() {
+        public ConnectorParameter getConnectorParameter() {
             return conn.params;
         }
 

@@ -15,6 +15,9 @@ package de.iip_ecosphere.platform.connectors.modbustcpipv1;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.iip_ecosphere.platform.connectors.ConnectorParameter;
+import de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusVarItem.ModbusVarItemType;
+
 /**
  * The ModbusItem is the data structure that is read from the machine and
  * written to the machine, to transfer data.
@@ -30,7 +33,7 @@ public class ModbusItem {
     /**
      * Holding registers size.
      */
-    private final int mHoldingRegisterSize = 13;
+    private int mHoldingRegisterSize = 0;
 
     /**
      * Holding registers values.
@@ -39,8 +42,33 @@ public class ModbusItem {
 
     /**
      * Creates an instance.
+     * 
+     * @param param the ConnectorParameter 
      */
-    public ModbusItem() {
+    public ModbusItem(ConnectorParameter param) {
+        
+        System.out.println("ModbusItem");
+        
+        String[] keys = ModbusKeys.getKeys();
+        
+        for (int i = 0; i < keys.length; i++) {
+           
+            ModbusVarItem item = (ModbusVarItem) param.getSpecificSetting(keys[i]);
+            
+            if (item.getType() == ModbusVarItemType.Short) {
+                
+                mHoldingRegisterSize += 1;
+                
+            } else if (item.getType() == ModbusVarItemType.Integer || item.getType() == ModbusVarItemType.Float ) {
+                
+                mHoldingRegisterSize += 2;
+                
+            } else if (item.getType() == ModbusVarItemType.Long || item.getType() == ModbusVarItemType.Double) {
+                
+                mHoldingRegisterSize += 4;
+            }
+        }
+        
         mHoldingRegister = new short[mHoldingRegisterSize];
     }
 
@@ -50,7 +78,7 @@ public class ModbusItem {
      * @param aIndex of the register to write to
      * @param aValue to write
      */
-    public void setHoldingRegister(short aIndex, short aValue) {
+    public void setHoldingRegister(int aIndex, short aValue) {
 
         if (aIndex < mHoldingRegisterSize) {
             mHoldingRegister[aIndex] = aValue;
