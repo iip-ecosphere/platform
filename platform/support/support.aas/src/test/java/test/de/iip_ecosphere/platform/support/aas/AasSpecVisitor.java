@@ -290,7 +290,7 @@ public class AasSpecVisitor implements AasVisitor {
         AasSpecVisitor v = new AasSpecVisitor(new PrintStream(bos));
         aas.accept(v);
         Charset cs = Charset.defaultCharset();
-        String testSpec = bos.toString(cs).trim();
+        String testSpec = bos.toString(cs).trim().replace("\r\n", "\n");
         if (null == resourcePrefix) {
             resourcePrefix = "";
         }
@@ -303,7 +303,7 @@ public class AasSpecVisitor implements AasVisitor {
         System.out.println("<-- test-out --");
         try {
             InputStream in = ResourceLoader.getResourceAsStream(resourceName);
-            String spec = IOUtils.toString(in, cs).trim();
+            String spec = IOUtils.toString(in, cs).trim().replace("\r\n", "\n");
             Assert.assertEquals(spec, testSpec);
         } catch (NullPointerException | IOException e) {
             Assert.fail(null == e.getMessage() ? "Cannot read resource " + resourceName : e.getMessage());
