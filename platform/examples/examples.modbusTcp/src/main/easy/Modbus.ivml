@@ -56,7 +56,7 @@ project Modbus {
           ModbusField {
             offset = 1234,
             name = "Data",
-            type = refBy(IntegerType),
+            type = refBy(Modbus_int32),
             cachingTime = CACHE_NONE
           }
         }
@@ -68,12 +68,12 @@ project Modbus {
           ModbusField {
             offset = 1234,
             name = "Data",
-            type = refBy(IntegerType),
+            type = refBy(Modbus_int32),
             cachingTime = CACHE_NONE
           }, ModbusField {
             offset = 1235,
             name = "Data1",
-            type = refBy(StringType),
+            type = refBy(Modbus_ascii),
             cachingTime = CACHE_NONE
           }
        }

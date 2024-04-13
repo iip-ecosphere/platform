@@ -4,257 +4,258 @@ project ModbusPhoenixEEM {
 
     annotate BindingTime bindingTime = BindingTime::compile to .;
 
-    //plan: just define sequence: sequenceOf(Field) modbusPhoenixEEMFields = {
     RecordType modbusPhoenixEEM = {
         name = "ModbusPhoenixEEM",
-        fields = {
-            ModbusField {
-                offset = 10511,
-                name = "Hour",
-                description = "Hour: operating hours counter",
-                type = refBy(Modbus_dword),
-                cachingTime = CACHE_NONE
-            }, ModbusField {
-                offset = 10513,
-                name = "U12",
-                description = "U12: conductor voltage",
-                type = refBy(Modbus_dword),
-                cachingTime = CACHE_NONE
-            }, ModbusField {
-                offset = 10515,
-                name = "U23",
-                description = "U23: conductor voltage",
-                type = refBy(Modbus_dword),
-                cachingTime = CACHE_NONE
-            }, ModbusField {
-                offset = 10517,
-                name = "U31",
-                description = "U31: conductor voltage",
-                type = refBy(Modbus_dword),
-                cachingTime = CACHE_NONE
-            }, ModbusField {
-                offset = 10519,
-                name = "V1",
-                description = "V1: conductor voltage to N",
-                type = refBy(Modbus_dword),
-                cachingTime = CACHE_NONE
-            }, ModbusField {
-                offset = 10521,
-                name = "V2",
-                description = "V2: conductor voltage to N",
-                type = refBy(Modbus_dword),
-                cachingTime = CACHE_NONE
-            }, ModbusField {
-                offset = 10523,
-                name = "V3",
-                description = "V3: conductor voltage to N",
-                type = refBy(Modbus_dword),
-                cachingTime = CACHE_NONE
-            }, ModbusField {
-                offset = 10525,
-                name = "frequency",
-                description = "F: frequency",
-                type = refBy(Modbus_dword),
-                cachingTime = CACHE_NONE
-            }, ModbusField {
-                offset = 10527,
-                name = "I1",
-                description = "I1: current",
-                type = refBy(Modbus_dword),
-                cachingTime = CACHE_NONE
-            }, ModbusField {
-                offset = 10529,
-                name = "I2",
-                description = "I2: current",
-                type = refBy(Modbus_dword),
-                cachingTime = CACHE_NONE
-            }, ModbusField {
-                offset = 10531,
-                name = "I3",
-                description = "I3: current",
-                type = refBy(Modbus_dword),
-                cachingTime = CACHE_NONE
-            }, ModbusField {
-                offset = 10533,
-                name = "In",
-                description = "In: neutral conductor current",
-                type = refBy(Modbus_dword),
-                cachingTime = CACHE_NONE
-            }, ModbusField {
-                offset = 10535,
-                name = "P",
-                description = "P: total active power +/-",
-                type = refBy(Modbus_integer),
-                cachingTime = CACHE_NONE
-            }, ModbusField {
-                offset = 10537,
-                name = "Q",
-                description = "Q: total reactive power +/-",
-                type = refBy(Modbus_integer),
-                cachingTime = CACHE_NONE
-            }, ModbusField {
-                offset = 10539,
-                name = "S",
-                description = "S: total apparent power",
-                type = refBy(Modbus_dword),
-                cachingTime = CACHE_NONE
-            }, ModbusField {
-                offset = 10541,
-                name = "PF",
-                description = "PF: total power factor -: capacitive and +: inductive",
-                type = refBy(Modbus_integer),
-                cachingTime = CACHE_NONE
-            }, ModbusField {
-                offset = 10543,
-                name = "P1",
-                description = "P1: active power phase 1 +/-",
-                type = refBy(Modbus_integer),
-                cachingTime = CACHE_NONE
-            }, ModbusField {
-                offset = 10545,
-                name = "P2",
-                description = "P2: active power phase 2 +/-",
-                type = refBy(Modbus_integer),
-                cachingTime = CACHE_NONE
-            }, ModbusField {
-                offset = 10547,
-                name = "P3",
-                description = "P3: active power phase 3 +/-",
-                type = refBy(Modbus_integer),
-                cachingTime = CACHE_NONE
-            }, ModbusField {
-                offset = 10549,
-                name = "Q1",
-                description = "Q1: reactive power phase 1 +/-",
-                type = refBy(Modbus_integer),
-                cachingTime = CACHE_NONE
-            }, ModbusField {
-                offset = 10551,
-                name = "Q2",
-                description = "Q2: reactive power phase 2 +/-",
-                type = refBy(Modbus_integer),
-                cachingTime = CACHE_NONE
-            }, ModbusField {
-                offset = 10553,
-                name = "Q3",
-                description = "Q3: reactive power phase 3 +/-",
-                type = refBy(Modbus_integer),
-                cachingTime = CACHE_NONE
-            }, ModbusField {
-                offset = 10555,
-                name = "S1",
-                description = "S1: apparent power phase 1",
-                type = refBy(Modbus_dword),
-                cachingTime = CACHE_NONE
-            }, ModbusField {
-                offset = 10557,
-                name = "S2",
-                description = "S2: apparent power phase 2",
-                type = refBy(Modbus_dword),
-                cachingTime = CACHE_NONE
-            }, ModbusField {
-                offset = 10559,
-                name = "S3",
-                description = "S3: apparent power phase 3",
-                type = refBy(Modbus_dword),
-                cachingTime = CACHE_NONE
-            }, ModbusField {
-                offset = 10561,
-                name = "PF1",
-                description = "PF1; power factor, phase 1 -: capacitive and +: inductive",
-                type = refBy(Modbus_integer),
-                cachingTime = CACHE_NONE
-            }, ModbusField {
-                offset = 10563,
-                name = "PF2",
-                description = "PF2; power factor, phase 2 -: capacitive and +: inductive",
-                type = refBy(Modbus_integer),
-                cachingTime = CACHE_NONE
-            }, ModbusField {
-                offset = 10565,
-                name = "PF3",
-                description = "PF3; power factor, phase 3 -: capacitive and +: inductive",
-                type = refBy(Modbus_integer),
-                cachingTime = CACHE_NONE
-            }, ModbusField {
-                offset = 10567,
-                name = "ISYS",
-                description = "ISYS: mean current value",
-                type = refBy(Modbus_dword),
-                cachingTime = CACHE_NONE
-            }, ModbusField {
-                offset = 10569,
-                name = "USYS",
-                description = "USYS: mean value of line voltages",
-                type = refBy(Modbus_dword),
-                cachingTime = CACHE_NONE
-            }, ModbusField {
-                offset = 10571,
-                name = "VSYS",
-                description = "VSYS: mean value of line voltages to N",
-                type = refBy(Modbus_dword),
-                cachingTime = CACHE_NONE
-            }, ModbusField {
-                offset = 10767,
-                name = "TotalActiveEnergyProcurement_system",
-                description = "Total active energy procurement system",
-                type = refBy(Modbus_dword),
-                cachingTime = CACHE_NONE
-            }, ModbusField {
-                offset = 10771,
-                name = "TotalInductiveReactiveEnergy_system",
-                description = "Total inductive reactive energy system",
-                type = refBy(Modbus_dword),
-                cachingTime = CACHE_NONE
-            }, ModbusField {
-                offset = 10773,
-                name = "TotalApparentEnergy_system",
-                description = "Total apparent energy system",
-                type = refBy(Modbus_dword),
-                cachingTime = CACHE_NONE
-            }, ModbusField {
-                offset = 10775,
-                name = "TotalActiveEnergySupply_system",
-                description = "Total active energy supply system",
-                type = refBy(Modbus_dword),
-                cachingTime = CACHE_NONE
-            }, ModbusField {
-                offset = 10777,
-                name = "TotalCapacitiveReactiveEnergy_system",
-                description = "Total capacitive reactive energy system",
-                type = refBy(Modbus_dword),
-                cachingTime = CACHE_NONE
-            }, ModbusField {
-                offset = 10779,
-                name = "PartialEnergyMeterActiveEnergyProcurement_system",
-                description = "Partial energy meter active energy procurement system",
-                type = refBy(Modbus_dword),
-                cachingTime = CACHE_NONE
-            }, ModbusField {
-                offset = 10781,
-                name = "PartialEnergyMeterInductiveReactiveEnergy_system",
-                description = "Partial energy meter inductive reactive energy system",
-                type = refBy(Modbus_dword),
-                cachingTime = CACHE_NONE
-            }, ModbusField {
-                offset = 10783,
-                name = "PartialEnergyMeterApparentEnergy_system",
-                description = "Partial energy meter apparent energy system",
-                type = refBy(Modbus_dword),
-                cachingTime = CACHE_NONE
-            }, ModbusField {
-                offset = 10785,
-                name = "PartialEnergyMeterActiveEnergySupply_system",
-                description = "Partial energy meter active energy supply system",
-                type = refBy(Modbus_dword),
-                cachingTime = CACHE_NONE
-            }, ModbusField {
-                offset = 10787,
-                name = "PartialEnergyMeterCapacitiveReactiveEnergy_system",
-                description = "Partial energy meter capacitive reactive energy system",
-                type = refBy(Modbus_dword),
-                cachingTime = CACHE_NONE
-            }
+        fields = modbusPhoenixEEMFields
+    };
+
+    sequenceOf(Field) modbusPhoenixEEMFields = {
+        ModbusField {
+            offset = 10511,
+            name = "Hour",
+            description = "Hour: operating hours counter",
+            type = refBy(Modbus_int32),
+            cachingTime = CACHE_NONE
+        }, ModbusField {
+            offset = 10513,
+            name = "U12",
+            description = "U12: conductor voltage",
+            type = refBy(Modbus_int32),
+            cachingTime = CACHE_NONE
+        }, ModbusField {
+            offset = 10515,
+            name = "U23",
+            description = "U23: conductor voltage",
+            type = refBy(Modbus_int32),
+            cachingTime = CACHE_NONE
+        }, ModbusField {
+            offset = 10517,
+            name = "U31",
+            description = "U31: conductor voltage",
+            type = refBy(Modbus_int32),
+            cachingTime = CACHE_NONE
+        }, ModbusField {
+            offset = 10519,
+            name = "V1",
+            description = "V1: conductor voltage to N",
+            type = refBy(Modbus_int32),
+            cachingTime = CACHE_NONE
+        }, ModbusField {
+            offset = 10521,
+            name = "V2",
+            description = "V2: conductor voltage to N",
+            type = refBy(Modbus_int32),
+            cachingTime = CACHE_NONE
+        }, ModbusField {
+            offset = 10523,
+            name = "V3",
+            description = "V3: conductor voltage to N",
+            type = refBy(Modbus_int32),
+            cachingTime = CACHE_NONE
+        }, ModbusField {
+            offset = 10525,
+            name = "frequency",
+            description = "F: frequency",
+            type = refBy(Modbus_int32),
+            cachingTime = CACHE_NONE
+        }, ModbusField {
+            offset = 10527,
+            name = "I1",
+            description = "I1: current",
+            type = refBy(Modbus_int32),
+            cachingTime = CACHE_NONE
+        }, ModbusField {
+            offset = 10529,
+            name = "I2",
+            description = "I2: current",
+            type = refBy(Modbus_int32),
+            cachingTime = CACHE_NONE
+        }, ModbusField {
+            offset = 10531,
+            name = "I3",
+            description = "I3: current",
+            type = refBy(Modbus_int32),
+            cachingTime = CACHE_NONE
+        }, ModbusField {
+            offset = 10533,
+            name = "In",
+            description = "In: neutral conductor current",
+            type = refBy(Modbus_int32),
+            cachingTime = CACHE_NONE
+        }, ModbusField {
+            offset = 10535,
+            name = "P",
+            description = "P: total active power +/-",
+            type = refBy(Modbus_int16),
+            cachingTime = CACHE_NONE
+        }, ModbusField {
+            offset = 10537,
+            name = "Q",
+            description = "Q: total reactive power +/-",
+            type = refBy(Modbus_int16),
+            cachingTime = CACHE_NONE
+        }, ModbusField {
+            offset = 10539,
+            name = "S",
+            description = "S: total apparent power",
+            type = refBy(Modbus_int32),
+            cachingTime = CACHE_NONE
+        }, ModbusField {
+            offset = 10541,
+            name = "PF",
+            description = "PF: total power factor -: capacitive and +: inductive",
+            type = refBy(Modbus_int16),
+            cachingTime = CACHE_NONE
+        }, ModbusField {
+            offset = 10543,
+            name = "P1",
+            description = "P1: active power phase 1 +/-",
+            type = refBy(Modbus_int16),
+            cachingTime = CACHE_NONE
+        }, ModbusField {
+            offset = 10545,
+            name = "P2",
+            description = "P2: active power phase 2 +/-",
+            type = refBy(Modbus_int16),
+            cachingTime = CACHE_NONE
+        }, ModbusField {
+            offset = 10547,
+            name = "P3",
+            description = "P3: active power phase 3 +/-",
+            type = refBy(Modbus_int16),
+            cachingTime = CACHE_NONE
+        }, ModbusField {
+            offset = 10549,
+            name = "Q1",
+            description = "Q1: reactive power phase 1 +/-",
+            type = refBy(Modbus_int16),
+            cachingTime = CACHE_NONE
+        }, ModbusField {
+            offset = 10551,
+            name = "Q2",
+            description = "Q2: reactive power phase 2 +/-",
+            type = refBy(Modbus_int16),
+            cachingTime = CACHE_NONE
+        }, ModbusField {
+            offset = 10553,
+            name = "Q3",
+            description = "Q3: reactive power phase 3 +/-",
+            type = refBy(Modbus_int16),
+            cachingTime = CACHE_NONE
+        }, ModbusField {
+            offset = 10555,
+            name = "S1",
+            description = "S1: apparent power phase 1",
+            type = refBy(Modbus_int32),
+            cachingTime = CACHE_NONE
+        }, ModbusField {
+            offset = 10557,
+            name = "S2",
+            description = "S2: apparent power phase 2",
+            type = refBy(Modbus_int32),
+            cachingTime = CACHE_NONE
+        }, ModbusField {
+            offset = 10559,
+            name = "S3",
+            description = "S3: apparent power phase 3",
+            type = refBy(Modbus_int32),
+            cachingTime = CACHE_NONE
+        }, ModbusField {
+            offset = 10561,
+            name = "PF1",
+            description = "PF1; power factor, phase 1 -: capacitive and +: inductive",
+            type = refBy(Modbus_int16),
+            cachingTime = CACHE_NONE
+        }, ModbusField {
+            offset = 10563,
+            name = "PF2",
+            description = "PF2; power factor, phase 2 -: capacitive and +: inductive",
+            type = refBy(Modbus_int16),
+            cachingTime = CACHE_NONE
+        }, ModbusField {
+            offset = 10565,
+            name = "PF3",
+            description = "PF3; power factor, phase 3 -: capacitive and +: inductive",
+            type = refBy(Modbus_int16),
+            cachingTime = CACHE_NONE
+        }, ModbusField {
+            offset = 10567,
+            name = "ISYS",
+            description = "ISYS: mean current value",
+            type = refBy(Modbus_int32),
+            cachingTime = CACHE_NONE
+        }, ModbusField {
+            offset = 10569,
+            name = "USYS",
+            description = "USYS: mean value of line voltages",
+            type = refBy(Modbus_int32),
+            cachingTime = CACHE_NONE
+        }, ModbusField {
+            offset = 10571,
+            name = "VSYS",
+            description = "VSYS: mean value of line voltages to N",
+            type = refBy(Modbus_int32),
+            cachingTime = CACHE_NONE
+        }, ModbusField {
+            offset = 10767,
+            name = "TotalActiveEnergyProcurement_system",
+            description = "Total active energy procurement system",
+            type = refBy(Modbus_int32),
+            cachingTime = CACHE_NONE
+        }, ModbusField {
+            offset = 10771,
+            name = "TotalInductiveReactiveEnergy_system",
+            description = "Total inductive reactive energy system",
+            type = refBy(Modbus_int32),
+            cachingTime = CACHE_NONE
+        }, ModbusField {
+            offset = 10773,
+            name = "TotalApparentEnergy_system",
+            description = "Total apparent energy system",
+            type = refBy(Modbus_int32),
+            cachingTime = CACHE_NONE
+        }, ModbusField {
+            offset = 10775,
+            name = "TotalActiveEnergySupply_system",
+            description = "Total active energy supply system",
+            type = refBy(Modbus_int32),
+            cachingTime = CACHE_NONE
+        }, ModbusField {
+            offset = 10777,
+            name = "TotalCapacitiveReactiveEnergy_system",
+            description = "Total capacitive reactive energy system",
+            type = refBy(Modbus_int32),
+            cachingTime = CACHE_NONE
+        }, ModbusField {
+            offset = 10779,
+            name = "PartialEnergyMeterActiveEnergyProcurement_system",
+            description = "Partial energy meter active energy procurement system",
+            type = refBy(Modbus_int32),
+            cachingTime = CACHE_NONE
+        }, ModbusField {
+            offset = 10781,
+            name = "PartialEnergyMeterInductiveReactiveEnergy_system",
+            description = "Partial energy meter inductive reactive energy system",
+            type = refBy(Modbus_int32),
+            cachingTime = CACHE_NONE
+        }, ModbusField {
+            offset = 10783,
+            name = "PartialEnergyMeterApparentEnergy_system",
+            description = "Partial energy meter apparent energy system",
+            type = refBy(Modbus_int32),
+            cachingTime = CACHE_NONE
+        }, ModbusField {
+            offset = 10785,
+            name = "PartialEnergyMeterActiveEnergySupply_system",
+            description = "Partial energy meter active energy supply system",
+            type = refBy(Modbus_int32),
+            cachingTime = CACHE_NONE
+        }, ModbusField {
+            offset = 10787,
+            name = "PartialEnergyMeterCapacitiveReactiveEnergy_system",
+            description = "Partial energy meter capacitive reactive energy system",
+            type = refBy(Modbus_int32),
+            cachingTime = CACHE_NONE
         }
     };
 
