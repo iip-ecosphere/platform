@@ -4,6 +4,7 @@ import AasBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
+@format(profile="java", profileArg_javadocIndent="* ", lineLength = 120)
 template AasAccessorImpl(Configuration config, FileArtifact target, AasSubmodelType type, String pkg) {
 
     setOf(String) done = {};

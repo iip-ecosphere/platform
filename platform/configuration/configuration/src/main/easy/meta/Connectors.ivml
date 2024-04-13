@@ -394,15 +394,106 @@ project Connectors {
    compound ModbusField refines Field {
        Integer offset;
    } 
+
+   def Boolean isModbusPath(IOTypeWithPath path) = isModbusPathType(path.type);
+
+   @DispatchBasis
+   def Boolean isModbusPathType(DataType type) = false;
+
+   @DispatchCase
+   def Boolean isModbusPathType(RecordType type) = type.fields->forAll(Field f | isModbusField(f));
+
+   @DispatchBasis
+   def Boolean isModbusField(Field field) = false;
+
+   @DispatchCase
+   def Boolean isModbusField(ModbusField field) = isModbusType(field.type);
+
+   @DispatchBasis
+   def Boolean isModbusType(DataType type) = false;
+
+   @DispatchCase
+   def Boolean isModbusType(AliasType type) = isModbusType(type.represents);
    
-   AliasType Modbus_dword = {
-       name = "Modbus_dword",
-       represents = refBy(Integer32Type)
-   };
-   AliasType Modbus_integer = {
-       name = "Modbus_integer",
+   AliasType Modbus_int16 = {
+       name = "Modbus_int16",
        represents = refBy(Integer16Type)
    };
+
+   @DispatchCase
+   def Boolean isModbusType(Integer16TypeType type) = true;
+
+   AliasType Modbus_uint16 = {
+       name = "Modbus_uint16",
+       represents = refBy(UnsignedInteger16Type)
+   };
+
+   @DispatchCase
+   def Boolean isModbusType(UnsignedInteger16TypeType type) = true;
+
+   AliasType Modbus_int32 = {
+       name = "Modbus_int32",
+       represents = refBy(Integer32Type)
+   };
+
+   @DispatchCase
+   def Boolean isModbusType(Integer32TypeType type) = true;
+
+   AliasType Modbus_uint32 = {
+       name = "Modbus_uint32",
+       represents = refBy(UnsignedInteger32Type)
+   };
+
+   @DispatchCase
+   def Boolean isModbusType(UnsignedInteger32TypeType type) = true;
+
+   AliasType Modbus_int64 = {
+       name = "Modbus_int64",
+       represents = refBy(Integer64Type)
+   };
+
+   @DispatchCase
+   def Boolean isModbusType(Integer64TypeType type) = true;
+
+   AliasType Modbus_uint64 = {
+       name = "Modbus_uint64",
+       represents = refBy(UnsignedInteger64Type)
+   };
+
+   @DispatchCase
+   def Boolean isModbusType(UnsignedInteger64TypeType type) = true;
+
+   AliasType Modbus_float32 = {
+       name = "Modbus_float32",
+       represents = refBy(FloatType)
+   };
+
+   @DispatchCase
+   def Boolean isModbusType(FloatTypeType type) = true;
+
+   AliasType Modbus_ascii = {
+       name = "Modbus_ascii",
+       represents = refBy(StringType)
+   };
+
+   @DispatchCase
+   def Boolean isModbusType(StringTypeType type) = true;
+
+   AliasType Modbus_bitmap = {
+       name = "Modbus_bitmap",
+       represents = refBy(Integer16Type)
+   };
+   
+   // see modbus_int16
+
+   AliasType Modbus_datetime = {
+       name = "Modbus_datetime",
+       represents = refBy(DateTimeType)
+   };
+
+   @DispatchCase
+   def Boolean isModbusType(DateTimeTypeType type) = true;
+   
    // more missing, don't forget freezing and mapping in ConnectorResource.vtl!
     
    compound ModbusTcpV1Connector refines Connector { // fixed template types see JavaConnector.vtl
@@ -420,8 +511,10 @@ project Connectors {
        assign (uiGroup = UiOptionalGroup2) to {
            String deviceServiceKey = "modbus/tcp";
        }
-       // CONSTRAINTS for FieldTypes -> ModbusField, non-nested
+       Constraint inInterfaceOk = isModbusPath(inInterface);
+       Constraint outInterfaceOk = isModbusPath(outInterface);
    }
+   
    
    // ------------------------ MODBUS / TCP ----------------------------------
 
@@ -440,8 +533,16 @@ project Connectors {
    }
    
    freeze {
-       Modbus_dword;
-       Modbus_integer;
+       Modbus_int16;
+       Modbus_uint16;
+       Modbus_int32;
+       Modbus_uint32;
+       Modbus_int64;
+       Modbus_uint64;
+       Modbus_float32;
+       Modbus_ascii;
+       Modbus_bitmap;
+       Modbus_datetime;
    };
     
 }

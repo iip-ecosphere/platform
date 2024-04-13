@@ -83,11 +83,6 @@ template AasBasics(Configuration config, FileArtifact target) {
         getIdShort(elt); // by default the field name but else the (imported) structure counts
     }
     
-    // EASy or move to easy
-    def htmlize(String text) {
-        text.replace("&","&amp;");
-    }
-    
     /**
     * Returns a class comment with the contents of var, else with dflt.
     */

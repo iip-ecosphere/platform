@@ -43,7 +43,7 @@ template Basics(Configuration config, FileArtifact target) {
     * output: potentially modified string
 	*/
 	def String htmlize(String s) {
-	    s.replace("<", "&lt;").replace(">", "&gt;").replace("@", "&commat;");
+	    s.replace("<", "&lt;").replace(">", "&gt;").replace("@", "&commat;").replace("&", "&amp;");
 	}
 	
 	/**
