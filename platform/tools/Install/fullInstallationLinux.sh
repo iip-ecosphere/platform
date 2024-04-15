@@ -225,7 +225,7 @@ if [ $yn == "y" ] || [ $yn == "Y" ]; then
                 sudo apt install npm -y;
                 sudo npm install -g @angular/cli@14.2.10;
                 sudo npm install -g express@4.18.1;
-                sudo npm install -g cors@2.8.5;
+                sudo npm install -g cors@2.8.5;;
         [Nn]* ) break;;
     esac
 
