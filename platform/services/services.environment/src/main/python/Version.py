@@ -77,10 +77,10 @@ class Version:
         """Initializes the service.
         
         Parameters:
-          - version -- the textual version in format "\d(.\d+)"
+          - version -- the textual version in format "\\d(.\\d+)"
         """ 
         if isVersion(version):
-            self.segments = list(map(int, filter(str.isdigit, re.split(r'(\d+)', version))))
+            self.segments = list(map(int, filter(str.isdigit, re.split(r'(\\d+)', version))))
         else:
             self.segments = [0]
 
@@ -112,7 +112,7 @@ class Version:
         
         Returns:
           str 
-            The string representation in format "\d(.\d+)"
+            The string representation in format "\\d(.\\d+)"
         """
 
         return '.'.join(map(str, self.segments))
