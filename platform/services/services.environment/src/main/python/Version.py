@@ -3,7 +3,7 @@ logger.basicConfig(level="DEBUG")
 import re
 
 SEPARATOR = "."
-PATTERN = re.compile("^(\d+)(\.\d+)*$")
+PATTERN = re.compile("^(\\d+)(\\.\\d+)*$")
 
 def isVersion(version):
     """Returns whether the given value is a string in form version format.
