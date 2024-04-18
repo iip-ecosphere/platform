@@ -99,6 +99,14 @@ template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, setOf(String) u
             new XmlElement(execCfg, "mainClass", "iip.nodes.${clsName}Test");
             new XmlElement(execCfg, "classpathFilenameExclusions", testClasspathFnExclusions);
             new XmlElement(execCfg, "classpathScope", "test");
+            if (elt.impl.isKindOf(Connector)) {
+                XmlElement exec = new XmlElement(execPluginExecs, "execution");
+                new XmlElement(exec, "id", "${clsName}ConnectivityTest");
+                XmlElement execCfg = new XmlElement(exec, "configuration");
+                new XmlElement(execCfg, "mainClass", "iip.connectivity.${clsName}Test");
+                new XmlElement(execCfg, "classpathFilenameExclusions", testClasspathFnExclusions);
+                new XmlElement(execCfg, "classpathScope", "test");
+            }
         }
         XmlElement exec = new XmlElement(execPluginExecs, "execution");
         new XmlElement(exec, "id", "App");

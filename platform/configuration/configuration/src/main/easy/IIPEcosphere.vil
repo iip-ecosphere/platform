@@ -510,6 +510,14 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         // do nothing, everything is here already generically in place
         generateTemplateArtifacts(appRoot, server.artifacts, assemblies);
     }
+    
+    @DispatchCase
+    generateTemplateElements(Path appRoot, Configuration config, MeshElement no, Connector conn, setOf(String) assemblies, setOf(String) javaTests) = {
+        Path javaTestSrc = "${appRoot}/src/test/java";
+        Path javaConnSrc = "${javaTestSrc}/${toPath(javaConnectivityPackage)}";
+        String clsName = asTypeName(conn.name);
+        vilTemplateProcessor("JavaConnectorConnectivityTest", config, "${javaConnSrc}/${clsName}Test.java", conn=conn, pkg=javaConnectivityPackage); 
+    }
 
     @DispatchCase
     generateTemplateElements(Path appRoot, Configuration config, MeshElement no, JavaService service, setOf(String) assemblies, setOf(String) javaTests) = {
