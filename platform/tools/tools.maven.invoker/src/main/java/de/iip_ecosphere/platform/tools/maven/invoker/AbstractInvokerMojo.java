@@ -253,10 +253,10 @@ public class AbstractInvokerMojo extends AbstractMojo implements Logger { // Abs
         request.addShellEnvironment("PYTHON_COMPILE_HASHDIR", hashDir); // invoker -D not correct?, pass on 2 mvn levels
         String settings = System.getenv("MAVEN_SETTINGS_PATH");
         if (null == settings) {
-            if (execRequest.getGlobalSettingsFile().exists()) {
+            if (null != execRequest.getGlobalSettingsFile() && execRequest.getGlobalSettingsFile().exists()) {
                 request.setGlobalSettingsFile(execRequest.getGlobalSettingsFile());
             }
-            if (execRequest.getUserSettingsFile().exists()) {
+            if (null != execRequest.getUserSettingsFile() && execRequest.getUserSettingsFile().exists()) {
                 request.setUserSettingsFile(execRequest.getUserSettingsFile());
             }
             File tmp = execRequest.getUserSettingsFile();
