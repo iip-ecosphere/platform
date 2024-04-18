@@ -4,6 +4,7 @@ import re
 
 SEPARATOR = "."
 PATTERN = re.compile("^(\\d+)(\\.\\d+)*$")
+SPLITPATTERN = re.compile("(\\d+)")
 
 def isVersion(version):
     """Returns whether the given value is a string in form version format.
@@ -77,10 +78,10 @@ class Version:
         """Initializes the service.
         
         Parameters:
-          - version -- the textual version in format "\\d(.\\d+)"
+          - version -- the textual version
         """ 
         if isVersion(version):
-            self.segments = list(map(int, filter(str.isdigit, re.split(r'(\\d+)', version))))
+            self.segments = list(map(int, filter(str.isdigit, re.split(SPLITPATTERN, version))))
         else:
             self.segments = [0]
 
@@ -112,7 +113,7 @@ class Version:
         
         Returns:
           str 
-            The string representation in format "\\d(.\\d+)"
+            The string representation
         """
 
         return '.'.join(map(str, self.segments))

@@ -1,5 +1,6 @@
 import unittest
 
+from VersionTest import VersionTest
 from YamlArtifactTest import YamlArtifactTest
 from ForwardingAppTest import ForwardingAppTest
 from GenericSerializerTest import Rec1SerializerTest
@@ -11,6 +12,7 @@ def suite():
     in an integration test with the Java side running the Python side as 
     server. However, more unit tests are of course welcome."""
     suite = unittest.TestSuite()
+    suite.addTest(VersionTest())
     suite.addTest(YamlArtifactTest())
     suite.addTest(ForwardingAppTest())
     suite.addTest(Rec1SerializerTest())
@@ -18,6 +20,9 @@ def suite():
     return suite
 
 if __name__ == '__main__':
+    exSuite = unittest.defaultTestLoader.loadTestsFromTestCase(VersionTest)
+    unittest.TextTestRunner(verbosity=3).run(exSuite)
+
     exSuite = unittest.defaultTestLoader.loadTestsFromTestCase(YamlArtifactTest)
     unittest.TextTestRunner(verbosity=3).run(exSuite)
 
