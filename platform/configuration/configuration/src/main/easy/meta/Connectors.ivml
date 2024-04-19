@@ -207,8 +207,7 @@ project Connectors {
       
     enum CacheMode {NONE, HASH, EQUALS};
       
-    // IIP-Ecosphere provided connectors
-    abstract compound Connector refines Service {
+    compound Connector refines Service { // not abstract, may be implemented in application code
        String class;
        String artifact;
        IOTypeWithPath inInterface; // provided data input to be mapped into adapter, alternative to adapterClass

@@ -21,20 +21,16 @@ template PythonAssembly(IIPEcosphere config, XmlFileArtifact target, Boolean wit
     }
     
     def dependencySet(String dependency, String dependency2) {
-        if (length(dependency) > 0) {
-            '<dependencySets>
-                <dependencySet>
-                    <includes>
-                        <include>${config.mvnIipGroup}:services.environment:zip:python:${config.iipVer}</include>
-                        <include>${dependency}</include>
-                        ${dependencyInclude(dependency2)|e}
-                    </includes>
-                    <unpack>true</unpack>
-                </dependencySet>
-            </dependencySets>'
-       } else {
-           ''
-       }
+        '<dependencySets>
+            <dependencySet>
+                <includes>
+                    <include>${config.mvnIipGroup}:services.environment:zip:python:${config.iipVer}</include>
+                    ${dependencyInclude(dependency)|e}
+                    ${dependencyInclude(dependency2)|e}
+                </includes>
+                <unpack>true</unpack>
+            </dependencySet>
+        </dependencySets>'
     }
 
     def main(IIPEcosphere config, XmlFileArtifact target, Boolean withServices, String dependency, String dependency2="") {
