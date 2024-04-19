@@ -26,7 +26,8 @@ project AllServicesPartSimpleMesh {
             defaultValue=-1,
             systemProperty="iip.app.simpleMesh.camPort"
           }
-        }
+        },
+        plugins = {refBy(BaSyx10Plugin)} // just for testing
     };
     
     Service myReceiverService = JavaService {
