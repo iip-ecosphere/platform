@@ -27,6 +27,8 @@ Improvements:
 * [#151](https://github.com/iip-ecosphere/platform/issues/151): UI CORS
 * [#155](https://github.com/iip-ecosphere/platform/issues/155): Align model locations to Maven, examples now use ''target/easy'' for the meta model and ''src/main/easy'' for the production configuration model. **For old example checkouts, delete all uncommitted files in ''src/main/easy'' that are also in ''target/easy''**.
 * Name convention change for service meshes in managed configurations: **The application name is not part of a service mesh name anymore** to enable more flexibility and reuse.
+* Python source compatibility for version > 3.9 (regex escapes, inspired through IMPT)
+* Streamlined assembly-based Python application packaging (inspired through IMPT).
 * [#157](https://github.com/iip-ecosphere/platform/issues/157): Clean up and untangle the configuration build flow, also for releases
 * [#115](https://github.com/iip-ecosphere/platform/issues/115): Cleanup, e.g., old build processes. AasUtils is now in support.aas, Version, AbstractSetup, JsonUtils are now in support. Duplicate classes were removed.
 * [#162](https://github.com/iip-ecosphere/platform/issues/156): Installation scripts revised, Angular also considered on Windows, more information during installation, generic deployment script added, mgt UI can be started.
