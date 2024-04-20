@@ -29,9 +29,15 @@
 
 *Symptom:* While executing in particular central parts of the platform, this error message/exception may occur.
 
-*Reason:* Maven tends to resolve dependencies to the most recent version using a given version number as minimum, in particular if version ranges are allowed. As long as dependencies do not change or the specified version range is feasible, no such problems shall occur. It may occur upon the first resolution, i.e., during installation or when dependencies are updated, e.g., during Continuous Integration (CI) when Maven is requested to search for more recent snapshots. However, in particular for Eclipse components which declare version ranges, compiler settings currently seem to be changed from JDK 8 to JDK 11, i.e., even a minor version change may suddenly (upon an unintended update) lead to this failure.
+*Reason:* Maven tends to resolve dependencies to the most recent version using a given version number as minimum, in particular if version ranges are allowed. As long as dependencies do not change or the specified version range is feasible, no such problems shall occur. It may occur upon the first resolution, i.e., during installation or when dependencies are updated, e.g., during Continuous Integration (CI) when Maven is requested to search for more recent snapshots. However, in particular for Eclipse components which declare version ranges, compiler settings have changed to JDK 11, i.e., even a minor version change may suddenly (upon an unintended update) lead to this failure.
 
-*Solution:* As quick fix, use the JDK version indicated by the class version number to execute the respective platform component, i.e., usually JDK 11. Alternatively, you may force Maven to download a compatible, previous version number by creating a simple POM and deleting the failing version. In any case, please let us know about the problem via GitHub. We will try to fix the version numbers for central parts such as Eclipse components to a version range that allows for safe execution.
+*Solution:* We have nailed down the versions of the respective components, requiring at least JDK 11 for oktoflow. Oktoflow and its build processes run up to JDK 16. For more modern JDKs see below.
+
+## Why does the platform not run on more recent JDKs?
+
+*Symptom:* When you run oktoflow with a JDK more recent than version 16, it fails to start.
+
+*Reason:* In it's core, oktoflow uses EASy-Producer, which, in turn, uses core components of Eclipse as well as xtext for domain-specific languages. However, switching over to a recent Eclipse and the respective dependencies is a non-trivial process, that may render oktoflow and its containers useless for the migration time. We started a migration process, which carefully explores these components and hopefully allows us upgrading EASy-Producer first. Then, we plan to migrate oktoflow.
 
 ## Platform code cannot be setup in Eclipse, e.g., parent POM missing
 
