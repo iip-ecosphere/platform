@@ -31,7 +31,7 @@
 
 *Reason:* Maven tends to resolve dependencies to the most recent version using a given version number as minimum, in particular if version ranges are allowed. As long as dependencies do not change or the specified version range is feasible, no such problems shall occur. It may occur upon the first resolution, i.e., during installation or when dependencies are updated, e.g., during Continuous Integration (CI) when Maven is requested to search for more recent snapshots. However, in particular for Eclipse components which declare version ranges, compiler settings have changed to JDK 11, i.e., even a minor version change may suddenly (upon an unintended update) lead to this failure.
 
-*Solution:* We have nailed down the versions of the respective components, requiring at least JDK 11 for oktoflow. Oktoflow and its build processes run up to JDK 16. For more modern JDKs see below.
+*Solution:* We have nailed down the versions of the respective components, requiring at least JDK 11 for oktoflow. Oktoflow and its build processes run up to JDK 16. However, the usable JDKs warn about illegal reflection accesses for some libraries. Getting rid of these libraries would require support for more modern JDKs (see below).
 
 ## Why does the platform not run on more recent JDKs?
 
