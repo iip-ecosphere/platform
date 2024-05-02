@@ -41,7 +41,7 @@ public class ModbusMachineCommandInputTranslator<O>
 
     @Override
     public O from(ModbusMachineCommand data) throws IOException {
-        
+
         AbstractModelAccess access = (AbstractModelAccess) getModelAccess();  
 
         for (int i = 0; i < data.getKeyCount(); i++) {

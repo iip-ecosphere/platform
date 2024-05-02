@@ -12,11 +12,7 @@
 
 package de.iip_ecosphere.platform.connectors.modbustcpipv1;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import de.iip_ecosphere.platform.connectors.ConnectorParameter;
-import de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusVarItem.ModbusVarItemType;
+import java.util.HashMap;
 
 /**
  * The ModbusItem is the data structure that is read from the machine and
@@ -28,88 +24,54 @@ import de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusVarItem.ModbusVa
  */
 public class ModbusItem {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ModbusItem.class);
-
-    /**
-     * Holding registers size.
-     */
-    private int mHoldingRegisterSize = 0;
-
-    /**
-     * Holding registers values.
-     */
-    private short[] mHoldingRegister;
+    private HashMap<Integer, Object> registers;
 
     /**
      * Creates an instance.
      * 
-     * @param param the ConnectorParameter 
+     * @param map the ModbusMap
      */
-    public ModbusItem(ConnectorParameter param) {
-        
-        System.out.println("ModbusItem");
-        
-        String[] keys = ModbusKeys.getKeys();
-        
-        for (int i = 0; i < keys.length; i++) {
-           
-            ModbusVarItem item = (ModbusVarItem) param.getSpecificSetting(keys[i]);
+    public ModbusItem(ModbusMap map) {
+
+        registers = new HashMap<Integer, Object>();
+
+        for (ModbusMap.Entry<String, ModbusVarItem> entry : map.entrySet()) {
             
-            if (item.getType() == ModbusVarItemType.Short) {
-                
-                mHoldingRegisterSize += 1;
-                
-            } else if (item.getType() == ModbusVarItemType.Integer || item.getType() == ModbusVarItemType.Float ) {
-                
-                mHoldingRegisterSize += 2;
-                
-            } else if (item.getType() == ModbusVarItemType.Long || item.getType() == ModbusVarItemType.Double) {
-                
-                mHoldingRegisterSize += 4;
-            }
+            ModbusVarItem varItem = entry.getValue();
+            registers.put(varItem.getOffset(), 0);
         }
+    }
+    
+    /**
+     * Returns the HashMap&lt;Integer, Object&gt; registers.
+     * 
+     * @return HashMap&lt;Integer, Object&gt; registers
+     */
+    public HashMap<Integer, Object> getRegisters() {
         
-        mHoldingRegister = new short[mHoldingRegisterSize];
+        return registers;
     }
-
+    
     /**
-     * Sets the holding register at aIndex to aValue.
+     * Returns the Object at offset.
      * 
-     * @param aIndex of the register to write to
-     * @param aValue to write
+     * @param offset of the Object to get
+     * @return the Object at offset
      */
-    public void setHoldingRegister(int aIndex, short aValue) {
-
-        if (aIndex < mHoldingRegisterSize) {
-            mHoldingRegister[aIndex] = aValue;
-        } else {
-            LOGGER.info("setHoldingRegister : aIndex = " + aIndex + " is out of range");
-        }
-
-    }
-
-    /**
-     * Returns the holding registers size.
-     * 
-     * @return  holding registers size
-     */
-    public int getHoldingRegisterSize() {
-        return mHoldingRegisterSize;
-    }
-
-    /**
-     * Get the holding registers value at aIndex.
-     * 
-     * @param aIndex of the register to read from
-     * @return holding registers value at aIndex or -1 if aIndex is out of range
-     */
-    public short getHoldingRegister(int aIndex) {
+    public Object getRegister(int offset) {
         
-        if (aIndex < mHoldingRegisterSize) {
-            return mHoldingRegister[aIndex];
-        } else {
-            LOGGER.info("getHoldingRegister : aIndex = " + aIndex + " is out of range");
-            return -1;
-        }    
+        return registers.get(offset);
     }
+    
+    /**
+     * Sets the Object at offset to value.
+     * 
+     * @param offset of the Object to set
+     * @param value to set for the offset
+     */
+    public void setRegister(int offset, Object value) {
+        
+        registers.put(offset, value);
+    }
+
 }

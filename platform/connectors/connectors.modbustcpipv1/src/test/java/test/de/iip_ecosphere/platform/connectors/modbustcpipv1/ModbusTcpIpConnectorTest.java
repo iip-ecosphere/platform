@@ -13,6 +13,7 @@
 package test.de.iip_ecosphere.platform.connectors.modbustcpipv1;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -31,6 +32,7 @@ import de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusVarItem;
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.Schema;
+import de.iip_ecosphere.platform.support.json.JsonUtils;
 
 /**
  * Tests the MODBUS TCP/IP connector (not secure, polling).
@@ -56,7 +58,8 @@ public class ModbusTcpIpConnectorTest extends AbstractModbusTcpIpConnectorTest {
     public static void init() {
         testServer = new TestServer(false);
         testServer.start();
-        LOGGER.info("MODBUS TCP/IP server started");
+        LOGGER.info("MODBUS TCP/IP server started at " + testServer.getHost() + ":" + testServer.getPort());
+        
     }
 
     /**
@@ -86,18 +89,21 @@ public class ModbusTcpIpConnectorTest extends AbstractModbusTcpIpConnectorTest {
     @Override
     protected ConnectorParameter getConnectorParameter() {
         Endpoint registryEndpoint = new Endpoint(Schema.TCP, testServer.getHost(), testServer.getPort(), "");
-        ConnectorParameterBuilder test = ConnectorParameterBuilder.newBuilder(registryEndpoint);
-        test.setApplicationInformation("App_Id", "App_Description");
-        test.setEndpointPath(registryEndpoint.getSchema() + ":" + registryEndpoint.getEndpoint());
+        ConnectorParameterBuilder testParameter = ConnectorParameterBuilder.newBuilder(registryEndpoint);
+        testParameter.setApplicationInformation("App_Id", "App_Description");
+        testParameter.setEndpointPath(registryEndpoint.getSchema() + ":" + registryEndpoint.getEndpoint());
         
-        ModbusMap map = testServer.getMap();
+        //So läuft der Test wieder durch, aber das Einstellen der SERVER_STRUCTURE verursacht Fehler...
+        String serverStructure = testServer.getServerStructure();
         
-        for (ModbusMap.Entry<String, ModbusVarItem> entry : map.entrySet()) {
-            
-            test.setSpecificSetting(entry.getKey(), entry.getValue());
-        }
+        Charset charset = Charset.forName("UTF-8");
+        byte[] bytes = serverStructure.getBytes(charset);
         
-        return test.build();
+        String str = new String(bytes, charset);
+        
+        testParameter.setSpecificSetting("SERVER_STRUCTURE", str);
+        
+        return testParameter.build();
 
     }
 
@@ -106,5 +112,14 @@ public class ModbusTcpIpConnectorTest extends AbstractModbusTcpIpConnectorTest {
             ProtocolAdapter<ModbusItem, Object, ModbusMachineData, ModbusMachineCommand> adapter) {
 
         return new ModbusTcpIpConnector<ModbusMachineData, ModbusMachineCommand>(adapter);
+    }
+    
+    /**
+     * Returns the TestServer.
+     * 
+     * @return the TestServer
+     */
+    public static TestServer getTestServer() {
+        return testServer;
     }
 }

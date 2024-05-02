@@ -1,14 +1,15 @@
 package test.de.iip_ecosphere.platform.connectors.modbustcpipv1;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Set;
 
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
-import de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusKeys;
-import de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusVarItem;
+import de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusItem;
+import de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusMap;
 import de.iip_ecosphere.platform.connectors.model.AbstractModelAccess;
 import de.iip_ecosphere.platform.connectors.model.ModelAccess;
 import de.iip_ecosphere.platform.connectors.types.AbstractConnectorOutputTypeTranslator;
+import de.iip_ecosphere.platform.support.json.JsonUtils;
 import test.de.iip_ecosphere.platform.connectors.MachineDataOutputTranslator.OutputCustomizer;
 
 /**
@@ -40,25 +41,20 @@ public class ModbusMachineDataOutputTranslator<S>  extends AbstractConnectorOutp
 
     @Override
     public ModbusMachineData to(Object source) throws IOException {
-
         AbstractModelAccess access = (AbstractModelAccess) getModelAccess();  
         ConnectorParameter params = access.getConnectorParameter();
         
-        String[] keys = ModbusKeys.getKeys();
+        Object serverStructure = params.getSpecificSetting("SERVER_STRUCTURE");
+        ModbusMap map = JsonUtils.fromJson(serverStructure, ModbusMap.class);
         
-        ArrayList<ModbusVarItem> items = new ArrayList<ModbusVarItem>();
+        Set<String> keys = map.keySet();
         
-        for (int i = 0; i < keys.length; i++) {
-            items.add((ModbusVarItem) params.getSpecificSetting(keys[i]));  
+        ModbusMachineData lResult = new ModbusMachineData(map);
+        
+        for (String key : keys) {
+            lResult.addValue(key, map.get(key), access.get(key));
         }
         
-        ModbusMachineData lResult = new ModbusMachineData();
-        
-        
-        for (int i = 0; i < items.size(); i++) {
-            lResult.addValue(items.get(i), access.get(keys[i]));
-        }
-       
         return lResult;
     }
 

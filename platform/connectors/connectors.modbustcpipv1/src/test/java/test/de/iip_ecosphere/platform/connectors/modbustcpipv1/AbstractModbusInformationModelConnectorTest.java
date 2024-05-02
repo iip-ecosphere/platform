@@ -23,10 +23,11 @@ import org.slf4j.LoggerFactory;
 import de.iip_ecosphere.platform.connectors.Connector;
 import de.iip_ecosphere.platform.connectors.ConnectorDescriptor;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
-import de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusKeys;
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
 import de.iip_ecosphere.platform.connectors.types.TranslatingProtocolAdapter;
 import de.iip_ecosphere.platform.support.TimeUtils;
+import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
+import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import test.de.iip_ecosphere.platform.connectors.ConnectorTest;
 import test.de.iip_ecosphere.platform.connectors.MachineCommandInputTranslator.InputCustomizer;
@@ -60,18 +61,17 @@ public abstract class AbstractModbusInformationModelConnectorTest<D> implements 
      * @throws IOException in case that creating the connector fails
      */
     public void testConnector(boolean withNotifications) throws IOException {
+        ActiveAasBase.setNotificationMode(NotificationMode.NONE);
         ConnectorTest.assertDescriptorRegistration(getConnectorDescriptor());
-        
+
         AtomicReference<ModbusMachineData> md = new AtomicReference<ModbusMachineData>();
         AtomicInteger count = new AtomicInteger(0);
 
         Connector<D, Object, ModbusMachineData, ModbusMachineCommand> connector = createConnector(
                 new TranslatingProtocolAdapter<D, Object, ModbusMachineData, ModbusMachineCommand>(
-                        new ModbusMachineDataOutputTranslator<D>(withNotifications, dataType, 
-                                this),
+                        new ModbusMachineDataOutputTranslator<D>(withNotifications, dataType, this),
                         new ModbusMachineCommandInputTranslator<Object>(Object.class)));
-         
-        
+
         ConnectorTest.assertInstance(connector, false);
         ConnectorTest.assertConnectorProperties(connector);
         connector.setReceptionCallback(new ReceptionCallback<ModbusMachineData>() {
@@ -87,32 +87,30 @@ public abstract class AbstractModbusInformationModelConnectorTest<D> implements 
                 return ModbusMachineData.class;
             }
         });
-        
+
         connector.connect(getConnectorParameter());
         ConnectorTest.assertInstance(connector, true);
         LOGGER.info("Connector '" + connector.getName() + "' started");
-        
+
         block(count, 2);
-        
+
         ModbusMachineData tmp = md.get();
         Assert.assertNotNull("We shall have received some data although the machine is not running", tmp);
-        
-        //All values should be 0
-        String[] keys = ModbusKeys.getKeys();
-        
-        Assert.assertEquals((short) 0, tmp.getValue(keys[0]));
-        Assert.assertEquals((int) 0, tmp.getValue(keys[1]));
-        Assert.assertTrue((float) tmp.getValue(keys[2]) < 1);
-        Assert.assertEquals((long) 0, tmp.getValue(keys[3]));
-        Assert.assertTrue((double) tmp.getValue(keys[4]) < 1);
 
-        testShort(connector, count, md, keys);
-        testInt(connector, count, md, keys);
-        testFloat(connector, count, md, keys);
-        testLong(connector, count, md, keys);
-        testDouble(connector, count, md, keys);
-        testAllToZero(connector, count, md, keys);
-        
+        // All values should be 0
+        Assert.assertEquals((short) 0, tmp.getValue("Short"));
+        Assert.assertEquals((int) 0, tmp.getValue("Integer"));
+        Assert.assertTrue((float) tmp.getValue("Float") < 1);
+        Assert.assertEquals((long) 0, tmp.getValue("Long"));
+        Assert.assertTrue((double) tmp.getValue("Double") < 1);
+
+        testShort(connector, count, md);
+        testInt(connector, count, md);
+        testFloat(connector, count, md);
+        testLong(connector, count, md);
+        testDouble(connector, count, md);
+        testAllToZero(connector, count, md);
+
         ConnectorTest.assertInstance(connector, true);
         connector.disconnect();
         ConnectorTest.assertInstance(connector, false);
@@ -123,61 +121,58 @@ public abstract class AbstractModbusInformationModelConnectorTest<D> implements 
      * Tries to write a short value.
      * 
      * @param connector the connector
-     * @param count the test counter
-     * @param md the machine data
-     * @param keys the ModbusKeys 
+     * @param count     the test counter
+     * @param md        the machine data
      * @throws IOException if an I/O problem occurs
      */
-    private void testShort(Connector<D, Object, ModbusMachineData, ModbusMachineCommand> connector, 
-        AtomicInteger count, AtomicReference<ModbusMachineData> md, String[] keys) throws IOException {
-        
+    private void testShort(Connector<D, Object, ModbusMachineData, ModbusMachineCommand> connector, AtomicInteger count,
+            AtomicReference<ModbusMachineData> md) throws IOException {
+
         // try to write a short value to the machine
         Object value = (short) 1;
-        
+
         ModbusMachineCommand cmd = new ModbusMachineCommand();
-        cmd.set(keys[0], value);
+        cmd.set("Short", value);
         connector.write(cmd);
-        
+
         block(count, 3);
-        
+
         ModbusMachineData tmp = md.get();
         
-        Assert.assertEquals(value, tmp.getValue(keys[0]));
-        Assert.assertEquals((int) 0, tmp.getValue(keys[1]));
-        Assert.assertTrue((float) tmp.getValue(keys[2]) < 1);
-        Assert.assertEquals((long) 0, tmp.getValue(keys[3]));
-        Assert.assertTrue((double) tmp.getValue(keys[4]) < 1);
-
+        Assert.assertEquals((short) value, tmp.getValue("Short"));
+        Assert.assertEquals((int) 0, tmp.getValue("Integer"));
+        Assert.assertTrue((float) tmp.getValue("Float") < 1);
+        Assert.assertEquals((long) 0, tmp.getValue("Long"));
+        Assert.assertTrue((double) tmp.getValue("Double") < 1);
     }
 
     /**
      * Tries to write an int value.
      * 
      * @param connector the connector
-     * @param count the test counter
-     * @param md the machine data
-     * @param keys the ModbusKeys 
+     * @param count     the test counter
+     * @param md        the machine data
      * @throws IOException if an I/O problem occurs
      */
-    private void testInt(Connector<D, Object, ModbusMachineData, ModbusMachineCommand> connector, 
-        AtomicInteger count, AtomicReference<ModbusMachineData> md, String[] keys) throws IOException {
-        
+    private void testInt(Connector<D, Object, ModbusMachineData, ModbusMachineCommand> connector, AtomicInteger count,
+            AtomicReference<ModbusMachineData> md) throws IOException {
+
         // try to write a int value to the machine
         Object value = (int) 5;
-        
+
         ModbusMachineCommand cmd = new ModbusMachineCommand();
-        cmd.set(keys[1], value);
+        cmd.set("Integer", value);
         connector.write(cmd);
-        
+
         block(count, 4);
-        
+
         ModbusMachineData tmp = md.get();
         
-        Assert.assertEquals((short) 1, tmp.getValue(keys[0]));
-        Assert.assertEquals(value, tmp.getValue(keys[1]));
-        Assert.assertTrue((float) tmp.getValue(keys[2]) < 1);
-        Assert.assertEquals((long) 0, tmp.getValue(keys[3]));
-        Assert.assertTrue((double) tmp.getValue(keys[4]) < 1);
+        Assert.assertEquals((short) 1, tmp.getValue("Short"));
+        Assert.assertEquals((int) value, tmp.getValue("Integer"));
+        Assert.assertTrue((float) tmp.getValue("Float") < 1);
+        Assert.assertEquals((long) 0, tmp.getValue("Long"));
+        Assert.assertTrue((double) tmp.getValue("Double") < 1);
 
     }
 
@@ -185,30 +180,29 @@ public abstract class AbstractModbusInformationModelConnectorTest<D> implements 
      * Tries to write a float value.
      * 
      * @param connector the connector
-     * @param count the test counter
-     * @param md the machine data
-     * @param keys the ModbusKeys 
+     * @param count     the test counter
+     * @param md        the machine data
      * @throws IOException if an I/O problem occurs
      */
-    private void testFloat(Connector<D, Object, ModbusMachineData, ModbusMachineCommand> connector, 
-        AtomicInteger count, AtomicReference<ModbusMachineData> md, String[] keys) throws IOException {
-        
+    private void testFloat(Connector<D, Object, ModbusMachineData, ModbusMachineCommand> connector, AtomicInteger count,
+            AtomicReference<ModbusMachineData> md) throws IOException {
+
         // try to write a float value to the machine
         Object value = (float) 17.23;
-        
+
         ModbusMachineCommand cmd = new ModbusMachineCommand();
-        cmd.set(keys[2], value);
+        cmd.set("Float", value);
         connector.write(cmd);
-        
+
         block(count, 5);
-        
+
         ModbusMachineData tmp = md.get();
-        
-        Assert.assertEquals((short) 1, tmp.getValue(keys[0]));
-        Assert.assertEquals((int) 5, tmp.getValue(keys[1]));
-        Assert.assertTrue((float) tmp.getValue(keys[2]) > 17);
-        Assert.assertEquals((long) 0, tmp.getValue(keys[3]));
-        Assert.assertTrue((double) tmp.getValue(keys[4]) < 1);
+
+        Assert.assertEquals((short) 1, tmp.getValue("Short"));
+        Assert.assertEquals((int) 5, tmp.getValue("Integer"));
+        Assert.assertTrue((float) tmp.getValue("Float") > 17);
+        Assert.assertEquals((long) 0, tmp.getValue("Long"));
+        Assert.assertTrue((double) tmp.getValue("Double") < 1);
 
     }
 
@@ -216,30 +210,29 @@ public abstract class AbstractModbusInformationModelConnectorTest<D> implements 
      * Tries to write a long value.
      * 
      * @param connector the connector
-     * @param count the test counter
-     * @param md the machine data
-     * @param keys the ModbusKeys 
+     * @param count     the test counter
+     * @param md        the machine data
      * @throws IOException if an I/O problem occurs
      */
-    private void testLong(Connector<D, Object, ModbusMachineData, ModbusMachineCommand> connector, 
-        AtomicInteger count, AtomicReference<ModbusMachineData> md, String[] keys) throws IOException {
-        
-        //try to write a long value to the machine
+    private void testLong(Connector<D, Object, ModbusMachineData, ModbusMachineCommand> connector, AtomicInteger count,
+            AtomicReference<ModbusMachineData> md) throws IOException {
+
+        // try to write a long value to the machine
         Object value = (long) 21;
-        
+
         ModbusMachineCommand cmd = new ModbusMachineCommand();
-        cmd.set(keys[3], value);
+        cmd.set("Long", value);
         connector.write(cmd);
-        
+
         block(count, 6);
-        
+
         ModbusMachineData tmp = md.get();
-        
-        Assert.assertEquals((short) 1, tmp.getValue(keys[0]));
-        Assert.assertEquals((int) 5, tmp.getValue(keys[1]));
-        Assert.assertTrue((float) tmp.getValue(keys[2]) > 17);
-        Assert.assertEquals(value, tmp.getValue(keys[3]));
-        Assert.assertTrue((double) tmp.getValue(keys[4]) < 1);
+
+        Assert.assertEquals((short) 1, tmp.getValue("Short"));
+        Assert.assertEquals((int) 5, tmp.getValue("Integer"));
+        Assert.assertTrue((float) tmp.getValue("Float") > 17);
+        Assert.assertEquals((long) value, tmp.getValue("Long"));
+        Assert.assertTrue((double) tmp.getValue("Double") < 1);
 
     }
 
@@ -247,30 +240,28 @@ public abstract class AbstractModbusInformationModelConnectorTest<D> implements 
      * Tries to write a double value.
      * 
      * @param connector the connector
-     * @param count the test counter
-     * @param md the machine data
-     * @param keys the ModbusKeys 
+     * @param count     the test counter
+     * @param md        the machine data
      * @throws IOException if an I/O problem occurs
      */
-    private void testDouble(Connector<D, Object, ModbusMachineData, ModbusMachineCommand> connector, 
-        AtomicInteger count, AtomicReference<ModbusMachineData> md, String[] keys) throws IOException {
-        
+    private void testDouble(Connector<D, Object, ModbusMachineData, ModbusMachineCommand> connector,
+            AtomicInteger count, AtomicReference<ModbusMachineData> md) throws IOException {
+
         // try to write a double value to the machine
         Object value = (double) 12345.6789;
-        
+
         ModbusMachineCommand cmd = new ModbusMachineCommand();
-        cmd.set(keys[4], value);
+        cmd.set("Double", value);
         connector.write(cmd);
-        
+
         block(count, 7);
-        
+
         ModbusMachineData tmp = md.get();
-        
-        Assert.assertEquals((short) 1, tmp.getValue(keys[0]));
-        Assert.assertEquals((int) 5, tmp.getValue(keys[1]));
-        Assert.assertTrue((float) tmp.getValue(keys[2]) > 17);
-        Assert.assertEquals((long) 21, tmp.getValue(keys[3]));
-        Assert.assertTrue((double) tmp.getValue(keys[4]) > 12345);
+        Assert.assertEquals((short) 1, tmp.getValue("Short"));
+        Assert.assertEquals((int) 5, tmp.getValue("Integer"));
+        Assert.assertTrue((float) tmp.getValue("Float") > 17);
+        Assert.assertEquals((long) 21, tmp.getValue("Long"));
+        Assert.assertTrue((double) tmp.getValue("Double") > 12345);
 
     }
 
@@ -278,45 +269,45 @@ public abstract class AbstractModbusInformationModelConnectorTest<D> implements 
      * Tries to write all values to 0.
      * 
      * @param connector the connector
-     * @param count the test counter
-     * @param md the machine data
-     * @param keys the ModbusKeys 
+     * @param count     the test counter
+     * @param md        the machine data
      * @throws IOException if an I/O problem occurs
      */
-    private void testAllToZero(Connector<D, Object, ModbusMachineData, ModbusMachineCommand> connector, 
-        AtomicInteger count, AtomicReference<ModbusMachineData> md, String[] keys) throws IOException {
+    private void testAllToZero(Connector<D, Object, ModbusMachineData, ModbusMachineCommand> connector,
+            AtomicInteger count, AtomicReference<ModbusMachineData> md) throws IOException {
 
         // try to write all values to 0
-        Object value = 0;
-        
         ModbusMachineCommand cmd = new ModbusMachineCommand();
-        
-        for (int i = 0; i < keys.length; i++) {
-            cmd.set(keys[i], value);
-        }
+        cmd.set("Short",  (short) 0);
+        cmd.set("Integer", (int) 0);
+        cmd.set("Float", (float) 0);
+        cmd.set("Long", (long) 0);
+        cmd.set("Double", (double) 0);
 
         connector.write(cmd);
-        
-        block(count, 7); 
-        
+
+        block(count, 7);
+
         ModbusMachineData tmp = md.get();
-        
-        Assert.assertEquals((short) 0, tmp.getValue(keys[0]));
-        Assert.assertEquals((int) 0, tmp.getValue(keys[1]));
-        Assert.assertTrue((float) tmp.getValue(keys[2]) < 1);
-        Assert.assertEquals((long) 0, tmp.getValue(keys[3]));
-        Assert.assertTrue((double) tmp.getValue(keys[4]) < 1);
+
+        Assert.assertEquals((short) 0, tmp.getValue("Short"));
+        Assert.assertEquals((int) 0, tmp.getValue("Integer"));
+        Assert.assertTrue((float) tmp.getValue("Float") < 1);
+        Assert.assertEquals((long) 0, tmp.getValue("Long"));
+        Assert.assertTrue((double) tmp.getValue("Double") < 1);
 
     }
-    
+
     /**
-     * Blocks until a certain number of (accumulated) receptions is reached or fails after 4s.
+     * Blocks until a certain number of (accumulated) receptions is reached or fails
+     * after 4s.
      * 
-     * @param count the counter
-     * @param receptions the expected number of receptions 
+     * @param count      the counter
+     * @param receptions the expected number of receptions
      */
     protected void block(AtomicInteger count, int receptions) {
-        int max = 35; // longer than polling interval in params, 30 may be required depending on machine speed
+        int max = 500; // longer than polling interval in params, 30 may be required depending on
+                      // machine speed
         while (count.get() < receptions && max > 0) {
             TimeUtils.sleep(200);
             max--;
@@ -325,7 +316,8 @@ public abstract class AbstractModbusInformationModelConnectorTest<D> implements 
     }
 
     /**
-     * Returns the connector descriptor for {@link #createConnector(ProtocolAdapter)}.
+     * Returns the connector descriptor for
+     * {@link #createConnector(ProtocolAdapter)}.
      * 
      * @return the connector descriptor
      */
@@ -341,7 +333,8 @@ public abstract class AbstractModbusInformationModelConnectorTest<D> implements 
             ProtocolAdapter<D, Object, ModbusMachineData, ModbusMachineCommand> adapter);
 
     /**
-     * Returns the connector parameters for {@link Connector#connect(ConnectorParameter)}.
+     * Returns the connector parameters for
+     * {@link Connector#connect(ConnectorParameter)}.
      * 
      * @return the connector parameters
      */

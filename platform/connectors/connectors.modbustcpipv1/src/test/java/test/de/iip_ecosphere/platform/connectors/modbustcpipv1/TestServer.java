@@ -15,9 +15,10 @@ package test.de.iip_ecosphere.platform.connectors.modbustcpipv1;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-import de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusKeys;
 import de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusMap;
+import de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusVarItem;
 import de.iip_ecosphere.platform.support.NetUtils;
+import de.iip_ecosphere.platform.support.json.JsonUtils;
 import net.wimpi.modbus.Modbus;
 import net.wimpi.modbus.ModbusCoupler;
 import net.wimpi.modbus.net.ModbusTCPListener;
@@ -33,25 +34,18 @@ import net.wimpi.modbus.procimg.SimpleRegister;
  */
 public class TestServer {
 
-    /**
-     * Determines the amount of holding registers for the TestServer.
-     * The TestServer has 4 16bit registers per key, so we can store 
-     * a 64bit value for each key if needed.
-     */
-    private static final int TEST_SIZE = ModbusKeys.getKeys().length * 4;
-
     private ModbusTCPListener mListener = null;
 
     private InetAddress mHost;
     private int mPort; 
-    
+    private String serverStructure;
     private ModbusMap map;
 
     /**
      * Creates a TestServer instance.
      * 
-     * @param defaultPort : true -> Modbus default port 502 is used
-     *                     false -> Free port from NetUtils.getEphemeralPort() is used.
+     * @param defaultPort : true -&gt; Modbus default port 502 is used
+     *                     false -&gt; Free port from NetUtils.getEphemeralPort() is used.
      */
     public TestServer(boolean defaultPort) {
         
@@ -60,11 +54,20 @@ public class TestServer {
         } else {
             mPort = Modbus.DEFAULT_PORT;
         }
+        
+        serverStructure = createServerStructure();
+        map = JsonUtils.fromJson(serverStructure, ModbusMap.class);
+        
+        if (map == null) {
+            System.out.println("TestServer -> No SERVER_STRUCTURE found");
+        } 
 
         SimpleProcessImage spi = null;
         spi = new SimpleProcessImage();
+        
+        int registerCount = getRegisterCount();
 
-        for (int i = 0; i < TEST_SIZE; i++) {
+        for (int i = 0; i < registerCount; i++) {
             spi.addRegister(new SimpleRegister(0));
         }
 
@@ -133,6 +136,61 @@ public class TestServer {
      */
     public ModbusMap getMap() {
         return map; 
+    }
+    
+    /**
+     * Calculates the count of Registers needed to store the ModbusServerMap
+     * and returs it.
+     * 
+     * @return the count of Registers needed to store the ModbusServerMap
+     */
+    public int getRegisterCount() {
+        
+        int maxOffset = 0;
+        
+        for (ModbusMap.Entry<String, ModbusVarItem> entry : map.entrySet()) {
+
+            ModbusVarItem value = entry.getValue();
+            
+            if (value.getOffset() > maxOffset) {
+                maxOffset = value.getOffset();
+            }
+
+        }
+        
+        maxOffset += 4;
+        
+        System.out.println("ServerRegisterCount: " + maxOffset);
+        
+        return maxOffset;
+        
+    }
+    
+    /**
+     * Returs the ServerSettings for the TestServer.
+     * 
+     * @return the ServerSettings
+     */
+    private String createServerStructure() {
+        
+        String serverSettings = "{"; 
+        serverSettings += "\"Short\" : {\"offset\" : 0, \"type\" : \"short\"},"; 
+        serverSettings += "\"Integer\" : {\"offset\" : 1, \"type\" : \"integer\"},"; 
+        serverSettings += "\"Float\" : {\"offset\" : 3, \"type\" : \"float\"},"; 
+        serverSettings += "\"Long\" : {\"offset\" : 5, \"type\" : \"long\"},"; 
+        serverSettings += "\"Double\" : {\"offset\" : 9, \"type\" : \"double\"}"; 
+        serverSettings += "}";
+
+        return serverSettings;
+    }
+    
+    /**
+     * Returns the ServerSettings.
+     * 
+     * @return the ServerSettings
+     */
+    public String getServerStructure() {
+        return serverStructure;
     }
 
 }

@@ -8,27 +8,33 @@ package de.iip_ecosphere.platform.connectors.modbustcpipv1;
  */
 public class ModbusVarItem {
     
-    private ModbusVarItemType type;
+    private String type;
     private int offset;
+
     
     /**
-     * Konstruktor.
+     * Setter for type.
      * 
-     * @param type of Item (Short, Integer, Float, Long, Double)
-     * @param offset of Item
+     * @param type the type to set
      */
-    public ModbusVarItem(ModbusVarItemType type, int offset) {
-        
+    public void setType(String type) {
         this.type = type;
-        this.offset = offset;
     }
     
+    /**
+     * Setter for offset.
+     * 
+     * @param offset the offset to set
+     */
+    public void setOffset(int offset) {
+        this.offset = offset;
+    }
     /**
      * Getter for type.
      * 
      * @return the type
      */
-    public ModbusVarItemType getType() {
+    public String getType() {
         return type;
     }
 
@@ -41,18 +47,31 @@ public class ModbusVarItem {
         return offset;
     }
     
+
     /**
-     * Different types for the ModbusVarItem.
+     * Returs the count of registers needed to store this type.
      * 
-     * @author Christian Nikolajew
-     *
+     * @return the count of registers needed to store this type
      */
-    public enum ModbusVarItemType {
-       Short,
-       Integer,
-       Float,
-       Long,
-       Double
+    public int getTypsRegisterSize() {
+        
+        int result = 0;
+        
+        if (type.equals("short")) {
+            result = 1;
+        } else if (type.equals("integer")) {
+            result = 2;
+        } else if (type.equals("float")) {
+            result = 2;
+        } else if (type.equals("long")) {
+            result = 4;
+        } else if (type.equals("double")) {
+            result = 4;
+        } else if (type.equals("dword")) {
+            result = 2;
+        }
+        
+        return result;
     }
 
 }

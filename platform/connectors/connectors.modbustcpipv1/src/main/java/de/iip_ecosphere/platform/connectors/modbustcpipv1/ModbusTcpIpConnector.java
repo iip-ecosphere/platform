@@ -15,6 +15,7 @@ package de.iip_ecosphere.platform.connectors.modbustcpipv1;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.nio.ByteBuffer;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
@@ -26,12 +27,12 @@ import de.iip_ecosphere.platform.connectors.ConnectorDescriptor;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.MachineConnector;
 import de.iip_ecosphere.platform.connectors.events.ConnectorTriggerQuery;
-import de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusVarItem.ModbusVarItemType;
 import de.iip_ecosphere.platform.connectors.model.AbstractModelAccess;
 import de.iip_ecosphere.platform.connectors.model.ModelAccess;
 import de.iip_ecosphere.platform.connectors.model.ModelInputConverter;
 import de.iip_ecosphere.platform.connectors.model.ModelOutputConverter;
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
+import de.iip_ecosphere.platform.support.json.JsonUtils;
 import net.wimpi.modbus.ModbusException;
 import net.wimpi.modbus.ModbusIOException;
 import net.wimpi.modbus.ModbusSlaveException;
@@ -58,10 +59,12 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
     public static final String NAME = "MODBUS TCP/IP";
     private static final Logger LOGGER = LoggerFactory.getLogger(ModbusTcpIpConnector.class);
 
-    private ModbusItem mItem;   
+    private ModbusItem mItem;
     private TCPMasterConnection mConnection;
     private ConnectorParameter mParams;
     private AtomicBoolean inPolling = new AtomicBoolean(false);
+
+    private ModbusMap map = null;
 
     /**
      * The descriptor of this connector (see META-INF/services).
@@ -102,15 +105,13 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
             ProtocolAdapter<ModbusItem, Object, CO, CI>... adapter) {
         super(selector, adapter);
         configureModelAccess(new ModbusTcpIpModelAccess());
-        //mItem = new ModbusItem();
     }
 
     @Override
     public String getName() {
         return NAME;
     }
-    
-    
+
     /**
      * Construct the endpoint URL.
      * 
@@ -119,10 +120,10 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
      */
     private String getEndpointUrl(ConnectorParameter params) {
 
-        String result = params.getSchema() + "://" + params.getHost() + ":" + params.getPort(); 
+        String result = params.getHost() + ":" + params.getPort();
         return result;
     }
-    
+
     // checkstyle: stop exception type check
 
     @Override
@@ -130,8 +131,10 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
 
         if (mConnection == null) {
             this.mParams = params;
-            
-            mItem = new ModbusItem(params);
+
+            setModbusMap();
+
+            mItem = new ModbusItem(map);
 
             String endpointURL = getEndpointUrl(params);
 
@@ -140,13 +143,44 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
 
             try {
                 mConnection.connect();
-                LOGGER.info("MODBUS TCP/IP connecting to {}", endpointURL);
+                LOGGER.info("MODBUS TCP/IP connecting to " + endpointURL);
             } catch (Exception e) {
                 e.printStackTrace();
                 LOGGER.info("MODBUS TCP/IP connection failed: {}");
             }
         }
 
+    }
+
+    /**
+     * Sets the ModbusMap.
+     */
+    private void setModbusMap() {
+
+        Set<String> keys = mParams.getSpecificSettingKeys();
+
+        for (String key : keys) {
+
+            if (key.equals("SERVER_STRUCTURE")) {
+
+                Object serverSettings = mParams.getSpecificSetting(key);
+                map = JsonUtils.fromJson(serverSettings, ModbusMap.class);
+
+            }
+        }
+
+        if (map == null) {
+            System.out.println("ModbusTcpIpConnector -> No SERVER_STRUCTURE found");
+        } 
+    }
+
+    /**
+     * Getter for ModbusMap.
+     * 
+     * @return the ModbusMap
+     */
+    public ModbusMap getMap() {
+        return map;
     }
 
     // checkstyle: resume exception type check
@@ -173,7 +207,6 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
         mConnection = null;
     }
 
-    
     @Override
     protected void error(String arg0, Throwable arg1) {
         LOGGER.error(arg0, arg1);
@@ -181,79 +214,239 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
 
     @Override
     protected ModbusItem read() throws IOException {
-        
-        readFromMachine();
-        
+
+        for (ModbusMap.Entry<String, ModbusVarItem> entry : map.entrySet()) {
+
+            ModbusVarItem varItem = entry.getValue();
+
+            try {
+
+                ReadMultipleRegistersRequest request = new ReadMultipleRegistersRequest(varItem.getOffset(),
+                        varItem.getTypsRegisterSize());
+
+                ModbusTCPTransaction lTransaction = new ModbusTCPTransaction(mConnection);
+                lTransaction.setRequest(request);
+                lTransaction.execute();
+
+                ReadMultipleRegistersResponse lResponse = (ReadMultipleRegistersResponse) lTransaction.getResponse();
+
+                if (varItem.getType().equals("short")) {
+
+                    Object value = lResponse.getRegister(0).toShort();
+                    mItem.setRegister(varItem.getOffset(), value);
+
+                } else if (varItem.getType().equals("integer")) {
+
+                    mItem.setRegister(varItem.getOffset(), getIntegerFromRegisters(lResponse.getRegisters()));
+
+                } else if (varItem.getType().equals("float")) {
+
+                    mItem.setRegister(varItem.getOffset(), getFloatFromRegisters(lResponse.getRegisters()));
+
+                } else if (varItem.getType().equals("long")) {
+
+                    mItem.setRegister(varItem.getOffset(), getLongFromRegisters(lResponse.getRegisters()));
+
+                } else if (varItem.getType().equals("double")) {
+
+                    mItem.setRegister(varItem.getOffset(), getDoubleFromRegisters(lResponse.getRegisters()));
+
+                } else if (varItem.getType().equals("dword")) {
+
+                    mItem.setRegister(varItem.getOffset(), lResponse.getRegister(0).toShort());
+
+                }
+
+            } catch (ModbusIOException e) {
+                e.printStackTrace();
+            } catch (ModbusSlaveException e) {
+                e.printStackTrace();
+            } catch (ModbusException e) {
+                e.printStackTrace();
+            }
+        }
+
         return mItem;
     }
 
     /**
-     * Reads data from the machine and set the ModbusItem mItem accordingly.
+     * Creates an Integer out of two Registers.
+     * 
+     * @param registers containing the Integer 
+     * @return the Integer
      */
-    private void readFromMachine() {
+    private int getIntegerFromRegisters(Register[] registers) {
 
-        try {
-            // Read HoldingRegisters
-            ReadMultipleRegistersRequest lRequest = new ReadMultipleRegistersRequest(0, mItem.getHoldingRegisterSize());
+        short lowShort = registers[0].toShort();
+        short highShort = registers[1].toShort();
 
-            ModbusTCPTransaction lTransaction = new ModbusTCPTransaction(mConnection);
-            lTransaction.setRequest(lRequest);
-            lTransaction.execute();
+        int result = ((highShort & 0xFFFF) << 16) | (lowShort & 0xFFFF);
 
-            ReadMultipleRegistersResponse lResponse = (ReadMultipleRegistersResponse) lTransaction.getResponse();
+        return result;
+    }
+    
+    /**
+     * Creates an Float out of two Registers.
+     * 
+     * @param registers containing the Float
+     * @return the Float
+     */
+    private float getFloatFromRegisters(Register[] registers) {
+        
+        short lowShort = registers[0].toShort();
+        short highShort = registers[1].toShort();
+        
+        int intRes = ((highShort & 0xFFFF) << 16) | (lowShort & 0xFFFF);
+        Float result = Float.intBitsToFloat(intRes); 
+        return result;
+    }
 
-            // Add result to ModbusItem
-            for (int i = 0; i < mItem.getHoldingRegisterSize(); i++) {
-                mItem.setHoldingRegister((short) i, (short) lResponse.getRegisterValue(i));
-            }
+    /**
+     * Creates an Long out of four Registers.
+     * 
+     * @param registers containing the Long
+     * @return the Long
+     */
+    private long getLongFromRegisters(Register[] registers) {
+        
+        short lowestShort = registers[0].toShort();
+        short lowShort = registers[1].toShort();
+        short highShort = registers[2].toShort();
+        short highestShort = registers[3].toShort();
 
-        } catch (ModbusIOException e) {
-            e.printStackTrace();
-        } catch (ModbusSlaveException e) {
-            e.printStackTrace();
-        } catch (ModbusException e) {
-            e.printStackTrace();
-        }
+        Long result = ((long) highestShort << 48) | ((long) highShort << 32) | ((long) lowShort << 16)
+                | lowestShort;
+        
+        return result;
+    }
+    
+    /**
+     * Creates an Double out of four Registers.
+     * 
+     * @param registers containing the Double
+     * @return the Double
+     */
+    private double getDoubleFromRegisters(Register[] registers) {
+        
+        short short0 = registers[0].toShort();
+        short short1 = registers[1].toShort();
+        short short2 = registers[2].toShort();
+        short short3 = registers[3].toShort();
 
+        ByteBuffer buffer = ByteBuffer.allocate(8);
+        buffer.putShort(0, short0);
+        buffer.putShort(2, short1);
+        buffer.putShort(4, short2);
+        buffer.putShort(6, short3);
+
+        buffer.rewind();
+        Double result = buffer.getDouble();
+        
+        return result;
     }
     
     @Override
     public void trigger(ConnectorTriggerQuery query) {
-       //Not used for MODBUS TCP/IP
+        // Not used for MODBUS TCP/IP
     }
 
     @Override
     protected void writeImpl(Object data) throws IOException {
         
-        writeToMachine();
+        if (data != null) {
+            ModbusVarItem varItem = (ModbusVarItem) data;
+            Object varItemValue = mItem.getRegister(varItem.getOffset());            
+
+            Register[] lHoldingRegisters = registers(varItem, varItemValue);
+
+            try {
+
+                ModbusTCPTransaction lTransaction = new ModbusTCPTransaction(mConnection);
+                ModbusRequest request = new WriteMultipleRegistersRequest(varItem.getOffset(), lHoldingRegisters);
+                lTransaction.setRequest(request);
+                lTransaction.execute();
+
+            } catch (ModbusIOException e) {
+                e.printStackTrace();
+            } catch (ModbusSlaveException e) {
+                e.printStackTrace();
+            } catch (ModbusException e) {
+                e.printStackTrace();
+            }
+        }
 
     }
-    
+
     /**
-     * Writes ModbusItem mItem to the machine.
+     * Creates the registers to write to the Machine.
+     * 
+     * @param varItem      the ModbusVarItem to write
+     * @param varItemValue the Value for the ModbusVarItem to write
+     * @return the registers to write to the Machine
      */
-    private void writeToMachine() {
-        
-        Register[] lHoldingRegisters = new Register[mItem.getHoldingRegisterSize()];
-        
-        for (int i = 0; i < mItem.getHoldingRegisterSize(); i++) {
-            lHoldingRegisters[i] = new SimpleRegister(mItem.getHoldingRegister(i));
-        }
- 
-        try {
+    private Register[] registers(ModbusVarItem varItem, Object varItemValue) {
 
-            ModbusTCPTransaction lTransaction = new ModbusTCPTransaction(mConnection);
-            ModbusRequest lRequest = new WriteMultipleRegistersRequest(0, lHoldingRegisters);
-            lTransaction.setRequest(lRequest);
-            lTransaction.execute();
+        Register[] holdingRegisters = new Register[varItem.getTypsRegisterSize()];
 
-        } catch (ModbusIOException e) {
-            e.printStackTrace();
-        } catch (ModbusSlaveException e) {
-            e.printStackTrace();
-        } catch (ModbusException e) {
-            e.printStackTrace();
+        if (varItem.getType().equals("short")) {
+
+            holdingRegisters[0] = new SimpleRegister((short) varItemValue);
+
+        } else if (varItem.getType().equals("integer")) {
+
+            int intToWrite = (int) varItemValue;
+
+            short highShort = (short) (intToWrite >> 16);
+            short lowShort = (short) (intToWrite & 0xFFFF);
+
+            holdingRegisters[0] = new SimpleRegister(lowShort);
+            holdingRegisters[1] = new SimpleRegister(highShort);
+
+        } else if (varItem.getType().equals("float")) {
+
+            float floatToWrite = (float) varItemValue;
+            int floatAsInt = Float.floatToIntBits(floatToWrite);
+
+            short highShort = (short) ((floatAsInt >> 16) & 0xFFFF);
+            short lowShort = (short) (floatAsInt & 0xFFFF);
+
+            holdingRegisters[0] = new SimpleRegister(lowShort);
+            holdingRegisters[1] = new SimpleRegister(highShort);
+
+        } else if (varItem.getType().equals("long")) {
+
+            long longToWrite = (long) varItemValue;
+
+            short highestShort = (short) ((longToWrite >> 48) & 0xFFFF);
+            short highShort = (short) ((longToWrite >> 32) & 0xFFFF);
+            short lowShort = (short) ((longToWrite >> 16) & 0xFFFF);
+            short lowestShort = (short) (longToWrite & 0xFFFF);
+
+            holdingRegisters[0] = new SimpleRegister(lowestShort);
+            holdingRegisters[1] = new SimpleRegister(lowShort);
+            holdingRegisters[2] = new SimpleRegister(highShort);
+            holdingRegisters[3] = new SimpleRegister(highestShort);
+
+        } else if (varItem.getType().equals("double")) {
+
+            double doubleToWrite = (double) varItemValue;
+
+            ByteBuffer buffer = ByteBuffer.allocate(8);
+            buffer.putDouble(doubleToWrite);
+
+            short short1 = buffer.getShort(0);
+            short short2 = buffer.getShort(2);
+            short short3 = buffer.getShort(4);
+            short short4 = buffer.getShort(6);
+
+            holdingRegisters[0] = new SimpleRegister(short1);
+            holdingRegisters[1] = new SimpleRegister(short2);
+            holdingRegisters[2] = new SimpleRegister(short3);
+            holdingRegisters[3] = new SimpleRegister(short4);
+
         }
+
+        return holdingRegisters;
     }
 
     /**
@@ -272,7 +465,7 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
         protected ModbusTcpIpModelAccess() {
             super(ModbusTcpIpConnector.this);
         }
-        
+
         /**
          * Returns the input converter instance.
          * 
@@ -291,70 +484,24 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
             return outputConverter;
         }
 
+        /**
+         * Returns the ModbusMap.
+         * 
+         * @return the ModbusMap
+         */
+        public ModbusMap getMap() {
+            return map;
+        }
+
         @Override
         public Object call(String qName, Object... arg1) throws IOException {
-            
-            ModbusVarItem item = (ModbusVarItem) mParams.getSpecificSetting(qName);
-            
-            if (item.getType() == ModbusVarItemType.Short) {
-                
-                short s = Short.valueOf(arg1[0].toString());
-                mItem.setHoldingRegister(item.getOffset(), s);
-                
-            } else if (item.getType() == ModbusVarItemType.Integer) {
-                
-                int intToWrite = Integer.valueOf(arg1[0].toString());
-                
-                short highShort = (short) (intToWrite >> 16);
-                short lowShort = (short) (intToWrite & 0xFFFF);
 
-                mItem.setHoldingRegister(item.getOffset(), lowShort);
-                mItem.setHoldingRegister(item.getOffset() + 1, highShort);
-                
-            } else if (item.getType() == ModbusVarItemType.Float) {
-                
-                float floatToWrite = Float.valueOf(arg1[0].toString());
-                int floatAsInt = Float.floatToIntBits(floatToWrite);
-                
-                short highShort = (short) ((floatAsInt >> 16) & 0xFFFF);
-                short lowShort = (short) ( floatAsInt & 0xFFFF);
+            ModbusMap map = ModbusTcpIpConnector.this.getMap();
+            ModbusVarItem varItem = map.get(qName);
 
-                mItem.setHoldingRegister((short) 3, lowShort);
-                mItem.setHoldingRegister((short) 4, highShort);
-                
-            } else if (item.getType() == ModbusVarItemType.Long) {
-                
-                long longToWrite = Long.valueOf(arg1[0].toString());
-                
-                short highestShort = (short) ((longToWrite >> 48) & 0xFFFF);
-                short highShort = (short) ((longToWrite >> 32) & 0xFFFF);
-                short lowShort = (short) ((longToWrite >> 16) & 0xFFFF);
-                short lowestShort = (short) (longToWrite & 0xFFFF);
-                
-                mItem.setHoldingRegister((short) 5, lowestShort);
-                mItem.setHoldingRegister((short) 6, lowShort);
-                mItem.setHoldingRegister((short) 7, highShort);
-                mItem.setHoldingRegister((short) 8, highestShort);
-                
-            } else if (item.getType() == ModbusVarItemType.Double) {
-                
-                double doubleToWrite = Double.valueOf(arg1[0].toString());
+            mItem.setRegister(varItem.getOffset(), arg1[0]);
 
-                ByteBuffer buffer = ByteBuffer.allocate(8);
-                buffer.putDouble(doubleToWrite);
-                
-                short short1 = buffer.getShort(0);
-                short short2 = buffer.getShort(2);
-                short short3 = buffer.getShort(4);
-                short short4 = buffer.getShort(6);
-                
-                mItem.setHoldingRegister((short) 9, short1);
-                mItem.setHoldingRegister((short) 10, short2);
-                mItem.setHoldingRegister((short) 11, short3);
-                mItem.setHoldingRegister((short) 12, short4);
-            }
-
-            writeImpl(mItem);
+            writeImpl(varItem);
             doPolling();
 
             return mItem;
@@ -363,63 +510,12 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
         @Override
         public Object get(String qName) throws IOException {
 
-            Object result = new Object();   
-            ModbusVarItem item = (ModbusVarItem) mParams.getSpecificSetting(qName);
-            
-            if (item.getType() == ModbusVarItemType.Short) {
-                
-                result = mItem.getHoldingRegister(item.getOffset());
-                
-            } else if (item.getType() == ModbusVarItemType.Integer) {
-            
-                short lowShort = mItem.getHoldingRegister(item.getOffset());
-                short highShort = mItem.getHoldingRegister(item.getOffset() + 1);
-                
-                int intRes = ((highShort & 0xFFFF) << 16) | (lowShort & 0xFFFF);
+            Object result = new Object();
+            ModbusMap map = ModbusTcpIpConnector.this.getMap();
+            ModbusVarItem varItem = map.get(qName);
 
-                result = intRes;
-                
-            } else if (item.getType() == ModbusVarItemType.Float) {
-                
-                short lowShort = mItem.getHoldingRegister(item.getOffset());
-                short highShort = mItem.getHoldingRegister(item.getOffset() + 1);
-                
-                int intRes = ((highShort & 0xFFFF) << 16) | (lowShort & 0xFFFF);
-                float floatRes = Float.intBitsToFloat(intRes);
-                
-                result = floatRes;
-                
-            } else if (item.getType() == ModbusVarItemType.Long) {
-                
-                short lowestShort = mItem.getHoldingRegister(item.getOffset());
-                short lowShort = mItem.getHoldingRegister(item.getOffset() + 1); 
-                short highShort = mItem.getHoldingRegister(item.getOffset() + 2);
-                short highestShort = mItem.getHoldingRegister(item.getOffset() + 3);
-                
-                long longRes = ((long) highestShort << 48) | ((long) highShort << 32) 
-                    | ((long) lowShort << 16) | lowestShort;
-                
-                result = longRes;
-                
-            } else if (item.getType() == ModbusVarItemType.Double) {
-                
-                short short1 = mItem.getHoldingRegister(item.getOffset());
-                short short2 = mItem.getHoldingRegister(item.getOffset() + 1);
-                short short3 = mItem.getHoldingRegister(item.getOffset() + 2);
-                short short4 = mItem.getHoldingRegister(item.getOffset() + 3);
-                
-                ByteBuffer buffer = ByteBuffer.allocate(8);
-                buffer.putShort(0, short1);
-                buffer.putShort(2, short2);
-                buffer.putShort(4, short3);
-                buffer.putShort(6, short4);
-                
-                buffer.rewind();
-                double doubleRes = buffer.getDouble();
-                
-                result = doubleRes;
-            }
-            
+            result = mItem.getRegister(varItem.getOffset());
+
             return result;
         }
 

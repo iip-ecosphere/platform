@@ -12,9 +12,10 @@
 
 package test.de.iip_ecosphere.platform.connectors.modbustcpipv1;
 
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Set;
 
-import de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusKeys;
+import de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusMap;
 import de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusVarItem;
 
 /**
@@ -24,51 +25,55 @@ import de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusVarItem;
  */
 public class ModbusMachineData {
     
-    private ArrayList<ModbusVarItem> valueTypesAndOffsets;
-    private ArrayList<Object> values;
+    private ModbusMap serverMap;
+    private HashMap<String, Object> mapValues;
+    
+
     
     /**
      * Creates an instance.
+     * 
+     * @param map the ModbusMap
      */
-    public ModbusMachineData() {
+    public ModbusMachineData(ModbusMap map) {
         
-        valueTypesAndOffsets = new ArrayList<ModbusVarItem>();
-        values = new ArrayList<Object>();
+        this.serverMap = map;
+        mapValues = new HashMap<String, Object>();
     }
     
     /**
-     * Adds a value to the ModbusMachineData.
+     * Adds a value to the ModbusMachineData by given key.
      * 
+     * @param key for the value to add
      * @param valueTypeAndOffset to add
      * @param value as Object
      */
-    public void addValue(ModbusVarItem valueTypeAndOffset, Object value) {
+    public void addValue(String key, ModbusVarItem valueTypeAndOffset, Object value) {
         
-        valueTypesAndOffsets.add(valueTypeAndOffset);
-        values.add(value);
+        mapValues.put(key, value);
+        
 
     }
     
     /**
      * Returns the value for a given key.
      * 
-     * @param key
+     * @param key the key
      * @return the value for key
      */
     public Object getValue(String key) {
         
-        String[] keys = ModbusKeys.getKeys();
+        Set<String> keys = serverMap.keySet();
         
         Object result = new Object();
         
-        for (int i = 0; i < keys.length; i++) {
-            
-            if (key.equals(keys[i])) {
-                
-                result = values.get(i);
+        for (String mapKey : keys) {
+        
+            if (key.equals(mapKey)) {
+                result = mapValues.get(key);
             }
         }
-        
+
         return result;
     }
     
