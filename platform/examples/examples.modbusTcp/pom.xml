@@ -90,6 +90,7 @@
                           <id>manualConnector</id>
                           <configuration>
                               <mainClass>${manual.class}</mainClass>
+                              <classpathScope>test</classpathScope>
                           </configuration>
                        </execution>
                    </executions>

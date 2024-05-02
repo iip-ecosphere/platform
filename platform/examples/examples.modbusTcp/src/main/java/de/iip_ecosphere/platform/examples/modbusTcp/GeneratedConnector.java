@@ -37,15 +37,16 @@ public class GeneratedConnector {
     private static MetricsProvider metrics = new MetricsProvider(new SimpleMeterRegistry());
 
     /**
-     * Runs the generated connector. Currently not integrated with test as the server must be online 
-     * (external, not guaranteed).
+     * Runs the generated connector. Currently not integrated with test as the
+     * server must be online (external, not guaranteed).
      * 
      * @param args the command line arguments, ignored
      * @throws IOException in case that the server cannot be accessed
      */
     public static void main(String[] args) throws IOException {
         if (args.length > 0 && "--skip".equals(args[0])) {
-            // when server is set up, regex in POM may become more specific and this part may be removed
+            // when server is set up, regex in POM may become more specific and this part
+            // may be removed
             System.out.println("MODBUS Connector test");
             System.exit(0);
         }
@@ -58,12 +59,12 @@ public class GeneratedConnector {
                 System.out.println("RCV " + data);
                 count.incrementAndGet();
             }
-            
+
             @Override
             public Class<ModbusPhoenixEEM> getType() {
                 return ModbusPhoenixEEM.class;
             }
-            
+
         };
         ModbusTcpIpConnector<ModbusPhoenixEEM, DataIn> conn = createPlatformConnector(cb);
         final int maxRequests = 10;
@@ -76,20 +77,20 @@ public class GeneratedConnector {
         System.out.println("Disconnecting...");
         conn.disconnect();
         System.out.println("Received: " + count);
-        System.exit(0);
+        //System.exit(0);
     }
 
     /**
      * Creates the platform connector to be tested.
-     *  
+     * 
      * @param callback the callback
      * @return the connector instance
      * @throws IOException if creating the connector fails
      */
     public static ModbusTcpIpConnector<ModbusPhoenixEEM, DataIn> createPlatformConnector(
-        ReceptionCallback<ModbusPhoenixEEM> callback) throws IOException {
+            ReceptionCallback<ModbusPhoenixEEM> callback) throws IOException {
         ModbusTcpIpConnector<ModbusPhoenixEEM, DataIn> conn = new ModbusTcpIpConnector<>(
-            MyModbusConnExample.createConnectorAdapter(metrics, new File("modbusTest.txt")));
+                MyModbusConnExample.createConnectorAdapter(metrics, new File("modbusTest.txt")));
         conn.connect(MyModbusConnExample.createConnectorParameter());
         conn.setReceptionCallback(callback);
         return conn;

@@ -13,7 +13,8 @@
 package de.iip_ecosphere.platform.examples.modbusTcp;
 
 /**
- * Test class representing two example sub-trees of machine data from the MODBUS information model. 
+ * Test class representing two example sub-trees of machine data from the MODBUS
+ * information model.
  * 
  * Plan: This class shall be generated from the configuration model.
  * 
@@ -23,18 +24,18 @@ public class MachineData {
 
     private BasicWoodworking basicWoodworking;
     private FullMachineToolDynamic fullMachineToolDynamic;
-    
+
     /**
      * Creates a new machine data instance.
      * 
-     * @param basicWoodworking the basic woodworking instance
+     * @param basicWoodworking       the basic woodworking instance
      * @param fullMachineToolDynamic the full machine tool dynamic instance
      */
     public MachineData(BasicWoodworking basicWoodworking, FullMachineToolDynamic fullMachineToolDynamic) {
         this.basicWoodworking = basicWoodworking;
         this.fullMachineToolDynamic = fullMachineToolDynamic;
     }
-    
+
     /**
      * Represents some data from the basic woodworking.
      * 
@@ -48,7 +49,7 @@ public class MachineData {
         /**
          * Creates a machine data object.
          * 
-         * @param currentMode the current mode of the machine
+         * @param currentMode  the current mode of the machine
          * @param currentState the current state
          */
         public BasicWoodworking(int currentMode, int currentState) {
@@ -73,24 +74,24 @@ public class MachineData {
         public double getCurrentState() {
             return currentState;
         }
-        
+
         @Override
         public String toString() {
             return "BasicWoodworking (mode=" + getCurrentMode() + ", state=" + getCurrentState() + ")";
         }
 
     }
-    
+
     /**
-     * From the FullMachineToolDynamic. We could go more into the dynamic data, but this also requires a basic 
-     * understanding.
+     * From the FullMachineToolDynamic. We could go more into the dynamic data, but
+     * this also requires a basic understanding.
      * 
      * @author Holger Eichelberger, SSE
      */
     public static class FullMachineToolDynamic {
-        
+
         private int myJob1State;
-        
+
         /**
          * Creates an instance.
          * 
@@ -99,7 +100,7 @@ public class MachineData {
         public FullMachineToolDynamic(int myJob1State) {
             this.myJob1State = myJob1State;
         }
-        
+
         /**
          * Returns the job1 state.
          * 
@@ -111,7 +112,7 @@ public class MachineData {
 
         @Override
         public String toString() {
-            return "FullMachineToolDynamic (myJob1State=" + getMyJob1State() + ")"; 
+            return "FullMachineToolDynamic (myJob1State=" + getMyJob1State() + ")";
         }
 
     }
@@ -140,7 +141,7 @@ public class MachineData {
         if (null != getFullMachineToolDynamic()) {
             result += ";" + getFullMachineToolDynamic();
         }
-        return result; 
+        return result;
     }
 
 }

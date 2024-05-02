@@ -13,13 +13,14 @@
 package de.iip_ecosphere.platform.examples.modbusTcp;
 
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicReference;
+
+//import org.junit.Assert;
 
 import de.iip_ecosphere.platform.connectors.Connector;
-import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusItem;
 import de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusTcpIpConnector;
 import de.iip_ecosphere.platform.connectors.types.TranslatingProtocolAdapter;
-import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
@@ -31,7 +32,7 @@ import iip.nodes.MyModbusConnExample;
  * @author Holger Eichelberger, SSE
  */
 public class ManualConnector {
-    
+
     /**
      * Executes the connector.
      * 
@@ -40,31 +41,76 @@ public class ManualConnector {
      */
     public static void main(String... args) throws IOException {
         ActiveAasBase.setNotificationMode(NotificationMode.NONE); // disable AAS connector registration
-        Connector<ModbusItem, Object, MachineData, MachineCommand> connector = 
-            new ModbusTcpIpConnector<MachineData, MachineCommand>(
-                new TranslatingProtocolAdapter<ModbusItem, Object, MachineData, MachineCommand>(
-                     new MachineDataOutputTranslator<ModbusItem>(ModbusItem.class),
-                     new MachineCommandInputTranslator<Object>(Object.class)));
-        connector.setReceptionCallback(new ReceptionCallback<MachineData>() {
+
+        AtomicReference<ModbusMachineData> md = new AtomicReference<ModbusMachineData>();
+
+        Connector<ModbusItem, Object, ModbusMachineData, ModbusMachineCommand> connector = 
+                new ModbusTcpIpConnector<ModbusMachineData, ModbusMachineCommand>(
+                new TranslatingProtocolAdapter<ModbusItem, Object, ModbusMachineData, ModbusMachineCommand>(
+                        new ModbusMachineDataOutputTranslator<ModbusItem>(false, ModbusItem.class),
+                        new ModbusMachineCommandInputTranslator<Object>(Object.class)));
+
+        connector.setReceptionCallback(new ReceptionCallback<ModbusMachineData>() {
 
             @Override
-            public void received(MachineData data) {
+            public void received(ModbusMachineData data) {
                 System.out.println("RECEIVED " + data);
+                md.set(data);
             }
 
             @Override
-            public Class<MachineData> getType() {
-                return MachineData.class;
+            public Class<ModbusMachineData> getType() {
+                return ModbusMachineData.class;
             }
-            
+
         });
-        
-        ConnectorParameter param = MyModbusConnExample.createConnectorParameter();
-        connector.connect(param);
+
+        connector.connect(MyModbusConnExample.createConnectorParameter());
         connector.request(true);
-        TimeUtils.sleep(20000); // model monitoring shall trigger further output
-        connector.disconnect();    
-        System.exit(0);
+        // TimeUtils.sleep(20000); // model monitoring shall trigger further output
+
+        ModbusMachineData tmp = md.get();
+
+        // Check if the values are 0
+        //Assert.assertEquals((int) 0, tmp.getValue("Data"));
+        //Assert.assertEquals((int) 0, tmp.getValue("I1"));
+        //Assert.assertEquals((int) 0, tmp.getValue("S1"));
+        //Assert.assertEquals((int) 0, tmp.getValue("V1"));
+
+        // Set values
+        ModbusMachineCommand cmd = new ModbusMachineCommand();
+        cmd.set("Data", 1);
+        cmd.set("I1", 9999);
+        cmd.set("S1", 123456789);
+        cmd.set("V1", -512);
+        connector.write(cmd);
+
+        tmp = md.get();
+
+        // Check the values set before
+        //Assert.assertEquals((int) 1, tmp.getValue("Data"));
+        //Assert.assertEquals((int) 9999, tmp.getValue("I1"));
+        //Assert.assertEquals((int) 123456789, tmp.getValue("S1"));
+        //Assert.assertEquals((int) -512, tmp.getValue("V1"));
+
+        // Set values back to 0
+        cmd = new ModbusMachineCommand();
+        cmd.set("Data", (int) 0);
+        cmd.set("I1", (int) 0);
+        cmd.set("S1", (int) 0);
+        cmd.set("V1", (int) 0);
+        connector.write(cmd);
+        
+        tmp = md.get();
+
+        // Check if the values are 0
+        //Assert.assertEquals((int) 0, tmp.getValue("Data"));
+        //Assert.assertEquals((int) 0, tmp.getValue("I1"));
+        //Assert.assertEquals((int) 0, tmp.getValue("S1"));
+        //Assert.assertEquals((int) 0, tmp.getValue("V1"));
+
+        connector.disconnect();
+        // System.exit(0);
     }
-    
+
 }

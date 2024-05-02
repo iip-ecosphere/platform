@@ -46,25 +46,26 @@ public class ModbusModelTest {
         /**
          * Creates a configurer instance.
          * 
-         * @param ivmlModelName the name of the IVML model representing the topmost platform configuration
-         * @param modelFolder the folder where the model is located (ignored if <b>null</b>)
-         * @param outputFolder the output folder for code generation
+         * @param ivmlModelName the name of the IVML model representing the topmost
+         *                      platform configuration
+         * @param modelFolder   the folder where the model is located (ignored if
+         *                      <b>null</b>)
+         * @param outputFolder  the output folder for code generation
          */
         public TestConfigurer(String ivmlModelName, File modelFolder, File outputFolder) {
             super(ivmlModelName, modelFolder, outputFolder);
         }
 
-        
         @Override
         protected void validateConfiguration(Configuration conf) throws ExecutionException {
             Assert.assertNotNull(conf);
         }
-        
+
         @Override
         protected void validateReasoningResult(ReasoningResult res) throws ExecutionException {
             Assert.assertFalse(res.hasConflict());
         }
-        
+
         @Override
         protected void handleExecutionException(ExecutionException ex) throws ExecutionException {
             throw ex;
@@ -82,7 +83,7 @@ public class ModbusModelTest {
             } else {
                 modelFolder = new File(folder);
             }
-            try {            
+            try {
                 modelFolder = modelFolder.getCanonicalFile();
             } catch (IOException e) {
                 Assert.fail("Cannot create canonical file name for " + modelFolder);
@@ -91,23 +92,23 @@ public class ModbusModelTest {
         }
 
     }
-    
+
     /**
      * Tests the platform/connector configuration.
      * 
      * @throws ExecutionException shall not occur
-     * @throws IOException shall not occur
+     * @throws IOException        shall not occur
      */
     @Test
     public void testVdw() throws ExecutionException, IOException {
         File gen = new File("gen/modbus");
-        PlatformInstantiator.instantiate(
-            AbstractIvmlTests.genApps(new TestConfigurer("Modbus", new File("src/test/easy"), gen)));
+        PlatformInstantiator
+                .instantiate(AbstractIvmlTests.genApps(new TestConfigurer("Modbus", new File("src/test/easy"), gen)));
     }
-    
+
     /**
-     * Runs the generated connector. Currently not integrated with test as the server must be online 
-     * (external, not guaranteed).
+     * Runs the generated connector. Currently not integrated with test as the
+     * server must be online (external, not guaranteed).
      * 
      * @param args the command line arguments, ignored
      * @throws IOException in case that the server cannot be accessed
