@@ -48,7 +48,7 @@ import de.iip_ecosphere.platform.transport.connectors.impl.AbstractTransportConn
  * @author Holger Eichelberger, SSE
  */
 @MachineConnector(hasModel = false, supportsEvents = true, supportsHierarchicalQNames = false, 
-    supportsModelCalls = false, supportsModelProperties = false, supportsModelStructs = false)
+    supportsModelCalls = false, supportsModelProperties = false, supportsModelStructs = false, specificSettings = {})
 public class PahoMqttv5Connector<CO, CI> extends AbstractChannelConnector<byte[], byte[], CO, CI> {
 
     public static final String NAME = "MQTT v5";

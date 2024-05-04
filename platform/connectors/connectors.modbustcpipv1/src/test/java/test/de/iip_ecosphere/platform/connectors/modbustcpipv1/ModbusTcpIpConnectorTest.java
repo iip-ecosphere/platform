@@ -26,13 +26,10 @@ import de.iip_ecosphere.platform.connectors.ConnectorDescriptor;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter.ConnectorParameterBuilder;
 import de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusItem;
-import de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusMap;
 import de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusTcpIpConnector;
-import de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusVarItem;
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.Schema;
-import de.iip_ecosphere.platform.support.json.JsonUtils;
 
 /**
  * Tests the MODBUS TCP/IP connector (not secure, polling).

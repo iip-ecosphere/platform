@@ -125,7 +125,7 @@ import de.iip_ecosphere.platform.support.identities.IdentityToken.TokenType;
  * @author Holger Eichelberger, SSE
  * @author Jan Cepok, SSE
  */
-@MachineConnector // default values sufficient
+@MachineConnector(specificSettings = {}) // other default values sufficient
 public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, CO, CI> {
 
     /**

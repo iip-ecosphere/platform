@@ -44,7 +44,7 @@ import de.iip_ecosphere.platform.libs.ads.WriteVisitor.WriteVisitorSupplier;
  * @author Holger Eichelberger, SSE
  */
 @MachineConnector(hasModel = true, supportsModelStructs = true, supportsEvents = false, requiresTypedAccess = true, 
-    supportsModelCalls = false)
+    supportsModelCalls = false, specificSettings = {})
 public class AdsConnector<CO, CI> extends AbstractConnector<Object, Object, CO, CI> {
 
     public static final String NAME = "Generic ADS connector";

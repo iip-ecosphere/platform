@@ -53,7 +53,8 @@ import net.wimpi.modbus.procimg.SimpleRegister;
  * 
  * @author Christian Nikolajew
  */
-@MachineConnector(hasModel = true, supportsModelStructs = false, supportsEvents = false)
+@MachineConnector(hasModel = true, supportsModelStructs = false, supportsEvents = false, 
+    specificSettings = {"SERVER_STRUCTURE"})
 public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, Object, CO, CI> {
 
     public static final String NAME = "MODBUS TCP/IP";

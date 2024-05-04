@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Set;
 
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
-import de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusItem;
 import de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusMap;
 import de.iip_ecosphere.platform.connectors.model.AbstractModelAccess;
 import de.iip_ecosphere.platform.connectors.model.ModelAccess;
