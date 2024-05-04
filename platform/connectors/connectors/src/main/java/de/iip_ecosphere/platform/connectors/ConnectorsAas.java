@@ -213,7 +213,7 @@ public class ConnectorsAas implements AasContributor {
      * 
      * @author Holger Eichelberger, SSE
      */
-    @MachineConnector
+    @MachineConnector(specificSettings = {})
     private static class DefaultAnnotationProvider {
     }
     

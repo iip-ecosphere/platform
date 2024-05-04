@@ -20,7 +20,7 @@ import de.iip_ecosphere.platform.connectors.types.ChannelProtocolAdapter;
  * @author Holger Eichelberger, SSE
  */
 @MachineConnector(hasModel = false, supportsEvents = false, supportsHierarchicalQNames = false, 
-    supportsModelCalls = false, supportsModelProperties = false, supportsModelStructs = false)
+    supportsModelCalls = false, supportsModelProperties = false, supportsModelStructs = false, specificSettings = {})
 public class MyChannelConnector<CO, CI> extends AbstractChannelConnector<byte[], byte[], CO, CI> {
 
     public static final String NAME = "MyChannelConnector";

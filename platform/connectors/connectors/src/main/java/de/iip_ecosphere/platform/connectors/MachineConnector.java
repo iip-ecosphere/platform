@@ -93,7 +93,7 @@ public @interface MachineConnector {
      * 
      * @return specific setting names
      */
-    public String[] specificSettings() default {};
+    public String[] specificSettings();
     
     /**
      * Returns whether a connector with {@link #hasModel() information model} supports multi-valued

@@ -85,7 +85,8 @@ public class ConnectorsAasTest {
      * @author Holger Eichelberger, SSE
      */
     @MachineConnector(hasModel = false, supportsEvents = false, supportsHierarchicalQNames = false, 
-        supportsModelCalls = false, supportsModelProperties = false, supportsModelStructs = false)
+        supportsModelCalls = false, supportsModelProperties = false, supportsModelStructs = false, 
+        specificSettings = {})
     private static class Connector1<CO, CI> extends AbstractConnector<Object, Object, CO, CI> {
 
         /**

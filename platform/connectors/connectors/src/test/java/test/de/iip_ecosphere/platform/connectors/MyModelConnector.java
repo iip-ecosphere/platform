@@ -35,7 +35,7 @@ import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
  * @author Holger Eichelberger, SSE
  */
 @MachineConnector(hasModel = true, supportsEvents = false, supportsHierarchicalQNames = true, 
-    supportsModelCalls = false, supportsModelProperties = false, supportsModelStructs = false)
+    supportsModelCalls = false, supportsModelProperties = false, supportsModelStructs = false, specificSettings = {})
 public class MyModelConnector<CO, CI> extends AbstractConnector<Object, Object, CO, CI> {
 
     public static final String NAME = "MyModelConnector";
