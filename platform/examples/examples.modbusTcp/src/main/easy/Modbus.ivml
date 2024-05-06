@@ -50,34 +50,7 @@ project Modbus {
 
     // ------------ data types ------------------
 
-    RecordType dataIn = {
-        name = "DataIn",
-        fields = {
-          ModbusField {
-            offset = 1234,
-            name = "Data",
-            type = refBy(Modbus_int32),
-            cachingTime = CACHE_NONE
-          }
-        }
-    };    
-    RecordType dataOut = {
-        name = "DataOut",
-        fields = // plan: just use imported sequence, EASy exception modbusPhoenixEEMFields
-        {
-          ModbusField {
-            offset = 1234,
-            name = "Data",
-            type = refBy(Modbus_int32),
-            cachingTime = CACHE_NONE
-          }, ModbusField {
-            offset = 1235,
-            name = "Data1",
-            type = refBy(Modbus_ascii),
-            cachingTime = CACHE_NONE
-          }
-       }
-    };
+    // see externalized ModbusPhoenixEEM.ivml
 
     // ------------ individual, reusable services ------------------
 
@@ -89,9 +62,9 @@ project Modbus {
         host = "127.0.0.1",
         //port = 502, // default localhost
         
-        input = {{type=refBy(dataIn)}},
+        input = {{type=refBy(modbusPhoenixRwEEM)}},
         output = {{type=refBy(modbusPhoenixEEM)}},
-        inInterface = {type=refBy(dataIn)}, 
+        inInterface = {type=refBy(modbusPhoenixRwEEM)}, 
         outInterface = {type=refBy(modbusPhoenixEEM)}
     };
 

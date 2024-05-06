@@ -4,9 +4,35 @@ project ModbusPhoenixEEM {
 
     annotate BindingTime bindingTime = BindingTime::compile to .;
 
+    // initial for reading out data
     RecordType modbusPhoenixEEM = {
         name = "ModbusPhoenixEEM",
         fields = modbusPhoenixEEMFields
+    };
+    
+    RecordType modbusPhoenixRwEEM = {
+        name = "ModbusPhoenixRwEEM",
+        fields = {
+            ModbusField {
+                offset = 1282,
+                name = "Day",
+                description = "Day of occurrence of the voltage dip (UTC)",
+                type = refBy(Modbus_uint16),
+                cachingTime = CACHE_NONE
+            }, ModbusField {
+                offset = 1283,
+                name = "Month",
+                description = "Month of occurrence of the voltage dip (UTC)",
+                type = refBy(Modbus_uint16),
+                cachingTime = CACHE_NONE
+            }, ModbusField {
+                offset = 1284,
+                name = "Year",
+                description = "Year of occurrence of the voltage dip (UTC)",
+                type = refBy(Modbus_uint16),
+                cachingTime = CACHE_NONE
+            }
+        }
     };
 
     sequenceOf(Field) modbusPhoenixEEMFields = {

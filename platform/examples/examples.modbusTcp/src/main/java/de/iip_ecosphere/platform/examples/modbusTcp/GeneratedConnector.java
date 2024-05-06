@@ -22,8 +22,8 @@ import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
-import iip.datatypes.DataIn;
 import iip.datatypes.ModbusPhoenixEEM;
+import iip.datatypes.ModbusPhoenixRwEEM;
 import iip.nodes.MyModbusConnExample;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 
@@ -66,7 +66,7 @@ public class GeneratedConnector {
             }
 
         };
-        ModbusTcpIpConnector<ModbusPhoenixEEM, DataIn> conn = createPlatformConnector(cb);
+        ModbusTcpIpConnector<ModbusPhoenixEEM, ModbusPhoenixRwEEM> conn = createPlatformConnector(cb);
         final int maxRequests = 10;
         for (int i = 0; i < maxRequests; i++) {
             System.out.println("REQUEST " + i);
@@ -87,9 +87,9 @@ public class GeneratedConnector {
      * @return the connector instance
      * @throws IOException if creating the connector fails
      */
-    public static ModbusTcpIpConnector<ModbusPhoenixEEM, DataIn> createPlatformConnector(
+    public static ModbusTcpIpConnector<ModbusPhoenixEEM, ModbusPhoenixRwEEM> createPlatformConnector(
             ReceptionCallback<ModbusPhoenixEEM> callback) throws IOException {
-        ModbusTcpIpConnector<ModbusPhoenixEEM, DataIn> conn = new ModbusTcpIpConnector<>(
+        ModbusTcpIpConnector<ModbusPhoenixEEM, ModbusPhoenixRwEEM> conn = new ModbusTcpIpConnector<>(
                 MyModbusConnExample.createConnectorAdapter(metrics, new File("modbusTest.txt")));
         conn.connect(MyModbusConnExample.createConnectorParameter());
         conn.setReceptionCallback(callback);
