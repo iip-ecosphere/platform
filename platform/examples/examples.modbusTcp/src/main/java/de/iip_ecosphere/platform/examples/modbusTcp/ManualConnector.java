@@ -12,19 +12,10 @@
 
 package de.iip_ecosphere.platform.examples.modbusTcp;
 
-import java.io.IOException;
-import java.util.concurrent.atomic.AtomicReference;
-
-//import org.junit.Assert;
-
 import de.iip_ecosphere.platform.connectors.Connector;
 import de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusItem;
 import de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusTcpIpConnector;
 import de.iip_ecosphere.platform.connectors.types.TranslatingProtocolAdapter;
-import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
-import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
-import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
-import iip.nodes.MyModbusConnExample;
 
 /**
  * Simple app to run the connector.
@@ -34,12 +25,31 @@ import iip.nodes.MyModbusConnExample;
 public class ManualConnector {
 
     /**
+     * Creates a ManualConnector instance and returns it.
+     * 
+     * @return  a ManualConnector instance
+     * 
+     */
+    public static Connector<ModbusItem, Object, ModbusMachineData, ModbusMachineCommand> createConnector() {
+     
+        Connector<ModbusItem, Object, ModbusMachineData, ModbusMachineCommand> connector =
+                new ModbusTcpIpConnector<ModbusMachineData, ModbusMachineCommand>(
+                new TranslatingProtocolAdapter<ModbusItem, Object, ModbusMachineData, ModbusMachineCommand>(
+                        new ModbusMachineDataOutputTranslator<ModbusItem>(false, ModbusItem.class),
+                        new ModbusMachineCommandInputTranslator<Object>(Object.class))); 
+        
+        return connector;
+    }
+    
+    /**
      * Executes the connector.
      * 
      * @param args ignored
      * @throws IOException if the connector fails (preliminary)
      */
+    /*
     public static void main(String... args) throws IOException {
+        
         ActiveAasBase.setNotificationMode(NotificationMode.NONE); // disable AAS connector registration
 
         AtomicReference<ModbusMachineData> md = new AtomicReference<ModbusMachineData>();
@@ -72,10 +82,10 @@ public class ManualConnector {
         ModbusMachineData tmp = md.get();
 
         // Check if the values are 0
-        //Assert.assertEquals((int) 0, tmp.getValue("Data"));
-        //Assert.assertEquals((int) 0, tmp.getValue("I1"));
-        //Assert.assertEquals((int) 0, tmp.getValue("S1"));
-        //Assert.assertEquals((int) 0, tmp.getValue("V1"));
+        Assert.assertEquals((int) 0, tmp.getValue("Data"));
+        Assert.assertEquals((int) 0, tmp.getValue("I1"));
+        Assert.assertEquals((int) 0, tmp.getValue("S1"));
+        Assert.assertEquals((int) 0, tmp.getValue("V1"));
 
         // Set values
         ModbusMachineCommand cmd = new ModbusMachineCommand();
@@ -88,10 +98,10 @@ public class ManualConnector {
         tmp = md.get();
 
         // Check the values set before
-        //Assert.assertEquals((int) 1, tmp.getValue("Data"));
-        //Assert.assertEquals((int) 9999, tmp.getValue("I1"));
-        //Assert.assertEquals((int) 123456789, tmp.getValue("S1"));
-        //Assert.assertEquals((int) -512, tmp.getValue("V1"));
+        Assert.assertEquals((int) 1, tmp.getValue("Data"));
+        Assert.assertEquals((int) 9999, tmp.getValue("I1"));
+        Assert.assertEquals((int) 123456789, tmp.getValue("S1"));
+        Assert.assertEquals((int) -512, tmp.getValue("V1"));
 
         // Set values back to 0
         cmd = new ModbusMachineCommand();
@@ -104,13 +114,15 @@ public class ManualConnector {
         tmp = md.get();
 
         // Check if the values are 0
-        //Assert.assertEquals((int) 0, tmp.getValue("Data"));
-        //Assert.assertEquals((int) 0, tmp.getValue("I1"));
-        //Assert.assertEquals((int) 0, tmp.getValue("S1"));
-        //Assert.assertEquals((int) 0, tmp.getValue("V1"));
+        Assert.assertEquals((int) 0, tmp.getValue("Data"));
+        Assert.assertEquals((int) 0, tmp.getValue("I1"));
+        Assert.assertEquals((int) 0, tmp.getValue("S1"));
+        Assert.assertEquals((int) 0, tmp.getValue("V1"));
 
         connector.disconnect();
         // System.exit(0);
+         
+         
     }
-
+*/
 }
