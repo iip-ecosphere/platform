@@ -2,6 +2,7 @@ project Modbus {
 
     import IIPEcosphere;
     import ModbusPhoenixEEM;
+    import ModbusSiemensSentron;
 
     annotate BindingTime bindingTime = BindingTime::compile to .;
 
@@ -67,6 +68,20 @@ project Modbus {
         inInterface = {type=refBy(modbusPhoenixRwEEM)}, 
         outInterface = {type=refBy(modbusPhoenixEEM)}
     };
+    
+    ModbusTcpV1Connector myModbusSentronConn = {
+        id = "myModbusSentronConn",
+        name = "myModbusSentronConn example",
+        description = "",
+        ver = "0.1.0",
+        host = "127.0.0.1",
+        //port = 502, // default localhost
+        
+        input = {{type=refBy(modbusSiemensRwSentron)}},
+        output = {{type=refBy(modbusSiemensSentron)}},
+        inInterface = {type=refBy(modbusSiemensRwSentron)}, 
+        outInterface = {type=refBy(modbusSiemensSentron)}
+    };    
 
     // not really needed except for populating the interfaces package
     Service myReceiverService = JavaService {
@@ -78,7 +93,7 @@ project Modbus {
         class = "ReceiverImpl",
         artifact = "",
         kind = ServiceKind::SINK_SERVICE,
-        input = {{type=refBy(modbusPhoenixEEM)}}
+        input = {{type=refBy(modbusPhoenixEEM)}, {type=refBy(modbusSiemensSentron)}}
     };
 
     // --------------------- monitoring ---------------------------
@@ -101,11 +116,16 @@ project Modbus {
 
     ServiceMesh myMesh = {
         description = "Modbus Service Net",
-        sources = {refBy(mySource)}
+        sources = {refBy(mySource), refBy(mySentronSource)}
     };
 
     MeshSource mySource = {
        impl = refBy(myModbusConn),
+       next = {refBy(myConnMySourceMyReceiver)}
+    };
+
+    MeshSource mySentronSource = {
+       impl = refBy(myModbusSentronConn),
        next = {refBy(myConnMySourceMyReceiver)}
     };
 

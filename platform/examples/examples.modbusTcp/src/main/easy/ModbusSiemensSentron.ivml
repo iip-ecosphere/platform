@@ -5,8 +5,8 @@ project ModbusSiemensSentron {
     annotate BindingTime bindingTime = BindingTime::compile to .;
 
     // initial for reading out data
-    RecordType modbusSiemensRSentron = {
-        name = "ModbusSiemensRSentron",
+    RecordType modbusSiemensRwSentron = {
+        name = "ModbusSiemensRwSentron",
         fields = {
             ModbusField {
                 offset = 50055,
@@ -30,8 +30,8 @@ project ModbusSiemensSentron {
         }
     };
     
-    RecordType modbusSiemensRwSentron = {
-        name = "ModbusSiemensRwSentron",
+    RecordType modbusSiemensSentron = {
+        name = "ModbusSiemensSentron",
         fields = {
             ModbusField {
                 offset = 50055,
