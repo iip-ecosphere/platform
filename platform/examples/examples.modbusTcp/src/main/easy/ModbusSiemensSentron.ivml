@@ -1,0 +1,82 @@
+project ModbusSiemensSentron {
+
+    import IIPEcosphere;
+
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+
+    // initial for reading out data
+    RecordType modbusSiemensRSentron = {
+        name = "ModbusSiemensRSentron",
+        fields = {
+            ModbusField {
+                offset = 50055,
+                name = "DisplayContrast",
+                description = "Display Contrast",
+                type = refBy(Modbus_uint64),
+                cachingTime = CACHE_NONE
+            }, ModbusField {
+                offset = 50057,
+                name = "DisplayBrightness",
+                description = "Display Brightness",
+                type = refBy(Modbus_uint64),
+                cachingTime = CACHE_NONE
+            }, ModbusField {
+                offset = 50061,
+                name = "BrightnessDuration",
+                description = "BrightnessDuration",
+                type = refBy(Modbus_uint64),
+                cachingTime = CACHE_NONE
+            }
+        }
+    };
+    
+    RecordType modbusSiemensRwSentron = {
+        name = "ModbusSiemensRwSentron",
+        fields = {
+            ModbusField {
+                offset = 50055,
+                name = "DisplayContrast",
+                description = "Display Contrast",
+                type = refBy(Modbus_uint64),
+                cachingTime = CACHE_NONE
+            }, ModbusField {
+                offset = 50057,
+                name = "DisplayBrightness",
+                description = "Display Brightness",
+                type = refBy(Modbus_uint64),
+                cachingTime = CACHE_NONE
+            }, ModbusField {
+                offset = 50061,
+                name = "BrightnessDuration",
+                description = "BrightnessDuration",
+                type = refBy(Modbus_uint64),
+                cachingTime = CACHE_NONE
+            }, ModbusField {
+                offset = 55,
+                name = "Frequency",
+                description = "Power Frequency",
+                type = refBy(Modbus_float32),
+                cachingTime = CACHE_NONE
+            }, ModbusField {
+                offset = 1,
+                name = "VoltageL1N",
+                description = "Voltage L1-N",
+                type = refBy(Modbus_float32),
+                cachingTime = CACHE_NONE
+            }, ModbusField {
+                offset = 13,
+                name = "CurrentL1",
+                description = "Current L1",
+                type = refBy(Modbus_float32),
+                cachingTime = CACHE_NONE
+            }
+        }
+    };
+
+    // ------------ freezing ------------------
+
+    freeze {
+        .;
+    } but (f|f.bindingTime >= BindingTime.runtimeMon);
+
+}
