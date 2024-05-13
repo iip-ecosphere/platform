@@ -27,8 +27,8 @@ import de.iip_ecosphere.platform.examples.modbusTcp.ModbusMachineCommand;
 import de.iip_ecosphere.platform.examples.modbusTcp.ModbusMachineData;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
-//import de.iip_ecosphere.platform.support.resources.FolderResourceResolver;
-//import de.iip_ecosphere.platform.support.resources.ResourceLoader;
+import de.iip_ecosphere.platform.support.resources.FolderResourceResolver;
+import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import iip.nodes.MyModbusConnExample;
 import de.iip_ecosphere.platform.connectors.Connector;
@@ -54,8 +54,8 @@ public class ModbusConnectorTest {
     @BeforeClass
     public static void init() {
         // load generated server resources without copying them
-        //ResourceLoader.registerResourceResolver(
-        //    new FolderResourceResolver("gen/modbus/SimpleModbusDemoApp/src/main/resources"));
+        ResourceLoader.registerResourceResolver(
+            new FolderResourceResolver("gen/modbus/SimpleModbusDemoApp/src/main/resources"));
         
         server = new ModbusServer();
         server.start();
