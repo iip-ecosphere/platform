@@ -36,7 +36,7 @@ import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
  * 
  * @author Holger Eichelberger, SSE
  */
-@MachineConnector(hasModel = true, supportsModelStructs = false, supportsEvents = false)
+@MachineConnector(hasModel = true, supportsModelStructs = false, supportsEvents = false, specificSettings = {})
 public class ConnectorImpl<CO, CI> extends AbstractConnector<Object, Object, CO, CI> {
 
     private static final Object DUMMY = new Object();

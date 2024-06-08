@@ -285,7 +285,8 @@ public class DataMapper {
          */
         public MappingConsumer(Class<T> cls) {
             for (Method m: cls.getDeclaredMethods()) {
-                if (m.getName().startsWith("get") && m.getParameterCount() == 0 && m.getReturnType() != Void.TYPE) {
+                if (!m.isBridge() && m.getName().startsWith("get") && m.getParameterCount() == 0 
+                    && m.getReturnType() != Void.TYPE) {
                     mapping.put(m.getReturnType(), new MapperEntry<T>(m));
                 }
             }
