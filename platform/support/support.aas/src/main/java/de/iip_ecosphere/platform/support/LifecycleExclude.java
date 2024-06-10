@@ -32,13 +32,6 @@ public @interface LifecycleExclude {
      * 
      * @return excluded descriptors
      */
-    public Class<?>[] value() default {};
-    
-    /**
-     * Returns class names of known lifecycle handles that shall not be started although present as descriptors.
-     * 
-     * @return excluded descriptors
-     */
-    public String[] names() default {};
+    public Class<?>[] value();
 
 }

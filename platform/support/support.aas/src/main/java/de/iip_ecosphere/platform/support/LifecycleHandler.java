@@ -214,9 +214,6 @@ public class LifecycleHandler {
                 for (Class<?> c : exclude.value()) {
                     excluded.add(c.getName());
                 }
-                for (String s : exclude.names()) {
-                    excluded.add(s);
-                }
             }
         }
         
