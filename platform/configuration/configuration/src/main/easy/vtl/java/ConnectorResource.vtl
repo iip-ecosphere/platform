@@ -6,7 +6,7 @@ template ConnectorResource(Configuration config, FileArtifact target, Connector 
 
 	mapOf(String, String) modbusTypes = {
 	   {"int", "integer"}, 
-	   {"short", "dword"},
+	   {"short", "ushort"},
 	   {"Int16", "short"},
 	   {"UnsignedInt16", "uint16"}, 
 	   {"Int32", "integer"},
@@ -14,9 +14,10 @@ template ConnectorResource(Configuration config, FileArtifact target, Connector 
 	   {"Int64", "long"},
 	   {"UnsignedInt64", "uint64"},
 	   {"Float", "float"},
+	   {"Double", "double"},
 	   {"String", "ascii"},
 	   {"DateTime", "datetime"}
-    }; // preliminary
+    };
 
     @DispatchBasis
     def genContents(Connector conn) {

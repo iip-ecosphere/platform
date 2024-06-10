@@ -469,6 +469,14 @@ project Connectors {
 
    @DispatchCase
    def Boolean isModbusType(FloatTypeType type) = true;
+   
+   AliasType Modbus_double = {
+       name = "Modbus_double",
+       represents = refBy(DoubleType)
+   };
+
+   @DispatchCase
+   def Boolean isModbusType(DoubleTypeType type) = true;
 
    AliasType Modbus_ascii = {
        name = "Modbus_ascii",
