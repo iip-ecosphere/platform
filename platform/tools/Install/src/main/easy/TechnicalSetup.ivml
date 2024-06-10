@@ -97,6 +97,7 @@ project TechnicalSetup {
     modelBaseFolder = ".."; // base folder for metaModel folder and configFolder
     metaModelFolder = "target/easy";
     configFolder = "src/main/easy";
+    genTarget = "../target/gen";
     artifactsUriPrefix = "http://" + platformServer + ":" + toString(mgtUiPort) + "/download";    
 
     // ------------ freezing ------------------
@@ -132,6 +133,7 @@ project TechnicalSetup {
         modelBaseFolder;
         metaModelFolder;
         configFolder;
+        genTarget;
         artifactsUriPrefix;
         .; // every variable declared in this project
     } but (f|f.bindingTime >= BindingTime.runtimeMon);
