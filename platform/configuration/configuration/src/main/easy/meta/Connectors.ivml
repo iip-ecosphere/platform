@@ -503,7 +503,7 @@ project Connectors {
 
    AliasType Modbus_boolean = {
        name = "Modbus_boolean",
-       represents = refBy(BooleanTypeType)
+       represents = refBy(BooleanType)
    };
 
    @DispatchCase
