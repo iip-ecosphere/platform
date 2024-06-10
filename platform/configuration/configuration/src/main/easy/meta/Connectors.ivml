@@ -500,6 +500,14 @@ project Connectors {
 
    @DispatchCase
    def Boolean isModbusType(DateTimeTypeType type) = true;
+
+   AliasType Modbus_boolean = {
+       name = "Modbus_boolean",
+       represents = refBy(BooleanTypeType)
+   };
+
+   @DispatchCase
+   def Boolean isModbusType(BooleanTypeType type) = true;
    
    // more missing, don't forget freezing and mapping in ConnectorResource.vtl!
     
