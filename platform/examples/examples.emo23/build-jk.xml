@@ -11,6 +11,7 @@
             <arg value="-Dunpack.force=true"/>
             <arg value="-DdisablePythonTests=true"/>
             <arg value="-Diip.ciBuildId=${build_num}"/> <!-- must be set in jenkins ANT build step -->
+        	<arg value="-Dmaven.build.cache.enabled=false"/> <!-- runs out of memory here -->
         </maven>
 	</target>
 </project>
