@@ -207,6 +207,11 @@
     <maven.compiler.target>11</maven.compiler.target>
     <maven.compiler.source>11</maven.compiler.source>
     <java.encoding>Cp1252</java.encoding>
+    
+    <maven.build.cache.exclude.value.1>gen</maven.build.cache.exclude.value.1> <!-- all examples -->
+    <maven.build.cache.exclude.value.2>tomcat.*</maven.build.cache.exclude.value.2> <!-- temporary test dir -->
+    <maven.build.cache.exclude.value.3>work</maven.build.cache.exclude.value.3> <!-- temporary test dir -->
+    <maven.build.cache.exclude.value.4>null</maven.build.cache.exclude.value.4> <!-- Docker cfg bug -->
   </properties>
 
   <repositories>       
@@ -775,14 +780,13 @@
         </plugins>
     </pluginManagement>
     
-    <!-- external configuration, affects build times
     <extensions>
 		<extension>
 		    <groupId>org.apache.maven.extensions</groupId>
 		    <artifactId>maven-build-cache-extension</artifactId>
 		    <version>1.2.0</version>
 		</extension>    
-    </extensions>-->
+    </extensions>
     
   </build>
   
