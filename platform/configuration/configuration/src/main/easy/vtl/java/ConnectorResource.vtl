@@ -6,15 +6,17 @@ template ConnectorResource(Configuration config, FileArtifact target, Connector 
 
 	mapOf(String, String) modbusTypes = {
 	   {"Boolean", "boolean"}, 
-	   {"int", "integer"}, 
-	   {"short", "ushort"},
-	   {"Int16", "short"},
-	   {"UnsignedInt16", "uint16"}, 
+	   {"int", "integer"}, // initial, superfluous?
+       {"Int16", "short"},
+	   {"Short", "short"},
+	   {"UnsignedInt16", "ushort"}, 
 	   {"Int32", "integer"},
-	   {"UnsignedInt32", "uint32"},
-	   {"Int64", "long"},
-	   {"UnsignedInt64", "uint64"},
+       {"Integer", "integer"}, 
+	   {"UnsignedInt32", "uinteger"}, 
+	   {"UnsignedInt64", "uinteger"}, // unmapped?
 	   {"Float", "float"},
+       {"Int64", "long"},
+	   {"Long", "long"},
 	   {"Double", "double"},
 	   {"String", "ascii"},
 	   {"DateTime", "datetime"}
