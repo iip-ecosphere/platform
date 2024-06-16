@@ -446,7 +446,7 @@ template AasImplTest(Configuration config, FileArtifact target, AasSubmodelType 
     def genEnumTests(AasSubmodelType type) {
         String clsName = asTypeName(type.name);
         setOf(AasEnumType) enumTypes = AasEnumType.allInstances();
-        for (AasEnumType e: enumTypes) {
+        for (AasEnumType e: enumTypes->sortedBy(m|m.name)) { // sortedBy for testing
             if (e.versionIdentifier == type.versionIdentifier and usedEnums.includes(e.name)) {
                 String enumName = asTypeName(e.name);
                 'assertEnum(${clsName}Builder.${enumName}.values(), 
