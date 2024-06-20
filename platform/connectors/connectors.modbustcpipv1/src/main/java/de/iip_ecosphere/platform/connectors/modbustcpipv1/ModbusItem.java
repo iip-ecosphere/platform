@@ -43,16 +43,6 @@ public class ModbusItem {
     }
     
     /**
-     * Returns the HashMap&lt;Integer, Object&gt; registers.
-     * 
-     * @return HashMap&lt;Integer, Object&gt; registers
-     */
-    public HashMap<Integer, Object> getRegisters() {
-        
-        return registers;
-    }
-    
-    /**
      * Returns the Object at offset.
      * 
      * @param offset of the Object to get

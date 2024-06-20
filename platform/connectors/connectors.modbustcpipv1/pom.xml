@@ -15,10 +15,16 @@
 	</parent>
 
 	<dependencies>
-		<dependency>
+		<dependency> <!-- for server  -->
 			<groupId>net.wimpi</groupId>
 			<artifactId>jamod</artifactId>
 			<version>1.2</version>
+            <scope>test</scope>
+		</dependency>
+		<dependency>
+		    <groupId>com.ghgande</groupId>
+		    <artifactId>j2mod</artifactId>
+		    <version>3.2.1</version>
 		</dependency>
 		<dependency>
 			<groupId>de.iip-ecosphere.platform</groupId>

@@ -13,7 +13,6 @@
 package test.de.iip_ecosphere.platform.connectors.modbustcpipv1;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -90,25 +89,18 @@ public class ModbusTcpIpConnectorTest extends AbstractModbusTcpIpConnectorTest {
         testParameter.setApplicationInformation("App_Id", "App_Description");
         testParameter.setEndpointPath(registryEndpoint.getSchema() + ":" + registryEndpoint.getEndpoint());
         
-        //So läuft der Test wieder durch, aber das Einstellen der SERVER_STRUCTURE verursacht Fehler...
         String serverStructure = testServer.getServerStructure();
-        
-        Charset charset = Charset.forName("UTF-8");
-        byte[] bytes = serverStructure.getBytes(charset);
-        
-        String str = new String(bytes, charset);
-        
-        testParameter.setSpecificSetting("SERVER_STRUCTURE", str);
+        testParameter.setSpecificSetting("SERVER_STRUCTURE", serverStructure);
         
         return testParameter.build();
 
     }
 
     @Override
-    protected Connector<ModbusItem, Object, ModbusMachineData, ModbusMachineCommand> createConnector(
-            ProtocolAdapter<ModbusItem, Object, ModbusMachineData, ModbusMachineCommand> adapter) {
+    protected Connector<ModbusItem, Object, ModbusDataC, ModbusCommandC> createConnector(
+            ProtocolAdapter<ModbusItem, Object, ModbusDataC, ModbusCommandC> adapter) {
 
-        return new ModbusTcpIpConnector<ModbusMachineData, ModbusMachineCommand>(adapter);
+        return new ModbusTcpIpConnector<ModbusDataC, ModbusCommandC>(adapter);
     }
     
     /**

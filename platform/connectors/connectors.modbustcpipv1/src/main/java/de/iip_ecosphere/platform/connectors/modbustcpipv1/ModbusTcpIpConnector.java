@@ -21,6 +21,18 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.ghgande.j2mod.modbus.ModbusException;
+import com.ghgande.j2mod.modbus.ModbusIOException;
+import com.ghgande.j2mod.modbus.ModbusSlaveException;
+import com.ghgande.j2mod.modbus.io.ModbusTCPTransaction;
+import com.ghgande.j2mod.modbus.msg.ModbusRequest;
+import com.ghgande.j2mod.modbus.msg.ReadMultipleRegistersRequest;
+import com.ghgande.j2mod.modbus.msg.ReadMultipleRegistersResponse;
+import com.ghgande.j2mod.modbus.msg.WriteMultipleRegistersRequest;
+import com.ghgande.j2mod.modbus.net.TCPMasterConnection;
+import com.ghgande.j2mod.modbus.procimg.Register;
+import com.ghgande.j2mod.modbus.procimg.SimpleRegister;
+
 import de.iip_ecosphere.platform.connectors.AbstractConnector;
 import de.iip_ecosphere.platform.connectors.AdapterSelector;
 import de.iip_ecosphere.platform.connectors.ConnectorDescriptor;
@@ -33,39 +45,31 @@ import de.iip_ecosphere.platform.connectors.model.ModelInputConverter;
 import de.iip_ecosphere.platform.connectors.model.ModelOutputConverter;
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
 import de.iip_ecosphere.platform.support.json.JsonUtils;
-import net.wimpi.modbus.ModbusException;
-import net.wimpi.modbus.ModbusIOException;
-import net.wimpi.modbus.ModbusSlaveException;
-import net.wimpi.modbus.io.ModbusTCPTransaction;
-import net.wimpi.modbus.msg.ModbusRequest;
-import net.wimpi.modbus.msg.ReadMultipleRegistersRequest;
-import net.wimpi.modbus.msg.ReadMultipleRegistersResponse;
-import net.wimpi.modbus.msg.WriteMultipleRegistersRequest;
-import net.wimpi.modbus.net.TCPMasterConnection;
-import net.wimpi.modbus.procimg.Register;
-import net.wimpi.modbus.procimg.SimpleRegister;
+
 
 /**
  * Implements the generic MODBUS TCP/IP connector.
  *
- * @param <CO> the output type to the IIP-Ecosphere platform
- * @param <CI> the input type from the IIP-Ecosphere platform
+ * @param <CO> the output type of the connector
+ * @param <CI> the input type of the connector
  * 
  * @author Christian Nikolajew
  */
-@MachineConnector(hasModel = true, supportsModelStructs = false, supportsEvents = false, 
-    specificSettings = {"SERVER_STRUCTURE"})
+@MachineConnector(hasModel = true, supportsModelStructs = false, supportsEvents = false, specificSettings = {
+    "SERVER_STRUCTURE", "UNITID", "TIMEOUT", "BIGBYTE" })
 public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, Object, CO, CI> {
 
     public static final String NAME = "MODBUS TCP/IP";
     private static final Logger LOGGER = LoggerFactory.getLogger(ModbusTcpIpConnector.class);
 
-    private ModbusItem mItem;
-    private TCPMasterConnection mConnection;
-    private ConnectorParameter mParams;
-    private AtomicBoolean inPolling = new AtomicBoolean(false);
-
     private ModbusMap map = null;
+    private ModbusItem item;
+    private TCPMasterConnection connection;
+    private ConnectorParameter params;
+    private AtomicBoolean inPolling = new AtomicBoolean(false);
+    private int timeout = 1000;
+    private boolean bigByte = true;
+    private int unitId = 1;
 
     /**
      * The descriptor of this connector (see META-INF/services).
@@ -106,6 +110,7 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
             ProtocolAdapter<ModbusItem, Object, CO, CI>... adapter) {
         super(selector, adapter);
         configureModelAccess(new ModbusTcpIpModelAccess());
+        
     }
 
     @Override
@@ -130,25 +135,27 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
     @Override
     protected void connectImpl(ConnectorParameter params) throws IOException {
 
-        if (mConnection == null) {
-            this.mParams = params;
+        if (connection == null) {
+            this.params = params;
 
             setModbusMap();
 
-            mItem = new ModbusItem(map);
+            item = new ModbusItem(map);
 
             String endpointURL = getEndpointUrl(params);
 
-            mConnection = new TCPMasterConnection(InetAddress.getByName(params.getHost()));
-            mConnection.setPort(params.getPort());
+            connection = new TCPMasterConnection(InetAddress.getByName(params.getHost()));
+            connection.setPort(params.getPort());
+            connection.setTimeout(timeout);
 
             try {
-                mConnection.connect();
+                connection.connect();
                 LOGGER.info("MODBUS TCP/IP connecting to " + endpointURL);
             } catch (Exception e) {
                 e.printStackTrace();
                 LOGGER.info("MODBUS TCP/IP connection failed: {}");
             }
+
         }
 
     }
@@ -158,21 +165,24 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
      */
     private void setModbusMap() {
 
-        Set<String> keys = mParams.getSpecificSettingKeys();
+        Set<String> keys = params.getSpecificSettingKeys();
 
         for (String key : keys) {
-
+            Object serverSettings = params.getSpecificSetting(key);
             if (key.equals("SERVER_STRUCTURE")) {
-
-                Object serverSettings = mParams.getSpecificSetting(key);
                 map = JsonUtils.fromJson(serverSettings, ModbusMap.class);
-
+            } else if (key.equals("BIGBYTE")) {
+                bigByte = (Boolean) serverSettings;
+            } else if (key.equals("UNITID")) {
+                unitId = (Integer) serverSettings;
+            } else if (key.equals("TIMEOUT")) {
+                timeout = (Integer) serverSettings;
             }
         }
 
         if (map == null) {
             System.out.println("ModbusTcpIpConnector -> No SERVER_STRUCTURE found");
-        } 
+        }
     }
 
     /**
@@ -205,7 +215,7 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
 
     @Override
     protected void disconnectImpl() throws IOException {
-        mConnection = null;
+        connection = null;
     }
 
     @Override
@@ -215,17 +225,21 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
 
     @Override
     protected ModbusItem read() throws IOException {
+        
+        //System.out.println("read()");        
 
         for (ModbusMap.Entry<String, ModbusVarItem> entry : map.entrySet()) {
 
             ModbusVarItem varItem = entry.getValue();
 
             try {
-
-                ReadMultipleRegistersRequest request = new ReadMultipleRegistersRequest(varItem.getOffset(),
-                        varItem.getTypsRegisterSize());
-
-                ModbusTCPTransaction lTransaction = new ModbusTCPTransaction(mConnection);
+                //System.out.println("Offset / Size: " + varItem.getOffset() + "/" + varItem.getTypeRegisterSize());
+                
+                ReadMultipleRegistersRequest request = new ReadMultipleRegistersRequest(varItem.getOffset(), 
+                        varItem.getTypeRegisterSize());
+                request.setUnitID(unitId);
+                
+                ModbusTCPTransaction lTransaction = new ModbusTCPTransaction(connection);
                 lTransaction.setRequest(request);
                 lTransaction.execute();
 
@@ -234,27 +248,27 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
                 if (varItem.getType().equals("short")) {
 
                     Object value = lResponse.getRegister(0).toShort();
-                    mItem.setRegister(varItem.getOffset(), value);
+                    item.setRegister(varItem.getOffset(), value);
 
                 } else if (varItem.getType().equals("integer")) {
 
-                    mItem.setRegister(varItem.getOffset(), getIntegerFromRegisters(lResponse.getRegisters()));
+                    item.setRegister(varItem.getOffset(), getIntegerFromRegisters(lResponse.getRegisters()));
 
                 } else if (varItem.getType().equals("float")) {
 
-                    mItem.setRegister(varItem.getOffset(), getFloatFromRegisters(lResponse.getRegisters()));
+                    item.setRegister(varItem.getOffset(), getFloatFromRegisters(lResponse.getRegisters()));
 
                 } else if (varItem.getType().equals("long")) {
 
-                    mItem.setRegister(varItem.getOffset(), getLongFromRegisters(lResponse.getRegisters()));
+                    item.setRegister(varItem.getOffset(), getLongFromRegisters(lResponse.getRegisters()));
 
                 } else if (varItem.getType().equals("double")) {
 
-                    mItem.setRegister(varItem.getOffset(), getDoubleFromRegisters(lResponse.getRegisters()));
+                    item.setRegister(varItem.getOffset(), getDoubleFromRegisters(lResponse.getRegisters()));
 
                 } else if (varItem.getType().equals("dword")) {
 
-                    mItem.setRegister(varItem.getOffset(), lResponse.getRegister(0).toShort());
+                    item.setRegister(varItem.getOffset(), lResponse.getRegister(0).toShort());
 
                 }
 
@@ -264,16 +278,16 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
                 e.printStackTrace();
             } catch (ModbusException e) {
                 e.printStackTrace();
-            }
+            } 
         }
 
-        return mItem;
+        return item;
     }
 
     /**
      * Creates an Integer out of two Registers.
      * 
-     * @param registers containing the Integer 
+     * @param registers containing the Integer
      * @return the Integer
      */
     private int getIntegerFromRegisters(Register[] registers) {
@@ -285,7 +299,7 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
 
         return result;
     }
-    
+
     /**
      * Creates an Float out of two Registers.
      * 
@@ -293,12 +307,20 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
      * @return the Float
      */
     private float getFloatFromRegisters(Register[] registers) {
+
+        short lowShort;
+        short highShort;
         
-        short lowShort = registers[0].toShort();
-        short highShort = registers[1].toShort();
+        if (bigByte) {
+            lowShort = registers[0].toShort();
+            highShort = registers[1].toShort();
+        } else {
+            highShort = registers[0].toShort();
+            lowShort = registers[1].toShort();
+        }
         
-        int intRes = ((highShort & 0xFFFF) << 16) | (lowShort & 0xFFFF);
-        Float result = Float.intBitsToFloat(intRes); 
+        int intRes = ((lowShort & 0xFFFF) << 16) | (highShort & 0xFFFF);
+        Float result = Float.intBitsToFloat(intRes);
         return result;
     }
 
@@ -309,18 +331,17 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
      * @return the Long
      */
     private long getLongFromRegisters(Register[] registers) {
-        
+
         short lowestShort = registers[0].toShort();
         short lowShort = registers[1].toShort();
         short highShort = registers[2].toShort();
         short highestShort = registers[3].toShort();
 
-        Long result = ((long) highestShort << 48) | ((long) highShort << 32) | ((long) lowShort << 16)
-                | lowestShort;
-        
+        Long result = ((long) highestShort << 48) | ((long) highShort << 32) | ((long) lowShort << 16) | lowestShort;
+
         return result;
     }
-    
+
     /**
      * Creates an Double out of four Registers.
      * 
@@ -328,7 +349,7 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
      * @return the Double
      */
     private double getDoubleFromRegisters(Register[] registers) {
-        
+
         short short0 = registers[0].toShort();
         short short1 = registers[1].toShort();
         short short2 = registers[2].toShort();
@@ -342,10 +363,10 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
 
         buffer.rewind();
         Double result = buffer.getDouble();
-        
+
         return result;
     }
-    
+
     @Override
     public void trigger(ConnectorTriggerQuery query) {
         // Not used for MODBUS TCP/IP
@@ -353,17 +374,17 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
 
     @Override
     protected void writeImpl(Object data) throws IOException {
-        
+
         if (data != null) {
             ModbusVarItem varItem = (ModbusVarItem) data;
-            Object varItemValue = mItem.getRegister(varItem.getOffset());            
+            Object varItemValue = item.getRegister(varItem.getOffset());
 
             Register[] lHoldingRegisters = registers(varItem, varItemValue);
 
             try {
 
-                ModbusTCPTransaction lTransaction = new ModbusTCPTransaction(mConnection);
-                ModbusRequest request = new WriteMultipleRegistersRequest(varItem.getOffset(), lHoldingRegisters);
+                ModbusRequest request = new  WriteMultipleRegistersRequest(varItem.getOffset(), lHoldingRegisters);
+                ModbusTCPTransaction lTransaction = new ModbusTCPTransaction(connection);
                 lTransaction.setRequest(request);
                 lTransaction.execute();
 
@@ -375,7 +396,6 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
                 e.printStackTrace();
             }
         }
-
     }
 
     /**
@@ -387,9 +407,9 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
      */
     private Register[] registers(ModbusVarItem varItem, Object varItemValue) {
 
-        Register[] holdingRegisters = new Register[varItem.getTypsRegisterSize()];
+        Register[] holdingRegisters = new Register[varItem.getTypeRegisterSize()];
 
-        if (varItem.getType().equals("short")) {
+        if (varItem.getType().equals("short") || varItem.getType().equals("dword")) {
 
             holdingRegisters[0] = new SimpleRegister((short) varItemValue);
 
@@ -408,8 +428,15 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
             float floatToWrite = (float) varItemValue;
             int floatAsInt = Float.floatToIntBits(floatToWrite);
 
-            short highShort = (short) ((floatAsInt >> 16) & 0xFFFF);
-            short lowShort = (short) (floatAsInt & 0xFFFF);
+            short highShort;
+            short lowShort;
+            if (bigByte) {
+                lowShort = (short) ((floatAsInt >> 16) & 0xFFFF);
+                highShort = (short) (floatAsInt & 0xFFFF);
+            } else {
+                highShort = (short) ((floatAsInt >> 16) & 0xFFFF);
+                lowShort = (short) (floatAsInt & 0xFFFF);
+            }
 
             holdingRegisters[0] = new SimpleRegister(lowShort);
             holdingRegisters[1] = new SimpleRegister(highShort);
@@ -485,39 +512,28 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
             return outputConverter;
         }
 
-        /**
-         * Returns the ModbusMap.
-         * 
-         * @return the ModbusMap
-         */
-        public ModbusMap getMap() {
-            return map;
-        }
-
         @Override
-        public Object call(String qName, Object... arg1) throws IOException {
+        public void set(String qName, Object arg1) throws IOException {
 
-            ModbusMap map = ModbusTcpIpConnector.this.getMap();
             ModbusVarItem varItem = map.get(qName);
-
-            mItem.setRegister(varItem.getOffset(), arg1[0]);
-
+            item.setRegister(varItem.getOffset(), arg1);
             writeImpl(varItem);
             doPolling();
-
-            return mItem;
         }
 
         @Override
         public Object get(String qName) throws IOException {
 
             Object result = new Object();
-            ModbusMap map = ModbusTcpIpConnector.this.getMap();
             ModbusVarItem varItem = map.get(qName);
-
-            result = mItem.getRegister(varItem.getOffset());
-
+            result = item.getRegister(varItem.getOffset());
             return result;
+        }
+        
+        @Override
+        public Object call(String qName, Object... arg1) throws IOException {
+            // Not used for MODBUS TCP/IP
+            return null;
         }
 
         @Override
@@ -539,11 +555,6 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
 
         @Override
         public void registerCustomType(Class<?> cls) throws IOException {
-            // Not used for MODBUS TCP/IP
-        }
-
-        @Override
-        public void set(String arg0, Object arg1) throws IOException {
             // Not used for MODBUS TCP/IP
         }
 
@@ -582,7 +593,7 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
 
         @Override
         public ConnectorParameter getConnectorParameter() {
-            return mParams;
+            return params;
         }
 
     }

@@ -29,9 +29,9 @@ public class ModbusTcpIpInputConverter extends ModelInputConverter {
     public ModbusTcpIpInputConverter() {
     }
     
-    @Override
-    public int toInteger(Object data) throws IOException {
-        return Integer.valueOf(data.toString());
-    }
+//    @Override
+//    public int toInteger(Object data) throws IOException {
+//        return Integer.valueOf(data.toString());
+//    }
     
 }

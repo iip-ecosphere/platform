@@ -53,11 +53,11 @@ public class ModbusVarItem {
      * 
      * @return the count of registers needed to store this type
      */
-    public int getTypsRegisterSize() {
+    public int getTypeRegisterSize() {
         
         int result = 0;
         
-        if (type.equals("short")) {
+        if (type.equals("short") || type.equals("dword")) {
             result = 1;
         } else if (type.equals("integer")) {
             result = 2;
@@ -67,9 +67,9 @@ public class ModbusVarItem {
             result = 4;
         } else if (type.equals("double")) {
             result = 4;
-        } else if (type.equals("dword")) {
-            result = 2;
-        }
+        } /*else if (type.equals("dword")) {
+            result = 1;
+        }*/
         
         return result;
     }
