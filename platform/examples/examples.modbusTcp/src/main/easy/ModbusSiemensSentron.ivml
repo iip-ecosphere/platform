@@ -8,68 +8,124 @@ project ModbusSiemensSentron {
     RecordType modbusSiemensRwSentron = {
         name = "ModbusSiemensRwSentron",
         fields = {
-            ModbusField {
-                offset = 50055,
-                name = "DisplayContrast",
-                description = "Display Contrast",
-                type = refBy(Modbus_uint64),
+            /*ModbusField {
+                offset = 213,
+                name = "Betriebsstundenzaehler",
+                description = "Betriebsstundenzaehler",
+                type = refBy(Modbus_uint32),
                 cachingTime = CACHE_NONE
             }, ModbusField {
-                offset = 50057,
-                name = "DisplayBrightness",
-                description = "Display Brightness",
-                type = refBy(Modbus_uint64),
+                offset = 215,
+                name = "Universalzaehler",
+                description = "Universalzaehler",
+                type = refBy(Modbus_uint32),
                 cachingTime = CACHE_NONE
             }, ModbusField {
-                offset = 50061,
-                name = "BrightnessDuration",
-                description = "BrightnessDuration",
-                type = refBy(Modbus_uint64),
+                offset = 373,
+                name = "Impulszaehler 0",
+                description = "Impulszaehler 0",
+                type = refBy(Modbus_uint32),
                 cachingTime = CACHE_NONE
-            }
+            } */
         }
     };
     
     RecordType modbusSiemensSentron = {
         name = "ModbusSiemensSentron",
         fields = {
-            ModbusField {
-                offset = 50055,
-                name = "DisplayContrast",
-                description = "Display Contrast",
-                type = refBy(Modbus_uint64),
-                cachingTime = CACHE_NONE
-            }, ModbusField {
-                offset = 50057,
-                name = "DisplayBrightness",
-                description = "Display Brightness",
-                type = refBy(Modbus_uint64),
-                cachingTime = CACHE_NONE
-            }, ModbusField {
-                offset = 50061,
-                name = "BrightnessDuration",
-                description = "BrightnessDuration",
-                type = refBy(Modbus_uint64),
-                cachingTime = CACHE_NONE
-            }, ModbusField {
-                offset = 55,
-                name = "Frequency",
-                description = "Power Frequency",
+		ModbusField {
+                offset = 25,
+                name = "PowerConsumption",
+                description = "PowerConsumption",
                 type = refBy(Modbus_float32),
                 cachingTime = CACHE_NONE
             }, ModbusField {
                 offset = 1,
-                name = "VoltageL1N",
-                description = "Voltage L1-N",
+                name = "Spannung L1-N",
+                description = "Spannung L1-N",
                 type = refBy(Modbus_float32),
                 cachingTime = CACHE_NONE
             }, ModbusField {
+                offset = 3,
+                name = "Spannung L2-N",
+                description = "Spannung L2-N",
+                type = refBy(Modbus_float32),
+                cachingTime = CACHE_NONE
+            }, ModbusField {
+                offset = 5,
+                name = "Spannung L3-N",
+                description = "Spannung L3-N",
+                type = refBy(Modbus_float32),
+                cachingTime = CACHE_NONE
+            }, ModbusField {
+                offset = 7,
+                name = "Spannung L1-L2",
+                description = "Spannung L1-L2",
+                type = refBy(Modbus_float32),
+                cachingTime = CACHE_NONE
+            }, ModbusField {
+                offset = 9,
+                name = "Spannung L2-L3",
+                description = "Spannung L2-L3",
+                type = refBy(Modbus_float32),
+                cachingTime = CACHE_NONE
+            }, ModbusField {
+                offset = 11,
+                name = "Spannung L3-L1",
+                description = "Spannung L3-L1",
+                type = refBy(Modbus_float32),
+                cachingTime = CACHE_NONE
+            } , ModbusField {
                 offset = 13,
-                name = "CurrentL1",
-                description = "Current L1",
+                name = "Strom L1",
+                description = "Strom L1",
+                type = refBy(Modbus_float32),
+                cachingTime = CACHE_NONE
+            }, ModbusField {
+                offset = 15,
+                name = "Strom L2",
+                description = "Strom L2",
+                type = refBy(Modbus_float32),
+                cachingTime = CACHE_NONE
+            }, ModbusField {
+                offset = 17,
+                name = "Strom L3",
+                description = "Strom L3",
                 type = refBy(Modbus_float32),
                 cachingTime = CACHE_NONE
             }
+
+	/*	, ModbusField {
+                offset = 213,
+                name = "Betriebsstundenzaehler",
+                description = "Betriebsstundenzaehler",
+                type = refBy(Modbus_uint32),
+                cachingTime = CACHE_NONE
+            }, ModbusField {
+                offset = 215,
+                name = "Universalzaehler",
+                description = "Universalzaehler",
+                type = refBy(Modbus_uint32),
+                cachingTime = CACHE_NONE
+            }, ModbusField {
+                offset = 373,
+                name = "Impulszaehler 0",
+                description = "Impulszaehler 0",
+                type = refBy(Modbus_uint32),
+                cachingTime = CACHE_NONE
+            }, ModbusField {
+                offset = 55,
+                name = "Netzfrequenz",
+                description = "Netzfrequenz",
+                type = refBy(Modbus_float32),
+                cachingTime = CACHE_NONE
+            },  ModbusField {
+                offset = 129,
+                name = "Maximale Netzfrequenz",
+                description = "Maximale Netzfrequenz",
+                type = refBy(Modbus_float32),
+                cachingTime = CACHE_NONE
+            } */
         }
     };
 

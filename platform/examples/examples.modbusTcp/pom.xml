@@ -29,6 +29,11 @@
       <groupId>de.iip-ecosphere.platform</groupId>
       <version>${project.version}</version>
     </dependency>   
+    <dependency> <!-- for server  -->
+        <groupId>net.wimpi</groupId>
+        <artifactId>jamod</artifactId>
+        <version>1.2</version>
+    </dependency>
       
     <dependency>
       <groupId>junit</groupId>

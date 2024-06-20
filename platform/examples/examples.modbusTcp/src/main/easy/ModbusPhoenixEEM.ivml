@@ -42,7 +42,7 @@ project ModbusPhoenixEEM {
             description = "Day of occurrence of the voltage dip (UTC)",
             type = refBy(Modbus_uint16),
             cachingTime = CACHE_NONE
-        }, ModbusField {
+        } , ModbusField {
             offset = 1283,
             name = "Month",
             description = "Month of occurrence of the voltage dip (UTC)",
@@ -54,13 +54,13 @@ project ModbusPhoenixEEM {
             description = "Year of occurrence of the voltage dip (UTC)",
             type = refBy(Modbus_uint16),
             cachingTime = CACHE_NONE
-        }, /*ModbusField {
+        } , ModbusField {
             offset = 32768,
             name = "U12",
             description = "Effective value voltage U12",
             type = refBy(Modbus_float32),
             cachingTime = CACHE_NONE
-        }, ModbusField {
+        } , ModbusField {
             offset = 32770,
             name = "U23",
             description = "Effective value voltage U23",
@@ -72,49 +72,55 @@ project ModbusPhoenixEEM {
             description = "Effective value voltage U31",
             type = refBy(Modbus_float32),
             cachingTime = CACHE_NONE
-        },*/ ModbusField {
+        }  ,  ModbusField {
             offset = 32774,
             name = "U1",
             description = "Effective value voltage U1",
             type = refBy(Modbus_float32),
             cachingTime = CACHE_NONE
-        }, /*ModbusField {
+        },  ModbusField {
             offset = 32776,
             name = "U2",
             description = "Effective value voltage U2",
             type = refBy(Modbus_float32),
             cachingTime = CACHE_NONE
-        }, ModbusField {
+        } , ModbusField {
             offset = 32778,
             name = "U3",
             description = "Effective value voltage U3",
             type = refBy(Modbus_float32),
             cachingTime = CACHE_NONE
-        }, */ ModbusField {
+        },  ModbusField {
             offset = 32780,
             name = "frequency",
             description = "Frequency",
             type = refBy(Modbus_float32),
             cachingTime = CACHE_NONE
-        }, ModbusField {
+        }   , ModbusField {
             offset = 32782,
             name = "I1",
             description = "Effective value current I1",
             type = refBy(Modbus_float32),
             cachingTime = CACHE_NONE
-        }/*, ModbusField {
+        } , ModbusField {
             offset = 32784,
             name = "I2",
             description = "Effective value current I2",
             type = refBy(Modbus_float32),
             cachingTime = CACHE_NONE
-        }, ModbusField {
+        } , ModbusField {
             offset = 32786,
             name = "I3",
             description = "Effective value current I3",
             type = refBy(Modbus_float32),
             cachingTime = CACHE_NONE
-        }*/
+        } , ModbusField {
+            offset = 32790,
+            name = "Total active power",
+            description = "Sum of active power according to DIN EN 61557-12 with sign",
+            type = refBy(Modbus_float32),
+            cachingTime = CACHE_NONE
+        }
     };
 
     // ------------ freezing ------------------

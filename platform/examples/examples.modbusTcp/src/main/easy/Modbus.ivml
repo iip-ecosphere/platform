@@ -60,6 +60,9 @@ project Modbus {
         name = "myModbusConn example",
         description = "",
         ver = "0.1.0",
+        unitId = 1,
+        timeout = 3000,
+        bigByteOrder = true,
         host = "127.0.0.1",
         //port = 502, // default localhost
         
@@ -74,7 +77,10 @@ project Modbus {
         name = "myModbusSentronConn example",
         description = "",
         ver = "0.1.0",
-        host = "127.0.0.1",
+        unitId = 1,
+        timeout = 3000,
+        bigByteOrder = true,
+        host = "192.168.0.10",
         //port = 502, // default localhost
         
         input = {{type=refBy(modbusSiemensRwSentron)}},

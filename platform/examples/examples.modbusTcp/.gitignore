@@ -3,3 +3,7 @@
 /opcTest.txt
 /log
 /modbusTest.txt
+/modbusTestGeneratedConnectorSentron.txt
+/totalRequestTimeGeneratedConnector.txt
+/totalRequestTimeGeneratedSentronConnector.txt
+/.temp-GeneratedConnector*.txt

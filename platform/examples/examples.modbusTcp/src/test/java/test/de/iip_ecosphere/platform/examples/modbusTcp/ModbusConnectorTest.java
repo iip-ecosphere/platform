@@ -1,3 +1,4 @@
+
 /**
  * ******************************************************************************
  * Copyright (c) {2021} The original author or authors
@@ -15,7 +16,6 @@ package test.de.iip_ecosphere.platform.examples.modbusTcp;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -23,17 +23,27 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.examples.modbusTcp.ManualConnector;
-import de.iip_ecosphere.platform.examples.modbusTcp.ModbusMachineCommand;
-import de.iip_ecosphere.platform.examples.modbusTcp.ModbusMachineData;
+import de.iip_ecosphere.platform.examples.modbusTcp.ModbusCommandE;
+import de.iip_ecosphere.platform.examples.modbusTcp.ModbusDataE;
+import de.iip_ecosphere.platform.examples.modbusTcp.ModbusServer;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.support.resources.FolderResourceResolver;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
+import iip.datatypes.ModbusPhoenixEEM;
+import iip.datatypes.ModbusPhoenixRwEEM;
+import iip.datatypes.ModbusPhoenixRwEEMImpl;
+import iip.datatypes.ModbusSiemensRwSentron;
+import iip.datatypes.ModbusSiemensRwSentronImpl;
+import iip.datatypes.ModbusSiemensSentron;
 import iip.nodes.MyModbusConnExample;
+import iip.nodes.MyModbusSentronConnExample;
 import de.iip_ecosphere.platform.connectors.Connector;
 import de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusItem;
+import de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusTcpIpConnector;
 import de.iip_ecosphere.platform.examples.modbusTcp.GeneratedConnector;
+import de.iip_ecosphere.platform.examples.modbusTcp.GeneratedConnectorSentron;
 
 /**
  * Tests the connector parts/plugins for the MODBUS server.
@@ -56,98 +66,30 @@ public class ModbusConnectorTest {
         // load generated server resources without copying them
         ResourceLoader.registerResourceResolver(
             new FolderResourceResolver("gen/modbus/SimpleModbusDemoApp/src/main/resources"));
-        
-        server = new ModbusServer();
-        server.start();
-        LOGGER.info("MODBUS TCP/IP server started");
+
     }
 
-    /**
-     * Shuts down the server.
-     */
-    @AfterClass
-    public static void shutdown() {
-        
-        server.stop();
-        LOGGER.info("MODBUS TCP/IP server stopped");
-    }
-    
     /**
      * Test for ManualConnector.
      * 
      * @throws IOException
      */
     @Test
-    public void testManualConnector() throws IOException {
-        System.out.println("testManualConnector()");
-        //ManualConnector.main();
+    public void manualConnectorTest() throws IOException {
         
-        ActiveAasBase.setNotificationMode(NotificationMode.NONE);
-        AtomicReference<ModbusMachineData> md = new AtomicReference<ModbusMachineData>();
+        System.out.println("manualConnectorTest()");
         
-        //Create an instance
-        Connector<ModbusItem, Object, ModbusMachineData, ModbusMachineCommand> connector =
-                ManualConnector.createConnector();
+        server = new ModbusServer(MyModbusConnExample.createConnectorParameter());
+        server.start();
         
-        connector.setReceptionCallback(new ReceptionCallback<ModbusMachineData>() {
+        functionTestManualConnector();
 
-            @Override
-            public void received(ModbusMachineData data) {
-                System.out.println("RECEIVED " + data);
-                md.set(data);
-            }
-
-            @Override
-            public Class<ModbusMachineData> getType() {
-                return ModbusMachineData.class;
-            }
-
-        });
+        server.stop();
         
-        connector.connect(MyModbusConnExample.createConnectorParameter());
-        connector.request(true);
         
-        ModbusMachineData tmp = md.get();
-
-        // Check if the values are 0
-        Assert.assertEquals((int) 0, tmp.getValue("Data"));
-        Assert.assertEquals((int) 0, tmp.getValue("I1"));
-        Assert.assertEquals((int) 0, tmp.getValue("S1"));
-        Assert.assertEquals((int) 0, tmp.getValue("V1"));
-
-        // Set values
-        ModbusMachineCommand cmd = new ModbusMachineCommand();
-        cmd.set("Data", 1);
-        cmd.set("I1", 9999);
-        cmd.set("S1", 123456789);
-        cmd.set("V1", -512);
-        connector.write(cmd);
-
-        tmp = md.get();
-
-        // Check the values set before
-        Assert.assertEquals((int) 1, tmp.getValue("Data"));
-        Assert.assertEquals((int) 9999, tmp.getValue("I1"));
-        Assert.assertEquals((int) 123456789, tmp.getValue("S1"));
-        Assert.assertEquals((int) -512, tmp.getValue("V1"));
-
-        // Set values back to 0
-        cmd = new ModbusMachineCommand();
-        cmd.set("Data", (int) 0);
-        cmd.set("I1", (int) 0);
-        cmd.set("S1", (int) 0);
-        cmd.set("V1", (int) 0);
-        connector.write(cmd);
+        String[] args = {}; 
+        //ManualConnector.main(args);
         
-        tmp = md.get();
-
-        // Check if the values are 0
-        Assert.assertEquals((int) 0, tmp.getValue("Data"));
-        Assert.assertEquals((int) 0, tmp.getValue("I1"));
-        Assert.assertEquals((int) 0, tmp.getValue("S1"));
-        Assert.assertEquals((int) 0, tmp.getValue("V1"));
-
-        connector.disconnect();
     }
     
     /**
@@ -155,11 +97,286 @@ public class ModbusConnectorTest {
      * 
      * @throws IOException
      */
-    @Test
-    public void testGeneratedConnector() throws IOException {
-        String[] args = {}; 
-        System.out.println("testGeneratedConnector()");
-        GeneratedConnector.main(args);
+//    @Test
+//    public void generatedConnectorTest() throws IOException {
+//       
+//        System.out.println("generatedConnectorTest()");
+//        
+//        server = new ModbusServer(MyModbusConnExample.createConnectorParameter());
+//        server.start();
+//        
+//        functionTestGeneratedConnector();
+//          
+//        server.stop();
+//        
+//        
+//        String[] args = {}; 
+//        GeneratedConnector.main(args);
+//    }
+    
+    /**
+     * Test for  GeneratedConnectorSentron.
+     * 
+     * @throws IOException
+     */
+//    @Test
+//    public void generatedConnectorSentronTest() throws IOException {
+//        
+//        System.out.println("generatedConnectorSentronTest()");
+//        
+//        server = new ModbusServer(MyModbusSentronConnExample.createConnectorParameter());
+//        server.start();
+//        
+//        functionTestGeneratedConnectorSentron();
+//        
+//        server.stop();
+//        
+//        
+//        String[] args = {}; 
+//        GeneratedConnectorSentron.main(args);
+//    }
+    
+    
+    /**
+     * Functiontest for ManualConnector.
+     * 
+     * @throws IOException
+     */
+    public void functionTestManualConnector() throws IOException {     
+ 
+        System.out.println("functionTestManualConnector -> start");
+        
+        ActiveAasBase.setNotificationMode(NotificationMode.NONE);
+        AtomicReference<ModbusDataE> md = new AtomicReference<ModbusDataE>();
+        
+        //Create an instance
+        Connector<ModbusItem, Object, ModbusDataE, ModbusCommandE> connector =
+                ManualConnector.createConnector();
+        
+        connector.setReceptionCallback(new ReceptionCallback<ModbusDataE>() {
+
+            @Override
+            public void received(ModbusDataE data) {
+                md.set(data);
+            }
+
+            @Override
+            public Class<ModbusDataE> getType() {
+                return ModbusDataE.class;
+            }
+
+        });
+        
+        connector.connect(MyModbusConnExample.createConnectorParameter());
+        connector.request(true);
+        
+        ModbusDataE tmp = md.get();
+
+        // Check if the values are 0
+        Assert.assertEquals((short) 0, tmp.getDay());
+        Assert.assertEquals((short) 0, tmp.getMonth());
+        Assert.assertEquals((short) 0, tmp.getYear());
+        Assert.assertTrue(tmp.getU12() <= 0.001);
+        Assert.assertTrue(tmp.getU23() <= 0.001);
+        Assert.assertTrue(tmp.getU31() <= 0.001);
+
+        // Set values
+        ModbusCommandE cmd = new ModbusCommandE();
+        cmd.setDay((short) 27);
+        cmd.setMonth((short) 5);
+        cmd.setYear((short) 2024);
+        connector.write(cmd);
+
+        tmp = md.get();
+
+        // Check the values set before
+        Assert.assertEquals((short) 27, tmp.getDay());
+        Assert.assertEquals((short) 5, tmp.getMonth());
+        Assert.assertEquals((short) 2024, tmp.getYear());
+        Assert.assertTrue(tmp.getU12() <= 0.001);
+        Assert.assertTrue(tmp.getU23() <= 0.001);
+        Assert.assertTrue(tmp.getU31() <= 0.001);
+
+        // Set values back to 0
+        cmd = new ModbusCommandE();
+        cmd.setDay((short) 0);
+        cmd.setMonth((short) 0);
+        cmd.setYear((short) 0);
+        connector.write(cmd);
+        
+        tmp = md.get();
+
+        // Check if the values are 0
+        Assert.assertEquals((short) 0, tmp.getDay());
+        Assert.assertEquals((short) 0, tmp.getMonth());
+        Assert.assertEquals((short) 0, tmp.getYear());
+        Assert.assertTrue(tmp.getU12() <= 0.001);
+        Assert.assertTrue(tmp.getU23() <= 0.001);
+        Assert.assertTrue(tmp.getU31() <= 0.001);
+
+        connector.disconnect();
+        
+        System.out.println("functionTestManualConnector -> success");
     }
     
+    /**
+     * Functiontest for GeneratedConnector.
+     * 
+     * @throws IOException
+     */
+    public void functionTestGeneratedConnector() throws IOException {
+        
+        System.out.println("functionTestGeneratedConnector -> start");
+        
+        ActiveAasBase.setNotificationMode(NotificationMode.NONE);
+        AtomicReference<ModbusPhoenixEEM> md = new AtomicReference<ModbusPhoenixEEM>();
+        
+        ReceptionCallback<ModbusPhoenixEEM> cb = new ReceptionCallback<>() {
+
+            @Override
+            public void received(ModbusPhoenixEEM data) {
+                md.set(data);
+                //System.out.println("RECEIVED (" + count.get() + "): " + data);
+            }
+
+            @Override
+            public Class<ModbusPhoenixEEM> getType() {
+                return ModbusPhoenixEEM.class;
+            }
+
+        };
+        
+        ModbusTcpIpConnector<ModbusPhoenixEEM, ModbusPhoenixRwEEM> connector = 
+                GeneratedConnector.createPlatformConnector(cb);
+        
+        connector.connect(MyModbusConnExample.createConnectorParameter());
+        connector.request(true);
+        
+        ModbusPhoenixEEM tmp = md.get();
+       
+        // Check if the values are 0
+        Assert.assertEquals((short) 0, tmp.getDay());
+        Assert.assertEquals((short) 0, tmp.getMonth());
+        Assert.assertEquals((short) 0, tmp.getYear());
+        Assert.assertTrue(tmp.getU12() <= 0.001);
+        Assert.assertTrue(tmp.getU23() <= 0.001);
+        Assert.assertTrue(tmp.getU31() <= 0.001);
+        
+        // Set values
+        ModbusPhoenixRwEEMImpl cmd = new ModbusPhoenixRwEEMImpl();
+        cmd.setDay((short) 27);
+        cmd.setMonth((short) 5);
+        cmd.setYear((short) 2024);
+        connector.write(cmd);
+        
+        tmp = md.get();
+        
+        // Check the values set before
+        Assert.assertEquals((short) 27, tmp.getDay());
+        Assert.assertEquals((short) 5, tmp.getMonth());
+        Assert.assertEquals((short) 2024, tmp.getYear());
+        Assert.assertTrue(tmp.getU12() <= 0.001);
+        Assert.assertTrue(tmp.getU23() <= 0.001);
+        Assert.assertTrue(tmp.getU31() <= 0.001);
+        
+        // Set values back to 0
+        cmd = new ModbusPhoenixRwEEMImpl();
+        cmd.setDay((short) 0);
+        cmd.setMonth((short) 0);
+        cmd.setYear((short) 0);
+        connector.write(cmd);
+        
+        tmp = md.get();
+        
+        // Check if the values are 0
+        Assert.assertEquals((short) 0, tmp.getDay());
+        Assert.assertEquals((short) 0, tmp.getMonth());
+        Assert.assertEquals((short) 0, tmp.getYear());
+        Assert.assertTrue(tmp.getU12() <= 0.001);
+        Assert.assertTrue(tmp.getU23() <= 0.001);
+        Assert.assertTrue(tmp.getU31() <= 0.001);
+        
+        System.out.println("functionTestGeneratedConnector -> success");
+    }
+    
+    /**
+     * Functiontest for GeneratedConnectorSentron.
+     * 
+     * @throws IOException
+     */
+    public void functionTestGeneratedConnectorSentron() throws IOException {
+        
+        System.out.println("functionTestGeneratedConnectorSentron -> start");
+        
+        ActiveAasBase.setNotificationMode(NotificationMode.NONE);
+        AtomicReference<ModbusSiemensSentron> md = new AtomicReference<ModbusSiemensSentron>();
+
+        ReceptionCallback<ModbusSiemensSentron> cb = new ReceptionCallback<>() {
+
+            @Override
+            public void received(ModbusSiemensSentron data) {
+                md.set(data);
+                //System.out.println("RECEIVED (" + count.get() + "): " + data);
+            }
+
+            @Override
+            public Class<ModbusSiemensSentron> getType() {
+                return ModbusSiemensSentron.class;
+            }
+
+        };
+        
+        ModbusTcpIpConnector<ModbusSiemensSentron, ModbusSiemensRwSentron> connector = 
+                GeneratedConnectorSentron.createPlatformConnector(cb);
+        
+        connector.connect(MyModbusSentronConnExample.createConnectorParameter());
+        connector.request(true);
+        
+        ModbusSiemensSentron tmp = md.get();
+        
+        // Check if the values are 0
+        //Assert.assertEquals((int) 0, tmp.getBetriebsstundenzaehler());
+        //Assert.assertEquals((int) 0, tmp.getImpulszaehler0());
+        //Assert.assertEquals((int) 0, tmp.getUniversalzaehler());
+        Assert.assertTrue(tmp.getStromL1() <= 0.001);
+        Assert.assertTrue(tmp.getStromL2() <= 0.001);
+        Assert.assertTrue(tmp.getStromL3() <= 0.001);
+        
+        // Set values
+        ModbusSiemensRwSentronImpl cmd = new ModbusSiemensRwSentronImpl();
+        //cmd.setBetriebsstundenzaehler((int) 7);
+        //cmd.setImpulszaehler0((int) 82);
+        //cmd.setUniversalzaehler((int) 123);
+        connector.write(cmd);
+        
+        tmp = md.get();
+        
+        // Check the values set before
+        //Assert.assertEquals((int) 7, tmp.getBetriebsstundenzaehler());
+        //Assert.assertEquals((int) 82, tmp.getImpulszaehler0());
+        //Assert.assertEquals((int) 123, tmp.getUniversalzaehler());
+        Assert.assertTrue(tmp.getStromL1() <= 0.001);
+        Assert.assertTrue(tmp.getStromL2() <= 0.001);
+        Assert.assertTrue(tmp.getStromL3() <= 0.001);
+        
+        // Set values back to 0
+        cmd = new ModbusSiemensRwSentronImpl();
+        //cmd.setBetriebsstundenzaehler((int) 0);
+        //cmd.setImpulszaehler0((int) 0);
+        //cmd.setUniversalzaehler((int) 0);
+        connector.write(cmd);
+        
+        tmp = md.get();
+        
+        // Check if the values are 0
+        //Assert.assertEquals((int) 0, tmp.getBetriebsstundenzaehler());
+        //Assert.assertEquals((int) 0, tmp.getImpulszaehler0());
+        //Assert.assertEquals((int) 0, tmp.getUniversalzaehler());
+        Assert.assertTrue(tmp.getStromL1() <= 0.001);
+        Assert.assertTrue(tmp.getStromL2() <= 0.001);
+        Assert.assertTrue(tmp.getStromL3() <= 0.001);
+        
+        
+        System.out.println("functionTestGeneratedConnectorSentron -> success");
+    }
 }

@@ -1,10 +1,9 @@
-package test.de.iip_ecosphere.platform.examples.modbusTcp;
+package de.iip_ecosphere.platform.examples.modbusTcp;
 
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusMap;
 import de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusVarItem;
 import de.iip_ecosphere.platform.support.json.JsonUtils;
-import iip.nodes.MyModbusConnExample;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -30,10 +29,12 @@ public class ModbusServer {
 
     /**
      * Creates an ModbusServer instance.
+     * 
+     * @param param the ConnectorParameter
      */
-    public ModbusServer() {
+    public ModbusServer(ConnectorParameter param) {
 
-        ConnectorParameter param = MyModbusConnExample.createConnectorParameter();
+        //ConnectorParameter param = MyModbusConnExample.createConnectorParameter();
         
         Set<String> keys = param.getSpecificSettingKeys();
 
@@ -63,7 +64,7 @@ public class ModbusServer {
         ModbusCoupler.getReference().setProcessImage(spi);
         ModbusCoupler.getReference().setMaster(false);
         ModbusCoupler.getReference().setUnitID(1);
-
+        
         listener = new ModbusTCPListener(3);
         port = param.getPort();
         listener.setPort(port);
@@ -86,6 +87,7 @@ public class ModbusServer {
 
         if (listener != null) {
             listener.start();
+            System.out.println("MODBUS TCP/IP server started");
         }
 
     }
@@ -97,6 +99,7 @@ public class ModbusServer {
 
         if (listener != null) {
             listener.stop();
+            System.out.println("MODBUS TCP/IP server stopped");
         }
 
     }
