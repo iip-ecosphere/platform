@@ -41,6 +41,6 @@ The following layers and components are available in the oktoflow platform:
 
 Released components are made available via [Maven Central](https://search.maven.org/search?q=iip-ecosphere) and example installations in terms of Docker Containers via [Docker Hub](https://hub.docker.com/r/iipecosphere/platform).
 
-![oktoflow](oktoflow.png | width=200)
+<img src="https://github.com/iip-ecosphere/platform/blob/main/platform/oktoflow.png" width="200">
 
 __The main page was moved one level up to the new [platform main page](../README.md).__
