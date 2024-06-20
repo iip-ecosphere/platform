@@ -522,7 +522,10 @@ project Connectors {
        }
        assign (uiGroup = UiOptionalGroup1) to {
            Port port = 502;
+           Integer unitId = 1;
+           Integer timeout = 1000;
        }
+       Boolean bigByteOrder = true;
        assign (uiGroup = UiOptionalGroup2) to {
            String deviceServiceKey = "modbus/tcp";
        }

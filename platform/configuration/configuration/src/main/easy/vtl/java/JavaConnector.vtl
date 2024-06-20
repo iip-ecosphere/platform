@@ -912,7 +912,10 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
     @DispatchCase
     def generateSpecificSettings(ModbusTcpV1Connector conn) {
         String connectorName = toIdentifier(conn.name);
-        '.setSpecificSettingFromResourceSafe("SERVER_STRUCTURE", "${connectorName}.server")'
+        '.setSpecificSettingFromResourceSafe("SERVER_STRUCTURE", "${connectorName}.server")
+        .setSpecificSetting("UNITID", ${conn.unitId})
+        .setSpecificSetting("TIMEOUT", ${conn.timeout})
+        .setSpecificSetting("BIGBYTE", ${conn.bigByteOrder})'
     }
     
 }
