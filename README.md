@@ -12,20 +12,14 @@ For installation and first steps, see [install guide](platform/documentation/INS
 
 ## News
 
+* ETFA'24: Paper on generating IDTA AAS submodel APIs accepted.
 * Started: Migration to JDK 17 and update of core libraries.
-* In progress: MODBUS/TCP connector by Christian Nikolajew
+* In progress: MODBUS/TCP connector by Christian Nikolajew (tested for compliance with Phoenix Contact EEM-MA 370 and Siemens SENTRON PAC 3200)
 * Plugins for alternative components with conflicting classpaths. Retrofit for BaSyx 1.0, in particular in AAS connector.
 * Serial connector tested and working.
 * Auto-generation of all IDTA specs published in February 2024 (accepted for ETFA'23 conference).
 * AAS abstraction/integration upgrade: referenceElement, multiLanguageProperties, entity, blob, more semanticIds, [IDTA 02004-1-2 Handover Documentation](https://industrialdigitaltwin.org/wp-content/uploads/2023/03/IDTA-02004-1-2_Submodel_Handover-Documentation.pdf), [IDTA 02011-1-0 Hierarchical Structures enabling Bills of Material](https://industrialdigitaltwin.org/wp-content/uploads/2023/04/IDTA-02011-1-0_Submodel_HierarchicalStructuresEnablingBoM.pdf), [IDTA 2023-01-24 Draft Submodel PCF](https://github.com/admin-shell-io/submodel-templates/tree/main/development/Carbon%20Footprint/1/0), [IDTA 02008-1-1 Time Series Data](https://industrialdigitaltwin.org/en/wp-content/uploads/sites/2/2023/03/IDTA-02008-1-1_Submodel_TimeSeriesData.pdf), [IDTA 02003-1-2 Generic Frame for Technical Data for Industrial Equipment in Manufacturing](https://industrialdigitaltwin.org/wp-content/uploads/2022/10/IDTA-02003-1-2_Submodel_TechnicalData.pdf), [IDTA 02002-1-0 Submodel for Contact Information](https://industrialdigitaltwin.org/wp-content/uploads/2022/10/IDTA-02002-1-0_Submodel_ContactInformation.pdf), [IDTA 02007-1-0 Nameplate for Software in Manufacturing](https://industrialdigitaltwin.org/wp-content/uploads/2023/08/IDTA-02007-1-0_Submodel_Software-Nameplate.pdf) related examples and XMAS AAS
 * Ongoing revision of the management UI: Initial UI design revision and cleanup, application implementation templates can be created and downloaded from the management UI (December 2023).
-* Improved installation scripts including Angular and the management UI.
-* In 0.7.0, the model locations of examples and templates have been aligned with Maven conventions, i.e., configuration in src/main/easy, updatable meta-model in target/easy.
-* [Tutorial videos](platform/documentation/TUTORIALS.md) (with platform update information) linked now from github.
-* New application example: [HM'23/EMO'23](platform/examples/examples.emo23/README.md) excluding IPR protected code
-* New name: The IIP-Ecosphere platform is now [oktoflow](http://oktoflow.de/).
-* [Platform handbook](platform/documentation/PlatformHandbook.pdf) now always at the same URL, including [sources](platform/documentation/src). Comments for clarification are welcome.
-* MIP technologies and NovoAI AVA connector definitions in configuration meta-model.
 
 ## Public demonstrations
 
@@ -35,7 +29,7 @@ For installation and first steps, see [install guide](platform/documentation/INS
 * Presentation of improved robot-based platform demonstrator at [TddT'22, Berlin](https://www.digitale-technologien.de/DT/Redaktion/DE/Veranstaltungen/2022/DT/220829_Tage_der_digitalen_Technologien.html) 
 * Presentation of robot-based visual quality inspection app on [HM'22](https://www.hannovermesse.de/de/) (with 3 sources, Python-based AI, AAS-based Angular application).
 
-The public demonstrations confirmed compatibility with Phoenix Contact PLCnext (OPC UA, EEM integration), Beckhoff IPC (OPC UA), VDW UMATI (OPC UA), Bitmotec (MQTT), Lenze (MQTT), MIP (MQTT), Beckhoff ADS (Windows) ...
+The demonstrations and further experiments confirmed compatibility with Phoenix Contact PLCnext (OPC UA, EEM integration), Beckhoff IPC (OPC UA), VDW UMATI (OPC UA), Bitmotec (MQTT), Lenze (MQTT), MIP (MQTT), Beckhoff ADS (Windows), Phoenix Contact EEM-MA 370 (Modbus/TCP), Siemens SENTRON PAC 3200 (Modbus/TCP) ...
 
 ## Overview
 

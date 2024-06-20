@@ -62,8 +62,8 @@ project Modbus {
         ver = "0.1.0",
         unitId = 1,
         timeout = 3000,
-        bigByteOrder = true,
-        host = "127.0.0.1",
+        bigByteOrder = false,
+        host = "127.0.0.1", // 192.168.2.82
         //port = 502, // default localhost
         
         input = {{type=refBy(modbusPhoenixRwEEM)}},
@@ -80,7 +80,7 @@ project Modbus {
         unitId = 1,
         timeout = 3000,
         bigByteOrder = true,
-        host = "192.168.0.10",
+        host = "127.0.0.1", // 192.168.0.10
         //port = 502, // default localhost
         
         input = {{type=refBy(modbusSiemensRwSentron)}},
