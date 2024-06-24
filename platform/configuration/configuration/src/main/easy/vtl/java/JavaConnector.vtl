@@ -19,13 +19,19 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
     mapOf(RecordType, String) typeOutVars = {};
     
     // path name customization
-    
+
+    @DispatchBasis
     def getFieldNameForPath(Field field) {
         field.name;
     }
 
+    @DispatchCase
     def getFieldNameForPath(UAFieldType field) {
         field.displayName;
+    }
+
+    def getFieldNameForPath(InfluxField field) {
+        getStringValueSafe(field.mappedName, field.name);
     }
     
     // qualified/unqualified Java types to be used as template parameter for data from machine in connector generation, 
@@ -916,6 +922,42 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         .setSpecificSetting("UNITID", ${conn.unitId})
         .setSpecificSetting("TIMEOUT", ${conn.timeout})
         .setSpecificSetting("BIGBYTE", ${conn.bigByteOrder})'
+    }
+    
+    @DispatchBasis
+    def collectTags(DataType type, String tags) {
+        tags;
+    }
+
+    @DispatchCase
+    def collectTags(RecordType type, String tags) {
+        for (Field f: type.fields) {
+            tags = collectFieldTags(f, tags);
+        }
+        tags;
+    }
+
+    def collectFieldTags(Field field, String tags) {
+        // nothing to do
+        tags;
+    }
+    
+    def collectFieldTags(InfluxField field, String tags) {
+        if (getBooleanValueSafe(field.tag, false)) {
+            appendWithSeparator(tags, ",", getStringValueSafe(field.mappedName, field.name));
+        } else {
+            tags;
+        }
+    }
+
+    @DispatchCase
+    def generateSpecificSettings(InfluxConnector conn) {
+        String tags = collectTags(conn.inInterface.type, "");
+        String connectorName = toIdentifier(conn.name);
+        '.setSpecificSetting("ORG", "${conn.organization}")
+        .setSpecificSetting("BUCKET", "${conn.bucket}")
+        .setSpecificSetting("MEASUREMENT", "${conn.measurement}")
+        .setSpecificSetting("TAGS", "${tags}")'
     }
     
 }

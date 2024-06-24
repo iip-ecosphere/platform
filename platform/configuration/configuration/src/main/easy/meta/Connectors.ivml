@@ -534,7 +534,7 @@ project Connectors {
    }
    
    
-   // ------------------------ MODBUS / TCP ----------------------------------
+   // ------------------------ Beckhoff ADS ----------------------------------
 
    compound AdsConnector refines Connector { // fixed template types see JavaConnector.vtl
        assign (uiGroup = UiInvisibleGroup) to {
@@ -549,6 +549,31 @@ project Connectors {
            String deviceServiceKey = "ADS";
        }
    }
+   
+   // ------------------------ INFLUX ----------------------------------
+
+   compound InfluxField refines Field {
+       String mappedName;
+       Boolean tag=false;
+   } 
+
+   compound InfluxConnector refines Connector {
+       assign (uiGroup = UiInvisibleGroup) to {
+           String class = "de.iip_ecosphere.platform.connectors.influx.InfluxConnector";
+           String artifact ="de.iip-ecosphere.platform:connectors.influx:";
+           NameplateInfo nameplateInfo = {
+               manufacturerProductDesignation = "Generic INFLUX DB connector@en",
+               manufacturer = refBy(manufacturer_sse)
+           };
+       }
+       assign (uiGroup = UiOptionalGroup2) to {
+           String deviceServiceKey = "INFLUX";
+       }
+       NonEmptyString organization;
+       NonEmptyString bucket;
+       NonEmptyString measurement;
+   }
+   
    
    freeze {
        Modbus_int16;
