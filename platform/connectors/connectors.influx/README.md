@@ -8,3 +8,5 @@ Besides connection and authentication data, a connector parameters object passed
 - BUCKET: the source/target bucket in the database
 - MEASUREMENT: the logical name of the data/objects to be written
 - TAGS the field names to be used as tags, may be empty, a single name or a list of comma-separated name
+
+For now, only simple, INFLUX specific StringTriggerQueries are processed. Results are streamed either based on time differences of the data points in the database or - with higher priority - a fixed delay given by the query.
