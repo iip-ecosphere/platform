@@ -33,6 +33,7 @@ import de.iip_ecosphere.platform.connectors.AdapterSelector;
 import de.iip_ecosphere.platform.connectors.ConnectorDescriptor;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.MachineConnector;
+import de.iip_ecosphere.platform.connectors.MachineConnectorSupportedQueries;
 import de.iip_ecosphere.platform.connectors.events.ConnectorTriggerQuery;
 import de.iip_ecosphere.platform.connectors.events.PatternTriggerQuery;
 import de.iip_ecosphere.platform.connectors.model.AbstractModelAccess;
@@ -81,6 +82,7 @@ import de.iip_ecosphere.platform.transport.serialization.QualifiedElementFactory
  */
 @MachineConnector(hasModel = true, supportsModelStructs = false, supportsEvents = false, 
     specificSettings = {"PLUGINID"}, supportsMultiValued = true)
+@MachineConnectorSupportedQueries({PatternTriggerQuery.class})
 public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, CI> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AasConnector.class);
