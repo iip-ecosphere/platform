@@ -181,7 +181,7 @@
 	                            </mvnArgs>
 	                            <brokerPort>0</brokerPort>
 	                            <logRegExprs> 
-	                                <logRegExpr>.*MODBUS Connector test.*</logRegExpr>
+	                                <logRegExpr>.*RECEIVED.*ModbusPhoenixEEMImpl.*</logRegExpr>
 	                            </logRegExprs>
 	                        </configuration>
 	                    </execution>

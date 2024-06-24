@@ -56,8 +56,7 @@ public class GeneratedConnector {
     public static void main(String[] args) throws IOException {
 
         //test(false);
-        //performanceTest(true);
-        System.out.println("MODBUS Connector test");
+        performanceTest(true); // must emit .*RECEIVED.*ModbusPhoenixEEMImpl.*, see POM!
     }
     
     /**
