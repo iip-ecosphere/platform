@@ -153,7 +153,7 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
                 LOGGER.info("MODBUS TCP/IP connecting to " + endpointURL);
             } catch (Exception e) {
                 e.printStackTrace();
-                LOGGER.info("MODBUS TCP/IP connection failed: {}");
+                LOGGER.info("MODBUS TCP/IP connection failed: {}", e.getMessage());
             }
 
         }
@@ -215,7 +215,10 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
 
     @Override
     protected void disconnectImpl() throws IOException {
-        connection = null;
+        if (null != connection) {
+            connection.close();
+            connection = null;
+        }
     }
 
     @Override
