@@ -8,4 +8,5 @@ Platform/Machine connectors component including
   * The generic [MQTT connector](connectors.mqtt/README.md) for v3 and v5 based on the two aforementioned MQTT connectors.
   * Platform connector for [serial connections](connectors.serial/README.md).
   * Platform connector for [MODBUS/TCP](connectors.modbustcpipv1/README.md).
+  * Platform connector for [INFLUX](connectors.influx/README.md).
   * The proprietary [ADS connector](connectors.ads/README.md) for Beckhoff TwinCat ADS.

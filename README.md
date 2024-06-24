@@ -13,6 +13,7 @@ For installation and first steps, see [install guide](platform/documentation/INS
 ## News
 
 * ETFA'24: Paper on generating IDTA AAS submodel APIs accepted.
+* Initial INFLUX DB connector
 * Started: Migration to JDK 17 and update of core libraries.
 * In progress: MODBUS/TCP connector by Christian Nikolajew (tested for compliance with Phoenix Contact EEM-MA 370 and Siemens SENTRON PAC 3200)
 * Plugins for alternative components with conflicting classpaths. Retrofit for BaSyx 1.0, in particular in AAS connector.

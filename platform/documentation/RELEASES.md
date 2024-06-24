@@ -17,6 +17,7 @@ New features:
 * Connectors with temporary data storage for transformation expressions
 * Serial connector, e.g., for EAN code scanners
 * MODBUS/TCP connector by Christian Nikolajew
+* Initial INFLUX DB connector
 * Plugins for alternative components with conflicting classpaths. Retrofit for BaSyx 1.0, in particular in AAS connector.
 * Generated simple connector test programs in implementation templates.
 * Auto-generation of all IDTA specs published in February 2024.
