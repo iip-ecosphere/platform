@@ -30,8 +30,11 @@ import org.junit.runners.Suite;
     ConnectorEventUtilsTest.class,
     ConnectorFactoryTest.class,
     PatternTriggerQueryTest.class,
+    StringTriggerQueryTest.class,
     FormatCacheTest.class,
-    ModelAccessProviderTest.class
+    ModelAccessProviderTest.class,
+    AbstractThreadedConnectorTest.class,
+    AbstractTypeMappingModelAccessTest.class
 })
 public class AllTests {
 }

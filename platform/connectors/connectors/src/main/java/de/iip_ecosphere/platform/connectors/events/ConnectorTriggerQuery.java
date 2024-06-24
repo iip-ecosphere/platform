@@ -19,5 +19,14 @@ package de.iip_ecosphere.platform.connectors.events;
  * @author Holger Eichelberger, SSE
  */
 public interface ConnectorTriggerQuery {
+    
+    /**
+     * Delay for multiple-data streamed result.
+     * 
+     * @return delay between two result data points in ms, none/existing timing if not positive
+     */
+    public default int delay() {
+        return 0;
+    }
 
 }

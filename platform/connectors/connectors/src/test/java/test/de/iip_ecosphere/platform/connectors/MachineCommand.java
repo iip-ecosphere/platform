@@ -76,5 +76,20 @@ public class MachineCommand {
     public int getLotSize() {
         return lotSize;
     }
+
+    @Override
+    public boolean equals(Object object) {
+        boolean result = false;
+        if (object instanceof MachineCommand) {
+            MachineCommand c = (MachineCommand) object;
+            result = getLotSize() == c.getLotSize() && isStart() == c.isStart() && isStop() == c.isStop();
+        }
+        return result;
+    }
+    
+    @Override
+    public int hashCode() {
+        return Boolean.hashCode(isStop()) + Boolean.hashCode(isStart()) + Integer.hashCode(getLotSize());
+    }
     
 }

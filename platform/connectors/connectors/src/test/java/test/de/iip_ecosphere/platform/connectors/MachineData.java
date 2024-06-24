@@ -62,4 +62,20 @@ public class MachineData {
     public String getVendor() {
         return vendor;
     }
+    
+    @Override
+    public boolean equals(Object object) {
+        boolean result = false;
+        if (object instanceof MachineData) {
+            MachineData d = (MachineData) object;
+            result = getLotSize() == d.getLotSize() && vendor.equals(d.getVendor());
+        }
+        return result;
+    }
+    
+    @Override
+    public int hashCode() {
+        return vendor.hashCode() + Integer.hashCode(getLotSize());
+    }
+    
 }

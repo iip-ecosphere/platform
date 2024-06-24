@@ -74,6 +74,42 @@ public class MachineCommandInputTranslator<O> extends AbstractConnectorInputType
          * @throws IOException if model access fails
          */
         public void additionalFromActions(ModelAccess access, MachineCommand data) throws IOException;
+        
+        /**
+         * Returns whether expected exceptions while setting values shall be asserted.
+         * 
+         * @return {@code true} for assert, {@code false} else
+         */
+        public default boolean assertSetExceptions() {
+            return true;
+        }
+
+        /**
+         * Returns whether expected exceptions while calling operations shall be asserted.
+         * 
+         * @return {@code true} for assert, {@code false} else
+         */
+        public default boolean assertOperationExceptions() {
+            return true;
+        }
+        
+        /**
+         * Returns the qualified name of the start field.
+         * 
+         * @return the qualified name, <b>null</b> for do not write/access
+         */
+        public default String getQNameStart() {
+            return null;
+        }
+
+        /**
+         * Returns the qualified name of the stop field.
+         * 
+         * @return the qualified name, <b>null</b> for do not write/access
+         */
+        public default String getQNameStop() {
+            return null;
+        }
 
     }
     
@@ -104,27 +140,41 @@ public class MachineCommandInputTranslator<O> extends AbstractConnectorInputType
         customizer.additionalFromActions(access, data);
         try {  // property does not exist
             access.set(customizer.getTopLevelModelPartName() + access.getQSeparator() + "abxy", "");
-            Assert.fail("Property shall not exist");
+            if (customizer.assertSetExceptions()) {
+                Assert.fail("Property shall not exist");
+            }
         } catch (IOException e) {
             // expected
         }
         try {  // operation does not exist
             access.call(customizer.getTopLevelModelPartName() + access.getQSeparator() + "abxy");
-            Assert.fail("Operation shall not exist");
+            if (customizer.assertOperationExceptions()) {
+                Assert.fail("Operation shall not exist");
+            }
         } catch (IOException e) {
             // expected
         }
         try {
             access.call("abc" + access.getQSeparator() + "abxy"); // submodel/operation do not exist
-            Assert.fail("Operation shall not exist");
+            if (customizer.assertOperationExceptions()) {
+                Assert.fail("Operation shall not exist");
+            }
         } catch (IOException e) {
             // expected
         }
         try {
             access.call("abxy"); // no submodel
-            Assert.fail("Operation shall not exist");
+            if (customizer.assertOperationExceptions()) {
+                Assert.fail("Operation shall not exist");
+            }
         } catch (IOException e) {
             // expected
+        }
+        if (null != customizer.getQNameStart()) {
+            access.set(customizer.getQNameStart(), access.getOutputConverter().fromBoolean(data.isStart()));
+        }
+        if (null != customizer.getQNameStop()) {
+            access.set(customizer.getQNameStop(), access.getOutputConverter().fromBoolean(data.isStop()));
         }
         return null; // irrelevant
     }

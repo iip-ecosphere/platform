@@ -78,6 +78,15 @@ public class MachineDataOutputTranslator<S> extends AbstractConnectorOutputTypeT
          * @return the power consumption qualified name
          */
         public String getQNameVarPowerConsumption();
+        
+        /**
+         * Returns whether expected exceptions while reading unknown properties shall be asserted.
+         * 
+         * @return {@code true} for assert, {@code false} else
+         */
+        public default boolean assertNotExistingProperties() {
+            return true;
+        }
 
     }
     
@@ -98,23 +107,25 @@ public class MachineDataOutputTranslator<S> extends AbstractConnectorOutputTypeT
     @Override
     public MachineData to(Object source) throws IOException {
         ModelAccess access = getModelAccess();
-        try {
-            access.get("abxy"); // no submodel
-            Assert.fail("Property shall not exist");
-        } catch (IOException e) {
-            // expected
-        }
-        try {
-            access.get("ab" + access.getQSeparator() + "abxy"); // submodel/property does not exist
-            Assert.fail("Property shall not exist");
-        } catch (IOException e) {
-            // expected
-        }
-        try {
-            access.get(AasTest.NAME_SUBMODEL + access.getQSeparator() + "abxy"); // property does not exist
-            Assert.fail("Property shall not exist");
-        } catch (IOException e) {
-            // expected
+        if (customizer.assertNotExistingProperties()) {
+            try {
+                access.get("abxy"); // no submodel
+                Assert.fail("Property shall not exist");
+            } catch (IOException e) {
+                // expected
+            }
+            try {
+                access.get("ab" + access.getQSeparator() + "abxy"); // submodel/property does not exist
+                Assert.fail("Property shall not exist");
+            } catch (IOException e) {
+                // expected
+            }
+            try {
+                access.get(AasTest.NAME_SUBMODEL + access.getQSeparator() + "abxy"); // property does not exist
+                Assert.fail("Property shall not exist");
+            } catch (IOException e) {
+                // expected
+            }
         }
         String vendor = customizer.getVendor(access);
         return new MachineData(

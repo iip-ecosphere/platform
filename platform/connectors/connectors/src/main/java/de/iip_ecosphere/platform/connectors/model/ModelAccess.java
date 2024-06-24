@@ -540,5 +540,11 @@ public interface ModelAccess {
      * @return the actual (parent) context, may be <b>null</b> if this step out was illegal in a non-nested context
      */
     public ModelAccess stepOut();
+
+    /**
+     * Called when this instance is explicitly not needed anymore. May not be called in single-threaded connectors.
+     */
+    public default void dispose() {
+    }
     
 }

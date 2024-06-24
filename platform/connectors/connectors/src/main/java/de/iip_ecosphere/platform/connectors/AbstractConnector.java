@@ -318,7 +318,7 @@ public abstract class AbstractConnector<O, I, CO, CI> implements Connector<O, I,
 
     @Override
     public void write(CI data) throws IOException {
-        writeImpl(selector.selectNorthInput(data).adaptInput(data));
+        writeImpl(configureAdapter(selector.selectNorthInput(data)).adaptInput(data));
     }
 
     /**
@@ -354,11 +354,21 @@ public abstract class AbstractConnector<O, I, CO, CI> implements Connector<O, I,
      * @throws IOException if receiving/translation fails
      */
     protected CO received(String channel, O data, boolean notifyCallback) throws IOException {
-        CO result = selector.selectSouthOutput(channel, data).adaptOutput(channel, data);
+        CO result = configureAdapter(selector.selectSouthOutput(channel, data)).adaptOutput(channel, data);
         if (null != result && null != callback && notifyCallback && checkCache(data)) {
             callback.received(result);
         }
         return result;
+    }
+    
+    /**
+     * Configures the adapter if needed.
+     * 
+     * @param adapter the adapter
+     * @return {@code adapter}
+     */
+    protected ProtocolAdapter<O, I, CO, CI> configureAdapter(ProtocolAdapter<O, I, CO, CI> adapter) {
+        return adapter;
     }
 
     @Override
