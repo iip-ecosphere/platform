@@ -9,7 +9,7 @@ import de.iip_ecosphere.platform.connectors.types.AbstractConnectorInputTypeTran
  * 
  * @author Holger Eichelberger, SSE
  */
-class IdentityInputTranslator extends AbstractConnectorInputTypeTranslator<Object, Object> {
+public class IdentityInputTranslator extends AbstractConnectorInputTypeTranslator<Object, Object> {
 
     @Override
     public Class<? extends Object> getSourceType() {

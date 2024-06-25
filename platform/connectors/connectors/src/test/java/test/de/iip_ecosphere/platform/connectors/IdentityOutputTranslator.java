@@ -9,7 +9,7 @@ import de.iip_ecosphere.platform.connectors.types.AbstractConnectorOutputTypeTra
  * 
  * @author Holger Eichelberger, SSE
  */
-class IdentityOutputTranslator extends AbstractConnectorOutputTypeTranslator<Object, Object> {
+public class IdentityOutputTranslator extends AbstractConnectorOutputTypeTranslator<Object, Object> {
 
     @Override
     public void initializeModelAccess() throws IOException {
