@@ -49,7 +49,7 @@ import de.iip_ecosphere.platform.support.identities.IdentityToken.TokenType;
  * @author Holger Eichelberger
  */
 @MachineConnector(hasModel = false, supportsModelStructs = false, supportsEvents = false, specificSettings = 
-    {"ORG", "BUCKET", "MEASUREMENT", "TAGS"})
+    {"ORG", "BUCKET", "MEASUREMENT", "TAGS", "BATCH"})
 @MachineConnectorSupportedQueries({StringTriggerQuery.class})
 public class InfluxConnector<CO, CI> extends AbstractThreadedConnector<Object, Object, CO, CI, InfluxModelAccess> {
 
@@ -63,6 +63,7 @@ public class InfluxConnector<CO, CI> extends AbstractThreadedConnector<Object, O
     private String bucket;
     private String measurement;
     private Set<String> tags = new HashSet<>();
+    private int batchSize = 1;
 
     /**
      * The descriptor of this connector (see META-INF/services).
@@ -136,6 +137,14 @@ public class InfluxConnector<CO, CI> extends AbstractThreadedConnector<Object, O
             String tmp = params.getSpecificStringSetting("TAGS");
             if (null != tmp) {
                 Arrays.stream(tmp.split(",")).forEach(t -> tags.add(t));
+            }
+            tmp = params.getSpecificStringSetting("BATCH");
+            if (null != tmp) {
+                try {
+                    batchSize = Integer.parseInt(tmp.toString());
+                } catch (NumberFormatException e) {
+                    LOGGER.info("Specific setting BATCH ignored: {}", e.getMessage());
+                }
             }
             
             LOGGER.info("INFLUX connecting to " + url);
@@ -274,6 +283,15 @@ public class InfluxConnector<CO, CI> extends AbstractThreadedConnector<Object, O
      */
     Set<String> getTags() {
         return tags;
+    }
+
+    /**
+     * Returns the configured batch size.
+     * 
+     * @return the batch size, batching is enabled if the value is greater than 1
+     */
+    int getBatchSize() {
+        return batchSize;
     }
 
 }

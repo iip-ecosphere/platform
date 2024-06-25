@@ -38,6 +38,7 @@ public class InfluxModelAccess extends AbstractTypeMappingModelAccess {
     private static final String SEPARATOR = "_";
     private List<String> nesting = new ArrayList<>();
     private String prefix = "";
+    private List<Point> batch = new ArrayList<Point>(10);
     
     /**
      * Data input converter.
@@ -179,8 +180,19 @@ public class InfluxModelAccess extends AbstractTypeMappingModelAccess {
     void writeCompleted() {
         if (null != writePoint) {
             writePoint.time(Instant.now(), WritePrecision.MS);
-            WriteApiBlocking writeApi = connector.getClient().getWriteApiBlocking();
-            writeApi.writePoint(writePoint);
+            int batchSize = connector.getBatchSize();
+            if (batchSize > 1) {
+                if (batch.size() == batchSize) {
+                    WriteApiBlocking writeApi = connector.getClient().getWriteApiBlocking();
+                    writeApi.writePoints(batch);
+                    batch.clear();
+                } else {
+                    batch.add(writePoint);
+                }
+            } else {
+                WriteApiBlocking writeApi = connector.getClient().getWriteApiBlocking();
+                writeApi.writePoint(writePoint);
+            }
         }
     }
     

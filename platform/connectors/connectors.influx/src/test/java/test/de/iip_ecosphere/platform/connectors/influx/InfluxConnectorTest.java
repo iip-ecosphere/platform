@@ -73,6 +73,11 @@ public class InfluxConnectorTest {
         expectedData.add(new MachineData(2, 0.72, "Kuka"));
     }
 
+    /**
+     * Customizes the type translators/assertions for this case.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
     private class MyCustomizer implements OutputCustomizer, InputCustomizer {
 
         @Override
@@ -258,6 +263,7 @@ public class InfluxConnectorTest {
             .setSpecificSetting("BUCKET", "myBucket")
             .setSpecificSetting("MEASUREMENT", "machineData")
             .setSpecificSetting("TAGS", "") // none so far
+            .setSpecificSetting("BATCH", "1") // so far no batching
             .setIdentities(identities)
             .build();
         conn.connect(param);
