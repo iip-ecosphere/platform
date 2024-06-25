@@ -15,8 +15,6 @@ package test.de.iip_ecosphere.platform.services.environment;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
-import de.iip_ecosphere.platform.connectors.types.AbstractConnectorInputTypeTranslator;
-import de.iip_ecosphere.platform.connectors.types.AbstractConnectorOutputTypeTranslator;
 import de.iip_ecosphere.platform.connectors.types.TranslatingProtocolAdapter;
 import de.iip_ecosphere.platform.services.environment.ConnectorServiceWrapper;
 import de.iip_ecosphere.platform.services.environment.MockingConnectorServiceWrapper;
@@ -27,9 +25,10 @@ import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
+import test.de.iip_ecosphere.platform.connectors.IdentityInputTranslator;
+import test.de.iip_ecosphere.platform.connectors.IdentityOutputTranslator;
 import de.iip_ecosphere.platform.support.Version;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -132,58 +131,6 @@ public class ConnectorServiceWrapperTest {
         yaml.setVersion(new Version("1.0.0"));
         yaml.setDeployable(true);
         return yaml;
-    }
-
-    /**
-     * Identity output translator.
-     * 
-     * @author Holger Eichelberger, SSE
-     */
-    private static class IdentityOutputTranslator extends AbstractConnectorOutputTypeTranslator<Object, Object> {
-
-        @Override
-        public void initializeModelAccess() throws IOException {
-        }
-
-        @Override
-        public Class<? extends Object> getSourceType() {
-            return Object.class;
-        }
-
-        @Override
-        public Class<? extends Object> getTargetType() {
-            return Object.class;
-        }
-
-        @Override
-        public Object to(Object source) throws IOException {
-            return source;
-        }
-        
-    }
-
-    /**
-     * Identity input translator.
-     * 
-     * @author Holger Eichelberger, SSE
-     */
-    private static class IdentityInputTranslator extends AbstractConnectorInputTypeTranslator<Object, Object> {
-
-        @Override
-        public Class<? extends Object> getSourceType() {
-            return Object.class;
-        }
-
-        @Override
-        public Class<? extends Object> getTargetType() {
-            return Object.class;
-        }
-
-        @Override
-        public Object from(Object data) throws IOException {
-            return data;
-        }
-        
     }
 
     /**
