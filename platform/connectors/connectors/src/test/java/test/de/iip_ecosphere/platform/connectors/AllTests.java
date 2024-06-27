@@ -31,6 +31,7 @@ import org.junit.runners.Suite;
     ConnectorFactoryTest.class,
     PatternTriggerQueryTest.class,
     StringTriggerQueryTest.class,
+    SimpleTimeseriesQueryTest.class,
     FormatCacheTest.class,
     ModelAccessProviderTest.class,
     AbstractThreadedConnectorTest.class,

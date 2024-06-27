@@ -30,7 +30,7 @@ import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
 public abstract class AbstractThreadedConnector<O, I, CO, CI, M extends ModelAccess> 
     extends AbstractConnector<O, I, CO, CI> {
 
-    private static final Timer TIMER = new Timer();
+    private Timer timer;
     private Supplier<M> modelAccessSupplier;
     private Map<Thread, M> accesses = new HashMap<>();
     private TimerTask cleanupTask;
@@ -129,7 +129,10 @@ public abstract class AbstractThreadedConnector<O, I, CO, CI, M extends ModelAcc
                 }
             }
         };
-        TIMER.schedule(cleanupTask, 0, cleanupPeriod);
+        if (null == timer) {
+            timer = new Timer();
+        }
+        timer.schedule(cleanupTask, 0, cleanupPeriod);
         super.connect(params);
     }
 
@@ -155,7 +158,12 @@ public abstract class AbstractThreadedConnector<O, I, CO, CI, M extends ModelAcc
 
     @Override
     protected void uninstallPollTask() {
-        cleanupTask.cancel();
+        if (null != cleanupTask) {
+            cleanupTask.cancel();
+        }
+        if (null != timer) {
+            timer.cancel();
+        }
         super.uninstallPollTask();
     }
 
