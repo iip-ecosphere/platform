@@ -21,7 +21,7 @@ We apply the following principles (with links also in the package description of
 
 This component also introduces basic identity support, i.e., identity tokens and security certificates. The realization is extensible, i.e., we provide a simple basic mechanism for local YAML files, but more complex mechanisms may be added as JSL extensions.
 
-The structure of an identity YAML file (must be resolvable as `identityStore.yml` on the classpath) is
+The structure of an identity YAML file (must be resolvable as `identityStore.yml` or as fallback `identityStore-test.yml` if the original one shall not be committed on the classpath or for development also in `src/main/resource` or `src/test/resources`) is
 
     name: <String>
     identities:

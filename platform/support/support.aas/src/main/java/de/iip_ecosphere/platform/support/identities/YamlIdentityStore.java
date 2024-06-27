@@ -37,8 +37,9 @@ import de.iip_ecosphere.platform.support.net.UriResolver;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 
 /**
- * Simple file-based identity store. Tries to load {@code identityStore.yml} from the classpath (root or folder 
- * {@code resources}) and as development fallbacks from {@code src/main/resources} or {@code src/test/resources}.
+ * Simple file-based identity store. Tries to load {@code identityStore.yml} or {@code identityStore-test.yml} as 
+ * fallback from the classpath (root or folder {@code resources}) and further as development fallbacks from 
+ * {@code src/main/resources} or {@code src/test/resources}.
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -63,7 +64,11 @@ public class YamlIdentityStore extends IdentityStore {
      * Creates a YAML identity store. Usually, shall be created via JSL ({@link IdentityStoreDescriptor}). [testing]
      */
     public YamlIdentityStore() {
-        data = YamlIdentityFile.load(resolve("identityStore.yml")); // can cope with null
+        InputStream idStream = resolve("identityStore.yml");
+        if (null == idStream) { // fallback if identity store shall not be committed, a test/template can be provided
+            idStream = resolve("identityStore-test.yml");
+        }
+        data = YamlIdentityFile.load(idStream); // can cope with null
         LoggerFactory.getLogger(YamlIdentityFile.class).info("Loaded identityStore {}", data.getName());
     }
     

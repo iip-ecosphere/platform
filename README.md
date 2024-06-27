@@ -12,8 +12,8 @@ For installation and first steps, see [install guide](platform/documentation/INS
 
 ## News
 
-* ETFA'24: Paper on generating IDTA AAS submodel APIs accepted.
-* Initial INFLUX DB connector
+* ETFA'24: Paper on generating IDTA AAS submodel APIs accepted (preprint on [arxiv](https://arxiv.org/abs/2406.14470)).
+* INFLUX DB connector for InfluxDb2
 * Started: Migration to JDK 17 and update of core libraries.
 * In progress: MODBUS/TCP connector by Christian Nikolajew (tested for compliance with Phoenix Contact EEM-MA 370 and Siemens SENTRON PAC 3200)
 * Plugins for alternative components with conflicting classpaths. Retrofit for BaSyx 1.0, in particular in AAS connector.
@@ -54,6 +54,7 @@ Platform installation, use and concepts are documented in several documents:
   * For more information, see the [documentation overview](platform/documentation/README.md)
 
 ## Publications
+* Holger Eichelberger, Alexander Weber, Model-driven realization of IDTA submodel specifications: The good, the bad, the incompatible? (preprint on [arxiv](https://arxiv.org/abs/2406.14470)).
 * Alexander Weber, Holger Eichelberger, Per Schreiber and Svenja Wienrich, Performance comparison of TwinCat ADS for Python and Java, [Symposium on Software Performance (SSP'23)](https://www.performance-symposium.org/2023/program/), 2023
 * Ahmad Alamoush and Holger Eichelberger, Analyzing and Improving the Performance of Continuous Container Creation and Deployment, [Symposium on Software Performance (SSP'23)](https://www.performance-symposium.org/2023/program/), 2023
 * Holger Eichelberger and Claudia Niederée, [Asset Administration Shells, Configuration, Code
@@ -95,6 +96,7 @@ Please note that several python models exceed the permitted file size of github,
 
 <a href="https://spring.io"><img src="https://docs.spring.io/spring-cloud-stream/docs/current/reference/html/img/banner-logo.svg" alt="Spring Cloud Stream" width="200"/></a> 
 <a href="https://maven.apache.org"><img src="https://maven.apache.org/images/maven-logo-black-on-white.png" alt="Maven" width="200"/></a> 
+<a href="https://www.influxdata.com/images/influxdata_full_navy-a7ca2ff4.svg" width="200"></a>
 <a href="https://sse.uni-hildesheim.de"><img src="https://sse.uni-hildesheim.de/media/_migrated/pics/EASy_Logo_02.png" alt="EASy-Producer" width="100"/></a> 
 
 IIP-Ecosphere would like to thank all utilized technologies and frameworks for the helpful contributions to the Open Source community.
