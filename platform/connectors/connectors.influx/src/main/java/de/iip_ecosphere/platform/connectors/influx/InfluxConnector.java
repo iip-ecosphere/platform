@@ -154,13 +154,18 @@ public class InfluxConnector<CO, CI> extends AbstractThreadedConnector<Object, O
                 if (null != tok) {
                     if (tok.getType() == TokenType.ISSUED) {
                         client = InfluxDBClientFactory.create(url, tok.getTokenDataAsCharArray(), org, bucket);
+                        LOGGER.info("INFLUX connected to " + url + " by token");
                     } else if (tok.getType() == TokenType.USERNAME) {
                         client = InfluxDBClientFactory.createV1(url, tok.getUserName(), tok.getTokenDataAsCharArray(), 
                             bucket, null, WriteConsistency.ONE);
+                        LOGGER.info("INFLUX connected to " + url + " by username/password");
+                    } else {
+                        LOGGER.error("INFLUX connector cannot handle identity token type " + tok.getType() + "!");
                     }
                 }
-
-                
+                if (null == client) {
+                    LOGGER.error("INFLUX not connected!");
+                }
             } catch (Exception e) {
                 LOGGER.error("INFLUX connection failed: {}", e.getMessage());
                 LOGGER.debug("INFLUX connection failed", e);
