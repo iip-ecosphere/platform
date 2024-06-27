@@ -37,9 +37,9 @@ import de.iip_ecosphere.platform.support.net.UriResolver;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 
 /**
- * Simple file-based identity store. Tries to load {@code identityStore.yml} or {@code identityStore-test.yml} as 
- * fallback from the classpath (root or folder {@code resources}) and further as development fallbacks from 
- * {@code src/main/resources} or {@code src/test/resources}.
+ * Simple file-based identity store. Tries to load {@code identityStore-ipr.yml} (quietly), {@code identityStore.yml} 
+ * or {@code identityStore-test.yml} as fallback from the classpath (root or folder {@code resources}) and further as 
+ * development fallbacks from {@code src/main/resources} or {@code src/test/resources}.
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -64,9 +64,12 @@ public class YamlIdentityStore extends IdentityStore {
      * Creates a YAML identity store. Usually, shall be created via JSL ({@link IdentityStoreDescriptor}). [testing]
      */
     public YamlIdentityStore() {
-        InputStream idStream = resolve("identityStore.yml");
-        if (null == idStream) { // fallback if identity store shall not be committed, a test/template can be provided
-            idStream = resolve("identityStore-test.yml");
+        InputStream idStream = resolve("identityStore-ipr.yml", false);
+        if (null == idStream) {
+            idStream = resolve("identityStore.yml", true);
+            if (null == idStream) { // fallback if store shall not be committed, a test/template can be provided
+                idStream = resolve("identityStore-test.yml", true);
+            }
         }
         data = YamlIdentityFile.load(idStream); // can cope with null
         LoggerFactory.getLogger(YamlIdentityFile.class).info("Loaded identityStore {}", data.getName());
@@ -76,9 +79,10 @@ public class YamlIdentityStore extends IdentityStore {
      * Resolves a resource, identity store file or key file listed in identity store.
      * 
      * @param resource the resource to resolve
+     * @param log perform logging
      * @return the resolved resource or <b>null</b> if not found
      */
-    private static InputStream resolve(String resource) {
+    private static InputStream resolve(String resource, boolean log) {
         String source = "classpath";
         InputStream in = ResourceLoader.getResourceAsStream(resource);
         // this is old style, could delegate more into resolvers...
@@ -102,17 +106,21 @@ public class YamlIdentityStore extends IdentityStore {
                     in = new FileInputStream(f);
                     source = f.getAbsolutePath();
                 } catch (IOException e) {
-                    LoggerFactory.getLogger(YamlIdentityFile.class)
-                        .info("Cannot load {}: {}", resource, e.getMessage());
+                    if (log) {
+                        LoggerFactory.getLogger(YamlIdentityFile.class)
+                            .info("Cannot load {}: {}", resource, e.getMessage());
+                    }
                 }
             } else {
                 in = null;
             }
         }
-        if (null != in) {
-            LoggerFactory.getLogger(YamlIdentityFile.class).info("Loading {} from {}", resource, source);
-        } else {
-            LoggerFactory.getLogger(YamlIdentityFile.class).warn("{} not found!", resource);
+        if (log) {
+            if (null != in) {
+                LoggerFactory.getLogger(YamlIdentityFile.class).info("Loading {} from {}", resource, source);
+            } else {
+                LoggerFactory.getLogger(YamlIdentityFile.class).warn("{} not found!", resource);
+            }
         }
         return in;
     }
@@ -210,7 +218,7 @@ public class YamlIdentityStore extends IdentityStore {
                         info.getFile(), e.getMessage());
             }
             if (null == result) {
-                result = resolve(info.getFile());
+                result = resolve(info.getFile(), true);
             }
         } 
         return result;
