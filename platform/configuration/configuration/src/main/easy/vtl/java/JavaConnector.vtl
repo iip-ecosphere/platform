@@ -30,8 +30,14 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         field.displayName;
     }
 
+    @DispatchCase
     def getFieldNameForPath(InfluxField field) {
         getStringValueSafe(field.mappedName, field.name);
+    }
+    
+    @DispatchCase
+    def getFieldPath(InfluxField field, String nameOrPath) {
+        '"${getStringValueSafe(field.mappedName, nameOrPath)}"'
     }
     
     // qualified/unqualified Java types to be used as template parameter for data from machine in connector generation, 
@@ -735,10 +741,18 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         conn.idShortSpec;
     }
 
+    /**
+    * Generates the endpoint path for the connector parameters of conn.
+    */
+    @DispatchBasis
     def generateEndpointPath(Connector conn) {
         ""
     }
 
+    /**
+    * Generates the endpoint path for the connector parameters of the AAS connector conn.
+    */
+    @DispatchCase
     def generateEndpointPath(AasConnector conn) {
         String regPath = "";
         String url = "http://" + conn.registryHost + ":" + conn.registryPort;
@@ -853,13 +867,23 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
                 'Map<String, IdentityToken> identities = new HashMap<>();
                 IdentityToken tok = IdentityStore.getInstance().getToken("${sec.authenticationKey}", true, "${conn.host}:${conn.port}"); 
                 identities.put(ConnectorParameter.ANY_ENDPOINT, tok);
-                identities.put("opc.tcp://${conn.host}:${conn.port}", tok);'
+                ${generateConnectorIdentities(conn)|e}'
             }
             if (isDefined(sec.keystoreKey) and sec.keystoreKey <> "") {
                 'String keystoreKey = "${sec.keystoreKey}";'
             } 
         }
     }
+    
+    @DispatchBasis
+    def generateConnectorIdentities(Connector conn) {
+        ""
+    }
+    
+    @DispatchBasis
+    def generateConnectorIdentities(OpcUaV1Connector conn) {
+        'identities.put("opc.tcp://${conn.host}:${conn.port}", tok);'
+    } 
     
     def generateConnectorParamSecuritySettings(Connector conn) {
         if (conn.security <> null) {
@@ -950,6 +974,9 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         }
     }
 
+    /**
+    * Generates the specific connector settings for the INFLUX connector conn.
+    */
     @DispatchCase
     def generateSpecificSettings(InfluxConnector conn) {
         String tags = collectTags(conn.inInterface.type, "");
@@ -957,7 +984,28 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         '.setSpecificSetting("ORG", "${conn.organization}")
         .setSpecificSetting("BUCKET", "${conn.bucket}")
         .setSpecificSetting("MEASUREMENT", "${conn.measurement}")
-        .setSpecificSetting("TAGS", "${tags}")'
+        .setSpecificSetting("TAGS", "${tags}")
+        .setSpecificSetting("BATCH", "${conn.batchSize}")'
+    }
+    
+    /**
+    * Generates the endpoint path for the connector parameters of the INFLUX DB connector conn.
+    */
+    @DispatchCase
+    def generateEndpointPath(InfluxConnector conn) {
+        String urlPath = getStringValueSafe(conn.urlPath, "");
+        if (urlPath <> "") {
+            '.setEndpointPath("${urlPath}")'
+        }
+    }
+
+    @DispatchCase
+    def getConnectorSchema(InfluxConnector conn) {
+        String result = "Schema.HTTP";
+        if (isDefined(conn.security) and conn.security <> null and conn.ssl) {
+            result = "Schema.HTTPS";
+        }
+        result;
     }
     
 }

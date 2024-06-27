@@ -572,6 +572,9 @@ project Connectors {
        NonEmptyString organization;
        NonEmptyString bucket;
        NonEmptyString measurement;
+       Integer batchSize = 1;
+       String urlPath = "";
+       Boolean ssl = true;
    }
    
    

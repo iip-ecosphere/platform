@@ -124,7 +124,7 @@ Connectors::ModbusTcpV1Connector::outInterfaceOk = The outInterface must only co
 Connectors::ModbusTcpV1Connector::port = Pre-defined TCP port for the modbus connector.
 Connectors::ModbusTcpV1Connector::unitId = ID of the addressed modbus device (default = 1).
 Connectors::ModbusTcpV1Connector::timeout = Desired network connection timeout (default = 1000).
-Connectors::ModbusTcpV1Connector::bigByteOrder = Does the device apply big or small byte order (default big/true).
+Connectors::ModbusTcpV1Connector::bigByteOrder = Does the device apply big or little endian byte order (default big/true).
 Connectors::Modbus_ascii = The modbus ASCII type.
 Connectors::Modbus_bitmap = The modbus bitmap type. 
 Connectors::Modbus_datetime = The modbus datetime type.
@@ -147,3 +147,6 @@ Connectors::InfluxConnector::deviceServiceKey = Refined logical name for the und
 Connectors::InfluxConnector::organization = Organization holding the instance of the INFLUX DB.
 Connectors::InfluxConnector::bucket = Source/target bucket.
 Connectors::InfluxConnector::measurement = Logical name of the type of data being stored/requested.
+Connectors::InfluxConnector::batchSize = Number of data points to cache/write at once, by default 1.
+Connectors::InfluxConnector::urlPath = Path part of the INFLUX access URL (empty by default).
+Connectors::InfluxConnector::ssl = Use ssl (default true).

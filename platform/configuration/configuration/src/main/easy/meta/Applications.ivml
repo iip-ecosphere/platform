@@ -128,7 +128,12 @@ project Applications {
         typeCheck(start.output, end.input); 
 
     def Boolean typeCheck(sequenceOf(IOType) start, sequenceOf(IOType) end) = 
-        fwdTypes(start)->collect(IOType t|t.type.name).overlaps(fwdTypes(end)->collect(IOType t|t.type.name));
+        fwdTypes(start)->collect(IOType t|collectForType(t, t.type)).flatten().overlaps(fwdTypes(end)->collect(IOType t|collectForType(t, t.type)).flatten());
+
+    @dispatchBasis
+    def sequenceOf(String) collectForType(IOType ioType, DataType type) = {ioType.name};
+    @dispatchCase
+    def sequenceOf(String) collectForType(IOType ioType, RecordType type) = type.fields->collect(Field f|f.name + "|" + f.type.name);
     
    // ------------------------------ platform trace -> AAS service -------------------
 
