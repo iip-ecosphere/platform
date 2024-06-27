@@ -49,7 +49,7 @@ project AllServices {
         kind = ServiceKind::TRANSFORMATION_SERVICE,
         input = {{type=refBy(EanScannerOutput)}},
         output = {{type=refBy(MdzhConfigOutput)}},
-        inInterface = {type=refBy(Empty)}, 
+        inInterface = {type=refBy(EanScannerOutput)}, 
         outInterface = {type=refBy(MdzhConfigOutput), path="ProductData/"},
         // TODO translation operations
         traceRcv = TraceKind::SYSOUT,
@@ -85,7 +85,7 @@ project AllServices {
         description = "",
         ver = "0.1.0",
         deployable = true,
-        input = {{type=refBy(LaserOutput)}, {type=refBy(PcfAasOutput)}},
+        input = {{type=refBy(LaserOutput)}, {type=refBy(PcfAasOutput)}, {type=refBy(sentronOutput)}},
         output = {{type=refBy(PcfOutput)}},
         artifact = "de.iip-ecosphere.platform.apps:examples.mdzh:" + iipVer,
         kind = ServiceKind::TRANSFORMATION_SERVICE,
@@ -117,6 +117,52 @@ project AllServices {
         // TODO translation operations
         traceRcv = TraceKind::SYSOUT,
         traceSent = TraceKind::SYSOUT
+    };
+    
+    ModbusTcpV1Connector myModbusConnector = {
+        id = "SentronModbusConn",
+        name = "Sentron Energy Modbus connector",
+        description = "",
+        ver = "0.1.0",
+        unitId = 1,
+        timeout = 3000,
+        bigByteOrder = true,
+        host = modbusDevice,
+        
+        input = {{type=refBy(Empty)}},
+        output = {{type=refBy(sentronOutput)}},
+        inInterface = {type=refBy(Empty)}, 
+        outInterface = {type=refBy(sentronOutput)}
+    };
+    
+    // org: democompany
+    // ssl = false
+    // ip = 74.234.165.158
+    // port = 8086
+    // bucket = vision
+    // point = (Point("eventhub_consumer").time(timestamp).field("Messages_0_Payload_TotalActivePower_Value", value))
+    InfluxConnector myInfluxCloudConnector = {
+        id = "InfluxCloudConn",
+        name = "Influx Db Cloud Connector",
+        description = "",
+        ver = "0.1.0",
+        host = influxServer,
+        port = 8086,
+        kind = ServiceKind::TRANSFORMATION_SERVICE,
+        security = {
+            authenticationKey = "influxCloud",
+            hostNameVerification = false   
+        },
+        urlPath = "",
+        organization = "UHi",
+        bucket = "connBucket",
+        measurement = "energy",
+        ssl = false,
+        batchSize = 1,
+        input = {{type=refBy(influxEnergyData)}},
+        output = {{type=refBy(influxEnergyData)}},
+        inInterface = {type=refBy(influxEnergyData)}, 
+        outInterface = {type=refBy(influxEnergyData)}
     };
    
     freeze {

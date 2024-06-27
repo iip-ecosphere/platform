@@ -6,7 +6,7 @@ project ServiceMeshPartMdzhMesh {
 
     ServiceMesh myMdzhMesh = {
         description = "MDZH mesh",
-        sources = {refBy(myEanSource)}
+        sources = {refBy(myEanSource), refBy(myEnergySource)}
     };
     
     MeshSource myEanSource = {
@@ -56,6 +56,27 @@ project ServiceMeshPartMdzhMesh {
 
     MeshConnector myEnergyAasConnMyPcfTransformer = {
         name = "Energy AAS sink -> PCF Transformer",
+        next = refBy(myPcfTransformer)
+    };
+
+
+    MeshSource myEnergySource = {
+       impl = refBy(myModbusConnector),
+       next = {refBy(myEnergySourceInfluxConn)}
+    };
+
+    MeshConnector myEnergySourceInfluxConn = {
+        name = "Modbus -> Influx",
+        next = refBy(myInfluxConn)
+    };
+
+    MeshProcessor myInfluxConn = {
+       impl = refBy(myInfluxCloudConnector),        
+       next = {refBy(myInfluxConnMyPcfTransformer)}
+    };
+
+    MeshConnector myInfluxConnMyPcfTransformer = {
+        name = "Influx -> PCF Transformer",
         next = refBy(myPcfTransformer)
     };
 

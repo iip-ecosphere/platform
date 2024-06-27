@@ -2,6 +2,7 @@ project AllTypes {
 
     import AllConstants; 
     import OpcUaDataTypes;
+    import AASDataTypes;
     
     annotate BindingTime bindingTime = BindingTime::compile to .;
     
@@ -10,12 +11,19 @@ project AllTypes {
         fields = {}
     };
     
-    RecordType EanScannerOutput = {
+    AasSubmodelType EanScannerOutput = {
         name = "EanScannerOutput",
         fields = {
-            Field {
+            AasField {
                 name = "data",
                 type = refBy(StringType)
+            },
+            AasField {
+                name="TestDataB",
+                minimumInstances = 1,
+                maximumInstances = -1,
+                type=refBy(StringListType),
+                cachingTime=CACHE_NONE
             }
         }
     };
@@ -26,37 +34,44 @@ project AllTypes {
     };
 
     // into Laser
-    RecordType MdzhConfigOutput = {
+    AasSubmodelType MdzhConfigOutput = {
         name = "MdzhConfigOutput",
         fields = {
-            Field { // UAFieldVariableType
+            AasField { // UAFieldVariableType
                 name="DMCData",
                 type=refBy(StringType),
                 cachingTime=CACHE_NONE
             },
-            Field {
+            AasField {
                 name="DoubleMarking",
                 type=refBy(BooleanType),
                 cachingTime=CACHE_NONE
             },
-            Field {
+            AasField {
                 name="OrderId",
                 type=refBy(Integer32Type), 
                 cachingTime=CACHE_NONE
             },
-            Field {
+            AasField {
                 name="PenType",
                 type=refBy(Integer32Type),
                 cachingTime=CACHE_NONE
             },
-            Field {
+            AasField {
                 name="TextData",
                 type=refBy(StringType),
                 cachingTime=CACHE_NONE
             },
-            Field {
+            AasField {
                 name="TextData2",
                 type=refBy(StringType),
+                cachingTime=CACHE_NONE
+            },
+            AasField {
+                name="TestData",
+                minimumInstances = 1,
+                maximumInstances = -1,
+                type=refBy(StringListType),
                 cachingTime=CACHE_NONE
             }
         }
@@ -104,6 +119,31 @@ project AllTypes {
         fields = {}
     };
     
+    RecordType sentronOutput = {
+        name = "SentronOutput",
+        fields = {
+            ModbusField {
+                offset = 25,
+                name = "PowerConsumption",
+                description = "PowerConsumption",
+                type = refBy(Modbus_float32),
+                cachingTime = CACHE_NONE
+            }        
+        }
+    };
+
+    RecordType influxEnergyData = {
+        name = "InfluxEnergyData",
+        fields = {
+            InfluxField {
+                name = "PowerConsumption",
+                mappedName = "Messages_0_Payload_TotalActivePower_Value",
+                description = "PowerConsumption",
+                type = refBy(Modbus_float32), // keep for now
+                cachingTime = CACHE_NONE
+            }        
+        }
+    };
     
     // ----------------- outdated - remove/replace -------------------------
     

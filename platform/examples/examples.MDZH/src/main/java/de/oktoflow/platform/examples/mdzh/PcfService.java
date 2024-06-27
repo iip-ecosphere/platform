@@ -36,6 +36,12 @@ public class PcfService extends PcfServiceImpl {
     public void processPcfAasOutput(PcfAasOutput data) {
         // TODO call ingest<Type>(instance). Possible output types: PcfOutputImpl
     }
+
+    @Override
+    public void processSentronOutput(SentronOutput data) {
+        // TODO Auto-generated method stub
+        
+    }
                 
     
 }

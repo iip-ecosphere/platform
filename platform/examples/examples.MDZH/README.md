@@ -22,7 +22,7 @@ As stated above, directly after obtaining this project, the application will not
 
   * Ensure that the Maven platformDependencies are installed (see [install](../../tools/Install))
   * Execute `mvn -U install` This will perform the broker-instantiation, the interface generation, the code compilation and packaging as well as the final application packaging. Build steps are only executed if the configuration model changes or generate code is not already existing. If a `resources.ipr` folder is present, it will take precendence over the `resources` folder. 
-  * To update/upgrade the model, call `mvn -P EasyGen -U generate-sources -Dunpack.force=true`.
+  * To update/upgrade the model, call `mvn -P EasyGen -U generate-sources -Dunpack.force=true`
 
 ## Required Updates
 

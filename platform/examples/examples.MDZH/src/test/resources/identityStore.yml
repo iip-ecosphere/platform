@@ -4,3 +4,8 @@ identities:
         userName: user
         tokenData: pwd
         tokenEncryptionAlgorithm: UTF-8
+    "influxCloud": 
+        type: ISSUED
+        tokenData: hidden
+        tokenEncryptionAlgorithm: UTF-8
+        

@@ -11,6 +11,8 @@ project AllConstants {
     String configAasSpec = "iri:.*car.*";
     String energyAasServer = "192.168.2.101";
     String energyAasSpec = "iri:.*car.*";
+    String modbusDevice = "192.168.0.10";
+    String influxServer = "127.0.0.1";
 
     // ------------ freezing ------------------
     

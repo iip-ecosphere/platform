@@ -38,6 +38,11 @@
      <artifactId>connectors.opcuav1</artifactId>
      <version>${project.version}</version>
     </dependency>
+    <dependency>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>connectors.influx</artifactId>
+     <version>${project.version}</version>
+    </dependency>
     
     <dependency>
       <groupId>junit</groupId>
