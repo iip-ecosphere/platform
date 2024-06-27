@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.client.InfluxDBClientFactory;
 import com.influxdb.client.QueryApi;
+import com.influxdb.client.domain.WriteConsistency;
 import com.influxdb.query.FluxRecord;
 import com.influxdb.query.FluxTable;
 
@@ -131,13 +132,6 @@ public class InfluxConnector<CO, CI> extends AbstractThreadedConnector<Object, O
             if (params.getEndpointPath() != null) {
                 url += "/" + params.getEndpointPath();
             }
-            IdentityToken tok = params.getIdentityToken(ConnectorParameter.ANY_ENDPOINT);
-            char[] dbToken = null;
-            if (null != tok) {
-                if (tok.getType() == TokenType.ISSUED || tok.getType() == TokenType.USERNAME) {
-                    dbToken = tok.getTokenDataAsCharArray();
-                }
-            }
             org = params.getSpecificStringSetting("ORG");
             bucket = params.getSpecificStringSetting("BUCKET");
             measurement = params.getSpecificStringSetting("MEASUREMENT");
@@ -156,7 +150,17 @@ public class InfluxConnector<CO, CI> extends AbstractThreadedConnector<Object, O
             
             LOGGER.info("INFLUX connecting to " + url);
             try {
-                client = InfluxDBClientFactory.create(url, dbToken, org, bucket);
+                IdentityToken tok = params.getIdentityToken(ConnectorParameter.ANY_ENDPOINT);
+                if (null != tok) {
+                    if (tok.getType() == TokenType.ISSUED) {
+                        client = InfluxDBClientFactory.create(url, tok.getTokenDataAsCharArray(), org, bucket);
+                    } else if (tok.getType() == TokenType.USERNAME) {
+                        client = InfluxDBClientFactory.createV1(url, tok.getUserName(), tok.getTokenDataAsCharArray(), 
+                            bucket, null, WriteConsistency.ONE);
+                    }
+                }
+
+                
             } catch (Exception e) {
                 LOGGER.error("INFLUX connection failed: {}", e.getMessage());
                 LOGGER.debug("INFLUX connection failed", e);
