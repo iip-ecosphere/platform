@@ -38,10 +38,13 @@ import com.influxdb.query.FluxRecord;
 import com.influxdb.query.FluxTable;
 
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
-import de.iip_ecosphere.platform.connectors.events.StringTriggerQuery;
+import de.iip_ecosphere.platform.connectors.ConnectorParameter.ConnectorParameterBuilder;
+import de.iip_ecosphere.platform.connectors.events.SimpleTimeseriesQuery;
+import de.iip_ecosphere.platform.connectors.events.SimpleTimeseriesQuery.TimeKind;
 import de.iip_ecosphere.platform.connectors.influx.InfluxConnector;
 import de.iip_ecosphere.platform.connectors.model.ModelAccess;
 import de.iip_ecosphere.platform.connectors.types.TranslatingProtocolAdapter;
+import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.identities.IdentityToken;
 import de.iip_ecosphere.platform.support.identities.IdentityToken.IdentityTokenBuilder;
@@ -157,18 +160,40 @@ public class InfluxConnectorTest {
         List<FluxRecord> records = table.getRecords();
         Instant now = Instant.now();
         for (MachineData d : expectedData) {
-            FluxRecord record = new FluxRecord(1);
-            Map<String, Object> values = record.getValues();
-            values.put("_start", now);
-            values.put("_stop", now);
-            values.put("_time", now);
-            values.put("lotSize", d.getLotSize());
-            values.put("powerConsumption", d.getPowerConsumption());
-            values.put("vendor", d.getVendor());
-            records.add(record);
+            addFluxRecord(records, now, "lotSize", d.getLotSize());
+            addFluxRecord(records, now, "powerConsumption", d.getPowerConsumption());
+            addFluxRecord(records, now, "vendor", d.getVendor());
             now = now.plus(500, ChronoUnit.MILLIS);
         }
         return result;
+    }
+    
+    /**
+     * Adds a flux record to {@code records}.
+     * 
+     * @param records the records list to modify
+     * @param now the time stamp(s) of the record
+     * @param field the field to represent
+     * @param value the value of the field
+     */
+    private void addFluxRecord(List<FluxRecord> records, Instant now, String field, Object value) {
+        FluxRecord record = new FluxRecord(1);
+        Map<String, Object> values = record.getValues();
+        values.put("_start", now);
+        values.put("_stop", now);
+        values.put("_time", now);
+        values.put("_field", field);
+        if (value instanceof Float) { // INFLUX cast
+            value = Double.valueOf((float) value);
+        } else if (value instanceof Integer) {
+            value = Long.valueOf((int) value);
+        } else if (value instanceof Short) {
+            value = Long.valueOf((short) value);
+        } else if (value instanceof Byte) {
+            value = Long.valueOf((byte) value);
+        }
+        values.put("_value", value);
+        records.add(record);
     }
     
     /**
@@ -258,7 +283,7 @@ public class InfluxConnectorTest {
         byte[] token = "MyToken".getBytes();
         identities.put(ConnectorParameter.ANY_ENDPOINT, 
             IdentityTokenBuilder.newBuilder().setIssuedToken(token, "plain").build());
-        ConnectorParameter param = ConnectorParameter.ConnectorParameterBuilder.newBuilder("localhost", 1234) // mocked
+        ConnectorParameter param = ConnectorParameterBuilder.newBuilder("localhost", 1234, Schema.HTTP) // mocked
             .setSpecificSetting("ORG", "myOrganization")
             .setSpecificSetting("BUCKET", "myBucket")
             .setSpecificSetting("MEASUREMENT", "machineData")
@@ -285,7 +310,7 @@ public class InfluxConnectorTest {
         cmd.setLotSize(4);
         conn.write(cmd);
         
-        StringTriggerQuery q = new StringTriggerQuery("from");
+        SimpleTimeseriesQuery q = new SimpleTimeseriesQuery(0, TimeKind.ABSOLUTE, -1, TimeKind.UNSPECIFIED);
         conn.trigger(q);
         
         TimeUtils.sleep(3000); // 3*500

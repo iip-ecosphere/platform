@@ -13,9 +13,12 @@
 package de.iip_ecosphere.platform.connectors.influx;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -34,8 +37,11 @@ import de.iip_ecosphere.platform.connectors.MachineConnector;
 import de.iip_ecosphere.platform.connectors.MachineConnectorSupportedQueries;
 import de.iip_ecosphere.platform.connectors.AbstractThreadedConnector;
 import de.iip_ecosphere.platform.connectors.events.ConnectorTriggerQuery;
+import de.iip_ecosphere.platform.connectors.events.SimpleTimeseriesQuery;
 import de.iip_ecosphere.platform.connectors.events.StringTriggerQuery;
+import de.iip_ecosphere.platform.connectors.events.SimpleTimeseriesQuery.TimeKind;
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
+import de.iip_ecosphere.platform.connectors.types.RecordCompletePredicate;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.identities.IdentityToken;
 import de.iip_ecosphere.platform.support.identities.IdentityToken.TokenType;
@@ -50,7 +56,7 @@ import de.iip_ecosphere.platform.support.identities.IdentityToken.TokenType;
  */
 @MachineConnector(hasModel = false, supportsModelStructs = false, supportsEvents = false, specificSettings = 
     {"ORG", "BUCKET", "MEASUREMENT", "TAGS", "BATCH"})
-@MachineConnectorSupportedQueries({StringTriggerQuery.class})
+@MachineConnectorSupportedQueries({StringTriggerQuery.class, SimpleTimeseriesQuery.class})
 public class InfluxConnector<CO, CI> extends AbstractThreadedConnector<Object, Object, CO, CI, InfluxModelAccess> {
 
     public static final String NAME = "INFLUX";
@@ -64,6 +70,7 @@ public class InfluxConnector<CO, CI> extends AbstractThreadedConnector<Object, O
     private String measurement;
     private Set<String> tags = new HashSet<>();
     private int batchSize = 1;
+    private RecordCompletePredicate recordComplete = RecordCompletePredicate.DEFAULT;
 
     /**
      * The descriptor of this connector (see META-INF/services).
@@ -151,7 +158,7 @@ public class InfluxConnector<CO, CI> extends AbstractThreadedConnector<Object, O
             try {
                 client = InfluxDBClientFactory.create(url, dbToken, org, bucket);
             } catch (Exception e) {
-                LOGGER.info("INFLUX connection failed: {}", e.getMessage());
+                LOGGER.error("INFLUX connection failed: {}", e.getMessage());
                 LOGGER.debug("INFLUX connection failed", e);
             }
         }
@@ -180,32 +187,102 @@ public class InfluxConnector<CO, CI> extends AbstractThreadedConnector<Object, O
     protected Object read() throws IOException {
         return DUMMY; // regardless, if we are asked, we do not report the changes; typeTranslator will compose the data
     }
+    
+    /**
+     * Turns a query time specification into a range query part.
+     * 
+     * @param start start or stop
+     * @param time the time value
+     * @param kind the kind
+     * @param addSeparator wheter a separator shall be added
+     * @return the range part
+     */
+    private String toRangePart(boolean start, int time, TimeKind kind, boolean addSeparator) {
+        // https://docs.influxdata.com/influxdb/cloud/query-data/influxql/explore-data/time-and-timezone/#relative-time
+        String result = "";
+        if (kind != TimeKind.UNSPECIFIED) {
+            result = start ? "start:" : "end:";
+            result += time;
+            switch (kind) {
+            case RELATIVE_WEEKS:
+                result += "w";
+                break;
+            case RELATIVE_DAYS:
+                result += "d";
+                break;
+            case RELATIVE_HOURS:
+                result += "h";
+                break;
+            case RELATIVE_MINUTES:
+                result += "m";
+                break;
+            case RELATIVE_SECONDS:
+                result += "s";
+                break;
+            case RELATIVE_MILLISECONDS:
+                result += "ms";
+                break;
+            case RELATIVE_MICROSECONDS:
+                result += "u";
+                break;
+            default:
+                break;
+            }
+        }
+        if (addSeparator) {
+            result += ",";
+        }
+        return result;
+    }
 
     @Override
     public void trigger(ConnectorTriggerQuery query) {
+        String qString = null;
+        int qDelay = null != query ? query.delay() : 0;
         if (query instanceof StringTriggerQuery) {
-            final StringTriggerQuery q = (StringTriggerQuery) query;
+            qString = ((StringTriggerQuery) query).getQuery();
+        } else if (query instanceof SimpleTimeseriesQuery) {
+            SimpleTimeseriesQuery q = (SimpleTimeseriesQuery) query;
+            qString = "from(bucket:\"" + getBucket() + "\") ";
+            final TimeKind startKind = q.getStartKind();
+            final TimeKind endKind = q.getEndKind();
+            if (startKind != TimeKind.UNSPECIFIED && endKind != TimeKind.UNSPECIFIED) {
+                qString += " |> range( ";
+                qString += toRangePart(true, q.getStart(), startKind, startKind != TimeKind.UNSPECIFIED);
+                qString += toRangePart(false, q.getEnd(), endKind, false);
+                qString += ") ";
+            } else {
+                qString += " |> range(start:0) ";
+            }
+            qString += "|> group(columns: [\"_time\"], mode:\"by\") ";
+            qString += "|> sort(columns:[\"_time\"])";
+        }
+        if (qString != null) {
+            final String queryString = qString;
             final Runnable run = () -> {
                 QueryApi queryApi = client.getQueryApi();
-                List<FluxTable> tables = queryApi.query(q.getQuery());
+                List<FluxTable> tables = queryApi.query(queryString);
                 InfluxModelAccess acc = getModelAccess();
                 if (null != acc) {
                     long lastTime = -1;
+                    Instant lastRecordTime = null;
+                    Map<String, Object> values = new HashMap<>();
                     for (FluxTable fluxTable : tables) {
                         List<FluxRecord> records = fluxTable.getRecords();
                         for (FluxRecord fluxRecord : records) {
-                            try {
-                                acc.setReadData(fluxRecord);
-                                received(DEFAULT_CHANNEL, DUMMY, true);
-                                acc.readCompleted();
-                            } catch (IOException e) {
-                                LoggerFactory.getLogger(getClass()).error("Cannot trigger connector {}: {}", getName(), 
-                                    e.getMessage());
+                            String field = fluxRecord.getField();
+                            Instant time = fluxRecord.getTime();
+                            if (null != field) {
+                                if (lastRecordTime != null && !lastRecordTime.equals(time) 
+                                    || recordComplete.isComplete(values, field)) {
+                                    flush(acc, values);
+                                } 
+                                values.put(field, fluxRecord.getValue());
                             }
-                            long thisTime = fluxRecord.getTime().toEpochMilli();
+                            long thisTime = time.toEpochMilli();
                             int delay = 0;
-                            if (q.delay() > 0) {
-                                delay = q.delay();
+                            if (qDelay > 0) {
+                                delay = qDelay;
                             } else {
                                 if (lastTime > 0) {
                                     delay = (int) (thisTime - lastTime);
@@ -214,10 +291,31 @@ public class InfluxConnector<CO, CI> extends AbstractThreadedConnector<Object, O
                             TimeUtils.sleep(Math.max(1, delay));
                         }
                     }
+                    if (!values.isEmpty()) {
+                        flush(acc, values);
+                    }
                 }
             };
             new Thread(run).start();
         }
+    }
+    
+    /**
+     * Flushes aggregated/collected values per record.
+     * 
+     * @param acc the model access instance
+     * @param values the values
+     */
+    private void flush(InfluxModelAccess acc, Map<String, Object> values) {
+        try {
+            acc.setReadData(values);
+            received(DEFAULT_CHANNEL, DUMMY, true);
+            acc.readCompleted();
+        } catch (IOException e) {
+            LoggerFactory.getLogger(getClass()).error("Cannot trigger connector {}: {}", 
+                getName(), e.getMessage());
+        }
+        values.clear();
     }
 
     // data must be measurement with columns set

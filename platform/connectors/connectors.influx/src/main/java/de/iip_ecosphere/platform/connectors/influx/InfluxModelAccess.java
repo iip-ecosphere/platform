@@ -16,11 +16,11 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import com.influxdb.client.WriteApiBlocking;
 import com.influxdb.client.domain.WritePrecision;
 import com.influxdb.client.write.Point;
-import com.influxdb.query.FluxRecord;
 
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.model.AbstractTypeMappingModelAccess;
@@ -41,7 +41,7 @@ public class InfluxModelAccess extends AbstractTypeMappingModelAccess {
     private List<Point> batch = new ArrayList<Point>(10);
     
     /**
-     * Data input converter.
+     * Data input converter. Internally, INFLUX converts all smaller types to float and long.
      * 
      * @author Holger Eichelberger
      */
@@ -53,10 +53,30 @@ public class InfluxModelAccess extends AbstractTypeMappingModelAccess {
         public InfluxInputConverter() {
         }
         
+        @Override
+        public float toFloat(Object data) throws IOException {
+            return ((Double) data).floatValue();
+        }
+        
+        @Override
+        public int toInteger(Object data) throws IOException {
+            return ((Long) data).intValue();
+        }
+
+        @Override
+        public byte toByte(Object data) throws IOException {
+            return ((Long) data).byteValue();
+        }
+
+        @Override
+        public short toShort(Object data) throws IOException {
+            return ((Long) data).shortValue();
+        }        
+        
     }    
 
     /**
-     * Data output converter.
+     * Data output converter. INFLUX converts internally
      * 
      * @author Holger Eichelberger
      */
@@ -74,7 +94,7 @@ public class InfluxModelAccess extends AbstractTypeMappingModelAccess {
     private InfluxOutputConverter outputConverter = new InfluxOutputConverter();
     private InfluxConnector<?, ?> connector;
     private Point writePoint;
-    private FluxRecord readRecord;
+    private Map<String, Object> readValues;
 
     /**
      * Creates an instance.
@@ -167,8 +187,8 @@ public class InfluxModelAccess extends AbstractTypeMappingModelAccess {
 
     @Override
     public Object get(String qName) throws IOException {
-        if (null != readRecord) {
-            return readRecord.getValueByKey(prefix + qName);
+        if (null != readValues) {
+            return readValues.get(prefix + qName);
         } else {
             throw new IOException("No data to read");
         }
@@ -199,17 +219,17 @@ public class InfluxModelAccess extends AbstractTypeMappingModelAccess {
     /**
      * Connector sets the data to read from.
      * 
-     * @param record the record instance
+     * @param values the values as map (field name; value)
      */
-    void setReadData(FluxRecord record) {
-        readRecord = record;
+    void setReadData(Map<String, Object> values) {
+        readValues = values;
     }
     
     /**
      * Connector indicates end reading, record can be disposed.
      */
     void readCompleted() {
-        readRecord = null;
+        readValues = null;
     }
     
     @Override

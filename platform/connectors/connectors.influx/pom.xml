@@ -23,7 +23,7 @@
 			<groupId>com.influxdb</groupId>
 			<artifactId>influxdb-client-java</artifactId>
 			<version>6.12.0</version> <!-- JDK 17 > 7.0.0 -->
-			</dependency>
+        </dependency>
 		<dependency>
 			<groupId>de.iip-ecosphere.platform</groupId>
 			<artifactId>support.aas</artifactId>
