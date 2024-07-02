@@ -1,0 +1,145 @@
+// MODBUS/TCP field definitions for Phoenix EEM 370
+// usage: just list the predefined variables as fields in a record type' field list
+// Modbus connector requires unitId = 1, bigByteOrder = false
+
+project PhoenixContactEem {
+
+    import Connectors;
+    
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+    
+    // ----------- Modbus EEM 379 read-write --------------------------
+    
+    // incomplete
+    
+    ModbusField phoenixEem370_rw_Day = {
+        offset = 1282,
+        name = "Day",
+        description = "Day of occurrence of the voltage dip (UTC)",
+        type = refBy(Modbus_uint16),
+        cachingTime = CACHE_NONE
+    };
+    
+    ModbusField phoenixEem370_rw_Month = {
+        offset = 1283,
+        name = "Month",
+        description = "Month of occurrence of the voltage dip (UTC)",
+        type = refBy(Modbus_uint16),
+        cachingTime = CACHE_NONE
+    };
+    
+    ModbusField phoenixEem370_rw_Year = {
+        offset = 1284,
+        name = "Year",
+        description = "Year of occurrence of the voltage dip (UTC)",
+        type = refBy(Modbus_uint16),
+        cachingTime = CACHE_NONE
+    };
+    
+    // ----------- Modbus EEM 379 read --------------------------
+    // incomplete
+
+    ModbusField phoenixEem370_U12 = {
+        offset = 32768,
+        name = "U12",
+        description = "Effective value voltage U12",
+        type = refBy(Modbus_float32),
+        cachingTime = CACHE_NONE,
+        readOnly = false
+    };
+ 
+    ModbusField phoenixEem370_U23 = {
+        offset = 32770,
+        name = "U23",
+        description = "Effective value voltage U23",
+        type = refBy(Modbus_float32),
+        cachingTime = CACHE_NONE,
+        readOnly = false
+    };
+    
+    ModbusField phoenixEem370_U31 = {
+        offset = 32772,
+        name = "U31",
+        description = "Effective value voltage U31",
+        type = refBy(Modbus_float32),
+        cachingTime = CACHE_NONE,
+        readOnly = false
+    };
+    
+    ModbusField phoenixEem370_U1 = {
+        offset = 32774,
+        name = "U1",
+        description = "Effective value voltage U1",
+        type = refBy(Modbus_float32),
+        cachingTime = CACHE_NONE,
+        readOnly = false
+    };
+    
+    ModbusField phoenixEem370_U2 = {
+        offset = 32776,
+        name = "U2",
+        description = "Effective value voltage U2",
+        type = refBy(Modbus_float32),
+        cachingTime = CACHE_NONE,
+        readOnly = false
+    };
+    
+    ModbusField phoenixEem370_U3 = {
+        offset = 32778,
+        name = "U3",
+        description = "Effective value voltage U3",
+        type = refBy(Modbus_float32),
+        cachingTime = CACHE_NONE,
+        readOnly = false
+    };
+    
+    ModbusField phoenixEem370_frequency = {
+        offset = 32780,
+        name = "frequency",
+        description = "Frequency",
+        type = refBy(Modbus_float32),
+        cachingTime = CACHE_NONE,
+        readOnly = false
+    };
+    
+    ModbusField phoenixEem370_I1 = {
+        offset = 32782,
+        name = "I1",
+        description = "Effective value current I1",
+        type = refBy(Modbus_float32),
+        cachingTime = CACHE_NONE,
+        readOnly = false
+    };
+    
+    ModbusField phoenixEem370_I2 = {
+        offset = 32784,
+        name = "I2",
+        description = "Effective value current I2",
+        type = refBy(Modbus_float32),
+        cachingTime = CACHE_NONE,
+        readOnly = false
+    };
+    
+    ModbusField phoenixEem370_I3 = {
+        offset = 32786,
+        name = "I3",
+        description = "Effective value current I3",
+        type = refBy(Modbus_float32),
+        cachingTime = CACHE_NONE,
+        readOnly = false
+    };
+    
+    ModbusField phoenixEem370_totalActivePower = {
+        offset = 32790,
+        name = "Total active power",
+        description = "Sum of active power according to DIN EN 61557-12 with sign",
+        type = refBy(Modbus_float32),
+        cachingTime = CACHE_NONE,
+        readOnly = false
+    };
+    
+    freeze {
+        .;
+    };
+    
+}

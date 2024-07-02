@@ -17,6 +17,7 @@ New features:
 * Connectors with temporary data storage for transformation expressions
 * Serial connector, e.g., for EAN code scanners
 * MODBUS/TCP connector by Christian Nikolajew
+* Example MODBUS/TCP field declarations for Phoenix Contact EEM 370 in meta model
 * INFLUX DB connector for InfluxDb2, tested with version 2.7.6
 * Added `identityStore-test.yml` as fallback for `identityStore.yml` (if the latter shall not be committed)
 * Plugins for alternative components with conflicting classpaths. Retrofit for BaSyx 1.0, in particular in AAS connector.
