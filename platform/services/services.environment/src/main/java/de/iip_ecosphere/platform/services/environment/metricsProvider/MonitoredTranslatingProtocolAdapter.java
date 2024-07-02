@@ -119,7 +119,7 @@ public class MonitoredTranslatingProtocolAdapter<O, I, CO, CI> extends ChannelTr
             log(ADAPT_INPUT_TIME, duration);
             
             //invoke garbage collection, so only the space that is occupied by living objects is counted
-            System.gc();
+            //System.gc(); // affects measurement
             MemoryUsage afterHeapMemoryUsage = memBean.getHeapMemoryUsage();
             //difference of memory consumed before and after the code
             long heapConsumed = afterHeapMemoryUsage.getUsed() - beforeHeapMemoryUsage.getUsed();
@@ -140,7 +140,7 @@ public class MonitoredTranslatingProtocolAdapter<O, I, CO, CI> extends ChannelTr
             log(ADAPT_OUTPUT_TIME, duration);
 
             //invoke garbage collection, so only the space that is occupied by living objects is counted
-            System.gc();
+            //System.gc(); // affects measurement
             MemoryUsage afterHeapMemoryUsage = memBean.getHeapMemoryUsage();
             //difference of memory consumed before and after the code
             long heapConsumed = afterHeapMemoryUsage.getUsed() - beforeHeapMemoryUsage.getUsed();
