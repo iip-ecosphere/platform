@@ -85,7 +85,7 @@ public class TestHiveMqServer extends AbstractTestServer {
      * Determins the server address from the command line.
      * 
      * @param args the first argument may be the port number, else 8883 is used; 
-     *     optionally --host=<name> may be given afterwards
+     *     optionally --host=&lt;name&gt; may be given afterwards
      * @return the server address
      */
     protected static ServerAddress getServerAddress(String[] args) {
@@ -98,7 +98,7 @@ public class TestHiveMqServer extends AbstractTestServer {
      * Starts the server from the command line.
      * 
      * @param args the first argument may be the port number, else 8883 is used; 
-     *     optionally --host=<name> may be given afterwards
+     *     optionally --host=&lt;name&gt; may be given afterwards
      */
     public static void main(String[] args) {
         TestHiveMqServer server = new TestHiveMqServer(getServerAddress(args));
