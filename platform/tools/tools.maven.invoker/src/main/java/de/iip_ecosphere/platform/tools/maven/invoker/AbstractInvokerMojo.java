@@ -138,7 +138,7 @@ public class AbstractInvokerMojo extends AbstractMojo implements Logger { // Abs
     private boolean mavenJavadocSkip;
     
     @Parameter(property = "maven.build.cache.enabled")
-    private Boolean mavenBuildCacheEnabled;
+    private String mavenBuildCacheEnabled;
 
     @Parameter(property = "enableJavadoc", defaultValue = "false") 
     private boolean enableJavadoc;
