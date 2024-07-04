@@ -136,6 +136,9 @@ public class AbstractInvokerMojo extends AbstractMojo implements Logger { // Abs
 
     @Parameter(property = "maven.javadoc.skip", defaultValue = "false") 
     private boolean mavenJavadocSkip;
+    
+    @Parameter(property = "maven.build.cache.enabled")
+    private Boolean mavenBuildCacheEnabled;
 
     @Parameter(property = "enableJavadoc", defaultValue = "false") 
     private boolean enableJavadoc;
@@ -203,9 +206,29 @@ public class AbstractInvokerMojo extends AbstractMojo implements Logger { // Abs
      * 
      * @return the request
      * @see #createBasicInvocationRequest()
+     * @see #passThroughSysProperties(InvocationRequest, Properties)
+     * @see #passThroughEnvSettings(InvocationRequest)
      */
     private InvocationRequest createInvocationRequest() {
         final InvocationRequest request = createBasicInvocationRequest();
+        passThroughSysProperties(request);
+        passThroughEnvSettings(request);
+        File pomFile = pom;
+        if (null == pomFile) {
+            pomFile = project.getFile();
+        }
+        getLog().info("Actual POM: " + pomFile);
+        request.setBaseDirectory(pomFile.getParentFile());
+        request.setPomFile(pomFile);
+        return request;
+    }
+    
+    /**
+     * Passes through selected system properties.
+     * 
+     * @param request the request to modify as a side effect
+     */
+    private void passThroughSysProperties(final InvocationRequest request) {
         Properties sysProperties = new Properties();
         if (null != systemProperties) {
             for (SystemProperty prop : systemProperties) {
@@ -235,6 +258,9 @@ public class AbstractInvokerMojo extends AbstractMojo implements Logger { // Abs
             sysProperties.put("maven.test.skip", "true");
             sysProperties.put("skipTests", "true"); // maven.test.skip might be sufficient
         }
+        if (null != mavenBuildCacheEnabled) {
+            sysProperties.put("maven.build.cache.enabled", mavenBuildCacheEnabled);
+        }
         if (disablePython || disableBuild) {
             sysProperties.put("python-compile.skip", "true");
             sysProperties.put("python-test.skip", "true");
@@ -251,6 +277,15 @@ public class AbstractInvokerMojo extends AbstractMojo implements Logger { // Abs
         }
         sysProperties.put("python-compile.hashDir", hashDir);
         request.addShellEnvironment("PYTHON_COMPILE_HASHDIR", hashDir); // invoker -D not correct?, pass on 2 mvn levels
+        request.setProperties(sysProperties);
+    }
+    
+    /**
+     * Passes through selected system environment settings.
+     * 
+     * @param request the request to modify as a side effect
+     */
+    private void passThroughEnvSettings(final InvocationRequest request) {
         String settings = System.getenv("MAVEN_SETTINGS_PATH");
         if (null == settings) {
             if (null != execRequest.getGlobalSettingsFile() && execRequest.getGlobalSettingsFile().exists()) {
@@ -273,15 +308,6 @@ public class AbstractInvokerMojo extends AbstractMojo implements Logger { // Abs
             request.addShellEnvironment("MAVEN_SETTINGS_PATH", settings);
         }
         getLog().info("Passing on env settings " + request.getShellEnvironments());
-        request.setProperties(sysProperties);
-        File pomFile = pom;
-        if (null == pomFile) {
-            pomFile = project.getFile();
-        }
-        getLog().info("Actual POM: " + pomFile);
-        request.setBaseDirectory(pomFile.getParentFile());
-        request.setPomFile(pomFile);
-        return request;
     }
     
     /**
