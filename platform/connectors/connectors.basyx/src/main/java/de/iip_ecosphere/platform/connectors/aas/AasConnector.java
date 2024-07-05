@@ -72,7 +72,7 @@ import de.iip_ecosphere.platform.transport.serialization.QualifiedElementFactory
  * the AAS, e.g., iri:urn:... Without, the connector tries to obtain a registry based on an AAS short id, which 
  * currently may fail. 
  * 
- * This class is based on {@link ElementFactory} for IDTA-style property "lists".
+ * This class is based on {@link QualifiedElementFactory} for IDTA-style property "lists".
  * 
  * @param <CO> the output type to the IIP-Ecosphere platform
  * @param <CI> the input type from the IIP-Ecosphere platform
