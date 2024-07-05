@@ -12,6 +12,10 @@
      <version>0.7.0-SNAPSHOT</version>
      <relativePath/>
   </parent>
+  
+  <properties>
+    <python-test.skip>true</python-test.skip> <!-- called here through Java/jUnit -->
+  </properties>
 
   <dependencies>
     <dependency>
