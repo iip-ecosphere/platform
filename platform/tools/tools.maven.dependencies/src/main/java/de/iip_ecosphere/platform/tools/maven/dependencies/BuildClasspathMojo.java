@@ -28,6 +28,7 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.apache.maven.project.MavenProject;
 
 /**
  * Reused build-classpath Mojo, allowing to prepend/append classpath elements not part of the Maven classpath.
@@ -116,19 +117,28 @@ public class BuildClasspathMojo extends org.apache.maven.plugins.dependency.from
         super.doExecute();
         boolean hasPrepends = (prepends != null && !prepends.isEmpty());
         boolean hasAppends = (appends != null && !appends.isEmpty());
+        MavenProject project = getProject();
+        String self = project.getGroupId().replace(".", "/") + "/" + project.getArtifactId() + "/" 
+               + project.getVersion() + "/" + project.getArtifactId() + "-" + project.getVersion();
+        String selfTest = self + "-tests.jar";
+        self += ".jar";
         if ((hasPrepends || hasAppends) && outputFile != null) {
             try {
                 String content = FileUtils.readFileToString(outputFile, Charset.defaultCharset());
                 if (hasPrepends) {
                     String tmp = "";
                     for (String s : prepends) {
+                        s = s.replace("${self}", self);
+                        s = s.replace("${self-test}", selfTest);
                         tmp += s + pathSeparator;
                     }
                     content = tmp + content;
                 }
                 if (hasAppends) {
                     String tmp = "";
-                    for (String s : prepends) {
+                    for (String s : appends) {
+                        s = s.replace("${self}", self);
+                        s = s.replace("${self-test}", selfTest);
                         tmp += pathSeparator + s;
                     }
                     content = content + tmp;
