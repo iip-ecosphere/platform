@@ -13,7 +13,8 @@ package test.de.iip_ecosphere.platform.services.environment.metricsProvider;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
-import test.de.iip_ecosphere.platform.services.environment.metricsProvider.meterRepresentations.CounterRepresentationTest;
+import test.de.iip_ecosphere.platform.services.environment.metricsProvider.meterRepresentations
+    .CounterRepresentationTest;
 import test.de.iip_ecosphere.platform.services.environment.metricsProvider.meterRepresentations.GaugeRepresentationTest;
 import test.de.iip_ecosphere.platform.services.environment.metricsProvider.meterRepresentations.MeterRepresentationTest;
 import test.de.iip_ecosphere.platform.services.environment.metricsProvider.meterRepresentations.TimerRepresentationTest;

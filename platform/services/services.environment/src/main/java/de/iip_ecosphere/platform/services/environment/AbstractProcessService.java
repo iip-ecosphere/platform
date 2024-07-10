@@ -217,7 +217,7 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractRunna
     /**
      * Returns the output translator.
      * 
-     * @return the translatir
+     * @return the translator
      */
     protected TypeTranslator<String, O> getOutputTranslator() {
         return outTrans;
