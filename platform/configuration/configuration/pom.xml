@@ -35,35 +35,35 @@
     </dependency>
     <dependency>
         <groupId>net.ssehub.easy</groupId>
-        <artifactId>net.ssehub.easy.basics</artifactId>
+        <artifactId>basics</artifactId>
     </dependency>
     <dependency>
         <groupId>net.ssehub.easy</groupId>
-        <artifactId>net.ssehub.easy.varModel</artifactId>
+        <artifactId>varModel</artifactId>
     </dependency>  
     <dependency>
         <groupId>net.ssehub.easy</groupId>
-        <artifactId>de.uni_hildesheim.sse.ivml</artifactId>
+        <artifactId>ivml</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>net.ssehub.easy.vil</groupId>
+        <artifactId>buildlang</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>net.ssehub.easy.vil</groupId>
+        <artifactId>templateLang</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>net.ssehub.easy.reasoning</groupId>
+      <artifactId>core</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>net.ssehub.easy.reasoning</groupId>
+        <artifactId>sseReasoner</artifactId>
     </dependency>
     <dependency>
         <groupId>net.ssehub.easy</groupId>
-        <artifactId>de.uni_hildesheim.sse.vil.buildlang</artifactId>
-    </dependency>
-    <dependency>
-        <groupId>net.ssehub.easy</groupId>
-        <artifactId>de.uni_hildesheim.sse.vil.templatelang</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>net.ssehub.easy</groupId>
-      <artifactId>net.ssehub.easy.reasoning.core</artifactId>
-    </dependency>
-    <dependency>
-        <groupId>net.ssehub.easy</groupId>
-        <artifactId>net.ssehub.easy.reasoning.sseReasoner</artifactId>
-    </dependency>
-    <dependency>
-        <groupId>net.ssehub.easy</groupId>
-        <artifactId>net.ssehub.easy.producer.core</artifactId>
+        <artifactId>core</artifactId>
         <exclusions>
             <exclusion> <!-- already there in JDK 11, overlap in module path -->
                 <groupId>xml-apis</groupId>
@@ -73,31 +73,31 @@
     </dependency>
     <dependency>
         <groupId>net.ssehub.easy</groupId>
-        <artifactId>net.ssehub.easy.producer.eclipse</artifactId>
+        <artifactId>core.eclipse</artifactId>
     </dependency>
     <dependency>
-        <groupId>net.ssehub.easy</groupId>
-        <artifactId>net.ssehub.easy.loader</artifactId>
+        <groupId>net.ssehub.easy.runtime</groupId>
+        <artifactId>loader</artifactId>
     </dependency>
     <dependency>
-      <groupId>net.ssehub.easy</groupId>
-      <artifactId>net.ssehub.easy.instantiation.maven</artifactId>
+      <groupId>net.ssehub.easy.instantiation</groupId>
+      <artifactId>maven</artifactId>
     </dependency>
     <dependency>
-        <groupId>net.ssehub.easy</groupId>
-        <artifactId>net.ssehub.easy.instantiation.java</artifactId>
+        <groupId>net.ssehub.easy.instantiation</groupId>
+        <artifactId>java</artifactId>
     </dependency>
     <dependency>
-        <groupId>net.ssehub.easy</groupId>
-        <artifactId>net.ssehub.easy.instantiation.ant</artifactId>
+        <groupId>net.ssehub.easy.instantiation</groupId>
+        <artifactId>ant</artifactId>
     </dependency>
     <dependency>
-        <groupId>net.ssehub.easy</groupId>
-        <artifactId>net.ssehub.easy.instantiation.docker</artifactId>
+        <groupId>net.ssehub.easy.instantiation</groupId>
+        <artifactId>docker</artifactId>
     </dependency>
     <dependency>
-        <groupId>net.ssehub.easy</groupId>
-        <artifactId>net.ssehub.easy.instantiation.lxc</artifactId>
+        <groupId>net.ssehub.easy.instantiation</groupId>
+        <artifactId>lxc</artifactId>
     </dependency>
   
     <dependency>
