@@ -70,11 +70,11 @@ template UiAngularPom(IIPEcosphere config, FileArtifact target) {
                   <execution>
                     <phase>prepare-package</phase>
                     <configuration>
-                      <tasks>
+                      <target>
                         <replace token="${ipInConfig}" value="${ipReplacement}" dir="dist/iipes-web">                                 
                           <include name="main.*.js"/>
                         </replace>
-                      </tasks>
+                      </target>
                     </configuration>
                     <goals>
                       <goal>run</goal>

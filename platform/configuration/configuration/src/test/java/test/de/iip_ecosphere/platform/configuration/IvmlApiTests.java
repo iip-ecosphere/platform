@@ -18,7 +18,7 @@ import java.util.concurrent.ExecutionException;
 
 import org.junit.Test;
 
-import de.iip_ecosphere.platform.configuration.PlatformInstantiator;
+import de.iip_ecosphere.platform.configuration.PlatformInstantiatorExecutor;
 
 /**
  * Tests the generation of the platform APIs.
@@ -39,7 +39,7 @@ public class IvmlApiTests extends AbstractIvmlTests {
         //System.setProperty(PlatformInstantiator.KEY_PROPERTY_TRACING, "ALL");
         //PlatformInstantiator.setTraceFilter();
         File gen = new File("gen/tests/api");
-        PlatformInstantiator.instantiate(
+        PlatformInstantiatorExecutor.instantiate(
             genApi(new TestConfigurer("PlatformConfiguration", new File("src/test/easy/api"), gen)));
         assertAllFiles(gen);
     }

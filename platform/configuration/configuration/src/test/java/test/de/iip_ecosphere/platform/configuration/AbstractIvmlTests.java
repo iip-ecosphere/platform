@@ -146,10 +146,11 @@ public abstract class AbstractIvmlTests {
      * 
      * @author Holger Eichelberger, SSE
      */
-    protected static class TestConfigurer extends InstantiationConfigurer {
+    public static class TestConfigurer extends InstantiationConfigurer {
 
         private File ivmlMetaModelFolder = null; // use the default in EasySetup
         private List<File> additionalIvmlFolders = null;
+        private boolean exit = false;
         
         /**
          * Creates a configurer instance. Copies the IVML configuration meta model to {@code target/ivml}
@@ -185,6 +186,54 @@ public abstract class AbstractIvmlTests {
                 additionalIvmlFolders.add(commonIvml);
             }
         }
+        
+        /**
+         * Creates a configurer instance from command line arguments delivered by {@link #toArgs()}.
+         * 
+         * @param args the command line arguments
+         */
+        public TestConfigurer(String[] args) {
+            super(args);
+            exit = true;
+            if (args.length > 4) {
+                ivmlMetaModelFolder = fromArg(args[5]);
+                if (args.length > 5) {
+                    additionalIvmlFolders = new ArrayList<>();
+                    for (int i = 6; i < args.length; i++) {
+                        additionalIvmlFolders.add(fromArg(args[i]));
+                    }
+                }
+            }
+        }        
+
+        @Override
+        public String getMainClass() {
+            return exit ? super.getMainClass() : PlatformInstantiatorTestMain.class.getName();
+        }
+
+        @Override
+        public boolean inTesting() {
+            return true;
+        }
+
+        /**
+         * Turns this configurer into command line arguments.
+         * 
+         * @return the arguments
+         */
+        public String[] toArgs() {
+            String[] tmp = super.toArgs();
+            String[] result = new String[tmp.length + 1 
+                 + (additionalIvmlFolders == null ? 0 : additionalIvmlFolders.size())];
+            System.arraycopy(tmp, 0, result, 0, tmp.length);
+            result[tmp.length] = toArg(ivmlMetaModelFolder);
+            if (null != additionalIvmlFolders) {
+                for (int i = 0; i < additionalIvmlFolders.size(); i++) {
+                    result[tmp.length + 1 + i] = toArg(additionalIvmlFolders.get(i));
+                }
+            }
+            return result;
+        }
 
         @Override
         public InstantiationConfigurer setStartRuleName(String startRuleName) {
@@ -205,12 +254,24 @@ public abstract class AbstractIvmlTests {
         
         @Override
         protected void validateConfiguration(Configuration conf) throws ExecutionException {
-            Assert.assertNotNull(conf);
+            if (exit) {
+                if (null == conf) {
+                    System.exit(-1);
+                }
+            } else {
+                Assert.assertNotNull(conf);
+            }
         }
         
         @Override
         protected void validateReasoningResult(ReasoningResult res) throws ExecutionException {
-            Assert.assertFalse(res.hasConflict());
+            if (exit) {
+                if (res.hasConflict()) {
+                    System.exit(-2);
+                }
+            } else {
+                Assert.assertFalse(res.hasConflict());
+            }
         }
         
         @Override

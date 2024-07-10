@@ -18,7 +18,7 @@ import java.util.concurrent.ExecutionException;
 
 import org.junit.Test;
 
-import de.iip_ecosphere.platform.configuration.PlatformInstantiator;
+import de.iip_ecosphere.platform.configuration.PlatformInstantiatorExecutor;
 
 /**
  * Tests the RoutingTest model.
@@ -36,7 +36,7 @@ public class IvmlRoutingTestTests extends AbstractIvmlTests {
     @Test
     public void testRoutingTest() throws ExecutionException, IOException {
         File gen = new File("gen/tests/RoutingTest");
-        PlatformInstantiator.instantiate(
+        PlatformInstantiatorExecutor.instantiate(
             genApps(new TestConfigurer("PlatformConfiguration", new File("src/test/easy/routingTest"), gen)));
         assertAllFiles(gen);
         assertTemplateZip(gen, "impl.RoutingTestApp");

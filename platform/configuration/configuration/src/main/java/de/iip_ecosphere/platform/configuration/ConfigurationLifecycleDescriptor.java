@@ -15,7 +15,6 @@ package de.iip_ecosphere.platform.configuration;
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.log4j.lf5.LogLevel;
 import org.slf4j.Logger;
 
 import de.iip_ecosphere.platform.support.LifecycleDescriptor;
@@ -37,6 +36,22 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
     private ListLoader loader;
     private boolean doLogging = true;
     private boolean doFilterLogs = false;
+    private ClassLoader classLoader = ConfigurationLifecycleDescriptor.class.getClassLoader();
+    
+    /**
+     * Defines the basic logging levels in here.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private enum LogLevel {
+        DEBUG,
+        INFO, 
+        WARN, 
+        ERROR,
+        TRACE,
+        FATAL,
+        OFF
+    }
     
     /**
      * SLF4J-to-EASy logging adapter.
@@ -126,6 +141,17 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
         
     }
     
+    /**
+     * Explicitly defines the class loader for loading EASy. Default is the class loader of this class.
+     * 
+     * @param classLoader the class loader, ignored if <b>null</b>
+     */
+    public void setClassLoader(ClassLoader classLoader) {
+        if (null != classLoader) {
+            this.classLoader = classLoader;
+        }
+    }
+    
     @Override
     public void startup(String[] args) {
         try {
@@ -133,7 +159,7 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
             // pass through everything and let platform logger decide
             EASyLoggerFactory.INSTANCE.setLoggingLevel(LoggingLevel.INFO);
             ConfigurationSetup setup = ConfigurationSetup.getSetup();
-            loader = new ListLoader(); // file .easyStartup from classloader
+            loader = new ListLoader(classLoader); // file .easyStartup from classloader
             EasySetup easySetup = setup.getEasyProducer();
             loader.setVerbose(easySetup.getLogLevel() == EasyLogLevel.EXTRA_VERBOSE);
             getLogger().info("EASy-Producer is starting");

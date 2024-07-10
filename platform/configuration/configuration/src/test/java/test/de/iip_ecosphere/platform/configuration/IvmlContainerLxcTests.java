@@ -20,7 +20,7 @@ import org.apache.commons.lang3.SystemUtils;
 import org.junit.Assume;
 import org.junit.Test;
 
-import de.iip_ecosphere.platform.configuration.PlatformInstantiator;
+import de.iip_ecosphere.platform.configuration.PlatformInstantiatorExecutor;
 
 /**
  * Tests the creation of containers via IVML models.
@@ -58,7 +58,7 @@ public class IvmlContainerLxcTests extends AbstractIvmlTests {
         Assume.assumeTrue(winAndLxcDisabled | uxAndHomeOk);
 
         File gen = new File("gen/tests/ContainerCreationLxc");
-        PlatformInstantiator
+        PlatformInstantiatorExecutor
             .instantiate(new TestConfigurer("ContainerCreationLxc", new File("src/test/easy/single"), gen));
         assertAllFiles(gen);
         assertTemplateZip(gen, "impl.SimpleMeshTestingContainerApp");

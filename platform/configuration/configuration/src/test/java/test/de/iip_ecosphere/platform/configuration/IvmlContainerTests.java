@@ -18,7 +18,7 @@ import java.util.concurrent.ExecutionException;
 
 import org.junit.Test;
 
-import de.iip_ecosphere.platform.configuration.PlatformInstantiator;
+import de.iip_ecosphere.platform.configuration.PlatformInstantiatorExecutor;
 
 /**
  * Tests the creation of containers via IVML models.
@@ -40,7 +40,7 @@ public class IvmlContainerTests extends AbstractIvmlTests {
         System.setProperty(dockerFailProp, "false"); // fails sometimes in CI due to unknown docker problems??
         
         File gen = new File("gen/tests/ContainerCreation");
-        PlatformInstantiator.instantiate(
+        PlatformInstantiatorExecutor.instantiate(
             new TestConfigurer("ContainerCreation", new File("src/test/easy/single"), gen));
         assertAllFiles(gen);
         assertTemplateZip(gen, "impl.SimpleMeshTestingContainerApp");

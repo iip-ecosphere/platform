@@ -35,6 +35,7 @@ public class PlatformInstantiator {
     public static final String KEY_PROPERTY_MVNARGS = "iip.easy.mvnArgs";
     public static final String KEY_PROPERTY_APPS = "iip.easy.apps";
     private static int exitCode = 0;
+    private static ClassLoader classLoader;
     
     /**
      * Configures the instantiation. Default is for command line execution, but the configurer allows for adjusting the 
@@ -61,6 +62,71 @@ public class PlatformInstantiator {
             this.ivmlModelName = ivmlModelName;
             this.modelFolder = modelFolder;
             this.outputFolder = outputFolder;
+        }
+
+        /**
+         * Creates a configurer instance from command line arguments delivered by {@link #toArgs()}.
+         * 
+         * @param args the command line arguments
+         */
+        public InstantiationConfigurer(String[] args) {
+            this.ivmlModelName = args[0];
+            this.modelFolder = fromArg(args[1]);
+            this.outputFolder = fromArg(args[2]);
+            this.metaModelFolder = fromArg(args[3]);
+            this.startRuleName = args[4];
+        }
+
+        /**
+         * Turns a textual file name into a file object.
+         * 
+         * @param file the file name
+         * @return the file, may be <b>null</b> if {@code file} was <b>null</b> or "-"
+         */
+        protected File fromArg(String file) {
+            return file == null || file.equals("-") ? null : new File(file);
+        }
+        
+        /**
+         * Turns a file name into a textual file specification.
+         * 
+         * @param file the file
+         * @return the file specification, may be "-" if {@code file} was <b>null</b>
+         */
+        protected String toArg(File file) {
+            return null == file ? "-" : file.toString();
+        }
+
+        /**
+         * Returns the qualified name of the class containing a main method for execution
+         * through {@link PlatformInstantiatorExecutor}.
+         * 
+         * @return the class name of {@link PlatformInstantiator}
+         */
+        public String getMainClass() {
+            return PlatformInstantiator.class.getName();
+        }
+        
+        /**
+         * Returns whether this configurer is currently used for testing.
+         * 
+         * @return {@code false} for production (the default), {@code true} for testing
+         */
+        public boolean inTesting() {
+            return false;
+        }
+
+        /**
+         * Turns this configurer into command line arguments.
+         * 
+         * @return the arguments
+         */
+        public String[] toArgs() {
+            return new String[] {ivmlModelName, 
+                toArg(modelFolder), 
+                toArg(outputFolder), 
+                toArg(metaModelFolder), 
+                startRuleName};
         }
         
         /**
@@ -193,9 +259,20 @@ public class PlatformInstantiator {
         }
 
     }
+    
+    /**
+     * Sets an explicit class loader for loading EASy-Producer. By default, it's the class loader of the 
+     * {@link ConfigurationLifecycleDescriptor}.
+     * 
+     * @param loader the class loader, ignored if <b>null</b>
+     */
+    public static void setClassLoader(ClassLoader loader) {
+        classLoader = loader;
+    }
 
     /**
-     * Performs the platform instantiation.
+     * Performs the platform instantiation. Considers the class loader set before through 
+     * {@link #setClassLoader(ClassLoader)}.
      * 
      * @param configurer the configurer
      * @throws ExecutionException in case that the instantiation fails and the configurer re-throws the exception
@@ -204,6 +281,7 @@ public class PlatformInstantiator {
         ConfigurationSetup setup = ConfigurationSetup.getSetup();
         configurer.configure(setup);
         ConfigurationLifecycleDescriptor lcd = configurer.obtainLifecycleDescriptor();
+        lcd.setClassLoader(classLoader); // ignored if null
         lcd.startup(new String[0]); // shall register executor
         configurer.validateConfiguration(ConfigurationManager.getIvmlConfiguration());
         ReasoningResult rRes = ConfigurationManager.validateAndPropagate();
@@ -252,8 +330,8 @@ public class PlatformInstantiator {
      * default {@link InstantiationConfigurer}
      */
     public static void main(String[] args) throws ExecutionException {
-        if (args.length < 3 || args.length > 4 ) {
-            System.out.println("IIP-Ecosphere platform instantiator");
+        if (args.length < 3) {
+            System.out.println("oktoflow platform instantiator");
             System.out.println("Following arguments are required:");
             System.out.println(" - name of the model/configuration");
             System.out.println(" - folder the model is located in, src/main/easy is used for the metamodel");

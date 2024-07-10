@@ -20,7 +20,7 @@ import java.util.concurrent.ExecutionException;
 
 import org.junit.Test;
 
-import de.iip_ecosphere.platform.configuration.PlatformInstantiator;
+import de.iip_ecosphere.platform.configuration.PlatformInstantiatorExecutor;
 
 /**
  * Tests the SerializerConfig1 model.
@@ -40,7 +40,7 @@ public class IvmlSerializerConfig1Tests extends AbstractIvmlSerializerConfigTest
     public void testSerializerConfig1() throws ExecutionException, IOException {
         assumeFalse(isIipBuildInitial());
         File gen = new File("gen/tests/SerializerConfig1");
-        PlatformInstantiator.instantiate(
+        PlatformInstantiatorExecutor.instantiate(
             new TestConfigurer("SerializerConfig1", new File("src/test/easy/single"), gen));
 
         assertAppInterfaces(new File(gen, "ApplicationInterfaces"), false);

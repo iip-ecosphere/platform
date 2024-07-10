@@ -35,35 +35,35 @@
     </dependency>
     <dependency>
         <groupId>net.ssehub.easy</groupId>
-        <artifactId>basics</artifactId>
+        <artifactId>net.ssehub.easy.basics</artifactId>
     </dependency>
     <dependency>
         <groupId>net.ssehub.easy</groupId>
-        <artifactId>varModel</artifactId>
+        <artifactId>net.ssehub.easy.varModel</artifactId>
     </dependency>  
     <dependency>
         <groupId>net.ssehub.easy</groupId>
-        <artifactId>ivml</artifactId>
-    </dependency>
-    <dependency>
-        <groupId>net.ssehub.easy.vil</groupId>
-        <artifactId>buildlang</artifactId>
-    </dependency>
-    <dependency>
-        <groupId>net.ssehub.easy.vil</groupId>
-        <artifactId>templateLang</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>net.ssehub.easy.reasoning</groupId>
-      <artifactId>core</artifactId>
-    </dependency>
-    <dependency>
-        <groupId>net.ssehub.easy.reasoning</groupId>
-        <artifactId>sseReasoner</artifactId>
+        <artifactId>de.uni_hildesheim.sse.ivml</artifactId>
     </dependency>
     <dependency>
         <groupId>net.ssehub.easy</groupId>
-        <artifactId>core</artifactId>
+        <artifactId>de.uni_hildesheim.sse.vil.buildlang</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>net.ssehub.easy</groupId>
+        <artifactId>de.uni_hildesheim.sse.vil.templatelang</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>net.ssehub.easy</groupId>
+      <artifactId>net.ssehub.easy.reasoning.core</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>net.ssehub.easy</groupId>
+        <artifactId>net.ssehub.easy.reasoning.sseReasoner</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>net.ssehub.easy</groupId>
+        <artifactId>net.ssehub.easy.producer.core</artifactId>
         <exclusions>
             <exclusion> <!-- already there in JDK 11, overlap in module path -->
                 <groupId>xml-apis</groupId>
@@ -73,31 +73,31 @@
     </dependency>
     <dependency>
         <groupId>net.ssehub.easy</groupId>
-        <artifactId>core.eclipse</artifactId>
+        <artifactId>net.ssehub.easy.producer.eclipse</artifactId>
     </dependency>
     <dependency>
-        <groupId>net.ssehub.easy.runtime</groupId>
-        <artifactId>loader</artifactId>
+        <groupId>net.ssehub.easy</groupId>
+        <artifactId>net.ssehub.easy.loader</artifactId>
     </dependency>
     <dependency>
-      <groupId>net.ssehub.easy.instantiation</groupId>
-      <artifactId>maven</artifactId>
+      <groupId>net.ssehub.easy</groupId>
+      <artifactId>net.ssehub.easy.instantiation.maven</artifactId>
     </dependency>
     <dependency>
-        <groupId>net.ssehub.easy.instantiation</groupId>
-        <artifactId>java</artifactId>
+        <groupId>net.ssehub.easy</groupId>
+        <artifactId>net.ssehub.easy.instantiation.java</artifactId>
     </dependency>
     <dependency>
-        <groupId>net.ssehub.easy.instantiation</groupId>
-        <artifactId>ant</artifactId>
+        <groupId>net.ssehub.easy</groupId>
+        <artifactId>net.ssehub.easy.instantiation.ant</artifactId>
     </dependency>
     <dependency>
-        <groupId>net.ssehub.easy.instantiation</groupId>
-        <artifactId>docker</artifactId>
+        <groupId>net.ssehub.easy</groupId>
+        <artifactId>net.ssehub.easy.instantiation.docker</artifactId>
     </dependency>
     <dependency>
-        <groupId>net.ssehub.easy.instantiation</groupId>
-        <artifactId>lxc</artifactId>
+        <groupId>net.ssehub.easy</groupId>
+        <artifactId>net.ssehub.easy.instantiation.lxc</artifactId>
     </dependency>
   
     <dependency>
@@ -188,6 +188,21 @@
         <id>Cfg</id>
 		  <build>
 		    <plugins>
+              <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>${org.apache.maven.jar.version}</version>
+                <executions>
+                  <execution>
+                    <goals>
+                      <goal>test-jar</goal>
+                    </goals>
+                    <configuration>
+                        <skip>false</skip>                        
+                    </configuration>
+                  </execution>
+                </executions>
+              </plugin>
 		      <plugin>
 		        <groupId>org.apache.maven.plugins</groupId>
 		        <artifactId>maven-dependency-plugin</artifactId>
@@ -323,7 +338,6 @@
                                       <value>true</value>
                                   </systemProperty>
                               </systemProperties>
-                              <checkChanged>true</checkChanged>
                               <skipIfExists>target/genInterfaces-${project.version}</skipIfExists>
                           </configuration>
                       </execution>
@@ -361,6 +375,57 @@
                       </execution>
                   </executions>
               </plugin>
+              
+             <!-- for configuration.maven, localRepoProperty/prefix to prevent full local paths -->
+             <plugin>
+                 <groupId>de.iip-ecosphere.platform</groupId>
+                 <artifactId>dependency-plugin</artifactId>
+                 <version>${project.version}</version>
+                 <executions>
+                     <execution>
+                         <id>production-classpath</id>
+                         <phase>prepare-package</phase>
+                         <goals>
+                             <goal>build-classpath</goal>
+                         </goals>
+                         <configuration>
+                             <outputFile>target/classes/config.classpath</outputFile>
+                             <prependGroupId>false</prependGroupId>
+                             <overWriteIfNewer>true</overWriteIfNewer>
+                             <localRepoProperty>repo</localRepoProperty>
+                             <!--<prefix>target/jars</prefix>-->
+                             <fileSeparator>/</fileSeparator>
+                             <pathSeparator>:</pathSeparator>
+                             <includeScope>runtime</includeScope>
+                             <prepends>
+                                 <prepend>repo/${self}</prepend>
+                             </prepends>
+                         </configuration>
+                     </execution>
+                     <execution>
+                         <id>test-classpath</id>
+                         <phase>prepare-package</phase>
+                         <goals>
+                             <goal>build-classpath</goal>
+                         </goals>
+                         <configuration>
+                             <outputFile>target/classes/config-test.classpath</outputFile>
+                             <prependGroupId>false</prependGroupId>
+                             <overWriteIfNewer>true</overWriteIfNewer>
+                             <localRepoProperty>repo</localRepoProperty>
+                             <!--<prefix>target/jars</prefix>-->
+                             <fileSeparator>/</fileSeparator>
+                             <pathSeparator>:</pathSeparator>
+                             <includeScope>test</includeScope>
+                             <prepends>
+                                 <prepend>repo/${self}</prepend>
+                                 <prepend>repo/${self-test}</prepend>
+                             </prepends>
+                         </configuration>
+                     </execution>
+                 </executions>
+             </plugin>
+              
           </plugins>
         </build>
       </profile>

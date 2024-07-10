@@ -2,6 +2,8 @@
 @indent(indentation = 4, additional = 0)
 template MqttBasics(Configuration config, FileArtifact target) {
 
+    String vmOpt = "--add-opens java.base/java.lang=ALL-UNNAMED";  
+
     def getHostOpt(IIPEcosphere config) {
         String host = "";
         if (isDefined(config.transportProtocol) and isDefined(config.transportProtocol.globalHost)) { 

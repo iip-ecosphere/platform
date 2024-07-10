@@ -18,7 +18,7 @@ import java.util.concurrent.ExecutionException;
 
 import org.junit.Test;
 
-import de.iip_ecosphere.platform.configuration.PlatformInstantiator;
+import de.iip_ecosphere.platform.configuration.PlatformInstantiatorExecutor;
 
 /**
  * Tests the KodexMesh model.
@@ -39,7 +39,7 @@ public class IvmlKodexMeshTests extends AbstractIvmlTests {
     @Test
     public void testKodexMesh() throws ExecutionException, IOException {
         File gen = new File("gen/tests/KodexMesh");
-        PlatformInstantiator.instantiate(
+        PlatformInstantiatorExecutor.instantiate(
             genApps(new TestConfigurer("KodexMesh", new File("src/test/easy/single"), gen)));
 
         File base = new File(gen, "ApplicationInterfaces");

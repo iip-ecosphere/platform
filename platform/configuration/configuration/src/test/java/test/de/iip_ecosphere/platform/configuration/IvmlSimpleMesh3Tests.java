@@ -18,7 +18,7 @@ import java.util.concurrent.ExecutionException;
 
 import org.junit.Test;
 
-import de.iip_ecosphere.platform.configuration.PlatformInstantiator;
+import de.iip_ecosphere.platform.configuration.PlatformInstantiatorExecutor;
 
 /**
  * Tests the SimpleMesh3 model.
@@ -38,7 +38,7 @@ public class IvmlSimpleMesh3Tests extends AbstractIvmlTests {
     @Test
     public void testSimpleMesh3() throws ExecutionException, IOException {
         File gen = new File("gen/tests/SimpleMesh3");
-        PlatformInstantiator.instantiate(
+        PlatformInstantiatorExecutor.instantiate(
             genApps(new TestConfigurer("PlatformConfiguration", new File("src/test/easy/simpleMesh3"), gen)));
         assertAllFiles(gen);
         assertTemplateZip(gen, "impl.SimpleMeshTestingApp3");
