@@ -40,7 +40,6 @@ import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
 
-import de.iip_ecosphere.platform.configuration.PlatformInstantiator;
 import de.iip_ecosphere.platform.configuration.PlatformInstantiatorExecutor;
 import de.iip_ecosphere.platform.configuration.maven.DependencyResolver.Caller;
 import de.iip_ecosphere.platform.tools.maven.python.AbstractLoggingMojo;
@@ -416,32 +415,33 @@ public abstract class AbstractConfigurationMojo extends AbstractLoggingMojo impl
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        if (asProcess) {
-            String resourcesDir = validateDirectory(makeAbsolute(getResourcesDirectory()));
-            if (null == resourcesDir) {
-                resourcesDir = validateDirectory(makeAbsolute(getFallbackResourcesDirectory()));
-            }
-            String outputDir = adjustOutputDir(makeAbsolute(getOutputDirectory()));
-            String modelDir = makeAbsolute(getModelDirectory());
-            String metaModelDir = makeAbsolute(getMetaModelDirectory());
-            String[] args = {getModel(), modelDir, outputDir, getStartRule(), metaModelDir};
-            if (isModelDirectoryValid()) {
-                if (enableRun(metaModelDir, modelDir, outputDir)) {
-                    PlatformInstantiatorExecutor executor = createExecutor();
-                    try {
+        String resourcesDir = validateDirectory(makeAbsolute(getResourcesDirectory()));
+        if (null == resourcesDir) {
+            resourcesDir = validateDirectory(makeAbsolute(getFallbackResourcesDirectory()));
+        }
+        String outputDir = adjustOutputDir(makeAbsolute(getOutputDirectory()));
+        String modelDir = makeAbsolute(getModelDirectory());
+        String metaModelDir = makeAbsolute(getMetaModelDirectory());
+        String[] args = {getModel(), modelDir, outputDir, getStartRule(), metaModelDir};
+        if (isModelDirectoryValid()) {
+            if (enableRun(metaModelDir, modelDir, outputDir)) {
+                PlatformInstantiatorExecutor executor = createExecutor();
+                try {
+                    if (asProcess) {
                         executor.executeAsProcess(getClass().getClassLoader(), resourcesDir, getTracingLevel(), 
                             composeMvnArgs(), args);
-                    } catch (ExecutionException e) {
-                        throw new MojoExecutionException(e.getMessage());
+                    } else {
+                        executor.execute(ClassLoader.getPlatformClassLoader(), resourcesDir, getTracingLevel(), 
+                            composeMvnArgs(), args);
                     }
-                } else {
-                    getLog().info("Skipped as code in output directory is newer than IVML model.");
+                } catch (ExecutionException e) {
+                    throw new MojoExecutionException(e.getMessage());
                 }
             } else {
-                getLog().info("Model directory is not valid. No IVML files found in " + getModelDirectory());
+                getLog().info("Skipped as code in output directory is newer than IVML model.");
             }
         } else {
-            executeDirect();
+            getLog().info("Model directory is not valid. No IVML files found in " + getModelDirectory());
         }
     }
     
@@ -471,53 +471,6 @@ public abstract class AbstractConfigurationMojo extends AbstractLoggingMojo impl
             mvnArgs += "-o";
         }
         return mvnArgs;
-    }
-
-    /**
-     * Executes the platform instantiator directly within this JVM. This may fail if there are significant
-     * library overlaps that can also not resolved by creating a dedicated classloader.
-     * 
-     * @throws MojoExecutionException if the Mojo fails in execution
-     * @throws MojoFailureException if the Mojo fails 
-     * @see #createEasyClassLoader()
-     */
-    private void executeDirect() throws MojoExecutionException, MojoFailureException {
-        System.setProperty(PlatformInstantiator.KEY_PROPERTY_TRACING, getTracingLevel());
-        System.setProperty(PlatformInstantiator.KEY_PROPERTY_MVNARGS, composeMvnArgs());
-        String resourcesDir = validateDirectory(makeAbsolute(getResourcesDirectory()));
-        if (null == resourcesDir) {
-            resourcesDir = validateDirectory(makeAbsolute(getFallbackResourcesDirectory()));
-        }
-        if (null != resourcesDir) {
-            System.setProperty("iip.resources", resourcesDir);
-        }
-        String outputDir = adjustOutputDir(makeAbsolute(getOutputDirectory()));
-        String modelDir = makeAbsolute(getModelDirectory());
-        String metaModelDir = makeAbsolute(getMetaModelDirectory());
-        String[] args = {getModel(), modelDir, outputDir, getStartRule(), metaModelDir};
-        try {
-            if (isModelDirectoryValid()) {
-                if (enableRun(metaModelDir, modelDir, outputDir)) {
-                    getLog().info("Calling platform instantiator with " + java.util.Arrays.toString(args) + ", tracing "
-                        + getTracingLevel() + (null == resourcesDir ? "" : " and resources dir " + resourcesDir));
-                    long start = System.currentTimeMillis();
-                    PlatformInstantiatorExecutor executor = createExecutor();
-                    PlatformInstantiator.setClassLoader(
-                        executor.createEasyClassLoader(ClassLoader.getPlatformClassLoader()));
-                    int exitCode = PlatformInstantiator.mainImpl(args);
-                    if (exitCode != 0) {
-                        throw new MojoExecutionException("Instantiation failed with exit code: " + exitCode);
-                    }
-                    recordExecutionTime(System.currentTimeMillis() - start);
-                } else {
-                    getLog().info("Skipped as code in output directory is newer than IVML model.");
-                }
-            } else {
-                getLog().info("Model directory is not valid. No IVML files found in " + getModelDirectory());
-            }
-        } catch (ExecutionException e) {
-            throw new MojoExecutionException(e.getMessage());
-        }
     }
 
     /**

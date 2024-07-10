@@ -20,6 +20,8 @@ import java.io.PrintWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -37,8 +39,6 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.model.fileset.FileSet;
-
-import com.google.common.io.Files;
 
 import de.iip_ecosphere.platform.configuration.maven.ProcessUnit.ProcessUnitBuilder;
 import de.iip_ecosphere.platform.configuration.maven.ProcessUnit.TerminationListener;
@@ -243,8 +243,8 @@ public class TestAppMojo extends AbstractLoggingMojo {
             FilesetUtils.streamFiles(artifacts, false).forEach(f -> {
                 File target = new File(new File(platformDir, "artifacts"), f.getName());
                 try {
-                    getLog().error("Copying artifact " + f + " to " + target);
-                    Files.copy(f, target);
+                    getLog().info("Copying artifact " + f + " to " + target);
+                    Files.copy(f.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 } catch (IOException e) {
                     getLog().error("Cannot copy artifact " + f + ":" + e.getMessage());
                 }
