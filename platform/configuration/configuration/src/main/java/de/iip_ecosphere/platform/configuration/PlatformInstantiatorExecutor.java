@@ -98,7 +98,7 @@ public class PlatformInstantiatorExecutor {
     }
         
     /**
-     * Executes the platform instantiator directly within an own JVM. This may fail if there are significant
+     * Executes the platform instantiator directly within an own JVM. This may be required if there are significant
      * library overlaps that can also not resolved by creating a dedicated classloader.
      * 
      * @param loader the class loader to load the classpath resource file
@@ -158,7 +158,41 @@ public class PlatformInstantiatorExecutor {
         }
         FileUtils.deleteQuietly(cpFile);
     }
-    
+
+    /**
+     * Executes the platform instantiator through an on class loader within this JVM. This may fail if there are 
+     * significant library overlaps that can also not resolved by creating a dedicated classloader.
+     * 
+     * @param loader the class loader to load the classpath resource file
+     * @param resourceDir the optional resources directory for the instantiation
+     * @param resourceDir the tracing level for the instantiation
+     * @param resourceDir the optional maven arguments for the instantiation (may be <b>null</b> for none)
+     * @param args the instantiator arguments
+     * @see #createEasyClassLoader(ClassLoader)
+     */
+    public void execute(ClassLoader loader, String resourcesDir, String tracingLevel, 
+        String mvnArgs, String... args) throws ExecutionException {
+        if (null != tracingLevel) {
+            System.setProperty(PlatformInstantiator.KEY_PROPERTY_TRACING, tracingLevel);
+        }
+        if (null != mvnArgs) {
+            System.setProperty(PlatformInstantiator.KEY_PROPERTY_MVNARGS, mvnArgs);
+        }
+        if (null != resourcesDir) {
+            System.setProperty("iip.resources", resourcesDir);
+        }
+        info.accept("Calling platform instantiator with " + java.util.Arrays.toString(args) + ", tracing "
+            + tracingLevel + (null == resourcesDir ? "" : " and resources dir " + resourcesDir));
+        long start = System.currentTimeMillis();
+        PlatformInstantiator.setClassLoader(createEasyClassLoader(loader));
+        int exitCode = PlatformInstantiator.mainImpl(args);
+        if (exitCode != 0) {
+            throw new ExecutionException("Instantiation failed with exit code: " + exitCode, null);
+        }
+        if (null != executionTimeConsumer) {
+            executionTimeConsumer.accept(System.currentTimeMillis() - start);
+        }
+    }
     
     /**
      * Constructs/relocates the class path for EASy-Producer from the {@code config.classpath} file
