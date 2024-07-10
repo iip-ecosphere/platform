@@ -18,10 +18,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.StandardCopyOption;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -29,7 +33,6 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.shared.utils.io.FileUtils;
 
 /**
  * Allows simple line-based modifications to a text file.
@@ -142,9 +145,11 @@ public class TextFileMojo extends AbstractMojo {
             if (isNonEmpty(replacements) && isNonEmpty(disabled)) {
                 getLog().info("Disabled replacement specs: " + disabled);
             }
-            File tmp = FileUtils.createTempFile("mvnTextFile", ".txt", null);
+            File tmp = null;
             try {
-                FileUtils.copyFile(file, tmp);
+                tmp = Files.createTempFile("mvnTextFile", ".txt").toFile();
+                Files.copy(file.toPath(), tmp.toPath(), LinkOption.NOFOLLOW_LINKS,
+                    StandardCopyOption.REPLACE_EXISTING);
             } catch (IOException e) {
                 throw new MojoExecutionException("Cannot copy source file " + file + ":" + e.getMessage());
             }
@@ -174,11 +179,7 @@ public class TextFileMojo extends AbstractMojo {
                 throw new MojoExecutionException("Cannot perform modifications:" + e.getMessage());
             }
 
-            try {
-                FileUtils.forceDelete(tmp);
-            } catch (IOException e) {
-                getLog().warn("Cannot delete tmp file: " + e.getMessage());
-            }
+            FileUtils.deleteQuietly(tmp);
             getLog().info("Modified file " + file);
         }
     }

@@ -37,9 +37,11 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
 import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
 
 import de.iip_ecosphere.platform.configuration.PlatformInstantiator;
+import de.iip_ecosphere.platform.configuration.PlatformInstantiatorExecutor;
 import de.iip_ecosphere.platform.configuration.maven.DependencyResolver.Caller;
 import de.iip_ecosphere.platform.tools.maven.python.AbstractLoggingMojo;
 import de.iip_ecosphere.platform.tools.maven.python.FileChangeDetector;
@@ -50,7 +52,7 @@ import de.iip_ecosphere.platform.tools.maven.python.FileChangeDetector;
  * @author Holger Eichelberger, SSE
  */
 public abstract class AbstractConfigurationMojo extends AbstractLoggingMojo implements Caller {
-
+    
     @Parameter(defaultValue = "${project}", required = true, readonly = true)
     private MavenProject project;
 
@@ -111,6 +113,9 @@ public abstract class AbstractConfigurationMojo extends AbstractLoggingMojo impl
     // different name, hook up with unpack
     @Parameter(property = "unpack.force", required = false, defaultValue = "false") 
     private boolean unpackForce;
+
+    @Parameter(required = false, defaultValue = "true")
+    private boolean asProcess;
 
     @Override
     public MavenProject getProject() {
@@ -411,12 +416,74 @@ public abstract class AbstractConfigurationMojo extends AbstractLoggingMojo impl
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        System.setProperty(PlatformInstantiator.KEY_PROPERTY_TRACING, getTracingLevel());
+        if (asProcess) {
+            String resourcesDir = validateDirectory(makeAbsolute(getResourcesDirectory()));
+            if (null == resourcesDir) {
+                resourcesDir = validateDirectory(makeAbsolute(getFallbackResourcesDirectory()));
+            }
+            String outputDir = adjustOutputDir(makeAbsolute(getOutputDirectory()));
+            String modelDir = makeAbsolute(getModelDirectory());
+            String metaModelDir = makeAbsolute(getMetaModelDirectory());
+            String[] args = {getModel(), modelDir, outputDir, getStartRule(), metaModelDir};
+            if (isModelDirectoryValid()) {
+                if (enableRun(metaModelDir, modelDir, outputDir)) {
+                    PlatformInstantiatorExecutor executor = createExecutor();
+                    try {
+                        executor.executeAsProcess(getClass().getClassLoader(), resourcesDir, getTracingLevel(), 
+                            composeMvnArgs(), args);
+                    } catch (ExecutionException e) {
+                        throw new MojoExecutionException(e.getMessage());
+                    }
+                } else {
+                    getLog().info("Skipped as code in output directory is newer than IVML model.");
+                }
+            } else {
+                getLog().info("Model directory is not valid. No IVML files found in " + getModelDirectory());
+            }
+        } else {
+            executeDirect();
+        }
+    }
+    
+    /**
+     * Creates an executor instance.
+     * 
+     * @return the instance
+     */
+    private PlatformInstantiatorExecutor createExecutor() {
+        File localRepo = null;
+        LocalRepository lr = getRepoSession().getLocalRepository();
+        if (lr != null) { // seems to fail at least in tests, usual fallback
+            localRepo = lr.getBasedir();
+        }
+        return new PlatformInstantiatorExecutor(localRepo, w -> getLog().warn(w), 
+            i -> getLog().info(i), t -> recordExecutionTime(t));
+    }
+    
+    /**
+     * Composes Maven execution arguments for EASy-Producer/Platform instantiator.
+     * 
+     * @return the Maven arguments
+     */
+    private String composeMvnArgs() {
         String mvnArgs = "";
         if (session.isOffline()) {
             mvnArgs += "-o";
         }
-        System.setProperty(PlatformInstantiator.KEY_PROPERTY_MVNARGS, mvnArgs);
+        return mvnArgs;
+    }
+
+    /**
+     * Executes the platform instantiator directly within this JVM. This may fail if there are significant
+     * library overlaps that can also not resolved by creating a dedicated classloader.
+     * 
+     * @throws MojoExecutionException if the Mojo fails in execution
+     * @throws MojoFailureException if the Mojo fails 
+     * @see #createEasyClassLoader()
+     */
+    private void executeDirect() throws MojoExecutionException, MojoFailureException {
+        System.setProperty(PlatformInstantiator.KEY_PROPERTY_TRACING, getTracingLevel());
+        System.setProperty(PlatformInstantiator.KEY_PROPERTY_MVNARGS, composeMvnArgs());
         String resourcesDir = validateDirectory(makeAbsolute(getResourcesDirectory()));
         if (null == resourcesDir) {
             resourcesDir = validateDirectory(makeAbsolute(getFallbackResourcesDirectory()));
@@ -434,6 +501,9 @@ public abstract class AbstractConfigurationMojo extends AbstractLoggingMojo impl
                     getLog().info("Calling platform instantiator with " + java.util.Arrays.toString(args) + ", tracing "
                         + getTracingLevel() + (null == resourcesDir ? "" : " and resources dir " + resourcesDir));
                     long start = System.currentTimeMillis();
+                    PlatformInstantiatorExecutor executor = createExecutor();
+                    PlatformInstantiator.setClassLoader(
+                        executor.createEasyClassLoader(ClassLoader.getPlatformClassLoader()));
                     int exitCode = PlatformInstantiator.mainImpl(args);
                     if (exitCode != 0) {
                         throw new MojoExecutionException("Instantiation failed with exit code: " + exitCode);

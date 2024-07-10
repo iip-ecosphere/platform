@@ -104,7 +104,8 @@ The goals support the following configuration settings:
   - `resourcesDirectory` optional folder containing resources to be included into the application (see platform handbook, default `resources.ipr`, `-Dconfiguration.resourcesDirectory=...`). If given and not absolute, the project base directory will be prepended.
   - `fallbackResourcesDirectory` optional folder containing resources to be included into the application if `resourcesDirectory` does not exist (see platform handbook, default `resources`, `-Dconfiguration.fallbackResourcesDirectory=...`). If given and not absolute, the project base directory will be prepended.
   - `adjustOutputDirectoryIfGenBroker` (default `true`,`-Dconfiguration.adjustOutputDirectoryIfGenBroker=...`) adjust the output directory to the sub-directory `broker` if the goal is `generateBroker` using any `gen` folder as parent, or if no `gen` folder is on the path, using the actual output directory as parent folder for `broker`.
-  - `force`(default `true`,`-Dconfiguration.force=...`) force the execution irrespective of file dates and `-Dunpack.force`
+  - `force` (default `true`,`-Dconfiguration.force=...`) force the execution irrespective of file dates and `-Dunpack.force`
+  - `asProcess` (default `true`) executes the platform instantiator in an own JVM process rather than within the Maven process. Although there are measures to separate the class loading of EASy-Producer/the configuration module from the caller, it seems that Maven loads some Google modules rather deeply into the JVM, which then collide with required xText dependencies. Thus, an execution as process is more bullet-proof.
   
 All goals take over the maven offline mode and pass it on to the instantiation for further consideration in maven sub-calls.
   

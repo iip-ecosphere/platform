@@ -125,12 +125,11 @@ public class DependencyResolver {
      * @param artifact the artifact to resolve
      * @return the resolved artifact, <b>null</b> for none
      */
-    private Artifact resolve(Artifact artifact) {
+    public Artifact resolve(Artifact artifact) {
         DefaultArtifact result = null;
         try {
             ArtifactRequest request = new ArtifactRequest();
-            request.setArtifact(new org.eclipse.aether.artifact.DefaultArtifact(artifact.getGroupId(), 
-                artifact.getArtifactId(), artifact.getClassifier(), artifact.getType(), artifact.getVersion()));
+            request.setArtifact(createAetherArtifact(artifact));
             request.setRepositories(caller.getRemoteRepos());
             ArtifactResult aetherResult = caller.getRepoSystem().resolveArtifact(caller.getRepoSession(), request);
             if (aetherResult.isResolved()) {
@@ -145,6 +144,17 @@ public class DependencyResolver {
             caller.getLog().warn("Artifact resolution problem: " + e.getMessage());
         }
         return result;
+    }
+    
+    /**
+     * Creates an aether artifact for a maven artifact.
+     * 
+     * @param artifact the maven artifact
+     * @return the aether artifact
+     */
+    private org.eclipse.aether.artifact.DefaultArtifact createAetherArtifact(Artifact artifact) {
+        return new org.eclipse.aether.artifact.DefaultArtifact(artifact.getGroupId(), 
+                artifact.getArtifactId(), artifact.getClassifier(), artifact.getType(), artifact.getVersion());
     }
 
     /**
@@ -164,12 +174,8 @@ public class DependencyResolver {
                 if (since.test(resolved.getFile())) {
                     changed = true;
                 } else {
-                    ProjectBuildingRequest buildingRequest = new DefaultProjectBuildingRequest(
-                        caller.getSession().getProjectBuildingRequest());
-                    buildingRequest.setProject(null);
                     try {
-                        MavenProject mavenProject = caller.getProjectBuilder().build(artifact, buildingRequest)
-                            .getProject();
+                        MavenProject mavenProject = createMavenProject(artifact);
                         for (Dependency d : mavenProject.getDependencies()) {
                             DefaultArtifact da = new DefaultArtifact(d.getGroupId(), d.getArtifactId(), 
                                 d.getVersion(), d.getScope(), "jar", "", JAR_HANDLER);
@@ -188,6 +194,24 @@ public class DependencyResolver {
     }
     
     /**
+     * Creates a Maven project instance.
+     * 
+     * @param artifact the artifact to return the Maven project instance for
+     * @return the Maven project instance, may be <b>null</b> if {@code artifact} is <b>null</b>
+     * @throws ProjectBuildingException if the project cannot be created
+     */
+    public MavenProject createMavenProject(Artifact artifact) throws ProjectBuildingException {
+        MavenProject result = null;
+        if (null != artifact) {
+            ProjectBuildingRequest buildingRequest = new DefaultProjectBuildingRequest(
+                caller.getSession().getProjectBuildingRequest());
+            buildingRequest.setProject(null);
+            result = caller.getProjectBuilder().build(artifact, buildingRequest).getProject();
+        }
+        return result;
+    }
+    
+    /**
      * Returns whether at least one of the given (snapshot) {@code artifacts} or its (snapshot) dependencies has changed
      * {@code since}. Stops artifact checking/resolution as soon as possible.
      * 
@@ -198,29 +222,43 @@ public class DependencyResolver {
     public boolean haveDependenciesChangedSince(List<String> artifacts, Predicate<File> since) {
         boolean changed = false;
         for (String a : artifacts) {
-            String[] tmp = a.split(":");
-            if (tmp.length >= 3) { //groupId:artifactId[:type[:classifier]]:version
-                String groupId = tmp[0];
-                String artifactId = tmp[1];
-                String version;
-                String type = "jar";
-                String classifier = "";
-                if (tmp.length == 3) {
-                    version = tmp[2];
-                } else if (tmp.length == 4) {
-                    type = tmp[2];
-                    version = tmp[3];
-                } else {
-                    type = tmp[2];
-                    classifier = tmp [3];
-                    version = tmp[4];
-                }
-                DefaultArtifact artifact = new DefaultArtifact(groupId, artifactId, version, "compile", 
-                    type, classifier, JAR_HANDLER);    
+            Artifact artifact = createArtifact(a, "compile");
+            if (null != artifact) {
                 changed = hasChanged(artifact, since);
             }
         }
         return changed;
+    }
+    
+    /**
+     * Creates an artifact instance.
+     * 
+     * @param artifact the textual artifact specification
+     * @param scope the resolution scope
+     * @return the artifact or <b>null</b> if none can be created
+     */
+    public static Artifact createArtifact(String artifact, String scope) {
+        Artifact result = null;
+        String[] tmp = artifact.split(":");
+        if (tmp.length >= 3) { //groupId:artifactId[:type[:classifier]]:version
+            String groupId = tmp[0];
+            String artifactId = tmp[1];
+            String version;
+            String type = "jar";
+            String classifier = "";
+            if (tmp.length == 3) {
+                version = tmp[2];
+            } else if (tmp.length == 4) {
+                type = tmp[2];
+                version = tmp[3];
+            } else {
+                type = tmp[2];
+                classifier = tmp [3];
+                version = tmp[4];
+            }
+            result = new DefaultArtifact(groupId, artifactId, version, scope, type, classifier, JAR_HANDLER);    
+        }
+        return result;
     }
     
     /**
