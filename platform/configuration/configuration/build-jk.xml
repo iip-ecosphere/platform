@@ -34,10 +34,10 @@
 
         <mvnDeployResolveArtifact folderName="IIP-test.configuration.configuration" pomFile="test.configuration.configuration/pom.xml" jarFolder="test.configuration.configuration/target" artifactPattern="apps.ServiceImpl-*.*.*.jar" />
 
-    	<ant dir="gen/tests/SimpleMesh/SimpleMeshTestingApp" antfile="build-jk.xml" />
+    	<!--<ant dir="gen/tests/SimpleMesh/SimpleMeshTestingApp" antfile="build-jk.xml" />
         <ant dir="gen/tests/SimpleMesh3/SimpleMeshTestingApp3" antfile="build-jk.xml" />
         <ant dir="gen/tests/KodexMesh/SimpleKodexTestingApp" antfile="build-jk.xml" />
-        <ant dir="gen/tests/RoutingTest/RoutingTestApp" antfile="build-jk.xml" />
+        <ant dir="gen/tests/RoutingTest/RoutingTestApp" antfile="build-jk.xml" />-->
     </target>
 	
 </project>

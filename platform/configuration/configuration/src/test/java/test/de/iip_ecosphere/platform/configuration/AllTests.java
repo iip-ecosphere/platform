@@ -27,7 +27,7 @@ import org.junit.runners.Suite;
     //IvmlSerializerConfig1Tests.class, // -> examples to allow for platform/mangementUi build before
     IvmlSerializerConfig1OldTests.class,
     IvmlRoutingTestTests.class,
-    //IvmlContainerTests.class,     // -> examples to allow for platform/mangementUi build before
+    IvmlContainerTests.class,
     //IvmlContainerLxcTests.class,  // -> examples to allow for platform/mangementUi build before
     StorageFactoryTest.class,
     FallbackLoggerTest.class,
