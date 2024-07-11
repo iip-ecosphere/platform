@@ -162,8 +162,7 @@
                      <descriptors>
                          <descriptor>src/main/assembly/assembly.xml</descriptor>
                      </descriptors>
-                     <appendAssemblyId>false</appendAssemblyId>
-                     <finalName>${project.build.finalName}-bin</finalName>
+                     <appendAssemblyId>true</appendAssemblyId>
                  </configuration>
              </execution>
          </executions>
