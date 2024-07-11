@@ -525,7 +525,7 @@ class RowProcessor {
     }
 
     /**
-     * Extracts, converts and finally sets a semantic id passed in from {@code value} through {@link setter}.
+     * Extracts, converts and finally sets a semantic id passed in from {@code value} through {@code setter}.
      * 
      * @param setter the semanticId setter
      * @param value the actual value representing the semantic id (usually prefixed by [IRI] or [IRDI])
@@ -612,7 +612,7 @@ class RowProcessor {
      * In case that field rows are split into two, post-process the last field by adding
      * the field's description and example values. 
      * 
-     * @see #setExampleValues(String, AasField)
+     * @see #setExampleValues(String, List, AasField)
      */
     private void postProcessFourColumns() { // IDTA 2007-1-0
         if (lastField != null) { 
@@ -856,7 +856,7 @@ class RowProcessor {
      * 
      * @param data the cell data
      * @param field the field to be modified as a side effect
-     * @see #processValueTypeExampleOneLine(String[], AasField)
+     * @see #processValueTypeExampleOneLine(String, AasField)
      */
     private void processValueTypeExample(String data, AasField field) {
         // topic: n/a IDTA-02002-0-12 others empty IDTA-02011-1-0
@@ -1186,7 +1186,7 @@ class RowProcessor {
     /**
      * Notified when reading of the specification is completed.
      * 
-     * @see #storeAsCurrent(AasType)
+     * @see #storeAsCurrent(List)
      */
     void readingCompleted() {
         storeAsCurrent(null);

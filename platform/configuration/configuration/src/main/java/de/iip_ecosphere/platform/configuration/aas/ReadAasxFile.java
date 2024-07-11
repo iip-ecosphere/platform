@@ -156,7 +156,6 @@ public class ReadAasxFile {
      * 
      * @param node the node to iterate over
      * @param function the function to apply to each child
-     * @see #getIterableChildsCount(Node)
      */
     private static void iterateChilds(Node node, Consumer<Node> function) {
         NodeList nodeList = node.getChildNodes();
@@ -780,7 +779,7 @@ public class ReadAasxFile {
         }
         
         /**
-         * Sets example values splitting the actual value in {@data} heuristically into multiple ones if needed.
+         * Sets example values splitting the actual value in {@code data} heuristically into multiple ones if needed.
          * 
          * @param data the data
          * @param field the target field

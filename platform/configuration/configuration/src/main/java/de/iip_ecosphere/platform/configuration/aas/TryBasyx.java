@@ -31,7 +31,7 @@ import de.iip_ecosphere.platform.support.plugins.PluginManager;
 public class TryBasyx {
     
     /**
-     * Returns the AAS factory to use, based on {@link #aasFactoryPluginId}.
+     * Returns the AAS factory to use, based on {@code aasFactoryPluginId}.
      *
      * @param aasFactoryPluginId the plugin id of the AAS factory to use
      * @return the factory to use

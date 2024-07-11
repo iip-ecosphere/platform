@@ -102,9 +102,9 @@ public class PlatformInstantiatorExecutor {
      * library overlaps that can also not resolved by creating a dedicated classloader.
      * 
      * @param loader the class loader to load the classpath resource file
-     * @param resourceDir the optional resources directory for the instantiation
-     * @param resourceDir the tracing level for the instantiation
-     * @param resourceDir the optional maven arguments for the instantiation (may be <b>null</b> for none)
+     * @param resourcesDir the optional resources directory for the instantiation
+     * @param tracingLevel the tracing level for the instantiation
+     * @param mvnArgs optional maven arguments for the instantiation (may be <b>null</b> for none)
      * @param args the instantiator arguments
      * @see #createEasyClassLoader(ClassLoader)
      */
@@ -164,9 +164,9 @@ public class PlatformInstantiatorExecutor {
      * significant library overlaps that can also not resolved by creating a dedicated classloader.
      * 
      * @param loader the class loader to load the classpath resource file
-     * @param resourceDir the optional resources directory for the instantiation
-     * @param resourceDir the tracing level for the instantiation
-     * @param resourceDir the optional maven arguments for the instantiation (may be <b>null</b> for none)
+     * @param resourcesDir the optional resources directory for the instantiation
+     * @param tracingLevel the tracing level for the instantiation
+     * @param mvnArgs optional maven arguments for the instantiation (may be <b>null</b> for none)
      * @param args the instantiator arguments
      * @see #createEasyClassLoader(ClassLoader)
      */
@@ -199,7 +199,6 @@ public class PlatformInstantiatorExecutor {
      * in configuration.configuration.
      * 
      * @param loader the resource class loader
-     * @param warn a warning consumer
      * @return the classpath, <b>null</b> if creating the classpath fails
      */
     public List<String> createEasyClasspath(ClassLoader loader) {
@@ -238,11 +237,9 @@ public class PlatformInstantiatorExecutor {
     /**
      * Creates a focused class loader for EASy-Producer. We assume that all dependencies are resolved.
      * 
-     * @param localRepo the local Maven repository, may be <b>null</b>
      * @param parent the parent class loader
-     * @param warn a warning consumer
      * @return the class loader, may be <b>null</b> for none
-     * @see #createEasyClasspath()
+     * @see #createEasyClasspath(ClassLoader)
      */
     public ClassLoader createEasyClassLoader(ClassLoader parent) {
         ClassLoader result = null;

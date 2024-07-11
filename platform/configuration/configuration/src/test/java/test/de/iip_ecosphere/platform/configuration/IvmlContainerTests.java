@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
+import org.apache.commons.lang.SystemUtils;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.configuration.PlatformInstantiatorExecutor;
@@ -36,6 +37,7 @@ public class IvmlContainerTests extends AbstractIvmlTests {
      */
     @Test
     public void testContainerTest() throws ExecutionException, IOException {
+        org.junit.Assume.assumeTrue(!SystemUtils.IS_OS_WINDOWS);
         final String dockerFailProp = "easy.docker.failOnError";
         System.setProperty(dockerFailProp, "false"); // fails sometimes in CI due to unknown docker problems??
         

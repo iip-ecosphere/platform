@@ -133,7 +133,7 @@ public abstract class SemanticIdRecognizer {
      * @param value the value
      * @param addPrefix whether the platform prefix from {@link #getIdentifierPrefix()} shall be prefixed
      * @return the prefix, <b>null</b> for none
-     * @see #getSemanticId(String)
+     * @see #getSemanticIdFrom(String, boolean, boolean)
      * @see #handles(String)
      */
     public static String getSemanticIdFrom(String value, boolean addPrefix) {
@@ -147,7 +147,6 @@ public abstract class SemanticIdRecognizer {
      * @param addPrefix whether the platform prefix from {@link #getIdentifierPrefix()} shall be prefixed
      * @param fromPath if {@code value} is a path, consider the relevant semantic id from the path
      * @return the prefix, <b>null</b> for none
-     * @see #getSemanticId(String)
      * @see #handles(String)
      */
     public static String getSemanticIdFrom(String value, boolean addPrefix, boolean fromPath) {
@@ -177,7 +176,6 @@ public abstract class SemanticIdRecognizer {
      * 
      * @param value the value
      * @return the prefix, <b>null</b> for none
-     * @see #getSemanticId(String)
      * @see #handles(String)
      */
     public static boolean isSemanticId(String value) {

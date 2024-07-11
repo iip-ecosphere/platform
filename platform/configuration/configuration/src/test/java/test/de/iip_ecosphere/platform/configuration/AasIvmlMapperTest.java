@@ -606,7 +606,7 @@ public class AasIvmlMapperTest {
     }
     
     /**
-     * Tests {@link AasIvmlMapper#getVariableName(String, String)}.
+     * Tests {@link AasIvmlMapper#getVariableName(String, String, String)}.
      */
     @Test
     public void testGetVariableName() {

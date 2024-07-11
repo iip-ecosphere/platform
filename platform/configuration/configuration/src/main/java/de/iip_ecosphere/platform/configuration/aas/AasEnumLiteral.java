@@ -39,10 +39,10 @@ public class AasEnumLiteral extends AbstractAasElement {
     }
 
     /**
-     * Returns the identifier to be used instead of {@link #getName()} to form the programming
+     * Returns the identifier to be used to form the programming
      * language identifier of the literal.
      * 
-     * @return the identifier, may be <b>null</b> to use {@link #getName()} instead
+     * @return the identifier, may be <b>null</b>
      */
     public String getIdentifier() {
         return identifier;
