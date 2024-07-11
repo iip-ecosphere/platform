@@ -138,11 +138,10 @@ public class LxcContainerManager extends AbstractContainerManager<LxcContainerDe
     /**
      * 
      * Adds a container from a tarball that can be created with distrobuilder and a
-     * template or via exporting an image.
+     * template or via exporting an image. Maybe add function to create tarball with 
+     * distrobuilder in this method.
      * 
-     * @see maybe add function to create tarball with distrobuilder in this method
      * @param location the location where the Yaml with container info is
-     * 
      * @return containerName, the name of the created container
      * @throws ExecutionException if adding the container failed
      **/
@@ -525,7 +524,7 @@ public class LxcContainerManager extends AbstractContainerManager<LxcContainerDe
 
     /**
      * Copy/import an image from a remote server that is defined in
-     * {@coder RemoteServer.java} and set up on localhost.
+     * {@code RemoteServer.java} and set up on localhost.
      * 
      * @param remote      the RemoteServer where the wanted image is stored
      * @param remoteImage the name of the image that is going to be copied

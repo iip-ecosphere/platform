@@ -132,7 +132,7 @@ public class IipEcospherePrometheusExporter extends MonitoringReceiver {
 
     /**
      * The default metrics servlet. Adapted from 
-     * {@link import si.matjazcerkvenik.alertmonitor.web.PrometheusMetricsServlet} as that class is not sufficiently 
+     * {@code si.matjazcerkvenik.alertmonitor.web.PrometheusMetricsServlet} as that class is not sufficiently 
      * configurable/reusable. 
      * 
      * @author Holger Eichelberger, SSE

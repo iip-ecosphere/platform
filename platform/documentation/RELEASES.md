@@ -1,10 +1,13 @@
 # oktoflow platform: Releases
 
-### Version 0.7.0 (consolidation):
+### Version 0.7.1 (consolidation, JDK 17):
 
 In progress:
+* [#106](https://github.com/iip-ecosphere/platform/issues/106): Migration to JDK 17
 * [#164](https://github.com/iip-ecosphere/platform/issues/164): UI design revision
 * [#117](https://github.com/iip-ecosphere/platform/issues/117): Multiple service managers per device
+
+### Version 0.7.0 (2024/07/11, no maven central release):
 
 New features:
 * Maven plugins/goals: explicit resource deletion and oktoflow application testing/platform starting
@@ -26,6 +29,7 @@ New features:
 * AAS abstraction/integration: referenceElement, multiLanguageProperties, entity, more semanticIds, [IDTA 02004-1-2 Handover Documentation](https://industrialdigitaltwin.org/wp-content/uploads/2023/03/IDTA-02004-1-2_Submodel_Handover-Documentation.pdf), [IDTA 02011-1-0 Hierarchical Structures enabling Bills of Material](https://industrialdigitaltwin.org/wp-content/uploads/2023/04/IDTA-02011-1-0_Submodel_HierarchicalStructuresEnablingBoM.pdf),  [IDTA 2023-01-24 Draft Submodel PCF](https://github.com/admin-shell-io/submodel-templates/tree/main/development/Carbon%20Footprint/1/0), [IDTA 02008-1-1 Time Series Data](https://industrialdigitaltwin.org/en/wp-content/uploads/sites/2/2023/03/IDTA-02008-1-1_Submodel_TimeSeriesData.pdf), [IDTA 02002-1-0 Submodel for Contact Information](https://industrialdigitaltwin.org/wp-content/uploads/2022/10/IDTA-02002-1-0_Submodel_ContactInformation.pdf), [IDTA 02007-1-0 Nameplate for Software in Manufacturing](https://industrialdigitaltwin.org/wp-content/uploads/2023/08/IDTA-02007-1-0_Submodel_Software-Nameplate.pdf) and related examples/tests including the XMAS AAS
 
 Improvements:
+* [#106](https://github.com/iip-ecosphere/platform/issues/106): Preprations for JDK 17 on JDK 13
 * [#156](https://github.com/iip-ecosphere/platform/issues/156): UI regression tests including in-test execution of platform, (un)deployment of app
 * [#151](https://github.com/iip-ecosphere/platform/issues/151): UI CORS
 * [#155](https://github.com/iip-ecosphere/platform/issues/155): Align model locations to Maven, examples now use ''target/easy'' for the meta model and ''src/main/easy'' for the production configuration model. **For old example checkouts, delete all uncommitted files in ''src/main/easy'' that are also in ''target/easy''**.

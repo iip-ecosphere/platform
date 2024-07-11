@@ -9,7 +9,7 @@
   <parent>
      <groupId>de.iip-ecosphere.platform</groupId>
      <artifactId>platformDependencies</artifactId>
-     <version>0.7.0-SNAPSHOT</version>
+     <version>0.7.1-SNAPSHOT</version>
      <relativePath/>
   </parent>
   
@@ -177,7 +177,6 @@
                            <appArg>--browsers=ChromeHeadless</appArg>
                            <appArg>--code-coverage</appArg>
                        </appArgs>
-                       <errToIn>true</errToIn>
                        <testTime>540000</testTime>
                        <platformDir>${platformDir}</platformDir>
                        <artifacts>

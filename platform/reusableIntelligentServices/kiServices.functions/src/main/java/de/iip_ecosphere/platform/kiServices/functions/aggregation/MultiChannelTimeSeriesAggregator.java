@@ -59,13 +59,13 @@ public class MultiChannelTimeSeriesAggregator <I, CI, O, D, T> {
          * 
          * @param category the category the aggregation was performed for
          * @param data the data collected over various point in times until 
-         *     {@link AggregationFunction#chunkCompleted(int, Date)}
+         *     {@link AggregationFunction#chunkCompleted(int, Object)}
          * @param timestamp the aggrgation time stamp
          */
         public void addData(String category, List<D> data, T timestamp);
 
         /**
-         * Builds the data after one or multiple calls to {@link #addData(String, List, Date)}.
+         * Builds the data after one or multiple calls to {@link #addData(String, List, Object)}.
          * @return the output instance
          */
         public O build();

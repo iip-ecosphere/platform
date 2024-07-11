@@ -50,10 +50,10 @@ public class LxcContainerManagerTest {
     public void testContainerManager()
             throws URISyntaxException, ExecutionException, InterruptedException, IOException {
 
-        // Some assumtions made for Jenkins to run test successfully
+        // Some assumptions made for Jenkins to run test successfully
         // To activate test again either assume false or set
         // "!SystemUtils.IS_OS_WINDOWS"
-        Assume.assumeTrue(SystemUtils.IS_OS_WINDOWS);
+        Assume.assumeFalse(SystemUtils.IS_OS_WINDOWS);
         Assume.assumeTrue(!SystemUtils.USER_HOME.startsWith("/home/"));
 
         String userHome = System.getProperty("user.home");
@@ -77,8 +77,8 @@ public class LxcContainerManagerTest {
 
         // ---- Adding container -----------------
         String workingDir = System.getProperty("user.dir");
-        String imageLocationStr = "file://" + workingDir + "/src/test/resources/";
-        URI location = new URI(imageLocationStr);
+        File imageLocation = new File(workingDir, "/src/test/resources/");
+        URI location = imageLocation.toURI();
 
         // Is the id of the container same as in the yaml file?
         Assert.assertEquals(testName, cm.addContainer(location));

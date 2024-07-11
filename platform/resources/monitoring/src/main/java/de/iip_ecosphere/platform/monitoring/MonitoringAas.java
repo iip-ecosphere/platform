@@ -112,7 +112,7 @@ public class MonitoringAas implements AasContributor {
     }
     
     /**
-     * A trace reception callback calling {@link MonitoringAas#handleNew(TraceRecord) TraceToAas} in own threads.
+     * A trace reception callback calling {@link MonitoringAas#handleNew(Alert) TraceToAas} in own threads.
      * 
      * @author Holger Eichelberger, SSE
      */

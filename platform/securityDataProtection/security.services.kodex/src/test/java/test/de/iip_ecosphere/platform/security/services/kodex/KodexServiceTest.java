@@ -182,7 +182,7 @@ public class KodexServiceTest {
      * @throws ExecutionException in case of service execution failures
      * @throws IOException in case of I/O related problems
      */
-    @Test(timeout = 6 * 60 * 1000)
+    @Test(timeout = 8 * 60 * 1000)
     public void testKodexService() throws IOException, ExecutionException {
         AtomicInteger receivedCount = new AtomicInteger(0);
         ReceptionCallback<OutData> rcp = new ReceptionCallback<OutData>() {
@@ -232,7 +232,7 @@ public class KodexServiceTest {
         service.setState(ServiceState.STARTING);
         setCount(0);
         setStartTime(System.currentTimeMillis());
-        int max = measure ? 15000 : 100;
+        int max = measure ? 15000 : 500;
         for (int i = 0; i < max; i++) {
             process(service, new InData("test", "test"));
         }

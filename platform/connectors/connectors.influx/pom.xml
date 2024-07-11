@@ -1,4 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	
 	<modelVersion>4.0.0</modelVersion>
 	
@@ -10,19 +10,20 @@
 	<parent>
 		<groupId>de.iip-ecosphere.platform</groupId>
 		<artifactId>platformDependencies</artifactId>
-		<version>0.7.0-SNAPSHOT</version>
-		<relativePath />
+		<version>0.7.1-SNAPSHOT</version>
+		<relativePath/>
 	</parent>
 	
 	<properties>
 	    <powermock.version>2.0.9</powermock.version>
+	    <argLine>--add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.time=ALL-UNNAMED --add-opens=java.base/java.lang.reflect=ALL-UNNAMED</argLine>
 	</properties>
 
 	<dependencies>
 		<dependency>
 			<groupId>com.influxdb</groupId>
 			<artifactId>influxdb-client-java</artifactId>
-			<version>6.12.0</version> <!-- JDK 17 > 7.0.0 -->
+			<version>7.1.0</version> <!-- JDK 17 > 7.0.0 -->
         </dependency>
 		<dependency>
 			<groupId>de.iip-ecosphere.platform</groupId>

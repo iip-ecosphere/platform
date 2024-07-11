@@ -67,7 +67,7 @@ public class MonitoringSetup extends AbstractSetup {
     }
 
     /**
-     * Reads a {@link MonitoringSetup} instance from {@link AbstractSetup#DEFAULT_FNAME) in the root folder 
+     * Reads a {@link MonitoringSetup} instance from {@link AbstractSetup#DEFAULT_FNAME} in the root folder 
      * of the jar/classpath. 
      *
      * @return the configuration instance

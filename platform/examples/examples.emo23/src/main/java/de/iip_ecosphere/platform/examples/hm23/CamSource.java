@@ -31,8 +31,8 @@ import iip.datatypes.CommandImpl;
 import iip.datatypes.ImageInput;
 import iip.datatypes.ImageInputImpl;
 import iip.impl.CamImageSourceImpl;
-import net.ssehub.easy.instantiation.core.model.artifactModel.FileUtils;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.slf4j.LoggerFactory;
