@@ -59,8 +59,8 @@
     </module>
 
     <module name="JavadocMethod">
-        <property name="excludeScope" value="anoninner"/>
-		<property name="scope" value="private"/>
+        <!--<property name="excludeScope" value="anoninner"/>-->
+		<property name="accessModifiers" value="private"/>
 		<property name="severity" value="error"/>
 	</module>
 	<module name="MissingJavadocMethod">

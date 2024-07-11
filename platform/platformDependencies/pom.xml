@@ -3,7 +3,7 @@
 
   <groupId>de.iip-ecosphere.platform</groupId>
   <artifactId>platformDependencies</artifactId>
-  <version>0.7.0-SNAPSHOT</version>
+  <version>0.7.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>platformDependencies</name>
@@ -166,7 +166,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     
-    <iip.version>0.7.0-SNAPSHOT</iip.version> <!-- project.version is always narrowest version -> plugins -->
+    <iip.version>0.7.1-SNAPSHOT</iip.version> <!-- project.version is always narrowest version -> plugins -->
 
     <org.slf4j.version>1.7.25</org.slf4j.version>
     <com.googlecode.json-simple.version>1.1.1</com.googlecode.json-simple.version>
@@ -180,7 +180,7 @@
     <!-- If changed, check against forced JUnit provider -->
     <junit.version>4.12</junit.version>
     <rabbitmq.version>5.15.0</rabbitmq.version>
-    <com.hivemq.version>2020.4</com.hivemq.version> <!-- Requires JDK 11 -->
+    <com.hivemq.version>2024.6</com.hivemq.version>
     <io.moquette.version>0.13</io.moquette.version>
     <org.apache.qpid.version>9.0.0</org.apache.qpid.version>
     
@@ -198,20 +198,22 @@
     <org.apache.maven.jar.version>3.2.0</org.apache.maven.jar.version>
     <org.apache.maven.surefire.version>3.0.0-M3</org.apache.maven.surefire.version>
     <org.apache.maven.assembly.version>3.1.1</org.apache.maven.assembly.version>
-    <org.jacoco.maven.jacoco.version>0.8.8</org.jacoco.maven.jacoco.version>
+    <org.jacoco.maven.jacoco.version>0.8.12</org.jacoco.maven.jacoco.version>
     <org.spring.boot.maven.version>2.4.2</org.spring.boot.maven.version>
-    <net.ssehub.easyProducer.version>1.3.6-SNAPSHOT</net.ssehub.easyProducer.version>
-    <com.google.guava.version>22.0</com.google.guava.version>
+    <net.ssehub.easyProducer.version>1.3.10-SNAPSHOT</net.ssehub.easyProducer.version>
+    <!--<com.google.guava.version>22.0</com.google.guava.version>-->
 
     <!-- for now due to edge deployment/initial experience -->
-    <maven.compiler.target>11</maven.compiler.target>
-    <maven.compiler.source>11</maven.compiler.source>
+    <maven.compiler.target>17</maven.compiler.target>
+    <maven.compiler.source>17</maven.compiler.source>
     <java.encoding>Cp1252</java.encoding>
     
     <maven.build.cache.exclude.value.1>gen</maven.build.cache.exclude.value.1> <!-- all examples -->
     <maven.build.cache.exclude.value.2>tomcat.*</maven.build.cache.exclude.value.2> <!-- temporary test dir -->
     <maven.build.cache.exclude.value.3>work</maven.build.cache.exclude.value.3> <!-- temporary test dir -->
     <maven.build.cache.exclude.value.4>null</maven.build.cache.exclude.value.4> <!-- Docker cfg bug -->
+    
+    <maven.build.cache.enabled>false</maven.build.cache.enabled> <!--  fails on windows -->
   </properties>
 
   <repositories>       
@@ -291,11 +293,11 @@
       
       <!-- Due to sudden conflicts in testing -->
       
-      <dependency>
+      <!--<dependency>
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
         <version>${com.google.guava.version}</version>
-      </dependency>
+      </dependency>-->
     
       <!-- Commons stuff -->
 
@@ -501,6 +503,7 @@
           <failOnError>false</failOnError>
           <detectJavaApiLink>false</detectJavaApiLink> 
           <detectOfflineLinks>false</detectOfflineLinks>
+          <doclint>all,-missing</doclint>
         </configuration>
         <executions>
           <execution>
@@ -791,7 +794,7 @@
 		    <groupId>org.apache.maven.extensions</groupId>
 		    <artifactId>maven-build-cache-extension</artifactId>
 		    <version>1.2.0</version>
-		</extension>    -->
+		</extension>-->
       <!-- Enabling the use of SSH -->
       <extension>
         <groupId>org.apache.maven.wagon</groupId>
