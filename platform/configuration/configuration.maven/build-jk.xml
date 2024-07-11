@@ -9,6 +9,7 @@
 	<target name="maven"> 
 	    <maven pomFile="pom.xml" goal="install">
 	        <arg value="-Djava8.home=/usr/lib/jvm/java-8-openjdk-amd64/bin/java"/>
+	    	<arg value="-Dmaven.home=${maven.bin.dir}"/>
 	    </maven>
 		<mvnDeployResolveArtifact folderName="IIP-configurationMaven" pomFile="pom.xml" jarFolder="target" artifactPattern="configuration-plugin-*.*.*.jar" />
 	</target>

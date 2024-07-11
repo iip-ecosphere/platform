@@ -47,6 +47,7 @@ public class ProcessUnit {
         CollectionUtils.toSet("ant", "ng", "npm", "mvn"));
     public static final String[] WIN_BAT_PREFIX = {"cmd", "/s", "/c"};
     public static final int UNKOWN_EXIT_STATUS = Integer.MIN_VALUE;
+    public static final String MAVEN_HOME = System.getProperty("maven.home");
     private static Timer timer;
     
     private String description;
@@ -399,7 +400,15 @@ public class ProcessUnit {
                 addArguments(ProcessUnit.WIN_BAT_PREFIX);
                 enableArgumentAggregation();
             }
-            addArgument("mvn");
+            String path = MAVEN_HOME;
+            if (path != null) {
+                if (!path.endsWith(File.separator)) {
+                    path += File.separator;
+                }
+            } else {
+                path = "";
+            }
+            addArgument(path + "mvn");
             return this;
         }
 
