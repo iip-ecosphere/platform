@@ -47,7 +47,7 @@ public class ProcessUnit {
         CollectionUtils.toSet("ant", "ng", "npm", "mvn"));
     public static final String[] WIN_BAT_PREFIX = {"cmd", "/s", "/c"};
     public static final int UNKOWN_EXIT_STATUS = Integer.MIN_VALUE;
-    public static final String MAVEN_HOME = System.getProperty("maven.home");
+    public static final String MAVEN_HOME = System.getProperty("okto.mvn.home");
     private static Timer timer;
     
     private String description;
