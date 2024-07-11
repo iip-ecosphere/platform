@@ -171,6 +171,7 @@
                          <descriptor>src/main/assembly/assembly.xml</descriptor>
                      </descriptors>
                      <appendAssemblyId>false</appendAssemblyId>
+                     <attach>true</attach>
                  </configuration>
              </execution>
              <execution>
@@ -185,6 +186,7 @@
                      </descriptors>
                      <finalName>${project.build.finalName}-spring</finalName>
                      <appendAssemblyId>false</appendAssemblyId>
+                     <attach>true</attach>
                  </configuration>
              </execution>
          </executions>
