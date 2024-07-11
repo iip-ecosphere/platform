@@ -206,7 +206,7 @@ public class AbstractInvokerMojo extends AbstractMojo implements Logger { // Abs
      * 
      * @return the request
      * @see #createBasicInvocationRequest()
-     * @see #passThroughSysProperties(InvocationRequest, Properties)
+     * @see #passThroughSysProperties(InvocationRequest)
      * @see #passThroughEnvSettings(InvocationRequest)
      */
     private InvocationRequest createInvocationRequest() {
