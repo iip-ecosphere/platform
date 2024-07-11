@@ -33,8 +33,10 @@ import io.micrometer.core.instrument.MeterRegistry;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.CapacityBaseUnit;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsAasConstants;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsAasConstructor;
-import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsAasConstructor.CollectionSupplier;
-import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsAasConstructor.PushMeterPredicate;
+import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsAasConstructor
+    .CollectionSupplier;
+import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsAasConstructor
+    .PushMeterPredicate;
 import de.iip_ecosphere.platform.support.aas.AasUtils;
 import de.iip_ecosphere.platform.support.aas.ElementsAccess;
 import de.iip_ecosphere.platform.support.aas.Property;
