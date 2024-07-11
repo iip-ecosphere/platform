@@ -8,7 +8,7 @@
   <parent>
      <groupId>de.iip-ecosphere.platform</groupId>
      <artifactId>platformDependencies</artifactId>
-     <version>0.7.0-SNAPSHOT</version>
+     <version>0.7.1-SNAPSHOT</version>
      <relativePath/>
   </parent>
   
@@ -247,6 +247,7 @@
                             <descriptor>src/main/assembly/plugin.xml</descriptor>
                             <descriptor>src/main/assembly/core.xml</descriptor>
                         </descriptors>
+                        <attach>true</attach>
                     </configuration>
                 </execution>
             </executions>

@@ -20,7 +20,8 @@ import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.AssetKind;
 import de.iip_ecosphere.platform.support.aas.LangString;
 import de.iip_ecosphere.platform.support.aas.types.contactInformations.ContactInformationsBuilder;
-import de.iip_ecosphere.platform.support.aas.types.contactInformations.ContactInformationsBuilder.ContactInformationBuilder;
+import de.iip_ecosphere.platform.support.aas.types.contactInformations.ContactInformationsBuilder
+    .ContactInformationBuilder;
 import de.iip_ecosphere.platform.support.aas.types.contactInformations.ContactInformationsBuilder.RoleOfContactPerson;
 import de.iip_ecosphere.platform.support.aas.types.contactInformations.ContactInformationsBuilder.TypeOfEmailAddress;
 import de.iip_ecosphere.platform.support.aas.types.contactInformations.ContactInformationsBuilder.TypeOfFaxNumber;

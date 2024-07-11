@@ -21,7 +21,8 @@ import de.iip_ecosphere.platform.support.aas.AssetKind;
 import de.iip_ecosphere.platform.support.aas.LangString;
 import de.iip_ecosphere.platform.support.aas.types.softwareNameplate.SoftwareNameplateBuilder;
 import de.iip_ecosphere.platform.support.aas.types.softwareNameplate.SoftwareNameplateBuilder.ConfigurationPathsBuilder;
-import de.iip_ecosphere.platform.support.aas.types.softwareNameplate.SoftwareNameplateBuilder.SoftwareNameplateInstanceBuilder;
+import de.iip_ecosphere.platform.support.aas.types.softwareNameplate.SoftwareNameplateBuilder
+    .SoftwareNameplateInstanceBuilder;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 
 /**

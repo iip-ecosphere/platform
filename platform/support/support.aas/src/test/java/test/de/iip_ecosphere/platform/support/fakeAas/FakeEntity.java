@@ -28,7 +28,8 @@ import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.Reference;
 import de.iip_ecosphere.platform.support.aas.ReferenceElement;
 import de.iip_ecosphere.platform.support.aas.RelationshipElement;
-import test.de.iip_ecosphere.platform.support.fakeAas.FakeSubmodelElementCollection.FakeSubmodelElementCollectionBuilder;
+import test.de.iip_ecosphere.platform.support.fakeAas.FakeSubmodelElementCollection
+    .FakeSubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;

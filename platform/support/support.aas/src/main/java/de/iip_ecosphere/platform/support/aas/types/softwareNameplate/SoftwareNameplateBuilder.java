@@ -26,7 +26,8 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.aas.types.common.DelegatingSubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.types.common.DelegatingSubmodelElementCollectionBuilder;
-import de.iip_ecosphere.platform.support.aas.types.contactInformations.ContactInformationsBuilder.ContactInformationBuilder;
+import de.iip_ecosphere.platform.support.aas.types.contactInformations.ContactInformationsBuilder
+    .ContactInformationBuilder;
 
 /**
  * Support for IDTA 2007-1-0 Nameplate for Software in Manufacturing.

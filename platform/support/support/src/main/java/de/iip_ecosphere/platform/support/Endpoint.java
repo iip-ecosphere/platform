@@ -135,7 +135,8 @@ public class Endpoint extends ServerAddress {
             Schema schema = Schema.valueOf(u.getScheme().toUpperCase());
             return new Endpoint(schema, u.getHost(), u.getPort(), u.getPath());
         } catch (URISyntaxException | IllegalArgumentException | NullPointerException e) {
-            LoggerFactory.getLogger(Endpoint.class).error("Cannot construct endpoint: {}", e.getMessage());
+            LoggerFactory.getLogger(Endpoint.class).error("Cannot construct endpoint for {}: {}", uri, 
+                e.getMessage());
             return null;
         } 
     }

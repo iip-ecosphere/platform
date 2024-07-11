@@ -9,14 +9,14 @@
   <parent>
      <groupId>de.iip-ecosphere.platform</groupId>
      <artifactId>platformDependencies</artifactId>
-     <version>0.7.0-SNAPSHOT</version>
+     <version>0.7.1-SNAPSHOT</version>
      <relativePath/>
   </parent>
   
   <properties>
     <maven.compiler.target>8</maven.compiler.target>
     <maven.compiler.source>8</maven.compiler.source>
-    <iip.version>0.7.0-SNAPSHOT</iip.version> <!-- automatically repaced for releases -->
+    <iip.version>0.7.1-SNAPSHOT</iip.version> <!-- automatically repaced for releases -->
   </properties>
 
   <dependencies>
@@ -112,8 +112,7 @@
 	            <configuration>
 	              <target>
 	                <jar destfile="target/pluginTest.jar">
-					    <fileset dir="target/test-classes"
-					        includes="test/iip_ecosphere/platform/support/plugins/*.class"/>
+					    <fileset dir="target/test-classes" includes="test/iip_ecosphere/platform/support/plugins/*.class"/>
                         <fileset dir="src/test/plugins/resources"/>
 	                </jar>
 	                <delete dir="target/test-classes/test/iip_ecosphere/platform/support/plugins"/>
