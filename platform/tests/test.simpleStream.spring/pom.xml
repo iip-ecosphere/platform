@@ -126,7 +126,7 @@
       <plugin>
          <groupId>org.apache.maven.plugins</groupId>
          <artifactId>maven-assembly-plugin</artifactId>
-         <version>3.1.1</version>
+         <version>3.7.1</version>
          <executions>
              <execution>
                  <id>hivemqv5</id>
@@ -184,8 +184,8 @@
                      <descriptors>
                          <descriptor>src/main/assembly/serviceZipAssembly.xml</descriptor>
                      </descriptors>
-                     <finalName>${project.build.finalName}-spring</finalName>
-                     <appendAssemblyId>false</appendAssemblyId>
+                     <!--<finalName>${project.build.finalName}-spring</finalName>-->
+                     <appendAssemblyId>true</appendAssemblyId>
                      <attach>true</attach>
                  </configuration>
              </execution>
