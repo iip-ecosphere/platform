@@ -1772,7 +1772,19 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
             loginContainerRegistry(mgr, regUser, regPwd);
         }
         
-        setOf(String) srcJarsPaths = {"platform", "mgtUi", "monitoring", "plJars", "monJars"};
+        setOf(String) srcJarsPaths = {"platform", "plJars"};
+        setOf(String) scriptFiles = {"platform.bat", "platform.sh"};
+        if (isDefined(config.platformMonitoring) and config.platformMonitoring <> null and not(config.platformMonitoring.isTypeOf(NoPlatformMonitoring))) {
+            scriptFiles.add("monitoring.bat");
+            scriptFiles.add("monitoring.sh");
+            srcJarsPaths.add("monitoring");
+            srcJarsPaths.add("monJars");
+        }
+        if (isDefined(config.managementUi) and config.managementUi <> null and not(config.managementUi.isTypeOf(NoManagementUI))) {
+            scriptFiles.add("mgtUi.bat");
+            scriptFiles.add("mgtUi.sh");
+            srcJarsPaths.add("mgtUi");
+        }
         
         for (String srcJarsPath : srcJarsPaths) {
             Path newDevicePath = "";
@@ -1824,16 +1836,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     }
                 }
             }
-        }
-        
-        setOf(String) scriptFiles = {"platform.bat", "platform.sh"};
-        if (isDefined(config.platformMonitoring) and config.platformMonitoring <> null and not(config.platformMonitoring.isTypeOf(NoPlatformMonitoring))) {
-            scriptFiles.add("monitoring.bat");
-            scriptFiles.add("monitoring.sh");
-        }
-        if (isDefined(config.managementUi) and config.managementUi <> null and not(config.managementUi.isTypeOf(NoManagementUI))) {
-            scriptFiles.add("mgtUi.bat");
-            scriptFiles.add("mgtUi.sh");
         }
         
         for (String scriptFile : scriptFiles) {
