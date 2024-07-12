@@ -376,6 +376,7 @@
                                       <value>true</value>
                                   </systemProperty>
                               </systemProperties>
+                              <skipTests>false</skipTests>
                           </configuration>
                       </execution>
                   </executions>

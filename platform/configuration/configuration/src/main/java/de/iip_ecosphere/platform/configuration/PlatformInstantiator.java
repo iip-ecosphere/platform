@@ -72,7 +72,7 @@ public class PlatformInstantiator {
         }
 
         /**
-         * Creates a configurer instance from command line arguments delivered by {@link #toArgs()}.
+         * Creates a configurer instance from command line arguments delivered by {@link #toArgs(boolean)}.
          * 
          * @param args the command line arguments
          */

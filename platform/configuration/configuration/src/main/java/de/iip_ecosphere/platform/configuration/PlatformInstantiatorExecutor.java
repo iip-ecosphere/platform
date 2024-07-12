@@ -12,9 +12,12 @@
 
 package de.iip_ecosphere.platform.configuration;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -161,9 +164,11 @@ public class PlatformInstantiatorExecutor {
             long start = System.currentTimeMillis();
             pArgs.add(mainCls);
             Collections.addAll(pArgs, args);
-            int exitCode = new ProcessBuilder(pArgs)
-                .inheritIO()
-                .start().waitFor();
+            Process process = new ProcessBuilder(pArgs)
+                .start(); // inheritIO does not help
+            new StreamGobbler(process.getInputStream(), System.out);
+            new StreamGobbler(process.getErrorStream(), System.out);
+            int exitCode = process.waitFor();
             if (exitCode != 0) {
                 throw new ExecutionException("Instantiation failed with exit code: " + exitCode, null);
             }
@@ -175,6 +180,42 @@ public class PlatformInstantiatorExecutor {
         }
         FileUtils.deleteQuietly(cpFile);
     }
+    
+    /**
+     * Simple process stream gobbler.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private class StreamGobbler extends Thread {
+        
+        private InputStream in;
+        private PrintStream out;
+
+        /**
+         * Creates a stream gobbler.
+         * 
+         * @param in the process stream
+         * @param out the output stream
+         */
+        private StreamGobbler(InputStream in, PrintStream out) {
+            this.in = in;
+            this.out = out;
+            start();
+        }
+
+        @Override
+        public void run() {
+            try {
+                BufferedReader input = new BufferedReader(new InputStreamReader(in));
+                String line = null;
+                while ((line = input.readLine()) != null) {
+                    out.println(line);
+                }
+            } catch (IOException e) {
+                System.err.println("Reading process stream failed: " + e.getMessage());
+            }
+        }
+    }    
 
     /**
      * Executes the platform instantiator through an on class loader within this JVM. This may fail if there are 
