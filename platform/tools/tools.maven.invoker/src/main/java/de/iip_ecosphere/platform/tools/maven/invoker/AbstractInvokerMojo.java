@@ -107,8 +107,8 @@ public class AbstractInvokerMojo extends AbstractMojo implements Logger { // Abs
     @Parameter(defaultValue = "${session.request}")
     private MavenExecutionRequest execRequest;
 
-    @Parameter(property = "skipTests", required = false, defaultValue = "false") 
-    private boolean skipTests;
+    @Parameter(property = "skipTests", required = false) 
+    private String skipTests;
 
     @Parameter(property = "maven.test.skip", required = false, defaultValue = "false") 
     private boolean mavenTestSkip;
@@ -240,34 +240,34 @@ public class AbstractInvokerMojo extends AbstractMojo implements Logger { // Abs
                 }
             }
         }
-        if (!enableJavadoc || mavenJavadocSkip) {
-            request.addShellEnvironment("MAVEN_ARGS", "-Dmaven.javadoc.skip=true"); // pass on 2 mvn levels
-            sysProperties.put("maven.javadoc.skip", "true");
-        }
+        boolean value = (!enableJavadoc || mavenJavadocSkip);
+        request.addShellEnvironment("MAVEN_ARGS", "-Dmaven.javadoc.skip=" + value); // pass on 2 mvn levels
+        sysProperties.put("maven.javadoc.skip", String.valueOf(value));
         if (unpackForce && !sysProperties.containsKey("unpack.force")) {
             sysProperties.put("unpack.force", "true");
         }
         if (configForce && !sysProperties.containsKey("configuration.force")) {
             sysProperties.put("configuration.force", "true");
         }
-        if (disableJava || disableBuild) {
-            sysProperties.put("maven.main.skip", "true");
-            sysProperties.put("maven.javadoc.skip", "true");
+        value = (disableJava || disableBuild);
+        sysProperties.put("maven.main.skip", String.valueOf(value));
+        sysProperties.put("maven.javadoc.skip", String.valueOf(value));
+        if (null == skipTests) {
+            value = mavenTestSkip;
+        } else {
+            value = Boolean.valueOf(skipTests);
         }
-        if (skipTests || mavenTestSkip || disableJava || disableBuild) {
-            sysProperties.put("maven.test.skip", "true");
-            sysProperties.put("skipTests", "true"); // maven.test.skip might be sufficient
-        }
+        value = value || disableJava || disableBuild;
+        sysProperties.put("maven.test.skip", String.valueOf(value));
+        sysProperties.put("skipTests", String.valueOf(value)); // maven.test.skip might be sufficient
         if (null != mavenBuildCacheEnabled) {
             sysProperties.put("maven.build.cache.enabled", mavenBuildCacheEnabled);
         }
-        if (disablePython || disableBuild) {
-            sysProperties.put("python-compile.skip", "true");
-            sysProperties.put("python-test.skip", "true");
-        }
-        if (disablePythonTests) {
-            sysProperties.put("python-test.skip", "true");
-        }
+        value = (disablePython || disableBuild);
+        sysProperties.put("python-compile.skip", String.valueOf(value));
+        sysProperties.put("python-test.skip", String.valueOf(value));
+        value = disablePythonTests;
+        sysProperties.put("python-test.skip", String.valueOf(value));
         if (buildId != null && buildId.length() > 0) {
             sysProperties.put("iip.ciBuildId", buildId);
         }
@@ -278,6 +278,7 @@ public class AbstractInvokerMojo extends AbstractMojo implements Logger { // Abs
         sysProperties.put("python-compile.hashDir", hashDir);
         request.addShellEnvironment("PYTHON_COMPILE_HASHDIR", hashDir); // invoker -D not correct?, pass on 2 mvn levels
         request.setProperties(sysProperties);
+        getLog().info("Setting sys properties " + request.getProperties());
     }
     
     /**
