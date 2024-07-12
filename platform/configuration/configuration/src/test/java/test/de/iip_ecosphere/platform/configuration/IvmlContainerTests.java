@@ -16,7 +16,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
-import org.apache.commons.lang.SystemUtils;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.configuration.PlatformInstantiatorExecutor;
@@ -37,17 +36,15 @@ public class IvmlContainerTests extends AbstractIvmlTests {
      */
     @Test
     public void testContainerTest() throws ExecutionException, IOException {
-        org.junit.Assume.assumeTrue(!SystemUtils.IS_OS_WINDOWS);
         final String dockerFailProp = "easy.docker.failOnError";
-        System.setProperty(dockerFailProp, "false"); // fails sometimes in CI due to unknown docker problems??
-        
         File gen = new File("gen/tests/ContainerCreation");
         PlatformInstantiatorExecutor.instantiate(
-            new TestConfigurer("ContainerCreation", new File("src/test/easy/single"), gen));
+            new TestConfigurer("ContainerCreation", new File("src/test/easy/single"), gen)
+                .setProperty(dockerFailProp, "false")); // windows, in CI fails sometimes due to unknown docker issue??
         assertAllFiles(gen);
         assertTemplateZip(gen, "impl.SimpleMeshTestingContainerApp");
 
-        System.setProperty(dockerFailProp, "true");
+        System.setProperty(dockerFailProp, "true"); // in any case
     }
     
 }

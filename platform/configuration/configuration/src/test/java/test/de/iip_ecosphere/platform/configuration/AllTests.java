@@ -20,6 +20,7 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
+    TestConfigurerTest.class,
     IvmlMetaModelTests.class,
     IvmlKodexMeshTests.class,
     IvmlSimpleMeshTests.class,

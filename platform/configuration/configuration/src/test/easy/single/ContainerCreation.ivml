@@ -126,7 +126,7 @@ project ContainerCreation {
     
     // ------------------------- UI -------------------------------
     
-    // current default: no UI configured
+    // current default: no UI configured, otherways breaks initial instantiation
 
     // ------------ application and service nets ------------------
     

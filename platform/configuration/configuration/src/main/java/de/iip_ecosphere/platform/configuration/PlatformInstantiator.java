@@ -13,6 +13,10 @@
 package de.iip_ecosphere.platform.configuration;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import de.iip_ecosphere.platform.support.FileUtils;
@@ -34,6 +38,8 @@ public class PlatformInstantiator {
     public static final String KEY_PROPERTY_TRACING = "iip.easy.tracing";
     public static final String KEY_PROPERTY_MVNARGS = "iip.easy.mvnArgs";
     public static final String KEY_PROPERTY_APPS = "iip.easy.apps";
+    private static final String ARG_PROPS_START = "props>";
+    private static final String ARG_PROPS_END = "<props";
     private static int exitCode = 0;
     private static ClassLoader classLoader;
     
@@ -50,6 +56,7 @@ public class PlatformInstantiator {
         private File modelFolder;
         private File metaModelFolder;
         private String startRuleName = "mainCli";
+        private Map<String, String> properties = new HashMap<>();
         
         /**
          * Creates a configurer instance.
@@ -70,11 +77,43 @@ public class PlatformInstantiator {
          * @param args the command line arguments
          */
         public InstantiationConfigurer(String[] args) {
-            this.ivmlModelName = args[0];
-            this.modelFolder = fromArg(args[1]);
-            this.outputFolder = fromArg(args[2]);
-            this.metaModelFolder = fromArg(args[3]);
-            this.startRuleName = args[4];
+            int pos = 0;
+            this.ivmlModelName = args[pos++];
+            this.modelFolder = fromArg(args[pos++]);
+            this.outputFolder = fromArg(args[pos++]);
+            this.metaModelFolder = fromArg(args[pos++]);
+            this.startRuleName = args[pos++];
+            if (args.length > 4 && ARG_PROPS_START.equals(args[pos])) {
+                pos++;
+                int startPos = pos;
+                String lastKey = "";
+                for (int p = pos; p < args.length && !ARG_PROPS_END.equals(args[p]); p++) {
+                    if (p - startPos % 2 == 0) {
+                        lastKey = args[p];
+                        properties.put(lastKey, null);
+                    } else {
+                        properties.put(lastKey, args[p]);
+                    }
+                }
+            }
+        }
+        
+        
+        /**
+         * Returns the last command line argument index consumed by this configurer.
+         * 
+         * @param args the command line arguments
+         * @return the index
+         */
+        protected int getLastArgsIndex(String[] args) {
+            int pos = 4;
+            if (args.length > 4 && ARG_PROPS_START.equals(args[5])) {
+                pos++;
+                while (pos < args.length && !ARG_PROPS_END.equals(args[pos])) {
+                    pos++;
+                }
+            }
+            return pos;
         }
 
         /**
@@ -119,14 +158,27 @@ public class PlatformInstantiator {
         /**
          * Turns this configurer into command line arguments.
          * 
+         * @param all {@code true} add all arguments for passong on setup between configurers, {@code false} only 
+         *     command line arguments for execution 
          * @return the arguments
          */
-        public String[] toArgs() {
-            return new String[] {ivmlModelName, 
-                toArg(modelFolder), 
-                toArg(outputFolder), 
-                toArg(metaModelFolder), 
-                startRuleName};
+        public String[] toArgs(boolean all) {
+            List<String> args = new ArrayList<>();
+            args.add(ivmlModelName); 
+            args.add(toArg(modelFolder)); 
+            args.add(toArg(outputFolder)); 
+            args.add(toArg(metaModelFolder)); 
+            args.add(startRuleName);
+            if (all && properties.size() > 0) {
+                args.add(ARG_PROPS_START);
+                for (String key : properties.keySet()) {
+                    args.add(key);
+                    args.add(properties.get(key));
+                }
+                args.add(ARG_PROPS_END);
+            }
+                
+            return args.toArray(new String[args.size()]); 
         }
         
         /**
@@ -175,12 +227,48 @@ public class PlatformInstantiator {
         }
         
         /**
-         * Returns the VIL start rule name.
+         * Returns the VIL start rule name. [public for testing]
          * 
          * @return the VIL start rule name
          */
-        protected String getStartRuleName() {
+        public String getStartRuleName() {
             return startRuleName;
+        }
+        
+        /**
+         * Returns the IVML model name. [testing]
+         * 
+         * @return the model name
+         */
+        public String getIvmlModelName() {
+            return ivmlModelName;
+        }
+
+        /**
+         * Returns the VIL output folder. [testing]
+         * 
+         * @return the output folder
+         */
+        public File getOutputFolder() {
+            return outputFolder;
+        }
+
+        /**
+         * Returns the model folder. [testing]
+         * 
+         * @return the model folder
+         */
+        public File getModelFolder() {
+            return modelFolder;
+        }
+
+        /**
+         * Returns the meta model folder. [testing]
+         * 
+         * @return the meta model folder
+         */
+        public File getMetaModelFolder() {
+            return metaModelFolder;
         }
         
         /**
@@ -231,6 +319,26 @@ public class PlatformInstantiator {
         protected void handleExecutionException(ExecutionException ex) throws ExecutionException {
             System.out.println(ex.getMessage());
             exitCode = 1;
+        }
+        
+        /**
+         * Sets a JVM system property for execution.
+         * 
+         * @param key the key
+         * @param value the value
+         */
+        public InstantiationConfigurer setProperty(String key, String value) {
+            properties.put(key, value);
+            return this;
+        }
+
+        /**
+         * Returns the properties.
+         * 
+         * @return the properties
+         */
+        public Map<String, String> getProperties() {
+            return new HashMap<>(properties);
         }
         
     }

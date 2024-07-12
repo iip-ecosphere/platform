@@ -188,18 +188,19 @@ public abstract class AbstractIvmlTests {
         }
         
         /**
-         * Creates a configurer instance from command line arguments delivered by {@link #toArgs()}.
+         * Creates a configurer instance from command line arguments delivered by {@link #toArgs(boolean)}.
          * 
          * @param args the command line arguments
          */
         public TestConfigurer(String[] args) {
             super(args);
             exit = true;
-            if (args.length > 4) {
-                ivmlMetaModelFolder = fromArg(args[5]);
-                if (args.length > 5) {
+            int last = super.getLastArgsIndex(args);
+            if (args.length > last) {
+                ivmlMetaModelFolder = fromArg(args[last + 1]);
+                if (args.length > last + 1) {
                     additionalIvmlFolders = new ArrayList<>();
-                    for (int i = 6; i < args.length; i++) {
+                    for (int i = last + 2; i < args.length; i++) {
                         additionalIvmlFolders.add(fromArg(args[i]));
                     }
                 }
@@ -216,13 +217,9 @@ public abstract class AbstractIvmlTests {
             return true;
         }
 
-        /**
-         * Turns this configurer into command line arguments.
-         * 
-         * @return the arguments
-         */
-        public String[] toArgs() {
-            String[] tmp = super.toArgs();
+        @Override
+        public String[] toArgs(boolean all) {
+            String[] tmp = super.toArgs(all);
             String[] result = new String[tmp.length + 1 
                  + (additionalIvmlFolders == null ? 0 : additionalIvmlFolders.size())];
             System.arraycopy(tmp, 0, result, 0, tmp.length);
@@ -292,6 +289,30 @@ public abstract class AbstractIvmlTests {
             easySetup.setLogLevel(EasyLogLevel.VERBOSE); // override for debugging
         }
 
+        @Override
+        public TestConfigurer setProperty(String key, String value) {
+            super.setProperty(key, value);
+            return this;
+        }
+        
+        /**
+         * Returns the meta model folder. [for testing]
+         * 
+         * @return the meta model folder (may be <b>null</b> for none)
+         */
+        public File getIvmlMetaModelFolder() {
+            return ivmlMetaModelFolder;
+        }
+        
+        /**
+         * Returns the additional IVML folders.
+         *  
+         * @return the additional IVML folders (may be <b>null</b> for none)
+         */
+        public List<File> getAdditionalIvmlFolders() {
+            return null != additionalIvmlFolders ? new ArrayList<>(additionalIvmlFolders) : null;
+        }
+        
     }
 
     /**

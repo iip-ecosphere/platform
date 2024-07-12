@@ -22,7 +22,9 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
@@ -34,7 +36,8 @@ import de.iip_ecosphere.platform.configuration.PlatformInstantiator.Instantiatio
 
 /**
  * Helper methods to execute the platform instantiator as an own process. This class must not have
- * dependencies into critical libraries that may conflict, e.g., logging or Google Guava.
+ * dependencies into critical libraries that may conflict, e.g., logging or Google Guava. Please set 
+ * JVM system properties on the executor so that they can be passed to the respective execution.
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -48,6 +51,7 @@ public class PlatformInstantiatorExecutor {
     private Consumer<Long> executionTimeConsumer;
     private String mainCls = PlatformInstantiator.class.getName();
     private boolean inTesting = false;
+    private Map<String, String> properties = new HashMap<>();
     
     /**
      * Creates an executor instance.
@@ -79,7 +83,7 @@ public class PlatformInstantiatorExecutor {
         executor.inTesting = configurer.inTesting();
         executor.mainCls = configurer.getMainClass();
         executor.executeAsProcess(PlatformInstantiatorExecutor.class.getClassLoader(), 
-            null, null, null, configurer.toArgs());
+            null, null, null, configurer.toArgs(false));
     }
 
     /**
@@ -95,6 +99,16 @@ public class PlatformInstantiatorExecutor {
             result += "=" + value;
         }
         return result;
+    }
+    
+    /**
+     * Sets a JVM system property for execution.
+     * 
+     * @param key the key
+     * @param value the value
+     */
+    public void setProperty(String key, String value) {
+        properties.put(key, value);
     }
         
     /**
@@ -115,6 +129,9 @@ public class PlatformInstantiatorExecutor {
             .info()
             .command()
             .orElseThrow(() -> new ExecutionException("Cannot determine JDK location", null)));
+        for (String key : properties.keySet()) {
+            pArgs.add(createJvmArg(key, properties.get(key)));
+        }
         File cpFile = null;
         List<String> cp = createEasyClasspath(loader);
         if (null != cp) {
@@ -182,8 +199,12 @@ public class PlatformInstantiatorExecutor {
             System.setProperty("iip.resources", resourcesDir);
         }
         info.accept("Calling platform instantiator with " + java.util.Arrays.toString(args) + ", tracing "
-            + tracingLevel + (null == resourcesDir ? "" : " and resources dir " + resourcesDir));
+            + tracingLevel + (null == resourcesDir ? "" : " and resources dir " + resourcesDir) + " and properties " 
+            + properties);
         long start = System.currentTimeMillis();
+        for (String key : properties.keySet()) {
+            System.setProperty(key, properties.get(key));
+        }
         PlatformInstantiator.setClassLoader(createEasyClassLoader(loader));
         int exitCode = PlatformInstantiator.mainImpl(args);
         if (exitCode != 0) {

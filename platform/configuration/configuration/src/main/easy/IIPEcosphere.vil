@@ -1826,7 +1826,15 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
             }
         }
         
-        setOf(String) scriptFiles = {"platform.bat", "platform.sh", "monitoring.bat", "monitoring.sh", "mgtUi.bat", "mgtUi.sh"};
+        setOf(String) scriptFiles = {"platform.bat", "platform.sh"};
+        if (isDefined(config.platformMonitoring) and config.platformMonitoring <> null and not(config.platformMonitoring.isTypeOf(NoPlatformMonitoring))) {
+            scriptFiles.add("monitoring.bat");
+            scriptFiles.add("monitoring.sh");
+        }
+        if (isDefined(config.managementUi) and config.managementUi <> null and not(config.managementUi.isTypeOf(NoManagementUI))) {
+            scriptFiles.add("mgtUi.bat");
+            scriptFiles.add("mgtUi.sh");
+        }
         
         for (String scriptFile : scriptFiles) {
             Path scriptFileDf = "${deviceDf}/scriptFiles";
@@ -2314,7 +2322,21 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         artifactsRoot.mkdir();
         commonRoot.mkdir();
 
-        advanceProgress("Instantiating management UI");
+        generateManagementUi(config, cfg.managementUi);
+        
+        vilTemplateProcessor("Readme", config, "${target}/README.txt");
+        if ((getContainerGenerationSafe(cfg.containerGeneration)) and getPlatformContainerGenerationSafe(cfg.platformContainerGeneration)){
+            generatePlatformContainers(config, target);
+        }
+    }
+    
+    @DispatchBasis
+    generateManagementUi(Configuration config, ManagementUI mgtUi) = {
+    }
+
+    @DispatchCase
+    generateManagementUi(Configuration config, AngularManagementUI mgtUi) = {
+        advanceProgress("Instantiating Angular management UI");
         mgtUiRoot.mkdir();
         vilTemplateProcessor("UiAngularWin", config, "${target}/mgtUi.bat");
         vilTemplateProcessor("UiAngularLinuxSysd", config, "${target}/iip-mgtUi.service", 
@@ -2325,14 +2347,9 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         vilTemplateProcessor("UiAngularExpress", config, "${mgtUiRoot}/server.js");
         vilTemplateProcessor("UiAngularPom", config, "${mgtUiRoot}/pom.xml");
         mvn(mgtUiRoot);
-        p = "${mgtUiRoot}/dist/iipes-web/assets/config";
+        Path p = "${mgtUiRoot}/dist/iipes-web/assets/config";
         p.mkdir();
         vilTemplateProcessor("UiAngularConfig", config, "${p}/config.json");
-        
-        vilTemplateProcessor("Readme", config, "${target}/README.txt");
-        if ((getContainerGenerationSafe(cfg.containerGeneration)) and getPlatformContainerGenerationSafe(cfg.platformContainerGeneration)){
-            generatePlatformContainers(config, target);
-        }
     }
     
     generatePlugins(IIPEcosphere cfg, Path componentRoot) = {

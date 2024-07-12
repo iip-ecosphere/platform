@@ -12,9 +12,11 @@
 
 package test.de.iip_ecosphere.platform.configuration;
 
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import de.iip_ecosphere.platform.configuration.PlatformInstantiator;
+import test.de.iip_ecosphere.platform.configuration.AbstractIvmlTests.TestConfigurer;
 
 /**
  * The main class if the {@link PlatformInstantiator} shall be executed as process during testing.
@@ -30,7 +32,12 @@ public class PlatformInstantiatorTestMain {
      */
     public static void main(String[] args) {
         try {
-            PlatformInstantiator.instantiate(new AbstractIvmlTests.TestConfigurer(args));
+            TestConfigurer tc = new TestConfigurer(args);
+            Map<String, String> props = tc.getProperties();
+            for (String key : props.keySet()) {
+                System.setProperty(key, props.get(key));
+            }
+            PlatformInstantiator.instantiate(tc);
         } catch (ExecutionException e) {
             System.err.println("Instantiation failed: " + e.getMessage());
         }
