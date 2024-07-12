@@ -557,6 +557,7 @@
             <include>**/AllTests*.class</include>
           </includes>
           <forkedProcessTimeoutInSeconds>3600</forkedProcessTimeoutInSeconds>
+          <redirectTestOutputToFile>true</redirectTestOutputToFile>
         </configuration>
         <dependencies>
           <!-- Force using the latest JUnit 47 provider, consider also in lib dependencies; seems also to work with
