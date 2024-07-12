@@ -1774,13 +1774,13 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         
         setOf(String) srcJarsPaths = {"platform", "plJars"};
         setOf(String) scriptFiles = {"platform.bat", "platform.sh"};
-        if (isDefined(config.platformMonitoring) and config.platformMonitoring <> null and not(config.platformMonitoring.isTypeOf(NoPlatformMonitoring))) {
+        if (hasMonitoring(config)) {
             scriptFiles.add("monitoring.bat");
             scriptFiles.add("monitoring.sh");
             srcJarsPaths.add("monitoring");
             srcJarsPaths.add("monJars");
         }
-        if (isDefined(config.managementUi) and config.managementUi <> null and not(config.managementUi.isTypeOf(NoManagementUI))) {
+        if (hasUI(config)) {
             scriptFiles.add("mgtUi.bat");
             scriptFiles.add("mgtUi.sh");
             srcJarsPaths.add("mgtUi");

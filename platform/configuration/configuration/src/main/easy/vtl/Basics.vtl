@@ -229,5 +229,13 @@ template Basics(Configuration config, FileArtifact target) {
     def getForceContainersCreationSafe(DecisionVariable var) {
         getBooleanValueSafe(var, false);
     }
+    
+    def hasMonitoring(IIPEcosphere config) {
+        isDefined(config.platformMonitoring) and config.platformMonitoring <> null and not(config.platformMonitoring.isTypeOf(NoPlatformMonitoring));
+    }
+    
+    def hasUI(IIPEcosphere config) {
+        isDefined(config.managementUi) and config.managementUi <> null and not(config.managementUi.isTypeOf(NoManagementUI));
+    }
         
 }

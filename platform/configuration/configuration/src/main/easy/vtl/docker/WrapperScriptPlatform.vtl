@@ -16,11 +16,15 @@ template WrapperScriptPlatform(IIPEcosphere config, FileArtifact target) {
         'sleep 70;'
         'echo ""'
         'echo ""'
-        'bash mgtUi.sh &'
-        'sleep 20;'
-        'echo ""'
-        'echo ""'
-        'bash monitoring.sh'
-        'sleep 20;'
+        if (hasUI(config)) {
+            'bash mgtUi.sh &'
+            'sleep 20;'
+            'echo ""'
+            'echo ""'
+        }
+        if (hasMonitoring(config)) {
+            'bash monitoring.sh'
+            'sleep 20;'
+        }
     }
 }
