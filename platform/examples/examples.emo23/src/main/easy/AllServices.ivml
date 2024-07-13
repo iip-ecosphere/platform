@@ -32,7 +32,7 @@ project AllServices {
         servicesPackageName = "servicesMip",
         input = {{type=refBy(MipMqttOutput)}},
         output = {{type=refBy(MipAiPythonOutput)}, {type=refBy(MipMqttInput), forward=false}},
-        artifact = "de.iip-ecosphere.platform:examples.hm23:" + iipVer,
+        artifact = "de.iip-ecosphere.platform:examples.emo23:" + iipVer,
         kind = ServiceKind::TRANSFORMATION_SERVICE,
         dependencies = {refBy(PYTHON39)},
         integrationMode = PythonIntegrationMode::websocket_continuous
@@ -81,7 +81,7 @@ project AllServices {
         inputHandlers = {ConnectorInputHandler{
             type=refBy(Command), 
             class="de.iip_ecosphere.platform.examples.hm23.MdzhInputHandler",
-            artifact="de.iip-ecosphere.platform:examples.hm23:" + iipVer
+            artifact="de.iip-ecosphere.platform:examples.emo23:" + iipVer
         }},
         
         input = {{type=refBy(MdzhInput)}, {type=refBy(Command), forward=false}},
@@ -104,7 +104,7 @@ project AllServices {
             manufacturer = refBy(manufacturer_sse)
         },
         class = fqnClassName("CamSource", overrideInProduction), 
-        artifact = "de.iip-ecosphere.platform:examples.hm23:" + iipVer,
+        artifact = "de.iip-ecosphere.platform:examples.emo23:" + iipVer,
         kind = ServiceKind::SOURCE_SERVICE,
         output = {{type=refBy(ImageInput)}},
         input = {{type=refBy(Command), forward=false}},
@@ -153,7 +153,7 @@ project AllServices {
              systemProperty="iip.app.hm23.robotId"
           }
         },
-        artifact = "de.iip-ecosphere.platform:examples.hm23:" + iipVer,
+        artifact = "de.iip-ecosphere.platform:examples.emo23:" + iipVer,
         dependencies = {refBy(PYTHON38), refBy(ScipPy141), refBy(NumPy1220), refBy(Tflite_Runtime28), refBy(Pandas153), refBy(Sklearn), refBy(Pillow940), refBy(KreasApplications108), refBy(Psutil594), refBy(Glob2), refBy(OpenCVPython47072)},
         integrationMode = PythonIntegrationMode::websocket_continuous,
         traceRcv = TraceKind::TRACE,
@@ -266,7 +266,7 @@ project AllServices {
           }
         },
         kind = ServiceKind::TRANSFORMATION_SERVICE,
-        artifact = "de.iip-ecosphere.platform:examples.hm23:" + iipVer,
+        artifact = "de.iip-ecosphere.platform:examples.emo23:" + iipVer,
         dependencies = {refBy(PYTHON38), refBy(flowrDependency), refBy(tensorflow290), refBy(keras290), 
           refBy(Pandas153), refBy(Pillow940), refBy(KreasApplications108), refBy(NumPy1220), refBy(Grpcio1430),
           refBy(Matplotlib371), refBy(Psutil594), refBy(MemoryProfiler0610), refBy(ScipPy141), refBy(ScikitLearn122),
@@ -288,7 +288,7 @@ project AllServices {
         },
         servicesPackageName = "services",
         //servicesPackageName = pythonServicePackageName(false),
-        artifact = "de.iip-ecosphere.platform:examples.hm23:" + iipVer,
+        artifact = "de.iip-ecosphere.platform:examples.emo23:" + iipVer,
         parameter = {},
         transportChannel = ""
         //transportChannel  = "Server-FlowerAi",
@@ -307,7 +307,7 @@ project AllServices {
             manufacturer = refBy(manufacturer_sse)
         },
         class = fqnClassName("ActionDecider", true),
-        artifact = "de.iip-ecosphere.platform:examples.hm23:" + iipVer,
+        artifact = "de.iip-ecosphere.platform:examples.emo23:" + iipVer,
         kind = ServiceKind::TRANSFORMATION_SERVICE,
         input = {{type=refBy(AiResult)}, {type=refBy(PlcOutput)}, {type=refBy(MdzhOutput)}, {type=refBy(BeckhoffOutput)}, {type=refBy(Command), forward=false}},
         output = {{type=refBy(DecisionResult)}, {type=refBy(Command), forward=false}, {type=refBy(PlcInput), forward=false}, {type=refBy(BeckhoffInput), forward=false}},
@@ -362,7 +362,7 @@ project AllServices {
         //class = fqnClassName("AppAas", true), // for now for testing
         server = refBy(flAasServer),
         class = "de.iip_ecosphere.platform.examples.hm23.mock.AppAas",
-        artifact = "de.iip-ecosphere.platform:examples.hm23:" + iipVer,
+        artifact = "de.iip-ecosphere.platform:examples.emo23:" + iipVer,
         kind = ServiceKind::SINK_SERVICE,
         input = {{type=refBy(DecisionResult)}, {type=refBy(MdzhOutput)}, {type=refBy(Command), forward=false}},
         output = {{type=refBy(Command), forward=false}},
@@ -507,7 +507,7 @@ project AllServices {
             manufacturer = refBy(manufacturer_sse)
         },
         class = fqnClassNameDrive("ChannelToTimeSeriesAggregator", true),
-        artifact = "de.iip-ecosphere.platform:examples.hm23:" + iipVer,
+        artifact = "de.iip-ecosphere.platform:examples.emo23:" + iipVer,
         kind = ServiceKind::TRANSFORMATION_SERVICE,
         input = {{type=refBy(PlcEnergyMeasurementJson)}, {type=refBy(DriveCommand), forward=false}},
         output = {{type=refBy(AggregatedPlcEnergyMeasurement)}},
@@ -544,7 +544,7 @@ project AllServices {
             defaultValue="Lenze-AI"
           }
         },
-        artifact = "de.iip-ecosphere.platform:examples.hm23:" + iipVer,
+        artifact = "de.iip-ecosphere.platform:examples.emo23:" + iipVer,
         dependencies = {refBy(PYTHON38)}, // TODO dependencies
         traceRcv = TraceKind::TRACE,
         traceSent = TraceKind::TRACE
@@ -604,7 +604,7 @@ project AllServices {
             defaultValue="ISMLL-AI"
           }
         },
-        artifact = "de.iip-ecosphere.platform:examples.hm23:" + iipVer,
+        artifact = "de.iip-ecosphere.platform:examples.emo23:" + iipVer,
         dependencies = {refBy(PYTHON38)}, // TODO dependencies
         traceRcv = TraceKind::TRACE,
         traceSent = TraceKind::TRACE
@@ -637,7 +637,7 @@ project AllServices {
           }
         },
         class = fqnClassNameDrive("DriveAppAas", true),
-        artifact = "de.iip-ecosphere.platform:examples.hm23:" + iipVer,
+        artifact = "de.iip-ecosphere.platform:examples.emo23:" + iipVer,
         dependencies = {refBy(mvnDefaultLib)},
         kind = ServiceKind::SINK_SERVICE,
         output = {{type=refBy(DriveCommand), forward=false}, {type=refBy(PlcInput), forward=false}, {type=refBy(Command), forward=false}, {type=refBy(MipMqttInput), forward=false}},
