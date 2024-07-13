@@ -107,6 +107,9 @@ public class AbstractInvokerMojo extends AbstractMojo implements Logger { // Abs
     @Parameter(defaultValue = "${session.request}")
     private MavenExecutionRequest execRequest;
 
+    @Parameter(property = "okto.mvn.home", required = false) 
+    private String oktoMvnHome;
+
     @Parameter(property = "skipTests", required = false) 
     private String skipTests;
 
@@ -268,8 +271,11 @@ public class AbstractInvokerMojo extends AbstractMojo implements Logger { // Abs
         sysProperties.put("python-test.skip", String.valueOf(value));
         value = disablePythonTests;
         sysProperties.put("python-test.skip", String.valueOf(value));
-        if (buildId != null && buildId.length() > 0) {
+        if (buildId != null && buildId.length() > 0) { // CI defined build id for time collector
             sysProperties.put("iip.ciBuildId", buildId);
+        }
+        if (oktoMvnHome != null && oktoMvnHome.length() > 0) { // CI defined maven
+            sysProperties.put("okto.mvn.home", oktoMvnHome);
         }
         String hashDir = pythonCompileHashDir;
         if (null == hashDir || hashDir.length() == 0) {
