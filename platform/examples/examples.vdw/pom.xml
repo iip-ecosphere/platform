@@ -89,12 +89,18 @@
                           <id>generatedConnector</id>
                           <configuration>
                               <mainClass>${generated.class}</mainClass>
+                              <arguments>
+                                  <argument>--add-opens=java.base/java.lang=ALL-UNNAMED</argument>
+                              </arguments>
                           </configuration>
                        </execution>
                        <execution>
                           <id>manualConnector</id>
                           <configuration>
                               <mainClass>${manual.class}</mainClass>
+                              <arguments>
+                                  <argument>--add-opens=java.base/java.lang=ALL-UNNAMED</argument>
+                              </arguments>
                           </configuration>
                        </execution>
                    </executions>
