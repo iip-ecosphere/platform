@@ -400,7 +400,17 @@ public class ProcessUnit {
                 addArguments(ProcessUnit.WIN_BAT_PREFIX);
                 enableArgumentAggregation();
             }
-            String path = MAVEN_HOME;
+            addArgument(getMavenPath());
+            return this;
+        }
+        
+        /**
+         * Returns the maven path.
+         * 
+         * @return the maven path
+         */
+        private String getMavenPath() {
+            String path = MAVEN_HOME; // might infer maven home, but how
             if (path != null) {
                 if (!path.endsWith(File.separator)) {
                     path += File.separator;
@@ -408,8 +418,7 @@ public class ProcessUnit {
             } else {
                 path = "";
             }
-            addArgument(path + "mvn");
-            return this;
+            return path + "mvn";
         }
 
         /**
@@ -511,6 +520,9 @@ public class ProcessUnit {
             } else if (cmdAsScript) {
                 addShellScriptCommand(cmd);
             } else {
+                if ("mvn".equals(cmd)) { // unqualified, try to qualify
+                    cmd = getMavenPath();
+                }
                 addArgument(cmd);
             }
             return this;

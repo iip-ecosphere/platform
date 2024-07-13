@@ -556,7 +556,7 @@ public class TestAppMojo extends AbstractLoggingMojo {
             result = new ArrayList<>();
             result.addAll(args);
             for (TestProcessSpec p : processes) {
-                p.extrapolateArgs(result);
+                result = p.extrapolateArgs(result);
             }
         }
         return result;
