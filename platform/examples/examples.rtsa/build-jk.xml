@@ -12,6 +12,9 @@
             <arg value="-Dconfiguration.testApp.skip=false"/>
             <arg value="-Djava8.home=/usr/lib/jvm/java-8-openjdk-amd64/bin/java"/>
             <arg value="-Diip.ciBuildId=${build_num}"/> <!-- must be set in jenkins ANT build step -->
+            <arg value="-Dokto.mvn.home=${maven.bin.dir}/bin"/>
         </maven>
+        <ant dir="gen/rtsa/ApplicationInterfaces" antfile="build-jk.xml" />
+        <ant dir="gen/rtsa/SimpleRTSADemoFlowApp" antfile="build-jk.xml" />
 	</target>
 </project>

@@ -12,6 +12,10 @@
             <arg value="-DdisablePythonTests=true"/>
             <arg value="-Diip.ciBuildId=${build_num}"/> <!-- must be set in jenkins ANT build step -->
         	<arg value="-Dmaven.build.cache.enabled=false"/> <!-- runs out of memory here -->
+            <arg value="-Dokto.mvn.home=${maven.bin.dir}/bin"/>
         </maven>
+        <ant dir="gen/hm23/ApplicationInterfaces" antfile="build-jk.xml" />
+        <ant dir="gen/hm23/DemonstrationDriveAppHM23" antfile="build-jk.xml" />
+        <ant dir="gen/hm23/DemonstrationFederatedLearningAppHM23" antfile="build-jk.xml" />
 	</target>
 </project>

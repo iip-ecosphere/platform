@@ -9,6 +9,7 @@
 	<target name="maven"> 
         <maven pomFile="pom.xml" goal="install">
             <arg value="-Dunpack.force=true"/>
+            <arg value="-Dokto.mvn.home=${maven.bin.dir}/bin"/>
         </maven>
 	</target>
 </project>

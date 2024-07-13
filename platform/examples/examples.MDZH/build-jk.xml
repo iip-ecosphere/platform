@@ -10,6 +10,9 @@
         <maven pomFile="pom.xml" goal="install">
             <arg value="-Dunpack.force=true"/>
             <arg value="-Diip.ciBuildId=${build_num}"/> <!-- must be set in jenkins ANT build step -->
+            <arg value="-Dokto.mvn.home=${maven.bin.dir}/bin"/>
         </maven>
+        <ant dir="gen/mdzh/ApplicationInterfaces" antfile="build-jk.xml" />
+        <ant dir="gen/mdzh/MDZHPCFApp" antfile="build-jk.xml" />
 	</target>
 </project>
