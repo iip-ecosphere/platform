@@ -11,5 +11,7 @@
             <arg value="-Dunpack.force=true"/>
             <arg value="-Diip.ciBuildId=${build_num}"/> <!-- must be set in jenkins ANT build step -->
         </maven>
+        <ant dir="gen/py/ApplicationInterfaces" antfile="build-jk.xml" />
+        <ant dir="gen/py/SimplePythonDemoFlowApp" antfile="build-jk.xml" />
 	</target>
 </project>
