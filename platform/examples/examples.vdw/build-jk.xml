@@ -15,7 +15,7 @@
         	<arg value="-Dtest.exec.args=--skip"/>
             <arg value="-Dokto.mvn.home=${maven.bin.dir}/bin"/>
         </maven>
-        <ant dir="gen/vdw/ApplicationInterfaces" antfile="build-jk.xml" />
-        <ant dir="gen/vdw/SimpleVDWOPCDemoApp" antfile="build-jk.xml" />
+        <!--<ant dir="gen/vdw/ApplicationInterfaces" antfile="build-jk.xml" />
+        <ant dir="gen/vdw/SimpleVDWOPCDemoApp" antfile="build-jk.xml" />-->
 	</target>
 </project>
