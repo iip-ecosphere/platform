@@ -130,7 +130,7 @@ public class ServerManager {
 
     /**
      * Obtains a class loader from {@code loaders} or adds a new one determined by 
-     * {@link DescriptorUtils#determineArtifactClassLoader(SpringCloudServiceDescriptor)}.
+     * {@link ArtifactResolver#determineArtifactClassLoader()}.
      * 
      * @param loaders the class loaders
      * @param sDesc the service descriptor

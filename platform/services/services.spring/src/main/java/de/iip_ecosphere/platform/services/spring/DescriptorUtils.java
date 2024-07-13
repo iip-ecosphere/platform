@@ -272,6 +272,7 @@ public class DescriptorUtils {
         result.add("java");
         result.add("-jar");
         result.add("-Dlog4j2.formatMsgNoLookups=true");
+        result.add("--add-opens=java.base/java.lang=ALL-UNNAMED"); // JDK 17
         Starter.addAppEnvironment(result);
         result.add(jar.getAbsolutePath());
         result.add("--" + Starter.PARAM_IIP_TEST_SERVICE_AUTOSTART + "=true"); // only for testing
