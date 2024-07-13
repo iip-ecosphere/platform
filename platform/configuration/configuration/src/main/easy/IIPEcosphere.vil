@@ -2177,6 +2177,9 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         setMaxSteps(config, false, 0, 1);
         IIPEcosphere cfg = config;
 
+        if (brokerRoot.exists()) {
+            brokerRoot.delete();
+        }
         brokerRoot.mkdir();
         generateBrokerScripts(cfg, cfg.transportProtocol);
 

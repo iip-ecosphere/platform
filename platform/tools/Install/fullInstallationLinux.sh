@@ -3,7 +3,7 @@ echo "For installing prerequisites, administrator permissions may be required!"
 
 mkdir -p Platform && cd Platform
 
-echo "Installing prerequisites Java 13, Maven version 3.6.3, and Python version 3.9"
+echo "Installing prerequisites Java 17, Maven version 3.9.7, and Python version 3.9"
 echo "This action will set and use Environment Variables"
 read -p "Do you want to install the prerequisites (skip only if already installed)? (y/n) " yn
 if [ $yn == "y" ] || [ $yn == "Y" ]; then 
@@ -17,7 +17,7 @@ if [ $yn == "y" ] || [ $yn == "Y" ]; then
             echo "The Java version you have is less than the minimum requirement Java $JavaLimit for the IIP-Ecosphere platform"
             echo "Your Java version is "$JAVA_VERSION
             while true; do
-                read -p "Do you want to install Java 13 - you should have at least Java $JAVA_VERSION? - You can't skip this step; if you skip it the installation will end. (y/n) " Javayn
+                read -p "Do you want to install Java 17 - you should have at least Java $JAVA_VERSION? - You can't skip this step; if you skip it the installation will end. (y/n) " Javayn
                 case $Javayn in
                     [Yy]* ) break;;
                     [Nn]* ) exit;;
@@ -31,7 +31,7 @@ if [ $yn == "y" ] || [ $yn == "Y" ]; then
     
     if [ -x "$(command -v mvn -version)" ]; then
         MVN_VERSION=$(mvn -version | grep "Apache Maven" | grep -oP '[[:digit:]]\.[[:digit:]]\.[[:digit:]]')
-        RecommendMvn=3.6.3
+        RecommendMvn=3.9.7
         if ! [ $MVN_VERSION == $RecommendMvn ]; then
             echo "You have Maven version $MVN_VERSION, it is recommended to have version $RecommendMvn"
             while true; do
@@ -105,33 +105,33 @@ if [ $yn == "y" ] || [ $yn == "Y" ]; then
         esac
     done   
     
-    # Install Java version 13 
+    # Install Java version 17 
     
     sudo apt-get update
     sudo apt install unzip -y
     sudo apt install jq -y
     
     if ! [ -x "$(command -v java -version)" ]; then
-        sudo apt install openjdk-13-jdk-headless -y
+        sudo apt install openjdk-17-jdk-headless -y
     else
         case $Javayn in
-            [Yy]* ) sudo apt install openjdk-13-jdk-headless -y; break;;
+            [Yy]* ) sudo apt install openjdk-17-jdk-headless -y; break;;
             [Nn]* ) exit;;
         esac
     fi
     
-    # Install Maven version 3.6.3
+    # Install Maven version 3.9.7
     
     if ! [ -x "$(command -v mvn -version)" ]; then
-        sudo wget https://archive.apache.org/dist/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz
-        sudo tar xzpvf apache-maven-3.6.3-bin.tar.gz
+        sudo wget https://archive.apache.org/dist/maven/maven-3/3.9.7/binaries/apache-maven-3.9.7-bin.tar.gz
+        sudo tar xzpvf apache-maven-3.9.7-bin.tar.gz
     
-        sudo ln -s $PWD/apache-maven-3.6.3/bin/mvn /usr/bin/mvn
+        sudo ln -s $PWD/apache-maven-3.9.7/bin/mvn /usr/bin/mvn
     else
         case $Mavenyn in
-            [Yy]* ) sudo wget https://archive.apache.org/dist/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz;
-                    sudo tar xzpvf apache-maven-3.6.3-bin.tar.gz;
-                    sudo ln -sf $PWD/apache-maven-3.6.3/bin/mvn /usr/bin/mvn;;
+            [Yy]* ) sudo wget https://archive.apache.org/dist/maven/maven-3/3.9.7/binaries/apache-maven-3.9.7-bin.tar.gz;
+                    sudo tar xzpvf apache-maven-3.9.7-bin.tar.gz;
+                    sudo ln -sf $PWD/apache-maven-3.9.7/bin/mvn /usr/bin/mvn;;
             [Nn]* ) break;;
         esac
     fi

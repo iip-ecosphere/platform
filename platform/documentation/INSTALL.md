@@ -10,7 +10,7 @@ Unpack the installation package, e.g., on Linux
 
     tar xzvf install.tar.gz
 
-All installation steps are described in the [README](../tools/Install/README.md) of the installation package, which is also contained in the respective archive files. 
+All installation steps are described in the [README](../tools/Install/README.md) of the installation package, which is also contained in the respective archive files. The required software installation is detailed in [PREREQUISITES](PREREQUISITES.md).
 
 ## Pre-packaged Docker containers
 

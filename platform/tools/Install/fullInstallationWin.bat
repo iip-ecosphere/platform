@@ -53,7 +53,7 @@ cd Platform
 
 :prerequisites
 echo =====================================================
-echo "Installing prerequisites Java 13, Maven version 3.6.3, and Python version 3.9"
+echo "Installing prerequisites Java 17, Maven version 3.9.7, and Python version 3.9"
 echo "This action will change Windows Environment Variables"
 set /P c=Do you want to install the prerequisites (skip only if already installed)? [y/n]
 if /I "%c%" EQU "Y" goto :prerequisitesYes
@@ -63,7 +63,7 @@ goto :prerequisites
 :prerequisitesYes
 
 echo =====================================================
-echo "Make sure that python is set to OFF, in the (App execution aliases) for Windows 11 - Settings > Apps > apps & features > App execution aliases"
+echo "Make sure that Python is set to OFF, in the (App execution aliases) for Windows 11 - Settings > Apps > apps & features > App execution aliases"
 pause
 
 REM Check current Java version 
@@ -79,7 +79,7 @@ for /F "tokens=1* delims=:" %%a in ('java -version 2^>^&1') do (
 set "javaVersion4=!javaVersion3:"=!"
 set /a javaVersion4=%javaVersion4
 
-set /a javaLimit=11
+set /a javaLimit=17
 
 if %javaVersion4% GEQ %javaLimit% set javaVersionCheck="Ok"
 if %javaVersion4% LSS %javaLimit% set javaVersionCheck="Diff"
@@ -95,7 +95,7 @@ for /F "tokens=1* delims=:" %%a in ('mvn -version 2^>^&1') do (
 
 (for /f "tokens=3 delims= " %%a in ('echo "%mvnVersion%"' ) do set "mvnVersion2=%%a")
 
-set RecommendMvn=3.6.3
+set RecommendMvn=3.9.7
 
 if "%mvnVersion2%" == "%RecommendMvn%" set mvnVersionCheck="Ok"
 if NOT "%mvnVersion2%" == "%RecommendMvn%" set mvnVersionCheck="Diff"
@@ -118,7 +118,7 @@ if "%pythonVersion3%" == "%RecommendPython%" set pythonVersionCheck="Ok"
 if NOT "%pythonVersion3%" == "%RecommendPython%" set pythonVersionCheck="Diff"
 if "%pythonVersion3%" == "is." set pythonVersionCheck="Non"
 
-REM Install Java version 13 
+REM Install Java version 17 
 
 if %javaVersionCheck% == "Ok" goto :skipJava
 if %javaVersionCheck% == "Diff" goto :askJava
@@ -128,24 +128,24 @@ if %javaVersionCheck% == "Non" goto :installJava
 echo "The Java version you have is less than the minimum requirement Java %javaLimit% for the IIP-Ecosphere platform"
 
 :answerJava
-set /P c=Do you want to install Java 13 - you should have at least Java %javaLimit%? - You can't skip this step; if you skip it the installation will end. [y/n]?
+set /P c=Do you want to install Java 17 - you should have at least Java %javaLimit%? - You can't skip this step; if you skip it the installation will end. [y/n]?
 if /I "%c%" EQU "Y" goto :installJava
 if /I "%c%" EQU "N" goto :installEndNow
 goto :answerJava
 
 :installJava
 
-curl https://download.java.net/openjdk/jdk13/ri/openjdk-13+33_windows-x64_bin.zip -o openjdk-13+33_windows-x64_bin.zip
-tar xzpvf openjdk-13+33_windows-x64_bin.zip
-setx JAVA_HOME "%cd%\jdk-13"
-SET JAVA_HOME=%cd%\jdk-13
+curl https://download.oracle.com/java/17/archive/jdk-17.0.10_windows-x64_bin.zip -o openjdk.zip
+tar xzpvf openjdk.zip
+setx JAVA_HOME "%cd%\jdk-17"
+SET JAVA_HOME=%cd%\jdk-17
 setx Path "%Path%;%JAVA_HOME%\bin"
 SET Path=%Path%;%JAVA_HOME%\bin
 netsh advfirewall firewall add rule name="Java" dir=in action=allow program="%JAVA_HOME%\bin\java.exe" enable=yes
 
 :skipJava
 
-REM Install Maven version 3.6.3 
+REM Install Maven version 3.9.7
 
 if %mvnVersionCheck% == "Ok" goto :skipMaven
 if %mvnVersionCheck% == "Diff" goto :askMaven
@@ -162,10 +162,10 @@ goto :answerMaven
 
 :installMaven
 
-curl https://archive.apache.org/dist/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.zip -o apache-maven-3.6.3-bin.zip
-tar xzpvf apache-maven-3.6.3-bin.zip
-setx MAVEN_HOME "%cd%\apache-maven-3.6.3"
-SET MAVEN_HOME=%cd%\apache-maven-3.6.3
+curl https://archive.apache.org/dist/maven/maven-3/3.9.7/binaries/apache-maven-3.9.7-bin.zip -o maven.zip
+tar xzpvf maven.zip
+setx MAVEN_HOME "%cd%\apache-maven-3.9.7"
+SET MAVEN_HOME=%cd%\apache-maven-3.9.7
 setx Path "%Path%;%MAVEN_HOME%\bin"
 SET Path=%Path%;%MAVEN_HOME%\bin
 
