@@ -14,9 +14,5 @@
         	<arg value="-Dmaven.build.cache.enabled=false"/> <!-- runs out of memory here -->
             <arg value="-Dokto.mvn.home=${maven.bin.dir}/bin"/>
         </maven>
-        <ant dir="gen/hm23/ApplicationInterfaces" antfile="build-jk.xml" />
-        <mvnDeployResolveArtifact artifactPattern="examples.emo23-*.*.*.??" folderName="IIP-apps-emp23" jarFolder="target" pomFile="pom.xml"/>
-        <ant dir="gen/hm23/DemonstrationDriveAppHM23" antfile="build-jk.xml" />
-        <ant dir="gen/hm23/DemonstrationFederatedLearningAppHM23" antfile="build-jk.xml" />
 	</target>
 </project>

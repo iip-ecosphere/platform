@@ -13,6 +13,7 @@
 	    <maven pomFile="pom.xml" goal="install">
             <arg value="-Dunpack.force=true"/>
 	    	<arg value="-Diip.ciBuildId=${build_num}"/> <!-- must be set in jenkins ANT build step -->
+            <arg value="-Dokto.mvn.home=${maven.bin.dir}/bin"/>
     	</maven>
 		<mvnDeployResolveArtifact folderName="IIP-examples" pomFile="pom.xml" jarFolder="target" artifactPattern="examples-*.*.*.jar" />
 	</target>

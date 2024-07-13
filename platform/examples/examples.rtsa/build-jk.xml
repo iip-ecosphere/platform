@@ -14,7 +14,5 @@
             <arg value="-Diip.ciBuildId=${build_num}"/> <!-- must be set in jenkins ANT build step -->
             <arg value="-Dokto.mvn.home=${maven.bin.dir}/bin"/>
         </maven>
-        <ant dir="gen/rtsa/ApplicationInterfaces" antfile="build-jk.xml" />
-        <ant dir="gen/rtsa/SimpleRTSADemoFlowApp" antfile="build-jk.xml" />
 	</target>
 </project>

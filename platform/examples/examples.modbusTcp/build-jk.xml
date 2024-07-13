@@ -15,7 +15,5 @@
         	<arg value="-Dtest.exec.args=--skip"/>
             <arg value="-Dokto.mvn.home=${maven.bin.dir}/bin"/>
         </maven>
-        <ant dir="gen/modbus/ApplicationInterfaces" antfile="build-jk.xml" />
-        <ant dir="gen/modbus/SimpleModbusDemoApp" antfile="build-jk.xml" />
 	</target>
 </project>
