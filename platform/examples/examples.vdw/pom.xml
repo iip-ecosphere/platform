@@ -229,7 +229,7 @@
 	                        <configuration>
 	                            <appId>generatedConnector</appId>
 	                            <mvnArgs>
-	                                <mvnArg>-Dexec.args="--add-opens=java.base/java.lang=ALL-UNNAMED ${test.exec.args}"</mvnArg>
+	                                <mvnArg>-Dexec.args="${test.exec.args}"</mvnArg>
 	                            </mvnArgs>
 	                            <brokerPort>0</brokerPort>
 	                            <logRegExprs>
