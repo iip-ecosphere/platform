@@ -35,6 +35,7 @@ import java.util.function.Consumer;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
+import de.iip_ecosphere.platform.support.JavaUtils;
 import de.iip_ecosphere.platform.configuration.PlatformInstantiator.InstantiationConfigurer;
 
 /**
@@ -128,10 +129,7 @@ public class PlatformInstantiatorExecutor {
     public void executeAsProcess(ClassLoader loader, String resourcesDir, String tracingLevel, 
         String mvnArgs, String... args) throws ExecutionException {
         List<String> pArgs = new ArrayList<>();
-        pArgs.add(ProcessHandle.current()
-            .info()
-            .command()
-            .orElseThrow(() -> new ExecutionException("Cannot determine JDK location", null)));
+        pArgs.add(JavaUtils.getJavaBinaryPath("java"));
         for (String key : properties.keySet()) {
             pArgs.add(createJvmArg(key, properties.get(key)));
         }

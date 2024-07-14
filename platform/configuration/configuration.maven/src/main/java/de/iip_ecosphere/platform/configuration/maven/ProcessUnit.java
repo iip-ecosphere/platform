@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.Timer;
@@ -34,6 +33,7 @@ import org.apache.commons.lang.SystemUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 
 import de.iip_ecosphere.platform.support.CollectionUtils;
+import de.iip_ecosphere.platform.support.JavaUtils;
 import de.iip_ecosphere.platform.tools.maven.python.Logger;
 import de.iip_ecosphere.platform.tools.maven.python.StandardLogger;
 
@@ -629,50 +629,6 @@ public class ProcessUnit {
                 throw new MojoExecutionException(e.getMessage(), e);
             }
         }
-        
-        // >> migrate to support
-
-        /**
-         * Returns the path to the running Java binary.
-         * 
-         * @return the path, may be <b>null</b> for unknown
-         */
-        public static String getJavaBinaryPath() {
-            String result = null;
-            Optional<String> jp = ProcessHandle.current()
-                .info()
-                .command();
-            if (jp.isPresent()) {
-                result = jp.get();
-            }
-            return result;
-        }
-        
-        /**
-         * Returns the path to the running JVM bin folder.
-         * 
-         * @return the path, may be <b>null</b> for unknown
-         */
-        public static String getJavaPath() {
-            String javaPath = getJavaBinaryPath();
-            if (null != javaPath) {
-                int pos = javaPath.lastIndexOf(File.separator);
-                if (pos > 0) {
-                    javaPath = javaPath.substring(0, pos);
-                }
-            } else {
-                javaPath = System.getProperty("sun.boot.library.path");
-                if (null != javaPath) {
-                    int pos = javaPath.lastIndexOf(File.separator + "lib");
-                    if (pos > 0) { // linux
-                        javaPath = javaPath.substring(0, pos) + File.separator + "bin";
-                    }
-                }
-            }
-            return javaPath;
-        }
-
-        // << migrate to support
 
         /**
          * Builds the process.
@@ -693,7 +649,7 @@ public class ProcessUnit {
                 builder.directory(home);
                 info =  " in " + home;
             }
-            String path = getJavaPath();
+            String path = JavaUtils.getJavaPath();
             if (null != path && null != MAVEN_HOME) {
                 path += File.pathSeparator + MAVEN_HOME;
             }
