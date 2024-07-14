@@ -69,6 +69,8 @@
                               <invokeGoals>
                                   <invokeGoal>install</invokeGoal>
                               </invokeGoals>
+                              <disableJava>true</disableJava>
+                              <disablePython>disablePython</disablePython>
                               <systemProperties>
                                   <systemProperty>
                                       <key>configuration.textFile.skip</key>
