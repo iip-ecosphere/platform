@@ -322,7 +322,6 @@ public class ProcessUnit {
         private String argAggregateStart;
         private String argAggregateEnd;
         private boolean err2In = false;
-        private boolean isMaven = false;
 
         /**
          * Creates a process builder instance.
@@ -403,7 +402,6 @@ public class ProcessUnit {
                 enableArgumentAggregation();
             }
             addArgument(getMavenPath());
-            isMaven = true;
             return this;
         }
         
@@ -527,7 +525,6 @@ public class ProcessUnit {
                     cmd = getMavenPath();
                 }
                 addArgument(cmd);
-                isMaven = true;
             }
             return this;
         }
@@ -696,12 +693,14 @@ public class ProcessUnit {
                 builder.directory(home);
                 info =  " in " + home;
             }
-            if (!isMaven) { // don't override maven
-                String javaPath = getJavaPath();
-                if (null != javaPath) {
-                    builder.environment().put("PATH", javaPath); // scripts are started through shell
-                    info += " with " + javaPath + " in PATH";
-                }
+            String path = getJavaPath();
+            if (null != path && null != MAVEN_HOME) {
+                path += File.pathSeparator + MAVEN_HOME;
+            }
+            if (null != path) {
+                path += File.pathSeparator + builder.environment().get("PATH");
+                builder.environment().put("PATH", path); // scripts are started through shell
+                info += " with " + path + " in PATH";
             }
             logger.info("Starting " + CollectionUtils.toStringSpaceSeparated(args) + info);
             Process proc = builder.start();
