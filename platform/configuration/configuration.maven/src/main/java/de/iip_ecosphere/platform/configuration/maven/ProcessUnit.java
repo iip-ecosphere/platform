@@ -632,6 +632,50 @@ public class ProcessUnit {
                 throw new MojoExecutionException(e.getMessage(), e);
             }
         }
+        
+        // >> migrate to support
+
+        /**
+         * Returns the path to the running Java binary.
+         * 
+         * @return the path, may be <b>null</b> for unknown
+         */
+        public static String getJavaBinaryPath() {
+            String result = null;
+            Optional<String> jp = ProcessHandle.current()
+                .info()
+                .command();
+            if (jp.isPresent()) {
+                result = jp.get();
+            }
+            return result;
+        }
+        
+        /**
+         * Returns the path to the running JVM bin folder.
+         * 
+         * @return the path, may be <b>null</b> for unknown
+         */
+        public static String getJavaPath() {
+            String javaPath = getJavaBinaryPath();
+            if (null != javaPath) {
+                int pos = javaPath.lastIndexOf(File.separator);
+                if (pos > 0) {
+                    javaPath = javaPath.substring(0, pos);
+                }
+            } else {
+                javaPath = System.getProperty("sun.boot.library.path");
+                if (null != javaPath) {
+                    int pos = javaPath.lastIndexOf(File.separator + "lib");
+                    if (pos > 0) { // linux
+                        javaPath = javaPath.substring(0, pos) + File.separator + "bin";
+                    }
+                }
+            }
+            return javaPath;
+        }
+
+        // << migrate to support
 
         /**
          * Builds the process.
@@ -653,20 +697,7 @@ public class ProcessUnit {
                 info =  " in " + home;
             }
             if (!isMaven) { // don't override maven
-                String javaPath = System.getProperty("sun.boot.library.path");
-                if (null == javaPath || javaPath.isEmpty()) {
-                    javaPath = null;
-                    Optional<String> jp = ProcessHandle.current()
-                        .info()
-                        .command();
-                    if (jp.isPresent()) {
-                        javaPath = jp.get();
-                        int pos = javaPath.lastIndexOf(File.separator);
-                        if (pos > 0) {
-                            javaPath = javaPath.substring(pos);
-                        }
-                    }
-                }
+                String javaPath = getJavaPath();
                 if (null != javaPath) {
                     builder.environment().put("PATH", javaPath); // scripts are started through shell
                     info += " with " + javaPath + " in PATH";
