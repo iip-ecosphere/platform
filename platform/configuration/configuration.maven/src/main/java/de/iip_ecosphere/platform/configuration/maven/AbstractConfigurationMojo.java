@@ -327,11 +327,22 @@ public abstract class AbstractConfigurationMojo extends AbstractLoggingMojo impl
             }
         }
         if (enabled) { 
-            long maxModel = getMaxLastModified(modelDir, f -> f.getName().endsWith(".ivml"));
+            long maxModel = getMaxLastModified(modelDir, f -> isModelFile(f));
             long maxOut = getMaxLastModified(outDir, f -> true);
             newer = maxOut < 0 || maxModel > maxOut;
         }
         return newer;
+    }
+
+    /**
+     * Returns whether {@code file} is an IVML, VIL or VTL file.
+     * 
+     * @param file the file to check
+     * @return {@code true} for one of these files, {@code false} else
+     */
+    private static boolean isModelFile(File file) {
+        String name = file.getName();
+        return name.endsWith(".ivml") || name.endsWith(".vil") || name.endsWith(".vtl");
     }
     
     /**
@@ -438,7 +449,7 @@ public abstract class AbstractConfigurationMojo extends AbstractLoggingMojo impl
                     throw new MojoExecutionException(e.getMessage());
                 }
             } else {
-                getLog().info("Skipped as code in output directory is newer than IVML model.");
+                getLog().info("Skipped as code in output directory '" + outputDir + "' is newer than IVML model.");
             }
         } else {
             getLog().info("Model directory is not valid. No IVML files found in " + getModelDirectory());
