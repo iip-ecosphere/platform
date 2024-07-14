@@ -20,13 +20,6 @@
       <groupId>de.iip-ecosphere.platform</groupId>
       <version>${project.version}</version>
     </dependency>
-
-    <!-- the application itself, generated code -->  
-    <dependency>
-      <artifactId>SimpleKodexTestingApp</artifactId>
-      <groupId>de.iip-ecosphere.platform.apps</groupId>
-      <version>0.1.0-SNAPSHOT</version> <!-- from config -->
-    </dependency>
     
     <dependency>
       <artifactId>configuration.configuration</artifactId>
@@ -68,12 +61,18 @@
      <profile>
         <id>App</id>
         <dependencies>    
+            <!-- the application itself, generated code -->  
         	<dependency>
       			<artifactId>apps.AppInterfacesKodexExample</artifactId>
       			<groupId>de.iip-ecosphere.platform</groupId>
       			<version>${project.version}</version>
-    	</dependency> 
-     </dependencies>
+    	   </dependency> 
+           <dependency>
+                <artifactId>SimpleKodexTestingApp</artifactId>
+                <groupId>de.iip-ecosphere.platform.apps</groupId>
+                <version>0.1.0-SNAPSHOT</version> <!-- from config -->
+           </dependency>
+        </dependencies>
         <build>
             <plugins>
                 <plugin>
@@ -100,9 +99,9 @@
         <build>
             <plugins>
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-dependency-plugin</artifactId>
-                    <version>3.2.0</version>
+                    <groupId>de.iip-ecosphere.platform</groupId>
+                    <artifactId>dependency-plugin</artifactId>
+                    <version>${project.version}</version>
                     <executions>
                         <execution>
                             <id>unpack</id>
