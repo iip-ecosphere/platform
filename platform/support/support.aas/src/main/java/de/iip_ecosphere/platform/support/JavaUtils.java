@@ -21,7 +21,21 @@ import java.util.Optional;
  * @author Holger Eichelberger, SSE
  */
 public class JavaUtils {
-    
+
+    /**
+     * Returns the path to the running Java binary.
+     * 
+     * @param dflt the default value to return if the original value is unknown
+     * @return the path, may be dflt
+     */
+    public static String getJavaBinaryPath(String dflt) {
+        String result = getJavaBinaryPath();
+        if (null == result) {
+            result = dflt;
+        }
+        return result;
+    }
+
     /**
      * Returns the path to the running Java binary.
      * 

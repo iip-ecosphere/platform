@@ -25,7 +25,8 @@ import de.iip_ecosphere.platform.support.JavaUtils;
 public class JavaUtilsTest {
 
     /**
-     * Tests {@link JavaUtils#getJavaPath()} and {@link JavaUtils#getJavaBinaryPath()}.
+     * Tests {@link JavaUtils#getJavaPath()}, {@link JavaUtils#getJavaBinaryPath()} and 
+     * {@link JavaUtils#getJavaBinaryPath(String)}.
      */
     @Test
     public void testJavaPaths() {
@@ -33,6 +34,8 @@ public class JavaUtilsTest {
         Assert.assertTrue(JavaUtils.getJavaPath().length() > 0);
         Assert.assertNotNull(JavaUtils.getJavaBinaryPath());
         Assert.assertTrue(JavaUtils.getJavaBinaryPath().length() > 0);
+        Assert.assertNotNull(JavaUtils.getJavaBinaryPath("java"));
+        Assert.assertTrue(JavaUtils.getJavaBinaryPath("java").length() > 0);
     }
 
 }
