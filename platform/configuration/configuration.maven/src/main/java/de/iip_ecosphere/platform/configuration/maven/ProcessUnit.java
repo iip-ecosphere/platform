@@ -321,6 +321,7 @@ public class ProcessUnit {
         private String argAggregateStart;
         private String argAggregateEnd;
         private boolean err2In = false;
+        private boolean isMaven = false;
 
         /**
          * Creates a process builder instance.
@@ -401,6 +402,7 @@ public class ProcessUnit {
                 enableArgumentAggregation();
             }
             addArgument(getMavenPath());
+            isMaven = true;
             return this;
         }
         
@@ -524,6 +526,7 @@ public class ProcessUnit {
                     cmd = getMavenPath();
                 }
                 addArgument(cmd);
+                isMaven = true;
             }
             return this;
         }
@@ -648,9 +651,11 @@ public class ProcessUnit {
                 builder.directory(home);
                 info =  " in " + home;
             }
-            String javaPath = System.getProperty("java.library.path") + File.separator + "bin";
-            builder.environment().put("PATH", javaPath); // scripts are started through shell
-            info += " with " + javaPath + " in PATH";
+            if (!isMaven) { // collides on Jenkins/Linux
+                String javaPath = System.getProperty("java.library.path") + File.separator + "bin";
+                builder.environment().put("PATH", javaPath); // scripts are started through shell
+                info += " with " + javaPath + " in PATH";
+            }
             logger.info("Starting " + CollectionUtils.toStringSpaceSeparated(args) + info);
             Process proc = builder.start();
             ProcessUnit result = new ProcessUnit(description, proc, timeout, listener, checkRegEx, logger);
