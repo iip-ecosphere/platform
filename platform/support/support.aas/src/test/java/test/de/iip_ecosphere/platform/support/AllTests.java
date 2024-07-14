@@ -39,6 +39,7 @@ import test.de.iip_ecosphere.platform.support.net.UriResolverTest;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
+    JavaUtilsTest.class,
     NetUtilsTest.class,
     SchemaServerEndpointTest.class,
     FactoryTest.class, // we do not go for a sub-suite for now as Maven may execute both
