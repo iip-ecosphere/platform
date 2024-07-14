@@ -3,9 +3,12 @@
 ### Version 0.7.1 (consolidation, JDK 17):
 
 In progress:
-* [#106](https://github.com/iip-ecosphere/platform/issues/106): Migration to JDK 17
 * [#164](https://github.com/iip-ecosphere/platform/issues/164): UI design revision
 * [#117](https://github.com/iip-ecosphere/platform/issues/117): Multiple service managers per device
+
+Improvements:
+* [#106](https://github.com/iip-ecosphere/platform/issues/106): Migration to JDK 17
+* Build process improvements for multiple Java/Maven installations like CI.
 
 ### Version 0.7.0 (2024/07/11, no maven central release):
 
