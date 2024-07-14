@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.Timer;
@@ -651,10 +652,25 @@ public class ProcessUnit {
                 builder.directory(home);
                 info =  " in " + home;
             }
-            if (!isMaven) { // collides on Jenkins/Linux
-                String javaPath = System.getProperty("java.library.path") + File.separator + "bin";
-                builder.environment().put("PATH", javaPath); // scripts are started through shell
-                info += " with " + javaPath + " in PATH";
+            if (!isMaven) { // don't override maven
+                String javaPath = System.getProperty("sun.boot.library.path");
+                if (null == javaPath || javaPath.isEmpty()) {
+                    javaPath = null;
+                    Optional<String> jp = ProcessHandle.current()
+                        .info()
+                        .command();
+                    if (jp.isPresent()) {
+                        javaPath = jp.get();
+                        int pos = javaPath.lastIndexOf(File.separator);
+                        if (pos > 0) {
+                            javaPath = javaPath.substring(pos);
+                        }
+                    }
+                }
+                if (null != javaPath) {
+                    builder.environment().put("PATH", javaPath); // scripts are started through shell
+                    info += " with " + javaPath + " in PATH";
+                }
             }
             logger.info("Starting " + CollectionUtils.toStringSpaceSeparated(args) + info);
             Process proc = builder.start();
