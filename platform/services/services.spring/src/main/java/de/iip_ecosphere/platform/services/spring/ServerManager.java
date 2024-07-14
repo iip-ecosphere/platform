@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -36,6 +35,7 @@ import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.services.environment.spring.Starter;
 import de.iip_ecosphere.platform.services.spring.descriptor.Server;
 import de.iip_ecosphere.platform.support.CollectionUtils;
+import de.iip_ecosphere.platform.support.JavaUtils;
 import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.ServerAddress;
@@ -97,9 +97,7 @@ public class ServerManager {
         @Override
         public de.iip_ecosphere.platform.support.Server start() {
             List<String> a = new ArrayList<>();
-            ProcessHandle processHandle = ProcessHandle.current();
-            Optional<String> opt = processHandle.info().command();
-            a.add(opt.orElseGet(() -> "java"));
+            a.add(JavaUtils.getJavaBinaryPath("java"));
             if (server.getMemory() > 0) {
                 a.add("-Xmx" + server.getMemory() + "M");
             }
