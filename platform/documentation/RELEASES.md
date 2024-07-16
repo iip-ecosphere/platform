@@ -7,6 +7,7 @@ In progress:
 * [#117](https://github.com/iip-ecosphere/platform/issues/117): Multiple service managers per device
 
 Improvements:
+* Preparing for JDK 21 based on Eclipse 2024-06.
 * [#106](https://github.com/iip-ecosphere/platform/issues/106): Migration to JDK 17
 * Build process improvements for multiple Java/Maven installations like CI.
 

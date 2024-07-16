@@ -2,22 +2,24 @@
 
 ## Execution
 
-- JDK 17 (tested with JDK 17.0.10)
+- JDK 17 (tested with JDK 17.0.10), JDK 21 (tested with JDK 21.0.2)
 - Maven 3.9.7
 - Python 3.9.6
 - Docker
 
 ## Development
 
-- Execution requirements
-- Eclipse 2024.03
+- Execution requirements as basis
+- Eclipse 2024-06 (4.32.0)
 - Eclipse Checkstyle plugin 10.14.2
-- M2E Maven integration 2.6.0
-- Git (LFS)
+- M2E Maven integration 2.6.1
+- eGit 6.10 (LFS, see below)
 
 Helpful:
-- PyDev Plugin for Eclipse
-- Findbugs Plugin for Eclipse
+- eclEmma 3.1.9 Plugin for Eclipse
+- PyDev 12.1.0 Plugin for Eclipse
+- Findbugs 3.0.1 Plugin for Eclipse
+- xText 2.35
 
 ## Git LFS
 

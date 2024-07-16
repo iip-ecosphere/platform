@@ -15,7 +15,7 @@ For installation and first steps, see [install guide](platform/documentation/INS
 * ETFA'24: Paper on generating IDTA AAS submodel APIs accepted (preprint on [arxiv](https://arxiv.org/abs/2406.14470)).
 * MODELS'24: Tutorial on AAS accepted.
 * INFLUX DB connector for InfluxDb2
-* Platform core migrated to JDK 17 (see our [migration story](platform/documentation/MigrationStory.md)). Container creation still needs upgrade [#165](https://github.com/iip-ecosphere/platform/issues/165).
+* Platform core migrated to **JDK 17** (see our [migration story](platform/documentation/MigrationStory.md)). Container creation still needs upgrade [#165](https://github.com/iip-ecosphere/platform/issues/165). Preparing for **JDK 21** based on Eclipse 2024-06.
 * In progress: MODBUS/TCP connector by Christian Nikolajew (tested for compliance with Phoenix Contact EEM-MA 370 and Siemens SENTRON PAC 3200), example re-usable MODBUS/TCP definitions for Phoenix Contact EEM-MA 370
 * Plugins for alternative components with conflicting classpaths. Retrofit for BaSyx 1.0, in particular in AAS connector.
 * Serial connector tested and working.

@@ -2,15 +2,15 @@
 
 This folder contains the documentation of the okotflow platform.
 
-* The platform [handbook](platform/documentation/PlatformHandbook.pdf)
-* [Install information](../documentation/INSTALL.md) for own installation, Docker containers and for playing with pre-packaged containers.
-* [Guideline for platform installation under Windows](../documentation/Platform_Installation_Guide_for_Windows.pdf)
-* [Guideline for platform installation under Linux](../documentation/Platform_Installation_Guide_for_Linux.pdf)
+* The platform [handbook](PlatformHandbook.pdf)
+* [Install information](INSTALL.md) for own installation, Docker containers and for playing with pre-packaged containers.
+* [Guideline for platform installation under Windows](Platform_Installation_Guide_for_Windows.pdf)
+* [Guideline for platform installation under Linux](Platform_Installation_Guide_for_Linux.pdf)
 
 ## Technical Guidelines
 * The technical requirements are documented in [PREREQUISITES](PREREQUISITES.md).
 * There is an overall **architecture** described in the (**platform handbook**)[PlatformHandbook.pdf]. Please consult the architecture first to understand how existing and new parts are related.
-* Please consider the [guideline on how to open the code projects and setup the environment](../documentation/Guideline.pdf?raw=true).
+* Please consider the [guideline on how to open the code projects and setup the environment](Guideline.pdf?raw=true).
 * Please note that special characters like whitespaces in folder names (in particular on Windows) may cause the installation, platform installation or examples to fail.  
 * **Java projects** are created with Eclipse. Import ``iipCodeFormatter.xml`` from ``platformDependencies`` as formatter settings. Set text editor print margin to 120 characters. For Python development, please install the `PyDev` Eclipse plugin, which is supported by our generated application templates.
 * Since version 0.7.1 we use **JDK 17** for build and execution. To achieve exchangeable projects across development installations, use in Eclipse the execution environment ``JavaSE-17`` as JRE system library.
