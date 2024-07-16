@@ -125,6 +125,9 @@ public class AbstractInvokerMojo extends AbstractMojo implements Logger { // Abs
     @Parameter(property = "disableJava", defaultValue = "false") 
     private boolean disableJava;
 
+    @Parameter(property = "disableJavaTests", defaultValue = "false") 
+    private boolean disableJavaTests;
+    
     @Parameter(property = "disablePython", defaultValue = "false") 
     private boolean disablePython;
 
@@ -260,7 +263,7 @@ public class AbstractInvokerMojo extends AbstractMojo implements Logger { // Abs
         } else {
             value = Boolean.valueOf(skipTests);
         }
-        value = value || disableJava || disableBuild;
+        value = value || disableJava || disableBuild || disableJavaTests;
         sysProperties.put("maven.test.skip", String.valueOf(value));
         sysProperties.put("skipTests", String.valueOf(value)); // maven.test.skip might be sufficient
         if (null != mavenBuildCacheEnabled) {
