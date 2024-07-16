@@ -44,11 +44,11 @@ import de.iip_ecosphere.platform.tools.maven.python.StandardLogger;
  */
 public class ProcessUnit {
     
+    public static final String PROP_MAVEN_BIN = "okto.mvn.home";
     public static final Set<String> SCRIPT_NAMES = Collections.unmodifiableSet(
         CollectionUtils.toSet("ant", "ng", "npm", "mvn"));
     public static final String[] WIN_BAT_PREFIX = {"cmd", "/s", "/c"};
     public static final int UNKOWN_EXIT_STATUS = Integer.MIN_VALUE;
-    public static final String MAVEN_HOME = System.getProperty("okto.mvn.home");
     private static Timer timer;
     
     private String description;
@@ -247,6 +247,15 @@ public class ProcessUnit {
     public static boolean isSuccess(int status) {
         return status != ProcessUnit.UNKOWN_EXIT_STATUS && status == 0;        
     }
+    
+    /**
+     * Returns the maven bin folder via {@link #PROP_MAVEN_BIN}.
+     * 
+     * @return the maven bin folder, may be <b>null</b>
+     */
+    public static String getMavenBinPath() {
+        return System.getProperty(PROP_MAVEN_BIN);
+    }
 
     /**
      * Returns the description of the unit.
@@ -411,7 +420,7 @@ public class ProcessUnit {
          * @return the maven path
          */
         private String getMavenPath() {
-            String path = MAVEN_HOME; // might infer maven home, but how
+            String path = getMavenBinPath();
             if (path != null) {
                 if (!path.endsWith(File.separator)) {
                     path += File.separator;
@@ -650,8 +659,8 @@ public class ProcessUnit {
                 info =  " in " + home;
             }
             String path = JavaUtils.getJavaPath();
-            if (null != path && null != MAVEN_HOME) {
-                path += File.pathSeparator + MAVEN_HOME;
+            if (null != path && null != getMavenBinPath()) {
+                path += File.pathSeparator + getMavenBinPath();
             }
             if (null != path) {
                 path += File.pathSeparator + builder.environment().get("PATH");

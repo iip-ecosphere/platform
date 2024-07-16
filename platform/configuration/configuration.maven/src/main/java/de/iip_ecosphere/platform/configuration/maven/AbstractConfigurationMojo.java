@@ -116,6 +116,13 @@ public abstract class AbstractConfigurationMojo extends AbstractLoggingMojo impl
     @Parameter(required = false, defaultValue = "true")
     private boolean asProcess;
 
+    /**
+     * The home directory of the Maven installation to use for the forked builds. Defaults to the current Maven
+     * installation.
+     */
+    @Parameter
+    private File mavenHome;
+
     @Override
     public MavenProject getProject() {
         return project;
@@ -426,6 +433,7 @@ public abstract class AbstractConfigurationMojo extends AbstractLoggingMojo impl
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
+        adjustMavenHome();
         String resourcesDir = validateDirectory(makeAbsolute(getResourcesDirectory()));
         if (null == resourcesDir) {
             resourcesDir = validateDirectory(makeAbsolute(getFallbackResourcesDirectory()));
@@ -454,6 +462,17 @@ public abstract class AbstractConfigurationMojo extends AbstractLoggingMojo impl
         } else {
             getLog().info("Model directory is not valid. No IVML files found in " + getModelDirectory());
         }
+    }
+    
+    /**
+     * If {@link ProcessUnit#getMavenBinPath()} is not set, try to set it via {@link #mavenHome}.
+     */
+    private void adjustMavenHome() {
+        String bin = ProcessUnit.getMavenBinPath();
+        if (null == bin && mavenHome != null) { // unset??
+            System.setProperty(ProcessUnit.PROP_MAVEN_BIN, mavenHome.getAbsolutePath());
+        }
+        getLog().info("Using Maven bin path: " + ProcessUnit.getMavenBinPath());            
     }
     
     /**

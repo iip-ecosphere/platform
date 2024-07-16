@@ -1,6 +1,6 @@
 # oktoflow platform: Maven plugins for application/platform instantiation and testing
 
-Maven plugin for the following platform configuration tasks (represented as Maven goals in atypical notation). Depending on the setup, you may call this plugin explicitly with `-Dokto.maven.home` pointing to the binary folder of the maven that shall be called as subprocess. As dedicated Java subprocesses, e.g., for testing, we use the Java executing maven (prepended to the subprocess environment variable PATH). 
+Maven plugin for the following platform configuration tasks (represented as Maven goals in atypical notation). Depending on the setup, you may call this plugin explicitly with `-Dokto.maven.home` pointing to the binary folder of the Maven that shall be called as subprocess - otherwise the path of the executing Maven or if not accessible just the command "mvn" on the PATH is used. As dedicated Java subprocesses, e.g., for testing, we use the Java executing Maven (prepended to the subprocess environment variable PATH). 
 
 # Platform instantiation
 
