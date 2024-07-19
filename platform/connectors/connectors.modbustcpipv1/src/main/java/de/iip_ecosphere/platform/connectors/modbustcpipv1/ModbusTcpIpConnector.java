@@ -13,8 +13,13 @@
 package de.iip_ecosphere.platform.connectors.modbustcpipv1;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.net.InetAddress;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -45,7 +50,6 @@ import de.iip_ecosphere.platform.connectors.model.ModelInputConverter;
 import de.iip_ecosphere.platform.connectors.model.ModelOutputConverter;
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
 import de.iip_ecosphere.platform.support.json.JsonUtils;
-
 
 /**
  * Implements the generic MODBUS TCP/IP connector.
@@ -110,7 +114,7 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
             ProtocolAdapter<ModbusItem, Object, CO, CI>... adapter) {
         super(selector, adapter);
         configureModelAccess(new ModbusTcpIpModelAccess());
-        
+
     }
 
     @Override
@@ -141,10 +145,14 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
             setModbusMap();
 
             item = new ModbusItem(map);
+            
+            System.out.println("Map:" + map);
+            System.out.println("Item:" + item);
 
             String endpointURL = getEndpointUrl(params);
 
             connection = new TCPMasterConnection(InetAddress.getByName(params.getHost()));
+            //connection = new TCPMasterConnection(InetAddress.getByName("192.168.178.20"));
             connection.setPort(params.getPort());
             connection.setTimeout(timeout);
 
@@ -153,7 +161,7 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
                 LOGGER.info("MODBUS TCP/IP connecting to " + endpointURL);
             } catch (Exception e) {
                 e.printStackTrace();
-                LOGGER.info("MODBUS TCP/IP connection failed: {}", e.getMessage());
+                LOGGER.info("MODBUS TCP/IP connection failed: {}");
             }
 
         }
@@ -215,10 +223,7 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
 
     @Override
     protected void disconnectImpl() throws IOException {
-        if (null != connection) {
-            connection.close();
-            connection = null;
-        }
+        connection = null;
     }
 
     @Override
@@ -228,20 +233,21 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
 
     @Override
     protected ModbusItem read() throws IOException {
-        
-        //System.out.println("read()");        
+
+        // System.out.println("read()");
 
         for (ModbusMap.Entry<String, ModbusVarItem> entry : map.entrySet()) {
 
             ModbusVarItem varItem = entry.getValue();
 
             try {
-                //System.out.println("Offset / Size: " + varItem.getOffset() + "/" + varItem.getTypeRegisterSize());
-                
-                ReadMultipleRegistersRequest request = new ReadMultipleRegistersRequest(varItem.getOffset(), 
+                // System.out.println("Offset / Size: " + varItem.getOffset() + "/" +
+                // varItem.getTypeRegisterSize());
+
+                ReadMultipleRegistersRequest request = new ReadMultipleRegistersRequest(varItem.getOffset(),
                         varItem.getTypeRegisterSize());
                 request.setUnitID(unitId);
-                
+
                 ModbusTCPTransaction lTransaction = new ModbusTCPTransaction(connection);
                 lTransaction.setRequest(request);
                 lTransaction.execute();
@@ -249,30 +255,44 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
                 ReadMultipleRegistersResponse lResponse = (ReadMultipleRegistersResponse) lTransaction.getResponse();
 
                 if (varItem.getType().equals("short")) {
+                    
+                    item.setRegister(varItem.getOffset(), lResponse.getRegisters()[0].toShort());
 
-                    Object value = lResponse.getRegister(0).toShort();
-                    item.setRegister(varItem.getOffset(), value);
+                } else if (varItem.getType().equals("ushort")) {
 
+                    item.setRegister(varItem.getOffset(), lResponse.getRegisters()[0].toUnsignedShort());
+                    
                 } else if (varItem.getType().equals("integer")) {
 
                     item.setRegister(varItem.getOffset(), getIntegerFromRegisters(lResponse.getRegisters()));
 
-                } else if (varItem.getType().equals("float")) {
+                } else if (varItem.getType().equals("uinteger")) {
 
-                    item.setRegister(varItem.getOffset(), getFloatFromRegisters(lResponse.getRegisters()));
+                    item.setRegister(varItem.getOffset(), getUnsignedIntegerFromRegisters(lResponse.getRegisters()));
 
                 } else if (varItem.getType().equals("long")) {
 
                     item.setRegister(varItem.getOffset(), getLongFromRegisters(lResponse.getRegisters()));
 
+                } else if (varItem.getType().equals("ulong")) {
+
+                    item.setRegister(varItem.getOffset(), getUnsignedLongFromRegisters(lResponse.getRegisters()));
+
+                } else if (varItem.getType().equals("float")) {
+
+                    item.setRegister(varItem.getOffset(), getFloatFromRegisters(lResponse.getRegisters()));
+
                 } else if (varItem.getType().equals("double")) {
 
                     item.setRegister(varItem.getOffset(), getDoubleFromRegisters(lResponse.getRegisters()));
 
-                } else if (varItem.getType().equals("dword")) {
+                } else if (varItem.getType().equals("ascii")) {
 
-                    item.setRegister(varItem.getOffset(), lResponse.getRegister(0).toShort());
+                    item.setRegister(varItem.getOffset(), getStringFromRegisters(lResponse.getRegisters()));
 
+                } else if (varItem.getType().equals("datetime")) {
+
+                    item.setRegister(varItem.getOffset(), getDatetimeFromRegisters(lResponse.getRegisters()));
                 }
 
             } catch (ModbusIOException e) {
@@ -281,7 +301,7 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
                 e.printStackTrace();
             } catch (ModbusException e) {
                 e.printStackTrace();
-            } 
+            }
         }
 
         return item;
@@ -295,11 +315,45 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
      */
     private int getIntegerFromRegisters(Register[] registers) {
 
-        short lowShort = registers[0].toShort();
-        short highShort = registers[1].toShort();
+        short lowShort;
+        short highShort;
+
+        if (bigByte) {
+            lowShort = registers[0].toShort();
+            highShort = registers[1].toShort();
+        } else {
+            highShort = registers[0].toShort();
+            lowShort = registers[1].toShort();
+        }
 
         int result = ((highShort & 0xFFFF) << 16) | (lowShort & 0xFFFF);
 
+        return result;
+    }
+
+    /**
+     * Creates an Long containing the value of a unsignedInteger.
+     * 
+     * @param registers containing the unsignedInteger
+     * @return the value of unsignedInteger as long
+     */
+    private long getUnsignedIntegerFromRegisters(Register[] registers) {
+
+        short lowShort;
+        short highShort;
+
+        if (bigByte) {
+            lowShort = registers[0].toShort();
+            highShort = registers[1].toShort();
+        } else {
+            highShort = registers[0].toShort();
+            lowShort = registers[1].toShort();
+        }
+
+        int lowInt = lowShort & 0xFFFF;
+        int highInt = highShort & 0xFFFF;
+
+        long result = ((long) highInt << 16) | lowInt;
         return result;
     }
 
@@ -313,7 +367,7 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
 
         short lowShort;
         short highShort;
-        
+
         if (bigByte) {
             lowShort = registers[0].toShort();
             highShort = registers[1].toShort();
@@ -321,7 +375,7 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
             highShort = registers[0].toShort();
             lowShort = registers[1].toShort();
         }
-        
+
         int intRes = ((lowShort & 0xFFFF) << 16) | (highShort & 0xFFFF);
         Float result = Float.intBitsToFloat(intRes);
         return result;
@@ -335,12 +389,60 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
      */
     private long getLongFromRegisters(Register[] registers) {
 
-        short lowestShort = registers[0].toShort();
-        short lowShort = registers[1].toShort();
-        short highShort = registers[2].toShort();
-        short highestShort = registers[3].toShort();
+        short lowestShort;
+        short lowShort;
+        short highShort;
+        short highestShort;
+
+        if (bigByte) {
+            lowestShort = registers[0].toShort();
+            lowShort = registers[1].toShort();
+            highShort = registers[2].toShort();
+            highestShort = registers[3].toShort();
+        } else {
+            highestShort = registers[0].toShort();
+            highShort = registers[1].toShort();
+            lowShort = registers[2].toShort();
+            lowestShort = registers[3].toShort();
+        }
 
         Long result = ((long) highestShort << 48) | ((long) highShort << 32) | ((long) lowShort << 16) | lowestShort;
+
+        return result;
+    }
+
+    /**
+     * Creates a BigInteger containing the value of a unsignedLong.
+     * 
+     * @param registers containing the unsignedLong
+     * @return the value of unsignedLong as BigInteger
+     */
+    private BigInteger getUnsignedLongFromRegisters(Register[] registers) {
+
+        short lowestShort;
+        short lowShort;
+        short highShort;
+        short highestShort;
+
+        if (bigByte) {
+            lowestShort = registers[0].toShort();
+            lowShort = registers[1].toShort();
+            highShort = registers[2].toShort();
+            highestShort = registers[3].toShort();
+        } else {
+            highestShort = registers[0].toShort();
+            highShort = registers[1].toShort();
+            lowShort = registers[2].toShort();
+            lowestShort = registers[3].toShort();
+        }
+
+        long lowestLong = lowestShort & 0xFFFFL;
+        long lowLong = lowShort & 0xFFFFL;
+        long highLong = highShort & 0xFFFFL;
+        long highestLong = highestShort & 0xFFFFL;
+
+        BigInteger result = BigInteger.valueOf(highestLong).shiftLeft(48).or(BigInteger.valueOf(highLong).shiftLeft(32))
+                .or(BigInteger.valueOf(lowLong).shiftLeft(16)).or(BigInteger.valueOf(lowestLong));
 
         return result;
     }
@@ -353,21 +455,66 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
      */
     private double getDoubleFromRegisters(Register[] registers) {
 
-        short short0 = registers[0].toShort();
-        short short1 = registers[1].toShort();
-        short short2 = registers[2].toShort();
-        short short3 = registers[3].toShort();
+        short lowestShort;
+        short lowShort;
+        short highShort;
+        short highestShort;
+
+        if (bigByte) {
+            lowestShort = registers[0].toShort();
+            lowShort = registers[1].toShort();
+            highShort = registers[2].toShort();
+            highestShort = registers[3].toShort();
+        } else {
+            highestShort = registers[0].toShort();
+            highShort = registers[1].toShort();
+            lowShort = registers[2].toShort();
+            lowestShort = registers[3].toShort();
+        }
 
         ByteBuffer buffer = ByteBuffer.allocate(8);
-        buffer.putShort(0, short0);
-        buffer.putShort(2, short1);
-        buffer.putShort(4, short2);
-        buffer.putShort(6, short3);
+        buffer.putShort(0, lowestShort);
+        buffer.putShort(2, lowShort);
+        buffer.putShort(4, highShort);
+        buffer.putShort(6, highestShort);
 
         buffer.rewind();
         Double result = buffer.getDouble();
 
         return result;
+    }
+
+    /**
+     * Creates a ASCII String out of Registers.
+     * 
+     * @param registers containing the String
+     * @return the String
+     */
+    private String getStringFromRegisters(Register[] registers) {
+
+        ByteBuffer buffer = ByteBuffer.allocate(registers.length * 2);
+
+        for (Register reg : registers) {
+            buffer.put((byte) (reg.toShort() >> 8));
+            buffer.put((byte) (reg.toShort() & 0xFF));
+        }
+
+        return new String(buffer.array(), StandardCharsets.US_ASCII).trim();
+    }
+
+    /**
+     * Create a LocalDateTime out of Registers.
+     * 
+     * @param registers containing LocalDateTime
+     * @return The LocalDateTime
+     */
+    private LocalDateTime getDatetimeFromRegisters(Register[] registers) {
+
+        long timePart1 = ((long) registers[0].toShort() << 48) | (long) registers[1].toShort() << 32;
+        long timePart2 = ((long) registers[2].toShort() << 16) | (registers[3].toShort() & 0xFFFF);
+        long timestamp = timePart1 | timePart2;
+
+        return LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneOffset.UTC);
     }
 
     @Override
@@ -386,7 +533,7 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
 
             try {
 
-                ModbusRequest request = new  WriteMultipleRegistersRequest(varItem.getOffset(), lHoldingRegisters);
+                ModbusRequest request = new WriteMultipleRegistersRequest(varItem.getOffset(), lHoldingRegisters);
                 ModbusTCPTransaction lTransaction = new ModbusTCPTransaction(connection);
                 lTransaction.setRequest(request);
                 lTransaction.execute();
@@ -412,72 +559,283 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
 
         Register[] holdingRegisters = new Register[varItem.getTypeRegisterSize()];
 
-        if (varItem.getType().equals("short") || varItem.getType().equals("dword")) {
+        if (varItem.getType().equals("short")) {
 
             holdingRegisters[0] = new SimpleRegister((short) varItemValue);
 
+        } else if (varItem.getType().equals("ushort")) {
+
+            holdingRegisters[0] = new SimpleRegister((short) varItemValue & 0xFFFF);
+
         } else if (varItem.getType().equals("integer")) {
 
-            int intToWrite = (int) varItemValue;
+            holdingRegisters = getIntegerAsRegisters(varItem);
 
-            short highShort = (short) (intToWrite >> 16);
-            short lowShort = (short) (intToWrite & 0xFFFF);
+        } else if (varItem.getType().equals("uinteger")) {
 
-            holdingRegisters[0] = new SimpleRegister(lowShort);
-            holdingRegisters[1] = new SimpleRegister(highShort);
+            holdingRegisters = getUnsignedIntegerAsRegisters(varItem);
 
         } else if (varItem.getType().equals("float")) {
 
-            float floatToWrite = (float) varItemValue;
-            int floatAsInt = Float.floatToIntBits(floatToWrite);
-
-            short highShort;
-            short lowShort;
-            if (bigByte) {
-                lowShort = (short) ((floatAsInt >> 16) & 0xFFFF);
-                highShort = (short) (floatAsInt & 0xFFFF);
-            } else {
-                highShort = (short) ((floatAsInt >> 16) & 0xFFFF);
-                lowShort = (short) (floatAsInt & 0xFFFF);
-            }
-
-            holdingRegisters[0] = new SimpleRegister(lowShort);
-            holdingRegisters[1] = new SimpleRegister(highShort);
+            holdingRegisters = getFloatAsRegisters(varItem);
 
         } else if (varItem.getType().equals("long")) {
 
-            long longToWrite = (long) varItemValue;
+            holdingRegisters = getLongAsRegisters(varItem);
 
-            short highestShort = (short) ((longToWrite >> 48) & 0xFFFF);
-            short highShort = (short) ((longToWrite >> 32) & 0xFFFF);
-            short lowShort = (short) ((longToWrite >> 16) & 0xFFFF);
-            short lowestShort = (short) (longToWrite & 0xFFFF);
+        } else if (varItem.getType().equals("ulong")) {
 
-            holdingRegisters[0] = new SimpleRegister(lowestShort);
-            holdingRegisters[1] = new SimpleRegister(lowShort);
-            holdingRegisters[2] = new SimpleRegister(highShort);
-            holdingRegisters[3] = new SimpleRegister(highestShort);
+            holdingRegisters = getUnsignedLongAsRegisters(varItem);
 
         } else if (varItem.getType().equals("double")) {
 
-            double doubleToWrite = (double) varItemValue;
+            holdingRegisters = getDoubleAsRegisters(varItem);
 
-            ByteBuffer buffer = ByteBuffer.allocate(8);
-            buffer.putDouble(doubleToWrite);
+        } else if (varItem.getType().equals("ascii")) {
 
-            short short1 = buffer.getShort(0);
-            short short2 = buffer.getShort(2);
-            short short3 = buffer.getShort(4);
-            short short4 = buffer.getShort(6);
+            holdingRegisters = getStringAsRegisters(varItem);
 
-            holdingRegisters[0] = new SimpleRegister(short1);
-            holdingRegisters[1] = new SimpleRegister(short2);
-            holdingRegisters[2] = new SimpleRegister(short3);
-            holdingRegisters[3] = new SimpleRegister(short4);
+        } else if (varItem.getType().equals("datetime")) {
 
+            holdingRegisters = getDatetimeAsRegisters(varItem);
         }
 
         return holdingRegisters;
+    }
+
+    /**
+     * Creates Register[] out of a Integer value.
+     * 
+     * @param varItem to set the Integer value for
+     * @return Register[] with the Integer value in it
+     */
+    private Register[] getIntegerAsRegisters(ModbusVarItem varItem) {
+
+        Register[] reg = new Register[varItem.getTypeRegisterSize()];
+        int value = (int) item.getRegister(varItem.getOffset());
+
+        short lowShort;
+        short highShort;
+
+        if (bigByte) {
+            lowShort = (short) (value & 0xFFFF);
+            highShort = (short) (value >> 16);
+        } else {
+            highShort = (short) (value & 0xFFFF);
+            lowShort = (short) (value >> 16);
+        }
+
+        reg[0] = new SimpleRegister(lowShort);
+        reg[1] = new SimpleRegister(highShort);
+
+        return reg;
+    }
+
+    /**
+     * Creates Register[] out of a unsigned Integer value.
+     * 
+     * @param varItem to set the unsigned Integer value for
+     * @return Register[] with the unsigned Integer value in it
+     */
+    private Register[] getUnsignedIntegerAsRegisters(ModbusVarItem varItem) {
+
+        Register[] reg = new Register[varItem.getTypeRegisterSize()];
+        long value = ((Integer) item.getRegister(varItem.getOffset())).longValue();
+
+        short lowShort;
+        short highShort;
+
+        if (bigByte) {
+            lowShort = (short) (value & 0xFFFF);
+            highShort = (short) (value >> 16);
+        } else {
+            highShort = (short) (value & 0xFFFF);
+            lowShort = (short) (value >> 16);
+        }
+
+        reg[0] = new SimpleRegister(lowShort);
+        reg[1] = new SimpleRegister(highShort);
+
+        return reg;
+    }
+
+    /**
+     * Creates Register[] out of a Float value.
+     * 
+     * @param varItem to set the Float value for
+     * @return the Register with the Float value in it
+     */
+    private Register[] getFloatAsRegisters(ModbusVarItem varItem) {
+
+        Register[] reg = new Register[varItem.getTypeRegisterSize()];
+        float value = (float) item.getRegister(varItem.getOffset());
+        int floatAsInt = Float.floatToIntBits(value);
+
+        short lowShort;
+        short highShort;
+
+        if (bigByte) {
+            lowShort = (short) ((floatAsInt >> 16) & 0xFFFF);
+            highShort = (short) (floatAsInt & 0xFFFF);
+        } else {
+            highShort = (short) ((floatAsInt >> 16) & 0xFFFF);
+            lowShort = (short) (floatAsInt & 0xFFFF);
+        }
+
+        reg[0] = new SimpleRegister(lowShort);
+        reg[1] = new SimpleRegister(highShort);
+
+        return reg;
+    }
+
+    /**
+     * Creates Register[] out of a Long value.
+     * 
+     * @param varItem to set the Long value for
+     * @return the Register with the Long value in it
+     */
+    private Register[] getLongAsRegisters(ModbusVarItem varItem) {
+
+        Register[] reg = new Register[varItem.getTypeRegisterSize()];
+        long value = (long) item.getRegister(varItem.getOffset());
+
+        short lowestShort;
+        short lowShort;
+        short highShort;
+        short highestShort;
+
+        if (bigByte) {
+            lowestShort = (short) (value & 0xFFFF);
+            lowShort = (short) ((value >> 16) & 0xFFFF);
+            highShort = (short) ((value >> 32) & 0xFFFF);
+            highestShort = (short) ((value >> 48) & 0xFFFF);
+        } else {
+            highestShort = (short) (value & 0xFFFF);
+            highShort = (short) ((value >> 16) & 0xFFFF);
+            lowShort = (short) ((value >> 32) & 0xFFFF);
+            lowestShort = (short) ((value >> 48) & 0xFFFF);
+        }
+
+        reg[0] = new SimpleRegister(lowestShort);
+        reg[1] = new SimpleRegister(lowShort);
+        reg[2] = new SimpleRegister(highShort);
+        reg[3] = new SimpleRegister(highestShort);
+
+        return reg;
+    }
+
+    /**
+     * Creates Register[] out of a unsigned Long value.
+     * 
+     * @param varItem to set the unsigned Long value for
+     * @return the Register with the unsigned Long value in it
+     */
+    private Register[] getUnsignedLongAsRegisters(ModbusVarItem varItem) {
+
+        Register[] reg = new Register[varItem.getTypeRegisterSize()];
+        BigInteger value = (BigInteger) item.getRegister(varItem.getOffset());
+
+        byte[] bytes = value.toByteArray();
+        byte[] fullBytes = new byte[8];
+        int start = Math.max(0, bytes.length - 8);
+        int length = Math.min(8, bytes.length);
+        System.arraycopy(bytes, start, fullBytes, 8 - length, length);
+
+        if (bigByte) {
+            reg[3] = new SimpleRegister((short) (((fullBytes[0] & 0xFF) << 8) | (fullBytes[1] & 0xFF)));
+            reg[2] = new SimpleRegister((short) (((fullBytes[2] & 0xFF) << 8) | (fullBytes[3] & 0xFF)));
+            reg[1] = new SimpleRegister((short) (((fullBytes[4] & 0xFF) << 8) | (fullBytes[5] & 0xFF)));
+            reg[0] = new SimpleRegister((short) (((fullBytes[6] & 0xFF) << 8) | (fullBytes[7] & 0xFF)));
+        } else {
+            reg[0] = new SimpleRegister((short) (((fullBytes[0] & 0xFF) << 8) | (fullBytes[1] & 0xFF)));
+            reg[1] = new SimpleRegister((short) (((fullBytes[2] & 0xFF) << 8) | (fullBytes[3] & 0xFF)));
+            reg[2] = new SimpleRegister((short) (((fullBytes[4] & 0xFF) << 8) | (fullBytes[5] & 0xFF)));
+            reg[3] = new SimpleRegister((short) (((fullBytes[6] & 0xFF) << 8) | (fullBytes[7] & 0xFF)));
+        }
+
+        return reg;
+    }
+
+    /**
+     * Creates Register[] out of a Double value.
+     * 
+     * @param varItem to set the Double value for
+     * @return the Register with the Double value in it
+     */
+    private Register[] getDoubleAsRegisters(ModbusVarItem varItem) {
+
+        Register[] reg = new Register[varItem.getTypeRegisterSize()];
+        double value = (double) item.getRegister(varItem.getOffset());
+
+        ByteBuffer buffer = ByteBuffer.allocate(8);
+        buffer.putDouble(value);
+
+        short lowestShort;
+        short lowShort;
+        short highShort;
+        short highestShort;
+
+        if (bigByte) {
+            lowestShort = buffer.getShort(0);
+            lowShort = buffer.getShort(2);
+            highShort = buffer.getShort(4);
+            highestShort = buffer.getShort(6);
+        } else {
+            lowestShort = buffer.getShort(6);
+            lowShort = buffer.getShort(4);
+            highShort = buffer.getShort(2);
+            highestShort = buffer.getShort(0);
+        }
+
+        reg[0] = new SimpleRegister(lowestShort);
+        reg[1] = new SimpleRegister(lowShort);
+        reg[2] = new SimpleRegister(highShort);
+        reg[3] = new SimpleRegister(highestShort);
+
+        return reg;
+    }
+
+    /**
+     * Creates Register[] out of a String value.
+     * 
+     * @param varItem to set the String value for
+     * @return the Register with the String value in it
+     */
+    private Register[] getStringAsRegisters(ModbusVarItem varItem) {
+
+        Register[] reg = new Register[varItem.getTypeRegisterSize()];
+        String value = (String) item.getRegister(varItem.getOffset());
+        byte[] bytes = value.getBytes();
+
+        for (int i = 0; i < bytes.length; i += 2) {
+            int lowByte = (i + 1 < bytes.length) ? (bytes[i + 1] & 0xFF) : 0;
+            int highByte = bytes[i] & 0xFF;
+
+            reg[i / 2] = new SimpleRegister((short) ((highByte << 8) | lowByte));
+        }
+
+        return reg;
+    }
+
+    /**
+     * Creates Register[] out of a Datetime value.
+     * 
+     * @param varItem to set the Datetime value for
+     * @return the Register with the Datetime value in it
+     */
+    private Register[] getDatetimeAsRegisters(ModbusVarItem varItem) {
+
+        Register[] reg = new Register[varItem.getTypeRegisterSize()];
+        LocalDateTime datetime = (LocalDateTime) item.getRegister(varItem.getOffset());
+
+        long timestamp = datetime.toInstant(ZoneOffset.UTC).toEpochMilli();
+
+        reg[0] = new SimpleRegister((short) (timestamp >> 48));
+        reg[1] = new SimpleRegister((short) (timestamp >> 32));
+        reg[2] = new SimpleRegister((short) (timestamp >> 16));
+        reg[3] = new SimpleRegister((short) (timestamp & 0xFFFF));
+
+        return reg;
     }
 
     /**
@@ -532,7 +890,7 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
             result = item.getRegister(varItem.getOffset());
             return result;
         }
-        
+
         @Override
         public Object call(String qName, Object... arg1) throws IOException {
             // Not used for MODBUS TCP/IP

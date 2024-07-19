@@ -29,11 +29,8 @@ public abstract class AbstractModbusTcpIpConnectorTest
     
     /**
      * Creates an instance.
-     * 
-     * @param dataType the datatype
      */
-    protected AbstractModbusTcpIpConnectorTest(Class<? extends ModbusItem> dataType) {
-        super(dataType);
+    protected AbstractModbusTcpIpConnectorTest() {
     }
 
     @Override

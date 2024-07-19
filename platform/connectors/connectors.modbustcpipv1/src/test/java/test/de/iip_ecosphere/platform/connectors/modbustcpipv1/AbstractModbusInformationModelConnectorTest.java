@@ -44,15 +44,11 @@ import test.de.iip_ecosphere.platform.connectors.MachineDataOutputTranslator.Out
 public abstract class AbstractModbusInformationModelConnectorTest<D> implements InputCustomizer, OutputCustomizer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractModbusInformationModelConnectorTest.class);
-    private Class<? extends D> dataType;
 
     /**
      * Creates an instance and sets the internal data type.
-     * 
-     * @param dataType the internal data type
      */
-    protected AbstractModbusInformationModelConnectorTest(Class<? extends D> dataType) {
-        this.dataType = dataType;
+    protected AbstractModbusInformationModelConnectorTest() {
     }
 
     /**

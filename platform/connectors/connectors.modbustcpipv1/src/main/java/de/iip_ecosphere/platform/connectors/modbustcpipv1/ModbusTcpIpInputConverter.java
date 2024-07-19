@@ -12,7 +12,6 @@
 
 package de.iip_ecosphere.platform.connectors.modbustcpipv1;
 
-import java.io.IOException;
 
 import de.iip_ecosphere.platform.connectors.model.ModelInputConverter;
 
@@ -28,10 +27,5 @@ public class ModbusTcpIpInputConverter extends ModelInputConverter {
      */
     public ModbusTcpIpInputConverter() {
     }
-    
-//    @Override
-//    public int toInteger(Object data) throws IOException {
-//        return Integer.valueOf(data.toString());
-//    }
     
 }

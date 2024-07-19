@@ -57,19 +57,21 @@ public class ModbusVarItem {
         
         int result = 0;
         
-        if (type.equals("short") || type.equals("dword")) {
+        if (type.equals("short") || type.equals("ushort")) {
             result = 1;
-        } else if (type.equals("integer")) {
+        } else if (type.equals("integer") || type.equals("uinteger")) {
             result = 2;
         } else if (type.equals("float")) {
             result = 2;
-        } else if (type.equals("long")) {
+        } else if (type.equals("long") || type.equals("ulong")) {
             result = 4;
         } else if (type.equals("double")) {
             result = 4;
-        } /*else if (type.equals("dword")) {
-            result = 1;
-        }*/
+        } else if (type.equals("ascii")) {
+            result = 2;
+        } else if (type.equals("datetime")) {
+            result = 4;
+        }
         
         return result;
     }

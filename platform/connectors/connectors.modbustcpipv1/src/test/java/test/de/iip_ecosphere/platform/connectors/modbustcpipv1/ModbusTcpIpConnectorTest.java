@@ -44,7 +44,7 @@ public class ModbusTcpIpConnectorTest extends AbstractModbusTcpIpConnectorTest {
      * Creates an instance of this test.
      */
     public ModbusTcpIpConnectorTest() {
-        super(ModbusItem.class);
+
     }
 
     /**
