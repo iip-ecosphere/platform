@@ -1,54 +1,40 @@
+/**
+ * ******************************************************************************
+ * Copyright (c) {2024} The original author or authors
+ *
+ * All rights reserved. This program and the accompanying materials are made 
+ * available under the terms of the Eclipse Public License 2.0 which is available 
+ * at http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
+ ********************************************************************************/
+
 package de.iip_ecosphere.platform.examples.modbusTcp;
 
+/**
+ * Some Modbus machine data for testing.
+ * 
+ * @author Christian Nikolajew
+ */
 public class ModbusDataE {
 
-    private short day;
-    private short mounth;
-    private short year;
+    private float i1;
+    private float i2;
+    private float i3;
+    private float totalActivePower;
     private float u12;
     private float u23;
     private float u31;
-//    private float u1;
-//    private float u2;
-//    private float u3;
-//    private float frequency;
-//    private float i1;
-//    private float i2;
-//    private float i3;
-//    private float totalActivePower;
+    private float u1;
+    private float u2;
+    private float u3;
 
     /**
      * Constructor.
      */
     public ModbusDataE() {
 
-    }
-
-    /**
-     * Setter for day.
-     * 
-     * @param day the day to set
-     */
-    public void setDay(short day) {
-        this.day = day;
-    }
-
-    /**
-     * Setter for month.
-     * 
-     * @param month the month to set
-     */
-    public void setMonth(short month) {
-        this.mounth = month;
-    }
-
-    /**
-     * Setter for year.
-     * 
-     * @param year the year to set
-     */
-    public void setYear(short year) {
-        this.year = year;
     }
 
     /**
@@ -70,8 +56,8 @@ public class ModbusDataE {
     }
 
     /**
-     * Setter for u31.
-     * 7
+     * Setter for u31. 7
+     * 
      * @param u31 the u31 to set
      */
     public void setU31(float u31) {
@@ -83,98 +69,62 @@ public class ModbusDataE {
      * 
      * @param u1 the u1 to set
      */
-//    public void setU1(float u1) {
-//        this.u1 = u1;
-//    }
+    public void setU1(float u1) {
+        this.u1 = u1;
+    }
 
     /**
      * Setter for u2.
      * 
      * @param u2 the u2 to set
      */
-//    public void setU2(float u2) {
-//        this.u2 = u2;
-//    }
+    public void setU2(float u2) {
+        this.u2 = u2;
+    }
 
     /**
      * Setter for u3.
      * 
      * @param u3 the u3 to set
      */
-//    public void setU3(float u3) {
-//        this.u3 = u3;
-//    }
-
-    /**
-     * Setter for frequency.
-     * 
-     * @param freq the frequency to set
-     */
-//    public void setFrequency(float freq) {
-//        frequency = freq;
-//    }
+    public void setU3(float u3) {
+        this.u3 = u3;
+    }
 
     /**
      * Setter for i1.
      * 
      * @param i1 the i1 to set
      */
-//    public void setI1(float i1) {
-//        this.i1 = i1;
-//    }
+    public void setI1(float i1) {
+        this.i1 = i1;
+    }
 
     /**
      * Setter for i2.
      * 
      * @param i2 the i2 to set.
      */
-//    public void setI2(float i2) {
-//        this.i2 = i2;
-//    }
+    public void setI2(float i2) {
+        this.i2 = i2;
+    }
 
     /**
      * Setter for i3.
      * 
      * @param i3 the i3 to set
      */
-//    public void setI3(float i3) {
-//        this.i3 = i3;
-//    }
+    public void setI3(float i3) {
+        this.i3 = i3;
+    }
 
     /**
      * Setter for totalActivePower.
      * 
      * @param tap the totalActivePower to set
      */
-//    public void setTotalActivePower(float tap) {
-//        totalActivePower = tap;
-//    }
-
-    /**
-     * Getter for day.
-     * 
-     * @return the value of day
-     */
-    public short getDay() {
-        return day;
-    }
-
-    /**
-     * Getter for month.
-     * 
-     * @return the value of month
-     */
-    public short getMonth() {
-        return mounth;
-    }
-
-    /**
-     * Getter for year.
-     * 
-     * @return the value of year
-     */
-    public short getYear() {
-        return year;
+    public void setTotalActivePower(float tap) {
+        totalActivePower = tap;
     }
 
     /**
@@ -208,77 +158,68 @@ public class ModbusDataE {
      * Getter for u1.
      * 
      * @return the value of u1
-      */
-//    public float getU1() {
-//        return u1;
-//    }
+     */
+    public float getU1() {
+        return u1;
+    }
 
     /**
      * Getter for u2.
      * 
      * @return the value of u2
      */
-//    public float getU2() {
-//        return u2;
-//    }
+    public float getU2() {
+        return u2;
+    }
 
     /**
      * Getter for u3.
      * 
      * @return the value of u3
      */
-//    public float getU3() {
-//        return u3;
-//    }
-
-    /**
-     * Getter for frequency.
-     * 
-     * @return the value of frequency
-     */
-//    public float getFrequency() {
-//        return frequency;
-//    }
+    public float getU3() {
+        return u3;
+    }
 
     /**
      * Getter for i1.
      * 
      * @return the value of i1
      */
-//    public float getI1() {
-//        return i1;
-//    }
+    public float getI1() {
+        return i1;
+    }
 
     /**
      * Getter for i2.
      * 
      * @return the value of i2
      */
-//    public float getI2() {
-//        return i2;
-//    }
+    public float getI2() {
+        return i2;
+    }
 
     /**
      * Getter for i3.
      * 
      * @return the value for i3.
      */
-//    public float getI3() {
-//        return i3;
-//    }
+    public float getI3() {
+        return i3;
+    }
 
     /**
      * Getter for taotalActivePower.
      * 
      * @return the value of totalActivePower
      */
-//    public float getTotalActivePower() {
-//        return totalActivePower;
-//    }
-    
+    public float getTotalActivePower() {
+        return totalActivePower;
+    }
+
     @Override
     public String toString() {
-        return org.apache.commons.lang3.builder.ReflectionToStringBuilder.toString(this, 
-            de.iip_ecosphere.platform.services.environment.IipStringStyle.SHORT_STRING_STYLE);
+        return org.apache.commons.lang3.builder.ReflectionToStringBuilder.toString(this,
+                de.iip_ecosphere.platform.services.environment.IipStringStyle.SHORT_STRING_STYLE);
     }
 }

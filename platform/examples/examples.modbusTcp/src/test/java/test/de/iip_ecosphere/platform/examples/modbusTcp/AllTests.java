@@ -1,5 +1,6 @@
-/********************************************************************************
- * Copyright (c) {2021} The original author or authors
+/**
+ * ******************************************************************************
+ * Copyright (c) {2024} The original author or authors
  *
  * All rights reserved. This program and the accompanying materials are made 
  * available under the terms of the Eclipse Public License 2.0 which is available 
@@ -8,6 +9,7 @@
  *
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
+
 package test.de.iip_ecosphere.platform.examples.modbusTcp;
 
 import org.junit.runner.RunWith;

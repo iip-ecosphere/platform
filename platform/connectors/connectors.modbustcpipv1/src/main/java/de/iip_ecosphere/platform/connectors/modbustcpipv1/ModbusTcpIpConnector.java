@@ -152,7 +152,6 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
             String endpointURL = getEndpointUrl(params);
 
             connection = new TCPMasterConnection(InetAddress.getByName(params.getHost()));
-            //connection = new TCPMasterConnection(InetAddress.getByName("192.168.178.20"));
             connection.setPort(params.getPort());
             connection.setTimeout(timeout);
 
@@ -234,15 +233,11 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
     @Override
     protected ModbusItem read() throws IOException {
 
-        // System.out.println("read()");
-
         for (ModbusMap.Entry<String, ModbusVarItem> entry : map.entrySet()) {
 
             ModbusVarItem varItem = entry.getValue();
 
             try {
-                // System.out.println("Offset / Size: " + varItem.getOffset() + "/" +
-                // varItem.getTypeRegisterSize());
 
                 ReadMultipleRegistersRequest request = new ReadMultipleRegistersRequest(varItem.getOffset(),
                         varItem.getTypeRegisterSize());

@@ -1,3 +1,15 @@
+/**
+ * ******************************************************************************
+ * Copyright (c) {2024} The original author or authors
+ *
+ * All rights reserved. This program and the accompanying materials are made 
+ * available under the terms of the Eclipse Public License 2.0 which is available 
+ * at http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
+ ********************************************************************************/
+
 package de.iip_ecosphere.platform.examples.modbusTcp;
 
 import java.io.File;
@@ -28,7 +40,7 @@ public class GeneratedConnectorSentron {
     
     public static final String TOTAL_REQUEST_TIME = "totalRequestTime";
     
-    private static final int MAX = 1000;
+    private static final int MAX = 100;
     private static MetricsProvider metrics = new MetricsProvider(new SimpleMeterRegistry());
     private static ModbusServer server;
     
@@ -45,8 +57,8 @@ public class GeneratedConnectorSentron {
     public static void main(String[] args) throws IOException {
         
         //test(false);
-        performanceTest(false);
-        
+        performanceTest(true);
+
     }
     
     /**
@@ -68,7 +80,7 @@ public class GeneratedConnectorSentron {
 
             @Override
             public void received(ModbusSiemensSentron data) {
-                System.out.println("RECEIVED (" + count.get() + "): " + data.getPowerConsumption());
+                System.out.println("RECEIVED (" + count.get() + "): " + data);
                 count.incrementAndGet();
             }
 
@@ -78,6 +90,7 @@ public class GeneratedConnectorSentron {
             }
 
         };
+        
         ModbusTcpIpConnector<ModbusSiemensSentron, ModbusSiemensRwSentron> conn = createPlatformConnector(cb);
        
         boolean run = true;
@@ -125,7 +138,7 @@ public class GeneratedConnectorSentron {
 
             @Override
             public void received(ModbusSiemensSentron data) {
-                System.out.println("RECEIVED (" + count.get() + "): " + data.getPowerConsumption());
+                System.out.println("RECEIVED (" + count.get() + "): " + data);
                 count.incrementAndGet();
             }
 

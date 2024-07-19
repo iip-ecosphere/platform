@@ -1,6 +1,6 @@
 /**
  * ******************************************************************************
- * Copyright (c) {2021} The original author or authors
+ * Copyright (c) {2024} The original author or authors
  *
  * All rights reserved. This program and the accompanying materials are made 
  * available under the terms of the Eclipse Public License 2.0 which is available 
@@ -58,15 +58,8 @@ public class ManualConnector {
      */
     public static Connector<ModbusItem, Object, ModbusDataE, ModbusCommandE> createConnector() {
 
-//        Connector<ModbusItem, Object, ModbusMachineData, ModbusMachineCommand> connector =
-//                new ModbusTcpIpConnector<ModbusMachineData, ModbusMachineCommand>(
-//                new TranslatingProtocolAdapter<ModbusItem, Object, ModbusMachineData, ModbusMachineCommand>(
-//                        new ModbusMachineDataOutputTranslator<ModbusItem>(false, ModbusItem.class),
-//                        new ModbusMachineCommandInputTranslator<Object>(Object.class))); 
-
         Connector<ModbusItem, Object, ModbusDataE, ModbusCommandE> connector = 
                 new ModbusTcpIpConnector<ModbusDataE, ModbusCommandE>(
-                //createConnectorAdapter(metrics, new File("modbusTestManualConnector.txt"), null, null));
                 createConnectorAdapter(null, null, null, null));
 
         return connector;
@@ -90,10 +83,8 @@ public class ManualConnector {
             MetricsProvider metrics, File log, Supplier<String> inPathSupplier, Supplier<String> outPathSupplier) {
 
         TranslatingProtocolAdapter<ModbusItem, Object, ModbusDataE, ModbusCommandE> adapter;
-        //adapter = new MonitoredTranslatingProtocolAdapter<ModbusItem, Object, ModbusDataE, ModbusCommandE>(
         adapter = new TranslatingProtocolAdapter<ModbusItem, Object, ModbusDataE, ModbusCommandE>(
                 new ModbusDataEOutputTranslator<ModbusItem>(false, ModbusItem.class),
-                //new ModbusCommandEInputTranslator<Object>(Object.class), metrics, log);
                 new ModbusCommandEInputTranslator<Object>(Object.class));
 
         return adapter;
@@ -108,8 +99,6 @@ public class ManualConnector {
      */
     public static void main(String... args) throws IOException {
 
-        
-        
         //test(true);
         performanceTest(true);
 

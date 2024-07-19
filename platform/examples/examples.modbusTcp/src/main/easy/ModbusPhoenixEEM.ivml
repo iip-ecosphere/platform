@@ -9,16 +9,16 @@ project ModbusPhoenixEEM {
     RecordType modbusPhoenixEEM = {
         name = "ModbusPhoenixEEM",
         fields = {
-            phoenixEem370_rw_Day,
+            /*phoenixEem370_rw_Day,
             phoenixEem370_rw_Month,
-            phoenixEem370_rw_Year,
+            phoenixEem370_rw_Year,*/
             phoenixEem370_U12,
             phoenixEem370_U23,
             phoenixEem370_U31,
             phoenixEem370_U1,
             phoenixEem370_U2,
             phoenixEem370_U3,
-            phoenixEem370_frequency,
+            //phoenixEem370_frequency,
             phoenixEem370_I1,
             phoenixEem370_I2,
             phoenixEem370_I3,

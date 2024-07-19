@@ -47,8 +47,11 @@ public abstract class AbstractModbusInformationModelConnectorTest<D> implements 
 
     /**
      * Creates an instance and sets the internal data type.
+     * 
+     * @param dataType the internal data type
      */
     protected AbstractModbusInformationModelConnectorTest() {
+
     }
 
     /**

@@ -28,8 +28,6 @@ public class ModbusMachineData {
     private ModbusMap serverMap;
     private HashMap<String, Object> mapValues;
     
-
-    
     /**
      * Creates an instance.
      * 

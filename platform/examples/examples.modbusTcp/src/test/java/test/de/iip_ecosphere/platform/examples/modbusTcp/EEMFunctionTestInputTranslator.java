@@ -10,7 +10,7 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package de.iip_ecosphere.platform.examples.modbusTcp;
+package test.de.iip_ecosphere.platform.examples.modbusTcp;
 
 import java.io.IOException;
 
@@ -18,38 +18,37 @@ import de.iip_ecosphere.platform.connectors.model.AbstractModelAccess;
 import de.iip_ecosphere.platform.connectors.types.AbstractConnectorInputTypeTranslator;
 
 /**
- * The ModbusCommandE input translator for tests.
+ * The  input translator for EEM function test.
  * 
  * @param <O> the output datatype
  * 
  * @author Christian Nikolajew
  */
-public class ModbusCommandEInputTranslator<O> extends AbstractConnectorInputTypeTranslator<ModbusCommandE, O> {
+public class EEMFunctionTestInputTranslator<O> extends AbstractConnectorInputTypeTranslator<EEMFunctionTestRw, O> {
 
     private Class<? extends O> sourceType;
-
+    
     /**
-     * Creates a new modbus command input translator.
+     * Creates a new EEMFunctionTestInputTranslator.
      * 
      * @param sourceType the source type
      */
-    public ModbusCommandEInputTranslator(Class<? extends O> sourceType) {
+    public EEMFunctionTestInputTranslator(Class<? extends O> sourceType) {
         this.sourceType = sourceType;
     }
-
+    
     @Override
     public Class<? extends O> getSourceType() {
         return sourceType;
     }
 
     @Override
-    public Class<? extends ModbusCommandE> getTargetType() {
-        return ModbusCommandE.class;
+    public Class<? extends EEMFunctionTestRw> getTargetType() {
+        return EEMFunctionTestRw.class;
     }
 
     @Override
-    public O from(ModbusCommandE data) throws IOException {
-
+    public O from(EEMFunctionTestRw data) throws IOException {
         AbstractModelAccess access = (AbstractModelAccess) getModelAccess();
 
         if (data.getDay() != null) {
