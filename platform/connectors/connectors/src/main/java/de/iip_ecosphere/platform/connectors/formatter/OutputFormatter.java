@@ -13,6 +13,8 @@
 package de.iip_ecosphere.platform.connectors.formatter;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -116,6 +118,24 @@ public interface OutputFormatter<T> {
          */
         public T fromFloat(float data) throws IOException;
 
+        /**
+         * Converts data from {@link BigInteger} to the output format.
+         * 
+         * @param data the data
+         * @return the converted output format
+         * @throws IOException if conversion fails
+         */
+        public T fromBigInteger(BigInteger data) throws IOException;
+
+        /**
+         * Converts data from {@link BigDecimal} to the output format.
+         * 
+         * @param data the data
+         * @return the converted output format
+         * @throws IOException if conversion fails
+         */
+        public T fromBigDecimal(BigDecimal data) throws IOException;
+        
         /**
          * Converts data from Boolean to the output format.
          * 

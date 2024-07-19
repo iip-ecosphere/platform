@@ -13,6 +13,8 @@
 package de.iip_ecosphere.platform.connectors.formatter;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 
@@ -104,6 +106,16 @@ public class ConverterToString implements OutputConverter<String> {
     @Override
     public <E> String fromElementList(List<QualifiedElement<E>> data) throws IOException {
         throw new IOException("currently not supported");
+    }
+
+    @Override
+    public String fromBigInteger(BigInteger data) throws IOException {
+        return data.toString();
+    }
+
+    @Override
+    public String fromBigDecimal(BigDecimal data) throws IOException {
+        return data.toString();
     }
 
 }

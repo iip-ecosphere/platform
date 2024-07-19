@@ -13,6 +13,8 @@
 package de.iip_ecosphere.platform.connectors.model;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -124,6 +126,16 @@ public class ModelOutputConverter implements OutputConverter<Object> {
     @Override
     public <E> Object fromElementList(List<QualifiedElement<E>> data) throws IOException {
         return data; // intended
+    }
+
+    @Override
+    public Object fromBigInteger(BigInteger data) throws IOException {
+        return data;
+    }
+
+    @Override
+    public Object fromBigDecimal(BigDecimal data) throws IOException {
+        return data;
     }
 
 }

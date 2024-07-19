@@ -14,6 +14,8 @@ package de.iip_ecosphere.platform.connectors.parser;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -416,7 +418,7 @@ public final class JsonInputParser implements InputParser<Any> {
     }
     
     /**
-     * Implements a JSON input converted.
+     * Implements a JSON input converter.
      * 
      * @author Holger Eichelberger, SSE
      */
@@ -569,6 +571,24 @@ public final class JsonInputParser implements InputParser<Any> {
                 }
             }
             return result;
+        }
+
+        @Override
+        public BigInteger toBigInteger(Any data) throws IOException {
+            try {
+                return data.toBigInteger();
+            } catch (JsonException e) { // wrong format, we cannot read that
+                throw new IOException(e);
+            }
+        }
+
+        @Override
+        public BigDecimal toBigDecimal(Any data) throws IOException {
+            try {
+                return data.toBigDecimal();
+            } catch (JsonException e) { // wrong format, we cannot read that
+                throw new IOException(e);
+            }
         }
 
     }

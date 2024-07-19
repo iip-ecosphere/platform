@@ -13,6 +13,8 @@
 package de.iip_ecosphere.platform.connectors.parser;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
@@ -256,6 +258,24 @@ public interface InputParser<T> {
          * @throws IOException if conversion fails
          */
         public float toFloat(T data) throws IOException;
+
+        /**
+         * Converts parsed data returned by {@link ParseResult} to a {@link BigInteger}.
+         * 
+         * @param data the obtained data
+         * @return the converted {@link BigInteger}
+         * @throws IOException if conversion fails
+         */        
+        public BigInteger toBigInteger(T data) throws IOException;
+
+        /**
+         * Converts parsed data returned by {@link ParseResult} to a {@link BigDecimal}.
+         * 
+         * @param data the obtained data
+         * @return the converted {@link BigDecimal}
+         * @throws IOException if conversion fails
+         */        
+        public BigDecimal toBigDecimal(T data) throws IOException;
 
         /**
          * Converts parsed data returned by {@link ParseResult} to Boolean.

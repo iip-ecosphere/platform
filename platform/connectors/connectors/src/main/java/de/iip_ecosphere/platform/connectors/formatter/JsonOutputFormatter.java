@@ -14,6 +14,8 @@ package de.iip_ecosphere.platform.connectors.formatter;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 import java.util.Stack;
@@ -157,6 +159,16 @@ public class JsonOutputFormatter implements OutputFormatter<IOConsumer<JsonGener
             return g -> {
                 g.writeString(FormatCache.format(data, format));
             };
+        }
+
+        @Override
+        public IOConsumer<JsonGenerator> fromBigInteger(BigInteger data) throws IOException {
+            return g -> g.writeNumber(data);
+        }
+
+        @Override
+        public IOConsumer<JsonGenerator> fromBigDecimal(BigDecimal data) throws IOException {
+            return g -> g.writeNumber(data);
         }
 
     }

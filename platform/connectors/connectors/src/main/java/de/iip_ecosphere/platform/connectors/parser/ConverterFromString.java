@@ -13,6 +13,8 @@
 package de.iip_ecosphere.platform.connectors.parser;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
 
 import de.iip_ecosphere.platform.connectors.parser.InputParser.InputConverter;
@@ -122,6 +124,16 @@ public class ConverterFromString implements InputConverter<String> {
     @Override
     public <E> List<QualifiedElement<E>> toElementList(String data, Class<E> eltCls) throws IOException {
         throw new IOException("currently not implemented");
+    }
+
+    @Override
+    public BigInteger toBigInteger(String data) throws IOException {
+        return new BigInteger(data);
+    }
+
+    @Override
+    public BigDecimal toBigDecimal(String data) throws IOException {
+        return new BigDecimal(data);
     }
 
 }

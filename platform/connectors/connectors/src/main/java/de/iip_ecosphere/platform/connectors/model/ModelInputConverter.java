@@ -13,6 +13,8 @@
 package de.iip_ecosphere.platform.connectors.model;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -147,6 +149,24 @@ public class ModelInputConverter implements InputConverter<Object> {
             return result;
         } else {
             throw new IOException("Cannot handle " + data + " as list.");
+        }
+    }
+
+    @Override
+    public BigInteger toBigInteger(Object data) throws IOException {
+        if (data.getClass() == Number.class) {
+            return BigInteger.valueOf(((Number) data).longValue());
+        } else {
+            return (BigInteger) data;
+        }
+    }
+
+    @Override
+    public BigDecimal toBigDecimal(Object data) throws IOException {
+        if (data.getClass() == Number.class) {
+            return BigDecimal.valueOf(((Number) data).doubleValue());
+        } else {
+            return (BigDecimal) data;
         }
     }
 
