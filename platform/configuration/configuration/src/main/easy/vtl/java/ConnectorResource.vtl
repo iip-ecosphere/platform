@@ -4,22 +4,22 @@ import JavaBasics;
 @indent(indentation = 4, additional = 0)
 template ConnectorResource(Configuration config, FileArtifact target, Connector conn) {
 
-	mapOf(String, String) modbusTypes = {
-	   {"Boolean", "boolean"}, 
-	   {"int", "integer"}, // initial, superfluous?
+    mapOf(String, String) modbusTypes = {
+       {"Boolean", "boolean"}, 
+       {"int", "integer"}, // initial, superfluous?
        {"Int16", "short"},
-	   {"Short", "short"},
-	   {"UnsignedInt16", "ushort"}, 
-	   {"Int32", "integer"},
+       {"Short", "short"},
+       {"UnsignedInt16", "ushort"}, 
+       {"Int32", "integer"},
        {"Integer", "integer"}, 
-	   {"UnsignedInt32", "uinteger"}, 
-	   {"UnsignedInt64", "uinteger"}, // unmapped?
-	   {"Float", "float"},
+       {"UnsignedInt32", "uinteger"}, 
+       {"UnsignedInt64", "ulong"}, // unmapped?
+       {"Float", "float"},
        {"Int64", "long"},
-	   {"Long", "long"},
-	   {"Double", "double"},
-	   {"String", "ascii"},
-	   {"DateTime", "datetime"}
+       {"Long", "long"},
+       {"Double", "double"},
+       {"String", "ascii"},
+       {"DateTime", "datetime"}
     };
 
     @DispatchBasis
@@ -68,11 +68,23 @@ template ConnectorResource(Configuration config, FileArtifact target, Connector 
 
     @DispatchCase
     def collectField(ModbusField field, mapOf(String, String) res) {
-        String type = toTypeName(field.type);
+        String type = getDirectTypeName(field.type);
         type = modbusTypes.get(type, type);
         if (type <> "") {
             res.add(field.name, '{"offset" : ${field.offset}, "type" : "${type}"}');
         }
+    }
+
+    // returns the directly defined type name, not via JavaBasics as then a different name occurs
+    @DispatchBasis
+    def getDirectTypeName(DataType type) {
+        type.name;
+    }
+
+    // returns the directly defined type name, not via JavaBasics as then a different name occurs
+    @DispatchCase
+    def getDirectTypeName(AliasType type) {
+        getDirectTypeName(type.represents);
     }
 
     def main(Configuration config, FileArtifact target, Connector conn) {
