@@ -185,7 +185,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 setOf(String) bins = {}; 
                 setOf(Plugin) plugins = {};
                 setOf(AssemblyInfo) assemblies = {}; 
-                setOf(String) resources = {}; 
+                setOf(ResourceInfo) resources = {}; 
                 sequenceOf(MeshElement) elements = {};
                 artifacts.add(a.artifact);
                 mapOf(MeshElement, setOf(MeshConnector)) mappedMesh = {};
@@ -1992,19 +1992,19 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     // ------------------------------------------ generating apps: generating/handling services resources ----------------------------------------
 
     @DispatchBasis
-    generateServiceResources(MeshElement no, ServiceBase base, Path appRoot, setOf(String) bins, setOf(AssemblyInfo) assemblies, setOf(String) resources, setOf(String) artifacts, Boolean noDeps) = {
+    generateServiceResources(MeshElement no, ServiceBase base, Path appRoot, setOf(String) bins, setOf(AssemblyInfo) assemblies, setOf(ResourceInfo) resources, setOf(String) artifacts, Boolean noDeps) = {
         if (not(noDeps)) {
             artifacts.add(getArtifact(no));
         }
     }
 
     @DispatchCase
-    generateServiceResources(MeshElement no, Connector conn, Path appRoot, setOf(String) bins, setOf(AssemblyInfo) assemblies, setOf(String) resources, setOf(String) artifacts, Boolean noDeps) = {
+    generateServiceResources(MeshElement no, Connector conn, Path appRoot, setOf(String) bins, setOf(AssemblyInfo) assemblies, setOf(ResourceInfo) resources, setOf(String) artifacts, Boolean noDeps) = {
         artifacts.add(getArtifact(conn)); // connectors are (currently) platform-supplied
     }
 
     @DispatchCase
-    generateServiceResources(MeshElement no, ModbusTcpV1Connector conn, Path appRoot, setOf(String) bins, setOf(AssemblyInfo) assemblies, setOf(String) resources, setOf(String) artifacts, Boolean noDeps) = {
+    generateServiceResources(MeshElement no, ModbusTcpV1Connector conn, Path appRoot, setOf(String) bins, setOf(AssemblyInfo) assemblies, setOf(ResourceInfo) resources, setOf(String) artifacts, Boolean noDeps) = {
         artifacts.add(getArtifact(conn)); // connectors are (currently) platform-supplied
         Path resourcesSrc = "${appRoot}/src/main/resources";
         String connectorName = toIdentifier(conn.name);
@@ -2012,7 +2012,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     }
     
     @DispatchCase
-    generateServiceResources(MeshElement no, JavaService service, Path appRoot, setOf(String) bins, setOf(AssemblyInfo) assemblies, setOf(String) resources, setOf(String) artifacts, Boolean noDeps) = {
+    generateServiceResources(MeshElement no, JavaService service, Path appRoot, setOf(String) bins, setOf(AssemblyInfo) assemblies, setOf(ResourceInfo) resources, setOf(String) artifacts, Boolean noDeps) = {
         if (not(noDeps)) {
             artifacts.add(getArtifact(no));
             addArtifacts(service.artifacts, service.artifact, bins, noDeps);
@@ -2020,7 +2020,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     }
 
     @DispatchCase
-    generateServiceResources(MeshElement no, PythonService service, Path appRoot, setOf(String) bins, setOf(AssemblyInfo) assemblies, setOf(String) resources, setOf(String) artifacts, Boolean noDeps) = {
+    generateServiceResources(MeshElement no, PythonService service, Path appRoot, setOf(String) bins, setOf(AssemblyInfo) assemblies, setOf(ResourceInfo) resources, setOf(String) artifacts, Boolean noDeps) = {
         IIPEcosphere cfg = config; // from global
         String serviceFolderName = toFolderName(service.id);
         Path assemblySrc = "${appRoot}/${assemblyRel}";

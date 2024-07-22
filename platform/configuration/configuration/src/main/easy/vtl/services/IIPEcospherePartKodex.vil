@@ -7,7 +7,7 @@ import IIPEcosphereBase;
 @advice(IIPEcosphere)
 vilScript IIPEcospherePartKodex (Project source, Configuration config, Project target) {
 
-    generateServiceResources(MeshElement no, KodexService service, Path appRoot, setOf(String) bins, setOf(AssemblyInfo) assemblies, setOf(String) resources, setOf(String) artifacts, Boolean noDeps) = {
+    generateServiceResources(MeshElement no, KodexService service, Path appRoot, setOf(String) bins, setOf(AssemblyInfo) assemblies, setOf(ResourceInfo) resources, setOf(String) artifacts, Boolean noDeps) = {
         IIPEcosphere cfg = config;
         String serviceFolderName = toFolderName(no.impl.id);
         String kodexServiceFolderName = "kodex_" + serviceFolderName;

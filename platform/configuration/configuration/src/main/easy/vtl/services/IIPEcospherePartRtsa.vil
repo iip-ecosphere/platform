@@ -9,9 +9,9 @@ import Rtsa;
 @advice(IIPEcosphere)
 vilScript IIPEcospherePartRtsa (Project source, Configuration config, Project target) {
 
-    generateServiceResources(MeshElement no, RtsaService service, Path appRoot, setOf(String) bins, setOf(AssemblyInfo) assemblies, setOf(String) resources, setOf(String) artifacts, Boolean noDeps) = {
-        resources.add(rtsaResources()+"|"+rtsaBin(service));
-        resources.add(rtsaResources()+"|"+rtsaInstance(service));
+    generateServiceResources(MeshElement no, RtsaService service, Path appRoot, setOf(String) bins, setOf(AssemblyInfo) assemblies, setOf(ResourceInfo) resources, setOf(String) artifacts, Boolean noDeps) = {
+        addResourceInfo(resources, rtsaResources(), rtsaBin(service));
+        addResourceInfo(resources, rtsaResources(), rtsaInstance(service));
         artifacts.add(getArtifact(service));
     }
 

@@ -149,7 +149,7 @@ vilScript IIPEcosphereBase (Project source, Configuration config, Project target
         if (prop.length() > 0) {
             args.add("-Deasy.docker.failOnError=${prop}");
         }
-println("Calling maven with ${path} ${args}");        
+        println("Calling maven with ${path} ${args}");        
         maven("${path}", args, false);
     }
     

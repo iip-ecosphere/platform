@@ -2,6 +2,8 @@
 @indent(indentation = 4, additional = 0)
 template Basics(Configuration config, FileArtifact target) {
 	
+    // for now, here to ease dependencies. Shall go to MavenBasics
+	
     compound AssemblyInfo {
         String id;
         String path;
@@ -20,7 +22,38 @@ template Basics(Configuration config, FileArtifact target) {
         aInfo.finalName = finalName;
         aInfo.attach = attach;
         assemblies.add(aInfo);
-        //assemblies.add("${id}|${path}|${phase}|${outDir}|${finalName}|${attach}");
+    }
+    
+    compound DependencyArtifact {
+        String artifact;
+        String classifier;
+        String outputDir;
+        String destFileName;
+        String type;
+        String goal;
+    }
+
+    def addDependencyArtifact(setOf(String) artifacts, String artifact, String classifier, String outputDir, String destFileName, String type, String goal) {
+        DependencyArtifact dInfo = new DependencyArtifact();
+        dInfo.artifact = artifact;
+        dInfo.classifier = classifier;
+        dInfo.outputDir = outputDir;
+        dInfo.destFileName = destFileName;
+        dInfo.type = type;
+        dInfo.goal = goal;
+        artifacts.add(dInfo);
+    }
+    
+    compound ResourceInfo {
+        String srcDir;
+        String file;
+    }
+
+    def addResourceInfo(setOf(ResourceInfo) infos, String srcDir, String file) {
+        ResourceInfo rInfo = new ResourceInfo();
+        rInfo.srcDir = srcDir;
+        rInfo.file = file;
+        infos.add(rInfo);
     }
 	
     def Boolean isUsedType(setOf(String) usedServiceTypes, Type type) {

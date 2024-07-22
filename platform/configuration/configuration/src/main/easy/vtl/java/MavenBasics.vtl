@@ -483,7 +483,7 @@ template MavenBasics(Configuration config, FileArtifact target) {
         XmlElement resource = new XmlElement(resources, "resource");
         new XmlElement(resource, "directory", resourceDirectory);
         new XmlElement(resource, "filtering", "false");
-        for (String f: files) {
+        for (String f: files->sortedBy(g|g)) { // sorted for testing
             new XmlElement(resource, "include", f);
         }
         config;

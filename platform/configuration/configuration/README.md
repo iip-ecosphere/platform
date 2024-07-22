@@ -72,5 +72,3 @@ For running the container tests, you need Docker and LXC (Linux only). To bypass
 Some of the test models include the RapidMiner RTSA integration. As RTSA is an IPR-protected commercial production, we cannot package it with its integration and must integrate its artifacts here. For this purpose, the folder `resources` contains resources that shall be packaged during platform/application installation. The RTSA files committed there contain fake RTSA implementation for testing built by the RTSA integration package. However, if you have a real RTSA at hands, create a similar directory called resources.ipr with the actual files and the instantiation will take it up.
 
 **Hint:** If tests are failing on your side due to a missing Docker installation, you may prevent this by `-Deasy.docker.failOnError=false`.
-
-**For snapshots:** EASy-Producer 1.3.6-SNAPSHOT built on **2024/04/13** or newer is required. Use `mvn -U exec:java ...`
