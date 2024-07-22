@@ -17,9 +17,12 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusTcpIpConnector;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.LogRunnable;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.MetricsProvider;
+import de.iip_ecosphere.platform.support.NetUtils;
+import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
@@ -39,9 +42,11 @@ public class GeneratedConnector {
 
     public static final String TOTAL_REQUEST_TIME = "totalRequestTime";
     
+    private static final boolean USE_FREE_PORT = true;
     private static final int MAX = 100;
     private static MetricsProvider metrics = new MetricsProvider(new SimpleMeterRegistry());
     private static ModbusServer server;
+    private static int serverPort = -1;
     
     private static Clock clock;
     private static LogRunnable logger;
@@ -108,6 +113,7 @@ public class GeneratedConnector {
         
         if (startServer) {
             server.stop();
+            serverPort = -1;
         }
     }
     
@@ -125,7 +131,7 @@ public class GeneratedConnector {
         new Thread(logger).start();
         
         if (startServer) {
-            server = new ModbusServer(MyModbusConnExample.createConnectorParameter());
+            server = new ModbusServer(adjustParameter(MyModbusConnExample.createConnectorParameter(), USE_FREE_PORT));
             server.start();
         }
 
@@ -168,6 +174,7 @@ public class GeneratedConnector {
 
         if (startServer) {
             server.stop();
+            serverPort = -1;
         }
         logger.stop();
     }
@@ -183,10 +190,28 @@ public class GeneratedConnector {
             ReceptionCallback<ModbusPhoenixEEM> callback) throws IOException {
         ModbusTcpIpConnector<ModbusPhoenixEEM, ModbusPhoenixRwEEM> conn = new ModbusTcpIpConnector<>(
                 MyModbusConnExample.createConnectorAdapter());
-        conn.connect(MyModbusConnExample.createConnectorParameter());
+        conn.connect(adjustParameter(MyModbusConnExample.createConnectorParameter(), false));
         conn.setReceptionCallback(callback);
         return conn;
     }
-    
+
+    /**
+     * Adjusts connector parameters if needed/desired, but only for the first (server) call.
+     * 
+     * @param params the original parameters
+     * @param allocate whether a new port shall be allocated if not yet one is known
+     * @return the connector parameter
+     */
+    public static ConnectorParameter adjustParameter(ConnectorParameter params, boolean allocate) {
+        if (serverPort < 0 && allocate) {
+            serverPort = NetUtils.getEphemeralPort();
+        }
+        if (serverPort > 0) {
+            return ConnectorParameter.ConnectorParameterBuilder.newBuilder(
+                params, "127.0.0.1", serverPort, Schema.IGNORE).build();
+        } else {
+            return params;
+        }
+    }
 
 }

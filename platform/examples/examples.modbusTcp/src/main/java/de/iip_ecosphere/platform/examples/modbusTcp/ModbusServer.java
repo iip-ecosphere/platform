@@ -97,7 +97,7 @@ public class ModbusServer {
 
         if (listener != null) {
             listener.start();
-            System.out.println("MODBUS TCP/IP server started");
+            System.out.println("MODBUS TCP/IP server started on port " + port);
         }
 
     }

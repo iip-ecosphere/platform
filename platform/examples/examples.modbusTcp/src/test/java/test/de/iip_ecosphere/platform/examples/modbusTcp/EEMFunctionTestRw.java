@@ -78,7 +78,7 @@ public class EEMFunctionTestRw {
     /**
      * Setter for year.
      * 
-     * @param s the short to set
+     * @param val the short to set
      */
     public void setYear(short val) {
         year = val;
