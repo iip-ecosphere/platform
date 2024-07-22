@@ -1,5 +1,6 @@
 /target/
 /bin/
+/gen/*.zip
 /gen/*.sh
 /gen/*.bat
 /gen/*.service
