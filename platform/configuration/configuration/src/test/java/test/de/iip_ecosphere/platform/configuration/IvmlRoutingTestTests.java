@@ -35,6 +35,7 @@ public class IvmlRoutingTestTests extends AbstractIvmlTests {
      */
     @Test
     public void testRoutingTest() throws ExecutionException, IOException {
+        // mvn: stdout now in target/surefire-reports/<qualifiedClassName>-output.txt
         File gen = new File("gen/tests/RoutingTest");
         PlatformInstantiatorExecutor.instantiate(
             genApps(new TestConfigurer("PlatformConfiguration", new File("src/test/easy/routingTest"), gen)));

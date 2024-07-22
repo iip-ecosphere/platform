@@ -32,6 +32,7 @@ public class IvmlMetaModelTests extends AbstractIvmlTests {
      */
     @Test
     public void testMetaModel() {
+        // mvn: stdout now in target/surefire-reports/<qualifiedClassName>-output.txt
         ConfigurationLifecycleDescriptor lcd = assertLifecycleDescriptor();
         lcd.startup(new String[0]); // shall register executor
         Assert.assertNotNull(ConfigurationManager.getIvmlConfiguration());

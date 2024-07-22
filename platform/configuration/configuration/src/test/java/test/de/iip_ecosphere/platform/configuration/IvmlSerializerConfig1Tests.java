@@ -38,7 +38,8 @@ public class IvmlSerializerConfig1Tests extends AbstractIvmlSerializerConfigTest
      */
     @Test
     public void testSerializerConfig1() throws ExecutionException, IOException {
-        assumeFalse(isIipBuildInitial());
+        // mvn: stdout now in target/surefire-reports/<qualifiedClassName>-output.txt
+        assumeFalse(isIipBuildInitial()); // first build, allow for initialization
         File gen = new File("gen/tests/SerializerConfig1");
         PlatformInstantiatorExecutor.instantiate(
             new TestConfigurer("SerializerConfig1", new File("src/test/easy/single"), gen));

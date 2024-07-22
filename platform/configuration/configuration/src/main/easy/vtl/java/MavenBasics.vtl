@@ -381,6 +381,13 @@ template MavenBasics(Configuration config, FileArtifact target) {
         new XmlElement(plugin, "executions");
     }
     
+    // on assembly descriptor (execs), add multiple assembly descriptor infos 
+    def appendAssemblyDescriptors(XmlElement assemblyExecs, setOf(AssemblyInfo) assemblies) {
+        for (AssemblyInfo as: assemblies.asSequence()->sortedBy(a|a.id)) { // sortedBy for testing
+            appendAssemblyDescriptor(assemblyExecs, as.id, as.path, attach=as.attach, outputDir=as.outDir, finalName=as.finalName, phase=as.phase);
+        }
+    }
+        
     def XmlElement appendAssemblyDescriptor(XmlElement execs, String id, String descriptor, String outputDir="\\${project.build.directory}", Boolean attach=false, String phase="package", String finalName="") {
         XmlElement exec = new XmlElement(execs, "execution");
         new XmlElement(exec, "id", id);

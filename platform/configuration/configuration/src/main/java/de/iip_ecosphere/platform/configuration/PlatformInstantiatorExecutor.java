@@ -86,6 +86,7 @@ public class PlatformInstantiatorExecutor {
             null, SYSOUT_CONSUMER, SYSOUT_CONSUMER, null);
         executor.inTesting = configurer.inTesting();
         executor.mainCls = configurer.getMainClass();
+        executor.properties = configurer.getProperties();
         executor.executeAsProcess(PlatformInstantiatorExecutor.class.getClassLoader(), 
             null, null, null, configurer.toArgs(false));
     }
@@ -158,10 +159,11 @@ public class PlatformInstantiatorExecutor {
         }
         try {
             info.accept("Calling platform instantiator as process with " + java.util.Arrays.toString(args) 
-                + ", tracing " + tracingLevel + (null == resourcesDir ? "" : " and resources dir " + resourcesDir));
+                + ", tracing " + tracingLevel + (null == resourcesDir ? "" : ", resources dir " + resourcesDir));
             long start = System.currentTimeMillis();
             pArgs.add(mainCls);
             Collections.addAll(pArgs, args);
+            //info.accept("cmd line: " + pArgs);
             Process process = new ProcessBuilder(pArgs)
                 .start(); // inheritIO does not help
             new StreamGobbler(process.getInputStream(), System.out);

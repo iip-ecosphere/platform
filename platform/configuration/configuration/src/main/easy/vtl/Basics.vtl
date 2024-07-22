@@ -2,6 +2,27 @@
 @indent(indentation = 4, additional = 0)
 template Basics(Configuration config, FileArtifact target) {
 	
+    compound AssemblyInfo {
+        String id;
+        String path;
+        String phase;
+        String outDir;
+        String finalName = "";
+        Boolean attach = true;
+    }
+    
+    def addAssemblyInfo(setOf(AssemblyInfo) assemblies, String id, String path, String phase, String outDir, String finalName="", Boolean attach = true) {
+        AssemblyInfo aInfo = new AssemblyInfo();
+        aInfo.id = id;
+        aInfo.path = path;
+        aInfo.phase = phase;
+        aInfo.outDir = outDir;
+        aInfo.finalName = finalName;
+        aInfo.attach = attach;
+        assemblies.add(aInfo);
+        //assemblies.add("${id}|${path}|${phase}|${outDir}|${finalName}|${attach}");
+    }
+	
     def Boolean isUsedType(setOf(String) usedServiceTypes, Type type) {
         String name = type;
         usedServiceTypes.includes(name);

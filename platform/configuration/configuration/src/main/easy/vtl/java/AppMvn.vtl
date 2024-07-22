@@ -4,7 +4,7 @@ import JavaMapping;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedServiceTypes, setOf(String) artifacts, setOf(String) bins, setOf(String) assemblies, setOf(String) resources, String starterCls, String appName, String appVersion, String appDescription, Boolean tests, Boolean springPackaging=true, String groupId="", Boolean ifArtifact=false, Boolean copyRuntimeDependencies=true) {
+template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedServiceTypes, setOf(String) artifacts, setOf(String) bins, setOf(AssemblyInfo) assemblies, setOf(String) resources, String starterCls, String appName, String appVersion, String appDescription, Boolean tests, Boolean springPackaging=true, String groupId="", Boolean ifArtifact=false, Boolean copyRuntimeDependencies=true) {
 
     def XmlElement appendSpringBootPlugin(XmlElement plugins, String version="2.4.2", String mainClass="") {
         XmlElement plugin = appendPlugin(plugins, "org.springframework.boot", "spring-boot-maven-plugin", version, false);
@@ -20,7 +20,7 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
         }
     }
 
-    def main(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedServiceTypes, setOf(String) artifacts, setOf(String) bins, setOf(String) assemblies, setOf(String) resources, String starterCls, String appName, String appVersion, String appDescription, Boolean tests, Boolean springPackaging=true, String groupId="", Boolean ifArtifact=false, Boolean copyRuntimeDependencies=true) {
+    def main(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedServiceTypes, setOf(String) artifacts, setOf(String) bins, setOf(AssemblyInfo) assemblies, setOf(String) resources, String starterCls, String appName, String appVersion, String appDescription, Boolean tests, Boolean springPackaging=true, String groupId="", Boolean ifArtifact=false, Boolean copyRuntimeDependencies=true) {
         String iipGroup = "de.iip-ecosphere.platform";
         String gId = groupId;
         if (length(gId) == 0) {
@@ -82,22 +82,7 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
         
         XmlElement plugins = createMavenBuildElement(project, "", true);
         XmlElement assemblyPlugin = appendAssemblyPlugin(plugins);
-        for (String ass: assemblies.asSequence()->sortedBy(a|a)) { // sortedBy for testing
-            sequenceOf(String) tmp = ass.split("\\|"); // escape |, splits into chars
-            String id = tmp[0];
-            String path = tmp[1];
-            String phase = tmp[2];
-            String outDir = tmp[3];
-            String fName = "";
-            if (tmp.size() > 4) {
-                fName = tmp[4];
-            }
-            Boolean attach = true;
-            if (tmp.size() > 5) {
-                attach = tmp[5] == "true";
-            }
-            appendAssemblyDescriptor(assemblyPlugin, id, path, attach=attach, outputDir=outDir, finalName=fName, phase=phase);
-        }
+        appendAssemblyDescriptors(assemblyPlugin, assemblies);
         //appendIipPythonPlugin(plugins, projectVersion);
         if (springPackaging) {
             appendSpringBootPlugin(plugins, "2.4.2", "${starterCls}");

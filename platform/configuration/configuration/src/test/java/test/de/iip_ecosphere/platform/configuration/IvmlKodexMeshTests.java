@@ -38,6 +38,7 @@ public class IvmlKodexMeshTests extends AbstractIvmlTests {
      */
     @Test
     public void testKodexMesh() throws ExecutionException, IOException {
+        // mvn: stdout now in target/surefire-reports/<qualifiedClassName>-output.txt
         File gen = new File("gen/tests/KodexMesh");
         PlatformInstantiatorExecutor.instantiate(
             genApps(new TestConfigurer("KodexMesh", new File("src/test/easy/single"), gen)));

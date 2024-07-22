@@ -13,7 +13,6 @@ template MqttWin(IIPEcosphere config, FileArtifact target, String addJavaOpts=""
         set PORT=%~1
         
         :blank
-        echo "This Broker requires at least Java 11!"
         java ${addJavaOpts} -cp "brokerJars/*" ${vmOpt} test.de.iip_ecosphere.platform.test.mqtt.hivemq.TestHiveMqServer %PORT% ${host} %*'
     }
 	

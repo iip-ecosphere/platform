@@ -67,6 +67,7 @@ public class CommentTests {
      */
     @Test
     public void testComments() {
+        // mvn: stdout now in target/surefire-reports/<qualifiedClassName>-output.txt
         SortedSet<String> missing = new TreeSet<>();
         ConfigurationSetup setup = ConfigurationSetup.getSetup();
         EasySetup easySetup = setup.getEasyProducer();

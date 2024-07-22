@@ -612,5 +612,16 @@ public abstract class AbstractIvmlTests {
     public static InstantiationConfigurer genAppsNoDeps(InstantiationConfigurer cfg) {
         return cfg.setStartRuleName("generateAppsNoDeps");
     }
+    
+    /**
+     * Helper method to set the tracing level.
+     * 
+     * @param cfg the configurer instance
+     * @param level ALL|FUNC|TOP
+     * @return {@code cfg}
+     */
+    public static InstantiationConfigurer setTracing(InstantiationConfigurer cfg, String level) {
+        return cfg.setProperty(PlatformInstantiator.KEY_PROPERTY_TRACING, level);
+    }
 
 }

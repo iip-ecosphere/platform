@@ -432,17 +432,17 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
     
     @DispatchCase
     def convName(UnsignedInteger16TypeType type) {
-         "Short"
+         "Integer"
     }
 
     @DispatchCase
     def convName(UnsignedInteger32TypeType type) {
-         "Integer"
+         "Long"
     }
     
     @DispatchCase
     def convName(UnsignedInteger64TypeType type) {
-         "Long"
+         "BigInteger"
     }
     
     @DispatchCase

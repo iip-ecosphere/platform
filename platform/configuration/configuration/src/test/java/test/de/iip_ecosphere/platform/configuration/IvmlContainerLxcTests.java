@@ -39,6 +39,7 @@ public class IvmlContainerLxcTests extends AbstractIvmlTests {
      */
     @Test
     public void testContainerTest() throws ExecutionException, IOException {
+        // mvn: stdout now in target/surefire-reports/<qualifiedClassName>-output.txt
         boolean winAndLxcDisabled = false;
         boolean uxAndHomeOk = false;
         if (SystemUtils.IS_OS_WINDOWS) {

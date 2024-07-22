@@ -135,17 +135,17 @@ template JavaBasics(Configuration config, FileArtifact target) {
     
     @DispatchCase
     def String toTypeName(UnsignedInteger16TypeType type) {
-        "short";
+        "int";
     }
 
     @DispatchCase
     def String toTypeName(UnsignedInteger32TypeType type) {
-        "int";
+        "long";
     }
     
     @DispatchCase
     def String toTypeName(UnsignedInteger64TypeType type) {
-        "long";
+        "BigInteger";
     }
     
     @DispatchCase

@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
+import org.apache.commons.lang.SystemUtils;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.configuration.PlatformInstantiatorExecutor;
@@ -36,15 +37,24 @@ public class IvmlContainerTests extends AbstractIvmlTests {
      */
     @Test
     public void testContainerTest() throws ExecutionException, IOException {
-        final String dockerFailProp = "easy.docker.failOnError";
+        // mvn: stdout now in target/surefire-reports/<qualifiedClassName>-output.txt
+        String dockerFailProp;
+        String dockerFailPropValue;
+        if (SystemUtils.IS_OS_WINDOWS) { // windows: usually no docker, just skip with fixed return ID
+            dockerFailProp = "easy.docker.skip";
+            dockerFailPropValue = "a12cb01";
+        } else { // CI fail sometimes due to unknown docker issue??
+            dockerFailProp = "easy.docker.failOnError";
+            dockerFailPropValue = "false";
+        }
         File gen = new File("gen/tests/ContainerCreation");
         PlatformInstantiatorExecutor.instantiate(
             new TestConfigurer("ContainerCreation", new File("src/test/easy/single"), gen)
-                .setProperty(dockerFailProp, "false")); // windows, in CI fails sometimes due to unknown docker issue??
+                .setProperty(dockerFailProp, dockerFailPropValue)); 
         assertAllFiles(gen);
         assertTemplateZip(gen, "impl.SimpleMeshTestingContainerApp");
 
-        System.setProperty(dockerFailProp, "true"); // in any case
+        System.setProperty(dockerFailProp, ""); // in any case
     }
     
 }

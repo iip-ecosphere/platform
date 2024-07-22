@@ -37,6 +37,7 @@ public class IvmlSimpleMesh3Tests extends AbstractIvmlTests {
      */
     @Test
     public void testSimpleMesh3() throws ExecutionException, IOException {
+        // mvn: stdout now in target/surefire-reports/<qualifiedClassName>-output.txt
         File gen = new File("gen/tests/SimpleMesh3");
         PlatformInstantiatorExecutor.instantiate(
             genApps(new TestConfigurer("PlatformConfiguration", new File("src/test/easy/simpleMesh3"), gen)));

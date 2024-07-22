@@ -184,7 +184,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 // generate service classes and service integration
                 setOf(String) bins = {}; 
                 setOf(Plugin) plugins = {};
-                setOf(String) assemblies = {}; 
+                setOf(AssemblyInfo) assemblies = {}; 
                 setOf(String) resources = {}; 
                 sequenceOf(MeshElement) elements = {};
                 artifacts.add(a.artifact);
@@ -253,7 +253,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 vilTemplateProcessor("SpringCloudStreamDeploymentDescriptor", config, "${resourcesSrc}/deployment.yml", app=a, elements=elements);
                 if (enablesPackaging(a, AppPackagingSchema::ZipWithClasspath)) {
                     vilTemplateProcessor("JavaSpringCloudStreamAssembly", config, "${assemblySrc}/spring.xml");
-                    assemblies.add("spring|${assemblyRel}/spring.xml|package|${mvnProjectBuildDir}");
+                    addAssemblyInfo(assemblies, "spring", "${assemblyRel}/spring.xml", "package", mvnProjectBuildDir);
                 }
                 vilTemplateProcessor("JavaLogbackXml", config, "${resourcesSrc}/logback.xml");
                 identityStoreJsl(resourcesSrc, cfg);
@@ -261,10 +261,11 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     
                 if (not(cfg.sharedInterfaces)) {
                     vilTemplateProcessor("JavaInterfaceAssembly", config, "${assemblySrc}/javaInterfaces.xml");
-                    assemblies.add("interfaces|${assemblyRel}/javaInterfaces.xml|package|${mvnProjectBuildDir}");
+                    addAssemblyInfo(assemblies, "interfaces", "${assemblyRel}/javaInterfaces.xml", "package", mvnProjectBuildDir);
+
                     if (isPythonUsed(usedServiceTypes)) {
                         vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/pythonInterfaces.xml", withServices=false, dependency="");
-                        assemblies.add("python|${assemblyRel}/pythonInterfaces.xml|package|${mvnProjectBuildDir}");
+                        addAssemblyInfo(assemblies, "python", "${assemblyRel}/pythonInterfaces.xml", "package", mvnProjectBuildDir);
                     }
                 }
                 
@@ -313,7 +314,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 vilTemplateProcessor("TemplatesEclipseGitignore", config, "${appRoot}/.gitignore", appName=appName);
                 vilTemplateProcessor("TemplatesEasyProducer", config, "${appRoot}/.EASyProducer", appName=appName);
 
-                setOf(String) assemblies = {}; 
+                setOf(AssemblyInfo) assemblies = {}; 
                 mapOf(MeshElement, setOf(MeshConnector)) mappedMesh = {};
                 sequenceOf(MeshElement) elements = {};
                 setOf(String) javaTests = {};
@@ -329,9 +330,9 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     generateTemplateElements(appRoot, config, s, assemblies);
                 }
                 
-                if (assemblies->select(a|a.startsWith("art_")).size() > 0) {
+                if (assemblies->select(a|a.id.startsWith("art_")).size() > 0) {
                     vilTemplateProcessor("TemplatesArtifactsAssembly", config, "${appRoot}/${assemblyRel}/artifacts.xml");
-                    assemblies.add("artifacts|${mvnProjectBaseDir}/${assemblyRel}/artifacts.xml|package|${mvnProjectBuildDir}|");
+                    addAssemblyInfo(assemblies, "artifacts", "${mvnProjectBaseDir}/${assemblyRel}/artifacts.xml", "package", mvnProjectBuildDir);
                 }
                 
                 elements = elements->sortedBy(n|n.name).toSequence(); // for testing
@@ -400,13 +401,13 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     }    
     
     // dispatch basis
-    generateServer(Configuration config, Server server, Path appRoot, Boolean noDeps, setOf(String) assemblies, setOf(String) artifacts) = {
+    generateServer(Configuration config, Server server, Path appRoot, Boolean noDeps, setOf(AssemblyInfo) assemblies, setOf(String) artifacts) = {
         if (isDefined(server.artifact) and server.artifact.length() > 0) {
             artifacts.add(server.artifact);
         }
     }
     
-    generateServer(Configuration config, PythonServer server, Path appRoot, Boolean noDeps, setOf(String) assemblies, setOf(String) artifacts) = {
+    generateServer(Configuration config, PythonServer server, Path appRoot, Boolean noDeps, setOf(AssemblyInfo) assemblies, setOf(String) artifacts) = {
         IIPEcosphere cfg = config; // from global
         String serverFolderName = toFolderName(server.id);
         Path javaSrc = "${appRoot}/src/main/java";
@@ -427,7 +428,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 sequenceOf(String) tmp = server.artifact.split(":");
                 String artifact = tmp[0]+":"+tmp[1]+":zip:python:"+tmp[2];
                 vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/python_${serverFolderName}.xml", withServices=true, dependency=artifact);
-                assemblies.add("python_${serverFolderName}|${assemblyRel}/python_${serverFolderName}.xml|prepare-package|${mvnProjectBuildDir}/classes|python_${serverFolderName}");
+                addAssemblyInfo(assemblies, "python_${serverFolderName}", "${assemblyRel}/python_${serverFolderName}.xml", "prepare-package", "${mvnProjectBuildDir}/classes", finalName="python_${serverFolderName}");
             }
         }
     }
@@ -485,11 +486,11 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     * Creates template elements for a certain mesh element/service.
     */ 
     @DispatchBasis
-    generateTemplateElements(Path appRoot, Configuration config, MeshElement no, ServiceBase service, setOf(String) assemblies, setOf(String) javaTests) = {
+    generateTemplateElements(Path appRoot, Configuration config, MeshElement no, ServiceBase service, setOf(AssemblyInfo) assemblies, setOf(String) javaTests) = {
     }
 
     @DispatchCase
-    generateTemplateElements(Path appRoot, Configuration config, MeshElement no, CompleteService service, setOf(String) assemblies, setOf(String) javaTests) = {
+    generateTemplateElements(Path appRoot, Configuration config, MeshElement no, CompleteService service, setOf(AssemblyInfo) assemblies, setOf(String) javaTests) = {
         // do nothing, everything is here already generically in place
     }
 
@@ -497,7 +498,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     * Creates template files for a server.
     */
     @DispatchBasis
-    generateTemplateElements(Path appRoot, Configuration config, Server server, setOf(String) assemblies) = {
+    generateTemplateElements(Path appRoot, Configuration config, Server server, setOf(AssemblyInfo) assemblies) = {
         // do nothing, everything is here already generically in place
     }
     
@@ -505,13 +506,13 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     * Creates template files for a Python server.
     */
     @DispatchCase
-    generateTemplateElements(Path appRoot, Configuration config, PythonServer server, setOf(String) assemblies) = {
+    generateTemplateElements(Path appRoot, Configuration config, PythonServer server, setOf(AssemblyInfo) assemblies) = {
         // do nothing, everything is here already generically in place
         generateTemplateArtifacts(appRoot, server.artifacts, assemblies);
     }
     
     @DispatchCase
-    generateTemplateElements(Path appRoot, Configuration config, MeshElement no, Connector conn, setOf(String) assemblies, setOf(String) javaTests) = {
+    generateTemplateElements(Path appRoot, Configuration config, MeshElement no, Connector conn, setOf(AssemblyInfo) assemblies, setOf(String) javaTests) = {
         Path javaTestSrc = "${appRoot}/src/test/java";
         Path javaConnSrc = "${javaTestSrc}/${toPath(javaConnectivityPackage)}";
         String clsName = asTypeName(conn.name);
@@ -519,7 +520,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     }
 
     @DispatchCase
-    generateTemplateElements(Path appRoot, Configuration config, MeshElement no, JavaService service, setOf(String) assemblies, setOf(String) javaTests) = {
+    generateTemplateElements(Path appRoot, Configuration config, MeshElement no, JavaService service, setOf(AssemblyInfo) assemblies, setOf(String) javaTests) = {
         if (service.class <> "") {
             String clsName = asTypeName(service.name);
             JavaPath jp = service.class;
@@ -538,13 +539,13 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     }
 
     @DispatchCase
-    generateTemplateElements(Path appRoot, Configuration config, MeshElement no, PythonService service, setOf(String) assemblies, setOf(String) javaTests) = {
+    generateTemplateElements(Path appRoot, Configuration config, MeshElement no, PythonService service, setOf(AssemblyInfo) assemblies, setOf(String) javaTests) = {
         String clsName = asTypeName(service.name);
         vilTemplateProcessor("PythonMeshElementTemplate", config, "${appRoot}/src/main/python/services/${clsName}.py", elt=no, pkg="services", service=service);
         Path assemblyPath = "${appRoot}/src/main/assembly";
         assemblyPath.mkdir();
         vilTemplateProcessor("PythonAssemblyTemplate", config, "${assemblyPath}/python.xml");
-        assemblies.add("python|${mvnProjectBaseDir}/${assemblyRel}/python.xml|package|${mvnProjectBuildDir}/classes|");
+        addAssemblyInfo(assemblies, "python", "${mvnProjectBaseDir}/${assemblyRel}/python.xml", "package", "${mvnProjectBuildDir}/classes");
         if (needsDataUnitJson(service)) {
             Path testResourcesSrc = "${appRoot}/src/test/resources";
             vilTemplateProcessor("TemplatesTestDataJson", config, "${testResourcesSrc}/testData-${clsName}.json.tmpl", elt=no);
@@ -556,7 +557,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     }
     
     @DispatchCase
-    generateTemplateElements(Path appRoot, Configuration config, MeshElement no, ServiceFamily family, setOf(String) assemblies, setOf(String) javaTests) = {
+    generateTemplateElements(Path appRoot, Configuration config, MeshElement no, ServiceFamily family, setOf(AssemblyInfo) assemblies, setOf(String) javaTests) = {
         for (Service m: family.members) {
             generateTemplateElements(appRoot, config, no, m, assemblies, javaTests);
         }
@@ -571,14 +572,14 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     * @param arts the artifacts to create the templates for, may be empty
     * @param assemblies the assemblies built/collected so far (may be modified as a side effect)
     */
-    generateTemplateArtifacts(Path appRoot, setOf(String) arts, setOf(String) assemblies) = {
+    generateTemplateArtifacts(Path appRoot, setOf(String) arts, setOf(AssemblyInfo) assemblies) = {
         Path assemblyPath = "${appRoot}/src/main/assembly";
         for (String art : arts) {
             String a = "${art}"; // EASy, whyever, seems to contain a container value instead of the value itself
             String format = a.substring(a.length() - 3);
             String id = "art_" + toIdentifier(a.substring(0, a.length() - 4));
             vilTemplateProcessor("TemplatesArtifactAssemblyTemplate", config, "${assemblyPath}/${id}.xml", id=id, format=format);
-            assemblies.add("${id}|${mvnProjectBaseDir}/${assemblyRel}/${id}.xml|package|${mvnProjectBuildDir}/artifacts|${id}|false");
+            addAssemblyInfo(assemblies, id, "${mvnProjectBaseDir}/${assemblyRel}/${id}.xml", "package", "${mvnProjectBuildDir}/artifacts", finalName=id, attach=false);
         }
     }
     
@@ -1991,19 +1992,19 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     // ------------------------------------------ generating apps: generating/handling services resources ----------------------------------------
 
     @DispatchBasis
-    generateServiceResources(MeshElement no, ServiceBase base, Path appRoot, setOf(String) bins, setOf(String) assemblies, setOf(String) resources, setOf(String) artifacts, Boolean noDeps) = {
+    generateServiceResources(MeshElement no, ServiceBase base, Path appRoot, setOf(String) bins, setOf(AssemblyInfo) assemblies, setOf(String) resources, setOf(String) artifacts, Boolean noDeps) = {
         if (not(noDeps)) {
             artifacts.add(getArtifact(no));
         }
     }
 
     @DispatchCase
-    generateServiceResources(MeshElement no, Connector conn, Path appRoot, setOf(String) bins, setOf(String) assemblies, setOf(String) resources, setOf(String) artifacts, Boolean noDeps) = {
+    generateServiceResources(MeshElement no, Connector conn, Path appRoot, setOf(String) bins, setOf(AssemblyInfo) assemblies, setOf(String) resources, setOf(String) artifacts, Boolean noDeps) = {
         artifacts.add(getArtifact(conn)); // connectors are (currently) platform-supplied
     }
 
     @DispatchCase
-    generateServiceResources(MeshElement no, ModbusTcpV1Connector conn, Path appRoot, setOf(String) bins, setOf(String) assemblies, setOf(String) resources, setOf(String) artifacts, Boolean noDeps) = {
+    generateServiceResources(MeshElement no, ModbusTcpV1Connector conn, Path appRoot, setOf(String) bins, setOf(AssemblyInfo) assemblies, setOf(String) resources, setOf(String) artifacts, Boolean noDeps) = {
         artifacts.add(getArtifact(conn)); // connectors are (currently) platform-supplied
         Path resourcesSrc = "${appRoot}/src/main/resources";
         String connectorName = toIdentifier(conn.name);
@@ -2011,7 +2012,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     }
     
     @DispatchCase
-    generateServiceResources(MeshElement no, JavaService service, Path appRoot, setOf(String) bins, setOf(String) assemblies, setOf(String) resources, setOf(String) artifacts, Boolean noDeps) = {
+    generateServiceResources(MeshElement no, JavaService service, Path appRoot, setOf(String) bins, setOf(AssemblyInfo) assemblies, setOf(String) resources, setOf(String) artifacts, Boolean noDeps) = {
         if (not(noDeps)) {
             artifacts.add(getArtifact(no));
             addArtifacts(service.artifacts, service.artifact, bins, noDeps);
@@ -2019,7 +2020,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     }
 
     @DispatchCase
-    generateServiceResources(MeshElement no, PythonService service, Path appRoot, setOf(String) bins, setOf(String) assemblies, setOf(String) resources, setOf(String) artifacts, Boolean noDeps) = {
+    generateServiceResources(MeshElement no, PythonService service, Path appRoot, setOf(String) bins, setOf(AssemblyInfo) assemblies, setOf(String) resources, setOf(String) artifacts, Boolean noDeps) = {
         IIPEcosphere cfg = config; // from global
         String serviceFolderName = toFolderName(service.id);
         Path assemblySrc = "${appRoot}/${assemblyRel}";
@@ -2037,7 +2038,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
             }
             artifacts.add(artifact);
             vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/python_${serviceFolderName}.xml", withServices=true, dependency=artifact, dependency2=shArtifact);
-            assemblies.add("python_${serviceFolderName}|${assemblyRel}/python_${serviceFolderName}.xml|prepare-package|${mvnProjectBuildDir}/classes|python_${serviceFolderName}");
+            addAssemblyInfo(assemblies, "python_${serviceFolderName}", "${assemblyRel}/python_${serviceFolderName}.xml", "prepare-package", "${mvnProjectBuildDir}/classes", finalName="python_${serviceFolderName}");
             artifacts.add(getArtifact(service));
             addArtifacts(service.artifacts, service.artifact, bins, noDeps);
         }
@@ -2075,7 +2076,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         assemblySrc.mkdir();
         
         setOf(String) bins = {}; 
-        setOf(String) assemblies = {}; 
+        setOf(AssemblyInfo) assemblies = {}; 
         setOf(String) resources = {}; 
         sequenceOf(MeshElement) elements = {};
         generateEnums(javaDatatypesSrc, pySrc);    
@@ -2112,10 +2113,10 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
 
         
         //vilTemplateProcessor("JavaInterfaceAssembly", config, "${assemblySrc}/javaInterfaces.xml");
-        //assemblies.add("interfaces|${assemblyRel}/javaInterfaces.xml|package|${mvnProjectBuildDir}");
+        //addAssemblyInfo(assemblies, "interfaces", "${assemblyRel}/javaInterfaces.xml", "package", mvnProjectBuildDir);
         if (isPythonUsed(usedServiceTypes)) {
             vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/pythonInterfaces.xml", withServices=false, dependency="");
-            assemblies.add("python|${assemblyRel}/pythonInterfaces.xml|package|${mvnProjectBuildDir}");
+            addAssemblyInfo(assemblies, "python", "${assemblyRel}/pythonInterfaces.xml", "package", mvnProjectBuildDir);
         }
         
         // partition according to container strategy

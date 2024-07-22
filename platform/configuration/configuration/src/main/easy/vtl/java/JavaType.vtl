@@ -157,7 +157,12 @@ template JavaType(Configuration config, FileArtifact target, RecordType type, St
     }
 
     def genHashCode(String access, DataType type, Boolean optional) {
-        '${considerWrapper(toTypeName(type))}.hashCode(${access})'
+        String javaType = toTypeName(type);
+        if ("BigInteger" == javaType or "BigDecimal" == javaType) {
+            '${access} != null ? ${access}.hashCode() : 0'
+        } else {
+            '${considerWrapper(toTypeName(type))}.hashCode(${access})'
+        }
     }
 
     def genHashCode(String access, AliasType type, Boolean optional) {
@@ -340,6 +345,7 @@ template JavaType(Configuration config, FileArtifact target, RecordType type, St
         
         ${imp|e}
         import de.iip_ecosphere.platform.support.iip_aas.ConfiguredName;
+        import java.math.*;
         ${genImports(type)|e}
 
         /**

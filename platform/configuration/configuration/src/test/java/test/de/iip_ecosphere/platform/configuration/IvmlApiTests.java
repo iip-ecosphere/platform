@@ -35,6 +35,7 @@ public class IvmlApiTests extends AbstractIvmlTests {
      */
     @Test
     public void testApi() throws ExecutionException, IOException {
+        // mvn: stdout now in target/surefire-reports/<qualifiedClassName>-output.txt
         //System.setProperty(PlatformInstantiator.KEY_PROPERTY_MVNARGS, "-o");
         //System.setProperty(PlatformInstantiator.KEY_PROPERTY_TRACING, "ALL");
         //PlatformInstantiator.setTraceFilter();
