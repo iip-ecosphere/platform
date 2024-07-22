@@ -54,7 +54,7 @@ jobs:
           cat src/main/easy/TechnicalSetup.ivml
           mvn install
           cp -r container/DevContainer/* gen
-          cp ../../configuration/configuration/gen/tests/SimpleMesh/SimpleMeshTestingApp/target/SimpleMeshTestingApp-0.1.0-SNAPSHOT-bin.jar gen
+          cp gen/SimpleMeshInstallTestingApp/target/SimpleMeshInstallTestingApp-0.1.0-SNAPSHOT-bin.jar gen/SimpleMeshTestingApp-0.1.0-SNAPSHOT-bin.jar
           echo "Base directory for container creation:"
           ls gen
       - name: Login to DockerHub
