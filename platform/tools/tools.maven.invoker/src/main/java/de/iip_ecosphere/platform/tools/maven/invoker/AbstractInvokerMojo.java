@@ -161,6 +161,12 @@ public class AbstractInvokerMojo extends AbstractMojo implements Logger { // Abs
     @Parameter(property = "iip.ciBuildId", defaultValue = "") 
     private String buildId;
     
+    @Parameter(property = "easy.docker.failOnError")
+    private String easyDockerFailOnError;
+    
+    @Parameter(property = "easy.docker.skip")
+    private String easyDockerSkip;
+    
     /**
      * A specific <code>fileSet</code> rule to select files and directories.
      */
@@ -266,9 +272,9 @@ public class AbstractInvokerMojo extends AbstractMojo implements Logger { // Abs
         value = value || disableJava || disableBuild || disableJavaTests;
         sysProperties.put("maven.test.skip", String.valueOf(value));
         sysProperties.put("skipTests", String.valueOf(value)); // maven.test.skip might be sufficient
-        if (null != mavenBuildCacheEnabled) {
-            sysProperties.put("maven.build.cache.enabled", mavenBuildCacheEnabled);
-        }
+        setAsProperty(sysProperties, "maven.build.cache.enabled", mavenBuildCacheEnabled);
+        setAsProperty(sysProperties, "easy.docker.failOnError", easyDockerFailOnError);
+        setAsProperty(sysProperties, "easy.docker.skip", easyDockerSkip);
         value = (disablePython || disableBuild);
         sysProperties.put("python-compile.skip", String.valueOf(value));
         sysProperties.put("python-test.skip", String.valueOf(value));
@@ -288,6 +294,19 @@ public class AbstractInvokerMojo extends AbstractMojo implements Logger { // Abs
         request.addShellEnvironment("PYTHON_COMPILE_HASHDIR", hashDir); // invoker -D not correct?, pass on 2 mvn levels
         request.setProperties(sysProperties);
         getLog().info("Setting sys properties " + request.getProperties());
+    }
+
+    /**
+     * If {@code value} is not <b>null</b>, set {@code value} for {@code key} in {@code sysProperties}.
+     * 
+     * @param sysProperties the system properties to modify
+     * @param key the properties key
+     * @param value the value, may be <b>null</b> to ignore the call
+     */
+    private void setAsProperty(Properties sysProperties, String key, String value) {
+        if (value != null) {
+            sysProperties.put(key, value);
+        }
     }
     
     /**
