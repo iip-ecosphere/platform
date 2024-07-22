@@ -53,7 +53,7 @@ jobs:
           mvn install
           cp container/fullPlatform/platform/*.sh gen
           cp container/fullPlatform/platform/deployment_plan.yaml gen
-          cp gen/SimpleMeshInstallTestingApp/target/SimpleMeshInstallTestingApp-0.1.0-SNAPSHOT-bin.jar gen
+          cp gen/SimpleMeshInstallTestingApp/target/SimpleMeshInstallTestingApp-0.1.0-SNAPSHOT-bin.jar gen/SimpleMeshTestingApp-0.1.0-SNAPSHOT-bin.jar
           echo "Base directory for container creation:"
           ls gen
       - name: Login to DockerHub
