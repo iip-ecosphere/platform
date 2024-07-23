@@ -66,9 +66,9 @@ public class SentronFunctionTestOutputTranslator<S>
         final ModelInputConverter inConverter = access.getInputConverter();
         SentronFunctionTest result = new SentronFunctionTest();
         
-        result.setBetriebsstundenzaehler(inConverter.toInteger(access.get("Betriebsstundenzaehler")));
-        result.setUniversalzaehler(inConverter.toInteger(access.get("Universalzaehler")));
-        result.setImpulszaehler(inConverter.toInteger(access.get("Impulszaehler 0")));
+        result.setBetriebsstundenzaehler(inConverter.toLong(access.get("Betriebsstundenzaehler")));
+        result.setUniversalzaehler(inConverter.toLong(access.get("Universalzaehler")));
+        result.setImpulszaehler(inConverter.toLong(access.get("Impulszaehler 0")));
         result.setSpannungL1L3((float) access.get("Spannung L1-L3"));
         result.setSpannungL2L3((float) access.get("Spannung L2-L3"));
         result.setSpannungL3L1((float) access.get("Spannung L3-L1"));

@@ -19,9 +19,9 @@ package test.de.iip_ecosphere.platform.examples.modbusTcp;
  */
 public class EEMFunctionTestRw {
 
-    private Short day = null;
-    private Short month = null;
-    private Short year = null;
+    private Integer day = null;
+    private Integer month = null;
+    private Integer year = null;
     
     /**
      * Constructor.
@@ -35,7 +35,7 @@ public class EEMFunctionTestRw {
      * 
      * @return the value of day
      */
-    public Short getDay() {
+    public Integer getDay() {
         return day;
     }
     
@@ -44,7 +44,7 @@ public class EEMFunctionTestRw {
      * 
      * @return the value of month
      */
-    public Short getMonth() {
+    public Integer getMonth() {
         return month;
     }
     
@@ -53,7 +53,7 @@ public class EEMFunctionTestRw {
      * 
      * @return the value of year
      */
-    public Short getYear() {
+    public Integer getYear() {
         return year;
     }
     
@@ -62,7 +62,7 @@ public class EEMFunctionTestRw {
      * 
      * @param val the short to set
      */
-    public void setDay(short val) {
+    public void setDay(Integer val) {
         day = val;
     }
     
@@ -71,7 +71,7 @@ public class EEMFunctionTestRw {
      * 
      * @param val the short to set
      */
-    public void setMonth(short val) {
+    public void setMonth(Integer val) {
         month = val;
     }
     
@@ -80,7 +80,7 @@ public class EEMFunctionTestRw {
      * 
      * @param val the short to set
      */
-    public void setYear(short val) {
+    public void setYear(Integer val) {
         year = val;
     }
 }

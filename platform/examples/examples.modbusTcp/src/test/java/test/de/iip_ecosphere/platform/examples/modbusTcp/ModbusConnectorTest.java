@@ -174,43 +174,43 @@ public class ModbusConnectorTest {
         EEMFunctionTest tmp = md.get();
 
         // Check if the values are 0
-        Assert.assertEquals((short) 0, tmp.getDay());
-        Assert.assertEquals((short) 0, tmp.getMonth());
-        Assert.assertEquals((short) 0, tmp.getYear());
+        Assert.assertEquals((int) 0, tmp.getDay());
+        Assert.assertEquals((int) 0, tmp.getMonth());
+        Assert.assertEquals((int) 0, tmp.getYear());
         Assert.assertTrue(tmp.getU12() <= 0.001);
         Assert.assertTrue(tmp.getU23() <= 0.001);
         Assert.assertTrue(tmp.getU31() <= 0.001);
 
         // Set values
         EEMFunctionTestRw cmd = new EEMFunctionTestRw();
-        cmd.setDay((short) 27);
-        cmd.setMonth((short) 5);
-        cmd.setYear((short) 2024);
+        cmd.setDay((int) 27);
+        cmd.setMonth((int) 5);
+        cmd.setYear((int) 2024);
         connector.write(cmd);
 
         tmp = md.get();
 
         // Check the values set before
-        Assert.assertEquals((short) 27, tmp.getDay());
-        Assert.assertEquals((short) 5, tmp.getMonth());
-        Assert.assertEquals((short) 2024, tmp.getYear());
+        Assert.assertEquals((int) 27, tmp.getDay());
+        Assert.assertEquals((int) 5, tmp.getMonth());
+        Assert.assertEquals((int) 2024, tmp.getYear());
         Assert.assertTrue(tmp.getU12() <= 0.001);
         Assert.assertTrue(tmp.getU23() <= 0.001);
         Assert.assertTrue(tmp.getU31() <= 0.001);
 
         // Set values back to 0
         cmd = new EEMFunctionTestRw();
-        cmd.setDay((short) 0);
-        cmd.setMonth((short) 0);
-        cmd.setYear((short) 0);
+        cmd.setDay((int) 0);
+        cmd.setMonth((int) 0);
+        cmd.setYear((int) 0);
         connector.write(cmd);
 
         tmp = md.get();
 
         // Check if the values are 0
-        Assert.assertEquals((short) 0, tmp.getDay());
-        Assert.assertEquals((short) 0, tmp.getMonth());
-        Assert.assertEquals((short) 0, tmp.getYear());
+        Assert.assertEquals((int) 0, tmp.getDay());
+        Assert.assertEquals((int) 0, tmp.getMonth());
+        Assert.assertEquals((int) 0, tmp.getYear());
         Assert.assertTrue(tmp.getU12() <= 0.001);
         Assert.assertTrue(tmp.getU23() <= 0.001);
         Assert.assertTrue(tmp.getU31() <= 0.001);
@@ -255,43 +255,43 @@ public class ModbusConnectorTest {
         EEMFunctionTest tmp = md.get();
 
         // Check if the values are 0
-        Assert.assertEquals((short) 0, tmp.getDay());
-        Assert.assertEquals((short) 0, tmp.getMonth());
-        Assert.assertEquals((short) 0, tmp.getYear());
+        Assert.assertEquals((int) 0, tmp.getDay());
+        Assert.assertEquals((int) 0, tmp.getMonth());
+        Assert.assertEquals((int) 0, tmp.getYear());
         Assert.assertTrue(tmp.getU12() <= 0.001);
         Assert.assertTrue(tmp.getU23() <= 0.001);
         Assert.assertTrue(tmp.getU31() <= 0.001);
 
         // Set values
         EEMFunctionTestRw cmd = new EEMFunctionTestRw();
-        cmd.setDay((short) 27);
-        cmd.setMonth((short) 5);
-        cmd.setYear((short) 2024);
+        cmd.setDay((int) 27);
+        cmd.setMonth((int) 5);
+        cmd.setYear((int) 2024);
         connector.write(cmd);
 
         tmp = md.get();
 
         // Check the values set before
-        Assert.assertEquals((short) 27, tmp.getDay());
-        Assert.assertEquals((short) 5, tmp.getMonth());
-        Assert.assertEquals((short) 2024, tmp.getYear());
+        Assert.assertEquals((int) 27, tmp.getDay());
+        Assert.assertEquals((int) 5, tmp.getMonth());
+        Assert.assertEquals((int) 2024, tmp.getYear());
         Assert.assertTrue(tmp.getU12() <= 0.001);
         Assert.assertTrue(tmp.getU23() <= 0.001);
         Assert.assertTrue(tmp.getU31() <= 0.001);
 
         // Set values back to 0
         cmd = new EEMFunctionTestRw();
-        cmd.setDay((short) 0);
-        cmd.setMonth((short) 0);
-        cmd.setYear((short) 0);
+        cmd.setDay((int) 0);
+        cmd.setMonth((int) 0);
+        cmd.setYear((int) 0);
         connector.write(cmd);
 
         tmp = md.get();
 
         // Check if the values are 0
-        Assert.assertEquals((short) 0, tmp.getDay());
-        Assert.assertEquals((short) 0, tmp.getMonth());
-        Assert.assertEquals((short) 0, tmp.getYear());
+        Assert.assertEquals((int) 0, tmp.getDay());
+        Assert.assertEquals((int) 0, tmp.getMonth());
+        Assert.assertEquals((int) 0, tmp.getYear());
         Assert.assertTrue(tmp.getU12() <= 0.001);
         Assert.assertTrue(tmp.getU23() <= 0.001);
         Assert.assertTrue(tmp.getU31() <= 0.001);
@@ -336,43 +336,43 @@ public class ModbusConnectorTest {
         SentronFunctionTest tmp = md.get();
 
         // Check if the values are 0
-        Assert.assertEquals((int) 0, tmp.getBetriebsstundenzaehler());
-        Assert.assertEquals((int) 0, tmp.getImpulszaehler());
-        Assert.assertEquals((int) 0, tmp.getUniversalzaehler());
+        Assert.assertEquals((long) 0, tmp.getBetriebsstundenzaehler());
+        Assert.assertEquals((long) 0, tmp.getImpulszaehler());
+        Assert.assertEquals((long) 0, tmp.getUniversalzaehler());
         Assert.assertTrue(tmp.getSpannungL1L3() <= 0.001);
         Assert.assertTrue(tmp.getSpannungL2L3() <= 0.001);
         Assert.assertTrue(tmp.getSpannungL3L1() <= 0.001);
 
         // Set values
         SentronFunctionTestRw cmd = new SentronFunctionTestRw();
-        cmd.setBetriebsstundenzaehler((int) 7);
-        cmd.setImpulszaehler((int) 82);
-        cmd.setUniversalzaehler((int) 123);
+        cmd.setBetriebsstundenzaehler((long) 7);
+        cmd.setImpulszaehler((long) 82);
+        cmd.setUniversalzaehler((long) 123);
         connector.write(cmd);
 
         tmp = md.get();
 
         // Check the values set before
-        Assert.assertEquals((int) 7, tmp.getBetriebsstundenzaehler());
-        Assert.assertEquals((int) 82, tmp.getImpulszaehler());
-        Assert.assertEquals((int) 123, tmp.getUniversalzaehler());
+        Assert.assertEquals((long) 7, tmp.getBetriebsstundenzaehler());
+        Assert.assertEquals((long) 82, tmp.getImpulszaehler());
+        Assert.assertEquals((long) 123, tmp.getUniversalzaehler());
         Assert.assertTrue(tmp.getSpannungL1L3() <= 0.001);
         Assert.assertTrue(tmp.getSpannungL2L3() <= 0.001);
         Assert.assertTrue(tmp.getSpannungL3L1() <= 0.001);
 
         // Set values back to 0
         cmd = new SentronFunctionTestRw();
-        cmd.setBetriebsstundenzaehler((int) 0);
-        cmd.setImpulszaehler((int) 0);
-        cmd.setUniversalzaehler((int) 0);
+        cmd.setBetriebsstundenzaehler((long) 0);
+        cmd.setImpulszaehler((long) 0);
+        cmd.setUniversalzaehler((long) 0);
         connector.write(cmd);
 
         tmp = md.get();
 
         // Check if the values are 0
-        Assert.assertEquals((int) 0, tmp.getBetriebsstundenzaehler());
-        Assert.assertEquals((int) 0, tmp.getImpulszaehler());
-        Assert.assertEquals((int) 0, tmp.getUniversalzaehler());
+        Assert.assertEquals((long) 0, tmp.getBetriebsstundenzaehler());
+        Assert.assertEquals((long) 0, tmp.getImpulszaehler());
+        Assert.assertEquals((long) 0, tmp.getUniversalzaehler());
         Assert.assertTrue(tmp.getSpannungL1L3() <= 0.001);
         Assert.assertTrue(tmp.getSpannungL2L3() <= 0.001);
         Assert.assertTrue(tmp.getSpannungL3L1() <= 0.001);

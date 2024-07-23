@@ -19,9 +19,9 @@ package test.de.iip_ecosphere.platform.examples.modbusTcp;
  */
 public class SentronFunctionTestRw {
 
-    private Integer betriebsstundenzaehler = null;
-    private Integer universalzaehler = null;
-    private Integer impulszaehler = null;
+    private Long betriebsstundenzaehler = null;
+    private Long universalzaehler = null;
+    private Long impulszaehler = null;
     
     /**
      * Constructor.
@@ -35,7 +35,7 @@ public class SentronFunctionTestRw {
      * 
      * @return the value of betriebsstundenzaehler
      */
-    public Integer getBetriebsstundenzaehler() {
+    public Long getBetriebsstundenzaehler() {
         return betriebsstundenzaehler;
     }
     
@@ -44,7 +44,7 @@ public class SentronFunctionTestRw {
      * 
      * @return the value of universalzaehler
      */
-    public Integer getUniversalzaehler() {
+    public Long getUniversalzaehler() {
         return universalzaehler;
     }
     
@@ -53,7 +53,7 @@ public class SentronFunctionTestRw {
      * 
      * @return the value of impulszaehler
      */
-    public Integer getImpulszaehler() {
+    public Long getImpulszaehler() {
         return impulszaehler;
     }
     
@@ -62,7 +62,7 @@ public class SentronFunctionTestRw {
      * 
      * @param val the int to set
      */
-    public void setBetriebsstundenzaehler(int val) {
+    public void setBetriebsstundenzaehler(Long val) {
         betriebsstundenzaehler = val;
     }
     
@@ -71,7 +71,7 @@ public class SentronFunctionTestRw {
      * 
      * @param val the int to set
      */
-    public void setUniversalzaehler(int val) {
+    public void setUniversalzaehler(Long val) {
         universalzaehler = val;
     }
     
@@ -80,7 +80,7 @@ public class SentronFunctionTestRw {
      * 
      * @param val the int to set
      */
-    public void setImpulszaehler(int val) {
+    public void setImpulszaehler(Long val) {
         impulszaehler = val;
     }
 }

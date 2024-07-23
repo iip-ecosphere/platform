@@ -23,9 +23,9 @@ import de.iip_ecosphere.platform.connectors.types.TranslatingProtocolAdapter;
  */
 public class SentronFunctionTest {
 
-    private int betriebsstundenzaehler;
-    private int universalzaehler;
-    private int impulszaehler;
+    private long betriebsstundenzaehler;
+    private long universalzaehler;
+    private long impulszaehler;
     private float spannungL1L3;
     private float spannungL2L3;
     private float spannungL3L1;
@@ -42,7 +42,7 @@ public class SentronFunctionTest {
      * 
      * @return the value of betriebsstundenzaehler
      */
-    public int getBetriebsstundenzaehler() {
+    public long getBetriebsstundenzaehler() {
         return betriebsstundenzaehler;
     }
     
@@ -51,7 +51,7 @@ public class SentronFunctionTest {
      * 
      * @return the value of universalzaehler
      */
-    public int getUniversalzaehler() {
+    public long getUniversalzaehler() {
         return universalzaehler;
     }
     
@@ -60,7 +60,7 @@ public class SentronFunctionTest {
      * 
      * @return the value of impulszaehler
      */
-    public int getImpulszaehler() {
+    public long getImpulszaehler() {
         return impulszaehler;
     }
     
@@ -96,7 +96,7 @@ public class SentronFunctionTest {
      * 
      * @param val the int to set
      */
-    public void setBetriebsstundenzaehler(int val) {
+    public void setBetriebsstundenzaehler(long val) {
         betriebsstundenzaehler = val;
     }
     
@@ -105,7 +105,7 @@ public class SentronFunctionTest {
      * 
      * @param val the int to set
      */
-    public void setUniversalzaehler(int val) {
+    public void setUniversalzaehler(long val) {
         universalzaehler = val;
     }
     
@@ -114,7 +114,7 @@ public class SentronFunctionTest {
      * 
      * @param val the int to set
      */
-    public void setImpulszaehler(int val) {
+    public void setImpulszaehler(long val) {
         impulszaehler = val;
     }
     

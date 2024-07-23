@@ -23,9 +23,9 @@ import de.iip_ecosphere.platform.connectors.types.TranslatingProtocolAdapter;
  */
 public class EEMFunctionTest {
 
-    private short day;
-    private short month;
-    private short year;
+    private int day;
+    private int month;
+    private int year;
     private float u12;
     private float u23;
     private float u31;
@@ -42,7 +42,7 @@ public class EEMFunctionTest {
      * 
      * @return the value of day
      */
-    public short getDay() {
+    public int getDay() {
         return day;
     }
 
@@ -51,7 +51,7 @@ public class EEMFunctionTest {
      * 
      * @return the value of month
      */
-    public short getMonth() {
+    public int getMonth() {
         return month;
     }
 
@@ -60,7 +60,7 @@ public class EEMFunctionTest {
      * 
      * @return the value of year
      */
-    public short getYear() {
+    public int getYear() {
         return year;
     }
 
@@ -96,7 +96,7 @@ public class EEMFunctionTest {
      * 
      * @param val the short to set
      */
-    public void setDay(short val) {
+    public void setDay(int val) {
         day = val;
     }
 
@@ -105,7 +105,7 @@ public class EEMFunctionTest {
      * 
      * @param val the short to set
      */
-    public void setMonth(short val) {
+    public void setMonth(int val) {
         month = val;
     }
 
@@ -114,7 +114,7 @@ public class EEMFunctionTest {
      * 
      * @param val the short to set
      */
-    public void setYear(short val) {
+    public void setYear(int val) {
         year = val;
     }
 

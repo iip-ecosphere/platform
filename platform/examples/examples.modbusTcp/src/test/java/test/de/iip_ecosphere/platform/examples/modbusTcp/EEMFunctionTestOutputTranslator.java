@@ -65,9 +65,9 @@ public class EEMFunctionTestOutputTranslator<S> extends AbstractConnectorOutputT
         final ModelInputConverter inConverter = access.getInputConverter();
         EEMFunctionTest result = new EEMFunctionTest();
         
-        result.setDay(inConverter.toShort(access.get("Day")));
-        result.setMonth(inConverter.toShort(access.get("Month")));
-        result.setYear(inConverter.toShort(access.get("Year")));
+        result.setDay(inConverter.toInteger(access.get("Day")));
+        result.setMonth(inConverter.toInteger(access.get("Month")));
+        result.setYear(inConverter.toInteger(access.get("Year")));
         result.setU12((float) access.get("U12"));
         result.setU23((float) access.get("U23"));
         result.setU31((float) access.get("U31"));
