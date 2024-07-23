@@ -20,6 +20,8 @@ Helpful:
 - PyDev 12.1.0 Plugin for Eclipse
 - Findbugs 3.0.1 Plugin for Eclipse
 - xText 2.35
+- EASy-Producer 3.10.0 Plugin for Eclipse from [SSE](https://projects.sse.uni-hildesheim.de/eclipse/update-sites/easy_nightly/); currently it is required to add the natures `de.uni_hildesheim.sse.EASy-Producer` and 
+`org.eclipse.xtext.ui.shared.xtextNature` and the builder `org.eclipse.xtext.ui.shared.xtextBuilder`to the project setup. Depending on your workspace use, it might be required to adjust the file associations so that EASy-Producer editors are default for `*.ivml`, `*.vil`, `*.vtl` and `*.text`.
 
 ## Git LFS
 
