@@ -4,7 +4,7 @@ import JavaMapping;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedServiceTypes, setOf(String) artifacts, setOf(String) bins, setOf(AssemblyInfo) assemblies, setOf(ResourceInfo) resources, String starterCls, String appName, String appVersion, String appDescription, Boolean tests, Boolean springPackaging=true, String groupId="", Boolean ifArtifact=false, Boolean copyRuntimeDependencies=true) {
+template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedServiceTypes, setOf(String) artifacts, setOf(DependencyArtifact) bins, setOf(AssemblyInfo) assemblies, setOf(ResourceInfo) resources, String starterCls, String appName, String appVersion, String appDescription, Boolean tests, Boolean springPackaging=true, String groupId="", Boolean ifArtifact=false, Boolean copyRuntimeDependencies=true) {
 
     def XmlElement appendSpringBootPlugin(XmlElement plugins, String version="2.4.2", String mainClass="") {
         XmlElement plugin = appendPlugin(plugins, "org.springframework.boot", "spring-boot-maven-plugin", version, false);
@@ -20,7 +20,7 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
         }
     }
 
-    def main(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedServiceTypes, setOf(String) artifacts, setOf(String) bins, setOf(AssemblyInfo) assemblies, setOf(ResourceInfo) resources, String starterCls, String appName, String appVersion, String appDescription, Boolean tests, Boolean springPackaging=true, String groupId="", Boolean ifArtifact=false, Boolean copyRuntimeDependencies=true) {
+    def main(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedServiceTypes, setOf(String) artifacts, setOf(DependencyArtifact) bins, setOf(AssemblyInfo) assemblies, setOf(ResourceInfo) resources, String starterCls, String appName, String appVersion, String appDescription, Boolean tests, Boolean springPackaging=true, String groupId="", Boolean ifArtifact=false, Boolean copyRuntimeDependencies=true) {
         String iipGroup = "de.iip-ecosphere.platform";
         String gId = groupId;
         if (length(gId) == 0) {
@@ -94,19 +94,14 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
             appendMavenDependencyPluginExecution(execs, "unpack", "${iipGroup}:services.environment:${projectVersion}", "python", "\\${project.basedir}/src/main/python", "pythonEnv.zip", type="zip");
         }*/
         mapOf(String, XmlElement) goalItems = {}; 
-        for (String bin: bins.asSequence()->sortedBy(b|b)) { // sortedBy for testing
-            sequenceOf(String) tmp = bin.split("\\|"); // escape |, splits into chars
-            String artifact = tmp[0];
-            String classifier = tmp[1];
-            String outputDir = tmp[2];
-            String destFileName = tmp[3];
-            String type = tmp[4];
-            String goal = tmp[5];
-            if (goalItems.containsKey(goal)) {
-                appendMavenDependencyPluginArtifactItem(goalItems.get(goal), artifact, classifier, outputDir, destFileName, type=type);
+        for (DependencyArtifact bin: bins.asSequence()->sortedBy(b|b.artifact)) { // sortedBy for testing
+            if (goalItems.containsKey(bin.goal)) {
+                appendMavenDependencyPluginArtifactItem(goalItems.get(bin.goal), bin.artifact, bin.classifier, 
+                    bin.outputDir, bin.destFileName, type=bin.type);
             } else {
-                XmlElement items = appendMavenDependencyPluginExecution(execs, goal, artifact, classifier, outputDir, destFileName, type=type, id=goal + "-unpack");
-                goalItems.add(goal, items);
+                XmlElement items = appendMavenDependencyPluginExecution(execs, bin.goal, bin.artifact, bin.classifier, 
+                    bin.outputDir, bin.destFileName, type=bin.type, id=bin.goal + "-unpack");
+                goalItems.add(bin.goal, items);
             }
         }
         

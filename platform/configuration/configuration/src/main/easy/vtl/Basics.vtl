@@ -33,7 +33,7 @@ template Basics(Configuration config, FileArtifact target) {
         String goal;
     }
 
-    def addDependencyArtifact(setOf(String) artifacts, String artifact, String classifier, String outputDir, String destFileName, String type, String goal) {
+    def addDependencyArtifact(setOf(DependencyArtifact) artifacts, String artifact, String classifier, String outputDir, String destFileName, String type, String goal) {
         DependencyArtifact dInfo = new DependencyArtifact();
         dInfo.artifact = artifact;
         dInfo.classifier = classifier;
@@ -42,6 +42,10 @@ template Basics(Configuration config, FileArtifact target) {
         dInfo.type = type;
         dInfo.goal = goal;
         artifacts.add(dInfo);
+    }
+
+    def addPythonDependencyArtifact(setOf(DependencyArtifact) artifacts, String artifact, String outputDir) {
+        addDependencyArtifact(artifacts, artifact, "python", outputDir, "python.zip", "zip", "unpack");
     }
     
     compound ResourceInfo {
