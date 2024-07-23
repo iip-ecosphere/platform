@@ -560,7 +560,7 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
 
         } else if (varItem.getType().equals("ushort")) {
 
-            holdingRegisters[0] = new SimpleRegister((short) varItemValue & 0xFFFF);
+            holdingRegisters[0] = new SimpleRegister(((Integer) varItemValue) & 0xFFFF);
 
         } else if (varItem.getType().equals("integer")) {
 
@@ -635,7 +635,7 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
     private Register[] getUnsignedIntegerAsRegisters(ModbusVarItem varItem) {
 
         Register[] reg = new Register[varItem.getTypeRegisterSize()];
-        long value = ((Integer) item.getRegister(varItem.getOffset())).longValue();
+        long value = ((Long) item.getRegister(varItem.getOffset()));
 
         short lowShort;
         short highShort;

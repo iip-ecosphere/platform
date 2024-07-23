@@ -12,9 +12,6 @@
 
 package de.iip_ecosphere.platform.connectors.modbustcpipv1;
 
-import java.io.IOException;
-import java.math.BigInteger;
-
 import de.iip_ecosphere.platform.connectors.model.ModelInputConverter;
 
 /**
@@ -30,54 +27,5 @@ public class ModbusTcpIpInputConverter extends ModelInputConverter {
     public ModbusTcpIpInputConverter() {
     }
 
-    @Override
-    public short toShort(Object data) throws IOException {
-        
-        short result;
-        
-        if (data.getClass() == Integer.class) {
-            
-            result = ((Integer) data).shortValue();
-            
-        } else {
-            
-            result = (short) data;
-        }
-        
-        return result;
-    }
-    
-    @Override
-    public int toInteger(Object data) throws IOException {
-        
-        int result;
-        
-        if (data.getClass() == Long.class) {
-            
-            result = ((Long) data).intValue();
-            
-        } else {
-            
-            result = (int) data;
-        }
-        
-        return result;
-    }
-    
-    @Override
-    public long toLong(Object data) throws IOException {
-        
-        long result;
-        
-        if (data.getClass() == BigInteger.class) {
-            
-            result = ((BigInteger) data).longValue();
-            
-        } else {
-            
-            result = (long) data;
-        }
-        
-        return result;
-    }
+
 }
