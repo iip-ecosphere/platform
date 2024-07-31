@@ -18,7 +18,9 @@ import java.time.Instant;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
@@ -56,6 +58,7 @@ public class Tools {
 
     private static final Map<Type, ValueType> TYPES2BASYX = new HashMap<>();
     private static final Map<ValueType, Type> BASYX2TYPES = new HashMap<>();
+    private static final Set<ValueType> BASYX2TYPES_ALIAS = new HashSet<>();
 
     private static final Map<AssetKind, org.eclipse.basyx.aas.metamodel.api.parts.asset.AssetKind> ASSETKINDS2BASYX 
         = new HashMap<>();
@@ -115,6 +118,17 @@ public class Tools {
         mapKind(AssetKind.TYPE, org.eclipse.basyx.aas.metamodel.api.parts.asset.AssetKind.TYPE);
         mapKind(AssetKind.INSTANCE, org.eclipse.basyx.aas.metamodel.api.parts.asset.AssetKind.INSTANCE);
     }
+
+    /**
+     * Maps a BaSyx property-value type into an implementation-independent type.
+     * 
+     * @param type the implementation-independent type
+     * @param basyxType the corresponding BaSyx property-value type
+     */
+    public static void mapBaSyxType(Type type, ValueType basyxType) {
+        BASYX2TYPES.put(basyxType, type);
+        BASYX2TYPES_ALIAS.add(basyxType);
+    }
     
     /**
      * Maps an implementation-independent type into a BaSyx property-value type.
@@ -122,7 +136,7 @@ public class Tools {
      * @param type the implementation-independent type
      * @param basyxType the corresponding BaSyx property-value type
      */
-    private static void mapType(Type type, ValueType basyxType) {
+    public static void mapType(Type type, ValueType basyxType) {
         TYPES2BASYX.put(type, basyxType);
         BASYX2TYPES.put(basyxType, type);
     }
@@ -133,7 +147,7 @@ public class Tools {
      * @param kind the implementation-independent asset kind
      * @param basyxKind the corresponding BaSyx asset kind
      */
-    private static void mapKind(AssetKind kind, org.eclipse.basyx.aas.metamodel.api.parts.asset.AssetKind basyxKind) {
+    public static void mapKind(AssetKind kind, org.eclipse.basyx.aas.metamodel.api.parts.asset.AssetKind basyxKind) {
         ASSETKINDS2BASYX.put(kind, basyxKind);
         BASYX2ASSETKINDS.put(basyxKind, kind);
     }
@@ -237,6 +251,17 @@ public class Tools {
      */
     public static Type translate(ValueType type) {
         return BASYX2TYPES.get(type);
+    }
+    
+    /**
+     * Returns whether {@code type} is mapped through {@link #mapBaSyxType(Type, ValueType)} as alias/one-way 
+     * fashion to an implementation type.
+     * 
+     * @param type the type to check
+     * @return {@code true} for one-way, {@code false} else
+     */
+    public static boolean isAlias(ValueType type) {
+        return BASYX2TYPES_ALIAS.contains(type);
     }
 
     /**

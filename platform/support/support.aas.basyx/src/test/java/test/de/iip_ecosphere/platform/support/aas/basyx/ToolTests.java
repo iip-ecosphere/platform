@@ -90,13 +90,15 @@ public class ToolTests {
     @Test
     public void testPropertyType() {
         for (Type t : Type.values()) {
-            if (t != Type.INTEGER && t != Type.AAS_INTEGER) {
+            if (t != Type.INTEGER && t != Type.AAS_INTEGER) {  // default alias
                 assertEquals(t, Tools.translate(t));
             }
         }
         for (ValueType t : ValueType.values()) {
             Type tt = Tools.translate(t);
-            if (tt != Type.AAS_INTEGER) {
+            if (Tools.isAlias(t)) {
+                Assert.assertNotNull(tt);
+            } else if (tt != Type.AAS_INTEGER) { // default alias
                 assertEquals(t, tt);
             }
         }
