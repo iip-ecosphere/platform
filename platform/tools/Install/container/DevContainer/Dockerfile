@@ -35,8 +35,6 @@ RUN chmod 777 *
 
 # ------ Eclipse ----------------------------------------------------------------------
 COPY eclipse/ /opt/eclipse
-#COPY PyDev10.0.1 /opt/eclipse/dropins/PyDev10.0.1
-#COPY EASyProducer /opt/eclipse/dropins/EASyProducer
 COPY impl.model /root/Desktop/eclipse-workspace/impl.model 
 
 # ------ installing dependencies ------------------------------------------------------
