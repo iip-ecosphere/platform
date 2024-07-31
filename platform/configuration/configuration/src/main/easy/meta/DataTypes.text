@@ -72,6 +72,7 @@ DataTypes::UiOptionalGroup1 = UI hint for optional settings in primary group.
 DataTypes::UiOptionalGroup2 = UI hint for optional settings in secondary group.
 DataTypes::AliasType::represents = The underlying type this alias represents.
 DataTypes::BaSyx10Plugin = Default plugin for retrofitted BaSyx 1.0
+DataTypes::BaSyx15Plugin = Default plugin for retrofitted BaSyx 1.5.1
 DataTypes::Plugin::artifact = Maven artifact of the plugin.
 DataTypes::Plugin::description = Optional short description of the plugin.
 DataTypes::Plugin::id = Unique plugin id as defined in the PluginDescriptor.
