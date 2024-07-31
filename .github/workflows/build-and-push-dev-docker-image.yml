@@ -68,7 +68,7 @@ jobs:
         id: extract
         with:
           command: x
-          cwd: ./gen/eclipse
+          cwd: gen/eclipse
           files: easy.tgz
       - name: Unzip PyDev
         uses : montudor/action-zip@v1
