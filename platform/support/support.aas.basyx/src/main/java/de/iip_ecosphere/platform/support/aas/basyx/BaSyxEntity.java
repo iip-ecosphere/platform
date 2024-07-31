@@ -206,6 +206,20 @@ public class BaSyxEntity extends BaSyxSubmodelElement implements Entity, Submode
             statements.add(reference.getSubmodelElement());
             return instance.add(reference);
         }
+
+        @Override
+        public EntityBuilder setEntityType(EntityType type) {
+            entity.setEntityType(Tools.translate(type));
+            return this;
+        }
+
+        @Override
+        public EntityBuilder setAsset(Reference asset) {
+            if (asset instanceof BaSyxReference) {
+                entity.setAsset(((BaSyxReference) asset).getReference());
+            }
+            return this;
+        }
         
     }
     
