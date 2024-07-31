@@ -35,14 +35,14 @@ RUN chmod 777 *
 
 # ------ Eclipse ----------------------------------------------------------------------
 COPY eclipse/ /opt/eclipse
-COPY PyDev10.0.1 /opt/eclipse/dropins/PyDev10.0.1
-COPY EASyProducer /opt/eclipse/dropins/EASyProducer
+#COPY PyDev10.0.1 /opt/eclipse/dropins/PyDev10.0.1
+#COPY EASyProducer /opt/eclipse/dropins/EASyProducer
 COPY impl.model /root/Desktop/eclipse-workspace/impl.model 
 
 # ------ installing dependencies ------------------------------------------------------
 RUN wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
 RUN sudo apt-get update
-RUN sudo apt-get install openjdk-11-jre -y
+RUN sudo apt-get install openjdk-21-jre -y
 RUN sudo apt-get install openjdk-8-jre -y
 RUN sudo apt install maven -y
 RUN sudo apt install git -y 
@@ -51,6 +51,7 @@ RUN sudo apt install gedit -y
 
 # ------ Desktop setup ----------------------------------------------------------------
 # Icons
+COPY icon.xpm /opt/eclipse
 COPY eclipse.desktop /root/Desktop/eclipse.desktop
 COPY chrome.desktop /root/Desktop/chrome.desktop
 # Chrome plugin

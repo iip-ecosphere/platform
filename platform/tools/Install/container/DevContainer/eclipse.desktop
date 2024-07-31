@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=Eclipse
 Type=Application
-Exec=/opt/eclipse/eclipse
+Exec=/opt/eclipse/easy
 Terminal=false
 Icon=/opt/eclipse/icon.xpm
 Comment=Integrated Development Environment
