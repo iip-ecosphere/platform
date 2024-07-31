@@ -54,9 +54,25 @@ jobs:
           cat src/main/easy/TechnicalSetup.ivml
           mvn install
           cp -r container/DevContainer/* gen
+          rm -r gen/eclipse
           cp gen/SimpleMeshInstallTestingApp/target/SimpleMeshInstallTestingApp-0.1.0-SNAPSHOT-bin.jar gen/SimpleMeshTestingApp-0.1.0-SNAPSHOT-bin.jar
           echo "Base directory for container creation:"
           ls gen
+      - name: Get pre-packaged EASy-Producer
+        uses: wei/wget@v1
+        with:
+          args: -O easy.tgz https://projects.sse.uni-hildesheim.de/eclipse/easy-nightly/net.ssehub.easy.producer.EasyProducer-linux.gtk.x86_64.tar.gz
+      - name: Extract EASy-Producer
+        uses: a7ul/tar-action@v1.1.0
+        id: extract
+        with:
+          command: x
+          cwd: ./gen/eclipse
+          files: easy.tgz
+      - name: Unzip PyDev
+        uses : montudor/action-zip@v1
+        with:
+          args: unzip -qq PyDev12.1.0.zip -d ./gen/eclipse
       - name: Login to DockerHub
         uses: docker/login-action@v1
         with:
