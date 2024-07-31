@@ -145,12 +145,26 @@ public class DelegatingEntityBuilder implements EntityBuilder {
 
     @Override
     public EntityBuilder setDescription(LangString... description) {
-        return delegate.setDescription(description);
+        delegate.setDescription(description);
+        return this;
     }
 
     @Override
     public EntityBuilder setSemanticId(String refValue) {
-        return delegate.setSemanticId(refValue);
+        delegate.setSemanticId(refValue);
+        return this;
+    }
+
+    @Override
+    public EntityBuilder setEntityType(EntityType type) {
+        delegate.setEntityType(type);
+        return this;
+    }
+
+    @Override
+    public EntityBuilder setAsset(Reference asset) {
+        delegate.setAsset(asset);
+        return this;
     }
 
 }

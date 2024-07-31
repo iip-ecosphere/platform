@@ -129,6 +129,16 @@ public class Utils {
         }
         return result;
     }
+    
+    /**
+     * Helper to parse a date.
+     * 
+     * @param date may be <b>null</b> for now or in format YYYY-MM-DDThh:mm:ss.SSS+hh:mm
+     * @return the date
+     */
+    public static Date parseDate(String date) {
+        return parseCalendar(date).toGregorianCalendar().getTime();
+    }
 
     /**
      * Wraps a submodel element collection.

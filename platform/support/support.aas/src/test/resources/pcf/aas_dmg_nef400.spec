@@ -4,6 +4,8 @@ AAS aas_DMG_NEF400
   SMC Metadata (semanticId: iri:https://admin-shell.io/idta/TimeSeries/Metadata/1/1)
    MLP Description (semanticId: iri:https://admin-shell.io/idta/TimeSeries/Metadata/Description/1/1)
    MLP Name (semanticId: iri:https://admin-shell.io/idta/TimeSeries/Metadata/Name/1/1)
+   SMC Record (semanticId: iri:https://admin-shell.io/idta/TimeSeries/Record/1/1)
+    PROPERTY Time01 = 2024-01-01T12:00:00.000+00:00 (semanticId: iri:https://admin-shell.io/idta/TimeSeries/UtcTime/1/1)
   SMC Segments (semanticId: iri:https://admin-shell.io/idta/TimeSeries/Segments/1/1)
    SMC LinkedSegment01 (semanticId: iri:https://admin-shell.io/idta/TimeSeries/Segments/LinkedSegment/1/1)
     MLP Description (semanticId: iri:https://admin-shell.io/idta/TimeSeries/Segment/Description/1/1)

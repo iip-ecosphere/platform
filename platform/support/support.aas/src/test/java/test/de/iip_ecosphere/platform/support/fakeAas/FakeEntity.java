@@ -148,6 +148,18 @@ public class FakeEntity extends FakeElement implements Entity {
         void buildMyDeferred() {
             parent.buildMyDeferred();
         }
+
+        @Override
+        public EntityBuilder setEntityType(EntityType type) {
+            instance.type = type;
+            return this;
+        }
+
+        @Override
+        public EntityBuilder setAsset(Reference asset) {
+            // ignored for now
+            return this;
+        }
         
     }
 

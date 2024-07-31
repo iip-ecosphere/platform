@@ -21,7 +21,7 @@ import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.AasUtils;
 import de.iip_ecosphere.platform.support.aas.AssetKind;
 import de.iip_ecosphere.platform.support.aas.Entity;
-import de.iip_ecosphere.platform.support.aas.Entity.EntityType;
+import de.iip_ecosphere.platform.support.aas.Entity.EntityBuilder;
 import de.iip_ecosphere.platform.support.aas.LangString;
 import de.iip_ecosphere.platform.support.aas.PersistenceRecipe.FileResource;
 import de.iip_ecosphere.platform.support.aas.Reference;
@@ -30,9 +30,9 @@ import de.iip_ecosphere.platform.support.aas.types.common.Utils;
 import de.iip_ecosphere.platform.support.aas.types.documentation.HandoverDocumentationBuilder;
 import de.iip_ecosphere.platform.support.aas.types.documentation.HandoverDocumentationBuilder.DocumentBuilder;
 import de.iip_ecosphere.platform.support.aas.types.documentation.HandoverDocumentationBuilder.DocumentStatus;
-import de.iip_ecosphere.platform.support.aas.types.hierarchicalStructure.HierarchicalStructureBuilder;
-import de.iip_ecosphere.platform.support.aas.types.hierarchicalStructure.HierarchicalStructureBuilder.ArcheType;
-import de.iip_ecosphere.platform.support.aas.types.hierarchicalStructure.HierarchicalStructureBuilder.EntryNodeBuilder;
+import de.iip_ecosphere.platform.support.aas.types.hierarchicalStructure.HierarchicalStructuresBuilder;
+import de.iip_ecosphere.platform.support.aas.types.hierarchicalStructure.HierarchicalStructuresBuilder.ArcheType;
+import de.iip_ecosphere.platform.support.aas.types.hierarchicalStructure.HierarchicalStructuresBuilder.EntryNodeBuilder;
 import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodelBuilder.FurtherInformationBuilder;
 import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodelBuilder.GeneralInformationBuilder;
@@ -86,13 +86,13 @@ public class XmasAas extends AbstractAasExample {
         AasBuilder aasBuilder = AasFactory.getInstance().createAasBuilder("Santa_s_Sleigh", 
             "urn:::AAS:::SantasSleigh#");
         aasBuilder.createAssetBuilder("santasSleigh", "urn:::Asset:::SantasSleigh#", AssetKind.INSTANCE).build();
-        HierarchicalStructureBuilder hsb = new HierarchicalStructureBuilder(aasBuilder, "BOM", 
-            "urn:::SM:::SantasSleighBOM#", ArcheType.ONE_DOWN);
-        EntryNodeBuilder enb = hsb.createEntryNodeBuilder("SantaSleigh_EntryNode", EntityType.SELFMANAGEDENTITY, null);
+        HierarchicalStructuresBuilder hsb = new HierarchicalStructuresBuilder(aasBuilder, 
+            "urn:::SM:::SantasSleighBOM#", "BOM").setArcheType(ArcheType.ONEDOWN);
+        EntryNodeBuilder enb = setName(hsb.createEntryNodeBuilder(), "SantaSleigh_EntryNode");
         Reference enbRef = enb.createReference();
         forEachPart((id, part) -> {
-            Entity ent = enb.createNodeBuilder(id, EntityType.SELFMANAGEDENTITY, part.createReference()).build();
-            enb.addHasPartOf(enbRef, ent.createReference());
+            Entity ent = setName(enb.createNodeBuilder(), id).setAsset(part.createReference()).build();
+            enb.setHasPart(enbRef, ent.createReference());
         });
         enb.build();
         hsb.build();
@@ -102,6 +102,21 @@ public class XmasAas extends AbstractAasExample {
             "santaSleigh.png", "0173-1#01-AIZ481#021");
         
         registerAas(aasBuilder);
+    }
+
+    /**
+     * Sets the name of an entity as property, previously it was just the idShort.
+     * 
+     * @param <B> the builder type
+     * @param builder the builder
+     * @param name the name value
+     * @return {@code builder}
+     */
+    private <B extends EntityBuilder> B setName(B builder, String name) {
+        builder.createPropertyBuilder("name")
+            .setValue(Type.STRING, name)
+            .build();
+        return builder;
     }
 
     /**

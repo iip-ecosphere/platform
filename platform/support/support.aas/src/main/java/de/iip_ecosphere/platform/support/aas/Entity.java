@@ -65,6 +65,24 @@ public interface Entity extends SubmodelElement, SubmodelElementCollection {
         public EntityBuilder setSemanticId(String refValue);
         
         /**
+         * Sets the entity type.
+         * 
+         * @param type the entity type
+         * 
+         * @return <b>this</b>
+         */
+        public EntityBuilder setEntityType(EntityType type);
+
+        /**
+         * Sets the asset reference.
+         * 
+         * @param type the asset reference, may be ignored if the actual type does not match
+         * 
+         * @return <b>this</b>
+         */
+        public EntityBuilder setAsset(Reference asset);
+        
+        /**
          * Creates a reference to the entity under creation.
          * 
          * @return the reference

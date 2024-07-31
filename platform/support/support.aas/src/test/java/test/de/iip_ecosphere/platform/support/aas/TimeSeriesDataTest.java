@@ -19,9 +19,8 @@ import de.iip_ecosphere.platform.support.aas.AssetKind;
 import de.iip_ecosphere.platform.support.aas.LangString;
 import de.iip_ecosphere.platform.support.aas.types.common.Utils;
 import de.iip_ecosphere.platform.support.aas.types.timeSeriesData.TimeSeriesBuilder;
-import de.iip_ecosphere.platform.support.aas.types.timeSeriesData.TimeSeriesBuilder.SegmentState;
 import de.iip_ecosphere.platform.support.aas.types.timeSeriesData.TimeSeriesBuilder.SegmentsBuilder;
-import de.iip_ecosphere.platform.support.aas.types.timeSeriesData.TimeSeriesBuilder.TimeUnit;
+import de.iip_ecosphere.platform.support.aas.types.timeSeriesData.TimeSeriesBuilder.State;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 
 /**
@@ -52,14 +51,14 @@ public class TimeSeriesDataTest extends AbstractAasExample {
             .setName(new LangString("en", "Example data"))
             .setDescription(new LangString("en", "Example timeseries data"))
             .createRecordBuilder()
-                .addTime(TimeUnit.UTC_TIME.getSemanticId(), Utils.parseCalendar("2024-01-01T12:00:00.000+00:00"))
+                .setTime("2024-01-01T12:00:00.000+00:00", null)
                 .build();
         SegmentsBuilder sBuilder = tsdBuilder.createSegmentsBuilder();
         sBuilder.createLinkedSegmentBuilder()
             .setName(new LangString("en", "External data"))
             .setDescription(new LangString("en", "External data"))
-            .setState(SegmentState.IN_PROGRESS)
-            .setLastUpdate(Utils.parseCalendar("2024-01-01T12:00:00.000+00:00"))
+            .setState(State.IN_PROGRESS)
+            .setLastUpdate(Utils.parseDate("2024-01-01T12:00:00.000+00:00"))
             .setEndpoint("ws:127.0.0.1/data")
             .setQuery("all=true")
             .build();

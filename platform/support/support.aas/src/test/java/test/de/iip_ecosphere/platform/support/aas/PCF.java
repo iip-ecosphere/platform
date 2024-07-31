@@ -13,30 +13,37 @@
 package test.de.iip_ecosphere.platform.support.aas;
 
 import java.io.File;
+import java.util.Date;
 
 import static de.iip_ecosphere.platform.support.aas.IdentifierType.*;
 
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.AssetKind;
 import de.iip_ecosphere.platform.support.aas.Entity;
+import de.iip_ecosphere.platform.support.aas.Entity.EntityBuilder;
 import de.iip_ecosphere.platform.support.aas.Entity.EntityType;
+import de.iip_ecosphere.platform.support.aas.IdentifierType;
 import de.iip_ecosphere.platform.support.aas.LangString;
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.aas.types.carbonFootprint.CarbonFootprintBuilder;
-import de.iip_ecosphere.platform.support.aas.types.carbonFootprint.CarbonFootprintBuilder.PcfCalculationMethod;
-import de.iip_ecosphere.platform.support.aas.types.carbonFootprint.CarbonFootprintBuilder.PcfLiveCyclePhase;
+import de.iip_ecosphere.platform.support.aas.types.carbonFootprint.CarbonFootprintBuilder.PCFCalculationMethod;
+import de.iip_ecosphere.platform.support.aas.types.carbonFootprint.CarbonFootprintBuilder
+    .PCFGoodsAddressHandoverBuilder;
+import de.iip_ecosphere.platform.support.aas.types.carbonFootprint.CarbonFootprintBuilder.PCFLifeCyclePhase;
+import de.iip_ecosphere.platform.support.aas.types.carbonFootprint.CarbonFootprintBuilder
+    .PCFReferenceValueForCalculation;
 import de.iip_ecosphere.platform.support.aas.types.carbonFootprint.CarbonFootprintBuilder.ProductCarbonFootprintBuilder;
-import de.iip_ecosphere.platform.support.aas.types.carbonFootprint.CarbonFootprintBuilder.QuantityUnit;
 import de.iip_ecosphere.platform.support.aas.types.common.Utils;
-import de.iip_ecosphere.platform.support.aas.types.hierarchicalStructure.HierarchicalStructureBuilder;
-import de.iip_ecosphere.platform.support.aas.types.hierarchicalStructure.HierarchicalStructureBuilder.ArcheType;
-import de.iip_ecosphere.platform.support.aas.types.hierarchicalStructure.HierarchicalStructureBuilder.EntryNodeBuilder;
+import de.iip_ecosphere.platform.support.aas.types.hierarchicalStructure.HierarchicalStructuresBuilder;
+import de.iip_ecosphere.platform.support.aas.types.hierarchicalStructure.HierarchicalStructuresBuilder.ArcheType;
+import de.iip_ecosphere.platform.support.aas.types.hierarchicalStructure.HierarchicalStructuresBuilder.EntryNodeBuilder;
 import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodelBuilder
     .ProductClassificationsBuilder;
 import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodelBuilder
     .TechnicalPropertiesBuilder;
 import de.iip_ecosphere.platform.support.aas.types.timeSeriesData.TimeSeriesBuilder;
+import de.iip_ecosphere.platform.support.aas.types.timeSeriesData.TimeSeriesBuilder.MetadataBuilder;
 import de.iip_ecosphere.platform.support.aas.types.timeSeriesData.TimeSeriesBuilder.SegmentsBuilder;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 
@@ -70,6 +77,27 @@ public class PCF extends AbstractAasExample {
         
         registerAas(aasBuilder);
     }
+
+    /**
+     * Sets location latitude/longitude as additional properties.
+     * 
+     * @param builder the builder to set the values on
+     * @param latitude the latitude
+     * @param longitude the longitude
+     * @return {@code builder}
+     */
+    private PCFGoodsAddressHandoverBuilder setLocation(PCFGoodsAddressHandoverBuilder builder, double latitude, 
+        double longitude) {
+        builder.createPropertyBuilder("Latitude")
+            .setValue(Type.DOUBLE, latitude)
+            .setSemanticId(IdentifierType.irdi("0173-1#02-ABH960#001"))
+            .build();
+        builder.createPropertyBuilder("Longitude")
+            .setValue(Type.DOUBLE, longitude)
+            .setSemanticId(IdentifierType.irdi("0173-1#02-ABH961#001"))
+            .build();
+        return builder;
+    }
     
     /**
      * Creates the PCF submodel.
@@ -77,73 +105,73 @@ public class PCF extends AbstractAasExample {
      * @param aasBuilder the AAS builder
      */
     private void createPcfSubmodel(AasBuilder aasBuilder) {
-        CarbonFootprintBuilder cfBuilder = new CarbonFootprintBuilder(aasBuilder, null, "urn:::SM:::PCF#");
-
+        CarbonFootprintBuilder cfBuilder = new CarbonFootprintBuilder(aasBuilder, "urn:::SM:::PCF#", "CarbonFootprint");
+        Date date = Utils.parseDate("2023-12-17T00:00:00.000Z");
         ProductCarbonFootprintBuilder pcfBuilder = cfBuilder.createProductCarbonFootprintBuilder()
-            .setPCFCalculationMethod(PcfCalculationMethod.GHG_PROTOCOL)
+            .setPCFCalculationMethod(PCFCalculationMethod.GHG_PROTOCOL)
             .setPCFCO2eq(0.235)
-            .setPCFReferenceValueForCalculation(QuantityUnit.PIECE)
+            .setPCFReferenceValueForCalculation(PCFReferenceValueForCalculation.PIECE)
             .setPCFQuantityOfMeasureForCalculation(1)
-            .addPCFLiveCyclePhase(PcfLiveCyclePhase.A1);
-        pcfBuilder.createPCFGoodsAddressHandoverBuilder()
+            .setPCFLifeCyclePhase(PCFLifeCyclePhase.A1)
+            .setPublicationDate(date);
+        PCFGoodsAddressHandoverBuilder ho = pcfBuilder.createPCFGoodsAddressHandoverBuilder()
             .setStreet("Koblenzer Str")
             .setHouseNumber("122")
             .setZipCode("41468")
             .setCityTown("Neuss")
-            .setCountry("Germany")
-            .setLatitude(51.151277079867036)
-            .setLongitude(6.777799507862787)
+            .setCountry("Germany");
+        setLocation(ho, 51.151277079867036, 6.777799507862787)
             .build();
         pcfBuilder.build();
 
         pcfBuilder = cfBuilder.createProductCarbonFootprintBuilder()
-            .setPCFCalculationMethod(PcfCalculationMethod.GHG_PROTOCOL)
+            .setPCFCalculationMethod(PCFCalculationMethod.GHG_PROTOCOL)
             .setPCFCO2eq(0.553)
-            .setPCFReferenceValueForCalculation(QuantityUnit.PIECE)
+            .setPCFReferenceValueForCalculation(PCFReferenceValueForCalculation.PIECE)
             .setPCFQuantityOfMeasureForCalculation(1)
-            .addPCFLiveCyclePhase(PcfLiveCyclePhase.A2);
-        pcfBuilder.createPCFGoodsAddressHandoverBuilder()
+            .setPCFLifeCyclePhase(PCFLifeCyclePhase.A2)
+            .setPublicationDate(date);
+        ho = pcfBuilder.createPCFGoodsAddressHandoverBuilder()
             .setStreet("Osteriede")
             .setHouseNumber("6")
             .setZipCode("30827")
             .setCityTown("Garbsen")
-            .setCountry("Germany")
-            .setLatitude(52.42771449186328)
-            .setLongitude(9.613097399392698)
+            .setCountry("Germany");
+        setLocation(ho, 52.42771449186328, 9.613097399392698)
             .build();
         pcfBuilder.build();
 
         pcfBuilder = cfBuilder.createProductCarbonFootprintBuilder()
-            .setPCFCalculationMethod(PcfCalculationMethod.GHG_PROTOCOL)
+            .setPCFCalculationMethod(PCFCalculationMethod.GHG_PROTOCOL)
             .setPCFCO2eq(0.823)
-            .setPCFReferenceValueForCalculation(QuantityUnit.PIECE)
+            .setPCFReferenceValueForCalculation(PCFReferenceValueForCalculation.PIECE)
             .setPCFQuantityOfMeasureForCalculation(1)
-            .addPCFLiveCyclePhase(PcfLiveCyclePhase.A3);
-        pcfBuilder.createPCFGoodsAddressHandoverBuilder()
+            .setPCFLifeCyclePhase(PCFLifeCyclePhase.A3)
+            .setPublicationDate(date);
+        ho = pcfBuilder.createPCFGoodsAddressHandoverBuilder()
             .setStreet("Messegelaende")
             .setHouseNumber("Halle 8")
             .setZipCode("30521")
             .setCityTown("Hannover")
-            .setCountry("Germany")
-            .setLatitude(52.322049093658464)
-            .setLongitude(9.81150344024394)
+            .setCountry("Germany");
+        setLocation(ho, 52.322049093658464, 9.81150344024394)
             .build();
         pcfBuilder.build();
 
         pcfBuilder = cfBuilder.createProductCarbonFootprintBuilder()
-            .setPCFCalculationMethod(PcfCalculationMethod.GHG_PROTOCOL)
+            .setPCFCalculationMethod(PCFCalculationMethod.GHG_PROTOCOL)
             .setPCFCO2eq(0.123)
-            .setPCFReferenceValueForCalculation(QuantityUnit.PIECE)
+            .setPCFReferenceValueForCalculation(PCFReferenceValueForCalculation.PIECE)
             .setPCFQuantityOfMeasureForCalculation(1)
-            .addPCFLiveCyclePhase(PcfLiveCyclePhase.A4);
-        pcfBuilder.createPCFGoodsAddressHandoverBuilder()
+            .setPCFLifeCyclePhase(PCFLifeCyclePhase.A4)
+            .setPublicationDate(date);
+        ho = pcfBuilder.createPCFGoodsAddressHandoverBuilder()
             .setStreet("Austrasse")
             .setHouseNumber("35")
             .setZipCode("86153")
             .setCityTown("Augsburg")
-            .setCountry("Germany")
-            .setLatitude(48.389832)
-            .setLongitude(10.887690)
+            .setCountry("Germany");
+        setLocation(ho, 48.389832, 10.887690)
             .build();
         pcfBuilder.build();
 
@@ -212,8 +240,11 @@ public class PCF extends AbstractAasExample {
      * @param part the target of the relationship
      */
     private void createNodeHasPartOf(EntryNodeBuilder enb, String id, AasBuilder part) {
-        Entity ent = enb.createNodeBuilder(id, EntityType.SELFMANAGEDENTITY, part.createReference()).build();
-        enb.addHasPartOf(enb.createReference(), ent.createReference());
+        Entity ent = setName(enb.createNodeBuilder(), "id")
+            .setEntityType(EntityType.SELFMANAGEDENTITY)
+            .setAsset(part.createReference())
+            .build();
+        enb.setHasPart(enb.createReference(), ent.createReference());
     }
     
     /**
@@ -222,10 +253,10 @@ public class PCF extends AbstractAasExample {
      * @param aasBuilder the AAS builder
      */
     private void createProductionProcess(AasBuilder aasBuilder) {
-        HierarchicalStructureBuilder hsBuilder = new HierarchicalStructureBuilder(aasBuilder, 
-            "ProductionProcess", "urn:::SM:::PP#", ArcheType.ONE_DOWN);
-        EntryNodeBuilder enb = hsBuilder.createEntryNodeBuilder("ProductionProcess", 
-            EntityType.SELFMANAGEDENTITY, null);
+        HierarchicalStructuresBuilder hsBuilder = new HierarchicalStructuresBuilder(aasBuilder, 
+            "urn:::SM:::PP#", "ProductionProcess");
+        hsBuilder.setArcheType(ArcheType.ONEDOWN);
+        EntryNodeBuilder enb = setName(hsBuilder.createEntryNodeBuilder(), "ProductionProcess");
 
         AasFactory f = AasFactory.getInstance();
         AasBuilder b = f.createAasBuilder("mdzh_configurator", 
@@ -250,10 +281,11 @@ public class PCF extends AbstractAasExample {
         createNodeHasPartOf(enb, "Station 3 - Turning", b);
         TimeSeriesBuilder tsd = new TimeSeriesBuilder(b, iri("https://aas2.uni-h.de/aas/DMG_NEF400/tsd"));
         tsd.setCreateMultiLanguageProperties(isCreateMultiLanguageProperties());
-        tsd.createMetadataBuilder()
+        MetadataBuilder mdb = tsd.createMetadataBuilder()
             .setName(new LangString("en", "Turning Power Time Series"))
-            .setDescription(new LangString("en", "Contains time series of the machine"))
-            .build();
+            .setDescription(new LangString("en", "Contains time series of the machine"));
+        mdb.createRecordBuilder().setTime("2024-01-01T12:00:00.000+00:00", null).build();
+        mdb.build();
         SegmentsBuilder sb = tsd.createSegmentsBuilder();
         sb.createLinkedSegmentBuilder()
             .setName(new LangString("en", "PowerUsage"))
@@ -292,13 +324,28 @@ public class PCF extends AbstractAasExample {
             .build();
         // intentionally no further submodels
         createNodeHasPartOf(enb, "Station 5 - Laser Marking", b);
-        enb.createNodeBuilder("Station 5 - Assembly", EntityType.SELFMANAGEDENTITY, null)
+        setName(enb.createNodeBuilder(), "Station 5 - Assembly")
             .build();
-        enb.createNodeBuilder("Station 5 - Quality Check", EntityType.SELFMANAGEDENTITY, null)
+        setName(enb.createNodeBuilder(), "Station 5 - Quality Check")
             .build();
         
         enb.build();
         hsBuilder.build();
+    }
+    
+    /**
+     * Sets the name of an entity as property, previously it was just the idShort.
+     * 
+     * @param <B> the builder type
+     * @param builder the builder
+     * @param name the name value
+     * @return {@code builder}
+     */
+    private <B extends EntityBuilder> B setName(B builder, String name) {
+        builder.createPropertyBuilder("name")
+            .setValue(Type.STRING, name)
+            .build();
+        return builder;
     }
     
     @Override
