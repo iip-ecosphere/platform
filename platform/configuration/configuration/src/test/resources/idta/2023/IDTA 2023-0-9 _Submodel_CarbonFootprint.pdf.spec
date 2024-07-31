@@ -345,7 +345,7 @@ project IDTA_02023_CarbonFootprint {
       AasField {
         name = "PCFGoodsAddressHandover",
         semanticId = "irdi:0173-1#02-ABI497#001",
-        type = refBy(AasGenericSubmodelElementCollection),
+        type = refBy(PCFGoodsAddressHandover),
         minimumInstances = 1,
         maximumInstances = 1,
         description = "Indicates the place of hand-over of the goods (use structure defined in section 2.5 SMC Address)."
@@ -430,7 +430,7 @@ project IDTA_02023_CarbonFootprint {
       AasField {
         name = "TCFGoodsTransportAddressTakeover",
         semanticId = "irdi:0173-1#02-ABI499#001",
-        type = refBy(TCFGoodsTransportAddressTakeover),
+        type = refBy(TCFGoodsTransportAddressHandover),
         minimumInstances = 1,
         maximumInstances = 1,
         description = "Indication of the place of receipt of goods (use structure defined in 2.5 SMC Address)."
@@ -462,10 +462,9 @@ project IDTA_02023_CarbonFootprint {
     }
   };
 
-  AasSubmodelElementCollectionType TCFGoodsTransportAddressTakeover = {
-    name = "TCFGoodsTransportAddressTakeover",
+  AasSubmodelElementCollectionType TCFGoodsTransportAddressHandover = {
+    name = "TCFGoodsTransportAddressHandover",
     semanticId = "irdi:0173-1#02-ABI499#001",
-    multiSemanticIds = true,
     description = "Structure to be reused for denoting addresses.",
     versionIdentifier = "IDTA 02023-0-9",
     fields = {
@@ -517,10 +516,9 @@ project IDTA_02023_CarbonFootprint {
     }
   };
 
-  AasSubmodelElementCollectionType TCFGoodsTransportAddressHandover = {
-    name = "TCFGoodsTransportAddressHandover",
+  AasSubmodelElementCollectionType PCFGoodsAddressHandover = {
+    name = "PCFGoodsAddressHandover",
     semanticId = "irdi:0173-1#02-ABI498#001",
-    multiSemanticIds = true,
     description = "Structure to be reused for denoting addresses.",
     versionIdentifier = "IDTA 02023-0-9",
     fields = {

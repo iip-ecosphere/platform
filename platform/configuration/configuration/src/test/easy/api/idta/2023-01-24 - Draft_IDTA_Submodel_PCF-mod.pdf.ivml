@@ -429,7 +429,6 @@ project IDTA_0000_CarbonFootprint {
     name = "DraftTCFGoodsTransportAddressTakeover",
     idShort = "TCFGoodsTransportAddressTakeover",
     semanticId = "irdi:0173-1#02-ABI499#001",
-    multiSemanticIds = true,
     description = "Structure to be reused for denoting addresses.",
     fields = {
       AasField {
@@ -502,7 +501,6 @@ project IDTA_0000_CarbonFootprint {
     name = "DraftTCFGoodsTransportAddressHandover",
     idShort = "TCFGoodsTransportAddressHandover",
     semanticId = "irdi:0173-1#02-ABI498#001",
-    multiSemanticIds = true,
     description = "Structure to be reused for denoting addresses.",
     fields = {
       AasField {

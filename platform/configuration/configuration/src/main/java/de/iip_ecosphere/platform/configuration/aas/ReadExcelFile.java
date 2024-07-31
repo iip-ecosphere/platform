@@ -233,9 +233,9 @@ public class ReadExcelFile {
             //readExcelData(baseDir + "2014/IDTA 02014-1-0_Submodel_FunctionalSafety.xlsx", null, "Fs");
             //readExcelData(baseDir + "2015/IDTA 02015-1-0 _Submodel_ControlComponentType.print.xlsx", null, "Ct");
             //readExcelData(baseDir + "2016/IDTA 02016-1-0 _Submodel_ControlComponentInstance.xlsx", null, "Ci");
-            readExcelData(baseDir + "2017/IDTA 02017-1-0_Submodel_Asset Interfaces Description.mod.xlsx", null);
+            //readExcelData(baseDir + "2017/IDTA 02017-1-0_Submodel_Asset Interfaces Description.mod.xlsx", null);
             //readExcelData(baseDir + "2021/IDTA 02021-1-0_Submodel_Sizing of Power Drive Trains.xlsx", null);
-            //readExcelData(baseDir + "2023/IDTA 2023-0-9 _Submodel_CarbonFootprint.xlsx", null);
+            readExcelData(baseDir + "2023/IDTA 2023-0-9 _Submodel_CarbonFootprint.xlsx", null);
             
             //readExcelData(baseDir + "2023-01-24 - Draft_IDTA_Submodel_PCF-mod.xlsx", null, "Draft");
         }

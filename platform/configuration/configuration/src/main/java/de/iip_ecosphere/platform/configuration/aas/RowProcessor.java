@@ -80,6 +80,7 @@ class RowProcessor {
     private List<AasField> genericFields = new ArrayList<>();
     private int genericTypeCount = 0;
     private boolean currentTypeIsAspect;
+    private boolean currentMultiSemIdProcessed;
 
     /**
      * Notifies about starting a data row. Further data passed in through {@link #addDataToRow(String)} is 
@@ -281,6 +282,7 @@ class RowProcessor {
         lastEnum = null;
         lastSemanticIdRaw = null;
         currentTypeIsAspect = false;
+        currentMultiSemIdProcessed = false;
     }
     
     // checkstyle: stop method length check
@@ -325,6 +327,7 @@ class RowProcessor {
                 } else {
                     ids = idShort.split(" or "); // IDTA 02023-0-9
                 }
+                currentMultiSemIdProcessed = ids.length > 1; // multiple type ids will be processed, others not
                 for (String id: ids) {
                     AasType t = new AasType(id, stateIdShort, isMultiValued);
                     t.setAspect(currentTypeIsAspect);
@@ -408,8 +411,8 @@ class RowProcessor {
                 tmp += " " + lastSemanticIdRaw;
             }
             final String multiSemanticIdValue = tmp;
-            setOnCurrent(a -> a.setMultiSemanticIds(countSemanticIdMarker(multiSemanticIdValue) > 1), 
-                "MultiSemanticIds");
+            setOnCurrent(a -> a.setMultiSemanticIds(!currentMultiSemIdProcessed 
+                && countSemanticIdMarker(multiSemanticIdValue) > 1), "MultiSemanticIds");
         } else if (header.equals("Kind")) {
             getLogger().info("Kind: {}", value); // ignore for now, taken from title, not present in all
         } else if (header.equals("Version")) {

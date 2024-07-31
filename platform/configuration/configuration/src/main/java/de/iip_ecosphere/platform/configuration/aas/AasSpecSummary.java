@@ -187,7 +187,6 @@ public class AasSpecSummary {
                         }
                     }
                     if (!AasField.isBasicType(ivmlValueType)) {
-                        
                         boolean isType = typeMap.containsKey(ivmlValueType);
                         boolean isEnum = enumMap.containsKey(ivmlValueType);
                         if (!isType && !isEnum && !AasImports.isKnownType(ivmlValueType, null)) {
@@ -197,9 +196,10 @@ public class AasSpecSummary {
                                 impType = refType.getIdShort();
                             }
                             if (null != impType) {
+                                boolean diff = !f.getValueType().equals(impType);
                                 f.setValueType(impType); // fix this
-                                getLogger().warn("Changed type of {}/{} to {} due to declared semanticId {}. ", 
-                                    t.getIdShort(), f.getIdShort(), semId);
+                                warn(diff, "Changed type of {}/{} to {} due to declared semanticId {}. ", 
+                                    t.getIdShort(), f.getIdShort(), impType, semId);
                             } else {
                                 getLogger().warn("Value type of field {} in type {} is not defined: {}. Using "
                                     + "generic type. Declared imports are: {}", f.getIdShort(), t.getIdShort(), 
@@ -210,6 +210,19 @@ public class AasSpecSummary {
                     }
                 }
             }
+        }
+    }
+    
+    /**
+     * Conditionally emits a warning.
+     * 
+     * @param condition the condition, must be {@code true} for emitting the warning
+     * @param text the text in logger style
+     * @param args the arguments
+     */
+    private void warn(boolean condition, String text, Object... args) {
+        if (condition) {
+            getLogger().warn(text, args);
         }
     }
     

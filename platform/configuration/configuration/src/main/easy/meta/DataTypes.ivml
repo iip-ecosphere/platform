@@ -378,6 +378,13 @@ project DataTypes {
         artifact = mvnIipGroup + ":support.aas.basyx1_0:" + iipVer,
         kind = PluginKind::AAS
     };
+
+    Plugin BaSyx15Plugin = {
+        id = "aas.basyx-1.5", // must be the same as in code
+        description = "BySyx 1.5.1 retrofitting AAS plugin",
+        artifact = mvnIipGroup + ":support.aas.basyx1_5:" + iipVer,
+        kind = PluginKind::AAS
+    };
     
     // -------------------------------- freeze fixed stuff ----------------------------------------
     
@@ -411,6 +418,7 @@ project DataTypes {
         FloatListType;
         iipVer;
         BaSyx10Plugin;
+        BaSyx15Plugin;
     };
     
 }

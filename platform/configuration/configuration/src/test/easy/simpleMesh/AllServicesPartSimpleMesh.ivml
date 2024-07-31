@@ -27,7 +27,7 @@ project AllServicesPartSimpleMesh {
             systemProperty="iip.app.simpleMesh.camPort"
           }
         },
-        plugins = {refBy(BaSyx10Plugin)} // just for testing
+        plugins = {refBy(BaSyx10Plugin)} // just for testing, would be specified individually at (AAS) connector
     };
     
     Service myReceiverService = JavaService {
