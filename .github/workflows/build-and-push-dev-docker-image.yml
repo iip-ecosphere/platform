@@ -73,7 +73,7 @@ jobs:
       - name: Unzip PyDev
         uses : montudor/action-zip@v1
         with:
-          args: unzip -qq PyDev12.1.0.zip -d ./platform/tools/Install/gen/eclipse
+          args: unzip -qq ./platform/tools/Install/gen/PyDev12.1.0.zip -d ./platform/tools/Install/gen/eclipse
       - name: Login to DockerHub
         uses: docker/login-action@v1
         with:
