@@ -54,7 +54,6 @@ jobs:
           cat src/main/easy/TechnicalSetup.ivml
           mvn install
           cp -r container/DevContainer/* gen
-          rm -r gen/eclipse
           mkdir -p gen/eclipse
           cp gen/SimpleMeshInstallTestingApp/target/SimpleMeshInstallTestingApp-0.1.0-SNAPSHOT-bin.jar gen/SimpleMeshTestingApp-0.1.0-SNAPSHOT-bin.jar
           echo "Base directory for container creation:"
