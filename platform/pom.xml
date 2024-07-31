@@ -27,6 +27,8 @@
      <module>support/support.aas</module>
      <module>support/support.aas.basyx</module>
      <module>support/support.aas.basyx.server</module>
+     <module>support/support.aas.basyx1_0</module>
+     <module>support/support.aas.basyx1_5</module>
      <module>support/support.iip-aas</module>
      <module>support/support.dfltSysMetrics</module>
      <module>support/support.sysMetrics.plcnext</module>

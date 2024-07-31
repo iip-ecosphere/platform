@@ -6,6 +6,7 @@ Basic functionality for the oktoflow platform in terms of:
   * [Default AAS client abstraction implementation](support.aas.basyx/README.md) for [Eclipse Basyx](https://www.eclipse.org/basyx/)
   * [Default AAS server abstraction implementation](support.aas.basyx.server/README.md) for [Eclipse Basyx](https://www.eclipse.org/basyx/)
   * [AAS client plugin](support.aas.basyx1_0/README.md) for [Eclipse Basyx 1.0.1](https://www.eclipse.org/basyx/), retrofitted alternative version as "extension" of [support.aas.basyx](support.aas.basyx/README.md)
+  * [AAS client plugin](support.aas.basyx1_5/README.md) for [Eclipse Basyx 1.5.1](https://www.eclipse.org/basyx/), retrofitted alternative version as "extension" of [support.aas.basyx](support.aas.basyx/README.md)
   * Additional [AAS support functionality for the oktoflow platform](support.iip-aas/README.md)
   * Simple default [system metrics implementation](support.dfltSysMetrics/README.md) refining the system monitoring interface in `support.aas`.
   * [System metrics for Phoenix Contact/PLCnext](support.sysMetrics.plcnext/README.md) refining the system monitoring interface in `support.aas`.

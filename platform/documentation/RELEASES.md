@@ -1,13 +1,14 @@
 # oktoflow platform: Releases
 
-### Version 0.7.1 (consolidation, JDK 17):
+### Version 0.7.1 (consolidation, JDK 17/JDK 21):
 
 In progress:
 * [#164](https://github.com/iip-ecosphere/platform/issues/164): UI design revision
 * [#117](https://github.com/iip-ecosphere/platform/issues/117): Multiple service managers per device
 
 Improvements:
-* Preparing for JDK 21 based on Eclipse 2024-06.
+* Support for JDK 21 based on Eclipse 2024-06.
+* Retrofit for BaSyx 1.5.1, in particular in AAS connector.
 * [#106](https://github.com/iip-ecosphere/platform/issues/106): Migration to JDK 17
 * Build process improvements for multiple Java/Maven installations like CI.
 
