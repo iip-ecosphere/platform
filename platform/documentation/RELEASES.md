@@ -11,6 +11,7 @@ Improvements:
 * Retrofit for BaSyx 1.5.1, in particular in AAS connector.
 * [#106](https://github.com/iip-ecosphere/platform/issues/106): Migration to JDK 17
 * Build process improvements for multiple Java/Maven installations like CI.
+* [#19](https://github.com/iip-ecosphere/platform/issues/19): Integration of generated IDTA interfaces.
 
 ### Version 0.7.0 (2024/07/11, no maven central release):
 
