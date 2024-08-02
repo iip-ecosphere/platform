@@ -498,7 +498,7 @@
         <configuration>
           <show>private</show>
           <encoding>${java.encoding}</encoding>
-          <source>8</source>
+          <source>17</source>
           <excludePackageNames>*.proto.*</excludePackageNames>
           <failOnError>false</failOnError>
           <detectJavaApiLink>false</detectJavaApiLink> 
