@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
@@ -710,6 +711,52 @@ public class Utils {
             .setValue(type, value)
             .build();
         return builder;
+    }
+    
+    /**
+     * An iterator which runs until the {@code elementProvider} becomes <b>null</b>.
+     * 
+     * @param <T> the element type
+     * @author Holger Eichelberger, SSE
+     */
+    public static class GetIterator<T> implements Iterator<T> {
+
+        private Function<Integer, T> elementProvider;
+        private int pos;
+        private T act;
+
+        /**
+         * Creates the iterator starting at index position 0.
+         * 
+         * @param elementProvider the element provider
+         */
+        public GetIterator(Function<Integer, T> elementProvider) {
+            this(elementProvider, 0);
+        }
+
+        /**
+         * Creates the iterator.
+         * 
+         * @param elementProvider the element provider
+         * @param pos the start index position
+         */
+        public GetIterator(Function<Integer, T> elementProvider, int pos) {
+            this.pos = pos;
+            this.elementProvider = elementProvider;
+        }
+        
+        @Override
+        public boolean hasNext() {
+            act = elementProvider.apply(pos);
+            return act != null;
+        }
+
+        @Override
+        public T next() {
+            pos++;
+            return act;
+        }
+        
     }
 
 }

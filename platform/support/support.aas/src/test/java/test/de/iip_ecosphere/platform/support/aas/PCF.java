@@ -37,11 +37,9 @@ import de.iip_ecosphere.platform.support.aas.types.common.Utils;
 import de.iip_ecosphere.platform.support.aas.types.hierarchicalStructure.HierarchicalStructuresBuilder;
 import de.iip_ecosphere.platform.support.aas.types.hierarchicalStructure.HierarchicalStructuresBuilder.ArcheType;
 import de.iip_ecosphere.platform.support.aas.types.hierarchicalStructure.HierarchicalStructuresBuilder.EntryNodeBuilder;
-import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodelBuilder;
-import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodelBuilder
-    .ProductClassificationsBuilder;
-import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodelBuilder
-    .TechnicalPropertiesBuilder;
+import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataBuilder;
+import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataBuilder.ProductClassificationsBuilder;
+import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataBuilder.TechnicalPropertiesBuilder;
 import de.iip_ecosphere.platform.support.aas.types.timeSeriesData.TimeSeriesBuilder;
 import de.iip_ecosphere.platform.support.aas.types.timeSeriesData.TimeSeriesBuilder.MetadataBuilder;
 import de.iip_ecosphere.platform.support.aas.types.timeSeriesData.TimeSeriesBuilder.SegmentsBuilder;
@@ -184,20 +182,26 @@ public class PCF extends AbstractAasExample {
      * @param aasBuilder the AAS builder
      */
     private void createTechnicalDataSubmodel(AasBuilder aasBuilder) {
-        TechnicalDataSubmodelBuilder tdBuilder = new TechnicalDataSubmodelBuilder(aasBuilder, "urn:::SM:::TD#");
+        TechnicalDataBuilder tdBuilder = new TechnicalDataBuilder(aasBuilder, "urn:::SM:::TD#");
         tdBuilder.setCreateMultiLanguageProperties(isCreateMultiLanguageProperties());
         
-        tdBuilder.createFurtherInformationBuilder(Utils.parseCalendar("2024-01-04T10:00:00.000+00:00"))
+        tdBuilder.createFurtherInformationBuilder().
+            setValidDate(Utils.parseDate("2024-01-04T10:00:00.000+00:00"))
             .build();
 
-        tdBuilder.createGeneralInformationBuilder("Mittelstand-Digital Zentrum Hannover", 
-            "K01", "K01", new LangString("de", "Kugelschreiber"))
+        tdBuilder.createGeneralInformationBuilder()
+            .setManufacturerName("Mittelstand-Digital Zentrum Hannover")
+            .setManufacturerArticleNumber("K01")
+            .setManufacturerOrderCode("K01")
+            .setManufacturerProductDesignation(new LangString("de", "Kugelschreiber"))
             .build();
 
         ProductClassificationsBuilder pcBuilder = tdBuilder.createProductClassificationsBuilder();
         pcBuilder
-            .createProductClassificationItemBuilder("ECLASS", "24-24-05-01")
+            .createProductClassificationItemBuilder()
+            .setProductClassificationSystem("ECLASS")
             .setClassificationSystemVersion("12.0 (BASIC)")
+            .setProductClassId("24-24-05-01")
             .build();
         pcBuilder.build();
 

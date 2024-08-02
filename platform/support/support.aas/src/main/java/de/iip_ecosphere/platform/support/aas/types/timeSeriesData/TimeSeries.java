@@ -172,8 +172,8 @@ public class TimeSeries extends DelegatingSubmodel {
         * @return the instance or <b>null</b> for none
         */
         public ExternalSegment getExternalSegment(int index) {
-            return new ExternalSegment(super.getSubmodelElementCollection(getCountingIdShort("ExternalSegment",
-                index)));
+            var tmp = super.getSubmodelElementCollection(getCountingIdShort("ExternalSegment", index));
+            return null == tmp ? null : new ExternalSegment(tmp);
         }
         
         /**
@@ -183,7 +183,8 @@ public class TimeSeries extends DelegatingSubmodel {
         * @return the instance or <b>null</b> for none
         */
         public LinkedSegment getLinkedSegment(int index) {
-            return new LinkedSegment(super.getSubmodelElementCollection(getCountingIdShort("LinkedSegment", index)));
+            var tmp = super.getSubmodelElementCollection(getCountingIdShort("LinkedSegment", index));
+            return null == tmp ? null : new LinkedSegment(tmp);
         }
         
         /**
@@ -193,8 +194,8 @@ public class TimeSeries extends DelegatingSubmodel {
         * @return the instance or <b>null</b> for none
         */
         public InternalSegment getInternalSegment(int index) {
-            return new InternalSegment(super.getSubmodelElementCollection(getCountingIdShort("InternalSegment",
-                index)));
+            var tmp = super.getSubmodelElementCollection(getCountingIdShort("InternalSegment", index));
+            return null == tmp ? null : new InternalSegment(tmp);
         }
         
     }
@@ -927,7 +928,8 @@ public class TimeSeries extends DelegatingSubmodel {
         * @return the instance or <b>null</b> for none
         */
         public Record getRecord(int index) {
-            return new Record(super.getSubmodelElementCollection(getCountingIdShort("Record", index)));
+            var tmp = super.getSubmodelElementCollection(getCountingIdShort("Record", index));
+            return null == tmp ? null : new Record(tmp);
         }
         
     }

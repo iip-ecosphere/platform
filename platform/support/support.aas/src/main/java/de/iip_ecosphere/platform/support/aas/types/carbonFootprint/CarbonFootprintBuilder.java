@@ -15,6 +15,7 @@ import de.iip_ecosphere.platform.support.aas.types.common.*;
 */
 public class CarbonFootprintBuilder extends DelegatingSubmodelBuilder {
 
+    @SuppressWarnings("unused")
     private boolean createMultiLanguageProperties = true;
 
     private int productCarbonFootprintCounter = 0;

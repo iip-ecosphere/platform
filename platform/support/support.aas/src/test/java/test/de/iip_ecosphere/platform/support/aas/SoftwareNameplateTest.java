@@ -12,7 +12,7 @@
 
 package test.de.iip_ecosphere.platform.support.aas;
 
-import static de.iip_ecosphere.platform.support.aas.types.common.Utils.parseCalendar;
+import static de.iip_ecosphere.platform.support.aas.types.common.Utils.parseDate;
 
 import java.io.File;
 
@@ -21,8 +21,13 @@ import de.iip_ecosphere.platform.support.aas.AssetKind;
 import de.iip_ecosphere.platform.support.aas.LangString;
 import de.iip_ecosphere.platform.support.aas.types.softwareNameplate.SoftwareNameplateBuilder;
 import de.iip_ecosphere.platform.support.aas.types.softwareNameplate.SoftwareNameplateBuilder.ConfigurationPathsBuilder;
+import de.iip_ecosphere.platform.support.aas.types.softwareNameplate.SoftwareNameplateBuilder.ContactInformationBuilder;
+import de.iip_ecosphere.platform.support.aas.types.softwareNameplate.SoftwareNameplateBuilder.RoleOfContactPerson;
 import de.iip_ecosphere.platform.support.aas.types.softwareNameplate.SoftwareNameplateBuilder
-    .SoftwareNameplateInstanceBuilder;
+    .SoftwareNameplate_InstanceBuilder;
+import de.iip_ecosphere.platform.support.aas.types.softwareNameplate.SoftwareNameplateBuilder.TypeOfEmailAddress;
+import de.iip_ecosphere.platform.support.aas.types.softwareNameplate.SoftwareNameplateBuilder.TypeOfFaxNumber;
+import de.iip_ecosphere.platform.support.aas.types.softwareNameplate.SoftwareNameplateBuilder.TypeOfTelephone;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 
 /**
@@ -49,8 +54,8 @@ public class SoftwareNameplateTest extends AbstractAasExample {
         aasBuilder.createAssetBuilder("ci", "urn:::Asset:::sn#", AssetKind.INSTANCE).build();
         SoftwareNameplateBuilder snp = new SoftwareNameplateBuilder(aasBuilder, "urn:::SM:::SwNp#");
         snp.setCreateMultiLanguageProperties(isCreateMultiLanguageProperties());
-        snp.createSoftwareNameplateTypeBuilder()
-            .setUriOfTheProduct("ZVEI.I40.ITinAutomation.DemoSW_123456")
+        snp.createSoftwareNameplate_TypeBuilder()
+            .setURIOfTheProduct("ZVEI.I40.ITinAutomation.DemoSW_123456")
             .setManufacturerName(new LangString("de", "ZVEI AK IT in Automation"))
             .setManufacturerProductDesignation(new LangString("en", "My Software Package for Demonstration"))
             .setManufacturerProductDescription(new LangString("en", "A first software..."))
@@ -60,28 +65,30 @@ public class SoftwareNameplateTest extends AbstractAasExample {
             .setVersion("0.9.1.0")
             .setVersionName(new LangString("en", "R2021 beta"))
             .setVersionInfo(new LangString("en", "Please do not install in productive environments!"))
-            .setReleaseDate(parseCalendar("2022-02-07T10:00:00.000+00:00"))
+            .setReleaseDate(parseDate("2022-02-07T10:00:00.000+00:00"))
             .setReleaseNotes(new LangString("en", "This release..."))
-            .setBuildDate(parseCalendar("2022-11-19T10:00:00.000+00:00"))
+            .setBuildDate(parseDate("2022-11-19T10:00:00.000+00:00"))
             .setInstallationURI(createURI("https://tud.de/inf/pk/demos/download/DemoFirmware_09.zip"))
-            .setInstallationFile("")
+            .setInstallationFile("", "")
             .setInstallerType("MSI")
             .setInstallationChecksum("0x2783")
             .build();
-        SoftwareNameplateInstanceBuilder snpi = snp.createSoftwareNameplateInstanceBuilder();
+        SoftwareNameplate_InstanceBuilder snpi = snp.createSoftwareNameplate_InstanceBuilder();
         snpi.setSerialNumber("123456")
             .setInstanceName("My Software Instance")
             .setInstalledVersion("0.9.1.0")
-            .setInstallationDate(parseCalendar("2020-11-19T09:30:20.000+00:00"))
+            .setInstallationDate(parseDate("2020-11-19T09:30:20.000+00:00"))
             .setInstallationPath(createFileURI("C:\\Windows\\Program Files\\Demo\\Firmware"))
             .setInstallationSource(createURI("https://tud.de/inf/pk/installation/firmware/src"))
             .setInstalledOnArchitecture("x86-32")
             .setInstalledOnOS("Windows 10")
             .setInstalledOnHost("IPC_42")
             .setSLAInformation("Service level GOLD USER");
-        ContactInformationsTest.populate(snpi.createContactInformationBuilder()).build();
+        populate(snpi.createContactBuilder()).build();
         
-        snpi.createInstalledModulesBuilder().build();
+        snpi.createInstalledModulesBuilder()
+            .setInstalledModule("Module")
+            .build();
         ConfigurationPathsBuilder cpb = snpi.createConfigurationPathsBuilder();
         cpb.createConfigurationPathBuilder()
             .setConfigurationURI(createFileURI("C:\\Users\\mw30\\Documents\\ZVEI\\AKITinAutomation\\20201013"))
@@ -93,6 +100,56 @@ public class SoftwareNameplateTest extends AbstractAasExample {
         snp.build();
         
         registerAas(aasBuilder);
+    }
+    
+    /**
+     * Populates an example contact information builder.
+     * 
+     * @param ci the builder
+     * @return {@code ci}
+     */
+    public static ContactInformationBuilder populate(ContactInformationBuilder ci) { // TODO avoid duplication
+        ci.setNameOfContact(new LangString("en", "Doe"));
+        ci.setFirstName(new LangString("en", "John"));
+        ci.setMiddleNames(new LangString("en", "M."));
+        ci.setAcademicTitle(new LangString("de", "Dr."));
+        ci.setTitle(new LangString("en", "Rev."));
+        ci.setCityTown(new LangString("en", "Doecit"));
+        ci.setNationalCode(new LangString("en", "US"));
+        ci.setStreet(new LangString("en", "John Avenue"));
+        ci.setPOBox(new LangString("en", "PO 12345"));
+        ci.setFurtherDetailsOfContact(new LangString("en", "unknown"));
+        ci.setAddressOfAdditionalLink("http://me.here.de");
+        ci.setCompany(new LangString("en", "Doe Ltd."));
+        ci.setDepartment(new LangString("en", "top management"));
+        ci.setRoleOfContactPerson(RoleOfContactPerson.ADMINISTRATIV_CONTACT);
+        ci.setTimeZone("-6:00");
+        ci.createEmailBuilder()
+            .setEmailAddress("john@doe.com")
+            .setPublicKey(new LangString("en", "???"))
+            .setTypeOfEmailAddress(TypeOfEmailAddress.OFFICE)
+            .setTypeOfPublicKey(new LangString("en", "N/A"))
+            .build();
+        ci.createFaxBuilder()
+            .setFaxNumber(new LangString("en", "000-000-0003"))
+            .setTypeOfFaxNumber(TypeOfFaxNumber.SECRETARY)
+            .build();
+        ci.createPhoneBuilder()
+            .setTelephoneNumber(new LangString("en", "000-000-0002"))
+            .setTypeOfTelephone(TypeOfTelephone.SECRETARY)
+            .setAvailableTime(new LangString("en", "0-24"))
+            .build();
+        ci.createIPCommunicationBuilder()
+            .setAddressOfAdditionalLink("http://comm.doe.com")
+            .setAvailableTime(new LangString("en", "24/7"))
+            .setTypeOfCommunication("Skype4business")
+            .build();
+        ci.createIPCommunicationBuilder()
+            .setAddressOfAdditionalLink("sip://comm.doe.com")
+            .setAvailableTime(new LangString("en", "8-17"))
+            .setTypeOfCommunication("SIP phone")
+            .build();
+        return ci;
     }
 
     @Override

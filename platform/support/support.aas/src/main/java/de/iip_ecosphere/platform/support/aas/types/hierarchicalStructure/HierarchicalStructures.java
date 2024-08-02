@@ -79,7 +79,8 @@ public class HierarchicalStructures extends DelegatingSubmodel {
         * @return the instance or <b>null</b> for none
         */
         public Node getNode(int index) {
-            return new Node(super.getEntity(getCountingIdShort("Node", index)));
+            var tmp = super.getEntity(getCountingIdShort("Node", index));
+            return null == tmp ? null : new Node(tmp);
         }
         
         /**
@@ -171,7 +172,8 @@ public class HierarchicalStructures extends DelegatingSubmodel {
         * @return the instance or <b>null</b> for none
         */
         public Node getNode(int index) {
-            return new Node(super.getEntity(getCountingIdShort("Node", index)));
+            var tmp = super.getEntity(getCountingIdShort("Node", index));
+            return null == tmp ? null : new Node(tmp);
         }
         
         /**

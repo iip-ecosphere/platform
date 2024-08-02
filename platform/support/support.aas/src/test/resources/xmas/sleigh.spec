@@ -1,17 +1,17 @@
 AAS Sleigh
  ASSET sleigh INSTANCE
- SUBMODEL Documentation (semanticId: irdi:0173-1#01-AHF578#001)
+ SUBMODEL HandoverDocumentation (semanticId: irdi:0173-1#01-AHF578#001)
   SMC Document01 (semanticId: irdi:0173-1#01-AHF579#001)
-   SMC DocumentClassification01 (semanticId: irdi:0173-1#02-ABI502#001/0173-1#01-AHF581#001)
+   SMC DocumentClassification01 (semanticId: irdi:0173-1#01-AHF581#001)
+    PROPERTY ClassId = DC (semanticId: irdi:0173-1#02-ABH996#001)
+    MLP ClassName (semanticId: irdi:0173-1#02-AAO102#003)
     PROPERTY ClassificationSystem = IEC61355-1:2008 (semanticId: irdi:0173-1#02-ABH997#001)
-    PROPERTY DocumentClassId = DC (semanticId: irdi:0173-1#02-ABH996#001)
-    MLP DocumentClassName (semanticId: irdi:0173-1#02-AAO102#003)
-   SMC DocumentId01 (semanticId: irdi:0173-1#02-ABI501#001/0173-1#01-AHF580#001)
+   SMC DocumentId01 (semanticId: irdi:0173-1#01-AHF580#001)
     PROPERTY DocumentDomainId = sleigh-001 (semanticId: irdi:0173-1#02-ABH994#001)
     PROPERTY IsPrimary = true (semanticId: irdi:0173-1#02-ABH995#001)
     PROPERTY ValueId = 1234 (semanticId: irdi:0173-1#02-AAO099#002)
-   SMC DocumentVersion01 (semanticId: irdi:0173-1#02-ABI503#001/0173-1#01-AHF582#001)
-    FILE DigitalFile01 (semanticId: irdi:0173-1#02-ABI504#001/0173-1#01-AHF583#001) length 44
+   SMC DocumentVersion01 (semanticId: irdi:0173-1#01-AHF582#001)
+    FILE DigitalFile01 (semanticId: irdi:0173-1#01-AHF583#001) length 44
     PROPERTY DocumentVersionId = 2023.12 (semanticId: irdi:0173-1#02-AAO100#002)
     MLP KeyWords (semanticId: irdi:0173-1#02-ABH999#001)
     PROPERTY Language01 = en (semanticId: irdi:0173-1#02-AAN468#006)

@@ -310,8 +310,8 @@ public abstract class AbstractAasExample {
      * @param file the file location
      * @return the URI instance
      */
-    public static URI createFileURI(String file) {
-        return createURI("file:/" + file.replace("\\", "/").replace(" ", "%20")); // newFile fails on Linux
+    public static String createFileURI(String file) {
+        return createURI("file:/" + file.replace("\\", "/").replace(" ", "%20")).toString(); // newFile fails on Linux
     }
     
     /**
@@ -320,9 +320,9 @@ public abstract class AbstractAasExample {
      * @param uri the URI text
      * @return the URI instance
      */
-    public static URI createURI(String uri) {
+    public static String createURI(String uri) {
         try {
-            return new URI(uri);
+            return new URI(uri).toString();
         } catch (URISyntaxException e) {
             System.err.println("Cannot create URI:" + e.getMessage());
             return null;

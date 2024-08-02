@@ -34,8 +34,8 @@ public class CarbonFootprint extends DelegatingSubmodel {
     * @return the instance or <b>null</b> for none
     */
     public ProductCarbonFootprint getProductCarbonFootprint(int index) {
-        return new ProductCarbonFootprint(super.getSubmodelElementCollection(getCountingIdShort(
-            "ProductCarbonFootprint", index)));
+        var tmp = super.getSubmodelElementCollection(getCountingIdShort("ProductCarbonFootprint", index));
+        return null == tmp ? null : new ProductCarbonFootprint(tmp);
     }
     
     /**
@@ -45,8 +45,8 @@ public class CarbonFootprint extends DelegatingSubmodel {
     * @return the instance or <b>null</b> for none
     */
     public TransportCarbonFootprint getTransportCarbonFootprint(int index) {
-        return new TransportCarbonFootprint(super.getSubmodelElementCollection(getCountingIdShort(
-            "TransportCarbonFootprint", index)));
+        var tmp = super.getSubmodelElementCollection(getCountingIdShort("TransportCarbonFootprint", index));
+        return null == tmp ? null : new TransportCarbonFootprint(tmp);
     }
     
     /**

@@ -78,25 +78,30 @@ public class ContactInformationsTest extends AbstractAasExample {
         ci.setAddressOfAdditionalLink("http://me.here.de");
         ci.setCompany(new LangString("en", "Doe Ltd."));
         ci.setDepartment(new LangString("en", "top management"));
-        ci.setRoleOfContactPerson(RoleOfContactPerson.ADMINISTRATIVE);
+        ci.setRoleOfContactPerson(RoleOfContactPerson.ADMINISTRATIV_CONTACT);
         ci.setTimeZone("-6:00");
-        ci.createEmailBuilder("john@doe.com")
+        ci.createEmailBuilder()
+            .setEmailAddress("john@doe.com")
             .setPublicKey(new LangString("en", "???"))
-            .setTypeOfFaxNumber(TypeOfEmailAddress.OFFICE)
+            .setTypeOfEmailAddress(TypeOfEmailAddress.OFFICE)
             .setTypeOfPublicKey(new LangString("en", "N/A"))
             .build();
-        ci.createFaxBuilder(new LangString("en", "000-000-0003"))
+        ci.createFaxBuilder()
+            .setFaxNumber(new LangString("en", "000-000-0003"))
             .setTypeOfFaxNumber(TypeOfFaxNumber.SECRETARY)
             .build();
-        ci.createPhoneBuilder(new LangString("en", "000-000-0002"))
+        ci.createPhoneBuilder()
+            .setTelephoneNumber(new LangString("en", "000-000-0002"))
             .setTypeOfTelephone(TypeOfTelephone.SECRETARY)
             .setAvailableTime(new LangString("en", "0-24"))
             .build();
-        ci.createIPCommunicationBuilder("http://comm.doe.com")
+        ci.createIPCommunicationBuilder()
+            .setAddressOfAdditionalLink("http://comm.doe.com")
             .setAvailableTime(new LangString("en", "24/7"))
             .setTypeOfCommunication("Skype4business")
             .build();
-        ci.createIPCommunicationBuilder("sip://comm.doe.com")
+        ci.createIPCommunicationBuilder()
+            .setAddressOfAdditionalLink("sip://comm.doe.com")
             .setAvailableTime(new LangString("en", "8-17"))
             .setTypeOfCommunication("SIP phone")
             .build();
@@ -114,13 +119,13 @@ public class ContactInformationsTest extends AbstractAasExample {
     @Test
     public void testEnums() {
         assertEnum(ContactInformationsBuilder.RoleOfContactPerson.values(), 
-            v -> v.getValue() != null && v.getValueId() != null);
+            v -> v.getValue() != null && v.getValueId() >= 0);
         assertEnum(ContactInformationsBuilder.TypeOfTelephone.values(), 
-            v -> v.getValue() != null && v.getValueId() != null);
+            v -> v.getValue() != null && v.getValueId() >= 0);
         assertEnum(ContactInformationsBuilder.TypeOfEmailAddress.values(), 
-            v -> v.getValue() != null && v.getValueId() != null);
+            v -> v.getValue() != null && v.getValueId() >= 0);
         assertEnum(ContactInformationsBuilder.TypeOfFaxNumber.values(), 
-            v -> v.getValue() != null && v.getValueId() != null);
+            v -> v.getValue() != null && v.getValueId() >= 0);
     }
     
 }

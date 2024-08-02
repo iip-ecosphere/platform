@@ -29,17 +29,15 @@ import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.types.common.Utils;
 import de.iip_ecosphere.platform.support.aas.types.documentation.HandoverDocumentationBuilder;
 import de.iip_ecosphere.platform.support.aas.types.documentation.HandoverDocumentationBuilder.DocumentBuilder;
-import de.iip_ecosphere.platform.support.aas.types.documentation.HandoverDocumentationBuilder.DocumentStatus;
+import de.iip_ecosphere.platform.support.aas.types.documentation.HandoverDocumentationBuilder.StatusValue;
 import de.iip_ecosphere.platform.support.aas.types.hierarchicalStructure.HierarchicalStructuresBuilder;
 import de.iip_ecosphere.platform.support.aas.types.hierarchicalStructure.HierarchicalStructuresBuilder.ArcheType;
 import de.iip_ecosphere.platform.support.aas.types.hierarchicalStructure.HierarchicalStructuresBuilder.EntryNodeBuilder;
-import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodelBuilder;
-import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodelBuilder.FurtherInformationBuilder;
-import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodelBuilder.GeneralInformationBuilder;
-import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodelBuilder
-    .ProductClassificationItemBuilder;
-import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodelBuilder
-    .ProductClassificationsBuilder;
+import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataBuilder;
+import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataBuilder.FurtherInformationBuilder;
+import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataBuilder.GeneralInformationBuilder;
+import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataBuilder.ProductClassificationItemBuilder;
+import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataBuilder.ProductClassificationsBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
 
 import static de.iip_ecosphere.platform.support.aas.IdentifierType.*;
@@ -203,13 +201,17 @@ public class XmasAas extends AbstractAasExample {
             .setDocumentVersionId("2023.12")
             .setTitle(new LangString("en", "Sleigh Operation Manual"))
             .setSummary(new LangString("en", "<missing>"))
-            .setKeywords(new LangString("en", "sleigh, reindeers, santa, customized"))
-            .setStatus(Utils.parseCalendar("2023-12-17T00:00:00.000Z"), DocumentStatus.RELEASED)
-            .setOrganizationName("North Pole Wood", "North Pole Wood Company Ltd")
-            .addDigitalFile(resource, toMimeType(documentFile))
+            .setKeyWords(new LangString("en", "sleigh, reindeers, santa, customized"))
+            .setStatusSetDate(Utils.parseDate("2023-12-17T00:00:00.000Z"))
+            .setStatusValue(StatusValue.RELEASED)
+            .setOrganizationName("North Pole Wood")
+            .setOrganizationOfficialName("North Pole Wood Company Ltd")
+            .setDigitalFile(resource.getPath(), toMimeType(documentFile), null)
             .build();
         db.createDocumentClassificationBuilder()
-            .setDocumentClass("DC", "IEC61355-1:2008", new LangString("de", "Anleitungen und Handbücher"))
+            .setClassificationSystem("IEC61355-1:2008")
+            .setClassId("DC")
+            .setClassName(new LangString("de", "Anleitungen und Handbücher"))
             .build();
         db.build();
         hdb.build();
@@ -262,29 +264,34 @@ public class XmasAas extends AbstractAasExample {
     private void createTechnicalDataSubmodel(AasBuilder aasBuilder, String manufacturerName, 
         LangString productDesignation, String partNumber, String orderCode, String productResourceName, 
         String productClassId) {
-        TechnicalDataSubmodelBuilder tdBuilder = new TechnicalDataSubmodelBuilder(aasBuilder,
+        TechnicalDataBuilder tdBuilder = new TechnicalDataBuilder(aasBuilder,
              iri("TechData_" + productDesignation + "_" + partNumber + "_" + orderCode));
         tdBuilder.setCreateMultiLanguageProperties(isCreateMultiLanguageProperties());
-        GeneralInformationBuilder giBuilder = tdBuilder.createGeneralInformationBuilder(manufacturerName, 
-            partNumber, orderCode, productDesignation);
+        GeneralInformationBuilder giBuilder = tdBuilder.createGeneralInformationBuilder()
+            .setManufacturerName(manufacturerName)
+            .setManufacturerArticleNumber(partNumber)
+            .setManufacturerOrderCode(orderCode)
+            .setManufacturerProductDesignation(productDesignation);
         if (productResourceName != null && productResourceName.length() > 0) {
             try {
                 registerResource(new FileResource(getFileResource(productResourceName), 
                     "/aasx/TechnicalDataSubmodel/" + productResourceName));
-                giBuilder.addProductImageFile("/aasx/TechnicalDataSubmodel/" + productResourceName, 
+                giBuilder.setProductImage("/aasx/TechnicalDataSubmodel/" + productResourceName, 
                     toMimeType(productResourceName)); // no idShort needed, -> postfix off ProductImage
             } catch (IOException e) {
                 System.err.println("Cannot create file resource, ignoring: " + e.getMessage());
             }
         }
         giBuilder.build();
-        FurtherInformationBuilder fiBuilder = tdBuilder.createFurtherInformationBuilder(
-            Utils.parseCalendar("2023-12-24T23:59:59.000+00:00"));
+        FurtherInformationBuilder fiBuilder = tdBuilder.createFurtherInformationBuilder()
+            .setValidDate(Utils.parseDate("2023-12-24T23:59:59.000+00:00"));
         fiBuilder.build();
         tdBuilder.createTechnicalPropertiesBuilder().build();
         ProductClassificationsBuilder pcBuilder = tdBuilder.createProductClassificationsBuilder();
         ProductClassificationItemBuilder pcIBuilder = pcBuilder
-            .createProductClassificationItemBuilder("ECLASS", productClassId)
+            .createProductClassificationItemBuilder()
+            .setProductClassificationSystem("ECLASS")
+            .setProductClassId(productClassId)
             .setClassificationSystemVersion("13");
         pcIBuilder.build();
         pcBuilder.build();

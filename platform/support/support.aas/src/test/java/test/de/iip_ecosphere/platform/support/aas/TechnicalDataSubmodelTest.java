@@ -14,8 +14,10 @@ package test.de.iip_ecosphere.platform.support.aas;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -24,7 +26,6 @@ import java.util.stream.Collectors;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.junit.Test;
 
@@ -37,19 +38,16 @@ import de.iip_ecosphere.platform.support.aas.LangString;
 import de.iip_ecosphere.platform.support.aas.MultiLanguageProperty;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
-import de.iip_ecosphere.platform.support.aas.types.technicaldata.FurtherInformation;
-import de.iip_ecosphere.platform.support.aas.types.technicaldata.GeneralInformation;
-import de.iip_ecosphere.platform.support.aas.types.technicaldata.ProductClassificationItem;
-import de.iip_ecosphere.platform.support.aas.types.technicaldata.ProductClassifications;
-import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodel;
-import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodelBuilder;
-import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodelBuilder.FurtherInformationBuilder;
-import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodelBuilder.GeneralInformationBuilder;
-import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodelBuilder
-    .ProductClassificationsBuilder;
-import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodelBuilder
-    .TechnicalPropertiesBuilder;
-import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalProperties;
+import de.iip_ecosphere.platform.support.aas.types.common.Utils;
+import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalData;
+import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalData.FurtherInformation;
+import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalData.GeneralInformation;
+import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalData.ProductClassificationItem;
+import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalData.ProductClassifications;
+import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalData.TechnicalProperties;
+import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataBuilder;
+import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataBuilder.ProductClassificationsBuilder;
+import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataBuilder.TechnicalPropertiesBuilder;
 
 import org.junit.Assert;
 
@@ -60,7 +58,7 @@ import org.junit.Assert;
  */
 public class TechnicalDataSubmodelTest {
 
-    private XMLGregorianCalendar cal;
+    private Date cal;
     private String manufacturerName = "manu AG";
     private String manufacturerPartNumber = "12345";
     private LangString manufacturerProductDesignation = new LangString("EN", "Desig");
@@ -74,18 +72,18 @@ public class TechnicalDataSubmodelTest {
      * @return the id
      */
     protected String getGeneralInformationManufacturerLogoId() {
-        return GeneralInformation.MANUFACTURER_LOGOID;
+        return "ManufacturerLogo";
     }
 
     /**
      * Turns a plain id into an id as used by {@link GeneralInformation} for product images. Although defined
      * by standards, implementation my do that ultimately in individual manner. 
      *  
-     * @param id the plain id
+     * @param id the id
      * @return the transformed id
      */
-    protected String toGeneralInformationProductImageFileId(String id) {
-        return GeneralInformation.PRODUCTIMAGE_PREFIX + id;
+    protected String toGeneralInformationProductImageFileId(int id) {
+        return Utils.getCountingIdShort("ProductImage", id);
     }
     
     /**
@@ -98,7 +96,7 @@ public class TechnicalDataSubmodelTest {
     public void testTechnicalDataSubmodel() throws DatatypeConfigurationException, ExecutionException {
         AasFactory factory = AasFactory.getInstance();
         AasBuilder aasBuilder = factory.createAasBuilder("MyAas", null);
-        TechnicalDataSubmodelBuilder tdSmBuilder = new TechnicalDataSubmodelBuilder(aasBuilder, null);
+        TechnicalDataBuilder tdSmBuilder = new TechnicalDataBuilder(aasBuilder, null);
         assertBuildFail(tdSmBuilder);
         createFurtherInformation(tdSmBuilder);
         assertBuildFail(tdSmBuilder);
@@ -111,7 +109,7 @@ public class TechnicalDataSubmodelTest {
         tdSmBuilder.build();
         Aas aas = aasBuilder.build();
         
-        TechnicalDataSubmodel tsub = new TechnicalDataSubmodel(aas);
+        TechnicalData tsub = new TechnicalData(aas);
         Assert.assertNotNull(tsub);
         assertFurtherInformation(tsub);
         assertGeneralInformation(tsub);
@@ -125,13 +123,14 @@ public class TechnicalDataSubmodelTest {
      * @param tdSmBuilder the technical data submodel builder
      * @throws DatatypeConfigurationException shall not occur
      */
-    private void createFurtherInformation(TechnicalDataSubmodelBuilder tdSmBuilder) 
+    private void createFurtherInformation(TechnicalDataBuilder tdSmBuilder) 
         throws DatatypeConfigurationException {
         final GregorianCalendar now = new GregorianCalendar();
-        cal = DatatypeFactory.newInstance().newXMLGregorianCalendar(now);
-        FurtherInformationBuilder fiBuilder = tdSmBuilder.createFurtherInformationBuilder(cal);
-        fiBuilder.addStatement("myId", furtherInformationStmt1);
-        fiBuilder.build();
+        cal = DatatypeFactory.newInstance().newXMLGregorianCalendar(now).toGregorianCalendar().getTime();
+        tdSmBuilder.createFurtherInformationBuilder()
+            .setValidDate(cal)
+            .setTextStatement(furtherInformationStmt1)
+            .build();
     }
 
     /**
@@ -139,12 +138,15 @@ public class TechnicalDataSubmodelTest {
      *  
      * @param tdSmBuilder the general information submodel builder
      */
-    private void createGeneralInformation(TechnicalDataSubmodelBuilder tdSmBuilder) {
-        GeneralInformationBuilder giBuilder = tdSmBuilder.createGeneralInformationBuilder(manufacturerName, 
-            manufacturerPartNumber, manufacturerOrderCode, manufacturerProductDesignation);
-        giBuilder.addProductImageFile("imgP0.png", "PNG");
-        giBuilder.setManufacturerLogo("manuAg.png", "PNG");
-        giBuilder.build();
+    private void createGeneralInformation(TechnicalDataBuilder tdSmBuilder) {
+        tdSmBuilder.createGeneralInformationBuilder()
+            .setManufacturerName(manufacturerName)
+            .setManufacturerArticleNumber(manufacturerPartNumber)
+            .setManufacturerOrderCode(manufacturerOrderCode)
+            .setManufacturerProductDesignation(manufacturerProductDesignation)
+            .setProductImage("imgP0.png", "PNG")
+            .setManufacturerLogo("manuAg.png", "PNG")
+            .build();
     }
 
     /**
@@ -152,13 +154,18 @@ public class TechnicalDataSubmodelTest {
      *  
      * @param tdSmBuilder the product classifications submodel builder
      */
-    private void createProductClassifications(TechnicalDataSubmodelBuilder tdSmBuilder) {
+    private void createProductClassifications(TechnicalDataBuilder tdSmBuilder) {
         ProductClassificationsBuilder pcBuilder = tdSmBuilder.createProductClassificationsBuilder();
         pcBuilder
-            .createProductClassificationItemBuilder("ECLASS", "a1274858")
+            .createProductClassificationItemBuilder()
+            .setProductClassificationSystem("ECLASS")
             .setClassificationSystemVersion("1.2.3")
+            .setProductClassId("a1274858")
             .build();
-        pcBuilder.createProductClassificationItemBuilder("ICS", "a-1274858").build();
+        pcBuilder.createProductClassificationItemBuilder()
+            .setProductClassificationSystem("ICS")
+            .setProductClassId("a-1274858")
+            .build();
         pcBuilder.build();
     }
 
@@ -167,12 +174,12 @@ public class TechnicalDataSubmodelTest {
      *  
      * @param tdSmBuilder the technical properties submodel builder
      */
-    private void createTechnicalProperties(TechnicalDataSubmodelBuilder tdSmBuilder) {
+    private void createTechnicalProperties(TechnicalDataBuilder tdSmBuilder) {
         TechnicalPropertiesBuilder tpBuilder = tdSmBuilder.createTechnicalPropertiesBuilder();
-        tpBuilder.createMainSectionBuilder("main1", false, false).build();
-        tpBuilder.createMainSectionBuilder("main2", false, false).build();
-        tpBuilder.createSubSectionBuilder("sub1", false, false).build();
-        tpBuilder.createSubSectionBuilder("sub2", false, false).build();
+        tpBuilder.createMainSectionBuilder(false, false).build();
+        tpBuilder.createMainSectionBuilder(false, false).build();
+        tpBuilder.createSubSectionBuilder(false, false).build();
+        tpBuilder.createSubSectionBuilder(false, false).build();
         tpBuilder.build();
     }
 
@@ -181,7 +188,7 @@ public class TechnicalDataSubmodelTest {
      * 
      * @param tdSmBuilder the technical data submodel builder
      */
-    private static void assertBuildFail(TechnicalDataSubmodelBuilder tdSmBuilder) {
+    private static void assertBuildFail(TechnicalDataBuilder tdSmBuilder) {
         try {
             tdSmBuilder.build();
             Assert.fail("No exception thrown");
@@ -196,18 +203,20 @@ public class TechnicalDataSubmodelTest {
      * @param tsub the technical data submodel
      * @throws ExecutionException shall not occur
      */
-    private void assertFurtherInformation(TechnicalDataSubmodel tsub) throws ExecutionException {
+    private void assertFurtherInformation(TechnicalData tsub) throws ExecutionException {
         FurtherInformation fi = tsub.getFurtherInformation();
         Assert.assertNotNull(fi);
-        XMLGregorianCalendar fiCal = fi.getValidDate();
+        Date fiCal = fi.getValidDate();
         Assert.assertNotNull(fiCal);
         Assert.assertEquals(cal, fiCal);
-        Iterable<MultiLanguageProperty> fiStmts = fi.getStatements();
+        Iterable<LangString[]> fiStmts = fi.getTextStatement();
         Assert.assertNotNull(fiStmts);
-        assertMLP(furtherInformationStmt1, fi.getStatement(01));
+        Iterator<LangString[]> fiStmtsIter = fiStmts.iterator();
+        Assert.assertTrue(fiStmtsIter.hasNext());
+        assertMLP(furtherInformationStmt1, fi.getTextStatementProperty(1));
 
         // modifications
-        fi.setValidDate(cal);
+        fi.getValidDateProperty().setValue(cal);
         Map<String, Collection<LangString>> stmts = new HashMap<>();
         List<LangString> stmts1 = new ArrayList<LangString>();
         stmts1.add(furtherInformationStmt1);
@@ -240,11 +249,11 @@ public class TechnicalDataSubmodelTest {
      * @param tsub the general information submodel
      * @throws ExecutionException shall not occur
      */
-    private void assertGeneralInformation(TechnicalDataSubmodel tsub) throws ExecutionException {
+    private void assertGeneralInformation(TechnicalData tsub) throws ExecutionException {
         GeneralInformation gi = tsub.getGeneralInformation();
         Assert.assertNotNull(gi);
         Assert.assertEquals(manufacturerName, gi.getManufacturerName());
-        MultiLanguageProperty desig = gi.getManufacturerProductDesignation();
+        MultiLanguageProperty desig = gi.getManufacturerProductDesignationProperty();
         Assert.assertNotNull(desig);
         assertMLP(manufacturerProductDesignation, desig);
         Assert.assertEquals(manufacturerPartNumber, gi.getManufacturerArticleNumber());
@@ -252,10 +261,10 @@ public class TechnicalDataSubmodelTest {
 
         FileDataElement logo = gi.getManufacturerLogo();
         assertEquals(getGeneralInformationManufacturerLogoId(), "manuAg.png", "PNG", logo);
-        List<FileDataElement> files = CollectionUtils.toList(gi.getProductImages().iterator());
+        List<FileDataElement> files = CollectionUtils.toList(gi.getProductImage().iterator());
         Assert.assertNotNull(files);
         Assert.assertTrue(files.size() == 1);
-        assertEquals(toGeneralInformationProductImageFileId("01"), "imgP0.png", "PNG", files.get(0));
+        assertEquals(toGeneralInformationProductImageFileId(1), "imgP0.png", "PNG", files.get(0));
 
         // modifications
         // currently none
@@ -286,11 +295,13 @@ public class TechnicalDataSubmodelTest {
      * @param tsub the product classifications submodel
      * @throws ExecutionException shall not occur
      */
-    private void assertProductClassifications(TechnicalDataSubmodel tsub) throws ExecutionException {
+    private void assertProductClassifications(TechnicalData tsub) throws ExecutionException {
         ProductClassifications pc = tsub.getProductClassifications();
         Assert.assertNotNull(pc);
+        List<SubmodelElementCollection> c = CollectionUtils.toList(
+                new Utils.GetIterator<>(i -> pc.getProductClassificationItem(i), 1));
 
-        Assert.assertEquals(2, pc.getProductClassificationItemsCount());
+        Assert.assertEquals(2, c.size());
         ProductClassificationItem i = pc.getProductClassificationItem(1);
         Assert.assertNotNull(i);
         assertEquals("ProductClassificationItem01", "ECLASS", "1.2.3", "a1274858", i);
@@ -332,36 +343,31 @@ public class TechnicalDataSubmodelTest {
      * 
      * @param tsub the technical properties submodel
      */
-    private void assertTechnicalProperties(TechnicalDataSubmodel tsub) {
+    private void assertTechnicalProperties(TechnicalData tsub) {
         TechnicalProperties tp = tsub.getTechnicalProperties();
         Assert.assertNotNull(tp);
         
-        List<SubmodelElementCollection> c = CollectionUtils.toList(tp.mainSections().iterator());
+        List<SubmodelElementCollection> c = CollectionUtils.toList(
+            new Utils.GetIterator<>(i -> tp.getMainSection(i), 1));
+                
         Assert.assertNotNull(c);
         Assert.assertTrue(c.size() == 2);
         Set<String> ids = c.stream().map(x -> x.getIdShort()).collect(Collectors.toSet());
-        Assert.assertTrue(ids.contains("main1"));
-        Assert.assertTrue(ids.contains("main2"));
+        Assert.assertTrue(ids.contains("MainSection01"));
+        Assert.assertTrue(ids.contains("MainSection02"));
         
-        c = CollectionUtils.toList(tp.subSections().iterator());
+        c = CollectionUtils.toList(new Utils.GetIterator<>(i -> tp.getSubSection(i), 1));
         Assert.assertNotNull(c);
         Assert.assertTrue(c.size() == 2);
         ids = c.stream().map(x -> x.getIdShort()).collect(Collectors.toSet());
-        Assert.assertTrue(ids.contains("sub1"));
-        Assert.assertTrue(ids.contains("sub2"));
+        Assert.assertTrue(ids.contains("SubSection01"));
+        Assert.assertTrue(ids.contains("SubSection02"));
 
         try {
-            List<SubmodelElement> s = CollectionUtils.toList(tp.arbitrary().iterator());
+            List<SubmodelElement> s = CollectionUtils.toList(
+                new Utils.GetIterator<>(i -> tp.getArbitraryProperty("xyz", i), 1));
             Assert.assertNotNull(s);
             Assert.assertTrue(s.isEmpty());
-        } catch (NullPointerException e) {
-            // problem in BaSyx, we ignore this for now
-        }
-        
-        try {
-            List<SubmodelElement> s = CollectionUtils.toList(tp.sMENotDescribedBySemanticId().iterator());
-            Assert.assertNotNull(s);
-            Assert.assertTrue(s.isEmpty());        
         } catch (NullPointerException e) {
             // problem in BaSyx, we ignore this for now
         }

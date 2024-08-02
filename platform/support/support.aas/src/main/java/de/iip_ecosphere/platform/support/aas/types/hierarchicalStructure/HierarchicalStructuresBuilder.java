@@ -16,6 +16,7 @@ import de.iip_ecosphere.platform.support.aas.types.common.*;
 */
 public class HierarchicalStructuresBuilder extends DelegatingSubmodelBuilder {
 
+    @SuppressWarnings("unused")
     private boolean createMultiLanguageProperties = true;
 
     private int entryNodeCounter = 0;
