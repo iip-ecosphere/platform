@@ -23,10 +23,6 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
-
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.CollectionUtils;
@@ -42,9 +38,9 @@ import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.Type;
-import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodelBuilder;
-import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodelBuilder.FurtherInformationBuilder;
-import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodelBuilder.GeneralInformationBuilder;
+import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataBuilder;
+import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataBuilder.FurtherInformationBuilder;
+import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataBuilder.GeneralInformationBuilder;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
@@ -392,20 +388,22 @@ public class NameplateSetup {
             // not there, ok
             try {
                 AasBuilder aasBuilder = factory.createAasBuilder(id, urn);
-                TechnicalDataSubmodelBuilder tdBuilder = new TechnicalDataSubmodelBuilder(aasBuilder, 
+                TechnicalDataBuilder tdBuilder = new TechnicalDataBuilder(aasBuilder, 
                     expandUrn(urn, "-technicalData"));
-                GeneralInformationBuilder giBuilder = tdBuilder.createGeneralInformationBuilder(
-                    LangString.create(getManufacturerName()).getDescription(), "", "",
-                    LangString.create(getManufacturerProductDesignation()));
+                GeneralInformationBuilder giBuilder = tdBuilder.createGeneralInformationBuilder()
+                    .setManufacturerName(getManufacturerName())
+                    .setManufacturerArticleNumber("octoflow")
+                    .setManufacturerOrderCode("octoflow")
+                    .setManufacturerProductDesignation(LangString.create(getManufacturerProductDesignation()));
                 PlatformAas.createAddress(giBuilder, getAddress()); // inofficial, not in Generic Frame
                 AasUtils.resolveImage(getProductImage(), AasUtils.CLASSPATH_RESOURCE_RESOLVER, false, 
-                    (n, r, m) -> giBuilder.addProductImageFile(r, m));
+                    (n, r, m) -> giBuilder.setProductImage(r, m));
                 AasUtils.resolveImage(getManufacturerLogo(), AasUtils.CLASSPATH_RESOURCE_RESOLVER, true, 
                     (n, r, m) -> giBuilder.setManufacturerLogo(r, m));
                 giBuilder.build();
                 final GregorianCalendar now = new GregorianCalendar();
-                XMLGregorianCalendar cal = DatatypeFactory.newInstance().newXMLGregorianCalendar(now);
-                FurtherInformationBuilder fiBuilder = tdBuilder.createFurtherInformationBuilder(cal);
+                FurtherInformationBuilder fiBuilder = tdBuilder.createFurtherInformationBuilder()
+                    .setValidDate(now.getTime());
                 fiBuilder.build();
                 tdBuilder.createTechnicalPropertiesBuilder().build();
                 tdBuilder.createProductClassificationsBuilder().build();
@@ -440,7 +438,7 @@ public class NameplateSetup {
                 }
                 aas = aasBuilder.build();
                 AasPartRegistry.remoteDeploy(CollectionUtils.addAll(new ArrayList<Aas>(), aas));
-            } catch (IOException | DatatypeConfigurationException e1) {
+            } catch (IOException e1) {
                 LoggerFactory.getLogger(getClass()).error("Creating nameplate AAS: {}", e.getMessage());
             }
         }
