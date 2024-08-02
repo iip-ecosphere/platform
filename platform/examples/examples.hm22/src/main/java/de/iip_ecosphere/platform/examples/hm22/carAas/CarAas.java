@@ -15,10 +15,6 @@ package de.iip_ecosphere.platform.examples.hm22.carAas;
 import java.io.IOException;
 import java.util.GregorianCalendar;
 
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.datatype.DatatypeConfigurationException;
-
 import de.iip_ecosphere.platform.examples.hm22.carAas.CarsYaml.Car;
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.Schema;
@@ -29,11 +25,10 @@ import de.iip_ecosphere.platform.support.aas.AasServer;
 import de.iip_ecosphere.platform.support.aas.DeploymentRecipe;
 import de.iip_ecosphere.platform.support.aas.LangString;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
+import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataBuilder;
+import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataBuilder.GeneralInformationBuilder;
 import de.iip_ecosphere.platform.support.aas.DeploymentRecipe.ImmediateDeploymentRecipe;
 import de.iip_ecosphere.platform.support.aas.Type;
-import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodelBuilder;
-import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodelBuilder.FurtherInformationBuilder;
-import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataSubmodelBuilder.GeneralInformationBuilder;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.AasUtils;
 
@@ -63,24 +58,22 @@ public class CarAas {
         
         // standard stuff
         
-        TechnicalDataSubmodelBuilder tdBuilder = new TechnicalDataSubmodelBuilder(aasB, null);
-        GeneralInformationBuilder giBuilder = tdBuilder.createGeneralInformationBuilder(
-            "Mittelstandszentrum Digital Hannover", "", "", 
-            LangString.create("HM'22 Demonstration car"));
+        TechnicalDataBuilder tdBuilder = new TechnicalDataBuilder(aasB, null);
+        GeneralInformationBuilder giBuilder = tdBuilder.createGeneralInformationBuilder()
+            .setManufacturerName("Mittelstandszentrum Digital Hannover")
+            .setManufacturerArticleNumber("car" + id)
+            .setManufacturerOrderCode("car" + id)
+            .setManufacturerProductDesignation(LangString.create("HM'22 Demonstration car"));
         AasUtils.resolveImage(car.getProductImage(), AasUtils.CLASSPATH_RESOURCE_RESOLVER, false, 
-            (n, r, m) -> giBuilder.addProductImageFile(r, m));
+            (n, r, m) -> giBuilder.setProductImage(r, m));
         AasUtils.resolveImage(car.getManufacturerLogo(), AasUtils.CLASSPATH_RESOURCE_RESOLVER, true, 
             (n, r, m) -> giBuilder.setManufacturerLogo(r, m));
         giBuilder.build();
         
-        try {
-            final GregorianCalendar now = new GregorianCalendar();
-            XMLGregorianCalendar cal = DatatypeFactory.newInstance().newXMLGregorianCalendar(now);
-            FurtherInformationBuilder fiBuilder = tdBuilder.createFurtherInformationBuilder(cal);
-            fiBuilder.build();
-        } catch (DatatypeConfigurationException e) {
-            System.out.println("Cannot create further information: " + e.getMessage());
-        }
+        final GregorianCalendar now = new GregorianCalendar();
+        tdBuilder.createFurtherInformationBuilder()
+            .setValidDate(now.getTime())
+            .build();
         tdBuilder.createTechnicalPropertiesBuilder().build();
         tdBuilder.createProductClassificationsBuilder().build();
 
