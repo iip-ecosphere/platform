@@ -61,15 +61,22 @@ public class TryBasyx {
         
         //    private static String aasFactoryPluginId = AasFactory.DEFAULT_PLUGIN_ID;
         AasFactory factory = getAasFactory(pluginId);
+        int successful = 0;
+        int failed = 0;
+        int all = 0;
         for (File f: aasxFiles) {
             System.out.println("Reading " + f.getName());
             try {
                 factory.createPersistenceRecipe().readFrom(f);
-                System.out.println("Successful " + f.getName());
+                System.out.println(" Successful " + f.getName());
+                successful++;
             } catch (IOException e) {
-                System.out.println("Failed " + f.getName());
+                System.out.println(" Failed " + f.getName());
+                failed++;
             }
+            all++;
         }
+        System.out.println(successful + " successful, " + failed + " failed, " + all + " total");
     }
 
     /**
@@ -80,16 +87,26 @@ public class TryBasyx {
     public static void main(String[] args) {
         // explicitly load plugins
         PluginManager.registerPlugin(new FolderClasspathPluginSetupDescriptor(
+            new File("../../support/support.aas.basyx1_5")));
+        PluginManager.registerPlugin(new FolderClasspathPluginSetupDescriptor(
             new File("../../support/support.aas.basyx1_0")));
         PluginManager.registerPlugin(new FolderClasspathPluginSetupDescriptor(
             new File("../../support/support.aas.basyx")));
 
+        System.out.println("If this program fails due to a PersistencyRecipt NullPointerException, please run ");
+        System.out.println("the mvn build process on all involved plugins. This program is not part of the tests of ");
+        System.out.println("this component - we cannot set production dependencies to optional components here.");
+        
         System.out.println("BaSyx 1.3");
         tryReading(AasFactory.DEFAULT_PLUGIN_ID);
         
         System.out.println();
         System.out.println("BaSyx 1.0");
         tryReading("aas.basyx-1.0");
+
+        System.out.println();
+        System.out.println("BaSyx 1.5");
+        tryReading("aas.basyx-1.5");
     }
 
 }
