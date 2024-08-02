@@ -80,7 +80,13 @@ template AasBasics(Configuration config, FileArtifact target) {
 
     @DispatchCase
     def getFieldName(AasElementType elt, AasField field) {
-        getIdShort(elt); // by default the field name but else the (imported) structure counts
+        if (elt == AasGenericSubmodelElementCollection) {
+            getIdShort(field);
+        } else if (elt == AasGenericEntityType) {
+            getIdShort(field);
+        } else {
+            getIdShort(elt); // by default the field name but else the (imported) structure counts
+        }
     }
     
     /**

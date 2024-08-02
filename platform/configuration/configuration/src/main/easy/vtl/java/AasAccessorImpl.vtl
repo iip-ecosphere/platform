@@ -185,11 +185,20 @@ template AasAccessorImpl(Configuration config, FileArtifact target, AasSubmodelT
             * @return the instance or <b>null</b> for none
             */
             public ${clsName} get${fldName}(${param}) {
-                return ${constructorStart}super.${methodName}(${accessEx})${constructorEnd};
+                ${injectNullCheck("super.${methodName}(${accessEx})", constructorStart, constructorEnd)}
             }
             '
         }
-    }    
+    }
+    
+    def injectNullCheck(String expr, String constructorStart, String constructorEnd) {
+        if (constructorStart != "") {
+            'var tmp = ${expr};
+            return null == tmp ? null : ${constructorStart}tmp${constructorEnd};' 
+        } else {
+            'return ${expr};'
+        }     
+    }
     
     def produceGetter(AasField field, String class, String type, String infix, String params, String aasType, String aasAccess) {
         if (notSkip(field)) {
