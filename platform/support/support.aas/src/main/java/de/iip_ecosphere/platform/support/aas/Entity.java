@@ -76,7 +76,7 @@ public interface Entity extends SubmodelElement, SubmodelElementCollection {
         /**
          * Sets the asset reference.
          * 
-         * @param type the asset reference, may be ignored if the actual type does not match
+         * @param asset the asset reference, may be ignored if the actual type does not match
          * 
          * @return <b>this</b>
          */
