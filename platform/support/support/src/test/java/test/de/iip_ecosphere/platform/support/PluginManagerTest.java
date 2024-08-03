@@ -68,13 +68,13 @@ public class PluginManagerTest {
             Assert.assertNotNull(tmp);
             Assert.assertTrue(tmp.length == 1);
             Assert.assertEquals(testURL, tmp[0].toString());
-        } catch (MalformedURLException e) {
+        } catch (IllegalArgumentException e) {
             Assert.fail("There shall be no exceptions");
         }
         try {
             URLPluginSetupDescriptor.toURL("aa");
             Assert.fail("There shall be an exception");
-        } catch (MalformedURLException e) {
+        } catch (IllegalArgumentException e) {
             // ok
         }
 

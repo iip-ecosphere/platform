@@ -19,6 +19,8 @@ import java.net.URLClassLoader;
 
 import org.slf4j.LoggerFactory;
 
+import de.iip_ecosphere.platform.support.NetUtils;
+
 /**
  * Default URL-based plugin setup descriptor. Typically, a specific descriptor inherits from this class and sets
  * up the required information in a constructor without arguments.
@@ -44,12 +46,12 @@ public class URLPluginSetupDescriptor implements PluginSetupDescriptor {
      * 
      * @param urls the URLs to convert
      * @return the converted URLs
-     * @throws MalformedURLException if one of the {@code urls} has invalid syntax
+     * @throws IllegalArgumentException if one of the {@code urls} has invalid syntax
      */
-    public static URL[] toURL(String... urls) throws MalformedURLException {
+    public static URL[] toURL(String... urls) throws IllegalArgumentException {
         URL[] result = new URL[urls.length];
         for (int u = 0; u < urls.length; u++) {
-            result[u] = new URL(urls[u]);
+            result[u] = NetUtils.createURL(urls[u]);
         }
         return result;
     }
@@ -65,7 +67,7 @@ public class URLPluginSetupDescriptor implements PluginSetupDescriptor {
         URL[] result;
         try {
             result = toURL(urls);
-        } catch (MalformedURLException e) {
+        } catch (IllegalArgumentException e) {
             LoggerFactory.getLogger(URLPluginSetupDescriptor.class).error(
                 "While converting URLs {}: {} Ignoring.", urls, e.getMessage());
             result = new URL[0];

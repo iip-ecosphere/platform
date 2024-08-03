@@ -15,6 +15,7 @@ package test.de.iip_ecosphere.platform.support;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.URL;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -162,6 +163,22 @@ public class NetUtilsTest {
     @Test
     public void isInContainer() {
         System.out.println("In container: " + NetUtils.isInContainer()); // we don't know where we are
+    }
+    
+    /**
+     * Tests {@link NetUtils#createURL(String)}.
+     */
+    @Test
+    public void testCreateUrl() {
+        try {
+            NetUtils.createURL("");
+            Assert.fail("No exception");
+        } catch (IllegalArgumentException e) {
+            // ok
+        }
+        final String text = "https://oktoflow.de";
+        URL url = NetUtils.createURL(text);
+        Assert.assertEquals(text, url.toString());
     }
     
 }

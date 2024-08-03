@@ -17,10 +17,12 @@ import java.io.UncheckedIOException;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
+import java.net.MalformedURLException;
 import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -317,6 +319,21 @@ public class NetUtils {
             result = "";
         }
         return result;
+    }
+
+    /**
+     * Creates a new URL. [transition to JDK 21]
+     * 
+     * @param url the URL as text
+     * @return the URL
+     * @throws IllegalArgumentException if the syntax is illegal
+     */
+    public static URL createURL(String url) throws IllegalArgumentException {
+        try {
+            return new URL(url); // to be replaced by URI.create(); when abandoning JDK 17
+        } catch (MalformedURLException e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 
 }
