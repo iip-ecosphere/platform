@@ -30,6 +30,7 @@ import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.LoggerFactory;
 
+import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
@@ -93,17 +94,21 @@ public abstract class AbstractRestProcessService<I, O> extends AbstractProcessSe
      * @throws IOException if creating the connection fails
      */
     protected HttpURLConnection getNewConnectionInstance() throws IOException {
-        URL url = new URL(getApiPath());
-        connection = (HttpURLConnection) url.openConnection();
-        connection.setDoOutput(true);
-        connection.setRequestMethod("POST");
-        connection.setRequestProperty("Content-Type", "application/json");
-        String bearer = getBearerToken();
-        if (null != bearer) {
-            connection.setRequestProperty("Authorization", bearer);
+        try {
+            URL url = NetUtils.createURL(getApiPath());
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setDoOutput(true);
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/json");
+            String bearer = getBearerToken();
+            if (null != bearer) {
+                connection.setRequestProperty("Authorization", bearer);
+            }
+            connection.connect();
+            return connection;
+        } catch (IllegalArgumentException e) {
+            throw new IOException(e.getMessage());
         }
-        connection.connect();
-        return connection;
     }
     
     /**

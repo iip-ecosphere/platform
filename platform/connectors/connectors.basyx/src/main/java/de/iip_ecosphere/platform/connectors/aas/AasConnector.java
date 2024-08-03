@@ -13,7 +13,6 @@
 package de.iip_ecosphere.platform.connectors.aas;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,6 +40,7 @@ import de.iip_ecosphere.platform.connectors.model.ModelInputConverter;
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
 import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.Endpoint;
+import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.aas.Aas;
@@ -201,7 +201,7 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
             Endpoint regEp = null;
             try {
                 Schema regSchema;
-                URL url = new URL(params.getEndpointPath());
+                URL url = NetUtils.createURL(params.getEndpointPath());
                 try {
                     regSchema = Schema.valueOf(url.getProtocol());
                 } catch (IllegalArgumentException e1) {
@@ -210,7 +210,7 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
                 if (url.getHost().length() > 0 && url.getPort() > 0) {
                     regEp = new Endpoint(regSchema, url.getHost(), url.getPort(), url.getPath());
                 }
-            } catch (MalformedURLException e) {
+            } catch (IllegalArgumentException e) {
             }
             if (null == regEp) { // fallback, use server and epPath
                 regEp = new Endpoint(schema, params.getHost(), params.getPort(), epPath);
