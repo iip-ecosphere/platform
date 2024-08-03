@@ -84,6 +84,15 @@ public class IipVersion {
     public String getBuildId() {
         return buildId;
     }
+    
+    /**
+     * Returns whether the build id is set.
+     * 
+     * @return {@code true} for is set, {@code false} else
+     */
+    public boolean isBuildIdSet() {
+        return !buildId.equals("??");
+    }
 
     /**
      * Returns whether this instance of the IIP-Ecosphere platform is a release version.

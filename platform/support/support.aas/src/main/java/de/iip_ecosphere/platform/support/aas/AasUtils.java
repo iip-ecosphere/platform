@@ -15,7 +15,6 @@ package de.iip_ecosphere.platform.support.aas;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -27,6 +26,7 @@ import java.util.function.Function;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.FileUtils;
+import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.json.JsonUtils;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 import de.iip_ecosphere.platform.support.resources.ResourceResolver;
@@ -286,7 +286,7 @@ public class AasUtils {
             }
             if (!resolved) {
                 try {
-                    URL url = new URL(image);
+                    URL url = NetUtils.createURL(image);
                     if ("http".equals(url.getProtocol()) || "https".equals(url.getProtocol())) {
                         String name = url.getFile();
                         int pos = name.lastIndexOf('/');
@@ -297,7 +297,7 @@ public class AasUtils {
                         handler.handle(name, url.toString(), "text/x-uri");
                         resolved = true;
                     }
-                } catch (MalformedURLException e) {
+                } catch (IllegalArgumentException e) {
                     // ok, we will go on below
                 }
             }

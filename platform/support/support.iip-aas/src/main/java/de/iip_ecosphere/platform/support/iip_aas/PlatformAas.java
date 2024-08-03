@@ -14,6 +14,8 @@ package de.iip_ecosphere.platform.support.iip_aas;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -25,10 +27,15 @@ import de.iip_ecosphere.platform.support.aas.AasUtils;
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
+import de.iip_ecosphere.platform.support.aas.LangString;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
+import de.iip_ecosphere.platform.support.aas.types.softwareNameplate.SoftwareNameplateBuilder;
+import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataBuilder;
+import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataBuilder.FurtherInformationBuilder;
+import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataBuilder.GeneralInformationBuilder;
 import de.iip_ecosphere.platform.support.iip_aas.ApplicationSetup.Address;
 import de.iip_ecosphere.platform.support.json.JsonResultWrapper;
 import de.iip_ecosphere.platform.support.json.JsonUtils;
@@ -105,6 +112,7 @@ public class PlatformAas implements AasContributor {
             SubmodelBuilder smBuilder = createNameplate(aasBuilder, setup);
             addSoftwareInfo(smBuilder, setup);
             smBuilder.build();
+            createSoftwareNameplate(aasBuilder, setup, versionInfo);
             addSoftwareInfo(smB, setup); // old style
             smB.createPropertyBuilder(NAME_PROPERTY_RELEASE)
                 .setValue(Type.BOOLEAN, versionInfo.isRelease())
@@ -150,34 +158,93 @@ public class PlatformAas implements AasContributor {
     }
 
     /**
-     * Creates the "nameplate". A bit of ZVEI Digital Nameplate for industrial equipment V1.0.
+     * Creates the "nameplate". Currently a mix of {@link TechnicalDataBuilder} and (for legacy reasons) the 
+     * ZVEI Digital Nameplate for industrial equipment V1.0.
      * 
      * @param aasBuilder the AAS builder, do not call {@link AasBuilder#build()} in here!
      * @param appSetup application setup
      * @return submodel builder if something needs to be added
      */
     public static SubmodelBuilder createNameplate(AasBuilder aasBuilder, ApplicationSetup appSetup) {
-        SubmodelBuilder sBuilder = aasBuilder.createSubmodelBuilder(SUBMODEL_NAMEPLATE, null);
+        TechnicalDataBuilder tdBuilder = new TechnicalDataBuilder(aasBuilder, null);
+        GeneralInformationBuilder giBuilder = tdBuilder.createGeneralInformationBuilder()
+            .setManufacturerName(appSetup.getManufacturerName())
+            .setManufacturerArticleNumber("oktoflow")
+            .setManufacturerOrderCode("oktoflow")
+            .setManufacturerProductDesignation(LangString.create(appSetup.getManufacturerProductDesignation()));
+        createAddress(giBuilder, appSetup.getAddress()); // inofficial, not in Generic Frame
+        AasUtils.resolveImage(appSetup.getProductImage(), AasUtils.CLASSPATH_RESOURCE_RESOLVER, false, 
+            (n, r, m) -> giBuilder.setProductImage(r, m));
+        AasUtils.resolveImage(appSetup.getManufacturerLogo(), AasUtils.CLASSPATH_RESOURCE_RESOLVER, true, 
+            (n, r, m) -> giBuilder.setManufacturerLogo(r, m));
+        giBuilder.build();
+        final GregorianCalendar now = new GregorianCalendar();
+        FurtherInformationBuilder fiBuilder = tdBuilder.createFurtherInformationBuilder()
+            .setValidDate(now.getTime());
+        fiBuilder.build();
+        tdBuilder.createTechnicalPropertiesBuilder().build();
+        tdBuilder.createProductClassificationsBuilder().build();
+        tdBuilder.build();
+
+        // legacy, keep for now for UI
         AasUtils.resolveImage(appSetup.getProductImage(), imageResolver, true, (n, r, m) -> {
-            sBuilder.createFileDataElementBuilder(NAME_PROPERTY_PRODUCTIMAGE, r, m)
+            tdBuilder.createFileDataElementBuilder(NAME_PROPERTY_PRODUCTIMAGE, r, m)
                 .setSemanticId("iri:https://admin-shell.io/ZVEI/TechnicalData/ProductImage/1/1")
                 .build();
         });
         AasUtils.resolveImage(appSetup.getManufacturerLogo(), imageResolver, true, (n, r, m) -> {
-            sBuilder.createFileDataElementBuilder(NAME_PROPERTY_MANUFACTURER_LOGO, r, m)
+            tdBuilder.createFileDataElementBuilder(NAME_PROPERTY_MANUFACTURER_LOGO, r, m)
                 .setSemanticId("iri:https://admin-shell.io/ZVEI/TechnicalData/ManufacturerLogo/1/1")
                 .build();
         });
-        sBuilder.createPropertyBuilder(NAME_PROPERTY_MANUFACTURER_NAME)
+        tdBuilder.createPropertyBuilder(NAME_PROPERTY_MANUFACTURER_NAME)
             .setValue(Type.LANG_STRING, appSetup.getManufacturerName())
             .setSemanticId("iri:https://admin-shell.io/ZVEI/TechnicalData/ManufacturerName/1/1")
             .build();
-        sBuilder.createPropertyBuilder(NAME_PROPERTY_MANUFACTURER_PRODUCT_DESIGNATION)
+        tdBuilder.createPropertyBuilder(NAME_PROPERTY_MANUFACTURER_PRODUCT_DESIGNATION)
             .setValue(Type.LANG_STRING, appSetup.getManufacturerProductDesignation())
             .setSemanticId("iri:https://admin-shell.io/ZVEI/TechnicalData/ManufacturerProductDesignation/1/1")
             .build();
-        createAddress(sBuilder, appSetup.getAddress());
-        return sBuilder;
+        createAddress(tdBuilder, appSetup.getAddress());
+        return tdBuilder;
+    }
+    
+    /**
+     * Creates the software nameplate.
+     * 
+     * @param aasBuilder the parent AAS builder
+     * @param urn the URN of the platform AAS
+     */
+    private void createSoftwareNameplate(AasBuilder aasBuilder, ApplicationSetup appSetup, IipVersion versionInfo) {
+        String version = null == appSetup.getVersion() ? "" : appSetup.getVersion().toString();
+        Date buildDate = new Date(0);
+        if (versionInfo.isBuildIdSet()) {
+            try {
+                buildDate = new Date(Long.parseLong(versionInfo.getBuildId()));
+            } catch (NumberFormatException e) {
+                // ignore
+            }
+        }
+        SoftwareNameplateBuilder snBuilder = new SoftwareNameplateBuilder(aasBuilder, null);
+        snBuilder.createSoftwareNameplate_TypeBuilder()
+            .setManufacturerName(LangString.create(appSetup.getManufacturerName()))
+            .setVersion(version)
+            .setVersionName(LangString.create(version + " " + (versionInfo.isRelease() ? "release" : "snapshot")))
+            .setBuildDate(buildDate)
+            .setURIOfTheProduct("https://oktoflow.de")
+            .setSoftwareType("I4.0 platform")
+            .setReleaseNotes(LangString.create("-"))
+            .setReleaseDate(buildDate)
+            .setManufacturerProductType(LangString.create("I4.0 platform"))
+            .setManufacturerProductFamily(LangString.create("platform"))
+            .setManufacturerProductDesignation(LangString.create("I4.0 platform"))
+            .setManufacturerProductDescription(LangString.create("Open Source I4.0 platform"))
+            .setInstallerType("mvn/EASy-Producer")
+            .setInstallationURI("https://oktoflow.de")
+            .setInstallationFile("platform.jar", "application/java-archive")
+            .setInstallationChecksum("")
+            .build();
+        snBuilder.build();
     }
     
     /**

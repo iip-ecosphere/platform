@@ -14,7 +14,6 @@ package de.iip_ecosphere.platform.support.iip_aas;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Timer;
@@ -25,6 +24,7 @@ import java.util.function.Supplier;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.LifecycleDescriptor;
+import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.OsUtils;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.TimeUtils;
@@ -139,7 +139,7 @@ public class AbstractAasLifecycleDescriptor implements LifecycleDescriptor {
             AasSetup setup = AasPartRegistry.getSetup();
             String serverAdr = factory.getServerBaseUri(setup.getServerEndpoint());
             try {
-                final URL serverUrl = new URL(serverAdr);
+                final URL serverUrl = NetUtils.createURL(serverAdr);
                 timer = new Timer(true);
                 timer.schedule(new TimerTask() {
                     
@@ -166,7 +166,7 @@ public class AbstractAasLifecycleDescriptor implements LifecycleDescriptor {
                         }
                     }
                 }, AAS_HEARTBEAT_PERIOD, AAS_HEARTBEAT_PERIOD);
-            } catch (MalformedURLException e) {
+            } catch (IllegalArgumentException e) {
                 LoggerFactory.getLogger(getClass()).warn("Cannot heartbeat for AAS registry/server. AAS server URL "
                     + "{} invalid: {}", serverAdr, e.getMessage());
             }
@@ -245,8 +245,8 @@ public class AbstractAasLifecycleDescriptor implements LifecycleDescriptor {
         String serverAdr = factory.getServerBaseUri(setup.getServerEndpoint());
         int startupTimeout = setup.getAasStartupTimeout();
         try { 
-            URL regUrl = new URL(regAdr);
-            URL serverUrl = new URL(serverAdr);
+            URL regUrl = NetUtils.createURL(regAdr);
+            URL serverUrl = NetUtils.createURL(serverAdr);
             LoggerFactory.getLogger(getClass()).info("Probing AAS registry {} and server {} for {} ms", 
                 regAdr, serverAdr, startupTimeout);
             if (!TimeUtils.waitFor(() -> {
@@ -258,7 +258,7 @@ public class AbstractAasLifecycleDescriptor implements LifecycleDescriptor {
                 LoggerFactory.getLogger(getClass()).info("AAS registry found at {} and server at {}", 
                     regAdr, serverAdr);
             }
-        } catch (MalformedURLException e) {
+        } catch (IllegalArgumentException e) {
             LoggerFactory.getLogger(getClass()).warn("Cannot wait for AAS registry/server. AAS registry "
                 + "{} or server {} URL invalid: {}", regAdr, serverAdr, e.getMessage());
         }

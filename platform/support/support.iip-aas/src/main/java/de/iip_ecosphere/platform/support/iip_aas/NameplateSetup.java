@@ -41,6 +41,7 @@ import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataBuilder;
 import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataBuilder.FurtherInformationBuilder;
 import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataBuilder.GeneralInformationBuilder;
+import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataBuilder.ProductClassificationsBuilder;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
@@ -65,9 +66,11 @@ public class NameplateSetup {
     
     private String manufacturerName;
     private String manufacturerProductDesignation;
-    // TODO complete me
+    private String manufacturerArticleNumber;
+    private String manufacturerOrderCodeNumber;
     private String productImage = "";
     private String manufacturerLogo = "";
+    private List<ProductClassificationItem> productClassificationItems = new ArrayList<>();
     private Address address = new Address(); // not official
     private List<Service> services = new ArrayList<>();
     
@@ -85,9 +88,12 @@ public class NameplateSetup {
     public NameplateSetup(NameplateSetup setup) {
         this.address = new Address(setup.address);
         this.productImage = setup.productImage;
+        this.manufacturerArticleNumber = setup.manufacturerArticleNumber;
+        this.manufacturerOrderCodeNumber = setup.manufacturerOrderCodeNumber;
         this.manufacturerLogo = setup.manufacturerLogo;
         this.manufacturerName = setup.manufacturerName;
         this.manufacturerProductDesignation = setup.manufacturerProductDesignation;
+        this.productClassificationItems.addAll(setup.productClassificationItems); // deep copy?
     }
     
     /**
@@ -212,6 +218,78 @@ public class NameplateSetup {
         }
 
     }
+    
+    /**
+     * Represents a product classification item.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public static class ProductClassificationItem {
+
+        private String productClassificationSystem;
+        private String classificationSystemVersion;
+        private String productClassId;
+
+        /**
+        * Returns the common name of the classification system.
+        *
+        * @return the value for ProductClassificationSystem
+        */
+        public String getProductClassificationSystem() {
+            return productClassificationSystem;
+        }
+
+        /**
+        * Changes the common name of the classification system.
+        *
+        * @param productClassificationSystem the value for ProductClassificationSystem
+        */
+        public void setProductClassificationSystem(String productClassificationSystem) {
+            this.productClassificationSystem = productClassificationSystem;
+        }
+
+        /**
+        * Returns the common version identifier of the used classification system, in order to distinguish different
+        * version of the property dictionary.
+        *
+        * @return  the value for ClassificationSystemVersion
+        */
+        public String getClassificationSystemVersion() {
+            return classificationSystemVersion;
+        }
+
+        /**
+        * Changes the common version identifier of the used classification system, in order to distinguish different
+        * version of the property dictionary..
+        *
+        * @param classificationSystemVersion the value for ClassificationSystemVersion
+        */
+        public void setClassificationSystemVersion(String classificationSystemVersion) {
+            this.classificationSystemVersion = classificationSystemVersion;
+        }
+
+        /**
+        * Returns the class of the associated product or industrial equipment in the classification system. According to
+        * the notation of the system..
+        *
+        * @return  the value for ProductClassId
+        */
+        public String getProductClassId() {
+            return productClassId;
+        }
+
+        /**
+        * Changes the class of the associated product or industrial equipment in the classification system. According to
+        * the notation of the system..
+        *
+        * @param productClassId the value for ProductClassId
+        */
+        public void setProductClassId(String productClassId) {
+            this.productClassId = productClassId;
+        }
+        
+        
+    }
 
     /**
      * Returns the manufacturer name.
@@ -223,12 +301,48 @@ public class NameplateSetup {
     }
 
     /**
-     * Changes the manufacturer name.
+     * Changes the manufacturer name. [snakeyaml]
      * 
      * @param manufacturerName the manufacturer name
      */
     public void setManufacturerName(String manufacturerName) {
         this.manufacturerName = manufacturerName;
+    }
+    
+    /**
+     * Returns the manufacturer article number.
+     * 
+     * @return the manufacturer article number
+     */
+    public String getManufacturerArticleNumber() {
+        return manufacturerArticleNumber;
+    }
+
+    /**
+     * Changes the manufacturer article number. [snakeyaml]
+     * 
+     * @param manufacturerArticleNumber the manufacturer article number
+     */
+    public void setManufacturerArticleNumber(String manufacturerArticleNumber) {
+        this.manufacturerArticleNumber = manufacturerArticleNumber;
+    }
+
+    /**
+     * Returns the manufacturer order code.
+     * 
+     * @return the manufacturer order code
+     */
+    public String getManufacturerOrderCodeNumber() {
+        return manufacturerOrderCodeNumber;
+    }
+
+    /**
+     * Changes the manufacturer order code. [snakeyaml]
+     * 
+     * @param manufacturerOrderCodeNumber the manufacturer order code
+     */
+    public void setManufacturerOrderCodeNumber(String manufacturerOrderCodeNumber) {
+        this.manufacturerOrderCodeNumber = manufacturerOrderCodeNumber;
     }
     
     /**
@@ -292,7 +406,7 @@ public class NameplateSetup {
     }
 
     /**
-     * Changes the manufacturer product designation.
+     * Changes the manufacturer product designation. [snakeyaml]
      * 
      * @param manufacturerProductDesignation the designation
      */
@@ -310,7 +424,7 @@ public class NameplateSetup {
     }
 
     /**
-     * Changes the address.
+     * Changes the address. [snakeyaml]
      * 
      * @param address the address
      */
@@ -328,7 +442,7 @@ public class NameplateSetup {
     }
 
     /**
-     * Changes the optional product image.
+     * Changes the optional product image. [snakeyaml]
      * 
      * @param productImage the image (local resolvable name or URI to image)
      */
@@ -346,7 +460,7 @@ public class NameplateSetup {
     }
 
     /**
-     * Defines the optional manufacturer logo.
+     * Defines the optional manufacturer logo. [snakeyaml]
      * 
      * @param manufacturerLogo the logo (local resolvable name or URI to image)
      */
@@ -354,8 +468,6 @@ public class NameplateSetup {
         this.manufacturerLogo = manufacturerLogo;
     }
     
-    // incomplete
-
     /**
      * Expands the last part of an URN by the given {@code expansion}.
      * 
@@ -378,6 +490,9 @@ public class NameplateSetup {
      * @param id the id short to create
      * @param further further build steps on the AAS, may be <b>null</b>
      * @return the AAS
+     * 
+     * @see #createTechnicalDataNameplate(AasBuilder, String)
+     * @see #createSoftwareNameplate(AasBuilder, String)
      */
     public Aas createAas(String urn, String id, Consumer<AasBuilder> further) {
         AasFactory factory = AasFactory.getInstance();
@@ -388,26 +503,7 @@ public class NameplateSetup {
             // not there, ok
             try {
                 AasBuilder aasBuilder = factory.createAasBuilder(id, urn);
-                TechnicalDataBuilder tdBuilder = new TechnicalDataBuilder(aasBuilder, 
-                    expandUrn(urn, "-technicalData"));
-                GeneralInformationBuilder giBuilder = tdBuilder.createGeneralInformationBuilder()
-                    .setManufacturerName(getManufacturerName())
-                    .setManufacturerArticleNumber("octoflow")
-                    .setManufacturerOrderCode("octoflow")
-                    .setManufacturerProductDesignation(LangString.create(getManufacturerProductDesignation()));
-                PlatformAas.createAddress(giBuilder, getAddress()); // inofficial, not in Generic Frame
-                AasUtils.resolveImage(getProductImage(), AasUtils.CLASSPATH_RESOURCE_RESOLVER, false, 
-                    (n, r, m) -> giBuilder.setProductImage(r, m));
-                AasUtils.resolveImage(getManufacturerLogo(), AasUtils.CLASSPATH_RESOURCE_RESOLVER, true, 
-                    (n, r, m) -> giBuilder.setManufacturerLogo(r, m));
-                giBuilder.build();
-                final GregorianCalendar now = new GregorianCalendar();
-                FurtherInformationBuilder fiBuilder = tdBuilder.createFurtherInformationBuilder()
-                    .setValidDate(now.getTime());
-                fiBuilder.build();
-                tdBuilder.createTechnicalPropertiesBuilder().build();
-                tdBuilder.createProductClassificationsBuilder().build();
-                tdBuilder.build();
+                createTechnicalDataNameplate(aasBuilder, urn);
                 SubmodelBuilder sub = aasBuilder.createSubmodelBuilder(SUBMODEL_SERVICES, null);
                 if (null != getServices()) {
                     for (Service s: getServices()) {
@@ -443,6 +539,43 @@ public class NameplateSetup {
             }
         }
         return aas;
+    }
+    
+    /**
+     * Creates the technical data nameplate. [legacy]
+     * 
+     * @param aasBuilder the parent AAS builder
+     * @param urn the URN of the platform AAS
+     */
+    private void createTechnicalDataNameplate(AasBuilder aasBuilder, String urn) {
+        TechnicalDataBuilder tdBuilder = new TechnicalDataBuilder(aasBuilder, 
+            expandUrn(urn, "-technicalData"));
+        GeneralInformationBuilder giBuilder = tdBuilder.createGeneralInformationBuilder()
+            .setManufacturerName(getManufacturerName())
+            .setManufacturerArticleNumber(getManufacturerArticleNumber())
+            .setManufacturerOrderCode(getManufacturerOrderCodeNumber())
+            .setManufacturerProductDesignation(LangString.create(getManufacturerProductDesignation()));
+        PlatformAas.createAddress(giBuilder, getAddress()); // inofficial, not in Generic Frame
+        AasUtils.resolveImage(getProductImage(), AasUtils.CLASSPATH_RESOURCE_RESOLVER, false, 
+            (n, r, m) -> giBuilder.setProductImage(r, m));
+        AasUtils.resolveImage(getManufacturerLogo(), AasUtils.CLASSPATH_RESOURCE_RESOLVER, true, 
+            (n, r, m) -> giBuilder.setManufacturerLogo(r, m));
+        giBuilder.build();
+        final GregorianCalendar now = new GregorianCalendar();
+        FurtherInformationBuilder fiBuilder = tdBuilder.createFurtherInformationBuilder()
+            .setValidDate(now.getTime());
+        fiBuilder.build();
+        tdBuilder.createTechnicalPropertiesBuilder().build();
+        ProductClassificationsBuilder pBuilder = tdBuilder.createProductClassificationsBuilder();
+        for (ProductClassificationItem item : productClassificationItems) {
+            pBuilder.createProductClassificationItemBuilder()
+                .setClassificationSystemVersion(item.getClassificationSystemVersion())
+                .setProductClassificationSystem(item.getProductClassificationSystem())
+                .setProductClassId(item.getProductClassId())
+                .build();
+        }
+        pBuilder.build();
+        tdBuilder.build();
     }
 
     /**
