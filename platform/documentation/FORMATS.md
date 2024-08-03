@@ -16,6 +16,7 @@ This file is supposed to provide a catalogue of various fixed data formats, e.g.
 - Service manager for [Spring](../services/services.spring/README.md)
 - Device/container software installation paths, aka [InstalledDependencies](../support/support/README.md)
 - Local [YAML-based Identity store](../support/support.aas/README.md)
+- Shortcut [device nameplate](../support/support.iip-aas/README.md)
 - Distributed testing and evaluation environment
 
 ## Semantic Id resolution catalogues

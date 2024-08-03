@@ -32,3 +32,36 @@ Local catalog format for semanticId resolution:
         ...
 
 `semanticId` specifies the id to be resolved. `version` and `revision` is information that could be extracted from the semanticId but given here for generality. In naming, any number of languages (here `de` and `en`) can be listed with the name of the defined concept, the structured name and a description in the respective language. Further, `publisher` and `kind` (IRI, IRDI, ...) may be given or implicitly set as default values by the resolver implementation.
+
+**Device nameplate format**
+    
+    manufacturerName: <String>
+    manufacturerProductDesignation: <String>
+    manufacturerArticleNumber: <String>
+    manufacturerOrderCodeNumber: <String>
+    productImage: <URL>
+    manufacturerLogo: <URL>
+    productClassificationItems:
+      - productClassificationSystem: <String>
+        classificationSystemVersion: <String>
+        productClassId: <String>
+      - ...
+    address:
+      - department: <String>
+        street: <String>
+        zipCode: <String>
+        cityTown: <String>
+    services:
+      - key: <String>
+        port: <Integer>
+        host: <String>
+        netmask: <String>
+        version: <String>
+      - ...
+       
+Simplified description of a device nameplate from the classpath file `nameplate.yml` (or in `src/test/resources` for testing) or deviceId.yml based on the configured deviceId provider. Sets up usual equipment device nameplate information, currently without technical properties. In addition, for legacy reasons, allows to specify a simplified manufacturer address. Further, a list of services identified by their `key` as stated in the services configuration. If given, dynamically overrides network connection information.
+      
+       = new ArrayList<>();
+    private Address address = new Address(); // not official
+    private List<Service> services = new ArrayList<>();
+    
