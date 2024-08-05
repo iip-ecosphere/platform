@@ -134,8 +134,8 @@ public class HandoverDocumentationBuilder extends DelegatingSubmodelBuilder {
     
     @Override
     public Submodel build() {
-        assertThat(0 <= documentCounter, "Cardinality of Document must be greater or equal 0.");
-        assertThat(0 <= entityCounter, "Cardinality of Entity must be greater or equal 0.");
+        assertThat(0 <= documentCounter, "Cardinality {} of Document must be greater or equal 0.", documentCounter);
+        assertThat(0 <= entityCounter, "Cardinality {} of Entity must be greater or equal 0.", entityCounter);
         
         return super.build();
     }
@@ -221,11 +221,14 @@ public class HandoverDocumentationBuilder extends DelegatingSubmodelBuilder {
         
         @Override
         public SubmodelElementCollection build() {
-            assertThat(1 <= documentIdCounter, "Cardinality of DocumentId must be greater or equal 1.");
-            assertThat(1 <= documentClassificationCounter, "Cardinality of DocumentClassification must be greater or eq"
-                + "ual 1.");
-            assertThat(0 <= documentVersionCounter, "Cardinality of DocumentVersion must be greater or equal 0.");
-            assertThat(0 <= documentedEntityCounter, "Cardinality of DocumentedEntity must be greater or equal 0.");
+            assertThat(1 <= documentIdCounter, "Cardinality {} of DocumentId must be greater or equal 1.",
+                documentIdCounter);
+            assertThat(1 <= documentClassificationCounter, "Cardinality {} of DocumentClassification must be greater or"
+                + " equal 1.", documentClassificationCounter);
+            assertThat(0 <= documentVersionCounter, "Cardinality {} of DocumentVersion must be greater or equal 0.",
+                documentVersionCounter);
+            assertThat(0 <= documentedEntityCounter, "Cardinality {} of DocumentedEntity must be greater or equal 0.",
+                documentedEntityCounter);
             
             return super.build();
         }
@@ -311,10 +314,11 @@ public class HandoverDocumentationBuilder extends DelegatingSubmodelBuilder {
         
         @Override
         public SubmodelElementCollection build() {
-            assertThat(documentDomainIdCounter == 1, "Cardinality of DocumentDomainId must be equal 1.");
-            assertThat(valueIdCounter == 1, "Cardinality of ValueId must be equal 1.");
-            assertThat(0 <= isPrimaryCounter && isPrimaryCounter <= 1, "Cardinality of IsPrimary must be greater or equ"
-                + "al 0 and less or equal 1.");
+            assertThat(documentDomainIdCounter == 1, "Cardinality {} of DocumentDomainId must be equal 1.",
+                documentDomainIdCounter);
+            assertThat(valueIdCounter == 1, "Cardinality {} of ValueId must be equal 1.", valueIdCounter);
+            assertThat(0 <= isPrimaryCounter && isPrimaryCounter <= 1, "Cardinality {} of IsPrimary must be greater or "
+                + "equal 0 and less or equal 1.", isPrimaryCounter);
             
             return super.build();
         }
@@ -403,9 +407,10 @@ public class HandoverDocumentationBuilder extends DelegatingSubmodelBuilder {
         
         @Override
         public SubmodelElementCollection build() {
-            assertThat(classIdCounter == 1, "Cardinality of ClassId must be equal 1.");
-            assertThat(classNameCounter == 1, "Cardinality of ClassName must be equal 1.");
-            assertThat(classificationSystemCounter == 1, "Cardinality of ClassificationSystem must be equal 1.");
+            assertThat(classIdCounter == 1, "Cardinality {} of ClassId must be equal 1.", classIdCounter);
+            assertThat(classNameCounter == 1, "Cardinality {} of ClassName must be equal 1.", classNameCounter);
+            assertThat(classificationSystemCounter == 1, "Cardinality {} of ClassificationSystem must be equal 1.",
+                classificationSystemCounter);
             
             return super.build();
         }
@@ -692,24 +697,31 @@ public class HandoverDocumentationBuilder extends DelegatingSubmodelBuilder {
         
         @Override
         public SubmodelElementCollection build() {
-            assertThat(1 <= languageCounter, "Cardinality of Language must be greater or equal 1.");
-            assertThat(documentVersionIdCounter == 1, "Cardinality of DocumentVersionId must be equal 1.");
-            assertThat(titleCounter == 1, "Cardinality of Title must be equal 1.");
-            assertThat(0 <= subTitleCounter && subTitleCounter <= 1, "Cardinality of SubTitle must be greater or equal "
-                + "0 and less or equal 1.");
-            assertThat(summaryCounter == 1, "Cardinality of Summary must be equal 1.");
-            assertThat(keyWordsCounter == 1, "Cardinality of KeyWords must be equal 1.");
-            assertThat(statusSetDateCounter == 1, "Cardinality of StatusSetDate must be equal 1.");
-            assertThat(statusValueCounter == 1, "Cardinality of StatusValue must be equal 1.");
-            assertThat(organizationNameCounter == 1, "Cardinality of OrganizationName must be equal 1.");
-            assertThat(organizationOfficialNameCounter == 1, "Cardinality of OrganizationOfficialName must be "
-                + "equal 1.");
-            assertThat(1 <= digitalFileCounter, "Cardinality of DigitalFile must be greater or equal 1.");
-            assertThat(0 <= previewFileCounter && previewFileCounter <= 1, "Cardinality of PreviewFile must be greater "
-                + "or equal 0 and less or equal 1.");
-            assertThat(0 <= refersToCounter, "Cardinality of RefersTo must be greater or equal 0.");
-            assertThat(0 <= basedOnCounter, "Cardinality of BasedOn must be greater or equal 0.");
-            assertThat(0 <= translationOfCounter, "Cardinality of TranslationOf must be greater or equal 0.");
+            assertThat(1 <= languageCounter, "Cardinality {} of Language must be greater or equal 1.",
+                languageCounter);
+            assertThat(documentVersionIdCounter == 1, "Cardinality {} of DocumentVersionId must be equal 1.",
+                documentVersionIdCounter);
+            assertThat(titleCounter == 1, "Cardinality {} of Title must be equal 1.", titleCounter);
+            assertThat(0 <= subTitleCounter && subTitleCounter <= 1, "Cardinality {} of SubTitle must be greater or equ"
+                + "al 0 and less or equal 1.", subTitleCounter);
+            assertThat(summaryCounter == 1, "Cardinality {} of Summary must be equal 1.", summaryCounter);
+            assertThat(keyWordsCounter == 1, "Cardinality {} of KeyWords must be equal 1.", keyWordsCounter);
+            assertThat(statusSetDateCounter == 1, "Cardinality {} of StatusSetDate must be equal 1.",
+                statusSetDateCounter);
+            assertThat(statusValueCounter == 1, "Cardinality {} of StatusValue must be equal 1.", statusValueCounter);
+            assertThat(organizationNameCounter == 1, "Cardinality {} of OrganizationName must be equal 1.",
+                organizationNameCounter);
+            assertThat(organizationOfficialNameCounter == 1, "Cardinality {} of OrganizationOfficialName must be equal "
+                + "1.", organizationOfficialNameCounter);
+            assertThat(1 <= digitalFileCounter, "Cardinality {} of DigitalFile must be greater or equal 1.",
+                digitalFileCounter);
+            assertThat(0 <= previewFileCounter && previewFileCounter <= 1, "Cardinality {} of PreviewFile must be great"
+                + "er or equal 0 and less or equal 1.", previewFileCounter);
+            assertThat(0 <= refersToCounter, "Cardinality {} of RefersTo must be greater or equal 0.",
+                refersToCounter);
+            assertThat(0 <= basedOnCounter, "Cardinality {} of BasedOn must be greater or equal 0.", basedOnCounter);
+            assertThat(0 <= translationOfCounter, "Cardinality {} of TranslationOf must be greater or equal 0.",
+                translationOfCounter);
             
             return super.build();
         }

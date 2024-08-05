@@ -33,6 +33,8 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import org.apache.commons.lang3.StringUtils;
+
 import de.iip_ecosphere.platform.support.aas.BlobDataElement;
 import de.iip_ecosphere.platform.support.aas.DataElement;
 import de.iip_ecosphere.platform.support.aas.ElementsAccess;
@@ -74,12 +76,17 @@ public class Utils {
      * {@code exception}.
      * 
      * @param valid the validity criteria
-     * @param exception the exception text
+     * @param exception the exception text, may contain "{}" as argument placeholder
+     * @param args arguments to replace "{}" in the given sequence
      * @throws IllegalArgumentException if not {@code valid}
      */
-    public static void assertThat(boolean valid, String exception) {
+    public static void assertThat(boolean valid, String exception, Object... args) {
         if (!valid) {
-            throw new IllegalArgumentException(exception);
+            String tmp = exception;
+            for (Object a : args) {
+                tmp = StringUtils.replaceOnce(tmp, "{}", null == a ? "null" : a.toString());
+            }
+            throw new IllegalArgumentException(tmp);
         }
     }
 

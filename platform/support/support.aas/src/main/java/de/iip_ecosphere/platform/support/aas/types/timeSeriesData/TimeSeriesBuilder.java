@@ -130,8 +130,8 @@ public class TimeSeriesBuilder extends DelegatingSubmodelBuilder {
     
     @Override
     public Submodel build() {
-        assertThat(metadataCounter == 1, "Cardinality of Metadata must be equal 1.");
-        assertThat(segmentsCounter == 1, "Cardinality of Segments must be equal 1.");
+        assertThat(metadataCounter == 1, "Cardinality {} of Metadata must be equal 1.", metadataCounter);
+        assertThat(segmentsCounter == 1, "Cardinality {} of Segments must be equal 1.", segmentsCounter);
         
         return super.build();
     }
@@ -209,10 +209,10 @@ public class TimeSeriesBuilder extends DelegatingSubmodelBuilder {
         
         @Override
         public SubmodelElementCollection build() {
-            assertThat(nameCounter == 1, "Cardinality of Name must be equal 1.");
-            assertThat(0 <= descriptionCounter && descriptionCounter <= 1, "Cardinality of Description must be greater "
-                + "or equal 0 and less or equal 1.");
-            assertThat(recordCounter == 1, "Cardinality of Record must be equal 1.");
+            assertThat(nameCounter == 1, "Cardinality {} of Name must be equal 1.", nameCounter);
+            assertThat(0 <= descriptionCounter && descriptionCounter <= 1, "Cardinality {} of Description must be great"
+                + "er or equal 0 and less or equal 1.", descriptionCounter);
+            assertThat(recordCounter == 1, "Cardinality {} of Record must be equal 1.", recordCounter);
             
             return super.build();
         }
@@ -266,7 +266,7 @@ public class TimeSeriesBuilder extends DelegatingSubmodelBuilder {
         
         @Override
         public SubmodelElementCollection build() {
-            assertThat(1 <= timeCounter, "Cardinality of Time must be greater or equal 1.");
+            assertThat(1 <= timeCounter, "Cardinality {} of Time must be greater or equal 1.", timeCounter);
             
             return super.build();
         }
@@ -335,9 +335,12 @@ public class TimeSeriesBuilder extends DelegatingSubmodelBuilder {
         
         @Override
         public SubmodelElementCollection build() {
-            assertThat(0 <= externalSegmentCounter, "Cardinality of ExternalSegment must be greater or equal 0.");
-            assertThat(0 <= linkedSegmentCounter, "Cardinality of LinkedSegment must be greater or equal 0.");
-            assertThat(0 <= internalSegmentCounter, "Cardinality of InternalSegment must be greater or equal 0.");
+            assertThat(0 <= externalSegmentCounter, "Cardinality {} of ExternalSegment must be greater or equal 0.",
+                externalSegmentCounter);
+            assertThat(0 <= linkedSegmentCounter, "Cardinality {} of LinkedSegment must be greater or equal 0.",
+                linkedSegmentCounter);
+            assertThat(0 <= internalSegmentCounter, "Cardinality {} of InternalSegment must be greater or equal 0.",
+                internalSegmentCounter);
             
             return super.build();
         }
@@ -561,30 +564,30 @@ public class TimeSeriesBuilder extends DelegatingSubmodelBuilder {
         
         @Override
         public SubmodelElementCollection build() {
-            assertThat(0 <= nameCounter && nameCounter <= 1, "Cardinality of Name must be greater or equal 0 and less o"
-                + "r equal 1.");
-            assertThat(0 <= descriptionCounter && descriptionCounter <= 1, "Cardinality of Description must be greater "
-                + "or equal 0 and less or equal 1.");
-            assertThat(0 <= recordCountCounter && recordCountCounter <= 1, "Cardinality of RecordCount must be greater "
-                + "or equal 0 and less or equal 1.");
-            assertThat(0 <= startTimeCounter && startTimeCounter <= 1, "Cardinality of StartTime must be greater or equ"
-                + "al 0 and less or equal 1.");
-            assertThat(0 <= endTimeCounter && endTimeCounter <= 1, "Cardinality of EndTime must be greater or equal 0 a"
-                + "nd less or equal 1.");
-            assertThat(0 <= durationCounter && durationCounter <= 1, "Cardinality of Duration must be greater or equal "
-                + "0 and less or equal 1.");
-            assertThat(0 <= samplingIntervalCounter && samplingIntervalCounter <= 1, "Cardinality of SamplingInterval m"
-                + "ust be greater or equal 0 and less or equal 1.");
-            assertThat(0 <= samplingRateCounter && samplingRateCounter <= 1, "Cardinality of SamplingRate must be great"
-                + "er or equal 0 and less or equal 1.");
-            assertThat(0 <= stateCounter && stateCounter <= 1, "Cardinality of State must be greater or equal 0 and les"
-                + "s or equal 1.");
-            assertThat(0 <= lastUpdateCounter && lastUpdateCounter <= 1, "Cardinality of LastUpdate must be greater or "
-                + "equal 0 and less or equal 1.");
-            assertThat(0 <= fileCounter && fileCounter <= 1, "Cardinality of File must be greater or equal 0 and less o"
-                + "r equal 1.");
-            assertThat(0 <= blobCounter && blobCounter <= 1, "Cardinality of Blob must be greater or equal 0 and less o"
-                + "r equal 1.");
+            assertThat(0 <= nameCounter && nameCounter <= 1, "Cardinality {} of Name must be greater or equal 0 and les"
+                + "s or equal 1.", nameCounter);
+            assertThat(0 <= descriptionCounter && descriptionCounter <= 1, "Cardinality {} of Description must be great"
+                + "er or equal 0 and less or equal 1.", descriptionCounter);
+            assertThat(0 <= recordCountCounter && recordCountCounter <= 1, "Cardinality {} of RecordCount must be great"
+                + "er or equal 0 and less or equal 1.", recordCountCounter);
+            assertThat(0 <= startTimeCounter && startTimeCounter <= 1, "Cardinality {} of StartTime must be greater or "
+                + "equal 0 and less or equal 1.", startTimeCounter);
+            assertThat(0 <= endTimeCounter && endTimeCounter <= 1, "Cardinality {} of EndTime must be greater or equal "
+                + "0 and less or equal 1.", endTimeCounter);
+            assertThat(0 <= durationCounter && durationCounter <= 1, "Cardinality {} of Duration must be greater or equ"
+                + "al 0 and less or equal 1.", durationCounter);
+            assertThat(0 <= samplingIntervalCounter && samplingIntervalCounter <= 1, "Cardinality {} of SamplingInterva"
+                + "l must be greater or equal 0 and less or equal 1.", samplingIntervalCounter);
+            assertThat(0 <= samplingRateCounter && samplingRateCounter <= 1, "Cardinality {} of SamplingRate must be gr"
+                + "eater or equal 0 and less or equal 1.", samplingRateCounter);
+            assertThat(0 <= stateCounter && stateCounter <= 1, "Cardinality {} of State must be greater or equal 0 and "
+                + "less or equal 1.", stateCounter);
+            assertThat(0 <= lastUpdateCounter && lastUpdateCounter <= 1, "Cardinality {} of LastUpdate must be greater "
+                + "or equal 0 and less or equal 1.", lastUpdateCounter);
+            assertThat(0 <= fileCounter && fileCounter <= 1, "Cardinality {} of File must be greater or equal 0 and les"
+                + "s or equal 1.", fileCounter);
+            assertThat(0 <= blobCounter && blobCounter <= 1, "Cardinality {} of Blob must be greater or equal 0 and les"
+                + "s or equal 1.", blobCounter);
             
             return super.build();
         }
@@ -806,28 +809,28 @@ public class TimeSeriesBuilder extends DelegatingSubmodelBuilder {
         
         @Override
         public SubmodelElementCollection build() {
-            assertThat(0 <= nameCounter && nameCounter <= 1, "Cardinality of Name must be greater or equal 0 and less o"
-                + "r equal 1.");
-            assertThat(0 <= descriptionCounter && descriptionCounter <= 1, "Cardinality of Description must be greater "
-                + "or equal 0 and less or equal 1.");
-            assertThat(0 <= recordCountCounter && recordCountCounter <= 1, "Cardinality of RecordCount must be greater "
-                + "or equal 0 and less or equal 1.");
-            assertThat(0 <= startTimeCounter && startTimeCounter <= 1, "Cardinality of StartTime must be greater or equ"
-                + "al 0 and less or equal 1.");
-            assertThat(0 <= endTimeCounter && endTimeCounter <= 1, "Cardinality of EndTime must be greater or equal 0 a"
-                + "nd less or equal 1.");
-            assertThat(0 <= durationCounter && durationCounter <= 1, "Cardinality of Duration must be greater or equal "
-                + "0 and less or equal 1.");
-            assertThat(0 <= samplingIntervalCounter && samplingIntervalCounter <= 1, "Cardinality of SamplingInterval m"
-                + "ust be greater or equal 0 and less or equal 1.");
-            assertThat(0 <= samplingRateCounter && samplingRateCounter <= 1, "Cardinality of SamplingRate must be great"
-                + "er or equal 0 and less or equal 1.");
-            assertThat(0 <= stateCounter && stateCounter <= 1, "Cardinality of State must be greater or equal 0 and les"
-                + "s or equal 1.");
-            assertThat(0 <= lastUpdateCounter && lastUpdateCounter <= 1, "Cardinality of LastUpdate must be greater or "
-                + "equal 0 and less or equal 1.");
-            assertThat(endpointCounter == 1, "Cardinality of Endpoint must be equal 1.");
-            assertThat(queryCounter == 1, "Cardinality of Query must be equal 1.");
+            assertThat(0 <= nameCounter && nameCounter <= 1, "Cardinality {} of Name must be greater or equal 0 and les"
+                + "s or equal 1.", nameCounter);
+            assertThat(0 <= descriptionCounter && descriptionCounter <= 1, "Cardinality {} of Description must be great"
+                + "er or equal 0 and less or equal 1.", descriptionCounter);
+            assertThat(0 <= recordCountCounter && recordCountCounter <= 1, "Cardinality {} of RecordCount must be great"
+                + "er or equal 0 and less or equal 1.", recordCountCounter);
+            assertThat(0 <= startTimeCounter && startTimeCounter <= 1, "Cardinality {} of StartTime must be greater or "
+                + "equal 0 and less or equal 1.", startTimeCounter);
+            assertThat(0 <= endTimeCounter && endTimeCounter <= 1, "Cardinality {} of EndTime must be greater or equal "
+                + "0 and less or equal 1.", endTimeCounter);
+            assertThat(0 <= durationCounter && durationCounter <= 1, "Cardinality {} of Duration must be greater or equ"
+                + "al 0 and less or equal 1.", durationCounter);
+            assertThat(0 <= samplingIntervalCounter && samplingIntervalCounter <= 1, "Cardinality {} of SamplingInterva"
+                + "l must be greater or equal 0 and less or equal 1.", samplingIntervalCounter);
+            assertThat(0 <= samplingRateCounter && samplingRateCounter <= 1, "Cardinality {} of SamplingRate must be gr"
+                + "eater or equal 0 and less or equal 1.", samplingRateCounter);
+            assertThat(0 <= stateCounter && stateCounter <= 1, "Cardinality {} of State must be greater or equal 0 and "
+                + "less or equal 1.", stateCounter);
+            assertThat(0 <= lastUpdateCounter && lastUpdateCounter <= 1, "Cardinality {} of LastUpdate must be greater "
+                + "or equal 0 and less or equal 1.", lastUpdateCounter);
+            assertThat(endpointCounter == 1, "Cardinality {} of Endpoint must be equal 1.", endpointCounter);
+            assertThat(queryCounter == 1, "Cardinality {} of Query must be equal 1.", queryCounter);
             
             return super.build();
         }
@@ -1030,27 +1033,27 @@ public class TimeSeriesBuilder extends DelegatingSubmodelBuilder {
         
         @Override
         public SubmodelElementCollection build() {
-            assertThat(0 <= nameCounter && nameCounter <= 1, "Cardinality of Name must be greater or equal 0 and less o"
-                + "r equal 1.");
-            assertThat(0 <= descriptionCounter && descriptionCounter <= 1, "Cardinality of Description must be greater "
-                + "or equal 0 and less or equal 1.");
-            assertThat(0 <= recordCountCounter && recordCountCounter <= 1, "Cardinality of RecordCount must be greater "
-                + "or equal 0 and less or equal 1.");
-            assertThat(0 <= startTimeCounter && startTimeCounter <= 1, "Cardinality of StartTime must be greater or equ"
-                + "al 0 and less or equal 1.");
-            assertThat(0 <= endTimeCounter && endTimeCounter <= 1, "Cardinality of EndTime must be greater or equal 0 a"
-                + "nd less or equal 1.");
-            assertThat(0 <= durationCounter && durationCounter <= 1, "Cardinality of Duration must be greater or equal "
-                + "0 and less or equal 1.");
-            assertThat(0 <= samplingIntervalCounter && samplingIntervalCounter <= 1, "Cardinality of SamplingInterval m"
-                + "ust be greater or equal 0 and less or equal 1.");
-            assertThat(0 <= samplingRateCounter && samplingRateCounter <= 1, "Cardinality of SamplingRate must be great"
-                + "er or equal 0 and less or equal 1.");
-            assertThat(0 <= stateCounter && stateCounter <= 1, "Cardinality of State must be greater or equal 0 and les"
-                + "s or equal 1.");
-            assertThat(0 <= lastUpdateCounter && lastUpdateCounter <= 1, "Cardinality of LastUpdate must be greater or "
-                + "equal 0 and less or equal 1.");
-            assertThat(recordsCounter == 1, "Cardinality of Records must be equal 1.");
+            assertThat(0 <= nameCounter && nameCounter <= 1, "Cardinality {} of Name must be greater or equal 0 and les"
+                + "s or equal 1.", nameCounter);
+            assertThat(0 <= descriptionCounter && descriptionCounter <= 1, "Cardinality {} of Description must be great"
+                + "er or equal 0 and less or equal 1.", descriptionCounter);
+            assertThat(0 <= recordCountCounter && recordCountCounter <= 1, "Cardinality {} of RecordCount must be great"
+                + "er or equal 0 and less or equal 1.", recordCountCounter);
+            assertThat(0 <= startTimeCounter && startTimeCounter <= 1, "Cardinality {} of StartTime must be greater or "
+                + "equal 0 and less or equal 1.", startTimeCounter);
+            assertThat(0 <= endTimeCounter && endTimeCounter <= 1, "Cardinality {} of EndTime must be greater or equal "
+                + "0 and less or equal 1.", endTimeCounter);
+            assertThat(0 <= durationCounter && durationCounter <= 1, "Cardinality {} of Duration must be greater or equ"
+                + "al 0 and less or equal 1.", durationCounter);
+            assertThat(0 <= samplingIntervalCounter && samplingIntervalCounter <= 1, "Cardinality {} of SamplingInterva"
+                + "l must be greater or equal 0 and less or equal 1.", samplingIntervalCounter);
+            assertThat(0 <= samplingRateCounter && samplingRateCounter <= 1, "Cardinality {} of SamplingRate must be gr"
+                + "eater or equal 0 and less or equal 1.", samplingRateCounter);
+            assertThat(0 <= stateCounter && stateCounter <= 1, "Cardinality {} of State must be greater or equal 0 and "
+                + "less or equal 1.", stateCounter);
+            assertThat(0 <= lastUpdateCounter && lastUpdateCounter <= 1, "Cardinality {} of LastUpdate must be greater "
+                + "or equal 0 and less or equal 1.", lastUpdateCounter);
+            assertThat(recordsCounter == 1, "Cardinality {} of Records must be equal 1.", recordsCounter);
             
             return super.build();
         }
@@ -1097,7 +1100,7 @@ public class TimeSeriesBuilder extends DelegatingSubmodelBuilder {
         
         @Override
         public SubmodelElementCollection build() {
-            assertThat(0 <= recordCounter, "Cardinality of Record must be greater or equal 0.");
+            assertThat(0 <= recordCounter, "Cardinality {} of Record must be greater or equal 0.", recordCounter);
             
             return super.build();
         }

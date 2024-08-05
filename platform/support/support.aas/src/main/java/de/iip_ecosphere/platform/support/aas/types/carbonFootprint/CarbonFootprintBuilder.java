@@ -439,10 +439,10 @@ public class CarbonFootprintBuilder extends DelegatingSubmodelBuilder {
     
     @Override
     public Submodel build() {
-        assertThat(0 <= productCarbonFootprintCounter, "Cardinality of ProductCarbonFootprint must be greater or equal "
-            + "0.");
-        assertThat(0 <= transportCarbonFootprintCounter, "Cardinality of TransportCarbonFootprint must be greater or eq"
-            + "ual 0.");
+        assertThat(0 <= productCarbonFootprintCounter, "Cardinality {} of ProductCarbonFootprint must be greater or equ"
+            + "al 0.", productCarbonFootprintCounter);
+        assertThat(0 <= transportCarbonFootprintCounter, "Cardinality {} of TransportCarbonFootprint must be greater or"
+            + " equal 0.", transportCarbonFootprintCounter);
         
         return super.build();
     }
@@ -622,20 +622,23 @@ public class CarbonFootprintBuilder extends DelegatingSubmodelBuilder {
         
         @Override
         public SubmodelElementCollection build() {
-            assertThat(1 <= pCFCalculationMethodCounter, "Cardinality of PCFCalculationMethod must be greater or equal "
-                + "1.");
-            assertThat(pCFCO2eqCounter == 1, "Cardinality of PCFCO2eq must be equal 1.");
-            assertThat(pCFReferenceValueForCalculationCounter == 1, "Cardinality of PCFReferenceValueForCalculation mus"
-                + "t be equal 1.");
-            assertThat(pCFQuantityOfMeasureForCalculationCounter == 1, "Cardinality of PCFQuantityOfMeasureForCalculati"
-                + "on must be equal 1.");
-            assertThat(1 <= pCFLifeCyclePhaseCounter, "Cardinality of PCFLifeCyclePhase must be greater or equal 1.");
-            assertThat(0 <= explanatoryStatementCounter && explanatoryStatementCounter <= 1, "Cardinality of Explanator"
-                + "yStatement must be greater or equal 0 and less or equal 1.");
-            assertThat(pCFGoodsAddressHandoverCounter == 1, "Cardinality of PCFGoodsAddressHandover must be equal 1.");
-            assertThat(publicationDateCounter == 1, "Cardinality of PublicationDate must be equal 1.");
-            assertThat(0 <= expirationDateCounter && expirationDateCounter <= 1, "Cardinality of ExpirationDate must be"
-                + " greater or equal 0 and less or equal 1.");
+            assertThat(1 <= pCFCalculationMethodCounter, "Cardinality {} of PCFCalculationMethod must be greater or equ"
+                + "al 1.", pCFCalculationMethodCounter);
+            assertThat(pCFCO2eqCounter == 1, "Cardinality {} of PCFCO2eq must be equal 1.", pCFCO2eqCounter);
+            assertThat(pCFReferenceValueForCalculationCounter == 1, "Cardinality {} of PCFReferenceValueForCalculation "
+                + "must be equal 1.", pCFReferenceValueForCalculationCounter);
+            assertThat(pCFQuantityOfMeasureForCalculationCounter == 1, "Cardinality {} of PCFQuantityOfMeasureForCalcul"
+                + "ation must be equal 1.", pCFQuantityOfMeasureForCalculationCounter);
+            assertThat(1 <= pCFLifeCyclePhaseCounter, "Cardinality {} of PCFLifeCyclePhase must be greater or equal 1."
+                , pCFLifeCyclePhaseCounter);
+            assertThat(0 <= explanatoryStatementCounter && explanatoryStatementCounter <= 1, "Cardinality {} of Explana"
+                + "toryStatement must be greater or equal 0 and less or equal 1.", explanatoryStatementCounter);
+            assertThat(pCFGoodsAddressHandoverCounter == 1, "Cardinality {} of PCFGoodsAddressHandover must be equal 1."
+                + "", pCFGoodsAddressHandoverCounter);
+            assertThat(publicationDateCounter == 1, "Cardinality {} of PublicationDate must be equal 1.",
+                publicationDateCounter);
+            assertThat(0 <= expirationDateCounter && expirationDateCounter <= 1, "Cardinality {} of ExpirationDate must"
+                + " be greater or equal 0 and less or equal 1.", expirationDateCounter);
             
             return super.build();
         }
@@ -747,16 +750,16 @@ public class CarbonFootprintBuilder extends DelegatingSubmodelBuilder {
         
         @Override
         public SubmodelElementCollection build() {
-            assertThat(0 <= streetCounter && streetCounter <= 1, "Cardinality of Street must be greater or equal 0 and "
-                + "less or equal 1.");
-            assertThat(0 <= houseNumberCounter && houseNumberCounter <= 1, "Cardinality of HouseNumber must be greater "
-                + "or equal 0 and less or equal 1.");
-            assertThat(0 <= zipCodeCounter && zipCodeCounter <= 1, "Cardinality of ZipCode must be greater or equal 0 a"
-                + "nd less or equal 1.");
-            assertThat(0 <= cityTownCounter && cityTownCounter <= 1, "Cardinality of CityTown must be greater or equal "
-                + "0 and less or equal 1.");
-            assertThat(0 <= countryCounter && countryCounter <= 1, "Cardinality of Country must be greater or equal 0 a"
-                + "nd less or equal 1.");
+            assertThat(0 <= streetCounter && streetCounter <= 1, "Cardinality {} of Street must be greater or equal 0 a"
+                + "nd less or equal 1.", streetCounter);
+            assertThat(0 <= houseNumberCounter && houseNumberCounter <= 1, "Cardinality {} of HouseNumber must be great"
+                + "er or equal 0 and less or equal 1.", houseNumberCounter);
+            assertThat(0 <= zipCodeCounter && zipCodeCounter <= 1, "Cardinality {} of ZipCode must be greater or equal "
+                + "0 and less or equal 1.", zipCodeCounter);
+            assertThat(0 <= cityTownCounter && cityTownCounter <= 1, "Cardinality {} of CityTown must be greater or equ"
+                + "al 0 and less or equal 1.", cityTownCounter);
+            assertThat(0 <= countryCounter && countryCounter <= 1, "Cardinality {} of Country must be greater or equal "
+                + "0 and less or equal 1.", countryCounter);
             
             return super.build();
         }
@@ -944,23 +947,26 @@ public class CarbonFootprintBuilder extends DelegatingSubmodelBuilder {
         
         @Override
         public SubmodelElementCollection build() {
-            assertThat(tCFCalculationMethodCounter == 1, "Cardinality of TCFCalculationMethod must be equal 1.");
-            assertThat(tCFCO2eqCounter == 1, "Cardinality of TCFCO2eq must be equal 1.");
-            assertThat(tCFReferenceValueForCalculationCounter == 1, "Cardinality of TCFReferenceValueForCalculation mus"
-                + "t be equal 1.");
-            assertThat(tCFQuantityOfMeasureForCalculationCounter == 1, "Cardinality of TCFQuantityOfMeasureForCalculati"
-                + "on must be equal 1.");
-            assertThat(1 <= tCFProcessesForGreenhouseGasEmissionInATransportServiceCounter, "Cardinality of TCFProcesse"
-                + "sForGreenhouseGasEmissionInATransportService must be greater or equal 1.");
-            assertThat(0 <= explanatoryStatementCounter && explanatoryStatementCounter <= 1, "Cardinality of Explanator"
-                + "yStatement must be greater or equal 0 and less or equal 1.");
-            assertThat(tCFGoodsTransportAddressTakeoverCounter == 1, "Cardinality of TCFGoodsTransportAddressTakeover m"
-                + "ust be equal 1.");
-            assertThat(tCFGoodsTransportAddressHandoverCounter == 1, "Cardinality of TCFGoodsTransportAddressHandover m"
-                + "ust be equal 1.");
-            assertThat(publicationDateCounter == 1, "Cardinality of PublicationDate must be equal 1.");
-            assertThat(0 <= expirationDateCounter && expirationDateCounter <= 1, "Cardinality of ExpirationDate must be"
-                + " greater or equal 0 and less or equal 1.");
+            assertThat(tCFCalculationMethodCounter == 1, "Cardinality {} of TCFCalculationMethod must be equal 1.",
+                    tCFCalculationMethodCounter);
+            assertThat(tCFCO2eqCounter == 1, "Cardinality {} of TCFCO2eq must be equal 1.", tCFCO2eqCounter);
+            assertThat(tCFReferenceValueForCalculationCounter == 1, "Cardinality {} of TCFReferenceValueForCalculation "
+                + "must be equal 1.", tCFReferenceValueForCalculationCounter);
+            assertThat(tCFQuantityOfMeasureForCalculationCounter == 1, "Cardinality {} of TCFQuantityOfMeasureForCalcul"
+                + "ation must be equal 1.", tCFQuantityOfMeasureForCalculationCounter);
+            assertThat(1 <= tCFProcessesForGreenhouseGasEmissionInATransportServiceCounter, "Cardinality {} of TCFProce"
+                + "ssesForGreenhouseGasEmissionInATransportService must be greater or equal 1.",
+                tCFProcessesForGreenhouseGasEmissionInATransportServiceCounter);
+            assertThat(0 <= explanatoryStatementCounter && explanatoryStatementCounter <= 1, "Cardinality {} of Explana"
+                + "toryStatement must be greater or equal 0 and less or equal 1.", explanatoryStatementCounter);
+            assertThat(tCFGoodsTransportAddressTakeoverCounter == 1, "Cardinality {} of TCFGoodsTransportAddressTakeove"
+                + "r must be equal 1.", tCFGoodsTransportAddressTakeoverCounter);
+            assertThat(tCFGoodsTransportAddressHandoverCounter == 1, "Cardinality {} of TCFGoodsTransportAddressHandove"
+                + "r must be equal 1.", tCFGoodsTransportAddressHandoverCounter);
+            assertThat(publicationDateCounter == 1, "Cardinality {} of PublicationDate must be equal 1.",
+                publicationDateCounter);
+            assertThat(0 <= expirationDateCounter && expirationDateCounter <= 1, "Cardinality {} of ExpirationDate must"
+                + " be greater or equal 0 and less or equal 1.", expirationDateCounter);
             
             return super.build();
         }
@@ -1072,16 +1078,16 @@ public class CarbonFootprintBuilder extends DelegatingSubmodelBuilder {
         
         @Override
         public SubmodelElementCollection build() {
-            assertThat(0 <= streetCounter && streetCounter <= 1, "Cardinality of Street must be greater or equal 0 and "
-                + "less or equal 1.");
-            assertThat(0 <= houseNumberCounter && houseNumberCounter <= 1, "Cardinality of HouseNumber must be greater "
-                + "or equal 0 and less or equal 1.");
-            assertThat(0 <= zipCodeCounter && zipCodeCounter <= 1, "Cardinality of ZipCode must be greater or equal 0 a"
-                + "nd less or equal 1.");
-            assertThat(0 <= cityTownCounter && cityTownCounter <= 1, "Cardinality of CityTown must be greater or equal "
-                + "0 and less or equal 1.");
-            assertThat(0 <= countryCounter && countryCounter <= 1, "Cardinality of Country must be greater or equal 0 a"
-                + "nd less or equal 1.");
+            assertThat(0 <= streetCounter && streetCounter <= 1, "Cardinality {} of Street must be greater or equal 0 a"
+                + "nd less or equal 1.", streetCounter);
+            assertThat(0 <= houseNumberCounter && houseNumberCounter <= 1, "Cardinality {} of HouseNumber must be great"
+                + "er or equal 0 and less or equal 1.", houseNumberCounter);
+            assertThat(0 <= zipCodeCounter && zipCodeCounter <= 1, "Cardinality {} of ZipCode must be greater or equal "
+                + "0 and less or equal 1.", zipCodeCounter);
+            assertThat(0 <= cityTownCounter && cityTownCounter <= 1, "Cardinality {} of CityTown must be greater or equ"
+                + "al 0 and less or equal 1.", cityTownCounter);
+            assertThat(0 <= countryCounter && countryCounter <= 1, "Cardinality {} of Country must be greater or equal "
+                + "0 and less or equal 1.", countryCounter);
             
             return super.build();
         }

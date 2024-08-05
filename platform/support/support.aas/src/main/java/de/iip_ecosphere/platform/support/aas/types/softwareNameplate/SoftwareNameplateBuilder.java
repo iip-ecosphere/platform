@@ -326,10 +326,11 @@ public class SoftwareNameplateBuilder extends DelegatingSubmodelBuilder {
     
     @Override
     public Submodel build() {
-        assertThat(0 <= softwareNameplate_TypeCounter && softwareNameplate_TypeCounter <= 1, "Cardinality of SoftwareNa"
-            + "meplate_Type must be greater or equal 0 and less or equal 1.");
-        assertThat(0 <= softwareNameplate_InstanceCounter && softwareNameplate_InstanceCounter <= 1, "Cardinality of So"
-            + "ftwareNameplate_Instance must be greater or equal 0 and less or equal 1.");
+        assertThat(0 <= softwareNameplate_TypeCounter && softwareNameplate_TypeCounter <= 1, "Cardinality {} of Softwar"
+            + "eNameplate_Type must be greater or equal 0 and less or equal 1.", softwareNameplate_TypeCounter);
+        assertThat(0 <= softwareNameplate_InstanceCounter && softwareNameplate_InstanceCounter <= 1, "Cardinality {} of"
+            + " SoftwareNameplate_Instance must be greater or equal 0 and less or equal 1.", 
+            softwareNameplate_InstanceCounter);
         
         return super.build();
     }
@@ -651,35 +652,40 @@ public class SoftwareNameplateBuilder extends DelegatingSubmodelBuilder {
         
         @Override
         public SubmodelElementCollection build() {
-            assertThat(uRIOfTheProductCounter == 1, "Cardinality of URIOfTheProduct must be equal 1.");
-            assertThat(manufacturerNameCounter == 1, "Cardinality of ManufacturerName must be equal 1.");
-            assertThat(manufacturerProductDesignationCounter == 1, "Cardinality of ManufacturerProductDesignation must "
-                + "be equal 1.");
+            assertThat(uRIOfTheProductCounter == 1, "Cardinality {} of URIOfTheProduct must be equal 1.",
+                uRIOfTheProductCounter);
+            assertThat(manufacturerNameCounter == 1, "Cardinality {} of ManufacturerName must be equal 1.",
+                manufacturerNameCounter);
+            assertThat(manufacturerProductDesignationCounter == 1, "Cardinality {} of ManufacturerProductDesignation mu"
+                + "st be equal 1.", manufacturerProductDesignationCounter);
             assertThat(0 <= manufacturerProductDescriptionCounter && manufacturerProductDescriptionCounter <= 1, 
-                "Cardinality of ManufacturerProductDescription must be greater or equal 0 and less or equal 1.");
-            assertThat(0 <= manufacturerProductFamilyCounter && manufacturerProductFamilyCounter <= 1, "Cardinality of "
-                + "ManufacturerProductFamily must be greater or equal 0 and less or equal 1.");
-            assertThat(0 <= manufacturerProductTypeCounter && manufacturerProductTypeCounter <= 1, "Cardinality of Manu"
-                + "facturerProductType must be greater or equal 0 and less or equal 1.");
-            assertThat(0 <= softwareTypeCounter && softwareTypeCounter <= 1, "Cardinality of SoftwareType must be great"
-                + "er or equal 0 and less or equal 1.");
-            assertThat(versionCounter == 1, "Cardinality of Version must be equal 1.");
-            assertThat(0 <= versionNameCounter && versionNameCounter <= 1, "Cardinality of VersionName must be greater "
-                + "or equal 0 and less or equal 1.");
-            assertThat(0 <= versionInfoCounter && versionInfoCounter <= 1, "Cardinality of VersionInfo must be greater "
-                + "or equal 0 and less or equal 1.");
-            assertThat(releaseDateCounter == 1, "Cardinality of ReleaseDate must be equal 1.");
-            assertThat(0 <= releaseNotesCounter && releaseNotesCounter <= 1, "Cardinality of ReleaseNotes must be great"
-                + "er or equal 0 and less or equal 1.");
-            assertThat(buildDateCounter == 1, "Cardinality of BuildDate must be equal 1.");
-            assertThat(0 <= installationURICounter && installationURICounter <= 1, "Cardinality of InstallationURI must"
-                + " be greater or equal 0 and less or equal 1.");
-            assertThat(0 <= installationFileCounter && installationFileCounter <= 1, "Cardinality of InstallationFile m"
-                + "ust be greater or equal 0 and less or equal 1.");
-            assertThat(0 <= installerTypeCounter && installerTypeCounter <= 1, "Cardinality of InstallerType must be gr"
-                + "eater or equal 0 and less or equal 1.");
-            assertThat(0 <= installationChecksumCounter && installationChecksumCounter <= 1, "Cardinality of Installati"
-                + "onChecksum must be greater or equal 0 and less or equal 1.");
+                "Cardinality {} of ManufacturerProductDescription must be greater or equal 0 and less or equal 1.",
+                manufacturerProductDescriptionCounter);
+            assertThat(0 <= manufacturerProductFamilyCounter && manufacturerProductFamilyCounter <= 1, "Cardinality {} "
+                + "of ManufacturerProductFamily must be greater or equal 0 and less or equal 1.", 
+                manufacturerProductFamilyCounter);
+            assertThat(0 <= manufacturerProductTypeCounter && manufacturerProductTypeCounter <= 1, "Cardinality {} of M"
+                + "anufacturerProductType must be greater or equal 0 and less or equal 1.", 
+                manufacturerProductTypeCounter);
+            assertThat(0 <= softwareTypeCounter && softwareTypeCounter <= 1, "Cardinality {} of SoftwareType must be gr"
+                + "eater or equal 0 and less or equal 1.", softwareTypeCounter);
+            assertThat(versionCounter == 1, "Cardinality {} of Version must be equal 1.", versionCounter);
+            assertThat(0 <= versionNameCounter && versionNameCounter <= 1, "Cardinality {} of VersionName must be great"
+                + "er or equal 0 and less or equal 1.", versionNameCounter);
+            assertThat(0 <= versionInfoCounter && versionInfoCounter <= 1, "Cardinality {} of VersionInfo must be great"
+                + "er or equal 0 and less or equal 1.", versionInfoCounter);
+            assertThat(releaseDateCounter == 1, "Cardinality {} of ReleaseDate must be equal 1.", releaseDateCounter);
+            assertThat(0 <= releaseNotesCounter && releaseNotesCounter <= 1, "Cardinality {} of ReleaseNotes must be gr"
+                + "eater or equal 0 and less or equal 1.", releaseNotesCounter);
+            assertThat(buildDateCounter == 1, "Cardinality {} of BuildDate must be equal 1.", buildDateCounter);
+            assertThat(0 <= installationURICounter && installationURICounter <= 1, "Cardinality {} of InstallationURI m"
+                + "ust be greater or equal 0 and less or equal 1.", installationURICounter);
+            assertThat(0 <= installationFileCounter && installationFileCounter <= 1, "Cardinality {} of InstallationFil"
+                + "e must be greater or equal 0 and less or equal 1.", installationFileCounter);
+            assertThat(0 <= installerTypeCounter && installerTypeCounter <= 1, "Cardinality {} of InstallerType must be"
+                + " greater or equal 0 and less or equal 1.", installerTypeCounter);
+            assertThat(0 <= installationChecksumCounter && installationChecksumCounter <= 1, "Cardinality {} of Install"
+                + "ationChecksum must be greater or equal 0 and less or equal 1.", installationChecksumCounter);
             
             return super.build();
         }
@@ -929,33 +935,35 @@ public class SoftwareNameplateBuilder extends DelegatingSubmodelBuilder {
         
         @Override
         public SubmodelElementCollection build() {
-            assertThat(0 <= serialNumberCounter && serialNumberCounter <= 1, "Cardinality of SerialNumber must be great"
-                + "er or equal 0 and less or equal 1.");
-            assertThat(0 <= instanceNameCounter && instanceNameCounter <= 1, "Cardinality of InstanceName must be great"
-                + "er or equal 0 and less or equal 1.");
-            assertThat(0 <= installedVersionCounter && installedVersionCounter <= 1, "Cardinality of InstalledVersion m"
-                + "ust be greater or equal 0 and less or equal 1.");
-            assertThat(0 <= installationDateCounter && installationDateCounter <= 1, "Cardinality of InstallationDate m"
-                + "ust be greater or equal 0 and less or equal 1.");
-            assertThat(0 <= installationPathCounter && installationPathCounter <= 1, "Cardinality of InstallationPath m"
-                + "ust be greater or equal 0 and less or equal 1.");
-            assertThat(0 <= installationSourceCounter && installationSourceCounter <= 1, "Cardinality of InstallationSo"
-                + "urce must be greater or equal 0 and less or equal 1.");
-            assertThat(0 <= installedOnArchitectureCounter && installedOnArchitectureCounter <= 1, "Cardinality of Inst"
-                + "alledOnArchitecture must be greater or equal 0 and less or equal 1.");
-            assertThat(0 <= installedOnOSCounter && installedOnOSCounter <= 1, "Cardinality of InstalledOnOS must be gr"
-                + "eater or equal 0 and less or equal 1.");
-            assertThat(0 <= installedOnHostCounter && installedOnHostCounter <= 1, "Cardinality of InstalledOnHost must"
-                + " be greater or equal 0 and less or equal 1.");
-            assertThat(0 <= installedModulesCounter && installedModulesCounter <= 1, "Cardinality of InstalledModules m"
-                + "ust be greater or equal 0 and less or equal 1.");
-            assertThat(0 <= configurationPathsCounter && configurationPathsCounter <= 1, "Cardinality of ConfigurationP"
-                + "aths must be greater or equal 0 and less or equal 1.");
-            assertThat(0 <= sLAInformationCounter && sLAInformationCounter <= 1, "Cardinality of SLAInformation must be"
-                + " greater or equal 0 and less or equal 1.");
-            assertThat(0 <= contactCounter && contactCounter <= 1, "Cardinality of Contact must be greater or equal 0 a"
-                + "nd less or equal 1.");
-            assertThat(0 <= inventoryTagCounter, "Cardinality of InventoryTag must be greater or equal 0.");
+            assertThat(0 <= serialNumberCounter && serialNumberCounter <= 1, "Cardinality {} of SerialNumber must be gr"
+                + "eater or equal 0 and less or equal 1.", serialNumberCounter);
+            assertThat(0 <= instanceNameCounter && instanceNameCounter <= 1, "Cardinality {} of InstanceName must be gr"
+                + "eater or equal 0 and less or equal 1.", instanceNameCounter);
+            assertThat(0 <= installedVersionCounter && installedVersionCounter <= 1, "Cardinality {} of InstalledVersio"
+                + "n must be greater or equal 0 and less or equal 1.", installedVersionCounter);
+            assertThat(0 <= installationDateCounter && installationDateCounter <= 1, "Cardinality {} of InstallationDat"
+                + "e must be greater or equal 0 and less or equal 1.", installationDateCounter);
+            assertThat(0 <= installationPathCounter && installationPathCounter <= 1, "Cardinality {} of InstallationPat"
+                + "h must be greater or equal 0 and less or equal 1.", installationPathCounter);
+            assertThat(0 <= installationSourceCounter && installationSourceCounter <= 1, "Cardinality {} of Installatio"
+                + "nSource must be greater or equal 0 and less or equal 1.", installationSourceCounter);
+            assertThat(0 <= installedOnArchitectureCounter && installedOnArchitectureCounter <= 1, "Cardinality {} of I"
+                + "nstalledOnArchitecture must be greater or equal 0 and less or equal 1.", 
+                installedOnArchitectureCounter);
+            assertThat(0 <= installedOnOSCounter && installedOnOSCounter <= 1, "Cardinality {} of InstalledOnOS must be"
+                + " greater or equal 0 and less or equal 1.", installedOnOSCounter);
+            assertThat(0 <= installedOnHostCounter && installedOnHostCounter <= 1, "Cardinality {} of InstalledOnHost m"
+                + "ust be greater or equal 0 and less or equal 1.", installedOnHostCounter);
+            assertThat(0 <= installedModulesCounter && installedModulesCounter <= 1, "Cardinality {} of InstalledModule"
+                + "s must be greater or equal 0 and less or equal 1.", installedModulesCounter);
+            assertThat(0 <= configurationPathsCounter && configurationPathsCounter <= 1, "Cardinality {} of Configurati"
+                + "onPaths must be greater or equal 0 and less or equal 1.", configurationPathsCounter);
+            assertThat(0 <= sLAInformationCounter && sLAInformationCounter <= 1, "Cardinality {} of SLAInformation must"
+                + " be greater or equal 0 and less or equal 1.", sLAInformationCounter);
+            assertThat(0 <= contactCounter && contactCounter <= 1, "Cardinality {} of Contact must be greater or equal "
+                + "0 and less or equal 1.", contactCounter);
+            assertThat(0 <= inventoryTagCounter, "Cardinality {} of InventoryTag must be greater or equal 0.",
+                inventoryTagCounter);
             
             return super.build();
         }
@@ -1010,7 +1018,8 @@ public class SoftwareNameplateBuilder extends DelegatingSubmodelBuilder {
         
         @Override
         public SubmodelElementCollection build() {
-            assertThat(1 <= installedModuleCounter, "Cardinality of InstalledModule must be greater or equal 1.");
+            assertThat(1 <= installedModuleCounter, "Cardinality {} of InstalledModule must be greater or equal 1.",
+                installedModuleCounter);
             
             return super.build();
         }
@@ -1060,7 +1069,8 @@ public class SoftwareNameplateBuilder extends DelegatingSubmodelBuilder {
         
         @Override
         public SubmodelElementCollection build() {
-            assertThat(1 <= configurationPathCounter, "Cardinality of ConfigurationPath must be greater or equal 1.");
+            assertThat(1 <= configurationPathCounter, "Cardinality {} of ConfigurationPath must be greater or equal 1.",
+                configurationPathCounter);
             
             return super.build();
         }
@@ -1131,9 +1141,10 @@ public class SoftwareNameplateBuilder extends DelegatingSubmodelBuilder {
         
         @Override
         public SubmodelElementCollection build() {
-            assertThat(configurationURICounter == 1, "Cardinality of ConfigurationURI must be equal 1.");
-            assertThat(0 <= configurationTypeCounter && configurationTypeCounter <= 1, "Cardinality of ConfigurationTyp"
-                + "e must be greater or equal 0 and less or equal 1.");
+            assertThat(configurationURICounter == 1, "Cardinality {} of ConfigurationURI must be equal 1.",
+                configurationURICounter);
+            assertThat(0 <= configurationTypeCounter && configurationTypeCounter <= 1, "Cardinality {} of Configuration"
+                + "Type must be greater or equal 0 and less or equal 1.", configurationTypeCounter);
             
             return super.build();
         }
@@ -1517,50 +1528,54 @@ public class SoftwareNameplateBuilder extends DelegatingSubmodelBuilder {
         
         @Override
         public SubmodelElementCollection build() {
-            assertThat(0 <= roleOfContactPersonCounter && roleOfContactPersonCounter <= 1, "Cardinality of RoleOfContac"
-                + "tPerson must be greater or equal 0 and less or equal 1.");
-            assertThat(0 <= nationalCodeCounter && nationalCodeCounter <= 1, "Cardinality of NationalCode must be great"
-                + "er or equal 0 and less or equal 1.");
-            assertThat(0 <= languageCounter, "Cardinality of Language must be greater or equal 0.");
-            assertThat(0 <= timeZoneCounter && timeZoneCounter <= 1, "Cardinality of TimeZone must be greater or equal "
-                + "0 and less or equal 1.");
-            assertThat(0 <= cityTownCounter && cityTownCounter <= 1, "Cardinality of CityTown must be greater or equal "
-                + "0 and less or equal 1.");
-            assertThat(0 <= companyCounter && companyCounter <= 1, "Cardinality of Company must be greater or equal 0 a"
-                + "nd less or equal 1.");
-            assertThat(0 <= departmentCounter && departmentCounter <= 1, "Cardinality of Department must be greater or "
-                + "equal 0 and less or equal 1.");
-            assertThat(0 <= phoneCounter && phoneCounter <= 1, "Cardinality of Phone must be greater or equal 0 and les"
-                + "s or equal 1.");
-            assertThat(0 <= faxCounter && faxCounter <= 1, "Cardinality of Fax must be greater or equal 0 and less or e"
-                + "qual 1.");
-            assertThat(0 <= emailCounter && emailCounter <= 1, "Cardinality of Email must be greater or equal 0 and les"
-                + "s or equal 1.");
-            assertThat(0 <= iPCommunicationCounter, "Cardinality of IPCommunication must be greater or equal 0.");
-            assertThat(0 <= streetCounter && streetCounter <= 1, "Cardinality of Street must be greater or equal 0 and "
-                + "less or equal 1.");
-            assertThat(0 <= zipcodeCounter && zipcodeCounter <= 1, "Cardinality of Zipcode must be greater or equal 0 a"
-                + "nd less or equal 1.");
-            assertThat(0 <= pOBoxCounter && pOBoxCounter <= 1, "Cardinality of POBox must be greater or equal 0 and les"
-                + "s or equal 1.");
-            assertThat(0 <= zipCodeOfPOBoxCounter && zipCodeOfPOBoxCounter <= 1, "Cardinality of ZipCodeOfPOBox must be"
-                + " greater or equal 0 and less or equal 1.");
-            assertThat(0 <= stateCountyCounter && stateCountyCounter <= 1, "Cardinality of StateCounty must be greater "
-                + "or equal 0 and less or equal 1.");
-            assertThat(0 <= nameOfContactCounter && nameOfContactCounter <= 1, "Cardinality of NameOfContact must be gr"
-                + "eater or equal 0 and less or equal 1.");
-            assertThat(0 <= firstNameCounter && firstNameCounter <= 1, "Cardinality of FirstName must be greater or equ"
-                + "al 0 and less or equal 1.");
-            assertThat(0 <= middleNamesCounter && middleNamesCounter <= 1, "Cardinality of MiddleNames must be greater "
-                + "or equal 0 and less or equal 1.");
-            assertThat(0 <= titleCounter && titleCounter <= 1, "Cardinality of Title must be greater or equal 0 and les"
-                + "s or equal 1.");
-            assertThat(0 <= academicTitleCounter && academicTitleCounter <= 1, "Cardinality of AcademicTitle must be gr"
-                + "eater or equal 0 and less or equal 1.");
-            assertThat(0 <= furtherDetailsOfContactCounter && furtherDetailsOfContactCounter <= 1, "Cardinality of Furt"
-                + "herDetailsOfContact must be greater or equal 0 and less or equal 1.");
-            assertThat(0 <= addressOfAdditionalLinkCounter && addressOfAdditionalLinkCounter <= 1, "Cardinality of Addr"
-                + "essOfAdditionalLink must be greater or equal 0 and less or equal 1.");
+            assertThat(0 <= roleOfContactPersonCounter && roleOfContactPersonCounter <= 1, "Cardinality {} of RoleOfCon"
+                + "tactPerson must be greater or equal 0 and less or equal 1.", roleOfContactPersonCounter);
+            assertThat(0 <= nationalCodeCounter && nationalCodeCounter <= 1, "Cardinality {} of NationalCode must be gr"
+                + "eater or equal 0 and less or equal 1.", nationalCodeCounter);
+            assertThat(0 <= languageCounter, "Cardinality {} of Language must be greater or equal 0.",
+                languageCounter);
+            assertThat(0 <= timeZoneCounter && timeZoneCounter <= 1, "Cardinality {} of TimeZone must be greater or equ"
+                + "al 0 and less or equal 1.", timeZoneCounter);
+            assertThat(0 <= cityTownCounter && cityTownCounter <= 1, "Cardinality {} of CityTown must be greater or equ"
+                + "al 0 and less or equal 1.", cityTownCounter);
+            assertThat(0 <= companyCounter && companyCounter <= 1, "Cardinality {} of Company must be greater or equal "
+                + "0 and less or equal 1.", companyCounter);
+            assertThat(0 <= departmentCounter && departmentCounter <= 1, "Cardinality {} of Department must be greater "
+                + "or equal 0 and less or equal 1.", departmentCounter);
+            assertThat(0 <= phoneCounter && phoneCounter <= 1, "Cardinality {} of Phone must be greater or equal 0 and "
+                + "less or equal 1.", phoneCounter);
+            assertThat(0 <= faxCounter && faxCounter <= 1, "Cardinality {} of Fax must be greater or equal 0 and less o"
+                + "r equal 1.", faxCounter);
+            assertThat(0 <= emailCounter && emailCounter <= 1, "Cardinality {} of Email must be greater or equal 0 and "
+                + "less or equal 1.", emailCounter);
+            assertThat(0 <= iPCommunicationCounter, "Cardinality {} of IPCommunication must be greater or equal 0.",
+                iPCommunicationCounter);
+            assertThat(0 <= streetCounter && streetCounter <= 1, "Cardinality {} of Street must be greater or equal 0 a"
+                + "nd less or equal 1.", streetCounter);
+            assertThat(0 <= zipcodeCounter && zipcodeCounter <= 1, "Cardinality {} of Zipcode must be greater or equal "
+                + "0 and less or equal 1.", zipcodeCounter);
+            assertThat(0 <= pOBoxCounter && pOBoxCounter <= 1, "Cardinality {} of POBox must be greater or equal 0 and "
+                + "less or equal 1.", pOBoxCounter);
+            assertThat(0 <= zipCodeOfPOBoxCounter && zipCodeOfPOBoxCounter <= 1, "Cardinality {} of ZipCodeOfPOBox must"
+                + " be greater or equal 0 and less or equal 1.", zipCodeOfPOBoxCounter);
+            assertThat(0 <= stateCountyCounter && stateCountyCounter <= 1, "Cardinality {} of StateCounty must be great"
+                + "er or equal 0 and less or equal 1.", stateCountyCounter);
+            assertThat(0 <= nameOfContactCounter && nameOfContactCounter <= 1, "Cardinality {} of NameOfContact must be"
+                + " greater or equal 0 and less or equal 1.", nameOfContactCounter);
+            assertThat(0 <= firstNameCounter && firstNameCounter <= 1, "Cardinality {} of FirstName must be greater or "
+                + "equal 0 and less or equal 1.", firstNameCounter);
+            assertThat(0 <= middleNamesCounter && middleNamesCounter <= 1, "Cardinality {} of MiddleNames must be great"
+                + "er or equal 0 and less or equal 1.", middleNamesCounter);
+            assertThat(0 <= titleCounter && titleCounter <= 1, "Cardinality {} of Title must be greater or equal 0 and "
+                + "less or equal 1.", titleCounter);
+            assertThat(0 <= academicTitleCounter && academicTitleCounter <= 1, "Cardinality {} of AcademicTitle must be"
+                + " greater or equal 0 and less or equal 1.", academicTitleCounter);
+            assertThat(0 <= furtherDetailsOfContactCounter && furtherDetailsOfContactCounter <= 1, "Cardinality {} of F"
+                + "urtherDetailsOfContact must be greater or equal 0 and less or equal 1.", 
+                furtherDetailsOfContactCounter);
+            assertThat(0 <= addressOfAdditionalLinkCounter && addressOfAdditionalLinkCounter <= 1, "Cardinality {} of A"
+                + "ddressOfAdditionalLink must be greater or equal 0 and less or equal 1.", 
+                addressOfAdditionalLinkCounter);
             
             return super.build();
         }
@@ -1646,11 +1661,12 @@ public class SoftwareNameplateBuilder extends DelegatingSubmodelBuilder {
         
         @Override
         public SubmodelElementCollection build() {
-            assertThat(telephoneNumberCounter == 1, "Cardinality of TelephoneNumber must be equal 1.");
-            assertThat(0 <= typeOfTelephoneCounter && typeOfTelephoneCounter <= 1, "Cardinality of TypeOfTelephone must"
-                + " be greater or equal 0 and less or equal 1.");
-            assertThat(0 <= availableTimeCounter && availableTimeCounter <= 1, "Cardinality of AvailableTime must be gr"
-                + "eater or equal 0 and less or equal 1.");
+            assertThat(telephoneNumberCounter == 1, "Cardinality {} of TelephoneNumber must be equal 1.",
+                telephoneNumberCounter);
+            assertThat(0 <= typeOfTelephoneCounter && typeOfTelephoneCounter <= 1, "Cardinality {} of TypeOfTelephone m"
+                + "ust be greater or equal 0 and less or equal 1.", typeOfTelephoneCounter);
+            assertThat(0 <= availableTimeCounter && availableTimeCounter <= 1, "Cardinality {} of AvailableTime must be"
+                + " greater or equal 0 and less or equal 1.", availableTimeCounter);
             
             return super.build();
         }
@@ -1717,9 +1733,9 @@ public class SoftwareNameplateBuilder extends DelegatingSubmodelBuilder {
         
         @Override
         public SubmodelElementCollection build() {
-            assertThat(faxNumberCounter == 1, "Cardinality of FaxNumber must be equal 1.");
-            assertThat(0 <= typeOfFaxNumberCounter && typeOfFaxNumberCounter <= 1, "Cardinality of TypeOfFaxNumber must"
-                + " be greater or equal 0 and less or equal 1.");
+            assertThat(faxNumberCounter == 1, "Cardinality {} of FaxNumber must be equal 1.", faxNumberCounter);
+            assertThat(0 <= typeOfFaxNumberCounter && typeOfFaxNumberCounter <= 1, "Cardinality {} of TypeOfFaxNumber m"
+                + "ust be greater or equal 0 and less or equal 1.", typeOfFaxNumberCounter);
             
             return super.build();
         }
@@ -1817,13 +1833,14 @@ public class SoftwareNameplateBuilder extends DelegatingSubmodelBuilder {
         
         @Override
         public SubmodelElementCollection build() {
-            assertThat(emailAddressCounter == 1, "Cardinality of EmailAddress must be equal 1.");
-            assertThat(0 <= publicKeyCounter && publicKeyCounter <= 1, "Cardinality of PublicKey must be greater or equ"
-                + "al 0 and less or equal 1.");
-            assertThat(0 <= typeOfEmailAddressCounter && typeOfEmailAddressCounter <= 1, "Cardinality of TypeOfEmailAdd"
-                + "ress must be greater or equal 0 and less or equal 1.");
-            assertThat(0 <= typeOfPublicKeyCounter && typeOfPublicKeyCounter <= 1, "Cardinality of TypeOfPublicKey must"
-                + " be greater or equal 0 and less or equal 1.");
+            assertThat(emailAddressCounter == 1, "Cardinality {} of EmailAddress must be equal 1.",
+                emailAddressCounter);
+            assertThat(0 <= publicKeyCounter && publicKeyCounter <= 1, "Cardinality {} of PublicKey must be greater or "
+                + "equal 0 and less or equal 1.", publicKeyCounter);
+            assertThat(0 <= typeOfEmailAddressCounter && typeOfEmailAddressCounter <= 1, "Cardinality {} of TypeOfEmail"
+                + "Address must be greater or equal 0 and less or equal 1.", typeOfEmailAddressCounter);
+            assertThat(0 <= typeOfPublicKeyCounter && typeOfPublicKeyCounter <= 1, "Cardinality {} of TypeOfPublicKey m"
+                + "ust be greater or equal 0 and less or equal 1.", typeOfPublicKeyCounter);
             
             return super.build();
         }
@@ -1910,11 +1927,12 @@ public class SoftwareNameplateBuilder extends DelegatingSubmodelBuilder {
         
         @Override
         public SubmodelElementCollection build() {
-            assertThat(addressOfAdditionalLinkCounter == 1, "Cardinality of AddressOfAdditionalLink must be equal 1.");
-            assertThat(0 <= typeOfCommunicationCounter && typeOfCommunicationCounter <= 1, "Cardinality of TypeOfCommun"
-                + "ication must be greater or equal 0 and less or equal 1.");
-            assertThat(0 <= availableTimeCounter && availableTimeCounter <= 1, "Cardinality of AvailableTime must be gr"
-                + "eater or equal 0 and less or equal 1.");
+            assertThat(addressOfAdditionalLinkCounter == 1, "Cardinality {} of AddressOfAdditionalLink must be equal 1."
+                + "", addressOfAdditionalLinkCounter);
+            assertThat(0 <= typeOfCommunicationCounter && typeOfCommunicationCounter <= 1, "Cardinality {} of TypeOfCom"
+                + "munication must be greater or equal 0 and less or equal 1.", typeOfCommunicationCounter);
+            assertThat(0 <= availableTimeCounter && availableTimeCounter <= 1, "Cardinality {} of AvailableTime must be"
+                + " greater or equal 0 and less or equal 1.", availableTimeCounter);
             
             return super.build();
         }

@@ -97,12 +97,14 @@ public class TechnicalDataBuilder extends DelegatingSubmodelBuilder {
     
     @Override
     public Submodel build() {
-        assertThat(generalInformationCounter == 1, "Cardinality of GeneralInformation must be equal 1.");
-        assertThat(0 <= productClassificationsCounter && productClassificationsCounter <= 1, "Cardinality of ProductCla"
-            + "ssifications must be greater or equal 0 and less or equal 1.");
-        assertThat(technicalPropertiesCounter == 1, "Cardinality of TechnicalProperties must be equal 1.");
-        assertThat(0 <= furtherInformationCounter && furtherInformationCounter <= 1, "Cardinality of FurtherInformation"
-            + " must be greater or equal 0 and less or equal 1.");
+        assertThat(generalInformationCounter == 1, "Cardinality {} of GeneralInformation must be equal 1.",
+            generalInformationCounter);
+        assertThat(0 <= productClassificationsCounter && productClassificationsCounter <= 1, "Cardinality {} of Product"
+            + "Classifications must be greater or equal 0 and less or equal 1.", productClassificationsCounter);
+        assertThat(technicalPropertiesCounter == 1, "Cardinality {} of TechnicalProperties must be equal 1.",
+            technicalPropertiesCounter);
+        assertThat(0 <= furtherInformationCounter && furtherInformationCounter <= 1, "Cardinality {} of FurtherInformat"
+            + "ion must be greater or equal 0 and less or equal 1.", furtherInformationCounter);
         
         return super.build();
     }
@@ -236,15 +238,18 @@ public class TechnicalDataBuilder extends DelegatingSubmodelBuilder {
         
         @Override
         public SubmodelElementCollection build() {
-            assertThat(manufacturerNameCounter == 1, "Cardinality of ManufacturerName must be equal 1.");
-            assertThat(0 <= manufacturerLogoCounter && manufacturerLogoCounter <= 1, "Cardinality of ManufacturerLogo m"
-                + "ust be greater or equal 0 and less or equal 1.");
-            assertThat(manufacturerProductDesignationCounter == 1, "Cardinality of ManufacturerProductDesignation must "
-                + "be equal 1.");
-            assertThat(manufacturerArticleNumberCounter == 1, "Cardinality of ManufacturerArticleNumber must be equal 1"
-                + ".");
-            assertThat(manufacturerOrderCodeCounter == 1, "Cardinality of ManufacturerOrderCode must be equal 1.");
-            assertThat(0 <= productImageCounter, "Cardinality of ProductImage must be greater or equal 0.");
+            assertThat(manufacturerNameCounter == 1, "Cardinality {} of ManufacturerName must be equal 1.",
+                manufacturerNameCounter);
+            assertThat(0 <= manufacturerLogoCounter && manufacturerLogoCounter <= 1, "Cardinality {} of ManufacturerLog"
+                + "o must be greater or equal 0 and less or equal 1.", manufacturerLogoCounter);
+            assertThat(manufacturerProductDesignationCounter == 1, "Cardinality {} of ManufacturerProductDesignation mu"
+                + "st be equal 1.", manufacturerProductDesignationCounter);
+            assertThat(manufacturerArticleNumberCounter == 1, "Cardinality {} of ManufacturerArticleNumber must be equa"
+                + "l 1.", manufacturerArticleNumberCounter);
+            assertThat(manufacturerOrderCodeCounter == 1, "Cardinality {} of ManufacturerOrderCode must be equal 1.",
+                manufacturerOrderCodeCounter);
+            assertThat(0 <= productImageCounter, "Cardinality {} of ProductImage must be greater or equal 0.",
+                productImageCounter);
             
             return super.build();
         }
@@ -293,8 +298,8 @@ public class TechnicalDataBuilder extends DelegatingSubmodelBuilder {
         
         @Override
         public SubmodelElementCollection build() {
-            assertThat(0 <= productClassificationItemCounter, "Cardinality of ProductClassificationItem must be greater"
-                + " or equal 0.");
+            assertThat(0 <= productClassificationItemCounter, "Cardinality {} of ProductClassificationItem must be grea"
+                + "ter or equal 0.", productClassificationItemCounter);
             
             return super.build();
         }
@@ -379,11 +384,13 @@ public class TechnicalDataBuilder extends DelegatingSubmodelBuilder {
         
         @Override
         public SubmodelElementCollection build() {
-            assertThat(productClassificationSystemCounter == 1, "Cardinality of ProductClassificationSystem must be equ"
-                + "al 1.");
+            assertThat(productClassificationSystemCounter == 1, "Cardinality {} of ProductClassificationSystem must be "
+                + "equal 1.", productClassificationSystemCounter);
             assertThat(0 <= classificationSystemVersionCounter && classificationSystemVersionCounter <= 1, 
-                "Cardinality of ClassificationSystemVersion must be greater or equal 0 and less or equal 1.");
-            assertThat(productClassIdCounter == 1, "Cardinality of ProductClassId must be equal 1.");
+                "Cardinality {} of ClassificationSystemVersion must be greater or equal 0 and less or equal 1.",
+                classificationSystemVersionCounter);
+            assertThat(productClassIdCounter == 1, "Cardinality {} of ProductClassId must be equal 1.",
+                productClassIdCounter);
             
             return super.build();
         }
@@ -466,9 +473,12 @@ public class TechnicalDataBuilder extends DelegatingSubmodelBuilder {
         
         @Override
         public SubmodelElementCollection build() {
-            assertThat(0 <= arbitraryCounter, "Cardinality of arbitrary must be greater or equal 0.");
-            assertThat(0 <= mainSectionCounter, "Cardinality of MainSection must be greater or equal 0.");
-            assertThat(0 <= subSectionCounter, "Cardinality of SubSection must be greater or equal 0.");
+            assertThat(0 <= arbitraryCounter, "Cardinality {} of arbitrary must be greater or equal 0.",
+                arbitraryCounter);
+            assertThat(0 <= mainSectionCounter, "Cardinality {} of MainSection must be greater or equal 0.",
+                mainSectionCounter);
+            assertThat(0 <= subSectionCounter, "Cardinality {} of SubSection must be greater or equal 0.",
+                subSectionCounter);
             
             return super.build();
         }
@@ -536,8 +546,9 @@ public class TechnicalDataBuilder extends DelegatingSubmodelBuilder {
         
         @Override
         public SubmodelElementCollection build() {
-            assertThat(0 <= textStatementCounter, "Cardinality of TextStatement must be greater or equal 0.");
-            assertThat(validDateCounter == 1, "Cardinality of ValidDate must be equal 1.");
+            assertThat(0 <= textStatementCounter, "Cardinality {} of TextStatement must be greater or equal 0.",
+                textStatementCounter);
+            assertThat(validDateCounter == 1, "Cardinality {} of ValidDate must be equal 1.", validDateCounter);
             
             return super.build();
         }

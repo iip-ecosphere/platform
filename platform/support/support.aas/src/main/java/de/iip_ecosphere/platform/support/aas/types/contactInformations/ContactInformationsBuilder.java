@@ -310,7 +310,8 @@ public class ContactInformationsBuilder extends DelegatingSubmodelBuilder {
     
     @Override
     public Submodel build() {
-        assertThat(1 <= contactInformationCounter, "Cardinality of ContactInformation must be greater or equal 1.");
+        assertThat(1 <= contactInformationCounter, "Cardinality {} of ContactInformation must be greater or equal 1.",
+            contactInformationCounter);
         
         return super.build();
     }
@@ -693,50 +694,54 @@ public class ContactInformationsBuilder extends DelegatingSubmodelBuilder {
         
         @Override
         public SubmodelElementCollection build() {
-            assertThat(0 <= roleOfContactPersonCounter && roleOfContactPersonCounter <= 1, "Cardinality of RoleOfContac"
-                + "tPerson must be greater or equal 0 and less or equal 1.");
-            assertThat(0 <= nationalCodeCounter && nationalCodeCounter <= 1, "Cardinality of NationalCode must be great"
-                + "er or equal 0 and less or equal 1.");
-            assertThat(0 <= languageCounter, "Cardinality of Language must be greater or equal 0.");
-            assertThat(0 <= timeZoneCounter && timeZoneCounter <= 1, "Cardinality of TimeZone must be greater or equal "
-                + "0 and less or equal 1.");
-            assertThat(0 <= cityTownCounter && cityTownCounter <= 1, "Cardinality of CityTown must be greater or equal "
-                + "0 and less or equal 1.");
-            assertThat(0 <= companyCounter && companyCounter <= 1, "Cardinality of Company must be greater or equal 0 a"
-                + "nd less or equal 1.");
-            assertThat(0 <= departmentCounter && departmentCounter <= 1, "Cardinality of Department must be greater or "
-                + "equal 0 and less or equal 1.");
-            assertThat(0 <= phoneCounter && phoneCounter <= 1, "Cardinality of Phone must be greater or equal 0 and les"
-                + "s or equal 1.");
-            assertThat(0 <= faxCounter && faxCounter <= 1, "Cardinality of Fax must be greater or equal 0 and less or e"
-                + "qual 1.");
-            assertThat(0 <= emailCounter && emailCounter <= 1, "Cardinality of Email must be greater or equal 0 and les"
-                + "s or equal 1.");
-            assertThat(0 <= iPCommunicationCounter, "Cardinality of IPCommunication must be greater or equal 0.");
-            assertThat(0 <= streetCounter && streetCounter <= 1, "Cardinality of Street must be greater or equal 0 and "
-                + "less or equal 1.");
-            assertThat(0 <= zipcodeCounter && zipcodeCounter <= 1, "Cardinality of Zipcode must be greater or equal 0 a"
-                + "nd less or equal 1.");
-            assertThat(0 <= pOBoxCounter && pOBoxCounter <= 1, "Cardinality of POBox must be greater or equal 0 and les"
-                + "s or equal 1.");
-            assertThat(0 <= zipCodeOfPOBoxCounter && zipCodeOfPOBoxCounter <= 1, "Cardinality of ZipCodeOfPOBox must be"
-                + " greater or equal 0 and less or equal 1.");
-            assertThat(0 <= stateCountyCounter && stateCountyCounter <= 1, "Cardinality of StateCounty must be greater "
-                + "or equal 0 and less or equal 1.");
-            assertThat(0 <= nameOfContactCounter && nameOfContactCounter <= 1, "Cardinality of NameOfContact must be gr"
-                + "eater or equal 0 and less or equal 1.");
-            assertThat(0 <= firstNameCounter && firstNameCounter <= 1, "Cardinality of FirstName must be greater or equ"
-                + "al 0 and less or equal 1.");
-            assertThat(0 <= middleNamesCounter && middleNamesCounter <= 1, "Cardinality of MiddleNames must be greater "
-                + "or equal 0 and less or equal 1.");
-            assertThat(0 <= titleCounter && titleCounter <= 1, "Cardinality of Title must be greater or equal 0 and les"
-                + "s or equal 1.");
-            assertThat(0 <= academicTitleCounter && academicTitleCounter <= 1, "Cardinality of AcademicTitle must be gr"
-                + "eater or equal 0 and less or equal 1.");
-            assertThat(0 <= furtherDetailsOfContactCounter && furtherDetailsOfContactCounter <= 1, "Cardinality of Furt"
-                + "herDetailsOfContact must be greater or equal 0 and less or equal 1.");
-            assertThat(0 <= addressOfAdditionalLinkCounter && addressOfAdditionalLinkCounter <= 1, "Cardinality of Addr"
-                + "essOfAdditionalLink must be greater or equal 0 and less or equal 1.");
+            assertThat(0 <= roleOfContactPersonCounter && roleOfContactPersonCounter <= 1, "Cardinality {} of RoleOfCon"
+                + "tactPerson must be greater or equal 0 and less or equal 1.", roleOfContactPersonCounter);
+            assertThat(0 <= nationalCodeCounter && nationalCodeCounter <= 1, "Cardinality {} of NationalCode must be gr"
+                + "eater or equal 0 and less or equal 1.", nationalCodeCounter);
+            assertThat(0 <= languageCounter, "Cardinality {} of Language must be greater or equal 0.",
+                languageCounter);
+            assertThat(0 <= timeZoneCounter && timeZoneCounter <= 1, "Cardinality {} of TimeZone must be greater or equ"
+                + "al 0 and less or equal 1.", timeZoneCounter);
+            assertThat(0 <= cityTownCounter && cityTownCounter <= 1, "Cardinality {} of CityTown must be greater or equ"
+                + "al 0 and less or equal 1.", cityTownCounter);
+            assertThat(0 <= companyCounter && companyCounter <= 1, "Cardinality {} of Company must be greater or equal "
+                + "0 and less or equal 1.", companyCounter);
+            assertThat(0 <= departmentCounter && departmentCounter <= 1, "Cardinality {} of Department must be greater "
+                + "or equal 0 and less or equal 1.", departmentCounter);
+            assertThat(0 <= phoneCounter && phoneCounter <= 1, "Cardinality {} of Phone must be greater or equal 0 and "
+                + "less or equal 1.", phoneCounter);
+            assertThat(0 <= faxCounter && faxCounter <= 1, "Cardinality {} of Fax must be greater or equal 0 and less o"
+                + "r equal 1.", faxCounter);
+            assertThat(0 <= emailCounter && emailCounter <= 1, "Cardinality {} of Email must be greater or equal 0 and "
+                + "less or equal 1.", emailCounter);
+            assertThat(0 <= iPCommunicationCounter, "Cardinality {} of IPCommunication must be greater or equal 0.",
+                iPCommunicationCounter);
+            assertThat(0 <= streetCounter && streetCounter <= 1, "Cardinality {} of Street must be greater or equal 0 a"
+                + "nd less or equal 1.", streetCounter);
+            assertThat(0 <= zipcodeCounter && zipcodeCounter <= 1, "Cardinality {} of Zipcode must be greater or equal "
+                + "0 and less or equal 1.", zipcodeCounter);
+            assertThat(0 <= pOBoxCounter && pOBoxCounter <= 1, "Cardinality {} of POBox must be greater or equal 0 and "
+                + "less or equal 1.", pOBoxCounter);
+            assertThat(0 <= zipCodeOfPOBoxCounter && zipCodeOfPOBoxCounter <= 1, "Cardinality {} of ZipCodeOfPOBox must"
+                + " be greater or equal 0 and less or equal 1.", zipCodeOfPOBoxCounter);
+            assertThat(0 <= stateCountyCounter && stateCountyCounter <= 1, "Cardinality {} of StateCounty must be great"
+                + "er or equal 0 and less or equal 1.", stateCountyCounter);
+            assertThat(0 <= nameOfContactCounter && nameOfContactCounter <= 1, "Cardinality {} of NameOfContact must be"
+                + " greater or equal 0 and less or equal 1.", nameOfContactCounter);
+            assertThat(0 <= firstNameCounter && firstNameCounter <= 1, "Cardinality {} of FirstName must be greater or "
+                + "equal 0 and less or equal 1.", firstNameCounter);
+            assertThat(0 <= middleNamesCounter && middleNamesCounter <= 1, "Cardinality {} of MiddleNames must be great"
+                + "er or equal 0 and less or equal 1.", middleNamesCounter);
+            assertThat(0 <= titleCounter && titleCounter <= 1, "Cardinality {} of Title must be greater or equal 0 and "
+                + "less or equal 1.", titleCounter);
+            assertThat(0 <= academicTitleCounter && academicTitleCounter <= 1, "Cardinality {} of AcademicTitle must be"
+                + " greater or equal 0 and less or equal 1.", academicTitleCounter);
+            assertThat(0 <= furtherDetailsOfContactCounter && furtherDetailsOfContactCounter <= 1, "Cardinality {} of F"
+                + "urtherDetailsOfContact must be greater or equal 0 and less or equal 1.", 
+                furtherDetailsOfContactCounter);
+            assertThat(0 <= addressOfAdditionalLinkCounter && addressOfAdditionalLinkCounter <= 1, "Cardinality {} of A"
+                + "ddressOfAdditionalLink must be greater or equal 0 and less or equal 1.", 
+                addressOfAdditionalLinkCounter);
             
             return super.build();
         }
@@ -822,11 +827,12 @@ public class ContactInformationsBuilder extends DelegatingSubmodelBuilder {
         
         @Override
         public SubmodelElementCollection build() {
-            assertThat(telephoneNumberCounter == 1, "Cardinality of TelephoneNumber must be equal 1.");
-            assertThat(0 <= typeOfTelephoneCounter && typeOfTelephoneCounter <= 1, "Cardinality of TypeOfTelephone must"
-                + " be greater or equal 0 and less or equal 1.");
-            assertThat(0 <= availableTimeCounter && availableTimeCounter <= 1, "Cardinality of AvailableTime must be gr"
-                + "eater or equal 0 and less or equal 1.");
+            assertThat(telephoneNumberCounter == 1, "Cardinality {} of TelephoneNumber must be equal 1.",
+                telephoneNumberCounter);
+            assertThat(0 <= typeOfTelephoneCounter && typeOfTelephoneCounter <= 1, "Cardinality {} of TypeOfTelephone m"
+                + "ust be greater or equal 0 and less or equal 1.", typeOfTelephoneCounter);
+            assertThat(0 <= availableTimeCounter && availableTimeCounter <= 1, "Cardinality {} of AvailableTime must be"
+                + " greater or equal 0 and less or equal 1.", availableTimeCounter);
             
             return super.build();
         }
@@ -893,9 +899,9 @@ public class ContactInformationsBuilder extends DelegatingSubmodelBuilder {
         
         @Override
         public SubmodelElementCollection build() {
-            assertThat(faxNumberCounter == 1, "Cardinality of FaxNumber must be equal 1.");
-            assertThat(0 <= typeOfFaxNumberCounter && typeOfFaxNumberCounter <= 1, "Cardinality of TypeOfFaxNumber must"
-                + " be greater or equal 0 and less or equal 1.");
+            assertThat(faxNumberCounter == 1, "Cardinality {} of FaxNumber must be equal 1.", faxNumberCounter);
+            assertThat(0 <= typeOfFaxNumberCounter && typeOfFaxNumberCounter <= 1, "Cardinality {} of TypeOfFaxNumber m"
+                + "ust be greater or equal 0 and less or equal 1.", typeOfFaxNumberCounter);
             
             return super.build();
         }
@@ -993,13 +999,14 @@ public class ContactInformationsBuilder extends DelegatingSubmodelBuilder {
         
         @Override
         public SubmodelElementCollection build() {
-            assertThat(emailAddressCounter == 1, "Cardinality of EmailAddress must be equal 1.");
-            assertThat(0 <= publicKeyCounter && publicKeyCounter <= 1, "Cardinality of PublicKey must be greater or equ"
-                + "al 0 and less or equal 1.");
-            assertThat(0 <= typeOfEmailAddressCounter && typeOfEmailAddressCounter <= 1, "Cardinality of TypeOfEmailAdd"
-                + "ress must be greater or equal 0 and less or equal 1.");
-            assertThat(0 <= typeOfPublicKeyCounter && typeOfPublicKeyCounter <= 1, "Cardinality of TypeOfPublicKey must"
-                + " be greater or equal 0 and less or equal 1.");
+            assertThat(emailAddressCounter == 1, "Cardinality {} of EmailAddress must be equal 1.",
+                emailAddressCounter);
+            assertThat(0 <= publicKeyCounter && publicKeyCounter <= 1, "Cardinality {} of PublicKey must be greater or "
+                + "equal 0 and less or equal 1.", publicKeyCounter);
+            assertThat(0 <= typeOfEmailAddressCounter && typeOfEmailAddressCounter <= 1, "Cardinality {} of TypeOfEmail"
+                + "Address must be greater or equal 0 and less or equal 1.", typeOfEmailAddressCounter);
+            assertThat(0 <= typeOfPublicKeyCounter && typeOfPublicKeyCounter <= 1, "Cardinality {} of TypeOfPublicKey m"
+                + "ust be greater or equal 0 and less or equal 1.", typeOfPublicKeyCounter);
             
             return super.build();
         }
@@ -1086,11 +1093,12 @@ public class ContactInformationsBuilder extends DelegatingSubmodelBuilder {
         
         @Override
         public SubmodelElementCollection build() {
-            assertThat(addressOfAdditionalLinkCounter == 1, "Cardinality of AddressOfAdditionalLink must be equal 1.");
-            assertThat(0 <= typeOfCommunicationCounter && typeOfCommunicationCounter <= 1, "Cardinality of TypeOfCommun"
-                + "ication must be greater or equal 0 and less or equal 1.");
-            assertThat(0 <= availableTimeCounter && availableTimeCounter <= 1, "Cardinality of AvailableTime must be gr"
-                + "eater or equal 0 and less or equal 1.");
+            assertThat(addressOfAdditionalLinkCounter == 1, "Cardinality {} of AddressOfAdditionalLink must be equal 1."
+                + "", addressOfAdditionalLinkCounter);
+            assertThat(0 <= typeOfCommunicationCounter && typeOfCommunicationCounter <= 1, "Cardinality {} of TypeOfCom"
+                + "munication must be greater or equal 0 and less or equal 1.", typeOfCommunicationCounter);
+            assertThat(0 <= availableTimeCounter && availableTimeCounter <= 1, "Cardinality {} of AvailableTime must be"
+                + " greater or equal 0 and less or equal 1.", availableTimeCounter);
             
             return super.build();
         }

@@ -136,8 +136,8 @@ public class HierarchicalStructuresBuilder extends DelegatingSubmodelBuilder {
     
     @Override
     public Submodel build() {
-        assertThat(entryNodeCounter == 1, "Cardinality of EntryNode must be equal 1.");
-        assertThat(archeTypeCounter == 1, "Cardinality of ArcheType must be equal 1.");
+        assertThat(entryNodeCounter == 1, "Cardinality {} of EntryNode must be equal 1.", entryNodeCounter);
+        assertThat(archeTypeCounter == 1, "Cardinality {} of ArcheType must be equal 1.", archeTypeCounter);
         
         return super.build();
     }
@@ -230,10 +230,11 @@ public class HierarchicalStructuresBuilder extends DelegatingSubmodelBuilder {
         
         @Override
         public Entity build() {
-            assertThat(1 <= nodeCounter, "Cardinality of Node must be greater or equal 1.");
-            assertThat(0 <= sameAsCounter, "Cardinality of SameAs must be greater or equal 0.");
-            assertThat(0 <= isPartOfCounter, "Cardinality of IsPartOf must be greater or equal 0.");
-            assertThat(0 <= hasPartCounter, "Cardinality of HasPart must be greater or equal 0.");
+            assertThat(1 <= nodeCounter, "Cardinality {} of Node must be greater or equal 1.", nodeCounter);
+            assertThat(0 <= sameAsCounter, "Cardinality {} of SameAs must be greater or equal 0.", sameAsCounter);
+            assertThat(0 <= isPartOfCounter, "Cardinality {} of IsPartOf must be greater or equal 0.",
+                isPartOfCounter);
+            assertThat(0 <= hasPartCounter, "Cardinality {} of HasPart must be greater or equal 0.", hasPartCounter);
             
             return super.build();
         }
@@ -347,12 +348,13 @@ public class HierarchicalStructuresBuilder extends DelegatingSubmodelBuilder {
         
         @Override
         public Entity build() {
-            assertThat(0 <= nodeCounter, "Cardinality of Node must be greater or equal 0.");
-            assertThat(0 <= sameAsCounter, "Cardinality of SameAs must be greater or equal 0.");
-            assertThat(0 <= isPartOfCounter, "Cardinality of IsPartOf must be greater or equal 0.");
-            assertThat(0 <= hasPartCounter, "Cardinality of HasPart must be greater or equal 0.");
-            assertThat(0 <= bulkCountCounter && bulkCountCounter <= 1, "Cardinality of BulkCount must be greater or equ"
-                + "al 0 and less or equal 1.");
+            assertThat(0 <= nodeCounter, "Cardinality {} of Node must be greater or equal 0.", nodeCounter);
+            assertThat(0 <= sameAsCounter, "Cardinality {} of SameAs must be greater or equal 0.", sameAsCounter);
+            assertThat(0 <= isPartOfCounter, "Cardinality {} of IsPartOf must be greater or equal 0.",
+                isPartOfCounter);
+            assertThat(0 <= hasPartCounter, "Cardinality {} of HasPart must be greater or equal 0.", hasPartCounter);
+            assertThat(0 <= bulkCountCounter && bulkCountCounter <= 1, "Cardinality {} of BulkCount must be greater or "
+                + "equal 0 and less or equal 1.", bulkCountCounter);
             
             return super.build();
         }
