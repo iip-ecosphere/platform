@@ -390,7 +390,7 @@ project IDTA_02017_AssetInterfacesDescription {
         displayName = "{property_name}",
         semanticId = "iri:https://www.w3.org/2019/wot/json-schema#propertyName",
         isGeneric = true,
-        type = refBy(Generic__property_name__2),
+        type = refBy(Generic__no_idShort__3),
         minimumInstances = 1,
         examples = {"? [idShort] timestemp","[idShort] temperature"},
         description = "Defines a data element within an object-based datapoint."
@@ -717,11 +717,12 @@ project IDTA_02017_AssetInterfacesDescription {
     }
   };
 
-  AasSubmodelElementCollectionType NoIdShort_0 = {
-    name = "<NoIdShort>",
+  AasSubmodelElementCollectionType Generic__no_idShort__3 = {
+    name = "<no_idShort>_3",
     semanticId = "iri:https://www.w3.org/2011/http#headers",
     description = "This SMC holds the information for http message header definition as a SMC.",
     versionIdentifier = "IDTA 02017-1-0",
+    isGeneric = true,
     fields = {
       AasField {
         name = "htv_fieldName",

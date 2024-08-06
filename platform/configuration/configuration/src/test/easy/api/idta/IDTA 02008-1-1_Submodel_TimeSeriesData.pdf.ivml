@@ -10,6 +10,7 @@ project IDTA_02008_TimeSeries {
     name = "State",
     description = "State of the time series related to its progress.",
     versionIdentifier = "IDTA 02008-1-1",
+    semanticId = "iri:https://admin-shell.io/idta/TimeSeries/Segment/State/1/1",
     literals = {
       AasEnumLiteral {
         name = "in progress",

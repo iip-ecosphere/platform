@@ -13,6 +13,7 @@
 package de.iip_ecosphere.platform.configuration.aas;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -125,6 +126,67 @@ public abstract class SemanticIdRecognizer {
             }
         }
         return result;
+    }
+    
+    /**
+     * Tries to find a semantic id within {@code value} whereby value my be postfixed with/out (again) 
+     * {@code separator}. Ignores leading IRI/IDRI identification in brackets.
+     *  
+     * @param value the value to try
+     * @param separator the separator, may be <b>null</b> or empty for none; if given, the postfix after separator 
+     *     is ignored
+     * @param addPrefix whether the platform prefix from {@link #getIdentifierPrefix()} shall be prefixed
+     * @param fromPath if {@code value} is a path, consider the relevant semantic id from the path
+     * @return the semantic id or <b>null</b> for none
+     * @see #getSemanticIdFrom(String, boolean, boolean)
+     */
+    public static String trySemanticIdWithDictionaryFrom(String value, String separator, boolean addPrefix, 
+        boolean fromPath) {
+        String result = null;
+        int pos;
+        if (null != separator && separator.length() > 0) {
+            pos = value.indexOf(separator);
+            if (pos > 0) {
+                value = value.substring(0, pos);
+            }
+        }
+        
+        pos = value.indexOf("[");
+        if (pos >= 0) {
+            int pos2 = value.indexOf("]", pos + 1);
+            if (pos2 > 0) {
+                value = value.substring(pos2 + 1).trim();
+            }
+        }
+        String[] tmp = value.split(" ");
+        pos = tmp.length;
+        while (pos > 0 && result == null) {
+            result = SemanticIdRecognizer.getSemanticIdFrom(String.join(" ", Arrays.copyOfRange(tmp, 0, pos)), 
+                addPrefix, fromPath);
+            pos--;
+        }
+        return result;
+    }
+
+    /**
+     * Tries to find a semantic id within {@code value} (may be <b>null</b>) whereby value my be postfixed with/out 
+     * (again) {@code separator}. Ignores leading IRI/IDRI identification in brackets.
+     *  
+     * @param value the value to try (may be <b>null</b>, then result will be <b>null</b>)
+     * @param separator the separator, may be <b>null</b> or empty for none; if given, the postfix after separator 
+     *     is ignored
+     * @param addPrefix whether the platform prefix from {@link #getIdentifierPrefix()} shall be prefixed
+     * @param fromPath if {@code value} is a path, consider the relevant semantic id from the path
+     * @return the semantic id or <b>null</b> for none
+     * @see #getSemanticIdFrom(String, boolean, boolean)
+     */
+    public static String trySafeSemanticIdWithDictionaryFrom(String value, String separator, boolean addPrefix, 
+        boolean fromPath) {
+        String result = null;
+        if (value != null) {
+            result = trySemanticIdWithDictionaryFrom(value, separator, addPrefix, fromPath);
+        }
+        return null == result ? value : result;
     }
 
     /**

@@ -193,6 +193,7 @@ public class IvmlWriter {
                 printlnStringField("description", e.getDescription(), true);
                 printlnField("isOpen", e.isOpen(), true, false);
                 printlnStringField("versionIdentifier", aasResult.getVersionIdentifier(), true);
+                printlnStringField("semanticId", e.getSemanticId(), true);
                 println("literals = {");
                 increaseIndent();
                 boolean hasValues = false;
@@ -217,7 +218,7 @@ public class IvmlWriter {
                     if (!hasValues && requiresValues) {
                         value = l.getIdShort();
                     }
-                    printlnStringField("value", value, true);
+                    printlnStringField("value", value, isValue(l.getValueId()));
                     printlnStringField("semanticId", l.getValueId(), false);
                     decreaseIndent();
                     println("}" + (last ? "" : ","));
@@ -275,21 +276,26 @@ public class IvmlWriter {
                     } else {
                         printlnStringField("name", name, true);    
                     }
-                    printlnStringField("semanticId", t.getSemanticId(), true);
-                    printlnField("multiSemanticIds", t.hasMultiSemanticIds(), true, false);
-                    printlnStringField("description", t.getDescription(), true);
-                    printlnStringField("versionIdentifier", aasResult.getVersionIdentifier(), true);
+                    printlnStringField("semanticId", t.getSemanticId(), isValue(t.getDescription()) 
+                        || isValue(aasResult.getVersionIdentifier()) || t.hasFields());
+                    printlnField("multiSemanticIds", t.hasMultiSemanticIds(), isValue(t.getDescription()) 
+                        || isValue(aasResult.getVersionIdentifier()) || t.hasFields(), false);
+                    printlnStringField("description", t.getDescription(), isValue(aasResult.getVersionIdentifier()) 
+                        || t.hasFields());
+                    printlnStringField("versionIdentifier", aasResult.getVersionIdentifier(), t.hasFields());
                     printlnField("isGeneric", t.isGeneric(), true, false);
                     printlnField("allowDuplicates", t.isAllowDuplicates(), true, false);
                     printlnField("ordered", t.isOrdered(), true, false);
-                    printlnField("fixedName", t.isFixedIdShort(), true, false);
-                    println("fields = {");
-                    increaseIndent();
-                    for (AasField f: t.fields()) {
-                        printField(f, t);
+                    printlnField("fixedName", t.isFixedIdShort(), t.hasFields(), false);
+                    if (t.hasFields()) {
+                        println("fields = {");
+                        increaseIndent();
+                        for (AasField f: t.fields()) {
+                            printField(f, t);
+                        }
+                        decreaseIndent();
+                        println("}");
                     }
-                    decreaseIndent();
-                    println("}");
                     decreaseIndent();
                     println("};");
                 }
@@ -572,6 +578,7 @@ public class IvmlWriter {
         if (isNoIdShort(idShort)) {
             result = "NoIdShort_" + (idCounter++); // IVML name must be given
         }
+        result = result.replace(" ", "_");
         return result;
     }
     

@@ -56,7 +56,9 @@ template AasImplTest(Configuration config, FileArtifact target, AasSubmodelType 
         if (isDefined(field.examples) and field.examples <> null) {
             for (String e: field.examples) {
                 if (result.length() == 0) {
-                    result = '${e}'; // VTL bug, keeps "reference"
+                    String tmp = '${e}'; // EASY-Bug, not string
+                    tmp = tmp.replace("“", "").replace("”", ""); // potentially unmappable characters
+                    result = '${tmp}'; // VTL bug, keeps "reference"
                 }
             }
         }
@@ -97,7 +99,7 @@ template AasImplTest(Configuration config, FileArtifact target, AasSubmodelType 
             } else {
                 String assertCast = "";
                 String assertParam = "";
-                String assertMethod = "Assert.assertEquals";
+                String assertMethod = "assertEquals";
                 if (typeInfix == "LangString") {
                     assertMethod = "assertLangStringsEquals";
                 } else if (typeInfix == "ReferenceElement") {
@@ -194,8 +196,8 @@ template AasImplTest(Configuration config, FileArtifact target, AasSubmodelType 
                 String eltVar = "elt${eltCounter}";
                 'RelationshipElement ${eltVar} = first(instance.get${methodNameSuffix}(${idShortEx2}${getSemIdParam(field, idShortEx2.length() > 0)}));
                 Assert.assertNotNull(${eltVar});
-                Assert.assertEquals(${firstEx}, ${eltVar}.getFirst());
-                Assert.assertEquals(${secondEx}, ${eltVar}.getSecond());'
+                assertEquals(${firstEx}, ${eltVar}.getFirst());
+                assertEquals(${secondEx}, ${eltVar}.getSecond());'
             }
         }
     }
@@ -220,8 +222,8 @@ template AasImplTest(Configuration config, FileArtifact target, AasSubmodelType 
                 String eltVar = "elt${eltCounter}";
                 'FileDataElement ${eltVar} = first(instance.get${methodNameSuffix}(${idShortEx2}${getSemIdParam(field, idShortEx2.length() > 0)}));
                 Assert.assertNotNull(${eltVar});
-                Assert.assertEquals(${testResourceFileEx}, ${eltVar}.getContents());
-                Assert.assertEquals(${testResourceMimeTypeEx}, ${eltVar}.getMimeType());'
+                assertEquals(${testResourceFileEx}, ${eltVar}.getContents());
+                assertEquals(${testResourceMimeTypeEx}, ${eltVar}.getMimeType());'
             }
         }
     }
@@ -328,9 +330,13 @@ template AasImplTest(Configuration config, FileArtifact target, AasSubmodelType 
                         params = '"generic"';
                     }
                 }
-                '${clsName}Builder ${builderName} = builder.create${fldName}Builder(${params});
-                ${populateStmt|e}
-                ${builderName}.build();'
+                Integer minCard = max(1, getIntegerValueSafe(field.minimumInstances, -1));
+                '${clsName}Builder ${builderName};
+                for (int card = 1; card <= ${minCard}; card++) {
+                    ${builderName} = builder.create${fldName}Builder(${params});
+                    ${populateStmt|e}
+                    ${builderName}.build();
+                }'
             }
         } else if (mode == 2) {
             if (!isImplementedByAPI(field.type) and notSkip(field)) {
@@ -425,7 +431,7 @@ template AasImplTest(Configuration config, FileArtifact target, AasSubmodelType 
             
             String clsName = asTypeName(typeName);
             '/**
-            * ${comment1} the ${aasType} ${typeName}.
+            * ${comment1} the ${aasType} ${htmlize(typeName)}.
             *
             * @param ${varName} the ${varName} to ${comment2}
             * @param depth recursion depth starting at 1
@@ -465,13 +471,13 @@ template AasImplTest(Configuration config, FileArtifact target, AasSubmodelType 
         String rangeIdEx = getRangeIdEx(true);
         String specFileName = aasName + "-" + getStringValueSafe(type.versionIdentifier, "unknown").replace(" ", "") 
             + ".spec";
+        String importPrefix = "${apiPkg}.${clsName}";
         
        'package ${pkg};
         
         import static de.iip_ecosphere.platform.support.aas.IdentifierType.*;
         import static de.iip_ecosphere.platform.support.aas.types.common.Utils.*;
 
-        import java.io.File;
         import java.util.Set;
         import java.util.HashSet;
         import java.util.concurrent.ExecutionException;
@@ -485,15 +491,16 @@ template AasImplTest(Configuration config, FileArtifact target, AasSubmodelType 
         import de.iip_ecosphere.platform.support.aas.types.common.*;
         
         import ${apiPkg}.${clsName}Builder;
-        import ${apiPkg}.${clsName}Builder.*;
-        import ${apiPkg}.${clsName}.*;
+        import ${apiPkg}.${clsName};
+        ${genImports(type, importPrefix + "Builder", "Builder")}
+        ${genImports(type, importPrefix, "")}
 
         import org.junit.Test;
         import org.junit.Assert;
         import test.de.iip_ecosphere.platform.support.aas.AbstractAasExample;
         
         /**
-        * Tests {@link ${clsName}Builder}.
+        * Tests {@link ${clsName}Builder} and {@link ${clsName}}.
         */
         public class ${clsName}BuilderTest extends AbstractAasExample {
 
@@ -540,8 +547,8 @@ template AasImplTest(Configuration config, FileArtifact target, AasSubmodelType 
             }
             
             @Override
-            public File[] getTargetFiles() {
-                return new File[] {new File("./output/${fileName}.aasx")};
+            public java.io.File[] getTargetFiles() {
+                return new java.io.File[] {new java.io.File("./output/${fileName}.aasx")};
             }
 
             @Override
@@ -584,7 +591,7 @@ template AasImplTest(Configuration config, FileArtifact target, AasSubmodelType 
             ${genPopulateMethods(type.fields, 1)|e}
             
             @Override
-            protected File getThumbnail() {
+            protected java.io.File getThumbnail() {
                 return null;
             }
             

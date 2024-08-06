@@ -11,6 +11,7 @@ project IDTA_02021_PowerDriveTrainSizing {
     name = "MovingPart",
     description = "The part that acts in a linear motion along the teeth.",
     versionIdentifier = "IDTA 02021-1-0",
+    semanticId = "iri:https://admin-shell.io/idta/PowerDriveTrainSizing/MovingPart/1/0",
     literals = {
       AasEnumLiteral {
         name = "Rack",
@@ -27,6 +28,7 @@ project IDTA_02021_PowerDriveTrainSizing {
     name = "MainComponentType",
     description = "The kind of main component in the drive train, such as a motor, gearbox or drive controller.",
     versionIdentifier = "IDTA 02021-1-0",
+    semanticId = "iri:https://admin-shell.io/idta/PowerDriveTrainSizing/MainComponentType/1/0",
     literals = {
       AasEnumLiteral {
         name = "Drive",
@@ -51,6 +53,7 @@ project IDTA_02021_PowerDriveTrainSizing {
     name = "CriticalityOfMessage",
     description = "marker for the criticality of the message with respect to the sizing result. E. g. trough symbol, color or code.",
     versionIdentifier = "IDTA 02021-1-0",
+    semanticId = "iri:https://admin-shell.io/idta/PowerDriveTrainSizing/CriticalityOfMessage/1/0",
     literals = {
       AasEnumLiteral {
         name = "Information",

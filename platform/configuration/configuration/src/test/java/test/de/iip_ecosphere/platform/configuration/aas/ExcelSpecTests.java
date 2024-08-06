@@ -260,4 +260,74 @@ public class ExcelSpecTests {
         testSpecWithXls("2023-01-24 - Draft_IDTA_Submodel_PCF-mod", "Draft");
     }    
 
+    /**
+     * Tests IDTA-02022-1-0.
+     * 
+     * @throws IOException shall not occur
+     */
+    @Test
+    public void testIdta02022_1_0_xls() throws IOException {
+        testSpecWithXls("2022/IDTA 02022-1-0_Submodel_Wireless Communication");
+    }
+    
+    /**
+     * Tests IDTA-02026-1-0.
+     * 
+     * @throws IOException shall not occur
+     */
+    @Test
+    public void testIdta02026_1_0_xls() throws IOException {
+        testSpecWithXls("2026/IDTA_02026-1-0_Submodel_ProvisionOf3DModels");
+    }
+ 
+    /**
+     * Tests IDTA-02027-1-0.
+     * 
+     * @throws IOException shall not occur
+     */
+    @Test
+    public void testIdta02027_1_0_xls() throws IOException {
+        testSpecWithXls("2027/IDTA 02027-1-0_Submodel_AssetInterfacesMappingConfiguration");
+    }
+
+    /**
+     * Tests IDTA-02034-1-0.
+     * 
+     * @throws IOException shall not occur
+     */
+    @Test
+    public void testIdta02034_1_0_xls() throws IOException {
+        testSpecWithXls("2034/IDTA 02034-1-0 Submodel_CreationAndClassificationOfMaterial");
+    }
+
+    /**
+     * Tests IDTA-02045-1-0.
+     * 
+     * @throws IOException shall not occur
+     */
+    @Test
+    public void testIdta02045_1_0_xls() throws IOException {
+        testSpecWithXls("2045/IDTA 02045-1-0_Submodel_Data Model for Asset Location");
+    }
+
+    /**
+     * Tests IDTA-02046-1-0.
+     * 
+     * @throws IOException shall not occur
+     */
+    @Test
+    public void testIdta02046_1_0_xls() throws IOException {
+        testSpecWithXls("2046/IDTA 02046-1-0_Submodel_WorkstationWorkerMatchingData");
+    }
+
+    /**
+     * Tests IDTA-02056-1-0.
+     * 
+     * @throws IOException shall not occur
+     */
+    @Test
+    public void testIdta02056_1_0_xls() throws IOException {
+        testSpecWithXls("2056/IDTA 02056-1-0_Submodel_Data Retention Policies");
+    }
+
 }

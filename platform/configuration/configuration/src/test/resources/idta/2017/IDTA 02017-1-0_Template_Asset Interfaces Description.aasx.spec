@@ -313,16 +313,12 @@ project IDTA_02017_AssetInterfacesDescription {
 
   AasSubmodelElementListType oneOf = {
     name = "oneOf",
-    semanticId = "iri:https://www.w3.org/2019/wot/security#oneOf",
-    fields = {
-    }
+    semanticId = "iri:https://www.w3.org/2019/wot/security#oneOf"
   };
 
   AasSubmodelElementListType allOf = {
     name = "allOf",
-    semanticId = "iri:https://www.w3.org/2019/wot/security#allOf",
-    fields = {
-    }
+    semanticId = "iri:https://www.w3.org/2019/wot/security#allOf"
   };
 
   AasSubmodelElementCollectionType apikey_sc = {
@@ -826,16 +822,12 @@ project IDTA_02017_AssetInterfacesDescription {
 
   AasSubmodelElementCollectionType actions = {
     name = "actions",
-    semanticId = "iri:https://www.w3.org/2019/wot/td#ActionAffordance",
-    fields = {
-    }
+    semanticId = "iri:https://www.w3.org/2019/wot/td#ActionAffordance"
   };
 
   AasSubmodelElementCollectionType events = {
     name = "events",
-    semanticId = "iri:https://www.w3.org/2019/wot/td#EventAffordance",
-    fields = {
-    }
+    semanticId = "iri:https://www.w3.org/2019/wot/td#EventAffordance"
   };
 
   AasSubmodelElementCollectionType ExternalDescriptor = {

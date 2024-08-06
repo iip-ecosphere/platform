@@ -70,17 +70,13 @@ project IDTA_02010_ServiceRequestNotification {
   AasEntityType SenderSystem = {
     name = "SenderSystem",
     semanticId = "irdi:0173-1#02-ABI770#001",
-    description = "Sender system.",
-    fields = {
-    }
+    description = "Sender system."
   };
 
   AasEntityType RelatedAsset = {
     name = "RelatedAsset",
     semanticId = "irdi:0173-1#02-ABI774#001",
-    description = "Related Asset.",
-    fields = {
-    }
+    description = "Related Asset."
   };
 
   AasSubmodelElementCollectionType DetailedInformation = {

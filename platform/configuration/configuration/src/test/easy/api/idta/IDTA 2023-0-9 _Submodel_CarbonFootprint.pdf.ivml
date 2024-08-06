@@ -10,6 +10,7 @@ project IDTA_02023_CarbonFootprint {
     name = "PCFCalculationMethod",
     description = "Standard, method for determining the greenhouse gas emissions of a product.",
     versionIdentifier = "IDTA 02023-0-9",
+    semanticId = "irdi:0173-1#02-ABG854#002",
     literals = {
       AasEnumLiteral {
         name = "EN 15804",
@@ -50,6 +51,7 @@ project IDTA_02023_CarbonFootprint {
     name = "PCFReferenceValueForCalculation",
     description = "Quantity unit of the product to which the PCF information on the CO footprint refers.",
     versionIdentifier = "IDTA 02023-0-9",
+    semanticId = "irdi:0173-1#02-ABG856#001",
     literals = {
       AasEnumLiteral {
         name = "g",
@@ -90,6 +92,7 @@ project IDTA_02023_CarbonFootprint {
     name = "PCFLifeCyclePhase",
     description = "Life cycle stages of the product according to the quantification requirements of the standard to which the PCF carbon footprint statement refers.",
     versionIdentifier = "IDTA 02023-0-9",
+    semanticId = "irdi:0173-1#02-ABG858#001",
     literals = {
       AasEnumLiteral {
         name = "A1 - raw material supply and upstream production",
@@ -188,6 +191,7 @@ project IDTA_02023_CarbonFootprint {
     name = "TCFCalculationMethod",
     description = "Standard, method for determining the greenhouse gas emissions for the transport of a product.",
     versionIdentifier = "IDTA 02023-0-9",
+    semanticId = "irdi:0173-1#02-ABG859#002",
     literals = {
       AasEnumLiteral {
         name = "EN 16258",
@@ -200,6 +204,7 @@ project IDTA_02023_CarbonFootprint {
     name = "TCFReferenceValueForCalculation",
     description = "Amount of product to which the TCF carbon footprint statement relates.",
     versionIdentifier = "IDTA 02023-0-9",
+    semanticId = "irdi:0173-1#02-ABG861#002",
     literals = {
       AasEnumLiteral {
         name = "g",
@@ -240,6 +245,7 @@ project IDTA_02023_CarbonFootprint {
     name = "TCFProcessesForGreenhouseGasEmissionInATransportService",
     description = "Processes in a transport service to determine the sum of all direct or indirect greenhouse gas emissions from fuel supply and vehicle operation.",
     versionIdentifier = "IDTA 02023-0-9",
+    semanticId = "irdi:0173-1#02-ABG863#002",
     literals = {
       AasEnumLiteral {
         name = "WTT - Well-to-Tank",

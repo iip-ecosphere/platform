@@ -95,7 +95,7 @@ template AasBasics(Configuration config, FileArtifact target) {
     def produceClassComment(DecisionVariable var, String entity, String dflt) {
         String comment = getStringValueSafe(var, "");
         if (comment.length() > 0) {
-            comment = "${entity} support for " + htmlize(comment.firstToLower());
+            comment = "${entity} support for " + htmlize(quoteComment(comment.firstToLower()));
         } else {
             comment = dflt + ".";
         }
@@ -105,8 +105,75 @@ template AasBasics(Configuration config, FileArtifact target) {
         */'
     }
 
-    def skip(AasElementType elt) {
-        //getBooleanValueSafe(elt.isGeneric, false);
+    /**
+     * Replaces problematic characters
+     */    
+    def quoteComment(String comment) {
+        comment.replace("“", "\"").replace("”", "\"");
+    }
+
+    @DispatchBasis    
+    def collectTypeNames(DataType type, setOf(String) result, String postfix) {
+	}
+
+    @DispatchCase
+    def collectTypeNames(AasSubmodelType type, setOf(String) result, String postfix) {
+	    String name = asTypeName(type.name) + postfix;
+		if (!result.includes(name)) {
+			result.add(name);
+			if (isDefined(type.fields) and type.fields <> null) {
+				collectFieldTypeNames(type.fields, result, postfix);
+			}
+		}
+    }
+
+    @DispatchCase
+    def collectTypeNames(AasEnumType type, setOf(String) result, String postfix) {
+	    if (postfix <> "") {
+            result.add(asTypeName(type.name)); // no postfix
+		}
+    }
+
+    @DispatchCase
+    def collectTypeNames(AasSubmodelElementCollectionType type, setOf(String) result, String postfix) {
+	    String name = asTypeName(type.name) + postfix;
+        if (type <> AasGenericSubmodelElementCollection and !result.includes(name)) {
+            result.add(name);
+            if (isDefined(type.fields) and type.fields <> null) {
+                collectFieldTypeNames(type.fields, result, postfix);
+            }
+        }
+    }
+
+    @DispatchCase
+    def collectTypeNames(AasEntityType type, setOf(String) result, String postfix) {
+	    String name = asTypeName(type.name) + postfix;
+        if (type <> AasGenericEntityType and !result.includes(name)) {
+            result.add(name);
+            if (isDefined(type.fields) and type.fields <> null) {
+                collectFieldTypeNames(type.fields, result, postfix);
+            }
+        }
+    }
+    
+    def collectFieldTypeNames(AasFields fields, setOf(String) result, String postfix) {
+        for (AasField field : fields) {
+		    if (field <> null and isDefined(field.type) and field.type <> null) {
+                collectTypeNames(field.type, result, postfix);
+			}
+        }
+    }
+    
+    def genImports(AasSubmodelType type, String prefix, String postfix) {
+        setOf(String) types = {};
+        collectTypeNames(type, types, postfix);
+        types.remove(asTypeName(type.name) + postfix);
+        for (String t : types->sortedBy(s|s)) {
+            'import ${prefix}.${t};'
+        }
+    }
+
+    def skip(AasElementType elt) {      //getBooleanValueSafe(elt.isGeneric, false);
         false;
     }
     

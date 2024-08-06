@@ -210,27 +210,21 @@ project IDTA_02016_ControlComponentInstance {
     name = "CiValues",
     idShort = "Values",
     semanticId = "iri:https://admin-shell.io/idta/ControlComponent/Skill/Parameter/Values/1/0",
-    description = "Collection of properties of the accepted values that the parameter may take.",
-    fields = {
-    }
+    description = "Collection of properties of the accepted values that the parameter may take."
   };
 
   AasSubmodelElementCollectionType Errors = {
     name = "CiErrors",
     idShort = "Errors",
     semanticId = "iri:https://admin-shell.io/idta/ControlComponent/Skill/Errors/1/0",
-    description = "Collection of references to the error codes of the component that may be triggered by this skill.",
-    fields = {
-    }
+    description = "Collection of references to the error codes of the component that may be triggered by this skill."
   };
 
   AasSubmodelElementCollectionType Uses = {
     name = "CiUses",
     idShort = "Uses",
     semanticId = "iri:https://admin-shell.io/idta/ControlComponent/Skill/Uses/1/0",
-    description = "Collection of references to other skills, that this skill uses.",
-    fields = {
-    }
+    description = "Collection of references to other skills, that this skill uses."
   };
 
   freeze {

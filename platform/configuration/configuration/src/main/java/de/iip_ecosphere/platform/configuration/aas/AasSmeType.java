@@ -26,28 +26,48 @@ import de.iip_ecosphere.platform.configuration.FallbackLogger;
  */
 enum AasSmeType {
     
-    AAS,
-    SUBMODEL,
-    SUBMODEL_LIST,
-    SUBMODEL_ELEMENT_COLLECTION,
-    SUBMODEL_ELEMENT_LIST,
-    SUBMODEL_ELEMENT,
-    PROPERTY,
-    MULTI_LANGUAGE_PROPERTY,
-    LANG_STRING,
-    ENTITY,
-    RELATION,
-    REFERENCE,
-    BLOB,
-    RANGE,
-    OPERATION,
-    FILE;
+    AAS(true),
+    SUBMODEL(true),
+    SUBMODEL_LIST(true),
+    SUBMODEL_ELEMENT_COLLECTION(true),
+    SUBMODEL_ELEMENT_LIST(true),
+    SUBMODEL_ELEMENT(true),
+    PROPERTY(false),
+    MULTI_LANGUAGE_PROPERTY(false),
+    LANG_STRING(false),
+    ENTITY(true),
+    RELATION(false),
+    REFERENCE(false),
+    BLOB(false),
+    RANGE(false),
+    OPERATION(false),
+    FILE(false);
     
     private static Logger logger;
     private static final Map<String, AasSmeType> TYPE_TRANSLATION = new HashMap<>();
+    private boolean isType; // IDTA 02026-1-0
+    
+    /**
+     * Creates a constant.
+     * 
+     * @param isType whether the constant represents a type (also then in IVML)
+     */
+    private AasSmeType(boolean isType) {
+        this.isType = isType;
+    }
 
+    /**
+     * Returns whether this SME type represents a type (also then in IVML).
+     * 
+     * @return {@code true} for type, {@code false} for operation, property, etc.
+     */
+    public boolean isType() {
+        return isType;
+    }
+    
     static { // explicity mapping to see potential inconsistencies
         TYPE_TRANSLATION.put("Property", AasSmeType.PROPERTY);
+        TYPE_TRANSLATION.put("Prop", AasSmeType.PROPERTY); // 2026-1-0
         TYPE_TRANSLATION.put("MLP", AasSmeType.MULTI_LANGUAGE_PROPERTY);
         TYPE_TRANSLATION.put("Range", AasSmeType.RANGE);
         TYPE_TRANSLATION.put("File", AasSmeType.FILE);

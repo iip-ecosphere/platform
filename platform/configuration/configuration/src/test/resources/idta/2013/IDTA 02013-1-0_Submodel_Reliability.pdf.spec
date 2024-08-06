@@ -10,6 +10,7 @@ project IDTA_02013_Reliability {
     name = "RyTypeOfVoltage",
     description = "classification of a power supply according to the time behaviour of the voltage.",
     versionIdentifier = "IDTA 02013-1-0",
+    semanticId = "irdi:0112/2///61987#ABA969#007",
     literals = {
       AasEnumLiteral {
         name = "AC",

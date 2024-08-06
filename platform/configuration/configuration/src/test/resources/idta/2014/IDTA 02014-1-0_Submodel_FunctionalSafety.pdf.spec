@@ -10,6 +10,7 @@ project IDTA_02014_FunctionalSafety {
     name = "FsTypeOfVoltage",
     description = "classification of a power supply according to the time behaviour of the voltage.",
     versionIdentifier = "IDTA 02014-1-0",
+    semanticId = "irdi:0112/2///61987#ABA969#007",
     literals = {
       AasEnumLiteral {
         name = "AC",
@@ -33,6 +34,7 @@ project IDTA_02014_FunctionalSafety {
     name = "FsTypeOfInterlockingDevice",
     description = "classification of device which prevent the hazardous operation of machine, depending on the technology of their actuating means and their output system.",
     versionIdentifier = "IDTA 02014-1-0",
+    semanticId = "irdi:0112/2///62683#ACE053#001",
     literals = {
       AasEnumLiteral {
         name = "TYPE1",
@@ -61,6 +63,7 @@ project IDTA_02014_FunctionalSafety {
     name = "FsFunctionalSafetyDeviceType",
     description = "classification of device depending on their safety related characteristics and their capability as subsystem or subsystem element.",
     versionIdentifier = "IDTA 02014-1-0",
+    semanticId = "irdi:0112/2///62683#ACE071#001",
     literals = {
       AasEnumLiteral {
         name = "SUBST",
@@ -89,6 +92,7 @@ project IDTA_02014_FunctionalSafety {
     name = "FsSIL",
     description = "safety integrity level: discrete level (one out of a possible three) for describing the capability to perform a safety function where safety integrity level three has the highest level of safety integrity and safety integrity level one has the lowest.",
     versionIdentifier = "IDTA 02014-1-0",
+    semanticId = "irdi:0112/2///62683#ACE051#001",
     literals = {
       AasEnumLiteral {
         name = "SIL1",
@@ -112,6 +116,7 @@ project IDTA_02014_FunctionalSafety {
     name = "FsPL",
     description = "performance level: discrete level used to specify the ability of safety-related parts of control systems to perform a safety function under foreseeable conditions.",
     versionIdentifier = "IDTA 02014-1-0",
+    semanticId = "irdi:0112/2///62683#ACE060#001",
     literals = {
       AasEnumLiteral {
         name = "PLA",
@@ -145,6 +150,7 @@ project IDTA_02014_FunctionalSafety {
     name = "FsCategory",
     description = "classification of the safety-related parts of a control system in respect of their resistance to faults and their subsequent behaviour in the fault condition, and which is achieved by the structural arrangement of the parts, fault detection and/or by their reliability.",
     versionIdentifier = "IDTA 02014-1-0",
+    semanticId = "irdi:0112/2///62683#ACE063#001",
     literals = {
       AasEnumLiteral {
         name = "CATB",

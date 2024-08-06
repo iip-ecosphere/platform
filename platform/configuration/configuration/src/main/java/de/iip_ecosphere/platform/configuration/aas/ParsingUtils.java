@@ -89,7 +89,7 @@ class ParsingUtils {
      * @return the modified version of {@code data}
      */
     static String removeLinebreaks(String data) {
-        return data.replace("\r\n", " ").replace("\r", " ").replace("\n", " ");
+        return null == data ? "" : data.replace("\r\n", " ").replace("\r", " ").replace("\n", " ");
     }
 
     /**
@@ -519,7 +519,12 @@ class ParsingUtils {
                 }
             }
         } else {
-            getLogger().warn("Unknown enum literal structure: {}", token);
+            if (!token.contains(" ")) { // initial "heuristic", IDTA 02046
+                AasEnumLiteral lit = new AasEnumLiteral(token, null, null, null);
+                en.addLiteral(lit);
+            } else {
+                getLogger().warn("Unknown enum literal structure: {}", token);
+            }
         }
     }
 
@@ -743,6 +748,7 @@ class ParsingUtils {
                 || idShort.startsWith("{Local"); // IDTA-02012-1-0 
             known |= (idShort.startsWith("{") && idShort.endsWith("}"));  // IDTA-02017-1-0
             known |= removeWhitespace(idShort).equalsIgnoreCase("<noidshort>"); // IDTA-02017-1-0
+            known |= removeWhitespace(idShort).equalsIgnoreCase("<no_idshort>"); // IDTA-02056-1-0
         }
         return known;
     }

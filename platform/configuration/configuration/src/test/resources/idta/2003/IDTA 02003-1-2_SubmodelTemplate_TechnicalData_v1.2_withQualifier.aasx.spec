@@ -215,9 +215,7 @@ project IDTA_02003_TechnicalData {
   AasSubmodelElementCollectionType SubSection = {
     name = "SubSection",
     semanticId = "iri:https://admin-shell.io/ZVEI/TechnicalData/SubSection/1/1",
-    description = "Subordinate subdivision possibility for properties.",
-    fields = {
-    }
+    description = "Subordinate subdivision possibility for properties."
   };
 
   AasSubmodelElementCollectionType FurtherInformation = {

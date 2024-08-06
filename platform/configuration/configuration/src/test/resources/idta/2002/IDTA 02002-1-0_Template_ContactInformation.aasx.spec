@@ -8,25 +8,31 @@ project IDTA_02002_ContactInformations {
     name = "RoleOfContactPerson",
     description = "function of a contact person in a process.",
     isOpen = true,
+    semanticId = "irdi:0173-1#02-AAO204#003",
     literals = {
       AasEnumLiteral {
         name = "administrativ contact",
+        description = "administrativ contact.",
         semanticId = "irdi:0173-1#07-AAS927#001"
       },
       AasEnumLiteral {
         name = "commercial contact",
+        description = "commercial contact.",
         semanticId = "irdi:0173-1#07-AAS928#001"
       },
       AasEnumLiteral {
         name = "other contact",
+        description = "other contact.",
         semanticId = "irdi:0173-1#07-AAS929#001"
       },
       AasEnumLiteral {
         name = "hazardous goods contact",
+        description = "hazardous goods contact.",
         semanticId = "irdi:0173-1#07-AAS930#001"
       },
       AasEnumLiteral {
         name = "technical contact",
+        description = "technical contact.",
         semanticId = "irdi:0173-1#07-AAS931#001"
       }
     }
@@ -35,29 +41,36 @@ project IDTA_02002_ContactInformations {
   AasEnumType TypeOfTelephone = {
     name = "TypeOfTelephone",
     description = "characterization of a telephone according to its location or usage.",
+    semanticId = "irdi:0173-1#02-AAO137#003",
     literals = {
       AasEnumLiteral {
         name = "office",
+        description = "office.",
         semanticId = "irdi:0173-1#07-AAS754#001"
       },
       AasEnumLiteral {
         name = "office mobile",
+        description = "office mobile.",
         semanticId = "irdi:0173-1#07-AAS755#001"
       },
       AasEnumLiteral {
         name = "secretary",
+        description = "secretary.",
         semanticId = "irdi:0173-1#07-AAS756#001"
       },
       AasEnumLiteral {
         name = "substitute",
+        description = "substitute.",
         semanticId = "irdi:0173-1#07-AAS757#001"
       },
       AasEnumLiteral {
         name = "home",
+        description = "home.",
         semanticId = "irdi:0173-1#07-AAS758#001"
       },
       AasEnumLiteral {
         name = "private mobile",
+        description = "private mobile.",
         semanticId = "irdi:0173-1#07-AAS759#001"
       }
     }
@@ -66,17 +79,21 @@ project IDTA_02002_ContactInformations {
   AasEnumType TypeOfFaxNumber = {
     name = "TypeOfFaxNumber",
     description = "characterization of the fax according its location or usage.",
+    semanticId = "irdi:0173-1#02-AAO196#003",
     literals = {
       AasEnumLiteral {
         name = "office",
+        description = "office.",
         semanticId = "irdi:0173-1#07-AAS754#001"
       },
       AasEnumLiteral {
         name = "secretary",
+        description = "secretary.",
         semanticId = "irdi:0173-1#07-AAS756#001"
       },
       AasEnumLiteral {
         name = "home",
+        description = "home.",
         semanticId = "irdi:0173-1#07-AAS758#001"
       }
     }
@@ -85,21 +102,26 @@ project IDTA_02002_ContactInformations {
   AasEnumType TypeOfEmailAddress = {
     name = "TypeOfEmailAddress",
     description = "characterization of an e-mail address according to its location or usage.",
+    semanticId = "irdi:0173-1#02-AAO199#003",
     literals = {
       AasEnumLiteral {
         name = "office",
+        description = "office.",
         semanticId = "irdi:0173-1#07-AAS754#001"
       },
       AasEnumLiteral {
         name = "secretary",
+        description = "secretary.",
         semanticId = "irdi:0173-1#07-AAS756#001"
       },
       AasEnumLiteral {
         name = "substitute",
+        description = "substitute.",
         semanticId = "irdi:0173-1#07-AAS757#001"
       },
       AasEnumLiteral {
         name = "home",
+        description = "home.",
         semanticId = "irdi:0173-1#07-AAS758#001"
       }
     }

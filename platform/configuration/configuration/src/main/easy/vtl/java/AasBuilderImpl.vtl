@@ -35,7 +35,7 @@ template AasBuilderImpl(Configuration config, FileArtifact target, AasSubmodelTy
     def produceSetterComment(DecisionVariable var, String name, String varName) {
         String comment = getStringValueSafe(var, "");
         if (comment.length() > 0) {
-            comment = "Changes " + htmlize(comment.firstToLower());
+            comment = "Changes " + htmlize(quoteComment(comment.firstToLower()));
         } else {
             comment = "Defines the value of ${name}";
         }
@@ -50,7 +50,7 @@ template AasBuilderImpl(Configuration config, FileArtifact target, AasSubmodelTy
     def produceSetterComment(DecisionVariable var, String name, sequenceOf(AasField) params, String furtherParam) {
         String comment = getStringValueSafe(var, "");
         if (comment.length() > 0) {
-            comment = "Changes " + htmlize(comment.firstToLower());
+            comment = "Changes " + htmlize(quoteComment(comment.firstToLower()));
         } else {
             comment = "Defines the value of ${name}";
         }
@@ -493,7 +493,7 @@ template AasBuilderImpl(Configuration config, FileArtifact target, AasSubmodelTy
                 semIdParamEx = ", semanticId";
             }
             String genericParam = "";
-            if (type.isGeneric) {
+            if (type.isGeneric or field.isGeneric) {
                 params = appendWithSeparator(params, ", ", "String idShort");
                 paramsComment0 = "@param idShort the actual idShort";
                 idEx = "idShort";
@@ -518,7 +518,7 @@ template AasBuilderImpl(Configuration config, FileArtifact target, AasSubmodelTy
                 }
             }
             '/**
-            * Creates a builder for ${field.name}.
+            * Creates a builder for ${htmlize(field.name)}.
             *
             ${paramsComment0|e}
             ${paramsComment1|e}
@@ -586,7 +586,7 @@ template AasBuilderImpl(Configuration config, FileArtifact target, AasSubmodelTy
                         text = appendWithSeparator(text, " and ", "less or equal ${field.maximumInstances}");
                     }
                 }
-                'assertThat(${condition}, "Cardinality of ${field.name} must be ${text}.");\n'
+                'assertThat(${condition}, "Cardinality {} of ${field.name} must be ${text}.", ${getFieldNameCounterIdentifier(field)});\n'
             }
         }
     }
@@ -606,12 +606,12 @@ template AasBuilderImpl(Configuration config, FileArtifact target, AasSubmodelTy
     // ------------------------------- produce classes -------------------------------------------
 
     @DispatchBasis    
-    def produceClasses(DataType type, Boolean counting, Boolean top) {
+    def produceClasses(DataType type, Boolean counting, Boolean top, AasField field) {
         ''
     }
 
     @DispatchCase
-    def produceClasses(AasSubmodelElementCollectionType type, Boolean counting, Boolean top) {
+    def produceClasses(AasSubmodelElementCollectionType type, Boolean counting, Boolean top, AasField field) {
         String clsName = asTypeName(type.name);
         if (!done.includes(type.name) and !isImplementedByAPI(type) and notSkip(type)) {
             done.add(type.name);
@@ -619,7 +619,7 @@ template AasBuilderImpl(Configuration config, FileArtifact target, AasSubmodelTy
             String idShortEx = 'getCountingIdShort("${getIdShort(type)}", nr)';
             String idShortComment = "";
             String idShortParam = "";
-            if (type.isGeneric) {
+            if (type.isGeneric or field.isGeneric) {
                 idShortComment = "* @param idShort the actual idShort";
                 idShortParam = "String idShort, ";
                 basicIdShortEx = "idShort";
@@ -646,7 +646,7 @@ template AasBuilderImpl(Configuration config, FileArtifact target, AasSubmodelTy
                 ${produceFields(type.fields)|e}
 
                 /**
-                * Creates a builder instance for ${getIdShort(type)}.
+                * Creates a builder instance for ${htmlize(getIdShort(type))}.
                 *
                 ${idShortComment|e}
                 * @param smBuilder the parent ${parentComment} builder
@@ -658,7 +658,7 @@ template AasBuilderImpl(Configuration config, FileArtifact target, AasSubmodelTy
                 }
                 
                 /**
-                * Creates a builder instance for ${getIdShort(type)}.
+                * Creates a builder instance for ${htmlize(getIdShort(type))}.
                 *
                 ${idShortComment|e}
                 * @param smBuilder the parent ${parentComment} builder
@@ -679,7 +679,7 @@ template AasBuilderImpl(Configuration config, FileArtifact target, AasSubmodelTy
     }
 
     @DispatchCase
-    def produceClasses(AasEntityType type, Boolean counting, Boolean top) {
+    def produceClasses(AasEntityType type, Boolean counting, Boolean top, AasField field) {
         String clsName = asTypeName(type.name);
         if (!done.includes(type.name) and !isImplementedByAPI(type) and notSkip(type)) {
             done.add(type.name);
@@ -687,7 +687,7 @@ template AasBuilderImpl(Configuration config, FileArtifact target, AasSubmodelTy
             String idShortEx = 'getCountingIdShort("${getIdShort(type)}", nr)';
             String idShortComment = "";
             String idShortParam = "";
-            if (type.isGeneric) {
+            if (type.isGeneric or field.isGeneric) {
                 idShortComment = "* @param idShort the actual idShort";
                 idShortParam = "String idShort, ";
                 basicIdShortEx = "idShort";
@@ -709,12 +709,13 @@ template AasBuilderImpl(Configuration config, FileArtifact target, AasSubmodelTy
                 semIdComment = "* @param semanticId the actual semantic ID";
             }
             
-            'public class ${clsName}Builder extends DelegatingEntityBuilder {
+            '${produceClassComment(type.description, "Builder", "Entity Builder implementation")}
+            public class ${clsName}Builder extends DelegatingEntityBuilder {
             
                 ${produceFields(type.fields)|e}
 
                 /**
-                * Creates a builder instance for ${getIdShort(type)}.
+                * Creates a builder instance for ${htmlize(getIdShort(type))}.
                 *
                 ${idShortComment|e}
                 * @param smBuilder the parent ${parentComment} builder
@@ -726,7 +727,7 @@ template AasBuilderImpl(Configuration config, FileArtifact target, AasSubmodelTy
                 }
                 
                 /**
-                * Creates a builder instance for ${getIdShort(type)}.
+                * Creates a builder instance for ${htmlize(getIdShort(type))}.
                 *
                 ${idShortComment|e}
                 * @param smBuilder the parent ${parentComment} builder
@@ -747,14 +748,14 @@ template AasBuilderImpl(Configuration config, FileArtifact target, AasSubmodelTy
     }
     
     @DispatchCase
-    def produceClasses(AasSubmodelType type, Boolean counting, Boolean top) {
+    def produceClasses(AasSubmodelType type, Boolean counting, Boolean top, AasField field) {
         '// TODO unconsidered submodel ${type}'
         //'${produceClassesForFields(type.fields, true)}'
     }
 
     def produceClassesForFields(AasFields fields, Boolean top) {
         for (AasField field: fields) {
-            '${produceClasses(field.type, isFieldCounting(field), top)|e}'
+            '${produceClasses(field.type, isFieldCounting(field), top, field)|e}'
         }
     }
     

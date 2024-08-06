@@ -10,6 +10,7 @@ project IDTA_02004_HandoverDocumentation {
     name = "StatusValue",
     description = "Each document version represents a point in time in the document lifecycle. This status value refers to the milestones in the document lifecycle. The following two values should be used for the application of this guideline: InReview (under review), Released (released).",
     versionIdentifier = "IDTA 02004-1-2",
+    semanticId = "irdi:0173-1#02-ABI001#001",
     literals = {
       AasEnumLiteral {
         name = "under review",

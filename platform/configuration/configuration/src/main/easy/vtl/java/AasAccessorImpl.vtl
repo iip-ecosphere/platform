@@ -177,7 +177,7 @@ template AasAccessorImpl(Configuration config, FileArtifact target, AasSubmodelT
                 constructorEnd = "";
             } 
             '/**
-            * Gets an instance of ${field.name}.
+            * Gets an instance of ${htmlize(field.name)}.
             *
             ${commentIdShort|e}
             ${comment|e}
@@ -234,7 +234,7 @@ template AasAccessorImpl(Configuration config, FileArtifact target, AasSubmodelT
                         }
                         transformEx = ", p -> getEnumValue(p, ${collectType}.class, ${specificType}.class)";
                     } else {
-                        transformEx = ", p -> cast(p, ${type}.class)";
+                        transformEx = ", p -> cast(p, ${considerWrapper(type)}.class)";
                     }
                     collectType = aasType;
                 } else if (aasType == "MultiLanguageProperty") {
@@ -246,7 +246,7 @@ template AasAccessorImpl(Configuration config, FileArtifact target, AasSubmodelT
                     semIdEx = 'semanticId != null && semanticId.length() > 0 ? semanticId : ${semIdEx}';
                 }
                 valueEx = 'collect(elements(), ${collectType}.class, ${semIdEx}${transformEx})';
-                type = "Iterable<${type}>";
+                type = "Iterable<${considerWrapper(type)}>";
             } else {
                 valueEx = 'get${infix}Value(this, ${idShortEx}${params})';
             }
@@ -342,7 +342,7 @@ template AasAccessorImpl(Configuration config, FileArtifact target, AasSubmodelT
             public static class ${clsName} extends DelegatingSubmodelElementCollection {
                 
                 /**
-                * Creates a wrapping instance for ${getIdShort(type)}.
+                * Creates a wrapping instance for ${htmlize(getIdShort(type))}.
                 *
                 * @param parent the parent submodel element collection builder
                 */

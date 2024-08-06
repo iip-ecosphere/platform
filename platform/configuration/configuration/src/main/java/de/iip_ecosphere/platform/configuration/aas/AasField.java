@@ -301,6 +301,7 @@ public class AasField extends AbstractAasElement {
             case "long":
                 result = "LongType";
                 break;
+            case "Float": // IDTA-02045-1-0
             case "float":
                 result = "FloatType";
                 break;
@@ -347,6 +348,7 @@ public class AasField extends AbstractAasElement {
             case "dateTimeStamp": // IDTA-02008-1-1 AASX
             case "TIMESTSAMP": // typo in IDTA-02008-1-1
             case "Date": // IDTA-02007-1-0
+            case "dateTime": // IDTA-02045-1-0
             case "DateTime": // IDTA-02010-1-0
             case "xs:dateTime": // IDTA-02010-1-0
             case "TimeStamp": // IDTA-02021-1-0

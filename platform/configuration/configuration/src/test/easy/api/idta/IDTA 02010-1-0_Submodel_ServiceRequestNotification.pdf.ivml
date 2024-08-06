@@ -11,6 +11,7 @@ project IDTA_02010_ServiceRequestNotification {
     name = "Priority",
     description = "Rating of the primacy of the message, which results from the urgency or importance definition.",
     versionIdentifier = "IDTA 02010-1-0",
+    semanticId = "irdi:0173-1#02-ABI773#001",
     literals = {
       AasEnumLiteral {
         name = "Low",
@@ -35,6 +36,7 @@ project IDTA_02010_ServiceRequestNotification {
     name = "Status",
     description = "Current processing status of the notification within the workflow definition.",
     versionIdentifier = "IDTA 02010-1-0",
+    semanticId = "irdi:0173-1#02-ABH938#002",
     literals = {
       AasEnumLiteral {
         name = "Message was sent by issuer",

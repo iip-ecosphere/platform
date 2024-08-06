@@ -14,6 +14,7 @@ package de.iip_ecosphere.platform.configuration.aas;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 /**
  * Represents an AAS enumeration.
@@ -33,6 +34,20 @@ public class AasEnum extends AbstractAasElement {
      */
     public AasEnum(String idShort) {
         setIdShort(idShort);
+    }
+    
+    /**
+     * Turns a {@code type} into an enum.
+     * 
+     * @param type the type to take the data from
+     * @param kind the enum parsing kind
+     * @param idShortModifier optional modifier for the idShort, may be <b>null</b>
+     */
+    public AasEnum(AasType type, ParsingEnumKind kind, Function<String, String> idShortModifier) {
+        this(null != idShortModifier ? idShortModifier.apply(type.getIdShort()) : type.getIdShort());
+        this.setDescription(type.getDescription());
+        this.setParsingEnumKind(kind);
+        this.setSemanticId(type.getSemanticId());
     }
 
     /**

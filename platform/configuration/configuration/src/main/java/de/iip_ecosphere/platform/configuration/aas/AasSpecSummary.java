@@ -15,9 +15,11 @@ package de.iip_ecosphere.platform.configuration.aas;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -112,7 +114,7 @@ public class AasSpecSummary {
                 rename.put(t.getSemanticId(), newIdShort);
                 t.setIdShort(newIdShort);
                 t.setDisplayName(idShort);
-                getLogger().warn("Renamed type {} to {} for semanticId {} as no IVML identifier.", idShort, newIdShort, 
+                getLogger().info("Renamed type {} to {} for semanticId {} as no IVML identifier.", idShort, newIdShort, 
                     t.getSemanticId());
                 idShort = newIdShort;
             }
@@ -127,7 +129,7 @@ public class AasSpecSummary {
                     t.setIdShort(newIdShort);
                     rename.put(t.getSemanticId(), newIdShort);
                     registerType(typeMap, sIdTypeMap, newIdShort, t);
-                    getLogger().warn("Renamed type {} to {} for semanticId {}.", idShort, newIdShort, 
+                    getLogger().info("Renamed type {} to {} for semanticId {}.", idShort, newIdShort, 
                         t.getSemanticId());
                 } else {
                     removeType.add(t); // just duplicate and hopefully not needed
@@ -145,7 +147,8 @@ public class AasSpecSummary {
         for (AasType t: types) {
             if (null == t.getSmeType()) {
                 getLogger().error("Type {} has no SME type assigned. Cannot print IVML. ", t.getIdShort());
-            }            
+            }
+            Set<String> fieldIdShorts = new HashSet<>();
             for (AasField f : t.fields()) {
                 String idShort = f.getIdShort();
                 if (null != idShort && idShort.startsWith("{")) {
@@ -167,6 +170,7 @@ public class AasSpecSummary {
                     }
                     f.setIdShort(idShort);
                 }
+                ensureUniqueFieldName(fieldIdShorts, f);
                 String ivmlValueType = f.getIvmlValueType(true);
                 if (null != ivmlValueType) {
                     ivmlValueType = stripRefBy(ivmlValueType);
@@ -182,7 +186,7 @@ public class AasSpecSummary {
                         if (null != impType) {
                             ivmlValueType = impType;
                             f.setValueType(impType); // fix this
-                            getLogger().warn("Changed type of {}/{} to {} due to import for semanticId {}. ", 
+                            getLogger().info("Changed type of {}/{} to {} due to import for semanticId {}. ", 
                                 t.getIdShort(), f.getIdShort(), semId);
                         }
                     }
@@ -198,7 +202,7 @@ public class AasSpecSummary {
                             if (null != impType) {
                                 boolean diff = !f.getValueType().equals(impType);
                                 f.setValueType(impType); // fix this
-                                warn(diff, "Changed type of {}/{} to {} due to declared semanticId {}. ", 
+                                info(diff, "Changed type of {}/{} to {} due to declared semanticId {}. ", 
                                     t.getIdShort(), f.getIdShort(), impType, semId);
                             } else {
                                 getLogger().warn("Value type of field {} in type {} is not defined: {}. Using "
@@ -214,15 +218,35 @@ public class AasSpecSummary {
     }
     
     /**
+     * Ensures unique field idShort names. May modify the idShort of {@code field}.
+     * 
+     * @param fieldIdShorts the collected/used idShorts of the fields of the same type so far
+     * @param field the field to check
+     */
+    private void ensureUniqueFieldName(Set<String> fieldIdShorts, AasField field) {
+        String idShort = field.getIdShort();
+        if (!fieldIdShorts.contains(idShort)) {
+            fieldIdShorts.add(idShort);
+        } else {
+            int i = 1;
+            String lastIdShort;
+            do {
+                lastIdShort = idShort + "_" + i++;
+            } while (fieldIdShorts.contains(lastIdShort));
+            field.setIdShort(lastIdShort);
+        }
+    }
+    
+    /**
      * Conditionally emits a warning.
      * 
      * @param condition the condition, must be {@code true} for emitting the warning
      * @param text the text in logger style
      * @param args the arguments
      */
-    private void warn(boolean condition, String text, Object... args) {
+    private void info(boolean condition, String text, Object... args) {
         if (condition) {
-            getLogger().warn(text, args);
+            getLogger().info(text, args);
         }
     }
     

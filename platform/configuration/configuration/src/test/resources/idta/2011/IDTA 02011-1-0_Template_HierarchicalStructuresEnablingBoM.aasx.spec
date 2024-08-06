@@ -7,6 +7,7 @@ project IDTA_02011_HierarchicalStructures {
   AasEnumType ArcheType = {
     name = "ArcheType",
     description = "ArcheType of the Submodel, there are three allowed.",
+    semanticId = "iri:https://admin-shell.io/idta/HierarchicalStructures/ArcheType/1/0",
     literals = {
       AasEnumLiteral {
         name = "Full"

@@ -19,7 +19,14 @@ project AllServices {
     import IDTA_02017_AssetInterfacesDescription with (IDTA_02017_AssetInterfacesDescription.version == v1.0);
     import IDTA_02021_PowerDriveTrainSizing with (IDTA_02021_PowerDriveTrainSizing.version == v1.0);
     import IDTA_02023_CarbonFootprint with (IDTA_02023_CarbonFootprint.version == v0.9);
-    import IDTA_0000_CarbonFootprint;
+    import IDTA_0000_CarbonFootprint; // draft
+    import IDTA_02022_WirelessCommunication with (IDTA_02022_WirelessCommunication.version == v1.0);
+    import IDTA_02026_Models3D with (IDTA_02026_Models3D.version == v1.0);
+    import IDTA_02027_AssetInterfacesMappingConfiguration with (IDTA_02027_AssetInterfacesMappingConfiguration.version == v1.0);
+    import IDTA_02034_BackendSpecificMaterialInformation with (IDTA_02034_BackendSpecificMaterialInformation.version == v1.0);
+    import IDTA_02045_AssetLocation with (IDTA_02045_AssetLocation.version == v1.0);
+    import IDTA_02046_WorkstationWorkerMatchingData with (IDTA_02046_WorkstationWorkerMatchingData.version == v1.0);
+    import IDTA_02056_DataRetentionPolicies with (IDTA_02056_DataRetentionPolicies.version == v1.0);
         
     annotate BindingTime bindingTime = BindingTime::compile to .;
     

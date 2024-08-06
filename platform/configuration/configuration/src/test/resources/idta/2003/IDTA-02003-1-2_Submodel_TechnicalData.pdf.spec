@@ -181,7 +181,7 @@ project IDTA_02003_TechnicalData {
         description = "Arbitrary SubmodelElement with semanticId possibly referring to a ConceptDescription can be used within the Technical Properties."
       },
       AasField {
-        name = "arbitrary",
+        name = "arbitrary_1",
         displayName = "{arbitrary}",
         semanticId = "iri:https://admin-shell.io/SemanticIdNotAvailable/1/1",
         isGeneric = true,

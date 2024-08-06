@@ -81,6 +81,7 @@ project AASDataTypes {
         String description;
         String versionIdentifier;
         Boolean isOpen = false;
+        String semanticId;
     }
 
     typedef AasFields sequenceOf(AasField) with (AasFields->select(f|isRelevant(f))->collect(f|f.name).hasDuplicates() == false);

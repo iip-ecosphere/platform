@@ -325,9 +325,7 @@ project IDTA_02004_HandoverDocumentation {
   AasEntityType Entity = {
     name = "Entity",
     semanticId = "iri:https://admin-shell.io/vdi/2770/1/0/EntityForDocumentation",
-    description = "States, that the described Entity is an important entity for documentation of the superordinate Asset of the Asset Administration Shell. Note: typically, such Entities are well-identified sub-parts of the Asset, such as supplier parts delivered to the manufacturer of the Asset.",
-    fields = {
-    }
+    description = "States, that the described Entity is an important entity for documentation of the superordinate Asset of the Asset Administration Shell. Note: typically, such Entities are well-identified sub-parts of the Asset, such as supplier parts delivered to the manufacturer of the Asset."
   };
 
   freeze {

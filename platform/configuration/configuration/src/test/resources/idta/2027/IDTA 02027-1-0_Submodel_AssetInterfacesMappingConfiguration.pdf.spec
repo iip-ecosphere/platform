@@ -1,0 +1,95 @@
+project IDTA_02027_AssetInterfacesMappingConfiguration {
+
+  version v1.0;
+
+  import AASDataTypes;
+
+  annotate BindingTime bindingTime = BindingTime::compile to .;
+
+  AasSubmodelType AssetInterfacesMappingConfiguration = {
+    name = "AssetInterfacesMappingConfiguration",
+    semanticId = "iri:https://admin-shell.io/idta/AssetInterfacesMappingConfiguration/1/0/Submodel",
+    description = "Definition of the Asset Interfaces Mapping Configuration Submodel identified by its semanticId. The idShort can be picked freely.",
+    versionIdentifier = "IDTA 02027-1-0",
+    fields = {
+      AasField {
+        name = "MappingConfigurations",
+        semanticId = "iri:https://admin-shell.io/idta/AssetInterfacesMappingConfiguration/1/0/MappingConfigurations",
+        type = refBy(MappingConfigurations),
+        minimumInstances = 1,
+        maximumInstances = 1,
+        examples = {"N/A"},
+        description = "A list of collections each referencing an interface in an AID Submodel and configuring source sink relations."
+      }
+    }
+  };
+
+  AasSubmodelElementListType MappingConfigurations = {
+    name = "MappingConfigurations",
+    semanticId = "iri:https://admin-shell.io/idta/AssetInterfacesMappingConfiguration/1/0/MappingConfigurations",
+    description = "A Submodel element list listing collections each referencing an interface in an AID Submodel and configuring source sink relations.",
+    versionIdentifier = "IDTA 02027-1-0",
+    fields = {
+      AasField {
+        name = "MappingConfiguration",
+        displayName = "{Configuration#00}",
+        semanticId = "iri:https://admin-shell.io/idta/AssetInterfacesMappingConfiguration/1/0/MappingConfiguration",
+        isGeneric = true,
+        type = refBy(Configuration),
+        minimumInstances = 0,
+        examples = {"N/A"},
+        description = "A collection referencing an interface in an AID Submodel and configuring source sink relations."
+      }
+    }
+  };
+
+  AasSubmodelElementCollectionType Configuration = {
+    name = "Configuration",
+    semanticId = "iri:https://admin-shell.io/idta/AssetInterfacesMappingConfiguration/1/0/MappingConfiguration",
+    description = "A configuration SMC references an interface in an AID Submodel and configures source sink relations.",
+    versionIdentifier = "IDTA 02027-1-0",
+    fields = {
+      AasField {
+        name = "InterfaceReference",
+        semanticId = "iri:https://admin-shell.io/idta/AssetInterfacesMappingConfiguration/1/0/InterfaceReference",
+        type = refBy(AasReferenceType),
+        minimumInstances = 1,
+        maximumInstances = 1,
+        examples = {"(Submodel) https://asset.com/assetinterfa cesdescription","(SubmodelElementCollection) InterfaceHTTP"},
+        description = "A reference referencing an interface of interest in an AID."
+      },
+      AasField {
+        name = "MappingSourceSinkRelations",
+        semanticId = "iri:https://admin-shell.io/idta/AssetInterfacesMappingConfiguration/1/0/MappingSourceSinkRelations",
+        type = refBy(MappingSourceSinkRelations),
+        minimumInstances = 1,
+        maximumInstances = 1,
+        examples = {"N/A"},
+        description = "A list of collections each configuring mappings from source to sink."
+      }
+    }
+  };
+
+  AasSubmodelElementListType MappingSourceSinkRelations = {
+    name = "MappingSourceSinkRelations",
+    semanticId = "iri:https://admin-shell.io/idta/AssetInterfacesMappingConfiguration/1/0/MappingSourceSinkRelations",
+    description = "The Submodel element list lists relations each configuring mappings from source to sink.",
+    versionIdentifier = "IDTA 02027-1-0",
+    fields = {
+      AasField {
+        name = "MappingSourceSinkRelation",
+        displayName = "{Relation#00}",
+        semanticId = "iri:https://admin-shell.io/idta/AssetInterfacesMappingConfiguration/1/0/MappingSourceSinkRelation",
+        isGeneric = true,
+        type = refBy(AasRelationType),
+        minimumInstances = 0,
+        examples = {"https:/asset.com/assetinterfac esdescription"},
+        description = "Configuration of a mapping from source to sink. The first reference references the source and the second the sink. Both references reference SMEs in Submodels, one in an AID Submodel."
+      }
+    }
+  };
+
+  freeze {
+    .;
+  } but (f|f.bindingTime >= BindingTime.runtimeMon);
+}

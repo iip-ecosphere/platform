@@ -7,6 +7,7 @@ project IDTA_0000_CarbonFootprint {
   AasEnumType PCFCalculationMethod = {
     name = "DraftPCFCalculationMethod",
     description = "Standard, method for determining the greenhouse gas emissions of a product.",
+    semanticId = "irdi:0173-1#02-ABG854#001",
     literals = {
       AasEnumLiteral {
         name = "EN 15804",
@@ -44,6 +45,7 @@ project IDTA_0000_CarbonFootprint {
   AasEnumType PCFReferenceValueForCalculation = {
     name = "DraftPCFReferenceValueForCalculation",
     description = "Quantity unit of the product to which the PCF information on the CO2 footprint refers.",
+    semanticId = "irdi:0173-1#02-ABG856#001",
     literals = {
       AasEnumLiteral {
         name = "g",
@@ -86,6 +88,7 @@ project IDTA_0000_CarbonFootprint {
   AasEnumType PCFLiveCyclePhase = {
     name = "DraftPCFLiveCyclePhase",
     description = "Life cycle stages of the product according to the quantification requirements of the standard to which the PCF carbon footprint statement refers.",
+    semanticId = "irdi:0173-1#02-ABG858#001",
     literals = {
       AasEnumLiteral {
         name = "A1 - raw material supply and upstream production",
@@ -189,6 +192,7 @@ project IDTA_0000_CarbonFootprint {
   AasEnumType TCFCalculationMethod = {
     name = "DraftTCFCalculationMethod",
     description = "Standard, method for determining the greenhouse gas emissions for the transport of a product.",
+    semanticId = "irdi:0173-1#02-ABG859#001",
     literals = {
       AasEnumLiteral {
         name = "EN 16258",
@@ -201,6 +205,7 @@ project IDTA_0000_CarbonFootprint {
   AasEnumType TCFReferenceValueForCalculation = {
     name = "DraftTCFReferenceValueForCalculation",
     description = "Amount of product to which the TCF carbon footprint statement relates.",
+    semanticId = "irdi:0173-1#02-ABG861#001",
     literals = {
       AasEnumLiteral {
         name = "g",
@@ -248,6 +253,7 @@ project IDTA_0000_CarbonFootprint {
   AasEnumType TCFProcessesForGreenhouseGasEmissionInATransportService = {
     name = "DraftTCFProcessesForGreenhouseGasEmissionInATransportService",
     description = "Processes in a transport service to determine the sum of all direct or indirect greenhouse gas emissions from fuel supply and vehicle operation.",
+    semanticId = "irdi:0173-1#02-ABG863#001",
     literals = {
       AasEnumLiteral {
         name = "WTT - Well-to-Tank",

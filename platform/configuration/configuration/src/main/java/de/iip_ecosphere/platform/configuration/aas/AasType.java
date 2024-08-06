@@ -334,6 +334,15 @@ public class AasType extends AbstractAasElement {
     }
     
     /**
+     * Returns whether this type has fields.
+     * 
+     * @return {@code true} if there are fields, {@code false} else
+     */
+    public boolean hasFields() {
+        return fields.size() > 0;
+    }
+    
+    /**
      * The number of fields declared for this type.
      * 
      * @return the number of fields

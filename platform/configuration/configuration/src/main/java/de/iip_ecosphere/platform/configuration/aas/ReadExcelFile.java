@@ -235,9 +235,15 @@ public class ReadExcelFile {
             //readExcelData(baseDir + "2016/IDTA 02016-1-0 _Submodel_ControlComponentInstance.xlsx", null, "Ci");
             //readExcelData(baseDir + "2017/IDTA 02017-1-0_Submodel_Asset Interfaces Description.mod.xlsx", null);
             //readExcelData(baseDir + "2021/IDTA 02021-1-0_Submodel_Sizing of Power Drive Trains.xlsx", null);
-            readExcelData(baseDir + "2023/IDTA 2023-0-9 _Submodel_CarbonFootprint.xlsx", null);
-            
+            //readExcelData(baseDir + "2022/IDTA 02022-1-0_Submodel_Wireless Communication.xlsx", null);
+            //readExcelData(baseDir + "2023/IDTA 2023-0-9 _Submodel_CarbonFootprint.xlsx", null);
             //readExcelData(baseDir + "2023-01-24 - Draft_IDTA_Submodel_PCF-mod.xlsx", null, "Draft");
+            //readExcelData(baseDir + "2026/IDTA_02026-1-0_Submodel_ProvisionOf3DModels.xlsx", null);
+            //readExcelData(baseDir + "2027/IDTA 02027-1-0_Submodel_AssetInterfacesMappingConfiguration.xlsx", null);
+            //readExcelData(baseDir + "2034/IDTA 02034-1-0 Submodel_CreationAndClassificationOfMaterial.xlsx", null);
+            //readExcelData(baseDir + "2045/IDTA 02045-1-0_Submodel_Data Model for Asset Location.xlsx", null);
+            //readExcelData(baseDir + "2046/IDTA 02046-1-0_Submodel_WorkstationWorkerMatchingData.xlsx", null);
+            readExcelData(baseDir + "2056/IDTA 02056-1-0_Submodel_Data Retention Policies.xlsx", null);
         }
     }
 

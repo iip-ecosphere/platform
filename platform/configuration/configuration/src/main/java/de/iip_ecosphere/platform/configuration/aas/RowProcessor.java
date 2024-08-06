@@ -74,13 +74,15 @@ class RowProcessor {
     private String projectName;
     private String specNumber = "0000";
     private AasField lastField;
-    private AasEnum lastEnum;
+    private List<AasEnum> lastEnum = new ArrayList<>();
     private String lastSemanticIdRaw;
     private Map<String, String> deferredTypes = new HashMap<>();
     private List<AasField> genericFields = new ArrayList<>();
     private int genericTypeCount = 0;
     private boolean currentTypeIsAspect;
     private boolean currentMultiSemIdProcessed;
+    private int lastEnum1Row = -1;
+    private int lastEnum2Row = -1;
 
     /**
      * Notifies about starting a data row. Further data passed in through {@link #addDataToRow(String)} is 
@@ -141,7 +143,7 @@ class RowProcessor {
      */
     private void enumAdded(AasEnum en) {
         if (ParsingEnumKind.VALUE_LIST == en.getParsingEnumKind()) { // IDTA-02023-0-9
-            lastEnum = en;
+            lastEnum.add(en);
         }
     }
     
@@ -214,40 +216,91 @@ class RowProcessor {
         if (maxRawIndex == 0 && hasRawData(0)) {
             // need to handle data on next table without header but without reading irrelevant data from next non-field
             // table
+            if (rawData[0].startsWith("<<")) { // IDTA02026 UML from figure by SmallPDF
+                endSection();
+            }
             if (rawData[0].startsWith("Table") || rawData[0].startsWith("Figure") 
                 || rawData[0].startsWith("2.8 Display names") || rawData[0].startsWith("2.4 Example")) { // IDTA2008-1-1
                 endSection();
+                if (rawData[0].contains(" ValueList ")) { // IDTA02026, "-" is problematic
+                    lastEnum1Row = 0; // indicate start
+                }
             }
         } else if (maxRawIndex == 1) {
-            if (lastEnum != null && hasRawData(1)) { // IDTA02023-0-9
-                String idShort = rawData[0];
-                String identifier = getEnumLiteralIdentifier(idShort);
-                lastEnum.addLiteral(new AasEnumLiteral(idShort, rawData[1], null, identifier));
+            if (!lastEnum.isEmpty() && hasRawData(1)) { // IDTA02023-0-9
+                if (lastEnum1Row < 0) { // we are not in IDTA 02026 format
+                    String idShort = rawData[0];
+                    String identifier = getEnumLiteralIdentifier(idShort);
+                    addLastEnumLiteral(new AasEnumLiteral(idShort, rawData[1], null, identifier));
+                }
             } else if (hasRawData(1)) {
-                lastEnum = null; // enum reading stops here, next 2 columns                
+                lastEnum.clear(); // enum reading stops here, next 2 columns
                 processTwoColumns();
             } else if (hasRawData(0)) {
                 postProcessFourColumns(); // IDTA 02007-1-0
             }
         } else if (maxRawIndex == 2 || maxRawIndex == 3) {
-            if (lastEnum != null && maxRawIndex == 2 && rawData[0] != null && hasRawData(3)) { // DRAFT PCF 2023
+            if (maxRawIndex == 2 && hasRawData(3)) { // IDTA 02026
+                if (lastEnum1Row > 0 && lastEnum2Row > 0 && current.size() > 0) {
+                    for (AasType t : current) {
+                        enumsHandler.add(new AasEnum(t, ParsingEnumKind.VALUE_LIST, id -> id + "ValueList"));
+                    }
+                    current.clear();
+                }
+                if (lastEnum1Row == 0 && rawData[0].equals("-") && rawData[1].equals("-") 
+                    && rawData[2].startsWith("semanticId =")) {
+                    lastEnum1Row = row;
+                }
+                if (rawData[0].equals("Preferred Name") && rawData[1].startsWith("Description") 
+                    && rawData[2].startsWith("Dictionary")) {
+                    lastEnum2Row = row;
+                }
+            }
+            
+            if (!lastEnum.isEmpty() && maxRawIndex == 2 && rawData[0] != null && hasRawData(3)) { // DRAFT PCF 2023
                 String valueId = rawData[0];
                 String idShort = rawData[1].replace("–", "-");
                 String semanticId = rawData[2];
+                String description = null;
+                if (lastEnum2Row > 0) { // IDTA 02026
+                    // we may have a non-separated classification system, only for ValueList/enum tables
+                    if (null != semanticId) {  
+                        semanticId = SemanticIdRecognizer.trySafeSemanticIdWithDictionaryFrom(
+                            semanticId, null, true, false);
+                    }
+                    // different structure
+                    idShort = rawData[0];
+                    description = rawData[1];
+                    // and new symbols
+                    if (semanticId.contains("n/a")) {
+                        semanticId = null;
+                    }
+                }
                 String identifier = getEnumLiteralIdentifier(idShort);
-                AasEnumLiteral lit = new AasEnumLiteral(idShort, semanticId, valueId, identifier);
+                AasEnumLiteral lit = new AasEnumLiteral(idShort, semanticId, description, identifier);
                 lit.setValue(valueId);
-                lastEnum.addLiteral(lit);
+                addLastEnumLiteral(lit);
             } else if (maxRawIndex == 2 && null == rawData[0] && lastField != null) {
                 postProcessFourColumns(); // IDTA 02007-1-0
             } else if (hasRawData(2) || hasRawData(3)) {
-                lastEnum = null; // enum reading stops here, next 4 columns
+                lastEnum.clear(); // enum reading stops here, next 4 columns
                 processFourColumns();
             }
         }
         maxRawIndex = -1;
         row++;
         System.arraycopy(rawData, 0, lastRawData, 0, rawData.length); // IDTA 2007-1-0
+    }
+    
+    /**
+     * Adds enum literals.
+     * 
+     * @param literal the literal to add
+     */
+    private void addLastEnumLiteral(AasEnumLiteral literal) {
+        for (AasEnum e : lastEnum) {
+            e.addLiteral(literal); // clone?
+        }
     }
 
     /**
@@ -279,10 +332,12 @@ class RowProcessor {
         lastHeader1Row = -1;
         lastHeader2Row = -1;
         lastField = null;
-        lastEnum = null;
+        lastEnum.clear();
         lastSemanticIdRaw = null;
         currentTypeIsAspect = false;
         currentMultiSemIdProcessed = false;
+        lastEnum1Row = -1;
+        lastEnum2Row = -1;
     }
     
     // checkstyle: stop method length check
@@ -315,17 +370,20 @@ class RowProcessor {
                 if (idShort.endsWith("{00}")) {
                     idShort = idShort.substring(0, idShort.length() - 4);
                     isMultiValued = true;
+                } else if (idShort.startsWith("{") && idShort.endsWith("#00}")) { // IDTA-02027-1-0
+                    idShort = idShort.substring(1, idShort.length() - 4).trim();
+                    isMultiValued = true;
                 }
                 getLogger().info("Processing type {}", idShort);
                 List<AasType> types = new ArrayList<>();
-                String[] ids;
+                String[] ids = null;
                 currentTypeIsAspect = false;
-                if (idShort.startsWith("{") && idShort.contains(" = ")) { // IDTA-020171-0
+                if (idShort.startsWith("{") && idShort.contains(" = ")) { // IDTA-02017-1-0
                     int eqPos = idShort.indexOf(" = ");
                     ids = pruneIds(idShort.substring(eqPos + 3).split(" | "));
                     currentTypeIsAspect = containsPlainType(aasTypes, ids) || containsPlainType(current, ids);
                 } else {
-                    ids = idShort.split(" or "); // IDTA 02023-0-9
+                    ids = toIdsBySeparator(idShort);
                 }
                 currentMultiSemIdProcessed = ids.length > 1; // multiple type ids will be processed, others not
                 for (String id: ids) {
@@ -354,7 +412,8 @@ class RowProcessor {
                 storeAsCurrent(types);
             }
         } else if (header.equals("Class")) {
-            setOnCurrent(a -> a.setSmeType(AasSmeType.toType(value)), "Class"); // TODO check class, enum?
+            final AasSmeType smeType = AasSmeType.toType(value);
+            setOnCurrent(a -> a.setSmeType(smeType), "Class"); // TODO check class, enum?
         } else if (header.equals("semanticId")) {
             if (current.size() > 1) { // IDTA 02023-0-9
                 String[] ids = value.split(" or ");
@@ -422,6 +481,29 @@ class RowProcessor {
         } else {
             getLogger().warn("Unknown 2 column header: {}", header);
         }
+    }
+    
+    /**
+     * Splits {@code idShort} into multiple ids if certain (varying) conditions/formats apply.
+     * 
+     * @param idShort the idShort(s) to split
+     * @return the splitted idShort(s)
+     */
+    private static String[] toIdsBySeparator(String idShort) {
+        String[] ids = null;
+        int pos = idShort.indexOf("(");
+        if (pos > 0) { // IDTA 02026-1-0
+            int pos2 = idShort.indexOf(")");
+            if (pos2 > pos) {
+                String tmpIdShort = idShort.substring(0, pos) + "/ " + idShort.substring(pos + 1, pos2);
+                tmpIdShort = tmpIdShort.replaceAll("\\s*/\\s*", "/");
+                ids = tmpIdShort.split("/");
+            }
+        }
+        if (null == ids) {
+            ids = idShort.split(" or "); // IDTA 02023-0-9
+        }
+        return ids;
     }
     
     // checkstyle: resume method length check
@@ -602,7 +684,9 @@ class RowProcessor {
         }
         if (process) {
             if (lastHeader1Row >= 0 && lastHeader2Row >= 0) {
-                processFourColumnsAsField();
+                if (!"class name of contained elements".equalsIgnoreCase(rawData[0])) { // IDTA 02045-1-0
+                    processFourColumnsAsField();
+                }
             } else {
                 if (lastHeader1Row >= 0 || lastHeader2Row >= 0) { // title page, nothing found
                     getLogger().warn("Missing headers: {}, {}", lastHeader1Row, lastHeader2Row);
@@ -1117,6 +1201,7 @@ class RowProcessor {
     private void processFieldCardinality(String data, AasField field) {
         data = removeBrackets(data); // needed in IDTA 02002-1-0 but not in IDTA 02003-1-2
         if (data != null) {
+            data = data.replace("" + (char) 8230, ".."); // 02022
             if ("*".equals(data)) { // 02016
                 data = "0..*";
             }
@@ -1163,6 +1248,7 @@ class RowProcessor {
      * @param newCurrent the new current type(s), may be <b>null</b> for none
      */
     private void storeAsCurrent(List<AasType> newCurrent) {
+        current.removeIf(t -> null != t.getSmeType() && !t.getSmeType().isType()); // IDTA 02026-1-0
         aasTypes.addAll(current);
         current.clear();
         if (null != newCurrent) {

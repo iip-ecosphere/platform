@@ -54,9 +54,7 @@ project IDTA_02001_ModuleTypePackage {
   AasSubmodelElementCollectionType BOMReferences = {
     name = "BOMReferences",
     semanticId = "iri:https://admin-shell.io/vdi/2658/1/0/MTPReferences",
-    description = "Collection containing references to documentation documents which are associated with TagNames within the MTP file.",
-    fields = {
-    }
+    description = "Collection containing references to documentation documents which are associated with TagNames within the MTP file."
   };
 
   AasSubmodelType AssetIdentification = {

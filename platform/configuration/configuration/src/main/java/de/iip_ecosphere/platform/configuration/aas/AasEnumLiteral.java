@@ -34,6 +34,7 @@ public class AasEnumLiteral extends AbstractAasElement {
      */
     public AasEnumLiteral(String idShort, String valueId, String description, String identifier) {
         setIdShort(idShort);
+        setDescription(description);
         this.valueId = valueId;
         this.identifier = identifier;
     }
