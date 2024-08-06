@@ -989,8 +989,146 @@ public abstract class AbstractAasExample {
             Assert.assertEquals(expected.getMin(), actual.getMin());
             Assert.assertEquals(expected.getMax(), actual.getMax());
         }
-    }    
+    }
     
+    /**
+     * Wrapped assert equals for objects to allow for mixed primitive-object static binding of test code.
+     * 
+     * @param expected the expected value
+     * @param actual the actual value
+     */
+    public static void assertEquals(Object expected, Object actual) {
+        Assert.assertEquals(expected, actual);
+    }
+
+    /**
+     * Wrapped assert equals for int to allow for mixed primitive-object static binding of test code.
+     * 
+     * @param expected the expected value
+     * @param actual the actual value
+     */
+    public static void assertEquals(int expected, int actual) {
+        Assert.assertEquals(expected, actual);
+    }
+
+    /**
+     * Wrapped assert equals for long to allow for mixed primitive-object static binding of test code.
+     * 
+     * @param expected the expected value
+     * @param actual the actual value
+     */
+    public static void assertEquals(long expected, long actual) {
+        Assert.assertEquals(expected, actual);
+    }
+
+    /**
+     * Wrapped assert equals for byte to allow for mixed primitive-object static binding of test code.
+     * 
+     * @param expected the expected value
+     * @param actual the actual value
+     */
+    public static void assertEquals(byte expected, byte actual) {
+        Assert.assertEquals(expected, actual);
+    }
+
+    /**
+     * Wrapped assert equals for short to allow for mixed primitive-object static binding of test code.
+     * 
+     * @param expected the expected value
+     * @param actual the actual value
+     */
+    public static void assertEquals(short expected, short actual) {
+        Assert.assertEquals(expected, actual);
+    }
+
+    /**
+     * Wrapped assert equals for double to allow for mixed primitive-object static binding of test code.
+     * 
+     * @param expected the expected value
+     * @param actual the actual value
+     * @param delta acceptable delta among the given values
+     */
+    public static void assertEquals(double expected, double actual, double delta) {
+        Assert.assertEquals(expected, actual, delta);
+    }
+
+    /**
+     * Wrapped assert equals for float to allow for mixed primitive-object static binding of test code.
+     * 
+     * @param expected the expected value
+     * @param actual the actual value
+     * @param delta acceptable delta among the given values
+     */
+    public static void assertEquals(float expected, float actual, float delta) {
+        Assert.assertEquals(expected, actual, delta);
+    }
+
+    /**
+     * Wrapped assert equals for int/Integer to allow for mixed primitive-object static binding of test code.
+     * 
+     * @param expected the expected value
+     * @param actual the actual value
+     */
+    public static void assertEquals(int expected, Integer actual) {
+        Assert.assertNotNull(actual);
+        Assert.assertEquals(expected, actual.intValue());
+    }
+
+    /**
+     * Wrapped assert equals for long/Long to allow for mixed primitive-object static binding of test code.
+     * 
+     * @param expected the expected value
+     * @param actual the actual value
+     */
+    public static void assertEquals(long expected, Long actual) {
+        Assert.assertNotNull(actual);
+        Assert.assertEquals(expected, actual.longValue());
+    }
+
+    /**
+     * Wrapped assert equals for byte/Byte to allow for mixed primitive-object static binding of test code.
+     * 
+     * @param expected the expected value
+     * @param actual the actual value
+     */
+    public static void assertEquals(byte expected, Byte actual) {
+        Assert.assertNotNull(actual);
+        Assert.assertEquals(expected, actual.byteValue());
+    }
+
+    /**
+     * Wrapped assert equals for short/Short to allow for mixed primitive-object static binding of test code.
+     * 
+     * @param expected the expected value
+     * @param actual the actual value
+     */
+    public static void assertEquals(short expected, Short actual) {
+        Assert.assertNotNull(actual);
+        Assert.assertEquals(expected, actual.shortValue());
+    }
+
+    /**
+     * Wrapped assert equals for double/Double to allow for mixed primitive-object static binding of test code.
+     * 
+     * @param expected the expected value
+     * @param actual the actual value
+     */
+    public static void assertEquals(double expected, Double actual, double delta) {
+        Assert.assertNotNull(actual);
+        Assert.assertEquals(expected, actual.doubleValue(), delta);
+    }
+
+    /**
+     * Wrapped assert equals for float/Float to allow for mixed primitive-object static binding of test code.
+     * 
+     * @param expected the expected value
+     * @param actual the actual value
+     */
+    public static void assertEquals(float expected, Float actual, float delta) {
+        Assert.assertNotNull(actual);
+        Assert.assertEquals(expected, actual.floatValue(), delta);
+    }
+
     // generic methods in test applied on a given value, set, iterator to obtain the "first" for assertions
     
     /**
@@ -1006,12 +1144,62 @@ public abstract class AbstractAasExample {
     }
 
     /**
-     * Returns the "first" element, enforcing as fallback primitive int output. 
+     * Returns the "first" element, enforcing as fallback primitive int output through static binding of test code. 
      * 
      * @param value the primitive value
      * @return {@code value}
      */
     public static int first(int value) {
+        return value;
+    }
+
+    /**
+     * Returns the "first" element, enforcing as fallback primitive short output through static binding of test code. 
+     * 
+     * @param value the primitive value
+     * @return {@code value}
+     */
+    public static short first(short value) {
+        return value;
+    }
+
+    /**
+     * Returns the "first" element, enforcing as fallback primitive byte output through static binding of test code. 
+     * 
+     * @param value the primitive value
+     * @return {@code value}
+     */
+    public static byte first(byte value) {
+        return value;
+    }
+
+    /**
+     * Returns the "first" element, enforcing as fallback primitive double output through static binding of test code. 
+     * 
+     * @param value the primitive value
+     * @return {@code value}
+     */
+    public static double first(double value) {
+        return value;
+    }
+
+    /**
+     * Returns the "first" element, enforcing as fallback primitive double output through static binding of test code. 
+     * 
+     * @param value the primitive value
+     * @return {@code value}
+     */
+    public static float first(float value) {
+        return value;
+    }
+
+    /**
+     * Returns the "first" element, enforcing as fallback primitive long output through static binding of test code. 
+     * 
+     * @param value the primitive value
+     * @return {@code value}
+     */
+    public static long first(long value) {
         return value;
     }
 
@@ -1040,5 +1228,5 @@ public abstract class AbstractAasExample {
         }
         return result;
     }
-
+    
 }

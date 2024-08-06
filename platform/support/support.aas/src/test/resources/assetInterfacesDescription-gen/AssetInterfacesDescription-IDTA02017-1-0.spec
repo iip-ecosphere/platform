@@ -25,7 +25,9 @@ AAS AssetInterfacesDescriptionExample
       RANGE lengthRange (semanticId: iri:https://oktoflow.de/semId-lengthRange) min 10 max 23
       RANGE min_max (semanticId: iri:https://oktoflow.de/semId-min_max) min 12.0 max 56.0
       SMC properties_2 (semanticId: iri:https://www.w3.org/2019/wot/json-schema#properties)
-       SMC generic01 (semanticId: iri:https://www.w3.org/2019/wot/json-schema#propertyName)
+       SMC generic01 (semanticId: iri:https://www.w3.org/2011/http#headers)
+        PROPERTY htv_fieldName = Accept-Charset (semanticId: iri:https://www.w3.org/2011/http#fieldName)
+        PROPERTY htv_fieldValue = utf-8 ?    [string] 56 (semanticId: iri:https://www.w3.org/2011/http#fieldValue)
       PROPERTY title = Festo_Robot1 (semanticId: iri:https://www.w3.org/2019/wot/td#title)
       PROPERTY type = integer (semanticId: iri:https://www.w3.org/1999/02/22-rdf-syntax-ns#type)
       PROPERTY unit = degree:celcius (semanticId: iri:https://schema.org/unitCode)

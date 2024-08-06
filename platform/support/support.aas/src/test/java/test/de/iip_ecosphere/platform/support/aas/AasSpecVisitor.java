@@ -13,9 +13,12 @@
 package test.de.iip_ecosphere.platform.support.aas;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -28,6 +31,7 @@ import java.util.concurrent.ExecutionException;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
 import de.iip_ecosphere.platform.support.CollectionUtils;
@@ -60,6 +64,7 @@ import org.junit.Assert;
 public class AasSpecVisitor implements AasVisitor {
 
     public static final DateFormat DATE_FORMATTER = createDateFormat("yyyy/MM/dd HH:mm:ss");
+    private static boolean storeTestOutput = false;
     
     private String indentation = "";
     private PrintStream out;
@@ -83,6 +88,15 @@ public class AasSpecVisitor implements AasVisitor {
         SimpleDateFormat result = new SimpleDateFormat(format);
         result.setTimeZone(TimeZone.getTimeZone("GMT"));
         return result;
+    }
+    
+    /**
+     * Enables/disables storing the test output to the user's temporary folder.
+     * 
+     * @param store {@code true} for storing the test output, {@code false} else
+     */
+    public static void setStoreTestOutput(boolean store) {
+        storeTestOutput = store;
     }
     
     /**
@@ -301,6 +315,16 @@ public class AasSpecVisitor implements AasVisitor {
         System.out.println(">-- test-out --");
         System.out.println(testSpec);
         System.out.println("<-- test-out --");
+        if (storeTestOutput) {
+            try {        
+                File f = new File(FileUtils.getTempDirectory(), fileName);
+                PrintWriter fw = new PrintWriter(new FileWriter(f));
+                fw.println(testSpec);
+                fw.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         try {
             InputStream in = ResourceLoader.getResourceAsStream(resourceName);
             String spec = IOUtils.toString(in, cs).trim().replace("\r\n", "\n");

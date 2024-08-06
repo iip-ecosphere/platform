@@ -1,0 +1,22 @@
+AAS AssetLocationExample
+ ASSET ci INSTANCE
+ SUBMODEL AssetLocation (semanticId: iri:https://admin-shell.io/idta/smt/assetlocation/1/0)
+  SMC Addresses (semanticId: iri:https://admin-shell.io/idta/sml/addresses/1/0)
+   PROPERTY Adress01 = -- SubmodelElementCollection (semanticId: irdi:0173-1#01-ADR442#007)
+  SMC AreaRelations
+  SMC AssetLocatingInformation (semanticId: iri:https://admin-shell.io/idta/sml/assetlocatinginformation/1/0)
+   PROPERTY Localizable = false (semanticId: iri:https://admin-shell.io/idta/prop/localizable/1/0)
+   MLP RealtimeCapabilityOfAAS (semanticId: iri:https://admin-shell.io/idta/mlp/realtimecapabilityofaas/1/0)
+   MLP RealtimeLocationSource (semanticId: iri:https://admin-shell.io/idta/mlp/realtimelocationsource/1/0)
+   PROPERTY RealtimeLocationSourceType = TEST (semanticId: iri:https://admin-shell.io/idta/prop/realtimelocationsourcetype/1/0)
+  SMC AssetTraces (semanticId: iri:https://admin-shell.io/idta/smc/assettraces/1/0)
+   REFERENCE AreaEventTimeSeriesData -> true (semanticId: iri:https://admin-shell.io/idta/ref/eventtimeseriesdata/1/0)
+   SMC AreaRecords (semanticId: iri:https://admin-shell.io/idta/sml/arearecords/1/0)
+    PROPERTY AreaRecordsRecord01 = -- SubmodelElementCollection (semanticId: iri:https://admin-shell.io/idta/smc/arearecordsrecord/1/0)
+   REFERENCE LocationEventTimeSeriesData -> true (semanticId: iri:https://admin-shell.io/idta/ref/eventtimeseriesdata/1/0)
+   SMC LocationRecords (semanticId: iri:https://admin-shell.io/idta/sml/locationrecords/1/0)
+    PROPERTY LocationRecordsRecord01 = -- SubmodelElementCollection (semanticId: iri:https://admin-shell.io/idta/smc/locationrecordsrecord/1/0)
+  SMC CoordinateSystems (semanticId: iri:https://admin-shell.io/idta/sml/coordinatesystems/1/0)
+   PROPERTY CoordinateSystemsRecord01 = -- SubmodelElementCollection (semanticId: iri:https://admin-shell.io/idta/smc/coordinatesystemsrecord/1/0)
+  SMC VisitedAreas (semanticId: iri:https://admin-shell.io/idta/sml/visitedareas/1/0)
+   PROPERTY VisitedAreasRecord01 = -- SubmodelElementCollection (semanticId: iri:https://admin-shell.io/idta/smc/visitedareasrecord/1/0)
