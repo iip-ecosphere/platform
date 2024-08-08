@@ -56,9 +56,8 @@ template AasImplTest(Configuration config, FileArtifact target, AasSubmodelType 
         if (isDefined(field.examples) and field.examples <> null) {
             for (String e: field.examples) {
                 if (result.length() == 0) {
-                    String tmp = '${e}'; // EASY-Bug, not string
-                    tmp = tmp.replace("“", "").replace("”", ""); // potentially unmappable characters
-                    result = '${tmp}'; // VTL bug, keeps "reference"
+                    e = e.replace("“", "").replace("”", ""); // potentially unmappable characters
+                    result = '${e}'; 
                 }
             }
         }

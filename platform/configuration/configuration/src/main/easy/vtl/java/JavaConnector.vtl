@@ -129,7 +129,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         }
         if (isDefined(conn.outChannels) and conn.outChannels <> null) {
             for (String c: conn.outChannels) {
-                result.add("${c}"); // EASy-Bug, string value conversion
+                result.add(c);
             }
         }
         result;
