@@ -58,9 +58,9 @@ public class IvmlContainerLxcTests extends AbstractIvmlTests {
         }
         Assume.assumeTrue(winAndLxcDisabled | uxAndHomeOk);
 
-        File gen = new File("gen/tests/ContainerCreationLxc");
+        File gen = new File(TEST_BASE_FOLDER, "ContainerCreationLxc");
         PlatformInstantiatorExecutor
-            .instantiate(new TestConfigurer("ContainerCreationLxc", new File("src/test/easy/single"), gen));
+            .instantiate(new TestConfigurer("ContainerCreationLxc", new File(MODEL_BASE_FOLDER, "single"), gen));
         assertAllFiles(gen);
         assertTemplateZip(gen, "impl.SimpleMeshTestingContainerApp");
     }

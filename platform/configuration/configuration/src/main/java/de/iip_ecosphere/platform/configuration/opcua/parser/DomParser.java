@@ -1555,7 +1555,7 @@ public class DomParser {
             fileName = StringUtils.removeEnd(fileName, ".NodeSet2");
             fileName = fileName.replace(".", "");
             fileName = fileName.replace("-", "_");
-            File ivmlFile = new File("gen/Opc" + fileName + ".ivml");
+            File ivmlFile = new File("target/gen/Opc" + fileName + ".ivml");
             process(file, fileName, ivmlFile, verboseDefault);
         }
         Collector.informationToExcel();

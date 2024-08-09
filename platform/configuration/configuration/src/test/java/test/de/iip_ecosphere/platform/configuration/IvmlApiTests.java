@@ -39,9 +39,9 @@ public class IvmlApiTests extends AbstractIvmlTests {
         //System.setProperty(PlatformInstantiator.KEY_PROPERTY_MVNARGS, "-o");
         //System.setProperty(PlatformInstantiator.KEY_PROPERTY_TRACING, "ALL");
         //PlatformInstantiator.setTraceFilter();
-        File gen = new File("gen/tests/api");
+        File gen = new File(TEST_BASE_FOLDER, "api");
         PlatformInstantiatorExecutor.instantiate(
-            genApi(new TestConfigurer("PlatformConfiguration", new File("src/test/easy/api"), gen)));
+            genApi(new TestConfigurer("PlatformConfiguration", new File(MODEL_BASE_FOLDER, "api"), gen)));
         assertAllFiles(gen);
     }
     

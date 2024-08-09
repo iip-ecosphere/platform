@@ -50,6 +50,9 @@ import static test.de.iip_ecosphere.platform.services.environment.PythonEnvironm
  */
 public abstract class AbstractIvmlTests {
     
+    public static final File TEST_BASE_FOLDER = new File("target/gen/tests");
+    public static final File MODEL_BASE_FOLDER = new File("src/test/easy");
+    
     private static final Set<String> ASSERT_FILE_EXTENSIONS = new HashSet<>();
     private static final Set<String> ASSERT_FILE_NAME_EXCLUSIONS = new HashSet<>();
     private static Boolean isIipBuildInitial;

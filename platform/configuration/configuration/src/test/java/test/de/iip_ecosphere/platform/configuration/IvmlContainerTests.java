@@ -47,9 +47,9 @@ public class IvmlContainerTests extends AbstractIvmlTests {
             dockerFailProp = "easy.docker.failOnError";
             dockerFailPropValue = "false";
         }
-        File gen = new File("gen/tests/ContainerCreation");
+        File gen = new File(TEST_BASE_FOLDER, "ContainerCreation");
         PlatformInstantiatorExecutor.instantiate(
-            new TestConfigurer("ContainerCreation", new File("src/test/easy/single"), gen)
+            new TestConfigurer("ContainerCreation", new File(MODEL_BASE_FOLDER, "single"), gen)
                 .setProperty(dockerFailProp, dockerFailPropValue)); 
         assertAllFiles(gen);
         assertTemplateZip(gen, "impl.SimpleMeshTestingContainerApp");

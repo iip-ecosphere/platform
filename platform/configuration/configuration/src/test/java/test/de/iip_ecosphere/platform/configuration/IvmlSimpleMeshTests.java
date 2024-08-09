@@ -38,9 +38,9 @@ public class IvmlSimpleMeshTests extends AbstractIvmlTests {
     @Test
     public void testSimpleMesh() throws ExecutionException, IOException {
         // mvn: stdout now in target/surefire-reports/<qualifiedClassName>-output.txt
-        File gen = new File("gen/tests/SimpleMesh");
+        File gen = new File(TEST_BASE_FOLDER, "SimpleMesh");
         PlatformInstantiatorExecutor.instantiate(
-            genApps(new TestConfigurer("PlatformConfiguration", new File("src/test/easy/simpleMesh"), gen)));
+            genApps(new TestConfigurer("PlatformConfiguration", new File(MODEL_BASE_FOLDER, "simpleMesh"), gen)));
         assertAllFiles(gen);
         assertTemplateZip(gen, "impl.SimpleMeshTestingApp");
     }

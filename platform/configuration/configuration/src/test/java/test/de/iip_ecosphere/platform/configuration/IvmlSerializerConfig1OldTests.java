@@ -38,9 +38,9 @@ public class IvmlSerializerConfig1OldTests extends AbstractIvmlSerializerConfigT
     @Test
     public void testSerializerConfig1Old() throws ExecutionException, IOException {
         // mvn: stdout now in target/surefire-reports/<qualifiedClassName>-output.txt
-        File gen = new File("gen/tests/SerializerConfig1old");
+        File gen = new File(TEST_BASE_FOLDER, "SerializerConfig1old");
         PlatformInstantiatorExecutor.instantiate(
-            genApps(new TestConfigurer("SerializerConfig1Old", new File("src/test/easy/single"), gen)));
+            genApps(new TestConfigurer("SerializerConfig1Old", new File(MODEL_BASE_FOLDER, "single"), gen)));
         
         File base = new File(gen, "MyAppExampleOld");
         assertAppInterfaces(base, true); // old style
