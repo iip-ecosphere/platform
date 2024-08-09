@@ -12,6 +12,7 @@ For installation and first steps, see [install guide](platform/documentation/INS
 
 ## News
 
+* Exiting: oktoflow shall become the technological core of the funded [DATI](https://www.bmbf.de/bmbf/de/forschung/datipilot/datipilot_node.html) Innovation Community ReGaP. Stay tuned!!!
 * ETFA'24: Paper on generating IDTA AAS submodel APIs accepted (preprint on [arxiv](https://arxiv.org/abs/2406.14470)).
 * MODELS'24: Tutorial on AAS accepted.
 * INFLUX DB connector for InfluxDb2
