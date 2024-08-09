@@ -11,7 +11,7 @@
 
 - Execution requirements as basis
 - Eclipse 2024-06 (4.32.0)
-- Eclipse Checkstyle plugin 10.14.2
+- Eclipse Checkstyle plugin 10.14.2-10.17.0
 - M2E Maven integration 2.6.1
 - eGit 6.10 (LFS, see below)
 
