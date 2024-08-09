@@ -27,6 +27,7 @@ import de.iip_ecosphere.platform.examples.SpringStartup;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.collector.Collector;
+import test.de.iip_ecosphere.platform.configuration.AbstractIvmlTests;
 import test.de.iip_ecosphere.platform.test.amqp.qpid.TestQpidServer;
 
 /**
@@ -105,11 +106,12 @@ public class ConfigurationTests {
      */
     private void testInstantiatedExample(String folder, String appName, int stopTime, Consumer<String> asserter) 
         throws IOException {
+        String base = AbstractIvmlTests.TEST_BASE_FOLDER.getPath();
         long start = System.currentTimeMillis();
-        File cfg = new File(System.getProperty("test.genFolder", "../../configuration/configuration/gen/tests")); // git
+        File cfg = new File(System.getProperty("test.genFolder", "../../configuration/configuration/" + base)); // git
         if (!cfg.exists()) {
             cfg = new File( // jenkins path, property does not work so far
-                "../../../../IIP_configuration.configuration/platform/configuration/configuration/gen/tests/");
+                "../../../../IIP_configuration.configuration/platform/configuration/configuration/" + base);
         }
         System.out.println("Using folder " + cfg.getAbsolutePath());
         Assert.assertTrue("configuration.configuration must be built before", cfg.exists());
