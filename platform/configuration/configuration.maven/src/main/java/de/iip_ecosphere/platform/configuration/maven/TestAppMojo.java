@@ -584,8 +584,8 @@ public class TestAppMojo extends AbstractLoggingMojo {
                 if (!dir.exists()) {
                     tmp = tmp.getParentFile();
                 }
-            } while (!dir.exists() && tmp.toString().length() > 0);
-            if (tmp.toString().length() == 0) {
+            } while (!dir.exists() && null != tmp && tmp.toString().length() > 0);
+            if (null == tmp || tmp.toString().length() == 0) {
                 dir = new File(outputDirectory, "broker/broker"); // fallback
             }
         }
