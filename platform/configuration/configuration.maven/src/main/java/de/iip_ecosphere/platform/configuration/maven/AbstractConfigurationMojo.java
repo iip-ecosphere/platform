@@ -338,7 +338,7 @@ public abstract class AbstractConfigurationMojo extends AbstractLoggingMojo impl
             long maxOut = getMaxLastModified(outDir, f -> true);
             newer = maxOut < 0 || maxModel > maxOut;
         }
-        return newer;
+        return newer || !new File(outDir).exists();
     }
 
     /**
