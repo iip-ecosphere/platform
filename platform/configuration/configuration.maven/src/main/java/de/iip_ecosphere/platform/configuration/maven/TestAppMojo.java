@@ -582,7 +582,7 @@ public class TestAppMojo extends AbstractLoggingMojo {
             do {
                 dir = new File(tmp, "broker/broker");
                 if (!dir.exists()) {
-                    tmp = tmp.getParentFile();
+                    tmp = new File(tmp.getParent()); // getParentFile differs between Windows/Jenkins
                 }
             } while (!dir.exists() && null != tmp && tmp.toString().length() > 0);
             if (null == tmp || tmp.toString().length() == 0) {
