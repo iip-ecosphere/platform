@@ -1,6 +1,6 @@
 # oktoflow platform examples: Asynchronous Python
 
-Demonstrates a simple application-specific (asynchronous) Python service in a simple service chain. If compile errors show up, e.g., in Eclipse, this means that the generated code is not yet in place. Run the instantiation/connector generation as described below (generated classes are intentionally not in github, generated example components are intentionally not deployed to Maven). 
+Demonstrates a simple application-specific (asynchronous) Python service in a simple service chain. If compile errors show up, e.g., in Eclipse, this means that the generated code is not yet in place. Run the instantiation/connector generation as described below (generated classes are intentionally not in github, generated example components are intentionally not deployed to Maven). Since version 0.7.1 the generated code is in `target/gen` rather than `gen`.
 
 The application consists of three (micro)-services, which are composed in the configuration model and integrated in a model-based fashion through the platform/application instantiation:
   * A sender service asynchronously ingests data once per second.
@@ -24,9 +24,9 @@ As stated above, directly after obtaining this project, the application will not
   * Execute `mvn -U install` This will perform the broker-instantiation, the interface generation, the code compilation and packaging as well as the final application packaging. Build steps are only executed if the configuration model changes or generate code is not already existing. If a `resources.ipr` folder is present, it will take precendence over the `resources` folder. 
   * To update/upgrade the model, call `mvn -P EasyGen -U generate-sources -Dunpack.force=true`.
 
-If you want to execute the example in a platform installation, add `gen/py/SimplePythonDemoFlowApp/target/SimplePythonDemoFlowApp-0.1.0-SNAPSHOT-bin.jar` to the devices and execute the application (Platform CLI, deployment script, etc. see Platform Handbook for details). If you want to execute the application standalone without platform:
+If you want to execute the example in a platform installation, add `target/gen/py/SimplePythonDemoFlowApp/target/SimplePythonDemoFlowApp-0.1.0-SNAPSHOT-bin.jar` to the devices and execute the application (Platform CLI, deployment script, etc. see Platform Handbook for details). If you want to execute the application standalone without platform:
 
-  * Start the broker (in an own shell, in Linux call `broker.sh`, in Windows `broker.bat` in `gen/broker`)
+  * Start the broker (in an own shell, in Linux call `broker.sh`, in Windows `broker.bat` in `target/gen/broker`)
   * Execute `mvn -P App exec:java` which executes the example via a starter class. This starter class is required to run the example (micro-)service based application standalone in one JVM on the actual computer. This requires some additional code to prepare a setup as the platform would do, e.g., unpack the Python service code and the oktoflow Python service environment, set the communication ports, switch the services into running state, etc. Most of the code is part of the Spring Cloud Stream manager extension of the platform (as this code depends on Spring related assumptions, we break here the platform architecture rule to not include extension components - this is just for running the example standalone, not for implementing the services). Ultimately, the application shall emit tuples of values received by the Fake Python "AI" service and the receiver service.
 
 ## Python

@@ -61,6 +61,7 @@
   <properties>
         <iip.resources>resources</iip.resources>
         <iip.model>PlatformConfiguration</iip.model>
+        <iip.gen>target/gen/py</iip.gen>
   </properties>
   
   <profiles>
@@ -146,7 +147,7 @@
                   <configuration>
                       <mainClass>de.iip_ecosphere.platform.examples.SpringStartup</mainClass>
                       <arguments>
-                        <argument>gen/py/SimplePythonDemoFlowApp/target/SimplePythonDemoFlowApp-0.1.0-SNAPSHOT-bin.jar</argument>
+                        <argument>${iip.gen}/SimplePythonDemoFlowApp/target/SimplePythonDemoFlowApp-0.1.0-SNAPSHOT-bin.jar</argument>
                       </arguments>
                   </configuration>
               </plugin>
@@ -241,7 +242,7 @@
 	            </executions>
 	            <configuration>
 	                <model>${iip.model}</model>
-	                <outputDirectory>gen/py</outputDirectory>
+	                <outputDirectory>${iip.gen}</outputDirectory>
 	                <metaModelDirectory>${project.build.directory}/easy</metaModelDirectory>
 	                <modelDirectory>src/main/easy</modelDirectory>
 	            </configuration>
