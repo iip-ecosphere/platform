@@ -150,6 +150,7 @@ The `testApp` goal (default phase `package`, can be seen as integration test but
 
   - `testCmd` (`-Dconfiguration.testApp.testCmd=...`, default `""`) the command to be executed for testing instead of an oktoflow application. Arguments are in `appArgs`. If not given, a test  application is tested via `mvn exec:java@app` (further settings see below).
   - `testCmdAsScript` (`-Dconfiguration.testApp.testCmdAsScript=...`, default `false`) to indicate that the command is a script and may need special treatment, e.g., on windows (automatically set `true` for `ant`, `mvn` or `npm` or `ng`)
+  - `outputDirectory` the directory where to write the generated parts to (usually, `gen` or a sub-directory of it, default `gen`, `-Dconfiguration.outputDirectory=...`). If not absolute, the project base directory will be prepended.
   - `appId` (`-Dconfiguration.testApp.appId=...`, default `app`) the id for executing the test application through `mvn exec:java@app` in test mode as given in the POM.
   - `appProfile` (`-Dconfiguration.testApp.appProfile=...`, default `App`) the profile name for executing the test application through `mvn exec:java@app` in test mode as given in the POM. The profile name may be `-`, then none will be set.
   - `appPom` (`-Dconfiguration.testApp.appPom=...`, default ``) the POM the app execution definition is contained within, if not given the same this test plugin is executed within.
@@ -164,6 +165,7 @@ The `testApp` goal (default phase `package`, can be seen as integration test but
   - `skip` (`-Dconfiguration.testApp.skip=...`, default `false`) skips the execution of this plugin.
   - `brokerPort` (`-Dconfiguration.testApp.brokerPort=...`, default `-1`) the port to use for the communication broker, an ephemeral one is used if not positive, execution of broker and platform are skipped if `0`.
   - `brokerWaitTime` (`-Dconfiguration.testApp.brokerWaitTime=...`, default `3000`) time in ms to wait for the broker to be safely up.
+  - `brokerDirectory` (`-Dconfiguration.testApp.brokerDir=...`, default `${configuration.outputDirectory}/broker/broker`) specifies the directory where the executable/generated platform broker is located. The default is based on `configuration.outputDirectory` (which, in turn, is by default `gen`) composed with `broker/broker` selecting an existing (parent) directory of the output directory, but may be overridden explicitly.
   - `testTime` (`-Dconfiguration.testApp.testTime=...`, default `120000`) time in ms to wait until the test shall be terminated as a failure (if not a log pattern match occurred before).
   - `platformDir` (`-Dconfiguration.testApp.platformDir=...`, default `""`) directory into which an optional platform was instantiated. If not given, no platform services will be executed at all. 
   - `startPlatform` (`-Dconfiguration.testApp.startPlatform=...`, default `true`) if `platformDir` is given, try to start the central platform services (transport adjusted to the `brokerPort`). 

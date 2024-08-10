@@ -112,6 +112,9 @@ public class TestAppMojo extends AbstractLoggingMojo {
     @Parameter(property = "configuration.testApp.skip", required = false, defaultValue = "false")
     private boolean skip;
 
+    @Parameter(property = "configuration.testApp.brokerDir", required = false, defaultValue = "")
+    private String brokerDir;
+
     @Parameter(property = "configuration.testApp.brokerPort", required = false, defaultValue = "-1")
     private int brokerPort;
 
@@ -121,6 +124,9 @@ public class TestAppMojo extends AbstractLoggingMojo {
     @Parameter(property = "configuration.testApp.testTime", required = true, defaultValue = "120000")
     private int testTime;
     private int testTimePlatform;
+    
+    @Parameter(property = "configuration.outputDirectory", required = true, defaultValue = "gen")
+    private String outputDirectory;
 
     @Parameter(property = "configuration.testApp.platformDir", required = false, defaultValue = "")
     private File platformDir;
@@ -563,6 +569,31 @@ public class TestAppMojo extends AbstractLoggingMojo {
     }
     
     /**
+     * Determines the probable broker directory from settings or {@link #outputDirectory}.
+     * 
+     * @return the broker directory
+     */
+    private File determineBrokerDir() {
+        File dir;
+        if (brokerDir != null && brokerDir.length() > 0) {
+            dir = new File(brokerDir);
+        } else {
+            File tmp = new File(outputDirectory);
+            do {
+                dir = new File(tmp, "broker/broker");
+                if (!dir.exists()) {
+                    tmp = tmp.getParentFile();
+                }
+            } while (!dir.exists() && tmp.toString().length() > 0);
+            if (tmp.toString().length() == 0) {
+                dir = new File(outputDirectory, "broker/broker"); // fallback
+            }
+        }
+        getLog().info("Using broker dir: " + dir);
+        return dir;
+    }
+    
+    /**
      * Implements the test execution.
      * 
      * @throws MojoExecutionException if the Mojo execution failed
@@ -577,7 +608,7 @@ public class TestAppMojo extends AbstractLoggingMojo {
         if (brokerPort > 0) {
             Runtime.getRuntime().addShutdownHook(new Thread(() -> stopProcessUnits()));
             getLog().info("Using broker port: " + brokerPort);
-            buildAndRegister(createPlatformBuilder("broker", new File("gen/broker/broker"), "broker", null, 
+            buildAndRegister(createPlatformBuilder("broker", determineBrokerDir(), "broker", null, 
                 String.valueOf(brokerPort))
                 .setTimeout(testTimePlatform));
             // broker may take a while; regEx would be ok, but we do not know the broker here -> generation?
