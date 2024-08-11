@@ -468,7 +468,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
             String ex = "access.get(${getFieldPath(field, p)}, ${cachingTime(field)})";
             String convOp = genConvertOp("inConverter", field.type, "to", ex);
             if (field.type.isKindOf(ListType) and convOp.startsWith("toList(")) {
-                convOp = convOpt.replace(".toList(", ".toElementList(");
+                convOp = convOp.replace(".toList(", ".toElementList(");
             }
             '${convOp}';
         }

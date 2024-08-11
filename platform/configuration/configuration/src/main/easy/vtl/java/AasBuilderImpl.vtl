@@ -274,7 +274,7 @@ template AasBuilderImpl(Configuration config, FileArtifact target, AasSubmodelTy
         '${getFieldNameIdentifier(field)}.getValue()'
     }
     
-    @DispatchBasis
+    @DispatchCase
     def String produceParameter(AasEnumType type, String paramType, String paramName) {
         String prefix = "";
         if (type.isOpen) {

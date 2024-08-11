@@ -179,8 +179,8 @@ template AasImplTest(Configuration config, FileArtifact target, AasSubmodelType 
     @DispatchCase
     def genPopulateField(AasField field, AasRelationTypeType type, Integer mode) {
         if (notSkip(field)) {
-            Reference firstEx = 'toTestRelationshipElementFirst("${getExample(field)}", getTestReference())';
-            Reference secondEx = 'toTestRelationshipElementSecond("${getExample(field)}", getTestReference())';
+            String firstEx = 'toTestRelationshipElementFirst("${getExample(field)}", getTestReference())';
+            String secondEx = 'toTestRelationshipElementSecond("${getExample(field)}", getTestReference())';
             String methodNameSuffix = asMethodNameSuffix(field.name);
             String idShortEx = "";
             String idShortEx2 = "";

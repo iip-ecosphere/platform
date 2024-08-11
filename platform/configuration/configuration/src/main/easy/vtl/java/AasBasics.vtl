@@ -197,7 +197,7 @@ template AasBasics(Configuration config, FileArtifact target) {
         getBooleanValueSafe(field.multiSemanticIds, false);
     }
 
-    @DispatchBase    
+    @DispatchBasis    
     def hasMultiSemId(DataType elt) {
     }
 
@@ -206,7 +206,7 @@ template AasBasics(Configuration config, FileArtifact target) {
         getBooleanValueSafe(elt.multiSemanticIds, false);
     }
     
-    @DispatchBase    
+    @DispatchBasis    
     def getSemId(DataType elt) {
         "";
     }
