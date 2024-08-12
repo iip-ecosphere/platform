@@ -38,7 +38,8 @@ public class Generator {
      * @param hierarchy the parsed element hierarchy
      */
     public static void generateIVMLModel(String fileName, File ivmlFile, ArrayList<BaseType> hierarchy) {
-        String ivmlHeader = "project Opc" + fileName + " {\n\n" + "\timport IIPEcosphere;\n" + "\timport DataTypes;\n"
+        String ivmlHeader = "project Opc" + fileName.replace(".", "_") + " {\n\n" 
+                + "\timport IIPEcosphere;\n" + "\timport DataTypes;\n"
                 + "\timport OpcUaDataTypes;\n\n"
                 + "\tannotate BindingTime bindingTime = BindingTime::compile to .;\n\n";
 
