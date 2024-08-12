@@ -1,12 +1,12 @@
 echo $1 | sudo -S apt-get update
 sudo apt install unzip -y
 sudo apt install jq -y
-sudo apt install openjdk-13-jdk-headless -y
+sudo apt install openjdk-17-jdk-headless -y
 #sudo apt install maven -y
-echo $1 | sudo wget https://archive.apache.org/dist/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz
-echo $1 | sudo tar xzpvf apache-maven-3.6.3-bin.tar.gz
+echo $1 | sudo wget https://archive.apache.org/dist/maven/maven-3/3.9.7/binaries/apache-maven-3.9.7-bin.tar.gz
+echo $1 | sudo tar xzpvf apache-maven-3.9.7-bin.tar.gz
 
-echo $1 | sudo ln -s $PWD/apache-maven-3.6.3/bin/mvn /usr/bin/mvn
+echo $1 | sudo ln -s $PWD/apache-maven-3.9.7/bin/mvn /usr/bin/mvn
 
 sudo apt-get update -y
 sudo apt-get install \
