@@ -1,6 +1,6 @@
 # oktoflow platform: Setup for an implementation project.
 
-Project for the application model. It will generate a template project in ``gen/impl/templates`` that you can copy-import into Eclipse to implement the services..
+Project for the application model. It will generate a template project in ``target/gen/impl/templates`` that you can copy-import into Eclipse to implement the services. Since version 0.7.1, this project contains a simple basic model (following the basic structures of `cfg` in `src/main/easy` in the project `configuration.configuration`).
 
 ##Typical steps
   * `mvn -U -P EasyGen generate-sources` to obtain the meta model
