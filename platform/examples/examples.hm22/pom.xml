@@ -16,6 +16,7 @@
   <properties>
       <iip.resources>${project.basedir}/resources</iip.resources>
       <iip.model>ExampleHm22Install</iip.model>
+      <iip.gen>target/gen/hm22</iip.gen>
   </properties>
   
   <profiles>
@@ -203,7 +204,7 @@
                             <configuration>
                               <mainClass>de.iip_ecosphere.platform.examples.SpringStartup</mainClass>
                               <arguments>
-                                <argument>gen/hm22/DemonstrationAppHM22/target/DemonstrationAppHM22-0.1.0-SNAPSHOT-bin.jar</argument>
+                                <argument>${iip.gen}/DemonstrationAppHM22/target/DemonstrationAppHM22-0.1.0-SNAPSHOT-bin.jar</argument>
                               </arguments>
                               <classpathScope>test</classpathScope>
                             </configuration>
@@ -373,7 +374,7 @@
                </executions>
                <configuration>
                    <model>${iip.model}</model>
-                   <outputDirectory>gen/hm22</outputDirectory>
+                   <outputDirectory>${iip.gen}</outputDirectory>
                    <metaModelDirectory>${project.build.directory}/easy</metaModelDirectory>
                    <modelDirectory>src/main/easy</modelDirectory>
                </configuration>
@@ -391,7 +392,7 @@
                         <arguments>
                             <argument>${iip.model}</argument>
                             <argument>src/test/easy</argument>
-                            <argument>gen/broker</argument>
+                            <argument>target/gen/broker</argument>
                             <argument>generateBroker</argument>
                         </arguments>
                     </configuration>
@@ -404,7 +405,7 @@
                         <arguments>
                             <argument>${iip.model}</argument>
                             <argument>src/test/easy</argument>
-                            <argument>gen/hm22</argument>
+                            <argument>${iip.gen}</argument>
                             <argument>generateAppsNoDeps</argument>
                         </arguments>
                         <systemProperties>
@@ -423,7 +424,7 @@
                         <arguments>
                             <argument>${iip.model}</argument>
                             <argument>src/test/easy</argument>
-                            <argument>gen/hm22</argument>
+                            <argument>${iip.gen}</argument>
                             <argument>generateApps</argument>
                         </arguments>
                         <systemProperties>
