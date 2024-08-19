@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProductLineProject id="2d837433-ca1e-478a-9663-80757d1996f5" name="PlatformConfiguration" version="0" location="examples.pythonSync">
+	<predecessors>
+	</predecessors>
+	<successors>
+	</successors>
+	<instantiators>
+	</instantiators>
+	<reasoners>
+		<entity timeout="0" />
+	</reasoners>
+	<copy>
+		<entity copyID="de.uni_hildesheim.sse.easy.instantiator.copy.no_copy" />
+	</copy>
+</ProductLineProject>
