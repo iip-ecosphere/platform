@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProductLineProject id="1a83b433-aa0e-468a-9663-89756d2993af" name="PlatformConfiguration" version="0" location="examples.rtsa">
+	<predecessors>
+	</predecessors>
+	<successors>
+	</successors>
+	<instantiators>
+	</instantiators>
+	<reasoners>
+		<entity timeout="0" />
+	</reasoners>
+	<copy>
+		<entity copyID="de.uni_hildesheim.sse.easy.instantiator.copy.no_copy" />
+	</copy>
+</ProductLineProject>
