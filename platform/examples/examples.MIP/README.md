@@ -1,6 +1,6 @@
 # oktoflow platform examples: MIP example
 
-Demonstrates a simple application-specific to test MIP MQTT connector to read data from magnetic scan sensor. 
+Demonstrates a simple application-specific to test MIP MQTT connector to read data from magnetic scan sensor. Since version 0.7.1 the generated code is in `target/gen` rather than `gen`.
 
 The application consists of two (micro)-services and one MIP MQTT connector, which are composed in the configuration model and integrated in a model-based fashion through the platform/application instantiation:
   * MIP MQTT connector read the data from MIP sensor software through MQTT broker.

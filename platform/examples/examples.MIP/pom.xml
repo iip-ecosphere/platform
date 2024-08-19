@@ -4,7 +4,7 @@
   <artifactId>examples.MIP</artifactId>
   <packaging>jar</packaging>
   <name>MIP example</name>
-  <description>Utilizing MIP Mqtt connector to read data from the MIP sensor with simple Python service.</description>
+  <description>Utilizing MIP MQTT connector to read data from the MIP sensor with simple Python service.</description>
 
   <parent>
      <groupId>de.iip-ecosphere.platform</groupId>
@@ -61,6 +61,7 @@
   <properties>
         <iip.resources>resources</iip.resources>
         <iip.model>PlatformConfiguration</iip.model>
+        <iip.gen>target/gen/py</iip.gen>
   </properties>
   
   <profiles>
@@ -146,7 +147,7 @@
                   <configuration>
                       <mainClass>de.iip_ecosphere.platform.examples.SpringStartup</mainClass>
                       <arguments>
-                        <argument>gen/py/SimpleMipApp/target/SimpleMipApp-0.1.0-SNAPSHOT-bin.jar </argument>
+                        <argument>${iip.gen}/SimpleMipApp/target/SimpleMipApp-0.1.0-SNAPSHOT-bin.jar </argument>
                       </arguments>
                   </configuration>
               </plugin>
@@ -231,7 +232,7 @@
 	            </executions>
 	            <configuration>
 	                <model>${iip.model}</model>
-	                <outputDirectory>gen/py</outputDirectory>
+	                <outputDirectory>${iip.gen}</outputDirectory>
                     <metaModelDirectory>${project.build.directory}/easy</metaModelDirectory>
                     <modelDirectory>src/main/easy</modelDirectory>
 	            </configuration>
