@@ -14,19 +14,16 @@ project TechnicalSetup {
     aasServer = {
         schema = AasSchema::HTTP,
         port = 9001,
-        host = platformServer,
         serverHost = "localhost" // allow Tomcat to serve all IPs
     };
     aasRegistryServer = {
         schema = AasSchema::HTTP,
         port = 9002,
-        host = platformServer,
         serverHost = "localhost", // allow Tomcat to serve all IPs
         path = "registry"
     };
     aasImplServer = {
-        port = 9003,
-        netmask = netpattern
+        port = 9003
     };
     aasProtocol = AasProtocolVabTcp{};
     aasAccessControlAllowOrigin = "*";
@@ -36,15 +33,9 @@ project TechnicalSetup {
     
     transportProtocol = TransportProtocolAMQP {
         port = 8883,
-        globalHost = platformServer,
-        localPort = 8884, 
-        brokerVer = "9.0.0",
-        netmask = netpattern,
         security = { // -> identityStore.yml in src/test/ or src/main depending on use
             authenticationKey = "amqp"
-        },
-        gatewayPort = -1, // ephemeral
-        memLimit = 440
+        }
     };
     
     serviceProtocol = ServiceProtocolAMQP {};
@@ -77,14 +68,12 @@ project TechnicalSetup {
     
     platformMonitoring = PrometheusPlatformMonitoring {
         schema = PrometheusSchema::HTTP,
-        host = platformServer,
         port = 9090,
         running = false,
         exporterPort = -1, // ephemeral
         exporterHost = "127.0.0.1",
         exporterRunning = false,
         alertMgrPort = 9091,
-        alertMgrHost = platformServer,
         alertMgrRunning = false,
         scrapeInterval = 1001,
         scrapeTimeout = 1000
@@ -92,9 +81,9 @@ project TechnicalSetup {
     
     // ------------------------- UI -------------------------------
     
-    managementUi = AngularManagementUI {
-        port = managementUiPort
-    };
+    /*managementUi = AngularManagementUI {
+        port = 4200
+    };*/
     
     // ---------- generation setup ------------
     
