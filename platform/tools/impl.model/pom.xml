@@ -105,7 +105,7 @@
        	</executions>
        	<configuration>
        		 <model>${iip.model}</model>
-       		 <outputDirectory>gen/impl</outputDirectory>      		
+       		 <outputDirectory>target/gen/impl</outputDirectory>      		
              <metaModelDirectory>${project.build.directory}/easy</metaModelDirectory>
              <modelDirectory>src/main/easy</modelDirectory>
        	</configuration>

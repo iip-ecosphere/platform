@@ -1,0 +1,15 @@
+project AllConstants {
+
+    import IIPEcosphere;
+    import DataTypes;
+
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+
+
+    // ------------ freezing ------------------
+    
+    freeze {
+        .; // every variable declared in this project
+    } but (f|f.bindingTime >= BindingTime.runtimeMon);
+
+}

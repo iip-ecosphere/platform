@@ -1,0 +1,10 @@
+project AllTypes {
+
+    import AllConstants;
+
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+    
+    freeze {
+        .;
+    }
+}
