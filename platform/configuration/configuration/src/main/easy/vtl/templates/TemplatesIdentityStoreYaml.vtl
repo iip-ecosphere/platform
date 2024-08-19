@@ -1,23 +1,26 @@
 @advice(IIPEcosphere)
-@indent(indentation = 4, additional = 0)
+@format(profile="yaml", indentSteps = 2, profileArg_sorting = "INSERT")
 template TemplatesIdentityStoreYaml(IIPEcosphere config, FileArtifact target, String appName) {
-	
-	def String transportProtocolEntry(TransportProtocol proto) {
-        "";
+
+    @DispatchBasis
+    def transportProtocolEntry(TransportProtocol proto, YamlNode ids) {
     }
 
-    def String transportProtocolEntry(TransportProtocolAMQP proto) {
-        '  "amqp": 
-             type: USERNAME
-             userName: user
-             tokenData: pwd
-             tokenEncryptionAlgorithm: UTF-8'
+    @DispatchCase
+    def transportProtocolEntry(TransportProtocolAMQP proto, YamlNode ids) {
+        ids.addObject("amqp")
+          .addValue("type", "USERNAME")
+          .addValue("userName", "user")
+          .addValue("tokenData", "pwd")
+          .addValue("tokenEncryptionAlgorithm", "UTF-8");
     }
-	
+    
     def main(IIPEcosphere config, FileArtifact target, String appName) {
-        'name: ${appName}
-        identities:
-        ${transportProtocolEntry(config.transportProtocol)}'
+        YamlFileArtifact art = target;
+        YamlNode doc = art.addDocument();
+        doc.addValue("name", appName);
+        YamlNode ids = doc.addObject("identities");
+        transportProtocolEntry(config.transportProtocol, ids);
     }
-	
+    
 }

@@ -104,6 +104,14 @@
         <groupId>net.ssehub.easy</groupId>
         <artifactId>net.ssehub.easy.instantiation.lxc</artifactId>
     </dependency>
+    <dependency>
+       <groupId>net.ssehub.easy</groupId>
+       <artifactId>net.ssehub.easy.instantiation.json</artifactId>
+    </dependency>  
+    <dependency>
+       <groupId>net.ssehub.easy</groupId>
+       <artifactId>net.ssehub.easy.instantiation.yaml</artifactId>
+    </dependency>  
   
     <dependency>
       <groupId>com.googlecode.json-simple</groupId>

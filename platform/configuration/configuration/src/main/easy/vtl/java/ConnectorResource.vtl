@@ -1,7 +1,7 @@
 import JavaBasics;
 
 @advice(IIPEcosphere)
-@indent(indentation = 4, additional = 0)
+@format(profile="json", indentSteps = 4, profileArg_prettyPrint = "true", profileArg_sorting = "COLLATOR")
 template ConnectorResource(Configuration config, FileArtifact target, Connector conn) {
 
     mapOf(String, String) modbusTypes = {
@@ -23,58 +23,54 @@ template ConnectorResource(Configuration config, FileArtifact target, Connector 
     };
 
     @DispatchBasis
-    def genContents(Connector conn) {
+    def genContents(Connector conn, JsonFileArtifact json) {
     }
     
     @DispatchBasis
-    def genContents(ModbusTcpV1Connector conn) {
-        mapOf(String, String) fields = {};
-        collectIOTypes(conn.input, fields);
-        collectIOTypes(conn.output, fields);
-        collectIOType(conn.inInterface, fields);
-        collectIOType(conn.outInterface, fields);
-        '{'
-        for (String field: fields.keys() -> sortedBy(k|k), ",") {
-           String val = fields.get(field);
-           ' "${field}" : ${fields.get(field)}'
-        }
-        '}'
+    def genContents(ModbusTcpV1Connector conn, JsonFileArtifact json) {
+        collectIOTypes(conn.input, json);
+        collectIOTypes(conn.output, json);
+        collectIOType(conn.inInterface, json);
+        collectIOType(conn.outInterface, json);
     }
     
-    def collectIOTypes(sequenceOf(IOType) types, mapOf(String, String) res) {
+    def collectIOTypes(sequenceOf(IOType) types, JsonFileArtifact json) {
         for (IOType t: types) {
-            collectIOType(t, res);
+            collectIOType(t, json);
         }
     }
     
-    def collectIOType(IOType t, mapOf(String, String) res) {
-        collectFields(t.type, res);
+    def collectIOType(IOType t, JsonFileArtifact json) {
+        collectFields(t.type, json);
     }
 
     @DispatchBasis
-    def collectFields(DataType t, mapOf(String, String) res) {
+    def collectFields(DataType t, JsonFileArtifact json) {
     }
 
     @DispatchCase
-    def collectFields(RecordType t, mapOf(String, String) res) {
+    def collectFields(RecordType t, JsonFileArtifact json) {
        for (Field f: t.fields) {
-           collectField(f, res);
+           collectField(f, json);
        }
     }
     
     @DispatchBasis
-    def collectField(Field field, mapOf(String, String) res) {
+    def collectField(Field field, JsonFileArtifact json) {
     }
 
     @DispatchCase
-    def collectField(ModbusField field, mapOf(String, String) res) {
+    def collectField(ModbusField field, JsonFileArtifact json) {
         String type = getDirectTypeName(field.type);
         type = modbusTypes.get(type, type);
         if (type <> "") {
-            res.add(field.name, '{"offset" : ${field.offset}, "type" : "${type}"}');
+           JsonNode n = json.getData();
+           n.addObject("${field.name}")
+               .addValue("offset", field.offset)
+               .addValue("type", type);
         }
     }
-
+    
     // returns the directly defined type name, not via JavaBasics as then a different name occurs
     @DispatchBasis
     def getDirectTypeName(DataType type) {
@@ -85,10 +81,11 @@ template ConnectorResource(Configuration config, FileArtifact target, Connector 
     @DispatchCase
     def getDirectTypeName(AliasType type) {
         getDirectTypeName(type.represents);
-    }
+    }    
 
     def main(Configuration config, FileArtifact target, Connector conn) {
-        genContents(conn);
+        JsonFileArtifact json = target;
+        genContents(conn, json);
     }
     
 }

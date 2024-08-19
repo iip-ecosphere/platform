@@ -16,7 +16,7 @@ project IIPEcosphere {
     String artifactsFolder = artifactsFolderDflt;
     String artifactsUriPrefix = "";
     String uploadFolder; // if not given, same as artifactsFolder
-    String footprintFolderDflt = "footprints";
+    String footprintFolderDflt = "target/footprints";
     String footprintFolder = footprintFolderDflt;
     String modelBaseFolder = "."; // base folder for metaModel folder and configFolder
     String metaModelFolder = "src/main/easy";

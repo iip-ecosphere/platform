@@ -18,7 +18,7 @@ import java.io.IOException;
 import org.slf4j.Logger;
 
 import de.iip_ecosphere.platform.support.LifecycleDescriptor;
-import de.uni_hildesheim.sse.easy.loader.ListLoader;
+import de.uni_hildesheim.sse.easy.loader.ManifestLoader;
 import net.ssehub.easy.basics.logger.EASyLoggerFactory;
 import net.ssehub.easy.basics.logger.ILogger;
 import net.ssehub.easy.basics.logger.LoggingLevel;
@@ -33,7 +33,7 @@ import net.ssehub.easy.producer.core.mgmt.EasyExecutor;
 public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
 
     private static Logger logger;
-    private ListLoader loader;
+    private ManifestLoader loader;
     private boolean doLogging = true;
     private boolean doFilterLogs = false;
     private ClassLoader classLoader = ConfigurationLifecycleDescriptor.class.getClassLoader();
@@ -159,7 +159,7 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
             // pass through everything and let platform logger decide
             EASyLoggerFactory.INSTANCE.setLoggingLevel(LoggingLevel.INFO);
             ConfigurationSetup setup = ConfigurationSetup.getSetup();
-            loader = new ListLoader(classLoader); // file .easyStartup from classloader
+            loader = new ManifestLoader(classLoader); // file .easyStartup from classloader
             EasySetup easySetup = setup.getEasyProducer();
             loader.setVerbose(easySetup.getLogLevel() == EasyLogLevel.EXTRA_VERBOSE);
             getLogger().info("EASy-Producer is starting");
