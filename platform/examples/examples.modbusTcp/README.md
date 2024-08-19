@@ -1,6 +1,6 @@
 # oktoflow platform examples: MODBUS/TCP
 
-Demonstrating and utilizing the MODBUS/TCP connector. If compile errors are shown, run the instantiation/connector generation as described below (generated classes intentionally not in github, generated connector libraries are intentionally not deployed to Maven). We utilize a software server with a fixed layout for testing.
+Demonstrating and utilizing the MODBUS/TCP connector. If compile errors are shown, run the instantiation/connector generation as described below (generated classes intentionally not in github, generated connector libraries are intentionally not deployed to Maven). We utilize a software server with a fixed layout for testing. Since version 0.7.1 the generated code is in `target/gen` rather than `gen`.
 
 This example currently contains two parts:
 

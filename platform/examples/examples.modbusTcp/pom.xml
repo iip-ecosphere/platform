@@ -61,6 +61,7 @@
         <iip.resources>resources</iip.resources>
         <test.docker.skip>true</test.docker.skip> <!-- default for local execution -->
         <test.exec.args>--skip</test.exec.args>
+        <iip.gen>target/gen/modbus</iip.gen>
   </properties>
 
   <profiles>
@@ -188,7 +189,7 @@
                    </executions>
                    <configuration>
                        <model>Modbus</model>
-                       <outputDirectory>gen/modbus</outputDirectory>
+                       <outputDirectory>${iip.gen}</outputDirectory>
                        <metaModelDirectory>${project.build.directory}/easy</metaModelDirectory>
                        <modelDirectory>src/main/easy</modelDirectory>
                    </configuration>
