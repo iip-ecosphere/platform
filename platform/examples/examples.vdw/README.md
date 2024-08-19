@@ -1,6 +1,6 @@
 # oktoflow platform examples: VDW OPC-UA
 
-Utilizing the VDW OPC-UA server through the respective platform connector. If compile errors are shown, run the instantiation/connector generation as described below (generated classes intentionally not in github, generated connector libraries are intentionally not deployed to Maven).
+Utilizing the VDW OPC-UA server through the respective platform connector. If compile errors are shown, run the instantiation/connector generation as described below (generated classes intentionally not in github, generated connector libraries are intentionally not deployed to Maven). Since version 0.7.1 the generated code is in `target/gen` rather than `gen`.
 
 This example currently contains two parts:
 
