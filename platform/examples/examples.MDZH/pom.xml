@@ -67,6 +67,7 @@
   <properties>
         <iip.resources>resources</iip.resources>
         <iip.model>PlatformConfiguration</iip.model>
+        <iip.gen>target/gen/mdzh</iip.gen>
   </properties>
   
   <profiles>
@@ -152,7 +153,7 @@
                   <configuration>
                       <mainClass>de.iip_ecosphere.platform.examples.SpringStartup</mainClass>
                       <arguments>
-                        <argument>gen/mdzh/MDZHPCFApp/target/MDZHPCFApp-0.1.0-SNAPSHOT-bin.jar</argument>
+                        <argument>${iip.gen}/MDZHPCFApp/target/MDZHPCFApp-0.1.0-SNAPSHOT-bin.jar</argument>
                       </arguments>
                   </configuration>
               </plugin>
@@ -247,7 +248,7 @@
 	            </executions>
 	            <configuration>
 	                <model>${iip.model}</model>
-	                <outputDirectory>gen/mdzh</outputDirectory>
+	                <outputDirectory>${iip.gen}</outputDirectory>
 	                <metaModelDirectory>${project.build.directory}/easy</metaModelDirectory>
 	                <modelDirectory>src/main/easy</modelDirectory>
 	            </configuration>
