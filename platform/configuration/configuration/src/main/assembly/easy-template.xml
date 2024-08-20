@@ -6,11 +6,10 @@
     <formats>
         <format>zip</format>
     </formats>
-    <baseDirectory>easyTemplate/cfg</baseDirectory>
     <includeBaseDirectory>false</includeBaseDirectory>
     <fileSets>
         <fileSet>
-            <directory>${project.basedir}/src/main/easyTemplate</directory>
+            <directory>${project.basedir}/src/main/easyTemplate/cfg</directory>
             <outputDirectory/>
             <includes>
                 <include>**/*.*</include>

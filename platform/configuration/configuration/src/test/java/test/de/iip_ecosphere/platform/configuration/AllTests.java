@@ -13,6 +13,8 @@ package test.de.iip_ecosphere.platform.configuration;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
+import test.de.iip_ecosphere.platform.configuration.opcua.DomParserTest;
+
 /**
  * Defines the tests to be executed.
  * 
@@ -38,7 +40,7 @@ import org.junit.runners.Suite;
     AasIvmlMapperTest.class,
     CommentTests.class,
     
-    test.de.iip_ecosphere.platform.configuration.opcua.AllTests.class
+    DomParserTest.class
 })
 public class AllTests {
 }
