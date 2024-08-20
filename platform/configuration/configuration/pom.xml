@@ -266,6 +266,20 @@
 		                     <attach>true</attach>
 		                 </configuration>
 		              </execution>
+                     <execution>
+                         <id>easy-template</id>
+                         <phase>package</phase>
+                         <goals>
+                             <goal>single</goal>
+                         </goals>
+                         <configuration>
+                             <descriptors>
+                                 <descriptor>src/main/assembly/easy-template.xml</descriptor>
+                             </descriptors>
+                             <outputDirectory>${project.build.directory}</outputDirectory>
+                             <attach>true</attach>
+                         </configuration>
+                      </execution>
 		             <execution>
 		                 <id>easy-test</id>
 		                 <phase>package</phase>
