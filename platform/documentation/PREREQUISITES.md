@@ -20,8 +20,9 @@ Helpful:
 - PyDev 12.1.0 Plugin for Eclipse
 - Findbugs 3.0.1 Plugin for Eclipse
 - xText 2.35
-- EASy-Producer 3.10.0 Plugin for Eclipse from [SSE EASy-producer nightly update site](https://projects.sse.uni-hildesheim.de/eclipse/update-sites/easy_nightly/). 
-    - The xtext builder may require `-Xms348m` and `-Xmx3072m` in `eclipse.ini` and it may take a while on a full build/project refresh, but without error/warning markers do not become visible.
+- EASy-Producer 3.10.0 Plugin for Eclipse from [SSE EASy-producer nightly update site](https://projects.sse.uni-hildesheim.de/eclipse/update-sites/easy_nightly/).
+    - May require `-Xms348m` and `-Xmx3072m` in `eclipse.ini` 
+    - Do not include the xtext builder. Although we took measures, it may run out of memory and crash Eclipse.
     - Depending on your workspace use, it might be required to adjust the file associations so that EASy-Producer editors are default for `*.ivml`, `*.vil`, `*.vtl` and `*.text`.
     - Please keep EASy-Producer updated on relevant changes so that model and EASy-Producer fit together.
 

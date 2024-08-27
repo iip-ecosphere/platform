@@ -4,8 +4,6 @@ This folder contains the documentation of the okotflow platform.
 
 * The platform [handbook](PlatformHandbook.pdf)
 * [Install information](INSTALL.md) for own installation, Docker containers and for playing with pre-packaged containers.
-* [Guideline for platform installation under Windows](Platform_Installation_Guide_for_Windows.pdf)
-* [Guideline for platform installation under Linux](Platform_Installation_Guide_for_Linux.pdf)
 
 ## Technical Guidelines
 * The technical requirements are documented in [PREREQUISITES](PREREQUISITES.md).
