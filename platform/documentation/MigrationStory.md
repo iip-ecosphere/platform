@@ -1,5 +1,5 @@
 # Migrating the Prerequisites of a Platform - an oktoflow (horror) Story
-July 2024
+July 2024, updated September 2024
 
 ## Introduction
 
@@ -53,9 +53,13 @@ Local change of the JDK and running the EASy-Producer test suites showed that it
 
 * Discrepancies between the included functionality of installed bundles from an update site, Eclipse launch configuration and the pre-built RCP app caused **missing functionality** and thus further effort. One cause for these discrepancies is that *RCP installations* are defined in terms of a product specification file (which may contain may more features and bundles), *update site* are built based on selected features/plugins and their transitive dependencies in a category file and *launch configurations* are defined in terms of enabled plugins (if not all installed plugins are used). Differences among these three specifications lead to different observable behavior. In particular, contributions to the Eclipse help system require bundles that do not appear to be necessary for an normal installation (as Eclipse usually ships with these bundles), while RCP installations need them explicitly stated. In our case, the help window first failed with an error message and, after adding the first dependencies, came up showing a webserver/JSP error, which can be resolved by adding missing dependencies (thanks to [this discussion](https://www.eclipse.org/forums/index.php/t/149680/) and similar posts). Moreover, in our case, the RCP start (triggered through application and startup code) did not execute the applications bundle activator, causing missing functionality through missing registrations. Here it helps to explicitly call these registrations from the RCP application startup code.
 
+* High-level EASy-Producer tests failed as they tried to add an xText nature to a new project, which, in turn, requires all dependencies to the xText nature set up. Initially, the symptom was on **classes for fragment hosts not found by Tycho**, which we partially could mitigate through `extraRequirements` of the target platform configuration (thanks to [this discussion](https://bugs.eclipse.org/bugs/show_bug.cgi?id=436617#c11)). However, we ultimately failed getting the dependency to the native SWT right, which contains some classes transitively required by the xText nature. For now, we just exclude the xText nature from the tests, re-enabling the tests.
+
+* The **pre-packaged RCP builds did not contain a JRE** although enabled in the product specification. While this is working in a product export of Eclipse, Maven Tycho needs the information in different form. Initially, we tried to manually copy the JREs for Windows, Linux and Mac into the "jre" folder of the RCP build, which is mentioned by some sites and works on Windows, but fails, depending on the JRE packaging, on Linux and Mac. Finally, [the justj documentation](https://eclipse.dev/justj/?page=documentation) helped us to get the RCP builds running, now, akin to Eclipse/Tycho with a simple specification of the JDK version. At first trial, the Windows RCP failed, but this was just due when starting it in the folder where it has been built - the execution file paths became too long for Windows.
+
 * During the migration, one particular test failed, which, since our migration to JDK 17, validates that **annotations** required by VIL/VTL are present and carry the requested information. However, we were a bit lazy and just emitted annotations through their own mechanisms to a file and diffed information collected for JDK 17 with those produced by JDK 21. Sadly, the sequence of the emitted annotation attributes/methods changed between the JDKs (compiler, reflection, etc.) so that now the test failed and required explicit sorting and output code to run independently of the JDK version. No further bytecode/reflection issued occurred during this step. 
 
-* Akin to the upgrade of bytecode manipulation frameworks for mokito for JDK 17, we now hat to upgrade these dependencies to JDK 21. Fortunately, these were just local changes, although a global upgrade of the bytecode manipulation would have even worked with Spring (cloud streams).
+* Akin to the upgrade of **bytecode manipulation frameworks** for mokito for JDK 17, we now hat to upgrade these dependencies to JDK 21. Fortunately, these were just local changes, although a global upgrade of the bytecode manipulation would have even worked with Spring (cloud streams).
 
 Finally, we upgraded the **CI tasks** to JDK 21, which confirms that the platform runs on that JDK.
     
@@ -68,3 +72,4 @@ At the end of this story, we can state, that we successfully migrated oktoflow t
 This is just information that we always forget to note down or is difficult to find. Might be it's helpful for others. Further entries may follow.
 
 * Eclipse launcher application parameter for classloader debugging: `-Dorg.eclipse.osgi/debug/loader=true -Dorg.eclipse.osgi/debug=true  -Dorg.slf4j.simpleLogger.defaultLogLevel=debug`
+* [Justj documentation](https://eclipse.dev/justj/?page=documentation)
