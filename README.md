@@ -13,17 +13,13 @@ For installation and first steps, see [install guide](platform/documentation/INS
 ## News
 
 * Exiting: oktoflow shall become the technological core of the funded [DATI](https://www.bmbf.de/bmbf/de/forschung/datipilot/datipilot_node.html) Innovation Community ReGaP. Stay tuned!!!
-* ETFA'24: Paper on generating IDTA AAS submodel APIs accepted (preprint on [arxiv](https://arxiv.org/abs/2406.14470)).
-* MODELS'24: Tutorial on AAS accepted.
+* 2 papers accepted for the Symposium on Software Performance 2024 in Linz
 * INFLUX DB connector for InfluxDb2
-* Platform core migrated to **JDK 17** (see our [migration story](platform/documentation/MigrationStory.md)). Container creation still needs upgrade [#165](https://github.com/iip-ecosphere/platform/issues/165). Platform runs on **JDK 21** with EASy-Producer/development based on Eclipse 2024-06.
+* Platform core migrated to **JDK 21** (see our [migration story](platform/documentation/MigrationStory.md)). Container creation still needs upgrade [#165](https://github.com/iip-ecosphere/platform/issues/165).
 * BaSyX 1.5.1 support (currently as alternative retro-fit for BaSyx 1.3.1 used as platform AAS version)
 * MODBUS/TCP connector by Christian Nikolajew (tested for compliance with Phoenix Contact EEM-MA 370 and Siemens SENTRON PAC 3200), example re-usable MODBUS/TCP definitions for Phoenix Contact EEM-MA 370
 * Plugins for alternative components with conflicting classpaths. Retrofit for BaSyx 1.0, in particular in AAS connector.
-* Serial connector tested and working.
-* Auto-generation of all IDTA specs published in February 2024 (accepted for ETFA'23 conference).
-* AAS abstraction/integration upgrade: referenceElement, multiLanguageProperties, entity, blob, more semanticIds, [IDTA 02004-1-2 Handover Documentation](https://industrialdigitaltwin.org/wp-content/uploads/2023/03/IDTA-02004-1-2_Submodel_Handover-Documentation.pdf), [IDTA 02011-1-0 Hierarchical Structures enabling Bills of Material](https://industrialdigitaltwin.org/wp-content/uploads/2023/04/IDTA-02011-1-0_Submodel_HierarchicalStructuresEnablingBoM.pdf), [IDTA 2023-01-24 Draft Submodel PCF](https://github.com/admin-shell-io/submodel-templates/tree/main/development/Carbon%20Footprint/1/0), [IDTA 02008-1-1 Time Series Data](https://industrialdigitaltwin.org/en/wp-content/uploads/sites/2/2023/03/IDTA-02008-1-1_Submodel_TimeSeriesData.pdf), [IDTA 02003-1-2 Generic Frame for Technical Data for Industrial Equipment in Manufacturing](https://industrialdigitaltwin.org/wp-content/uploads/2022/10/IDTA-02003-1-2_Submodel_TechnicalData.pdf), [IDTA 02002-1-0 Submodel for Contact Information](https://industrialdigitaltwin.org/wp-content/uploads/2022/10/IDTA-02002-1-0_Submodel_ContactInformation.pdf), [IDTA 02007-1-0 Nameplate for Software in Manufacturing](https://industrialdigitaltwin.org/wp-content/uploads/2023/08/IDTA-02007-1-0_Submodel_Software-Nameplate.pdf) related examples and XMAS AAS
-* Ongoing revision of the management UI: Initial UI design revision and cleanup, application implementation templates can be created and downloaded from the management UI (December 2023).
+* Auto-generation of all IDTA specs published in February 2024, for details see our [ETFA'24 paper](10.1109/ETFA61755.2024.10710924), generated code partially integrated with platform core
 
 ## Public demonstrations
 
@@ -57,13 +53,17 @@ Platform installation, use and concepts are documented in several documents:
   * For more information, see the [documentation overview](platform/documentation/README.md)
 
 ## Publications
-* Holger Eichelberger, Alexander Weber, Model-driven realization of IDTA submodel specifications: The good, the bad, the incompatible? (preprint on [arxiv](https://arxiv.org/abs/2406.14470)).
+* Christian Nikolajew, Holger Eichelberger, Industry 4.0 Connectors - A Performance Experiment with Modbus/TCP, Symposium on Software Performance (SSP'24), to appear
+* Alexander Weber, Jobst Hildebrand, Holger Eichelberger, ADS Performance Revisited, Symposium on Software Performance (SSP'24), to appear
+* Ahmad Alamoush, Holger Eichelberger, Open source container orchestration for Industry 4.0 – requirements and systematic feature analysis, International Journal on Software Tools for Technology Transfer, 26 (4) [DOI](https://doi.org/10.1007/s10009-024-00767-w)
+* Holger Eichelberger, Alexander Weber, Model-Driven Realization of IDTA Submodel Specifications: The Good, the Bad, the Incompatible?, IEEE 28th International Conference on Emerging Technologies and Factory Automation (ETFA'24), pp. 1-8, [DOI](10.1109/ETFA61755.2024.10710924)
+* Leonhard Faubel, Thomas Woudsma, Benjamin Kloepper, Holger Eichelberger, Fabian Buelow, Klaus Schmid, MLOps for Cyber-Physical Production Systems: Challenges and Solutions, IEEE Software, [DOI](https://doi.org/10.1109/MS.2024.3441101), [arxiv](https://arxiv.org/abs/2406.14470)
 * Alexander Weber, Holger Eichelberger, Per Schreiber and Svenja Wienrich, Performance comparison of TwinCat ADS for Python and Java, [Symposium on Software Performance (SSP'23)](https://www.performance-symposium.org/2023/program/), 2023
 * Ahmad Alamoush and Holger Eichelberger, Analyzing and Improving the Performance of Continuous Container Creation and Deployment, [Symposium on Software Performance (SSP'23)](https://www.performance-symposium.org/2023/program/), 2023
 * Holger Eichelberger and Claudia Niederée, [Asset Administration Shells, Configuration, Code
 Generation: A power trio for Industry 4.0 Platforms](https://ieeexplore.ieee.org/document/10275339), 
-IEEE 28th International Conference on Emerging Technologies and Factory Automation (ETFA'23), pp. 1-8, doi: 10.1109/ETFA54631.2023.10275339.
-* Christian Sauer and Holger Eichelberger: Experiences in Collecting Requirements for an AI-enabled Industry 4.0 Platform, GI Fachgruppe Requirements Engineering (to appear in November 2023)
+IEEE 28th International Conference on Emerging Technologies and Factory Automation (ETFA'23), pp. 1-8, [DOI](10.1109/ETFA54631.2023.10275339).
+* Christian Sauer and Holger Eichelberger: Experiences in Collecting Requirements for an AI-enabled Industry 4.0 Platform, GI Fachgruppe Requirements Engineering, Softwaretechnik-Trends, 43(4), 2023 [GI](https://dl.gi.de/items/25db5e2c-c3c5-4f22-adae-f4829ad96e4a)
 * Kevin Feichtinger, Kristof Meixner, Felix Rinker, István Koren, Holger Eichelberger, Tonja Heinemann, Jörg Holtmann, Marco Konersmann, Judith Michael, Eva-Maria Neumann, Jérôme Pfeiffer, Rick Rabiser, Matthias Riebisch and Klaus Schmid (2023): [Software in Cyberphysischen Produktionssystemen - Herausforderungen zur Umsetzung in der Industrie](https://ojs.di-verlag.de/index.php/atp_edition/article/view/2646) In: ATP-Magazin, 2023 (4): 62-68. 
 * Holger Eichelberger, Gregory Palmer, Svenja Reimer, Tat Trong Vu, Hieu Do, Sofiane Laridi, Alexander Weber, Claudia Niederée, Thomas Hildebrandt in Thais Batista, Tomás Bures, Claudia Raibulet and Henry Muccini (Hrsg.) (2023): [Developing an AI-Enabled IIoT Platform - Lessons Learned from Early Use Case Validation](https://www.springerprofessional.de/developing-an-ai-enabled-iiot-platform-lessons-learned-from-earl/25802260) In: Software Architecture. ECSA 2022 Tracks and Workshops Bd. 13928. S. 265-283. Springer International Publishing.
 * Holger Eichelberger, Gregory Palmer and Claudia Niederee (2023): Developing an AI-enabled Industry 4.0 platform - Performance experiences on deploying AI onto an industrial edge device In: Softwaretechnik-Trends, 43 (1): 35-37. 
@@ -77,6 +77,12 @@ IEEE 28th International Conference on Emerging Technologies and Factory Automati
 * Holger Eichelberger, Christian Sauer, Shayan Amir Ahmadian, Michael Schicktanz, Andreas Dewes, Gregory Palmer and Claudia Niederée, [IIP-Ecosphere Plattform – Anforderungen (Funktionale und Qualitäts-Sicht)](https://www.iip-ecosphere.eu/wp-content/uploads/2021/03/IIP-2021_002-eng.pdf), IIP-Ecosphere Whitepaper
 * Heiko Stichweh, Christian Sauer and Holger Eichelberger, [IIP-Ecosphere Platform Requirements (Usage View)](https://www.iip-ecosphere.eu/wp-content/uploads/2021/03/IIP-2021_001_IIP-Ecosphere_Platform_Requirements_Usage_View.pdf), IIP-Ecosphere Whitepaper
 * Christian Sauer, Holger Eichelberger, Amir Shayan Ahmadian, Andreas Dewes, Jan Jürjens, [Current Industrie 4.0 Platforms – An Overview](https://www.iip-ecosphere.eu/wp-content/uploads/2021/02/IIP-2020_001-en.pdf), IIP-Ecosphere Whitepaper
+
+## Tutorials (with oktoflow as example)
+
+* Klaus Schmid, Holger Eichelberger, Variability Modeling and Implementation with EASy-Producer, International Software Product Line Conference (SPLC'24)
+* Klaus Schmid, Holger Eichelberger, Modeling Variability and Its Transformation using the EASy-Producer tool suite, International Conference on Model Driven Engineering Languages and Systems (MODELS'24)
+* Holger Eichelberger, Klaus Schmid, Modeling Asset Administration Shells in Industry 4.0 - A critical overview, International Conference on Model Driven Engineering Languages and Systems (MODELS'24)
 
 ## Building the Platform
 
