@@ -110,7 +110,7 @@ public class AasIvmlMapperTest {
         if (null != ivmlFolder) {
             org.apache.commons.io.FileUtils.deleteDirectory(ivmlFolder);
         }
-        ivmlFolder = FileUtils.createTmpFolder("config.config");
+        ivmlFolder = FileUtils.createTmpFolder("config.config").getCanonicalFile();
         
         String srcCfg = (origIvmlMeta.toString() + "/cfg/").replace('/', File.separatorChar);
         org.apache.commons.io.FileUtils.copyDirectory(origIvmlMeta, new File(ivmlFolder, "meta"), 

@@ -1066,7 +1066,7 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
         Parameters params = service.parameter;
         if (size(params) > 0) {
             'service.addParameterConfigurer(c -> {
-                ${produceParametersReg(params)}
+                ${produceParametersReg(params, new JavaCodeBlock())}
             });
         
             HashMap<String, String> paramValues = new HashMap<>();
