@@ -2,26 +2,26 @@
 
 ## Execution
 
-- JDK 17 (tested with JDK 17.0.10), JDK 21 (tested with JDK 21.0.2)
+- JDK 21 (tested with JDK 21.0.2), JDK 17 (tested with JDK 17.0.10) 
 - Maven 3.9.7
-- Python 3.9.6
+- Python 3.9.6 (not yet prepared for implicit virtual environments)
 - Docker
 
 ## Development
 
 - Execution requirements as basis
-- Eclipse 2024-06 (4.32.0)
-- Eclipse Checkstyle plugin 10.14.2-10.17.0
+- Eclipse 2024-06 (4.32.0), Eclipse 2024-09 (4.33.0)
+- Eclipse Checkstyle plugin 10.14.2-10.18.2
 - M2E Maven integration 2.6.1
-- eGit 6.10 (LFS, see below)
+- eGit 6.10-7.0.0 (LFS, see below)
 
 Helpful:
 - eclEmma 3.1.9 Plugin for Eclipse
-- PyDev 12.1.0 Plugin for Eclipse
+- PyDev 12.1.0-12.2.0 Plugin for Eclipse
 - Findbugs 3.0.1 Plugin for Eclipse
-- xText 2.35
+- xText 2.35.0-2.36.0
 - EASy-Producer 3.10.0 Plugin for Eclipse from [SSE EASy-producer nightly update site](https://projects.sse.uni-hildesheim.de/eclipse/update-sites/easy_nightly/).
-    - May require `-Xms348m` and `-Xmx3072m` in `eclipse.ini` 
+    - May require `-Xms512m` and `-Xmx5120m` in `eclipse.ini` 
     - Do not include the xtext builder. Although we took measures, it may run out of memory and crash Eclipse.
     - Depending on your workspace use, it might be required to adjust the file associations so that EASy-Producer editors are default for `*.ivml`, `*.vil`, `*.vtl` and `*.text`.
     - Please keep EASy-Producer updated on relevant changes so that model and EASy-Producer fit together.
