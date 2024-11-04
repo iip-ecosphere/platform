@@ -1,0 +1,62 @@
+import JavaBasics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+@format(profile="java", profileArg_javadocIndent="* ", lineLength = 120, profileArg_eltSorting="CONS")
+template JavaSerializerBase(IIPEcosphere config, JavaCodeArtifact target, RecordType type, String pkg, String typePkg, Boolean sharedInterfaces, Boolean impl) {
+
+    def genClsInit(IIPEcosphere config, JavaCodeClass mainCls, String typeName) {
+    }
+
+    def genFrom(IIPEcosphere config, RecordType type, JavaCodeMethod from, String paramName, String dataType) {
+    }
+
+    def genTo(IIPEcosphere config, RecordType type, JavaCodeMethod to, String paramName, String dataType) {
+    }
+    
+    def String getProtocolName() {
+        "X";
+    }
+
+    def genCls(IIPEcosphere config, JavaCodeArtifact target, RecordType type, String pkg, String typePkg, Boolean sharedInterfaces, Boolean impl) {
+        String clsName = asTypeName(type.name);
+        String typeName = clsName;
+        String add = "";
+        if (sharedInterfaces) {
+            add = "Impl";
+            if (impl) {
+                typeName = typeName + add;
+            }
+        }
+
+        JavaCodeClass mainCls = codeCreateClass(target, pkg, "${typeName}Serializer", '${getProtocolName()} transport serializer for ${clsName}');
+        if (pkg != typePkg) {
+            mainCls.addImport("${typePkg}.*");
+        }
+        mainCls.addInterface("de.iip_ecosphere.platform.transport.serialization.Serializer<${typeName}>");
+        genClsInit(config, mainCls, typeName);
+        
+        JavaCodeMethod from = mainCls.addMethod(typeName, "from", "");
+        from.addParameter("byte[]", "data");
+        from.addOverrideAnnotation();
+        from.addException("java.io.IOException");
+        genFrom(config, type, from, "data", "${clsName}${add}");
+
+        JavaCodeMethod to = mainCls.addMethod("byte[]", "to", "");
+        to.addParameter(typeName, "source");
+        to.addOverrideAnnotation();
+        to.addException("java.io.IOException");
+        genTo(config, type, to, "source", "${clsName}${add}");
+
+        JavaCodeMethod clone = mainCls.addMethod(typeName, "clone", "");
+        clone.addParameter(typeName, "origin");
+        clone.addOverrideAnnotation();
+        clone.addException("java.io.IOException");
+        clone.addReturn("new ${clsName}${add}(origin)");
+
+        JavaCodeMethod getType = mainCls.addMethod("Class<${typeName}>", "getType", "");
+        getType.addOverrideAnnotation();
+        getType.addReturn("${typeName}.class");
+    }
+    
+}

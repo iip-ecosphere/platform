@@ -3,7 +3,8 @@ import JavaBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template JavaType(Configuration config, FileArtifact target, RecordType type, String pkg, Boolean interface, Boolean sharedInterfaces, Boolean impl) {
+@format(profile="java", profileArg_javadocIndent="* ", lineLength = 120, profileArg_eltSorting="CONS")
+template JavaType(Configuration config, JavaCodeArtifact target, RecordType type, String pkg, Boolean interface, Boolean sharedInterfaces, Boolean impl) {
 
     String ending = " {";
     Boolean emitJavadoc = true;
@@ -27,265 +28,111 @@ template JavaType(Configuration config, FileArtifact target, RecordType type, St
         }
     }
     
-    // generates code for the individual attributes
-    def attributes(RecordType type) {
-        IIPEcosphere cfg = config;
-        if (not(interface)) {
-            for (Field f: type.fields) {
-                '@JsonProperty("${f.name}")'  // unconditional -> service integrations
-                '@ConfiguredName("${f.name}")'
-                'private ${getTypeName(f)} ${asMethodFieldIdentifier(f.name)};\n'
-            }
-        }
-    }
-
-    // generates code for shallow copy of all fields (shallow for now)
-    def copy(RecordType type, String sourceVariable) {
-        for (Field f: type.fields) {
-            'this.${asMethodFieldIdentifier(f.name)} = ${sourceVariable}.get${asMethodNameSuffix(f.name)}();'
-        }
-    }
-    
-    // generates code for the getters
-    def getters(RecordType type) {
-        IIPEcosphere cfg = config;
-        for (Field f: type.fields) {
-            if (emitJavadoc) {
-                '/**
-                  * Returns the value of {@code ${asMethodFieldIdentifier(f.name)}}.${prependIfNotEmpty(" ", htmlize(stripLang(f.description)))}
-                  * 
-                  * @return the value
-                  */'
-            } else {
-                '@Override'
-            }
-            '@JsonIgnore' // unconditional -> service integrations
-            'public ${getTypeName(f)} get${asMethodNameSuffix(f.name)}()${ending}'
-            if (not(interface)) {
-                '
-                    return ${asMethodFieldIdentifier(f.name)};
-                }\n'
-            }
-        }
-    }
-    
-    def readOnlyHint(Field field) {
-        if (field.readOnly) {
-            '* This field is read only, but needs an accessor for connector serializers. Although you can change it, 
-            * a connector may ignore the value.'
-        } else {
-            ''
-        }
-    }
-
-    // generates code for the setters
-    def setters(RecordType type) {
-        IIPEcosphere cfg = config;
-        for (Field f: type.fields) {
-            if (emitJavadoc) {
-                '/**
-                 * Changes the value of {@code ${asMethodFieldIdentifier(f.name)}}.${prependIfNotEmpty(" ", htmlize(stripLang(f.description)))}
-                 ${readOnlyHint(f)|e}
-                 * 
-                 * @param value the new value
-                 */'
-            } else {
-                '@Override'
-            }
-            '@JsonIgnore' // unconditional -> service integrations
-            'public void set${asMethodNameSuffix(f.name)}(${getTypeName(f)} value)${ending}'
-            if (not(interface)) {
-                '
-                    this.${asMethodFieldIdentifier(f.name)} = value;
-                }\n'
-            }
-        }
-    }
-    
-    def constructors(RecordType type, String clsName, String add) {
-        if (not(interface)) {
-            '/**
-             * Default constructor. Fields are pre-allocated with default Java values.
-             */
-            public ${clsName}${add}() {
-            }
-
-            /**
-             * Copy constructor.
-             * 
-             * @param from the instance to copy the values from
-             */
-            public ${clsName}${add}(${clsName} from) {
-                ${copy(type, "from")}
-            }'        
-        }
-    }
-    
-    def toString(String kw) {
-        if (kw == "class") {
-            '@Override
-            public String toString() {
-                return org.apache.commons.lang3.builder.ReflectionToStringBuilder.toString(this, 
-                    de.iip_ecosphere.platform.services.environment.IipStringStyle.SHORT_STRING_STYLE);
-            }'
-        }
-    }
-    
-    def genHashCodeEquals(String kw, String clsName, RecordType type) {
-        if (kw == "class") {
-            
-            '@Override
-            public int hashCode() {
-                int hc = 0;
-                ${genRecHashCode(type)|e}
-                return hc;
-            }
-            
-            @Override
-            public boolean equals(Object other) {
-                boolean eq;
-                if (other instanceof ${clsName}) {
-                    ${clsName} oth = (${clsName}) other;
-                    eq = true;
-                    ${genRecEquals(type)|e}
-                } else {
-                    eq = false;
-                }
-                return eq;
-            }'
-        }
-    }
-
+    @DispatchBasis
     def genHashCode(String access, DataType type, Boolean optional) {
         String javaType = toTypeName(type);
         if ("BigInteger" == javaType or "BigDecimal" == javaType) {
-            '${access} != null ? ${access}.hashCode() : 0'
+            "${access} != null ? ${access}.hashCode() : 0";
         } else {
-            '${considerWrapper(toTypeName(type))}.hashCode(${access})'
+            "${considerWrapper(toTypeName(type))}.hashCode(${access})";
         }
     }
 
+    @DispatchCase
     def genHashCode(String access, AliasType type, Boolean optional) {
         genHashCode(access, type.represents, optional);
     }
 
+    @DispatchCase
     def genHashCode(String access, EnumType type, Boolean optional) {
-        '${access} != null ? ${access}.hashCode() : 0'
+        "${access} != null ? ${access}.hashCode() : 0";
     }
     
+    @DispatchCase
     def genHashCode(String access, RecordType type, Boolean optional) {
         genHashCodeObject(access, optional);
     }
     
+    @DispatchCase
     def genHashCode(String access, IEC61131_3DateTimeTypeType type, Boolean optional) {
         genHashCodeObject(access, optional);
     }
 
+    @DispatchCase
     def genHashCode(String access, DateTimeTypeType type, Boolean optional) {
         genHashCodeObject(access, optional);
     }
 
+    @DispatchCase
     def genHashCode(String access, ByteStringTypeType type, Boolean optional) {
         genHashCodeObject(access, optional);
     }
 
+    @DispatchCase
     def genHashCode(String access, ObjectTypeType type, Boolean optional) {
         genHashCodeObject(access, optional);
     }
 
+    @DispatchCase
     def genHashCode(String access, StringTypeType type, Boolean optional) {
         genHashCodeObject(access, optional);
     }
 
+    @DispatchCase
     def genHashCode(String access, ArrayType type, Boolean optional) {
         genHashCodeObject(access, optional);
     }
     
     def genHashCodeObject(String access, Boolean optional) {
-        '${access} != null ? ${access}.hashCode() : 0'
-    }
-    
-    @DispatchBasis
-    def genHashCodeField(Field field) {
-        genHashCodeBasis(field);
-    }
-    
-    @DispatchCase
-    def genHashCodeField(AasField field) {
-        if (isMultiField(field)) {
-            'hc += ${genHashCodeObject(getHashCodeAccess(field), field.optional)};';
-        } else {
-            genHashCodeBasis(field);
-        }
+        "${access} != null ? ${access}.hashCode() : 0";
     }
     
     def getHashCodeAccess(Field f) {
         "get${asMethodNameSuffix(f.name)}()";
     }
-    
-    def genHashCodeBasis(Field f) {
-       'hc += ${genHashCode(getHashCodeAccess(f), f.type, f.optional)};'
-    }
-    
-    def genRecHashCode(RecordType type) {
-        for (Field f: type.fields) {
-            '${genHashCodeField(f)}'
-        }
-    }
 
+    @DispatchBasis
     def genEquals(String access, DataType type, Boolean optional) {
-        '${access} == oth.${access}'
+        "${access} == oth.${access}";
     }
 
+    @DispatchCase
     def genEquals(String access, RecordType type, Boolean optional) {
         genEqualsObject(access, optional);
     }
     
+    @DispatchCase
     def genEquals(String access, IEC61131_3DateTimeTypeType type, Boolean optional) {
         genEqualsObject(access, optional);
     }
 
+    @DispatchCase
     def genEquals(String access, DateTimeTypeType type, Boolean optional) {
         genEqualsObject(access, optional);
     }
 
+    @DispatchCase
     def genEquals(String access, ByteStringTypeType type, Boolean optional) {
         genEqualsObject(access, optional);
     }
 
+    @DispatchCase
     def genEquals(String access, ObjectTypeType type, Boolean optional) {
         genEqualsObject(access, optional);
     }
 
+    @DispatchCase
     def genEquals(String access, StringTypeType type, Boolean optional) {
         genEqualsObject(access, optional);
     }
 
+    @DispatchCase
     def genEquals(String access, ArrayType type, Boolean optional) {
         genEqualsObject(access, optional);
     }
     
     def genEqualsObject(String access, Boolean optional) {
-        '${access} != null ? ${access}.equals(oth.${access}) : true'
-    }
-
-    def genRecEquals(RecordType type) {
-        for (Field f: type.fields) {
-            'eq &= ${genEquals("get${asMethodNameSuffix(f.name)}()", f.type, f.optional)};'
-        }
-    }
-    
-    def genImports(RecordType type) {
-        IIPEcosphere cfg = config;
-        if (typeNeedsAasElement(type)) {
-            'import de.iip_ecosphere.platform.transport.serialization.QualifiedElement;'
-        }
-        if (cfg.serializer==Serializer::Json) {
-            'import com.fasterxml.jackson.annotation.JsonProperty;'
-            'import com.fasterxml.jackson.annotation.JsonIgnore;'
-        } else {
-            ''
-        }
+        "${access} != null ? ${access}.equals(oth.${access}) : true";
     }
     
     @DispatchBasis
@@ -312,24 +159,59 @@ template JavaType(Configuration config, FileArtifact target, RecordType type, St
         isMultiField(field);
     }
 
-    def main(Configuration config, FileArtifact target, RecordType type, String pkg, Boolean interface, Boolean sharedInterfaces, Boolean impl) {
+    @DispatchBasis
+    def genHashCodeField(Field field, JavaCodeMethod hash) {
+        genHashCodeBasis(field, hash);
+    }
+    
+    def genHashCodeBasis(Field f, JavaCodeMethod hash) {
+       hash.addAssignment("hc", "+=", genHashCode(getHashCodeAccess(f), f.type, f.optional));
+    }
+    
+    @DispatchCase
+    def genHashCodeField(AasField field, JavaCodeMethod hash) {
+        if (isMultiField(field)) {
+            hash.addAssignment("hc", "+=", genHashCodeObject(getHashCodeAccess(field), field.optional));
+        } else {
+            genHashCodeBasis(field, hash);
+        }
+    }
+
+    def configureGetterSetter(JavaCodeMethod method, boolean getter, Field f) {
+        if (emitJavadoc) {
+            JavaCodeJavadocComment comment = method.getJavadocComment();
+            if (getter) {
+                comment.setComment('Returns the value of {@code ${asMethodFieldIdentifier(f.name)}}.${prependIfNotEmpty(" ", stripLang(f.description))}');
+                comment.addReturnComment("the value");
+            } else {
+                comment.setComment('Changes the value of {@code ${asMethodFieldIdentifier(f.name)}}.${prependIfNotEmpty(" ", stripLang(f.description))}');
+                if (f.readOnly) {
+                    comment.addComment(" This field is read only, but needs an accessor for connector serializers. Although you can change it, a connector may ignore the value.");
+                } 
+                comment.addParameterComment("value", "the new value");
+            }
+        } else {
+            method.addOverrideAnnotation();
+        }
+        method.addAnnotation("com.fasterxml.jackson.annotation.JsonIgnore"); // unconditional -> service integrations
+    }
+    
+    def main(Configuration config, JavaCodeArtifact target, RecordType type, String pkg, Boolean interface, Boolean sharedInterfaces, Boolean impl) {
+        IIPEcosphere cfg = config;
+    
         String clsName = asTypeName(type.name);
-        String kw = "class";
         String add = "";
         String comment;
         String implements = "";
-        String imp = "";
         if (sharedInterfaces) {
             if (interface) {
                 ending = ";\n";
-                kw = "interface";
                 comment = "Interface";
                 emitJavadoc = true;
             } else {
                 if (impl) {
                     add = "Impl";
-                    implements = " implements ${clsName}";
-                    imp = "import ${pkg}.${clsName};";
+                    implements = "${pkg}.${clsName}";
                     emitJavadoc = false;
                 } else { // just as a usual type, but anyway shared, e.g., for connector data types
                     emitJavadoc = true;
@@ -341,33 +223,56 @@ template JavaType(Configuration config, FileArtifact target, RecordType type, St
             interface = false;
             emitJavadoc = true;
         }
-        'package ${pkg};
-        
-        ${imp|e}
-        import de.iip_ecosphere.platform.support.iip_aas.ConfiguredName;
-        import java.math.*;
-        ${genImports(type)|e}
 
-        /**
-         * ${comment} of the application data type ${clsName}.
-         * Generated by: EASy-Producer.
-         */
-        @ConfiguredName("${type.name}")
-        public ${kw} ${clsName}${add}${implements} {
-         
-            ${attributes(type)|e}
+        JavaCodeClass mainCls = codeCreateClass(target, pkg, clsName + add, '${comment} of the application data type ${clsName}');
+        mainCls.addImport("java.math.*"); // preliminary, BigInt
+        if (typeNeedsAasElement(type)) {
+            mainCls.addImport("de.iip_ecosphere.platform.transport.serialization.QualifiedElement");
+        }
+        mainCls.addAnnotation("de.iip_ecosphere.platform.support.iip_aas.ConfiguredName").addStringArgument(type.name);
+        mainCls.addInterface(implements);
+        mainCls.asInterface(interface);
 
-            ${constructors(type, clsName, add)|e}
+        for (Field f: type.fields) {
+            JavaCodeAttribute attr = mainCls.createAttribute(getTypeName(f), asMethodFieldIdentifier(f.name), not(interface));
+            if (not(interface)) {
+                attr.addAnnotation("com.fasterxml.jackson.annotation.JsonProperty").addStringArgument(f.name); // unconditional -> service integrations
+                attr.addAnnotation("de.iip_ecosphere.platform.support.iip_aas.ConfiguredName").addStringArgument(f.name);        
+            }
+            configureGetterSetter(mainCls.addGetter(attr), true, f);
+            configureGetterSetter(mainCls.addSetter(attr, "value"), false, f);
+        }
 
-            ${getters(type)}
+        if (not(interface)) { // below: out-of-order method production
+            mainCls.addConstructor("Default constructor. Fields are pre-allocated with default Java values.");
+
+            JavaCodeMethod cons = mainCls.addConstructor("Copy constructor.");
+            cons.addParameter(clsName, "from", "the instance to copy the values from");
+
+            JavaCodeMethod hash = mainCls.addHashCode();
+            hash.addVariable("int", "hc", "0");
+
+            JavaCodeMethod eq = mainCls.addEquals("other");
+            eq.addVariable("boolean", "eq", "");
+            JavaCodeAlternative eqAlt = eq.addIf('other instanceof ${clsName}');
+            eqAlt.addAssignment("${clsName} oth", "(${clsName}) other");
+            eqAlt.addAssignment("eq", "true");
+
+            for (Field f: type.fields) {
+                cons.addAssignment('this.${asMethodFieldIdentifier(f.name)}', 'from.get${asMethodNameSuffix(f.name)}()');
+                genHashCodeField(f, hash);
+                eqAlt.addAssignment("eq", "&=", genEquals("get${asMethodNameSuffix(f.name)}()", f.type, f.optional));
+            }
             
-            ${setters(type)}
+            hash.addReturn("hc");
 
-            ${genHashCodeEquals(kw, clsName, type)|e}
+            eqAlt.addElse().addAssignment("eq", "false");
+            eq.addReturn("eq");
             
-            ${toString(kw)|e}
-
-        }'
+            JavaCodeMethod toString = mainCls.addToString();
+            toString.addReturn("org.apache.commons.lang3.builder.ReflectionToStringBuilder.toString(this, 
+                de.iip_ecosphere.platform.services.environment.IipStringStyle.SHORT_STRING_STYLE)");
+        }
     }
     
 }
