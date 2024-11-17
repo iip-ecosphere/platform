@@ -29,7 +29,7 @@ template JavaType(Configuration config, JavaCodeArtifact target, RecordType type
     }
     
     @DispatchBasis
-    def genHashCode(String access, DataType type, Boolean optional) {
+    def String genHashCode(String access, DataType type, Boolean optional) {
         String javaType = toTypeName(type);
         if ("BigInteger" == javaType or "BigDecimal" == javaType) {
             "${access} != null ? ${access}.hashCode() : 0";
@@ -39,51 +39,51 @@ template JavaType(Configuration config, JavaCodeArtifact target, RecordType type
     }
 
     @DispatchCase
-    def genHashCode(String access, AliasType type, Boolean optional) {
+    def String genHashCode(String access, AliasType type, Boolean optional) {
         genHashCode(access, type.represents, optional);
     }
 
     @DispatchCase
-    def genHashCode(String access, EnumType type, Boolean optional) {
+    def String genHashCode(String access, EnumType type, Boolean optional) {
         "${access} != null ? ${access}.hashCode() : 0";
     }
     
     @DispatchCase
-    def genHashCode(String access, RecordType type, Boolean optional) {
+    def String genHashCode(String access, RecordType type, Boolean optional) {
         genHashCodeObject(access, optional);
     }
     
     @DispatchCase
-    def genHashCode(String access, IEC61131_3DateTimeTypeType type, Boolean optional) {
+    def String genHashCode(String access, IEC61131_3DateTimeTypeType type, Boolean optional) {
         genHashCodeObject(access, optional);
     }
 
     @DispatchCase
-    def genHashCode(String access, DateTimeTypeType type, Boolean optional) {
+    def String genHashCode(String access, DateTimeTypeType type, Boolean optional) {
         genHashCodeObject(access, optional);
     }
 
     @DispatchCase
-    def genHashCode(String access, ByteStringTypeType type, Boolean optional) {
+    def String genHashCode(String access, ByteStringTypeType type, Boolean optional) {
         genHashCodeObject(access, optional);
     }
 
     @DispatchCase
-    def genHashCode(String access, ObjectTypeType type, Boolean optional) {
+    def String genHashCode(String access, ObjectTypeType type, Boolean optional) {
         genHashCodeObject(access, optional);
     }
 
     @DispatchCase
-    def genHashCode(String access, StringTypeType type, Boolean optional) {
+    def String genHashCode(String access, StringTypeType type, Boolean optional) {
         genHashCodeObject(access, optional);
     }
 
     @DispatchCase
-    def genHashCode(String access, ArrayType type, Boolean optional) {
+    def String genHashCode(String access, ArrayType type, Boolean optional) {
         genHashCodeObject(access, optional);
     }
     
-    def genHashCodeObject(String access, Boolean optional) {
+    def String genHashCodeObject(String access, Boolean optional) {
         "${access} != null ? ${access}.hashCode() : 0";
     }
     
@@ -92,46 +92,46 @@ template JavaType(Configuration config, JavaCodeArtifact target, RecordType type
     }
 
     @DispatchBasis
-    def genEquals(String access, DataType type, Boolean optional) {
+    def String genEquals(String access, DataType type, Boolean optional) {
         "${access} == oth.${access}";
     }
 
     @DispatchCase
-    def genEquals(String access, RecordType type, Boolean optional) {
+    def String genEquals(String access, RecordType type, Boolean optional) {
         genEqualsObject(access, optional);
     }
     
     @DispatchCase
-    def genEquals(String access, IEC61131_3DateTimeTypeType type, Boolean optional) {
+    def String genEquals(String access, IEC61131_3DateTimeTypeType type, Boolean optional) {
         genEqualsObject(access, optional);
     }
 
     @DispatchCase
-    def genEquals(String access, DateTimeTypeType type, Boolean optional) {
+    def String genEquals(String access, DateTimeTypeType type, Boolean optional) {
         genEqualsObject(access, optional);
     }
 
     @DispatchCase
-    def genEquals(String access, ByteStringTypeType type, Boolean optional) {
+    def String genEquals(String access, ByteStringTypeType type, Boolean optional) {
         genEqualsObject(access, optional);
     }
 
     @DispatchCase
-    def genEquals(String access, ObjectTypeType type, Boolean optional) {
+    def String genEquals(String access, ObjectTypeType type, Boolean optional) {
         genEqualsObject(access, optional);
     }
 
     @DispatchCase
-    def genEquals(String access, StringTypeType type, Boolean optional) {
+    def String genEquals(String access, StringTypeType type, Boolean optional) {
         genEqualsObject(access, optional);
     }
 
     @DispatchCase
-    def genEquals(String access, ArrayType type, Boolean optional) {
+    def String genEquals(String access, ArrayType type, Boolean optional) {
         genEqualsObject(access, optional);
     }
     
-    def genEqualsObject(String access, Boolean optional) {
+    def String genEqualsObject(String access, Boolean optional) {
         "${access} != null ? ${access}.equals(oth.${access}) : true";
     }
     
