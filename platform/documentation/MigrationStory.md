@@ -1,4 +1,4 @@
-# Modernizing a Platform Technical Dependencies - an oktoflow (horror) Story
+# Modernizing a Platform's Technical Dependencies - an oktoflow (horror) Story
 July 2024, updated September 2024
 
 ## Introduction
