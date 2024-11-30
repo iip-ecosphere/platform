@@ -10,9 +10,15 @@ template SpringBasics(Configuration config, FileArtifact target) {
     /*
     * Generates the serializer registration code for the given set of serializer class names.
     */
-    def generateSerializerRegistration(setOf(String) serializers) {
+def generateSerializerRegistration(setOf(String) serializers) {
+    for (String cls : serializers.toSequence()->sortedBy(c|c)) { // sortedBy for testing
+        'SerializerRegistry.registerSerializer(${cls}.class);'
+    }
+}
+
+    def generateSerializerRegistration(setOf(String) serializers, JavaCodeMethod meth) {
         for (String cls : serializers.toSequence()->sortedBy(c|c)) { // sortedBy for testing
-            'SerializerRegistry.registerSerializer(${cls}.class);'
+            meth.addCall("de.iip_ecosphere.platform.transport.serialization.SerializerRegistry.registerSerializer", JavaCodeImportScope.CLASS).addArgument(cls+".class");
         }
     }
 

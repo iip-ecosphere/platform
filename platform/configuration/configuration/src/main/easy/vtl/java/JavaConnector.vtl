@@ -19,7 +19,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
     mapOf(RecordType, String) typeOutVars = {};
     
     // path name customization
-
+    
     @DispatchBasis
     def getFieldNameForPath(Field field) {
         field.name;
@@ -29,7 +29,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
     def getFieldNameForPath(UAFieldType field) {
         field.displayName;
     }
-
+    
     @DispatchCase
     def getFieldNameForPath(InfluxField field) {
         getStringValueSafe(field.mappedName, field.name);
@@ -468,7 +468,7 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
             String ex = "access.get(${getFieldPath(field, p)}, ${cachingTime(field)})";
             String convOp = genConvertOp("inConverter", field.type, "to", ex);
             if (field.type.isKindOf(ListType) and convOp.startsWith("toList(")) {
-                convOp = convOpt.replace(".toList(", ".toElementList(");
+                convOp = convOp.replace(".toList(", ".toElementList(");
             }
             '${convOp}';
         }

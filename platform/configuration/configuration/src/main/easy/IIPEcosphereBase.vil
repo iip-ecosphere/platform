@@ -141,6 +141,7 @@ vilScript IIPEcosphereBase (Project source, Configuration config, Project target
             a = appendWithSeparator(a, ",", addArgs);
         }
         sequenceOf(String) args = a.split(",")->reject(s|s.trim().length()==0);
+        //args.add("-o");  // uncomment for testing
         String prop = getProperty("easy.docker.skip", "");
         if (prop.length() > 0) {
             args.add("-Deasy.docker.skip=${prop}");

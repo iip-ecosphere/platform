@@ -4,21 +4,24 @@ import AasBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-@format(profile="java", profileArg_javadocIndent="* ", lineLength = 120)
-template AasImplTest(Configuration config, FileArtifact target, AasSubmodelType type, String apiPkg, String pkg) {
+@format(profile="java", profileArg_javadocIndent=" * ", lineLength = 120, charset="UTF-8")
+template AasImplTest(Configuration config, JavaCodeArtifact target, AasSubmodelType type, String apiPkg, String pkg) {
 
     String mainTypeClsName;
     Integer eltCounter = 0;
     setOf(String) doneMethods = {};
     setOf(String) usedEnums = {};
     DataType currentType = IntegerType;
+	String importPrefix;
 
-    def getGenericIdEx(boolean inc, boolean addComma) { // inc in case that we need differing values, skipped
-        String result = '"generic"';
-        if (addComma) {
-           result = result + ", ";
-        }
-        result;
+    def incGenericId() {  // inc in case that we need differing values, skipped
+	}
+
+	def addGenericIdArg(AasField field, JavaCodeMethodCall c) {
+        if (field.isGeneric) {
+		    c.addArgument('"generic"');
+		}
+		c;
     }
     
     def getRangeIdEx(boolean inc) { // inc in case that we need differing values, skipped 
@@ -28,27 +31,19 @@ template AasImplTest(Configuration config, FileArtifact target, AasSubmodelType 
     // ----------------------------- populate fields --------------------------------------------
     
     // mode 1 = populate setter, mode 2 = populate tests, mode 3 = top-level populate tests
-
-    def genPopulate(sequenceOf(AasField) fields, Integer mode, DataType origin) {
-        DataType currentBefore = currentType;
-        currentType = origin; 
-        String result = "";
-        for (AasField f: fields) {
-            result = appendWithNewline(result, '${genPopulateField(f, stripMultiListType(f), mode)}');
-        }
-        currentType = currentBefore;
-        '${result|e}'
-    }
-
-    /*def genPopulate(AasSubmodelElementCollectionType type, Integer mode) {
-        for (AasField f: fields) {
-            '${genPopulateField(f, f.type, mode)|e}'
-        }
-    }*/
+	
+	def genPopulate(sequenceOf(AasField) fields, Integer mode, DataType origin, JavaCodeMethod m) {
+		DataType currentBefore = currentType;
+		currentType = origin; 
+		for (AasField f: fields) {
+			genPopulateField(f, stripMultiListType(f), mode, m);
+		}
+		currentType = currentBefore;
+	}
     
     @DispatchBasis
-    def genPopulateField(AasField field, DataType type, Integer mode) {
-        '// TODO unconsidered type in genPopulateField: ${type.name} ${type}'      
+    def genPopulateField(AasField field, DataType type, Integer mode, JavaCodeMethod m) {
+        m.addSLComment('TODO unconsidered type in genPopulateField: ${type.name} ${type}');
     }
 
     def getExample(AasField field) {
@@ -63,406 +58,373 @@ template AasImplTest(Configuration config, FileArtifact target, AasSubmodelType 
         }
         result.replace("\\", "\\\\"); // -> Java representation
     }
+
+	def addSemIdArg(AasField field, JavaCodeMethodCall c) {
+		if (hasMultiSemId(field)) {
+		    c.addStringArgument('iri:https://oktoflow.de/semId-${field.name}');
+		}
+	}
     
-    def getSemIdParam(AasField field, Boolean withSep) {
-        String semIdParam = "";
-        if (hasMultiSemId(field)) {
-            if (withSep) {
-                semIdParam = ", ";
-            }
-            semIdParam = semIdParam + '"iri:https://oktoflow.de/semId-${field.name}"';
-        }
-        semIdParam;     
-    }
-    
-    def genField(AasField field, String typeInfix, String toTestParam, String dflt, Integer mode) {
+    def genField(AasField field, String typeInfix, String toTestParam, String dflt, Integer mode, JavaCodeMethod m) {
         if (notSkip(field)) {
-            String toTestParamEx = "";
-            if (toTestParam.length() > 0) {
-                toTestParamEx = toTestParam + ", ";
-            }
-            String dfltEx = "";
-            if (dflt.length() > 0) {
-                dfltEx = ", " + dflt;
-            }
-            String idShortEx = "";
-            String idShortEx2 = "";
-            if (field.isGeneric) {
-                idShortEx = getGenericIdEx(true, true);
-                idShortEx2 = getGenericIdEx(false, false);
-            }
-            String testValueEx = 'toTest${typeInfix}(${toTestParamEx}"${getExample(field)}"${dfltEx})';
-            String methodNameSuffix = asMethodNameSuffix(validateName(field.name));
+            incGenericId();
+			JavaCodeExpression testValueEx = new JavaCodeMethodCall('toTest${typeInfix}')
+				.addClassArgument(toTestParam).addStringArgument(getExample(field)).addArgument(dflt);
             if (mode == 1) {
-                'builder.set${methodNameSuffix}(${idShortEx}${testValueEx}${getSemIdParam(field, true)});'
+			    JavaCodeMethodCall c = genBuilderSetCall(field, m, true);
+				c.addArgument(testValueEx);
+                addSemIdArg(field, c);
             } else {
-                String assertCast = "";
-                String assertParam = "";
-                String assertMethod = "assertEquals";
+				JavaCodeVariableDeclaration v = genEltVar(field, "de.iip_ecosphere.platform.support.aas.RelationshipElement", true, true, m);
+				JavaCodeExpression actualEx = v.getInitializer();
+				if (typeInfix == "Long") {
+				    testValueEx = new JavaCodeCastExpression("long", testValueEx);
+				    actualEx = new JavaCodeCastExpression("long", actualEx);
+                }
+
+				JavaCodeMethodCall c;
                 if (typeInfix == "LangString") {
-                    assertMethod = "assertLangStringsEquals";
+				    c = m.addCall("assertLangStringsEquals");
                 } else if (typeInfix == "ReferenceElement") {
-                    assertMethod = "assertReferenceEquals";
-                } else if (typeInfix == "Double" or typeInfix == "Float") {
-                    assertParam = ", 0.01";
-                } else if (typeInfix == "Long") {
-                    assertCast = "(long) ";
-                }
-                String param = "";
-                if (isFieldCounting(field)) {
-                    param = "${idShortEx}1";
+				    c = m.addCall("assertReferenceEquals");
                 } else {
-                    param = idShortEx2;
+				    c = m.addCall("assertEquals");
+				}
+				c.addArgument(testValueEx).addArgument(actualEx);
+				if (typeInfix == "Double" or typeInfix == "Float") {
+				    c.addArgument(0.01);
                 }
-                '${assertMethod}(${assertCast}${testValueEx}, ${assertCast}first(instance.get${methodNameSuffix}(${idShortEx2}${getSemIdParam(field, idShortEx2.length() > 0)}))${assertParam});'
-                'Assert.assertNotNull(instance.get${methodNameSuffix}Property($param));'
+				
+				String methodNameSuffix = asMethodNameSuffix(validateName(field.name));
+				c = m.addCall("org.junit.Assert.assertNotNull", JavaCodeImportScope.CLASS)
+				    .addCallArgument("instance.get${methodNameSuffix}Property", JavaCodeImportScope.NONE);
+	            addGenericIdArg(field, c);
+                if (isFieldCounting(field)) {
+				    c.addArgument(1); // take populated value
+                }
             } 
         }
     }
     
-    def getSetterParam(AasField field, String typeInfix, String toTestParamEx, String dfltEx) {
-        'toTest${typeInfix}(${toTestParamEx}"${getExample(field)}"${dfltEx})';
+    @DispatchCase
+    def genPopulateField(AasField field, StringTypeType type, Integer mode, JavaCodeMethod m) {
+        genField(field, "String", "", '"TEST"', mode, m);
     }
 
     @DispatchCase
-    def genPopulateField(AasField field, StringTypeType type, Integer mode) {
-        genField(field, "String", "", '"TEST"', mode);
+    def genPopulateField(AasField field, IntegerTypeType type, Integer mode, JavaCodeMethod m) {
+        genField(field, "Int", "", "0", mode, m);
     }
 
     @DispatchCase
-    def genPopulateField(AasField field, IntegerTypeType type, Integer mode) {
-        genField(field, "Int", "", "0", mode);
+    def genPopulateField(AasField field, DoubleTypeType type, Integer mode, JavaCodeMethod m) {
+        genField(field, "Double", "", "0.0", mode, m);
     }
 
     @DispatchCase
-    def genPopulateField(AasField field, DoubleTypeType type, Integer mode) {
-        genField(field, "Double", "", "0.0", mode);
+    def genPopulateField(AasField field, LongTypeType type, Integer mode, JavaCodeMethod m) {
+        genField(field, "Long", "", "0", mode, m);
     }
 
     @DispatchCase
-    def genPopulateField(AasField field, LongTypeType type, Integer mode) {
-        genField(field, "Long", "", "0", mode);
-    }
-
-    @DispatchCase
-    def genPopulateField(AasField field, UnsignedInteger64TypeType type, Integer mode) {
-        genField(field, "BigInteger", "", "0", mode);
+    def genPopulateField(AasField field, UnsignedInteger64TypeType type, Integer mode, JavaCodeMethod m) {
+        genField(field, "BigInteger", "", "0", mode, m);
     }
     
     @DispatchCase
-    def genPopulateField(AasField field, FloatTypeType type, Integer mode) {
-        genField(field, "Float", "", "0.0f", mode);
+    def genPopulateField(AasField field, FloatTypeType type, Integer mode, JavaCodeMethod m) {
+        genField(field, "Float", "", "0.0f", mode, m);
     }
 
     @DispatchCase
-    def genPopulateField(AasField field, BooleanTypeType type, Integer mode) {
-        genField(field, "Boolean", "", "false", mode);
+    def genPopulateField(AasField field, BooleanTypeType type, Integer mode, JavaCodeMethod m) {
+        genField(field, "Boolean", "", "false", mode, m);
     }
     
     @DispatchCase
-    def genPopulateField(AasField field, DateTimeTypeType type, Integer mode) {
-        genField(field, "Date", "", "getDateOfTest()", mode);
+    def genPopulateField(AasField field, DateTimeTypeType type, Integer mode, JavaCodeMethod m) {
+        genField(field, "Date", "", "getDateOfTest()", mode, m);
     }
 
     @DispatchCase
-    def genPopulateField(AasField field, AasEnumType type, Integer mode) {
+    def genPopulateField(AasField field, AasEnumType type, Integer mode, JavaCodeMethod m) {
         usedEnums.add(type.name);
         String clsName = asTypeName(type.name);
-        genField(field, "Enum", "${clsName}.class", "", mode);
+        genField(field, "Enum", "${importPrefix}Builder.${clsName}.class", "", mode, m);
     }
 
     @DispatchCase
-    def genPopulateField(AasField field, AasMultiLangStringTypeType type, Integer mode) {
-        genField(field, "LangString", "", '"test@en"', mode);
+    def genPopulateField(AasField field, AasMultiLangStringTypeType type, Integer mode, JavaCodeMethod m) {
+        genField(field, "LangString", "", '"test@en"', mode, m);
     }
     
+    def asMethodNameSuffix(String name, Boolean validateName) {
+        String methodNameSuffix = name;
+        if (validateName) {
+            methodNameSuffix = validateName(methodNameSuffix);
+        }
+        asMethodNameSuffix(methodNameSuffix);
+    }
+    
+	def JavaCodeMethodCall genBuilderSetCall(AasField field, JavaCodeMethod m, Boolean validateName) {
+		String methodNameSuffix = asMethodNameSuffix(field.name, validateName);
+		JavaCodeMethodCall c = m.addCall('builder.set${methodNameSuffix}', JavaCodeImportScope.NONE);
+		addGenericIdArg(field, c);
+	}
+	
+	def incEltVar() {
+        eltCounter = eltCounter + 1;
+		"elt${eltCounter}";
+	}
+	
+	def genEltVar(AasField field, String type, Boolean inline, Boolean validateName, JavaCodeMethod m) {
+		String methodNameSuffix = asMethodNameSuffix(field.name, validateName);
+		JavaCodeVariableDeclaration v;
+        if (inline) {
+		    v = m.createVariable(type, "tmp");
+		} else {
+		    v = m.addVariable(type, incEltVar());
+		}
+  	    JavaCodeMethodCall f = v.addCall("first");
+	    JavaCodeMethodCall c = f.addCallArgument('instance.get${methodNameSuffix}', JavaCodeImportScope.NONE);
+	    addGenericIdArg(field, c);
+	    addSemIdArg(field, c);
+		if (!inline) {
+			m.addCall("org.junit.Assert.assertNotNull", JavaCodeImportScope.CLASS).addArgument(v);
+		}
+		v;
+	}
+	
     @DispatchCase
-    def genPopulateField(AasField field, AasRelationTypeType type, Integer mode) {
+    def genPopulateField(AasField field, AasRelationTypeType type, Integer mode, JavaCodeMethod m) {
         if (notSkip(field)) {
             String firstEx = 'toTestRelationshipElementFirst("${getExample(field)}", getTestReference())';
             String secondEx = 'toTestRelationshipElementSecond("${getExample(field)}", getTestReference())';
-            String methodNameSuffix = asMethodNameSuffix(field.name);
-            String idShortEx = "";
-            String idShortEx2 = "";
-            if (field.isGeneric) {
-                idShortEx = getGenericIdEx(true, true);
-                idShortEx2 = getGenericIdEx(false, false);
-            }
+            incGenericId();
             if (mode == 1) {
-                'builder.set${methodNameSuffix}(${idShortEx}${firstEx}, ${secondEx}${getSemIdParam(field, true)});'
+			    JavaCodeMethodCall c = genBuilderSetCall(field, m, false);
+				c.addArgument(firstEx);
+				c.addArgument(secondEx);
+                addSemIdArg(field, c);
             } else {
-                eltCounter = eltCounter + 1;
-                String eltVar = "elt${eltCounter}";
-                'RelationshipElement ${eltVar} = first(instance.get${methodNameSuffix}(${idShortEx2}${getSemIdParam(field, idShortEx2.length() > 0)}));
-                Assert.assertNotNull(${eltVar});
-                assertEquals(${firstEx}, ${eltVar}.getFirst());
-                assertEquals(${secondEx}, ${eltVar}.getSecond());'
+				JavaCodeVariableDeclaration v = genEltVar(field, "de.iip_ecosphere.platform.support.aas.RelationshipElement", false, false, m);
+                m.addCall("assertEquals").addArgument(firstEx).addArgument(new JavaCodeMethodCall(v, 'getFirst'));
+                m.addCall("assertEquals").addArgument(secondEx).addArgument(new JavaCodeMethodCall(v, 'getSecond'));
             }
         }
     }
-    
 
     @DispatchCase
-    def genPopulateField(AasField field, AasFileResourceTypeType type, Integer mode) {
+    def genPopulateField(AasField field, AasFileResourceTypeType type, Integer mode, JavaCodeMethod m) {
         if (notSkip(field)) {
             String testResourceFileEx = 'toTestResourceFile("${getExample(field)}", "")';
             String testResourceMimeTypeEx = 'toTestResourceMimeType("${getExample(field)}", "")';
-            String methodNameSuffix = asMethodNameSuffix(field.name);
-            String idShortEx = "";
-            String idShortEx2 = "";
-            if (field.isGeneric) {
-                idShortEx = getGenericIdEx(true, true);
-                idShortEx2 = getGenericIdEx(false, false);
-            }
+			incGenericId();
             if (mode == 1) {
-                'builder.set${methodNameSuffix}(${idShortEx}${testResourceFileEx}, ${testResourceMimeTypeEx}${getSemIdParam(field, true)});'
+			    JavaCodeMethodCall c = genBuilderSetCall(field, m, false);
+				c.addArgument(testResourceFileEx);
+				c.addArgument(testResourceMimeTypeEx);
+                addSemIdArg(field, c);
             } else {
-                eltCounter = eltCounter + 1;
-                String eltVar = "elt${eltCounter}";
-                'FileDataElement ${eltVar} = first(instance.get${methodNameSuffix}(${idShortEx2}${getSemIdParam(field, idShortEx2.length() > 0)}));
-                Assert.assertNotNull(${eltVar});
-                assertEquals(${testResourceFileEx}, ${eltVar}.getContents());
-                assertEquals(${testResourceMimeTypeEx}, ${eltVar}.getMimeType());'
+				JavaCodeVariableDeclaration v = genEltVar(field, "de.iip_ecosphere.platform.support.aas.FileDataElement", false, false, m);
+                m.addCall("assertEquals").addArgument(testResourceFileEx).addArgument(new JavaCodeMethodCall(v, 'getContents'));
+                m.addCall("assertEquals").addArgument(testResourceMimeTypeEx).addArgument(new JavaCodeMethodCall(v, 'getMimeType'));
             }
         }
     }
 
     @DispatchCase
-    def genPopulateField(AasField field, AasRangeTypeType type, Integer mode) {
+    def genPopulateField(AasField field, AasRangeTypeType type, Integer mode, JavaCodeMethod m) {
         if (notSkip(field)) {
-            String testEx = 'toTestRange("${getExample(field)}", getTestRange(), ${getRangeIdEx(true)}, getSmBuilder())';
-            String methodNameSuffix = asMethodNameSuffix(field.name);
-            String idShortEx = "";
-            String idShortEx2 = "";
-            if (field.isGeneric) {
-                idShortEx = getGenericIdEx(true, true);
-                idShortEx2 = getGenericIdEx(false, false);
-            }
+            String testEx = 'toTestRange("${getExample(field)}", getTestRange(), ${getRangeIdEx(true)}, getTestSmBuilder())';
+			incGenericId();
             if (mode == 1) {
-                eltCounter = eltCounter + 1;
-                String eltVar = "elt${eltCounter}";
-                'Range ${eltVar} = ${testEx};
-                builder.set${methodNameSuffix}(${idShortEx}${eltVar}.getType(), ${eltVar}.getMin(), ${eltVar}.getMax()${getSemIdParam(field, true)});'
+		        JavaCodeVariableDeclaration v = m.addVariable("de.iip_ecosphere.platform.support.aas.Range", incEltVar()).addInitializer(testEx);
+				String methodNameSuffix = asMethodNameSuffix(field.name);
+				JavaCodeMethodCall c = m.addCall('builder.set${methodNameSuffix}', JavaCodeImportScope.NONE);
+				addGenericIdArg(field, c);
+				c.addArgument(new JavaCodeMethodCall(v, "getType"));
+				c.addArgument(new JavaCodeMethodCall(v, "getMin"));
+				c.addArgument(new JavaCodeMethodCall(v, "getMax"));
+                addSemIdArg(field, c);
             } else {
-                eltCounter = eltCounter + 1;
-                String eltVar = "elt${eltCounter}";
-                'Range ${eltVar} = first(instance.get${methodNameSuffix}(${idShortEx2}${getSemIdParam(field, idShortEx2.length() > 0)}));
-                Assert.assertNotNull(${eltVar});
-                assertEquals(${testEx}, ${eltVar});'
+				JavaCodeVariableDeclaration v = genEltVar(field, "de.iip_ecosphere.platform.support.aas.Range", false, false, m);
+                m.addCall("assertEquals").addArgument(testEx).addArgument(v);
             }
         }
     }
     
     @DispatchCase
-    def genPopulateField(AasField field, AasBlobTypeType type, Integer mode) {
+    def genPopulateField(AasField field, AasBlobTypeType type, Integer mode, JavaCodeMethod m) {
         if (notSkip(field)) {
             String testResourceFileEx = 'toTestResourceFile("${getExample(field)}", "")';
             String testResourceMimeTypeEx = 'toTestResourceMimeType("${getExample(field)}", "")';
-            String methodNameSuffix = asMethodNameSuffix(field.name);
-            String idShortEx = "";
-            String idShortEx2 = "";
-            if (field.isGeneric) {
-                idShortEx = getGenericIdEx(true, true);
-                idShortEx2 = getGenericIdEx(false, false);
-            }
+			incGenericId();
             if (mode == 1) {
-                'builder.set${methodNameSuffix}(${idShortEx}${testResourceFileEx}, ${testResourceMimeTypeEx}${getSemIdParam(field, true)});'
+			    JavaCodeMethodCall c = genBuilderSetCall(field, m, false);
+				c.addArgument(testResourceFileEx);
+				c.addArgument(testResourceMimeTypeEx);
+                addSemIdArg(field, c);
             } else {
-                eltCounter = eltCounter + 1;
-                String eltVar = "elt${eltCounter}";
-                'BlobDataElement ${eltVar} = first(instance.get${methodNameSuffix}(${idShortEx2}${getSemIdParam(field, idShortEx2.length() > 0)}));
-                Assert.assertNotNull(${eltVar});
-                Assert.assertEquals(${testResourceFileEx}, ${eltVar}.getValue());
-                Assert.assertEquals(${testResourceMimeTypeEx}, ${eltVar}.getMimeType());'
+				JavaCodeVariableDeclaration v = genEltVar(field, "de.iip_ecosphere.platform.support.aas.BlobDataElement", false, false, m);
+                m.addCall("assertEquals").addArgument(testResourceFileEx).addArgument(new JavaCodeMethodCall(v, 'getValue'));
+                m.addCall("assertEquals").addArgument(testResourceMimeTypeEx).addArgument(new JavaCodeMethodCall(v, 'getMimeType'));
             }
         }
     }
 
     @DispatchCase
-    def genPopulateField(AasField field, AasReferenceTypeType type, Integer mode) {
-        genField(field, "ReferenceElement", "", 'getTestReference()', mode);
+    def genPopulateField(AasField field, AasReferenceTypeType type, Integer mode, JavaCodeMethod m) {
+        genField(field, "ReferenceElement", "", 'getTestReference()', mode, m);
     }
 
     @DispatchCase
-    def genPopulateField(AasField field, AasAnyURITypeType type, Integer mode) {
-        genField(field, "String", "", '"http://me.here.de"', mode);
+    def genPopulateField(AasField field, AasAnyURITypeType type, Integer mode, JavaCodeMethod m) {
+        genField(field, "String", "", '"http://me.here.de"', mode, m);
     }
     
     // AasRangeTypeType,  AasLangStringType
     
-    def genSubStructure(AasField field, String typeName, Integer mode) {
+    def genSubStructure(AasField field, String typeName, Integer mode, JavaCodeMethod m) {
         DataType type = field.type;
         String clsName = asTypeName(typeName);
         String fldName = asTypeName(field.name);
-        // for mode 2, 3
-        String params = "";
-        if (field.isGeneric) {
-            params = '"generic"';
-        }
-        if (isFieldCounting(field)) {
-            params = appendWithSeparator(params, ", ", "1");
-        }
-        if (hasMultiSemId(field)) { // type before
-            params = appendWithSeparator(params, ", ", '"${getSemId(type)}"');
-        }
         if (mode == 1) {
-            // overwrite params
             if (notSkip(field)) {
                 String builderName = fldName.firstToLowerCase() + "Builder";
+				
+				m.addVariable(qualifyAasCls('${importPrefix}Builder.', '${clsName}Builder'), builderName);
+                Integer minCard = max(1, getIntegerValueSafe(field.minimumInstances, -1));
+                JavaCodeForLoop f = m.addForLoop("int", "card", "1", 'card <= ${minCard}', 'card++');
+				JavaCodeMethodCall bld = new JavaCodeMethodCall('builder.create${fldName}Builder', JavaCodeImportScope.NONE);
+				f.addAssignment(builderName, bld);
+				
                 String populateStmt = "";
                 if (type == AasGenericSubmodelElementCollection) {
-                    params = "false, false"; // ordered, allowsDuplicates
+				    bld.addArgument(false); // ordered
+				    bld.addArgument(false); // allowsDuplicates
                 } else if (type == AasGenericEntityType) {
-                    params = 'Entity.EntityType.SELFMANAGEDENTITY'; // preliminary default
+                    m.addImport("de.iip_ecosphere.platform.support.aas.Entity"); // ensure
+				    bld.addArgument('Entity.EntityType.SELFMANAGEDENTITY'); // preliminary default
                 } else {
-                    params = "";
-                    populateStmt = 'populate(${builderName}, depth + 1);';
-                    populateStmt = injectRecursionControl(field, 3, populateStmt);
+					injectRecursionControl(field, 3, f, 'populate(${builderName}, depth + 1)');
                 }
                 if (hasMultiSemId(type)) {
-                    params = appendWithSeparator(params, ", ", '"${getSemId(type)}"');
+				    bld.addStringArgument(getSemId(type));
                 }
                 if (field.isGeneric) {
-                    if (params.length() > 0) {
-                        params = appendWithSeparator('"generic"', ", ", params);
-                    } else {
-                        params = '"generic"';
-                    }
+					bld.addStringArgument("generic");
                 }
-                Integer minCard = max(1, getIntegerValueSafe(field.minimumInstances, -1));
-                '${clsName}Builder ${builderName};
-                for (int card = 1; card <= ${minCard}; card++) {
-                    ${builderName} = builder.create${fldName}Builder(${params});
-                    ${populateStmt|e}
-                    ${builderName}.build();
-                }'
+				f.addCall('${builderName}.build', JavaCodeImportScope.NONE);
             }
-        } else if (mode == 2) {
+        } else if (mode == 2 or mode == 3) {
             if (!isImplementedByAPI(field.type) and notSkip(field)) {
-                String stmt = 'test(instance.get${fldName}(${params}), depth + 1);';
-                '${injectRecursionControl(field, 2, stmt)}'
-            }
-        } else if (mode == 3) {
-            if (!isImplementedByAPI(field.type) and notSkip(field)) {
-                String stmt = 'test(instance.get${fldName}(${params}), depth + 1);';
-                '${injectRecursionControl(field, 2, stmt)}'
+				JavaCodeMethodCall c = new JavaCodeMethodCall("instance.get${fldName}", JavaCodeImportScope.NONE);
+				if (field.isGeneric) {
+					c.addStringArgument("generic");
+				}
+				if (isFieldCounting(field)) {
+					c.addArgument(1); // populated sample value
+				}
+				if (hasMultiSemId(field)) { // type before
+					c.addStringArgument(getSemId(type));
+				}
+				c = new JavaCodeMethodCall("test").addArgument(c).addArgument("depth + 1");
+                injectRecursionControl(field, 2, m.getBlock(), c);
             }
         }
     }
-    
-    def injectRecursionControl(Field field, int maxDepth, String stmt) {
-        if (currentType == field.type) {
-            stmt = "if (depth < ${maxDepth}) {\n    ${stmt}\n}";
-        } else {
-            String type = field.type.name;
-            stmt = 'if (!stack.contains("${type}")) {\n    stack.add("${type}");\n    ${stmt}\n    stack.remove("${type}");\n}';
-        }
-        stmt;
+
+	def injectRecursionControl(Field field, int maxDepth, JavaCodeBlock b, JavaCodeExpression expr) {
+		if (currentType == field.type) {
+		    b.addIf("depth < ${maxDepth}").add(expr);
+		} else {
+			String type = field.type.name;
+			JavaCodeAlternative a = b.addIf('!stack.contains("${type}")');
+			a.addCall("stack.add", JavaCodeImportScope.NONE).addStringArgument(type);
+			a.add(expr);
+			a.addCall("stack.remove", JavaCodeImportScope.NONE).addStringArgument(type);
+		}
+	}
+
+    @DispatchCase
+    def genPopulateField(AasField field, AasEntityType type, Integer mode, JavaCodeMethod m) {
+        genSubStructure(field, type.name, mode, m);
     }
 
     @DispatchCase
-    def genPopulateField(AasField field, AasEntityType type, Integer mode) {
-        '${genSubStructure(field, type.name, mode)}'
-    }
-
-    @DispatchCase
-    def genPopulateField(AasField field, AasSubmodelElementCollectionType type, Integer mode) {
-        '${genSubStructure(field, type.name, mode)}'
+    def genPopulateField(AasField field, AasSubmodelElementCollectionType type, Integer mode, JavaCodeMethod m) {
+        genSubStructure(field, type.name, mode, m);
     }
     
     @DispatchCase
-    def genPopulateField(AasField field, AasSubmodelType type, Integer mode) {
-        '// TODO unconsidered submodel ${type}'
-        //'${genSubStructure(field, type.name, mode)}'
+    def genPopulateField(AasField field, AasSubmodelType type, Integer mode, JavaCodeMethod m) {
+        m.addSLComment('TODO unconsidered submodel ${type}');
+        //genSubStructure(field, type.name, mode, m);
     }
 
     // methods
 
-    def genPopulateMethods(sequenceOf(AasField) fields, Integer mode) {
+    def genPopulateMethods(sequenceOf(AasField) fields, Integer mode, JavaCodeClass cls) {
         for (AasField f: fields) {
-            '${genPopulateMethods(f, f.type, mode)|e}'
+            genPopulateMethods(f, f.type, mode, cls);
         }
     }
     
     @DispatchBasis
-    def genPopulateMethods(AasField field, DataType type, Integer mode) {
-        ''
+    def genPopulateMethods(AasField field, DataType type, Integer mode, JavaCodeClass cls) {
     }
 
     @DispatchCase
-    def genPopulateMethods(AasField field, AasEntityType type, Integer mode) {
-        genMethod(field, type.name, type.fields, "Entity", mode);
+    def genPopulateMethods(AasField field, AasEntityType type, Integer mode, JavaCodeClass cls) {
+        genMethod(field, type.name, type.fields, "Entity", mode, cls);
     }
 
     @DispatchCase
-    def genPopulateMethods(AasField field, AasSubmodelElementCollectionType type, Integer mode) {
-        genMethod(field, type.name, type.fields, "SMEC", mode);
+    def genPopulateMethods(AasField field, AasSubmodelElementCollectionType type, Integer mode, JavaCodeClass cls) {
+        genMethod(field, type.name, type.fields, "SMEC", mode, cls);
     }
     
-    def genMethod(AasField field, String typeName, sequenceOf(AasField) fields, String aasType, Integer mode) {
+    def genMethod(AasField field, String typeName, sequenceOf(AasField) fields, String aasType, Integer mode, JavaCodeClass cls) {
         String key = typeName + ":" + mode; // unclear!
         if (!isImplementedByAPI(field.type) and notSkip(field) and doneMethods.excludes(key)) {
             doneMethods.add(key);
-            String methodName;
-            String typeSuffix;
-            String comment1;
-            String comment2; 
-            String varName;
-            String throwsEx;
-            String throwsComment;
-            if (mode == 1) {
-                methodName = "populate";
-                typeSuffix = "Builder";
-                comment1 = "Populates";
-                comment2 = "populate";
-                varName = "builder";
-                throwsEx = "";
-                throwsComment = "";
-            } else {
-                methodName = "test";
-                typeSuffix = "";
-                comment1 = "Tests";
-                comment2 = "test";
-                varName = "instance";
-                throwsEx = " throws ExecutionException";
-                throwsComment = "* @throws ExecutionException if property accesses/conversions fail";
-            }
-            
             String clsName = asTypeName(typeName);
-            '/**
-            * ${comment1} the ${aasType} ${htmlize(typeName)}.
-            *
-            * @param ${varName} the ${varName} to ${comment2}
-            * @param depth recursion depth starting at 1
-            ${throwsComment|e}
-            */
-            private static void ${methodName}(${clsName}${typeSuffix} ${varName}, int depth)${throwsEx} {
-                ${genPopulate(fields, mode, field.type)}
+			JavaCodeMethod meth;
+            if (mode == 1) {
+			    meth = cls.addMethod("void", "populate", "Populates the ${aasType} ${typeName}.");
+			    meth.addParameter("${clsName}Builder", "builder", "the builder to populate");
+            } else {
+			    meth = cls.addMethod("void", "test", "Tests the ${aasType} ${typeName}.");
+				meth.addParameter('${importPrefix}.${clsName}', "instance", "the instance to test");
+			    meth.addException("java.util.concurrent.ExecutionException", "if property accesses/conversions fail");
             }
-            
-            ${genPopulateMethods(fields, mode)|e}'
-        } else {
-            ''
+			meth.setStatic().setPrivate();
+			meth.addParameter("int", "depth", "recursion depth starting at 1");
+            genPopulate(fields, mode, field.type, meth);
+            genPopulateMethods(fields, mode, cls);
         }
     }
     
     // ------------------------------------------ enum tests -------------------------------------
 
-    def genEnumTests(AasSubmodelType type) {
+    def genEnumTests(AasSubmodelType type, JavaCodeMethod m) {
         String clsName = asTypeName(type.name);
         setOf(AasEnumType) enumTypes = AasEnumType.allInstances();
         for (AasEnumType e: enumTypes->sortedBy(m|m.name)) { // sortedBy for testing
             if (e.versionIdentifier == type.versionIdentifier and usedEnums.includes(e.name)) {
                 String enumName = asTypeName(e.name);
-                'assertEnum(${clsName}Builder.${enumName}.values(), 
-                    v -> v.getValue() != null && v.getValueId() >= 0 && v.getSemanticId() != null);\n'
+				
+				JavaCodeMethodCall a = m.addCall("assertEnum");
+				a.addCallArgument("${apiPkg}.${clsName}Builder.${enumName}.values", JavaCodeImportScope.CLASS);
+		        a.addLambdaArgument().addVariable("v").addExpression("v.getValue() != null && v.getValueId() >= 0 && v.getSemanticId() != null");
             }
         }
     }
     
     // ------------------------------------------ main --------------------------------------------
-
-    def main(Configuration config, FileArtifact target, AasSubmodelType type, String apiPkg, String pkg) {
+	
+	def main(Configuration config, JavaCodeArtifact target, AasSubmodelType type, String apiPkg, String pkg) {
         String clsName = asTypeName(type.name);
         mainTypeClsName = clsName;
         String fileName = toFolderName(getIdShort(type)).firstToLower();
@@ -470,153 +432,87 @@ template AasImplTest(Configuration config, FileArtifact target, AasSubmodelType 
         String rangeIdEx = getRangeIdEx(true);
         String specFileName = aasName + "-" + getStringValueSafe(type.versionIdentifier, "unknown").replace(" ", "") 
             + ".spec";
-        String importPrefix = "${apiPkg}.${clsName}";
-        
-       'package ${pkg};
-        
-        import static de.iip_ecosphere.platform.support.aas.IdentifierType.*;
-        import static de.iip_ecosphere.platform.support.aas.types.common.Utils.*;
+        importPrefix = "${apiPkg}.${clsName}";
 
-        import java.util.Set;
-        import java.util.HashSet;
-        import java.util.concurrent.ExecutionException;
+        JavaCodeClass mainCls = codeCreateClass(target, pkg, clsName + "BuilderTest", 
+            "Tests {@link ${clsName}Builder} and {@link ${clsName}}");
+	    mainCls.addStaticImport("de.iip_ecosphere.platform.support.aas.IdentifierType.*");
+	    mainCls.addStaticImport("de.iip_ecosphere.platform.support.aas.types.common.Utils.*");
 
-        import de.iip_ecosphere.platform.support.Builder;
-        import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
-        import de.iip_ecosphere.platform.support.aas.Entity.EntityBuilder;
-        import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
-        import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
-        import de.iip_ecosphere.platform.support.aas.*;
-        import de.iip_ecosphere.platform.support.aas.types.common.*;
-        
-        import ${apiPkg}.${clsName}Builder;
-        import ${apiPkg}.${clsName};
-        ${genImports(type, importPrefix + "Builder", "Builder")}
-        ${genImports(type, importPrefix, "")}
+        mainCls.addExtends("test.de.iip_ecosphere.platform.support.aas.AbstractAasExample");
+		JavaCodeAttribute testRef = mainCls.addAttribute("de.iip_ecosphere.platform.support.aas.Reference", "testReference").setStatic();
+		JavaCodeAttribute testRange = mainCls.addAttribute("de.iip_ecosphere.platform.support.aas.Range", "testRange").setStatic();
+        JavaCodeAttribute testSmBuilder = mainCls.addAttribute("de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder", "testSmBuilder").setStatic();
+        mainCls.addAttribute("java.util.Set<String>", "stack").setStatic().addNew("java.util.HashSet<>");
 
-        import org.junit.Test;
-        import org.junit.Assert;
-        import test.de.iip_ecosphere.platform.support.aas.AbstractAasExample;
-        
-        /**
-        * Tests {@link ${clsName}Builder} and {@link ${clsName}}.
-        */
-        public class ${clsName}BuilderTest extends AbstractAasExample {
+        mainCls.addGetter(testRef).setProtected().getJavadocComment().setComment("Returns the test reference.", "the test reference");
+        mainCls.addGetter(testRange).setProtected().getJavadocComment().setComment("Returns the test range.", "the test range");
+        mainCls.addGetter(testSmBuilder).setProtected().getJavadocComment().setComment("Returns the test submodel builder, e.g., for ranges.", "the test submodel builder, e.g., for ranges");
 
-            private static Reference testReference;
-            private static Range testRange;
-            private static SubmodelBuilder testSmBuilder;
-            private static Set<String> stack = new HashSet<>();
-            
-            /**
-            * Returns the test reference.
-            *
-            * @return the test reference
-            */
-            protected static Reference getTestReference() {
-                return testReference;
-            }
-            
-            /**
-            * Returns the test range.
-            *
-            * @return the test range
-            */
-            protected static Range getTestRange() {
-                return testRange;
-            } 
+		JavaCodeMethod m = mainCls.addMethod("String", "getTestFileName").setProtected();
+		m.addOverrideAnnotation();
+		m.addParameter("de.iip_ecosphere.platform.support.aas.Aas", "aas");
+		m.addReturn(new JavaCodeStringExpression("${specFileName}"));
 
-            /**
-            * Returns the a submodel builder, e.g., for ranges.
-            *
-            * @return the a submodel builder, e.g., for ranges
-            */
-            protected static SubmodelBuilder getSmBuilder() {
-                return testSmBuilder;
-            }
-            
-            @Override
-            protected String getTestFileName(Aas aas) {
-                return "${specFileName}";
-            }
+		m = mainCls.addMethod("String", "getFolderName").setProtected();
+		m.addOverrideAnnotation();
+		m.addReturn(new JavaCodeStringExpression("${fileName}-gen"));
 
-            @Override
-            protected String getFolderName() {
-                return "${fileName}-gen";
-            }
-            
-            @Override
-            public java.io.File[] getTargetFiles() {
-                return new java.io.File[] {new java.io.File("./output/${fileName}.aasx")};
-            }
+		m = mainCls.addMethod(new JavaCodeTypeSpecification("java.io.File[]"), "getTargetFiles");
+		m.addOverrideAnnotation();
+		m.addReturn('new java.io.File[] {new java.io.File("./output/${fileName}.aasx")}');
 
-            @Override
-            protected void createAas() {
-                Aas refAas = AasFactory.getInstance().createAasBuilder("${aasName}ExampleRef", 
-                    "urn:::AAS:::${aasName}RefExample#").build();
-                testReference = refAas.createReference(); // just for test instances, do not registerAas
-                testSmBuilder = refAas.createSubmodelBuilder("test_sm", null);
-                testRange = testSmBuilder.createRangeBuilder(${rangeIdEx}, Type.AAS_INTEGER, 1, 2).build();
-                
-                AasBuilder aasBuilder = AasFactory.getInstance().createAasBuilder("${aasName}Example", 
-                    "urn:::AAS:::${aasName}Example#");
-                aasBuilder.createAssetBuilder("ci", "urn:::Asset:::ci#", AssetKind.INSTANCE).build();
+		m = mainCls.addMethod("", "createAas").setProtected();
+		m.addOverrideAnnotation();
+		m.addVariable("de.iip_ecosphere.platform.support.aas.Aas", "refAas")
+			.addCall("de.iip_ecosphere.platform.support.aas.AasFactory.getInstance", JavaCodeImportScope.CLASS)
+			.addCall("createAasBuilder").addStringArgument("${aasName}ExampleRef").addStringArgument("urn:::AAS:::${aasName}RefExample#")
+			.addCall("build");
+	    m.addAssignment("testReference", 'refAas.createReference()');
+	    m.addAssignment("testSmBuilder", 'refAas.createSubmodelBuilder("test_sm", null)');
+		m.addImport("de.iip_ecosphere.platform.support.aas.Type"); // lazy
+	    m.addAssignment("testRange", 'testSmBuilder.createRangeBuilder(${rangeIdEx}, Type.AAS_INTEGER, 1, 2).build()');
+		m.addVariable("de.iip_ecosphere.platform.support.aas.Aas.AasBuilder", "aasBuilder")
+			.addCall("de.iip_ecosphere.platform.support.aas.AasFactory.getInstance", JavaCodeImportScope.CLASS)
+			.addCall("createAasBuilder").addStringArgument("${aasName}Example").addStringArgument("urn:::AAS:::${aasName}Example#");
+	    m.addImport("de.iip_ecosphere.platform.support.aas.AssetKind"); // lazy
+        m.addCall("aasBuilder.createAssetBuilder").addStringArgument("ci").addStringArgument("urn:::Asset:::ci#").addArgument("AssetKind.INSTANCE").addCall("build");
+	    m.addVariable("${apiPkg}.${clsName}Builder", "smBuilder")
+		    .addNew("${clsName}Builder").addArgument("aasBuilder").addStringArgument("urn:::SM:::${aasName}#");
+	    m.addCall("smBuilder.setCreateMultiLanguageProperties", JavaCodeImportScope.NONE).addArgument("isCreateMultiLanguageProperties", JavaCodeImportScope.NONE);
+		m.addCall("populate").addArgument("smBuilder").addArgument(1);
+		m.addCall("build").qualifiedBy("smBuilder");
+        JavaCodeTryBlock t = m.addTry();
+		t.addCall("testAas").addCallArgument("registerAas").addArgument("aasBuilder");
+		JavaCodeBlock c = t.addCatch("java.util.concurrent.ExecutionException", "e");
+		c.addCall("e.printStackTrace", JavaCodeImportScope.NONE).addArgument("System.out");
+		c.addCall("org.junit.Assert.fail", JavaCodeImportScope.CLASS).addArgument("e.getMessage", JavaCodeImportScope.NONE);
+		
+		String builderCls = "${clsName}Builder";
+		m = mainCls.addMethod(builderCls, "populate", "Populates an example contact information builder.").setStatic();
+		m.addParameter(builderCls, "builder", "the instance to populate");
+		m.addParameter("int", "depth", "initialization recursion depth");
+		genPopulate(type.fields, 1, type, m);
+		m.addReturn("builder", "{@code builder}");
 
-                ${clsName}Builder smBuilder = new ${clsName}Builder(aasBuilder, "urn:::SM:::${aasName}#");
-                smBuilder.setCreateMultiLanguageProperties(isCreateMultiLanguageProperties());
-                populate(smBuilder, 1);
-                smBuilder.build();
-                
-                try {
-                    testAas(registerAas(aasBuilder));
-                } catch (ExecutionException e) {
-                    e.printStackTrace(System.out);
-                    Assert.fail(e.getMessage());
-                }
-            }
-            
-            /**
-             * Populates an example contact information builder.
-             * 
-             * @param builder the instance to populate
-             * @param depth initialization recursion depth
-             * @return {@code builder}
-             */
-            public static ${clsName}Builder populate(${clsName}Builder builder, int depth) {
-                ${genPopulate(type.fields, 1, type)}
-                return builder;
-            }
-            
-            ${genPopulateMethods(type.fields, 1)|e}
-            
-            @Override
-            protected java.io.File getThumbnail() {
-                return null;
-            }
-            
-            /**
-            * Tests the created AAS.
-            *
-            * @param aas the top-level AAS instance to test
-            * @throws ExecutionException if property accesses fail during the test execution
-            */
-            private void testAas(Aas aas) throws ExecutionException {
-                ${mainTypeClsName} instance = new ${mainTypeClsName}(aas);
-                int depth = 0;
-                ${genPopulate(type.fields, 3, type)}
-            }
+		genPopulateMethods(type.fields, 1, mainCls);
+		
+		m = mainCls.addMethod(new JavaCodeTypeSpecification("java.io.File"), "getThumbnail").setProtected();
+		m.addOverrideAnnotation();
+		m.addReturn("null");
+		
+        m = mainCls.addMethod("", "testAas", "Tests the created AAS.").setPrivate();
+		m.addParameter("de.iip_ecosphere.platform.support.aas.Aas", "aas", "the top-level AAS instance to test");
+        m.addException("java.util.concurrent.ExecutionException", "if property accesses fail during the test execution");		
+		m.addVariable(mainTypeClsName, "instance").addNew(mainTypeClsName).addArgument("aas");
+		m.addVariable("int", "depth", "0");
+		genPopulate(type.fields, 3, type, m);
 
-            ${genPopulateMethods(type.fields, 2)|e}
-            
-            /**
-            * Tests declared enums.
-            */
-            @Test
-            public void testEnums() {
-                ${genEnumTests(type)}
-            }
-
-        }'
+		genPopulateMethods(type.fields, 2, mainCls);
+		
+		m = mainCls.addMethod("", "testEnums", "Tests declared enums.");
+		m.addJunitTestAnnotation();
+		genEnumTests(type, m);
     }
 
 }
