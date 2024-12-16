@@ -326,8 +326,16 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     }
                 }
                 
+                mapOf(Server, setOf(ServiceBase)) serverServices = {};
+                for (ServiceBase s : ServiceBase.allInstances()) {
+                    if (isDefined(s.server) and s.server <> null) {
+                        setOf(ServiceBase) sb = serverServices.getOrAdd(s, {});
+                        sb.add(s);
+                    }
+                }
                 for (Server s : a.servers) {
-                    generateTemplateElements(appRoot, config, s, assemblies);
+                    setOf(ServiceBase) services = serverServices.get(s, {});
+                    generateTemplateElements(appRoot, config, s, assemblies, services);
                 }
                 
                 if (assemblies->select(a|a.id.startsWith("art_")).size() > 0) {
@@ -498,7 +506,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     * Creates template files for a server.
     */
     @DispatchBasis
-    generateTemplateElements(Path appRoot, Configuration config, Server server, setOf(AssemblyInfo) assemblies) = {
+    generateTemplateElements(Path appRoot, Configuration config, Server server, setOf(AssemblyInfo) assemblies, setOf(ServiceBase) services) = {
         // do nothing, everything is here already generically in place
     }
     
@@ -506,9 +514,21 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     * Creates template files for a Python server.
     */
     @DispatchCase
-    generateTemplateElements(Path appRoot, Configuration config, PythonServer server, setOf(AssemblyInfo) assemblies) = {
-        // do nothing, everything is here already generically in place
+    generateTemplateElements(Path appRoot, Configuration config, PythonServer server, setOf(AssemblyInfo) assemblies, setOf(ServiceBase) services) = {
         generateTemplateArtifacts(appRoot, server.artifacts, assemblies);
+println("GEN-TE-P " + server+" "+services);        
+        String srvName = asTypeName(server.id);
+        if (services.isEmpty()) {
+println("GEN-TE-P1");        
+            vilTemplateProcessor("PythonServerTestTemplate", config, "${appRoot}/src/test/python/${srvName}Test.py", pythonElements=null, pythonServer=server);
+        } else {
+println("GEN-TE-P2");        
+            for (ServiceBase s: services) {
+                PythonService ps = s;
+                String clsName = asTypeName(ps.name);
+                vilTemplateProcessor("PythonServerTestTemplate", config, "${appRoot}/src/test/python/${srvName}${clsName}Test.py", pythonElements=ps, pythonServer=server);
+            }
+        }
     }
     
     @DispatchCase

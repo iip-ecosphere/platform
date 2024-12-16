@@ -3,20 +3,27 @@ import PythonBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template PythonServerTestTemplate(Configuration config, FileArtifact target, PythonService pythonElements) {
+template PythonServerTestTemplate(Configuration config, FileArtifact target, PythonService pythonElements, PythonServer pythonServer) {
 
-    def serviceImports(PythonService pythonElements) {
+    def serviceImports(PythonService pythonElements, PythonServer pythonServer) {
+        if (pythonElements <> null) {
         String clsName = asTypeName(pythonElements.name);
-        String serverName = asTypeName(pythonElements.server.id);
         'from ${clsName} import ${clsName}
-         from ${serverName} import ${serverName}
         '
+        }
+        if (pythonServer <> null) {
+            String serverName = asTypeName(pythonServer.id);
+            'from ${serverName} import ${serverName}
+            '
+        }
     }
     
     def typeImports(PythonService pythonElements) {
-        setOf(String) done = {};
-        '${genTypeImports(pythonElements.input, done)}'
-        '${genTypeImports(pythonElements.output, done)}' 
+        if (pythonElements <> null) {
+            setOf(String) done = {};
+            '${genTypeImports(pythonElements.input, done)}'
+            '${genTypeImports(pythonElements.output, done)}' 
+        }
     }
     
     def genTypeImports(sequenceOf(IOType) types, setOf(String) done) {
@@ -31,12 +38,15 @@ template PythonServerTestTemplate(Configuration config, FileArtifact target, Pyt
         }
     }
     
-    def genSerializerImports(sequenceOf(IOType) types) {
-        //from serializers.ImageInputSerializer import ImageInputSerializer
-        for (IOType type : types) {
-            String typeName = toTypeName(type);
-            'from serializers.${typeName}Serializer import ${typeName}Serializer
-            '
+    def genSerializerImports(PythonService pythonElements) {
+        if (pythonElements <> null) {
+            //from serializers.ImageInputSerializer import ImageInputSerializer
+            for (IOType type : pythonElements.input) {
+                String typeName = toTypeName(type);
+                'from serializers.${typeName}Serializer import ${typeName}Serializer
+                '
+            }
+        
         }
     }
     
@@ -54,8 +64,52 @@ template PythonServerTestTemplate(Configuration config, FileArtifact target, Pyt
             'sys.path.insert(5, "../../main/python/${pathSuffix}")'
         }
     }
+    
+    def genService(PythonService pythonElements) {
+        if (pythonElements <> null) {
+            'time.sleep(10)
 
-    def main(Configuration config, FileArtifact target, PythonService pythonElements) {
+             service = ${asTypeName(pythonElements.name)}()
+
+             service.setState(ServiceState.STARTING)
+             service.setState(ServiceState.RUNNING)
+
+             ${genSerializerInitialization(pythonElements.input)}
+
+             service.attachIngestor(assertionIngestor) 
+
+             runAllTestsFromFile(service.getId(), "../../test/resources/testData-${asTypeName(pythonElements.name)}.json")
+                
+             # prepare your data, e.g., loading from json
+             """Needed to enable the loading of resources like the finished service would"""
+
+             # instantiate your service here, e.g., service = PyService()
+             # call your service here, e.g., service.processNewInput(impl)
+
+             service.setState(ServiceState.STOPPING)
+             service.setState(ServiceState.STOPPED)'            
+        }
+    }
+
+    def genServiceIngestor(PythonService pythonElements) {
+        if (pythonElements <> null) {
+            'def assertionIngestor(data):
+                #add your assertions in this block, data will be your returned data
+                print("output", data)
+            '            
+        }
+    }
+
+    def main(Configuration config, FileArtifact target, PythonService pythonElements, PythonServer pythonServer) {
+        String clsName = asTypeName(pythonServer.id);
+        String servicesPackageName = "services";
+        if (pythonElements <> null) {
+            if (pythonElements.server <> null and pythonElements.server.isKindOf(PythonServer)) {
+                pythonServer = pythonElements.server;
+                clsName = clsName + asTypeName(pythonElements.name);
+            }
+            servicesPackageName = getStringValueSafe(pythonElements.servicesPackageName, "services");
+        }
         'import unittest
         
         import sys
@@ -70,52 +124,32 @@ template PythonServerTestTemplate(Configuration config, FileArtifact target, Pyt
         sys.path.insert(2, ("../../../gen/hm23/ApplicationInterfaces/src/main/python/iip"))
         """ always fixed value as these directories are generated in the impl.impl """
         sys.path.insert(3, "../../main/python/services") 
-        sys.path.insert(5, "../../main/python/${getStringValueSafe(pythonElements.servicesPackageName, "services")}") 
+        sys.path.insert(5, "../../main/python/${servicesPackageName}") 
         sys.path.insert(4, "../../main/python")
 
         import time
         from Service import ServiceState
         import json
 
-        ${serviceImports(pythonElements)}
+        ${serviceImports(pythonElements, pythonServer)}
         ${typeImports(pythonElements)}
-        ${genSerializerImports(pythonElements.input)}
+        ${genSerializerImports(pythonElements)}
 
         os.chdir("../../main/python") 
 
-        class ${asTypeName(pythonElements.name)}Test(unittest.TestCase):
+        class ${clsName}Test(unittest.TestCase):
         
             def test_inputTest(self):
             
                 #Change name to correct .json, access rawData for values i.e. rawData["InputType"]["Value1"]
                 rawData = ""
     
-                server =  ${asTypeName(pythonElements.server.id)}()
+                server =  ${asTypeName(pythonServer.id)}()
 
                 server.setState(ServiceState.STARTING)                
                 server.setState(ServiceState.RUNNING)
 
-                time.sleep(10)
-
-                service = ${asTypeName(pythonElements.name)}()
-
-                service.setState(ServiceState.STARTING)
-                service.setState(ServiceState.RUNNING)
-
-                ${genSerializerInitialization(pythonElements.input)}
-
-                service.attachIngestor(assertionIngestor) 
-
-                runAllTestsFromFile(service.getId(), "../../test/resources/testData-${asTypeName(pythonElements.name)}.json")
-                
-                # prepare your data, e.g., loading from json
-                """Needed to enable the loading of resources like the finished service would"""
-
-                # instantiate your service here, e.g., service = PyService()
-                # call your service here, e.g., service.processNewInput(impl)
-
-                service.setState(ServiceState.STOPPING)
-                service. setState(ServiceState.STOPPED)	            
+	            ${genService(pythonElements)|e}
                 
                 server.setState(ServiceState.STOPING)  
                 server.setState(ServiceState.STOPPED)  
@@ -123,9 +157,7 @@ template PythonServerTestTemplate(Configuration config, FileArtifact target, Pyt
                 # do your asserts here
                 self.assertTrue(True)
 
-        def assertionIngestor(data):
-            #add your assertions in this block, data will be your returned data
-            print("output", data)
+        ${genServiceIngestor(pythonElements)|e}
 
         if __name__ == "__main__":
             """Makes unittest and argparse work together"""
