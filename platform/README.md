@@ -17,9 +17,12 @@ The following layers and components are available in the oktoflow platform:
          * Transport connector binder for MQTT v3 and v5 based on [Eclipse Paho](https://www.eclipse.org/paho/)
          * Transport connector binder for AMQP based on [RabbitMQ](https://www.rabbitmq.com/)
     * External [connectors component](connectors/README.md) (with links to contained parts)
-       * Platform connector for OPC UA v1 based on [Eclipse Milo](https://projects.eclipse.org/projects/iot.milo)
-       * Platform connector for AAS based on the abstraction in the support layer
-       * Platform connector for MQTT v3 and v5 based on [Eclipse Paho](https://www.eclipse.org/paho/)
+       * OPC UA connector based on [Eclipse Milo](https://projects.eclipse.org/projects/iot.milo)
+       * AAS connector based on the abstraction in the support layer
+       * MQTT v3 and v5 connectors based on [Eclipse Paho](https://www.eclipse.org/paho/), including generic version-selecting MQTT connector
+       * MODUBUS/TCP connector
+       * INFLUX connector
+       * Serial connector
  * [Services](platform/services/README.md) 
     * Basic platform [service management](services/services/README.md) 
     * Default [service management](services/services.spring/README.md) for Spring Cloud Streams
