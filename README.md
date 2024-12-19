@@ -93,6 +93,7 @@ IEEE 28th International Conference on Emerging Technologies and Factory Automati
 * Jan-Hendrik Cepok, Evaluation und Verbesserung der IIP-Ecosphere-Konnektoren für OPC UA und Verwaltungsschalen, BSc thesis, 2024
 * Marcel Nöhre, Swagger im Bereich IIP-Ecosphere für Verwaltungsschalen in der Industrie 4.0, BSc thesis, 2023
 * Luca Schulz, Container-Virtualisierung mit LXC in der IIP-Ecosphere-Plattform, BSc thesis, 2023
+* Marcel Nöhre, REST basierter Service als Anbindung an die Kodex-API im IIP-Ecosphere Projekt, BSc project thesis, 2022
 * Luca Schulz, Analyse alternativer Realisierung des JSON-MQTT Datentransports in einer Industrie 4.0 im Rahmen von IIP-Ecosphere, BSc project thesis, 2022
 * Monika Staciwa, Modell-basierte Erstellung von containervirtualisierter Industrie 4.0 Anwendungen am Beispiel der IIP-Ecosphere-Plattform, BSc thesis, 2022
 * Miguel Gomez Casado, Service and device monitoring on devices in IIP-Ecosphere, BSc project thesis, 2021
