@@ -12,8 +12,7 @@ For installation and first steps, see [install guide](platform/documentation/INS
 
 ## News
 
-* Exiting: oktoflow shall become the technological core of the funded [DATI](https://www.bmbf.de/bmbf/de/forschung/datipilot/datipilot_node.html) Innovation Community ReGaP. Stay tuned!!!
-* 2 papers accepted for the Symposium on Software Performance 2024 in Linz
+* Exiting: oktoflow shall become the technological core of the funded [DATI](https://www.bmbf.de/bmbf/de/forschung/datipilot/datipilot_node.html) Innovation Community ReGaP. ReGaP will start January 2025. Stay tuned!!!
 * INFLUX DB connector for InfluxDb2
 * Platform core migrated to **JDK 21** (see our [migration story](platform/documentation/MigrationStory.md)). Container creation still needs upgrade [#165](https://github.com/iip-ecosphere/platform/issues/165).
 * BaSyX 1.5.1 support (currently as alternative retro-fit for BaSyx 1.3.1 used as platform AAS version)
@@ -53,9 +52,10 @@ Platform installation, use and concepts are documented in several documents:
   * For more information, see the [documentation overview](platform/documentation/README.md)
 
 ## Publications
+* Holger Eichelberger, Christian Sauer, Amir Shayan Ahmadian, Christian Kröher, Industry 4.0/IIoT Platforms for manufacturing systems - A systematic review contrasting the scientific and the industrial side, Journal of Information and Software Technology, 107650, 2024, [DOI](https://doi.org/10.1016/j.infsof.2024.107650)
 * Christian Nikolajew, Holger Eichelberger, Industry 4.0 Connectors - A Performance Experiment with Modbus/TCP, Symposium on Software Performance (SSP'24), to appear, [arxiv](http://arxiv.org/abs/2410.15813)
 * Alexander Weber, Jobst Hildebrand, Holger Eichelberger, ADS Performance Revisited, Symposium on Software Performance (SSP'24), to appear, [arxiv](http://arxiv.org/abs/2410.15853)
-* Ahmad Alamoush, Holger Eichelberger, Open source container orchestration for Industry 4.0 â€“ requirements and systematic feature analysis, International Journal on Software Tools for Technology Transfer, 26 (4) [DOI](https://doi.org/10.1007/s10009-024-00767-w)
+* Ahmad Alamoush, Holger Eichelberger, Open source container orchestration for Industry 4.0 - requirements and systematic feature analysis, International Journal on Software Tools for Technology Transfer, 26 (4) [DOI](https://doi.org/10.1007/s10009-024-00767-w)
 * Holger Eichelberger, Alexander Weber, Model-Driven Realization of IDTA Submodel Specifications: The Good, the Bad, the Incompatible?, IEEE 28th International Conference on Emerging Technologies and Factory Automation (ETFA'24), pp. 1-8, [DOI](10.1109/ETFA61755.2024.10710924)
 * Leonhard Faubel, Thomas Woudsma, Benjamin Kloepper, Holger Eichelberger, Fabian Buelow, Klaus Schmid, MLOps for Cyber-Physical Production Systems: Challenges and Solutions, IEEE Software, [DOI](https://doi.org/10.1109/MS.2024.3441101), [arxiv](https://arxiv.org/abs/2406.14470)
 * Alexander Weber, Holger Eichelberger, Per Schreiber and Svenja Wienrich, Performance comparison of TwinCat ADS for Python and Java, [Symposium on Software Performance (SSP'23)](https://www.performance-symposium.org/2023/program/), 2023
