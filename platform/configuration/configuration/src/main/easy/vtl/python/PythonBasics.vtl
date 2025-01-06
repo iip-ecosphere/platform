@@ -192,20 +192,35 @@ template PythonBasics(Configuration config, FileArtifact target) {
     
     // --------------------- parameter ------------------------
     
-    def produceParameterFields(Parameters params) {
-        for (Parameter p: params) {
-            'param_${p.name} = ${produceParameterDefault(p)}'
-        }
+def produceParameterFields(Parameters params) {
+    for (Parameter p: params) {
+        'param_${p.name} = ${produceParameterDefault(p)}'
+    }
+}
+
+    def produceParameterFields(Parameters params, PythonCodeClass c) {
+        params->forEach(Parameter p|c.addAttribute('param_' + p.name, produceParameterDefault(p)));
     }
 
-    def produceSetStateStarting(PythonService service) {
-        '#code for set state to STARTING
-        pass'
+def produceSetStateStarting(PythonService service) {
+    '#code for set state to STARTING
+    pass'
+}
+
+    def produceSetStateStarting(PythonService service, PythonCodeFunction f) {
+        f.addSLComment("code for set state to STARTING");
+        f.addPass();
     }
 
-    def produceSetStateStopping(PythonService service) {
-        '#code for set state to STOPPING
-        pass'
+
+def produceSetStateStopping(PythonService service) {
+    '#code for set state to STOPPING
+    pass'
+}
+
+    def produceSetStateStopping(PythonService service, PythonCodeFunction f) {
+        f.addSLComment("code for set state to STOPPING");
+        f.addPass();
     }
 
     def produceParameterDefault(Parameter p) {
@@ -232,51 +247,71 @@ template PythonBasics(Configuration config, FileArtifact target) {
         '${toBoolean(p.defaultValue)}'
     }
     
-    def produceReconfigure(Parameters params) {
+def produceReconfigure(Parameters params) {
+    if (params.size() > 0) {
+        'def notifyReconfigured(self, values: dict):
+            """Called to inform the implementing class that a parameter reconfiguration happened.
+               
+               Parameters:
+                 - values -- the new param names/values
+               """ 
+            pass
+        
+        def reconfigure(self, values:dict):
+            """Called by ServiceEnvironment to initialize service parameters or to reconfigure them at runtime.
+               
+               Parameters:
+                 - values -- the new param names/values
+               """ 
+            ${produceReconfigureCode(params)}
+            self.notifyReconfigured(values)
+            
+        ${produceParameterGetter(params)}
+        
+        '
+    } else {
+        ''
+    }
+}
+
+def produceParameterGetter(Parameters params) {
+    for (Parameter p: params) {
+        'def get${asMethodNameSuffix(p.name)}(self):
+            """Returns the value of parameter ${p.name}. May change at runtime upon reconfiguration.
+               
+               Result:
+                 - the value of the parameter
+               """ 
+
+            return self.param_${p.name}'
+    }
+}
+
+def produceReconfigureCode(Parameters params) {
+    for (Parameter p: params) {
+        String expr = 'values["${p.name}"]';
+        'if "${p.name}" in values:
+            self.param_${p.name} = ${convertValue(p, expr)}'
+    }
+}
+
+    def produceReconfigure(Parameters params, PythonCodeClass c) {
         if (params.size() > 0) {
-            'def notifyReconfigured(self, values: dict):
-                """Called to inform the implementing class that a parameter reconfiguration happened.
-                   
-                   Parameters:
-                     - values -- the new param names/values
-                   """ 
-                pass
+            c.addFunc("notifyReconfigured", "Called to inform the implementing class that a parameter reconfiguration happened.")
+                .addParameter("values", "dict", "the new param names/values");
             
-            def reconfigure(self, values:dict):
-                """Called by ServiceEnvironment to initialize service parameters or to reconfigure them at runtime.
-                   
-                   Parameters:
-                     - values -- the new param names/values
-                   """ 
-                ${produceReconfigureCode(params)}
-                self.notifyReconfigured(values)
+            PythonCodeFunction f = c.addFunc("reconfigure", "Called by ServiceEnvironment to initialize service parameters or to reconfigure them at runtime.");
+            f.addParameter("values", "dict", "the new param names/values");
+            for (Parameter p: params) {
+                String expr = 'values["${p.name}"]';
+                f.addIf('"${p.name}" in values').add('self.param_${p.name} = ${convertValue(p, expr)}');
+            }
+            f.addSelfCall("notifyReconfigured").addArgument("values");
                 
-            ${produceParameterGetter(params)}
-            
-            '
-        } else {
-            ''
-        }
-    }
-
-    def produceParameterGetter(Parameters params) {
-        for (Parameter p: params) {
-            'def get${asMethodNameSuffix(p.name)}(self):
-                """Returns the value of parameter ${p.name}. May change at runtime upon reconfiguration.
-                   
-                   Result:
-                     - the value of the parameter
-                   """ 
-
-                return self.param_${p.name}'
-        }
-    }
-
-    def produceReconfigureCode(Parameters params) {
-        for (Parameter p: params) {
-            String expr = 'values["${p.name}"]';
-            'if "${p.name}" in values:
-                self.param_${p.name} = ${convertValue(p, expr)}'
+            for (Parameter p: params) {
+                c.addFunc('get${asMethodNameSuffix(p.name)}', "Returns the value of parameter ${p.name}. May change at runtime upon reconfiguration.")
+                    .addReturn("self.param_${p.name}", "the value of the parameter");
+            }
         }
     }
     
@@ -300,18 +335,25 @@ template PythonBasics(Configuration config, FileArtifact target) {
         'str(${expr}).lower() == "true"'
     }
 
-    def generateReceiveClientServer(PythonServer server) {
+def generateReceiveClientServer(PythonServer server) {
+    if (isDefined(server.transportChannel) and server.transportChannel.length() > 0) {
+        'def receivedClientServer(self, data):
+            """Called when data on client-server connection arrives.
+            
+            Parameters:
+              - data -- the data (type depends on client-server implementation)
+            """
+            
+            pass'
+    } else {
+        ''
+    }
+}
+
+    def generateReceiveClientServer(PythonServer server, PythonCodeClass cls) {
         if (isDefined(server.transportChannel) and server.transportChannel.length() > 0) {
-            'def receivedClientServer(self, data):
-                """Called when data on client-server connection arrives.
-                
-                Parameters:
-                  - data -- the data (type depends on client-server implementation)
-                """
-                
-                pass'
-        } else {
-            ''
+            cls.addMethod("receivedClientServer", "Called when data on client-server connection arrives.")
+                .addParameter("data", "", "the data (type depends on client-server implementation)");
         }
     }
     
@@ -328,6 +370,101 @@ template PythonBasics(Configuration config, FileArtifact target) {
             res = "Possible output types: " + res;
         }
         res;
+    }
+    
+    def PythonCodeClass addPythonClass(PythonCodeArtifact a, String className, String comment) {
+       a.addClass(className, '${comment}
+       Generated by: EASy-Producer.');
+    }
+    
+    def addAttachIngestor(PythonCodeClass cls) {
+        PythonCodeFunction f = cls.addFunc("attachIngestor", "Called by ServiceEnvironment to attach an individual type-generic ingestor, i.e., a function 
+           that allows to asynchronously ingest result data back into stream processing. The ingestor
+           cares for the type and the target stream.");
+        f.addParameter("ingestor", "", "the ingestor function");
+        f.addAssign("self.ingestor", "ingestor");
+    }
+    
+    def addAttachIngest(PythonCodeClass cls) {
+        PythonCodeFunction f = cls.addFunc("ingest", "Ingests result data asynchronously into stream processing. Target stream and data type are 
+           handled by the ingestor.");
+        f.addParameter("data", "", "the data to ingest; if the type is unknown/no type translator registered, nothing will happen");
+        f.addIf("self.ingestor is not None").addCall("self.ingestor").addArgument("data");
+    }
+    
+    def addSetStateStartStop(PythonCodeClass cls, String kind) {
+        PythonCodeFunction f = cls.addFunc("setState", "Changes the state. [R133c]");
+        f.addParameter("state", "ServiceState", "the new state");
+        f.addSuperCall("setState").addArgument("state");
+        f.addIf("state==ServiceState.STARTING").addSelfCall("start");
+        f.addIf("state==ServiceState.STOPPING").addSelfCall("stop");
+
+        cls.addFunc("start", "Called when the ${kind} shall start.");
+        cls.addFunc("stop", "Called when the ${kind} shall stop.");
+    }
+    
+    def genSerializerImports(sequenceOf(IOType) types, PythonCodeArtifact target) {
+        for (IOType type : types) {
+            String typeName = toTypeName(type);
+            target.addImport('serializers.${typeName}Serializer', '${typeName}Serializer');
+        }
+    }
+    
+    def genSerializerInitialization(sequenceOf(IOType) types, PythonCodeFunction f) {
+        for (IOType type : types) {
+            String typeName = toTypeName(type);
+            f.addAssign("serializer" + typeName, typeName + "Serializer()");
+        }       
+    }
+    
+    def genTypeImports(sequenceOf(IOType) types, setOf(String) done, PythonCodeArtifact target) {
+        for (IOType type : types) {
+            String clsName = toTypeName(type);
+            if (not(done.includes(clsName))) {
+                done.add(clsName); 
+                addDatatypeImport(clsName, true, target);
+            }
+        }
+    }
+    
+    def addDatatypeImport(String clsName, boolean addImpl, PythonCodeArtifact target) {
+        target.addImport("datatypes." + clsName, clsName);
+        if (addImpl) {
+            target.addImport("datatypes." + clsName + "Impl", clsName + "Impl");
+        }
+    }
+    
+    def genTestAssertionIngestor(PythonCodeArtifact target) {
+        PythonCodeFunction f = target.addFunc("assertionIngestor").addParameter("data");
+        f.addSLComment("add your assertions in this block, data will be your returned data");
+        f.addCall("print").addStringArgument("output").addArgument("data");
+    }
+    
+    def genTestMainUnittestArgparse(PythonCodeArtifact target) {
+        PythonCodeAlternative i = target.addIf('__name__ == "__main__"');
+        i.addSLComment("Makes unittest and argparse work together", true);
+        i.addCall("unittest.main").addArgument("argv", '["first-arg-is-ignored"]').addArgument('exit', false);
+    }
+    
+    def PythonCodeFunction addSourceMethod(MeshSource src, String type, String methodSuffix, String methodSuffixWithServiceId, PythonCodeClass cls) {
+        cls.addMethod(methodSuffix, "Data generator for source classes.")
+            .addReturnType(type, "the created data");
+    } 
+
+    def PythonCodeFunction addAsyncProcessorInMethod(MeshProcessor proc, String type, String methodSuffix, String methodSuffixWithServiceId, PythonCodeClass cls) {
+        cls.addMethod(methodSuffix, "Asynchronous data processing method. Use self.ingest(data) to pass the result back to the data stream.")
+            .addParameter("data", type, "the data to process");
+    } 
+
+    def PythonCodeFunction addSyncProcessorMethod(MeshProcessor proc, String inType, String outType, String methodSuffix, String methodSuffixWithServiceId, PythonCodeClass cls) {
+        cls.addMethod(methodSuffix, "Synchronous data processing method.")
+            .addParameter("data", inType, "the data to process")
+            .addReturnType(outType, "the processed data");
+    } 
+    
+    def PythonCodeFunction addSinkMethod(MeshSink snk, String type, String methodSuffix, String methodSuffixWithServiceId, PythonCodeClass cls) {
+        cls.addMethod(methodSuffix, "Sink method, receives data.")
+            .addParameter("data", type, "the received data");
     }
     
 }

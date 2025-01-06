@@ -6,25 +6,21 @@ import MeshBasics;
 template PythonMeshElementTemplateBase(Configuration config, FileArtifact target, MeshElement elt, String pkg, PythonService service) extends MeshBasics {
 
     String typeAdd = "";
+    PythonCodeClass cls;
 
     // called via MeshBasics.generateDataMethods for MeshSource
     def generateSourceMethod(MeshSource src, String type, String methodSuffix, String methodSuffixWithServiceId) {
         if (!src.impl.asynchronous) {
-        'def ${methodSuffix}(self) -> ${type}:
-            """Data generator for source classes.
-        
-            Return:
-              - the created data
-            """
-            result = ${type}${typeAdd}()
-            ${generateSourceMethodImpl(src.impl)}
-            return result\n'
+            PythonCodeFunction f = addSourceMethod(src, type, methodSuffix, methodSuffixWithServiceId, cls);
+            f.addAssign('result', '${type}${typeAdd}()');
+            generateSourceMethodImpl(src.impl, f);
+            f.addReturn("result");
         }
     } 
     
-    // dispatch basis
-    def generateSourceMethodImpl(ServiceBase service) {
-        '#TODO add your code here'
+    @DispatchBasis
+    def generateSourceMethodImpl(ServiceBase service, PythonCodeFunction f) {
+        f.addSLComment("TODO add your code here");
     }
 
     // called via MeshBasics.generateDataMethods for asynch MeshProcessor
@@ -35,74 +31,54 @@ template PythonMeshElementTemplateBase(Configuration config, FileArtifact target
                 forward = t.forward;
             }
         }
-        'def ${methodSuffix}(self, data: ${type}):
-            """Asynchronous data processing method. Use self.ingest(data) to pass the result back to the data stream
-               ${generatePossibleOutputTypes(service, config)|e}
-        
-            Parameters:
-              - data -- the data to process
-            """
-            ${generateAsyncProcessorInMethodImpl(proc.impl, forward)}\n\n'
+        PythonCodeFunction f = addAsyncProcessorInMethod(proc, type, methodSuffix, methodSuffixWithServiceId, cls);
+        PythonCodeDocComment c = f.getComment();
+        c.setComment("${c.getComment()}
+            ${generatePossibleOutputTypes(service, config)|e}");
+        generateAsyncProcessorInMethodImpl(proc.impl, forward, f);
     }
     
-    // dispatch basis
-    def generateAsyncProcessorInMethodImpl(ServiceBase service, Boolean forward) {
-        '#create result instance and call self.ingest(data)
-        raise NotImplementedError'
+    @DispatchBasis
+    def generateAsyncProcessorInMethodImpl(ServiceBase service, Boolean forward, PythonCodeFunction f) {
+        f.addSLComment("create result instance and call self.ingest(data)");
+        f.addRaiseNotImplementedError();
     } 
 
     // called via MeshBasics.generateDataMethods for synch MeshProcessor
     def generateSyncProcessorMethod(MeshProcessor proc, String inType, String outType, String methodSuffix, String methodSuffixWithServiceId) {
-        'def ${methodSuffix}(self, data: ${inType}) -> ${outType}:
-            """Synchronous data processing method.
-        
-            Parameters:
-              - data -- the data to process
-            Returns:
-              the processed data              
-            """
-            result = ${outType}${typeAdd}()
-            ${generateSyncProcessorMethodImpl(proc.impl)}
-            return result\n'
+        PythonCodeFunction f = addSyncProcessorMethod(proc, inType, outType, methodSuffix, methodSuffixWithServiceId, cls);
+        f.addAssign('result', '${outType}${typeAdd}()');
+        generateSyncProcessorMethodImpl(proc.impl, f);
+        f.addReturn('result');
     }
     
-    // dispatch basis
-    def generateSyncProcessorMethodImpl(ServiceBase service) {
-        '#TODO add your code here'
+    @DispatchBasis
+    def generateSyncProcessorMethodImpl(ServiceBase service, PythonCodeFunction f) {
+        f.addSLComment('TODO add your code here');
     } 
     
     // called via MeshBasics.generateDataMethods for MeshSink
     def generateSinkMethod(MeshSink snk, String type, String methodSuffix, String methodSuffixWithServiceId) {
-        'def ${methodSuffix}(self, data: ${type}):
-            """Sink method, receives data.
-        
-            Parameters:
-              - data -- the received data
-            """
-            ${generateSinkMethodImpl(snk.impl)}\n'
+        PythonCodeFunction f = addSinkMethod(snk, type, methodSuffix, methodSuffixWithServiceId, cls);
+        generateSinkMethodImpl(snk.impl, f);
     }
     
-    // dispatch basis
-    def generateSinkMethodImpl(ServiceBase service) {
+    @DispatchBasis
+    def generateSinkMethodImpl(ServiceBase service, PythonCodeFunction f) {
         'raise NotImplementedError'
     }
     
-    def produceDatatypeImports(MeshElement elt, ServiceBase service) {
-        '${generateImports(service)}'
+    def produceDatatypeImports(MeshElement elt, ServiceBase service, PythonCodeArtifact target) {
+        generateImports(service, target);
         setOf(RecordType) types = collectRecordTypes(elt);
-        for (RecordType t: types) {
-            String name = t.name;
-            'from datatypes.${name} import ${name}'
-            'from datatypes.${name}Impl import ${name}Impl'
-        }
+        types->forEach(RecordType t| addDatatypeImport(t.name, true, target));
     } 
 
-    // dispatch basis
-    def generateImports(ServiceBase service) {
-        ''
+    @DispatchBasis
+    def generateImports(ServiceBase service, PythonCodeArtifact target) {
     }
     
-    // dispatch basis
+    @DispatchBasis
     def inheritsFrom(String cls) {
         cls;
     }
@@ -115,31 +91,22 @@ template PythonMeshElementTemplateBase(Configuration config, FileArtifact target
         }    
     }
     
-    def produceReconfigure(ServiceBase service) {
+    def produceReconfigure(ServiceBase service, PythonCodeClass c) {
         if (service.parameter.size() > 0) {
-            'def notifyReconfigured(self, values: dict):
-                """Called to inform the implementing class that a parameter reconfiguration happened.
-                   
-                   Parameters:
-                     - values -- the new param names/values
-                   """ 
-                # if you want to react on parameter changes, you may add code here
-                # if you are not interested in parameter changes, feel free to delete this method
-                pass
-            '
-        } else {
-            ''
+            c.addFunc("notifyReconfigured", "Called to inform the implementing class that a parameter reconfiguration happened.")
+                .addParameter("values", "dict", "the new param names/values")
+                .addSLComment("if you want to react on parameter changes, you may add code here")
+                .addSLComment("if you are not interested in parameter changes, feel free to delete this method")
+                .addPass();
         }
     }
     
-    // dispatch basis
-    def generateFurtherMethods(ServiceBase service) {
-        ''
+    @DispatchBasis
+    def generateFurtherMethods(ServiceBase service, PythonCodeClass c) {
     } 
     
-    // dispatch basis
-    def produceConstructorRest(ServiceBase service) {
-        ''
+    @DispatchBasis
+    def produceConstructorRest(ServiceBase service, PythonCodeFunction f) {
     }    
     
 }

@@ -4,154 +4,87 @@ import ServiceBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template PythonServiceInterface(Configuration config, FileArtifact target, ServiceBase service, String pkg) extends ServiceBasics {
+@format(profile="python")
+template PythonServiceInterface(Configuration config, PythonCodeArtifact target, ServiceBase service, String pkg) extends ServiceBasics {
 
     setOf(String) reg = {};
+    PythonCodeClass cls;
     
     def registerMethod(String kind, String type, String funcName) {
         reg.add("Registry.${kind}['${service.id}_${type}'] = self.${funcName}");
     }
     
-    def generateRegisterMethodBody() {
-        for (String s: reg) {
-            '${s}'
-        }
-    }
-    
-        // called via produceForInputTypes/produceForOutputTypes
+    @Override
     def produceAsyncProcessorBody(IOType type) {
         String t = toTypeName(type);
         String funcName = "process${t.firstToUpperCase()}";
         registerMethod("asyncTransformers", t, funcName);
-        'def ${funcName}(self, data: ${t}):
-            """Asynchronous data processing method. Use self.ingest(data) to pass the result back to the data stream.
-               ${generatePossibleOutputTypes(service, config)|e}
-        
-            Parameters:
-              - data -- the data to process
-            """
-            raise NotImplementedError'
+        cls.addFunc(funcName, "Asynchronous data processing method. Use self.ingest(data) to pass the result back to the data stream. ${generatePossibleOutputTypes(service, config)}")
+            .addParameter("data", t, "the data to process")
+            .addRaiseNotImplementedError();
     }
     
-    // called via produceForInputTypes/produceForOutputTypes
+    @Override
     def produceSyncProcessorBody(IOType returnType, IOType dataType) {
         String r = toTypeName(returnType);
         String t = toTypeName(dataType);
         String funcName = "transform${t.firstToUpperCase()}";
         registerMethod("syncTransformers", t, funcName);
-        'def ${funcName}(self, data: ${t}) -> ${r}:
-            """Synchronous data processing/transformation method.
-        
-            Parameters:
-              - data -- the data to process
-            Returns:
-              the processed data (not None)
-            """
-            raise NotImplementedError'
+        cls.addFunc(funcName, "Synchronous data processing/transformation method.")
+            .addParameter("data", t, "the data to process").addReturnType(t, "the processed data (not None)")
+            .addRaiseNotImplementedError();
     }
     
-    // called via produceForInputTypes/produceForOutputTypes
+    @Override
     def produceProducerBody(IOType type) {
         String t = toTypeName(type);
         String funcName = "produce${t.firstToUpperCase()}";
         registerMethod("senders", t, funcName);
-        'def ${funcName}(self) -> ${t}:
-            """Synchronous data generator for source classes.
-        
-            Return:
-              - the created data
-            """
-            raise NotImplementedError'
+        cls.addFunc(funcName, "Synchronous data generator for source classes.")
+            .addReturnType(t, "the created data").addRaiseNotImplementedError();
     }
     
-    def produceSuper(ServiceBase base) {
-        ''
+    @DispatchBasis
+    def produceSuper(ServiceBase base, PythonCodeFunction f) {
     } 
     
-    def produceSuper(PythonService service) {
+    @DispatchCase
+    def produceSuper(PythonService service, PythonCodeFunction f) {
         String sId = "'${service.id}'";
-        'super().__init__("${service.id}", "${service.name}", Version("${service.ver}"), "${service.description}", ${toBoolean(service.deployable)}, ServiceKind.${service.kind})
-        Registry.services[${sId}] = self'
+        f.add('super().__init__("${service.id}", "${service.name}", Version("${service.ver}"), "${service.description}", ${toBoolean(service.deployable)}, ServiceKind.${service.kind})');
+        f.addAssign('Registry.services[${sId}]', 'self');
     }
     
-    def produceDatatypeImports(ServiceBase service) {
-        setOf(RecordType) types = collectRecordTypes(service);
-        for (RecordType t: types) {
-            String name = t.name;
-            'from datatypes.${name} import ${name}'
-        }
-    }
-
-    def main(Configuration config, FileArtifact target, ServiceBase service, String pkg) {
+    def main(Configuration config, PythonCodeArtifact target, ServiceBase service, String pkg) {
         String clsName = asTypeName(service.name);
-        'from AbstractService import AbstractService
-        import Registry
-        from Version import Version
-        from Service import ServiceState
-        from Service import ServiceKind
-        ${produceDatatypeImports(service)}
-        from decimal import Decimal
+        target.addImport("AbstractService", "AbstractService");
+        target.addImport("Registry");
+        target.addImport("Version", "Version");
+        target.addImport("Service", "ServiceState");
+        target.addImport("Service", "ServiceKind");
+        setOf(RecordType) types = collectRecordTypes(service);
+        types->forEach(RecordType t|addDatatypeImport(t.name, false, target));
+        target.addImport("decimal", "Decimal");
+        target.addEmptyLine();
 
-        class ${clsName}Interface(AbstractService):
-            """Partially implemented service interface for "${service.name}"
-               Generated by: EASy-Producer."""
+        cls = addPythonClass(target, clsName + "Interface", 'Partially implemented service interface for "${service.name}"')
+            .addBase("AbstractService");
+        cls.addAttribute("ingestor", "None");
+        produceParameterFields(service.parameter, cls);
             
-            ingestor = None
-            ${produceParameterFields(service.parameter)}
-            
-            def __init__(self):
-                """Initializes the service.""" 
-                ${produceSuper(service)}
-                self.registerMethods()
-                
-            def attachIngestor(self, ingestor):
-                """Called by ServiceEnvironment to attach an individual type-generic ingestor, i.e., a function 
-                   that allows to asynchronously ingest result data back into stream processing. The ingestor
-                   cares for the type and the target stream.
-                   
-                   Parameters:
-                     - ingestor -- the ingestor function
-                   """ 
-                self.ingestor = ingestor
+        PythonCodeFunction f = cls.addConstructor("Initializes the service.");
+        produceSuper(service, f);
+        f.addCall("self.registerMethods");
 
-            def ingest(self, data):
-                """Ingests result data asynchronously into stream processing. Target stream and data type are 
-                   handled by the ingestor.
-                   
-                   Parameters:
-                     - data -- the data to ingest; if the type is unknown/no type translator registered, nothing will happen
-                   """ 
-                if self.ingestor is not None:
-                    self.ingestor(data)
-
-            def setState(self, state:ServiceState):
-                """Changes the state. [R133c]
-                
-                Parameters:
-                  - newState -- the new state (ServiceState)
-                """
-                super().setState(state)
-                if (state==ServiceState.STARTING):
-                    self.start()
-                if (state==ServiceState.STOPPING):
-                    self.stop()
-
-            def start(self):
-                """Called when the server shall start.
-                """
-                pass
-
-            def stop(self):
-                """Called when the server shall stop.
-                """
-                pass
-
-            ${produceReconfigure(service.parameter)}
-            ${produceForInputTypes(service)}
-            ${produceForOutputTypes(service)}
-            
-            def registerMethods(self):
-                ${generateRegisterMethodBody()}'
+        addAttachIngestor(cls);
+        addAttachIngest(cls);
+        addSetStateStartStop(cls, "service");
+        produceReconfigure(service.parameter, cls);
+        produceForInputTypes(service);
+        produceForOutputTypes(service);
+  
+        f = cls.addFunc("registerMethods");
+        reg->forEach(s|f.add(s));
     }
     
 }

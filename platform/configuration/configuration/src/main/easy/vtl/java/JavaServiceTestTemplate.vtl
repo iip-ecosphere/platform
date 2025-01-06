@@ -4,149 +4,114 @@ import ServiceBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template JavaServiceTestTemplate(Configuration config, FileArtifact target, JavaService service, String pkg) extends ServiceBasics {
+template JavaServiceTestTemplate(Configuration config, JavaCodeArtifact target, JavaService service, String pkg) extends ServiceBasics {
 
     // something in the auto-formatting goes crazy here. Resorting to individual VIL context expressions :/
     setOf(String) reqIngestors = {};
+    JavaCodeClass mainCls;
     
-    def genAsyncIngestorHint() {
+    @Override
+    def produceAsyncProcessorBody2(IOType type) {
+        String t = toTypeName(type);
+        JavaCodeMethod m = mainCls.addMethod("void", "testProcess${t.firstToUpperCase()}", 'Tests processing a data item of type "${t}" asynchronously.');
+        m.addJunitTestAnnotation();
+        m.addVariable(qualifyIipType(type.type, t), "data", getTestValue(type.type));
+        m.addSLComment("TODO fill data via setters");
+        m.addCall("service.process${t.firstToUpperCase()}").addArgument("data");
         if (service.kind <> ServiceKind::SINK_SERVICE) {
-            "// asynchronous results occur through ingestors, see startup()"
+            m.addSLComment("asynchronous results occur through ingestors, see startup()");
         } else {
-            "// no direct output for a sink. may be it's generating a log, a file, etc. to assert"
+            m.addSLComment("no direct output for a sink. may be it's generating a log, a file, etc. to assert");
         }
     }
     
-    // called via produceForInputTypes/produceForOutputTypes
-    def produceAsyncProcessorBody(IOType type) {
-        String t = toTypeName(type);
-        '/**'
-        ' * Tests processing a data item of type "${t}" asynchronously.'
-        ' */'
-        '@Test'
-        'public void testProcess${t.firstToUpperCase()}() {
-            ${t} data = new ${t}${getTypeAdd()}();
-            // TODO fill data via setters
-            service.process${t.firstToUpperCase()}(data);
-            ${genAsyncIngestorHint()}
-        }'
-    }
-    
-    // called via produceForInputTypes/produceForOutputTypes
-    def produceSyncProcessorBody(IOType returnType, IOType dataType) {
+    @Override
+    def produceSyncProcessorBody2(IOType returnType, IOType dataType) {
         String r = toTypeName(returnType);
         String t = toTypeName(dataType);
-        '/**'
-        ' * Tests processing a data item of type "${t}" synchronously.'
-        ' */'
-        '@Test'
-        'public void testTransform${t.firstToUpperCase()}() {
-            ${t} data = new ${t}${getTypeAdd()}();
-            // TODO fill data via setters
-            ${r} res = service.transform${t.firstToUpperCase()}(data);
-            Assert.assertNotNull(res); // contract, see platform handbook
-            // TODO assert fields of res
-        }'
+        JavaCodeMethod m = mainCls.addMethod("void", "testTransform${t.firstToUpperCase()}", 'Tests processing a data item of type "${t}" synchronously.');
+        m.addJunitTestAnnotation();
+        m.addVariable(qualifyIipType(dataType.type, t), "data", getTestValue(dataType.type));
+        m.addSLComment("TODO fill data via setters");
+        m.addVariable(qualifyIipType(returnType.type, r), "res", "service.transform${t.firstToUpperCase()}(data)");
+        m.addJunitAssertCall("assertNotNull").addArgument("res"); // contract, see platform handbook
+        m.addSLComment("TODO assert fields of res");
     }
     
-    // called via produceForInputTypes/produceForOutputTypes
-    def produceIngestorBody(IOType type) {
+    @Override
+    def produceIngestorBody2(IOType type) {
         reqIngestors.add(toTypeName(type));
-        ""
     }
     
-    // called via produceForInputTypes/produceForOutputTypes
-    def produceProducerBody(IOType type) {
+    @Override
+    def produceProducerBody2(IOType type) {
         String t = toTypeName(type);
-        '/**'
-        ' * Synchronous source method, called to produce data items of type "${t}".'
-        ' *'
-        ' * @return the data value to be ingested'
-        ' */'
-        '@Test'
-        'public void testProduce${t.firstToUpperCase()}() {
-            ${t} res = service.produce${t.firstToUpperCase()}();
-            Assert.assertNotNull(res); // contract, see platform handbook
-            // TODO assert fields of res
-        }'
+        JavaCodeMethod m = mainCls.addMethod("void", "testProduce${t.firstToUpperCase()}", 'Synchronous source method, called to produce data items of type "${t}".');
+        m.addJunitTestAnnotation();
+        m.addVariable(qualifyIipType(type.type, t), "res", "service.produce${t.firstToUpperCase()}()");
+        m.addJunitAssertCall("assertNotNull").addArgument("res"); // contract, see platform handbook
+        m.addSLComment("TODO assert fields of res");
+    }
+
+    @DispatchBasis
+    def String getTestValue(DataType type) {
+        getJavaDefaultValue(toTypeName(type));
     }
     
-    def String getTypeAdd() {
-        String typeAdd;
+    @DispatchCase
+    def String getTestValue(RecordType type) {
+        String result = toTypeName(type);
         IIPEcosphere cfg = config;
         if (cfg.sharedInterfaces) {
-            typeAdd = "Impl";
-        } else {
-            typeAdd = "";
+            result = result + "Impl";
+            mainCls.addImport(qualifyIipType(type, result));
         }
-        typeAdd;
+        "new ${result}()";
     }
     
-    def genIngestorAttachments() {
+    def genIngestorAttachments(JavaCodeMethod m) {
         for (String t: reqIngestors->sortedBy(n|n).toSequence()) {
-            'service.attach${t.firstToUpperCase()}Ingestor(d -> {
-                // called when results from asynchronous service processing occurs 
-                Assert.assertNotNull(d); // contract, see platform handbook            
-                // TODO add assert here or collect results and assert in test
-            });'
+            JavaCodeBlock b = m.addCall('service.attach${t.firstToUpperCase()}Ingestor').addLambdaArgument().addVariable("d").addBlock();
+            b.addSLComment("called when results from asynchronous service processing occurs");
+            b.addJunitAssertCall("assertNotNull").addArgument("d"); // contract, see platform handbook
+            b.addSLComment("TODO add assert here or collect results and assert in test");
         }
     }
+
+    @DispatchBasis
+    def String qualifyIipType(DataType type, String name) {
+        name;
+    }
+
+    @DispatchCase
+    def String qualifyIipType(RecordType type, String name) {
+        "iip.datatypes." + name;
+    }    
     
-    def main(Configuration config, FileArtifact target, JavaService service, String pkg) {
+    def setServiceState(String state, String errorCls, String errorMsg, JavaCodeMethod m) {
+        JavaCodeTryBlock t = m.addTry();
+        t.addCall("service.setState").addVariableArgument("de.iip_ecosphere.platform.services.environment.ServiceState." + state, JavaCodeImportScope.CLASS);
+        t.addCatch("java.util.concurrent.ExecutionException", "e").addCall("org.slf4j.LoggerFactory.getLogger", JavaCodeImportScope.CLASS).addArgument(errorCls)
+            .addCall("error").addStringArgument("${errorMsg}: {}").addArgument("e");
+    }
+    
+    def main(Configuration config, JavaCodeArtifact target, JavaService service, String pkg) {
         JavaPath jp = service.class;
         String clsName = jp.getName();
-        'package ${pkg};
-        
-        import java.util.concurrent.ExecutionException;
-        import de.iip_ecosphere.platform.services.environment.*;
-        import iip.datatypes.*;
-        
-        import org.slf4j.LoggerFactory;
-        
-        import org.junit.After;
-        import org.junit.Assert;
-        import org.junit.Before;
-        import org.junit.Test;
+        mainCls = codeCreateClass(target, pkg, clsName + "Test", 'IIP-Ecosphere service jUnit test for \'${service.name}\'');
+        mainCls.addAttribute(service.class, "service");
+        produceForInputTypes2(service);
+        produceForOutputTypes2(service);
+        JavaCodeMethod m = mainCls.addMethod("void", "startup", "Initializes the test.");
+        m.addJunitBeforeAnnotation();
+        m.addSLComment("constructor for testing, does not set up service management values!");
+        m.addAssignment("service", new JavaCodeConstructorCall(clsName));
+        genIngestorAttachments(m);
+        setServiceState("STARTING", "getClass()", "Cannot start service", m);
 
-        /**
-         * IIP-Ecosphere service jUnit test for \'${service.name}\'.
-         * Generated by: EASy-Producer.
-         */
-        public class ${clsName}Test {
-
-            private ${clsName} service;
-
-            ${produceForInputTypes(service)}
-            ${produceForOutputTypes(service)}
-
-            /**
-             * Initializes the test.
-             */
-            @Before
-            public void startup() {
-                service = new ${clsName}(); // constructor for testing, does not set up service management values!
-                ${genIngestorAttachments()}
-                
-                try {
-                    service.setState(ServiceState.STARTING);
-                } catch (ExecutionException e) {
-                    LoggerFactory.getLogger(getClass()).error("Cannot start service: {}", e);
-                }
-            }
-
-            /**
-             * Shuts down the test.
-             */
-            @After
-            public void shutdown() {
-                try {
-                    service.setState(ServiceState.STOPPING);
-                } catch (ExecutionException e) {
-                    LoggerFactory.getLogger(getClass()).error("Cannot stop service: {}", e);
-                }
-            }
-            
-        }'
+        m = mainCls.addMethod("void", "shutdown", "Shuts down the test.");
+        m.addJunitAfterAnnotation();
+        setServiceState("STOPPING", "getClass()", "Cannot stop service", m);
     }
-    
+        
 }

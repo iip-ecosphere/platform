@@ -94,6 +94,10 @@
     </dependency>
     <dependency>
         <groupId>net.ssehub.easy</groupId>
+        <artifactId>net.ssehub.easy.instantiation.python</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>net.ssehub.easy</groupId>
         <artifactId>net.ssehub.easy.instantiation.ant</artifactId>
     </dependency>
     <dependency>

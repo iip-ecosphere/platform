@@ -3,17 +3,14 @@ import PythonServerBase;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template PythonFlowerServerStrategy(Configuration config, FileArtifact target) {
+template PythonFlowerServerStrategy(Configuration config, PythonCodeArtifact target) {
 
-    def main(Configuration config, FileArtifact target) {
+    def main(Configuration config, PythonCodeArtifact target) {
         IIPEcosphere cfg = config;
-        'import flwr as fl
-        from services.flowers.Client import Client
-
-        class Strategy(fl.server.strategy.FedAvg):
-
-            def __init__(self):
-                self.super()'
+        target.addImport("flwr").setAlias("fl");
+        target.addImport("services.flowers.Client", "Client");
+        PythonCodeClass cls = target.addClass("Strategy").addBase("fl.server.strategy.FedAvg", PythonCodeImportScope.NONE);
+        cls.addConstructor().add("self.super()");
     }
     
 }

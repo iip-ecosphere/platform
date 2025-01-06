@@ -6,30 +6,26 @@ import ServiceBasics;
 @indent(indentation = 4, additional = 0)
 template PythonServerBase(Configuration config, FileArtifact target, PythonServer server, String pkg) {
     
-    def produceSuper(PythonServer server) {
-        ''
+    def produceSuper(PythonServer server, PythonCodeFunction f) {
     } 
 
-    def produceFields(PythonServer server) {
-        ''
+    def produceFields(PythonServer server, PythonCodeClass cls) {
     }
         
-    def produceSetStateStarting(PythonServer server) {
-        '#code for set state to STARTING
-        pass'
+    def produceSetStateStarting(PythonServer server, PythonCodeFunction f) {
+        f.addSLComment("code for set state to STARTING");
+        f.addPass();
     }
 
-    def produceSetStateStopping(PythonServer server) {
-        '#code for set state to STOPPING
-        pass'
+    def produceSetStateStopping(PythonServer server, PythonCodeFunction f) {
+        f.addSLComment("code for set state to STOPPING");
+        f.addPass();
     }
 
-    def produceImports(PythonServer server) {
-        ''
+    def produceImports(PythonServer server, PythonCodeArtifact target) {
     }
 
-    def produceRest(PythonServer server) {
-        ''
+    def produceRest(PythonServer server, PythonCodeClass cls) {
     } 
    
 }

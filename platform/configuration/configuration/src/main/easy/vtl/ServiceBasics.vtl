@@ -80,6 +80,64 @@ template ServiceBasics(Configuration config, FileArtifact target) {
     }
     
     def produceProducerBody(IOType type) {
+}
+
+
+
+    def produceForInputTypes2(ServiceBase service) {
+        if (service.asynchronous or service.kind==ServiceKind::SINK_SERVICE) {
+            for (IOType in : service.input) {
+                produceAsyncProcessorBody2(in);
+            }
+        } else {
+            mapOf(IOType, IOType) pairs = ioPairs(service);
+            for (IOType in : pairs.keys()) {
+                IOType out = pairs.get(in);
+                produceSyncProcessorBody2(out, in);
+            }
+            sequenceOf(IOType) rcv = backward(service.input);
+            if (rcv.size() > 0) { // EASY bug
+                for (IOType in : rcv) {
+                    produceAsyncProcessorBody2(in);
+                }
+            }
+        }
+    }
+    
+    def produceForOutputTypes2(ServiceBase service) {
+        if (service.asynchronous) {
+            for (IOType out : service.output) {
+                produceIngestorBody2(out);
+            }
+        } else {
+            for (IOType out : backward(service.output)) {
+                produceIngestorBody2(out);
+            }
+            
+            mapOf(IOType, IOType) pairs = ioPairs(service);
+            //setOf(IOType) mappedOut = values(pairs); // easy bug
+            setOf(IOType) mappedOut = {};
+            for (IOType in : pairs.keys()) {
+                mappedOut.add(pairs.get(in));
+            }
+            for (IOType out : forward(service.output)) {
+                if (mappedOut.excludes(out)) {
+                    produceProducerBody2(out);
+                }
+            }
+        }
+    }
+    
+    def produceAsyncProcessorBody2(IOType type) {
+    }
+    
+    def produceSyncProcessorBody2(IOType returnType, IOType dataType) {
+    }
+    
+    def produceIngestorBody2(IOType type) {
+    }
+    
+    def produceProducerBody2(IOType type) {
     }
     
     // ----------------------------- parameters -------------------------------

@@ -192,6 +192,21 @@ template JavaBasics(Configuration config, FileArtifact target) {
         }
     }
     
+    def String getJavaDefaultValue(String typeName) {
+        switch (typeName) {
+            "String" : "\"\"",
+            "int" : "0",
+            "long" : "0L",
+            "float" : "0.0",
+            "double" : "0.0d",
+            "byte" : "0",
+            "boolean" : "false",
+            "char" : "0",
+            "short" : "0",
+            default: "null"
+        }        
+    }    
+
     def String toTypeName(ListType type) {
         DataType eltType = type.type;
         String t = considerWrapper(toTypeName(eltType));

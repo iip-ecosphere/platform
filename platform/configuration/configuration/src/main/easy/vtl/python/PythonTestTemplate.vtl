@@ -3,114 +3,66 @@ import PythonBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template PythonTestTemplate(Configuration config, FileArtifact target, PythonService pythonElements) {
+@format(profile="python")
+template PythonTestTemplate(Configuration config, PythonCodeArtifact target, PythonService pythonElements) {
+    
+    def main(Configuration config, PythonCodeArtifact target, PythonService pythonElements) {
+        target.addImport("unittest");
+        target.addImport("sys");
+        target.addImport("os");
+        target.addImport("argparse");
+        
+        target.addSysPathInsert(6, "../../../target/pySrc/iip");
+        target.addSysPathInsert(7, "../../../target/pySrc");
+        target.addImport("TestUtils", "runTestsFromFile").addName("runTestsFromTestFile").addName("readTestDataJson").addName("runAllTestsFromFile").addName("getListOfDeserializedData");
+        target.addSLComment("will be the relative paths from impl.impl to impl.model, given through pom /gen onwards!", true);
+        target.addSysPathInsert(1, "../../../gen/hm23/ApplicationInterfaces/src/main/python");
+        target.addSysPathInsert(2, "../../../gen/hm23/ApplicationInterfaces/src/main/python/iip");
+        target.addSLComment("always fixed value as these directories are generated in the impl.impl", true);
+        target.addSysPathInsert(3, "../../main/python/services");
+        target.addSysPathInsert(5, '../../main/python/${getStringValueSafe(pythonElements.servicesPackageName, "services")}');
+        target.addSysPathInsert(4, "../../main/python");
+        target.addEmptyLine();
+        target.addImport("Service", "ServiceState");
+        target.addImport("json");
 
-    def serviceImports(PythonService pythonElements) {
         String clsName = asTypeName(pythonElements.name);
-        'from ${clsName} import ${clsName}
-        '
-    }
-    
-    def typeImports(PythonService pythonElements) {
+        target.addImport(clsName, clsName);
+
         setOf(String) done = {};
-        '${genTypeImports(pythonElements.input, done)}'
-        '${genTypeImports(pythonElements.output, done)}' 
-    }
-    
-    def genTypeImports(sequenceOf(IOType) types, setOf(String) done) {
-        for (IOType type : types) {
-            String clsName = toTypeName(type);
-            if (not(done.includes(clsName))) {
-                done.add(clsName); 
-                'from datatypes.${clsName} import ${clsName}'
-                'from datatypes.${clsName}Impl import ${clsName}Impl
-                '
-            }
-        }
-    }
-    
-    def genSerializerImports(sequenceOf(IOType) types) {
-        //from serializers.ImageInputSerializer import ImageInputSerializer
-        for (IOType type : types) {
-            String typeName = toTypeName(type);
-            'from serializers.${typeName}Serializer import ${typeName}Serializer
-            '
-        }
-    }
-    
-    def genSerializerInitialization(sequenceOf(IOType) types) {
-            //from serializers.ImageInputSerializer import ImageInputSerializer
-        for (IOType type : types) {
-            String typeName = toTypeName(type);
-            'serializer${typeName} = ${typeName}Serializer()
-            '
-        }       
-    }
+        genTypeImports(pythonElements.input, done, target);
+        genTypeImports(pythonElements.output, done, target);
+        genSerializerImports(pythonElements.input, target);
 
+        target.addEmptyLine();
+        target.addCall("os.chdir").addStringArgument("../../main/python");
+        target.addEmptyLine();
+        PythonCodeClass c = target.addClass(asTypeName(pythonElements.name) + "Test").addBase("unittest.TestCase", PythonCodeImportScope.NONE);
 
-    def main(Configuration config, FileArtifact target, PythonService pythonElements) {
-        'import unittest
-        
-        import sys
-        import os
-        import argparse
+        PythonCodeFunction f = c.addFunc("test_inputTest");
+        f.addSLComment('Change name to correct .json, access rawData for values i.e. rawData["InputType"]["Value1"]');
+        f.addAssign("rawData", '""');
+        f.addAssign("service", '${asTypeName(pythonElements.name)}()');
+        f.addCall("service.setState").addArgument("ServiceState.STARTING");
+        f.addCall("service.setState").addArgument("ServiceState.RUNNING");
+        genSerializerInitialization(pythonElements.input, f);
+        f.addCall("service.attachIngestor").addArgument("assertionIngestor");
+        f.addCall("runAllTestsFromFile").addArgument("service.getId()").addStringArgument("../../test/resources/testData-${asTypeName(pythonElements.name)}.json");
+        f.addEmptyLine();
+        f.addSLComment('prepare your data, e.g., loading from json');
+        f.addSLComment('Needed to enable the loading of resources like the finished service would', true);
+        f.addEmptyLine();
+        f.addSLComment('instantiate your service here, e.g., service = PyService()');
+        f.addSLComment('call your service here, e.g., service.processNewInput(impl)');
+        f.addEmptyLine();
+        f.addCall("service.setState").addArgument("ServiceState.STOPPING");
+        f.addCall("service.setState").addArgument("ServiceState.STOPPED");
+        f.addEmptyLine();
+        f.addSLComment('do your asserts here');
+        f.addCall("self.assertTrue").addArgument(true);
 
-        sys.path.insert(6, "../../../target/pySrc/iip")
-        sys.path.insert(7, "../../../target/pySrc")
-        from TestUtils import runTestsFromFile, runTestsFromTestFile, readTestDataJson, runAllTestsFromFile, getListOfDeserializedData
-        """ will be the relative paths from impl.impl to impl.model, given through pom /gen onwards! """
-        sys.path.insert(1, "../../../gen/hm23/ApplicationInterfaces/src/main/python")
-        sys.path.insert(2, ("../../../gen/hm23/ApplicationInterfaces/src/main/python/iip"))
-        """ always fixed value as these directories are generated in the impl.impl """
-        sys.path.insert(3, "../../main/python/services") 
-        sys.path.insert(5, "../../main/python/${getStringValueSafe(pythonElements.servicesPackageName, "services")}") 
-        sys.path.insert(4, "../../main/python")
-
-        from Service import ServiceState
-        import json
-
-        ${serviceImports(pythonElements)}
-        ${typeImports(pythonElements)}
-        ${genSerializerImports(pythonElements.input)}
-
-        os.chdir("../../main/python") 
-
-        class ${asTypeName(pythonElements.name)}Test(unittest.TestCase):
-        
-            def test_inputTest(self):
-            
-                #Change name to correct .json, access rawData for values i.e. rawData["InputType"]["Value1"]
-                rawData = ""
-                service = ${asTypeName(pythonElements.name)}()
-
-                service.setState(ServiceState.STARTING)
-                service.setState(ServiceState.RUNNING)
-
-                ${genSerializerInitialization(pythonElements.input)}
-
-                service.attachIngestor(assertionIngestor) 
-
-                runAllTestsFromFile(service.getId(), "../../test/resources/testData-${asTypeName(pythonElements.name)}.json")
-                
-                # prepare your data, e.g., loading from json
-                """Needed to enable the loading of resources like the finished service would"""
-
-                # instantiate your service here, e.g., service = PyService()
-                # call your service here, e.g., service.processNewInput(impl)
-
-                service.setState(ServiceState.STOPPING)
-                service. setState(ServiceState.STOPPED)	            
-
-                # do your asserts here
-                self.assertTrue(True)
-
-        def assertionIngestor(data):
-            #add your assertions in this block, data will be your returned data
-            print("output", data)
-
-        if __name__ == "__main__":
-            """Makes unittest and argparse work together"""
-            unittest.main(argv=["first-arg-is-ignored"], exit=False)'
+        genTestAssertionIngestor(target);
+        genTestMainUnittestArgparse(target);
     }
     
 }

@@ -19,6 +19,8 @@ import org.slf4j.Logger;
 
 import de.iip_ecosphere.platform.support.LifecycleDescriptor;
 import de.uni_hildesheim.sse.easy.loader.ManifestLoader;
+import de.uni_hildesheim.sse.easy.loader.framework.Log;
+import de.uni_hildesheim.sse.easy.loader.framework.Log.LoaderLogger;
 import net.ssehub.easy.basics.logger.EASyLoggerFactory;
 import net.ssehub.easy.basics.logger.ILogger;
 import net.ssehub.easy.basics.logger.LoggingLevel;
@@ -58,7 +60,7 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
      * 
      * @author Holger Eichelberger, SSE
      */
-    private class Slf4EasyLogger implements ILogger {
+    private class Slf4EasyLogger implements ILogger, LoaderLogger {
         
         @Override
         public void info(String msg, Class<?> clazz, String bundleName) {
@@ -93,6 +95,31 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
             if (allowLogging(msg, clazz, bundleName, LogLevel.FATAL)) {
                 getLogger().error("[" + clazz.getName() + "] " + msg);
             }
+        }
+
+        @Override
+        public void error(String error) {
+            getLogger().error("[Loader] " + error);
+        }
+
+        @Override
+        public void error(String error, Exception exception) {
+            getLogger().error("[Loader] " + error);
+        }
+
+        @Override
+        public void warn(String warning) {
+            getLogger().warn("[Loader] " + warning);
+        }
+
+        @Override
+        public void warn(String warning, Exception exception) {
+            getLogger().warn("[Loader] " + warning);
+        }
+
+        @Override
+        public void info(String msg) {
+            getLogger().warn("[Loader] " + msg); // warn for now
         }
         
     }
@@ -155,11 +182,13 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
     @Override
     public void startup(String[] args) {
         try {
-            EASyLoggerFactory.INSTANCE.setLogger(new Slf4EasyLogger());
+            Slf4EasyLogger logger = new Slf4EasyLogger();
+            Log.setLogger(logger);
+            EASyLoggerFactory.INSTANCE.setLogger(logger);
             // pass through everything and let platform logger decide
             EASyLoggerFactory.INSTANCE.setLoggingLevel(LoggingLevel.INFO);
             ConfigurationSetup setup = ConfigurationSetup.getSetup();
-            loader = new ManifestLoader(classLoader); // file .easyStartup from classloader
+            loader = new ManifestLoader(false, classLoader); // to debug, replace first parameter by true, mvn install
             EasySetup easySetup = setup.getEasyProducer();
             loader.setVerbose(easySetup.getLogLevel() == EasyLogLevel.EXTRA_VERBOSE);
             getLogger().info("EASy-Producer is starting");

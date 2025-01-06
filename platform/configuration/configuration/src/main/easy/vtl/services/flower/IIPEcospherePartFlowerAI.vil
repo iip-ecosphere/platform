@@ -7,7 +7,8 @@ import IIPEcosphereBase;
 @advice(IIPEcosphere)
 vilScript IIPEcospherePartFlowerAi (Project source, Configuration config, Project target) {
 
-    generateTemplateElements(Path appRoot, Configuration config, FlowerFederatedAiServer server, setOf(AssemblyInfo) assemblies) = {
+    @DispatchCase
+    generateTemplateElements(Path appRoot, Configuration config, FlowerFederatedAiServer server, setOf(AssemblyInfo) assemblies, setOf(ServiceBase) services) = {
         String clsName = asTypeName(server.id);
         vilTemplateProcessor("PythonServer", config, "${appRoot}/src/main/python/services/${clsName}Server.py", server=server, pkg="services");
         vilTemplateProcessor("TemplatesFlowerConfig", config, "${appRoot}/src/main/python/services/flowers/config.ini", server=server);

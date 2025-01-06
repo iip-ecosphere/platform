@@ -265,7 +265,12 @@ public class PlatformInstantiatorExecutor {
      */
     public List<String> createEasyClasspath(ClassLoader loader) {
         List<String> result = null;
-        InputStream cpIn = loader.getResourceAsStream(inTesting ? "config-test.classpath" : "config.classpath");
+        String cpFile = inTesting ? "config-test.classpath" : "config.classpath";
+        System.out.println("Loading classpath from " + cpFile);
+        if (inTesting) {
+            System.out.println("Hint: to update the classpath, see README.MD");
+        }
+        InputStream cpIn = loader.getResourceAsStream(cpFile);
         if (null != cpIn) {
             if (null == localRepo) { // usual fallback
                 String tmp = System.getenv("M2_HOME");

@@ -76,3 +76,5 @@ Some of the test models include the RapidMiner RTSA integration. As RTSA is an I
 ## Tests
 
 Some tests are executed for code generation in this project, the remainder is executed by the `examples` project there. Since version 0.7.1 the generated code is in `target/gen` rather than `gen`.
+
+Some tests are executed in own JVMs to prevent conflicting dependencies with Maven. To update the persisted dependency list, call `mvn prepare-package`. To build this component without tests, run `mvn install -DdisableJavaTests=true`. 

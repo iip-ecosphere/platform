@@ -3,6 +3,7 @@ import SpringBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
+@format(profile="java", profileArg_javadocIndent=" * ", lineLength = 120)
 template JavaSpringCloudStreamStarter(Configuration config, JavaCodeArtifact target, String pkg, setOf(String) serializers) {
 
     def main(Configuration config, JavaCodeArtifact target, String pkg, setOf(String) serializers) {

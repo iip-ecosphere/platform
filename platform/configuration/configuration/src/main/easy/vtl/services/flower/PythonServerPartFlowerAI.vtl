@@ -6,53 +6,48 @@ import PythonServerBase;
 @indent(indentation = 4, additional = 0)
 template PythonServerPartFlowerAI(Configuration config, FileArtifact target, PythonServer server, String pkg) {
 
-    def produceFields(FlowerFederatedAiServer server) {
-        ''
+    def produceFields(FlowerFederatedAiServer server, PythonCodeClass cls) {
     }
 
-    def produceSetStateStarting(FlowerFederatedAiServer server) {
-        '# flower code for set state to STARTING
-        print("Starting flower server: ${server.id}")
-        self.IP = self.getNetMgtKeyAddress()
-        self.thread = Thread(target=self.runServerMethod)
-        self.thread.start()
-        pass'
+    def produceSetStateStarting(FlowerFederatedAiServer server, PythonCodeFunction f) {
+        f.addSLComment("flower code for set state to STARTING");
+        f.addPrint().addStringArgument("Starting flower server: ${server.id}");
+        f.addAssign('self.IP', 'self.getNetMgtKeyAddress()');
+        f.addAssign('self.thread', 'Thread(target=self.runServerMethod)');
+        f.add('self.thread.start()');
+        f.addPass();
     }
 
-    def produceSetStateStopping(FlowerFederatedAiServer server) {
-        '# flower code for set state to STOPPING
-        print("Stopping flower server: ${server.id}")
-        self.thread.stop()
-        pass'
+    def produceSetStateStopping(FlowerFederatedAiServer server, PythonCodeFunction f) {
+        f.addSLComment("flower code for set state to STOPPING");
+        f.addPrint().addStringArgument("Stopping flower server: ${server.id}");
+        f.add('self.thread.stop()');
+        f.addPass();
     }
 
-    def produceImports(FlowerFederatedAiServer server) {
-        'from Service import Service
-        from threading import Thread
-        import flwr as fl
-        import configparser
-        from services.flowers.Strategy import Strategy
-        '
+    def produceImports(FlowerFederatedAiServer server, PythonCodeArtifact target) {
+        target.addImport("Service", "Service");
+        target.addImport("threading", "Thread");
+        target.addImport("flwr").setAlias("fl");
+        target.addImport("configparser");
+        target.addImport("services.flowers.Strategy", "Strategy");
     }
 
-    def produceRest(FlowerFederatedAiServer server) {
-        'def runServerMethod(self):
-            """started via thread runner in python"""
-            if self.IP is None:
-                # localhost fallback is always ok, for external traffic an IP might be needed
-                self.IP = "localhost:${server.port}" 
-            config = configparser.ConfigParser()
-            config.read("config.ini")
-
-            stra = Strategy(   
-                min_evaluate_clients=config["fl"]["clients"],
-                min_available_clients=config["fl"]["clients"],
-                min_fit_clients=config["fl"]["clients"]
-            )
-            
-            print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Prestarted SERVER")
-            fl.server.start_server(server_address=self.IP, config=fl.server.ServerConfig(num_rounds=config["fl"]["rounds"], ), strategy=stra)
-        '
+    def produceRest(FlowerFederatedAiServer server, PythonCodeClass cls) {
+        PythonCodeFunction f = cls.addMethod("runServerMethod", "started via thread runner in python");
+        PythonCodeAlternative a = f.addIf('self.IP is None');
+        a.addSLComment('localhost fallback is always ok, for external traffic an IP might be needed');
+        a.addAssign('self.IP', '"localhost:${server.port}"');
+        f.addAssign('config', 'configparser.ConfigParser()');
+        f.add('config.read("config.ini")');
+        f.addAssign('stra', 'Strategy(   
+            min_evaluate_clients=config["fl"]["clients"],
+            min_available_clients=config["fl"]["clients"],
+            min_fit_clients=config["fl"]["clients"]
+        )');
+        f.addEmptyLine();
+        f.addPrint().addStringArgument(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Prestarted SERVER");
+        f.add('fl.server.start_server(server_address=self.IP, config=fl.server.ServerConfig(num_rounds=config["fl"]["rounds"], ), strategy=stra)');
     }
 
 }

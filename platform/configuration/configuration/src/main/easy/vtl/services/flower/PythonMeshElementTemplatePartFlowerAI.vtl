@@ -6,41 +6,47 @@ import PythonMeshElementTemplateBase;
 @indent(indentation = 4, additional = 0)
 template PythonMeshElementTemplatePartFlowerAI(Configuration config, FileArtifact target, MeshElement elt, String pkg, PythonService service) {
 
-    def generateAsyncProcessorInMethodImpl(FlowerFederatedAiService service, Boolean forward) {
+    @DispatchCase
+    def generateAsyncProcessorInMethodImpl(FlowerFederatedAiService service, Boolean forward, PythonCodeFunction f) {
         if (forward) {
-            'client = Client()
-            fl.client.start_numpy_client(server_address=self.IP, client=client)'
+            f.addAssign('client', 'Client()');
+            f.add('fl.client.start_numpy_client(server_address=self.IP, client=client)');
         } else {
-            'pass'
+            f.addPass();
         }
     } 
         
-    def generateSyncProcessorMethodImpl(FlowerFederatedAiService service) {
-        'client = Client()
-        fl.client.start_numpy_client(server_address=self.IP ,client=client)'
+    @DispatchCase
+    def generateSyncProcessorMethodImpl(FlowerFederatedAiService service, PythonCodeFunction f) {
+        f.addAssign('client', 'Client()');
+        f.add('fl.client.start_numpy_client(server_address=self.IP ,client=client)');
     } 
     
-    def generateImports(FlowerFederatedAiService service) {
-        'from Service import Service
-        from services.flowers.Client import Client
-        import flwr as fl
-        '  
+    @DispatchCase
+    def generateImports(FlowerFederatedAiService service, PythonCodeArtifact target) {
+        target.addImport("Service", "Service");
+        target.addImport("services.flowers.Client", "Client");
+        target.addImport("services.flowers.Client", "Client");
+        target.addImport("flwr").setAlias("fl");
     }
     
+    @DispatchCase
     def inheritsFrom(String cls) {
         cls; // may add flower stuff here
     }
 
-    def generateFurtherMethods(FlowerFederatedAiService service) {
-        '${generateReceiveClientServer(service.server)|e}'
+    @DispatchCase
+    def generateFurtherMethods(FlowerFederatedAiService service, PythonCodeClass c) {
+        generateReceiveClientServer(service.server, c);
     } 
     
-    def produceConstructorRest(FlowerFederatedAiService service) {
+    @DispatchCase
+    def produceConstructorRest(FlowerFederatedAiService service, PythonCodeFunction f) {
         FlowerFederatedAiServer server = service.server;
-        'self.IP = self.getNetMgtKeyAddress()
-        if self.IP is None:
-            # fallback, then server is not relocatable anymore
-            self.IP = "${server.host}:${server.port}"'
+        f.addAssign('self.IP', 'self.getNetMgtKeyAddress()');
+        PythonCodeAlternative a = f.addIf('self.IP is None');
+        a.addSLComment('fallback, then server is not relocatable anymore');
+        a.addAssign('self.IP', '"${server.host}:${server.port}"');
     }
 
 }

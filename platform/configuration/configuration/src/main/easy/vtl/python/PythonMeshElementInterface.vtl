@@ -3,156 +3,76 @@ import MeshBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template PythonMeshElementInterface(Configuration config, FileArtifact target, MeshElement elt, String pkg) extends MeshBasics {
+@format(profile="python")
+template PythonMeshElementInterface(Configuration config, PythonCodeArtifact target, MeshElement elt, String pkg) extends MeshBasics {
 
     setOf(String) reg = {};
+    PythonCodeClass cls;
     
     def registerMethod(String kind, MeshElement elt, String type, String methodSuffix) {
         reg.add("Registry.${kind}['${elt.impl.id}_${type}'] = self.${methodSuffix}");
-    }
-    
-    def generateRegisterMethodBody() {
-        for (String s: reg) {
-            '${s}'
-        }
     }
 
     // called via MeshBasics.generateDataMethods for MeshSource
     def generateSourceMethod(MeshSource src, String type, String methodSuffix, String methodSuffixWithServiceId) {
         if (!src.impl.asynchronous) {
-        registerMethod("senders", src, type, methodSuffix);
-        'def ${methodSuffix}(self) -> ${type}:
-            """Data generator for source classes.
-        
-            Return:
-              - the created data
-            """
-            raise NotImplementedError'
+            registerMethod("senders", src, type, methodSuffix);
+            addSourceMethod(src, type, methodSuffix, methodSuffixWithServiceId, cls).addRaiseNotImplementedError();
         }
     } 
 
     // called via MeshBasics.generateDataMethods for asynch MeshProcessor
     def generateAsyncProcessorInMethod(MeshProcessor proc, String type, String methodSuffix, String methodSuffixWithServiceId) {
         registerMethod("asyncTransformers", proc, type, methodSuffix);
-        'def ${methodSuffix}(self, data: ${type}):
-            """Asynchronous data processing method. Use self.ingest(data) to pass the result back to the data stream.
-        
-            Parameters:
-              - data -- the data to process
-            """
-            raise NotImplementedError'
+        addAsyncProcessorInMethod(proc, type, methodSuffix, methodSuffixWithServiceId, cls).addRaiseNotImplementedError();
     } 
 
     // called via MeshBasics.generateDataMethods for synch MeshProcessor
     def generateSyncProcessorMethod(MeshProcessor proc, String inType, String outType, String methodSuffix, String methodSuffixWithServiceId) {
         registerMethod("syncTransformers", proc, type, methodSuffix);
-        'def ${methodSuffix}(self, data: ${inType}) -> ${outType}:
-            """Synchronous data processing method.
-        
-            Parameters:
-              - data -- the data to process
-            Returns:
-              the processed data              
-            """
-            raise NotImplementedError'
+        addSyncProcessorMethod(proc, inType, outType, methodSuffix, methodSuffixWithServiceId, cls).addRaiseNotImplementedError();
     } 
     
     // called via MeshBasics.generateDataMethods for MeshSink
     def generateSinkMethod(MeshSink snk, String type, String methodSuffix, String methodSuffixWithServiceId) {
-         registerMethod("receivers", snk, type, methodSuffix);
-        'def ${methodSuffix}(self, data: ${type}):
-            """Sink method, receives data.
-        
-            Parameters:
-              - data -- the received data
-            """
-            raise NotImplementedError'
+        registerMethod("receivers", snk, type, methodSuffix);
+        addSinkMethod(snk, type, methodSuffix, methodSuffixWithServiceId, cls).addRaiseNotImplementedError();
     }
     
-    def produceSuper(ServiceBase base) {
-        ''
+    def produceSuper(ServiceBase base, PythonCodeFunction f) {
     } 
     
-    def produceSuper(PythonService service) {
+    def produceSuper(PythonService service, PythonCodeFunction f) {
         String sId = "'${service.id}'";
-        'super().__init__("${service.id}", "${service.name}", Version("${service.ver}"), "${service.description}", ${toBoolean(service.deployable)}, ServiceKind.${service.kind})
-        Registry.services[${sId}] = self'
+        f.add('super().__init__("${service.id}", "${service.name}", Version("${service.ver}"), "${service.description}", ${toBoolean(service.deployable)}, ServiceKind.${service.kind})');
+        f.addAssign('Registry.services[${sId}]', 'self');
     }
     
-    def produceDatatypeImports(MeshElement elt) {
-        setOf(RecordType) types = collectRecordTypes(elt);
-        for (RecordType t: types) {
-            String name = t.name;
-            'from datatypes.${name} import ${name}'
-        }
-    } 
-
-    def main(Configuration config, FileArtifact target, MeshElement elt, String pkg) {
+    def main(Configuration config, PythonCodeArtifact target, MeshElement elt, String pkg) {
         String clsName = asTypeName(elt.name);
-        'from AbstractService import AbstractService
-        import iip.Registry
-        from Version import Version
-        from Service import ServiceState
-        from Service import ServiceKind
-        ${produceDatatypeImports(elt)}
+        target.addImport("AbstractService", "AbstractService");
+        target.addImport("iip.Registry");
+        target.addImport("Version", "Version");
+        target.addImport("Service", "ServiceState");
+        target.addImport("Service", "ServiceKind");
+        setOf(RecordType) types = collectRecordTypes(elt);
+        types->forEach(RecordType t|addDatatypeImport(t.name, false, target));
+        
+        cls = addPythonClass(target, clsName + "Interface", 'Partially implemented service interface for ${clsName}')
+            .addBase("AbstractService");
+        cls.addAttribute("ingestor", "None");
+        PythonCodeFunction f = cls.addConstructor("Initializes the service.");
+        produceSuper(elt.impl, f);
+        f.add("self.registerMethods()");
+        
+        addAttachIngestor(cls);
+        addAttachIngest(cls);
+        addSetStateStartStop(cls, "service");        
+        
+        generateDataMethods(elt, true);
 
-        class ${clsName}Interface(AbstractService):
-            """Partially implemented service interface for ${clsName}
-               Generated by: EASy-Producer."""
-            
-            ingestor = None
-            
-            def __init__(self):
-                """Initializes the service.""" 
-                ${produceSuper(elt.impl)}
-                self.registerMethods()
-                
-            def attachIngestor(self, ingestor):
-                """Called by ServiceEnvironment to attach an individual type-generic ingestor, i.e., a function 
-                   that allows to asynchronously ingest result data back into stream processing. The ingestor
-                   cares for the type and the target stream.
-                   
-                   Parameters:
-                     - ingestor -- the ingestor function
-                   """ 
-                self.ingestor = ingestor
-
-            def ingest(self, data):
-                """Ingests result data asynchronously into stream processing. Target stream and data type are 
-                   handled by the ingestor.
-                   
-                   Parameters:
-                     - data -- the data to ingest; if the type is unknown/no type translator registered, nothing will happen
-                   """ 
-                if self.ingestor is not None:
-                    self.ingestor(data)
-
-            def setState(self, state:ServiceState):
-                """Changes the state. [R133c]
-                
-                Parameters:
-                  - newState -- the new state (ServiceState)
-                """
-                super().setState(state)
-                if (state==ServiceState.STARTING):
-                    self.start()
-                if (state==ServiceState.STOPPING):
-                    self.stop()
-
-            def start(self):
-                """Called when the server shall start.
-                """
-                pass
-
-            def stop(self):
-                """Called when the server shall stop.
-                """
-                pass
-
-            ${generateDataMethods(elt, true)}
-            
-            def registerMethods(self):
-                ${generateRegisterMethodBody()}'
+        f = cls.addMethod("registerMethods");
+        reg->forEach(String s|f.add(s));
     }
     
 }
