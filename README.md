@@ -12,7 +12,8 @@ For installation and first steps, see [install guide](platform/documentation/INS
 
 ## News
 
-* Exiting: oktoflow shall become the technological core of the funded [DATI](https://www.bmbf.de/bmbf/de/forschung/datipilot/datipilot_node.html) Innovation Community ReGaP. ReGaP will start January 2025. Stay tuned!!!
+* oktoflow code generation migrating to VTL artifacts
+* Exiting: oktoflow become thes technological core of the funded [DATI](https://www.bmbf.de/bmbf/de/forschung/datipilot/datipilot_node.html) Innovation Community ReGaP. ReGaP will start January 2025. Stay tuned!!!
 * INFLUX DB connector for InfluxDb2
 * Platform core migrated to **JDK 21** (see our [migration story](platform/documentation/MigrationStory.md)). Container creation still needs upgrade [#165](https://github.com/iip-ecosphere/platform/issues/165).
 * BaSyX 1.5.1 support (currently as alternative retro-fit for BaSyx 1.3.1 used as platform AAS version)
