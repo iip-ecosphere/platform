@@ -109,7 +109,7 @@ public class Docker extends AbstractManagerSetup {
     /**
      * Returns the host/port of the docker registry to use.
      * 
-     * @return the registry, e.g., localhost:5050
+     * @return the registry, e.g., localhost:5050; may be <b>null</b> or empty
      */
     public String getRegistry() {
         return registry;
