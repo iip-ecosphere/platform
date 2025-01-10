@@ -11,13 +11,11 @@ template SpringCloudStreamDeploymentDescriptorBase(Configuration config, FileArt
     Boolean returnType = false;
     Boolean inputType = false;
 
-    def generateServices(sequenceOf(MeshElement) elements) {
-        for (MeshElement elt: elements) {
-            '${generateService(elt, elt.impl, true, "")}'
-        }
+    def generateServices(sequenceOf(MeshElement) elements, YamlList list) {
+        elements->forEach(MeshElement elt|generateService(elt, elt.impl, true, "", list));
     }
     
-    def generateService(MeshElement elt, ServiceBase service, Boolean topLevel, String familyId) {
+    def generateService(MeshElement elt, ServiceBase service, Boolean topLevel, String familyId, YamlList list) {
     }
     
     /*
@@ -37,254 +35,199 @@ template SpringCloudStreamDeploymentDescriptorBase(Configuration config, FileArt
     */
     def getProtocolKey(ServiceProtocol prot) {
     }
-
-    def generateService(MeshElement elt, ServiceFamily family, Boolean topLevel, String familyId) {
-        String famId = family.id;
-        '- id: ${family.id}
-          applicationId: ${app.id}
-          name: ${family.name}
-          description: ${family.description}
-          version: 0.0.1
-          kind: ${family.kind}
-          topLevel: ${topLevel}
-          cmdArg: 
-            - --iip.port=\\${port}
-            - --iip.protocol=\\${protocol}
-            ${generateAppOpt()|e}
-          relations:
-            - endpoint:
-                portArg: --transport.port=\\${port} --binders.properties.external.environment.${getProtocolKey()}.port=\\${port} --spring.cloud.stream.binders.properties.external.environment.${getProtocolKey()}.port=\\${port}
-                hostArg: --transport.host=\\${host} --binders.properties.external.environment.${getProtocolKey()}.host=\\${host} --spring.cloud.stream.binders.properties.external.environment.${getProtocolKey()}.host=\\${host}
-            ${generateRelations(elt)|e}
-          ${generateEnsemble(elt, family, familyId)|e}'
-        for (Service m : family.members) {
-            '${generateService(elt, m, false, famId)}'
-        }
-    }
-
-    def generateService(MeshElement elt, Service service, Boolean topLevel, String familyId) {
-        '- id: ${service.id}
-          applicationId: ${app.id}
-          name: ${service.name}
-          version: ${service.ver}
-          description: ${service.description}
-          deployable: ${service.deployable}
-          ${generateService(service)|e}
-          kind: ${service.kind}
-          topLevel: ${topLevel}
-          cmdArg: 
-            - --iip.port=\\${port}
-            - --iip.protocol=\\${protocol}
-            ${generateAppOpt()|e}
-          relations:
-            - endpoint:
-                portArg: --transport.port=\\${port} --binders.properties.external.environment.${getProtocolKey()}.port=\\${port} --spring.cloud.stream.binders.properties.external.environment.${getProtocolKey()}.port=\\${port}
-                hostArg: --transport.host=\\${host} --binders.properties.external.environment.${getProtocolKey()}.host=\\${host} --spring.cloud.stream.binders.properties.external.environment.${getProtocolKey()}.host=\\${host}
-            ${generateRelations(elt)|e}
-          ${generateMemLimitEntry(service)|e}
-          ${generateProcess(elt, service)|e}
-          ${generateEnsemble(elt, service, familyId)|e}'
+    
+    def getEndpointCmdArgs(String kind, String varName) {
+        String protocolKey = getProtocolKey();
+        "--transport.${kind}=\\${${varName}} --binders.properties.external.environment.${protocolKey}.${kind}=\\${${varName}} --spring.cloud.stream.binders.properties.external.environment.${protocolKey}.${kind}=\\${${varName}}";
     }
     
-    // dispatch basis
-    def generateService(ServiceBase service) {
+    def generateCmdArgsEndpoint(YamlList rels) {
+        YamlNode relsEndpoint = rels.addObject().addObject("endpoint");
+        relsEndpoint.addValue("portArg", getEndpointCmdArgs("port", "port"));
+        relsEndpoint.addValue("hostArg", getEndpointCmdArgs("host", "host"));
+    }
+    
+    def generateService(MeshElement elt, ServiceFamily family, Boolean topLevel, String familyId, YamlList list) {
+        YamlNode n = list.addObject();
+        String famId = family.id;
+        n.addValue("id", famId);
+        n.addValue("applicationId", app.id);
+        n.addValue("name", family.name);
+        n.addValueNotEmpty("description", family.description); // default is ""
+        n.addValue("version", "0.0.1"); // no version available?
+        n.addValue("kind", family.kind);
+        n.addValue("topLevel", topLevel);
+        YamlList cmdArg = n.addList("cmdArg");
+        cmdArg.addValue("--iip.port=\\${port}");
+        cmdArg.addValue("--iip.protocol=\\${protocol}");
+        generateAppOpt(cmdArg);
+        YamlList rels = n.addList("relations");
+        generateCmdArgsEndpoint(rels);
+        generateRelations(elt, rels);
+        generateEnsemble(elt, family, familyId, n);
+        family.members->forEach(Service m|generateService(elt, m, false, famId, list));
+    }
+
+    def generateService(MeshElement elt, Service service, Boolean topLevel, String familyId, YamlList list) {
+        YamlNode n = list.addObject();
+        n.addValue("id", service.id);
+        n.addValue("applicationId", app.id);
+        n.addValue("name", service.name);
+        n.addValue("version", service.ver);
+        n.addValueNotEmpty("description", service.description); // default is ""
+        n.addValue("deployable", service.deployable);
+        generateService(service, n);
+        n.addValue("kind", service.kind);
+        n.addValue("topLevel", topLevel);
+        YamlList cmdArg = n.addList("cmdArg");
+        cmdArg.addValue("--iip.port=\\${port}");
+        cmdArg.addValue("--iip.protocol=\\${protocol}");
+        generateAppOpt(cmdArg);
+        YamlList rels = n.addList("relations");
+        generateCmdArgsEndpoint(rels);
+        generateRelations(elt, rels);
+        if (service.memLimit > 0) {
+            n.addValue("memory", "service.memLimit");
+        }
+        generateProcess(elt, service, n);
+        generateEnsemble(elt, service, familyId, n);
+    }
+    
+    @DispatchBasis
+    def generateService(ServiceBase service, YamlNode node) {
         if (isDefined(service.server)) {
-            'netMgtKey: ${service.server.id}'
-        } else {
-            ''
+            node.addValue("netMgtKey", service.server.id);
         }
     }
         
-    def generateEnsemble(MeshElement elt, ServiceBase service, String familyId) {
+    def generateEnsemble(MeshElement elt, ServiceBase service, String familyId, YamlNode node) {
        if (familyId <> "") {
-           'ensembleWith: ${familyId}'
+           node.addValue("ensembleWith", familyId);
        } else if (elt.ensemble <> null) {
-           'ensembleWith: ${elt.ensemble.impl.id}'
-       } else {
-           ''
+           node.addValue("ensembleWith", elt.ensemble.impl.id);
        }
     }
     
-    def generateProcess(MeshElement elt, Service service) {
-        ''
+    def YamlNode addProcess(YamlNode node, String executablePath, String started, String homePath = "", sequenceOf(String) artifacts = {}, sequenceOf(String) cmdArg = {}, Boolean addTopNode = true) {
+        YamlNode p = node;
+        if (addTopNode) {
+            p = node.addObject("process");
+        }
+        p.addListNotEmpty("artifacts", artifacts);
+        if (homePath.length() == 0) {
+            homePath = executablePath;
+        } 
+        p.addValue("homePath", homePath);        
+        p.addValue("executablePath", executablePath);
+        p.addListNotEmpty("cmdArg", cmdArg);
+        if (started <> "") {
+            p.addValueNotEmpty("started", started == "true");
+        }
+        p;
+    }
+    
+    def generateProcess(MeshElement elt, Service service, YamlNode node) {
     }
 
-    def generateProcess(MeshElement elt, PythonService service) {
+    def generateProcess(MeshElement elt, PythonService service, YamlNode node) {
         String id = toFolderName(service.id);
-        'process: 
-            homePath: \\${tmp}/${id}/python
-            ${pythonExecutable(service)|e}
-            executablePath: \\${tmp}/${id}/python
-            artifacts:
-              - /python_${id}.zip
-              ${genAdditionalArtifacts(service.artifacts)|e}
-            ${locationKey(service)|e}
-            ${pythonExecArgs(service)|e}
-            cmdArg:
-              - --mode
-              - console
-              - --modulesPath
-              - \\${tmp}/${id}/python
-              - --servicesPackage
-              - ${pythonServicesPackageName(service)}
-              - --sid
-              - ${service.id}
-              ${pythonDataArg(service)|e}
-            started: true'
+        sequenceOf(String) artifacts = createArtifacts("/python_${id}.zip");
+        genAdditionalArtifacts(service.artifacts, artifacts);
+        sequenceOf(String) cmdArg = createPythonCmdArg(service.id, pythonServicesPackageName(service), "\\${tmp}/${id}/python");
+        if (service.integrationMode == PythonIntegrationMode::console_oneShot) {
+            cmdArg.add("--data");
+        }
+        YamlNode p = addProcess(node, "\\${tmp}/${id}/python", "true", artifacts=artifacts, cmdArg=cmdArg);
+        if (isDefined(service.entrypointModule) and service.entrypointModule.length() > 0) {
+            p.addValue("executable", service.entrypointModule);
+        }
+        String condaEnv = getStringValueSafe(service.condaEnv, "");
+        if (condaEnv.trim().length() > 0) {
+            p.addValue("locationKey", "CONDA");
+            sequenceOf(String) execArg = {};
+            execArg.add("run");
+            addCmdArg("-n", condaEnv, execArg);
+            p.addList("execArg", execArg);
+        }
     }
     
-    def genAdditionalArtifacts(setOf(String) artifacts) {
-        if (artifacts.size() > 0) {
-            for (String a : artifacts) {
-                if (!a.startsWith("/")) {
-                    a = "/" + a;
-                }
-                '- ${a}'
+    def sequenceOf(String) createArtifacts(String artifact) {
+        sequenceOf(String) artifacts = {};
+        artifacts.add(artifact);
+        artifacts;
+    }
+    
+    def sequenceOf(String) createPythonCmdArg(String sid, String servicesPackage, String modulesPath, String mode="console") {
+        sequenceOf(String) cmdArg = {};
+        addCmdArg("--mode", mode, cmdArg);
+        addCmdArg("--modulesPath", modulesPath, cmdArg);
+        addCmdArg("--servicesPackage", servicesPackage, cmdArg);
+        addCmdArg("--sid", sid, cmdArg);
+        cmdArg;
+    }
+    
+    def addCmdArg(String name, String value, sequenceOf(String) result) {
+        result.add(name);
+        result.add(value);
+    }
+    
+    def genAdditionalArtifacts(setOf(String) artifacts, sequenceOf(String) result) {
+        for (String a : artifacts) {
+            if (!a.startsWith("/")) {
+                a = "/" + a;
             }
-        }
-    }
-
-
-    def locationKey(PythonService service) {
-        String condaEnv = getStringValueSafe(service.condaEnv, "");
-        if (condaEnv.trim().length() > 0) {
-            'locationKey: CONDA'
-        } else {
-            ''
-        }
-    }
-    
-    def pythonExecArgs(PythonService service) {
-        String condaEnv = getStringValueSafe(service.condaEnv, "");
-        if (condaEnv.trim().length() > 0) {
-            'execArg:
-              - run
-              - -n
-              - ${condaEnv}'
-        } else {
-            ''
+            result.add(a);
         }
     }
     
     def pythonServicesPackageName(PythonService service) {
         if (service.servicesPackageName <> null) {
-            '${service.servicesPackageName}'
+            '${service.servicesPackageName}';
         } else {
-            'services'
+            'services';
         }
     }
     
-    def pythonDataArg(PythonService service) {
-        if (service.integrationMode == PythonIntegrationMode::console_oneShot) {
-            "--data"
-        } else {
-            ""
-        }
-    }
-    
-    def pythonExecutable(PythonService service) {
-        if (isDefined(service.entrypointModule) and service.entrypointModule.length() > 0) {
-            "executable: ${service.entrypointModule}"
-        } else {
-            ""
-        }
-    }
-    
-    def generateAppOpt() {
-        '${generateCmdArg(getStringValueSafe(app.cmdArg, ""), "")}'
+    def generateAppOpt(YamlList list) {
+        generateCmdArg(getStringValueSafe(app.cmdArg, ""), list);
     }
 
-    def generateCmdArg(String cmdArg, String key) {
-        if (cmdArg.length() > 0) { // EASY-bug
-            String indent = "";
-            if (key.length() > 0) {
-                indent = "  ";
-                '${key}:'
-            }
-            sequenceOf(String) tmp = cmdArg.split(",");
-            for (String a: tmp) {
-                "${indent}- ${a}"
-            }
+    def generateCmdArg(String cmdArg, YamlList list) {
+        if (cmdArg.length() > 0) {
+            list.addValues(cmdArg.split(","));
         }
     }
     
-    def generateMemLimitEntry(Service service) {
-        if (service.memLimit > 0) {
-            "memory: ${service.memLimit}"
-        } else {
-            "";
-        }
-    }
-    
-    def generateMemLimitOpt(Service service) {
-        String opt = toJvmMemLimitOpt(service.memLimit);
-        if (opt.length() > 0) {
-            "- ${opt}"
-        } else {
-            "";
-        }
-    }
-    
-    def generateRelations(MeshElement elt) {
+    def generateRelations(MeshElement elt, YamlList list) {
     }
 
-    def generateRelations(MeshSource elt) {
-        generateRelations(elt, elt.next);
+    def generateRelations(MeshSource elt, YamlList list) {
+        generateRelations(elt, elt.next, list);
     }
 
-    def generateRelations(MeshInnerElement elt) {
-        generateRelations(elt, elt.next);
-    }
-    
-    def String substNewlines(String str, String subst) {
-        str.replace("\r", "").replace("\n", subst);
-    }
-    
-    def String trimTrailingComma(String str) {
-        if (str.length() > 1 and str.endsWith(",")) {
-            str = str.substring(0, str.length() - 1);
-        } 
-        if (str.length() > 1 and str.startsWith(",")) {
-            str = str.substring(1);
-        } 
-        str;
+    def generateRelations(MeshInnerElement elt, YamlList list) {
+        generateRelations(elt, elt.next, list);
     }
 
-    def generateRelations(MeshElement elt, setOf(MeshConnector) conns) {
-        String res = "";
+    def generateRelations(MeshElement elt, setOf(MeshConnector) conns, YamlList list) {
         for (MeshConnector c: nextConnectors(elt)) {
             MeshElement target = c.next;
-            res = appendNL(res, generateConnections(elt, target, "OUT", "-out-0", target.impl.id));
+            generateConnections(elt, target, "OUT", "-out-0", target.impl.id, list);
         }
         for (MeshElement e: elements) {
             if (e <> elt) {
-                res = appendNL(res, generateConnections(e, elt, "IN", "-in-0", e.impl.id));
+                generateConnections(e, elt, "IN", "-in-0", e.impl.id, list);
             }
-        }
-        '${res}'
-    }
-    
-    // -> basics after impact check
-    def String appendNL(String text1, String text2) {
-        if (text1.length() > 0) {
-            if (text2.length() > 0) {
-                text1 + "\n" + text2;
-            } else {
-                text1;
-            }
-        } else {
-            text2;
         }
     }
     
-    def generateConnections(MeshElement start, MeshElement end, String dir, String connSuffix, String service) {
-        String res = "";
+    def generateConnections(MeshElement start, MeshElement end, String dir, String connSuffix, String service, YamlList list) {
         for (IOType out : start.impl.output) {
             for (IOType in: end.impl.input) {
                 if (in.type == out.type and (
                     nextConnectors(start)->collect(c|c.next).includes(end) or // configured forward conn 
                     (not(in.forward) and not(out.forward)))) { // configured backward conn
-                    res = appendNL(res, generateConnection(start, end, out, dir, connSuffix, service));
+                    generateConnection(start, end, out, dir, connSuffix, service, list);
                  }
              }
          }
@@ -292,12 +235,11 @@ template SpringCloudStreamDeploymentDescriptorBase(Configuration config, FileArt
              for (IOType in : start.impl.input) {
                 for (IOType out: end.impl.output) {
                     if (in.type == out.type and (not(in.forward) and not(out.forward))) {
-                        res = appendNL(res, generateConnection(end, start, out, "OUT", "-out-0", service));
+                        generateConnection(end, start, out, "OUT", "-out-0", service, list);
                     }
                 }
              }
          }
-         res;
     }
     
     def Boolean isAsyncSource(MeshElement elt) {
@@ -308,7 +250,7 @@ template SpringCloudStreamDeploymentDescriptorBase(Configuration config, FileArt
         elt.impl.asynchronous == true and elt.impl.isKindOf(Connector);
     }
     
-    def generateConnection(MeshElement start, MeshElement end, IOType type, String dir, String connSuffix, String service) {
+    def generateConnection(MeshElement start, MeshElement end, IOType type, String dir, String connSuffix, String service, YamlList list) {
         String res = "";
         String typeName = toTypeName(type.type);
         String conn = getMethodSuffixId(getMethodSuffix(end, typeName, getOutName(end, typeName)), end);
@@ -327,17 +269,13 @@ template SpringCloudStreamDeploymentDescriptorBase(Configuration config, FileArt
                 conn = "process" + conn.substring(6);
             }
         }
-        res = appendNL(res, 
-          "- channel: ${conn}${connSuffix}\n" +
-          "  direction: ${dir}\n" +
-          "  id: ${start.impl.id} -> ${end.impl.id}\n" +
-          "  type: ${typeName}\n" + 
-          "  function: ${func}");
-        if (service <> "") {
-            res = res + 
-            "\n  service: ${service}";
-        }
-        res;
+        YamlNode c = list.addObject();
+        c.addValue("channel", conn + connSuffix);
+        c.addValue("direction", dir);
+        c.addValue("id", start.impl.id + " -> " + end.impl.id);
+        c.addValue("type", typeName);
+        c.addValueNotEmpty("function", func); // default is ""
+        c.addValueNotEmpty("service", service);
     }
 
     // -------------------------- mesh basics refinement, extract stream names ---------------------------------
@@ -377,14 +315,11 @@ template SpringCloudStreamDeploymentDescriptorBase(Configuration config, FileArt
     
     // ----------------------------------- types -----------------------------------
     
-    def generateTypes(sequenceOf(MeshElement) elements) {
+    def generateTypes(sequenceOf(MeshElement) elements, YamlNode node) {
         setOf(DataType) types = {};
-        for (MeshElement elt: elements) {
-            collectTypes(elt, types);
-        }
+        elements->forEach(MeshElement elt|collectTypes(elt, types));
         if (types.size() > 0) {
-            'types:
-                ${generateTypes(types)}'
+            generateTypes(types, node.addList("types"));
         }
     }
     
@@ -407,32 +342,27 @@ template SpringCloudStreamDeploymentDescriptorBase(Configuration config, FileArt
         collectRecordTypes(type.type, types);
     }
     
-    def generateTypes(setOf(DataType) types) {
+    def generateTypes(setOf(DataType) types, YamlList list) {
         setOf(RecordType) recTypes = {};
-        for (DataType t : types) {
-            collectRecordTypes(t, recTypes);
-        }
+        types->forEach(DataType t|collectRecordTypes(t, recTypes));
         for (RecordType type: recTypes->sortedBy(t|t.name)) {
-            '${generateType(type)}'
+            generateType(type, list);
         }
     }
     
-    def generateType(DataType type) {
-        ''
+    def generateType(DataType type, YamlList list) {
     }
 
-    def generateType(RecordType type) {
-        '- name: ${toTypeName(type)}'
+    def generateType(RecordType type, YamlList list) {
+        YamlNode node = list.addObject();
+        node.addValue("name", toTypeName(type));
         if (type.fields.size() > 0) {
-            '  fields:
-                ${generateFields(type.fields)}'
-        }
-    }
-    
-    def generateFields(Fields fields) {
-        for (Field f: fields) {
-            '- name: ${f.name}
-              type: ${toTypeName(f.type)}'
+            YamlList list = node.addList("fields"); 
+            for (Field f: type.fields) {
+                YamlNode n = list.addObject();
+                n.addValue("name", f.name);
+                n.addValue("type", toTypeName(f.type));
+            }
         }
     }
     
@@ -462,122 +392,105 @@ template SpringCloudStreamDeploymentDescriptorBase(Configuration config, FileArt
         }
     }
     
-    def generateAppSetup(ServiceBase service) {
-        '\n'
+    def generateAppSetup(ServiceBase service, YamlNode node) {
     }
 
-    def generateAppSetup(Service service) {
+    def generateAppSetup(Service service, YamlNode node) {
         if (isDefined(service.nameplateInfo) and service.nameplateInfo <> null) {
-            generateAppSetup(service.id, service.name, service.ver, service.nameplateInfo, indent=2);
-        } else {
-            ''
+            generateAppSetup(service.id, service.name, service.ver, service.nameplateInfo, node);
         }
     } 
     
-    def generateAppSetup(Application app) {
+    def generateAppSetup(Application app, YamlNode node) {
         if (isDefined(app.nameplateInfo) and app.nameplateInfo <> null) {
-            generateAppSetup(app.id, app.name, app.ver, app.nameplateInfo);
-        } else {
-            ''
+            generateAppSetup(app.id, app.name, app.ver, app.nameplateInfo, node);
         }
     } 
     
-    def generateAppSetup(String id, String name, String ver, NameplateInfo p, String prefix = "", Integer indent = 0) {
-        'application:
-          id: ${id}
-          name: ${name}
-          version: ${ver}
-          ${generateNameplateInfoSetup(p, prefix, indent)|e}'
+    def generateAppSetup(String id, String name, String ver, NameplateInfo p, YamlNode node, String prefix = "") {
+        YamlNode aNode = node.addObject("application");
+        aNode.addValue("id", id);
+        aNode.addValue("name", name);
+        aNode.addValue("version", ver);
+        generateNameplateInfoSetup(p, prefix, aNode);        
     }
     
-    def generateNameplateInfoSetup(NameplateInfo p, String prefix, Integer indent) {
+    def generateNameplateInfoSetup(NameplateInfo p, String prefix, YamlNode node) {
         if (p <> null) {
             Manufacturer m = p.manufacturer;
-            ManufacturerAddress ad = m.address;
-            '${prefix}manufacturerName: ${m.manufacturerName}
-            manufacturerProductDesignation: ${p.manufacturerProductDesignation}
-            manufacturerLogo: ${m.manufacturerLogo}
-            productImage: ${p.productImage}
-            address:
-              department: ${ad.department}
-              street: ${ad.street}
-              zipCode: ${ad.zipCode}
-              cityTown: ${ad.cityTown}' | indent;
-        } else {
-            ''
+            node.addValue(prefix + "manufacturerName", m.manufacturerName);
+            node.addValueNotEmpty("manufacturerProductDesignation", p.manufacturerProductDesignation); // default null, considered
+            node.addValue("manufacturerLogo", m.manufacturerLogo);
+            node.addValueNotEmpty("productImage", p.productImage); // default is ""
+            if (isDefined(m.address) and m.address <> null) { // default is an empty address object
+                ManufacturerAddress ad = m.address;
+                YamlNode adNode = node.addObject("address");
+                adNode.addValue("department", ad.department);
+                adNode.addValue("street", ad.street);
+                adNode.addValue("zipCode", ad.zipCode);
+                adNode.addValue("cityTown", ad.cityTown);
+            }
         }
     }
 
-    def generateServers(Application app) {
+    def generateServers(Application app, YamlNode node) {
         if (isDefined(app.servers) and app.servers.size() > 0) {
-            'servers:
-              ${generateServersImpl(app.servers)}'
+            YamlList list = node.addList("servers");
+            // sorted by for deterministic testing
+            for (Server s : app.servers->sortedBy(t|t.id)) {
+                YamlNode n = list.addObject();
+                n.addValue("id", s.id);
+                n.addValue("version", s.ver);
+                n.addValueNotEmpty("description", s.description); // default is ""
+                n.addValue("transportChannel", getStringValueSafe(s.transportChannel, ""));
+                n.addValue("host", s.host);
+                n.addValue("port", s.port);
+                n.addValue("cls", getServerCls(s));
+                n.addValue("started", s.running);
+                n.addValue("asProcess", asProcess(s));
+                generateServer(s, n);
+            }    
         }
     }
     
-    def generateServersImpl(setOf(Server) servers) {
-        // sorted by for deterministic testing
-        for (Server s : servers->sortedBy(t|t.id)) {
-            '- id: ${s.id}
-              version: ${s.ver}
-              description: ${s.description}
-              transportChannel: ${getStringValueSafe(s.transportChannel, "")}
-              host: ${s.host}
-              port: ${s.port}
-              cls: ${getServerCls(s)}
-              started: ${s.running}
-              asProcess: ${asProcess(s)}
-              ${generateServer(s)|e}'
-        }    
-    }
-
     @DispatchBasis
     def asProcess(Server server) {
-        'true'
+        true;
     }
 
     @DispatchCase
     def asProcess(PythonServer server) {
-        'false' // we wrap this anyway into a Python process, so a Java process shall not be needed
+        false; // we wrap this anyway into a Python process, so a Java process shall not be needed
     }
 
-    // dispatch basis
-    def generateServer(Server server) {
-        ''
+    @DispatchBasis
+    def generateServer(Server server, YamlNode node) {
     }
 
-    def generateServer(JavaServer server) {
+    def generateServer(JavaServer server, YamlNode node) {
         if (server.memLimit > 0) {
-            "memory: ${server.memLimit}"
+            node.addValue("memory", server.memLimit);
         }
-        '${generateCmdArg(getStringValueSafe(server.cmdArg, ""), "cmdArg")}'
+        String cmdArg = getStringValueSafe(server.cmdArg, "");
+        if (cmdArg.length() > 0) {
+            generateCmdArg(cmdArg, node.addList("cmdArg"));
+        }
     }
     
-    def generateServer(PythonServer server) {
+    def generateServer(PythonServer server, YamlNode node) {
         String clsName = asTypeName(server.id);
         String id = toFolderName(server.id);
-        'artifacts:
-          - /python_${id}.zip
-          ${genAdditionalArtifacts(server.artifacts)|e}
-        netMgtKey: ${server.id}
-        cmdArg:
-          - --mode
-          - console
-          - --modulesPath
-          - \\${tmp}/python_${id}
-          - --servicesPackage
-          - ${pythonServicesPackageName(server)}
-          - --sid
-          - ${server.id}
-        homePath: \\${tmp}/python_${id}
-        executablePath: \\${tmp}/python_${id}'
+        sequenceOf(String) artifacts = createArtifacts("/python_${id}.zip");
+        sequenceOf(String) cmdArg = createPythonCmdArg(server.id, pythonServicesPackageName(server), "\\${tmp}/python_${id}");
+        YamlNode p = addProcess(node, "\\${tmp}/python_${id}", "", artifacts=artifacts, addTopNode=false, cmdArg=cmdArg);
+        p.addValue("netMgtKey", server.id);
     }
     
     def pythonServicesPackageName(PythonServer server) {
         if (server.servicesPackageName <> null) {
-            '${server.servicesPackageName}'
+            '${server.servicesPackageName}';
         } else {
-            'server'
+            'server';
         }
     }    
     

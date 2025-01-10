@@ -98,24 +98,24 @@ template JavaMapping(Configuration config, FileArtifact target) {
         binderName(config.transportProtocol);
     }
     
-    // dispatch base
+    @DispatchBasis
     def binderName(TransportProtocol proto) {
-        ''
+        '';
     }
     
-    // dispatch base
+    @DispatchCase
     def binderName(TransportProtocolAMQP proto) {
-        'amqpBinder'
+        'amqpBinder';
     }
 
-    // dispatch base
+    @DispatchCase
     def binderName(TransportProtocolMQTTv3 proto) {
-        'mqttv3Binder' // depends on transportProtocolModule
+        'mqttv3Binder'; // depends on transportProtocolModule
     }
 
-    // dispatch base
+    @DispatchCase
     def binderName(TransportProtocolMQTTv5 proto) {
-        'mqttv5Binder' // depends on transportProtocolModule
+        'mqttv5Binder'; // depends on transportProtocolModule
     }
     
     // --------------------------------------------------------------

@@ -3,20 +3,17 @@ import JavaBasics;
 import MavenBasics;
 import JavaMapping;
 import MeshBasics;
+import SpringCloudStreamDeploymentDescriptorBase;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
 template SpringCloudStreamDeploymentDescriptorPartKodex(Configuration config, FileArtifact target, Application app, sequenceOf(MeshElement) elements) {
 
-    def generateProcess(MeshElement elt, KodexService service) {
+    def generateProcess(MeshElement elt, KodexService service, YamlNode node) {
         String id = toFolderName(service.id);
-        'process: 
-            artifacts:
-              - /kodex.zip
-              - /kodex_${id}.zip
-            homePath: \\${tmp}/${id}/kodex
-            executablePath: \\${tmp}/${id}/kodex 
-            started: true'
+        sequenceOf(String) artifacts = createArtifacts("/kodex.zip");
+        artifacts.add("/kodex_${id}.zip");
+        addProcess(node, "\\${tmp}/${id}/kodex", "true", artifacts=artifacts);
     }
 
 }

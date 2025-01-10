@@ -3,6 +3,7 @@ import JavaBasics;
 import MavenBasics;
 import JavaMapping;
 import MeshBasics;
+import SpringCloudStreamDeploymentDescriptorBase;
 
 import Rtsa;
 
@@ -10,22 +11,17 @@ import Rtsa;
 @indent(indentation = 4, additional = 0)
 template SpringCloudStreamDeploymentDescriptorPartRtsa(Configuration config, FileArtifact target, Application app, sequenceOf(MeshElement) elements) {
 
-    def generateProcess(MeshElement elt, RtsaService service) {
+    def generateProcess(MeshElement elt, RtsaService service, YamlNode node) {
         String id = toFolderName(service.id);
+        sequenceOf(String) artifacts = {};
         String bin = rtsaBin(service);
         if (bin <> "") {
-            bin = "- /" + bin;
+            artifacts.add("/" + bin);
         }
-        String instance = rtsaInstance(service);
-        'process: 
-            artifacts:
-              ${bin|e}
-              - /${instance}
-            homePath: \\${tmp}/${id}/rtsa
-            executablePath: \\${tmp}/${id}/rtsa 
-            cmdArg:
-              - --iip.rtsa.path=${service.path}
-            started: true'
+        artifacts.add("/" + rtsaInstance(service));
+        sequenceOf(String) cmdArg = {};
+        cmdArg.add("--iip.rtsa.path=${service.path}");
+        addProcess(node, "\\${tmp}/${id}/rtsa", "true", artifacts=artifacts, cmdArg=cmdArg);
     }
 
 }

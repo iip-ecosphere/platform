@@ -9,30 +9,18 @@ import SpringCloudStreamDeploymentDescriptorBase;
 @indent(indentation = 4, additional = 0)
 template SpringCloudStreamDeploymentDescriptorPartFlowerAI(Configuration config, FileArtifact target, Application app, sequenceOf(MeshElement) elements) {
 
-    def generateServer(FlowerFederatedAiServer server) {
+    def generateServer(FlowerFederatedAiServer server, YamlNode node) {
         String clsName = asTypeName(server.id);
         String id = toFolderName(server.id);
-        'artifacts:
-          - /python_${id}.zip
-        cmdArg:
-          - --mode
-          - console
-          - --modulesPath
-          - \\${tmp}/flowerAi_${id}
-          - --servicesPackage
-          - ${pythonServicesPackageName(server)}
-          - --sid
-          - ${server.id}
-        homePath: \\${tmp}/flowerAi_${id}
-        executablePath: \\${tmp}/flowerAi_${id}'
+        sequenceOf(String) artifacts = createArtifacts("/python_${id}.zip");
+        sequenceOf(String) cmdArg = createPythonCmdArg(server.id, pythonServicesPackageName(server), "\\${tmp}/flowerAi_${id}");
+        addProcess(node, "\\${tmp}/flowerAi_${id}", "", artifacts=artifacts, cmdArg=cmdArg, addTopNode=false);
     }
     
-    def generateService(FlowerFederatedAiService service) {
+    def generateService(FlowerFederatedAiService service, YamlNode node) {
         if (isDefined(service.server)) {
-            'netMgtKey: ${service.server.id}
-            transportChannel: ${getStringValueSafe(service.server.transportChannel, "")}'
-        } else {
-            ''
+            node.addValue("netMgtKey", service.server.id);
+            node.addValue("transportChannel", getStringValueSafe(service.server.transportChannel, ""));
         }
     }
     

@@ -1,133 +1,100 @@
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template DeploymentPlan(IIPEcosphere config, FileArtifact target, DeploymentPlan plan, Application app, String artifact) {
+@format(profile="yaml", indentSteps = 4, profileArg_sorting = "INSERT", profileArg_indicatorIndent="2")
+template DeploymentPlan(IIPEcosphere config, YamlFileArtifact target, DeploymentPlan plan, Application app, String artifact) {
 
-    def main(IIPEcosphere config, FileArtifact target, DeploymentPlan plan, Application app, String artifact) {
-        'application: ${plan.name}
-        id: ${plan.id}
-        appId: ${app.id}
-        version: ${plan.ver}
-        description: ${plan.description}
-        ${generateArtifact(artifact)|e}
-        parallelize: ${plan.parallelize}
-        allowMultiExecution: ${plan.allowMultiExecution}
-        onUndeployRemoveArtifact: ${plan.onUndeployRemoveArtifact}
-        disabled: ${plan.disabled}
-        ${generateEnsembles(plan)|e}
-        ${generateAssignments(plan)|e}
-        ${generateArguments(plan)|e}
-        ${generateServers(plan)|e}
-        ${generateParameter(plan)|e}'
-    }
-    
-    def generateArtifact(String artifact) {
-        if (artifact <> "") {
-            'artifact: ${artifact}'
+    def main(IIPEcosphere config, YamlFileArtifact target, DeploymentPlan plan, Application app, String artifact) {
+        YamlNode n = target.addDocument(true);
+        n.addValue("application", plan.name);
+        n.addValue("id", plan.id);
+        n.addValue("appId", app.id);
+        n.addValue("version", plan.ver);
+        n.addValue("description", plan.description);
+        n.addValueNotEmpty("artifact", artifact);
+        n.addValue("parallelize", plan.parallelize);
+        n.addValue("allowMultiExecution", plan.allowMultiExecution);
+        n.addValue("onUndeployRemoveArtifact", plan.onUndeployRemoveArtifact);
+        n.addValue("disabled", plan.disabled);
+        generateEnsembles(plan, n);
+        generateAssignments(plan, n);
+        if (isDefined(plan.cmdArg) and plan.cmdArg.length() > 0) {
+            n.addList("arguments", plan.cmdArg.split(","));
         }
+        generateServers(plan, n);
+        generateParameter(plan, n);
     }
     
-    def generateArguments(DeploymentPlan plan) {
-        if (isDefined(plan.cmdArg) and plan.cmdArg.length() > 0) { // EASY-bug
-            sequenceOf(String) tmp = plan.cmdArg.split(",");
-            'arguments:'
-            for (String a: tmp) {
-                "  - ${a}"
-            }
-        }
-    }
-    
-    def generateAssignments(DeploymentPlan plan) {
+    def generateAssignments(DeploymentPlan plan, YamlNode node) {
         if (isDefined(plan.assignments) and plan.assignments.size() > 0) {
-            'assignments:'
-            for (ServiceAssignment a: plan.assignments) {
-                '${generateAssignment(a)}'
-            }
+            YamlList list = node.addList("assignments");
+            plan.assignments->forEach(ServiceAssignment a|generateAssignment(a, list));
         }
     }
 
-    // dispatch basis
-    def generateAssignment(ServiceAssignment assng) {
-        ''
+    @DispatchBasis
+    def generateAssignment(ServiceAssignment assng, YamlList list) {
     }
 
-    def generateAssignment(NamedServiceAssignment assng) {
-        '  - resource: ${assng.resource}
-            services:'
-        for (MeshElement s: assng.services) {
-            '    - ${s.impl.id}'
-        }
+    def generateAssignment(NamedServiceAssignment assng, YamlList list) {
+        YamlNode n = list.addObject();
+        n.addValue("resource", assng.resource);
+        YamlList sList = n.addList("services");
+        assng.services->forEach(MeshElement s|sList.addValue(s.impl.id));
     }
     
-    def generateEnsembles(DeploymentPlan plan) {
+    def generateEnsembles(DeploymentPlan plan, YamlNode node) {
         if (isDefined(plan.ensembles) and plan.ensembles.size() > 0) {
-            'ensembles:'
-            for (EnsembleSpec s: plan.ensembles) {
-                '  ${s.leader.impl.id}: ${s.member.impl.id}'
-            }
+           YamlNode e = node.addObject("ensembles");
+           plan.ensembles->forEach(EnsembleSpec s|e.addValue(s.leader.impl.id, s.member.impl.id));
         }
     }
 
-    def generateServers(DeploymentPlan plan) {
+    def generateServers(DeploymentPlan plan, YamlNode node) {
         if (isDefined(plan.servers) and plan.servers.size() > 0) {
-            'servers:'
-            for (ServerAssignment a: plan.servers) {
-                '${generateServer(a)}'
+            YamlList s = node.addList("servers");
+            plan.servers->forEach(ServerAssignment a|generateServer(a, s));
+        }
+    }
+
+    @DispatchBasis
+    def generateServer(ServerAssignment assng, YamlList list) {
+    }
+
+    def generateServer(NamedServerAssignment assng, YamlList list) {
+        list.addObject().addValue(assng.server.id, assng.hostId);
+    }
+    
+    def generateParameter(DeploymentPlan plan, YamlNode node) {
+        if (plan.parameter.size() > 0) {
+            YamlNode p = node.addObject("serviceParams");
+            for (ParameterServiceAssignment a: plan.parameter) {
+                a.parameter->forEach(ParameterAssignment pa|generateParameterAssignment(pa, p.addObject(a.service.id)));
             }
         }
     }
-
-    // dispatch basis
-    def generateServer(ServerAssignment assng) {
-        ''
-    }
-
-    def generateServer(NamedServerAssignment assng) {
-        '  - ${assng.server.id}: ${assng.hostId}'
-    }
     
-    def generateParameter(DeploymentPlan plan) {
-        if (plan.parameter.size() > 0) {
-            'serviceParams:
-                ${generateParameterServiceAssignments(plan.parameter)}'
-        }
-    }
-    
-    def generateParameterServiceAssignments(sequenceOf(ParameterServiceAssignment) parameter) {
-        for (ParameterServiceAssignment a: parameter) {
-            '${a.service.id}:
-              ${generateParameterServiceAssignment(a)}'
-        }
+    @DispatchBasis
+    def generateParameterAssignment(ParameterAssignment assng, YamlNode node) {
     }
 
-    def generateParameterServiceAssignment(ParameterServiceAssignment assng) {
-        for (ParameterAssignment a: assng.parameter) {
-            '  ${generateParameterAssignment(a)}'
-        }
+    def generateParameterAssignment(IntegerParameterAssignment assng, YamlNode node) {
+        node.addValue(assng.parameter, assng.value);
     }
 
-    // dispatch basis
-    def generateParameterAssignment(ParameterAssignment assng) {
-        ''
+    def generateParameterAssignment(StringParameterAssignment assng, YamlNode node) {
+        node.addValue(assng.parameter, assng.value);
     }
 
-    def generateParameterAssignment(IntegerParameterAssignment assng) {
-        '${assng.parameter} : ${assng.value}'
+    def generateParameterAssignment(RealParameterAssignment assng, YamlNode node) {
+        node.addValue(assng.parameter, assng.value);
     }
 
-    def generateParameterAssignment(StringParameterAssignment assng) {
-        '${assng.parameter} : ${assng.value}'
+    def generateParameterAssignment(BooleanParameterAssignment assng, YamlNode node) {
+        node.addValue(assng.parameter, assng.value);
     }
 
-    def generateParameterAssignment(RealParameterAssignment assng) {
-        '${assng.parameter} : ${assng.value}'
-    }
-
-    def generateParameterAssignment(BooleanParameterAssignment assng) {
-        '${assng.parameter} : ${assng.value}'
-    }
-
-    def generateParameterAssignment(LongParameterAssignment assng) {
-        '${assng.parameter} : ${assng.value}'
+    def generateParameterAssignment(LongParameterAssignment assng, YamlNode node) {
+        node.addValue(assng.parameter, assng.value);
     }
 
 }

@@ -3,44 +3,10 @@ import JavaMapping;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, FileArtifact target, EcsDevice deviceType) {
+@format(profile="yaml", indentSteps = 2, profileArg_sorting = "INSERT")
+template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, YamlFileArtifact target, EcsDevice deviceType) {
 
-    def serverHost(EndpointAddress addr) {
-        if (addr.serverHost <> null) {
-            'serverHost: ${addr.serverHost}'
-        } else {
-            ''
-        }
-    }
-    
-    def produceAasCors(IIPEcosphere config) {
-        String aasCors = getStringValueSafe(config.aasAccessControlAllowOrigin, "");
-        if (aasCors <> "") {
-            'accessControlAllowOrigin: "${aasCors}"'
-        } else {
-            ''
-        }
-    }
-
-    def produceAasPluginId(IIPEcosphere config) {
-        String aasPluginId = getStringValueSafe(config.aasPluginId, "");
-        if (aasPluginId <> "") {
-            'pluginId: "${aasPluginId}"'
-        } else {
-            ''
-        }
-    }
-
-    def produceAasStartupTimeout(IIPEcosphere config) {
-        Integer timeout = getIntegerValueSafe(config.aasStartupTimeout, 0);
-        if (timeout > 0) {
-            'aasStartupTimeout: ${timeout}'
-        } else {
-            ''
-        }
-    }
-
-    def produceAas(IIPEcosphere config, String aasPersistence="", Boolean withDocker=true, Boolean implLocalEphemerial=false) {
+    def produceAas(IIPEcosphere config, YamlNode node, String aasPersistence="", Boolean withDocker=true, Boolean implLocalEphemerial=false) {
         EndpointAddress aasServer = config.aasServer;
         EndpointAddress aasRegistryServer = config.aasRegistryServer;
         ImplAddress aasImplServer = config.aasImplServer;
@@ -52,65 +18,58 @@ template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, FileArtifact 
             aasImplServerHost = "127.0.0.1";
         }
         if (withDocker) {
-        '${produceContainerMgr(config.containerManager)}'
+            produceContainerMgr(config.containerManager, node);
         }
-        'monitoringUpdatePeriod: ${config.containerManager.monitoringUpdatePeriod}'
-        'aas:
-          server:
-            port: ${aasServer.port}
-            host: ${aasServer.host}
-            schema: ${aasServer.schema}
-            path: ${aasServer.path}
-          registry:
-            port: ${aasRegistryServer.port}
-            host: ${aasRegistryServer.host}
-            schema: ${aasRegistryServer.schema}
-            path: ${aasRegistryServer.path}
-          implementation:
-            port: ${aasImplServerPort}
-            host: ${aasImplServerHost}
-            netmask: ${aasImplNetmask}
-            schema: ${aasImplServer.schema}
-            protocol: ${aasProtocolName(aasImplServer.protocol)}
-          ${serverHost(aasServer)|e}
-          ${produceAasCors(config)|e}
-          ${produceAasStartupTimeout(config)|e}
-          ${produceAasPersistence(aasPersistence)|e}
-          ${produceAasPluginId(config)|e}'
+        node.addValue("monitoringUpdatePeriod", config.containerManager.monitoringUpdatePeriod);
+        YamlNode aas = node.addObject("aas");
+        produceAasServer(aas, "server", aasServer.port, aasServer.host, aasServer.schema, aasServer.path);
+        produceAasServer(aas, "registry", aasRegistryServer.port, aasRegistryServer.host, aasRegistryServer.schema, aasRegistryServer.path);
+        produceAasServer(aas, "implementation", aasImplServerPort, aasImplServerHost, aasImplServer.schema, "", netmask=aasImplNetmask, protocol=aasProtocolName(aasImplServer.protocol));
+        if (aasServer.serverHost <> null) {
+            aas.addValue("serverHost", aasServer.serverHost);
+        }
+        aas.addValueNotEmpty("accessControlAllowOrigin", getStringValueSafe(config.aasAccessControlAllowOrigin, ""));
+        Integer timeout = getIntegerValueSafe(config.aasStartupTimeout, 0);
+        if (timeout > 0) {
+            aas.addValue("aasStartupTimeout", timeout);
+        }
+        aas.addValueNotEmpty("persistence", aasPersistence);
+        aas.addValueNotEmpty("pluginId", getStringValueSafe(config.aasPluginId, ""));
     }
 
-    def produceContainerMgr(ContainerManager containerManager) {
-        ''
+    def produceAasServer(YamlNode node, String kind, Integer port, String host, DecisionVariable schema, String path, String netmask="", String protocol="") {
+        YamlNode kindNode = node.addObject(kind);
+        kindNode.addValue("port", port);
+        kindNode.addValue("host", host);
+        kindNode.addValueNotEmpty("netmask", netmask); // default is ""
+        kindNode.addValue("schema", schema);
+        kindNode.addValueNotEmpty("path", path); // default is ""
+        kindNode.addValueNotEmpty("protocol", protocol); // default null (!)
+    } 
+
+    def produceContainerMgr(ContainerManager containerManager, YamlNode node) {
     }
     
-    def produceContainerMgr(DockerContainerManager containerManager) {
-        'docker:
-            dockerHost: ${containerManager.dockerHost}
-            dockerImageYamlFilename: ${containerManager.dockerImageYamlFilename}
-            deleteWhenUndeployed: ${containerManager.deleteWhenUndeployed}'
+    def produceContainerMgr(DockerContainerManager containerManager, YamlNode node) {
+        YamlNode docker = node.addObject("docker");
+        docker.addValue("dockerHost", containerManager.dockerHost);
+        docker.addValue("dockerImageYamlFilename", containerManager.dockerImageYamlFilename);
+        docker.addValue("deleteWhenUndeployed", containerManager.deleteWhenUndeployed);
         if (isDefined(containerManager.registry) and containerManager.registry <> "") {
-        '    registry: ${containerManager.registry}'
+            docker.addValueNotEmpty("registry", containerManager.registry); // default null, considered in code
         }
         if (isDefined(containerManager.authenticationKey) and containerManager.authenticationKey <> "") {
-        '    authenticationKey: ${containerManager.authenticationKey}'
+            docker.addValue("authenticationKey", containerManager.authenticationKey);
         }
     }
 
-    def produceContainerMgr(LxcContainerManager containerManager) {
-        'lxc:
-            dockerHost: ${containerManager.dockerHost}
-            lxcImageYamlFilename: ${containerManager.lxcImageYamlFilename}
-            deleteWhenUndeployed: ${containerManager.deleteWhenUndeployed}'
+    def produceContainerMgr(LxcContainerManager containerManager, YamlNode node) {
+        YamlNode docker = node.addObject("lxc");
+        docker.addValue("dockerHost", containerManager.dockerHost);
+        docker.addValue("lxcImageYamlFilename", containerManager.lxcImageYamlFilename);
+        docker.addValue("deleteWhenUndeployed", containerManager.deleteWhenUndeployed);
     }
-    
-    def produceAasPersistence(String aasPersistence) {
-        if (aasPersistence.length() > 0) {
-            'persistence: ${aasPersistence}'
-        } else {
-            ''
-        }
-    }
-    
+
     def getActionTimeout(TransportProtocol tp) {
         max(1000, getIntegerValueSafe(tp.actionTimeout, 1000));
     }
@@ -122,71 +81,62 @@ template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, FileArtifact 
     def getActionTimeout(TransportProtocolMQTTv5 tp) {
         max(3000, getIntegerValueSafe(tp.actionTimeout, 3000));
     }
-    
-    def produceTransport(IIPEcosphere config) {
-       TransportProtocol tp = config.transportProtocol;
-       String gHost = getStringValueSafe(tp.globalHost, "");
-       'transport:
-            host: ${gHost}
-            port: ${tp.port}
-            actionTimeout: ${getActionTimeout(tp)}
-            ${produceTransportSecurity(tp, true)|e}
-            ${produceGateway(tp)|e}'
-    }
-    
-    def produceGateway(TransportProtocol tp) {
-        Integer port = getIntegerValueSafe(tp.gatewayPort, 10000);
-        String netmask = getStringValueSafe(tp.netmask, "");
-        'gatewayPort: ${port}
-        netmask : ${netmask}'
+
+    def produceTransport(IIPEcosphere config, YamlNode node) {
+        TransportProtocol tp = config.transportProtocol;
+        YamlNode t = node.addObject("transport");
+        t.addValue("host", getStringValueSafe(tp.globalHost, ""));
+        t.addValue("port", tp.port);
+        t.addValue("actionTimeout", getActionTimeout(tp));
+        produceTransportSecurity(tp, true, t);
+        produceGateway(tp, t);
     }    
-    
-    def produceTransportSecurity(TransportProtocol tp, Boolean userPwdFallback) {
+
+    def produceGateway(TransportProtocol tp, YamlNode node) {
+        node.addValue("gatewayPort", getIntegerValueSafe(tp.gatewayPort, 10000));
+        node.addValueNotEmpty("netmask", getStringValueSafe(tp.netmask, "")); // default is ""
+    }    
+
+    def produceTransportSecurity(TransportProtocol tp, Boolean userPwdFallback, YamlNode node) {
         if (isDefined(tp.security) and tp.security <> null) {
             SecuritySettings sec = tp.security;
             if (isDefined(sec.authenticationKey) and sec.authenticationKey <> "") {
-                'authenticationKey: ${sec.authenticationKey}'
+                node.addValue("authenticationKey", sec.authenticationKey);
             }
             if (isDefined(sec.keystoreKey) and sec.keystoreKey <> "") {
-                'keystoreKey: ${sec.keystoreKey}'
+                node.addValue("keystoreKey", sec.keystoreKey);
             }
             if (isDefined(sec.keyAlias) and sec.keyAlias <> "") {
-                'keyAlias: ${sec.keyAlias}'
+                node.addValue("keyAlias", sec.keyAlias);
             }
             if (isDefined(sec.hostNameVerification)) {
-                'hostnameVerification: ${sec.hostNameVerification}'
+                node.addValue("hostnameVerification", sec.hostNameVerification);
             }
-        } else {
-            ''
         }
     }
-    
-    def produceNetMgr(IIPEcosphere config) {
+
+    def produceNetMgr(IIPEcosphere config, YamlNode node) {
        // take over the AAS netmask for consistency
        ImplAddress aasImplServer = config.aasImplServer;
        String aasImplNetmask = aasImplServer.netmask;
        // we leave out port range for now
-       'netMgr:
-            netmask: ${aasImplNetmask}'
-    }
+        if (aasImplNetmask <> "") {
+           node.addObject("netMgr").addValueNotEmpty("netmask", aasImplNetmask); // default is ""
+       }
+    }    
     
-    def produceArtefactInfixes(EcsDevice deviceType) {
+    def produceEcsRuntimeCfg(IIPEcosphere config, YamlFileArtifact target, EcsDevice deviceType) {
+        YamlNode n = target.addDocument(true);
+        produceTransport(config, n);
+        produceAas(config, n, implLocalEphemerial=config.aasImplServer.devicesAsEphemeral);
+        produceNetMgr(config, n);
         if (deviceType.containerName.trim().length() > 0) { // not "dflt" here
-            'artifactInfixes:
-              - ${deviceType.containerName}'
-        } else {
-            ''
+            sequenceOf(String) values = {deviceType.containerName};
+            n.addList("artifactInfixes", values);
         }
-    }
-    
-    def produceEcsRuntimeCfg(IIPEcosphere config, FileArtifact target, EcsDevice deviceType) {
-        '${produceTransport(config)}'
-        '${produceAas(config, implLocalEphemerial=config.aasImplServer.devicesAsEphemeral)}'
-        '${produceNetMgr(config)}'
-        '${produceArtefactInfixes(deviceType)|e}'
     } 
-
-    def main(IIPEcosphere config, FileArtifact target, EcsDevice deviceType) {
+    
+    def main(IIPEcosphere config, YamlFileArtifact target, EcsDevice deviceType) {
         produceEcsRuntimeCfg(config, target, deviceType);
     }
 

@@ -9,7 +9,8 @@ import EcsRuntimeDockerContainerManagerYaml;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template JavaSpringCloudStreamYaml(IIPEcosphere config, FileArtifact target, mapOf(MeshElement, setOf(MeshConnector)) mappedMesh, sequenceOf(MeshElement) nodes, Application app) extends MeshBasics {
+@format(profile="yaml", indentSteps = 2, profileArg_sorting = "INSERT")
+template JavaSpringCloudStreamYaml(IIPEcosphere config, YamlFileArtifact target, mapOf(MeshElement, setOf(MeshConnector)) mappedMesh, sequenceOf(MeshElement) nodes, Application app) extends MeshBasics {
 
     sequenceOf(String) tmp = {};
     setOf(String) beans = {};
@@ -19,30 +20,18 @@ template JavaSpringCloudStreamYaml(IIPEcosphere config, FileArtifact target, map
     /*
     * Emits a list prefixed by name:elt, elements separated by ";". Empty if elt is empty.
     */
-    def namedList(String name, setOf(String) elt) {
+    def namedList(String name, setOf(String) elt, YamlNode node) {
         if (elt.size() > 0) {
-            "${name}: ${semicolonList(elt)}"
-        }
-    }
-    
-    /*
-    * Conditionally emit native encoding (or not).
-    */
-    def nativeEnc(Boolean enable) {
-        if (enable) {
-            'producer: 
-              useNativeEncoding: true'
-        } else {
-            ''
+            node.addValue(name, semicolonList(elt));
         }
     }
         
     /*
     * Emits a spring destination table from destinations. Considers destination "*" as "useNativeEncoding".
     */
-    def generateDestinations(mapOf(String, setOf(String)) destinations) {
+    def generateDestinations(mapOf(String, setOf(String)) destinations, YamlNode node) {
         if (destinations.size() > 0) {
-            'bindings:'
+            YamlNode bindings = node.addObject("bindings");
             for (String k : destinations.keys().asSequence()->sortedBy(e|e)) { // sortedBy for testing
                 String dst = "";
                 Boolean useNativeEncoding = false;
@@ -56,65 +45,50 @@ template JavaSpringCloudStreamYaml(IIPEcosphere config, FileArtifact target, map
                         dst = dst + d;
                     }
                 }
-                ' ${k}:
-                    ${destinations(dst)|e}
-                    ${nativeEnc(useNativeEncoding)|e}'
+                YamlNode obj = bindings.addObject(k);
+                obj.addValueNotEmpty("destination", dst);
+                if (useNativeEncoding) {
+                    obj.addObject("producer").addValue("useNativeEncoding", true);
+                }
             }
         }
     }
 
-    /*
-    * Conditionally emits dst with prefix "destination:" if non empty, empty if dst is empty.
-    */
-    def destinations(String dst) {
-        if (dst.length() > 0) {
-            'destination: ${dst}'
-        } else {
-            ''
-        }
-    }
     
     // ----------------------------- creates a protocol setup --------------------------
 
-    // convenience function
-    def protocolConfig(IIPEcosphere config, Boolean global) {
-        protocolConfig(config.transportProtocol, global);
+    @DispatchBase
+    def protocolConfig(TransportProtocol protocol, Boolean global, YamlNode node) {
     }
 
-    // dispatch base
-    def protocolConfig(TransportProtocol protocol, Boolean global) {
-        ''
+    def protocolConfig(TransportProtocolAMQP protocol, Boolean global, YamlNode node) {
+        produceProtocolConfig(protocol, "amqp", global, true, node);
     }
 
-    def protocolConfig(TransportProtocolAMQP protocol, Boolean global) {
-        '${produceProtocolConfig(protocol, "amqp", global, true)}'
+    def protocolConfig(TransportProtocolMQTTv3 protocol, Boolean global, YamlNode node) {
+        produceProtocolConfig(protocol, "mqtt", global, false, node);
     }
 
-    def protocolConfig(TransportProtocolMQTTv3 protocol, Boolean global) {
-        '${produceProtocolConfig(protocol, "mqtt", global, false)}'
+    def protocolConfig(TransportProtocolMQTTv5 protocol, Boolean global, YamlNode node) {
+        produceProtocolConfig(protocol, "mqtt", global, false, node);
     }
 
-    def protocolConfig(TransportProtocolMQTTv5 protocol, Boolean global) {
-        '${produceProtocolConfig(protocol, "mqtt", global, false)}'
-    }
-
-    def produceProtocolConfig(TransportProtocol protocol, String key, Boolean global, Boolean userPwdFallback) {
-        '${key}:
-            host: ${protocolHost(protocol, global)}
-            port: ${protocolPort(protocol, global)}
-            actionTimeout: ${getActionTimeout(protocol)}
-            ${produceTransportSecurity(protocol, userPwdFallback)|e}'
+    def produceProtocolConfig(TransportProtocol protocol, String key, Boolean global, Boolean userPwdFallback, YamlNode node) {
+        YamlNode proto = node.addObject(key);
+        proto.addValue("host", protocolHost(protocol, global));
+        proto.addValue("port", protocolPort(protocol, global));
+        proto.addValue("actionTimeout", getActionTimeout(protocol));
+        produceTransportSecurity(protocol, userPwdFallback, proto);
     }
     
     // --------------------------- spring poller(s) ---------------------------------------------
     
-    def poller(sequenceOf(MeshElement) nodes) {
+    def poller(sequenceOf(MeshElement) nodes, YamlNode node) {
         // until Spring Cloud Streams 3.1.1 there is no individual poll setting per source
         // might be solved with code, but unsure if needed at all as connectors are anyway asynchronous
         Integer pollInterval = calcPollerInterval(nodes);
         if (pollInterval > 0) {
-            'poller:
-                fixedDelay: ${pollInterval}'
+            node.addObject("poller").addValue("fixedDelay", pollInterval);
         }
     }
         
@@ -123,66 +97,58 @@ template JavaSpringCloudStreamYaml(IIPEcosphere config, FileArtifact target, map
     // produce the official, but also our work-around binder structure
     // internal binder is for internal, localhost communication
     // external could be a global broker, that may dynamically be selected by the platform 
-    def produceBinders(IIPEcosphere config) {
+    def produceBinders(IIPEcosphere config, YamlNode node) {
         String binder = binderName(config);
-        'binders:
-            properties:
-               internal:
-                   type: ${binder}
-                   environment:
-                       ${protocolConfig(config, false)}
-               external:
-                   type: ${binder}
-                   environment:
-                       ${protocolConfig(config, true)}'
+        YamlNode bProp = node.addObjects("binders/properties", "/");
+        produceBinder(config, "internal", binder, false, bProp);
+        produceBinder(config, "external", binder, true, bProp);
+    }
+    
+    def produceBinder(IIPEcosphere config, String kind, String type, Boolean global, YamlNode node) {
+        YamlNode kindNode = node.addObject(kind);
+        kindNode.addValue("type", type);
+        YamlNode kindEnv = kindNode.addObject("environment");
+        protocolConfig(config.transportProtocol, global, kindEnv);
     }
     
     // ----------------------------------------- main -------------------------------------
  
-    def main(IIPEcosphere config, FileArtifact target, mapOf(MeshElement, setOf(MeshConnector)) mappedMesh, sequenceOf(MeshElement) nodes, Application app) {
+    def main(IIPEcosphere config, YamlFileArtifact target, mapOf(MeshElement, setOf(MeshConnector)) mappedMesh, sequenceOf(MeshElement) nodes, Application app) {
         mapOf(String, setOf(String)) destinations = {};
         setOf(String) functions = {};
         setOf(String) sources = {};
         calcBindings(mappedMesh, nodes, destinations, functions, sources, "", app);
+        YamlNode n = target.addDocument(true);
 
-        '${protocolConfig(config, false)}'
-        '${produceTransport(config)}'
-        '${produceAas(config, withDocker=false, implLocalEphemerial=config.aasImplServer.devicesAsEphemeral)}'
-        '${produceBinders(config)}'
+        protocolConfig(config.transportProtocol, false, n);
+        produceTransport(config, n);
+        produceAas(config, n, withDocker=false, implLocalEphemerial=config.aasImplServer.devicesAsEphemeral);
+        produceBinders(config, n);
         if (app.debug) {
-            'logging: 
-               level: 
-                 org: 
-                   springframework: 
-                     cloud: DEBUG 
-                     integration: DEBUG'
+            YamlNode log = n.addObjects("logging/level/org/springframework", "/");
+            log.addValue("cloud", "DEBUG");
+            log.addValue("integration", "DEBUG");
         }
-        'metricsprovider:
-            schedulerrate: 3000
-            memorybaseunit: kilobytes
-            diskbaseunit: megabytes
-        management:
-            health:
-                binders:
-                    enabled: true
-            endpoints:
-                web:
-                    exposure:
-                        include: "metrics"
-        spring:
-            main:
-                banner-mode: off
-            cloud:
-                function:
-                    ${namedList("definition", functions)}
-                ${namedList("sources", sources)|e}
-                stream:
-                    ${poller(nodes)|e}
-                    default:
-                        contentType: application/iip
-                    defaultBinder: internal
-                    ${generateDestinations(destinations)}
-                    ${produceBinders(config)}'
+        YamlNode metricsProvider = n.addObject("metricsprovider");
+        metricsProvider.addValue("schedulerrate", 3000);
+        metricsProvider.addValue("memorybaseunit", "kilobytes");
+        metricsProvider.addValue("diskbaseunit", "megabytes");
+        
+        YamlNode management = n.addObject("management");
+        management.addObjects("health/binders", "/").addValue("enabled", true);
+        management.addObjects("endpoints/web/exposure", "/").addValue("include", "metrics");
+        
+        YamlNode spring = n.addObject("spring");
+        spring.addObject("main").addValue("banner-mode", "off");
+        YamlNode springCloud = spring.addObject("cloud");
+        namedList("definition", functions, springCloud.addObject("function"));
+        namedList("sources", sources, springCloud);
+        YamlNode springCloudStream = springCloud.addObject("stream");
+        poller(nodes, springCloudStream);
+        springCloudStream.addObject("default").addValue("contentType", "application/iip");
+        springCloudStream.addValue("defaultBinder", "internal");
+        generateDestinations(destinations, springCloudStream);
+        produceBinders(config, springCloudStream);
     }
 
 }
