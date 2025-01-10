@@ -64,7 +64,7 @@ public class StorageServerSetup {
     /**
      * Get the authentication key pointing to the identity store.
      *
-     * @return the authentication key
+     * @return the authentication key, may be <b>null</b> or empty for none
      */
     public String getAuthenticationKey() {
         return authenticationKey;

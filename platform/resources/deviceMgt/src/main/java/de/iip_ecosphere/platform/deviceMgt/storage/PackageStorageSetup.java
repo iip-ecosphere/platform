@@ -92,7 +92,7 @@ public class PackageStorageSetup {
     /**
      * Get the authentication key pointing to the identity store.
      *
-     * @return the authentication key
+     * @return the authentication key, may be empty or <b>null</b> for none
      */
     public String getAuthenticationKey() {
         return authenticationKey;
