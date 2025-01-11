@@ -87,7 +87,7 @@ template SpringCloudStreamDeploymentDescriptorBase(Configuration config, FileArt
         generateCmdArgsEndpoint(rels);
         generateRelations(elt, rels);
         if (service.memLimit > 0) {
-            n.addValue("memory", "service.memLimit");
+            n.addValue("memory", service.memLimit);
         }
         generateProcess(elt, service, n);
         generateEnsemble(elt, service, familyId, n);
