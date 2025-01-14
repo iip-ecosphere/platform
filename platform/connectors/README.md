@@ -9,4 +9,5 @@ Platform/Machine connectors component including
   * Platform connector for [serial connections](connectors.serial/README.md).
   * Platform connector for [MODBUS/TCP](connectors.modbustcpipv1/README.md).
   * Platform connector for [INFLUX](connectors.influx/README.md).
+  * Platform connector for [REST](connectors.rest/README.md).
   * The proprietary [ADS connector](connectors.ads/README.md) for Beckhoff TwinCat ADS.
