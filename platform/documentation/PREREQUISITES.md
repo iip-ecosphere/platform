@@ -20,6 +20,7 @@ Helpful:
 - PyDev 12.1.0-12.2.0 Plugin for Eclipse
 - Findbugs 3.0.1 Plugin for Eclipse
 - xText 2.35.0-2.36.0
+- create a global checkstyle configuration named "IIP Code Conventions" and set `/platformDependencies/iipCodeConventions.xml' as project relative configuration in Eclipse (`Window|Properties|Checkstyle`).
 - EASy-Producer 3.10.0 Plugin for Eclipse from [SSE EASy-producer nightly update site](https://projects.sse.uni-hildesheim.de/eclipse/update-sites/easy_nightly/).
     - May require `-Xms512m` and `-Xmx5120m` in `eclipse.ini` 
     - Do not include the xtext builder. Although we took measures, it may run out of memory and crash Eclipse.
