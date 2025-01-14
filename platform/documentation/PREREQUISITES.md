@@ -29,8 +29,12 @@ Helpful:
 
 ## Git LFS
 
-* Please note that several Python models exceed the permitted file size of github, thus, [GIT Large File Support](https://git-lfs.com/) is required. We manage ``*.pickle``, ``*.h5``, ``*.tflite`` with LFS. 
+Please note that several Python models exceed the permitted file size of github, thus, [GIT Large File Support](https://git-lfs.com/) is required. We manage ``*.pickle``, ``*.h5``, ``*.tflite`` with LFS. 
 
   * On the local repository, ``git lfs install`` must be executed. 
   * For pushing (after a git commit/push), an additional command is needed, e.g. ``git lfs push origin main --all``. If it hangs, restart the command. 
   * Receiving files requires ``git lfs pull``.
+
+## Git Authentication
+
+Git does not allow for username/password commits anymore. Please create an auth token and use that as password.
