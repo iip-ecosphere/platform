@@ -23,7 +23,7 @@ Helpful:
 - create a global checkstyle configuration named "IIP Code Conventions" and set `/platformDependencies/iipCodeConventions.xml' as project relative configuration in Eclipse (`Window|Properties|Checkstyle`).
 - EASy-Producer 3.10.0 Plugin for Eclipse from [SSE EASy-producer nightly update site](https://projects.sse.uni-hildesheim.de/eclipse/update-sites/easy_nightly/).
     - May require `-Xms512m` and `-Xmx5120m` in `eclipse.ini` 
-    - Do not include the xtext builder. Although we took measures, it may run out of memory and crash Eclipse.
+    - Do not use the XTextBuilder "org.eclipse.xtext.ui.shared.xtextBuilder" rather than "de.uni_hildesheim.sse.EASy-Producer.Builder". On or models, the XtextBuilder may crash or hang Eclipse. The EASy-Builder just focuses on markers, however, sometimes problem markers are not correctly updated/removed while warning markers do work.
     - Depending on your workspace use, it might be required to adjust the file associations so that EASy-Producer editors are default for `*.ivml`, `*.vil`, `*.vtl` and `*.text`.
     - Please keep EASy-Producer updated on relevant changes so that model and EASy-Producer fit together.
 

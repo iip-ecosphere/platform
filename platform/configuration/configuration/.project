@@ -6,7 +6,7 @@
 	</projects>
 	<buildSpec>
 		<buildCommand>
-			<name>org.eclipse.xtext.ui.shared.xtextBuilder</name>
+			<name>de.uni_hildesheim.sse.EASy-Producer.Builder</name>
 			<arguments>
 			</arguments>
 		</buildCommand>
