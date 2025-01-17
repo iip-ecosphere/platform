@@ -259,6 +259,19 @@
             <updatePolicy>never</updatePolicy> <!-- local installs -->
         </snapshots>
     </repository>
+
+    <repository>
+        <id>redhat</id> <!-- springsource "moved"" from bintray to redhat-->
+        <url>https://maven.repository.redhat.com/ga/</url>
+        <releases>
+            <enabled>true</enabled>
+            <updatePolicy>never</updatePolicy>
+        </releases>
+        <snapshots>
+            <enabled>false</enabled>
+            <updatePolicy>never</updatePolicy> <!-- local installs -->
+        </snapshots>
+    </repository>
     
   </repositories>
   
