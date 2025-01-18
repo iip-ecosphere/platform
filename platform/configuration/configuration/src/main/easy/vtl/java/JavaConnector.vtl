@@ -60,6 +60,11 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
     def String getMachineOutputTypeName(ModbusTcpV1Connector conn) {
         "de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusItem"; // taken from code
     }
+    
+    @DispatchCase
+    def String getMachineOutputTypeName(RestConnector conn) {
+        "de.iip_ecosphere.platform.connectors.rest.RESTItem"; // taken from code
+    }    
 
     @DispatchCase
     def String getMachineOutputTypeName(AdsConnector conn) {
@@ -89,6 +94,11 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
 
     @DispatchCase
     def String getMachineInputTypeName(ModbusTcpV1Connector conn) {
+        "Object"; // generic, to be overridden
+    }
+
+    @DispatchCase
+    def String getMachineInputTypeName(RestConnector conn) {
         "Object"; // generic, to be overridden
     }
 
@@ -946,6 +956,12 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         .setSpecificSetting("UNITID", ${conn.unitId})
         .setSpecificSetting("TIMEOUT", ${conn.timeout})
         .setSpecificSetting("BIGBYTE", ${conn.bigByteOrder})'
+    }
+
+    @DispatchCase
+    def generateSpecificSettings(RestConnector conn) {
+        String connectorName = toIdentifier(conn.name);
+        '.setSpecificSettingFromResourceSafe("SERVER_STRUCTURE", "${connectorName}.server")'
     }
     
     @DispatchBasis

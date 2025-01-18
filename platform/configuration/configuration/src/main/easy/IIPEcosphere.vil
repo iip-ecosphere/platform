@@ -2023,6 +2023,23 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         String connectorName = toIdentifier(conn.name);
         vilTemplateProcessor("ConnectorResource", config, "${resourcesSrc}/${connectorName}.server", conn=conn);
     }
+
+    @DispatchCase
+    generateServiceResources(MeshElement no, RestConnector conn, Path appRoot, setOf(DependencyArtifact) bins, setOf(AssemblyInfo) assemblies, setOf(ResourceInfo) resources, setOf(String) artifacts, Boolean noDeps) = {
+        artifacts.add(getArtifact(conn)); // connectors are (currently) platform-supplied
+        Path javaSrc = "${appRoot}/src/main/java";
+        Path javaNodesSrc = "${javaSrc}/${toPath(javaNodesPackage)}";
+        String typeName = asTypeName(conn.name);
+        vilTemplateProcessor("JavaConnectorRestImpl", config, "${javaNodesSrc}/${typeName}Impl.java", conn=conn, pkg=javaNodesPackage);
+        typeName = toTypeName(conn.inInterface);
+        vilTemplateProcessor("JavaConnectorRestType", config, "${javaNodesSrc}/${typeName}RestType.java", type=conn.inInterface, pkg=javaNodesPackage);
+        typeName = toTypeName(conn.outInterface);
+        vilTemplateProcessor("JavaConnectorRestType", config, "${javaNodesSrc}/${typeName}RestType.java", type=conn.inInterface, pkg=javaNodesPackage);
+        
+        Path resourcesSrc = "${appRoot}/src/main/resources";
+        String connectorName = toIdentifier(conn.name);
+        vilTemplateProcessor("ConnectorResource", config, "${resourcesSrc}/${connectorName}.server", conn=conn);
+    }
     
     @DispatchCase
     generateServiceResources(MeshElement no, JavaService service, Path appRoot, setOf(DependencyArtifact) bins, setOf(AssemblyInfo) assemblies, setOf(ResourceInfo) resources, setOf(String) artifacts, Boolean noDeps) = {

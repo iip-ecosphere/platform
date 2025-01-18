@@ -1,0 +1,28 @@
+import Basics;
+import JavaBasics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+@format(profile="java", profileArg_javadocIndent="* ", lineLength = 120, profileArg_eltSorting="CONS")
+template JavaConnectorRestType(Configuration config, JavaCodeArtifact target, RecordType type, String pkg) {
+    
+    def main(Configuration config, JavaCodeArtifact target, RecordType type, String pkg) {
+        IIPEcosphere cfg = config;
+    
+        String typeName = asTypeName(type.name);
+        String clsName = typeName + "RestType";
+
+        JavaCodeClass mainCls = codeCreateClass(target, pkg, clsName, 'Rest type for the application data type ${typeName}');
+        mainCls.addImport("java.math.*"); // preliminary, BigInt
+        mainCls.addExtends("de.iip_ecosphere.platform.connectors.rest.RESTServerResponse");
+
+        for (Field f: type.fields) {
+            JavaCodeAttribute attr = mainCls.addAttribute(getTypeName(f), asMethodFieldIdentifier(f.name));
+            mainCls.addGetter(attr);
+            mainCls.addSetter(attr, "value");
+        }
+
+        mainCls.addConstructor("Default constructor. Fields are pre-allocated with default Java values.");
+    }
+    
+}

@@ -22,51 +22,66 @@ template ConnectorResource(Configuration config, FileArtifact target, Connector 
        {"DateTime", "datetime"}
     };
 
-    @DispatchBasis
     def genContents(Connector conn, JsonFileArtifact json) {
+        collectIOTypes(conn.input, conn, json);
+        collectIOTypes(conn.output, conn, json);
+        collectIOType(conn.inInterface, conn, json);
+        collectIOType(conn.outInterface, conn, json);
     }
     
-    @DispatchBasis
-    def genContents(ModbusTcpV1Connector conn, JsonFileArtifact json) {
-        collectIOTypes(conn.input, json);
-        collectIOTypes(conn.output, json);
-        collectIOType(conn.inInterface, json);
-        collectIOType(conn.outInterface, json);
-    }
-    
-    def collectIOTypes(sequenceOf(IOType) types, JsonFileArtifact json) {
+    def collectIOTypes(sequenceOf(IOType) types, Connector conn, JsonFileArtifact json) {
         for (IOType t: types) {
-            collectIOType(t, json);
+            collectIOType(t, conn, json);
         }
     }
     
-    def collectIOType(IOType t, JsonFileArtifact json) {
-        collectFields(t.type, json);
+    def collectIOType(IOType t, Connector conn, JsonFileArtifact json) {
+        collectFields(t.type, conn, json);
     }
 
     @DispatchBasis
-    def collectFields(DataType t, JsonFileArtifact json) {
+    def collectFields(DataType t, Connector conn, JsonFileArtifact json) {
     }
 
     @DispatchCase
-    def collectFields(RecordType t, JsonFileArtifact json) {
+    def collectFields(RecordType t, Connector conn, JsonFileArtifact json) {
        for (Field f: t.fields) {
-           collectField(f, json);
+           collectField(f, conn, json);
        }
     }
     
     @DispatchBasis
-    def collectField(Field field, JsonFileArtifact json) {
+    def collectField(Field field, Connector conn, JsonFileArtifact json) {
     }
 
     @DispatchCase
-    def collectField(ModbusField field, JsonFileArtifact json) {
+    def collectField(ModbusField field, Connector conn, JsonFileArtifact json) {
         String type = getDirectTypeName(field.type);
         type = modbusTypes.get(type, type);
         if (type <> "") {
-           JsonNode n = json.getData();
-           n.addObject("${field.name}")
+            JsonNode n = json.getData();
+            n.addObject("${field.name}")
                .addValue("offset", field.offset)
+               .addValue("type", type);
+        }
+    }
+
+    @DispatchCase
+    def collectField(RestField field, RestConnector conn, JsonFileArtifact json) {
+        String type = getDirectTypeName(field.type);
+        type = modbusTypes.get(type, type);
+        if (type <> "") {
+            String endpoint = field.endpoint;
+            if (endpoint.length() == 0) {
+                endpoint = field.name;
+            }
+            String endpointPrefix = conn.endpointPrefix;
+            if (endpointPrefix <> "") {
+                endpoint = endpointPrefix + endpoint;
+            }
+            JsonNode n = json.getData();
+            n.addObject("${field.name}")
+               .addValue("endpoint", endpoint)
                .addValue("type", type);
         }
     }

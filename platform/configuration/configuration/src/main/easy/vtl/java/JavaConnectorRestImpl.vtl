@@ -1,0 +1,33 @@
+import Basics;
+import JavaBasics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+@format(profile="java", profileArg_javadocIndent="* ", lineLength = 120, profileArg_eltSorting="CONS")
+template JavaConnectorRestImpl(Configuration config, JavaCodeArtifact target, RestConnector conn, String pkg) {
+    
+    def main(Configuration config, JavaCodeArtifact target, RestConnector conn, String pkg) {
+        IIPEcosphere cfg = config;
+    
+        String typeName = asTypeName(conn.name);
+        String clsName = typeName + "Impl";
+
+        JavaCodeClass mainCls = codeCreateClass(target, pkg, clsName, 'Rest connector implementation for ${typeName}');
+        mainCls.addExtends("de.iip_ecosphere.platform.connectors.rest.RESTConnector<CO, CI>");
+        mainCls.addGeneric("CO", "the output type of the connector");
+        mainCls.addGeneric("CI", "the input type of the connector");
+
+        JavaCodeMethod m = mainCls.addConstructor("Connector constructor.");
+        m.addParameter("de.iip_ecosphere.platform.connectors.types.ProtocolAdapter<CO, CI>...", "adapter", "the protocol adapter");
+        m.addSuperCall().addArgument("adapter");
+        
+        m = mainCls.addMethod("Class<?>", "getInputClass");
+        m.addOverrideAnnotation();
+        m.addReturn(toTypeName(conn.inInterface) + "RestType.class");
+
+        m = mainCls.addMethod("Class<?>", "getValueClass");
+        m.addOverrideAnnotation();
+        m.addReturn(toTypeName(conn.inInterface) + "RestType.class");
+    }
+    
+}

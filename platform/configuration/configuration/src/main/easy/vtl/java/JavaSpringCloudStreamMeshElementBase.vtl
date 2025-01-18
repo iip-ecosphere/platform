@@ -519,13 +519,24 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
         '()->service.getInPath("${getPath(conn.inInterface)}"), ()->service.getOutPath("${getPath(conn.outInterface)}")'
     }
     
+    @DispatchBasis
+    def String getConnectorCls(Connector conn) {
+        conn.class;
+    }
+
+    @DispatchCase
+    def String getConnectorCls(RestConnector conn) {
+        String typeName = asTypeName(conn.name);
+        typeName + "Impl";
+    }
+    
     def initialService(MeshElement elt, Connector conn, setOf(String) serviceVars) {
         String connGen = getConnectorGenerics(conn, true);
         String clsName = getClsName(elt);
         serviceVars.add("service");
         'ConnectorParameter param = createConnectorParameter();
         Connector${connGen} conn = ConnectorFactory.createConnector(
-            "${conn.class}", () -> param, 
+            "${getConnectorCls(conn)}", () -> param, 
             createConnectorAdapter(${genCreateConnectorAdapterSuppliers(conn)}));
         conn.enablePolling(false); // independent of notifications, disable as @Autowired may not be
         ${getYamlServiceFragment("serviceData", clsName, conn.id)}; 
