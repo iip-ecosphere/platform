@@ -50,12 +50,12 @@ public class TestServer {
      */
     private void createEndpointDescriptionSingle() {
         endpointDescriptionSingle = "{";
-        endpointDescriptionSingle += "\"String\" : {\"type\" : \"String\", \"endpoint\" : \"string\"},";
-        endpointDescriptionSingle += "\"Short\" : {\"type\" : \"Short\", \"endpoint\" : \"short\"},";
-        endpointDescriptionSingle += "\"Integer\" : {\"type\" : \"Integer\", \"endpoint\" : \"integer\"},";
-        endpointDescriptionSingle += "\"Long\" : {\"type\" : \"Long\", \"endpoint\" : \"long\"},";
-        endpointDescriptionSingle += "\"Float\" : {\"type\" : \"Float\", \"endpoint\" : \"float\"},";
-        endpointDescriptionSingle += "\"Double\" : {\"type\" : \"Double\", \"endpoint\" : \"double\"}";
+        endpointDescriptionSingle += "\"String\" : {\"endpoint\" : \"string\"},";
+        endpointDescriptionSingle += "\"Short\" : {\"endpoint\" : \"short\"},";
+        endpointDescriptionSingle += "\"Integer\" : {\"endpoint\" : \"integer\"},";
+        endpointDescriptionSingle += "\"Long\" : {\"endpoint\" : \"long\"},";
+        endpointDescriptionSingle += "\"Float\" : {\"endpoint\" : \"float\"},";
+        endpointDescriptionSingle += "\"Double\" : {\"endpoint\" : \"double\"}";
         endpointDescriptionSingle += "}";
     }
 
@@ -64,7 +64,7 @@ public class TestServer {
      */
     private void createEndpointDescriptionSet() {
         endpointDescriptionSet = "{";
-        endpointDescriptionSet += "\"All\" : {\"type\" : \"ValueSet\", \"endpoint\" : \"all\"}";
+        endpointDescriptionSet += "\"All\" : {\"endpoint\" : \"all\"}";
         endpointDescriptionSet += "}";
     }
 
@@ -73,12 +73,12 @@ public class TestServer {
      */
     private void createEndpointDescriptionSingleWP() {
         endpointDescriptionSingleWP = "{";
-        endpointDescriptionSingleWP += "\"String\" : {\"type\" : \"String\", \"endpoint\" : \"?path=string\"},";
-        endpointDescriptionSingleWP += "\"Short\" : {\"type\" : \"Short\", \"endpoint\" : \"?path=short\"},";
-        endpointDescriptionSingleWP += "\"Integer\" : {\"type\" : \"Integer\", \"endpoint\" : \"?path=integer\"},";
-        endpointDescriptionSingleWP += "\"Long\" : {\"type\" : \"Long\", \"endpoint\" : \"?path=long\"},";
-        endpointDescriptionSingleWP += "\"Float\" : {\"type\" : \"Float\", \"endpoint\" : \"?path=float\"},";
-        endpointDescriptionSingleWP += "\"Double\" : {\"type\" : \"Double\", \"endpoint\" : \"?path=double\"}";
+        endpointDescriptionSingleWP += "\"String\" : {\"endpoint\" : \"?path=string\"},";
+        endpointDescriptionSingleWP += "\"Short\" : {\"endpoint\" : \"?path=short\"},";
+        endpointDescriptionSingleWP += "\"Integer\" : {\"endpoint\" : \"?path=integer\"},";
+        endpointDescriptionSingleWP += "\"Long\" : {\"endpoint\" : \"?path=long\"},";
+        endpointDescriptionSingleWP += "\"Float\" : {\"endpoint\" : \"?path=float\"},";
+        endpointDescriptionSingleWP += "\"Double\" : {\"endpoint\" : \"?path=double\"}";
         endpointDescriptionSingleWP += "}";
     }
 
@@ -87,7 +87,7 @@ public class TestServer {
      */
     private void createEndpointDescriptionSetWP() {
         endpointDescriptionSetWP = "{";
-        endpointDescriptionSetWP += "\"AllWP\" : {\"type\" : \"ValueSet\", \"endpoint\" : "
+        endpointDescriptionSetWP += "\"AllWP\" : {\"endpoint\" : "
                 + "\"?paths=string,short,integer,long,float,double\"}";
         endpointDescriptionSetWP += "}";
     }

@@ -83,15 +83,16 @@ public class RESTConnectorTest {
 
         ActiveAasBase.setNotificationMode(NotificationMode.NONE);
 
-        RESTConnector<RESTMeasurement, RESTCommand> connector = new SpecificRESTConnectorSingle(getProtocolAdapter());
+        RESTConnector<MachineOutputSingle, MachineInput> connector = new SpecificRESTConnectorSingle(
+                getProtocolAdapterSingle());
 
         try {
-            connector.connect(getConnectorParameter(RequestType.Single));
-            AtomicReference<RESTMeasurement> restReference = new AtomicReference<RESTMeasurement>();
-            connector.setReceptionCallback(createCallback(restReference));
+            connector.connect(getConnectorParameter("single"));
+            AtomicReference<MachineOutputSingle> restReference = new AtomicReference<MachineOutputSingle>();
+            connector.setReceptionCallback(createCallbackSingle(restReference));
 
             ConnectorTest.assertInstance(connector, true);
-            RESTMeasurement rest = restReference.get();
+            MachineOutputSingle rest = restReference.get();
 
             while (rest == null) {
                 TimeUtils.sleep(10);
@@ -99,12 +100,16 @@ public class RESTConnectorTest {
             }
 
             Assert.assertNotNull(rest);
-            Assert.assertEquals("Hello World", rest.getStringValue());
-            Assert.assertEquals((short) 1, rest.getShortValue());
-            Assert.assertEquals((int) 1000, rest.getIntValue());
-            Assert.assertEquals((long) 1000000, rest.getLongValue());
-            Assert.assertTrue((float) Math.PI == rest.getFloatValue());
-            Assert.assertTrue((double) Math.PI == rest.getDoubleValue());
+            Assert.assertEquals("Hello World!", rest.getStringValue().getValue());
+            Assert.assertEquals(1, rest.getShortValue().getValue());
+            Assert.assertEquals(100, rest.getIntegerValue().getValue());
+            Assert.assertEquals(10000, rest.getLongValue().getValue());
+
+            float diffFloat = ((float) Math.PI) - ((Number) rest.getFloatValue().getValue()).floatValue();
+            Assert.assertTrue(diffFloat < 0.001);
+
+            double diffDouble = ((double) Math.PI) - ((double) rest.getDoubleValue().getValue());
+            Assert.assertTrue(diffDouble < 0.001);
 
             System.out.println("");
             LOGGER.info("testRequestTypeSingle() -> success" + "\n");
@@ -124,16 +129,17 @@ public class RESTConnectorTest {
 
         ActiveAasBase.setNotificationMode(NotificationMode.NONE);
 
-        RESTConnector<RESTMeasurement, RESTCommand> connector = new SpecificRESTConnectorSingle(getProtocolAdapter());
+        RESTConnector<MachineOutputSingle, MachineInput> connector = new SpecificRESTConnectorSingle(
+                getProtocolAdapterSingle());
 
         try {
-            connector.connect(getConnectorParameter(RequestType.SingleWP));
-            AtomicReference<RESTMeasurement> restReference = new AtomicReference<RESTMeasurement>();
-            connector.setReceptionCallback(createCallback(restReference));
+            connector.connect(getConnectorParameter("singleWP"));
+            AtomicReference<MachineOutputSingle> restReference = new AtomicReference<MachineOutputSingle>();
+            connector.setReceptionCallback(createCallbackSingle(restReference));
 
             ConnectorTest.assertInstance(connector, true);
 
-            RESTMeasurement rest = restReference.get();
+            MachineOutputSingle rest = restReference.get();
 
             while (rest == null) {
                 TimeUtils.sleep(10);
@@ -141,12 +147,16 @@ public class RESTConnectorTest {
             }
 
             Assert.assertNotNull(rest);
-            Assert.assertEquals("Hello World", rest.getStringValue());
-            Assert.assertEquals((short) 1, rest.getShortValue());
-            Assert.assertEquals((int) 1000, rest.getIntValue());
-            Assert.assertEquals((long) 1000000, rest.getLongValue());
-            Assert.assertTrue((float) Math.PI == rest.getFloatValue());
-            Assert.assertTrue((double) Math.PI == rest.getDoubleValue());
+            Assert.assertEquals("Hello World!", rest.getStringValue().getValue());
+            Assert.assertEquals(1, rest.getShortValue().getValue());
+            Assert.assertEquals(100, rest.getIntegerValue().getValue());
+            Assert.assertEquals(10000, rest.getLongValue().getValue());
+
+            float diffFloat = ((float) Math.PI) - ((Number) rest.getFloatValue().getValue()).floatValue();
+            Assert.assertTrue(diffFloat < 0.001);
+
+            double diffDouble = ((double) Math.PI) - ((double) rest.getDoubleValue().getValue());
+            Assert.assertTrue(diffDouble < 0.001);
 
             System.out.println("");
             LOGGER.info("testRequestTypeSingleWP() -> success" + "\n");
@@ -166,16 +176,16 @@ public class RESTConnectorTest {
 
         ActiveAasBase.setNotificationMode(NotificationMode.NONE);
 
-        RESTConnector<RESTMeasurement, RESTCommand> connector = new SpecificRESTConnectorSet(getProtocolAdapter());
+        RESTConnector<MachineOutputSet, MachineInput> connector = new SpecificRESTConnectorSet(getProtocolAdapterSet());
 
         try {
-            connector.connect(getConnectorParameter(RequestType.Set));
-            AtomicReference<RESTMeasurement> restReference = new AtomicReference<RESTMeasurement>();
-            connector.setReceptionCallback(createCallback(restReference));
+            connector.connect(getConnectorParameter("set"));
+            AtomicReference<MachineOutputSet> restReference = new AtomicReference<MachineOutputSet>();
+            connector.setReceptionCallback(createCallbackSet(restReference));
 
             ConnectorTest.assertInstance(connector, true);
 
-            RESTMeasurement rest = restReference.get();
+            MachineOutputSet rest = restReference.get();
 
             while (rest == null) {
                 TimeUtils.sleep(10);
@@ -183,12 +193,16 @@ public class RESTConnectorTest {
             }
 
             Assert.assertNotNull(rest);
-            Assert.assertEquals("Hello World", rest.getStringValue());
-            Assert.assertEquals((short) 1, rest.getShortValue());
-            Assert.assertEquals((int) 1000, rest.getIntValue());
-            Assert.assertEquals((long) 1000000, rest.getLongValue());
-            Assert.assertTrue((float) Math.PI == rest.getFloatValue());
-            Assert.assertTrue((double) Math.PI == rest.getDoubleValue());
+            Assert.assertEquals("Hello World!", rest.getStringValue().getValue());
+            Assert.assertEquals(1, rest.getShortValue().getValue());
+            Assert.assertEquals(100, rest.getIntegerValue().getValue());
+            Assert.assertEquals(10000, rest.getLongValue().getValue());
+
+            float diffFloat = ((float) Math.PI) - ((Number) rest.getFloatValue().getValue()).floatValue();
+            Assert.assertTrue(diffFloat < 0.001);
+
+            double diffDouble = ((double) Math.PI) - ((double) rest.getDoubleValue().getValue());
+            Assert.assertTrue(diffDouble < 0.001);
 
             System.out.println("");
             LOGGER.info("testRequestTypeSet() -> success" + "\n");
@@ -208,16 +222,16 @@ public class RESTConnectorTest {
 
         ActiveAasBase.setNotificationMode(NotificationMode.NONE);
 
-        RESTConnector<RESTMeasurement, RESTCommand> connector = new SpecificRESTConnectorSet(getProtocolAdapter());
+        RESTConnector<MachineOutputSet, MachineInput> connector = new SpecificRESTConnectorSet(getProtocolAdapterSet());
 
         try {
-            connector.connect(getConnectorParameter(RequestType.SetWP));
-            AtomicReference<RESTMeasurement> restReference = new AtomicReference<RESTMeasurement>();
-            connector.setReceptionCallback(createCallback(restReference));
+            connector.connect(getConnectorParameter("setWP"));
+            AtomicReference<MachineOutputSet> restReference = new AtomicReference<MachineOutputSet>();
+            connector.setReceptionCallback(createCallbackSet(restReference));
 
             ConnectorTest.assertInstance(connector, true);
 
-            RESTMeasurement rest = restReference.get();
+            MachineOutputSet rest = restReference.get();
 
             while (rest == null) {
                 TimeUtils.sleep(10);
@@ -225,12 +239,16 @@ public class RESTConnectorTest {
             }
 
             Assert.assertNotNull(rest);
-            Assert.assertEquals("Hello World", rest.getStringValue());
-            Assert.assertEquals((short) 1, rest.getShortValue());
-            Assert.assertEquals((int) 1000, rest.getIntValue());
-            Assert.assertEquals((long) 1000000, rest.getLongValue());
-            Assert.assertTrue((float) Math.PI == rest.getFloatValue());
-            Assert.assertTrue((double) Math.PI == rest.getDoubleValue());
+            Assert.assertEquals("Hello World!", rest.getStringValue().getValue());
+            Assert.assertEquals(1, rest.getShortValue().getValue());
+            Assert.assertEquals(100, rest.getIntegerValue().getValue());
+            Assert.assertEquals(10000, rest.getLongValue().getValue());
+
+            float diffFloat = ((float) Math.PI) - ((Number) rest.getFloatValue().getValue()).floatValue();
+            Assert.assertTrue(diffFloat < 0.001);
+
+            double diffDouble = ((double) Math.PI) - ((double) rest.getDoubleValue().getValue());
+            Assert.assertTrue(diffDouble < 0.001);
 
             System.out.println("");
             LOGGER.info("testRequestTypeSetWP() -> success" + "\n");
@@ -247,36 +265,75 @@ public class RESTConnectorTest {
      * 
      * @return ProtocolAdapter for testing
      */
-    private ProtocolAdapter<RESTItem, Object, RESTMeasurement, RESTCommand> getProtocolAdapter() {
+    private ProtocolAdapter<RESTItem, Object, MachineOutputSingle, MachineInput> getProtocolAdapterSingle() {
 
-        ProtocolAdapter<RESTItem, Object, RESTMeasurement, RESTCommand> adapter = 
-                new TranslatingProtocolAdapter<RESTItem, Object, RESTMeasurement, RESTCommand>(
-                new RESTMeasurementOutputTranslator<RESTItem>(false, RESTItem.class),
-                new RESTCommandInputTranslator<Object>(Object.class));
+        ProtocolAdapter<RESTItem, Object, MachineOutputSingle, MachineInput> adapter = 
+                new TranslatingProtocolAdapter<RESTItem, Object, MachineOutputSingle, MachineInput>(
+                new MachineOutputTranslatorSingle<RESTItem>(false, RESTItem.class),
+                new MachineInputTranslator<Object>());
 
         return adapter;
     }
 
     /**
-     * Creates and returns a ReceptionCallback<RESTMeasurement> for the Connector.
+     * Creates and returns a ProtocolAdapter for testing.
      * 
-     * @param restRef AtomicReference<RESTMeasurement> to set received data
-     * @return ReceptionCallback<RESTMeasurement> callback
+     * @return ProtocolAdapter for testing
      */
-    private ReceptionCallback<RESTMeasurement> createCallback(AtomicReference<RESTMeasurement> restRef) {
+    private ProtocolAdapter<RESTItem, Object, MachineOutputSet, MachineInput> getProtocolAdapterSet() {
 
-        ReceptionCallback<RESTMeasurement> callback = new ReceptionCallback<RESTMeasurement>() {
-            // connector.setReceptionCallback(new ReceptionCallback<RESTMeasurement>() {
+        ProtocolAdapter<RESTItem, Object, MachineOutputSet, MachineInput> adapter = 
+                new TranslatingProtocolAdapter<RESTItem, Object, MachineOutputSet, MachineInput>(
+                new MachineOutputTranslatorSet<RESTItem>(false, RESTItem.class), new MachineInputTranslator<Object>());
+
+        return adapter;
+    }
+
+    /**
+     * Creates and returns a ReceptionCallbac<MachineOutputSingle> for the
+     * Connector.
+     * 
+     * @param restRef AtomicReference<MachineOutputSingle> to set received data
+     * @return ReceptionCallback<MachineOutputSingle> callback
+     */
+    private ReceptionCallback<MachineOutputSingle> createCallbackSingle(AtomicReference<MachineOutputSingle> restRef) {
+
+        ReceptionCallback<MachineOutputSingle> callback = new ReceptionCallback<MachineOutputSingle>() {
 
             @Override
-            public void received(RESTMeasurement data) {
+            public void received(MachineOutputSingle data) {
                 restRef.set(data);
                 // count.incrementAndGet();
             }
 
             @Override
-            public Class<RESTMeasurement> getType() {
-                return RESTMeasurement.class;
+            public Class<MachineOutputSingle> getType() {
+                return MachineOutputSingle.class;
+            }
+        };
+
+        return callback;
+    }
+
+    /**
+     * Creates and returns a ReceptionCallbac<MachineOutputSet> for the Connector.
+     * 
+     * @param restRef AtomicReference<MachineOutputSet> to set received data
+     * @return ReceptionCallback<MachineOutputSet> callback
+     */
+    private ReceptionCallback<MachineOutputSet> createCallbackSet(AtomicReference<MachineOutputSet> restRef) {
+
+        ReceptionCallback<MachineOutputSet> callback = new ReceptionCallback<MachineOutputSet>() {
+
+            @Override
+            public void received(MachineOutputSet data) {
+                restRef.set(data);
+                // count.incrementAndGet();
+            }
+
+            @Override
+            public Class<MachineOutputSet> getType() {
+                return MachineOutputSet.class;
             }
         };
 
@@ -299,21 +356,21 @@ public class RESTConnectorTest {
      * 
      * @return the connector parameters
      */
-    protected ConnectorParameter getConnectorParameter(RequestType type) {
+    protected ConnectorParameter getConnectorParameter(String type) {
 
         Endpoint endpoint = null;
         String endpoints = null;
 
-        if (type == RequestType.Single) {
+        if (type.equals("single")) {
             endpoint = new Endpoint(Schema.HTTP, "localhost", 8080, "TestServer/api/endpoints/");
             endpoints = testServer.getEndpointDescriptionSingle();
-        } else if (type == RequestType.SingleWP) {
+        } else if (type.equals("singleWP")) {
             endpoint = new Endpoint(Schema.HTTP, "localhost", 8080, "TestServer/api/endpoints/single");
             endpoints = testServer.getEndpointDescriptionSingleWP();
-        } else if (type == RequestType.Set) {
+        } else if (type.equals("set")) {
             endpoint = new Endpoint(Schema.HTTP, "localhost", 8080, "TestServer/api/endpoints/");
             endpoints = testServer.getEndpointDescriptionSet();
-        } else if (type == RequestType.SetWP) {
+        } else if (type.equals("setWP")) {
             endpoint = new Endpoint(Schema.HTTP, "localhost", 8080, "TestServer/api/endpoints/set");
             endpoints = testServer.getEndpointDescriptionSetWP();
         }
@@ -321,9 +378,7 @@ public class RESTConnectorTest {
         ConnectorParameterBuilder testParameter = ConnectorParameterBuilder.newBuilder(endpoint);
         testParameter.setApplicationInformation("App_Id", "App_Description");
         testParameter.setEndpointPath(endpoint.toUri());
-
         testParameter.setSpecificSetting("Endpoints", endpoints);
-        testParameter.setSpecificSetting("RequestType", type);
 
         return testParameter.build();
     }

@@ -1,126 +1,124 @@
 package test.de.iip_ecosphere.platform.connectors.rest;
 
-public class RESTMeasurement {
-
-    private String stringValue;
-    private short shortValue;
-    private int intValue;
-    private long longValue;
-    private float floatValue;
-    private double doubleValue;
+public class MachineOutputSingle {
     
-    /**
-     * Constructor.
-     */
-    public RESTMeasurement() {
-        
-    }
-
+    private TestServerResponsSingle stringValue;
+    private TestServerResponsSingle shortValue;
+    private TestServerResponsSingle integerValue;
+    private TestServerResponsSingle longValue;
+    private TestServerResponsSingle floatValue;
+    private TestServerResponsSingle doubleValue;
+    
     /**
      * Getter for stringValue.
      * 
      * @return stringValue
      */
-    public String getStringValue() {
+    public TestServerResponsSingle getStringValue() {
         return stringValue;
     }
-
+    
     /**
      * Setter for stringValue.
      * 
      * @param stringValue to set
      */
-    public void setStringValue(String stringValue) {
+    public void setStringValue(TestServerResponsSingle stringValue) {
         this.stringValue = stringValue;
     }
-
+    
     /**
      * Getter for shortValue.
      * 
      * @return shortValue
      */
-    public short getShortValue() {
+    public TestServerResponsSingle getShortValue() {
         return shortValue;
     }
-
+    
     /**
      * Setter for shortValue.
      * 
      * @param shortValue to set
      */
-    public void setShortValue(short shortValue) {
+    public void setShortValue(TestServerResponsSingle shortValue) {
         this.shortValue = shortValue;
     }
-
+    
     /**
-     * Getter for intValue.
+     * Getter for integerValue.
      * 
-     * @return intValue
+     * @return integerValue
      */
-    public int getIntValue() {
-        return intValue;
+    public TestServerResponsSingle getIntegerValue() {
+        return integerValue;
     }
-
+    
     /**
-     * Setter for intValue.
+     * Setter for integerValue.
      * 
-     * @param intValue to set
+     * @param integerValue to set
      */
-    public void setIntValue(int intValue) {
-        this.intValue = intValue;
+    public void setIntegerValue(TestServerResponsSingle integerValue) {
+        this.integerValue = integerValue;
     }
-
+    
     /**
      * Getter for longValue.
      * 
      * @return longValue
      */
-    public long getLongValue() {
+    public TestServerResponsSingle getLongValue() {
         return longValue;
     }
-
+    
     /**
      * Setter for longValue.
      * 
      * @param longValue to set
      */
-    public void setLongValue(long longValue) {
+    public void setLongValue(TestServerResponsSingle longValue) {
         this.longValue = longValue;
     }
-
+    
     /**
      * Getter for floatValue.
      * 
      * @return floatValue
      */
-    public float getFloatValue() {
+    public TestServerResponsSingle getFloatValue() {
         return floatValue;
     }
-
+    
     /**
      * Setter for floatValue.
      * 
      * @param floatValue to set
      */
-    public void setFloatValue(float floatValue) {
+    public void setFloatValue(TestServerResponsSingle floatValue) {
         this.floatValue = floatValue;
     }
-
+    
     /**
      * Getter for doubleValue.
      * 
      * @return doubleValue
      */
-    public double getDoubleValue() {
+    public TestServerResponsSingle getDoubleValue() {
         return doubleValue;
     }
-
+    
     /**
      * Setter for doubleValue.
      * 
      * @param doubleValue to set
      */
-    public void setDoubleValue(double doubleValue) {
+    public void setDoubleValue(TestServerResponsSingle doubleValue) {
         this.doubleValue = doubleValue;
     }
+    
+
+    
+
+
 }

@@ -1,8 +1,9 @@
 package de.iip_ecosphere.platform.connectors.rest;
 
 import java.io.IOException;
-import java.util.ArrayList;
+
 import java.util.Collections;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -44,10 +45,8 @@ public abstract class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, 
 
     private MappingJackson2HttpMessageConverter jsonConverter;
 
-    private RESTMap map = null;
     private RESTItem item = null;
     private ConnectorParameter params;
-
 
     /**
      * The descriptor of this connector (see META-INF/services).
@@ -73,6 +72,7 @@ public abstract class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, 
      */
     @SafeVarargs
     public RESTConnector(ProtocolAdapter<RESTItem, Object, CO, CI>... adapter) {
+
         this(null, adapter);
     }
 
@@ -91,9 +91,9 @@ public abstract class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, 
 
         ObjectMapper mapper = new ObjectMapper();
         SimpleModule module = new SimpleModule();
-        
-        RESTServerResponseDeserializer<?, ?> responseDeserializer = 
-                new RESTServerResponseDeserializer<>(getResponseClass(), getValueClass());
+
+        RESTServerResponseDeserializer<?, ?> responseDeserializer = new RESTServerResponseDeserializer<>(
+                getResponseClass(), getItemClass());
         module.addDeserializer(getResponseClass(), responseDeserializer);
 
         mapper.registerModule(module);
@@ -122,29 +122,30 @@ public abstract class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, 
     private void specificSettings() {
 
         Set<String> keys = params.getSpecificSettingKeys();
+        RESTEndpointMap map = null;
 
         for (String key : keys) {
 
             if (key.equals("Endpoints")) {
+
                 Object endpoints = params.getSpecificSetting(key);
-                map = JsonUtils.fromJson(endpoints, RESTMap.class);
+                map = JsonUtils.fromJson(endpoints, RESTEndpointMap.class);
+
             }
 
         }
 
         if (map == null) {
-            LOGGER.info(
-                    "RESTConnector:specificSettings(): No Endpoints found -> RESTMap and RESTItem cannot be created");
+            LOGGER.info("RESTConnector:specificSettings(): No Endpoints found -> RESTItem cannot be created");
         } else {
             item = new RESTItem(map);
-            LOGGER.info("RESTConnector:specificSettings(): RESTMap and RESTItem created -> " + map);
+            LOGGER.info("RESTConnector:specificSettings(): RESTItem created -> " + item);
         }
     }
 
     @Override
     protected void disconnectImpl() throws IOException {
         this.params = null;
-        this.map = null;
         this.item = null;
         LOGGER.info("RESTConnector:disconnectImpl()" + "\n" + "\n");
     }
@@ -157,80 +158,32 @@ public abstract class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, 
 
     @Override
     protected RESTItem read() throws IOException {
+        String path = params.getEndpointPath();
 
-        if (RESTServerResponseSingle.class.isAssignableFrom(getResponseClass())) {
-            readServerResponseSingle();
-        } else if (RESTServerResponseSet.class.isAssignableFrom(getResponseClass())) {
-            readServerResponseSet();
-        } else {
-            LOGGER.info("RESTConnector.read(): targetClass is not assignable");
+        RESTEndpointMap endpointMap = item.getEndpointMap();
+
+        for (Entry<String, RESTEndpoint> entry : endpointMap.entrySet()) {
+
+            String key = entry.getKey().toLowerCase();
+            String endpoint = entry.getValue().getEndpoint();
+            String uri = path + endpoint;
+
+            RestTemplate restTemplate = new RestTemplate(Collections.singletonList(jsonConverter));
+            ResponseEntity<?> responseEntity = restTemplate.exchange(uri, HttpMethod.GET, null, getResponseClass());
+
+            RESTServerResponse result = (RESTServerResponse) responseEntity.getBody();
+
+            if (result != null) {
+
+                item.setValue(key, result);
+                LOGGER.info("RESTConnector.read(): " + uri + " -> " + result);
+
+            } else {
+                LOGGER.info("RESTConnector.read(): Failed to read " + key + " from " + uri);
+            }
         }
 
         return item;
-    }
-
-    /**
-     * Read ServerResponseSingle.
-     */
-    private void readServerResponseSingle() {
-
-        String path = params.getEndpointPath();
-
-        for (RESTMap.Entry<String, RESTVarItem> entry : map.entrySet()) {
-
-            String endpoint = entry.getValue().getEndpoint();
-            String uri = path + endpoint;
-
-            RestTemplate restTemplate = new RestTemplate(Collections.singletonList(jsonConverter));
-
-            String key = entry.getKey();
-
-            ResponseEntity<?> responseEntity = restTemplate.exchange(uri, HttpMethod.GET, null, getResponseClass());
-
-            RESTServerResponseSingle result = (RESTServerResponseSingle) responseEntity.getBody();
-            RESTServerResponseValue value = result.getValue();
-
-            if (value != null) {
-                item.setValue(key, value.getValue());
-                LOGGER.info("RESTConnector.read(): " + uri + " -> " + value.getValue());
-            } else {
-                LOGGER.info("RESTConnector.read(): Failed to read " + key + " from " + uri);
-            }
-        }
-    }
-
-    /**
-     * Read ServerResponseSet.
-     */
-    private void readServerResponseSet() {
-
-        String path = params.getEndpointPath();
-
-        for (RESTMap.Entry<String, RESTVarItem> entry : map.entrySet()) {
-
-            String endpoint = entry.getValue().getEndpoint();
-            String uri = path + endpoint;
-
-            RestTemplate restTemplate = new RestTemplate(Collections.singletonList(jsonConverter));
-
-            String key = entry.getKey();
-
-            ResponseEntity<?> responseEntity = restTemplate.exchange(uri, HttpMethod.GET, null, getResponseClass());
-
-            RESTServerResponseSet result = (RESTServerResponseSet) responseEntity.getBody();
-            ArrayList<RESTServerResponseValue> values = result.getValues();
-
-            if (values != null) {
-
-                for (RESTServerResponseValue value : values) {
-                    item.setValue(value.getName(), value.getValue());
-                    LOGGER.info("RESTConnector.read(): " + uri + " -> " + value);
-                }
-
-            } else {
-                LOGGER.info("RESTConnector.read(): Failed to read " + key + " from " + uri);
-            }
-        }
     }
 
     @Override
@@ -238,22 +191,24 @@ public abstract class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, 
         // TODO Auto-generated method stub
 
     }
-    
+
     /**
-     * Returns the specific ResponseClass derived from RESTServerResponseSingle or RESTServerResponseSet.
+     * Returns the specific ResponseClass derived from RESTServerResponseSingle or
+     * RESTServerResponseSet.
      * 
      * @param <T1> the specific ResponseClass
      * @return the specific ResponseClass
      */
     protected abstract <T1 extends RESTServerResponse> Class<T1> getResponseClass();
-    
+
     /**
-     * Returns the specific ValueClass derived from RESTServerResponseValue.
+     * Returns the specific inner Item Class of RESTServerResponse. If
+     * RESTServerResponse don't have a inner Item Class null is returned.
      * 
-     * @param <T2> the specific ValueClass
-     * @return the specific ValueClass
+     * @param <T2> the specific inner ItemClass
+     * @return the specific inner ItemClass or null
      */
-    protected abstract <T2 extends RESTServerResponseValue> Class<T2> getValueClass();
+    protected abstract <T2> Class<T2> getItemClass();
 
     /**
      * Implements the model access for REST.
@@ -302,6 +257,11 @@ public abstract class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, 
          */
         public RESTOutputConverter getOutputConverter() {
             return outputConverter;
+        }
+
+        @Override
+        public ConnectorParameter getConnectorParameter() {
+            return params;
         }
 
         @Override
@@ -361,10 +321,6 @@ public abstract class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, 
             return null;
         }
 
-        @Override
-        public ConnectorParameter getConnectorParameter() {
-            return params;
-        }
     }
 
     @Override

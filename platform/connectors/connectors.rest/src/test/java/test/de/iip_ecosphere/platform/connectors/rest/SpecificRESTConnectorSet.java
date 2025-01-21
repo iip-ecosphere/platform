@@ -3,10 +3,9 @@ package test.de.iip_ecosphere.platform.connectors.rest;
 import de.iip_ecosphere.platform.connectors.rest.RESTConnector;
 import de.iip_ecosphere.platform.connectors.rest.RESTItem;
 import de.iip_ecosphere.platform.connectors.rest.RESTServerResponse;
-import de.iip_ecosphere.platform.connectors.rest.RESTServerResponseValue;
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
 
-public class SpecificRESTConnectorSet extends RESTConnector<RESTMeasurement, RESTCommand> {
+public class SpecificRESTConnectorSet extends RESTConnector<MachineOutputSet, MachineInput> {
 
     /**
      * Constructor.
@@ -14,7 +13,7 @@ public class SpecificRESTConnectorSet extends RESTConnector<RESTMeasurement, RES
      * @param adapter the protocol adapter
      */
     @SafeVarargs
-    public SpecificRESTConnectorSet(ProtocolAdapter<RESTItem, Object, RESTMeasurement, RESTCommand>... adapter) {
+    public SpecificRESTConnectorSet(ProtocolAdapter<RESTItem, Object, MachineOutputSet, MachineInput>... adapter) {
         super(adapter);
     }
     
@@ -22,14 +21,13 @@ public class SpecificRESTConnectorSet extends RESTConnector<RESTMeasurement, RES
     @Override
     protected <T1 extends RESTServerResponse> Class<T1> getResponseClass() {
 
-        return (Class<T1>) SetValue.class;
+        return (Class<T1>) TestServerResponseSet.class;
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    protected <T2 extends RESTServerResponseValue> Class<T2> getValueClass() {
-        
-        return (Class<T2>) ResponseValue.class;
+    protected <T2> Class<T2> getItemClass() {
+        return (Class<T2>) TestServerResponseSetItem.class;
     }
 
 }

@@ -6,17 +6,20 @@ import java.util.HashMap;
 
 public class RESTItem {
     
-    private HashMap <String, Object> values;
+    private RESTEndpointMap endpointMap;
+    private HashMap <String, RESTServerResponse> values;
     
     /**
      * Constructor.
      */
-    public RESTItem(RESTMap map) {
-        values = new HashMap<String, Object>();
+    public RESTItem(RESTEndpointMap endpointMap) {
         
-        for (RESTMap.Entry<String, RESTVarItem> entry : map.entrySet()) {
+        this.endpointMap = endpointMap;
+        values = new HashMap<String, RESTServerResponse>();
+        
+        for (HashMap.Entry<String, RESTEndpoint> entry : endpointMap.entrySet()) {
             
-            values.put(entry.getKey(), 0);
+            values.put(entry.getKey().toLowerCase(), null);
             
         }       
     }
@@ -37,7 +40,16 @@ public class RESTItem {
      * @param key for the value to set
      * @param value to set
      */
-    public void setValue(String key, Object value) {
+    public void setValue(String key, RESTServerResponse value) {
         values.put(key, value);
     }   
+    
+    /**
+     * Getter for endpointMap.
+     * 
+     * @return endpointMap
+     */
+    public RESTEndpointMap getEndpointMap() {
+        return endpointMap;
+    }
 }
