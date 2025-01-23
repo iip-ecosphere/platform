@@ -1,0 +1,35 @@
+project RestPhoenixEEMSingleResponse { 
+
+	import IIPEcosphere;
+
+	annotate BindingTime bindingTime = BindingTime::compile to .;
+		
+	RecordType restPhoenixEEMSingleResponse = {
+		name = "RestPhoenixEEMSingleResponse" ,
+		fileds = {
+			RestField {
+				name = "context",
+				type = refBy(StringType)
+			}, RestField {
+				name = "id",
+				type = refBy(StringType)
+			}, RestField {
+				name = "timestamp",
+				type = refBy(StringType)
+			}, RestField {
+				name = "name",
+				type = refBy(StringType)
+			}, RestField {
+				name = "value",
+				type = refBy(ObjectType) 
+			}, RestField {
+				name = "unit",
+				type = refBy(StringType)
+			}, RestField {
+				name = "description",
+				type = refBy(StringType)
+			}
+		}
+	
+	};
+}

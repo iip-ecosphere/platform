@@ -161,12 +161,6 @@ public class TestServerResponsSingle extends RESTServerResponse {
         this.description = description;
     }
 
-//    @Override
-//    public Object getResponseValue() {
-//        // TODO Auto-generated method stub
-//        return value;
-//    }
-
     @Override
     public void set(String key, Object value) {
 
@@ -189,10 +183,5 @@ public class TestServerResponsSingle extends RESTServerResponse {
         }
         
     }
-
-//    @Override
-//    public Object[] getValues() {
-//        return null;
-//    }
 
 }
