@@ -112,11 +112,13 @@ project Rest {
     };
 	
 	MeshSource mySource = {
-       impl = refBy(myRestConnEEMSingle)
+       impl = refBy(myRestConnEEMSingle),
+       next = {refBy(myConnMySourceMyReceiver)}
     };
 	
 	MeshConnector myConnMySourceMyReceiver = {
-        name = "Source->Receiver"
+        name = "Source->Receiver",
+        next = refBy(myReceiver)
     };
 	
 	MeshSink myReceiver = {
