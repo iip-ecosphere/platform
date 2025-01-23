@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ProductLineProject id="1a837433-ba0e-478a-9663-89757d1993ac" name="Modbus" version="0" location="examples.modbusTcp">
+<ProductLineProject id="2a837433-ba0e-418a-9233-87757d1993ac" name="Rest" version="0" location="examples.rest">
 	<predecessors>
 	</predecessors>
 	<successors>

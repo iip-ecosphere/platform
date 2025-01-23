@@ -83,7 +83,7 @@ project Rest {
         class = "ReceiverImpl",
         artifact = "",
         kind = ServiceKind::SINK_SERVICE,
-        input = {type=refBy(restPhoenixEEMSingle)}
+        input = {{type=refBy(restPhoenixEEMSingle)}}
     };
 	
 	// --------------------- monitoring ----------------------
