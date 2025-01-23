@@ -1,5 +1,6 @@
 import Basics;
 import JavaBasics;
+import JavaType;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
@@ -15,14 +16,37 @@ template JavaConnectorRestType(Configuration config, JavaCodeArtifact target, Re
         JavaCodeClass mainCls = codeCreateClass(target, pkg, clsName, 'Rest type for the application data type ${typeName}');
         mainCls.addImport("java.math.*"); // preliminary, BigInt
         mainCls.addExtends("de.iip_ecosphere.platform.connectors.rest.RESTServerResponse");
+        mainCls.addAnnotation("com.fasterxml.jackson.annotation.JsonIgnoreProperties").addArgument("ignoreUnknown", true);
 
         for (Field f: type.fields) {
             JavaCodeAttribute attr = mainCls.addAttribute(getTypeName(f), asMethodFieldIdentifier(f.name));
+            attr.addAnnotation("com.fasterxml.jackson.annotation.JsonProperty").addStringArgument(f.name);
             mainCls.addGetter(attr);
             mainCls.addSetter(attr, "value");
         }
 
         mainCls.addConstructor("Default constructor. Fields are pre-allocated with default Java values.");
+        JavaCodeMethod m = mainCls.addMethod("set");
+            m.addOverrideAnnotation();
+            m.addParameter("String", "key");
+            m.addParameter("Object", "value");
+            
+            JavaCodeAlternative a;
+            for (Field f: type.fields) {
+                String cond = 'key.equals("${f.name}")';
+                if (a <> null) {
+                    a = a.addElseIf(cond);
+                } else {
+                    a = m.addIf(cond);
+                }
+                genSetAssignment(f, f.type, a);
+            }
+            addLoggerCall(a.addElse(), "error", "Key '{}' not found").addArgument(key);
+    }
+    
+    @DispatchBasis
+    def genSetAssignment(Field f, DataType type, JavaCodeBlock block) {
+        block.addAssignment(asMethodFieldIdentifier(f.name), new JavaCodeCastExpression(considerWrapper(getTypeName(f)), "value"));
     }
     
 }

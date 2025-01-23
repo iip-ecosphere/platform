@@ -501,5 +501,21 @@ template JavaBasics(Configuration config, FileArtifact target) {
             .addCall("addShutdownHook")
                 .addArgument('new Thread(() -> ${func})');
     }
+    
+    def codeCatchLogError(JavaCodeTryBlock try, String exceptionType, String msg) {
+        JavaCodeCatchBlock catch = try.addCatch(exceptionType, "e");
+        addLoggerCall(catch, "error", msg).addArgument("e.getMessage()");
+    }
+    
+    def JavaCodeMethodCall addLoggerCall(JavaCodeBlockInterface block, String call, String msg) {
+        block.addCall("org.slf4j.LoggerFactory.getLogger", JavaCodeImportScope.CLASS)
+            .addArgument("getClass()")
+            .addCall(call)
+                .addStringArgument(msg);
+    }     
+
+    def codeCatchExecutionExceptionLogError(JavaCodeTryBlock try, String msg) {
+        codeCatchLogError(try, "java.util.concurrent.ExecutionException", msg);
+    }
 
 }

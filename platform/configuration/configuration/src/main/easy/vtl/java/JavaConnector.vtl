@@ -112,17 +112,17 @@ template JavaConnector(Configuration config, FileArtifact target) extends DataOp
         "Object"; // taken from code
     }
 
-    def getConnectorGenerics(Connector conn, boolean withMachine) {
-        String type = "<";
+    def getConnectorGenerics(Connector conn, boolean withMachine, String pkg = "", String typeAdd="", String prefix="") {
+        String type = "<" + prefix;
         if (withMachine) {
-            type = type + getMachineOutputTypeName(conn);
+            type = type + pkg + getMachineOutputTypeName(conn) + typeAdd;
             type = type + ", ";
-            type = type + getMachineInputTypeName(conn);
+            type = type + pkg + getMachineInputTypeName(conn) + typeAdd;
             type = type + ", ";
         }
-        type = type + asTypeName(getFirstTypeName(conn.output));
+        type = type + pkg + asTypeName(getFirstTypeName(conn.output)) + typeAdd;
         type = type + ", ";
-        type = type + asTypeName(getFirstTypeName(conn.input));
+        type = type + pkg + asTypeName(getFirstTypeName(conn.input)) + typeAdd;
         type + ">";
     }
 
