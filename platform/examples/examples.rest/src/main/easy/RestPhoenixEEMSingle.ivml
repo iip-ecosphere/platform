@@ -2,7 +2,7 @@ project RestPhoenixEEMSingle {
 
 	import IIPEcosphere;
 
-    	annotate BindingTime bindingTime = BindingTime::compile to .;
+    annotate BindingTime bindingTime = BindingTime::compile to .;
 	
 	RecordType restPhoenixRwEEMSingle = {
 		name = "RestPhoenixRwEEMSingle",
@@ -83,4 +83,11 @@ project RestPhoenixEEMSingle {
 			}		
 		}	
 	};
+	
+    // ------------ freezing ------------------
+
+    freeze {
+        .;
+    } but (f|f.bindingTime >= BindingTime.runtimeMon);
+    	
 }
