@@ -2030,15 +2030,31 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         Path javaSrc = "${appRoot}/src/main/java";
         Path javaNodesSrc = "${javaSrc}/${toPath(javaNodesPackage)}";
         String typeName = asTypeName(conn.name);
-        vilTemplateProcessor("JavaConnectorRestImpl", config, "${javaNodesSrc}/${typeName}Impl.java", conn=conn, pkg=javaNodesPackage);
-        typeName = toTypeName(conn.inInterface);
-        vilTemplateProcessor("JavaConnectorRestType", config, "${javaNodesSrc}/${typeName}RestType.java", type=conn.inInterface.type, pkg=javaNodesPackage);
-        typeName = toTypeName(conn.outInterface);
-        vilTemplateProcessor("JavaConnectorRestType", config, "${javaNodesSrc}/${typeName}RestType.java", type=conn.outInterface.type, pkg=javaNodesPackage);
-        
+        setOf(RecordType) types = {};
+        setOf(RecordType) outTypes = {};
+        collectRestTypes(conn.inInterface.type, types);
+        collectRestTypes(conn.outInterface.type, outTypes);
+        types = types.including(outTypes);
+        vilTemplateProcessor("JavaConnectorRestImpl", config, "${javaNodesSrc}/${typeName}Impl.java", conn=conn, pkg=javaNodesPackage, usedRestTypes=types);
+        for (RecordType t: types) {
+            typeName = toTypeName(t);
+            vilTemplateProcessor("JavaConnectorRestType", config, "${javaNodesSrc}/${typeName}RestType.java", type=t, pkg=javaNodesPackage, output=outTypes.includes(t));
+        }
         Path resourcesSrc = "${appRoot}/src/main/resources";
         String connectorName = toIdentifier(conn.name);
         vilTemplateProcessor("ConnectorResource", config, "${resourcesSrc}/${connectorName}.server", conn=conn);
+    }
+    
+    @DispatchBasis
+    collectRestTypes(DataType type, setOf(RecordType) result) = {
+    }
+
+    @DispatchCase
+    collectRestTypes(RecordType type, setOf(RecordType) result) = {
+        result.add(type);
+        for (Field f : type.fields) {
+            collectRestTypes(f.type, result);
+        }
     }
     
     @DispatchCase

@@ -5,9 +5,9 @@ import JavaConnector;
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
 @format(profile="java", profileArg_javadocIndent="* ", lineLength = 120, profileArg_eltSorting="CONS")
-template JavaConnectorRestImpl(Configuration config, JavaCodeArtifact target, RestConnector conn, String pkg) {
+template JavaConnectorRestImpl(Configuration config, JavaCodeArtifact target, RestConnector conn, String pkg, setOf(DataType) usedRestTypes) {
     
-    def main(Configuration config, JavaCodeArtifact target, RestConnector conn, String pkg) {
+    def main(Configuration config, JavaCodeArtifact target, RestConnector conn, String pkg, setOf(DataType) usedRestTypes) {
         IIPEcosphere cfg = config;
     
         String typeName = asTypeName(conn.name);
@@ -21,14 +21,16 @@ template JavaConnectorRestImpl(Configuration config, JavaCodeArtifact target, Re
         generics = getConnectorGenerics(conn, false, pkg=pkg + ".", typeAdd="RestType", prefix="de.iip_ecosphere.platform.connectors.rest.RESTItem, Object, ");
         m.addParameter("de.iip_ecosphere.platform.connectors.types.ProtocolAdapter${generics}...", "adapter", "the protocol adapter");
         m.addSuperCall().addArgument("adapter");
-        
-        m = mainCls.addMethod("Class<?>", "getResponseClass");
-        m.addOverrideAnnotation();
-        m.addReturn(toTypeName(conn.inInterface) + "RestType.class");
 
-        m = mainCls.addMethod("Class<?>", "getItemClass");
+        String rCls = "";
+        for (DataType t : usedRestTypes->sortedBy(x|x.name)) {
+            rCls = appendWithSeparator(rCls, ", ", "iip.nodes." + asTypeName(t.name) + "RestType.class");
+        }
+        mainCls.addImport("de.iip_ecosphere.platform.connectors.rest.RESTServerResponse");
+        m = mainCls.addMethod("Class<? extends RESTServerResponse>[]", "getResponseClass");
         m.addOverrideAnnotation();
-        m.addReturn(toTypeName(conn.inInterface) + "RestType.class");
+        m.addAnnotation("SuppressWarnings").addStringArgument("unchecked");
+        m.addReturn("new Class[]{${rCls}}");
     }
     
 }
