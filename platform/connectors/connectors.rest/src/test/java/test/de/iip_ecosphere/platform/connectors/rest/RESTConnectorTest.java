@@ -1,6 +1,7 @@
 package test.de.iip_ecosphere.platform.connectors.rest;
 
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.AfterClass;
@@ -89,7 +90,8 @@ public class RESTConnectorTest {
         try {
             connector.connect(getConnectorParameter("single"));
             AtomicReference<MachineOutputSingle> restReference = new AtomicReference<MachineOutputSingle>();
-            connector.setReceptionCallback(createCallbackSingle(restReference));
+            AtomicInteger count = new AtomicInteger(0);
+            connector.setReceptionCallback(createCallbackSingle(restReference, count));
 
             ConnectorTest.assertInstance(connector, true);
             MachineOutputSingle rest = restReference.get();
@@ -110,6 +112,21 @@ public class RESTConnectorTest {
 
             double diffDouble = ((double) Math.PI) - ((double) rest.getDoubleValue().getValue());
             Assert.assertTrue(diffDouble < 0.001);
+
+            MachineInput input = new MachineInput();
+            input.setStringValue("New String Value");
+            connector.write(input);
+
+            int currentCount = count.get();
+            int targetCount = currentCount + 1;
+
+            while (currentCount < targetCount) {
+                TimeUtils.sleep(10);
+                rest = restReference.get();
+                currentCount = count.get();
+            }
+
+            Assert.assertEquals("New String Value", rest.getStringValue().getValue());
 
             System.out.println("");
             LOGGER.info("testRequestTypeSingle() -> success" + "\n");
@@ -135,7 +152,8 @@ public class RESTConnectorTest {
         try {
             connector.connect(getConnectorParameter("singleWP"));
             AtomicReference<MachineOutputSingle> restReference = new AtomicReference<MachineOutputSingle>();
-            connector.setReceptionCallback(createCallbackSingle(restReference));
+            AtomicInteger count = new AtomicInteger(0);
+            connector.setReceptionCallback(createCallbackSingle(restReference, count));
 
             ConnectorTest.assertInstance(connector, true);
 
@@ -147,7 +165,7 @@ public class RESTConnectorTest {
             }
 
             Assert.assertNotNull(rest);
-            Assert.assertEquals("Hello World!", rest.getStringValue().getValue());
+            Assert.assertEquals("New String Value", rest.getStringValue().getValue());
             Assert.assertEquals(1, rest.getShortValue().getValue());
             Assert.assertEquals(100, rest.getIntegerValue().getValue());
             Assert.assertEquals(10000, rest.getLongValue().getValue());
@@ -157,6 +175,21 @@ public class RESTConnectorTest {
 
             double diffDouble = ((double) Math.PI) - ((double) rest.getDoubleValue().getValue());
             Assert.assertTrue(diffDouble < 0.001);
+            
+            MachineInput input = new MachineInput();
+            input.setStringValue("Hello World!");
+            connector.write(input);
+
+            int currentCount = count.get();
+            int targetCount = currentCount + 1;
+
+            while (currentCount < targetCount) {
+                TimeUtils.sleep(5);
+                rest = restReference.get();
+                currentCount = count.get();
+            }
+
+            Assert.assertEquals("Hello World!", rest.getStringValue().getValue());
 
             System.out.println("");
             LOGGER.info("testRequestTypeSingleWP() -> success" + "\n");
@@ -181,7 +214,8 @@ public class RESTConnectorTest {
         try {
             connector.connect(getConnectorParameter("set"));
             AtomicReference<MachineOutputSet> restReference = new AtomicReference<MachineOutputSet>();
-            connector.setReceptionCallback(createCallbackSet(restReference));
+            AtomicInteger count = new AtomicInteger(0);
+            connector.setReceptionCallback(createCallbackSet(restReference, count));
 
             ConnectorTest.assertInstance(connector, true);
 
@@ -203,6 +237,21 @@ public class RESTConnectorTest {
 
             double diffDouble = ((double) Math.PI) - ((double) rest.getDoubleValue().getValue());
             Assert.assertTrue(diffDouble < 0.001);
+            
+            MachineInput input = new MachineInput();
+            input.setStringValue("New String Value");
+            connector.write(input);
+
+            int currentCount = count.get();
+            int targetCount = currentCount + 1;
+
+            while (currentCount < targetCount) {
+                TimeUtils.sleep(5);
+                rest = restReference.get();
+                currentCount = count.get();
+            }
+
+            Assert.assertEquals("New String Value", rest.getStringValue().getValue());
 
             System.out.println("");
             LOGGER.info("testRequestTypeSet() -> success" + "\n");
@@ -227,7 +276,8 @@ public class RESTConnectorTest {
         try {
             connector.connect(getConnectorParameter("setWP"));
             AtomicReference<MachineOutputSet> restReference = new AtomicReference<MachineOutputSet>();
-            connector.setReceptionCallback(createCallbackSet(restReference));
+            AtomicInteger count = new AtomicInteger(0);
+            connector.setReceptionCallback(createCallbackSet(restReference, count));
 
             ConnectorTest.assertInstance(connector, true);
 
@@ -239,7 +289,7 @@ public class RESTConnectorTest {
             }
 
             Assert.assertNotNull(rest);
-            Assert.assertEquals("Hello World!", rest.getStringValue().getValue());
+            Assert.assertEquals("New String Value", rest.getStringValue().getValue());
             Assert.assertEquals(1, rest.getShortValue().getValue());
             Assert.assertEquals(100, rest.getIntegerValue().getValue());
             Assert.assertEquals(10000, rest.getLongValue().getValue());
@@ -249,6 +299,21 @@ public class RESTConnectorTest {
 
             double diffDouble = ((double) Math.PI) - ((double) rest.getDoubleValue().getValue());
             Assert.assertTrue(diffDouble < 0.001);
+            
+            MachineInput input = new MachineInput();
+            input.setStringValue("Hello World!");
+            connector.write(input);
+
+            int currentCount = count.get();
+            int targetCount = currentCount + 1;
+
+            while (currentCount < targetCount) {
+                TimeUtils.sleep(5);
+                rest = restReference.get();
+                currentCount = count.get();
+            }
+
+            Assert.assertEquals("Hello World!", rest.getStringValue().getValue());
 
             System.out.println("");
             LOGGER.info("testRequestTypeSetWP() -> success" + "\n");
@@ -296,14 +361,15 @@ public class RESTConnectorTest {
      * @param restRef AtomicReference<MachineOutputSingle> to set received data
      * @return ReceptionCallback<MachineOutputSingle> callback
      */
-    private ReceptionCallback<MachineOutputSingle> createCallbackSingle(AtomicReference<MachineOutputSingle> restRef) {
+    private ReceptionCallback<MachineOutputSingle> createCallbackSingle(AtomicReference<MachineOutputSingle> restRef,
+            AtomicInteger count) {
 
         ReceptionCallback<MachineOutputSingle> callback = new ReceptionCallback<MachineOutputSingle>() {
 
             @Override
             public void received(MachineOutputSingle data) {
                 restRef.set(data);
-                // count.incrementAndGet();
+                count.incrementAndGet();
             }
 
             @Override
@@ -321,14 +387,15 @@ public class RESTConnectorTest {
      * @param restRef AtomicReference<MachineOutputSet> to set received data
      * @return ReceptionCallback<MachineOutputSet> callback
      */
-    private ReceptionCallback<MachineOutputSet> createCallbackSet(AtomicReference<MachineOutputSet> restRef) {
+    private ReceptionCallback<MachineOutputSet> createCallbackSet(AtomicReference<MachineOutputSet> restRef,  
+            AtomicInteger count) {
 
         ReceptionCallback<MachineOutputSet> callback = new ReceptionCallback<MachineOutputSet>() {
 
             @Override
             public void received(MachineOutputSet data) {
                 restRef.set(data);
-                // count.incrementAndGet();
+                count.incrementAndGet();
             }
 
             @Override
@@ -358,20 +425,16 @@ public class RESTConnectorTest {
      */
     protected ConnectorParameter getConnectorParameter(String type) {
 
-        Endpoint endpoint = null;
+        Endpoint endpoint = new Endpoint(Schema.HTTP, "localhost", 8080, "TestServer/api/endpoints/");
         String endpoints = null;
 
         if (type.equals("single")) {
-            endpoint = new Endpoint(Schema.HTTP, "localhost", 8080, "TestServer/api/endpoints/");
             endpoints = testServer.getEndpointDescriptionSingle();
         } else if (type.equals("singleWP")) {
-            endpoint = new Endpoint(Schema.HTTP, "localhost", 8080, "TestServer/api/endpoints/single");
             endpoints = testServer.getEndpointDescriptionSingleWP();
         } else if (type.equals("set")) {
-            endpoint = new Endpoint(Schema.HTTP, "localhost", 8080, "TestServer/api/endpoints/");
             endpoints = testServer.getEndpointDescriptionSet();
         } else if (type.equals("setWP")) {
-            endpoint = new Endpoint(Schema.HTTP, "localhost", 8080, "TestServer/api/endpoints/set");
             endpoints = testServer.getEndpointDescriptionSetWP();
         }
 

@@ -8,6 +8,8 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -44,7 +46,6 @@ public abstract class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, 
     private static final Logger LOGGER = LoggerFactory.getLogger(RESTConnector.class);
 
     private MappingJackson2HttpMessageConverter jsonConverter;
-
     private RESTItem item = null;
     private ConnectorParameter params;
 
@@ -92,9 +93,17 @@ public abstract class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, 
         ObjectMapper mapper = new ObjectMapper();
         SimpleModule module = new SimpleModule();
 
-        RESTServerResponseDeserializer<?, ?> responseDeserializer = new RESTServerResponseDeserializer<>(
-                getResponseClass(), getItemClass());
-        module.addDeserializer(getResponseClass(), responseDeserializer);
+        for (Class<? extends RESTServerResponse> responseClass : getResponseClass()) {
+
+            @SuppressWarnings("unchecked")
+            Class<RESTServerResponse> type = (Class<RESTServerResponse>) responseClass;
+
+            RESTServerResponseDeserializer<RESTServerResponse, ?> responseDeserializer = 
+                    new RESTServerResponseDeserializer<>(type);
+
+            module.addDeserializer(type, responseDeserializer);
+
+        }
 
         mapper.registerModule(module);
         jsonConverter = new MappingJackson2HttpMessageConverter();
@@ -111,9 +120,7 @@ public abstract class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, 
     protected void connectImpl(ConnectorParameter params) throws IOException {
 
         this.params = params;
-
         specificSettings();
-
     }
 
     /**
@@ -129,6 +136,7 @@ public abstract class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, 
             if (key.equals("Endpoints")) {
 
                 Object endpoints = params.getSpecificSetting(key);
+                System.out.println(endpoints);
                 map = JsonUtils.fromJson(endpoints, RESTEndpointMap.class);
 
             }
@@ -167,16 +175,25 @@ public abstract class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, 
             String key = entry.getKey().toLowerCase();
             String endpoint = entry.getValue().getEndpoint();
             String uri = path + endpoint;
+            int responseClassIndex = entry.getValue().getResponseTypeIndex();
 
             RestTemplate restTemplate = new RestTemplate(Collections.singletonList(jsonConverter));
-            ResponseEntity<?> responseEntity = restTemplate.exchange(uri, HttpMethod.GET, null, getResponseClass());
+            ResponseEntity<?> responseEntity = restTemplate.exchange(uri, HttpMethod.GET, null, 
+                    getResponseClass()[responseClassIndex]);
+//            if (key.equals("tn")) {
+//                responseEntity = restTemplate.exchange(uri, HttpMethod.GET, null, getResponseClass()[1]);
+//
+//            } else {
+//                responseEntity = restTemplate.exchange(uri, HttpMethod.GET, null, getResponseClass()[0]);
+//
+//            }
 
             RESTServerResponse result = (RESTServerResponse) responseEntity.getBody();
 
             if (result != null) {
 
                 item.setValue(key, result);
-                LOGGER.info("RESTConnector.read(): " + uri + " -> " + result);
+                LOGGER.info("RESTConnector.read(): " + uri + "[ " + responseClassIndex + " ] -> " + result);
 
             } else {
                 LOGGER.info("RESTConnector.read(): Failed to read " + key + " from " + uri);
@@ -188,27 +205,32 @@ public abstract class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, 
 
     @Override
     protected void writeImpl(Object data) throws IOException {
-        // TODO Auto-generated method stub
+
+        if (data != null) {
+
+            String path = params.getEndpointPath();
+            // String endpoint = "setValue";
+            String uri = path + "?value=" + data;
+
+            RestTemplate restTemplate = new RestTemplate();
+
+            String requestBody = "";
+            HttpHeaders headers = new HttpHeaders();
+
+            HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
+            ResponseEntity<String> response = restTemplate.exchange(uri, HttpMethod.PUT, requestEntity, String.class);
+
+            System.out.println("Response: " + response.getBody());
+        }
 
     }
 
     /**
-     * Returns the specific ResponseClass derived from RESTServerResponseSingle or
-     * RESTServerResponseSet.
+     * Returns an Array containig the specific RESTServerResponse classes.
      * 
-     * @param <T1> the specific ResponseClass
-     * @return the specific ResponseClass
+     * @return Array containig the specific RESTServerResponse classes.
      */
-    protected abstract <T1 extends RESTServerResponse> Class<T1> getResponseClass();
-
-    /**
-     * Returns the specific inner Item Class of RESTServerResponse. If
-     * RESTServerResponse don't have a inner Item Class null is returned.
-     * 
-     * @param <T2> the specific inner ItemClass
-     * @return the specific inner ItemClass or null
-     */
-    protected abstract <T2> Class<T2> getItemClass();
+    protected abstract Class<? extends RESTServerResponse>[] getResponseClass();
 
     /**
      * Implements the model access for REST.

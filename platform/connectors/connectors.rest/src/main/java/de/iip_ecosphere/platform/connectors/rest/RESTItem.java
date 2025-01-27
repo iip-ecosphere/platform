@@ -30,7 +30,7 @@ public class RESTItem {
      * @param key to retrive
      * @return Object stored for key
      */
-    public Object getValue(String key) {
+    public RESTServerResponse getValue(String key) {
         return values.get(key);
     }
     

@@ -53,6 +53,7 @@ public class MachineOutputTranslatorSingle<S> extends AbstractConnectorOutputTyp
         result.setI1((TestServerResponsSingle) access.get("i1"));
         result.setI2((TestServerResponsSingle) access.get("i2"));
         result.setI3((TestServerResponsSingle) access.get("i3"));
+        result.setTn((TestServerResponsSingleTN) access.get("tn"));
 
         return result;
     }

@@ -15,16 +15,14 @@ public class RESTServerResponseDeserializer<T1 extends RESTServerResponse, T2>
         extends JsonDeserializer<T1> {
 
     private Class<T1> responseClass;
-    private Class<T2> itemClass;
 
     /**
      * Constructor.
      * 
      * @param targetType for Json deserialization
      */
-    protected RESTServerResponseDeserializer(Class<T1> responseClass, Class<T2> itemClass) {
+    protected RESTServerResponseDeserializer(Class<T1> responseClass) {
         this.responseClass = responseClass;
-        this.itemClass = itemClass;
     }
 
     @SuppressWarnings("unchecked")
@@ -53,7 +51,7 @@ public class RESTServerResponseDeserializer<T1 extends RESTServerResponse, T2>
                     int index = 0;
                     
                     for (JsonNode itemNode : innerNode) {
-                        T2 item = jp.getCodec().treeToValue(itemNode, itemClass);
+                        T2 item = jp.getCodec().treeToValue(itemNode, response.getItemClass());
                         items[index] = item;
                         
                         index++;

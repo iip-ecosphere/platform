@@ -12,6 +12,7 @@ public class MachineOutputSingle {
     private TestServerResponsSingle i1;
     private TestServerResponsSingle i2;
     private TestServerResponsSingle i3;
+    private TestServerResponsSingleTN tn;
     
     /**
      * Getter for f.
@@ -192,5 +193,23 @@ public class MachineOutputSingle {
     public void setI3(TestServerResponsSingle i3) {
         this.i3 = i3;
     }
+
+    /**
+     * Getter for tn.
+     * 
+     * @return tn
+     */
+	public TestServerResponsSingleTN getTn() {
+		return tn;
+	}
+
+	/**
+	 * Setter for tn.
+	 * 
+	 * @param tn to set
+	 */
+	public void setTn(TestServerResponsSingleTN tn) {
+		this.tn = tn;
+	}
 
 }

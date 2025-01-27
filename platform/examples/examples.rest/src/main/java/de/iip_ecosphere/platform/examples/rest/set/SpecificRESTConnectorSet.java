@@ -20,15 +20,11 @@ public class SpecificRESTConnectorSet extends RESTConnector<MachineOutputSet, Ma
     
     @SuppressWarnings("unchecked")
     @Override
-    protected <T1 extends RESTServerResponse> Class<T1> getResponseClass() {
+    protected  Class<? extends RESTServerResponse>[] getResponseClass() {
 
-        return (Class<T1>) TestServerResponseSet.class;
+        return new Class[]{TestServerResponseSet.class};
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    protected <T2> Class<T2> getItemClass() {
-        return (Class<T2>) TestServerResponseSetItem.class;
-    }
+    
 
 }

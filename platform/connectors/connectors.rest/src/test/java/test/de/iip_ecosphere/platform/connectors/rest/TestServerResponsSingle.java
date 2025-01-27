@@ -161,38 +161,10 @@ public class TestServerResponsSingle extends RESTServerResponse {
         this.description = description;
     }
 
-//    @Override
-//    public Object getResponseValue() {
-//        // TODO Auto-generated method stub
-//        return value;
-//    }
-
     @Override
-    public void set(String key, Object value) {
-
-        if (key.equals("context")) {
-            context = (String) value;
-        } else if (key.equals("id")) {
-            id = (String) value; 
-        } else if (key.equals("timestamp")) {
-            timestamp = (String) value;
-        } else if (key.equals("name")) {
-            name = (String) value;
-        } else if (key.equals("value")) {
-            this.value =  value;
-        } else if (key.equals("unit")) {
-            unit = (String) value; 
-        } else if (key.equals("description")) {
-            description = (String) value; 
-        } else {
-            System.out.println("Key not found");
-        }
-        
+    protected <T2> Class<T2> getItemClass() {
+        // No inner Item Class
+        return null;
     }
-
-//    @Override
-//    public Object[] getValues() {
-//        return null;
-//    }
 
 }

@@ -17,10 +17,12 @@ public class MachineInputTranslator<O> extends AbstractConnectorInputTypeTransla
         return MachineInput.class;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public O from(MachineInput data) throws IOException {
-        // TODO Auto-generated method stub
-        return null;
+
+        System.out.println(data);
+        return (O) data.getStringValue();
     }
 
 }

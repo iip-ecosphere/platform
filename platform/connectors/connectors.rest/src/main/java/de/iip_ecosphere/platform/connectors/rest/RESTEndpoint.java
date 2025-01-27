@@ -3,6 +3,7 @@ package de.iip_ecosphere.platform.connectors.rest;
 public class RESTEndpoint {
     
     private String endpoint;
+    private int responseTypeIndex;
 
     /**
      * Getter for endpoint.
@@ -20,6 +21,24 @@ public class RESTEndpoint {
      */
     public void setEndpoint(String endpoint) {
         this.endpoint = endpoint;
+    }
+
+    /**
+     * Getter for responseTypeIndex.
+     * 
+     * @return responseTypeIndex
+     */
+    public int getResponseTypeIndex() {
+        return responseTypeIndex;
+    }
+
+    /**
+     * Setter for responseTypeIndex.
+     * 
+     * @param responseTypeIndex to set
+     */
+    public void setResponseTypeIndex(int responseTypeIndex) {
+        this.responseTypeIndex = responseTypeIndex;
     }
     
     

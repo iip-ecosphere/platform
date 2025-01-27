@@ -3,7 +3,9 @@ package test.de.iip_ecosphere.platform.examples.rest;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -11,10 +13,11 @@ import org.springframework.web.bind.annotation.RestController;
 import de.iip_ecosphere.platform.examples.rest.set.TestServerResponseSet;
 import de.iip_ecosphere.platform.examples.rest.set.TestServerResponseSetItem;
 import de.iip_ecosphere.platform.examples.rest.single.TestServerResponsSingle;
+import de.iip_ecosphere.platform.examples.rest.single.TestServerResponsSingleTN;
 
 @RestController
-@RequestMapping("TestServer/api/endpoints")
-public class TestServerController {
+@RequestMapping("TestServerEEM/api/endpoints")
+public class TestServerControllerEEM {
 
     private Object f = 50.000;
     private Object u1 = 229.845;
@@ -26,6 +29,7 @@ public class TestServerController {
     private Object i1 = 2.533;
     private Object i2 = 2.468;
     private Object i3 = 2.476;
+    private Object tn = 3;
 
     /**
      * Getter f.
@@ -215,6 +219,40 @@ public class TestServerController {
         result.setDescription("Effective value current I3");
 
         return result;
+    }
+    
+    /**
+     * Getter I3.
+     * 
+     * @return I3
+     */
+    @GetMapping("/tn")
+    public TestServerResponsSingleTN getTn() {
+        TestServerResponsSingleTN result = new TestServerResponsSingleTN();
+        result.setContext("/api/v1/measurements/tn");
+        result.setId("tn");
+        result.setTimestamp(getCurrentTimestamp());
+        result.setName("TN");
+        result.setValue(tn);
+        result.setDescription("Tariff Number");
+
+        return result;
+    }
+    
+    /**
+     * Put Endpoint to set a new Value for stringValue. 
+     * 
+     * @param value to set for stringValue
+     * @return ResponseEntity<String> containing 
+     */
+    @PutMapping()
+    public ResponseEntity<String> updateStringValue(@RequestParam("value") int value) {
+        
+        tn = value;
+        
+        ResponseEntity<String> mes = ResponseEntity.ok("StringValue wurde aktualisiert: neuer Wert ist " + tn);
+        System.out.println(mes);
+        return mes; 
     }
 
     /**

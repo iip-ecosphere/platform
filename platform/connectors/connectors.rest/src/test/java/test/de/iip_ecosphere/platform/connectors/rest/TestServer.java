@@ -13,7 +13,7 @@ public class TestServer {
     private ConfigurableApplicationContext context;
 
     private String endpointDescriptionSingle;
-    private String endpointDescriptionSingleWP;
+    private String endDesSingleWP;
     private String endpointDescriptionSet;
     private String endpointDescriptionSetWP;
 
@@ -50,12 +50,12 @@ public class TestServer {
      */
     private void createEndpointDescriptionSingle() {
         endpointDescriptionSingle = "{";
-        endpointDescriptionSingle += "\"String\" : {\"endpoint\" : \"string\"},";
-        endpointDescriptionSingle += "\"Short\" : {\"endpoint\" : \"short\"},";
-        endpointDescriptionSingle += "\"Integer\" : {\"endpoint\" : \"integer\"},";
-        endpointDescriptionSingle += "\"Long\" : {\"endpoint\" : \"long\"},";
-        endpointDescriptionSingle += "\"Float\" : {\"endpoint\" : \"float\"},";
-        endpointDescriptionSingle += "\"Double\" : {\"endpoint\" : \"double\"}";
+        endpointDescriptionSingle += "\"String\" : {\"endpoint\" : \"string\", \"responseTypeIndex\" : \"0\"},";
+        endpointDescriptionSingle += "\"Short\" : {\"endpoint\" : \"short\", \"responseTypeIndex\" : \"0\"},";
+        endpointDescriptionSingle += "\"Integer\" : {\"endpoint\" : \"integer\", \"responseTypeIndex\" : \"0\"},";
+        endpointDescriptionSingle += "\"Long\" : {\"endpoint\" : \"long\", \"responseTypeIndex\" : \"0\"},";
+        endpointDescriptionSingle += "\"Float\" : {\"endpoint\" : \"float\", \"responseTypeIndex\" : \"0\"},";
+        endpointDescriptionSingle += "\"Double\" : {\"endpoint\" : \"double\", \"responseTypeIndex\" : \"0\"}";
         endpointDescriptionSingle += "}";
     }
 
@@ -64,7 +64,7 @@ public class TestServer {
      */
     private void createEndpointDescriptionSet() {
         endpointDescriptionSet = "{";
-        endpointDescriptionSet += "\"All\" : {\"endpoint\" : \"all\"}";
+        endpointDescriptionSet += "\"All\" : {\"endpoint\" : \"all\", \"responseTypeIndex\" : \"0\"}";
         endpointDescriptionSet += "}";
     }
 
@@ -72,14 +72,14 @@ public class TestServer {
      * Creates the endpointDescriptionSingleWP.
      */
     private void createEndpointDescriptionSingleWP() {
-        endpointDescriptionSingleWP = "{";
-        endpointDescriptionSingleWP += "\"String\" : {\"endpoint\" : \"?path=string\"},";
-        endpointDescriptionSingleWP += "\"Short\" : {\"endpoint\" : \"?path=short\"},";
-        endpointDescriptionSingleWP += "\"Integer\" : {\"endpoint\" : \"?path=integer\"},";
-        endpointDescriptionSingleWP += "\"Long\" : {\"endpoint\" : \"?path=long\"},";
-        endpointDescriptionSingleWP += "\"Float\" : {\"endpoint\" : \"?path=float\"},";
-        endpointDescriptionSingleWP += "\"Double\" : {\"endpoint\" : \"?path=double\"}";
-        endpointDescriptionSingleWP += "}";
+        endDesSingleWP = "{";
+        endDesSingleWP += "\"String\" : {\"endpoint\" : \"?path=string\", \"responseTypeIndex\" : \"0\"},";
+        endDesSingleWP += "\"Short\" : {\"endpoint\" : \"?path=short\", \"responseTypeIndex\" : \"0\"},";
+        endDesSingleWP += "\"Integer\" : {\"endpoint\" : \"?path=integer\", \"responseTypeIndex\" : \"0\"},";
+        endDesSingleWP += "\"Long\" : {\"endpoint\" : \"?path=long\", \"responseTypeIndex\" : \"0\"},";
+        endDesSingleWP += "\"Float\" : {\"endpoint\" : \"?path=float\", \"responseTypeIndex\" : \"0\"},";
+        endDesSingleWP += "\"Double\" : {\"endpoint\" : \"?path=double\", \"responseTypeIndex\" : \"0\"}";
+        endDesSingleWP += "}";
     }
 
     /**
@@ -88,7 +88,7 @@ public class TestServer {
     private void createEndpointDescriptionSetWP() {
         endpointDescriptionSetWP = "{";
         endpointDescriptionSetWP += "\"AllWP\" : {\"endpoint\" : "
-                + "\"?paths=string,short,integer,long,float,double\"}";
+                + "\"set?paths=string,short,integer,long,float,double\", \"responseTypeIndex\" : \"0\"}";
         endpointDescriptionSetWP += "}";
     }
 
@@ -107,7 +107,7 @@ public class TestServer {
      * @return endpointDescriptionSingleWP
      */
     public String getEndpointDescriptionSingleWP() {
-        return endpointDescriptionSingleWP;
+        return endDesSingleWP;
     }
 
     /**

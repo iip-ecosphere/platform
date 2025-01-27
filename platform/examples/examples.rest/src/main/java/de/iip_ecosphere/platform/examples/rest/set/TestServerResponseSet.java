@@ -1,7 +1,5 @@
 package de.iip_ecosphere.platform.examples.rest.set;
 
-import java.util.Arrays;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -80,21 +78,9 @@ public class TestServerResponseSet extends RESTServerResponse {
         this.items = items;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public void set(String key, Object value) {
-        
-        if (key.equals("context")) {
-            context = (String) value;
-        } else if (key.equals("timestamp")) {
-            timestamp = (String) value;
-        } else if (key.equals("items")) {
-            Object[] objArray = (Object[]) value;
-            items = Arrays.copyOf(objArray, objArray.length, TestServerResponseSetItem[].class);
-        }
+    protected <T2> Class<T2> getItemClass() {
+        return (Class<T2>) TestServerResponseSetItem.class;
     }
-
-//    @Override
-//    public Object[] getValues() {
-//        return items;
-//    }
 }

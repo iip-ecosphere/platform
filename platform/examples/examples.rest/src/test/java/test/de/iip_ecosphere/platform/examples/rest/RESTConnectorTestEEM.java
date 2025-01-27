@@ -1,7 +1,9 @@
 package test.de.iip_ecosphere.platform.examples.rest;
 
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+
 
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -28,6 +30,7 @@ import de.iip_ecosphere.platform.examples.rest.single.MachineInputTranslatorSing
 import de.iip_ecosphere.platform.examples.rest.single.MachineOutputSingle;
 import de.iip_ecosphere.platform.examples.rest.single.MachineOutputTranslatorSingle;
 import de.iip_ecosphere.platform.examples.rest.single.SpecificRESTConnectorSingle;
+import de.iip_ecosphere.platform.examples.rest.single.TestServerResponsSingleTN;
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.TimeUtils;
@@ -36,15 +39,17 @@ import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 
 
-public class RESTConnectorTest {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RESTConnectorTest.class);
-    private static TestServer testServer;
+
+public class RESTConnectorTestEEM {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(RESTConnectorTestEEM.class);
+    private static TestServerEEM testServer;
 
     /**
      * Creates an instance of this test.
      */
-    public RESTConnectorTest() {
+    public RESTConnectorTestEEM() {
 
     }
 
@@ -53,7 +58,7 @@ public class RESTConnectorTest {
      */
     @BeforeClass
     public static void init() {
-        testServer = new TestServer();
+        testServer = new TestServerEEM();
         testServer.start();
         LOGGER.info("RESTConnectorTest -> REST server started");
 
@@ -98,7 +103,8 @@ public class RESTConnectorTest {
         try {
             connector.connect(getConnectorParameter("single"));
             AtomicReference<MachineOutputSingle> restReference = new AtomicReference<MachineOutputSingle>();
-            connector.setReceptionCallback(createCallbackSingle(restReference));
+            AtomicInteger count = new AtomicInteger(0);
+            connector.setReceptionCallback(createCallbackSingle(restReference, count));
 
             MachineOutputSingle rest = restReference.get();
 
@@ -118,6 +124,32 @@ public class RESTConnectorTest {
             Assert.assertEquals(2.533, rest.getI1().getValue());
             Assert.assertEquals(2.468, rest.getI2().getValue());
             Assert.assertEquals(2.476, rest.getI3().getValue());
+            Assert.assertEquals(3, rest.getTn().getValue());
+            
+            MachineInputSingle input = new MachineInputSingle();
+            
+            TestServerResponsSingleTN tn = new TestServerResponsSingleTN();
+            tn.setContext("/api/v1/measurements/tn");
+            tn.setId("tn");
+            tn.setTimestamp("timestamp");
+            tn.setName("TN");
+            tn.setValue(1);
+            tn.setDescription("Tariff Number");
+            
+            input.setTn(tn);
+            connector.write(input);
+
+            int currentCount = count.get();
+            int targetCount = currentCount + 1;
+
+            while (currentCount < targetCount) {
+                TimeUtils.sleep(10);
+                rest = restReference.get();
+                currentCount = count.get();
+            }
+
+            Assert.assertEquals(1, rest.getTn().getValue());
+
 
             System.out.println("");
             LOGGER.info("testRequestTypeSingle() -> success" + "\n");
@@ -142,7 +174,8 @@ public class RESTConnectorTest {
         try {
             connector.connect(getConnectorParameter("singleWP"));
             AtomicReference<MachineOutputSingle> restReference = new AtomicReference<MachineOutputSingle>();
-            connector.setReceptionCallback(createCallbackSingle(restReference));
+            AtomicInteger count = new AtomicInteger(0);
+            connector.setReceptionCallback(createCallbackSingle(restReference, count));
 
             MachineOutputSingle rest = restReference.get();
 
@@ -287,16 +320,16 @@ public class RESTConnectorTest {
         String endpoints = null;
 
         if (type.equals("single")) {
-            endpoint = new Endpoint(Schema.HTTP, "localhost", 8080, "TestServer/api/endpoints/");
+            endpoint = new Endpoint(Schema.HTTP, "localhost", 8080, "TestServerEEM/api/endpoints/");
             endpoints = testServer.getEndpointDescriptionSingle();
         } else if (type.equals("singleWP")) {
-            endpoint = new Endpoint(Schema.HTTP, "localhost", 8080, "TestServer/api/endpoints/single");
+            endpoint = new Endpoint(Schema.HTTP, "localhost", 8080, "TestServerEEM/api/endpoints/single");
             endpoints = testServer.getEndpointDescriptionSingleWP();
         } else if (type.equals("set")) {
-            endpoint = new Endpoint(Schema.HTTP, "localhost", 8080, "TestServer/api/endpoints/");
+            endpoint = new Endpoint(Schema.HTTP, "localhost", 8080, "TestServerEEM/api/endpoints/");
             endpoints = testServer.getEndpointDescriptionSet();
         } else if (type.equals("setWP")) {
-            endpoint = new Endpoint(Schema.HTTP, "localhost", 8080, "TestServer/api/endpoints/set");
+            endpoint = new Endpoint(Schema.HTTP, "localhost", 8080, "TestServerEEM/api/endpoints/set");
             endpoints = testServer.getEndpointDescriptionSetWP();
         }
 
@@ -347,13 +380,14 @@ public class RESTConnectorTest {
      * @param restRef AtomicReference<MachineOutputSingle> to set received data
      * @return ReceptionCallback<MachineOutputSingle> callback
      */
-    private ReceptionCallback<MachineOutputSingle> createCallbackSingle(AtomicReference<MachineOutputSingle> restRef) {
+    private ReceptionCallback<MachineOutputSingle> createCallbackSingle(AtomicReference<MachineOutputSingle> restRef,  AtomicInteger count) {
 
         ReceptionCallback<MachineOutputSingle> callback = new ReceptionCallback<MachineOutputSingle>() {
 
             @Override
             public void received(MachineOutputSingle data) {
                 restRef.set(data);
+                count.incrementAndGet();
             }
 
             @Override
