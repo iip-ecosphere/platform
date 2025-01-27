@@ -1,0 +1,67 @@
+project RestPhoenixEEMSingleResponses { 
+
+	import IIPEcosphere;
+
+	annotate BindingTime bindingTime = BindingTime::compile to .;
+		
+	RecordType restPhoenixEEMResponseMeasurement = {
+		name = "RestPhoenixEEMResponseMeasurement" ,
+		fields = {
+			RestField {
+				name = "context",
+				type = refBy(StringType)
+			}, RestField {
+				name = "id",
+				type = refBy(StringType)
+			}, RestField {
+				name = "timestamp",
+				type = refBy(StringType)
+			}, RestField {
+				name = "name",
+				type = refBy(StringType)
+			}, RestField {
+				name = "value",
+				type = refBy(ObjectType) 
+			}, RestField {
+				name = "unit",
+				type = refBy(StringType)
+			}, RestField {
+				name = "description",
+				type = refBy(StringType)
+			}
+		}	
+	
+	};
+	
+	RecordType restPhoenixEEMResponseTraiffNumber = {
+		name = "RestPhoenixEEMResponseTraiffNumber" ,
+		fields = {
+			RestField {
+				name = "context",
+				type = refBy(StringType)
+			}, RestField {
+				name = "id",
+				type = refBy(StringType)
+			}, RestField {
+				name = "timestamp",
+				type = refBy(StringType)
+			}, RestField {
+				name = "name",
+				type = refBy(StringType)
+			}, RestField {
+				name = "value",
+				type = refBy(ObjectType) 
+			}, RestField {
+				name = "description",
+				type = refBy(StringType)
+			}
+		}	
+	
+	};
+	
+	// ------------ freezing ------------------
+
+    freeze {
+        .;
+    } but (f|f.bindingTime >= BindingTime.runtimeMon);
+}
