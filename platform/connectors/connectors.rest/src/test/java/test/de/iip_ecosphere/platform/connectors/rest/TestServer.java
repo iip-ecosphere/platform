@@ -50,12 +50,18 @@ public class TestServer {
      */
     private void createEndpointDescriptionSingle() {
         endpointDescriptionSingle = "{";
-        endpointDescriptionSingle += "\"String\" : {\"endpoint\" : \"string\", \"responseTypeIndex\" : \"0\"},";
-        endpointDescriptionSingle += "\"Short\" : {\"endpoint\" : \"short\", \"responseTypeIndex\" : \"0\"},";
-        endpointDescriptionSingle += "\"Integer\" : {\"endpoint\" : \"integer\", \"responseTypeIndex\" : \"0\"},";
-        endpointDescriptionSingle += "\"Long\" : {\"endpoint\" : \"long\", \"responseTypeIndex\" : \"0\"},";
-        endpointDescriptionSingle += "\"Float\" : {\"endpoint\" : \"float\", \"responseTypeIndex\" : \"0\"},";
-        endpointDescriptionSingle += "\"Double\" : {\"endpoint\" : \"double\", \"responseTypeIndex\" : \"0\"}";
+        endpointDescriptionSingle += "\"string\" : {\"name\" : \"string\",\"endpoint\" : \"endpoints/string\", "
+                + "\"responseTypeIndex\" : \"0\"},";
+        endpointDescriptionSingle += "\"short\" : {\"name\" : \"short\",\"endpoint\" : \"endpoints/short\", "
+                + "\"responseTypeIndex\" : \"0\"},";
+        endpointDescriptionSingle += "\"integer\" : {\"name\" : \"integer\",\"endpoint\" : \"endpoints/integer\", "
+                + "\"responseTypeIndex\" : \"0\"},";
+        endpointDescriptionSingle += "\"long\" : {\"name\" : \"long\",\"endpoint\" : \"endpoints/long\", "
+                + "\"responseTypeIndex\" : \"0\"},";
+        endpointDescriptionSingle += "\"float\" : {\"name\" : \"float\",\"endpoint\" : \"endpoints/float\", "
+                + "\"responseTypeIndex\" : \"0\"},";
+        endpointDescriptionSingle += "\"double\" : {\"name\" : \"double\",\"endpoint\" : \"endpoints/double\", "
+                + "\"responseTypeIndex\" : \"0\"}";
         endpointDescriptionSingle += "}";
     }
 
@@ -64,7 +70,7 @@ public class TestServer {
      */
     private void createEndpointDescriptionSet() {
         endpointDescriptionSet = "{";
-        endpointDescriptionSet += "\"All\" : {\"endpoint\" : \"all\", \"responseTypeIndex\" : \"0\"}";
+        endpointDescriptionSet += "\"all\" : {\"endpoint\" : \"endpoints/all\", \"responseTypeIndex\" : \"0\"}";
         endpointDescriptionSet += "}";
     }
 
@@ -73,12 +79,12 @@ public class TestServer {
      */
     private void createEndpointDescriptionSingleWP() {
         endDesSingleWP = "{";
-        endDesSingleWP += "\"String\" : {\"endpoint\" : \"?path=string\", \"responseTypeIndex\" : \"0\"},";
-        endDesSingleWP += "\"Short\" : {\"endpoint\" : \"?path=short\", \"responseTypeIndex\" : \"0\"},";
-        endDesSingleWP += "\"Integer\" : {\"endpoint\" : \"?path=integer\", \"responseTypeIndex\" : \"0\"},";
-        endDesSingleWP += "\"Long\" : {\"endpoint\" : \"?path=long\", \"responseTypeIndex\" : \"0\"},";
-        endDesSingleWP += "\"Float\" : {\"endpoint\" : \"?path=float\", \"responseTypeIndex\" : \"0\"},";
-        endDesSingleWP += "\"Double\" : {\"endpoint\" : \"?path=double\", \"responseTypeIndex\" : \"0\"}";
+        endDesSingleWP += "\"string\" : {\"endpoint\" : \"endpoints?path=string\", \"responseTypeIndex\" : \"0\"},";
+        endDesSingleWP += "\"short\" : {\"endpoint\" : \"endpoints?path=short\", \"responseTypeIndex\" : \"0\"},";
+        endDesSingleWP += "\"integer\" : {\"endpoint\" : \"endpoints?path=integer\", \"responseTypeIndex\" : \"0\"},";
+        endDesSingleWP += "\"long\" : {\"endpoint\" : \"endpoints?path=long\", \"responseTypeIndex\" : \"0\"},";
+        endDesSingleWP += "\"float\" : {\"endpoint\" : \"endpoints?path=float\", \"responseTypeIndex\" : \"0\"},";
+        endDesSingleWP += "\"double\" : {\"endpoint\" : \"endpoints?path=double\", \"responseTypeIndex\" : \"0\"}";
         endDesSingleWP += "}";
     }
 
@@ -88,7 +94,7 @@ public class TestServer {
     private void createEndpointDescriptionSetWP() {
         endpointDescriptionSetWP = "{";
         endpointDescriptionSetWP += "\"AllWP\" : {\"endpoint\" : "
-                + "\"set?paths=string,short,integer,long,float,double\", \"responseTypeIndex\" : \"0\"}";
+                + "\"endpoints/set?paths=string,short,integer,long,float,double\", \"responseTypeIndex\" : \"0\"}";
         endpointDescriptionSetWP += "}";
     }
 

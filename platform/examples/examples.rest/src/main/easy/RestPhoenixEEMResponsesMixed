@@ -1,0 +1,161 @@
+project RestPhoenixEEMResponsesMixed { 
+
+	import IIPEcosphere;
+	
+	annotate BindingTime bindingTime = BindingTime::compile to .;
+	
+	RecordType restPhoenixEEMResponseTraiffNumber = {
+		name = "RestPhoenixEEMResponseTraiffNumber" ,
+		fields = {
+			RestField {
+				name = "context",
+				type = refBy(StringType)
+			}, RestField {
+				name = "id",
+				type = refBy(StringType)
+			}, RestField {
+				name = "timestamp",
+				type = refBy(StringType)
+			}, RestField {
+				name = "name",
+				type = refBy(StringType)
+			}, RestField {
+				name = "value",
+				type = refBy(ObjectType) 
+			}, RestField {
+				name = "description",
+				type = refBy(StringType)
+			}
+		}
+	};
+	
+	RecordType restPhoenixEEMResponseMeasurementSingle = {
+		name = "RestPhoenixEEMResponseMeasurementSingle" ,
+		fields = {
+			RestField {
+				name = "context",
+				type = refBy(StringType)
+			}, RestField {
+				name = "id",
+				type = refBy(StringType)
+			}, RestField {
+				name = "timestamp",
+				type = refBy(StringType)
+			}, RestField {
+				name = "name",
+				type = refBy(StringType)
+			}, RestField {
+				name = "value",
+				type = refBy(ObjectType) 
+			}, RestField {
+				name = "unit",
+				type = refBy(StringType)
+			}, RestField {
+				name = "description",
+				type = refBy(StringType)
+			}
+		}
+	};
+	
+	RecordType restPhoenixEEMResponseMeasurementSetItem = {
+		name = "RestPhoenixEEMResponseMeasurementSetItem" ,
+		fields = {
+			RestField {
+				name = "href",
+				type = refBy(StringType)
+			}, RestField {
+				name = "id",
+				type = refBy(StringType)
+			},  RestField {
+				name = "name",
+				type = refBy(StringType)
+			}, RestField {
+				name = "value",
+				type = refBy(ObjectType) 
+			}, RestField {
+				name = "unit",
+				type = refBy(StringType)
+			}, RestField {
+				name = "description",
+				type = refBy(StringType)
+			}
+		}
+	};
+	
+	RecordType restPhoenixEEMResponseMeasurementSet = {
+		name = "RestPhoenixEEMResponseMeasurementSet" ,
+		fields = {
+			RestField {
+				name = "context",
+				type = refBy(StringType)
+			}, RestField {
+				name = "timestamp",
+				type = refBy(StringType)
+			} /*, RestField {
+				name = "items",
+				type = refBy(ArrayType(refBy(restPhoenixEEMResponseMeasurementSetItem)))
+			}*/
+		}
+	};
+	
+	RecordType restPhoenixEEMResponseInformationRootItem = {
+		name = "RestPhoenixEEMResponseInformationRootItem" ,
+		fields = {
+			RestField {
+				name = "href",
+				type = refBy(StringType)
+			}, RestField {
+				name = "description",
+				type = refBy(StringType)
+			}
+		}
+	};
+	
+	RecordType restPhoenixEEMResponseInformationInfoItem = {
+		name = "RestPhoenixEEMResponseInformationInfoItem" ,
+		fields = {
+			RestField {
+				name = "href",
+				type = refBy(StringType)
+			}, RestField {
+				name = "id",
+				type = refBy(StringType)
+			},  RestField {
+				name = "name",
+				type = refBy(StringType)
+			}, RestField {
+				name = "value",
+				type = refBy(ObjectType) 
+			}, RestField {
+				name = "description",
+				type = refBy(StringType)
+			}
+		}
+	};
+	
+	RecordType restPhoenixEEMResponseInformation = {
+		name = "RestPhoenixEEMResponseInformation" ,
+		fields = {
+			RestField {
+				name = "context",
+				type = refBy(StringType)
+			}, RestField {
+				name = "timestamp",
+				type = refBy(StringType)
+			} /*, RestField {
+				name = "rootItems",
+				type = refBy(ArrayType(refBy(restPhoenixEEMResponseInformationRootItem)))
+			}, RestField {
+				name = "infoItems",
+				type = refBy(ArrayType(refBy(restPhoenixEEMResponseInformationInfoItem)))
+			} */
+		}
+	};
+	
+	// ------------ freezing ------------------
+
+    freeze {
+        .;
+    } but (f|f.bindingTime >= BindingTime.runtimeMon);	
+	
+}

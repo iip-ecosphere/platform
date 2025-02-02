@@ -1,56 +1,53 @@
-package de.iip_ecosphere.platform.examples.rest.single;
+package de.iip_ecosphere.platform.examples.rest;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import de.iip_ecosphere.platform.connectors.rest.RESTServerResponse;
+public class TestServerResponseMeasurementSetItem {
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class TestServerResponsSingle extends RESTServerResponse {
-
-    @JsonProperty("context")
-    private String context;
-
-    @JsonProperty("id")
+    private String href;
     private String id;
-
-    @JsonProperty("timestamp")
-    private String timestamp;
-
-    @JsonProperty("name")
     private String name;
-
-    @JsonProperty("value")
     private Object value;
-
-    @JsonProperty("unit")
     private String unit;
-
-    @JsonProperty("description")
     private String description;
     
     /**
      * Constructor.
      */
-    public TestServerResponsSingle() {
+    public TestServerResponseMeasurementSetItem() {
+        
     }
     
     /**
-     * Getter for context.
+     * Constructor. Only needed for the TestServer -> Must not be generated.
      * 
-     * @return context
+     * @param value = Instance of TestServerValueMeasurement
      */
-    public String getContext() {
-        return context;
+    @JsonIgnore
+    public TestServerResponseMeasurementSetItem(TestServerValueMeasurement value) {
+        this.id = value.getId();
+        this.name = value.getName();
+        this.value = value.getValue();
+        this.unit = value.getUnit();
+        this.description = value.getDescription();
     }
-
+    
     /**
-     * Setter for context.
+     * Getter for href.
      * 
-     * @param context to set
+     * @return href
      */
-    public void setContext(String context) {
-        this.context = context;
+    public String getHref() {
+        return href;
+    }
+    
+    /**
+     * Setter for href.
+     * 
+     * @param href to set
+     */
+    public void setHref(String href) {
+        this.href = href;
     }
 
     /**
@@ -70,25 +67,7 @@ public class TestServerResponsSingle extends RESTServerResponse {
     public void setId(String id) {
         this.id = id;
     }
-
-    /**
-     * Getter for timestamp.
-     * 
-     * @return timestamp
-     */
-    public String getTimestamp() {
-        return timestamp;
-    }
-
-    /**
-     * Setter for timestamp.
-     * 
-     * @param timestamp to set
-     */
-    public void setTimestamp(String timestamp) {
-        this.timestamp = timestamp;
-    }
-
+    
     /**
      * Getter for name.
      * 
@@ -160,11 +139,6 @@ public class TestServerResponsSingle extends RESTServerResponse {
     public void setDescription(String description) {
         this.description = description;
     }
-    
-    @Override
-    protected <T2> Class<T2> getItemClass() {
-        // No inner Item Class
-        return null;
-    }
+
 
 }

@@ -1,8 +1,8 @@
 package test.de.iip_ecosphere.platform.connectors.rest;
 
-public class MachineInput {
+public class MachineInputSingle {
     
-    private String stringValue;
+    private String stringValue = null;
     
     /**
      * Getter for stringValue.

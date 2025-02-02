@@ -1,0 +1,25 @@
+project RestPhoenixEEMSet { 
+
+	import IIPEcosphere;
+	import RestPhoenixEEMResponsesSet;
+	
+	annotate BindingTime bindingTime = BindingTime::compile to .;
+	
+	RecordType restPhoenixRwEEMSet = {
+		name = "RestPhoenixRwEEMSet",
+	};
+	
+	RecordType restPhoenixEEMSet = {
+		name = "RestPhoenixEEMSet",
+		fields = {
+			RestField {
+				name = "all",
+				endpoint = "all",
+				type = refBy(restPhoenixEEMResponseMeasurementSet),
+				cachingTime = CACHE_NONE
+				
+			}	
+		}	
+	};
+
+}

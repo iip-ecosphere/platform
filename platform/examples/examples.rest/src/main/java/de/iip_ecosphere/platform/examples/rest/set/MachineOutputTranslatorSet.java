@@ -8,23 +8,26 @@ import de.iip_ecosphere.platform.connectors.model.AbstractModelAccess;
 import de.iip_ecosphere.platform.connectors.model.ModelAccess;
 import de.iip_ecosphere.platform.connectors.rest.RESTEndpointMap;
 import de.iip_ecosphere.platform.connectors.types.AbstractConnectorOutputTypeTranslator;
+import de.iip_ecosphere.platform.examples.rest.TestServerResponseMeasurementSet;
+import de.iip_ecosphere.platform.examples.rest.TestServerResponseMeasurementSetItem;
 import de.iip_ecosphere.platform.support.json.JsonUtils;
 
 public class MachineOutputTranslatorSet<S> extends AbstractConnectorOutputTypeTranslator<S, MachineOutputSet> {
 
     private boolean withNotifications;
     private Class<? extends S> sourceType;
-    
+
     /**
      * Constructor.
+     * 
      * @param withNotifications
      * @param sourceType
      */
     public MachineOutputTranslatorSet(boolean withNotifications, Class<? extends S> sourceType) {
         this.withNotifications = withNotifications;
-        this.sourceType = sourceType; 
+        this.sourceType = sourceType;
     }
-    
+
     @Override
     public void initializeModelAccess() throws IOException {
         ModelAccess access = getModelAccess();
@@ -46,24 +49,24 @@ public class MachineOutputTranslatorSet<S> extends AbstractConnectorOutputTypeTr
         AbstractModelAccess access = (AbstractModelAccess) getModelAccess();
         ConnectorParameter params = access.getConnectorParameter();
 
-        
         Object endpoints = params.getSpecificSetting("Endpoints");
         RESTEndpointMap map = JsonUtils.fromJson(endpoints, RESTEndpointMap.class);
-        //final ModelInputConverter inConverter = access.getInputConverter();
-        
+        // final ModelInputConverter inConverter = access.getInputConverter();
+
         MachineOutputSet result = new MachineOutputSet();
-        
+
         Set<String> keys = map.keySet();
-        
+
         if (keys.size() == 1) {
             String key = keys.iterator().next();
-            TestServerResponseSet response = (TestServerResponseSet) access.get(key.toLowerCase());
-            TestServerResponseSetItem[] items = response.getItems();
-            
-            for (TestServerResponseSetItem item : items) {
-                
+            TestServerResponseMeasurementSet response = 
+                    (TestServerResponseMeasurementSet) access.get(key.toLowerCase());
+            TestServerResponseMeasurementSetItem[] items = response.getItems();
+
+            for (TestServerResponseMeasurementSetItem item : items) {
+
                 if (item.getId().equals("f")) {
-                    result.setF(item);
+                    result.setFq(item);
                 } else if (item.getId().equals("u1")) {
                     result.setU1(item);
                 } else if (item.getId().equals("u2")) {
@@ -75,15 +78,15 @@ public class MachineOutputTranslatorSet<S> extends AbstractConnectorOutputTypeTr
                 } else if (item.getId().equals("u23")) {
                     result.setU23(item);
                 } else if (item.getId().equals("u31")) {
-                	result.setU31(item);
+                    result.setU31(item);
                 } else if (item.getId().equals("i1")) {
-                	result.setI1(item);
+                    result.setI1(item);
                 } else if (item.getId().equals("i2")) {
-                	result.setI2(item);
+                    result.setI2(item);
                 } else if (item.getId().equals("i3")) {
-                	result.setI3(item);
+                    result.setI3(item);
                 }
-            }             
+            }
         }
 
         return result;

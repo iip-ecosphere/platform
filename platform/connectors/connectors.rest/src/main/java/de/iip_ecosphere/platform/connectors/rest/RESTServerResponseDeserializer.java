@@ -37,6 +37,8 @@ public class RESTServerResponseDeserializer<T1 extends RESTServerResponse, T2>
             response = responseClass.getDeclaredConstructor().newInstance();
             Iterator<String> iter = node.fieldNames();
             
+            int itemClassIndex = 0;
+            
             while (iter.hasNext()) {
                 String fieldName = iter.next();
                 
@@ -48,15 +50,16 @@ public class RESTServerResponseDeserializer<T1 extends RESTServerResponse, T2>
                     
                     T2[] items = (T2[]) new Object[innerNode.size()];
                     
-                    int index = 0;
+                    int itemsIndex = 0;
                     
                     for (JsonNode itemNode : innerNode) {
-                        T2 item = jp.getCodec().treeToValue(itemNode, response.getItemClass());
-                        items[index] = item;
+                        T2 item = (T2) jp.getCodec().treeToValue(itemNode, response.getItemClass()[itemClassIndex]);
+                        items[itemsIndex] = item;
                         
-                        index++;
+                        itemsIndex++;
                         
                     }
+                    itemClassIndex++;
                     
                     response.set(fieldName, items);
                     

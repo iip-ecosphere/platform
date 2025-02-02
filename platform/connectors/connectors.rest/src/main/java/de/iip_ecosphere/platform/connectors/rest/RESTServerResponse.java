@@ -37,11 +37,18 @@ public abstract class RESTServerResponse {
     }
     
     /**
-     * Returns the specific inner Item Class of RESTServerResponse. If
-     * RESTServerResponse don't have a inner Item Class null is returned.
+     * Getter for Class attribute value. Returns null if the Class has no simple value attribute.
+     * 
+     * @return value or null
+     */
+    public abstract Object getValue();
+    
+    /**
+     * Returns the specific inner Item Classes of RESTServerResponse as Array. If
+     * RESTServerResponse don't have a inner Item Classes null is returned.
      * 
      * @param <T2> the specific inner ItemClass
      * @return the specific inner ItemClass or null
      */
-    protected abstract <T2> Class<T2> getItemClass();
+    protected abstract Class<?>[] getItemClass();
 }

@@ -1,12 +1,13 @@
-package de.iip_ecosphere.platform.examples.rest.single;
+package de.iip_ecosphere.platform.examples.rest;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import de.iip_ecosphere.platform.connectors.rest.RESTServerResponse;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class TestServerResponsSingleTN extends RESTServerResponse {
+public class TestServerResponsMeasurementSingle extends RESTServerResponse {
 
     @JsonProperty("context")
     private String context;
@@ -23,13 +24,30 @@ public class TestServerResponsSingleTN extends RESTServerResponse {
     @JsonProperty("value")
     private Object value;
 
+    @JsonProperty("unit")
+    private String unit;
+
     @JsonProperty("description")
     private String description;
     
     /**
      * Constructor.
      */
-    public TestServerResponsSingleTN() {
+    public TestServerResponsMeasurementSingle() {
+    }
+    
+    /**
+     * Constructor. Only needed for the TestServer -> Must not be generated.
+     * 
+     * @param value = Instance of TestServerValueMeasurement
+     */
+    @JsonIgnore
+    public TestServerResponsMeasurementSingle(TestServerValueMeasurement value) {
+        this.id = value.getId();
+        this.name = value.getName();
+        this.value = value.getValue();
+        this.unit = value.getUnit();
+        this.description = value.getDescription();
     }
     
     /**
@@ -123,6 +141,24 @@ public class TestServerResponsSingleTN extends RESTServerResponse {
     }
 
     /**
+     * Getter for unit.
+     * 
+     * @return unit
+     */
+    public String getUnit() {
+        return unit;
+    }
+
+    /**
+     * Setter for unit.
+     * 
+     * @param unit to set
+     */
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
+
+    /**
      * Getter for description.
      * 
      * @return description
@@ -139,10 +175,12 @@ public class TestServerResponsSingleTN extends RESTServerResponse {
     public void setDescription(String description) {
         this.description = description;
     }
+    
+
 
     @Override
-    protected <T2> Class<T2> getItemClass() {
-        // No inner Item Class
+    protected Class<?>[] getItemClass() {
+        // TODO Auto-generated method stub
         return null;
     }
 

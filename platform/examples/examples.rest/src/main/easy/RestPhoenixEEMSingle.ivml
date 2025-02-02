@@ -1,7 +1,7 @@
 project RestPhoenixEEMSingle { 
 
 	import IIPEcosphere;
-	import RestPhoenixEEMSingleResponses;
+	import RestPhoenixEEMResponsesMixed;
 
     annotate BindingTime bindingTime = BindingTime::compile to .;
 	
@@ -30,61 +30,61 @@ project RestPhoenixEEMSingle {
 			}, RestField {
 				name = "f",
 				endpoint = "f",
-				type =  refBy(restPhoenixEEMResponseMeasurement),
+				type =  refBy(restPhoenixEEMResponseMeasurementSingle),
 				cachingTime = CACHE_NONE
 
 			}, RestField {
 				name = "U1",
 				endpoint = "u1",
-				type =  refBy(restPhoenixEEMResponseMeasurement),
+				type =  refBy(restPhoenixEEMResponseMeasurementSingle),
 				cachingTime = CACHE_NONE
 				
 			}, RestField {		
 				name = "U2",
 				endpoint = "u2",
-				type =  refBy(restPhoenixEEMResponseMeasurement),
+				type =  refBy(restPhoenixEEMResponseMeasurementSingle),
 				cachingTime = CACHE_NONE
 				
 			}, RestField {			
 				name = "U3",
 				endpoint = "u3",
-				type =  refBy(restPhoenixEEMResponseMeasurement),
+				type =  refBy(restPhoenixEEMResponseMeasurementSingle),
 				cachingTime = CACHE_NONE
 				
 			}, RestField {		
 				name = "U12",
 				endpoint = "u12",
-				type =  refBy(restPhoenixEEMResponseMeasurement),
+				type =  refBy(restPhoenixEEMResponseMeasurementSingle),
 				cachingTime = CACHE_NONE
 				
 			}, RestField {		
 				name = "U23",
 				endpoint = "u23",
-				type =  refBy(restPhoenixEEMResponseMeasurement),
+				type =  refBy(restPhoenixEEMResponseMeasurementSingle),
 				cachingTime = CACHE_NONE
 				
 			}, RestField {		
 				name = "U31",
 				endpoint = "u31",
-				type =  refBy(restPhoenixEEMResponseMeasurement),
+				type =  refBy(restPhoenixEEMResponseMeasurementSingle),
 				cachingTime = CACHE_NONE
 				
 			}, RestField {		
 				name = "I1",
 				endpoint = "i1",
-				type =  refBy(restPhoenixEEMResponseMeasurement),
+				type =  refBy(restPhoenixEEMResponseMeasurementSingle),
 				cachingTime = CACHE_NONE
 				
 			}, RestField {			
 				name = "I2",
 				endpoint = "i2",
-				type =  refBy(restPhoenixEEMResponseMeasurement),
+				type =  refBy(restPhoenixEEMResponseMeasurementSingle),
 				cachingTime = CACHE_NONE
 				
 			}, RestField {			
 				name = "I3",
 				endpoint = "i3",
-				type =  refBy(restPhoenixEEMResponseMeasurement),
+				type =  refBy(restPhoenixEEMResponseMeasurementSingle),
 				cachingTime = CACHE_NONE
 				
 			}		

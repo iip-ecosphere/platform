@@ -3,6 +3,8 @@ project Rest {
 
 	import IIPEcosphere;
 	import RestPhoenixEEMSingle;
+	import RestPhoenixEEMSet;
+	//import RestPhoenixEEMMixed;
 	
 	annotate BindingTime bindingTime = BindingTime::compile to .;
 
@@ -66,12 +68,38 @@ project Rest {
 		description = "RESTConnector example for Phoenix Contract EmPro",
 		ver = "0.1.0",
 		
-		
 		input = {{type=refBy(restPhoenixRwEEMSingle)}},
 		output = {{type=refBy(restPhoenixEEMSingle)}},
 		inInterface = {type=refBy(restPhoenixRwEEMSingle)},
 		outInterface = {type=refBy(restPhoenixEEMSingle)}
 	};
+	
+	
+	RestConnector myRestConnEEMSet = {
+		id = "myRestConnEEMSet",
+		name = "myRestConnEEMSet example",
+		description = "RESTConnector example for Phoenix Contract EmPro",
+		ver = "0.1.0",
+			
+		input = {{type=refBy(restPhoenixRwEEMSet)}},
+		output = {{type=refBy(restPhoenixEEMSet)}},
+		inInterface = {type=refBy(restPhoenixRwEEMSet)},
+		outInterface = {type=refBy(restPhoenixEEMSet)}
+	};
+	
+	/*
+	RestConnector myRestConnEEMMixed = {
+		id = "myRestConnEEMMixed",
+		name = "myRestConnEEMMixed example",
+		description = "RESTConnector example for Phoenix Contract EmPro",
+		ver = "0.1.0",
+			
+		input = {{type=refBy(restPhoenixRwEEMMixed)}},
+		output = {{type=refBy(restPhoenixEEMMixed)}},
+		inInterface = {type=refBy(restPhoenixRwEEMMixed)},
+		outInterface = {type=refBy(restPhoenixEEMMixed)}
+	};
+	*/
 	
 	// not really needed except for populating the interfaces package
     Service myReceiverService = JavaService {
@@ -83,7 +111,7 @@ project Rest {
         class = "ReceiverImpl",
         artifact = "",
         kind = ServiceKind::SINK_SERVICE,
-        input = {{type=refBy(restPhoenixEEMSingle)}}
+        input = {{type=refBy(restPhoenixEEMSingle)}, {type=refBy(restPhoenixEEMSet)} /*, {type=refBy(restPhoenixEEMMixed)}*/}
     };
 	
 	// --------------------- monitoring ----------------------
@@ -108,13 +136,25 @@ project Rest {
 	
 	 ServiceMesh myMesh = {
         description = "REST Service Net",
-        sources = {refBy(mySource)} 
+        sources = {refBy(mySource), refBy(mySourceSet) /*, refBy(mySourceMixed)*/} 
     };
 	
 	MeshSource mySource = {
        impl = refBy(myRestConnEEMSingle),
        next = {refBy(myConnMySourceMyReceiver)}
     };
+    
+    MeshSource mySourceSet = {
+       impl = refBy(myRestConnEEMSet),
+       next = {refBy(myConnMySourceMyReceiver)}
+    };
+    
+    /*
+    MeshSource mySourceMixed = {
+       impl = refBy(myRestConnEEMMixed),
+       next = {refBy(myConnMySourceMyReceiver)}
+    };
+    */
 	
 	MeshConnector myConnMySourceMyReceiver = {
         name = "Source->Receiver",
