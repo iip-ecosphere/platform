@@ -207,6 +207,11 @@
         <version>${project.version}</version>
     </dependency>
     <dependency>
+        <artifactId>connectors.rest</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>
+    <dependency>
         <artifactId>connectors.mqttv5</artifactId>
         <groupId>de.iip-ecosphere.platform</groupId>
         <version>${project.version}</version>

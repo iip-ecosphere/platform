@@ -5,9 +5,9 @@ import JavaType;
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
 @format(profile="java", profileArg_javadocIndent="* ", lineLength = 120, profileArg_eltSorting="CONS")
-template JavaConnectorRestType(Configuration config, JavaCodeArtifact target, RecordType type, String pkg, Boolean output) {
+template JavaConnectorRestType(Configuration config, JavaCodeArtifact target, RecordType type, String pkg, Boolean output, mapOf(RecordType, setOf(RecordType)) itemTypes) {
     
-    def main(Configuration config, JavaCodeArtifact target, RecordType type, String pkg, Boolean output) {
+    def main(Configuration config, JavaCodeArtifact target, RecordType type, String pkg, Boolean output, mapOf(RecordType, setOf(RecordType)) itemTypes) {
         IIPEcosphere cfg = config;
     
         String typeName = asTypeName(type.name);
@@ -28,10 +28,23 @@ template JavaConnectorRestType(Configuration config, JavaCodeArtifact target, Re
         }
 
         mainCls.addConstructor("Default constructor. Fields are pre-allocated with default Java values.");
-        JavaCodeMethod m = mainCls.addMethod("Class<?>", "getItemClass");
+        JavaCodeMethod m = mainCls.addMethod("Class<?>[]", "getItemClass");
         m.addOverrideAnnotation();
-        m.addSLComment("application for different nested array types unclear, for now returning constantly null");
-        m.addReturn("null");
+        setOf(RecordType) it = itemTypes.get(type);
+        if (it == null) {
+            m.addReturn("null");
+        } else {
+            String rCls = "";
+            for (DataType t : it->sortedBy(x|x.name)) {
+                rCls = appendWithSeparator(rCls, ", ", "iip.nodes." + asTypeName(t.name) + "RestType.class");
+            }
+            m.addReturn("new Class[]{${rCls}}");
+        }
+        
+        m = mainCls.addMethod("Object", "getValue");
+        m.addOverrideAnnotation();
+        m.addAnnotation("com.fasterxml.jackson.annotation.JsonIgnore");
+        m.addReturn("null");        
     }
     
     def String mapTypeName(Field f) {

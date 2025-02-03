@@ -2032,13 +2032,15 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         String typeName = asTypeName(conn.name);
         setOf(RecordType) types = {};
         setOf(RecordType) outTypes = {};
-        collectRestTypes(conn.inInterface.type, types);
-        collectRestTypes(conn.outInterface.type, outTypes);
+        setOf(RecordType) usedTypes = {};
+        mapOf(RecordType, setOf(RecordType)) itemTypes = {};
+        collectRestTypes(conn.inInterface.type, types, usedTypes, itemTypes);
+        collectRestTypes(conn.outInterface.type, outTypes, usedTypes, itemTypes);
         types = types.including(outTypes);
-        vilTemplateProcessor("JavaConnectorRestImpl", config, "${javaNodesSrc}/${typeName}Impl.java", conn=conn, pkg=javaNodesPackage, usedRestTypes=types);
+        vilTemplateProcessor("JavaConnectorRestImpl", config, "${javaNodesSrc}/${typeName}Impl.java", conn=conn, pkg=javaNodesPackage, usedRestTypes=usedTypes);
         for (RecordType t: types) {
             typeName = toTypeName(t);
-            vilTemplateProcessor("JavaConnectorRestType", config, "${javaNodesSrc}/${typeName}RestType.java", type=t, pkg=javaNodesPackage, output=outTypes.includes(t));
+            vilTemplateProcessor("JavaConnectorRestType", config, "${javaNodesSrc}/${typeName}RestType.java", type=t, pkg=javaNodesPackage, output=outTypes.includes(t), itemTypes=itemTypes);
         }
         Path resourcesSrc = "${appRoot}/src/main/resources";
         String connectorName = toIdentifier(conn.name);
@@ -2046,17 +2048,48 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     }
     
     @DispatchBasis
-    collectRestTypes(DataType type, setOf(RecordType) result) = {
+    collectRestTypes(DataType type, setOf(RecordType) result, setOf(RecordType) used, mapOf(RecordType, setOf(RecordType)) items) = {
     }
 
     @DispatchCase
-    collectRestTypes(RecordType type, setOf(RecordType) result) = {
+    collectRestTypes(RecordType type, setOf(RecordType) result, setOf(RecordType) used, mapOf(RecordType, setOf(RecordType)) items) = {
         result.add(type);
         for (Field f : type.fields) {
-            collectRestTypes(f.type, result);
+            setOf(RecordType) it = items.get(type);
+            if (not(items.containsKey(type))) {
+                it = {};
+                items.add(type, it);
+            } else {
+                it = items.get(type);
+            }
+            addUsedType(f, used, it);
+            collectRestTypes(f.type, result, used, items);
         }
     }
     
+    @DispatchBasis
+    addUsedType(Field field, setOf(RecordType) used, setOf(RecordType) items) = {
+    }
+
+    @DispatchCase
+    addUsedType(RestField field, setOf(RecordType) used, setOf(RecordType) items) = {
+        addToSet(field.type, used);
+        addToSet(field.type, items);
+    }
+
+    @DispatchCase
+    addUsedType(RestSetField field, setOf(RecordType) used, setOf(RecordType) items) = {
+        addToSet(field.setType, used);
+        addToSet(field.type, items);
+    }
+    
+    addToSet(DataType type, setOf(RecordType) used) = {
+        if (type.isKindOf(RecordType)) {
+            RecordType rt = type;
+            used.add(rt);
+        }
+    }
+            
     @DispatchCase
     generateServiceResources(MeshElement no, JavaService service, Path appRoot, setOf(DependencyArtifact) bins, setOf(AssemblyInfo) assemblies, setOf(ResourceInfo) resources, setOf(String) artifacts, Boolean noDeps) = {
         if (not(noDeps)) {

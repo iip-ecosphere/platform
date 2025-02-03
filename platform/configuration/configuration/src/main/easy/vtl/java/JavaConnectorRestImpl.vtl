@@ -21,7 +21,7 @@ template JavaConnectorRestImpl(Configuration config, JavaCodeArtifact target, Re
         generics = getConnectorGenerics(conn, false, pkg=pkg + ".", typeAdd="RestType", prefix="de.iip_ecosphere.platform.connectors.rest.RESTItem, Object, ");
         m.addParameter("de.iip_ecosphere.platform.connectors.types.ProtocolAdapter${generics}...", "adapter", "the protocol adapter");
         m.addSuperCall().addArgument("adapter");
-
+        
         String rCls = "";
         for (DataType t : usedRestTypes->sortedBy(x|x.name)) {
             rCls = appendWithSeparator(rCls, ", ", "iip.nodes." + asTypeName(t.name) + "RestType.class");

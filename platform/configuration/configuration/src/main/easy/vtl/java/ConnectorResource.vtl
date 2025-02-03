@@ -80,10 +80,24 @@ template ConnectorResource(Configuration config, FileArtifact target, Connector 
                 endpoint = endpointPrefix + endpoint;
             }
             JsonNode n = json.getData();
-            n.addObject("${field.name}")
+            JsonNode o = n.addObject("${field.name}")
                .addValue("endpoint", endpoint)
                .addValue("type", type);
+            Integer endpointIndex = getEndpointIndex(field);
+            if (endpointIndex >= 0) {
+                o.addValue("endpointIndex", endpointIndex);
+            }
         }
+    }
+    
+    @DispatchBasis
+    def Integer getEndpointIndex(RestField field) {
+        -1;
+    }
+    
+    @DispatchCase
+    def Integer getEndpointIndex(RestSetField field) {
+        field.endpointIndex;
     }
     
     // returns the directly defined type name, not via JavaBasics as then a different name occurs
