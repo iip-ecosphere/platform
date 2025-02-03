@@ -144,6 +144,7 @@ Connectors::RestConnector::nameplateInfo = Pre-defined nameplate info for the mo
 Connectors::RestConnector::port = Pre-defined TCP port for the modbus connector.
 Connectors::RestConnector::endpointPrefix = Optional endpoint prefix for all contained fields.
 Connectors::RestField::endpoint = Optional endpoint for this field, prefixed by the connector endpoint, replaced by the field name if empty.
+Connectors::RestSetField::setType = Type containing the type entries.
 Connectors::InfluxField::mappedName = Explicitly mapping a field name into a database field name. (default: not given)
 Connectors::InfluxField::tag = Is the field an INFLUX tag? (default: none)
 Connectors::InfluxConnector::artifact = Pre-defined artifact implementing the INFLUX connector.

@@ -538,6 +538,12 @@ project Connectors {
    compound RestField refines Field {
        String endpoint = "";
    } 
+
+   compound RestSetField refines RestField {
+        assign(bindingTime = BindingTime::specify) to {
+            refTo(DataType) setType;
+		}   	
+   } 
    
    compound RestConnector refines Connector { // fixed template types see JavaConnector.vtl
        assign (uiGroup = UiInvisibleGroup) to {
