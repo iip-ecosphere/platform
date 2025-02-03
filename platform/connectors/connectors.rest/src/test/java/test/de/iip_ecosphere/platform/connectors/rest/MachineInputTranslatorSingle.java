@@ -1,4 +1,4 @@
-package de.iip_ecosphere.platform.examples.rest.single;
+package test.de.iip_ecosphere.platform.connectors.rest;
 
 import java.io.IOException;
 
@@ -23,12 +23,11 @@ public class MachineInputTranslatorSingle<O> extends AbstractConnectorInputTypeT
         
         AbstractModelAccess access = (AbstractModelAccess) getModelAccess();
 
-        if (data.getTn() != null) {
-            access.set("tn", data.getTn().getValue());
+        if (data.getStringValue() != null) {
+            access.set("string", data.getStringValue());
         }
         
         return null;
-
     }
 
 }

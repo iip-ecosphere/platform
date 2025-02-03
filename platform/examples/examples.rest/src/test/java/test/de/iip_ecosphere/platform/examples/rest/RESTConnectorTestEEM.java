@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -20,6 +19,12 @@ import de.iip_ecosphere.platform.connectors.rest.RESTConnector;
 import de.iip_ecosphere.platform.connectors.rest.RESTItem;
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
 import de.iip_ecosphere.platform.connectors.types.TranslatingProtocolAdapter;
+import de.iip_ecosphere.platform.examples.rest.TestServerResponsTariffNumber;
+import de.iip_ecosphere.platform.examples.rest.mixed.MachineInputMixed;
+import de.iip_ecosphere.platform.examples.rest.mixed.MachineInputTranslatorMixed;
+import de.iip_ecosphere.platform.examples.rest.mixed.MachineOutputMixed;
+import de.iip_ecosphere.platform.examples.rest.mixed.MachineOutputTranslatorMixed;
+import de.iip_ecosphere.platform.examples.rest.mixed.SpecificRESTConnectorMixed;
 import de.iip_ecosphere.platform.examples.rest.set.MachineInputSet;
 import de.iip_ecosphere.platform.examples.rest.set.MachineInputTranslatorSet;
 import de.iip_ecosphere.platform.examples.rest.set.MachineOutputSet;
@@ -30,16 +35,12 @@ import de.iip_ecosphere.platform.examples.rest.single.MachineInputTranslatorSing
 import de.iip_ecosphere.platform.examples.rest.single.MachineOutputSingle;
 import de.iip_ecosphere.platform.examples.rest.single.MachineOutputTranslatorSingle;
 import de.iip_ecosphere.platform.examples.rest.single.SpecificRESTConnectorSingle;
-import de.iip_ecosphere.platform.examples.rest.single.TestServerResponsSingleTN;
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
-
-
-
 
 public class RESTConnectorTestEEM {
 
@@ -87,7 +88,77 @@ public class RESTConnectorTestEEM {
         testRequestTypeSingleWP();
         testRequestTypeSet();
         testRequestTypeSetWP();
+        
+        testRequestTypeMixed();
 
+    }
+
+    /**
+     * Test with RequestType = Mixed.
+     */
+    private void testRequestTypeMixed() {
+        LOGGER.info("RESTConnectorTest -> testWithPolling() -> testRequestTypeMixed()");
+        ActiveAasBase.setNotificationMode(NotificationMode.NONE);
+        
+        RESTConnector<MachineOutputMixed, MachineInputMixed> connector = new SpecificRESTConnectorMixed(
+                getProtocolAdapterMixed());
+        
+        try {
+            connector.connect(getConnectorParameter("mixed"));
+            
+            AtomicReference<MachineOutputMixed> restReference = new AtomicReference<MachineOutputMixed>();
+            AtomicInteger count = new AtomicInteger(0);
+            connector.setReceptionCallback(createCallbackMixed(restReference, count));
+            
+                  
+            MachineOutputMixed rest = restReference.get();
+
+            while (rest == null) {
+                TimeUtils.sleep(10);
+                rest = restReference.get();
+            }
+            
+            Assert.assertNotNull(rest);
+            Assert.assertEquals(3, rest.getTn().getValue());
+            Assert.assertEquals(50.000, rest.getF().getValue());
+            Assert.assertEquals(229.845, rest.getU1().getValue());
+            Assert.assertEquals(229.805, rest.getU2().getValue());
+            Assert.assertEquals(229.853, rest.getU3().getValue());
+            Assert.assertEquals(2.533, rest.getI1().getValue());
+            Assert.assertEquals(2.468, rest.getI2().getValue());
+            Assert.assertEquals(2.476, rest.getI3().getValue());
+            
+            Assert.assertEquals("Device information", rest.getRoot1().getDescription());
+            Assert.assertEquals("Instantaneous values", rest.getRoot2().getDescription());
+            Assert.assertEquals("EEM-MA370", rest.getInfo1().getValue());
+            Assert.assertEquals("2.0", rest.getInfo2().getValue());
+            
+            
+            MachineInputMixed input = new MachineInputMixed();
+
+            TestServerResponsTariffNumber tn = rest.getTn();
+            tn.setValue(1);
+            input.setTn(tn);
+            connector.write(input);
+            
+            int currentCount = count.get();
+            int targetCount = currentCount + 1;
+
+            while (currentCount < targetCount) {
+                TimeUtils.sleep(10);
+                rest = restReference.get();
+                currentCount = count.get();
+            }
+
+            Assert.assertEquals(1, rest.getTn().getValue());
+ 
+            System.out.println("");
+            LOGGER.info("testRequestTypeMixed() -> success" + "\n");
+            connector.disconnect();
+            
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -95,13 +166,13 @@ public class RESTConnectorTestEEM {
      */
     private void testRequestTypeSingle() {
         LOGGER.info("RESTConnectorTest -> testWithPolling() -> testRequestTypeSingle()");
-
         ActiveAasBase.setNotificationMode(NotificationMode.NONE);
 
         RESTConnector<MachineOutputSingle, MachineInputSingle> connector = new SpecificRESTConnectorSingle(
                 getProtocolAdapterSingle());
         try {
             connector.connect(getConnectorParameter("single"));
+
             AtomicReference<MachineOutputSingle> restReference = new AtomicReference<MachineOutputSingle>();
             AtomicInteger count = new AtomicInteger(0);
             connector.setReceptionCallback(createCallbackSingle(restReference, count));
@@ -114,7 +185,7 @@ public class RESTConnectorTestEEM {
             }
 
             Assert.assertNotNull(rest);
-            Assert.assertEquals(50.000, rest.getF().getValue());
+            Assert.assertEquals(50.000, rest.getFq().getValue());
             Assert.assertEquals(229.845, rest.getU1().getValue());
             Assert.assertEquals(229.805, rest.getU2().getValue());
             Assert.assertEquals(229.853, rest.getU3().getValue());
@@ -125,17 +196,11 @@ public class RESTConnectorTestEEM {
             Assert.assertEquals(2.468, rest.getI2().getValue());
             Assert.assertEquals(2.476, rest.getI3().getValue());
             Assert.assertEquals(3, rest.getTn().getValue());
-            
+
             MachineInputSingle input = new MachineInputSingle();
-            
-            TestServerResponsSingleTN tn = new TestServerResponsSingleTN();
-            tn.setContext("/api/v1/measurements/tn");
-            tn.setId("tn");
-            tn.setTimestamp("timestamp");
-            tn.setName("TN");
+
+            TestServerResponsTariffNumber tn = rest.getTn();
             tn.setValue(1);
-            tn.setDescription("Tariff Number");
-            
             input.setTn(tn);
             connector.write(input);
 
@@ -149,7 +214,6 @@ public class RESTConnectorTestEEM {
             }
 
             Assert.assertEquals(1, rest.getTn().getValue());
-
 
             System.out.println("");
             LOGGER.info("testRequestTypeSingle() -> success" + "\n");
@@ -185,7 +249,7 @@ public class RESTConnectorTestEEM {
             }
 
             Assert.assertNotNull(rest);
-            Assert.assertEquals(50.000, rest.getF().getValue());
+            Assert.assertEquals(50.000, rest.getFq().getValue());
             Assert.assertEquals(229.845, rest.getU1().getValue());
             Assert.assertEquals(229.805, rest.getU2().getValue());
             Assert.assertEquals(229.853, rest.getU3().getValue());
@@ -195,6 +259,25 @@ public class RESTConnectorTestEEM {
             Assert.assertEquals(2.533, rest.getI1().getValue());
             Assert.assertEquals(2.468, rest.getI2().getValue());
             Assert.assertEquals(2.476, rest.getI3().getValue());
+            Assert.assertEquals(1, rest.getTn().getValue());
+            
+            MachineInputSingle input = new MachineInputSingle();
+
+            TestServerResponsTariffNumber tn = rest.getTn();
+            tn.setValue(3);
+            input.setTn(tn);
+            connector.write(input);
+
+            int currentCount = count.get();
+            int targetCount = currentCount + 1;
+
+            while (currentCount < targetCount) {
+                TimeUtils.sleep(10);
+                rest = restReference.get();
+                currentCount = count.get();
+            }
+
+            Assert.assertEquals(3, rest.getTn().getValue());
 
             System.out.println("");
             LOGGER.info("testRequestTypeSingleWP() -> success" + "\n");
@@ -214,8 +297,8 @@ public class RESTConnectorTestEEM {
 
         ActiveAasBase.setNotificationMode(NotificationMode.NONE);
 
-        RESTConnector<MachineOutputSet, MachineInputSet> connector = 
-        		new SpecificRESTConnectorSet(getProtocolAdapterSet());
+        RESTConnector<MachineOutputSet, MachineInputSet> connector = new SpecificRESTConnectorSet(
+                getProtocolAdapterSet());
 
         try {
             connector.connect(getConnectorParameter("set"));
@@ -230,7 +313,7 @@ public class RESTConnectorTestEEM {
             }
 
             Assert.assertNotNull(rest);
-            Assert.assertEquals(50.000, rest.getF().getValue());
+            Assert.assertEquals(50.000, rest.getFq().getValue());
             Assert.assertEquals(229.845, rest.getU1().getValue());
             Assert.assertEquals(229.805, rest.getU2().getValue());
             Assert.assertEquals(229.853, rest.getU3().getValue());
@@ -259,8 +342,8 @@ public class RESTConnectorTestEEM {
 
         ActiveAasBase.setNotificationMode(NotificationMode.NONE);
 
-        RESTConnector<MachineOutputSet, MachineInputSet> connector = 
-        		new SpecificRESTConnectorSet(getProtocolAdapterSet());
+        RESTConnector<MachineOutputSet, MachineInputSet> connector = new SpecificRESTConnectorSet(
+                getProtocolAdapterSet());
 
         try {
             connector.connect(getConnectorParameter("setWP"));
@@ -275,7 +358,7 @@ public class RESTConnectorTestEEM {
             }
 
             Assert.assertNotNull(rest);
-            Assert.assertEquals(50.000, rest.getF().getValue());
+            Assert.assertEquals(50.000, rest.getFq().getValue());
             Assert.assertEquals(229.845, rest.getU1().getValue());
             Assert.assertEquals(229.805, rest.getU2().getValue());
             Assert.assertEquals(229.853, rest.getU3().getValue());
@@ -295,8 +378,6 @@ public class RESTConnectorTestEEM {
             e.printStackTrace();
         }
     }
-
-
 
     /**
      * Returns the connector descriptor for
@@ -320,17 +401,20 @@ public class RESTConnectorTestEEM {
         String endpoints = null;
 
         if (type.equals("single")) {
-            endpoint = new Endpoint(Schema.HTTP, "localhost", 8080, "TestServerEEM/api/endpoints/");
+            endpoint = new Endpoint(Schema.HTTP, "localhost", 8080, "TestServerEEM/api/");
             endpoints = testServer.getEndpointDescriptionSingle();
         } else if (type.equals("singleWP")) {
-            endpoint = new Endpoint(Schema.HTTP, "localhost", 8080, "TestServerEEM/api/endpoints/single");
+            endpoint = new Endpoint(Schema.HTTP, "localhost", 8080, "TestServerEEM/api/");
             endpoints = testServer.getEndpointDescriptionSingleWP();
         } else if (type.equals("set")) {
-            endpoint = new Endpoint(Schema.HTTP, "localhost", 8080, "TestServerEEM/api/endpoints/");
+            endpoint = new Endpoint(Schema.HTTP, "localhost", 8080, "TestServerEEM/api/measurements/");
             endpoints = testServer.getEndpointDescriptionSet();
         } else if (type.equals("setWP")) {
-            endpoint = new Endpoint(Schema.HTTP, "localhost", 8080, "TestServerEEM/api/endpoints/set");
+            endpoint = new Endpoint(Schema.HTTP, "localhost", 8080, "TestServerEEM/api/measurements/set");
             endpoints = testServer.getEndpointDescriptionSetWP();
+        } else if (type.equals("mixed")) {
+            endpoint = new Endpoint(Schema.HTTP, "localhost", 8080, "TestServerEEM/api/");
+            endpoints = testServer.getEndpointDescriptionMixed();
         }
 
         ConnectorParameterBuilder testParameter = ConnectorParameterBuilder.newBuilder(endpoint);
@@ -342,7 +426,7 @@ public class RESTConnectorTestEEM {
 
         return testParameter.build();
     }
-    
+
     /**
      * Creates and returns a ProtocolAdapter for testing.
      * 
@@ -367,12 +451,27 @@ public class RESTConnectorTestEEM {
 
         ProtocolAdapter<RESTItem, Object, MachineOutputSet, MachineInputSet> adapter = 
                 new TranslatingProtocolAdapter<RESTItem, Object, MachineOutputSet, MachineInputSet>(
-                new MachineOutputTranslatorSet<RESTItem>(false, RESTItem.class), 
+                new MachineOutputTranslatorSet<RESTItem>(false, RESTItem.class),
                 new MachineInputTranslatorSet<Object>());
 
         return adapter;
     }
     
+    /**
+     * Creates and returns a ProtocolAdapter for testing.
+     * 
+     * @return ProtocolAdapter for testing
+     */
+    private ProtocolAdapter<RESTItem, Object, MachineOutputMixed, MachineInputMixed> getProtocolAdapterMixed() {
+
+        ProtocolAdapter<RESTItem, Object, MachineOutputMixed, MachineInputMixed> adapter = 
+                new TranslatingProtocolAdapter<RESTItem, Object, MachineOutputMixed, MachineInputMixed>(
+                new MachineOutputTranslatorMixed<RESTItem>(false, RESTItem.class),
+                new MachineInputTranslatorMixed<Object>());
+
+        return adapter;
+    }
+
     /**
      * Creates and returns a ReceptionCallbac<MachineOutputSingle> for the
      * Connector.
@@ -380,7 +479,8 @@ public class RESTConnectorTestEEM {
      * @param restRef AtomicReference<MachineOutputSingle> to set received data
      * @return ReceptionCallback<MachineOutputSingle> callback
      */
-    private ReceptionCallback<MachineOutputSingle> createCallbackSingle(AtomicReference<MachineOutputSingle> restRef,  AtomicInteger count) {
+    private ReceptionCallback<MachineOutputSingle> createCallbackSingle(AtomicReference<MachineOutputSingle> restRef,
+            AtomicInteger count) {
 
         ReceptionCallback<MachineOutputSingle> callback = new ReceptionCallback<MachineOutputSingle>() {
 
@@ -423,4 +523,29 @@ public class RESTConnectorTestEEM {
         return callback;
     }
 
+    /**
+     * Creates and returns a ReceptionCallbac<MachineOutputSet> for the Connector.
+     * 
+     * @param restRef AtomicReference<MachineOutputSet> to set received data
+     * @return ReceptionCallback<MachineOutputSet> callback
+     */
+    private ReceptionCallback<MachineOutputMixed> createCallbackMixed(AtomicReference<MachineOutputMixed> restRef, 
+            AtomicInteger count) {
+
+        ReceptionCallback<MachineOutputMixed> callback = new ReceptionCallback<MachineOutputMixed>() {
+
+            @Override
+            public void received(MachineOutputMixed data) {
+                restRef.set(data);
+                count.incrementAndGet();
+            }
+
+            @Override
+            public Class<MachineOutputMixed> getType() {
+                return MachineOutputMixed.class;
+            }
+        };
+
+        return callback;
+    }
 }

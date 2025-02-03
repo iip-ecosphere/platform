@@ -13,6 +13,7 @@ public class TestServerEEM {
     private String endpointDescriptionSingleWP;
     private String endpointDescriptionSet;
     private String endpointDescriptionSetWP;
+    private String endpointDescriptionMixed;
 
 
     /**
@@ -23,7 +24,7 @@ public class TestServerEEM {
         createEndpointDescriptionSingleWP();
         createEndpointDescriptionSet();
         createEndpointDescriptionSetWP();
-        
+        createEndpointDescriptionMixed();
     }
 
     /**
@@ -42,23 +43,38 @@ public class TestServerEEM {
             context.close();
         }
     }
+    
+    /**
+     * Creates the endpointDescriptionMixed.
+     */
+    private void createEndpointDescriptionMixed() {
+        endpointDescriptionMixed = "{";
+        endpointDescriptionMixed += "\"tn\" : {\"endpoint\" : \"tariff-number/tn\", \"responseTypeIndex\" : \"0\"},";
+        endpointDescriptionMixed += "\"f\" : {\"endpoint\" : \"measurements/f\", \"responseTypeIndex\" : \"1\"},";
+        endpointDescriptionMixed += "\"u1\" : {\"endpoint\" : \"measurements/u1\", \"responseTypeIndex\" : \"1\"},";
+        endpointDescriptionMixed += "\"u2\" : {\"endpoint\" : \"measurements/u2\", \"responseTypeIndex\" : \"1\"},";
+        endpointDescriptionMixed += "\"u3\" : {\"endpoint\" : \"measurements/u3\", \"responseTypeIndex\" : \"1\"},";
+        endpointDescriptionMixed += "\"all\" : {\"endpoint\" : \"measurements/all\", \"responseTypeIndex\" : \"2\"},";
+        endpointDescriptionMixed += "\"information\" : {\"endpoint\" : \"information\", \"responseTypeIndex\" : \"3\"}";
+        endpointDescriptionMixed += "}";
+    }
 
     /**
      * Creates the endpointDescriptionSingle.
      */
     private void createEndpointDescriptionSingle() {
         endpointDescriptionSingle = "{";
-        endpointDescriptionSingle += "\"TN\" : {\"endpoint\" : \"tn\", \"responseTypeIndex\" : \"1\"},";
-        endpointDescriptionSingle += "\"f\" : {\"endpoint\" : \"f\", \"responseTypeIndex\" : \"0\"},";
-        endpointDescriptionSingle += "\"U1\" : {\"endpoint\" : \"u1\", \"responseTypeIndex\" : \"0\"},";
-        endpointDescriptionSingle += "\"U2\" : {\"endpoint\" : \"u2\", \"responseTypeIndex\" : \"0\"},";
-        endpointDescriptionSingle += "\"U3\" : {\"endpoint\" : \"u3\", \"responseTypeIndex\" : \"0\"},";
-        endpointDescriptionSingle += "\"U12\" : {\"endpoint\" : \"u12\", \"responseTypeIndex\" : \"0\"},";
-        endpointDescriptionSingle += "\"U23\" : {\"endpoint\" : \"u23\", \"responseTypeIndex\" : \"0\"},";
-        endpointDescriptionSingle += "\"U31\" : {\"endpoint\" : \"u31\", \"responseTypeIndex\" : \"0\"},";
-        endpointDescriptionSingle += "\"I1\" : {\"endpoint\" : \"i1\", \"responseTypeIndex\" : \"0\"},";
-        endpointDescriptionSingle += "\"I2\" : {\"endpoint\" : \"i2\", \"responseTypeIndex\" : \"0\"},";
-        endpointDescriptionSingle += "\"I3\" : {\"endpoint\" : \"i3\", \"responseTypeIndex\" : \"0\"}";
+        endpointDescriptionSingle += "\"tn\" : {\"endpoint\" : \"tariff-number/tn\", \"responseTypeIndex\" : \"1\"},";
+        endpointDescriptionSingle += "\"f\" : {\"endpoint\" : \"measurements/f\", \"responseTypeIndex\" : \"0\"},";
+        endpointDescriptionSingle += "\"u1\" : {\"endpoint\" : \"measurements/u1\", \"responseTypeIndex\" : \"0\"},";
+        endpointDescriptionSingle += "\"u2\" : {\"endpoint\" : \"measurements/u2\", \"responseTypeIndex\" : \"0\"},";
+        endpointDescriptionSingle += "\"u3\" : {\"endpoint\" : \"measurements/u3\", \"responseTypeIndex\" : \"0\"},";
+        endpointDescriptionSingle += "\"u12\" : {\"endpoint\" : \"measurements/u12\", \"responseTypeIndex\" : \"0\"},";
+        endpointDescriptionSingle += "\"u23\" : {\"endpoint\" : \"measurements/u23\", \"responseTypeIndex\" : \"0\"},";
+        endpointDescriptionSingle += "\"u31\" : {\"endpoint\" : \"measurements/u31\", \"responseTypeIndex\" : \"0\"},";
+        endpointDescriptionSingle += "\"i1\" : {\"endpoint\" : \"measurements/i1\", \"responseTypeIndex\" : \"0\"},";
+        endpointDescriptionSingle += "\"i2\" : {\"endpoint\" : \"measurements/i2\", \"responseTypeIndex\" : \"0\"},";
+        endpointDescriptionSingle += "\"i3\" : {\"endpoint\" : \"measurements/i3\", \"responseTypeIndex\" : \"0\"}";
         endpointDescriptionSingle += "}";
         
         System.out.println("createEndpointDescriptionSingle() -> " + endpointDescriptionSingle);
@@ -69,7 +85,7 @@ public class TestServerEEM {
      */
     private void createEndpointDescriptionSet() {
         endpointDescriptionSet = "{";
-        endpointDescriptionSet += "\"All\" : {\"endpoint\" : \"all\", \"responseTypeIndex\" : \"0\"}";
+        endpointDescriptionSet += "\"all\" : {\"endpoint\" : \"all\", \"responseTypeIndex\" : \"0\"}";
         endpointDescriptionSet += "}";
     }
 
@@ -78,16 +94,28 @@ public class TestServerEEM {
      */
     private void createEndpointDescriptionSingleWP() {
         endpointDescriptionSingleWP = "{";
-        endpointDescriptionSingleWP += "\"f\" : {\"endpoint\" : \"?path=f\", \"responseTypeIndex\" : \"0\"},";
-        endpointDescriptionSingleWP += "\"U1\" : {\"endpoint\" : \"?path=u1\", \"responseTypeIndex\" : \"0\"},";
-        endpointDescriptionSingleWP += "\"U2\" : {\"endpoint\" : \"?path=u2\", \"responseTypeIndex\" : \"0\"},";
-        endpointDescriptionSingleWP += "\"U3\" : {\"endpoint\" : \"?path=u3\", \"responseTypeIndex\" : \"0\"},";
-        endpointDescriptionSingleWP += "\"U12\" : {\"endpoint\" : \"?path=u12\", \"responseTypeIndex\" : \"0\"},";
-        endpointDescriptionSingleWP += "\"U23\" : {\"endpoint\" : \"?path=u23\", \"responseTypeIndex\" : \"0\"},";
-        endpointDescriptionSingleWP += "\"U31\" : {\"endpoint\" : \"?path=u31\", \"responseTypeIndex\" : \"0\"},";
-        endpointDescriptionSingleWP += "\"I1\" : {\"endpoint\" : \"?path=i1\", \"responseTypeIndex\" : \"0\"},";
-        endpointDescriptionSingleWP += "\"I2\" : {\"endpoint\" : \"?path=i2\", \"responseTypeIndex\" : \"0\"},";
-        endpointDescriptionSingleWP += "\"I3\" : {\"endpoint\" : \"?path=i3\", \"responseTypeIndex\" : \"0\"}";
+        endpointDescriptionSingleWP += "\"tn\" : {\"endpoint\" : \"tariff-number?path=tn\","
+                + " \"responseTypeIndex\" : \"1\"},";
+        endpointDescriptionSingleWP += "\"f\" : {\"endpoint\" : \"measurements/single?path=f\","
+                + " \"responseTypeIndex\" : \"0\"},";
+        endpointDescriptionSingleWP += "\"u1\" : {\"endpoint\" : \"measurements/single?path=u1\","
+                + " \"responseTypeIndex\" : \"0\"},";
+        endpointDescriptionSingleWP += "\"u2\" : {\"endpoint\" : \"measurements/single?path=u2\","
+                + " \"responseTypeIndex\" : \"0\"},";
+        endpointDescriptionSingleWP += "\"u3\" : {\"endpoint\" : \"measurements/single?path=u3\","
+                + " \"responseTypeIndex\" : \"0\"},";
+        endpointDescriptionSingleWP += "\"u12\" : {\"endpoint\" : \"measurements/single?path=u12\","
+                + " \"responseTypeIndex\" : \"0\"},";
+        endpointDescriptionSingleWP += "\"u23\" : {\"endpoint\" : \"measurements/single?path=u23\","
+                + " \"responseTypeIndex\" : \"0\"},";
+        endpointDescriptionSingleWP += "\"u31\" : {\"endpoint\" : \"measurements/single?path=u31\","
+                + " \"responseTypeIndex\" : \"0\"},";
+        endpointDescriptionSingleWP += "\"i1\" : {\"endpoint\" : \"measurements/single?path=i1\","
+                + " \"responseTypeIndex\" : \"0\"},";
+        endpointDescriptionSingleWP += "\"i2\" : {\"endpoint\" : \"measurements/single?path=i2\","
+                + " \"responseTypeIndex\" : \"0\"},";
+        endpointDescriptionSingleWP += "\"i3\" : {\"endpoint\" : \"measurements/single?path=i3\","
+                + " \"responseTypeIndex\" : \"0\"}";
         endpointDescriptionSingleWP += "}";
     }
 
@@ -96,7 +124,7 @@ public class TestServerEEM {
      */
     private void createEndpointDescriptionSetWP() {
         endpointDescriptionSetWP = "{";
-        endpointDescriptionSetWP += "\"AllWP\" : {\"endpoint\" : "
+        endpointDescriptionSetWP += "\"allWP\" : {\"endpoint\" : "
                 + "\"?paths=f,u1,u2,u3,u12,u23,u31,i1,i2,i3\", \"responseTypeIndex\" : \"0\"}";
         endpointDescriptionSetWP += "}";
     }
@@ -107,8 +135,8 @@ public class TestServerEEM {
      * @return endpointDescriptionSingle
      */
     public String getEndpointDescriptionSingle() {
-    	createEndpointDescriptionSingle();
-    	
+        createEndpointDescriptionSingle();
+        
         return endpointDescriptionSingle;
     }
 
@@ -137,5 +165,14 @@ public class TestServerEEM {
      */
     public String getEndpointDescriptionSetWP() {
         return endpointDescriptionSetWP;
+    }
+
+    /**
+     * Getter for endpointDescriptionMixed.
+     * 
+     * @return endpointDescriptionMixed
+     */
+    public String getEndpointDescriptionMixed() {
+        return endpointDescriptionMixed;
     }
 }

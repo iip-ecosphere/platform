@@ -1,5 +1,6 @@
 package test.de.iip_ecosphere.platform.connectors.rest;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -78,9 +79,15 @@ public class TestServerResponseSet extends RESTServerResponse {
         this.items = items;
     }
 
-    @SuppressWarnings("unchecked")
+    @JsonIgnore
     @Override
-    protected <T2> Class<T2> getItemClass() {
-        return (Class<T2>) TestServerResponseSetItem.class;
+    public Object getValue() {
+        return null;
+    }
+
+    @Override
+    protected Class<?>[] getItemClass() {
+        // TODO Auto-generated method stub
+        return new Class[] {TestServerResponseSetItem.class};
     }
 }

@@ -1,11 +1,11 @@
-package de.iip_ecosphere.platform.examples.rest.single;
+package de.iip_ecosphere.platform.examples.rest.mixed;
 
 import java.io.IOException;
 
 import de.iip_ecosphere.platform.connectors.model.AbstractModelAccess;
 import de.iip_ecosphere.platform.connectors.types.AbstractConnectorInputTypeTranslator;
 
-public class MachineInputTranslatorSingle<O> extends AbstractConnectorInputTypeTranslator<MachineInputSingle, O> {
+public class MachineInputTranslatorMixed<O> extends AbstractConnectorInputTypeTranslator<MachineInputMixed, O> {
 
     @Override
     public Class<? extends O> getSourceType() {
@@ -14,13 +14,14 @@ public class MachineInputTranslatorSingle<O> extends AbstractConnectorInputTypeT
     }
 
     @Override
-    public Class<? extends MachineInputSingle> getTargetType() {
-        return MachineInputSingle.class;
+    public Class<? extends MachineInputMixed> getTargetType() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     @Override
-    public O from(MachineInputSingle data) throws IOException {
-        
+    public O from(MachineInputMixed data) throws IOException {
+       
         AbstractModelAccess access = (AbstractModelAccess) getModelAccess();
 
         if (data.getTn() != null) {
@@ -28,7 +29,6 @@ public class MachineInputTranslatorSingle<O> extends AbstractConnectorInputTypeT
         }
         
         return null;
-
     }
 
 }

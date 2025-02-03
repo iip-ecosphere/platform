@@ -8,8 +8,6 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -136,6 +134,7 @@ public abstract class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, 
             if (key.equals("Endpoints")) {
 
                 Object endpoints = params.getSpecificSetting(key);
+                //endpoints = endpoints.toString().toLowerCase();
                 System.out.println(endpoints);
                 map = JsonUtils.fromJson(endpoints, RESTEndpointMap.class);
 
@@ -176,19 +175,29 @@ public abstract class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, 
             String endpoint = entry.getValue().getEndpoint();
             String uri = path + endpoint;
             int responseClassIndex = entry.getValue().getResponseTypeIndex();
+            
+//            ResponseEntity<?> responseEntity = null;
+//            
+//            if (responseClassIndex == -1) {
+//                RestTemplate restTemplate = new RestTemplate();
+//                        
+//                responseEntity = restTemplate.getForEntity(uri, String.class);
+//                        //restTemplate.exchange(uri, HttpMethod.GET, null, 
+//                        //String.class);
+//            } else {
+//                RestTemplate restTemplate = new RestTemplate(Collections.singletonList(jsonConverter));
+//                responseEntity = restTemplate.exchange(uri, HttpMethod.GET, null, 
+//                        getResponseClass()[responseClassIndex]);
+//            }
 
             RestTemplate restTemplate = new RestTemplate(Collections.singletonList(jsonConverter));
             ResponseEntity<?> responseEntity = restTemplate.exchange(uri, HttpMethod.GET, null, 
                     getResponseClass()[responseClassIndex]);
-//            if (key.equals("tn")) {
-//                responseEntity = restTemplate.exchange(uri, HttpMethod.GET, null, getResponseClass()[1]);
-//
-//            } else {
-//                responseEntity = restTemplate.exchange(uri, HttpMethod.GET, null, getResponseClass()[0]);
-//
-//            }
+
+
 
             RESTServerResponse result = (RESTServerResponse) responseEntity.getBody();
+            
 
             if (result != null) {
 
@@ -207,20 +216,29 @@ public abstract class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, 
     protected void writeImpl(Object data) throws IOException {
 
         if (data != null) {
-
+            
+            String qName = (String) data;
             String path = params.getEndpointPath();
-            // String endpoint = "setValue";
-            String uri = path + "?value=" + data;
-
+            String endpoint = item.getEndpointMap().get(qName).getSimpleEndpoint();
+            Object value = item.getValue(qName).getValue();
+            
+            String uri = path + endpoint + "?value=" + value;
+            System.out.println("write to:" + uri);
+            
             RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<?> responseEntity = restTemplate.exchange(uri, HttpMethod.PUT, null, 
+                    String.class);
 
-            String requestBody = "";
-            HttpHeaders headers = new HttpHeaders();
+//            RestTemplate restTemplate = new RestTemplate();
+//
+//            String requestBody = "";
+//            HttpHeaders headers = new HttpHeaders();
+//
+//            HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
+//            ResponseEntity<String> response = restTemplate.exchange(uri, HttpMethod.PUT, requestEntity, String.class);
 
-            HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
-            ResponseEntity<String> response = restTemplate.exchange(uri, HttpMethod.PUT, requestEntity, String.class);
+            System.out.println("Response: " + responseEntity.getBody());
 
-            System.out.println("Response: " + response.getBody());
         }
 
     }
@@ -259,7 +277,10 @@ public abstract class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, 
 
         @Override
         public void set(String qName, Object value) throws IOException {
-            // TODO Auto-generated method stub
+            RESTServerResponse res = item.getValue(qName);
+            res.set("value", value);
+            item.setValue(qName, res);
+            writeImpl(qName);
 
         }
 

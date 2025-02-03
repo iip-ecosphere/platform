@@ -1,4 +1,4 @@
-package test.de.iip_ecosphere.platform.connectors.rest;
+package de.iip_ecosphere.platform.examples.rest;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import de.iip_ecosphere.platform.connectors.rest.RESTServerResponse;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class TestServerResponsSingle extends RESTServerResponse {
+public class TestServerResponsTariffNumber extends RESTServerResponse {
 
     @JsonProperty("context")
     private String context;
@@ -23,16 +23,13 @@ public class TestServerResponsSingle extends RESTServerResponse {
     @JsonProperty("value")
     private Object value;
 
-    @JsonProperty("unit")
-    private String unit;
-
     @JsonProperty("description")
     private String description;
     
     /**
      * Constructor.
      */
-    public TestServerResponsSingle() {
+    public TestServerResponsTariffNumber() {
     }
     
     /**
@@ -126,24 +123,6 @@ public class TestServerResponsSingle extends RESTServerResponse {
     }
 
     /**
-     * Getter for unit.
-     * 
-     * @return unit
-     */
-    public String getUnit() {
-        return unit;
-    }
-
-    /**
-     * Setter for unit.
-     * 
-     * @param unit to set
-     */
-    public void setUnit(String unit) {
-        this.unit = unit;
-    }
-
-    /**
      * Getter for description.
      * 
      * @return description
@@ -160,6 +139,7 @@ public class TestServerResponsSingle extends RESTServerResponse {
     public void setDescription(String description) {
         this.description = description;
     }
+
 
     @Override
     protected Class<?>[] getItemClass() {

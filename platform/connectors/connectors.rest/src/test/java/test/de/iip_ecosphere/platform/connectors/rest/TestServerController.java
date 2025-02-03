@@ -204,6 +204,7 @@ public class TestServerController {
 
         return result;
     }
+    
 
     /**
      * Get a String as TestServerResponsSingle.
@@ -325,7 +326,7 @@ public class TestServerController {
      * @param value to set for stringValue
      * @return ResponseEntity<String> containing 
      */
-    @PutMapping()
+    @PutMapping("/string")
     public ResponseEntity<String> updateStringValue(@RequestParam("value") String value) {
         
         stringValue = value;

@@ -40,7 +40,6 @@ public class MachineOutputTranslatorSingle<S> extends AbstractConnectorOutputTyp
     @Override
     public MachineOutputSingle to(S source) throws IOException {
         AbstractModelAccess access = (AbstractModelAccess) getModelAccess();
-        //final ModelInputConverter inConverter = access.getInputConverter();
 
         MachineOutputSingle result = new MachineOutputSingle();
         result.setStringValue((TestServerResponsSingle) access.get("string"));

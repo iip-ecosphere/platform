@@ -1,11 +1,11 @@
-project RestPhoenixEEMSingleResponses { 
+project RestPhoenixEEMResponsesSingle { 
 
 	import IIPEcosphere;
 
 	annotate BindingTime bindingTime = BindingTime::compile to .;
 		
-	RecordType restPhoenixEEMResponseMeasurement = {
-		name = "RestPhoenixEEMResponseMeasurement" ,
+	RecordType restPhoenixEEMResponseMeasurementSingle = {
+		name = "RestPhoenixEEMResponseMeasurementSingle" ,
 		fields = {
 			RestField {
 				name = "context",

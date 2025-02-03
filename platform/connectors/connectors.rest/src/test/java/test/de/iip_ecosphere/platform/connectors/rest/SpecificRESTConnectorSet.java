@@ -5,7 +5,7 @@ import de.iip_ecosphere.platform.connectors.rest.RESTItem;
 import de.iip_ecosphere.platform.connectors.rest.RESTServerResponse;
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
 
-public class SpecificRESTConnectorSet extends RESTConnector<MachineOutputSet, MachineInput> {
+public class SpecificRESTConnectorSet extends RESTConnector<MachineOutputSet, MachineInputSet> {
 
     /**
      * Constructor.
@@ -13,7 +13,8 @@ public class SpecificRESTConnectorSet extends RESTConnector<MachineOutputSet, Ma
      * @param adapter the protocol adapter
      */
     @SafeVarargs
-    public SpecificRESTConnectorSet(ProtocolAdapter<RESTItem, Object, MachineOutputSet, MachineInput>... adapter) {
+    public SpecificRESTConnectorSet(ProtocolAdapter<RESTItem, Object, MachineOutputSet,
+            MachineInputSet>... adapter) {
         super(adapter);
     }
     

@@ -1,124 +1,125 @@
 package de.iip_ecosphere.platform.examples.rest.set;
 
+import de.iip_ecosphere.platform.examples.rest.TestServerResponseMeasurementSetItem;
+
 public class MachineOutputSet {
 
-    
-    private TestServerResponseSetItem f;
-    private TestServerResponseSetItem u1;
-    private TestServerResponseSetItem u2;
-    private TestServerResponseSetItem u3;
-    private TestServerResponseSetItem u12;
-    private TestServerResponseSetItem u23;
-    private TestServerResponseSetItem u31;
-    private TestServerResponseSetItem i1;
-    private TestServerResponseSetItem i2;
-    private TestServerResponseSetItem i3;
-    
+    private TestServerResponseMeasurementSetItem fq;
+    private TestServerResponseMeasurementSetItem u1;
+    private TestServerResponseMeasurementSetItem u2;
+    private TestServerResponseMeasurementSetItem u3;
+    private TestServerResponseMeasurementSetItem u12;
+    private TestServerResponseMeasurementSetItem u23;
+    private TestServerResponseMeasurementSetItem u31;
+    private TestServerResponseMeasurementSetItem i1;
+    private TestServerResponseMeasurementSetItem i2;
+    private TestServerResponseMeasurementSetItem i3;
+
     /**
      * Getter for f.
      * 
      * @return f
      */
-    public TestServerResponseSetItem getF() {
-        return f;
+    public TestServerResponseMeasurementSetItem getFq() {
+        return fq;
     }
-    
+
     /**
-     * Setter for f.
+     * Setter for fq.
      * 
-     * @param f to set
+     * @param fq to set
      */
-    public void setF(TestServerResponseSetItem f) {
-        this.f = f;
+    public void setFq(TestServerResponseMeasurementSetItem fq) {
+        this.fq = fq;
     }
-    
+
     /**
      * Getter for u1.
      * 
      * @return u1
      */
-    public TestServerResponseSetItem getU1() {
+    public TestServerResponseMeasurementSetItem getU1() {
         return u1;
     }
-    
+
     /**
      * Setter for u1.
      * 
      * @param u1 to set
      */
-    public void setU1(TestServerResponseSetItem u1) {
+    public void setU1(TestServerResponseMeasurementSetItem u1) {
         this.u1 = u1;
     }
-    
+
     /**
      * Getter for u2.
      * 
      * @return u2
      */
-    public TestServerResponseSetItem getU2() {
+    public TestServerResponseMeasurementSetItem getU2() {
         return u2;
     }
-    
+
     /**
      * Setter for u2.
      * 
      * @param u2 to set
      */
-    public void setU2(TestServerResponseSetItem u2) {
+    public void setU2(TestServerResponseMeasurementSetItem u2) {
         this.u2 = u2;
     }
-    
+
     /**
      * Getter for u3.
      * 
      * @return u3
      */
-    public TestServerResponseSetItem getU3() {
+    public TestServerResponseMeasurementSetItem getU3() {
         return u3;
     }
-    
+
     /**
      * Setter for u3.
      * 
      * @param u3 to set
      */
-    public void setU3(TestServerResponseSetItem u3) {
+    public void setU3(TestServerResponseMeasurementSetItem u3) {
         this.u3 = u3;
     }
-    
+
     /**
      * Getter for u12.
      * 
      * @return u12
      */
-    public TestServerResponseSetItem getU12() {
+    public TestServerResponseMeasurementSetItem getU12() {
         return u12;
     }
-    
+
     /**
      * Setter for u12.
      * 
      * @param u12 to set
      */
-    public void setU12(TestServerResponseSetItem u12) {
+    public void setU12(TestServerResponseMeasurementSetItem u12) {
         this.u12 = u12;
     }
-    
+
     /**
      * Getter for u23.
      * 
      * @return u23
      */
-    public TestServerResponseSetItem getU23() {
+    public TestServerResponseMeasurementSetItem getU23() {
         return u23;
     }
-    
+
     /**
      * Setter for u23.
      * 
      * @param u23 to set
      */
-    public void setU23(TestServerResponseSetItem u23) {
+    public void setU23(TestServerResponseMeasurementSetItem u23) {
         this.u23 = u23;
     }
 
@@ -127,7 +128,7 @@ public class MachineOutputSet {
      * 
      * @return u31
      */
-    public TestServerResponseSetItem getU31() {
+    public TestServerResponseMeasurementSetItem getU31() {
         return u31;
     }
 
@@ -136,7 +137,7 @@ public class MachineOutputSet {
      * 
      * @param u31 to set
      */
-    public void setU31(TestServerResponseSetItem u31) {
+    public void setU31(TestServerResponseMeasurementSetItem u31) {
         this.u31 = u31;
     }
 
@@ -145,7 +146,7 @@ public class MachineOutputSet {
      * 
      * @return i1
      */
-    public TestServerResponseSetItem getI1() {
+    public TestServerResponseMeasurementSetItem getI1() {
         return i1;
     }
 
@@ -154,7 +155,7 @@ public class MachineOutputSet {
      * 
      * @param i1 to set
      */
-    public void setI1(TestServerResponseSetItem i1) {
+    public void setI1(TestServerResponseMeasurementSetItem i1) {
         this.i1 = i1;
     }
 
@@ -163,7 +164,7 @@ public class MachineOutputSet {
      * 
      * @return i2
      */
-    public TestServerResponseSetItem getI2() {
+    public TestServerResponseMeasurementSetItem getI2() {
         return i2;
     }
 
@@ -172,7 +173,7 @@ public class MachineOutputSet {
      * 
      * @param i2 to set
      */
-    public void setI2(TestServerResponseSetItem i2) {
+    public void setI2(TestServerResponseMeasurementSetItem i2) {
         this.i2 = i2;
     }
 
@@ -181,7 +182,7 @@ public class MachineOutputSet {
      * 
      * @return i3
      */
-    public TestServerResponseSetItem getI3() {
+    public TestServerResponseMeasurementSetItem getI3() {
         return i3;
     }
 
@@ -190,7 +191,7 @@ public class MachineOutputSet {
      * 
      * @param i3 to set
      */
-    public void setI3(TestServerResponseSetItem i3) {
+    public void setI3(TestServerResponseMeasurementSetItem i3) {
         this.i3 = i3;
     }
 }

@@ -1,8 +1,8 @@
-package de.iip_ecosphere.platform.examples.rest.single;
+package de.iip_ecosphere.platform.examples.rest.mixed;
 
 import de.iip_ecosphere.platform.examples.rest.TestServerResponsTariffNumber;
 
-public class MachineInputSingle {
+public class MachineInputMixed {
 
     private TestServerResponsTariffNumber tn;
 
@@ -23,5 +23,4 @@ public class MachineInputSingle {
     public void setTn(TestServerResponsTariffNumber tn) {
         this.tn = tn;
     }
-
 }

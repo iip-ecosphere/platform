@@ -1,12 +1,13 @@
-package de.iip_ecosphere.platform.examples.rest.set;
+package de.iip_ecosphere.platform.examples.rest;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import de.iip_ecosphere.platform.connectors.rest.RESTServerResponse;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class TestServerResponseSet extends RESTServerResponse {
+public class TestServerResponseMeasurementSet extends RESTServerResponse {
 
     @JsonProperty("context")
     private String context;
@@ -15,12 +16,12 @@ public class TestServerResponseSet extends RESTServerResponse {
     private String timestamp;
     
     @JsonProperty("items")
-    private TestServerResponseSetItem[] items;
+    private TestServerResponseMeasurementSetItem[] items;
     
     /**
      * Constructor.
      */
-    public TestServerResponseSet() {
+    public TestServerResponseMeasurementSet() {
         
     }
     
@@ -65,7 +66,7 @@ public class TestServerResponseSet extends RESTServerResponse {
      * 
      * @return items;
      */
-    public TestServerResponseSetItem[] getItems() {
+    public TestServerResponseMeasurementSetItem[] getItems() {
         return items;
     }
     
@@ -74,13 +75,22 @@ public class TestServerResponseSet extends RESTServerResponse {
      * 
      * @param items to set
      */
-    public void setItems(TestServerResponseSetItem[] items) {
+    public void setItems(TestServerResponseMeasurementSetItem[] items) {
         this.items = items;
     }
 
-    @SuppressWarnings("unchecked")
+
+
+    @JsonIgnore
     @Override
-    protected <T2> Class<T2> getItemClass() {
-        return (Class<T2>) TestServerResponseSetItem.class;
+    public Object getValue() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    protected Class<?>[] getItemClass() {
+
+        return new Class[] {TestServerResponseMeasurementSetItem.class};
     }
 }

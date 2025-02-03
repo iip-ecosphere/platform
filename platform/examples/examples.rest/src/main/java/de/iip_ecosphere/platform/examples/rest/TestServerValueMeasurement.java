@@ -1,8 +1,10 @@
-package de.iip_ecosphere.platform.examples.rest.set;
+package de.iip_ecosphere.platform.examples.rest;
 
-public class TestServerResponseSetItem {
+/**
+ * Only needed for the TestServer.
+ */
+public class TestServerValueMeasurement {
 
-    private String href;
     private String id;
     private String name;
     private Object value;
@@ -12,26 +14,8 @@ public class TestServerResponseSetItem {
     /**
      * Constructor.
      */
-    public TestServerResponseSetItem() {
+    public TestServerValueMeasurement() {
         
-    }
-    
-    /**
-     * Getter for href.
-     * 
-     * @return href
-     */
-    public String getHref() {
-        return href;
-    }
-    
-    /**
-     * Setter for href.
-     * 
-     * @param href to set
-     */
-    public void setHref(String href) {
-        this.href = href;
     }
 
     /**
@@ -51,7 +35,7 @@ public class TestServerResponseSetItem {
     public void setId(String id) {
         this.id = id;
     }
-    
+
     /**
      * Getter for name.
      * 
@@ -64,7 +48,7 @@ public class TestServerResponseSetItem {
     /**
      * Setter for name.
      * 
-     * @param name to set
+     * @param nameto set
      */
     public void setName(String name) {
         this.name = name;
@@ -123,6 +107,6 @@ public class TestServerResponseSetItem {
     public void setDescription(String description) {
         this.description = description;
     }
-
-
+    
+    
 }

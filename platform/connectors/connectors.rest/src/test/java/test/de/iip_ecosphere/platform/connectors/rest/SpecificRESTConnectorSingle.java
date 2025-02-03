@@ -6,7 +6,7 @@ import de.iip_ecosphere.platform.connectors.rest.RESTServerResponse;
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
 
 
-public class SpecificRESTConnectorSingle extends RESTConnector<MachineOutputSingle, MachineInput> {
+public class SpecificRESTConnectorSingle extends RESTConnector<MachineOutputSingle, MachineInputSingle> {
 
     
     /**
@@ -16,7 +16,7 @@ public class SpecificRESTConnectorSingle extends RESTConnector<MachineOutputSing
      */
     @SafeVarargs
     public SpecificRESTConnectorSingle(
-            ProtocolAdapter<RESTItem, Object, MachineOutputSingle, MachineInput>... adapter) {
+            ProtocolAdapter<RESTItem, Object, MachineOutputSingle, MachineInputSingle>... adapter) {
         super(adapter);
     }
     
