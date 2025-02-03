@@ -41,7 +41,7 @@ public abstract class RESTServerResponse {
      * 
      * @return value or null
      */
-    public abstract Object getValue();
+    public  abstract Object getValue();
     
     /**
      * Returns the specific inner Item Classes of RESTServerResponse as Array. If

@@ -197,6 +197,7 @@ public abstract class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, 
 
 
             RESTServerResponse result = (RESTServerResponse) responseEntity.getBody();
+            
 
             if (result != null) {
 

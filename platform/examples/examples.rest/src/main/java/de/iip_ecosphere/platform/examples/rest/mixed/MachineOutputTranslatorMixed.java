@@ -36,7 +36,7 @@ public class MachineOutputTranslatorMixed<S> extends AbstractConnectorOutputType
     @Override
     public Class<? extends S> getSourceType() {
         // TODO Auto-generated method stub
-        return null;
+        return sourceType;
     }
 
     @Override
@@ -49,7 +49,7 @@ public class MachineOutputTranslatorMixed<S> extends AbstractConnectorOutputType
     public MachineOutputMixed to(S source) throws IOException {
         AbstractModelAccess access = (AbstractModelAccess) getModelAccess();
         access.getConnectorParameter();
-        
+
         MachineOutputMixed result = new MachineOutputMixed();
         result.setTn((TestServerResponsTariffNumber) access.get("tn"));
         result.setF((TestServerResponsMeasurementSingle) access.get("f"));

@@ -4,7 +4,7 @@ project Rest {
 	import IIPEcosphere;
 	import RestPhoenixEEMSingle;
 	import RestPhoenixEEMSet;
-	//import RestPhoenixEEMMixed;
+	import RestPhoenixEEMMixed;
 	
 	annotate BindingTime bindingTime = BindingTime::compile to .;
 
@@ -87,7 +87,7 @@ project Rest {
 		outInterface = {type=refBy(restPhoenixEEMSet)}
 	};
 	
-	/*
+	
 	RestConnector myRestConnEEMMixed = {
 		id = "myRestConnEEMMixed",
 		name = "myRestConnEEMMixed example",
@@ -99,7 +99,7 @@ project Rest {
 		inInterface = {type=refBy(restPhoenixRwEEMMixed)},
 		outInterface = {type=refBy(restPhoenixEEMMixed)}
 	};
-	*/
+	
 	
 	// not really needed except for populating the interfaces package
     Service myReceiverService = JavaService {
@@ -111,7 +111,7 @@ project Rest {
         class = "ReceiverImpl",
         artifact = "",
         kind = ServiceKind::SINK_SERVICE,
-        input = {{type=refBy(restPhoenixEEMSingle)}, {type=refBy(restPhoenixEEMSet)} /*, {type=refBy(restPhoenixEEMMixed)}*/}
+        input = {{type=refBy(restPhoenixEEMSingle)}, {type=refBy(restPhoenixEEMSet)} , {type=refBy(restPhoenixEEMMixed)}}
     };
 	
 	// --------------------- monitoring ----------------------
@@ -136,7 +136,7 @@ project Rest {
 	
 	 ServiceMesh myMesh = {
         description = "REST Service Net",
-        sources = {refBy(mySource), refBy(mySourceSet) /*, refBy(mySourceMixed)*/} 
+        sources = {refBy(mySource), refBy(mySourceSet), refBy(mySourceMixed)} 
     };
 	
 	MeshSource mySource = {
@@ -149,12 +149,12 @@ project Rest {
        next = {refBy(myConnMySourceMyReceiver)}
     };
     
-    /*
+    
     MeshSource mySourceMixed = {
        impl = refBy(myRestConnEEMMixed),
        next = {refBy(myConnMySourceMyReceiver)}
     };
-    */
+    
 	
 	MeshConnector myConnMySourceMyReceiver = {
         name = "Source->Receiver",

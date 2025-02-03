@@ -132,6 +132,25 @@ public class RESTConnectorTestEEM {
             Assert.assertEquals("Instantaneous values", rest.getRoot2().getDescription());
             Assert.assertEquals("EEM-MA370", rest.getInfo1().getValue());
             Assert.assertEquals("2.0", rest.getInfo2().getValue());
+            
+            
+            MachineInputMixed input = new MachineInputMixed();
+
+            TestServerResponsTariffNumber tn = rest.getTn();
+            tn.setValue(1);
+            input.setTn(tn);
+            connector.write(input);
+            
+            int currentCount = count.get();
+            int targetCount = currentCount + 1;
+
+            while (currentCount < targetCount) {
+                TimeUtils.sleep(10);
+                rest = restReference.get();
+                currentCount = count.get();
+            }
+
+            Assert.assertEquals(1, rest.getTn().getValue());
  
             System.out.println("");
             LOGGER.info("testRequestTypeMixed() -> success" + "\n");
@@ -180,14 +199,8 @@ public class RESTConnectorTestEEM {
 
             MachineInputSingle input = new MachineInputSingle();
 
-            TestServerResponsTariffNumber tn = new TestServerResponsTariffNumber();
-            tn.setContext("/api/v1/measurements/tn");
-            tn.setId("tn");
-            tn.setTimestamp("timestamp");
-            tn.setName("TN");
+            TestServerResponsTariffNumber tn = rest.getTn();
             tn.setValue(1);
-            tn.setDescription("Tariff Number");
-
             input.setTn(tn);
             connector.write(input);
 
@@ -246,17 +259,12 @@ public class RESTConnectorTestEEM {
             Assert.assertEquals(2.533, rest.getI1().getValue());
             Assert.assertEquals(2.468, rest.getI2().getValue());
             Assert.assertEquals(2.476, rest.getI3().getValue());
+            Assert.assertEquals(1, rest.getTn().getValue());
             
             MachineInputSingle input = new MachineInputSingle();
 
-            TestServerResponsTariffNumber tn = new TestServerResponsTariffNumber();
-            tn.setContext("/api/v1/measurements/tn");
-            tn.setId("tn");
-            tn.setTimestamp("timestamp");
-            tn.setName("TN");
+            TestServerResponsTariffNumber tn = rest.getTn();
             tn.setValue(3);
-            tn.setDescription("Tariff Number");
-
             input.setTn(tn);
             connector.write(input);
 
@@ -529,6 +537,7 @@ public class RESTConnectorTestEEM {
             @Override
             public void received(MachineOutputMixed data) {
                 restRef.set(data);
+                count.incrementAndGet();
             }
 
             @Override

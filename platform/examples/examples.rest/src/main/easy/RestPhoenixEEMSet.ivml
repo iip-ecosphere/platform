@@ -1,7 +1,7 @@
 project RestPhoenixEEMSet { 
 
 	import IIPEcosphere;
-	import RestPhoenixEEMResponsesSet;
+	import RestPhoenixEEMResponsesMixed;
 	
 	annotate BindingTime bindingTime = BindingTime::compile to .;
 	

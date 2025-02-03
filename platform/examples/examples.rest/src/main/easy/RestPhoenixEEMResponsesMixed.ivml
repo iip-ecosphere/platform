@@ -4,6 +4,7 @@ project RestPhoenixEEMResponsesMixed {
 	
 	annotate BindingTime bindingTime = BindingTime::compile to .;
 	
+	
 	RecordType restPhoenixEEMResponseTraiffNumber = {
 		name = "RestPhoenixEEMResponseTraiffNumber" ,
 		fields = {
@@ -57,6 +58,7 @@ project RestPhoenixEEMResponsesMixed {
 		}
 	};
 	
+	
 	RecordType restPhoenixEEMResponseMeasurementSetItem = {
 		name = "RestPhoenixEEMResponseMeasurementSetItem" ,
 		fields = {
@@ -94,7 +96,7 @@ project RestPhoenixEEMResponsesMixed {
 			} /*, RestField {
 				name = "items",
 				type = refBy(ArrayType(refBy(restPhoenixEEMResponseMeasurementSetItem)))
-			}*/
+			} */
 		}
 	};
 	
