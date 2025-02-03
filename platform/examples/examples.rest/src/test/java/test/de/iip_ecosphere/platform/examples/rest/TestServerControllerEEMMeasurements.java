@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 import de.iip_ecosphere.platform.examples.rest.TestServerResponsMeasurementSingle;
 import de.iip_ecosphere.platform.examples.rest.TestServerResponseMeasurementSet;
 import de.iip_ecosphere.platform.examples.rest.TestServerResponseMeasurementSetItem;
-import de.iip_ecosphere.platform.examples.rest.TestServerValueMeasurement;
 
 
 @RestController

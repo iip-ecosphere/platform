@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import de.iip_ecosphere.platform.connectors.rest.RESTServerResponse;
+import test.de.iip_ecosphere.platform.examples.rest.TestServerValueMeasurement;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TestServerResponsMeasurementSingle extends RESTServerResponse {

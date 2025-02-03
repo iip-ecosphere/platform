@@ -1,4 +1,4 @@
-package de.iip_ecosphere.platform.examples.rest;
+package test.de.iip_ecosphere.platform.examples.rest;
 
 /**
  * Only needed for the TestServer.
