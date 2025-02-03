@@ -21,5 +21,11 @@ project RestPhoenixEEMSet {
 			}	
 		}	
 	};
+	
+	// ------------ freezing ------------------
+
+    freeze {
+        .;
+    } but (f|f.bindingTime >= BindingTime.runtimeMon);
 
 }

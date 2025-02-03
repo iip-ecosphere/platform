@@ -84,6 +84,11 @@ project RestPhoenixEEMResponsesMixed {
 		}
 	};
 	
+	ArrayType myMeasurementSetArray = {
+		name = "MyMeasurementSetArray[]",
+		type = refBy(restPhoenixEEMResponseMeasurementSetItem)
+	};
+	
 	RecordType restPhoenixEEMResponseMeasurementSet = {
 		name = "RestPhoenixEEMResponseMeasurementSet" ,
 		fields = {
@@ -93,13 +98,13 @@ project RestPhoenixEEMResponsesMixed {
 			}, RestField {
 				name = "timestamp",
 				type = refBy(StringType)
-			} /*, RestField {
+			}, Field {
 				name = "items",
-				type = refBy(ArrayType(refBy(restPhoenixEEMResponseMeasurementSetItem)))
-			} */
+				type = refBy(myMeasurementSetArray)
+			}
 		}
 	};
-	
+
 	RecordType restPhoenixEEMResponseInformationRootItem = {
 		name = "RestPhoenixEEMResponseInformationRootItem" ,
 		fields = {
@@ -111,6 +116,11 @@ project RestPhoenixEEMResponsesMixed {
 				type = refBy(StringType)
 			}
 		}
+	};
+	
+	ArrayType myInformationRootArray = {
+		name = "MyInformationRootArray[]",
+		type = refBy(restPhoenixEEMResponseInformationRootItem)
 	};
 	
 	RecordType restPhoenixEEMResponseInformationInfoItem = {
@@ -135,6 +145,11 @@ project RestPhoenixEEMResponsesMixed {
 		}
 	};
 	
+	ArrayType myInformationInfoArray = {
+		name = "MyInformationInfoArray[]",
+		type = refBy(restPhoenixEEMResponseInformationInfoItem)
+	};
+	
 	RecordType restPhoenixEEMResponseInformation = {
 		name = "RestPhoenixEEMResponseInformation" ,
 		fields = {
@@ -144,13 +159,13 @@ project RestPhoenixEEMResponsesMixed {
 			}, RestField {
 				name = "timestamp",
 				type = refBy(StringType)
-			} /*, RestField {
+			}, Field {
 				name = "rootItems",
-				type = refBy(ArrayType(refBy(restPhoenixEEMResponseInformationRootItem)))
-			}, RestField {
+				type = refBy(myInformationRootArray)
+			}, Field {
 				name = "infoItems",
-				type = refBy(ArrayType(refBy(restPhoenixEEMResponseInformationInfoItem)))
-			} */
+				type = refBy(myInformationInfoArray)
+			}
 		}
 	};
 	

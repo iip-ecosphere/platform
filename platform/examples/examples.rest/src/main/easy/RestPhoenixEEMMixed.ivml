@@ -53,58 +53,69 @@ project RestPhoenixEEMMixed {
 				type =  refBy(restPhoenixEEMResponseMeasurementSingle),
 				cachingTime = CACHE_NONE
 				
-			}, RestField {			
+			}, RestSetField {			
 				name = "I1",
 				endpoint = "measurements/all",
 				//endpointIndex = 7,
 				type =  refBy(restPhoenixEEMResponseMeasurementSetItem),
+				setType = refBy(restPhoenixEEMResponseMeasurementSet),
 				cachingTime = CACHE_NONE
 				
-			}, RestField {			
+			}, RestSetField {			
 				name = "I2",
 				endpoint = "measurements/all",
 				//endpointIndex = 8,
 				type =  refBy(restPhoenixEEMResponseMeasurementSetItem),
+				setType = refBy(restPhoenixEEMResponseMeasurementSet),
 				cachingTime = CACHE_NONE
 				
-			}, RestField {			
+			}, RestSetField {			
 				name = "I3",
 				endpoint = "measurements/all",
 				//endpointIndex = 9,
 				type =  refBy(restPhoenixEEMResponseMeasurementSetItem),
+				setType = refBy(restPhoenixEEMResponseMeasurementSet),
 				cachingTime = CACHE_NONE
 				
-			}, RestField {			
+			}, RestSetField {			
 				name = "Root1",
 				endpoint = "information",
 				//endpointIndex = 0,
 				type =  refBy(restPhoenixEEMResponseInformationRootItem),
+				setType = refBy(restPhoenixEEMResponseInformation),
 				cachingTime = CACHE_NONE
 				
-			}, RestField {			
+			}, RestSetField {			
 				name = "Root2",
 				endpoint = "information",
 				//endpointIndex = 1,
 				type =  refBy(restPhoenixEEMResponseInformationRootItem),
+				setType = refBy(restPhoenixEEMResponseInformation),
 				cachingTime = CACHE_NONE
 				
-			}, RestField {			
+			}, RestSetField {			
 				name = "Info1",
 				endpoint = "information",
 				//endpointIndex = 0,
 				type =  refBy(restPhoenixEEMResponseInformationInfoItem),
+				setType = refBy(restPhoenixEEMResponseInformation),
 				cachingTime = CACHE_NONE
 				
-			}, RestField {			
+			}, RestSetField {			
 				name = "Info2",
 				endpoint = "information",
 				//endpointIndex = 1,
 				type =  refBy(restPhoenixEEMResponseInformationInfoItem),
+				setType = refBy(restPhoenixEEMResponseInformation),
 				cachingTime = CACHE_NONE
 				
 			}
-			
-			
 		}
 	};
+	
+	// ------------ freezing ------------------
+
+    freeze {
+        .;
+    } but (f|f.bindingTime >= BindingTime.runtimeMon);
 }
