@@ -2062,25 +2062,28 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
             } else {
                 it = items.get(type);
             }
-            addUsedType(f, used, it);
-            collectRestTypes(f.type, result, used, items);
+            addUsedType(f, result, used, it, items);
         }
     }
     
     @DispatchBasis
-    addUsedType(Field field, setOf(RecordType) used, setOf(RecordType) items) = {
+    addUsedType(Field field, setOf(RecordType) result, setOf(RecordType) used, setOf(RecordType) items, mapOf(RecordType, setOf(RecordType)) allItems) = {
+        collectRestTypes(field.type, result, used, allItems);
     }
 
     @DispatchCase
-    addUsedType(RestField field, setOf(RecordType) used, setOf(RecordType) items) = {
+    addUsedType(RestField field, setOf(RecordType) result, setOf(RecordType) used, setOf(RecordType) items, mapOf(RecordType, setOf(RecordType)) allItems) = {
         addToSet(field.type, used);
         addToSet(field.type, items);
+        collectRestTypes(field.type, result, used, allItems);
     }
 
     @DispatchCase
-    addUsedType(RestSetField field, setOf(RecordType) used, setOf(RecordType) items) = {
+    addUsedType(RestSetField field, setOf(RecordType) result, setOf(RecordType) used, setOf(RecordType) items, mapOf(RecordType, setOf(RecordType)) allItems) = {
         addToSet(field.setType, used);
         addToSet(field.type, items);
+        collectRestTypes(field.type, result, used, allItems);
+        collectRestTypes(field.setType, result, used, allItems);
     }
     
     addToSet(DataType type, setOf(RecordType) used) = {

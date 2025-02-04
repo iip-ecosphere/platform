@@ -41,18 +41,30 @@ template JavaConnectorRestType(Configuration config, JavaCodeArtifact target, Re
             m.addReturn("new Class[]{${rCls}}");
         }
         
-        m = mainCls.addMethod("Object", "getValue");
+        m = mainCls.addMethod("Object", "getValueToWrite");
         m.addOverrideAnnotation();
         m.addAnnotation("com.fasterxml.jackson.annotation.JsonIgnore");
         m.addReturn("null");        
     }
     
     def String mapTypeName(Field f) {
-        String result = getTypeName(f);
-        if (f.type.isKindOf(RecordType)) {
-            result = result + "RestType";
-        }
-        result;
+        mapTypeName(f.type);
+    }
+    
+    def String mapTypeName(AasField f) {
+        getTypeName(f);
+    }
+    
+    def String mapTypeName(DataType type) {
+        toTypeName(type);
+    }
+
+    def String mapTypeName(ArrayType type) {
+        mapTypeName(type.type) + "[]";
+    }
+    
+    def String mapTypeName(RecordType type) {
+        toTypeName(type) + "RestType";
     }
     
 }
