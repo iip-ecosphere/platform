@@ -167,4 +167,10 @@ public class TestServerResponsSingle extends RESTServerResponse {
         return null;
     }
 
+    @Override
+    public Object getValueToWrite() {
+
+        return value;
+    }
+
 }

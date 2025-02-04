@@ -220,7 +220,7 @@ public abstract class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, 
             String qName = (String) data;
             String path = params.getEndpointPath();
             String endpoint = item.getEndpointMap().get(qName).getSimpleEndpoint();
-            Object value = item.getValue(qName).getValue();
+            Object value = item.getValue(qName).getValueToWrite();
             
             String uri = path + endpoint + "?value=" + value;
             System.out.println("write to:" + uri);

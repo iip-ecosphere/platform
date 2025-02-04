@@ -104,11 +104,11 @@ public class RESTConnectorTestEEM {
             }
             
             Assert.assertNotNull(rest);
-            Assert.assertEquals(3, rest.getTn().getValue());
-            Assert.assertEquals(50.000, rest.getF().getValue());
-            Assert.assertEquals(229.845, rest.getU1().getValue());
-            Assert.assertEquals(229.805, rest.getU2().getValue());
-            Assert.assertEquals(229.853, rest.getU3().getValue());
+            Assert.assertEquals(3, rest.getTn().getValueToWrite());
+            Assert.assertEquals(50.000, rest.getF().getValueToWrite());
+            Assert.assertEquals(229.845, rest.getU1().getValueToWrite());
+            Assert.assertEquals(229.805, rest.getU2().getValueToWrite());
+            Assert.assertEquals(229.853, rest.getU3().getValueToWrite());
             Assert.assertEquals(2.533, rest.getI1().getValue());
             Assert.assertEquals(2.468, rest.getI2().getValue());
             Assert.assertEquals(2.476, rest.getI3().getValue());
@@ -135,7 +135,7 @@ public class RESTConnectorTestEEM {
                 currentCount = count.get();
             }
 
-            Assert.assertEquals(1, rest.getTn().getValue());
+            Assert.assertEquals(1, rest.getTn().getValueToWrite());
  
             System.out.println("");
             LOGGER.info("testRequestTypeMixed() -> success" + "\n");

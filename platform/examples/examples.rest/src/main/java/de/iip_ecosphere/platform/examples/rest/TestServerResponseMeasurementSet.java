@@ -79,12 +79,8 @@ public class TestServerResponseMeasurementSet extends RESTServerResponse {
         this.items = items;
     }
 
-
-
-    @JsonIgnore
     @Override
-    public Object getValue() {
-        // TODO Auto-generated method stub
+    public Object getValueToWrite() {
         return null;
     }
 

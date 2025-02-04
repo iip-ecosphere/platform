@@ -102,15 +102,15 @@ public class RESTConnectorTest {
             }
 
             Assert.assertNotNull(rest);
-            Assert.assertEquals("Hello World!", rest.getStringValue().getValue());
-            Assert.assertEquals(1, rest.getShortValue().getValue());
-            Assert.assertEquals(100, rest.getIntegerValue().getValue());
-            Assert.assertEquals(10000, rest.getLongValue().getValue());
+            Assert.assertEquals("Hello World!", rest.getStringValue().getValueToWrite());
+            Assert.assertEquals(1, rest.getShortValue().getValueToWrite());
+            Assert.assertEquals(100, rest.getIntegerValue().getValueToWrite());
+            Assert.assertEquals(10000, rest.getLongValue().getValueToWrite());
 
-            float diffFloat = ((float) Math.PI) - ((Number) rest.getFloatValue().getValue()).floatValue();
+            float diffFloat = ((float) Math.PI) - ((Number) rest.getFloatValue().getValueToWrite()).floatValue();
             Assert.assertTrue(diffFloat < 0.001);
 
-            double diffDouble = ((double) Math.PI) - ((double) rest.getDoubleValue().getValue());
+            double diffDouble = ((double) Math.PI) - ((double) rest.getDoubleValue().getValueToWrite());
             Assert.assertTrue(diffDouble < 0.001);
 
             MachineInputSingle input = new MachineInputSingle();
@@ -126,7 +126,7 @@ public class RESTConnectorTest {
                 currentCount = count.get();
             }
 
-            Assert.assertEquals("New String Value", rest.getStringValue().getValue());
+            Assert.assertEquals("New String Value", rest.getStringValue().getValueToWrite());
 
             System.out.println("");
             LOGGER.info("testRequestTypeSingle() -> success" + "\n");
@@ -165,15 +165,15 @@ public class RESTConnectorTest {
             }
 
             Assert.assertNotNull(rest);
-            Assert.assertEquals("New String Value", rest.getStringValue().getValue());
-            Assert.assertEquals(1, rest.getShortValue().getValue());
-            Assert.assertEquals(100, rest.getIntegerValue().getValue());
-            Assert.assertEquals(10000, rest.getLongValue().getValue());
+            Assert.assertEquals("New String Value", rest.getStringValue().getValueToWrite());
+            Assert.assertEquals(1, rest.getShortValue().getValueToWrite());
+            Assert.assertEquals(100, rest.getIntegerValue().getValueToWrite());
+            Assert.assertEquals(10000, rest.getLongValue().getValueToWrite());
 
-            float diffFloat = ((float) Math.PI) - ((Number) rest.getFloatValue().getValue()).floatValue();
+            float diffFloat = ((float) Math.PI) - ((Number) rest.getFloatValue().getValueToWrite()).floatValue();
             Assert.assertTrue(diffFloat < 0.001);
 
-            double diffDouble = ((double) Math.PI) - ((double) rest.getDoubleValue().getValue());
+            double diffDouble = ((double) Math.PI) - ((double) rest.getDoubleValue().getValueToWrite());
             Assert.assertTrue(diffDouble < 0.001);
 
             MachineInputSingle input = new MachineInputSingle();
@@ -189,7 +189,7 @@ public class RESTConnectorTest {
                 currentCount = count.get();
             }
 
-            Assert.assertEquals("Hello World!", rest.getStringValue().getValue());
+            Assert.assertEquals("Hello World!", rest.getStringValue().getValueToWrite());
 
             System.out.println("");
             LOGGER.info("testRequestTypeSingleWP() -> success" + "\n");

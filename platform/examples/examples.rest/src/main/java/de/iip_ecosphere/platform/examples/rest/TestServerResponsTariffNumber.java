@@ -147,4 +147,9 @@ public class TestServerResponsTariffNumber extends RESTServerResponse {
         return null;
     }
 
+    @Override
+    public Object getValueToWrite() {
+        return value;
+    }
+
 }

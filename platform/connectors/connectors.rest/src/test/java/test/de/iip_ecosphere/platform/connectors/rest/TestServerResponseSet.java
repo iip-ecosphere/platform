@@ -79,9 +79,9 @@ public class TestServerResponseSet extends RESTServerResponse {
         this.items = items;
     }
 
-    @JsonIgnore
+    
     @Override
-    public Object getValue() {
+    public Object getValueToWrite() {
         return null;
     }
 

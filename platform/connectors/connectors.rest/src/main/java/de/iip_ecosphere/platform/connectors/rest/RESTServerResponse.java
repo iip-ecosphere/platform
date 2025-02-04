@@ -3,6 +3,7 @@ package de.iip_ecosphere.platform.connectors.rest;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -41,7 +42,8 @@ public abstract class RESTServerResponse {
      * 
      * @return value or null
      */
-    public  abstract Object getValue();
+    @JsonIgnore
+    public  abstract Object getValueToWrite();
     
     /**
      * Returns the specific inner Item Classes of RESTServerResponse as Array. If

@@ -73,7 +73,7 @@ public class TestServerControllerEEMTariffNumber {
     public ResponseEntity<String> updateTn(@RequestParam("value") int value) {
 
         tn.set("value", value);
-        ResponseEntity<String> mes = ResponseEntity.ok("tn wurde aktualisiert: neuer Wert ist " + tn.getValue());
+        ResponseEntity<String> mes = ResponseEntity.ok("tn wurde aktualisiert: neuer Wert ist " + tn.getValueToWrite());
         System.out.println(mes);
         return mes;
     }

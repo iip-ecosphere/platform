@@ -25,7 +25,7 @@ public class MachineInputTranslatorMixed<O> extends AbstractConnectorInputTypeTr
         AbstractModelAccess access = (AbstractModelAccess) getModelAccess();
 
         if (data.getTn() != null) {
-            access.set("tn", data.getTn().getValue());
+            access.set("tn", data.getTn().getValueToWrite());
         }
         
         return null;

@@ -98,10 +98,8 @@ public class TestServerResponseInformation extends RESTServerResponse {
         this.infoItems = infoItems;
     }
     
-    @JsonIgnore
     @Override
-    public Object getValue() {
-        // TODO Auto-generated method stub
+    public Object getValueToWrite() {
         return null;
     }
 

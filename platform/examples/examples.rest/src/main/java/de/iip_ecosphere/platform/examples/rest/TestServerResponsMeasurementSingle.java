@@ -185,4 +185,9 @@ public class TestServerResponsMeasurementSingle extends RESTServerResponse {
         return null;
     }
 
+    @Override
+    public Object getValueToWrite() {
+        return value;
+    }
+
 }
