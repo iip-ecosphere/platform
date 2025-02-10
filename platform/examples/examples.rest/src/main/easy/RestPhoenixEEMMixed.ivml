@@ -11,7 +11,7 @@ project RestPhoenixEEMMixed {
 			RestField {
 				name = "tn1",
 				endpoint = "tariff-number/tn1",
-				asSingleValue = true;				
+				asSingleValue = true,		
 				//endpointIndex = -1,
 				type =  refBy(restPhoenixEEMResponseTraiffNumber),
 				cachingTime = CACHE_NONE
@@ -19,7 +19,7 @@ project RestPhoenixEEMMixed {
 			}, RestField {
 				name = "tn2",
 				endpoint = "tariff-number/tn2",
-				asSingleValue = false;	
+				asSingleValue = false,
 				//endpointIndex = -1,
 				type =  refBy(restPhoenixEEMResponseTraiffNumber),
 				cachingTime = CACHE_NONE
