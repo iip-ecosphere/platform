@@ -104,7 +104,7 @@ public class TestServerResponseInformation extends RESTServerResponse {
     }
 
     @Override
-    protected Class<?>[] getItemClass() {
+    protected Class<?>[] getItemClasses() {
 
         return new Class[] {TestServerResponseInformationRootItem.class, TestServerResponseInformationInfoItem.class};
     }

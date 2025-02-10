@@ -180,7 +180,7 @@ public class TestServerResponsMeasurementSingle extends RESTServerResponse {
 
 
     @Override
-    protected Class<?>[] getItemClass() {
+    protected Class<?>[] getItemClasses() {
         // TODO Auto-generated method stub
         return null;
     }

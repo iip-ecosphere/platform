@@ -24,7 +24,7 @@ public class SpecificRESTConnectorMixed extends RESTConnector<MachineOutputMixed
 
     @SuppressWarnings("unchecked")
     @Override
-    protected Class<? extends RESTServerResponse>[] getResponseClass() {
+    protected Class<? extends RESTServerResponse>[] getResponseClasses() {
 
         return new Class[] {TestServerResponsTariffNumber.class, TestServerResponsMeasurementSingle.class,
             TestServerResponseMeasurementSet.class, TestServerResponseInformation.class};

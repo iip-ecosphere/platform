@@ -5,6 +5,8 @@ public class RESTEndpoint {
     private String name;
     private String endpoint;
     private int responseTypeIndex;
+    private boolean asSingleValue;
+    private int setIndex;
 
     /**
      * Getter for endpoint.
@@ -76,7 +78,41 @@ public class RESTEndpoint {
     public void setName(String name) {
         this.name = name;
     }
-    
-    
+
+    /**
+     * Getter for simpleValueToWrite.
+     * 
+     * @return simpleValueToWrite
+     */
+    public boolean getAsSingleValue() {
+        return asSingleValue;
+    }
+
+    /**
+     * Setter for simpleValueToWrite.
+     * 
+     * @param simpleValueToWrite to set
+     */
+    public void setAsSingleValue(boolean simpleValueToWrite) {
+        this.asSingleValue = simpleValueToWrite;
+    }
+
+    /**
+     * Getter for setIndex.
+     * 
+     * @return setIndex
+     */
+    public int getSetIndex() {
+        return setIndex;
+    }
+
+    /**
+     * Setter for setIndex.
+     * 
+     * @param setIndex to set
+     */
+    public void setSetIndex(int setIndex) {
+        this.setIndex = setIndex;
+    }
 
 }

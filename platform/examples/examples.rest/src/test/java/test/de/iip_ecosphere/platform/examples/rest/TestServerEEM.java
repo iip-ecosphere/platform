@@ -47,15 +47,24 @@ public class TestServerEEM {
     /**
      * Creates the endpointDescriptionMixed.
      */
-    private void createEndpointDescriptionMixed() {
+    private void createEndpointDescriptionMixed() { 
         endpointDescriptionMixed = "{";
-        endpointDescriptionMixed += "\"tn\" : {\"endpoint\" : \"tariff-number/tn\", \"responseTypeIndex\" : \"0\"},";
-        endpointDescriptionMixed += "\"f\" : {\"endpoint\" : \"measurements/f\", \"responseTypeIndex\" : \"1\"},";
-        endpointDescriptionMixed += "\"u1\" : {\"endpoint\" : \"measurements/u1\", \"responseTypeIndex\" : \"1\"},";
-        endpointDescriptionMixed += "\"u2\" : {\"endpoint\" : \"measurements/u2\", \"responseTypeIndex\" : \"1\"},";
-        endpointDescriptionMixed += "\"u3\" : {\"endpoint\" : \"measurements/u3\", \"responseTypeIndex\" : \"1\"},";
-        endpointDescriptionMixed += "\"all\" : {\"endpoint\" : \"measurements/all\", \"responseTypeIndex\" : \"2\"},";
-        endpointDescriptionMixed += "\"information\" : {\"endpoint\" : \"information\", \"responseTypeIndex\" : \"3\"}";
+        endpointDescriptionMixed += "\"tn1\" : {\"endpoint\" : \"tariff-number/tn1\","
+                + " \"responseTypeIndex\" : \"0\", \"asSingleValue\" : true},";
+        endpointDescriptionMixed += "\"tn2\" : {\"endpoint\" : \"tariff-number/tn2\","
+                + " \"responseTypeIndex\" : \"0\", \"asSingleValue\" : false},";
+        endpointDescriptionMixed += "\"f\" : {\"endpoint\" : \"measurements/f\","
+                + " \"responseTypeIndex\" : \"1\", \"asSingleValue\" : false},";
+        endpointDescriptionMixed += "\"u1\" : {\"endpoint\" : \"measurements/u1\","
+                + " \"responseTypeIndex\" : \"1\", \"asSingleValue\" : false},";
+        endpointDescriptionMixed += "\"u2\" : {\"endpoint\" : \"measurements/u2\","
+                + " \"responseTypeIndex\" : \"1\", \"asSingleValue\" : false},";
+        endpointDescriptionMixed += "\"u3\" : {\"endpoint\" : \"measurements/u3\","
+                + " \"responseTypeIndex\" : \"1\", \"asSingleValue\" : false},";
+        endpointDescriptionMixed += "\"all\" : {\"endpoint\" : \"measurements/all\","
+                + " \"responseTypeIndex\" : \"2\", \"asSingleValue\" : false},";
+        endpointDescriptionMixed += "\"information\" : {\"endpoint\" : \"information\","
+                + " \"responseTypeIndex\" : \"3\", \"asSingleValue\" : false}";
         endpointDescriptionMixed += "}";
     }
 

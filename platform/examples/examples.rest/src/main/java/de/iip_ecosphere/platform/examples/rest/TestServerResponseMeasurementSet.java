@@ -85,7 +85,7 @@ public class TestServerResponseMeasurementSet extends RESTServerResponse {
     }
 
     @Override
-    protected Class<?>[] getItemClass() {
+    protected Class<?>[] getItemClasses() {
 
         return new Class[] {TestServerResponseMeasurementSetItem.class};
     }

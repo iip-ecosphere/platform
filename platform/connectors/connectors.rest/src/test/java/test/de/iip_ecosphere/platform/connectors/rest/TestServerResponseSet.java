@@ -86,7 +86,7 @@ public class TestServerResponseSet extends RESTServerResponse {
     }
 
     @Override
-    protected Class<?>[] getItemClass() {
+    protected Class<?>[] getItemClasses() {
         // TODO Auto-generated method stub
         return new Class[] {TestServerResponseSetItem.class};
     }

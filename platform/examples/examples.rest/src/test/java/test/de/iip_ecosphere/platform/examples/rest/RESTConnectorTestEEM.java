@@ -94,8 +94,7 @@ public class RESTConnectorTestEEM {
             AtomicReference<MachineOutputMixed> restReference = new AtomicReference<MachineOutputMixed>();
             AtomicInteger count = new AtomicInteger(0);
             connector.setReceptionCallback(createCallbackMixed(restReference, count));
-            
-                  
+                              
             MachineOutputMixed rest = restReference.get();
 
             while (rest == null) {
@@ -104,38 +103,55 @@ public class RESTConnectorTestEEM {
             }
             
             Assert.assertNotNull(rest);
-            Assert.assertEquals(3, rest.getTn().getValueToWrite());
+            Assert.assertEquals(3, rest.getTn1().getValueToWrite());
             Assert.assertEquals(50.000, rest.getF().getValueToWrite());
             Assert.assertEquals(229.845, rest.getU1().getValueToWrite());
             Assert.assertEquals(229.805, rest.getU2().getValueToWrite());
             Assert.assertEquals(229.853, rest.getU3().getValueToWrite());
             Assert.assertEquals(2.533, rest.getI1().getValue());
             Assert.assertEquals(2.468, rest.getI2().getValue());
-            Assert.assertEquals(2.476, rest.getI3().getValue());
-            
+            Assert.assertEquals(2.476, rest.getI3().getValue());           
             Assert.assertEquals("Device information", rest.getRoot1().getDescription());
             Assert.assertEquals("Instantaneous values", rest.getRoot2().getDescription());
             Assert.assertEquals("EEM-MA370", rest.getInfo1().getValue());
-            Assert.assertEquals("2.0", rest.getInfo2().getValue());
-            
+            Assert.assertEquals("2.0", rest.getInfo2().getValue());           
             
             MachineInputMixed input = new MachineInputMixed();
+            TestServerResponsTariffNumber tn1 = rest.getTn1();
+            tn1.setValue(1);
+            input.setTn1(tn1);
+            connector.write(input);            
 
-            TestServerResponsTariffNumber tn = rest.getTn();
-            tn.setValue(1);
-            input.setTn(tn);
+            rest = waitUntilReceived(count, restReference, rest);
+
+            Assert.assertEquals(1, rest.getTn1().getValueToWrite());            
+            
+            Assert.assertEquals("", rest.getTn2().getContext());
+            Assert.assertEquals("", rest.getTn2().getId());
+            Assert.assertEquals("", rest.getTn2().getTimestamp());
+            Assert.assertEquals("", rest.getTn2().getName());
+            Assert.assertEquals(null, rest.getTn2().getValue());
+            Assert.assertEquals("", rest.getTn2().getDescription());
+            
+            TestServerResponsTariffNumber tn2 = new TestServerResponsTariffNumber();
+            tn2.setContext("/api/v1/measurements/tn2");
+            tn2.setId("tn2");
+            tn2.setTimestamp("timestamp");
+            tn2.setName("TN2");
+            tn2.setValue(3);
+            tn2.setDescription("Tariff Number 2");
+            
+            input.setTn2(tn2);
             connector.write(input);
             
-            int currentCount = count.get();
-            int targetCount = currentCount + 1;
+            rest = waitUntilReceived(count, restReference, rest);
 
-            while (currentCount < targetCount) {
-                TimeUtils.sleep(10);
-                rest = restReference.get();
-                currentCount = count.get();
-            }
-
-            Assert.assertEquals(1, rest.getTn().getValueToWrite());
+            Assert.assertEquals("/api/v1/measurements/tn2", rest.getTn2().getContext());
+            Assert.assertEquals("tn2", rest.getTn2().getId());
+            Assert.assertEquals("timestamp", rest.getTn2().getTimestamp());
+            Assert.assertEquals("TN2", rest.getTn2().getName());
+            Assert.assertEquals(3, rest.getTn2().getValue());
+            Assert.assertEquals("Tariff Number 2", rest.getTn2().getDescription());
  
             System.out.println("");
             LOGGER.info("testRequestTypeMixed() -> success" + "\n");
@@ -145,7 +161,28 @@ public class RESTConnectorTestEEM {
             e.printStackTrace();
         }
     }
+    
+    /**
+     * Waits until new data are received.
+     * 
+     * @param count AtomicInteger
+     * @param restReference AtomicReference<MachineOutputMixed>
+     * @param rest MachineOutputMixed
+     */
+    private MachineOutputMixed waitUntilReceived(AtomicInteger count, 
+            AtomicReference<MachineOutputMixed> restReference, MachineOutputMixed rest) {
+        
+        int currentCount = count.get();
+        int targetCount = currentCount + 1;
 
+        while (currentCount < targetCount) {
+            TimeUtils.sleep(10);
+            rest = restReference.get();
+            currentCount = count.get();
+        }
+        
+        return rest;
+    }
     /**
      * Returns the connector descriptor for
      * {@link #createConnector(ProtocolAdapter)}.
@@ -234,4 +271,5 @@ public class RESTConnectorTestEEM {
 
         return callback;
     }
+   
 }

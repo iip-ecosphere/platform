@@ -52,5 +52,5 @@ public abstract class RESTServerResponse {
      * @param <T2> the specific inner ItemClass
      * @return the specific inner ItemClass or null
      */
-    protected abstract Class<?>[] getItemClass();
+    protected abstract Class<?>[] getItemClasses();
 }

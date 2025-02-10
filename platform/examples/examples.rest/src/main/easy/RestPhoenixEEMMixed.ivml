@@ -8,19 +8,39 @@ project RestPhoenixEEMMixed {
 	RecordType restPhoenixRwEEMMixed = {
 		name = "RestPhoenixRwEEMMixed",
 		fields = {
+			RestField {
+				name = "tn1",
+				endpoint = "tariff-number/tn1",
+				asSingleValue = true;				
+				//endpointIndex = -1,
+				type =  refBy(restPhoenixEEMResponseTraiffNumber),
+				cachingTime = CACHE_NONE
 				
-			
+			}, RestField {
+				name = "tn2",
+				endpoint = "tariff-number/tn2",
+				asSingleValue = false;	
+				//endpointIndex = -1,
+				type =  refBy(restPhoenixEEMResponseTraiffNumber),
+				cachingTime = CACHE_NONE
+				
+			}				
 		}
 	};
 	
 	RecordType restPhoenixEEMMixed = {
 		name = "RestPhoenixEEMMixed",
 		fields = {	
-		
-		
 			RestField {
-				name = "tariff-number",
-				endpoint = "tariff-number/tn",
+				name = "tn1",
+				endpoint = "tariff-number/tn1",
+				//endpointIndex = -1,
+				type =  refBy(restPhoenixEEMResponseTraiffNumber),
+				cachingTime = CACHE_NONE
+				
+			}, RestField {
+				name = "tn2",
+				endpoint = "tariff-number/tn2",
 				//endpointIndex = -1,
 				type =  refBy(restPhoenixEEMResponseTraiffNumber),
 				cachingTime = CACHE_NONE

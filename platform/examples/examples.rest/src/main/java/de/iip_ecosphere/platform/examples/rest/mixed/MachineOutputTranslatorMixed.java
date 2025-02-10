@@ -2,13 +2,17 @@ package de.iip_ecosphere.platform.examples.rest.mixed;
 
 import java.io.IOException;
 
+import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.model.AbstractModelAccess;
 import de.iip_ecosphere.platform.connectors.model.ModelAccess;
+import de.iip_ecosphere.platform.connectors.rest.RESTEndpointMap;
 import de.iip_ecosphere.platform.connectors.types.AbstractConnectorOutputTypeTranslator;
 import de.iip_ecosphere.platform.examples.rest.TestServerResponsMeasurementSingle;
 import de.iip_ecosphere.platform.examples.rest.TestServerResponsTariffNumber;
 import de.iip_ecosphere.platform.examples.rest.TestServerResponseInformation;
 import de.iip_ecosphere.platform.examples.rest.TestServerResponseMeasurementSet;
+import de.iip_ecosphere.platform.examples.rest.TestServerResponseMeasurementSetItem;
+import de.iip_ecosphere.platform.support.json.JsonUtils;
 
 public class MachineOutputTranslatorMixed<S> extends AbstractConnectorOutputTypeTranslator<S, MachineOutputMixed> {
 
@@ -48,10 +52,13 @@ public class MachineOutputTranslatorMixed<S> extends AbstractConnectorOutputType
     @Override
     public MachineOutputMixed to(S source) throws IOException {
         AbstractModelAccess access = (AbstractModelAccess) getModelAccess();
-        access.getConnectorParameter();
+        ConnectorParameter params = access.getConnectorParameter();
+        Object endpoints = params.getSpecificSetting("Endpoints");
+        RESTEndpointMap map = JsonUtils.fromJson(endpoints, RESTEndpointMap.class);
 
         MachineOutputMixed result = new MachineOutputMixed();
-        result.setTn((TestServerResponsTariffNumber) access.get("tn"));
+        result.setTn1((TestServerResponsTariffNumber) access.get("tn1"));
+        result.setTn2((TestServerResponsTariffNumber) access.get("tn2"));
         result.setF((TestServerResponsMeasurementSingle) access.get("f"));
         result.setU1((TestServerResponsMeasurementSingle) access.get("u1"));
         result.setU2((TestServerResponsMeasurementSingle) access.get("u2"));

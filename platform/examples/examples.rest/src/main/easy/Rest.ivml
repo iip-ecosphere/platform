@@ -76,7 +76,7 @@ project Rest {
     Service myReceiverService = JavaService {
         id = "RestReceiver",
         name = "REST Receiver",
-        description = "",
+        description = "Reciver for RESTConnector example",
         ver = "0.1.0",
         deployable = true,
         class = "ReceiverImpl",

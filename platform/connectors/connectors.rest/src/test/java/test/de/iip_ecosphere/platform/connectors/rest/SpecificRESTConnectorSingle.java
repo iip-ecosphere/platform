@@ -22,7 +22,7 @@ public class SpecificRESTConnectorSingle extends RESTConnector<MachineOutputSing
     
     @SuppressWarnings("unchecked")
     @Override
-    protected  Class<? extends RESTServerResponse>[] getResponseClass() {
+    protected  Class<? extends RESTServerResponse>[] getResponseClasses() {
      
         return  new Class[]{TestServerResponsSingle.class};
     }

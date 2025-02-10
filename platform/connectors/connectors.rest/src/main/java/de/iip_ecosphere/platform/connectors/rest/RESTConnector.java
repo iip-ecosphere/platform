@@ -8,7 +8,10 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
@@ -91,7 +94,7 @@ public abstract class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, 
         ObjectMapper mapper = new ObjectMapper();
         SimpleModule module = new SimpleModule();
 
-        for (Class<? extends RESTServerResponse> responseClass : getResponseClass()) {
+        for (Class<? extends RESTServerResponse> responseClass : getResponseClasses()) {
 
             @SuppressWarnings("unchecked")
             Class<RESTServerResponse> type = (Class<RESTServerResponse>) responseClass;
@@ -176,23 +179,12 @@ public abstract class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, 
             String uri = path + endpoint;
             int responseClassIndex = entry.getValue().getResponseTypeIndex();
             
-//            ResponseEntity<?> responseEntity = null;
-//            
-//            if (responseClassIndex == -1) {
-//                RestTemplate restTemplate = new RestTemplate();
-//                        
-//                responseEntity = restTemplate.getForEntity(uri, String.class);
-//                        //restTemplate.exchange(uri, HttpMethod.GET, null, 
-//                        //String.class);
-//            } else {
-//                RestTemplate restTemplate = new RestTemplate(Collections.singletonList(jsonConverter));
-//                responseEntity = restTemplate.exchange(uri, HttpMethod.GET, null, 
-//                        getResponseClass()[responseClassIndex]);
-//            }
+
+            Class<? extends RESTServerResponse> responseClass = getResponseClasses()[responseClassIndex];
 
             RestTemplate restTemplate = new RestTemplate(Collections.singletonList(jsonConverter));
             ResponseEntity<?> responseEntity = restTemplate.exchange(uri, HttpMethod.GET, null, 
-                    getResponseClass()[responseClassIndex]);
+                    responseClass);
 
 
 
@@ -219,15 +211,40 @@ public abstract class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, 
             
             String qName = (String) data;
             String path = params.getEndpointPath();
-            String endpoint = item.getEndpointMap().get(qName).getSimpleEndpoint();
-            Object value = item.getValue(qName).getValueToWrite();
+            RESTEndpoint restEndpoint = item.getEndpointMap().get(qName);
+            String endpoint = restEndpoint.getSimpleEndpoint();
+            ResponseEntity<?> responseEntity = null;
             
-            String uri = path + endpoint + "?value=" + value;
-            System.out.println("write to:" + uri);
+            if (restEndpoint.getAsSingleValue()) {
+              
+                
+                Object value = item.getValue(qName).getValueToWrite();
+                
+                String uri = path + endpoint + "?value=" + value;
+                System.out.println("write to:" + uri);
+                
+                RestTemplate restTemplate = new RestTemplate();
+                responseEntity = restTemplate.exchange(uri, HttpMethod.PUT, null, 
+                        String.class);
+                
+            } else {
+                
+                Object value = item.getValue(qName);
+                
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.APPLICATION_JSON);
+                
+                HttpEntity<?> requestEntity = new HttpEntity<>(value, headers);
+                
+                String uri = path + endpoint;
+                System.out.println("write to:" + uri);
+                
+                RestTemplate restTemplate = new RestTemplate();
+                responseEntity = restTemplate.exchange(uri, HttpMethod.PUT, requestEntity, 
+                        String.class);
+            }
             
-            RestTemplate restTemplate = new RestTemplate();
-            ResponseEntity<?> responseEntity = restTemplate.exchange(uri, HttpMethod.PUT, null, 
-                    String.class);
+            
 
 //            RestTemplate restTemplate = new RestTemplate();
 //
@@ -237,7 +254,7 @@ public abstract class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, 
 //            HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
 //            ResponseEntity<String> response = restTemplate.exchange(uri, HttpMethod.PUT, requestEntity, String.class);
 
-            System.out.println("Response: " + responseEntity.getBody());
+            LOGGER.info("Response: " + responseEntity.getBody());
 
         }
 
@@ -248,7 +265,7 @@ public abstract class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, 
      * 
      * @return Array containig the specific RESTServerResponse classes.
      */
-    protected abstract Class<? extends RESTServerResponse>[] getResponseClass();
+    protected abstract Class<? extends RESTServerResponse>[] getResponseClasses();
 
     /**
      * Implements the model access for REST.
@@ -277,9 +294,17 @@ public abstract class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, 
 
         @Override
         public void set(String qName, Object value) throws IOException {
+            RESTEndpoint end = item.getEndpointMap().get(qName);
             RESTServerResponse res = item.getValue(qName);
-            res.set("value", value);
-            item.setValue(qName, res);
+            
+            if (end.getAsSingleValue()) {
+                res.set("value", value);
+                item.setValue(qName, res);
+            } else {
+
+                item.setValue(qName, (RESTServerResponse) value);
+            }
+            
             writeImpl(qName);
 
         }
