@@ -27,7 +27,7 @@ template JavaConnectorRestImpl(Configuration config, JavaCodeArtifact target, Re
             rCls = appendWithSeparator(rCls, ", ", "iip.nodes." + asTypeName(t.name) + "RestType.class");
         }
         mainCls.addImport("de.iip_ecosphere.platform.connectors.rest.RESTServerResponse");
-        m = mainCls.addMethod("Class<? extends RESTServerResponse>[]", "getResponseClass");
+        m = mainCls.addMethod("Class<? extends RESTServerResponse>[]", "getResponseClasses");
         m.addOverrideAnnotation();
         m.addAnnotation("SuppressWarnings").addStringArgument("unchecked");
         m.addReturn("new Class[]{${rCls}}");

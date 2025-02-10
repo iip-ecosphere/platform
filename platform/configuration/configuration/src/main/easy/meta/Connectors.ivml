@@ -537,6 +537,7 @@ project Connectors {
 
    compound RestField refines Field {
        String endpoint = "";
+       Boolean asSingleValue = false;
    } 
 
    compound RestSetField refines RestField {

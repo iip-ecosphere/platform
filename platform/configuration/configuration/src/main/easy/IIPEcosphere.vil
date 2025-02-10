@@ -2040,7 +2040,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         vilTemplateProcessor("JavaConnectorRestImpl", config, "${javaNodesSrc}/${typeName}Impl.java", conn=conn, pkg=javaNodesPackage, usedRestTypes=usedTypes);
         for (RecordType t: types) {
             typeName = toTypeName(t);
-            vilTemplateProcessor("JavaConnectorRestType", config, "${javaNodesSrc}/${typeName}RestType.java", type=t, pkg=javaNodesPackage, output=outTypes.includes(t), itemTypes=itemTypes);
+            vilTemplateProcessor("JavaConnectorRestType", config, "${javaNodesSrc}/${typeName}RestType.java", type=t, pkg=javaNodesPackage, output=outTypes.includes(t), itemTypes=itemTypes, usedRestTypes=usedTypes);
         }
         Path resourcesSrc = "${appRoot}/src/main/resources";
         String connectorName = toIdentifier(conn.name);

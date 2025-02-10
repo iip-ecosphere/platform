@@ -82,7 +82,8 @@ template ConnectorResource(Configuration config, FileArtifact target, Connector 
             JsonNode n = json.getData();
             JsonNode o = n.addObject("${field.name}")
                .addValue("endpoint", endpoint)
-               .addValue("type", type);
+               .addValue("type", type)
+               .addValue("asSingleValue", field.asSingleValue);
             Integer endpointIndex = getEndpointIndex(field);
             if (endpointIndex >= 0) {
                 o.addValue("endpointIndex", endpointIndex);
