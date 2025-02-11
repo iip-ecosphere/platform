@@ -543,7 +543,7 @@ project Connectors {
    compound RestSetField refines RestField {
         assign(bindingTime = BindingTime::specify) to {
             refTo(DataType) setType;
-            Integer endpointIndex;
+            Integer endpointIndex = -1;
 		}   	
    } 
    
