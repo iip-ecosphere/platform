@@ -5,8 +5,8 @@ project RestPhoenixEEMResponsesMixed {
 	annotate BindingTime bindingTime = BindingTime::compile to .;
 	
 	
-	RecordType restPhoenixEEMResponseTraiffNumber = {
-		name = "RestPhoenixEEMResponseTraiffNumber" ,
+	RecordType restPhoenixEEMResponseTariffNumber = {
+		name = "RestPhoenixEEMResponseTariffNumber" ,
 		fields = {
 			RestField {
 				name = "context",

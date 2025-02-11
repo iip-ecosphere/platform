@@ -1,12 +1,14 @@
 package de.iip_ecosphere.platform.examples.rest;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import de.iip_ecosphere.platform.connectors.rest.RESTServerResponse;
+import test.de.iip_ecosphere.platform.examples.rest.TestServerValueMeasurement;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class TestServerResponsTariffNumber extends RESTServerResponse {
+public class TestServerResponseMeasurementSingle extends RESTServerResponse {
 
     @JsonProperty("context")
     private String context;
@@ -23,13 +25,30 @@ public class TestServerResponsTariffNumber extends RESTServerResponse {
     @JsonProperty("value")
     private Object value;
 
+    @JsonProperty("unit")
+    private String unit;
+
     @JsonProperty("description")
     private String description;
     
     /**
      * Constructor.
      */
-    public TestServerResponsTariffNumber() {
+    public TestServerResponseMeasurementSingle() {
+    }
+    
+    /**
+     * Constructor. Only needed for the TestServer -> Must not be generated.
+     * 
+     * @param value = Instance of TestServerValueMeasurement
+     */
+    @JsonIgnore
+    public TestServerResponseMeasurementSingle(TestServerValueMeasurement value) {
+        this.id = value.getId();
+        this.name = value.getName();
+        this.value = value.getValue();
+        this.unit = value.getUnit();
+        this.description = value.getDescription();
     }
     
     /**
@@ -123,6 +142,24 @@ public class TestServerResponsTariffNumber extends RESTServerResponse {
     }
 
     /**
+     * Getter for unit.
+     * 
+     * @return unit
+     */
+    public String getUnit() {
+        return unit;
+    }
+
+    /**
+     * Setter for unit.
+     * 
+     * @param unit to set
+     */
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
+
+    /**
      * Getter for description.
      * 
      * @return description
@@ -139,6 +176,7 @@ public class TestServerResponsTariffNumber extends RESTServerResponse {
     public void setDescription(String description) {
         this.description = description;
     }
+    
 
 
     @Override

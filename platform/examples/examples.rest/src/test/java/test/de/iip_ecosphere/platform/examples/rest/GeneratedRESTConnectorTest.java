@@ -11,8 +11,6 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.iip_ecosphere.platform.connectors.Connector;
-import de.iip_ecosphere.platform.connectors.ConnectorDescriptor;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter.ConnectorParameterBuilder;
 import de.iip_ecosphere.platform.connectors.rest.RESTConnector;
@@ -32,18 +30,20 @@ import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 
-public class RESTConnectorTestEEM {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RESTConnectorTestEEM.class);
+
+public class GeneratedRESTConnectorTest {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(GeneratedRESTConnectorTest.class);
     private static TestServerEEM testServer;
-
+    
     /**
      * Creates an instance of this test.
      */
-    public RESTConnectorTestEEM() {
+    public GeneratedRESTConnectorTest() {
 
     }
-
+    
     /**
      * Sets the test up by starting an embedded REST server.
      */
@@ -72,29 +72,29 @@ public class RESTConnectorTestEEM {
      */
     @Test
     public void testWithPolling() throws IOException, InterruptedException {
-        LOGGER.info("RESTConnectorTest -> testWithPolling()");
+        LOGGER.info("GeneratedRESTConnectorTest -> testWithPolling()");
         
-        testRequestTypeMixed();
+        testGeneratedRESTConnector();
 
     }
-
+    
     /**
-     * Test with RequestType = Mixed.
+     * Test with generated RESTConnector.
      */
-    private void testRequestTypeMixed() {
-        LOGGER.info("RESTConnectorTest -> testWithPolling() -> testRequestTypeMixed()");
+    private void testGeneratedRESTConnector() {       
         ActiveAasBase.setNotificationMode(NotificationMode.NONE);
         
+        ConnectorParameter param = getParam();        
         RESTConnector<MachineOutputMixed, MachineInputMixed> connector = new SpecificRESTConnectorMixed(
-                getProtocolAdapterMixed());
+                getProtocolAdapter());
         
         try {
-            connector.connect(getConnectorParameter("mixed"));
+            connector.connect(param);
             
             AtomicReference<MachineOutputMixed> restReference = new AtomicReference<MachineOutputMixed>();
             AtomicInteger count = new AtomicInteger(0);
-            connector.setReceptionCallback(createCallbackMixed(restReference, count));
-                              
+            connector.setReceptionCallback(createCallback(restReference, count));
+            
             MachineOutputMixed rest = restReference.get();
 
             while (rest == null) {
@@ -114,7 +114,7 @@ public class RESTConnectorTestEEM {
             Assert.assertEquals("Meter readings", rest.getRoot1().getDescription());
             Assert.assertEquals("Instantaneous values", rest.getRoot2().getDescription());
             Assert.assertEquals("1.5.1", rest.getInfo1().getValue());
-            Assert.assertEquals("2.0", rest.getInfo2().getValue());          
+            Assert.assertEquals("2.0", rest.getInfo2().getValue()); 
             
             MachineInputMixed input = new MachineInputMixed();
             TestServerResponseTariffNumber tn1 = rest.getTn1();
@@ -123,9 +123,8 @@ public class RESTConnectorTestEEM {
             connector.write(input);            
 
             rest = waitUntilReceived(count, restReference, rest);
-
-            Assert.assertEquals(1, rest.getTn1().getValueToWrite());            
             
+            Assert.assertEquals(1, rest.getTn1().getValueToWrite());                        
             Assert.assertEquals("", rest.getTn2().getContext());
             Assert.assertEquals("", rest.getTn2().getId());
             Assert.assertEquals("", rest.getTn2().getTimestamp());
@@ -152,14 +151,56 @@ public class RESTConnectorTestEEM {
             Assert.assertEquals("TN2", rest.getTn2().getName());
             Assert.assertEquals(3, rest.getTn2().getValue());
             Assert.assertEquals("Tariff Number 2", rest.getTn2().getDescription());
- 
+                   
             System.out.println("");
-            LOGGER.info("testRequestTypeMixed() -> success" + "\n");
+            LOGGER.info("GeneratedRESTConnectorTest() -> success" + "\n");
             connector.disconnect();
             
         } catch (IOException e) {
             e.printStackTrace();
         }
+         
+    }
+    
+    /**
+     * Creates and returns a ProtocolAdapter for testing.
+     * 
+     * @return ProtocolAdapter for testing
+     */
+    private ProtocolAdapter<RESTItem, Object, MachineOutputMixed, MachineInputMixed> getProtocolAdapter() {
+
+        ProtocolAdapter<RESTItem, Object, MachineOutputMixed, MachineInputMixed> adapter = 
+                new TranslatingProtocolAdapter<RESTItem, Object, MachineOutputMixed, MachineInputMixed>(
+                new MachineOutputTranslatorMixed<RESTItem>(false, RESTItem.class),
+                new MachineInputTranslatorMixed<Object>());
+
+        return adapter;
+    }
+    
+    /**
+     * Creates and returns a ReceptionCallbac<MachineOutputSet> for the Connector.
+     * 
+     * @param restRef AtomicReference<MachineOutputSet> to set received data
+     * @return ReceptionCallback<MachineOutputSet> callback
+     */
+    private ReceptionCallback<MachineOutputMixed> createCallback(AtomicReference<MachineOutputMixed> restRef, 
+            AtomicInteger count) {
+
+        ReceptionCallback<MachineOutputMixed> callback = new ReceptionCallback<MachineOutputMixed>() {
+
+            @Override
+            public void received(MachineOutputMixed data) {
+                restRef.set(data);
+                count.incrementAndGet();
+            }
+
+            @Override
+            public Class<MachineOutputMixed> getType() {
+                return MachineOutputMixed.class;
+            }
+        };
+
+        return callback;
     }
     
     /**
@@ -183,93 +224,22 @@ public class RESTConnectorTestEEM {
         
         return rest;
     }
+    
     /**
-     * Returns the connector descriptor for
-     * {@link #createConnector(ProtocolAdapter)}.
+     * Creates and returns ConnectorParameter for this test.
      * 
-     * @return the connector descriptor
+     * @return ConnectorParameter for this test
      */
-    protected Class<? extends ConnectorDescriptor> getConnectorDescriptor() {
-        return RESTConnector.Descriptor.class;
-    }
-
-    /**
-     * Returns the connector parameters for
-     * {@link Connector#connect(ConnectorParameter)}.
-     * 
-     * @return the connector parameters
-     */
-    protected ConnectorParameter getConnectorParameter(String type) {
-
-        Endpoint endpoint = null;
-        String endpoints = null;
-
-        if (type.equals("single")) {
-            endpoint = new Endpoint(Schema.HTTP, "localhost", 8080, "TestServerEEM/api/");
-            endpoints = testServer.getEndpointDescriptionSingle();
-        } else if (type.equals("singleWP")) {
-            endpoint = new Endpoint(Schema.HTTP, "localhost", 8080, "TestServerEEM/api/");
-            endpoints = testServer.getEndpointDescriptionSingleWP();
-        } else if (type.equals("set")) {
-            endpoint = new Endpoint(Schema.HTTP, "localhost", 8080, "TestServerEEM/api/measurements/");
-            endpoints = testServer.getEndpointDescriptionSet();
-        } else if (type.equals("setWP")) {
-            endpoint = new Endpoint(Schema.HTTP, "localhost", 8080, "TestServerEEM/api/measurements/set");
-            endpoints = testServer.getEndpointDescriptionSetWP();
-        } else if (type.equals("mixed")) {
-            endpoint = new Endpoint(Schema.HTTP, "localhost", 8080, "TestServerEEM/api/");
-            endpoints = testServer.getEndpointDescriptionMixed();
-        }
-
+    private ConnectorParameter getParam() {
+        
+        Endpoint endpoint = new Endpoint(Schema.HTTP, "localhost", 8080, "TestServerEEM/api/");
+        String generatedEndpointDescription = testServer.getGeneratedEndpointDescription();
+        
         ConnectorParameterBuilder testParameter = ConnectorParameterBuilder.newBuilder(endpoint);
         testParameter.setApplicationInformation("App_Id", "App_Description");
         testParameter.setEndpointPath(endpoint.toUri());
-
-        testParameter.setSpecificSetting("Endpoints", endpoints);
-        testParameter.setSpecificSetting("RequestType", type);
-
-        return testParameter.build();
+        testParameter.setSpecificSetting("Endpoints", generatedEndpointDescription);
+        ConnectorParameter param = testParameter.build();
+        return param;
     }
-    
-    /**
-     * Creates and returns a ProtocolAdapter for testing.
-     * 
-     * @return ProtocolAdapter for testing
-     */
-    private ProtocolAdapter<RESTItem, Object, MachineOutputMixed, MachineInputMixed> getProtocolAdapterMixed() {
-
-        ProtocolAdapter<RESTItem, Object, MachineOutputMixed, MachineInputMixed> adapter = 
-                new TranslatingProtocolAdapter<RESTItem, Object, MachineOutputMixed, MachineInputMixed>(
-                new MachineOutputTranslatorMixed<RESTItem>(false, RESTItem.class),
-                new MachineInputTranslatorMixed<Object>());
-
-        return adapter;
-    }
-
-    /**
-     * Creates and returns a ReceptionCallbac<MachineOutputSet> for the Connector.
-     * 
-     * @param restRef AtomicReference<MachineOutputSet> to set received data
-     * @return ReceptionCallback<MachineOutputSet> callback
-     */
-    private ReceptionCallback<MachineOutputMixed> createCallbackMixed(AtomicReference<MachineOutputMixed> restRef, 
-            AtomicInteger count) {
-
-        ReceptionCallback<MachineOutputMixed> callback = new ReceptionCallback<MachineOutputMixed>() {
-
-            @Override
-            public void received(MachineOutputMixed data) {
-                restRef.set(data);
-                count.incrementAndGet();
-            }
-
-            @Override
-            public Class<MachineOutputMixed> getType() {
-                return MachineOutputMixed.class;
-            }
-        };
-
-        return callback;
-    }
-   
 }

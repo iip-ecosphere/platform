@@ -6,7 +6,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 
 @SpringBootApplication
 public class TestServerEEM {
-    
+
     private ConfigurableApplicationContext context;
 
     private String endpointDescriptionSingle;
@@ -15,6 +15,7 @@ public class TestServerEEM {
     private String endpointDescriptionSetWP;
     private String endpointDescriptionMixed;
 
+    private String generatedEndpointDescription;
 
     /**
      * Creates a TestServer instance.
@@ -25,6 +26,42 @@ public class TestServerEEM {
         createEndpointDescriptionSet();
         createEndpointDescriptionSetWP();
         createEndpointDescriptionMixed();
+        createGeneratedEndpointDescription();
+    }
+
+    /**
+     * Creates the generatedEndpointDescription.
+     */
+    private void createGeneratedEndpointDescription() {
+        generatedEndpointDescription = "{"
+                + "   \"f\" : {\"asSingleValue\" : false, \"endpoint\" : "
+                + "\"measurements/f\", \"type\" : \"TestServerResponseMeasurementSingle\"},"
+                + "   \"I1\" : {\"asSingleValue\" : false, \"endpoint\" : "
+                + "\"measurements/all\", \"endpointIndex\" : 7, \"type\" : \"TestServerResponseMeasurementSetItem\"},"
+                + "   \"I2\" : {\"asSingleValue\" : false, \"endpoint\" : "
+                + "\"measurements/all\", \"endpointIndex\" : 8, \"type\" : \"TestServerResponseMeasurementSetItem\"},"
+                + "   \"I3\" : {\"asSingleValue\" : false, \"endpoint\" : "
+                + "\"measurements/all\", \"endpointIndex\" : 9, \"type\" : \"TestServerResponseMeasurementSetItem\"},"
+                + "   \"Info1\" : {\"asSingleValue\" : false, \"endpoint\" : "
+                + "\"information\", \"endpointIndex\" : 2, \"type\" : \"TestServerResponseInformationInfoItem\"},"
+                + "   \"Info2\" : {\"asSingleValue\" : false, \"endpoint\" : "
+                + "\"information\", \"endpointIndex\" : 1, \"type\" : \"TestServerResponseInformationInfoItem\"},"
+                + "   \"Root1\" : {\"asSingleValue\" : false, \"endpoint\" : "
+                + "\"information\", \"endpointIndex\" : 2, \"type\" : \"TestServerResponseInformationRootItem\"},"
+                + "   \"Root2\" : {\"asSingleValue\" : false, \"endpoint\" : "
+                + "\"information\", \"endpointIndex\" : 1, \"type\" : \"TestServerResponseInformationRootItem\"},"
+                + "   \"tn1\" : {\"asSingleValue\" : true, \"endpoint\" : "
+                + "\"tariff-number/tn1\", \"type\" : \"TestServerResponseTariffNumber\"},"
+                + "   \"tn2\" : {\"asSingleValue\" : false, \"endpoint\" : "
+                + "\"tariff-number/tn2\", \"type\" : \"TestServerResponseTariffNumber\"},"
+                + "   \"U1\" : {\"asSingleValue\" : false, \"endpoint\" : "
+                + "\"measurements/u1\", \"type\" : \"TestServerResponseMeasurementSingle\"},"
+                + "   \"U2\" : {\"asSingleValue\" : false, \"endpoint\" : "
+                + "\"measurements/u2\", \"type\" : \"TestServerResponseMeasurementSingle\"},"
+                + "   \"U3\" : {\"asSingleValue\" : false, \"endpoint\" : "
+                + "\"measurements/u3\", \"type\" : \"TestServerResponseMeasurementSingle\"}"
+                + "}";
+
     }
 
     /**
@@ -43,29 +80,40 @@ public class TestServerEEM {
             context.close();
         }
     }
-    
+
     /**
      * Creates the endpointDescriptionMixed.
      */
-    private void createEndpointDescriptionMixed() { 
-        endpointDescriptionMixed = "{";
-        endpointDescriptionMixed += "\"tn1\" : {\"endpoint\" : \"tariff-number/tn1\","
-                + " \"responseTypeIndex\" : \"0\", \"asSingleValue\" : true},";
-        endpointDescriptionMixed += "\"tn2\" : {\"endpoint\" : \"tariff-number/tn2\","
-                + " \"responseTypeIndex\" : \"0\", \"asSingleValue\" : false},";
-        endpointDescriptionMixed += "\"f\" : {\"endpoint\" : \"measurements/f\","
-                + " \"responseTypeIndex\" : \"1\", \"asSingleValue\" : false},";
-        endpointDescriptionMixed += "\"u1\" : {\"endpoint\" : \"measurements/u1\","
-                + " \"responseTypeIndex\" : \"1\", \"asSingleValue\" : false},";
-        endpointDescriptionMixed += "\"u2\" : {\"endpoint\" : \"measurements/u2\","
-                + " \"responseTypeIndex\" : \"1\", \"asSingleValue\" : false},";
-        endpointDescriptionMixed += "\"u3\" : {\"endpoint\" : \"measurements/u3\","
-                + " \"responseTypeIndex\" : \"1\", \"asSingleValue\" : false},";
-        endpointDescriptionMixed += "\"all\" : {\"endpoint\" : \"measurements/all\","
-                + " \"responseTypeIndex\" : \"2\", \"asSingleValue\" : false},";
-        endpointDescriptionMixed += "\"information\" : {\"endpoint\" : \"information\","
-                + " \"responseTypeIndex\" : \"3\", \"asSingleValue\" : false}";
-        endpointDescriptionMixed += "}";
+    private void createEndpointDescriptionMixed() {
+        endpointDescriptionMixed = "{"
+                + "   \"f\" : {\"asSingleValue\" : false, \"endpoint\" : "
+                + "\"measurements/f\", \"type\" : \"TestServerResponseMeasurementSingle\"},"
+                + "   \"I1\" : {\"asSingleValue\" : false, \"endpoint\" : "
+                + "\"measurements/all\", \"endpointIndex\" : 7, \"type\" : \"TestServerResponseMeasurementSetItem\"},"
+                + "   \"I2\" : {\"asSingleValue\" : false, \"endpoint\" : "
+                + "\"measurements/all\", \"endpointIndex\" : 8, \"type\" : \"TestServerResponseMeasurementSetItem\"},"
+                + "   \"I3\" : {\"asSingleValue\" : false, \"endpoint\" : "
+                + "\"measurements/all\", \"endpointIndex\" : 9, \"type\" : \"TestServerResponseMeasurementSetItem\"},"
+                + "   \"Info1\" : {\"asSingleValue\" : false, \"endpoint\" : "
+                + "\"information\", \"endpointIndex\" : 2, \"type\" : \"TestServerResponseInformationInfoItem\"},"
+                + "   \"Info2\" : {\"asSingleValue\" : false, \"endpoint\" : "
+                + "\"information\", \"endpointIndex\" : 1, \"type\" : \"TestServerResponseInformationInfoItem\"},"
+                + "   \"Root1\" : {\"asSingleValue\" : false, \"endpoint\" : "
+                + "\"information\", \"endpointIndex\" : 2, \"type\" : \"TestServerResponseInformationRootItem\"},"
+                + "   \"Root2\" : {\"asSingleValue\" : false, \"endpoint\" : "
+                + "\"information\", \"endpointIndex\" : 1, \"type\" : \"TestServerResponseInformationRootItem\"},"
+                + "   \"tn1\" : {\"asSingleValue\" : true, \"endpoint\" : "
+                + "\"tariff-number/tn1\", \"type\" : \"TestServerResponseTariffNumber\"},"
+                + "   \"tn2\" : {\"asSingleValue\" : false, \"endpoint\" : "
+                + "\"tariff-number/tn2\", \"type\" : \"TestServerResponseTariffNumber\"},"
+                + "   \"U1\" : {\"asSingleValue\" : false, \"endpoint\" : "
+                + "\"measurements/u1\", \"type\" : \"TestServerResponseMeasurementSingle\"},"
+                + "   \"U2\" : {\"asSingleValue\" : false, \"endpoint\" : "
+                + "\"measurements/u2\", \"type\" : \"TestServerResponseMeasurementSingle\"},"
+                + "   \"U3\" : {\"asSingleValue\" : false, \"endpoint\" : "
+                + "\"measurements/u3\", \"type\" : \"TestServerResponseMeasurementSingle\"}"
+                + "}";
+
     }
 
     /**
@@ -85,8 +133,6 @@ public class TestServerEEM {
         endpointDescriptionSingle += "\"i2\" : {\"endpoint\" : \"measurements/i2\", \"responseTypeIndex\" : \"0\"},";
         endpointDescriptionSingle += "\"i3\" : {\"endpoint\" : \"measurements/i3\", \"responseTypeIndex\" : \"0\"}";
         endpointDescriptionSingle += "}";
-        
-        System.out.println("createEndpointDescriptionSingle() -> " + endpointDescriptionSingle);
     }
 
     /**
@@ -145,7 +191,7 @@ public class TestServerEEM {
      */
     public String getEndpointDescriptionSingle() {
         createEndpointDescriptionSingle();
-        
+
         return endpointDescriptionSingle;
     }
 
@@ -183,5 +229,14 @@ public class TestServerEEM {
      */
     public String getEndpointDescriptionMixed() {
         return endpointDescriptionMixed;
+    }
+
+    /**
+     * Getter for generatedEndpointDescription.
+     * 
+     * @return generatedEndpointDescription
+     */
+    public String getGeneratedEndpointDescription() {
+        return generatedEndpointDescription;
     }
 }

@@ -1,12 +1,17 @@
 package de.iip_ecosphere.platform.connectors.rest;
 
+import java.util.HashMap;
+
 public class RESTEndpoint {
     
     private String name;
     private String endpoint;
-    private int responseTypeIndex;
     private boolean asSingleValue;
-    private int setIndex;
+    private String type;
+    private String setType;
+    private int endpointIndex;
+    
+    private HashMap<String, Integer> itemIndexes = new HashMap<>();; 
 
     /**
      * Getter for endpoint.
@@ -43,23 +48,7 @@ public class RESTEndpoint {
         this.endpoint = endpoint;
     }
 
-    /**
-     * Getter for responseTypeIndex.
-     * 
-     * @return responseTypeIndex
-     */
-    public int getResponseTypeIndex() {
-        return responseTypeIndex;
-    }
 
-    /**
-     * Setter for responseTypeIndex.
-     * 
-     * @param responseTypeIndex to set
-     */
-    public void setResponseTypeIndex(int responseTypeIndex) {
-        this.responseTypeIndex = responseTypeIndex;
-    }
 
     /**
      * Getter for name.
@@ -98,21 +87,76 @@ public class RESTEndpoint {
     }
 
     /**
-     * Getter for setIndex.
+     * Getter for endpointIndex.
      * 
-     * @return setIndex
+     * @return endpointIndex
      */
-    public int getSetIndex() {
-        return setIndex;
+    public int getEndpointIndex() {
+        return endpointIndex;
     }
 
     /**
-     * Setter for setIndex.
+     * Setter for endpointIndex.
      * 
-     * @param setIndex to set
+     * @param endpointIndex to set
      */
-    public void setSetIndex(int setIndex) {
-        this.setIndex = setIndex;
+    public void setEndpointIndex(int endpointIndex) {
+        this.endpointIndex = endpointIndex;
     }
 
+    /**
+     * Getter for type.
+     * 
+     * @return type
+     */
+    public String getType() {
+        return type;
+    }
+
+    /**
+     * Setter for type.
+     * 
+     * @param type to set
+     */
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    /**
+     * Getter for setType.
+     * 
+     * @returnsetType
+     */
+    public String getSetType() {
+        return setType;
+    }
+
+    /**
+     * Setter for setType.
+     * 
+     * @param setType to set
+     */
+    public void setSetType(String setType) {
+        this.setType = setType;
+    }
+
+    /**
+     * Add index for key to itemIndexes.
+     * 
+     * @param key to add
+     * @param index to add
+     */
+    public void addItemIndex(String key, int index) {
+        itemIndexes.put(key, index);
+    }
+    
+    /**
+     * Get ItemIndex for key.
+     * 
+     * @param key to retreive
+     * @return value for key
+     */
+    public int getItemIndex(String key) {
+        return itemIndexes.get(key);
+    }
 }

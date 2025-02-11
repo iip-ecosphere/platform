@@ -3,12 +3,12 @@ package test.de.iip_ecosphere.platform.connectors.rest;
 import java.io.IOException;
 import java.util.Set;
 
-import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.model.AbstractModelAccess;
 import de.iip_ecosphere.platform.connectors.model.ModelAccess;
 import de.iip_ecosphere.platform.connectors.rest.RESTEndpointMap;
+import de.iip_ecosphere.platform.connectors.rest.RESTItem;
 import de.iip_ecosphere.platform.connectors.types.AbstractConnectorOutputTypeTranslator;
-import de.iip_ecosphere.platform.support.json.JsonUtils;
+
 
 public class MachineOutputTranslatorSet<S> extends AbstractConnectorOutputTypeTranslator<S, MachineOutputSet> {
 
@@ -44,14 +44,18 @@ public class MachineOutputTranslatorSet<S> extends AbstractConnectorOutputTypeTr
     @Override
     public MachineOutputSet to(S source) throws IOException {
         AbstractModelAccess access = (AbstractModelAccess) getModelAccess();
-        ConnectorParameter params = access.getConnectorParameter();
-
-        
-        Object endpoints = params.getSpecificSetting("Endpoints");
-        RESTEndpointMap map = JsonUtils.fromJson(endpoints, RESTEndpointMap.class);
+//        ConnectorParameter params = access.getConnectorParameter();
+//
+//        
+//        Object endpoints = params.getSpecificSetting("Endpoints");
+//        RESTEndpointMap map = JsonUtils.fromJson(endpoints, RESTEndpointMap.class);
         //final ModelInputConverter inConverter = access.getInputConverter();
         
+        RESTItem restItem = (RESTItem) source;
+        RESTEndpointMap map = restItem.getEndpointMap();
+        
         MachineOutputSet result = new MachineOutputSet();
+        
         
         Set<String> keys = map.keySet();
         

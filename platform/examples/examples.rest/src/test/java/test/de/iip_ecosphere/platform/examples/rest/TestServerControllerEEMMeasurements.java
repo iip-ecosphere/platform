@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import de.iip_ecosphere.platform.examples.rest.TestServerResponsMeasurementSingle;
+import de.iip_ecosphere.platform.examples.rest.TestServerResponseMeasurementSingle;
 import de.iip_ecosphere.platform.examples.rest.TestServerResponseMeasurementSet;
 import de.iip_ecosphere.platform.examples.rest.TestServerResponseMeasurementSetItem;
 
@@ -109,8 +109,8 @@ public class TestServerControllerEEMMeasurements {
      * @return f
      */
     @GetMapping("/f")
-    public TestServerResponsMeasurementSingle getF() {
-        TestServerResponsMeasurementSingle result = new TestServerResponsMeasurementSingle(f);
+    public TestServerResponseMeasurementSingle getF() {
+        TestServerResponseMeasurementSingle result = new TestServerResponseMeasurementSingle(f);
         result.setContext("/api/v1/measurements/f");
         result.setTimestamp(getCurrentTimestamp());
 
@@ -123,8 +123,8 @@ public class TestServerControllerEEMMeasurements {
      * @return U1
      */
     @GetMapping("/u1")
-    public TestServerResponsMeasurementSingle getU1() {
-        TestServerResponsMeasurementSingle result = new TestServerResponsMeasurementSingle(u1);
+    public TestServerResponseMeasurementSingle getU1() {
+        TestServerResponseMeasurementSingle result = new TestServerResponseMeasurementSingle(u1);
         result.setContext("/api/v1/measurements/u1");
         result.setTimestamp(getCurrentTimestamp());
 
@@ -137,8 +137,8 @@ public class TestServerControllerEEMMeasurements {
      * @return U2
      */
     @GetMapping("/u2")
-    public TestServerResponsMeasurementSingle getU2() {
-        TestServerResponsMeasurementSingle result = new TestServerResponsMeasurementSingle(u2);
+    public TestServerResponseMeasurementSingle getU2() {
+        TestServerResponseMeasurementSingle result = new TestServerResponseMeasurementSingle(u2);
         result.setContext("/api/v1/measurements/u2");
         result.setTimestamp(getCurrentTimestamp());
 
@@ -151,8 +151,8 @@ public class TestServerControllerEEMMeasurements {
      * @return U3
      */
     @GetMapping("/u3")
-    public TestServerResponsMeasurementSingle getU3() {
-        TestServerResponsMeasurementSingle result = new TestServerResponsMeasurementSingle(u3);
+    public TestServerResponseMeasurementSingle getU3() {
+        TestServerResponseMeasurementSingle result = new TestServerResponseMeasurementSingle(u3);
         result.setContext("/api/v1/measurements/u3");
         result.setTimestamp(getCurrentTimestamp());
 
@@ -165,8 +165,8 @@ public class TestServerControllerEEMMeasurements {
      * @return U12
      */
     @GetMapping("/u12")
-    public TestServerResponsMeasurementSingle getU12() {
-        TestServerResponsMeasurementSingle result = new TestServerResponsMeasurementSingle(u12);
+    public TestServerResponseMeasurementSingle getU12() {
+        TestServerResponseMeasurementSingle result = new TestServerResponseMeasurementSingle(u12);
         result.setContext("/api/v1/measurements/u12");
         result.setTimestamp(getCurrentTimestamp());
 
@@ -179,8 +179,8 @@ public class TestServerControllerEEMMeasurements {
      * @return U23
      */
     @GetMapping("/u23")
-    public TestServerResponsMeasurementSingle getU23() {
-        TestServerResponsMeasurementSingle result = new TestServerResponsMeasurementSingle(u23);
+    public TestServerResponseMeasurementSingle getU23() {
+        TestServerResponseMeasurementSingle result = new TestServerResponseMeasurementSingle(u23);
         result.setContext("/api/v1/measurements/u23");
         result.setTimestamp(getCurrentTimestamp());
 
@@ -193,8 +193,8 @@ public class TestServerControllerEEMMeasurements {
      * @return U31
      */
     @GetMapping("/u31")
-    public TestServerResponsMeasurementSingle getU31() {
-        TestServerResponsMeasurementSingle result = new TestServerResponsMeasurementSingle(u31);
+    public TestServerResponseMeasurementSingle getU31() {
+        TestServerResponseMeasurementSingle result = new TestServerResponseMeasurementSingle(u31);
         result.setContext("/api/v1/measurements/u31");
         result.setTimestamp(getCurrentTimestamp());
 
@@ -207,8 +207,8 @@ public class TestServerControllerEEMMeasurements {
      * @return I1
      */
     @GetMapping("/i1")
-    public TestServerResponsMeasurementSingle getI1() {
-        TestServerResponsMeasurementSingle result = new TestServerResponsMeasurementSingle(i1);
+    public TestServerResponseMeasurementSingle getI1() {
+        TestServerResponseMeasurementSingle result = new TestServerResponseMeasurementSingle(i1);
         result.setContext("/api/v1/measurements/i1");
         result.setTimestamp(getCurrentTimestamp());
 
@@ -221,8 +221,8 @@ public class TestServerControllerEEMMeasurements {
      * @return I2
      */
     @GetMapping("/i2")
-    public TestServerResponsMeasurementSingle getI2() {
-        TestServerResponsMeasurementSingle result = new TestServerResponsMeasurementSingle(i2);
+    public TestServerResponseMeasurementSingle getI2() {
+        TestServerResponseMeasurementSingle result = new TestServerResponseMeasurementSingle(i2);
         result.setContext("/api/v1/measurements/i2");
         result.setTimestamp(getCurrentTimestamp());
 
@@ -235,8 +235,8 @@ public class TestServerControllerEEMMeasurements {
      * @return I3
      */
     @GetMapping("/i3")
-    public TestServerResponsMeasurementSingle getI3() {
-        TestServerResponsMeasurementSingle result = new TestServerResponsMeasurementSingle(i3);
+    public TestServerResponseMeasurementSingle getI3() {
+        TestServerResponseMeasurementSingle result = new TestServerResponseMeasurementSingle(i3);
         result.setContext("/api/v1/measurements/i3");
         result.setTimestamp(getCurrentTimestamp());
 
@@ -252,9 +252,9 @@ public class TestServerControllerEEMMeasurements {
      * @return SingleValue at path
      */
     @GetMapping("/single")
-    public TestServerResponsMeasurementSingle getPath(@RequestParam("path") String path) {
+    public TestServerResponseMeasurementSingle getPath(@RequestParam("path") String path) {
 
-        TestServerResponsMeasurementSingle value = new TestServerResponsMeasurementSingle();
+        TestServerResponseMeasurementSingle value = new TestServerResponseMeasurementSingle();
 
         if (path.equals("f")) {
             value = getF();

@@ -12,16 +12,14 @@ project RestPhoenixEEMMixed {
 				name = "tn1",
 				endpoint = "tariff-number/tn1",
 				asSingleValue = true,		
-				//endpointIndex = -1,
-				type =  refBy(restPhoenixEEMResponseTraiffNumber),
+				type =  refBy(restPhoenixEEMResponseTariffNumber),
 				cachingTime = CACHE_NONE
 				
 			}, RestField {
 				name = "tn2",
 				endpoint = "tariff-number/tn2",
 				asSingleValue = false,
-				//endpointIndex = -1,
-				type =  refBy(restPhoenixEEMResponseTraiffNumber),
+				type =  refBy(restPhoenixEEMResponseTariffNumber),
 				cachingTime = CACHE_NONE
 				
 			}				
@@ -34,49 +32,45 @@ project RestPhoenixEEMMixed {
 			RestField {
 				name = "tn1",
 				endpoint = "tariff-number/tn1",
-				//endpointIndex = -1,
-				type =  refBy(restPhoenixEEMResponseTraiffNumber),
+				asSingleValue = true,
+				type =  refBy(restPhoenixEEMResponseTariffNumber),
 				cachingTime = CACHE_NONE
 				
 			}, RestField {
 				name = "tn2",
 				endpoint = "tariff-number/tn2",
-				//endpointIndex = -1,
-				type =  refBy(restPhoenixEEMResponseTraiffNumber),
+				asSingleValue = false,
+				type =  refBy(restPhoenixEEMResponseTariffNumber),
 				cachingTime = CACHE_NONE
 				
 			}, RestField {
 				name = "f",
 				endpoint = "measurements/f",
-				//endpointIndex = -1,
 				type =  refBy(restPhoenixEEMResponseMeasurementSingle),
 				cachingTime = CACHE_NONE
 
 			}, RestField {
 				name = "U1",
 				endpoint = "measurements/u1",
-				//endpointIndex = -1,
 				type =  refBy(restPhoenixEEMResponseMeasurementSingle),
 				cachingTime = CACHE_NONE
 				
 			}, RestField {		
 				name = "U2",
 				endpoint = "measurements/u2",
-				//endpointIndex = -1,
 				type =  refBy(restPhoenixEEMResponseMeasurementSingle),
 				cachingTime = CACHE_NONE
 				
 			}, RestField {			
 				name = "U3",
 				endpoint = "measurements/u3",
-				//endpointIndex = -1,
 				type =  refBy(restPhoenixEEMResponseMeasurementSingle),
 				cachingTime = CACHE_NONE
 				
 			}, RestSetField {			
 				name = "I1",
 				endpoint = "measurements/all",
-				//endpointIndex = 7,
+				endpointIndex = 7,
 				type =  refBy(restPhoenixEEMResponseMeasurementSetItem),
 				setType = refBy(restPhoenixEEMResponseMeasurementSet),
 				cachingTime = CACHE_NONE
@@ -84,7 +78,7 @@ project RestPhoenixEEMMixed {
 			}, RestSetField {			
 				name = "I2",
 				endpoint = "measurements/all",
-				//endpointIndex = 8,
+				endpointIndex = 8,
 				type =  refBy(restPhoenixEEMResponseMeasurementSetItem),
 				setType = refBy(restPhoenixEEMResponseMeasurementSet),
 				cachingTime = CACHE_NONE
@@ -92,7 +86,7 @@ project RestPhoenixEEMMixed {
 			}, RestSetField {			
 				name = "I3",
 				endpoint = "measurements/all",
-				//endpointIndex = 9,
+				endpointIndex = 9,
 				type =  refBy(restPhoenixEEMResponseMeasurementSetItem),
 				setType = refBy(restPhoenixEEMResponseMeasurementSet),
 				cachingTime = CACHE_NONE
@@ -100,7 +94,7 @@ project RestPhoenixEEMMixed {
 			}, RestSetField {			
 				name = "Root1",
 				endpoint = "information",
-				//endpointIndex = 0,
+				endpointIndex = 0,
 				type =  refBy(restPhoenixEEMResponseInformationRootItem),
 				setType = refBy(restPhoenixEEMResponseInformation),
 				cachingTime = CACHE_NONE
@@ -108,7 +102,7 @@ project RestPhoenixEEMMixed {
 			}, RestSetField {			
 				name = "Root2",
 				endpoint = "information",
-				//endpointIndex = 1,
+				endpointIndex = 1,
 				type =  refBy(restPhoenixEEMResponseInformationRootItem),
 				setType = refBy(restPhoenixEEMResponseInformation),
 				cachingTime = CACHE_NONE
@@ -116,7 +110,7 @@ project RestPhoenixEEMMixed {
 			}, RestSetField {			
 				name = "Info1",
 				endpoint = "information",
-				//endpointIndex = 0,
+				endpointIndex = 0,
 				type =  refBy(restPhoenixEEMResponseInformationInfoItem),
 				setType = refBy(restPhoenixEEMResponseInformation),
 				cachingTime = CACHE_NONE
@@ -124,7 +118,7 @@ project RestPhoenixEEMMixed {
 			}, RestSetField {			
 				name = "Info2",
 				endpoint = "information",
-				//endpointIndex = 1,
+				endpointIndex = 1,
 				type =  refBy(restPhoenixEEMResponseInformationInfoItem),
 				setType = refBy(restPhoenixEEMResponseInformation),
 				cachingTime = CACHE_NONE
