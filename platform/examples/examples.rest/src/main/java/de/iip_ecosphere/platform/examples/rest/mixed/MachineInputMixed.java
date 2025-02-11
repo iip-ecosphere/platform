@@ -1,18 +1,18 @@
 package de.iip_ecosphere.platform.examples.rest.mixed;
 
-import de.iip_ecosphere.platform.examples.rest.TestServerResponsTariffNumber;
+import de.iip_ecosphere.platform.examples.rest.TestServerResponseTariffNumber;
 
 public class MachineInputMixed {
 
-    private TestServerResponsTariffNumber tn1;
-    private TestServerResponsTariffNumber tn2;
+    private TestServerResponseTariffNumber tn1;
+    private TestServerResponseTariffNumber tn2;
 
     /**
      * Getter for tn1.
      * 
      * @return tn1
      */
-    public TestServerResponsTariffNumber getTn1() {
+    public TestServerResponseTariffNumber getTn1() {
         return tn1;
     }
 
@@ -21,7 +21,7 @@ public class MachineInputMixed {
      * 
      * @param tn1 to set
      */
-    public void setTn1(TestServerResponsTariffNumber tn1) {
+    public void setTn1(TestServerResponseTariffNumber tn1) {
         this.tn1 = tn1;
     }
     
@@ -30,7 +30,7 @@ public class MachineInputMixed {
      * 
      * @return tn2
      */
-    public TestServerResponsTariffNumber getTn2() {
+    public TestServerResponseTariffNumber getTn2() {
         return tn2;
     }
 
@@ -39,7 +39,7 @@ public class MachineInputMixed {
      * 
      * @param tn2 to set
      */
-    public void setTn2(TestServerResponsTariffNumber tn2) {
+    public void setTn2(TestServerResponseTariffNumber tn2) {
         this.tn2 = tn2;
     }
 }

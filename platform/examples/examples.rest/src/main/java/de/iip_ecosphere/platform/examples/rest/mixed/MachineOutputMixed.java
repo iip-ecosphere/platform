@@ -1,20 +1,20 @@
 package de.iip_ecosphere.platform.examples.rest.mixed;
 
-import de.iip_ecosphere.platform.examples.rest.TestServerResponsMeasurementSingle;
-import de.iip_ecosphere.platform.examples.rest.TestServerResponsTariffNumber;
+import de.iip_ecosphere.platform.examples.rest.TestServerResponseMeasurementSingle;
+import de.iip_ecosphere.platform.examples.rest.TestServerResponseTariffNumber;
 import de.iip_ecosphere.platform.examples.rest.TestServerResponseInformationInfoItem;
 import de.iip_ecosphere.platform.examples.rest.TestServerResponseInformationRootItem;
 import de.iip_ecosphere.platform.examples.rest.TestServerResponseMeasurementSetItem;
 
 public class MachineOutputMixed {
 
-    private TestServerResponsTariffNumber tn1;
-    private TestServerResponsTariffNumber tn2;
+    private TestServerResponseTariffNumber tn1;
+    private TestServerResponseTariffNumber tn2;
     
-    private TestServerResponsMeasurementSingle f;
-    private TestServerResponsMeasurementSingle u1;
-    private TestServerResponsMeasurementSingle u2;
-    private TestServerResponsMeasurementSingle u3;
+    private TestServerResponseMeasurementSingle f;
+    private TestServerResponseMeasurementSingle u1;
+    private TestServerResponseMeasurementSingle u2;
+    private TestServerResponseMeasurementSingle u3;
     
     private TestServerResponseMeasurementSetItem i1;
     private TestServerResponseMeasurementSetItem i2;
@@ -31,7 +31,7 @@ public class MachineOutputMixed {
      * 
      * @return tn1
      */
-    public TestServerResponsTariffNumber getTn1() {
+    public TestServerResponseTariffNumber getTn1() {
         return tn1;
     }
     
@@ -40,7 +40,7 @@ public class MachineOutputMixed {
      * 
      * @param tn1 to set
      */
-    public void setTn1(TestServerResponsTariffNumber tn1) {
+    public void setTn1(TestServerResponseTariffNumber tn1) {
         this.tn1 = tn1;
     }
     
@@ -49,7 +49,7 @@ public class MachineOutputMixed {
      * 
      * @return tn2
      */
-    public TestServerResponsTariffNumber getTn2() {
+    public TestServerResponseTariffNumber getTn2() {
         return tn2;
     }
     
@@ -58,7 +58,7 @@ public class MachineOutputMixed {
      * 
      * @param tn2 to set
      */
-    public void setTn2(TestServerResponsTariffNumber tn2) {
+    public void setTn2(TestServerResponseTariffNumber tn2) {
         this.tn2 = tn2;
     }
     
@@ -67,7 +67,7 @@ public class MachineOutputMixed {
      * 
      * @return f
      */
-    public TestServerResponsMeasurementSingle getF() {
+    public TestServerResponseMeasurementSingle getF() {
         return f;
     }
     
@@ -76,7 +76,7 @@ public class MachineOutputMixed {
      * 
      * @param f to set
      */
-    public void setF(TestServerResponsMeasurementSingle frq) {
+    public void setF(TestServerResponseMeasurementSingle frq) {
         this.f = frq;
     }
     
@@ -85,7 +85,7 @@ public class MachineOutputMixed {
      * 
      * @return u1
      */
-    public TestServerResponsMeasurementSingle getU1() {
+    public TestServerResponseMeasurementSingle getU1() {
         return u1;
     }
     
@@ -94,7 +94,7 @@ public class MachineOutputMixed {
      * 
      * @param u1 to set
      */
-    public void setU1(TestServerResponsMeasurementSingle u1) {
+    public void setU1(TestServerResponseMeasurementSingle u1) {
         this.u1 = u1;
     }
     
@@ -103,7 +103,7 @@ public class MachineOutputMixed {
      * 
      * @return u2
      */
-    public TestServerResponsMeasurementSingle getU2() {
+    public TestServerResponseMeasurementSingle getU2() {
         return u2;
     }
     
@@ -112,7 +112,7 @@ public class MachineOutputMixed {
      * 
      * @param u2 to set
      */
-    public void setU2(TestServerResponsMeasurementSingle u2) {
+    public void setU2(TestServerResponseMeasurementSingle u2) {
         this.u2 = u2;
     }
     
@@ -121,7 +121,7 @@ public class MachineOutputMixed {
      * 
      * @return u3
      */
-    public TestServerResponsMeasurementSingle getU3() {
+    public TestServerResponseMeasurementSingle getU3() {
         return u3;
     }
     
@@ -130,7 +130,7 @@ public class MachineOutputMixed {
      * 
      * @param u3 to set
      */
-    public void setU3(TestServerResponsMeasurementSingle u3) {
+    public void setU3(TestServerResponseMeasurementSingle u3) {
         this.u3 = u3;
     }
     

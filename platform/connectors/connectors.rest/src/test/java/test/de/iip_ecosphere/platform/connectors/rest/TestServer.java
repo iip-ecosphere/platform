@@ -51,17 +51,17 @@ public class TestServer {
     private void createEndpointDescriptionSingle() {
         endpointDescriptionSingle = "{";
         endpointDescriptionSingle += "\"string\" : {\"name\" : \"string\",\"endpoint\" : \"endpoints/string\", "
-                + "\"responseTypeIndex\" : \"0\", \"asSingleValue\" : true},";
+                + "\"type\" : \"TestServerResponsSingle\", \"asSingleValue\" : true},";
         endpointDescriptionSingle += "\"short\" : {\"name\" : \"short\",\"endpoint\" : \"endpoints/short\", "
-                + "\"responseTypeIndex\" : \"0\"},";
+                + "\"type\" : \"TestServerResponsSingle\"},";
         endpointDescriptionSingle += "\"integer\" : {\"name\" : \"integer\",\"endpoint\" : \"endpoints/integer\", "
-                + "\"responseTypeIndex\" : \"0\"},";
+                + "\"type\" : \"TestServerResponsSingle\"},";
         endpointDescriptionSingle += "\"long\" : {\"name\" : \"long\",\"endpoint\" : \"endpoints/long\", "
-                + "\"responseTypeIndex\" : \"0\"},";
+                + "\"type\" : \"TestServerResponsSingle\"},";
         endpointDescriptionSingle += "\"float\" : {\"name\" : \"float\",\"endpoint\" : \"endpoints/float\", "
-                + "\"responseTypeIndex\" : \"0\"},";
+                + "\"type\" : \"TestServerResponsSingle\"},";
         endpointDescriptionSingle += "\"double\" : {\"name\" : \"double\",\"endpoint\" : \"endpoints/double\", "
-                + "\"responseTypeIndex\" : \"0\"}";
+                + "\"type\" : \"TestServerResponsSingle\"}";
         endpointDescriptionSingle += "}";
     }
 
@@ -70,7 +70,18 @@ public class TestServer {
      */
     private void createEndpointDescriptionSet() {
         endpointDescriptionSet = "{";
-        endpointDescriptionSet += "\"all\" : {\"endpoint\" : \"endpoints/all\", \"responseTypeIndex\" : \"0\"}";
+        endpointDescriptionSet += "\"string\" : {\"endpoint\" : \"endpoints/all\", "
+                + "\"type\" : \"TestServerResponseSet\"},";
+        endpointDescriptionSet += "\"short\" : {\"endpoint\" : \"endpoints/all\", "
+                + "\"type\" : \"TestServerResponseSet\"},";
+        endpointDescriptionSet += "\"integer\" : {\"endpoint\" : \"endpoints/all\", "
+                + "\"type\" : \"TestServerResponseSet\"},";
+        endpointDescriptionSet += "\"long\" : {\"endpoint\" : \"endpoints/all\", "
+                + "\"type\" : \"TestServerResponseSet\"},";
+        endpointDescriptionSet += "\"float\" : {\"endpoint\" : \"endpoints/all\", "
+                + "\"type\" : \"TestServerResponseSet\"},";
+        endpointDescriptionSet += "\"double\" : {\"endpoint\" : \"endpoints/all\", "
+                + "\"type\" : \"TestServerResponseSet\"}";
         endpointDescriptionSet += "}";
     }
 
@@ -80,12 +91,17 @@ public class TestServer {
     private void createEndpointDescriptionSingleWP() {
         endDesSingleWP = "{";
         endDesSingleWP += "\"string\" : {\"endpoint\" : \"endpoints?path=string\","
-                + " \"responseTypeIndex\" : \"0\", \"asSingleValue\" : true},";
-        endDesSingleWP += "\"short\" : {\"endpoint\" : \"endpoints?path=short\", \"responseTypeIndex\" : \"0\"},";
-        endDesSingleWP += "\"integer\" : {\"endpoint\" : \"endpoints?path=integer\", \"responseTypeIndex\" : \"0\"},";
-        endDesSingleWP += "\"long\" : {\"endpoint\" : \"endpoints?path=long\", \"responseTypeIndex\" : \"0\"},";
-        endDesSingleWP += "\"float\" : {\"endpoint\" : \"endpoints?path=float\", \"responseTypeIndex\" : \"0\"},";
-        endDesSingleWP += "\"double\" : {\"endpoint\" : \"endpoints?path=double\", \"responseTypeIndex\" : \"0\"}";
+                + " \"type\" : \"TestServerResponsSingle\", \"asSingleValue\" : true},";
+        endDesSingleWP += "\"short\" : {\"endpoint\" : \"endpoints?path=short\", "
+                + "\"type\" : \"TestServerResponsSingle\"},";
+        endDesSingleWP += "\"integer\" : {\"endpoint\" : \"endpoints?path=integer\", "
+                + "\"type\" : \"TestServerResponsSingle\"},";
+        endDesSingleWP += "\"long\" : {\"endpoint\" : \"endpoints?path=long\", "
+                + "\"type\" : \"TestServerResponsSingle\"},";
+        endDesSingleWP += "\"float\" : {\"endpoint\" : \"endpoints?path=float\", "
+                + "\"type\" : \"TestServerResponsSingle\"},";
+        endDesSingleWP += "\"double\" : {\"endpoint\" : \"endpoints?path=double\", "
+                + "\"type\" : \"TestServerResponsSingle\"}";
         endDesSingleWP += "}";
     }
 
@@ -95,7 +111,8 @@ public class TestServer {
     private void createEndpointDescriptionSetWP() {
         endpointDescriptionSetWP = "{";
         endpointDescriptionSetWP += "\"AllWP\" : {\"endpoint\" : "
-                + "\"endpoints/set?paths=string,short,integer,long,float,double\", \"responseTypeIndex\" : \"0\"}";
+                + "\"endpoints/set?paths=string,short,integer,long,float,double\", "
+                + "\"type\" : \"TestServerResponseSet\"}";
         endpointDescriptionSetWP += "}";
     }
 

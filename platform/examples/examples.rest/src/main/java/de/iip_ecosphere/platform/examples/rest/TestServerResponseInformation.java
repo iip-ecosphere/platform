@@ -1,6 +1,5 @@
 package de.iip_ecosphere.platform.examples.rest;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import de.iip_ecosphere.platform.connectors.rest.RESTServerResponse;
