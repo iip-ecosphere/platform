@@ -434,6 +434,7 @@ template AasImplTest(Configuration config, JavaCodeArtifact target, AasSubmodelT
             + ".spec";
         importPrefix = "${apiPkg}.${clsName}";
 
+		target.addImportExclusion("java.io.File");
         JavaCodeClass mainCls = codeCreateClass(target, pkg, clsName + "BuilderTest", 
             "Tests {@link ${clsName}Builder} and {@link ${clsName}}");
 	    mainCls.addStaticImport("de.iip_ecosphere.platform.support.aas.IdentifierType.*");
@@ -458,7 +459,7 @@ template AasImplTest(Configuration config, JavaCodeArtifact target, AasSubmodelT
 		m.addOverrideAnnotation();
 		m.addReturn(new JavaCodeStringExpression("${fileName}-gen"));
 
-		m = mainCls.addMethod(new JavaCodeTypeSpecification("java.io.File[]"), "getTargetFiles");
+		m = mainCls.addMethod("java.io.File[]", "getTargetFiles");
 		m.addOverrideAnnotation();
 		m.addReturn('new java.io.File[] {new java.io.File("./output/${fileName}.aasx")}');
 
@@ -497,7 +498,7 @@ template AasImplTest(Configuration config, JavaCodeArtifact target, AasSubmodelT
 
 		genPopulateMethods(type.fields, 1, mainCls);
 		
-		m = mainCls.addMethod(new JavaCodeTypeSpecification("java.io.File"), "getThumbnail").setProtected();
+		m = mainCls.addMethod("java.io.File", "getThumbnail").setProtected();
 		m.addOverrideAnnotation();
 		m.addReturn("null");
 		
