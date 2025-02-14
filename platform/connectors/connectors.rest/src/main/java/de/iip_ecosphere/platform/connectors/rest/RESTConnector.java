@@ -93,7 +93,7 @@ public abstract class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, 
             ProtocolAdapter<RESTItem, Object, CO, CI>... adapter) {
         super(selector, adapter);
         configureModelAccess(new RESTModelAccess());
-
+        
         ObjectMapper mapper = new ObjectMapper();
         SimpleModule module = new SimpleModule();
 
@@ -112,7 +112,6 @@ public abstract class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, 
         mapper.registerModule(module);
         jsonConverter = new MappingJackson2HttpMessageConverter();
         jsonConverter.setObjectMapper(mapper);
-
     }
 
     @Override
@@ -145,7 +144,6 @@ public abstract class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, 
             if (key.equals("Endpoints")) {
 
                 Object endpoints = params.getSpecificSetting(key);
-                System.out.println(endpoints);
                 map = JsonUtils.fromJson(endpoints, RESTEndpointMap.class);
 
                 removeDuplicateEndpoints(map, endpointsInMap, mapWithLowerCaseKeys, entpointItemIndexes);
@@ -163,7 +161,7 @@ public abstract class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, 
             LOGGER.info("RESTConnector:specificSettings(): RESTEndpointMap created -> " + mapWithLowerCaseKeys);
             item = new RESTItem(finalMap);
             LOGGER.info("RESTConnector:specificSettings(): RESTItem created -> " + item);
-        }
+        }       
     }
 
     /**
@@ -171,25 +169,23 @@ public abstract class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, 
      * 
      * @param map                  to remove duplicate Endpoints
      * @param endpointsInMap       empty ArrayList<String>
-     * @param mapWithLowerCaseKeys empty RESTEndpointMap
-     * @param entpointItemIndexes  empty ArrayList<RESTEndpoint>
+     * @param lowerCaseMap empty RESTEndpointMap
+     * @param entpointsWithIndex  empty ArrayList<RESTEndpoint>
      */
     private void removeDuplicateEndpoints(RESTEndpointMap map, ArrayList<String> endpointsInMap,
-            RESTEndpointMap mapWithLowerCaseKeys, ArrayList<RESTEndpoint> entpointItemIndexes) {
+            RESTEndpointMap lowerCaseMap, ArrayList<RESTEndpoint> entpointsWithIndex) {
 
         for (Map.Entry<String, RESTEndpoint> entry : map.entrySet()) {
 
             if (!endpointsInMap.contains(entry.getValue().getEndpoint())) {
-                mapWithLowerCaseKeys.put(entry.getKey().toLowerCase(), entry.getValue());
+                lowerCaseMap.put(entry.getKey().toLowerCase(), entry.getValue());
             }
 
             endpointsInMap.add(entry.getValue().getEndpoint());
 
-            System.out.println(entry.getValue().getEndpointIndex());
-
-            if (entry.getValue().getEndpointIndex() != 0) {
+            if (entry.getValue().getEndpointIndex() != -1) {
                 entry.getValue().setName(entry.getKey().toLowerCase());
-                entpointItemIndexes.add(entry.getValue());
+                entpointsWithIndex.add(entry.getValue());
             }
         }
     }
@@ -215,30 +211,23 @@ public abstract class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, 
     /**
      * Resets the keys for duplicate Endpoints.
      * 
-     * @param mapWithLowerCaseKeys RESTEndpointMap with lowercase keys to reset keys
+     * @param lowerCaseMap RESTEndpointMap with lowercase keys to reset keys
      *                             for duplicate Endpoints
      * @param endpointsInMap       ArrayList<String> containing duplicate Endpoints
      *                             as String
      * @param finalMap             RESTEndpointMap with reseted keys for duplicate
      *                             Endpoints
      */
-    private void resetKeysForDuplicateEndpoints(RESTEndpointMap mapWithLowerCaseKeys, ArrayList<String> endpointsInMap,
+    private void resetKeysForDuplicateEndpoints(RESTEndpointMap lowerCaseMap, ArrayList<String> endpointsInMap,
             RESTEndpointMap finalMap) {
 
-        for (Map.Entry<String, RESTEndpoint> entry : mapWithLowerCaseKeys.entrySet()) {
-
-            System.out.println(entry.getKey());
+        for (Map.Entry<String, RESTEndpoint> entry : lowerCaseMap.entrySet()) {
 
             if (endpointsInMap.contains(entry.getValue().getEndpoint())) {
 
                 String end = entry.getValue().getEndpoint();
                 String[] split = end.split("/");
                 String newKey = split[split.length - 1];
-
-                System.out.println(entry.getKey() + " -> " + entry.getValue().getEndpointIndex());
-
-                // entry.getValue().addItemIndex(entry.getKey(),
-                // entry.getValue().getEndpointIndex());
 
                 finalMap.put(newKey, entry.getValue());
             } else {
@@ -250,20 +239,18 @@ public abstract class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, 
     /**
      * Adds itemIndexes to finalMap.
      * @param finalMap to add itemIndexes
-     * @param entpointItemIndexes ArrayList<RESTEndpoint> containing RESTEndpoints with endpointIndex
+     * @param entpointsWithIndex ArrayList<RESTEndpoint> containing RESTEndpoints with endpointIndex
      */
-    private void addEndpointIndexes(RESTEndpointMap finalMap, ArrayList<RESTEndpoint> entpointItemIndexes) {
+    private void addEndpointIndexes(RESTEndpointMap finalMap, ArrayList<RESTEndpoint> entpointsWithIndex) {
 
         for (Map.Entry<String, RESTEndpoint> entry : finalMap.entrySet()) {
 
-            for (RESTEndpoint end : entpointItemIndexes) {
+            for (RESTEndpoint end : entpointsWithIndex) {
 
                 if (end.getEndpoint().equals(entry.getValue().getEndpoint())) {
                     entry.getValue().addItemIndex(end.getName(), end.getEndpointIndex());
                 }
             }
-
-            System.out.println(entry.getKey() + " -> " + entry.getValue().getEndpoint());
         }
     }
 
@@ -314,10 +301,7 @@ public abstract class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, 
 
             for (Class<? extends RESTServerResponse> response : responseClasses) {
 
-                // System.out.println(response.getSimpleName());
-                // System.out.println(responseType);
                 if (response.getSimpleName().equals(responseType)) {
-                    // System.out.println("Found response Type");
                     responseClass = response;
                     break;
                 }
@@ -357,7 +341,6 @@ public abstract class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, 
                 Object value = item.getValue(qName).getValueToWrite();
 
                 String uri = path + endpoint + "?value=" + value;
-                System.out.println("write to:" + uri);
 
                 RestTemplate restTemplate = new RestTemplate();
                 responseEntity = restTemplate.exchange(uri, HttpMethod.PUT, null, String.class);
@@ -372,7 +355,6 @@ public abstract class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, 
                 HttpEntity<?> requestEntity = new HttpEntity<>(value, headers);
 
                 String uri = path + endpoint;
-                System.out.println("write to:" + uri);
 
                 RestTemplate restTemplate = new RestTemplate();
                 responseEntity = restTemplate.exchange(uri, HttpMethod.PUT, requestEntity, String.class);

@@ -43,7 +43,7 @@ public class TestServerEEM {
                 + "   \"I3\" : {\"asSingleValue\" : false, \"endpoint\" : "
                 + "\"measurements/all\", \"endpointIndex\" : 9, \"type\" : \"TestServerResponseMeasurementSetItem\"},"
                 + "   \"Info1\" : {\"asSingleValue\" : false, \"endpoint\" : "
-                + "\"information\", \"endpointIndex\" : 2, \"type\" : \"TestServerResponseInformationInfoItem\"},"
+                + "\"information\", \"endpointIndex\" : 0, \"type\" : \"TestServerResponseInformationInfoItem\"},"
                 + "   \"Info2\" : {\"asSingleValue\" : false, \"endpoint\" : "
                 + "\"information\", \"endpointIndex\" : 1, \"type\" : \"TestServerResponseInformationInfoItem\"},"
                 + "   \"Root1\" : {\"asSingleValue\" : false, \"endpoint\" : "

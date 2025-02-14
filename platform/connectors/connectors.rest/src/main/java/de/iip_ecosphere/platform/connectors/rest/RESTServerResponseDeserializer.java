@@ -15,7 +15,6 @@ public class RESTServerResponseDeserializer<T1 extends RESTServerResponse, T2>
         extends JsonDeserializer<T1> {
 
     private Class<T1> responseClass;
-
     /**
      * Constructor.
      * 
@@ -37,29 +36,35 @@ public class RESTServerResponseDeserializer<T1 extends RESTServerResponse, T2>
             response = responseClass.getDeclaredConstructor().newInstance();
             Iterator<String> iter = node.fieldNames();
             
-            int itemClassIndex = 0;
-            
             while (iter.hasNext()) {
                 String fieldName = iter.next();
                 
                 JsonNode innerNode = node.get(fieldName);
                 
-                //System.out.println("Feldname: " + fieldName + " = " + node.get(fieldName).asText());
-                
                 if (innerNode.isArray()) {
                     
                     T2[] items = (T2[]) new Object[innerNode.size()];
+                    Class<?>[] itemClasses = response.getItemClasses();
                     
                     int itemsIndex = 0;
                     
                     for (JsonNode itemNode : innerNode) {
-                        T2 item = (T2) jp.getCodec().treeToValue(itemNode, response.getItemClasses()[itemClassIndex]);
-                        items[itemsIndex] = item;
                         
+                        for (Class<?> cls : itemClasses) {
+                            
+                            try {
+                                T2 item = (T2) jp.getCodec().treeToValue(itemNode, cls);
+                                items[itemsIndex] = item;
+                                break;
+                            } catch (JsonProcessingException e) {
+                                //e.printStackTrace();
+                            }
+                            
+                        }
+
                         itemsIndex++;
                         
                     }
-                    itemClassIndex++;
                     
                     response.set(fieldName, items);
                     

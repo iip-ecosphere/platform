@@ -113,7 +113,7 @@ public class GeneratedRESTConnectorTest {
             Assert.assertEquals(2.476, rest.getI3().getValue());           
             Assert.assertEquals("Meter readings", rest.getRoot1().getDescription());
             Assert.assertEquals("Instantaneous values", rest.getRoot2().getDescription());
-            Assert.assertEquals("1.5.1", rest.getInfo1().getValue());
+            Assert.assertEquals("EEM-MA370", rest.getInfo1().getValue());
             Assert.assertEquals("2.0", rest.getInfo2().getValue()); 
             
             MachineInputMixed input = new MachineInputMixed();
