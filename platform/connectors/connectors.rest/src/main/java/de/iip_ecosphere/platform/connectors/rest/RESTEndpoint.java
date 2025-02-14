@@ -9,7 +9,7 @@ public class RESTEndpoint {
     private boolean asSingleValue;
     private String type;
     private String setType;
-    private int endpointIndex;
+    private int endpointIndex = -1;
     
     private HashMap<String, Integer> itemIndexes = new HashMap<>();; 
 
@@ -82,8 +82,8 @@ public class RESTEndpoint {
      * 
      * @param simpleValueToWrite to set
      */
-    public void setAsSingleValue(boolean simpleValueToWrite) {
-        this.asSingleValue = simpleValueToWrite;
+    public void setAsSingleValue(boolean asSingleValue) {
+        this.asSingleValue = asSingleValue;
     }
 
     /**
