@@ -93,10 +93,10 @@ public class TestServerControllerEEMTariffNumber {
     @PutMapping("/tn1")
     public ResponseEntity<String> updateTn(@RequestParam("value") int value) {
 
-        tn1.set("value", value);
+        tn1.setValue(value);
         ResponseEntity<String> mes = ResponseEntity.ok("tn wurde aktualisiert: neuer Wert ist " 
-            + tn1.getValueToWrite());
-        //System.out.println(mes);
+            + tn1.getValue());
+
         return mes;
     }
     

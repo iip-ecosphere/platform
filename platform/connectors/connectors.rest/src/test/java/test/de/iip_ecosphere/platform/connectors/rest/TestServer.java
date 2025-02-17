@@ -70,17 +70,7 @@ public class TestServer {
      */
     private void createEndpointDescriptionSet() {
         endpointDescriptionSet = "{";
-        endpointDescriptionSet += "\"string\" : {\"endpoint\" : \"endpoints/all\", "
-                + "\"type\" : \"TestServerResponseSet\"},";
-        endpointDescriptionSet += "\"short\" : {\"endpoint\" : \"endpoints/all\", "
-                + "\"type\" : \"TestServerResponseSet\"},";
-        endpointDescriptionSet += "\"integer\" : {\"endpoint\" : \"endpoints/all\", "
-                + "\"type\" : \"TestServerResponseSet\"},";
-        endpointDescriptionSet += "\"long\" : {\"endpoint\" : \"endpoints/all\", "
-                + "\"type\" : \"TestServerResponseSet\"},";
-        endpointDescriptionSet += "\"float\" : {\"endpoint\" : \"endpoints/all\", "
-                + "\"type\" : \"TestServerResponseSet\"},";
-        endpointDescriptionSet += "\"double\" : {\"endpoint\" : \"endpoints/all\", "
+        endpointDescriptionSet += "\"all\" : {\"endpoint\" : \"endpoints/all\", "
                 + "\"type\" : \"TestServerResponseSet\"}";
         endpointDescriptionSet += "}";
     }

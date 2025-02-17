@@ -2,7 +2,6 @@ package test.de.iip_ecosphere.platform.connectors.rest;
 
 import de.iip_ecosphere.platform.connectors.rest.RESTConnector;
 import de.iip_ecosphere.platform.connectors.rest.RESTItem;
-import de.iip_ecosphere.platform.connectors.rest.RESTServerResponse;
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
 
 public class SpecificRESTConnectorSet extends RESTConnector<MachineOutputSet, MachineInputSet> {
@@ -18,9 +17,8 @@ public class SpecificRESTConnectorSet extends RESTConnector<MachineOutputSet, Ma
         super(adapter);
     }
     
-    @SuppressWarnings("unchecked")
     @Override
-    protected Class<? extends RESTServerResponse> [] getResponseClasses() {
+    protected Class<?> [] getResponseClasses() {
 
         return new Class[]{TestServerResponseSet.class};
     }

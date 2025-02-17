@@ -103,18 +103,18 @@ public class GeneratedRESTConnectorTest {
             }
             
             Assert.assertNotNull(rest);
-            Assert.assertEquals(3, rest.getTn1().getValueToWrite());
-            Assert.assertEquals(50.000, rest.getF().getValueToWrite());
-            Assert.assertEquals(229.845, rest.getU1().getValueToWrite());
-            Assert.assertEquals(229.805, rest.getU2().getValueToWrite());
-            Assert.assertEquals(229.853, rest.getU3().getValueToWrite());
-            Assert.assertEquals(2.533, rest.getI1().getValue());
-            Assert.assertEquals(2.468, rest.getI2().getValue());
-            Assert.assertEquals(2.476, rest.getI3().getValue());           
-            Assert.assertEquals("Meter readings", rest.getRoot1().getDescription());
-            Assert.assertEquals("Instantaneous values", rest.getRoot2().getDescription());
-            Assert.assertEquals("EEM-MA370", rest.getInfo1().getValue());
-            Assert.assertEquals("2.0", rest.getInfo2().getValue()); 
+            Assert.assertEquals(3, rest.getTn1().getValue());
+            Assert.assertEquals(50.000, rest.getF().getValue());
+            Assert.assertEquals(229.845, rest.getU1().getValue());
+            Assert.assertEquals(229.805, rest.getU2().getValue());
+            Assert.assertEquals(229.853, rest.getU3().getValue());
+            Assert.assertEquals(2.533, rest.getAll().getItems()[7].getValue());
+            Assert.assertEquals(2.468, rest.getAll().getItems()[8].getValue());
+            Assert.assertEquals(2.476, rest.getAll().getItems()[9].getValue());           
+            Assert.assertEquals("Device information", rest.getInformation().getRootItems()[0].getDescription());
+            Assert.assertEquals("Instantaneous values", rest.getInformation().getRootItems()[1].getDescription());
+            Assert.assertEquals("EEM-MA370", rest.getInformation().getInfoItems()[0].getValue());
+            Assert.assertEquals("2.0", rest.getInformation().getInfoItems()[1].getValue()); 
             
             MachineInputMixed input = new MachineInputMixed();
             TestServerResponseTariffNumber tn1 = rest.getTn1();
@@ -124,7 +124,7 @@ public class GeneratedRESTConnectorTest {
 
             rest = waitUntilReceived(count, restReference, rest);
             
-            Assert.assertEquals(1, rest.getTn1().getValueToWrite());                        
+            Assert.assertEquals(1, rest.getTn1().getValue());                        
             Assert.assertEquals("", rest.getTn2().getContext());
             Assert.assertEquals("", rest.getTn2().getId());
             Assert.assertEquals("", rest.getTn2().getTimestamp());
