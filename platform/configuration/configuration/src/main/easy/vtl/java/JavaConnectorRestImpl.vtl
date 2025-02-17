@@ -4,7 +4,7 @@ import JavaConnector;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-@format(profile="java", profileArg_javadocIndent="* ", lineLength = 120, profileArg_eltSorting="CONS")
+@format(profile="java", profileArg_javadocIndent=" * ", lineLength = 120, profileArg_eltSorting="CONS")
 template JavaConnectorRestImpl(Configuration config, JavaCodeArtifact target, RestConnector conn, String pkg, setOf(DataType) usedRestTypes) {
     
     def main(Configuration config, JavaCodeArtifact target, RestConnector conn, String pkg, setOf(DataType) usedRestTypes) {

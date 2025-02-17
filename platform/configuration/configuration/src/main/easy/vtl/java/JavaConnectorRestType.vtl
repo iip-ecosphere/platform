@@ -4,21 +4,16 @@ import JavaType;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-@format(profile="java", profileArg_javadocIndent="* ", lineLength = 120, profileArg_eltSorting="CONS")
-template JavaConnectorRestType(Configuration config, JavaCodeArtifact target, RecordType type, String pkg, Boolean output, mapOf(RecordType, setOf(RecordType)) itemTypes, setOf(DataType) usedRestTypes) {
+@format(profile="java", profileArg_javadocIndent=" * ", lineLength = 120, profileArg_eltSorting="CONS")
+template JavaConnectorRestType(Configuration config, JavaCodeArtifact target, RecordType type, String pkg) {
     
-    def main(Configuration config, JavaCodeArtifact target, RecordType type, String pkg, Boolean output, mapOf(RecordType, setOf(RecordType)) itemTypes, setOf(DataType) usedRestTypes) {
+    def main(Configuration config, JavaCodeArtifact target, RecordType type, String pkg) {
         IIPEcosphere cfg = config;
     
         String typeName = asTypeName(type.name);
         String clsName = typeName + "RestType";
-        Boolean isUsedType = usedRestTypes.includes(type);
 
         JavaCodeClass mainCls = codeCreateClass(target, pkg, clsName, 'Rest type for the application data type ${typeName}');
-        mainCls.addImport("java.math.*"); // preliminary, BigInt
-        if (isUsedType) { 
-            mainCls.addExtends("de.iip_ecosphere.platform.connectors.rest.RESTServerResponse");
-        }
         mainCls.addAnnotation("com.fasterxml.jackson.annotation.JsonIgnoreProperties").addArgument("ignoreUnknown", true);
 
         String getValueToWrite = "null";
@@ -35,25 +30,6 @@ template JavaConnectorRestType(Configuration config, JavaCodeArtifact target, Re
         }
 
         mainCls.addConstructor("Default constructor. Fields are pre-allocated with default Java values.");
-        if (isUsedType) { 
-            JavaCodeMethod m = mainCls.addMethod("Class<?>[]", "getItemClasses");
-            m.addOverrideAnnotation();
-            setOf(RecordType) it = itemTypes.get(type);
-            if (it == null) {
-                m.addReturn("null");
-            } else {
-                String rCls = "";
-                for (DataType t : it->sortedBy(x|x.name)) {
-                    rCls = appendWithSeparator(rCls, ", ", "iip.nodes." + asTypeName(t.name) + "RestType.class");
-                }
-                m.addReturn("new Class[]{${rCls}}");
-            }
-        
-            m = mainCls.addMethod("Object", "getValueToWrite");
-            m.addOverrideAnnotation();
-            m.addAnnotation("com.fasterxml.jackson.annotation.JsonIgnore");
-            m.addReturn(getValueToWrite);        
-        }
     }
     
     def String mapTypeName(Field f) {

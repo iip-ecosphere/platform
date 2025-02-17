@@ -2033,14 +2033,13 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         setOf(RecordType) types = {};
         setOf(RecordType) outTypes = {};
         setOf(RecordType) usedTypes = {};
-        mapOf(RecordType, setOf(RecordType)) itemTypes = {};
-        collectRestTypes(conn.inInterface.type, types, usedTypes, itemTypes);
-        collectRestTypes(conn.outInterface.type, outTypes, usedTypes, itemTypes);
+        collectRestTypes(conn.inInterface.type, types, usedTypes);
+        collectRestTypes(conn.outInterface.type, outTypes, usedTypes);
         types = types.including(outTypes);
         vilTemplateProcessor("JavaConnectorRestImpl", config, "${javaNodesSrc}/${typeName}Impl.java", conn=conn, pkg=javaNodesPackage, usedRestTypes=usedTypes);
         for (RecordType t: types) {
             typeName = toTypeName(t);
-            vilTemplateProcessor("JavaConnectorRestType", config, "${javaNodesSrc}/${typeName}RestType.java", type=t, pkg=javaNodesPackage, output=outTypes.includes(t), itemTypes=itemTypes, usedRestTypes=usedTypes);
+            vilTemplateProcessor("JavaConnectorRestType", config, "${javaNodesSrc}/${typeName}RestType.java", type=t, pkg=javaNodesPackage);
         }
         Path resourcesSrc = "${appRoot}/src/main/resources";
         String connectorName = toIdentifier(conn.name);
@@ -2048,42 +2047,32 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     }
     
     @DispatchBasis
-    collectRestTypes(DataType type, setOf(RecordType) result, setOf(RecordType) used, mapOf(RecordType, setOf(RecordType)) items) = {
+    collectRestTypes(DataType type, setOf(RecordType) result, setOf(RecordType) used) = {
     }
 
     @DispatchCase
-    collectRestTypes(RecordType type, setOf(RecordType) result, setOf(RecordType) used, mapOf(RecordType, setOf(RecordType)) items) = {
+    collectRestTypes(RecordType type, setOf(RecordType) result, setOf(RecordType) used) = {
         result.add(type);
         for (Field f : type.fields) {
-            setOf(RecordType) it = items.get(type);
-            if (not(items.containsKey(type))) {
-                it = {};
-                items.add(type, it);
-            } else {
-                it = items.get(type);
-            }
-            addUsedType(f, result, used, it, items);
+            addUsedType(f, result, used);
         }
     }
+
+    @DispatchCase
+    collectRestTypes(ArrayType type, setOf(RecordType) result, setOf(RecordType) used) = {
+        collectRestTypes(type.type, result, used);
+    }
+
     
     @DispatchBasis
-    addUsedType(Field field, setOf(RecordType) result, setOf(RecordType) used, setOf(RecordType) items, mapOf(RecordType, setOf(RecordType)) allItems) = {
-        collectRestTypes(field.type, result, used, allItems);
+    addUsedType(Field field, setOf(RecordType) result, setOf(RecordType) used) = {
+        collectRestTypes(field.type, result, used);
     }
 
     @DispatchCase
-    addUsedType(RestField field, setOf(RecordType) result, setOf(RecordType) used, setOf(RecordType) items, mapOf(RecordType, setOf(RecordType)) allItems) = {
+    addUsedType(RestField field, setOf(RecordType) result, setOf(RecordType) used) = {
         addToSet(field.type, used);
-        addToSet(field.type, items);
-        collectRestTypes(field.type, result, used, allItems);
-    }
-
-    @DispatchCase
-    addUsedType(RestSetField field, setOf(RecordType) result, setOf(RecordType) used, setOf(RecordType) items, mapOf(RecordType, setOf(RecordType)) allItems) = {
-        addToSet(field.setType, used);
-        addToSet(field.type, items);
-        collectRestTypes(field.type, result, used, allItems);
-        collectRestTypes(field.setType, result, used, allItems);
+        collectRestTypes(field.type, result, used);
     }
     
     addToSet(DataType type, setOf(RecordType) used) = {
