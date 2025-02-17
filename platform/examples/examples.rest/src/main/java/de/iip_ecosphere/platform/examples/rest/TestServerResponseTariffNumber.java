@@ -3,10 +3,8 @@ package de.iip_ecosphere.platform.examples.rest;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import de.iip_ecosphere.platform.connectors.rest.RESTServerResponse;
-
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class TestServerResponseTariffNumber extends RESTServerResponse {
+public class TestServerResponseTariffNumber {
 
     @JsonProperty("context")
     private String context;
@@ -139,17 +137,4 @@ public class TestServerResponseTariffNumber extends RESTServerResponse {
     public void setDescription(String description) {
         this.description = description;
     }
-
-
-    @Override
-    protected Class<?>[] getItemClasses() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Object getValueToWrite() {
-        return value;
-    }
-
 }

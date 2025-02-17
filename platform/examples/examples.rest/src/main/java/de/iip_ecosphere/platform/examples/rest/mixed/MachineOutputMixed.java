@@ -2,9 +2,8 @@ package de.iip_ecosphere.platform.examples.rest.mixed;
 
 import de.iip_ecosphere.platform.examples.rest.TestServerResponseMeasurementSingle;
 import de.iip_ecosphere.platform.examples.rest.TestServerResponseTariffNumber;
-import de.iip_ecosphere.platform.examples.rest.TestServerResponseInformationInfoItem;
-import de.iip_ecosphere.platform.examples.rest.TestServerResponseInformationRootItem;
-import de.iip_ecosphere.platform.examples.rest.TestServerResponseMeasurementSetItem;
+import de.iip_ecosphere.platform.examples.rest.TestServerResponseInformation;
+import de.iip_ecosphere.platform.examples.rest.TestServerResponseMeasurementSet;
 
 public class MachineOutputMixed {
 
@@ -16,15 +15,10 @@ public class MachineOutputMixed {
     private TestServerResponseMeasurementSingle u2;
     private TestServerResponseMeasurementSingle u3;
     
-    private TestServerResponseMeasurementSetItem i1;
-    private TestServerResponseMeasurementSetItem i2;
-    private TestServerResponseMeasurementSetItem i3;
+    private TestServerResponseMeasurementSet all;
     
-    private TestServerResponseInformationRootItem root1;
-    private TestServerResponseInformationRootItem root2;
-    
-    private TestServerResponseInformationInfoItem info1;
-    private TestServerResponseInformationInfoItem info2;
+    private TestServerResponseInformation information;
+
     
     /**
      * Getter for tn1.
@@ -133,130 +127,40 @@ public class MachineOutputMixed {
     public void setU3(TestServerResponseMeasurementSingle u3) {
         this.u3 = u3;
     }
-    
+
     /**
-     * Getter for i1.
+     * Getter for all.
      * 
-     * @return i1
+     * @return all
      */
-    public TestServerResponseMeasurementSetItem getI1() {
-        return i1;
-    }
-    
-    /**
-     * Setter for i1.
-     * 
-     * @param i1 to set
-     */
-    public void setI1(TestServerResponseMeasurementSetItem i1) {
-        this.i1 = i1;
-    }
-    
-    /**
-     * Getter for i2.
-     * 
-     * @return i2
-     */
-    public TestServerResponseMeasurementSetItem getI2() {
-        return i2;
-    }
-    
-    /**
-     * Setter for i2.
-     * 
-     * @param i2 to set
-     */
-    public void setI2(TestServerResponseMeasurementSetItem i2) {
-        this.i2 = i2;
-    }
-    
-    /**
-     * Getter for i3.
-     * 
-     * @return i3
-     */
-    public TestServerResponseMeasurementSetItem getI3() {
-        return i3;
-    }
-    
-    /**
-     * Setter for i3.
-     * 
-     * @param i3 to set
-     */
-    public void setI3(TestServerResponseMeasurementSetItem i3) {
-        this.i3 = i3;
+    public TestServerResponseMeasurementSet getAll() {
+        return all;
     }
 
     /**
-     * Getter for root1.
+     * Setter for all.
      * 
-     * @return root1
+     * @param all to set
      */
-    public TestServerResponseInformationRootItem getRoot1() {
-        return root1;
+    public void setAll(TestServerResponseMeasurementSet all) {
+        this.all = all;
     }
 
     /**
-     * Setter for root1.
+     * Getter for information.
      * 
-     * @param root1 to set
+     * @return information
      */
-    public void setRoot1(TestServerResponseInformationRootItem root1) {
-        this.root1 = root1;
+    public TestServerResponseInformation getInformation() {
+        return information;
     }
 
     /**
-     * Getter for root2.
+     * Setter for information.
      * 
-     * @return root2
+     * @param information to set
      */
-    public TestServerResponseInformationRootItem getRoot2() {
-        return root2;
-    }
-
-    /**
-     * Setter for root2.
-     * 
-     * @param root2 to set
-     */
-    public void setRoot2(TestServerResponseInformationRootItem root2) {
-        this.root2 = root2;
-    }
-
-    /**
-     * Getter for info1.
-     * 
-     * @return info1
-     */
-    public TestServerResponseInformationInfoItem getInfo1() {
-        return info1;
-    }
-
-    /**
-     * Setter for info1.
-     * 
-     * @param info1 to set
-     */
-    public void setInfo1(TestServerResponseInformationInfoItem info1) {
-        this.info1 = info1;
-    }
-
-    /**
-     * Getter for info2.
-     * 
-     * @return info2
-     */
-    public TestServerResponseInformationInfoItem getInfo2() {
-        return info2;
-    }
-
-    /**
-     * Setter for info2.
-     * 
-     * @param info2 to set
-     */
-    public void setInfo2(TestServerResponseInformationInfoItem info2) {
-        this.info2 = info2;
+    public void setInformation(TestServerResponseInformation information) {
+        this.information = information;
     }
 }

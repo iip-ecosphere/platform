@@ -2,9 +2,7 @@ package de.iip_ecosphere.platform.examples.rest;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import de.iip_ecosphere.platform.connectors.rest.RESTServerResponse;
-
-public class TestServerResponseInformation extends RESTServerResponse {
+public class TestServerResponseInformation {
 
     @JsonProperty("context")
     private String context;
@@ -96,16 +94,4 @@ public class TestServerResponseInformation extends RESTServerResponse {
     public void setInfoItems(TestServerResponseInformationInfoItem[] infoItems) {
         this.infoItems = infoItems;
     }
-    
-    @Override
-    public Object getValueToWrite() {
-        return null;
-    }
-
-    @Override
-    protected Class<?>[] getItemClasses() {
-
-        return new Class[] {TestServerResponseInformationRootItem.class, TestServerResponseInformationInfoItem.class};
-    }
-
 }

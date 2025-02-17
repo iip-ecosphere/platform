@@ -5,8 +5,6 @@ import java.io.IOException;
 import de.iip_ecosphere.platform.connectors.model.AbstractModelAccess;
 import de.iip_ecosphere.platform.connectors.model.ModelAccess;
 
-import de.iip_ecosphere.platform.connectors.rest.RESTEndpointMap;
-import de.iip_ecosphere.platform.connectors.rest.RESTItem;
 import de.iip_ecosphere.platform.connectors.types.AbstractConnectorOutputTypeTranslator;
 import de.iip_ecosphere.platform.examples.rest.TestServerResponseMeasurementSingle;
 import de.iip_ecosphere.platform.examples.rest.TestServerResponseTariffNumber;
@@ -53,9 +51,6 @@ public class MachineOutputTranslatorMixed<S> extends AbstractConnectorOutputType
 
         if (source != null) {
 
-            RESTItem item = (RESTItem) source;
-            RESTEndpointMap map = item.getEndpointMap();
-
             AbstractModelAccess access = (AbstractModelAccess) getModelAccess();
 
             MachineOutputMixed result = new MachineOutputMixed();
@@ -65,20 +60,8 @@ public class MachineOutputTranslatorMixed<S> extends AbstractConnectorOutputType
             result.setU1((TestServerResponseMeasurementSingle) access.get("u1"));
             result.setU2((TestServerResponseMeasurementSingle) access.get("u2"));
             result.setU3((TestServerResponseMeasurementSingle) access.get("u3"));
-            result.setI1(((TestServerResponseMeasurementSet) 
-                    access.get("all")).getItems()[map.get("all").getItemIndex("i1")]);
-            result.setI2(((TestServerResponseMeasurementSet) 
-                    access.get("all")).getItems()[map.get("all").getItemIndex("i2")]);
-            result.setI3(((TestServerResponseMeasurementSet) 
-                    access.get("all")).getItems()[map.get("all").getItemIndex("i3")]);
-            result.setRoot1(((TestServerResponseInformation) 
-                    access.get("information")).getRootItems()[map.get("information").getItemIndex("root1")]);
-            result.setRoot2(((TestServerResponseInformation) 
-                    access.get("information")).getRootItems()[map.get("information").getItemIndex("root2")]);
-            result.setInfo1(((TestServerResponseInformation) 
-                    access.get("information")).getInfoItems()[map.get("information").getItemIndex("info1")]);
-            result.setInfo2(((TestServerResponseInformation) 
-                    access.get("information")).getInfoItems()[map.get("information").getItemIndex("info2")]);
+            result.setAll((TestServerResponseMeasurementSet) access.get("all"));  
+            result.setInformation((TestServerResponseInformation) access.get("information"));
 
             return result;
 

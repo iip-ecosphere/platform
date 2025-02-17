@@ -3,10 +3,8 @@ package de.iip_ecosphere.platform.examples.rest;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import de.iip_ecosphere.platform.connectors.rest.RESTServerResponse;
-
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class TestServerResponseMeasurementSet extends RESTServerResponse {
+public class TestServerResponseMeasurementSet {
 
     @JsonProperty("context")
     private String context;
@@ -76,16 +74,5 @@ public class TestServerResponseMeasurementSet extends RESTServerResponse {
      */
     public void setItems(TestServerResponseMeasurementSetItem[] items) {
         this.items = items;
-    }
-
-    @Override
-    public Object getValueToWrite() {
-        return null;
-    }
-
-    @Override
-    protected Class<?>[] getItemClasses() {
-
-        return new Class[] {TestServerResponseMeasurementSetItem.class};
     }
 }
