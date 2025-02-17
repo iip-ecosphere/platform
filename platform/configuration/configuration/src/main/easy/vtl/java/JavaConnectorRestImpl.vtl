@@ -17,20 +17,21 @@ template JavaConnectorRestImpl(Configuration config, JavaCodeArtifact target, Re
         JavaCodeClass mainCls = codeCreateClass(target, pkg, clsName, 'Rest connector implementation for ${typeName}');
         mainCls.addExtends("de.iip_ecosphere.platform.connectors.rest.RESTConnector" + generics);
 
-        JavaCodeMethod m = mainCls.addConstructor("Connector constructor.");
-        generics = getConnectorGenerics(conn, false, pkg=pkg + ".", typeAdd="RestType", prefix="de.iip_ecosphere.platform.connectors.rest.RESTItem, Object, ");
-        m.addParameter("de.iip_ecosphere.platform.connectors.types.ProtocolAdapter${generics}...", "adapter", "the protocol adapter");
-        m.addSuperCall().addArgument("adapter");
+        mainCls.addConstructor("Connector constructor.").(m|{
+            generics = getConnectorGenerics(conn, false, pkg=pkg + ".", typeAdd="RestType", prefix="de.iip_ecosphere.platform.connectors.rest.RESTItem, Object, ");
+            m.addParameter("de.iip_ecosphere.platform.connectors.types.ProtocolAdapter${generics}...", "adapter", "the protocol adapter");
+            m.addSuperCall().addArgument("adapter");
+        });
         
         String rCls = "";
         for (DataType t : usedRestTypes->sortedBy(x|x.name)) {
             rCls = appendWithSeparator(rCls, ", ", "iip.nodes." + asTypeName(t.name) + "RestType.class");
         }
-        mainCls.addImport("de.iip_ecosphere.platform.connectors.rest.RESTServerResponse");
-        m = mainCls.addMethod("Class<? extends RESTServerResponse>[]", "getResponseClasses");
-        m.addOverrideAnnotation();
-        m.addAnnotation("SuppressWarnings").addStringArgument("unchecked");
-        m.addReturn("new Class[]{${rCls}}");
+        mainCls.addMethod("Class<?>[]", "getResponseClasses").setProtected().(m|{
+            m.addOverrideAnnotation();
+            m.addAnnotation("SuppressWarnings").addStringArgument("unchecked");
+            m.addReturn("new Class[]{${rCls}}");
+        });
     }
     
 }

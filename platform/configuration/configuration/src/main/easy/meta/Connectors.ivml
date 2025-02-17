@@ -540,13 +540,6 @@ project Connectors {
        Boolean asSingleValue = false;
    } 
 
-   compound RestSetField refines RestField {
-        assign(bindingTime = BindingTime::specify) to {
-            refTo(DataType) setType;
-            Integer endpointIndex = -1;
-		}   	
-   } 
-   
    compound RestConnector refines Connector { // fixed template types see JavaConnector.vtl
        assign (uiGroup = UiInvisibleGroup) to {
            String class = "de.iip_ecosphere.platform.connectors.rest.RESTConnector";
