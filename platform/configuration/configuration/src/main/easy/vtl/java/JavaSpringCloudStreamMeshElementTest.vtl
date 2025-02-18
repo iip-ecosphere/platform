@@ -417,6 +417,14 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
     protected def genAssertPredicates(MeshSink elt, ServiceBase service, String clsName) {
         ''
     }
+
+    def getConnectorCls(Connector connector) {
+        connector.class + "<>";
+    }
+    
+    def getConnectorCls(RestConnector connector) {
+        "iip.nodes." + asTypeName(connector.name) + "Impl";
+    }
     
     def genMethods(MeshSource elt, Connector connector, String clsName) {
         String connGen = getConnectorGenerics(connector, false);
@@ -433,7 +441,7 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, FileArtifact
         protected void testConnector(ConnectorParameter params, ReceptionCallback<${outType}> callback) throws IOException {
             ActiveAasBase.setNotificationMode(NotificationMode.NONE); // disable AAS connector registration
             ${connector.class}${connGen} conn = 
-                new ${connector.class}<>(${clsName}.createConnectorAdapter());
+                new ${getConnectorCls(connector)}(${clsName}.createConnectorAdapter());
             conn.connect(params);
             conn.setReceptionCallback(callback);
             conn.request(true);
