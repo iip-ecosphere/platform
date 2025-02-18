@@ -400,7 +400,7 @@ public class DockerContainerDescriptor extends BasicContainerDescriptor {
             result = readFromYaml(in, file.toURI());
         } catch (FileNotFoundException e) {
             LoggerFactory.getLogger(DockerContainerDescriptor.class).error(
-                "Reading container descriptor: " + e.getMessage());
+                "Reading container descriptor {}: {}", file, e.getMessage());
         }
         return result;
     }
@@ -419,7 +419,7 @@ public class DockerContainerDescriptor extends BasicContainerDescriptor {
                 result.setUri(uri);
             } catch (IOException e) {
                 LoggerFactory.getLogger(DockerContainerDescriptor.class).error(
-                    "Reading container descriptor: " + e.getMessage());
+                    "Reading container descriptor {}: {}", uri, e.getMessage());
             }
         }
         return result;
