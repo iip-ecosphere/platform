@@ -203,7 +203,7 @@ public class BasicContainerDescriptor implements ContainerDescriptor {
             result = readFromYaml(in, file.toURI());
         } catch (FileNotFoundException e) {
             LoggerFactory.getLogger(BasicContainerDescriptor.class).error(
-                "Reading container descriptor: " + e.getMessage());
+                "Reading container descriptor {}: {}", file, e.getMessage());
         }
         return result;
     }
@@ -222,7 +222,7 @@ public class BasicContainerDescriptor implements ContainerDescriptor {
                 result.setUri(uri);
             } catch (IOException e) {
                 LoggerFactory.getLogger(BasicContainerDescriptor.class).error(
-                    "Reading container descriptor: " + e.getMessage());
+                    "Reading container descriptor {}: {}", uri, e.getMessage());
             }
         }
         return result;
