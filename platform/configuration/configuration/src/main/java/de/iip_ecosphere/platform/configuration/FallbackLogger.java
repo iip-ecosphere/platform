@@ -109,7 +109,11 @@ public class FallbackLogger implements Logger {
         if (level.ordinal() >= this.level.ordinal()) {
             String tmp = format;
             for (Object a: arguments) {
-                tmp = tmp.replaceFirst("\\{\\}", null == a ? "null" : a.toString());
+                try {
+                    tmp = tmp.replaceFirst("\\{\\}", null == a ? "null" : a.toString());
+                } catch (IllegalArgumentException e) {
+                    // just keep tmp as it is
+                }
             }
             emit(level, tmp);
         }

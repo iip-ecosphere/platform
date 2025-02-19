@@ -44,6 +44,38 @@ template JavaBasics(Configuration config, FileArtifact target) {
     
     // ------------------------------------------ type name access -------------------------------------
 
+    def String toSimpleName(String name) {
+        JavaPath p = name;
+        p.getName();
+    }
+    
+    def String toQualifiedTypeName(String type) {
+        if (isPrimitive(type)) {
+            type;
+        } else {
+            "iip.datatypes." + type;
+        }
+    }
+
+    def String toQualifiedTypeName(IOType type) {
+        toQualifiedTypeName(type.type);
+    }
+
+    @DispatchBasis
+    def String toQualifiedTypeName(DataType type) {
+        toTypeName(type);
+    }
+
+    @DispatchCase
+    def String toQualifiedTypeName(RecordType type) {
+        "iip.datatypes." + toTypeName(type);
+    }
+
+    @DispatchCase
+    def String toQualifiedTypeName(EnumType type) {
+        "iip.datatypes." + toTypeName(type);
+    }
+
     def String toTypeName(IOType type) {
         toTypeName(type.type);
     }
@@ -145,7 +177,7 @@ template JavaBasics(Configuration config, FileArtifact target) {
     
     @DispatchCase
     def String toTypeName(UnsignedInteger64TypeType type) {
-        "long";
+        "java.math.BigInteger";
     }
     
     @DispatchCase
@@ -206,7 +238,7 @@ template JavaBasics(Configuration config, FileArtifact target) {
             default: "null"
         }        
     }    
-
+    
     def String toTypeName(ListType type) {
         DataType eltType = type.type;
         String t = considerWrapper(toTypeName(eltType));
@@ -294,7 +326,8 @@ template JavaBasics(Configuration config, FileArtifact target) {
         }
     }
     
-    def getJavaServiceKind(ServiceKind kind) {
+    def getJavaServiceKind(ServiceKind kind, JavaCodeClass c) {
+        c.addImport("de.iip_ecosphere.platform.services.environment.ServiceKind");
         switch (kind) {
             ServiceKind::SOURCE_SERVICE: "ServiceKind.SOURCE_SERVICE",
             ServiceKind::SINK_SERVICE: "ServiceKind.SINK_SERVICE",
@@ -306,63 +339,62 @@ template JavaBasics(Configuration config, FileArtifact target) {
     
     // ------------------------------------ simple parameters -------------------------------
     
-    def produceParametersReg(Parameters params, JavaCodeBlock block) {
-        for (Parameter p: params) {
-            '${produceParameterReg(p, block)}'
-        }
+    def produceParameterConfigurerCall(Parameters params, JavaCodeBlockInterface block) {
+        block.addImport("de.iip_ecosphere.platform.transport.serialization.TypeTranslators"); // as used below
+        JavaCodeBlock b = block.addCall("service.addParameterConfigurer")
+            .addLambdaArgument()
+                .addVariable("c")
+                .addBlock();
+        produceParametersReg(params, b);
+    }
+    
+    def produceParametersReg(Parameters params, JavaCodeBlockInterface block) {
+        params->forEach(Parameter p|produceParameterReg(p, block));
     }
 
     @DispatchBasis
-    def produceParameterReg(Parameter p, JavaCodeBlock block) {
-        ''
+    def produceParameterReg(Parameter p, JavaCodeBlockInterface block) {
     }
     
     @DispatchCase
-    def produceParameterReg(StringParameter p, JavaCodeBlock block) {
-        '${produceParameterDecl(p, "String.class", "TypeTranslators.JSON_STRING", block)}'
+    def produceParameterReg(StringParameter p, JavaCodeBlockInterface block) {
+        produceParameterDecl(p, "String.class", "TypeTranslators.JSON_STRING", block);
     }
 
     @DispatchCase
-    def produceParameterReg(IntegerParameter p, JavaCodeBlock block) {
-        '${produceParameterDecl(p, "Integer.class", "TypeTranslators.INTEGER", block)}'
+    def produceParameterReg(IntegerParameter p, JavaCodeBlockInterface block) {
+        produceParameterDecl(p, "Integer.class", "TypeTranslators.INTEGER", block);
     }
 
     @DispatchCase
-    def produceParameterReg(LongParameter p, JavaCodeBlock block) {
-        '${produceParameterDecl(p, "Long.class", "TypeTranslators.LONG", block)}'
+    def produceParameterReg(LongParameter p, JavaCodeBlockInterface block) {
+        produceParameterDecl(p, "Long.class", "TypeTranslators.LONG", block);
     }
 
     @DispatchCase
-    def produceParameterReg(BooleanParameter p, JavaCodeBlock block) {
-        '${produceParameterDecl(p, "Boolean.class", "TypeTranslators.BOOLEAN", block)}'
+    def produceParameterReg(BooleanParameter p, JavaCodeBlockInterface block) {
+        produceParameterDecl(p, "Boolean.class", "TypeTranslators.BOOLEAN", block);
     }
 
     @DispatchCase
-    def produceParameterReg(RealParameter p, JavaCodeBlock block) {
-        '${produceParameterDecl(p, "Double.class", "TypeTranslators.DOUBLE", block)}'
+    def produceParameterReg(RealParameter p, JavaCodeBlockInterface block) {
+        produceParameterDecl(p, "Double.class", "TypeTranslators.DOUBLE", block);
     }
     
-    def produceParameterDecl(Parameter p, String cls, String typeTranslator, JavaCodeBlock block) {
-        String sysProp = getStringValueSafe(p.systemProperty, "");
-        if (sysProp <> "") {
-            sysProp = ', "${sysProp}"';
-        }
-        '${produceParameterDecl(p.name, cls, typeTranslator, sysProp, block)}'
+    def produceParameterDecl(Parameter p, String cls, String typeTranslator, JavaCodeBlockInterface block) {
+        produceParameterDecl(p.name, cls, typeTranslator, getStringValueSafe(p.systemProperty, ""), block);
     }
 
-    def produceParameterDecl(String name, String cls, String typeTranslator, String sysProp, JavaCodeBlock block) {
+    def produceParameterDecl(String name, String cls, String typeTranslator, String sysProp, JavaCodeBlockInterface block) {
         // fast track, no attributes, no implicit recovery, just parameter declaration
-        JavaCodeMethodCall call = block.addCall("de.iip_ecosphere.platform.services.environment.AbstractService.addConfigurer")
+        JavaCodeMethodCall call = block.addCall("de.iip_ecosphere.platform.services.environment.AbstractService.addConfigurer", JavaCodeImportScope.METHOD_CLASS_IMPORT)
             .addArgument("c")
             .addStringArgument(name)
             .addArgument(cls)
             .addArgument(typeTranslator)
             .addArgument("v -> {}")
-            .addArgument("null");
-        if (sysProp <> "") {
-            call.addArgument(sysProp);
-        }
-        'AbstractService.addConfigurer(c, "${name}", ${cls}, ${typeTranslator}, v -> {}, null${sysProp});'
+            .addArgument("null")
+            .addStringArgumentNotEmpty(sysProp);
     }
     
     // ------------------------------------------ other -------------------------------------
@@ -444,7 +476,7 @@ template JavaBasics(Configuration config, FileArtifact target) {
     def getQualifier(AasField field) {
         String semId = getStringValueSafe(field.semanticId, "");
         if (semId <> "") {
-            ', "${semId}"';
+            '"${semId}"';
         } else {
             "";
         }
@@ -471,7 +503,7 @@ template JavaBasics(Configuration config, FileArtifact target) {
     def DataType getElementType(ListType type) {
         type.type;
     }
-
+    
     // --------------------------------- Java code artifact helpers -----------------------
 
     /**
@@ -507,15 +539,24 @@ template JavaBasics(Configuration config, FileArtifact target) {
         addLoggerCall(catch, "error", msg).addArgument("e.getMessage()");
     }
     
-    def JavaCodeMethodCall addLoggerCall(JavaCodeBlockInterface block, String call, String msg) {
+    def JavaCodeMethodCall addLoggerCall(JavaCodeBlockInterface block, String call, String msg, String cls="getClass()") {
         block.addCall("org.slf4j.LoggerFactory.getLogger", JavaCodeImportScope.CLASS)
-            .addArgument("getClass()")
+            .addArgument(cls)
             .addCall(call)
                 .addStringArgument(msg);
     }     
 
-    def codeCatchExecutionExceptionLogError(JavaCodeTryBlock try, String msg) {
+    def JavaCodeMethodCall codeCatchExecutionExceptionLogError(JavaCodeTryBlock try, String msg) {
         codeCatchLogError(try, "java.util.concurrent.ExecutionException", msg);
+    }
+    
+    def JavaCodeMethodCall addTimeUtilsSleep(JavaCodeBlockInterface b, Integer ms) {
+        JavaCodeMethodCall c = b.addCall("de.iip_ecosphere.platform.support.TimeUtils.sleep", JavaCodeImportScope.METHOD_CLASS_IMPORT);
+        if (ms < 0) {
+            c;
+        } else {
+            c.addArgument(ms);
+        }
     }
 
 }

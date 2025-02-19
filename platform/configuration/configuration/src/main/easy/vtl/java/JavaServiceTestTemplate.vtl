@@ -11,7 +11,7 @@ template JavaServiceTestTemplate(Configuration config, JavaCodeArtifact target, 
     JavaCodeClass mainCls;
     
     @Override
-    def produceAsyncProcessorBody2(IOType type) {
+    def produceAsyncProcessorBody(IOType type) {
         String t = toTypeName(type);
         JavaCodeMethod m = mainCls.addMethod("void", "testProcess${t.firstToUpperCase()}", 'Tests processing a data item of type "${t}" asynchronously.');
         m.addJunitTestAnnotation();
@@ -26,7 +26,7 @@ template JavaServiceTestTemplate(Configuration config, JavaCodeArtifact target, 
     }
     
     @Override
-    def produceSyncProcessorBody2(IOType returnType, IOType dataType) {
+    def produceSyncProcessorBody(IOType returnType, IOType dataType) {
         String r = toTypeName(returnType);
         String t = toTypeName(dataType);
         JavaCodeMethod m = mainCls.addMethod("void", "testTransform${t.firstToUpperCase()}", 'Tests processing a data item of type "${t}" synchronously.');
@@ -39,12 +39,12 @@ template JavaServiceTestTemplate(Configuration config, JavaCodeArtifact target, 
     }
     
     @Override
-    def produceIngestorBody2(IOType type) {
+    def produceIngestorBody(IOType type) {
         reqIngestors.add(toTypeName(type));
     }
     
     @Override
-    def produceProducerBody2(IOType type) {
+    def produceProducerBody(IOType type) {
         String t = toTypeName(type);
         JavaCodeMethod m = mainCls.addMethod("void", "testProduce${t.firstToUpperCase()}", 'Synchronous source method, called to produce data items of type "${t}".');
         m.addJunitTestAnnotation();
@@ -100,8 +100,8 @@ template JavaServiceTestTemplate(Configuration config, JavaCodeArtifact target, 
         String clsName = jp.getName();
         mainCls = codeCreateClass(target, pkg, clsName + "Test", 'IIP-Ecosphere service jUnit test for \'${service.name}\'');
         mainCls.addAttribute(service.class, "service");
-        produceForInputTypes2(service);
-        produceForOutputTypes2(service);
+        produceForInputTypes(service);
+        produceForOutputTypes(service);
         JavaCodeMethod m = mainCls.addMethod("void", "startup", "Initializes the test.");
         m.addJunitBeforeAnnotation();
         m.addSLComment("constructor for testing, does not set up service management values!");

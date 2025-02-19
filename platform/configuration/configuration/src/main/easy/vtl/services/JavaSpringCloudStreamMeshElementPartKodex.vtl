@@ -20,72 +20,63 @@ template JavaSpringCloudStreamMeshElementPartKodex(Configuration config, FileArt
         "de.iip_ecosphere.platform.security.services.kodex.KodexService";
     }
     
-    def generateImports(KodexService service) {
-        'import com.fasterxml.jackson.databind.ObjectMapper;
-        import com.fasterxml.jackson.core.JsonProcessingException;'
-    }
-    
-    def generateReceptionCallback(MeshProcessor elt, KodexService service) {
-        String serviceId = "_" + toIdentifier(service.id);
-        '${generateTypeTranslators(elt, service, serviceId)}'
+    def generateReceptionCallback(MeshProcessor elt, KodexService service, JavaCodeClass c) {
+        generateTypeTranslators(elt, service, "_" + toIdentifier(service.id), c);
     }
 
-    def genIngestor(KodexService service, String methodSuffix, String conn, String type, String dir, ServiceBase target, String connPlaceHolder) {
+    def genIngestor(KodexService service, String methodSuffix, String conn, String type, String dir, ServiceBase target, String connPlaceHolder, JavaCodeBlockInterface block) {
         mapOf(IOType, IOType) pairs = ioPairs(service.input, service.output);
         for (IOType in : pairs.keys()) {
             IOType out = pairs.get(in);
-            String expr = generateTransportSend(service, type, springConnId(service, conn, target, app), connPlaceHolder);
+            JavaCodeExpression expr = generateTransportSend(service, type, springConnId(service, conn, target, app), connPlaceHolder);
             if (getTypeAdd() <> "") {
-                '${kodexServiceName(in, out)}.attachIngestor(${type}${getTypeAdd()}.class, data -> ${genSentProbe(service, expr, false, type, "data")});'
+                block.addCall("attachIngestor").qualifiedBy(kodexServiceName(in, out)).addClassArgument(type + getTypeAdd()).addLambdaArgument("data").addAsExpression(genSentProbe(service, expr, false, type, "data"));
             }
-            '${kodexServiceName(in, out)}.attachIngestor(${type}.class, data -> ${genSentProbe(service, expr, false, type, "data")});'
+            block.addCall("attachIngestor").qualifiedBy(kodexServiceName(in, out)).addClassArgument(type).addLambdaArgument("data").addAsExpression(genSentProbe(service, expr, false, type, "data"));
         }
     }
     
-    def generateServiceAttribute(MeshProcessor elt, KodexService service) {
+    def generateServiceAttribute(MeshProcessor elt, KodexService service, JavaCodeClass c) {
         mapOf(IOType, IOType) pairs = ioPairs(elt);
         String serviceType = getServiceType(elt, service);
         for (IOType in : pairs.keys()) {
-            String inType = toTypeName(in.type);
+            String inType = toQualifiedTypeName(in.type);
             IOType out = pairs.get(in);
-            String outType = toTypeName(out.type);
-            'private ${serviceType}<${inType},${outType}> ${kodexServiceName(in, out)};'
+            String outType = toQualifiedTypeName(out.type);
+            c.addAttribute("${serviceType}<${inType},${outType}>", kodexServiceName(in, out));
         }
     }
     
-    def generateAsyncProcessorBody(MeshElement proc, KodexService kodex, String methodSuffix, String methodSuffixWithServiceId, String type) {
+    def generateAsyncProcessorBody(MeshElement proc, KodexService kodex, String methodSuffix, String methodSuffixWithServiceId, String type, JavaCodeMethod m) {
         mapOf(IOType, IOType) pairs = ioPairs(proc);
-        setOf(IOType) ins = pairs.keys()->select(t|toTypeName(t.type)==type);
+        String simpleType = toSimpleName(type);
+        setOf(IOType) ins = pairs.keys()->select(t|toTypeName(t.type)==simpleType);
         if (ins.size() > 0) {
             IOType in = ins.toSequence().first();
             if (pairs.containsKey(in)) {
                 IOType out = pairs.get(in);
                 String procExpr = "${kodexServiceName(in, out)}.processQuiet(data)";
-                'return data -> {
-                    ${genRcvProbe(kodex, procExpr, type, "data")};
-                };'
+                m.addReturn(new JavaCodeLambdaExpression("data").addAsExpression(genRcvProbe(kodex, procExpr, type, "data")));
             } else {
-                'return null;'
+                m.addReturn("null");
             }
         } else {
-            'return null;'
+            m.addReturn("null");
         }
     }
 
-    def initialService(MeshProcessor elt, KodexService service, setOf(String) serviceVars) {
+    def initialService(MeshProcessor elt, KodexService service, setOf(String) serviceVars, JavaCodeMethod m) {
         String clsName = getClsName(elt);
-        '${getYamlServiceFragment("serviceData", clsName, "${service.id}")};\n'
+        getYamlServiceFragment("serviceData", clsName, "${service.id}", m);
         mapOf(IOType, IOType) pairs = ioPairs(elt);
         for (IOType in : pairs.keys()) {
             String inType = toTypeName(in.type);
             IOType out = pairs.get(in);
             String outType = toTypeName(out.type);
             serviceVars.add(kodexServiceName(in, out));
-            '${kodexServiceName(in, out)} = new ${getServiceType(elt, elt.impl)}(
-                new ${inType}InputTranslator(), 
-                new ${outType}OutputTranslator(), 
-                null, // via attachIngestor
-                serviceData);'
+            JavaCodeMethodCall init = new JavaCodeConstructorCall(getServiceType(elt, elt.impl)).addArgument(new JavaCodeConstructorCall(inType + "InputTranslator"))
+                .addArgument(new JavaCodeConstructorCall(outType + "OutputTranslator")).addNullArgument().addArgument("serviceData");
+            m.addAssignment(kodexServiceName(in, out), init);
         }
     }
     

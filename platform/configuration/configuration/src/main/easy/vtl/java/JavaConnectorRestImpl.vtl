@@ -12,13 +12,13 @@ template JavaConnectorRestImpl(Configuration config, JavaCodeArtifact target, Re
     
         String typeName = asTypeName(conn.name);
         String clsName = typeName + "Impl";
-        String generics = getConnectorGenerics(conn, false, pkg=pkg + ".", typeAdd="RestType"); // adjust to rest, allow for auto-imports
+        String generics = getConnectorGenerics(conn, false); // , pkg=pkg + ".", typeAdd="RestType", adjust to rest, allow for auto-imports
 
         JavaCodeClass mainCls = codeCreateClass(target, pkg, clsName, 'Rest connector implementation for ${typeName}');
         mainCls.addExtends("de.iip_ecosphere.platform.connectors.rest.RESTConnector" + generics);
 
         mainCls.addConstructor("Connector constructor.").(m|{
-            generics = getConnectorGenerics(conn, false, pkg=pkg + ".", typeAdd="RestType", prefix="de.iip_ecosphere.platform.connectors.rest.RESTItem, Object, ");
+            generics = getConnectorGenerics(conn, false, prefix="de.iip_ecosphere.platform.connectors.rest.RESTItem, Object, "); // , pkg=pkg + ".", typeAdd="RestType"
             m.addParameter("de.iip_ecosphere.platform.connectors.types.ProtocolAdapter${generics}...", "adapter", "the protocol adapter");
             m.addSuperCall().addArgument("adapter");
         });

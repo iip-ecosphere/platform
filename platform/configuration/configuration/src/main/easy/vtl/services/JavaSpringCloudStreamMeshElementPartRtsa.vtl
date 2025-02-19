@@ -15,22 +15,22 @@ template JavaSpringCloudStreamMeshElementPartRtsa(Configuration config, FileArti
     mapOf(String, String) inFieldNames = {};
     mapOf(String, String) outFieldNames = {};
     
-    def initialService(MeshElement elt, RtsaService service, setOf(String) serviceVars) {
+    def initialService(MeshElement elt, RtsaService service, setOf(String) serviceVars, JavaCodeMethod m) {
         String clsName = "RtsaRestService";
-        '${getYamlServiceFragment("serviceData", clsName, "${service.id}")};\n'
+        getYamlServiceFragment("serviceData", clsName, "${service.id}", m);
         serviceVars.add("service");
-        'service = new MultiRtsaRestService(serviceData);\n'
+        m.addAssignment("service", new JavaCodeConstructorCall("de.iip_ecosphere.platform.kiServices.rapidminer.rtsa.MultiRtsaRestService").addArgument("serviceData"));
         for (IOType in: service.input) {
             String inType = toTypeName(in.type);
             String field = getRtsaFieldName(in);
             inFieldNames.add(inType, field);
-            'service.registerInputTypeTranslator(${inType}.class, "${field}", new ${inType}InputTranslator());\n'
+            m.addCall("service.registerInputTypeTranslator").addClassArgument(inType).addStringArgument(field).addArgument(new JavaCodeConstructorCall(inType + "InputTranslator"));
         }
         for (IOType out: service.output) {
             String outType = toTypeName(out.type);
             String field = getRtsaFieldName(out);
             outFieldNames.add(outType, field);
-            'service.registerOutputTypeTranslator(${outType}.class, "${field}", new ${outType}OutputTranslator());\n'
+            m.addCall("service.registerOutputTypeTranslator").addClassArgument(outType).addStringArgument(field).addArgument(new JavaCodeConstructorCall(outType + "OutputTranslator"));
         }
     }
 
@@ -48,23 +48,17 @@ template JavaSpringCloudStreamMeshElementPartRtsa(Configuration config, FileArti
         }
     }
     
-    def generateImports(RtsaService service) {
-        'import de.iip_ecosphere.platform.kiServices.rapidminer.rtsa.MultiRtsaRestService;
-        import com.fasterxml.jackson.databind.ObjectMapper;
-        import com.fasterxml.jackson.core.JsonProcessingException;'
+    def generateServiceAttribute(MeshElement elt, RtsaService service, JavaCodeClass c) {
+        c.addAttribute("de.iip_ecosphere.platform.kiServices.rapidminer.rtsa.MultiRtsaRestService", "service");
     }
 
-    def generateServiceAttribute(MeshElement elt, RtsaService service) {
-        'private MultiRtsaRestService service;'
-    }
-
-    def genIngestor(RtsaService service, String methodSuffix, String conn, String type, String dir, ServiceBase target, String connPlaceHolder) {
+    def genIngestor(RtsaService service, String methodSuffix, String conn, String type, String dir, ServiceBase target, String connPlaceHolder, JavaCodeBlockInterface block) {
         String field = outFieldNames.get(type);
-        String expr = generateTransportSend(service, type, springConnId(service, conn, target, app), connPlaceHolder);
+        JavaCodeExpression expr = generateTransportSend(service, type, springConnId(service, conn, target, app), connPlaceHolder);
         if (getTypeAdd() <> "") {
-            'service.attachIngestor(${type}${getTypeAdd()}.class, "${field}", data -> ${genSentProbe(service, expr, false, type, "data")});'
+            block.addCall("service.attachIngestor").addClassArgument(type + getTypeAdd()).addStringArgument(field).addLambdaArgument("data").addAsExpression(genSentProbe(service, expr, false, type, "data"));
         }
-        'service.attachIngestor(${type}.class, "${field}", data -> ${genSentProbe(service, expr, false, type, "data")});'
+        block.addCall("service.attachIngestor").addClassArgument(type).addStringArgument(field).addLambdaArgument("data").addAsExpression(genSentProbe(service, expr, false, type, "data"));
     }
     
     def getServiceType(MeshElement elt, RtsaService service) {
@@ -81,35 +75,35 @@ template JavaSpringCloudStreamMeshElementPartRtsa(Configuration config, FileArti
         bwd;
     }
 
-    def generateAsyncProcessorBody(MeshElement proc, RtsaService service, String methodSuffix, String methodSuffixWithServiceId, String type) {
-        String field = inFieldNames.get(type);
+    def generateAsyncProcessorBody(MeshElement proc, RtsaService service, String methodSuffix, String methodSuffixWithServiceId, String type, JavaCodeMethod m) {
+        String simpleTypeName = toSimpleName(type);
+        String field = inFieldNames.get(simpleTypeName);
         String expr;
-        if (not(isBackward(service.input, type))) { // service is not prepared for this
+        if (not(isBackward(service.input, simpleTypeName))) { // service is not prepared for this
             expr = 'service.processQuiet("${field}", data)';
         } else {
             expr = '';
         }
-        'return data -> ${genRcvProbe(service, expr, type, "data")};'
+        m.addReturn(new JavaCodeLambdaExpression("data").addAsExpression(genRcvProbe(service, expr, type, "data")));
     }
     
     // shall not be called, RTSA is so far always asynchronous
-    def generateSyncProcessorBody(MeshProcessor proc, RtsaService service, String methodSuffix, String inType, String outType) {
+    def generateSyncProcessorBody(MeshProcessor proc, RtsaService service, String methodSuffix, String inType, String outType, JavaCodeMethod m) {
         String field = inFieldNames.get(inType);
-        String expr = 'service.processQuiet("${field}", data)';
-        'return data -> ${genSentProbe(service, expr, true, outType, "data")};'
+        JavaCodeExpression expr = new JavaCodeMethodCall("service.processQuiet").addStringArgument(field).addArgument("data");
+        m.addReturn(new JavaCodeLambdaExpression("data").addAsExpression(genSentProbe(service, expr, true, outType, "data")));
     }
 
     // shall not be called, RTSA is so far always asynchronous
-    def generateSyncProcessorBody(MeshProcessor proc, RtsaService service, String methodSuffix, String methodSuffixWithServiceId, String inType, String outType) {
+    def generateSyncProcessorBody(MeshProcessor proc, RtsaService service, String methodSuffix, String methodSuffixWithServiceId, String inType, String outType, JavaCodeMethod m) {
         String inField = inFieldNames.get(inType);
         String outField = outFieldNames.get(outType);
-        String expr = 'service.processSyncQuiet("${inField}", data, "${outField}")';
-        'return data -> ${genSentProbe(service, expr, true, outType, "data")};'
+        JavaCodeExpression expr = new JavaCodeMethodCall("service.processSyncQuiet").addStringArgument(inField).addArgument("data").addStringArgument(outField);
+        m.addReturn(new JavaCodeLambdaExpression("data").addAsExpression(genSentProbe(service, expr, true, outType, "data")));
     }    
 
-    def generateReceptionCallback(MeshProcessor elt, RtsaService service) {
-        String serviceId = "_" + toIdentifier(service.id);
-        '${generateTypeTranslators(elt, service, serviceId)}'
+    def generateReceptionCallback(MeshProcessor elt, RtsaService service, JavaCodeClass c) {
+        generateTypeTranslators(elt, service, "_" + toIdentifier(service.id), c);
     }
     
 }

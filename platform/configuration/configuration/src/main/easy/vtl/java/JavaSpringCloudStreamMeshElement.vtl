@@ -10,10 +10,11 @@ insert JavaSpringCloudStreamMeshElementPart*;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template JavaSpringCloudStreamMeshElement(Configuration config, FileArtifact target, MeshElement elt, String pkg, 
+@format(profile="java", profileArg_javadocIndent=" * ", lineLength = 120)
+template JavaSpringCloudStreamMeshElement(Configuration config, JavaCodeArtifact target, MeshElement elt, String pkg, 
     Application app, Boolean sharedInterfaces, String familyInterface, ServiceBase familyMember, setOf(MeshElement) nodes) extends JavaSpringCloudStreamMeshElementBase {
 
-    def main(Configuration config, FileArtifact target, MeshElement elt, String pkg, Application app, 
+    def main(Configuration config, JavaCodeArtifact target, MeshElement elt, String pkg, Application app, 
         Boolean sharedInterfaces, String familyInterface, ServiceBase familyMember, setOf(MeshElement) nodes) {
         gen(config, target, elt, pkg, app, sharedInterfaces, familyInterface, familyMember, nodes);
     }

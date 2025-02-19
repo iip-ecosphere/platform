@@ -3,7 +3,7 @@ import JavaBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-@format(profile="java", profileArg_javadocIndent="* ", lineLength = 120, profileArg_eltSorting="CONS")
+@format(profile="java", profileArg_javadocIndent=" * ", lineLength = 120, profileArg_eltSorting="CONS")
 template JavaType(Configuration config, JavaCodeArtifact target, RecordType type, String pkg, Boolean interface, Boolean sharedInterfaces, Boolean impl) {
 
     String ending = " {";
@@ -31,7 +31,7 @@ template JavaType(Configuration config, JavaCodeArtifact target, RecordType type
     @DispatchBasis
     def String genHashCode(String access, DataType type, Boolean optional) {
         String javaType = toTypeName(type);
-        if ("BigInteger" == javaType or "BigDecimal" == javaType) {
+        if ("java.math.BigInteger" == javaType or "java.math.BigDecimal" == javaType) {
             "${access} != null ? ${access}.hashCode() : 0";
         } else {
             "${considerWrapper(toTypeName(type))}.hashCode(${access})";
@@ -93,7 +93,12 @@ template JavaType(Configuration config, JavaCodeArtifact target, RecordType type
 
     @DispatchBasis
     def String genEquals(String access, DataType type, Boolean optional) {
-        "${access} == oth.${access}";
+        String javaType = toTypeName(type);
+        if ("java.math.BigInteger" == javaType or "java.math.BigDecimal" == javaType) {
+            genEqualsObject(access, optional);
+        } else {
+            "${access} == oth.${access}";
+        }
     }
 
     @DispatchCase
@@ -225,7 +230,6 @@ template JavaType(Configuration config, JavaCodeArtifact target, RecordType type
         }
 
         JavaCodeClass mainCls = codeCreateClass(target, pkg, clsName + add, '${comment} of the application data type ${clsName}');
-        mainCls.addImport("java.math.*"); // preliminary, BigInt
         if (typeNeedsAasElement(type)) {
             mainCls.addImport("de.iip_ecosphere.platform.transport.serialization.QualifiedElement");
         }

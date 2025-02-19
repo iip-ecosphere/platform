@@ -23,12 +23,7 @@ template JavaServer(Configuration config, JavaCodeArtifact target, Server server
         meth.addIf("null == yServer")
             .addThrow('new ExecutionException("No such server known: ${server.id}", null)');
         meth.addAssignment("service", 'new PythonAsyncProcessService(yServer.toService())');
-        JavaCodeBlock b = meth.addCall("service.addParameterConfigurer")
-            //.addArgument('c -> {${content(produceParametersReg(server.parameter))}}')
-            .addLambdaArgument()
-                .addVariable("c")
-                .addBlock();
-        String x = produceParametersReg(server.parameter, b);
+        produceParameterConfigurerCall(server.parameter, meth);
         codeAddShutdownHook(meth, "{ stop(true); }");
     }    
     
@@ -47,16 +42,7 @@ template JavaServer(Configuration config, JavaCodeArtifact target, Server server
         meth.addCall("service.setState", JavaCodeImportScope.NONE)
             .addConstantArgument("de.iip_ecosphere.platform.services.environment.ServiceState.${state}");
     }
-    
-    def codeCatchLogError(JavaCodeTryBlock try, String msg) {
-        JavaCodeCatchBlock catch = try.addCatch("java.util.concurrent.ExecutionException", "e");
-        catch.addCall("org.slf4j.LoggerFactory.getLogger", JavaCodeImportScope.CLASS)
-            .addArgument("getClass()")
-            .addCall("error")
-                .addStringArgument(msg)
-                .addArgument("e.getMessage()");
-    }
-    
+     
     def main(Configuration config, JavaCodeArtifact target, Server server, String pkg) {
         String clsName = asTypeName(server.id);
         JavaCodeClass mainCls = codeCreateClass(target, pkg, "${clsName}Server", "Service-based server '${server.id}'");
@@ -73,7 +59,7 @@ template JavaServer(Configuration config, JavaCodeArtifact target, Server server
         meth.addOverrideAnnotation();
         JavaCodeTryBlock try = meth.addTry();
         codeSetState(try, "STARTING");
-        codeCatchLogError(try, "Starting server service ${server.id}: {}");
+        codeCatchExecutionExceptionLogError(try, "Starting server service ${server.id}: {}");
         meth.addReturn("this");
 
         meth = mainCls.addMethod("stop");
@@ -81,7 +67,7 @@ template JavaServer(Configuration config, JavaCodeArtifact target, Server server
         meth.addParameter("boolean", "dispose");
         try = meth.addTry();
         codeSetState(try, "STOPPING");
-        codeCatchLogError(try, "Stopping server service ${server.id}: {}");
+        codeCatchExecutionExceptionLogError(try, "Stopping server service ${server.id}: {}");
     }
     
 }

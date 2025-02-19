@@ -3,7 +3,7 @@ import JavaSerializerBase;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-@format(profile="java", profileArg_javadocIndent="* ", lineLength = 120, profileArg_eltSorting="CONS")
+@format(profile="java", profileArg_javadocIndent=" * ", lineLength = 120, profileArg_eltSorting="CONS")
 template JavaJsonSerializer(IIPEcosphere config, JavaCodeArtifact target, RecordType type, String pkg, String typePkg, Boolean sharedInterfaces, Boolean impl) extends JavaSerializerBase {
 
     @Override

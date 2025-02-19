@@ -8,6 +8,7 @@ template MeshBasics(Configuration config, FileArtifact target) {
 
     mapOf(String, Boolean) asyncIngestors = {};
     mapOf(String, String) ingestors = {};
+    Boolean qualifiedTypes = true;
     
     def String getClsName(MeshElement elt) {
         asTypeName(elt.name);
@@ -102,14 +103,15 @@ template MeshBasics(Configuration config, FileArtifact target) {
     def String getDeploymentDescriptorPath() {
         "deployment.yml";
     }
-    
-    def String getYamlServiceFragment(String varName, String clsName, String serviceId, String artifactVarName="art", String appVar="") {
-        'YamlArtifact ${artifactVarName} = YamlArtifact.readFromYamlSafe(ResourceLoader
-            .getResourceAsStream("${getDeploymentDescriptorPath()}"));'
+
+    def getYamlServiceFragment(String varName, String clsName, String serviceId, JavaCodeBlockInterface m, String artifactVarName="art", String appVar="") {
+        m.addVariable("de.iip_ecosphere.platform.services.environment.YamlArtifact", artifactVarName).addCall("YamlArtifact.readFromYamlSafe")
+            .addCallArgument("de.iip_ecosphere.platform.support.resources.ResourceLoader.getResourceAsStream", JavaCodeImportScope.METHOD_CLASS_IMPORT).addStringArgument(getDeploymentDescriptorPath());
         if (appVar.length() > 0) {
-            'ApplicationSetup ${appVar} = ${artifactVarName}.getApplication();'
+            m.addVariable("de.iip_ecosphere.platform.support.iip_aas.ApplicationSetup", appVar, new JavaCodeMethodCall("getApplication").qualifiedBy(artifactVarName));
         }
-        'YamlService ${varName} = ${artifactVarName}.getServiceSafe("${serviceId}")'
+        m.addVariable("de.iip_ecosphere.platform.services.environment.YamlService", varName, 
+            new JavaCodeMethodCall("getServiceSafe").qualifiedBy(artifactVarName).addStringArgument(serviceId));
     }
 
     def generateDataMethods(MeshElement elt, Boolean filter) {
@@ -134,21 +136,34 @@ template MeshBasics(Configuration config, FileArtifact target) {
     def sequenceOf(IOType) getSourceInput(Connector impl) {
         impl.output;
     }
+    
+    def enableMeshQualifiedTypes(boolean enable) {
+        qualifiedTypes = enable;
+    }
+    
+    def String toDataMethodsTypeName(DataType type) {
+        if (qualifiedTypes) {
+            toQualifiedTypeName(type);
+        } else {
+            toTypeName(type);
+        }
+    }
 
     def generateDataMethods(MeshSource elt, Boolean filter) {
-        '${generateAsyncDataMethods(filterBackward(getSourceInput(elt.impl), filter), 
-            filterBackward(getSourceOutput(elt.impl), filter), elt)}'
+        generateAsyncDataMethods(filterBackward(getSourceInput(elt.impl), filter), 
+            filterBackward(getSourceOutput(elt.impl), filter), elt);
         String serviceId = "_" + toIdentifier(elt.impl.id);
         for (IOType out : getSourceOutput(elt.impl)) {
-            String type = toTypeName(out.type);
-            String methodSuffix = "create" + type.firstToUpperCase();
+            String type = toDataMethodsTypeName(out.type);
+            String simpleType = toSimpleName(type);
+            String methodSuffix = "create" + simpleType.firstToUpperCase();
             String methodSuffixId = methodSuffix + serviceId;
             if (recordSourceIngestor(elt, out)) {
-                ingestors.add(methodSuffixId, type);
+                ingestors.add(methodSuffixId, simpleType);
                 asyncIngestors.add(methodSuffixId, elt.impl.asynchronous);
             }
             notifyTypeUse(elt, false, out, methodSuffix, methodSuffixId, true);
-            '${generateSourceMethod(elt, type, methodSuffix, methodSuffixId)}'
+            generateSourceMethod(elt, type, methodSuffix, methodSuffixId);
         }
     }
 
@@ -167,9 +182,9 @@ template MeshBasics(Configuration config, FileArtifact target) {
     def generateDataMethods(MeshProcessor elt, Boolean filter) {
         String serviceId = "_" + toIdentifier(elt.impl.id);
         if (elt.impl.asynchronous) {
-            '${generateAsyncDataMethods(elt.input, elt.output, elt)}'
+            generateAsyncDataMethods(elt.input, elt.output, elt);
         } else {
-            '${generateAsyncDataMethods(filterBackward(elt.input, filter), filterBackward(elt.output, filter), elt)}'
+            generateAsyncDataMethods(filterBackward(elt.input, filter), filterBackward(elt.output, filter), elt);
             Integer p = 0;
             sequenceOf(IOType) inFwd = forward(elt.input);
             sequenceOf(IOType) outFwd = forward(elt.output);
@@ -178,16 +193,16 @@ template MeshBasics(Configuration config, FileArtifact target) {
                 IOType in = inFwd[p];
                 IOType out = outFwd[p];
                 p = p + 1;
-                String inType = toTypeName(in.type);
-                String outType = toTypeName(out.type);
-                String methodSuffix = "transform" + inType.firstToUpperCase() + outType.firstToUpperCase();
+                String inType = toDataMethodsTypeName(in.type);
+                String outType = toDataMethodsTypeName(out.type);
+                String methodSuffix = "transform" + toSimpleName(inType).firstToUpperCase() + toSimpleName(outType).firstToUpperCase();
                 String methodSuffixId = methodSuffix + serviceId;
                 if (recordSyncProcessorIngestor(elt, out)) {
                     ingestors.add(methodSuffixId, outType);
                     asyncIngestors.add(methodSuffixId, false);
                 }
                 notifyTypeUse(elt, true, in, methodSuffix, methodSuffixId, true);
-                '${generateSyncProcessorMethod(elt, inType, outType, methodSuffix, methodSuffixId)}'
+                generateSyncProcessorMethod(elt, inType, outType, methodSuffix, methodSuffixId);
             }
             // there are no remaining -> constraint syncEqualIO
         }
@@ -196,37 +211,39 @@ template MeshBasics(Configuration config, FileArtifact target) {
     def generateAsyncDataMethods(sequenceOf(IOType) input, sequenceOf(IOType) output, MeshElement elt) {
         String serviceId = "_" + toIdentifier(elt.impl.id);
         for (IOType out : output) {
-            String type = toTypeName(out.type);
-            String methodSuffix = "process" + type.firstToUpperCase();
+            String type = toDataMethodsTypeName(out.type);
+            String simpleType = toSimpleName(type);
+            String methodSuffix = "process" + simpleType.firstToUpperCase();
             String methodSuffixId = methodSuffix + serviceId;
             if (recordAsyncProcessorIngestor(elt, out)) {
-                ingestors.add(methodSuffixId, type);
+                ingestors.add(methodSuffixId, simpleType);
                 asyncIngestors.add(methodSuffixId, true);
             }
             notifyTypeUse(elt, false, out, methodSuffix, methodSuffixId, false);
         }
         for (IOType in : input) {
-            String type = toTypeName(in.type);
-            String methodSuffix = "process" + type.firstToUpperCase();
+            String type = toDataMethodsTypeName(in.type);
+            String simpleType = toSimpleName(type);
+            String methodSuffix = "process" + simpleType.firstToUpperCase();
             String methodSuffixId = methodSuffix + serviceId;
             /*if (recordAsyncProcessorIngestor(elt, in)) {
-                ingestors.add(methodSuffixId, type);
+                ingestors.add(methodSuffixId, simpleType);
                 asyncIngestors.add(methodSuffixId, true);
             }*/
             notifyTypeUse(elt, true, in, methodSuffix, methodSuffixId, true);
-            '${generateAsyncProcessorInMethod(elt, type, methodSuffix, methodSuffixId)}'
+            generateAsyncProcessorInMethod(elt, type, methodSuffix, methodSuffixId);
         }    
     }
         
     def generateDataMethods(MeshSink elt, Boolean filter) {
-        '${generateAsyncDataMethods(filterBackward(elt.input, filter), filterBackward(elt.impl.output, filter), elt)}'
+        generateAsyncDataMethods(filterBackward(elt.input, filter), filterBackward(elt.impl.output, filter), elt);
         String serviceId = "_" + toIdentifier(elt.impl.id);
         for (IOType in : elt.input) {
-            String type = toTypeName(in.type);
-            String methodSuffix = "receive" + type.firstToUpperCase();
+            String type = toDataMethodsTypeName(in.type);
+            String methodSuffix = "receive" + toSimpleName(type).firstToUpperCase();
             String methodSuffixId = methodSuffix + serviceId;
             notifyTypeUse(elt, true, in, methodSuffix, methodSuffixId, true);
-            '${generateSinkMethod(elt, type, methodSuffix, methodSuffixId)}'
+            generateSinkMethod(elt, type, methodSuffix, methodSuffixId);
         }
     }
     
@@ -234,23 +251,18 @@ template MeshBasics(Configuration config, FileArtifact target) {
     }
 
     def generateSourceMethod(MeshSource src, String type, String methodSuffix, String methodSuffixWithServiceId) {
-        ''
     } 
 
     def generateAsyncProcessorInMethod(MeshElement elt, String type, String methodSuffix, String methodSuffixWithServiceId) {
-        ''
     } 
 
     def generateAsyncProcessorInMethod(MeshProcessor proc, String type, String methodSuffix, String methodSuffixWithServiceId) {
-        ''
     } 
 
     def generateSyncProcessorMethod(MeshProcessor proc, String inType, String outType, String methodSuffix, String methodSuffixWithServiceId) {
-        ''
     } 
     
     def generateSinkMethod(MeshSink sink, String type, String methodSuffix, String methodSuffixWithServiceId) {
-        ''
     } 
     
     // --------------------------------- collecting record types ---------------------------------------------
@@ -301,23 +313,31 @@ template MeshBasics(Configuration config, FileArtifact target) {
     }
     
     // --------------------------------- iterating ingestors ---------------------------------------------
- 
-     def addIngestor(mapOf(String, setOf(String)) ingestors, String ingestor, String conn) {
+
+    compound IngestorInfo {
+        JavaCodeBlock block;
         setOf(String) conns;
-        if (not(ingestors.containsKey(ingestor))) {
-            conns = {};
-            ingestors.add(ingestor, conns);
-        } else {
-            conns = ingestors.get(ingestor);
-        }
-        conns.add(conn);
     }
  
+    def addIngestor(mapOf(String, IngestorInfo) ingestors, JavaCodeBlock ingestor, String conn) {
+        IngestorInfo info;
+        setOf(String) conns;
+        String ingCode = ingestor.toCode();
+        if (not(ingestors.containsKey(ingCode))) {
+            info = new IngestorInfo();
+            info.conns = {};
+            info.block = ingestor;
+            ingestors.add(ingCode, info);
+        } else {
+            info = ingestors.get(ingCode);
+        }
+        info.conns.add(conn);
+    }
+    
      // requires generateDataMethods to be called before
-     def processIngestors(MeshElement elt, ServiceBase base, setOf(MeshElement) nodes, String connPlaceHolder, Boolean genSend, Boolean genReceive) {
-         String result = ""; // ugly workaround for EASy bug
+     def processIngestors(MeshElement elt, ServiceBase base, setOf(MeshElement) nodes, String connPlaceHolder, Boolean genSend, Boolean genReceive, JavaCodeBlockInterface block) {
          setOf(String) conns = {};
-         mapOf(String, setOf(String)) ings = {};
+         mapOf(String, IngestorInfo) ings = {};
          if (not(base.isKindOf(Connector)) and genSend) { 
              setOf(DataType) outBack = {}; // are we allowed to send/ingest this?
              for (IOType t: backward(base.output)) {
@@ -334,7 +354,8 @@ template MeshBasics(Configuration config, FileArtifact target) {
                              done.add(target);
                              String outName = getOutName(target, type);
                              String conn = getMethodSuffixId(getMethodSuffix(target, type, outName), target);
-                             String ingCode = generateIngestor(base, methodSuffix, conn, type, "in", target.impl, connPlaceHolder);
+                             JavaCodeBlock ingCode = new JavaCodeBlock();
+                             generateIngestor(base, methodSuffix, conn, type, "in", target.impl, connPlaceHolder, ingCode);
                              addIngestor(ings, ingCode, conn + "-in-0");
                              conns.add(conn); // TODO still needed?
                              conns.add(type); // TODO still needed?
@@ -351,7 +372,8 @@ template MeshBasics(Configuration config, FileArtifact target) {
                                             conn = "process" + conn.substring(6);
                                         }
                                         if (conn.startsWith("process")) {
-                                            String ingCode = generateIngestor(base, methodSuffix, conn, type, "in", target.impl, connPlaceHolder);
+                                            JavaCodeBlock ingCode = new JavaCodeBlock();
+                                            generateIngestor(base, methodSuffix, conn, type, "in", target.impl, connPlaceHolder, ingCode);
                                             addIngestor(ings, ingCode, conn + "-in-0");
                                             conns.add(type); // TODO still needed?
                                             conns.add(conn); // TODO still needed?
@@ -367,14 +389,16 @@ template MeshBasics(Configuration config, FileArtifact target) {
  
           // emit collected ingestors  
          for (String ing : ings.keys()->sortedBy(i|i)) {
+            IngestorInfo info = ings.get(ing);
+            JavaCodeBlock ingCode = info.block;
             if (connPlaceHolder <> "") {
                 String conns = "";
-                for (String c: ings.get(ing)->sortedBy(n|n)) {
-                    conns = conns + ", \"${c}\"";
+                for (String c: info.conns->sortedBy(n|n)) {
+                    conns = appendWithSeparator(conns, ",", "\"${c}\"");
                 }
-                ing = ing.substitute(connPlaceHolder, conns);
+                ingCode.replaceVariable(connPlaceHolder, conns);
             }
-            result = appendWithNewline(result, ing);
+            block.addAll(ingCode);
          }
  
          // go over all possibilities, in particular for backward
@@ -392,7 +416,7 @@ template MeshBasics(Configuration config, FileArtifact target) {
     
                                  String conn = toTypeName(in) + "_" + n.impl.id + "_" + elt.impl.id; // TODO also above
                                  if (not(conns.includes(conn))) {
-                                     result = appendWithNewline(result, generateCreateReceptionCallback(n, in, elt, first));
+                                     generateCreateReceptionCallback(n, in, elt, first, block);
                                      first = false;
                                      conns.add(conn);
                                  }
@@ -402,19 +426,15 @@ template MeshBasics(Configuration config, FileArtifact target) {
                  }
              }
          }
-         '${result}'
     }
     
-    def generateCreateReceptionCallback(MeshElement source, IOType sourceType, MeshElement receiver, boolean first) {
-        ''
+    def generateCreateReceptionCallback(MeshElement source, IOType sourceType, MeshElement receiver, boolean first, JavaCodeBlockInterface block) {
     }
     
-    def generateIngestor(ServiceBase base, String methodSuffix, String conn, String type, String dir, ServiceBase target, String connPlaceHolder) {
-        ''
+    def generateIngestor(ServiceBase base, String methodSuffix, String conn, String type, String dir, ServiceBase target, String connPlaceHolder, JavaCodeBlockInterface block) {
     }
 
-    def processOutput(MeshElement elt, ServiceBase base, setOf(MeshElement) nodes) {
-        String result = ""; // ugly workaround for EASy bug
+    def processOutput(MeshElement elt, ServiceBase base, setOf(MeshElement) nodes, JavaCodeBlockInterface block) {
         for (IOType eltOut : base.output) {
             String conn = getMethodSuffixId(getMethodSuffix(elt, toTypeName(eltOut), outType(elt, eltOut)), elt);
             for (MeshConnector c: nextConnectors(elt)) {                     
@@ -425,12 +445,11 @@ template MeshBasics(Configuration config, FileArtifact target) {
                         String type = toTypeName(eltOut.type);
                         String methodSuffix = getMethodSuffix(target, toTypeName(cOut), outType(target, cOut));
                         //"receive" + type.firstToUpperCase();
-                        result = appendWithNewline(result, generateIngestor(base, methodSuffix, conn, type, "out", target.impl, ""));
+                        generateIngestor(base, methodSuffix, conn, type, "out", target.impl, "", block);
                     }
                 }
             }
         }
-        '${result}'
     }
     
     /**
@@ -479,7 +498,7 @@ template MeshBasics(Configuration config, FileArtifact target) {
     }
     
     protected def getDataTypeJson(DataType type) {
-        ''
+        "";
     }
     
     protected def getDataTypeJson(RecordType type) {
@@ -514,7 +533,7 @@ template MeshBasics(Configuration config, FileArtifact target) {
     }
 
     protected def toImplTypeName(RecordType type, String typeAdd) {
-        toTypeName(type) + typeAdd;
+        "iip.datatypes." + toTypeName(type) + typeAdd;
     }
     
 }

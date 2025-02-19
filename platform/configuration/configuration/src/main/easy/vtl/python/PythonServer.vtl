@@ -10,6 +10,7 @@ insert PythonServerPart*;
 template PythonServer(Configuration config, PythonCodeArtifact target, PythonServer server, String pkg) extends PythonServerBase {
     
     def main(Configuration config, PythonCodeArtifact target, PythonServer server, String pkg) {
+        enableMeshQualifiedTypes(false);
         String clsName = asTypeName(server.id);
         target.addImport("AbstractService", "AbstractService");
         target.addImport("Registry");

@@ -14,22 +14,20 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
     Integer argsNestingLevel = 0;
     Integer nestedStepCount = 0;
 
-    def translateDataOperations(setOf(AssignmentOperation) assng, DataType src, String srcQual, DataType tgt, String tgtQual, setOf(String) done) {
+    def translateDataOperations(setOf(AssignmentOperation) assng, DataType src, String srcQual, DataType tgt, String tgtQual, setOf(String) done, JavaCodeBlockInterface meth) {
         mapOf(Field, String) fields = {};
         mapOf(Field, String) fieldIndexes = {};
         mapFields(src, fields, fieldIndexes, srcQual, "", true); 
         mapFields(tgt, fields, fieldIndexes, tgtQual, "", false);
-        for (AssignmentOperation a : assng, "\n") {
-            '${translateDataOperation(a, fields, fieldIndexes, done)}'
-        }
+        assng->forEach(AssignmentOperation a|meth.add(translateDataOperation(a, fields, fieldIndexes, done)));
     }
 
-    // dispatch basis
-    def String translateDataOperation(AssignmentOperation assng, mapOf(Field, String) fields, mapOf(Field, String) indexes, setOf(String) done) {
-        ""
+    @DispatchBasis
+    def JavaCodeExpression translateDataOperation(AssignmentOperation assng, mapOf(Field, String) fields, mapOf(Field, String) indexes, setOf(String) done) {
+        new JavaCodeExpression();
     }
 
-    def String translateDataOperation(ModelCallOperation call, mapOf(Field, String) fields, mapOf(Field, String) indexes, setOf(String) done) {
+    def JavaCodeExpression translateDataOperation(ModelCallOperation call, mapOf(Field, String) fields, mapOf(Field, String) indexes, setOf(String) done) {
         boolean emit = true;
         Boolean hasField = isDefined(call.field) and call.field <> null;
         if (hasField)  {
@@ -39,141 +37,138 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
                 done.add(call.field);
             }
         }
-        String ex = "";
         if (emit) {
-            ex = 'access.call("${call.name}", ${combineArgs(call.arguments, ", ", fields, indexes)});';
+            JavaCodeExpression ex = combineArgs(new JavaCodeMethodCall("access.call").addStringArgument(call.name), 
+                call.arguments, fields, indexes);
             if (hasField and not(call.field.readOnly)) {
-                ex = translateFieldAccess(call.field, fields, true, ";", ex, done, true, indexes);
+                ex = translateFieldAccess(call.field, fields, true, ex, done, true, indexes);
             }
+            ex;
+        } else {
+            new JavaCodeExpression();
         }
-        ex;
     }
 
-    def String translateDataOperation(FieldAssignmentOperation assng, mapOf(Field, String) fields, mapOf(Field, String) indexes, setOf(String) done) {
+    def JavaCodeExpression translateDataOperation(FieldAssignmentOperation assng, mapOf(Field, String) fields, mapOf(Field, String) indexes, setOf(String) done) {
         if ((fields.containsKey(assng.field) or argsNestingLevel > 0) and not(assng.field.readOnly)) {
-            translateFieldAccess(assng.field, fields, true, ";", translateDataOperation(assng.operation, fields, indexes), done, true, indexes);
+            translateFieldAccess(assng.field, fields, true, translateDataOperation(assng.operation, fields, indexes), done, true, indexes);
         } else {
-            ""
+            new JavaCodeExpression();
         }
     }
     
-    def String translateDataOperation(TransferAssignmentOperation assng, mapOf(Field, String) fields, mapOf(Field, String) indexes, setOf(String) done) {
+    def JavaCodeExpression translateDataOperation(TransferAssignmentOperation assng, mapOf(Field, String) fields, mapOf(Field, String) indexes, setOf(String) done, JavaCodeBlockInterface meth) {
         if ((indexes.containsKey(assng.field) and fields.containsKey(assng.nameField) and fields.containsKey(assng.valueField)) or argsNestingLevel > 0) {
-            String fnExpr = getTransferAssignmentExpression(assng, fields, indexes, done);
-            translateFieldAccess(assng.nameField, fields, true, ";", fnExpr, done, true, indexes);
+            JavaCodeExpression fnExpr = getTransferAssignmentExpression(assng, fields, indexes, done);
+            translateFieldAccess(assng.nameField, fields, true, fnExpr, done, true, indexes);
         } else {
-            ""
+            new JavaCodeExpression();
         }
     }
     
-    def String getTransferAssignmentExpression(TransferAssignmentOperation assng, mapOf(Field, String) fields, mapOf(Field, String) indexes, setOf(String) done) {
-        "/* FIELD/CONVERTER ACCESS NOT DEFINED */"
+    def JavaCodeExpression getTransferAssignmentExpression(TransferAssignmentOperation assng, mapOf(Field, String) fields, mapOf(Field, String) indexes, setOf(String) done) {
+        new JavaCodeTextExpression("/* FIELD/CONVERTER ACCESS NOT DEFINED */");
     }
 
-    // dispatch basis
-    def String translateDataOperation(DataOperation op, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
-        ""
+    @DispatchBasis
+    def JavaCodeExpression translateDataOperation(DataOperation op, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
+        new JavaCodeExpression();
     }
 
-    def String translateDataOperation(OutChannelDataOperation op, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
-        "channel" // accesses serializer attribute
+    def JavaCodeExpression translateDataOperation(OutChannelDataOperation op, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
+        new JavaCodeTextExpression("channel"); // accesses serializer attribute
     }
 
-    def String translateDataOperation(DataFieldAccess op, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
-        translateFieldAccess(op.field, fields, false, "", "", dummy, false, indexes);
+    def JavaCodeExpression translateDataOperation(DataFieldAccess op, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
+        translateFieldAccess(op.field, fields, false, new JavaCodeExpression(), dummy, false, indexes);
     }
-    
-    def String translateDataOperation(FieldNameDataOperation op, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
+
+    def JavaCodeExpression translateDataOperation(FieldNameDataOperation op, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
         if (indexes.containsKey(op.field)) {
-            "/* FIELD ACCESS NOT DEFINED */";
+            new JavaCodeTextExpression("/* FIELD ACCESS NOT DEFINED */");
         } else {
-            ""
+            new JavaCodeExpression();
         }
     }
     
-    def String translateFieldAccess(Field field, mapOf(Field, String) fields, Boolean set, String setEnd, String value, setOf(String) done, Boolean recordDone, mapOf(Field, String) indexes) {
+    def JavaCodeExpression translateFieldAccess(Field field, mapOf(Field, String) fields, Boolean set, JavaCodeExpression value, setOf(String) done, Boolean recordDone, mapOf(Field, String) indexes) {
         if ((fields.containsKey(field) and indexes.containsKey(field)) or argsNestingLevel > 0) {
            if (recordDone and argsNestingLevel == 0) {
                done.add(mapTargetPath(fields.get(field), field));
            }
-           genFieldAccess(fields.get(field), field, set, setEnd, value, indexes.get(field));
+           genFieldAccess(fields.get(field), field, set, value, indexes.get(field));
         } else {
-           ""
+           new JavaCodeExpression();
         }
     }
         
     // can be overridden
-    def genFieldAccess(String path, Field field, Boolean set, String setEnd, String value, String indexes) {
+    def JavaCodeExpression genFieldAccess(String path, Field field, Boolean set, JavaCodeExpression value, String indexes) {
        if (set) {
-           path + ".set" + asMethodNameSuffix(field.name) + "(" + value + ")${setEnd}";
+           new JavaCodeMethodCall(path + ".set" + asMethodNameSuffix(field.name)).addArgument(value);
        } else {
-           path + ".get" + asMethodNameSuffix(field.name) + "()"; 
+           new JavaCodeMethodCall(path + ".get" + asMethodNameSuffix(field.name)); 
        }
     }
 
-    // dispatch basis (completeness)
-    def String translateDataOperation(ConstantDataOperation op, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
-        ""
+    @DispatchBasis
+    def JavaCodeExpression translateDataOperation(ConstantDataOperation op, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
+        new JavaCodeExpression();
     }
 
-    def String translateDataOperation(IntegerConstantDataOperation op, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
-        "${op.value}"
+    def JavaCodeExpression translateDataOperation(IntegerConstantDataOperation op, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
+        new JavaCodeTextExpression(op.value);
     }
 
-    def String translateDataOperation(StringConstantDataOperation op, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
-        "\"${op.value}\""
+    def JavaCodeExpression translateDataOperation(StringConstantDataOperation op, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
+        new JavaCodeStringExpression(op.value);
     }
 
-    def String translateDataOperation(BooleanConstantDataOperation op, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
-        "${op.value}"
+    def JavaCodeExpression translateDataOperation(BooleanConstantDataOperation op, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
+        new JavaCodeTextExpression(op.value);
     }
 
-    def String translateDataOperation(RealConstantDataOperation op, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
-        "${op.value}"
+    def JavaCodeExpression translateDataOperation(RealConstantDataOperation op, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
+        new JavaCodeTextExpression(op.value);
     }
     
-    def String translateDataOperation(ParenthesisDataOperation op, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
-        "(" + translateDataOperation(op.operation, fields, indexes) + ")";
+    def JavaCodeExpression translateDataOperation(ParenthesisDataOperation op, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
+        new JavaCodeParenthesisExpression(translateDataOperation(op.operation, fields, indexes));
     }
 
-    // dispatch basis (completeness)
-    def String translateDataOperation(DataTranslationOperation op, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
-        ""
+    @DispatchBasis
+    def JavaCodeExpression translateDataOperation(DataTranslationOperation op, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
+        new JavaCodeExpression();
     }
 
-    def String translateDataOperation(AddDataTranslationOperation op, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
-        combine(op, " + ", fields, indexes);
-    }
-
-    def String translateDataOperation(SubtractDataTranslationOperation op, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
-        combine(op, " - ", fields, indexes);
-    }
-
-    def String translateDataOperation(MuliplyDataTranslationOperation op, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
-        combine(op, " * ", fields, indexes);
-    }
-
-    def String translateDataOperation(DivideDataTranslationOperation op, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
-        combine(op, " / ", fields, indexes);
-    }
-
-    def String combine(DataTranslationOperation op, String sep, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
-        combineArgs(op.arguments, sep, fields, indexes);
+    def JavaCodeExpression translateDataOperation(AddDataTranslationOperation op, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
+        combine(op, "+", fields, indexes);
     }
     
-    def String combineArgs(sequenceOf(DataOperation) args, String sep, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
-        String result = "";
-        boolean first = true;
+    def JavaCodeExpression translateDataOperation(SubtractDataTranslationOperation op, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
+        combine(op, "-", fields, indexes);
+    }
+    
+    def JavaCodeExpression translateDataOperation(MuliplyDataTranslationOperation op, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
+        combine(op, "*", fields, indexes);
+    }
+    
+    def JavaCodeExpression translateDataOperation(DivideDataTranslationOperation op, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
+        combine(op, "/", fields, indexes);
+    }
+
+    def JavaCodeExpression combine(DataTranslationOperation op, String jop, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
+        JavaCodeArgumentListExpression operands = combineArgs(new JavaCodeArgumentListExpression(), op.arguments, fields, indexes);
+        new JavaCodeOperatorExpression(jop, operands);
+    }
+
+    def JavaCodeArgumentListExpression combineArgs(JavaCodeArgumentListExpression ex, sequenceOf(DataOperation) args, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
         argsNestingLevel = argsNestingLevel + 1;
         for (DataOperation op : args) {
-            if (not(first)) {
-                result = result + sep;
-            }
-            result = result + translateDataOperation(op, fields, indexes);
-            first = false;
+            ex.addArgument(translateDataOperation(op, fields, indexes));
         }
         argsNestingLevel = argsNestingLevel - 1;
-        result;
+        ex;
     }
     
     // ----------------------------------- maps fields to access paths  -----------------------------
@@ -203,13 +198,13 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
             index = index + 1;
         }
     } 
-    
-    def getterPath(String qual, Field f) {
-        qual + ".get" + asMethodNameSuffix(f.name) + "()";
+
+    def JavaCodeExpression getterPath(String qual, Field f) {
+        new JavaCodeMethodCall(qual + ".get" + asMethodNameSuffix(f.name));
     }
 
-    def setterPath(String qual, Field f, String value) {
-        qual + ".set" + asMethodNameSuffix(f.name) + "(${value})";
+    def JavaCodeExpression setterPath(String qual, Field f, JavaCodeExpression value) {
+        new JavaCodeMethodCall(qual + ".set" + asMethodNameSuffix(f.name)).addArgument(value);
     }
 
     // ----------------------------------- maps access paths to fields -----------------------------
@@ -228,7 +223,7 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
     // customizable paths, may be different depending on application, use here method calls
     // if you override this function, also override mapTargetSeparator()
     def mapTargetPath(String qual, Field f) {
-        getterPath(qual, f);
+        getterPath(qual, f).toCode();
     }
 
     def String mapTargetSeparator() {
@@ -238,7 +233,7 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
     // customizable paths, may be different depending on application, use here method calls
     // if you override this function, also override mapSourceSeparator()
     def mapSourcePath(String qual, Field f) {
-        getterPath(qual, f);
+        getterPath(qual, f).toCode();
     }
     
     def String mapSourceSeparator() {
@@ -250,20 +245,21 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
     // produce for the input data type (to read from). Thus we have to build up both access path.
     // Currently the default Java implementation focuses on object transfers from temporary instances.
     
-    // dispatch basis, do nothing on plain types
-    def produceDataTransfer(DataType type, mapOf(String, Field) mapping, String typeQual, String mapQual, setOf(String) done, String indexes, String paths) {
+    @DispatchBasis
+    def produceDataTransfer(DataType type, mapOf(String, Field) mapping, String typeQual, String mapQual, setOf(String) done, String indexes, String paths, JavaCodeBlockInterface block) {
     }
 
-    // typical top-level entry point, produce data transfer for RecordType
-    def produceDataTransfer(RecordType type, mapOf(String, Field) mapping, String typeQual, String mapQual, setOf(String) done, String indexes, String paths) {
+    @DispatchCase
+    def produceDataTransfer(RecordType type, mapOf(String, Field) mapping, String typeQual, String mapQual, setOf(String) done, String indexes, String paths, JavaCodeBlockInterface block) {
         String targetSep = mapTargetSeparator();
         String sourceSep = mapSourceSeparator();
         boolean isTop = mapQual.rfind(sourceSep) == 0;
         int index = 0;
         String out = "";
-        if (isTop) {
-            '${startTopRecordType(type, mapQual)}'
+         if (isTop) {
+            startTopRecordType(type, mapQual, block);
         }
+        JavaCodeBlock code = new JavaCodeBlock();
         for (Field f : type.fields) {
             String iq;
             if (indexes.length() > 0) {
@@ -279,39 +275,45 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
             String tn = mapTargetPath(typeQual, f);
             String mq = mapSourcePath(mapQual, f);
             if (not(done.includes(tn)) and mapping.containsKey(mq)) {
-                out = appendWithNewline(out, produceDataTransfer(f, prefixPath(tn, targetSep), mapping.get(mq), prefixPath(mq, sourceSep), iq, p));
-                out = appendWithNewline(out, produceDataTransfer(f, f.type, mapping, tn, mq, done, iq, p));
+                produceDataTransfer(f, prefixPath(tn, targetSep), mapping.get(mq), prefixPath(mq, sourceSep), iq, p, code);
+                produceDataTransfer(f, f.type, mapping, tn, mq, done, iq, p, code);
             }
         }
-        '${produceDataTransferOutput(type, out, getTemporaryVariable(typeQual, typeQual))}'
+        produceDataTransferOutput(type, block, code, getTemporaryVariable(typeQual, typeQual));
         if (isTop) {
-            '${endTopRecordType(mapQual)}'
+            endTopRecordType(mapQual, block);
         }
     }
 
-    def startTopRecordType(RecordType type, String path) {
+    def startTopRecordType(RecordType type, String path, JavaCodeBlockInterface block) {
     }
     
-    def endTopRecordType(String path) {
+    def endTopRecordType(String path, JavaCodeBlockInterface block) {
     }
     
     // to be refined by caller; by default, data transfer code is written as one method. if not, output can be redirected
-    def produceDataTransferOutput(RecordType type, String text, String tmpVar) {
-        '${text}'
+    def produceDataTransferOutput(RecordType type, JavaCodeBlockInterface target, JavaCodeBlock code, String tmpVar) {
+        target.addAll(code);
     }
 
     // internal dispatch basis, akin produceDataTransfer(DataType), but carries actual field that is not present at top-level call
-    def produceDataTransfer(Field field, DataType type, mapOf(String, Field) mapping, String typeQual, String mapQual, setOf(String) done, String indexes, String paths) {
+    def produceDataTransfer(Field field, DataType type, mapOf(String, Field) mapping, String typeQual, String mapQual, setOf(String) done, String indexes, String paths, JavaCodeBlockInterface block) {
        if (isKindOf(type, RecordType)) { // fallback for OPC, shall not be needed
-            produceDataTransfer(type, mapping, typeQual, mapQual, done, indexes, paths);
-        } else {
-            '';
+            startRecord(field, indexes, block);
+            produceDataTransfer(type, mapping, typeQual, mapQual, done, indexes, paths, block);
+            endRecord(field, indexes, block);
         }
     }
 
+    def startRecord(Field field, String indexes, JavaCodeBlockInterface block) {
+    }
+
+    def endRecord(Field field, String indexes, JavaCodeBlockInterface block) {
+    }
+
     // akin produceDataTransfer(RecordType), but carries actual field that is not present at top-level call, calls produceDataTransfer(RecordType)
-    def produceDataTransfer(Field field, RecordType type, mapOf(String, Field) mapping, String typeQual, String mapQual, setOf(String) done, String indexes, String paths) {
-         produceDataTransfer(type, mapping, typeQual, mapQual, done, indexes, paths);
+    def produceDataTransfer(Field field, RecordType type, mapOf(String, Field) mapping, String typeQual, String mapQual, setOf(String) done, String indexes, String paths, JavaCodeBlockInterface block) {
+         produceDataTransfer(type, mapping, typeQual, mapQual, done, indexes, paths, block);
     }
         
     // returns the prefix before the last sep in path
@@ -334,8 +336,8 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
         }
     } 
     
-    def produceDataTransfer(Field tgt, String tgtQual, Field src, String srcQual, String indexes, String paths) {
-        "\n" + setterPath(tgtQual, tgt, getterPath(srcQual, src)) + ";";
+    def produceDataTransfer(Field tgt, String tgtQual, Field src, String srcQual, String indexes, String paths, JavaCodeBlockInterface block) {
+        block.add(setterPath(tgtQual, tgt, getterPath(srcQual, src)));
     }
     
     // -------------------------------------- formatter/parser conversion ------------------------------------ 
@@ -344,13 +346,13 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
     // types defined in JavaBasic must match these functions; confParam in particular for date must match also
     @DispatchBasis    
     def convName(DataType type) {
-        ""
+        "";
     }
     
     // to/from will be prefixed, must map to method names in Input/OutputConverter
     @DispatchCase
     def convName(PrimitiveType type) {
-        "/* NOT DEFINED */"
+        "/* NOT DEFINED */";
     }
 
     @DispatchCase
@@ -361,98 +363,98 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
 
     @DispatchCase
     def convName(ObjectTypeType type) {
-        "Object"
+        "Object";
     }
 
     @DispatchCase
     def convName(ShortTypeType type) {
-        "Short"
+        "Short";
     }
     
     @DispatchCase
     def convName(IntegerTypeType type) {
-        "Integer"
+        "Integer";
     }
     
     @DispatchCase
     def convName(LongTypeType type) {
-        "Long"
+        "Long";
     }
 
     @DispatchCase
     def convName(StringTypeType type) {
-        "String"
+        "String";
     }
     
     @DispatchCase
     def convName(BooleanTypeType type) {
-        "Boolean"
+        "Boolean";
     }
 
     @DispatchCase
     def convName(FloatTypeType type) {
-        "Float"
+        "Float";
     }
 
     @DispatchCase
     def convName(DoubleTypeType type) {
-         "Double"
+         "Double";
     }
 
     @DispatchCase
     def convName(ByteTypeType type) {
-         "Byte"
+         "Byte";
     }
 
     @DispatchCase
     def convName(EnumType type) {
-         "Enum"
+         "Enum";
     }
 
     // Start - Added types OPC UA - by Ahmad
     @DispatchCase
     def convName(Integer16TypeType type) {
-         "Short"
+         "Short";
     }
 
     @DispatchCase
     def convName(Integer32TypeType type) {
-         "Integer"
+         "Integer";
     }
     
     @DispatchCase
     def convName(Integer64TypeType type) {
-         "Long"
+         "Long";
     }
     
     @DispatchCase
     def convName(SByteTypeType type) {
-         "Byte"
+         "Byte";
     }
     
     @DispatchCase
     def convName(UnsignedInteger16TypeType type) {
-         "Integer"
+         "Integer";
     }
 
     @DispatchCase
     def convName(UnsignedInteger32TypeType type) {
-         "Long"
+         "Long";
     }
     
     @DispatchCase
     def convName(UnsignedInteger64TypeType type) {
-         "BigInteger"
+         "BigInteger";
     }
     
     @DispatchCase
     def convName(ByteStringTypeType type) {
-         "ByteArray"
+         "ByteArray";
     }
     
     @DispatchCase
     def convName(DateTimeTypeType type) {
-         "LocalDateTime"
+         "LocalDateTime";
     }
     // End - Added types OPC UA - by Ahmad
 
@@ -461,65 +463,60 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
 
     @DispatchCase
     def convName(StringArrayTypeType type) {
-        "StringArray"
+        "StringArray";
     }
 
     @DispatchCase
     def convName(IntegerArrayTypeType type) {
-        "IntegerArray"
+        "IntegerArray";
     }
 
     @DispatchCase
     def convName(DoubleArrayTypeType type) {
-        "DoubleArray"
+        "DoubleArray";
     }
 
     @DispatchCase
     def convName(ArrayType type) {
-        "Object" // fallback
+        "Object"; // fallback
     }
 
     @DispatchCase
     def convName(ListType type) {
-        "List"
+        "List";
     }
 
     @DispatchCase
     def convName(IEC61131_3DateTimeTypeType type) {
-        "Date"
+        "Date";
     }
     
     // dispatch basis, additional parameter to be passed to the parser/formatter conversion method, usually empty
     @DispatchBasis
-    def convParam(DataType type, Boolean convFrom) {
-        "" // no param
+    def convParam(DataType type, Boolean convFrom, JavaCodeMethodCall call) {
     }
 
     @DispatchCase
-    def convParam(DateTimeTypeType type, Boolean convFrom) {
-        "\"ISO8601\""
+    def convParam(DateTimeTypeType type, Boolean convFrom, JavaCodeMethodCall call) {
+        call.addStringArgument("ISO8601");
     }
 
     @DispatchCase
-    def convParam(IEC61131_3DateTimeTypeType type, Boolean convFrom) {
-        "\"'DT#'YYYY-MM-dd-HH:mm:ss.SS\""
+    def convParam(IEC61131_3DateTimeTypeType type, Boolean convFrom, JavaCodeMethodCall call) {
+        call.addStringArgument("'DT#'YYYY-MM-dd-HH:mm:ss.SS");
     }
     
     @DispatchCase
-    def convParam(EnumType type, Boolean convFrom) {
-        if (convFrom) {
-            ""
-        } else {
-            toTypeName(type) + ".class";
+    def convParam(EnumType type, Boolean convFrom, JavaCodeMethodCall call) {
+        if (!convFrom) {
+            call.addClassArgument(toQualifiedTypeName(type));
         }
     }
 
     @DispatchCase
-    def convParam(ListType type, Boolean convFrom) {
-        if (convFrom) {
-            ""
-        } else {
-            toTypeName(type.type) + ".class";
+    def convParam(ListType type, Boolean convFrom, JavaCodeMethodCall call) {
+        if (!convFrom) {
+            call.addClassArgument(toQualifiedTypeName(type.type));
         }
     }
     
@@ -528,31 +525,23 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
     // - the type to convert
     // - prefix to be used before #convName, "from" or "to"
     // - data the actual data to be converted, may be a parameter name    
-    def genConvertOp(String converter, DataType type, String prefix, String data) {
+    def JavaCodeExpression genConvertOp(String converter, DataType type, String prefix, JavaCodeExpression data) {
         String convertOp = prefix + convName(type);
-        String convP = convParam(type, prefix=="from");
-        if (convP.length() > 0) {
-            convP = ", ${convP}";
-        }
-        '${converter}.${prefix}${convName(type)}(${data}${convP})'
+        JavaCodeMethodCall call = new JavaCodeMethodCall(prefix + convName(type)).qualifiedBy(converter).addArgument(data);
+        convParam(type, prefix=="from", call);
+        call;
     }
     
-    // temporary variables
-    def String createTemporaryVariable(String path, String sep, DataType type, String init) {
+    // temporary variables, added to block if needed
+    def createTemporaryVariable(String path, String sep, DataType type, JavaCodeExpression init, JavaCodeBlockInterface block) {
         if (not(variables.containsKey(path))) {
             String name = suffixPath(path, sep);
             if (name.length() == 0) {
                 name = "tmp";
             }
-            name = name.toIdentifier() + variables.size();
+            name = name.replace(".", "").replace("()","").toIdentifier() + variables.size(); // preliminary, check getter path -> expression
             variables.add(path, name);
-            String ini = "";
-            if (init.length() > 0) {
-                ini = " = ${init}";
-            }
-            '${asTypeName(type.name)} ${name}$ini;'
-        } else {
-            ''
+            block.addVariable(toQualifiedTypeName(type), name, init);
         }
     }
     
@@ -568,15 +557,17 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
         variables.clear();
     }
     
-    // wraps a function expression (without considering ";") so that IOExceptions are 
-    // caught, requires static import of de.iip_ecosphere.platform.support.function.IOVoidFunction.optional
-    def wrapOptional(Field field, String ex, String args="()", String optFind="", String optReplace="") {
+    def JavaCodeExpression wrapOptionalIoVoid(Field field, JavaCodeExpression ex, String param="", String args="", String optFind="", String optReplace="") {
+        wrapOptional(field, ex, param=param, args=args, optFind=optFind, optReplace=optReplace, op="de.iip_ecosphere.platform.support.function.IOVoidFunction.optional");
+    }
+    
+    // wraps an expression (without considering ";") so that IOExceptions are caught
+    def JavaCodeExpression wrapOptional(Field field, JavaCodeExpression ex, String param="", String args="", String optFind="", String optReplace="", String op="de.iip_ecosphere.platform.connectors.model.ModelAccessProvider.optional") {
         if (field.optional) {
-            String e = ex;
-            if (optFind <> "") {
-                e = e.replace(optFind, optReplace);
-            }
-            "optional(${args} -> ${e})"
+            ex.replaceVariable(optFind, optReplace); // happens only if args <> ""
+            JavaCodeMethodCall m = new JavaCodeMethodCall(op, JavaCodeImportScope.METHOD);
+            m.addArgument(param).addLambdaArgument().addVariables(args).addExpression(ex);
+            m;
         } else {
             ex;
         }

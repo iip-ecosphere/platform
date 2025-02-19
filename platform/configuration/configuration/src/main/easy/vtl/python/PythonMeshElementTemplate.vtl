@@ -9,6 +9,7 @@ insert PythonMeshElementTemplatePart*;
 template PythonMeshElementTemplate(Configuration config, PythonCodeArtifact target, MeshElement elt, String pkg, PythonService service) extends PythonMeshElementTemplateBase {
 
     def main(Configuration config, PythonCodeArtifact target, MeshElement elt, String pkg, PythonService service) {
+        enableMeshQualifiedTypes(false);
         IIPEcosphere cfg = config;
         initTypeAdd(cfg);
         String clsName = asTypeName(service.name);
@@ -21,7 +22,7 @@ template PythonMeshElementTemplate(Configuration config, PythonCodeArtifact targ
         target.addImport("interfaces." + clsName + "Interface", clsName + "Interface");
         target.addEmptyLine();
         target.addSLComment("Do not utilise global code here. Place the needed function in the start / end methods.
-            Add methods needed to be run on the start of a service in the start or end methods NOT in init()", true);
+        Add methods needed to be run on the start of a service in the start or end methods NOT in init()", true);
         target.addEmptyLine();
 
         cls = addPythonClass(target, clsName, 'Template service implementation for ${clsName}');
@@ -37,7 +38,7 @@ template PythonMeshElementTemplate(Configuration config, PythonCodeArtifact targ
         produceSetStateStopping(service, f);
         
         produceReconfigure(service, cls);
-		generateDataMethods(elt, true);
+        generateDataMethods(elt, true);
         generateFurtherMethods(service, cls);
 
         target.addSLComment("registers itself");

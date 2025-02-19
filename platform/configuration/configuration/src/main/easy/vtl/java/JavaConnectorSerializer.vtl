@@ -4,7 +4,8 @@ import DataOperationBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template JavaConnectorSerializer(Configuration config, FileArtifact target, DataType imType, String path, DataType pltfType, 
+@format(profile="java", profileArg_javadocIndent=" * ", lineLength = 120)
+template JavaConnectorSerializer(Configuration config, JavaCodeArtifact target, DataType imType, String path, DataType pltfType, 
     String pkg, String typePkg, Boolean sharedInterfaces, Boolean impl, MachineFormatter formatter, MachineParser parser, 
     String className, setOf(AssignmentOperation) assng) extends DataOperationBasics {
 
@@ -17,65 +18,58 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
     Boolean optionalFound = false;
     Boolean genFrom = false;
     Integer arrayCount = 0;
-    
-    def importTypePackage(String pkg, String typePkg) {
-        if (pkg != typePkg) {
-            'import ${typePkg}.*;'
-        } else {
-            ''
-        }
-    }
-    
+        
     // ------------------------------- refinement of DataOperationBasics ---------
     
-    def String translateDataOperation(FieldNameDataOperation op, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
+    def JavaCodeExpression translateDataOperation(FieldNameDataOperation op, mapOf(Field, String) fields, mapOf(Field, String) indexes) {
         if (indexes.containsKey(op.field)) {
-            "pr.getFieldName(" + indexes.get(op.field) + ")";
+            new JavaCodeMethodCall("pr.getFieldName").addArgument(indexes.get(op.field));
         } else {
-            ""
+            new JavaCodeExpression();
         }
     }
     
-    def String getTransferAssignmentExpression(TransferAssignmentOperation assng, mapOf(Field, String) fields, mapOf(Field, String) indexes, setOf(String) done) {
-        String lambda = translateFieldAccess(assng.valueField, fields, true, "", genConvertOp("inConverter", assng.valueField.type, "to", "v"), done, true, indexes);
-        "pr.getFieldName(v -> ${lambda}, " + indexes.get(assng.field) + ")";
+    def JavaCodeExpression getTransferAssignmentExpression(TransferAssignmentOperation assng, mapOf(Field, String) fields, mapOf(Field, String) indexes, setOf(String) done) {
+        JavaCodeExpression lambda = translateFieldAccess(assng.valueField, fields, true, genConvertOp("inConverter", assng.valueField.type, "to", "v"), done, true, indexes);
+        JavaCodeMethodCall m = new JavaCodeMethodCall("pr.getFieldName");
+            m.addLambdaArgument().addVariable("v").addExpression(lambda);
+            m.addArgument(indexes.get(assng.field));
+         m;
     }
     
     // --------------------------------- genFrom ---------------------------------
     
-    def genFrom(DataType imType, String imTypeName, DataType pltfType, String pltfTypeName, String imVarName, String pltfVarName) {
+    def genFrom(DataType imType, String imTypeName, DataType pltfType, String pltfTypeName, String imVarName, String pltfVarName, JavaCodeBlockInterface meth) {
         index = "";
         optionalFound = false;
-        '' // TODO unclear for now
+        // TODO unclear for now
     }
     
-    def genFrom(RecordType imType, String imTypeName, DataType pltfType, String pltfTypeName, String imVarName, String pltfVarName) {
+    def genFrom(RecordType imType, String imTypeName, DataType pltfType, String pltfTypeName, String imVarName, String pltfVarName, JavaCodeBlockInterface meth) {
         index = "";
         optionalFound = false;
         if (parser <> null) {
             setOf(String) done = {};
-            '${translateDataOperations(assng, imType, imVarName, pltfType, pltfVarName, done)}'
+            translateDataOperations(assng, imType, imVarName, pltfType, pltfVarName, done, meth);
             mapOf(String, Field) mapping = {};
             mapSourcePaths(imType, mapping, imVarName);
             optionalFound = false; // from now again in sequence until optional
-            '${produceDataTransfer(pltfType, mapping, pltfVarName, imVarName, done, "", "")}'
-        } else {
-            ''
+            produceDataTransfer(pltfType, mapping, pltfVarName, imVarName, done, "", "", meth);
         }
     }
     
     // called via translateDataOperations, no modelCalls in channel connectors
-    def String translateDataOperation(ModelCallOperation call, mapOf(Field, String) fields, mapOf(Field, String) indexes, setOf(String) done) {
-        "// model call not supported ${call.name}(...)"
+    def JavaCodeExpression translateDataOperation(ModelCallOperation call, mapOf(Field, String) fields, mapOf(Field, String) indexes, setOf(String) done) {
+        new JavaCodeTextExpression("// model call not supported ${call.name}(...)");
     }
 
     // called via translateDataOperations
-    def genFieldAccess(String path, Field field, Boolean set, String setEnd, String value, String indexes) {
-        genFieldAcc(path, field, set, setEnd, value, indexes, "");
+    def JavaCodeExpression genFieldAccess(String path, Field field, Boolean set, JavaCodeExpression value, String indexes) {
+        genFieldAcc(path, field, set, value, indexes, "");
     }
 
     // called via translateDataOperations
-    def genFieldAcc(String path, Field field, Boolean set, String setEnd, String value, String indexes, String paths) {
+    def JavaCodeExpression genFieldAcc(String path, Field field, Boolean set, JavaCodeExpression value, String indexes, String paths) {
        String p;
        String ix;
        String getOp;
@@ -93,47 +87,48 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
        }
        if (set) {
            if (field.readOnly) {
-               ''
+               new JavaCodeExpression();
            } else {
-               String ex;
+               JavaCodeExpression ex;
                if (not(genFrom)) {
                    ex = value; // already converted
                } else {
                    ex = genConvertOp("outConverter", field.type, "from", value);
                }
-               wrapOptional(field, path + ".set" + asMethodNameSuffix(field.name) + "(" + ex + ")") + "${setEnd}"; 
+               JavaCodeMethodCall m = new JavaCodeMethodCall(path + ".set" + asMethodNameSuffix(field.name));
+               m.addArgument(ex);
+               wrapOptionalIoVoid(field, m);
            }
        } else {
-           String ex;
+           JavaCodeMethodCall ex;
            if (not(genFrom)) {
                p = substPathEx('"${p}"', topPath, "path");
+               ex = new JavaCodeMethodCall(getOp).qualifiedBy(prVariableName.last()).addArgument(p);
                if (ix.length() > 0 and not(optionalFound)) {
-                   ex = "${prVariableName.last()}.${getOp}(${p}, ${ix})";
-               } else {
-                   ex = "${prVariableName.last()}.${getOp}(${p})";
+                   ex.addArgument(ix);
                }
            } else {
-               ex = path + ".get" + asMethodNameSuffix(field.name) + "()";
+               ex = new JavaCodeMethodCall("get"+ asMethodNameSuffix(field.name)).qualifiedBy(path);
            }
-           '${adjustConvertOp(field, genConvertOp("inConverter", field.type, "to", ex))}';
+           adjustConvertOp(field, genConvertOp("inConverter", field.type, "to", ex));
        }
     }
     
     @DispatchBasis
-    def adjustConvertOp(Field field, String convOp) {
-        '${convOp}'
+    def JavaCodeExpression adjustConvertOp(Field field, JavaCodeExpression convOp) {
+        convOp;
     }
 
     @DispatchCase
-    def adjustConvertOp(AasField field, String convOp) {
+    def JavaCodeExpression adjustConvertOp(AasField field, JavaCodeExpression convOp) {
         if (isMultiField(field) and field.type.isKindOf(ListType)) {
-            convOp = convOp.replace(".toList(", ".toElementList(");
+            convOp.replaceMethod("toList", "toElementList");
         }
-        '${convOp}'
+        convOp;
     }
 
-    def produceDataTransfer(Field tgt, String tgtQual, Field src, String srcQual, String indexes, String paths) {
-        String acc = genFieldAcc(mapSourcePath(srcQual, src), tgt, genFrom, ";", getterPath(tgtQual, tgt), indexes, paths);
+    def produceDataTransfer(Field tgt, String tgtQual, Field src, String srcQual, String indexes, String paths, JavaCodeBlockInterface block) {
+        JavaCodeExpression acc = genFieldAcc(mapSourcePath(srcQual, src), tgt, genFrom, getterPath(tgtQual, tgt), indexes, paths);
         if (not(genFrom)) {
             if (isRecordArray(src) and isRecordArray(tgt)) {
                 arrayCount = arrayCount + 1;
@@ -142,100 +137,106 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
                 String arrayName = "array${arrayCount}";
                 String srcArrayEltTypeName = asTypeName(srcArrayType.type.name);
                 String tgtArrayEltTypeName = asTypeName(tgtArrayType.type.name);
+                String qTgtArrayEltTypeName = asTypeName(toQualifiedTypeName(tgtArrayType.type));
                 String outerPrName = "prArray${arrayCount}";
                 String pathEx = substPathEx('"${src.name}"', topPath, "path");
                 prVariableName.add("prElement");
                 String fieldPath = getFieldPath(src, pathEx);
-                '${getParserResultType(parser)} ${outerPrName} = pr.stepInto(${fieldPath}, ${suffixPath(indexes, ",")});
-                ${tgtArrayEltTypeName}[] ${arrayName} = new ${tgtArrayEltTypeName}[${outerPrName}.getArraySize()];
-                for (int i = 0, size = ${outerPrName}.getArraySize(); i < size; i++) {
-                    ${getParserResultType(parser)} prElement = ${outerPrName}.stepInto("", i);
-                    ${arrayName}[i] = new ${tgtArrayEltTypeName}${add}();
-                    ${genFrom(srcArrayType.type, srcArrayEltTypeName, tgtArrayType.type, tgtArrayEltTypeName, "tmp", "${arrayName}[i]")}
-                    prElement.stepOut();
-                }
-                prArray${arrayCount}.stepOut();'
+
+                block.addVariable(getParserResultType(parser), outerPrName, 
+                    new JavaCodeMethodCall("stepInto").qualifiedBy("pr").addArgument(fieldPath).addArgument(suffixPath(indexes, ",")));
+                block.addVariable(qTgtArrayEltTypeName + "[]", arrayName).addNewArray(tgtArrayEltTypeName).addDimension(outerPrName + ".getArraySize()");
+                JavaCodeForLoop l = block.addForLoop("int", "i", "0", "i < size", "i++");
+                    l.addLoopVariable("size", outerPrName + ".getArraySize()");
+                    l.addVariable(getParserResultType(parser), "prElement", outerPrName + '.stepInto("", i)');
+                    l.addAssignment(arrayName + "[i]", new JavaCodeConstructorCall(qTgtArrayEltTypeName + add));
+                    genFrom(srcArrayType.type, srcArrayEltTypeName, tgtArrayType.type, tgtArrayEltTypeName, "tmp", "${arrayName}[i]", l);
+                    l.addCall("stepOut").qualifiedBy("prElement");
+                block.addCall("stepOut").qualifiedBy("prArray" + arrayCount);
+                
                 prVariableName.removeLast();
                 acc = arrayName;
             }
             if (tgt.type.isKindOf(RecordType)) {
-                String nextPath = getterPath(tgtQual, tgt); // all "vars" before the .set
-                String cons = "new ${toTypeName(tgt.type)}${add}()";
-                '\n${createTemporaryVariable(nextPath, mapSourceSeparator(), tgt.type, "${cons}")}
-                ${wrapOptional(tgt, setterPath(getTemporaryVariable(tgtQual, tgtQual), tgt, getTemporaryVariable(nextPath, cons)))};'
+                JavaCodeExpression nextPath = getterPath(tgtQual, tgt); // all "vars" before the .set
+                JavaCodeExpression cons = new JavaCodeConstructorCall(toQualifiedTypeName(tgt.type) + add);
+                createTemporaryVariable(nextPath.toCode(), mapSourceSeparator(), tgt.type, cons, block);
+                block.add(wrapOptionalIoVoid(tgt, setterPath(getTemporaryVariable(tgtQual, tgtQual), tgt, getTemporaryVariable(nextPath.toCode(), cons))));
             } else {
-                '\n${wrapOptional(tgt, setterPath(getTemporaryVariable(tgtQual, tgtQual), tgt, acc))};'
+                block.add(wrapOptionalIoVoid(tgt, setterPath(getTemporaryVariable(tgtQual, tgtQual), tgt, acc)));
             }            
         } else {
-            '\n${acc}'
+            block.add(acc);
         }
     }
     
     // called via produceDataTransfer
-    def produceDataTransfer(Field field, RecordType type, mapOf(String, Field) mapping, String typeQual, String mapQual, setOf(String) done, String indexes, String paths) {
+    def produceDataTransfer(Field field, RecordType type, mapOf(String, Field) mapping, String typeQual, String mapQual, setOf(String) done, String indexes, String paths, JavaCodeBlockInterface block) {
+        startRecord(field, indexes, block); // issues with dynamic dispatch and block, left in just in case -> startRecord, endRecord
+        produceDataTransfer(type, mapping, typeQual, mapQual, done, indexes, paths, block);
+        endRecord(field, indexes, block);
+    }
+    
+    def startRecord(Field field, String indexes, JavaCodeBlockInterface block) {
         if (optWithStepIn) {
             nestedStepCount = nestedStepCount + 1;
             String pathEx = substPathEx('"${field.name}"', topPath, "path");
             String fieldPath = getFieldPath(field, pathEx);
-            '\n\npr = pr.stepInto(${fieldPath}, ${suffixPath(indexes, ",")});' !<CR>;
+            block.addAssignment("pr", new JavaCodeMethodCall("pr.stepInto").addArgument(fieldPath).addArgument(suffixPath(indexes, ",")));
         }
-        '${produceDataTransfer(type, mapping, typeQual, mapQual, done, indexes, paths)}'
-        if (optWithStepIn and nestedStepCount > 0) {
+    }
+
+    def endRecord(Field field, String indexes, JavaCodeBlockInterface block) {
+        if (optWithStepIn) {
             nestedStepCount = nestedStepCount - 1;
-            'pr = pr.stepOut();\n'
-        } else {
-            ''
+            block.addAssignment("pr", new JavaCodeMethodCall("pr.stepOut"));
         }
     }
 
     // ---------------------------------- genTo -------------------------------------
     
-    def genTo(DataType imType, String imTypeName, DataType pltfType, String pltfTypeName) {
+    def genTo(DataType imType, String imTypeName, DataType pltfType, String pltfTypeName, JavaCodeMethod meth) {
         index = 0;
         if (formatter <> null) {
-            'formatter.add("", ${genConvertOp("outConverter", pltfType, "from", "source")});'
-        } else {
-            ''
+            meth.addCall("add").qualifiedBy("formatter").addStringArgument("") 
+                .addArgument(genConvertOp("outConverter", pltfType, "from", "source"));
         }
     }
     
-    def genTo(RecordType imType, String imTypeName, RecordType pltfType, String pltfTypeName) {
+    def genTo(RecordType imType, String imTypeName, RecordType pltfType, String pltfTypeName, JavaCodeMethod meth) {
         index = 0;
         if (formatter <> null) {
-            '${imTypeName} tmp = new ${imTypeName}();'
-            genToField("source", "", "", pltfType, imType, false);
-        } else {
-            ''
+            meth.addVariable(imTypeName, "tmp", new JavaCodeConstructorCall(imTypeName)); // TODO check if needed
+            genToField("source", "", "", pltfType, imType, false, meth);
         }
     }
 
-    def genToField(String qual, String name, String fieldName, DataType type, DataType srcType, Boolean nullable) {
-        ''
+    def genToField(String qual, String name, String fieldName, DataType type, DataType srcType, Boolean nullable, JavaCodeBlockInterface meth) {
     }
     
-    def genToField(String qual, String name, String fieldName, PrimitiveType type, PrimitiveType srcType, Boolean nullable) {
+    def genToField(String qual, String name, String fieldName, PrimitiveType type, PrimitiveType srcType, Boolean nullable, JavaCodeBlockInterface meth) {
         String data = "${qual}.get${asMethodNameSuffix(fieldName)}()";
         if (isRecordArray(type) and isRecordArray(srcType)) {
             arrayCount = arrayCount + 1;
             ArrayType tgtArrayType = type; // conversion
             ArrayType srcArrayType = srcType; // conversion
             String arrayName = "array${arrayCount}";
-            String arrayEltTypeName = "${asTypeName(tgtArrayType.type.name)}";
-            '\nformatter.startArrayStructure("${name}");
-            formatter.startObjectStructure(null);
-            ${arrayEltTypeName}[] ${arrayName} = ${data};
-            for (int i = 0; i < ${arrayName}.length; i++) {
-                ${genToField("${arrayName}[i]", "", "", tgtArrayType.type, srcArrayType.type, nullable)}
-            }
-            formatter.endStructure();
-            formatter.endStructure();'
+            String arrayEltTypeName = asTypeName(toQualifiedTypeName(tgtArrayType.type));
+            meth.addCall("startArrayStructure").qualifiedBy("formatter").addStringArgument(name);
+            meth.addCall("startObjectStructure").qualifiedBy("formatter").addNullArgument();
+            meth.addVariable(arrayEltTypeName + "[]", arrayName, data);
+            JavaCodeForLoop l = meth.addForLoop("int", "i", "0", "i < ${arrayName}.length", "i++");
+            genToField("${arrayName}[i]", "", "", tgtArrayType.type, srcArrayType.type, nullable, l);
+            meth.addCall("endStructure").qualifiedBy("formatter");
+            meth.addCall("endStructure").qualifiedBy("formatter");
         } else {
             String pathEx = substPathEx('"${name}"', topPath, "path");
-            'formatter.add(${pathEx}, ${genConvertOp("outConverter", type, "from", data)});\n'
+            meth.addCall("add").qualifiedBy("formatter").addArgument(pathEx)
+                .addArgument(genConvertOp("outConverter", type, "from", data));
         }
     }
     
-    def genToField(String qual, String name, String fieldName, RecordType type, RecordType srcType, Boolean nullable) {
+    def genToField(String qual, String name, String fieldName, RecordType type, RecordType srcType, Boolean nullable, JavaCodeBlockInterface meth) {
         String q = qual;
         if (fieldName.length() > 0) { // fieldName == "" on top level
            q = q + ".get" + asMethodNameSuffix(fieldName) + "()";
@@ -245,7 +246,7 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
             srcFieldTypes.add(f.name, f.type);
         }
         if (nullable) {
-            '\nif (${q} != null) {\n'
+            meth = meth.addIf("${q} != null");
         }
         for (Field f : type.fields) {
             String n = f.name;
@@ -253,28 +254,24 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
                n = name + "." + n;
             }
             DataType srcFieldType = srcFieldTypes.get(f.name, ObjectType);
-            String s = genToField(q, n, f.name, f.type, srcFieldType, f.nullable);
+            genToField(q, n, f.name, f.type, srcFieldType, f.nullable, meth);
             index = index + 1;
-            '${s}'
-        }
-        if (nullable) {
-            '}'
         }
     }
     
     // ------------------------- parser types ---------------------------
     
-    // dispatch basis
+    @DispatchBasis
     def String getParserType(MachineParser parser) {
         "";
     }
 
-    // dispatch basis
+    @DispatchBasis
     def String getParserConverterType(MachineParser parser) {
         "";
     }
 
-    // dispatch basis
+    @DispatchBasis
     def String getParserResultType(MachineParser parser) {
         "";
     }
@@ -292,27 +289,27 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
     }
     
     def String getParserType(JsonParser parser) {
-        "JsonInputParser";
+        "de.iip_ecosphere.platform.connectors.parser.JsonInputParser";
     }
 
     def String getParserConverterType(JsonParser parser) {
-        "JsonInputParser.JsonInputConverter";
+        "de.iip_ecosphere.platform.connectors.parser.JsonInputParser.JsonInputConverter";
     }
 
     def String getParserResultType(JsonParser parser) {
-        "JsonInputParser.JsonParseResult";
+        "de.iip_ecosphere.platform.connectors.parser.JsonInputParser.JsonParseResult";
     }
 
     def String getParserType(TextLineParser parser) {
-        "TextLineParser";
+        "de.iip_ecosphere.platform.connectors.parser.TextLineParser";
     }
 
     def String getParserConverterType(TextLineParser parser) {
-        "TextLineParser.TextLineParserConverter";
+        "de.iip_ecosphere.platform.connectors.parser.TextLineParser.TextLineParserConverter";
     }
 
     def String getParserResultType(TextLineParser parser) {
-        "TextLineParser.TextLineParseResult";
+        "de.iip_ecosphere.platform.connectors.parser.TextLineParser.TextLineParseResult";
     }
     
     // ------------------------- formatter types ---------------------------
@@ -336,199 +333,181 @@ template JavaConnectorSerializer(Configuration config, FileArtifact target, Data
     }
 
     def String getFormatterType(TextLineFormatter formatter) {
-        "TextLineFormatter";
+        "de.iip_ecosphere.platform.connectors.formatter.TextLineFormatter";
     }
 
     def String getFormatterConverterType(TextLineFormatter formatter) {
-        "TextLineFormatter.TextLineFormatterConverter";
+        "de.iip_ecosphere.platform.connectors.formatter.TextLineFormatter.TextLineFormatterConverter";
     }
 
     def String getFormatterType(JsonFormatter formatter) {
-        "JsonOutputFormatter";
+        "de.iip_ecosphere.platform.connectors.formatter.JsonOutputFormatter";
     }
 
     def String getFormatterConverterType(JsonFormatter formatter) {
-        "JsonOutputFormatter.JsonOutputConverter";
+        "de.iip_ecosphere.platform.connectors.formatter.JsonOutputFormatter.JsonOutputConverter";
     }
     
     // ---------------------------- inits ---------------------------------
 
-    def generateInitParser(String className) {
-        if (parser <> null) {
-            '${generateInitParser(parser, className)}'
-        } else {
-            ''
-        }
+    def JavaCodeExpression generateInitParser(MachineParser parser, String className) {
+        new JavaCodeTextExpression("");
     }
 
-    def generateInitParser(MachineParser parser, String className) {
-        ''
+    def JavaCodeExpression generateInitParser(TextLineParser parser, String className) {
+        JavaCodeConstructorCall c = new JavaCodeConstructorCall("de.iip_ecosphere.platform.connectors.parser.TextLineParser", JavaCodeImportScope.CLASS_NO_METHOD);
+        c.addArgument("encoding");
+        c.addStringArgument(parser.separator);
+        c;
     }
 
-    def generateInitParser(TextLineParser parser, String className) {
-        'parser = new TextLineParser(encoding, "${parser.separator}");'
+    def JavaCodeExpression generateInitParser(JsonParser parser, String className) {
+        new JavaCodeConstructorCall("de.iip_ecosphere.platform.connectors.parser.JsonInputParser");
     }
 
-    def generateInitParser(JsonParser parser, String className) {
-        'parser = new JsonInputParser();'
-    }
-
-    def generateInitParser(JavaMachineParser parser, String className) {
-        'parser = (${getParserType(parser)}) ParserUtils.createInstance(
-            ${className}.class.getClassLoader(), "${getParserType(parser)}", encoding);'
+    def JavaCodeExpression generateInitParser(JavaMachineParser parser, String className) {
+        JavaCodeMethodCall m = new JavaCodeMethodCall("de.iip_ecosphere.platform.connectors.parser.ParserUtils.createInstance", JavaCodeImportScope.METHOD_CLASS_IMPORT);
+        m.addArgument("${className}.class.getClassLoader()");
+        m.addStringArgument(getParserType(parser));
+        m.addArgument("encoding");
+        new JavaCodeCastExpression(getParserType(parser), m);
     }
     
-    def generateInitFormatter(String className) {
-        if (formatter <> null) {
-            '${generateInitFormatter(formatter, className)}'
-        } else {
-            ''
-        }
-    }
-    
-    def generateInitFormatter(MachineFormatter formatter, String className) {
-        'formatter = new DummyFormatter();'
+    def JavaCodeExpression generateInitFormatter(MachineFormatter formatter, String className) {
+        new JavaCodeConstructorCall('de.iip_ecosphere.platform.connectors.formatter.DummyFormatter', JavaCodeImportScope.CLASS_NO_METHOD);
     }
 
-    def generateInitFormatter(TextLineFormatter formatter, String className) {
-        'formatter = new TextLineFormatter(encoding, "${formatter.separator}");'
+    def JavaCodeExpression generateInitFormatter(TextLineFormatter formatter, String className) {
+        JavaCodeConstructorCall c = new JavaCodeConstructorCall("de.iip_ecosphere.platform.connectors.formatter.TextLineFormatter", JavaCodeImportScope.CLASS_NO_METHOD);
+        c.addArgument("encoding");
+        c.addStringArgument(formatter.separator);
+        c;
     }
 
-    def generateInitFormatter(JsonFormatter formatter, String className) {
-        'formatter = new JsonOutputFormatter();'
+    def JavaCodeExpression generateInitFormatter(JsonFormatter formatter, String className) {
+        new JavaCodeConstructorCall('de.iip_ecosphere.platform.connectors.formatter.JsonOutputFormatter', JavaCodeImportScope.CLASS_NO_METHOD);
     }
 
-    def generateInitFormatter(JavaMachineFormatter formatter, String className) {
-        'formatter = (${getFormatterType(formatter)}) FormatterUtils.createInstance(
-            ${className}.class.getClassLoader(), "${getFormatterType(formatter)}", encoding);'
+    def JavaCodeExpression generateInitFormatter(JavaMachineFormatter formatter, String className) {
+        JavaCodeMethodCall m = new JavaCodeMethodCall("de.iip_ecosphere.platform.connectors.formatter.FormatterUtils.createInstance", JavaCodeImportScope.METHOD_CLASS_IMPORT);
+        m.addArgument("${className}.class.getClassLoader()");
+        m.addStringArgument(getFormatterType(formatter));
+        m.addArgument("encoding");
+        new JavaCodeCastExpression(getFormatterType(formatter), m);
     }
     
     // ---------------------------- attributes ---------------------------------
-    
-    def generateParserAttribute() {
-        if (parser <> null) {
-            'private ${getParserType(parser)} parser;'
-        } else {
-            ''
-        }
-    }
-    
-    def generateParserFrom(String imTypeName, String pltfTypeName) {
+        
+    def generateParserFrom(String imTypeName, String pltfTypeName, JavaCodeMethod meth) {
         if (parser <> null) {
             genFrom = false;
             clearTemporaryVariables();
-            '${getParserResultType(parser)} pr = parser.parse(data);
-            ${getParserConverterType(parser)} inConverter = parser.getConverter(); 
-            ${pltfTypeName} result = new ${pltfTypeName}${add}();
-            ${genFrom(imType, imTypeName, pltfType, pltfTypeName, "tmp", "result")}
-            return result;'
+            meth.addVariable(getParserResultType(parser), "pr", "parser.parse(data)");
+            meth.addVariable(getParserConverterType(parser), "inConverter", "parser.getConverter()");
+            JavaCodeVariableDeclaration result = meth.addVariable(pltfTypeName, "result", new JavaCodeConstructorCall(pltfTypeName + add, JavaCodeImportScope.CLASS_NO_METHOD));
+            genFrom(imType, imTypeName, pltfType, pltfTypeName, "tmp", "result", meth);
+            meth.addReturn(result);
         } else {
-            'return null;'
+            meth.addReturn("null");
         }
     }
 
-    def generateFormatterAttribute() {
-        if (formatter <> null) {
-            'private ${getFormatterType(formatter)} formatter;'
-        } else {
-            ''
-        }
-    }
-
-    def generateFormatterTo(String imTypeName, String pltfTypeName) {
+    def generateFormatterTo(String imTypeName, String pltfTypeName, JavaCodeMethod meth) {
         if (formatter <> null) {
             genFrom = true;
             clearTemporaryVariables();
-            '${getFormatterConverterType(formatter)} outConverter = formatter.getConverter();
-            ${genTo(imType, imTypeName, pltfType, pltfTypeName)}
-            return formatter.chunkCompleted();'
+            meth.addVariable(getFormatterConverterType(formatter), "outConverter", "formatter.getConverter()");
+            genTo(imType, imTypeName, pltfType, pltfTypeName, meth);
+            meth.addReturn(new JavaCodeMethodCall("chunkCompleted").qualifiedBy("formatter"));
         } else {
-            'return null;'
+            meth.addReturn("null");
         }
     }
     
     // ---------------------------------- clone -------------------------------------
     
-    def generateClone(DataType type, String typeName, String add) {
-        'return new ${typeName}(origin);' // no ${add}, arrays?
+    def JavaCodeExpression generateClone(DataType type, String typeName, String add) {
+        JavaCodeConstructorCall c = new JavaCodeConstructorCall(typeName);
+        c.addArgument("origin");
+        c; // no ${add}, arrays?
     }
 
-    def generateClone(RecordType type, String typeName, String add) {
-        'return new ${typeName}${add}(origin);'
+    def JavaCodeExpression generateClone(RecordType type, String typeName, String add) {
+        JavaCodeConstructorCall c = new JavaCodeConstructorCall(typeName + add);
+        c.addArgument("origin");
+        c;
     }
+
+    def addSerializerMethod(String name, String type, JavaCodeClass mainCls) {
+        JavaCodeMethod m = mainCls.addMethod("", name);
+        m.addOverrideAnnotation();
+        if (name == "from") {
+            m.setType(type);
+            m.addParameter("String", "channel");
+            m.addParameter("byte[]", "data");
+        } else {
+            m.setType("byte[]");
+            m.addParameter(type, "source");
+        }
+        m.addException("java.io.IOException");
+        m.addVariable("String", "path", 'pathSupplier == null ? "${path}" : pathSupplier.get()').setFinal();
+        m;
+    }    
     
     // ---------------------------------- main ---------------------------------------
 
-    def main(Configuration config, FileArtifact target, DataType imType, String path, DataType pltfType, String pkg, 
+    def main(Configuration config, JavaCodeArtifact target, DataType imType, String path, DataType pltfType, String pkg, 
         String typePkg, Boolean sharedInterfaces, Boolean impl, MachineFormatter formatter, MachineParser parser, 
         String className, setOf(AssignmentOperation) assng) {
-        String imTypeName = asTypeName(imType.name);
+        String imTypeName = asTypeName(toQualifiedTypeName(imType));
         topPath = path;
         String pltfTypeName = asTypeName(pltfType.name);
+        String pltfTypeNameQn = asTypeName(toQualifiedTypeName(pltfType));
         if (sharedInterfaces) {
             add = "Impl";
         }
+        
+        JavaCodeClass mainCls = codeCreateClass(target, pkg, className, "Parser/formatter connector serializer for ${pltfTypeName}");
+        mainCls.addInterface("de.iip_ecosphere.platform.connectors.types.ChanneledConnectorOutputTypeAdapter.ChanneledSerializer<${pltfTypeNameQn}>");
 
-        'package ${pkg};
-        
-        import java.io.IOException;
-        import java.util.*;
-        import java.util.function.*;
-        import static de.iip_ecosphere.platform.support.function.IOVoidFunction.optional;
-        import de.iip_ecosphere.platform.support.function.*;
-        import de.iip_ecosphere.platform.transport.serialization.*;
-        import de.iip_ecosphere.platform.connectors.parser.InputParser.InputConverter;
-        import de.iip_ecosphere.platform.connectors.parser.InputParser.ParseResult;
-        import de.iip_ecosphere.platform.connectors.parser.*;
-        import de.iip_ecosphere.platform.connectors.formatter.OutputFormatter.OutputConverter;
-        import de.iip_ecosphere.platform.connectors.formatter.*;
-        import de.iip_ecosphere.platform.connectors.types.ChanneledConnectorOutputTypeAdapter.ChanneledSerializer;        
-        ${importTypePackage(pkg, typePkg)}
-        import com.fasterxml.jackson.databind.ObjectMapper;
-        import com.fasterxml.jackson.core.JsonProcessingException;
-        
-        /**
-         * Parser/formatter connector serializer for ${pltfTypeName}.
-         * Generated by: EASy-Producer.
-         */
-        public class ${className} implements ChanneledSerializer<${pltfTypeName}> {
-        
-            ${generateParserAttribute()|e}
-            ${generateFormatterAttribute()|e}
-            private Map<String, Integer> mapping;
-            private Supplier<String> pathSupplier;
-            
-            public ${className}(String encoding, Map<String, Integer> mapping, Supplier<String> pathSupplier) {
-                this.mapping = mapping;
-                this.pathSupplier = pathSupplier;
-                ${generateInitParser(className)|e}
-                ${generateInitFormatter(className)|e}
-            }
-        
-            @Override             
-            public ${pltfTypeName} from(String channel, byte[] data) throws IOException {
-                final String path = pathSupplier == null ? "${path}" : pathSupplier.get();
-                ${generateParserFrom("${imTypeName}${add}", "${pltfTypeName}")}
-            }
-
-            @Override    
-            public byte[] to(${pltfTypeName} source) throws IOException {
-                final String path = pathSupplier == null ? "${path}" : pathSupplier.get();
-                ${generateFormatterTo("${imTypeName}${add}", "${pltfTypeName}")}
-            }
-
-            @Override
-            public ${pltfTypeName} clone(${pltfTypeName} origin) throws IOException {
-                ${generateClone(pltfType, pltfTypeName, add)}
-            }
-
-            @Override
-            public Class<${pltfTypeName}> getType() {
-                return ${pltfTypeName}.class;
-            }
-        
+        if (parser <> null) {
+            mainCls.addAttribute(getParserType(parser), "parser");
         }
-        '
+
+        if (formatter <> null) {
+            mainCls.addAttribute(getFormatterType(formatter), "formatter");
+        }
+        mainCls.addAttribute("java.util.Map<String, Integer>", "mapping");
+        mainCls.addAttribute("java.util.function.Supplier<String>", "pathSupplier");
+
+        JavaCodeMethod m = mainCls.addConstructor();
+        m.addParameter("String", "encoding");
+        m.addParameter("java.util.Map<String, Integer>", "mapping");
+        m.addParameter("java.util.function.Supplier<String>", "pathSupplier");
+        m.addAssign("this.mapping", "mapping");
+        m.addAssign("this.pathSupplier", "pathSupplier");
+        if (parser <> null) {
+            m.addAssign("parser", generateInitParser(parser, className));
+        }
+        if (formatter <> null) {
+            m.addAssign("formatter", generateInitFormatter(formatter, className));
+        } 
+        
+        m = addSerializerMethod("from", pltfTypeNameQn, mainCls);
+        generateParserFrom(imTypeName + add, pltfTypeNameQn, m);
+
+        m = addSerializerMethod("to", pltfTypeNameQn, mainCls);
+        generateFormatterTo(imTypeName + add, pltfTypeNameQn, m);
+
+        m = mainCls.addMethod(pltfTypeNameQn, "clone");
+        m.addOverrideAnnotation();
+        m.addParameter(pltfTypeNameQn, "origin");
+        m.addException("java.io.IOException");
+        m.addReturn(generateClone(pltfType, pltfTypeNameQn, add));
+
+        m = mainCls.addMethod("Class<${pltfTypeName}>", "getType");
+        m.addOverrideAnnotation();
+        m.addReturn("${pltfTypeName}.class");
     }
     
 }

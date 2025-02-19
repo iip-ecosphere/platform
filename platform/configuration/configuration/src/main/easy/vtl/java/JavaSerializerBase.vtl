@@ -2,7 +2,7 @@ import JavaBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-@format(profile="java", profileArg_javadocIndent="* ", lineLength = 120, profileArg_eltSorting="CONS")
+@format(profile="java", profileArg_javadocIndent=" * ", lineLength = 120, profileArg_eltSorting="CONS")
 template JavaSerializerBase(IIPEcosphere config, JavaCodeArtifact target, RecordType type, String pkg, String typePkg, Boolean sharedInterfaces, Boolean impl) {
 
     def genClsInit(IIPEcosphere config, JavaCodeClass mainCls, String typeName) {

@@ -8,19 +8,23 @@ import ServiceBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact target, MeshElement elt, String pkg, 
+template JavaSpringCloudStreamMeshElementBase(Configuration config, JavaCodeArtifact target, MeshElement elt, String pkg, 
     Application app, Boolean sharedInterfaces, String familyInterface, ServiceBase familyMember, setOf(MeshElement) nodes) extends MeshBasics {
 
     Boolean isConnector = false;
     setOf(String) serviceVars = {};
+    JavaCodeClass mainCls;
 
     // do not create annotations if we have a family interface, then the node delegates here
-    def nodeAnnotation(String annotation) {
-        if (familyInterface.length() > 0) {
-            ''
-        } else {
-            '${annotation}'
-        }
+    def JavaCodeMethod nodeAnnotation(JavaCodeMethod m, String annotation) {
+        if (familyInterface.length() == 0) {
+            m.annotate(annotation);
+        } 
+        m;
+    }
+    
+    def JavaCodeMethod nodeBeanAnnotation(JavaCodeMethod m) {
+        nodeAnnotation(m, "org.springframework.context.annotation.Bean");
     }
 
     // -------------- special case no service allowed for convenience when building up a configuration ------------------
@@ -45,7 +49,7 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
         }
     }
     
-    def genIngestors(MeshElement elt, ServiceBase base, String methodSuffix, String type) {
+    /*def genIngestors(MeshElement elt, ServiceBase base, String methodSuffix, String type) {
     }
 
     def genIngestors(MeshSource elt, ServiceBase base, String methodSuffix, String type) {
@@ -54,11 +58,11 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
 
     def genIngestors(MeshProcessor elt, ServiceBase base, String methodSuffix, String type) {
         genIngestorSet(base, elt.next, methodSuffix, type);
-    }
+    }*/
     
     // sinks shall not ingest
     
-    def genIngestorSet(ServiceBase base, setOf(MeshConnector) next, String methodSuffix, String type) {
+    /*def genIngestorSet(ServiceBase base, setOf(MeshConnector) next, String methodSuffix, String type) {
         if (not(sharedInterfaces)) {
             methodSuffix = getMethodSuffixId(methodSuffix, getServiceIdSuffix(base));
         }    
@@ -69,66 +73,62 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
             String conn = getMethodSuffixId(getMethodSuffix(target, type, outName), target);
             generateIngestor(base, methodSuffix, conn, type, "in", target.impl, "");
         }
-    }
+    }*/
     
     // ----------------------------------- metrics / probes -------------------------------
     
     // generates a sent probe expression (if configured) for the given functional expression 
-    def genSentProbe(ServiceBase base, String expr, Boolean needsReturn, String exprType, String data) {
+    def JavaCodeElement genSentProbe(ServiceBase base, JavaCodeExpression expr, Boolean needsReturn, String exprType, String data) {
         if (base.monitorSentCount or base.traceSent <> TraceKind::NONE) {
-            String mon = "";
+            JavaCodeBlock block = new JavaCodeBlock();
             String trace = "";
             if (base.monitorSentCount) {
-                mon = 'MetricsProvider.increaseCounterBy(serviceSent, 1.0);';
+                block.call("MetricsProvider.increaseCounterBy").arg("serviceSent").arg("1.0");
             }
             if (base.traceSent <> TraceKind::NONE) {
                 String d;                
                 if (data.length() > 0) {
                     d = data;
                 } else { // take from expression, store in local variable
-                    trace = '${exprType} r = ${expr};\n';
-                    expr = "r";
-                    d = expr;
+                    d = "r";
+                    block.var(exprType, d, expr);
+                    expr = new JavaCodeVariableExpression(d);
                 }
                 if (base.traceRcv == TraceKind::TRACE) {
-                    trace = trace + 'Transport.sendTraceRecord(new TraceRecord("${base.id}", "sending", ${d}));';
+                    block.call("de.iip_ecosphere.platform.transport.Transport.sendTraceRecord", JavaCodeImportScope.CLASS).newArg("de.iip_ecosphere.platform.transport.status.TraceRecord").stringArg(base.id).stringArg("sending").arg(d);
                 } else if (base.traceRcv == TraceKind::TRACE_NO_DATA) {
-                    trace = trace + 'Transport.sendTraceRecord(new TraceRecord("${base.id}", "sending", null));';
+                    block.call("de.iip_ecosphere.platform.transport.Transport.sendTraceRecord", JavaCodeImportScope.CLASS).newArg("de.iip_ecosphere.platform.transport.status.TraceRecord").stringArg(base.id).stringArg("sending").addNullArgument();
                 } else if (base.traceRcv == TraceKind::LOG) {
-                    trace = trace + 'LoggerFactory.getLogger(getClass()).debug("sending in {}", "${base.id}");';
+                    addLoggerCall(block, "debug", "sending in {}: {}").stringArg(base.id).arg(d);
                 } else if (base.traceRcv == TraceKind::LOG_NO_DATA) {
-                    trace = trace + 'LoggerFactory.getLogger(getClass()).debug("sending in {}: {}", "${base.id}", ${d});';
+                    addLoggerCall(block, "debug", "sending in {}").stringArg(base.id);
                 } else { // SYSOUT
-                    trace = trace + 'System.out.println("sending in ${base.id}: " + ${d});';
+                    block.SystemOutPrintln().arg('"sending in ${base.id}: " + ${d}');
                 }
             } 
+            
             String ret;
             if (needsReturn) {
-               ret = "return ";
+               block.return(expr);
             } else {
-               ret = "";
+               block.add(expr);
             }
-            '{
-                ${mon|e}
-                ${trace|e} 
-                ${ret}${expr}; 
-            }'
         } else {
-            '${expr}'
+            new JavaCodeStringExpression(expr);
         }
     }
     
     def genTimeRecording(ServiceBase base, String timerVar, String expr) {
-        "${timerVar}.record(() -> ${expr})"
+        "${timerVar}.record(() -> ${expr})";
     }
     
     // generates a received probe expression (if configured) for the given functional expression 
-    def genRcvProbe(ServiceBase base, String expr, String exprType, String data) {
+    def JavaCodeElement genRcvProbe(ServiceBase base, String expr, String exprType, String data) {
         if (base.monitorRcvCount or base.monitorProcessingTime or base.traceRcv <> TraceKind::NONE) {
-            String mon = "";
+            JavaCodeBlock block = new JavaCodeBlock();
             String trace = "";
             if (base.monitorRcvCount) {
-                mon = 'MetricsProvider.increaseCounterBy(serviceReceived, 1.0);';
+                block.call("MetricsProvider.increaseCounterBy").arg("serviceReceived").arg("1.0");
             }
             if (base.monitorProcessingTime) {
                 if (expr <> "") {
@@ -140,28 +140,28 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
                 if (data.length() > 0) {
                     d = data;
                 } else { // take from expression, store in local variable
-                    expr = "${type} r = ${expr}";
+                    block.var(type, "r", expr);
+                    expr = "";
                     d = "r";
                 }
                 if (base.traceRcv == TraceKind::TRACE) {
-                    trace = 'Transport.sendTraceRecord(new TraceRecord("${base.id}", "receiving", ${d}));';
+                    block.call("de.iip_ecosphere.platform.transport.Transport.sendTraceRecord", JavaCodeImportScope.CLASS).newArg("de.iip_ecosphere.platform.transport.status.TraceRecord").stringArg(base.id).stringArg("receiving").arg(d);
                 } else if (base.traceRcv == TraceKind::TRACE_NO_DATA) {
-                    trace = 'Transport.sendTraceRecord(new TraceRecord("${base.id}", "receiving", null));';
+                    block.call("de.iip_ecosphere.platform.transport.Transport.sendTraceRecord", JavaCodeImportScope.CLASS).newArg("de.iip_ecosphere.platform.transport.status.TraceRecord").stringArg(base.id).stringArg("receiving").addNullArgument();
                 } else if (base.traceRcv == TraceKind::LOG) {
-                    trace = 'LoggerFactory.getLogger(getClass()).debug("received in {}: {}", "${base.id}", ${d});';
+                    addLoggerCall(block, "debug", "received in {}: {}").stringArg(base.id).arg(d);
                 } else if (base.traceRcv == TraceKind::LOG_NO_DATA) {
-                    trace = 'LoggerFactory.getLogger(getClass()).debug("received in {}", "${base.id}");';
+                    addLoggerCall(block, "debug", "received in {}").stringArg(base.id);
                 } else { // SYSOUT
-                    trace = 'System.out.println("received in ${base.id}: " + ${d});';
+                    block.SystemOutPrintln().arg('"received in ${base.id}: " + ${d}');
                 }
             }
-            '{
-                    ${mon|e}
-                    ${trace|e} 
-                    ${expr}; 
-            }'
+if (expr <> "") {
+            block.add(expr + ";"); // add only if expr<>"", returns block
+}
+block;            
         } else {
-            '${expr}'
+            new JavaCodeStringExpression(expr);
         }
     }
     
@@ -175,37 +175,39 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
         }
     }
 
-    def genMapService(String serviceVarName) {
-        if (familyInterface <> "") {
-            'Starter.mapService(${serviceVarName}, ${isDefaultService(elt.impl, familyMember)});'
-        } else {
-            'Starter.mapService(${serviceVarName});'
-        }
+    def genMapService(String serviceVarName, JavaCodeBlockInterface block) {
+        block.callQualified("de.iip_ecosphere.platform.services.environment.spring.Starter.mapService").arg(serviceVarName).(c|{
+            if (familyInterface <> "") {
+                c.arg(isDefaultService(elt.impl, familyMember));
+            }
+        });
+    }
+    
+    def createMetrics(JavaCodeBlockInterface block, String var, String method, MeshElement elt) {
+        block.assign(var, new JavaCodeMethodCall(method).stringArg(elt.impl.id).arg("sId").stringArg(app.id).arg("iId"));
     }
 
-    def registerService(MeshElement elt, ServiceBase service) {
-        'String iId;
-        String sId;'
+    def registerService(MeshElement elt, ServiceBase service, JavaCodeBlockInterface block) {
+        block.var("String", "iId");
+        block.var("String", "sId");
         for (String s: serviceVars) {
-            'sId = Starter.getServiceId(${s}); // ${s}.getId() is "static"
-            iId = ServiceBase.getApplicationInstanceId(sId);
-            if (iId == null || iId.length() == 0) {
-                iId = "dflt";
-            }'
-            'serviceSent = metrics.createServiceSentCounter("${elt.impl.id}", sId, "${app.id}", iId);'
-            'serviceReceived = metrics.createServiceReceivedCounter("${elt.impl.id}", sId, "${app.id}", iId);'
-            'processingTime = metrics.createServiceProcessingTimer("${elt.impl.id}", sId, "${app.id}", iId);'
-            '${attachMetricsProvider("${s}")}'
-            '${genMapService("${s}")}'
+            String sId = "${s}";
+            block.assign("sId").callQualified("de.iip_ecosphere.platform.services.environment.spring.Starter.getServiceId").arg(sId); // ${s}.getId() is "static"
+            block.assign("iId").callQualified("de.iip_ecosphere.platform.services.environment.switching.ServiceBase.getApplicationInstanceId").arg("sId");
+            block.if("iId == null || iId.length() == 0").assign("iId", '"dflt"');
+            createMetrics(block, "serviceSent", "metrics.createServiceSentCounter", elt);
+            createMetrics(block, "serviceReceived", "metrics.createServiceReceivedCounter", elt);
+            createMetrics(block, "processingTime", "metrics.createServiceProcessingTimer", elt);
+            attachMetricsProvider(sId, block);
+            genMapService(sId, block);
         }
     }
 
-    def initIngestors(MeshElement elt, ServiceBase base) {
-        ''
+    def initIngestors(MeshElement elt, ServiceBase base, JavaCodeBlockInterface block) {
     }
 
     //specialization of MeshBasics
-    def generateCreateReceptionCallback(MeshElement source, IOType sourceType, MeshElement receiver, boolean first) {
+    def generateCreateReceptionCallback(MeshElement source, IOType sourceType, MeshElement receiver, boolean first, JavaCodeBlockInterface block) {
         String serviceId = "_" + toIdentifier(source.impl.id);
         String coType = toTypeName(sourceType);
         String suffix = coType.firstToUpperCase() + serviceId;
@@ -214,92 +216,89 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
             prefix = "receive";
         }
         String func = "${prefix}${coType}_${toIdentifier(receiver.impl.id)}";
-        'createReceptionCallback(${composeDestination("${source.impl.id}_${coType}", app, "appInstId")}, ${func}(), ${coType}.class, "${func}-in-0");'
+        block.call("createReceptionCallback").arg(composeDestination("${source.impl.id}_${coType}", app, "appInstId"))
+            .arg(new JavaCodeMethodCall(func)).classArg(coType).stringArg("${func}-in-0");
     }
     
-    def attachIngestors(MeshElement elt, ServiceBase base) {
-        processIngestors(elt, base, nodes, ", #CONNS#", true, familyInterface == "");
+    def attachIngestors(MeshElement elt, ServiceBase base, JavaCodeBlockInterface block) {
+        processIngestors(elt, base, nodes, ", #CONNS#", true, familyInterface == "", block);
     }
     
     //specialization of MeshBasics, requires indirection for insert-import; does not work with override
-    def generateIngestor(ServiceBase base, String methodSuffix, String conn, String type, String dir, ServiceBase target, String connPlaceHolder) {
-        genIngestor(base, methodSuffix, conn, type, dir, target, connPlaceHolder);
+    def generateIngestor(ServiceBase base, String methodSuffix, String conn, String type, String dir, ServiceBase target, String connPlaceHolder, JavaCodeBlockInterface block) {
+        genIngestor(base, methodSuffix, conn, type, dir, target, connPlaceHolder, block);
     }
     
-    def genIngestor(ServiceBase base, String methodSuffix, String conn, String type, String dir, ServiceBase target, String connPlaceHolder) {
+    def genIngestor(ServiceBase base, String methodSuffix, String conn, String type, String dir, ServiceBase target, String connPlaceHolder, JavaCodeBlockInterface block) {
         String methodName;
         if (sharedInterfaces) {
-            methodName = "attach${type.firstToUpperCase()}Ingestor";
+            methodName = "attach${toSimpleName(type).firstToUpperCase()}Ingestor";
         } else {
             methodName = "attach${methodSuffix}Ingestor";
         }
-        String expr = generateTransportSend(base, type, springConnId(base, conn, target, app), connPlaceHolder);
-        'service.${methodName}(data -> ${genSentProbe(base, expr, false, type, "data")});'
+        JavaCodeExpression expr = generateTransportSend(base, type, springConnId(base, conn, target, app), connPlaceHolder);
+        block.call("service." + methodName).lambdaArg("data").asExpr(genSentProbe(base, expr, false, type, "data"));
     }
     
-    def generateTransportSend(ServiceBase sender, String type, String springConnId, String connPlaceHolder) {
+    def JavaCodeExpression generateTransportSend(ServiceBase sender, String type, String springConnId, String connPlaceHolder) {
         if (springConnId <> "") {
-            'SerializerMessageConverter.serializeAndSend(streamBridge, "${springConnId}", data);'
+            new JavaCodeMethodCall("de.iip_ecosphere.platform.transport.spring.SerializerMessageConverter.serializeAndSend", JavaCodeImportScope.METHOD_CLASS_IMPORT).arg("streamBridge").stringArg(springConnId).arg("data");
         } else {
             // subsequent nodes do not know anything about the active member, only the family  
             String senderId = sender.id;
             if (familyInterface <> "" and familyMember == sender) {
                 senderId = elt.impl.id;
             }
-            'Transport.send(c -> c.asyncSend(${composeDestination("${senderId}_${type}", app, "appInstId")}, data), "${senderId}"${connPlaceHolder})'
+            JavaCodeMethodCall l = new JavaCodeMethodCall("c.asyncSend").arg(composeDestination("${senderId}_${type}", app, "appInstId")).arg("data");
+            new JavaCodeMethodCall("de.iip_ecosphere.platform.transport.Transport.send", JavaCodeImportScope.CLASS).arg(new JavaCodeLambdaExpression("c").expr(l)).stringArg(senderId).arg(connPlaceHolder);
         }
     }
     
     // called via MeshBasics.generateDataMethods for MeshSource
     def generateSourceMethod(MeshSource src, String type, String methodSuffix, String methodSuffixWithServiceId) {
-        generateSourceMethod(src, overrideImpl(src.impl), type, methodSuffix, methodSuffixWithServiceId);
+        generateSourceMethod(src, overrideImpl(src.impl), type, methodSuffix, methodSuffixWithServiceId, mainCls);
     }
     
-    def generateSourceMethod(MeshSource src, ServiceBase service, String type, String methodSuffix, String methodSuffixWithServiceId) {
+    def generateSourceMethod(MeshSource src, ServiceBase service, String type, String methodSuffix, String methodSuffixWithServiceId, JavaCodeClass c) {
     }
     
-    def generateSourceMethod(MeshSource src, Service service, String type, String methodSuffix, String methodSuffixWithServiceId) {
+    def generateSourceMethod(MeshSource src, Service service, String type, String methodSuffix, String methodSuffixWithServiceId, JavaCodeClass c) {
         String methodName;
         if (sharedInterfaces) {
-            methodName = "produce${type.firstToUpperCase()}";
+            methodName = "produce" + toSimpleName(type).firstToUpperCase();
         } else {
             methodName = methodSuffix;
         }
-        '/**
-        * Creates data to be ingested.
-        *
-        * @return the data supplier functor
-        */
-        ${nodeAnnotation("@Bean")|e}'
-        if (service.asynchronous) {
-            // ${genIngestors(src, service, methodSuffix, type)}          
-            'public Supplier<Flux<${type}>> ${methodSuffixWithServiceId}() {
-                // this is no real use of flux, but ensures that method is called only once to set the ingestor
-                // when the mesh element is really active
-                return () -> Flux.from(emitter -> {
-                    // empty emitter, else duplicates the effort of #28
-                });
-            }'
-        } else {
-            String svc = insertSelector(service, type, "data");
-            String expr = '${fallbackToNull(src, "${svc}.${methodName}()", true)}';
-            '\npublic Supplier<${type}> ${methodSuffixWithServiceId}() {
-                return () -> ${genSentProbe(service, expr, true, type, "")}; 
-            }'
-        }
+        nodeBeanAnnotation(c.method("java.util.function.Supplier<${type}>", methodSuffixWithServiceId, "Creates data to be ingested.")).(m|{
+            m.getJavadocComment().addReturnComment("the data supplier functor");
+            if (service.asynchronous) {
+                // ${genIngestors(src, service, methodSuffix, type)}
+                m.setType("java.util.function.Supplier<reactor.core.publisher.Flux<${type}>>");
+                m.addSLComment("this is no real use of flux, but ensures that method is called only once to set the ingestor");
+                m.addSLComment("when the mesh element is really active");
+                JavaCodeMethodCall flux = new JavaCodeMethodCall("Flux.from");
+                flux.lambdaArg().var("emitter").addBlock().addSLComment("empty emitter, else duplicates the effort of #28");
+                m.return(new JavaCodeLambdaExpression().expr(flux));
+            } else {
+                String svc = insertSelector(service, type, "data");
+                String expr = '${fallbackToNull(src, "${svc}.${methodName}()", true)}';
+                m.return(new JavaCodeLambdaExpression().asExpr(genSentProbe(service, expr, true, type, "")));
+            }
+        });
     }
 
-    def generateSourceMethod(MeshSource src, Connector conn, String type, String methodSuffix, String methodSuffixWithServiceId) {
+    def generateSourceMethod(MeshSource src, Connector conn, String type, String methodSuffix, String methodSuffixWithServiceId, JavaCodeClass c) {
         String sel = insertSelector(conn, type, "data");
         String expr;
         String methodName = methodSuffixWithServiceId;
         boolean forward = true;
-        sequenceOf(IOType) tps = conn.input->select(t|toTypeName(t) == type);
+        String sType = toSimpleName(type);
+        sequenceOf(IOType) tps = conn.input->select(t|toTypeName(t) == sType);
         if (tps.size() > 0) {
             IOType t = tps[0];
             forward = t.forward;
         }
-        if (forward or type == getFirstTypeName(conn.input)) {
+        if (forward or sType == getFirstTypeName(conn.input)) {
             expr = '${fallbackToNull(src, "${sel}.send(data)", false)}';
         } else {
             expr = sel;
@@ -309,16 +308,9 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
                 methodName = "process" + methodName.substring(6);
             }
         }
-        '/**
-        * Called when data arrived that shall be passed on to the connector.
-        *
-        * @return the data consumer functor
-        */
-        ${nodeAnnotation("@Bean")|e}
-        public Consumer<${asTypeName(type)}> ${methodName}() {
-            return data -> ${genRcvProbe(conn, expr, type, "data")};
-        }
-        '
+        nodeBeanAnnotation(c.method("java.util.function.Consumer<${asTypeName(type)}>", methodName, "Called when data arrived that shall be passed on to the connector.")).(m|{
+            m.return(new JavaCodeLambdaExpression("data").asExpr(genRcvProbe(conn, expr, type, "data")), "the data consumer functor");
+        });
     }
     
     def Boolean recordSourceIngestor(MeshSource elt, IOType type) {
@@ -336,31 +328,26 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
     } 
     
     def generateAsyncProcessorInMethod(MeshElement proc, ServiceBase base, String type, String methodSuffix, String methodSuffixWithServiceId) {
-        '/**
-        * Called when data arrived that shall be processed (asynchronously).
-        *
-        * @return the data consumer functor
-        */
-        ${nodeAnnotation("@Bean")|e}
-        public Consumer<${type}> ${methodSuffixWithServiceId}() {
-            ${generateAsyncProcessorBody(proc, base, methodSuffix, methodSuffixWithServiceId, type)}
-        }'
+        nodeBeanAnnotation(mainCls.method("java.util.function.Consumer<${type}>", methodSuffixWithServiceId, "Called when data arrived that shall be processed (asynchronously).")).(m|{
+            generateAsyncProcessorBody(proc, base, methodSuffix, methodSuffixWithServiceId, type, m);
+            m.getJavadocComment().addReturnComment("the data consumer functor");
+        });
     }
 
-    def generateAsyncProcessorBody(MeshElement proc, ServiceBase base, String methodSuffix, String methodSuffixWithServiceId, String type) {
+    def generateAsyncProcessorBody(MeshElement proc, ServiceBase base, String methodSuffix, String methodSuffixWithServiceId, String type, JavaCodeMethod m) {
         String methodName;
         if (sharedInterfaces) {
-            methodName = "process${type.firstToUpperCase()}";
+            methodName = "process" + toSimpleName(type).firstToUpperCase();
         } else {
             methodName = methodSuffix;
         }
         String expr = '${fallbackToNull(proc, "service.${methodName}(data)", false)}';
-        'return data -> ${genRcvProbe(base, expr, type, "data")};'
+        m.return(new JavaCodeLambdaExpression("data").asExpr(genRcvProbe(base, expr, type, "data")));
     }
     
-    def generateAsyncProcessorBody(MeshElement proc, Connector conn, String methodSuffix, String methodSuffixWithServiceId, String type) {
+    def generateAsyncProcessorBody(MeshElement proc, Connector conn, String methodSuffix, String methodSuffixWithServiceId, String type, JavaCodeMethod m) {
         String expr = '${fallbackToNull(proc, "service.send(data)", false)}';
-        'return data -> ${genRcvProbe(conn, expr, type, "data")};'
+        m.return(new JavaCodeLambdaExpression("data").asExpr(genRcvProbe(conn, expr, type, "data")));
     }
 
     // called via MeshBasics.generateDataMethods for synch MeshProcessor
@@ -369,29 +356,24 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
     }
     
     def generateSyncProcessorMethod(MeshProcessor proc, ServiceBase base, String inType, String outType, String methodSuffix, String methodSuffixWithServiceId) {
-        '/**
-        * Called when data arrived that shall be processed (synchronously).
-        *
-        * @return the data transformation functor
-        */
-        ${nodeAnnotation("@Bean")|e}
-        public Function<${inType}, ${outType}> ${methodSuffixWithServiceId}() {
-            ${generateSyncProcessorBody(proc, overrideImpl(base), methodSuffix, methodSuffixWithServiceId, inType, outType)}
-        }'
-    } 
+        nodeBeanAnnotation(mainCls.method("java.util.function.Function<${inType}, ${outType}>", methodSuffixWithServiceId, "Called when data arrived that shall be processed (synchronously).")).(m|{
+            generateSyncProcessorBody(proc, overrideImpl(base), methodSuffix, methodSuffixWithServiceId, inType, outType, m);
+            m.getJavadocComment().addReturnComment("the data transformation functor");
+        });
+   } 
 
-    def generateSyncProcessorBody(MeshProcessor proc, ServiceBase base, String methodSuffix, String methodSuffixWithServiceId, String inType, String outType) {
+    def generateSyncProcessorBody(MeshProcessor proc, ServiceBase base, String methodSuffix, String methodSuffixWithServiceId, String inType, String outType, JavaCodeMethod m) {
         String methodName;
         if (sharedInterfaces) {
-            methodName = "transform${inType.firstToUpperCase()}";
+            methodName = "transform" + toSimpleName(inType).firstToUpperCase();
         } else {
             methodName = methodSuffix;
         }
-        'return data -> ${fallbackToNull(proc, "service.${methodName}(data)", true)};'
+        m.return('data -> ${fallbackToNull(proc, "service.${methodName}(data)", true)}');
     }
 
-    def generateSyncProcessorBody(MeshProcessor proc, Connector conn, String methodSuffix, String methodSuffixWithServiceId, String inType, String outType) {
-        'return data -> ${fallbackToNull(proc, "service.send(data)", true)};'
+    def generateSyncProcessorBody(MeshProcessor proc, Connector conn, String methodSuffix, String methodSuffixWithServiceId, String inType, String outType, JavaCodeMethod m) {
+        m.return('data -> ${fallbackToNull(proc, "service.send(data)", true)}');
     }
     
     // called via MeshBasics.generateDataMethods for MeshSink
@@ -401,122 +383,110 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
             methodName = "send";
         } else {
             if (sharedInterfaces) {
-                methodName = "process${type.firstToUpperCase()}";
+                methodName = "process" + toSimpleName(type).firstToUpperCase();
             } else {
                 methodName = methodSuffix;
             }
         }
-        '/**
-        * Called when data arrived that shall be received (data sink).
-        *
-        * @return the data consumer functor
-        */
-        ${nodeAnnotation("@Bean")|e}
-        public Consumer<${type}> ${methodSuffixWithServiceId}() {
-            ${generateSinkMethodBody(snk, overrideImpl(snk.impl), methodName, methodSuffixWithServiceId, type)}
-        }'
+        nodeBeanAnnotation(mainCls.method("java.util.function.Consumer<${type}>", methodSuffixWithServiceId, "Called when data arrived that shall be received (data sink).")).(m|{
+            generateSinkMethodBody(snk, overrideImpl(snk.impl), methodName, methodSuffixWithServiceId, type, m);
+            m.getJavadocComment().addReturnComment("the data consumer functor");
+        });
     } 
     
-    def generateSinkMethodBody(MeshSink snk, ServiceBase service, String methodName, String methodSuffixWithServiceId, String type) {
+    def generateSinkMethodBody(MeshSink snk, ServiceBase service, String methodName, String methodSuffixWithServiceId, String type, JavaCodeMethod m) {
         String expr = '${fallbackToNull(snk, "service.${methodName}(data)", false)}';
-        'return data -> ${genRcvProbe(service, expr, type, "data")};'
+        m.return(new JavaCodeLambdaExpression("data").asExpr(genRcvProbe(service, expr, type, "data")));
     }
     
     // ----------------------- initial service parameters -----------------------------------------------
     
-    def generateParameterInit(ServiceBase service) {
+    def generateParameterInit(ServiceBase service, JavaCodeMethod m) {
         Parameters params = service.parameter;
         if (size(params) > 0) {
-            'HashMap<String, String> paramValues = new HashMap<>();
-            ParameterConfigurer<?> cfg;'
+            m.var("HashMap<String, String>", "paramValues").addNew("java.util.HashMap").addGenerics("");
+            m.var("de.iip_ecosphere.platform.services.environment.ParameterConfigurer<?>", "cfg");
             for (Parameter p: params) {
                 // TODO compile time?
-                'cfg = service.getParameterConfigurer("${p.name}");
-                if (null != cfg) {
-                    ${generateParameterInit(p)}
-                }'
+                m.assign("cfg", new JavaCodeMethodCall("service.getParameterConfigurer").stringArg(p.name));
+                m.if("null != cfg").(a|{
+                    generateParameterInit(p, a);
+                });
             }
-            'try {
-                service.reconfigure(paramValues);
-            } catch (ExecutionException e) {
-                LoggerFactory.getLogger(getClass()).error("Configuring initial parameter: " + e.getMessage());
-            }'
+            m.try().(t|{
+                t.call("service.reconfigure").arg("paramValues");
+                codeCatchExecutionExceptionLogError(t, "Configuring initial parameter: {}");
+            });
         }
     }
 
-    def generateParameterInit(CReversibleProperty p) {
-        '//type not considered in generation, please detail dynamic dispatch'
+    def generateParameterInit(CReversibleProperty p, JavaCodeBlock m) {
+        m.SLComment("type not considered in generation, please detail dynamic dispatch");
     }
     
-    def generateParameterInit(IntegerParameter p) {
-        'cfg.addValue(paramValues, ${p.defaultValue});'
+    def generateParameterInit(IntegerParameter p, JavaCodeBlock m) {
+        m.call("cfg.addValue").arg("paramValues").arg(p.defaultValue);
     }
-
-    def generateParameterInit(StringParameter p) {
-        'cfg.addValue(paramValues, "${p.defaultValue}");'
+    
+    def generateParameterInit(StringParameter p, JavaCodeBlock m) {
+        m.call("cfg.addValue").arg("paramValues").stringArg(p.defaultValue);
     }
-
-    def generateParameterInit(RealParameter p) {
-        'cfg.addValue(paramValues, (double) ${p.defaultValue});'
+    
+    def generateParameterInit(RealParameter p, JavaCodeBlock m) {
+        m.call("cfg.addValue").arg("paramValues").arg(new JavaCodeCastExpression("double", p.defaultValue));
     }
-
-    def generateParameterInit(BooleanParameter p) {
-        'cfg.addValue(paramValues, ${p.defaultValue});'
+    
+    def generateParameterInit(BooleanParameter p, JavaCodeBlock m) {
+        m.call("cfg.addValue").arg("paramValues").arg(p.defaultValue);
     }
-
-    def generateParameterInit(LongParameter p) {
-        'cfg.addValue(paramValues, ${p.value}L);'
+    
+    def generateParameterInit(LongParameter p, JavaCodeBlock m) {
+        m.call("cfg.addValue").arg("paramValues").arg(p.defaultValue + "L");
     }
         
     // --------------- initial service to obtain a service instance to run with -------------------------
     
-    def initialService(MeshElement elt, ServiceBase service, setOf(String) serviceVars) {
-        ''
+    def initialService(MeshElement elt, ServiceBase service, setOf(String) serviceVars, JavaCodeMethod m) {
     }
     
     // optional method to support testing, must be used in initialService if not empty
-    def generatedServiceInitMethod(MeshElement elt, ServiceBase service) {
-        ''
+    def generatedServiceInitMethod(MeshElement elt, ServiceBase service, JavaCodeClass c) {
     }
 
-    def initialService(MeshElement elt, Service service, setOf(String) serviceVars) {
-        ''
+    def initialService(MeshElement elt, Service service, setOf(String) serviceVars, JavaCodeMethod m) {
     }
     
-    def generateAbstractServiceCreateInstance(MeshElement elt, ServiceBase service, String attrName, String className) {
+    def generateAbstractServiceCreateInstance(MeshElement elt, ServiceBase service, String attrName, String className, JavaCodeMethod m) {
         String serviceType = getServiceType(elt, service);
-        '${attrName} = AbstractService.createInstance("${className}", 
-            ${serviceType}.class, 
-            "${service.id}", 
-            "${getDeploymentDescriptorPath()}");'
+        m.assign(attrName).callQualified("de.iip_ecosphere.platform.services.environment.AbstractService.createInstance").stringArg(className)
+            .classArg(serviceType).stringArg(service.id).stringArg(getDeploymentDescriptorPath());
     }
     
-    def attachMetricsProvider(String serviceVarName) {
-        'MonitoringService.setUp(${serviceVarName}, metrics);'
+    def attachMetricsProvider(String serviceVarName, JavaCodeBlockInterface block) {
+        block.callQualified("de.iip_ecosphere.platform.services.environment.MonitoringService.setUp").arg(serviceVarName).arg("metrics");    
     }
     
-    def initAppInstId(String serviceVar) {
-        'appInstId = getAppInstIdSuffix(${serviceVar}, "_");'
+    def initAppInstId(String serviceVar, JavaCodeMethod m) {
+        m.assign("appInstId", new JavaCodeMethodCall("getAppInstIdSuffix").arg(serviceVar).stringArg("_"));
     }
 
-    def initialService(MeshElement elt, JavaService service, setOf(String) serviceVars) {
+    def initialService(MeshElement elt, JavaService service, setOf(String) serviceVars, JavaCodeMethod m) {
         if (service.class.length() > 0) {
             serviceVars.add("service");
-            '${generateAbstractServiceCreateInstance(elt, service, "service", service.class)}'
-            '${generateParameterInit(service)|e}'
-            '${initAppInstId("service")}'
-            '${initialServiceRest(service)|e}'
+            generateAbstractServiceCreateInstance(elt, service, "service", service.class, m);
+            generateParameterInit(service, m);
+            initAppInstId("service", m);
+            initialServiceRest(service, m);
         } else {
-            '// NO service defined, no initialization possible'
+            m.addSLComment("NO service defined, no initialization possible");
         }
     }
 
-    def initialServiceRest(JavaService service) {
-         ''
+    def initialServiceRest(JavaService service, JavaCodeMethod m) {
     }
     
     def genCreateConnectorAdapterSuppliers(Connector conn) {
-        '()->service.getInPath("${getPath(conn.inInterface)}"), ()->service.getOutPath("${getPath(conn.outInterface)}")'
+        '()->service.getInPath("${getPath(conn.inInterface)}"), ()->service.getOutPath("${getPath(conn.outInterface)}")';
     }
     
     @DispatchBasis
@@ -530,35 +500,38 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
         typeName + "Impl";
     }
     
-    def initialService(MeshElement elt, Connector conn, setOf(String) serviceVars) {
+    def initialService(MeshElement elt, Connector conn, setOf(String) serviceVars, JavaCodeMethod m) {
         String connGen = getConnectorGenerics(conn, true);
         String clsName = getClsName(elt);
         serviceVars.add("service");
-        'ConnectorParameter param = createConnectorParameter();
-        Connector${connGen} conn = ConnectorFactory.createConnector(
-            "${getConnectorCls(conn)}", () -> param, 
-            createConnectorAdapter(${genCreateConnectorAdapterSuppliers(conn)}));
-        conn.enablePolling(false); // independent of notifications, disable as @Autowired may not be
-        ${getYamlServiceFragment("serviceData", clsName, conn.id)}; 
-        service = new ${wrapperCls(conn)}${getConnectorGenerics(conn, true)}(serviceData, conn, 
-            () -> param${wrapperCtorParam(conn)});
-        service.setReceptionCallback(new ConnectorReceptionCallback());
-        ${initAppInstId("service")}'
+        m.var("ConnectorParameter", "param", "createConnectorParameter()");
+        JavaCodeMethodCall init = new JavaCodeMethodCall("de.iip_ecosphere.platform.connectors.ConnectorFactory.createConnector", JavaCodeImportScope.METHOD_CLASS_IMPORT);
+        init.stringArg(getConnectorCls(conn));
+        init.arg("() -> param");
+        init.addCallArgument("createConnectorAdapter").arg(genCreateConnectorAdapterSuppliers(conn));
+        m.var("de.iip_ecosphere.platform.connectors.Connector" + connGen, "conn").initializer(init);
+        m.call("conn.enablePolling").arg(false); // independent of notifications, disable as @Autowired may not be
+        getYamlServiceFragment("serviceData", clsName, conn.id, m);
+        init = new JavaCodeConstructorCall(wrapperCls(conn) + connGen).arg("serviceData").arg("conn").arg("() -> param");
+        wrapperCtorParam(conn, init);
+        m.assign("service", init);
+        m.call("service.setReceptionCallback").newArg("ConnectorReceptionCallback");
+        initAppInstId("service", m);
     }
     
     def wrapperCls(Connector conn) {
-        String wrapperCls = "ConnectorServiceWrapper";
+        String wrapperCls = "de.iip_ecosphere.platform.services.environment.ConnectorServiceWrapper";
         if (isDefined(conn.mock) and conn.mock) {
-            wrapperCls = "MockingConnectorServiceWrapper";
+            wrapperCls = "de.iip_ecosphere.platform.services.environment.MockingConnectorServiceWrapper";
         }
         wrapperCls;
     }
 
-    def wrapperCtorParam(Connector conn) {
-        "";
+    def JavaCodeMethodCall wrapperCtorParam(Connector conn, JavaCodeMethodCall m) {
+        m; // orig: return "" for parameters, here: pass through m and modify m if needed
     }
     
-    // dispatch basis
+    @DispatchBasis
     def String enumerateFields(DataType type) {
         "";
     }
@@ -580,158 +553,104 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
         result;
     }
     
-    def initIngestors(MeshElement elt, Connector conn) {
-        'service.enablePolling(true); // if notifications enabled, enable now also polling as @Autowired is done'
+    def initIngestors(MeshElement elt, Connector conn, JavaCodeBlockInterface block) {
+        block.SLComment("if notifications enabled, enable now also polling as @Autowired is done");
+        block.call("service.enablePolling").arg(true);
     }
     
-    def generatedServiceInitMethod(MeshElement elt, Connector conn) {
-        String connGen = getConnectorGenerics(conn, true);
-        '/**
-        * Creates the default connector adapter without path suppliers. [public for testing]
-        *
-        * @return the connector adapter
-        */
-        public static ${adapterType(conn, false, true)} createConnectorAdapter() {
-            return createConnectorAdapter(null, null, null, null);
-        }
-        
-        /**
-        * Creates the connector adapter. [public for testing]
-        *
-        * @param inPathSupplier function returning the actual input base path to use for data accesses, may be <b>null</b>
-        * @param outPathSupplier function returning the actual output base path to use for data accesses, may be <b>null</b>
-        * @return the connector adapter
-        */
-        public static ${adapterType(conn, false, true)} createConnectorAdapter(Supplier<String> inPathSupplier, Supplier<String> outPathSupplier) {
-            return createConnectorAdapter(null, null, inPathSupplier, outPathSupplier);
-        }
-        
-        /**
-        * Creates the connector adapter without path suppliers. [public for testing]
-        *
-        * @param metrics the metrics provider to use, <b>null</b> for no metric measurements
-        * @param log the log file to use to record individual measurements in experiments, <b>null</b> for no logging.
-        *      Only becomes active if {@code metrics} is not <b>null</b>
-        * @return the connector adapter
-        */
-        public static ${adapterType(conn, false, true)} createConnectorAdapter(
-            de.iip_ecosphere.platform.services.environment.metricsProvider.MetricsProvider metrics, File log) {
-            return createConnectorAdapter(metrics, log, null, null);
-        }
-        
-        /**
-        * Creates the connector adapter. [public for testing]
-        *
-        * @param metrics the metrics provider to use, <b>null</b> for no metric measurements
-        * @param log the log file to use to record individual measurements in experiments, <b>null</b> for no logging.
-        *      Only becomes active if {@code metrics} is not <b>null</b>
-        * @param inPathSupplier function returning the actual input base path to use for data accesses, may be <b>null</b>
-        * @param outPathSupplier function returning the actual output base path to use for data accesses, may be <b>null</b>
-        * @return the connector adapter
-        */
-        public static ${adapterType(conn, false, true)} createConnectorAdapter(
-            de.iip_ecosphere.platform.services.environment.metricsProvider.MetricsProvider metrics, File log, Supplier<String> inPathSupplier, Supplier<String> outPathSupplier) {
-            ${adapterCreationFragment(conn, "adapter", "metrics", "log")};
-            return adapter;
-        }'
+    def genConnectorAdapterMethod(Boolean withPathSuppliers, Boolean withMetrics, Connector conn, JavaCodeClass c) {
+        c.method(adapterType(conn, false, true), "createConnectorAdapter", "Creates the connector adapter. [public for testing]").setStatic().(m|{
+            JavaCodeMethodCall r = new JavaCodeMethodCall("createConnectorAdapter");            
+            if (withMetrics) {
+                m.param("de.iip_ecosphere.platform.services.environment.metricsProvider.MetricsProvider", "metrics", "the metrics provider to use, <b>null</b> for no metric measurements");
+                m.param("java.io.File", "log", "the log file to use to record individual measurements in experiments, <b>null</b> for no logging. Only becomes active if {@code metrics} is not <b>null</b>");
+                r.arg("metrics").arg("log");
+            } else {
+                r.addNullArgument().addNullArgument();
+            }
+            if (withPathSuppliers) {
+                m.param("java.util.function.Supplier<String>", "inPathSupplier", "function returning the actual input base path to use for data accesses, may be <b>null</b>");
+                m.param("java.util.function.Supplier<String>", "outPathSupplier", "function returning the actual output base path to use for data accesses, may be <b>null</b>");
+                r.arg("inPathSupplier").arg("outPathSupplier");
+            } else {
+                r.addNullArgument().addNullArgument();
+            }
+            if (not(withMetrics) and not(withPathSuppliers)) {
+                m.getJavadocComment().setComment("Creates the default connector adapter without path suppliers. [public for testing]");
+            }
+            if (withMetrics and withPathSuppliers) {
+                adapterCreationFragment(conn, "adapter", "metrics", "log", m);
+                m.return("adapter", "the connector adapter");
+            } else {
+                m.return(r, "the connector adapter");
+            }
+        });
+    }
+    
+    def generatedServiceInitMethod(MeshElement elt, Connector conn, JavaCodeClass c) {
+        genConnectorAdapterMethod(false, false, conn, c);
+        genConnectorAdapterMethod(true, false, conn, c);
+        genConnectorAdapterMethod(false, true, conn, c);
+        genConnectorAdapterMethod(true, true, conn, c);
     }
 
-    def generateReceptionCallback(MeshElement elt, ServiceBase base) {
-        ''
+    def generateReceptionCallback(MeshElement elt, ServiceBase base, JavaCodeClass c) {
     }
 
     // remaining stuff of class, may be overridden if needed    
     @DispatchBasis
-    def generateClassRest(MeshElement elt, ServiceBase service) {
-        ''
-    }
-    
-    // still needed??
-    def generateReceptionCallback(MeshProcessor elt, ServiceBase service, String serviceId) {
-        for (IOType out : elt.output) {
-             String type = toTypeName(out.type);
-             String methodSuffixEnd = type.firstToUpperCase() + serviceId;
-             String methodSuffix = "create" + methodSuffixEnd;
-             String sendEx = generateTransportSend(service, type, "", "");
-
-            '/**
-             * Reception callback.
-             * 
-             * @author EASy-Producer
-             */
-            private class ${type}ReceptionCallback implements ReceptionCallback<${type}> {
-
-                @Override
-                public void received(${type} data) {
-                    ${genRcvProbe(service, sendEx, type, "data")}
-                }
-
-                @Override
-                public Class<${type}> getType() {
-                    return ${type}.class;
-                }
-
-            }
-            '
-        }
+    def generateClassRest(MeshElement elt, ServiceBase service, JavaCodeClass c) {
     }
         
-    def generateTypeTranslators(MeshProcessor elt, ServiceBase service, String serviceId) {
+    def generateTypeTranslators(MeshProcessor elt, ServiceBase service, String serviceId, JavaCodeClass c) {
         for (IOType in : elt.input) {
+            String qType = toQualifiedTypeName(in.type);
             String type = toTypeName(in.type);
-            '/**
-             * In-data JSON type translator.
-             * 
-             * @author EASy-Producer
-             */
-            private static class ${type}InputTranslator implements TypeTranslator<${type}, String> {
-
-                @Override
-                public ${type} from(String data) throws IOException {
-                    return null; // shall be filled, not needed here
-                }
-
-                @Override
-                public String to(${type} source) throws IOException {
-                    try {
-                        ObjectMapper objectMapper = new ObjectMapper();
-                        return objectMapper.writeValueAsString(source);
-                    } catch (JsonProcessingException e) {
-                        throw new IOException(e);
-                    }                
-                }
-
-             }
-             '
+            c.addClass(type + "InputTranslator", "In-data JSON type translator.").implements("de.iip_ecosphere.platform.transport.serialization.TypeTranslator<${qType}, String>").(t|{
+                t.setStatic().setPrivate();
+                t.method(type, "from").(m|{
+                    m.throws("java.io.IOException");
+                    m.param("String", "data");
+                    m.override();
+                    m.return("null"); // shall be filled, not needed here
+                });
+                t.method("String", "to").(m|{
+                    m.throws("java.io.IOException");
+                    m.param(type, "source");
+                    m.override();
+                    m.try().(b|{
+                        b.var("com.fasterxml.jackson.databind.ObjectMapper", "objectMapper").addNew("ObjectMapper");
+                        b.return(new JavaCodeMethodCall("objectMapper.writeValueAsString").arg("source"));
+                        b.catch("com.fasterxml.jackson.core.JsonProcessingException", "e").addThrow("new IOException(e)");
+                    });
+                });
+            });
         }
         
         for (IOType out : elt.output) {
-             String type = toTypeName(out.type);
-             '/**
-              * Out-data JSON type translator.
-              * 
-              * @author EASy-Producer
-              */
-             private static class ${type}OutputTranslator implements TypeTranslator<String, ${type}> {
-
-                 @Override
-                 public String from(${type} data) throws IOException {
-                     return null; // shall be filled, not needed here
-                 }
-
-                 @Override
-                 public ${type} to(String source) throws IOException {
-                     try {
-                         ObjectMapper objectMapper = new ObjectMapper();
-                         JsonUtils.handleIipDataClasses(objectMapper); // only if nested?
-                         return objectMapper.readValue(source, ${type}${getTypeAdd()}.class);
-                     } catch (JsonProcessingException e) {
-                         throw new IOException(e);
-                     }
-                 }
-             }
-             '
-         }
+            String qType = toQualifiedTypeName(out.type);
+            String type = toTypeName(out.type);
+            c.addClass(type + "OutputTranslator", "Out-data JSON type translator.").implements("de.iip_ecosphere.platform.transport.serialization.TypeTranslator<String, ${qType}>").(t|{
+                t.setStatic().setPrivate();
+                t.method("String", "from").(m|{
+                    m.param(type, "data");
+                    m.override();
+                    m.throws("java.io.IOException");
+                    m.return("null"); // shall be filled, not needed here
+                });
+                t.method(type, "to").(m|{
+                    m.param("String", "source");
+                    m.override();
+                    m.throws("java.io.IOException");
+                    m.try().(b|{
+                        b.var("com.fasterxml.jackson.databind.ObjectMapper", "objectMapper").addNew("ObjectMapper");
+                        b.callQualified("de.iip_ecosphere.platform.support.json.JsonUtils.handleIipDataClasses").arg("objectMapper"); // only if nested?
+                        b.return(new JavaCodeMethodCall("objectMapper.readValue").arg("source").classArg(qType + getTypeAdd()));
+                        b.catch("com.fasterxml.jackson.core.JsonProcessingException", "e").addThrow("new IOException(e)");
+                    });
+                });
+            });
+        }
     }
     
     // --------------- service type -------------------------
@@ -744,9 +663,9 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
             clsName = getClsName(elt);
         }
         if (sharedInterfaces) {
-            "${clsName}Interface";
+            "iip.interfaces.${clsName}Interface";
         } else {
-            "${clsName}Service";
+            "iip.interfaces.${clsName}Service";
         }
     }
     
@@ -758,34 +677,22 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
         }
         cls;
     }
-    
-    def generateImports(ServiceBase base) {
-        if (base.isKindOf(JavaService)) {
-            'import iip.interfaces.*;'
-        }
-        if (base.kind == ServiceKind::SOURCE_SERVICE) {
-            'import reactor.core.publisher.Flux;'
-        } else {
-            ''
-        }
-    }
-    
-    def generateServiceAttribute(MeshElement elt, ServiceBase base) {
-        String serviceType = getServiceType(elt, base);
-        'private ${serviceType} service;'
+        
+    def generateServiceAttribute(MeshElement elt, ServiceBase base, JavaCodeClass c) {
+        c.attribute(getServiceType(elt, base), "service");
     }
     
     // --------------------------- ServiceFamily ----------------------------------
     
     def isDefaultService(ServiceBase eltImpl, ServiceBase service) {
-        'false'
+        'false';
     }
 
     def isDefaultService(ServiceFamily eltImpl, ServiceBase service) {
         if (defaultService(eltImpl) == service) {
-            'true'
+            'true';
         } else {
-            'false'
+            'false';
         }
     }
 
@@ -793,73 +700,68 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
         family.members.toSequence().first();
     }
     
-    def initIngestors(MeshElement elt, ServiceFamily family) {
+    def initIngestors(MeshElement elt, ServiceFamily family, JavaCodeBlockInterface block) {
         Service init = defaultService(family);
         String clsName = familyMemberName(asTypeName(init.name), familyInterfaceName(getClsName(elt)));
-        'service = new ${clsName}(streamBridge, metrics);
-        selector.initial("${init.id}");'
+        block.assign("service").addNew(clsName).arg("streamBridge").arg("metrics");
+        block.call("selector.initial").stringArg(init.id);
         for (String s: serviceVars) {
-            '${genMapService("${s}")}'
-        }        
+            genMapService("${s}", block);
+        }
     }
     
-    def registerService(MeshElement elt, ServiceFamily service) {
-        'familyStub.setActiveMemberSupplier(() -> service);'
+    def registerService(MeshElement elt, ServiceFamily service, JavaCodeBlockInterface block) {
+        block.call("familyStub.setActiveMemberSupplier").lambdaArg().expr("service");
     }
     
-    def generateImports(ServiceFamily service) {
-        ''
-    }
-
-    def generateServiceAttribute(MeshElement elt, ServiceFamily family) {
+    def generateServiceAttribute(MeshElement elt, ServiceFamily family, JavaCodeClass c) {
         Service init = defaultService(family);
         if (familyInterface.length() == 0 and isDefined(family.selector) and family.selector <> null) {
-            '${generateSelectorServiceAttribute(family, family.selector)|e}'
+            generateSelectorServiceAttribute(family, family.selector, c);
         }
-        'private ${familyInterfaceName(getClsName(elt))} service;
-        private String actServiceId = "${init.id}";
-        private FamilyServiceStub familyStub;'
+        c.attribute(familyInterfaceName(getClsName(elt)), "service");
+        c.attribute("String", "actServiceId").addStringInitializer(init.id);
+        c.attribute("de.iip_ecosphere.platform.services.environment.FamilyServiceStub", "familyStub");
     }
 
-    def initialService(MeshElement elt, ServiceFamily family, setOf(String) serviceVars) {
+    def initialService(MeshElement elt, ServiceFamily family, setOf(String) serviceVars, JavaCodeMethod m) {
         serviceVars.add("familyStub");
-        'familyStub = new FamilyServiceStub("${family.id}", 
-            AbstractService.getResourceAsStream(${getClsName(elt)}.class.getClassLoader(), "${getDeploymentDescriptorPath()}"));
-        ${initAppInstId("familyStub")}'
+        JavaCodeMethodCall res = new JavaCodeMethodCall("de.iip_ecosphere.platform.services.environment.AbstractService.getResourceAsStream", JavaCodeImportScope.METHOD_CLASS_IMPORT).arg(getClsName(elt)+".class.getClassLoader()").stringArg(getDeploymentDescriptorPath());
+        m.assign("familyStub").addNew("de.iip_ecosphere.platform.services.environment.FamilyServiceStub").stringArg(family.id).arg(res);
+        initAppInstId("familyStub", m);
     }
 
-    def generateSelectorServiceAttribute(ServiceFamily family, FamilyMemberSelector selector) {
-        ''
+    def generateSelectorServiceAttribute(ServiceFamily family, FamilyMemberSelector selector, JavaCodeClass c) {
     }
     
-    def generateSelectorServiceAttribute(ServiceFamily family, ServiceSelectorBasedFamilyMemberSelector selector) {
+    def generateSelectorServiceAttribute(ServiceFamily family, ServiceSelectorBasedFamilyMemberSelector selector, JavaCodeClass c) {
         String type = toTypeName(selector.type);
         Service init = defaultService(family);
-        'private ServiceSelector<${type}> selector = 
-            ServiceSelector.createInstance(getClass().getClassLoader(), "${selector.class}", ${type}.class, "${init.id}");'
+        JavaCodeExpression initEx = new JavaCodeMethodCall("de.iip_ecosphere.platform.services.environment.switching.ServiceSelector.createInstance", JavaCodeImportScope.METHOD_CLASS_IMPORT)
+            .arg("getClass().getClassLoader()").stringArg(selector.class).classArg(type).stringArg(init.id);
+        c.attribute("ServiceSelector<${type}>", "selector").initializer(initEx);
     }
     
     def getServiceType(MeshElement elt, ServiceFamily service) {
         "";
     }
 
-    def generateAsyncProcessorBody(MeshElement proc, ServiceFamily service, String methodSuffix, String methodSuffixWithServiceId, String type) {
+    def generateAsyncProcessorBody(MeshElement proc, ServiceFamily service, String methodSuffix, String methodSuffixWithServiceId, String type, JavaCodeMethod m) {
         String svc = insertSelector(service, type, "data");
-        'return data -> ${svc}.${methodSuffixWithServiceId}().accept(data);'
+        m.return('data -> ${svc}.${methodSuffixWithServiceId}().accept(data)');
     }
     
-    def generateSyncProcessorBody(MeshProcessor proc, ServiceFamily service, String methodSuffix, String methodSuffixWithServiceId, String inType, String outType) {
+    def generateSyncProcessorBody(MeshProcessor proc, ServiceFamily service, String methodSuffix, String methodSuffixWithServiceId, String inType, String outType, JavaCodeMethod m) {
         String svc = insertSelector(service, inType, "data");
-        'return data -> ${svc}.${methodSuffixWithServiceId}().apply(data);'
+        m.return('data -> ${svc}.${methodSuffixWithServiceId}().apply(data)');
     }
 
-    def genIngestor(ServiceFamily service, String methodSuffix, String conn, String type, String dir, ServiceBase target, String connPlaceHolder) {
-        ''
+    def genIngestor(ServiceFamily service, String methodSuffix, String conn, String type, String dir, ServiceBase target, String connPlaceHolder, JavaCodeBlockInterface block) {
     }
     
-    def generateSinkMethodBody(MeshSink snk, ServiceFamily service, String methodName, String methodSuffixWithServiceId, String type) {
+    def generateSinkMethodBody(MeshSink snk, ServiceFamily service, String methodName, String methodSuffixWithServiceId, String type, JavaCodeMethod m) {
         String svc = insertSelector(service, type, "data");
-        'return data -> ${svc}.${methodName}().accept(data);'
+        m.return('data -> ${svc}.${methodName}().accept(data)');
     }
 
     // dispatch basis
@@ -888,7 +790,7 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
     }
 
     def insertSelector(ServiceSelectorBasedFamilyMemberSelector selector, String type, String dataVar) {
-        String fType = toTypeName(selector.type);
+        String fType = toQualifiedTypeName(selector.type);
         if (type == fType) {
             "selectService(data)";
         } else {
@@ -896,50 +798,42 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
         }
     }
     
-    def attachIngestors(MeshElement elt, ServiceFamily base) {
-        '${processIngestors(elt, base, nodes, ", #CONNS#", false, true)}'
-        'service.initService();'
+    def attachIngestors(MeshElement elt, ServiceFamily base, JavaCodeBlockInterface block) {
+        processIngestors(elt, base, nodes, ", #CONNS#", false, true, block);
+        block.call("service.initService");
     }
     
-    def generateInputEventHandlers(MeshElement elt, ServiceBase service, String mainClsName) {
-        ""
+    def generateInputEventHandlers(MeshElement elt, ServiceBase service, String mainClsName, JavaCodeClass c) {
     }
 
-    def generateImports(Connector conn) {
-        if (conn.inputHandlers <> null and conn.inputHandlers.size() > 0) {
-            'import de.iip_ecosphere.platform.connectors.events.*;'
-        }
-    }
-
-    def generateInputEventHandlers(MeshElement elt, Connector conn, String mainClsName) {
+    def generateInputEventHandlers(MeshElement elt, Connector conn, String mainClsName, JavaCodeClass c) {
         if (conn.inputHandlers <> null and conn.inputHandlers.size() > 0) {
             for (ConnectorInputHandler h: conn.inputHandlers) {
                 String typeName = toTypeName(h.type);
-                'private ConnectorInputHandler<${typeName}> ${firstToLowerCase(typeName)}Handler = ConnectorEventUtils.createInputHandlerInstance(
-                    ${mainClsName}.class.getClassLoader(), 
-                    "${h.class}", ${typeName}.class);'
+                JavaCodeExpression init = new JavaCodeMethodCall("de.iip_ecosphere.platform.connectors.events.ConnectorEventUtils.createInputHandlerInstance", JavaCodeImportScope.CLASS)
+                    .arg(mainClsName + ".class.getClassLoader()").stringArg(h.class).classArg(typeName);
+                c.attribute("de.iip_ecosphere.platform.connectors.events.ConnectorInputHandler<${typeName}>", firstToLowerCase(typeName) + "Handler").initializer(init);
             }
         }
     }
 
     // inserts a selector/event handler for a connector, here a event handler
     def insertSelector(Connector conn, String type, String dataVar) {
-        setOf(ConnectorInputHandler) handlers = conn.inputHandlers->select(h|toTypeName(h.type) == type);
+        setOf(ConnectorInputHandler) handlers = conn.inputHandlers->select(h|toQualifiedTypeName(h.type) == type);
         if (handlers.size() > 0) {
             ConnectorInputHandler h = handlers.projectSingle();
             String typeName = toTypeName(h.type);
-            "handle${typeName}(${dataVar})"
+            "handle${typeName}(${dataVar})";
         } else {
             "service";
         }
     }
 
-    def generateEventHandlers(MeshElement elt, ServiceBase service) {
-        ''
+    def generateEventHandlers(MeshElement elt, ServiceBase service, JavaCodeClass c) {
     }
     
     // generates connector event handler helper functions
-    def generateEventHandlers(MeshElement elt, Connector conn) {
+    def generateEventHandlers(MeshElement elt, Connector conn, JavaCodeClass c) {
         String serviceType = getServiceType(elt, conn);
         if (conn.inputHandlers <> null and conn.inputHandlers.size() > 0) {
             for (ConnectorInputHandler h: conn.inputHandlers) {
@@ -952,214 +846,143 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
                 if (isDefined(conn.mock) and conn.mock) {
                     connAccess = "service"; // mock can handle triggers as proxy
                 }
-                'private ${serviceType} handle${typeName}(${typeName} data) {
-                    if (null != ${handleVar}) {
-                        String newCls = ${handleVar}.getNewConnectorClass(data);
-                        if (null != newCls && newCls.length() > 0) {
-                            ConnectorParameter param = createConnectorParameter();
-                            Connector${connGen} conn = ConnectorFactory.createConnector(
-                                newCls, () -> param, createConnectorAdapter(${genCreateConnectorAdapterSuppliers(conn)}));
-                            if (null != conn) {
-                                try {
-                                    // as experiment, simple form, no switching strategy for now
-                                    conn.enablePolling(false); // independent of notifications, disable as @Autowired may not be
-                                    ${getYamlServiceFragment("serviceData", clsName, conn.id)}; 
-                                    ${serviceType} oldService = ${service};
-                                    ${serviceType} newService 
-                                        = new ${wrapperCls(conn)}${getConnectorGenerics(conn, true)}(serviceData, conn, () -> param${wrapperCtorParam(conn)});
-                                    newService.setReceptionCallback(new ConnectorReceptionCallback());
-                                    newService.setState(ServiceState.STARTING);
-                                    ${service} = newService;
-                                    oldService.setState(ServiceState.STOPPING);
-                                    Starter.mapService(${service});
-                                } catch (ExecutionException e) {
-                                    System.out.println("Cannot switch connector: " + e.getMessage());
-                                }
-                            }
-                        }
-                        ${handleVar}.received(data, ${connAccess});
-                    }
-                    return service;
-                }'
+                c.method(serviceType, "handle" + typeName).setPrivate().(m|{
+                    m.param(typeName, "data");
+                    JavaCodeAlternative a = m.if("null != ${handleVar}");
+                        a.var("String", "newCls", "${handleVar}.getNewConnectorClass(data)");
+                        a.if("null != newCls && newCls.length() > 0").(a1|{
+                            a1.var("ConnectorParameter", "param", "createConnectorParameter()");
+                            a1.var("Connector" + connGen, "conn", new JavaCodeMethodCall("de.iip_ecosphere.platform.connectors.ConnectorFactory.createConnector", JavaCodeImportScope.METHOD_CLASS_IMPORT)
+                                .arg("newCls").arg("() -> param").arg("createConnectorAdapter(${genCreateConnectorAdapterSuppliers(conn)})"));
+                            a1.if("null != conn").(a2|{
+                                a2.try().(t|{
+                                    t.addSLComment("as experiment, simple form, no switching strategy for now");
+                                    t.call("conn.enablePolling").arg(false); // independent of notifications, disable as @Autowired may not be
+                                    getYamlServiceFragment("serviceData", clsName, conn.id, t);
+                                    t.var(serviceType, "oldService", service);
+                                    t.var(serviceType, "newService", wrapperCtorParam(conn, new JavaCodeConstructorCall(wrapperCls(conn) + getConnectorGenerics(conn, true)).arg("serviceData").arg("conn").arg("() -> param")));
+                                    t.call("newService.setReceptionCallback").newArg("ConnectorReceptionCallback");
+                                    t.call("newService.setState").addConstantArgument("de.iip_ecosphere.platform.services.environment.ServiceState.STARTING");
+                                    t.assign(service, "newService");
+                                    t.call("oldService.setState").addConstantArgument("de.iip_ecosphere.platform.services.environment.ServiceState.STOPPING");
+                                    t.callQualified("de.iip_ecosphere.platform.services.environment.spring.Starter.mapService").arg(service);
+                                    t.catch("java.util.concurrent.ExecutionException", "e").SystemOutPrintln().arg('"Cannot switch connector: " + e.getMessage()');
+                                });
+                            });
+                        });
+                        a.call("received").qualifiedBy(handleVar).arg("data").arg(connAccess);
+                    m.return(service);
+                });
             }
         }
     }
     
-    def generateReceptionCallback(MeshProcessor elt, ServiceFamily family) {
+    def generateReceptionCallback(MeshProcessor elt, ServiceFamily family, JavaCodeClass c) {
         if (isDefined(family.selector) and family.selector <> null) {
-            generateServiceSwitch(elt, family, family.selector);            
+            generateServiceSwitch(elt, family, family.selector, c);
         }
     }
 
-    def generateServiceSwitch(MeshProcessor elt, ServiceFamily family, FamilyMemberSelector selector) {
-        ''
+    def generateServiceSwitch(MeshProcessor elt, ServiceFamily family, FamilyMemberSelector selector, JavaCodeClass c) {
     }           
 
-    def generateServiceSwitch(MeshProcessor elt, ServiceFamily family, ServiceSelectorBasedFamilyMemberSelector selector) {
+    def generateServiceSwitch(MeshProcessor elt, ServiceFamily family, ServiceSelectorBasedFamilyMemberSelector selector, JavaCodeClass c) {
         String fType = toTypeName(selector.type);
         String fInterface = familyInterfaceName(getClsName(elt));
         
-        '/**
-        * Selects the new service from the given {@code data} via the {@link #selector}.
-        * 
-        * @param data the data to select from
-        * @return {@link #service} for call chains
-        */
-        private ${fInterface} selectService(${fType} data) {
-            String id = selector.select(data);
-            if (null != id && !actServiceId.equals(id)) {
-                Transport.sendTraceRecord(new TraceRecord("${family.id}", TraceRecord.ACTION_SWITCHING_SERVICE, actServiceId));
-                ${fInterface} newService; // instantiation shall override AAS service mapping
-                switch (id) {
-                ${generateServiceSelection(fInterface, family, "newService")}                    
-                default:
-                    newService = null;
-                    break;
-                }
-                if (newService != null) {
-                    ${fInterface} oldService = service;
-                    service = selector.createStrategy().doSwitch(service, newService);
-                    if (oldService != service) {
-                        service.initService(); // connect outputs
-                        actServiceId = service.getId();
-                        oldService.detach();
+        c.method(fInterface, "selectService", "Selects the new service from the given {@code data} via the {@link #selector}.").(m|{
+            m.setPrivate().param(fType, "data", "the data to select from");
+            m.var("String", "id", "selector.select(data)");
+            m.if("null != id && !actServiceId.equals(id)").(a1|{
+                a1.call("de.iip_ecosphere.platform.transport.Transport.sendTraceRecord", JavaCodeImportScope.CLASS).newArg("de.iip_ecosphere.platform.transport.status.TraceRecord").stringArg(family.id).arg("TraceRecord.ACTION_SWITCHING_SERVICE").arg("actServiceId");
+                a1.var(fInterface, "newService"); // instantiation shall override AAS service mapping
+                a1.switch("id").(s|{
+                    for (Service m: family.members.toSequence()->sortedBy(s|s.id)) {
+                        s.stringCase(m.id, false, true).assign("newService").addNew(familyMemberName(asTypeName(m.name), fInterface)).arg("streamBridge").arg("metrics");
                     }
-                }
-                selector.actionCompleted(actServiceId);
-                Transport.sendTraceRecord(new TraceRecord("${family.id}", TraceRecord.ACTION_SWITCHED_SERVICE, actServiceId));
-            }
-            return service;
-        }'
-    }           
-    
-    def generateServiceSelection(String fInterface, ServiceFamily family, String newServiceVar) {
-        for (Service m: family.members.toSequence()->sortedBy(s|s.id)) {
-            'case "${m.id}": 
-                ${newServiceVar} = new ${familyMemberName(asTypeName(m.name), fInterface)}(streamBridge, metrics);
-                break;'
-        }
-    }
-    
-    def generateServiceBase(String implements) {
-        if (implements <> "") {
-            '@Override
-            public void setState(ServiceState state) throws ExecutionException {
-                service.setState(state);
-            }'
-
-            '@Override
-            public ServiceState getState() {
-                return service.getState();
-            }'
-
-            '@Override
-            public String getId() {
-                return service.getId();
-            }'
-
-        }
+                    s.dflt(false, true).assign("newService", "null");
+                });
+                a1.if("newService != null").(a2|{
+                    a2.var(fInterface, "oldService", "service");
+                    a2.assign("service", "selector.createStrategy().doSwitch(service, newService)");
+                    a2.if("oldService != service").(a3|{
+                        a3.call("service.initService"); // // connect outputs
+                        a3.assign("actServiceId", "service.getId()");
+                        a3.call("oldService.detach");
+                    });
+                });
+                a1.call("selector.actionCompleted").arg("actServiceId");
+                a1.call("de.iip_ecosphere.platform.transport.Transport.sendTraceRecord", JavaCodeImportScope.CLASS).newArg("de.iip_ecosphere.platform.transport.status.TraceRecord").stringArg(family.id).arg("TraceRecord.ACTION_SWITCHED_SERVICE").arg("actServiceId");
+            });
+            m.return("service", "{@link #service} for call chains");
+        });
     }
         
     // -------------------- Python --------------------------
 
-    def initialService(MeshElement elt, PythonService service, setOf(String) serviceVars) {
-        '${generateAbstractServiceCreateInstance(elt, service, "service", getServiceType(elt, service))}\n'
+    def initialService(MeshElement elt, PythonService service, setOf(String) serviceVars, JavaCodeMethod m) {
+        generateAbstractServiceCreateInstance(elt, service, "service", getServiceType(elt, service), m);
         // no mapServices here as Python may take long and block the constructor -> initIngestors
         serviceVars.add("service");
         for (IOType in: service.input) {
             String type = toTypeName(in);
-            'service.registerInputTypeTranslator(${type}.class, "${type}", new ${type}InputTranslator());\n'
+            m.call("service.registerInputTypeTranslator").classArg(type).stringArg(type).newArg(type + "InputTranslator");
         }
         for (IOType out: service.output) {
             String type = toTypeName(out);
-            'service.registerOutputTypeTranslator(${type}.class, "${type}", new ${type}OutputTranslator());\n'
+            m.call("service.registerOutputTypeTranslator").classArg(type).stringArg(type).newArg(type + "OutputTranslator");
         }
         Parameters params = service.parameter;
         if (size(params) > 0) {
-            'service.addParameterConfigurer(c -> {
-                ${produceParametersReg(params, new JavaCodeBlock())}
-            });
-        
-            HashMap<String, String> paramValues = new HashMap<>();
-            ParameterConfigurer<?> cfg;'
+            produceParameterConfigurerCall(params, m);
+            m.var("java.util.HashMap<String, String>", "paramValues", "new HashMap<>()");
+            m.var("de.iip_ecosphere.platform.services.environment.ParameterConfigurer<?>", "cfg");
             for (Parameter p: params) {
                 // TODO compile time?
-                'cfg = service.getParameterConfigurer("${p.name}");
-                if (null != cfg) {
-                    ${generateParameterInit(p)}
-                }'
+                m.assign("cfg", new JavaCodeMethodCall("service.getParameterConfigurer").stringArg(p.name));
+                generateParameterInit(p, m.if("null != cfg"));
             }
-            'try {
-                service.reconfigure(paramValues);
-            } catch (ExecutionException e) {
-                LoggerFactory.getLogger(getClass()).error("Configuring initial parameter: " + e.getMessage());
-            }'
+            m.try().(t|{
+                t.call("service.reconfigure").arg("paramValues");
+                codeCatchExecutionExceptionLogError(t, "Configuring initial parameter: {}");
+            });
         }
-        
-        '${initAppInstId("service")}'
-    }
-    
-    def generateImports(PythonService service) {
-        'import com.fasterxml.jackson.databind.ObjectMapper;
-        import com.fasterxml.jackson.core.JsonProcessingException;'
+        initAppInstId("service", m);
     }
     
     def getServiceType(MeshElement elt, PythonService service) {
         if (service.integrationMode == PythonIntegrationMode::websocket_continuous) {
-            "de.iip_ecosphere.platform.services.environment.PythonWsProcessService"
+            "de.iip_ecosphere.platform.services.environment.PythonWsProcessService";
         } else if (service.integrationMode == PythonIntegrationMode::console_continuous) {
-            "de.iip_ecosphere.platform.services.environment.PythonAsyncProcessService"
+            "de.iip_ecosphere.platform.services.environment.PythonAsyncProcessService";
         } else {
-            "de.iip_ecosphere.platform.services.environment.PythonSyncProcessService"
+            "de.iip_ecosphere.platform.services.environment.PythonSyncProcessService";
         }
     }
     
     def genTimeRecording(PythonService base, String timerVar, String expr) {
-        "MetricsProvider.recordNsTime(${timerVar}, () -> service.getAvgResponseTime(), () -> ${expr})"
+        "MetricsProvider.recordNsTime(${timerVar}, () -> service.getAvgResponseTime(), () -> ${expr})";
+    }
+            
+    def genIngestor(PythonService service, String methodSuffix, String conn, String type, String dir, ServiceBase target, String connPlaceHolder, JavaCodeBlockInterface block) {
+        JavaCodeExpression expr = generateTransportSend(service, type, springConnId(service, conn, target, app), connPlaceHolder);
+        block.call("service.attachIngestor").classArg(type).stringArg(type).lambdaArg("data").asExpr(genSentProbe(service, expr, false, type, "data"));
+    }
+
+    def generateAsyncProcessorBody(MeshElement proc, PythonService service, String methodSuffix, String methodSuffixWithServiceId, String type, JavaCodeMethod m) {
+        String expr = 'service.processQuiet("${toSimpleName(type)}", data)';
+        m.return(new JavaCodeLambdaExpression("data").asExpr(genRcvProbe(service, expr, type, "data")));
+    }
+    
+    def generateSyncProcessorBody(MeshProcessor proc, PythonService service, String methodSuffix, String methodSuffixWithServiceId, String inType, String outType, JavaCodeMethod m) {
+        String expr = 'service.processSyncQuiet("${toSimpleName(inType)}", data, "${toSimpleName(outType)}")';
+        m.return(new JavaCodeLambdaExpression("data").asExpr(genSentProbe(service, expr, true, inType, "data")));
+    }
+
+    def generateReceptionCallback(MeshProcessor elt, PythonService service, JavaCodeClass c) {
+        generateTypeTranslators(elt, service, "_" + toIdentifier(service.id), c);
     }
         
-    def genIngestor(PythonService service, String methodSuffix, String conn, String type, String dir, ServiceBase target, String connPlaceHolder) {
-        String expr = generateTransportSend(service, type, springConnId(service, conn, target, app), connPlaceHolder);
-        'service.attachIngestor(${type}.class, "${type}", data -> ${genSentProbe(service, expr, false, type, "data")});'
-    }
-
-    def generateAsyncProcessorBody(MeshElement proc, PythonService service, String methodSuffix, String methodSuffixWithServiceId, String type) {
-        String expr = 'service.processQuiet("${type}", data)';
-        'return data -> ${genRcvProbe(service, expr, type, "data")};'
-    }
-    
-    def generateSyncProcessorBody(MeshProcessor proc, PythonService service, String methodSuffix, String methodSuffixWithServiceId, String inType, String outType) {
-        String expr = 'service.processSyncQuiet("${inType}", data, "${outType}")';
-        'return data -> ${genSentProbe(service, expr, true, inType, "data")};'
-    }
-
-    def generateReceptionCallback(MeshProcessor elt, PythonService service) {
-        String serviceId = "_" + toIdentifier(service.id);
-        '${generateTypeTranslators(elt, service, serviceId)}'
-    }
-    
-    def genClassAnnotations(MeshElement elt) {
-        String serviceId = elt.impl.id.toIdentifier();
-        '@Component
-        @ConditionalOnProperty(value="iip.service.${serviceId}", havingValue="true", matchIfMissing=true)
-        @EnableScheduling'
-    }
-    
-    def genConstructorDoc(String familyInterface) {
-        if (familyInterface <> "") {
-            '/**
-            * Creates an instance.
-            *
-            * @param streamBridge the stream bridge
-            * @param metrics the metrics provider
-            */'
-         } else {
-            '/**
-            * Creates an instance.
-            */'
-         }
-    }
-    
     def String getTypeAdd() {
         String typeAdd;
         IIPEcosphere cfg = config;
@@ -1173,119 +996,80 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, FileArtifact
     
     // --------------------- main ---------------------------
 
-    def gen(Configuration config, FileArtifact target, MeshElement elt, String pkg, Application app, 
+    def gen(Configuration config, JavaCodeArtifact target, MeshElement elt, String pkg, Application app, 
         Boolean sharedInterfaces, String familyInterface, ServiceBase familyMember, setOf(MeshElement) nodes) {
         String implements = "";
         ServiceBase impl = elt.impl;
         String serviceId = impl.id.toIdentifier();
         String mainClsName = getClsName(elt);
-        String constructorParams = "";
-        String constructorInit = "";
         if (familyInterface <> "") {
-            implements = " implements ${familyInterface}";
+            implements = familyInterface;
             impl = familyMember;
             mainClsName = familyMemberName(asTypeName(familyMember.name), familyInterface);
-            constructorParams = "StreamBridge streamBridge, MetricsProvider metrics";
-            constructorInit = "this.streamBridge = streamBridge;\nthis.metrics = metrics;";
         }
-        'package ${pkg};
         
-        import java.io.*;
-        import java.util.*;
-        import java.util.function.*;
-        import java.util.concurrent.*;
-        import javax.annotation.PostConstruct;
-        import org.slf4j.LoggerFactory;
-        import org.springframework.beans.factory.annotation.*;
-        import org.springframework.context.annotation.Bean;
-        import org.springframework.cloud.stream.function.StreamBridge;
-        import org.springframework.stereotype.Component;
-        import org.springframework.context.annotation.ComponentScan;
-        import org.springframework.context.annotation.Import;
-        import org.springframework.scheduling.annotation.EnableScheduling;
-        import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-        import io.micrometer.core.instrument.*;
-        import static de.iip_ecosphere.platform.connectors.model.ModelAccessProvider.optional;
-        import de.iip_ecosphere.platform.support.*;
-        import de.iip_ecosphere.platform.support.identities.*;
-        import de.iip_ecosphere.platform.support.resources.*;
-        import de.iip_ecosphere.platform.support.iip_aas.*;
-        import de.iip_ecosphere.platform.support.json.JsonUtils;
-        import de.iip_ecosphere.platform.support.net.*;
-        import de.iip_ecosphere.platform.transport.Transport;
-        import de.iip_ecosphere.platform.transport.status.TraceRecord;
-        import de.iip_ecosphere.platform.transport.serialization.*;
-        import de.iip_ecosphere.platform.transport.connectors.*;
-        import de.iip_ecosphere.platform.transport.spring.SerializerMessageConverter;
-        import de.iip_ecosphere.platform.services.environment.switching.ServiceSelector;
-        import de.iip_ecosphere.platform.services.environment.*;
-        import de.iip_ecosphere.platform.services.environment.switching.*;
-        import de.iip_ecosphere.platform.services.environment.metricsProvider.MonitoredTranslatingProtocolAdapter;
-        import de.iip_ecosphere.platform.services.environment.spring.Starter;
-        import de.iip_ecosphere.platform.services.environment.spring.SpringAsyncServiceBase;
-        import de.iip_ecosphere.platform.services.environment.spring.metricsProvider.MetricsProvider;
-        import de.iip_ecosphere.platform.connectors.Connector;
-        import de.iip_ecosphere.platform.connectors.ConnectorFactory;
-        import de.iip_ecosphere.platform.connectors.ConnectorParameter;
-        import de.iip_ecosphere.platform.connectors.ConnectorParameter.CacheMode;
-        import de.iip_ecosphere.platform.connectors.types.*;
-        import de.iip_ecosphere.platform.connectors.model.*;
-        import iip.datatypes.*;
-        import iip.serializers.*;
-        ${generateImports(impl)|e}
-
-        /**
-         * Spring Cloud Stream service frame for net node \'${elt.name}\'.
-         *
-         * @author EASy-Producer.
-         */
-        ${genClassAnnotations(elt)|e}
-        public class ${mainClsName} extends SpringAsyncServiceBase${implements} {
+        mainCls = codeCreateClass(target, pkg, mainClsName, "Spring Cloud Stream service frame for net node '${elt.name}'");
+        mainCls.annotate("org.springframework.stereotype.Component");
+        mainCls.annotate("org.springframework.boot.autoconfigure.condition.ConditionalOnProperty")
+            .stringArg("value", "iip.service." + serviceId).stringArg("havingValue", "true").arg("matchIfMissing", true);
+        mainCls.annotate("org.springframework.scheduling.annotation.EnableScheduling");
+        mainCls.extends("de.iip_ecosphere.platform.services.environment.spring.SpringAsyncServiceBase");
+        mainCls.implements(implements); // only if <> ""
         
-            @Value("\\${iip.service.${serviceId}:true}")
-            private String activated;
-            @Autowired
-            private StreamBridge streamBridge;
-            ${generateServiceAttribute(elt, impl)}
-            // so far plain delegation, preparation but so far no support for service switching
-            @Autowired
-            private MetricsProvider metrics;
-            private Counter serviceSent;
-            private Counter serviceReceived;
-            private io.micrometer.core.instrument.Timer processingTime;
-            private String appInstId = "";
-            ${generateInputEventHandlers(elt, impl, mainClsName)|e}
-
-            ${generateReceptionCallback(elt, impl)|e}
+        mainCls.attribute("String", "activated").annotate("org.springframework.beans.factory.annotation.Value").stringArg("\\${iip.service.${serviceId}:true}");
+        mainCls.attribute("org.springframework.cloud.stream.function.StreamBridge", "streamBridge").annotate("org.springframework.beans.factory.annotation.Autowired");
+        generateServiceAttribute(elt, impl, mainCls);
+        mainCls.attribute("de.iip_ecosphere.platform.services.environment.spring.metricsProvider.MetricsProvider", "metrics").annotate("org.springframework.beans.factory.annotation.Autowired");
+        mainCls.attribute("io.micrometer.core.instrument.Counter", "serviceSent");
+        mainCls.attribute("io.micrometer.core.instrument.Counter", "serviceReceived");
+        mainCls.attribute("io.micrometer.core.instrument.Timer", "processingTime");
+        mainCls.attribute("String", "appInstId").stringInitializer("");
+        generateInputEventHandlers(elt, impl, mainClsName, mainCls);
+        generateReceptionCallback(elt, impl, mainCls);
         
-             ${genConstructorDoc(familyInterface)}
-            public ${mainClsName}(${constructorParams}) {
-                ${constructorInit|e}
-                ${initialService(elt, impl, serviceVars)}
+        mainCls.constructor("Creates an instance.").(m|{
+            if (familyInterface <> "") {
+               m.param("org.springframework.cloud.stream.function.StreamBridge", "streamBridge", "the stream bridge");
+               m.param("de.iip_ecosphere.platform.services.environment.spring.metricsProvider.MetricsProvider", "metrics", "the metrics provider");
+               m.assign("this.streamBridge", "streamBridge");
+               m.assign("this.metrics", "metrics");
             }
+            initialService(elt, impl, serviceVars, m);
+        });
         
-            ${generatedServiceInitMethod(elt, impl)|e}
-            ${generateDataMethods(elt, true)}
-            ${generateConnectorParameter(elt, app)}
-
-            /**
-             * Initializes the service when feasible in Spring lifecycle.
-             */
-            ${nodeAnnotation("@PostConstruct")|e}
-            public void initService() {
-                if (null == activated || "".equals(activated) || "true".equals(activated)) {
-                    LoggerFactory.getLogger(getClass()).info("Initializing service ${serviceId}: {}", activated);
-                    ${registerService(elt, impl)}
-                    ${initIngestors(elt, impl)}
-                    ${attachIngestors(elt, impl)}
-                }
-            }
-            ${generateAdapterTranslators(elt)}
-            ${generateReceptionCallback(elt, app)}
-            ${generateEventHandlers(elt, impl)|e}
-            ${generateServiceBase(implements)|e}
-            ${generateClassRest(elt, impl)|e}
-        }'
+        generatedServiceInitMethod(elt, impl, mainCls);
+        generateDataMethods(elt, true);
+        generateConnectorParameter(elt, app, mainCls);
+        
+        nodeAnnotation(mainCls.method("", "initService", "Initializes the service when feasible in Spring lifecycle."), "javax.annotation.PostConstruct").(m|{
+            m.if('null == activated || "".equals(activated) || "true".equals(activated)').(a|{
+                addLoggerCall(a, "info", "Initializing service ${serviceId}: {}").arg("activated");
+                registerService(elt, impl, a);
+                initIngestors(elt, impl, a);
+                attachIngestors(elt, impl, a);
+            });
+        });
+        
+        generateAdapterTranslators(elt, mainCls);
+        generateReceptionCallback(elt, app, mainCls);
+        generateEventHandlers(elt, impl, mainCls);
+        if (implements <> "") {
+            mainCls.method("", "setState").(m|{
+                m.param("de.iip_ecosphere.platform.services.environment.ServiceState", "state");
+                m.throws("java.util.concurrent.ExecutionException");
+                m.override();
+                m.call("service.setState").arg("state");
+            });
+            mainCls.method("de.iip_ecosphere.platform.services.environment.ServiceState", "getState").(m|{
+                m.override();
+                m.return("service.getState()");
+            });
+            mainCls.method("String", "getId").(m|{
+                m.override();
+                m.return("service.getId()");
+            });
+        }
+        generateClassRest(elt, impl, mainCls);
     }
     
 }

@@ -6,67 +6,45 @@ import ServiceBasics;
 @indent(indentation = 4, additional = 0)
 template JavaServiceInterfaceBase(Configuration config, FileArtifact target, ServiceBase service, String pkg) extends ServiceBasics {
 
-    // something in the auto-formatting goes crazy here. Resorting to individual VIL context expressions :/
-    
+    JavaCodeClass mainCls;
+
     // called via produceForInputTypes/produceForOutputTypes
     def produceAsyncProcessorBody(IOType type) {
         String t = toTypeName(type);
-        '/**'
-        ' * Processes a data item of type "${t}" asynchronously. Use the respective ingestor for the return'
-        ' * type to pass back the result of processing.'
-        ' *'
-        ' * @param data the data item to be processed'
-        ' */'
-        'public void process${t.firstToUpperCase()}(${t} data);'
+        mainCls.addMethod("", "process" + t.firstToUpperCase(), 'Processes a data item of type "${t}" asynchronously. Use the respective ingestor for the return type to pass back the result of processing.')
+            .addParameter(toQualifiedTypeName(t), "data", "the data item to be processed");
     }
     
     // called via produceForInputTypes/produceForOutputTypes
     def produceSyncProcessorBody(IOType returnType, IOType dataType) {
-        String r = toTypeName(returnType);
         String t = toTypeName(dataType);
-        '/**'
-        ' * Processes/transforms a data item of type "${t}" synchronously.'
-        ' *'
-        ' * @param data the data item to be processed'
-        ' * @return the result of processing (must not be <b>null</b>)'
-        ' */'
-        'public ${r} transform${t.firstToUpperCase()}(${t} data);'
+        mainCls.addMethod(toQualifiedTypeName(returnType), "transform" + t.firstToUpperCase(), 'Processes/transforms a data item of type "${t}" synchronously.', 'the result of processing (must not be <b>null</b>)')
+            .addParameter(toQualifiedTypeName(dataType), "data", "the data item to be processed");
     }
     
     // called via produceForInputTypes/produceForOutputTypes
     def produceIngestorBody(IOType type) {
         String t = toTypeName(type);
-        '/**'
-        ' * Attaches a return value ingestor for asynchronous processing.'
-        ' *'
-        ' * @param ingestor the ingestor instance'
-        ' */'
-        'public void attach${t.firstToUpperCase()}Ingestor(DataIngestor<${t}> ingestor);'
+        mainCls.addMethod("", "attach" + t.firstToUpperCase() + "Ingestor", 'Attaches a return value ingestor for asynchronous processing.')
+            .addParameter("de.iip_ecosphere.platform.services.environment.DataIngestor<${toQualifiedTypeName(type)}>", "ingestor", "the ingestor instance");
     }
     
     // called via produceForInputTypes/produceForOutputTypes
     def produceProducerBody(IOType type) {
         String t = toTypeName(type);
-        '/**'
-        ' * Synchronous source method, called to produce data items of type "${t}".'
-        ' *'
-        ' * @return the data value to be ingested'
-        ' */'
-        'public ${t} produce${t.firstToUpperCase()}();'
+        mainCls.addMethod(toQualifiedTypeName(type), "produce" + t.firstToUpperCase(), 'Synchronous source method, called to produce data items of type "${t}".', 'the data value to be ingested');
     }
     
     def memberIdConsts(ServiceBase service) {
-        ''
     }
 
     def memberIdConsts(ServiceFamily family) {
         for (Service s: family.members) {
-            'public static final String MEMBER_${asIdentifier(s.id).toUpperCase()} = "${s.id}";'
+            mainCls.addAttribute("String", "MEMBER_" + asIdentifier(s.id).toUpperCase()).addStringInitializer(s.id).setPublicStaticFinal();
         }
     }
     
     def producerInterfaceRest(ServiceBase service) {
-        ''
     }
     
 }
