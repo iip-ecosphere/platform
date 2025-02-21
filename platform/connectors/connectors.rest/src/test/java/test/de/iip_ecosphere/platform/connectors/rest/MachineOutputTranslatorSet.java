@@ -61,7 +61,7 @@ public class MachineOutputTranslatorSet<S> extends AbstractConnectorOutputTypeTr
         
         if (keys.size() == 1) {
             String key = keys.iterator().next();
-            TestServerResponseSet response = (TestServerResponseSet) access.get(key.toLowerCase());
+            TestServerResponseSetRestType response = (TestServerResponseSetRestType) access.get(key.toLowerCase());
             TestServerResponseSetItem[] items = response.getItems();
             
             for (TestServerResponseSetItem item : items) {

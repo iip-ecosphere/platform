@@ -2,7 +2,7 @@ package de.iip_ecosphere.platform.examples.rest;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class TestServerResponseInformation {
+public class TestServerResponseInformationRestType {
 
     @JsonProperty("context")
     private String context;
@@ -19,7 +19,7 @@ public class TestServerResponseInformation {
     /**
      * Constructor.
      */
-    public TestServerResponseInformation() {
+    public TestServerResponseInformationRestType() {
         
     }
     

@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import de.iip_ecosphere.platform.examples.rest.TestServerResponseInformation;
+import de.iip_ecosphere.platform.examples.rest.TestServerResponseInformationRestType;
 import de.iip_ecosphere.platform.examples.rest.TestServerResponseInformationInfoItem;
 import de.iip_ecosphere.platform.examples.rest.TestServerResponseInformationRootItem;
 
@@ -16,13 +16,13 @@ import de.iip_ecosphere.platform.examples.rest.TestServerResponseInformationRoot
 @RequestMapping("TestServerEEM/api/information")
 public class TestServerControllerEEMInformation {
 
-    private TestServerResponseInformation information;
+    private TestServerResponseInformationRestType information;
     
     /**
      * Constructor.
      */
     public TestServerControllerEEMInformation() {
-        information = new TestServerResponseInformation();
+        information = new TestServerResponseInformationRestType();
         information.setContext("/api/v1/information");
         information.setTimestamp(getCurrentTimestamp());
         
@@ -107,7 +107,7 @@ public class TestServerControllerEEMInformation {
      * @return information
      */
     @GetMapping()
-    public TestServerResponseInformation getInformation() {
+    public TestServerResponseInformationRestType getInformation() {
         
         return information;
     }

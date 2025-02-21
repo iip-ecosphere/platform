@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class TestServerResponsSingle {
+public class TestServerResponsSingleRestType {
 
     @JsonProperty("context")
     private String context;
@@ -30,7 +30,7 @@ public class TestServerResponsSingle {
     /**
      * Constructor.
      */
-    public TestServerResponsSingle() {
+    public TestServerResponsSingleRestType() {
     }
     
     /**

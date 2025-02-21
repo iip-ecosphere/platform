@@ -418,7 +418,7 @@ public class RESTConnectorTest {
         ConnectorParameterBuilder testParameter = ConnectorParameterBuilder.newBuilder(endpoint);
         testParameter.setApplicationInformation("App_Id", "App_Description");
         testParameter.setEndpointPath(endpoint.toUri());
-        testParameter.setSpecificSetting("Endpoints", endpoints);
+        testParameter.setSpecificSetting("SERVER_STRUCTURE", endpoints);
 
         return testParameter.build();
     }

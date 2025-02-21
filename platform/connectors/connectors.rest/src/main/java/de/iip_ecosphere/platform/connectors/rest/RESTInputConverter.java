@@ -1,5 +1,7 @@
 package de.iip_ecosphere.platform.connectors.rest;
 
+import java.io.IOException;
+
 import de.iip_ecosphere.platform.connectors.model.ModelInputConverter;
 
 /**
@@ -14,5 +16,15 @@ public class RESTInputConverter extends ModelInputConverter {
      */
     public RESTInputConverter() {
         
+    }
+    
+    @Override
+    public Object toObject(Object data) throws IOException {
+        
+        if (data instanceof Convertable) {
+            data = ((Convertable) data).fromREST(data);
+        }
+        System.out.println(data);
+        return data;
     }
 }

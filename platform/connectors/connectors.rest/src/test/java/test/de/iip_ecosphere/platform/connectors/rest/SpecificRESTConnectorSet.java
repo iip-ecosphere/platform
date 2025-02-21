@@ -20,6 +20,6 @@ public class SpecificRESTConnectorSet extends RESTConnector<MachineOutputSet, Ma
     @Override
     protected Class<?> [] getResponseClasses() {
 
-        return new Class[]{TestServerResponseSet.class};
+        return new Class[]{TestServerResponseSetRestType.class};
     }
 }
