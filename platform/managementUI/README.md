@@ -5,7 +5,7 @@
 - install node.js and node package manager (npm)
 - install Angular CLI
 
-Currently, we build the UI with node.js version 16.10.0, npm version 7.24.0 (or 9.5.1) and Angular 14.2.10. More recent versions may not be compatible. Please see also (Angular version compatibility matrix)[https://angular.io/guide/versions].
+Node.js, npm and angular versions, see [platform prerequisites](../documentation/PREREQUISITES.md). Please see also (Angular version compatibility matrix)[https://angular.io/guide/versions].
 
 ## Running Management UI from Code
 
