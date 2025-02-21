@@ -41,9 +41,11 @@ template JavaConnectorRestType(Configuration config, JavaCodeArtifact target, Re
         mainCls.method("Object", "fromREST").(m|{
             m.override();
             m.param("Object", "data");
-            m.var("Object", "result", "null");
+            m.var("Object", "result", "data");
             m.if("data instanceof " + clsName).(i|{
                 i.assign("result", "fromRESTImpl((${clsName}) data)");
+            }).elseIf("data instanceof " + clsName + "[]").(e|{
+                e.assign("result", "fromRESTImpl((${clsName}[]) data)");
             });
             m.return("result");
         });
@@ -55,16 +57,42 @@ template JavaConnectorRestType(Configuration config, JavaCodeArtifact target, Re
             m.return("result", "the converted instance");
         });
 
+        mainCls.method(qTypeName+ "[]", "fromRESTImpl", "Implements the conversion from the corresponding REST type array.").setStatic().(m|{
+            m.param(clsName + "[]", "orig", "the original value");
+            m.var(qTypeName + "[]", "result", "null");
+            m.if("orig != null").(i|{
+                i.assign("result", "new " + typeName + "[orig.length]");//.newArrayArg(typeName).dimension("orig.length");
+                i.addForLoop("int", "i", "0", "i < orig.length", "i++").(l|{
+                    l.addAssign("result[i]", "").addCall("fromRESTImpl").arg("orig[i]");
+                });
+            });
+            m.return("result", "the converted instance");
+        });
+
         mainCls.method("Object", "toREST").(m|{
             m.override();
             m.param("Object", "data");
-            m.var("Object", "result", "null");
+            m.var("Object", "result", "data");
             m.if("data instanceof " + typeName).(i|{
                 i.assign("result", "toRESTImpl((${typeName}) data)");
+            }).elseIf("data instanceof " + typeName + "[]").(e|{
+                e.assign("result", "toRESTImpl((${typeName}[]) data)");
             });
             m.return("result");
         });
 
+        mainCls.method(clsName + "[]", "toRESTImpl", "Implements the conversion from the transport type to REST").setStatic().(m|{
+            m.param(typeName + "[]", "orig", "the original value");
+            m.var(clsName + "[]", "result", "null");
+            m.if("orig != null").(i|{
+                i.assign("result", "new " + clsName + "[orig.length]");//.newArrayArg(clsName).dimension("orig.length");
+                i.addForLoop("int", "i", "0", "i < orig.length", "i++").(l|{
+                    l.addAssign("result[i]", "").addCall("toRESTImpl").arg("orig[i]");
+                });
+            });
+            m.return("result", "the converted instance");
+        });
+        
         mainCls.method(clsName, "toRESTImpl", "Implements the conversion from the transport type to REST").setStatic().(m|{
             m.param(typeName, "orig", "the original value");
             m.var(clsName, "result").addNew(clsName);
@@ -87,21 +115,8 @@ template JavaConnectorRestType(Configuration config, JavaCodeArtifact target, Re
 
     @DispatchCase
     def genAssign(Field f, ArrayType type, String method, String host, JavaCodeBlockInterface b) {
-        String origVal = "orig.get" + asMethodNameSuffix(f.name) + "()";
-        String dim = origVal + ".length";
-        String typeName = toQualifiedTypeName(type.type);
-        String rtTypeName = "iip.nodes." + toTypeName(type.type) + "RestType";
-        if (method.startsWith("to")) {
-            typeName = rtTypeName;
-        }
-        b.if(origVal + " != null").(i|{
-            i.call("result.set" + asMethodNameSuffix(f.name)).newArrayArg(typeName).dimension(dim);
-            String tmpRead = "result.get" + asMethodNameSuffix(f.name) + "()[i]";
-            String origRead = ".get" + asMethodNameSuffix(f.name) + "()[i]";
-            i.addForLoop("int", "i", "0", "i < " + dim, "i++").(l|{
-                l.addAssign(tmpRead, "").addCall(method).qualifiedByType(rtTypeName).arg("orig" + origRead);
-            });
-        });
+        String origRead = ".get" + asMethodNameSuffix(f.name) + "()";
+        b.call("result.set" + asMethodNameSuffix(f.name)).addCallArgument(method).qualifiedByType(toTypeName(type.type)+"RestType").arg("orig" + origRead);
     } 
     
     def String mapTypeName(Field f) {
