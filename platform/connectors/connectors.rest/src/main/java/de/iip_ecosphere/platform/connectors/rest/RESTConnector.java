@@ -1,20 +1,10 @@
 package de.iip_ecosphere.platform.connectors.rest;
 
 import java.io.IOException;
-import java.security.KeyManagementException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
+import java.lang.reflect.Field;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManagerFactory;
-
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
@@ -22,7 +12,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
 import de.iip_ecosphere.platform.connectors.AbstractConnector;
@@ -33,9 +22,6 @@ import de.iip_ecosphere.platform.connectors.MachineConnector;
 import de.iip_ecosphere.platform.connectors.model.AbstractModelAccess;
 import de.iip_ecosphere.platform.connectors.model.ModelAccess;
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
-import de.iip_ecosphere.platform.support.Schema;
-import de.iip_ecosphere.platform.support.identities.IdentityStore;
-import de.iip_ecosphere.platform.support.identities.IdentityToken;
 import de.iip_ecosphere.platform.support.json.JsonUtils;
 
 /**
@@ -123,11 +109,11 @@ public abstract class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, 
 
         for (String key : keys) {
 
-            if (key.equals("Endpoints")) {
+            if (key.equals("SERVER_STRUCTURE")) {
 
                 Object endpoints = params.getSpecificSetting(key);
                 map = JsonUtils.fromJson(endpoints, RESTEndpointMap.class);
-                
+
                 for (RESTEndpointMap.Entry<String, RESTEndpoint> entry : map.entrySet()) {
                     lowerCaseMap.put(entry.getKey().toLowerCase(), entry.getValue());
                 }
@@ -160,8 +146,6 @@ public abstract class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, 
     protected RESTItem read() throws IOException {
         String path = params.getEndpointPath();
 
-        Schema schema = params.getSchema();
-
         RESTEndpointMap endpointMap = item.getEndpointMap();
 
         for (Entry<String, RESTEndpoint> entry : endpointMap.entrySet()) {
@@ -171,21 +155,8 @@ public abstract class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, 
             String uri = path + endpoint;
 
             String responseType = null;
-
-            if (entry.getValue().getSetType() != null) {
-                responseType = entry.getValue().getSetType();
-            } else {
-                responseType = entry.getValue().getType();
-
-                // NUr zu testen muss wieder raus
-                if (responseType.equals("TestServerResponseInformationRootItem")) {
-                    responseType = "TestServerResponseInformation";
-                } else if (responseType.equals("TestServerResponseInformationInfoItem")) {
-                    responseType = "TestServerResponseInformation";
-                } else if (responseType.equals("TestServerResponseMeasurementSetItem")) {
-                    responseType = "TestServerResponseMeasurementSet";
-                }
-            }
+            responseType = entry.getValue().getType();
+            responseType += "RestType";
 
             Class<?>[] responseClasses = getResponseClasses();
             Class<?> responseClass = null;
@@ -204,18 +175,9 @@ public abstract class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
 
-            if (schema == Schema.HTTPS) {
-
-                entity = getHttpsEntity(headers, restTemplate);
-                responseEntity = restTemplate.exchange(uri, HttpMethod.GET, entity, responseClass);
-
-            } else if (schema == Schema.HTTP) {
-                restTemplate = new RestTemplate();
-                entity = new HttpEntity<>(headers);
-                responseEntity = restTemplate.exchange(uri, HttpMethod.GET, entity, responseClass);
-            } else {
-                LOGGER.info("unknown schema for REST: use HTTP or HTTPS");
-            }
+            restTemplate = new RestTemplate();
+            entity = new HttpEntity<>(headers);
+            responseEntity = restTemplate.exchange(uri, HttpMethod.GET, entity, responseClass);
 
             if (responseEntity != null) {
 
@@ -229,55 +191,6 @@ public abstract class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, 
         }
 
         return item;
-    }
-
-    /**
-     * Creats SSL encription for HTTPS.
-     * 
-     * @param headers
-     * @param restTemplate
-     * @return
-     */
-    private HttpEntity<String> getHttpsEntity(HttpHeaders headers, RestTemplate restTemplate) {
-
-        KeyStore keystore;
-        try {
-            keystore = IdentityStore.getInstance().getKeystoreFile(params.getKeystoreKey());
-            IdentityToken token = params.getIdentityToken(params.getEndpointPath());
-            KeyManagerFactory keyManager = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-
-
-            keyManager.init(keystore, params.getKeystoreKey().toCharArray());
-            TrustManagerFactory trustManager = 
-                    TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-            trustManager.init(keystore);
-            SSLContext sslContext = SSLContext.getInstance("SSL");
-            sslContext.init(keyManager.getKeyManagers(), trustManager.getTrustManagers(), null);
-            CloseableHttpClient httpClient = HttpClients.custom().setSSLContext(sslContext).build();
-            HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory(httpClient);
-            restTemplate = new RestTemplate(factory);
-
-            headers.set("Authorization", token.getTokenDataAsString());
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (UnrecoverableKeyException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (KeyStoreException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (KeyManagementException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
-        HttpEntity<String> entity = new HttpEntity<>(headers);
-
-        return entity;
     }
 
     @Override
@@ -337,6 +250,7 @@ public abstract class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, 
 
         private RESTInputConverter inputConverter = new RESTInputConverter();
         private RESTOutputConverter outputConverter = new RESTOutputConverter();
+        private Object objectToAccess = null;
 
         /**
          * Creates an instance.
@@ -344,11 +258,36 @@ public abstract class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, 
         public RESTModelAccess() {
             super(RESTConnector.this);
         }
+        
+        /**
+         * Creates an instance.
+         * 
+         * @param objectToAccess for RESTModelAccess
+         */
+        public RESTModelAccess(Object objectToAccess) {
+            this();
+            this.objectToAccess = objectToAccess;
+        }
 
         @Override
         public Object get(String qName) throws IOException {
             Object result = new Object();
-            result = item.getValue(qName);
+
+            if (objectToAccess != null) {
+                try {
+                    
+                    Field dataField = objectToAccess.getClass().getDeclaredField(qName);
+                    dataField.setAccessible(true);
+                    result = dataField.get(objectToAccess);                   
+                    
+                } catch (NoSuchFieldException | SecurityException | IllegalArgumentException 
+                        | IllegalAccessException e) {
+                    throw new IOException(e);
+                }
+            } else {
+                result = item.getValue(qName);
+            }
+            
             LOGGER.info("RESTModelAccess:get(" + qName + ") -> result: " + result);
             return result;
         }
@@ -437,14 +376,21 @@ public abstract class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, 
 
         @Override
         public ModelAccess stepInto(String name) throws IOException {
-            // Not used for REST
-            return null;
+
+            name = name.toLowerCase();
+            RESTModelAccess result = null;
+            Object obj = item.getValue(name);
+            
+            result = new RESTModelAccess(obj);
+            
+            return result;
         }
 
         @Override
         public ModelAccess stepOut() {
-            // Not used for REST
-            return null;
+            RESTModelAccess result = null;
+            result = new RESTModelAccess();
+            return result;
         }
 
     }

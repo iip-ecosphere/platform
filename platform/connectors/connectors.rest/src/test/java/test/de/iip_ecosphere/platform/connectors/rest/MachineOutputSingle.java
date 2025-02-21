@@ -2,19 +2,19 @@ package test.de.iip_ecosphere.platform.connectors.rest;
 
 public class MachineOutputSingle {
     
-    private TestServerResponsSingle stringValue;
-    private TestServerResponsSingle shortValue;
-    private TestServerResponsSingle integerValue;
-    private TestServerResponsSingle longValue;
-    private TestServerResponsSingle floatValue;
-    private TestServerResponsSingle doubleValue;
+    private TestServerResponsSingleRestType stringValue;
+    private TestServerResponsSingleRestType shortValue;
+    private TestServerResponsSingleRestType integerValue;
+    private TestServerResponsSingleRestType longValue;
+    private TestServerResponsSingleRestType floatValue;
+    private TestServerResponsSingleRestType doubleValue;
     
     /**
      * Getter for stringValue.
      * 
      * @return stringValue
      */
-    public TestServerResponsSingle getStringValue() {
+    public TestServerResponsSingleRestType getStringValue() {
         return stringValue;
     }
     
@@ -23,7 +23,7 @@ public class MachineOutputSingle {
      * 
      * @param stringValue to set
      */
-    public void setStringValue(TestServerResponsSingle stringValue) {
+    public void setStringValue(TestServerResponsSingleRestType stringValue) {
         this.stringValue = stringValue;
     }
     
@@ -32,7 +32,7 @@ public class MachineOutputSingle {
      * 
      * @return shortValue
      */
-    public TestServerResponsSingle getShortValue() {
+    public TestServerResponsSingleRestType getShortValue() {
         return shortValue;
     }
     
@@ -41,7 +41,7 @@ public class MachineOutputSingle {
      * 
      * @param shortValue to set
      */
-    public void setShortValue(TestServerResponsSingle shortValue) {
+    public void setShortValue(TestServerResponsSingleRestType shortValue) {
         this.shortValue = shortValue;
     }
     
@@ -50,7 +50,7 @@ public class MachineOutputSingle {
      * 
      * @return integerValue
      */
-    public TestServerResponsSingle getIntegerValue() {
+    public TestServerResponsSingleRestType getIntegerValue() {
         return integerValue;
     }
     
@@ -59,7 +59,7 @@ public class MachineOutputSingle {
      * 
      * @param integerValue to set
      */
-    public void setIntegerValue(TestServerResponsSingle integerValue) {
+    public void setIntegerValue(TestServerResponsSingleRestType integerValue) {
         this.integerValue = integerValue;
     }
     
@@ -68,7 +68,7 @@ public class MachineOutputSingle {
      * 
      * @return longValue
      */
-    public TestServerResponsSingle getLongValue() {
+    public TestServerResponsSingleRestType getLongValue() {
         return longValue;
     }
     
@@ -77,7 +77,7 @@ public class MachineOutputSingle {
      * 
      * @param longValue to set
      */
-    public void setLongValue(TestServerResponsSingle longValue) {
+    public void setLongValue(TestServerResponsSingleRestType longValue) {
         this.longValue = longValue;
     }
     
@@ -86,7 +86,7 @@ public class MachineOutputSingle {
      * 
      * @return floatValue
      */
-    public TestServerResponsSingle getFloatValue() {
+    public TestServerResponsSingleRestType getFloatValue() {
         return floatValue;
     }
     
@@ -95,7 +95,7 @@ public class MachineOutputSingle {
      * 
      * @param floatValue to set
      */
-    public void setFloatValue(TestServerResponsSingle floatValue) {
+    public void setFloatValue(TestServerResponsSingleRestType floatValue) {
         this.floatValue = floatValue;
     }
     
@@ -104,7 +104,7 @@ public class MachineOutputSingle {
      * 
      * @return doubleValue
      */
-    public TestServerResponsSingle getDoubleValue() {
+    public TestServerResponsSingleRestType getDoubleValue() {
         return doubleValue;
     }
     
@@ -113,7 +113,7 @@ public class MachineOutputSingle {
      * 
      * @param doubleValue to set
      */
-    public void setDoubleValue(TestServerResponsSingle doubleValue) {
+    public void setDoubleValue(TestServerResponsSingleRestType doubleValue) {
         this.doubleValue = doubleValue;
     }
     

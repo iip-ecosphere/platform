@@ -42,12 +42,12 @@ public class MachineOutputTranslatorSingle<S> extends AbstractConnectorOutputTyp
         AbstractModelAccess access = (AbstractModelAccess) getModelAccess();
 
         MachineOutputSingle result = new MachineOutputSingle();
-        result.setStringValue((TestServerResponsSingle) access.get("string"));
-        result.setShortValue((TestServerResponsSingle) access.get("short"));
-        result.setIntegerValue((TestServerResponsSingle) access.get("integer"));
-        result.setLongValue((TestServerResponsSingle) access.get("long"));
-        result.setFloatValue((TestServerResponsSingle) access.get("float"));
-        result.setDoubleValue((TestServerResponsSingle) access.get("double"));
+        result.setStringValue((TestServerResponsSingleRestType) access.get("string"));
+        result.setShortValue((TestServerResponsSingleRestType) access.get("short"));
+        result.setIntegerValue((TestServerResponsSingleRestType) access.get("integer"));
+        result.setLongValue((TestServerResponsSingleRestType) access.get("long"));
+        result.setFloatValue((TestServerResponsSingleRestType) access.get("float"));
+        result.setDoubleValue((TestServerResponsSingleRestType) access.get("double"));
 
         return result;
     }

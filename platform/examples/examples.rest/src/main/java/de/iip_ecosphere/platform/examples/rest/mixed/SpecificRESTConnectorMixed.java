@@ -3,10 +3,10 @@ package de.iip_ecosphere.platform.examples.rest.mixed;
 import de.iip_ecosphere.platform.connectors.rest.RESTConnector;
 import de.iip_ecosphere.platform.connectors.rest.RESTItem;
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
-import de.iip_ecosphere.platform.examples.rest.TestServerResponseMeasurementSingle;
-import de.iip_ecosphere.platform.examples.rest.TestServerResponseTariffNumber;
-import de.iip_ecosphere.platform.examples.rest.TestServerResponseInformation;
-import de.iip_ecosphere.platform.examples.rest.TestServerResponseMeasurementSet;
+import de.iip_ecosphere.platform.examples.rest.TestServerResponseMeasurementSingleRestType;
+import de.iip_ecosphere.platform.examples.rest.TestServerResponseTariffNumberRestType;
+import de.iip_ecosphere.platform.examples.rest.TestServerResponseInformationRestType;
+import de.iip_ecosphere.platform.examples.rest.TestServerResponseMeasurementSetRestType;
 
 public class SpecificRESTConnectorMixed extends RESTConnector<MachineOutputMixed, MachineInputMixed> {
 
@@ -24,8 +24,10 @@ public class SpecificRESTConnectorMixed extends RESTConnector<MachineOutputMixed
     @Override
     protected Class<?>[] getResponseClasses() {
 
-        return new Class[] {TestServerResponseTariffNumber.class, TestServerResponseMeasurementSingle.class,
-            TestServerResponseMeasurementSet.class, TestServerResponseInformation.class};
+        return new Class[] {TestServerResponseTariffNumberRestType.class, 
+            TestServerResponseMeasurementSingleRestType.class,
+            TestServerResponseMeasurementSetRestType.class, 
+            TestServerResponseInformationRestType.class};
     }
 
 }

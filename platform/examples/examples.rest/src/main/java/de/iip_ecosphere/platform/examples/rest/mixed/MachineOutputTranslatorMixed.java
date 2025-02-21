@@ -6,10 +6,10 @@ import de.iip_ecosphere.platform.connectors.model.AbstractModelAccess;
 import de.iip_ecosphere.platform.connectors.model.ModelAccess;
 
 import de.iip_ecosphere.platform.connectors.types.AbstractConnectorOutputTypeTranslator;
-import de.iip_ecosphere.platform.examples.rest.TestServerResponseMeasurementSingle;
-import de.iip_ecosphere.platform.examples.rest.TestServerResponseTariffNumber;
-import de.iip_ecosphere.platform.examples.rest.TestServerResponseInformation;
-import de.iip_ecosphere.platform.examples.rest.TestServerResponseMeasurementSet;
+import de.iip_ecosphere.platform.examples.rest.TestServerResponseMeasurementSingleRestType;
+import de.iip_ecosphere.platform.examples.rest.TestServerResponseTariffNumberRestType;
+import de.iip_ecosphere.platform.examples.rest.TestServerResponseInformationRestType;
+import de.iip_ecosphere.platform.examples.rest.TestServerResponseMeasurementSetRestType;
 
 public class MachineOutputTranslatorMixed<S> extends AbstractConnectorOutputTypeTranslator<S, MachineOutputMixed> {
 
@@ -49,25 +49,25 @@ public class MachineOutputTranslatorMixed<S> extends AbstractConnectorOutputType
     @Override
     public MachineOutputMixed to(S source) throws IOException {
 
-        if (source != null) {
+//        if (source != null) {
 
-            AbstractModelAccess access = (AbstractModelAccess) getModelAccess();
+        AbstractModelAccess access = (AbstractModelAccess) getModelAccess();
 
-            MachineOutputMixed result = new MachineOutputMixed();
-            result.setTn1((TestServerResponseTariffNumber) access.get("tn1"));
-            result.setTn2((TestServerResponseTariffNumber) access.get("tn2"));
-            result.setF((TestServerResponseMeasurementSingle) access.get("f"));
-            result.setU1((TestServerResponseMeasurementSingle) access.get("u1"));
-            result.setU2((TestServerResponseMeasurementSingle) access.get("u2"));
-            result.setU3((TestServerResponseMeasurementSingle) access.get("u3"));
-            result.setAll((TestServerResponseMeasurementSet) access.get("all"));  
-            result.setInformation((TestServerResponseInformation) access.get("information"));
+        MachineOutputMixed result = new MachineOutputMixed();
+        result.setTn1((TestServerResponseTariffNumberRestType) access.get("tn1"));
+        result.setTn2((TestServerResponseTariffNumberRestType) access.get("tn2"));
+        result.setF((TestServerResponseMeasurementSingleRestType) access.get("f"));
+        result.setU1((TestServerResponseMeasurementSingleRestType) access.get("u1"));
+        result.setU2((TestServerResponseMeasurementSingleRestType) access.get("u2"));
+        result.setU3((TestServerResponseMeasurementSingleRestType) access.get("u3"));
+        result.setAll((TestServerResponseMeasurementSetRestType) access.get("all"));
+        result.setInformation((TestServerResponseInformationRestType) access.get("information"));
 
-            return result;
+        return result;
 
-        }
-
-        return null;
+//        }
+//
+//        return null;
     }
 
 }

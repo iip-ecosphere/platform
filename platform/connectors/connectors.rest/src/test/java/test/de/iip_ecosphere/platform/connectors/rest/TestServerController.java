@@ -23,9 +23,9 @@ public class TestServerController {
      * @return TestServerResponsSingle at path
      */
     @GetMapping()
-    public TestServerResponsSingle getPath(@RequestParam("path") String path) {
+    public TestServerResponsSingleRestType getPath(@RequestParam("path") String path) {
 
-        TestServerResponsSingle result = new TestServerResponsSingle();
+        TestServerResponsSingleRestType result = new TestServerResponsSingleRestType();
 
         if (path.equals("string")) {
             result = getString();
@@ -51,10 +51,10 @@ public class TestServerController {
      * @return TestServerResponseSet at path
      */
     @GetMapping("/set")
-    public TestServerResponseSet getPaths(@RequestParam("paths") String paths) {
+    public TestServerResponseSetRestType getPaths(@RequestParam("paths") String paths) {
         String[] valuePaths = paths.split(",");
         TestServerResponseSetItem[] items = new TestServerResponseSetItem[valuePaths.length];
-        TestServerResponseSet result = new TestServerResponseSet();
+        TestServerResponseSetRestType result = new TestServerResponseSetRestType();
         result.setContext("/api/v1/measurements/set");
         result.setTimestamp(getCurrentTimestamp());
 
@@ -138,8 +138,8 @@ public class TestServerController {
      * @return TestServerResponseSet containing all values.
      */
     @GetMapping("/all")
-    public TestServerResponseSet getAll() {
-        TestServerResponseSet result = new TestServerResponseSet();
+    public TestServerResponseSetRestType getAll() {
+        TestServerResponseSetRestType result = new TestServerResponseSetRestType();
         result.setContext("/api/v1/measurements/all");
         result.setTimestamp(getCurrentTimestamp());
 
@@ -212,8 +212,8 @@ public class TestServerController {
      * @return TestServerResponsSingle -> string
      */
     @GetMapping("/string")
-    public TestServerResponsSingle getString() {
-        TestServerResponsSingle result = new TestServerResponsSingle();
+    public TestServerResponsSingleRestType getString() {
+        TestServerResponsSingleRestType result = new TestServerResponsSingleRestType();
         result.setContext("/api/v1/measurements/string");
         result.setId("string");
         result.setTimestamp(getCurrentTimestamp());
@@ -231,8 +231,8 @@ public class TestServerController {
      * @return TestServerResponsSingle -> short
      */
     @GetMapping("/short")
-    public TestServerResponsSingle getShort() {
-        TestServerResponsSingle result = new TestServerResponsSingle();
+    public TestServerResponsSingleRestType getShort() {
+        TestServerResponsSingleRestType result = new TestServerResponsSingleRestType();
         result.setContext("/api/v1/measurements/short");
         result.setId("short");
         result.setTimestamp(getCurrentTimestamp());
@@ -250,8 +250,8 @@ public class TestServerController {
      * @return TestServerResponsSingle -> integer
      */
     @GetMapping("/integer")
-    public TestServerResponsSingle getInteger() {
-        TestServerResponsSingle result = new TestServerResponsSingle();
+    public TestServerResponsSingleRestType getInteger() {
+        TestServerResponsSingleRestType result = new TestServerResponsSingleRestType();
         result.setContext("/api/v1/measurements/integer");
         result.setId("integer");
         result.setTimestamp(getCurrentTimestamp());
@@ -269,8 +269,8 @@ public class TestServerController {
      * @return TestServerResponsSingle -> long
      */
     @GetMapping("/long")
-    public TestServerResponsSingle getLong() {
-        TestServerResponsSingle result = new TestServerResponsSingle();
+    public TestServerResponsSingleRestType getLong() {
+        TestServerResponsSingleRestType result = new TestServerResponsSingleRestType();
         result.setContext("/api/v1/measurements/long");
         result.setId("long");
         result.setTimestamp(getCurrentTimestamp());
@@ -288,8 +288,8 @@ public class TestServerController {
      * @return TestServerResponsSingle -> float
      */
     @GetMapping("/float")
-    public TestServerResponsSingle getFloat() {
-        TestServerResponsSingle result = new TestServerResponsSingle();
+    public TestServerResponsSingleRestType getFloat() {
+        TestServerResponsSingleRestType result = new TestServerResponsSingleRestType();
         result.setContext("/api/v1/measurements/float");
         result.setId("float");
         result.setTimestamp(getCurrentTimestamp());
@@ -307,8 +307,8 @@ public class TestServerController {
      * @return TestServerResponsSingle ->double
      */
     @GetMapping("/double")
-    public TestServerResponsSingle getDouble() {
-        TestServerResponsSingle result = new TestServerResponsSingle();
+    public TestServerResponsSingleRestType getDouble() {
+        TestServerResponsSingleRestType result = new TestServerResponsSingleRestType();
         result.setContext("/api/v1/measurements/double");
         result.setId("double");
         result.setTimestamp(getCurrentTimestamp());

@@ -31,7 +31,11 @@
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
 		</dependency>
-
+		<dependency>
+			<artifactId>SimpleRestDemoApp</artifactId>
+			<groupId>de.iip-ecosphere.platform.apps</groupId>
+			<version>0.1.0-SNAPSHOT</version> 
+		</dependency>
 
 	</dependencies>
 

@@ -1,10 +1,13 @@
 package de.iip_ecosphere.platform.examples.rest;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import test.de.iip_ecosphere.platform.examples.rest.TestServerValueMeasurement;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class TestServerResponseTariffNumber {
+public class TestServerResponseMeasurementSingleRestType {
 
     @JsonProperty("context")
     private String context;
@@ -21,13 +24,30 @@ public class TestServerResponseTariffNumber {
     @JsonProperty("value")
     private Object value;
 
+    @JsonProperty("unit")
+    private String unit;
+
     @JsonProperty("description")
     private String description;
     
     /**
      * Constructor.
      */
-    public TestServerResponseTariffNumber() {
+    public TestServerResponseMeasurementSingleRestType() {
+    }
+    
+    /**
+     * Constructor. Only needed for the TestServer -> Must not be generated.
+     * 
+     * @param value = Instance of TestServerValueMeasurement
+     */
+    @JsonIgnore
+    public TestServerResponseMeasurementSingleRestType(TestServerValueMeasurement value) {
+        this.id = value.getId();
+        this.name = value.getName();
+        this.value = value.getValue();
+        this.unit = value.getUnit();
+        this.description = value.getDescription();
     }
     
     /**
@@ -118,6 +138,24 @@ public class TestServerResponseTariffNumber {
      */
     public void setValue(Object value) {
         this.value = value;
+    }
+
+    /**
+     * Getter for unit.
+     * 
+     * @return unit
+     */
+    public String getUnit() {
+        return unit;
+    }
+
+    /**
+     * Setter for unit.
+     * 
+     * @param unit to set
+     */
+    public void setUnit(String unit) {
+        this.unit = unit;
     }
 
     /**

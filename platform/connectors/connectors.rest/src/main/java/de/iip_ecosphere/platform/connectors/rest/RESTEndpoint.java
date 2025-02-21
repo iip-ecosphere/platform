@@ -8,8 +8,6 @@ public class RESTEndpoint {
     private String endpoint;
     private boolean asSingleValue;
     private String type;
-    private String setType;
-    private int endpointIndex = -1;
     
     private HashMap<String, Integer> itemIndexes = new HashMap<>();; 
 
@@ -87,24 +85,6 @@ public class RESTEndpoint {
     }
 
     /**
-     * Getter for endpointIndex.
-     * 
-     * @return endpointIndex
-     */
-    public int getEndpointIndex() {
-        return endpointIndex;
-    }
-
-    /**
-     * Setter for endpointIndex.
-     * 
-     * @param endpointIndex to set
-     */
-    public void setEndpointIndex(int endpointIndex) {
-        this.endpointIndex = endpointIndex;
-    }
-
-    /**
      * Getter for type.
      * 
      * @return type
@@ -120,24 +100,6 @@ public class RESTEndpoint {
      */
     public void setType(String type) {
         this.type = type;
-    }
-
-    /**
-     * Getter for setType.
-     * 
-     * @returnsetType
-     */
-    public String getSetType() {
-        return setType;
-    }
-
-    /**
-     * Setter for setType.
-     * 
-     * @param setType to set
-     */
-    public void setSetType(String setType) {
-        this.setType = setType;
     }
 
     /**

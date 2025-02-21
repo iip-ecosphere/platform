@@ -1,5 +1,7 @@
 package de.iip_ecosphere.platform.connectors.rest;
 
+import java.io.IOException;
+
 import de.iip_ecosphere.platform.connectors.model.ModelOutputConverter;
 
 /**
@@ -14,6 +16,16 @@ public class RESTOutputConverter extends ModelOutputConverter {
      */
     public RESTOutputConverter() {
         
+    }
+    
+    @Override
+    public Object fromObject(Object data) throws IOException {
+        
+        if (data instanceof Convertable) {
+            data = ((Convertable) data).toREST(data);
+        }
+        System.out.println(data);
+        return data;
     }
 
 }

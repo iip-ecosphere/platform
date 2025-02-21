@@ -19,7 +19,7 @@ import de.iip_ecosphere.platform.connectors.rest.RESTConnector;
 import de.iip_ecosphere.platform.connectors.rest.RESTItem;
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
 import de.iip_ecosphere.platform.connectors.types.TranslatingProtocolAdapter;
-import de.iip_ecosphere.platform.examples.rest.TestServerResponseTariffNumber;
+import de.iip_ecosphere.platform.examples.rest.TestServerResponseTariffNumberRestType;
 import de.iip_ecosphere.platform.examples.rest.mixed.MachineInputMixed;
 import de.iip_ecosphere.platform.examples.rest.mixed.MachineInputTranslatorMixed;
 import de.iip_ecosphere.platform.examples.rest.mixed.MachineOutputMixed;
@@ -117,7 +117,7 @@ public class RESTConnectorTestEEM {
             Assert.assertEquals("2.0", rest.getInformation().getInfoItems()[1].getValue());      
             
             MachineInputMixed input = new MachineInputMixed();
-            TestServerResponseTariffNumber tn1 = rest.getTn1();
+            TestServerResponseTariffNumberRestType tn1 = rest.getTn1();
             tn1.setValue(1);
             input.setTn1(tn1);
             connector.write(input);            
@@ -133,7 +133,7 @@ public class RESTConnectorTestEEM {
             Assert.assertEquals(null, rest.getTn2().getValue());
             Assert.assertEquals("", rest.getTn2().getDescription());
             
-            TestServerResponseTariffNumber tn2 = new TestServerResponseTariffNumber();
+            TestServerResponseTariffNumberRestType tn2 = new TestServerResponseTariffNumberRestType();
             tn2.setContext("/api/v1/measurements/tn2");
             tn2.setId("tn2");
             tn2.setTimestamp("timestamp");
@@ -208,7 +208,7 @@ public class RESTConnectorTestEEM {
         testParameter.setApplicationInformation("App_Id", "App_Description");
         testParameter.setEndpointPath(endpoint.toUri());
 
-        testParameter.setSpecificSetting("Endpoints", endpoints);
+        testParameter.setSpecificSetting("SERVER_STRUCTURE", endpoints);
 
         return testParameter.build();
     }

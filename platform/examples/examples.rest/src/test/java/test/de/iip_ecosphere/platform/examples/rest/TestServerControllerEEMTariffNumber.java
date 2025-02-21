@@ -11,21 +11,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import de.iip_ecosphere.platform.examples.rest.TestServerResponseTariffNumber;
+import de.iip_ecosphere.platform.examples.rest.TestServerResponseTariffNumberRestType;
 
 @RestController
 @RequestMapping("TestServerEEM/api/tariff-number")
 public class TestServerControllerEEMTariffNumber {
 
 
-    private TestServerResponseTariffNumber tn1;
-    private TestServerResponseTariffNumber tn2;
+    private TestServerResponseTariffNumberRestType tn1;
+    private TestServerResponseTariffNumberRestType tn2;
     
     /**
      * Constructor.
      */
     public TestServerControllerEEMTariffNumber() {
-        tn1 = new TestServerResponseTariffNumber();
+        tn1 = new TestServerResponseTariffNumberRestType();
         tn1.setContext("/api/v1/measurements/tn1");
         tn1.setId("tn1");
         tn1.setTimestamp(getCurrentTimestamp());
@@ -33,7 +33,7 @@ public class TestServerControllerEEMTariffNumber {
         tn1.setValue(3);
         tn1.setDescription("Tariff Number 1");
         
-        tn2 = new TestServerResponseTariffNumber();
+        tn2 = new TestServerResponseTariffNumberRestType();
         tn2.setContext("");
         tn2.setId("");
         tn2.setTimestamp("");
@@ -48,7 +48,7 @@ public class TestServerControllerEEMTariffNumber {
      * @return tn1
      */
     @GetMapping("/tn1")
-    public TestServerResponseTariffNumber getTn1() {
+    public TestServerResponseTariffNumberRestType getTn1() {
 
         return tn1;
     }
@@ -59,7 +59,7 @@ public class TestServerControllerEEMTariffNumber {
      * @return tn2
      */
     @GetMapping("/tn2")
-    public TestServerResponseTariffNumber getTn2() {
+    public TestServerResponseTariffNumberRestType getTn2() {
 
         return tn2;
     }
@@ -71,9 +71,9 @@ public class TestServerControllerEEMTariffNumber {
      * @return value for path
      */
     @GetMapping()
-    public TestServerResponseTariffNumber getPath(@RequestParam("path") String path) {
+    public TestServerResponseTariffNumberRestType getPath(@RequestParam("path") String path) {
         
-        TestServerResponseTariffNumber result = null;
+        TestServerResponseTariffNumberRestType result = null;
         
         if (path.equals("tn1")) {
 
@@ -106,7 +106,7 @@ public class TestServerControllerEEMTariffNumber {
      * @return ResponseEntity<String> containing a response message
      */
     @PutMapping("/tn2")
-    public ResponseEntity<String> updateTn(@RequestBody TestServerResponseTariffNumber newTn) {
+    public ResponseEntity<String> updateTn(@RequestBody TestServerResponseTariffNumberRestType newTn) {
         
         tn2 = newTn;
         ResponseEntity<String> mes = ResponseEntity.ok("tn wurde aktualisiert");

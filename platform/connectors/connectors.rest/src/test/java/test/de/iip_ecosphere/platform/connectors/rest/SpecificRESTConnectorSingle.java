@@ -22,7 +22,7 @@ public class SpecificRESTConnectorSingle extends RESTConnector<MachineOutputSing
     @Override
     protected  Class<?>[] getResponseClasses() {
      
-        return  new Class[]{TestServerResponsSingle.class};
+        return  new Class[]{TestServerResponsSingleRestType.class};
     }
 
 }
