@@ -45,7 +45,7 @@ template JavaConnectorRestType(Configuration config, JavaCodeArtifact target, Re
             m.if("data instanceof " + clsName).(i|{
                 i.assign("result", "fromRESTImpl((${clsName}) data)");
             });
-            m.return("null");
+            m.return("result");
         });
 
         mainCls.method(qTypeName, "fromRESTImpl", "Implements the conversion from the corresponding REST type.").setStatic().(m|{
