@@ -7,6 +7,12 @@
 - Python 3.9.6 (not yet prepared for implicit virtual environments)
 - Docker
 
+For the Web-UI (see also (Angular version compatibility matrix)[https://angular.io/guide/versions]). More recent versions may not work. 
+
+- node.js 16.10.0
+- npm version 7.24.0 (or 9.5.1) 
+- Angular 14.2.10
+
 ## Development
 
 - Execution requirements as basis
