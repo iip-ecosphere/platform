@@ -2,6 +2,7 @@ package de.iip_ecosphere.platform.connectors.rest;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -196,39 +197,54 @@ public abstract class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, 
     @Override
     protected void writeImpl(Object data) throws IOException {
 
-        if (data != null) {
+        if (item.getKeysToWriteSize() != 0) {
+            
+            HashMap<String, Object> toWrite = item.getKeysToWrite();
+            
+            for (Entry<String, Object> entry : toWrite.entrySet()) {
+                String qName = entry.getKey();
+                String path = params.getEndpointPath();
+                RESTEndpoint restEndpoint = item.getEndpointMap().get(qName);
+                String endpoint = restEndpoint.getSimpleEndpoint();
+                ResponseEntity<?> responseEntity = null;
+                
+                if (restEndpoint.getAsSingleValue()) {
 
-            String qName = (String) data;
-            String path = params.getEndpointPath();
-            RESTEndpoint restEndpoint = item.getEndpointMap().get(qName);
-            String endpoint = restEndpoint.getSimpleEndpoint();
-            ResponseEntity<?> responseEntity = null;
+                    Object valueObject = item.getValue(qName);
+                    Field valueField = null;
+                    Object value = null;
 
-            if (restEndpoint.getAsSingleValue()) {
+                    try {
+                        valueField = valueObject.getClass().getDeclaredField("value");
+                        valueField.setAccessible(true);
+                        value = valueField.get(valueObject);
+                    } catch (NoSuchFieldException | SecurityException | IllegalArgumentException
+                            | IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
 
-                Object value = item.getSimpleValueToWrite(qName);
+                    String uri = path + endpoint + "?value=" + value;
 
-                String uri = path + endpoint + "?value=" + value;
+                    RestTemplate restTemplate = new RestTemplate();
+                    responseEntity = restTemplate.exchange(uri, HttpMethod.PUT, null, String.class);
 
-                RestTemplate restTemplate = new RestTemplate();
-                responseEntity = restTemplate.exchange(uri, HttpMethod.PUT, null, String.class);
+                } else {
 
-            } else {
+                    Object value = item.getValue(qName);
 
-                Object value = item.getValue(qName);
+                    HttpHeaders headers = new HttpHeaders();
+                    headers.setContentType(MediaType.APPLICATION_JSON);
 
-                HttpHeaders headers = new HttpHeaders();
-                headers.setContentType(MediaType.APPLICATION_JSON);
+                    HttpEntity<?> requestEntity = new HttpEntity<>(value, headers);
 
-                HttpEntity<?> requestEntity = new HttpEntity<>(value, headers);
+                    String uri = path + endpoint;
 
-                String uri = path + endpoint;
+                    RestTemplate restTemplate = new RestTemplate();
+                    responseEntity = restTemplate.exchange(uri, HttpMethod.PUT, requestEntity, String.class);
+                }
 
-                RestTemplate restTemplate = new RestTemplate();
-                responseEntity = restTemplate.exchange(uri, HttpMethod.PUT, requestEntity, String.class);
+                LOGGER.info("Response: " + responseEntity.getBody());
             }
-
-            LOGGER.info("Response: " + responseEntity.getBody());
 
         }
 
@@ -251,6 +267,7 @@ public abstract class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, 
         private RESTInputConverter inputConverter = new RESTInputConverter();
         private RESTOutputConverter outputConverter = new RESTOutputConverter();
         private Object objectToAccess = null;
+        private String keyToWrite = null;
 
         /**
          * Creates an instance.
@@ -258,7 +275,7 @@ public abstract class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, 
         public RESTModelAccess() {
             super(RESTConnector.this);
         }
-        
+
         /**
          * Creates an instance.
          * 
@@ -275,34 +292,65 @@ public abstract class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, 
 
             if (objectToAccess != null) {
                 try {
-                    
+
                     Field dataField = objectToAccess.getClass().getDeclaredField(qName);
                     dataField.setAccessible(true);
-                    result = dataField.get(objectToAccess);                   
-                    
-                } catch (NoSuchFieldException | SecurityException | IllegalArgumentException 
+                    result = dataField.get(objectToAccess);
+
+                } catch (NoSuchFieldException | SecurityException | IllegalArgumentException
                         | IllegalAccessException e) {
                     throw new IOException(e);
                 }
             } else {
                 result = item.getValue(qName);
             }
-            
+
             LOGGER.info("RESTModelAccess:get(" + qName + ") -> result: " + result);
             return result;
         }
 
         @Override
         public void set(String qName, Object value) throws IOException {
-            RESTEndpoint end = item.getEndpointMap().get(qName);
 
-            if (end.getAsSingleValue()) {
-                item.addSimpleValuesToWrite(qName, value);
+            if (objectToAccess != null) {
+
+                Field dataField;
+                try {
+                    dataField = objectToAccess.getClass().getDeclaredField(qName);
+                    dataField.setAccessible(true);
+                    dataField.set(objectToAccess, value);
+                } catch (NoSuchFieldException | SecurityException | IllegalArgumentException
+                        | IllegalAccessException e) {
+                    throw new IOException(e);
+                }
+
+                item.addKeyToWrite(keyToWrite, value);
+
             } else {
-                item.setValue(qName, (Object) value);
-            }
+                RESTEndpoint end = item.getEndpointMap().get(qName);
 
-            writeImpl(qName);
+                if (end.getAsSingleValue()) {
+
+                    Object valueObject = item.getValue(qName);
+                    Field valueField = null;
+
+                    try {
+                        valueField = valueObject.getClass().getDeclaredField("value");
+                        valueField.setAccessible(true);
+                        valueField.set(valueObject, value);
+                    } catch (NoSuchFieldException | SecurityException | IllegalArgumentException
+                            | IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                    
+                    item.setValue(qName, valueObject);
+
+                } else {
+                    item.setValue(qName, (Object) value);
+                }
+                
+                item.addKeyToWrite(qName, value);
+            }
 
         }
 
@@ -378,19 +426,17 @@ public abstract class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, 
         public ModelAccess stepInto(String name) throws IOException {
 
             name = name.toLowerCase();
-            RESTModelAccess result = null;
             Object obj = item.getValue(name);
-            
-            result = new RESTModelAccess(obj);
-            
+            RESTModelAccess result = new RESTModelAccess(obj);
+            result.keyToWrite = name;
+
             return result;
         }
 
         @Override
         public ModelAccess stepOut() {
-            RESTModelAccess result = null;
-            result = new RESTModelAccess();
-            return result;
+
+            return new RESTModelAccess();
         }
 
     }

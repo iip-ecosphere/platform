@@ -21,10 +21,17 @@ public class RESTOutputConverter extends ModelOutputConverter {
     @Override
     public Object fromObject(Object data) throws IOException {
         
-        if (data instanceof Convertable) {
-            data = ((Convertable) data).toREST(data);
+        if (data instanceof Convertable[]) {
+            
+            Convertable[] con = (Convertable[]) data;
+            data = con[0].toREST(data);
+            
+        } else  if (data instanceof Convertable) {
+            
+            Convertable con = (Convertable) data;
+            data = con.toREST(data);
         }
-        System.out.println(data);
+
         return data;
     }
 

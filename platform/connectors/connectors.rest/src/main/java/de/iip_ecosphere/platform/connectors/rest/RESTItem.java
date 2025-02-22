@@ -8,7 +8,7 @@ public class RESTItem {
     
     private RESTEndpointMap endpointMap;
     private HashMap <String, Object> values;
-    private HashMap <String, Object> simpleValuesToWrite;
+    private HashMap <String, Object> keysToWrite;
     
     /**
      * Constructor.
@@ -17,7 +17,7 @@ public class RESTItem {
         
         this.endpointMap = endpointMap;
         values = new HashMap<String, Object>();
-        simpleValuesToWrite = new HashMap<String, Object>();
+        keysToWrite = new HashMap<String, Object>();
         
         for (HashMap.Entry<String, RESTEndpoint> entry : endpointMap.entrySet()) {
             
@@ -57,13 +57,12 @@ public class RESTItem {
 
    
     /**
-     * Get Object value for String key from simpleValuesToWrite.
+     * Get keysToWrite.
      * 
-     * @param key to retreive
-     * @return Object value stored for key
+     * @return keysToWrite
      */
-    public Object getSimpleValueToWrite(String key) {
-        return simpleValuesToWrite.get(key);
+    public HashMap <String, Object>  getKeysToWrite() {
+        return keysToWrite;
     }
 
     /**
@@ -71,7 +70,16 @@ public class RESTItem {
      * @param key to add
      * @param value to add
      */
-    public void addSimpleValuesToWrite(String key, Object value) {
-        this.simpleValuesToWrite.put(key, value);
+    public void addKeyToWrite(String key, Object value) {
+        this.keysToWrite.put(key, value);
+    }
+    
+    /**
+     * Get size of keysToWrite.
+     * 
+     * @return size of keysToWrite
+     */
+    public int getKeysToWriteSize() {
+        return keysToWrite.size();
     }
 }

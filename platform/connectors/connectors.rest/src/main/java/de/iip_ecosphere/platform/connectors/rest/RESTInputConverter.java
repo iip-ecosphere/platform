@@ -21,10 +21,17 @@ public class RESTInputConverter extends ModelInputConverter {
     @Override
     public Object toObject(Object data) throws IOException {
         
-        if (data instanceof Convertable) {
-            data = ((Convertable) data).fromREST(data);
+        if (data instanceof Convertable[]) {
+
+            Convertable[] con = (Convertable[]) data;
+            data = con[0].fromREST(data);
+
+        } else if (data instanceof Convertable) {
+            
+            Convertable con = (Convertable) data;
+            data = con.fromREST(data);
         }
-        System.out.println(data);
+
         return data;
     }
 }

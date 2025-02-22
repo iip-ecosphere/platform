@@ -29,6 +29,23 @@ project RestPhoenixEEMMixed {
 	RecordType restPhoenixEEMMixed = {
 		name = "RestPhoenixEEMMixed",
 		fields = {	
+		
+	/*		RestField {
+				name = "temperature",
+				endpoint = "Temperature.GetStatus?id=0",
+				asSingleValue = true,
+				type =  refBy(restHTG3Temperature),
+				cachingTime = CACHE_NONE
+				
+			}, RestField {
+				name = "humidity",
+				endpoint = "Humidity.GetStatus?id=0",
+				asSingleValue = false,
+				type =  refBy(restHTG3Humidity),
+				cachingTime = CACHE_NONE
+				
+			} */
+			
 			RestField {
 				name = "tn1",
 				endpoint = "tariff-number/tn1",
@@ -71,7 +88,7 @@ project RestPhoenixEEMMixed {
 				type =  refBy(restPhoenixEEMResponseMeasurementSingle),
 				cachingTime = CACHE_NONE
 				
-			}, RestField {			
+			} , RestField {			
 				name = "all",
 				endpoint = "measurements/all",
 				asSingleValue = false,

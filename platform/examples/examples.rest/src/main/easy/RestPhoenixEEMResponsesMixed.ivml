@@ -4,6 +4,34 @@ project RestPhoenixEEMResponsesMixed {
 	
 	annotate BindingTime bindingTime = BindingTime::compile to .;
 	
+	RecordType restHTG3Temperature = {
+		name = "RestHTG3Temperature" ,
+		fields = {
+			RestField {
+				name = "id",
+				type = refBy(IntegerType)
+			}, RestField {
+				name = "tC",
+				type = refBy(ObjectType)
+			}, RestField {
+				name = "tF",
+				type = refBy(ObjectType)
+			}
+		}
+	};
+	
+	RecordType restHTG3Humidity = {
+		name = "RestHTG3Humidity" ,
+		fields = {
+			RestField {
+				name = "id",
+				type = refBy(IntegerType)
+			}, RestField {
+				name = "rh",
+				type = refBy(DoubleType)
+			}
+		}
+	};
 	
 	RecordType restPhoenixEEMResponseTariffNumber = {
 		name = "RestPhoenixEEMResponseTariffNumber" ,

@@ -183,6 +183,7 @@ public class RESTConnectorTestEEM {
         
         return rest;
     }
+    
     /**
      * Returns the connector descriptor for
      * {@link #createConnector(ProtocolAdapter)}.
