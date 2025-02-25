@@ -61,6 +61,7 @@
   <properties>
       <iip.resources>${project.basedir}/resources</iip.resources>
       <iip.model>PlatformConfiguration</iip.model>
+      <iip.gen>target/gen/hm23</iip.gen>
   </properties>  
 
   <profiles>
@@ -293,7 +294,7 @@
                             <configuration>
                               <mainClass>de.iip_ecosphere.platform.examples.SpringStartup</mainClass>
                               <arguments>
-                                <argument>gen/hm23/DemonstrationFederatedLearningAppHM23/target/DemonstrationFederatedLearningAppHM23-0.1.0-SNAPSHOT-bin.jar</argument>
+                                <argument>${iip.gen}/DemonstrationFederatedLearningAppHM23/target/DemonstrationFederatedLearningAppHM23-0.1.0-SNAPSHOT-bin.jar</argument>
                               </arguments>
                               <classpathScope>test</classpathScope>
                             </configuration>
@@ -303,7 +304,7 @@
                             <configuration>
                               <mainClass>de.iip_ecosphere.platform.examples.SpringStartup</mainClass>
                               <arguments>
-                                <argument>gen/hm23/DemonstrationDriveAppHM23/target/DemonstrationDriveAppHM23-0.1.0-SNAPSHOT-bin.jar</argument>
+                                <argument>${iip.gen}/DemonstrationDriveAppHM23/target/DemonstrationDriveAppHM23-0.1.0-SNAPSHOT-bin.jar</argument>
                               </arguments>
                               <classpathScope>test</classpathScope>
                             </configuration>
@@ -458,7 +459,7 @@
                 </executions>
                 <configuration>
                     <model>${iip.model}</model>
-                    <outputDirectory>gen/hm23</outputDirectory>
+                    <outputDirectory>${iip.gen}</outputDirectory>
                     <metaModelDirectory>${project.build.directory}/easy</metaModelDirectory>
                     <modelDirectory>src/main/easy</modelDirectory>
                 </configuration>
