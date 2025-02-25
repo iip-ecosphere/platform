@@ -1,0 +1,7 @@
+/target/
+/bin/
+/resources.ipr/
+/log
+__pycache__/
+*.pyc
+/tmp/
