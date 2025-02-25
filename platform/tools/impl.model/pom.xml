@@ -28,7 +28,6 @@
   </dependencies>
 
   <properties>
-      <ivml.file>Test</ivml.file>
       <maven.main.skip>true</maven.main.skip>
       <maven.test.skip>true</maven.test.skip>
       <maven.javadoc.skip>true</maven.javadoc.skip>

@@ -3,10 +3,9 @@
 Project for the application model. It will generate a template project in ``target/gen/impl/templates`` that you can copy-import into Eclipse to implement the services. Since version 0.7.1, this project contains a simple basic model (following the basic structures of `cfg` in `src/main/easy` in the project `configuration.configuration`).
 
 ##Typical steps
-  * `mvn -U -P EasyGen generate-sources` to obtain the meta model
-  * Add a basic model to `src/main/easy`, e.g., from examples or from the tests of the configuration component. Let's call the file and the IVML project "Test". If you try multiple "platforms", please also adjust `sharedArtifact`.
-  * In case your basic model name is not "Test", then change the "Test" name in "< argument>Test</ argument>" in pom.xml file to your basic model name - two places (generateAppsNoDeps, generateApps).
-  * Instantiate the application without integration `mvn -P EasyGen configuration:generateAppsNoDeps`, in particular to obtain the generate interfaces and the implementation template (then as ZIP in ``gen/impl/templates``).
+  * `mvn -U generate-sources` to obtain the meta model
+  * Update the basic model in `src/main/easy`. If you try multiple "platforms", please adjust `sharedArtifact` in `TechnicalSetup.ivml`.
+  * Instantiate the application without integration `mvn configuration:generateAppsNoDeps`, in particular to obtain the generate interfaces and the implementation template (then as ZIP in ``gen/impl/templates``).
   * Import the implementation project into Eclipse.
   * Continue there.
 
