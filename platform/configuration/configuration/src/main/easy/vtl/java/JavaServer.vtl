@@ -57,17 +57,19 @@ template JavaServer(Configuration config, JavaCodeArtifact target, Server server
         meth.addCall("de.iip_ecosphere.platform.services.environment.Starter.mapService", JavaCodeImportScope.CLASS)
             .addArgument("service");
         meth.addOverrideAnnotation();
-        JavaCodeTryBlock try = meth.addTry();
-        codeSetState(try, "STARTING");
-        codeCatchExecutionExceptionLogError(try, "Starting server service ${server.id}: {}");
+        meth.addTry().(t|{
+            codeSetState(t, "STARTING");
+            codeCatchExecutionExceptionLogError(t, "Starting server service ${server.id}: {}");
+        });
         meth.addReturn("this");
 
         meth = mainCls.addMethod("stop");
         meth.addOverrideAnnotation();
         meth.addParameter("boolean", "dispose");
-        try = meth.addTry();
-        codeSetState(try, "STOPPING");
-        codeCatchExecutionExceptionLogError(try, "Stopping server service ${server.id}: {}");
+        meth.addTry().(t|{
+            codeSetState(t, "STOPPING");
+            codeCatchExecutionExceptionLogError(t, "Stopping server service ${server.id}: {}");
+        });
     }
     
 }

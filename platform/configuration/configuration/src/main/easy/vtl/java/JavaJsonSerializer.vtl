@@ -42,16 +42,18 @@ template JavaJsonSerializer(IIPEcosphere config, JavaCodeArtifact target, Record
 
     @Override
     def genFrom(IIPEcosphere config, RecordType type, JavaCodeMethod from, String paramName, String dataType) {
-        JavaCodeTryBlock fromTry = from.addTry();
-        fromTry.addReturn("MAPPER.readValue(${paramName}, ${dataType}.class)");
-        fromTry.addCatch("com.fasterxml.jackson.core.JsonProcessingException", "e").addThrow("new IOException(e)");
+        from.addTry().(t|{
+            t.addReturn("MAPPER.readValue(${paramName}, ${dataType}.class)");
+            t.addCatch("com.fasterxml.jackson.core.JsonProcessingException", "e").addThrow("new IOException(e)");
+        });
     }
 
     @Override
     def genTo(IIPEcosphere config, RecordType type, JavaCodeMethod to, String paramName, String dataType) {
-        JavaCodeTryBlock toTry = to.addTry();
-        toTry.addReturn("MAPPER.writeValueAsBytes(${paramName})");
-        toTry.addCatch("com.fasterxml.jackson.core.JsonProcessingException", "e").addThrow("new IOException(e)");
+        to.addTry().(t|{
+            t.addReturn("MAPPER.writeValueAsBytes(${paramName})");
+            t.addCatch("com.fasterxml.jackson.core.JsonProcessingException", "e").addThrow("new IOException(e)");
+        });
     }
 
     def main(IIPEcosphere config, JavaCodeArtifact target, RecordType type, String pkg, String typePkg, Boolean sharedInterfaces, Boolean impl) {

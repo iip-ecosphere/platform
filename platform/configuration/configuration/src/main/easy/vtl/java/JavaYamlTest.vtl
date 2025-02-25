@@ -10,15 +10,15 @@ template JavaYamlTest(Configuration config, JavaCodeArtifact target, String pkg,
         JavaCodeMethod meth = mainCls.addMethod("void", "testCfg", "Tests reading a Yaml configuration file.");
         meth.addAnnotation("org.junit.Test");
         meth.addException("java.io.IOException", "shall not occur if test is successful");
-        JavaCodeTryBlock try = meth.addTry(); // incomplete
-        try.addResource("java.io.FileInputStream", "fis", "")
-            .addNew("java.io.FileInputStream")
-                .addNew("java.io.File")
-                    .addStringArgument(cfgFile);
-        try.addCall("de.iip_ecosphere.platform.support.setup.AbstractSetup.readFromYaml", JavaCodeImportScope.METHOD)
-            .addArgument("${fqnCls}.class")
-            .addArgument("fis");
-        try.addCatch("java.io.IOException", "e")
+        meth.addTry().(t|{ // incomplete
+	        t.addResource("java.io.FileInputStream", "fis", "")
+	            .addNew("java.io.FileInputStream")
+	                .addNew("java.io.File")
+	                    .addStringArgument(cfgFile);
+        	t.addCall("de.iip_ecosphere.platform.support.setup.AbstractSetup.readFromYaml", JavaCodeImportScope.METHOD)
+	            .addArgument("${fqnCls}.class")
+	            .addArgument("fis");
+        }).addCatch("java.io.IOException", "e")
            .addSLComment("close file and re-throw")
            .addThrow("e");
     }

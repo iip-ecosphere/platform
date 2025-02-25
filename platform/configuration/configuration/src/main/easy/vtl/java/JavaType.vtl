@@ -258,24 +258,19 @@ template JavaType(Configuration config, JavaCodeArtifact target, RecordType type
 
             JavaCodeMethod eq = mainCls.addEquals("other");
             eq.addVariable("boolean", "eq", "");
-            JavaCodeAlternative eqAlt = eq.addIf('other instanceof ${clsName}');
-            eqAlt.addAssignment("${clsName} oth", "(${clsName}) other");
-            eqAlt.addAssignment("eq", "true");
-
-            for (Field f: type.fields) {
-                cons.addAssignment('this.${asMethodFieldIdentifier(f.name)}', 'from.get${asMethodNameSuffix(f.name)}()');
-                genHashCodeField(f, hash);
-                eqAlt.addAssignment("eq", "&=", genEquals("get${asMethodNameSuffix(f.name)}()", f.type, f.optional));
-            }
-            
-            hash.addReturn("hc");
-
-            eqAlt.addElse().addAssignment("eq", "false");
+            eq.addIf('other instanceof ${clsName}').(a|{
+                a.addAssignment("${clsName} oth", "(${clsName}) other");
+                a.addAssignment("eq", "true");
+	            for (Field f: type.fields) {
+	                cons.addAssignment('this.${asMethodFieldIdentifier(f.name)}', 'from.get${asMethodNameSuffix(f.name)}()');
+	                genHashCodeField(f, hash);
+	                a.addAssignment("eq", "&=", genEquals("get${asMethodNameSuffix(f.name)}()", f.type, f.optional));
+	            }
+	            hash.addReturn("hc");
+			}).addElse().addAssignment("eq", "false");
             eq.addReturn("eq");
             
-            JavaCodeMethod toString = mainCls.addToString();
-            toString.addReturn("org.apache.commons.lang3.builder.ReflectionToStringBuilder.toString(this, 
-                de.iip_ecosphere.platform.services.environment.IipStringStyle.SHORT_STRING_STYLE)");
+            mainCls.addReflectiveToString();
         }
     }
     

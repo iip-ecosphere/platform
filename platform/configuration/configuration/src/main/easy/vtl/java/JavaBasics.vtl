@@ -558,5 +558,11 @@ template JavaBasics(Configuration config, FileArtifact target) {
             c.addArgument(ms);
         }
     }
+    
+    def addReflectiveToString(JavaCodeClass c) {
+        c.addImport("org.apache.commons.lang3.builder.ReflectionToStringBuilder");
+        c.addImport("de.iip_ecosphere.platform.services.environment.IipStringStyle");
+        c.addToString().addReturn("ReflectionToStringBuilder.toString(this, IipStringStyle.SHORT_STRING_STYLE)");
+    }
 
 }

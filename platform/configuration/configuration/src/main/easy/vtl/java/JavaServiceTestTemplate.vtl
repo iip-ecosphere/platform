@@ -89,10 +89,11 @@ template JavaServiceTestTemplate(Configuration config, JavaCodeArtifact target, 
     }    
     
     def setServiceState(String state, String errorCls, String errorMsg, JavaCodeMethod m) {
-        JavaCodeTryBlock t = m.addTry();
-        t.addCall("service.setState").addVariableArgument("de.iip_ecosphere.platform.services.environment.ServiceState." + state, JavaCodeImportScope.CLASS);
-        t.addCatch("java.util.concurrent.ExecutionException", "e").addCall("org.slf4j.LoggerFactory.getLogger", JavaCodeImportScope.CLASS).addArgument(errorCls)
-            .addCall("error").addStringArgument("${errorMsg}: {}").addArgument("e");
+        m.addTry().(t|{
+            t.addCall("service.setState").addVariableArgument("de.iip_ecosphere.platform.services.environment.ServiceState." + state, JavaCodeImportScope.CLASS);
+            t.addCatch("java.util.concurrent.ExecutionException", "e").addCall("org.slf4j.LoggerFactory.getLogger", JavaCodeImportScope.CLASS).addArgument(errorCls)
+                .addCall("error").addStringArgument("${errorMsg}: {}").addArgument("e");
+        });
     }
     
     def main(Configuration config, JavaCodeArtifact target, JavaService service, String pkg) {

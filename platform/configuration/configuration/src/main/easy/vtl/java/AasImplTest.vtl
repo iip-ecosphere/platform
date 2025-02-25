@@ -483,11 +483,12 @@ template AasImplTest(Configuration config, JavaCodeArtifact target, AasSubmodelT
 	    m.addCall("smBuilder.setCreateMultiLanguageProperties", JavaCodeImportScope.NONE).addArgument("isCreateMultiLanguageProperties", JavaCodeImportScope.NONE);
 		m.addCall("populate").addArgument("smBuilder").addArgument(1);
 		m.addCall("build").qualifiedBy("smBuilder");
-        JavaCodeTryBlock t = m.addTry();
-		t.addCall("testAas").addCallArgument("registerAas").addArgument("aasBuilder");
-		JavaCodeBlock c = t.addCatch("java.util.concurrent.ExecutionException", "e");
-		c.addCall("e.printStackTrace", JavaCodeImportScope.NONE).addArgument("System.out");
-		c.addCall("org.junit.Assert.fail", JavaCodeImportScope.CLASS).addArgument("e.getMessage", JavaCodeImportScope.NONE);
+        m.addTry().(t|{
+    		t.addCall("testAas").addCallArgument("registerAas").addArgument("aasBuilder");
+		}).addCatch("java.util.concurrent.ExecutionException", "e").(c|{
+            c.addCall("e.printStackTrace", JavaCodeImportScope.NONE).addArgument("System.out");
+            c.addCall("org.junit.Assert.fail", JavaCodeImportScope.CLASS).addArgument("e.getMessage", JavaCodeImportScope.NONE);
+		});
 		
 		String builderCls = "${clsName}Builder";
 		m = mainCls.addMethod(builderCls, "populate", "Populates an example contact information builder.").setStatic();

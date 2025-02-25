@@ -53,10 +53,7 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, JavaCodeArti
             a.addGetter(true);
             a.addSetter(true).addToJavadocComment(" [required by Jackson]");
         }
-        
-        c.addImport("org.apache.commons.lang3.builder.ReflectionToStringBuilder");
-        c.addImport("de.iip_ecosphere.platform.services.environment.IipStringStyle");
-        c.addToString().addReturn("ReflectionToStringBuilder.toString(this, IipStringStyle.SHORT_STRING_STYLE)");
+        addReflectiveToString(c);
         
         genMatcher(elt, service);
     }
@@ -140,24 +137,25 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, JavaCodeArti
         JavaCodeMethod m = mainCls.addMethod("", "testService", "Tests the service with a given JSON input stream.");
         m.addException("java.io.IOException", "if the data cannot be loaded/mapped to the service input data");
         m.addParameter("java.io.InputStream", "in", "the Yaml input stream, will be closed");
-        JavaCodeTryBlock b = m.addTry();
-        b.addImport("org.springframework.boot.builder.SpringApplicationBuilder");
-        b.addImport("org.springframework.cloud.stream.binder.test.TestChannelBinderConfiguration");
-        b.addImport("org.springframework.boot.WebApplicationType");
-        b.addResource("org.springframework.context.ConfigurableApplicationContext", "context", 
-            "new SpringApplicationBuilder(TestChannelBinderConfiguration.getCompleteConfiguration()).web(WebApplicationType.NONE).run()");
-        b.addVariable("org.springframework.cloud.stream.binder.test.InputDestination", "source", "context.getBean(InputDestination.class)");
-        b.addVariable("org.springframework.cloud.stream.binder.test.OutputDestination", "target", "context.getBean(OutputDestination.class)");
-        b.addSLComment("force initializing Transport");
-        b.addCall("iip.Starter.getSetup", JavaCodeImportScope.METHOD_CLASS_IMPORT);
-        createDataMapper(b, elt, service);
-        b.addCall("de.iip_ecosphere.platform.services.environment.DataMapper.mapJsonData", JavaCodeImportScope.CLASS).addArgument("in").addClassArgument("DataUnit").addArgument("consumer");
-        b.addSLComment("if context is not ready");
-        addTimeUtilsSleep(b, 3000);
-        b.addCall("context.close");
-        b.addCall("detach");
-        addLoggerCall(b, "info", "Test done. Cooling down for 1s");
-        addTimeUtilsSleep(b, 1000);
+        m.addTry().(b|{
+	        b.addImport("org.springframework.boot.builder.SpringApplicationBuilder");
+	        b.addImport("org.springframework.cloud.stream.binder.test.TestChannelBinderConfiguration");
+	        b.addImport("org.springframework.boot.WebApplicationType");
+	        b.addResource("org.springframework.context.ConfigurableApplicationContext", "context", 
+	            "new SpringApplicationBuilder(TestChannelBinderConfiguration.getCompleteConfiguration()).web(WebApplicationType.NONE).run()");
+	        b.addVariable("org.springframework.cloud.stream.binder.test.InputDestination", "source", "context.getBean(InputDestination.class)");
+	        b.addVariable("org.springframework.cloud.stream.binder.test.OutputDestination", "target", "context.getBean(OutputDestination.class)");
+	        b.addSLComment("force initializing Transport");
+	        b.addCall("iip.Starter.getSetup", JavaCodeImportScope.METHOD_CLASS_IMPORT);
+	        createDataMapper(b, elt, service);
+	        b.addCall("de.iip_ecosphere.platform.services.environment.DataMapper.mapJsonData", JavaCodeImportScope.CLASS).addArgument("in").addClassArgument("DataUnit").addArgument("consumer");
+	        b.addSLComment("if context is not ready");
+	        addTimeUtilsSleep(b, 3000);
+	        b.addCall("context.close");
+	        b.addCall("detach");
+	        addLoggerCall(b, "info", "Test done. Cooling down for 1s");
+	        addTimeUtilsSleep(b, 1000);
+        });
 
         m = mainCls.addMethod("", "after", "After the test (class): If there are still service threads hanging around, get rid of them.").setStatic();
         m.addAnnotation("org.junit.AfterClass");
@@ -167,14 +165,16 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, JavaCodeArti
         m = mainCls.addMethod("", "testService", 'Tests the service with the file given in system property "iip.test.dataFile", "../../src/test/resources/${fileName}" or the default resource "${fileName}".');
         m.addException("java.io.IOException", "if the data cannot be loaded/mapped to the service input data");
         m.addVariable("java.io.InputStream", "in");
-        b = m.addTry();
-        b.addVariable("String", "fileName", 'System.getProperty("iip.test.dataFile", "../../src/test/resources/${fileName}")');
-        addLoggerCall(b, "info", "Opening {}").addArgument("fileName");
-        b.addAssignment("in", new JavaCodeConstructorCall("java.io.FileInputStream").addArgument("fileName"));
-        b.addCatch("java.io.IOException", "e").addAssignment("in", new JavaCodeMethodCall("de.iip_ecosphere.platform.support.resources.ResourceLoader.getResourceAsStream", JavaCodeImportScope.METHOD_CLASS_IMPORT).addStringArgument(fileName));
-        JavaCodeAlternative a = m.addIf("null != in");
-        a.addCall("testService").addArgument("in");
-        addLoggerCall(a.addElse(), "error", "No test data found. Skipping test.");
+        m.addTry().(b|{
+	        b.addVariable("String", "fileName", 'System.getProperty("iip.test.dataFile", "../../src/test/resources/${fileName}")');
+	        addLoggerCall(b, "info", "Opening {}").addArgument("fileName");
+	        b.addAssignment("in", new JavaCodeConstructorCall("java.io.FileInputStream").addArgument("fileName"));
+	        b.addCatch("java.io.IOException", "e").addAssignment("in", new JavaCodeMethodCall("de.iip_ecosphere.platform.support.resources.ResourceLoader.getResourceAsStream", JavaCodeImportScope.METHOD_CLASS_IMPORT).addStringArgument(fileName));
+        });
+        m.addIf("null != in").(a|{
+	        a.addCall("testService").addArgument("in");
+	        addLoggerCall(a.addElse(), "error", "No test data found. Skipping test.");
+        });
     }
     
     /*
@@ -323,12 +323,14 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, JavaCodeArti
     def genServiceAutostop(JavaCodeMethod m, ServiceBase service) {
         m.addVariable("de.iip_ecosphere.platform.services.environment.Service", "svc")
             .addCall("iip.Starter.getMappedService", JavaCodeImportScope.METHOD_CLASS_IMPORT).addStringArgument(service.id);
-        JavaCodeAlternative a = m.addIf("null != svc");
-        JavaCodeTryBlock t = a.addTry();
-        addLoggerCall(t, "info", "Service autostop (test): ${service.id}");
-        m.addImport("de.iip_ecosphere.platform.services.environment.ServiceState");
-        t.addCall("svc.setState").addArgument("ServiceState.STOPPING");
-        codeCatchExecutionExceptionLogError(t, "Stopping service ${service.id}: {}");
+        m.addIf("null != svc").(a|{
+            a.addTry().(t|{
+		        addLoggerCall(t, "info", "Service autostop (test): ${service.id}");
+		        m.addImport("de.iip_ecosphere.platform.services.environment.ServiceState");
+		        t.addCall("svc.setState").addArgument("ServiceState.STOPPING");
+		        codeCatchExecutionExceptionLogError(t, "Stopping service ${service.id}: {}");
+            });
+        });
     }
 
     def genTests(MeshSource elt, Connector connector) {
