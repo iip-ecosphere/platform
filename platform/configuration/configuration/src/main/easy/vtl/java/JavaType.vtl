@@ -238,13 +238,14 @@ template JavaType(Configuration config, JavaCodeArtifact target, RecordType type
         mainCls.asInterface(interface);
 
         for (Field f: type.fields) {
-            JavaCodeAttribute attr = mainCls.createAttribute(getTypeName(f), asMethodFieldIdentifier(f.name), not(interface));
+            mainCls.createAttribute(getTypeName(f), asMethodFieldIdentifier(f.name), not(interface)).(attr|{
             if (not(interface)) {
                 attr.addAnnotation("com.fasterxml.jackson.annotation.JsonProperty").addStringArgument(f.name); // unconditional -> service integrations
                 attr.addAnnotation("de.iip_ecosphere.platform.support.iip_aas.ConfiguredName").addStringArgument(f.name);        
             }
             configureGetterSetter(mainCls.addGetter(attr), true, f);
             configureGetterSetter(mainCls.addSetter(attr, "value"), false, f);
+            });
         }
 
         if (not(interface)) { // below: out-of-order method production
@@ -256,7 +257,7 @@ template JavaType(Configuration config, JavaCodeArtifact target, RecordType type
             JavaCodeMethod hash = mainCls.addHashCode();
             hash.addVariable("int", "hc", "0");
 
-            JavaCodeMethod eq = mainCls.addEquals("other");
+            JavaCodeMethod eq = mainCls.addEquals("other").(eq|{
             eq.addVariable("boolean", "eq", "");
             eq.addIf('other instanceof ${clsName}').(a|{
                 a.addAssignment("${clsName} oth", "(${clsName}) other");
@@ -269,6 +270,7 @@ template JavaType(Configuration config, JavaCodeArtifact target, RecordType type
 	            hash.addReturn("hc");
 			}).addElse().addAssignment("eq", "false");
             eq.addReturn("eq");
+            });
             
             mainCls.addReflectiveToString();
         }

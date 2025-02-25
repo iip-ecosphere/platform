@@ -146,12 +146,13 @@ template JavaConnectorSerializer(Configuration config, JavaCodeArtifact target, 
                 block.addVariable(getParserResultType(parser), outerPrName, 
                     new JavaCodeMethodCall("stepInto").qualifiedBy("pr").addArgument(fieldPath).addArgument(suffixPath(indexes, ",")));
                 block.addVariable(qTgtArrayEltTypeName + "[]", arrayName).addNewArray(tgtArrayEltTypeName).addDimension(outerPrName + ".getArraySize()");
-                JavaCodeForLoop l = block.addForLoop("int", "i", "0", "i < size", "i++");
+                block.addForLoop("int", "i", "0", "i < size", "i++").(l|{
                     l.addLoopVariable("size", outerPrName + ".getArraySize()");
                     l.addVariable(getParserResultType(parser), "prElement", outerPrName + '.stepInto("", i)');
                     l.addAssignment(arrayName + "[i]", new JavaCodeConstructorCall(qTgtArrayEltTypeName + add));
                     genFrom(srcArrayType.type, srcArrayEltTypeName, tgtArrayType.type, tgtArrayEltTypeName, "tmp", "${arrayName}[i]", l);
                     l.addCall("stepOut").qualifiedBy("prElement");
+                });
                 block.addCall("stepOut").qualifiedBy("prArray" + arrayCount);
                 
                 prVariableName.removeLast();
@@ -225,8 +226,9 @@ template JavaConnectorSerializer(Configuration config, JavaCodeArtifact target, 
             meth.addCall("startArrayStructure").qualifiedBy("formatter").addStringArgument(name);
             meth.addCall("startObjectStructure").qualifiedBy("formatter").addNullArgument();
             meth.addVariable(arrayEltTypeName + "[]", arrayName, data);
-            JavaCodeForLoop l = meth.addForLoop("int", "i", "0", "i < ${arrayName}.length", "i++");
+            meth.addForLoop("int", "i", "0", "i < ${arrayName}.length", "i++").(l|{
             genToField("${arrayName}[i]", "", "", tgtArrayType.type, srcArrayType.type, nullable, l);
+            });
             meth.addCall("endStructure").qualifiedBy("formatter");
             meth.addCall("endStructure").qualifiedBy("formatter");
         } else {

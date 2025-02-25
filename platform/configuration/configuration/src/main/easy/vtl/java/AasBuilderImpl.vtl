@@ -666,14 +666,15 @@ template AasBuilderImpl(Configuration config, JavaCodeArtifact target, AasSubmod
             if (getBooleanValueSafe(type.isOpen, false)) {
                implements = "I${clsName}"; 
             
-               JavaCodeClass iface = cls.addClass("I" + clsName, getClassComment(type.description, "Interface", 
-                   "AAS enumeration interface", false)).asInterface().setPublic();
+               cls.addClass("I" + clsName, getClassComment(type.description, "Interface", 
+                   "AAS enumeration interface", false)).asInterface().setPublic().(iface|{
                iface.addMethod("int", "getValueId", "Returns the value id/given ordinal.", "the value id/given ordinal");
                iface.addMethod("String", "getSemanticId", "Returns the semantic id.", "the semantic id");
                iface.addMethod("String", "getValue", "Returns the value to be used in the AAS.", "the value to be used in the AAS");
+               });
             }
-            JavaCodeEnum enm = cls.addEnum(clsName, getClassComment(type.description, "Enumeration", 
-                "AAS enumeration implementation", false));
+            cls.addEnum(clsName, getClassComment(type.description, "Enumeration", 
+                "AAS enumeration implementation", false)).(enm|{
             enm.addInterface(implements); // ignored if empty
             for (EnumLiteral literal: type.literals) {
                 produceLiteral(literal, enm);
@@ -683,17 +684,19 @@ template AasBuilderImpl(Configuration config, JavaCodeArtifact target, AasSubmod
             JavaCodeAttribute enmSemanticId = enm.addAttribute("String", "semanticId");
             JavaCodeAttribute enmValue = enm.addAttribute("String", "value");
             
-            JavaCodeMethod m = enm.addConstructor("Creates a constant.");
+                enm.addConstructor("Creates a constant.").(m|{
             m.addParameter("int", "valueId", "the value id/given ordinal");
             m.addParameter("String", "semanticId", "the semantic id");
             m.addParameter("String", "value", "the value");
             m.addAssignment("this.valueId", "valueId");
             m.addAssignment("this.semanticId", "semanticId");
             m.addAssignment("this.value", "value");
+                });
             
             genEnumGetter(type, enmValueId, "(optional) value id/given ordinal", enm);
             genEnumGetter(type, enmSemanticId, "(optional) semantic id", enm);
             genEnumGetter(type, enmValue, "value to be used in the AAS", enm);
+            });
         }
     }
 

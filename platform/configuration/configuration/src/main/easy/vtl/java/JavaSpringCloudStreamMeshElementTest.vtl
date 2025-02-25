@@ -49,9 +49,10 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, JavaCodeArti
             String typeName = toTypeName(in);
             String implTypeName = toImplTypeName(in, typeAdd);
             String attributeName = firstToLowerCase(toTypeName(in));
-            JavaCodeAttribute a = c.addAttribute(implTypeName, attributeName);
+            c.addAttribute(implTypeName, attributeName).(a|{
             a.addGetter(true);
             a.addSetter(true).addToJavadocComment(" [required by Jackson]");
+            });
         }
         addReflectiveToString(c);
         
@@ -472,11 +473,12 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, JavaCodeArti
         m.addVariable("de.iip_ecosphere.platform.services.environment.YamlService", "yaml").addInitializer(c2);
         m.addVariable("java.io.File", "f").addCall("de.iip_ecosphere.platform.support.FileUtils.findFile", 
             JavaCodeImportScope.METHOD_CLASS_IMPORT).addArgument('new File("..")').addStringArgument(serviceArtifact);
-        JavaCodeAlternative a = m.addIf("null != f && null != yaml.getProcess()");
+        m.addIf("null != f && null != yaml.getProcess()").(a|{
         a.addCall("iip.Starter.extractProcessArtifacts", JavaCodeImportScope.METHOD_CLASS_IMPORT)
             .addStringArgument(service.id).addArgument("yaml.getProcess()").addArgument("f").addNullArgument();
         addLoggerCall(a.addElse(), "info", "Service artifact {} not found in {}", cls=clsNameTestClass)
             .addStringArgument(serviceArtifact).addStringArgument("..");
+        });
         m.addVariable("org.junit.runner.JUnitCore", "junit").addNew("JUnitCore");
         m.addCall("junit.addListener").addNew("org.junit.internal.TextListener").addArgument("System.out");
         m.addCall("junit.run").addClassArgument(clsNameTestClass);
@@ -540,35 +542,43 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, JavaCodeArti
 
         genClasses(elt, elt.impl);
         
-        JavaCodeMethod m = mainCls.addConstructor("Creates an instance and registers the application serializers.");
+        mainCls.addConstructor("Creates an instance and registers the application serializers.").(m|{
             generateSerializerRegistration(serializers, m);
+        });
+
         genMethods(elt, elt.impl, clsName);
 
-        m = mainCls.addMethod("", "incrementReceived", "Increments the received counter for the given data {@code type}.").setPrivate();
+        mainCls.addMethod("", "incrementReceived", "Increments the received counter for the given data {@code type}.").setPrivate().(m|{
         m.addParameter("Class<?>", "type", "the type to increment the counter for");
-        JavaCodeAlternative a = m.addIf("received.containsKey(type)");
+            m.addIf("received.containsKey(type)").(a|{
         a.addAsStatement("received.put(type, received.get(type) + 1)");
         a.addElse().addAsStatement("received.put(type, 1)");
+            });
+        });
         
         genAssertPredicates(elt, elt.impl);
 
-        m = mainCls.addMethod("java.util.function.Predicate<Map<Class<?>, Integer>>", "createReceivedCounterAssertPredicate", 
-            "Returns the predicate to assert the counters for received data type instances.").setProtected();
+        mainCls.addMethod("java.util.function.Predicate<Map<Class<?>, Integer>>", "createReceivedCounterAssertPredicate", 
+            "Returns the predicate to assert the counters for received data type instances.").setProtected().(m|{
         m.addReturn("m -> true", "the predicate (by default, a predicate with constant value {@code true})");
+        });
 
-        m = mainCls.addMethod("", "printReceivedData", "Prints the received data. Can be overridden.").setProtected();
+        mainCls.addMethod("", "printReceivedData", "Prints the received data. Can be overridden.").setProtected().(m|{
         m.addParameter("Object", "data", "the received data");
         m.addSystemOutPrintlnCall().addArgument("data");
+        });
         
-        m = mainCls.addMethod("int", "getInitialPeriod", "Returns the initial period.").setProtected();
+        mainCls.addMethod("int", "getInitialPeriod", "Returns the initial period.").setProtected().(m|{
         m.addReturn("500", "the initial period in ms, no (initial) input delay happens if the value is zero or negative");
+        });
 
         genTests(elt, elt.impl);
 
-        m = mainCls.addMainMethod("Starts the configured version of this service/connector as main program.");
+        mainCls.addMainMethod("Starts the configured version of this service/connector as main program.").(m|{
         m.addException("java.io.IOException", "shall not occur");
         m.addAssignment("cmdArgs", "args");
         genMain(elt, elt.impl, m);
+        });
     }
     
 }

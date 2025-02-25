@@ -295,7 +295,7 @@ template AasImplTest(Configuration config, JavaCodeArtifact target, AasSubmodelT
 				
 				m.addVariable(qualifyAasCls('${importPrefix}Builder.', '${clsName}Builder'), builderName);
                 Integer minCard = max(1, getIntegerValueSafe(field.minimumInstances, -1));
-                JavaCodeForLoop f = m.addForLoop("int", "card", "1", 'card <= ${minCard}', 'card++');
+                m.addForLoop("int", "card", "1", 'card <= ${minCard}', 'card++').(f|{
 				JavaCodeMethodCall bld = new JavaCodeMethodCall('builder.create${fldName}Builder', JavaCodeImportScope.NONE);
 				f.addAssignment(builderName, bld);
 				
@@ -316,6 +316,7 @@ template AasImplTest(Configuration config, JavaCodeArtifact target, AasSubmodelT
 					bld.addStringArgument("generic");
                 }
 				f.addCall('${builderName}.build', JavaCodeImportScope.NONE);
+				});
             }
         } else if (mode == 2 or mode == 3) {
             if (!isImplementedByAPI(field.type) and notSkip(field)) {
@@ -340,10 +341,11 @@ template AasImplTest(Configuration config, JavaCodeArtifact target, AasSubmodelT
 		    b.addIf("depth < ${maxDepth}").add(expr);
 		} else {
 			String type = field.type.name;
-			JavaCodeAlternative a = b.addIf('!stack.contains("${type}")');
+			b.addIf('!stack.contains("${type}")').(a|{
 			a.addCall("stack.add", JavaCodeImportScope.NONE).addStringArgument(type);
 			a.add(expr);
 			a.addCall("stack.remove", JavaCodeImportScope.NONE).addStringArgument(type);
+			});
 		}
 	}
 

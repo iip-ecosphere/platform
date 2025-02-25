@@ -151,39 +151,41 @@ template JavaServiceBaseImpl(Configuration config, JavaCodeArtifact target, Serv
         createYamlConstructor(mainCls, false);
         createYamlConstructor(mainCls, true);
         
-        JavaCodeMethod m = mainCls.addMethod("de.iip_ecosphere.platform.services.environment.ParameterConfigurer<?>", "getParameterConfigurer");
-        m.addParameter("String", "paramName");
-        m.addOverrideAnnotation();
+        mainCls.addMethod("de.iip_ecosphere.platform.services.environment.ParameterConfigurer<?>", "getParameterConfigurer").(m|{
+            m.param("String", "paramName");
+            m.override();
         m.addReturn("paramConfigurers.get(paramName)");
-        
-        m = mainCls.addMethod("java.util.Set<String>", "getParameterNames");
-        m.addOverrideAnnotation();
+        });
+        mainCls.addMethod("java.util.Set<String>", "getParameterNames").(m|{
+            m.override();
         m.addReturn("paramConfigurers.keySet()");
-
-        m = mainCls.addMethod("", "registerParameterConfigurers", "Registers the configurers.").setProtected();
+        });
+        mainCls.addMethod("", "registerParameterConfigurers", "Registers the configurers.").setProtected().(m|{
         regs->forEach(JavaCodeMethodCall r|m.add(r));
+        });
         produceForParameter(service);
 
         for (String t : ingestorTypes->sortedBy(n|n)) {
             String sT = toSimpleName(t);
             String mNameInfix = sT.firstToUpperCase() + "Ingestor";
             String att = sT.firstToLowerCase() + "Ingestors";
-        
-            m = mainCls.addMethod("", "attach" + mNameInfix);
-            m.addOverrideAnnotation();
-            m.addParameter("de.iip_ecosphere.platform.services.environment.DataIngestor<${t}>", "ingestor");
+            mainCls.addMethod("", "attach" + mNameInfix).(m|{
+                m.override();
+                m.param("de.iip_ecosphere.platform.services.environment.DataIngestor<${t}>", "ingestor");
             m.addIf("ingestor != null").addCall("add").qualifiedBy(att).addArgument("ingestor");
-            
-            m = mainCls.addMethod("boolean", "has" + mNameInfix, "Returns whether there are registered ${sT} ingestors.").setProtected();
+            });
+            mainCls.addMethod("boolean", "has" + mNameInfix, "Returns whether there are registered ${sT} ingestors.").setProtected().(m|{
             m.addReturn(att + ".size() > 0", "{@code true} if there are ${sT} ingestors, {@code false} else");
-        
-            m = mainCls.addMethod("int", "has" + mNameInfix + "Count", "Returns the number of registered ${sT} ingestors.").setProtected();
+            });
+            mainCls.addMethod("int", "has" + mNameInfix + "Count", "Returns the number of registered ${sT} ingestors.").setProtected().(m|{
             m.addReturn(att + ".size()", "the number of ${sT} ingestors");
-
-            m = mainCls.addMethod("", "ingest" + sT.firstToUpperCase(), "Sends {@code data} to all registered ${sT} ingestors.").setProtected();
-            m.addParameter(t, "data", "the data to be sent");
-            JavaCodeForLoop f = m.addForLoop("int", "i", "0", "i < ${att}.size()", "i++");
+            });
+            mainCls.addMethod("", "ingest" + sT.firstToUpperCase(), "Sends {@code data} to all registered ${sT} ingestors.").setProtected().(m|{
+                m.param(t, "data", "the data to be sent");
+                m.addForLoop("int", "i", "0", "i < ${att}.size()", "i++").(f|{
             f.addCall("get").qualifiedBy(att).addArgument("i").addCall("ingest").addArgument("data");
+                });
+            });
         }
     }
     

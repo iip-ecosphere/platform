@@ -848,7 +848,7 @@ block;
                 }
                 c.method(serviceType, "handle" + typeName).setPrivate().(m|{
                     m.param(typeName, "data");
-                    JavaCodeAlternative a = m.if("null != ${handleVar}");
+                    m.if("null != ${handleVar}").(a|{
                         a.var("String", "newCls", "${handleVar}.getNewConnectorClass(data)");
                         a.if("null != newCls && newCls.length() > 0").(a1|{
                             a1.var("ConnectorParameter", "param", "createConnectorParameter()");
@@ -871,6 +871,7 @@ block;
                             });
                         });
                         a.call("received").qualifiedBy(handleVar).arg("data").arg(connAccess);
+                    });
                     m.return(service);
                 });
             }

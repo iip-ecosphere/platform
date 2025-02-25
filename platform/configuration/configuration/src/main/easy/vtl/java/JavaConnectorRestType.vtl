@@ -25,7 +25,7 @@ template JavaConnectorRestType(Configuration config, JavaCodeArtifact target, Re
 
         String getValueToWrite = "null";
         for (Field f: type.fields) {
-            JavaCodeAttribute attr = mainCls.addAttribute(mapTypeName(f), asMethodFieldIdentifier(f.name));
+            mainCls.addAttribute(mapTypeName(f), asMethodFieldIdentifier(f.name)).(attr|{
             if (getValueToWrite == "null") {
                 getValueToWrite = attr.getName(); 
             }
@@ -34,6 +34,7 @@ template JavaConnectorRestType(Configuration config, JavaCodeArtifact target, Re
             }
             mainCls.addGetter(attr);
             mainCls.addSetter(attr, "value");
+            });
         }
 
         mainCls.addConstructor("Default constructor. Fields are pre-allocated with default Java values.");
