@@ -299,15 +299,14 @@ def produceReconfigureCode(Parameters params) {
         if (params.size() > 0) {
             c.addFunc("notifyReconfigured", "Called to inform the implementing class that a parameter reconfiguration happened.")
                 .addParameter("values", "dict", "the new param names/values");
-            
-            PythonCodeFunction f = c.addFunc("reconfigure", "Called by ServiceEnvironment to initialize service parameters or to reconfigure them at runtime.");
+            c.addFunc("reconfigure", "Called by ServiceEnvironment to initialize service parameters or to reconfigure them at runtime.").(f|{
             f.addParameter("values", "dict", "the new param names/values");
             for (Parameter p: params) {
                 String expr = 'values["${p.name}"]';
                 f.addIf('"${p.name}" in values').add('self.param_${p.name} = ${convertValue(p, expr)}');
             }
             f.addSelfCall("notifyReconfigured").addArgument("values");
-                
+            });
             for (Parameter p: params) {
                 c.addFunc('get${asMethodNameSuffix(p.name)}', "Returns the value of parameter ${p.name}. May change at runtime upon reconfiguration.")
                     .addReturn("self.param_${p.name}", "the value of the parameter");
@@ -386,19 +385,20 @@ def generateReceiveClientServer(PythonServer server) {
     }
     
     def addAttachIngest(PythonCodeClass cls) {
-        PythonCodeFunction f = cls.addFunc("ingest", "Ingests result data asynchronously into stream processing. Target stream and data type are 
-           handled by the ingestor.");
+        cls.addFunc("ingest", "Ingests result data asynchronously into stream processing. Target stream and data type are 
+           handled by the ingestor.").(f|{
         f.addParameter("data", "", "the data to ingest; if the type is unknown/no type translator registered, nothing will happen");
         f.addIf("self.ingestor is not None").addCall("self.ingestor").addArgument("data");
+        });
     }
     
     def addSetStateStartStop(PythonCodeClass cls, String kind) {
-        PythonCodeFunction f = cls.addFunc("setState", "Changes the state. [R133c]");
+        cls.addFunc("setState", "Changes the state. [R133c]").(f|{
         f.addParameter("state", "ServiceState", "the new state");
         f.addSuperCall("setState").addArgument("state");
         f.addIf("state==ServiceState.STARTING").addSelfCall("start");
         f.addIf("state==ServiceState.STOPPING").addSelfCall("stop");
-
+        });
         cls.addFunc("start", "Called when the ${kind} shall start.");
         cls.addFunc("stop", "Called when the ${kind} shall stop.");
     }
@@ -435,15 +435,17 @@ def generateReceiveClientServer(PythonServer server) {
     }
     
     def genTestAssertionIngestor(PythonCodeArtifact target) {
-        PythonCodeFunction f = target.addFunc("assertionIngestor").addParameter("data");
+        target.addFunc("assertionIngestor").addParameter("data").(f|{
         f.addSLComment("add your assertions in this block, data will be your returned data");
         f.addCall("print").addStringArgument("output").addArgument("data");
+        });
     }
     
     def genTestMainUnittestArgparse(PythonCodeArtifact target) {
-        PythonCodeAlternative i = target.addIf('__name__ == "__main__"');
-        i.addSLComment("Makes unittest and argparse work together", true);
-        i.addCall("unittest.main").addArgument("argv", '["first-arg-is-ignored"]').addArgument('exit', false);
+        target.addIf('__name__ == "__main__"').(i|{
+            i.addSLComment("Makes unittest and argparse work together", true);
+            i.addCall("unittest.main").addArgument("argv", '["first-arg-is-ignored"]').addArgument('exit', false);
+        });
     }
     
     def PythonCodeFunction addSourceMethod(MeshSource src, String type, String methodSuffix, String methodSuffixWithServiceId, PythonCodeClass cls) {

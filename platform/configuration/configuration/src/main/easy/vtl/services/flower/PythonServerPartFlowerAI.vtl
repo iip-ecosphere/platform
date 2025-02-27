@@ -34,10 +34,11 @@ template PythonServerPartFlowerAI(Configuration config, FileArtifact target, Pyt
     }
 
     def produceRest(FlowerFederatedAiServer server, PythonCodeClass cls) {
-        PythonCodeFunction f = cls.addMethod("runServerMethod", "started via thread runner in python");
-        PythonCodeAlternative a = f.addIf('self.IP is None');
+        cls.addMethod("runServerMethod", "started via thread runner in python").(f|{
+            f.addIf('self.IP is None').(a|{
         a.addSLComment('localhost fallback is always ok, for external traffic an IP might be needed');
         a.addAssign('self.IP', '"localhost:${server.port}"');
+            });
         f.addAssign('config', 'configparser.ConfigParser()');
         f.add('config.read("config.ini")');
         f.addAssign('stra', 'Strategy(   
@@ -48,6 +49,7 @@ template PythonServerPartFlowerAI(Configuration config, FileArtifact target, Pyt
         f.addEmptyLine();
         f.addPrint().addStringArgument(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Prestarted SERVER");
         f.add('fl.server.start_server(server_address=self.IP, config=fl.server.ServerConfig(num_rounds=config["fl"]["rounds"], ), strategy=stra)');
+        });
     }
 
 }

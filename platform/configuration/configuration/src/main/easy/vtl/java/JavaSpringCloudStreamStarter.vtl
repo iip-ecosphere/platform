@@ -12,28 +12,29 @@ template JavaSpringCloudStreamStarter(Configuration config, JavaCodeArtifact tar
         mainCls.addAnnotation("org.springframework.context.annotation.ComponentScan")
             .addArgument('{"iip.nodes", "de.iip_ecosphere.platform.services.environment.spring", "de.iip_ecosphere.platform.transport.spring"}');
         mainCls.addExtends("de.iip_ecosphere.platform.services.environment.spring.Starter");
-        JavaCodeMethod m = mainCls.addConstructor("Creates an instance.");
+        mainCls.addConstructor("Creates an instance.").(m|{
         m.addParameter("org.springframework.core.env.Environment", "environment", "the Spring environment");
         m.addAnnotation("org.springframework.beans.factory.annotation.Autowired");
         m.addSuperCall().addArgument("environment");
-        
-        m = mainCls.addMethod("java.util.List<de.iip_ecosphere.platform.services.environment.Service>", "createServices").setProtected();
+        });
+        mainCls.addMethod("java.util.List<de.iip_ecosphere.platform.services.environment.Service>", "createServices").setProtected().(m|{
         m.addOverrideAnnotation();
         m.addParameter("de.iip_ecosphere.platform.services.environment.YamlArtifact", "artifact");
         m.addReturn("null");
-        
-        m = mainCls.addMethod("org.springframework.messaging.converter.MessageConverter", "customMessageConverter", 
-            'Creates a custom message converter and binds it against "application/iip".');
+        });
+        mainCls.addMethod("org.springframework.messaging.converter.MessageConverter", "customMessageConverter", 
+            'Creates a custom message converter and binds it against "application/iip".').(m|{
         m.addAnnotation("org.springframework.context.annotation.Bean");
         m.addReturn(new JavaCodeConstructorCall("de.iip_ecosphere.platform.transport.spring.SerializerMessageConverter"), "the custom message converter");
-
-        m = mainCls.addMethod("", "registerSerializers", "Registers required, generated serializers.").setStatic();        
+        });
+        mainCls.addMethod("", "registerSerializers", "Registers required, generated serializers.").setStatic().(m|{
         generateSerializerRegistration(serializers, m);
-            
-        m = mainCls.addMainMethod();
+        });
+        mainCls.addMainMethod().(m|{
         m.getJavadocComment().setComment("Starts the service chain.");
         m.addCall("registerSerializers");
         m.addCall("main").addArgument("iip.Starter.class").addArgument("args");
+        });
     }
     
 }

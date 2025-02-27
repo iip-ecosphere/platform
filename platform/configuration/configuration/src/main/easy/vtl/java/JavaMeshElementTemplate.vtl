@@ -13,36 +13,39 @@ template JavaMeshElementTemplate(Configuration config, JavaCodeArtifact target, 
     // called via produceForInputTypes/produceForOutputTypes
     def produceAsyncProcessorBody(IOType type) {
         String t = toTypeName(type);
-        JavaCodeMethod m = mainCls.addMethod("", "process" + t.firstToUpperCase());
-            m.addOverrideAnnotation();
+        mainCls.addMethod("", "process" + t.firstToUpperCase()).(m|{
+            m.override();
             m.addParameter(toQualifiedTypeName(type), "data");
             if (elt.kind == ServiceKind::SINK_SERVICE) {
                 m.addSLComment("TODO Store, emit, pass on your data here. This is the sink.");
             } else {
                 m.addSLComment("TODO call ingest<Type>(instance). " + generatePossibleOutputTypes(elt.impl, config));
             }
+        });
     }
     
     // called via produceForInputTypes/produceForOutputTypes
     def produceSyncProcessorBody(IOType returnType, IOType dataType) {
         String r = toTypeName(returnType);
         String t = toTypeName(dataType);
-        JavaCodeMethod m = mainCls.addMethod(toQualifiedTypeName(returnType), "transform" + t.firstToUpperCase());
-            m.addOverrideAnnotation();
+        mainCls.addMethod(toQualifiedTypeName(returnType), "transform" + t.firstToUpperCase()).(m|{
+            m.override();
             m.addParameter(toQualifiedTypeName(dataType), "data");
-            m.addVariable(toQualifiedTypeName(returnType), "result").addNew(toQualifiedTypeName(returnType) + typeAdd);
+            m.var(toQualifiedTypeName(returnType), "result").addNew(toQualifiedTypeName(returnType) + typeAdd);
             m.addSLComment("TODO add your code here");
             m.addReturn("result");
+        });
     }
     
     // called via produceForInputTypes/produceForOutputTypes
     def produceProducerBody(IOType type) {
         String t = toTypeName(type);
-        JavaCodeMethod m = mainCls.addMethod(toQualifiedTypeName(type), "produce" + t.firstToUpperCase());
-            m.addOverrideAnnotation();
-            m.addVariable(toQualifiedTypeName(type), "result").addNew(toQualifiedTypeName(type) + typeAdd);
+        mainCls.addMethod(toQualifiedTypeName(type), "produce" + t.firstToUpperCase()).(m|{
+            m.override();
+            m.var(toQualifiedTypeName(type), "result").addNew(toQualifiedTypeName(type) + typeAdd);
             m.addSLComment("TODO add your code here");
             m.addReturn("result");
+        });
     }
 
     def main(Configuration config, JavaCodeArtifact target, MeshElement elt, String pkg, String name) {
@@ -54,13 +57,15 @@ template JavaMeshElementTemplate(Configuration config, JavaCodeArtifact target, 
             typeAdd = "";
         }
         mainCls = codeCreateClass(target, pkg, name, "Service implementation for net node \'${elt.name}\'");
-        mainCls.addExtends("iip.impl." + clsName + "Impl");
-        JavaCodeMethod m = mainCls.addConstructor("Fallback constructor, also used for testing main program.");
+        mainCls.extends("iip.impl." + clsName + "Impl");
+        mainCls.addConstructor("Fallback constructor, also used for testing main program.").(m|{
             m.addSuperCall().addArgument(getJavaServiceKind(elt.impl.kind, mainCls));
-        m = mainCls.addConstructor("Creates a service instance from a service id and a YAML artifact.");
+        });
+        mainCls.addConstructor("Creates a service instance from a service id and a YAML artifact.").(m|{
             m.addParameter("String", "serviceId", "the service id");
             m.addParameter("java.io.InputStream", "ymlFile", "the YML file containing the YAML artifact with the service descriptor");
             m.addSuperCall().addArgument("serviceId").addArgument("ymlFile");
+        });
         produceForInputTypes(elt.impl);
         produceForOutputTypes(elt.impl);
     }

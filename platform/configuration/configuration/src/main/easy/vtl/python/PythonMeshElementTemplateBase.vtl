@@ -11,10 +11,11 @@ template PythonMeshElementTemplateBase(Configuration config, FileArtifact target
     // called via MeshBasics.generateDataMethods for MeshSource
     def generateSourceMethod(MeshSource src, String type, String methodSuffix, String methodSuffixWithServiceId) {
         if (!src.impl.asynchronous) {
-            PythonCodeFunction f = addSourceMethod(src, type, methodSuffix, methodSuffixWithServiceId, cls);
+            addSourceMethod(src, type, methodSuffix, methodSuffixWithServiceId, cls).(f|{
             f.addAssign('result', '${type}${typeAdd}()');
             generateSourceMethodImpl(src.impl, f);
             f.addReturn("result");
+            });
         }
     } 
     
@@ -31,11 +32,13 @@ template PythonMeshElementTemplateBase(Configuration config, FileArtifact target
                 forward = t.forward;
             }
         }
-        PythonCodeFunction f = addAsyncProcessorInMethod(proc, type, methodSuffix, methodSuffixWithServiceId, cls);
-        PythonCodeDocComment c = f.getComment();
+        addAsyncProcessorInMethod(proc, type, methodSuffix, methodSuffixWithServiceId, cls).(f|{
+            f.getComment().(c|{
         c.setComment("${c.getComment()}
             ${generatePossibleOutputTypes(service, config)|e}");
+            });
         generateAsyncProcessorInMethodImpl(proc.impl, forward, f);
+        });
     }
     
     @DispatchBasis
@@ -46,10 +49,11 @@ template PythonMeshElementTemplateBase(Configuration config, FileArtifact target
 
     // called via MeshBasics.generateDataMethods for synch MeshProcessor
     def generateSyncProcessorMethod(MeshProcessor proc, String inType, String outType, String methodSuffix, String methodSuffixWithServiceId) {
-        PythonCodeFunction f = addSyncProcessorMethod(proc, inType, outType, methodSuffix, methodSuffixWithServiceId, cls);
+        addSyncProcessorMethod(proc, inType, outType, methodSuffix, methodSuffixWithServiceId, cls).(f|{
         f.addAssign('result', '${outType}${typeAdd}()');
         generateSyncProcessorMethodImpl(proc.impl, f);
         f.addReturn('result');
+        });
     }
     
     @DispatchBasis
@@ -59,8 +63,9 @@ template PythonMeshElementTemplateBase(Configuration config, FileArtifact target
     
     // called via MeshBasics.generateDataMethods for MeshSink
     def generateSinkMethod(MeshSink snk, String type, String methodSuffix, String methodSuffixWithServiceId) {
-        PythonCodeFunction f = addSinkMethod(snk, type, methodSuffix, methodSuffixWithServiceId, cls);
+        addSinkMethod(snk, type, methodSuffix, methodSuffixWithServiceId, cls).(f|{
         generateSinkMethodImpl(snk.impl, f);
+        });
     }
     
     @DispatchBasis

@@ -71,20 +71,19 @@ template PythonServiceInterface(Configuration config, PythonCodeArtifact target,
             .addBase("AbstractService");
         cls.addAttribute("ingestor", "None");
         produceParameterFields(service.parameter, cls);
-            
-        PythonCodeFunction f = cls.addConstructor("Initializes the service.");
+        cls.addConstructor("Initializes the service.").(f|{
         produceSuper(service, f);
         f.addCall("self.registerMethods");
-
+        });
         addAttachIngestor(cls);
         addAttachIngest(cls);
         addSetStateStartStop(cls, "service");
         produceReconfigure(service.parameter, cls);
         produceForInputTypes(service);
         produceForOutputTypes(service);
-  
-        f = cls.addFunc("registerMethods");
+        cls.addFunc("registerMethods").(f|{
         reg->forEach(s|f.add(s));
+        });
     }
     
 }

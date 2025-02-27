@@ -92,17 +92,18 @@ template PythonType(Configuration config, PythonCodeArtifact target, RecordType 
 
     def genSetterAssignment(Field f, ArrayType type, PythonCodeFunction meth) {
          meth.addAssign("tmp", "[]");
-         PythonCodeForLoop fl = meth.addFor("e", "v");
-         PythonCodeAlternative alt = fl.addIf('"numpy" in str(type(e))');
-         alt.addCall("tmp.append").addArgument("e.item()");
-         alt.addElse().addCall("tmp.append").addArgument("e");
-         meth.addAssign("self._${asIdentifier(f.name)}", "tmp");
+         meth.addFor("e", "v").(fl|{
+             fl.addIf('"numpy" in str(type(e))').(alt|{
+                 alt.addCall("tmp.append").addArgument("e.item()");
+             }).addElse().addCall("tmp.append").addArgument("e");
+		 });
+		 meth.addAssign("self._${asIdentifier(f.name)}", "tmp");
     }
-    
+ 
     protected def genNumpyConversion(Field f, DataType type, PythonCodeFunction meth) {
-        PythonCodeAlternative alt = meth.addIf('"numpy" in str(type(v))');
-        alt.addAssign("self._${asIdentifier(f.name)}", "v.item()");
-        alt.addElse().addAssign("self._${asIdentifier(f.name)}", "v");
+        meth.addIf('"numpy" in str(type(v))').(alt|{
+            alt.addAssign("self._${asIdentifier(f.name)}", "v.item()");
+        }).addElse().addAssign("self._${asIdentifier(f.name)}", "v");
     }
     
     def genSetterParamVDoc(Field f, NumericPrimitiveType type) {

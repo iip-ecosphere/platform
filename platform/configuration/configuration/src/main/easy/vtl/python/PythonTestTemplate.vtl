@@ -37,9 +37,8 @@ template PythonTestTemplate(Configuration config, PythonCodeArtifact target, Pyt
         target.addEmptyLine();
         target.addCall("os.chdir").addStringArgument("../../main/python");
         target.addEmptyLine();
-        PythonCodeClass c = target.addClass(asTypeName(pythonElements.name) + "Test").addBase("unittest.TestCase", PythonCodeImportScope.NONE);
-
-        PythonCodeFunction f = c.addFunc("test_inputTest");
+        target.addClass(asTypeName(pythonElements.name) + "Test").addBase("unittest.TestCase", PythonCodeImportScope.NONE).(c|{
+            c.addFunc("test_inputTest").(f|{
         f.addSLComment('Change name to correct .json, access rawData for values i.e. rawData["InputType"]["Value1"]');
         f.addAssign("rawData", '""');
         f.addAssign("service", '${asTypeName(pythonElements.name)}()');
@@ -60,6 +59,8 @@ template PythonTestTemplate(Configuration config, PythonCodeArtifact target, Pyt
         f.addEmptyLine();
         f.addSLComment('do your asserts here');
         f.addCall("self.assertTrue").addArgument(true);
+            });
+        });
 
         genTestAssertionIngestor(target);
         genTestMainUnittestArgparse(target);

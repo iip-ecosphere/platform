@@ -33,30 +33,31 @@ template JavaSerializerBase(IIPEcosphere config, JavaCodeArtifact target, Record
         if (pkg != typePkg) {
             mainCls.addImport("${typePkg}.*");
         }
-        mainCls.addInterface("de.iip_ecosphere.platform.transport.serialization.Serializer<${typeName}>");
+        mainCls.implements("de.iip_ecosphere.platform.transport.serialization.Serializer<${typeName}>");
         genClsInit(config, mainCls, typeName);
         
-        JavaCodeMethod from = mainCls.addMethod(typeName, "from", "");
+        JavaCodeMethod from = mainCls.addMethod(typeName, "from", "").(from|{
         from.addParameter("byte[]", "data");
-        from.addOverrideAnnotation();
-        from.addException("java.io.IOException");
+            from.override();
+            from.throws("java.io.IOException");
         genFrom(config, type, from, "data", "${clsName}${add}");
-
-        JavaCodeMethod to = mainCls.addMethod("byte[]", "to", "");
+        });
+        mainCls.addMethod("byte[]", "to", "").(to|{
         to.addParameter(typeName, "source");
-        to.addOverrideAnnotation();
-        to.addException("java.io.IOException");
+            to.override();
+            to.throws("java.io.IOException");
         genTo(config, type, to, "source", "${clsName}${add}");
-
-        JavaCodeMethod clone = mainCls.addMethod(typeName, "clone", "");
+        });
+        mainCls.addMethod(typeName, "clone", "").(clone|{
         clone.addParameter(typeName, "origin");
-        clone.addOverrideAnnotation();
-        clone.addException("java.io.IOException");
+            clone.override();
+            clone.throws("java.io.IOException");
         clone.addReturn("new ${clsName}${add}(origin)");
-
-        JavaCodeMethod getType = mainCls.addMethod("Class<${typeName}>", "getType", "");
-        getType.addOverrideAnnotation();
+        });
+        mainCls.addMethod("Class<${typeName}>", "getType", "").(getType|{
+            getType.override();
         getType.addReturn("${typeName}.class");
+        });
     }
     
 }

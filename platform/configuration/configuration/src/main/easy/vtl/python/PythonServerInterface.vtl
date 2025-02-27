@@ -17,21 +17,21 @@ template PythonServerInterface(Configuration config, PythonCodeArtifact target, 
         target.addImport("Service", "ServiceState");
         target.addImport("Service", "ServiceKind");
         
-        PythonCodeClass cls = addPythonClass(target, clsName + "ServerInterface", 'Interface for server "${server.id}"')
-            .addBase("AbstractService");
+        addPythonClass(target, clsName + "ServerInterface", 'Interface for server "${server.id}"')
+            .addBase("AbstractService").(cls|{
         cls.addAttribute('ingestor', "None");
         produceParameterFields(server.parameter, cls);
-        
-        PythonCodeFunction f = cls.addConstructor("Initializes the server service.");
+            cls.addConstructor("Initializes the server service.").(f|{
         String sId = "'${server.id}'";
         f.addSuperConstructorCall().addStringArgument("${server.id}").addStringArgument("${server.id}").addArgument('Version("${server.ver}")').addStringArgument("${server.description}").addArgument(true).addArgument("ServiceKind.SERVER");
         f.addAssign('Registry.services[${sId}]', 'self');
-        
+            });
         addAttachIngestor(cls);
         addAttachIngest(cls);
         produceReconfigure(server.parameter, cls);
         addSetStateStartStop(cls, "server");
         generateReceiveClientServer(server, cls);
+        });
      }
     
 }

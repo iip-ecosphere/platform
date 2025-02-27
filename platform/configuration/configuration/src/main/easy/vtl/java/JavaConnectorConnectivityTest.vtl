@@ -23,7 +23,7 @@ template JavaConnectorConnectivityTest(IIPEcosphere config, JavaCodeArtifact tar
     
     def addCallback(JavaCodeClass cls, DataType type, String varName) {
         String clsName = toTypeName(type);
-        JavaCodeAttribute attr = cls.addAttribute("de.iip_ecosphere.platform.transport.connectors.ReceptionCallback<${clsName}>", varName).(attr|{
+        cls.addAttribute("de.iip_ecosphere.platform.transport.connectors.ReceptionCallback<${clsName}>", varName).(attr|{
             attr.setStatic().setPrivate();
             attr.addAnonymous("ReceptionCallback<${clsName}>").(init|{
                 init.addMethod("void", "received").(meth|{

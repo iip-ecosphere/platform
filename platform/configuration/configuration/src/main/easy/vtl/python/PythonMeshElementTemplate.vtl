@@ -27,15 +27,16 @@ template PythonMeshElementTemplate(Configuration config, PythonCodeArtifact targ
 
         cls = addPythonClass(target, clsName, 'Template service implementation for ${clsName}');
         cls.addBase(inheritsFrom(ifName));
-        PythonCodeFunction f = cls.addConstructor("Initializes the service.");
+        cls.addConstructor("Initializes the service.").(f|{
         f.addSuperConstructorCall();
         produceConstructorRest(service, f);
-        
-        f = cls.addFunc("start", "Called when the service shall start.");
+        });
+        cls.addFunc("start", "Called when the service shall start.").(f|{
         produceSetStateStarting(service, f);
-
-        f = cls.addFunc("stop", "Called when the service shall stop.");
+        });
+        cls.addFunc("stop", "Called when the service shall stop.").(f|{
         produceSetStateStopping(service, f);
+        });
         
         produceReconfigure(service, cls);
         generateDataMethods(elt, true);

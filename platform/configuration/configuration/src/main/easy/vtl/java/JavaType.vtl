@@ -184,7 +184,7 @@ template JavaType(Configuration config, JavaCodeArtifact target, RecordType type
 
     def configureGetterSetter(JavaCodeMethod method, boolean getter, Field f) {
         if (emitJavadoc) {
-            JavaCodeJavadocComment comment = method.getJavadocComment();
+            method.getJavadocComment().(comment|{
             if (getter) {
                 comment.setComment('Returns the value of {@code ${asMethodFieldIdentifier(f.name)}}.${prependIfNotEmpty(" ", stripLang(f.description))}');
                 comment.addReturnComment("the value");
@@ -195,6 +195,7 @@ template JavaType(Configuration config, JavaCodeArtifact target, RecordType type
                 } 
                 comment.addParameterComment("value", "the new value");
             }
+            });
         } else {
             method.addOverrideAnnotation();
         }

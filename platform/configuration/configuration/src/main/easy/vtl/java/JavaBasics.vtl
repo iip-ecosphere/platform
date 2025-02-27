@@ -146,7 +146,7 @@ template JavaBasics(Configuration config, FileArtifact target) {
     }
     
     @DispatchCase
-	def String toTypeName(Integer16TypeType type) {
+    def String toTypeName(Integer16TypeType type) {
         "short";
     }
     
@@ -189,7 +189,7 @@ template JavaBasics(Configuration config, FileArtifact target) {
     def String toTypeName(DateTimeTypeType type) {
         "java.time.LocalDateTime";
     }
-	
+    
     @DispatchCase
     def String toTypeName(ArrayType type) {
         toTypeName(type.type) + "[]";
@@ -551,12 +551,11 @@ template JavaBasics(Configuration config, FileArtifact target) {
     }
     
     def JavaCodeMethodCall addTimeUtilsSleep(JavaCodeBlockInterface b, Integer ms) {
-        JavaCodeMethodCall c = b.addCall("de.iip_ecosphere.platform.support.TimeUtils.sleep", JavaCodeImportScope.METHOD_CLASS_IMPORT);
-        if (ms < 0) {
-            c;
-        } else {
-            c.addArgument(ms);
-        }
+        b.addCall("de.iip_ecosphere.platform.support.TimeUtils.sleep", JavaCodeImportScope.METHOD_CLASS_IMPORT).(c|{
+            if (ms >= 0) {
+                c.addArgument(ms);
+            }
+        });
     }
     
     def addReflectiveToString(JavaCodeClass c) {

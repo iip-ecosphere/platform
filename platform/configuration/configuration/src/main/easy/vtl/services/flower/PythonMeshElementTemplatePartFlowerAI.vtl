@@ -44,9 +44,10 @@ template PythonMeshElementTemplatePartFlowerAI(Configuration config, FileArtifac
     def produceConstructorRest(FlowerFederatedAiService service, PythonCodeFunction f) {
         FlowerFederatedAiServer server = service.server;
         f.addAssign('self.IP', 'self.getNetMgtKeyAddress()');
-        PythonCodeAlternative a = f.addIf('self.IP is None');
+        f.addIf('self.IP is None').(a|{
         a.addSLComment('fallback, then server is not relocatable anymore');
         a.addAssign('self.IP', '"${server.host}:${server.port}"');
+        });
     }
 
 }

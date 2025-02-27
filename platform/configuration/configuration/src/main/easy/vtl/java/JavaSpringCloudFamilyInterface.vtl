@@ -46,9 +46,10 @@ template JavaSpringCloudFamilyInterface(Configuration config, JavaCodeArtifact t
         mainCls.addExtends("de.iip_ecosphere.platform.services.environment.switching.ServiceBase");
         generateDataMethods(elt, true);
         mainCls.addMethod("", "initService", "Initializes the service instance. Please execute resource-intensive or time-intensive calls here.");
-        JavaCodeMethod m = mainCls.addMethod("", "setState", "Changes the state. [R133c]");
+        mainCls.addMethod("", "setState", "Changes the state. [R133c]").(m|{
             m.addParameter("de.iip_ecosphere.platform.services.environment.ServiceState", "state", "the new state");
             m.addException("java.util.concurrent.ExecutionException", "if changing the state fails for some reason");
+        });
         mainCls.addMethod("", "detach", "Detaches the service. Opposite of {@link #initService()}.");
     }
     

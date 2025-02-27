@@ -24,10 +24,11 @@ template JavaServiceBaseImpl(Configuration config, JavaCodeArtifact target, Serv
     def registerParameter(Parameter p, String cls, String typeTranslator) {
         String suffix = attributeMethodSuffix(p);
         mainCls.addImport("de.iip_ecosphere.platform.transport.serialization.TypeTranslators"); // as used below
-        JavaCodeMethodCall c = new JavaCodeMethodCall("de.iip_ecosphere.platform.services.environment.AbstractService.addConfigurer", JavaCodeImportScope.METHOD_CLASS_IMPORT);
+        new JavaCodeMethodCall("de.iip_ecosphere.platform.services.environment.AbstractService.addConfigurer", JavaCodeImportScope.METHOD_CLASS_IMPORT).(c|{
         c.addArgument("paramConfigurers").addStringArgument(p.name).addArgument(cls).addArgument(typeTranslator);
         c.addArgument("v -> setParameter${suffix}(v)").addArgument("() -> getParameter${suffix}()").addStringArgumentNotEmpty(getStringValueSafe(p.systemProperty, ""));
         regs.add(c);
+        });
     }
     
     // ---------------------------------- attributes ----------------------------
@@ -69,13 +70,14 @@ template JavaServiceBaseImpl(Configuration config, JavaCodeArtifact target, Serv
     // ---------------------------------- accessors ----------------------------
     
     def produceAccessors(Parameter p, String type) {
-        JavaCodeMethod m = mainCls.addMethod("", "setParameter" + attributeMethodSuffix(p), 'Changes the service parameter "${p.name}".');
+        mainCls.addMethod("", "setParameter" + attributeMethodSuffix(p), 'Changes the service parameter "${p.name}".').(m|{
         m.addParameter(type, attributeName(p), "the parameter value");
         m.addException("java.util.concurrent.ExecutionException", "if setting the value fails, e.g., as the service is in the wrong state such as startup vs. runtime");
         m.addAssignment("this." + attributeName(p), attributeName(p));
-        
-        m = mainCls.addMethod(type, "getParameter" + attributeMethodSuffix(p), 'Returns the service parameter "${p.name}".');
+        });
+        mainCls.addMethod(type, "getParameter" + attributeMethodSuffix(p), 'Returns the service parameter "${p.name}".').(m|{
         m.addReturn("this." + attributeName(p), "the value of the parameter");
+        });
     }
     
     // called via produceForParameter(service)
@@ -104,21 +106,23 @@ template JavaServiceBaseImpl(Configuration config, JavaCodeArtifact target, Serv
     }
 
     def createFallbackConstructor(JavaCodeClass cls, boolean withId) {
-        JavaCodeMethod m = mainCls.addConstructor('Fallback constructor setting most fields to "empty" default values.');
+        mainCls.addConstructor('Fallback constructor setting most fields to "empty" default values.').(m|{
             m.setProtected();
-            JavaCodeMethodCall c = new JavaCodeMethodCall("super");
+            new JavaCodeMethodCall("super").(c|{
             if (withId) {
                 c.addArgument(m.addParameter("String", "serviceId", "the id of the service"));
             }
             c.addArgument(m.addParameter("de.iip_ecosphere.platform.services.environment.ServiceKind", "kind", "the service kind"));
             m.add(c);
+            });
             m.addCall("registerParameterConfigurers");
+        });
     }
     
     def createYamlConstructor(JavaCodeClass cls, boolean withId) {
-        JavaCodeMethod m = mainCls.addConstructor('Creates a service instance from YAML information.');
+        mainCls.addConstructor('Creates a service instance from YAML information.').(m|{
             m.setProtected();
-            JavaCodeMethodCall c = new JavaCodeMethodCall("super");
+            new JavaCodeMethodCall("super").(c|{
             if (withId) {
                 m.getJavadocComment().setComment("Creates a service instance from a service id and a YAML artifact.");
                 c.addArgument(m.addParameter("String", "serviceId", "the id of the service"));
@@ -127,7 +131,9 @@ template JavaServiceBaseImpl(Configuration config, JavaCodeArtifact target, Serv
                 c.addArgument(m.addParameter("de.iip_ecosphere.platform.services.environment.YamlService", "yaml", "the service information as read from YAML"));
             }
             m.add(c);
+            });
             m.addCall("registerParameterConfigurers");
+        });
     }
     
     def main(Configuration config, JavaCodeArtifact target, ServiceBase service, String pkg) {

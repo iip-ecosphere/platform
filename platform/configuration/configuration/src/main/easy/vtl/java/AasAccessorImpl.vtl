@@ -148,29 +148,30 @@ template AasAccessorImpl(Configuration config, JavaCodeArtifact target, AasSubmo
         if (notSkip(field)) {
             String clsName = asTypeName(type.name);
             String fldName = asTypeName(validateName(field.name));
-            JavaCodeMethod mth = mainCls.addMethod(qualifyAasCls(clsName), "get"+fldName, "Gets an instance of ${field.name}.");
-            mth.getJavadocComment().addReturnComment("the instance or <b>null</b> for none");
-
-            String idShortParam = "";
-            if (field.isGeneric) {
-                mth.addParameter("String", "idShort", "the actual idShort");
-                idShortParam = "idShort";
-            }
-            String accessEx = getFieldNameEx(field, "index", idShortParam);
-            if (isFieldCounting(field)) {
-                mth.addParameter("int", "index", "0-based index to access a specific instance");
-            }
-            if (hasMultiSemId(field)) {
-                mth.addParameter("String", "semanticId", "the actual semanticId");
-            }
-            
-            JavaCodeExpression returnEx = new JavaCodeTextExpression("super.${methodName}(${accessEx})");
-            if (!isImplementedByAPI(type)) { // add null check
-                mth.addVariable("", "tmp", returnEx);
-                returnEx = new JavaCodeTernaryExpression("null == tmp", "null", 
-                    new JavaCodeConstructorCall(clsName).addArgument("tmp"));
-            }     
-            mth.addReturn(returnEx);
+            mainCls.addMethod(qualifyAasCls(clsName), "get"+fldName, "Gets an instance of ${field.name}.").(mth|{
+                mth.getJavadocComment().addReturnComment("the instance or <b>null</b> for none");
+    
+                String idShortParam = "";
+                if (field.isGeneric) {
+                    mth.addParameter("String", "idShort", "the actual idShort");
+                    idShortParam = "idShort";
+                }
+                String accessEx = getFieldNameEx(field, "index", idShortParam);
+                if (isFieldCounting(field)) {
+                    mth.addParameter("int", "index", "0-based index to access a specific instance");
+                }
+                if (hasMultiSemId(field)) {
+                    mth.addParameter("String", "semanticId", "the actual semanticId");
+                }
+                
+                JavaCodeExpression returnEx = new JavaCodeTextExpression("super.${methodName}(${accessEx})");
+                if (!isImplementedByAPI(type)) { // add null check
+                    mth.addVariable("", "tmp", returnEx);
+                    returnEx = new JavaCodeTernaryExpression("null == tmp", "null", 
+                        new JavaCodeConstructorCall(clsName).addArgument("tmp"));
+                }     
+                mth.addReturn(returnEx);
+            });
         }
     }
     
@@ -277,18 +278,17 @@ template AasAccessorImpl(Configuration config, JavaCodeArtifact target, AasSubmo
         String clsName = asTypeName(type.name);
         if (!done.includes(clsName) and !isImplementedByAPI(type) and notSkip(type)) {
             done.add(clsName);
-
-            JavaCodeClass cls = mainCls.addClass(clsName, 
-                getClassComment(type.description, "Accessor", "AAS accessor implementation", false));
-            cls.setPublic();
-            cls.setStatic();
+            mainCls.addClass(clsName, 
+                getClassComment(type.description, "Accessor", "AAS accessor implementation", false)).(cls|{
+                cls.setPublic().setStatic();
             cls.addExtends("de.iip_ecosphere.platform.support.aas.types.common.DelegatingSubmodelElementCollection");
-            JavaCodeMethod cons = cls.addConstructor("Creates a wrapping instance for ${getIdShort(type)}.")
-                .setProtected();
+                cls.addConstructor("Creates a wrapping instance for ${getIdShort(type)}.")
+                    .setProtected().(cons|{
             cons.addParameter("de.iip_ecosphere.platform.support.aas.SubmodelElementCollection", "parent", "the parent submodel element collection builder");    
             cons.add("super(parent);");
+                });
             produceMethodsForFields(type.fields, clsName, cls);
-
+            });
             produceClassesForFields(type.fields, false, mainCls);
         }
     }
@@ -298,18 +298,17 @@ template AasAccessorImpl(Configuration config, JavaCodeArtifact target, AasSubmo
         String clsName = asTypeName(type.name);
         if (!done.includes(clsName) and !isImplementedByAPI(type) and notSkip(type)) {
             done.add(clsName);
-            
-            JavaCodeClass cls = mainCls.addClass(clsName, 
-                getClassComment(type.description, "Accessor", "AAS accessor implementation", false));
-            cls.setPublic();
-            cls.setStatic();
-            cls.addExtends("de.iip_ecosphere.platform.support.aas.types.common.DelegatingEntity");
-            JavaCodeMethod cons = cls.addConstructor("Creates a wrapping instance for ${getIdShort(type)}.")
-                .setProtected();
-            cons.addParameter("de.iip_ecosphere.platform.support.aas.Entity", "parent", "the parent submodel element collection builder");    
-            cons.add("super(parent);");
-            produceMethodsForFields(type.fields, clsName, cls);
-
+            mainCls.addClass(clsName, 
+                getClassComment(type.description, "Accessor", "AAS accessor implementation", false)).(cls|{
+                cls.setPublic().setStatic();
+                cls.addExtends("de.iip_ecosphere.platform.support.aas.types.common.DelegatingEntity");
+                cls.addConstructor("Creates a wrapping instance for ${getIdShort(type)}.")
+                    .setProtected().(cons|{
+                    cons.addParameter("de.iip_ecosphere.platform.support.aas.Entity", "parent", "the parent submodel element collection builder");    
+                    cons.add("super(parent);");
+                });
+                produceMethodsForFields(type.fields, clsName, cls);
+            });
             produceClassesForFields(type.fields, false, mainCls);
         }
     }
@@ -328,16 +327,15 @@ template AasAccessorImpl(Configuration config, JavaCodeArtifact target, AasSubmo
         
         JavaCodeClass mainCls = codeCreateClass(target, pkg, clsName, 
             getClassComment(type.description, "Accessor", "AAS Accessor implementation", true));
-        mainCls.addStaticImport("de.iip_ecosphere.platform.support.aas.IdentifierType.*");
-        mainCls.addStaticImport("de.iip_ecosphere.platform.support.aas.types.common.Utils.*");
-        mainCls.addImport("${pkg}.${clsName}Builder.*");
-        mainCls.addExtends("de.iip_ecosphere.platform.support.aas.types.common.DelegatingSubmodel");
-
-        JavaCodeMethod cons = mainCls.addConstructor("Creates a wrapping ${getIdShort(type)} submodel instance.");
-        cons.addParameter("de.iip_ecosphere.platform.support.aas.Aas", "aas", "the parent AAS");
-        cons.add('super(aas.getSubmodel("${getIdShort(type)}"));');
-
-        produceMethodsForFields(type.fields, "${clsName}", mainCls);
-        produceClassesForFields(type.fields, true, mainCls);
+            mainCls.addStaticImport("de.iip_ecosphere.platform.support.aas.IdentifierType.*");
+            mainCls.addStaticImport("de.iip_ecosphere.platform.support.aas.types.common.Utils.*");
+            mainCls.addImport("${pkg}.${clsName}Builder.*");
+            mainCls.addExtends("de.iip_ecosphere.platform.support.aas.types.common.DelegatingSubmodel");
+            mainCls.addConstructor("Creates a wrapping ${getIdShort(type)} submodel instance.").(cons|{
+                cons.addParameter("de.iip_ecosphere.platform.support.aas.Aas", "aas", "the parent AAS");
+                cons.add('super(aas.getSubmodel("${getIdShort(type)}"));');
+            });
+            produceMethodsForFields(type.fields, "${clsName}", mainCls);
+            produceClassesForFields(type.fields, true, mainCls);
     }
 }

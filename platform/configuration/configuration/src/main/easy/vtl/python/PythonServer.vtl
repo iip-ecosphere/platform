@@ -22,22 +22,22 @@ template PythonServer(Configuration config, PythonCodeArtifact target, PythonSer
         target.addSLComment("Do not utilise global code here. Place the needed function in the start / end methods.\n" 
             + "Add methods needed to be run on the start of a service in the start or end methods NOT in init()", true);
         
-        PythonCodeClass cls = addPythonClass(target, clsName + "Server", 'Partially implemented server for "${server.id}"')
-            .addBase(clsName + "ServerInterface");
-        
+        addPythonClass(target, clsName + "Server", 'Partially implemented server for "${server.id}"')
+            .addBase(clsName + "ServerInterface").(cls|{
         produceFields(server, cls);
-        
-        PythonCodeFunction f = cls.addConstructor("Initializes the server service.");
+            cls.addConstructor("Initializes the server service.").(f|{
         f.addSuperConstructorCall();
         produceSuper(server, f);
-
-        f = cls.addFunc("start", "Called when the server shall start.");
+            });
+            cls.addFunc("start", "Called when the server shall start.").(f|{
         produceSetStateStarting(server, f);
-        f = cls.addFunc("stop", "Called when the server shall stop.");
+            });
+            cls.addFunc("stop", "Called when the server shall stop.").(f|{
         produceSetStateStopping(server, f);
-
+            });
         generateReceiveClientServer(server, cls);
         produceRest(server, cls);
+        });
         
         target.addSLComment("registers itself");
         target.addCall(clsName + "Server");

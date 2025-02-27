@@ -28,12 +28,14 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, JavaCodeArti
             } else {
                 String dest = composeDestination("${base.id}_${type}", app);
                 block.addVariable("java.util.function.Predicate<${type}>", "pred" + type, "getAssertPredicate${type}()").setFinal();
-                JavaCodeMethodCall m = block.addCall("createReceptionCallback").addStringArgument(dest);
-                JavaCodeBlock b = m.addLambdaArgument("d").addBlock();
+                block.addCall("createReceptionCallback").addStringArgument(dest).(m|{
+                    m.addLambdaArgument("d").addBlock().(b|{
                     b.addCall("incrementReceived").addClassArgument(type);
                     b.addCall("printReceivedData").addArgument("d");
                     b.addCall("org.junit.Assert.assertTrue", JavaCodeImportScope.METHOD).addArgument("pred${type}.test(d)");
+                    });
                 m.addClassArgument(type);
+                });
             }
         }
     }
@@ -41,7 +43,8 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, JavaCodeArti
     // --------------------- classes ---------------------
     
     def genClasses(MeshElement elt, ServiceBase service) {
-        JavaCodeClass c = mainCls.addClass("DataUnit", "Represents all potential inputs to the service and the JSON input format.").setPublic().setStatic();
+        mainCls.addClass("DataUnit", "Represents all potential inputs to the service and the JSON input format.").(c|{
+            c.setPublic().setStatic();
         c.addImport("de.iip_ecosphere.platform.services.environment.DataMapper.BaseDataUnit");
         c.addExtends("BaseDataUnit");
         
@@ -55,36 +58,37 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, JavaCodeArti
             });
         }
         addReflectiveToString(c);
-        
+        });
         genMatcher(elt, service);
     }
     
     def genMatcher(MeshElement elt, ServiceBase service) {
-        JavaCodeClass c = mainCls.addClass("TestMatcher", "A predicate-based matcher for spring-based output testing. Class generated here, because we do not want to " 
-            + "include the testing artifact of services.environment and hamcrest shall not be a major production dependency.").setPrivate();
-        c.addExtends("org.hamcrest.core.IsAnything<Object>");
+        mainCls.addClass("TestMatcher", "A predicate-based matcher for spring-based output testing. Class generated here, because we do not want to " 
+            + "include the testing artifact of services.environment and hamcrest shall not be a major production dependency.").setPrivate().(c|{
+            c.extends("org.hamcrest.core.IsAnything<Object>");
         c.addAttribute("java.util.Map<Class<?>, java.util.function.Predicate<?>>", "predicates").addNew("java.util.HashMap<>");
         c.addConstructor("Creates an instance.").addSuperCall().addStringArgument(service.id + " matcher");
-
-        JavaCodeMethod m = c.addMethod("", "addPredicate", "Adds a predicate for a given type.").setPrivate();
+        c.addMethod("", "addPredicate", "Adds a predicate for a given type.").setPrivate().(m|{
         m.addGeneric("T", "the type of data to be considered by the predicate");
         m.addParameter("Class<T>", "cls", "the type to add the predicate for");
         m.addParameter("java.util.function.Predicate<T>", "pred", "the predicate");
         m.addCall("predicates.put").addArgument("cls").addArgument("pred");
-
-        m = c.addMethod("boolean", "matches");
+        });
+        c.addMethod("boolean", "matches").(m|{
         m.addOverrideAnnotation();
         m.addParameter("Object", "obj");
         m.addReturn("test(obj)");
-
-        m = c.addMethod("boolean", "test", "Does a typed test against {@link #predicates}.", 
-            "whether {@code obj} matches the condition of a registered predicate or {@code true} if none was registered").setPrivate();
+        });
+        c.addMethod("boolean", "test", "Does a typed test against {@link #predicates}.", 
+            "whether {@code obj} matches the condition of a registered predicate or {@code true} if none was registered").setPrivate().(m|{
         m.addGeneric("T", "the type of data to be considered by the test");
         m.addParameter("T", "obj", "the data/object to be tested");
         m.addCall("incrementReceived").addArgument("obj.getClass()");
         m.addCall("printReceivedData").addArgument("obj");
         m.addVariable("java.util.function.Predicate<T>", "pred", "(Predicate<T>) predicates.get(obj.getClass())").addSuppressWarningsUncheckedAnnotation();
         m.addReturn("null == pred ? true : pred.test(obj)");
+        });
+        });
     }
 
     // not needed here
@@ -118,12 +122,13 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, JavaCodeArti
 
     def genMethods(MeshSource elt, ServiceBase service, String clsName) {
         String fileName = getFileName(service);
-        JavaCodeMethod m = mainCls.addMethod("", "testSource", "Tests the source.");
-        m.addException("java.io.IOException", "if setting up the source fails");
+        mainCls.addMethod("", "testSource", "Tests the source.").(m|{
+            m.throws("java.io.IOException", "if setting up the source fails");
         createDataMapper(m, elt, service);
         addTimeUtilsSleep(m, 5000);
         genServiceAutostop(m, service);
         m.addCall("System.exit").addArgument(0);
+        });
     }
 
     def createDataMapper(JavaCodeBlockInterface b, MeshElement elt, ServiceBase service) {
@@ -135,8 +140,8 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, JavaCodeArti
 
     def genMethods(MeshInnerElement elt, ServiceBase service, String clsName) {
         String fileName = getFileName(service);
-        JavaCodeMethod m = mainCls.addMethod("", "testService", "Tests the service with a given JSON input stream.");
-        m.addException("java.io.IOException", "if the data cannot be loaded/mapped to the service input data");
+        mainCls.addMethod("", "testService", "Tests the service with a given JSON input stream.").(m|{
+            m.throws("java.io.IOException", "if the data cannot be loaded/mapped to the service input data");
         m.addParameter("java.io.InputStream", "in", "the Yaml input stream, will be closed");
         m.addTry().(b|{
 	        b.addImport("org.springframework.boot.builder.SpringApplicationBuilder");
@@ -157,17 +162,17 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, JavaCodeArti
 	        addLoggerCall(b, "info", "Test done. Cooling down for 1s");
 	        addTimeUtilsSleep(b, 1000);
         });
-
-        m = mainCls.addMethod("", "after", "After the test (class): If there are still service threads hanging around, get rid of them.").setStatic();
+        });
+        mainCls.addMethod("", "after", "After the test (class): If there are still service threads hanging around, get rid of them.").setStatic().(m|{
         m.addAnnotation("org.junit.AfterClass");
         m.addSLComment("no other way known so far, binders survive, not suitable for jUnit");
         m.addCall("System.exit").addArgument(0);
-
-        m = mainCls.addMethod("", "testService", 'Tests the service with the file given in system property "iip.test.dataFile", "../../src/test/resources/${fileName}" or the default resource "${fileName}".');
-        m.addException("java.io.IOException", "if the data cannot be loaded/mapped to the service input data");
-        m.addVariable("java.io.InputStream", "in");
+        });
+        mainCls.addMethod("", "testService", 'Tests the service with the file given in system property "iip.test.dataFile", "../../src/test/resources/${fileName}" or the default resource "${fileName}".').(m|{
+            m.throws("java.io.IOException", "if the data cannot be loaded/mapped to the service input data");
+            m.var("java.io.InputStream", "in");
         m.addTry().(b|{
-	        b.addVariable("String", "fileName", 'System.getProperty("iip.test.dataFile", "../../src/test/resources/${fileName}")');
+                b.var("String", "fileName", 'System.getProperty("iip.test.dataFile", "../../src/test/resources/${fileName}")');
 	        addLoggerCall(b, "info", "Opening {}").addArgument("fileName");
 	        b.addAssignment("in", new JavaCodeConstructorCall("java.io.FileInputStream").addArgument("fileName"));
 	        b.addCatch("java.io.IOException", "e").addAssignment("in", new JavaCodeMethodCall("de.iip_ecosphere.platform.support.resources.ResourceLoader.getResourceAsStream", JavaCodeImportScope.METHOD_CLASS_IMPORT).addStringArgument(fileName));
@@ -175,6 +180,7 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, JavaCodeArti
         m.addIf("null != in").(a|{
 	        a.addCall("testService").addArgument("in");
 	        addLoggerCall(a.addElse(), "error", "No test data found. Skipping test.");
+        });
         });
     }
     
@@ -206,7 +212,7 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, JavaCodeArti
                         fullTypeName = typeName + typeAdd;
                     }
                     JavaCodeMethodCall c = m.addCall("addHandler").qualifiedBy(var).addClassArgument(fullTypeName);
-                    JavaCodeBlock b = c.addLambdaArgument("d").addBlock();
+                    c.addLambdaArgument("d").addBlock().(b|{
                     if (connId <> "") {
                         b.addVariable("org.springframework.messaging.Message<${fullTypeName}>", "msg")
                             .addCall("org.springframework.integration.support.MessageBuilder.withPayload", JavaCodeImportScope.METHOD_CLASS_IMPORT)
@@ -224,6 +230,7 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, JavaCodeArti
                         b.addSLComment("one for async via transport - ignored if spring");
                         b.addCall("de.iip_ecosphere.platform.transport.Transport.send", JavaCodeImportScope.CLASS).addArgument('c -> c.asyncSend("${dest}", d)').addStringArgument(senderId).addStringArgument(conn + "-in-0");
                     }
+                    });
                 }
             }
         }
@@ -255,15 +262,15 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, JavaCodeArti
         String connGen = getConnectorGenerics(connector, false);
         String outType = asTypeName(getFirstTypeName(connector.output));
         
-        JavaCodeMethod m = mainCls.addMethod("", "testConnector", "Tests the connector.").setProtected();
-        m.addException("java.io.IOException", "shall not occur");
+        mainCls.addMethod("", "testConnector", "Tests the connector.").setProtected().(m|{
+            m.throws("java.io.IOException", "shall not occur");
         m.addParameter("de.iip_ecosphere.platform.connectors.ConnectorParameter", "params", "the connector parameter to use");
         m.addParameter("de.iip_ecosphere.platform.transport.connectors.ReceptionCallback<${outType}>", "callback", "the callback to attach to the connector");
         m.addImport("de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode");
         m.addSLComment("disable AAS connector registration");
         m.addCall("de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.setNotificationMode", JavaCodeImportScope.METHOD_CLASS_IMPORT)
             .addArgument("NotificationMode.NONE");
-        m.addVariable(connector.class + connGen, "conn", "new ${getConnectorCls(connector)}(${clsName}.createConnectorAdapter())");
+            m.var(connector.class + connGen, "conn", "new ${getConnectorCls(connector)}(${clsName}.createConnectorAdapter())");
         m.addCall("conn.connect").addArgument("params");
         m.addCall("conn.setReceptionCallback").addArgument("callback");
         m.addCall("conn.request").addArgument(true);
@@ -278,9 +285,10 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, JavaCodeArti
         }
         m.addSystemOutPrintlnCall().addStringArgument("Disconnecting...");
         m.addCall("conn.disconnect");
-        
-        m = mainCls.addMethod("de.iip_ecosphere.platform.connectors.ConnectorParameter", "createConnectorParameter", "Returns the connector parameter to be used.").setProtected();
+        });
+        mainCls.addMethod("de.iip_ecosphere.platform.connectors.ConnectorParameter", "createConnectorParameter", "Returns the connector parameter to be used.").setProtected().(m|{
         m.addReturn(clsName + ".createConnectorParameter()", "the connector parameter, by default as configured in the model");
+        });
     }
 
     // --------------------- tests --------------------------
@@ -296,8 +304,8 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, JavaCodeArti
     }
 
     def genTests(MeshSource elt, ServiceBase service) {
-        JavaCodeMethod m = mainCls.addMethod("", "test" + firstToUpperCase(toIdentifier(service.id)) + "Service", "Tests the source.");
-        m.addException("java.io.IOException", "shall not occur / test failure");
+        mainCls.addMethod("", "test" + firstToUpperCase(toIdentifier(service.id)) + "Service", "Tests the source.").(m|{
+            m.throws("java.io.IOException", "shall not occur / test failure");
         m.addJunitTestAnnotation();
         m.addVariable("de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode", "oldM")
             .addCall("de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.setNotificationMode", JavaCodeImportScope.METHOD_CLASS_IMPORT)
@@ -305,12 +313,13 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, JavaCodeArti
         m.addCall("testSource");
         genAssertReceived(m);
         m.addCall("ActiveAasBase.setNotificationMode").addArgument("oldM");
+        });
     }
 
     def genTests(MeshInnerElement elt, ServiceBase service) {
         String fileName = getFileName(service);
-        JavaCodeMethod m =mainCls.addMethod("", "test" + firstToUpperCase(toIdentifier(service.id)) + "Service", 'Tests the service with the default resource "${fileName}".');
-        m.addException("java.io.IOException", "shall not occur / test failure");
+        mainCls.addMethod("", "test" + firstToUpperCase(toIdentifier(service.id)) + "Service", 'Tests the service with the default resource "${fileName}".').(m|{
+            m.throws("java.io.IOException", "shall not occur / test failure");
         m.addJunitTestAnnotation();
         m.addVariable("de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode", "oldM")
             .addCall("de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.setNotificationMode", JavaCodeImportScope.METHOD_CLASS_IMPORT)
@@ -319,6 +328,7 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, JavaCodeArti
         genAssertReceived(m);
         genServiceAutostop(m, service);
         m.addCall("ActiveAasBase.setNotificationMode").addArgument("oldM");
+        });
     }
     
     def genServiceAutostop(JavaCodeMethod m, ServiceBase service) {
@@ -338,27 +348,30 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, JavaCodeArti
         DataType oType = getFirstType(connector.output);
         String outType = toTypeName(oType);
         String outTypeFQ = toQualifiedTypeName(oType);
-        
-        JavaCodeMethod m = mainCls.addMethod("", "testConnector", "Tests the connector, here whether the connector (parameterized by {@link #createConnectorParameter()} delivered any data.");
+        mainCls.addMethod("", "testConnector", "Tests the connector, here whether the connector (parameterized by {@link #createConnectorParameter()} delivered any data.").(m|{
         m.addJunitTestAnnotation();
-        m.addException("java.io.IOException", "shall not occur / test failure");
+            m.throws("java.io.IOException", "shall not occur / test failure");
         m.addVariable(mainCls.getName(), "test").addNew(mainCls.getName());
         m.addVariable("java.util.concurrent.atomic.AtomicInteger", "counter").addNew("AtomicInteger").addArgument(0);
-        JavaCodeAnonymousClass a = m.addVariable("de.iip_ecosphere.platform.transport.connectors.ReceptionCallback<${outTypeFQ}>", "callback")
-            .addAnonymous("ReceptionCallback<${outType}>");
-        JavaCodeMethod am = a.addMethod("", "received");
-        am.addOverrideAnnotation();
+            m.addVariable("de.iip_ecosphere.platform.transport.connectors.ReceptionCallback<${outTypeFQ}>", "callback")
+                .addAnonymous("ReceptionCallback<${outType}>").(a|{
+                a.addMethod("", "received").(am|{
+                    am.override();
         am.addParameter(outTypeFQ, "data");
         am.addCall("counter.incrementAndGet");
         am.addCall("printReceivedData").addArgument("data");
         am.addCall("incrementReceived").addClassArgument(outType);
-        am = a.addMethod("Class<${outType}>", "getType");
-        am.addOverrideAnnotation();
+                });
+                a.addMethod("Class<${outType}>", "getType").(am|{
+                    am.override();
         am.addReturn(outType + ".class");
+                });
+            });
         m.addCall("test.testConnector").addArgument("test.createConnectorParameter()").addArgument("callback");
         m.addCall("org.junit.Assert.assertTrue", JavaCodeImportScope.METHOD)
             .addStringArgument("Connector does not deliver data").addArgument("counter.get() > 0");
         genAssertReceived(m);
+        });
     }
     
     // ------------------- properties -----------------------
@@ -491,15 +504,18 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, JavaCodeArti
         String clsNameTest = mainCls.getName();
 
         m.addVariable(mainCls.getName(), "test", "").addNew(mainCls.getName());
-        JavaCodeAnonymousClass a = m.addVariable("de.iip_ecosphere.platform.transport.connectors.ReceptionCallback<${outTypeFQ}>", "callback")
-            .addAnonymous("ReceptionCallback<${outType}>");
-        JavaCodeMethod am = a.addMethod("", "received");
-        am.addOverrideAnnotation();
+        m.addVariable("de.iip_ecosphere.platform.transport.connectors.ReceptionCallback<${outTypeFQ}>", "callback")
+            .addAnonymous("ReceptionCallback<${outType}>").(a|{
+            a.addMethod("", "received").(am|{
+                am.override();
         am.addParameter(outTypeFQ, "data");
         am.addSystemOutPrintlnCall().addArgument("data");
-        am = a.addMethod("Class<${outType}>", "getType");
-        am.addOverrideAnnotation();
+            });
+            a.addMethod("Class<${outType}>", "getType").(am|{
+                am.override();
         am.addReturn(outType + ".class");
+            });
+        });
         m.addCall("test.testConnector").addArgument("test.createConnectorParameter()").addArgument("callback");
         m.addCall("System.exit").addArgument(0);
     }
@@ -562,12 +578,10 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, JavaCodeArti
             "Returns the predicate to assert the counters for received data type instances.").setProtected().(m|{
         m.addReturn("m -> true", "the predicate (by default, a predicate with constant value {@code true})");
         });
-
         mainCls.addMethod("", "printReceivedData", "Prints the received data. Can be overridden.").setProtected().(m|{
         m.addParameter("Object", "data", "the received data");
         m.addSystemOutPrintlnCall().addArgument("data");
         });
-        
         mainCls.addMethod("int", "getInitialPeriod", "Returns the initial period.").setProtected().(m|{
         m.addReturn("500", "the initial period in ms, no (initial) input delay happens if the value is zero or negative");
         });

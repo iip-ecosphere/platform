@@ -143,13 +143,13 @@ template JavaConnectorSerializer(Configuration config, JavaCodeArtifact target, 
                 prVariableName.add("prElement");
                 String fieldPath = getFieldPath(src, pathEx);
 
-                block.addVariable(getParserResultType(parser), outerPrName, 
+                block.var(getParserResultType(parser), outerPrName, 
                     new JavaCodeMethodCall("stepInto").qualifiedBy("pr").addArgument(fieldPath).addArgument(suffixPath(indexes, ",")));
-                block.addVariable(qTgtArrayEltTypeName + "[]", arrayName).addNewArray(tgtArrayEltTypeName).addDimension(outerPrName + ".getArraySize()");
+                block.var(qTgtArrayEltTypeName + "[]", arrayName).addNewArray(tgtArrayEltTypeName).addDimension(outerPrName + ".getArraySize()");
                 block.addForLoop("int", "i", "0", "i < size", "i++").(l|{
                     l.addLoopVariable("size", outerPrName + ".getArraySize()");
-                    l.addVariable(getParserResultType(parser), "prElement", outerPrName + '.stepInto("", i)');
-                    l.addAssignment(arrayName + "[i]", new JavaCodeConstructorCall(qTgtArrayEltTypeName + add));
+                    l.var(getParserResultType(parser), "prElement", outerPrName + '.stepInto("", i)');
+                    l.assign(arrayName + "[i]", new JavaCodeConstructorCall(qTgtArrayEltTypeName + add));
                     genFrom(srcArrayType.type, srcArrayEltTypeName, tgtArrayType.type, tgtArrayEltTypeName, "tmp", "${arrayName}[i]", l);
                     l.addCall("stepOut").qualifiedBy("prElement");
                 });

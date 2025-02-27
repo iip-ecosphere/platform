@@ -61,18 +61,19 @@ template PythonMeshElementInterface(Configuration config, PythonCodeArtifact tar
         cls = addPythonClass(target, clsName + "Interface", 'Partially implemented service interface for ${clsName}')
             .addBase("AbstractService");
         cls.addAttribute("ingestor", "None");
-        PythonCodeFunction f = cls.addConstructor("Initializes the service.");
+        cls.addConstructor("Initializes the service.").(f|{
         produceSuper(elt.impl, f);
         f.add("self.registerMethods()");
+        });
         
         addAttachIngestor(cls);
         addAttachIngest(cls);
         addSetStateStartStop(cls, "service");        
-        
         generateDataMethods(elt, true);
 
-        f = cls.addMethod("registerMethods");
+        cls.addMethod("registerMethods").(f|{
         reg->forEach(String s|f.add(s));
+        });
     }
     
 }

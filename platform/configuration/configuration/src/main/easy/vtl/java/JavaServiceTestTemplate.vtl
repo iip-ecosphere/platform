@@ -13,9 +13,9 @@ template JavaServiceTestTemplate(Configuration config, JavaCodeArtifact target, 
     @Override
     def produceAsyncProcessorBody(IOType type) {
         String t = toTypeName(type);
-        JavaCodeMethod m = mainCls.addMethod("void", "testProcess${t.firstToUpperCase()}", 'Tests processing a data item of type "${t}" asynchronously.');
+        mainCls.addMethod("void", "testProcess${t.firstToUpperCase()}", 'Tests processing a data item of type "${t}" asynchronously.').(m|{
         m.addJunitTestAnnotation();
-        m.addVariable(qualifyIipType(type.type, t), "data", getTestValue(type.type));
+            m.var(qualifyIipType(type.type, t), "data", getTestValue(type.type));
         m.addSLComment("TODO fill data via setters");
         m.addCall("service.process${t.firstToUpperCase()}").addArgument("data");
         if (service.kind <> ServiceKind::SINK_SERVICE) {
@@ -23,19 +23,21 @@ template JavaServiceTestTemplate(Configuration config, JavaCodeArtifact target, 
         } else {
             m.addSLComment("no direct output for a sink. may be it's generating a log, a file, etc. to assert");
         }
+        });
     }
     
     @Override
     def produceSyncProcessorBody(IOType returnType, IOType dataType) {
         String r = toTypeName(returnType);
         String t = toTypeName(dataType);
-        JavaCodeMethod m = mainCls.addMethod("void", "testTransform${t.firstToUpperCase()}", 'Tests processing a data item of type "${t}" synchronously.');
+        mainCls.addMethod("void", "testTransform${t.firstToUpperCase()}", 'Tests processing a data item of type "${t}" synchronously.').(m|{
         m.addJunitTestAnnotation();
-        m.addVariable(qualifyIipType(dataType.type, t), "data", getTestValue(dataType.type));
+            m.var(qualifyIipType(dataType.type, t), "data", getTestValue(dataType.type));
         m.addSLComment("TODO fill data via setters");
-        m.addVariable(qualifyIipType(returnType.type, r), "res", "service.transform${t.firstToUpperCase()}(data)");
+            m.var(qualifyIipType(returnType.type, r), "res", "service.transform${t.firstToUpperCase()}(data)");
         m.addJunitAssertCall("assertNotNull").addArgument("res"); // contract, see platform handbook
         m.addSLComment("TODO assert fields of res");
+        });
     }
     
     @Override
@@ -46,11 +48,12 @@ template JavaServiceTestTemplate(Configuration config, JavaCodeArtifact target, 
     @Override
     def produceProducerBody(IOType type) {
         String t = toTypeName(type);
-        JavaCodeMethod m = mainCls.addMethod("void", "testProduce${t.firstToUpperCase()}", 'Synchronous source method, called to produce data items of type "${t}".');
+        mainCls.addMethod("void", "testProduce${t.firstToUpperCase()}", 'Synchronous source method, called to produce data items of type "${t}".').(m|{
         m.addJunitTestAnnotation();
-        m.addVariable(qualifyIipType(type.type, t), "res", "service.produce${t.firstToUpperCase()}()");
+            m.var(qualifyIipType(type.type, t), "res", "service.produce${t.firstToUpperCase()}()");
         m.addJunitAssertCall("assertNotNull").addArgument("res"); // contract, see platform handbook
         m.addSLComment("TODO assert fields of res");
+        });
     }
 
     @DispatchBasis
@@ -103,16 +106,17 @@ template JavaServiceTestTemplate(Configuration config, JavaCodeArtifact target, 
         mainCls.addAttribute(service.class, "service");
         produceForInputTypes(service);
         produceForOutputTypes(service);
-        JavaCodeMethod m = mainCls.addMethod("void", "startup", "Initializes the test.");
+        mainCls.addMethod("void", "startup", "Initializes the test.").(m|{
         m.addJunitBeforeAnnotation();
         m.addSLComment("constructor for testing, does not set up service management values!");
-        m.addAssignment("service", new JavaCodeConstructorCall(clsName));
+            m.assign("service", new JavaCodeConstructorCall(clsName));
         genIngestorAttachments(m);
         setServiceState("STARTING", "getClass()", "Cannot start service", m);
-
-        m = mainCls.addMethod("void", "shutdown", "Shuts down the test.");
+        });
+        mainCls.addMethod("void", "shutdown", "Shuts down the test.").(m|{
         m.addJunitAfterAnnotation();
         setServiceState("STOPPING", "getClass()", "Cannot stop service", m);
+        });
     }
         
 }
