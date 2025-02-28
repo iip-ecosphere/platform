@@ -528,6 +528,9 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         Path javaConnSrc = "${javaTestSrc}/${toPath(javaConnectivityPackage)}";
         String clsName = asTypeName(conn.name);
         vilTemplateProcessor("JavaConnectorConnectivityTest", config, "${javaConnSrc}/${clsName}Test.java", conn=conn, pkg=javaConnectivityPackage); 
+        Path testResourcesSrc = "${appRoot}/resources/software";
+        String outName = asTypeName(getFirstTypeName(conn.output));
+        vilTemplateProcessor("TemplatesTestDataJson", config, "${testResourcesSrc}/testData-${clsName}-${outName}.json.tmpl", elt=no);
     }
 
     @DispatchCase
