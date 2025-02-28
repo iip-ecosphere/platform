@@ -18,12 +18,4 @@ This example consists of several pieces:
       
 Regarding Python code, we make the assumption that the module of the Python Service Environment `iip` and the generated modules `datatypes`, `interfaces`, `serializers` and `services` are visible to Python within the same folder (physically or virtually).
   
-As stated above, directly after obtaining this project, the application will not run and even show compile errors. This is due to the fact that generated parts and even the configuration meta model are missing. We will add them through the following steps (as explained in more details in the Platform Handbook). As usual with Maven projects, you may add the argument `-U` to update snapshots if parts are already in place):
-
-  * Ensure that the Maven platformDependencies are installed (see [install](../../tools/Install))
-  * Execute `mvn -U install` This will perform the broker-instantiation, the interface generation, the code compilation and packaging as well as the final application packaging. Build steps are only executed if the configuration model changes or generate code is not already existing. If a `resources.ipr` folder is present, it will take precendence over the `resources` folder. 
-  * To update/upgrade the model, call `mvn -P EasyGen -U generate-sources -Dunpack.force=true`
-
-## Required Updates
-
-See [Platform configuration](../../configuration/configuration) for details on the state of the generation and the required version of EASy-Producer (at least from the day of the last commit of this example). If the configuration meta model shall be updated, add `-Dunpack.force=true`.
+Directly after obtaining this project, the application will not run and even show compile errors. This is an all-in-one example. For building/updating the meta-model, please refer to the [building instructions for all-in-one examples](../../tools/Install).
