@@ -227,7 +227,7 @@ template JavaConnectorSerializer(Configuration config, JavaCodeArtifact target, 
             meth.addCall("startObjectStructure").qualifiedBy("formatter").addNullArgument();
             meth.addVariable(arrayEltTypeName + "[]", arrayName, data);
             meth.addForLoop("int", "i", "0", "i < ${arrayName}.length", "i++").(l|{
-            genToField("${arrayName}[i]", "", "", tgtArrayType.type, srcArrayType.type, nullable, l);
+                genToField("${arrayName}[i]", "", "", tgtArrayType.type, srcArrayType.type, nullable, l);
             });
             meth.addCall("endStructure").qualifiedBy("formatter");
             meth.addCall("endStructure").qualifiedBy("formatter");

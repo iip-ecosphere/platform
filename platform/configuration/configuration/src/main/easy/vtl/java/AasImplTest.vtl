@@ -296,26 +296,26 @@ template AasImplTest(Configuration config, JavaCodeArtifact target, AasSubmodelT
 				m.addVariable(qualifyAasCls('${importPrefix}Builder.', '${clsName}Builder'), builderName);
                 Integer minCard = max(1, getIntegerValueSafe(field.minimumInstances, -1));
                 m.addForLoop("int", "card", "1", 'card <= ${minCard}', 'card++').(f|{
-				JavaCodeMethodCall bld = new JavaCodeMethodCall('builder.create${fldName}Builder', JavaCodeImportScope.NONE);
-				f.addAssignment(builderName, bld);
-				
-                String populateStmt = "";
-                if (type == AasGenericSubmodelElementCollection) {
-				    bld.addArgument(false); // ordered
-				    bld.addArgument(false); // allowsDuplicates
-                } else if (type == AasGenericEntityType) {
-                    m.addImport("de.iip_ecosphere.platform.support.aas.Entity"); // ensure
-				    bld.addArgument('Entity.EntityType.SELFMANAGEDENTITY'); // preliminary default
-                } else {
-					injectRecursionControl(field, 3, f, 'populate(${builderName}, depth + 1)');
-                }
-                if (hasMultiSemId(type)) {
-				    bld.addStringArgument(getSemId(type));
-                }
-                if (field.isGeneric) {
-					bld.addStringArgument("generic");
-                }
-				f.addCall('${builderName}.build', JavaCodeImportScope.NONE);
+    				JavaCodeMethodCall bld = new JavaCodeMethodCall('builder.create${fldName}Builder', JavaCodeImportScope.NONE);
+    				f.addAssignment(builderName, bld);
+    				
+                    String populateStmt = "";
+                    if (type == AasGenericSubmodelElementCollection) {
+    				    bld.addArgument(false); // ordered
+    				    bld.addArgument(false); // allowsDuplicates
+                    } else if (type == AasGenericEntityType) {
+                        m.addImport("de.iip_ecosphere.platform.support.aas.Entity"); // ensure
+    				    bld.addArgument('Entity.EntityType.SELFMANAGEDENTITY'); // preliminary default
+                    } else {
+    					injectRecursionControl(field, 3, f, 'populate(${builderName}, depth + 1)');
+                    }
+                    if (hasMultiSemId(type)) {
+    				    bld.addStringArgument(getSemId(type));
+                    }
+                    if (field.isGeneric) {
+    					bld.addStringArgument("generic");
+                    }
+    				f.addCall('${builderName}.build', JavaCodeImportScope.NONE);
 				});
             }
         } else if (mode == 2 or mode == 3) {
@@ -342,9 +342,9 @@ template AasImplTest(Configuration config, JavaCodeArtifact target, AasSubmodelT
 		} else {
 			String type = field.type.name;
 			b.addIf('!stack.contains("${type}")').(a|{
-			a.addCall("stack.add", JavaCodeImportScope.NONE).addStringArgument(type);
-			a.add(expr);
-			a.addCall("stack.remove", JavaCodeImportScope.NONE).addStringArgument(type);
+    			a.addCall("stack.add", JavaCodeImportScope.NONE).addStringArgument(type);
+    			a.add(expr);
+    			a.addCall("stack.remove", JavaCodeImportScope.NONE).addStringArgument(type);
 			});
 		}
 	}

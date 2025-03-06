@@ -185,16 +185,16 @@ template JavaType(Configuration config, JavaCodeArtifact target, RecordType type
     def configureGetterSetter(JavaCodeMethod method, boolean getter, Field f) {
         if (emitJavadoc) {
             method.getJavadocComment().(comment|{
-            if (getter) {
-                comment.setComment('Returns the value of {@code ${asMethodFieldIdentifier(f.name)}}.${prependIfNotEmpty(" ", stripLang(f.description))}');
-                comment.addReturnComment("the value");
-            } else {
-                comment.setComment('Changes the value of {@code ${asMethodFieldIdentifier(f.name)}}.${prependIfNotEmpty(" ", stripLang(f.description))}');
-                if (f.readOnly) {
-                    comment.addComment(" This field is read only, but needs an accessor for connector serializers. Although you can change it, a connector may ignore the value.");
-                } 
-                comment.addParameterComment("value", "the new value");
-            }
+                if (getter) {
+                    comment.setComment('Returns the value of {@code ${asMethodFieldIdentifier(f.name)}}.${prependIfNotEmpty(" ", stripLang(f.description))}');
+                    comment.addReturnComment("the value");
+                } else {
+                    comment.setComment('Changes the value of {@code ${asMethodFieldIdentifier(f.name)}}.${prependIfNotEmpty(" ", stripLang(f.description))}');
+                    if (f.readOnly) {
+                        comment.addComment(" This field is read only, but needs an accessor for connector serializers. Although you can change it, a connector may ignore the value.");
+                    } 
+                    comment.addParameterComment("value", "the new value");
+                }
             });
         } else {
             method.addOverrideAnnotation();
@@ -240,12 +240,12 @@ template JavaType(Configuration config, JavaCodeArtifact target, RecordType type
 
         for (Field f: type.fields) {
             mainCls.createAttribute(getTypeName(f), asMethodFieldIdentifier(f.name), not(interface)).(attr|{
-            if (not(interface)) {
-                attr.addAnnotation("com.fasterxml.jackson.annotation.JsonProperty").addStringArgument(f.name); // unconditional -> service integrations
-                attr.addAnnotation("de.iip_ecosphere.platform.support.iip_aas.ConfiguredName").addStringArgument(f.name);        
-            }
-            configureGetterSetter(mainCls.addGetter(attr), true, f);
-            configureGetterSetter(mainCls.addSetter(attr, "value"), false, f);
+                if (not(interface)) {
+                    attr.addAnnotation("com.fasterxml.jackson.annotation.JsonProperty").addStringArgument(f.name); // unconditional -> service integrations
+                    attr.addAnnotation("de.iip_ecosphere.platform.support.iip_aas.ConfiguredName").addStringArgument(f.name);        
+                }
+                configureGetterSetter(mainCls.addGetter(attr), true, f);
+                configureGetterSetter(mainCls.addSetter(attr, "value"), false, f);
             });
         }
 
@@ -259,18 +259,18 @@ template JavaType(Configuration config, JavaCodeArtifact target, RecordType type
             hash.addVariable("int", "hc", "0");
 
             JavaCodeMethod eq = mainCls.addEquals("other").(eq|{
-            eq.addVariable("boolean", "eq", "");
-            eq.addIf('other instanceof ${clsName}').(a|{
-                a.addAssignment("${clsName} oth", "(${clsName}) other");
-                a.addAssignment("eq", "true");
-	            for (Field f: type.fields) {
-	                cons.addAssignment('this.${asMethodFieldIdentifier(f.name)}', 'from.get${asMethodNameSuffix(f.name)}()');
-	                genHashCodeField(f, hash);
-	                a.addAssignment("eq", "&=", genEquals("get${asMethodNameSuffix(f.name)}()", f.type, f.optional));
-	            }
-	            hash.addReturn("hc");
-			}).addElse().addAssignment("eq", "false");
-            eq.addReturn("eq");
+                eq.addVariable("boolean", "eq", "");
+                eq.addIf('other instanceof ${clsName}').(a|{
+                    a.addAssignment("${clsName} oth", "(${clsName}) other");
+                    a.addAssignment("eq", "true");
+    	            for (Field f: type.fields) {
+    	                cons.addAssignment('this.${asMethodFieldIdentifier(f.name)}', 'from.get${asMethodNameSuffix(f.name)}()');
+    	                genHashCodeField(f, hash);
+    	                a.addAssignment("eq", "&=", genEquals("get${asMethodNameSuffix(f.name)}()", f.type, f.optional));
+    	            }
+    	            hash.addReturn("hc");
+    			}).addElse().addAssignment("eq", "false");
+                eq.addReturn("eq");
             });
             
             mainCls.addReflectiveToString();

@@ -28,14 +28,14 @@ template PythonMeshElementTemplate(Configuration config, PythonCodeArtifact targ
         cls = addPythonClass(target, clsName, 'Template service implementation for ${clsName}');
         cls.addBase(inheritsFrom(ifName));
         cls.addConstructor("Initializes the service.").(f|{
-        f.addSuperConstructorCall();
-        produceConstructorRest(service, f);
+            f.addSuperConstructorCall();
+            produceConstructorRest(service, f);
         });
         cls.addFunc("start", "Called when the service shall start.").(f|{
-        produceSetStateStarting(service, f);
+            produceSetStateStarting(service, f);
         });
         cls.addFunc("stop", "Called when the service shall stop.").(f|{
-        produceSetStateStopping(service, f);
+            produceSetStateStopping(service, f);
         });
         
         produceReconfigure(service, cls);

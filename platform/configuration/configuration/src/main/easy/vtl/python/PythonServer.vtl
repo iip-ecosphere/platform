@@ -24,19 +24,19 @@ template PythonServer(Configuration config, PythonCodeArtifact target, PythonSer
         
         addPythonClass(target, clsName + "Server", 'Partially implemented server for "${server.id}"')
             .addBase(clsName + "ServerInterface").(cls|{
-        produceFields(server, cls);
+            produceFields(server, cls);
             cls.addConstructor("Initializes the server service.").(f|{
-        f.addSuperConstructorCall();
-        produceSuper(server, f);
+                f.addSuperConstructorCall();
+                produceSuper(server, f);
             });
             cls.addFunc("start", "Called when the server shall start.").(f|{
-        produceSetStateStarting(server, f);
+                produceSetStateStarting(server, f);
             });
             cls.addFunc("stop", "Called when the server shall stop.").(f|{
-        produceSetStateStopping(server, f);
+                produceSetStateStopping(server, f);
             });
-        generateReceiveClientServer(server, cls);
-        produceRest(server, cls);
+            generateReceiveClientServer(server, cls);
+            produceRest(server, cls);
         });
         
         target.addSLComment("registers itself");

@@ -300,12 +300,12 @@ def produceReconfigureCode(Parameters params) {
             c.addFunc("notifyReconfigured", "Called to inform the implementing class that a parameter reconfiguration happened.")
                 .addParameter("values", "dict", "the new param names/values");
             c.addFunc("reconfigure", "Called by ServiceEnvironment to initialize service parameters or to reconfigure them at runtime.").(f|{
-            f.addParameter("values", "dict", "the new param names/values");
-            for (Parameter p: params) {
-                String expr = 'values["${p.name}"]';
-                f.addIf('"${p.name}" in values').add('self.param_${p.name} = ${convertValue(p, expr)}');
-            }
-            f.addSelfCall("notifyReconfigured").addArgument("values");
+                f.addParameter("values", "dict", "the new param names/values");
+                for (Parameter p: params) {
+                    String expr = 'values["${p.name}"]';
+                    f.addIf('"${p.name}" in values').add('self.param_${p.name} = ${convertValue(p, expr)}');
+                }
+                f.addSelfCall("notifyReconfigured").addArgument("values");
             });
             for (Parameter p: params) {
                 c.addFunc('get${asMethodNameSuffix(p.name)}', "Returns the value of parameter ${p.name}. May change at runtime upon reconfiguration.")
@@ -387,17 +387,17 @@ def generateReceiveClientServer(PythonServer server) {
     def addAttachIngest(PythonCodeClass cls) {
         cls.addFunc("ingest", "Ingests result data asynchronously into stream processing. Target stream and data type are 
            handled by the ingestor.").(f|{
-        f.addParameter("data", "", "the data to ingest; if the type is unknown/no type translator registered, nothing will happen");
-        f.addIf("self.ingestor is not None").addCall("self.ingestor").addArgument("data");
+            f.addParameter("data", "", "the data to ingest; if the type is unknown/no type translator registered, nothing will happen");
+            f.addIf("self.ingestor is not None").addCall("self.ingestor").addArgument("data");
         });
     }
     
     def addSetStateStartStop(PythonCodeClass cls, String kind) {
         cls.addFunc("setState", "Changes the state. [R133c]").(f|{
-        f.addParameter("state", "ServiceState", "the new state");
-        f.addSuperCall("setState").addArgument("state");
-        f.addIf("state==ServiceState.STARTING").addSelfCall("start");
-        f.addIf("state==ServiceState.STOPPING").addSelfCall("stop");
+            f.addParameter("state", "ServiceState", "the new state");
+            f.addSuperCall("setState").addArgument("state");
+            f.addIf("state==ServiceState.STARTING").addSelfCall("start");
+            f.addIf("state==ServiceState.STOPPING").addSelfCall("stop");
         });
         cls.addFunc("start", "Called when the ${kind} shall start.");
         cls.addFunc("stop", "Called when the ${kind} shall stop.");
@@ -436,8 +436,8 @@ def generateReceiveClientServer(PythonServer server) {
     
     def genTestAssertionIngestor(PythonCodeArtifact target) {
         target.addFunc("assertionIngestor").addParameter("data").(f|{
-        f.addSLComment("add your assertions in this block, data will be your returned data");
-        f.addCall("print").addStringArgument("output").addArgument("data");
+            f.addSLComment("add your assertions in this block, data will be your returned data");
+            f.addCall("print").addStringArgument("output").addArgument("data");
         });
     }
     

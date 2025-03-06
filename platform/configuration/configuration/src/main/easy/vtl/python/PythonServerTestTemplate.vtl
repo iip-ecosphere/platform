@@ -52,39 +52,39 @@ template PythonServerTestTemplate(Configuration config, PythonCodeArtifact targe
         target.addEmptyLine();
         target.addClass(clsName + "Test").addBase("unittest.TestCase", PythonCodeImportScope.NONE).(c|{
             c.addFunc("test_inputTest").(f|{
-        f.addSLComment('Change name to correct .json, access rawData for values i.e. rawData["InputType"]["Value1"]');
-        f.addAssign("rawData", '""');
-        f.addAssign("server", '${asTypeName(pythonServer.id)}()');
-        f.addCall("server.setState").addArgument("ServiceState.STARTING");
-        f.addCall("server.setState").addArgument("ServiceState.RUNNING");
-        f.addEmptyLine();
-        if (pythonElements <> null) {
-            f.addCall("time.sleep").addArgument(10);
-            f.addEmptyLine();
-            f.addAssign("service", '${asTypeName(pythonElements.name)}()');
-            f.addCall("service.setState").addArgument("ServiceState.STARTING");
-            f.addCall("service.setState").addArgument("ServiceState.RUNNING");
-            genSerializerInitialization(pythonElements.input, f);
-            f.addCall("service.attachIngestor").addArgument("assertionIngestor");
-            f.addCall("runAllTestsFromFile").addArgument("service.getId()").addArgument("../../test/resources/testData-${asTypeName(pythonElements.name)}.json");
-            f.addEmptyLine();
-            f.addSLComment("prepare your data, e.g., loading from json");
-            f.addSLComment("Needed to enable the loading of resources like the finished service would", true);
-            f.addEmptyLine();
-            f.addSLComment("instantiate your service here, e.g., service = PyService()");
-            f.addSLComment("call your service here, e.g., service.processNewInput(impl)");
-            f.addEmptyLine();
-            f.addCall("service.setState").addArgument("ServiceState.STOPPING");
-            f.addCall("service.setState").addArgument("ServiceState.STOPPED");
-            f.addEmptyLine();
-
-            genTestAssertionIngestor(target);
-        }
-        f.addCall("server.setState").addArgument("ServiceState.STOPPING");
-        f.addCall("server.setState").addArgument("ServiceState.STOPPED");
-        f.addEmptyLine();
-        f.addSLComment("do your asserts here");
-        f.addCall("self.assertTrue").addArgument(true);
+                f.addSLComment('Change name to correct .json, access rawData for values i.e. rawData["InputType"]["Value1"]');
+                f.addAssign("rawData", '""');
+                f.addAssign("server", '${asTypeName(pythonServer.id)}()');
+                f.addCall("server.setState").addArgument("ServiceState.STARTING");
+                f.addCall("server.setState").addArgument("ServiceState.RUNNING");
+                f.addEmptyLine();
+                if (pythonElements <> null) {
+                    f.addCall("time.sleep").addArgument(10);
+                    f.addEmptyLine();
+                    f.addAssign("service", '${asTypeName(pythonElements.name)}()');
+                    f.addCall("service.setState").addArgument("ServiceState.STARTING");
+                    f.addCall("service.setState").addArgument("ServiceState.RUNNING");
+                    genSerializerInitialization(pythonElements.input, f);
+                    f.addCall("service.attachIngestor").addArgument("assertionIngestor");
+                    f.addCall("runAllTestsFromFile").addArgument("service.getId()").addArgument("../../test/resources/testData-${asTypeName(pythonElements.name)}.json");
+                    f.addEmptyLine();
+                    f.addSLComment("prepare your data, e.g., loading from json");
+                    f.addSLComment("Needed to enable the loading of resources like the finished service would", true);
+                    f.addEmptyLine();
+                    f.addSLComment("instantiate your service here, e.g., service = PyService()");
+                    f.addSLComment("call your service here, e.g., service.processNewInput(impl)");
+                    f.addEmptyLine();
+                    f.addCall("service.setState").addArgument("ServiceState.STOPPING");
+                    f.addCall("service.setState").addArgument("ServiceState.STOPPED");
+                    f.addEmptyLine();
+        
+                    genTestAssertionIngestor(target);
+                }
+                f.addCall("server.setState").addArgument("ServiceState.STOPPING");
+                f.addCall("server.setState").addArgument("ServiceState.STOPPED");
+                f.addEmptyLine();
+                f.addSLComment("do your asserts here");
+                f.addCall("self.assertTrue").addArgument(true);
             });
         });
         genTestMainUnittestArgparse(target);

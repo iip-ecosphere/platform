@@ -50,24 +50,24 @@ template JavaServer(Configuration config, JavaCodeArtifact target, Server server
         generateAttributes(server, mainCls);
         mainCls.addConstructor("Creates a server instance.").(meth|{
             meth.throws("java.util.concurrent.ExecutionException", "if the server cannot be created");
-        generateConstructor(server, meth);
+            generateConstructor(server, meth);
         });
         mainCls.addMethod("de.iip_ecosphere.platform.support.Server", "start").(meth|{
-        meth.addCall("de.iip_ecosphere.platform.services.environment.Starter.mapService", JavaCodeImportScope.CLASS)
-            .addArgument("service");
+            meth.addCall("de.iip_ecosphere.platform.services.environment.Starter.mapService", JavaCodeImportScope.CLASS)
+                .addArgument("service");
             meth.override();
-        meth.addTry().(t|{
-            codeSetState(t, "STARTING");
-            codeCatchExecutionExceptionLogError(t, "Starting server service ${server.id}: {}");
-        });
-        meth.addReturn("this");
+            meth.addTry().(t|{
+                codeSetState(t, "STARTING");
+                codeCatchExecutionExceptionLogError(t, "Starting server service ${server.id}: {}");
+            });
+            meth.addReturn("this");
         });
         mainCls.addMethod("stop").(meth|{
             meth.override();
-        meth.addParameter("boolean", "dispose");
-        meth.addTry().(t|{
-            codeSetState(t, "STOPPING");
-            codeCatchExecutionExceptionLogError(t, "Stopping server service ${server.id}: {}");
+            meth.addParameter("boolean", "dispose");
+            meth.addTry().(t|{
+                codeSetState(t, "STOPPING");
+                codeCatchExecutionExceptionLogError(t, "Stopping server service ${server.id}: {}");
             });
         });
     }

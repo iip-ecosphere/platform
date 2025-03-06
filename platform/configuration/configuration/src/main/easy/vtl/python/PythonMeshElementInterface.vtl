@@ -62,8 +62,8 @@ template PythonMeshElementInterface(Configuration config, PythonCodeArtifact tar
             .addBase("AbstractService");
         cls.addAttribute("ingestor", "None");
         cls.addConstructor("Initializes the service.").(f|{
-        produceSuper(elt.impl, f);
-        f.add("self.registerMethods()");
+            produceSuper(elt.impl, f);
+            f.add("self.registerMethods()");
         });
         
         addAttachIngestor(cls);
@@ -72,7 +72,7 @@ template PythonMeshElementInterface(Configuration config, PythonCodeArtifact tar
         generateDataMethods(elt, true);
 
         cls.addMethod("registerMethods").(f|{
-        reg->forEach(String s|f.add(s));
+            reg->forEach(String s|f.add(s));
         });
     }
     

@@ -269,6 +269,11 @@ project Connectors {
        Constraint mustHaveParser = machineParser <> null;
        Constraint mustHaveFormatter = machineFormatter <> null;
    }
+
+   // marker type for connectors that are not fully implemented and need some code generation
+   // to be finalized for use in apps   
+   abstract compound GeneratedConnector refines Connector {
+   }
    
    // ------------------------------------ OPC UA -----------------------------------------
    
@@ -540,7 +545,7 @@ project Connectors {
        Boolean asSingleValue = false;
    } 
 
-   compound RestConnector refines Connector { // fixed template types see JavaConnector.vtl
+   compound RestConnector refines GeneratedConnector { // fixed template types see JavaConnector.vtl
        assign (uiGroup = UiInvisibleGroup) to {
            String class = "de.iip_ecosphere.platform.connectors.rest.RESTConnector";
            String artifact ="de.iip-ecosphere.platform:connectors.rest:";

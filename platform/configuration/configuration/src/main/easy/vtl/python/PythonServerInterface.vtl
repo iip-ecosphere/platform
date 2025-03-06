@@ -19,18 +19,18 @@ template PythonServerInterface(Configuration config, PythonCodeArtifact target, 
         
         addPythonClass(target, clsName + "ServerInterface", 'Interface for server "${server.id}"')
             .addBase("AbstractService").(cls|{
-        cls.addAttribute('ingestor', "None");
-        produceParameterFields(server.parameter, cls);
+            cls.addAttribute('ingestor', "None");
+            produceParameterFields(server.parameter, cls);
             cls.addConstructor("Initializes the server service.").(f|{
-        String sId = "'${server.id}'";
-        f.addSuperConstructorCall().addStringArgument("${server.id}").addStringArgument("${server.id}").addArgument('Version("${server.ver}")').addStringArgument("${server.description}").addArgument(true).addArgument("ServiceKind.SERVER");
-        f.addAssign('Registry.services[${sId}]', 'self');
+                String sId = "'${server.id}'";
+                f.addSuperConstructorCall().addStringArgument("${server.id}").addStringArgument("${server.id}").addArgument('Version("${server.ver}")').addStringArgument("${server.description}").addArgument(true).addArgument("ServiceKind.SERVER");
+                f.addAssign('Registry.services[${sId}]', 'self');
             });
-        addAttachIngestor(cls);
-        addAttachIngest(cls);
-        produceReconfigure(server.parameter, cls);
-        addSetStateStartStop(cls, "server");
-        generateReceiveClientServer(server, cls);
+            addAttachIngestor(cls);
+            addAttachIngest(cls);
+            produceReconfigure(server.parameter, cls);
+            addSetStateStartStop(cls, "server");
+            generateReceiveClientServer(server, cls);
         });
      }
     

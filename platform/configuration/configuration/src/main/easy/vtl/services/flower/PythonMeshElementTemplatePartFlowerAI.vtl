@@ -45,8 +45,8 @@ template PythonMeshElementTemplatePartFlowerAI(Configuration config, FileArtifac
         FlowerFederatedAiServer server = service.server;
         f.addAssign('self.IP', 'self.getNetMgtKeyAddress()');
         f.addIf('self.IP is None').(a|{
-        a.addSLComment('fallback, then server is not relocatable anymore');
-        a.addAssign('self.IP', '"${server.host}:${server.port}"');
+            a.addSLComment('fallback, then server is not relocatable anymore');
+            a.addAssign('self.IP', '"${server.host}:${server.port}"');
         });
     }
 

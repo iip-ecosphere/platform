@@ -37,26 +37,26 @@ template JavaSerializerBase(IIPEcosphere config, JavaCodeArtifact target, Record
         genClsInit(config, mainCls, typeName);
         
         JavaCodeMethod from = mainCls.addMethod(typeName, "from", "").(from|{
-        from.addParameter("byte[]", "data");
-            from.override();
-            from.throws("java.io.IOException");
-        genFrom(config, type, from, "data", "${clsName}${add}");
+            from.addParameter("byte[]", "data");
+                from.override();
+                from.throws("java.io.IOException");
+            genFrom(config, type, from, "data", "${clsName}${add}");
         });
         mainCls.addMethod("byte[]", "to", "").(to|{
-        to.addParameter(typeName, "source");
-            to.override();
-            to.throws("java.io.IOException");
-        genTo(config, type, to, "source", "${clsName}${add}");
+            to.addParameter(typeName, "source");
+                to.override();
+                to.throws("java.io.IOException");
+            genTo(config, type, to, "source", "${clsName}${add}");
         });
         mainCls.addMethod(typeName, "clone", "").(clone|{
-        clone.addParameter(typeName, "origin");
-            clone.override();
-            clone.throws("java.io.IOException");
-        clone.addReturn("new ${clsName}${add}(origin)");
+            clone.addParameter(typeName, "origin");
+                clone.override();
+                clone.throws("java.io.IOException");
+            clone.addReturn("new ${clsName}${add}(origin)");
         });
         mainCls.addMethod("Class<${typeName}>", "getType", "").(getType|{
             getType.override();
-        getType.addReturn("${typeName}.class");
+            getType.addReturn("${typeName}.class");
         });
     }
     

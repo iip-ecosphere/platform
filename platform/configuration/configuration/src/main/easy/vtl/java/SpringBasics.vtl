@@ -7,12 +7,16 @@ import MeshBasics;
 @indent(indentation = 4, additional = 0)
 template SpringBasics(Configuration config, FileArtifact target) {
 
+    def addSerializerRegistration(JavaCodeMethod meth, String cls) {
+        meth.addCall("de.iip_ecosphere.platform.transport.serialization.SerializerRegistry.registerSerializer", JavaCodeImportScope.CLASS).addClassArgument(cls);
+    }
+
     /*
     * Generates the serializer registration code for the given set of serializer class names.
     */
     def generateSerializerRegistration(setOf(String) serializers, JavaCodeMethod meth) {
         for (String cls : serializers.toSequence()->sortedBy(c|c)) { // sortedBy for testing
-            meth.addCall("de.iip_ecosphere.platform.transport.serialization.SerializerRegistry.registerSerializer", JavaCodeImportScope.CLASS).addArgument(cls+".class");
+            addSerializerRegistration(meth, cls);
         }
     }
 

@@ -245,6 +245,27 @@ template JavaBasics(Configuration config, FileArtifact target) {
         "java.util.List<${t}>"
     }
     
+    @DispatchBasis
+    def String getConnectorCls(Connector conn) {
+        conn.class;
+    }
+
+    @DispatchCase
+    def String getConnectorCls(GeneratedConnector conn) {
+        String typeName = asTypeName(conn.name);
+        "iip.nodes." + typeName + "Impl";
+    }
+    
+    @DispatchBasis
+    def String getConnectorInstanceGenerics(Connector conn) {
+        "<>"; // typically resolved by Java
+    }
+
+    @DispatchCase
+    def String getConnectorInstanceGenerics(GeneratedConnector conn) {
+        ""; // typically no generics as instantiated
+    }    
+    
     // ------------------------------------------ primitive type casting -------------------------------------
     
     def cast(DataType type) {

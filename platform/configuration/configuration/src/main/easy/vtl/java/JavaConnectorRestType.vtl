@@ -26,14 +26,14 @@ template JavaConnectorRestType(Configuration config, JavaCodeArtifact target, Re
         String getValueToWrite = "null";
         for (Field f: type.fields) {
             mainCls.addAttribute(mapTypeName(f), asMethodFieldIdentifier(f.name)).(attr|{
-            if (getValueToWrite == "null") {
-                getValueToWrite = attr.getName(); 
-            }
-            if (not(f.type.isKindOf(RecordType))) {
-                attr.addAnnotation("com.fasterxml.jackson.annotation.JsonProperty").addStringArgument(f.name);
-            }
-            mainCls.addGetter(attr);
-            mainCls.addSetter(attr, "value");
+                if (getValueToWrite == "null") {
+                    getValueToWrite = attr.getName(); 
+                }
+                if (not(f.type.isKindOf(RecordType))) {
+                    attr.addAnnotation("com.fasterxml.jackson.annotation.JsonProperty").addStringArgument(f.name);
+                }
+                mainCls.addGetter(attr);
+                mainCls.addSetter(attr, "value");
             });
         }
 
