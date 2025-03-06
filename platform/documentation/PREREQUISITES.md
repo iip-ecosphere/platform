@@ -27,7 +27,7 @@ Helpful:
 - Findbugs 3.0.1 Plugin for Eclipse
 - xText 2.35.0-2.36.0
 - create a global checkstyle configuration named "IIP Code Conventions" and set `/platformDependencies/iipCodeConventions.xml' as project relative configuration in Eclipse (`Window|Properties|Checkstyle`).
-- EASy-Producer 3.10.0 Plugin for Eclipse from [SSE EASy-producer nightly update site](https://projects.sse.uni-hildesheim.de/eclipse/update-sites/easy_nightly/).
+- EASy-Producer 3.10.0 as [pre-built nightly Eclipse installation](https://projects.sse.uni-hildesheim.de/eclipse/easy-nightly/) or as plugin for Eclipse from the [SSE EASy-producer nightly update site](https://projects.sse.uni-hildesheim.de/eclipse/update-sites/easy_nightly/).
     - May require `-Xms512m` and `-Xmx5120m` in `eclipse.ini` 
     - Do not use the XTextBuilder "org.eclipse.xtext.ui.shared.xtextBuilder" rather than "de.uni_hildesheim.sse.EASy-Producer.Builder". On or models, the XtextBuilder may crash or hang Eclipse. The EASy-Builder just focuses on markers. Uncheck 'General|Workspace|Refresh using native hooks or polling' and 'General|Workspace|Refresh on access' or, if needed, 'Project|Build Automatically'. 
     - Depending on your workspace use, it might be required to adjust the file associations so that EASy-Producer editors are default for `*.ivml`, `*.vil`, `*.vtl` and `*.text`.
