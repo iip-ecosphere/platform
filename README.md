@@ -12,14 +12,10 @@ For installation and first steps, see [install guide](platform/documentation/INS
 
 ## News
 
-* oktoflow code generation migrating to VTL artifacts
-* Exiting: oktoflow become thes technological core of the funded [DATI](https://www.bmbf.de/bmbf/de/forschung/datipilot/datipilot_node.html) Innovation Community ReGaP. ReGaP will start January 2025. Stay tuned!!!
-* INFLUX DB connector for InfluxDb2
-* Platform core migrated to **JDK 21** (see our [migration story](platform/documentation/MigrationStory.md)). Container creation still needs upgrade [#165](https://github.com/iip-ecosphere/platform/issues/165).
-* BaSyX 1.5.1 support (currently as alternative retro-fit for BaSyx 1.3.1 used as platform AAS version)
-* MODBUS/TCP connector by Christian Nikolajew (tested for compliance with Phoenix Contact EEM-MA 370 and Siemens SENTRON PAC 3200), example re-usable MODBUS/TCP definitions for Phoenix Contact EEM-MA 370
-* Plugins for alternative components with conflicting classpaths. Retrofit for BaSyx 1.0, in particular in AAS connector.
-* Auto-generation of all IDTA specs published in February 2024, for details see our [ETFA'24 paper](10.1109/ETFA61755.2024.10710924), generated code partially integrated with platform core
+* Next: [ReGaP-community kickoff](https://regap.de/community-kickoff/) at the 19th of March in Hannover, with oktoflow as technological core; initial okotflow apps developing
+* Validation of container generation and migration to JDK 21/recent Python ahead
+* oktoflow code generation initially migrated to VTL artifacts, still improving/developing
+* REST connector by Christian Nikolajew
 
 ## Public demonstrations
 
