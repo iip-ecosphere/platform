@@ -43,7 +43,7 @@ XmlElement ex2 = appendExecutionsParent(dPlug);
 appendMavenDependencyPluginCopyDepsExecution(ex2, jarDir="../${dir}", copyOwn=true);
 appendWinLinuxDependencyPluginBuildClasspathExecution(ex2, dir, ownArtifact="${iipGroup}.${artifactId}-${config.iipVer}");
 
-        sequenceOf(String) files = {"*.yml", "*.png", "*.jpg"};
+        sequenceOf(String) files = defltOktoResourceFiles();
         ex2 = appendMavenResourcesCopyResources(plugins, mavenBuildOutputResourcesDir(), getResourcesFolder()+"/devices", files, id="dev-res");
         appendMavenResourcesCopyResourcesExecution(ex2, "copy-resources", mavenBuildOutputResourcesDir(), getResourcesFolder()+"/platform", files, id="platf-res");
     }

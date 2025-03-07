@@ -606,5 +606,10 @@ template MavenBasics(Configuration config, FileArtifact target) {
     def appendEclipseLifecycleMapping4DependenciesPlugin(XmlElement parent, String versionRange="[3.1.2,)", String goal="copy", String ver="1.0.0") {
         appendEclipseLifecycleMappingPlugin(parent, "org.apache.maven.plugins", "maven-dependency-plugin", versionRange, goal, ver);
     }
+    
+    def sequenceOf(String) defltOktoResourceFiles() {
+        sequenceOf(String) res = {"*.yml", "*.png", "*.jpg", "*.json"};
+        res;
+    } 
 
 }

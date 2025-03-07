@@ -120,7 +120,7 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
             }
         }
 
-        sequenceOf(String) files = {"*.yml", "*.png", "*.jpg"};
+        sequenceOf(String) files = defltOktoResourceFiles();
         appendMavenResourcesCopyResourcesExecution(rExecs, "copy-resources", mavenBuildOutputResourcesDir(), getResourcesFolder()+"/platform", files, id="platf-res");
         appendMavenResourcesCopyResourcesExecution(rExecs, "copy-resources", mavenBuildOutputResourcesDir(), getResourcesFolder()+"/software", files, id="sw-res");
         

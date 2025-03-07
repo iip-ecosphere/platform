@@ -61,7 +61,7 @@ appendWinLinuxDependencyPluginBuildClasspathExecution(ex2, dir, ownArtifact="${i
         appendCompilerPlugin(plugins);
         appendSurefirePlugin(plugins, tests=tests);
 
-        sequenceOf(String) files = {"*.yml", "*.png", "*.jpg"};
+        sequenceOf(String) files = defltOktoResourceFiles();
         ex2 = appendMavenResourcesCopyResources(plugins, mavenBuildOutputResourcesDir(), getResourcesFolder()+"/software", files, id="sw-res");
         appendMavenResourcesCopyResourcesExecution(ex2, "copy-resources", mavenBuildOutputResourcesDir(), getResourcesFolder()+"/platform", files, id="platf-res");
     }

@@ -37,7 +37,7 @@ appendMavenDependencyPluginCopyDepsExecution(ex, jarDir="../${dir}", copyOwn=tru
 appendWinLinuxDependencyPluginBuildClasspathExecution(ex, dir, ownArtifact="${iipGroup}.${artifactId}-${config.iipVer}");
         appendCompilerPlugin(plugins);
         appendSurefirePlugin(plugins, tests=tests);
-        sequenceOf(String) files = {"*.yml", "*.png", "*.jpg"};
+        sequenceOf(String) files = defltOktoResourceFiles();
         ex = appendMavenResourcesCopyResources(plugins, mavenBuildOutputResourcesDir(), getResourcesFolder()+"/devices", files, id="dev-res");
         appendMavenResourcesCopyResourcesExecution(ex, "copy-resources", mavenBuildOutputResourcesDir(), getResourcesFolder()+"/platform", files, id="platf-res");
     }
