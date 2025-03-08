@@ -178,9 +178,12 @@ public class ResourceLoader {
                 result = r.resolve(loader, "/" + name);
             }
             if (result != null) {
-                LoggerFactory.getLogger(ResourceLoader.class).info("LOADING {} via {}", name, r.getName());
+                LoggerFactory.getLogger(ResourceLoader.class).info("Loading {} via {}", name, r.getName());
                 break;
             }
+        }
+        if (null == result) {
+            LoggerFactory.getLogger(ResourceLoader.class).debug("Resource {} not found", name);
         }
         return result;
     }
