@@ -501,6 +501,9 @@ public class DataMapper {
         JsonUtils.handleIipDataClasses(objectMapper);
         
         JsonFactory jf = new JsonFactory();
+        if (null == stream) {
+            LoggerFactory.getLogger(DataMapper.class).error("No stream found, is file/resource name correct?");
+        }
         JsonParser jp = jf.createParser(stream);
         jp.setCodec(objectMapper);
         jp.nextToken();

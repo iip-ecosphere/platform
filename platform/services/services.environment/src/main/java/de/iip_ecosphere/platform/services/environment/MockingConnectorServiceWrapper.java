@@ -143,7 +143,9 @@ public class MockingConnectorServiceWrapper<O, I, CO, CI> extends ConnectorServi
     protected InputStream getDataStream(String name) {
         InputStream result = openDataStream(name);
         if (null == result && name.endsWith(".yml")) {
-            result = openDataStream(name.substring(0, name.length() - 3) + "json");
+            String altName = name.substring(0, name.length() - 3) + "json";
+            LoggerFactory.getLogger(getClass()).info("File {} not found, falling back to : {}", name, altName);
+            result = openDataStream(altName);
         }
         return result;
     }
