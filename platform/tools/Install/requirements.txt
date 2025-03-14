@@ -1,3 +1,4 @@
+pyflakes
 pyyaml
 pyzbar
 opencv-python
