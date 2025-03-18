@@ -15,6 +15,7 @@ package test.de.iip_ecosphere.platform.support.aas;
 import org.junit.Assert;
 import org.junit.Test;
 
+import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.types.common.EnumRegistry;
 import de.iip_ecosphere.platform.support.aas.types.common.Utils;
 
@@ -68,6 +69,19 @@ public class UtilsTest {
         
         EnumRegistry.unregisterEnum(MyExtendingEnum.class);
         Assert.assertEquals(null, Utils.getEnumValue("VALUE3", IMyEnum.class, MyEnum.class));
+    }
+    
+    /**
+     * Tests {@link AasFactory#composeIdShort(String...)}.
+     */
+    @Test
+    public void testComposeIdShort() {
+        Assert.assertEquals("", AasFactory.composeIdShort());
+        Assert.assertEquals("Test", AasFactory.composeIdShort("Test"));
+        Assert.assertEquals("Test", AasFactory.composeIdShort("Test", ""));
+        Assert.assertEquals("TestA", AasFactory.composeIdShort("Test", "a"));
+        Assert.assertEquals("TestAnother", AasFactory.composeIdShort("Test", "another"));
+        Assert.assertEquals("testAnotherName", AasFactory.composeIdShort("test", "another", "Name"));
     }
     
     
