@@ -6,7 +6,7 @@
 
 - JDK 21 (tested with JDK 21.0.2), JDK 17 (tested with JDK 17.0.10); either one in in path, evironment variable ``JAVA_HOME`` set to JDK installation directory
 - Maven 3.9.7 in path
-- Python 3.9.6 in path with packages `pyyaml` and `pyflakes` (not yet prepared for implicit virtual environments) 
+- Python 3.9.6 in path with packages `pyyaml`, `websockets` and `pyflakes` (not yet prepared for implicit virtual environments) 
 
 Depending on the use of Python packages/libraries by your/used platform services, installation of further Python libraries may be required.
 
