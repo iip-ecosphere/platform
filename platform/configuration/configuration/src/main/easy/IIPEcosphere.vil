@@ -2114,8 +2114,8 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
             artifacts.add(artifact);
         }
         vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/python_${serviceFolderName}.xml", withServices=true, dependency=artifact, dependency2=shArtifact);
-        addAssemblyInfo(assemblies, "python_${serviceFolderName}", "${assemblyRel}/python_${serviceFolderName}.xml", "prepare-package", "${mvnProjectBuildDir}/classes", finalName="python_${serviceFolderName}");
         if (not(noDeps)) {
+            addAssemblyInfo(assemblies, "python_${serviceFolderName}", "${assemblyRel}/python_${serviceFolderName}.xml", "prepare-package", "${mvnProjectBuildDir}/classes", finalName="python_${serviceFolderName}");
             artifacts.add(getArtifact(service));
             addArtifacts(service.artifacts, service.artifact, bins, noDeps);
         }
