@@ -21,11 +21,11 @@ template Dockerfile(IIPEcosphere config, FileArtifact target, sequenceOf(MeshEle
                 'ENV IIP_INCONTAINER=true'
             }
         } else {
-            'FROM alpine:3.18'
+            'FROM alpine:3.20'
             '${containerSettings(config, containerType, device)}'
             'ENV IIP_INCONTAINER=true'
             'RUN apk add bash'
-            'RUN apk add openjdk11'
+            'RUN apk add openjdk21'
             if (not(collectDependencies(elements)->selectByKind(SystemDependency)->select(d|d.key=='JAVA8').isEmpty())) {
                 'RUN apk add openjdk8'
             }

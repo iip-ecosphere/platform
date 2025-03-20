@@ -718,7 +718,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         Boolean baseImageMethod = getContainerBaseImageMethodSafe(config.containerBaseImageMethod); 
         Boolean newChangeOnContainerFiles = false;
         Boolean newChangeJarFiles = false;
-		String fpFolder = getStringValueSafe(config.footprintFolder, config.footprintFolderDflt);
+        String fpFolder = getStringValueSafe(config.footprintFolder, config.footprintFolderDflt);
         String dfName;
 
         ContainerManager mgr = config.containerManager;
@@ -1215,6 +1215,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         Boolean baseImageMethod = getContainerBaseImageMethodSafe(config.containerBaseImageMethod);
         Boolean newChangeOnContainerFiles = false;
         Boolean newChangeJarFiles = false;
+        String fpFolder = getStringValueSafe(config.footprintFolder, config.footprintFolderDflt);
         
         if (allElements.size() > 1 and getContainerGenerationSafe(config.containerGeneration)) {
 

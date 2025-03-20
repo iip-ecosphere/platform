@@ -8,9 +8,9 @@ template DockerfilePlatform(IIPEcosphere config, FileArtifact target) {
 	
     def main(IIPEcosphere config, FileArtifact target) {
 
-        'FROM python:3.9-slim-buster'
+        'FROM python:3.9.21-slim'
         //'${containerSettings(config, containerType, device)}'
-        'RUN apt-get update && apt-get install -y openjdk-11-jre && apt-get install -y npm'
+        'RUN apt-get update -y && apt install wget -y && wget https://download.oracle.com/java/21/latest/jdk-21_linux-x64_bin.deb && dpkg -i jdk-21_linux-x64_bin.deb'
         //'RUN apt-get install -y openjdk-11-jre'
 
         'COPY requirements.txt requirements.txt'
