@@ -167,7 +167,7 @@ public class FileChangeDetector {
      * @return the hash file
      */
     public static File getHashFileInTarget(MavenProject project, String hashFileName) {
-        return new File(project.getBuild().getDirectory(), hashFileName + FILE_EXTENSION);
+        return new File(project.getBuild().getDirectory(), hashFileName + "." + FILE_EXTENSION);
     }
 
 }
