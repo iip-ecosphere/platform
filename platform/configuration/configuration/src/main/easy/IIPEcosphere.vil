@@ -410,7 +410,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     
     // dispatch basis
     generateServer(Configuration config, Server server, Path appRoot, Boolean noDeps, setOf(AssemblyInfo) assemblies, setOf(String) artifacts) = {
-        if (isDefined(server.artifact) and server.artifact.length() > 0) {
+        if (not(noDeps) and isDefined(server.artifact) and server.artifact.length() > 0) {
             artifacts.add(server.artifact);
         }
     }
@@ -426,13 +426,10 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         vilTemplateProcessor("JavaServer", config, "${javaServerSrc}/${clsName}Server.java", server=server, pkg=javaServerPackage);
         //vilTemplateProcessor("PythonServer", config, "${appRoot}/src/main/python/services/${clsName}Server.py", server=server, pkg="services");
         vilTemplateProcessor("PythonServerInterface", config, "${appRoot}/src/main/python/interfaces/${clsName}ServerInterface.py", server=server, pkg="interfaces");
-        if (isDefined(server.artifact) and server.artifact.length() > 0) {
+        if (not(noDeps) and isDefined(server.artifact) and server.artifact.length() > 0) { // artifact available after user services build, only for full app build
             artifacts.add(server.artifact);
             sequenceOf(String) tmp = server.artifact.split(":");
-            String artifact = "";
-            if (not(noDeps)) { // artifact available after user services build, only for full app build
-                artifact = tmp[0]+":"+tmp[1]+":zip:python:"+tmp[2];
-            }
+            String artifact = tmp[0]+":"+tmp[1]+":zip:python:"+tmp[2];
             vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/python_${serverFolderName}.xml", withServices=true, dependency=artifact);
             addAssemblyInfo(assemblies, "python_${serverFolderName}", "${assemblyRel}/python_${serverFolderName}.xml", "prepare-package", "${mvnProjectBuildDir}/classes", finalName="python_${serverFolderName}");
         }
@@ -2106,21 +2103,23 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         sequenceOf(String) tmp = service.artifact.split(":");
         String artifact = tmp[0]+":"+tmp[1]+":zip:python:"+tmp[2];
         String shArtifact = "";
-        if (cfg.sharedInterfaces) {
-            //addPythonDependencyArtifact(bins, cfg.sharedArtifact, mvnProjectPySrcDir);
-            //addPythonDependencyArtifact(bins, tmp[0]+":"+tmp[1]+":"+tmp[2], mvnProjectPySrcDir);
-            artifacts.add("${cfg.mvnIipGroup}:services.environment:zip:python:${cfg.iipVer}");
-            sequenceOf(String) sTmp = cfg.sharedArtifact.split(":");
-            shArtifact = sTmp[0]+":"+sTmp[1]+":zip:python:"+sTmp[2];
-            artifacts.add(shArtifact);
-        }
         if (not(noDeps)) { // artifact available after user services build, only for full app build
+            if (cfg.sharedInterfaces) {
+                //addPythonDependencyArtifact(bins, cfg.sharedArtifact, mvnProjectPySrcDir);
+                //addPythonDependencyArtifact(bins, tmp[0]+":"+tmp[1]+":"+tmp[2], mvnProjectPySrcDir);
+                artifacts.add("${cfg.mvnIipGroup}:services.environment:zip:python:${cfg.iipVer}");
+                sequenceOf(String) sTmp = cfg.sharedArtifact.split(":");
+                shArtifact = sTmp[0]+":"+sTmp[1]+":zip:python:"+sTmp[2];
+                artifacts.add(shArtifact);
+            }
             artifacts.add(artifact);
         }
         vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/python_${serviceFolderName}.xml", withServices=true, dependency=artifact, dependency2=shArtifact);
-        addAssemblyInfo(assemblies, "python_${serviceFolderName}", "${assemblyRel}/python_${serviceFolderName}.xml", "prepare-package", "${mvnProjectBuildDir}/classes", finalName="python_${serviceFolderName}");
-        artifacts.add(getArtifact(service));
-        addArtifacts(service.artifacts, service.artifact, bins, noDeps);
+        if (not(noDeps)) {
+            addAssemblyInfo(assemblies, "python_${serviceFolderName}", "${assemblyRel}/python_${serviceFolderName}.xml", "prepare-package", "${mvnProjectBuildDir}/classes", finalName="python_${serviceFolderName}");
+            artifacts.add(getArtifact(service));
+            addArtifacts(service.artifacts, service.artifact, bins, noDeps);
+        }
     }
 
     addArtifacts(setOf(String) artifacts, String artifact, setOf(DependencyArtifact) bins, Boolean noDeps) = {

@@ -35,5 +35,10 @@ public class GenerateBrokerMojo extends AbstractConfigurationMojo {
     protected String adjustOutputDir(String outputDir) {
         return new File(findGenParent(outputDir), "broker").toString();
     }
+    
+    @Override
+    protected boolean enableRun(String metaModelDir, String modelDir, String outputDir) { 
+        return getUnpackForce() || super.enableRun(metaModelDir, modelDir, outputDir);
+    }    
 
 }
