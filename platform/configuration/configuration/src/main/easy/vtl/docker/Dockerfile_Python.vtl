@@ -101,8 +101,7 @@ template Dockerfile_Python(IIPEcosphere config, FileArtifact target, sequenceOf(
                     for (Dependency s : deps) {
                         if (genDependency(s) == 'PYTHON2') {
                             if (IsPythonInstalled == 0) {
-                                'FROM python:2.7.10 '
-                                'RUN apt-get update'
+                                'FROM python:2.7.10'
                                 IsPythonInstalled = 1;
                                 pythonPipInstalled = 'RUN python2 -m pip install -r requirements.txt';
                             }
@@ -112,7 +111,7 @@ template Dockerfile_Python(IIPEcosphere config, FileArtifact target, sequenceOf(
                         } else if (genDependency(s) == 'PYTHON38') {
                             if (IsPythonInstalled == 0) {
                                 'FROM python:3.8.16-slim-buster'
-                                'RUN apt-get update'
+                                'RUN apt-get update -y'
                                 IsPythonInstalled = 1;
                                 pythonPipInstalled = 'RUN python3 -m pip install -r requirements.txt';
                             }
@@ -121,8 +120,8 @@ template Dockerfile_Python(IIPEcosphere config, FileArtifact target, sequenceOf(
                             }
                         } else if (genDependency(s) == 'PYTHON39') {
                             if (IsPythonInstalled == 0) {
-                                'FROM python:3.9.16-slim-buster'
-                                'RUN apt-get update'
+                                'FROM python:3.9.21-slim'
+                                'RUN apt-get update -y'
                                 IsPythonInstalled = 1;
                                 pythonPipInstalled = 'RUN python3 -m pip install -r requirements.txt';
                             }
@@ -135,8 +134,8 @@ template Dockerfile_Python(IIPEcosphere config, FileArtifact target, sequenceOf(
             }
             
             if (IsPythonInstalled == 0) {
-                'FROM python:3.9.16-slim-buster'
-                'RUN apt-get update'
+                'FROM python:3.9.21-slim'
+                'RUN apt-get update -y'
                 IsPythonInstalled = 1;
                 pythonPipInstalled = 'RUN python3 -m pip install -r requirements.txt';
                 for (String s: tmp) {
@@ -145,13 +144,11 @@ template Dockerfile_Python(IIPEcosphere config, FileArtifact target, sequenceOf(
             }
 
             ''
-            'RUN apt-get install -y openjdk-11-jdk'
+            'RUN apt install wget -y && wget https://download.oracle.com/java/21/latest/jdk-21_linux-x64_bin.deb && dpkg -i jdk-21_linux-x64_bin.deb'
             ''
             if (not(collectDependencies(elements)->selectByKind(SystemDependency)->select(d|d.key=='JAVA8').isEmpty())) {
-                'RUN apt-get install software-properties-common -y'
-                'RUN apt-add-repository "deb http://archive.debian.org/debian-security stretch/updates main"'
-                'RUN apt-get update'
-                'RUN apt-get install -y openjdk-8-jdk'
+                '# Installed Java 8'
+                'RUN wget http://www.mirbsd.org/~tg/Debs/sources.txt/wtf-bookworm.sources && mkdir -p /etc/apt/sources.list.d && mv wtf-bookworm.sources /etc/apt/sources.list.d/ && apt update && apt install openjdk-8-jdk -y'
             }
             ''
             '${containerSettings(config, containerType, device)}'
