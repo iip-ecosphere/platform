@@ -448,6 +448,7 @@ public class AasPartRegistry {
         AasSetup old = aasSetup;
         setup = aasSetup;
         AasFactory.setPluginId(setup.getPluginId());
+        aasImplPort = -1; // reset
         return old;
     }
     
