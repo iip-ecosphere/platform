@@ -37,11 +37,12 @@ def composeIdShort(*names):
     for n in names:
         if len(res) == 0:
             res = n
-        else:
-            if len(n) == 1:
-                res = res + "_" + n[0].upper()
-            elif len(n) > 1:
-                res = res + "_" + n[0].upper() + n[1:]
+        elif len(n) > 0:
+            res = res + "_" + n
+            #if len(n) == 1:
+            #    res = res + n[0].upper()
+            #elif len(n) > 1:
+            #    res = res + n[0].upper() + n[1:]
     return res
 
 class Service:
