@@ -70,7 +70,7 @@ public class DeviceManagementAasTest {
     @BeforeClass
     public static void startup() throws IOException {
         AasPartRegistry.AasBuildResult res = AasPartRegistry.build(); //c -> c instanceof DeviceManagementAas
-        AasPartRegistry.setAasSetup(AasSetup.createLocalEphemeralSetup());
+        AasPartRegistry.setAasSetup(AasSetup.createLocalEphemeralSetup(), true);
         implServer = res.getProtocolServerBuilder().build();
         implServer.start();
         aasServer = AasPartRegistry.deploy(res.getAas());

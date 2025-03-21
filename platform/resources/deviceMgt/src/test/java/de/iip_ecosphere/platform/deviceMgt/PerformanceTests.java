@@ -49,7 +49,7 @@ public class PerformanceTests {
     @BeforeClass
     public static void startup() throws IOException {
         AasPartRegistry.AasBuildResult res = AasPartRegistry.build(); //c -> c instanceof DeviceManagementAas
-        AasPartRegistry.setAasSetup(AasPartRegistry.AasSetup.createLocalEphemeralSetup());
+        AasPartRegistry.setAasSetup(AasPartRegistry.AasSetup.createLocalEphemeralSetup(), true);
         implServer = res.getProtocolServerBuilder().build();
         implServer.start();
         aasServer = AasPartRegistry.deploy(res.getAas());

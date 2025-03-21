@@ -61,7 +61,7 @@ public class DeviceRegistryAasClientTest {
     public void setUp() throws Exception {
         ActiveAasBase.setNotificationMode(ActiveAasBase.NotificationMode.SYNCHRONOUS);
 
-        AasPartRegistry.setAasSetup(AasPartRegistry.AasSetup.createLocalEphemeralSetup());
+        AasPartRegistry.setAasSetup(AasPartRegistry.AasSetup.createLocalEphemeralSetup(), true);
         AasPartRegistry.AasBuildResult res = AasPartRegistry.build(CONTRIBUTOR_CLASS::isInstance);
 
         implServer = res.getProtocolServerBuilder().build();

@@ -62,34 +62,32 @@ public class StubEcsAas implements AasContributor {
         Submodel.SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(AasPartRegistry.NAME_SUBMODEL_RESOURCES, null);
 
         SubmodelElementCollection.SubmodelElementCollectionBuilder device =
-                smB.createSubmodelElementCollectionBuilder(A_DEVICE, false, false);
+            smB.createSubmodelElementCollectionBuilder(A_DEVICE, false, false);
 
         device.createOperationBuilder("updateRuntime")
-                .setInvocable(iCreator.createInvocable(A_DEVICE + "_" + "updateRuntime"))
-                .addInputVariable("uri", Type.STRING)
-                .addOutputVariable("result", Type.NONE)
-               .build();
+            .setInvocable(iCreator.createInvocable(A_DEVICE + "_" + "updateRuntime"))
+            .addInputVariable("uri", Type.STRING)
+            .build(); // void
 
         device.createOperationBuilder("createRemoteConnectionCredentials")
-                .setInvocable(iCreator.createInvocable(A_DEVICE + "_" + "createRemoteConnectionCredentials"))
-                .addOutputVariable("key", Type.STRING)
-                .addOutputVariable("secret", Type.STRING)
-                .build();
+            .setInvocable(iCreator.createInvocable(A_DEVICE + "_" + "createRemoteConnectionCredentials"))
+            .addOutputVariable("key", Type.STRING)
+            .addOutputVariable("secret", Type.STRING)
+            .build(); // void
 
         device.createOperationBuilder("setConfig")
-                .setInvocable(iCreator.createInvocable(A_DEVICE + "_" + "setConfig"))
-                .addInputVariable("uri", Type.STRING)
-                .addInputVariable("location", Type.STRING)
-                .addOutputVariable("result", Type.NONE)
-                .build();
+            .setInvocable(iCreator.createInvocable(A_DEVICE + "_" + "setConfig"))
+            .addInputVariable("uri", Type.STRING)
+            .addInputVariable("location", Type.STRING)
+            .build(); // void
 
         device.createPropertyBuilder("runtimeName")
-                .setValue(Type.STRING, "stubRuntime")
-                .build();
+            .setValue(Type.STRING, "stubRuntime")
+            .build(); // void
 
         device.createPropertyBuilder("runtimeVersion")
-                .setValue(Type.INTEGER, 1)
-                .build();
+            .setValue(Type.INTEGER, 1)
+            .build(); // void
 
         device.build();
         smB.build();
