@@ -31,6 +31,19 @@ class ServiceKind(Enum):
     PROBE_SERVICE = 3
     SERVER = 4
 
+def composeIdShort(*names):
+    """Composes multiple id parts to a single AAS idShort"""
+    res = ""
+    for n in names:
+        if len(res) == 0:
+            res = n
+        else:
+            if len(n) == 1:
+                res = res + "_" + n[0].upper()
+            elif len(n) > 1:
+                res = res + "_" + n[0].upper() + n[1:]
+    return res
+
 class Service:
     """Interface of an administrative service interface."""
 

@@ -64,7 +64,7 @@ class VABBaSyxTCPInterface:
             logger.debug("INV path " + str(pathLen)+" "+path)
             jsonValueLen = struct.unpack('i', data[pos:pos+4])
             pos = pos + 4
-            json = data[pos:pos + pathLen].decode('UTF-8')
+            json = data[pos:].decode('UTF-8')
             logger.debug("INV paramJson " + json)
             self.basyxInvoke(path, json, conn)
 
