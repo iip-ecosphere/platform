@@ -437,18 +437,32 @@ public class AasPartRegistry {
     public static AasSetup getSetup() {
         return setup;
     }
-    
+
+    /**
+     * Defines the AAS setup without resetting the AAS device/component implementation port.
+     * 
+     * @param aasSetup the setup information
+     * @return the setup information before this call
+     * @see #setAasSetup(AasSetup, boolean)
+     */
+    public static AasSetup setAasSetup(AasSetup aasSetup) {
+        return setAasSetup(aasSetup, false);
+    }
+
     /**
      * Defines the AAS setup.
      * 
      * @param aasSetup the setup information
+     * @param resetImplPort reset or keep the AAS device/component implementation port
      * @return the setup information before this call
      */
-    public static AasSetup setAasSetup(AasSetup aasSetup) {
+    public static AasSetup setAasSetup(AasSetup aasSetup, boolean resetImplPort) {
         AasSetup old = aasSetup;
         setup = aasSetup;
         AasFactory.setPluginId(setup.getPluginId());
-        aasImplPort = -1; // reset
+        if (resetImplPort) {
+            aasImplPort = -1;
+        }
         return old;
     }
     
