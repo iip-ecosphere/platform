@@ -82,6 +82,16 @@ project Connectors {
 
     compound JsonFormatter refines GenericMachineFormatter {
     }
+
+    // -------------------------------------- Data Time Diff --------------------------------
+
+    abstract compound DataTimeDiffProvider {
+    }
+    
+    compound JavaDataTimeDiffProvider refines DataTimeDiffProvider {
+       NonEmptyString class; // optional class name, must comply with formatter.OutputFormatter
+       String artifact; // optional maven artifact
+    }
     
     // -------------------------------------- Data Operations -------------------------------
     
@@ -216,6 +226,7 @@ project Connectors {
        Port port;
        Integer samplingPeriod = 0; // no sampling by default
        SecuritySettings security = null;
+       DataTimeDiffProvider dataTimeDiffProvider = null;
 
        assign (uiGroup = UiOptionalGroup1) to {
            setOf(AssignmentOperation) operations = {};
@@ -560,6 +571,46 @@ project Connectors {
        }
        assign (uiGroup = UiOptionalGroup2) to {
            String deviceServiceKey = "REST";
+       }
+   }
+
+   // ------------------------ file ----------------------------------
+   
+   compound FileConnector refines ChannelConnector {
+       assign (uiGroup = UiInvisibleGroup) to {
+           String class = "de.oktoflow.platform.connectors.file.FileConnector";
+           String artifact ="de.iip-ecosphere.platform:connectors.file:";
+           NameplateInfo nameplateInfo = {
+               manufacturerProductDesignation = "Generic file connector@en",
+               manufacturer = refBy(manufacturer_sse)
+           };
+           NonEmptyString host = "localhost";
+           Port port = 1;
+           String deviceServiceKey = "";
+       }
+       NonEmptyString readFiles;
+       String writeFiles;
+       Integer dataTimeDiff = 0;
+   }
+
+   compound JsonConnector refines FileConnector {
+       assign (uiGroup = UiInvisibleGroup) to {
+           machineFormatter = JsonFormatter{};
+           machineParser = JsonParser{};
+       }
+   }
+
+   compound CSVConnector refines FileConnector {
+       assign (uiGroup = UiInvisibleGroup) to {
+           machineFormatter = TextLineFormatter{separator=","};
+           machineParser = TextLineParser{separator=","};
+       }
+   }
+
+   compound TSVConnector refines FileConnector {
+       assign (uiGroup = UiInvisibleGroup) to {
+           machineFormatter = TextLineFormatter{separator="\\t"};
+           machineParser = TextLineParser{separator="\\t"};
        }
    }
    
