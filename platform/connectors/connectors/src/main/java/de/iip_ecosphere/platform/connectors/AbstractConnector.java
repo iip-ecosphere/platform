@@ -23,6 +23,7 @@ import javax.net.ssl.SSLContext;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.connectors.events.ConnectorTriggerQuery;
+import de.iip_ecosphere.platform.connectors.events.DataTimeDifferenceProvider;
 import de.iip_ecosphere.platform.connectors.model.AbstractModelAccess.NotificationChangedListener;
 import de.iip_ecosphere.platform.connectors.model.ModelAccess;
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
@@ -60,6 +61,7 @@ public abstract class AbstractConnector<O, I, CO, CI> implements Connector<O, I,
     private boolean enablePolling = true; // enable by default
     private CachingStrategy cachingStrategy;
     private Map<String, Object> storage;
+    private DataTimeDifferenceProvider<CO> dataTimeDifferenceProvider;
 
     /**
      * Creates an instance and installs the protocol adapter(s) with a default
@@ -355,10 +357,24 @@ public abstract class AbstractConnector<O, I, CO, CI> implements Connector<O, I,
      */
     protected CO received(String channel, O data, boolean notifyCallback) throws IOException {
         CO result = configureAdapter(selector.selectSouthOutput(channel, data)).adaptOutput(channel, data);
-        if (null != result && null != callback && notifyCallback && checkCache(data)) {
-            callback.received(result);
+        if (null != result) {
+            if (null != callback && notifyCallback && checkCache(data)) {
+                callback.received(result);
+            }
+            if (null != dataTimeDifferenceProvider) {
+                notifyDataTimeDifference(dataTimeDifferenceProvider.determineDifference(result));
+            }
         }
         return result;
+    }
+    
+    /**
+     * Notifies this connector about a determined/changed time difference between the actual data received
+     * and the next data to be received. Not considered if not overridden!
+     * 
+     * @param difference the time difference in ms
+     */
+    protected void notifyDataTimeDifference(int difference) {
     }
     
     /**
@@ -540,9 +556,15 @@ public abstract class AbstractConnector<O, I, CO, CI> implements Connector<O, I,
     public Object getStorageValue(String key) {
         return null == storage || null == key ? null : storage.get(key);
     }
+    
+    @Override
+    public void setDataTimeDifferenceProvider(DataTimeDifferenceProvider<CO> provider) {
+        this.dataTimeDifferenceProvider = provider;
+    }
 
     @Override
     public void setDataTimeDifference(int difference) {
+        notifyDataTimeDifference(difference);
     }
     
     @Override
