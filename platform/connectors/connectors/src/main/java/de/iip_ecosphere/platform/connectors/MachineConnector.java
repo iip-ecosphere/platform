@@ -18,7 +18,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import de.iip_ecosphere.platform.connectors.events.DataTimeDifferenceProvider;
 import de.iip_ecosphere.platform.connectors.model.ModelAccess;
 
 /**
@@ -103,13 +102,6 @@ public @interface MachineConnector {
      * @return {@code true} for multi-valued, {@code false} else
      */
     public boolean supportsMultiValued() default false;
-
-    /**
-     * Returns whether this connector considers {@link DataTimeDifferenceProvider}.
-     * 
-     * @return {@code true} for considered, {@code false} else
-     */
-    public boolean supportsDataTimeDifference() default false;
     
     // on further properties, adjust ConnectorsAas/ConnectorsAasTest!
     

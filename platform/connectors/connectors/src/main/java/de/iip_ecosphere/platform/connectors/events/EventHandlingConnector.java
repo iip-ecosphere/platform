@@ -66,4 +66,11 @@ public interface EventHandlingConnector {
      */
     public Object getStorageValue(String key);
 
+    /**
+     * Adjusts the simulated data time difference.
+     * 
+     * @param difference the difference, negative for configured fixed default, 0 for none (handle with care)
+     */
+    public void setDataTimeDifference(int difference);
+
 }

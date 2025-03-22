@@ -15,7 +15,6 @@ import java.io.IOException;
 
 import org.slf4j.LoggerFactory;
 
-import de.iip_ecosphere.platform.connectors.events.DataTimeDifferenceProvider;
 import de.iip_ecosphere.platform.connectors.events.EventHandlingConnector;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 
@@ -161,14 +160,6 @@ public interface Connector <O, I, CO, CI> extends EventHandlingConnector {
      * @param value the new value
      */
     public default void notifyReconfigured(String parameterName, String value) {
-    }
-
-    /**
-     * Defines the time difference provider. Depends on the connector implementation.
-     * 
-     * @param provider the provider, may be <b>null</b> for none
-     */
-    public default void setDataTimeDifferenceProvider(DataTimeDifferenceProvider<CO> provider) {
     }
 
 }
