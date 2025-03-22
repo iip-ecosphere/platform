@@ -54,6 +54,10 @@
      <module>connectors/connectors.opcuav1</module>
      <module>connectors/connectors.ads</module>
      <module>connectors/connectors.serial</module>
+     <module>connectors/connectors.influx</module>
+     <module>connectors/connectors.modbustcpipv1</module>
+     <module>connectors/connectors.rest</module>
+     <module>connectors/connectors.file</module>
      <!-- services layer -->
      <module>services/services.environment</module>
      <module>services/services.environment.spring</module>
