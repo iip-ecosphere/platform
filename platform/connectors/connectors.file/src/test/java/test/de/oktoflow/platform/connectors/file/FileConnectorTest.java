@@ -59,14 +59,18 @@ public class FileConnectorTest {
      * 
      * @param outSer the output serializer to use
      * @param inSer the input serializer to use
+     * @param determineTimeDiff shall a data dependent time difference be applied/simulated
      * @return the connector instance
      */
     private Connector<byte[], byte[], Product, Command> createConnector(Serializer<Product> outSer, 
-        Serializer<Command> inSer) {
+        Serializer<Command> inSer, boolean determineTimeDiff) {
         Connector<byte[], byte[], Product, Command> result = new FileConnector<>(
             new ChannelTranslatingProtocolAdapter<byte[], byte[], Product, Command>(
                 AbstractSerializingConnectorTest.PROD_CHANNEL, new ConnectorOutputTypeAdapter<Product>(outSer), 
                 AbstractSerializingConnectorTest.CMD_CHANNEL, new ConnectorInputTypeAdapter<Command>(inSer)));
+        if (determineTimeDiff) {
+            result.setDataTimeDifferenceProvider(p -> 900); // for testing, constant
+        }
         return result;
     }
     
@@ -91,7 +95,7 @@ public class FileConnectorTest {
      */
     @Test
     public void testSingleFile() throws IOException {
-        testConnector("src/test/resources/singleFile/dataFile.json", composeTmpPath(""), 2);
+        testConnector("src/test/resources/singleFile/dataFile.json", composeTmpPath(""), 2, false);
     }
 
     /**
@@ -101,7 +105,7 @@ public class FileConnectorTest {
      */
     @Test
     public void testSingleFileResource() throws IOException {
-        testConnector("singleFile/dataFile.json", null, 2);
+        testConnector("singleFile/dataFile.json", null, 2, false);
     }
 
     /**
@@ -111,7 +115,7 @@ public class FileConnectorTest {
      */
     @Test
     public void testMultipleFiles() throws IOException {
-        testConnector("src/test/resources/multiFiles/", composeTmpPath("fileConnTest.txt"), 4);
+        testConnector("src/test/resources/multiFiles/", composeTmpPath("fileConnTest.txt"), 4, false);
     }
 
     /**
@@ -121,7 +125,7 @@ public class FileConnectorTest {
      */
     @Test
     public void testRegExFiles() throws IOException {
-        testConnector("src/test/resources/patternFiles/dataFile\\d.json", null, 4);
+        testConnector("src/test/resources/patternFiles/dataFile\\d.json", null, 4, true);
     }
 
     /**
@@ -202,7 +206,8 @@ public class FileConnectorTest {
      * @param determineTimeDiff shall a data dependent time difference be applied/simulated
      * @throws IOException
      */
-    private void testConnector(String readFiles, String writeFiles, int expectedReceived) throws IOException {
+    private void testConnector(String readFiles, String writeFiles, int expectedReceived, boolean determineTimeDiff) 
+        throws IOException {
         System.out.println("Testing with read (" + readFiles + ") write (" + writeFiles + ")");
         File[] tmpFiles = deleteTmpConnectorFiles(writeFiles);
         ConnectorTest.assertDescriptorRegistration(FileConnector.Descriptor.class);
@@ -218,7 +223,7 @@ public class FileConnectorTest {
         Serializer<Command> inSer = new CommandJsonSerializer();
         SerializerRegistry.registerSerializer(inSer);
 
-        Connector<byte[], byte[], Product, Command> c = createConnector(outSer, inSer);
+        Connector<byte[], byte[], Product, Command> c = createConnector(outSer, inSer, determineTimeDiff);
         ConnectorTest.assertInstance(c, false);
         ConnectorTest.assertConnectorProperties(c);
         c.connect(cParams);

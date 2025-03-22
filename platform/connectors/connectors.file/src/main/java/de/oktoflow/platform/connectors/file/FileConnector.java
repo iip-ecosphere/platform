@@ -57,7 +57,8 @@ import de.iip_ecosphere.platform.support.resources.ResourceLoader;
  * @author Holger Eichelberger, SSE
  */
 @MachineConnector(hasModel = false, supportsEvents = true, supportsHierarchicalQNames = false, 
-    supportsModelCalls = false, supportsModelProperties = false, supportsModelStructs = false, specificSettings = {})
+    supportsModelCalls = false, supportsModelProperties = false, supportsModelStructs = false, specificSettings = {}, 
+    supportsDataTimeDifference = true)
 @MachineConnectorSupportedQueries({ConnectorTriggerQuery.class}) // we don't care for the trigger contents so far
 public class FileConnector<CO, CI> extends AbstractChannelConnector<byte[], byte[], CO, CI> {
 
@@ -255,9 +256,9 @@ public class FileConnector<CO, CI> extends AbstractChannelConnector<byte[], byte
             }
         }).start();
     }
-
+    
     @Override
-    public void setDataTimeDifference(int difference) {
+    protected void notifyDataTimeDifference(int difference) {
         nextDataInterval = difference;
     }
 
