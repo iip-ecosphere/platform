@@ -38,6 +38,8 @@ import de.iip_ecosphere.platform.connectors.ChannelAdapterSelector;
 import de.iip_ecosphere.platform.connectors.ConnectorDescriptor;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.MachineConnector;
+import de.iip_ecosphere.platform.connectors.MachineConnectorSupportedQueries;
+import de.iip_ecosphere.platform.connectors.events.ConnectorTriggerQuery;
 import de.iip_ecosphere.platform.connectors.formatter.OutputFormatter;
 import de.iip_ecosphere.platform.connectors.parser.InputParser;
 import de.iip_ecosphere.platform.connectors.types.ChannelProtocolAdapter;
@@ -55,14 +57,14 @@ import de.iip_ecosphere.platform.support.resources.ResourceLoader;
  * @author Holger Eichelberger, SSE
  */
 @MachineConnector(hasModel = false, supportsEvents = true, supportsHierarchicalQNames = false, 
-    supportsModelCalls = false, supportsModelProperties = false, supportsModelStructs = false, specificSettings = {}, 
-    supportsDataTimeDifference = true)
+    supportsModelCalls = false, supportsModelProperties = false, supportsModelStructs = false, specificSettings = {})
+@MachineConnectorSupportedQueries({ConnectorTriggerQuery.class}) // we don't care for the trigger contents so far
 public class FileConnector<CO, CI> extends AbstractChannelConnector<byte[], byte[], CO, CI> {
 
     public static final String NAME = "File";
     public static final String SETTING_READ_FILES = "READ_FILES";
     public static final String SETTING_WRITE_FILES = "WRITE_FILES";
-    public static final String SETTING_DATA_TIMEDIFFL = "DATA_TIMEDIFF";
+    public static final String SETTING_DATA_TIMEDIFF = "DATA_TIMEDIFF";
     public static final String OUT_NAME_PREFIX = "FileConnector_";
     public static final String OUT_NAME_SUFFIX = ".txt";
     
@@ -185,7 +187,7 @@ public class FileConnector<CO, CI> extends AbstractChannelConnector<byte[], byte
             this.writeFiles = new File(writeFiles); // file or directory
         } // warn?
         LOGGER.info("File connected with InputFile(s) " + readFiles + " OutputFile" + writeFiles);
-        fixedDataInterval = params.getSpecificIntSetting(SETTING_DATA_TIMEDIFFL);
+        fixedDataInterval = params.getSpecificIntSetting(SETTING_DATA_TIMEDIFF);
         pollingFrequency = params.getNotificationInterval();
         requestTimeout = params.getRequestTimeout();
         readData();
@@ -255,7 +257,7 @@ public class FileConnector<CO, CI> extends AbstractChannelConnector<byte[], byte
     }
 
     @Override
-    protected void notifyDataTimeDifference(int difference) {
+    public void setDataTimeDifference(int difference) {
         nextDataInterval = difference;
     }
 
@@ -348,6 +350,15 @@ public class FileConnector<CO, CI> extends AbstractChannelConnector<byte[], byte
                 return name.startsWith(OUT_NAME_PREFIX) && name.endsWith(suffix);
             }
         };
+    }
+    
+    @Override
+    public void trigger(ConnectorTriggerQuery query) {
+        try { // ignore the query, just trigger
+            read();
+        } catch (IOException e) {
+            LOGGER.error("While processing a query trigger: {}", e.getMessage(), e);
+        }
     }
 
 }
