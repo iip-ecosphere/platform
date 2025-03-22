@@ -47,9 +47,37 @@ public class ConnectorEventUtils {
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException 
             | ClassCastException | NoSuchMethodException | InvocationTargetException e) {
             String loaders = ClassLoaderUtils.hierarchyToString(loader);
-            LoggerFactory.getLogger(ConnectorEventUtils.class).error("Cannot instantiate input handler of type '" 
-                + className + " via " + loaders + "': " + e.getClass().getSimpleName() + " " + e.getMessage() 
-                + ". Events of type " + type.getName() + " will not be handled!");
+            LoggerFactory.getLogger(ConnectorEventUtils.class).error("Cannot instantiate input handler of type '{} via "
+                + "{}': {} {}. Events of type {} will not be handled!", className, loaders, 
+                e.getClass().getSimpleName(), e.getMessage(), type.getName());
+        }
+        return result;
+    }
+
+    /**
+     * Convenience method for creating (custom) data time difference provider instances.
+     * 
+     * @param <T> the data type to be handled by the connector
+     * @param loader the class loader to load the class with
+     * @param className the name of the parser class (must implement {@link InputParser} and provide a non-argument 
+     *     constructor
+     * @param type the type to be handled by the connector
+     * @return the parser instance (<b>null</b> if the parser cannot be found/initialized)
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> DataTimeDifferenceProvider<T> createDataTimeDifferenceProvider(ClassLoader loader, 
+        String className, Class<T> type) {
+        DataTimeDifferenceProvider<T> result = null;
+        try {
+            Class<?> handlerClass = loader.loadClass(className);
+            Object instance = handlerClass.getDeclaredConstructor().newInstance();
+            result = (DataTimeDifferenceProvider<T>) instance;
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException 
+            | ClassCastException | NoSuchMethodException | InvocationTargetException e) {
+            String loaders = ClassLoaderUtils.hierarchyToString(loader);
+            LoggerFactory.getLogger(ConnectorEventUtils.class).error("Cannot instantiate data time difference provider "
+                + "of type '{} via {}': {} {}. Data instances of type {} will not be considered!", className, loaders, 
+                e.getClass().getSimpleName(), e.getMessage(), type.getName());
         }
         return result;
     }

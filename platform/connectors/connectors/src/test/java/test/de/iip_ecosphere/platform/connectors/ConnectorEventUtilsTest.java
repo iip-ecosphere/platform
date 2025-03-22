@@ -17,6 +17,7 @@ import org.junit.Test;
 
 import de.iip_ecosphere.platform.connectors.events.ConnectorEventUtils;
 import de.iip_ecosphere.platform.connectors.events.ConnectorInputHandler;
+import de.iip_ecosphere.platform.connectors.events.DataTimeDifferenceProvider;
 import de.iip_ecosphere.platform.connectors.events.EventHandlingConnector;
 
 /**
@@ -40,14 +41,39 @@ public class ConnectorEventUtilsTest {
     }
 
     /**
+     * Test data time difference provider.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public static class MyDataTimeDifferenceProvider implements DataTimeDifferenceProvider<Object> {
+
+        @Override
+        public int determineDifference(Object data) {
+            return 10;
+        }
+        
+    }
+
+    /**
      * Tests {@link ConnectorEventUtils#createInputHandlerInstance(ClassLoader, String, Class)}.
      */
     @Test
-    public void testInstantiation() {
+    public void testInputHandlerInstantiation() {
         Assert.assertNull(ConnectorEventUtils.createInputHandlerInstance(
             getClass().getClassLoader(), "xxx", Object.class));
         Assert.assertNotNull(ConnectorEventUtils.createInputHandlerInstance(
             getClass().getClassLoader(), MyInputHandler.class.getName(), Object.class));
+    }
+
+    /**
+     * Tests {@link ConnectorEventUtils#createDataTimeDifferenceProvider(ClassLoader, String, Class)}.
+     */
+    @Test
+    public void testDataTimeDifferenceProvider() {
+        Assert.assertNull(ConnectorEventUtils.createDataTimeDifferenceProvider(
+            getClass().getClassLoader(), "yyy", Object.class));
+        Assert.assertNotNull(ConnectorEventUtils.createDataTimeDifferenceProvider(
+            getClass().getClassLoader(), MyDataTimeDifferenceProvider.class.getName(), Object.class));
     }
 
 }
