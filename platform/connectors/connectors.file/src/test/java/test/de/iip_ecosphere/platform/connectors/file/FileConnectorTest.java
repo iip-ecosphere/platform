@@ -74,13 +74,27 @@ public class FileConnectorTest {
     }
     
     /**
+     * Composes a temporary path.
+     * 
+     * @param postfix the path postfix after the temporary folder, e.g., a file name, may be empty
+     * @return the composed path
+     */
+    private static String composeTmpPath(String postfix) {
+        String tmp = FileUtils.getTempDirectoryPath();
+        if (!tmp.endsWith(File.separator)) {
+            tmp += File.separator;
+        }
+        return tmp + postfix;
+    }
+    
+    /**
      * Tests a single file.
      * 
      * @throws IOException shall not occur
      */
     @Test
     public void testSingleFile() throws IOException {
-        testConnector("src/test/resources/singleFile/dataFile.json", FileUtils.getTempDirectoryPath() , 2, false);
+        testConnector("src/test/resources/singleFile/dataFile.json", composeTmpPath("") , 2, false);
     }
 
     /**
@@ -90,8 +104,7 @@ public class FileConnectorTest {
      */
     @Test
     public void testMultipleFiles() throws IOException {
-        testConnector("src/test/resources/multiFiles/", FileUtils.getTempDirectoryPath() + "fileConnTest.txt", 
-            4, false);
+        testConnector("src/test/resources/multiFiles/", composeTmpPath("fileConnTest.txt"), 4, false);
     }
 
     /**
