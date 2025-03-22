@@ -79,9 +79,9 @@ public class UtilsTest {
         Assert.assertEquals("", AasFactory.composeIdShort());
         Assert.assertEquals("Test", AasFactory.composeIdShort("Test"));
         Assert.assertEquals("Test", AasFactory.composeIdShort("Test", ""));
-        Assert.assertEquals("TestA", AasFactory.composeIdShort("Test", "a"));
-        Assert.assertEquals("TestAnother", AasFactory.composeIdShort("Test", "another"));
-        Assert.assertEquals("testAnotherName", AasFactory.composeIdShort("test", "another", "Name"));
+        Assert.assertEquals("Test_a", AasFactory.composeIdShort("Test", "a"));
+        Assert.assertEquals("Test_another", AasFactory.composeIdShort("Test", "another"));
+        Assert.assertEquals("test_another_Name", AasFactory.composeIdShort("test", "another", "Name"));
     }
     
     

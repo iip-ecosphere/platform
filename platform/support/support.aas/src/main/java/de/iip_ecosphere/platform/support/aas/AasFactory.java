@@ -619,7 +619,7 @@ public abstract class AasFactory {
     }
 
     /**
-     * Safely composes an idShort from multiple names.
+     * Composes an idShort from multiple names.
      * 
      * @param names the names to compose
      * @return the composed name
@@ -627,13 +627,19 @@ public abstract class AasFactory {
     public static String composeIdShort(String... names) {
         String result = "";
         for (String s : names) {
-            String tmp = s;
+            /*String tmp = s;
             if (result.length() > 0) {
                 if (tmp.length() > 0) {
                     tmp = Character.toUpperCase(tmp.charAt(0)) + tmp.substring(1);
                 } // further cleanup?
             }
-            result += tmp;
+            result += "_" + tmp;*/
+            if (s.length() > 0) {
+                if (result.length() > 0) {
+                    result += "_";
+                }
+                result += s;
+            }
         }
         return result;
     }
