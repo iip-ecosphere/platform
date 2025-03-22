@@ -1,0 +1,11 @@
+identities:
+    "mqttAuth":
+        type: USERNAME
+        userName: user
+        tokenData: user
+        tokenEncryptionAlgorithm: UTF-8
+    "mqttKeyStore":
+        type: USERNAME
+        tokenData: a1234567
+        tokenEncryptionAlgorithm: UTF-8
+        file: src/test/secCfg/client-trust-store.jks
