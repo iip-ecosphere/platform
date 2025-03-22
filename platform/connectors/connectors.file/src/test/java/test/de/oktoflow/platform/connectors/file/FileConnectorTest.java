@@ -10,7 +10,7 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package test.de.iip_ecosphere.platform.connectors.file;
+package test.de.oktoflow.platform.connectors.file;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,7 +27,6 @@ import org.junit.Test;
 import de.iip_ecosphere.platform.connectors.Connector;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter.ConnectorParameterBuilder;
-import de.iip_ecosphere.platform.connectors.file.FileConnector;
 import de.iip_ecosphere.platform.connectors.types.ChannelTranslatingProtocolAdapter;
 import de.iip_ecosphere.platform.connectors.types.ConnectorInputTypeAdapter;
 import de.iip_ecosphere.platform.connectors.types.ConnectorOutputTypeAdapter;
@@ -36,6 +35,7 @@ import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.serialization.Serializer;
 import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry;
+import de.oktoflow.platform.connectors.file.FileConnector;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
