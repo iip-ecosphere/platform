@@ -94,7 +94,17 @@ public class FileConnectorTest {
      */
     @Test
     public void testSingleFile() throws IOException {
-        testConnector("src/test/resources/singleFile/dataFile.json", composeTmpPath("") , 2, false);
+        testConnector("src/test/resources/singleFile/dataFile.json", composeTmpPath(""), 2, false);
+    }
+
+    /**
+     * Tests a single file as resource.
+     * 
+     * @throws IOException shall not occur
+     */
+    @Test
+    public void testSingleFileResource() throws IOException {
+        testConnector("singleFile/dataFile.json", null, 2, false);
     }
 
     /**

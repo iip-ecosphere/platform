@@ -18,6 +18,8 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -41,6 +43,7 @@ import de.iip_ecosphere.platform.connectors.parser.InputParser;
 import de.iip_ecosphere.platform.connectors.types.ChannelProtocolAdapter;
 import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.TimeUtils;
+import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 
 /**
  * Implements the generic file connector. Intended to use with appropriate data serializers or wrapped 
@@ -161,7 +164,11 @@ public class FileConnector<CO, CI> extends AbstractChannelConnector<byte[], byte
                             
                         });
                     } catch (PatternSyntaxException e) {
-                        LOGGER.warn("Pattern '{}' is not a Java regular expression. Ignoring.", f.getName());
+                        LOGGER.warn("Pattern '{}' is not a Java regular expression. Ignoring/trying as resource.", 
+                            f.getName());
+                    }
+                    if (tmp == null || tmp.length == 0) { // might not be a pattern rather than a resource
+                        tmp = new File[] {new File(token)};
                     }
                 }
                 if (null != tmp) {
@@ -185,12 +192,36 @@ public class FileConnector<CO, CI> extends AbstractChannelConnector<byte[], byte
     }
     
     /**
+     * Tries to open {@code file} or, as fallback, as a resource.
+     * 
+     * @param file the file to open
+     * @return the opened stream
+     * @throws IOException if opening {@code file} finally fails
+     */
+    private BufferedReader open(File file) throws IOException {
+        BufferedReader result;
+        try {
+            result = new BufferedReader(new FileReader(file));
+        } catch (IOException e) {
+            InputStream in = ResourceLoader.getResourceAsStream(file.toString());
+            if (in != null) {
+                result = new BufferedReader(new InputStreamReader(in));
+            } else {
+                throw e;
+            }
+        }
+        return result;
+    }
+    
+    /**
      * Reads the data from all files line-by-line.
      */
     private void readData() {
         new Thread(() -> {
             for (File f: readFiles) {
-                try (BufferedReader br = new BufferedReader(new FileReader(f))) {
+                
+                
+                try (BufferedReader br = open(f)) {
                     String line;
                     while (connected && (line = br.readLine()) != null) {
                         if (pollingFrequency > 0) {
