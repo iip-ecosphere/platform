@@ -53,8 +53,8 @@ import test.de.iip_ecosphere.platform.transport.AbstractTransportConnectorTest.T
  */
 public abstract class AbstractSerializingConnectorTest {
 
-    private static final String CMD_CHANNEL = "cmd";
-    private static final String PROD_CHANNEL = "prod";
+    public static final String CMD_CHANNEL = "cmd";
+    public static final String PROD_CHANNEL = "prod";
     
     /**
      * Creates the connector to be tested.

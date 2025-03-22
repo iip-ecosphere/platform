@@ -114,12 +114,7 @@ public interface ModelAccess {
      * {@link MachineConnector#supportsModelProperties()} is {@code false})
      */
     public default int getInt(String qName) throws IOException {
-        Object tmp = get(qName);
-        if (tmp.getClass() == Integer.class) {
-            return ((Integer) tmp).intValue();
-        } else {
-            throw new IOException("Cannot turn " + tmp + "into an int");
-        }
+        return getInputConverter().toInteger(get(qName));
     }
 
     /**
@@ -131,12 +126,7 @@ public interface ModelAccess {
      * {@link MachineConnector#supportsModelProperties()} is {@code false})
      */
     public default float getFloat(String qName) throws IOException {
-        Object tmp = get(qName);
-        if (tmp.getClass() == Float.class) {
-            return ((Float) tmp).floatValue();
-        } else {
-            throw new IOException("Cannot turn " + tmp + "into a double");
-        }
+        return getInputConverter().toFloat(get(qName));
     }
 
     /**
@@ -148,12 +138,7 @@ public interface ModelAccess {
      * {@link MachineConnector#supportsModelProperties()} is {@code false})
      */
     public default double getDouble(String qName) throws IOException {
-        Object tmp = get(qName);
-        if (tmp.getClass() == Double.class) {
-            return ((Double) tmp).doubleValue();
-        } else {
-            throw new IOException("Cannot turn " + tmp + "into a double");
-        }
+        return getInputConverter().toDouble(get(qName));
     }
 
     /**
@@ -165,12 +150,7 @@ public interface ModelAccess {
      * {@link MachineConnector#supportsModelProperties()} is {@code false})
      */
     public default long getLong(String qName) throws IOException {
-        Object tmp = get(qName);
-        if (tmp.getClass() == Long.class) {
-            return ((Long) tmp).longValue();
-        } else {
-            throw new IOException("Cannot turn " + tmp + "into a long");
-        }
+        return getInputConverter().toLong(get(qName));
     }
 
     /**
@@ -182,12 +162,7 @@ public interface ModelAccess {
      * {@link MachineConnector#supportsModelProperties()} is {@code false})
      */
     public default short getShort(String qName) throws IOException {
-        Object tmp = get(qName);
-        if (tmp.getClass() == Short.class) {
-            return ((Short) tmp).shortValue();
-        } else {
-            throw new IOException("Cannot turn " + tmp + "into a long");
-        }
+        return getInputConverter().toShort(get(qName));
     }
 
     /**
@@ -199,12 +174,7 @@ public interface ModelAccess {
      * {@link MachineConnector#supportsModelProperties()} is {@code false})
      */
     public default byte getByte(String qName) throws IOException {
-        Object tmp = get(qName);
-        if (tmp.getClass() == Short.class) {
-            return ((Byte) tmp).byteValue();
-        } else {
-            throw new IOException("Cannot turn " + tmp + "into a byte");
-        }
+        return getInputConverter().toByte(get(qName));
     }
 
     /**
@@ -216,12 +186,7 @@ public interface ModelAccess {
      * {@link MachineConnector#supportsModelProperties()} is {@code false})
      */
     public default boolean getBoolean(String qName) throws IOException {
-        Object tmp = get(qName);
-        if (tmp.getClass() == Short.class) {
-            return ((Boolean) tmp).booleanValue();
-        } else {
-            throw new IOException("Cannot turn " + tmp + "into a boolean");
-        }
+        return getInputConverter().toBoolean(get(qName));
     }
 
     /**
@@ -233,12 +198,7 @@ public interface ModelAccess {
      * {@link MachineConnector#supportsModelProperties()} is {@code false})
      */
     public default String getString(String qName) throws IOException {
-        Object tmp = get(qName);
-        if (tmp.getClass() == String.class) {
-            return (String) tmp;
-        } else {
-            throw new IOException("Cannot turn " + tmp + "into a string");
-        }
+        return getInputConverter().toString(get(qName));
     }
     
     /**
@@ -279,7 +239,7 @@ public interface ModelAccess {
      * {@link MachineConnector#supportsModelProperties()} is {@code false})
      */
     public default void setInt(String qName, int value) throws IOException {
-        set(qName, value);
+        set(qName, getOutputConverter().fromInteger(value));
     }
 
     /**
@@ -291,7 +251,7 @@ public interface ModelAccess {
      * {@link MachineConnector#supportsModelProperties()} is {@code false})
      */
     public default void setLong(String qName, long value) throws IOException {
-        set(qName, value);
+        set(qName, getOutputConverter().fromLong(value));
     }
 
     /**
@@ -303,7 +263,7 @@ public interface ModelAccess {
      * {@link MachineConnector#supportsModelProperties()} is {@code false})
      */
     public default void setByte(String qName, byte value) throws IOException {
-        set(qName, value);
+        set(qName, getOutputConverter().fromByte(value));
     }
 
     /**
@@ -315,7 +275,7 @@ public interface ModelAccess {
      * {@link MachineConnector#supportsModelProperties()} is {@code false})
      */
     public default void setShort(String qName, short value) throws IOException {
-        set(qName, value);
+        set(qName, getOutputConverter().fromShort(value));
     }
 
     /**
@@ -327,7 +287,7 @@ public interface ModelAccess {
      * {@link MachineConnector#supportsModelProperties()} is {@code false})
      */
     public default void setBoolean(String qName, boolean value) throws IOException {
-        set(qName, value);
+        set(qName, getOutputConverter().fromBoolean(value));
     }
 
     /**
@@ -339,7 +299,7 @@ public interface ModelAccess {
      * {@link MachineConnector#supportsModelProperties()} is {@code false})
      */
     public default void setDouble(String qName, double value) throws IOException {
-        set(qName, value);
+        set(qName, getOutputConverter().fromDouble(value));
     }
 
     /**
@@ -351,7 +311,7 @@ public interface ModelAccess {
      * {@link MachineConnector#supportsModelProperties()} is {@code false})
      */
     public default void setFloat(String qName, float value) throws IOException {
-        set(qName, value);
+        set(qName, getOutputConverter().fromFloat(value));
     }
 
     /**
@@ -363,7 +323,7 @@ public interface ModelAccess {
      * {@link MachineConnector#supportsModelProperties()} is {@code false})
      */
     public default void setString(String qName, String value) throws IOException {
-        set(qName, value);
+        set(qName, getOutputConverter().fromString(value));
     }
 
     /**
