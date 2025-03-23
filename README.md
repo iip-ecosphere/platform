@@ -12,7 +12,7 @@ For installation and first steps, see [install guide](platform/documentation/INS
 
 ## News
 
-* Next: [ReGaP-community kickoff](https://regap.de/community-kickoff/) at the 19th of March in Hannover, with oktoflow as technological core; initial okotflow apps developing
+* Many interesting ideas and proto-requirements from the [ReGaP-community kickoff](https://regap.de/community-kickoff/). Initial contribution: file-based connector for CSV, JSON, etc.
 * Validation of container generation and migration to JDK 21/recent Python ahead
 * oktoflow code generation initially migrated to VTL artifacts, still improving/developing
 * REST connector by Christian Nikolajew

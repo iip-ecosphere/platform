@@ -12,6 +12,11 @@ Improvements:
 * [#106](https://github.com/iip-ecosphere/platform/issues/106): Migration to JDK 17
 * Build process improvements for multiple Java/Maven installations like CI.
 * [#19](https://github.com/iip-ecosphere/platform/issues/19): Integration of generated IDTA interfaces.
+* Revision of code generation to Java/Python/JSON/YAML artifacts provided by EASy-Producer
+* [#167](https://github.com/iip-ecosphere/platform/issues/167): Generated Windows/Linux script line endings.
+
+New features:
+* [#169](https://github.com/iip-ecosphere/platform/issues/169): File-based connector for CSV, JSON (ReGaP)
 
 ### Version 0.7.0 (2024/07/11, no maven central release):
 
