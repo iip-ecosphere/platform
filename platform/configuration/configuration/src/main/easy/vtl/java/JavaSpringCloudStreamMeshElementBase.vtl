@@ -516,6 +516,7 @@ block;
         wrapperCtorParam(conn, init);
         m.assign("service", init);
         m.call("service.setReceptionCallback").newArg("ConnectorReceptionCallback");
+        setDataTimeDiffProvider(conn, "service", m);
         initAppInstId("service", m);
     }
     
@@ -815,7 +816,42 @@ block;
                 c.attribute("de.iip_ecosphere.platform.connectors.events.ConnectorInputHandler<${typeName}>", firstToLowerCase(typeName) + "Handler").initializer(init);
             }
         }
+        if (conn.dataTimeDiffProvider <> null) { // --> added after rewrite
+            generateDataTimeDiffProvider(conn.dataTimeDiffProvider, mainClsName, c);
+        } // <-- added after rewrite
     }
+    
+    // --> added after
+    
+    @DispatchBasis
+    def generateDataTimeDiffProvider(DataTimeDiffProvider provider, String mainClsName, JavaCodeClass c) {
+    }
+
+    @DispatchCase
+    def generateDataTimeDiffProvider(JavaDataTimeDiffProvider provider, String mainClsName, JavaCodeClass c) {
+        String typeName = toTypeName(provider.type);
+        JavaCodeExpression init = new JavaCodeMethodCall("de.iip_ecosphere.platform.connectors.events.ConnectorEventUtils.createDataTimeDifferenceProvider", JavaCodeImportScope.CLASS)
+            .arg(mainClsName + ".class.getClassLoader()").stringArg(provider.class).classArg(typeName);
+        c.attribute("de.iip_ecosphere.platform.connectors.events.DataTimeDifferenceProvider<${typeName}>", firstToLowerCase(typeName) + "DataTimeDiffProvider").initializer(init);
+    }
+    
+    def setDataTimeDiffProvider(Connector conn, String connVar, JavaCodeBlockInterface m) {
+        if (conn.dataTimeDiffProvider <> null) {
+            generateDataTimeDiffSetter(conn.dataTimeDiffProvider, connVar, m);
+        }
+    }
+    
+    @DispatchBasis
+    def generateDataTimeDiffSetter(DataTimeDiffProvider provider, String connVar, JavaCodeBlockInterface m) {
+    }
+
+    @DispatchCase
+    def generateDataTimeDiffSetter(JavaDataTimeDiffProvider provider, String connVar, JavaCodeBlockInterface m) {
+        String typeName = toTypeName(provider.type);
+        m.call(connVar + ".setDataTimeDifferenceProvider").arg(firstToLowerCase(typeName) + "DataTimeDiffProvider");
+    }
+    
+    // <-- added after rewrite
 
     // inserts a selector/event handler for a connector, here a event handler
     def insertSelector(Connector conn, String type, String dataVar) {
@@ -862,6 +898,7 @@ block;
                                     t.var(serviceType, "oldService", service);
                                     t.var(serviceType, "newService", wrapperCtorParam(conn, new JavaCodeConstructorCall(wrapperCls(conn) + getConnectorGenerics(conn, true)).arg("serviceData").arg("conn").arg("() -> param")));
                                     t.call("newService.setReceptionCallback").newArg("ConnectorReceptionCallback");
+                                    setDataTimeDiffProvider(conn, "newService", t);
                                     t.call("newService.setState").addConstantArgument("de.iip_ecosphere.platform.services.environment.ServiceState.STARTING");
                                     t.assign(service, "newService");
                                     t.call("oldService.setState").addConstantArgument("de.iip_ecosphere.platform.services.environment.ServiceState.STOPPING");

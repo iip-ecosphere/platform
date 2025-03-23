@@ -89,9 +89,18 @@ project Connectors {
     }
     
     compound JavaDataTimeDiffProvider refines DataTimeDiffProvider {
-       NonEmptyString class; // optional class name, must comply with formatter.OutputFormatter
+       refTo(DataType) type;
+       NonEmptyString class; // optional class name, must comply with DataTimeDiffProvider
        String artifact; // optional maven artifact
     }
+    
+    @DispatchBasis
+    def Boolean providerOk(DataTimeDiffProvider provider, Connector conn) = 
+        true;
+    
+    @DispatchCase
+    def Boolean providerOk(JavaDataTimeDiffProvider provider, Connector conn) = 
+        conn.input->exists(t|t.type == provider.type);
     
     // -------------------------------------- Data Operations -------------------------------
     
@@ -226,7 +235,6 @@ project Connectors {
        Port port;
        Integer samplingPeriod = 0; // no sampling by default
        SecuritySettings security = null;
-       DataTimeDiffProvider dataTimeDiffProvider = null;
 
        assign (uiGroup = UiOptionalGroup1) to {
            setOf(AssignmentOperation) operations = {};
@@ -234,6 +242,7 @@ project Connectors {
            String inAdapterClass = ""; // if given, use adapter; may be "*" to use generated transport serializer
            String outAdapterClass = ""; // if given, use adapter; may be "*" to use generated transport serializer
            setOf(ConnectorInputHandler) inputHandlers = {};
+           DataTimeDiffProvider dataTimeDiffProvider = null;
            CacheMode cacheMode = CacheMode::NONE;
            ServiceKind kind = ServiceKind.SOURCE_SERVICE;
            Parameters parameter = {
@@ -247,6 +256,7 @@ project Connectors {
            };
        }
        Constraint inputHandlersOk = inputHandlers->forAll(h|handlerOk(h, self));
+       Constraint dataTimeProviderOk = providerOk(dataTimeDiffProvider, self);
        assign (uiGroup = UiOptionalGroup2) to {
            Boolean mock = false; // in-vivo testing, enable a mocking connector service wrapper
            String deviceServiceKey;
