@@ -2,6 +2,12 @@
 
 This project supports the installation of the oktoflow platform.
 
+## Platform dependencies (examples only)
+
+If you just want to execute the examples without installint a full platform, execute `mvn -P DepsOnly install`
+
+## Full install
+
 The platform can be installed on Windows and on Linux. Please note that special characters like whitespaces in folder names (in particular on Windows) may cause the installation, platform installation or examples to fail. We will explain the individual steps for Ubuntu 20.4.1 Linux installed.
 
 The platform is intended for distributed installation. In this explanation we exemplify such a distribution in terms of two machines, the **server** (IP address 147.172.178.145) and one **device** (IP address 147.172.178.143). Please substitute the IP addresses in the steps below according to your local network setup.
