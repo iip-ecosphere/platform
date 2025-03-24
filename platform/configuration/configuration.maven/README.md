@@ -284,7 +284,7 @@ It can be set up as follows:
 
 # Angular build
 
-For pragmatic reasons, this artifact also contains the `ngBuild` goal (default `compile` phase) for building angular applications.
+For pragmatic reasons, this artifact also contains the `ngBuild` goal (default `compile` phase) for building angular applications. ``npm`` and ``ng`` are eventually qualified with path in the environment variable ``NODEJS_HOME`` or first path entry containing ``nodejs``.
 
   ```xml
   <build>
@@ -312,7 +312,7 @@ It can be configured by:
 
 # Angular test
 
-For pragmatic reasons, this artifact also contains the `ngTest` goal (default `test` phase) for building angular applications.
+For pragmatic reasons, this artifact also contains the `ngTest` goal (default `test` phase) for building angular applications. ``npm`` and ``ng`` are eventually qualified with path in the environment variable ``NODEJS_HOME`` or first path entry containing ``nodejs``.
 
   ```xml
   <build>

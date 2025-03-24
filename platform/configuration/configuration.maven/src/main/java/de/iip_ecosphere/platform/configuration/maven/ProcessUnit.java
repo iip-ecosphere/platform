@@ -24,8 +24,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
@@ -430,6 +432,40 @@ public class ProcessUnit {
             }
             return path + "mvn";
         }
+        
+        /**
+         * Prepends {@code path} before {@code cmd} as file system path.
+         * 
+         * @param path the path, may be empty/null (ignored)
+         * @param cmd the command
+         * @return the composed path (if not ignored) and command separated by a file separator
+         */
+        private String prependPath(String path, String cmd) {
+            String result = cmd;
+            if (null != path && path.length() > 0) {
+                result = path + File.separator + cmd;
+            }
+            return result;
+        }
+        
+        /**
+         * Returns the path for NodeJS.
+         * 
+         * @return the path, may be empty for unknown
+         */
+        private String getNodeJsPath() {
+            String result = System.getenv("NODEJS_HOME");
+            if (null == result) {
+                AtomicReference<String> res = new AtomicReference<>(result);
+                splitPath(e -> {
+                    if (e.contains("nodejs")) {
+                        res.set(e);
+                    }                
+                });
+                result = res.get();
+            }
+            return result;
+        }
 
         /**
          * Adds a shell command (shall be used for arguments). Prefixes a command processor for windows and
@@ -525,6 +561,9 @@ public class ProcessUnit {
                 if (SystemUtils.IS_OS_WINDOWS) {
                     addArguments(ProcessUnit.WIN_BAT_PREFIX);
                     enableArgumentAggregation();
+                }
+                if ("ng".equals(cmd) || "npm".equals(cmd)) {  // unqualified, try to qualify
+                    cmd = prependPath(getNodeJsPath(), cmd);
                 }
                 addArgument(cmd);
             } else if (cmdAsScript) {
@@ -663,7 +702,9 @@ public class ProcessUnit {
                 path += File.pathSeparator + getMavenBinPath();
             }
             if (null != path) {
-                path += File.pathSeparator + builder.environment().get("PATH");
+                if (builder.environment().get("PATH") != null) {
+                    path += File.pathSeparator + builder.environment().get("PATH");
+                }
                 builder.environment().put("PATH", path); // scripts are started through shell
                 info += " with " + path + " in PATH";
             }
@@ -706,6 +747,19 @@ public class ProcessUnit {
         }
         
     }
+    
+    /**
+     * Splits the OS path into path elements.
+     * 
+     * @param pathEltConsumer the element consumer
+     */
+    private static void splitPath(Consumer<String> pathEltConsumer) {
+        String path = System.getProperty("java.library.path", "");
+        StringTokenizer tokens = new StringTokenizer(path, File.pathSeparator);
+        while (tokens.hasMoreTokens()) {
+            pathEltConsumer.accept(tokens.nextToken());
+        }
+    }    
     
     /**
      * Consumes matching log regEx until all required are matched. Informs then the associated process unit.
