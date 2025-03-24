@@ -62,6 +62,7 @@ public class MockingConnectorServiceWrapper<O, I, CO, CI> extends ConnectorServi
     private IOIterator<? extends CO> triggerIterator;
     private DataRecorder recorder;    
     private Map<String, Object> storage;
+    private int notificationInterval = 0;
     
     /**
      * Creates a service wrapper instance.
@@ -339,7 +340,7 @@ public class MockingConnectorServiceWrapper<O, I, CO, CI> extends ConnectorServi
                     while (endless || once || count < bduf.get$repeats()) {
                         LoggerFactory.getLogger(getClass()).info("Ingesting data for {} "
                             + "[endless {}, once {}, count {}]: {}", getId(), endless, once, count, next);
-                        handleReceived(next, 0);
+                        handleReceived(next, notificationInterval);
                         period = bduf.get$period();
                         if (period > 0) {
                             TimeUtils.sleep(period);
@@ -378,6 +379,13 @@ public class MockingConnectorServiceWrapper<O, I, CO, CI> extends ConnectorServi
     @Override
     public Object getStorageValue(String key) {
         return null == storage || null == key ? null : storage.get(key);
+    }
+
+    @Override
+    public void setDataTimeDifference(int difference) {
+        if (difference >= 0) {
+            this.notificationInterval = difference;
+        }
     }
         
 }
