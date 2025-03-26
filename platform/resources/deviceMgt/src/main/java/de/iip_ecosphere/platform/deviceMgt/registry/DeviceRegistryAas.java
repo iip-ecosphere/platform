@@ -63,23 +63,23 @@ public class DeviceRegistryAas implements AasContributor {
                 .setInvocable(iCreator.createInvocable(getQName(NAME_OP_DEVICE_ADD)))
                 .addInputVariable("deviceId", Type.STRING)
                 .addInputVariable("deviceIp", Type.STRING)
-                .build(Type.NONE);
+                .build();
 
         registryColl.createOperationBuilder(NAME_OP_DEVICE_REMOVE)
                 .setInvocable(iCreator.createInvocable(getQName(NAME_OP_DEVICE_REMOVE)))
                 .addInputVariable("deviceId", Type.STRING)
-                .build(Type.NONE);
+                .build();
 
         registryColl.createOperationBuilder(NAME_OP_IM_ALIVE)
                 .setInvocable(iCreator.createInvocable(getQName(NAME_OP_IM_ALIVE)))
                 .addInputVariable("deviceId", Type.STRING)
-                .build(Type.NONE);
+                .build();
 
         registryColl.createOperationBuilder(NAME_OP_SEND_TELEMETRY)
                 .setInvocable(iCreator.createInvocable(getQName(NAME_OP_SEND_TELEMETRY)))
                 .addInputVariable("deviceId", Type.STRING)
                 .addInputVariable("telemetryData", Type.STRING)
-                .build(Type.NONE);
+                .build();
 
         registryColl.build();
 

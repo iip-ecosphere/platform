@@ -59,7 +59,7 @@ public class DeviceManagementAas implements AasContributor {
         deviceManager.createOperationBuilder(NAME_OP_UPDATE_RUNTIME)
                 .setInvocable(iCreator.createInvocable(getQName(NAME_OP_UPDATE_RUNTIME)))
                 .addInputVariable("deviceId", Type.STRING)
-                .build(Type.NONE);
+                .build();
         
         deviceManager.createOperationBuilder(NAME_OP_ESTABLISH_SSH)
                 .setInvocable(iCreator.createInvocable(getQName(NAME_OP_ESTABLISH_SSH)))
@@ -70,7 +70,7 @@ public class DeviceManagementAas implements AasContributor {
                 .setInvocable(iCreator.createInvocable(getQName(NAME_OP_SET_CONFIG)))
                 .addInputVariable("deviceId", Type.STRING)
                 .addInputVariable("configPath", Type.STRING)
-                .build(Type.NONE);
+                .build();
         
         deviceManager.build();
 
