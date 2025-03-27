@@ -27,7 +27,7 @@ During the platform instantiation based on your decisions, also the platform and
 
 For the next steps, we assume that you obtained the installation package and unpacked it. We assume that the folder where we unpacked the installation package is ``/iip/actual``. 
 
-## Installation by script
+### Installation by script
 
 We provide installation scripts for [Windows](fullInstallationWin.bat) and [Linux](fullInstallationLinux.sh), which will download the installation package. The installation scripts automate the manual installation based on the default setup decisions for the platform and your interactive input. For better understanding the platform and for more flexibility, we recommend the manual installation procedure explained below. Please note that support for installing prerequisites such as Docker through the scripts are based on assumptions for Ubuntu Linux and may be limited for Windows. Administrator permissions may be required, at least for installing some prerequisites.
 
@@ -38,21 +38,21 @@ Please note that the actual platform installation may run longer, as a specific 
 
 If you already have installed a different version of Python, the platform installation may grab the wrong installation, miss packages and fail. In that case, please set the environment variable ``IIP_PYTHON`` to the intended Python executable and re-instantiate the platform (in the folder `Platform/Install` execute `mvn install`).
 
-## Manual installation
+### Manual installation
 
 There are two detailed installation descriptions, one for [Windows](README-win.md) and one for [Linux](README-linux.md).
 
-## Adjust the platform configuration
+### Adjust the platform configuration
 
 The install package contains a example configuration in the folder ``src/main/easy``. As discussed in the platform handbook, a platform configuration consists of several files for technical setup, type definitions, service specifications, application and service mesh definitions. Moreover, there is the configuration meta model which will be obtained and unpacked during the next steps. Please note that the configuration meta model is only updated on explicit request, not automatically.
 
 In general, there are several decisions that you may make now, e.g., the transport protocol, the wire format, the identification approach for the devices, specific properties of the devices that shall be considered during container creation. We will focus on some decisions now:
 
-### Where will the central server be located? (required)
+#### Where will the central server be located? (required)
 
 As stated before, we assume that this will be 147.172.178.145, which is already the default IP in the platform configuration. If you want to use any other address, please open ``src/main/easy/TechnicalSetup.ivml``, search for ``platformServer`` (or 147.172.178.145) and adjust the IP there by the IP of your server.
 
-### Do you want the platform to create containers? (optional)
+#### Do you want the platform to create containers? (optional)
 
 Container creation is currently disabled by default as it requires the respective setup and takes time, in particular during the first instantiation. On further instantiations of the platform, e.g., when defining applications, advanced methods aim at reducing the container creation time.
 
@@ -72,7 +72,7 @@ To enable these settings, please go into the freeze-part at the end of ``Technic
     platformContainerGeneration;
     containerTestingMode;
 
-### Do you want to use the platform management UI? (optional) 
+#### Do you want to use the platform management UI? (optional) 
 
 Then we need to enable the Angular UI as follows
 
@@ -93,7 +93,7 @@ To enable these settings, please go into the freeze-part at the end of ``Technic
     artifactsFolder;
     artifactsUriPrefix;
 
-### Do you want the platform to create system startup scripts for you? (optional)
+#### Do you want the platform to create system startup scripts for you? (optional)
 
 These startup scripts may for technical reasons require absolute directories. The ``instDir`` states the actual installation directory, the ``javaExe`` the Java executable to be used. Please add then the following lines to the ``TechnicalSetup.ivml``.
 
@@ -105,11 +105,11 @@ To enable these settings, please go into the freeze-part at the end of ``Technic
     instDir;
     javaExe;
 
-### Do you need special setup for the transport protocol? (optional)
+#### Do you need special setup for the transport protocol? (optional)
 
 One particular setting to be considered is the `` globalHost`` for data transport, the global communication broker. In the install package, this shall be automatically set through the global variable ``platformServer`` to ease the setup for a single server installation, but in your settings also different servers for different central services (AAS, monitoring, broker, etc.) may be set up, which then require a more individualized setup. Currently, the selection of code artifacts is restricted to the Maven servers used for development, i.e., further artifacts cannot be obtained from further repositories, e.g., the future platform service store. This will be targeted by one of the next releases. 
 
-### Do you you want to develop applications on multiple computers? (optional)
+#### Do you you want to develop applications on multiple computers? (optional)
 
 The okoflow platform uses Apache Maven for all build and integration processes, also for integrating binary programs or Python scripts.  For realization applications, the platform generation processes instantiate Java/Python data/service interfaces as well as service/application templates to ease the development work. Both, service interfaces and implemented templates must be "installed" into a Maven repository to be available for the final application instantiation. 
 
@@ -142,7 +142,7 @@ To enable these settings, please go into the freeze-part at the end of ``Technic
     
 Please note that the actual authentication information is stated in the Maven ``settings.xml`` file, which is outside the scope of the platform. For more details, see e.g. [a description here](https://www.baeldung.com/maven-deploy-nexus).
 
-## Instantiate the platform
+### Instantiate the platform
 
 Instantiate the platform using
 
@@ -150,7 +150,7 @@ Instantiate the platform using
 
 This step also obtains and unpacks the respective platform configuration model. Your instantiated platform components will be in the ``gen`` folder.
 
-## Update your installation
+### Update your installation
 
 If you already instantiated an older (snapshot) version of the platform, please advise mvn to update its artifacts, i.e., 
 
@@ -158,9 +158,9 @@ If you already instantiated an older (snapshot) version of the platform, please 
 
 If you also want to update the configuration meta model, which may upgrade and evolve your applications, please specify in addition ``-Dunpack.force=true``.
 
-## Starting the central parts 
+### Starting the central parts 
 
-### Manually
+#### Manually
 
 Start the platform server(s) component through the generated scripts in the gen folder. If you run all processes from the console as explained, this requires a separate shell for platform, ECS Runtime, service manager and UI/CLI as the processes run intentionally endless. Make sure to wait for each script to be done before starting the next (usually "Running until ctrl+C"). For Windows, please use the respective scripts with file extension `.bat`. 
 
@@ -179,11 +179,11 @@ and then the ECS-Runtime/Service Manager for this device
 
 Instead of `ecsServiceMgr.sh` you may also start `ecs.sh` and `serviceMgr.sh` as separate processes in separate shells. 
 
-### Via startup scripts
+#### Via startup scripts
 
 If you created systemd startup scripts, it is now time to install them, i.e., usually to copy them into ``/ecs/systemd/system``, to refresh the setup and to enable the services depending on your Linux distribution. After enabling, the broker, the platform service, the monitoring service, and, if configured, the management user interface shall be up.
 
-### Management User Interface
+#### Management User Interface
 
 The management user interface is instantiated along with the platform. *The user interface is still under development.* If you want to have a first look, start
 
@@ -191,11 +191,11 @@ The management user interface is instantiated along with the platform. *The user
     
 (on Windows `mgtUi.bat`) and open then in a browser `http://localhost:4200`.
 
-## Deploying and starting platform components on the devices
+### Deploying and starting platform components on the devices
 
 Depending on your decisions made before, the fundamental platform components must be deployed manually or can be installed in terms of the generated containers.
 
-### Manual Deployment
+#### Manual Deployment
 
 For each required program, the instantiation creates a folder with all dependencies and the respective startup script. Moreover, the setup of the install package enables the creation of respective ZIP files `broker-bin.zip`, `ecs-bin.zip`, `ecsSvcMgr-bin.zip` or `svcMgr-bin.zip`. 
 
@@ -206,7 +206,7 @@ For each required program, the instantiation creates a folder with all dependenc
 
 Currently, by default, no explicit on/offboarding of devices is needed. 
 
-### Deployment to devices with containers
+#### Deployment to devices with containers
 
 On the devices, run 
 
@@ -214,11 +214,11 @@ On the devices, run
 
 with the address of your server, the port of the local docker registry and the name of the container (there are also variants for `plcnext` or `bitmotec`, replacing `dflt` in the container name). The platform may also generate scripts for starting the individual containers.
 
-## Deploying applications
+### Deploying applications
 
 Depending on your installation, the application may be distributed/executed by the platform or requires manual actions.
 
-### Plan-based deployment
+#### Plan-based deployment
 
 The platform instantiation copies an example deployment plan as well as the application binaries into the configured `artifacts` folder. The example deployment plan starts the services on the actual computer (`.`, assuming that ECS-Runtime and Service Manager or the combined version are running). The application in this plan is taken from the build directory of the application. In a distributed setup, the application artifacts are downloaded through the specified URI prefix via the web server of the management user interface.
 
@@ -238,11 +238,11 @@ On the management UI you may navigate to `runtime` and then to `deployment plans
 
 When writing own deployment plans, consider changing the default device identification provider from MAC addresses to network names. In the log of the ECS-Runtime/Service manager for a device, you will find the actual device ID needed in the the deployment plans, e.g., ``USING id 00FFB9A35D2B from de.iip_ecosphere.platform.support.iip_aas.MacIdProvider``. You can also find this information for available devices in the `resources` tab of the management UI.
 
-### Manual deployment
+#### Manual deployment
 
 You can use the CLI to start individual services of the application on a certain resource. However, this requires information on the structure of the application, which is better provided through a deployment plan.
 
-## Developing applications
+### Developing applications
 
 Application development is currently not fully supported by the management UI but we are working on that. This install package contains a [simple example application](summary.pdf) with two services. For creating an application we recommend for now consulting the platform handbook.
 
@@ -259,7 +259,7 @@ Outlook on UI-supported development of applications (still in development):
 
 The first tab in the ``configuration`` menu allows for customizing the platform. Currently, this requires a manual re-instantiation and a re-start of the platform.
 
-# Further contents
+## Further contents
   
 Besides the Maven build specifications for the platform dependencies, the test broker and the oktoflow platform components, this Installation bundle also contains build information for two containers, namely an application container including the service manager and a simple application as well as a standalone container including the ECS runtime. Both containers can be build upon the artifacts provided through this installation package.
 
