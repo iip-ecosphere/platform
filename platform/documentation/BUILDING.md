@@ -4,7 +4,7 @@
 
 As stated above, directly after obtaining this project, the app will not run and even show compile errors. This is due to the fact that we do not commit generated files, i.e., the build process must be executed once to get rid of these "errors".
 
-Ensure that the Maven platformDependencies are installed (see [install](../../tools/Install)).
+Ensure that the Maven platformDependencies are installed (see [install](../tools/Install), for the examples also the examples-only variant will do).
 
 For building, in the project folder of the example app:
 
