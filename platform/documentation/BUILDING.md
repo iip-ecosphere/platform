@@ -27,3 +27,8 @@ The meta-model is not automatically updated. This allows the owner to declide wh
 Ensure that the Maven platformDependencies are installed (see [install](../../tools/Install))
 
   * `mvn install`, for component updates `mvn -U install`
+
+## Failures
+
+* When building an example, Maven complains about missing platformDependencies, in particular for a SNAPSHOT version. We did not repeate the repository declaration in all examples, which, for a fresh installation (also with a new version) means that maven does not know from where to download the basic platform dependencies. Please install the platform dependencies first as stated above.
+* After successfully installing the platform/platform dependencies, Maven complains again. This may be due to the fact that build processes try to avoid repeating steps, i.e., from the last try there are leftovers that disturb the build process. In your project folder, delete the `target/gen` folder or try `mvn clean`.
