@@ -18,11 +18,13 @@ For virtualized execution, automated creation of containers
 
 ### Web User Interface
 
-For the Web-UI (see also (Angular version compatibility matrix)[https://angular.io/guide/versions]). More recent versions may not work. 
+We use/test against the following versions
 
-- node.js 16.10.0
-- npm version 7.24.0 (or 9.5.1) 
-- Angular 14.2.10
+- node.js 22.14.0 (also 22.0.0/20.11.1/18.19.1 and newer shall work)
+- npm version 10.9.2
+- Angular 19.2.5
+
+For the Web-UI (see also (Angular version compatibility matrix)[https://angular.io/guide/versions]). 
 
 ## Development
 

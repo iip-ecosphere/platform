@@ -14,6 +14,7 @@ Improvements:
 * [#19](https://github.com/iip-ecosphere/platform/issues/19): Integration of generated IDTA interfaces.
 * Revision of code generation to Java/Python/JSON/YAML artifacts provided by EASy-Producer
 * [#167](https://github.com/iip-ecosphere/platform/issues/167): Generated Windows/Linux script line endings.
+* [#166](https://github.com/iip-ecosphere/platform/issues/166): Upgrade Angular for UI.
 
 New features:
 * [#169](https://github.com/iip-ecosphere/platform/issues/169): File-based connector for CSV, JSON (ReGaP)
