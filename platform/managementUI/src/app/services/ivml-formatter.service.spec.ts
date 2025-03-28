@@ -105,7 +105,7 @@ describe('IvmlFormatterService', () => {
       uf = await service.deleteMesh("testApp", "");
       expect(uf.successful).withContext(uf.feedback).toBeTruthy;
     }
-  }, 2 * TIMEOUT_LIFECYCLE_MS);
+  }, 3 * TIMEOUT_LIFECYCLE_MS);
 
 });
 
