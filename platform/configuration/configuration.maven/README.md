@@ -185,6 +185,7 @@ The `testApp` goal (default phase `package`, can be seen as integration test but
     - `home` optional home directory of the process
     - `waitFor` whether the process shall be executed and completed before continuing (default `true`)
   - `artifacts` file set of files to be copied into `platformDir` artifacts directory before starting platform processes, considered only if `platformDir` is given.
+  - `nodejs` (`-Dconfiguration.ngTest.nodejs=...`, default empty) sets the nodejs home (Windows)/bin (Linux) directory
 
 # Process execution
 

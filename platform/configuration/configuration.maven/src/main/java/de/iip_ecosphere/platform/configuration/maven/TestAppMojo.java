@@ -158,6 +158,9 @@ public class TestAppMojo extends AbstractLoggingMojo {
     @Parameter(property = "configuration.testApp.befores", required = false)
     private List<TestProcessSpec> befores;
     
+    @Parameter(property = "configuration.ngTest.nodejs", required = false, defaultValue = "")
+    private String nodejs;  // takeover    
+    
     @Parameter(required = false)
     private FileSet artifacts;
     
@@ -624,6 +627,7 @@ public class TestAppMojo extends AbstractLoggingMojo {
         }
         if (null != testCmd && testCmd.length() > 0) {
             deployApp(true, "");
+            testBuilder.setNodeJsHome(nodejs);
             testBuilder.addArgumentOrScriptCommand(testCmdAsScript, testCmd);
             testBuilder.addArguments(appArgs);
         } else {
