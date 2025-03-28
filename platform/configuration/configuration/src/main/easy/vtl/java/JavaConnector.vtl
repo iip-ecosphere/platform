@@ -877,7 +877,7 @@ template JavaConnector(Configuration config, JavaCodeArtifact target) extends Da
         }
         String parity = getStringValueSafe(conn.parity, "");
         if (parity <> "") {
-            r.call("setSpecificSetting").stringArg("PARITY").arg(parity);
+            r.call("setSpecificSetting").stringArg("PARITY").stringArg(parity);
         }
     }
 
