@@ -6,6 +6,7 @@
 - install Angular CLI
 
 Node.js, npm and angular versions, see [platform prerequisites](../documentation/PREREQUISITES.md). Please see also (Angular version compatibility matrix)[https://angular.io/guide/versions].
+During the upgrade to Angular 19, some components did not complain for incompatibilties, i.e., it might be that ``npm install --force`` is requried.
 
 ## Running Management UI from Code
 
@@ -110,7 +111,7 @@ For more material icons, see [Google Fonts Icons](https://fonts.google.com/icons
 * Build and test the management UI using ``mvn install`` (see above). It might be needed to delete ``gen`` and ``target/gen`` folders before.
 * Build the management for development, run the individual processes (see above) and check the individual parts for their operation.
 
-On Windows, it might be necessary to open new cmd shells as it might cache some executables like `ng`.
+On Windows, it might be necessary to open new cmd shells as it might cache some executables like `ng`. In particular on the CI, it may be needed to delete ``node_modules`` and `.angular/cache`.
 
 ## TODO
 
