@@ -49,6 +49,7 @@ public class NgBuildMojo extends AbstractLoggingMojo {
                 throw new MojoExecutionException(pu.getDescription() + " failed with status: " + status);
             }
             pu = new ProcessUnit.ProcessUnitBuilder("ng build", this)
+                .setNodeJsHome(nodejs)
                 .addArgumentOrScriptCommand("ng")
                 .addArgument("build")
                 .redirectErr2In()
