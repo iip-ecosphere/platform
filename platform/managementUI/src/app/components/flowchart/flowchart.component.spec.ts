@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { FlowchartComponent } from './flowchart.component';
-import { HttpClientModule } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { RouterTestingModule } from "@angular/router/testing";
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { FormsModule } from '@angular/forms';
@@ -18,19 +18,19 @@ describe('FlowchartComponent', () => {
   beforeEach(async () => {
     await EnvConfigService.init();
     await TestBed.configureTestingModule({
-      imports: [ HttpClientModule, 
-          RouterTestingModule, 
-          MatDialogModule, 
-          FormsModule, 
-          MatIconModule, 
-          MatCardModule, 
-          MatInputModule ],
-      declarations: [ FlowchartComponent ],
-      providers: [
-          {provide: MatDialogRef, useValue: {}},
-          {provide: MAT_DIALOG_DATA, useValue: []},
-      ]
-    })
+    declarations: [FlowchartComponent],
+    imports: [RouterTestingModule,
+        MatDialogModule,
+        FormsModule,
+        MatIconModule,
+        MatCardModule,
+        MatInputModule],
+    providers: [
+        { provide: MatDialogRef, useValue: {} },
+        { provide: MAT_DIALOG_DATA, useValue: [] },
+        provideHttpClient(withInterceptorsFromDi()),
+    ]
+})
     .compileComponents();
     fixture = TestBed.createComponent(FlowchartComponent);
     component = fixture.componentInstance;

@@ -10,9 +10,10 @@ import { Subject, Subscription } from 'rxjs';
 import { Utils } from 'src/app/services/utils.service';
 
 @Component({
-  selector: 'app-status-box',
-  templateUrl: './status-box.component.html',
-  styleUrls: ['./status-box.component.scss']
+    selector: 'app-status-box',
+    templateUrl: './status-box.component.html',
+    styleUrls: ['./status-box.component.scss'],
+    standalone: false
 })
 export class StatusBoxComponent extends Utils implements OnInit {
 

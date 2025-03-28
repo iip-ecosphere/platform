@@ -4,7 +4,7 @@
   <div  class="container">
     <div *ngFor="let element of Data.submodelElements" class="element">
       <div *ngIf="element.idShort != 'deviceRegistry' && element.idShort != 'deviceManager' && element.idShort != 'containers'">
-        <mat-card tabindex="0" class="device" >
+        <mat-card appearance="outlined" tabindex="0" class="device" >
           <mat-card-content>
             <div id="box">
               <div id="head">

@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { LogsDialogComponent } from './logs-dialog.component';
-import { HttpClientModule } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { EnvConfigService } from '../../../services/env-config.service';
 
 describe('ServicesComponent', () => {
@@ -13,10 +13,11 @@ describe('ServicesComponent', () => {
   beforeEach(async () => {
     await EnvConfigService.init();
     await TestBed.configureTestingModule({
-      imports: [ HttpClientModule ],
-      declarations: [ LogsDialogComponent ],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA]
-    })
+    declarations: [LogsDialogComponent],
+    schemas: [CUSTOM_ELEMENTS_SCHEMA],
+    imports: [],
+    providers: [provideHttpClient(withInterceptorsFromDi())]
+})
     .compileComponents();
     fixture = TestBed.createComponent(LogsDialogComponent);
     component = fixture.componentInstance;

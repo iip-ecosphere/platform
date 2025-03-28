@@ -10,9 +10,10 @@ import { StatusCollectionNotifier } from 'src/app/services/status-collection.ser
 import { chunkInput } from '../file-upload/file-upload.component';
 
 @Component({
-  selector: 'app-deployment-plans',
-  templateUrl: './deployment-plans.component.html',
-  styleUrls: ['./deployment-plans.component.scss']
+    selector: 'app-deployment-plans',
+    templateUrl: './deployment-plans.component.html',
+    styleUrls: ['./deployment-plans.component.scss'],
+    standalone: false
 })
 export class DeploymentPlansComponent extends Utils implements OnInit {
 

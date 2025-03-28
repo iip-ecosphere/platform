@@ -1,7 +1,8 @@
 import { Injectable, Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-  name: 'onlyId'
+    name: 'onlyId',
+    standalone: false
 })
 @Injectable({providedIn: 'root'})
 

@@ -6,9 +6,10 @@ import { DataUtils, Utils } from 'src/app/services/utils.service';
 import { IvmlFormatterService } from 'src/app/services/ivml-formatter.service';
 
 @Component({
-  selector: 'app-subeditor-button',
-  templateUrl: './subeditor-button.component.html',
-  styleUrls: ['./subeditor-button.component.scss']
+    selector: 'app-subeditor-button',
+    templateUrl: './subeditor-button.component.html',
+    styleUrls: ['./subeditor-button.component.scss'],
+    standalone: false
 })
 export class SubeditorButtonComponent extends Utils implements OnInit {
 

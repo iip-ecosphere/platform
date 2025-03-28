@@ -5,9 +5,10 @@ import { StatusCollectionNotifier } from 'src/app/services/status-collection.ser
 import { InputVariable, Resource } from 'src/interfaces';
 
 @Component({
-  selector: 'app-instances',
-  templateUrl: './instances.component.html',
-  styleUrls: ['./instances.component.scss']
+    selector: 'app-instances',
+    templateUrl: './instances.component.html',
+    styleUrls: ['./instances.component.scss'],
+    standalone: false
 })
 export class InstancesComponent implements OnInit {
 

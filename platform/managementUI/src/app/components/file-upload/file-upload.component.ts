@@ -5,9 +5,10 @@ import { Utils } from 'src/app/services/utils.service';
  * Component providing a file selection/upload button.
  */
 @Component({
-  selector: 'app-file-upload',
-  templateUrl: './file-upload.component.html',
-  styleUrls: ['./file-upload.component.scss']
+    selector: 'app-file-upload',
+    templateUrl: './file-upload.component.html',
+    styleUrls: ['./file-upload.component.scss'],
+    standalone: false
 })
 export class FileUploadComponent extends Utils {
 

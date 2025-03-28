@@ -1,16 +1,18 @@
 import { TestBed } from '@angular/core/testing';
 
 import { TechnicalDataRetrieverService } from './technical-data-retriever.service';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { MatIconModule } from '@angular/material/icon';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 describe('TechnicalDataRetrieverService', () => {
   let service: TechnicalDataRetrieverService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [ HttpClientTestingModule, MatIconModule ]
-    });  
+    imports: [MatIconModule],
+    providers: [provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
+});  
     service = TestBed.inject(TechnicalDataRetrieverService);
   });
 

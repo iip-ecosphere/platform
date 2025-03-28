@@ -3,15 +3,16 @@ import { Component, OnInit, HostListener} from '@angular/core';
 import { InputVariable } from 'src/interfaces';
 import { Subscription } from 'rxjs';
 import { EnvConfigService } from 'src/app/services/env-config.service';
-import { HttpClient} from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { AAS_OP_PREFIX_SME, AAS_TYPE_STRING, ApiService } from 'src/app/services/api.service';
 //import * as saveAs from 'file-saver';
 
 @Component({
-  selector: 'app-logs-dialog',
-  templateUrl: './logs-dialog.component.html',
-  styleUrls: ['./logs-dialog.component.scss'],
-  host: {'window:beforeunload':'closeLogsStream'}
+    selector: 'app-logs-dialog',
+    templateUrl: './logs-dialog.component.html',
+    styleUrls: ['./logs-dialog.component.scss'],
+    host: { 'window:beforeunload': 'closeLogsStream' },
+    standalone: false
 })
 
 export class LogsDialogComponent implements OnInit{

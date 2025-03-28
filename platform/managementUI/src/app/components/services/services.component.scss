@@ -1,5 +1,5 @@
 
-@import "../../../styles.scss";
+@use "../../../styles.scss" as sty;
 
 .container {
   background-color: rgb(230, 230, 230);
@@ -11,7 +11,7 @@
 }
 
 .btn {
-  background-color:$color_spaBlue;
+  background-color:sty.$color_spaBlue;
   margin-bottom: 5px;
   width:100%;
 }
@@ -20,15 +20,18 @@
   background-color: rgb(247, 248, 248);
 }
 
-::ng-deep .mat-radio-button.mat-accent .mat-radio-inner-circle {
-  background-color: $color_spaBlue;   /*inner circle color change*/
+/*TODO(mdc-migration): The following rule targets internal classes of radio that may no longer apply for the MDC version.*/
+::ng-deep .mat-mdc-radio-button.mat-accent .mat-radio-inner-circle {
+  background-color: sty.$color_spaBlue;   /*inner circle color change*/
 }
 
-::ng-deep.mat-radio-button.mat-accent.mat-radio-checked .mat-radio-outer-circle {
+/*TODO(mdc-migration): The following rule targets internal classes of radio that may no longer apply for the MDC version.*/
+::ng-deep.mat-mdc-radio-button.mat-accent.mat-radio-checked .mat-radio-outer-circle {
  //border-color:rgb(35, 142, 184); /*outer ring color change*/
  border-color:rgb(173, 171, 172);
 }
 
+/*TODO(mdc-migration): The following rule targets internal classes of radio that may no longer apply for the MDC version.*/
 ::ng-deep.mat-radio-outer-circle {
   border-color:rgb(173, 171, 172); /*outer ring color change*/
 }

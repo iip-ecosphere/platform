@@ -1,22 +1,32 @@
-@import "../editor.component.scss";
+@use "../../../../styles.scss" as sty;
+@use "../editor.component.scss";
 
 tr:nth-child(odd) {
   background-color:initial;
 }
 
 // default material color is white
+/* TODO(mdc-migration): The following rule targets internal classes of select that may no longer apply for the MDC version.*/
 :host ::ng-deep .mat-select-value {    
   color: black !important;  
 }
 
 // default material color is white
+/* TODO(mdc-migration): The following rule targets internal classes of select that may no longer apply for the MDC version.*/
 :host ::ng-deep .mat-select-arrow {    
   color: black !important;  
 }
 
+:host ::ng-deep .mat-mdc-form-field {
+    --mdc-outlined-text-field-input-text-color: black !important;  
+    --mdc-outlined-text-field-outline-color: sty.$color_deepSea !important;
+    --mdc-outlined-text-field-hover-outline-color: sty.$color_deepSea !important;
+    --mdc-outlined-text-field-focus-outline-color: sty.$color_octoRed !important;
+}
+
 .valuecontainer {
   border: 3px solid white;
-  background-color: $color_seaBlue;
+  background-color: sty.$color_seaBlue;
   border-radius: 4px;
   box-shadow: none;
 }
@@ -30,12 +40,12 @@ tr:nth-child(odd) {
 
 .flexcontainer-background {
   @extend .flexcontainer;
-  background-color: $color_seaBlue;
-  border: 0px none $color_seaBlue !important;
+  background-color: sty.$color_seaBlue;
+  border: 0px none sty.$color_seaBlue !important;
   border-radius: 4px;
 }
 
-.custom.mat-card{
+.custom.mat-mdc-card{
   margin: 0.3em;
   padding: 0.3em;
   background-clip: content-box;
@@ -46,7 +56,7 @@ tr:nth-child(odd) {
   min-height: 4em;
   border: 2px none black;
   border-radius: 4px;
-  background-color: $color_seaBlue;
+  background-color: sty.$color_seaBlue;
   margin-left: 0em;
 }
 
@@ -56,7 +66,7 @@ tr:nth-child(odd) {
   min-height: 4em;
   border: 2px solid black;
   border-radius: 4px;
-  background-color: $color_seaBlue;
+  background-color: sty.$color_seaBlue;
   margin-left: 0em;
 }
 

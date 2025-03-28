@@ -1,4 +1,4 @@
-@import "../../../styles.scss";
+@use "../../../styles.scss" as sty;
 
 tr:nth-child(odd) {
   background-color: initial;
@@ -8,22 +8,25 @@ tr:nth-child(odd) {
   margin-bottom: 0em;
 }
 
+/* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version.*/
 :host ::ng-deep .mat-form-field-wrapper {
   margin: 0 !important;
   padding: 0;
 }
 
 // default material color is white
+/* TODO(mdc-migration): The following rule targets internal classes of select that may no longer apply for the MDC version.*/
 :host ::ng-deep .mat-select-value {    
   color: black !important;  
 }
 
 // default material color is white
+/* TODO(mdc-migration): The following rule targets internal classes of select that may no longer apply for the MDC version.*/
 :host ::ng-deep .mat-select-arrow {    
   color: black !important;  
 }
 
-.custom.mat-card {
+.custom.mat-mdc-card {
   margin: 0.3em;
   padding: 0.3em;
 }
@@ -39,7 +42,7 @@ tr:nth-child(odd) {
   flex-wrap: wrap;
   overflow-y:hidden;
   gap: 0.5em;
-  background-color: $color_seaBlue;
+  background-color: sty.$color_seaBlue;
   margin-bottom: 0.2em;
 }
 
@@ -50,20 +53,20 @@ tr:nth-child(odd) {
   flex-wrap: wrap;
   overflow-x:hidden;
   gap: 0.5em;
-  background-color: $color_seaBlue;
+  background-color: sty.$color_seaBlue;
   margin-bottom: 0.2em;
 }
 
 .inputField {
-  min-width: $editorInputFieldWidth;
+  min-width: sty.$editorInputFieldWidth;
 }
 
 .inputBox {
   min-height: 8em;
-  min-width: calc(1.1em + #{$editorInputFieldWidth});
+  min-width: calc(1.1em + #{sty.$editorInputFieldWidth});
   margin: 0.2em;
-  background-color: $color_poolBlue_light;
-  border: 3px solid $color_lakeGreen;
+  background-color: sty.$color_poolBlue_light;
+  border: 3px solid sty.$color_lakeGreen;
   color: black;
 }
 
@@ -72,8 +75,8 @@ tr:nth-child(odd) {
     min-width: 16em;
     margin: 0.5em;
     padding: 0.5em;
-    background-color: $color_poolBlue_light;
-    border: 3px solid $color_lakeGreen;
+    background-color: sty.$color_poolBlue_light;
+    border: 3px solid sty.$color_lakeGreen;
     color: black;
 }
 
@@ -85,7 +88,7 @@ tr:nth-child(odd) {
 }
 
 .feedback {
-  background-color: $color_spaBlue; /* Green background color */
+  background-color: sty.$color_spaBlue; /* Green background color */
   color: #fff; /* White text color */
   padding: 10px 20px; /* Padding around the message */
   border-radius: 4px; /* Rounded corners */

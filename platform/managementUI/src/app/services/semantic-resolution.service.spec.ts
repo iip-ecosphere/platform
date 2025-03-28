@@ -1,15 +1,16 @@
 import { TestBed } from '@angular/core/testing';
 
 import { LANG_ENGLISH, LANG_GERMAN, ResolvedSemanticId, SemanticResolutionService } from './semantic-resolution.service';
-import { HttpClientModule } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 describe('SemanticResolutionService', () => {
   let service: SemanticResolutionService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [ HttpClientModule ]
-    });
+    imports: [],
+    providers: [provideHttpClient(withInterceptorsFromDi())]
+});
     service = TestBed.inject(SemanticResolutionService);
   });
 

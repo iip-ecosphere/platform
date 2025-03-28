@@ -7,9 +7,10 @@ import { ApiService } from 'src/app/services/api.service';
 import { IvmlFormatterService } from 'src/app/services/ivml-formatter.service';
 
 @Component({
-  selector: 'app-input-ref-select',
-  templateUrl: './input-ref-select.component.html',
-  styleUrls: ['./input-ref-select.component.scss']
+    selector: 'app-input-ref-select',
+    templateUrl: './input-ref-select.component.html',
+    styleUrls: ['./input-ref-select.component.scss'],
+    standalone: false
 })
 export class InputRefSelectComponent extends Utils implements OnInit {
 

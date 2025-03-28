@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { EditorComponent } from './editor.component';
-import { HttpClientModule } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormsModule } from "@angular/forms";
@@ -16,14 +16,15 @@ describe('EditorComponent', () => {
   beforeEach(async () => {
     await EnvConfigService.init();
     await TestBed.configureTestingModule({
-      imports: [ HttpClientModule, FormsModule, MatTooltipModule ],
-      declarations: [ EditorComponent ],
-      providers: [
-          {provide: MatDialogRef, useValue: {}},
-          {provide: MAT_DIALOG_DATA, useValue: []},
-      ],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA]
-    })
+    declarations: [EditorComponent],
+    schemas: [CUSTOM_ELEMENTS_SCHEMA],
+    imports: [FormsModule, MatTooltipModule],
+    providers: [
+        { provide: MatDialogRef, useValue: {} },
+        { provide: MAT_DIALOG_DATA, useValue: [] },
+        provideHttpClient(withInterceptorsFromDi()),
+    ]
+})
     .compileComponents();
 
     fixture = TestBed.createComponent(EditorComponent);

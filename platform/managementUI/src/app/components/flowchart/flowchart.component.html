@@ -18,7 +18,7 @@
       <div class="child">
         <div *ngIf="services && services.value">
           <div *ngFor="let service of services.value">
-            <mat-card *ngIf="!isMeta(service.idShort)" class="element" (click)="selectService(service)">
+            <mat-card appearance="outlined" *ngIf="!isMeta(service.idShort)" class="element" (click)="selectService(service)">
               <!--
               <mat-card-title *ngIf="service.idShort" style="font-size: medium;">
                 {{ getId(service.value) }}
@@ -61,7 +61,7 @@
     <div class="drawflow-container">
       <div id="drawflow" ></div>
       <!--<div id="drawflow" style="height: 74%;"></div> -->
-      <mat-card class="flowchart-create">
+      <mat-card appearance="outlined" class="flowchart-create">
         <mat-label style="margin-left: 1%;">mesh name</mat-label>
         <input matInput type="text"
           style="font-size:14px; margin-right: 1%; margin-left: 1%;"
@@ -78,7 +78,7 @@
     -->
     </div>
 
-    <mat-card class="flowchart-toolbar">
+    <mat-card appearance="outlined" class="flowchart-toolbar">
       <mat-icon (click)="zoomIn()">zoom_in</mat-icon>
       <mat-icon (click)="zoomOut()">zoom_out</mat-icon>
       <!-- <mat-icon (click)="false">save</mat-icon> -->

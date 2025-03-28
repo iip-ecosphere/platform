@@ -7,9 +7,10 @@ import { Resource, editorInput } from 'src/interfaces';
  * usual in the configuration model.
  */
 @Component({
-  selector: 'app-lang-string-input',
-  templateUrl: './lang-string-input.component.html',
-  styleUrls: ['./lang-string-input.component.scss']
+    selector: 'app-lang-string-input',
+    templateUrl: './lang-string-input.component.html',
+    styleUrls: ['./lang-string-input.component.scss'],
+    standalone: false
 })
 export class LangStringInputComponent implements OnInit {
 

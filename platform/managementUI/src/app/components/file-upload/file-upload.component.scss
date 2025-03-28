@@ -1,9 +1,9 @@
-@import "../../../styles.scss";
+@use "../../../styles.scss" as sty;
 
 .file-input {
   display: none;
 }
 
 .upload-btn {
-  background-color:$color_spaBlue;
+  background-color:sty.$color_spaBlue;
 }

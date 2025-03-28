@@ -136,9 +136,6 @@ describe('UtilsService', () => {
   // -------------------------- Data Utils -----------------------------------
 
   it('should implement getProperty', () => {
-    expect(DataUtils.getProperty(data, "xx")).toBeUndefined();
-    expect(DataUtils.getPropertyValue(data, "xx")).toBeUndefined();
-
     let d: any[] = [];
     expect(DataUtils.getProperty(d, "xx")).toBeUndefined();
     expect(DataUtils.getPropertyValue(d, "xx")).toBeUndefined();

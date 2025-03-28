@@ -3,7 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { InputRefSelectComponent } from './input-ref-select.component';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { HttpClientModule } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { ApiService } from 'src/app/services/api.service';
 import { SubeditorButtonComponent } from '../inputControls/subeditor-button/subeditor-button.component';
 import { MatCardModule } from '@angular/material/card';
@@ -23,26 +23,26 @@ describe('InputRefSelectComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ 
-        HttpClientModule, 
-        MatDialogModule, 
-        MatIconModule, 
-        MatCardModule, 
-        MatTooltipModule, 
+    declarations: [
+        InputRefSelectComponent,
+        SubeditorButtonComponent
+    ],
+    imports: [MatDialogModule,
+        MatIconModule,
+        MatCardModule,
+        MatTooltipModule,
         MatToolbarModule,
         MatFormFieldModule,
         MatSelectModule,
         MatInputModule, // required via MatFormFieldModule
         FormsModule, // required via MatFormFieldModule
-        BrowserAnimationsModule ],
-      declarations: [ 
-        InputRefSelectComponent, 
-        SubeditorButtonComponent ],
-      providers: [
-        {provide: MatDialogRef, useValue: {}},
-        {provide: MAT_DIALOG_DATA, useValue: []},
-      ]
-    })
+        BrowserAnimationsModule],
+    providers: [
+        { provide: MatDialogRef, useValue: {} },
+        { provide: MAT_DIALOG_DATA, useValue: [] },
+        provideHttpClient(withInterceptorsFromDi()),
+    ]
+})
     .compileComponents();
 
     fixture = TestBed.createComponent(InputRefSelectComponent);

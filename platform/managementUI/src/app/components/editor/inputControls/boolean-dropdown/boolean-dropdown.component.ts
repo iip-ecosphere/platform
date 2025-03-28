@@ -2,9 +2,10 @@ import { Component, Input, OnInit } from '@angular/core';
 import { editorInput } from 'src/interfaces';
 
 @Component({
-  selector: 'app-boolean-dropdown',
-  templateUrl: './boolean-dropdown.component.html',
-  styleUrls: ['./boolean-dropdown.component.scss']
+    selector: 'app-boolean-dropdown',
+    templateUrl: './boolean-dropdown.component.html',
+    styleUrls: ['./boolean-dropdown.component.scss'],
+    standalone: false
 })
 export class BooleanDropdownComponent implements OnInit {
 

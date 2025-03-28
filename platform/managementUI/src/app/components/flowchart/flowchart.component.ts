@@ -13,9 +13,10 @@ interface Bus {
 }
 
 @Component({
-  selector: 'app-flowchart',
-  templateUrl: './flowchart.component.html',
-  styleUrls: ['./flowchart.component.scss']
+    selector: 'app-flowchart',
+    templateUrl: './flowchart.component.html',
+    styleUrls: ['./flowchart.component.scss'],
+    standalone: false
 })
 export class FlowchartComponent implements OnInit {
 

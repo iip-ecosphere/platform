@@ -29,7 +29,7 @@
   </span> 
 
   <div *ngIf="selector">
-    <mat-card class="inputBox custom" id="ref-select.input">
+    <mat-card appearance="outlined" class="inputBox custom" id="ref-select.input">
       {{ getDisplayName(input) }}      
       <table>
         <tr>
@@ -58,7 +58,7 @@
 
   <div *ngIf="isArray(input.value) else single" class="valuebox">
     <div class="flexcontainer-background" [style.width]="getContainerWidth()" id="ref-select.container">
-      <mat-card *ngFor="let value of input.value; let i=index" class="inputCard custom">
+      <mat-card appearance="outlined" *ngFor="let value of input.value; let i=index" class="inputCard custom">
         <div class="flexcontainer">
           <table>
             <tr>
@@ -97,7 +97,7 @@
   <ng-template #single>
     <div class ="valuebox" *ngIf="!selector">
       <div class="flexcontainer-background" [style.width]="getContainerWidth()" id="ref-select.single">
-      <mat-card class="inputCard custom" *ngIf="input.value">
+      <mat-card appearance="outlined" class="inputCard custom" *ngIf="input.value">
         <div class="valuecontainer">
           <table>
             <tr>

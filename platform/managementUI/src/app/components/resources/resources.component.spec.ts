@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed  } from '@angular/core/testing';
 
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ResourcesComponent } from './resources.component';
-import { HttpClientModule } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { EnvConfigService } from '../../services/env-config.service';
 import { Location } from "@angular/common";
 import { RouterTestingModule } from "@angular/router/testing";
@@ -22,10 +22,11 @@ describe('ResourcesComponent', () => {
     await EnvConfigService.init();
     await TestBed
       .configureTestingModule({
-        imports: [ HttpClientModule, RouterTestingModule.withRoutes(routes) ],
-        declarations: [ ResourcesComponent ],
-        schemas: [CUSTOM_ELEMENTS_SCHEMA]
-      })
+    declarations: [ResourcesComponent],
+    schemas: [CUSTOM_ELEMENTS_SCHEMA],
+    imports: [RouterTestingModule.withRoutes(routes)],
+    providers: [provideHttpClient(withInterceptorsFromDi())]
+})
       .compileComponents()
       .then(() => {
         fixture = TestBed.createComponent(ResourcesComponent);
@@ -62,6 +63,7 @@ describe('ResourcesComponent', () => {
       
       const divHead = box.querySelector('div[id="head"]') as HTMLElement;
       expect(divHead).toBeTruthy();
+      const id = divHead.querySelector('h1')?.textContent;
       expect(divHead.querySelector('h1')?.textContent).toMatch(/^local$/);
       expect(divHead?.textContent).toContain(expectedManufacturer);
 

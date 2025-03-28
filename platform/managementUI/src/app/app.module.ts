@@ -1,7 +1,7 @@
 import { MatRadioModule } from '@angular/material/radio';
-import { APP_INITIALIZER, NgModule } from '@angular/core';
+import { NgModule, inject, provideAppInitializer } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http";
+import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from "@angular/common/http";
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -51,71 +51,58 @@ import { NgVar } from './directives/ng-var.directive';
 import { FileUploadComponent } from './components/file-upload/file-upload.component';
 import { LangStringInputComponent } from './components/editor/inputControls/lang-string-input/lang-string-input.component';
 
-@NgModule({
-  declarations: [
-    AppComponent,
-    ResourcesComponent,
-    ContainersComponent,
-    ServicesComponent,
-    TidyPipe,
-    DeploymentPlansComponent,
-    ResourceDetailsComponent,
-    OnlyIdPipe,
-    StatusBoxComponent,
-    FlowchartComponent,
-    ListComponent,
-    InstancesComponent,
-    EditorComponent,
-    InputRefSelectComponent,
-    LangStringInputComponent,
-    StatusDetailsComponent,
-    LogsDialogComponent,
-    EnumDropdownComponent,
-    BooleanDropdownComponent,
-    SubeditorButtonComponent,
-    MeshFeedbackComponent,
-    NgVar,
-    FileUploadComponent
-  ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    HttpClientModule,
-    BrowserAnimationsModule,
-    FormsModule,
-    ReactiveFormsModule,
-    MatToolbarModule,
-    MatCardModule,
-    MatTabsModule,
-    MatButtonModule,
-    MatInputModule,
-    MatFormFieldModule,
-    MatIconModule,
-    MatSelectModule,
-    MatSnackBarModule,
-    MatProgressSpinnerModule,
-    MatSidenavModule,
-    MatListModule,
-    MatDividerModule,
-    MatTooltipModule,
-    MatDialogModule,
-    MatRadioModule
-  ],
-  entryComponents:[
-    LogsDialogComponent
-  ],
-  providers: [{
-    provide:HTTP_INTERCEPTORS,
-    useClass: Interceptor,
-    multi: true,
-    },
-    {
-    provide: APP_INITIALIZER,
-    useFactory: (envConfigService: EnvConfigService) => () => EnvConfigService.init(),
-    deps: [EnvConfigService],
-    multi: true,
-    }
-  ],
-  bootstrap: [AppComponent]
-})
+@NgModule({ declarations: [
+        AppComponent,
+        ResourcesComponent,
+        ContainersComponent,
+        ServicesComponent,
+        TidyPipe,
+        DeploymentPlansComponent,
+        ResourceDetailsComponent,
+        OnlyIdPipe,
+        StatusBoxComponent,
+        FlowchartComponent,
+        ListComponent,
+        InstancesComponent,
+        EditorComponent,
+        InputRefSelectComponent,
+        LangStringInputComponent,
+        StatusDetailsComponent,
+        LogsDialogComponent,
+        EnumDropdownComponent,
+        BooleanDropdownComponent,
+        SubeditorButtonComponent,
+        MeshFeedbackComponent,
+        NgVar,
+        FileUploadComponent
+    ],
+    bootstrap: [AppComponent], imports: [BrowserModule,
+        AppRoutingModule,
+        BrowserAnimationsModule,
+        FormsModule,
+        ReactiveFormsModule,
+        MatToolbarModule,
+        MatCardModule,
+        MatTabsModule,
+        MatButtonModule,
+        MatInputModule,
+        MatFormFieldModule,
+        MatIconModule,
+        MatSelectModule,
+        MatSnackBarModule,
+        MatProgressSpinnerModule,
+        MatSidenavModule,
+        MatListModule,
+        MatDividerModule,
+        MatTooltipModule,
+        MatDialogModule,
+        MatRadioModule], providers: [{
+            provide: HTTP_INTERCEPTORS,
+            useClass: Interceptor,
+            multi: true,
+        },
+        provideAppInitializer(() => {
+        const initializerFn = ((envConfigService: EnvConfigService) => () => EnvConfigService.init())(inject(EnvConfigService));
+        return initializerFn();
+      }), provideHttpClient(withInterceptorsFromDi())] })
 export class AppModule { }

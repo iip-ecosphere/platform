@@ -102,6 +102,16 @@ Use the colors from the (internal) oktoflow styleguide as defined in ``styles.sc
 
 For more material icons, see [Google Fonts Icons](https://fonts.google.com/icons).
 
+## Upgrading Angular
+
+* Install the required NodeJS/Angular version, see [Angular compatibility matrix](https://angular.dev/reference/versions).
+* Set environment variable ``NODEJS_HOME`` to the home directory of the new NodeJS installation.
+* Run the respective Angular update procedure, see [Updating Angular](https://angular.dev/update-guide) with material enabled.
+* Build and test the management UI using ``mvn install`` (see above). It might be needed to delete ``gen`` and ``target/gen`` folders before.
+* Build the management for development, run the individual processes (see above) and check the individual parts for their operation.
+
+On Windows, it might be necessary to open new cmd shells as it might cache some executables like `ng`.
+
 ## TODO
 
 * Delete meshes.

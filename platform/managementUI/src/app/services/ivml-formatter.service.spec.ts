@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 
 import { IvmlFormatterService } from './ivml-formatter.service';
-import { HttpClientModule } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { IVML_TYPE_Boolean, IVML_TYPE_Integer, IVML_TYPE_PREFIX_enumeration, IVML_TYPE_Real, IVML_TYPE_String, IvmlRecordValue, MT_metaVariable } from 'src/interfaces';
 import { GRAPHFORMAT_DRAWFLOW } from './api.service';
 import { Utils } from './utils.service';
@@ -13,8 +13,9 @@ describe('IvmlFormatterService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [ HttpClientModule ]
-    });
+    imports: [],
+    providers: [provideHttpClient(withInterceptorsFromDi())]
+});
     service = TestBed.inject(IvmlFormatterService);
   });
 

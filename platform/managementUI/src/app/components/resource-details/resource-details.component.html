@@ -11,7 +11,7 @@
       {{ resource.idShort }}
     </div><br>
 
-    <mat-card class="gray-element" *ngIf="resource">
+    <mat-card appearance="outlined" class="gray-element" *ngIf="resource">
       <div *ngFor="let cat of categories">
         <p class="category">{{cat}}</p>
         <div *ngFor="let element of resource.value" style="margin-left: 15px;">

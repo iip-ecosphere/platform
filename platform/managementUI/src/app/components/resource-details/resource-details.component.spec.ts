@@ -4,7 +4,7 @@ import { ResourceDetailsComponent } from './resource-details.component';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { TidyPipe } from '../../pipes/tidy.pipe';
-import { HttpClientModule } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { RouterTestingModule } from "@angular/router/testing";
 import { ActivatedRoute, convertToParamMap} from '@angular/router';
 import { EnvConfigService } from '../../services/env-config.service';
@@ -17,12 +17,13 @@ describe('ResourceDetailsComponent', () => {
   beforeEach(async () => {
     await EnvConfigService.init();
     await TestBed.configureTestingModule({
-      imports: [ HttpClientModule, MatCardModule,RouterTestingModule, MatIconModule ],
-      declarations: [ ResourceDetailsComponent, TidyPipe ],
-      providers: [ResourceDetailsComponent, {
-        provide: ActivatedRoute,
-        useValue: {snapshot: {paramMap: convertToParamMap({'id': 'local'})}}
-      }]
+        declarations: [ResourceDetailsComponent, TidyPipe],
+        imports: [MatCardModule, RouterTestingModule, MatIconModule],
+        providers: [ResourceDetailsComponent, {
+            provide: ActivatedRoute,
+            useValue: { snapshot: { paramMap: convertToParamMap({ 'id': 'local' }) } }
+        }, provideHttpClient(withInterceptorsFromDi())],
+        teardown: {destroyAfterEach: false} // NG0205: Injector has already been destroyed
     })
     .compileComponents()
     .then(() => {

@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'app-mesh-feedback',
-  templateUrl: './mesh-feedback.component.html',
-  styleUrls: ['./mesh-feedback.component.scss']
+    selector: 'app-mesh-feedback',
+    templateUrl: './mesh-feedback.component.html',
+    styleUrls: ['./mesh-feedback.component.scss'],
+    standalone: false
 })
 export class MeshFeedbackComponent implements OnInit {
 

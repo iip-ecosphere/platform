@@ -10,7 +10,8 @@ import {
   
   @Directive({
     selector: '[ngVar]',
-  })
+    standalone: false
+})
   export class NgVar<T = unknown> {
     private _context: NgVarContext<T> = new NgVarContext<T>();
     private _viewRef: EmbeddedViewRef<NgVarContext<T>> | null = null;

@@ -8,9 +8,10 @@ import { PlatformResources, GeneralInformation } from 'src/interfaces';
 import { Utils } from 'src/app/services/utils.service';
 
 @Component({
-  selector: 'app-resources',
-  templateUrl: './resources.component.html',
-  styleUrls: ['./resources.component.scss']
+    selector: 'app-resources',
+    templateUrl: './resources.component.html',
+    styleUrls: ['./resources.component.scss'],
+    standalone: false
 })
 export class ResourcesComponent extends Utils implements OnInit  {
 

@@ -3,10 +3,11 @@ import { TestBed, waitForAsync, ComponentFixture } from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterTestingModule } from '@angular/router/testing';
 import { AppComponent } from './app.component';
-import { HttpClientModule } from '@angular/common/http';
+import {} from '@angular/common/http';
 import { EnvConfigService } from './services/env-config.service';
+import { provideHttpClient } from '@angular/common/http';
 
-describe('AppComponent', () => {
+describe('AppComponent', () => { // TODO starts failing in angular 18, preserveSymlinks does not help here
 
   let fixture: ComponentFixture<AppComponent>;
   let component: AppComponent;
@@ -16,12 +17,15 @@ describe('AppComponent', () => {
     await TestBed
       .configureTestingModule({
         imports: [
-          RouterTestingModule, 
-          EnvConfigService.imp(HttpClientModule, HttpClientModule)
+          RouterTestingModule
         ],
         declarations: [
           AppComponent
         ],
+        providers: [
+          provideHttpClient()
+        ],
+        teardown: {destroyAfterEach: false}, // NG0205: Injector has already been destroyed
         schemas: [CUSTOM_ELEMENTS_SCHEMA]
       })
       .compileComponents()

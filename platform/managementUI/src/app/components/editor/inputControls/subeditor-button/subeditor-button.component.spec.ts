@@ -5,7 +5,7 @@ import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/materia
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MTK_compound, Resource } from 'src/interfaces';
 import { ApiService } from 'src/app/services/api.service';
-import { HttpClientModule } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { EditorComponent } from '../../editor.component';
 import { MatIconModule } from '@angular/material/icon';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -25,13 +25,15 @@ describe('SubeditorButtonComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ HttpClientModule, MatDialogModule, MatTooltipModule, MatIconModule, 
-        BrowserAnimationsModule, MatOptionModule, MatSelectModule, MatCardModule, MatToolbarModule, MatFormFieldModule, FormsModule ],
-      declarations: [ SubeditorButtonComponent, EditorComponent, BooleanDropdownComponent, InputRefSelectComponent ],
-      providers: [
-          {provide: MatDialogRef, useValue: {}},
-          {provide: MAT_DIALOG_DATA, useValue: []},
-      ]
+        declarations: [SubeditorButtonComponent, EditorComponent, BooleanDropdownComponent, InputRefSelectComponent],
+        imports: [MatDialogModule, MatTooltipModule, MatIconModule,
+            BrowserAnimationsModule, MatOptionModule, MatSelectModule, MatCardModule, MatToolbarModule, MatFormFieldModule, FormsModule],
+        providers: [
+            { provide: MatDialogRef, useValue: {} },
+            { provide: MAT_DIALOG_DATA, useValue: [] },
+            provideHttpClient(withInterceptorsFromDi()),
+        ],
+        teardown: {destroyAfterEach: false} // NG0205: Injector has already been destroyed
     })
     .compileComponents();
 

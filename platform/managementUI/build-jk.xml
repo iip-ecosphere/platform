@@ -10,6 +10,7 @@
         <maven pomFile="pom.xml" goal="install">
             <arg value="-Dunpack.force=true"/>
         	<arg value="-Diip.ciBuildId=${build_num}"/> <!-- must be set in jenkins ANT build step -->
+        	<sysproperty key="NODEJS_HOME" value="/var/lib/jenkins/oktoflow/nodejs" />
         </maven>
 		<tstamp>
 		    <format property="NOW" pattern="yyyyMMddHHmmss" locale="en,GB"/>

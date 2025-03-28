@@ -2,9 +2,10 @@ import { Component, Input, OnInit } from '@angular/core';
 import { Resource, editorInput, metaTypes, MT_varValue } from 'src/interfaces';
 
 @Component({
-  selector: 'app-enum-dropdown',
-  templateUrl: './enum-dropdown.component.html',
-  styleUrls: ['./enum-dropdown.component.scss']
+    selector: 'app-enum-dropdown',
+    templateUrl: './enum-dropdown.component.html',
+    styleUrls: ['./enum-dropdown.component.scss'],
+    standalone: false
 })
 export class EnumDropdownComponent implements OnInit {
 

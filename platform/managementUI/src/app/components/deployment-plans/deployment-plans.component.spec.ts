@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { DeploymentPlansComponent } from './deployment-plans.component';
-import { HttpClientModule } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { EnvConfigService } from '../../services/env-config.service';
 import { retry } from '../../services/utils.service';
 import { FileUploadComponent } from '../file-upload/file-upload.component';
@@ -16,9 +16,10 @@ describe('DeploymentPlansComponent', () => {
   beforeEach(async () => {
     await EnvConfigService.init();
     await TestBed.configureTestingModule({
-      imports: [ HttpClientModule, MatIconModule, MatTooltipModule ],
-      declarations: [ DeploymentPlansComponent, FileUploadComponent ]
-    })
+    declarations: [DeploymentPlansComponent, FileUploadComponent],
+    imports: [MatIconModule, MatTooltipModule],
+    providers: [provideHttpClient(withInterceptorsFromDi())]
+})
     .compileComponents();
     fixture = TestBed.createComponent(DeploymentPlansComponent);
     component = fixture.componentInstance;

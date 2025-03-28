@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { StatusBoxComponent } from './status-box.component';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { statusMessage } from 'src/interfaces';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -11,6 +11,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { NgVar } from 'src/app/directives/ng-var.directive';
 import { FileUploadComponent } from '../../file-upload/file-upload.component';
 import { MatIconModule } from '@angular/material/icon';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 describe('StatusBoxComponent', () => {
   let component: StatusBoxComponent;
@@ -18,19 +19,20 @@ describe('StatusBoxComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ HttpClientTestingModule, 
-        MatDialogModule, 
-        BrowserAnimationsModule, 
-        MatCardModule, 
+    declarations: [StatusBoxComponent, NgVar, FileUploadComponent],
+    imports: [MatDialogModule,
+        BrowserAnimationsModule,
+        MatCardModule,
         MatIconModule,
         MatProgressSpinnerModule,
-        MatTooltipModule ],
-      declarations: [ StatusBoxComponent, NgVar, FileUploadComponent ],
-      providers: [
-          {provide: MatDialogRef, useValue: {}},
-          {provide: MAT_DIALOG_DATA, useValue: []},
-      ]
-    })
+        MatTooltipModule],
+    providers: [
+        { provide: MatDialogRef, useValue: {} },
+        { provide: MAT_DIALOG_DATA, useValue: [] },
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+    ]
+})
     .compileComponents();
     fixture = TestBed.createComponent(StatusBoxComponent);
     component = fixture.componentInstance;

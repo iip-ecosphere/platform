@@ -435,7 +435,7 @@ export class IvmlFormatterService extends UtilsService {
           value: "",
           idShort: "value"
         }
-        let val = [type?.value] || []; 
+        let val = [type?.value]; 
         let editorInput:editorInput =
           {name: "value", type: selectedType.idShort, value:val,
           description: [{language: '', text: ''}],

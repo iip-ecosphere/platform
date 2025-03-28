@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { InstancesComponent } from './instances.component';
-import { HttpClientModule } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { EnvConfigService } from '../../services/env-config.service';
 import { retry } from '../../services/utils.service';
 import { MatIconModule } from '@angular/material/icon';
@@ -14,9 +14,10 @@ describe('InstancesComponent', () => {
   beforeEach(async () => {
     await EnvConfigService.init();
     await TestBed.configureTestingModule({
-      imports: [ HttpClientModule, MatIconModule ],
-      declarations: [ InstancesComponent ]
-    })
+    declarations: [InstancesComponent],
+    imports: [MatIconModule],
+    providers: [provideHttpClient(withInterceptorsFromDi())]
+})
     .compileComponents();
 
     fixture = TestBed.createComponent(InstancesComponent);

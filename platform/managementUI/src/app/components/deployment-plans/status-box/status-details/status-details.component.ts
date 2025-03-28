@@ -2,9 +2,10 @@ import { Component, Input, OnInit, ElementRef, Renderer2, ViewChild } from '@ang
 import { statusCollection } from 'src/interfaces';
 
 @Component({
-  selector: 'app-status-details',
-  templateUrl: './status-details.component.html',
-  styleUrls: ['./status-details.component.scss']
+    selector: 'app-status-details',
+    templateUrl: './status-details.component.html',
+    styleUrls: ['./status-details.component.scss'],
+    standalone: false
 })
 export class StatusDetailsComponent implements OnInit {
 

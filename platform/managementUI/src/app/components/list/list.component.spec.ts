@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ListComponent } from './list.component';
-import { HttpClientModule } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatIconModule } from '@angular/material/icon';
@@ -32,21 +32,21 @@ describe('ListComponent', () => {
   beforeEach(async () => {
     await EnvConfigService.init();
     await TestBed.configureTestingModule({
-      imports: [ HttpClientModule, 
-        MatTabsModule, 
+    declarations: [ListComponent, FileUploadComponent, EditorComponent],
+    imports: [MatTabsModule,
         MatIconModule,
-        BrowserAnimationsModule, 
-        MatDialogModule, 
+        BrowserAnimationsModule,
+        MatDialogModule,
         MatTooltipModule,
         MatSelectModule,
         FormsModule,
-        RouterTestingModule.withRoutes(routes) ],
-      declarations: [ ListComponent, FileUploadComponent, EditorComponent ],
-      providers: [
-          {provide: MatDialogRef, useValue: {}},
-          {provide: MAT_DIALOG_DATA, useValue: []},
-      ]
-    })
+        RouterTestingModule.withRoutes(routes)],
+    providers: [
+        { provide: MatDialogRef, useValue: {} },
+        { provide: MAT_DIALOG_DATA, useValue: [] },
+        provideHttpClient(withInterceptorsFromDi()),
+    ]
+})
     .compileComponents().then(() => {
       fixture = TestBed.createComponent(ListComponent);
       component = fixture.componentInstance;

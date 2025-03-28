@@ -1,16 +1,18 @@
 import { TestBed } from '@angular/core/testing';
 
 import { StatusCollectionService } from './status-collection.service';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ST_ADDED, ST_CHANGED, ST_ERROR, ST_PROCESS, ST_RESULT } from 'src/interfaces';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 describe('StatusCollectionService', () => {
   let service: StatusCollectionService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [ HttpClientTestingModule ]
-    });  
+    imports: [],
+    providers: [provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
+});  
     service = TestBed.inject(StatusCollectionService);
   });
 

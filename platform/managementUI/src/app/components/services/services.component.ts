@@ -7,9 +7,10 @@ import { MatRadioChange } from '@angular/material/radio';
 import { Utils } from 'src/app/services/utils.service';
 
 @Component({
-  selector: 'app-services',
-  templateUrl: './services.component.html',
-  styleUrls: ['./services.component.scss']
+    selector: 'app-services',
+    templateUrl: './services.component.html',
+    styleUrls: ['./services.component.scss'],
+    standalone: false
 })
 export class ServicesComponent extends Utils implements OnInit {
 

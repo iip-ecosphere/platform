@@ -6,9 +6,10 @@ import { LANG_ENGLISH, SemanticResolutionService } from 'src/app/services/semant
 import { Resource, ResourceAttribute } from 'src/interfaces';
 
 @Component({
-  selector: 'app-resource-details',
-  templateUrl: './resource-details.component.html',
-  styleUrls: ['./resource-details.component.scss']
+    selector: 'app-resource-details',
+    templateUrl: './resource-details.component.html',
+    styleUrls: ['./resource-details.component.scss'],
+    standalone: false
 })
 export class ResourceDetailsComponent implements OnInit {
 

@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ServicesComponent } from './services.component';
-import { HttpClientModule } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { EnvConfigService } from '../../services/env-config.service';
 import { MatTabsModule } from '@angular/material/tabs';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -16,10 +16,11 @@ describe('ServicesComponent', () => {
   beforeEach(async () => {
     await EnvConfigService.init();
     await TestBed.configureTestingModule({
-      imports: [ HttpClientModule, MatTabsModule, BrowserAnimationsModule ],
-      declarations: [ ServicesComponent ],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA]
-    })
+    declarations: [ServicesComponent],
+    schemas: [CUSTOM_ELEMENTS_SCHEMA],
+    imports: [MatTabsModule, BrowserAnimationsModule],
+    providers: [provideHttpClient(withInterceptorsFromDi())]
+})
     .compileComponents();
     fixture = TestBed.createComponent(ServicesComponent);
     component = fixture.componentInstance;

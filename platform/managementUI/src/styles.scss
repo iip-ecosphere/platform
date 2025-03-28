@@ -1,8 +1,8 @@
 /* You can add global styles to this file, and also import other style files */
-//@import '~@angular/material/prebuilt-themes/deeppurple-amber.css';
+//@import '@angular/material/prebuilt-themes/deeppurple-amber.css';
 
 @use '@angular/material' as mat;
-@import "drawflow.scss";
+@use "drawflow.scss";
 
 $color_lakeGreen: #036070;
 $color_seaBlue_orig: rgb(135,161,177);
@@ -129,11 +129,13 @@ tr:nth-child(odd) {
 }
 
 // outline
+/* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version. */
 .mat-form-field-appearance-outline .mat-form-field-outline {
   //color: black;
   color: $color_gray;
 }
 // focused outline
+/* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version. */
 .mat-form-field-appearance-outline.mat-focused .mat-form-field-outline-thick {
   color:$color_poolBlue;
 }
@@ -141,13 +143,14 @@ tr:nth-child(odd) {
 //-----------
 
 // sub-menu
+/* TODO(mdc-migration): The following rule targets internal classes of tabs that may no longer apply for the MDC version. */
 .mat-tab-label {
   color: rgb(0,0,0) !important;
   //background-color: rgb(203, 203, 203);
   background-color: $color_poolBlue;
 }
 
-.mat-tab-group.mat-primary .mat-ink-bar, .mat-tab-nav-bar.mat-primary .mat-ink-bar {
+.mat-mdc-tab-group.mat-primary .mat-ink-bar, .mat-mdc-tab-nav-bar.mat-primary .mat-ink-bar {
   background-color:$color_poolBlue;
 }
 
@@ -308,7 +311,7 @@ Round icon button in item, scaled for inner editors.
   background: RGB(003, 161, 177);
 }
 
-.custom-dialog-container .mat-dialog-container {
+.custom-dialog-container .mat-mdc-dialog-container {
   background-color: $color_seaBlue;
   padding: 2px;
 }
