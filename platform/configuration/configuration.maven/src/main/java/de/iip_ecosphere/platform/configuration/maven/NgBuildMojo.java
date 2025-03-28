@@ -41,6 +41,7 @@ public class NgBuildMojo extends AbstractLoggingMojo {
                 .setNodeJsHome(nodejs)
                 .addArgumentOrScriptCommand("npm")
                 .addArgument("install")
+                .addArgument("--force")
                 .addArgument("--no-progress")
                 .build4Mvn();
             int status = pu.waitFor();
