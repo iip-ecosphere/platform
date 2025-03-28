@@ -333,6 +333,7 @@ public class ProcessUnit {
         private String argAggregateStart;
         private String argAggregateEnd;
         private boolean err2In = false;
+        private String nodejsHome;
 
         /**
          * Creates a process builder instance.
@@ -443,9 +444,26 @@ public class ProcessUnit {
         private String prependPath(String path, String cmd) {
             String result = cmd;
             if (null != path && path.length() > 0) {
-                result = path + File.separator + cmd;
+                if (!path.endsWith(File.separator)) {
+                    path += File.separator;
+                }
+                result = path + cmd;
             }
             return result;
+        }
+        
+        /**
+         * Changes the nodejs home/bin directory, i.e., the directory where the bin files are located, which is usually 
+         * in Windows the home directory, in linux the bin sub-directory.
+         * 
+         * @param home the home directory, ignored if <b>null</b> or empty
+         * @return <b>this</b> for chaining
+         */
+        public ProcessUnitBuilder setNodeJsHome(String home) {
+            if (home != null && home.length() > 0) {
+                this.nodejsHome = home;
+            }
+            return this;
         }
         
         /**
@@ -454,7 +472,10 @@ public class ProcessUnit {
          * @return the path, may be empty for unknown
          */
         private String getNodeJsPath() {
-            String result = System.getenv("NODEJS_HOME");
+            String result = nodejsHome;
+            if (null == result) {
+                result = System.getenv("NODEJS_HOME");
+            }
             if (null == result) {
                 AtomicReference<String> res = new AtomicReference<>(result);
                 splitPath(e -> {

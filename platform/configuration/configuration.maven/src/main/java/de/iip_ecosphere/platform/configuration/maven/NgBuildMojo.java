@@ -30,11 +30,15 @@ public class NgBuildMojo extends AbstractLoggingMojo {
 
     @Parameter(property = "configuration.ngBuild.skip", required = false, defaultValue = "false")
     private boolean skip;
+    
+    @Parameter(property = "configuration.ngTest.nodejs", required = false, defaultValue = "")
+    private String nodejs;    
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         if (!skip) {
             ProcessUnit pu = new ProcessUnit.ProcessUnitBuilder("npm install", this)
+                .setNodeJsHome(nodejs)
                 .addArgumentOrScriptCommand("npm")
                 .addArgument("install")
                 .addArgument("--no-progress")

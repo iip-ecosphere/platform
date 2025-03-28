@@ -284,7 +284,7 @@ It can be set up as follows:
 
 # Angular build
 
-For pragmatic reasons, this artifact also contains the `ngBuild` goal (default `compile` phase) for building angular applications. ``npm`` and ``ng`` are eventually qualified with path in the environment variable ``NODEJS_HOME`` or first path entry containing ``nodejs``.
+For pragmatic reasons, this artifact also contains the `ngBuild` goal (default `compile` phase) for building angular applications. ``npm`` and ``ng`` are eventually qualified with the value from the ``nodejs``setting, the value in the environment variable ``NODEJS_HOME`` or the first PATH entry containing ``nodejs``.
 
   ```xml
   <build>
@@ -309,10 +309,11 @@ For pragmatic reasons, this artifact also contains the `ngBuild` goal (default `
 
 It can be configured by:
   - `skip` (`-Dconfiguration.ngBuild.skip=...`, default `false`) skips the execution of this plugin.
+  - `nodejs` (`-Dconfiguration.ngTest.nodejs=...`, default empty) sets the nodejs home (Windows)/bin (Linux) directory
 
 # Angular test
 
-For pragmatic reasons, this artifact also contains the `ngTest` goal (default `test` phase) for building angular applications. ``npm`` and ``ng`` are eventually qualified with path in the environment variable ``NODEJS_HOME`` or first path entry containing ``nodejs``.
+For pragmatic reasons, this artifact also contains the `ngTest` goal (default `test` phase) for building angular applications. ``npm`` and ``ng`` are eventually qualified with the value from the ``nodejs``setting, the value in the environment variable ``NODEJS_HOME`` or the first PATH entry containing ``nodejs``.
 
   ```xml
   <build>
@@ -342,4 +343,4 @@ It can be configured by:
   - `noProgress` (`-Dconfiguration.ngTest.noProgress=...`, default `true`) disables progress output.
   - `headless` (`-Dconfiguration.ngTest.headless=...`, default `true`) enables headless mode.
   - `coverage` (`-Dconfiguration.ngTest.coverage=...`, default `true`) enables code coverage analysis.
-  
+  - `nodejs` (`-Dconfiguration.ngTest.nodejs=...`, default empty) sets the nodejs home (Windows)/bin (Linux) directory

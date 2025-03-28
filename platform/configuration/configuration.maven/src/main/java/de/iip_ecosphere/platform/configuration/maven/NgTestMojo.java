@@ -43,10 +43,14 @@ public class NgTestMojo extends AbstractLoggingMojo {
     @Parameter(property = "configuration.ngTest.coverage", required = false, defaultValue = "true")
     private boolean coverage;
 
+    @Parameter(property = "configuration.ngTest.nodejs", required = false, defaultValue = "")
+    private String nodejs;
+    
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         if (!skip) {
             ProcessUnit pu = new ProcessUnit.ProcessUnitBuilder("ng test", this)
+                .setNodeJsHome(nodejs)
                 .addArgumentOrScriptCommand("ng")
                 .addArgument("test")
                 .addArgument(noWatch, "--no-watch")
