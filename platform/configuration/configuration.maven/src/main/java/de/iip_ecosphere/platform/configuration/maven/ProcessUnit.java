@@ -722,6 +722,13 @@ public class ProcessUnit {
             if (null != path && null != getMavenBinPath()) {
                 path += File.pathSeparator + getMavenBinPath();
             }
+            if (null != nodejsHome && nodejsHome.length() > 0) {
+                if (path == null) {
+                    path = nodejsHome;
+                } else {
+                    path += File.pathSeparator + nodejsHome;
+                }
+            }
             if (null != path) {
                 if (builder.environment().get("PATH") != null) {
                     path += File.pathSeparator + builder.environment().get("PATH");
