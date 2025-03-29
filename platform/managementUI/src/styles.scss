@@ -140,14 +140,40 @@ tr:nth-child(odd) {
   color:$color_poolBlue;
 }
 
+/*.mdc-text-field {
+    color: black !important;
+    --mdc-outlined-text-field-input-text-color: black !important;  
+    --mdc-outlined-text-field-outline-color: $color_deepSea !important;
+    --mdc-outlined-text-field-hover-outline-color: $color_deepSea !important;
+    --mdc-outlined-text-field-focus-outline-color: $color_octoRed !important;
+}*/
+
 //-----------
 
 // sub-menu
-/* TODO(mdc-migration): The following rule targets internal classes of tabs that may no longer apply for the MDC version. */
 .mat-tab-label {
-  color: rgb(0,0,0) !important;
+  //color: rgb(0,0,0) !important;
   //background-color: rgb(203, 203, 203);
   background-color: $color_poolBlue;
+}
+
+// wrapper around text-like fields
+.mat-mdc-text-field-wrapper {
+  color: black;  
+  --mdc-outlined-text-field-input-text-color: black !important;  
+  --mdc-outlined-text-field-outline-color: $color_deepSea !important;
+  --mdc-outlined-text-field-hover-outline-color: $color_deepSea !important;
+}
+
+// select dropdown value
+.mat-mdc-select-value {
+  color: black;
+}
+
+// select dropdown arrow
+.mat-mdc-select-arrow {
+  color: black !important;
+  //filter: hue-rotate(60deg);
 }
 
 .mat-mdc-tab-group.mat-primary .mat-ink-bar, .mat-mdc-tab-nav-bar.mat-primary .mat-ink-bar {

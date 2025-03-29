@@ -27,8 +27,12 @@
   color: sty.$color_lakeGreen !important;
 }
 
-::ng-deep .mat-mdc-tab {
-    background: sty.$color_poolBlue !important;
+::ng-deep .mat-mdc-tab, .mat-focus-indicator, .mdc-tab-indicator--active {
+    background-color: sty.$color_poolBlue !important;
+}
+
+.mdc-tab {
+  background-color: sty.$color_poolBlue !important;
 }
 
 ::ng-deep .mat-mdc-option {    
