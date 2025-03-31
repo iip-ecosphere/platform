@@ -898,9 +898,9 @@ template JavaConnector(Configuration config, JavaCodeArtifact target) extends Da
 
     @DispatchCase
     def generateSpecificSettings(FileConnector conn, JavaCodeMethodCall r) {
-        r.call("setSpecificSetting").stringArg("READ_FILES").stringArg(conn.readFiles);
-        r.call("setSpecificSetting").stringArg("WRITE_FILES").stringArg(conn.writeFiles);
-        r.call("setSpecificSetting").arg("DATA_TIMEDIFF").arg(conn.dataTimeDiff);
+        r.call("setSpecificSetting").stringArg("READ_FILES").stringArg(getStringValueSafe(conn.readFiles, ""));
+        r.call("setSpecificSetting").stringArg("WRITE_FILES").stringArg(getStringValueSafe(conn.writeFiles, ""));
+        r.call("setSpecificSetting").stringArg("DATA_TIMEDIFF").arg(conn.dataTimeDiff);
     }
     
     @DispatchBasis

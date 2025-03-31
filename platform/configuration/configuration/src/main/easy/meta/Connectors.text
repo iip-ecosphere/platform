@@ -172,3 +172,5 @@ Connectors::FileConnector::deviceServiceKey = Refined logical name for the under
 Connectors::FileConnector::readFiles = The data files to read; may be a single file, a folder to take all contained files from or a regular expression. App resources are considered if possible. Identified files are sorted by path/name to determine the processing sequence.
 Connectors::FileConnector::writeFiles = The data files to write to; may be a single file or a folder.
 Connectors::FileConnector::dataTimeDiff = Default time difference between two data points to ingest in ms if not polling is enabled, then "samplingFrequency" counts. May be dynamically superseded by dataTimeDiffProvider or inputHandlers.
+Connectors::FileConnector::inChannel = Input channel name (overridden with fake value).
+Connectors::FileConnector::outChannel = Output channel name (overridden with fake value).

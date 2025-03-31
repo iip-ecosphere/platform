@@ -92,7 +92,7 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
 
         @Override
         public void exception(String msg, Class<?> clazz, String bundleName) {
-            if (allowLogging(msg, clazz, bundleName, LogLevel.FATAL)) {
+            if (allowLogging(msg, clazz, bundleName, LogLevel.ERROR)) {
                 getLogger().error("[" + clazz.getName() + "] " + msg);
             }
         }

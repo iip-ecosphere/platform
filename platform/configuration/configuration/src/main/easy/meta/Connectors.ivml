@@ -95,12 +95,12 @@ project Connectors {
     }
     
     @DispatchBasis
-    def Boolean providerOk(DataTimeDiffProvider provider, Connector conn) = 
+    def Boolean providerOk(DataTimeDiffProvider provider, Service conn) = 
         true;
     
     @DispatchCase
     def Boolean providerOk(JavaDataTimeDiffProvider provider, Connector conn) = 
-        conn.input->exists(t|t.type == provider.type);
+        provider <> null implies conn.input->exists(t|t.type == provider.type);
     
     // -------------------------------------- Data Operations -------------------------------
     
@@ -213,6 +213,10 @@ project Connectors {
        String artifact; // may be empty -> same as connector (or other known artifact)
     }
     
+
+    def Boolean handlerOk(ConnectorInputHandler handler, Service conn) = 
+        true;
+
     // prepared for polymorphic handler types hierarchy
     // handler type must be in input types, otherwise handler is useless (no problem, but also no effect)
     def Boolean handlerOk(ConnectorInputHandler handler, Connector conn) = 
@@ -597,6 +601,8 @@ project Connectors {
            NonEmptyString host = "localhost";
            Port port = 1;
            String deviceServiceKey = "";
+           String inChannel = "file"; // pseudo, otherwise no code
+           String outChannel = "file"; // pseudo, otherwise no code           
        }
        NonEmptyString readFiles;
        String writeFiles;
