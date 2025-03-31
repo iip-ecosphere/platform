@@ -92,17 +92,17 @@ public class AppAas extends TraceToAasService implements iip.interfaces.AppAasIn
         smBuilder.createOperationBuilder(OP_START)
             .addInputVariable("id", Type.STRING)
             .setInvocable(ic.createInvocable(OP_START))
-            .build(Type.NONE);
+            .build();
         smBuilder.createOperationBuilder(OP_SWITCH_AI)
             .setInvocable(ic.createInvocable(OP_SWITCH_AI))
-            .build(Type.NONE);
+            .build();
         smBuilder.createOperationBuilder(OP_QUIT_ROBOT)
             .setInvocable(ic.createInvocable(OP_QUIT_ROBOT))
-            .build(Type.NONE);
+            .build();
         smBuilder.createOperationBuilder(OP_FEEDBACK)
             .addInputVariable("ok", Type.BOOLEAN)
             .setInvocable(ic.createInvocable(OP_FEEDBACK))
-            .build(Type.NONE);
+            .build();
         
         ProtocolServerBuilder psb = factory.createProtocolServerBuilder(
             AasFactory.DEFAULT_PROTOCOL, vabServer.getPort());
