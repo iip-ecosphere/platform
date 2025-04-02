@@ -50,6 +50,8 @@ project Devices {
     // Instantiation shall create installedDependencies.yml with this key and install path!
     compound SystemDependency refines Dependency {
         String key; 
+        String version = "";
+        setOf(refTo(Dependency)) dependencies = {};
     }
     
     compound LinuxSystemDependency refines SystemDependency {
@@ -63,26 +65,41 @@ project Devices {
         sequenceOf(String) bashSetups = {}; // like source some file to get the env right before
     }
 
-    enum JavaVersion {jdk8, jdk11, jdk16}; 
+    enum JavaVersion {jdk8, jdk11, jdk16, jdk17, jdk21}; 
 
     SystemDependency JRE8 = {
-        key = "JAVA8"
+        key = "JAVA8",
+        version = "8"
     };
    
     SystemDependency JDK8 = {
-        key = "JAVA8"
+        key = "JAVA8",
+        version = "8"
     };
 
     SystemDependency JRE11 = {
-        key = "JAVA11"
+        key = "JAVA11",
+        version = "11"
     };
 
     SystemDependency JDK11 = {
-        key = "JAVA11"
+        key = "JAVA11",
+        version = "11"
+    };
+
+    SystemDependency JDK17 = {
+        key = "JAVA17",
+        version = "17.0.10"
+    };
+
+    SystemDependency JDK21 = {
+        key = "JAVA21",
+        version = "21.0.2"
     };
     
     SystemDependency PYTHON2 = {
-        key = "PYTHON2"
+        key = "PYTHON2",
+        version = "2"
     };
 
     SystemDependency CONDA = {
@@ -90,15 +107,20 @@ project Devices {
     };
 
     SystemDependency PYTHON3 = {
-        key = "PYTHON3"
+        key = "PYTHON3",
+        version = "11"
     };
 
     SystemDependency PYTHON38 = {
-        key = "PYTHON38"
+        key = "PYTHON38",
+        dependencies = {refBy(pyyaml60), refBy(pyflakes250), refBy(websockets1102), refBy(pyzbar019), refBy(OpenCVPython45564), refBy(NumPy1201), refBy(Pillow910)},
+        version = "3.8.10"
     };
     
     SystemDependency PYTHON39 = {
-        key = "PYTHON39"
+        key = "PYTHON39",
+        dependencies = {}, // please fill
+        version = "3.9.21" // or whatever worked
     };
    
     compound PythonDependency refines Dependency {      //e.g. numpy 1.21.5
@@ -145,6 +167,11 @@ project Devices {
     PythonDependency pytorch201 = {
        name = "torch",
        version = "2.0.1"
+    };
+
+    PythonDependency pickle4_001 = {
+       name = "pickle4",
+       version = "0.0.1"
     };
 
     setOf(refTo(Dependency)) linuxTestingSoftware = {refBy(linuxTestingMaven)};
@@ -194,14 +221,54 @@ project Devices {
        version = ""
     };
 
+    PythonDependency pyyaml60 = {
+       name = "pyyaml",
+       version = "6.0"
+    };
+
     PythonDependency pyflakesNoVersion = {
        name = "pyflakes",
        version = ""
+    };
+
+    PythonDependency pyflakes250 = {
+       name = "pyflakes",
+       version = "2.5.0"
     };
     
     PythonDependency websocketsNoVersion = {
        name = "websockets",
        version = ""
+    };
+
+    PythonDependency websockets1102 = {
+       name = "websockets",
+       version = "11.0.2"
+    };
+
+    PythonDependency pyzbar019 = {
+       name = "pyzbar",
+       version = "0.1.9"
+    };
+
+    PythonDependency OpenCVPython45564 = {
+       name = "opencv-python",
+       version = "4.5.5.64"
+    };
+    
+    LinuxCommandBasedSystemDependency SysPythonNative = {
+        installCommands = {"apk add make automake gcc g++ subversion python3-dev"}
+    };
+
+    PythonDependency NumPy1201 = { 
+       name = "numpy",
+       version = "1.20.1", 
+       dependencies = {refBy(SysPythonNative)}
+    };
+    
+    PythonDependency Pillow910 = {
+       name = "Pillow",
+       version = "9.1.0"
     };
 
     // ------------------ DeviceId --------------------------- 
@@ -325,6 +392,14 @@ project Devices {
         pyyamlNoVersion;
         pyflakesNoVersion;
         websocketsNoVersion;
+        pyyaml60;
+        pyflakes250;
+        websockets1102;
+        pyzbar019;
+        OpenCVPython45564;
+        SysPythonNative;
+        NumPy1201;
+        Pillow910;
     } but (f|f.bindingTime >= BindingTime.runtimeMon);
 
 }
