@@ -157,7 +157,7 @@ project Applications {
    };
    
    compound TraceToAasOutTransport {
-       NonEmptyString host = null;
+       NonEmptyString host;
        Port port;
        SecuritySettings security = null;
    }
