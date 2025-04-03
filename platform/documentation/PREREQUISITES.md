@@ -8,27 +8,27 @@
 - Maven 3.9.7 in path
 - Python in path with the following packages (required if Python services are used, required for building and basic operations) 
 
-|Python    | 3.8.10 | 3.9.21 | 3.13.2   |
-|----------|--------|-------------------|
-|pyyaml    | 6.0    | 6.0    | in prep. |
-|pyflakes  | 3.3.2  | 3.3.2  |  3.3.2   |
-|websockets| 11.0.2 | 11.0.2 | 11.0.2   |
+| Python     | 3.8.10 | 3.9.21 | 3.13.2   |
+| ---------- | ------ | ------ | -------- |
+| pyyaml     | 6.0    | 6.0    | in prep. |
+| pyflakes   | 3.3.2  | 3.3.2  |  3.3.2   |
+| websockets | 11.0.2 | 11.0.2 | 11.0.2   |
 
 ### Python service setup
 
 Depending on the use of Python packages/libraries by your/used platform services, installation of further Python libraries may be required. Services shall declare their full dependencies in the configuration model, including the required Python version, so that containers can be build automatically from this information. For development, testing or bare metal installation, the Python dependencies above as well as the following dependencies are needed.
 
-|oktoflow Component     |Python        | 3.8.10 |  3.9.21  | 3.13.2   |
-|-----------------------|--------------|--------|---------------------|
-| kiservices.functions  |pyzbar        | 0.1.9  |  6.0     | in prep. |
-| kiservices.functions  |opencv-python | 3.3.2  |  3.3.2   |  3.3.2   |
-| kiservices.functions  |numpy         | 1.20.1 |  1.20.1  | 1.20.1   |
-| kiservices.functions  |pillow        | 9.1.0  |  9.1.0   | in prep. |
-|-----------------------|--------------|--------|----------|----------|
-| flower service/server |flwr          | 1.2.0  | in prep. | in prep. |
-| flower service/server |tensorflow*   | 2.9.0  | in prep. | in prep. |
-| flower service/server |pytorch*      | 2.0.1  | in prep. | in prep. |
-| flower service/server |numpy         | 1.22.0 | in prep. | in prep. |
+| oktoflow Component    | Python        | 3.8.10 |  3.9.21  | 3.13.2   |
+| --------------------- | ------------- | ------ | -------- | -------- |
+| kiservices.functions  | pyzbar        | 0.1.9  |  6.0     | in prep. |
+| kiservices.functions  | opencv-python | 3.3.2  |  3.3.2   |  3.3.2   |
+| kiservices.functions  | numpy         | 1.20.1 |  1.20.1  | 1.20.1   |
+| kiservices.functions  | pillow        | 9.1.0  |  9.1.0   | in prep. |
+| --------------------- | ------------- | ------ | -------- | -------- |
+| flower service/server | flwr          | 1.2.0  | in prep. | in prep. |
+| flower service/server | tensorflow*   | 2.9.0  | in prep. | in prep. |
+| flower service/server | pytorch*      | 2.0.1  | in prep. | in prep. |
+| flower service/server | numpy         | 1.22.0 | in prep. | in prep. |
 
 Alternative dependency within one component are marked by *.
 
