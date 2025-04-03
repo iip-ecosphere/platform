@@ -19,16 +19,8 @@ template PythonBaseReq(IIPEcosphere config, FileArtifact target, sequenceOf(Mesh
             isCondaReq = 1;
         }
         
-        // preliminary fix, just very basic ones, shall also include the remaining -> check versions here
-        //'pyyaml
-        //pyflakes
-        //websockets'
-
         setOf(Dependency) deps = {};
-        setOf(Dependency) platformDeps = config.basicPlatformDependencies -> selectByType(PythonDependency);
-        for (PythonDependency d : platformDeps) {
-            deps.add(d);
-        }
+
         for (PythonService pyService : services) {
             if ((isDefined(pyService.condaEnv) and pyService.condaEnv.length() > 0)) {
                 isCondaService = 1;
@@ -36,7 +28,13 @@ template PythonBaseReq(IIPEcosphere config, FileArtifact target, sequenceOf(Mesh
                 isCondaService = 0;
             }
             if (isCondaService == isCondaReq) {
-                //setOf(Dependency) deps = pyService.dependencies;
+                setOf(Dependency) systemDeps = pyService.dependencies -> selectByType(SystemDependency);
+                for (SystemDependency systemDep : systemDeps) {
+                   for (PythonDependency d : systemDep.dependencies) {
+                      deps.add(d);
+                   }
+                }
+                
                 setOf(Dependency) pyDeps = pyService.dependencies -> selectByType(PythonDependency);
                 setOf(Dependency) serverDeps = pyService.server.dependencies -> selectByType(PythonDependency);
                 for (PythonDependency d : pyDeps) {
