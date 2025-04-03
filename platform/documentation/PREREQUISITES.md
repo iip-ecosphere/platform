@@ -24,7 +24,6 @@ Depending on the use of Python packages/libraries by your/used platform services
 | kiservices.functions  | opencv-python | 3.3.2  |  3.3.2   |  3.3.2   |
 | kiservices.functions  | numpy         | 1.20.1 |  1.20.1  | 1.20.1   |
 | kiservices.functions  | pillow        | 9.1.0  |  9.1.0   | in prep. |
-| --------------------- | ------------- | ------ | -------- | -------- |
 | flower service/server | flwr          | 1.2.0  | in prep. | in prep. |
 | flower service/server | tensorflow*   | 2.9.0  | in prep. | in prep. |
 | flower service/server | pytorch*      | 2.0.1  | in prep. | in prep. |
