@@ -97,17 +97,19 @@ project Devices {
         version = "21.0.2"
     };
     
-    SystemDependency PYTHON2 = {
+    SystemDependency PYTHON2 = { // TODO remove if not needed
         key = "PYTHON2",
+        dependencies = {refBy(pyyamlNoVersion), refBy(pyflakesNoVersion), refBy(websocketsNoVersion)},
         version = "2"
     };
 
-    SystemDependency CONDA = {
+    SystemDependency CONDA = { // symbolic, we use a matching version of the respective Python
         key = "CONDA"
     };
 
-    SystemDependency PYTHON3 = {
+    SystemDependency PYTHON3 = { // TODO remove if not needed
         key = "PYTHON3",
+        dependencies = {refBy(pyyamlNoVersion), refBy(pyflakesNoVersion), refBy(websocketsNoVersion)},
         version = "11"
     };
 
@@ -119,8 +121,8 @@ project Devices {
     
     SystemDependency PYTHON39 = {
         key = "PYTHON39",
-        dependencies = {}, // please fill
-        version = "3.9.21" // or whatever worked
+        dependencies = {refBy(pyyaml60), refBy(pyflakes250), refBy(websockets1102), refBy(pyzbar019), refBy(OpenCVPython45564), refBy(NumPy1201), refBy(Pillow910)}, // TODO please adjust
+        version = "3.9.21" // // TODO please adjust if needed
     };
    
     compound PythonDependency refines Dependency {      //e.g. numpy 1.21.5
@@ -130,7 +132,7 @@ project Devices {
     }
     
     compound MavenDependency refines Dependency {
-        String artifact;
+        ArtifactString artifact;
     }
 
     MavenDependency mvnDefaultLib = {
@@ -214,7 +216,7 @@ project Devices {
        name = "procps"
     };  
    
-    setOf(refTo(Dependency)) basicPlatformDependencies = {refBy(pyyamlNoVersion), refBy(pyflakesNoVersion), refBy(websocketsNoVersion)};
+    setOf(refTo(Dependency)) basicPlatformDependencies = {refBy(pyyamlNoVersion), refBy(pyflakesNoVersion), refBy(websocketsNoVersion)}; // TODO use dependencies of PYTHONXX instead and remove
 
     PythonDependency pyyamlNoVersion = {
        name = "pyyaml",

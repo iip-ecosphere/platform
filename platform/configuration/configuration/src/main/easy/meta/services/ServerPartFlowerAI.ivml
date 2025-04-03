@@ -22,7 +22,7 @@ project ServerPartFlowerAI {
    };
    
    // minimum dependencies
-   setOf(refTo(Dependency)) reqFlowerDependencies = {refBy(PYTHON38), refBy(flowrDependency), refBy(pickle4_001)};
+   setOf(refTo(Dependency)) reqFlowerDependencies = {refBy(PYTHON38), refBy(flowrDependency)};
    
    compound FlowerFederatedAiServer refines PythonServer {
        String transportChannel = "Server-FlowerAi";
