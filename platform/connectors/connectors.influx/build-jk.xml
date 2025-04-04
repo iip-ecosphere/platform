@@ -8,6 +8,5 @@
     <!-- deploy to SSE Mvn repo -->
 	<target name="maven"> 
 	    <maven pomFile="pom.xml" goal="deploy"/>
-		<!--<mvnDeployResolveArtifact folderName="IIP-connectors.influx" pomFile="pom.xml" jarFolder="target" artifactPattern="connectors.influx-*.*.*.jar" />-->
 	</target>
 </project>
