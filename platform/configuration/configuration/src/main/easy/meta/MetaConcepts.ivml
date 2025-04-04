@@ -4,7 +4,7 @@ project MetaConcepts {
     // later usage
     
     const String COPY_PREFIX = "TMP_";
-    typedef NonEmptyString String with (isDefined(NonEmptyString) and size(NonEmptyString) > 0);
+    typedef NonEmptyString String with (ifDefined(NonEmptyString) and size(NonEmptyString) > 0);
 	enum BindingTime {specify = 0, compile = 1, startup = 2, runtimeMon = 3, runtimeEnact = 4};
 	annotate BindingTime bindingTime = BindingTime::compile to MetaConcepts;
     
