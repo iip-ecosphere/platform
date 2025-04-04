@@ -18,6 +18,6 @@
         <mkdir dir="pckg"/>
         <copy file="target/mgtUI.zip" tofile="pckg/IIP-Ecosphere-mgtUi-latest.zip"/>
         <copy file="target/mgtUI.tgz" tofile="pckg/IIP-Ecosphere-mgtUi-latest.tgz"/>
-		<mvnDeployResolveArtifact folderName="IIP-mgtUi" pomFile="pom.xml" jarFolder="target" artifactPattern="managementUi-*.*.*.zip" />
+		<!--<mvnDeployResolveArtifact folderName="IIP-mgtUi" pomFile="pom.xml" jarFolder="target" artifactPattern="managementUi-*.*.*.zip" />-->
 	</target>
 </project>
