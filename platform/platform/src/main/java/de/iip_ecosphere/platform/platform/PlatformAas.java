@@ -101,12 +101,12 @@ public class PlatformAas implements AasContributor {
         smB.createOperationBuilder(NAME_OPERATION_UNDEPLOY)
             .addInputVariable("url", Type.STRING)
             .setInvocable(iCreator.createInvocable(NAME_OPERATION_UNDEPLOY))
-            .build(Type.NONE);
+            .build();
         smB.createOperationBuilder(NAME_OPERATION_UNDEPLOY_WITHID)
             .addInputVariable("url", Type.STRING)
             .addInputVariable("instanceId", Type.STRING)
             .setInvocable(iCreator.createInvocable(NAME_OPERATION_UNDEPLOY))
-            .build(Type.NONE);
+            .build();
         smB.createOperationBuilder(NAME_OPERATION_DEPLOY_ASYNC)
             .addInputVariable("url", Type.STRING)
             .setInvocable(iCreator.createInvocable(NAME_OPERATION_DEPLOY_ASYNC))
@@ -130,7 +130,7 @@ public class PlatformAas implements AasContributor {
             .addInputVariable("name", Type.STRING)
             .addInputVariable("data", Type.STRING)
             .setInvocable(iCreator.createInvocable(NAME_OPERATION_UPLOAD))
-            .build(Type.NONE);
+            .build();
         smB.build();
         
         // just that they are there

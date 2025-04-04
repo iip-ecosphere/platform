@@ -7,7 +7,7 @@
 	
     <!-- deploy to SSE Mvn repo -->
 	<target name="maven"> 
-        <maven pomFile="pom.xml" goal="install">
+        <maven pomFile="pom.xml" goal="deploy">
             <arg value="-Dunpack.force=true"/>
         	<arg value="-Diip.ciBuildId=${build_num}"/> <!-- must be set in jenkins ANT build step -->
         	<arg value="-Dconfiguration.ngTest.nodejs=/var/lib/jenkins/oktoflow/nodejs/bin/" />
