@@ -28,7 +28,7 @@ project AllServicesPartPythonSync {
         output = {{type=refBy(PythonSyncTestOutput)}},
         artifact = "de.iip-ecosphere.platform:examples.pythonSync:" + iipVer,
         kind = ServiceKind::TRANSFORMATION_SERVICE,
-        dependencies = {refBy(PYTHON39)}
+        dependencies = {refBy(PYTHON313)}
     };
     
     Service myPythonSyncReceiverService = JavaService {

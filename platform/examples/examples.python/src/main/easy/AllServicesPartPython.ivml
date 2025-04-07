@@ -27,7 +27,7 @@ project AllServicesPartPython {
         output = {{type=refBy(PythonTestOutput)}},
         artifact = "de.iip-ecosphere.platform:examples.python:" + iipVer,
         kind = ServiceKind::TRANSFORMATION_SERVICE,
-        dependencies = {refBy(PYTHON39)},
+        dependencies = {refBy(PYTHON313)},
         integrationMode = PythonIntegrationMode::websocket_continuous
     };
     
