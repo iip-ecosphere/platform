@@ -7,7 +7,6 @@
     
     <!-- deploy to SSE Mvn repo -->
     <target name="maven"> 
-        <maven pomFile="pom.xml" goal="install"/>
-        <mvnDeployResolveArtifact folderName="test-mqtt-moquette" pomFile="pom.xml" jarFolder="target" artifactPattern="test.mqtt.moquette*.*.*.jar" />
+        <maven pomFile="pom.xml" goal="deploy"/>
     </target>
 </project>
