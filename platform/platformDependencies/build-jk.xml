@@ -7,7 +7,6 @@
 	
     <!-- deploy to SSE Mvn repo -->
 	<target name="maven"> 
-		<maven pomFile="pom.xml" goal="install"/>
-	    <mvnDeployPom folderName="IIP-platformDependencies" pomFile="pom.xml" />
+		<maven pomFile="pom.xml" goal="deploy"/>
 	</target>
 </project>
