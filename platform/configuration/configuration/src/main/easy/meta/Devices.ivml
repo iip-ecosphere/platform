@@ -122,7 +122,13 @@ project Devices {
     SystemDependency PYTHON39 = {
         key = "PYTHON39",
         dependencies = {refBy(pyyaml60), refBy(pyflakes250), refBy(websockets1102), refBy(pyzbar019), refBy(OpenCVPython45564), refBy(NumPy1201), refBy(Pillow910)}, // TODO please adjust
-        version = "3.9.21" // // TODO please adjust if needed
+        version = "3.9.21" // TODO please adjust if needed
+    };
+    
+    SystemDependency PYTHON313 = {
+        key = "PYTHON313",
+        dependencies = {refBy(pyyaml602), refBy(pyflakes250), refBy(websockets1102), refBy(pyzbar019), refBy(OpenCVPython45564), refBy(NumPy224), refBy(Pillow1110)}, // TODO please adjust
+        version = "3.13.2" // TODO please adjust if needed
     };
    
     compound PythonDependency refines Dependency {      //e.g. numpy 1.21.5
@@ -227,6 +233,11 @@ project Devices {
        name = "pyyaml",
        version = "6.0"
     };
+    
+    PythonDependency pyyaml602 = {
+       name = "pyyaml",
+       version = "6.0.2"
+    };
 
     PythonDependency pyflakesNoVersion = {
        name = "pyflakes",
@@ -267,10 +278,20 @@ project Devices {
        version = "1.20.1", 
        dependencies = {refBy(SysPythonNative)}
     };
+
+    PythonDependency NumPy224 = {
+       name = "numpy",
+       version = "2.2.4"
+    };
     
     PythonDependency Pillow910 = {
        name = "Pillow",
        version = "9.1.0"
+    };
+
+    PythonDependency Pillow1110 = {
+       name = "Pillow",
+       version = "11.1.0"
     };
 
     // ------------------ DeviceId --------------------------- 
@@ -373,6 +394,7 @@ project Devices {
         PYTHON3;
         PYTHON38;
         PYTHON39;
+        PYTHON313;
         mvnDefaultLib;        
         tensorflow280;
         tensorflow290;
@@ -402,6 +424,9 @@ project Devices {
         SysPythonNative;
         NumPy1201;
         Pillow910;
+        pyyaml602;
+        NumPy224;
+        Pillow1110;
     } but (f|f.bindingTime >= BindingTime.runtimeMon);
 
 }
