@@ -10,7 +10,7 @@
 
 | Python     | 3.8.10 | 3.9.21 | 3.13.2   |
 | ---------- | ------ | ------ | -------- |
-| pyyaml     | 6.0    | 6.0    | in prep. |
+| pyyaml     | 6.0    | 6.0    |  6.0.2   |
 | pyflakes   | 3.3.2  | 3.3.2  |  3.3.2   |
 | websockets | 11.0.2 | 11.0.2 | 11.0.2   |
 
@@ -20,10 +20,10 @@ Depending on the use of Python packages/libraries by your/used platform services
 
 | oktoflow Component    | Python        | 3.8.10 |  3.9.21  | 3.13.2   |
 | --------------------- | ------------- | ------ | -------- | -------- |
-| kiservices.functions  | pyzbar        | 0.1.9  |  6.0     | in prep. |
+| kiservices.functions  | pyzbar        | 0.1.9  |  0.1.9   |  0.1.9   |
 | kiservices.functions  | opencv-python | 3.3.2  |  3.3.2   |  3.3.2   |
 | kiservices.functions  | numpy         | 1.20.1 |  1.20.1  | 1.20.1   |
-| kiservices.functions  | pillow        | 9.1.0  |  9.1.0   | in prep. |
+| kiservices.functions  | pillow        | 9.1.0  |  9.1.0   | 11.1.0   |
 | flower service/server | flwr          | 1.2.0  | in prep. | in prep. |
 | flower service/server | tensorflow*   | 2.9.0  | in prep. | in prep. |
 | flower service/server | pytorch*      | 2.0.1  | in prep. | in prep. |
