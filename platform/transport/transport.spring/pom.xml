@@ -8,7 +8,7 @@
   
   <parent>
      <groupId>de.iip-ecosphere.platform</groupId>
-     <artifactId>platformDependencies</artifactId>
+     <artifactId>platformDependenciesSpring</artifactId>
      <version>0.7.1-SNAPSHOT</version>
      <relativePath/>
   </parent>
