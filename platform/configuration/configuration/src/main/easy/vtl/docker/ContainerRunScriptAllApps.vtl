@@ -62,7 +62,7 @@ template ContainerRunScriptAllApps(IIPEcosphere config, FileArtifact target, Con
     }
     
     def genPorts(String ports) {
-        if (ports == "ECS") {
+        if (ports == "ECS" or ports == "BOTH") {
             'ECS_PORT=\\$1'
             'if [ -z "\\$ECS_PORT" ]'
             'then'
@@ -70,10 +70,12 @@ template ContainerRunScriptAllApps(IIPEcosphere config, FileArtifact target, Con
             '    while :'
             '    do'
             '        ECS_PORT="`shuf -i \\$LOWERPORT-\\$UPPERPORT -n 1`"'
-            '        ss -lpn | grep -q ":\\$PORT " || break'
+            '        ss -lpn | grep -q ":\\$ECS_PORT " || break'
             '    done'
             'fi'            
-        } else if (ports == "SVC") {
+        }
+        
+        if (ports == "SVC" or ports == "BOTH") {
             'SVC_PORT=\\$1'
             'if [ -z "\\$SVC_PORT" ]'
             'then'
@@ -81,31 +83,9 @@ template ContainerRunScriptAllApps(IIPEcosphere config, FileArtifact target, Con
             '    while :'
             '    do'
             '        SVC_PORT="`shuf -i \\$LOWERPORT-\\$UPPERPORT -n 1`"'
-            '        ss -lpn | grep -q ":\\$PORT " || break'
+            '        ss -lpn | grep -q ":\\$SVC_PORT " || break'
             '    done'
             'fi'            
-        } else if (ports == "BOTH") {
-            'ECS_PORT=\\$1'
-            'if [ -z "\\$ECS_PORT" ]'
-            'then'
-            '    read LOWERPORT UPPERPORT < /proc/sys/net/ipv4/ip_local_port_range'
-            '    while :'
-            '    do'
-            '        ECS_PORT="`shuf -i \\$LOWERPORT-\\$UPPERPORT -n 1`"'
-            '        ss -lpn | grep -q ":\\$PORT " || break'
-            '    done'
-            'fi'
-            ' '
-            'SVC_PORT=\\$2'
-            'if [ -z "\\$SVC_PORT" ]'
-            'then'
-            '    read LOWERPORT UPPERPORT < /proc/sys/net/ipv4/ip_local_port_range'
-            '    while :'
-            '    do'
-            '        SVC_PORT="`shuf -i \\$LOWERPORT-\\$UPPERPORT -n 1`"'
-            '        ss -lpn | grep -q ":\\$PORT " || break'
-            '    done'
-            'fi'
         }
     }
         
