@@ -75,7 +75,12 @@ template ContainerRunScript(IIPEcosphere config, FileArtifact target, Applicatio
         }
         
         if (ports == "SVC" or ports == "BOTH") {
-            'SVC_PORT=\\$1'
+            if (ports == "BOTH") {
+            	'SVC_PORT=\\$2'
+           	} else {
+           		'SVC_PORT=\\$1'
+           	}
+           	
             'if [ -z "\\$SVC_PORT" ]'
             'then'
             '    read LOWERPORT UPPERPORT < /proc/sys/net/ipv4/ip_local_port_range'
