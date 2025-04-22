@@ -783,7 +783,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     vilTemplateProcessor("PythonBaseReq", config, req, elements=elements, dependencies=dependencies, justCommenDep=justCommenDep);
                     Path lastReq = "${deviceBaseDf}/requirements.txt";
                     if (not(sameMd5HashFiles(req, lastReq))){
-                        copy(req, deviceBaseDf);
                         newChangeOnContainerFiles = true;
                     }
                     
@@ -793,7 +792,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                             vilTemplateProcessor("PythonBaseReq", config, condaReq, elements=elements, dependencies=dependencies, justCommenDep=justCommenDep);
                             Path lastCondaReq = "${deviceBaseDf}/conda.${py.condaEnv}.requirements.txt";
                             if (not(sameMd5HashFiles(condaReq, lastCondaReq))){
-                                copy(condaReq, deviceBaseDf);
                                 newChangeOnContainerFiles = true; 
                             }
                         }                    
@@ -804,16 +802,13 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 vilTemplateProcessor("InstalledDependencies", config, instDep, elements=elements, isPython=isPythonService);
                 Path lastInstDep = "${deviceBaseDf}/installedDependencies.yml";
                 if (not(sameMd5HashFiles(instDep, lastInstDep))){
-                    copy(instDep, deviceBaseDf);
                     newChangeOnContainerFiles = true;
                 }
             
                 Path devicesPath = getResourcesFolder() + "/devices";
                 Path devicesGenPath = "${appRoot}/../resources/devices";
-                copy(devicesPath, devicesGenPath);
                 Path lastDevicesPath = "${deviceBaseDf}/resources/devices";
                 if (not(sameMd5HashFolders(devicesPath, lastDevicesPath))){
-                    copy(devicesPath, lastDevicesPath);
                     newChangeOnContainerFiles = true;
                 }
                 
@@ -822,11 +817,9 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     identityStorePath = getResourcesFolder() + "/software/identityStore.yml";
                 }
                 Path identityStoreGenPath = "${appRoot}/../resources";
-                copy(identityStorePath, identityStoreGenPath);
                 Path lastIdentityStoreFilePath = "${deviceBaseDf}/resources/identityStore.yml";
                 if (not(sameMd5HashFiles(identityStorePath, lastIdentityStoreFilePath))){
                     Path lastIdentityStorePath = "${deviceBaseDf}/resources";
-                    copy(identityStorePath, lastIdentityStorePath);
                     newChangeOnContainerFiles = true;
                 }
                 
@@ -837,7 +830,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 Path d = "${appRoot}/../" + dfName;
                 Path lastDockerfile = "${deviceBaseDf}/${dfName}";
                 if (not(sameMd5HashFiles(d, lastDockerfile))){
-                    copy(d, deviceBaseDf);
                     newChangeOnContainerFiles = true;
                 }
                 
@@ -876,7 +868,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                         dfName = createContainerBuildBaseScript(mgr, a, elements, appRoot, isPythonService, justCommenDep);
                         Path lastAllDepRequirements = "${deviceBaseDf}/requirements.txt";
                         if (not(sameMd5HashFiles(allDepRequirements, lastAllDepRequirements))){
-                            copy(allDepRequirements, deviceBaseDf);
                             newChangeOnContainerFiles = true;
                         }
 
@@ -894,7 +885,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                         Path d = "${appRoot}/../" + dfName;
                         Path lastDockerfile = "${deviceBaseDf}/${dfName}";
                         if (not(sameMd5HashFiles(d, lastDockerfile))){
-                            copy(d, deviceBaseDf);
                             newChangeOnContainerFiles = true;
                         }
                     
@@ -949,7 +939,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                             if (newDevicePath.exists()) {
                                 newDevicePath.rename("${srcJarsPath}${deviceSpec}${tmpFolderName}");
                                 if (not(sameMd5HashJarsFolders(newDevicePath, lastDevicePath))){
-                                    copy(newDevicePath, lastDevicePath);
                                     newChangeJarFiles = true;
                                 }
                                 newDevicePath.rename("${srcJarsPath}${deviceSpec}");
@@ -961,7 +950,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                             
                             if (newDevicePath.exists()) {
                                 if (not(sameMd5HashFolders(newDevicePath, lastDevicePath))){
-                                    copy(newDevicePath, lastDevicePath);
                                     if ((cntType == ContainerType::EcsSvc_App) and (srcJarsPath == "ecsServiceMgr")) {
                                         newChangeJarFiles = true;
                                     } else if ((cntType == ContainerType::Ecs_Svc_App) and ((srcJarsPath == "ecsRuntime") or (srcJarsPath == "serviceMgr"))) {
@@ -975,7 +963,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                                 Path pomFile = "${appRoot}/../${srcJarsPath}${deviceSpec}/pom.xml";
                                 Path lastPomFile = "${pomFileDf}/pom.xml";
                                 if (not(sameMd5HashFiles(pomFile, lastPomFile))){
-                                    copy(pomFile, pomFileDf);
                                     newChangeJarFiles = true;
                                 }
                             }
@@ -989,7 +976,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                         Path newScriptFile = "${appRoot}/../${scriptFile}";
                         Path lastScriptFile = "${scriptFileDf}/${scriptFile}";
                         if (not(sameMd5HashFiles(newScriptFile, lastScriptFile))){
-                            copy(newScriptFile, scriptFileDf);
                             if ((cntType == ContainerType::EcsSvc_App) and (scriptFile.startsWith("ecsServiceMgr"))) {
                                 newChangeJarFiles = true;
                             } else if ((cntType == ContainerType::Ecs_Svc_App) and ((scriptFile.startsWith("ecs")) or (scriptFile.startsWith("serviceMgr")))) {
@@ -1003,7 +989,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     Path brokerDf = "${deviceDf}/broker/src";
                     Path brokerPath = "${appRoot}/../broker/src";
                     if (not(sameMd5HashFolders(brokerPath, brokerDf))){
-                        copy(brokerPath, brokerDf);
                         newChangeJarFiles = true;
                     }
 
@@ -1014,7 +999,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                         Path newBrokerFile = "${appRoot}/../broker/${brokerFile}";
                         Path lastBrokerFile = "${brokerFilesDf}/${brokerFile}";
                         if (not(sameMd5HashFiles(newBrokerFile, lastBrokerFile))){
-                            copy(newBrokerFile, brokerFilesDf);
                             newChangeJarFiles = true;
                         }
                     }
@@ -1022,7 +1006,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     Path lastBrokerJars = "${deviceDf}/broker/brokerJars";
                     Path newBrokerJars = "${target}/broker/brokerJars";
                     if (not(sameMd5HashJarsFolders(newBrokerJars, lastBrokerJars))){
-                        copy(newBrokerJars, lastBrokerJars);
                         newChangeJarFiles = true;
                     }
 
@@ -1035,7 +1018,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                                 vilTemplateProcessor("PythonReq", config, req, elements=elements, device=device);
                                 Path lastReq = "${deviceDf}/requirements.txt";
                                 if (not(sameMd5HashFiles(req, lastReq)) and (baseImageCreated == 2)){
-                                    copy(req, deviceDf);
                                     newChangeOnContainerFiles = true;
                                 }
                                 
@@ -1045,7 +1027,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                                         vilTemplateProcessor("PythonReq", config, condaReq, elements=elements, device=device);
                                         Path lastCondaReq = "${deviceDf}/conda.${py.condaEnv}.requirements.txt";
                                         if (not(sameMd5HashFiles(condaReq, lastCondaReq))){
-                                            copy(condaReq, deviceDf);
                                             newChangeOnContainerFiles = true;
                                         }
                                     }
@@ -1061,7 +1042,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                             vilTemplateProcessor("PythonReq", config, req, elements=elements, device=device);
                             Path lastReq = "${deviceDf}/requirements.txt";
                             if (not(sameMd5HashFiles(req, lastReq))){
-                                copy(req, deviceDf);
                                 newChangeOnContainerFiles = true;
                             }
                             
@@ -1071,7 +1051,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                                     vilTemplateProcessor("PythonReq", config, condaReq, elements=elements, device=device);
                                     Path lastCondaReq = "${deviceDf}/conda.${py.condaEnv}.requirements.txt";
                                     if (not(sameMd5HashFiles(condaReq, lastCondaReq))){
-                                        copy(condaReq, deviceDf);
                                         newChangeOnContainerFiles = true;
                                     }
                                 }
@@ -1082,7 +1061,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                         vilTemplateProcessor("InstalledDependencies", config, instDep, elements=elements, isPython=isPythonService, baseImageExist=baseImageCreated);
                         Path lastInstDep = "${deviceDf}/installedDependencies.yml";
                         if (not(sameMd5HashFiles(instDep, lastInstDep))){
-                            copy(instDep, deviceDf);
                             newChangeOnContainerFiles = true;
                         }
                 
@@ -1091,7 +1069,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                         copy(devicesPath, devicesGenPath);
                         Path lastDevicesPath = "${deviceDf}/resources/devices";
                         if (not(sameMd5HashFolders(devicesPath, lastDevicesPath))){
-                            copy(devicesPath, lastDevicesPath);
                             newChangeOnContainerFiles = true;
                         }
 
@@ -1100,11 +1077,9 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                             identityStorePath = getResourcesFolder() + "/software/identityStore.yml";
                         }
                         Path identityStoreGenPath = "${appRoot}/../resources";
-                        copy(identityStorePath, identityStoreGenPath);
                         Path lastIdentityStoreFilePath = "${deviceDf}/resources/identityStore.yml";
                         if (not(sameMd5HashFiles(identityStorePath, lastIdentityStoreFilePath))){
                             Path lastIdentityStorePath = "${deviceDf}/resources";
-                            copy(identityStorePath, lastIdentityStorePath);
                             newChangeOnContainerFiles = true;
                         }
 
@@ -1116,7 +1091,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     vilTemplateProcessor("WrapperScript", config, ws, containerType=cntType); 
                     Path lastWs = "${deviceDf}/wrapper_script.sh";
                     if (not(sameMd5HashFiles(ws, lastWs))){
-                        copy(ws, deviceDf);
                         newChangeOnContainerFiles = true;
                     }
                       
@@ -1125,7 +1099,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     Path d = "${appRoot}/../" + dfName;
                     Path lastDockerfile = "${deviceDf}/${dfName}";
                     if (not(sameMd5HashFiles(d, lastDockerfile))){
-                        copy(d, deviceDf);
                         newChangeOnContainerFiles = true;
                     }
 
@@ -1163,7 +1136,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                             vilTemplateProcessor("WrapperScript", config, ecs_ws, containerType=ContainerType::Ecs);
                             Path lastEcs_Ws = "${deviceDf}/wrapper_script.sh";
                             if (not(sameMd5HashFiles(ecs_ws, lastEcs_Ws))){
-                                copy(ecs_ws, deviceDf);
                                 newChangeOnContainerFiles = true;
                             }                            
                      
@@ -1171,7 +1143,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                             Path ecsD = "${appRoot}/../" + ecsDfName;
                             Path lastDockerEcsfile = "${deviceDf}/${ecsDfName}";
                             if (not(sameMd5HashFiles(ecsD, lastDockerEcsfile))){
-                                copy(ecsD, deviceDf);
                                 newChangeOnContainerFiles = true;
                             }
                             
@@ -1271,7 +1242,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     vilTemplateProcessor("PythonBaseReq", config, req, elements=allElements, dependencies=dependencies, justCommenDep=justCommenDep);
                     Path lastReq = "${deviceBaseDf}/requirements.txt";
                     if (not(sameMd5HashFiles(req, lastReq))){
-                        copy(req, deviceBaseDf);
                         newChangeOnContainerFiles = true;
                     }
                     
@@ -1281,7 +1251,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                             vilTemplateProcessor("PythonBaseReq", config, condaReq, elements=allElements, dependencies=dependencies, justCommenDep=justCommenDep);
                             Path lastCondaReq = "${deviceBaseDf}/conda.${py.condaEnv}.requirements.txt";
                             if (not(sameMd5HashFiles(condaReq, lastCondaReq))){
-                                copy(condaReq, deviceBaseDf);
                                 newChangeOnContainerFiles = true;
                             }
                         }                    
@@ -1292,7 +1261,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 vilTemplateProcessor("InstalledDependencies", config, instDep, elements=allElements, isPython=isPythonService);
                 Path lastInstDep = "${deviceBaseDf}/installedDependencies.yml";
                 if (not(sameMd5HashFiles(instDep, lastInstDep))){
-                    copy(instDep, deviceBaseDf);
                     newChangeOnContainerFiles = true;
                 }
             
@@ -1301,7 +1269,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 copy(devicesPath, devicesGenPath);
                 Path lastDevicesPath = "${deviceBaseDf}/resources/devices";
                 if (not(sameMd5HashFolders(devicesPath, lastDevicesPath))){
-                    copy(devicesPath, lastDevicesPath);
                     newChangeOnContainerFiles = true;
                 }
 
@@ -1314,7 +1281,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 Path lastIdentityStoreFilePath = "${deviceBaseDf}/resources/identityStore.yml";
                 if (not(sameMd5HashFiles(identityStorePath, lastIdentityStoreFilePath))){
                     Path lastIdentityStorePath = "${deviceBaseDf}/resources";
-                    copy(identityStorePath, lastIdentityStorePath);
                     newChangeOnContainerFiles = true;
                 }
                 
@@ -1325,7 +1291,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 Path d = "${target}/" + dfName;
                 Path lastDockerfile = "${deviceBaseDf}/${dfName}";
                 if (not(sameMd5HashFiles(d, lastDockerfile))){
-                    copy(d, deviceBaseDf);
                     newChangeOnContainerFiles = true;
                 }
 
@@ -1363,7 +1328,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                         dfName = createContainerBuildBaseScriptAllApps(mgr, applications, allElements, target, isPythonService, justCommenDep);
                         Path lastAllDepRequirements = "${deviceBaseDf}/requirements.txt";
                         if (not(sameMd5HashFiles(allDepRequirements, lastAllDepRequirements))){
-                            copy(allDepRequirements, deviceBaseDf);
                             newChangeOnContainerFiles = true;
                         }
 
@@ -1381,7 +1345,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                         Path d = "${target}/" + dfName;
                         Path lastDockerfile = "${deviceBaseDf}/${dfName}";
                         if (not(sameMd5HashFiles(d, lastDockerfile))){
-                            copy(d, deviceBaseDf);
                             newChangeOnContainerFiles = true;
                         }
 
@@ -1443,7 +1406,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                                 if (newDevicePath.exists()) {
                                     newDevicePath.rename("${srcJarsPath}${deviceSpec}${tmpFolderName}");
                                     if (not(sameMd5HashJarsFolders(newDevicePath, lastDevicePath))){
-                                        copy(newDevicePath, lastDevicePath);
                                         newChangeJarFiles = true;
                                     }
                                     newDevicePath.rename("${srcJarsPath}${deviceSpec}");
@@ -1455,7 +1417,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                                 
                                 if (newDevicePath.exists()) {
                                     if (not(sameMd5HashFolders(newDevicePath, lastDevicePath))){
-                                        copy(newDevicePath, lastDevicePath);
                                         if ((cntType == ContainerType::EcsSvc_App) and (srcJarsPath == "ecsServiceMgr")) {
                                             newChangeJarFiles = true;
                                         } else if ((cntType == ContainerType::Ecs_Svc_App) and ((srcJarsPath == "ecsRuntime") or (srcJarsPath == "serviceMgr"))) {
@@ -1469,7 +1430,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                                     Path pomFile = "${target}/${srcJarsPath}${deviceSpec}/pom.xml";
                                     Path lastPomFile = "${pomFileDf}/pom.xml";
                                     if (not(sameMd5HashFiles(pomFile, lastPomFile))){
-                                        copy(pomFile, pomFileDf);
                                         newChangeJarFiles = true;
                                     }
                                 }
@@ -1483,7 +1443,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                             Path newScriptFile = "${target}/${scriptFile}";
                             Path lastScriptFile = "${scriptFileDf}/${scriptFile}";
                             if (not(sameMd5HashFiles(newScriptFile, lastScriptFile))){
-                                copy(newScriptFile, scriptFileDf);
                                 if ((cntType == ContainerType::EcsSvc_App) and (scriptFile.startsWith("ecsServiceMgr"))) {
                                     newChangeJarFiles = true;
                                 } else if ((cntType == ContainerType::Ecs_Svc_App) and ((scriptFile.startsWith("ecs")) or (scriptFile.startsWith("serviceMgr")))) {
@@ -1497,7 +1456,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                         Path brokerDf = "${deviceDf}/broker/src";
                         Path brokerPath = "${target}/broker/src";
                         if (not(sameMd5HashFolders(brokerPath, brokerDf))){
-                            copy(brokerPath, brokerDf);
                             newChangeJarFiles = true;
                         }
                         
@@ -1508,7 +1466,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                             Path newBrokerFile = "${target}broker/${brokerFile}";
                             Path lastBrokerFile = "${brokerFilesDf}/${brokerFile}";
                             if (not(sameMd5HashFiles(newBrokerFile, lastBrokerFile))){
-                                copy(newBrokerFile, brokerFilesDf);
                                 newChangeJarFiles = true;
                             }
                         }
@@ -1516,7 +1473,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                         Path lastBrokerJars = "${deviceDf}/broker/brokerJars";
                         Path newBrokerJars = "${target}/broker/brokerJars";
                         if (not(sameMd5HashJarsFolders(newBrokerJars, lastBrokerJars))){
-                            copy(newBrokerJars, lastBrokerJars);
                             newChangeJarFiles = true;
                         }						
 												
@@ -1529,7 +1485,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                                     vilTemplateProcessor("PythonReq", config, req, elements=allElements, device=device);
                                     Path lastReq = "${deviceDf}/requirements.txt";
                                     if (not(sameMd5HashFiles(req, lastReq)) and (baseImageCreated == 2)){
-                                        copy(req, deviceDf);
                                         newChangeOnContainerFiles = true;
                                     }
                                     
@@ -1539,7 +1494,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                                             vilTemplateProcessor("PythonReq", config, condaReq, elements=allElements, device=device);
                                             Path lastCondaReq = "${deviceDf}/conda.${py.condaEnv}.requirements.txt";
                                             if (not(sameMd5HashFiles(condaReq, lastCondaReq))){
-                                                copy(condaReq, deviceDf);
                                                 newChangeOnContainerFiles = true;
                                             }
                                         }
@@ -1556,7 +1510,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                                 vilTemplateProcessor("PythonReq", config, req, elements=allElements, device=device);
                                 Path lastReq = "${deviceDf}/requirements.txt";
                                 if (not(sameMd5HashFiles(req, lastReq))){
-                                    copy(req, deviceDf);
                                     newChangeOnContainerFiles = true;
                                 }
                                 
@@ -1566,7 +1519,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                                         vilTemplateProcessor("PythonReq", config, condaReq, elements=allElements, device=device);
                                         Path lastCondaReq = "${deviceDf}/conda.${py.condaEnv}.requirements.txt";
                                         if (not(sameMd5HashFiles(condaReq, lastCondaReq))){
-                                            copy(condaReq, deviceDf);
                                             newChangeOnContainerFiles = true;
                                         }
                                     }
@@ -1577,7 +1529,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                             vilTemplateProcessor("InstalledDependencies", config, instDep, elements=allElements, isPython=isPythonService);
                             Path lastInstDep = "${deviceDf}/installedDependencies.yml";
                             if (not(sameMd5HashFiles(instDep, lastInstDep))){
-                                copy(instDep, deviceDf);
                                 newChangeOnContainerFiles = true;
                             }
 
@@ -1586,7 +1537,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                             copy(devicesPath, devicesGenPath);
                             Path lastDevicesPath = "${deviceDf}/resources/devices";
                             if (not(sameMd5HashFolders(devicesPath, lastDevicesPath))){
-                                copy(devicesPath, lastDevicesPath);
                                 newChangeOnContainerFiles = true;
                             }                            
 	                    
@@ -1598,8 +1548,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                             copy(identityStorePath, identityStoreGenPath);
                             Path lastIdentityStoreFilePath = "${deviceDf}/resources/identityStore.yml";
                             if (not(sameMd5HashFiles(identityStorePath, lastIdentityStoreFilePath))){
-                                Path lastIdentityStorePath = "${deviceDf}/resources";
-                                copy(identityStorePath, lastIdentityStorePath);
                                 newChangeOnContainerFiles = true;
                             }
 
@@ -1611,7 +1559,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                         vilTemplateProcessor("WrapperScript", config, ws, containerType=cntType); 
                         Path lastWs = "${deviceDf}/wrapper_script.sh";
                         if (not(sameMd5HashFiles(ws, lastWs))){
-                            copy(ws, deviceDf);
                             newChangeOnContainerFiles = true;
                         }
                         
@@ -1620,7 +1567,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                         Path d = "${target}/" + dfName;
                         Path lastDockerfile = "${deviceDf}/${dfName}";
                         if (not(sameMd5HashFiles(d, lastDockerfile))){
-                            copy(d, deviceDf);
                             newChangeOnContainerFiles = true;
                         }
 
@@ -1650,7 +1596,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                             vilTemplateProcessor("WrapperScript", config, ecs_ws, containerType=ContainerType::Ecs);
                             Path lastEcs_Ws = "${deviceDf}/wrapper_script.sh";
                             if (not(sameMd5HashFiles(ecs_ws, lastEcs_Ws))){
-                                copy(ecs_ws, deviceDf);
                                 newChangeOnContainerFiles = true;
                             }    
 
@@ -1658,7 +1603,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                             Path ecsD = "${target}/" + ecsDfName;
                             Path lastDockerEcsfile = "${deviceDf}/${ecsDfName}";
                             if (not(sameMd5HashFiles(ecsD, lastDockerEcsfile))){
-                                copy(ecsD, deviceDf);
                                 newChangeOnContainerFiles = true;
                             }
                             
@@ -1694,14 +1638,21 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
 
     Boolean sameMd5HashFiles(Path newFilePath, Path lastFilePath) = { 
         Boolean result = true;
-        if (not(lastFilePath.exists()) or not(newFilePath.exists())){
+        JsonFileArtifact jfa = "${lastFilePath}.json";
+        JsonNode data = jfa.getData();
+
+        if (not(data.has(newFilePath)) or not(newFilePath.exists())){
             result = false;
         } else {
             FileArtifact newFilePathArtifact = newFilePath; // must exist!
-            FileArtifact lastFilePathArtifact = lastFilePath; // must exist!
-            if (not(newFilePathArtifact.getMd5Hash() == lastFilePathArtifact.getMd5Hash())){
+            String lastFilePathMd5 = data.getValue(newFilePath); // must exist!
+            
+            if (not(newFilePathArtifact.getMd5Hash() == lastFilePathMd5)){
                 result = false;
             }
+        }
+        if (not(result)){
+            vilTemplateProcessor("StoreMd5Hash", config, jfa, path=newFilePath);
         }
         
         result;
@@ -1709,27 +1660,27 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     
     Boolean sameMd5HashJarsFolders(Path newFilePath, Path lastFilePath) = { 
         setOf(FileArtifact) newPathArtifactsSet = newFilePath.selectAll();
-        setOf(FileArtifact) lastPathArtifactsSet = lastFilePath.selectAll();
 
         Boolean result = true;
+        JsonFileArtifact jfa = "${lastFilePath}.json";
+        JsonNode data = jfa.getData();
         
         for (FileArtifact file : newPathArtifactsSet){
             if (not((file.getName().startsWith("de.iip-ecosphere.platform")) and (file.getName().find(".exec-") != -1))) {
-                FileArtifact findFile;
-                String fileExist = "No";
+                Boolean fileResult = true;
             
-                for (FileArtifact newFile : lastPathArtifactsSet){
-                    if (file.getName() == newFile.getName()){
-                        findFile = newFile;
-                        fileExist = "Yes";
+                if (data.has(file.getPath())){
+                    if (not(file.getMd5Hash() == data.getValue(file.getPath()))){
+                        fileResult = false;
                     }
+                } else {
+                	fileResult = false;
                 }
-            
-                if (fileExist == "No"){
-                    result = false;
-                } else if (not(file.getMd5Hash() == findFile.getMd5Hash())){
-                    result = false;
-                }
+            	
+                if (not(fileResult)){
+                 	result = false;
+            		vilTemplateProcessor("StoreMd5Hash", config, jfa, path=file.getPath());
+       			}
             }
         }
         
@@ -1738,26 +1689,26 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     
     Boolean sameMd5HashFolders(Path newFilePath, Path lastFilePath) = { 
         setOf(FileArtifact) newPathArtifactsSet = newFilePath.selectAll();
-        setOf(FileArtifact) lastPathArtifactsSet = lastFilePath.selectAll();
 
         Boolean result = true;
+        JsonFileArtifact jfa = "${lastFilePath}.json";
+        JsonNode data = jfa.getData();
         
         for (FileArtifact file : newPathArtifactsSet){
-            FileArtifact findFile;
-            String fileExist = "No";
+            Boolean fileResult = true;
             
-            for (FileArtifact newFile : lastPathArtifactsSet){
-                if (file.getName() == newFile.getName()){
-                    findFile = newFile;
-                    fileExist = "Yes";
+            if (data.has(file.getPath())){
+            	if (not(file.getMd5Hash() == data.getValue(file.getPath()))){
+                    fileResult = false;
                 }
+            } else {
+            	fileResult = false;
             }
             
-            if (fileExist == "No"){
+            if (not(fileResult)){
                 result = false;
-            } else if (not(file.getMd5Hash() == findFile.getMd5Hash())){
-                result = false;
-            }
+        		vilTemplateProcessor("StoreMd5Hash", config, jfa, path=file.getPath());
+   			}
         }
         
         result;
@@ -1818,7 +1769,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 lastDevicePath = "${deviceSourcesDf}/${srcJarsPath}";
                 if (newDevicePath.exists()) {
                     if (not(sameMd5HashJarsFolders(newDevicePath, lastDevicePath))){
-                        copy(newDevicePath, lastDevicePath);
                         newChangeJarFiles = true;
                     }
                 }
@@ -1835,7 +1785,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 
                 if (newDevicePath.exists()) {
                     if (not(sameMd5HashFolders(newDevicePath, lastDevicePath))){
-                        copy(newDevicePath, lastDevicePath);
                         newChangeJarFiles = true;
                     }
         
@@ -1843,7 +1792,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     Path pomFile = "${target}/${srcJarsPath}/pom.xml";
                     Path lastPomFile = "${pomFileDf}/pom.xml";
                     if (not(sameMd5HashFiles(pomFile, lastPomFile))){
-                        copy(pomFile, pomFileDf);
                         newChangeJarFiles = true;
                     }
                     
@@ -1852,7 +1800,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                         Path newServerJs = "${target}/${srcJarsPath}/server.js";
                         Path lastserverJs = "${serverJsDf}/server.js";
                         if (not(sameMd5HashFiles(newServerJs, lastserverJs))){
-                            copy(newServerJs, serverJsDf);
                             newChangeJarFiles = true;
                         }
                     }
@@ -1865,7 +1812,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
             Path newScriptFile = "${target}/${scriptFile}";
             Path lastScriptFile = "${scriptFileDf}/${scriptFile}";
             if (not(sameMd5HashFiles(newScriptFile, lastScriptFile))){
-                copy(newScriptFile, scriptFileDf);
                 newChangeJarFiles = true;
             }
         }
@@ -1873,7 +1819,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         Path brokerDf = "${deviceDf}/broker/src";
         Path brokerPath = "${target}/broker/src";
         if (not(sameMd5HashFolders(brokerPath, brokerDf))){
-            copy(brokerPath, brokerDf);
             newChangeJarFiles = true;
         }
         
@@ -1884,7 +1829,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
             Path newBrokerFile = "${target}/broker/${brokerFile}";
             Path lastBrokerFile = "${brokerFilesDf}/${brokerFile}";
             if (not(sameMd5HashFiles(newBrokerFile, lastBrokerFile))){
-                copy(newBrokerFile, brokerFilesDf);
                 newChangeJarFiles = true;
             }
         }
@@ -1892,7 +1836,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         Path lastBrokerJars = "${deviceDf}/broker/brokerJars";
         Path newBrokerJars = "${target}/broker/brokerJars";
         if (not(sameMd5HashJarsFolders(newBrokerJars, lastBrokerJars))){
-            copy(newBrokerJars, lastBrokerJars);
             newChangeJarFiles = true;
         }
         
@@ -1906,7 +1849,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         vilTemplateProcessor("PythonReqPlatform", config, req, text=requirementsText );
         Path lastReq = "${deviceDf}/requirements.txt";
         if (not(sameMd5HashFiles(req, lastReq))){
-            copy(req, deviceDf);
             newChangeOnContainerFiles = true;
         }
 
@@ -1917,7 +1859,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         vilTemplateProcessor("InstalledDependencies", config, instDep, elements=allElements, isPython=isPythonService);
         Path lastInstDep = "${deviceDf}/installedDependencies.yml";
         if (not(sameMd5HashFiles(instDep, lastInstDep))){
-            copy(instDep, deviceDf);
             newChangeOnContainerFiles = true;
         }
 
@@ -1928,7 +1869,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         vilTemplateProcessor("WrapperScriptPlatform", config, ws); 
         Path lastWs = "${deviceDf}/wrapper_script_platform.sh";
         if (not(sameMd5HashFiles(ws, lastWs))){
-            copy(ws, deviceDf);
             newChangeOnContainerFiles = true;
         }
 
@@ -1937,7 +1877,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         copy(devicesPath, devicesGenPath);
         Path lastDevicesPath = "${deviceDf}/resources/devices";
         if (not(sameMd5HashFolders(devicesPath, lastDevicesPath))){
-            copy(devicesPath, lastDevicesPath);
             newChangeOnContainerFiles = true;
         }                            
 	    
@@ -1949,8 +1888,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         copy(identityStorePath, identityStoreGenPath);
         Path lastIdentityStoreFilePath = "${deviceDf}/resources/identityStore.yml";
         if (not(sameMd5HashFiles(identityStorePath, lastIdentityStoreFilePath))){
-            Path lastIdentityStorePath = "${deviceDf}/resources";
-            copy(identityStorePath, lastIdentityStorePath);
             newChangeOnContainerFiles = true;
         }
         
@@ -1959,7 +1896,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         Path d = "${target}/" + dfName;
         Path lastDockerfile = "${deviceDf}/${dfName}";
         if (not(sameMd5HashFiles(d, lastDockerfile))){
-            copy(d, deviceDf);
             newChangeOnContainerFiles = true;
         }
 
