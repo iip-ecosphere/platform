@@ -15,20 +15,20 @@ package de.iip_ecosphere.platform.support.function;
 import java.io.IOException;
 
 /**
- * A consumer that may throw an {@link IOException}.
+ * A supplier that may throw an {@link IOException}.
  * 
- * @param <T> the type of the input to the operation
+ * @param <T> the type of results supplied by this supplier
  * @author Holger Eichelberger, SSE
  */
 @FunctionalInterface
-public interface IOConsumer<T> {
+public interface IOSupplier<T> {
 
     /**
-     * Performs this operation on the given argument.
+     * Gets a result.
      *
-     * @param input the input argument
+     * @return a result
      * @throws IOException if accepting fails for some reason
      */
-    void accept(T input) throws IOException;
-    
+    T get() throws IOException;
+
 }
